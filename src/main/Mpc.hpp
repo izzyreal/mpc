@@ -6,7 +6,7 @@
 
 #include <disk/DiskController.hpp>
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <Logger.hpp>
 
@@ -56,8 +56,7 @@ namespace mpc::sampler {
 }
 
 namespace mpc {
-    class Mpc
-            : public moduru::observer::Observable {
+    class Mpc : public Observable {
     private:
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<controls::Controls> controls;

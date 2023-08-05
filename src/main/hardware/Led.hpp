@@ -1,13 +1,13 @@
 #pragma once
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <string>
 
 namespace mpc::hardware
 {
 	class Led
-		: public moduru::observer::Observable
+		: public Observable
 	{
 
 	private:

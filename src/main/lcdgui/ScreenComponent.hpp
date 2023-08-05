@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.hpp"
-#include <observer/Observer.hpp>
+#include <Observer.hpp>
 
 #include <controls/BaseControls.hpp>
 
@@ -23,7 +23,7 @@
 namespace mpc::lcdgui
 {
 	class ScreenComponent
-		: public Component, public moduru::observer::Observer
+		: public Component, public Observer
 	{
 
 	private:

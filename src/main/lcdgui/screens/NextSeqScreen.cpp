@@ -206,7 +206,7 @@ void NextSeqScreen::displayTiming()
 	findField("timing")->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }
 
-void NextSeqScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void NextSeqScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

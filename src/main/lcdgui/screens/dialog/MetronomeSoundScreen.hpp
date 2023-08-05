@@ -27,7 +27,7 @@ namespace mpc::lcdgui::screens::dialog
 		void open() override;
 		void close() override;
 
-		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
+		void update(Observable* o, Message message) override;
 
 	private:
 		std::vector<std::string> soundNames = { "CLICK", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };

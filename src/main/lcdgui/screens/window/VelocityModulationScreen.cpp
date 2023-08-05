@@ -84,7 +84,7 @@ void VelocityModulationScreen::displayVeloLevel()
 	findField("velolevel")->setTextPadded(sampler->getLastNp(program.get())->getVeloToLevel(), " ");
 }
 
-void VelocityModulationScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void VelocityModulationScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 

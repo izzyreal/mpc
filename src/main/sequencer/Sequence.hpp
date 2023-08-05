@@ -1,5 +1,5 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 #include <Mpc.hpp>
 
 #include <memory>
@@ -17,7 +17,7 @@ class Sequencer;
 namespace mpc::sequencer {
 
 class Sequence final
-: public moduru::observer::Observable
+: public Observable
 {
     
 private:

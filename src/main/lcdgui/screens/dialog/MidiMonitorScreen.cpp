@@ -60,7 +60,7 @@ void MidiMonitorScreen::initTimer(std::weak_ptr<mpc::lcdgui::Label> label)
 	blinkThread = std::thread(&MidiMonitorScreen::static_blink, this, label);
 }
 
-void MidiMonitorScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void MidiMonitorScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

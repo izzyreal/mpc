@@ -70,7 +70,7 @@ void VeloPitchScreen::displayVelo()
 	findField("velo")->setText("127");
 }
 
-void VeloPitchScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void VeloPitchScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 

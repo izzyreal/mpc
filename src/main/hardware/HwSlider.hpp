@@ -1,12 +1,12 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc { class Mpc; }
 
 namespace mpc::hardware {
 
 	class Slider
-		: public moduru::observer::Observable
+		: public Observable
 	{
 
 	private:

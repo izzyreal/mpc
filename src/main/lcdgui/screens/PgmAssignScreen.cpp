@@ -422,7 +422,7 @@ void PgmAssignScreen::displayPad()
 	findField("pad")->setText(sampler->getPadName(mpc.getPad()));
 }
 
-void PgmAssignScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void PgmAssignScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

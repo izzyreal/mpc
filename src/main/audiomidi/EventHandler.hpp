@@ -1,5 +1,5 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Event.hpp>
@@ -11,7 +11,7 @@
 namespace mpc::audiomidi {
 
 	class EventHandler final
-		: public moduru::observer::Observable
+		: public Observable
 	{
 
 	private:

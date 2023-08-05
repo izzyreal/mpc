@@ -50,7 +50,7 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable*, moduru::observer::Message message) override;
+		void update(Observable*, Message message) override;
 
 	private:
 		void displayTempo();

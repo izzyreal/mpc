@@ -1,8 +1,8 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc::sampler {
-	class Sound : public moduru::observer::Observable
+	class Sound : public Observable
 	{
 
 	private:

@@ -116,7 +116,7 @@ void ChannelSettingsScreen::turnWheel(int i)
 	}
 }
 
-void ChannelSettingsScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void ChannelSettingsScreen::update(Observable* o, Message message)
 {
 	init();
 

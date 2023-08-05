@@ -1,7 +1,7 @@
 #pragma once
 
 #include <hardware/HwComponent.hpp>
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc {
     class Mpc;
@@ -14,7 +14,7 @@ namespace mpc::controls {
 namespace mpc::hardware {
     class HwPad
             : public HwComponent
-                    , public moduru::observer::Observable
+                    , public Observable
     {
 
     private:

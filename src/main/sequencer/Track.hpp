@@ -4,7 +4,7 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include "thirdp/concurrentqueue.h"
 #include <memory>
@@ -18,7 +18,7 @@ namespace mpc::sequencer {
     class FrameSeq;
 
 class Track : 
-    public moduru::observer::Observable
+    public Observable
 {
     
 private:

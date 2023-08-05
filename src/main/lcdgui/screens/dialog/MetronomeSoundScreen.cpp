@@ -229,7 +229,7 @@ void MetronomeSoundScreen::turnWheel(int i)
     }
 }
 
-void MetronomeSoundScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void MetronomeSoundScreen::update(Observable* o, Message message)
 {
     init();
 

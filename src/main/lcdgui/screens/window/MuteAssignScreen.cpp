@@ -105,7 +105,7 @@ void MuteAssignScreen::displayNote1()
 	findField("note1")->setText(std::to_string(note1) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
-void MuteAssignScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void MuteAssignScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

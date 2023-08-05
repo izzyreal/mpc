@@ -1,6 +1,6 @@
 #pragma once
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <vector>
 #include <memory>
@@ -25,7 +25,7 @@ namespace mpc::hardware
 
 class PadAndButtonKeyboard;
 
-class Hardware final : public moduru::observer::Observable
+class Hardware final : public Observable
 {
 
 private:

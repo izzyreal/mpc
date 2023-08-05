@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens
 	public:
 		void right() override;
 		void function(int i) override;
-		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
+		void update(Observable* o, Message message) override;
 		void open() override;
 		void close() override;
         void pad(int padIndexWithBank, int velo) override;

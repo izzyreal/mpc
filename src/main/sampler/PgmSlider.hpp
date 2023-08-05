@@ -1,10 +1,10 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc::sampler
 {
 	class PgmSlider
-		: public moduru::observer::Observable
+		: public Observable
 	{
 
 	private:

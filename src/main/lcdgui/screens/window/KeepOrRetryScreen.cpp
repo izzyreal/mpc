@@ -138,7 +138,7 @@ void KeepOrRetryScreen::displayAssignToNote()
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }
 
-void KeepOrRetryScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void KeepOrRetryScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

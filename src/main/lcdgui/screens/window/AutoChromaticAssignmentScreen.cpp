@@ -178,7 +178,7 @@ void AutoChromaticAssignmentScreen::displayProgramName()
     findField("program-name")->setText(newName);
 }
 
-void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void AutoChromaticAssignmentScreen::update(Observable* observable, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

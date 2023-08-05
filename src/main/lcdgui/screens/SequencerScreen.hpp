@@ -59,7 +59,7 @@ namespace mpc::lcdgui::screens
 		void displayNextSq();
 
 	public:
-		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
+		void update(Observable* o, Message message) override;
 
 		void pressEnter() override;
 		void function(int i) override;

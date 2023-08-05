@@ -186,7 +186,7 @@ void LoadASoundScreen::displayAssignToNote()
 	findField("assign-to-note")->setText(noteName + "/" + padName);
 }
 
-void LoadASoundScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void LoadASoundScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 	if (msg == "note")

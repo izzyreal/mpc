@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
 	public:
         KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex);
 
-        void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
+        void update(Observable* o, Message message) override;
 
         void open() override;
         void close() override;

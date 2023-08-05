@@ -1,10 +1,10 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc::sequencer
 {
 	class Event
-		: public moduru::observer::Observable
+		: public Observable
 	{
 	public:
         bool dontDelete = false;

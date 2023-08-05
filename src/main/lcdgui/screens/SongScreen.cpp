@@ -396,7 +396,7 @@ void SongScreen::setLoop(bool b)
 	displayLoop();
 }
 
-void SongScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void SongScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 

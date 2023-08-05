@@ -1,5 +1,5 @@
 #pragma once
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc::lcdgui::screens::window
 {

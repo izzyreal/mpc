@@ -1,11 +1,11 @@
 #pragma once
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc::sequencer {
 
     class TimeSignature
-            : public moduru::observer::Observable
+            : public Observable
     {
 
     private:

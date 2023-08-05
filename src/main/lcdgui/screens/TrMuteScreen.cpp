@@ -202,7 +202,7 @@ void TrMuteScreen::refreshTracks()
 	}
 }
 
-void TrMuteScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void TrMuteScreen::update(Observable* o, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 

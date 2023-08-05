@@ -1,6 +1,6 @@
 #pragma once
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/MidiClockEvent.hpp>
@@ -18,7 +18,7 @@ namespace mpc::audiomidi {
 
 namespace mpc::audiomidi {
     class MidiInput :
-        public moduru::observer::Observable,
+        public Observable,
         public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>>
     {
     private:

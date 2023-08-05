@@ -64,7 +64,7 @@ void VeloEnvFilterScreen::turnWheel(int i)
 	}
 }
 
-void VeloEnvFilterScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void VeloEnvFilterScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 

@@ -314,7 +314,7 @@ int SampleScreen::getMonitor()
 	return monitor;
 }
 
-void SampleScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void SampleScreen::update(Observable* o, Message message)
 {
 	if (dynamic_cast<mpc::audiomidi::SoundRecorder*>(o) != nullptr)
 	{

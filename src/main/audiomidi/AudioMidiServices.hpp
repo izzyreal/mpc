@@ -8,7 +8,7 @@
 #include "engine/Drum.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <set>
 #include <memory>
@@ -49,7 +49,7 @@ namespace mpc::audiomidi
 {
 
 	class AudioMidiServices final
-		: public moduru::observer::Observable
+		: public Observable
 	{
 
 	private:

@@ -41,7 +41,7 @@ namespace mpc::lcdgui::screens
 		void close() override;
         void openWindow() override;
 
-		void update(moduru::observer::Observable*, moduru::observer::Message message) override;
+		void update(Observable*, Message message) override;
 
         void setFromNote(int i);
 

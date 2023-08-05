@@ -1,12 +1,12 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 namespace mpc::lcdgui::screens {
 
 class OthersScreen
-: public mpc::lcdgui::ScreenComponent, public moduru::observer::Observable
+: public mpc::lcdgui::ScreenComponent, public Observable
 {
   
 private:

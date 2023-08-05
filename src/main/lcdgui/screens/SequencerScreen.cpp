@@ -364,7 +364,7 @@ void SequencerScreen::displayTiming()
 	findField("timing")->setText(timingCorrectNames[noteValue]);
 }
 
-void SequencerScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void SequencerScreen::update(Observable* o, Message message)
 {
 	if (sequence.lock())
 		sequence.lock()->deleteObserver(this);

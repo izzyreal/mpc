@@ -1,7 +1,7 @@
 #pragma once
 #include <sequencer/Sequence.hpp>
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -22,7 +22,7 @@ namespace mpc::sequencer
 namespace mpc::sequencer
 {
 	class Sequencer final
-		: public moduru::observer::Observable
+		: public Observable
 	{
 
 	public:

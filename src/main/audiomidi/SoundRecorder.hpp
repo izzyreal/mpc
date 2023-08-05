@@ -8,7 +8,7 @@
 
 #include "circular_buffer.hpp"
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <memory>
 #include <atomic>
@@ -26,7 +26,7 @@ namespace mpc::audiomidi
 {
 	class SoundRecorder
 		: public AudioProcess
-		, public moduru::observer::Observable
+		, public Observable
 	{
 
 	private:

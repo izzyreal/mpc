@@ -96,7 +96,7 @@ void AssignmentViewScreen::turnWheel(int i)
     displayPad(lastPad->getIndex() % 16);
 }
 
-void AssignmentViewScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void AssignmentViewScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

@@ -182,7 +182,7 @@ void PgmParamsScreen::openWindow()
 	}
 }
 
-void PgmParamsScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
+void PgmParamsScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <observer/Observable.hpp>
+#include <Observer.hpp>
 
 #include <hardware/HwComponent.hpp>
 
@@ -18,7 +18,7 @@ namespace mpc::hardware {
 
 class Button
 : public mpc::hardware::HwComponent
-, public moduru::observer::Observable
+, public Observable
 {
     
 private:

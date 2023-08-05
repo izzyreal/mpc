@@ -149,7 +149,7 @@ void NextSeqPadScreen::refreshSeqs()
 	}
 }
 
-void NextSeqPadScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
+void NextSeqPadScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
 	if (msg == "bank")

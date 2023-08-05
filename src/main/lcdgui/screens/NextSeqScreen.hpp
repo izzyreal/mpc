@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens
 
 		NextSeqScreen(mpc::Mpc& mpc, const int layerIndex);
 		
-		void update(moduru::observer::Observable*, moduru::observer::Message) override;
+		void update(Observable*, Message) override;
 		void open() override;
 		void close() override;
 
