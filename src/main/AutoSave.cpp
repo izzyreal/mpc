@@ -16,7 +16,7 @@
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
 
-#include "lang/StrUtil.hpp"
+#include <StrUtil.hpp>
 
 using namespace mpc;
 using namespace mpc::file::all;
