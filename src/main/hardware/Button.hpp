@@ -5,6 +5,7 @@
 #include <hardware/HwComponent.hpp>
 
 #include <string>
+#include <memory>
 
 namespace mpc {
 class Mpc;

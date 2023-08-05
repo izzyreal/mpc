@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <hardware/HwComponent.hpp>
 #include <Observer.hpp>
 

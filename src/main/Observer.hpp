@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <utility>
+#include <variant>
+#include <vector>
 
 namespace mpc {
 class Observable;
