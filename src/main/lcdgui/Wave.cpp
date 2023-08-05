@@ -2,8 +2,6 @@
 
 #include <Util.hpp>
 
-#include <math/Math.hpp>
-
 #include "Bressenham.hpp"
 
 #include <cmath>
@@ -144,10 +142,10 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 	
 		if (sample > 0)
 		{
-			peakPos = moduru::math::Math::maxf(peakPos, sample);
+			peakPos = std::fmax(peakPos, sample);
 		}
 		else if (sample < 0) {
-			peakNeg = moduru::math::Math::minf(peakNeg, sample);
+			peakNeg = std::fmin(peakNeg, sample);
 		}
 	}
 
