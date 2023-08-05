@@ -6,7 +6,7 @@
 
 #include "MonoResampler.hpp"
 
-#include <collections/TSCircularBuffer.hpp>
+#include "circular_buffer.hpp"
 
 #include <observer/Observable.hpp>
 
