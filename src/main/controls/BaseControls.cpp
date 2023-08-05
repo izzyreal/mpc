@@ -9,6 +9,7 @@
 #include <hardware/TopPanel.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 #include <audiomidi/EventHandler.hpp>
 
 #include <sampler/Pad.hpp>
@@ -487,12 +488,25 @@ void BaseControls::rec()
 
     auto controls = mpc.getControls();
     
-    if (controls->isRecPressed())
+    if (controls->isRecPressed(/*includeLocked=*/false))
     {
         return;
     }
 
     controls->setRecPressed(true);
+
+    controls->setRecLocked(false);
+
+    const auto rate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+    const auto seconds_2 = rate * 2;
+
+    mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames([&](int /*bufferOffset*/){
+        const auto myControls = mpc.getControls();
+        if (myControls->isRecPressed(/*includeLocked=*/false))
+        {
+            myControls->setRecLocked(true);
+        }
+    }, seconds_2);
 
     auto hw = mpc.getHardware();
     
@@ -518,10 +532,28 @@ void BaseControls::overDub()
     }
 
     auto controls = mpc.getControls();
+
+    if (controls->isOverDubPressed(/*includeLocked=*/false))
+    {
+        return;
+    }
+
     controls->setOverDubPressed(true);
 
+    controls->setOverDubLocked(false);
+
+    const auto rate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+    const auto seconds_2 = rate * 2;
+
+    mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames([&](int /*bufferOffset*/){
+        const auto myControls = mpc.getControls();
+        if (myControls->isOverDubPressed(/*includeLocked=*/false))
+        {
+            myControls->setOverDubLocked(true);
+        }
+    }, seconds_2);
+
     auto hw = mpc.getHardware();
-    
 
     if (sequencer->isRecordingOrOverdubbing())
     {
