@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string>
 
-namespace moduru {
+namespace mpc {
 
 	class Logger {
 
@@ -25,5 +25,5 @@ namespace moduru {
 	};
 }
 
-#define MLOG(arg) (moduru::Logger::l.log(arg))
+#define MLOG(arg) (mpc::Logger::l.log(arg))
 #endif

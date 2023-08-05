@@ -1,12 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include <Logger.hpp>
+#include "Logger.hpp"
 
 #include <string>
 
 #include "mpc_fs.hpp"
 
-using namespace moduru;
-using namespace std;
+using namespace mpc;
 
 Logger::Logger()
 {
