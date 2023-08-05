@@ -1,7 +1,6 @@
 #include "NextSeqPadScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 NextSeqPadScreen::NextSeqPadScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "next-seq-pad", layerIndex)

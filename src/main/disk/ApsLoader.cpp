@@ -17,7 +17,7 @@
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <stdexcept>
 
@@ -28,7 +28,6 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::aps;
-using namespace moduru::lang;
 
 void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
 {

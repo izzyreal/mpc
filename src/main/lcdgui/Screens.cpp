@@ -159,7 +159,7 @@
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 #include <lcdgui/screens/window/VmpcMidiPresetsScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <cmrc/cmrc.hpp>
 #include <string_view>
@@ -173,7 +173,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::lang;
 using namespace rapidjson;
 
 Screens::Screens(mpc::Mpc &mpc)

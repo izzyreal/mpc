@@ -2,10 +2,9 @@
 
 #include <sequencer/Sequence.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 ChangeTsigScreen::ChangeTsigScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "change-tsig", layerIndex)

@@ -27,7 +27,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 
 const int EVENT_ROW_COUNT = 4;
 

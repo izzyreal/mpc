@@ -4,7 +4,7 @@
 
 #include <VecUtil.hpp>
 #include <file/ByteUtil.hpp>
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::file::sndreader;
 
@@ -39,7 +39,7 @@ std::string SndHeaderReader::getName()
 	}
 
 
-	return moduru::lang::StrUtil::trim(name);
+	return StrUtil::trim(name);
 }
 
 int SndHeaderReader::getLevel()

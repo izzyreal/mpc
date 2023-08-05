@@ -9,7 +9,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "save-all-file", layerIndex)

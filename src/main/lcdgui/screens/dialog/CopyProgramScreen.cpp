@@ -1,7 +1,6 @@
 #include "CopyProgramScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "copy-program", layerIndex)

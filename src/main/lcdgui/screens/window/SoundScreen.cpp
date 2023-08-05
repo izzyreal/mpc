@@ -3,7 +3,6 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 SoundScreen::SoundScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "sound", layerIndex)

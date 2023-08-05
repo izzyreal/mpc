@@ -12,7 +12,7 @@
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <Logger.hpp>
 
 using namespace mpc::nvram;
@@ -21,7 +21,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
-using namespace moduru::lang;
 
 VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc& mpc, int layerIndex)
 : ScreenComponent(mpc, "vmpc-midi", layerIndex)

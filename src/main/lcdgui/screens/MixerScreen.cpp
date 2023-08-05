@@ -15,7 +15,6 @@ using namespace mpc::controls;
 using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
-using namespace moduru::lang;
 
 MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "mixer", layerIndex)

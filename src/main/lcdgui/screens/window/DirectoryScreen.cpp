@@ -18,7 +18,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::lang;
 
 DirectoryScreen::DirectoryScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "directory", layerIndex)
@@ -566,7 +565,7 @@ void DirectoryScreen::displayRightFields()
 		else
 		{
 			auto fileName = fs::path(disk->getFileName(i + yOffset1));
-			auto name = moduru::lang::StrUtil::padRight(fileName.stem().string(), " ", 16);
+			auto name = StrUtil::padRight(fileName.stem().string(), " ", 16);
 			auto ext = fileName.extension().string();
 
 			findField("b" + std::to_string(i))->setText(name + ext);
@@ -939,5 +938,5 @@ void DirectoryScreen::drawGraphicsRight()
 
 std::string DirectoryScreen::padFileName(std::string s, std::string pad)
 {
-	return StrUtil::padRight(moduru::lang::StrUtil::trim(s), pad, 8);
+	return StrUtil::padRight(StrUtil::trim(s), pad, 8);
 }

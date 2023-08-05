@@ -3,10 +3,9 @@
 #include <lcdgui/screens/SongScreen.hpp>
 #include <sequencer/Song.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 DeleteSongScreen::DeleteSongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-song", layerIndex)

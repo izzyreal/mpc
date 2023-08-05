@@ -9,7 +9,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 using namespace moduru;
 
 EraseScreen::EraseScreen(mpc::Mpc& mpc, const int layerIndex)

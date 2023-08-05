@@ -3,10 +3,9 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-track", layerIndex)

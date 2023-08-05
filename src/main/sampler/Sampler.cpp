@@ -19,7 +19,7 @@
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <thirdp/libsamplerate/samplerate.h>
 
@@ -33,7 +33,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace mpc::engine;
-using namespace moduru::lang;
 
 Sampler::Sampler(mpc::Mpc& mpc)
 	: mpc(mpc)

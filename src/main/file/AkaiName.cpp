@@ -1,5 +1,5 @@
 #include "AkaiName.hpp"
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <cmath>
 #include <algorithm>
@@ -7,7 +7,6 @@
 #include <Logger.hpp>
 
 using namespace mpc::file;
-using namespace moduru::lang;
 
 bool AkaiName::isAkaiName(const std::string& name)
 {

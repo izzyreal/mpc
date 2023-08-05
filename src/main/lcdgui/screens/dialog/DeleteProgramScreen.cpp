@@ -2,7 +2,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
-using namespace moduru::lang;
 
 DeleteProgramScreen::DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-program", layerIndex)

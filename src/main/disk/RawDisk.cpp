@@ -7,14 +7,13 @@
 
 #include <util/VolumeMounter.h>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <Logger.hpp>
 
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
 using namespace akaifat::util;
 using namespace akaifat::fat;
-using namespace moduru::lang;
 
 RawDisk::RawDisk(mpc::Mpc& _mpc)
 	: AbstractDisk(_mpc)

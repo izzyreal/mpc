@@ -15,7 +15,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace mpc::nvram;
 
-using namespace moduru::lang;
 
 FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "file-exists", layerIndex)

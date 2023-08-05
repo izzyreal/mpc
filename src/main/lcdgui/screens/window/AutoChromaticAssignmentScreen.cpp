@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::sampler;
-using namespace moduru::lang;
 
 AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)

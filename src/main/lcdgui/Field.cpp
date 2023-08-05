@@ -6,7 +6,7 @@
 
 #include <Util.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <stdexcept>
 
@@ -17,7 +17,6 @@
 #include <stdexcept>
 
 using namespace mpc::lcdgui;
-using namespace moduru::lang;
 
 Field::Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int width)
 	: TextComp(mpc, name), mpc(mpc)

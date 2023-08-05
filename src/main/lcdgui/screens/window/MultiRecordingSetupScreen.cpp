@@ -5,7 +5,6 @@
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "multi-recording-setup", layerIndex)

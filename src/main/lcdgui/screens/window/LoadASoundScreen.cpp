@@ -119,7 +119,7 @@ void LoadASoundScreen::keepSound()
         auto s = sampler->getSound(i);
         if (s == previewSound) continue;
 
-        if (moduru::lang::StrUtil::eqIgnoreCase(s->getName(), candidateSoundName))
+        if (StrUtil::eqIgnoreCase(s->getName(), candidateSoundName))
         {
             existingSoundIndex = i;
             break;

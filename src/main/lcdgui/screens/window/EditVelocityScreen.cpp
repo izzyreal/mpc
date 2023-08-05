@@ -6,12 +6,11 @@
 
 #include <Util.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-using namespace moduru::lang;
 
 EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "edit-velocity", layerIndex)
@@ -128,8 +127,8 @@ void EditVelocityScreen::displayNotes()
 		findField("note0")->setSize(47, 9);
 		findLabel("note1")->Hide(false);
 		findField("note1")->Hide(false);
-		findField("note0")->setText(moduru::lang::StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-		findField("note1")->setText(moduru::lang::StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+		findField("note0")->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+		findField("note1")->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 	}
 	else
 	{

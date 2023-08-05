@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 
 TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "timing-correct", layerIndex)

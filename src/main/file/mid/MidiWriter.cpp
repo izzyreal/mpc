@@ -32,7 +32,7 @@
 #include <sequencer/SystemExclusiveEvent.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <file/ByteUtil.hpp>
 
 #include <set>
@@ -48,7 +48,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 	auto meta = std::make_shared<mpc::midi::MidiTrack>();
 	auto seqParams = std::make_shared<mpc::midi::event::meta::Text>(0, 0, "LOOP=ON  START=000 END=END TEMPO=ON ");
 	meta->insertEvent(seqParams);
-	auto seqName = std::make_shared<mpc::midi::event::meta::TrackName>(0, 0, "MPC2000XL 1.00  " + moduru::lang::StrUtil::padRight(sequence->getName(), " ", 16));
+	auto seqName = std::make_shared<mpc::midi::event::meta::TrackName>(0, 0, "MPC2000XL 1.00  " + StrUtil::padRight(sequence->getName(), " ", 16));
 	meta->insertEvent(seqName);
 	std::vector<std::shared_ptr<mpc::midi::event::meta::Tempo>> tempos;
 	int previousTick = 0;
@@ -126,7 +126,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		auto mt = std::make_shared<mpc::midi::MidiTrack>();
 		auto in = std::make_shared<meta::InstrumentName>(0, 0, "        ");
 		mt->insertEvent(in);
-		auto trackNumber = moduru::lang::StrUtil::padLeft(std::to_string(t->getIndex()), "0", 2);
+		auto trackNumber = StrUtil::padLeft(std::to_string(t->getIndex()), "0", 2);
         std::string trackDevice = t->getDeviceIndex() == 0 ? "C0" : "E0";
 
         if (t->getDeviceIndex() > 0)
@@ -138,7 +138,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 
 		auto text = std::make_shared<meta::Text>(0, 0, "TRACK DATA:" + trackNumber + trackDevice +"006403  000107   ");
 		mt->insertEvent(text);
-		auto tn = std::make_shared<meta::TrackName>(0, 0, moduru::lang::StrUtil::padRight(t->getName(), " ", 16));
+		auto tn = std::make_shared<meta::TrackName>(0, 0, StrUtil::padRight(t->getName(), " ", 16));
 		mt->insertEvent(tn);
 		for (auto& event : t->getEvents()) {
 			auto noteEvent = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);

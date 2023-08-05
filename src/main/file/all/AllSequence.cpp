@@ -15,7 +15,7 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <file/ByteUtil.hpp>
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <cmath>
@@ -26,7 +26,6 @@
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 using namespace moduru;
 
 AllSequence::AllSequence(const std::vector<char>& bytes)

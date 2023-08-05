@@ -10,14 +10,13 @@
 #include <disk/StdDisk.hpp>
 #include <nvram/VolumesPersistence.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::disk;
 using namespace mpc::nvram;
-using namespace moduru::lang;
 
 VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-disks", layerIndex)

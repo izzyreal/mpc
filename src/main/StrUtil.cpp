@@ -6,7 +6,7 @@
 
 #include <sstream>
 
-using namespace mpc::lang;
+using namespace mpc;
 
 std::string StrUtil::replaceAll(std::string str, char c, std::string replacement) {
 	if (replacement.length() > 1) return "<error>";
@@ -140,19 +140,19 @@ bool StrUtil::hasEnding(std::string const &fullString, std::string const &ending
 	}
 }
 
-std::string ltrim(const std::string& s, char c)
+inline std::string ltrim(const std::string& s, char c)
 {
     size_t start = s.find_first_not_of(c);
     return (start == std::string::npos) ? "" : s.substr(start);
 }
  
-std::string rtrim(const std::string& s, char c)
+inline std::string rtrim(const std::string& s, char c)
 {
     size_t end = s.find_last_not_of(c);
     return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 }
  
-std::string trim_by_c(const std::string& s, char c)
+inline std::string trim_by_c(const std::string& s, char c)
 {
     return ltrim(rtrim(s, c), c);
 }

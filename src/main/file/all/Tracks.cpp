@@ -6,7 +6,7 @@
 #include <sequencer/Track.hpp>
 
 #include <file/ByteUtil.hpp>
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <cmath>
@@ -45,7 +45,7 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 		for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
         {
 			auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-			auto name = moduru::lang::StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
+			auto name = StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
 			saveBytes[offset + j] = name[j];
 		}
 

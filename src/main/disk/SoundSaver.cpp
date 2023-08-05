@@ -8,7 +8,7 @@
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <thread>
 
@@ -16,7 +16,6 @@ using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::lang;
 
 SoundSaver::SoundSaver(mpc::Mpc& _mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds, bool _wav)
 : mpc (_mpc), sounds (_sounds), wav (_wav), saveSoundsThread (std::thread(&SoundSaver::static_saveSounds, this))

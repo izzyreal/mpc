@@ -3,12 +3,11 @@
 #include <file/aps/ApsParser.hpp>
 #include <sampler/Sampler.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <VecUtil.hpp>
 
 using namespace mpc::file::aps;
-using namespace moduru::lang;
 using namespace moduru;
 
 ApsSoundNames::ApsSoundNames(const std::vector<char>& loadBytes)

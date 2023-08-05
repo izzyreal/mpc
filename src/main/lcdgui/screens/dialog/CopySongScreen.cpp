@@ -3,10 +3,9 @@
 #include <sequencer/Song.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 CopySongScreen::CopySongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-song", layerIndex)

@@ -7,11 +7,10 @@
 #include <lcdgui/MixerFader.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
-using namespace moduru::lang;
 
 MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 	: Component("mixer-strip"), mpc(mpc)

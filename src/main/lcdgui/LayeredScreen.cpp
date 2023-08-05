@@ -20,7 +20,7 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <cmath>
 #include <set>
@@ -36,7 +36,6 @@ CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)

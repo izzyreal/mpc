@@ -11,7 +11,6 @@
 
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 std::vector<std::shared_ptr<MidiControlPreset>> MidiControlPersistence::presets;
 

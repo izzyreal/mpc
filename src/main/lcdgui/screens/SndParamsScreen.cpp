@@ -8,7 +8,6 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::lang;
 
 SndParamsScreen::SndParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "params", layerIndex)

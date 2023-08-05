@@ -6,13 +6,12 @@
 #include <lcdgui/screens/UserScreen.hpp>
 
 #include <file/ByteUtil.hpp>
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <VecUtil.hpp>
 
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 std::vector<char> Defaults::UNKNOWN1 = { 1, 0, 0, 1, 1, 0 };
 std::vector<char> Defaults::UNKNOWN2 = { 0, 0, (char) 0xFF, (char) 0xFF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0

@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace mpc::lang
+namespace mpc
 {
 	class StrUtil
 	{

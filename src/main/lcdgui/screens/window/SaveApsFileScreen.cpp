@@ -12,7 +12,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-using namespace moduru::lang;
 
 SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "save-aps-file", layerIndex)

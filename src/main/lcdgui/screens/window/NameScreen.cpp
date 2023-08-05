@@ -7,7 +7,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-using namespace moduru::lang;
 
 NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "name", layerIndex)

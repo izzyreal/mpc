@@ -1,9 +1,8 @@
 #include "DeleteSequenceScreen.hpp"
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 DeleteSequenceScreen::DeleteSequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-sequence", layerIndex)

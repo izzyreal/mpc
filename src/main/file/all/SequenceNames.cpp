@@ -9,13 +9,12 @@
 #include <sequencer/SystemExclusiveEvent.hpp>
 
 #include <file/ByteUtil.hpp>
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <cmath>
 
 using namespace mpc::file::all;
-using namespace moduru::lang;
 
 SequenceNames::SequenceNames(const std::vector<char>& b)
 {

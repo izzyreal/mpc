@@ -27,8 +27,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-using namespace moduru::lang;
-
 void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overridePath)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");

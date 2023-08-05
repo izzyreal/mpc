@@ -12,7 +12,7 @@
 #include "Wave.hpp"
 #include "EnvGraph.hpp"
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <memory>
 #include <string>

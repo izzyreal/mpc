@@ -6,7 +6,6 @@
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 SongScreen::SongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "song", layerIndex)

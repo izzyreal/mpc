@@ -28,7 +28,7 @@
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::disk;
 
@@ -48,8 +48,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
-
-using namespace moduru::lang;
 
 AbstractDisk::AbstractDisk(mpc::Mpc& _mpc)
         : mpc (_mpc)

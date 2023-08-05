@@ -11,7 +11,6 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 
 EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "events", layerIndex)

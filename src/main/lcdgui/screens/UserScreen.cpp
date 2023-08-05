@@ -7,7 +7,6 @@
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 UserScreen::UserScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "user", layerIndex)
@@ -212,7 +211,7 @@ void UserScreen::resetPreferences()
 
 	for (int i = 0; i < 64; i++)
 	{
-		trackNames.push_back(std::string("Track-" + moduru::lang::StrUtil::padLeft(std::to_string((int)(i + 1)), "0", 2)));
+		trackNames.push_back(std::string("Track-" + StrUtil::padLeft(std::to_string((int)(i + 1)), "0", 2)));
 	}
 
 	lastBar = 1;
@@ -225,7 +224,7 @@ void UserScreen::resetPreferences()
 
 	for (int i = 1; i < 33; i++)
 	{
-		deviceNames.push_back("Device" + moduru::lang::StrUtil::padLeft(std::to_string(i), "0", 2));
+		deviceNames.push_back("Device" + StrUtil::padLeft(std::to_string(i), "0", 2));
 	}
 }
 

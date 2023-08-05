@@ -5,7 +5,6 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "load-a-sequence", layerIndex)

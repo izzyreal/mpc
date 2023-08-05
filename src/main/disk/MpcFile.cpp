@@ -1,13 +1,12 @@
 #include <disk/MpcFile.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
 #include <Logger.hpp>
 
 using namespace mpc::disk;
-using namespace moduru::lang;
 using namespace akaifat::fat;
 
 MpcFile::MpcFile(nonstd::any fileObject)

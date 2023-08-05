@@ -27,7 +27,7 @@
 
 // moduru
 #include <System.hpp>
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <algorithm>
 
@@ -35,7 +35,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
 	: mpc (mpc)

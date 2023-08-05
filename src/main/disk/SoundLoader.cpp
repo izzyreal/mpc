@@ -8,7 +8,7 @@
 #include <sampler/Sound.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::sampler;
 using namespace mpc::disk;
@@ -16,7 +16,6 @@ using namespace mpc::file::wav;
 using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 SoundLoader::SoundLoader(mpc::Mpc& mpcToUse, bool replaceToUse)
 : mpc (mpcToUse), replace (replaceToUse)

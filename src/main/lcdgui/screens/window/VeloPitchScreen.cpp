@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
-using namespace moduru::lang;
 
 VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velo-pitch", layerIndex)

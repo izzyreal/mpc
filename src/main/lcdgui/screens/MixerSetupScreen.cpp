@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
-using namespace moduru::lang;
 
 MixerSetupScreen::MixerSetupScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mixer-setup", layerIndex)

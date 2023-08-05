@@ -2,7 +2,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
-using namespace moduru::lang;
 
 CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-note-parameters", layerIndex)

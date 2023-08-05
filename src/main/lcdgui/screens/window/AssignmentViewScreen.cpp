@@ -1,10 +1,9 @@
 #include "AssignmentViewScreen.hpp"
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
-using namespace moduru::lang;
 
 AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "assignment-view", layerIndex)

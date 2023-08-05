@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
-using namespace moduru::lang;
 
 DrumScreen::DrumScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "drum", layerIndex)

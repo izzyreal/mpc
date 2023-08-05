@@ -11,7 +11,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace mpc::engine;
-using namespace moduru::lang;
 
 ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "channel-settings", layerIndex)

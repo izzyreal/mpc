@@ -19,7 +19,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
-using namespace moduru::lang;
 
 LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "load", layerIndex)

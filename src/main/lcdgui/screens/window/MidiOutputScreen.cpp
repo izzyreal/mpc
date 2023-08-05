@@ -102,9 +102,9 @@ void MidiOutputScreen::displayDeviceName()
 	std::string devNumber;
 	
 	if (deviceIndex >= 16)
-		devNumber = moduru::lang::StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
+		devNumber = StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
 	else
-		devNumber = moduru::lang::StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
+		devNumber = StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
 
 	findField("devicenumber")->setText(devNumber);
 }

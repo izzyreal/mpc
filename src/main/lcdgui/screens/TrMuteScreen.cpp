@@ -2,7 +2,6 @@
 
 #include "sequencer/Track.hpp"
 
-using namespace moduru::lang;
 using namespace mpc::lcdgui::screens;
 
 TrMuteScreen::TrMuteScreen(mpc::Mpc& mpc, const int layerIndex)

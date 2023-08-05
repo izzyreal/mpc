@@ -1,7 +1,6 @@
 #include "TimeDisplayScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 TimeDisplayScreen::TimeDisplayScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "time-display", layerIndex)

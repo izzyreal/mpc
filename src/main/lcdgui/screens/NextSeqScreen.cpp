@@ -10,7 +10,6 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 NextSeqScreen::NextSeqScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "next-seq", layerIndex)

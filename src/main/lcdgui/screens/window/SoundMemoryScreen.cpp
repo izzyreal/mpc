@@ -2,10 +2,9 @@
 
 #include <lcdgui/PunchRect.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::lang;
 
 SoundMemoryScreen::SoundMemoryScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "sound-memory", layerIndex)

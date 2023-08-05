@@ -8,7 +8,7 @@
 
 #include <Util.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <lang/utf8_decode.h>
 
 #include <cmath>
@@ -18,7 +18,6 @@
 #endif
 
 using namespace mpc::lcdgui;
-using namespace moduru::lang;
 
 TextComp::TextComp(mpc::Mpc& mpc, const std::string& name)
 	: Component(name), mpc(mpc)

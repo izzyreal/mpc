@@ -22,7 +22,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace moduru::lang;
 
 SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "sequencer", layerIndex)

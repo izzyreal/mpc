@@ -12,9 +12,8 @@
 
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
-using namespace moduru::lang;
 using namespace mpc::disk;
 using namespace mpc::file;
 using namespace mpc::lcdgui;

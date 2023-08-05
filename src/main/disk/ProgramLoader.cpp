@@ -14,7 +14,7 @@
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 #include <thread>
 
@@ -27,7 +27,6 @@ using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::lang;
 
 std::shared_ptr<MpcFile> findSoundFileByFilenameWithoutExtension(mpc::Mpc& mpc, const std::string& filename, std::string& foundExtension)
 {
@@ -36,7 +35,7 @@ std::shared_ptr<MpcFile> findSoundFileByFilenameWithoutExtension(mpc::Mpc& mpc, 
     auto disk = mpc.getDisk();
 
     for (auto &f: disk->getAllFiles()) {
-        if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), filename + ".snd")) {
+        if (mpc::StrUtil::eqIgnoreCase(mpc::StrUtil::replaceAll(f->getName(), ' ', ""), filename + ".snd")) {
             result = f;
             foundExtension = "snd";
             break;
@@ -45,7 +44,7 @@ std::shared_ptr<MpcFile> findSoundFileByFilenameWithoutExtension(mpc::Mpc& mpc, 
 
     if (!result || !result->exists()) {
         for (auto &f: disk->getAllFiles()) {
-            if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), filename + ".wav")) {
+            if (mpc::StrUtil::eqIgnoreCase(mpc::StrUtil::replaceAll(f->getName(), ' ', ""), filename + ".wav")) {
                 result = f;
                 foundExtension = "wav";
                 break;

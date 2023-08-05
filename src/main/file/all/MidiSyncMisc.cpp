@@ -3,7 +3,7 @@
 #include <Mpc.hpp>
 #include <file/all/AllParser.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <lcdgui/screens/SongScreen.hpp>
@@ -45,7 +45,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
 	{
-		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(songScreen->getDefaultSongName(), " ", 16)[i];
+		saveBytes[DEF_SONG_NAME_OFFSET + i] = StrUtil::padRight(songScreen->getDefaultSongName(), " ", 16)[i];
 	}
 
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;

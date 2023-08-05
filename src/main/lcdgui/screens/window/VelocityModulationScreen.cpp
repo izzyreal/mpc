@@ -2,7 +2,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
-using namespace moduru::lang;
 
 VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velocity-modulation", layerIndex)

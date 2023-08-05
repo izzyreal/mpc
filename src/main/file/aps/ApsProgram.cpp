@@ -8,7 +8,7 @@
 #include <sampler/Program.hpp>
 #include <sampler/Pad.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <VecUtil.hpp>
 
 using namespace mpc::file::aps;
@@ -30,7 +30,7 @@ ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
 		name.push_back(c);
 	}
 
-    name = lang::StrUtil::trim(name);
+    name = StrUtil::trim(name);
 
 	slider = new ApsSlider(VecUtil::CopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
 	
@@ -50,7 +50,7 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	this->index = index;
 	byteList.push_back({ (char) index });
 	byteList.push_back(UNKNOWN);
-	auto programName = moduru::lang::StrUtil::padRight(program->getName(), " ", 16);
+	auto programName = StrUtil::padRight(program->getName(), " ", 16);
 
 	for (char c : programName)
 		byteList.push_back({ c });

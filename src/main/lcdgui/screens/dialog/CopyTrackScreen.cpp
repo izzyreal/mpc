@@ -2,10 +2,9 @@
 
 #include <sequencer/Track.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace moduru::lang;
 
 CopyTrackScreen::CopyTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-track", layerIndex)

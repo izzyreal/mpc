@@ -10,7 +10,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 
 using namespace mpc;
@@ -19,7 +19,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
-using namespace moduru::lang;
 
 std::string Util::replaceDotWithSmallSpaceDot(const std::string& s) {
     const auto dotindex = static_cast<int>(s.find('.'));

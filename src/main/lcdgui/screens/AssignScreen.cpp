@@ -2,10 +2,9 @@
 
 #include <sampler/PgmSlider.hpp>
 
-#include <lang/StrUtil.hpp>
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens;
-using namespace moduru::lang;
 
 AssignScreen::AssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "assign", layerIndex)
