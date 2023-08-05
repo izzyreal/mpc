@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
 		MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
 
 	private:
 		void displayNote();

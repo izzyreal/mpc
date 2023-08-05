@@ -314,20 +314,20 @@ int SampleScreen::getMonitor()
 	return monitor;
 }
 
-void SampleScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void SampleScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
 	if (dynamic_cast<mpc::audiomidi::SoundRecorder*>(o) != nullptr)
 	{
 		try
 		{
-			auto vuValue = nonstd::any_cast<std::pair<float, float>>(arg);
+			auto vuValue = std::get<std::pair<float, float>>(message);
 			auto left = vuValue.first;
 			auto right = vuValue.second;
 			if (left > peakL) peakL = left;
 			if (right > peakR) peakR = right;
 			updateVU(left, right);
 		}
-		catch (const std::exception& e) {
+		catch (const std::exception&) {
 			// nothing to do
 		}
 		return;

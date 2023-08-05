@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens::dialog
 
 	public:
 		void initTimer(std::weak_ptr<mpc::lcdgui::Label> label);
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
 
 	public:
 		MidiMonitorScreen(mpc::Mpc& mpc, const std::string& name, const int layerIndex);

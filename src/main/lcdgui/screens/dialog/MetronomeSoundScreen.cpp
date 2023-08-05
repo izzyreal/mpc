@@ -229,12 +229,13 @@ void MetronomeSoundScreen::turnWheel(int i)
     }
 }
 
-void MetronomeSoundScreen::update(moduru::observer::Observable* o, nonstd::any msg)
+void MetronomeSoundScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
     init();
-    auto s = nonstd::any_cast<std::string>(msg);
 
-    if (s == "note")
+    const auto msg = std::get<std::string>(message);
+
+    if (msg == "note")
     {
         if (param == "accent")
             setAccentPad(mpc.getPad());

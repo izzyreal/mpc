@@ -116,17 +116,17 @@ void ChannelSettingsScreen::turnWheel(int i)
 	}
 }
 
-void ChannelSettingsScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void ChannelSettingsScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
-	auto s = nonstd::any_cast<std::string>(arg);
-
 	init();
 
-	if (s == "note")
+    const auto msg = std::get<std::string>(message);
+
+	if (msg == "note")
     {
         setNote(mpc.getNote());
     }
-	else if (s == "bank")
+	else if (msg == "bank")
 	{
 		displayChannel();
 	}

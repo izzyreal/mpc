@@ -364,7 +364,7 @@ void SequencerScreen::displayTiming()
 	findField("timing")->setText(timingCorrectNames[noteValue]);
 }
 
-void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void SequencerScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
 	if (sequence.lock())
 		sequence.lock()->deleteObserver(this);
@@ -378,94 +378,94 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	track = sequencer->getActiveTrack();
 	track->addObserver(this);
 
-	auto s = nonstd::any_cast<std::string>(arg);
+    const auto msg = std::get<std::string>(message);
 
-	if (s == "nextsqvalue")
+	if (msg == "nextsqvalue")
 	{
 		displayNextSq();
 	}
-	else if (s == "nextsq")
+	else if (msg == "nextsq")
 	{
 		displayNextSq();
 		ls->setFocus("nextsq");
 	}
-	else if (s == "nextsqoff")
+	else if (msg == "nextsqoff")
 	{
 		displayNextSq();
 	}
-	else if (s == "count")
+	else if (msg == "count")
 	{
 		displayCount();
 	}
-	else if (s == "tracknumbername")
+	else if (msg == "tracknumbername")
 	{
 		displayTr();
 		displayOn();
 	}
-	else if (s == "seqnumbername")
+	else if (msg == "seqnumbername")
 	{
 		displaySq();
 	}
-	else if (s == "loop")
+	else if (msg == "loop")
 	{
 		displayLoop();
 	}
-	else if (s == "recordingmode")
+	else if (msg == "recordingmode")
 	{
 		displayRecordingMode();
 	}
-	else if (s == "numberofbars")
+	else if (msg == "numberofbars")
 	{
 		displayBars();
 	}
-	else if (s == "trackon")
+	else if (msg == "trackon")
 	{
 		displayOn();
 	}
-	else if (s == "bar")
+	else if (msg == "bar")
 	{
 		displayNow0();
 		displayTempoLabel();
 	}
-	else if (s == "beat")
+	else if (msg == "beat")
 	{
 		displayNow1();
 		displayTempoLabel();
 	}
-	else if (s == "clock")
+	else if (msg == "clock")
 	{
 		displayNow2();
 		displayTempoLabel();
 	}
-	else if (s == "tempo")
+	else if (msg == "tempo")
 	{
 		displayTempo();
 	}
-	else if (s == "tempo-source")
+	else if (msg == "tempo-source")
 	{
 		displayTempoSource();
 	}
-	else if (s == "timesignature")
+	else if (msg == "timesignature")
 	{
 		displayTsig();
 	}
-	else if (s == "programchange")
+	else if (msg == "programchange")
 	{
 		displayPgm();
 	}
-	else if (s == "velocityratio")
+	else if (msg == "velocityratio")
 	{
 		displayVelo();
 	}
-	else if (s == "bus")
+	else if (msg == "bus")
 	{
 		displayBus();
 	}
-	else if (s == "device")
+	else if (msg == "device")
 	{
 		displayDeviceNumber();
 	}
-	else if (s == "devicename")
+	else if (msg == "devicename")
 	{
 		displayDeviceName();
 	}

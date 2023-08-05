@@ -206,50 +206,50 @@ void NextSeqScreen::displayTiming()
 	findField("timing")->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }
 
-void NextSeqScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void NextSeqScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
-    std::string s = nonstd::any_cast<std::string>(arg);
+    const auto msg = std::get<std::string>(message);
 
-	if (s == "seqnumbername")
+	if (msg == "seqnumbername")
 	{
 		displaySq();
 	}
-	else if (s == "bar")
+	else if (msg == "bar")
 	{
 		displayNow0();
 	}
-	else if (s == "beat")
+	else if (msg == "beat")
 	{
 		displayNow1();
 	}
-	else if (s == "clock")
+	else if (msg == "clock")
 	{
 		displayNow2();
 	}
-	else if (s == "now")
+	else if (msg == "now")
 	{
 		displayNow0();
 		displayNow1();
 		displayNow2();
 	}
-	else if (s == "nextsqvalue")
+	else if (msg == "nextsqvalue")
 	{
 		displayNextSq();
 	}
-	else if (s == "nextsq")
+	else if (msg == "nextsq")
 	{
 		displayNextSq();
 	}
-	else if (s == "nextsqoff")
+	else if (msg == "nextsqoff")
 	{
 		selectNextSqFromScratch = true;
 		displayNextSq();
 	}
-	else if (s == "timing")
+	else if (msg == "timing")
 	{
 		displayTiming();
 	}
-	else if (s == "tempo")
+	else if (msg == "tempo")
 	{
 		displayTempo();
 	}

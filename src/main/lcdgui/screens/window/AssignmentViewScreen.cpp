@@ -96,20 +96,20 @@ void AssignmentViewScreen::turnWheel(int i)
     displayPad(lastPad->getIndex() % 16);
 }
 
-void AssignmentViewScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void AssignmentViewScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
-	auto s = nonstd::any_cast<std::string>(arg);
+    const auto msg = std::get<std::string>(message);
 
-	if (s == "bank")
+	if (msg == "bank")
 	{
 		displayAssignmentView();
 	}
-	else if (s == "pad")
+	else if (msg == "pad")
 	{
 		ls->setFocus(getFocusFromPadIndex());
 		displayAssignmentView();
 	}
-	else if (s == "note")
+	else if (msg == "note")
 	{
 		displayNote();
 		displaySoundName();

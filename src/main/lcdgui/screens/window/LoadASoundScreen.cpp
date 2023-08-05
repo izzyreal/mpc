@@ -186,9 +186,9 @@ void LoadASoundScreen::displayAssignToNote()
 	findField("assign-to-note")->setText(noteName + "/" + padName);
 }
 
-void LoadASoundScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+void LoadASoundScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
 {
-	auto msg = nonstd::any_cast<std::string>(message);
+	const auto msg = std::get<std::string>(message);
 	if (msg == "note")
 	{
         assignToNote = mpc.getNote();

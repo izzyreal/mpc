@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::dialog2
 
 	public:
 		PopupScreen(mpc::Mpc& mpc);
-		~PopupScreen() override;
+		~PopupScreen();
 
 		void close() override;
 

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
 		AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
 
 	public:
 		void up() override;

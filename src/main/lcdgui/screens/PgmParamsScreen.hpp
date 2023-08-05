@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens {
 		
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
+		void update(moduru::observer::Observable* observable, moduru::observer::Message message) override;
 
 	private:
 		void displayReson();

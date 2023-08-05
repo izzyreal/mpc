@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens::window
         void mainScreen() override;
         void numpad(int i) override {}
 
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
+		void update(moduru::observer::Observable* observable, moduru::observer::Message message) override;
 
 		void turnWheel(int i) override;
 		void function(int i) override;

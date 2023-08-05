@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens
 		void pad(int i, int velo) override;
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
 
 	private:
 		void displayAssignNote();

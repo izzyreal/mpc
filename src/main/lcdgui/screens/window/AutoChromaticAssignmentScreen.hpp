@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
 		AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+		void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
 
 	private:
 		const std::vector<std::string> letters{ "A" , "B", "C", "D" };

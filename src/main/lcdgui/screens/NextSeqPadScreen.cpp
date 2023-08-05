@@ -149,9 +149,9 @@ void NextSeqPadScreen::refreshSeqs()
 	}
 }
 
-void NextSeqPadScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+void NextSeqPadScreen::update(moduru::observer::Observable* observable, moduru::observer::Message message)
 {
-	auto msg = nonstd::any_cast<std::string>(message);
+	const auto msg = std::get<std::string>(message);
 	if (msg == "bank")
     {
         displayBank();

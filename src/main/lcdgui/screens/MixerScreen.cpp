@@ -145,13 +145,13 @@ void MixerScreen::displayMixerStrips()
     }
 }
 
-void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void MixerScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
-    auto s = nonstd::any_cast<std::string>(arg);
-    
+    const auto msg = std::get<std::string>(message);
+
     init();
     
-    if (s == "bank")
+    if (msg == "bank")
     {
         for (auto& m : mixerStrips)
             m->setBank(mpc.getBank());

@@ -422,16 +422,16 @@ void PgmAssignScreen::displayPad()
 	findField("pad")->setText(sampler->getPadName(mpc.getPad()));
 }
 
-void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void PgmAssignScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
-	auto s = nonstd::any_cast<std::string>(arg);
+    const auto msg = std::get<std::string>(message);
 
-	if (s == "note")
+	if (msg == "note")
 	{
 		displayNote();
 		displaySoundName();
 	}
-	else if (s == "pad")
+	else if (msg == "pad")
 	{
 		displayNote();
 		displayPad();

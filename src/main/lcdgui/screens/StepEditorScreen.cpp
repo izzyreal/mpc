@@ -1220,9 +1220,9 @@ void StepEditorScreen::displayView()
 	findField("view")->setText(viewNames[view]);
 }
 
-void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message)
+void StepEditorScreen::update(moduru::observer::Observable*, moduru::observer::Message message)
 {
-	auto msg = nonstd::any_cast<std::string>(message);
+	const auto msg = std::get<std::string>(message);
 
     if (msg == "step-editor")
 	{

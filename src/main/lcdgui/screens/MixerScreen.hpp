@@ -80,7 +80,7 @@ public:
     void setXPos(unsigned char newXPos);
 
 public:
-    void update(moduru::observer::Observable* o, nonstd::any arg) override;
+    void update(moduru::observer::Observable* o, moduru::observer::Message message) override;
     
 private:
     friend class SelectMixerDrumScreen;

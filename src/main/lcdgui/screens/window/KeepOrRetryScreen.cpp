@@ -138,11 +138,11 @@ void KeepOrRetryScreen::displayAssignToNote()
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }
 
-void KeepOrRetryScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void KeepOrRetryScreen::update(moduru::observer::Observable* o, moduru::observer::Message message)
 {
-    auto s = nonstd::any_cast<std::string>(arg);
-    
-    if (s == "note")
+    const auto msg = std::get<std::string>(message);
+
+    if (msg == "note")
     {
         assignToNote = mpc.getNote();
         displayAssignToNote();
