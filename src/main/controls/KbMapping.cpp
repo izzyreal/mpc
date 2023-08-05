@@ -1,12 +1,11 @@
 #include "KbMapping.hpp"
-#include <sys/KeyCodes.hpp>
+#include "KeyCodes.hpp"
 #include <Paths.hpp>
 
 #include <Logger.hpp>
 
 using namespace mpc::controls;
 using namespace WonderRabbitProject::key;
-using namespace moduru::sys;
 
 KbMapping::KbMapping()
 {

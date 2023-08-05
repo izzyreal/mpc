@@ -15,16 +15,14 @@
 #include <controls/KbMapping.hpp>
 
 #include <StrUtil.hpp>
-#include <Logger.hpp>
 
-#include <sys/KeyCodes.hpp>
+#include <controls/KeyCodes.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
-using namespace moduru::sys;
 
 VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)

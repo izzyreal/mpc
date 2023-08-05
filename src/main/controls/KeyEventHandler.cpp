@@ -13,14 +13,13 @@
 #include <hardware/HwComponent.hpp>
 #include <hardware/DataWheel.hpp>
 
-#include <sys/KeyCodes.hpp>
+#include "KeyCodes.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::hardware;
-using namespace moduru::sys;
 
 KeyEventHandler::KeyEventHandler(mpc::Mpc &mpc)
         : mpc(mpc)
