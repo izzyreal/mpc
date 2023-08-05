@@ -9,7 +9,7 @@
 #include <Util.hpp>
 
 #include <StrUtil.hpp>
-#include <lang/utf8_decode.h>
+#include <utf8_decode.h>
 
 #include <cmath>
 
