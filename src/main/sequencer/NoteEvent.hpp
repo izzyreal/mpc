@@ -2,6 +2,7 @@
 #include <sequencer/Event.hpp>
 #include <engine/midi/ShortMessage.hpp>
 #include <optional>
+#include <memory>
 #include "assert.h"
 
 namespace mpc::sequencer
