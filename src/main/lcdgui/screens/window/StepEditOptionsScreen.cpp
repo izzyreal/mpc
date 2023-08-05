@@ -1,6 +1,6 @@
 #include "StepEditOptionsScreen.hpp"
 
-#include "lang/StrUtil.hpp"
+#include <StrUtil.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

@@ -4,7 +4,7 @@
 #include "hardware/HwPad.hpp"
 #include "Paths.hpp"
 #include "disk/AbstractDisk.hpp"
-#include "lang/StrUtil.hpp"
+#include <StrUtil.hpp>
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <cassert>

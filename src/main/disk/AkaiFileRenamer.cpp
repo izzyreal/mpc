@@ -2,15 +2,14 @@
 
 #include <cassert>
 
-#include <raw/fat/ShortNameGenerator.hpp>
-#include <raw/fat/ShortName.hpp>
+#include "ShortNameGenerator.hpp"
+#include "ShortName.hpp"
 #include "../file/AkaiName.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file;
-using namespace moduru::raw::fat;
 
-void AkaiFileRenamer::renameFilesInDirectory(fs::path p)
+void AkaiFileRenamer::renameFilesInDirectory(const fs::path& p)
 {
     assert(fs::is_directory(p));
 
