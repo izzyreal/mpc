@@ -1,6 +1,6 @@
 #include "BMFParser.hpp"
 
-#include <file/FileUtil.hpp>
+#include "../mpc_fs.hpp"
 
 #include "bitmap.hpp"
 
@@ -145,26 +145,6 @@ bool BMFParser::GetBMFontData(const char* pBinary, size_t fileSize, bmfont* pBMF
 		}
 	}
 	return true;
-}
-
-char* BMFParser::GetFileData(string filePath, size_t* pSize)
-{
-	char* pData = nullptr;
-	FILE* pFile = moduru::file::FileUtil::fopenw(filePath, "rb");
-
-	if (pFile == nullptr)
-	{
-		*pSize = 0;
-		return nullptr;
-	}
-
-	fseek(pFile, 0, SEEK_END);
-	*pSize = ftell(pFile);
-	fseek(pFile, 0, SEEK_SET);
-	pData = (char*)malloc(*pSize);
-	fread(pData, *pSize, 1, pFile);
-	fclose(pFile);
-	return pData;
 }
 
 bmfont BMFParser::getLoadedFont() {

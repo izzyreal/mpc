@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "../mpc_fs.hpp"
+
 namespace mpc::lcdgui {
 
     /**
@@ -46,25 +48,7 @@ namespace mpc::lcdgui {
         PixelMatrix pixels;
 
     public:
-        /**
-     * @brief Opens a file as its name is provided and reads pixel-by-pixel 
-     * the data into a matrix of on/off pixels. Any errors will cout but will 
-     * result in an empty matrix (with no rows and no columns).
-     *
-     * @param file  name of the filename to be opened and read as a matrix of pixels
-    **/
-        void open(std::string file);
-
-        /**
-     * @brief Saves the current image, represented by the matrix of pixels, as 
-     * a Windows BMP file with the name provided by the parameter. 
-     * 
-     * File extension is not forced but should be .bmp. Any errors will cout 
-     * and will NOT attempt to save the file.
-     *
-     * @param file  name of the filename to be written as a bmp image
-    **/
-        void save(std::string file) const;
+        void open(fs::path p);
 
         /**
       * @brief Validates whether or not the current matrix of pixels represents a
