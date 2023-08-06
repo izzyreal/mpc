@@ -60,7 +60,13 @@ FetchContent_Declare(rtmidi
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
 )
 
-FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2)
+FetchContent_Declare(libsamplerate
+    GIT_REPOSITORY https://github.com/libsndfile/libsamplerate.git
+    GIT_TAG        master
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/libsamplerate
+)
+
+FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2 libsamplerate)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -108,9 +114,10 @@ target_include_directories(mpc PUBLIC
     ${rapidjson_SOURCE_DIR}/include
     ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
+    ${libsamplerate_SOURCE_DIR}/include
 )
 
-target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi)
+target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi samplerate)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")

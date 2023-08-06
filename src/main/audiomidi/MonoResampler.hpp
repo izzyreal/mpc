@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "thirdp/libsamplerate/samplerate.h"
+#include <samplerate.h>
 
 namespace mpc::audiomidi {
 

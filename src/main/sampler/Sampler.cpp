@@ -21,7 +21,7 @@
 
 #include <StrUtil.hpp>
 
-#include <thirdp/libsamplerate/samplerate.h>
+#include <samplerate.h>
 
 #include <cmrc/cmrc.hpp>
 #include <string_view>
