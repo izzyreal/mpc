@@ -358,3 +358,15 @@ void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<N
         }
     }
 }
+
+std::vector<char> Util::vecCopyOfRange(const std::vector<char>& src, int offset, int endOffset)
+{
+    return std::vector<char>(begin(src) + offset, begin(src) + endOffset);
+}
+
+bool Util::vecEquals(const std::vector<char>& a, const std::vector<char>& b) {
+    if (a.size() != b.size()) return false;
+    for (int i = 0; i < a.size(); i++)
+        if (a[i] != b[i]) return false;
+    return true;
+}

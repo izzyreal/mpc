@@ -3,14 +3,15 @@
 #include <sequencer/Song.hpp>
 #include <sequencer/Step.hpp>
 
-#include <VecUtil.hpp>
+#include "Util.hpp"
+#include <Util.hpp>
 
 using namespace mpc::file::all;
 
 Song::Song(const std::vector<char>& loadBytes)
 {
 
-    auto nameBytes = moduru::VecUtil::CopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
+    auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 
 	for (char& c : nameBytes)
     {
@@ -21,7 +22,7 @@ Song::Song(const std::vector<char>& loadBytes)
     size_t end = name.find_last_not_of(' ');
     name = (end == std::string::npos) ? "" : name.substr(0, end + 1);
 
-    auto stepsBytes = moduru::VecUtil::CopyOfRange(loadBytes, FIRST_STEP_OFFSET, FIRST_STEP_OFFSET + STEPS_LENGTH);
+    auto stepsBytes = Util::vecCopyOfRange(loadBytes, FIRST_STEP_OFFSET, FIRST_STEP_OFFSET + STEPS_LENGTH);
 
     for (int i = 0; i < STEPS_LENGTH; i += STEP_LENGTH)
     {

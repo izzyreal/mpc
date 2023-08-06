@@ -7,9 +7,8 @@
 #include <sampler/Pad.hpp>
 #include "engine/Drum.hpp"
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
 using namespace mpc::file::aps;
 using namespace mpc::disk;
 using namespace mpc::sampler;
@@ -22,24 +21,24 @@ ApsParser::ApsParser(const std::vector<char>& loadBytes)
         return;
     }
     
-    header = std::make_unique<ApsHeader>(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+    header = std::make_unique<ApsHeader>(Util::vecCopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
     
     auto const soundNamesEnd = HEADER_LENGTH + (header->getSoundAmount() * SOUND_NAME_LENGTH);
-    soundNames = std::make_unique<ApsSoundNames>(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET + HEADER_LENGTH, soundNamesEnd));
+    soundNames = std::make_unique<ApsSoundNames>(Util::vecCopyOfRange(loadBytes, HEADER_OFFSET + HEADER_LENGTH, soundNamesEnd));
     programCount = (loadBytes.size() - 1689 - (soundNames->get().size() * 17)) / PROGRAM_LENGTH;
     auto const nameEnd = soundNamesEnd + PAD_LENGTH1 + APS_NAME_LENGTH;
     auto const nameOffset = soundNamesEnd + PAD_LENGTH1;
-    apsName = std::make_unique<ApsName>(VecUtil::CopyOfRange(loadBytes, nameOffset, nameEnd));
+    apsName = std::make_unique<ApsName>(Util::vecCopyOfRange(loadBytes, nameOffset, nameEnd));
     auto const parametersEnd = nameEnd + PARAMETERS_LENGTH;
-    globalParameters = std::make_unique<ApsGlobalParameters>(VecUtil::CopyOfRange(loadBytes, nameEnd, parametersEnd));
+    globalParameters = std::make_unique<ApsGlobalParameters>(Util::vecCopyOfRange(loadBytes, nameEnd, parametersEnd));
     auto const maTableEnd = parametersEnd + TABLE_LENGTH;
-    maTable = std::make_unique<ApsAssignTable>(VecUtil::CopyOfRange(loadBytes, parametersEnd, maTableEnd));
+    maTable = std::make_unique<ApsAssignTable>(Util::vecCopyOfRange(loadBytes, parametersEnd, maTableEnd));
     int const drum1MixerOffset = maTableEnd + PAD_LENGTH2;
 
     for (int i = 0; i < 4; i++) {
         int offset = drum1MixerOffset + (i * (MIXER_LENGTH + DRUM_CONFIG_LENGTH + DRUM_PAD_LENGTH));
-        drumMixers[i] = std::make_unique<ApsMixer>(VecUtil::CopyOfRange(loadBytes, offset, offset + MIXER_LENGTH));
-        drumConfigurations[i] = std::make_unique<ApsDrumConfiguration>(VecUtil::CopyOfRange(loadBytes, offset + MIXER_LENGTH, offset + MIXER_LENGTH + DRUM_CONFIG_LENGTH));
+        drumMixers[i] = std::make_unique<ApsMixer>(Util::vecCopyOfRange(loadBytes, offset, offset + MIXER_LENGTH));
+        drumConfigurations[i] = std::make_unique<ApsDrumConfiguration>(Util::vecCopyOfRange(loadBytes, offset + MIXER_LENGTH, offset + MIXER_LENGTH + DRUM_CONFIG_LENGTH));
     }
     
     int const firstProgramOffset = drum1MixerOffset + ((MIXER_LENGTH + DRUM_CONFIG_LENGTH) * 4) + PAD_LENGTH3 - 6;
@@ -47,7 +46,7 @@ ApsParser::ApsParser(const std::vector<char>& loadBytes)
     for (int i = 0; i < programCount; i++)
     {
         int offset = firstProgramOffset + (i * (PROGRAM_LENGTH + PROGRAM_PAD_LENGTH));
-        programs.push_back(std::make_unique<ApsProgram>(VecUtil::CopyOfRange(loadBytes, offset, offset + PROGRAM_LENGTH)));
+        programs.push_back(std::make_unique<ApsProgram>(Util::vecCopyOfRange(loadBytes, offset, offset + PROGRAM_LENGTH)));
     }
 }
 

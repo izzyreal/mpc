@@ -10,7 +10,7 @@
 
 #include <file/ByteUtil.hpp>
 #include <StrUtil.hpp>
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 #include <cmath>
 
@@ -22,7 +22,7 @@ SequenceNames::SequenceNames(const std::vector<char>& b)
 	{	
 		int offset = i * ENTRY_LENGTH;
 		std::string stringBuffer = "";
-		auto nameBytes = moduru::VecUtil::CopyOfRange(b, offset, offset + AllParser::NAME_LENGTH);
+		auto nameBytes = Util::vecCopyOfRange(b, offset, offset + AllParser::NAME_LENGTH);
 
 		for (char c : nameBytes)
 		{
@@ -34,7 +34,7 @@ SequenceNames::SequenceNames(const std::vector<char>& b)
 		}
 		names[i] = stringBuffer;
 
-		auto usednessBytes = moduru::VecUtil::CopyOfRange(b, offset + AllParser::NAME_LENGTH, offset + AllParser::NAME_LENGTH + 2);
+		auto usednessBytes = Util::vecCopyOfRange(b, offset + AllParser::NAME_LENGTH, offset + AllParser::NAME_LENGTH + 2);
 		usednesses[i] = usednessBytes[0] != 0 || usednessBytes[1] != 0;
 	}
 }

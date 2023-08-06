@@ -3,7 +3,7 @@
 #include <file/all/AllParser.hpp>
 #include <file/all/Defaults.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 #include <utility>
 
 using namespace mpc::nvram;
@@ -13,7 +13,7 @@ Defaults DefaultsParser::AllDefaultsFromFile(mpc::Mpc& mpc, fs::path p)
 {
 
     auto data = get_file_data(std::move(p));
-	return { mpc, moduru::VecUtil::CopyOfRange(data, 0, AllParser::DEFAULTS_LENGTH) };
+	return { mpc, Util::vecCopyOfRange(data, 0, AllParser::DEFAULTS_LENGTH) };
 }
 
 DefaultsParser::DefaultsParser(mpc::Mpc& mpc)

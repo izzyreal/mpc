@@ -6,9 +6,8 @@
 
 #include <file/ByteUtil.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
 using namespace mpc::file::pgmreader;
 
 PgmAllNoteParameters::PgmAllNoteParameters(ProgramFileReader* programFile) 
@@ -37,7 +36,7 @@ int PgmAllNoteParameters::getMidiNotesEnd()
 std::vector<char> PgmAllNoteParameters::getMidiNotesArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-	midiNotesArray = VecUtil::CopyOfRange(pgmFileArray, getMidiNotesStart(), getMidiNotesEnd());
+	midiNotesArray = Util::vecCopyOfRange(pgmFileArray, getMidiNotesStart(), getMidiNotesEnd());
 	return midiNotesArray;
 }
 
@@ -99,7 +98,7 @@ int PgmAllNoteParameters::getTune(int midiNote)
 {
 	auto startPos = (midiNote * 25) + 9;
 	auto endPos = (midiNote * 25) + 11;
-	auto tuneBytes = VecUtil::CopyOfRange(getMidiNotesArray(), startPos, endPos);
+	auto tuneBytes = Util::vecCopyOfRange(getMidiNotesArray(), startPos, endPos);
 	return ByteUtil::bytes2short(tuneBytes);
 }
 

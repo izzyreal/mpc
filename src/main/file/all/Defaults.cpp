@@ -7,7 +7,7 @@
 
 #include <file/ByteUtil.hpp>
 #include <StrUtil.hpp>
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;
@@ -84,7 +84,7 @@ void Defaults::parseNames(std::vector<char> loadBytes)
 {
 	std::vector<char> stringBuffer;
 	
-    stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
+    stringBuffer = Util::vecCopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
 	
     defaultSeqName = "";
 	
@@ -101,7 +101,7 @@ void Defaults::parseNames(std::vector<char> loadBytes)
 	for (int i = 0; i < 33; i++)
     {
 		offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
-		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
+		stringBuffer = Util::vecCopyOfRange(loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
 		std::string s;
 		
         for (char c : stringBuffer)
@@ -118,7 +118,7 @@ void Defaults::parseNames(std::vector<char> loadBytes)
 	for (int i = 0; i < 64; i++)
     {
 		offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH);
+		stringBuffer = Util::vecCopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH);
 		std::string s;
 	
         for (char c : stringBuffer)

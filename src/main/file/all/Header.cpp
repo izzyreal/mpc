@@ -1,6 +1,6 @@
 #include <file/all/Header.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 #include <string>
 
@@ -27,7 +27,7 @@ std::vector<char>& Header::getHeaderArray()
 bool Header::verifyFileID()
 {
 	auto verifyFileID = false;
-	auto checkFileID = moduru::VecUtil::CopyOfRange(loadBytes, 0, 16);
+	auto checkFileID = Util::vecCopyOfRange(loadBytes, 0, 16);
 	std::string fileIDString;
 	for (char c : checkFileID) {
 		if (c == 0x00) break;

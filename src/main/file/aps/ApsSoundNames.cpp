@@ -5,10 +5,9 @@
 
 #include <StrUtil.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 using namespace mpc::file::aps;
-using namespace moduru;
 
 ApsSoundNames::ApsSoundNames(const std::vector<char>& loadBytes)
 {
@@ -16,7 +15,7 @@ ApsSoundNames::ApsSoundNames(const std::vector<char>& loadBytes)
     
     while (sound < loadBytes.size() / ApsParser::SOUND_NAME_LENGTH)
     {
-        auto nameBytes = VecUtil::CopyOfRange(loadBytes, sound * ApsParser::SOUND_NAME_LENGTH, (sound * ApsParser::SOUND_NAME_LENGTH) + NAME_STRING_LENGTH);
+        auto nameBytes = Util::vecCopyOfRange(loadBytes, sound * ApsParser::SOUND_NAME_LENGTH, (sound * ApsParser::SOUND_NAME_LENGTH) + NAME_STRING_LENGTH);
 
         std::string nameStr;
         for (char c : nameBytes)

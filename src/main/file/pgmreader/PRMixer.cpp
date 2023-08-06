@@ -3,9 +3,8 @@
 #include <file/pgmreader/ProgramFileReader.hpp>
 #include <file/pgmreader/SoundNames.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
 using namespace mpc::file::pgmreader;
 
 Mixer::Mixer(ProgramFileReader* programFile) 
@@ -34,7 +33,7 @@ int Mixer::getMixerEnd()
 std::vector<char> Mixer::getMixerArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    if (mixerArray.size() == 0) mixerArray = VecUtil::CopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());
+    if (mixerArray.size() == 0) mixerArray = Util::vecCopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());
     return mixerArray;
 }
 

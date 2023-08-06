@@ -7,7 +7,7 @@
 
 #include <file/ByteUtil.hpp>
 #include <StrUtil.hpp>
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 #include <cmath>
 
@@ -24,7 +24,7 @@ Tracks::Tracks(const std::vector<char>& loadBytes)
 		auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 		std::string name;
         
-		for (char c : moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH))
+		for (char c : Util::vecCopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH))
         {
 			if (c == 0x00) break;
 			name.push_back(c);

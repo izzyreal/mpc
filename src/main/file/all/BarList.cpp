@@ -3,7 +3,7 @@
 #include <file/all/Bar.hpp>
 #include <sequencer/Sequence.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 using namespace mpc::file::all;
 
@@ -13,7 +13,7 @@ BarList::BarList(const std::vector<char>& loadBytes)
 	
     for (int i = 0; i < 999; i++)
     {
-		auto bar = new Bar(moduru::VecUtil::CopyOfRange(loadBytes, i * 4, (i * 4) + 4), previousBar);
+		auto bar = new Bar(Util::vecCopyOfRange(loadBytes, i * 4, (i * 4) + 4), previousBar);
 		
         if (bar->lastTick == 0)
         {

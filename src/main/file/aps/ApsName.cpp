@@ -2,14 +2,13 @@
 
 #include <file/aps/ApsParser.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 using namespace mpc::file::aps;
-using namespace moduru;
 
 ApsName::ApsName(const std::vector<char>& loadBytes)
 {
-	auto nameBytes = VecUtil::CopyOfRange(loadBytes, 0, NAME_STRING_LENGTH);
+	auto nameBytes = Util::vecCopyOfRange(loadBytes, 0, NAME_STRING_LENGTH);
 	name = "";
 	for (char c : nameBytes) {
 		if (c == 0x00) break;

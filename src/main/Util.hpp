@@ -33,5 +33,18 @@ namespace mpc
 		static void set16LevelsValues(mpc::Mpc&, const std::shared_ptr<mpc::sequencer::NoteOnEvent>&, const int padIndex);
 		static void setSliderNoteVariationParameters(mpc::Mpc&, const std::weak_ptr<mpc::sequencer::NoteOnEvent>&, const std::weak_ptr<mpc::sampler::Program>&);
 
+        static std::vector<char> vecCopyOfRange(const std::vector<char>& src, int offset, int length);
+        static bool vecEquals(const std::vector<char>& a, const std::vector<char>& b);
+
+    private:
+        template<typename T>
+        static void vecCopy(std::vector<T>& src, int srcPos, std::vector<T>& dest, int destPos, int length) {
+            if (destPos + length > dest.size()) throw std::invalid_argument("Destination out of bounds!\n");
+            if (srcPos + length > src.size()) throw std::invalid_argument("Source out of bounds!\n");
+
+            for (int i = 0; i < length; i++)
+                dest[i + destPos] = src[i + srcPos];
+        }
+
 	};
 }

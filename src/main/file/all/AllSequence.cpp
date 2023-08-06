@@ -16,7 +16,7 @@
 
 #include <file/ByteUtil.hpp>
 #include <StrUtil.hpp>
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 #include <cmath>
 
@@ -26,12 +26,11 @@
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace moduru;
 
 AllSequence::AllSequence(const std::vector<char>& bytes)
 {
-    barList = new BarList(VecUtil::CopyOfRange(bytes, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
-    auto nameBytes = VecUtil::CopyOfRange(bytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
+    barList = new BarList(Util::vecCopyOfRange(bytes, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
+    auto nameBytes = Util::vecCopyOfRange(bytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
     name = "";
     
     for (char c : nameBytes)
@@ -60,7 +59,7 @@ AllSequence::AllSequence(const std::vector<char>& bytes)
     {
         auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
         std::string stringBuffer;
-        auto stringBytes = VecUtil::CopyOfRange(bytes, offset, offset + AllParser::DEV_NAME_LENGTH);
+        auto stringBytes = Util::vecCopyOfRange(bytes, offset, offset + AllParser::DEV_NAME_LENGTH);
         
         for (char c : stringBytes)
         {
@@ -73,7 +72,7 @@ AllSequence::AllSequence(const std::vector<char>& bytes)
         devNames[i] = stringBuffer;
     }
     
-    tracks = new Tracks(VecUtil::CopyOfRange(bytes, TRACKS_OFFSET, TRACKS_LENGTH));
+    tracks = new Tracks(Util::vecCopyOfRange(bytes, TRACKS_OFFSET, TRACKS_LENGTH));
     allEvents = readEvents(bytes);
 }
 
@@ -281,23 +280,23 @@ std::vector<std::vector<char>> AllSequence::readEventSegments(const std::vector<
     
     for (int i = 0; i < MAX_EVENT_SEG_COUNT; i++)
     {
-        auto ea = VecUtil::CopyOfRange(seqBytes, candidateOffset, candidateOffset + EVENT_SEG_LENGTH);
+        auto ea = Util::vecCopyOfRange(seqBytes, candidateOffset, candidateOffset + EVENT_SEG_LENGTH);
         
-        if (VecUtil::Equals(ea, TERMINATOR))
+        if (Util::vecEquals(ea, TERMINATOR))
             break;
 
         int sysexSegs;
         if (ea[EVENT_ID_OFFSET] == SYS_EX_ID) {
             for (sysexSegs = 0; sysexSegs < MAX_SYSEX_SIZE; sysexSegs++)
             {
-                auto potentialTerminator = VecUtil::CopyOfRange(seqBytes, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH), candidateOffset + (sysexSegs * EVENT_SEG_LENGTH) + EVENT_SEG_LENGTH);
+                auto potentialTerminator = Util::vecCopyOfRange(seqBytes, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH), candidateOffset + (sysexSegs * EVENT_SEG_LENGTH) + EVENT_SEG_LENGTH);
                 
                 if (potentialTerminator[EVENT_ID_OFFSET] == SYS_EX_TERMINATOR_ID)
                     break;
             }
             
             sysexSegs++;
-            ea = VecUtil::CopyOfRange(seqBytes, candidateOffset, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH));
+            ea = Util::vecCopyOfRange(seqBytes, candidateOffset, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH));
         }
         eventArrays.push_back(ea);
         candidateOffset += (int)(ea.size());

@@ -4,9 +4,9 @@
 #include <file/pgmreader/ProgramFileReader.hpp>
 #include <file/pgmreader/SoundNames.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
+#include <Util.hpp>
 using namespace mpc::file::pgmreader;
 
 Pads::Pads(ProgramFileReader* programFile) 
@@ -35,7 +35,7 @@ int Pads::getPadsEnd()
 std::vector<char> Pads::getPadsArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-	padsArray = VecUtil::CopyOfRange(pgmFileArray, getPadsStart(), getPadsEnd());
+	padsArray = Util::vecCopyOfRange(pgmFileArray, getPadsStart(), getPadsEnd());
 	return padsArray;
 }
 

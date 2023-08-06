@@ -2,17 +2,15 @@
 
 #include "AllEvent.hpp"
 #include "AllSequence.hpp"
+#include "Util.hpp"
 
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-
-#include <VecUtil.hpp>
 
 #include <cmath>
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace moduru;
 
 std::vector<char> AllSysExEvent::MIXER_SIGNATURE = { (char) 240, 71, 0, 68, 69 };
 
@@ -27,7 +25,7 @@ std::shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const std::vector<char>& b
     for (int i = 0; i < byteCount; i++)
 		sysexLoadData[i] = bytes[DATA_OFFSET + i];
 
-	if (VecUtil::Equals(VecUtil::CopyOfRange(sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE))
+	if (Util::vecEquals(Util::vecCopyOfRange(sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE))
     {
 		event = std::make_shared<MixerEvent>();
         auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);

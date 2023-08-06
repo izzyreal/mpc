@@ -4,7 +4,7 @@
 #include <file/all/AllParser.hpp>
 
 #include <StrUtil.hpp>
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -23,7 +23,7 @@ MidiSyncMisc::MidiSyncMisc(const std::vector<char>& b)
 	input = b[INPUT_OFFSET];
 	output = b[OUTPUT_OFFSET];
 
-	auto stringBuffer = moduru::VecUtil::CopyOfRange(b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
+	auto stringBuffer = Util::vecCopyOfRange(b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
 	defSongName = std::string(stringBuffer.begin(), stringBuffer.end());
 }
 

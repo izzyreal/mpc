@@ -3,9 +3,8 @@
 #include <file/pgmreader/ProgramFileReader.hpp>
 #include <file/pgmreader/SoundNames.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
 using namespace mpc::file::pgmreader;
 
 Slider::Slider(ProgramFileReader* programFile) 
@@ -34,7 +33,7 @@ int Slider::getSliderEnd()
 std::vector<char> Slider::getSliderArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    sliderArray = VecUtil::CopyOfRange(pgmFileArray, getSliderStart(), getSliderEnd());
+    sliderArray = Util::vecCopyOfRange(pgmFileArray, getSliderStart(), getSliderEnd());
     return sliderArray;
 }
 

@@ -3,9 +3,8 @@
 #include <file/pgmreader/ProgramFileReader.hpp>
 #include <file/pgmreader/SoundNames.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
 using namespace mpc::file::pgmreader;
 
 ProgramName::ProgramName(ProgramFileReader* programFile) 
@@ -34,7 +33,7 @@ int ProgramName::getProgramNameEnd()
 std::vector<char> ProgramName::getProgramNameArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    programNameArray = VecUtil::CopyOfRange(pgmFileArray, getProgramNameStart(), getProgramNameEnd());
+    programNameArray = Util::vecCopyOfRange(pgmFileArray, getProgramNameStart(), getProgramNameEnd());
     return programNameArray;
 }
 

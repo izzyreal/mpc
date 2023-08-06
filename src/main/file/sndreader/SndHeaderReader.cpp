@@ -2,7 +2,7 @@
 
 #include <file/sndreader/SndReader.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 #include <file/ByteUtil.hpp>
 #include <StrUtil.hpp>
 
@@ -11,7 +11,7 @@ using namespace mpc::file::sndreader;
 SndHeaderReader::SndHeaderReader(SndReader* sndReader)
 {
 	auto sndFileArray = sndReader->getSndFileArray();
-	headerArray = moduru::VecUtil::CopyOfRange(sndFileArray, 0, 42);
+	headerArray = Util::vecCopyOfRange(sndFileArray, 0, 42);
 }
 
 std::vector<char>& SndHeaderReader::getHeaderArray()
@@ -60,28 +60,28 @@ bool SndHeaderReader::isMono()
 
 int SndHeaderReader::getStart()
 {
-    auto startArray = moduru::VecUtil::CopyOfRange(headerArray, 22, 26);
+    auto startArray = Util::vecCopyOfRange(headerArray, 22, 26);
 	auto start = ByteUtil::bytes2uint(startArray);
     return start;
 }
 
 int SndHeaderReader::getEnd()
 {
-	auto endArray = moduru::VecUtil::CopyOfRange(headerArray, 26, 30);
+	auto endArray = Util::vecCopyOfRange(headerArray, 26, 30);
 	auto end = ByteUtil::bytes2uint(endArray);
 	return end;
 }
 
 int SndHeaderReader::getNumberOfFrames()
 {
-	auto numberOfFramesArray = moduru::VecUtil::CopyOfRange(headerArray, 30, 34);
+	auto numberOfFramesArray = Util::vecCopyOfRange(headerArray, 30, 34);
 	int numberOfFrames = ByteUtil::bytes2uint(numberOfFramesArray);
 	return numberOfFrames;
 }
 
 int SndHeaderReader::getLoopLength()
 {
-	auto loopLengthArray = moduru::VecUtil::CopyOfRange(headerArray, 34, 38);
+	auto loopLengthArray = Util::vecCopyOfRange(headerArray, 34, 38);
 	auto loopLength = ByteUtil::bytes2uint(loopLengthArray);
 	return loopLength;
 }
@@ -99,7 +99,7 @@ int SndHeaderReader::getNumberOfBeats()
 
 int SndHeaderReader::getSampleRate()
 {
-	auto rateArray = moduru::VecUtil::CopyOfRange(headerArray, 40, 42);
+	auto rateArray = Util::vecCopyOfRange(headerArray, 40, 42);
 	auto rate = ByteUtil::bytes2ushort(rateArray);
 	return static_cast<int>(rate);
 }

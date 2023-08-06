@@ -2,15 +2,14 @@
 
 #include <file/pgmreader/ProgramFileReader.hpp>
 
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
-using namespace moduru;
 using namespace mpc::file::pgmreader;
 
 PgmHeader::PgmHeader(ProgramFileReader* programFile)
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-	headerArray = VecUtil::CopyOfRange(pgmFileArray, 0, 4);
+	headerArray = Util::vecCopyOfRange(pgmFileArray, 0, 4);
 }
 
 std::vector<char> PgmHeader::getHeaderArray()

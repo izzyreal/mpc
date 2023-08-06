@@ -9,16 +9,15 @@
 #include <sampler/Pad.hpp>
 
 #include <StrUtil.hpp>
-#include <VecUtil.hpp>
+#include <Util.hpp>
 
 using namespace mpc::file::aps;
 using namespace mpc::engine;
-using namespace moduru;
 
 ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
 {
 	index = loadBytes[INDEX_OFFSET];
-	auto nameBytes = VecUtil::CopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
+	auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
 
     name = "";
 	
@@ -32,16 +31,16 @@ ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
 
     name = StrUtil::trim(name);
 
-	slider = new ApsSlider(VecUtil::CopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
+	slider = new ApsSlider(Util::vecCopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
 	
 	for (int i = 0; i < 64; i++)
 	{
 		int offset = NOTE_PARAMETERS_OFFSET + (i * NOTE_PARAMETERS_LENGTH);
-		noteParameters[i] = new ApsNoteParameters(VecUtil::CopyOfRange(loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
+		noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
 	}
 
-	mixer = new ApsMixer(VecUtil::CopyOfRange(loadBytes, MIXER_OFFSET, MIXER_END));
-	assignTable = new ApsAssignTable(VecUtil::CopyOfRange(loadBytes, ASSIGN_TABLE_OFFSET, ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
+	mixer = new ApsMixer(Util::vecCopyOfRange(loadBytes, MIXER_OFFSET, MIXER_END));
+	assignTable = new ApsAssignTable(Util::vecCopyOfRange(loadBytes, ASSIGN_TABLE_OFFSET, ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
 }
 
 ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
