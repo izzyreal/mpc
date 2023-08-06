@@ -1,11 +1,11 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include <thirdp/wrpkey/key.hxx>
-
 #include <utility>
 #include <vector>
 #include <string>
+
+#include "wrpkey/key.hxx"
 
 namespace mpc::controls
 {
