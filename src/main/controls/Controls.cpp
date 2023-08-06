@@ -54,14 +54,14 @@ bool Controls::isErasePressed()
 	return erasePressed;
 }
 
-bool Controls::isRecPressed()
+bool Controls::isRecPressed(bool includeLocked)
 {
-	return recPressed;
+	return recPressed || (includeLocked && recLocked);
 }
 
-bool Controls::isOverDubPressed()
+bool Controls::isOverDubPressed(bool includeLocked)
 {
-	return overDubPressed;
+	return overDubPressed || (includeLocked && overDubLocked);
 }
 
 bool Controls::isTapPressed()
@@ -142,12 +142,22 @@ void Controls::setErasePressed(bool b)
 
 void Controls::setRecPressed(bool b)
 {
-	recPressed = b;
+    recPressed = b;
+}
+
+void Controls::setRecLocked(bool b)
+{
+	recLocked = b;
 }
 
 void Controls::setOverDubPressed(bool b)
 {
 	overDubPressed = b;
+}
+
+void Controls::setOverDubLocked(bool b)
+{
+	overDubLocked = b;
 }
 
 void Controls::setTapPressed(bool b)

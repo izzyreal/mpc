@@ -487,12 +487,14 @@ void BaseControls::rec()
 
     auto controls = mpc.getControls();
     
-    if (controls->isRecPressed())
+    if (controls->isRecPressed(/*includeLocked=*/false))
     {
         return;
     }
 
     controls->setRecPressed(true);
+
+    controls->setRecLocked(false);
 
     auto hw = mpc.getHardware();
     
@@ -518,10 +520,17 @@ void BaseControls::overDub()
     }
 
     auto controls = mpc.getControls();
+
+    if (controls->isOverDubPressed(/*includeLocked=*/false))
+    {
+        return;
+    }
+
     controls->setOverDubPressed(true);
 
+    controls->setOverDubLocked(false);
+
     auto hw = mpc.getHardware();
-    
 
     if (sequencer->isRecordingOrOverdubbing())
     {
