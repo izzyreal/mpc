@@ -33,7 +33,7 @@ namespace mpc::lcdgui::screens
 		int input = 0;
 		int threshold = -20;
 		int mode = 2;
-		int time = 10;
+		int time = 100;
 		int monitor = 0;
 		int preRec = 100;
 		float peakL = 0;
