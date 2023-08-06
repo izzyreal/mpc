@@ -22,7 +22,7 @@ void Logger::log(std::string s) {
 		return;
 	}
 
-	auto fp = fs::ofstream(path, std::ios::app | std::ios::binary);
+	auto fp = std::ofstream(path, std::ios::app | std::ios::binary);
 
 	s += "\n";
 
