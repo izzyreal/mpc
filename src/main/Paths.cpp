@@ -66,13 +66,7 @@ fs::path Paths::autoSavePath()
     return path;
 }
 
-fs::path Paths::demoDataSrcPath()
-{
-    static auto demoDataPath = fs::path(sago::getData()) / "VMPC2000XL" / "DemoData";
-    return demoDataPath;
-}
-
-fs::path Paths::demoDataDestPath()
+fs::path Paths::demoDataPath()
 {
     static auto demoDataPath = defaultLocalVolumePath() / "Demos";
     return demoDataPath;

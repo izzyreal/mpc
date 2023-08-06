@@ -20,8 +20,7 @@ public:
     static fs::path autoSavePath();
 
     static fs::path configPath();
-    static fs::path demoDataSrcPath();
-    static fs::path demoDataDestPath();
+    static fs::path demoDataPath();
 
 };
 }

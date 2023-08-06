@@ -45,6 +45,25 @@ CMRC_DECLARE(mpc);
 using namespace mpc;
 using namespace mpc::lcdgui;
 
+void copyDir(const fs::path& src, const fs::path& dest)
+{
+    auto fs = cmrc::mpc::get_filesystem();
+
+    for (auto&& entry: fs.iterate_directory(src))
+    {
+        if (entry.is_directory()) continue;
+
+        auto path = fs::path(dest / entry.filename());
+
+        if (!fs::exists(path))
+        {
+            auto file = fs.open(src / entry.filename());
+            std::vector<char> data(file.begin(), file.end());
+            set_file_data(path, data);
+        }
+    }
+}
+
 Mpc::Mpc()
 {
 #if __linux__
@@ -58,7 +77,15 @@ Mpc::Mpc()
         Paths::defaultLocalVolumePath(),
         Paths::recordingsPath(),
         Paths::midiControlPresetsPath(),
-        Paths::autoSavePath()
+        Paths::autoSavePath(),
+        Paths::demoDataPath() / "TEST1",
+        Paths::demoDataPath() / "TEST2"
+    };
+
+    std::vector<std::pair<fs::path, fs::path>> factoryData{
+            {"midicontrolpresets", Paths::midiControlPresetsPath()},
+            {"demodata/TEST1", Paths::demoDataPath() / "TEST1"},
+            {"demodata/TEST2", Paths::demoDataPath() / "TEST2"}
     };
 
     auto fs = cmrc::mpc::get_filesystem();
@@ -88,30 +115,12 @@ Mpc::Mpc()
         }
     }
 
+    for (auto& src_dest : factoryData)
+    {
+        copyDir(src_dest.first, src_dest.second);
+    }
+
 	mpc::Logger::l.setPath(mpc::Paths::logFilePath().string());
-
-#ifndef __linux__
-    auto demoSrc = Paths::demoDataSrcPath();
-    auto demoDest = Paths::demoDataDestPath();
-
-	if (!fs::exists(demoDest))
-	{
-		try
-		{
-			MLOG("Copying demo data into " + demoDest.string());
-			fs::copy(demoSrc, demoDest, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
-		}
-		catch (std::exception& e)
-		{
-            std::string errorMsg = e.what();
-			MLOG("An error occurred while copying demo data from " + demoSrc.string() + " to " + demoDest.string());
-		}
-	}
-	else
-	{
-		MLOG(demoDest.string() + " already exists, it will not be touched.");
-	}
-#endif
 
 	hardware = std::make_shared<hardware::Hardware>(*this);
 }
