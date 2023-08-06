@@ -37,8 +37,8 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
 
-		unsigned char modeIn = 1;
-		unsigned char modeOut = 1;
+		unsigned char modeIn = 0;
+		unsigned char modeOut = 0;
 
 	private:
 		const std::vector<std::string> modeNames{ "OFF", "MIDI CLOCK", "TIME CODE" };
