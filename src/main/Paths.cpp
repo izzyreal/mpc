@@ -1,6 +1,6 @@
 #include "Paths.hpp"
 
-#include <thirdp/PlatformFolders/platform_folders.h>
+#include <platform_folders.h>
 
 #ifdef __APPLE__
 #include <TargetConditionals.h>

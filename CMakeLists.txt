@@ -66,7 +66,13 @@ FetchContent_Declare(libsamplerate
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/libsamplerate
 )
 
-FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2 libsamplerate)
+FetchContent_Declare(platformfolders
+    GIT_REPOSITORY https://github.com/sago007/PlatformFolders.git
+    GIT_TAG        master
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/platformfolders
+)
+
+FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -117,7 +123,7 @@ target_include_directories(mpc PUBLIC
     ${libsamplerate_SOURCE_DIR}/include
 )
 
-target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi samplerate)
+target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi samplerate platform_folders)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")
