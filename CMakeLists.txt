@@ -54,6 +54,8 @@ FetchContent_Declare(rtmidi
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
 )
 
+set(BUILD_TESTING OFF)
+
 FetchContent_Declare(libsamplerate
     GIT_REPOSITORY https://github.com/libsndfile/libsamplerate.git
     GIT_TAG        master
