@@ -1,9 +1,9 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "Logger.hpp"
+#include <Logger.hpp>
+
+#include <mpc_fs.hpp>
 
 #include <string>
-
-#include "mpc_fs.hpp"
 
 using namespace mpc;
 
@@ -22,7 +22,7 @@ void Logger::log(std::string s) {
 		return;
 	}
 
-	auto fp = std::ofstream (path, std::ios::app | std::ios::binary);
+	auto fp = fs::ofstream(path, std::ios::app | std::ios::binary);
 
 	s += "\n";
 

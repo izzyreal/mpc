@@ -5,12 +5,6 @@ include(cmake/ResourceBundling.cmake)
 
 include(FetchContent)
 
-FetchContent_Declare(moduru
-  GIT_REPOSITORY https://github.com/izzyreal/moduru.git
-  GIT_TAG        master
-  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/moduru
-)
-
 FetchContent_Declare(akaifat
   GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
   GIT_TAG        main
@@ -78,7 +72,7 @@ FetchContent_Declare(concurrentqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/concurrentqueue
 )
 
-FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
+FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
 
 FetchContent_GetProperties(tl-expected concurrentqueue)
 
@@ -122,7 +116,6 @@ add_library(mpc ${_source_list_main})
 target_include_directories(mpc PUBLIC
     ${_src_root_path_main}
     ${akaifat_SOURCE_DIR}/src/main
-    ${moduru_SOURCE_DIR}/src/main
     ${rapidjson_SOURCE_DIR}/include
     ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
@@ -130,7 +123,7 @@ target_include_directories(mpc PUBLIC
     ${concurrentqueue_SOURCE_DIR}
 )
 
-target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi samplerate platform_folders)
+target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")
