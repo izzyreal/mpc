@@ -74,9 +74,11 @@ FetchContent_Declare(concurrentqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/concurrentqueue
 )
 
+FetchContent_Populate(concurrentqueue)
+
 FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
 
-FetchContent_GetProperties(tl-expected concurrentqueue)
+FetchContent_GetProperties(tl-expected)
 
 if(NOT tl-expected_POPULATED)
   FetchContent_Populate(tl-expected)
