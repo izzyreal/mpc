@@ -1,5 +1,7 @@
 #include "AllParser.hpp"
 
+#include <stdexcept>
+
 #include <Mpc.hpp>
 
 #include <file/all/Count.hpp>

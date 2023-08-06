@@ -49,7 +49,7 @@ void copyDir(const fs::path& src, const fs::path& dest)
 {
     auto fs = cmrc::mpc::get_filesystem();
 
-    for (auto&& entry: fs.iterate_directory(src))
+    for (auto&& entry: fs.iterate_directory(src.string()))
     {
         if (entry.is_directory()) continue;
 
@@ -57,7 +57,7 @@ void copyDir(const fs::path& src, const fs::path& dest)
 
         if (!fs::exists(path))
         {
-            auto file = fs.open(src / entry.filename());
+            auto file = fs.open((src / entry.filename()).string());
             std::vector<char> data(file.begin(), file.end());
             set_file_data(path, data);
         }
