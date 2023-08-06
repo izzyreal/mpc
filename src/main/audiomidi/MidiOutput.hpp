@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "thirdp/concurrentqueue.h"
+#include <concurrentqueue.h>
 
 namespace mpc::audiomidi {
 

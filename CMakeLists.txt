@@ -72,9 +72,15 @@ FetchContent_Declare(platformfolders
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/platformfolders
 )
 
+FetchContent_Declare(concurrentqueue
+    GIT_REPOSITORY https://github.com/cameron314/concurrentqueue.git
+    GIT_TAG        master
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/concurrentqueue
+)
+
 FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
 
-FetchContent_GetProperties(tl-expected)
+FetchContent_GetProperties(tl-expected concurrentqueue)
 
 if(NOT tl-expected_POPULATED)
   FetchContent_Populate(tl-expected)
@@ -121,6 +127,7 @@ target_include_directories(mpc PUBLIC
     ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
     ${libsamplerate_SOURCE_DIR}/include
+    ${concurrentqueue_SOURCE_DIR}
 )
 
 target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi samplerate platform_folders)

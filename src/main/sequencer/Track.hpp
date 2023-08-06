@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Mpc.hpp>
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Event.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <Observer.hpp>
+#include "Mpc.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Event.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/NoteEventStore.hpp"
+#include "Observer.hpp"
 
-#include "thirdp/concurrentqueue.h"
+#include <concurrentqueue.h>
 #include <memory>
 #include <unordered_map>
-#include "sequencer/NoteEventStore.hpp"
 
 namespace mpc { class Mpc; }
 
