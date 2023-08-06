@@ -1,4 +1,8 @@
 #include "Sequencer.hpp"
+
+#include <algorithm>
+#include <chrono>
+
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include <Mpc.hpp>
@@ -25,16 +29,16 @@
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
-// moduru
-#include <System.hpp>
 #include <StrUtil.hpp>
-
-#include <algorithm>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+
+uint64_t currentTimeMillis() {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
 	: mpc (mpc)
@@ -43,7 +47,7 @@ Sequencer::Sequencer(mpc::Mpc& mpc)
 
 void Sequencer::init()
 {
-	lastTap = moduru::System::currentTimeMillis();
+	lastTap = currentTimeMillis();
 	nextSq = -1;
 
 	auto userScreen = mpc.screens->get<UserScreen>("user");
@@ -1246,7 +1250,7 @@ void Sequencer::tap()
 	if (isPlaying())
 		return;
 
-	auto now = moduru::System::currentTimeMillis();
+	const auto now = currentTimeMillis();
 
 	if (now - lastTap > 2000)
 	{

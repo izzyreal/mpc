@@ -8,7 +8,6 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include <chrono>
 
 namespace mpc::engine::midi { class ShortMessage; }
 
