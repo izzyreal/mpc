@@ -5,11 +5,9 @@
 #include <sequencer/SeqUtil.hpp>
 
 #include <Util.hpp>
-#include <System.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace moduru;
 
 EraseScreen::EraseScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "erase", layerIndex)
@@ -95,6 +93,8 @@ void EraseScreen::function(int i)
 
 		auto seq = sequencer->getActiveSequence();
 
+        const auto selectedType = eventTypes[type];
+
 		for (auto j = startIndex; j < lastIndex + 1; j++)
 		{
             std::vector<int> removalIndices;
@@ -106,73 +106,26 @@ void EraseScreen::function(int i)
 				auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
 
 				if (e->getTick() >= time0 && e->getTick() < time1)
-				{
-                    std::string excludeClass;
-                    std::string includeClass;
-					
-					switch (erase)
-					{
-					case 0:
-						if (ne)
-						{
-							auto nn = ne->getNote();
-							
-							if (midi && nn >= noteA && nn <= noteB)
-								removalIndices.push_back(k);
-							
-							if (!midi && (noteA <= 34 || noteA == nn))
-								removalIndices.push_back(k);
-						}
-						else
-						{
-							removalIndices.push_back(k);
-						}
-						break;
-					case 1:
-						excludeClass = eventClassNames[type];
-
-						if (System::demangle(typeid(e).name()) != excludeClass)
-						{
-							if (ne)
-							{
-								auto nn = ne->getNote();
-							
-								if (midi && nn >= noteA && nn <= noteB)
-									removalIndices.push_back(k);
-								
-								if (!midi && (noteA > 34 && noteA != nn))
-									removalIndices.push_back(k);
-							}
-							else
-							{
-								removalIndices.push_back(k);
-							}
-						}
-						break;
-					case 2:
-						includeClass = eventClassNames[type];
-						
-						if (System::demangle(typeid(e).name()) == includeClass)
-						{
-							if (ne)
-							{
-								auto nn = ne->getNote();
-							
-								if (midi && nn >= noteA && nn <= noteB)
-									removalIndices.push_back(k);
-								
-								if (!midi && (noteA <= 34 || noteA == nn))
-									removalIndices.push_back(k);
-							}
-							else
-							{
-								removalIndices.push_back(k);
-							}
-						}
-						break;
-					}
-
-				}
+                {
+                    if (erase == 0
+                        || (erase == 1 && e->getTypeName() != selectedType)
+                        || erase == 2 && e->getTypeName() != selectedType)
+                    {
+                        if (ne)
+                        {
+                            const auto nn = ne->getNote();
+                            if ((midi && nn >= noteA && nn <= noteB) || (!midi && (noteA <= 34 || noteA == nn)))
+                            {
+                                removalIndices.push_back(k);
+                            }
+                        }
+                        else
+                        {
+                            removalIndices.push_back(k);
+                        }
+                    }
+                    break;
+                }
 			}
 
 			sort(begin(removalIndices), end(removalIndices));

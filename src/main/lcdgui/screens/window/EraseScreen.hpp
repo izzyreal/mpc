@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens::window
 		void displayTime() override;
 
 	private:
-		const std::vector<std::string> eventClassNames{ "com.mpc.sequencer.NoteEvent", "com.mpc.sequencer.PitchBendEvent", "com.mpc.sequencer.ControlChangeEvent", "com.mpc.sequencer.ProgramChangeEvent", "com.mpc.sequencer.ChannelPressureEvent", "com.mpc.sequencer.PolyPressureEvent", "com.mpc.sequencer.SystemExclusiveEvent" };
+		const std::vector<std::string> eventTypes{ "note-on", "pitch-bend", "control-change", "program-change", "channel-pressure", "poly-pressure", "system-exclusive" };
 		const std::vector<std::string> typeNames{ "NOTES", "PITCH BEND", "CONTROL", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
 		const std::vector<std::string> eraseNames{ "ALL EVENTS", "ALL EXCEPT", "ONLY ERASE" };
 
