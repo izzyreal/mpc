@@ -57,7 +57,7 @@ void copyDir(const fs::path& src, const fs::path& dest)
 
         if (!fs::exists(path))
         {
-            auto file = fs.open((src / entry.filename()).string());
+            auto file = fs.open(src.string() + "/" + entry.filename());
             std::vector<char> data(file.begin(), file.end());
             set_file_data(path, data);
         }
