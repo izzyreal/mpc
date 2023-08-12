@@ -1,14 +1,10 @@
 #include "Background.hpp"
+
+#include "ResourceUtil.h"
+
 #include <Paths.hpp>
 
-#include <cmrc/cmrc.hpp>
-#include <string_view>
-
 #include "LodePNG.hpp"
-
-CMRC_DECLARE(mpc);
-
-#include <Logger.hpp>
 
 using namespace mpc::lcdgui;
 
@@ -42,16 +38,8 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 
 	if (dirty)
 	{
-		auto fs = cmrc::mpc::get_filesystem();
-		std::string fileName = "/screens/bg/" + name + ".png";
-		
-		if (!fs.exists(fileName))
-		{
-			MLOG("Background " + fileName + " does not exist!");
-			Component::Draw(pixels);
-			return;
-		}
-		
+		const std::string fileName = "/screens/bg/" + name + ".png";
+
 		unsigned int width = 248;
 		unsigned int height = 60;
 
@@ -60,9 +48,9 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
             height = 360;
         }
 		
-		auto file = fs.open(fileName);
-		std::vector<unsigned char> file_data(file.begin(), file.end());
-		std::vector<unsigned char> data;
+		const auto file_data_char = ResourceUtil::get_resource_data(fileName);
+        std::vector<unsigned char> file_data(file_data_char.begin(), file_data_char.end());
+        std::vector<unsigned char> data;
 
 		lodepng::decode(data, width, height, file_data, LCT_RGB, 8);
 

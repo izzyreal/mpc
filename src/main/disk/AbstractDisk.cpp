@@ -405,11 +405,18 @@ void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> pre
     performIoOrOpenErrorPopup(ioFunc);
 }
 
-void AbstractDisk::readMidiControlPreset(fs::path p, std::shared_ptr<MidiControlPreset> preset)
+void AbstractDisk::readMidiControlPreset(const fs::path& p, const std::shared_ptr<MidiControlPreset>& preset)
 {
-    std::function<preset_or_error()> ioFunc = [p, preset] {
+    MLOG("Trying to read MIDI control preset at path " + p.string());
+
+    std::function<preset_or_error()> ioFunc = [p, preset] () -> preset_or_error {
 
         auto data = get_file_data(p);
+
+        if (data.size() < 681)
+        {
+            return tl::make_unexpected(mpc_io_error_msg{"MIDI control preset file is smaller than 681 bytes: " + p.string()});
+        }
 
         preset->rows.clear();
         preset->name = "";

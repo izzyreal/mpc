@@ -25,14 +25,11 @@
 #include <cmath>
 #include <set>
 
-#include <cmrc/cmrc.hpp>
-#include <string_view>
+#include "ResourceUtil.h"
 
 #if __linux__
 #include <climits>
 #endif
-
-CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -40,15 +37,13 @@ using namespace mpc::lcdgui::screens;
 LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-    auto fs = cmrc::mpc::get_filesystem();
+    const auto fntPath = "fonts/mpc2000xl-font.fnt";
+    auto fntData = ResourceUtil::get_resource_data(fntPath);
 
-    auto fntFile = fs.open("fonts/mpc2000xl-font.fnt");
-    char* fntData = (char*) std::string_view(fntFile.begin(), fntFile.end() - fntFile.begin()).data();
+    const auto bmpPath = "fonts/mpc2000xl-font_0.bmp";
+    auto bmpData = ResourceUtil::get_resource_data(bmpPath);
 
-    auto bmpFile = fs.open("fonts/mpc2000xl-font_0.bmp");
-    char* bmpData = (char*) std::string_view(bmpFile.begin(), bmpFile.end() - bmpFile.begin()).data();
-
-	BMFParser bmfParser(fntData, fntFile.size(), bmpData, bmpFile.size());
+	BMFParser bmfParser(&fntData[0], fntData.size(), &bmpData[0], bmpData.size());
 
 	font = bmfParser.getLoadedFont();
 	atlas = bmfParser.getAtlas();

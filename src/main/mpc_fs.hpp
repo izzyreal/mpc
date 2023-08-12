@@ -22,7 +22,7 @@ namespace fs = std::filesystem;
 namespace fs = ghc::filesystem;
 #endif
 
-inline std::vector<char> get_file_data(fs::path p)
+inline std::vector<char> get_file_data(const fs::path& p)
 {
     std::ifstream ifs(p, std::ios::in | std::ios::binary | std::ios::ate);
 
@@ -35,13 +35,13 @@ inline std::vector<char> get_file_data(fs::path p)
     return bytes;
 }
 
-inline void set_file_data(fs::path p, const std::vector<char>& bytes)
+inline void set_file_data(const fs::path& p, const std::vector<char>& bytes)
 {
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
     ofs.write(bytes.data(), bytes.size());
 }
 
-inline void set_file_data(fs::path p, const std::string& bytes)
+inline void set_file_data(const fs::path& p, const std::string& bytes)
 {
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
     ofs.write(bytes.data(), bytes.size());

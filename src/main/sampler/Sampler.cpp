@@ -23,10 +23,7 @@
 
 #include <samplerate.h>
 
-#include <cmrc/cmrc.hpp>
-#include <string_view>
-
-CMRC_DECLARE(mpc);
+#include "ResourceUtil.h"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -170,49 +167,47 @@ void Sampler::setMasterPadAssign(std::vector<int> v)
 	masterPadAssign = v;
 }
 
-void Sampler::init()
-{
+void Sampler::init() {
     initMasterPadAssign = Pad::getPadNotes(mpc);
 
-	auto program = createNewProgramAddFirstAvailableSlot().lock();
-	program->setName("NewPgm-A");
-	
-	for (int i = 0; i < 4; i++)
-	{
-		for (auto j = 0; j < 16; j++)
-		{
-			std::string result = "";
-			result.append(abcd[i]);
-			result.append(StrUtil::padLeft(std::to_string(j + 1), "0", 2));
-			padNames.push_back(result);
-		}
-	}
+    auto program = createNewProgramAddFirstAvailableSlot().lock();
+    program->setName("NewPgm-A");
 
-    auto fs = cmrc::mpc::get_filesystem();
+    for (int i = 0; i < 4; i++) {
+        for (auto j = 0; j < 16; j++) {
+            std::string result = "";
+            result.append(abcd[i]);
+            result.append(StrUtil::padLeft(std::to_string(j + 1), "0", 2));
+            padNames.push_back(result);
+        }
+    }
+
     clickSound = std::make_shared<Sound>(44100);
     clickSound->setMono(true);
     clickSound->setLevel(100);
 
-    if (fs.exists("audio/click.wav"))
-    {
-        auto clickFile = fs.open("audio/click.wav");
-        auto clickData = (char*) std::string_view(clickFile.begin(), clickFile.end() - clickFile.begin()).data();
+    auto clickData = ResourceUtil::get_resource_data("audio/click.wav");
 
-        auto stream = wav_init_istringstream(clickData, clickFile.size());
+    if (clickData.size() != 146)
+    {
+        MLOG("Warning: click.wav does not exist or doesn't have the correct size!");
+    }
+    else
+    {
+        auto stream = wav_init_istringstream(&clickData[0], clickData.size());
         int sampleRate, validBits, numChannels, numFrames;
         wav_read_header(stream, sampleRate, validBits, numChannels, numFrames);
-        
+
         if (numChannels == 1 && validBits == 16) {
-            for (int i = 0; i < numFrames; i++)
-            {
+            for (int i = 0; i < numFrames; i++) {
                 float frame = wav_get_LE(stream, 2) / 32768.0;
                 clickSound->insertFrame(std::vector<float>{frame}, clickSound->getFrameCount());
             }
         }
         clickSound->setEnd(numFrames);
     }
-    
-	masterPadAssign = initMasterPadAssign;
+
+    masterPadAssign = initMasterPadAssign;
 }
 
 void Sampler::playMetronome(unsigned int velocity, int framePos)

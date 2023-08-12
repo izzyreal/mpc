@@ -1,7 +1,5 @@
 #include "Screens.hpp"
 
-#include <Paths.hpp>
-
 #include <lcdgui/Component.hpp>
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Info.hpp>
@@ -161,12 +159,9 @@
 
 #include <StrUtil.hpp>
 
-#include <cmrc/cmrc.hpp>
-#include <string_view>
+#include "ResourceUtil.h"
 
 #include <rapidjson/document.h>
-
-CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -186,15 +181,13 @@ std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()
 
     if (result.empty())
     {
-        auto fs = cmrc::mpc::get_filesystem();
-
         for (int i = 0; i < 4; i++)
         {
-            auto file = fs.open("screens/layer" + std::to_string(i + 1) + ".json");
-            char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
+            const auto path = "screens/layer" + std::to_string(i + 1) + ".json";
+            auto data = mpc::ResourceUtil::get_resource_data(path);
 
             auto panelDoc = std::make_unique<Document>();
-            panelDoc->Parse(data, file.size());
+            panelDoc->Parse(&data[0], data.size());
             result.push_back(std::move(panelDoc));
         }
     }

@@ -29,40 +29,16 @@
 
 #include <lcdgui/Screens.hpp>
 
-#include "file/all/AllParser.hpp"
+#include "ResourceUtil.h"
 
 #include <string>
-
-#include <cmrc/cmrc.hpp>
-#include <string_view>
 
 #if __linux__
 #include <X11/Xlib.h>
 #endif
 
-CMRC_DECLARE(mpc);
-
 using namespace mpc;
 using namespace mpc::lcdgui;
-
-void copyDir(const fs::path& src, const fs::path& dest)
-{
-    auto fs = cmrc::mpc::get_filesystem();
-
-    for (auto&& entry: fs.iterate_directory(src.string()))
-    {
-        if (entry.is_directory()) continue;
-
-        auto path = fs::path(dest / entry.filename());
-
-        if (!fs::exists(path))
-        {
-            auto file = fs.open(src.string() + "/" + entry.filename());
-            std::vector<char> data(file.begin(), file.end());
-            set_file_data(path, data);
-        }
-    }
-}
 
 Mpc::Mpc()
 {
@@ -76,19 +52,8 @@ Mpc::Mpc()
         Paths::storesPath(),
         Paths::defaultLocalVolumePath(),
         Paths::recordingsPath(),
-        Paths::midiControlPresetsPath(),
-        Paths::autoSavePath(),
-        Paths::demoDataPath() / "TEST1",
-        Paths::demoDataPath() / "TEST2"
+        Paths::autoSavePath()
     };
-
-    std::vector<std::pair<fs::path, fs::path>> factoryData{
-            {"midicontrolpresets", Paths::midiControlPresetsPath()},
-            {"demodata/TEST1", Paths::demoDataPath() / "TEST1"},
-            {"demodata/TEST2", Paths::demoDataPath() / "TEST2"}
-    };
-
-    auto fs = cmrc::mpc::get_filesystem();
 
     for (auto& p : requiredPaths)
     {
@@ -96,31 +61,40 @@ Mpc::Mpc()
         {
             fs::create_directories(p);
         }
+    }
 
-        if (p == Paths::midiControlPresetsPath())
+    const std::vector<std::string> demo_files{ "TEST1/BASIC_KIT.ALL", "TEST1/BASIC_KIT.APS", "TEST1/BASIC_KIT.MID", "TEST1/BASIC_KIT.PGM",
+                "TEST1/HAT1.SND", "TEST1/KICK1.SND", "TEST1/SNARE4.SND", "TEST2/2PEOPLE3.SND", "TEST2/CLIMAX.SND",
+                "TEST2/FRUTZLE.ALL", "TEST2/FRUTZLE.APS", "TEST2/FRUTZLE.MID", "TEST2/FRUTZLE.PGM", "TEST2/KICKHAT3.SND",
+                "TEST2/KICKHAT5.SND", "TEST2/KICK_C_1.SND", "TEST2/KICK_C_2.SND", "TEST2/MOOI.SND", "TEST2/OBOE.SND",
+                "TEST2/PIAMA2.SND", "TEST2/PIAMA3.SND", "TEST2/RIDE.SND", "TEST2/RIDE1.SND", "TEST2/SOLOBASS.SND",
+                "TEST2/WOOSH.SND" };
+
+    if (!fs::exists(Paths::demoDataPath()))
+    {
+        fs::create_directories(Paths::demoDataPath() / "TEST1");
+        fs::create_directories(Paths::demoDataPath() / "TEST2");
+        for (auto& demo_file : demo_files)
         {
-            for (auto &&entry: fs.iterate_directory("midicontrolpresets"))
-            {
-                if (entry.is_directory()) continue;
-
-                auto path = fs::path(p / entry.filename());
-
-                if (!fs::exists(path))
-                {
-                    auto file = fs.open("midicontrolpresets/" + entry.filename());
-                    std::vector<char> data(file.begin(), file.end());
-                    set_file_data(path, data);
-                }
-            }
+            const auto data = mpc::ResourceUtil::get_resource_data("demodata/" + demo_file);
+            set_file_data(Paths::demoDataPath() / demo_file, data);
         }
     }
 
-    for (auto& src_dest : factoryData)
+    if (!fs::exists(Paths::midiControlPresetsPath()))
     {
-        copyDir(src_dest.first, src_dest.second);
+        fs::create_directories(Paths::midiControlPresetsPath());
+
+        const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp" };
+
+        for (auto& preset : factory_midi_control_presets)
+        {
+            const auto data = mpc::ResourceUtil::get_resource_data("midicontrolpresets/" + preset);
+            set_file_data(Paths::midiControlPresetsPath() / preset, data);
+        }
     }
 
-	mpc::Logger::l.setPath(mpc::Paths::logFilePath().string());
+    mpc::Logger::l.setPath(mpc::Paths::logFilePath().string());
 
 	hardware = std::make_shared<hardware::Hardware>(*this);
 }

@@ -4,7 +4,6 @@ set(_mpc_resources_root ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 
 function(_bundle_mpc_resources _target_name)
   set(total_list "")
-  set(total_list_test "")
 
   _add_resource_files(${_target_name} ${_mpc_resources_root} screens json "${total_list}")
   _add_resource_files(${_target_name} ${_mpc_resources_root} screens/bg png "${total_list}")
@@ -14,18 +13,24 @@ function(_bundle_mpc_resources _target_name)
   _add_resource_files(${_target_name} ${_mpc_resources_root} demodata/TEST1 "SND;PGM;APS;MID;ALL" "${total_list}")
   _add_resource_files(${_target_name} ${_mpc_resources_root} demodata/TEST2 "SND;PGM;APS;MID;ALL" "${total_list}")
 
+  if (NOT (APPLE AND NOT IOS))
+    cmrc_add_resource_library(
+            mpc_resources
+            ALIAS mpc::rc
+            NAMESPACE mpc
+            WHENCE ${_mpc_resources_root}
+            ${total_list}
+    )
+
+    target_link_libraries(${_target_name} mpc::rc)
+  endif()
+
+  set(total_list_test "")
+
   _add_test_resource_files(${_target_name}-tests ${_mpc_resources_root} test/ProgramLoading/program1 "PGM;SND" "${total_list_test}")
   _add_test_resource_files(${_target_name}-tests ${_mpc_resources_root} test/ProgramLoading/program2 "PGM;SND" "${total_list_test}")
   _add_test_resource_files(${_target_name}-tests ${_mpc_resources_root} test/ApsLoading "APS;SND" "${total_list_test}")
   _add_test_resource_files(${_target_name}-tests ${_mpc_resources_root} test/Sampler SND "${total_list_test}")
-
-  cmrc_add_resource_library(
-    mpc_resources
-    ALIAS mpc::rc
-    NAMESPACE mpc
-    WHENCE ${_mpc_resources_root}
-    ${total_list}
-    )
 
   cmrc_add_resource_library(
     mpc_test_resources
@@ -34,7 +39,7 @@ function(_bundle_mpc_resources _target_name)
     WHENCE ${_mpc_resources_root}
     ${total_list_test}
     )
-  target_link_libraries(${_target_name} mpc::rc)
+
   target_link_libraries(${_target_name}-tests mpctest::rc)
 endfunction()
 

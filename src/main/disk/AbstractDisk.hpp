@@ -67,7 +67,7 @@ namespace mpc::disk {
         void writeAll(const std::string& fileName);
         void writeMidiControlPreset(std::shared_ptr<mpc::nvram::MidiControlPreset> preset);
 
-        void readMidiControlPreset(fs::path p, std::shared_ptr<mpc::nvram::MidiControlPreset>);
+        void readMidiControlPreset(const fs::path& p, const std::shared_ptr<mpc::nvram::MidiControlPreset>&);
 
         bool checkExists(std::string fileName);
         virtual bool deleteRecursive(std::weak_ptr<MpcFile>);
