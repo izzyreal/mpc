@@ -185,6 +185,8 @@ endif()
 
 _bundle_mpc_resources(mpc)
 
+set(MPC_FACTORY_RESOURCES ${MPC_FACTORY_RESOURCES} PARENT_SCOPE)
+
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_IGNORE_FILES
     /.git
