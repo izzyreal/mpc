@@ -8,6 +8,7 @@ include(FetchContent)
 FetchContent_Declare(akaifat
   GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
   GIT_TAG        main
+  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
@@ -16,18 +17,21 @@ set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG        v3.3.2
+  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/Catch2
 )
 
 FetchContent_Declare(filesystem
   GIT_REPOSITORY https://github.com/gulrak/filesystem.git
   GIT_TAG        v1.5.12
+  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/filesystem
 )
 
 FetchContent_Declare(tl-expected
   GIT_REPOSITORY https://github.com/TartanLlama/expected.git
   GIT_TAG        v1.0.0
+  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/expected
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
@@ -40,6 +44,7 @@ set(RAPIDJSON_BUILD_TESTS OFF)
 FetchContent_Declare(rapidjson
   GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
   GIT_TAG        v1.1.0
+  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rapidjson
 )
 
@@ -51,6 +56,7 @@ set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall")
 FetchContent_Declare(rtmidi
     GIT_REPOSITORY https://github.com/thestk/rtmidi.git
     GIT_TAG        master
+    GIT_SHALLOW    ON
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
 )
 
@@ -59,18 +65,21 @@ set(BUILD_TESTING OFF)
 FetchContent_Declare(libsamplerate
     GIT_REPOSITORY https://github.com/libsndfile/libsamplerate.git
     GIT_TAG        master
+    GIT_SHALLOW    ON
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/libsamplerate
 )
 
 FetchContent_Declare(platformfolders
     GIT_REPOSITORY https://github.com/sago007/PlatformFolders.git
     GIT_TAG        master
+    GIT_SHALLOW    ON
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/platformfolders
 )
 
 FetchContent_Declare(concurrentqueue
     GIT_REPOSITORY https://github.com/cameron314/concurrentqueue.git
     GIT_TAG        master
+    GIT_SHALLOW    ON
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/concurrentqueue
 )
 
