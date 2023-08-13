@@ -81,15 +81,16 @@ Mpc::Mpc()
         }
     }
 
-    if (!fs::exists(Paths::midiControlPresetsPath()))
+    fs::create_directories(Paths::midiControlPresetsPath());
+
+    const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp" };
+
+    for (auto& preset : factory_midi_control_presets)
     {
-        fs::create_directories(Paths::midiControlPresetsPath());
+        const auto data = mpc::ResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
-        const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp" };
-
-        for (auto& preset : factory_midi_control_presets)
+        if (!fs::exists(Paths::midiControlPresetsPath() / preset) || fs::file_size(Paths::midiControlPresetsPath() / preset) != data.size())
         {
-            const auto data = mpc::ResourceUtil::get_resource_data("midicontrolpresets/" + preset);
             set_file_data(Paths::midiControlPresetsPath() / preset, data);
         }
     }
