@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 namespace mpc { class Mpc; }
 
