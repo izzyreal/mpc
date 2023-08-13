@@ -21,6 +21,7 @@ public:
 
     static fs::path configPath();
     static fs::path demoDataPath();
+    static fs::path tempPath();
 
 };
 }

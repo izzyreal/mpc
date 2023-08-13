@@ -71,3 +71,9 @@ fs::path Paths::demoDataPath()
     static auto demoDataPath = defaultLocalVolumePath() / "Demos";
     return demoDataPath;
 }
+
+fs::path Paths::tempPath()
+{
+    static auto tempPath = appDocumentsPath() / "Temp";
+    return tempPath;
+}
