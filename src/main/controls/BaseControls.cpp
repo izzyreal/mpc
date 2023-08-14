@@ -296,12 +296,12 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     }
 
     const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-    const char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->getDrum() : -1;
+    const auto drum = collectionContainsCurrentScreen(samplerScreens) ?
+            std::optional<uint8_t>(drumScreen->getDrum()) : std::optional<uint8_t>();
 
     mpc.getControls()->storePlayNoteEvent(padIndexWithBank, playOnEvent);
     mpc.getEventHandler()->handle(playOnEvent, track.get(), drum);
 
-    //---------------------
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
 
     if (sequencer->isRecordingOrOverdubbing())

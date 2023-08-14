@@ -6,6 +6,7 @@
 #include <sequencer/NoteEvent.hpp>
 
 #include <memory>
+#include <optional>
 #include <map>
 
 namespace mpc::audiomidi {
@@ -24,14 +25,20 @@ namespace mpc::audiomidi {
 		void handle(
                 const std::shared_ptr<mpc::sequencer::Event>& event,
                 mpc::sequencer::Track* track,
-                char drum = -1);
+                std::optional<uint8_t> drum = std::optional<uint8_t>());
 		void handleNoThru(const std::shared_ptr<mpc::sequencer::Event>& event,
                           mpc::sequencer::Track* track,
                           int timeStamp,
-                          char drum = -1);
+                          std::optional<uint8_t> clientDrumIndex = std::optional<uint8_t>());
 
 	private:
 		void midiOut(const std::shared_ptr<mpc::sequencer::Event> &event, mpc::sequencer::Track* track);
+
+        void handleDrumEvent(int timeStamp,
+                             const std::shared_ptr<mpc::sequencer::NoteOnEvent>& noteOnEvent,
+                             const std::shared_ptr<mpc::sequencer::NoteOffEvent>& noteOffEvent,
+                             uint8_t drumIndex,
+                             mpc::sequencer::Track* track);
 
 	public:
 		EventHandler(mpc::Mpc& mpc);

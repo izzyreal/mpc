@@ -14,7 +14,6 @@
 #include <sequencer/NoteEvent.hpp>
 
 #include <lcdgui/screens/SequencerScreen.hpp>
-#include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
@@ -168,13 +167,10 @@ void mpc::controls::GlobalReleaseControls::handlePlayNoteOff(const std::shared_p
 
 	off_event->setTick(-1);
 
-	char drum = -1;
 	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 
-	if (collectionContainsCurrentScreen(samplerScreens))
-	{
-		drum = drumScreen->getDrum();
-	}
+    const auto drum = collectionContainsCurrentScreen(samplerScreens) ?
+                      std::optional<uint8_t>(drumScreen->getDrum()) : std::optional<uint8_t>();
 
 	mpc.getEventHandler()->handle(off_event, track.get(), drum);
 }
