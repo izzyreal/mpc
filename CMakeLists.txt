@@ -8,7 +8,6 @@ include(FetchContent)
 FetchContent_Declare(akaifat
   GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
   GIT_TAG        main
-  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
