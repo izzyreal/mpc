@@ -151,3 +151,8 @@ bool mpc::sequencer::NoteOnEvent::isFinalized()
 {
     return duration.has_value();
 }
+
+bool NoteOnEvent::isPlayOnly()
+{
+    return dynamic_cast<NoteOnEventPlayOnly*>(this) != nullptr;
+}

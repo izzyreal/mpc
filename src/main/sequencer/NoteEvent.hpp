@@ -57,6 +57,7 @@ namespace mpc::sequencer
         int getVelocity();
         bool isDrumNote();
         bool isFinalized();
+        bool isPlayOnly();
 
         NoteOnEvent(int i = 60, int vel = 127);
         NoteOnEvent(mpc::engine::midi::ShortMessage* msg);
