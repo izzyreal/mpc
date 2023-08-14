@@ -1,4 +1,9 @@
-## v0.5.1
+## v0.5.2 (14-8-2023)
+* Experimental skin feature: place `sliders.png`, `datawheels.png` or `bg.jpg` in `~/Documents/VMPC2000XL/Skin` to replace these assets with your own. The original assets can be found here: https://github.com/izzyreal/vmpc-juce/tree/master/resources/img.
+* Lock `RECORD` or `OVERDUB` button by double-clicking with the mouse. Click once to unlock. This way you can make VMPC2000XL as a plugin start recording even when it's not in focus and when it's synced to the DAW.
+* Smaller macOS installer and binaries by moving resource files out of the binary and placing them in the Resources directory in the Bundle.
+
+## v0.5.1 (29-7-2023)
 * Updated documentation: https://vmpcdocs.izmar.nl
 * Documentation also [available in PDF](https://vmpcdocs.izmar.nl/vmpc2000xl.pdf).
 * Song mode: Do not crash when pressing PLAY when `(end of song)` is selected.
