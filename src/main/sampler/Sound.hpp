@@ -40,10 +40,10 @@ namespace mpc::sampler {
 		void setLoopTo(int loopTo);
 		void setTune(int tune);
 		void insertFrame(std::vector<float> frame, unsigned int index);
-        void insertFrames(std::vector<float>& frames, unsigned int index);
-        void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index);
-        void appendFrames(std::vector<float>& frames);
-        void appendFrames(std::vector<float>& left, std::vector<float>& right);
+        void insertFrames(std::vector<float>& frames, unsigned int index, uint32_t nFrames = 0);
+        void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index, uint32_t nFrames = 0);
+        void appendFrames(std::vector<float>& frames, uint32_t nFrames = 0);
+        void appendFrames(std::vector<float>& left, std::vector<float>& right, uint32_t nFrames = 0);
         void removeFramesFromEnd(int numFramesToRemove);
 
 	public:
