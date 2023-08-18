@@ -275,15 +275,15 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
     {
         if (mode == 0)
         {
-            sound->appendFrames(unresampledLeft);
+            sound->appendFrames(unresampledLeft, nFrames);
         }
         else if (mode == 1)
         {
-            sound->appendFrames(unresampledRight);
+            sound->appendFrames(unresampledRight, nFrames);
         }
         else if (mode == 2)
         {
-            sound->appendFrames(unresampledLeft, unresampledRight);
+            sound->appendFrames(unresampledLeft, unresampledRight, nFrames);
         }
     }
 
