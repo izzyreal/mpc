@@ -162,7 +162,7 @@ void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int l
 	const float ratio = 1.0f / (1.0f - invisible);
 
 	const unsigned int posLineLength = (unsigned int) (floor(13.0 * ((peakPos - invisible) * ratio)));
-	const unsigned int negLineLength = (unsigned int)(floor(13.0 * ((abs(peakNeg) - invisible) * ratio)));
+	const unsigned int negLineLength = (unsigned int)(floor(13.0 * ((std::fabs(peakNeg) - invisible) * ratio)));
 
 	if (posLineLength != 13 && !(fine && lineX == 55))
 	{
@@ -174,7 +174,7 @@ void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int l
 		bitmap.emplace_back(Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
 	}
 
-	if (abs(peakNeg) > invisible)
+	if (std::fabs(peakNeg) > invisible)
 	{
 		bitmap.emplace_back(Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
 	}
@@ -192,7 +192,7 @@ void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int l
 		if (peakPos > invisible)
 			colors->push_back(false);
 		
-		if (abs(peakNeg) > invisible)
+		if (std::fabs(peakNeg) > invisible)
 			colors->push_back(false);
 	
 		if (negLineLength != 13)
@@ -218,7 +218,7 @@ void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int l
 			}
 		}
 
-		if (abs(peakNeg) > invisible)
+		if (std::fabs(peakNeg) > invisible)
 		{
 			if (fine)
 			{
