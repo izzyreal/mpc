@@ -109,6 +109,8 @@ void SoundRecorder::stop()
 
     int writePointer = 0;
 
+    const int ringBufferRemainingFrameCount = ringBufferLeft.available();
+
     while (!ringBufferLeft.empty())
     {
         unresampledLeft[writePointer] = ringBufferLeft.get();
@@ -122,7 +124,7 @@ void SoundRecorder::stop()
         {
             const auto input = mode == 0 ? unresampledLeft : unresampledRight;
             const auto generatedFrameCount = resamplers[0].resample(
-                    input, resampledLeft, engineSampleRate, input.size());
+                    input, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
 
             sound->appendFrames(resampledLeft, generatedFrameCount);
 
@@ -132,9 +134,9 @@ void SoundRecorder::stop()
         else if (mode == 2)
         {
             const auto generatedFrameCountL = resamplers[0].resample(
-                    unresampledLeft, resampledLeft, engineSampleRate, unresampledLeft.size());
+                    unresampledLeft, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
             const auto generatedFrameCountR = resamplers[1].resample(
-                    unresampledRight, resampledRight, engineSampleRate, unresampledRight.size());
+                    unresampledRight, resampledRight, engineSampleRate, ringBufferRemainingFrameCount);
 
             assert(generatedFrameCountL == generatedFrameCountR);
 
@@ -152,15 +154,15 @@ void SoundRecorder::stop()
     {
         if (mode == 0)
         {
-            sound->appendFrames(unresampledLeft);
+            sound->appendFrames(unresampledLeft, ringBufferRemainingFrameCount);
         }
         else if (mode == 1)
         {
-            sound->appendFrames(unresampledRight);
+            sound->appendFrames(unresampledRight, ringBufferRemainingFrameCount);
         }
         else if (mode == 2)
         {
-            sound->appendFrames(unresampledLeft, unresampledRight);
+            sound->appendFrames(unresampledLeft, unresampledRight, ringBufferRemainingFrameCount);
         }
     }
 
