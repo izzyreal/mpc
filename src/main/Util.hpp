@@ -17,15 +17,13 @@ namespace mpc
 	{
 
 	public:
-		static std::vector<int> getPadAndVelo(const int x, const int y);
-		static std::string getFileName(const std::string& s);
+        static std::string getFileName(const std::string& s);
 		static std::vector<std::string> splitName(const std::string& s);
 		static std::string distributeTimeSig(const std::string& s);
 		static std::string replaceDotWithSmallSpaceDot(const std::string& s);
 		static void drawLine(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<int>>& line, const bool color);
 		static void drawLine(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<int>>& line, const bool color, const std::vector<int>& offsetxy);
-		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors);
-		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors, const std::vector<int>& offsetxy);
+        static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors, const std::vector<int>& offsetxy);
 		static std::vector<std::string>& noteNames();
 		static std::string tempoString(const double tempo);
 		static int getTextWidthInPixels(const std::string& text);
@@ -37,15 +35,5 @@ namespace mpc
         static std::vector<char> vecCopyOfRange(const std::vector<char>& src, int offset, int length);
         static bool vecEquals(const std::vector<char>& a, const std::vector<char>& b);
 
-    private:
-        template<typename T>
-        static void vecCopy(std::vector<T>& src, int srcPos, std::vector<T>& dest, int destPos, int length) {
-            if (destPos + length > dest.size()) throw std::invalid_argument("Destination out of bounds!\n");
-            if (srcPos + length > src.size()) throw std::invalid_argument("Source out of bounds!\n");
-
-            for (int i = 0; i < length; i++)
-                dest[i + destPos] = src[i + srcPos];
-        }
-
-	};
+    };
 }

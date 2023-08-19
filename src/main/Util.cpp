@@ -28,56 +28,6 @@ std::string Util::replaceDotWithSmallSpaceDot(const std::string& s) {
     return part1 + tempoDot + part2;
 }
 
-std::vector<int> Util::getPadAndVelo(const int x, const int y)
-{
-    int velocity;
-    int padSize = 93;
-    int emptySize = 23;
-    int padPosX = 785;
-    int padPosY = 343;
-    int xPos = -1;
-    int yPos = -1;
-    
-    for (int j = 0; j < 4; j++)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            int xborderl = padPosX + (i * padSize) + (i * (emptySize + (i * 2)));
-            int xborderr = xborderl + padSize;
-            int yborderu = padPosY + (j * padSize) + (j * (emptySize + (j * 2)));
-            int yborderd = yborderu + padSize;
-            int centerx = xborderl + (padSize / 2);
-            int centery = yborderu + (padSize / 2);
-            
-            if (x > xborderl && x < xborderr && y > yborderu && y < yborderd)
-            {
-                xPos = i;
-                yPos = j;
-                int distcx = abs(centerx - x);
-                int distcy = abs(centery - y);
-                velocity = 127 - ((127.0 / 46.0) * ((distcx + distcy) / 2.0));
-                break;
-            }
-        }
-    }
-    
-    if (xPos == -1 || yPos == -1)
-        return std::vector<int>{ -1, -1 };
-    
-    int padNumber = -1;
-    std::vector<int> column0 = { 12, 8, 4, 0 };
-    std::vector<int> column1 = { 13, 9, 5, 1 };
-    std::vector<int> column2 = { 14, 10, 6, 2 };
-    std::vector<int> column3 = { 15, 11, 7, 3 };
-    auto columns = std::vector<std::vector<int>>(4);
-    columns[0] = column0;
-    columns[1] = column1;
-    columns[2] = column2;
-    columns[3] = column3;
-    padNumber = columns[xPos][yPos];
-    return std::vector<int>{ (int)padNumber, (int)velocity };
-}
-
 std::string Util::getFileName(const std::string& s)
 {
     std::string copy = s;
@@ -142,16 +92,6 @@ void Util::drawLine(std::vector<std::vector<bool>>& pixels,
 {
     for (auto& l : line)
         pixels[l[0] + offsetxy[0]][l[1] + offsetxy[1]] = color;
-}
-
-void Util::drawLines(std::vector<std::vector<bool>>& pixels,
-                     const std::vector<std::vector<std::vector<int>>>& lines,
-                     const std::vector<bool>& colors)
-{
-    int colorCounter = 0;
-    
-    for (auto& l : lines)
-        drawLine(pixels, l, colors[colorCounter++]);
 }
 
 void Util::drawLines(std::vector<std::vector<bool>>& pixels,
@@ -361,7 +301,7 @@ void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<N
 
 std::vector<char> Util::vecCopyOfRange(const std::vector<char>& src, int offset, int endOffset)
 {
-    return std::vector<char>(begin(src) + offset, begin(src) + endOffset);
+    return {begin(src) + offset, begin(src) + endOffset};
 }
 
 bool Util::vecEquals(const std::vector<char>& a, const std::vector<char>& b) {
