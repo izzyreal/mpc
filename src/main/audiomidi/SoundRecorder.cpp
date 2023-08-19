@@ -45,7 +45,7 @@ bool SoundRecorder::isArmed()
 	return armed;
 }
 
-void SoundRecorder::prepare(const std::shared_ptr<Sound> soundToUse, int newLengthInFrames, int engineSampleRateToUse)
+void SoundRecorder::prepare(const std::shared_ptr<Sound>& soundToUse, int newLengthInFrames, int engineSampleRateToUse)
 {
 	if (recording)
     {
@@ -54,7 +54,7 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> soundToUse, int newLeng
 
     sound = soundToUse;
 
-    assert(sound->getSampleData()->size() == 0);
+    assert(sound->getSampleData()->empty());
 
     engineSampleRate = engineSampleRateToUse;
     lengthInFrames = newLengthInFrames * (engineSampleRate / 44100.f);
@@ -118,29 +118,34 @@ void SoundRecorder::stop()
 
     if (engineSampleRate != 44100)
     {
-        if (mode == 0)
+        if (mode == 0 || mode == 1)
         {
-            resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, unresampledLeft.size());
-            sound->appendFrames(resampledLeft);
-            auto leftRemainder = resamplers[0].wrapUpAndGetRemainder();
-            sound->appendFrames(leftRemainder);
-        }
-        else if (mode == 1)
-        {
-            resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, unresampledRight.size());
-            sound->appendFrames(resampledRight);
-            auto rightRemainder = resamplers[1].wrapUpAndGetRemainder();
-            sound->appendFrames(rightRemainder);
+            const auto input = mode == 0 ? unresampledLeft : unresampledRight;
+            const auto generatedFrameCount = resamplers[0].resample(
+                    input, resampledLeft, engineSampleRate, input.size());
+
+            sound->appendFrames(resampledLeft, generatedFrameCount);
+
+            const auto remainingFrameCount = resamplers[0].wrapUpAndGetRemainder(resampledLeft);
+            sound->appendFrames(resampledLeft, remainingFrameCount);
         }
         else if (mode == 2)
         {
-            resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, unresampledLeft.size());
-            resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, unresampledRight.size());
-            sound->appendFrames(resampledLeft, resampledRight);
+            const auto generatedFrameCountL = resamplers[0].resample(
+                    unresampledLeft, resampledLeft, engineSampleRate, unresampledLeft.size());
+            const auto generatedFrameCountR = resamplers[1].resample(
+                    unresampledRight, resampledRight, engineSampleRate, unresampledRight.size());
 
-            auto leftRemainder = resamplers[0].wrapUpAndGetRemainder();
-            auto rightRemainder = resamplers[1].wrapUpAndGetRemainder();
-            sound->appendFrames(leftRemainder, rightRemainder);
+            assert(generatedFrameCountL == generatedFrameCountR);
+
+            sound->appendFrames(resampledLeft, resampledRight, generatedFrameCountL);
+
+            const auto remainingFrameCountL = resamplers[0].wrapUpAndGetRemainder(resampledLeft);
+            const auto remainingFrameCountR = resamplers[1].wrapUpAndGetRemainder(resampledRight);
+
+            assert(remainingFrameCountL == remainingFrameCountR);
+
+            sound->appendFrames(resampledLeft, resampledRight, remainingFrameCountL);
         }
     }
     else
@@ -254,21 +259,20 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
 
     if (shouldResample)
     {
-        if (mode == 0)
+        if (mode == 0 || mode == 1)
         {
-            resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, nFrames);
-            sound->appendFrames(resampledLeft);
-        }
-        else if (mode == 1)
-        {
-            resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, nFrames);
-            sound->appendFrames(resampledRight);
+            const auto input = mode == 0 ? unresampledLeft : unresampledRight;
+            const auto generatedFrameCount = resamplers[0].resample(input, resampledLeft, engineSampleRate, nFrames);
+            sound->appendFrames(resampledLeft, generatedFrameCount);
         }
         else if (mode == 2)
         {
-            resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, nFrames);
-            resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, nFrames);
-            sound->appendFrames(resampledLeft, resampledRight);
+            const auto generatedFrameCountL = resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, nFrames);
+            const auto generatedFrameCountR = resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, nFrames);
+
+            assert(generatedFrameCountL == generatedFrameCountR);
+
+            sound->appendFrames(resampledLeft, resampledRight, generatedFrameCountL);
         }
     }
     else

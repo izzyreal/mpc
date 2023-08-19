@@ -10,12 +10,15 @@ namespace mpc::audiomidi {
     {
     public:
         MonoResampler();
-        void resample(const std::vector<float>& input,
+
+        // Returns number of generated frames
+        uint32_t resample(const std::vector<float>& input,
                       std::vector<float>& output,
                       int sourceSampleRate,
                       int maxNumInputFramesToProcess);
 
-        std::vector<float> wrapUpAndGetRemainder();
+        // Returns number of generated frames
+        uint32_t wrapUpAndGetRemainder(std::vector<float>& output);
 
         void reset();
 

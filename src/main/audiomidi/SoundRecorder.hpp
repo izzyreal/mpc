@@ -40,16 +40,18 @@ namespace mpc::audiomidi
 
 		std::shared_ptr<Sound> sound;
 
+        const uint32_t INTERNAL_BUF_SIZE = 100000;
 
         std::vector<MonoResampler> resamplers = std::vector<MonoResampler>(2);
-        std::vector<float> leftChannelCopy = std::vector<float>(100000);
-        std::vector<float> rightChannelCopy = std::vector<float>(100000);
-		circular_buffer<float> ringBufferLeft = circular_buffer<float>(100000);
-		circular_buffer<float> ringBufferRight = circular_buffer<float>(100000);
-        std::vector<float> unresampledLeft = std::vector<float>(100000);
-        std::vector<float> unresampledRight = std::vector<float>(100000);
-        std::vector<float> resampledLeft = std::vector<float>(100000);
-        std::vector<float> resampledRight = std::vector<float>(100000);
+
+        std::vector<float> leftChannelCopy = std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> rightChannelCopy = std::vector<float>(INTERNAL_BUF_SIZE);
+		circular_buffer<float> ringBufferLeft = circular_buffer<float>(INTERNAL_BUF_SIZE);
+		circular_buffer<float> ringBufferRight = circular_buffer<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> unresampledLeft = std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> unresampledRight = std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> resampledLeft = std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> resampledRight = std::vector<float>(INTERNAL_BUF_SIZE);
 
         int recPointer = 0;
         int engineSampleRate = 44100;
@@ -61,7 +63,7 @@ namespace mpc::audiomidi
 
 	public:
 		void setSampleScreenActive(bool active);
-		void prepare(const std::shared_ptr<Sound>, int newLengthInFrames, int engineSampleRate);
+		void prepare(const std::shared_ptr<Sound>&, int newLengthInFrames, int engineSampleRate);
 		void start();
 		void stop();
 		void cancel();
