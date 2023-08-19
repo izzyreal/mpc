@@ -125,10 +125,10 @@ void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int l
 	if (!mono && view == 1)
 		offset += frameCount;
 
-	if (offset < 0 || (offset >= frameCount && !fine))
+	if (offset < 0 || (mono && offset >= frameCount && !fine))
 		return;
 
-	if (!mono && view == 0 && offset > frameCount && !fine)
+	if (!mono && view == 0 && offset >= frameCount && !fine)
 		return;
 
 	if (!mono && view == 1 && offset < frameCount && !fine)
