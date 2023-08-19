@@ -2,47 +2,13 @@
 
 #include "Mpc.hpp"
 #include "mpc_fs.hpp"
+#include "MidiControlCommand.hpp"
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace mpc::nvram {
-    struct MidiControlCommand {
-
-        std::string label;
-        bool isNote = false;
-        char channel = -2;
-        char value = -2;
-        bool isEmpty() {
-            return !isNote && channel == -2 && value == -2;
-        }
-        void reset() {
-            isNote = false; channel = -2; value = -2;
-        }
-        MidiControlCommand() {}
-        MidiControlCommand(std::string newLabel, bool newIsNote, int newChannelIndex, int newValue) : label(newLabel), isNote(newIsNote), channel(newChannelIndex), value(newValue) {}
-        MidiControlCommand(const MidiControlCommand& c) : label(c.label), isNote(c.isNote), channel(c.channel), value(c.value) {}
-        bool equals(const MidiControlCommand& other) {
-            return isNote == other.isNote && channel == other.channel && value == other.value;
-        }
-
-        std::vector<char> toBytes() {
-            std::vector<char> result;
-
-            for (int i = 0; i < label.size(); i++)
-            {
-                result.push_back(label[i]);
-            }
-
-            result.push_back(' ');
-
-            result.push_back(isNote ? 1 : 0);
-            result.push_back(channel);
-            result.push_back(value);
-            return result;
-        }
-    };
-
     struct MidiControlPreset {
         enum AutoLoadMode { NO, ASK, YES };
         std::string name;
@@ -62,10 +28,6 @@ namespace mpc::nvram {
         static void loadAllPresetsFromDiskIntoMemory(mpc::Mpc&);
 
         static void loadDefaultMapping(Mpc &mpc);
-
-        // Presets available in the default preset path,
-        // loaded into memory, and maintained as presets are changed, added or deleted.
-        static std::vector<std::shared_ptr<MidiControlPreset>> presets;
 
         // Persistence of the in-memory mapping, so it's not required
         // to save a preset explicitly before restarting the application.

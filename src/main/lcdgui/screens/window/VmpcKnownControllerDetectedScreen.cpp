@@ -22,7 +22,7 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(mpc::Mpc &m
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-    auto& presets = nvram::MidiControlPersistence::presets;
+    auto& presets = mpc.presets;
     auto preset = std::find_if(
             presets.begin(),
             presets.end(),
@@ -69,7 +69,7 @@ void VmpcKnownControllerDetectedScreen::displayMessage()
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-    for (auto& p : nvram::MidiControlPersistence::presets)
+    for (auto& p : mpc.presets)
     {
         if (controllerName.find(p->name) != std::string::npos)
         {

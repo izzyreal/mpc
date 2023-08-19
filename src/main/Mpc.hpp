@@ -55,6 +55,12 @@ namespace mpc::sampler {
     class Sampler;
 }
 
+namespace mpc::nvram {
+    struct MidiControlPreset;
+    // Presets available in the default preset path,
+    // loaded into memory, and maintained as presets are changed, added or deleted.
+}
+
 namespace mpc {
     class Mpc : public Observable {
     private:
@@ -78,6 +84,7 @@ namespace mpc {
 
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;
+        std::vector<std::shared_ptr<nvram::MidiControlPreset>> presets;
         void init(const int inputCount, const int outputCount);
         void setBank(int i);
         int getBank();

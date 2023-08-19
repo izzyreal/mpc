@@ -12,8 +12,6 @@
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
 
-std::vector<std::shared_ptr<MidiControlPreset>> MidiControlPersistence::presets;
-
 void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
 {
     loadDefaultMapping(mpc);
@@ -183,7 +181,7 @@ void MidiControlPersistence::loadFileByNameIntoPreset(
 
 void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
 {
-    presets.clear();
+    mpc.presets.clear();
 
     auto presetsPath = mpc::Paths::midiControlPresetsPath();
     assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
@@ -195,7 +193,7 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
             continue;
         }
 
-        auto preset = presets.emplace_back(std::make_shared<MidiControlPreset>());
+        auto preset = mpc.presets.emplace_back(std::make_shared<MidiControlPreset>());
         mpc.getDisk()->readMidiControlPreset(e.path(), preset);
     }
 }
