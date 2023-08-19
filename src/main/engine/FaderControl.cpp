@@ -7,12 +7,12 @@ using namespace mpc::engine;
 using namespace mpc::engine::control;
 
 FaderControl::FaderControl()
-	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 100)
+	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 100.f)
 {
 }
 
 std::shared_ptr<ControlLaw> FaderControl::MPC_FADER_LAW() {
-	static auto res = std::make_shared<LinearLaw>(0, 100, "");
+	static auto res = std::make_shared<LinearLaw>(0.f, 100.f, "");
 	return res;
 }
 

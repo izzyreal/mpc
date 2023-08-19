@@ -30,7 +30,7 @@ void VmpcRecordJamScreen::function(int i)
 		auto lengthInFrames = 44100 * 60 * minutes;
 		auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 		auto ams = mpc.getAudioMidiServices();
-		auto rate = ams->getAudioServer()->getSampleRate();
+		auto rate = static_cast<int>(ams->getAudioServer()->getSampleRate());
 		auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, vmpcDirectToDiskRecorderScreen->outputFolder, false, rate);
 
 		if (ams->prepareBouncing(settings.get()))

@@ -29,15 +29,12 @@ private:
     static double ticksPerSecond(const double tempo);
     
 public:
-    static double ticksToFrames(double ticks, const double tempo, float sr);
-    
+    static double ticksToFrames(double ticks, const double tempo, int sr);
+
 public:
-    static double framesToTicks(double d, const double tempo, float sr);
-    
-public:
-    static double sequenceFrameLength(Sequence*, int firstTick, int lastTick, float sr);
-    static int loopFrameLength(Sequence*, float sr);
-    static int songFrameLength(Song* song, Sequencer*, float sr);
+    static double sequenceFrameLength(Sequence*, int firstTick, int lastTick, int sr);
+    static int loopFrameLength(Sequence*, int sr);
+    static int songFrameLength(Song* song, Sequencer*, int sr);
     
 };
 }

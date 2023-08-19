@@ -55,17 +55,12 @@ double SeqUtil::ticksPerSecond(const double tempo)
     return bps * 96.0;
 }
 
-double SeqUtil::ticksToFrames(double ticks, const double tempo, float sr)
+double SeqUtil::ticksToFrames(double ticks, const double tempo, int sr)
 {   
 	return (ticks * secondsPerTick(tempo) * sr);
 }
 
-double SeqUtil::framesToTicks(double d, const double tempo, float sr)
-{
-	return (d / sr) * (ticksPerSecond(tempo));
-}
-
-double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, float sr)
+double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, int sr)
 {
 	double result = 0;
 	auto lastTceTick = firstTick;
@@ -113,12 +108,12 @@ double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, 
 	return (int)(ceil(result));
 }
 
-int SeqUtil::loopFrameLength(Sequence* seq, float sr)
+int SeqUtil::loopFrameLength(Sequence* seq, int sr)
 {
     return static_cast<int>(sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
 }
 
-int SeqUtil::songFrameLength(Song* song, Sequencer* sequencer, float sr)
+int SeqUtil::songFrameLength(Song* song, Sequencer* sequencer, int sr)
 {
 	double result = 0;
 	auto steps = song->getStepCount();

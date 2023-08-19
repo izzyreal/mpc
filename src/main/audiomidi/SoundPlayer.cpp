@@ -50,7 +50,7 @@ bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileF
         return false;
     }
 
-    audioFormat = std::make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
+    audioFormat = std::make_shared<AudioFormat>(static_cast<float>(sourceSampleRate), validBits, sourceNumChannels, true, false);
 
     src_reset(srcLeft);
     src_reset(srcRight);

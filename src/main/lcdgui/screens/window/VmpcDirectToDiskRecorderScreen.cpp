@@ -84,7 +84,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		auto rate = rates[sampleRate];
 
 //		if (!offline)
-        rate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+        rate = static_cast<int>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
 
 		auto sequence = sequencer->getSequence(seq);
         loopWasEnabled = sequence->isLoopEnabled();

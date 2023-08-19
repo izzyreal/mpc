@@ -26,7 +26,7 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE = std::vector<int>{ 0, 3 };
+std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE{ 0, 3 };
 
 std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {
@@ -50,13 +50,11 @@ std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char>& bytes)
                 return AllSysExEvent::bytesToMpcEvent(bytes);
         }
     }
-    else
-    {
-        return AllNoteOnEvent::bytesToMpcEvent(bytes);
-    }
+
+    return AllNoteOnEvent::bytesToMpcEvent(bytes);
 }
 
-std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<Event> event)
+std::vector<char> AllEvent::mpcEventToBytes(const std::shared_ptr<Event>& event)
 {
     assert(!std::dynamic_pointer_cast<NoteOffEvent>(event));
     
@@ -92,6 +90,8 @@ std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<Event> event)
     {
         return AllSysExEvent::mpcEventToBytes(mixer);
     }
+
+    return {};
 }
 
 int AllEvent::readTick(const std::vector<char>& bytes)
@@ -111,5 +111,5 @@ void AllEvent::writeTick(std::vector<char>& event, int tick)
     event[TICK_BYTE2_OFFSET] = ba[1];
     auto s3 = static_cast<int16_t>(floor(tick / 65536.0));
     
-    event[TICK_BYTE3_OFFSET] = BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteOnEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
+    event[TICK_BYTE3_OFFSET] = BitUtil::stitchBytes(static_cast<unsigned char>(event[TICK_BYTE3_OFFSET]), AllNoteOnEvent::DURATION_BYTE1_BIT_RANGE, static_cast<unsigned char>(s3), TICK_BYTE3_BIT_RANGE);
 }

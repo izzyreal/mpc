@@ -17,7 +17,7 @@ FilterControls::FilterControls(int id, string name, int idOffset)
 }
 
 shared_ptr<ControlLaw> FilterControls::SEMITONE_LAW() {
-	static shared_ptr<ControlLaw> res = make_shared<LinearLaw>(-48, 96, "semitones");
+	static shared_ptr<ControlLaw> res = make_shared<LinearLaw>(-48.f, 96.f, "semitones");
 	return res;
 }
 
