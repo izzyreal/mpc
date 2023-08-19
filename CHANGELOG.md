@@ -1,3 +1,8 @@
+## v0.5.3 (19-8-2023)
+* Fix sampling at 44.1KHz.
+* Fix waveform display of right channel in TRIM, LOOP and ZONE screens.
+* Fix waveform display in Linux (it was messing up the lower half).
+
 ## v0.5.2 (14-8-2023)
 * Experimental skin feature: place `sliders.png`, `datawheels.png` or `bg.jpg` in `~/Documents/VMPC2000XL/Skin` to replace these assets with your own. The original assets can be found here: https://github.com/izzyreal/vmpc-juce/tree/master/resources/img.
 * Lock `RECORD` or `OVERDUB` button by double-clicking with the mouse. Click once to unlock. This way you can make VMPC2000XL as a plugin start recording even when it's not in focus and when it's synced to the DAW.
