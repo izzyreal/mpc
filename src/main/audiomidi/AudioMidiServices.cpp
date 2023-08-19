@@ -30,7 +30,6 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
-// stl
 #include <cmath>
 #include <string>
 
@@ -215,13 +214,13 @@ void AudioMidiServices::setAssignableMixOutLevels()
 
 std::vector<std::string> AudioMidiServices::getInputNames()
 {
-	if (!server) return std::vector<std::string>{"<disabled>"};
+	if (!server) return {"<disabled>"};
 	return server->getAvailableInputNames();
 }
 
 std::vector<std::string> AudioMidiServices::getOutputNames()
 {
-	if (!server) return std::vector<std::string>{"<disabled>"};
+	if (!server) return {"<disabled>"};
 	return server->getAvailableOutputNames();
 }
 
