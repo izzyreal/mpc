@@ -68,8 +68,13 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound>& soundToUse, int newLen
         sound->setMono(true);
     }
 
+    ringBufferLeft.reset();
+    ringBufferRight.reset();
+
     resamplers[0].reset();
     resamplers[1].reset();
+
+    recPointer = 0;
 }
 
 // Should be called from the audio thread
@@ -80,12 +85,7 @@ void SoundRecorder::start()
         return;
     }
 
-    ringBufferLeft.reset();
-    ringBufferRight.reset();
-
     mpc.getLayeredScreen()->getCurrentBackground()->setName("recording");
-
-    recPointer = 0;
 
     armed = false;
     recording = true;
