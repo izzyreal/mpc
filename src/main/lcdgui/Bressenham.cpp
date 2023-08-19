@@ -5,12 +5,12 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-vector<vector<int>> Bressenham::Line(int x1,
+LcdLine Bressenham::Line(int x1,
 	int y1,
 	int const x2,
 	int const y2)
 {
-	vector<vector<int>> res;
+	LcdLine res;
 
 	int delta_x(x2 - x1);
 	// if x1 == x2, then it does not matter what we set here
@@ -22,7 +22,7 @@ vector<vector<int>> Bressenham::Line(int x1,
 	signed char const iy((delta_y > 0) - (delta_y < 0));
 	delta_y = std::abs(delta_y) << 1;
 
-	res.push_back(vector<int>{ x1, y1 });
+	res.emplace_back(x1, y1);
 
 	if (delta_x >= delta_y)
 	{
@@ -41,7 +41,7 @@ vector<vector<int>> Bressenham::Line(int x1,
 			error += delta_y;
 			x1 += ix;
 
-			res.push_back(vector<int>{ x1, y1 });
+			res.emplace_back(x1, y1);
 		}
 	}
 	else
@@ -61,7 +61,7 @@ vector<vector<int>> Bressenham::Line(int x1,
 			error += delta_x;
 			y1 += iy;
 
-			res.push_back(vector<int>{ x1, y1 });
+			res.emplace_back(x1, y1);
 		}
 	}
 	return res;

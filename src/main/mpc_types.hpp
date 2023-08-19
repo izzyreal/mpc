@@ -26,3 +26,7 @@ using sequence_or_error  = tl::expected<std::shared_ptr<mpc::sequencer::Sequence
 using sequences_or_error = tl::expected<std::vector<std::shared_ptr<mpc::sequencer::Sequence>>, mpc::disk::mpc_io_error_msg>;
 using preset_or_error    = tl::expected<std::shared_ptr<mpc::nvram::MidiControlPreset>, mpc::disk::mpc_io_error_msg>;
 using wav_or_error       = tl::expected<std::shared_ptr<mpc::file::wav::WavFile>, mpc::disk::mpc_io_error_msg>;
+
+using LcdPixel = std::pair<uint8_t, uint8_t>;
+using LcdLine = std::vector<LcdPixel>;
+using LcdBitmap = std::vector<LcdLine>;

@@ -78,30 +78,30 @@ std::string Util::distributeTimeSig(const std::string& s)
 }
 
 void Util::drawLine(std::vector<std::vector<bool>>& pixels,
-                    const std::vector<std::vector<int>>& line,
+                    const LcdLine & line,
                     const bool color)
 {
     for (auto& l : line)
-        pixels[l[0]][l[1]] = color;
+        pixels[l.first][l.second] = color;
 }
 
 void Util::drawLine(std::vector<std::vector<bool>>& pixels,
-                    const std::vector<std::vector<int>>& line,
+                    const LcdLine& line,
                     const bool color,
                     const std::vector<int>& offsetxy)
 {
     for (auto& l : line)
-        pixels[l[0] + offsetxy[0]][l[1] + offsetxy[1]] = color;
+        pixels[l.first + offsetxy[0]][l.second + offsetxy[1]] = color;
 }
 
 void Util::drawLines(std::vector<std::vector<bool>>& pixels,
-                     const std::vector<std::vector<std::vector<int>>>& lines,
+                     const LcdBitmap& bitmap,
                      const std::vector<bool>& colors,
                      const std::vector<int>& offsetxy)
 {
     int colorCounter = 0;
-    for (auto& l : lines)
-        drawLine(pixels, l, colors[colorCounter++], offsetxy);
+    for (auto& line : bitmap)
+        drawLine(pixels, line, colors[colorCounter++], offsetxy);
 }
 
 std::vector<std::string>& Util::noteNames()

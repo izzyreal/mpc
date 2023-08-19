@@ -1,6 +1,8 @@
 #pragma once
 #include "Component.hpp"
 
+#include "mpc_types.hpp"
+
 #include <vector>
 
 namespace mpc::lcdgui
@@ -23,7 +25,7 @@ namespace mpc::lcdgui
 		unsigned int zoomFactor{ 3 };		// zoomed view only
 
 	private:
-		void makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vector<bool>* colors, unsigned int samplePos);
+		void makeLine(LcdBitmap&, std::vector<bool>* colors, unsigned int samplePos);
 		void initSamplesPerPixel();
 
 	public:

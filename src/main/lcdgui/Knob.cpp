@@ -39,15 +39,15 @@ void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 			(*pixels)[i][j] = !color;
 	}
 
-	std::vector<std::vector<std::vector<int>>> lines;
-	lines.push_back(Bressenham::Line(0, 3, 0, 7));
-	lines.push_back(Bressenham::Line(0, 7, 3, 10));
-	lines.push_back(Bressenham::Line(3, 10, 7, 10));
-	lines.push_back(Bressenham::Line(7, 10, 10, 7));
-	lines.push_back(Bressenham::Line(10, 7, 10, 3));
-	lines.push_back(Bressenham::Line(10, 3, 7, 0));
-	lines.push_back(Bressenham::Line(7, 0, 3, 0));
-	lines.push_back(Bressenham::Line(3, 0, 0, 3));
+	LcdBitmap lines;
+	lines.emplace_back(Bressenham::Line(0, 3, 0, 7));
+	lines.emplace_back(Bressenham::Line(0, 7, 3, 10));
+	lines.emplace_back(Bressenham::Line(3, 10, 7, 10));
+	lines.emplace_back(Bressenham::Line(7, 10, 10, 7));
+	lines.emplace_back(Bressenham::Line(10, 7, 10, 3));
+	lines.emplace_back(Bressenham::Line(10, 3, 7, 0));
+	lines.emplace_back(Bressenham::Line(7, 0, 3, 0));
+	lines.emplace_back(Bressenham::Line(3, 0, 0, 3));
 	
 	int angle = (int) ((value * 3.1) - 245);
 	float radius = 4.95f;
@@ -55,13 +55,10 @@ void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 	float angleToRadians = ((float) (angle) / 180.0) * 3.14159265;
 	int x0 = (int)(radius * cos(angleToRadians));
 	int y0 = (int)(radius * sin(angleToRadians));
-	lines.push_back(Bressenham::Line(5, 5, x0 + radiusInt + 1, y0 + radiusInt + 1));
+	lines.emplace_back(Bressenham::Line(5, 5, x0 + radiusInt + 1, y0 + radiusInt + 1));
 	
-	std::vector<bool> colors;
+	std::vector<bool> colors(lines.size(), color);
     
-	for (int i = 0; i < lines.size(); i++)
-		colors.push_back(color);
-	
 	std::vector<int> offsetxy { rect.L, rect.T };
 	mpc::Util::drawLines(*pixels, lines, colors, offsetxy);
 	dirty = false;

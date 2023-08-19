@@ -109,7 +109,7 @@ void Wave::setSelection(unsigned int start, unsigned int end)
 	SetDirty();
 }
 
-void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vector<bool>* colors, unsigned int lineX)
+void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int lineX)
 {
 	int offset = 0;
 	float peakPos = 0;
@@ -149,12 +149,12 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		}
 	}
 
-	lines->clear();
+	bitmap.clear();
 	colors->clear();
 	
 	if (fine && lineX == 55)
 	{
-		lines->push_back(Bressenham::Line(lineX, 0, lineX, 26));
+		bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 26));
 		colors->push_back(true);
 	}
 
@@ -166,22 +166,22 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 
 	if (posLineLength != 13 && !(fine && lineX == 55))
 	{
-		lines->push_back(Bressenham::Line(lineX, 0, lineX, 13 - (posLineLength + 1)));
+		bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 13 - (posLineLength + 1)));
 	}
 
 	if (peakPos > invisible)
 	{
-		lines->push_back(Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
+		bitmap.emplace_back(Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
 	}
 
 	if (abs(peakNeg) > invisible)
 	{
-		lines->push_back(Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
+		bitmap.emplace_back(Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
 	}
 
 	if (negLineLength != 13 && !(fine && lineX == 55))
 	{
-		lines->push_back(Bressenham::Line(lineX, 13 + (negLineLength + 1), lineX, 26));
+		bitmap.emplace_back(Bressenham::Line(lineX, 13 + (negLineLength + 1), lineX, 26));
 	}
 
 	if (!fine && samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd)
@@ -248,16 +248,16 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 
 	Clear(pixels);
 
-	std::vector<std::vector<std::vector<int>>> lines;
+	LcdBitmap bitmap;
 	std::vector<bool> colors;
 
 	for (int i = 0; i < w; i++)
 	{
-		makeLine(&lines, &colors, i);
+		makeLine(bitmap, &colors, i);
 		int counter = 0;
 		
-		for (auto& l : lines)
-			mpc::Util::drawLine(*pixels, l, colors[counter++], std::vector<int>{x, y});
+		for (auto& line : bitmap)
+			mpc::Util::drawLine(*pixels, line, colors[counter++], std::vector<int>{x, y});
 	}
 
 	dirty = false;
