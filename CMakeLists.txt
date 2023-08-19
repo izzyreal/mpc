@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-include(cmake/ResourceBundling.cmake)
+include(cmake/MpcResourceBundling.cmake)
 
 include(FetchContent)
 
@@ -192,8 +192,6 @@ if (APPLE)
 endif()
 
 _bundle_mpc_resources(mpc)
-
-set(MPC_FACTORY_RESOURCES ${MPC_FACTORY_RESOURCES} PARENT_SCOPE)
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_IGNORE_FILES
