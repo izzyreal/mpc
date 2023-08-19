@@ -17,6 +17,8 @@
 
 #include <file/all/Defaults.hpp>
 
+#include "MidiControlPersistence.hpp"
+
 using namespace mpc::nvram;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -120,3 +122,5 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 9) othersScreen->setContrast(bytes[9]);
   if (bytes.size() > 10) vmpcSettingsScreen->midiControlMode = bytes[10];
 }
+
+std::vector<std::shared_ptr<MidiControlPreset>> NvRam::presets;

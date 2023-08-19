@@ -2,6 +2,7 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "disk/AbstractDisk.hpp"
+#include "nvram/NvRam.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -22,7 +23,7 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(mpc::Mpc &m
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-    auto& presets = nvram::MidiControlPersistence::presets;
+    auto& presets = nvram::NvRam::presets;
     auto preset = std::find_if(
             presets.begin(),
             presets.end(),
@@ -69,7 +70,7 @@ void VmpcKnownControllerDetectedScreen::displayMessage()
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-    for (auto& p : nvram::MidiControlPersistence::presets)
+    for (auto& p : nvram::NvRam::presets)
     {
         if (controllerName.find(p->name) != std::string::npos)
         {

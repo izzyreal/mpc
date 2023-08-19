@@ -7,6 +7,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "NameScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "nvram/NvRam.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
@@ -76,7 +77,7 @@ void VmpcMidiPresetsScreen::open()
 {
     MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
 
-    if (row + rowOffset >= (MidiControlPersistence::presets.size() + 1))
+    if (row + rowOffset >= (NvRam::presets.size() + 1))
     {
         row = 0;
         rowOffset = 0;
@@ -91,13 +92,13 @@ void VmpcMidiPresetsScreen::open()
 void VmpcMidiPresetsScreen::displayUpAndDown()
 {
     findChild<Label>("up")->Hide(rowOffset == 0);
-    findChild<Label>("down")->Hide(rowOffset + 4 >= MidiControlPersistence::presets.size());
+    findChild<Label>("down")->Hide(rowOffset + 4 >= NvRam::presets.size());
 }
 
 void VmpcMidiPresetsScreen::turnWheel(int i)
 {
     init();
-    auto &presets = MidiControlPersistence::presets;
+    auto &presets = NvRam::presets;
     const int presetIndex = (row + rowOffset) - 1;
 
     if (presetIndex < 0 || presetIndex >= presets.size())
@@ -124,7 +125,7 @@ void VmpcMidiPresetsScreen::function(int i)
 {
     ScreenComponent::function(i);
 
-    auto& presets = MidiControlPersistence::presets;
+    auto& presets = NvRam::presets;
 
     switch (i)
     {
@@ -184,7 +185,7 @@ void VmpcMidiPresetsScreen::up()
 
 void VmpcMidiPresetsScreen::down()
 {
-    if (row + rowOffset >= MidiControlPersistence::presets.size()) return;
+    if (row + rowOffset >= NvRam::presets.size()) return;
     if (row == 3) rowOffset++; else row++;
     displayRows();
 }
@@ -198,7 +199,7 @@ void VmpcMidiPresetsScreen::left()
 
 void VmpcMidiPresetsScreen::right()
 {
-    if (column == 1 || (row + rowOffset == 0 && MidiControlPersistence::presets.empty())) return;
+    if (column == 1 || (row + rowOffset == 0 && NvRam::presets.empty())) return;
 
     if (row + rowOffset == 0)
     {
@@ -211,7 +212,7 @@ void VmpcMidiPresetsScreen::right()
 
 void VmpcMidiPresetsScreen::displayRows()
 {
-    auto presets = MidiControlPersistence::presets;
+    auto presets = NvRam::presets;
 
     for (int i = 0; i < 4; i++)
     {
