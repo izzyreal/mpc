@@ -11,6 +11,12 @@ FetchContent_Declare(akaifat
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
+FetchContent_Declare(macos-raw-usb-helper
+  GIT_REPOSITORY https://github.com/izzyreal/macos-raw-usb-helper
+  GIT_TAG        main
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/macos-raw-usb-helper
+)
+
 set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
 
 FetchContent_Declare(Catch2
@@ -84,7 +90,7 @@ FetchContent_Declare(concurrentqueue
 
 FetchContent_Populate(concurrentqueue)
 
-FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
+FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders macos-raw-usb-helper)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -115,6 +121,7 @@ file(
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     "${_src_root_path_main}/*.c*"
     "${_src_root_path_main}/*.h*"
+    "${_src_root_path_main}/*.mm"
 )
 
 foreach(_source IN ITEMS ${_source_list_main})
@@ -133,6 +140,7 @@ target_include_directories(mpc PUBLIC
     ${tl-expected_SOURCE_DIR}/include
     ${libsamplerate_SOURCE_DIR}/include
     ${concurrentqueue_SOURCE_DIR}
+    ${macos-raw-usb-helper_SOURCE_DIR}
 )
 
 target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders)
@@ -147,6 +155,10 @@ endif()
 
 if (IOS)
     target_compile_definitions(rtmidi PRIVATE TARGET_OS_IPHONE=1)
+endif()
+
+if (APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL iOS)
+    target_link_libraries(mpc "-framework Foundation -framework ServiceManagement")
 endif()
 
 ## Configure test suite application ##

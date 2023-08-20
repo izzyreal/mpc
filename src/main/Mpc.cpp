@@ -2,6 +2,8 @@
 
 #include "Mpc.hpp"
 
+#include "Helper.h"
+
 #include <lcdgui/ScreenComponent.hpp>
 
 #include "Paths.hpp"
@@ -42,6 +44,8 @@ using namespace mpc::lcdgui;
 
 Mpc::Mpc()
 {
+    InstallHelperTool();
+
 #if __linux__
     XInitThreads();
 #endif
