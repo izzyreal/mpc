@@ -672,19 +672,19 @@ void EditSoundScreen::function(int j)
             
             for (int i = start; i < end; i++)
             {
-                float v = abs(sampleData[i]);
-                peak = std::max(peak, v);
+                float v = std::fabs(sampleData[i]);
+                peak = std::fmax(peak, v);
 
                 if (!sound->isMono())
                 {
-                    v = abs(sampleData[(i + sound->getFrameCount())]);
-                    peak = std::max(peak, v);
+                    v = std::fabs(sampleData[(i + sound->getFrameCount())]);
+                    peak = std::fmax(peak, v);
                 }
             }
             
             peak = std::min(1.0f, peak);
             
-            float factor = 1.0f / peak;
+            const float factor = 1.0f / peak;
 
             for (int i = start; i < end; i++)
             {
