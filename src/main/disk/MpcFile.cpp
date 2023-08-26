@@ -9,22 +9,21 @@
 using namespace mpc::disk;
 using namespace akaifat::fat;
 
-MpcFile::MpcFile(nonstd::any fileObject)
+MpcFile::MpcFile(const std::variant<fs::path, std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>>& fileObject)
 {
-    if (!fileObject.has_value()) throw std::runtime_error("No object provided to MpcFile");
-    
-    if (fileObject.type() == typeid(fs::path))
+    if (auto fsPath = std::get_if<fs::path>(&fileObject))
     {
-        fs_path = nonstd::any_cast<fs::path>(fileObject);
+        fs_path = *fsPath;
+        return;
     }
-    else if (fileObject.type() == typeid(std::shared_ptr<AkaiFatLfnDirectoryEntry>))
+    else if (auto akaiEntry = std::get_if<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(&fileObject))
     {
-        rawEntry = nonstd::any_cast<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(fileObject);
+        rawEntry = *akaiEntry;
         raw = true;
+        return;
     }
-    else {
-        throw std::runtime_error("Invalid object provided to MpcFile");
-    }
+
+    throw std::runtime_error("Invalid object provided to MpcFile");
 }
 
 std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()

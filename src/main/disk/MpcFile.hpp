@@ -1,12 +1,12 @@
 #pragma once
 
 #include <mpc_fs.hpp>
-#include <any.hpp>
 
 #include <vector>
 #include <string>
 #include <memory>
 #include <iostream>
+#include <variant>
 
 namespace akaifat::fat { class AkaiFatLfnDirectoryEntry; }
 
@@ -48,7 +48,7 @@ public:
     std::shared_ptr<std::istream> getInputStream();
     std::shared_ptr<std::ostream> getOutputStream();
     
-    MpcFile(nonstd::any a);
+    explicit MpcFile(const std::variant<fs::path, std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>>&);
     
 };
 }

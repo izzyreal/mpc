@@ -4,20 +4,19 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-
-#include <any.hpp>
+#include <variant>
 
 namespace mpc::engine::control {
     class EnumControl : public Control
     {
     private:
-        nonstd::any value;
+        std::variant<int, std::string> value;
 
     public:
-        void setValue(nonstd::any value);
+        void setValue(const std::variant<int, std::string>& value);
 
         std::string getValueString() override;
-        EnumControl(int id, std::string name, nonstd::any value);
+        EnumControl(int id, std::string name, const std::variant<int, std::string>& value);
 
     };
 

@@ -1,36 +1,34 @@
 #include <engine/control/EnumControl.hpp>
 
+#include <utility>
 #include <vector>
 #include <string>
-#include <stdio.h>
 
-using namespace std;
 using namespace mpc::engine::control;
 
-using namespace nonstd;
-
-EnumControl::EnumControl(int id, string name, nonstd::any value) : Control(id, name)
+EnumControl::EnumControl(int id, std::string name, const std::variant<int, std::string>& valueToUse)
+    : Control(id, std::move(name)), value(valueToUse)
 {
-    this->value = value;
 }
 
-void EnumControl::setValue(nonstd::any value)
+void EnumControl::setValue(const std::variant<int, std::string>& valueToUse)
 {
-    this->value = value;
+    value = valueToUse;
     notifyParent(this);
 }
 
-string EnumControl::getValueString()
+std::string EnumControl::getValueString()
 {
-    if (!value.has_value())
-        return nullptr;
-    
-    if (value.type() == typeid(int))
-        return to_string(nonstd::any_cast<int>(value));
-    else if (value.type() == typeid(string))
-        return nonstd::any_cast<string>(value);
-    
-    return nullptr;
+    if (auto intValue = std::get_if<int>(&value))
+    {
+        return std::to_string(*intValue);
+    }
+    else if (auto strValue = std::get_if<std::string>(&value))
+    {
+        return *strValue;
+    }
+
+    return {};
 }
 
 

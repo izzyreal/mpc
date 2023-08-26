@@ -76,7 +76,7 @@ struct Volume {
     std::shared_ptr<mpc::disk::MpcFile> getRoot()
     {
         if (type == LOCAL_DIRECTORY)
-            return std::make_shared<mpc::disk::MpcFile>(fs::path(localDirectoryPath));
+            return std::make_shared<mpc::disk::MpcFile>(ghc::filesystem::path(localDirectoryPath));
         return {};
     }
     
