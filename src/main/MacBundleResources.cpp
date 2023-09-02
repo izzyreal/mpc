@@ -1,6 +1,6 @@
 #ifdef __APPLE__
 #include <TargetConditionals.h>
-#if not TARGET_OS_IPHONE
+//#if not TARGET_OS_IPHONE
 
 #include "MacBundleResources.h"
 #include <CoreFoundation/CoreFoundation.h>
@@ -52,5 +52,5 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
     return resourcePath;
 }
 
-#endif
+//#endif
 #endif

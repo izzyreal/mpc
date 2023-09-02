@@ -7,12 +7,12 @@
 
 #include <TargetConditionals.h>
 
-#if not TARGET_OS_IPHONE
+//#if not TARGET_OS_IPHONE
 
 #include "MacBundleResources.h"
 
 #define MAC_BUNDLE_RESOURCES 1
-#endif
+//#endif
 #endif
 
 namespace mpc {

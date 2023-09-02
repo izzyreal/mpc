@@ -13,7 +13,7 @@ function(_bundle_mpc_resources _target_name)
   _add_mpc_resource_files(${_mpc_resources_root} demodata/TEST1 "SND;PGM;APS;MID;ALL" "${total_list}")
   _add_mpc_resource_files(${_mpc_resources_root} demodata/TEST2 "SND;PGM;APS;MID;ALL" "${total_list}")
 
-  if (NOT (APPLE AND NOT IOS))
+  if (NOT (APPLE))
     cmrc_add_resource_library(
             mpc_resources
             ALIAS mpc::rc
