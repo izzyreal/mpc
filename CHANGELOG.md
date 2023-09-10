@@ -1,3 +1,6 @@
+## v0.5.3.1 (23-8-2023, Linux only release)
+Fixes Edit window | NORMALIZE. It was corrupting the sound due to my absentminded use of `abs` rather than `std::fabs`, `min` rather than `std::fmin` and same for `fmax`.
+
 ## v0.5.3 (19-8-2023)
 * Fix sampling at 44.1KHz.
 * Fix waveform display of right channel in TRIM, LOOP and ZONE screens.
