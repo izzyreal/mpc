@@ -127,7 +127,7 @@ namespace WonderRabbitProject
       {
         {
           #include "key/detail.keys.hxx"
-          
+/*          
           for(const auto& t : keys)
           {
 #if __GNUC__ == 4 &&  __GNUC_MINOR__ < 7
@@ -138,6 +138,7 @@ namespace WonderRabbitProject
             code_to_name_table.emplace(std::get<1>(t), std::get<0>(t));
 #endif
           }
+          */
         }
         {
 #if __GNUC__ == 4 &&  __GNUC_MINOR__ < 7

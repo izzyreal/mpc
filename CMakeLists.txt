@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
+set(HAVE_STDBOOL_H ON)
+
 include(cmake/ResourceBundling.cmake)
 
 include(FetchContent)
 
 FetchContent_Declare(akaifat
   GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
-  GIT_TAG        main
+  GIT_TAG        wasm 
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
@@ -96,6 +98,12 @@ project(mpc)
 
 set(CMAKE_CXX_STANDARD 17)
 
+    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    set(CMAKE_HAVE_THREADS_LIBRARY 1)
+    set(CMAKE_USE_WIN32_THREADS_INIT 0)
+    set(CMAKE_USE_PTHREADS_INIT 1)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 if(APPLE)
   if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
     # This is not a typo. See https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -171,21 +179,6 @@ endforeach()
 
 add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
 target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
-
-if (UNIX)
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-    target_link_libraries(mpc-tests Threads::Threads)
-endif (UNIX)
-
-if (UNIX AND NOT APPLE)
-    include(FindPkgConfig)
-    pkg_search_module(udisks2 REQUIRED udisks2)
-    target_include_directories(mpc SYSTEM PUBLIC ${udisks2_INCLUDE_DIRS})
-    target_include_directories(mpc-tests SYSTEM PUBLIC ${udisks2_INCLUDE_DIRS})
-    target_link_libraries(mpc-tests ${udisks2_LIBRARIES})
-    target_link_libraries(mpc ${udisks2_LIBRARIES})
-endif()
 
 if (APPLE)
     target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
