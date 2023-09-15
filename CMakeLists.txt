@@ -195,3 +195,7 @@ set(CPACK_SOURCE_IGNORE_FILES
     /\\\\.DS_Store
 )
 include(CPack)
+
+add_executable(mpc-wasm src/main/WasmWrapper.cpp)
+
+target_link_libraries(mpc-wasm mpc)
