@@ -228,6 +228,9 @@ void SongScreen::function(int i)
 	
 	switch (i)
 	{
+    case 3:
+        openScreen("convert-song-to-seq");
+        break;
 	case 4:
 		if (sequencer->isPlaying())
 			return;

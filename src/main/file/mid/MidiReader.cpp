@@ -145,7 +145,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         }
     }
 
-    sequence->setLastBar(barCounter - 1);
+    sequence->setLastBarIndex(barCounter - 1);
     sequence->setFirstLoopBarIndex(firstLoopBar);
 
     if (lastLoopBar == -1)

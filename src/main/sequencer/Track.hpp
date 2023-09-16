@@ -59,12 +59,12 @@ private:
     int getCorrectedTickPos();
 
 public:
-    bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
+    bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
     std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note, int velocity);
     bool finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent>& event, int duration);
     std::shared_ptr<NoteOnEvent> recordNoteEventASync(unsigned char note, unsigned char velocity);
     void finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent>& event);
-    void addEvent(int tick, const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
+    void addEvent(int tick, const std::shared_ptr<Event>& event, bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     void removeEvent(int i);
     void removeEvent(const std::shared_ptr<Event>& event);

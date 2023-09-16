@@ -137,7 +137,7 @@ void DiskController::detectRawUsbVolumes()
     MLOG("Iterating through scraped USB volumes...");
     auto persistedConfigs = VolumesPersistence::getPersistedConfigs();
 
-    for (int i = disks.size() - 1; i >= 0; i--)
+    for (int i = static_cast<int>(disks.size()) - 1; i >= 0; i--)
     {
         auto d = disks[i];
 

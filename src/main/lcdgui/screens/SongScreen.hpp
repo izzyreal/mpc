@@ -12,6 +12,7 @@ namespace mpc::lcdgui::screens::window
 {
 	class SongWindow;
 	class NameScreen;
+    class ConvertSongToSeqScreen;
 }
 
 namespace mpc::lcdgui::screens
@@ -66,6 +67,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::lcdgui::screens::dialog::DeleteSongScreen;
 		friend class mpc::lcdgui::screens::dialog::CopySongScreen;
 		friend class mpc::lcdgui::screens::window::NameScreen;
+		friend class mpc::lcdgui::screens::window::ConvertSongToSeqScreen;
 
 	};
 }

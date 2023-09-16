@@ -549,7 +549,11 @@
  "labels" : [ "From song:", "To sequence:", "Track status:" ],
  "x" : [ 44, 32, 26 ],
  "y" : [ 16, 26, 40 ],
- "parameters" : [ "fromsong", "tosequence", "trackstatus" ],
+ "parameters" : [
+  "fromsong", [ "_", "_", "_", "tosequence" ],
+  "tosequence", [ "_", "_", "fromsong", "trackstatus" ],
+  "trackstatus", [ "_", "_", "tosequence", "_" ]
+ ],
  "tfsize" : [ 114, 114, 120 ],
  "fblabels" : [ null, null, null, "CLOSE", "DO IT", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]

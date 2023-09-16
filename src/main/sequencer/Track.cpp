@@ -189,7 +189,7 @@ bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent>& event, i
     return old_duration != duration;
 }
 
-void Track::addEvent(int tick, const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick)
+void Track::addEvent(int tick, const std::shared_ptr<Event>& event, bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (events.empty())
     {
@@ -198,7 +198,7 @@ void Track::addEvent(int tick, const std::shared_ptr<Event>& event, bool allowMu
 
     event->setTick(tick);
 
-    insertEventWhileRetainingSort(event, allowMultipleNotesOnSameTick);
+    insertEventWhileRetainingSort(event, allowMultipleNoteEventsWithSameNoteOnSameTick);
 
     notifyObservers(std::string("step-editor"));
 }
@@ -894,7 +894,7 @@ std::string Track::getActualName()
     return name;
 }
 
-bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick)
+bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (!isUsed())
     {
@@ -905,7 +905,7 @@ bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, b
 
     auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-    if (noteEvent && !allowMultipleNotesOnSameTick) 
+    if (noteEvent && !allowMultipleNoteEventsWithSameNoteOnSameTick)
     {
         for (auto& e : events)
         {

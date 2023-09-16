@@ -40,5 +40,7 @@ namespace mpc::lcdgui::screens::window
 		void setErase(int i);
 		void setType(int i);
 
+        void doErase();
+
 	};
 }
