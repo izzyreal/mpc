@@ -76,69 +76,9 @@ void EraseScreen::function(int i)
 		openScreen("sequencer");
 		break;
 	case 4:
-	{
-		auto startIndex = track;
-		auto lastIndex = track;
-
-		if (startIndex < 0)
-		{
-			startIndex = 0;
-			lastIndex = 63;
-		}
-
-		auto midi = sequencer->getActiveTrack()->getBus() == 0;
-
-		auto noteA = note0;
-		auto noteB = midi ? note1 : -1;
-
-		auto seq = sequencer->getActiveSequence();
-
-        const auto selectedType = eventTypes[type];
-
-		for (auto j = startIndex; j < lastIndex + 1; j++)
-		{
-            std::vector<int> removalIndices;
-			auto t = seq->getTrack(j);
-			
-			for (auto k = 0; k < t->getEvents().size(); k++)
-			{
-				auto e = t->getEvent(k);
-				auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
-
-				if (e->getTick() >= time0 && e->getTick() < time1)
-                {
-                    if (erase == 0
-                        || (erase == 1 && e->getTypeName() != selectedType)
-                        || erase == 2 && e->getTypeName() != selectedType)
-                    {
-                        if (ne)
-                        {
-                            const auto nn = ne->getNote();
-                            if ((midi && nn >= noteA && nn <= noteB) || (!midi && (noteA <= 34 || noteA == nn)))
-                            {
-                                removalIndices.push_back(k);
-                            }
-                        }
-                        else
-                        {
-                            removalIndices.push_back(k);
-                        }
-                    }
-                    break;
-                }
-			}
-
-			sort(begin(removalIndices), end(removalIndices));
-			reverse(begin(removalIndices), end(removalIndices));
-
-			for (int index : removalIndices)
-            {
-                t->removeEvent(index);
-            }
-		}
+        doErase();
 		openScreen("sequencer");
 		break;
-	}
 	}
 }
 
@@ -253,4 +193,51 @@ void EraseScreen::setType(int i)
 	type = i;
 	displayType();
 	displayNotes();
+}
+
+void EraseScreen::doErase()
+{
+    const auto firstTrackIndex = track < 0 ? 0 : track;
+    const auto lastTrackIndex = track < 0 ? 63 : track;
+
+    const auto midi = sequencer->getActiveTrack()->getBus() == 0;
+
+    const auto noteA = note0;
+    const auto noteB = midi ? note1 : -1;
+
+    auto seq = sequencer->getActiveSequence();
+
+    const auto selectedType = eventTypes[type];
+
+    for (auto trackIndex = firstTrackIndex; trackIndex <= lastTrackIndex; trackIndex++)
+    {
+        const auto seqTrack = seq->getTrack(trackIndex);
+
+        for (auto eventIndex = static_cast<int>(seqTrack->getEvents().size()) - 1; eventIndex >= 0; eventIndex--)
+        {
+            const auto event = seqTrack->getEvent(eventIndex);
+            const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+
+            if (event->getTick() >= time0 && event->getTick() < time1)
+            {
+                if (erase == 0 ||
+                    (erase == 1 && event->getTypeName() != selectedType) ||
+                    erase == 2 && event->getTypeName() != selectedType)
+                {
+                    if (noteEvent)
+                    {
+                        const auto nn = noteEvent->getNote();
+                        if ((midi && nn >= noteA && nn <= noteB) || (!midi && (noteA <= 34 || noteA == nn)))
+                        {
+                            seqTrack->removeEvent(eventIndex);
+                        }
+                    }
+                    else
+                    {
+                        seqTrack->removeEvent(eventIndex);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -12,7 +12,7 @@ using namespace mpc::lcdgui::screens;
 TEST_CASE("Load an empty auto-save state", "[auto-save]")
 {
     auto tmpDocsPath = fs::temp_directory_path();
-    tmpDocsPath.concat("VMPC2000XL-test");
+    tmpDocsPath = tmpDocsPath / "VMPC2000XL-test";
 
     {
         Mpc mpc;

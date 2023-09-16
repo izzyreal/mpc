@@ -1,12 +1,14 @@
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/SeqUtil.hpp"
 
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/Step.hpp>
-#include <sequencer/Song.hpp>
-#include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/TimeSignature.hpp>
+#include "Mpc.hpp"
+
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Step.hpp"
+#include "sequencer/Song.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/TimeSignature.hpp"
 
 #include <cmath>
 
@@ -33,30 +35,30 @@ int SeqUtil::getBarFromTick(Sequence* s, int position)
 {
 	if (position == 0)
 		return 0;
-	
+
 	auto ts = s->getTimeSignature();
 	auto num = ts.getNumerator();
 	auto den = ts.getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
 	auto bar = (int)(floor(position / (denTicks * num)));
-	
+
     return bar;
 }
 
 double SeqUtil::secondsPerTick(const double tempo)
-{   
+{
     return 60.0 / tempo / 96.0;
 }
 
 double SeqUtil::ticksPerSecond(const double tempo)
 {
-    
+
     auto bps = tempo / 60.0;
     return bps * 96.0;
 }
 
 double SeqUtil::ticksToFrames(double ticks, const double tempo, int sr)
-{   
+{
 	return (ticks * secondsPerTick(tempo) * sr);
 }
 
@@ -84,7 +86,7 @@ double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, 
 	for (int i = 0; i < tceSize - 1; i++)
 	{
 		auto nextTce = tempoChangeEvents[i + 1];
-	
+
 		if (firstTick > nextTce->getTick())
 			continue;
 
@@ -126,7 +128,7 @@ int SeqUtil::songFrameLength(Song* song, Sequencer* sequencer, int sr)
 			result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
 		}
 	}
-    
+
 	return static_cast<int>(result);
 }
 void SeqUtil::setTimeSignature(Sequence* sequence, int firstBarIndex, int tsLastBarIndex, int num, int den)
@@ -145,10 +147,10 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 		newBarLengths[i] = sequence->getBarLengthsInTicks()[i];
 
 	newBarLengths[bar] = newDenTicks * num;
-	
+
 	sequence->getNumerators()[bar] = num;
 	sequence->getDenominators()[bar] = den;
-	
+
 	if (bar == sequence->getLastBarIndex())
 	{
 		sequence->getNumerators()[sequence->getLastBarIndex() + 1] = num;
@@ -159,7 +161,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 		sequence->getNumerators()[lastBar + 1] = sequence->getNumerators()[lastBar];
 		sequence->getDenominators()[lastBar + 1] = sequence->getDenominators()[lastBar];
 	}
-	
+
 	std::vector<int> oldBarStartPos(999);
 	oldBarStartPos[0] = 0;
 
@@ -170,12 +172,12 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 			oldBarStartPos[i] = 0;
 			continue;
 		}
-		
+
 		oldBarStartPos[i] = oldBarStartPos[i - 1] + sequence->getBarLengthsInTicks()[i - 1];
 	}
 
 	std::vector<int> newBarStartPos(999);
-	
+
 	for (int i = bar; i < 999; i++)
 	{
 		if (i == 0)
@@ -324,4 +326,128 @@ int SeqUtil::getClock(Sequence* s, int position)
 
 	auto clock = (int)(position % (denTicks));
 	return clock;
+}
+
+void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, uint8_t copyFirstBar, uint8_t copyLastBar, uint8_t copyCount, uint8_t copyAfterBar)
+{
+    const auto sequencer = mpc.getSequencer();
+
+    auto fromSequence = sequencer->getSequence(fromSeqIndex);
+
+    if (!fromSequence->isUsed())
+    {
+        return;
+    }
+
+    auto toSequence = sequencer->getSequence(toSeqIndex);
+    auto numberOfBars = (copyLastBar - copyFirstBar + 1) * copyCount;
+
+    if (numberOfBars > 999)
+    {
+        numberOfBars = 999;
+    }
+
+    if (!toSequence->isUsed())
+    {
+        toSequence->init(numberOfBars - 1);
+    }
+    else
+    {
+        if (toSequence->getLastBarIndex() + numberOfBars > 998)
+        {
+            numberOfBars = 998 - toSequence->getLastBarIndex();
+        }
+
+        toSequence->insertBars(numberOfBars, copyAfterBar);
+    }
+
+    int copyCounter = 0;
+
+    for (int i = 0; i < numberOfBars; i++)
+    {
+        toSequence->setTimeSignature(i + copyAfterBar, fromSequence->getNumerator(copyCounter + copyFirstBar), fromSequence->getDenominator(copyCounter + copyFirstBar));
+        copyCounter++;
+
+        if (copyCounter >= copyCount)
+            copyCounter = 0;
+    }
+
+    auto firstTick = 0;
+    auto lastTick = 0;
+    auto firstTickOfToSeq = 0;
+
+    for (int i = 0; i < 999; i++)
+    {
+        if (i == copyFirstBar)
+            break;
+
+        firstTick += fromSequence->getBarLengthsInTicks()[i];
+    }
+
+    for (int i = 0; i < 999; i++)
+    {
+        lastTick += fromSequence->getBarLengthsInTicks()[i];
+
+        if (i == copyLastBar)
+        {
+            break;
+        }
+    }
+
+    for (int i = 0; i < 999; i++)
+    {
+        if (i == copyAfterBar)
+            break;
+
+        firstTickOfToSeq += toSequence->getBarLengthsInTicks()[i];
+    }
+
+    auto segmentLengthTicks = lastTick - firstTick;
+    auto offset = firstTickOfToSeq - firstTick;
+
+    for (int i = 0; i < 64; i++)
+    {
+        auto t1 = fromSequence->getTrack(i);
+
+        if (!t1->isUsed())
+        {
+            continue;
+        }
+
+        auto t1Events = t1->getEventRange(firstTick, lastTick);
+        auto t2 = toSequence->getTrack(i);
+
+        if (!t2->isUsed())
+        {
+            t2->setUsed(true);
+        }
+
+        auto toSeqLastTick = toSequence->getLastTick();
+
+        for (auto& event : t1Events)
+        {
+            auto firstCopyTick = event->getTick() + offset;
+
+            if (firstCopyTick >= toSeqLastTick)
+            {
+                // The events in Track are ordered by tick, so this and
+                // any following event copies would be out of bounds.
+                break;
+            }
+
+            for (auto k = 0; k < copyCount; k++)
+            {
+                auto tick = firstCopyTick + (k * segmentLengthTicks);
+
+                // We do a more specific exit-check here, since within-bounds
+                // copies may be followed by out-of-bounds ones.
+                if (tick >= toSeqLastTick)
+                {
+                    break;
+                }
+
+                t2->cloneEventIntoTrack(event, tick);
+            }
+        }
+    }
 }

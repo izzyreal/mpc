@@ -105,7 +105,7 @@ void StepEditorScreen::open()
 
         if (insertEventScreen->isEventAddedBeforeLeavingTheScreen())
         {
-            auto eventCount = eventsAtCurrentTick.size() - 1;
+            auto eventCount = static_cast<int>(eventsAtCurrentTick.size()) - 1;
             auto event = eventsAtCurrentTick[eventCount -1];
             auto eventType = event->getTypeName();
 

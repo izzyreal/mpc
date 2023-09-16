@@ -67,8 +67,9 @@ public:
     std::string getName();
     void setDeviceName(int i, std::string s);
     std::string getDeviceName(int i);
-    void setLastBar(int i);
+    void setLastBarIndex(int i);
     int getLastBarIndex();
+    int getBarCount();
     void setLoopEnabled(bool b);
     std::shared_ptr<Track> getTrack(int i);
     void setUsed(bool b);

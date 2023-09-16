@@ -343,7 +343,7 @@ void TempoChangeScreen::function(int j)
 		
 		seq->removeTempoChangeEvent(offset + yPos);
 
-		if (offset + yPos == tceList.size() - 1)
+		if (offset + yPos == static_cast<int>(tceList.size()) - 1)
 			setOffset(offset - 1);
 		
 		initVisibleEvents();

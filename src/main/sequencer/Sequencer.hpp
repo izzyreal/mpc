@@ -87,10 +87,10 @@ namespace mpc::sequencer
 		std::shared_ptr<Sequence> copySequence(std::shared_ptr<Sequence> source);
 		void copySequenceParameters(std::shared_ptr<Sequence> source, std::shared_ptr<Sequence> dest);
 		void copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst);
-		void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
 		void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
 
 	public:
+        static void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
 		void notifyTimeDisplay();
 		void notifyTimeDisplayRealtime();
 		void init();

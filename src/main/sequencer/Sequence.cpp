@@ -153,7 +153,7 @@ std::string Sequence::getDeviceName(int i)
 	return deviceNames[i];
 }
 
-void Sequence::setLastBar(int i)
+void Sequence::setLastBarIndex(int i)
 {
 	if (i < 0 || i > 998)
 		return;
@@ -164,6 +164,11 @@ void Sequence::setLastBar(int i)
 int Sequence::getLastBarIndex()
 {
 	return lastBarIndex;
+}
+
+int Sequence::getBarCount()
+{
+    return lastBarIndex + 1;
 }
 
 void Sequence::setLoopEnabled(bool b)
@@ -201,8 +206,8 @@ void Sequence::init(int newLastBarIndex)
 		t->setBusNumber(userScreen->bus);
 		t->setVelocityRatio(userScreen->velo);
 	}
-	
-	setLastBar(newLastBarIndex);
+
+    setLastBarIndex(newLastBarIndex);
 
     tempoTrackIsInitialized.store(false);
     tempoChangeTrack->removeEvents();
