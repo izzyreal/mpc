@@ -1,3 +1,7 @@
+## v0.5.4 (17-9-2023)
+* Implement Convert Song to Seq (shout out to c3ntr0n800 for the reminder).
+* Fix Erase window issue. It wasn't removing all the events that should be erased.
+
 ## v0.5.3.1 (23-8-2023, Linux only release)
 Fixes Edit window | NORMALIZE. It was corrupting the sound due to my absentminded use of `abs` rather than `std::fabs`, `min` rather than `std::fmin` and same for `fmax`.
 
