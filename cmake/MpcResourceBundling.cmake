@@ -2,7 +2,7 @@ include(cmake/CMakeRC.cmake)
 
 set(_mpc_resources_root ${CMAKE_CURRENT_SOURCE_DIR}/resources)
 
-function(_bundle_mpc_resources _target_name)
+function(_bundle_resources)
 
   set(total_list "")
 
@@ -23,7 +23,7 @@ function(_bundle_mpc_resources _target_name)
             ${total_list}
     )
 
-    target_link_libraries(${_target_name} mpc::rc)
+    target_link_libraries(mpc mpc::rc)
   endif()
 
   set(total_list "")
@@ -41,7 +41,29 @@ function(_bundle_mpc_resources _target_name)
     ${total_list}
     )
 
-  target_link_libraries(${_target_name}-tests mpctest::rc)
+  target_link_libraries(mpc-tests mpctest::rc)
+
+  if (APPLE AND NOT IOS)
+
+    file(GLOB_RECURSE MPC_RESOURCES "${CMAKE_SOURCE_DIR}/resources/*")
+
+    list(FILTER MPC_RESOURCES EXCLUDE REGEX "${CMAKE_SOURCE_DIR}/resources/test/.*")
+
+    foreach(RESOURCE ${MPC_RESOURCES})
+      get_filename_component(SOURCE_DIR "${RESOURCE}" DIRECTORY)
+      string(REPLACE "${CMAKE_SOURCE_DIR}/resources" "" RELATIVE_DIR "${SOURCE_DIR}")
+      set_source_files_properties(${RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources${RELATIVE_DIR}")
+    endforeach()
+
+    target_sources(mpc PUBLIC ${MPC_RESOURCES})
+
+    string(REPLACE "resources" "Resources" total_list_upper_case ${total_list})
+
+    set_target_properties(mpc PROPERTIES
+            RESOURCE ${total_list_upper_case}
+    )
+  endif()
+
 endfunction()
 
 function(_add_resources _rsrc_root_path _sub_dir _extensions _total_list)

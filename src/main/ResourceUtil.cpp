@@ -2,13 +2,42 @@
 
 #include "Logger.hpp"
 
-#ifdef MAC_BUNDLE_RESOURCES
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#if not TARGET_OS_IPHONE
 #include "MacBundleResources.h"
+#define MAC_BUNDLE_RESOURCES 1
+#endif
+#endif
+
+#ifdef MAC_BUNDLE_RESOURCES
+
 #include "mpc_fs.hpp"
+
+std::vector<char> get_resource_data_from_mac_os_bundle(const std::string &path)
+{
+    auto resource_path = mpc::MacBundleResources::getResourcePath(path);
+
+    if (resource_path.empty())
+    {
+        resource_path = "../Resources/" + path;
+    }
+
+    return get_file_data(resource_path);
+}
 #else
+
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 CMRC_DECLARE(mpc);
+
+std::vector<char> get_resource_data_from_in_memory_filesystem(const std::string& path)
+{
+    const auto file = cmrc::mpc::get_filesystem().open(path.c_str());
+    const auto data = std::string_view(file.begin(), file.size()).data();
+    const std::vector<char> data_vec(data, data + file.size());
+    return data_vec;
+}
 #endif
 
 using namespace mpc;
@@ -30,19 +59,3 @@ std::vector<char> ResourceUtil::get_resource_data(const std::string& path)
     }
     return {};
 }
-
-#ifdef MAC_BUNDLE_RESOURCES
-std::vector<char> ResourceUtil::get_resource_data_from_mac_os_bundle(const std::string &path)
-{
-    const auto resource_path = mpc::MacBundleResources::getResourcePath(path);
-    return get_file_data(resource_path);
-}
-#else
-std::vector<char> ResourceUtil::get_resource_data_from_in_memory_filesystem(const std::string& path)
-{
-  const auto file = cmrc::mpc::get_filesystem().open(path.c_str());
-  const auto data = std::string_view(file.begin(), file.size()).data();
-  const std::vector<char> data_vec(data, data + file.size());
-  return data_vec;
-}
-#endif

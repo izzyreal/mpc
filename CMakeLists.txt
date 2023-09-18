@@ -169,7 +169,12 @@ foreach(_source IN ITEMS ${_source_list_test})
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
+if (APPLE)
+    add_executable(mpc-tests MACOSX_BUNDLE ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
+else()
+    add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
+endif()
+
 target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
 
 if (UNIX)
@@ -191,7 +196,7 @@ if (APPLE)
     target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
 endif()
 
-_bundle_mpc_resources(mpc)
+_bundle_resources()
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_IGNORE_FILES

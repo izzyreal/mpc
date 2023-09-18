@@ -14,7 +14,6 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
     CFBundleRef bundle = CFBundleGetBundleWithIdentifier(bundleIdentifier);
 
     if (!bundle) {
-        std::cerr << "Failed to access the bundle." << std::endl;
         return "";
     }
 
