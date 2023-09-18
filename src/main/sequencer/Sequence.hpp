@@ -35,6 +35,10 @@ private:
     std::vector<int> numerators = std::vector<int>(999);
     std::vector<int> denominators = std::vector<int>(999);
     
+    std::vector<int> oldBarLengthsInTicks = std::vector<int>(999);
+    std::vector<int> oldNumerators = std::vector<int>(999);
+    std::vector<int> oldDenominators = std::vector<int>(999);
+
     std::string name;
     bool loopEnabled = true;
     int lastBarIndex = -1;

@@ -463,16 +463,20 @@ void Sequence::insertBars(int barCount, int afterBar)
 
 	lastBarIndex += barCount;
 
-	for (int i = afterBar; i < 999; i++)
+    oldBarLengthsInTicks = barLengthsInTicks;
+    oldNumerators = numerators;
+    oldDenominators = denominators;
+
+	for (int i = 998; i >= afterBar; i--)
 	{
-        if (i + barCount >= 999)
+        if (i - barCount < 0)
         {
-            continue;
+            break;
         }
 
-        barLengthsInTicks[i + barCount] = barLengthsInTicks[i];
-		numerators[i + barCount] = numerators[i];
-		denominators[i + barCount] = denominators[i];
+        barLengthsInTicks[i] = oldBarLengthsInTicks[i - barCount];
+		numerators[i] = oldNumerators[i - barCount];
+		denominators[i] = oldDenominators[i - barCount];
 	}
 
     // The below are sane defaults for the fresh bars, but the
@@ -484,8 +488,8 @@ void Sequence::insertBars(int barCount, int afterBar)
 		numerators[i] = 4;
 		denominators[i] = 4;
 	}
-	
-	int barStart = 0;
+
+    int barStart = 0;
 	auto barCounter = 0;
 	
 	for (auto l : barLengthsInTicks)
@@ -498,19 +502,20 @@ void Sequence::insertBars(int barCount, int afterBar)
 	}
 
 	barCounter = 0;
-	int newBarStart = 0;
-	
-	for (auto l : barLengthsInTicks)
-	{
-		if (barCounter == afterBar + barCount)
-			break;
-
-		newBarStart += l;
-		barCounter++;
-	}
 
     if (!isAppending)
     {
+        int newBarStart = 0;
+
+        for (auto l : barLengthsInTicks)
+        {
+            if (barCounter == afterBar + barCount)
+                break;
+
+            newBarStart += l;
+            barCounter++;
+        }
+
         for (auto& t : tracks)
         {
             if (t->getIndex() == 64 || t->getIndex() == 65)

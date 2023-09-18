@@ -139,96 +139,56 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int firstBarIndex, int tsLast
 
 void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 {
-	auto newDenTicks = 96 * (4.0 / den);
-    std::vector<int> newBarLengths(999);
-	auto lastBar = sequence->getLastBarIndex();
+	const auto newDenTicks = 96 * (4.0 / den);
 
-	for (int i = 0; i < 999; i++)
-		newBarLengths[i] = sequence->getBarLengthsInTicks()[i];
+    const auto barStart = sequence->getFirstTickOfBar(bar);
+    const auto oldBarLength = sequence->getBarLengthsInTicks()[bar];
+    const auto newBarLength = newDenTicks * num;
+    const auto tickShift = newBarLength - oldBarLength;
 
-	newBarLengths[bar] = newDenTicks * num;
+    if (newBarLength < oldBarLength)
+    {
+        // The bar will be cropped, so we may have to remove some events
+        // if they fall outside the new new bar's region.
+        for (int tick = barStart + newBarLength; tick < barStart + oldBarLength; tick++)
+        {
+            for (auto& t : sequence->getTracks())
+            {
+                for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0; eventIndex--)
+                {
+                    if (t->getEvent(eventIndex)->getTick() == tick)
+                    {
+                        t->removeEvent(eventIndex);
+                    }
+                }
+            }
+        }
+    }
 
-	sequence->getNumerators()[bar] = num;
-	sequence->getDenominators()[bar] = den;
+    if (bar < 998)
+    {
+        // We're changing the timesignature of not the last bar, so
+        // all bars after the bar we're changing are shifting. Here we
+        // shift all relevant event ticks.
+        const auto nextBarStartTick = sequence->getFirstTickOfBar(bar + 1);
 
-	if (bar == sequence->getLastBarIndex())
-	{
-		sequence->getNumerators()[sequence->getLastBarIndex() + 1] = num;
-		sequence->getDenominators()[sequence->getLastBarIndex() + 1] = den;
-	}
-	else
-	{
-		sequence->getNumerators()[lastBar + 1] = sequence->getNumerators()[lastBar];
-		sequence->getDenominators()[lastBar + 1] = sequence->getDenominators()[lastBar];
-	}
+        for (auto& t: sequence->getTracks())
+        {
+            for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0; eventIndex--)
+            {
+                auto event = t->getEvent(eventIndex);
 
-	std::vector<int> oldBarStartPos(999);
-	oldBarStartPos[0] = 0;
+                if (event->getTick() >= nextBarStartTick && event->getTick() < sequence->getLastTick())
+                {
+                    event->setTick(event->getTick() + tickShift);
+                }
+            }
+        }
+    }
 
-	for (int i = bar; i < 999; i++)
-	{
-		if (i == 0)
-		{
-			oldBarStartPos[i] = 0;
-			continue;
-		}
-
-		oldBarStartPos[i] = oldBarStartPos[i - 1] + sequence->getBarLengthsInTicks()[i - 1];
-	}
-
-	std::vector<int> newBarStartPos(999);
-
-	for (int i = bar; i < 999; i++)
-	{
-		if (i == 0)
-		{
-			newBarStartPos[i] = 0;
-			continue;
-		}
-
-		newBarStartPos[i] = newBarStartPos[i - 1] + newBarLengths[i - 1];
-	}
-
-	for (auto& t : sequence->getTracks())
-	{
-		if (t->getIndex() == 64 || t->getIndex() == 65)
-			continue;
-
-        std::vector<std::shared_ptr<Event>> toRemove;
-		bool keep;
-
-		for (auto& event : t->getEvents())
-		{
-			keep = false;
-
-			for (int i = 0; i < bar; i++)
-			{
-				if (event->getTick() >= oldBarStartPos[i] && event->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
-				{
-					keep = true;
-					break;
-				}
-			}
-
-			for (int i = bar; i < 999; i++)
-			{
-				if (event->getTick() >= oldBarStartPos[i] && event->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
-				{
-					event->setTick(event->getTick() - (oldBarStartPos[i] - newBarStartPos[i]));
-					keep = true;
-					break;
-				}
-			}
-
-			if (!keep)
-				toRemove.push_back(event);
-		}
-
-		for (auto& e : toRemove)
-			t->removeEvent(e);
-	}
-
-    sequence->setBarLengths(newBarLengths);
+    sequence->getBarLengthsInTicks()[bar] = newBarLength;
+    sequence->getNumerators()[bar] = num;
+    sequence->getDenominators()[bar] = den;
 }
 
 int SeqUtil::setBar(int i, Sequence* sequence, int position)
@@ -340,53 +300,57 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
     }
 
     auto toSequence = sequencer->getSequence(toSeqIndex);
-    auto numberOfBars = (copyLastBar - copyFirstBar + 1) * copyCount;
+    auto numberOfDestinationBars = (copyLastBar - copyFirstBar + 1) * copyCount;
 
-    if (numberOfBars > 999)
+    if (numberOfDestinationBars > 999)
     {
-        numberOfBars = 999;
+        numberOfDestinationBars = 999;
     }
 
     if (!toSequence->isUsed())
     {
-        toSequence->init(numberOfBars - 1);
+        toSequence->init(numberOfDestinationBars - 1);
     }
     else
     {
-        if (toSequence->getLastBarIndex() + numberOfBars > 998)
+        if (toSequence->getLastBarIndex() + numberOfDestinationBars > 998)
         {
-            numberOfBars = 998 - toSequence->getLastBarIndex();
+            numberOfDestinationBars = 998 - toSequence->getLastBarIndex();
         }
 
-        toSequence->insertBars(numberOfBars, copyAfterBar);
+        toSequence->insertBars(numberOfDestinationBars, copyAfterBar);
     }
 
-    int copyCounter = 0;
+    int sourceBarCounter = 0;
 
-    for (int i = 0; i < numberOfBars; i++)
+    const auto numberOfSourceBars = (copyLastBar + 1) - copyFirstBar;
+
+    for (int i = 0; i < numberOfDestinationBars; i++)
     {
-        toSequence->setTimeSignature(i + copyAfterBar, fromSequence->getNumerator(copyCounter + copyFirstBar), fromSequence->getDenominator(copyCounter + copyFirstBar));
-        copyCounter++;
+        toSequence->setTimeSignature(i + copyAfterBar, fromSequence->getNumerator(sourceBarCounter + copyFirstBar), fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
 
-        if (copyCounter >= copyCount)
-            copyCounter = 0;
+        sourceBarCounter++;
+
+        if (sourceBarCounter >= numberOfSourceBars)
+        {
+            sourceBarCounter = 0;
+        }
     }
 
-    auto firstTick = 0;
-    auto lastTick = 0;
-    auto firstTickOfToSeq = 0;
+    auto firstTickOfFromSequence = 0;
+    auto lastTickOfFromSequence = 0;
 
     for (int i = 0; i < 999; i++)
     {
         if (i == copyFirstBar)
             break;
 
-        firstTick += fromSequence->getBarLengthsInTicks()[i];
+        firstTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
     }
 
     for (int i = 0; i < 999; i++)
     {
-        lastTick += fromSequence->getBarLengthsInTicks()[i];
+        lastTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
 
         if (i == copyLastBar)
         {
@@ -394,16 +358,18 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
         }
     }
 
+    auto firstTickOfToSequence = 0;
+
     for (int i = 0; i < 999; i++)
     {
         if (i == copyAfterBar)
             break;
 
-        firstTickOfToSeq += toSequence->getBarLengthsInTicks()[i];
+        firstTickOfToSequence += toSequence->getBarLengthsInTicks()[i];
     }
 
-    auto segmentLengthTicks = lastTick - firstTick;
-    auto offset = firstTickOfToSeq - firstTick;
+    const auto segmentLengthTicks = lastTickOfFromSequence - firstTickOfFromSequence;
+    const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
 
     for (int i = 0; i < 64; i++)
     {
@@ -414,7 +380,7 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
             continue;
         }
 
-        auto t1Events = t1->getEventRange(firstTick, lastTick);
+        auto t1Events = t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
         auto t2 = toSequence->getTrack(i);
 
         if (!t2->isUsed())

@@ -150,6 +150,7 @@ void ConvertSongToSeqScreen::convertSongToSeq()
     const auto destinationSequence = sequencer->getSequence(toSequenceIndex);
 
     destinationSequence->init(0);
+    destinationSequence->setName(song->getName());
 
     for (int stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
     {
@@ -249,7 +250,6 @@ void ConvertSongToSeqScreen::convertSongToSeq()
         return;
     }
 
-    destinationSequence->setName(song->getName());
     destinationSequence->setLastBarIndex(destinationSequence->getLastBarIndex() - 1);
 
     if (trackStatus == 0 || trackStatus == 1)
