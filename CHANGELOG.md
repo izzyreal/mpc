@@ -1,3 +1,6 @@
+## v0.5.5 (19-9-2023)
+* Fix insert bars and changing time signature. It was fine in trivial cases, but it corrupted the less trivial ones. It should now work properly. This was affecting the Convert Song to Seq functionality, which should now also be reliable.
+
 ## v0.5.4 (17-9-2023)
 * Implement Convert Song to Seq (shout out to c3ntr0n800 for the reminder).
 * Fix Erase window issue. It wasn't removing all the events that should be erased.
