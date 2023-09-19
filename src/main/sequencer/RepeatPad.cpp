@@ -86,7 +86,9 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
         if (track->getBus() > 0 && note != 34)
         {
-            auto voiceOverlap = program->getNoteParameters(note)->getVoiceOverlap();
+            const auto noteParameters = program->getNoteParameters(note);
+            const auto sound = mpc.getSampler()->getSound(noteParameters->getSoundIndex());
+            auto voiceOverlap = (sound && sound->isLoopEnabled()) ? 2 : noteParameters->getVoiceOverlap();
 
             mpc.getDrum(track->getBus() - 1).mpcNoteOn(
                 note, noteEvent->getVelocity(), noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrameOffset, true, -1,

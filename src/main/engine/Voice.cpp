@@ -113,7 +113,7 @@ void Voice::init(
         veloToAttack = np->getVelocityToAttack();
         decayMode = np->getDecayMode();
         veloToLevel = np->getVeloToLevel();
-        voiceOverlapMode = np->getVoiceOverlap();
+        voiceOverlapMode = mpcSound->isLoopEnabled() ? 2 : np->getVoiceOverlap();
     }
 
     switch (varType) {
@@ -350,7 +350,7 @@ void Voice::startDecay() {
 }
 
 int Voice::getVoiceOverlap() {
-    return mpcSound->isLoopEnabled() ? 2 : voiceOverlapMode;
+    return voiceOverlapMode;
 }
 
 int Voice::getStripNumber() {

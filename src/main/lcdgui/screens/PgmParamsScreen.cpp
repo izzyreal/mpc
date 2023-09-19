@@ -259,13 +259,15 @@ void PgmParamsScreen::displayVoiceOverlap()
 {
 	init();
 	
-    auto lastNoteParameters = sampler->getLastNp(program.get());
+    const auto lastNoteParameters = sampler->getLastNp(program.get());
     auto mode = lastNoteParameters->getVoiceOverlap();
     
-    auto sound = sampler->getSound(lastNoteParameters->getSoundIndex());
-    
+    const auto sound = sampler->getSound(lastNoteParameters->getSoundIndex());
+
     if (sound && sound->isLoopEnabled())
+    {
         mode = 2;
-    
+    }
+
 	findField("voiceoverlap")->setText(voiceOverlapModes[mode]);
 }

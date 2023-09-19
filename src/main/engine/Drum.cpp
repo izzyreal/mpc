@@ -192,7 +192,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 		}
 	}
 
-    if (np->getVoiceOverlap() == VoiceOverlapMode::MONO)
+    if (!sound->isLoopEnabled() && np->getVoiceOverlap() == VoiceOverlapMode::MONO)
     {
         stopMonoOrPolyVoiceWithSameNoteParameters(np, note);
     }

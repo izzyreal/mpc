@@ -189,10 +189,14 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
                                                                    0.01)), 1, 127);
             const auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
             const auto pgm = sampler->getProgram(pgmIndex);
-            const auto voiceOverlap = pgm->getNoteParameters(
-                    noteOnEvent->getNote())->getVoiceOverlap();
-            const auto duration =
-                    voiceOverlap == 2 ? noteOnEvent->getDuration() : NoteOnEvent::Duration();
+            const auto noteParameters = pgm->getNoteParameters(noteOnEvent->getNote());
+
+            const std::shared_ptr<mpc::sampler::Sound> sound = sampler->getSound(noteParameters->getSoundIndex());
+
+            const auto voiceOverlap = (sound && sound->isLoopEnabled()) ? 2 : noteParameters->getVoiceOverlap();
+
+            const auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : NoteOnEvent::Duration();
+
             const auto durationFrames = (duration > 0) ?
                                         SeqUtil::ticksToFrames(*duration, sequencer->getTempo(),
                                                                audioServer->getSampleRate()) : -1;
