@@ -1,3 +1,6 @@
+## v0.5.6 (20-9-2023)
+* Fix looping sounds. They resulted in hanging notes.
+
 ## v0.5.5 (19-9-2023)
 * Fix insert bars and changing time signature. It was fine in trivial cases, but it corrupted the less trivial ones. It should now work properly. This was affecting the Convert Song to Seq functionality, which should now also be reliable.
 
