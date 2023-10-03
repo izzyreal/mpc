@@ -1,5 +1,5 @@
 ## v0.5.7 (3-10-2023)
-* Fix a rare plugin crash related to MIDI handling after unloading and loading the plugin.
+* Fix a rare plugin crash related to MIDI handling after unloading and loading the plugin. Standalone was and is unaffected by this issue.
 
 ## v0.5.6 (20-9-2023)
 * Fix looping sounds. They resulted in hanging notes.
