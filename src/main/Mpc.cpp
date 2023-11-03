@@ -33,19 +33,11 @@
 
 #include <string>
 
-#if __linux__
-#include <X11/Xlib.h>
-#endif
-
 using namespace mpc;
 using namespace mpc::lcdgui;
 
 Mpc::Mpc()
 {
-#if __linux__
-    XInitThreads();
-#endif
-
     std::vector<fs::path> requiredPaths {
         Paths::appDocumentsPath(),
         Paths::configPath(),
