@@ -45,13 +45,13 @@ function(_bundle_resources)
 
   if (APPLE AND NOT IOS)
 
-    file(GLOB_RECURSE MPC_RESOURCES "${CMAKE_SOURCE_DIR}/resources/*")
+    file(GLOB_RECURSE MPC_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 
-    list(FILTER MPC_RESOURCES EXCLUDE REGEX "${CMAKE_SOURCE_DIR}/resources/test/.*")
+    list(FILTER MPC_RESOURCES EXCLUDE REGEX "${CMAKE_CURRENT_SOURCE_DIR}/resources/test/.*")
 
     foreach(RESOURCE ${MPC_RESOURCES})
       get_filename_component(SOURCE_DIR "${RESOURCE}" DIRECTORY)
-      string(REPLACE "${CMAKE_SOURCE_DIR}/resources" "" RELATIVE_DIR "${SOURCE_DIR}")
+      string(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/resources" "" RELATIVE_DIR "${SOURCE_DIR}")
       set_source_files_properties(${RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources${RELATIVE_DIR}")
     endforeach()
 
