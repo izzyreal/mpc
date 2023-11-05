@@ -22,6 +22,7 @@ namespace mpc::lcdgui::screens::window
 		void left() override;
 		void right() override;
 		void pressEnter() override;
+        void setSlider(int) override;
 
 	private:
 		void displayLoopLngth();

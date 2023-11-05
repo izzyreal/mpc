@@ -169,3 +169,30 @@ void LoopToFineScreen::pressEnter()
 	displayLngthField();
 	displayFineWave();
 }
+
+void LoopToFineScreen::setSlider(int i)
+{
+    if (!mpc.getControls()->isShiftPressed())
+    {
+        return;
+    }
+
+    init();
+
+    if (param == "to")
+    {
+        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+        loopScreen->setSliderLoopTo(i);
+        displayTo();
+        displayLngthField();
+        displayFineWave();
+    }
+    else if (param == "lngth")
+    {
+        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+        loopScreen->setSliderLength(i);
+        displayTo();
+        displayLngthField();
+        displayFineWave();
+    }
+}

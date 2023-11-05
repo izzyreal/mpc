@@ -224,56 +224,68 @@ void TrimScreen::setSlider(int i)
     
 	init();
 
-	auto sound = sampler->getSound();
-	auto const oldLength = sound->getEnd() - sound->getStart();
-    auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
-
 	if (param == "st")
 	{
-		auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
-
-		if (candidatePos > maxPos)
-			candidatePos = maxPos;
-		
-		sound->setStart(candidatePos);
-		displaySt();
-
-        if (sound->getEnd() == sound->getStart())
-        {
-            displayEnd();
-        }
-
-        if (smplLngthFix)
-		{
-			sound->setEnd(sound->getStart() + oldLength);
-			displayEnd();
-		}
-
-		displayWave();
+        setSliderStart(i);
+        displayWave();
 	}
 	else if (param == "end")
 	{
-		auto maxPos = smplLngthFix ? oldLength : int(0);
-	
-		if (candidatePos < maxPos)
-			candidatePos = maxPos;
-		
-		sound->setEnd(candidatePos);
-		displayEnd();
-
-        if (sound->getEnd() == sound->getStart())
-        {
-                displaySt();
-        }
-
-        if (smplLngthFix)
-		{
-			sound->setStart(sound->getEnd() - oldLength);
-			displaySt();
-		}
-
+        setSliderEnd(i);
 		displayWave();
 	}
+}
+
+void TrimScreen::setSliderStart(int i)
+{
+    auto sound = sampler->getSound();
+    auto const oldLength = sound->getEnd() - sound->getStart();
+    auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
+
+    auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
+
+    if (candidatePos > maxPos)
+        candidatePos = maxPos;
+
+    sound->setStart(candidatePos);
+    displaySt();
+
+    if (sound->getEnd() == sound->getStart())
+    {
+        displayEnd();
+    }
+
+    if (smplLngthFix)
+    {
+        sound->setEnd(sound->getStart() + oldLength);
+        displayEnd();
+    }
+}
+
+void TrimScreen::setSliderEnd(int i)
+{
+    auto sound = sampler->getSound();
+    auto const oldLength = sound->getEnd() - sound->getStart();
+    auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
+
+    auto maxPos = smplLngthFix ? oldLength : int(0);
+
+    if (candidatePos < maxPos)
+        candidatePos = maxPos;
+
+    sound->setEnd(candidatePos);
+    displayEnd();
+
+    if (sound->getEnd() == sound->getStart())
+    {
+        displaySt();
+    }
+
+    if (smplLngthFix)
+    {
+        sound->setStart(sound->getEnd() - oldLength);
+        displaySt();
+    }
 }
 
 void TrimScreen::left()

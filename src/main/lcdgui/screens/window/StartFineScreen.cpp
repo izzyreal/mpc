@@ -159,3 +159,22 @@ void StartFineScreen::pressEnter()
 	displayLngthLabel();
 	displayFineWave();
 }
+
+void StartFineScreen::setSlider(int i)
+{
+    if (!mpc.getControls()->isShiftPressed())
+    {
+        return;
+    }
+
+    init();
+
+    if (param == "start")
+    {
+        auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+        trimScreen->setSliderStart(i);
+        displayStart();
+        displayLngthLabel();
+        displayFineWave();
+    }
+}

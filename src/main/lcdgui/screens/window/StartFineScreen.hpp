@@ -22,6 +22,7 @@ namespace mpc::lcdgui::screens::window
 		void left() override;
 		void right() override;
 		void pressEnter() override;
+        void setSlider(int) override;
 
 	private:
 		const std::vector<std::string> playXNames{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };

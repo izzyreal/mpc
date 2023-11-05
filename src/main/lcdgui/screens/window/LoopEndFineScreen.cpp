@@ -117,8 +117,15 @@ void LoopEndFineScreen::turnWheel(int i)
 		displayLoopLngth();
 	}
 	else if (param == "lngth")
-	{		
-		sound->setEnd(sound->getEnd() + soundInc);
+	{
+        auto candidate = sound->getEnd() + soundInc;
+
+        if (candidate < sound->getLoopTo())
+        {
+            candidate = sound->getLoopTo();
+        }
+
+		sound->setEnd(candidate);
 
 		displayEnd();
 		displayLngthField();
@@ -167,4 +174,31 @@ void LoopEndFineScreen::pressEnter()
 	displayEnd();
 	displayLngthField();
 	displayFineWave();
+}
+
+void LoopEndFineScreen::setSlider(int i)
+{
+    if (!mpc.getControls()->isShiftPressed())
+    {
+        return;
+    }
+
+    init();
+
+    if (param == "end")
+    {
+        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+        loopScreen->setSliderEnd(i);
+        displayEnd();
+        displayLngthField();
+        displayFineWave();
+    }
+    else if (param == "lngth")
+    {
+        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+        loopScreen->setSliderLength(i);
+        displayEnd();
+        displayLngthField();
+        displayFineWave();
+    }
 }
