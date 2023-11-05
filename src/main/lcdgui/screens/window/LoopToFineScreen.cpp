@@ -101,17 +101,20 @@ void LoopToFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-	auto loopLength = static_cast<int>(sound->getEnd() - sound->getLoopTo());
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-	
+
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
 
 	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+    {
+        soundInc = field->getSplitIncrement(i >= 0);
+    }
 
 	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+    {
+        field->disableTypeMode();
+    }
 
 	if (param == "loop-lngth")
 	{
@@ -119,26 +122,18 @@ void LoopToFineScreen::turnWheel(int i)
 		displayLoopLngth();
 	}
 	else if (param == "lngth")
-	{		
-		sound->setEnd(sound->getEnd() + soundInc);
-		
+	{
+        auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
+
+        loopScreen->setLength(newLength);
+
+        displayTo();
 		displayLngthField();
 		displayFineWave();
 	}
 	else if (param == "to")
 	{
-		if (loopScreen->loopLngthFix)
-		{
-			int highestLoopTo = sound->getFrameCount() - loopLength;
-
-			if (sound->getLoopTo() + soundInc > highestLoopTo)
-				soundInc = sound->getLoopTo() - highestLoopTo;
-		}
-
-		sound->setLoopTo(sound->getLoopTo() + soundInc);
-
-		if (loopScreen->loopLngthFix)
-			sound->setEnd(sound->getLoopTo() + loopLength);
+        loopScreen->setLoopTo(sound->getLoopTo() + soundInc);
 
 		displayTo();
 		displayLngthField();
@@ -179,9 +174,10 @@ void LoopToFineScreen::setSlider(int i)
 
     init();
 
+    auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+
     if (param == "to")
     {
-        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
         loopScreen->setSliderLoopTo(i);
         displayTo();
         displayLngthField();
@@ -189,7 +185,6 @@ void LoopToFineScreen::setSlider(int i)
     }
     else if (param == "lngth")
     {
-        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
         loopScreen->setSliderLength(i);
         displayTo();
         displayLngthField();

@@ -99,17 +99,21 @@ void LoopEndFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
-	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+    auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
 
 	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+    {
+        soundInc = field->getSplitIncrement(i >= 0);
+    }
 
 	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+    {
+        field->disableTypeMode();
+    }
 
 	if (param == "loop-lngth")
 	{
@@ -118,33 +122,17 @@ void LoopEndFineScreen::turnWheel(int i)
 	}
 	else if (param == "lngth")
 	{
-        auto candidate = sound->getEnd() + soundInc;
+        auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
 
-        if (candidate < sound->getLoopTo())
-        {
-            candidate = sound->getLoopTo();
-        }
-
-		sound->setEnd(candidate);
-
+        loopScreen->setLength(newLength);
 		displayEnd();
 		displayLngthField();
 		displayFineWave();
 	}
 	else if (param == "end")
 	{
-		auto candidate = sound->getEnd() + soundInc;
-
-		if (candidate > sound->getFrameCount())
-			candidate = sound->getFrameCount();
-
-		if (loopScreen->loopLngthFix && candidate - loopLength < 0)
-			candidate = loopLength;
-
-		sound->setEnd(candidate);
-
-		if (loopScreen->loopLngthFix)
-			sound->setLoopTo(sound->getEnd() - loopLength);
+		auto newValue = sound->getEnd() + soundInc;
+        trimScreen->setEnd(newValue);
 
 		displayEnd();
 		displayLngthField();
@@ -185,17 +173,18 @@ void LoopEndFineScreen::setSlider(int i)
 
     init();
 
+    auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+
     if (param == "end")
     {
-        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-        loopScreen->setSliderEnd(i);
+        trimScreen->setSliderEnd(i);
         displayEnd();
         displayLngthField();
         displayFineWave();
     }
     else if (param == "lngth")
     {
-        auto loopScreen = mpc.screens->get<LoopScreen>("loop");
         loopScreen->setSliderLength(i);
         displayEnd();
         displayLngthField();

@@ -1,6 +1,7 @@
 #include "EndFineScreen.hpp"
 
 #include <lcdgui/screens/TrimScreen.hpp>
+#include <lcdgui/screens/LoopScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -95,30 +96,25 @@ void EndFineScreen::turnWheel(int i)
 	init();
 	auto sound = sampler->getSound();
 
-	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-
     auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
 
 	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+    {
+        soundInc = field->getSplitIncrement(i >= 0);
+    }
 
 	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+    {
+        field->disableTypeMode();
+    }
 
+    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	if (param == "end")
+    if (param == "end")
 	{
-		auto candidate = sound->getEnd() + soundInc;
-
-		if (trimScreen->smplLngthFix && candidate < startEndLength)
-			candidate = startEndLength;
-
-		sound->setEnd(candidate);
-
-		if (trimScreen->smplLngthFix)
-			sound->setStart(sound->getEnd() - startEndLength);
+		auto newValue = sound->getEnd() + soundInc;
+        trimScreen->setEnd(newValue);
 
 		displayLngthLabel();
 		displayEnd();

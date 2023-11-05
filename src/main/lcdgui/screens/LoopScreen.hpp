@@ -4,10 +4,13 @@
 namespace mpc::lcdgui::screens::window
 {
 	class LoopEndFineScreen;
+	class EndFineScreen;
 	class LoopToFineScreen;
 }
 
 namespace mpc::lcdgui::screens {
+
+    class TrimScreen;
 
 	class LoopScreen
 		: public mpc::lcdgui::ScreenComponent
@@ -28,8 +31,9 @@ namespace mpc::lcdgui::screens {
 		void setSlider(int i) override;
 
         void setSliderLoopTo(int);
-        void setSliderEnd(int);
         void setSliderLength(int);
+        void setLoopTo(int);
+        void setLength(int);
 
 	private:
 		const std::vector<std::string> playXNames{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
@@ -48,7 +52,9 @@ namespace mpc::lcdgui::screens {
 
 	private:
 		friend class mpc::lcdgui::screens::window::LoopEndFineScreen;
+		friend class mpc::lcdgui::screens::window::EndFineScreen;
 		friend class mpc::lcdgui::screens::window::LoopToFineScreen;
+		friend class mpc::lcdgui::screens::TrimScreen;
 
 	};
 }

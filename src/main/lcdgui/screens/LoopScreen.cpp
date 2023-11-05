@@ -123,11 +123,6 @@ void LoopScreen::turnWheel(int i)
         return;
     }
 
-	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
-    
-	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-	auto const loopFix = loopScreen->loopLngthFix;
-	
 	auto field = findField(param);
 	
 	if (field->isSplit())
@@ -143,69 +138,24 @@ void LoopScreen::turnWheel(int i)
 	if (param == "to")
 	{
 		auto candidateLoopTo = sound->getLoopTo() + soundInc;
-		auto candidateEnd = candidateLoopTo + oldLoopLength;
-
-		if (loopFix && candidateEnd > sound->getFrameCount())
-		{
-			candidateEnd = sound->getFrameCount();
-			candidateLoopTo = sound->getFrameCount() - oldLoopLength;
-		}
-
-		if (!loopFix && candidateLoopTo > sound->getEnd())
-		{
-			sound->setLoopTo(sound->getEnd());
-		}
-		else
-		{
-			sound->setLoopTo(candidateLoopTo);
-		}
-		
-		if (loopFix)
-        {
-            sound->setEnd(candidateEnd);
-        }
-
-		displayEndLength();
-		displayEndLengthValue();
-		displayTo();
-		displayWave();
+        setLoopTo(candidateLoopTo);
+        displayEndLength();
+        displayEndLengthValue();
+        displayTo();
+        displayWave();
     }
     else if (param == "endlengthvalue")
 	{
 		if (endSelected)
 		{
-			auto endCandidate = sound->getEnd() + soundInc;
+            auto newEndValue = sound->getEnd() + soundInc;
 
-			if (endCandidate > sound->getFrameCount())
-            {
-                endCandidate = sound->getFrameCount();
-            }
-
-			sound->setEnd(endCandidate);
-
-			if (loopFix)
-			{
-				auto loopToCandidate = sound->getEnd() - oldLoopLength;
-
-				if (loopToCandidate < 0)
-				{
-					loopToCandidate = 0;
-					sound->setEnd(oldLoopLength);
-				}
-
-				sound->setLoopTo(loopToCandidate);
-			}
+            auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+            trimScreen->setEnd(newEndValue);
 		}
 		else {
-			auto endCandidate = sound->getEnd() + soundInc;
-			
-			if (endCandidate < sound->getLoopTo())
-				endCandidate = sound->getLoopTo();
-
-			if (endCandidate > sound->getFrameCount())
-				endCandidate = sound->getFrameCount();
-
-			sound->setEnd(endCandidate);
+			auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
+            setLength(newLength);
 		}
 
 		displayEndLength();
@@ -262,7 +212,9 @@ void LoopScreen::setSlider(int i)
 
 	init();
 
-	if (param == "to")
+    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+
+    if (param == "to")
 	{
         setSliderLoopTo(i);
 		
@@ -271,11 +223,11 @@ void LoopScreen::setSlider(int i)
 		displayTo();
 		displayWave();
 	}
-	else if (param == "endlengthvalue")
-	{
+    else if (param == "endlengthvalue")
+    {
         if (endSelected)
         {
-            setSliderEnd(i);
+            trimScreen->setSliderEnd(i);
         }
         else
         {
@@ -291,71 +243,85 @@ void LoopScreen::setSlider(int i)
 
 void LoopScreen::setSliderLoopTo(int i)
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
     auto sound = sampler->getSound();
-
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
-    auto const lengthFix = trimScreen->smplLngthFix;
-
-    auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
-
-    if (candidatePos < 0)
-        candidatePos = 0;
-
-    if (loopLngthFix && candidatePos + oldLength > sound->getFrameCount())
-        candidatePos = sound->getFrameCount() - oldLength;
-
-    sound->setLoopTo(candidatePos);
-
-    if (lengthFix)
-        sound->setEnd(sound->getLoopTo() + oldLength);
+    auto newLoopToValue = (int)((i / 124.0) * (loopLngthFix ? (sound->getFrameCount() - oldLength) : sound->getEnd()));
+    setLoopTo(newLoopToValue);
 }
 
-void LoopScreen::setSliderEnd(int i)
+void LoopScreen::setLoopTo(int newLoopToValue)
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+    const auto loopLengthIsFixed = loopLngthFix;
+    const auto soundLengthIsFixed = mpc.screens->get<TrimScreen>("trim")->smplLngthFix;
     auto sound = sampler->getSound();
 
-    auto const oldLength = sound->getEnd() - sound->getLoopTo();
-    auto const lengthFix = trimScreen->smplLngthFix;
+    const auto oldSoundLength = sound->getEnd() - sound->getStart();
+    const auto oldLoopLength = sound->getEnd() - sound->getLoopTo();
 
-    auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
+    auto lowerBound = 0;
+    auto upperBound = sound->getEnd();
 
-    auto maxEndPos = lengthFix ? oldLength : 0;
+    if (soundLengthIsFixed && loopLengthIsFixed)
+    {
+        lowerBound = oldSoundLength - oldLoopLength;
+    }
 
-    if (candidatePos < maxEndPos)
-        candidatePos = maxEndPos;
+    if (loopLengthIsFixed)
+    {
+        upperBound = sound->getFrameCount() - oldLoopLength;
+    }
 
-    sound->setEnd(candidatePos);
+    if (newLoopToValue < lowerBound) newLoopToValue = lowerBound;
+    if (newLoopToValue > upperBound) newLoopToValue = upperBound;
 
-    if (lengthFix)
-        sound->setLoopTo(sound->getEnd() - oldLength);
+    sound->setLoopTo(newLoopToValue);
+
+    if (loopLengthIsFixed)
+    {
+        sound->setEnd(sound->getLoopTo() + oldLoopLength);
+    }
+
+    if (soundLengthIsFixed)
+    {
+        sound->setStart(sound->getEnd() - oldSoundLength);
+    }
+}
+
+// Adjusts the Loop To value if soundLengthIsFixed, else adjusts the End value
+void LoopScreen::setLength(int newLength)
+{
+    const auto loopLengthIsFixed = loopLngthFix;
+
+    if (loopLengthIsFixed)
+    {
+        return;
+    }
+
+    const auto soundLengthIsFixed = mpc.screens->get<TrimScreen>("trim")->smplLngthFix;
+
+    if (newLength < 0)
+    {
+        newLength = 0;
+    }
+
+    auto sound = sampler->getSound();
+
+    if (soundLengthIsFixed)
+    {
+        setLoopTo(sound->getEnd() - newLength);
+    }
+    else
+    {
+        auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+        trimScreen->setEnd(sound->getLoopTo() + newLength);
+    }
 }
 
 void LoopScreen::setSliderLength(int i)
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
     auto sound = sampler->getSound();
-
-    auto const oldLength = sound->getEnd() - sound->getLoopTo();
-    auto const lengthFix = trimScreen->smplLngthFix;
-
-    auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
-
-    if (candidatePos < sound->getLoopTo())
-    {
-        candidatePos = sound->getLoopTo();
-    }
-
-    auto maxEndPos = lengthFix ? oldLength : 0;
-
-    if (candidatePos < maxEndPos)
-        candidatePos = maxEndPos;
-
-    sound->setEnd(candidatePos);
-
-    if (lengthFix)
-        sound->setLoopTo(sound->getEnd() - oldLength);
+    auto newLength = (int)((i / 124.0) * sound->getFrameCount());
+    setLength(newLength);
 }
 
 void LoopScreen::left()

@@ -1,5 +1,6 @@
 #include "TrimScreen.hpp"
 
+#include "lcdgui/screens/LoopScreen.hpp"
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/Layer.hpp>
@@ -265,26 +266,44 @@ void TrimScreen::setSliderStart(int i)
 void TrimScreen::setSliderEnd(int i)
 {
     auto sound = sampler->getSound();
-    auto const oldLength = sound->getEnd() - sound->getStart();
-    auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
+    auto newValue = (int)((i / 124.0) * sound->getFrameCount());
+    setEnd(newValue);
+}
 
-    auto maxPos = smplLngthFix ? oldLength : int(0);
+void TrimScreen::setEnd(int newValue)
+{
+    const auto loopLengthIsFixed = mpc.screens->get<LoopScreen>("loop")->loopLngthFix;
+    auto sound = sampler->getSound();
 
-    if (candidatePos < maxPos)
-        candidatePos = maxPos;
+    const auto oldSoundLength = sound->getEnd() - sound->getStart();
+    const auto oldLoopLength = sound->getEnd() - sound->getLoopTo();
 
-    sound->setEnd(candidatePos);
-    displayEnd();
+    auto lowerBound = 0;
+    const auto upperBound = sound->getFrameCount();
 
-    if (sound->getEnd() == sound->getStart())
+    if (smplLngthFix)
     {
-        displaySt();
+        lowerBound = oldSoundLength;
+    }
+
+    if (loopLengthIsFixed)
+    {
+        lowerBound = std::max<int>(lowerBound, oldLoopLength);
+    }
+
+    if (newValue < lowerBound) newValue = lowerBound;
+    if (newValue > upperBound) newValue = upperBound;
+
+    sound->setEnd(newValue);
+
+    if (loopLengthIsFixed)
+    {
+        sound->setLoopTo(sound->getEnd() - oldLoopLength);
     }
 
     if (smplLngthFix)
     {
-        sound->setStart(sound->getEnd() - oldLength);
-        displaySt();
+        sound->setStart(sound->getEnd() - oldSoundLength);
     }
 }
 
