@@ -134,8 +134,10 @@ void ZoneScreen::turnWheel(int i)
 
 	auto sound = sampler->getSound();
 
-	if (param == "" || !sound)
-		return;
+	if (param.empty() || !sound)
+    {
+        return;
+    }
 
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
@@ -189,6 +191,34 @@ void ZoneScreen::turnWheel(int i)
 		displayWave();
 		displayZone();
 	}
+}
+
+void ZoneScreen::setSlider(int i)
+{
+    if (!mpc.getControls()->isShiftPressed())
+    {
+        return;
+    }
+
+    init();
+
+    if (param == "st")
+    {
+        const auto minZoneStart = zone == 0 ? 0 : zones[zone - 1][0];
+        const auto maxZoneStart = zones[zone][1];
+        const auto rangeLength = maxZoneStart - minZoneStart;
+        const auto newZoneStart = ((i / 124.0) * rangeLength) + minZoneStart;
+        setZoneStart(zone, static_cast<int>(newZoneStart));
+    }
+    else if (param == "end")
+    {
+        const auto sound = sampler->getSound();
+        const auto minZoneEnd = zones[zone][0];
+        const auto maxZoneEnd = zone == (numberOfZones - 1) ? sound->getFrameCount() : zones[zone + 1][1];
+        const auto rangeLength = maxZoneEnd - minZoneEnd;
+        const auto newZoneEnd = ((i / 124.0) * rangeLength) + minZoneEnd;
+        setZoneEnd(zone, static_cast<int>(newZoneEnd));
+    }
 }
 
 void ZoneScreen::displayWave()
@@ -285,13 +315,13 @@ void ZoneScreen::initZones()
 
 	for (int i = 0; i < numberOfZones - 1; i++)
 	{
-		zones.push_back(std::vector<int>(2));
+		zones.emplace_back(2);
 		zones[i][0] = (int) floor(zoneStart);
 		zones[i][1] = (int) floor(zoneStart + zoneLength);
 		zoneStart += zoneLength;
 	}
 
-	zones.push_back(std::vector<int>(2));
+	zones.emplace_back(2);
 	zones[numberOfZones - 1][0] = (int)floor(zoneStart);
 	zones[numberOfZones - 1][1] = sound->getFrameCount();
 	zone = 0;
@@ -393,7 +423,7 @@ void ZoneScreen::pressEnter()
 
 	if (candidate != INT_MAX)
 	{
-		if (param == "st" || param == "start")
+		if (param == "st")
 		{
 			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 			zoneScreen->setZoneStart(zoneScreen->zone, candidate);

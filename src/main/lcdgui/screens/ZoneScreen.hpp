@@ -32,6 +32,7 @@ namespace mpc::lcdgui::screens
 		void pressEnter() override;
 		void left() override;
 		void right() override;
+        void setSlider(int) override;
 
 		ZoneScreen(mpc::Mpc& mpc, const int layerIndex);
 
