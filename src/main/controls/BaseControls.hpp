@@ -85,7 +85,6 @@ namespace mpc::controls {
 		virtual void shift();
 		virtual void undoSeq();
 		virtual void erase();
-		virtual void setSlider(int) {}
 
 		virtual bool isTypable();
 

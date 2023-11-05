@@ -204,21 +204,31 @@ void ZoneScreen::setSlider(int i)
 
     if (param == "st")
     {
-        const auto minZoneStart = zone == 0 ? 0 : zones[zone - 1][0];
-        const auto maxZoneStart = zones[zone][1];
-        const auto rangeLength = maxZoneStart - minZoneStart;
-        const auto newZoneStart = ((i / 124.0) * rangeLength) + minZoneStart;
-        setZoneStart(zone, static_cast<int>(newZoneStart));
+        setSliderZoneStart(i);
     }
     else if (param == "end")
     {
-        const auto sound = sampler->getSound();
-        const auto minZoneEnd = zones[zone][0];
-        const auto maxZoneEnd = zone == (numberOfZones - 1) ? sound->getFrameCount() : zones[zone + 1][1];
-        const auto rangeLength = maxZoneEnd - minZoneEnd;
-        const auto newZoneEnd = ((i / 124.0) * rangeLength) + minZoneEnd;
-        setZoneEnd(zone, static_cast<int>(newZoneEnd));
+        setSliderZoneEnd(i);
     }
+}
+
+void ZoneScreen::setSliderZoneStart(int i)
+{
+    const auto minZoneStart = zone == 0 ? 0 : zones[zone - 1][0];
+    const auto maxZoneStart = zones[zone][1];
+    const auto rangeLength = maxZoneStart - minZoneStart;
+    const auto newZoneStart = ((i / 124.0) * rangeLength) + minZoneStart;
+    setZoneStart(zone, static_cast<int>(newZoneStart));
+}
+
+void ZoneScreen::setSliderZoneEnd(int i)
+{
+    const auto sound = sampler->getSound();
+    const auto minZoneEnd = zones[zone][0];
+    const auto maxZoneEnd = zone == (numberOfZones - 1) ? sound->getFrameCount() : zones[zone + 1][1];
+    const auto rangeLength = maxZoneEnd - minZoneEnd;
+    const auto newZoneEnd = ((i / 124.0) * rangeLength) + minZoneEnd;
+    setZoneEnd(zone, static_cast<int>(newZoneEnd));
 }
 
 void ZoneScreen::displayWave()

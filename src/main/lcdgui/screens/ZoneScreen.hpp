@@ -26,7 +26,10 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		void openWindow() override;
+        ZoneScreen(mpc::Mpc& mpc, const int layerIndex);
+
+        void open() override;
+        void openWindow() override;
 		void function(int f) override;
 		void turnWheel(int i) override;
 		void pressEnter() override;
@@ -34,10 +37,9 @@ namespace mpc::lcdgui::screens
 		void right() override;
         void setSlider(int) override;
 
-		ZoneScreen(mpc::Mpc& mpc, const int layerIndex);
+        void setSliderZoneStart(int);
+        void setSliderZoneEnd(int);
 
-		void open() override;
-	
 	private:
 		void displayWave();
 		void displaySnd();

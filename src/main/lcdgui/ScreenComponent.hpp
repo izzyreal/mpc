@@ -111,7 +111,7 @@ namespace mpc::lcdgui
 		virtual void shift() { mpc.getControls()->getBaseControls()->shift(); }
 		virtual void undoSeq() { mpc.getControls()->getBaseControls()->undoSeq(); }
 		virtual void erase() { mpc.getControls()->getBaseControls()->erase(); }
-		virtual void setSlider(int i) { mpc.getControls()->getBaseControls()->setSlider(i); }
+		virtual void setSlider(int i) { }
 
 		int getSoundIncrement(int notch) { return mpc.getControls()->getBaseControls()->getSoundIncrement(notch); }
 

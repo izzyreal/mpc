@@ -124,3 +124,22 @@ void ZoneEndFineScreen::pressEnter()
 	displayLngthLabel();
 	displayFineWave();
 }
+
+void ZoneEndFineScreen::setSlider(int i)
+{
+    if (!mpc.getControls()->isShiftPressed())
+    {
+        return;
+    }
+
+    init();
+
+    if (param == "end")
+    {
+        auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+        zoneScreen->setSlider(i);
+        displayEnd();
+        displayLngthLabel();
+        displayFineWave();
+    }
+}
