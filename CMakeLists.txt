@@ -170,9 +170,9 @@ foreach(_source IN ITEMS ${_source_list_test})
 endforeach()
 
 if (APPLE)
-    add_executable(mpc-tests MACOSX_BUNDLE ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
+    add_executable(mpc-tests MACOSX_BUNDLE ${_source_list_test})
 else()
-    add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
+    add_executable(mpc-tests ${_source_list_test})
 endif()
 
 target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
