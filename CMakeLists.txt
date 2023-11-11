@@ -109,6 +109,7 @@ endif()
 
 set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/src/main")
 
+if (APPLE)
 file(
     GLOB_RECURSE _source_list_main 
     LIST_DIRECTORIES false
@@ -117,6 +118,15 @@ file(
     "${_src_root_path_main}/*.h*"
     "${_src_root_path_main}/*.mm"
 )
+else()
+file(
+    GLOB_RECURSE _source_list_main 
+    LIST_DIRECTORIES false
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${_src_root_path_main}/*.c*"
+    "${_src_root_path_main}/*.h*"
+)
+endif()    
 
 foreach(_source IN ITEMS ${_source_list_main})
     get_filename_component(_source_path "${_source}" PATH)
