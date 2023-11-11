@@ -9,6 +9,11 @@ MonoResampler::MonoResampler()
     state = src_new(0, 1, &srcError);
 }
 
+MonoResampler::~MonoResampler()
+{
+    src_delete(state);
+}
+
 uint32_t MonoResampler::resample(
         const std::vector<float> &inputData,
         std::vector<float> &output,

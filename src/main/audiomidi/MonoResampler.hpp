@@ -11,6 +11,7 @@ namespace mpc::audiomidi {
     {
     public:
         MonoResampler();
+        ~MonoResampler();
 
         // Returns number of generated frames
         uint32_t resample(const std::vector<float>& input,

@@ -21,8 +21,8 @@ SoundPlayer::SoundPlayer()
 
 SoundPlayer::~SoundPlayer()
 {
-    delete srcLeft;
-    delete srcRight;
+    src_delete(srcLeft);
+    src_delete(srcRight);
 }
 
 bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileFormat f) {
