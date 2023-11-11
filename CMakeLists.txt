@@ -115,6 +115,7 @@ file(
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     "${_src_root_path_main}/*.c*"
     "${_src_root_path_main}/*.h*"
+    "${_src_root_path_main}/*.mm"
 )
 
 foreach(_source IN ITEMS ${_source_list_main})
