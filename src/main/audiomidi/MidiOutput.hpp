@@ -12,8 +12,8 @@ namespace mpc::audiomidi {
     {
 
 	private:
-        moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>> outputQueueA;
-        moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>> outputQueueB;
+        moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>> outputQueueA = moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>>(100);
+        moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>> outputQueueB = moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>>(100);
 
 	public:
         void enqueueMessageOutputA(std::shared_ptr<mpc::engine::midi::ShortMessage>);

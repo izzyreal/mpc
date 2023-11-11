@@ -27,8 +27,8 @@ private:
     
     std::vector<std::shared_ptr<Event>> events;
 
-    moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>> queuedNoteOnEvents;
-    moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>> queuedNoteOffEvents;
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>> queuedNoteOnEvents = moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>(20);
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>> queuedNoteOffEvents = moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>(20);
     std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteOnEvent>>(20);
     std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteOffEvent>>(20);
 
