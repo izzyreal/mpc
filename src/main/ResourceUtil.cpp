@@ -5,7 +5,6 @@
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #if not TARGET_OS_IPHONE
-#include "MacBundleResources.h"
 #define MAC_BUNDLE_RESOURCES 1
 #endif
 #endif
@@ -14,14 +13,11 @@
 
 #include "mpc_fs.hpp"
 
+#include "MacBundleResources.hpp"
+
 std::vector<char> get_resource_data_from_mac_os_bundle(const std::string &path)
 {
-    auto resource_path = mpc::MacBundleResources::getResourcePath(path);
-
-    if (resource_path.empty())
-    {
-        resource_path = "../Resources/" + path;
-    }
+    auto resource_path = getMacBundleResourcesPath() + "/" + path;
 
     return get_file_data(resource_path);
 }
