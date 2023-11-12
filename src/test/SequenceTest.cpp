@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/BarsScreen.hpp"
@@ -13,6 +13,7 @@ using namespace mpc::lcdgui::screens;
 TEST_CASE("Insert bar and move event forward", "[sequence]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);

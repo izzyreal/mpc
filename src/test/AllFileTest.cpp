@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
@@ -60,6 +60,7 @@ void saveAndLoadTestAllFile(mpc::Mpc& mpc)
 TEST_CASE("ALL file song", "[allfile]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 1);
     auto sequencer = mpc.getSequencer();
 
@@ -97,6 +98,7 @@ TEST_CASE("ALL file song", "[allfile]")
 TEST_CASE("ALL file track is on and used", "[allfile]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 1);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
@@ -130,6 +132,7 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 TEST_CASE("ALL file note event", "[allfile]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 1);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
@@ -168,6 +171,7 @@ TEST_CASE("ALL file note event", "[allfile]")
 TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 1);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);

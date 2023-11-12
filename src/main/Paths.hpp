@@ -9,7 +9,7 @@ private:
     fs::path appConfigHome();
 
 public:
-    fs::path appDocumentsPath();
+    virtual fs::path appDocumentsPath();
 
     fs::path storesPath();
     fs::path defaultLocalVolumePath();

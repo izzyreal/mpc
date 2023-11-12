@@ -1,12 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sampler/Sampler.hpp"
 #include "engine/Drum.hpp"
 
 TEST_CASE("Delete program", "[program]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto sampler = mpc.getSampler();
     sampler->createNewProgramAddFirstAvailableSlot();

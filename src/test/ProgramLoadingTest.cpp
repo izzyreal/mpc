@@ -1,8 +1,8 @@
 #include "catch2/catch_test_macros.hpp"
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "disk/AbstractDisk.hpp"
-#include "disk/Volume.hpp"
+#include "disk/MpcFile.hpp"
 #include "disk/ProgramLoader.hpp"
 #include "lcdgui/screens/window/LoadAProgramScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
@@ -18,15 +18,7 @@ using namespace mpc::lcdgui::screens::window;
 
 void prepareResources(mpc::Mpc& mpc)
 {
-    auto tmpDocsPath = fs::temp_directory_path();
-    tmpDocsPath = tmpDocsPath / "VMPC2000XL-test";
-    fs::remove_all(tmpDocsPath);
-    fs::create_directories(tmpDocsPath);
     auto disk = mpc.getDisk();
-
-    disk->getVolume().localDirectoryPath = tmpDocsPath.string();
-    disk->initRoot();
-    disk->initFiles();
 
     auto fs = cmrc::mpctest::get_filesystem();
 
@@ -110,6 +102,7 @@ TEST_CASE("Load 2 programs in Clear P & S mode", "[load-programs]")
     for (int i = 0; i < 2; i++)
     {
         Mpc mpc;
+        mpc::TestMpc::initializeTestMpc(mpc);
         std::shared_ptr<sampler::Program> p1;
         std::shared_ptr<sampler::Program> p2;
         doTest(mpc, true, i == 0, p1, p2);
@@ -130,6 +123,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode", "[load-programs]")
     for (int i = 0; i < 2; i++)
     {
         Mpc mpc;
+        mpc::TestMpc::initializeTestMpc(mpc);
         std::shared_ptr<sampler::Program> p1;
         std::shared_ptr<sampler::Program> p2;
 
@@ -239,6 +233,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode, 1 missing sound", "[load-progra
     for (int i = 0; i < 2; i++)
     {
         Mpc mpc;
+        mpc::TestMpc::initializeTestMpc(mpc);
         std::shared_ptr<sampler::Program> p1;
         std::shared_ptr<sampler::Program> p2;
 

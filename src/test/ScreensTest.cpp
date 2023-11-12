@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <Mpc.hpp>
+#include "TestMpc.hpp"
 
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
@@ -160,7 +160,8 @@ SCENARIO("All screens can be opened", "[gui]") {
 
 	GIVEN("An initialized Mpc with an initialized Sequence") {
 		mpc::Mpc mpc;
-		mpc.init(1, 5);
+        mpc::TestMpc::initializeTestMpc(mpc);
+        mpc.init(1, 5);
         
         
         auto s = mpc.getSampler()->addSound();
@@ -181,7 +182,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 			int layerIndex = ls->openScreen(screenName);
 			
 			// We do a check for the most important screen
-			if (screenName.compare("sequencer") == 0)
+			if (screenName == "sequencer")
 				REQUIRE(layerIndex == 0);
 
 			if (layerIndex == -1)
@@ -205,7 +206,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 			}
 
 			// And another check for the most important screen
-			if (screenName.compare("sequencer") == 0)
+			if (screenName == "sequencer")
 				REQUIRE(blackPixelCount > 0);
 
 			if (blackPixelCount > 0)
@@ -214,17 +215,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 				bad.push_back(screenName + " is openable, but has 0 black pixels");
 		}
 
-		MLOG("These screens are fine:");
-		for (auto& msg : good)
-			MLOG(msg);
-
-		MLOG("\nThese screens are broken:");
-		for (auto& msg : bad)
-			MLOG(msg);
-
-		printf("%i screens are fine and %i screens are broken. Check ~/Documents/VMPC2000XL/vmpc.log for more details.\n", good.size(), bad.size());
-
-		REQUIRE(good.size() >= 129); // This will be increased as the screens get refactored.
+		REQUIRE(bad.empty());
 
 	}
 }

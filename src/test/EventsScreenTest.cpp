@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
@@ -16,6 +16,7 @@ TEST_CASE("COPY1", "[events-screen]")
  * After: a note on all 16ths.
  */
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
@@ -70,6 +71,7 @@ TEST_CASE("COPY2", "[events-screen]")
  * After: a note on all 16ths with 23 ticks "delay".
  */
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
@@ -127,6 +129,7 @@ TEST_CASE("COPY3", "[events-screen]")
  *        the end of the first bar.
  */
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
@@ -187,6 +190,7 @@ TEST_CASE("COPY4", "[events-screen]")
  */
 
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(1);
@@ -224,6 +228,7 @@ TEST_CASE("COPY5", "[events-screen]")
  * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex to 0 at note 8
  */
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
@@ -278,6 +283,7 @@ TEST_CASE("COPY6", "[events-screen]")
  *        while the original 8 notes of the 2nd half are still there.
  */
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);

@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <Mpc.hpp>
+#include "TestMpc.hpp"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <controls/GlobalReleaseControls.hpp>
@@ -22,6 +22,7 @@ using namespace std;
 TEST_CASE("Next step, previous step", "[sequencer]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto pos = [&]{ return mpc.getSequencer()->getTickPosition();};
     auto seq = mpc.getSequencer()->getSequence(0);
@@ -67,6 +68,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     bool audioThreadBusy = true;
 
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     auto seq = mpc.getSequencer();
@@ -153,6 +155,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 TEST_CASE("Copy sequence", "[sequencer]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto sequencer = mpc.getSequencer();
     sequencer->setTempo(121);
@@ -192,6 +195,7 @@ TEST_CASE("Undo", "[sequencer]")
     const int BUFFER_SIZE = 4096;
 
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(0, 1);
 
     auto sequencer = mpc.getSequencer();

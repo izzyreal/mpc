@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <Mpc.hpp>
+#include "TestMpc.hpp"
 
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Sequence.hpp>
@@ -24,7 +24,8 @@ SCENARIO("A MidiFile can be written", "[file]") {
 	GIVEN("An Mpc with a Sequence") {
 
 		mpc::Mpc mpc;
-		mpc.init(1, 1);
+        mpc::TestMpc::initializeTestMpc(mpc);
+        mpc.init(1, 1);
 		auto sequencer = mpc.getSequencer();
 		auto sequence = sequencer->getSequence(0);
 		sequence->init(1);

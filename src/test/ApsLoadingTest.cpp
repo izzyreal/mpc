@@ -1,9 +1,9 @@
 #include "catch2/catch_test_macros.hpp"
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sampler/Sampler.hpp"
 #include "disk/AbstractDisk.hpp"
-#include "disk/Volume.hpp"
+#include "disk/MpcFile.hpp"
 #include "disk/ApsLoader.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -17,15 +17,7 @@ using namespace mpc::lcdgui::screens::window;
 
 void prepareApsResources(mpc::Mpc& mpc)
 {
-    auto tmpDocsPath = fs::temp_directory_path();
-    tmpDocsPath = tmpDocsPath / "VMPC2000XL-test";
-    fs::remove_all(tmpDocsPath);
-    fs::create_directories(tmpDocsPath);
     auto disk = mpc.getDisk();
-
-    disk->getVolume().localDirectoryPath = tmpDocsPath.string();
-    disk->initRoot();
-    disk->initFiles();
 
     auto fs = cmrc::mpctest::get_filesystem();
 
@@ -72,5 +64,6 @@ void doApsTest(mpc::Mpc& mpc)
 TEST_CASE("Load APS with 2 programs and 3 sounds", "[load-aps]")
 {
     Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     doApsTest(mpc);
 }

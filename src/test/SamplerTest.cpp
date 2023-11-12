@@ -1,10 +1,9 @@
 #include "catch2/catch_test_macros.hpp"
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "disk/AbstractDisk.hpp"
-#include "disk/Volume.hpp"
+#include "disk/MpcFile.hpp"
 #include "lcdgui/ScreenComponent.hpp"
-#include "mpc_fs.hpp"
 #include "disk/SoundLoader.hpp"
 
 #include <cmrc/cmrc.hpp>
@@ -17,13 +16,8 @@ using namespace mpc::disk;
 
 void prepareSamplerResources(mpc::Mpc& mpc)
 {
-    auto tmpDocsPath = fs::temp_directory_path();
-    tmpDocsPath = tmpDocsPath / "VMPC2000XL-test";
-    fs::remove_all(tmpDocsPath);
-    fs::create_directories(tmpDocsPath);
     auto disk = mpc.getDisk();
 
-    disk->getVolume().localDirectoryPath = tmpDocsPath.string();
     disk->initRoot();
     disk->initFiles();
 
@@ -44,6 +38,7 @@ void prepareSamplerResources(mpc::Mpc& mpc)
 TEST_CASE("Sort sounds by memory index", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
@@ -92,6 +87,7 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
 TEST_CASE("Sort sounds by name", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
@@ -140,6 +136,7 @@ TEST_CASE("Sort sounds by name", "[sampler]")
 TEST_CASE("Sort sounds by size", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
@@ -190,6 +187,7 @@ TEST_CASE("Sort sounds by size", "[sampler]")
 TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
@@ -235,6 +233,7 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
 TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
@@ -290,6 +289,7 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
 TEST_CASE("Delete sound 1", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     auto sampler = mpc.getSampler();
@@ -313,6 +313,7 @@ TEST_CASE("Delete sound 1", "[sampler]")
 TEST_CASE("Delete sound 2", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     auto sampler = mpc.getSampler();
@@ -336,6 +337,7 @@ TEST_CASE("Delete sound 2", "[sampler]")
 TEST_CASE("Purge unused sounds", "[sampler]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
 
     auto sampler = mpc.getSampler();

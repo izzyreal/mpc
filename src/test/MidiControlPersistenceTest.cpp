@@ -1,7 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 
-#include "Mpc.hpp"
-#include "Paths.hpp"
+#include "TestMpc.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
@@ -13,6 +12,7 @@ using namespace mpc::lcdgui::screens;
 TEST_CASE("Initial state", "[midi-control-persistence]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     MidiControlPersistence::deleteLastState(mpc);
     mpc.init(1, 5);
 
@@ -41,6 +41,7 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     MidiControlPersistence::deleteLastState(mpc);
     mpc.init(1, 5);
 
@@ -65,6 +66,7 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
 TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     MidiControlPersistence::deleteLastState(mpc);
     mpc.init(1, 5);
 

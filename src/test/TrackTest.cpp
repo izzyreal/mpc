@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
@@ -11,6 +11,7 @@ using namespace mpc::lcdgui::screens;
 TEST_CASE("timing-correct", "[track]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(0);
@@ -60,6 +61,7 @@ TEST_CASE("timing-correct", "[track]")
 TEST_CASE("swing1", "[track]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(0);
@@ -95,6 +97,7 @@ TEST_CASE("swing1", "[track]")
 TEST_CASE("quantize", "[track]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(0);

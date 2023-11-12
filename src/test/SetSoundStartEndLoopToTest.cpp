@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Mpc.hpp"
+#include "TestMpc.hpp"
 #include "sampler/Sampler.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"
@@ -37,6 +37,7 @@ std::shared_ptr<Sound> initSound(mpc::Mpc& mpc)
 TEST_CASE("TRIM screen", "[sound]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
     mpc.getLayeredScreen()->openScreen("trim");
@@ -161,6 +162,7 @@ TEST_CASE("TRIM screen", "[sound]")
 TEST_CASE("Start fine window", "[sound]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
     mpc.getLayeredScreen()->openScreen("trim");
@@ -212,6 +214,7 @@ TEST_CASE("Start fine window", "[sound]")
 TEST_CASE("End fine window", "[sound]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
     mpc.getLayeredScreen()->openScreen("trim");
@@ -264,6 +267,7 @@ TEST_CASE("End fine window", "[sound]")
 TEST_CASE("LOOP screen with end", "[sound]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
     mpc.getLayeredScreen()->openScreen("loop");
@@ -428,6 +432,7 @@ TEST_CASE("LOOP screen with end", "[sound]")
 TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
     mpc.getLayeredScreen()->openScreen("loop");
@@ -481,6 +486,7 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
 TEST_CASE("Loop To fine window", "[sound]")
 {
     mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
     mpc.getLayeredScreen()->openScreen("loop");

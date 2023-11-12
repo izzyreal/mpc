@@ -26,7 +26,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overridePath)
+void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
 
@@ -35,7 +35,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         return;
     }
 
-    const auto path = overridePath.empty() ? mpc.paths->autoSavePath() : fs::path(overridePath);
+    const auto path = mpc.paths->autoSavePath();
     const auto apsFile = path / "APS.APS";
     const auto allFile = path / "ALL.ALL";
     const auto soundIndexFile = path / "soundIndex.txt";
@@ -237,7 +237,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
     restoreAutoSavedStateAction();
 }
 
-void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePath)
+void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
 
@@ -247,7 +247,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
         return;
     }
 
-    const auto path = overridePath.empty() ? mpc.paths->autoSavePath() : fs::path(overridePath);
+    const auto path = mpc.paths->autoSavePath();
     const auto apsFile = path / "APS.APS";
     const auto allFile = path / "ALL.ALL";
     const auto soundIndexFile = path / "soundIndex.txt";
