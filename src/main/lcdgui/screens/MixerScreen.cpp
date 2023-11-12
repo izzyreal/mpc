@@ -358,7 +358,7 @@ void MixerScreen::turnWheelLinked(int i)
         if (tab == 0)
         {
             auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
-            bool record = sequencer->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+            bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
             
             if (yPos == 0)
             {
@@ -434,7 +434,7 @@ void MixerScreen::turnWheel(int i)
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
         
-        bool record = sequencer->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+        bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
         
         if (yPos == 0)
         {
@@ -486,7 +486,7 @@ void MixerScreen::turnWheel(int i)
 void MixerScreen::recordMixerEvent(int pad, int param, int value)
 {
     auto event = std::make_shared<MixerEvent>();
-    sequencer->getActiveTrack()->addEvent(sequencer->getTickPosition(), event);
+    sequencer.lock()->getActiveTrack()->addEvent(sequencer.lock()->getTickPosition(), event);
     event->setPadNumber(pad);
     event->setParameter(param);
     event->setValue(value);

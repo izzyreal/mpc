@@ -20,14 +20,14 @@ void ChangeBarsScreen::open()
 void ChangeBarsScreen::function(int i)
 {
     ScreenComponent::function(i);
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	switch (i)
 	{
 	case 1:
 	{
 		if (numberOfBars > 0 && afterBar <= seq->getLastBarIndex())
-			sequencer->move(0);
+			sequencer.lock()->move(0);
 
 		seq->insertBars(numberOfBars, afterBar);
 
@@ -37,7 +37,7 @@ void ChangeBarsScreen::function(int i)
 	case 4:
 	{
 		if (firstBar <= seq->getLastBarIndex())
-			sequencer->move(0);
+			sequencer.lock()->move(0);
 
 		seq->deleteBars(firstBar, lastBar);
 		openScreen("sequencer");
@@ -90,7 +90,7 @@ void ChangeBarsScreen::displayLastBar()
 
 void ChangeBarsScreen::setLastBar(int i)
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	if (i < 0 || i > seq->getLastBarIndex())
 		return;
@@ -105,7 +105,7 @@ void ChangeBarsScreen::setLastBar(int i)
 
 void ChangeBarsScreen::setFirstBar(int i)
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	if (i < 0 || i > seq->getLastBarIndex())
 		return;
@@ -120,7 +120,7 @@ void ChangeBarsScreen::setFirstBar(int i)
 
 void ChangeBarsScreen::setNumberOfBars(int i)
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	if (i < 0 || i > (998 - seq->getLastBarIndex()))
 		return;
@@ -131,7 +131,7 @@ void ChangeBarsScreen::setNumberOfBars(int i)
 
 void ChangeBarsScreen::setAfterBar(int i)
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	if (i < 0 || i > seq->getLastBarIndex() + 1)
 		return;

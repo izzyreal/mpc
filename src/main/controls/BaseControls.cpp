@@ -64,7 +64,7 @@ void BaseControls::init()
         splittable = false;
     }
     
-    track = sequencer->getActiveTrack();
+    track = sequencer.lock()->getActiveTrack();
     
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     
@@ -252,7 +252,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
 
     controls->pressPad(padIndexWithBank);
 
-    if (currentScreenName == "sequencer" && (controls->isTapPressed() || controls->isNoteRepeatLocked()) && sequencer->isPlaying() && padWasNotPressed)
+    if (currentScreenName == "sequencer" && (controls->isTapPressed() || controls->isNoteRepeatLocked()) && sequencer.lock()->isPlaying() && padWasNotPressed)
     {
         return;
     }
@@ -264,7 +264,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
       velo = 127;
     }
 
-    if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
+    if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
         return;
     
     if (controls->isNoteRepeatLocked())
@@ -304,30 +304,30 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
 
-    if (sequencer->isRecordingOrOverdubbing())
+    if (sequencer.lock()->isRecordingOrOverdubbing())
     {
         recordNoteOnEvent = track->recordNoteEventASync(note, padVelo);
     }
     else if (mpc.getControls()->isStepRecording() && (track->getBus() == 0 || isDrumNote(note)))
     {
-        recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
-        sequencer->playMetronomeTrack();
+        recordNoteOnEvent = track->recordNoteEventSynced(sequencer.lock()->getTickPosition(), note, padVelo);
+        sequencer.lock()->playMetronomeTrack();
     }
     else if (mpc.getControls()->isRecMainWithoutPlaying())
     {
-        recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
+        recordNoteOnEvent = track->recordNoteEventSynced(sequencer.lock()->getTickPosition(), note, padVelo);
         auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
         int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
         if (stepLength != 1)
         {
-            int bar = sequencer->getCurrentBarIndex() + 1;
+            int bar = sequencer.lock()->getCurrentBarIndex() + 1;
             track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
 
-            if (recordNoteOnEvent->getTick() != sequencer->getTickPosition())
-                sequencer->move(recordNoteOnEvent->getTick());
+            if (recordNoteOnEvent->getTick() != sequencer.lock()->getTickPosition())
+                sequencer.lock()->move(recordNoteOnEvent->getTick());
         }
-        sequencer->playMetronomeTrack();
+        sequencer.lock()->playMetronomeTrack();
     }
 
     if (recordNoteOnEvent)
@@ -383,7 +383,7 @@ void BaseControls::numpad(int i)
                 ls->openScreen("vmpc-settings");
                 break;
             case 1:
-                if (sequencer->isPlaying())
+                if (sequencer.lock()->isPlaying())
                 {
                     return;
                 }
@@ -395,7 +395,7 @@ void BaseControls::numpad(int i)
                 break;
             case 3:
             {
-                if (sequencer->isPlaying())
+                if (sequencer.lock()->isPlaying())
                 {
                     break;
                 }
@@ -404,7 +404,7 @@ void BaseControls::numpad(int i)
                 break;
             }
             case 4:
-                if (sequencer->isPlaying())
+                if (sequencer.lock()->isPlaying())
                 {
                     break;
                 }
@@ -412,7 +412,7 @@ void BaseControls::numpad(int i)
                 ls->openScreen("sample");
                 break;
             case 5:
-                if (sequencer->isPlaying())
+                if (sequencer.lock()->isPlaying())
                 {
                     break;
                 }
@@ -421,7 +421,7 @@ void BaseControls::numpad(int i)
                 break;
             case 6:
             {
-                auto newDrum = sequencer->getActiveTrack()->getBus() - 1;
+                auto newDrum = sequencer.lock()->getActiveTrack()->getBus() - 1;
 
                 if (newDrum >= 0)
                 {
@@ -434,7 +434,7 @@ void BaseControls::numpad(int i)
             }
             case 7:
             {
-                auto newDrum = sequencer->getActiveTrack()->getBus() - 1;
+                auto newDrum = sequencer.lock()->getActiveTrack()->getBus() - 1;
 
                 if (newDrum >= 0)
                 {
@@ -446,7 +446,7 @@ void BaseControls::numpad(int i)
                 break;
             }
             case 8:
-                if (sequencer->isPlaying())
+                if (sequencer.lock()->isPlaying())
                 {
                     break;
                 }
@@ -454,7 +454,7 @@ void BaseControls::numpad(int i)
                 ls->openScreen("others");
                 break;
             case 9:
-                if (sequencer->isPlaying())
+                if (sequencer.lock()->isPlaying())
                 {
                     break;
                 }
@@ -498,10 +498,10 @@ void BaseControls::rec()
 
     auto hw = mpc.getHardware();
     
-    if (sequencer->isRecordingOrOverdubbing())
+    if (sequencer.lock()->isRecordingOrOverdubbing())
     {
-        sequencer->setRecording(false);
-        sequencer->setOverdubbing(false);
+        sequencer.lock()->setRecording(false);
+        sequencer.lock()->setOverdubbing(false);
     }
 
     if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
@@ -532,10 +532,10 @@ void BaseControls::overDub()
 
     auto hw = mpc.getHardware();
 
-    if (sequencer->isRecordingOrOverdubbing())
+    if (sequencer.lock()->isRecordingOrOverdubbing())
     {
-        sequencer->setRecording(false);
-        sequencer->setOverdubbing(false);
+        sequencer.lock()->setRecording(false);
+        sequencer.lock()->setOverdubbing(false);
     }
 
     if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
@@ -558,7 +558,7 @@ void BaseControls::stop()
     if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->record != 4 || controls->isShiftPressed()))
         ams->stopBouncingEarly();
     
-    sequencer->stop();
+    sequencer.lock()->stop();
     
     if (!currentScreenAllowsPlay())
     {
@@ -580,17 +580,17 @@ void BaseControls::play()
     init();
     auto hw = mpc.getHardware();
     
-    if (sequencer->isPlaying())
+    if (sequencer.lock()->isPlaying())
     {
-        if (controls->isRecPressed() && !sequencer->isOverDubbing())
+        if (controls->isRecPressed() && !sequencer.lock()->isOverDubbing())
         {
-            sequencer->setOverdubbing(false);
-            sequencer->setRecording(true);
+            sequencer.lock()->setOverdubbing(false);
+            sequencer.lock()->setRecording(true);
         }
-        else if (controls->isOverDubPressed() && !sequencer->isRecording())
+        else if (controls->isOverDubPressed() && !sequencer.lock()->isRecording())
         {
-            sequencer->setOverdubbing(true);
-            sequencer->setRecording(false);
+            sequencer.lock()->setOverdubbing(true);
+            sequencer.lock()->setRecording(false);
         }
     }
     else
@@ -602,7 +602,7 @@ void BaseControls::play()
                 ls->openScreen("sequencer");
             }
             
-            sequencer->rec();
+            sequencer.lock()->rec();
         }
         else if (controls->isOverDubPressed())
         {
@@ -611,7 +611,7 @@ void BaseControls::play()
                 ls->openScreen("sequencer");
             }
             
-            sequencer->overdub();
+            sequencer.lock()->overdub();
         }
         else {
             if (controls->isShiftPressed() && !mpc.getAudioMidiServices()->isBouncing())
@@ -625,8 +625,8 @@ void BaseControls::play()
                     ls->openScreen("sequencer");
                 }
                 
-                sequencer->setSongModeEnabled(currentScreenName == "song");
-                sequencer->play();
+                sequencer.lock()->setSongModeEnabled(currentScreenName == "song");
+                sequencer.lock()->play();
             }
         }
     }
@@ -638,7 +638,7 @@ void BaseControls::playStart()
     auto hw = mpc.getHardware();
     auto controls = mpc.getControls();
     
-    if (sequencer->isPlaying())
+    if (sequencer.lock()->isPlaying())
     {
         return;
     }
@@ -650,7 +650,7 @@ void BaseControls::playStart()
             ls->openScreen("sequencer");
         }
         
-        sequencer->recFromStart();
+        sequencer.lock()->recFromStart();
     }
     else if (controls->isOverDubPressed())
     {
@@ -659,7 +659,7 @@ void BaseControls::playStart()
             ls->openScreen("sequencer");
         }
         
-        sequencer->overdubFromStart();
+        sequencer.lock()->overdubFromStart();
     }
     else
     {
@@ -674,8 +674,8 @@ void BaseControls::playStart()
                 ls->openScreen("sequencer");
             }
             
-            sequencer->setSongModeEnabled(currentScreenName == "song");
-            sequencer->playFromStart();
+            sequencer.lock()->setSongModeEnabled(currentScreenName == "song");
+            sequencer.lock()->playFromStart();
         }
     }
 }
@@ -690,7 +690,7 @@ void BaseControls::mainScreen()
         ams->stopSoundRecorder();
     
     ls->openScreen("sequencer");
-    sequencer->setSoloEnabled(sequencer->isSoloEnabled());
+    sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
     
     auto hw = mpc.getHardware();
     hw->getLed("next-seq")->light(false);
@@ -708,7 +708,7 @@ void BaseControls::tap()
     }
 
     controls->setTapPressed(true);
-    sequencer->tap();
+    sequencer.lock()->tap();
 }
 
 void BaseControls::goTo()
@@ -852,7 +852,7 @@ void BaseControls::shift()
 
 void BaseControls::undoSeq()
 {
-    sequencer->undoSeq();
+    sequencer.lock()->undoSeq();
 }
 
 void BaseControls::erase()
@@ -861,12 +861,12 @@ void BaseControls::erase()
     auto controls = mpc.getControls();
     controls->setErasePressed(true);
     
-    if (!sequencer->getActiveSequence()->isUsed())
+    if (!sequencer.lock()->getActiveSequence()->isUsed())
     {
         return;
     }
     
-    if (!sequencer->isRecordingOrOverdubbing())
+    if (!sequencer.lock()->isRecordingOrOverdubbing())
     {
         ls->openScreen("erase");
     }

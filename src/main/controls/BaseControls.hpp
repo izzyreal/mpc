@@ -96,7 +96,7 @@ namespace mpc::controls {
 	protected:
 		std::string param;
 		mpc::Mpc& mpc;
-		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 
 	private:
 		std::shared_ptr<mpc::sampler::Sampler> sampler;

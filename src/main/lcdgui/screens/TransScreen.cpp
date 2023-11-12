@@ -13,10 +13,10 @@ TransScreen::TransScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TransScreen::open()
 {
-	findChild("function-keys")->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer.lock()->isPlaying());
 
 	setBar0(0);
-	setBar1(sequencer->getActiveSequence()->getLastBarIndex());
+	setBar1(sequencer.lock()->getActiveSequence()->getLastBarIndex());
 
 	displayTransposeAmount();
 	displayTr();
@@ -57,7 +57,7 @@ void TransScreen::turnWheel(int i)
 	{
 		auto candidate = bar0 + i;
 		
-		if (candidate < 0 || candidate > sequencer->getActiveSequence()->getLastBarIndex())
+		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence()->getLastBarIndex())
 			return;
 
 		setBar0(candidate);
@@ -66,7 +66,7 @@ void TransScreen::turnWheel(int i)
 	{
 		auto candidate = bar1 + i;
 	
-		if (candidate < 0 || candidate > sequencer->getActiveSequence()->getLastBarIndex())
+		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence()->getLastBarIndex())
 			return;
 
 		setBar1(candidate);
@@ -125,7 +125,7 @@ void TransScreen::displayTransposeAmount()
 
 void TransScreen::displayTr()
 {
-	auto trName = std::string(tr == -1 ? "ALL" : sequencer->getActiveSequence()->getTrack(tr)->getName());
+	auto trName = std::string(tr == -1 ? "ALL" : sequencer.lock()->getActiveSequence()->getTrack(tr)->getName());
 	findField("tr")->setTextPadded(tr + 1, "0");
 	findLabel("track-name")->setText(trName);
 }
@@ -139,29 +139,29 @@ void TransScreen::displayBars()
 void TransScreen::play()
 {
 	ScreenComponent::play();
-	findChild("function-keys")->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer.lock()->isPlaying());
 }
 
 void TransScreen::playStart()
 {
 	ScreenComponent::playStart();
-	findChild("function-keys")->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer.lock()->isPlaying());
 }
 
 void TransScreen::rec()
 {
 	ScreenComponent::rec();
-	findChild("function-keys")->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer.lock()->isPlaying());
 }
 
 void TransScreen::overDub()
 {
 	ScreenComponent::overDub();
-	findChild("function-keys")->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer.lock()->isPlaying());
 }
 
 void TransScreen::stop()
 {
 	ScreenComponent::stop();
-	findChild("function-keys")->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer.lock()->isPlaying());
 }

@@ -27,14 +27,14 @@ void SecondSeqScreen::function(int i)
         openScreen(punchScreen->tabNames[i]);
         break;
     case 5:
-        if (sequencer->isSecondSequenceEnabled())
+        if (sequencer.lock()->isSecondSequenceEnabled())
         {
-            sequencer->setSecondSequenceEnabled(false);
+            sequencer.lock()->setSecondSequenceEnabled(false);
             openScreen("sequencer");
             return;
         }
  
-        sequencer->setSecondSequenceEnabled(true);
+        sequencer.lock()->setSecondSequenceEnabled(true);
         openScreen("sequencer");
         break;
     }
@@ -61,14 +61,14 @@ void SecondSeqScreen::setSq(int i)
 
 void SecondSeqScreen::displaySq()
 {
-    auto sqName = sequencer->getSequence(sq)->getName();
+    auto sqName = sequencer.lock()->getSequence(sq)->getName();
     findField("sq")->setTextPadded(sq + 1, "0");
     findLabel("sequence-name")->setText("-" + sqName);
 }
 
 void SecondSeqScreen::displayFunctionKeys()
 {
-    if (sequencer->isSecondSequenceEnabled())
+    if (sequencer.lock()->isSecondSequenceEnabled())
         ls->setFunctionKeysArrangement(2);
     else
         ls->setFunctionKeysArrangement(0);

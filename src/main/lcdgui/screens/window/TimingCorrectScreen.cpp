@@ -18,7 +18,7 @@ void TimingCorrectScreen::open()
 	findField("note1")->setAlignment(Alignment::Centered, 18);
 	findField("note1")->setLocation(116, 40);
 
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	setTime0(0);
 	setTime1(seq->getLastTick());
@@ -39,7 +39,7 @@ void TimingCorrectScreen::function(int i)
 	{
 	case 4:
 	{
-		sequencer->storeActiveSequenceInUndoPlaceHolder();
+		sequencer.lock()->storeActiveSequenceInUndoPlaceHolder();
 
 		std::vector<int> noteRange(2);
 
@@ -64,7 +64,7 @@ void TimingCorrectScreen::function(int i)
 
         auto eventRange = track->getEventRange(time0, time1);
 
-		auto sequence = sequencer->getActiveSequence();
+		auto sequence = sequencer.lock()->getActiveSequence();
 
         for (auto& e: eventRange)
         {
@@ -183,7 +183,7 @@ void TimingCorrectScreen::displayAmount()
 
 void TimingCorrectScreen::displayTime()
 {
-	auto s = sequencer->getActiveSequence().get();
+	auto s = sequencer.lock()->getActiveSequence().get();
 	findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1, "0");
 	findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");
 	findField("time2")->setTextPadded(SeqUtil::getClock(s, time0), "0");

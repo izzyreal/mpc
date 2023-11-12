@@ -88,12 +88,12 @@ void StepEditorScreen::open()
 	updateComponents();
 	setViewNotesText();
 	displayView();
-	sequencer->addObserver(this);
+	sequencer.lock()->addObserver(this);
 	track->addObserver(this);
 
-	findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
-	findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
-	findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+	findField("now0")->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+	findField("now1")->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+	findField("now2")->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
 
     initVisibleEvents();
 
@@ -137,7 +137,7 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
-    sequencer->deleteObserver(this);
+    sequencer.lock()->deleteObserver(this);
 	track->deleteObserver(this);
 
     storeColumnForEventAtActiveRow();
@@ -150,7 +150,7 @@ void StepEditorScreen::close()
         nextScreen != "edit-multiple")
 	{
 		track->removeDoubles();
-        sequencer->resetUndo();
+        sequencer.lock()->resetUndo();
 	}
 
 	for (auto& e : visibleEvents)
@@ -248,7 +248,7 @@ void StepEditorScreen::function(int i)
 	}
 	case 3:
 	{
-		bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+		bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence()->getLastTick();
 
 		if (selectionEndIndex == -1)
 		{
@@ -396,15 +396,15 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param == "now0")
 	{
-        setSequencerTickPos([&]{ sequencer->setBar(sequencer->getCurrentBarIndex() + i); });
+        setSequencerTickPos([&]{ sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i); });
     }
 	else if (param == "now1")
 	{
-        setSequencerTickPos([&]{ sequencer->setBeat(sequencer->getCurrentBeatIndex() + i); });
+        setSequencerTickPos([&]{ sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatIndex() + i); });
 	}
 	else if (param == "now2")
 	{
-        setSequencerTickPos([&]{ sequencer->setClock(sequencer->getCurrentClockNumber() + i); });
+        setSequencerTickPos([&]{ sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i); });
 	}
 	else if (param == "tcvalue")
 	{
@@ -541,11 +541,11 @@ void StepEditorScreen::setSequencerTickPos(const std::function<void()>& tickPosS
 {
     storeColumnForEventAtActiveRow();
 
-    auto oldTickPos = sequencer->getTickPosition();
+    auto oldTickPos = sequencer.lock()->getTickPosition();
 
     tickPosSetter();
 
-    if (oldTickPos != sequencer->getTickPosition())
+    if (oldTickPos != sequencer.lock()->getTickPosition())
     {
         track->removeDoubles();
         resetYPosAndYOffset();
@@ -560,11 +560,11 @@ void StepEditorScreen::prevStepEvent()
     setSequencerTickPos([&] {
         if (mpc.getControls()->isGoToPressed())
         {
-            sequencer->goToPreviousEvent();
+            sequencer.lock()->goToPreviousEvent();
         }
         else
         {
-            sequencer->goToPreviousStep();
+            sequencer.lock()->goToPreviousStep();
         }
     });
 }
@@ -574,11 +574,11 @@ void StepEditorScreen::nextStepEvent()
     setSequencerTickPos([&]{
         if (mpc.getControls()->isGoToPressed())
         {
-            sequencer->goToNextEvent();
+            sequencer.lock()->goToNextEvent();
         }
         else
         {
-            sequencer->goToNextStep();
+            sequencer.lock()->goToNextStep();
         }
     });
 }
@@ -587,9 +587,9 @@ void StepEditorScreen::prevBarStart()
 {
     setSequencerTickPos([&]{
         if (mpc.getControls()->isGoToPressed())
-            sequencer->setBar(0);
+            sequencer.lock()->setBar(0);
         else
-            sequencer->setBar(sequencer->getCurrentBarIndex() - 1);
+            sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() - 1);
     });
 }
 
@@ -597,9 +597,9 @@ void StepEditorScreen::nextBarEnd()
 {
     setSequencerTickPos([&]{
         if (mpc.getControls()->isGoToPressed())
-            sequencer->setBar(sequencer->getActiveSequence()->getLastBarIndex() + 1);
+            sequencer.lock()->setBar(sequencer.lock()->getActiveSequence()->getLastBarIndex() + 1);
         else
-            sequencer->setBar(sequencer->getCurrentBarIndex() + 1);
+            sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);
     });
 }
 
@@ -820,7 +820,7 @@ void StepEditorScreen::initVisibleEvents()
 
 	for (auto& event : track->getEvents())
 	{
-		if (event->getTick() == sequencer->getTickPosition())
+		if (event->getTick() == sequencer.lock()->getTickPosition())
 		{
 			if ((view == 0
 				|| view == 1)
@@ -935,7 +935,7 @@ void StepEditorScreen::refreshEventRows()
 		{
 			eventRow->Hide(false);
 			event->addObserver(this);
-			eventRow->setBus(sequencer->getActiveTrack()->getBus());
+			eventRow->setBus(sequencer.lock()->getActiveTrack()->getBus());
 		}
 		else
 		{
@@ -1296,17 +1296,17 @@ void StepEditorScreen::update(Observable*, Message message)
 	}
 	else if (msg == "bar")
 	{
-		findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+		findField("now0")->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg == "beat")
 	{
-		findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+		findField("now1")->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg == "clock")
 	{
-		findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+		findField("now2")->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
 		setyOffset(0);
 	}
 }
@@ -1415,7 +1415,7 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
 
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
 {
-    auto tick = sequencer->getTickPosition();
+    auto tick = sequencer.lock()->getTickPosition();
     for (auto& e : track->getEventRange(tick, tick))
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);

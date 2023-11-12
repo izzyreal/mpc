@@ -90,7 +90,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 {
 	init();
 	
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 	
 	if (param[0] == 'a')
 	{
@@ -174,7 +174,7 @@ void MultiRecordingSetupScreen::down()
 
 void MultiRecordingSetupScreen::displayMrsLine(int i)
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 	auto trackIndex = visibleMrsLines[i]->getTrack();
 
 	auto aField = findField("a" + std::to_string(i));

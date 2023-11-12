@@ -12,7 +12,7 @@ PunchScreen::PunchScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PunchScreen::open()
 {
-    if (sequencer->isPlaying())
+    if (sequencer.lock()->isPlaying())
     {
         openScreen("trans");
         return;
@@ -24,12 +24,12 @@ void PunchScreen::open()
         return;
     }
     
-    auto lastTick = sequencer->getActiveSequence()->getLastTick();
+    auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
     
     if (lastTick < time0 || lastTick < time1 || (time0 == 0 && time1 == 0))
     {
         setTime0(0);
-        setTime1(sequencer->getActiveSequence()->getLastTick());
+        setTime1(sequencer.lock()->getActiveSequence()->getLastTick());
     }
 
     displayBackground();
@@ -85,7 +85,7 @@ void PunchScreen::displayAutoPunch()
 
 void PunchScreen::displayTime()
 {
-    auto sequence = sequencer->getActiveSequence().get();
+    auto sequence = sequencer.lock()->getActiveSequence().get();
 
     for (int i = 0; i < 3; i++)
     {

@@ -37,7 +37,6 @@ Track::Track(mpc::Mpc& mpc, Sequence* parent, int i)
 {
 	this->parent = parent;
 
-	sequencer = mpc.getSequencer();
 	trackIndex = i;
 	programChange = 0;
 	velocityRatio = 100;
@@ -361,7 +360,7 @@ std::vector<std::shared_ptr<Event>>& Track::getEvents()
 
 int Track::getCorrectedTickPos()
 {
-    auto pos = sequencer->getTickPosition();
+    auto pos = mpc.getSequencer()->getTickPosition();
     auto correctedTickPos = -1;
 
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
@@ -414,7 +413,7 @@ void Track::processRealtimeQueuedEvents()
         return;
     }
 
-    auto pos = this->sequencer->getTickPosition();
+    auto pos = mpc.getSequencer()->getTickPosition();
     auto correctedTickPos = getCorrectedTickPos();
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++) {
@@ -502,6 +501,8 @@ void Track::playNext()
     {
         return;
     }
+
+    const auto sequencer = mpc.getSequencer();
 
 	auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
 	auto _delete = sequencer->isRecording() && (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti) && (trackIndex < 64);
@@ -635,7 +636,7 @@ std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endT
 
 void Track::correctTimeRange(int startPos, int endPos, int stepLength, int swingPercentage, int lowestNote, int highestNote)
 {
-	auto s = sequencer->getActiveSequence();
+	auto s = mpc.getSequencer()->getActiveSequence();
 	int accumBarLengths = 0;
 	auto fromBar = 0;
 	auto toBar = 0;
@@ -669,10 +670,14 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength, int swing
 		if (ne)
 		{
 			if (event->getTick() >= endPos)
-				break;
+            {
+                break;
+            }
 
 			if (event->getTick() >= startPos && event->getTick() < endPos)
-				timingCorrect(fromBar, toBar, ne, stepLength, swingPercentage);
+            {
+                timingCorrect(fromBar, toBar, ne, stepLength, swingPercentage);
+            }
 		}
 	}
 
@@ -691,7 +696,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, i
     int previousAccumBarLengths = 0;
     auto barNumber = 0;
     auto numberOfSteps = 0;
-    auto sequence = sequencer->getActiveSequence();
+    auto sequence = mpc.getSequencer()->getActiveSequence();
     int segmentStart = 0;
     int segmentEnd = 0;
 

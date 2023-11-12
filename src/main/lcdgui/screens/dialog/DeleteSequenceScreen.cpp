@@ -20,7 +20,7 @@ void DeleteSequenceScreen::turnWheel(int i)
 	
 	if (param == "sq")
 	{
-		sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
+		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		displaySequenceNumberName();
 	}
 }
@@ -38,8 +38,8 @@ void DeleteSequenceScreen::function(int i)
 		openScreen("sequence");
 		break;
 	case 4:
-		sequencer->move(0);
-		sequencer->purgeSequence(sequencer->getActiveSequenceIndex());
+		sequencer.lock()->move(0);
+		sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
 		openScreen("sequencer");
 		break;
 	}
@@ -47,6 +47,6 @@ void DeleteSequenceScreen::function(int i)
 
 void DeleteSequenceScreen::displaySequenceNumberName()
 {
-	auto sequenceName = sequencer->getActiveSequence()->getName();
-	findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequenceName);
+	auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+	findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequenceName);
 }

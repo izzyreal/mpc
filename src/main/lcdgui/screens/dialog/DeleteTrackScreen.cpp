@@ -14,7 +14,7 @@ DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void DeleteTrackScreen::open()
 {
-	setTr(sequencer->getActiveTrackIndex());
+	setTr(sequencer.lock()->getActiveTrackIndex());
 	displayTr();
 }
 
@@ -40,7 +40,7 @@ void DeleteTrackScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto s = sequencer->getActiveSequence();
+		auto s = sequencer.lock()->getActiveSequence();
 		s->purgeTrack(tr);
 		openScreen("sequencer");
 	}
@@ -58,7 +58,7 @@ void DeleteTrackScreen::setTr(int i)
 
 void DeleteTrackScreen::displayTr()
 {
-	auto trackName = sequencer->getActiveSequence()->getTrack(tr)->getName();
+	auto trackName = sequencer.lock()->getActiveSequence()->getTrack(tr)->getName();
 	findField("tr")->setText(StrUtil::padLeft(std::to_string(tr + 1), "0", 2) + "-" + trackName);
 }
 

@@ -14,21 +14,21 @@ ChangeBars2Screen::ChangeBars2Screen(mpc::Mpc& mpc, const int layerIndex)
 
 void ChangeBars2Screen::open()
 {
-	setNewBars(sequencer->getActiveSequence()->getLastBarIndex());
+	setNewBars(sequencer.lock()->getActiveSequence()->getLastBarIndex());
 	displayCurrent();
 	displayNewBars();
 }
 
 void ChangeBars2Screen::displayCurrent()
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 	findLabel("current")->setText(std::to_string(seq->getLastBarIndex() + 1));
 }
 
 void ChangeBars2Screen::function(int i)
 {
 	ScreenComponent::function(i);
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	switch (i)
 	{
@@ -55,7 +55,7 @@ void ChangeBars2Screen::function(int i)
 		}
 
 		if (changed)
-			sequencer->move(0);
+			sequencer.lock()->move(0);
 
 		openScreen("sequencer");
 		break;
@@ -65,7 +65,7 @@ void ChangeBars2Screen::function(int i)
 
 void ChangeBars2Screen::displayNewBars()
 {
-	auto seq = sequencer->getActiveSequence();
+	auto seq = sequencer.lock()->getActiveSequence();
 
 	auto message0 = findLabel("message0");
 	auto message1 = findLabel("message1");

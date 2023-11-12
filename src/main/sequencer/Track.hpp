@@ -34,7 +34,6 @@ private:
 
     Sequence* parent{ nullptr };
     
-    std::shared_ptr<Sequencer> sequencer;
     int busNumber = 0;
     std::string name;
     bool on{ false };

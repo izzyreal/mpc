@@ -18,7 +18,7 @@ void DeleteAllTracksScreen::function(int i)
 		openScreen("delete-track");
 		break;
 	case 4:
-		sequencer->getActiveSequence()->purgeAllTracks();
+		sequencer.lock()->getActiveSequence()->purgeAllTracks();
 		openScreen("sequencer");
 		break;
 	}

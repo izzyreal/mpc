@@ -65,10 +65,10 @@ namespace mpc {
     class Mpc : public Observable {
     private:
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
-        std::shared_ptr<controls::Controls> controls;
-        std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<sequencer::Sequencer> sequencer;
+        std::shared_ptr<controls::Controls> controls;
         std::shared_ptr<sampler::Sampler> sampler;
+        std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::audiomidi::MidiDeviceDetector> midiDeviceDetector;
         std::vector<audiomidi::MidiInput*> midiInputs;

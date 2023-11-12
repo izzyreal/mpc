@@ -53,7 +53,7 @@ void InsertEventScreen::insertEvent()
 	{
         const bool allowMultipleNotesOnSameTick = true;
 		auto noteEvent = std::make_shared<NoteOnEvent>();
-        track->addEvent(sequencer->getTickPosition(), noteEvent, allowMultipleNotesOnSameTick);
+        track->addEvent(sequencer.lock()->getTickPosition(), noteEvent, allowMultipleNotesOnSameTick);
         auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
         unsigned short duration = timingCorrectScreen->getNoteValueLengthInTicks();
 		noteEvent->setDuration(duration);
@@ -65,45 +65,45 @@ void InsertEventScreen::insertEvent()
 	else if (insertEventType == 1)
 	{
 		auto pitchBendEvent = std::make_shared<PitchBendEvent>();
-		track->addEvent(sequencer->getTickPosition(), pitchBendEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), pitchBendEvent);
 		pitchBendEvent->setAmount(0);
 	}
 	else if (insertEventType == 2)
 	{
 		auto controlChangeEvent = std::make_shared<ControlChangeEvent>();
-		track->addEvent(sequencer->getTickPosition(), controlChangeEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), controlChangeEvent);
 		controlChangeEvent->setController(0);
 		controlChangeEvent->setAmount(0);
 	}
 	else if (insertEventType == 3)
 	{
 		auto programChangeEvent = std::make_shared<ProgramChangeEvent>();
-		track->addEvent(sequencer->getTickPosition(), programChangeEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), programChangeEvent);
 		programChangeEvent->setProgram(1);
 	}
 	else if (insertEventType == 4)
 	{
 		auto channelPressureEvent = std::make_shared<ChannelPressureEvent>();
-		track->addEvent(sequencer->getTickPosition(), channelPressureEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), channelPressureEvent);
 		channelPressureEvent->setAmount(0);
 	}
 	else if (insertEventType == 5)
 	{
 		auto polyPressureEvent = std::make_shared<PolyPressureEvent>();
-		track->addEvent(sequencer->getTickPosition(), polyPressureEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), polyPressureEvent);
 		polyPressureEvent->setNote(60);
 		polyPressureEvent->setAmount(0);
 	}
 	else if (insertEventType == 6)
 	{
 		auto systemExclusiveEvent = std::make_shared<SystemExclusiveEvent>();
-		track->addEvent(sequencer->getTickPosition(), systemExclusiveEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), systemExclusiveEvent);
 		systemExclusiveEvent->setByteB(247);
 	}
 	else if (insertEventType == 7)
 	{
 		auto mixerEvent = std::make_shared<MixerEvent>();
-		track->addEvent(sequencer->getTickPosition(), mixerEvent);
+		track->addEvent(sequencer.lock()->getTickPosition(), mixerEvent);
 		mixerEvent->setPadNumber(0);
 		mixerEvent->setParameter(0);
 		mixerEvent->setValue(0);

@@ -25,7 +25,7 @@ VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(mpc::Mpc& mpc, co
 
 void VmpcDirectToDiskRecorderScreen::open()
 {
-	setSq(sequencer->getActiveSequenceIndex());
+	setSq(sequencer.lock()->getActiveSequenceIndex());
 	displayRecord();
 	displaySong();
 	displayTime();
@@ -38,7 +38,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 {
 	init();
 
-	auto seq = sequencer->getSequence(sq).get();
+	auto seq = sequencer.lock()->getSequence(sq).get();
 
 	checkAllTimes(mpc, i, seq);
 
@@ -86,7 +86,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 //		if (!offline)
         rate = static_cast<int>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
 
-		auto sequence = sequencer->getSequence(seq);
+		auto sequence = sequencer.lock()->getSequence(seq);
         loopWasEnabled = sequence->isLoopEnabled();
 
 		switch (record)
@@ -101,7 +101,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else			
-				sequencer->playFromStart();
+				sequencer.lock()->playFromStart();
 
 			break;
 		}
@@ -111,12 +111,12 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
 			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
-			sequencer->move(sequence->getLoopStart());
+			sequencer.lock()->move(sequence->getLoopStart());
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
-				sequencer->play();
+				sequencer.lock()->play();
 
 			break;
 		}
@@ -126,28 +126,28 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
 			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
-			sequencer->move(time0);
+			sequencer.lock()->move(time0);
 			
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
-				sequencer->play();
+				sequencer.lock()->play();
 			
 			break;
 		}
 		case 3:
 		{
-			auto mpcSong = sequencer->getSong(song);
+			auto mpcSong = sequencer.lock()->getSong(song);
 
 			if (!mpcSong->isUsed())
 				return;
 
-			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.get(), rate);
+			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
 			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
 
 			openScreen("song");
 
-			sequencer->setSongModeEnabled(true);
+			sequencer.lock()->setSongModeEnabled(true);
 
 			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->setLoop(false);
@@ -155,7 +155,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
-				sequencer->playFromStart();
+				sequencer.lock()->playFromStart();
 
 			break;
 		}
@@ -199,7 +199,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(int i)
 	
 	setTime0(0);
 	
-	auto s = sequencer->getSequence(sq);
+	auto s = sequencer.lock()->getSequence(sq);
 	
 	if (s->isUsed())
 		setTime1(s->getLastTick());
@@ -253,7 +253,7 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
 
 	if (record != 3)
 		return;
-    auto songName = sequencer->getSong(song)->getName();
+    auto songName = sequencer.lock()->getSong(song)->getName();
 	findField("song")->setText(StrUtil::padLeft(std::to_string(song + 1), "0", 2) + "-" + songName);
 }
 
@@ -286,7 +286,7 @@ void VmpcDirectToDiskRecorderScreen::displaySq()
 	if (!visible)
 		return;
 
-    auto seqName = sequencer->getSequence(sq)->getName();
+    auto seqName = sequencer.lock()->getSequence(sq)->getName();
 	findField("sq")->setText(StrUtil::padLeft(std::to_string(sq + 1), "0", 2) + "-" + seqName);
 }
 
@@ -303,7 +303,7 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 	if (invisible)
 		return;
 
-	auto sequence = sequencer->getSequence(sq);
+	auto sequence = sequencer.lock()->getSequence(sq);
 
 	findField("time0")->setTextPadded(SeqUtil::getBar(sequence.get(), time0 ) + 1, "0");
 	findField("time1")->setTextPadded(SeqUtil::getBeat(sequence.get(), time0) + 1, "0");

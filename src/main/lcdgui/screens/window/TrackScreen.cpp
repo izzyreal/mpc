@@ -16,8 +16,8 @@ void TrackScreen::open()
 	ls->setPreviousScreenName("sequencer");
 
 	init();
-	auto activeTrackIndex = sequencer->getActiveTrackIndex();
-	auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
+	auto activeTrackIndex = sequencer.lock()->getActiveTrackIndex();
+	auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);
 
 	findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
 	findLabel("tracknamerest")->setText(track->getName().substr(1));
@@ -48,10 +48,10 @@ void TrackScreen::openNameScreen()
 
     if (param.find("default") != std::string::npos)
     {
-        initialNameScreenName = sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex());
+        initialNameScreenName = sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex());
 
         enterAction = [this](std::string& nameScreenName) {
-            sequencer->setDefaultTrackName(nameScreenName, sequencer->getActiveTrackIndex());
+            sequencer.lock()->setDefaultTrackName(nameScreenName, sequencer.lock()->getActiveTrackIndex());
             openScreen("sequencer");
         };
     }

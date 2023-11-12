@@ -68,15 +68,15 @@ void GlobalReleaseControls::function(int i)
 	case 5:
 		controls->setF6Pressed(false);
 
-		if (!sequencer->isPlaying() && currentScreenName != "sequencer")
+		if (!sequencer.lock()->isPlaying() && currentScreenName != "sequencer")
 			sampler->finishBasicVoice();
 
 		if (currentScreenName == "track-mute")
 		{
-			if (!sequencer->isSoloEnabled())
+			if (!sequencer.lock()->isSoloEnabled())
 				ls->setCurrentBackground("track-mute");
 
-			sequencer->setSoloEnabled(sequencer->isSoloEnabled());
+			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
 		else if (ls->getPreviousScreenName() == "directory" && currentScreenName == "popup")
 		{
@@ -101,12 +101,12 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	auto recordOnEvent = controls->retrieveRecordNoteEvent(padIndexWithBank);
 	if (!recordOnEvent) return;
 
-	if (sequencer->isRecordingOrOverdubbing() && controls->isErasePressed())
+	if (sequencer.lock()->isRecordingOrOverdubbing() && controls->isErasePressed())
 	{
 		return;
 	}
 
-	if (sequencer->isRecordingOrOverdubbing())
+	if (sequencer.lock()->isRecordingOrOverdubbing())
 	{
 		track->finalizeNoteEventASync(recordOnEvent);
 	}
@@ -137,24 +137,24 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
             }
         }
 		
-		if (!controls->arePadsPressed()) sequencer->stopMetronomeTrack();
+		if (!controls->arePadsPressed()) sequencer.lock()->stopMetronomeTrack();
 
 		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(recordOnEvent, newDuration);
 
 		if ((durationHasBeenAdjusted && recWithoutPlaying) || (stepRec && increment))
 		{
-			int nextPos = sequencer->getTickPosition() + stepLength;
-			auto bar = sequencer->getCurrentBarIndex() + 1;
+			int nextPos = sequencer.lock()->getTickPosition() + stepLength;
+			auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
 			nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
-			auto lastTick = sequencer->getActiveSequence()->getLastTick();
+			auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
 
 			if (nextPos != 0 && nextPos < lastTick)
 			{
-				sequencer->move(nextPos);
+				sequencer.lock()->move(nextPos);
 			}
 			else
 			{
-				sequencer->move(lastTick);
+				sequencer.lock()->move(lastTick);
 			}
 		}
 	}
@@ -198,8 +198,8 @@ void GlobalReleaseControls::tap()
 	auto controls = mpc.getControls();
 	controls->setTapPressed(false);
 
-	if (sequencer->isRecordingOrOverdubbing())
-		sequencer->flushTrackNoteCache();
+	if (sequencer.lock()->isRecordingOrOverdubbing())
+		sequencer.lock()->flushTrackNoteCache();
 
     if (!controls->isNoteRepeatLocked())
     {
