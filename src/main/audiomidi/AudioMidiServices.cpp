@@ -325,7 +325,7 @@ bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	{
 		auto eapa = diskRecorders[i];
 
-		if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate, !settings->split))
+		if (!eapa->prepare(mpc, settings->lengthInFrames, settings->sampleRate, !settings->split))
         {
             return false;
         }

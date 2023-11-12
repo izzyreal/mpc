@@ -1,7 +1,6 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
-#include "Paths.hpp"
 #include "mpc_fs.hpp"
 
 #include <disk/AbstractDisk.hpp>
@@ -36,7 +35,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         return;
     }
 
-    const auto path = overridePath.empty() ? Paths::autoSavePath() : fs::path(overridePath);
+    const auto path = overridePath.empty() ? mpc.paths->autoSavePath() : fs::path(overridePath);
     const auto apsFile = path / "APS.APS";
     const auto allFile = path / "ALL.ALL";
     const auto soundIndexFile = path / "soundIndex.txt";
@@ -97,7 +96,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
                 for (auto &soundName: soundNames)
                 {
-                    const auto soundPath = Paths::autoSavePath() / soundName;
+                    const auto soundPath = mpc.paths->autoSavePath() / soundName;
 
                     auto soundData = get_file_data(soundPath);
 
@@ -148,7 +147,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
 
-        auto relativePath = fs::relative(currentDir, mpc::Paths::defaultLocalVolumePath());
+        auto relativePath = fs::relative(currentDir, mpc.paths->defaultLocalVolumePath());
 
         for (auto& pathSegment : relativePath)
         {
@@ -248,7 +247,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
         return;
     }
 
-    const auto path = overridePath.empty() ? Paths::autoSavePath() : fs::path(overridePath);
+    const auto path = overridePath.empty() ? mpc.paths->autoSavePath() : fs::path(overridePath);
     const auto apsFile = path / "APS.APS";
     const auto allFile = path / "ALL.ALL";
     const auto soundIndexFile = path / "soundIndex.txt";

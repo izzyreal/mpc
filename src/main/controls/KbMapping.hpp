@@ -7,6 +7,10 @@
 
 #include "wrpkey/key.hxx"
 
+namespace mpc {
+    class Mpc;
+}
+
 namespace mpc::controls
 {
 class KbMapping
@@ -23,12 +27,13 @@ public:
     void importMapping();
     std::vector<std::pair<std::string, int>>& getLabelKeyMap();
 
-    KbMapping();
+    KbMapping(mpc::Mpc&);
 
     static int getNextKeyCode(int keyCode);
     static int getPreviousKeyCode(int keyCode);
 
 private:
+    mpc::Mpc& mpc;
     const static WonderRabbitProject::key::key_helper_t* kh;
     std::vector<std::pair<std::string, int>> labelKeyMap;
 

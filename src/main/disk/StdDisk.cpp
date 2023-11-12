@@ -39,7 +39,7 @@ void StdDisk::initFiles()
 	files.clear();
 	allFiles.clear();
 
-    AkaiFileRenamer::renameFilesInDirectory(getDir()->fs_path);
+    AkaiFileRenamer::renameFilesInDirectory(mpc, getDir()->fs_path);
 
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 

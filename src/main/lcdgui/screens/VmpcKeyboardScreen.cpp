@@ -111,7 +111,7 @@ void VmpcKeyboardScreen::setLearning(bool b)
 
 bool VmpcKeyboardScreen::hasMappingChanged()
 {
-    auto persisted = KbMapping();
+    auto persisted = KbMapping(mpc);
     auto inMem = mpc.getControls()->getKbMapping().lock();
 
     for (auto& mapping : inMem->getLabelKeyMap())

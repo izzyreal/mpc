@@ -3,7 +3,6 @@
 #include <nvram/DefaultsParser.hpp>
 
 #include <Mpc.hpp>
-#include <Paths.hpp>
 
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
@@ -23,7 +22,7 @@ using namespace mpc::lcdgui::screens;
 
 void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
-  const auto path = mpc::Paths::configPath() / "nvram.vmp";
+  const auto path = mpc.paths->configPath() / "nvram.vmp";
 
   if (!fs::exists(path))
   {
@@ -55,7 +54,7 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
   DefaultsParser dp(mpc);
-  auto path = mpc::Paths::configPath() / "nvram.vmp";
+  auto path = mpc.paths->configPath() / "nvram.vmp";
   set_file_data(path, dp.getBytes());
 }
 
@@ -66,7 +65,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
   auto audioMidiServices  = mpc.getAudioMidiServices();
-  auto path = mpc::Paths::configPath() / "vmpc-specific.ini";
+  auto path = mpc.paths->configPath() / "vmpc-specific.ini";
   
   std::vector<char> bytes{
     (char) (vmpcSettingsScreen->initialPadMapping),
@@ -89,7 +88,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 {
   auto audioMidiServices  = mpc.getAudioMidiServices();
 
-  auto path = mpc::Paths::configPath() / "vmpc-specific.ini";
+  auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
   if (!fs::exists(path))
   {

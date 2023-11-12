@@ -11,8 +11,8 @@ namespace mpc::nvram {
 class VolumesPersistence {
 public:
     static void save(mpc::Mpc&);
-    static std::map<std::string, mpc::disk::MountMode> getPersistedConfigs();
-    static std::string getPersistedActiveUUID();
+    static std::map<std::string, mpc::disk::MountMode> getPersistedConfigs(mpc::Mpc&);
+    static std::string getPersistedActiveUUID(mpc::Mpc&);
     
 };
 }

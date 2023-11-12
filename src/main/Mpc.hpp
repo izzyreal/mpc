@@ -10,6 +10,8 @@
 
 #include <Logger.hpp>
 
+#include "Paths.hpp"
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -84,6 +86,7 @@ namespace mpc {
 
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;
+        std::shared_ptr<mpc::Paths> paths;
         std::vector<std::shared_ptr<nvram::MidiControlPreset>> midiControlPresets;
         void init(const int inputCount, const int outputCount);
         void setBank(int i);

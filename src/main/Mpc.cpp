@@ -38,13 +38,18 @@ using namespace mpc::lcdgui;
 
 Mpc::Mpc()
 {
+    paths = std::make_shared<mpc::Paths>();
+}
+
+void Mpc::init(const int inputCount, const int outputCount)
+{
     std::vector<fs::path> requiredPaths {
-        Paths::appDocumentsPath(),
-        Paths::configPath(),
-        Paths::storesPath(),
-        Paths::defaultLocalVolumePath(),
-        Paths::recordingsPath(),
-        Paths::autoSavePath()
+            paths->appDocumentsPath(),
+            paths->configPath(),
+            paths->storesPath(),
+            paths->defaultLocalVolumePath(),
+            paths->recordingsPath(),
+            paths->autoSavePath()
     };
 
     for (auto& p : requiredPaths)
@@ -56,24 +61,24 @@ Mpc::Mpc()
     }
 
     const std::vector<std::string> demo_files{ "TEST1/BASIC_KIT.ALL", "TEST1/BASIC_KIT.APS", "TEST1/BASIC_KIT.MID", "TEST1/BASIC_KIT.PGM",
-                "TEST1/HAT1.SND", "TEST1/KICK1.SND", "TEST1/SNARE4.SND", "TEST2/2PEOPLE2.SND", "TEST2/2PEOPLE3.SND", "TEST2/CLIMAX.SND",
-                "TEST2/FRUTZLE.ALL", "TEST2/FRUTZLE.APS", "TEST2/FRUTZLE.MID", "TEST2/FRUTZLE.PGM", "TEST2/KICKHAT3.SND",
-                "TEST2/KICKHAT5.SND", "TEST2/KICK_C_1.SND", "TEST2/KICK_C_2.SND", "TEST2/MOOI.SND", "TEST2/OBOE.SND",
-                "TEST2/PIAMA2.SND", "TEST2/PIAMA3.SND", "TEST2/RIDE.SND", "TEST2/RIDE1.SND", "TEST2/SOLOBASS.SND",
-                "TEST2/WOOSH.SND" };
+                                               "TEST1/HAT1.SND", "TEST1/KICK1.SND", "TEST1/SNARE4.SND", "TEST2/2PEOPLE2.SND", "TEST2/2PEOPLE3.SND", "TEST2/CLIMAX.SND",
+                                               "TEST2/FRUTZLE.ALL", "TEST2/FRUTZLE.APS", "TEST2/FRUTZLE.MID", "TEST2/FRUTZLE.PGM", "TEST2/KICKHAT3.SND",
+                                               "TEST2/KICKHAT5.SND", "TEST2/KICK_C_1.SND", "TEST2/KICK_C_2.SND", "TEST2/MOOI.SND", "TEST2/OBOE.SND",
+                                               "TEST2/PIAMA2.SND", "TEST2/PIAMA3.SND", "TEST2/RIDE.SND", "TEST2/RIDE1.SND", "TEST2/SOLOBASS.SND",
+                                               "TEST2/WOOSH.SND" };
 
-    if (!fs::exists(Paths::demoDataPath()))
+    if (!fs::exists(paths->demoDataPath()))
     {
-        fs::create_directories(Paths::demoDataPath() / "TEST1");
-        fs::create_directories(Paths::demoDataPath() / "TEST2");
+        fs::create_directories(paths->demoDataPath() / "TEST1");
+        fs::create_directories(paths->demoDataPath() / "TEST2");
         for (auto& demo_file : demo_files)
         {
             const auto data = mpc::ResourceUtil::get_resource_data("demodata/" + demo_file);
-            set_file_data(Paths::demoDataPath() / demo_file, data);
+            set_file_data(paths->demoDataPath() / demo_file, data);
         }
     }
 
-    fs::create_directories(Paths::midiControlPresetsPath());
+    fs::create_directories(paths->midiControlPresetsPath());
 
     const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp" };
 
@@ -81,19 +86,16 @@ Mpc::Mpc()
     {
         const auto data = mpc::ResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
-        if (!fs::exists(Paths::midiControlPresetsPath() / preset) || fs::file_size(Paths::midiControlPresetsPath() / preset) != data.size())
+        if (!fs::exists(paths->midiControlPresetsPath() / preset) || fs::file_size(paths->midiControlPresetsPath() / preset) != data.size())
         {
-            set_file_data(Paths::midiControlPresetsPath() / preset, data);
+            set_file_data(paths->midiControlPresetsPath() / preset, data);
         }
     }
 
-    mpc::Logger::l.setPath(mpc::Paths::logFilePath().string());
+    mpc::Logger::l.setPath(paths->logFilePath().string());
 
-	hardware = std::make_shared<hardware::Hardware>(*this);
-}
+    hardware = std::make_shared<hardware::Hardware>(*this);
 
-void Mpc::init(const int inputCount, const int outputCount)
-{
 	diskController = std::make_unique<mpc::disk::DiskController>(*this);
 
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);

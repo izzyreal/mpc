@@ -1,20 +1,21 @@
 #include "AkaiFileRenamer.hpp"
 
+#include "Mpc.hpp"
+
 #include <cassert>
 
 #include "ShortNameGenerator.hpp"
 #include "ShortName.hpp"
 #include "../file/AkaiName.hpp"
-#include "../Paths.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file;
 
-void AkaiFileRenamer::renameFilesInDirectory(const fs::path& p)
+void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc& mpc, const fs::path& p)
 {
     assert(fs::is_directory(p));
 
-    auto tempRoot = mpc::Paths::tempPath();
+    auto tempRoot = mpc.paths->tempPath();
 
     if (fs::exists(tempRoot))
     {

@@ -1,5 +1,4 @@
 #include "Rectangle.hpp"
-#include <Paths.hpp>
 
 using namespace mpc::lcdgui;
 

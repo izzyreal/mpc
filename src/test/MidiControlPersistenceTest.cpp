@@ -12,8 +12,8 @@ using namespace mpc::lcdgui::screens;
 
 TEST_CASE("Initial state", "[midi-control-persistence]")
 {
-    MidiControlPersistence::deleteLastState();
     mpc::Mpc mpc;
+    MidiControlPersistence::deleteLastState(mpc);
     mpc.init(1, 5);
 
     REQUIRE(!mpc.midiControlPresets.empty());
@@ -40,8 +40,8 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 
 TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
 {
-    MidiControlPersistence::deleteLastState();
     mpc::Mpc mpc;
+    MidiControlPersistence::deleteLastState(mpc);
     mpc.init(1, 5);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
@@ -64,8 +64,8 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
 
 TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 {
-    MidiControlPersistence::deleteLastState();
     mpc::Mpc mpc;
+    MidiControlPersistence::deleteLastState(mpc);
     mpc.init(1, 5);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
@@ -99,7 +99,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Save the preset by pressing ENTER in NameScreen
     controls->function(4);
 
-    const auto newPresetPath = mpc::Paths::midiControlPresetsPath() / "New_preset.vmp";
+    const auto newPresetPath = mpc.paths->midiControlPresetsPath() / "New_preset.vmp";
 
     REQUIRE(fs::exists(newPresetPath));
     auto preset = std::make_shared<MidiControlPreset>();

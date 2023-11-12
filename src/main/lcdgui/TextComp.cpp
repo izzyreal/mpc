@@ -1,7 +1,6 @@
 #include "TextComp.hpp"
 
 #include <Mpc.hpp>
-#include <Paths.hpp>
 
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>

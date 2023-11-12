@@ -1,20 +1,20 @@
 #include "KbMapping.hpp"
 #include "KeyCodes.hpp"
-#include <Paths.hpp>
+#include "Mpc.hpp"
 
 #include <Logger.hpp>
 
 using namespace mpc::controls;
 using namespace WonderRabbitProject::key;
 
-KbMapping::KbMapping()
+KbMapping::KbMapping(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
 {
     importMapping();
 }
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
 
 void KbMapping::exportMapping() {
-	const auto path = mpc::Paths::configPath() / "keys.txt";
+	const auto path = mpc.paths->configPath() / "keys.txt";
 
     std::vector<char> bytes;
 	
@@ -39,7 +39,7 @@ void KbMapping::exportMapping() {
 void KbMapping::importMapping()
 {
     labelKeyMap.clear();
-    const auto path = mpc::Paths::configPath() / "keys.txt";
+    const auto path = mpc.paths->configPath() / "keys.txt";
 
     if (!fs::exists(path))
     {

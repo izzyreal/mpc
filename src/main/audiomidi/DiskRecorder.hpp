@@ -14,6 +14,8 @@
 #include <atomic>
 #endif
 
+namespace mpc { class Mpc; }
+
 namespace mpc::audiomidi {
 
 	class DiskRecorder
@@ -36,7 +38,7 @@ namespace mpc::audiomidi {
 	public:
 		bool start();
 		bool stopEarly();
-		bool prepare(int lengthInFrames, int sampleRate, bool isStereo);
+		bool prepare(mpc::Mpc&, int lengthInFrames, int sampleRate, bool isStereo);
 		int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 
 	public:

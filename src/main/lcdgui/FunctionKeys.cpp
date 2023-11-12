@@ -3,8 +3,6 @@
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Background.hpp>
 
-#include <Paths.hpp>
-
 #include <Mpc.hpp>
 
 using namespace mpc::lcdgui;

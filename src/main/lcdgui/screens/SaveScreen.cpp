@@ -2,7 +2,6 @@
 
 #include <cstdint>
 
-#include <Paths.hpp>
 #include <sequencer/Track.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
@@ -377,7 +376,7 @@ void SaveScreen::displayFree()
     std::uintmax_t availableSpaceInBytes = 0;
 
     try {
-        availableSpaceInBytes = fs::space(mpc::Paths::storesPath()).available;
+        availableSpaceInBytes = fs::space(mpc.paths->storesPath()).available;
     } catch (fs::filesystem_error&) {
         MLOG("An exception occurred when SaveScreen::displayFree was trying to query available space!");
     }

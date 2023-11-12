@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Mpc.hpp"
 #include "mpc_fs.hpp"
 #include "MidiControlCommand.hpp"
 
 #include <string>
 #include <vector>
 #include <memory>
+
+namespace mpc { class Mpc; }
 
 namespace mpc::nvram {
     struct MidiControlPreset {
@@ -22,8 +23,8 @@ namespace mpc::nvram {
         static void saveVmpcMidiScreenPresetToFile(mpc::Mpc& mpc, fs::path p, std::string name);
 
     public:
-        static bool doesPresetWithNameExist(std::string name);
-        static void deleteLastState();
+        static bool doesPresetWithNameExist(mpc::Mpc&, std::string name);
+        static void deleteLastState(mpc::Mpc&);
         static void loadFileByNameIntoPreset(mpc::Mpc&, std::string name, std::shared_ptr<MidiControlPreset>);
         static void loadAllPresetsFromDiskIntoMemory(mpc::Mpc&);
 

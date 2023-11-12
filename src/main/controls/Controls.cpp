@@ -20,7 +20,7 @@ Controls::Controls(mpc::Mpc& _mpc) :
 	baseControls (std::make_shared<BaseControls>(_mpc)),
 	releaseControls (std::make_shared<GlobalReleaseControls>(_mpc)),
 	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
-	kbMapping (std::make_shared<KbMapping>())
+	kbMapping (std::make_shared<KbMapping>(_mpc))
 {
 }
 

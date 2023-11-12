@@ -29,7 +29,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
 
     checkFileExistsAndSavePresetAndShowPopup = [this](std::string& presetName) {
 
-        if (MidiControlPersistence::doesPresetWithNameExist(presetName))
+        if (MidiControlPersistence::doesPresetWithNameExist(this->mpc, presetName))
         {
             auto replaceAction = [this, presetName]{
                 auto vmpcMidiScreen = this->mpc.screens->get<VmpcMidiScreen>("vmpc-midi");

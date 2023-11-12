@@ -2,8 +2,6 @@
 
 #include "ResourceUtil.h"
 
-#include <Paths.hpp>
-
 #include "LodePNG.hpp"
 
 using namespace mpc::lcdgui;

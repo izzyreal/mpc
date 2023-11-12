@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include "Paths.hpp"
 
 #include <disk/MpcFile.hpp>
 #include <disk/ApsLoader.hpp>
@@ -370,7 +369,7 @@ void AbstractDisk::writeAll(const std::string& fileName)
 
 void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> preset)
 {
-    std::function<preset_or_error()> ioFunc = [preset] {
+    std::function<preset_or_error()> ioFunc = [preset, this] {
         std::vector<char> data;
 
         data.push_back(preset->autoloadMode);
@@ -395,7 +394,7 @@ void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> pre
                 data.push_back(b);
         }
 
-        auto presetPath = mpc::Paths::midiControlPresetsPath() / (preset->name + ".vmp");
+        auto presetPath = mpc.paths->midiControlPresetsPath() / (preset->name + ".vmp");
 
         set_file_data(presetPath, data);
 

@@ -1,7 +1,6 @@
 #include "DiskController.hpp"
 
 #include <Mpc.hpp>
-#include <Paths.hpp>
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/StdDisk.hpp>
@@ -29,7 +28,7 @@ void DiskController::initDisks()
     defaultVolume.type = LOCAL_DIRECTORY;
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "DEFAULT";
-    defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath().string();
+    defaultVolume.localDirectoryPath = mpc.paths->defaultLocalVolumePath().string();
     defaultVolume.volumeSize = fs::space(defaultVolume.localDirectoryPath).capacity;
     disks.back()->initRoot();
     
@@ -37,7 +36,7 @@ void DiskController::initDisks()
 
     detectRawUsbVolumes();
 
-    auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID();
+    auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID(mpc);
     MLOG("Persisted UUID: " + persistedActiveUUID);
     
     for (int i = 0; i < disks.size(); i++)
@@ -135,7 +134,7 @@ void DiskController::detectRawUsbVolumes()
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     MLOG("Iterating through scraped USB volumes...");
-    auto persistedConfigs = VolumesPersistence::getPersistedConfigs();
+    auto persistedConfigs = VolumesPersistence::getPersistedConfigs(mpc);
 
     for (int i = static_cast<int>(disks.size()) - 1; i >= 0; i--)
     {

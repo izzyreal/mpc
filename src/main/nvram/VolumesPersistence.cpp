@@ -1,7 +1,6 @@
 #include "VolumesPersistence.hpp"
 
-#include <Mpc.hpp>
-#include <Paths.hpp>
+#include "Mpc.hpp"
 #include <disk/AbstractDisk.hpp>
 
 #include <rapidjson/document.h>
@@ -11,14 +10,15 @@ using namespace mpc::nvram;
 using namespace mpc::disk;
 using namespace rapidjson;
 
-const auto volumesPersistencePath = mpc::Paths::configPath() / "volumes.json";
+fs::path getVolumesPersistencePath(mpc::Mpc& mpc) { return mpc.paths->configPath() / "volumes.json"; }
+
 const size_t bufSize = 2048;
 
-Document read()
+Document read(mpc::Mpc& mpc)
 {
     Document result;
 
-    const auto path = fs::path(volumesPersistencePath);
+    const auto path = getVolumesPersistencePath(mpc);
     
     if (fs::exists(path))
     {
@@ -39,9 +39,9 @@ Document read()
     return result;
 }
 
-std::string VolumesPersistence::getPersistedActiveUUID()
+std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc& mpc)
 {
-    Document doc = read();
+    Document doc = read(mpc);
     Value& volumes = doc["volumes"];
 
     for (auto i = volumes.Begin(); i != volumes.End(); i++)
@@ -56,11 +56,11 @@ std::string VolumesPersistence::getPersistedActiveUUID()
     return "";
 }
 
-std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs()
+std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs(mpc::Mpc& mpc)
 {
     std::map<std::string, MountMode> persistedConfigs;
     
-    Document doc = read();
+    Document doc = read(mpc);
     Value& volumes = doc["volumes"];
     
     for (auto i = volumes.Begin(); i != volumes.End(); i++)
@@ -74,7 +74,7 @@ std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs()
 
 void VolumesPersistence::save(mpc::Mpc & mpc)
 {
-    Document d = read();
+    Document d = read(mpc);
         
     Value& volumes = d["volumes"];
     
@@ -120,7 +120,6 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
         }
     }
 
-    const auto path = fs::path(volumesPersistencePath);
     StringBuffer buffer;
 
     Writer<StringBuffer> writer(buffer);
@@ -128,5 +127,6 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
 
     const char* data = buffer.GetString();
 
+    const auto path = getVolumesPersistencePath(mpc);
     set_file_data(path, std::vector<char>{data, data + buffer.GetSize() });
 }

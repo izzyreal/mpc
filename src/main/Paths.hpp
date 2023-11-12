@@ -6,22 +6,22 @@ namespace mpc {
 class Paths
 {
 private:
-    static fs::path appConfigHome();
+    fs::path appConfigHome();
 
 public:
-    static fs::path appDocumentsPath();
+    fs::path appDocumentsPath();
 
-    static fs::path storesPath();
-    static fs::path defaultLocalVolumePath();
+    fs::path storesPath();
+    fs::path defaultLocalVolumePath();
 
-    static fs::path logFilePath();
-    static fs::path recordingsPath();
-    static fs::path midiControlPresetsPath();
-    static fs::path autoSavePath();
+    fs::path logFilePath();
+    fs::path recordingsPath();
+    fs::path midiControlPresetsPath();
+    fs::path autoSavePath();
 
-    static fs::path configPath();
-    static fs::path demoDataPath();
-    static fs::path tempPath();
+    fs::path configPath();
+    fs::path demoDataPath();
+    fs::path tempPath();
 
 };
 }

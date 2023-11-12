@@ -4,7 +4,7 @@
 #include <engine/audio/core/AudioBuffer.hpp>
 
 #include <audiomidi/WavOutputFileStream.hpp>
-#include <Paths.hpp>
+#include "Mpc.hpp"
 
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
@@ -17,7 +17,7 @@ DiskRecorder::DiskRecorder(mpc::engine::audio::core::AudioProcess* process, int 
 {
 }
 
-bool DiskRecorder::prepare(int lengthInFrames, int sampleRate, bool isStereo)
+bool DiskRecorder::prepare(mpc::Mpc& mpc, int lengthInFrames, int sampleRate, bool isStereo)
 {
     if (writing.load())
     {
@@ -31,7 +31,7 @@ bool DiskRecorder::prepare(int lengthInFrames, int sampleRate, bool isStereo)
         const auto fileName = isStereo ? fileNamesStereo[index] :
                 (i == 0 ? fileNamesMono[index].first : fileNamesMono[index].second);
 
-        auto absolutePath = mpc::Paths::recordingsPath() / fileName;
+        auto absolutePath = mpc.paths->recordingsPath() / fileName;
 
         fileStreams.push_back(wav_init_ofstream(absolutePath));
 

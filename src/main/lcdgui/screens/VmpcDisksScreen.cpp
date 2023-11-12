@@ -165,7 +165,7 @@ void VmpcDisksScreen::down()
 
 bool VmpcDisksScreen::hasConfigChanged()
 {
-    auto persisted = VolumesPersistence::getPersistedConfigs();
+    auto persisted = VolumesPersistence::getPersistedConfigs(mpc);
     
     for (auto& kv : config)
     {
