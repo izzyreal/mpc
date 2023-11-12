@@ -9,14 +9,14 @@
 
 using namespace mpc;
 
-std::string getBundleResourcesPath();
+std::string getMacMainBundleResourcesPath();
 
 std::string MacBundleResources::getResourcePath(const std::string& resourceName) {
     CFStringRef bundleIdentifier = CFStringCreateWithCString(kCFAllocatorDefault, "nl.izmar.vmpc2000xl", kCFStringEncodingUTF8);
     CFBundleRef bundle = CFBundleGetBundleWithIdentifier(bundleIdentifier);
 
     if (!bundle) {
-        const auto fallbackResourcesPath = getBundleResourcesPath();
+        const auto fallbackResourcesPath = getMacMainBundleResourcesPath();
         if (!fallbackResourcesPath.empty())
         {
             return fallbackResourcesPath + "/" + resourceName;
