@@ -49,8 +49,6 @@ void AudioServer::removeAudioBuffer(mpc::engine::audio::core::AudioBuffer* buffe
 
 AudioServer::~AudioServer() {
 	for (auto& b : buffers) {
-		if (b != nullptr) {
-			delete b;
-		}
+        delete b;
 	}
 }

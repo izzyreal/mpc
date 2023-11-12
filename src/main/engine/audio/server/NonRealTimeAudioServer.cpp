@@ -24,7 +24,7 @@ void NonRealTimeAudioServer::setSampleRate(int rate)
 	server->setSampleRate(rate);
 }
 
-void NonRealTimeAudioServer::setWeakPtr(shared_ptr<NonRealTimeAudioServer> sharedPtr) {
+void NonRealTimeAudioServer::setSharedPtr(shared_ptr<NonRealTimeAudioServer> sharedPtr) {
 	me = sharedPtr;
 }
 
@@ -114,12 +114,12 @@ void NonRealTimeAudioServer::stopNRT()
 void NonRealTimeAudioServer::close()
 {
 	server->close();
+    server = nullptr;
 }
 
 void NonRealTimeAudioServer::setClient(shared_ptr<AudioClient> client)
 {
-	auto lServer = server;
-	lServer->setClient(me);
+	server->setClient(me);
     this->client = client;
     if(startASAP) {
         startASAP = false;

@@ -134,6 +134,6 @@ namespace mpc::audiomidi
 
 	public:
 		AudioMidiServices(mpc::Mpc& mpcToUse);
-
+        ~AudioMidiServices();
 	};
 }

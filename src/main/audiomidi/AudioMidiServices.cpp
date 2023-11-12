@@ -52,6 +52,11 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc& mpcToUse)
     frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse);
 }
 
+AudioMidiServices::~AudioMidiServices()
+{
+    offlineServer->setSharedPtr(nullptr);
+}
+
 void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
 	server = std::make_shared<ExternalAudioServer>();
@@ -109,7 +114,7 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
 	mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
 
-	offlineServer->setWeakPtr(offlineServer);
+	offlineServer->setSharedPtr(offlineServer);
 	offlineServer->setClient(cac);
 
 	offlineServer->start();

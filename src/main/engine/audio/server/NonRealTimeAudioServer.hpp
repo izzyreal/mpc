@@ -15,7 +15,6 @@ namespace mpc::engine::audio::server {
     {
 
     private:
-
         std::shared_ptr<NonRealTimeAudioServer> me;
 
         bool realTime{true};
@@ -40,7 +39,7 @@ namespace mpc::engine::audio::server {
 
         bool isRealTime();
 
-        void setWeakPtr(std::shared_ptr<NonRealTimeAudioServer> sharedPtr);
+        void setSharedPtr(std::shared_ptr<NonRealTimeAudioServer> sharedPtr);
 
     public:
         // implement AudioServer
