@@ -665,18 +665,17 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength, int swing
 
 	for (auto& event : events)
 	{
-		auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-		if (ne)
+		if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event))
 		{
-			if (event->getTick() >= endPos)
+			if (noteEvent->getTick() >= endPos)
             {
                 break;
             }
 
-			if (event->getTick() >= startPos && event->getTick() < endPos)
+			if (noteEvent->getTick() >= startPos && noteEvent->getTick() < endPos &&
+                noteEvent->getNote() >= lowestNote && noteEvent->getNote() <= highestNote)
             {
-                timingCorrect(fromBar, toBar, ne, stepLength, swingPercentage);
+                timingCorrect(fromBar, toBar, noteEvent, stepLength, swingPercentage);
             }
 		}
 	}
