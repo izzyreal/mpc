@@ -8,8 +8,6 @@
 #include "engine/Drum.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 
-#include <Observer.hpp>
-
 #include <set>
 #include <memory>
 #include <atomic>
@@ -49,7 +47,6 @@ namespace mpc::audiomidi
 {
 
 	class AudioMidiServices final
-		: public Observable
 	{
 
 	private:
