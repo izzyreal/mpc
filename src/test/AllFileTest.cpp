@@ -61,7 +61,6 @@ TEST_CASE("ALL file song", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 1);
     auto sequencer = mpc.getSequencer();
 
     sequencer->getSequence(0)->init(1);
@@ -99,7 +98,6 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 1);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     seq->getTrack(60)->setUsed(false);
@@ -133,7 +131,6 @@ TEST_CASE("ALL file note event", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 1);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     auto tr = seq->getTrack(63);
@@ -172,7 +169,6 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 1);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     seq->getTrack(60)->setDeviceIndex(1);

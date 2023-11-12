@@ -39,7 +39,6 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
 
@@ -88,7 +87,6 @@ TEST_CASE("Sort sounds by name", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
 
@@ -137,7 +135,6 @@ TEST_CASE("Sort sounds by size", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
 
@@ -188,7 +185,6 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
 
@@ -234,7 +230,6 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     prepareSamplerResources(mpc);
 
@@ -290,7 +285,6 @@ TEST_CASE("Delete sound 1", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     auto sampler = mpc.getSampler();
     auto program = sampler->getProgram(0);
@@ -314,7 +308,6 @@ TEST_CASE("Delete sound 2", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     auto sampler = mpc.getSampler();
     auto program = sampler->getProgram(0);
@@ -338,7 +331,6 @@ TEST_CASE("Purge unused sounds", "[sampler]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     auto sampler = mpc.getSampler();
     auto program = sampler->getProgram(0);

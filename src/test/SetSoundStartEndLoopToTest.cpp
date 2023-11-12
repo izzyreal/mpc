@@ -20,7 +20,6 @@ const uint16_t MAX_SLIDER_VALUE = 127;
 
 std::shared_ptr<Sound> initSound(mpc::Mpc& mpc)
 {
-    mpc.init(1, 1);
     auto sound = mpc.getSampler()->addSound();
     sound->setMono(true);
     std::vector<float> silence(SOUND_LENGTH);

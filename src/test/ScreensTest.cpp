@@ -161,9 +161,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 	GIVEN("An initialized Mpc with an initialized Sequence") {
 		mpc::Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
-        mpc.init(1, 5);
-        
-        
+
         auto s = mpc.getSampler()->addSound();
         s->setMono(true);
         s->setName("test");

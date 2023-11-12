@@ -24,7 +24,7 @@ namespace mpc::nvram {
 
     public:
         static bool doesPresetWithNameExist(mpc::Mpc&, std::string name);
-        static void deleteLastState(mpc::Mpc&);
+
         static void loadFileByNameIntoPreset(mpc::Mpc&, std::string name, std::shared_ptr<MidiControlPreset>);
         static void loadAllPresetsFromDiskIntoMemory(mpc::Mpc&);
 

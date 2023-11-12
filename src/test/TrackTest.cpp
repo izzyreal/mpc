@@ -12,7 +12,6 @@ TEST_CASE("timing-correct", "[track]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(0);
     auto tr = seq->getTrack(0);
@@ -62,7 +61,6 @@ TEST_CASE("swing1", "[track]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(0);
     auto tr = seq->getTrack(0);
@@ -98,7 +96,6 @@ TEST_CASE("quantize", "[track]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(0);
     auto tr = seq->getTrack(0);

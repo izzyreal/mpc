@@ -13,8 +13,6 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    MidiControlPersistence::deleteLastState(mpc);
-    mpc.init(1, 5);
 
     REQUIRE(!mpc.midiControlPresets.empty());
 
@@ -42,8 +40,6 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    MidiControlPersistence::deleteLastState(mpc);
-    mpc.init(1, 5);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     auto controls = mpc.getActiveControls();
@@ -67,8 +63,6 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    MidiControlPersistence::deleteLastState(mpc);
-    mpc.init(1, 5);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     auto controls = mpc.getActiveControls();

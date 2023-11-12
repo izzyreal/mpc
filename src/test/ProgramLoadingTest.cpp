@@ -51,8 +51,6 @@ void doTest(mpc::Mpc& mpc,
             std::shared_ptr<sampler::Program>& p1,
             std::shared_ptr<sampler::Program>& p2)
 {
-    mpc.init(1, 5);
-
     mpc.screens->get<LoadAProgramScreen>("load-a-program")->setLoadReplaceSameSound(replaceSameSounds);
 
     prepareResources(mpc);
@@ -152,8 +150,6 @@ void doTestWithMissingSound(mpc::Mpc& mpc,
                             std::shared_ptr<sampler::Program>& p1,
                             std::shared_ptr<sampler::Program>& p2)
 {
-    mpc.init(1, 5);
-
     mpc.screens->get<LoadAProgramScreen>("load-a-program")->setLoadReplaceSameSound(replaceSameSounds);
 
     prepareResources(mpc);

@@ -1,8 +1,11 @@
 #include "TestPaths.hpp"
 
+fs::path mpc::TestPaths::appConfigHome()
+{
+    return appDocumentsPath() / "config";
+}
+
 fs::path mpc::TestPaths::appDocumentsPath()
 {
-    auto tmpDocsPath = fs::temp_directory_path();
-    tmpDocsPath = tmpDocsPath / "VMPC2000XL-test";
-    return tmpDocsPath;
+    return fs::temp_directory_path() / "VMPC2000XL-test";;
 }

@@ -5,8 +5,8 @@
 namespace mpc {
 class Paths
 {
-private:
-    fs::path appConfigHome();
+protected:
+    virtual fs::path appConfigHome();
 
 public:
     virtual fs::path appDocumentsPath();

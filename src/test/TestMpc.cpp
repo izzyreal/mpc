@@ -10,4 +10,5 @@ void mpc::TestMpc::initializeTestMpc(mpc::Mpc& mpc)
     auto testDocPath = mpc.paths->appDocumentsPath();
     fs::remove_all(testDocPath);
     fs::create_directories(testDocPath);
+    mpc.init(1, 5);
 }

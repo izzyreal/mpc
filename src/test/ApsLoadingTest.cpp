@@ -35,7 +35,6 @@ void prepareApsResources(mpc::Mpc& mpc)
 
 void doApsTest(mpc::Mpc& mpc)
 {
-    mpc.init(1, 5);
     prepareApsResources(mpc);
 
     auto disk = mpc.getDisk();

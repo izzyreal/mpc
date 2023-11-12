@@ -198,16 +198,6 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
     }
 }
 
-void MidiControlPersistence::deleteLastState(mpc::Mpc& mpc)
-{
-    auto lastStatePath = mpc.paths->configPath() / "midicontrolmapping.vmp";
-
-    if (fs::exists(lastStatePath))
-    {
-        fs::remove(lastStatePath);
-    }
-}
-
 bool MidiControlPersistence::doesPresetWithNameExist(mpc::Mpc& mpc, std::string name)
 {
     auto path_it = fs::directory_iterator(mpc.paths->midiControlPresetsPath());

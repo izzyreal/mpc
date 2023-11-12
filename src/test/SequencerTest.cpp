@@ -23,7 +23,6 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
     auto pos = [&]{ return mpc.getSequencer()->getTickPosition();};
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
@@ -69,7 +68,6 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
 
     auto seq = mpc.getSequencer();
     seq->setCountEnabled(false);
@@ -156,7 +154,6 @@ TEST_CASE("Copy sequence", "[sequencer]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(1, 5);
     auto sequencer = mpc.getSequencer();
     sequencer->setTempo(121);
 
@@ -196,7 +193,6 @@ TEST_CASE("Undo", "[sequencer]")
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc.init(0, 1);
 
     auto sequencer = mpc.getSequencer();
     sequencer->setCountEnabled(false);
