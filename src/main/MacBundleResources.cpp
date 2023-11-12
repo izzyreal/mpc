@@ -9,29 +9,16 @@
 
 using namespace mpc;
 
-std::string getMacMainBundleResourcesPath();
-
 std::string MacBundleResources::getResourcePath(const std::string& resourceName) {
     CFStringRef bundleIdentifier = CFStringCreateWithCString(kCFAllocatorDefault, "nl.izmar.vmpc2000xl", kCFStringEncodingUTF8);
     CFBundleRef bundle = CFBundleGetBundleWithIdentifier(bundleIdentifier);
 
-    if (!bundle) {
-        const auto fallbackResourcesPath = getMacMainBundleResourcesPath();
-        if (!fallbackResourcesPath.empty())
-        {
-            return fallbackResourcesPath + "/" + resourceName;
-        }
-        return "";
-    }
-
-    // Convert resourceName to CFString
     CFStringRef resourceNameCF = CFStringCreateWithCString(nullptr, resourceName.c_str(), kCFStringEncodingUTF8);
     if (!resourceNameCF) {
         std::cerr << "Failed to create CFString." << std::endl;
         return "";
     }
 
-    // Get the resource URL
     CFURLRef resourceURL = CFBundleCopyResourceURL(bundle, resourceNameCF, nullptr, nullptr);
     CFRelease(resourceNameCF);
 
@@ -40,7 +27,6 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
         return "";
     }
 
-    // Convert the URL to a file system path
     CFStringRef resourcePathCF = CFURLCopyFileSystemPath(resourceURL, kCFURLPOSIXPathStyle);
     CFRelease(resourceURL);
 
@@ -49,7 +35,6 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
         return "";
     }
 
-    // Convert CFString to std::string
     const char* resourcePathCStr = CFStringGetCStringPtr(resourcePathCF, kCFStringEncodingUTF8);
     std::string resourcePath(resourcePathCStr);
 
