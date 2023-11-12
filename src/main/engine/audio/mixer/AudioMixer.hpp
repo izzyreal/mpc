@@ -35,8 +35,6 @@ namespace mpc::engine::audio::mixer {
     public:
         std::shared_ptr<MixerControls> getMixerControls();
 
-        std::shared_ptr<mpc::engine::audio::server::AudioServer> getAudioServer();
-
     public:
         mpc::engine::audio::core::AudioBuffer *getSharedBuffer();
 

@@ -12,17 +12,12 @@ using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;
 
-AudioMixer::AudioMixer(const std::shared_ptr<MixerControls>& controls, const std::shared_ptr<AudioServer>& server)
+AudioMixer::AudioMixer(const std::shared_ptr<MixerControls>& controlsToUse, const std::shared_ptr<AudioServer>& serverToUse)
+: controls(controlsToUse), server(serverToUse)
 {
-	this->controls = controls;
-	this->server = server;
 	sharedAudioBuffer = server->createAudioBuffer("Mixer (shared)");
 	createBusses(controls);
 	createStrips(controls);
-}
-
-std::shared_ptr<AudioServer> AudioMixer::getAudioServer() {
-	return server;
 }
 
 std::shared_ptr<MixerControls> AudioMixer::getMixerControls()
