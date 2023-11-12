@@ -12,6 +12,7 @@ using namespace mpc;
 std::string MacBundleResources::getResourcePath(const std::string& resourceName) {
     CFStringRef bundleIdentifier = CFStringCreateWithCString(kCFAllocatorDefault, "nl.izmar.vmpc2000xl", kCFStringEncodingUTF8);
     CFBundleRef bundle = CFBundleGetBundleWithIdentifier(bundleIdentifier);
+    CFRelease(bundleIdentifier);
 
     CFStringRef resourceNameCF = CFStringCreateWithCString(nullptr, resourceName.c_str(), kCFStringEncodingUTF8);
     if (!resourceNameCF) {

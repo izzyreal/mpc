@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <thread>
+#include <atomic>
 
 namespace mpc { class Mpc; }
 
@@ -14,7 +15,7 @@ namespace mpc::audiomidi {
         ~MidiDeviceDetector();
 
     private:
-        bool running = false;
+        std::atomic_bool running = false;
         std::thread* pollThread;
         std::set<std::string> deviceNames;
         auto lower_my_priority() -> bool;

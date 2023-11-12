@@ -107,12 +107,9 @@ MidiDeviceDetector::~MidiDeviceDetector()
 {
     running = false;
 
-    while (!pollThread->joinable())
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    if (pollThread && pollThread->joinable()) {
+        pollThread->join();
     }
-
-    pollThread->join();
 
     delete pollThread;
 }
