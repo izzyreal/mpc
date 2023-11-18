@@ -21,6 +21,14 @@ DiskRecorder::DiskRecorder(mpc::Mpc& mpcToUse, AudioProcess* process, int indexT
 
 bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStereo)
 {
+    if (bufferLeft.empty())
+    {
+        ringBufferLeft = moodycamel::ReaderWriterQueue<float>(BUFFER_SIZE);
+        ringBufferRight = moodycamel::ReaderWriterQueue<float>(BUFFER_SIZE);
+        bufferLeft = std::vector<float>(BUFFER_SIZE);
+        bufferRight = std::vector<float>(BUFFER_SIZE);
+    }
+
     if (writing.load())
     {
         return false;
@@ -56,6 +64,15 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStere
     if (isStereo)
     {
         lengthInBytes *= 2;
+        byteBufferLeft.clear();
+        byteBufferRight.clear();
+        stereoByteBuffer = std::vector<char>(BUFFER_SIZE * 2 * 2);
+    }
+    else
+    {
+        byteBufferLeft = std::vector<char>(BUFFER_SIZE * 2);
+        byteBufferRight = std::vector<char>(BUFFER_SIZE * 2);
+        stereoByteBuffer.clear();
     }
 	
     delete outputFileFormat;
@@ -74,9 +91,18 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStere
     writeThread = std::thread([this]{
         while (preparedToWrite.load() || writing.load())
         {
-            writeRingBufferToDisk();
             std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            writeRingBufferToDisk();
         }
+
+        ringBufferLeft = moodycamel::ReaderWriterQueue<float>(0);
+        ringBufferRight = moodycamel::ReaderWriterQueue<float>(0);
+        bufferLeft.clear();
+        bufferRight.clear();
+
+        byteBufferLeft.clear();
+        byteBufferRight.clear();
+        stereoByteBuffer.clear();
     });
 
 	return true;
