@@ -100,6 +100,11 @@ unsigned short FrameSeqBase::getEventFrameOffset() const
     return tickFrameOffset;
 }
 
+unsigned short FrameSeqBase::getBounceFrameOffset() const
+{
+    return bounceFrameOffset;
+}
+
 void FrameSeqBase::stop()
 {
     if (!running.load())
@@ -109,6 +114,8 @@ void FrameSeqBase::stop()
 
     running.store(false);
     sequencerShouldStartPlayingOnNextLock = false;
+    wasBouncing = false;
+    bounceFrameOffset = 0;
     tickFrameOffset = 0;
 }
 
@@ -503,6 +510,12 @@ bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameInde
     if (mpc.getAudioMidiServices()->isBouncing())
     {
         auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+
+        if (!wasBouncing)
+        {
+            wasBouncing = true;
+            bounceFrameOffset = tickFrameOffset;
+        }
 
         return directToDiskRecorderScreen->getRecord() != 4;
     }
