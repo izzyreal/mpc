@@ -952,7 +952,8 @@ const std::vector<std::string> BaseControls::screensThatOnlyAllowPlay {
     "song",
     "track-mute",
     "next-seq",
-    "next-seq-pad"
+    "next-seq-pad",
+    "vmpc-recording-finished"
 };
 
 const std::vector<std::string> BaseControls::allowCentralNoteAndPadUpdateScreens{

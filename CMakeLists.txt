@@ -82,7 +82,15 @@ FetchContent_Declare(concurrentqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/concurrentqueue
 )
 
+FetchContent_Declare(readerwriterqueue
+    GIT_REPOSITORY https://github.com/cameron314/readerwriterqueue.git
+    GIT_TAG        master
+    GIT_SHALLOW    ON
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/readerwriterqueue
+)
+
 FetchContent_Populate(concurrentqueue)
+FetchContent_Populate(readerwriterqueue)
 
 FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
 
@@ -133,6 +141,7 @@ target_include_directories(mpc PUBLIC
     ${tl-expected_SOURCE_DIR}/include
     ${libsamplerate_SOURCE_DIR}/include
     ${concurrentqueue_SOURCE_DIR}
+    ${readerwriterqueue_SOURCE_DIR}
 )
 
 target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders)

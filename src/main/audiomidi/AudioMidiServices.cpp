@@ -284,7 +284,7 @@ void AudioMidiServices::initializeDiskRecorders()
 {
     for (int i = 0; i < outputProcesses.size(); i++)
     {
-        auto diskRecorder = std::make_shared<DiskRecorder>(outputProcesses[i], i);
+        auto diskRecorder = std::make_shared<DiskRecorder>(mpc, outputProcesses[i], i);
 
         diskRecorders.push_back(diskRecorder);
 
@@ -330,7 +330,7 @@ bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	{
 		auto eapa = diskRecorders[i];
 
-		if (!eapa->prepare(mpc, settings->lengthInFrames, settings->sampleRate, !settings->split))
+		if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate, !settings->split))
         {
             return false;
         }
@@ -340,20 +340,23 @@ bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	return true;
 }
 
-bool AudioMidiServices::startBouncing()
+void AudioMidiServices::startBouncing()
 {
 	if (!bouncePrepared)
-		return false;
+    {
+        return;
+    }
 
 	bouncePrepared = false;
 	bouncing.store(true);
-	return true;
 }
 
-bool AudioMidiServices::stopBouncing()
+void AudioMidiServices::stopBouncing()
 {
 	if (!bouncing.load())
-		return false;
+    {
+        return;
+    }
 
 	mpc.getLayeredScreen()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
@@ -366,21 +369,21 @@ bool AudioMidiServices::stopBouncing()
         seq->setLoopEnabled(true);
         directToDiskRecorderScreen->loopWasEnabled = false;
     }
-
-    return true;
 }
 
-bool AudioMidiServices::stopBouncingEarly()
+void AudioMidiServices::stopBouncingEarly()
 {
 	if (!bouncing.load())
-		return false;
+    {
+        return;
+    }
 
 	for (auto& recorder : diskRecorders)
-		recorder->stopEarly();
+    {
+        recorder->stopEarly();
+    }
 
-	mpc.getLayeredScreen()->openScreen("vmpc-recording-finished");
-	bouncing.store(false);
-	return true;
+    stopBouncing();
 }
 
 void AudioMidiServices::startRecordingSound()
