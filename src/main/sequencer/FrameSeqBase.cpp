@@ -22,6 +22,7 @@
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/PunchScreen.hpp"
@@ -126,6 +127,11 @@ void FrameSeqBase::move(int newTickPos)
     sequencerPlayTickCounter = newTickPos;
     sequencer->move(newTickPos);
     updateTimeDisplay();
+}
+
+void FrameSeqBase::setSequencerPlayTickCounter(unsigned long long value)
+{
+    sequencerPlayTickCounter = value;
 }
 
 std::shared_ptr<Sequence> FrameSeqBase::switchToNextSequence()
@@ -494,6 +500,13 @@ void FrameSeqBase::processEventsAfterNFrames(int frameIndex)
 
 bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameIndex)
 {
+    if (mpc.getAudioMidiServices()->isBouncing())
+    {
+        auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+
+        return directToDiskRecorderScreen->getRecord() != 4;
+    }
+
     const auto lockedToClock = midiClockTickCounter++ == 0;
 
     if (midiClockTickCounter == 4)

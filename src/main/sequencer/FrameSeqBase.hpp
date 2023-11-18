@@ -150,5 +150,7 @@ namespace mpc::sequencer {
 
         void enqueueEventAfterNFrames(const std::function<void(unsigned int)> &event, unsigned long nFrames);
 
+        void setSequencerPlayTickCounter(unsigned long long);
+
     };
 }

@@ -99,9 +99,14 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
 			
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-				openScreen("vmpc-file-in-use");
-			else			
-				sequencer.lock()->playFromStart();
+            {
+                openScreen("vmpc-file-in-use");
+            }
+			else
+            {
+                sequencer.lock()->playFromStart();
+                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(0);
+            }
 
 			break;
 		}
@@ -114,9 +119,14 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			sequencer.lock()->move(sequence->getLoopStart());
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-				openScreen("vmpc-file-in-use");
+            {
+                openScreen("vmpc-file-in-use");
+            }
 			else
-				sequencer.lock()->play();
+            {
+                sequencer.lock()->play();
+                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(sequence->getLoopStart());
+            }
 
 			break;
 		}
@@ -127,12 +137,17 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer.lock()->move(time0);
-			
+
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-				openScreen("vmpc-file-in-use");
+            {
+                openScreen("vmpc-file-in-use");
+            }
 			else
-				sequencer.lock()->play();
-			
+            {
+                sequencer.lock()->play();
+                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(time0);
+            }
+
 			break;
 		}
 		case 3:
@@ -153,9 +168,14 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			songScreen->setLoop(false);
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-				openScreen("vmpc-file-in-use");
+            {
+                openScreen("vmpc-file-in-use");
+            }
 			else
-				sequencer.lock()->playFromStart();
+            {
+                sequencer.lock()->playFromStart();
+                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(0);
+            }
 
 			break;
 		}
