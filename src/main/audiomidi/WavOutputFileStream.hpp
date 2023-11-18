@@ -49,9 +49,9 @@ void wav_writeHeader(std::ofstream& stream, const int sampleRate, int numChannel
     wav_putLE(stream, 0, 4); // Offset 40. For now we set data chunk size 0 
 }
 
-void wav_write_bytes(std::ofstream& stream, const std::vector<char>& bytes)
+void wav_write_bytes(std::ofstream& stream, const std::vector<char>& bytes, uint32_t byteCount)
 {
-    stream.write((char*)(&bytes[0]), bytes.size());
+    stream.write((char*)(&bytes[0]), byteCount);
 }
 
 void wav_close(std::ofstream &stream, const int frameCount)

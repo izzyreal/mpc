@@ -74,6 +74,9 @@ namespace mpc::sequencer {
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
 
+        // Offset of the tick at which bouncing started
+        unsigned short bounceFrameOffset = 0;
+
         unsigned long long sequencerPlayTickCounter = 0;
 
         void updateTimeDisplay();
@@ -118,6 +121,7 @@ namespace mpc::sequencer {
         unsigned char midiClockTickCounter = 0;
         bool sequencerShouldStartPlayingOnNextLock = false;
         bool wasRunning = false;
+        bool wasBouncing = false;
         std::shared_ptr<mpc::engine::midi::ShortMessage> midiSyncStartStopContinueMsg;
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(50);
 
@@ -141,6 +145,7 @@ namespace mpc::sequencer {
         void startMetronome();
 
         unsigned short getEventFrameOffset() const;
+        unsigned short getBounceFrameOffset() const;
 
         void stop();
 

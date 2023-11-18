@@ -1,10 +1,12 @@
-#include <audiomidi/DiskRecorder.hpp>
+#include "DiskRecorder.hpp"
 
-#include <engine/audio/core/AudioFormat.hpp>
-#include <engine/audio/core/AudioBuffer.hpp>
-
-#include <audiomidi/WavOutputFileStream.hpp>
 #include "Mpc.hpp"
+
+#include "WavOutputFileStream.hpp"
+#include "AudioMidiServices.hpp"
+
+#include "engine/audio/core/AudioFormat.hpp"
+#include "engine/audio/core/AudioBuffer.hpp"
 
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
@@ -12,19 +14,19 @@ using namespace mpc::engine::audio::core;
 const std::vector<std::pair<std::string, std::string>> DiskRecorder::fileNamesMono{ {"L.wav", "R.wav"}, {"1.wav", "2.wav"}, {"3.wav", "4.wav"}, {"5.wav", "6.wav"}, {"7.wav", "8.wav"}};
 const std::vector<std::string> DiskRecorder::fileNamesStereo{"L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 
-DiskRecorder::DiskRecorder(mpc::engine::audio::core::AudioProcess* process, int indexToUse)
-	: AudioProcessAdapter(process), index(indexToUse)
+DiskRecorder::DiskRecorder(mpc::Mpc& mpcToUse, AudioProcess* process, int indexToUse)
+	: AudioProcessAdapter(process), mpc(mpcToUse), index(indexToUse)
 {
 }
 
-bool DiskRecorder::prepare(mpc::Mpc& mpc, int lengthInFrames, int sampleRate, bool isStereo)
+bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStereo)
 {
     if (writing.load())
     {
         return false;
     }
 
-	this->lengthInFrames = lengthInFrames;
+	lengthInFrames = lengthInFramesToUse;
 
     for (int i = 0; i < (isStereo ? 1 : 2); i++)
     {
@@ -56,95 +58,50 @@ bool DiskRecorder::prepare(mpc::Mpc& mpc, int lengthInFrames, int sampleRate, bo
         lengthInBytes *= 2;
     }
 	
-	if (format != nullptr)
-    {
-        delete format;
+    delete outputFileFormat;
+
+    outputFileFormat = new AudioFormat(sampleRate, 16, (isStereo ? 2 : 1), true, false);
+
+    while (ringBufferLeft.pop()) {}
+    while (ringBufferRight.pop()) {}
+
+    preparedToWrite.store(true);
+
+    if (writeThread.joinable()) {
+        writeThread.join();
     }
 
-	format = new mpc::engine::audio::core::AudioFormat(sampleRate, 16, (isStereo ? 2 : 1), true, false);
-	
+    writeThread = std::thread([this]{
+        while (preparedToWrite.load() || writing.load())
+        {
+            writeRingBufferToDisk();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        }
+    });
+
 	return true;
 }
 
 int DiskRecorder::processAudio(AudioBuffer* buf, int nFrames)
 {
-	auto ret = AudioProcessAdapter::processAudio(buf, nFrames);
-	
+	const auto ret = AudioProcessAdapter::processAudio(buf, nFrames);
+
 	if (writing.load())
 	{
-        if (format->getChannels() == 1)
+        const auto sourceBufferLeft = buf->getChannel(0);
+        const auto sourceBufferRight = buf->getChannel(1);
+
+        int bufferOffset = 0;
+
+        if (writtenByteCount == 0)
         {
-            AudioBuffer bufLeft("", 2, nFrames, buf->getSampleRate());
-            bufLeft.copyFrom(buf);
-            bufLeft.removeChannel(1);
-
-            AudioBuffer bufRight("", 2, nFrames, buf->getSampleRate());
-            bufRight.copyFrom(buf);
-            bufRight.removeChannel(0);
-
-            std::vector<char> audioBufferAsBytesLeft(bufLeft.getByteArrayBufferSize(format, nFrames));
-            bufLeft.convertToByteArray_(0, nFrames, audioBufferAsBytesLeft, 0, format);
-
-            std::vector<char> audioBufferAsBytesRight(bufRight.getByteArrayBufferSize(format, nFrames));
-            bufRight.convertToByteArray_(0, nFrames, audioBufferAsBytesRight, 0, format);
-
-            if (audioBufferAsBytesLeft.size() + writtenByteCount >= lengthInBytes)
-            {
-                audioBufferAsBytesLeft.resize(lengthInBytes - writtenByteCount);
-                audioBufferAsBytesRight.resize(lengthInBytes - writtenByteCount);
-
-                writing.store(false);
-            }
-
-            wav_write_bytes(fileStreams[0], audioBufferAsBytesLeft);
-            wav_write_bytes(fileStreams[1], audioBufferAsBytesRight);
-
-            writtenByteCount += audioBufferAsBytesLeft.size();
-
-            if (!writing.load() && fileStreams[0].is_open())
-            {
-                wav_close(fileStreams[0], lengthInFrames);
-                wav_close(fileStreams[1], lengthInFrames);
-                lengthInBytes = 0;
-                lengthInFrames = 0;
-
-                if (format != nullptr)
-                {
-                    delete format;
-                    format = nullptr;
-                }
-
-                fileStreams.clear();
-            }
+            bufferOffset = mpc.getAudioMidiServices()->getFrameSequencer()->getBounceFrameOffset();
         }
-        else if (format->getChannels() == 2)
+
+        for (int f = bufferOffset; f < nFrames; f++)
         {
-            std::vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
-            buf->convertToByteArray_(0, nFrames, audioBufferAsBytes, 0, format);
-
-            if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)
-            {
-                audioBufferAsBytes.resize(lengthInBytes - writtenByteCount);
-                writing.store(false);
-            }
-
-            wav_write_bytes(fileStreams[0], audioBufferAsBytes);
-            writtenByteCount += audioBufferAsBytes.size();
-
-            if (!writing.load() && fileStreams[0].is_open())
-            {
-                wav_close(fileStreams[0], lengthInFrames);
-                lengthInBytes = 0;
-                lengthInFrames = 0;
-
-                if (format != nullptr)
-                {
-                    delete format;
-                    format = nullptr;
-                }
-
-                fileStreams.clear();
-            }
+            ringBufferLeft.enqueue(sourceBufferLeft[f]);
+            ringBufferRight.enqueue(sourceBufferRight[f]);
         }
 	}
 
@@ -167,6 +124,87 @@ bool DiskRecorder::start()
 	return true;
 }
 
+void DiskRecorder::writeRingBufferToDisk()
+{
+    const auto availableFrames = ringBufferLeft.size_approx();
+
+    if (availableFrames == 0)
+    {
+        return;
+    }
+
+    auto bytesToWritePerChannel = availableFrames * 2;
+
+    for (int frame = 0; frame < availableFrames; frame++)
+    {
+        bufferLeft[frame] = *ringBufferLeft.peek();
+        bufferRight[frame] = *ringBufferRight.peek();
+        ringBufferLeft.pop();
+        ringBufferRight.pop();
+    }
+
+    if (outputFileFormat->getChannels() == 1)
+    {
+        FloatSampleTools::float2byteGeneric(bufferLeft, 0, byteBufferLeft, 0, outputFileFormat->getFrameSize(),
+                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+        FloatSampleTools::float2byteGeneric(bufferRight, 0, byteBufferRight, 0, outputFileFormat->getFrameSize(),
+                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+    }
+    else if (outputFileFormat->getChannels() == 2)
+    {
+        FloatSampleTools::float2byteGeneric(bufferLeft, 0, stereoByteBuffer, 0, outputFileFormat->getFrameSize(),
+                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+        FloatSampleTools::float2byteGeneric(bufferRight, 0, stereoByteBuffer, outputFileFormat->getFrameSize() / 2, outputFileFormat->getFrameSize(),
+                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+    }
+
+    if (outputFileFormat->getChannels() == 1 && bytesToWritePerChannel + writtenByteCount >= lengthInBytes)
+    {
+        bytesToWritePerChannel = lengthInBytes - writtenByteCount;
+        writing.store(false);
+    }
+    else if (outputFileFormat->getChannels() == 2 && (bytesToWritePerChannel * 2) + writtenByteCount >= lengthInBytes)
+    {
+        bytesToWritePerChannel = (lengthInBytes - writtenByteCount) / 2;
+        writing.store(false);
+    }
+
+    if (outputFileFormat->getChannels() == 1)
+    {
+        wav_write_bytes(fileStreams[0], byteBufferLeft, bytesToWritePerChannel);
+        wav_write_bytes(fileStreams[1], byteBufferRight, bytesToWritePerChannel);
+    }
+    else if (outputFileFormat->getChannels() == 2)
+    {
+        wav_write_bytes(fileStreams[0], stereoByteBuffer, bytesToWritePerChannel * 2);
+    }
+
+    writtenByteCount += bytesToWritePerChannel;
+
+    if (outputFileFormat->getChannels() == 2)
+    {
+        writtenByteCount += bytesToWritePerChannel;
+    }
+
+    if (!writing.load() && fileStreams[0].is_open())
+    {
+        for (auto& fileStream : fileStreams)
+        {
+            wav_close(fileStream, lengthInFrames);
+        }
+
+        fileStreams.clear();
+
+        lengthInBytes = 0;
+        lengthInFrames = 0;
+    }
+
+    if (writtenByteCount > 0)
+    {
+        preparedToWrite.store(false);
+    }
+}
+
 bool DiskRecorder::stopEarly()
 {
     if (!writing.load())
@@ -183,8 +221,14 @@ bool DiskRecorder::stopEarly()
     }
 
 	writing.store(false);
+    preparedToWrite.store(false);
 
-    auto bytesPerFrame = format->getChannels() == 1 ? 2 : 4;
+    if (writeThread.joinable())
+    {
+        writeThread.join();
+    }
+
+    auto bytesPerFrame = outputFileFormat->getChannels() == 1 ? 2 : 4;
 
 	auto writtenFrames = writtenByteCount / bytesPerFrame;
 
@@ -197,21 +241,22 @@ bool DiskRecorder::stopEarly()
 	lengthInBytes = 0;
 	lengthInFrames = 0;
 
-	if (format != nullptr)
-	{
-		delete format;
-		format = nullptr;
-	}
+	delete outputFileFormat;
+    outputFileFormat = nullptr;
 
 	return true;
 }
 
 DiskRecorder::~DiskRecorder()
 {
-    fileStreams.clear();
+    preparedToWrite.store(false);
+    writing.store(false);
 
-	if (format != nullptr)
+    if (writeThread.joinable())
     {
-        delete format;
+        writeThread.join();
     }
+
+    fileStreams.clear();
+    delete outputFileFormat;
 }
