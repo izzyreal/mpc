@@ -54,9 +54,8 @@ void wav_write_bytes(std::ofstream& stream, const std::vector<char>& bytes, uint
     stream.write((char*)(&bytes[0]), byteCount);
 }
 
-void wav_close(std::ofstream &stream, const int frameCount)
+void wav_close(std::ofstream &stream, const int frameCount, const int numChannels)
 {
-    const int numChannels = 2;
     const int validBits = 16;
 
     auto bytesPerSample = (validBits + 7) / 8;
