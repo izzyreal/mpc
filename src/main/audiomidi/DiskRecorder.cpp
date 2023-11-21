@@ -220,7 +220,7 @@ void DiskRecorder::writeRingBufferToDisk()
     {
         for (auto& fileStream : fileStreams)
         {
-            wav_close(fileStream, lengthInFrames, outputFileFormat->getChannels());
+            wav_close(fileStream, lengthInFrames);
         }
 
         fileStreams.clear();
@@ -246,7 +246,7 @@ bool DiskRecorder::stopEarly()
 
     for (auto& fileStream : fileStreams)
     {
-        wav_close(fileStream, writtenFrames, outputFileFormat->getChannels());
+        wav_close(fileStream, writtenFrames);
     }
 
     fileStreams.clear();

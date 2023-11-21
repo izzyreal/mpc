@@ -54,14 +54,15 @@ void wav_write_bytes(std::ofstream& stream, const std::vector<char>& bytes, uint
     stream.write((char*)(&bytes[0]), byteCount);
 }
 
-void wav_close(std::ofstream &stream, const int frameCount, const int numChannels)
+void wav_close(std::ofstream &stream, const int frameCount)
 {
+    const int numChannels = 2;
     const int validBits = 16;
 
-    const auto bytesPerSample = (validBits + 7) / 8;
-    const auto blockAlign = bytesPerSample * numChannels;
+    auto bytesPerSample = (validBits + 7) / 8;
+    auto blockAlign = bytesPerSample * numChannels;
 
-    const auto dataChunkSize = blockAlign * frameCount;
+    auto dataChunkSize = blockAlign * frameCount;
     auto mainChunkSize = 4 + 8 + 16 + 8 + dataChunkSize;
     
     bool wordAlignAdjust = false;
