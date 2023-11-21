@@ -583,28 +583,38 @@ std::vector<float> Sampler::resampleSingleChannel(std::vector<float>& input, int
 
 void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr<Sound> destSnd)
 {
-    float* srcArray = &data[0];
+    const auto inputFrameCount = static_cast<int>(destSnd->isMono() ? data.size() : data.size() / 2);
+    const auto srcRatio = (double)(destSnd->getSampleRate()) / (double)(sourceRate);
+    const auto outputFrameCount = static_cast<int>((floor)(inputFrameCount * srcRatio));
+    const auto destinationSampleCount = destSnd->isMono() ? outputFrameCount : outputFrameCount * 2;
 
     SRC_DATA srcData;
-    srcData.data_in = srcArray;
-    srcData.input_frames = data.size();
-    srcData.src_ratio = (double)(destSnd->getSampleRate()) / (double)(sourceRate);
+    srcData.input_frames = inputFrameCount;
+    srcData.src_ratio = srcRatio;
     
-    srcData.output_frames = (floor)(data.size() * srcData.src_ratio);
+    srcData.output_frames = outputFrameCount;
 
-    auto dest = destSnd->getSampleData();
-    dest->resize(srcData.output_frames);
+    auto destinationSampleData = destSnd->getSampleData();
+    destinationSampleData->resize(destinationSampleCount);
 
-    float* destArray = &(*dest)[0];
-    srcData.data_out = destArray;
+    const int numChannels = destSnd->isMono() ? 1 : 2;
 
-    auto error = src_simple(&srcData, 0, 1);
-
-    if (error != 0)
+    for (int i = 0; i < numChannels; i++)
     {
-        const char* errormsg = src_strerror(error);
-        std::string errorStr(errormsg);
-        MLOG("libsamplerate error: " + errorStr);
+        const auto srcArray = &data[i * inputFrameCount];
+        srcData.data_in = srcArray;
+
+        float* destArray = &(*destinationSampleData)[i * outputFrameCount];
+        srcData.data_out = destArray;
+
+        auto error = src_simple(&srcData, 0, 1);
+
+        if (error != 0)
+        {
+            const char* errormsg = src_strerror(error);
+            std::string errorStr(errormsg);
+            MLOG("libsamplerate error: " + errorStr);
+        }
     }
 }
 

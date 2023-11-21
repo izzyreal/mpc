@@ -176,7 +176,8 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
     }
 
     if (wavFile->getSampleRate() > 44100 && shouldBeConverted) {
-        auto tempSound = std::make_shared<Sound>(wavFile->getSampleRate());
+        auto tempSound = std::make_shared<Sound>(44100);
+        tempSound->setMono(numChannels == 1);
         Sampler::resample(*sampleData, wavFile->getSampleRate(), tempSound);
         auto tempData = *tempSound->getSampleData();
         sampleData->swap(tempData);

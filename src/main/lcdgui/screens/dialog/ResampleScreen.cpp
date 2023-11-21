@@ -86,6 +86,7 @@ void ResampleScreen::function(int i)
 		auto destSnd = sampler->addSound();
 		destSnd->setName(newName);
         destSnd->setSampleRate(newFs);
+        destSnd->setMono(snd->isMono());
 
 		auto source = snd->getSampleData();
 
@@ -104,7 +105,6 @@ void ResampleScreen::function(int i)
 			else if (f < -1) f = -1;
 		}
 
-		destSnd->setMono(snd->isMono());
 		destSnd->setName(newName);
         const int diff = newFs - snd->getSampleRate();
         int newTuning = static_cast<int>(diff * (120.f / newFs));
