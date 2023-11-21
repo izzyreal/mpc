@@ -67,7 +67,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     REQUIRE(fs::exists(recordingPath));
 
-    auto wavInputStream = std::make_shared<std::ifstream>(recordingPath);
+    auto wavInputStream = std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
 
     auto wavOrError = mpc::file::wav::WavFile::readWavStream(wavInputStream);
 
