@@ -79,6 +79,6 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     for (int i = 0; i < 100; i++)
     {
-        REQUIRE(wavFrames[i] > 0.002f);
+        REQUIRE(wavFrames[i] > 0.f);
     }
 }

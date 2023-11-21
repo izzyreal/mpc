@@ -170,16 +170,16 @@ void DiskRecorder::writeRingBufferToDisk()
     if (outputFileFormat->getChannels() == 1)
     {
         FloatSampleTools::float2byteGeneric(bufferLeft, 0, byteBufferLeft, 0, outputFileFormat->getFrameSize(),
-                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+                                            availableFrames, outputFileFormat, 0.f);
         FloatSampleTools::float2byteGeneric(bufferRight, 0, byteBufferRight, 0, outputFileFormat->getFrameSize(),
-                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+                                            availableFrames, outputFileFormat, 0.f);
     }
     else if (outputFileFormat->getChannels() == 2)
     {
         FloatSampleTools::float2byteGeneric(bufferLeft, 0, stereoByteBuffer, 0, outputFileFormat->getFrameSize(),
-                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+                                            availableFrames, outputFileFormat, 0.f);
         FloatSampleTools::float2byteGeneric(bufferRight, 0, stereoByteBuffer, outputFileFormat->getFrameSize() / 2, outputFileFormat->getFrameSize(),
-                                            availableFrames, outputFileFormat, DEFAULT_DITHER_BITS);
+                                            availableFrames, outputFileFormat, 0.f);
     }
 
     if (outputFileFormat->getChannels() == 1 && bytesToWritePerChannel + writtenByteCount >= lengthInBytes)
