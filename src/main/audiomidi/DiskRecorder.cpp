@@ -150,7 +150,8 @@ bool DiskRecorder::start()
 
 void DiskRecorder::writeRingBufferToDisk()
 {
-    const auto availableFrames = ringBufferLeft.size_approx();
+    const auto availableFrames =
+            std::min<size_t>(ringBufferLeft.size_approx(), ringBufferRight.size_approx());
 
     if (availableFrames == 0)
     {
