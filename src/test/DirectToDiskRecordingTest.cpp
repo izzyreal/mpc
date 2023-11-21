@@ -61,7 +61,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     mpc.getActiveControls()->function(4);
 
     const auto recordingsPath = mpc.paths->recordingsPath();
-    const auto recordingPath = recordingsPath / "L.WAV";
+    const auto recordingPath = recordingsPath / "L.wav";
 
     audioThread.join();
 
@@ -79,6 +79,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     for (int i = 0; i < 100; i++)
     {
+        printf("%f\n", wavFrames[i]);
         REQUIRE(wavFrames[i] > 0.f);
     }
 }
