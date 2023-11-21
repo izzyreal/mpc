@@ -309,6 +309,7 @@ int WavFile::readSample()
 	int val = 0;
 	for (auto b = 0; b < bytesPerSample; b++) {
 		if (bufferPointer == bytesRead) {
+            printf("%lld\n", iStream->gcount());
             iStream->read(&buffer[0], BUFFER_SIZE);
             auto read = iStream->gcount();
 
