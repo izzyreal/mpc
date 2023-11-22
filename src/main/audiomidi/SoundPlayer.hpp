@@ -7,10 +7,12 @@
 #include "circular_buffer.hpp"
 #include <samplerate.h>
 
+#include "readerwriterqueue.h"
+
 #include <fstream>
 #include <memory>
 #include <atomic>
-#include <mutex>
+#include <thread>
 
 using namespace mpc::sampler;
 using namespace mpc::engine::audio::core;
@@ -24,21 +26,27 @@ namespace mpc::audiomidi
     {
 
     private:
+        std::thread readThread;
         int ingestedSourceFrameCount = 0;
         int sourceFrameCount = 0;
-        std::shared_ptr<AudioFormat> audioFormat;
+        int playedFrameCount = 0;
+        std::atomic_ulong totalResamplerGeneratedFrameCount = 0;
+        unsigned long resamplerGeneratedFrameCounter = 0;
+        std::shared_ptr<AudioFormat> inputAudioFormat;
         SoundPlayerFileFormat fileFormat;
         float fadeFactor = -1.0f;
         bool stopEarly = false;
+        void readWithoutResampling();
+        void readWithResampling(float ratio);
+        short readNextShort();
 
-    private:
-        std::mutex _playing;
-        bool playing = false;
+        std::atomic_bool playing = false;
         std::string filePath;
-        circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(60000);
-        circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(60000);
-        circular_buffer<float> resampleOutputBufferLeft = circular_buffer<float>(60000);
-        circular_buffer<float> resampleOutputBufferRight = circular_buffer<float>(60000);
+        moodycamel::ReaderWriterQueue<float> bufferLeft = moodycamel::ReaderWriterQueue<float>(60000);
+        moodycamel::ReaderWriterQueue<float> bufferRight = moodycamel::ReaderWriterQueue<float>(60000);
+        std::vector<float> resampleInputBufferLeft;
+        std::vector<float> resampleInputBufferRight;
+        std::vector<float> resampleOutputBuffer;
         SRC_STATE* srcLeft = nullptr;
         SRC_STATE* srcRight = nullptr;
         int srcLeftError = 0;
@@ -46,20 +54,11 @@ namespace mpc::audiomidi
         std::shared_ptr<std::istream> stream;
 
     public:
-        bool start(std::shared_ptr<std::istream>, SoundPlayerFileFormat);
+        bool start(const std::shared_ptr<std::istream>&, SoundPlayerFileFormat, int audioServerSampleRate);
         int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
-        void open() override {}
-        void close() override {}
-
-    public:
         void enableStopEarly();
         bool isPlaying();
 
-    private:
-        void stop();
-        void resampleChannel(bool left, std::vector<float> &input, int sourceSampleRate, int destinationSampleRate);
-
-    public:
         SoundPlayer();
         ~SoundPlayer();
 

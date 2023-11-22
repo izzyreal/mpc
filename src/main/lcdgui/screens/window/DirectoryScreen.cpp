@@ -10,6 +10,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <Util.hpp>
 
@@ -214,9 +215,12 @@ void DirectoryScreen::function(int f)
 
             if (!isWav && !isSnd) return;
 
+            const auto audioServerSampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+
             bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(
                     file->getInputStream(),
-                    isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV);
+                    isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV,
+                    audioServerSampleRate);
             
             auto name = file->getNameWithoutExtension();
 
