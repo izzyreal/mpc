@@ -36,8 +36,6 @@ uint32_t MonoResampler::resample(
 
 uint32_t MonoResampler::wrapUpAndGetRemainder(std::vector<float>& output)
 {
-    std::vector<float> dummy{0};
-
     data.data_in = &dummy[0];
     data.input_frames = 1;
     data.data_out = &output[0];

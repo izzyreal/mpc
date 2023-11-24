@@ -28,5 +28,6 @@ namespace mpc::audiomidi {
         SRC_STATE* state;
         SRC_DATA data;
         int srcError = 0;
+        const std::vector<float> dummy{0};
     };
 }
