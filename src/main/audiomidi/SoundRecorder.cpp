@@ -135,15 +135,12 @@ void SoundRecorder::stop()
         {
             const auto generatedFrameCountL = resamplers[0].resample(
                     unresampledLeft, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
-            const auto generatedFrameCountR = resamplers[1].resample(
-                    unresampledRight, resampledRight, engineSampleRate, ringBufferRemainingFrameCount);
 
             assert(generatedFrameCountL == generatedFrameCountR);
 
             sound->appendFrames(resampledLeft, resampledRight, generatedFrameCountL);
 
             const auto remainingFrameCountL = resamplers[0].wrapUpAndGetRemainder(resampledLeft);
-            const auto remainingFrameCountR = resamplers[1].wrapUpAndGetRemainder(resampledRight);
 
             assert(remainingFrameCountL == remainingFrameCountR);
 
