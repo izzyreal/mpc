@@ -267,7 +267,6 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
         else if (mode == 2)
         {
             const auto generatedFrameCountL = resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, nFrames);
-            const auto generatedFrameCountR = resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, nFrames);
 
             assert(generatedFrameCountL == generatedFrameCountR);
 
