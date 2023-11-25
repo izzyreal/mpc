@@ -1,11 +1,9 @@
 #pragma once
-#include <engine/audio/core/AudioProcessAdapter.hpp>
 #include <engine/audio/core/AudioProcess.hpp>
 
 #include <sampler/Sound.hpp>
 
-#include "circular_buffer.hpp"
-#include <samplerate.h>
+#include "audiomidi/MonoResampler.hpp"
 
 #include "readerwriterqueue.h"
 
@@ -49,10 +47,7 @@ namespace mpc::audiomidi
         std::vector<float> resampleInputBufferLeft;
         std::vector<float> resampleInputBufferRight;
         std::vector<float> resampleOutputBuffer;
-        SRC_STATE* srcLeft = nullptr;
-        SRC_STATE* srcRight = nullptr;
-        int srcLeftError = 0;
-        int srcRightError = 0;
+        std::vector<MonoResampler> resamplers = std::vector<MonoResampler>(2);
         std::shared_ptr<std::istream> stream;
 
     public:

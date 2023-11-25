@@ -15,8 +15,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::audio::core;
 using namespace mpc::sampleops;
 
-SoundRecorder::SoundRecorder(mpc::Mpc& mpc)
-	: mpc(mpc)
+SoundRecorder::SoundRecorder(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
 {
 }
 
@@ -120,11 +119,13 @@ void SoundRecorder::stop()
 
     if (engineSampleRate != 44100)
     {
+        const auto ratio = 44100.f / engineSampleRate;
+
         if (mode == 0 || mode == 1)
         {
             const auto& input = mode == 0 ? unresampledLeft : unresampledRight;
             const auto generatedFrameCount = resamplers[0].resample(
-                    input, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
+                    input, resampledLeft, ratio, ringBufferRemainingFrameCount);
 
             sound->appendFrames(resampledLeft, generatedFrameCount);
 
@@ -134,10 +135,10 @@ void SoundRecorder::stop()
         else if (mode == 2)
         {
             const auto generatedFrameCountL = resamplers[0].resample(
-                    unresampledLeft, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
+                    unresampledLeft, resampledLeft, ratio, ringBufferRemainingFrameCount);
 
             const auto generatedFrameCountR = resamplers[1].resample(
-                    unresampledRight, resampledRight, engineSampleRate, ringBufferRemainingFrameCount);
+                    unresampledRight, resampledRight, ratio, ringBufferRemainingFrameCount);
 
             assert(generatedFrameCountL == generatedFrameCountR);
 
@@ -263,19 +264,21 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
 
     if (shouldResample)
     {
+        const auto ratio = 44100.f / engineSampleRate;
+
         if (mode == 0 || mode == 1)
         {
-            const auto& input = mode == 0 ? unresampledLeft : unresampledRight;
-            const auto generatedFrameCount = resamplers[0].resample(input, resampledLeft, engineSampleRate, nFrames);
+            const auto input = mode == 0 ? unresampledLeft : unresampledRight;
+            const auto generatedFrameCount = resamplers[0].resample(input, resampledLeft, ratio, nFrames);
             sound->appendFrames(resampledLeft, generatedFrameCount);
         }
         else if (mode == 2)
         {
-            const auto generatedFrameCountL = resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, nFrames);
-            const auto generatedFrameCountR = resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, nFrames);
+            const auto generatedFrameCountL = resamplers[0].resample(unresampledLeft, resampledLeft, ratio, nFrames);
+            const auto generatedFrameCountR = resamplers[1].resample(unresampledRight, resampledRight, ratio, nFrames);
 
-            assert(generatedFrameCountL == generatedFrameCountR);
-
+            assert(generatedFrameCountL == generatedFrameCountR);       
+  
             sound->appendFrames(resampledLeft, resampledRight, generatedFrameCountL);
         }
     }
