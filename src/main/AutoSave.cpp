@@ -10,7 +10,6 @@
 #include <file/sndwriter/SndWriter.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 #include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
-#include <lcdgui/screens/window/DirectoryScreen.hpp>
 
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
@@ -169,9 +168,6 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         layeredScreen->openScreen(previousScreen);
         layeredScreen->Draw();
 
-        auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
-        directoryScreen->setPreviousScreenName(previousScreen == "save" ? "save" : "load");
-
         layeredScreen->openScreen(screen);
         layeredScreen->Draw();
 
@@ -263,6 +259,21 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
     std::function<void()> storeAutoSavedStateAction = [&](){
 
         auto layeredScreen = mpc.getLayeredScreen();
+
+        // Reopening the Directory window is problematic because:
+        // 1. We're not storing the directory screen's x and y pos
+        // 2. Even if we did, these values may be invalid due to changes
+        //    in directory content.
+        // So we're going for a sane default, which is to open either
+        // the LOAD or SAVE screen, depending from where the user
+        // opened the Directory window.
+        // We do this by pressing F4 via ...->function(3)
+        if (layeredScreen->getCurrentScreenName() == "directory")
+        {
+            mpc.getActiveControls()->function(3);
+            layeredScreen->setPreviousScreenName("sequencer");
+        }
+
         auto screen = layeredScreen->getCurrentScreenName();
         auto previousScreen = layeredScreen->getPreviousScreenName();
 
