@@ -59,6 +59,9 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream>& streamToUse, SoundP
     src_reset(srcLeft);
     src_reset(srcRight);
 
+    while (bufferLeft.pop()) {}
+    while (bufferRight.pop()) {}
+
     const auto ratio =
             static_cast<float>(audioServerSampleRate) / static_cast<float>(sourceSampleRate);
 
