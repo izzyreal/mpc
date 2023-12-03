@@ -122,7 +122,7 @@ void SoundRecorder::stop()
     {
         if (mode == 0 || mode == 1)
         {
-            const auto input = mode == 0 ? unresampledLeft : unresampledRight;
+            const auto& input = mode == 0 ? unresampledLeft : unresampledRight;
             const auto generatedFrameCount = resamplers[0].resample(
                     input, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
 
@@ -136,11 +136,16 @@ void SoundRecorder::stop()
             const auto generatedFrameCountL = resamplers[0].resample(
                     unresampledLeft, resampledLeft, engineSampleRate, ringBufferRemainingFrameCount);
 
+            const auto generatedFrameCountR = resamplers[1].resample(
+                    unresampledRight, resampledRight, engineSampleRate, ringBufferRemainingFrameCount);
+
             assert(generatedFrameCountL == generatedFrameCountR);
 
             sound->appendFrames(resampledLeft, resampledRight, generatedFrameCountL);
 
             const auto remainingFrameCountL = resamplers[0].wrapUpAndGetRemainder(resampledLeft);
+
+            const auto remainingFrameCountR = resamplers[1].wrapUpAndGetRemainder(resampledRight);
 
             assert(remainingFrameCountL == remainingFrameCountR);
 
@@ -260,13 +265,14 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
     {
         if (mode == 0 || mode == 1)
         {
-            const auto input = mode == 0 ? unresampledLeft : unresampledRight;
+            const auto& input = mode == 0 ? unresampledLeft : unresampledRight;
             const auto generatedFrameCount = resamplers[0].resample(input, resampledLeft, engineSampleRate, nFrames);
             sound->appendFrames(resampledLeft, generatedFrameCount);
         }
         else if (mode == 2)
         {
             const auto generatedFrameCountL = resamplers[0].resample(unresampledLeft, resampledLeft, engineSampleRate, nFrames);
+            const auto generatedFrameCountR = resamplers[1].resample(unresampledRight, resampledRight, engineSampleRate, nFrames);
 
             assert(generatedFrameCountL == generatedFrameCountR);
 
