@@ -1,5 +1,16 @@
+## v0.5.8 (3-12-2023)
+* Allow custom skins. See https://github.com/izzyreal/vmpc-juce/tree/master/resources/img for the original bitmaps. Place files with those file names in `~/Documents/VMPC2000XL/Skin` to override the originals. At the moment the background, slider and datawheel are skinnable. Let me know if you need anything else to be skinnable.
+* Fixed an issue with Timing Correct. It was ignoring the note range.
+* Support using the slider in the Zone screen, as well as in all the Fine screens. As usual, hold Shift while moving the slider to change Start, End or Loop To.
+* Fixed unnecessary memory allocation.
+* Optimized memory and disk usage while recording and previewing sounds, and when bouncing sequences and songs to disk.
+* Support key repeats on Linux. Note that the delay and interval are hardcoded at 400ms and 25ms respectively.
+* Added demo beats to Linux and iOS versions.
+* Updated documentation: https://vmpcdocs.izmar.nl/ and https://vmpcdocs.izmar.nl/vmpc2000xl.pdf
+* [internal] [Unit tests](https://github.com/izzyreal/mpc/tree/master/src/test) are now run in the CI/CD. Although we don't have that many unit tests, a bunch of important functionality that was historically fragile is now always tested before publishing a new release.
+
 ## v0.5.7 (3-10-2023)
-* Fix a rare plugin crash related to MIDI handling after unloading and loading the plugin. Standalone was and is unaffected by this issue.
+* Fix a rare plugin crash related to MIDI handling after unloading and loading the plugin. Standalone was and still is unaffected by this issue.
 
 ## v0.5.6 (20-9-2023)
 * Fix looping sounds. They resulted in hanging notes.
