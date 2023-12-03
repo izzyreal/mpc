@@ -68,7 +68,7 @@ fs::path Paths::autoSavePath()
 
 fs::path Paths::demoDataPath()
 {
-    static auto demoDataPath = defaultLocalVolumePath() / "Demos";
+    static auto demoDataPath = defaultLocalVolumePath() / "DEMOS";
     return demoDataPath;
 }
 
