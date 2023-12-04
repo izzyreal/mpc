@@ -8,6 +8,7 @@
 * Added demo beats to Linux and iOS versions.
 * Updated documentation: https://vmpcdocs.izmar.nl/ and https://vmpcdocs.izmar.nl/vmpc2000xl.pdf
 * [internal] [Unit tests](https://github.com/izzyreal/mpc/tree/master/src/test) are now run in the CI/CD. Although we don't have that many unit tests, a bunch of important functionality that was historically fragile is now always tested before publishing a new release.
+* Additional info regarding AU use in Logic: https://github.com/izzyreal/vmpc-juce/blob/master/plugin-compatibility-matrix.md
 
 ## v0.5.7 (3-10-2023)
 * Fix a rare plugin crash related to MIDI handling after unloading and loading the plugin. Standalone was and still is unaffected by this issue.
