@@ -8,7 +8,6 @@
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
 
 #include <hardware/Hardware.hpp>
@@ -57,7 +56,6 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
         return;
     }
     
-    auto tempoChangeEvent = std::dynamic_pointer_cast<TempoChangeEvent>(event);
     auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
 
     auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
@@ -99,10 +97,6 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
             mixer->setLevel(mixerEvent->getValue());
         else if (mixerEvent->getParameter() == 1)
             mixer->setPanning(mixerEvent->getValue());
-    }
-    else if (tempoChangeEvent && tempoChangeEvent->getTempo() != sequencer->getTempo())
-    {
-        sequencer->setTempo(tempoChangeEvent->getTempo());
     }
 }
 
