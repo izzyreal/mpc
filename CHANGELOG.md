@@ -1,3 +1,6 @@
+## v0.5.9 (5-12-2023)
+* Fix tempo change bug when tempo source is master (shout out to playpm for reporting this bug)
+
 ## v0.5.8 (3-12-2023)
 * Allow custom skins. See https://github.com/izzyreal/vmpc-juce/tree/master/resources/img for the original bitmaps. Place files with those file names in `~/Documents/VMPC2000XL/Skin` to override the originals. At the moment the background, slider and datawheel are skinnable. Let me know if you need anything else to be skinnable.
 * Fixed an issue with Timing Correct. It was ignoring the note range.
