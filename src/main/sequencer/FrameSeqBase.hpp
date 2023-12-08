@@ -2,6 +2,7 @@
 
 #include "FrameSeqBase.hpp"
 #include <sequencer/Clock.hpp>
+#include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>
 #include <utility>
@@ -70,6 +71,7 @@ namespace mpc::sequencer {
         Clock clock;
         std::shared_ptr<Sequencer> sequencer;
         bool metronome = false;
+        std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
 
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
@@ -113,7 +115,6 @@ namespace mpc::sequencer {
         std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen;
         std::shared_ptr<mpc::lcdgui::screens::SequencerScreen> sequencerScreen;
         std::shared_ptr<mpc::lcdgui::screens::UserScreen> userScreen;
-        std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
         std::shared_ptr<mpc::lcdgui::screens::PunchScreen> punchScreen;
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 

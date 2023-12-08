@@ -17,25 +17,42 @@ void FrameSeq::work(int nFrames)
     bool songHasStopped = false;
     bool normalPlayHasStopped = false;
 
+    processSampleRateChange();
+    processTempoChange();
+
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
         processEventsAfterNFrames(frameIndex);
 
-        if (!clock.proc())
+        if (syncScreen->modeOut != 0)
         {
-            continue;
+            if (clock.proc())
+            {
+                tickFrameOffset = frameIndex;
+            }
+            else
+            {
+                continue;
+            }
         }
-
-        processSampleRateChange();
-
-        tickFrameOffset = frameIndex;
 
         const bool sequencerShouldPlay = processTransport(isRunningAtStartOfBuffer, frameIndex);
 
         if (sequencerShouldPlay)
         {
+            if (syncScreen->modeOut == 0)
+            {
+                if (clock.proc())
+                {
+                    tickFrameOffset = frameIndex;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
             triggerClickIfNeeded();
-            processTempoChange();
             displayPunchRects();
 
             if (metronome)

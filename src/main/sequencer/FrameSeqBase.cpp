@@ -23,7 +23,6 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include "lcdgui/screens/SyncScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/PunchScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
@@ -62,6 +61,13 @@ void FrameSeqBase::start() {
     if (running.load())
     {
         return;
+    }
+
+    processSampleRateChange();
+
+    if (syncScreen->modeOut == 0)
+    {
+        clock.reset();
     }
 
     running.store(true);
@@ -507,6 +513,26 @@ void FrameSeqBase::processEventsAfterNFrames(int frameIndex)
 
 bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameIndex)
 {
+    bool sequencerShouldPlay = wasRunning;
+
+    if (syncScreen->modeOut == 0)
+    {
+        if (!wasRunning && isRunningAtStartOfBuffer)
+        {
+            wasRunning = true;
+            sequencerPlayTickCounter = sequencer->getPlayStartTick();
+            sequencerShouldPlay = true;
+        }
+        else if (wasRunning && !isRunningAtStartOfBuffer)
+        {
+            wasRunning = false;
+            sequencerShouldPlay = false;
+            metronome = false;
+        }
+
+        return sequencerShouldPlay;
+    }
+
     if (mpc.getAudioMidiServices()->isBouncing())
     {
         auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
@@ -527,32 +553,33 @@ bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameInde
         midiClockTickCounter = 0;
     }
 
-    bool sequencerShouldPlay = wasRunning;
-
-    if (lockedToClock)
+    if (syncScreen->modeOut > 0)
     {
-        sendMidiClockMsg();
-
-        if (!wasRunning && isRunningAtStartOfBuffer)
+        if (lockedToClock)
         {
-            wasRunning = true;
-            enqueueMidiSyncStart1msBeforeNextClock();
-            sequencerShouldStartPlayingOnNextLock = true;
-            sequencerPlayTickCounter = sequencer->getPlayStartTick();
-        }
-        else if (sequencerShouldStartPlayingOnNextLock)
-        {
-            sequencerShouldPlay = true;
-            sequencerShouldStartPlayingOnNextLock = false;
-        }
-    }
+            sendMidiClockMsg();
 
-    if (wasRunning && !isRunningAtStartOfBuffer)
-    {
-        sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
-        wasRunning = false;
-        sequencerShouldPlay = false;
-        metronome = false;
+            if (!wasRunning && isRunningAtStartOfBuffer)
+            {
+                wasRunning = true;
+                enqueueMidiSyncStart1msBeforeNextClock();
+                sequencerShouldStartPlayingOnNextLock = true;
+                sequencerPlayTickCounter = sequencer->getPlayStartTick();
+            }
+            else if (sequencerShouldStartPlayingOnNextLock)
+            {
+                sequencerShouldPlay = true;
+                sequencerShouldStartPlayingOnNextLock = false;
+            }
+        }
+
+        if (wasRunning && !isRunningAtStartOfBuffer)
+        {
+            sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
+            wasRunning = false;
+            sequencerShouldPlay = false;
+            metronome = false;
+        }
     }
 
     return sequencerShouldPlay;
