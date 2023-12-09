@@ -24,34 +24,20 @@ void FrameSeq::work(int nFrames)
     {
         processEventsAfterNFrames(frameIndex);
 
-        if (syncScreen->modeOut != 0)
+        const bool sequencerShouldPlay = processTransport(isRunningAtStartOfBuffer, frameIndex);
+
+        if (syncScreen->modeOut != 0 || sequencerShouldPlay)
         {
-            if (clock.proc())
-            {
-                tickFrameOffset = frameIndex;
-            }
-            else
+            if (!clock.proc())
             {
                 continue;
             }
-        }
 
-        const bool sequencerShouldPlay = processTransport(isRunningAtStartOfBuffer, frameIndex);
+            tickFrameOffset = frameIndex;
+        }
 
         if (sequencerShouldPlay)
         {
-            if (syncScreen->modeOut == 0)
-            {
-                if (clock.proc())
-                {
-                    tickFrameOffset = frameIndex;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-
             triggerClickIfNeeded();
             displayPunchRects();
 
