@@ -37,17 +37,12 @@ namespace mpc::engine::audio::server {
 		virtual bool isRunning() = 0;
 		virtual void close() = 0;
 		virtual void setClient(std::shared_ptr<AudioClient> client) = 0;
-		virtual std::vector<std::string> getAvailableOutputNames() = 0;
-		virtual std::vector<std::string> getAvailableInputNames() = 0;
 		virtual IOAudioProcess* openAudioOutput(std::string name) = 0;
 		virtual IOAudioProcess* openAudioInput(std::string name) = 0;
 		virtual void closeAudioOutput(IOAudioProcess* output) = 0;
 		virtual void closeAudioInput(IOAudioProcess* input) = 0;
 		virtual float getSampleRate();
 		virtual void setSampleRate(int rate);
-		virtual int getInputLatencyFrames() = 0;
-		virtual int getOutputLatencyFrames() = 0;
-		virtual int getTotalLatencyFrames() = 0;
 
 	public:
 		AudioServer();

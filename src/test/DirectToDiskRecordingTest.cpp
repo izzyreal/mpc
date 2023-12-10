@@ -45,13 +45,22 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     audioServer->setSampleRate(44100);
     audioServer->resizeBuffers(BUFFER_SIZE);
 
-    std::vector<float> outputBuffer(BUFFER_SIZE * 2);
+    const float** inputBuffer = new const float*[2];
+    inputBuffer[0] = new float[BUFFER_SIZE];
+    inputBuffer[1] = new float[BUFFER_SIZE];
+
+    float** outputBuffer = new float*[10];
+
+    for (int i = 0; i < 10; ++i)
+    {
+        outputBuffer[i] = new float[BUFFER_SIZE];
+    }
 
     auto audioThread = std::thread([&]{
         for (int i = 0; i < DSP_CYCLE_COUNT; i++)
         {
             audioMidiServices->changeBounceStateIfRequired();
-            audioServer->work(&outputBuffer[0], &outputBuffer[0], BUFFER_SIZE, 0, 2);
+            audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, 0, 2);
             std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
         }
     });
@@ -81,4 +90,13 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     {
         REQUIRE(wavFrames[i] > 0.f);
     }
+
+    for (int i = 0; i < 10; ++i)
+    {
+        if (i < 2) delete[] inputBuffer[i];
+        delete[] outputBuffer[i];
+    }
+
+    delete[] inputBuffer;
+    delete[] outputBuffer;
 }
