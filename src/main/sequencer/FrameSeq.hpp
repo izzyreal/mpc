@@ -4,7 +4,8 @@
 
 #include <engine/audio/server/AudioClient.hpp>
 
-#include <sequencer/Clock.hpp>
+#include "Clock.hpp"
+#include "MidiClockOutput.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>
@@ -12,8 +13,6 @@
 #include <vector>
 #include <functional>
 #include <atomic>
-
-namespace mpc::engine::midi { class ShortMessage; }
 
 namespace mpc { class Mpc; }
 
@@ -27,8 +26,6 @@ namespace mpc::lcdgui::screens {
     class SequencerScreen;
 
     class UserScreen;
-
-    class SyncScreen;
 
     class PunchScreen;
 
@@ -44,18 +41,17 @@ namespace mpc::sequencer {
     class FrameSeq : public mpc::engine::audio::server::AudioClient
     {
     private:
-        std::atomic<bool> running{false};
+        std::atomic<bool> sequencerIsRunning{false};
+        bool shouldWaitForMidiClockLock = false;
         std::atomic_int32_t requestedSampleRate{44100};
         Clock clock;
+        std::shared_ptr<MidiClockOutput> midiClockOutput;
         std::shared_ptr<Sequencer> sequencer;
         bool metronome = false;
         std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
 
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
-
-        // Offset of the tick at which bouncing started
-        unsigned short bounceFrameOffset = 0;
 
         unsigned long long sequencerPlayTickCounter = 0;
 
@@ -67,10 +63,6 @@ namespace mpc::sequencer {
 
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames(int frameIndex);
-
-        // Has to be called exactly once for each tick. If it returns true,
-        // the sequencer is now actually playing.
-        bool processTransport(bool isRunningAtStartOfBuffer, int frameIndex);
 
         void triggerClickIfNeeded();
 
@@ -97,38 +89,24 @@ namespace mpc::sequencer {
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 
         mpc::Mpc &mpc;
-        unsigned char midiClockTickCounter = 0;
-        bool sequencerShouldStartPlayingOnNextLock = false;
-        bool wasRunning = false;
-        bool wasBouncing = false;
-        std::shared_ptr<mpc::engine::midi::ShortMessage> midiSyncStartStopContinueMsg;
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(50);
 
         void move(int newTickPos);
 
         void stopSequencer();
 
-        void sendMidiClockMsg();
-
-        std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
-
     public:
         explicit FrameSeq(mpc::Mpc &mpc);
 
         void work(int nFrames) override;
 
-        void enqueueMidiSyncStart1msBeforeNextClock();
-
         void setSampleRate(unsigned int sampleRate);
-
-        void sendMidiSyncMsg(unsigned char status, unsigned int frameIndex);
 
         void start();
 
         void startMetronome();
 
         unsigned short getEventFrameOffset() const;
-        unsigned short getBounceFrameOffset() const;
 
         void stop();
 

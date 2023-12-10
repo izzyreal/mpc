@@ -14,7 +14,6 @@
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/SeqUtil.hpp"
 #include "sequencer/RepeatPad.hpp"
 
 
@@ -48,15 +47,13 @@ FrameSeq::FrameSeq(mpc::Mpc& mpc)
           punchScreen(mpc.screens->get<PunchScreen>("punch")),
           songScreen(mpc.screens->get<SongScreen>("song")),
           userScreen(mpc.screens->get<UserScreen>("user")),
-          midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
-          msg(std::make_shared<ShortMessage>())
+          midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
 {
-    msg->setMessage(ShortMessage::TIMING_CLOCK);
-    clock.init(requestedSampleRate);
 }
 
-void FrameSeq::start() {
-    if (running.load())
+void FrameSeq::start()
+{
+    if (sequencerIsRunning.load())
     {
         return;
     }
@@ -67,12 +64,18 @@ void FrameSeq::start() {
     {
         clock.reset();
     }
+    else
+    {
+        shouldWaitForMidiClockLock = true;
+    }
 
-    running.store(true);
+    sequencerPlayTickCounter = sequencer->getPlayStartTick();
+
+    sequencerIsRunning.store(true);
 }
 
 void FrameSeq::startMetronome() {
-    if (running.load())
+    if (sequencerIsRunning.load())
     {
         return;
     }
@@ -81,51 +84,25 @@ void FrameSeq::startMetronome() {
     start();
 }
 
-void FrameSeq::sendMidiClockMsg()
-{
-    auto clockMsg = std::make_shared<mpc::engine::midi::ShortMessage>();
-    clockMsg->setMessage(ShortMessage::TIMING_CLOCK);
-
-    if (syncScreen->getModeOut() > 0) {
-        clockMsg->bufferPos = tickFrameOffset;
-
-        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2) {
-            mpc.getMidiOutput()->enqueueMessageOutputA(clockMsg);
-        }
-
-        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2) {
-            mpc.getMidiOutput()->enqueueMessageOutputB(clockMsg);
-        }
-    }
-}
-
 unsigned short FrameSeq::getEventFrameOffset() const
 {
     return tickFrameOffset;
 }
 
-unsigned short FrameSeq::getBounceFrameOffset() const
-{
-    return bounceFrameOffset;
-}
-
 void FrameSeq::stop()
 {
-    if (!running.load())
+    if (!sequencerIsRunning.load())
     {
         return;
     }
 
-    running.store(false);
-    sequencerShouldStartPlayingOnNextLock = false;
-    wasBouncing = false;
-    bounceFrameOffset = 0;
+    sequencerIsRunning.store(false);
     tickFrameOffset = 0;
 }
 
 bool FrameSeq::isRunning()
 {
-    return running.load();
+    return sequencerIsRunning.load();
 }
 
 unsigned int FrameSeq::getTickPosition() const
@@ -216,28 +193,6 @@ void FrameSeq::triggerClickIfNeeded()
     if (relativePos % static_cast<int>(denTicks) == 0)
     {
         mpc.getSampler()->playMetronome(relativePos == 0 ? 127 : 64, getEventFrameOffset());
-    }
-}
-
-void FrameSeq::sendMidiSyncMsg(unsigned char status, unsigned int frameIndex)
-{
-    midiSyncStartStopContinueMsg->setMessage(status);
-
-    midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
-
-    if (syncScreen->getModeOut() > 0)
-    {
-        midiSyncStartStopContinueMsg->setMessage(status);
-
-        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueueMessageOutputA(midiSyncStartStopContinueMsg);
-        }
-
-        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueueMessageOutputB(midiSyncStartStopContinueMsg);
-        }
     }
 }
 
@@ -474,20 +429,6 @@ void FrameSeq::enqueueEventAfterNFrames(const std::function<void(unsigned int)>&
     }
 }
 
-void FrameSeq::enqueueMidiSyncStart1msBeforeNextClock()
-{
-    const auto durationToNextClockInFrames =
-            static_cast<unsigned int>(SeqUtil::ticksToFrames(4, clock.getBpm(), static_cast<float>(clock.getSampleRate())));
-
-    const auto oneMsInFrames = static_cast<unsigned int>(clock.getSampleRate() / 1000.f);
-
-    const unsigned int numberOfFramesBeforeMidiSyncStart = durationToNextClockInFrames - oneMsInFrames;
-
-    enqueueEventAfterNFrames([&](unsigned int frameIndex){
-            sendMidiSyncMsg(sequencer->getPlayStartTick() == 0 ? ShortMessage::START : ShortMessage::CONTINUE, frameIndex);
-    }, numberOfFramesBeforeMidiSyncStart);
-}
-
 void FrameSeq::setSampleRate(unsigned int sampleRate)
 {
     requestedSampleRate = sampleRate;
@@ -509,80 +450,6 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
     }
 }
 
-bool FrameSeq::processTransport(bool isRunningAtStartOfBuffer, int frameIndex)
-{
-    bool sequencerShouldPlay = wasRunning;
-
-    if (syncScreen->modeOut == 0)
-    {
-        if (!wasRunning && isRunningAtStartOfBuffer)
-        {
-            wasRunning = true;
-            sequencerPlayTickCounter = sequencer->getPlayStartTick();
-            sequencerShouldPlay = true;
-        }
-        else if (wasRunning && !isRunningAtStartOfBuffer)
-        {
-            wasRunning = false;
-            sequencerShouldPlay = false;
-            metronome = false;
-        }
-
-        return sequencerShouldPlay;
-    }
-
-    if (mpc.getAudioMidiServices()->isBouncing())
-    {
-        auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
-
-        if (!wasBouncing)
-        {
-            wasBouncing = true;
-            bounceFrameOffset = tickFrameOffset;
-        }
-
-        return directToDiskRecorderScreen->getRecord() != 4;
-    }
-
-    const auto lockedToClock = midiClockTickCounter++ == 0;
-
-    if (midiClockTickCounter == 4)
-    {
-        midiClockTickCounter = 0;
-    }
-
-    if (syncScreen->modeOut > 0)
-    {
-        if (lockedToClock)
-        {
-            sendMidiClockMsg();
-
-            if (!wasRunning && isRunningAtStartOfBuffer)
-            {
-                wasRunning = true;
-                enqueueMidiSyncStart1msBeforeNextClock();
-                sequencerShouldStartPlayingOnNextLock = true;
-                sequencerPlayTickCounter = sequencer->getPlayStartTick();
-            }
-            else if (sequencerShouldStartPlayingOnNextLock)
-            {
-                sequencerShouldPlay = true;
-                sequencerShouldStartPlayingOnNextLock = false;
-            }
-        }
-
-        if (wasRunning && !isRunningAtStartOfBuffer)
-        {
-            sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
-            wasRunning = false;
-            sequencerShouldPlay = false;
-            metronome = false;
-        }
-    }
-
-    return sequencerShouldPlay;
-}
-
 void FrameSeq::processSampleRateChange()
 {
     if (clock.getSampleRate() != requestedSampleRate)
@@ -595,7 +462,7 @@ void FrameSeq::processSampleRateChange()
 
 void FrameSeq::work(int nFrames)
 {
-    const bool isRunningAtStartOfBuffer = running.load();
+    const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -605,79 +472,93 @@ void FrameSeq::work(int nFrames)
     processSampleRateChange();
     processTempoChange();
 
+    midiClockOutput->processSampleRateChange();
+    midiClockOutput->processTempoChange();
+
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
+        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
+
         processEventsAfterNFrames(frameIndex);
 
-        const bool sequencerShouldPlay = processTransport(isRunningAtStartOfBuffer, frameIndex);
-
-        if (syncScreen->modeOut != 0 || sequencerShouldPlay)
+        if (!sequencerIsRunningAtStartOfBuffer)
         {
-            if (!clock.proc())
-            {
-                continue;
-            }
-
-            tickFrameOffset = frameIndex;
+            continue;
         }
 
-        if (sequencerShouldPlay)
+        if (syncScreen->modeOut != 0)
         {
-            triggerClickIfNeeded();
-            displayPunchRects();
-
-            if (metronome)
+            if (midiClockOutput->isLastProcessedFrameMidiClockLock())
             {
-                sequencerPlayTickCounter++;
+                shouldWaitForMidiClockLock = false;
+            }
+            else if (shouldWaitForMidiClockLock)
+            {
                 continue;
             }
+        }
 
-            if (sequencer->isCountingIn())
-            {
-                sequencerPlayTickCounter++;
-                stopCountingInIfRequired();
-                continue;
-            }
+        if (!clock.proc())
+        {
+            continue;
+        }
 
-            updateTimeDisplay();
+        tickFrameOffset = frameIndex;
 
-            if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
-                !sequencer->isSongModeEnabled() &&
-                sequencer->getNextSq() != -1)
-            {
-                seq = switchToNextSequence();
-                continue;
-            }
-            else if (sequencer->isSongModeEnabled())
-            {
-                if (!songHasStopped && processSongMode())
-                {
-                    songHasStopped = true;
-                    continue;
-                }
-            }
-            else if (seq->isLoopEnabled())
-            {
-                if (processSeqLoopEnabled())
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                if (!normalPlayHasStopped && processSeqLoopDisabled())
-                {
-                    normalPlayHasStopped = true;
-                }
-            }
+        triggerClickIfNeeded();
+        displayPunchRects();
 
-            if (!songHasStopped && !normalPlayHasStopped)
-            {
-                sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
-                processNoteRepeat();
-            }
-
+        if (metronome)
+        {
             sequencerPlayTickCounter++;
+            continue;
         }
+
+        if (sequencer->isCountingIn())
+        {
+            sequencerPlayTickCounter++;
+            stopCountingInIfRequired();
+            continue;
+        }
+
+        updateTimeDisplay();
+
+        if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
+            !sequencer->isSongModeEnabled() &&
+            sequencer->getNextSq() != -1)
+        {
+            seq = switchToNextSequence();
+            continue;
+        }
+        else if (sequencer->isSongModeEnabled())
+        {
+            if (!songHasStopped && processSongMode())
+            {
+                songHasStopped = true;
+                continue;
+            }
+        }
+        else if (seq->isLoopEnabled())
+        {
+            if (processSeqLoopEnabled())
+            {
+                continue;
+            }
+        }
+        else
+        {
+            if (!normalPlayHasStopped && processSeqLoopDisabled())
+            {
+                normalPlayHasStopped = true;
+            }
+        }
+
+        if (!songHasStopped && !normalPlayHasStopped)
+        {
+            sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+            processNoteRepeat();
+        }
+
+        sequencerPlayTickCounter++;
     }
 }

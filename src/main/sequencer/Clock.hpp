@@ -17,6 +17,7 @@ namespace mpc::sequencer {
         double Fs_rec;
 
     public:
+        Clock();
         void init(double Fs);
 
         void set_bpm(const double &BPM);
