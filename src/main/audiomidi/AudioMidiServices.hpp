@@ -101,8 +101,6 @@ namespace mpc::audiomidi
 		void setupMixer();
 		void setAssignableMixOutLevels();
 		void createSynth();
-		std::vector<std::string> getInputNames();
-		std::vector<std::string> getOutputNames();
 		void setMonitorLevel(int level);
 
     public:
