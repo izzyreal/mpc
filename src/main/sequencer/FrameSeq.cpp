@@ -71,6 +71,11 @@ void FrameSeq::start()
 
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
 
+    for (auto& spilledTick : spilledTicks)
+    {
+        spilledTick = -1;
+    }
+
     sequencerIsRunning.store(true);
 }
 
@@ -473,10 +478,10 @@ void FrameSeq::work(int nFrames)
     processSampleRateChange();
     processTempoChange();
 
-//    midiClockOutput->processSampleRateChange();
-//    midiClockOutput->processTempoChange();
+    midiClockOutput->processSampleRateChange();
+    midiClockOutput->processTempoChange();
 
-    auto& ticks = mpc.getExternalClock()->getTicksForCurrentBuffer();
+    auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
     bool comesFromSpilledTick = false;
 
@@ -485,7 +490,7 @@ void FrameSeq::work(int nFrames)
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
-//        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
+        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
 
         processEventsAfterNFrames(frameIndex);
 
@@ -515,14 +520,14 @@ void FrameSeq::work(int nFrames)
         }
         else
         {
-            if (std::find(ticks.begin(), ticks.end(), frameIndex) == ticks.end())
+            if (std::find(externalClockTicks.begin(), externalClockTicks.end(), frameIndex) == externalClockTicks.end())
             {
                 comesFromSpilledTick = false;
 
                 if (auto candidate = std::find(spilledTicks.begin(), spilledTicks.end(), frameIndex); candidate != spilledTicks.end())
                 {
                     comesFromSpilledTick = true;
-                    spilledTicks.erase(candidate);
+                    *candidate = -1;
                 }
                 else
                 {
@@ -531,7 +536,7 @@ void FrameSeq::work(int nFrames)
             }
         }
 
-        const int loops = (useInternalClock || comesFromSpilledTick) ? 1 : 12;
+        const int loops = (useInternalClock || comesFromSpilledTick) ? 1 : 24;
 
         for (int loop = 0; loop < loops; loop++) {
 
@@ -541,7 +546,8 @@ void FrameSeq::work(int nFrames)
             {
                 if (!comesFromSpilledTick)
                 {
-                    spilledTicks.push_back(tickFrameOffset);
+                    auto candidate = std::find(spilledTicks.begin(), spilledTicks.end(), -1);
+                    *candidate = tickFrameOffset;
                 }
                 continue;
             }
@@ -605,6 +611,7 @@ void FrameSeq::work(int nFrames)
 
     for (auto& spilledTick : spilledTicks)
     {
+        if (spilledTick == -1) continue;
         spilledTick -= nFrames;
     }
 }

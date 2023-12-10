@@ -1,5 +1,4 @@
 #include "ExternalClock.hpp"
-#include "Logger.hpp"
 
 using namespace mpc::sequencer;
 
@@ -11,12 +10,12 @@ void ExternalClock::clearTicks()
     }
 }
 
-std::vector<int>& ExternalClock::getTicksForCurrentBuffer()
+std::vector<int32_t>& ExternalClock::getTicksForCurrentBuffer()
 {
     return ticks;
 }
 
-void ExternalClock::computeTicksForCurrentBuffer(
+/*void ExternalClock::computeTicksForCurrentBuffer(
         double ppqPosAtStartOfBuffer,
         int nFrames,
         int sampleRate,
@@ -42,7 +41,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        auto relativePosition = fmod(ppqPositions[sample], 0.125);
+        auto relativePosition = fmod(ppqPositions[sample], 0.25);
 
         if (previousRelativePosition >= relativePosition &&
             relativePosition <= tolerance)
@@ -52,9 +51,9 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
         previousRelativePosition = relativePosition; // Update the previous position
     }
-}
+}*/
 
-/*void ExternalClock::computeTicksForCurrentBuffer(
+void ExternalClock::computeTicksForCurrentBuffer(
         double ppqPosAtStartOfBuffer,
         int nFrames,
         int sampleRate,
@@ -64,15 +63,13 @@ void ExternalClock::computeTicksForCurrentBuffer(
     const double resolution = 4.0;
     auto samplesPerTick = samplesPerBeat / resolution;
 
-    // Calculate the PPQ position of the first 1/96th tick in the buffer
     double firstTickPPQ = ceil(ppqPosAtStartOfBuffer * resolution) / resolution;
     double firstTickSample = (firstTickPPQ - ppqPosAtStartOfBuffer) * samplesPerBeat;
 
     int tickCounter = 0;
 
-    // Find all ticks in the current buffer
     for (double sample = firstTickSample; sample < nFrames; sample += samplesPerTick)
     {
         ticks[tickCounter++] = static_cast<int>(sample);
     }
-}*/
+}
