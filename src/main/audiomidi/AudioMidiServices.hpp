@@ -90,7 +90,7 @@ namespace mpc::audiomidi
 		std::shared_ptr<mpc::engine::audio::mixer::MixerControls> mixerControls;
 		std::shared_ptr<mpc::engine::audio::server::CompoundAudioClient> cac;
 		std::shared_ptr<MidiOutput> midiOutput;
-		std::vector<mpc::engine::audio::server::IOAudioProcess*> inputProcesses;
+		mpc::engine::audio::server::IOAudioProcess* inputProcess = nullptr;
 		std::vector<mpc::engine::audio::server::IOAudioProcess*> outputProcesses;
 		std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 		std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
@@ -128,7 +128,7 @@ namespace mpc::audiomidi
 		bool isBouncePrepared();
 
 	public:
-		void start(const int inputCount, const int outputCount);
+		void start();
 
 	public:
 		AudioMidiServices(mpc::Mpc& mpcToUse);

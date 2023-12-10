@@ -41,7 +41,7 @@ Mpc::Mpc()
     paths = std::make_shared<mpc::Paths>();
 }
 
-void Mpc::init(const int inputCount, const int outputCount)
+void Mpc::init()
 {
     std::vector<fs::path> requiredPaths {
             paths->appDocumentsPath(),
@@ -123,7 +123,7 @@ void Mpc::init(const int inputCount, const int outputCount)
     sequencer->init();
 	MLOG("Sequencer initialized");
 
-    audioMidiServices->start(inputCount, outputCount);
+    audioMidiServices->start();
     MLOG("AudioMidiServices started");
 
     // This needs to happen before the sampler initializes initMasterPadAssign

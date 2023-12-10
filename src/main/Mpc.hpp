@@ -88,7 +88,7 @@ namespace mpc {
         std::shared_ptr<mpc::lcdgui::Screens> screens;
         std::shared_ptr<mpc::Paths> paths;
         std::vector<std::shared_ptr<nvram::MidiControlPreset>> midiControlPresets;
-        void init(const int inputCount, const int outputCount);
+        void init();
         void setBank(int i);
         int getBank();
         void setNote(int note);
