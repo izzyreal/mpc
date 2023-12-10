@@ -478,6 +478,11 @@ void FrameSeq::work(int nFrames)
 
     auto& ticks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
+    bool comesFromSpilledTick = false;
+
+    const double lengthOfOneTickInSamples =
+            (60.0 * internalClock.getSampleRate()) / (internalClock.getBpm() * 96.0);
+
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
 //        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
@@ -512,70 +517,91 @@ void FrameSeq::work(int nFrames)
         {
             if (std::find(ticks.begin(), ticks.end(), frameIndex) == ticks.end())
             {
-                continue;
+                comesFromSpilledTick = false;
+
+                if (auto candidate = std::find(spilledTicks.begin(), spilledTicks.end(), frameIndex); candidate != spilledTicks.end())
+                {
+                    comesFromSpilledTick = true;
+                    spilledTicks.erase(candidate);
+                }
+                else
+                {
+                    continue;
+                }
             }
         }
 
-        tickFrameOffset = frameIndex;
+        const int loops = (useInternalClock || comesFromSpilledTick) ? 1 : 24;
 
-//        MLOG("\nsequencerPlayTickCounter " + std::to_string(sequencerPlayTickCounter));
-//        MLOG("tickFrameOffset " + std::to_string(tickFrameOffset));
+        for (int loop = 0; loop < loops; loop++) {
 
-        triggerClickIfNeeded();
-        /*
-        displayPunchRects();
+            tickFrameOffset = frameIndex + (loop * lengthOfOneTickInSamples);
 
-        if (metronome)
-        {
+            if (tickFrameOffset >= nFrames)
+            {
+                spilledTicks.push_back(tickFrameOffset);
+                continue;
+            }
+
+            triggerClickIfNeeded();
+            displayPunchRects();
+
+            if (metronome)
+            {
+                sequencerPlayTickCounter++;
+                continue;
+            }
+
+            if (sequencer->isCountingIn())
+            {
+                sequencerPlayTickCounter++;
+                stopCountingInIfRequired();
+                continue;
+            }
+
+            updateTimeDisplay();
+
+            if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
+                !sequencer->isSongModeEnabled() &&
+                sequencer->getNextSq() != -1)
+            {
+                seq = switchToNextSequence();
+                continue;
+            }
+            else if (sequencer->isSongModeEnabled())
+            {
+                if (!songHasStopped && processSongMode())
+                {
+                    songHasStopped = true;
+                    continue;
+                }
+            }
+            else if (seq->isLoopEnabled())
+            {
+                if (processSeqLoopEnabled())
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                if (!normalPlayHasStopped && processSeqLoopDisabled())
+                {
+                    normalPlayHasStopped = true;
+                }
+            }
+
+            if (!songHasStopped && !normalPlayHasStopped)
+            {
+                sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+                processNoteRepeat();
+            }
             sequencerPlayTickCounter++;
-            continue;
         }
+    }
 
-        if (sequencer->isCountingIn())
-        {
-            sequencerPlayTickCounter++;
-            stopCountingInIfRequired();
-            continue;
-        }
-
-        updateTimeDisplay();
-
-        if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
-            !sequencer->isSongModeEnabled() &&
-            sequencer->getNextSq() != -1)
-        {
-            seq = switchToNextSequence();
-            continue;
-        }
-        else if (sequencer->isSongModeEnabled())
-        {
-            if (!songHasStopped && processSongMode())
-            {
-                songHasStopped = true;
-                continue;
-            }
-        }
-        else if (seq->isLoopEnabled())
-        {
-            if (processSeqLoopEnabled())
-            {
-                continue;
-            }
-        }
-        else
-        {
-            if (!normalPlayHasStopped && processSeqLoopDisabled())
-            {
-                normalPlayHasStopped = true;
-            }
-        }
-
-        if (!songHasStopped && !normalPlayHasStopped)
-        {
-            sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
-            processNoteRepeat();
-        }
-        */
-        sequencerPlayTickCounter++;
+    for (auto& spilledTick : spilledTicks)
+    {
+        spilledTick -= nFrames;
     }
 }

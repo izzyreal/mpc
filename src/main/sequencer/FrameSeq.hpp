@@ -55,6 +55,8 @@ namespace mpc::sequencer {
 
         unsigned long long sequencerPlayTickCounter = 0;
 
+        std::vector<int> spilledTicks;
+
         void updateTimeDisplay();
 
         void processTempoChange();
