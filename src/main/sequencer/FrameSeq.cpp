@@ -531,7 +531,7 @@ void FrameSeq::work(int nFrames)
             }
         }
 
-        const int loops = (useInternalClock || comesFromSpilledTick) ? 1 : 24;
+        const int loops = (useInternalClock || comesFromSpilledTick) ? 1 : 12;
 
         for (int loop = 0; loop < loops; loop++) {
 
@@ -539,7 +539,10 @@ void FrameSeq::work(int nFrames)
 
             if (tickFrameOffset >= nFrames)
             {
-                spilledTicks.push_back(tickFrameOffset);
+                if (!comesFromSpilledTick)
+                {
+                    spilledTicks.push_back(tickFrameOffset);
+                }
                 continue;
             }
 
