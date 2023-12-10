@@ -15,7 +15,7 @@
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/RepeatPad.hpp"
-
+#include "ExternalClock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
@@ -62,7 +62,7 @@ void FrameSeq::start()
 
     if (syncScreen->modeOut == 0)
     {
-        clock.reset();
+        internalClock.reset();
     }
     else
     {
@@ -384,8 +384,8 @@ void FrameSeq::processNoteRepeat()
                     getTickPosition(),
                     repeatIntervalTicks,
                     getEventFrameOffset(),
-                    clock.getBpm(),
-                    static_cast<float>(clock.getSampleRate()));
+                    internalClock.getBpm(),
+                    static_cast<float>(internalClock.getSampleRate()));
         }
     }
 }
@@ -403,9 +403,9 @@ void FrameSeq::processTempoChange()
 {
     double tempo = sequencer->getTempo();
 
-    if (tempo != clock.getBpm())
+    if (tempo != internalClock.getBpm())
     {
-        clock.set_bpm(tempo);
+        internalClock.set_bpm(tempo);
         sequencer->notify("tempo");
     }
 }
@@ -452,17 +452,18 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
 
 void FrameSeq::processSampleRateChange()
 {
-    if (clock.getSampleRate() != requestedSampleRate)
+    if (internalClock.getSampleRate() != requestedSampleRate)
     {
-        auto bpm = clock.getBpm();
-        clock.init(requestedSampleRate);
-        clock.set_bpm(bpm);
+        auto bpm = internalClock.getBpm();
+        internalClock.init(requestedSampleRate);
+        internalClock.set_bpm(bpm);
     }
 }
 
 void FrameSeq::work(int nFrames)
 {
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
+    const bool useInternalClock = syncScreen->modeIn == 0;
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -498,9 +499,21 @@ void FrameSeq::work(int nFrames)
             }
         }
 
-        if (!clock.proc())
+        if (useInternalClock)
         {
-            continue;
+            if (!internalClock.proc())
+            {
+                continue;
+            }
+        }
+        else
+        {
+            auto& ticks = mpc.getExternalClock()->getTicksForCurrentBuffer();
+
+            if (std::find(ticks.begin(), ticks.end(), frameIndex) == ticks.end())
+            {
+                continue;
+            }
         }
 
         tickFrameOffset = frameIndex;

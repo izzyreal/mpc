@@ -44,7 +44,7 @@ namespace mpc::sequencer {
         std::atomic<bool> sequencerIsRunning{false};
         bool shouldWaitForMidiClockLock = false;
         std::atomic_int32_t requestedSampleRate{44100};
-        Clock clock;
+        Clock internalClock;
         std::shared_ptr<MidiClockOutput> midiClockOutput;
         std::shared_ptr<Sequencer> sequencer;
         bool metronome = false;
