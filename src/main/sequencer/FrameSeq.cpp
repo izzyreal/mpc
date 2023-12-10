@@ -473,12 +473,14 @@ void FrameSeq::work(int nFrames)
     processSampleRateChange();
     processTempoChange();
 
-    midiClockOutput->processSampleRateChange();
-    midiClockOutput->processTempoChange();
+//    midiClockOutput->processSampleRateChange();
+//    midiClockOutput->processTempoChange();
+
+    auto& ticks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
-        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
+//        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
 
         processEventsAfterNFrames(frameIndex);
 
@@ -508,8 +510,6 @@ void FrameSeq::work(int nFrames)
         }
         else
         {
-            auto& ticks = mpc.getExternalClock()->getTicksForCurrentBuffer();
-
             if (std::find(ticks.begin(), ticks.end(), frameIndex) == ticks.end())
             {
                 continue;
@@ -518,7 +518,11 @@ void FrameSeq::work(int nFrames)
 
         tickFrameOffset = frameIndex;
 
+//        MLOG("\nsequencerPlayTickCounter " + std::to_string(sequencerPlayTickCounter));
+//        MLOG("tickFrameOffset " + std::to_string(tickFrameOffset));
+
         triggerClickIfNeeded();
+        /*
         displayPunchRects();
 
         if (metronome)
@@ -571,7 +575,7 @@ void FrameSeq::work(int nFrames)
             sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
             processNoteRepeat();
         }
-
+        */
         sequencerPlayTickCounter++;
     }
 }

@@ -25,13 +25,24 @@ void ExternalClock::computeTicksForCurrentBuffer(
     const double timePerTick = timePerBeat / 96.0; // Time for one tick
     const double framesPerTick = timePerTick * sampleRate; // Frames per tick
 
-    // Current position in frames
-    double currentFrame = (ppqPosAtStartOfBuffer - std::floor(ppqPosAtStartOfBuffer)) * timePerBeat * sampleRate;
+    const double beatFraction = ppqPosAtStartOfBuffer - std::floor(ppqPosAtStartOfBuffer);
+    const double beatFractionInFrames = beatFraction * timePerTick * sampleRate;
+    const double startOfBeatWasThisManyFramesBeforeStartOfThisBuffer =
+            -beatFractionInFrames;
+
+    double tickFramePos = startOfBeatWasThisManyFramesBeforeStartOfThisBuffer;
+
+    while (tickFramePos < 0)
+    {
+        tickFramePos += framesPerTick;
+    }
 
     int tickCounter = 0;
 
-    while(currentFrame < nFrames) {
-        ticks[tickCounter++] = static_cast<int>(std::round(currentFrame));
-        currentFrame += framesPerTick; // Move to the next tick
+    while (std::round(tickFramePos) < nFrames)
+    {
+        ticks[tickCounter++] = static_cast<int>(std::round<double>(tickFramePos));
+        tickFramePos += framesPerTick;
     }
 }
+
