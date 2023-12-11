@@ -69,6 +69,8 @@ void FrameSeq::start()
 
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
 
+    spilledTicks.clear();
+
 //    for (auto& spilledTick : spilledTicks)
 //    {
 //        spilledTick = -1;
@@ -481,6 +483,15 @@ void FrameSeq::work(int nFrames)
 
     auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
+    for (auto& externalClockTick : externalClockTicks)
+    {
+        if (static_cast<int>(externalClockTick) >= nFrames)
+        {
+//            MLOG("Inserting externalClockTick into spilledTicks: " + std::to_string(externalClockTick));
+            spilledTicks.push_back(externalClockTick);
+        }
+    }
+
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
 //        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
@@ -514,9 +525,9 @@ void FrameSeq::work(int nFrames)
         else
         {
             const auto frameIndexIsExternalClockTick =
-                    std::find_if(externalClockTicks.begin(), externalClockTicks.end(), [&](const double& t){ return std::round(t) == frameIndex; }) != externalClockTicks.end();
+                    std::find_if(externalClockTicks.begin(), externalClockTicks.end(), [&](const double& t){ return static_cast<int>(t) == frameIndex; }) != externalClockTicks.end();
 
-            auto spilledTickIt = std::find_if(spilledTicks.begin(), spilledTicks.end(), [&](const double& t){ return std::round(t) == frameIndex; });
+            const auto spilledTickIt = std::find_if(spilledTicks.begin(), spilledTicks.end(), [&](const double& t){ return static_cast<int>(t) == frameIndex; });
             const auto frameIndexIsSpilledTick = spilledTickIt != spilledTicks.end();
 
             if (!frameIndexIsExternalClockTick && !frameIndexIsSpilledTick)
@@ -529,6 +540,8 @@ void FrameSeq::work(int nFrames)
                 spilledTicks.erase(spilledTickIt);
             }
         }
+
+//        MLOG("tick " + std::to_string(sequencerPlayTickCounter) + " at frame " + std::to_string(frameIndex));
 
         tickFrameOffset = frameIndex;
 
@@ -589,11 +602,14 @@ void FrameSeq::work(int nFrames)
         sequencerPlayTickCounter++;
     }
 
-    for (auto& externalClockTick : externalClockTicks)
+//    MLOG("spilledTicksSize: " + std::to_string(spilledTicks.size()));
+
+    for (int i = 1; i < spilledTicks.size(); i++)
     {
-        if (externalClockTick >= nFrames)
+        auto candidate = spilledTicks[i] - spilledTicks[i-1];
+        if (candidate < 229 || candidate > 230)
         {
-            spilledTicks.push_back(externalClockTick);
+//            MLOG("messed up frameseq: " + std::to_string(candidate));
         }
     }
 

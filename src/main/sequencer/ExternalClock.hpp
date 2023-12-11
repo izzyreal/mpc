@@ -13,6 +13,6 @@ namespace mpc::sequencer {
         std::vector<double>& getTicksForCurrentBuffer();
 
     private:
-        std::vector<double> ticks = std::vector<double>(100, -1);
+        std::vector<double> ticks = std::vector<double>(200, -1);
     };
 }
