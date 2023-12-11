@@ -13,6 +13,6 @@ namespace mpc::sequencer {
         std::vector<int32_t>& getTicksForCurrentBuffer();
 
     private:
-        std::vector<int32_t> ticks = std::vector<int>(50, -1);
+        std::vector<int32_t> ticks = std::vector<int>(100, -1);
     };
 }

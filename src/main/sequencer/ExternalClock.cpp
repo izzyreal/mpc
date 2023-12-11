@@ -61,15 +61,19 @@ void ExternalClock::computeTicksForCurrentBuffer(
 {
     auto samplesPerBeat = (60.0 * sampleRate) / bpm;
     const double resolution = 4.0;
-    auto samplesPerTick = samplesPerBeat / resolution;
+    const auto samplesPer16th = samplesPerBeat / resolution;
+    const auto samplesPerTick = samplesPerBeat / 96.0;
 
     double firstTickPPQ = ceil(ppqPosAtStartOfBuffer * resolution) / resolution;
     double firstTickSample = (firstTickPPQ - ppqPosAtStartOfBuffer) * samplesPerBeat;
 
     int tickCounter = 0;
 
-    for (double sample = firstTickSample; sample < nFrames; sample += samplesPerTick)
+    for (double sample = firstTickSample; sample < nFrames; sample += samplesPer16th)
     {
-        ticks[tickCounter++] = static_cast<int>(sample);
+        for (int subDivision = 0; subDivision < 24; subDivision++)
+        {
+            ticks[tickCounter++] = static_cast<int>(sample + (subDivision * samplesPerTick));
+        }
     }
 }

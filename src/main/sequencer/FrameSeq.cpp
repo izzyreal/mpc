@@ -25,8 +25,6 @@
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
-#include <engine/midi/ShortMessage.hpp>
-
 #include "Util.hpp"
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
@@ -71,10 +69,10 @@ void FrameSeq::start()
 
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
 
-    for (auto& spilledTick : spilledTicks)
-    {
-        spilledTick = -1;
-    }
+//    for (auto& spilledTick : spilledTicks)
+//    {
+//        spilledTick = -1;
+//    }
 
     sequencerIsRunning.store(true);
 }
@@ -478,19 +476,14 @@ void FrameSeq::work(int nFrames)
     processSampleRateChange();
     processTempoChange();
 
-    midiClockOutput->processSampleRateChange();
-    midiClockOutput->processTempoChange();
+//    midiClockOutput->processSampleRateChange();
+//    midiClockOutput->processTempoChange();
 
     auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-    bool comesFromSpilledTick = false;
-
-    const double lengthOfOneTickInSamples =
-            (60.0 * internalClock.getSampleRate()) / (internalClock.getBpm() * 96.0);
-
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
-        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
+//        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
 
         processEventsAfterNFrames(frameIndex);
 
@@ -520,98 +513,91 @@ void FrameSeq::work(int nFrames)
         }
         else
         {
-            if (std::find(externalClockTicks.begin(), externalClockTicks.end(), frameIndex) == externalClockTicks.end())
-            {
-                comesFromSpilledTick = false;
+            const auto frameIndexIsExternalClockTick = std::find(externalClockTicks.begin(), externalClockTicks.end(), frameIndex) != externalClockTicks.end();
 
-                if (auto candidate = std::find(spilledTicks.begin(), spilledTicks.end(), frameIndex); candidate != spilledTicks.end())
-                {
-                    comesFromSpilledTick = true;
-                    *candidate = -1;
-                }
-                else
-                {
-                    continue;
-                }
+            auto spilledTickIt = std::find(spilledTicks.begin(), spilledTicks.end(), frameIndex);
+            const auto frameIndexIsSpilledTick = spilledTickIt != spilledTicks.end();
+
+            if (!frameIndexIsExternalClockTick && !frameIndexIsSpilledTick)
+            {
+                continue;
+            }
+
+            if (frameIndexIsSpilledTick)
+            {
+                spilledTicks.erase(spilledTickIt);
             }
         }
 
-        const int loops = (useInternalClock || comesFromSpilledTick) ? 1 : 24;
+        tickFrameOffset = frameIndex;
 
-        for (int loop = 0; loop < loops; loop++) {
+        triggerClickIfNeeded();
+        displayPunchRects();
 
-            tickFrameOffset = frameIndex + (loop * lengthOfOneTickInSamples);
-
-            if (tickFrameOffset >= nFrames)
-            {
-                if (!comesFromSpilledTick)
-                {
-                    auto candidate = std::find(spilledTicks.begin(), spilledTicks.end(), -1);
-                    *candidate = tickFrameOffset;
-                }
-                continue;
-            }
-
-            triggerClickIfNeeded();
-            displayPunchRects();
-
-            if (metronome)
-            {
-                sequencerPlayTickCounter++;
-                continue;
-            }
-
-            if (sequencer->isCountingIn())
-            {
-                sequencerPlayTickCounter++;
-                stopCountingInIfRequired();
-                continue;
-            }
-
-            updateTimeDisplay();
-
-            if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
-                !sequencer->isSongModeEnabled() &&
-                sequencer->getNextSq() != -1)
-            {
-                seq = switchToNextSequence();
-                continue;
-            }
-            else if (sequencer->isSongModeEnabled())
-            {
-                if (!songHasStopped && processSongMode())
-                {
-                    songHasStopped = true;
-                    continue;
-                }
-            }
-            else if (seq->isLoopEnabled())
-            {
-                if (processSeqLoopEnabled())
-                {
-                    continue;
-                }
-            }
-            else
-            {
-                if (!normalPlayHasStopped && processSeqLoopDisabled())
-                {
-                    normalPlayHasStopped = true;
-                }
-            }
-
-            if (!songHasStopped && !normalPlayHasStopped)
-            {
-                sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
-                processNoteRepeat();
-            }
+        if (metronome)
+        {
             sequencerPlayTickCounter++;
+            continue;
+        }
+
+        if (sequencer->isCountingIn())
+        {
+            sequencerPlayTickCounter++;
+            stopCountingInIfRequired();
+            continue;
+        }
+
+        updateTimeDisplay();
+
+        if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
+            !sequencer->isSongModeEnabled() &&
+            sequencer->getNextSq() != -1)
+        {
+            seq = switchToNextSequence();
+            continue;
+        }
+        else if (sequencer->isSongModeEnabled())
+        {
+            if (!songHasStopped && processSongMode())
+            {
+                songHasStopped = true;
+                continue;
+            }
+        }
+        else if (seq->isLoopEnabled())
+        {
+            if (processSeqLoopEnabled())
+            {
+                continue;
+            }
+        }
+        else
+        {
+            if (!normalPlayHasStopped && processSeqLoopDisabled())
+            {
+                normalPlayHasStopped = true;
+            }
+        }
+
+        if (!songHasStopped && !normalPlayHasStopped)
+        {
+            sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+            processNoteRepeat();
+        }
+
+        sequencerPlayTickCounter++;
+    }
+
+    for (auto& externalClockTick : externalClockTicks)
+    {
+        if (externalClockTick >= nFrames)
+        {
+            spilledTicks.push_back(externalClockTick);
         }
     }
 
     for (auto& spilledTick : spilledTicks)
     {
-        if (spilledTick == -1) continue;
         spilledTick -= nFrames;
     }
 }
