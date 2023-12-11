@@ -4,13 +4,13 @@ using namespace mpc::sequencer;
 
 void ExternalClock::clearTicks()
 {
-    for (int & tick : ticks)
+    for (double & tick : ticks)
     {
         tick = -1;
     }
 }
 
-std::vector<int32_t>& ExternalClock::getTicksForCurrentBuffer()
+std::vector<double>& ExternalClock::getTicksForCurrentBuffer()
 {
     return ticks;
 }
@@ -73,7 +73,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
     {
         for (int subDivision = 0; subDivision < 24; subDivision++)
         {
-            ticks[tickCounter++] = static_cast<int>(sample + (subDivision * samplesPerTick));
+            ticks[tickCounter++] = sample + (subDivision * samplesPerTick);
         }
     }
 }

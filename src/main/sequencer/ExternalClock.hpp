@@ -10,9 +10,9 @@ namespace mpc::sequencer {
                                           int sampleRate,
                                           double bpm);
         void clearTicks();
-        std::vector<int32_t>& getTicksForCurrentBuffer();
+        std::vector<double>& getTicksForCurrentBuffer();
 
     private:
-        std::vector<int32_t> ticks = std::vector<int>(100, -1);
+        std::vector<double> ticks = std::vector<double>(100, -1);
     };
 }

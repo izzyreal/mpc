@@ -513,9 +513,10 @@ void FrameSeq::work(int nFrames)
         }
         else
         {
-            const auto frameIndexIsExternalClockTick = std::find(externalClockTicks.begin(), externalClockTicks.end(), frameIndex) != externalClockTicks.end();
+            const auto frameIndexIsExternalClockTick =
+                    std::find_if(externalClockTicks.begin(), externalClockTicks.end(), [&](const double& t){ return std::round(t) == frameIndex; }) != externalClockTicks.end();
 
-            auto spilledTickIt = std::find(spilledTicks.begin(), spilledTicks.end(), frameIndex);
+            auto spilledTickIt = std::find_if(spilledTicks.begin(), spilledTicks.end(), [&](const double& t){ return std::round(t) == frameIndex; });
             const auto frameIndexIsSpilledTick = spilledTickIt != spilledTicks.end();
 
             if (!frameIndexIsExternalClockTick && !frameIndexIsSpilledTick)
