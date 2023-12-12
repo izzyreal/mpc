@@ -36,10 +36,10 @@ void parseDoubles(const char* input, std::vector<double>& output) {
     }
 }
 
-void readPpqPositions(std::vector<double>& ppqPositions)
+void readDoublesFromFile(std::vector<double>& ppqPositions, std::string fileName)
 {
     auto fs = cmrc::mpctest::get_filesystem();
-    auto file = fs.open("test/ExternalClock/ableton-live-44.1khz-64frames-120bpm.txt");
+    auto file = fs.open("test/ExternalClock/" + fileName);
     char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
     parseDoubles(data, ppqPositions);
 }
@@ -55,15 +55,13 @@ void printDouble(double d)
     printf("%s\n", doubleToStringWithPrecision(d, 15).c_str());
 }
 
-TEST_CASE("120bpm 44.1khz 64 frames", "[external-clock]")
+TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 {
     std::vector<double> ppqPositions;
-    readPpqPositions(ppqPositions);
+    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-64frames-120bpm.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    mpc::sequencer::FrameSeq frameSeq(mpc);
-//    frameSeq.start();
 
     std::vector<double> ticks;
 
@@ -89,7 +87,7 @@ TEST_CASE("120bpm 44.1khz 64 frames", "[external-clock]")
         mpc.getExternalClock()->clearTicks();
     }
 
-    for (int tick = 1; tick < 100; tick++)
+    for (int tick = 1; tick < ticks.size(); tick++)
     {
         if (ticks[tick] == -1) continue;
 
@@ -116,4 +114,38 @@ TEST_CASE("120bpm 44.1khz 64 frames", "[external-clock]")
     const int expectedTickCount = barCount * 4 * 96;
     const size_t emptyBuffers = std::count(ticks.begin(), ticks.end(), -1);
     REQUIRE(ticks.size() - emptyBuffers == expectedTickCount);
+}
+
+TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", "[external-clock]")
+{
+    std::vector<double> ppqPositions;
+    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars.txt");
+    std::vector<double> tempos;
+    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars-tempo-map.txt");
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    std::vector<double> ticks;
+
+    for (int i = 0; i < ppqPositions.size(); i++)
+    {
+        const auto ppqPosition = ppqPositions[i];
+        const auto tempo = tempos[i];
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+
+        auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
+
+        for (auto& tick : ticksForCurrentBuffer)
+        {
+            if (tick == -1) continue;
+            ticks.push_back(tick);
+        }
+
+        mpc.getExternalClock()->clearTicks();
+    }
+
+    const int barCount = 16;
+    const int expectedTickCount = barCount * 4 * 96;
+    REQUIRE(ticks.size() == expectedTickCount);
 }
