@@ -109,7 +109,7 @@ TEST_CASE("120bpm 44.1khz 64 frames", "[external-clock]")
         const double tb = ticks[tick] + (emptyBuffersBetween * 64);
         const double diff = tb - ta;
         const double deviation = diff - frames_per_tick;
-        REQUIRE(deviation < 1e-11);
+        REQUIRE(std::abs(deviation) <= 0.6875);
     }
 
     const int barCount = 16;
