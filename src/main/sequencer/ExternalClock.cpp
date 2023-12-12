@@ -66,14 +66,30 @@ void ExternalClock::computeTicksForCurrentBuffer(
     const double samplesPerBeat = (60.0 * sampleRate) / bpm;
     const double resolution = 96.0;
     const double samplesPerTick = samplesPerBeat / resolution;
+
+    // Calculate the PPQ position in ticks
     const double ppqPosTicks = ppqPosAtStartOfBuffer * resolution;
-    const double firstTickPpq = ceil(ppqPosTicks) - ppqPosTicks;
-    const double firstTickSample = firstTickPpq * samplesPerTick;
+
+    // Calculate the sample position of the first tick in this buffer
+    double firstTickPpq = ceil(ppqPosTicks) - ppqPosTicks;
+    double firstTickSample = firstTickPpq * samplesPerTick;
+
+    // Correcting firstTickSample based on the lastSamplePosition
+    if (lastSamplePosition > 0) {
+        firstTickSample = fmod(lastSamplePosition, samplesPerTick);
+        if (firstTickSample != 0) {
+            firstTickSample = samplesPerTick - firstTickSample;
+        }
+    }
 
     int tickCounter = 0;
 
+    // Adjust the loop to iterate over the buffer
     for (double sample = firstTickSample; sample < nFrames; sample += samplesPerTick)
     {
-        ticks[tickCounter++] = sample;
+        ticks[tickCounter++] = static_cast<int>(sample); // Ensure sample is an integer
     }
+
+    // Update the lastSamplePosition for the next buffer
+    lastSamplePosition += nFrames;
 }

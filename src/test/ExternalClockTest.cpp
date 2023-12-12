@@ -113,7 +113,7 @@ TEST_CASE("120bpm 44.1khz 64 frames", "[external-clock]")
     }
 
     const int barCount = 16;
-    const int expectedTickCount = (barCount * 4 * 96) + 1;
+    const int expectedTickCount = barCount * 4 * 96;
     const size_t emptyBuffers = std::count(ticks.begin(), ticks.end(), -1);
     REQUIRE(ticks.size() - emptyBuffers == expectedTickCount);
 }

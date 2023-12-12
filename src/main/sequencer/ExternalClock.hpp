@@ -14,5 +14,6 @@ namespace mpc::sequencer {
 
     private:
         std::vector<double> ticks = std::vector<double>(200, -1);
+        double lastSamplePosition = 0;
     };
 }
