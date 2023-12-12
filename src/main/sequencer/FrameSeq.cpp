@@ -69,13 +69,6 @@ void FrameSeq::start()
 
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
 
-    spilledTicks.clear();
-
-//    for (auto& spilledTick : spilledTicks)
-//    {
-//        spilledTick = -1;
-//    }
-
     sequencerIsRunning.store(true);
 }
 
@@ -487,8 +480,7 @@ void FrameSeq::work(int nFrames)
     {
         if (static_cast<int>(externalClockTick) >= nFrames)
         {
-//            MLOG("Inserting externalClockTick into spilledTicks: " + std::to_string(externalClockTick));
-            spilledTicks.push_back(externalClockTick);
+            throw std::exception();
         }
     }
 
@@ -527,17 +519,9 @@ void FrameSeq::work(int nFrames)
             const auto frameIndexIsExternalClockTick =
                     std::find_if(externalClockTicks.begin(), externalClockTicks.end(), [&](const double& t){ return static_cast<int>(t) == frameIndex; }) != externalClockTicks.end();
 
-            const auto spilledTickIt = std::find_if(spilledTicks.begin(), spilledTicks.end(), [&](const double& t){ return static_cast<int>(t) == frameIndex; });
-            const auto frameIndexIsSpilledTick = spilledTickIt != spilledTicks.end();
-
-            if (!frameIndexIsExternalClockTick && !frameIndexIsSpilledTick)
+            if (!frameIndexIsExternalClockTick)
             {
                 continue;
-            }
-
-            if (frameIndexIsSpilledTick)
-            {
-                spilledTicks.erase(spilledTickIt);
             }
         }
 
@@ -600,21 +584,5 @@ void FrameSeq::work(int nFrames)
         }
 
         sequencerPlayTickCounter++;
-    }
-
-//    MLOG("spilledTicksSize: " + std::to_string(spilledTicks.size()));
-
-    for (int i = 1; i < spilledTicks.size(); i++)
-    {
-        auto candidate = spilledTicks[i] - spilledTicks[i-1];
-        if (candidate < 229 || candidate > 230)
-        {
-//            MLOG("messed up frameseq: " + std::to_string(candidate));
-        }
-    }
-
-    for (auto& spilledTick : spilledTicks)
-    {
-        spilledTick -= nFrames;
     }
 }

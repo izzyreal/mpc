@@ -1,7 +1,5 @@
 #include "ExternalClock.hpp"
 
-#include <Logger.hpp>
-
 using namespace mpc::sequencer;
 
 void ExternalClock::clearTicks()
@@ -65,29 +63,17 @@ void ExternalClock::computeTicksForCurrentBuffer(
         int sampleRate,
         double bpm)
 {
-    auto samplesPerBeat = (60.0 * sampleRate) / bpm;
-    double firstBeatPPQ = ceil(ppqPosAtStartOfBuffer);
-    double firstBeatSample = (firstBeatPPQ - ppqPosAtStartOfBuffer) * samplesPerBeat;
+    const double samplesPerBeat = (60.0 * sampleRate) / bpm;
+    const double resolution = 96.0;
+    const double samplesPerTick = samplesPerBeat / resolution;
+    const double ppqPosTicks = ppqPosAtStartOfBuffer * resolution;
+    const double firstTickPpq = ceil(ppqPosTicks) - ppqPosTicks;
+    const double firstTickSample = firstTickPpq * samplesPerTick;
 
     int tickCounter = 0;
 
-    const auto samplesPerTick = samplesPerBeat / 96.0;
-
-    double sample = firstBeatSample;
-
-    while (sample < nFrames)
+    for (double sample = firstTickSample; sample < nFrames; sample += samplesPerTick)
     {
-        for (int subDivision = 0; subDivision < 96; subDivision++)
-        {
-            ticks[tickCounter++] = sample + (subDivision * samplesPerTick);
-//            if (subDivision > 0) {
-//                auto candidate = ticks[subDivision] - ticks[subDivision - 1];
-//                if (candidate < 229 || candidate > 230) {
-//                    MLOG("messed up external clock: " + std::to_string(candidate));
-//                }
-//            }
-        }
-
-        sample += samplesPerBeat;
+        ticks[tickCounter++] = sample;
     }
 }
