@@ -67,6 +67,8 @@ void FrameSeq::start()
         shouldWaitForMidiClockLock = true;
     }
 
+    mpc.getExternalClock()->reset();
+
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
 
     sequencerIsRunning.store(true);
