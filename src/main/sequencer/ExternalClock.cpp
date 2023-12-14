@@ -4,8 +4,7 @@ using namespace mpc::sequencer;
 
 void ExternalClock::reset()
 {
-    createdTicksSincePlayStart = 0;
-    firstBarStart = -1;
+    createdTicksSincePlayStart = -1;
 }
 
 void ExternalClock::clearTicks()
@@ -23,15 +22,13 @@ std::vector<double>& ExternalClock::getTicksForCurrentBuffer()
 
 void ExternalClock::computeTicksForCurrentBuffer(
         double ppqPosAtStartOfBuffer,
-        double firstBarStartAtStartOfBuffer,
         int nFrames,
         int sampleRate,
         double bpm)
 {
-    if (firstBarStart == -1)
+    if (createdTicksSincePlayStart == -1)
     {
-        firstBarStart = firstBarStartAtStartOfBuffer;
-        createdTicksSincePlayStart = firstBarStart * resolution;
+        createdTicksSincePlayStart = ppqPosAtStartOfBuffer * resolution;
     }
 
     const double samplesPerBeat = (60.0 * sampleRate) / bpm;
