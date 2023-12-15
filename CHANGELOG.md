@@ -1,3 +1,8 @@
+## v0.5.10 (15-12-2023)
+* Fix plugin-to-host synchronization. Note that at the moment tempo changes from the host are handled ok on the iPad version in AUM, but not in Ableton Live and possibly other DAWs. More investigation needed, so for now to keep VMPC2000XL in sync with the DAW use small buffer sizes (128 or lower preferably), keep the tempo static, and start playing from the start of a bar. The problem that was fixed in this version is that VMPC2000XL used to start playing too late. Moreover, if you notice VMPC2000XL is not syncing to the host at all, check if you have `MIDI clock` enabled in the MIDI/SYNC screen (Shift + 9):
+<img width="407" alt="image" src="https://github.com/izzyreal/mpc/assets/3707432/52832a21-e512-4c94-87cb-52838c4274ae">
+
+
 ## v0.5.9 (5-12-2023)
 * Fix tempo change bug when tempo source is master (shout out to playpm for reporting this bug)
 
