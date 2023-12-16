@@ -146,6 +146,40 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     }
 
     const int barCount = 16;
-    const int expectedTickCount = barCount * 4 * 96;
+    const int expectedTickCount = (barCount * 4 * 96) + 2;
+    REQUIRE(ticks.size() == expectedTickCount);
+}
+
+TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "[external-clock]")
+{
+    std::vector<double> ppqPositions;
+    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars.txt");
+    std::vector<double> tempos;
+    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars-tempo-map.txt");
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    std::vector<double> ticks;
+
+    for (int i = 0; i < ppqPositions.size(); i++)
+    {
+        const auto ppqPosition = ppqPositions[i];
+        const auto tempo = tempos[i];
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+
+        auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
+
+        for (auto& tick : ticksForCurrentBuffer)
+        {
+            if (tick == -1) continue;
+            ticks.push_back(tick);
+        }
+
+        mpc.getExternalClock()->clearTicks();
+    }
+
+    const int barCount = 16;
+    const int expectedTickCount = (barCount * 4 * 96) + 2;
     REQUIRE(ticks.size() == expectedTickCount);
 }
