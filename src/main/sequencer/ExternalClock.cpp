@@ -4,7 +4,7 @@ using namespace mpc::sequencer;
 
 void ExternalClock::reset()
 {
-    previousAbsolutePpqPosition = 0.0;
+    previousAbsolutePpqPosition = -1.0;
     previousRelativePpqPosition = 1.0;
 }
 
@@ -44,7 +44,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        if (ppqPositions[sample] < previousAbsolutePpqPosition)
+        if (ppqPositions[sample] <= previousAbsolutePpqPosition)
         {
             continue;
         }
