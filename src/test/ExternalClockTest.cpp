@@ -178,7 +178,73 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
 
         mpc.getExternalClock()->clearTicks();
     }
-    
+
     const int expectedTickCount = 6164;
+    REQUIRE(ticks.size() == expectedTickCount);
+}
+
+TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]")
+{
+    std::vector<double> ppqPositions;
+    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm.txt");
+    std::vector<double> tempos;
+    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm-tempo-map.txt");
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    std::vector<int32_t> ticks;
+
+    for (int i = 0; i < ppqPositions.size(); i++)
+    {
+        const auto ppqPosition = ppqPositions[i];
+        const auto tempo = tempos[i];
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+
+        auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
+
+        for (auto& tick : ticksForCurrentBuffer)
+        {
+            if (tick == -1) continue;
+            ticks.push_back(tick);
+        }
+
+        mpc.getExternalClock()->clearTicks();
+    }
+
+    const int expectedTickCount = 1536;
+    REQUIRE(ticks.size() == expectedTickCount);
+}
+
+TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]")
+{
+    std::vector<double> ppqPositions;
+    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm.txt");
+    std::vector<double> tempos;
+    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm-tempo-map.txt");
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+
+    std::vector<int32_t> ticks;
+
+    for (int i = 0; i < ppqPositions.size(); i++)
+    {
+        const auto ppqPosition = ppqPositions[i];
+        const auto tempo = tempos[i];
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+
+        auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
+
+        for (auto& tick : ticksForCurrentBuffer)
+        {
+            if (tick == -1) continue;
+            ticks.push_back(tick);
+        }
+
+        mpc.getExternalClock()->clearTicks();
+    }
+
+    const int expectedTickCount = 1536;
     REQUIRE(ticks.size() == expectedTickCount);
 }
