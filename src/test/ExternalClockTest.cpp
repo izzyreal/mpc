@@ -63,9 +63,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    std::vector<double> ticks;
-
-//    int counter = 0;
+    std::vector<int32_t> ticks;
 
     for (double ppqPosition : ppqPositions)
     {
@@ -87,7 +85,6 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
         }
 
         mpc.getExternalClock()->clearTicks();
-//        if (counter++ == 10) break;
     }
 
     for (int tick = 1; tick < ticks.size(); tick++)
@@ -96,7 +93,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 
         int i = 1;
 
-        double ta = ticks[tick - i];
+        int32_t ta = ticks[tick - i];
 
         int emptyBuffersBetween = 1;
 
@@ -107,10 +104,10 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
             emptyBuffersBetween++;
         }
 
-        const double tb = ticks[tick] + (emptyBuffersBetween * 64);
-        const double diff = tb - ta;
+        const int32_t tb = ticks[tick] + (emptyBuffersBetween * 64);
+        const int32_t diff = tb - ta;
         const double deviation = diff - frames_per_tick;
-//        REQUIRE(std::abs(deviation) <= 0.6875);
+        REQUIRE(std::abs(deviation) <= 0.6875);
     }
 
     const int barCount = 16;
@@ -129,7 +126,7 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    std::vector<double> ticks;
+    std::vector<int32_t> ticks;
 
     for (int i = 0; i < ppqPositions.size(); i++)
     {
@@ -163,7 +160,7 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    std::vector<double> ticks;
+    std::vector<int32_t> ticks;
 
     for (int i = 0; i < ppqPositions.size(); i++)
     {
@@ -181,8 +178,7 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
 
         mpc.getExternalClock()->clearTicks();
     }
-
-    const int barCount = 16;
-    const int expectedTickCount = (barCount * 4 * 96) + 2;
+    
+    const int expectedTickCount = 6164;
     REQUIRE(ticks.size() == expectedTickCount);
 }

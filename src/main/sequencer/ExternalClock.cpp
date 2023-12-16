@@ -10,20 +10,20 @@ void ExternalClock::reset()
 
 void ExternalClock::clearTicks()
 {
-    for (double & tick : ticks)
+    for (int32_t& tick : ticks)
     {
         tick = -1;
     }
 }
 
-std::vector<double>& ExternalClock::getTicksForCurrentBuffer()
+std::vector<int32_t>& ExternalClock::getTicksForCurrentBuffer()
 {
     return ticks;
 }
 
 void ExternalClock::computeTicksForCurrentBuffer(
         double ppqPosition,
-        int numSamples,
+        int nFrames,
         int sampleRate,
         double bpm)
 {
@@ -34,7 +34,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     double offset = 0.0;
 
-    for (int sample = 0; sample < numSamples; ++sample)
+    for (int sample = 0; sample < nFrames; ++sample)
     {
         ppqPositions[sample] = ppqPosition + offset;
         offset += ppqPerSample;
@@ -42,7 +42,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     int tickCounter = 0;
 
-    for (int sample = 0; sample < numSamples; ++sample)
+    for (int sample = 0; sample < nFrames; ++sample)
     {
         if (ppqPositions[sample] < previousAbsolutePpqPosition)
         {
@@ -59,5 +59,5 @@ void ExternalClock::computeTicksForCurrentBuffer(
         previousRelativePpqPosition = relativePosition;
     }
 
-    previousAbsolutePpqPosition = ppqPositions[numSamples - 1];
+    previousAbsolutePpqPosition = ppqPositions[nFrames - 1];
 }

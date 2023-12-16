@@ -10,13 +10,13 @@ namespace mpc::sequencer {
                                           int sampleRate,
                                           double bpm);
         void clearTicks();
-        std::vector<double>& getTicksForCurrentBuffer();
+        std::vector<int32_t>& getTicksForCurrentBuffer();
         void reset();
 
     private:
         const double resolution = 96.0;
         std::vector<double> ppqPositions = std::vector<double>(2048, -1);
-        std::vector<double> ticks = std::vector<double>(200, -1);
+        std::vector<int32_t> ticks = std::vector<int32_t>(200, -1);
         double previousAbsolutePpqPosition = 0.0;
         double previousRelativePpqPosition = 1.0;
     };
