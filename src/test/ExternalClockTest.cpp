@@ -65,6 +65,8 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 
     std::vector<double> ticks;
 
+//    int counter = 0;
+
     for (double ppqPosition : ppqPositions)
     {
         mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 64, 44100, 120);
@@ -85,6 +87,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
         }
 
         mpc.getExternalClock()->clearTicks();
+//        if (counter++ == 10) break;
     }
 
     for (int tick = 1; tick < ticks.size(); tick++)

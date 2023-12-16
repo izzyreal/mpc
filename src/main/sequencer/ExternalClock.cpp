@@ -4,7 +4,8 @@ using namespace mpc::sequencer;
 
 void ExternalClock::reset()
 {
-    createdTicksSincePlayStart = -1;
+    previousAbsolutePpqPosition = 0.0;
+    previousRelativePpqPosition = 1.0;
 }
 
 void ExternalClock::clearTicks()
@@ -21,27 +22,42 @@ std::vector<double>& ExternalClock::getTicksForCurrentBuffer()
 }
 
 void ExternalClock::computeTicksForCurrentBuffer(
-        double ppqPosAtStartOfBuffer,
-        int nFrames,
+        double ppqPosition,
+        int numSamples,
         int sampleRate,
         double bpm)
 {
-    if (createdTicksSincePlayStart == -1)
-    {
-        createdTicksSincePlayStart = ppqPosAtStartOfBuffer * resolution;
-    }
+    auto samplesInMinute = sampleRate * 60;
+    auto samplesPerBeat = samplesInMinute / bpm;
+    auto ppqPerSample = 1.0 / samplesPerBeat;
+    auto currentSubDiv = 1.0 / 96.0;
 
-    const double samplesPerBeat = (60.0 * sampleRate) / bpm;
-    const double samplesPerTick = samplesPerBeat / resolution;
-    double tickPosAtStartOfBuffer = ppqPosAtStartOfBuffer * resolution;
-    double ticksBeforeNextTick = -(tickPosAtStartOfBuffer - createdTicksSincePlayStart);
-    double firstTickSample = ticksBeforeNextTick * samplesPerTick;
+    double offset = 0.0;
+
+    for (int sample = 0; sample < numSamples; ++sample)
+    {
+        ppqPositions[sample] = ppqPosition + offset;
+        offset += ppqPerSample;
+    }
 
     int tickCounter = 0;
 
-    for (double sample = firstTickSample; static_cast<int>(sample) < nFrames; sample += samplesPerTick)
+    for (int sample = 0; sample < numSamples; ++sample)
     {
-        ticks[tickCounter++] = static_cast<int>(sample); // Ensure sample is an integer
-        createdTicksSincePlayStart++;
+        if (ppqPositions[sample] < previousAbsolutePpqPosition)
+        {
+            continue;
+        }
+
+        auto relativePosition = fmod(ppqPositions[sample], currentSubDiv);
+
+        if (relativePosition < previousRelativePpqPosition)
+        {
+            ticks[tickCounter++] = sample;
+        }
+
+        previousRelativePpqPosition = relativePosition;
     }
+
+    previousAbsolutePpqPosition = ppqPositions[numSamples - 1];
 }

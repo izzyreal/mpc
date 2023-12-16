@@ -15,7 +15,9 @@ namespace mpc::sequencer {
 
     private:
         const double resolution = 96.0;
+        std::vector<double> ppqPositions = std::vector<double>(2048, -1);
         std::vector<double> ticks = std::vector<double>(200, -1);
-        unsigned long long createdTicksSincePlayStart = -1;
+        double previousAbsolutePpqPosition = 0.0;
+        double previousRelativePpqPosition = 1.0;
     };
 }
