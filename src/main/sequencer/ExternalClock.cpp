@@ -59,5 +59,8 @@ void ExternalClock::computeTicksForCurrentBuffer(
         previousRelativePpqPosition = relativePosition;
     }
 
-    previousAbsolutePpqPosition = ppqPositions[nFrames - 1];
+    if (ppqPositions[nFrames - 1] > previousAbsolutePpqPosition)
+    {
+        previousAbsolutePpqPosition = ppqPositions[nFrames - 1];
+    }
 }

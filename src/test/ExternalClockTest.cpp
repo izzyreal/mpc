@@ -245,6 +245,6 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
         mpc.getExternalClock()->clearTicks();
     }
 
-    const int expectedTickCount = 1536;
+    const int expectedTickCount = 1552;
     REQUIRE(ticks.size() == expectedTickCount);
 }
