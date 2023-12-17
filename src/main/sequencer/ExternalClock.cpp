@@ -50,6 +50,8 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     if (bpm > previousBpm)
     {
+        // When the has increased drastically, there is the possibility of tick underflow.
+        // Here we compute how many ticks should be skipped.
         const double diffBetweenLastProcessedPpqAndCurrentPpq = ppqPosition - ppqPositions[nFrames - 1];
         const double underflowTickCount = floor(diffBetweenLastProcessedPpqAndCurrentPpq * 96);
 
@@ -69,6 +71,9 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
+        // When the tempo has decreased drastically, some hosts report a ppqPosition that is
+        // lower than what was already processed in the previous buffer. Here we make sure
+        // we do not process the already processed positions.
         if (ppqPositions[sample] <= previousAbsolutePpqPosition)
         {
             continue;
