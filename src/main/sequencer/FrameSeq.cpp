@@ -74,7 +74,8 @@ void FrameSeq::start()
     sequencerIsRunning.store(true);
 }
 
-void FrameSeq::startMetronome() {
+void FrameSeq::startMetronome()
+{
     if (sequencerIsRunning.load())
     {
         return;
