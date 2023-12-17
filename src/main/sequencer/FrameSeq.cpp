@@ -58,15 +58,12 @@ void FrameSeq::start()
 
     processSampleRateChange();
 
-    if (syncScreen->modeOut == 0)
-    {
-        internalClock.reset();
-    }
-    else
+    if (syncScreen->modeOut != 0)
     {
         shouldWaitForMidiClockLock = true;
     }
 
+    internalClock.reset();
     mpc.getExternalClock()->reset();
 
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
@@ -463,8 +460,9 @@ void FrameSeq::processSampleRateChange()
 
 void FrameSeq::work(int nFrames)
 {
+    auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
-    const bool useInternalClock = syncScreen->modeIn == 0;
+    const bool useInternalClock = syncScreen->modeIn == 0 || !mpc.getExternalClock()->areTicksBeingProduced();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -476,8 +474,6 @@ void FrameSeq::work(int nFrames)
 
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
-
-    auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
     for (auto& externalClockTick : externalClockTicks)
     {

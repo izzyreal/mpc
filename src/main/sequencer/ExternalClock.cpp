@@ -8,6 +8,7 @@ void ExternalClock::reset()
     previousRelativePpqPosition = 1.0;
     previousBpm = 0;
     previousPpqPositionOfLastBarStart = 0;
+    ticksAreBeingProduced = false;
 }
 
 void ExternalClock::clearTicks()
@@ -98,4 +99,10 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     previousBpm = bpm;
     previousPpqPositionOfLastBarStart = ppqPositionOfLastBarStart;
+    ticksAreBeingProduced = ticksAreBeingProduced || tickCounter > 0;
+}
+
+bool ExternalClock::areTicksBeingProduced()
+{
+    return ticksAreBeingProduced;
 }

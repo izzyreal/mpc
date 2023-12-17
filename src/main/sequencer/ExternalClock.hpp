@@ -13,8 +13,10 @@ namespace mpc::sequencer {
         void clearTicks();
         std::vector<int32_t>& getTicksForCurrentBuffer();
         void reset();
+        bool areTicksBeingProduced();
 
     private:
+        bool ticksAreBeingProduced = false;
         const double resolution = 96.0;
         std::vector<double> ppqPositions = std::vector<double>(65536, -1);
         std::vector<int32_t> ticks = std::vector<int32_t>(200, -1);
