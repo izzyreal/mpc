@@ -518,12 +518,16 @@ void FrameSeq::work(int nFrames)
         }
         else
         {
-            const auto frameIndexIsExternalClockTick =
-                    std::find_if(externalClockTicks.begin(), externalClockTicks.end(), [&](const double& t){ return static_cast<int>(t) == frameIndex; }) != externalClockTicks.end();
+            const auto tickCountAtThisFrameIndex = std::count(externalClockTicks.begin(), externalClockTicks.end(), frameIndex);
 
-            if (!frameIndexIsExternalClockTick)
+            if (tickCountAtThisFrameIndex == 0)
             {
                 continue;
+            }
+
+            if (tickCountAtThisFrameIndex > 1)
+            {
+                sequencerPlayTickCounter += (tickCountAtThisFrameIndex - 1);
             }
         }
 

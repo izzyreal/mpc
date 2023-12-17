@@ -6,6 +6,7 @@ void ExternalClock::reset()
 {
     previousAbsolutePpqPosition = -1.0;
     previousRelativePpqPosition = 1.0;
+    previousBpm = 0;
 }
 
 void ExternalClock::clearTicks()
@@ -27,10 +28,28 @@ void ExternalClock::computeTicksForCurrentBuffer(
         int sampleRate,
         double bpm)
 {
+    if (previousBpm == 0)
+    {
+        previousBpm = bpm;
+    }
+
     auto samplesInMinute = sampleRate * 60;
     auto samplesPerBeat = samplesInMinute / bpm;
     auto ppqPerSample = 1.0 / samplesPerBeat;
     auto currentSubDiv = 1.0 / 96.0;
+
+    int tickCounter = 0;
+
+    if (bpm > previousBpm)
+    {
+        const double diffBetweenLastProcessedPpqAndCurrentPpq = ppqPosition - ppqPositions[nFrames - 1];
+        const double underflowTickCount = floor(diffBetweenLastProcessedPpqAndCurrentPpq * 96);
+
+        for (int i = 0; i < underflowTickCount; i++)
+        {
+            ticks[tickCounter++] = 0;
+        }
+    }
 
     double offset = 0.0;
 
@@ -39,8 +58,6 @@ void ExternalClock::computeTicksForCurrentBuffer(
         ppqPositions[sample] = ppqPosition + offset;
         offset += ppqPerSample;
     }
-
-    int tickCounter = 0;
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
@@ -63,4 +80,6 @@ void ExternalClock::computeTicksForCurrentBuffer(
     {
         previousAbsolutePpqPosition = ppqPositions[nFrames - 1];
     }
+
+    previousBpm = bpm;
 }

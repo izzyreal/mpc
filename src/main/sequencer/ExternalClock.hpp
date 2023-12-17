@@ -19,5 +19,6 @@ namespace mpc::sequencer {
         std::vector<int32_t> ticks = std::vector<int32_t>(200, -1);
         double previousAbsolutePpqPosition = -1.0;
         double previousRelativePpqPosition = 1.0;
+        double previousBpm = 0;
     };
 }
