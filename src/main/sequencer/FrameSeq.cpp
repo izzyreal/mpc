@@ -473,8 +473,8 @@ void FrameSeq::work(int nFrames)
     processSampleRateChange();
     processTempoChange();
 
-//    midiClockOutput->processSampleRateChange();
-//    midiClockOutput->processTempoChange();
+    midiClockOutput->processSampleRateChange();
+    midiClockOutput->processTempoChange();
 
     auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -488,7 +488,7 @@ void FrameSeq::work(int nFrames)
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
-//        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
+        midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer, frameIndex);
 
         processEventsAfterNFrames(frameIndex);
 
@@ -530,8 +530,6 @@ void FrameSeq::work(int nFrames)
                 sequencerPlayTickCounter += (tickCountAtThisFrameIndex - 1);
             }
         }
-
-//        MLOG("tick " + std::to_string(sequencerPlayTickCounter) + " at frame " + std::to_string(frameIndex));
 
         tickFrameOffset = frameIndex;
 
