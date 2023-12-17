@@ -1,11 +1,11 @@
-#include "ExternalAudioServer.hpp"
+#include "RealTimeAudioServer.hpp"
 #include "StereoInputProcess.hpp"
 #include "StereoOutputProcess.hpp"
 
 using namespace mpc::engine::audio::server;
 using namespace std;
 
-void ExternalAudioServer::start()
+void RealTimeAudioServer::start()
 {
 	if (running)
 		return;
@@ -13,17 +13,17 @@ void ExternalAudioServer::start()
 	running = true;
 }
 
-void ExternalAudioServer::stop()
+void RealTimeAudioServer::stop()
 {
 	running = false;
 }
 
-bool ExternalAudioServer::isRunning()
+bool RealTimeAudioServer::isRunning()
 {
 	return running;
 }
 
-void ExternalAudioServer::close()
+void RealTimeAudioServer::close()
 {
 	for (auto& i : activeInputs)
 		if (i != nullptr) delete i;
@@ -35,7 +35,7 @@ void ExternalAudioServer::close()
 	activeOutputs.clear();
 }
 
-void ExternalAudioServer::resizeBuffers(int newSize)
+void RealTimeAudioServer::resizeBuffers(int newSize)
 {
 	for (auto& i : activeInputs)
 	{
@@ -52,7 +52,7 @@ void ExternalAudioServer::resizeBuffers(int newSize)
 	AudioServer::resizeBuffers(newSize);
 }
 
-void ExternalAudioServer::work(float* inputBuffer, float* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
+void RealTimeAudioServer::work(float* inputBuffer, float* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
 	if (!running) {
 		return;
 	}
@@ -90,7 +90,7 @@ void ExternalAudioServer::work(float* inputBuffer, float* outputBuffer, int nFra
 	}
 }
 
-void ExternalAudioServer::work(const float** inputBuffer, float** outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
+void RealTimeAudioServer::work(const float** inputBuffer, float** outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
 	if (!running) {
 		return;
 	}
@@ -136,7 +136,7 @@ void ExternalAudioServer::work(const float** inputBuffer, float** outputBuffer, 
 	}
 }
 
-void ExternalAudioServer::work(const float* const* inputBuffer, float* const* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
+void RealTimeAudioServer::work(const float* const* inputBuffer, float* const* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
 	if (!running) {
 		return;
 	}
@@ -182,37 +182,24 @@ void ExternalAudioServer::work(const float* const* inputBuffer, float* const* ou
 	}
 }
 
-void ExternalAudioServer::setClient(shared_ptr<AudioClient> client)
+void RealTimeAudioServer::setClient(shared_ptr<AudioClient> client)
 {
-	auto lClient = client;
-	this->client = lClient.get();
+	this->client = client.get();
 }
 
-vector<string> ExternalAudioServer::getAvailableOutputNames()
-{
-	vector<string> res{ "STEREO OUT", "ASSIGNABLE MIX OUT 1/2", "ASSIGNABLE MIX OUT 3/4", "ASSIGNABLE MIX OUT 5/6", "ASSIGNABLE MIX OUT 7/8" };
-	return res;
-}
-
-vector<string> ExternalAudioServer::getAvailableInputNames()
-{
-	vector<string> res{ "RECORD IN" };
-	return res;
-}
-
-IOAudioProcess* ExternalAudioServer::openAudioOutput(string name)
+IOAudioProcess* RealTimeAudioServer::openAudioOutput(string name)
 {
 	activeOutputs.push_back(new StereoOutputProcess(name));
 	return activeOutputs.back();
 }
 
-IOAudioProcess* ExternalAudioServer::openAudioInput(string name)
+IOAudioProcess* RealTimeAudioServer::openAudioInput(string name)
 {
 	activeInputs.push_back(new StereoInputProcess(name));
 	return activeInputs.back();
 }
 
-void ExternalAudioServer::closeAudioOutput(mpc::engine::audio::server::IOAudioProcess* output)
+void RealTimeAudioServer::closeAudioOutput(IOAudioProcess* output)
 {
 	if (output == nullptr)
 		return;
@@ -229,7 +216,7 @@ void ExternalAudioServer::closeAudioOutput(mpc::engine::audio::server::IOAudioPr
 	}
 }
 
-void ExternalAudioServer::closeAudioInput(mpc::engine::audio::server::IOAudioProcess* input)
+void RealTimeAudioServer::closeAudioInput(IOAudioProcess* input)
 {
 	if (input == nullptr)
 		return;
@@ -244,19 +231,4 @@ void ExternalAudioServer::closeAudioInput(mpc::engine::audio::server::IOAudioPro
 			break;
 		}
 	}
-}
-
-int ExternalAudioServer::getInputLatencyFrames()
-{
-	return bufferSize;
-}
-
-int ExternalAudioServer::getOutputLatencyFrames()
-{
-	return bufferSize;
-}
-
-int ExternalAudioServer::getTotalLatencyFrames()
-{
-	return getInputLatencyFrames() + getOutputLatencyFrames();
 }

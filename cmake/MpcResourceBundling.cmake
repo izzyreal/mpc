@@ -32,6 +32,7 @@ function(_bundle_resources)
   _add_resources(${_mpc_resources_root} test/ProgramLoading/program2 "PGM;SND" "${total_list}")
   _add_resources(${_mpc_resources_root} test/ApsLoading "APS;SND" "${total_list}")
   _add_resources(${_mpc_resources_root} test/Sampler SND "${total_list}")
+  _add_resources(${_mpc_resources_root} test/ExternalClock txt "${total_list}")
 
   cmrc_add_resource_library(
     mpc_test_resources

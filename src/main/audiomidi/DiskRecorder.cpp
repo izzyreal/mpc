@@ -115,14 +115,7 @@ int DiskRecorder::processAudio(AudioBuffer* buf, int nFrames)
         const auto sourceBufferLeft = buf->getChannel(0);
         const auto sourceBufferRight = buf->getChannel(1);
 
-        int bufferOffset = 0;
-
-        if (writtenByteCount == 0)
-        {
-            bufferOffset = mpc.getAudioMidiServices()->getFrameSequencer()->getBounceFrameOffset();
-        }
-
-        for (int f = bufferOffset; f < nFrames; f++)
+        for (int f = 0; f < nFrames; f++)
         {
             ringBufferLeft.enqueue(sourceBufferLeft[f]);
             ringBufferRight.enqueue(sourceBufferRight[f]);

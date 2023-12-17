@@ -11,7 +11,7 @@
 
 namespace mpc::engine::audio::server
 {
-	class ExternalAudioServer : public AudioServer {
+	class RealTimeAudioServer : public AudioServer {
 
 	public:
 		void start() override;
@@ -19,15 +19,10 @@ namespace mpc::engine::audio::server
 		bool isRunning() override;
 		void close() override;
 		void setClient(std::shared_ptr<AudioClient> client) override;
-		std::vector<std::string> getAvailableOutputNames() override;
-		std::vector<std::string> getAvailableInputNames() override;
 		IOAudioProcess* openAudioOutput(std::string name) override;
 		IOAudioProcess* openAudioInput(std::string name) override;
 		void closeAudioOutput(mpc::engine::audio::server::IOAudioProcess* output) override;
 		void closeAudioInput(mpc::engine::audio::server::IOAudioProcess* input) override;
-		int getInputLatencyFrames() override;
-		int getOutputLatencyFrames() override;
-		int getTotalLatencyFrames() override;
 		void resizeBuffers(int newSize) override;
 
 	public:

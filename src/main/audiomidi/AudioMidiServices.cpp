@@ -1,7 +1,6 @@
 #include "AudioMidiServices.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
-// mpc
 #include <Mpc.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
 #include <audiomidi/DiskRecorder.hpp>
@@ -23,14 +22,12 @@
 #include <engine/audio/mixer/MainMixControls.hpp>
 
 #include <engine/audio/server/CompoundAudioClient.hpp>
-#include <engine/audio/server/IOAudioProcess.hpp>
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
-#include <engine/audio/server/ExternalAudioServer.hpp>
+#include <engine/audio/server/RealTimeAudioServer.hpp>
 
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
-#include <cmath>
 #include <string>
 
 using namespace mpc;
@@ -57,9 +54,9 @@ AudioMidiServices::~AudioMidiServices()
     offlineServer->setSharedPtr(nullptr);
 }
 
-void AudioMidiServices::start(const int inputCount, const int outputCount) {
+void AudioMidiServices::start() {
 
-	server = std::make_shared<ExternalAudioServer>();
+	server = std::make_shared<RealTimeAudioServer>();
 	offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
 
     frameSeq->setSampleRate(offlineServer->getSampleRate());
@@ -71,31 +68,20 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
     createSynth();
 
+    inputProcess = server->openAudioInput("RECORD IN");
+    monitorInputAdapter = std::make_shared<MonitorInputAdapter>(mpc, inputProcess);
 
-    inputProcesses = std::vector<IOAudioProcess*>(inputCount <= 1 ? inputCount : 1);
-	outputProcesses = std::vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
+    const std::vector<std::string> outputNames {
+        "STEREO OUT",
+        "ASSIGNABLE MIX OUT 1/2",
+        "ASSIGNABLE MIX OUT 3/4",
+        "ASSIGNABLE MIX OUT 5/6",
+        "ASSIGNABLE MIX OUT 7/8"
+    };
 
-	for (auto& p : inputProcesses)
+    for (int i = 0; i < 5; i++)
 	{
-		p = nullptr;
-	}
-
-	for (auto& p : outputProcesses)
-	{
-		p = nullptr;
-	}
-
-	for (int i = 0; i < inputProcesses.size(); i++)
-	{
-		inputProcesses[i] = server->openAudioInput(getInputNames()[i]);
-		// For now we assume there is only 1 stereo input pair max
-		if (i == 0)
-			monitorInputAdapter = std::make_shared<MonitorInputAdapter>(mpc, inputProcesses[i]);
-	}
-
-	for (int i = 0; i < outputProcesses.size(); i++)
-	{
-		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i]);
+		outputProcesses.push_back(server->openAudioOutput(outputNames[i]));
 	}
 
 	connectVoices();
@@ -217,18 +203,6 @@ void AudioMidiServices::setAssignableMixOutLevels()
 	}
 }
 
-std::vector<std::string> AudioMidiServices::getInputNames()
-{
-	if (!server) return {"<disabled>"};
-	return server->getAvailableInputNames();
-}
-
-std::vector<std::string> AudioMidiServices::getOutputNames()
-{
-	if (!server) return {"<disabled>"};
-	return server->getAvailableOutputNames();
-}
-
 Drum& AudioMidiServices::getDrum(int i)
 {
 	return soundPlayerChannels[i];
@@ -309,18 +283,11 @@ void AudioMidiServices::destroyServices()
 
 void AudioMidiServices::closeIO()
 {
-	for (auto j = 0; j < inputProcesses.size(); j++)
-	{
-		if (inputProcesses[j])
-			server->closeAudioInput(inputProcesses[j]);
-	}
+    server->closeAudioInput(inputProcess);
 
-	for (auto j = 0; j < outputProcesses.size(); j++)
+	for (auto & outputProcess : outputProcesses)
 	{
-		if (outputProcesses[j] == nullptr)
-			continue;
-
-		server->closeAudioOutput(outputProcesses[j]);
+		server->closeAudioOutput(outputProcess);
 	}
 }
 

@@ -6,6 +6,11 @@ const double Clock::ppqn_f = 96.0;
 const double Clock::rec60 = (1.0 / 60.0);
 const double Clock::rec03 = (10.0 / 3.0);
 
+Clock::Clock()
+{
+    init(44100);
+}
+
 void Clock::init(double Fs)
 {
 	Fs_rec = 1.0 / Fs;
