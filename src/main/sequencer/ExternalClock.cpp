@@ -7,6 +7,7 @@ void ExternalClock::reset()
     previousAbsolutePpqPosition = -1.0;
     previousRelativePpqPosition = 1.0;
     previousBpm = 0;
+    previousPpqPositionOfLastBarStart = 0;
 }
 
 void ExternalClock::clearTicks()
@@ -24,6 +25,7 @@ std::vector<int32_t>& ExternalClock::getTicksForCurrentBuffer()
 
 void ExternalClock::computeTicksForCurrentBuffer(
         double ppqPosition,
+        double ppqPositionOfLastBarStart,
         int nFrames,
         int sampleRate,
         double bpm)
@@ -31,6 +33,12 @@ void ExternalClock::computeTicksForCurrentBuffer(
     if (previousBpm == 0)
     {
         previousBpm = bpm;
+    }
+
+    // The transport has jumped back while playing, most likely because of looping
+    if (ppqPositionOfLastBarStart < previousPpqPositionOfLastBarStart)
+    {
+        previousAbsolutePpqPosition = ppqPositionOfLastBarStart;
     }
 
     auto samplesInMinute = sampleRate * 60;
@@ -82,4 +90,5 @@ void ExternalClock::computeTicksForCurrentBuffer(
     }
 
     previousBpm = bpm;
+    previousPpqPositionOfLastBarStart = ppqPositionOfLastBarStart;
 }

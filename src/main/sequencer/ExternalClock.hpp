@@ -6,6 +6,7 @@ namespace mpc::sequencer {
     class ExternalClock {
     public:
         void computeTicksForCurrentBuffer(double ppqPosAtStartOfBuffer,
+                                          double ppqPositionOfLastBarStart,
                                           int nFrames,
                                           int sampleRate,
                                           double bpm);
@@ -20,5 +21,6 @@ namespace mpc::sequencer {
         double previousAbsolutePpqPosition = -1.0;
         double previousRelativePpqPosition = 1.0;
         double previousBpm = 0;
+        double previousPpqPositionOfLastBarStart = 0;
     };
 }
