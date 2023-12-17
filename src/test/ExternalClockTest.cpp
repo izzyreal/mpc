@@ -19,6 +19,7 @@ double bpm = 120.0;
 double sample_rate = 44100.0;
 double frames_per_beat = sample_rate * 60 / bpm;
 double frames_per_tick = frames_per_beat / 96.0;
+const double ppqPositionOfLastBarStart = 0;
 
 void parseDoubles(const char* input, std::vector<double>& output) {
     std::stringstream ss(input);
@@ -67,7 +68,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 
     for (double ppqPosition : ppqPositions)
     {
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 64, 44100, 120);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, 64, 44100, 120);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -132,7 +133,7 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     {
         const auto ppqPosition = ppqPositions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, 2048, 44100, tempo);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -166,7 +167,7 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
     {
         const auto ppqPosition = ppqPositions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, 2048, 44100, tempo);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -199,7 +200,7 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
     {
         const auto ppqPosition = ppqPositions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, 2048, 44100, tempo);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -232,7 +233,7 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
     {
         const auto ppqPosition = ppqPositions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, 2048, 44100, tempo);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, 2048, 44100, tempo);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
