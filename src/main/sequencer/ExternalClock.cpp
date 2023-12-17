@@ -1,5 +1,9 @@
 #include "ExternalClock.hpp"
 
+#if __linux__
+#include <cmath>
+#endif
+
 using namespace mpc::sequencer;
 
 void ExternalClock::reset()
