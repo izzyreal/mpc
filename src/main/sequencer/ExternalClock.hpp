@@ -2,6 +2,10 @@
 
 #include <vector>
 
+#if __linux__
+#include <cstdint>
+#endif
+
 namespace mpc::sequencer {
     class ExternalClock {
     public:
