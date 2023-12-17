@@ -50,7 +50,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     if (bpm > previousBpm)
     {
-        // When the has increased drastically, there is the possibility of tick underflow.
+        // When the tempo has increased drastically, there is the possibility of tick underflow.
         // Here we compute how many ticks should be skipped.
         const double diffBetweenLastProcessedPpqAndCurrentPpq = ppqPosition - ppqPositions[nFrames - 1];
         const double underflowTickCount = floor(diffBetweenLastProcessedPpqAndCurrentPpq * 96);
@@ -91,6 +91,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     if (ppqPositions[nFrames - 1] > previousAbsolutePpqPosition)
     {
+        // This should happen any time the tempo has not drastically decreased.
         previousAbsolutePpqPosition = ppqPositions[nFrames - 1];
     }
 
