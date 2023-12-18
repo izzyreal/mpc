@@ -1,3 +1,7 @@
+## v0.5.11 (18-12-2023)
+* Improve plugin-to-host synchronization. You can now change the tempo in the host however you like, including big changes in tempo, for example from 30 to 300 BPM in an instant or other way around. It should work with any buffer size, as long as the host starts at the start of a bar. If you have a loop configured in the host, this should also work. You can also start playing in VMPC2000XL when the host is not playing.
+* [macOS] VST3 on older macOS versions was not working due to an issue with the version of Xcode I was using for my builds. This is now fixed.
+
 ## v0.5.10 (15-12-2023)
 * Fix plugin-to-host synchronization. The problem that was fixed in this version is that VMPC2000XL used to start playing too late. But note that at the moment tempo changes from the host are handled ok on the iPad version in AUM, but not in Ableton Live and possibly other DAWs. More investigation and improvements needed, so for now to keep VMPC2000XL in sync with the DAW use small buffer sizes (preferably 128 or lower), keep the tempo static, and start playing from the start of a bar. By the way, if you notice VMPC2000XL is not syncing to the host at all, check if you have MIDI clock enabled in the MIDI/SYNC screen (Shift + 9):
 <img width="407" alt="image" src="https://github.com/izzyreal/mpc/assets/3707432/52832a21-e512-4c94-87cb-52838c4274ae">
