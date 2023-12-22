@@ -206,14 +206,14 @@ void Sound::insertFrame(std::vector<float> frame, unsigned int index)
 void Sound::insertFrames(std::vector<float>& frames, unsigned int index, uint32_t nFrames)
 {
     assert(mono);
-    sampleData.insert(sampleData.begin() + index, frames.begin(), nFrames == 0 ? frames.end() : frames.begin() + nFrames);
+    sampleData.insert(sampleData.begin() + index, frames.begin(), frames.begin() + nFrames);
 }
 
 void Sound::insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index, uint32_t nFrames)
 {
     assert(!mono);
-    sampleData.insert(sampleData.begin() + index + getFrameCount(), right.begin(), nFrames == 0 ? right.end() : right.begin() + nFrames);
-    sampleData.insert(sampleData.begin() + index, left.begin(), nFrames == 0 ? left.end() : left.begin() + nFrames);
+    sampleData.insert(sampleData.begin() + index + getFrameCount(), right.begin(), right.begin() + nFrames);
+    sampleData.insert(sampleData.begin() + index, left.begin(), left.begin() + nFrames);
 }
 
 void Sound::appendFrames(std::vector<float> &frames, uint32_t nFrames)
