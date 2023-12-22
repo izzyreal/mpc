@@ -23,7 +23,7 @@ std::shared_ptr<Sound> initSound(mpc::Mpc& mpc)
     auto sound = mpc.getSampler()->addSound();
     sound->setMono(true);
     std::vector<float> silence(SOUND_LENGTH);
-    sound->insertFrames(silence, 0);
+    sound->insertFrames(silence, 0, SOUND_LENGTH);
     sound->setEnd(SOUND_LENGTH);
     sound->setLoopTo(SOUND_LENGTH);
 
