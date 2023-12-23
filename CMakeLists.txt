@@ -22,7 +22,7 @@ FetchContent_Declare(Catch2
 
 FetchContent_Declare(filesystem
   GIT_REPOSITORY https://github.com/gulrak/filesystem.git
-  GIT_TAG        v1.5.12
+  GIT_TAG        v1.5.14
   GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/filesystem
 )
@@ -117,13 +117,24 @@ endif()
 
 set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/src/main")
 
-file(
-    GLOB_RECURSE _source_list_main 
+if (IOS)
+  file(
+    GLOB_RECURSE _source_list_main
     LIST_DIRECTORIES false
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     "${_src_root_path_main}/*.c*"
     "${_src_root_path_main}/*.h*"
-)
+    "${_src_root_path_main}/*.m*"
+  )
+else()
+  file(
+    GLOB_RECURSE _source_list_main
+    LIST_DIRECTORIES false
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${_src_root_path_main}/*.c*"
+    "${_src_root_path_main}/*.h*"
+  )
+endif()
 
 foreach(_source IN ITEMS ${_source_list_main})
     get_filename_component(_source_path "${_source}" PATH)
