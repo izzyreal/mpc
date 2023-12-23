@@ -6,12 +6,16 @@
 #include <TargetConditionals.h>
 #endif
 
+#if TARGET_OS_IOS
+std::string getIosSharedDocumentsFolder();
+#endif
+
 using namespace mpc;
 
 fs::path Paths::appDocumentsPath()
 {
 #if TARGET_OS_IOS
-    static auto path = fs::path(sago::getDocumentsFolder());
+    static auto path = fs::path(getIosSharedDocumentsFolder());
 #else
     static auto path = fs::path(sago::getDocumentsFolder()) / "VMPC2000XL";
 #endif
