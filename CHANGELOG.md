@@ -1,3 +1,6 @@
+## v0.5.12 (24-12-2023)
+* Recording new sounds while your audio engine is running at a sample rate other than 44100 Hz was resulting in corrupted sounds and crashes. This is now fixed.
+
 ## v0.5.11 (18-12-2023)
 * Improve plugin-to-host synchronization. You can now change the tempo in the host however you like, including big changes in tempo, for example from 30 to 300 BPM in an instant or other way around. It should work with any buffer size, as long as the host starts at the start of a bar. If you have a loop configured in the host, this should also work. You can also start playing in VMPC2000XL when the host is not playing.
 * [macOS] VST3 on older macOS versions was not working due to an issue with the version of Xcode I was using for my builds. This is now fixed.
