@@ -461,6 +461,7 @@ void FrameSeq::processSampleRateChange()
 void FrameSeq::work(int nFrames)
 {
     auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
+    const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const bool useInternalClock = syncScreen->modeIn == 0 || !mpc.getExternalClock()->areTicksBeingProduced();
 
@@ -494,7 +495,7 @@ void FrameSeq::work(int nFrames)
             continue;
         }
 
-        if (syncScreen->modeOut != 0)
+        if (syncScreen->modeOut != 0 && !isBouncing)
         {
             if (midiClockOutput->isLastProcessedFrameMidiClockLock())
             {

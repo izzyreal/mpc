@@ -50,8 +50,10 @@ namespace mpc::audiomidi {
 		int writtenByteCount = 0;
 		int lengthInFrames = 0;
 		int lengthInBytes = 0;
+        bool isOnlySilence = true;
 
         void writeRingBufferToDisk();
+        void removeFilesIfEmpty();
 
 	public:
 		bool start();

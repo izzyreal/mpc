@@ -79,6 +79,8 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStere
 
     outputFileFormat = new AudioFormat(sampleRate, 16, (isStereo ? 2 : 1), true, false);
 
+    isOnlySilence = true;
+
     preparedToWrite.store(true);
 
     writeThread = std::thread([this]{
@@ -112,6 +114,11 @@ int DiskRecorder::processAudio(AudioBuffer* buf, int nFrames)
 
 	if (writing.load())
 	{
+        if (isOnlySilence)
+        {
+            isOnlySilence = buf->isSilent();
+        }
+
         const auto sourceBufferLeft = buf->getChannel(0);
         const auto sourceBufferRight = buf->getChannel(1);
 
@@ -220,6 +227,8 @@ void DiskRecorder::writeRingBufferToDisk()
 
         lengthInBytes = 0;
         lengthInFrames = 0;
+
+        removeFilesIfEmpty();
     }
 }
 
@@ -248,10 +257,31 @@ bool DiskRecorder::stopEarly()
 	lengthInBytes = 0;
 	lengthInFrames = 0;
 
-	delete outputFileFormat;
-    outputFileFormat = nullptr;
+    removeFilesIfEmpty();
+    return true;
+}
 
-	return true;
+void DiskRecorder::removeFilesIfEmpty()
+{
+    const bool isStereo = outputFileFormat->getChannels() == 2;
+
+    for (int i = 0; i < (isStereo ? 1 : 2); i++)
+    {
+        const auto fileName = isStereo ? fileNamesStereo[index] :
+                              (i == 0 ? fileNamesMono[index].first : fileNamesMono[index].second);
+
+        const auto absolutePath = mpc.paths->recordingsPath() / fileName;
+
+        if (!fs::exists(absolutePath))
+        {
+            continue;
+        }
+
+        if  (isOnlySilence)
+        {
+            fs::remove(absolutePath);
+        }
+    }
 }
 
 DiskRecorder::~DiskRecorder()
