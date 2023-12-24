@@ -127,7 +127,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     preset = std::make_shared<MidiControlPreset>();
     mpc.getDisk()->readMidiControlPreset(newPresetPath, preset);
 
-    REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::YES);
+    REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::AutoLoadModeYes);
     REQUIRE(preset->rows[0].label == "pad-1");
     REQUIRE(preset->rows[0].value == 38);
     REQUIRE(preset->rows[0].channel == 1);
