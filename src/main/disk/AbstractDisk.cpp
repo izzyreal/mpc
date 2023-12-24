@@ -118,7 +118,7 @@ void AbstractDisk::writeSnd(std::shared_ptr<Sound> s, std::string fileName)
         auto name = mpc::Util::getFileName(fileName == "" ? s->getName() + ".SND" : fileName);
         auto f = newFile(name);
         auto sw = SndWriter(s.get());
-        auto sndArray = sw.getSndFileArray();
+        auto& sndArray = sw.getSndFileArray();
         f->setFileData(sndArray);
         flush();
         initFiles();

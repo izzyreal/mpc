@@ -41,7 +41,7 @@ namespace mpc::file::sndwriter
 		void setSampleData(const std::vector<float>& fa, bool b);
 
 	public:
-		std::vector<char> getSndFileArray();
+		std::vector<char>& getSndFileArray();
 
 		SndWriter(mpc::sampler::Sound* sound);
 	};

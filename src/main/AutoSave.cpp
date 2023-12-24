@@ -326,7 +326,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         for (auto& sound : sounds)
         {
             SndWriter sndWriter(sound.get());
-            auto data = sndWriter.getSndFileArray();
+            auto& data = sndWriter.getSndFileArray();
             auto soundFilePath = path / (sound->getName() + ".SND");
             set_file_data(soundFilePath, data);
             soundNames = soundNames.append(sound->getName() + ".SND\n");

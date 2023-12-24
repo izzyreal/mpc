@@ -33,7 +33,7 @@ TEST_CASE("Write and read non-destructively", "[snd-persistence]")
         inputData.emplace_back(short_to_float(static_cast<int16_t>(i)));
     }
 
-    auto writtenData = SndWriter(&snd1).getSndFileArray();
+    auto& writtenData = SndWriter(&snd1).getSndFileArray();
     SndReader reader(writtenData);
     std::vector<float> outputData;
     reader.readData(outputData);

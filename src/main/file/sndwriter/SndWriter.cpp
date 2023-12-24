@@ -106,7 +106,7 @@ void SndWriter::setSampleData(const std::vector<float>& fa, bool mono)
 	}
 }
 
-std::vector<char> SndWriter::getSndFileArray()
+std::vector<char>& SndWriter::getSndFileArray()
 {
 	auto header = sndHeaderWriter->getHeaderArray();
 	for (int i = 0; i < header.size(); i++) {
