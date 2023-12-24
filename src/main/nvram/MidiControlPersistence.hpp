@@ -11,9 +11,9 @@ namespace mpc { class Mpc; }
 
 namespace mpc::nvram {
     struct MidiControlPreset {
-        enum AutoLoadMode { NO, ASK, YES };
+        enum AutoLoadMode { AutoLoadModeNo, AutoLoadModeAsk, AutoLoadModeYes };
         std::string name;
-        unsigned char autoloadMode = AutoLoadMode::ASK;
+        unsigned char autoloadMode = AutoLoadMode::AutoLoadModeAsk;
         std::vector<MidiControlCommand> rows;
     };
 

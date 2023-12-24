@@ -33,6 +33,8 @@ private:
     friend class StdDisk;
         
 public:
+    // Returns an empty path if this MpcFile instance is backed by a rawEntry.
+    fs::path getPath();
     bool isDirectory();
     bool isFile();
     bool exists();

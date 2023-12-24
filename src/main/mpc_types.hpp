@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-namespace mpc::nvram { class MidiControlPreset; }
+namespace mpc::nvram { struct MidiControlPreset; }
 namespace mpc::sampler { class Sound; class Program; }
 namespace mpc::sequencer { class Sequence; }
 namespace mpc::file::wav { class WavFile; }

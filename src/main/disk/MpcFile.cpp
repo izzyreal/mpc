@@ -225,3 +225,8 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
         return std::make_shared<std::ofstream>(fs_path, std::ios::out | std::ios::binary);
     }
 }
+
+fs::path MpcFile::getPath()
+{
+    return fs_path;
+}

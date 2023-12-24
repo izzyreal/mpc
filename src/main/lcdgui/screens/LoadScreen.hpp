@@ -53,6 +53,8 @@ public:
     void open() override;
     void up() override;
 
+    std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
+
 private:
     const std::vector<std::string> views{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
     
@@ -70,7 +72,6 @@ private:
     void displayDeviceType();
     
     void setView(int i);
-    std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
     std::string getSelectedFileName();
     bool isSelectedFileDirectory();
     void setFileLoadWithMaxCheck(int i);
