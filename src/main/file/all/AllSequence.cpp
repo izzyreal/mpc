@@ -40,6 +40,8 @@ AllSequence::AllSequence(const std::vector<char>& bytes)
         
         name.push_back(c);
     }
+
+    name = StrUtil::trim(name);
     
     tempo = getTempoDouble(std::vector<char>{ bytes[TEMPO_BYTE1_OFFSET] , bytes[TEMPO_BYTE2_OFFSET] });
     auto barCountBytes = std::vector<char>{ bytes[BAR_COUNT_BYTE1_OFFSET], bytes[BAR_COUNT_BYTE2_OFFSET] };

@@ -188,7 +188,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
         if (allSong->getIsUsed())
         {
             mpcSong->setUsed(true);
-            mpcSong->setName(allSong->name);
+            mpcSong->setName(StrUtil::trim(allSong->name));
 
             auto steps = allSong->getSteps();
 

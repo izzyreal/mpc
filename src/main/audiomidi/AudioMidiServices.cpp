@@ -293,11 +293,19 @@ void AudioMidiServices::closeIO()
 
 bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
-	for (int i = 0; i < diskRecorders.size(); i++)
+    const auto destinationDirectory = mpc.paths->recordingsPath() / settings->recordingName;
+
+    fs::create_directory(destinationDirectory);
+
+    for (int i = 0; i < diskRecorders.size(); i++)
 	{
 		auto eapa = diskRecorders[i];
 
-		if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate, !settings->split))
+		if (!eapa->prepare(
+                settings->lengthInFrames,
+                settings->sampleRate,
+                !settings->splitStereoIntoLeftAndRightChannel,
+                destinationDirectory))
         {
             return false;
         }

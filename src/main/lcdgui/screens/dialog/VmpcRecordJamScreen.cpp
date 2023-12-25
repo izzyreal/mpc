@@ -1,6 +1,5 @@
 #include "VmpcRecordJamScreen.hpp"
 
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
 
@@ -26,12 +25,12 @@ void VmpcRecordJamScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto minutes = 60;
-		auto lengthInFrames = 44100 * 60 * minutes;
-		auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
-		auto ams = mpc.getAudioMidiServices();
-		auto rate = static_cast<int>(ams->getAudioServer()->getSampleRate());
-		auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, vmpcDirectToDiskRecorderScreen->outputFolder, false, rate);
+		const auto minutes = 60;
+		const auto ams = mpc.getAudioMidiServices();
+		const auto rate = static_cast<int>(ams->getAudioServer()->getSampleRate());
+        const auto lengthInFrames = rate * 60 * minutes;
+        const auto recordingName = "Jam-" + DirectToDiskSettings::getTimeStamp();
+		const auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, false, rate, recordingName);
 
 		if (ams->prepareBouncing(settings.get()))
 		{

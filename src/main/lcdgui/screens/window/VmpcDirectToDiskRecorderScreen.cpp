@@ -9,8 +9,6 @@
 
 #include <lcdgui/screens/SongScreen.hpp>
 
-#include <Util.hpp>
-
 using namespace mpc;
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
@@ -94,9 +92,19 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		case 0:
 		{
 			openScreen("sequencer");
-			if (loopWasEnabled) sequence->setLoopEnabled(false);
-			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
+
+            if (loopWasEnabled)
+            {
+                sequence->setLoopEnabled(false);
+            }
+
+			const auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
+            const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+			const auto settings = std::make_unique<DirectToDiskSettings>(
+                    lengthInFrames,
+                    splitStereoIntoLeftAndRightChannel,
+                    rate,
+                    recordingName);
 			
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
@@ -113,10 +121,21 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		case 1:
 		{
 			openScreen("sequencer");
-			auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
-            if (loopWasEnabled) sequence->setLoopEnabled(false);
-			sequencer.lock()->move(sequence->getLoopStart());
+
+            auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
+            const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+            auto settings = std::make_unique<DirectToDiskSettings>(
+                    lengthInFrames,
+                    splitStereoIntoLeftAndRightChannel,
+                    rate,
+                    recordingName);
+
+            if (loopWasEnabled)
+            {
+                sequence->setLoopEnabled(false);
+            }
+
+            sequencer.lock()->move(sequence->getLoopStart());
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
@@ -133,10 +152,21 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		case 2:
 		{
 			openScreen("sequencer");
+
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
-            if (loopWasEnabled) sequence->setLoopEnabled(false);
-			sequencer.lock()->move(time0);
+            const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+            auto settings = std::make_unique<DirectToDiskSettings>(
+                    lengthInFrames,
+                    splitStereoIntoLeftAndRightChannel,
+                    rate,
+                    recordingName);
+
+            if (loopWasEnabled)
+            {
+                sequence->setLoopEnabled(false);
+            }
+
+            sequencer.lock()->move(time0);
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
@@ -155,10 +185,17 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto mpcSong = sequencer.lock()->getSong(song);
 
 			if (!mpcSong->isUsed())
-				return;
+            {
+                return;
+            }
 
-			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
+			const auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
+            const auto recordingName = mpcSong->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+            auto settings = std::make_unique<DirectToDiskSettings>(
+                    lengthInFrames,
+                    splitStereoIntoLeftAndRightChannel,
+                    rate,
+                    recordingName);
 
 			openScreen("song");
 
@@ -247,7 +284,7 @@ void VmpcDirectToDiskRecorderScreen::setOffline(bool b)
 
 void VmpcDirectToDiskRecorderScreen::setSplitLR(bool b)
 {
-	splitLR = b;
+    splitStereoIntoLeftAndRightChannel = b;
 	displaySplitLR();
 }
 
@@ -288,7 +325,7 @@ void VmpcDirectToDiskRecorderScreen::displayOffline()
 
 void VmpcDirectToDiskRecorderScreen::displaySplitLR()
 {
-	findField("split-lr")->setText(splitLR ? "YES" : "NO");
+	findField("split-lr")->setText(splitStereoIntoLeftAndRightChannel ? "YES" : "NO");
 }
 
 void VmpcDirectToDiskRecorderScreen::displayRecord()

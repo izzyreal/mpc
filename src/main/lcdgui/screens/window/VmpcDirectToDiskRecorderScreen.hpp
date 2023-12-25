@@ -45,10 +45,8 @@ namespace mpc::lcdgui::screens::window
 		int sq = 0;
 		int song = 0;
 		
-        // Currently unused
-        std::string outputFolder = "DEFAULT";
-		bool offline = false;
-		bool splitLR = true;
+        bool offline = false;
+		bool splitStereoIntoLeftAndRightChannel = true;
 		int sampleRate = 0;
         bool loopWasEnabled = false;
 

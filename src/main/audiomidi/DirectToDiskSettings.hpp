@@ -1,22 +1,24 @@
 #pragma once
+
 #include <string>
 
-namespace mpc {
-	namespace audiomidi {
+namespace mpc::audiomidi {
 
-		class DirectToDiskSettings
+    class DirectToDiskSettings {
 
-		{
+    public:
+        const int sampleRate;
+        const int lengthInFrames;
+        const bool splitStereoIntoLeftAndRightChannel;
+        const std::string recordingName;
 
-		public:
-			int sampleRate;
-			int lengthInFrames{};
-			std::string outputFolder{};
-			bool split{};
+        static std::string getTimeStamp();
 
-		public:
-			DirectToDiskSettings(int lengthInFrames, std::string outputFolder, bool split, int sampleRate);
+    public:
+        DirectToDiskSettings(int lengthInFrames,
+                             bool splitStereoIntoLeftAndRightChannel,
+                             int sampleRate,
+                             std::string  recordingName);
 
-		};
-	}
+    };
 }

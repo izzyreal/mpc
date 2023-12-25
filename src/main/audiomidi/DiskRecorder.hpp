@@ -43,6 +43,7 @@ namespace mpc::audiomidi {
         static const std::vector<std::string> fileNamesStereo;
 
         int index = 0;
+        fs::path destinationDirectory;
 		mpc::engine::audio::core::AudioFormat* outputFileFormat = nullptr;
 		std::vector<std::ofstream> fileStreams;
 		std::atomic<bool> writing = ATOMIC_VAR_INIT(false);
@@ -58,7 +59,7 @@ namespace mpc::audiomidi {
 	public:
 		bool start();
 		bool stopEarly();
-		bool prepare(int lengthInFrames, int sampleRate, bool isStereo);
+		bool prepare(int lengthInFrames, int sampleRate, bool isStereo, fs::path destinationDirectory);
 		int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 
 	public:

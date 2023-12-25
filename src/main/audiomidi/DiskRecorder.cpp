@@ -1,5 +1,7 @@
 #include "DiskRecorder.hpp"
 
+#include <utility>
+
 #include "Mpc.hpp"
 
 #include "WavOutputFileStream.hpp"
@@ -19,7 +21,7 @@ DiskRecorder::DiskRecorder(mpc::Mpc& mpcToUse, AudioProcess* process, int indexT
 {
 }
 
-bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStereo)
+bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStereo, fs::path destinationDirectoryToUse)
 {
     if (bufferLeft.empty())
     {
@@ -35,13 +37,14 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate, bool isStere
     }
 
 	lengthInFrames = lengthInFramesToUse;
+    destinationDirectory = std::move(destinationDirectoryToUse);
 
     for (int i = 0; i < (isStereo ? 1 : 2); i++)
     {
         const auto fileName = isStereo ? fileNamesStereo[index] :
                 (i == 0 ? fileNamesMono[index].first : fileNamesMono[index].second);
 
-        auto absolutePath = mpc.paths->recordingsPath() / fileName;
+        auto absolutePath = destinationDirectory / fileName;
 
         fileStreams.push_back(wav_init_ofstream(absolutePath));
 
@@ -270,7 +273,7 @@ void DiskRecorder::removeFilesIfEmpty()
         const auto fileName = isStereo ? fileNamesStereo[index] :
                               (i == 0 ? fileNamesMono[index].first : fileNamesMono[index].second);
 
-        const auto absolutePath = mpc.paths->recordingsPath() / fileName;
+        const auto absolutePath = destinationDirectory / fileName;
 
         if (!fs::exists(absolutePath))
         {
