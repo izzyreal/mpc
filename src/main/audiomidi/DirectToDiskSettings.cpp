@@ -24,6 +24,6 @@ std::string DirectToDiskSettings::getTimeStamp()
     std::tm *tm = std::localtime(&t);
 
     std::ostringstream oss;
-    oss << std::put_time(tm, "%d-%b-%Y-%H-%M");
+    oss << std::put_time(tm, "%d-%b-%Y-%H-%M-%S");
     return oss.str();
 }
