@@ -1,3 +1,17 @@
+## v0.5.13 (28-12-2023)
+iOS specific improvements:
+* AUv3 and Standalone now share the same documents (including imported samples).
+* There's a share/export button. You can share the following things: APS, ALL and SND files of the active state, a selected (in the LOAD screen) file or directory, or a direct-to-disk recording (aka bounce). Directories and recordings are always zipped before sharing/exporting. There are many share destinations available: Save to Files, AirDrop, etc.
+* There's a Recording Manager button (folder icon). It shows a list of direct-to-disk recordings, which you can play and delete.
+* The standalone application can only be used in landscape orientation.
+
+Please note that the VMPC2000XL folder that is located in "On My iPad" is not used anymore starting with this version (v0.5.13) of VMPC2000XL. Make sure any important files you have there are moved out, because in the next iPad release of VMPC2000XL this folder will be removed completely.
+
+Generic improvements:
+* Fixed a regression in direct-to-disk recording where the recording process would never start.
+* Direct-to-disk recordings are now stored in a directory with a nice name with timestamp. They will not be overwritten anymore.
+* Direct-to-disk recordings that are silent are automatically removed right after finishing recording.
+
 ## v0.5.12 (24-12-2023)
 * Recording new sounds while your audio engine is running at a sample rate other than 44100 Hz was resulting in corrupted sounds and crashes. This is now fixed.
 
