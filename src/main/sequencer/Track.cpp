@@ -406,7 +406,6 @@ int Track::getCorrectedTickPos()
     return correctedTickPos;
 }
 
-
 void Track::processRealtimeQueuedEvents()
 {
     auto noteOnCount = this->queuedNoteOnEvents.try_dequeue_bulk(bulkNoteOns.begin(), 20);
@@ -420,9 +419,12 @@ void Track::processRealtimeQueuedEvents()
     auto pos = mpc.getSequencer()->getTickPosition();
     auto correctedTickPos = getCorrectedTickPos();
 
-    for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++) {
+    for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
+    {
         auto noteOff = bulkNoteOffs[noteOffIndex];
-        if (noteOff->getTick() == -2) {
+
+        if (noteOff->getTick() == -2)
+        {
             noteOff->setTick(pos);
         }
     }
@@ -508,8 +510,9 @@ void Track::playNext()
 
     const auto sequencer = mpc.getSequencer();
 
-	auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
-	auto _delete = sequencer->isRecording() && (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti);
+	const auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
+    const auto isActiveTrackIndex = trackIndex == sequencer->getActiveTrackIndex();
+	auto _delete = sequencer->isRecording() && (isActiveTrackIndex || recordingModeIsMulti);
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
@@ -535,8 +538,8 @@ void Track::playNext()
         }
 	}
 
-    auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
-    auto hardware = mpc.getHardware();
+    const auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
+    const auto hardware = mpc.getHardware();
 
 	if (auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
@@ -544,17 +547,31 @@ void Track::playNext()
 
         if (sequencer->isOverDubbing() &&
             mpc.getControls()->isErasePressed() &&
-            (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti) &&
+            (isActiveTrackIndex || recordingModeIsMulti) &&
             busNumber > 0)
         {
+            const auto sampler = mpc.getSampler();
+
+            const std::shared_ptr<mpc::sampler::Program> program =
+                    sampler->getProgram(sampler->getDrumBusProgramIndex(busNumber));
+
+            const auto noteNumber = note->getNote();
+
             bool oneOrMorePadsArePressed = false;
+            bool noteIsPressed = false;
 
             for (auto& p : hardware->getPads())
             {
-              if (p->isPressed())
-              {
-                oneOrMorePadsArePressed = true;
-              }
+                if (p->isPressed())
+                {
+                    oneOrMorePadsArePressed = true;
+
+                    if (program->getNoteFromPad(p->getPadIndexWithBankWhenLastPressed()) == noteNumber)
+                    {
+                        noteIsPressed = true;
+                        break;
+                    }
+                }
             }
           
             if (!_delete && oneOrMorePadsArePressed && hardware->getTopPanel()->isSixteenLevelsEnabled())
@@ -603,6 +620,11 @@ void Track::playNext()
                         }
                     }
                 }
+            }
+
+            if (!_delete && noteIsPressed)
+            {
+                _delete = true;
             }
         }
     }
