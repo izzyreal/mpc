@@ -69,7 +69,15 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     mpc.getActiveControls()->function(4);
 
-    const auto recordingsPath = mpc.paths->recordingsPath();
+    auto recordingsPath = mpc.paths->recordingsPath();
+
+    for (const auto& entry : fs::directory_iterator(recordingsPath)) {
+        if (fs::is_directory(entry)) {
+            recordingsPath = entry.path();
+            break;
+        }
+    }
+
     const auto recordingPath = recordingsPath / "L.wav";
 
     audioThread.join();
