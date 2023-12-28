@@ -67,6 +67,7 @@ namespace mpc::nvram {
 namespace mpc {
     class Mpc : public Observable {
     private:
+        bool pluginModeEnabled = false;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<controls::Controls> controls;
@@ -100,6 +101,8 @@ namespace mpc {
         std::string getPreviousSamplerScreenName();
         void setPreviousSamplerScreenName(std::string s);
         void panic();
+        void setPluginModeEnabled(bool);
+        bool isPluginModeEnabled();
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();

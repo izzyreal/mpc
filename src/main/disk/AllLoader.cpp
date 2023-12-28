@@ -164,8 +164,13 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     syncScreen->sendMMCEnabled = midiSyncMisc->isSendMMCEnabled();
     syncScreen->in = midiSyncMisc->getInput();
     syncScreen->out = midiSyncMisc->getOutput();
-    syncScreen->setModeIn(midiSyncMisc->getInMode());
-    syncScreen->setModeOut(midiSyncMisc->getOutMode());
+
+    if (!mpc.isPluginModeEnabled())
+    {
+        syncScreen->setModeIn(midiSyncMisc->getInMode());
+        syncScreen->setModeOut(midiSyncMisc->getOutMode());
+    }
+
     syncScreen->shiftEarly = midiSyncMisc->getShiftEarly();
     syncScreen->frameRate = midiSyncMisc->getFrameRate();
 

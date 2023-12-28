@@ -349,3 +349,13 @@ std::shared_ptr<mpc::sequencer::ExternalClock> Mpc::getExternalClock()
 {
     return externalClock;
 }
+
+void Mpc::setPluginModeEnabled(bool b)
+{
+    pluginModeEnabled = b;
+}
+
+bool Mpc::isPluginModeEnabled()
+{
+    return pluginModeEnabled;
+}
