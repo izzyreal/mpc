@@ -111,13 +111,17 @@ void Track::flushNoteCache()
 
 void Track::setUsed(bool b)
 {
-	if (!used && b && trackIndex < 64)
-		name = mpc.getSequencer()->getDefaultTrackName(trackIndex);
+	if (!used && b)
+    {
+        name = mpc.getSequencer()->getDefaultTrackName(trackIndex);
+    }
 
 	used = b;
 
 	if (used)
+    {
         notifyObservers(std::string("tracknumbername"));
+    }
 }
 
 void Track::setOn(bool b)
@@ -505,24 +509,30 @@ void Track::playNext()
     const auto sequencer = mpc.getSequencer();
 
 	auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
-	auto _delete = sequencer->isRecording() && (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti) && (trackIndex < 64);
+	auto _delete = sequencer->isRecording() && (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti);
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
-	if (sequencer->isRecording() && punchScreen->on && trackIndex < 64)
+	if (sequencer->isRecording() && punchScreen->on)
 	{
 		auto pos = sequencer->getTickPosition();
 
 		_delete = false;
 
 		if (punchScreen->autoPunch == 0 && pos >= punchScreen->time0)
-			_delete = true;
+        {
+            _delete = true;
+        }
 
 		if (punchScreen->autoPunch == 1 && pos < punchScreen->time1)
-			_delete = true;
+        {
+            _delete = true;
+        }
 
 		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
-			_delete = true;
+        {
+            _delete = true;
+        }
 	}
 
     auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
@@ -535,7 +545,6 @@ void Track::playNext()
         if (sequencer->isOverDubbing() &&
             mpc.getControls()->isErasePressed() &&
             (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti) &&
-            trackIndex < 64 &&
             busNumber > 0)
         {
             bool oneOrMorePadsArePressed = false;
@@ -545,7 +554,6 @@ void Track::playNext()
               if (p->isPressed())
               {
                 oneOrMorePadsArePressed = true;
-                break;
               }
             }
           
@@ -589,7 +597,9 @@ void Track::playNext()
                             }
 
                             if (varValue == wouldBeVarValue)
+                            {
                                 _delete = true;
+                            }
                         }
                     }
                 }
