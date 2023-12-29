@@ -111,17 +111,13 @@ void Track::flushNoteCache()
 
 void Track::setUsed(bool b)
 {
-	if (!used && b)
-    {
-        name = mpc.getSequencer()->getDefaultTrackName(trackIndex);
-    }
+	if (!used && b && trackIndex < 64)
+		name = mpc.getSequencer()->getDefaultTrackName(trackIndex);
 
 	used = b;
 
 	if (used)
-    {
         notifyObservers(std::string("tracknumbername"));
-    }
 }
 
 void Track::setOn(bool b)
@@ -253,7 +249,7 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allo
         clone = std::make_shared<SystemExclusiveEvent>(*source);
     }
     clone->setTick(tick);
-    
+
     if (!used) setUsed(true);
 
     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
@@ -512,30 +508,24 @@ void Track::playNext()
 
 	const auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
     const auto isActiveTrackIndex = trackIndex == sequencer->getActiveTrackIndex();
-	auto _delete = sequencer->isRecording() && (isActiveTrackIndex || recordingModeIsMulti);
+	auto _delete = sequencer->isRecording() && (isActiveTrackIndex || recordingModeIsMulti) && (trackIndex < 64);
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
-	if (sequencer->isRecording() && punchScreen->on)
+	if (sequencer->isRecording() && punchScreen->on && trackIndex < 64)
 	{
 		auto pos = sequencer->getTickPosition();
 
 		_delete = false;
 
 		if (punchScreen->autoPunch == 0 && pos >= punchScreen->time0)
-        {
-            _delete = true;
-        }
+			_delete = true;
 
 		if (punchScreen->autoPunch == 1 && pos < punchScreen->time1)
-        {
-            _delete = true;
-        }
+			_delete = true;
 
 		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
-        {
-            _delete = true;
-        }
+			_delete = true;
 	}
 
     const auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
@@ -548,6 +538,7 @@ void Track::playNext()
         if (sequencer->isOverDubbing() &&
             mpc.getControls()->isErasePressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) &&
+            trackIndex < 64 &&
             busNumber > 0)
         {
             const auto sampler = mpc.getSampler();
@@ -573,7 +564,7 @@ void Track::playNext()
                     }
                 }
             }
-          
+
             if (!_delete && oneOrMorePadsArePressed && hardware->getTopPanel()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
@@ -614,9 +605,7 @@ void Track::playNext()
                             }
 
                             if (varValue == wouldBeVarValue)
-                            {
                                 _delete = true;
-                            }
                         }
                     }
                 }
