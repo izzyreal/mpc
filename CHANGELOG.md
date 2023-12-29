@@ -1,9 +1,19 @@
+## v0.5.14 (29-12-2023, all systems except iPadOS)
+* Keep following the host tempo after loading TEST1 or TEST2 demo beats. VMPC2000XL uses the MIDI/SYNC input and output modes to determine whether to follow the host tempo and transport. These settings are stored in `.ALL` files, and therefor also in standalone auto-save and DAW project data. With this update, when you're running VMPC2000XL as a plugin, the MIDI/SYNC input and output modes are not changed when loading a `.ALL` file or restoring a DAW project.
+* Fix 'Hold pads or keys to erase' while overdubbing.
+
+## iPadOS build v0.5.13 (3) (28-12-2023)
+* Better resizing in AUv3.
+* Keep following the host tempo after loading TEST1 or TEST2 demo beats. See v0.5.14 above for more explanation.
+* Fix 'Hold pads or keys to erase' while overdubbing.
+
 ## v0.5.13 (28-12-2023)
-iOS specific improvements:
+iPadOS specific improvements:
 * AUv3 and Standalone now share the same documents (including imported samples).
 * There's a share/export button. You can share the following things: APS, ALL and SND files of the active state, a selected (in the LOAD screen) file or directory, or a direct-to-disk recording (aka bounce). Directories and recordings are always zipped before sharing/exporting. There are many share destinations available: Save to Files, AirDrop, etc.
 * There's a Recording Manager button (folder icon). It shows a list of direct-to-disk recordings, which you can play and delete.
 * The standalone application can only be used in landscape orientation.
+* iPhoneOS support has been dropped. The screen is too small for the current UI and there are no concrete plans to make a UI that is suitable for iOS devices that are smaller than the smallest iPad. So from now on the mentioning of iOS will be phased out in favor of iPadOS.
 
 Please note that the VMPC2000XL folder that is located in "On My iPad" is not used anymore starting with this version (v0.5.13) of VMPC2000XL. Make sure any important files you have there are moved out, because in the next iPad release of VMPC2000XL this folder will be removed completely.
 
