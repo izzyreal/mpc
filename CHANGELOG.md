@@ -1,10 +1,10 @@
 ## v0.5.14 (29-12-2023, all systems except iPadOS)
-* Keep following the host tempo after loading TEST1 or TEST2 demo beats. VMPC2000XL uses the MIDI/SYNC input and output modes to determine whether to follow the host tempo and transport. These settings are stored in `.ALL` files, and therefor also in standalone auto-save and DAW project data. With this update, when you're running VMPC2000XL as a plugin, the MIDI/SYNC input and output modes are not changed when loading a `.ALL` file or restoring a DAW project.
+* [plugin] Keep following the host tempo after loading TEST1 or TEST2 demo beats. VMPC2000XL uses the MIDI/SYNC input and output modes to determine whether to follow the host tempo and transport. These settings are stored in `.ALL` files, and therefor also in standalone auto-save and DAW project data. With this update, when you're running VMPC2000XL as a plugin, the MIDI/SYNC input and output modes are not changed when loading a `.ALL` file or restoring a DAW project.
 * Fix 'Hold pads or keys to erase' while overdubbing.
 
 ## iPadOS build v0.5.13 (3) (28-12-2023)
 * Better resizing in AUv3.
-* Keep following the host tempo after loading TEST1 or TEST2 demo beats. See v0.5.14 above for more explanation.
+* [AUv3] Keep following the host tempo after loading TEST1 or TEST2 demo beats. See v0.5.14 above for more explanation.
 * Fix 'Hold pads or keys to erase' while overdubbing.
 
 ## v0.5.13 (28-12-2023)
