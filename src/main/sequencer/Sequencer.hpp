@@ -165,8 +165,8 @@ namespace mpc::sequencer
 		void goToPreviousStep();
 		void goToNextStep();
 		void tap();
-		int getResolution();
-		void move(int tick);
+
+        void move(int tick);
 		int getTickPosition();
 		std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
 		void setActiveTrackIndex(int i);
