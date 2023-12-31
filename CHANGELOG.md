@@ -1,3 +1,9 @@
+## v0.5.14.2 (31-12-2023)
+* Fix song mode when running VMPC2000XL as a plugin.
+
+## v0.5.14.1 (30-12-2023, macOS only)
+* This macOS only release addresses an issue with asking for microphone/audio input permissions in the standalone version.
+
 ## v0.5.14 (29-12-2023, all systems except iPadOS)
 * [plugin] Keep following the host tempo after loading TEST1 or TEST2 demo beats. VMPC2000XL uses the MIDI/SYNC input and output modes to determine whether to follow the host tempo and transport. These settings are stored in `.ALL` files, and therefor also in standalone auto-save and DAW project data. With this update, when you're running VMPC2000XL as a plugin, the MIDI/SYNC input and output modes are not changed when loading a `.ALL` file or restoring a DAW project.
 * Fix 'Hold pads or keys to erase' while overdubbing.
