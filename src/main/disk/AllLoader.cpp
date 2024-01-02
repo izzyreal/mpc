@@ -180,6 +180,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     secondSequenceScreen->sq = sequencer->secondSeqIndex;
 
     auto songScreen = mpc.screens->get<SongScreen>("song");
+    songScreen->setOffset(-1);
     songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
 
     auto songs = allParser.getSongs();
