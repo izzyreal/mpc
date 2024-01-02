@@ -1,7 +1,6 @@
 #include "MidiInput.hpp"
 
 #include <Mpc.hpp>
-#include <Util.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MidiOutput.hpp>
@@ -24,7 +23,6 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 
-#include <sequencer/Event.hpp>
 #include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -53,6 +51,12 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 {
     const auto msg = dynamic_cast<ShortMessage*>(midiMsg);
 
+    if (mpc.getLayeredScreen()->getCurrentScreenName() == "midi-input-monitor")
+    {
+        const auto notificationMessage = std::string(index == 0 ? "a" : "b") + std::to_string(msg->getChannel());
+        notifyObservers(notificationMessage);
+    }
+
     const auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
@@ -60,8 +64,6 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
         midiFullControl->processMidiInputEvent(mpc, msg);
         return;
     }
-
-    std::shared_ptr<Event> event;
 
     const auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
@@ -71,23 +73,23 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     }
     else if (msg->isMidiClock())
     {
-        event = handleMidiClock(msg);
+        handleMidiClock(msg);
     }
     else if (msg->isNoteOn() || msg->isNoteOff())
     {
         if (msg->isNoteOn())
         {
-            event = handleNoteOn(msg, timeStamp);
+            handleNoteOn(msg, timeStamp);
         }
         else if (msg->isNoteOff())
         {
-            event = handleNoteOff(msg, timeStamp);
+            handleNoteOff(msg, timeStamp);
         }
 
         switch (mpc.screens->get<MidiOutputScreen>("midi-output")->getSoftThru())
         {
             case 1:
-                //midiOut(event, track.get());
+                // Soft thru:OFF
                 break;
             case 2:
                 transportOmni(midiMsg, "a");
@@ -100,7 +102,6 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
                 transportOmni(midiMsg, "b");
                 break;
         }
-
     }
     else if (msg->isControlChange())
     {
@@ -109,12 +110,6 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     else if (msg->isChannelPressure())
     {
         handleChannelPressure(msg);
-    }
-
-    if (event)
-    {
-        std::string notificationMessage = std::string(index == 0 ? "a" : "b") + std::to_string(msg->getChannel());
-        notifyObservers(notificationMessage);
     }
 }
 
@@ -255,21 +250,9 @@ void MidiInput::handleControlChange(ShortMessage* msg)
 
 void MidiInput::midiOut(Track* track)
 {
-    std::string notificationLetter;
-
     auto deviceNumber = track->getDeviceIndex() - 1;
 
-    if (deviceNumber != -1 && deviceNumber < 32)
-    {
-        auto channel = deviceNumber;
-
-        if (channel > 15)
-        {
-            channel -= 16;
-        }
-    }
-
-    notificationLetter = "a";
+    std::string notificationLetter = "a";
 
     if (deviceNumber > 15)
     {
@@ -294,7 +277,7 @@ void MidiInput::transportOmni(MidiMessage *msg, const std::string& outputLetter)
     }
 }
 
-std::shared_ptr<NoteOnEvent> MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
+void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 {
     auto playMidiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
     int trackNumber;
@@ -313,19 +296,20 @@ std::shared_ptr<NoteOnEvent> MidiInput::handleNoteOn(ShortMessage* msg, const in
 
     int pad = -1;
     auto bus = track->getBus();
+
     if (bus > 0)
     {
         pad = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
         if (track->getIndex() < 64 && mpc.getControls()->isTapPressed() && sequencer->isPlaying())
         {
-            return nullptr;
+            return;
         }
     }
 
     if (pad != -1)
     {
         mpc.getActiveControls()->pad(pad, playMidiNoteOn->getVelocity());
-        return nullptr;
+        return;
     }
     else
     {
@@ -365,10 +349,9 @@ std::shared_ptr<NoteOnEvent> MidiInput::handleNoteOn(ShortMessage* msg, const in
         }
         
     }
-    return playMidiNoteOn;
 }
 
-std::shared_ptr<NoteOffEvent> MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
+void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 {
     int note = msg->getData1();
     int trackNumber;
@@ -396,7 +379,7 @@ std::shared_ptr<NoteOffEvent> MidiInput::handleNoteOff(ShortMessage* msg, const 
     if (pad != -1)
     {
         mpc.getReleaseControls()->simplePad(pad);
-        return nullptr;
+        return;
     }
     else if (auto storedRecordMidiNoteOn = retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
@@ -454,12 +437,11 @@ std::shared_ptr<NoteOffEvent> MidiInput::handleNoteOff(ShortMessage* msg, const 
     if (auto storedmidiNoteOn = retrievePlayNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
         mpc.getEventHandler()->handleNoThru(storedmidiNoteOn->getNoteOff(), track.get(), timeStamp);
-        return storedmidiNoteOn->getNoteOff();
+        return;
     }
-    return nullptr;
 }
 
-std::shared_ptr<MidiClockEvent> MidiInput::handleMidiClock(ShortMessage* msg)
+void MidiInput::handleMidiClock(ShortMessage* msg)
 {
     auto mce = std::make_shared<MidiClockEvent>(msg->getStatus());
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
@@ -481,7 +463,6 @@ std::shared_ptr<MidiClockEvent> MidiInput::handleMidiClock(ShortMessage* msg)
             break;
         }
     }
-    return mce;
 }
 
 void MidiInput::handleChannelPressure(ShortMessage* msg)

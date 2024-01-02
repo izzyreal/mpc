@@ -37,10 +37,10 @@ namespace mpc::audiomidi {
 
         void transportOmni(mpc::engine::midi::MidiMessage *msg, const std::string& outputLetter);
         
-        std::shared_ptr<mpc::sequencer::NoteOnEvent> handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
-        std::shared_ptr<mpc::sequencer::NoteOffEvent> handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
+        void handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
+        void handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
 
-        std::shared_ptr<mpc::sequencer::MidiClockEvent> handleMidiClock(mpc::engine::midi::ShortMessage* msg);
+        void handleMidiClock(mpc::engine::midi::ShortMessage* msg);
 
         void handleControlChange(mpc::engine::midi::ShortMessage* msg);
 
