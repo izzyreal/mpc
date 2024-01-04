@@ -9,7 +9,6 @@ using namespace mpc::file::all;
 
 Song::Song(const std::vector<char>& loadBytes)
 {
-
     auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 
 	for (char& c : nameBytes)
@@ -36,21 +35,20 @@ Song::Song(const std::vector<char>& loadBytes)
         steps.emplace_back(seqIndex, repeatCount);
     }
 
-    isUsed = loadBytes[IS_USED_OFFSET];
     loopFirstStepIndex = loadBytes[LOOP_FIRST_STEP_INDEX_OFFSET];
     loopLastStepIndex = loadBytes[LOOP_LAST_STEP_INDEX_OFFSET];
     loopEnabled = loadBytes[LOOP_ENABLED_OFFSET] == 1;
 
-    /*
-     * The AllSong parser was in a very bad shape for most of its lifetime.
-     * One of the things it did was incorrectly store unused songs as used.
-     * This implies there are users out there who have such corrupted ALL
-     * files created with VMPC2000XL. The below serves as a sanitation hack.
-     */
-    if (isUsed && name == "(Unused)")
-    {
-        isUsed = false;
-    }
+    // This is what it's supposed to do, but there may be users out there
+    // with badly persisted files due to older versions of VMPC2000XL:
+
+    // isUsed = loadBytes[IS_USED_OFFSET];
+
+    // So for now we rely on the following heuristic, as this will
+    // correctly parse real MPC2000XL ALL songs, as well as the ones written
+    // with older versions of VMPC2000XL, unless someone decides to name
+    // their song "(Unused)":
+    isUsed = name != "(Unused)"
 }
 
 Song::Song(mpc::sequencer::Song* mpcSong)
