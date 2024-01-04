@@ -48,7 +48,7 @@ Song::Song(const std::vector<char>& loadBytes)
     // correctly parse real MPC2000XL ALL songs, as well as the ones written
     // with older versions of VMPC2000XL, unless someone decides to name
     // their song "(Unused)":
-    isUsed = name != "(Unused)"
+    isUsed = name != "(Unused)";
 }
 
 Song::Song(mpc::sequencer::Song* mpcSong)
