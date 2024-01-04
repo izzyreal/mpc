@@ -39,6 +39,8 @@ namespace mpc::audiomidi
         void readWithoutResampling();
         void readWithResampling(float ratio);
         short readNextShort();
+        int32_t readNext24BitInt();
+        float readNextFrame();
 
         std::atomic_bool playing = false;
         std::string filePath;

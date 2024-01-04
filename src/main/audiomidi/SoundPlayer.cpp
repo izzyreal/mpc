@@ -133,34 +133,34 @@ void SoundPlayer::readWithoutResampling()
             std::min<int>(currentBufferSpace, sourceFrameCount - ingestedSourceFrameCount);
 
     frameCountToIngest = std::min<int>(frameCountToIngest, 10000);
-
+    const int bytesPerSample = inputAudioFormat->getSampleSizeInBits() / 8;
     const auto byteCountToIngest = frameCountToIngest * inputAudioFormat->getFrameSize();
 
-    for (int b = 0; b < byteCountToIngest; b += 2)
+    for (int currentByteIndex = 0; currentByteIndex < byteCountToIngest; currentByteIndex += bytesPerSample)
     {
-        if (channels == 2 && fileFormat == SND && b >= (byteCountToIngest / 2))
+        if (channels == 2 && fileFormat == SND && currentByteIndex >= (byteCountToIngest / bytesPerSample))
         {
             break;
         }
 
-        bufferLeft.emplace(sampleops::short_to_float(readNextShort()));
+        bufferLeft.emplace(readNextFrame());
 
         if (channels == 2 && fileFormat == WAV)
         {
-            bufferRight.emplace(sampleops::short_to_float(readNextShort()));
-            b += 2;
+            bufferRight.emplace(readNextFrame());
+            currentByteIndex += bytesPerSample;
         }
     }
 
     if (channels == 2 && fileFormat == SND)
     {
-        const auto bytesPerChannel = sourceFrameCount * 2;
+        const auto bytesPerChannel = sourceFrameCount * bytesPerSample;
 
-        stream->seekg(-(byteCountToIngest/2) + bytesPerChannel, std::ios_base::cur);
+        stream->seekg(-(byteCountToIngest / 2) + bytesPerChannel, std::ios_base::cur);
 
-        for (int b = 0; b < (byteCountToIngest / 2); b += 2)
+        for (int currentByteIndex = 0; currentByteIndex < (byteCountToIngest / 2); currentByteIndex += bytesPerSample)
         {
-            bufferRight.emplace(sampleops::short_to_float(readNextShort()));
+            bufferRight.emplace(readNextFrame());
         }
 
         stream->seekg(-bytesPerChannel, std::ios_base::cur);
@@ -190,20 +190,21 @@ void SoundPlayer::readWithResampling(const float ratio)
     const auto byteCountToIngest = unresampledFrameCountToIngest * inputAudioFormat->getFrameSize();
 
     int frameCounter = 0;
+    const int bytesPerSample = inputAudioFormat->getSampleSizeInBits() / 8;
 
-    for (int b = 0; b < byteCountToIngest; b += 2)
+    for (int currentByteIndex = 0; currentByteIndex < byteCountToIngest; currentByteIndex += bytesPerSample)
     {
-        if (channels == 2 && fileFormat == SND && b >= (byteCountToIngest / 2))
+        if (channels == 2 && fileFormat == SND && currentByteIndex >= (byteCountToIngest / 2))
         {
             break;
         }
 
-        resampleInputBufferLeft[frameCounter] = sampleops::short_to_float(readNextShort());
+        resampleInputBufferLeft[frameCounter] = readNextFrame();
 
         if (channels == 2 && fileFormat == WAV)
         {
-            resampleInputBufferRight[frameCounter] = sampleops::short_to_float(readNextShort());
-            b += 2;
+            resampleInputBufferRight[frameCounter] = readNextFrame();
+            currentByteIndex += bytesPerSample;
         }
 
         frameCounter++;
@@ -217,9 +218,9 @@ void SoundPlayer::readWithResampling(const float ratio)
 
         frameCounter = 0;
 
-        for (int b = 0; b < (byteCountToIngest / 2); b += 2)
+        for (int currentByteIndex = 0; currentByteIndex < (byteCountToIngest / 2); currentByteIndex += bytesPerSample)
         {
-            resampleInputBufferRight[frameCounter++] = sampleops::short_to_float(readNextShort());
+            resampleInputBufferRight[frameCounter++] = readNextFrame();
         }
 
         stream->seekg(-bytesPerChannel, std::ios_base::cur);
@@ -261,6 +262,38 @@ void SoundPlayer::readWithResampling(const float ratio)
     {
         totalResamplerGeneratedFrameCount.store(resamplerGeneratedFrameCounter);
     }
+}
+
+float SoundPlayer::readNextFrame()
+{
+    if (inputAudioFormat->getSampleSizeInBits() == 24)
+    {
+        return sampleops::int24_to_float(readNext24BitInt());
+    }
+
+    return sampleops::short_to_float(readNextShort());
+}
+
+int32_t SoundPlayer::readNext24BitInt()
+{
+    char buffer[3];
+    stream->read(buffer, 3);
+
+    if (stream->gcount() != 3)
+    {
+        return 0;
+    }
+
+    int32_t value = static_cast<unsigned char>(buffer[0]) |
+                (static_cast<unsigned char>(buffer[1]) << 8) |
+                (static_cast<unsigned char>(buffer[2]) << 16);
+
+    if (value & 0x00800000)
+    {
+        value |= static_cast<int32_t>(0xFF000000);
+    }
+
+    return value;
 }
 
 short SoundPlayer::readNextShort()

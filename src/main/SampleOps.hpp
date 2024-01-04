@@ -31,4 +31,9 @@ namespace mpc::sampleops {
     {
         return static_cast<float>(s) / 32768;
     }
+
+    inline float int24_to_float(const int value)
+    {
+        return static_cast<float>(value) / 8388608.0f; // 8388608 is 2^23
+    }
 }
