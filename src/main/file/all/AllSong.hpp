@@ -28,7 +28,16 @@ private:
     static const int STEPS_LENGTH = 500;
     static const int STEP_LENGTH = 2;
     static const int STEP_COUNT = 250;
-    static const int IS_USED_OFFSET = FIRST_STEP_OFFSET + (STEP_COUNT * STEP_LENGTH);
+    static const int STEPS_TERMINATOR_OFFSET = FIRST_STEP_OFFSET + (STEP_COUNT * STEP_LENGTH);
+    static const int IS_USED_OFFSET = STEPS_TERMINATOR_OFFSET + 2;
+    static const int LOOP_FIRST_STEP_INDEX_OFFSET = IS_USED_OFFSET + 1;
+    static const int LOOP_LAST_STEP_INDEX_OFFSET = LOOP_FIRST_STEP_INDEX_OFFSET + 1;
+    static const int LOOP_ENABLED_OFFSET = LOOP_LAST_STEP_INDEX_OFFSET + 1;
+
+private:
+    int loopFirstStepIndex = 0;
+    int loopLastStepIndex = 0;
+    bool loopEnabled = false;
 
 public:
     std::string name;
@@ -47,5 +56,8 @@ public:
     Song(mpc::sequencer::Song* mpcSong);
     std::vector<std::pair<uint8_t, uint8_t>> getSteps();
     bool getIsUsed();
+    int getLoopFirstStepIndex();
+    int getLoopLastStepIndex();
+    bool isLoopEnabled();
 };
 }

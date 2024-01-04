@@ -4,7 +4,6 @@
 #include <sequencer/Step.hpp>
 
 #include "Util.hpp"
-#include <Util.hpp>
 
 using namespace mpc::file::all;
 
@@ -38,6 +37,9 @@ Song::Song(const std::vector<char>& loadBytes)
     }
 
     isUsed = loadBytes[IS_USED_OFFSET];
+    loopFirstStepIndex = loadBytes[LOOP_FIRST_STEP_INDEX_OFFSET];
+    loopLastStepIndex = loadBytes[LOOP_LAST_STEP_INDEX_OFFSET];
+    loopEnabled = loadBytes[LOOP_ENABLED_OFFSET] == 1;
 
     /*
      * The AllSong parser was in a very bad shape for most of its lifetime.
@@ -80,9 +82,15 @@ Song::Song(mpc::sequencer::Song* mpcSong)
         saveBytes[FIRST_STEP_OFFSET + (i * 2) + 1] = static_cast<char>(step->getRepeats());
     }
 
-    saveBytes[IS_USED_OFFSET] = mpcSong->isUsed() ? 1 : 0;
+    saveBytes[STEPS_TERMINATOR_OFFSET] = static_cast<char>(0xFF);
+    saveBytes[STEPS_TERMINATOR_OFFSET + 1] = static_cast<char>(0xFF);
 
-	for (int i = IS_USED_OFFSET + 1; i < LENGTH; i++)
+    saveBytes[IS_USED_OFFSET] = mpcSong->isUsed() ? 1 : 0;
+    saveBytes[LOOP_FIRST_STEP_INDEX_OFFSET] = mpcSong->getFirstStep();
+    saveBytes[LOOP_LAST_STEP_INDEX_OFFSET] = mpcSong->getLastStep();
+    saveBytes[LOOP_ENABLED_OFFSET] = mpcSong->isLoopEnabled();
+
+	for (int i = LOOP_ENABLED_OFFSET + 1; i < LENGTH; i++)
     {
         saveBytes[i] = 0;
     }
@@ -101,6 +109,21 @@ std::vector<std::pair<uint8_t, uint8_t>> Song::getSteps()
 bool Song::getIsUsed()
 {
     return isUsed;
+}
+
+int Song::getLoopFirstStepIndex()
+{
+    return loopLastStepIndex;
+}
+
+int Song::getLoopLastStepIndex()
+{
+    return loopLastStepIndex;
+}
+
+bool Song::isLoopEnabled()
+{
+    return loopEnabled;
 }
 
 std::vector<char>& Song::getBytes()
