@@ -48,6 +48,25 @@ bool wav_read_header(const std::shared_ptr<std::istream>& stream, int& sampleRat
     auto mainChunkSize = wav_get_LE(stream, 4);       // Offset 4;
     /*auto riffTypeId =*/ wav_get_LE(stream, 4);          // Offset 8
     auto fmtChunkId = wav_get_LE(stream, 4);          // Offset 12
+
+    while (fmtChunkId != FMT_CHUNK_ID && stream->gcount() >= 4)
+    {
+        const auto chunkSize = wav_get_LE(stream, 4);
+        if (stream->gcount() >= chunkSize)
+        {
+            stream->seekg(chunkSize, std::ios_base::cur);
+        }
+        if (stream->gcount() >= 4)
+        {
+            fmtChunkId = wav_get_LE(stream, 4);
+        }
+    }
+
+    if (fmtChunkId != FMT_CHUNK_ID)
+    {
+        return false;
+    }
+
     auto lengthOfFormatData = wav_get_LE(stream, 4);  // Offset 16
     auto isPCM = wav_get_LE(stream, 2) == 1;          // Offset 20
     numChannels = wav_get_LE(stream, 2);              // Offset 22
