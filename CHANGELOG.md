@@ -1,3 +1,8 @@
+## v0.5.14.3 (5-1-2024)
+* Implement ALL file song first loop step, last loop step and loop enabled reading and writing.
+* Fix loading songs from ALL files created by the real MPC2000XL.
+* Fix previewing 24-bit WAV files and WAV files with non-fmt chunks before the fmt chunk via the PLAY function in the LOAD and Directory screens.
+
 ## v0.5.14.2 (31-12-2023)
 * Fix song mode when running VMPC2000XL as a plugin.
 
