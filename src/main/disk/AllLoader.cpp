@@ -54,7 +54,7 @@ void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 
 void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 {
-    auto lSequencer = mpc.getSequencer();
+    auto mpcSequencer = mpc.getSequencer();
     auto allSequences = allParser.getAllSequences();
     auto allSeqNames = allParser.getSeqNames()->getNames();
     auto defaults = allParser.getDefaults();
@@ -95,13 +95,14 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
         as->applyToMpcSeq(mpcSeq);
     }
 
-    auto sequencer = allParser.getSequencer();
-    lSequencer->setActiveSequenceIndex(sequencer->sequence);
-    lSequencer->setActiveTrackIndex(sequencer->track);
+    auto allParserSequencer = allParser.getSequencer();
+    mpcSequencer->setActiveSequenceIndex(allParserSequencer->sequence);
+    mpcSequencer->setActiveTrackIndex(allParserSequencer->track);
+    mpcSequencer->setTempo(allParserSequencer->masterTempo);
 
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 
-    timingCorrectScreen->setNoteValue(sequencer->tc);
+    timingCorrectScreen->setNoteValue(allParserSequencer->tc);
 
     auto count = allParser.getCount();
 
@@ -118,7 +119,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     countMetronomeScreen->setInPlay(count->isEnabledInPlay());
     countMetronomeScreen->setInRec(count->isEnabledInRec());
     countMetronomeScreen->setWaitForKey(count->isWaitForKeyEnabled());
-    lSequencer->setCountEnabled(count->isEnabled());
+    mpcSequencer->setCountEnabled(count->isEnabled());
 
     auto midiInput = allParser.getMidiInput();
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
@@ -137,7 +138,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 
     midiInputScreen->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
     midiInputScreen->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
-    lSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
+    mpcSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
     midiInputScreen->setNotePassEnabled(midiInput->isNotePassEnabled());
     midiInputScreen->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
     midiInputScreen->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
@@ -174,10 +175,10 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     syncScreen->shiftEarly = midiSyncMisc->getShiftEarly();
     syncScreen->frameRate = midiSyncMisc->getFrameRate();
 
-    lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
+    mpcSequencer->setSecondSequenceEnabled(allParserSequencer->secondSeqEnabled);
 
     auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
-    secondSequenceScreen->sq = sequencer->secondSeqIndex;
+    secondSequenceScreen->sq = allParserSequencer->secondSeqIndex;
 
     auto songScreen = mpc.screens->get<SongScreen>("song");
     songScreen->setOffset(-1);
@@ -188,7 +189,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     for (int i = 0; i < 20; i++)
     {
         auto allSong = songs[i];
-        auto mpcSong = lSequencer->getSong(i);
+        auto mpcSong = mpcSequencer->getSong(i);
         mpcSong->setUsed(false);
 
         if (allSong->getIsUsed())

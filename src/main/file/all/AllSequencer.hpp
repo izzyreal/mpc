@@ -18,12 +18,14 @@ private:
 public:
     static const int SEQ_OFFSET = 0;
     static const int TR_OFFSET = 2;
+    static const int MASTER_TEMPO_OFFSET = 4;
     static const int TC_OFFSET = 7;
     static const int SECOND_SEQ_ENABLED_OFFSET = 9;
     static const int SECOND_SEQ_INDEX_OFFSET = 10;
     
     int sequence;
     int track;
+    double masterTempo;
     int tc;
     bool secondSeqEnabled;
     int secondSeqIndex;

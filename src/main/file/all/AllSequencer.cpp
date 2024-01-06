@@ -1,4 +1,5 @@
 #include "AllSequencer.hpp"
+#include "file/ByteUtil.hpp"
 
 #include <Mpc.hpp>
 
@@ -14,6 +15,8 @@ AllSequencer::AllSequencer(const std::vector<char>& loadBytes)
 {
 	sequence = loadBytes[SEQ_OFFSET];
 	track = loadBytes[TR_OFFSET];
+    const auto masterTempoBytes = { loadBytes[MASTER_TEMPO_OFFSET], loadBytes[MASTER_TEMPO_OFFSET + 1] };
+    masterTempo = ByteUtil::bytes2ushort(masterTempoBytes) / 10.0;
 	tc = loadBytes[TC_OFFSET];
 	secondSeqEnabled = loadBytes[SECOND_SEQ_ENABLED_OFFSET] > 0;
 	secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
@@ -22,11 +25,21 @@ AllSequencer::AllSequencer(const std::vector<char>& loadBytes)
 AllSequencer::AllSequencer(mpc::Mpc& mpc)
 {
 	saveBytes = std::vector<char>(LENGTH);
-	for (int i = 0; i < LENGTH; i++)
-		saveBytes[i] = TEMPLATE[i];
-	auto seq = mpc.getSequencer();
-	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
+
+    for (int i = 0; i < LENGTH; i++)
+    {
+        saveBytes[i] = TEMPLATE[i];
+    }
+
+    auto seq = mpc.getSequencer();
+
+    saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
+
+    const auto masterTempoBytes = ByteUtil::ushort2bytes(seq->getTempo() * 10.0);
+
+    saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
+    saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
 
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
