@@ -134,7 +134,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
-    midiInputScreen->setReceiveCh(midiInput->getReceiveCh());
+    midiInputScreen->setReceiveCh(midiInput->getReceiveCh() - 1);
     midiInputScreen->setType(midiInput->getFilterType());
     midiInputScreen->setMidiFilterEnabled(midiInput->isFilterEnabled());
     midiInputScreen->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());

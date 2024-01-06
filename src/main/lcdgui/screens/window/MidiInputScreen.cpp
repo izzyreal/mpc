@@ -92,7 +92,7 @@ void MidiInputScreen::displayPass()
             pass = exclusivePassEnabled;
             break;
         default:
-            const uint8_t ccIndex = type - 5;
+            const uint8_t ccIndex = type - 6;
             pass = ccPassEnabled[ccIndex];
             break;
     }
@@ -227,7 +227,7 @@ void MidiInputScreen::setPass(bool b)
             exclusivePassEnabled = b;
             break;
         default:
-            const uint8_t ccIndex = type - 5;
+            const uint8_t ccIndex = type - 6;
             ccPassEnabled[ccIndex] = b;
             break;
     }
