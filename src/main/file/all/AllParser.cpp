@@ -70,9 +70,6 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 	midiInput = new MidiInput(mpc);
 	chunks.push_back(midiInput->getBytes());
 
-	for (int i = 0; i < 16; i++)
-		chunks.push_back(std::vector<char>{ (char)0xFF });
-
 	midiSyncMisc = new MidiSyncMisc(mpc);
 	chunks.push_back(midiSyncMisc->getBytes());
 	misc = new Misc(mpc);

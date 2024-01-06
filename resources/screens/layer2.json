@@ -751,7 +751,7 @@
  "labels" : [ "Receive ch:", "Seq:", "Duration:", "MIDI filter:", "Type:", "Pass?:" ],
  "x" : [ 26, 182, 127, 26, 26, 169 ],
  "y" : [ 13, 13, 22, 34, 43, 43 ],
- "tfsize" : [ 18, 18, 18, 18, 102, 18 ],
+ "tfsize" : [ 18, 18, 18, 18, 96, 18 ],
  "parameters" : [ "receivech", "seq", "duration", "midifilter", "type", "pass" ],
  "fblabels" : [ null, "MONITR", null, "CLOSE", null, null ],
  "fbtypes" : [ null, 1, null, 0, null, null ]

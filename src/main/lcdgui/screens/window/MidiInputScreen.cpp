@@ -70,6 +70,33 @@ void MidiInputScreen::turnWheel(int i)
 
 void MidiInputScreen::displayPass()
 {
+    bool pass;
+
+    switch (type) {
+        case 0:
+            pass = notePassEnabled;
+            break;
+        case 1:
+            pass = pitchBendPassEnabled;
+            break;
+        case 2:
+            pass = pgmChangePassEnabled;
+            break;
+        case 3:
+            pass = chPressurePassEnabled;
+            break;
+        case 4:
+            pass = polyPressurePassEnabled;
+            break;
+        case 5:
+            pass = exclusivePassEnabled;
+            break;
+        default:
+            const uint8_t ccIndex = type - 5;
+            pass = ccPassEnabled[ccIndex];
+            break;
+    }
+
 	findField("pass")->setText(pass ? "YES" : "NO");
 }
 
@@ -164,10 +191,13 @@ bool MidiInputScreen::isMidiFilterEnabled()
 void MidiInputScreen::setType(int i)
 {
 	if (i < 0 || i > 134)
-		return;
+    {
+        return;
+    }
 
 	type = i;
 	displayType();
+    displayPass();
 }
 
 int MidiInputScreen::getType()
@@ -177,16 +207,32 @@ int MidiInputScreen::getType()
 
 void MidiInputScreen::setPass(bool b)
 {
-	if (pass == b)
-		return;
+	switch (type) {
+        case 0:
+            notePassEnabled = b;
+            break;
+        case 1:
+            pitchBendPassEnabled = b;
+            break;
+        case 2:
+            pgmChangePassEnabled = b;
+            break;
+        case 3:
+            chPressurePassEnabled = b;
+            break;
+        case 4:
+            polyPressurePassEnabled = b;
+            break;
+        case 5:
+            exclusivePassEnabled = b;
+            break;
+        default:
+            const uint8_t ccIndex = type - 5;
+            ccPassEnabled[ccIndex] = b;
+            break;
+    }
 
-	pass = b;
 	displayPass();
-}
-
-bool MidiInputScreen::getPass()
-{
-	return pass;
 }
 
 bool MidiInputScreen::isNotePassEnabled()
@@ -247,4 +293,9 @@ bool MidiInputScreen::isExclusivePassEnabled()
 void MidiInputScreen::setExclusivePassEnabled(bool b)
 {
 	exclusivePassEnabled = b;
+}
+
+std::vector<bool>& MidiInputScreen::getCcPassEnabled()
+{
+    return ccPassEnabled;
 }
