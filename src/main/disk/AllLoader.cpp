@@ -31,6 +31,7 @@
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include "lcdgui/screens/window/TimeDisplayScreen.hpp"
+#include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
@@ -194,6 +195,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto songScreen = mpc.screens->get<SongScreen>("song");
     songScreen->setOffset(-1);
     songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
+    auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change");
+    ignoreTempoChangeScreen->setIgnore(midiSyncMisc->getSongModeIgnoreTempoChangeEvents());
 
     auto songs = allParser.getSongs();
 

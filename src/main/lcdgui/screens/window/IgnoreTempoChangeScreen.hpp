@@ -19,6 +19,9 @@ namespace mpc::lcdgui::screens::window
 
 		void open() override;
 
+        void setIgnore(bool);
+        bool getIgnore();
+
 	private:
 		bool ignore = true;
 		void displayIgnore();

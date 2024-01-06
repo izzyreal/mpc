@@ -8,8 +8,10 @@
 
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
+#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::file::all;
 
@@ -25,6 +27,8 @@ MidiSyncMisc::MidiSyncMisc(const std::vector<char>& b)
 
 	auto stringBuffer = Util::vecCopyOfRange(b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
 	defSongName = std::string(stringBuffer.begin(), stringBuffer.end());
+
+    songModeIgnoreTempoChangeEventsInSequence = b[SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET] == 0x01;
 }
 
 MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
@@ -49,6 +53,9 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 	}
 
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;
+
+    saveBytes[SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET] =
+            mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change")->getIgnore();
 }
 
 int MidiSyncMisc::getInMode()
@@ -89,6 +96,11 @@ int MidiSyncMisc::getOutput()
 std::string MidiSyncMisc::getDefSongName()
 {
     return defSongName;
+}
+
+bool MidiSyncMisc::getSongModeIgnoreTempoChangeEvents()
+{
+    return songModeIgnoreTempoChangeEventsInSequence;
 }
 
 std::vector<char>& MidiSyncMisc::getBytes()

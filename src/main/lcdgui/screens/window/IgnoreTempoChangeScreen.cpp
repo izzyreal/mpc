@@ -36,3 +36,13 @@ void IgnoreTempoChangeScreen::displayIgnore()
 {
 	findField("insequence")->setText(ignore ? "ON" : "OFF");
 }
+
+void IgnoreTempoChangeScreen::setIgnore(bool b)
+{
+    ignore = b;
+}
+
+bool IgnoreTempoChangeScreen::getIgnore()
+{
+    return ignore;
+}
