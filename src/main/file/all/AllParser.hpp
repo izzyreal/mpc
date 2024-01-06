@@ -46,8 +46,8 @@ namespace mpc::file::all
 	public:
 		static const int SEQUENCER_OFFSET{ 1808 };
 		static const int COUNT_OFFSET{ 1829 };
-		static const int COUNT_LENGTH{ 11 };
-		static const int MIDI_INPUT_OFFSET{ 1840 };
+		static const int COUNT_LENGTH{ 13 };
+		static const int MIDI_INPUT_OFFSET{ 1842 };
 		static const int MIDI_SYNC_OFFSET{ 1904 };
 		static const int MISC_OFFSET{ 1936 };
 		static const int SEQUENCE_NAMES_OFFSET{ 2064 };
