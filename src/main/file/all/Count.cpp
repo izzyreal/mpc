@@ -23,6 +23,8 @@ Count::Count(const std::vector<char>& b)
 	clickOutput = b[CLICK_OUTPUT_OFFSET];
 	waitForKeyEnabled = b[WAIT_FOR_KEY_ENABLED_OFFSET] > 0;
 	sound = b[SOUND_OFFSET];
+	accentPad = b[ACCENT_PAD_OFFSET];
+	normalPad = b[NORMAL_PAD_OFFSET];
 	accentVelo = b[ACCENT_VELO_OFFSET];
 	normalVelo = b[NORMAL_VELO_OFFSET];
 }
