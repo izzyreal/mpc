@@ -153,6 +153,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     midiInputScreen->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
     midiInputScreen->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
     midiInputScreen->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
+    midiInputScreen->getCcPassEnabled() = midiInput->getCcPassEnabled();
 
     auto midiSyncMisc = allParser.getMidiSync();
 

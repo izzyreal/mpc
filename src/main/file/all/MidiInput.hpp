@@ -11,7 +11,7 @@ class MidiInput
 {
     
 public:
-    static const int LENGTH{ 46 };
+    static const int LENGTH{ 62 };
     static const int SOFT_THRU_MODE_OFFSET = 0;
     static const int RECEIVE_CH_OFFSET{ 1 };
     static const int SUSTAIN_PEDAL_TO_DURATION_OFFSET{ 2 };
@@ -26,6 +26,7 @@ public:
     static const int CH_PRESSURE_PASS_ENABLED_OFFSET{ 43 };
     static const int POLY_PRESSURE_PASS_ENABLED_OFFSET{ 44 };
     static const int EXCLUSIVE_PASS_ENABLED_OFFSET{ 45 };
+    static const int CC_PASS_ENABLED_OFFSET{ 46 };
 
     int softThruMode;
     int receiveCh;
@@ -40,6 +41,7 @@ public:
     bool chPressurePassEnabled;
     bool polyPressurePassEnabled;
     bool exclusivePassEnabled;
+    std::vector<bool> ccPassEnabled = std::vector<bool>(128);
     std::vector<char> saveBytes;
     
 public:
@@ -56,6 +58,7 @@ public:
     bool isChPressurePassEnabled();
     bool isPolyPressurePassEnabled();
     bool isExclusivePassEnabled();
+    std::vector<bool> getCcPassEnabled();
     
 public:
     std::vector<char>& getBytes();

@@ -2,6 +2,8 @@
 
 #include <Mpc.hpp>
 
+#include "file/BitUtil.hpp"
+
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
@@ -30,6 +32,17 @@ MidiInput::MidiInput(const std::vector<char>& b)
 	chPressurePassEnabled = b[CH_PRESSURE_PASS_ENABLED_OFFSET] > 0;
 	polyPressurePassEnabled = b[POLY_PRESSURE_PASS_ENABLED_OFFSET] > 0;
 	exclusivePassEnabled = b[EXCLUSIVE_PASS_ENABLED_OFFSET] > 0;
+
+    int ccPassEnabledCounter = 0;
+
+    for (int i = 0; i < 16; i++)
+    {
+        const auto currentCcPassEnabled = b[CC_PASS_ENABLED_OFFSET + i];
+        for (int j = 0; j < 8; j++)
+        {
+            ccPassEnabled[ccPassEnabledCounter++] = BitUtil::isBitOn(currentCcPassEnabled, j);
+        }
+    }
 }
 
 MidiInput::MidiInput(mpc::Mpc& mpc)
@@ -52,12 +65,26 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 		saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] = static_cast<int8_t>(screen->getMrsLines()[i]->getTrack() + 1);
 	}
 
-	saveBytes[NOTE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(notePassEnabled ? 1 : 0);
-	saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] = static_cast<int8_t>(pitchBendPassEnabled ? 1 : 0);
-	saveBytes[PGM_CHANGE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(pgmChangePassEnabled ? 1 : 0);
-	saveBytes[CH_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(chPressurePassEnabled ? 1 : 0);
-	saveBytes[POLY_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(polyPressurePassEnabled ? 1 : 0);
-	saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(exclusivePassEnabled ? 1 : 0);
+	saveBytes[NOTE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isNotePassEnabled() ? 1 : 0);
+	saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isPitchBendPassEnabled() ? 1 : 0);
+	saveBytes[PGM_CHANGE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isPgmChangePassEnabled() ? 1 : 0);
+	saveBytes[CH_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isChPressurePassEnabled() ? 1 : 0);
+	saveBytes[POLY_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isPolyPressurePassEnabled() ? 1 : 0);
+	saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isExclusivePassEnabled() ? 1 : 0);
+
+    for (int i = 0; i < 16; i++)
+    {
+        char currentCcPassByte = 0x00;
+
+        for (int j = 0; j < 8; j++)
+        {
+            const bool currentCcPassEnabled = midiInputScreen->getCcPassEnabled()[(i*8) + j];
+
+            currentCcPassByte = BitUtil::setBit(currentCcPassByte, j, currentCcPassEnabled);
+        }
+
+        saveBytes[CC_PASS_ENABLED_OFFSET + i] = currentCcPassByte;
+    }
 }
 
 int MidiInput::getSoftThruMode()
@@ -123,6 +150,11 @@ bool MidiInput::isPolyPressurePassEnabled()
 bool MidiInput::isExclusivePassEnabled()
 {
     return exclusivePassEnabled;
+}
+
+std::vector<bool> MidiInput::getCcPassEnabled()
+{
+    return ccPassEnabled;
 }
 
 std::vector<char>& MidiInput::getBytes()
