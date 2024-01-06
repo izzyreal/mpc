@@ -99,6 +99,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     mpcSequencer->setActiveSequenceIndex(allParserSequencer->sequence);
     mpcSequencer->setActiveTrackIndex(allParserSequencer->track);
     mpcSequencer->setTempo(allParserSequencer->masterTempo);
+    mpcSequencer->setTempoSourceSequence(allParserSequencer->tempoSourceIsSequence);
 
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 

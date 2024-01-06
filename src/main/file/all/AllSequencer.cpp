@@ -17,6 +17,7 @@ AllSequencer::AllSequencer(const std::vector<char>& loadBytes)
 	track = loadBytes[TR_OFFSET];
     const auto masterTempoBytes = { loadBytes[MASTER_TEMPO_OFFSET], loadBytes[MASTER_TEMPO_OFFSET + 1] };
     masterTempo = ByteUtil::bytes2ushort(masterTempoBytes) / 10.0;
+    tempoSourceIsSequence = loadBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] == 0x01;
 	tc = loadBytes[TC_OFFSET];
 	secondSeqEnabled = loadBytes[SECOND_SEQ_ENABLED_OFFSET] > 0;
 	secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
@@ -40,6 +41,8 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
+
+    saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] = seq->isTempoSourceSequenceEnabled() ? 0x01 : 0x00;
 
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
