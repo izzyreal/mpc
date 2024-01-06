@@ -1,5 +1,6 @@
 #include "AllSequencer.hpp"
 #include "file/ByteUtil.hpp"
+#include "lcdgui/screens/window/TimeDisplayScreen.hpp"
 
 #include <Mpc.hpp>
 
@@ -19,6 +20,7 @@ AllSequencer::AllSequencer(const std::vector<char>& loadBytes)
     masterTempo = ByteUtil::bytes2ushort(masterTempoBytes) / 10.0;
     tempoSourceIsSequence = loadBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] == 0x01;
 	tc = loadBytes[TC_OFFSET];
+    timeDisplayStyle = loadBytes[TIME_DISPLAY_STYLE_OFFSET];
 	secondSeqEnabled = loadBytes[SECOND_SEQ_ENABLED_OFFSET] > 0;
 	secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
 }
@@ -32,23 +34,24 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
         saveBytes[i] = TEMPLATE[i];
     }
 
-    auto seq = mpc.getSequencer();
+    const auto mpcSequencer = mpc.getSequencer();
 
-    saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
-	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
+    saveBytes[SEQ_OFFSET] = mpcSequencer->getActiveSequenceIndex();
+	saveBytes[TR_OFFSET] = mpcSequencer->getActiveTrackIndex();
 
-    const auto masterTempoBytes = ByteUtil::ushort2bytes(seq->getTempo() * 10.0);
+    const auto masterTempoBytes = ByteUtil::ushort2bytes(mpcSequencer->getTempo() * 10.0);
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
 
-    saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] = seq->isTempoSourceSequenceEnabled() ? 0x01 : 0x00;
+    saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] = mpcSequencer->isTempoSourceSequenceEnabled() ? 0x01 : 0x00;
 
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-	auto noteValue = timingCorrectScreen->getNoteValue();
+	const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+	const auto noteValue = timingCorrectScreen->getNoteValue();
 
 	saveBytes[TC_OFFSET] = noteValue;
-	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = seq->isSecondSequenceEnabled() ? 1 : 0;
+    saveBytes[TIME_DISPLAY_STYLE_OFFSET] = mpc.screens->get<TimeDisplayScreen>("time-display")->getDisplayStyle();
+	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = mpcSequencer->isSecondSequenceEnabled() ? 1 : 0;
 	
 	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;

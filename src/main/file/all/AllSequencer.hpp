@@ -21,6 +21,7 @@ public:
     static const int MASTER_TEMPO_OFFSET = 4;
     static const int TEMPO_SOURCE_IS_SEQUENCE_OFFSET = 6;
     static const int TC_OFFSET = 7;
+    static const int TIME_DISPLAY_STYLE_OFFSET = 8;
     static const int SECOND_SEQ_ENABLED_OFFSET = 9;
     static const int SECOND_SEQ_INDEX_OFFSET = 10;
     
@@ -29,6 +30,7 @@ public:
     double masterTempo;
     bool tempoSourceIsSequence;
     int tc;
+    int timeDisplayStyle;
     bool secondSeqEnabled;
     int secondSeqIndex;
     std::vector<char> saveBytes;

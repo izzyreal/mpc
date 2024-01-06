@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window {
 		void displayStartTime();
 		void displayFrameRate();
 
-	private:
+	public:
 		void setFrameRate(int i);
 		void setDisplayStyle(int i);
 		void setStartTime(int i);
@@ -29,6 +29,7 @@ namespace mpc::lcdgui::screens::window {
 		void setM(int i);
 		void setF(int i);
 		void setS(int i);
+        int getDisplayStyle();
 
 	private:
 		std::vector<std::string> displayStyleNames{ "BAR,BEAT,CLOCK", "HOUR,MINUTE,SEC" };

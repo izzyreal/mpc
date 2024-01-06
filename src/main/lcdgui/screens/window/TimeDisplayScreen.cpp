@@ -132,3 +132,8 @@ void TimeDisplayScreen::setFrameRate(int i)
 	frameRate = i;
 	displayFrameRate();
 }
+
+int TimeDisplayScreen::getDisplayStyle()
+{
+    return displayStyle;
+}
