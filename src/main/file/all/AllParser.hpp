@@ -44,7 +44,6 @@ namespace mpc::file::all
 		static const int DEFAULTS_LENGTH{ 1728 };
 
 	public:
-		static const int UNKNOWN1_OFFSET{ 1744 };
 		static const int SEQUENCER_OFFSET{ 1808 };
 		static const int COUNT_OFFSET{ 1824 };
 		static const int COUNT_LENGTH{ 16 };

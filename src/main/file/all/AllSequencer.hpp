@@ -10,7 +10,7 @@ namespace mpc::file::all
 class AllSequencer
 {
 public:
-    static const int LENGTH = 16;
+    static const int LENGTH = 11;
     
 private:
     static std::vector<char> TEMPLATE;
