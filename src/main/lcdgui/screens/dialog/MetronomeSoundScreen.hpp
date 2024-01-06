@@ -6,6 +6,8 @@
 
 namespace mpc::sampler { class Sampler; }
 
+namespace mpc::disk { class AllLoader; }
+
 namespace mpc::lcdgui
 {
 	class Field;
@@ -65,6 +67,9 @@ namespace mpc::lcdgui::screens::dialog
 		void setNormalPad(int i);
 		int getNormalVelo();
 		void setNormalVelo(int i);
+
+    private:
+        friend class mpc::disk::AllLoader;
 
 	};
 }

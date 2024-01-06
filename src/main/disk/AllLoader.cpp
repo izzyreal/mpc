@@ -115,8 +115,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 
     countMetronomeScreen->setCountIn(count->getCountInMode());
-    metronomeSoundScreen->setAccentPad(count->getAccentPad());
-    metronomeSoundScreen->setNormalPad(count->getNormalPad());
+    metronomeSoundScreen->accentPad = count->getAccentPad();
+    metronomeSoundScreen->normalPad = count->getNormalPad();
     metronomeSoundScreen->setAccentVelo(count->getAccentVelo());
     metronomeSoundScreen->setNormalVelo(count->getNormalVelo());
     metronomeSoundScreen->setOutput(count->getClickOutput());

@@ -155,7 +155,7 @@ int MetronomeSoundScreen::getAccentVelo()
 
 void MetronomeSoundScreen::setAccentVelo(int i)
 {
-    if (i < 0 || i > 127)
+    if (i < 1 || i > 127)
         return;
 
     accentVelo = i;
@@ -183,7 +183,7 @@ int MetronomeSoundScreen::getNormalVelo()
 
 void MetronomeSoundScreen::setNormalVelo(int i)
 {
-    if (i < 0 || i > 127)
+    if (i < 1 || i > 127)
         return;
 
     normalVelo = i;
