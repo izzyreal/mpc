@@ -63,7 +63,7 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 	sequencer = new AllSequencer(mpc);
 	chunks.push_back(sequencer->getBytes());
 
-    chunks.push_back({ 0, 12, 0, 0, 0 });
+    chunks.push_back({ 0, 12, 0, 0, 0, 0, 0, 0, 0, 0 });
 
     count = new Count(mpc);
 	chunks.push_back(count->getBytes());
