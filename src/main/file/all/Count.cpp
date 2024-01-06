@@ -44,6 +44,8 @@ Count::Count(mpc::Mpc& mpc)
 	saveBytes[CLICK_OUTPUT_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getOutput());
 	saveBytes[WAIT_FOR_KEY_ENABLED_OFFSET] = static_cast< int8_t >((countMetronomeScreen->isWaitForKeyEnabled() ? 1 : 0));
 	saveBytes[SOUND_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getSound());
+	saveBytes[ACCENT_PAD_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getAccentPad());
+	saveBytes[NORMAL_PAD_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getNormalPad());
 	saveBytes[ACCENT_VELO_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getAccentVelo());
 	saveBytes[NORMAL_VELO_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getNormalVelo());
 }
@@ -91,6 +93,16 @@ bool Count::isWaitForKeyEnabled()
 int Count::getSound()
 {
     return sound;
+}
+
+int Count::getAccentPad()
+{
+    return accentPad;
+}
+
+int Count::getNormalPad()
+{
+    return normalPad;
 }
 
 int Count::getAccentVelo()

@@ -20,8 +20,10 @@ public:
     static const int CLICK_OUTPUT_OFFSET = 6;
     static const int WAIT_FOR_KEY_ENABLED_OFFSET = 7;
     static const int SOUND_OFFSET = 8;
-    static const int ACCENT_VELO_OFFSET = 9;
-    static const int NORMAL_VELO_OFFSET = 10;
+    static const int ACCENT_PAD_OFFSET = 9;
+    static const int NORMAL_PAD_OFFSET = 10;
+    static const int ACCENT_VELO_OFFSET = 11;
+    static const int NORMAL_VELO_OFFSET = 12;
     bool enabled;
     int countInMode;
     int clickVolume;
@@ -31,6 +33,8 @@ public:
     int clickOutput;
     bool waitForKeyEnabled;
     int sound;
+    int accentPad;
+    int normalPad;
     int accentVelo;
     int normalVelo;
     std::vector<char> saveBytes;
@@ -45,9 +49,11 @@ public:
     int getClickOutput();
     bool isWaitForKeyEnabled();
     int getSound();
+    int getAccentPad();
+    int getNormalPad();
     int getAccentVelo();
     int getNormalVelo();
-    
+
 public:
     std::vector<char>& getBytes();
     
