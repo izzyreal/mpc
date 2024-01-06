@@ -46,9 +46,9 @@ namespace mpc::lcdgui::screens::dialog
 		int output = 0;
 		int sound = 0;
 		int accentVelo = 127;
-		int accentPad = 35;
+		int accentPad = 0;
 		int normalVelo = 64;
-		int normalPad = 35;
+		int normalPad = 0;
 
 	public:
 		int getVolume();

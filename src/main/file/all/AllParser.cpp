@@ -66,7 +66,7 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 	chunks.push_back(count->getBytes());
 	midiInput = new MidiInput(mpc);
 	chunks.push_back(midiInput->getBytes());
-	
+
 	for (int i = 0; i < 16; i++)
 		chunks.push_back(std::vector<char>{ (char)0xFF });
 

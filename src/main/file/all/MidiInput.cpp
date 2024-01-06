@@ -4,6 +4,7 @@
 
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
+#include <lcdgui/screens/window/MidiOutputScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -11,6 +12,7 @@ using namespace mpc::file::all;
 
 MidiInput::MidiInput(const std::vector<char>& b)
 {
+    softThruMode = b[SOFT_THRU_MODE_OFFSET];
 	receiveCh = b[RECEIVE_CH_OFFSET];
 	sustainPedalToDuration = b[SUSTAIN_PEDAL_TO_DURATION_OFFSET] > 0;
 	filterEnabled = b[FILTER_ENABLED_OFFSET] > 0;
@@ -33,14 +35,10 @@ MidiInput::MidiInput(const std::vector<char>& b)
 MidiInput::MidiInput(mpc::Mpc& mpc)
 {
 	saveBytes = std::vector<char>(LENGTH);
-	
-	for (int i = 0; i < LENGTH; i++)
-	{
-		saveBytes[i] = TEMPLATE[i];
-	}
 
 	auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
+    saveBytes[SOFT_THRU_MODE_OFFSET] = mpc.screens->get<MidiOutputScreen>("midi-output")->getSoftThru();
 	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh());
 	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
 	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
@@ -62,7 +60,10 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 	saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(exclusivePassEnabled ? 1 : 0);
 }
 
-std::vector<char> MidiInput::TEMPLATE = std::vector<char>{ 127, 64, 1, 0, 1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 1, 0, 0, 0, 0, 0 };
+int MidiInput::getSoftThruMode()
+{
+    return softThruMode;
+}
 
 int MidiInput::getReceiveCh()
 {

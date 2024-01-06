@@ -28,6 +28,7 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
+#include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include "lcdgui/screens/window/TimeDisplayScreen.hpp"
 #include <lcdgui/screens/SecondSeqScreen.hpp>
@@ -126,6 +127,9 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     mpcSequencer->setCountEnabled(count->isEnabled());
 
     auto midiInput = allParser.getMidiInput();
+
+    mpc.screens->get<MidiOutputScreen>("midi-output")->setSoftThru(midiInput->getSoftThruMode());
+
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
     midiInputScreen->setReceiveCh(midiInput->getReceiveCh());

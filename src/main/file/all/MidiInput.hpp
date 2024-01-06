@@ -10,11 +10,9 @@ namespace mpc::file::all {
 class MidiInput
 {
     
-private:
-    static std::vector<char> TEMPLATE;
-    
 public:
     static const int LENGTH{ 48 };
+    static const int SOFT_THRU_MODE_OFFSET = 2;
     static const int RECEIVE_CH_OFFSET{ 3 };
     static const int SUSTAIN_PEDAL_TO_DURATION_OFFSET{ 4 };
     static const int FILTER_ENABLED_OFFSET{ 5 };
@@ -28,6 +26,8 @@ public:
     static const int CH_PRESSURE_PASS_ENABLED_OFFSET{ 45 };
     static const int POLY_PRESSURE_PASS_ENABLED_OFFSET{ 46 };
     static const int EXCLUSIVE_PASS_ENABLED_OFFSET{ 47 };
+
+    int softThruMode;
     int receiveCh;
     bool sustainPedalToDuration;
     bool filterEnabled;
@@ -43,6 +43,7 @@ public:
     std::vector<char> saveBytes;
     
 public:
+    int getSoftThruMode();
     int getReceiveCh();
     bool isSustainPedalToDurationEnabled();
     bool isFilterEnabled();
