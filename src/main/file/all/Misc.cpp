@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
+#include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
@@ -54,7 +55,8 @@ Misc::Misc(mpc::Mpc& mpc)
 	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditOptionsScreen->isAutoStepIncrementEnabled() ? 1 : 0);
 	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(stepEditOptionsScreen->isDurationOfRecordedNotesTcValue() ? 1 : 0);
 	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(stepEditOptionsScreen->getTcValuePercentage());
-	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = 0; // Unimplemented
+    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
+	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = midiInputScreen->getProgChangeSeq() ? 0x01 : 0x00;
 }
 
 int Misc::getTapAvg()

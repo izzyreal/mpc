@@ -163,6 +163,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     stepEditOptionsScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
     stepEditOptionsScreen->setDurationOfRecordedNotesTcValue(misc->isDurationOfRecNotesTc());
     stepEditOptionsScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
+    midiInputScreen->setProgChangeSeq(misc->isPgmChToSeqEnabled());
 
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
     midiSwScreen->setSwitches(misc->getSwitches());
