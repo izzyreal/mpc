@@ -713,9 +713,20 @@ void BaseControls::tap()
 
 void BaseControls::goTo()
 {
+    if (!sequencer.lock()->getActiveSequence()->isUsed())
+    {
+        return;
+    }
+
     init();
+
     auto controls = mpc.getControls();
     controls->setGoToPressed(true);
+
+    if (currentScreenName == "sequencer")
+    {
+        ls->openScreen("locate");
+    }
 }
 
 void BaseControls::nextSeq()
