@@ -8,6 +8,8 @@
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
 
+#include "file/ByteUtil.hpp"
+
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
@@ -15,6 +17,15 @@ using namespace mpc::file::all;
 
 Misc::Misc(const std::vector<char>& b)
 {
+    for (int i = 0; i < 9; i++)
+    {
+        const auto locationOffset = LOCATIONS_OFFSET + (i * 4);
+        const uint16_t locationBarIndex = ByteUtil::bytes2ushort({b[locationOffset], b[locationOffset+1]});
+        const uint8_t locationBeatIndex = b[locationOffset+2];
+        const uint8_t locationClock = b[locationOffset+3];
+        locations[i] = {locationBarIndex, locationBeatIndex, locationClock};
+    }
+
 	tapAvg = b[TAP_AVG_OFFSET];
 	inReceiveMMCEnabled = b[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] > 0;
     
@@ -33,9 +44,27 @@ Misc::Misc(const std::vector<char>& b)
 
 Misc::Misc(mpc::Mpc& mpc)
 {
-	auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
+    saveBytes = std::vector<char>(LENGTH);
+
+    auto& locationsToPersist = mpc.screens->get<LocateScreen>("locate")->getLocations();
+
+    assert(locationsToPersist.size() == 9);
+
+    for (int i = 0; i < 9; i++)
+    {
+        const auto locationBarBytes = ByteUtil::ushort2bytes(std::get<0>(locationsToPersist[i]));
+        const auto locationBeatByte = std::get<1>(locationsToPersist[i]);
+        const auto locationClockByte = std::get<2>(locationsToPersist[i]);
+        const auto locationOffset = LOCATIONS_OFFSET + (i * 4);
+        saveBytes[locationOffset] = locationBarBytes[0];
+        saveBytes[locationOffset+1] = locationBarBytes[1];
+        saveBytes[locationOffset+2] = locationBeatByte;
+        saveBytes[locationOffset+3] = locationClockByte;
+    }
+
+    auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
 	auto othersScreen = mpc.screens->get<OthersScreen>("others");
-	saveBytes = std::vector<char>(LENGTH);
+
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging() - 2);
 
 	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
@@ -92,6 +121,11 @@ bool Misc::isPgmChToSeqEnabled()
 std::vector<std::pair<int, int>> Misc::getSwitches()
 {
     return switches;
+}
+
+std::vector<LocateScreen::Location>& Misc::getLocations()
+{
+    return locations;
 }
 
 std::vector<char>& Misc::getBytes()

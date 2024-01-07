@@ -32,6 +32,7 @@
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include "lcdgui/screens/window/TimeDisplayScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
+#include "lcdgui/screens/window/LocateScreen.hpp"
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
@@ -164,6 +165,9 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     stepEditOptionsScreen->setDurationOfRecordedNotesTcValue(misc->isDurationOfRecNotesTc());
     stepEditOptionsScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
     midiInputScreen->setProgChangeSeq(misc->isPgmChToSeqEnabled());
+
+    auto locateScreen = mpc.screens->get<LocateScreen>("locate");
+    locateScreen->setLocations(misc->getLocations());
 
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
     midiSwScreen->setSwitches(misc->getSwitches());
