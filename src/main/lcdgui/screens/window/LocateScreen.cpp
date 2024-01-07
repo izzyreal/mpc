@@ -204,3 +204,14 @@ uint8_t LocateScreen::getMaxClockForThisBar()
 {
     return 96 * (4.0 / sequencer.lock()->getActiveSequence()->getDenominator(barIndex)) - 1;
 }
+
+void LocateScreen::setLocations(const std::vector<Location>& newLocations)
+{
+    assert(newLocations.size() == 9);
+    locations = newLocations;
+}
+
+std::vector<LocateScreen::Location> &LocateScreen::getLocations()
+{
+    return locations;
+}

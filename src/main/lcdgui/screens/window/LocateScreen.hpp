@@ -17,6 +17,9 @@ namespace mpc::lcdgui::screens::window {
 
         void open() override;
 
+        void setLocations(const std::vector<Location>&);
+        std::vector<Location>& getLocations();
+
     private:
         std::vector<Location> locations = std::vector<Location>(9, {0, 0, 0});
 

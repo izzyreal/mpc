@@ -49,7 +49,7 @@ namespace mpc::file::all
 		static const int COUNT_LENGTH{ 13 };
 		static const int MIDI_INPUT_OFFSET{ 1842 };
 		static const int MIDI_SYNC_OFFSET{ 1904 };
-		static const int MISC_OFFSET{ 1936 };
+		static const int MISC_OFFSET{ 1933 };
 		static const int SEQUENCE_NAMES_OFFSET{ 2064 };
 		static const int SONGS_OFFSET{ 3846 };
 		static const int SEQUENCES_OFFSET{ 14406 };
