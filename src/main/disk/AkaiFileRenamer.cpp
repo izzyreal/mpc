@@ -31,6 +31,11 @@ void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc& mpc, const fs::path& p)
     {
         std::string akaiName;
 
+        if (e.path().filename() == ".DS_Store")
+        {
+            continue;
+        }
+
         if (fs::is_directory(e))
         {
             const auto tidyString = ShortNameGenerator::tidyString(e.path().filename().string());

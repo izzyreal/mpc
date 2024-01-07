@@ -36,7 +36,7 @@ Misc::Misc(mpc::Mpc& mpc)
 	auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
 	auto othersScreen = mpc.screens->get<OthersScreen>("others");
 	saveBytes = std::vector<char>(LENGTH);
-	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
+	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging() - 2);
 
 	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 

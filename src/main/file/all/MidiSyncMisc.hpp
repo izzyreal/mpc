@@ -12,7 +12,7 @@ class MidiSyncMisc
 {
     
 public:
-    static const int LENGTH = 32;
+    static const int LENGTH = 24;
     
 private:
     static const int IN_MODE_OFFSET = 0;

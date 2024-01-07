@@ -170,7 +170,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 
     auto othersScreen = mpc.screens->get<OthersScreen>("others");
 
-    othersScreen->setTapAveraging(misc->getTapAvg());
+    othersScreen->setTapAveraging(misc->getTapAvg() + 2);
 
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
