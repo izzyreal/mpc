@@ -19,8 +19,13 @@ namespace mpc::sequencer {
 class Sequence final
 : public Observable
 {
-    
+public:
+    struct StartTime {
+        uint8_t hours; uint8_t minutes; uint8_t seconds; uint8_t frames; uint8_t frameDecimals;
+    };
+
 private:
+    StartTime startTime{0, 0, 0, 0, 0};
     std::atomic_bool tempoTrackIsInitialized { false };
     mpc::Mpc& mpc;
     double initialTempo = 120.0;
@@ -114,6 +119,8 @@ public:
     int getFirstTickOfBeat(int bar, int beat);
     
     void resetTrackEventIndices(int tick);
+
+    StartTime& getStartTime();
     
 public:
     Sequence(mpc::Mpc&);

@@ -671,3 +671,8 @@ void Sequence::resetTrackEventIndices(int tick)
 	
     tempoChangeTrack->move(tick, tick);
 }
+
+Sequence::StartTime& Sequence::getStartTime()
+{
+    return startTime;
+}

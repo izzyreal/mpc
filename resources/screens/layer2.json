@@ -563,7 +563,15 @@
  "labels" : [ "Display style:", "Start time:", "h", "m", "s", "f", "Frame rate:" ],
  "x" : [ 32, 50, 128, 146, 164, 182, 50 ],
  "y" : [ 13, 23, 23, 23, 23, 23, 33 ],
- "parameters" : [ "displaystyle", "starttime", "h", "m", "s", "f", "framerate" ],
+ "parameters" : [
+  "displaystyle", ["_", "_", "_", "hours"],
+  "hours", ["_", "minutes", "displaystyle", "framerate"],
+  "minutes", ["hours", "seconds", "displaystyle", "framerate"],
+  "seconds", ["minutes", "frames", "displaystyle", "framerate"],
+  "frames", ["seconds", "frame-decimals", "displaystyle", "framerate"],
+  "frame-decimals", ["frames", "_", "displaystyle", "framerate"],
+  "framerate", ["_", "_", "hours", "_"]
+ ],
  "tfsize" : [ 90, 12, 12, 12, 12, 12, 18 ],
  "fblabels" : [ null, null, null, "CLOSE", null, null ],
  "fbtypes" : [ null, null, null, 0, null, null ]

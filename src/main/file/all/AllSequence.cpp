@@ -56,7 +56,13 @@ AllSequence::AllSequence(const std::vector<char>& bytes)
     }
     
     loop = (bytes[LOOP_ENABLED_OFFSET] > 0);
-    
+
+    startTime.hours = bytes[START_TIME_OFFSET];
+    startTime.minutes = bytes[START_TIME_OFFSET+1];
+    startTime.seconds = bytes[START_TIME_OFFSET+2];
+    startTime.frames = bytes[START_TIME_OFFSET+3];
+    startTime.frameDecimals = bytes[START_TIME_OFFSET+4];
+
     for (int i = 0; i < 33; i++)
     {
         auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
@@ -133,11 +139,17 @@ void AllSequence::applyToMpcSeq(std::shared_ptr<mpc::sequencer::Sequence> mpcSeq
     mpcSeq->setLastLoopBarIndex(loopLast);
 
     if (loopLastEnd)
+    {
         mpcSeq->setLastLoopBarIndex(INT_MAX);
+    }
 
     mpcSeq->setLoopEnabled(loop);
+    mpcSeq->getStartTime().hours = startTime.hours;
+    mpcSeq->getStartTime().minutes = startTime.minutes;
+    mpcSeq->getStartTime().seconds = startTime.seconds;
+    mpcSeq->getStartTime().frames = startTime.frames;
+    mpcSeq->getStartTime().frameDecimals = startTime.frameDecimals;
 }
-
 
 AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
 {
@@ -183,7 +195,13 @@ AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
     saveBytes[LOOP_LAST_OFFSET] = loopEndBytes[0];
     saveBytes[LOOP_LAST_OFFSET + 1] = loopEndBytes[1];
     saveBytes[LOOP_ENABLED_OFFSET] = seq->isLoopEnabled() ? 1 : 0;
-    
+
+    saveBytes[START_TIME_OFFSET] = seq->getStartTime().hours;
+    saveBytes[START_TIME_OFFSET+1] = seq->getStartTime().minutes;
+    saveBytes[START_TIME_OFFSET+2] = seq->getStartTime().seconds;
+    saveBytes[START_TIME_OFFSET+3] = seq->getStartTime().frames;
+    saveBytes[START_TIME_OFFSET+4] = seq->getStartTime().frameDecimals;
+
     for (int i = 0; i < PADDING4.size(); i++)
     {
         saveBytes[PADDING4_OFFSET + i] = PADDING4[i];
