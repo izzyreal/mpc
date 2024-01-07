@@ -153,7 +153,8 @@ vector<string> screenNames = {
 "delete-sequence",
 "delete-all-files",
 "popup",
-"vmpc-convert-and-load-wav"
+"vmpc-convert-and-load-wav",
+"locate"
 };
 
 SCENARIO("All screens can be opened", "[gui]") {
