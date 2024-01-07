@@ -72,6 +72,9 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 
 	midiSyncMisc = new MidiSyncMisc(mpc);
 	chunks.push_back(midiSyncMisc->getBytes());
+
+    chunks.push_back({0, 0, 0, 0, 0, 0, 0, 0});
+
 	misc = new Misc(mpc);
 	chunks.push_back(misc->getBytes());
 	seqNames = new SequenceNames(mpc);

@@ -19,7 +19,7 @@ void OthersScreen::displayTapAveraging()
 
 void OthersScreen::setTapAveraging(int i)
 {
-	if (i < 0 || i > 8)
+	if (i < 2 || i > 4)
 	{
 		return;
 	}

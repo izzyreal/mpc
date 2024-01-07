@@ -76,7 +76,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (audioMidiServices->getMainLevel()),
     (char) (mpc.getHardware()->getSlider()->getValue()),
     (char) (vmpcSettingsScreen->autoConvertWavs),
-    (char) (othersScreen->getTapAveraging()),
+    0x00, // This was tap averaging, but it does not belong here
     (char) (othersScreen->getContrast()),
     (char) (vmpcSettingsScreen->midiControlMode)
   };
@@ -115,7 +115,8 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 5) audioMidiServices->setMainLevel(bytes[5]);
   if (bytes.size() > 6) mpc.getHardware()->getSlider()->setValue(bytes[6]);
   if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
-  if (bytes.size() > 8) othersScreen->setTapAveraging(bytes[8]);
+  // We used to have tap averaging here, but it doesn't belong here, so
+  // for now we ignore this byte.
   if (bytes.size() > 9) othersScreen->setContrast(bytes[9]);
   if (bytes.size() > 10) vmpcSettingsScreen->midiControlMode = bytes[10];
 }
