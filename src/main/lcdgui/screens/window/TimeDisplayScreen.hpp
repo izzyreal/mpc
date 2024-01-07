@@ -24,23 +24,17 @@ namespace mpc::lcdgui::screens::window {
 	public:
 		void setFrameRate(int i);
 		void setDisplayStyle(int i);
-		void setStartTime(int i);
-		void setH(int i);
-		void setM(int i);
-		void setF(int i);
-		void setS(int i);
+		void setHours(int i);
+		void setMinutes(int i);
+		void setSeconds(int i);
+		void setFrames(int i);
+		void setFrameDecimals(int i);
         int getDisplayStyle();
 
 	private:
 		std::vector<std::string> displayStyleNames{ "BAR,BEAT,CLOCK", "HOUR,MINUTE,SEC" };
 		std::vector<std::string> frameRateNames = { "24", "25", "30D", "30" };
 		int displayStyle = 0;
-		int startTime = 0;
 		int frameRate = 0;
-		int h = 0;
-		int m = 0;
-		int f = 0;
-		int s = 0;
-
 	};
 }

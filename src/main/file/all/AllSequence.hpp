@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "sequencer/Sequence.hpp"
+
 namespace mpc::sequencer
 {
 class Sequence;
@@ -63,6 +65,7 @@ public:
     static const int LOOP_FIRST_OFFSET{ 48 };
     static const int LOOP_LAST_OFFSET{ 50 };
     static const int LOOP_ENABLED_OFFSET{ 52 };
+    static const int START_TIME_OFFSET{53};
     static const int PADDING4_OFFSET{ 59 };
     
 private:
@@ -83,6 +86,8 @@ public:
     int loopLast;
     bool loopLastEnd;
     bool loop;
+    mpc::sequencer::Sequence::StartTime startTime{0, 0, 0, 0, 0};
+
     double tempo;
     std::vector<std::string> devNames = std::vector<std::string>(33);
     Tracks* tracks = nullptr;

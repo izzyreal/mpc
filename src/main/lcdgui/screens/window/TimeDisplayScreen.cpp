@@ -17,31 +17,33 @@ void TimeDisplayScreen::open()
 void TimeDisplayScreen::turnWheel(int i)
 {
 	init();
+
+    const auto startTime = sequencer.lock()->getActiveSequence()->getStartTime();
 	
 	if (param == "displaystyle")
 	{
 		setDisplayStyle(displayStyle + i);
 	}
-	else if (param == "starttime")
+	else if (param == "hours")
 	{
-		setStartTime(startTime + i);
+        setHours(startTime.hours + i);
 	}
-	else if (param == "h")
+	else if (param == "minutes")
 	{
-		setH(h + i);
+        setMinutes(startTime.minutes + i);
 	}
-	else if (param == "m")
+	else if (param == "seconds")
 	{
-		setM(m + i);
+        setSeconds(startTime.seconds + i);
 	}
-	else if (param == "s")
+	else if (param == "frames")
 	{
-		setS(s + i);
+        setFrames(startTime.frames + i);
 	}
-	else if (param == "f")
+	else if (param == "frame-decimals")
 	{
-		setF(f + i);
-	}
+        setFrameDecimals(startTime.frameDecimals + i);
+    }
 	else if (param == "framerate")
 	{
 		setFrameRate(frameRate + i);
@@ -55,11 +57,12 @@ void TimeDisplayScreen::displayDisplayStyle()
 
 void TimeDisplayScreen::displayStartTime()
 {
-	findField("starttime")->setText(StrUtil::padLeft(std::to_string(startTime), "0", 2));
-	findField("h")->setText(StrUtil::padLeft(std::to_string(h), "0", 2));
-	findField("m")->setText(StrUtil::padLeft(std::to_string(m), "0", 2));
-	findField("s")->setText(StrUtil::padLeft(std::to_string(s), "0", 2));
-	findField("f")->setText(StrUtil::padLeft(std::to_string(f), "0", 2));
+    const auto startTime = sequencer.lock()->getActiveSequence()->getStartTime();
+	findField("hours")->setText(StrUtil::padLeft(std::to_string(startTime.hours), "0", 2));
+	findField("minutes")->setText(StrUtil::padLeft(std::to_string(startTime.minutes), "0", 2));
+	findField("seconds")->setText(StrUtil::padLeft(std::to_string(startTime.seconds), "0", 2));
+	findField("frames")->setText(StrUtil::padLeft(std::to_string(startTime.frames), "0", 2));
+	findField("frame-decimals")->setText(StrUtil::padLeft(std::to_string(startTime.frameDecimals), "0", 2));
 }
 
 void TimeDisplayScreen::displayFrameRate()
@@ -77,58 +80,43 @@ void TimeDisplayScreen::setDisplayStyle(int i)
 	displayDisplayStyle();
 }
 
-void TimeDisplayScreen::setH(int i)
+void TimeDisplayScreen::setHours(int i)
 {
-	if (i < 0 || i > 59)
-	{
-		return;
-	}
-	h = i;
+	sequencer.lock()->getActiveSequence()->getStartTime().hours = std::clamp<uint8_t>(i, 0, 23);
 	displayStartTime();
 }
 
-void TimeDisplayScreen::setStartTime(int i)
+void TimeDisplayScreen::setMinutes(int i)
 {
-	if (i < 0 || i > 23) {
-		return;
-	}
+    sequencer.lock()->getActiveSequence()->getStartTime().minutes = std::clamp<uint8_t>(i, 0, 59);
+    displayStartTime();
+}
 
-	startTime = i;
+void TimeDisplayScreen::setSeconds(int i)
+{
+    sequencer.lock()->getActiveSequence()->getStartTime().seconds = std::clamp<uint8_t>(i, 0, 59);
 	displayStartTime();
 }
 
-void TimeDisplayScreen::setM(int i)
+void TimeDisplayScreen::setFrames(int i)
 {
-	if (i < 0 || i > 59) {
-		return;
-	}
-	m = i;
+    sequencer.lock()->getActiveSequence()->getStartTime().frames = std::clamp<uint8_t>(i, 0, 29);
 	displayStartTime();
 }
 
-void TimeDisplayScreen::setF(int i)
+void TimeDisplayScreen::setFrameDecimals(int i)
 {
-	if (i < 0 || i > 99) {
-		return;
-	}
-	f = i;
-	displayStartTime();
-}
-
-void TimeDisplayScreen::setS(int i)
-{
-	if (i < 0 || i > 29) {
-		return;
-	}
-	s = i;
+    sequencer.lock()->getActiveSequence()->getStartTime().frameDecimals = std::clamp<uint8_t>(i, 0, 99);
 	displayStartTime();
 }
 
 void TimeDisplayScreen::setFrameRate(int i)
 {
-	if (i < 0 || i > 3) {
+	if (i < 0 || i > 3)
+    {
 		return;
 	}
+
 	frameRate = i;
 	displayFrameRate();
 }
