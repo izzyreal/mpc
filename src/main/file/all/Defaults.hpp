@@ -27,6 +27,7 @@ public:
     static const int LAST_TICK_BYTE3_OFFSET{ 30 };
     static const int UNKNOWN32_BIT_INT_OFFSET{ 32 };
     static const int UNKNOWN2_OFFSET{ 48 };
+    static const int LOOP_ENABLED_OFFSET{ 52 };
     static std::vector<char> UNKNOWN2;
     
 public:
@@ -50,6 +51,7 @@ public:
     int timeSigNum;
     int timeSigDen;
     int barCount;
+    bool loopEnabled;
     
     std::vector<std::string> devNames = std::vector<std::string>(33);
     std::vector<std::string> trackNames = std::vector<std::string>(64);
@@ -70,6 +72,7 @@ public:
     int getTimeSigNum();
     int getTimeSigDen();
     int getBarCount();
+    bool isLoopEnabled();
     std::vector<std::string> getDefaultDevNames();
     std::vector<std::string> getDefaultTrackNames();
     std::vector<int> getDevices();

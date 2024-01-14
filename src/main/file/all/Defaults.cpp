@@ -7,7 +7,6 @@
 
 #include <file/ByteUtil.hpp>
 #include <StrUtil.hpp>
-#include <Util.hpp>
 
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;
@@ -30,6 +29,7 @@ Defaults::Defaults(mpc::Mpc& mpc, const std::vector<char>& loadBytes)
 	auto barCountBytes = std::vector<char>{ loadBytes[BAR_COUNT_BYTE1_OFFSET], loadBytes[BAR_COUNT_BYTE2_OFFSET] };
 
     barCount = ByteUtil::bytes2ushort(barCountBytes);
+    loopEnabled = loadBytes[LOOP_ENABLED_OFFSET] == 0x01;
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -78,6 +78,8 @@ Defaults::Defaults(mpc::Mpc& mpc)
 		saveBytes[UNKNOWN2_OFFSET + i] = UNKNOWN2[i];
 
 	setTrackSettings();
+
+    saveBytes[LOOP_ENABLED_OFFSET] = userScreen->loop ? 0x01 : 0x00;
 }
 
 void Defaults::parseNames(std::vector<char> loadBytes)
@@ -155,6 +157,11 @@ int Defaults::getTimeSigDen()
 int Defaults::getBarCount()
 {
     return barCount;
+}
+
+bool Defaults::isLoopEnabled()
+{
+    return loopEnabled;
 }
 
 std::vector<std::string> Defaults::getDefaultDevNames()

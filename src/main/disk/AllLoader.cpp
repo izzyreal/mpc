@@ -66,6 +66,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto userScreen = mpc.screens->get<UserScreen>("user");
 
     userScreen->setLastBar(defaults->getBarCount() - 1);
+    userScreen->setLoop(defaults->isLoopEnabled());
     userScreen->setBus(defaults->getBusses()[0]);
 
     for (int i = 0; i < 33; i++)
