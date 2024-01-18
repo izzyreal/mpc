@@ -21,6 +21,13 @@ SoundPlayer::SoundPlayer()
 
 SoundPlayer::~SoundPlayer()
 {
+    playing.store(false);
+
+    if (readThread.joinable())
+    {
+        readThread.join();
+    }
+
     src_delete(srcLeft);
     src_delete(srcRight);
 }
@@ -31,6 +38,12 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream>& streamToUse, SoundP
     {
         return false;
     }
+
+    if (readThread.joinable())
+    {
+        readThread.join();
+    }
+
     stream = streamToUse;
     fileFormat = fileFormatToUse;
 
@@ -102,11 +115,6 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream>& streamToUse, SoundP
         resampleInputBufferRight.clear();
         resampleOutputBuffer.clear();
     });
-
-    if (readThread.joinable())
-    {
-        readThread.detach();
-    }
 
     return true;
 }
