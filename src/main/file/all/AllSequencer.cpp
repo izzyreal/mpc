@@ -39,7 +39,13 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
     saveBytes[SEQ_OFFSET] = mpcSequencer->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = mpcSequencer->getActiveTrackIndex();
 
+    const bool tempoSourceIsSequence = mpcSequencer->isTempoSourceSequenceEnabled();
+
+    mpcSequencer->setTempoSourceSequence(false);
+
     const auto masterTempoBytes = ByteUtil::ushort2bytes(mpcSequencer->getTempo() * 10.0);
+
+    mpcSequencer->setTempoSourceSequence(tempoSourceIsSequence);
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];

@@ -103,6 +103,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto allParserSequencer = allParser.getSequencer();
     mpcSequencer->setActiveSequenceIndex(allParserSequencer->sequence);
     mpcSequencer->setActiveTrackIndex(allParserSequencer->track);
+    mpcSequencer->setTempoSourceSequence(false);
     mpcSequencer->setTempo(allParserSequencer->masterTempo);
     mpcSequencer->setTempoSourceSequence(allParserSequencer->tempoSourceIsSequence);
 

@@ -69,7 +69,6 @@ void Sequencer::init()
 	recording = false;
 	
 	tempo = userScreen->tempo;
-	tempo = 120.0;
 
 	metronomeOnly = false;
 	activeSequenceIndex = 0;
