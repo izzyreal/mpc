@@ -111,7 +111,7 @@ bool Song::getIsUsed()
 
 int Song::getLoopFirstStepIndex()
 {
-    return loopLastStepIndex;
+    return loopFirstStepIndex;
 }
 
 int Song::getLoopLastStepIndex()

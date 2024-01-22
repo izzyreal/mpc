@@ -217,9 +217,6 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
         {
             mpcSong->setUsed(true);
             mpcSong->setName(StrUtil::trim(allSong->name));
-            mpcSong->setFirstStep(allSong->getLoopFirstStepIndex());
-            mpcSong->setLastStep(allSong->getLoopLastStepIndex());
-            mpcSong->setLoopEnabled(allSong->isLoopEnabled());
 
             auto steps = allSong->getSteps();
 
@@ -230,6 +227,10 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
                 step->setSequence(steps[j].first);
                 step->setRepeats(steps[j].second);
             }
+
+            mpcSong->setFirstStep(allSong->getLoopFirstStepIndex());
+            mpcSong->setLastStep(allSong->getLoopLastStepIndex());
+            mpcSong->setLoopEnabled(allSong->isLoopEnabled());
         }
     }
 }
