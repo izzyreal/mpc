@@ -47,7 +47,7 @@ namespace mpc::sequencer {
         Clock internalClock;
         std::shared_ptr<MidiClockOutput> midiClockOutput;
         std::shared_ptr<Sequencer> sequencer;
-        bool metronome = false;
+        bool metronomeOnly = false;
         std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
 
         // Offset of current tick within current buffer
@@ -102,7 +102,7 @@ namespace mpc::sequencer {
 
         void setSampleRate(unsigned int sampleRate);
 
-        void start();
+        void start(bool metronomeOnly = false);
 
         void startMetronome();
 

@@ -49,7 +49,7 @@ FrameSeq::FrameSeq(mpc::Mpc& mpc)
 {
 }
 
-void FrameSeq::start()
+void FrameSeq::start(const bool metronomeOnlyToUse)
 {
     if (sequencerIsRunning.load())
     {
@@ -68,6 +68,8 @@ void FrameSeq::start()
 
     sequencerPlayTickCounter = sequencer->getPlayStartTick();
 
+    metronomeOnly = metronomeOnlyToUse;
+
     sequencerIsRunning.store(true);
 }
 
@@ -78,8 +80,7 @@ void FrameSeq::startMetronome()
         return;
     }
 
-    metronome = true;
-    start();
+    start(true);
 }
 
 unsigned short FrameSeq::getEventFrameOffset() const
@@ -390,7 +391,7 @@ void FrameSeq::processNoteRepeat()
 
 void FrameSeq::updateTimeDisplay()
 {
-    if (!sequencer->isCountingIn() && !metronome)
+    if (!sequencer->isCountingIn() && !metronomeOnly)
     {
         sequencer->notifyTimeDisplayRealtime();
         sequencer->notifyObservers(std::string("timesignature"));
@@ -534,7 +535,7 @@ void FrameSeq::work(int nFrames)
         triggerClickIfNeeded();
         displayPunchRects();
 
-        if (metronome)
+        if (metronomeOnly)
         {
             sequencerPlayTickCounter++;
             continue;
