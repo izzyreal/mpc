@@ -1,3 +1,10 @@
+## v0.5.14.4 (29-1-2024)
+* Fix crash when quickly and repeatedly previewing SND or WAV files in the LOAD or Directory screen.
+* Implement Locate screen. This screen and its functionality, which is present on the real MPC2000XL, was simply not implemented in VMPC2000XL so far. Now it is. The locations are persisted to the ALL file as well.
+* Fix various ALL-file persistence issues.
+* Never rename `.DS_Store` file as part of making all files Akai-name compatible. This should avoid some garbage files accumulating in your MPC2000XL directory.
+* Fix hanging clock after using pads to add notes via step editor.
+
 ## v0.5.14.3 (5-1-2024)
 * Implement ALL file song first loop step, last loop step and loop enabled reading and writing.
 * Fix loading songs from ALL files created by the real MPC2000XL.
