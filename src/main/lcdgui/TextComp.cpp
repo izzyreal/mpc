@@ -169,8 +169,10 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		{
 			bool doubleInverted = field != nullptr && field->isSplit() && field->getActiveSplit() + 2 <= xPos / 6;
 
+            const bool color = (field != nullptr && field->isTypeModeEnabled()) ? false : !(inverted && !doubleInverted);
+
 			if (w > xPos)
-				(*pixels)[xPos + x][y + 8] = !(inverted && !doubleInverted);
+				(*pixels)[xPos + x][y + 8] = color;
 		}
 	}
 

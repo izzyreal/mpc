@@ -1046,12 +1046,12 @@ void Sequencer::setBar(int i)
 	
 	if (i > s->getLastBarIndex() + 1)
     {
-        return;
+        i = s->getLastBarIndex() + 1;
     }
 
 	if (s->getLastBarIndex() == 998 && i > 998)
     {
-        return;
+        i = 998;
     }
 
 	auto ts = s->getTimeSignature();
@@ -1098,9 +1098,14 @@ void Sequencer::setBar(int i)
 
 void Sequencer::setBeat(int i)
 {
-	if (i < 0 || isPlaying())
+	if (isPlaying())
     {
         return;
+    }
+
+    if (i < 0)
+    {
+        i = 0;
     }
 
 	auto s = getActiveSequence();
@@ -1112,25 +1117,30 @@ void Sequencer::setBeat(int i)
     }
 	
 	auto ts = s->getTimeSignature();
-	auto difference = i - getCurrentBeatIndex();
 	auto num = ts.getNumerator();
-	
-	if (i >= num)
+
+    if (i >= num)
     {
-        return;
+        i = num - 1;
     }
 
-	auto den = ts.getDenominator();
-	auto denTicks = 96 * (4.0 / den);
+    const auto difference = i - getCurrentBeatIndex();
+
+	const auto denTicks = 96 * (4.0 / ts.getDenominator());
 	pos += difference * denTicks;
 	move(pos);
 }
 
 void Sequencer::setClock(int i)
 {
-	if (i < 0 || isPlaying())
+	if (isPlaying())
     {
         return;
+    }
+
+    if (i < 0)
+    {
+        i = 0;
     }
 
 	auto s = getActiveSequence();
@@ -1142,19 +1152,15 @@ void Sequencer::setClock(int i)
     }
 	
 	getCurrentClockNumber();
-	int difference = i - getCurrentClockNumber();
 	auto den = s->getTimeSignature().getDenominator();
 	auto denTicks = 96 * (4.0 / den);
 
 	if (i > denTicks - 1)
     {
-        return;
+        i = denTicks - 1;
     }
 
-	if (pos + difference > s->getLastTick())
-    {
-        return;
-    }
+    const int difference = i - getCurrentClockNumber();
 
 	pos += difference;
 	move(pos);

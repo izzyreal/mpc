@@ -90,8 +90,6 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	{
 		inverted = oldInverted;
 		(*pixels)[x][y + FONT_HEIGHT + 1] = false;
-		(*pixels)[x + 12][y + FONT_HEIGHT + 1] = false;
-		(*pixels)[x + 30][y + FONT_HEIGHT + 1] = false;
 	}
 }
 
@@ -240,7 +238,17 @@ int Field::enter()
     
 	try
 	{
-		value = stoi(getText());
+        if (name == "tempo")
+        {
+            // UTF-8 representation of u8"\u00CB", the special dot in a tempo string
+            const std::string toReplace = "\xC3\x8B";
+            const size_t pos = text.find(toReplace);
+            value = stoi(std::string(text).replace(pos, toReplace.length(), ""));
+        }
+        else
+        {
+            value = stoi(getText());
+        }
 	}
 	catch (std::invalid_argument& e)
 	{
@@ -254,10 +262,56 @@ int Field::enter()
 
 void Field::type(int i)
 {
-	auto textCopy = StrUtil::replaceAll(getText(), ' ', "");
-	
+    auto textCopy = StrUtil::replaceAll(getText(), ' ', "");
+
+    if (name == "tempo")
+    {
+        std::string newText;
+
+        if (textCopy.empty())
+        {
+            newText = u8"\u00CB" + std::to_string(i);
+        }
+        else
+        {
+            // UTF-8 representation of u8"\u00CB", the special dot in a tempo string
+            std::string toReplace = "\xC3\x8B";
+            size_t pos = textCopy.find(toReplace);
+
+            if (pos != std::string::npos)
+            {
+                textCopy.replace(pos, toReplace.length(), "");
+
+                if (textCopy.length() == 4)
+                {
+                    textCopy.clear();
+                }
+
+                if (textCopy == "0" && i == 0)
+                {
+                    return;
+                }
+
+                if (textCopy == "0")
+                {
+                    textCopy.clear();
+                }
+
+                textCopy.append(u8"\u00CB" + std::to_string(i));
+            }
+
+            newText = textCopy;
+        }
+
+        setText(StrUtil::padLeft(newText, " ", 6));
+
+        return;
+    }
+
 	if (textCopy.length() == floor(w / FONT_WIDTH))
-		textCopy = "";
+    {
+        textCopy = "";
+    }
 
 	if (textCopy == "0" && i == 0)
 		return;
@@ -266,7 +320,7 @@ void Field::type(int i)
 		textCopy = "";
 
 	auto newText = textCopy.append(std::to_string(i));
-	setTextPadded(newText.c_str());
+    setTextPadded(newText);
 }
 
 bool Field::isTypeModeEnabled()
