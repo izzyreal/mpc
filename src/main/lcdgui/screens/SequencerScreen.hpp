@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
 	private:
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 
-		void checkTrackUsed();
+		void setTrackToUsedIfItIsCurrentlyUnused();
 		void displaySq();
 		void displayTempoSource();
 		void displayVelo();

@@ -508,6 +508,7 @@ void SequencerScreen::pressEnter()
 		}
 		else if (param == "velo")
 		{
+            setTrackToUsedIfItIsCurrentlyUnused();
 			track->setVelocityRatio(candidate);
 		}
 	}
@@ -566,7 +567,7 @@ void SequencerScreen::function(int i)
 	}
 }
 
-void SequencerScreen::checkTrackUsed()
+void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused()
 {
 	if (!track->isUsed())
 	{
@@ -580,7 +581,9 @@ void SequencerScreen::turnWheel(int i)
 	init();
 
 	if (param.size() >= 3 && param.substr(0, 3) == "now")
-		setLastFocus("step-editor", "view");
+    {
+        setLastFocus("step-editor", "view");
+    }
 
 	if (param == "now0")
 	{
@@ -596,7 +599,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "devicenumber")
 	{
-		checkTrackUsed();
+        setTrackToUsedIfItIsCurrentlyUnused();
         track->setDeviceIndex(track->getDeviceIndex() + i);
 	}
 	else if (param == "tr")
@@ -612,7 +615,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "bus")
 	{
-		checkTrackUsed();
+        setTrackToUsedIfItIsCurrentlyUnused();
 
 		track->setBusNumber(track->getBus() + i);
 		
@@ -638,12 +641,12 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "pgm")
 	{
-		checkTrackUsed();
+        setTrackToUsedIfItIsCurrentlyUnused();
 		track->setProgramChange(track->getProgramChange() + i);
 	}
 	else if (param == "velo")
 	{
-		checkTrackUsed();
+        setTrackToUsedIfItIsCurrentlyUnused();
 		track->setVelocityRatio(track->getVelocityRatio() + i);
 	}
 	else if (param == "timing")
@@ -720,7 +723,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "on")
 	{
-		checkTrackUsed();
+        setTrackToUsedIfItIsCurrentlyUnused();
 		track->setOn(i > 0);
 	}
 }
@@ -792,7 +795,8 @@ void SequencerScreen::openWindow()
 	{
 		openScreen("change-bars");
 	}
-	else if (param == "velo") {
+	else if (param == "velo")
+    {
 		openScreen("edit-velocity");
 	}
 }
