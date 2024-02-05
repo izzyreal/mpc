@@ -208,7 +208,7 @@ void Voice::initializeSamplerateDependents()
 
     if (!basic) {
         auto holdLengthSamples = playableSampleLength - attackLengthSamples - decayLengthSamples;
-        attack->setValue(decayMode == 1 ? (float) (0) : attackMs * timeRatio);
+        attack->setValue(attackMs * timeRatio);
         hold->setValue(decayMode == 1 ? 0 : holdLengthSamples);
         decay->setValue(decayMs * timeRatio);
     }
