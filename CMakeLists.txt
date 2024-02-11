@@ -117,7 +117,7 @@ endif()
 
 set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/src/main")
 
-if (IOS)
+if (APPLE)
   file(
     GLOB_RECURSE _source_list_main
     LIST_DIRECTORIES false

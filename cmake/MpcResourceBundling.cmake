@@ -14,7 +14,7 @@ function(_bundle_resources)
   _add_resources(${_mpc_resources_root} demodata/TEST1 "SND;PGM;APS;MID;ALL" "${total_list}")
   _add_resources(${_mpc_resources_root} demodata/TEST2 "SND;PGM;APS;MID;ALL" "${total_list}")
 
-  if (NOT (APPLE AND NOT IOS))
+  if (NOT APPLE)
     cmrc_add_resource_library(
             mpc_resources
             ALIAS mpc::rc
@@ -44,7 +44,7 @@ function(_bundle_resources)
 
   target_link_libraries(mpc-tests mpctest::rc)
 
-  if (APPLE AND NOT IOS)
+  if (APPLE)
 
     file(GLOB_RECURSE MPC_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 
@@ -56,11 +56,11 @@ function(_bundle_resources)
       set_source_files_properties(${RESOURCE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources${RELATIVE_DIR}")
     endforeach()
 
-    target_sources(mpc PUBLIC ${MPC_RESOURCES})
+    target_sources(mpc-tests PRIVATE ${MPC_RESOURCES})
 
     string(REPLACE "resources" "Resources" total_list_upper_case ${total_list})
 
-    set_target_properties(mpc PROPERTIES
+    set_target_properties(mpc-tests PROPERTIES
             RESOURCE ${total_list_upper_case}
     )
   endif()
