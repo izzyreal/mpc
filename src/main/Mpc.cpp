@@ -147,12 +147,11 @@ void Mpc::init()
 	for (auto& screenName : screenNames)
         screens->get<ScreenComponent>(screenName);
 
-    mpc::nvram::MidiControlPersistence::restoreLastState(*this);
+  mpc::nvram::MidiControlPersistence::restoreLastState(*this);
 
-    layeredScreen->openScreen("sequencer");
+  layeredScreen->openScreen("sequencer");
 
-    midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
-    midiDeviceDetector->start(*this);
+  midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
 
 	MLOG("Mpc is ready");
 }
@@ -358,4 +357,9 @@ void Mpc::setPluginModeEnabled(bool b)
 bool Mpc::isPluginModeEnabled()
 {
     return pluginModeEnabled;
+}
+
+void Mpc::startMidiDeviceDetector()
+{
+    midiDeviceDetector->start(*this);
 }

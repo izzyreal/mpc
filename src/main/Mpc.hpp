@@ -92,6 +92,7 @@ namespace mpc {
         std::shared_ptr<mpc::Paths> paths;
         std::vector<std::shared_ptr<nvram::MidiControlPreset>> midiControlPresets;
         void init();
+        void startMidiDeviceDetector();
         void setBank(int i);
         int getBank();
         void setNote(int note);

@@ -55,7 +55,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                 auto name = rtMidiIn->getPortName(i);
                 allCurrentNames.emplace(name);
             }
-
+          
             for (auto &name: allCurrentNames)
             {
                 if (deviceNames.emplace(name).second)
