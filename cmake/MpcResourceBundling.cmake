@@ -28,7 +28,7 @@ function(_bundle_resources)
     NAMESPACE mpctest
     WHENCE ${_mpc_resources_root}
     ${MPC_TEST_RESOURCES}
-    )
+  )
 
   target_link_libraries(mpc-tests mpctest::rc)
 
