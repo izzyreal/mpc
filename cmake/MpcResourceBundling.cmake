@@ -40,12 +40,11 @@ function(_bundle_resources)
     NAMESPACE mpctest
     WHENCE ${_mpc_resources_root}
     ${total_list}
-    )
+  )
 
   target_link_libraries(mpc-tests mpctest::rc)
 
   if (APPLE)
-
     file(GLOB_RECURSE MPC_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/resources/*")
 
     list(FILTER MPC_RESOURCES EXCLUDE REGEX "${CMAKE_CURRENT_SOURCE_DIR}/resources/test/.*")
@@ -57,12 +56,6 @@ function(_bundle_resources)
     endforeach()
 
     target_sources(mpc-tests PRIVATE ${MPC_RESOURCES})
-
-    string(REPLACE "resources" "Resources" total_list_upper_case ${total_list})
-
-    set_target_properties(mpc-tests PROPERTIES
-            RESOURCE ${total_list_upper_case}
-    )
   endif()
 
 endfunction()
