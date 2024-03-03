@@ -36,7 +36,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 
 	if (dirty)
 	{
-		const std::string fileName = "/screens/bg/" + name + ".png";
+		const std::string fileName = "screens/bg/" + name + ".png";
 
 		unsigned int width = 248;
 		unsigned int height = 60;
