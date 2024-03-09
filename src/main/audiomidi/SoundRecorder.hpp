@@ -33,7 +33,7 @@ namespace mpc::audiomidi
 		mpc::Mpc& mpc;
 		bool recording = false;
 		bool cancelled = false;
-		int lengthInFrames = 0;
+		int lengthInFramesAtEngineSampleRate = 0;
 
         // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
         int mode = 0;
@@ -53,7 +53,7 @@ namespace mpc::audiomidi
         std::vector<float> resampledLeft = std::vector<float>(INTERNAL_BUF_SIZE);
         std::vector<float> resampledRight = std::vector<float>(INTERNAL_BUF_SIZE);
 
-        int recPointer = 0;
+        int recordedFrameCountAtEngineSampleRate = 0;
         int engineSampleRate = 44100;
 
 		unsigned int inputGain = 0;

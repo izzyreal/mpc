@@ -47,7 +47,7 @@ bool SoundRecorder::isArmed()
 
 void SoundRecorder::prepare(const std::shared_ptr<Sound>& soundToUse, int newLengthInFrames, int engineSampleRateToUse)
 {
-	if (recording)
+	  if (recording)
     {
         return;
     }
@@ -57,13 +57,18 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound>& soundToUse, int newLen
     assert(sound->getSampleData()->empty());
 
     engineSampleRate = engineSampleRateToUse;
-    lengthInFrames = newLengthInFrames * (engineSampleRate / 44100.f);
+    lengthInFramesAtEngineSampleRate = newLengthInFrames * (engineSampleRate / 44100.f);
+
+    const auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+    const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
+    
+    lengthInFramesAtEngineSampleRate += preRecFramesAt44Khz * (engineSampleRate / 44100.f);
 
     cancelled = false;
 
     mode = mpc.screens->get<SampleScreen>("sample")->getMode();
 
-	if (mode != 2)
+	  if (mode != 2)
     {
         sound->setMono(true);
     }
@@ -74,7 +79,7 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound>& soundToUse, int newLen
     resamplers[0].reset();
     resamplers[1].reset();
 
-    recPointer = 0;
+    recordedFrameCountAtEngineSampleRate = 0;
 }
 
 // Should be called from the audio thread
@@ -168,16 +173,20 @@ void SoundRecorder::stop()
         }
     }
 
-    const auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
-    const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
-
-    const int lengthInFramesAt44Khz = static_cast<int>(lengthInFrames / (engineSampleRate / 44100.f));
-    const int overflowAt44Khz = sound->getFrameCount() - (lengthInFramesAt44Khz + preRecFramesAt44Khz);
+    const int lengthInFramesAt44Khz = static_cast<int>(lengthInFramesAtEngineSampleRate / (engineSampleRate / 44100.f));
+    const int overflowAt44Khz = sound->getFrameCount() - lengthInFramesAt44Khz;
 
     if (overflowAt44Khz > 0)
     {
         sound->removeFramesFromEnd(overflowAt44Khz);
     }
+    else
+    {
+      assert(overflowAt44Khz == 0);
+    }
+
+    const auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+    const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
 
     sound->setStart(preRecFramesAt44Khz);
     sound->setEnd(sound->getFrameCount());
@@ -246,7 +255,7 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
     const bool shouldResample = engineSampleRate != 44100;
 
     if (const auto preRecFrames = (int)(engineSampleRate * 0.001 * sampleScreen->preRec);
-        recPointer == 0 && preRecFrames > 0)
+        recordedFrameCountAtEngineSampleRate == 0 && preRecFrames > 0)
     {
         const int numFramesToMoveBack = preRecFrames;
         ringBufferLeft.moveTailToHead();
@@ -295,9 +304,9 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
         }
     }
 
-    recPointer += nFrames;
+    recordedFrameCountAtEngineSampleRate += nFrames;
 
-    if (recPointer >= lengthInFrames)
+    if (recordedFrameCountAtEngineSampleRate >= lengthInFramesAtEngineSampleRate)
     {
         recording = false;
     }
