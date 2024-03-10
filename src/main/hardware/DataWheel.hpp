@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HwComponent.hpp"
 #include <Observer.hpp>
 
 #include <functional>
@@ -21,4 +22,22 @@ namespace mpc::hardware
         void turn(int increment);
 
 	};
+
+    class DataWheelUp : public HwComponent {
+    public:
+        DataWheelUp(mpc::Mpc& mpc, DataWheel& dataWheelToUse)
+        : HwComponent(mpc, "datawheel-up"), dataWheel(dataWheelToUse) {}
+        void push(int) override;
+    private:
+        DataWheel& dataWheel;
+    };
+
+    class DataWheelDown : public HwComponent {
+    public:
+        DataWheelDown(mpc::Mpc& mpc, DataWheel& dataWheelToUse)
+                : HwComponent(mpc, "datawheel-down"), dataWheel(dataWheelToUse) {}
+        void push(int) override;
+    private:
+        DataWheel& dataWheel;
+    };
 }

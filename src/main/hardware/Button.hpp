@@ -17,16 +17,14 @@ class BaseControls;
 
 namespace mpc::hardware {
 
-class Button
-: public mpc::hardware::HwComponent
-, public Observable
+class Button : public HwComponent, public Observable
 {
     
 private:
     std::weak_ptr<mpc::controls::BaseControls> controls;
     
 public:
-    void push() override;
+    void push(int) override;
     void release() override;
     
     Button(mpc::Mpc& mpc, const std::string& label);

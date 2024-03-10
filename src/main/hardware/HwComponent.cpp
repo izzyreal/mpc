@@ -19,7 +19,7 @@ std::string HwComponent::getLabel()
 
 void HwComponent::push()
 {
-    mpc.getHardware()->getPadAndButtonKeyboard()->pressHardwareComponent(label);
+    push(1);
 }
 
 void HwComponent::push(int /* velocity */)

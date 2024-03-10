@@ -58,6 +58,7 @@ public:
     std::shared_ptr<Slider> getSlider();
 
     std::shared_ptr<HwComponent> getComponentByLabel(const std::string& label);
+    const std::vector<std::shared_ptr<HwComponent>>& getComponents();
 
     Hardware(mpc::Mpc& mpc);
 

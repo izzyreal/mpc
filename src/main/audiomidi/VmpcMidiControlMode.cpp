@@ -104,14 +104,6 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
                 }
                 previousDataWheelValue = controllerValue;
             }
-            else if (label == "datawheel-up")
-            {
-                dataWheel->turn(1);
-            }
-            else if (label == "datawheel-down")
-            {
-                dataWheel->turn(-1);
-            }
             else if (label == "slider")
             {
                 hardware->getSlider()->setValue(controllerValue);
@@ -133,7 +125,6 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             else
             {
                 hwComponent->push(msg->getData2());
-                hwComponent->push();
             }
         }
     }

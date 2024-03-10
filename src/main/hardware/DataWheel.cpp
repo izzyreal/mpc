@@ -29,3 +29,13 @@ void DataWheel::turn(int increment)
 
 	updateUi(increment);
 }
+
+void DataWheelUp::push(int increment)
+{
+    dataWheel.turn(increment);
+}
+
+void DataWheelDown::push(int decrement)
+{
+    dataWheel.turn(-decrement);
+}

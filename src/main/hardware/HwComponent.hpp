@@ -15,14 +15,14 @@ namespace mpc::hardware {
         const std::string label;
         
 	public:
-        virtual void push();
+        HwComponent() = delete;
+        void push();
         virtual void push(int /* velocity */);
         virtual void release() {}
 
         std::string getLabel();
-        
+
 	protected:
 		HwComponent(mpc::Mpc& mpc, const std::string& label);
-
 	};
 }

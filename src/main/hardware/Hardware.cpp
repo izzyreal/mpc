@@ -25,24 +25,27 @@ Hardware::Hardware(mpc::Mpc& mpc)
     
     for (auto& l : buttonLabels)
     {
-        buttons.push_back(std::make_shared<Button>(mpc, l));
-        components.push_back(buttons.back());
+        buttons.emplace_back(std::make_shared<Button>(mpc, l));
+        components.emplace_back(buttons.back());
     }
     
     for (int i = 0; i <= 9; i++)
     {
-        buttons.push_back(std::make_shared<Button>(mpc, std::to_string(i)));
-        components.push_back(buttons.back());
+        buttons.emplace_back(std::make_shared<Button>(mpc, std::to_string(i)));
+        components.emplace_back(buttons.back());
     }
     
     for (int i = 0; i <= 15; i++)
     {
-        pads.push_back(std::make_shared<HwPad>(mpc, i));
-        components.push_back(pads.back());
+        pads.emplace_back(std::make_shared<HwPad>(mpc, i));
+        components.emplace_back(pads.back());
     }
     
     dataWheel = std::make_shared<DataWheel>(mpc);
-    
+
+    components.emplace_back(std::make_shared<DataWheelUp>(mpc, *dataWheel));
+    components.emplace_back(std::make_shared<DataWheelDown>(mpc, *dataWheel));
+
     std::vector<std::string> ledLabels{ "full-level", "sixteen-levels", "next-seq", "track-mute", "pad-bank-a", "pad-bank-b", "pad-bank-c", "pad-bank-d", "after", "undo-seq", "rec", "overdub", "play" };
     
     for (auto& l : ledLabels)
@@ -129,4 +132,9 @@ std::shared_ptr<HwComponent> Hardware::getComponentByLabel(const std::string& la
 PadAndButtonKeyboard* Hardware::getPadAndButtonKeyboard()
 {
     return padAndButtonKeyboard;
+}
+
+const std::vector<std::shared_ptr<HwComponent>>& Hardware::getComponents()
+{
+    return components;
 }
