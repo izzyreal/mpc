@@ -16,7 +16,7 @@ namespace mpc::audiomidi {
         // Returns number of generated frames
         uint32_t resample(const std::vector<float>& input,
                       std::vector<float>& output,
-                      int sourceSampleRate,
+                      float ratio,
                       int maxNumInputFramesToProcess);
 
         // Returns number of generated frames

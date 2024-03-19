@@ -15,8 +15,6 @@ using namespace mpc::audiomidi;
 
 SoundPlayer::SoundPlayer()
 {
-    srcLeft = src_new(0, 1, &srcLeftError);
-    srcRight = src_new(0, 1, &srcRightError);
 }
 
 SoundPlayer::~SoundPlayer()
@@ -27,9 +25,6 @@ SoundPlayer::~SoundPlayer()
     {
         readThread.join();
     }
-
-    src_delete(srcLeft);
-    src_delete(srcRight);
 }
 
 bool SoundPlayer::start(const std::shared_ptr<std::istream>& streamToUse, SoundPlayerFileFormat fileFormatToUse, int audioServerSampleRate)
@@ -69,8 +64,10 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream>& streamToUse, SoundP
 
     inputAudioFormat = std::make_shared<AudioFormat>(static_cast<float>(sourceSampleRate), validBits, sourceNumChannels, true, false);
 
-    src_reset(srcLeft);
-    src_reset(srcRight);
+    for (auto& resampler : resamplers)
+    {
+        resampler.reset();
+    }
 
     while (bufferLeft.pop()) {}
     while (bufferRight.pop()) {}
@@ -236,37 +233,50 @@ void SoundPlayer::readWithResampling(const float ratio)
 
     ingestedSourceFrameCount += unresampledFrameCountToIngest;
 
-    const int endOfInput = (ingestedSourceFrameCount >= sourceFrameCount) ? 1 : 0;
+    const bool endOfInput = ingestedSourceFrameCount >= sourceFrameCount;
+  
+    const auto generatedFramesLeft = resamplers[0].resample(resampleInputBufferLeft, resampleOutputBuffer, ratio, unresampledFrameCountToIngest);
 
-    SRC_DATA data;
-    data.data_in = &resampleInputBufferLeft[0];
-    data.input_frames = unresampledFrameCountToIngest;
-    data.data_out = &resampleOutputBuffer[0];
-    data.output_frames = resampleOutputBuffer.size();
-    data.end_of_input = endOfInput;
-    data.src_ratio = ratio;
-
-    src_process(srcLeft, &data);
-
-    for (int f = 0; f < data.output_frames_gen; f++)
+    for (int f = 0; f < generatedFramesLeft; f++)
     {
         bufferLeft.enqueue(resampleOutputBuffer[f]);
+    }
+  
+    resamplerGeneratedFrameCounter += generatedFramesLeft;
+
+    if (endOfInput)
+    {
+      const auto generatedFramesLeftRemainder = resamplers[0].wrapUpAndGetRemainder(resampleOutputBuffer);
+  
+      for (int f = 0; f < generatedFramesLeftRemainder; f++)
+      {
+          bufferLeft.enqueue(resampleOutputBuffer[f]);
+      }
+      
+      resamplerGeneratedFrameCounter += generatedFramesLeftRemainder;
     }
 
     if (channels == 2)
     {
-        data.data_in = &resampleInputBufferRight[0];
-        src_process(srcRight, &data);
+        const auto generatedFramesRight = resamplers[1].resample(resampleInputBufferRight, resampleOutputBuffer, ratio, unresampledFrameCountToIngest);
 
-        for (int f = 0; f < data.output_frames_gen; f++)
+        for (int f = 0; f < generatedFramesRight; f++)
         {
             bufferRight.enqueue(resampleOutputBuffer[f]);
         }
+      
+        if (endOfInput)
+        {
+          const auto generatedFramesRight = resamplers[1].wrapUpAndGetRemainder(resampleOutputBuffer);
+  
+          for (int f = 0; f < generatedFramesRight; f++)
+          {
+              bufferRight.enqueue(resampleOutputBuffer[f]);
+          }
+        }
     }
 
-    resamplerGeneratedFrameCounter += data.output_frames_gen;
-
-    if (data.end_of_input == 1)
+    if (endOfInput == 1)
     {
         totalResamplerGeneratedFrameCount.store(resamplerGeneratedFrameCounter);
     }
