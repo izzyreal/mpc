@@ -1,3 +1,8 @@
+## v0.6.0 (15-6-2024)
+* First public iOS TestFlight release: https://testflight.apple.com/join/yEgfYk21
+* Allow typing tempo, bar/beat/clock, and velocity ratio in MAIN screen
+* Do not ignore attack when dcy md is start
+* Fix recording time when sampling
 ## v0.5.14.4 (29-1-2024)
 * Fix crash when quickly and repeatedly previewing SND or WAV files in the LOAD or Directory screen.
 * Implement Locate screen. This screen and its functionality, which is present on the real MPC2000XL, was simply not implemented in VMPC2000XL so far. Now it is. The locations are persisted to the ALL file as well.
