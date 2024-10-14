@@ -1,23 +1,26 @@
 #pragma once
 
 #include <vector>
+#include <cstdint>
 
 namespace mpc::file::aps
 {
 class ApsHeader
 {
+private:
+    const std::vector<char> APS_HEADER_MAGIC{ 0x0A, 0x05 };
     
 public:
     bool valid = false;
-    int soundCount = 0;
+    uint16_t soundCount = 0;
     std::vector<char> saveBytes;
     
 public:
-    bool isValid();
-    int getSoundAmount();
-    std::vector<char> getBytes();
+    bool isValid() const;
+    int getSoundAmount() const;
+    std::vector<char> getBytes() const;
     
-    ApsHeader(const std::vector<char>& loadBytes);
-    ApsHeader(int soundCount);
+    explicit ApsHeader(const std::vector<char>& loadBytes);
+    explicit ApsHeader(uint16_t soundCount);
 };
 }

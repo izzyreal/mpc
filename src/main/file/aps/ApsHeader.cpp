@@ -1,33 +1,45 @@
-#include <file/aps/ApsHeader.hpp>
+#include "file/aps/ApsHeader.hpp"
+
+#include "file/ByteUtil.hpp"
+#include "MpcSpecs.h"
+
+#include <cassert>
 
 using namespace mpc::file::aps;
 
 ApsHeader::ApsHeader(const std::vector<char>& loadBytes)
 {
-	valid = loadBytes[0] == 10 && loadBytes[1] == 5 && loadBytes[3] == 0;
-	soundCount = loadBytes[2];
+	valid = loadBytes[0] == APS_HEADER_MAGIC[0] &&
+            loadBytes[1] == APS_HEADER_MAGIC[1];
+
+    soundCount = mpc::file::ByteUtil::bytes2ushort({loadBytes[2], loadBytes[3]});
+
+    assert(soundCount <= mpc::MAX_SOUND_COUNT_IN_MEMORY);
 }
 
-ApsHeader::ApsHeader(int soundCount)
+ApsHeader::ApsHeader(const uint16_t soundCount)
 {
-	saveBytes = std::vector<char>(4);
-	saveBytes[0] = 10;
+    assert(soundCount <= mpc::MAX_SOUND_COUNT_IN_MEMORY);
+
+    saveBytes = std::vector<char>(4);
+
+    const auto soundCountBytes = mpc::file::ByteUtil::ushort2bytes(soundCount);
+    saveBytes[0] = 10;
 	saveBytes[1] = 5;
-	saveBytes[2] = soundCount;
-	saveBytes[3] = 0;
+	saveBytes[2] = soundCountBytes[0];
+	saveBytes[3] = soundCountBytes[1];
 }
 
-bool ApsHeader::isValid()
+bool ApsHeader::isValid() const
 {
     return valid;
 }
 
-int ApsHeader::getSoundAmount()
+int ApsHeader::getSoundAmount() const
 {
     return soundCount;
 }
 
-std::vector<char> ApsHeader::getBytes()
-{
+std::vector<char> ApsHeader::getBytes() const {
     return saveBytes;
 }
