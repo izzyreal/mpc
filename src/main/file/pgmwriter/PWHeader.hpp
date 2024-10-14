@@ -1,28 +1,25 @@
 #pragma once
 
 #include <vector>
+#include <cstdint>
 
-namespace mpc {
-	namespace file {
-		namespace pgmwriter {
+namespace mpc::file::pgmwriter {
 
-			class PWHeader
-			{
+    class PWHeader {
 
-			private:
-				std::vector<char> headerArray{};
+    private:
+        const std::vector<char> PGM_HEADER_MAGIC{ 0x07, 0x04 };
+        std::vector<char> headerArray;
 
-			private:
-				void writeFirstTwoBytes();
-				void setNumberOfSamples(int numberOfSamples);
+    private:
+        void writeMagic();
 
-			public:
-				std::vector<char> getHeaderArray();
+        void setSoundCount(uint16_t soundCount);
 
-			public:
-				PWHeader(int numberOfSamples);
-			};
+    public:
+        std::vector<char> getHeaderArray();
 
-		}
-	}
+    public:
+        PWHeader(int numberOfSamples);
+    };
 }

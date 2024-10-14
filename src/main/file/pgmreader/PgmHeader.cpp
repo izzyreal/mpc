@@ -1,8 +1,13 @@
-#include <file/pgmreader/PgmHeader.hpp>
+#include "PgmHeader.hpp"
 
-#include <file/pgmreader/ProgramFileReader.hpp>
+#include "MpcSpecs.h"
 
-#include <Util.hpp>
+#include "file/pgmreader/ProgramFileReader.hpp"
+
+#include "file/ByteUtil.hpp"
+#include "Util.hpp"
+
+#include <cassert>
 
 using namespace mpc::file::pgmreader;
 
@@ -17,19 +22,18 @@ std::vector<char> PgmHeader::getHeaderArray()
     return headerArray;
 }
 
-bool PgmHeader::verifyFirstTwoBytes()
+bool PgmHeader::verifyMagic()
 {
-	auto verifyFirstTwoBytes = false;
-	int i = headerArray[0];
-	int j = headerArray[1];
-	if (i == 7 && j == 4) {
-		verifyFirstTwoBytes = true;
-	}
-	return verifyFirstTwoBytes;
+	return headerArray[0] == PGM_HEADER_MAGIC[0] &&
+           headerArray[1] == PGM_HEADER_MAGIC[1];
 }
 
-int PgmHeader::getNumberOfSamples()
+const uint16_t PgmHeader::getSoundCount()
 {
-    auto numberOfSamples = headerArray[2];
-    return numberOfSamples;
+    const auto result =
+            ByteUtil::bytes2ushort({headerArray[2], headerArray[3]});
+
+    assert(result <= MAX_SOUND_COUNT_IN_MEMORY);
+
+    return result;
 }

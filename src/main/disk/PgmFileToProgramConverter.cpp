@@ -113,14 +113,14 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
 
     ProgramFileReader reader(f);
 
-    if (!reader.getHeader()->verifyFirstTwoBytes())
+    if (!reader.getHeader()->verifyMagic())
     {
         throw std::invalid_argument("PGM first 2 bytes are incorrect");
     }
 
     auto pgmSoundNames = reader.getSampleNames();
 
-    for (int i = 0; i < reader.getHeader()->getNumberOfSamples(); i++)
+    for (int i = 0; i < reader.getHeader()->getSoundCount(); i++)
     {
         soundNames.push_back(pgmSoundNames->getSampleName(i));
     }

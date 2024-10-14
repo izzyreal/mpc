@@ -1,29 +1,26 @@
 #pragma once
 
 #include <vector>
+#include <cstdint>
 
-namespace mpc {
-	namespace file {
-		namespace pgmreader {
+namespace mpc::file::pgmreader {
 
-			class ProgramFileReader;
+    class ProgramFileReader;
 
-			class PgmHeader
-			{
+    class PgmHeader {
 
-			private:
-				std::vector<char> headerArray{};
+    private:
+        const std::vector<char> PGM_HEADER_MAGIC{ 0x07, 0x04 };
+        std::vector<char> headerArray;
 
-			public:
-				std::vector<char> getHeaderArray();
-				bool verifyFirstTwoBytes();
+    public:
+        std::vector<char> getHeaderArray();
 
-			public:
-				int getNumberOfSamples();
+        bool verifyMagic();
 
-				PgmHeader(ProgramFileReader* programFile);
-			};
+    public:
+        const uint16_t getSoundCount();
 
-		}
-	}
+        PgmHeader(ProgramFileReader *programFile);
+    };
 }

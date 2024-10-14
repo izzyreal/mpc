@@ -14,7 +14,7 @@ SoundNames::SoundNames(ProgramFileReader* programFile)
 
 int SoundNames::getSampleNamesSize()
 {
-	int sampleNamesSize = (programFile->getHeader()->getNumberOfSamples()) * 17;
+	int sampleNamesSize = (programFile->getHeader()->getSoundCount()) * 17;
 	return sampleNamesSize;
 }
 
@@ -30,7 +30,7 @@ std::string SoundNames::getSampleName(int sampleNumber)
 {
 	std::string sampleNameString;
 	auto h = programFile->getHeader();
-	if (sampleNumber < h->getNumberOfSamples()) {
+	if (sampleNumber < h->getSoundCount()) {
 		sampleNamesArray = getSampleNamesArray();
 		auto sampleName = Util::vecCopyOfRange(sampleNamesArray, (sampleNumber * 17), ((sampleNumber * 17) + 16));
 		for (char c : sampleName) {
