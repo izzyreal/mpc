@@ -1,5 +1,7 @@
 #include <sampler/NoteParameters.hpp>
 
+#include <cassert>
+
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
@@ -24,6 +26,7 @@ int NoteParameters::getSoundIndex()
 
 void NoteParameters::setSoundIndex(int i)
 {
+    assert(i >= -1);
     soundIndex = i;
 }
 
