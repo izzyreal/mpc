@@ -21,7 +21,11 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
     if ([bundle.bundlePath hasSuffix:@".app"] && ![bundle.bundlePath containsString:@"mpc-tests"]) {
 
 #if TARGET_OS_OSX
-        appBundleURL = [appBundleURL URLByAppendingPathComponent:@"Contents/PlugIns/VMPC2000XL.appex/"];
+        NSURL *appexURL = [appBundleURL URLByAppendingPathComponent:@"Contents/PlugIns/VMPC2000XL.appex/"];
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[appexURL path]]) {
+            appBundleURL = appexURL;
+        }
 #else
         appBundleURL = [appBundleURL URLByAppendingPathComponent:@"PlugIns/VMPC2000XL.appex/"];
 #endif
