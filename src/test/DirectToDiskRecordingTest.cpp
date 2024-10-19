@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "sequencer/Track.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
