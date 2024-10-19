@@ -262,6 +262,11 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
     bool shouldBeConverted = false;
     auto sound = mpc.getSampler()->addSound();
 
+    if (sound == nullptr)
+    {
+        return;
+    }
+
     soundLoader.loadSound(soundFile, result, sound, shouldBeConverted);
 
     if  (!result.success)

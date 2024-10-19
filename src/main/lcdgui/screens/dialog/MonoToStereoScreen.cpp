@@ -133,6 +133,12 @@ void MonoToStereoScreen::function(int j)
 		}
 
 		auto newSound = sampler->addSound(left->getSampleRate());
+
+        if (newSound == nullptr)
+        {
+            return;
+        }
+
 		newSound->setName(newStName);
 		sampler->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
         newSound->setMono(false);

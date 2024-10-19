@@ -36,6 +36,12 @@ void CopySoundScreen::function(int i)
 	{
 		auto sound = sampler->getSound();
 		auto newSound = sampler->copySound(sound);
+
+        if (newSound.lock() == nullptr)
+        {
+            return;
+        }
+
 		newSound.lock()->setName(newName);
 		sampler->setSoundIndex(sampler->getSoundCount() - 1);
 		openScreen("sound");

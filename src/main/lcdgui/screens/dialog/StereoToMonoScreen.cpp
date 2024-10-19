@@ -93,6 +93,11 @@ void StereoToMonoScreen::function(int i)
 		auto left = sampler->addSound(sound->getSampleRate());
 		auto right = sampler->addSound(sound->getSampleRate());
 
+        if (left == nullptr || right == nullptr)
+        {
+            return;
+        }
+
 		left->setName(newLName);
 		right->setName(newRName);
 

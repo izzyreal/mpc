@@ -120,6 +120,12 @@ void SampleScreen::function(int i)
 		else
 		{
 			auto sound = sampler->addSound();
+            
+            if (sound == nullptr)
+            {
+                return;
+            }
+
 			sound->setName(sampler->addOrIncreaseNumber("sound1"));
 			auto lengthInFrames = time * (44100 * 0.1);
 			ams->getSoundRecorder()->prepare(sound, lengthInFrames, ams->getAudioServer()->getSampleRate());

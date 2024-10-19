@@ -464,6 +464,11 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     auto sound = sampler->addSound();
 
+    if (sound == nullptr)
+    {
+        return;
+    }
+
     soundLoader.loadSound(getSelectedFile(), result, sound, shouldBeConverted);
 
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");

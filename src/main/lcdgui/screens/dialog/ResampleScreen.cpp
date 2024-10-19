@@ -84,6 +84,12 @@ void ResampleScreen::function(int i)
 	{
 		auto snd = sampler->getSound(sampler->getSoundIndex());
 		auto destSnd = sampler->addSound();
+
+        if (destSnd == nullptr)
+        {
+            return;
+        }
+
 		destSnd->setName(newName);
         destSnd->setSampleRate(newFs);
         destSnd->setMono(snd->isMono());

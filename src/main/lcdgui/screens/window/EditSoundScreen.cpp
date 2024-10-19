@@ -414,6 +414,12 @@ void EditSoundScreen::function(int j)
 		else if (edit == 2)
 		{
 			auto newSample = sampler->addSound();
+
+            if (newSample == nullptr)
+            {
+                return;
+            }
+
 			newSample->setSampleRate(sound->getSampleRate());
 			newSample->setName(newName);
 			auto newSampleData = newSample->getSampleData();
@@ -625,8 +631,14 @@ void EditSoundScreen::function(int j)
 
 			if (sound->isMono())
 			{
-				auto ts = mpc::sampler::TimeStretch(*sound->getSampleData(), (float)(timeStretchRatio * 0.0001), sound->getSampleRate(), timeStretchAdjust);
 				auto newSample = sampler->addSound(sound->getSampleRate());
+
+                if (newSample == nullptr)
+                {
+                    return;
+                }
+
+				auto ts = mpc::sampler::TimeStretch(*sound->getSampleData(), (float)(timeStretchRatio * 0.0001), sound->getSampleRate(), timeStretchAdjust);
 				auto procData = ts.getProcessedData();
 				newSample->getSampleData()->swap(procData);
 				newSample->setMono(true);
@@ -634,6 +646,13 @@ void EditSoundScreen::function(int j)
 			}
 			else
 			{
+    	        auto newSample = sampler->addSound(sound->getSampleRate());
+
+                if (newSample == nullptr)
+                {
+                    return;
+                }
+
                 std::vector<float> sampleDataLeft = *sound->getSampleData();
 				sampleDataLeft.erase(sampleDataLeft.begin() + (sampleDataLeft.size() * 0.5), sampleDataLeft.end());
                 std::vector<float> sampleDataRight = *sound->getSampleData();
@@ -643,7 +662,6 @@ void EditSoundScreen::function(int j)
 				auto newSampleDataLeft = ts0.getProcessedData();
 				auto ts1 = mpc::sampler::TimeStretch(sampleDataRight, (float)(timeStretchRatio / 10000.0), sound->getSampleRate(), timeStretchAdjust);
 				auto newSampleDataRight = ts1.getProcessedData();
-				auto newSample = sampler->addSound(sound->getSampleRate());
 				auto newSampleData = mpc::sampler::Sampler::mergeToStereo(newSampleDataLeft, newSampleDataRight);
 				auto newSampleDataP = newSample->getSampleData();
 				newSampleDataP->swap(newSampleData);
@@ -710,6 +728,11 @@ void EditSoundScreen::function(int j)
 				auto end = zoneScreen->getZoneEnd(i);
 
 				auto zone = sampler->createZone(source, start, end, endMargin);
+
+                if (zone.lock() == nullptr)
+                {
+                    return;
+                }
 				
 				if (i == 0)
 				{

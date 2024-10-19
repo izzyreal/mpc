@@ -13,7 +13,8 @@ TEST_CASE("APS with maximum number of sounds", "[apsparser]")
 
     for (uint16_t i = 0; i < MAX_SOUND_COUNT; i++)
     {
-        mpc.getSampler()->addSound();
+        auto sound = mpc.getSampler()->addSound();
+        assert(sound != nullptr);
     }
 
     assert(mpc.getSampler()->getSoundCount() == MAX_SOUND_COUNT);

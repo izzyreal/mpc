@@ -322,7 +322,7 @@ std::shared_ptr<Sound> Sampler::addSound()
 std::shared_ptr<Sound> Sampler::addSound(int sampleRate)
 {
 	auto res = std::make_shared<Sound>(sampleRate);
-	sounds.push_back(res);
+	sounds.emplace_back(res);
 	return res;
 }
 
@@ -623,6 +623,12 @@ std::weak_ptr<Sound> Sampler::createZone(std::weak_ptr<Sound> source, int start,
 	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
 
 	auto zone = copySound(source);
+
+    if (zone.lock() == nullptr)
+    {
+        return {};
+    }
+
 	auto zoneLength = end - start + overlap;
 	auto endCandidate = start + zoneLength;
 	trimSample(zone, start, endCandidate);
@@ -996,6 +1002,12 @@ std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source)
 {
 	auto sound = source.lock();
 	auto newSound = addSound(sound->getSampleRate());
+
+    if (newSound == nullptr)
+    {
+        return {};
+    }
+
 	newSound->setName(sound->getName());
 	newSound->setLoopEnabled(sound->isLoopEnabled());
 	auto dest = newSound->getSampleData();

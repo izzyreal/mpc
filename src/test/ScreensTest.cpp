@@ -164,6 +164,7 @@ SCENARIO("All screens can be opened", "[gui]") {
         mpc::TestMpc::initializeTestMpc(mpc);
 
         auto s = mpc.getSampler()->addSound();
+        assert(s != nullptr);
         s->setMono(true);
         s->setName("test");
         for (int i = 0; i < 1000; i ++)
