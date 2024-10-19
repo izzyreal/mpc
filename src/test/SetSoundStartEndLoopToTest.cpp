@@ -9,7 +9,6 @@
 #include "lcdgui/screens/window/StartFineScreen.hpp"
 #include "lcdgui/screens/window/EndFineScreen.hpp"
 #include "lcdgui/screens/window/LoopToFineScreen.hpp"
-#include "lcdgui/screens/window/LoopEndFineScreen.hpp"
 
 using namespace mpc::sampler;
 using namespace mpc::lcdgui::screens;
