@@ -109,7 +109,7 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> fi
 
             SoundLoaderResult soundLoaderResult;
             const bool shouldBeConverted = false;
-            auto sound = mpc.getSampler()->addSound();
+            auto sound = mpc.getSampler()->addSound("load");
             soundLoader.loadSound(soundFile, soundLoaderResult, sound, shouldBeConverted);
 
             if (!soundLoaderResult.success)

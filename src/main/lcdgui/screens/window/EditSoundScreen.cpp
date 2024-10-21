@@ -413,7 +413,7 @@ void EditSoundScreen::function(int j)
 		}
 		else if (edit == 2)
 		{
-			auto newSample = sampler->addSound();
+			auto newSample = sampler->addSound(returnToScreenName);
 
             if (newSample == nullptr)
             {
@@ -631,7 +631,7 @@ void EditSoundScreen::function(int j)
 
 			if (sound->isMono())
 			{
-				auto newSample = sampler->addSound(sound->getSampleRate());
+				auto newSample = sampler->addSound(sound->getSampleRate(), returnToScreenName);
 
                 if (newSample == nullptr)
                 {
@@ -646,7 +646,7 @@ void EditSoundScreen::function(int j)
 			}
 			else
 			{
-    	        auto newSample = sampler->addSound(sound->getSampleRate());
+    	        auto newSample = sampler->addSound(sound->getSampleRate(), returnToScreenName);
 
                 if (newSample == nullptr)
                 {

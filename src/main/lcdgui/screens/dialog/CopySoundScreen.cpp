@@ -35,7 +35,7 @@ void CopySoundScreen::function(int i)
 	case 4:
 	{
 		auto sound = sampler->getSound();
-		auto newSound = sampler->copySound(sound);
+		auto newSound = sampler->copySound(sound, "sound");
 
         if (newSound.lock() == nullptr)
         {

@@ -1,5 +1,4 @@
 #pragma once
-#include "sampler/NoteParameters.hpp"
 
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"

@@ -132,7 +132,7 @@ void MonoToStereoScreen::function(int j)
 			newSampleDataRight = *right->getSampleData();
 		}
 
-		auto newSound = sampler->addSound(left->getSampleRate());
+		auto newSound = sampler->addSound(left->getSampleRate(), "mono-to-stereo");
 
         if (newSound == nullptr)
         {

@@ -83,7 +83,7 @@ void ResampleScreen::function(int i)
 	case 4:
 	{
 		auto snd = sampler->getSound(sampler->getSoundIndex());
-		auto destSnd = sampler->addSound();
+		auto destSnd = sampler->addSound("sound");
 
         if (destSnd == nullptr)
         {

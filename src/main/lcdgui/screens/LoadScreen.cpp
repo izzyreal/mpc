@@ -462,7 +462,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     SoundLoaderResult result;
 
-    auto sound = sampler->addSound();
+    auto sound = sampler->addSound("load");
 
     if (sound == nullptr)
     {

@@ -1,6 +1,7 @@
 #include "Sampler.hpp"
 
 #include <Mpc.hpp>
+#include "MpcSpecs.h"
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/WavInputStringStream.hpp>
 
@@ -12,6 +13,7 @@
 
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
@@ -84,7 +86,6 @@ void Sampler::nudgeSoundIndex(bool up)
         }
 
         soundIndex++;
-        printf("");
         return;
     }
 
@@ -314,16 +315,54 @@ std::vector<std::shared_ptr<Sound>>& Sampler::getSounds()
 	return sounds;
 }
 
-std::shared_ptr<Sound> Sampler::addSound()
+std::shared_ptr<Sound> Sampler::addSound(
+        const std::string screenToGoToIfSoundDirectoryIsFull)
 {
-	return addSound(44100);
+        return addSound(44100, screenToGoToIfSoundDirectoryIsFull);
 }
 
-std::shared_ptr<Sound> Sampler::addSound(int sampleRate)
+/*
+ * Adds a sound to the sampler's sound directory, if there is room for it.
+ * On the MPC2000XL, the sound directory can hold a maximum of 256 sounds at a
+ * time.
+ * If there is room, a shared_ptr to the added sound, with no sample data, is
+ * returned. The sound has been initialized to the sample rate provided by the
+ * caller. If there is no room, an empty shared_ptr is ultimately returned.
+ * But in this case, first the PopupScreen is opened with a message to the user
+ * that the sound directory is full. The popup screen awaits interaction (a
+ * button push), to finally return to screenToGoToIfSoundDirectoryIsFull.
+ *
+ * The caller may provide an empty string for screenToGoToIfSoundDirectoryIsFull,
+ * to express the fact that the caller never expects the sound directory to be
+ * full. This is the case when loading an APS, which always replaces all existing
+ * sounds. See mpc::disk::ApsLoader. This is also the case when restoring
+ * persisted state as part of the auto-save mechanism, which also replaces all
+ * existing sounds. See mpc::AutoSave. Additionally, if the mpc library is
+ * consumed by a plugin implementation, such as vmpc-juce, this implementation
+ * should also provide an empty string as part of its state restoration routine.
+ * This can be seen in VmpcProcessor.cpp in https://github.com/izzyreal/vmpc-juce.
+ * Finally, in most unit tests it makes sense to pass an empty string here.
+ * When an empty string is provided, the popup screen is not opened, and the
+ * function immediately returns an empty shared_ptr.
+ */
+std::shared_ptr<Sound> Sampler::addSound(
+        const int sampleRate,
+        const std::string screenToGoToIfSoundDirectoryIsFull)
 {
-	auto res = std::make_shared<Sound>(sampleRate);
-	sounds.emplace_back(res);
-	return res;
+    if (sounds.size() >= mpc::MAX_SOUND_COUNT_IN_MEMORY)
+    {
+        if (!screenToGoToIfSoundDirectoryIsFull.empty())
+        {
+            auto popupScreen = mpc.screens->get<mpc::lcdgui::screens::dialog2::PopupScreen>("popup");
+            popupScreen->setText("Sound directory full(256max)");
+            popupScreen->returnToScreenAfterInteraction(screenToGoToIfSoundDirectoryIsFull);
+            mpc.getLayeredScreen()->openScreen("popup");
+        }
+        return {};
+    }
+
+	sounds.emplace_back(std::make_shared<Sound>(sampleRate));
+	return sounds.back();
 }
 
 int Sampler::getSoundCount()
@@ -478,7 +517,6 @@ void Sampler::switchToNextSoundSortType()
         if (sortedSounds[i].first == s)
         {
             soundIndex = i;
-            printf("");
             break;
         }
     }
@@ -622,7 +660,7 @@ std::weak_ptr<Sound> Sampler::createZone(std::weak_ptr<Sound> source, int start,
 {
 	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
 
-	auto zone = copySound(source);
+	auto zone = copySound(source, "zone");
 
     if (zone.lock() == nullptr)
     {
@@ -998,10 +1036,10 @@ void Sampler::selectNextSound()
     nudgeSoundIndex(true);
 }
 
-std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source)
+std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source, const std::string screenToGoToIfSoundDirectoryIsFull)
 {
 	auto sound = source.lock();
-	auto newSound = addSound(sound->getSampleRate());
+	auto newSound = addSound(sound->getSampleRate(), screenToGoToIfSoundDirectoryIsFull);
 
     if (newSound == nullptr)
     {

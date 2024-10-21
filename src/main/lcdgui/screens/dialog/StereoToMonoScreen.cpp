@@ -90,11 +90,18 @@ void StereoToMonoScreen::function(int i)
 			}
 		}
 
-		auto left = sampler->addSound(sound->getSampleRate());
-		auto right = sampler->addSound(sound->getSampleRate());
+		auto left = sampler->addSound(sound->getSampleRate(), "stereo-to-mono");
 
-        if (left == nullptr || right == nullptr)
+        if (left == nullptr)
         {
+            return;
+        }
+
+		auto right = sampler->addSound(sound->getSampleRate(), "stereo-to-mono");
+
+        if (right == nullptr)
+        {
+            sampler->deleteSound(left);
             return;
         }
 

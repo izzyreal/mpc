@@ -119,7 +119,7 @@ void SampleScreen::function(int i)
 		}
 		else
 		{
-			auto sound = sampler->addSound();
+			auto sound = sampler->addSound("sample");
             
             if (sound == nullptr)
             {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <string>
 
 namespace mpc { class Mpc; }

@@ -101,7 +101,13 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
                     SndReader sndReader(soundData);
 
-                    auto sound = mpc.getSampler()->addSound(sndReader.getSampleRate());
+                    auto sound = mpc.getSampler()->addSound(sndReader.getSampleRate(), "");
+
+                    if (sound == nullptr)
+                    {
+                        break;
+                    }
+
                     sound->setMono(sndReader.isMono());
                     sndReader.readData(*sound->getSampleData());
                     sound->setName(sndReader.getName());
