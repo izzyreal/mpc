@@ -252,7 +252,7 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
         return {};
     }
 
-    Value &arrangement = layerDocuments()[foundInLayer]->GetObject()[screenName.c_str()];
+    Value &arrangement = layerDocuments()[foundInLayer]->GetObj()[screenName.c_str()];
 
     std::vector<std::shared_ptr<Component>> components;
 
