@@ -26,10 +26,10 @@ void ZoneScreen::open()
 {
     mpc.getControls()->getBaseControls()->typableParams = { "st", "end" };
 
-    if (zones.empty())
-		initZones();
+    const bool sound = sampler->getSound() ? true : false;
 
-	bool sound = sampler->getSound() ? true : false;
+    initZones();
+
 	findField("snd")->setFocusable(sound);
 	findField("playx")->setFocusable(sound);
 	findField("st")->setFocusable(sound);
@@ -176,6 +176,7 @@ void ZoneScreen::turnWheel(int i)
 	else if (param == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
+        initZones();
 		displayEnd();
 		displaySnd();
 		displaySt();
@@ -185,6 +186,7 @@ void ZoneScreen::turnWheel(int i)
 	else if (param == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
+        initZones();
 		displayEnd();
 		displaySnd();
 		displaySt();
@@ -310,18 +312,25 @@ void ZoneScreen::displayZone()
 
 void ZoneScreen::initZones()
 {
-	zones.clear();
-	
-	auto sound = sampler->getSound();
+	const auto sound = sampler->getSound();
 
 	if (!sound)
 	{
-		zone = 0;
+        zones.clear();
+        zone = 0;
 		return;
 	}
 
-	float zoneLength = sound->getFrameCount() / float(numberOfZones);
-	float zoneStart = 0.f;
+    if (numberOfFramesAtLastZoneInitialization == sound->getFrameCount() &&
+            zones.size() == numberOfZones)
+    {
+        return;
+    }
+
+    zones.clear();
+
+    const float zoneLength = sound->getFrameCount() / float(numberOfZones);
+    float zoneStart = 0.f;
 
 	for (int i = 0; i < numberOfZones - 1; i++)
 	{
@@ -335,6 +344,8 @@ void ZoneScreen::initZones()
 	zones[numberOfZones - 1][0] = (int)floor(zoneStart);
 	zones[numberOfZones - 1][1] = sound->getFrameCount();
 	zone = 0;
+
+    numberOfFramesAtLastZoneInitialization = sound->getFrameCount();
 }
 
 void ZoneScreen::setZoneStart(int zoneIndex, int start)

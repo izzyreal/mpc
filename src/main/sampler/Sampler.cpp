@@ -656,23 +656,6 @@ void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr
     }
 }
 
-std::weak_ptr<Sound> Sampler::createZone(std::weak_ptr<Sound> source, int start, int end, int endMargin)
-{
-	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
-
-	auto zone = copySound(source, "zone");
-
-    if (zone.lock() == nullptr)
-    {
-        return {};
-    }
-
-	auto zoneLength = end - start + overlap;
-	auto endCandidate = start + zoneLength;
-	trimSample(zone, start, endCandidate);
-	return zone;
-}
-
 void Sampler::stopAllVoices(int frameOffset)
 {
 	mpc.getDrum(0).allSoundOff(frameOffset);

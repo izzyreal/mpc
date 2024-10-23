@@ -8,6 +8,7 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sampler;
 using namespace mpc::controls;
 
 EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -366,6 +367,49 @@ void EditSoundScreen::turnWheel(int i)
 	{
 		setCreateNewProgram(i > 0);
 	}
+}
+
+static std::shared_ptr<Sound> createZone(
+        std::shared_ptr<Sampler> sampler,
+        const std::shared_ptr<Sound> source,
+        const int start,
+        const int end,
+        const int endMargin
+) {
+	const auto overlapInFrames = (int)(endMargin * source->getSampleRate() * 0.001);
+
+    auto zone = sampler->addSound(source->getSampleRate(), "zone");
+
+    if (zone == nullptr)
+    {
+        return {};
+    }
+
+    zone->setMono(source->isMono());
+
+	const auto zoneLength = end - start + overlapInFrames;
+	const auto endWithOverlap = start + zoneLength;
+
+    const auto sourceSampleData = source->getSampleData();
+
+    for (uint32_t frameIndex = start; frameIndex < endWithOverlap; ++frameIndex)
+    {
+        if (frameIndex > source->getLastFrameIndex())
+        {
+            break;
+        }
+
+        const auto frameData = source->isMono() ?
+            std::vector<float>{(*sourceSampleData)[frameIndex]} :
+            std::vector<float>{(*sourceSampleData)[frameIndex],
+                (*sourceSampleData)[frameIndex+source->getLastFrameIndex()]};
+
+        zone->insertFrame(frameData, zone->getLastFrameIndex() + 1);
+    }
+
+    zone->setEnd(zone->getFrameCount());
+
+	return zone;
 }
 
 void EditSoundScreen::function(int j)
@@ -727,20 +771,20 @@ void EditSoundScreen::function(int j)
 				auto start = zoneScreen->getZoneStart(i);
 				auto end = zoneScreen->getZoneEnd(i);
 
-				auto zone = sampler->createZone(source, start, end, endMargin);
+				auto zone = createZone(sampler, source, start, end, endMargin);
 
-                if (zone.lock() == nullptr)
+                if (zone == nullptr)
                 {
                     return;
                 }
 				
 				if (i == 0)
 				{
-					zone.lock()->setName(newName);
+					zone->setName(newName);
 				}
 				else
 				{
-					zone.lock()->setName(sampler->addOrIncreaseNumber(newName));
+					zone->setName(sampler->addOrIncreaseNumber(newName));
 				}
 			}
 
