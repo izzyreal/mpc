@@ -88,47 +88,47 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         }
         else
         {
-            if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_UpArrow])
+            if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_UpArrow])
             {
                 screen->up();
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_DownArrow])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_DownArrow])
             {
                 screen->down();
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_F1])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F1])
             {
                 screen->function(0);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_F2])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F2])
             {
                 screen->function(1);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_F3])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F3])
             {
                 screen->function(2);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_F4])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F4])
             {
                 screen->function(3);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_F5])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F5])
             {
                 screen->function(4);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_F6])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F6])
             {
                 screen->function(5);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_Escape])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_Escape])
             {
                 screen->mainScreen();
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_ANSI_Equal])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_ANSI_Equal])
             {
                 screen->turnWheel(1);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_ANSI_Minus])
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_ANSI_Minus])
             {
                 screen->turnWheel(-1);
             }
