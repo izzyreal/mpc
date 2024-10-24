@@ -188,17 +188,23 @@ void ChannelSettingsScreen::displayPanning()
     auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getStereoMixerChannel();
 
-    if (mixerChannel->getPanning() != 0) {
-        auto panning = "L";
+    const int8_t normalizedPan = mixerChannel->getPanning() - 50;
 
-        if (mixerChannel->getPanning() > 0)
-            panning = "R";
-
-        findField("panning")->setText(
-                panning + StrUtil::padLeft(std::to_string(abs(mixerChannel->getPanning())), " ", 2));
-    } else {
+    if (normalizedPan == 0)
+    {
         findField("panning")->setText("MID");
+        return;
     }
+
+    auto panning = "L";
+
+    if (normalizedPan > 0)
+    {
+        panning = "R";
+    }
+
+    findField("panning")->setText(
+        panning + StrUtil::padLeft(std::to_string(abs(normalizedPan)), " ", 2));
 }
 
 void ChannelSettingsScreen::displayOutput()
