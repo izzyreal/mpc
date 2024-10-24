@@ -16,6 +16,8 @@
 
 #include <disk/MpcFile.hpp>
 
+#include "StrUtil.hpp"
+
 #include <stdexcept>
 
 using namespace mpc::disk;
@@ -124,8 +126,18 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
     {
         soundNames.push_back(pgmSoundNames->getSampleName(i));
     }
+    
+    const std::string programNameInData = StrUtil::trim(reader.getProgramName()->getProgramNameASCII());
+    
+    if (StrUtil::eqIgnoreCase(programNameInData, f->getNameWithoutExtension()))
+    {
+        program->setName(programNameInData);
+    }
+    else
+    {
+        program->setName(f->getNameWithoutExtension());
+    }
 
-    program->setName(f->getNameWithoutExtension());
     setNoteParameters(reader, program);
     setMixer(reader, program);
     setSlider(reader, program);
