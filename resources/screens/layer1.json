@@ -611,7 +611,7 @@
 {
  "infowidgets" : [ "up", "down" ],
  "infosize" : [ 5, 5 ],
- "infox" : [ 202, 202 ],
+ "infox" : [ 238, 238 ],
  "infoy" : [ 2, 38 ],
  "fblabels" : [
  ["SETNGS", "KEYBRD", "AUTSAV", "LEARN", "RESET", "SAVE" ],

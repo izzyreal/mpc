@@ -29,7 +29,7 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
-        auto param = std::make_shared<Parameter>(mpc, "                ", "row" + std::to_string(i), 2, 3 + (i * 9), 17 * 6);
+        auto param = std::make_shared<Parameter>(mpc, "                ", "row" + std::to_string(i), 2, 3 + (i * 9), 23 * 6);
         addChild(param);
     }
 }
@@ -239,15 +239,15 @@ void VmpcKeyboardScreen::updateRows()
 {
     auto kbMapping = mpc.getControls()->getKbMapping().lock();
     auto& labelKeyMap = kbMapping->getLabelKeyMap();
+    const int MAX_LABEL_LENGTH = 15;
 
     for (int i = 0; i < 5; i++)
     {
         auto l = findChild<Label>("row" + std::to_string(i));
         auto f = findChild<Field>("row" + std::to_string(i));
         
-        int length = 15;
         auto mapping = labelKeyMap[i + rowOffset];
-        auto labelText = StrUtil::padRight(mapping.first, " ", length) + ":";
+        auto labelText = StrUtil::padRight(mapping.first, " ", MAX_LABEL_LENGTH) + ":";
 
         for (auto& c : labelText)
         {
@@ -255,7 +255,8 @@ void VmpcKeyboardScreen::updateRows()
         }
 
         l->setText(labelText);
-        f->setText(kbMapping->getKeyCodeString(mapping.second));
+        const auto truncatedKeyCodeString = kbMapping->getKeyCodeString(mapping.second).substr(0, 21);  
+        f->setText(truncatedKeyCodeString);
         f->setInverted(row == i);
         
         if (learning && i == row)
