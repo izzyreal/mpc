@@ -10,6 +10,7 @@
 #include <file/sndwriter/SndWriter.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 #include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
@@ -286,6 +287,10 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         if (screen == "vmpc-continue-previous-session" || screen == "vmpc-known-controller-detected")
         {
             screen = "sequencer";
+        }
+        else if (screen == "edit-sound")
+        {
+            screen = mpc.screens->get<EditSoundScreen>("edit-sound")->getReturnToScreenName(); 
         }
 
         if (previousScreen == "vmpc-continue-previous-session" || previousScreen == "vmpc-known-controller-detected")
