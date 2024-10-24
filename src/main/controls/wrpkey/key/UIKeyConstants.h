@@ -1,4 +1,3 @@
-#pragma once
 enum UIKeyConstants {
     UIKeyboardHIDUsageKeyboardErrorRollOver   = 0x01,    /* ErrorRollOver */
     UIKeyboardHIDUsageKeyboardPOSTFail        = 0x02,    /* POSTFail */
