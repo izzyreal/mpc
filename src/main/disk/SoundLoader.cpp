@@ -29,17 +29,19 @@ void SoundLoader::setPreview(bool b)
 
 void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, std::shared_ptr<Sound> sound, const bool shouldBeConverted)
 {
-    std::string soundFileName = f->getName();
-    std::string extension = f->getExtension();
-    std::string soundName = f->getNameWithoutExtension();
+    const std::string soundFileName = f->getName();
+    const std::string extension = f->getExtension();
+    const std::string nameWithoutExtension = f->getNameWithoutExtension();
     
     auto sampler = mpc.getSampler();
-    auto existingSoundIndex = sampler->checkExists(soundName);
  
     sound_or_error soundOrError;
-    
+  
+    int16_t existingSoundIndex;
+
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
     {
+        existingSoundIndex = sampler->checkExists(nameWithoutExtension);
         bool willBeConverted = shouldBeConverted;
         wav_or_error wavMetaOrError = mpc.getDisk()->readWavMeta(f);
         
@@ -66,18 +68,29 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
         }
 
         auto onSuccess = [&](std::shared_ptr<WavFile> wavFile){
-            return onReadWavSuccess(wavFile, f->getNameWithoutExtension(), sound, willBeConverted);
+            return onReadWavSuccess(wavFile, nameWithoutExtension, sound, willBeConverted);
         };
 
         soundOrError = mpc.getDisk()->readWav2(f, onSuccess);
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {
-        auto onSndReaderSuccess = [sound](std::shared_ptr<SndReader> sndReader) -> sound_or_error {
+        auto onSndReaderSuccess = [sampler, sound, nameWithoutExtension, &existingSoundIndex](std::shared_ptr<SndReader> sndReader) -> sound_or_error {
 
             if (!sndReader->isHeaderValid())
             {
                 return tl::make_unexpected(mpc_io_error_msg{"Invalid SND header"});
+            }
+
+            if (StrUtil::eqIgnoreCase(sndReader->getName(), nameWithoutExtension))
+            {
+                existingSoundIndex = sampler->checkExists(sndReader->getName());
+                sound->setName(sndReader->getName());
+            }
+            else
+            {
+                existingSoundIndex = sampler->checkExists(nameWithoutExtension);
+                sound->setName(nameWithoutExtension);
             }
 
             sndReader->readData(*sound->getSampleData());
@@ -86,7 +99,6 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
             sound->setEnd(sndReader->getEnd());
             sound->setLoopTo(sndReader->getEnd() - sndReader->getLoopLength());
             sound->setSampleRate(sndReader->getSampleRate());
-            sound->setName(sndReader->getName());
             sound->setLoopEnabled(sndReader->isLoopEnabled());
             sound->setLevel(sndReader->getLevel());
             sound->setTune(sndReader->getTune());
@@ -108,7 +120,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
     {
         return;
     }
-    
+
     if (existingSoundIndex != -1)
     {
         if (replace)
