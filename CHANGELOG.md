@@ -3,10 +3,11 @@
 * Fix various issues when using more than 127 sounds.
 * Implement 256 sounds in memory limit. Before this, VMPC2000XL would allow over 256 sounds in memory at a time, which is incongruent and incompatible with the real MPC2000XL.
 * Fix iOS keyboard configuration and learn (i.e. `Shift + 0` and then `F2` for `KEYBRD`).
-* Fix sound and program name derivation. To summarize, the real MPC2000XL uses the sound or program name that is encoded in the actual the file data -- with mixed casing, like `CoolKick` or `NewPgm-A` -- if, and only if, the this encoded name is a case-insensitive equivalent of the file name. If it's not, the file name becomes the sound or program name, resulting in upper casing, like `COOLKICK` or `NEWPGM-A`. VMPC2000XL now follows this behaviour.
+* Fix sound and program name derivation. To summarize, the real MPC2000XL uses the sound or program name that is encoded in the actual the file data -- with mixed casing, like `CoolKick` or `NewPgm-A` -- if, and only if, the encoded name is a case-insensitive equivalent of the file name. If it's not, the file name becomes the sound or program name, resulting in upper casing, like `COOLKICK` or `NEWPGM-A`. VMPC2000XL now follows this behaviour.
 * Minor cosmetic fixes in `KEYBRD`, `Copy Sound`, and `Channel Settings` screens.
 * For developers: I'm learning Vim, so I've made some minor changes to facilitate working on VMPC2000XL in Vim. The main change is the creation of `compile_commands.json` during the CMake generation stage. The rest of my setup can be found [here](https://github.com/izzyreal/vim-config).
-* Many thanks to all the bug reporters on GitHub!
+
+A special thank you to all the bug reporters on GitHub!
 
 ## v0.6.0 (15-6-2024)
 * First public iOS TestFlight release: https://testflight.apple.com/join/yEgfYk21
