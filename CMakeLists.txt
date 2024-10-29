@@ -20,13 +20,6 @@ FetchContent_Declare(Catch2
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/Catch2
 )
 
-FetchContent_Declare(filesystem
-  GIT_REPOSITORY https://github.com/gulrak/filesystem.git
-  GIT_TAG        v1.5.14
-  GIT_SHALLOW    ON
-  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/filesystem
-)
-
 FetchContent_Declare(tl-expected
   GIT_REPOSITORY https://github.com/TartanLlama/expected.git
   GIT_TAG        v1.0.0
@@ -92,7 +85,7 @@ FetchContent_Declare(readerwriterqueue
 FetchContent_Populate(concurrentqueue)
 FetchContent_Populate(readerwriterqueue)
 
-FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
+FetchContent_MakeAvailable(rtmidi akaifat rapidjson Catch2 libsamplerate platformfolders)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -109,7 +102,7 @@ if(APPLE)
     # This is not a typo. See https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
     set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE INTERNAL "Minimum iOS deployment version")
   else()
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE INTERNAL "Minimum OS X deployment version")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE INTERNAL "Minimum OS X deployment version")
   endif()
 endif()
 
@@ -148,14 +141,13 @@ target_include_directories(mpc PUBLIC
     ${_src_root_path_main}
     ${akaifat_SOURCE_DIR}/src/main
     ${rapidjson_SOURCE_DIR}/include
-    ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
     ${libsamplerate_SOURCE_DIR}/include
     ${concurrentqueue_SOURCE_DIR}
     ${readerwriterqueue_SOURCE_DIR}
 )
 
-target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders)
+target_link_libraries(mpc akaifat rtmidi samplerate platform_folders)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")

@@ -155,9 +155,9 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
         auto relativePath = fs::relative(currentDir, mpc.paths->defaultLocalVolumePath());
 
-        for (auto& pathSegment : relativePath)
+        for (auto& pathSegment : fs::directory_iterator(relativePath))
         {
-            mpc.getDisk()->moveForward(pathSegment.string());
+            mpc.getDisk()->moveForward(pathSegment.path().string());
             mpc.getDisk()->initFiles();
         }
 
