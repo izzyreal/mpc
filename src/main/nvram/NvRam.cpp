@@ -14,7 +14,6 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
 
-#include <file/all/AllParser.hpp>
 #include <file/all/Defaults.hpp>
 
 using namespace mpc::nvram;
@@ -25,8 +24,7 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
   const auto path = mpc.paths->configPath() / "nvram.vmp";
 
-  if (!fs::exists(path) ||
-      fs::file_size(path) != mpc::file::all::AllParser::DEFAULTS_LENGTH)
+  if (!fs::exists(path))
   {
       return;
   }
