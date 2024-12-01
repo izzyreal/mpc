@@ -13,7 +13,7 @@ DataWheel::DataWheel(mpc::Mpc& mpc)
 {
 }
 
-void DataWheel::turn(int increment)
+void DataWheel::turn(int increment, const bool updateUiEnabled)
 {
 	auto controls = mpc.getActiveControls();
 	
@@ -27,5 +27,5 @@ void DataWheel::turn(int increment)
 		}
 	}
 
-	updateUi(increment);
+	if (updateUiEnabled) updateUi(increment);
 }

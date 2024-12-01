@@ -18,7 +18,7 @@ namespace mpc::hardware
 	public:
 		DataWheel(mpc::Mpc& mpc);
         std::function<void(int)> updateUi = [](int increment){};
-        void turn(int increment);
+        void turn(int increment, const bool updateUiEnabled = true);
 
 	};
 }
