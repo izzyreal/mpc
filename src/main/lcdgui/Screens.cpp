@@ -161,7 +161,7 @@
 
 #include <StrUtil.hpp>
 
-#include "ResourceUtil.h"
+#include "MpcResourceUtil.hpp"
 
 #include <rapidjson/document.h>
 
@@ -186,7 +186,7 @@ std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()
         for (int i = 0; i < 4; i++)
         {
             const auto path = "screens/layer" + std::to_string(i + 1) + ".json";
-            auto data = mpc::ResourceUtil::get_resource_data(path);
+            auto data = mpc::MpcResourceUtil::get_resource_data(path);
 
             auto panelDoc = std::make_unique<Document>();
             panelDoc->Parse(&data[0], data.size());

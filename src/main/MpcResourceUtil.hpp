@@ -4,7 +4,7 @@
 #include <string>
 
 namespace mpc {
-    class ResourceUtil {
+    class MpcResourceUtil {
 
     public:
         static std::vector<char> get_resource_data(const std::string &path);

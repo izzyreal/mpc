@@ -30,7 +30,7 @@
 
 #include <lcdgui/Screens.hpp>
 
-#include "ResourceUtil.h"
+#include "MpcResourceUtil.hpp"
 
 #include <string>
 
@@ -75,7 +75,7 @@ void Mpc::init()
         fs::create_directories(paths->demoDataPath() / "TEST2");
         for (auto& demo_file : demo_files)
         {
-            const auto data = mpc::ResourceUtil::get_resource_data("demodata/" + demo_file);
+            const auto data = mpc::MpcResourceUtil::get_resource_data("demodata/" + demo_file);
             set_file_data(paths->demoDataPath() / demo_file, data);
         }
     }
@@ -86,7 +86,7 @@ void Mpc::init()
 
     for (auto& preset : factory_midi_control_presets)
     {
-        const auto data = mpc::ResourceUtil::get_resource_data("midicontrolpresets/" + preset);
+        const auto data = mpc::MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
         if (!fs::exists(paths->midiControlPresetsPath() / preset) || fs::file_size(paths->midiControlPresetsPath() / preset) != data.size())
         {

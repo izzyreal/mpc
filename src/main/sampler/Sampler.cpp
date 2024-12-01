@@ -25,7 +25,7 @@
 
 #include <samplerate.h>
 
-#include "ResourceUtil.h"
+#include "MpcResourceUtil.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -187,7 +187,7 @@ void Sampler::init() {
     clickSound->setMono(true);
     clickSound->setLevel(100);
 
-    auto clickData = ResourceUtil::get_resource_data("audio/click.wav");
+    auto clickData = MpcResourceUtil::get_resource_data("audio/click.wav");
 
     if (clickData.size() != 146)
     {

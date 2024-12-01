@@ -1,6 +1,6 @@
 #include "Background.hpp"
 
-#include "ResourceUtil.h"
+#include "MpcResourceUtil.hpp"
 
 #include "LodePNG.hpp"
 
@@ -46,7 +46,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
             height = 360;
         }
 		
-		const auto file_data_char = ResourceUtil::get_resource_data(fileName);
+		const auto file_data_char = MpcResourceUtil::get_resource_data(fileName);
         std::vector<unsigned char> file_data(file_data_char.begin(), file_data_char.end());
         std::vector<unsigned char> data;
 

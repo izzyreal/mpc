@@ -1,4 +1,4 @@
-#include "ResourceUtil.h"
+#include "MpcResourceUtil.hpp"
 
 #include "Logger.hpp"
 
@@ -34,7 +34,7 @@ std::vector<char> get_resource_data_from_in_memory_filesystem(const std::string&
 
 using namespace mpc;
 
-std::vector<char> ResourceUtil::get_resource_data(const std::string& path)
+std::vector<char> MpcResourceUtil::get_resource_data(const std::string& path)
 {
     try {
 #ifdef MAC_BUNDLE_RESOURCES

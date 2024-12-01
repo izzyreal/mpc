@@ -25,7 +25,7 @@
 #include <cmath>
 #include <set>
 
-#include "ResourceUtil.h"
+#include "MpcResourceUtil.hpp"
 
 #if __linux__
 #include <climits>
@@ -38,10 +38,10 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
     const auto fntPath = "fonts/mpc2000xl-font.fnt";
-    auto fntData = ResourceUtil::get_resource_data(fntPath);
+    auto fntData = MpcResourceUtil::get_resource_data(fntPath);
 
     const auto bmpPath = "fonts/mpc2000xl-font_0.bmp";
-    auto bmpData = ResourceUtil::get_resource_data(bmpPath);
+    auto bmpData = MpcResourceUtil::get_resource_data(bmpPath);
 
 	BMFParser bmfParser(&fntData[0], fntData.size(), &bmpData[0], bmpData.size());
 
