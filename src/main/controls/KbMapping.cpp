@@ -206,10 +206,15 @@ std::string KbMapping::getHardwareComponentLabelAssociatedWithKeycode(int keyCod
 	return "";
 }
 
-std::string KbMapping::getKeyCodeString(int keyCode) {
+std::string KbMapping::getKeyCodeString(int keyCode, const bool oneChar) {
 	auto names = kh->names(keyCode);
 	if (names.size() > 1) {
 		for (auto& s : names) {
+            if (oneChar)
+            {
+                if (s.length() == 1) return s;
+                continue;
+            }
 			if (s.length() > 3) return s;
 		}
 	}

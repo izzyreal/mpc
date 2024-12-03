@@ -107,7 +107,7 @@ void Button::push()
 	else if (label == "f6") {
 		screen->function(5);
 	}
-	else if (label == "shift") {
+	else if (label == "shift" || label == "shift_#1" || label == "shift_#2" || label == "shift_#3") {
 		screen->shift();
 	}
 	else if (label == "enter") {

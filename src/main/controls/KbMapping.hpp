@@ -20,7 +20,7 @@ public:
     void initializeDefaults();
     int getKeyCodeFromLabel(const std::string& label);
     std::string getHardwareComponentLabelAssociatedWithKeycode(int keyCode);
-    static std::string getKeyCodeString(int keyCode);
+    static std::string getKeyCodeString(int keyCode, const bool oneChar = false);
     void setKeyCodeForLabel(const int keyCode, const std::string& label);
 
     void exportMapping();
