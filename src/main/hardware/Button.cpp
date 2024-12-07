@@ -169,7 +169,7 @@ void Button::push()
 void Button::release() {
     auto c = mpc.getReleaseControls();
 	
-    if (label == "shift") {
+	if (label == "shift" || label == "shift_#1" || label == "shift_#2" || label == "shift_#3") {
 		c->shift();
 	}
 	else if (label == "erase") {
