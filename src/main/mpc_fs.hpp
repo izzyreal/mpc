@@ -26,6 +26,11 @@ inline std::vector<char> get_file_data(const fs::path& p)
 {
     std::ifstream ifs(p, std::ios::in | std::ios::binary | std::ios::ate);
 
+    if (!ifs.is_open())
+    {
+        return {};
+    }
+    
     std::ifstream::pos_type fileSize = ifs.tellg();
     ifs.seekg(0, std::ios::beg);
 
