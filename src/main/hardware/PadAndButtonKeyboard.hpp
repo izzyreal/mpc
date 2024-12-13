@@ -18,7 +18,7 @@ namespace mpc::hardware {
 
         mpc::Mpc& mpc;
 
-        bool upperCase = false;
+        bool upperCase = true;
 
         std::unordered_map<std::string, bool> pressedZeroTimes;
 
@@ -29,6 +29,9 @@ namespace mpc::hardware {
         void pressHardwareComponent(const std::string& label);
         void resetPreviousPad();
         void resetPressedZeroTimes();
+        void resetUpperCase();
+
+        const bool const isUpperCase() { return upperCase; }
 
     };
 

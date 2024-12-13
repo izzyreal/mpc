@@ -104,3 +104,8 @@ void PadAndButtonKeyboard::resetPressedZeroTimes()
 {
     pressedZeroTimes.clear();
 }
+
+void PadAndButtonKeyboard::resetUpperCase()
+{
+    upperCase = true;
+}

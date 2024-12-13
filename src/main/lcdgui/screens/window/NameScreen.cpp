@@ -2,7 +2,10 @@
 
 #include "hardware/Hardware.hpp"
 #include "hardware/PadAndButtonKeyboard.hpp"
-#include <lcdgui/Underline.hpp>
+#include "hardware/Led.hpp"
+#include "hardware/TopPanel.hpp"
+#include "lcdgui/Underline.hpp"
+
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
@@ -57,6 +60,10 @@ void NameScreen::close()
     mainScreenAction = [](){};
 	name.clear();
 	nameLimit = 16;
+
+    const auto fullLevelEnabled = mpc.getHardware()->getTopPanel()->isFullLevelEnabled();
+
+    mpc.getHardware()->getLed("full-level")->notifyObservers("full-level-" + std::string(fullLevelEnabled ? "on" : "off"));
 }
 
 void NameScreen::left()

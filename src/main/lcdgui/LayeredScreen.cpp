@@ -116,6 +116,7 @@ int LayeredScreen::openScreen(std::string newScreenName)
     {
         mpc.getHardware()->getPadAndButtonKeyboard()->resetPreviousPad();
         mpc.getHardware()->getPadAndButtonKeyboard()->resetPressedZeroTimes();
+        mpc.getHardware()->getPadAndButtonKeyboard()->resetUpperCase();
     }
 
     auto focus = getFocusedLayer()->findField(getFocus());
