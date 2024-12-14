@@ -31,7 +31,7 @@ namespace mpc::hardware {
         void resetPressedZeroTimes();
         void resetUpperCase();
 
-        const bool const isUpperCase() { return upperCase; }
+        const bool isUpperCase() { return upperCase; }
 
     };
 
