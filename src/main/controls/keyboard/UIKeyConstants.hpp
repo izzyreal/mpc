@@ -1,3 +1,7 @@
+#pragma once
+
+namespace mpc::controls::keyboard {
+
 enum UIKeyConstants {
     UIKeyboardHIDUsageKeyboardErrorRollOver   = 0x01,    /* ErrorRollOver */
     UIKeyboardHIDUsageKeyboardPOSTFail        = 0x02,    /* POSTFail */
@@ -225,3 +229,5 @@ enum UIKeyConstants {
     UIKeyboardHIDUsageKeyboardHiragana = UIKeyboardHIDUsageKeyboardLANG4,
     UIKeyboardHIDUsageKeyboardZenkakuHankakuKanji = UIKeyboardHIDUsageKeyboardLANG5,
 };
+
+} // namespace mpc::controls::keyboard

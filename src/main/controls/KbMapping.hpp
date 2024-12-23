@@ -1,11 +1,9 @@
 #pragma once
-#include <cstdint>
 #include <vector>
 #include <utility>
 #include <vector>
 #include <string>
 
-#include "wrpkey/key.hxx"
 
 namespace mpc {
     class Mpc;
@@ -34,7 +32,6 @@ public:
 
 private:
     mpc::Mpc& mpc;
-    const static WonderRabbitProject::key::key_helper_t* kh;
     std::vector<std::pair<std::string, int>> labelKeyMap;
 
     // migrate persisted mappings in old format to new
