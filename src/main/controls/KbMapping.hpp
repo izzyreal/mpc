@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+#include "KeyCodeHelper.hpp"
 
 namespace mpc {
     class Mpc;
@@ -16,23 +17,23 @@ class KbMapping
     
 public:
     void initializeDefaults();
-    int getKeyCodeFromLabel(const std::string& label);
-    std::string getHardwareComponentLabelAssociatedWithKeycode(int keyCode);
-    static std::string getKeyCodeString(int keyCode, const bool oneChar = false);
-    void setKeyCodeForLabel(const int keyCode, const std::string& label);
+    const VmpcKeyCode getKeyCodeFromLabel(const std::string& label);
+    std::string getHardwareComponentLabelAssociatedWithKeycode(const VmpcKeyCode keyCode);
+    static const std::string getKeyCodeString(const VmpcKeyCode keyCode, const bool oneChar = false);
+    void setKeyCodeForLabel(const VmpcKeyCode keyCode, const std::string& label);
 
     void exportMapping();
     void importMapping();
-    std::vector<std::pair<std::string, int>>& getLabelKeyMap();
+    std::vector<std::pair<std::string, VmpcKeyCode>>& getLabelKeyMap();
 
     KbMapping(mpc::Mpc&);
 
-    static int getNextKeyCode(int keyCode);
-    static int getPreviousKeyCode(int keyCode);
+    static const VmpcKeyCode getNextKeyCode(const VmpcKeyCode keyCode);
+    static const VmpcKeyCode getPreviousKeyCode(const VmpcKeyCode keyCode);
 
 private:
     mpc::Mpc& mpc;
-    std::vector<std::pair<std::string, int>> labelKeyMap;
+    std::vector<std::pair<std::string, VmpcKeyCode>> labelKeyMap;
 
     // migrate persisted mappings in old format to new
     void migrateV0_4_4MappingToV0_5();

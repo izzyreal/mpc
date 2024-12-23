@@ -1,7 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
-
-#include <string>
+#include "controls/KeyCodeHelper.hpp"
 
 namespace mpc { class Mpc; }
 
@@ -27,7 +26,7 @@ public:
 private:
     int row = 0;
     int rowOffset = 0;
-    int learnCandidate = -1;
+    mpc::controls::VmpcKeyCode learnCandidate = mpc::controls::VmpcKeyCode::VMPC_KEY_UNKNOWN;
     
     bool learning = false;
     bool hasMappingChanged();

@@ -1,13 +1,8 @@
 #include "KbMapping.hpp"
-#include "KeyCodes.hpp"
+
 #include "Mpc.hpp"
 
-#include "controls/keyboard/KeyHelper.hpp"
-
-#include <Logger.hpp>
-
 using namespace mpc::controls;
-using namespace mpc::controls::keyboard;
 
 KbMapping::KbMapping(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
 {
@@ -26,7 +21,7 @@ void KbMapping::exportMapping() {
         
 		bytes.push_back(' ');
 		
-        auto keyCode = std::to_string(mapping.second);
+        auto keyCode = std::to_string(static_cast<int>(mapping.second));
 		
         for (char& c : keyCode)
 			bytes.push_back(c);
@@ -90,7 +85,7 @@ void KbMapping::importMapping()
             
             if (parsedKeyCode != -1)
             {
-                labelKeyMap.emplace_back(label, parsedKeyCode);
+                labelKeyMap.emplace_back(label, static_cast<VmpcKeyCode>(parsedKeyCode));
             }
             
             label.clear();
@@ -104,83 +99,78 @@ void KbMapping::importMapping()
 
 void KbMapping::initializeDefaults()
 {
-    const KeyHelper& kh = KeyHelper::instance();
     labelKeyMap.clear();
-    labelKeyMap.emplace_back("left", kh.code("left"));
-    labelKeyMap.emplace_back("right", kh.code("right"));
-    labelKeyMap.emplace_back("up", kh.code("up"));
-    labelKeyMap.emplace_back("down", kh.code("down"));
-    labelKeyMap.emplace_back("rec", kh.code("l"));
-    labelKeyMap.emplace_back("overdub", kh.code("semicolon"));
-    labelKeyMap.emplace_back("stop", kh.code("quote"));
-    labelKeyMap.emplace_back("play", kh.code("space"));
-    labelKeyMap.emplace_back("play-start", kh.code("backslash"));
-    labelKeyMap.emplace_back("main-screen", kh.code("escape"));
-    labelKeyMap.emplace_back("open-window", kh.code("i"));
-    labelKeyMap.emplace_back("prev-step-event", kh.code("q"));
-    labelKeyMap.emplace_back("next-step-event", kh.code("w"));
-    labelKeyMap.emplace_back("go-to", kh.code("e"));
-    labelKeyMap.emplace_back("prev-bar-start", kh.code("r"));
-    labelKeyMap.emplace_back("next-bar-end", kh.code("t"));
-    labelKeyMap.emplace_back("tap", kh.code("y"));
-    labelKeyMap.emplace_back("next-seq", kh.code("["));
-    labelKeyMap.emplace_back("track-mute", kh.code("]"));
-    labelKeyMap.emplace_back("full-level", kh.code("o"));
-    labelKeyMap.emplace_back("sixteen-levels", kh.code("p"));
-    labelKeyMap.emplace_back("f1", kh.code("f1"));
-    labelKeyMap.emplace_back("f2", kh.code("f2"));
-    labelKeyMap.emplace_back("f3", kh.code("f3"));
-    labelKeyMap.emplace_back("f4", kh.code("f4"));
-    labelKeyMap.emplace_back("f5", kh.code("f5"));
-    labelKeyMap.emplace_back("f6", kh.code("f6"));
-    labelKeyMap.emplace_back("shift_#1", kh.code("shift"));
-    labelKeyMap.emplace_back("shift_#2", kh.code("left shift"));
-    labelKeyMap.emplace_back("shift_#3", kh.code("right shift"));
-    labelKeyMap.emplace_back("enter", kh.code("enter"));
-    labelKeyMap.emplace_back("undo-seq", kh.code("f10"));
-    labelKeyMap.emplace_back("erase", kh.code("f8"));
-    labelKeyMap.emplace_back("after", kh.code("f9"));
-    labelKeyMap.emplace_back("bank-a", kh.code("home"));
-    labelKeyMap.emplace_back("bank-b", kh.code("end"));
-    labelKeyMap.emplace_back("bank-c", kh.code("insert"));
-    labelKeyMap.emplace_back("bank-d", kh.code("delete"));
-    labelKeyMap.emplace_back("0", kh.code("0"));
-    labelKeyMap.emplace_back("1", kh.code("1"));
-    labelKeyMap.emplace_back("2", kh.code("2"));
-    labelKeyMap.emplace_back("3", kh.code("3"));
-    labelKeyMap.emplace_back("4", kh.code("4"));
-    labelKeyMap.emplace_back("5", kh.code("5"));
-    labelKeyMap.emplace_back("6", kh.code("6"));
-    labelKeyMap.emplace_back("7", kh.code("7"));
-    labelKeyMap.emplace_back("8", kh.code("8"));
-    labelKeyMap.emplace_back("9", kh.code("9"));
-    labelKeyMap.emplace_back("pad-1", kh.code("z"));
-    labelKeyMap.emplace_back("pad-2", kh.code("x"));
-    labelKeyMap.emplace_back("pad-3", kh.code("c"));
-    labelKeyMap.emplace_back("pad-4", kh.code("v"));
-    labelKeyMap.emplace_back("pad-5", kh.code("a"));
-    labelKeyMap.emplace_back("pad-6", kh.code("s"));
-    labelKeyMap.emplace_back("pad-7", kh.code("d"));
-    labelKeyMap.emplace_back("pad-8", kh.code("f"));
-    labelKeyMap.emplace_back("pad-9", kh.code("b"));
-    labelKeyMap.emplace_back("pad-10", kh.code("n"));
-    labelKeyMap.emplace_back("pad-11", kh.code("m"));
-    labelKeyMap.emplace_back("pad-12", kh.code("comma"));
-    labelKeyMap.emplace_back("pad-13", kh.code("g"));
-    labelKeyMap.emplace_back("pad-14", kh.code("h"));
-    labelKeyMap.emplace_back("pad-15", kh.code("j"));
-    labelKeyMap.emplace_back("pad-16", kh.code("k"));
-    labelKeyMap.emplace_back("datawheel-down", kh.code("minus"));
-    labelKeyMap.emplace_back("datawheel-up", kh.code("equals"));
-    labelKeyMap.emplace_back("ctrl", kh.code("control"));
-#ifdef __APPLE__
-    labelKeyMap.emplace_back("alt", kh.code("option"));
-#elif defined _WIN32 || defined __linux__
-    labelKeyMap.emplace_back("alt", kh.code("alternate"));
-#endif
+    labelKeyMap.emplace_back("left", VmpcKeyCode::VMPC_KEY_LeftArrow);
+    labelKeyMap.emplace_back("right", VmpcKeyCode::VMPC_KEY_RightArrow);
+    labelKeyMap.emplace_back("up", VmpcKeyCode::VMPC_KEY_UpArrow);
+    labelKeyMap.emplace_back("down", VmpcKeyCode::VMPC_KEY_DownArrow);
+    labelKeyMap.emplace_back("rec", VmpcKeyCode::VMPC_KEY_ANSI_L);
+    labelKeyMap.emplace_back("overdub", VmpcKeyCode::VMPC_KEY_ANSI_Semicolon);
+    labelKeyMap.emplace_back("stop", VmpcKeyCode::VMPC_KEY_ANSI_Quote);
+    labelKeyMap.emplace_back("play", VmpcKeyCode::VMPC_KEY_Space);
+    labelKeyMap.emplace_back("play-start", VmpcKeyCode::VMPC_KEY_ANSI_Backslash);
+    labelKeyMap.emplace_back("main-screen", VmpcKeyCode::VMPC_KEY_Escape);
+    labelKeyMap.emplace_back("open-window", VmpcKeyCode::VMPC_KEY_ANSI_I);
+    labelKeyMap.emplace_back("prev-step-event", VmpcKeyCode::VMPC_KEY_ANSI_Q);
+    labelKeyMap.emplace_back("next-step-event", VmpcKeyCode::VMPC_KEY_ANSI_W);
+    labelKeyMap.emplace_back("go-to", VmpcKeyCode::VMPC_KEY_ANSI_E);
+    labelKeyMap.emplace_back("prev-bar-start", VmpcKeyCode::VMPC_KEY_ANSI_R);
+    labelKeyMap.emplace_back("next-bar-end", VmpcKeyCode::VMPC_KEY_ANSI_T);
+    labelKeyMap.emplace_back("tap", VmpcKeyCode::VMPC_KEY_ANSI_Y);
+    labelKeyMap.emplace_back("next-seq", VmpcKeyCode::VMPC_KEY_ANSI_LeftBracket);
+    labelKeyMap.emplace_back("track-mute", VmpcKeyCode::VMPC_KEY_ANSI_RightBracket);
+    labelKeyMap.emplace_back("full-level", VmpcKeyCode::VMPC_KEY_ANSI_O);
+    labelKeyMap.emplace_back("sixteen-levels", VmpcKeyCode::VMPC_KEY_ANSI_P);
+    labelKeyMap.emplace_back("f1", VmpcKeyCode::VMPC_KEY_F1);
+    labelKeyMap.emplace_back("f2", VmpcKeyCode::VMPC_KEY_F2);
+    labelKeyMap.emplace_back("f3", VmpcKeyCode::VMPC_KEY_F3);
+    labelKeyMap.emplace_back("f4", VmpcKeyCode::VMPC_KEY_F4);
+    labelKeyMap.emplace_back("f5", VmpcKeyCode::VMPC_KEY_F5);
+    labelKeyMap.emplace_back("f6", VmpcKeyCode::VMPC_KEY_F6);
+    labelKeyMap.emplace_back("shift_#1", VmpcKeyCode::VMPC_KEY_Shift);
+    labelKeyMap.emplace_back("shift_#2", VmpcKeyCode::VMPC_KEY_LeftShift);
+    labelKeyMap.emplace_back("shift_#3", VmpcKeyCode::VMPC_KEY_RightShift);
+    labelKeyMap.emplace_back("enter", VmpcKeyCode::VMPC_KEY_Return);
+    labelKeyMap.emplace_back("undo-seq", VmpcKeyCode::VMPC_KEY_F10);
+    labelKeyMap.emplace_back("erase", VmpcKeyCode::VMPC_KEY_F8);
+    labelKeyMap.emplace_back("after", VmpcKeyCode::VMPC_KEY_F9);
+    labelKeyMap.emplace_back("bank-a", VmpcKeyCode::VMPC_KEY_Home);
+    labelKeyMap.emplace_back("bank-b", VmpcKeyCode::VMPC_KEY_End);
+    labelKeyMap.emplace_back("bank-c", VmpcKeyCode::VMPC_KEY_Insert);
+    labelKeyMap.emplace_back("bank-d", VmpcKeyCode::VMPC_KEY_Delete);
+    labelKeyMap.emplace_back("0", VmpcKeyCode::VMPC_KEY_ANSI_0);
+    labelKeyMap.emplace_back("1", VmpcKeyCode::VMPC_KEY_ANSI_1);
+    labelKeyMap.emplace_back("2", VmpcKeyCode::VMPC_KEY_ANSI_2);
+    labelKeyMap.emplace_back("3", VmpcKeyCode::VMPC_KEY_ANSI_3);
+    labelKeyMap.emplace_back("4", VmpcKeyCode::VMPC_KEY_ANSI_4);
+    labelKeyMap.emplace_back("5", VmpcKeyCode::VMPC_KEY_ANSI_5);
+    labelKeyMap.emplace_back("6", VmpcKeyCode::VMPC_KEY_ANSI_6);
+    labelKeyMap.emplace_back("7", VmpcKeyCode::VMPC_KEY_ANSI_7);
+    labelKeyMap.emplace_back("8", VmpcKeyCode::VMPC_KEY_ANSI_8);
+    labelKeyMap.emplace_back("9", VmpcKeyCode::VMPC_KEY_ANSI_9);
+    labelKeyMap.emplace_back("pad-1", VmpcKeyCode::VMPC_KEY_ANSI_Z);
+    labelKeyMap.emplace_back("pad-2", VmpcKeyCode::VMPC_KEY_ANSI_X);
+    labelKeyMap.emplace_back("pad-3", VmpcKeyCode::VMPC_KEY_ANSI_C);
+    labelKeyMap.emplace_back("pad-4", VmpcKeyCode::VMPC_KEY_ANSI_V);
+    labelKeyMap.emplace_back("pad-5", VmpcKeyCode::VMPC_KEY_ANSI_A);
+    labelKeyMap.emplace_back("pad-6", VmpcKeyCode::VMPC_KEY_ANSI_S);
+    labelKeyMap.emplace_back("pad-7", VmpcKeyCode::VMPC_KEY_ANSI_D);
+    labelKeyMap.emplace_back("pad-8", VmpcKeyCode::VMPC_KEY_ANSI_F);
+    labelKeyMap.emplace_back("pad-9", VmpcKeyCode::VMPC_KEY_ANSI_B);
+    labelKeyMap.emplace_back("pad-10", VmpcKeyCode::VMPC_KEY_ANSI_N);
+    labelKeyMap.emplace_back("pad-11", VmpcKeyCode::VMPC_KEY_ANSI_M);
+    labelKeyMap.emplace_back("pad-12", VmpcKeyCode::VMPC_KEY_ANSI_Comma);
+    labelKeyMap.emplace_back("pad-13", VmpcKeyCode::VMPC_KEY_ANSI_G);
+    labelKeyMap.emplace_back("pad-14", VmpcKeyCode::VMPC_KEY_ANSI_H);
+    labelKeyMap.emplace_back("pad-15", VmpcKeyCode::VMPC_KEY_ANSI_J);
+    labelKeyMap.emplace_back("pad-16", VmpcKeyCode::VMPC_KEY_ANSI_K);
+    labelKeyMap.emplace_back("datawheel-down", VmpcKeyCode::VMPC_KEY_ANSI_Minus);
+    labelKeyMap.emplace_back("datawheel-up", VmpcKeyCode::VMPC_KEY_ANSI_Equal);
+    labelKeyMap.emplace_back("ctrl", VmpcKeyCode::VMPC_KEY_Control);
+    labelKeyMap.emplace_back("alt", VmpcKeyCode::VMPC_KEY_OptionOrAlt);
 }
 
-int KbMapping::getKeyCodeFromLabel(const std::string& label) {
+const VmpcKeyCode KbMapping::getKeyCodeFromLabel(const std::string& label) {
 	for (auto& kv : labelKeyMap)
     {
         if (kv.first == label)
@@ -188,11 +178,12 @@ int KbMapping::getKeyCodeFromLabel(const std::string& label) {
             return kv.second;
         }
     }
-	return -1;
+
+	return VmpcKeyCode::VMPC_KEY_UNKNOWN;
 }
 
-std::string KbMapping::getHardwareComponentLabelAssociatedWithKeycode(int keyCode) {
-	for (std::pair<std::string, int>& mapping : labelKeyMap) {
+std::string KbMapping::getHardwareComponentLabelAssociatedWithKeycode(const VmpcKeyCode keyCode) {
+	for (std::pair<std::string, VmpcKeyCode>& mapping : labelKeyMap) {
 		std::string label = mapping.first;
 		if (keyCode == mapping.second)
         {
@@ -208,34 +199,12 @@ std::string KbMapping::getHardwareComponentLabelAssociatedWithKeycode(int keyCod
 	return "";
 }
 
-std::string KbMapping::getKeyCodeString(int keyCode, const bool oneChar)
+const std::string KbMapping::getKeyCodeString(const VmpcKeyCode keyCode, const bool oneChar)
 {
-    const KeyHelper &kh = KeyHelper::instance();
-	auto names = kh.names(keyCode);
-
-    if (names.size() > 1)
-    {
-		for (auto& s : names)
-        {
-            if (oneChar)
-            {
-                if (s.length() == 1) return s;
-                continue;
-            }
-		
-            if (s.length() > 3) return s;
-		}
-	}
-
-    if (names.empty())
-    {
-        return {};
-    }
-
-	return kh.name(keyCode);
+    return KeyCodeHelper::vmpcKeyCodeNames.at(keyCode);
 }
 
-void KbMapping::setKeyCodeForLabel(const int keyCode, const std::string& label)
+void KbMapping::setKeyCodeForLabel(const const VmpcKeyCode keyCode, const std::string& label)
 {
     for (auto& kv : labelKeyMap)
     {
@@ -243,74 +212,27 @@ void KbMapping::setKeyCodeForLabel(const int keyCode, const std::string& label)
     }
 }
 
-int KbMapping::getNextKeyCode(int keyCode)
+const VmpcKeyCode KbMapping::getPreviousKeyCode(const VmpcKeyCode keyCode)
 {
-    bool wasFound = false;
-    int last = -1;
-
-    int result = -1;
-
-    const KeyHelper &kh = KeyHelper::instance();
-
-    for (auto& kv : KeyCodes::keyCodeNames)
+    if (static_cast<int>(keyCode) - 1  >= 0)
     {
-        auto keyCode2 = kv.first;
-        if (wasFound && kh.is_valid(keyCode2))
-        {
-            result = keyCode2;
-            wasFound = false;
-        }
-
-        if (keyCode2 == keyCode)
-        {
-            wasFound = true;
-        }
-
-        last = keyCode2;
+        return static_cast<VmpcKeyCode>(static_cast<int>(keyCode) - 1);
     }
 
-    if (result != -1)
-    {
-        return result;
-    }
-    return last;
+    return static_cast<VmpcKeyCode>(0);
 }
 
-int KbMapping::getPreviousKeyCode(int keyCode)
+const VmpcKeyCode KbMapping::getNextKeyCode(const VmpcKeyCode keyCode)
 {
-    int first = -1;
-
-    int previous = -1;
-    int counter = 0;
-
-    const KeyHelper &kh = KeyHelper::instance();
-
-    for (auto& kv : KeyCodes::keyCodeNames)
+    if (static_cast<int>(keyCode) + 1 < static_cast<int>(VmpcKeyCode::VMPC_KEY_ENUMERATOR_SIZE))
     {
-        auto keyCode2 = kv.first;
-
-        if (first == -1)
-        {
-            first = keyCode2;
-        }
-
-        if (keyCode2 == keyCode && counter > 0)
-        {
-            return previous;
-        }
-
-        if (kh.is_valid(keyCode2))
-        {
-            previous = keyCode2;
-        }
-
-        counter++;
+        return static_cast<VmpcKeyCode>(static_cast<int>(keyCode) + 1);
     }
 
-    return first;
+    return static_cast<VmpcKeyCode>(static_cast<int>(VmpcKeyCode::VMPC_KEY_ENUMERATOR_SIZE) - 1);
 }
 
-std::vector<std::pair<std::string, int>>& KbMapping::getLabelKeyMap()
+std::vector<std::pair<std::string, VmpcKeyCode>>& KbMapping::getLabelKeyMap()
 {
     return labelKeyMap;
 }

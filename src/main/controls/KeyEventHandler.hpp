@@ -1,7 +1,6 @@
 #ifndef KeyEventHandler_h
 #define KeyEventHandler_h
 
-#include <memory>
 #include <vector>
 
 namespace mpc {

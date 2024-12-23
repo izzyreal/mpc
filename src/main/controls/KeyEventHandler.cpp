@@ -13,7 +13,7 @@
 #include <hardware/HwComponent.hpp>
 #include <hardware/DataWheel.hpp>
 
-#include "KeyCodes.hpp"
+#include "KeyCodeHelper.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -35,7 +35,8 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
 
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
-    bool isCapsLock = KeyCodes::getKeyCodeName(keyEvent.rawKeyCode) == "caps lock";
+    const auto vmpcKeyCode = KeyCodeHelper::getVmpcFromPlatformKeyCode(keyEvent.rawKeyCode);
+    const bool isCapsLock =  vmpcKeyCode == VmpcKeyCode::VMPC_KEY_CapsLock;
 
     // Special case as caps lock only sends key releases on OSX
     if (isCapsLock)
@@ -56,7 +57,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         if (keyEvent.keyDown)
         {
 
-//            Uncomment to disable key repeats
+//            Uncomment to disable key repeats:
 //            if (it != end(pressed))
 //                return;
 
@@ -75,7 +76,6 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     }
 
     auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-    auto keyCodeDisplayName = KeyCodes::getKeyCodeName(keyEvent.rawKeyCode);
 
     if (currentScreenName == "vmpc-keyboard")
     {
@@ -88,47 +88,47 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         }
         else
         {
-            if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_UpArrow])
+            if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_UpArrow)
             {
                 screen->up();
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_DownArrow])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_DownArrow)
             {
                 screen->down();
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F1])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_F1)
             {
                 screen->function(0);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F2])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_F2)
             {
                 screen->function(1);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F3])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_F3)
             {
                 screen->function(2);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F4])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_F4)
             {
                 screen->function(3);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F5])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_F5)
             {
                 screen->function(4);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_F6])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_F6)
             {
                 screen->function(5);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_Escape])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_Escape)
             {
                 screen->mainScreen();
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_ANSI_Equal])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_ANSI_Equal)
             {
                 screen->turnWheel(1);
             }
-            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::VMPC_KEY_ANSI_Minus])
+            else if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_ANSI_Minus)
             {
                 screen->turnWheel(-1);
             }
@@ -137,8 +137,8 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         return;
     }
 
-    bool allowTypingOfNames = true;
-    auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(keyEvent.rawKeyCode);
+    const bool allowTypingOfNames = true;
+    const auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(vmpcKeyCode);
 
     if (keyEvent.keyDown && currentScreenName == "name" && allowTypingOfNames)
     {
@@ -149,27 +149,29 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         if (label != "left" && label != "right" && label != "f2" && label != "f3" && label != "f4" &&
             label != "f5" && label != "datawheel-down" && label != "datawheel-up" && label != "main-screen")
         {
-            auto keyCodeString = kbMapping->getKeyCodeString(keyEvent.rawKeyCode);
+            const auto nameScreen = mpc.screens->get<NameScreen>("name");
 
-            if (keyCodeString == "space")
-            {
-                keyCodeString = " ";
-            }
-
-            auto nameScreen = mpc.screens->get<NameScreen>("name");
-
-            if (keyCodeString.length() == 1)
-            {
-                auto charWithCasing = static_cast<char>(mpc.getControls()->isShiftPressed() ? toupper(keyCodeString[0]) : tolower(keyCodeString[0]));
-                nameScreen->typeCharacter(charWithCasing);
-                return;
-            }
-
-            if (keyCodeString == "backspace")
+            if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_Backspace)
             {
                 nameScreen->backSpace();
                 return;
             }
+
+            if (vmpcKeyCode == VmpcKeyCode::VMPC_KEY_Delete)
+            {
+                //nameScreen->deleteCurrentChar();
+                return;
+            }
+            
+            const auto keyCodeChar = KeyCodeHelper::getCharForTypableVmpcKeyCode(vmpcKeyCode);
+
+            if (keyCodeChar == 0)
+            {
+                return;
+            }
+
+            const auto charWithCasing = static_cast<char>(mpc.getControls()->isShiftPressed() ? toupper(keyCodeChar) : tolower(keyCodeChar));
+            nameScreen->typeCharacter(charWithCasing);
         }
     }
 
@@ -203,8 +205,8 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         else if (label == "alt")
             mpc.getControls()->setAltPressed(keyEvent.keyDown);
 
-            // And we have some things that are not buttons. Probably pads should be handled here
-            // as well, so we can do some velocity calculation based on the current state of Mpc.
+        // And we have some things that are not buttons. Probably pads should be handled here
+        // as well, so we can do some velocity calculation based on the current state of Mpc.
         else if (label.find("datawheel-") != std::string::npos && keyEvent.keyDown)
         {
             int increment = 1;

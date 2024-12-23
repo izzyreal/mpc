@@ -16,7 +16,7 @@
 
 #include <StrUtil.hpp>
 
-#include <controls/KeyCodes.hpp>
+#include <controls/KeyCodeHelper.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -169,9 +169,9 @@ void VmpcKeyboardScreen::function(int i)
         case 3:
             if (learning)
             {
-                auto kbMapping = mpc.getControls()->getKbMapping().lock();
-                auto mapping = kbMapping->getLabelKeyMap()[row + rowOffset];
-                auto oldKeyCode = mapping.second;
+                const auto kbMapping = mpc.getControls()->getKbMapping().lock();
+                const auto mapping = kbMapping->getLabelKeyMap()[row + rowOffset];
+                const auto oldKeyCode = mapping.second;
                 
                 if (learnCandidate != oldKeyCode)
                 {
@@ -226,7 +226,7 @@ void VmpcKeyboardScreen::mainScreen()
 
 void VmpcKeyboardScreen::setLearnCandidate(const int rawKeyCode)
 {
-    learnCandidate = rawKeyCode;
+    learnCandidate = KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
     updateRows();
 }
 
@@ -261,7 +261,7 @@ void VmpcKeyboardScreen::updateRows()
         
         if (learning && i == row)
         {
-            f->setText(KeyCodes::getKeyCodeName(learnCandidate));
+            f->setText(KeyCodeHelper::vmpcKeyCodeNames.at(learnCandidate));
             f->setBlinking(true);
         }
         else
