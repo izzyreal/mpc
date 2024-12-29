@@ -3,14 +3,15 @@
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
-#include "controls/keyboard/UIKeyConstants.hpp"
+#include "controls/UIKeyConstants.hpp"
 #else
 #include <Carbon/Carbon.h>
 #endif
 #elif defined _WIN32
+#include <windows.h>
 #include <WinUser.h>
 #elif defined __linux__
-#include <X11/keysymdef.h>
+#include <X11/keysym.h>
 #endif
 
 using namespace mpc::controls;
@@ -133,7 +134,7 @@ const std::map<const VmpcKeyCode, const std::string> KeyCodeHelper::vmpcKeyCodeN
 };
 
 
-const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCodes = {
+const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCodes {
 
 #if defined(__APPLE__) && !TARGET_OS_IOS
     { kVK_Delete, VmpcKeyCode::VMPC_KEY_Backspace },
@@ -250,116 +251,115 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
     { kVK_PageDown, VmpcKeyCode::VMPC_KEY_PageDown }
 
 #elif defined(__APPLE__) && TARGET_OS_IOS
-        { UIKeyboardHIDUsageKeyboardF1, VmpcKeyCode::VMPC_KEY_F1 },
-        { UIKeyboardHIDUsageKeyboardF2, VmpcKeyCode::VMPC_KEY_F2 },
-        { UIKeyboardHIDUsageKeyboardF3, VmpcKeyCode::VMPC_KEY_F3 },
-        { UIKeyboardHIDUsageKeyboardF4, VmpcKeyCode::VMPC_KEY_F4 },
-        { UIKeyboardHIDUsageKeyboardF5, VmpcKeyCode::VMPC_KEY_F5 },
-        { UIKeyboardHIDUsageKeyboardF6, VmpcKeyCode::VMPC_KEY_F6 },
-        { UIKeyboardHIDUsageKeyboardF7, VmpcKeyCode::VMPC_KEY_F7 },
-        { UIKeyboardHIDUsageKeyboardF8, VmpcKeyCode::VMPC_KEY_F8 },
-        { UIKeyboardHIDUsageKeyboardF9, VmpcKeyCode::VMPC_KEY_F9 },
-        { UIKeyboardHIDUsageKeyboardF10, VmpcKeyCode::VMPC_KEY_F10 },
-        { UIKeyboardHIDUsageKeyboardF11, VmpcKeyCode::VMPC_KEY_F11 },
-        { UIKeyboardHIDUsageKeyboardF12, VmpcKeyCode::VMPC_KEY_F12 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF1, VmpcKeyCode::VMPC_KEY_F1 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF2, VmpcKeyCode::VMPC_KEY_F2 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF3, VmpcKeyCode::VMPC_KEY_F3 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF4, VmpcKeyCode::VMPC_KEY_F4 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF5, VmpcKeyCode::VMPC_KEY_F5 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF6, VmpcKeyCode::VMPC_KEY_F6 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF7, VmpcKeyCode::VMPC_KEY_F7 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF8, VmpcKeyCode::VMPC_KEY_F8 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF9, VmpcKeyCode::VMPC_KEY_F9 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF10, VmpcKeyCode::VMPC_KEY_F10 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF11, VmpcKeyCode::VMPC_KEY_F11 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF12, VmpcKeyCode::VMPC_KEY_F12 },
 
-        { UIKeyboardHIDUsageKeyboardEscape, VmpcKeyCode::VMPC_KEY_Escape },
-        { UIKeyboardHIDUsageKeyboardGraveAccentAndTilde, VmpcKeyCode::VMPC_KEY_ANSI_Grave },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardEscape, VmpcKeyCode::VMPC_KEY_Escape },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardGraveAccentAndTilde, VmpcKeyCode::VMPC_KEY_ANSI_Grave },
         { 0, VmpcKeyCode::VMPC_KEY_ISO_Section }, // No corresponding value
-        { UIKeyboardHIDUsageKeyboardTab, VmpcKeyCode::VMPC_KEY_Tab },
-        { UIKeyboardHIDUsageKeyboardCapsLock, VmpcKeyCode::VMPC_KEY_CapsLock },
-        { UIKeyboardHIDUsageKeyboardLeftShift, VmpcKeyCode::VMPC_KEY_Shift },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardTab, VmpcKeyCode::VMPC_KEY_Tab },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardCapsLock, VmpcKeyCode::VMPC_KEY_CapsLock },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardLeftShift, VmpcKeyCode::VMPC_KEY_Shift },
         { 0, VmpcKeyCode::VMPC_KEY_Function }, // No corresponding value
-        { UIKeyboardHIDUsageKeyboardLeftControl, VmpcKeyCode::VMPC_KEY_Control },
-        { UIKeyboardHIDUsageKeyboardAlt, VmpcKeyCode::VMPC_KEY_OptionOrAlt },
-        { UIKeyboardHIDUsageKeyboardLeftAlt, VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt },
-        { UIKeyboardHIDUsageKeyboardRightAlt, VmpcKeyCode::VMPC_KEY_RightOptionOrAlt },
-        { UIKeyboardHIDUsageKeyboardGUI, VmpcKeyCode::VMPC_KEY_Meta },
-        { UIKeyboardHIDUsageKeyboardLeftGUI, VmpcKeyCode::VMPC_KEY_LeftMeta },
-        { UIKeyboardHIDUsageKeyboardRightGUI, VmpcKeyCode::VMPC_KEY_RightMeta },
-        { UIKeyboardHIDUsageKeyboardHyphen, VmpcKeyCode::VMPC_KEY_ANSI_Minus },
-        { UIKeyboardHIDUsageKeyboardEqualSign, VmpcKeyCode::VMPC_KEY_ANSI_Equal },
-        { UIKeyboardHIDUsageKeyboardDeleteOrBackspace, VmpcKeyCode::VMPC_KEY_Delete },
-        { UIKeyboardHIDUsageKeyboardOpenBracket, VmpcKeyCode::VMPC_KEY_ANSI_LeftBracket },
-        { UIKeyboardHIDUsageKeyboardCloseBracket, VmpcKeyCode::VMPC_KEY_ANSI_RightBracket },
-        { UIKeyboardHIDUsageKeyboardBackslash, VmpcKeyCode::VMPC_KEY_ANSI_Backslash },
-        { UIKeyboardHIDUsageKeyboardSemicolon, VmpcKeyCode::VMPC_KEY_ANSI_Semicolon },
-        { UIKeyboardHIDUsageKeyboardQuote, VmpcKeyCode::VMPC_KEY_ANSI_Quote },
-        { UIKeyboardHIDUsageKeyboardReturnOrEnter, VmpcKeyCode::VMPC_KEY_Return },
-        { UIKeyboardHIDUsageKeyboardComma, VmpcKeyCode::VMPC_KEY_ANSI_Comma },
-        { UIKeyboardHIDUsageKeyboardPeriod, VmpcKeyCode::VMPC_KEY_ANSI_Period },
-        { UIKeyboardHIDUsageKeyboardSlash, VmpcKeyCode::VMPC_KEY_ANSI_Slash },
-        { UIKeyboardHIDUsageKeyboardRightShift, VmpcKeyCode::VMPC_KEY_RightShift },
-        { UIKeyboardHIDUsageKeyboardRightAlt, VmpcKeyCode::VMPC_KEY_RightOptionOrAlt },
-        { UIKeyboardHIDUsageKeyboardSpacebar, VmpcKeyCode::VMPC_KEY_Space },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardLeftControl, VmpcKeyCode::VMPC_KEY_Control },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardLeftAlt, VmpcKeyCode::VMPC_KEY_OptionOrAlt },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardLeftAlt, VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardRightAlt, VmpcKeyCode::VMPC_KEY_RightOptionOrAlt },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardLeftGUI, VmpcKeyCode::VMPC_KEY_LeftMeta },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardRightGUI, VmpcKeyCode::VMPC_KEY_RightMeta },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardHyphen, VmpcKeyCode::VMPC_KEY_ANSI_Minus },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardEqualSign, VmpcKeyCode::VMPC_KEY_ANSI_Equal },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardDeleteOrBackspace, VmpcKeyCode::VMPC_KEY_Delete },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardOpenBracket, VmpcKeyCode::VMPC_KEY_ANSI_LeftBracket },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardCloseBracket, VmpcKeyCode::VMPC_KEY_ANSI_RightBracket },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardBackslash, VmpcKeyCode::VMPC_KEY_ANSI_Backslash },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardSemicolon, VmpcKeyCode::VMPC_KEY_ANSI_Semicolon },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardQuote, VmpcKeyCode::VMPC_KEY_ANSI_Quote },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardReturnOrEnter, VmpcKeyCode::VMPC_KEY_Return },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardComma, VmpcKeyCode::VMPC_KEY_ANSI_Comma },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardPeriod, VmpcKeyCode::VMPC_KEY_ANSI_Period },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardSlash, VmpcKeyCode::VMPC_KEY_ANSI_Slash },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardRightShift, VmpcKeyCode::VMPC_KEY_RightShift },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardRightAlt, VmpcKeyCode::VMPC_KEY_RightOptionOrAlt },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardSpacebar, VmpcKeyCode::VMPC_KEY_Space },
 
-        { UIKeyboardHIDUsageKeypad0, VmpcKeyCode::VMPC_KEY_ANSI_Keypad0 },
-        { UIKeyboardHIDUsageKeypad1, VmpcKeyCode::VMPC_KEY_ANSI_Keypad1 },
-        { UIKeyboardHIDUsageKeypad2, VmpcKeyCode::VMPC_KEY_ANSI_Keypad2 },
-        { UIKeyboardHIDUsageKeypad3, VmpcKeyCode::VMPC_KEY_ANSI_Keypad3 },
-        { UIKeyboardHIDUsageKeypad4, VmpcKeyCode::VMPC_KEY_ANSI_Keypad4 },
-        { UIKeyboardHIDUsageKeypad5, VmpcKeyCode::VMPC_KEY_ANSI_Keypad5 },
-        { UIKeyboardHIDUsageKeypad6, VmpcKeyCode::VMPC_KEY_ANSI_Keypad6 },
-        { UIKeyboardHIDUsageKeypad7, VmpcKeyCode::VMPC_KEY_ANSI_Keypad7 },
-        { UIKeyboardHIDUsageKeypad8, VmpcKeyCode::VMPC_KEY_ANSI_Keypad8 },
-        { UIKeyboardHIDUsageKeypad9, VmpcKeyCode::VMPC_KEY_ANSI_Keypad9 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad0, VmpcKeyCode::VMPC_KEY_ANSI_Keypad0 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad1, VmpcKeyCode::VMPC_KEY_ANSI_Keypad1 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad2, VmpcKeyCode::VMPC_KEY_ANSI_Keypad2 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad3, VmpcKeyCode::VMPC_KEY_ANSI_Keypad3 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad4, VmpcKeyCode::VMPC_KEY_ANSI_Keypad4 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad5, VmpcKeyCode::VMPC_KEY_ANSI_Keypad5 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad6, VmpcKeyCode::VMPC_KEY_ANSI_Keypad6 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad7, VmpcKeyCode::VMPC_KEY_ANSI_Keypad7 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad8, VmpcKeyCode::VMPC_KEY_ANSI_Keypad8 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypad9, VmpcKeyCode::VMPC_KEY_ANSI_Keypad9 },
 
-        { UIKeyboardHIDUsageKeyboard0, VmpcKeyCode::VMPC_KEY_ANSI_0 },
-        { UIKeyboardHIDUsageKeyboard1, VmpcKeyCode::VMPC_KEY_ANSI_1 },
-        { UIKeyboardHIDUsageKeyboard2, VmpcKeyCode::VMPC_KEY_ANSI_2 },
-        { UIKeyboardHIDUsageKeyboard3, VmpcKeyCode::VMPC_KEY_ANSI_3 },
-        { UIKeyboardHIDUsageKeyboard4, VmpcKeyCode::VMPC_KEY_ANSI_4 },
-        { UIKeyboardHIDUsageKeyboard5, VmpcKeyCode::VMPC_KEY_ANSI_5 },
-        { UIKeyboardHIDUsageKeyboard6, VmpcKeyCode::VMPC_KEY_ANSI_6 },
-        { UIKeyboardHIDUsageKeyboard7, VmpcKeyCode::VMPC_KEY_ANSI_7 },
-        { UIKeyboardHIDUsageKeyboard8, VmpcKeyCode::VMPC_KEY_ANSI_8 },
-        { UIKeyboardHIDUsageKeyboard9, VmpcKeyCode::VMPC_KEY_ANSI_9 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard0, VmpcKeyCode::VMPC_KEY_ANSI_0 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard1, VmpcKeyCode::VMPC_KEY_ANSI_1 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard2, VmpcKeyCode::VMPC_KEY_ANSI_2 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard3, VmpcKeyCode::VMPC_KEY_ANSI_3 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard4, VmpcKeyCode::VMPC_KEY_ANSI_4 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard5, VmpcKeyCode::VMPC_KEY_ANSI_5 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard6, VmpcKeyCode::VMPC_KEY_ANSI_6 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard7, VmpcKeyCode::VMPC_KEY_ANSI_7 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard8, VmpcKeyCode::VMPC_KEY_ANSI_8 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboard9, VmpcKeyCode::VMPC_KEY_ANSI_9 },
 
-        { UIKeyboardHIDUsageKeyboardQ, VmpcKeyCode::VMPC_KEY_ANSI_Q },
-        { UIKeyboardHIDUsageKeyboardW, VmpcKeyCode::VMPC_KEY_ANSI_W },
-        { UIKeyboardHIDUsageKeyboardE, VmpcKeyCode::VMPC_KEY_ANSI_E },
-        { UIKeyboardHIDUsageKeyboardR, VmpcKeyCode::VMPC_KEY_ANSI_R },
-        { UIKeyboardHIDUsageKeyboardT, VmpcKeyCode::VMPC_KEY_ANSI_T },
-        { UIKeyboardHIDUsageKeyboardY, VmpcKeyCode::VMPC_KEY_ANSI_Y },
-        { UIKeyboardHIDUsageKeyboardU, VmpcKeyCode::VMPC_KEY_ANSI_U },
-        { UIKeyboardHIDUsageKeyboardI, VmpcKeyCode::VMPC_KEY_ANSI_I },
-        { UIKeyboardHIDUsageKeyboardO, VmpcKeyCode::VMPC_KEY_ANSI_O },
-        { UIKeyboardHIDUsageKeyboardP, VmpcKeyCode::VMPC_KEY_ANSI_P },
-        { UIKeyboardHIDUsageKeyboardA, VmpcKeyCode::VMPC_KEY_ANSI_A },
-        { UIKeyboardHIDUsageKeyboardS, VmpcKeyCode::VMPC_KEY_ANSI_S },
-        { UIKeyboardHIDUsageKeyboardD, VmpcKeyCode::VMPC_KEY_ANSI_D },
-        { UIKeyboardHIDUsageKeyboardF, VmpcKeyCode::VMPC_KEY_ANSI_F },
-        { UIKeyboardHIDUsageKeyboardG, VmpcKeyCode::VMPC_KEY_ANSI_G },
-        { UIKeyboardHIDUsageKeyboardH, VmpcKeyCode::VMPC_KEY_ANSI_H },
-        { UIKeyboardHIDUsageKeyboardJ, VmpcKeyCode::VMPC_KEY_ANSI_J },
-        { UIKeyboardHIDUsageKeyboardK, VmpcKeyCode::VMPC_KEY_ANSI_K },
-        { UIKeyboardHIDUsageKeyboardL, VmpcKeyCode::VMPC_KEY_ANSI_L },
-        { UIKeyboardHIDUsageKeyboardZ, VmpcKeyCode::VMPC_KEY_ANSI_Z },
-        { UIKeyboardHIDUsageKeyboardX, VmpcKeyCode::VMPC_KEY_ANSI_X },
-        { UIKeyboardHIDUsageKeyboardC, VmpcKeyCode::VMPC_KEY_ANSI_C },
-        { UIKeyboardHIDUsageKeyboardV, VmpcKeyCode::VMPC_KEY_ANSI_V },
-        { UIKeyboardHIDUsageKeyboardB, VmpcKeyCode::VMPC_KEY_ANSI_B },
-        { UIKeyboardHIDUsageKeyboardN, VmpcKeyCode::VMPC_KEY_ANSI_N },
-        { UIKeyboardHIDUsageKeyboardM, VmpcKeyCode::VMPC_KEY_ANSI_M },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardQ, VmpcKeyCode::VMPC_KEY_ANSI_Q },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardW, VmpcKeyCode::VMPC_KEY_ANSI_W },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardE, VmpcKeyCode::VMPC_KEY_ANSI_E },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardR, VmpcKeyCode::VMPC_KEY_ANSI_R },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardT, VmpcKeyCode::VMPC_KEY_ANSI_T },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardY, VmpcKeyCode::VMPC_KEY_ANSI_Y },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardU, VmpcKeyCode::VMPC_KEY_ANSI_U },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardI, VmpcKeyCode::VMPC_KEY_ANSI_I },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardO, VmpcKeyCode::VMPC_KEY_ANSI_O },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardP, VmpcKeyCode::VMPC_KEY_ANSI_P },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardA, VmpcKeyCode::VMPC_KEY_ANSI_A },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardS, VmpcKeyCode::VMPC_KEY_ANSI_S },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardD, VmpcKeyCode::VMPC_KEY_ANSI_D },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardF, VmpcKeyCode::VMPC_KEY_ANSI_F },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardG, VmpcKeyCode::VMPC_KEY_ANSI_G },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardH, VmpcKeyCode::VMPC_KEY_ANSI_H },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardJ, VmpcKeyCode::VMPC_KEY_ANSI_J },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardK, VmpcKeyCode::VMPC_KEY_ANSI_K },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardL, VmpcKeyCode::VMPC_KEY_ANSI_L },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardZ, VmpcKeyCode::VMPC_KEY_ANSI_Z },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardX, VmpcKeyCode::VMPC_KEY_ANSI_X },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardC, VmpcKeyCode::VMPC_KEY_ANSI_C },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardV, VmpcKeyCode::VMPC_KEY_ANSI_V },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardB, VmpcKeyCode::VMPC_KEY_ANSI_B },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardN, VmpcKeyCode::VMPC_KEY_ANSI_N },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardM, VmpcKeyCode::VMPC_KEY_ANSI_M },
 
-        { UIKeyboardHIDUsageKeyboardLeftArrow, VmpcKeyCode::VMPC_KEY_LeftArrow },
-        { UIKeyboardHIDUsageKeyboardRightArrow, VmpcKeyCode::VMPC_KEY_RightArrow },
-        { UIKeyboardHIDUsageKeyboardUpArrow, VmpcKeyCode::VMPC_KEY_UpArrow },
-        { UIKeyboardHIDUsageKeyboardDownArrow, VmpcKeyCode::VMPC_KEY_DownArrow },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardLeftArrow, VmpcKeyCode::VMPC_KEY_LeftArrow },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardRightArrow, VmpcKeyCode::VMPC_KEY_RightArrow },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardUpArrow, VmpcKeyCode::VMPC_KEY_UpArrow },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardDownArrow, VmpcKeyCode::VMPC_KEY_DownArrow },
 
         { 0, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDecimal },
-        { UIKeyboardHIDUsageKeypadAsterisk, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply },
-        { UIKeyboardHIDUsageKeypadPlus, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadAsterisk, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadPlus, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus },
         { 0, VmpcKeyCode::VMPC_KEY_ANSI_KeypadClear }, // No corresponding value
-        { UIKeyboardHIDUsageKeypadSlash, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide },
-        { UIKeyboardHIDUsageKeypadEnter, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter },
-        { UIKeyboardHIDUsageKeypadHyphen, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus },
-        { UIKeyboardHIDUsageKeypadEqualSign, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEquals },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadSlash, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadEnter, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadHyphen, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadEqualSign, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEquals },
 
-        { UIKeyboardHIDUsageKeyboardHome, VmpcKeyCode::VMPC_KEY_Home },
-        { UIKeyboardHIDUsageKeyboardPageUp, VmpcKeyCode::VMPC_KEY_PageUp },
-        { UIKeyboardHIDUsageKeyboardEnd, VmpcKeyCode::VMPC_KEY_End },
-        { UIKeyboardHIDUsageKeyboardPageDown, VmpcKeyCode::VMPC_KEY_PageDown }
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardHome, VmpcKeyCode::VMPC_KEY_Home },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardPageUp, VmpcKeyCode::VMPC_KEY_PageUp },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardEnd, VmpcKeyCode::VMPC_KEY_End },
+        { UIKeyConstants::UIKeyboardHIDUsageKeyboardPageDown, VmpcKeyCode::VMPC_KEY_PageDown }
 
 
 #elif defined _WIN32
@@ -469,7 +469,7 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
         { VK_PRIOR, VmpcKeyCode::VMPC_KEY_PageUp },
         { VK_END, VmpcKeyCode::VMPC_KEY_End },
         { VK_NEXT, VmpcKeyCode::VMPC_KEY_PageDown },
-        { VK_BACKSPACE, VmpcKeyCode::VMPC_KEY_Backspace }
+        { VK_BACK, VmpcKeyCode::VMPC_KEY_Backspace }
 
 #elif defined __linux__
 
@@ -486,13 +486,17 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
         { XK_F11, VmpcKeyCode::VMPC_KEY_F11 },
         { XK_F12, VmpcKeyCode::VMPC_KEY_F12 },
 
-        { XK_Backspace, VmpcKeyCode::VMPC_KEY_Backspace },
+        { XK_BackSpace, VmpcKeyCode::VMPC_KEY_Backspace },
         { XK_Escape, VmpcKeyCode::VMPC_KEY_Escape },
         { XK_Tab, VmpcKeyCode::VMPC_KEY_Tab },
         { XK_Caps_Lock, VmpcKeyCode::VMPC_KEY_CapsLock },
         { XK_Shift_L, VmpcKeyCode::VMPC_KEY_Shift },
+        { XK_Shift_L, VmpcKeyCode::VMPC_KEY_LeftShift },
+        { XK_Shift_R, VmpcKeyCode::VMPC_KEY_RightShift },
         { XK_Control_L, VmpcKeyCode::VMPC_KEY_Control },
-        { XK_Alt, VmpcKeyCode::VMPC_KEY_OptionOrAlt },
+        { XK_Control_L, VmpcKeyCode::VMPC_KEY_LeftControl },
+        { XK_Control_R, VmpcKeyCode::VMPC_KEY_LeftControl },
+        { XK_Alt_L, VmpcKeyCode::VMPC_KEY_OptionOrAlt },
         { XK_Alt_L, VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt },
         { XK_Alt_R, VmpcKeyCode::VMPC_KEY_RightOptionOrAlt },
         { XK_minus, VmpcKeyCode::VMPC_KEY_ANSI_Minus },
@@ -560,7 +564,7 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
 #endif
 };
 
-const std::map<const VmpcKeyCode, const char> KeyCodeHelper::typableVmpcKeyCodes = {
+const std::map<const VmpcKeyCode, const char> KeyCodeHelper::typableVmpcKeyCodes {
     { VmpcKeyCode::VMPC_KEY_ANSI_0, '0' },
     { VmpcKeyCode::VMPC_KEY_ANSI_1, '1' },
     { VmpcKeyCode::VMPC_KEY_ANSI_2, '2' },

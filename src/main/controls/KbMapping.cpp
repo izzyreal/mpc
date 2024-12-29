@@ -204,7 +204,7 @@ const std::string KbMapping::getKeyCodeString(const VmpcKeyCode keyCode, const b
     return KeyCodeHelper::vmpcKeyCodeNames.at(keyCode);
 }
 
-void KbMapping::setKeyCodeForLabel(const const VmpcKeyCode keyCode, const std::string& label)
+void KbMapping::setKeyCodeForLabel(const VmpcKeyCode keyCode, const std::string& label)
 {
     for (auto& kv : labelKeyMap)
     {
