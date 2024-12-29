@@ -12,6 +12,8 @@
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
+#include "KeyboardLayout.hpp"
+
 using namespace mpc::controls;
 
 Controls::Controls(mpc::Mpc& _mpc) : 
@@ -22,6 +24,28 @@ Controls::Controls(mpc::Mpc& _mpc) :
 	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
 	kbMapping (std::make_shared<KbMapping>(_mpc))
 {
+    const auto layout = KeyboardLayout::getCurrentKeyboardLayout();
+
+    for (auto &entry : layout)
+    {
+        const auto kc = entry.first;
+        const auto &charWithoutModifiers = entry.second.charWithoutModifiers;
+        const auto &charWithShiftModifier = entry.second.charWithShiftModifier;
+
+		if (charWithoutModifiers.empty() && charWithShiftModifier.empty())
+		{
+			return;
+		}
+
+        if (charWithShiftModifier.empty())
+        {
+            printf("For keycode '%i' we have char '%s' without modifiers\n", kc, charWithoutModifiers.c_str());
+        }
+        else
+        {
+            printf("For keycode '%i' we have char '%s' without modifiers, and '%s' with Shift\n", kc, charWithoutModifiers.c_str(), charWithShiftModifier.c_str());
+        }
+    }
 }
 
 std::weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
