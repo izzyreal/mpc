@@ -4,9 +4,10 @@
 
 #if __APPLE__
 #include <TargetConditionals.h>
-#if TARGET_OS_IOS == 1
+#if TARGET_OS_IOS
 #include "UIKeyConstants.hpp"
-#elif TARGET_OS_OSX == 1
+#include "UITextInputModeBridge.hpp"
+#elif TARGET_OS_OSX
 #include <Carbon/Carbon.h>
 #endif
 #elif defined (_WIN32)
@@ -152,54 +153,69 @@ namespace mpc::controls {
             }
             return result;
 #elif defined(__APPLE__) && (TARGET_OS_IOS == 1)
-            std::map<const int, const KeyCodeInfo> result {
+            
+            const auto automaticHardwareLayout = getAutomaticHardwareLayout();
+            printf("\n\n==========\nautomaticHardwareLayout: %s\n============\n\n", automaticHardwareLayout.c_str());
+            
+            std::map<const int, const KeyCodeInfo> letters {
                 { UIKeyConstants::UIKeyboardHIDUsageKeyboardA, { "a", "A" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardB, { "b", "B" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardC, { "c", "C" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardD, { "d", "D" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardE, { "e", "E" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardF, { "f", "F" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardG, { "g", "G" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardH, { "h", "H" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardI, { "i", "I" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardJ, { "j", "J" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardK, { "k", "K" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardL, { "l", "L" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardM, { "m", "M" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardN, { "n", "N" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardO, { "o", "O" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardP, { "p", "P" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardQ, { "q", "Q" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardR, { "r", "R" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardS, { "s", "S" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardT, { "t", "T" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardU, { "u", "U" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardV, { "v", "V" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardW, { "w", "W" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardX, { "x", "X" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardY, { "y", "Y" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardZ, { "z", "Z" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard1, { "1", "!" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard2, { "2", "@" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard3, { "3", "#" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard4, { "4", "$" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard5, { "5", "%" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard6, { "6", "^" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard7, { "7", "&" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard8, { "8", "*" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard9, { "9", "(" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboard0, { "0", ")" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardHyphen, { "-", "_" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardEqualSign, { "=", "+" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardOpenBracket, { "[", "{" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardCloseBracket, { "]", "}" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardBackslash, { "\\", "|" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardSemicolon, { ";", ":" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardQuote, { "'", "\"" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardComma, { ",", "<" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardPeriod, { ".", ">" } },
-                    { UIKeyConstants::UIKeyboardHIDUsageKeyboardSlash, { "/", "?" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardB, { "b", "B" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardC, { "c", "C" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardD, { "d", "D" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardE, { "e", "E" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardF, { "f", "F" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardG, { "g", "G" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardH, { "h", "H" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardI, { "i", "I" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardJ, { "j", "J" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardK, { "k", "K" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardL, { "l", "L" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardM, { "m", "M" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardN, { "n", "N" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardO, { "o", "O" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardP, { "p", "P" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardQ, { "q", "Q" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardR, { "r", "R" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardS, { "s", "S" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardT, { "t", "T" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardU, { "u", "U" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardV, { "v", "V" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardW, { "w", "W" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardX, { "x", "X" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardY, { "y", "Y" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardZ, { "z", "Z" } }
             };
+            
+            std::map<const int, const KeyCodeInfo> numbers {
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard1, { "1", "!" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard2, { "2", "@" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard3, { "3", "#" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard4, { "4", "$" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard5, { "5", "%" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard6, { "6", "^" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard7, { "7", "&" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard8, { "8", "*" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard9, { "9", "(" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboard0, { "0", ")" } }
+            };
+            
+            std::map<const int, const KeyCodeInfo> specialCharacters {
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardHyphen, { "-", "_" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardEqualSign, { "=", "+" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardOpenBracket, { "[", "{" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardCloseBracket, { "]", "}" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardBackslash, { "\\", "|" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardSemicolon, { ";", ":" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardQuote, { "'", "\"" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardComma, { ",", "<" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardPeriod, { ".", ">" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardSlash, { "/", "?" } }
+            };
+            
+            std::map<const int, const KeyCodeInfo> result = letters;
+            result.insert(numbers.begin(), numbers.end());
+            result.insert(specialCharacters.begin(), specialCharacters.end());
+            
             return result;
 #elif defined(__linux__)
             std::map<const int, const KeyCodeInfo> result;
