@@ -199,11 +199,6 @@ std::string KbMapping::getHardwareComponentLabelAssociatedWithKeycode(const Vmpc
 	return "";
 }
 
-const std::string KbMapping::getKeyCodeString(const VmpcKeyCode keyCode, const bool oneChar)
-{
-    return KeyCodeHelper::vmpcKeyCodeNames.at(keyCode);
-}
-
 void KbMapping::setKeyCodeForLabel(const VmpcKeyCode keyCode, const std::string& label)
 {
     for (auto& kv : labelKeyMap)

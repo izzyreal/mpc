@@ -1,5 +1,7 @@
 #include "KeyCodeHelper.hpp"
 
+#include "KeyboardLayout.hpp"
+
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
@@ -15,124 +17,6 @@
 #endif
 
 using namespace mpc::controls;
-
-const std::map<const VmpcKeyCode, const std::string> KeyCodeHelper::vmpcKeyCodeNames = {
-    { VmpcKeyCode::VMPC_KEY_F1, "F1"  },
-    { VmpcKeyCode::VMPC_KEY_F2, "F2"  },
-    { VmpcKeyCode::VMPC_KEY_F3, "F3"  },
-    { VmpcKeyCode::VMPC_KEY_F4, "F4"  },
-    { VmpcKeyCode::VMPC_KEY_F5 , "F5"  },
-    { VmpcKeyCode::VMPC_KEY_F6 , "F6"  },
-    { VmpcKeyCode::VMPC_KEY_F7 , "F7"  },
-    { VmpcKeyCode::VMPC_KEY_F8, "F8"  },
-    { VmpcKeyCode::VMPC_KEY_F9, "F9"  },
-    { VmpcKeyCode::VMPC_KEY_F10, "F10" },
-    { VmpcKeyCode::VMPC_KEY_F11, "F11" },
-    { VmpcKeyCode::VMPC_KEY_F12, "F12" },
-
-    { VmpcKeyCode::VMPC_KEY_Escape, "esc" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Grave, "` (backtick)" },
-    { VmpcKeyCode::VMPC_KEY_ISO_Section, "§ (section mark)" },
-    { VmpcKeyCode::VMPC_KEY_Tab, "tab" },
-    { VmpcKeyCode::VMPC_KEY_CapsLock, "caps lock" },
-    { VmpcKeyCode::VMPC_KEY_Shift, "shift" },
-    { VmpcKeyCode::VMPC_KEY_LeftShift, "left shift" },
-    { VmpcKeyCode::VMPC_KEY_RightShift, "right shift" },
-    { VmpcKeyCode::VMPC_KEY_Function, "fn" },
-    { VmpcKeyCode::VMPC_KEY_Control, "control" },
-    { VmpcKeyCode::VMPC_KEY_LeftControl, "left control" },
-    { VmpcKeyCode::VMPC_KEY_RightControl, "right control" },
-    { VmpcKeyCode::VMPC_KEY_OptionOrAlt, "option/alt" },
-    { VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt, "left option/alt" },
-    { VmpcKeyCode::VMPC_KEY_RightOptionOrAlt, "right option/alt" },
-    { VmpcKeyCode::VMPC_KEY_LeftMeta, "left start/command/meta" },
-    { VmpcKeyCode::VMPC_KEY_RightMeta, "right start/command/meta" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Minus, "minus" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Equal, "equals" },
-    { VmpcKeyCode::VMPC_KEY_Delete, "delete" },
-    { VmpcKeyCode::VMPC_KEY_Insert, "insert" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_LeftBracket, "{ (left bracket)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_RightBracket, "} (right bracket)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Backslash, "\\ (backslash)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Semicolon, "; (semicolon)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Quote, "' (quote)" },
-    { VmpcKeyCode::VMPC_KEY_Return, "return" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter, "keypad enter" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Comma, ", (comma)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Period, ". (period)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Slash, "/ (slash)" },
-    { VmpcKeyCode::VMPC_KEY_Space, "space" },
-
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad0, "Keypad 0" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad1, "Keypad 1" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad2, "Keypad 2" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad3, "Keypad 3" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad4, "Keypad 4" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad5, "Keypad 5" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad6, "Keypad 6" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad7, "Keypad 7" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad8, "Keypad 8" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Keypad9, "Keypad 9" },
-
-    { VmpcKeyCode::VMPC_KEY_ANSI_0, "0" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_1, "1" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_2, "2" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_3, "3" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_4, "4" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_5, "5" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_6, "6" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_7, "7" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_8, "8" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_9, "9" },
-
-    { VmpcKeyCode::VMPC_KEY_ANSI_Q, "q" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_W, "w" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_E, "e" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_R, "r" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_T, "t" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Y, "y" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_U, "u" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_I, "i" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_O, "o" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_P, "p" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_A, "a" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_S, "s" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_D, "d" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_F, "f" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_G, "g" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_H, "h" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_J, "j" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_K, "k" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_L, "l (letter L)" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_Z, "z" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_X, "x" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_C, "c" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_V, "v" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_B, "b" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_N, "n" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_M, "m" },
-
-    { VmpcKeyCode::VMPC_KEY_LeftArrow, "cursor left"  },
-    { VmpcKeyCode::VMPC_KEY_RightArrow, "cursor right" },
-    { VmpcKeyCode::VMPC_KEY_UpArrow, "cursor up"    },
-    { VmpcKeyCode::VMPC_KEY_DownArrow, "cursor down"  },
-
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadDecimal, "keypad decimal" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply, "keypad multiply" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus, "keypad plus" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadClear, "keypad clear" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide, "keypad divide" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter, "keypad enter" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus, "keypad minus" },
-    { VmpcKeyCode::VMPC_KEY_ANSI_KeypadEquals, "keypad equals" },
-
-    { VmpcKeyCode::VMPC_KEY_Home, "home" },
-    { VmpcKeyCode::VMPC_KEY_PageUp, "page up" },
-    { VmpcKeyCode::VMPC_KEY_End, "end" },
-    { VmpcKeyCode::VMPC_KEY_PageDown, "page down" },
-    { VmpcKeyCode::VMPC_KEY_Backspace, "backspace" }
-};
-
 
 const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCodes {
 
@@ -361,10 +245,9 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardEnd, VmpcKeyCode::VMPC_KEY_End },
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardPageDown, VmpcKeyCode::VMPC_KEY_PageDown }
 
-
 #elif defined _WIN32
 
-    { VK_F1, VmpcKeyCode::VMPC_KEY_F1 },
+        { VK_F1, VmpcKeyCode::VMPC_KEY_F1 },
         { VK_F2, VmpcKeyCode::VMPC_KEY_F2 },
         { VK_F3, VmpcKeyCode::VMPC_KEY_F3 },
         { VK_F4, VmpcKeyCode::VMPC_KEY_F4 },
@@ -473,7 +356,7 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
 
 #elif defined __linux__
 
-    { XK_F1, VmpcKeyCode::VMPC_KEY_F1 },
+        { XK_F1, VmpcKeyCode::VMPC_KEY_F1 },
         { XK_F2, VmpcKeyCode::VMPC_KEY_F2 },
         { XK_F3, VmpcKeyCode::VMPC_KEY_F3 },
         { XK_F4, VmpcKeyCode::VMPC_KEY_F4 },
@@ -607,7 +490,7 @@ const std::map<const VmpcKeyCode, const char> KeyCodeHelper::typableVmpcKeyCodes
 
 const VmpcKeyCode KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKeyCode)
 {
-    if (platformToVmpcKeyCodes.find(platformKeyCode) == platformToVmpcKeyCodes.end())
+    if (platformToVmpcKeyCodes.count(platformKeyCode) == 0)
     {
         return VmpcKeyCode::VMPC_KEY_UNKNOWN;
     }
@@ -617,7 +500,7 @@ const VmpcKeyCode KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKe
 
 const char KeyCodeHelper::getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
 {
-    if (typableVmpcKeyCodes.find(vmpcKeyCode) == typableVmpcKeyCodes.end())
+    if (typableVmpcKeyCodes.count(vmpcKeyCode) == 0)
     {
         return 0;
     }
@@ -625,3 +508,35 @@ const char KeyCodeHelper::getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKey
     return typableVmpcKeyCodes.at(vmpcKeyCode);
 }
 
+const int KeyCodeHelper::getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
+{
+    for (auto &kv : platformToVmpcKeyCodes)
+    {
+        if (kv.second == vmpcKeyCode)
+        {
+            return kv.first;
+        }
+    }
+
+    return -1;
+}
+
+const std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)
+{
+    const auto platformKeyCode = getPlatformFromVmpcKeyCode(vmpcKeyCode);
+
+    if (platformKeyCode == - 1)
+    {
+        return {};
+    }
+
+    const auto layout = KeyboardLayout::getCurrentKeyboardLayout();
+
+    if (layout.count(platformKeyCode) == 0)
+    {
+        return {};
+    }
+
+    auto keyCodeInfo = layout.at(platformKeyCode);
+    return keyCodeInfo.charWithoutModifiers;
+}

@@ -156,16 +156,18 @@ namespace mpc::controls
     class KeyCodeHelper
     {
         public:
-            static const std::map<const VmpcKeyCode, const std::string> vmpcKeyCodeNames;
-
             static const VmpcKeyCode getVmpcFromPlatformKeyCode(const int platformKeyCode);
             
             static const char getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
+
+            static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
 
         private:
             static const std::map<const int, const VmpcKeyCode> platformToVmpcKeyCodes;
 
             static const std::map<const VmpcKeyCode, const char> typableVmpcKeyCodes;
+
+            static const int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
     };
 } // namespace mpc::controls

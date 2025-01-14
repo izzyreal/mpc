@@ -13,6 +13,7 @@
 #include <lcdgui/Field.hpp>
 
 #include <controls/KbMapping.hpp>
+#include "controls/KeyCodeHelper.hpp"
 
 #include <StrUtil.hpp>
 
@@ -255,13 +256,13 @@ void VmpcKeyboardScreen::updateRows()
         }
 
         l->setText(labelText);
-        const auto truncatedKeyCodeString = kbMapping->getKeyCodeString(mapping.second).substr(0, 21);  
+        const auto truncatedKeyCodeString = mpc::controls::KeyCodeHelper::getKeyCodeString(mapping.second);
         f->setText(truncatedKeyCodeString);
         f->setInverted(row == i);
         
         if (learning && i == row)
         {
-            f->setText(KeyCodeHelper::vmpcKeyCodeNames.at(learnCandidate));
+            f->setText(KeyCodeHelper::getKeyCodeString(learnCandidate));
             f->setBlinking(true);
         }
         else

@@ -19,7 +19,6 @@ public:
     void initializeDefaults();
     const VmpcKeyCode getKeyCodeFromLabel(const std::string& label);
     std::string getHardwareComponentLabelAssociatedWithKeycode(const VmpcKeyCode keyCode);
-    static const std::string getKeyCodeString(const VmpcKeyCode keyCode, const bool oneChar = false);
     void setKeyCodeForLabel(const VmpcKeyCode keyCode, const std::string& label);
 
     void exportMapping();
