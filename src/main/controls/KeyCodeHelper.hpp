@@ -160,7 +160,9 @@ namespace mpc::controls
             
             static const char getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
-            static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
+            static const std::string guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode);
+
+            static const std::string getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode);
 
         private:
             static const std::map<const int, const VmpcKeyCode> platformToVmpcKeyCodes;
@@ -169,5 +171,6 @@ namespace mpc::controls
 
             static const int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
+            static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
     };
 } // namespace mpc::controls

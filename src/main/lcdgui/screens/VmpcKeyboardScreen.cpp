@@ -256,13 +256,13 @@ void VmpcKeyboardScreen::updateRows()
         }
 
         l->setText(labelText);
-        const auto truncatedKeyCodeString = mpc::controls::KeyCodeHelper::getKeyCodeString(mapping.second);
-        f->setText(truncatedKeyCodeString);
+        const auto keyCodeDisplayName = KeyCodeHelper::getAsciiCompatibleDisplayName(mapping.second);
+        f->setText(keyCodeDisplayName);
         f->setInverted(row == i);
         
         if (learning && i == row)
         {
-            f->setText(KeyCodeHelper::getKeyCodeString(learnCandidate));
+            f->setText(KeyCodeHelper::getAsciiCompatibleDisplayName(learnCandidate));
             f->setBlinking(true);
         }
         else

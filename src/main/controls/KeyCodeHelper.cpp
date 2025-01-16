@@ -521,6 +521,109 @@ const int KeyCodeHelper::getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCod
     return -1;
 }
 
+const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode)
+{
+    if (vmpcKeyCode >= VmpcKeyCode::VMPC_KEY_F1 && vmpcKeyCode <= VmpcKeyCode::VMPC_KEY_F12)
+    {
+        const auto fNumber = ((int)vmpcKeyCode - (int)VmpcKeyCode::VMPC_KEY_F1) + 1;
+        return "F" + std::to_string(fNumber);
+    }
+
+    std::string result;
+
+    switch (vmpcKeyCode)
+    {
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are used for simple ASCII-based display, like the
+        // virtual MPC2000XL's LCD screen, as well as for Unicode-based text
+        // rendering in a more graphically advanced UI.
+        case VmpcKeyCode::VMPC_KEY_Space: result = "Space"; break;
+        case VmpcKeyCode::VMPC_KEY_Shift: result = "Shift"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftShift: result = "Left shift"; break;
+        case VmpcKeyCode::VMPC_KEY_RightShift: result = "Right shift"; break;
+        case VmpcKeyCode::VMPC_KEY_OptionOrAlt: result = "Option/Alt"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt: result = "Left option/alt"; break;
+        case VmpcKeyCode::VMPC_KEY_RightOptionOrAlt: result = "Right option/alt"; break;
+        case VmpcKeyCode::VMPC_KEY_Control: result = "Control"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftControl: result = "Left control"; break;
+        case VmpcKeyCode::VMPC_KEY_RightControl: result = "Right control"; break;
+        case VmpcKeyCode::VMPC_KEY_Escape: result = "Escape"; break;
+        case VmpcKeyCode::VMPC_KEY_Return: result = "Return"; break;
+        case VmpcKeyCode::VMPC_KEY_PageUp: result = "Page up"; break;
+        case VmpcKeyCode::VMPC_KEY_PageDown: result = "Page down"; break;
+        case VmpcKeyCode::VMPC_KEY_Home: result = "Home"; break;
+        case VmpcKeyCode::VMPC_KEY_End: result = "End"; break;
+        case VmpcKeyCode::VMPC_KEY_Delete: result = "Delete"; break;
+        case VmpcKeyCode::VMPC_KEY_Insert: result = "Insert"; break;
+        case VmpcKeyCode::VMPC_KEY_Tab: result = "Tab"; break;
+
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are only used for simple ASCII-based display, like the
+        // virtual MPC2000XL's LCD screen.
+        case VmpcKeyCode::VMPC_KEY_LeftArrow: result = "Left arrow"; break;
+        case VmpcKeyCode::VMPC_KEY_UpArrow: result = "Up arrow"; break;
+        case VmpcKeyCode::VMPC_KEY_RightArrow: result = "Right arrow"; break;
+        case VmpcKeyCode::VMPC_KEY_DownArrow: result = "Down arrow"; break;
+
+        // Keys that produce characters, but a descriptor should be used as display name
+        case VmpcKeyCode::VMPC_KEY_ANSI_Grave: result = "Grave accent"; break;
+        case VmpcKeyCode::VMPC_KEY_ISO_Section: result = "Section"; break;
+
+        default: result = getKeyCodeString(vmpcKeyCode);
+    }
+
+    return result;
+}
+
+const std::string KeyCodeHelper::guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode)
+{
+    if (vmpcKeyCode >= VmpcKeyCode::VMPC_KEY_F1 && vmpcKeyCode <= VmpcKeyCode::VMPC_KEY_F12)
+    {
+        const auto fNumber = ((int)vmpcKeyCode - (int)VmpcKeyCode::VMPC_KEY_F1) + 1;
+        return "F" + std::to_string(fNumber);
+    }
+
+    std::string result;
+
+    switch (vmpcKeyCode)
+    {
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are used for simple ASCII-based display, like the
+        // virtual MPC2000XL's LCD screen, as well as for Unicode-based text
+        // rendering in a more graphically advanced UI.
+        case VmpcKeyCode::VMPC_KEY_Space: result = "Space"; break;
+        case VmpcKeyCode::VMPC_KEY_Shift: result = "Shift"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftShift: result = "Left shift"; break;
+        case VmpcKeyCode::VMPC_KEY_RightShift: result = "Right shift"; break;
+        case VmpcKeyCode::VMPC_KEY_OptionOrAlt: result = "Option/Alt"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt: result = "Left option/alt"; break;
+        case VmpcKeyCode::VMPC_KEY_RightOptionOrAlt: result = "Right option/alt"; break;
+        case VmpcKeyCode::VMPC_KEY_Control: result = "Control"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftControl: result = "Left control"; break;
+        case VmpcKeyCode::VMPC_KEY_RightControl: result = "Right control"; break;
+        case VmpcKeyCode::VMPC_KEY_Escape: result = "Escape"; break;
+        case VmpcKeyCode::VMPC_KEY_Return: result = "Return"; break;
+        case VmpcKeyCode::VMPC_KEY_PageUp: result = "Page up"; break;
+        case VmpcKeyCode::VMPC_KEY_PageDown: result = "Page down"; break;
+        case VmpcKeyCode::VMPC_KEY_Home: result = "Home"; break;
+        case VmpcKeyCode::VMPC_KEY_End: result = "End"; break;
+        case VmpcKeyCode::VMPC_KEY_Delete: result = "Delete"; break;
+        case VmpcKeyCode::VMPC_KEY_Insert: result = "Insert"; break;
+        case VmpcKeyCode::VMPC_KEY_Tab: result = "Tab"; break;
+
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are only used for Unicode-based text rendering.
+        case VmpcKeyCode::VMPC_KEY_LeftArrow: result = "\u2190"; break;
+        case VmpcKeyCode::VMPC_KEY_UpArrow: result = "\u2191"; break;
+        case VmpcKeyCode::VMPC_KEY_RightArrow: result = "\u2192"; break;
+        case VmpcKeyCode::VMPC_KEY_DownArrow: result = "\u2193"; break;
+
+        default: result = getKeyCodeString(vmpcKeyCode);
+    }
+
+    return result;
+}
+
 const std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)
 {
     const auto platformKeyCode = getPlatformFromVmpcKeyCode(vmpcKeyCode);
@@ -538,5 +641,5 @@ const std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)
     }
 
     auto keyCodeInfo = layout.at(platformKeyCode);
-    return keyCodeInfo.charWithoutModifiers;
+    return keyCodeInfo.charWithoutModifiers + keyCodeInfo.charWithShiftModifier;
 }
