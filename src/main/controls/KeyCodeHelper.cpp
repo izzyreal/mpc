@@ -120,10 +120,10 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
     { kVK_UpArrow, VmpcKeyCode::VMPC_KEY_UpArrow },
     { kVK_DownArrow, VmpcKeyCode::VMPC_KEY_DownArrow },
 
-    { kVK_ANSI_KeypadDecimal, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDecimal },
+    { kVK_ANSI_KeypadDecimal, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPeriodOrDelete },
     { kVK_ANSI_KeypadMultiply, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply },
     { kVK_ANSI_KeypadPlus, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus },
-    { kVK_ANSI_KeypadClear, VmpcKeyCode::VMPC_KEY_ANSI_KeypadClear },
+    { kVK_ANSI_KeypadClear, VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear },
     { kVK_ANSI_KeypadDivide, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide },
     { kVK_ANSI_KeypadEnter, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter },
     { kVK_ANSI_KeypadMinus, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus },
@@ -341,10 +341,10 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
         { VK_UP, VmpcKeyCode::VMPC_KEY_UpArrow },
         { VK_DOWN, VmpcKeyCode::VMPC_KEY_DownArrow },
 
-        { VK_DECIMAL, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDecimal },
+        { VK_DECIMAL, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPeriodOrDelete },
         { VK_MULTIPLY, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply },
         { VK_ADD, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus },
-        { VK_CLEAR, VmpcKeyCode::VMPC_KEY_ANSI_KeypadClear },
+        { VK_CLEAR, VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear },
         { VK_DIVIDE, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide },
         { VK_SUBTRACT, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus },
 
@@ -643,5 +643,16 @@ const std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)
     }
 
     auto keyCodeInfo = layout.at(platformKeyCode);
-    return keyCodeInfo.charWithoutModifiers + keyCodeInfo.charWithShiftModifier;
+    auto c1 = keyCodeInfo.charWithoutModifiers;
+    const auto c2 = keyCodeInfo.charWithShiftModifier;
+    
+    if (c1.length() == 1 && c2.length() == 1)
+    {
+        if (std::toupper(c1.front()) == c2.front())
+        {
+            c1.clear();
+        }
+    }
+    
+    return c1 + c2;
 }
