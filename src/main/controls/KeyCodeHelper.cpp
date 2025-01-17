@@ -187,6 +187,15 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
         { UIKeyConstants::UIKeyboardHIDUsageKeypad7, VmpcKeyCode::VMPC_KEY_ANSI_Keypad7 },
         { UIKeyConstants::UIKeyboardHIDUsageKeypad8, VmpcKeyCode::VMPC_KEY_ANSI_Keypad8 },
         { UIKeyConstants::UIKeyboardHIDUsageKeypad9, VmpcKeyCode::VMPC_KEY_ANSI_Keypad9 },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadNumLock, VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadSlash, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadAsterisk, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadHyphen, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadPlus, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadEnter, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadPeriod, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPeriodOrDelete },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadEqualSign, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEquals },
+        { UIKeyConstants::UIKeyboardHIDUsageKeypadComma, VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma },
 
         { UIKeyConstants::UIKeyboardHIDUsageKeyboard0, VmpcKeyCode::VMPC_KEY_ANSI_0 },
         { UIKeyConstants::UIKeyboardHIDUsageKeyboard1, VmpcKeyCode::VMPC_KEY_ANSI_1 },
@@ -230,15 +239,6 @@ const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCod
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardRightArrow, VmpcKeyCode::VMPC_KEY_RightArrow },
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardUpArrow, VmpcKeyCode::VMPC_KEY_UpArrow },
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardDownArrow, VmpcKeyCode::VMPC_KEY_DownArrow },
-
-        { 0, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDecimal },
-        { UIKeyConstants::UIKeyboardHIDUsageKeypadAsterisk, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMultiply },
-        { UIKeyConstants::UIKeyboardHIDUsageKeypadPlus, VmpcKeyCode::VMPC_KEY_ANSI_KeypadPlus },
-        { 0, VmpcKeyCode::VMPC_KEY_ANSI_KeypadClear }, // No corresponding value
-        { UIKeyConstants::UIKeyboardHIDUsageKeypadSlash, VmpcKeyCode::VMPC_KEY_ANSI_KeypadDivide },
-        { UIKeyConstants::UIKeyboardHIDUsageKeypadEnter, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter },
-        { UIKeyConstants::UIKeyboardHIDUsageKeypadHyphen, VmpcKeyCode::VMPC_KEY_ANSI_KeypadMinus },
-        { UIKeyConstants::UIKeyboardHIDUsageKeypadEqualSign, VmpcKeyCode::VMPC_KEY_ANSI_KeypadEquals },
 
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardHome, VmpcKeyCode::VMPC_KEY_Home },
         { UIKeyConstants::UIKeyboardHIDUsageKeyboardPageUp, VmpcKeyCode::VMPC_KEY_PageUp },
@@ -521,7 +521,7 @@ const int KeyCodeHelper::getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCod
     return -1;
 }
 
-const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode)
+const std::string getDescriptorIfCommonForAsciiAndUnicode(const VmpcKeyCode vmpcKeyCode)
 {
     if (vmpcKeyCode >= VmpcKeyCode::VMPC_KEY_F1 && vmpcKeyCode <= VmpcKeyCode::VMPC_KEY_F12)
     {
@@ -556,7 +556,32 @@ const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode
         case VmpcKeyCode::VMPC_KEY_Delete: result = "Delete"; break;
         case VmpcKeyCode::VMPC_KEY_Insert: result = "Insert"; break;
         case VmpcKeyCode::VMPC_KEY_Tab: result = "Tab"; break;
+        case VmpcKeyCode::VMPC_KEY_CapsLock: result = "Caps lock"; break;
+        case VmpcKeyCode::VMPC_KEY_Function: result = "Function"; break;
+        case VmpcKeyCode::VMPC_KEY_LeftMeta: result = "Left meta"; break;
+        case VmpcKeyCode::VMPC_KEY_RightMeta: result = "Right meta"; break;
+        case VmpcKeyCode::VMPC_KEY_Backspace: result = "Backspace"; break;
+        case VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear: result = "Keypad num lock"; break;
+        case VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter: result = "Keypad enter"; break;
+        default: break;
+    }
 
+    return result;
+}
+
+const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode)
+{
+    const auto commonDescriptor = getDescriptorIfCommonForAsciiAndUnicode(vmpcKeyCode);
+
+    if (!commonDescriptor.empty())
+    {
+        return commonDescriptor;
+    }
+
+    std::string result;
+
+    switch (vmpcKeyCode)
+    {
         // Bespoke descriptors for keys that don't produce characters.
         // Below descriptors are only used for simple ASCII-based display, like the
         // virtual MPC2000XL's LCD screen.
@@ -577,40 +602,17 @@ const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode
 
 const std::string KeyCodeHelper::guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode)
 {
-    if (vmpcKeyCode >= VmpcKeyCode::VMPC_KEY_F1 && vmpcKeyCode <= VmpcKeyCode::VMPC_KEY_F12)
+    const auto commonDescriptor = getDescriptorIfCommonForAsciiAndUnicode(vmpcKeyCode);
+
+    if (!commonDescriptor.empty())
     {
-        const auto fNumber = ((int)vmpcKeyCode - (int)VmpcKeyCode::VMPC_KEY_F1) + 1;
-        return "F" + std::to_string(fNumber);
+        return commonDescriptor;
     }
 
     std::string result;
 
     switch (vmpcKeyCode)
     {
-        // Bespoke descriptors for keys that don't produce characters.
-        // Below descriptors are used for simple ASCII-based display, like the
-        // virtual MPC2000XL's LCD screen, as well as for Unicode-based text
-        // rendering in a more graphically advanced UI.
-        case VmpcKeyCode::VMPC_KEY_Space: result = "Space"; break;
-        case VmpcKeyCode::VMPC_KEY_Shift: result = "Shift"; break;
-        case VmpcKeyCode::VMPC_KEY_LeftShift: result = "Left shift"; break;
-        case VmpcKeyCode::VMPC_KEY_RightShift: result = "Right shift"; break;
-        case VmpcKeyCode::VMPC_KEY_OptionOrAlt: result = "Option/Alt"; break;
-        case VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt: result = "Left option/alt"; break;
-        case VmpcKeyCode::VMPC_KEY_RightOptionOrAlt: result = "Right option/alt"; break;
-        case VmpcKeyCode::VMPC_KEY_Control: result = "Control"; break;
-        case VmpcKeyCode::VMPC_KEY_LeftControl: result = "Left control"; break;
-        case VmpcKeyCode::VMPC_KEY_RightControl: result = "Right control"; break;
-        case VmpcKeyCode::VMPC_KEY_Escape: result = "Escape"; break;
-        case VmpcKeyCode::VMPC_KEY_Return: result = "Return"; break;
-        case VmpcKeyCode::VMPC_KEY_PageUp: result = "Page up"; break;
-        case VmpcKeyCode::VMPC_KEY_PageDown: result = "Page down"; break;
-        case VmpcKeyCode::VMPC_KEY_Home: result = "Home"; break;
-        case VmpcKeyCode::VMPC_KEY_End: result = "End"; break;
-        case VmpcKeyCode::VMPC_KEY_Delete: result = "Delete"; break;
-        case VmpcKeyCode::VMPC_KEY_Insert: result = "Insert"; break;
-        case VmpcKeyCode::VMPC_KEY_Tab: result = "Tab"; break;
-
         // Bespoke descriptors for keys that don't produce characters.
         // Below descriptors are only used for Unicode-based text rendering.
         case VmpcKeyCode::VMPC_KEY_LeftArrow: result = "\u2190"; break;

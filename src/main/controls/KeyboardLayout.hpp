@@ -205,11 +205,33 @@ namespace mpc::controls {
                 { UIKeyConstants::UIKeyboardHIDUsageKeyboardQuote, { "'", "\"" } },
                 { UIKeyConstants::UIKeyboardHIDUsageKeyboardComma, { ",", "<" } },
                 { UIKeyConstants::UIKeyboardHIDUsageKeyboardPeriod, { ".", ">" } },
-                { UIKeyConstants::UIKeyboardHIDUsageKeyboardSlash, { "/", "?" } }
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardSlash, { "/", "?" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeyboardNonUSBackslash, { "§", "±" } }
+            };
+
+            std::map<const int, const KeyCodeInfo> keypad {
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad0, { "0", "0" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad1, { "1", "1" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad2, { "2", "2" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad3, { "3", "3" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad4, { "4", "4" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad5, { "5", "5" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad6, { "6", "6" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad7, { "7", "7" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad8, { "8", "8" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypad9, { "9", "9" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadAsterisk, { "*", "*" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadPlus, { "+", "+" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadEqualSign, { "=", "=" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadHyphen, { "-", "-" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadSlash, { "/", "/" } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadPeriod, { ".", "." } },
+                { UIKeyConstants::UIKeyboardHIDUsageKeypadComma, { ",", "," } }
             };
             
             std::map<const int, const KeyCodeInfo> result = letters;
             result.insert(numbers.begin(), numbers.end());
+            result.insert(keypad.begin(), keypad.end());
             result.insert(specialCharacters.begin(), specialCharacters.end());
             
             return result;
