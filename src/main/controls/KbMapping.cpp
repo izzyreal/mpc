@@ -2,6 +2,10 @@
 
 #include "Mpc.hpp"
 
+#if __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 using namespace mpc::controls;
 
 KbMapping::KbMapping(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
@@ -61,25 +65,32 @@ void KbMapping::importMapping()
 
     int byteIndex = 0;
 
-    while (!headerHasBeenParsed && !versionHasBeenParsed && byteIndex < bytes.size())
+    while ((!headerHasBeenParsed || !versionHasBeenParsed) && byteIndex < bytes.size())
     {
         if (!headerHasBeenParsed)
         {
-            if (bytes[byteIndex++] == '\n')
+            if (bytes[byteIndex] == '\n')
             {
                 headerHasBeenParsed = true;
-                continue;
+                byteIndex++;
             }
-            header += bytes[byteIndex++];
+            else
+            {
+                header += bytes[byteIndex++];
+            }
         }
-        else
+        else if (!versionHasBeenParsed)
         {
-            if (bytes[byteIndex++] == '\n')
+            if (bytes[byteIndex] == '\n')
             {
                 versionHasBeenParsed = true;
-                continue;
+                byteIndex++;
+                break;
             }
-            version += bytes[byteIndex++];
+            else
+            {
+                version += bytes[byteIndex++];
+            }
         }
     }
 
@@ -131,9 +142,22 @@ void KbMapping::importMapping()
             {
                 parsedKeyCode = stoi(keyCode);
 
-                if (shouldConvertPlatformKeycodesToVmpc && parsedKeyCode >= 0)
+                if (shouldConvertPlatformKeycodesToVmpc && parsedKeyCode != -1)
                 {
-                    parsedKeyCode = static_cast<int>(KeyCodeHelper::getVmpcFromPlatformKeyCode(parsedKeyCode));
+                    switch (parsedKeyCode)
+                    {
+#if TARGET_OS_OSX == 1
+                        case -16:
+                            parsedKeyCode = static_cast<int>(VmpcKeyCode::VMPC_KEY_Insert);
+                            break;
+                        case -17:
+                            parsedKeyCode = static_cast<int>(VmpcKeyCode::VMPC_KEY_Delete);
+                            break;
+#endif
+                        default:
+                            parsedKeyCode = static_cast<int>(KeyCodeHelper::getVmpcFromPlatformKeyCode(parsedKeyCode));
+                            break;
+                    }
                 }
             }
             catch (const std::exception& e)
@@ -150,6 +174,11 @@ void KbMapping::importMapping()
             keyCode.clear();
             parsingLabel = true;
         }
+    }
+
+    if (shouldConvertPlatformKeycodesToVmpc)
+    {
+        exportMapping();
     }
 }
 
