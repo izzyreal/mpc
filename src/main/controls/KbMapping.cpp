@@ -151,8 +151,6 @@ void KbMapping::importMapping()
             parsingLabel = true;
         }
     }
-
-    migrateV0_4_4MappingToV0_5();
 }
 
 void KbMapping::initializeDefaults()
@@ -290,20 +288,3 @@ std::vector<std::pair<std::string, VmpcKeyCode>>& KbMapping::getLabelKeyMap()
     return labelKeyMap;
 }
 
-void KbMapping::migrateV0_4_4MappingToV0_5()
-{
-    auto importedMap = labelKeyMap;
-
-    initializeDefaults();
-
-    for (auto& mapping : labelKeyMap)
-    {
-        for (auto& mapping2 : importedMap)
-        {
-            if (mapping.first == mapping2.first)
-            {
-                mapping.second = mapping2.second;
-            }
-        }
-    }
-}

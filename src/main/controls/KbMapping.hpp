@@ -34,9 +34,6 @@ private:
     mpc::Mpc& mpc;
     std::vector<std::pair<std::string, VmpcKeyCode>> labelKeyMap;
 
-    // migrate persisted mappings in old format to new
-    void migrateV0_4_4MappingToV0_5();
-   
     const std::string magicHeader { "vmpc2000xl_keyboard_mapping" };
 };
 }
