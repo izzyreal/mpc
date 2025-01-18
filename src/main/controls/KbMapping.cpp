@@ -9,10 +9,17 @@ KbMapping::KbMapping(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
     importMapping();
 }
 
-void KbMapping::exportMapping() {
+void KbMapping::exportMapping()
+{
 	const auto path = mpc.paths->configPath() / "keys.txt";
 
+    const std::string version = "v1\n";
+
     std::vector<char> bytes;
+
+    for (auto &c : magicHeader) bytes.push_back(c);
+    bytes.push_back('\n');
+    for (auto &c : version) bytes.push_back(c);
 	
     for (auto& mapping : labelKeyMap)
     {
@@ -44,13 +51,59 @@ void KbMapping::importMapping()
         return;
     }
     
-    auto bytes = get_file_data(path);
+    const auto bytes = get_file_data(path);
+
+    std::string header;
+    std::string version;
+
+    bool headerHasBeenParsed = false;
+    bool versionHasBeenParsed = false;
+
+    int byteIndex = 0;
+
+    while (!headerHasBeenParsed && !versionHasBeenParsed && byteIndex < bytes.size())
+    {
+        if (!headerHasBeenParsed)
+        {
+            if (bytes[byteIndex++] == '\n')
+            {
+                headerHasBeenParsed = true;
+                continue;
+            }
+            header += bytes[byteIndex++];
+        }
+        else
+        {
+            if (bytes[byteIndex++] == '\n')
+            {
+                versionHasBeenParsed = true;
+                continue;
+            }
+            version += bytes[byteIndex++];
+        }
+    }
+
+    bool shouldConvertPlatformKeycodesToVmpc = false;
+
+    if (header != magicHeader)
+    {
+        // keys.txt is in an older format than the one introduced with VMPC2000XL 0.9.0.
+        // In this format, we were still persisting platform-specific keycodes.
+        //
+        // In the new format, we are persisting VMPC2000XL keycodes. It also starts the
+        // file with a magic header and a version.
+        //
+        // So, in this case, we'll convert the keycodes to VMPC2000XL ones as we go through
+        // the file. We must also reset the parser's byte index.
+        byteIndex = 0;
+        shouldConvertPlatformKeycodesToVmpc = true;
+    }
 
     std::string label;
     std::string keyCode;
     bool parsingLabel = true;
 
-    for (int i = 0; i < bytes.size(); i++)
+    for (int i = byteIndex; i < bytes.size(); i++)
     {
         if (bytes[i] != ' ' && parsingLabel)
         {
@@ -77,6 +130,11 @@ void KbMapping::importMapping()
             try
             {
                 parsedKeyCode = stoi(keyCode);
+
+                if (shouldConvertPlatformKeycodesToVmpc && parsedKeyCode >= 0)
+                {
+                    parsedKeyCode = static_cast<int>(KeyCodeHelper::getVmpcFromPlatformKeyCode(parsedKeyCode));
+                }
             }
             catch (const std::exception& e)
             {
