@@ -597,6 +597,11 @@ const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode
         default: result = getKeyCodeString(vmpcKeyCode);
     }
 
+    if (result.size() == 2)
+    {
+        result = std::string(1, result.front()) + " (or " + std::string(1, result.back()) + " with Shift)";
+    }
+
     return result;
 }
 
