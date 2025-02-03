@@ -64,8 +64,13 @@ namespace mpc::engine::audio::server {
         void resizeBuffers(int newSize) override;
 
         void work(int nFrames) override;
-        void work(const float *const *inputBuffer, float *const *outputBuffer, int nFrames, int inputChannelCount,
-                  int outputChannelCount);
+        void work(const float *const *inputBuffer,
+                  float *const *outputBuffer,
+                  const int nFrames,
+                  const std::vector<uint8_t> &mpcMonoInputChannelIndices,
+                  const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+                  const std::vector<uint8_t> &hostInputChannelIndices,
+                  const std::vector<uint8_t> &hostOutputChannelIndices);
         NonRealTimeAudioServer(std::shared_ptr<AudioServer> server);
         ~NonRealTimeAudioServer();
     };

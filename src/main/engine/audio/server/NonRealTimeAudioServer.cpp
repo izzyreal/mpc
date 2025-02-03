@@ -130,12 +130,14 @@ bool NonRealTimeAudioServer::isRunning()
 void NonRealTimeAudioServer::work(
         const float* const* inputBuffer,
         float* const* outputBuffer,
-        int nFrames,
-        int inputChannelCount,
-        int outputChannelCount)
+        const int nFrames,
+        const std::vector<uint8_t> &mpcMonoInputChannelIndices,
+        const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+        const std::vector<uint8_t> &hostInputChannelIndices,
+        const std::vector<uint8_t> &hostOutputChannelIndices)
 {
-	auto externalAudioServer = dynamic_pointer_cast<RealTimeAudioServer>(server);
-    externalAudioServer->work(inputBuffer, outputBuffer, nFrames, inputChannelCount, outputChannelCount);
+	auto realTimeAudioServer = dynamic_pointer_cast<RealTimeAudioServer>(server);
+    realTimeAudioServer->work(inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices, mpcMonoOutputChannelIndices, hostInputChannelIndices, hostOutputChannelIndices);
 }
 
 void NonRealTimeAudioServer::work(int nFrames)

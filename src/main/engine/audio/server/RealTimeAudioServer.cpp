@@ -51,7 +51,8 @@ void RealTimeAudioServer::resizeBuffers(int newSize)
 	
 	AudioServer::resizeBuffers(newSize);
 }
-
+		
+//For compatibility with the PortAudio framework
 void RealTimeAudioServer::work(float* inputBuffer, float* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
 	if (!running) {
 		return;
@@ -90,6 +91,7 @@ void RealTimeAudioServer::work(float* inputBuffer, float* outputBuffer, int nFra
 	}
 }
 
+// For compatibility with JUCE 7.0.2
 void RealTimeAudioServer::work(const float** inputBuffer, float** outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
 	if (!running) {
 		return;
@@ -136,48 +138,50 @@ void RealTimeAudioServer::work(const float** inputBuffer, float** outputBuffer, 
 	}
 }
 
-void RealTimeAudioServer::work(const float* const* inputBuffer, float* const* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {
+// For compatibility with JUCE 7.0.5+
+void RealTimeAudioServer::work(const float* const* inputBuffer,
+                               float* const* outputBuffer,
+                               int nFrames,
+                               const std::vector<uint8_t> &mpcMonoInputChannelIndices,
+                               const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+                               const std::vector<uint8_t> &hostInputChannelIndices,
+                               const std::vector<uint8_t> &hostOutputChannelIndices) {
 	if (!running) {
 		return;
 	}
 
-	int sampleCounter = 0;
-	const int inputsToProcess = min((int) (inputChannelCount * 0.5), (int)activeInputs.size());
 
-	for (int frame = 0; frame < nFrames; frame++)
+    uint8_t channelCounter = 0;
+
+	for (int i = 0; i < mpcMonoInputChannelIndices.size(); i++)
 	{
-		int channelCounter = 0;
+        const auto mpcStereoInputIndex = static_cast<int>(std::floor(mpcMonoInputChannelIndices[i] / 2.f));
+        auto &vmpcInput = activeInputs[mpcStereoInputIndex];
+        const auto localBufferFrameOffset = mpcMonoInputChannelIndices[i] % 2;
+        const auto &hostBuffer = inputBuffer[hostInputChannelIndices[i]];
 
-		for (int input = 0; input < inputsToProcess; input ++)
-		{
-			activeInputs[input]->localBuffer[sampleCounter++] = inputBuffer[channelCounter][frame];
-			activeInputs[input]->localBuffer[sampleCounter++] = inputBuffer[channelCounter + 1][frame];
-			channelCounter += 2;
+	    for (int frame = 0; frame < nFrames; frame++)
+	    {
+            const auto localBufferFrameIndex = (frame * 2) + localBufferFrameOffset;
+            vmpcInput->localBuffer[localBufferFrameIndex] = hostBuffer[frame];
 		}
 	}
 
 	client->work(nFrames);
 
-	const int outputsToProcess = outputChannelCount * 0.5;
+    channelCounter = 0;
 
-	for (int frame = 0; frame < nFrames; frame++)
+    for (int i = 0; i < mpcMonoOutputChannelIndices.size(); i++)
 	{
-		int channelCounter = 0;
+        const auto mpcStereoOutputIndex = static_cast<int>(std::floor(mpcMonoOutputChannelIndices[i] / 2.f));
+        const auto &vmpcOutput = activeOutputs[mpcStereoOutputIndex];
+        const auto localBufferFrameOffset = mpcMonoOutputChannelIndices[i] % 2;
+        auto &hostBuffer = outputBuffer[hostOutputChannelIndices[i]];
 
-		for (int output = 0; output < outputsToProcess; output++)
-		{
-			if (output >= activeOutputs.size())
-			{
-				outputBuffer[channelCounter][frame] = 0.0f;
-				outputBuffer[channelCounter + 1][frame] = 0.0f;
-				channelCounter += 2;
-				continue;
-			}
-
-			const auto frame_x2 = frame * 2;
-			outputBuffer[channelCounter][frame] = activeOutputs[output]->localBuffer[frame_x2];
-			outputBuffer[channelCounter + 1][frame] = activeOutputs[output]->localBuffer[frame_x2 + 1];
-			channelCounter += 2;
+	    for (int frame = 0; frame < nFrames; frame++)
+	    {
+            const auto localBufferFrameIndex = (frame * 2) + localBufferFrameOffset;
+            hostBuffer[frame] = vmpcOutput->localBuffer[localBufferFrameIndex];
 		}
 	}
 }

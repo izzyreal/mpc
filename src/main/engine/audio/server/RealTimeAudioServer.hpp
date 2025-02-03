@@ -32,7 +32,13 @@ namespace mpc::engine::audio::server
 		// For compatibility with JUCE 7.0.2
         void work(const float** inputBuffer, float** outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount);
 
-		// For compatibility with JUCE 7.0.5
-        void work(const float* const* inputBuffer, float* const* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount);
+		// For compatibility with JUCE 7.0.5+
+        void work(const float* const* inputBuffer,
+                  float* const* outputBuffer,
+                  const int nFrames,
+                  const std::vector<uint8_t> &mpcMonoInputChannelIndices,
+                  const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+                  const std::vector<uint8_t> &hostInputChannelIndices,
+                  const std::vector<uint8_t> &hostOutputChannelIndices);
 	};
 }
