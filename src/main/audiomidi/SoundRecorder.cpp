@@ -180,10 +180,6 @@ void SoundRecorder::stop()
     {
         sound->removeFramesFromEnd(overflowAt44Khz);
     }
-    else
-    {
-      assert(overflowAt44Khz == 0);
-    }
 
     const auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
     const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
