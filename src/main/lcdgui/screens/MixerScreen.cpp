@@ -222,7 +222,7 @@ void MixerScreen::setTab(int i)
     }
     
     displayMixerStrips();
-    displayFunctionKeys();
+    setLink(link);
 }
 
 int MixerScreen::getTab()
