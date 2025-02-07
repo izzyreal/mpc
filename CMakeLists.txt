@@ -202,7 +202,7 @@ target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
 if (UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    target_link_libraries(mpc-tests Threads::Threads)
+    target_link_libraries(mpc-tests Threads::Threads X11)
 endif (UNIX)
 
 if (UNIX AND NOT APPLE)
