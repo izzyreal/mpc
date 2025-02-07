@@ -260,7 +260,7 @@ namespace mpc::controls {
                             XKeyEvent event;
                             event.type = KeyPress;
                             event.display = display;
-                            event.keycode = XKeysymToKeycode(vk);
+                            event.keycode = XKeysymToKeycode(display, vk);
                             event.state = modifierName.empty() ? 0 : ShiftMask;
                             event.window = DefaultRootWindow(display);
                             int len = XLookupString(&event, buffer, sizeof(buffer), nullptr, nullptr);
