@@ -60,7 +60,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
         for (int i = 0; i < DSP_CYCLE_COUNT; i++)
         {
             audioMidiServices->changeBounceStateIfRequired();
-            audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, 0, 2);
+            audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {}, {0, 1});
             std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
         }
     });

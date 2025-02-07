@@ -215,7 +215,13 @@ if (UNIX AND NOT APPLE)
 endif()
 
 if (APPLE)
-    target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
+target_link_libraries(mpc-tests stdc++  
+    "-framework Foundation"  
+    "-framework Security"  
+    "-framework DiskArbitration"  
+    "-framework SystemConfiguration"  
+    "-framework Carbon"  
+)  
 endif()
 
 _bundle_resources()

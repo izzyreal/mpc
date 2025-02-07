@@ -88,7 +88,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
         while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
                track->getEvents().size() < humanTickPositions.size())
         {
-            server->work(nullptr, nullptr, BUFFER_SIZE, 0, 1);
+            server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
 
             if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
             {
@@ -216,7 +216,7 @@ TEST_CASE("Undo", "[sequencer]")
     for (int i = 0; i < 20; i++)
     {
         if (i % 2 == 0) pads[0]->push(127); else pads[0]->release();
-        server->work(nullptr, nullptr, BUFFER_SIZE, 0, 1);
+        server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
     }
 
     sequencer->stop();
