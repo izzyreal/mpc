@@ -37,7 +37,7 @@ void MixerScreen::open()
     }
 
     displayMixerStrips();
-    displayFunctionKeys();
+    setLink(link);
     mpc.addObserver(this);
 }
 
