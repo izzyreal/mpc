@@ -4,10 +4,12 @@
 #import <Foundation/Foundation.h>
 #include <TargetConditionals.h>
 
+#include <dlfcn.h>
+
 using namespace mpc;
 
-std::string MacBundleResources::getResourcePath(const std::string& resourceName) {
-    
+std::string getNonLv2ResourcePath(const std::string& resourceName)
+{
     NSString *resourceNameNSString = [NSString stringWithUTF8String:resourceName.c_str()];
 
     NSBundle* bundle = [NSBundle mainBundle];
@@ -39,6 +41,47 @@ std::string MacBundleResources::getResourcePath(const std::string& resourceName)
     
     filePath = [filePath stringByAppendingString:resourceNameNSString];
     return {[filePath UTF8String]};
+}
+
+std::string getLv2ResourcePath(const std::string& resourceName)
+{
+    Dl_info info;
+
+    if (dladdr((void*)MacBundleResources::getResourcePath, &info) == 0)
+    {
+        return {};
+    }
+
+    char* path_copy = realpath(info.dli_fname, NULL);
+    if (!path_copy) return NULL;
+
+    if (std::string(path_copy).find(".lv2") == std::string::npos)
+    {
+        return "";
+    }
+
+    char* last_slash = strrchr(path_copy, '/');
+    if (last_slash) *last_slash = '\0';
+
+    char* resources_path = (char*)malloc(PATH_MAX);
+
+    snprintf(resources_path, PATH_MAX, "%s/resources", path_copy);
+    free(path_copy);
+
+    const auto result = std::string(resources_path) + "/" + resourceName;
+    return result;
+}
+
+std::string MacBundleResources::getResourcePath(const std::string& resourceName)
+{
+    const auto lv2ResourcePath = getLv2ResourcePath(resourceName);
+
+    if (!lv2ResourcePath.empty())
+    {
+        return lv2ResourcePath;
+    }
+
+    return getNonLv2ResourcePath(resourceName);
 }
 
 #endif
