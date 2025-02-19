@@ -1,7 +1,8 @@
 #include "StereoMixer.hpp"
 
+#include <algorithm>
+
 using namespace mpc::engine;
-using namespace std;
 
 StereoMixer::StereoMixer()
 {
@@ -11,10 +12,7 @@ StereoMixer::StereoMixer()
 
 void StereoMixer::setPanning(int i)
 {
-	if (i < 0 || i > 100)
-		return;
-
-	panning = i;
+	panning = std::clamp(i, 0, 100);
 }
 
 int StereoMixer::getPanning()
@@ -24,10 +22,7 @@ int StereoMixer::getPanning()
 
 void StereoMixer::setLevel(int i)
 {
-	if (i < 0 || i > 100)
-		return;
-
-	level = i;
+	level = std::clamp(i, 0, 100);
 }
 
 int StereoMixer::getLevel()

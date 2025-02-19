@@ -1,5 +1,7 @@
 #include "IndivFxMixer.hpp"
 
+#include <algorithm>
+
 using namespace mpc::engine;
 
 IndivFxMixer::IndivFxMixer()
@@ -30,18 +32,12 @@ int IndivFxMixer::getOutput()
 
 void IndivFxMixer::setOutput(int i)
 {
-	if (i < 0 || i > 8)
-		return;
-
-	output = i;
+	output = std::clamp(i, 0, 8);
 }
 
 void IndivFxMixer::setVolumeIndividualOut(int i)
 {
-	if (i < 0 || i > 100)
-		return;
-
-	volumeIndividualOut = i;
+	volumeIndividualOut = std::clamp(i, 0, 100);
 }
 
 int IndivFxMixer::getVolumeIndividualOut()
@@ -51,10 +47,7 @@ int IndivFxMixer::getVolumeIndividualOut()
 
 void IndivFxMixer::setFxPath(int i)
 {
-	if (i < 0 || i > 4)
-		return;
-
-	fxPath = i;
+	fxPath = std::clamp(i, 0, 4);
 }
 
 int IndivFxMixer::getFxPath()
@@ -64,10 +57,7 @@ int IndivFxMixer::getFxPath()
 
 void IndivFxMixer::setFxSendLevel(int i)
 {
-	if (i < 0 || i > 100)
-		return;
-
-	fxSendLevel = i;
+	fxSendLevel = std::clamp(i, 0, 100);
 }
 
 int IndivFxMixer::getFxSendLevel()
