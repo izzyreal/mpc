@@ -563,6 +563,7 @@ const std::string getDescriptorIfCommonForAsciiAndUnicode(const VmpcKeyCode vmpc
         case VmpcKeyCode::VMPC_KEY_Backspace: result = "Backspace"; break;
         case VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear: result = "Keypad num lock"; break;
         case VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter: result = "Keypad enter"; break;
+        case VmpcKeyCode::VMPC_KEY_UNKNOWN: result = "<none>"; break;
         default: break;
     }
 
@@ -593,8 +594,17 @@ const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode
         // Keys that produce characters, but a descriptor should be used as display name
         case VmpcKeyCode::VMPC_KEY_ANSI_Grave: result = "Grave accent"; break;
         case VmpcKeyCode::VMPC_KEY_ISO_Section: result = "Section"; break;
+        case VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma: result = ", (numpad)"; break;
 
-        default: result = getKeyCodeString(vmpcKeyCode);
+        default:
+            result = getKeyCodeString(vmpcKeyCode);
+            if (static_cast<int>(vmpcKeyCode) >= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0) &&
+                    static_cast<int>(vmpcKeyCode) <= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma))
+            {
+                result += " (numpad)";
+            }
+
+            break;
     }
 
     if (result.size() == 2)

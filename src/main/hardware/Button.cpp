@@ -134,34 +134,34 @@ void Button::push()
 	else if (label == "bank-d") {
 		screen->bank(3);
 	}
-	else if (label == "0") {
+	else if (label == "0" || label == "0 (extra)") {
 		screen->numpad(0);
 	}
-	else if (label == "1") {
+	else if (label == "1" || label == "1 (extra)") {
 		screen->numpad(1);
 	}
-	else if (label == "2") {
+	else if (label == "2" || label == "2 (extra)") {
 		screen->numpad(2);
 	}
-	else if (label == "3") {
+	else if (label == "3" || label == "3 (extra)") {
 		screen->numpad(3);
 	}
-	else if (label == "4") {
+	else if (label == "4" || label == "4 (extra)") {
 		screen->numpad(4);
 	}
-	else if (label == "5") {
+	else if (label == "5" || label == "5 (extra)") {
 		screen->numpad(5);
 	}
-	else if (label == "6") {
+	else if (label == "6" || label == "6 (extra)") {
 		screen->numpad(6);
 	}
-	else if (label == "7") {
+	else if (label == "7" || label == "7 (extra)") {
 		screen->numpad(7);
 	}
-	else if (label == "8") {
+	else if (label == "8" || label == "8 (extra)") {
 		screen->numpad(8);
 	}
-	else if (label == "9") {
+	else if (label == "9" || label == "9 (extra)") {
 		screen->numpad(9);
 	}
 }

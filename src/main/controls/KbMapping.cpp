@@ -176,6 +176,27 @@ void KbMapping::importMapping()
         }
     }
 
+    for (int i = static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0);
+         i <= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad9);
+         i++)
+    {
+        bool keypadKeyIsAlreadyAssigned = false;
+        for (auto &mapping : labelKeyMap)
+        {
+            if (static_cast<int>(mapping.second) == i)
+            {
+                keypadKeyIsAlreadyAssigned = true;
+                break;
+            }
+        }
+
+        if (!keypadKeyIsAlreadyAssigned)
+        {
+            const auto label = std::to_string(i - static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0)) + " (extra)";
+            labelKeyMap.emplace_back(label, static_cast<VmpcKeyCode>(i));
+        }
+    }
+
     if (shouldConvertPlatformKeycodesToVmpc)
     {
         exportMapping();
@@ -233,6 +254,16 @@ void KbMapping::initializeDefaults()
     labelKeyMap.emplace_back("7", VmpcKeyCode::VMPC_KEY_ANSI_7);
     labelKeyMap.emplace_back("8", VmpcKeyCode::VMPC_KEY_ANSI_8);
     labelKeyMap.emplace_back("9", VmpcKeyCode::VMPC_KEY_ANSI_9);
+    labelKeyMap.emplace_back("0 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad0);
+    labelKeyMap.emplace_back("1 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad1);
+    labelKeyMap.emplace_back("2 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad2);
+    labelKeyMap.emplace_back("3 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad3);
+    labelKeyMap.emplace_back("4 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad4);
+    labelKeyMap.emplace_back("5 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad5);
+    labelKeyMap.emplace_back("6 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad6);
+    labelKeyMap.emplace_back("7 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad7);
+    labelKeyMap.emplace_back("8 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad8);
+    labelKeyMap.emplace_back("9 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad9);
     labelKeyMap.emplace_back("pad-1", VmpcKeyCode::VMPC_KEY_ANSI_Z);
     labelKeyMap.emplace_back("pad-2", VmpcKeyCode::VMPC_KEY_ANSI_X);
     labelKeyMap.emplace_back("pad-3", VmpcKeyCode::VMPC_KEY_ANSI_C);
@@ -294,12 +325,12 @@ void KbMapping::setKeyCodeForLabel(const VmpcKeyCode keyCode, const std::string&
 
 const VmpcKeyCode KbMapping::getPreviousKeyCode(const VmpcKeyCode keyCode)
 {
-    if (static_cast<int>(keyCode) - 1  >= 0)
+    if (static_cast<int>(keyCode) - 1  >= -1)
     {
         return static_cast<VmpcKeyCode>(static_cast<int>(keyCode) - 1);
     }
 
-    return static_cast<VmpcKeyCode>(0);
+    return static_cast<VmpcKeyCode>(-1);
 }
 
 const VmpcKeyCode KbMapping::getNextKeyCode(const VmpcKeyCode keyCode)
