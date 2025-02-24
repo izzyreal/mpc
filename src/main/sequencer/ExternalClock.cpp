@@ -2,6 +2,11 @@
 
 #if __linux__
 #include <cmath>
+#elif defined(__APPLE__)
+#include <TargetConditionals.h>
+#if TARGET_OS_MAC
+#include <cmath>
+#endif
 #endif
 
 using namespace mpc::sequencer;
