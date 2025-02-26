@@ -776,7 +776,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, i
         }
     }
 
-    if (swingPercentage > 50)
+    if ((stepLength == 24 || stepLength == 48) && (tick + stepLength) % (stepLength * 2) == 0 && swingPercentage > 50)
     {
         const int swingOffset = ((swingPercentage - 50.f) / 25.f) * (stepLength / 2);
         tick += swingOffset;
