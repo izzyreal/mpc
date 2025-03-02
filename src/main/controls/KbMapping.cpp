@@ -1,6 +1,7 @@
 #include "KbMapping.hpp"
 
 #include "Mpc.hpp"
+#include <cctype>
 
 #if __APPLE__
 #include <TargetConditionals.h>
@@ -124,6 +125,14 @@ void KbMapping::importMapping()
         
         if (bytes[i] == ' ')
         {
+            if (i + 1 < bytes.size() && bytes[i+1] == '(')
+            {
+                // Here we do a fix for https://github.com/izzyreal/mpc/issues/258 in case
+                // the user has already persisted a corrupt keys.txt
+                label += '_';
+                continue;
+            }
+
             parsingLabel = false;
             continue;
         }
@@ -192,7 +201,7 @@ void KbMapping::importMapping()
 
         if (!keypadKeyIsAlreadyAssigned)
         {
-            const auto label = std::to_string(i - static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0)) + " (extra)";
+            const auto label = std::to_string(i - static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0)) + "_(extra)";
             labelKeyMap.emplace_back(label, static_cast<VmpcKeyCode>(i));
         }
     }
@@ -254,16 +263,16 @@ void KbMapping::initializeDefaults()
     labelKeyMap.emplace_back("7", VmpcKeyCode::VMPC_KEY_ANSI_7);
     labelKeyMap.emplace_back("8", VmpcKeyCode::VMPC_KEY_ANSI_8);
     labelKeyMap.emplace_back("9", VmpcKeyCode::VMPC_KEY_ANSI_9);
-    labelKeyMap.emplace_back("0 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad0);
-    labelKeyMap.emplace_back("1 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad1);
-    labelKeyMap.emplace_back("2 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad2);
-    labelKeyMap.emplace_back("3 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad3);
-    labelKeyMap.emplace_back("4 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad4);
-    labelKeyMap.emplace_back("5 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad5);
-    labelKeyMap.emplace_back("6 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad6);
-    labelKeyMap.emplace_back("7 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad7);
-    labelKeyMap.emplace_back("8 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad8);
-    labelKeyMap.emplace_back("9 (extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad9);
+    labelKeyMap.emplace_back("0_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad0);
+    labelKeyMap.emplace_back("1_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad1);
+    labelKeyMap.emplace_back("2_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad2);
+    labelKeyMap.emplace_back("3_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad3);
+    labelKeyMap.emplace_back("4_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad4);
+    labelKeyMap.emplace_back("5_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad5);
+    labelKeyMap.emplace_back("6_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad6);
+    labelKeyMap.emplace_back("7_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad7);
+    labelKeyMap.emplace_back("8_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad8);
+    labelKeyMap.emplace_back("9_(extra)", VmpcKeyCode::VMPC_KEY_ANSI_Keypad9);
     labelKeyMap.emplace_back("pad-1", VmpcKeyCode::VMPC_KEY_ANSI_Z);
     labelKeyMap.emplace_back("pad-2", VmpcKeyCode::VMPC_KEY_ANSI_X);
     labelKeyMap.emplace_back("pad-3", VmpcKeyCode::VMPC_KEY_ANSI_C);
