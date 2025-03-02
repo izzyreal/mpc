@@ -81,7 +81,22 @@ namespace mpc::controls {
                 return {};
             }
 
-            const auto layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(inputSource, kTISPropertyUnicodeKeyLayoutData));
+            __block CFDataRef layoutData = nullptr;
+
+            if (pthread_main_np()) {
+                layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(inputSource, kTISPropertyUnicodeKeyLayoutData));
+            } else {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(inputSource, kTISPropertyUnicodeKeyLayoutData));
+                });
+            }
+            
+            if (layoutData == nullptr)
+            {
+                printf("Failed to get layout data\n");
+                return {};
+            }
+
             const UCKeyboardLayout* keyboardLayout = reinterpret_cast<const UCKeyboardLayout*>(CFDataGetBytePtr(layoutData));
 
             if (!keyboardLayout)
