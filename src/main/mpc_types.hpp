@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 namespace mpc::nvram { struct MidiControlPreset; }
 namespace mpc::sampler { class Sound; class Program; }
