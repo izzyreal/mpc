@@ -229,24 +229,51 @@ void FrameSeq::stopCountingInIfRequired()
     }
 }
 
+// Returns true if the song has stopped
 bool FrameSeq::processSongMode()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (getTickPosition() >= seq->getLastTick() - 1)
+    if (getTickPosition() < seq->getLastTick())
     {
-        sequencer->playToTick(seq->getLastTick() - 1);
-        sequencer->incrementPlayedStepRepetitions();
-        auto song = sequencer->getSong(songScreen->getActiveSongIndex());
-        auto step = songScreen->getOffset() + 1;
+        return false;
+    }
 
-        auto doneRepeating = sequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
-        auto reachedLastStep = step == song->getStepCount() - 1;
+    sequencer->playToTick(seq->getLastTick() - 1);
+    sequencer->incrementPlayedStepRepetitions();
+    auto song = sequencer->getSong(songScreen->getActiveSongIndex());
+    auto step = songScreen->getOffset() + 1;
 
-        if (doneRepeating && songScreen->isLoopEnabled() && step == song->getLastStep())
+    auto doneRepeating = sequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
+    auto reachedLastStep = step == song->getStepCount() - 1;
+
+    if (doneRepeating && songScreen->isLoopEnabled() && step == song->getLastStep())
+    {
+        sequencer->resetPlayedStepRepetitions();
+        songScreen->setOffset(song->getFirstStep() - 1);
+        auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
+
+        if (!sequencer->getSequence(newStep->getSequence())->isUsed())
+        {
+            stopSequencer();
+            return true;
+        }
+
+        move(0);
+    }
+    else if (doneRepeating && reachedLastStep)
+    {
+        sequencer->setEndOfSong(true);
+        stopSequencer();
+        return true;
+    }
+    else
+    {
+        if (doneRepeating)
         {
             sequencer->resetPlayedStepRepetitions();
-            songScreen->setOffset(song->getFirstStep() - 1);
+            songScreen->setOffset(songScreen->getOffset() + 1);
+
             auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
             if (!sequencer->getSequence(newStep->getSequence())->isUsed())
@@ -254,36 +281,12 @@ bool FrameSeq::processSongMode()
                 stopSequencer();
                 return true;
             }
-
-            move(0);
-        }
-        else if (doneRepeating && reachedLastStep)
-        {
-            sequencer->setEndOfSong(true);
-            stopSequencer();
-            return true;
         }
         else
         {
-            if (doneRepeating)
-            {
-                sequencer->resetPlayedStepRepetitions();
-                songScreen->setOffset(songScreen->getOffset() + 1);
-
-                auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
-
-                if (!sequencer->getSequence(newStep->getSequence())->isUsed())
-                {
-                    stopSequencer();
-                    return true;
-                }
-            }
-            else
-            {
-                sequencer->playToTick(seq->getLastTick() - 1);
-            }
-            move(0);
+            sequencer->playToTick(seq->getLastTick() - 1);
         }
+        move(0);
     }
 
     return false;
