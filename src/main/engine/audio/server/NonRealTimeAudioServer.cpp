@@ -132,9 +132,9 @@ void NonRealTimeAudioServer::work(
         float* const* outputBuffer,
         const int nFrames,
         const std::vector<uint8_t> &mpcMonoInputChannelIndices,
-        const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+        const FixedVector<uint8_t, 18> &mpcMonoOutputChannelIndices,
         const std::vector<uint8_t> &hostInputChannelIndices,
-        const std::vector<uint8_t> &hostOutputChannelIndices)
+        const FixedVector<uint8_t, 18> &hostOutputChannelIndices)
 {
 	auto realTimeAudioServer = dynamic_pointer_cast<RealTimeAudioServer>(server);
     realTimeAudioServer->work(inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices, mpcMonoOutputChannelIndices, hostInputChannelIndices, hostOutputChannelIndices);

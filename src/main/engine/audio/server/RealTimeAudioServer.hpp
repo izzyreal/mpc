@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "../../../FixedVector.hpp"
 
 namespace mpc::engine::audio::server
 {
@@ -37,8 +38,8 @@ namespace mpc::engine::audio::server
                   float* const* outputBuffer,
                   const int nFrames,
                   const std::vector<uint8_t> &mpcMonoInputChannelIndices,
-                  const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+                  const FixedVector<uint8_t, 18> &mpcMonoOutputChannelIndices,
                   const std::vector<uint8_t> &hostInputChannelIndices,
-                  const std::vector<uint8_t> &hostOutputChannelIndices);
+                  const FixedVector<uint8_t, 18> &hostOutputChannelIndices);
 	};
 }

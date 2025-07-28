@@ -145,9 +145,9 @@ void RealTimeAudioServer::work(const float* const* inputBuffer,
                                float* const* outputBuffer,
                                int nFrames,
                                const std::vector<uint8_t> &mpcMonoInputChannelIndices,
-                               const std::vector<uint8_t> &mpcMonoOutputChannelIndices,
+                               const FixedVector<uint8_t, 18> &mpcMonoOutputChannelIndices,
                                const std::vector<uint8_t> &hostInputChannelIndices,
-                               const std::vector<uint8_t> &hostOutputChannelIndices) {
+                               const FixedVector<uint8_t, 18> &hostOutputChannelIndices) {
 	if (!running) {
 		return;
 	}
