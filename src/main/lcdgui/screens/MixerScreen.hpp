@@ -3,6 +3,7 @@
 #include <lcdgui/MixerStrip.hpp>
 
 #include <memory>
+#include <bitset>
 
 namespace mpc::lcdgui::screens {
 class SelectMixerDrumScreen;
