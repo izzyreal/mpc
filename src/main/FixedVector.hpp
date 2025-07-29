@@ -2,6 +2,7 @@
 #include <array>
 
 #include <stdexcept>
+#include <initializer_list>
 
 template <typename T, std::size_t Capacity>
 class FixedVector {
@@ -10,6 +11,14 @@ class FixedVector {
 
 public:
     FixedVector() = default;
+
+    FixedVector(std::initializer_list<T> init) {
+        if (init.size() > Capacity)
+            throw std::overflow_error("FixedVector capacity exceeded");
+        for (const auto& val : init) {
+            data_[size_++] = val;
+        }
+    }
 
     FixedVector(const FixedVector& other)
         : data_(other.data_), size_(other.size_) {}
