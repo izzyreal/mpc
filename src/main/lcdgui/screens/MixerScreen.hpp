@@ -39,7 +39,7 @@ public:
 
 private:
     void recordMixerEvent(int pad, int param, int value);
-    void turnWheelLinked(int i);
+    void setXPos(unsigned char newXPos);
     
 private:
     const std::vector<std::string> fxPathNames{ "--", "M1", "M2", "R1", "R2" };
@@ -49,7 +49,8 @@ private:
 private:
     int tab = 0;
     int lastTab = -1;
-    bool link = false;
+
+    std::bitset<16> selection;
 
     int xPos = 0;
     int yPos = 0;
@@ -77,7 +78,7 @@ private:
 
 public:
     int getTab();
-    void setXPos(unsigned char newXPos);
+    void pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank);
 
 public:
     void update(Observable* o, Message message) override;

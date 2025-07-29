@@ -232,7 +232,7 @@ void BaseControls::various(int note, std::optional<int> padIndexWithBank)
             unsigned char bankEndPadIndex = bankStartPadIndex + 16;
             if (*padIndexWithBank >= bankStartPadIndex && *padIndexWithBank < bankEndPadIndex)
             {
-                mixerScreen->setXPos(*padIndexWithBank % 16);
+                mixerScreen->pressPadIndexWithoutBank(*padIndexWithBank % 16);
             }
         }
         else if (channelSettingsScreen)
