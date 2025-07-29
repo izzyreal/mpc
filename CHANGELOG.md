@@ -1,3 +1,17 @@
+## v0.9.0 RC4 (29-7-2025)
+* Fix slider UI updates when moving the slider via MIDI.
+* Fix Song mode DAW synchronization.
+* In the Mixer screens, holding down SHIFT and tapping the drum pads, allows you to select multiple channels simultaneously. This is an official MPC2000XL feature that was missing all these years.
+* Fix various multi-bus issues with the VST3 version. The issues were noticed in Reaper, but it's possible other hosts had issues too. The wrong audio was sent to the wrong bus, and after changing the individual output of a pad, there was noise in the buffer. Additionally in Reaper many of the additional buses would at times be muted after opening the plugin. Also the initial channel configuration in Reaper was incorrect.
+* Follow DAW tempo, even when the DAW is not playing.
+* Fix iOS Bluetooth MIDI permissions.
+* Show the disclaimer only once. It was showing every time you opened the GUI in some hosts for some plugin formats.
+
+## v0.9.0 RC0 (28-2-2025)
+* Completely new UI based on vector graphics
+* Improved multi-bus plugin support
+* LV2 for macOS and Windows
+
 ## v0.6.4 (24-10-2024)
 
 * Fix various issues when using more than 127 sounds.
