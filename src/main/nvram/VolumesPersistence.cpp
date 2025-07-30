@@ -23,7 +23,7 @@ Document read(mpc::Mpc& mpc)
     if (fs::exists(path))
     {
         const auto bytes = get_file_data(path);
-        result.Parse(bytes.data());
+        result.Parse(bytes.data(), bytes.size());
     }
     
     if (!result.IsObject())
