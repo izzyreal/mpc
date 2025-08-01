@@ -78,6 +78,8 @@ int LayeredScreen::openScreen(std::string newScreenName)
         return -1;
     }
 
+    const auto oldFocusedLayerIndex = focusedLayerIndex;
+
     auto screenComponent = mpc.screens->getScreenComponent(newScreenName);
 
     if (!screenComponent)
@@ -163,6 +165,11 @@ int LayeredScreen::openScreen(std::string newScreenName)
         {
             mpc.getSequencer()->setNextSq(-1);
         }
+    }
+
+    if (focusedLayerIndex < oldFocusedLayerIndex)
+    {
+        clearScreenToReturnToWhenPressingOpenWindow();
     }
 
 	return focusedLayerIndex;
@@ -550,3 +557,19 @@ FunctionKeys* LayeredScreen::getFunctionKeys()
 {
 	return getFocusedLayer()->getFunctionKeys();
 }
+
+std::string LayeredScreen::getScreenToReturnToWhenPressingOpenWindow()
+{
+    return screenToReturnToWhenPressingOpenWindow;
+}
+
+void LayeredScreen::setScreenToReturnToWhenPressingOpenWindow(const std::string screenToUse)
+{
+    screenToReturnToWhenPressingOpenWindow = screenToUse;
+}
+
+void LayeredScreen::clearScreenToReturnToWhenPressingOpenWindow()
+{
+    screenToReturnToWhenPressingOpenWindow.clear();
+}
+

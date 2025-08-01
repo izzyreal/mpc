@@ -57,7 +57,18 @@ void Button::push()
 		screen->mainScreen();
 	}
 	else if (label == "open-window") {
+        auto currentScreenName = ls->getCurrentScreenName();
+
+        const auto layerIndex = ls->getFocusedLayerIndex();
+
 		screen->openWindow();
+
+        if (currentScreenName != ls->getCurrentScreenName() &&
+            currentScreenName != "popup" &&
+            ls->getFocusedLayerIndex() > layerIndex)
+        {
+            ls->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
+        }
 	}
 	else if (label == "prev-step-event") {
 		screen->prevStepEvent();

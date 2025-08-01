@@ -59,6 +59,7 @@ namespace mpc::lcdgui {
 		int focusedLayerIndex{ 0 };
 		std::string currentScreenName;
 		std::string previousScreenName;
+        std::string screenToReturnToWhenPressingOpenWindow;
 
 	private:
 		FunctionKeys* getFunctionKeys();
@@ -76,6 +77,10 @@ namespace mpc::lcdgui {
 		void setPreviousScreenName(std::string screenName);
 		std::string getPreviousScreenName();
 		void setFunctionKeysArrangement(int arrangementIndex);
+
+        std::string getScreenToReturnToWhenPressingOpenWindow();
+        void setScreenToReturnToWhenPressingOpenWindow(const std::string);
+        void clearScreenToReturnToWhenPressingOpenWindow();
 
 	public:
 		std::vector<std::vector<bool>>* getPixels();
