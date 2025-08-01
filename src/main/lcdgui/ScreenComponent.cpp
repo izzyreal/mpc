@@ -73,3 +73,18 @@ const std::string ScreenComponent::getLastFocus(const std::string& screenName)
 {
 	return mpc.getLayeredScreen()->getLastFocus(screenName);
 }
+
+void ScreenComponent::openWindow()
+{
+    auto layeredScreen = mpc.getLayeredScreen();
+
+    if (layeredScreen->getScreenToReturnToWhenPressingOpenWindow().empty() ||
+        name == "midi-output-monitor")
+    {
+        return;
+    }
+
+    layeredScreen->openScreen(layeredScreen->getScreenToReturnToWhenPressingOpenWindow());
+    layeredScreen->clearScreenToReturnToWhenPressingOpenWindow();
+}
+

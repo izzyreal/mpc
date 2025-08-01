@@ -86,7 +86,7 @@ namespace mpc::lcdgui
 		virtual void up() { mpc.getControls()->getBaseControls()->up(); }
 		virtual void down() { mpc.getControls()->getBaseControls()->down(); }
 		virtual void function(int i) { init(); mpc.getControls()->getBaseControls()->function(i); }
-		virtual void openWindow() {}
+		virtual void openWindow();
 		virtual void turnWheel(int i) {}
 		virtual void numpad(int i) { mpc.getControls()->getBaseControls()->numpad(i); }
 		virtual void pressEnter() { mpc.getControls()->getBaseControls()->pressEnter(); }
