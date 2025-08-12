@@ -4,7 +4,7 @@
 
 #include <engine/audio/server/AudioClient.hpp>
 
-#include <sequencer/Clock.hpp>
+#include <sequencer/OldClock.hpp>
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>

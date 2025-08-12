@@ -41,11 +41,11 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
 
     const bool tempoSourceIsSequence = mpcSequencer->isTempoSourceSequenceEnabled();
 
-    mpcSequencer->setTempoSourceSequence(false);
+    mpcSequencer->setTempoSourceSequence(false, false);
 
     const auto masterTempoBytes = ByteUtil::ushort2bytes(mpcSequencer->getTempo() * 10.0);
 
-    mpcSequencer->setTempoSourceSequence(tempoSourceIsSequence);
+    mpcSequencer->setTempoSourceSequence(tempoSourceIsSequence, false);
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];

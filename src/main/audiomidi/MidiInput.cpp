@@ -391,7 +391,7 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
         }
         else if (step || recWithoutPlaying)
         {
-            auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
+            auto newDuration = static_cast<int>(sequencer->getTickPosition());
 
             const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
             const auto increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
