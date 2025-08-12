@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "sequencer/ExternalClock.hpp"
 #include "sequencer/Track.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
@@ -11,6 +12,7 @@
 TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-disk-recording]")
 {
     const int BUFFER_SIZE = 512;
+    const int SAMPLE_RATE = 44100;
     const int DSP_CYCLE_DURATION_MICROSECONDS = 11601;
     const int DSP_CYCLE_COUNT = 2000000 / DSP_CYCLE_DURATION_MICROSECONDS;
 
@@ -42,7 +44,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     auto audioMidiServices = mpc.getAudioMidiServices();
     auto audioServer = audioMidiServices->getAudioServer();
 
-    audioServer->setSampleRate(44100);
+    audioServer->setSampleRate(SAMPLE_RATE);
     audioServer->resizeBuffers(BUFFER_SIZE);
 
     const float** inputBuffer = new const float*[2];
@@ -56,11 +58,23 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
         outputBuffer[i] = new float[BUFFER_SIZE];
     }
 
+    auto clock = mpc.getExternalClock();
+
+    int64_t timeInSamples = 0;
+
     auto audioThread = std::thread([&]{
         for (int i = 0; i < DSP_CYCLE_COUNT; i++)
         {
             audioMidiServices->changeBounceStateIfRequired();
+            const double lastPpqPos = clock->getLastProcessedIncomingPpqPosition();
+            const auto beatsPerFrame = 1.0 / ((1.0/(mpc.getSequencer()->getTempo()/60.0)) * SAMPLE_RATE);
+            const auto ppqPos = lastPpqPos == std::numeric_limits<double>::lowest() ? 0 : (lastPpqPos + (BUFFER_SIZE * beatsPerFrame));
+
+            clock->resetJumpOccurredInLastBuffer();
+            clock->clearTicks();
+            clock->computeTicksForCurrentBuffer(ppqPos, 0, BUFFER_SIZE, SAMPLE_RATE, mpc.getSequencer()->getTempo(), timeInSamples);
             audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {}, {0, 1});
+            timeInSamples += BUFFER_SIZE;
             std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
         }
     });

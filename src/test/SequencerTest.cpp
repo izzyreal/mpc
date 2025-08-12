@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "sequencer/ExternalClock.hpp"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <controls/GlobalReleaseControls.hpp>
@@ -48,6 +49,7 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 
 TEST_CASE("Can record and playback from different threads", "[sequencer]")
 {
+    const int SAMPLE_RATE = 44100;
     const int BUFFER_SIZE = 512;
     const int PROCESS_BLOCK_INTERVAL = 12; // Approximate duration of 512 frames at 44100khz
     const int AUDIO_THREAD_TIMEOUT = 4000;
@@ -78,8 +80,13 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     auto track = seq->getActiveTrack();
 
     auto server = mpc.getAudioMidiServices()->getAudioServer();
-    server->resizeBuffers(512);
-    server->setSampleRate(44100);
+    auto clock = mpc.getExternalClock();
+
+    server->resizeBuffers(BUFFER_SIZE);
+
+    server->setSampleRate(SAMPLE_RATE);
+
+    int64_t timeInSamples = 0;
 
     thread audioThread([&]() {
 
@@ -88,7 +95,15 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
         while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
                track->getEvents().size() < humanTickPositions.size())
         {
+            const double lastPpqPos = clock->getLastProcessedIncomingPpqPosition();
+            const auto beatsPerFrame = 1.0 / ((1.0/(seq->getTempo()/60.0)) * SAMPLE_RATE);
+            const auto ppqPos = lastPpqPos == std::numeric_limits<double>::lowest() ? 0 : (lastPpqPos + (BUFFER_SIZE * beatsPerFrame));
+
+            clock->resetJumpOccurredInLastBuffer();
+            clock->clearTicks();
+            clock->computeTicksForCurrentBuffer(ppqPos, 0, BUFFER_SIZE, SAMPLE_RATE, seq->getTempo(), timeInSamples);
             server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+            timeInSamples += BUFFER_SIZE;
 
             if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
             {
@@ -190,6 +205,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
 TEST_CASE("Undo", "[sequencer]")
 {
     const int BUFFER_SIZE = 4096;
+    const int SAMPLE_RATE = 44100;
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -207,16 +223,28 @@ TEST_CASE("Undo", "[sequencer]")
 
     auto server = mpc.getAudioMidiServices()->getAudioServer();
     server->resizeBuffers(BUFFER_SIZE);
-    server->setSampleRate(44100);
+    server->setSampleRate(SAMPLE_RATE);
 
     sequencer->recFromStart();
 
     auto pads = mpc.getHardware()->getPads();
 
+    int64_t timeInSamples = 0;
+
+    auto clock = mpc.getExternalClock();
+
     for (int i = 0; i < 20; i++)
     {
         if (i % 2 == 0) pads[0]->push(127); else pads[0]->release();
+        const double lastPpqPos = clock->getLastProcessedIncomingPpqPosition();
+        const auto beatsPerFrame = 1.0 / ((1.0/(sequencer->getTempo()/60.0)) * SAMPLE_RATE);
+        const auto ppqPos = lastPpqPos == std::numeric_limits<double>::lowest() ? 0 : (lastPpqPos + (BUFFER_SIZE * beatsPerFrame));
+
+        clock->resetJumpOccurredInLastBuffer();
+        clock->clearTicks();
+        clock->computeTicksForCurrentBuffer(ppqPos, 0, BUFFER_SIZE, SAMPLE_RATE, sequencer->getTempo(), timeInSamples);
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+        timeInSamples += BUFFER_SIZE;
     }
 
     sequencer->stop();

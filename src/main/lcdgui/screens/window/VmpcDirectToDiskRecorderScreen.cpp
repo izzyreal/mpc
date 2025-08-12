@@ -113,7 +113,6 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			else
             {
                 sequencer.lock()->playFromStart();
-                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(0);
             }
 
 			break;
@@ -144,7 +143,6 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			else
             {
                 sequencer.lock()->play();
-                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(sequence->getLoopStart());
             }
 
 			break;
@@ -175,7 +173,6 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			else
             {
                 sequencer.lock()->play();
-                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(time0);
             }
 
 			break;
@@ -211,7 +208,6 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			else
             {
                 sequencer.lock()->playFromStart();
-                mpc.getAudioMidiServices()->getFrameSequencer()->setSequencerPlayTickCounter(0);
             }
 
 			break;
