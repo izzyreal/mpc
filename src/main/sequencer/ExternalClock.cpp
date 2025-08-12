@@ -9,12 +9,19 @@
 #endif
 #endif
 
+#include <limits>
+
 using namespace mpc::sequencer;
+
+ExternalClock::ExternalClock()
+{
+    reset();
+}
 
 void ExternalClock::reset()
 {
-    previousAbsolutePpqPosition = -1.0;
-    previousRelativePpqPosition = 1.0;
+    previousAbsolutePpqPosition = std::numeric_limits<double>::lowest();
+    previousRelativePpqPosition = std::numeric_limits<double>::max();
     previousBpm = 0;
     previousPpqPositionOfLastBarStart = 0;
     ticksAreBeingProduced = false;
@@ -22,13 +29,10 @@ void ExternalClock::reset()
 
 void ExternalClock::clearTicks()
 {
-    for (int32_t& tick : ticks)
-    {
-        tick = -1;
-    }
+    ticks.clear();
 }
 
-std::vector<int32_t>& ExternalClock::getTicksForCurrentBuffer()
+const FixedVector<uint16_t, 200>& ExternalClock::getTicksForCurrentBuffer()
 {
     return ticks;
 }
@@ -51,12 +55,20 @@ void ExternalClock::computeTicksForCurrentBuffer(
         previousAbsolutePpqPosition = ppqPositionOfLastBarStart;
     }
 
+    /*
+
+       // This works as a hack for fixing the problem with VMPC2000XL's sequencer
+       // not progressing after Reaper loops back to the starting position of a loop
+       // that is smaller than the sequence.
+    while (ppqPosition < previousAbsolutePpqPosition)
+    {
+        previousAbsolutePpqPosition -= 1;
+    }
+    */
+
     auto samplesInMinute = sampleRate * 60;
     auto samplesPerBeat = samplesInMinute / bpm;
     auto ppqPerSample = 1.0 / samplesPerBeat;
-    auto currentSubDiv = 1.0 / 96.0;
-
-    int tickCounter = 0;
 
     if (bpm > previousBpm)
     {
@@ -68,7 +80,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
         for (int i = 0; i < underflowTickCount; i++)
         {
             // All underflowing ticks will be played back at sample index 0 within this buffer.
-            ticks[tickCounter++] = 0;
+            ticks.push_back(0);
         }
     }
 
@@ -90,11 +102,11 @@ void ExternalClock::computeTicksForCurrentBuffer(
             continue;
         }
 
-        auto relativePosition = fmod(ppqPositions[sample], currentSubDiv);
+        auto relativePosition = fmod(ppqPositions[sample], subDiv);
 
         if (relativePosition < previousRelativePpqPosition)
         {
-            ticks[tickCounter++] = sample;
+            ticks.push_back(sample);
         }
 
         previousRelativePpqPosition = relativePosition;
@@ -108,10 +120,11 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     previousBpm = bpm;
     previousPpqPositionOfLastBarStart = ppqPositionOfLastBarStart;
-    ticksAreBeingProduced = ticksAreBeingProduced || tickCounter > 0;
+    ticksAreBeingProduced = ticksAreBeingProduced || ticks.size() > 0;
 }
 
 bool ExternalClock::areTicksBeingProduced()
 {
     return ticksAreBeingProduced;
 }
+

@@ -25,6 +25,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/Song.hpp>
 #include <sequencer/Step.hpp>
+#include <sequencer/ExternalClock.hpp>
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
@@ -1456,6 +1457,12 @@ void Sequencer::move(int tick)
     notifyObservers(std::string("tempo"));
 }
 
+void Sequencer::movePpqPos(const double ppqPos)
+{
+    auto clock = mpc.getExternalClock();
+    //clock->jumpToPpqPos(ppqPos);
+}
+
 int Sequencer::getTickPosition()
 {
     if (isPlaying())
@@ -1757,3 +1764,10 @@ void Sequencer::resetPlayedStepRepetitions()
 {
 	playedStepRepetitions = 0;
 }
+
+const bool Sequencer::shouldRelyOnExternalPpqPos()
+{
+    const auto syncScreen = mpc.screens->get<SyncScreen>("sync");
+    return mpc.isPluginModeEnabled() && syncScreen->getModeIn() == 1;
+}
+

@@ -480,9 +480,9 @@ void FrameSeq::work(int nFrames)
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
 
-    for (auto& externalClockTick : externalClockTicks)
+    for (size_t tickIndex = 0; tickIndex < externalClockTicks.size(); tickIndex++)
     {
-        if (static_cast<int>(externalClockTick) >= nFrames)
+        if (externalClockTicks[tickIndex] >= nFrames)
         {
             throw std::exception();
         }
@@ -520,7 +520,15 @@ void FrameSeq::work(int nFrames)
         }
         else
         {
-            const auto tickCountAtThisFrameIndex = std::count(externalClockTicks.begin(), externalClockTicks.end(), frameIndex);
+            size_t tickCountAtThisFrameIndex = 0;
+
+            for (size_t tickIndex = 0; tickIndex < externalClockTicks.size(); tickIndex++)
+            {
+                if (auto tickFrameIndex = externalClockTicks[tickIndex]; tickFrameIndex == frameIndex)
+                {
+                    tickCountAtThisFrameIndex++;
+                }
+            }
 
             if (tickCountAtThisFrameIndex == 0)
             {

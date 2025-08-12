@@ -89,6 +89,8 @@ namespace mpc::sequencer
 		void copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst);
 		void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
 
+        const bool shouldRelyOnExternalPpqPos();
+
 	public:
         static void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
 		void notifyTimeDisplay();
@@ -167,6 +169,7 @@ namespace mpc::sequencer
 		void tap();
 
         void move(int tick);
+        void movePpqPos(const double ppqPos);
 		int getTickPosition();
 		std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
 		void setActiveTrackIndex(int i);

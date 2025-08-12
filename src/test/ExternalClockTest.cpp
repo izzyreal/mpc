@@ -76,14 +76,12 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-        for (auto& tick : ticksForCurrentBuffer)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
-            if (tick == -1) continue;
-            ticks.push_back(tick);
+            ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
-        if (std::count(ticksForCurrentBuffer.begin(),
-                       ticksForCurrentBuffer.end(), -1) == ticksForCurrentBuffer.size())
+        if (ticksForCurrentBuffer.size() == 0)
         {
             // No ticks generated for current buffer
             ticks.push_back(-1);
@@ -141,10 +139,9 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-        for (auto& tick : ticksForCurrentBuffer)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
-            if (tick == -1) continue;
-            ticks.push_back(tick);
+            ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
         mpc.getExternalClock()->clearTicks();
@@ -175,10 +172,9 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-        for (auto& tick : ticksForCurrentBuffer)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
-            if (tick == -1) continue;
-            ticks.push_back(tick);
+            ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
         mpc.getExternalClock()->clearTicks();
@@ -208,10 +204,9 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-        for (auto& tick : ticksForCurrentBuffer)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
-            if (tick == -1) continue;
-            ticks.push_back(tick);
+            ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
         mpc.getExternalClock()->clearTicks();
@@ -241,10 +236,9 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-        for (auto& tick : ticksForCurrentBuffer)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
-            if (tick == -1) continue;
-            ticks.push_back(tick);
+            ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
         mpc.getExternalClock()->clearTicks();
@@ -276,24 +270,17 @@ TEST_CASE("1 bar loop", "[external-clock]")
     {
         const auto ppqPosition = ppqPositions[i];
         mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, blockSizes[i], 44100, 120);
+
         auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
         frameSeq->work(blockSizes[i]);
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
-        for (auto& tick : ticksForCurrentBuffer)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
-            if (tick == -1) continue;
-            ticks.push_back(tick);
+            ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
-        printf("After processing ppqPosition %i, seq pos is %i\n", i, mpc.getSequencer()->getTickPosition());
-
         mpc.getExternalClock()->clearTicks();
-    }
-
-    for (auto &t : ticks)
-    {
-        //printf("%i\n", t);
     }
 }
 
