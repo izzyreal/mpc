@@ -4,6 +4,10 @@
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/ExternalClock.hpp"
 
+#include "audiomidi/AudioMidiServices.hpp"
+
+#include "lcdgui/screens/SyncScreen.hpp"
+
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
@@ -249,3 +253,47 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
     const int expectedTickCount = 1552;
     REQUIRE(ticks.size() == expectedTickCount);
 }
+
+TEST_CASE("1 bar loop", "[external-clock]")
+{
+    std::vector<double> ppqPositions;
+    readDoublesFromFile(ppqPositions, "reaper-44.1khz-120bpm-1-bar-loop-ppqpos.txt");
+
+    std::vector<double> blockSizes;
+    readDoublesFromFile(blockSizes, "reaper-44.1khz-120bpm-1-bar-loop-block.txt");
+
+    mpc::Mpc mpc;
+    mpc::TestMpc::initializeTestMpc(mpc);
+    mpc.getSequencer()->getSequence(0)->init(1);
+    mpc.getSequencer()->playFromStart();
+
+    auto syncScreen = mpc.screens->get<mpc::lcdgui::screens::SyncScreen>("sync");
+    syncScreen->modeIn = 1;
+
+    std::vector<int32_t> ticks;
+
+    for (int i = 0; i < ppqPositions.size(); i++)
+    {
+        const auto ppqPosition = ppqPositions[i];
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, blockSizes[i], 44100, 120);
+        auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+        frameSeq->work(blockSizes[i]);
+        auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
+
+        for (auto& tick : ticksForCurrentBuffer)
+        {
+            if (tick == -1) continue;
+            ticks.push_back(tick);
+        }
+
+        printf("After processing ppqPosition %i, seq pos is %i\n", i, mpc.getSequencer()->getTickPosition());
+
+        mpc.getExternalClock()->clearTicks();
+    }
+
+    for (auto &t : ticks)
+    {
+        //printf("%i\n", t);
+    }
+}
+
