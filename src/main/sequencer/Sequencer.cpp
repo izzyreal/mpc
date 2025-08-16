@@ -1100,7 +1100,7 @@ void Sequencer::setBar(int i)
         pos = s->getLastTick();
     }
 
-	move(pos);
+	move(tickToPpq(pos));
 	
 	notifyObservers(std::string("timesignature"));
 	setBeat(0);
@@ -1139,7 +1139,7 @@ void Sequencer::setBeat(int i)
 
 	const auto denTicks = 96 * (4.0 / ts.getDenominator());
 	pos += difference * denTicks;
-	move(pos);
+	move(tickToPpq(pos));
 }
 
 void Sequencer::setClock(int i)
@@ -1174,7 +1174,7 @@ void Sequencer::setClock(int i)
     const int difference = i - getCurrentClockNumber();
 
 	pos += difference;
-	move(pos);
+	move(tickToPpq(pos));
 }
 
 int Sequencer::getLoopEnd()
