@@ -36,6 +36,16 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
+uint32_t Sequencer::ppqToTick(const double ppqPosition)
+{
+    return static_cast<uint32_t>(std::floor<double>(ppqPosition * TICKS_PER_PPQ));
+}
+
+double Sequencer::tickToPpq(const uint32_t tick)
+{
+    return tick / (double) TICKS_PER_PPQ;
+}
+
 uint64_t currentTimeMillis() {
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
@@ -310,7 +320,7 @@ void Sequencer::setActiveSequenceIndex(int i)
 	
 	if (!isPlaying())
 	{
-		position = 0;
+		ppqPosition = 0.0;
 		notifyTimeDisplay();
 	}
 	
@@ -421,7 +431,7 @@ void Sequencer::play(bool fromStart)
 			return;
 	}
 
-	move(position);
+	move(ppqPosition);
     
 	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
@@ -451,7 +461,7 @@ void Sequencer::play(bool fromStart)
                 move(s->getFirstTickOfBar(getCurrentBarIndex()));
             }
 
-            countInStartPos = position;
+            countInStartPos = ppqToTick(ppqPosition);
             countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
 
 			countingIn = true;
@@ -512,7 +522,7 @@ void Sequencer::undoSeq()
 
 	sequences[activeSequenceIndex].swap(s);
 	
-	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
+	sequences[activeSequenceIndex]->resetTrackEventIndices(ppqToTick(ppqPosition));
 
 	undoSeqAvailable = !undoSeqAvailable;
 	auto hw = mpc.getHardware();
@@ -613,7 +623,7 @@ void Sequencer::stop(int tick)
 
 	if (!isPlaying() && !bouncing)
 	{
-		if (position != 0)
+		if (ppqPosition != 0.0)
         {
             setBar(0); // real 2kxl doesn't do this
         }
@@ -736,7 +746,7 @@ void Sequencer::notifyTrack()
 void Sequencer::setSequence(int i, std::shared_ptr<Sequence> s)
 {
 	sequences[i].swap(s);
-	sequences[i]->resetTrackEventIndices(position);
+	sequences[i]->resetTrackEventIndices(ppqToTick(ppqPosition));
 }
 
 void Sequencer::purgeAllSequences()
@@ -752,7 +762,7 @@ void Sequencer::purgeAllSequences()
 void Sequencer::purgeSequence(int i)
 {
 	sequences[i] = std::make_shared<Sequence>(mpc);
-	sequences[i]->resetTrackEventIndices(position);
+	sequences[i]->resetTrackEventIndices(ppqToTick(ppqPosition));
 	std::string res = defaultSequenceName;
 	res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
 	sequences[i]->setName(res);
@@ -762,7 +772,7 @@ void Sequencer::copySequence(int source, int destination)
 {
 	auto copy = copySequence(sequences[source]);
 	sequences[destination].swap(copy);
-	sequences[destination]->resetTrackEventIndices(position);
+	sequences[destination]->resetTrackEventIndices(ppqToTick(ppqPosition));
 	sequences[destination]->initLoop();
 }
 
@@ -1329,7 +1339,7 @@ void Sequencer::goToPreviousStep()
         prevStepIndex = 0;
     }
 
-    move(prevStepIndex * stepSize);
+    move((prevStepIndex * stepSize) / (double) TICKS_PER_PPQ);
 }
 
 void Sequencer::goToNextStep()
@@ -1365,7 +1375,7 @@ void Sequencer::goToNextStep()
         nextStepIndex = stepGrid.size() - 1;
     }
 
-    move(nextStepIndex * stepSize);
+    move((nextStepIndex * stepSize) / (double) TICKS_PER_PPQ);
 }
 
 void Sequencer::tap()
@@ -1432,10 +1442,10 @@ void Sequencer::tap()
 	setTempo(newTempo);
 }
 
-void Sequencer::move(int tick)
+void Sequencer::move(const double ppqPositionToUse)
 {
-	position = tick;
-	playStartTick = tick;
+	ppqPosition = ppqPositionToUse;
+	playStartPpqPosition = ppqPositionToUse;
 
 	auto sequence = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 
@@ -1444,23 +1454,17 @@ void Sequencer::move(int tick)
         sequence = sequences[getSongSequenceIndex()];
     }
 
-	sequence->resetTrackEventIndices(position);
+	sequence->resetTrackEventIndices(ppqToTick(ppqPosition));
 
 	if (secondSequenceEnabled)
 	{
 		auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
-		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(position);
+		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(ppqToTick(ppqPosition));
 	}
 
 	notifyTimeDisplay();
     notifyObservers(std::string("timesignature"));
     notifyObservers(std::string("tempo"));
-}
-
-void Sequencer::movePpqPos(const double ppqPos)
-{
-    auto clock = mpc.getExternalClock();
-    //clock->jumpToPpqPos(ppqPos);
 }
 
 int Sequencer::getTickPosition()
@@ -1470,7 +1474,7 @@ int Sequencer::getTickPosition()
         return mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition();
     }
  
-    return position;
+    return ppqToTick(ppqPosition);
 }
 
 std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
@@ -1679,9 +1683,9 @@ bool Sequencer::isOverDubbing()
     return overdubbing;
 }
 
-int Sequencer::getPlayStartTick()
+const double Sequencer::getPlayStartPpqPosition()
 {
-    return playStartTick;
+    return playStartPpqPosition;
 }
 
 void Sequencer::notify(std::string s)
@@ -1707,7 +1711,7 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	playStartTick = 0;
+	playStartPpqPosition = 0.0;
     mpc.getAudioMidiServices()->getFrameSequencer()->startMetronome();
 }
 
@@ -1736,7 +1740,7 @@ void Sequencer::clearPlaceHolder()
 void Sequencer::movePlaceHolderTo(int destIndex)
 {
 	sequences[destIndex].swap(placeHolder);
-	sequences[destIndex]->resetTrackEventIndices(position);
+	sequences[destIndex]->resetTrackEventIndices(ppqToTick(ppqPosition));
 	clearPlaceHolder();
 }
 

@@ -66,7 +66,7 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
     internalClock.reset();
     mpc.getExternalClock()->reset();
 
-    sequencerPlayTickCounter = sequencer->getPlayStartTick();
+    sequencerPlayTickCounter = Sequencer::ppqToTick(sequencer->getPlayStartPpqPosition());
 
     metronomeOnly = metronomeOnlyToUse;
 
@@ -112,7 +112,7 @@ unsigned int FrameSeq::getTickPosition() const
 void FrameSeq::move(int newTickPos)
 {
     sequencerPlayTickCounter = newTickPos;
-    sequencer->move(newTickPos);
+    sequencer->move(Sequencer::tickToPpq(newTickPos));
     updateTimeDisplay();
 }
 
@@ -126,7 +126,7 @@ std::shared_ptr<Sequence> FrameSeq::switchToNextSequence()
     sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
     sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
     sequencer->setNextSq(-1);
-    sequencer->move(0);
+    sequencer->move(0.0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
     newSeq->initLoop();
     move(0);
@@ -343,7 +343,7 @@ bool FrameSeq::processSeqLoopDisabled()
         else
         {
             sequencer->stop(seq->getLastTick());
-            sequencer->move(seq->getLastTick());
+            sequencer->move(Sequencer::tickToPpq(seq->getLastTick()));
         }
 
         return true;

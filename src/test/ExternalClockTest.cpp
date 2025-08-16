@@ -258,6 +258,9 @@ TEST_CASE("1 bar loop", "[external-clock]")
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
+
+    assert(mpc.getSequencer()->getTickPosition() == 0);
+
     mpc.getSequencer()->getSequence(0)->init(1);
     mpc.getSequencer()->playFromStart();
 
@@ -265,6 +268,10 @@ TEST_CASE("1 bar loop", "[external-clock]")
     syncScreen->modeIn = 1;
 
     std::vector<int32_t> ticks;
+
+    uint64_t highestTickPos = 0;
+
+    uint64_t cumulativeTickPos = 0;
 
     for (int i = 0; i < ppqPositions.size(); i++)
     {
@@ -278,9 +285,14 @@ TEST_CASE("1 bar loop", "[external-clock]")
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
+            cumulativeTickPos += 1;
         }
 
         mpc.getExternalClock()->clearTicks();
+
+        highestTickPos = std::max<uint64_t>(highestTickPos, mpc.getSequencer()->getTickPosition());
     }
+
+    printf("highestTickPos: %i, cumulativeTickPos: %i\n", highestTickPos, cumulativeTickPos);
 }
 
