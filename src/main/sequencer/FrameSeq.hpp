@@ -4,7 +4,6 @@
 
 #include <engine/audio/server/AudioClient.hpp>
 
-#include "Clock.hpp"
 #include "MidiClockOutput.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 
@@ -42,9 +41,9 @@ namespace mpc::sequencer {
     {
     private:
         std::atomic<bool> sequencerIsRunning{false};
+        double previousTempo = 0.0;
         bool shouldWaitForMidiClockLock = false;
         std::atomic_int32_t requestedSampleRate{44100};
-        Clock internalClock;
         std::shared_ptr<MidiClockOutput> midiClockOutput;
         std::shared_ptr<Sequencer> sequencer;
         bool metronomeOnly = false;
@@ -58,8 +57,6 @@ namespace mpc::sequencer {
         void updateTimeDisplay();
 
         void processTempoChange();
-
-        void processSampleRateChange();
 
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames(int frameIndex);

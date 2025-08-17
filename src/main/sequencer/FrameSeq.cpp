@@ -28,6 +28,7 @@
 #include "Util.hpp"
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include <limits>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -56,14 +57,11 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
         return;
     }
 
-    processSampleRateChange();
-
     if (syncScreen->modeOut != 0)
     {
         shouldWaitForMidiClockLock = true;
     }
 
-    internalClock.reset();
     mpc.getExternalClock()->reset();
 
     sequencerPlayTickCounter = Sequencer::ppqToTick(sequencer->getPlayStartPpqPosition());
@@ -386,8 +384,8 @@ void FrameSeq::processNoteRepeat()
                     getTickPosition(),
                     repeatIntervalTicks,
                     getEventFrameOffset(),
-                    internalClock.getBpm(),
-                    static_cast<float>(internalClock.getSampleRate()));
+                    sequencer->getTempo(),
+                    static_cast<float>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate()));
         }
     }
 }
@@ -403,11 +401,9 @@ void FrameSeq::updateTimeDisplay()
 
 void FrameSeq::processTempoChange()
 {
-    double tempo = sequencer->getTempo();
-
-    if (tempo != internalClock.getBpm())
+    if (previousTempo != sequencer->getTempo())
     {
-        internalClock.set_bpm(tempo);
+        previousTempo = sequencer->getTempo();
         sequencer->notify("tempo");
     }
 }
@@ -452,29 +448,43 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
     }
 }
 
-void FrameSeq::processSampleRateChange()
-{
-    if (internalClock.getSampleRate() != requestedSampleRate)
-    {
-        auto bpm = internalClock.getBpm();
-        internalClock.init(requestedSampleRate);
-        internalClock.set_bpm(bpm);
-    }
-}
-
 void FrameSeq::work(int nFrames)
 {
-    auto& externalClockTicks = mpc.getExternalClock()->getTicksForCurrentBuffer();
+    const auto externalClock = mpc.getExternalClock();
+
+    externalClock->clearTicks();
+
     const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
-    const bool useInternalClock = syncScreen->modeIn == 0 || !mpc.getExternalClock()->areTicksBeingProduced();
+    const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+    const auto tempo = mpc.getSequencer()->getTempo();
+
+    if (sequencerIsRunningAtStartOfBuffer)
+    {
+        const auto lastPpqPos = mpc.getExternalClock()->getLastKnownPpqPosition();
+        const auto beatsPerFrame = 1.0 / ((1.0/(tempo/60.0)) * sampleRate);
+
+        const auto ppqPos =
+            lastPpqPos == std::numeric_limits<double>::lowest() ?
+            mpc.getSequencer()->getPlayStartPpqPosition() :
+            lastPpqPos + (nFrames * beatsPerFrame);
+
+        externalClock->
+            computeTicksForCurrentBuffer(
+                    ppqPos,
+                    0.0,
+                    nFrames,
+                    sampleRate,
+                    tempo);
+    }
+
+    auto& externalClockTicks = externalClock->getTicksForCurrentBuffer();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
     bool songHasStopped = false;
     bool normalPlayHasStopped = false;
 
-    processSampleRateChange();
     processTempoChange();
 
     midiClockOutput->processSampleRateChange();
@@ -511,34 +521,24 @@ void FrameSeq::work(int nFrames)
             }
         }
 
-        if (useInternalClock)
+        size_t tickCountAtThisFrameIndex = 0;
+
+        for (size_t tickIndex = 0; tickIndex < externalClockTicks.size(); tickIndex++)
         {
-            if (!internalClock.proc())
+            if (auto tickFrameIndex = externalClockTicks[tickIndex]; tickFrameIndex == frameIndex)
             {
-                continue;
+                tickCountAtThisFrameIndex++;
             }
         }
-        else
+
+        if (tickCountAtThisFrameIndex == 0)
         {
-            size_t tickCountAtThisFrameIndex = 0;
+            continue;
+        }
 
-            for (size_t tickIndex = 0; tickIndex < externalClockTicks.size(); tickIndex++)
-            {
-                if (auto tickFrameIndex = externalClockTicks[tickIndex]; tickFrameIndex == frameIndex)
-                {
-                    tickCountAtThisFrameIndex++;
-                }
-            }
-
-            if (tickCountAtThisFrameIndex == 0)
-            {
-                continue;
-            }
-
-            if (tickCountAtThisFrameIndex > 1)
-            {
-                sequencerPlayTickCounter += (tickCountAtThisFrameIndex - 1);
-            }
+        if (tickCountAtThisFrameIndex > 1)
+        {
+            sequencerPlayTickCounter += (tickCountAtThisFrameIndex - 1);
         }
 
         tickFrameOffset = frameIndex;

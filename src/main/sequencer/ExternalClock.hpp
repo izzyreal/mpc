@@ -19,6 +19,12 @@ namespace mpc::sequencer {
         const FixedVector<uint16_t, 200>& getTicksForCurrentBuffer();
         void reset();
         bool areTicksBeingProduced();
+        
+        const double getLastKnownBpm();
+        const uint32_t getLastKnownSampleRate();
+        const double getLastKnownPpqPosition();
+
+        void setPreviousAbsolutePpqPosition(const double ppqPosition);
 
     private:
         const double resolution = 96.0;
@@ -32,5 +38,6 @@ namespace mpc::sequencer {
         double previousRelativePpqPosition;
         double previousBpm;
         double previousPpqPositionOfLastBarStart;
+        uint32_t previousSampleRate;
     };
 }

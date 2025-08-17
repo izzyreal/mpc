@@ -44,6 +44,8 @@ void ExternalClock::computeTicksForCurrentBuffer(
         int sampleRate,
         double bpm)
 {
+    previousSampleRate = sampleRate;
+
     if (previousBpm == 0)
     {
         previousBpm = bpm;
@@ -126,5 +128,20 @@ void ExternalClock::computeTicksForCurrentBuffer(
 bool ExternalClock::areTicksBeingProduced()
 {
     return ticksAreBeingProduced;
+}
+
+const double ExternalClock::getLastKnownBpm()
+{
+    return previousBpm;
+}
+
+const uint32_t ExternalClock::getLastKnownSampleRate()
+{
+    return previousSampleRate;
+}
+
+const double ExternalClock::getLastKnownPpqPosition()
+{
+    return previousAbsolutePpqPosition;
 }
 
