@@ -673,7 +673,7 @@ void Sequencer::stop(int tick)
         countingIn = false;
     }
 
-    move(pos);
+    move(pos / (double) TICKS_PER_PPQ);
 
 	if (!bouncing)
     {
