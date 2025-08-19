@@ -451,34 +451,12 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
 void FrameSeq::work(int nFrames)
 {
     const auto externalClock = mpc.getExternalClock();
-
-    externalClock->clearTicks();
-
     const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
     const auto tempo = mpc.getSequencer()->getTempo();
 
-    if (sequencerIsRunningAtStartOfBuffer)
-    {
-        const auto lastPpqPos = mpc.getExternalClock()->getLastKnownPpqPosition();
-        const auto beatsPerFrame = 1.0 / ((1.0/(tempo/60.0)) * sampleRate);
-
-        const auto ppqPos =
-            lastPpqPos == std::numeric_limits<double>::lowest() ?
-            mpc.getSequencer()->getPlayStartPpqPosition() :
-            lastPpqPos + (nFrames * beatsPerFrame);
-
-        externalClock->
-            computeTicksForCurrentBuffer(
-                    ppqPos,
-                    0.0,
-                    nFrames,
-                    sampleRate,
-                    tempo);
-    }
-
-    auto& externalClockTicks = externalClock->getTicksForCurrentBuffer();
+    const auto& externalClockTicks = externalClock->getTicksForCurrentBuffer();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
