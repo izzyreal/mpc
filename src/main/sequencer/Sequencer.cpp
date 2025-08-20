@@ -38,7 +38,7 @@ using namespace mpc::sequencer;
 
 uint32_t Sequencer::ppqToTick(const double ppqPosition)
 {
-    return static_cast<uint32_t>(std::floor<double>(ppqPosition * TICKS_PER_PPQ));
+    return static_cast<uint32_t>(std::floor<double>(ppqPosition * (double) TICKS_PER_PPQ));
 }
 
 double Sequencer::tickToPpq(const uint32_t tick)
@@ -1447,12 +1447,8 @@ void Sequencer::move(const double ppqPositionToUse)
 	ppqPosition = ppqPositionToUse;
 	playStartPpqPosition = ppqPositionToUse;
 
-	auto sequence = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
-
-	if (!isPlaying() && songMode)
-    {
-        sequence = sequences[getSongSequenceIndex()];
-    }
+	const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() :
+        (songMode ? sequences[getSongSequenceIndex()] : getActiveSequence());
 
 	sequence->resetTrackEventIndices(ppqToTick(ppqPosition));
 
@@ -1471,9 +1467,10 @@ int Sequencer::getTickPosition()
 {
     if (isPlaying())
     {
-        return mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition();
+        //printf("last know ppq: %f\n", mpc.getExternalClock()->getLastKnownPpqPosition());
+        return ppqToTick(mpc.getExternalClock()->getLastKnownPpqPosition());
     }
- 
+
     return ppqToTick(ppqPosition);
 }
 

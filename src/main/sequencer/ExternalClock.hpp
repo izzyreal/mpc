@@ -23,6 +23,7 @@ namespace mpc::sequencer {
         const double getLastKnownBpm();
         const uint32_t getLastKnownSampleRate();
         const double getLastKnownPpqPosition();
+        const double getLastProcessedIncomingPpqPosition();
 
         void setPreviousAbsolutePpqPosition(const double ppqPosition);
 
@@ -34,6 +35,7 @@ namespace mpc::sequencer {
         FixedVector<uint16_t, 200> ticks;
 
         bool ticksAreBeingProduced;
+        double previousIncomingPpqPosition;
         double previousAbsolutePpqPosition;
         double previousRelativePpqPosition;
         double previousBpm;

@@ -20,6 +20,7 @@ ExternalClock::ExternalClock()
 
 void ExternalClock::reset()
 {
+    previousIncomingPpqPosition = std::numeric_limits<double>::lowest();
     previousAbsolutePpqPosition = std::numeric_limits<double>::lowest();
     previousRelativePpqPosition = std::numeric_limits<double>::max();
     previousBpm = 0;
@@ -44,6 +45,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
         int sampleRate,
         double bpm)
 {
+    previousIncomingPpqPosition = ppqPosition;
     previousSampleRate = sampleRate;
 
     if (previousBpm == 0)
@@ -143,5 +145,10 @@ const uint32_t ExternalClock::getLastKnownSampleRate()
 const double ExternalClock::getLastKnownPpqPosition()
 {
     return previousAbsolutePpqPosition;
+}
+
+const double ExternalClock::getLastProcessedIncomingPpqPosition()
+{
+    return previousIncomingPpqPosition;
 }
 

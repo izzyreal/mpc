@@ -26,7 +26,7 @@ namespace mpc::sequencer
 	{
 
 	public:
-        static const uint16_t TICKS_PER_PPQ = 384;
+        static const uint16_t TICKS_PER_PPQ = 96;
         static uint32_t ppqToTick(const double ppqPosition);
         static double tickToPpq(const uint32_t tick);
 
