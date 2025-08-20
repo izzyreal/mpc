@@ -129,22 +129,6 @@ void ExternalClock::computeTicksForCurrentBuffer(
     previousBpm = bpm;
     previousPpqPositionOfLastBarStart = ppqPositionOfLastBarStart;
     ticksAreBeingProduced = ticksAreBeingProduced || ticks.size() > 0;
-
-    if (ppqPosition < 0 && ppqPositions[nFrames - 1] > 0)
-    {
-        MLOG("We went from negative PPQ to positive in this buffer. We have detected ticks at the following frame offsets:");
-        for (int i = 0; i < ticks.size(); i++)
-        {
-            MLOG(std::to_string(ticks[i]) + " which corresponds with computed PPQ " + std::to_string(ppqPositions[ticks[i]]));
-            MLOG("Surrounding computed PPQs:");
-            for (int j = ((ticks[i]) - 5); j < ((ticks[i]) + 5); j++)
-            {
-                if (j < 0) continue;
-                if (j > ppqPositions.size()) continue;
-                MLOG("Surrounding PPQ: " + std::to_string(ppqPositions[j]));
-            }
-        }
-    }
 }
 
 bool ExternalClock::areTicksBeingProduced()
