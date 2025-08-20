@@ -1468,7 +1468,7 @@ int Sequencer::getTickPosition()
     if (isPlaying())
     {
         //printf("last know ppq: %f\n", mpc.getExternalClock()->getLastKnownPpqPosition());
-        return ppqToTick(mpc.getExternalClock()->getLastKnownPpqPosition());
+        return ppqToTick(mpc.getExternalClock()->getLastProcessedIncomingPpqPosition());
     }
 
     return ppqToTick(ppqPosition);
