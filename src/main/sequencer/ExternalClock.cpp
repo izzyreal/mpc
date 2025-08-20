@@ -10,6 +10,9 @@
 #endif
 
 #include <limits>
+#include <string>
+
+#include <Logger.hpp>
 
 using namespace mpc::sequencer;
 
@@ -48,15 +51,11 @@ void ExternalClock::computeTicksForCurrentBuffer(
     previousIncomingPpqPosition = ppqPosition;
     previousSampleRate = sampleRate;
 
+    ppqPositions.clear();
+
     if (previousBpm == 0)
     {
         previousBpm = bpm;
-    }
-
-    // The transport has jumped back while playing, most likely because of looping
-    if (ppqPositionOfLastBarStart < previousPpqPositionOfLastBarStart)
-    {
-        previousAbsolutePpqPosition = ppqPositionOfLastBarStart;
     }
 
     /*
@@ -92,7 +91,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        ppqPositions[sample] = ppqPosition + offset;
+        ppqPositions.push_back(ppqPosition + offset);
         offset += ppqPerSample;
     }
 
@@ -107,6 +106,11 @@ void ExternalClock::computeTicksForCurrentBuffer(
         }
 
         auto relativePosition = fmod(ppqPositions[sample], subDiv);
+
+        if (relativePosition < 0)
+        {
+            relativePosition += subDiv;
+        }
 
         if (relativePosition < previousRelativePpqPosition)
         {
@@ -125,6 +129,22 @@ void ExternalClock::computeTicksForCurrentBuffer(
     previousBpm = bpm;
     previousPpqPositionOfLastBarStart = ppqPositionOfLastBarStart;
     ticksAreBeingProduced = ticksAreBeingProduced || ticks.size() > 0;
+
+    if (ppqPosition < 0 && ppqPositions[nFrames - 1] > 0)
+    {
+        MLOG("We went from negative PPQ to positive in this buffer. We have detected ticks at the following frame offsets:");
+        for (int i = 0; i < ticks.size(); i++)
+        {
+            MLOG(std::to_string(ticks[i]) + " which corresponds with computed PPQ " + std::to_string(ppqPositions[ticks[i]]));
+            MLOG("Surrounding computed PPQs:");
+            for (int j = ((ticks[i]) - 5); j < ((ticks[i]) + 5); j++)
+            {
+                if (j < 0) continue;
+                if (j > ppqPositions.size()) continue;
+                MLOG("Surrounding PPQ: " + std::to_string(ppqPositions[j]));
+            }
+        }
+    }
 }
 
 bool ExternalClock::areTicksBeingProduced()
