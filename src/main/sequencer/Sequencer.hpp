@@ -43,6 +43,8 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         bool isUndoSeqAvailable();
 
+        void bumpPpqPos(const double amount);
+
 	private:
         mpc::Mpc& mpc;
         bool playing = false;

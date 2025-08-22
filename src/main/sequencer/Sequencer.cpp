@@ -1442,6 +1442,16 @@ void Sequencer::tap()
 	setTempo(newTempo);
 }
 
+void Sequencer::bumpPpqPos(const double amount)
+{
+    ppqPosition += amount;
+
+    if (ppqToTick(ppqPosition) > getActiveSequence()->getLastTick())
+    {
+        ppqPosition -= tickToPpq(getActiveSequence()->getLastTick());
+    }
+}
+
 void Sequencer::move(const double ppqPositionToUse)
 {
 	ppqPosition = ppqPositionToUse;
@@ -1465,12 +1475,6 @@ void Sequencer::move(const double ppqPositionToUse)
 
 int Sequencer::getTickPosition()
 {
-    if (isPlaying())
-    {
-        //printf("last know ppq: %f\n", mpc.getExternalClock()->getLastKnownPpqPosition());
-        return ppqToTick(mpc.getExternalClock()->getLastProcessedIncomingPpqPosition());
-    }
-
     return ppqToTick(ppqPosition);
 }
 
