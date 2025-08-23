@@ -255,12 +255,15 @@ bool Sequencer::isTempoSourceSequenceEnabled()
     return tempoSourceSequenceEnabled;
 }
 
-void Sequencer::setTempoSourceSequence(bool b)
+void Sequencer::setTempoSourceSequence(bool b, const bool shouldNotifyObservers)
 {
 	tempoSourceSequenceEnabled = b;
 	
-	notifyObservers(std::string("tempo-source"));
-	notifyObservers(std::string("tempo"));
+    if (shouldNotifyObservers)
+    {
+        notifyObservers(std::string("tempo-source"));
+        notifyObservers(std::string("tempo"));
+    }
 }
 
 bool Sequencer::isRecordingOrOverdubbing()

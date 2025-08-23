@@ -107,7 +107,7 @@ namespace mpc::sequencer
 		void setTempo(double newTempo);
 		double getTempo();
 		bool isTempoSourceSequenceEnabled();
-		void setTempoSourceSequence(bool b);
+		void setTempoSourceSequence(bool b, const bool shouldNotifyObservers = true);
 		bool isRecordingOrOverdubbing();
 		bool isRecording();
 		bool isSoloEnabled();
