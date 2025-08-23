@@ -24,6 +24,7 @@ namespace mpc::sequencer {
         const uint32_t getLastKnownSampleRate();
         const double getLastKnownPpqPosition();
         const double getLastProcessedIncomingPpqPosition();
+        const double getLastProcessedPpqCount();
 
         void setPreviousAbsolutePpqPosition(const double ppqPosition);
 
@@ -40,6 +41,7 @@ namespace mpc::sequencer {
         double previousRelativePpqPosition;
         double previousBpm;
         double previousPpqPositionOfLastBarStart;
+        double lastProcessedPpqCount;
         uint32_t previousSampleRate;
     };
 }

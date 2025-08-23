@@ -26,6 +26,7 @@ void ExternalClock::reset()
     previousIncomingPpqPosition = std::numeric_limits<double>::lowest();
     previousAbsolutePpqPosition = std::numeric_limits<double>::lowest();
     previousRelativePpqPosition = std::numeric_limits<double>::max();
+    lastProcessedPpqCount = 0;
     previousBpm = 0;
     previousPpqPositionOfLastBarStart = 0;
     ticksAreBeingProduced = false;
@@ -72,6 +73,8 @@ void ExternalClock::computeTicksForCurrentBuffer(
     auto samplesInMinute = sampleRate * 60;
     auto samplesPerBeat = samplesInMinute / bpm;
     auto ppqPerSample = 1.0 / samplesPerBeat;
+
+    lastProcessedPpqCount = nFrames * ppqPerSample;
 
     if (bpm > previousBpm)
     {
@@ -154,5 +157,10 @@ const double ExternalClock::getLastKnownPpqPosition()
 const double ExternalClock::getLastProcessedIncomingPpqPosition()
 {
     return previousIncomingPpqPosition;
+}
+
+const double ExternalClock::getLastProcessedPpqCount()
+{
+    return lastProcessedPpqCount;
 }
 
