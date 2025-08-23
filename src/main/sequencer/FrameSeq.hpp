@@ -52,8 +52,6 @@ namespace mpc::sequencer {
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
 
-        unsigned long long sequencerPlayTickCounter = 0;
-
         void updateTimeDisplay();
 
         void processTempoChange();
@@ -109,11 +107,7 @@ namespace mpc::sequencer {
 
         bool isRunning();
 
-        unsigned int getTickPosition() const;
-
         void enqueueEventAfterNFrames(const std::function<void(unsigned int)> &event, unsigned long nFrames);
-
-        void setSequencerPlayTickCounter(unsigned long long);
 
     };
 }

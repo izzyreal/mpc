@@ -116,7 +116,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	if (controls->isStepRecording()|| controls->isRecMainWithoutPlaying())
 	{
-		auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
+		auto newDuration = static_cast<int>(sequencer.lock()->getTickPosition());
 
         const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
         const bool increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();

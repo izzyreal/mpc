@@ -1452,6 +1452,11 @@ void Sequencer::bumpPpqPos(const double amount)
     }
 }
 
+void Sequencer::bumpPpqPosByTicks(const uint8_t tickCount)
+{
+    ppqPosition += tickToPpq(tickCount);
+}
+
 void Sequencer::move(const double ppqPositionToUse)
 {
 	ppqPosition = ppqPositionToUse;

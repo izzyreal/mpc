@@ -44,6 +44,7 @@ namespace mpc::sequencer
         bool isUndoSeqAvailable();
 
         void bumpPpqPos(const double amount);
+        void bumpPpqPosByTicks(const uint8_t tickCount);
 
 	private:
         mpc::Mpc& mpc;

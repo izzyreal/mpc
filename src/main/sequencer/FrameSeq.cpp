@@ -64,8 +64,6 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
 
     mpc.getExternalClock()->reset();
 
-    sequencerPlayTickCounter = Sequencer::ppqToTick(sequencer->getPlayStartPpqPosition());
-
     metronomeOnly = metronomeOnlyToUse;
 
     sequencerIsRunning.store(true);
@@ -102,26 +100,15 @@ bool FrameSeq::isRunning()
     return sequencerIsRunning.load();
 }
 
-unsigned int FrameSeq::getTickPosition() const
-{
-    return static_cast<unsigned int>(sequencerPlayTickCounter);
-}
-
 void FrameSeq::move(int newTickPos)
 {
-    sequencerPlayTickCounter = newTickPos;
     sequencer->move(Sequencer::tickToPpq(newTickPos));
     updateTimeDisplay();
 }
 
-void FrameSeq::setSequencerPlayTickCounter(unsigned long long value)
-{
-    sequencerPlayTickCounter = value;
-}
-
 std::shared_ptr<Sequence> FrameSeq::switchToNextSequence()
 {
-    sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+    sequencer->playToTick(sequencer->getTickPosition());
     sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
     sequencer->setNextSq(-1);
     sequencer->move(0.0);
@@ -155,18 +142,18 @@ void FrameSeq::triggerClickIfNeeded()
         }
     }
 
-    auto pos = sequencerPlayTickCounter;
-    auto bar = sequencer->getCurrentBarIndex();
-    auto seq = sequencer->getCurrentlyPlayingSequence();
-    auto firstTickOfBar = seq->getFirstTickOfBar(bar);
-    auto relativePos = pos - firstTickOfBar;
+    const auto pos = sequencer->getTickPosition();
+    const auto bar = sequencer->getCurrentBarIndex();
+    const auto seq = sequencer->getCurrentlyPlayingSequence();
+    const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
+    const auto relativePos = pos - firstTickOfBar;
 
     if (isStepEditor && relativePos == 0)
     {
         return;
     }
 
-    auto den = seq->getDenominator(bar);
+    const auto den = seq->getDenominator(bar);
     auto denTicks = 96 * (4.0 / den);
 
     switch (countMetronomeScreen->getRate())
@@ -204,11 +191,11 @@ void FrameSeq::displayPunchRects()
         auto punchInTime = punchScreen->time0;
         auto punchOutTime = punchScreen->time1;
 
-        if (punchIn && getTickPosition() == punchInTime) {
+        if (punchIn && sequencer->getTickPosition() == punchInTime) {
             sequencerScreen->setPunchRectOn(0, false);
             sequencerScreen->setPunchRectOn(1, true);
         }
-        else if (punchOut && getTickPosition() == punchOutTime)
+        else if (punchOut && sequencer->getTickPosition() == punchOutTime)
         {
             sequencerScreen->setPunchRectOn(1, false);
             sequencerScreen->setPunchRectOn(2, true);
@@ -218,7 +205,7 @@ void FrameSeq::displayPunchRects()
 
 void FrameSeq::stopCountingInIfRequired()
 {
-    if (getTickPosition() >= sequencer->countInEndPos)
+    if (sequencer->getTickPosition() >= sequencer->countInEndPos)
     {
         move(sequencer->countInStartPos);
         sequencer->setCountingIn(false);
@@ -232,7 +219,7 @@ bool FrameSeq::processSongMode()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (getTickPosition() < seq->getLastTick())
+    if (sequencer->getTickPosition() < seq->getLastTick())
     {
         return false;
     }
@@ -294,7 +281,7 @@ bool FrameSeq::processSeqLoopEnabled()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (sequencerPlayTickCounter >= seq->getLoopEnd() - 1)
+    if (sequencer->getTickPosition() >= seq->getLoopEnd() - 1)
     {
         auto punch = punchScreen->on && sequencer->isRecordingOrOverdubbing();
         bool punchIn = punchScreen->autoPunch == 0 || punchScreen->autoPunch == 2;
@@ -312,7 +299,7 @@ bool FrameSeq::processSeqLoopEnabled()
         if (punch && punchOut && !punchIn)
             sequencerScreen->setPunchRectOn(1, true);
 
-        sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+        sequencer->playToTick(sequencer->getTickPosition());
         move(seq->getLoopStart());
 
         if (sequencer->isRecordingOrOverdubbing())
@@ -331,7 +318,7 @@ bool FrameSeq::processSeqLoopDisabled()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (getTickPosition() >= seq->getLastTick())
+    if (sequencer->getTickPosition() >= seq->getLastTick())
     {
         if (sequencer->isRecordingOrOverdubbing())
         {
@@ -360,7 +347,7 @@ void FrameSeq::processNoteRepeat()
         int swingPercentage = timingCorrectScreen->getSwing();
         int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (repeatIntervalTicks * 0.5));
         auto shiftTiming = timingCorrectScreen->getAmount() * (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
-        auto tickPosWithShift = getTickPosition() - shiftTiming;
+        auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
 
         bool shouldRepeatPad = false;
 
@@ -381,7 +368,7 @@ void FrameSeq::processNoteRepeat()
         {
             RepeatPad::process(
                     mpc,
-                    getTickPosition(),
+                    sequencer->getTickPosition(),
                     repeatIntervalTicks,
                     getEventFrameOffset(),
                     sequencer->getTempo(),
@@ -516,7 +503,7 @@ void FrameSeq::work(int nFrames)
 
         if (tickCountAtThisFrameIndex > 1)
         {
-            sequencerPlayTickCounter += (tickCountAtThisFrameIndex - 1);
+            sequencer->bumpPpqPosByTicks(tickCountAtThisFrameIndex - 1);
         }
 
         tickFrameOffset = frameIndex;
@@ -526,20 +513,20 @@ void FrameSeq::work(int nFrames)
 
         if (metronomeOnly)
         {
-            sequencerPlayTickCounter++;
+            sequencer->bumpPpqPosByTicks(1);
             continue;
         }
 
         if (sequencer->isCountingIn())
         {
-            sequencerPlayTickCounter++;
+            sequencer->bumpPpqPosByTicks(1);
             stopCountingInIfRequired();
             continue;
         }
 
         updateTimeDisplay();
 
-        if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
+        if (sequencer->getTickPosition() >= seq->getLastTick() - 1 &&
             !sequencer->isSongModeEnabled() &&
             sequencer->getNextSq() != -1)
         {
@@ -571,10 +558,11 @@ void FrameSeq::work(int nFrames)
 
         if (!songHasStopped && !normalPlayHasStopped)
         {
-            sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+            sequencer->playToTick(sequencer->getTickPosition());
             processNoteRepeat();
         }
 
-        sequencerPlayTickCounter++;
+        sequencer->bumpPpqPosByTicks(1);
     }
 }
+
