@@ -10,23 +10,23 @@ namespace mpc::sequencer {
     class ExternalClock {
     public:
         ExternalClock();
-        void computeTicksForCurrentBuffer(double ppqPosAtStartOfBuffer,
-                                          double ppqPositionOfLastBarStart,
-                                          int nFrames,
-                                          int sampleRate,
-                                          double bpm);
+        void computeTicksForCurrentBuffer(const double ppqPosAtStartOfBuffer,
+                                          const double ppqPositionOfLastBarStart,
+                                          const int nFrames,
+                                          const int sampleRate,
+                                          const double bpm,
+                                          const int64_t timeInSamples);
         void clearTicks();
         const FixedVector<uint16_t, 200>& getTicksForCurrentBuffer();
         void reset();
         bool areTicksBeingProduced();
         
-        const double getLastKnownBpm();
-        const uint32_t getLastKnownSampleRate();
-        const double getLastKnownPpqPosition();
         const double getLastProcessedIncomingPpqPosition();
-        const double getLastProcessedPpqCount();
 
         void setPreviousAbsolutePpqPosition(const double ppqPosition);
+
+        bool didJumpOccurInLastBuffer();
+        void resetJumpOccurredInLastBuffer();
 
     private:
         const double resolution = 96.0;
@@ -41,7 +41,9 @@ namespace mpc::sequencer {
         double previousRelativePpqPosition;
         double previousBpm;
         double previousPpqPositionOfLastBarStart;
-        double lastProcessedPpqCount;
         uint32_t previousSampleRate;
+        int64_t previousTimeInSamples;
+        uint16_t previousBufferSize;
+        bool jumpOccurredInLastBuffer;
     };
 }

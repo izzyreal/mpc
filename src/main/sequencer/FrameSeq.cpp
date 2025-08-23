@@ -444,8 +444,24 @@ void FrameSeq::work(int nFrames)
     const auto tempo = mpc.getSequencer()->getTempo();
 
     const auto& externalClockTicks = externalClock->getTicksForCurrentBuffer();
+    const bool positionalJumpOccurred = externalClock->didJumpOccurInLastBuffer();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
+
+    if (positionalJumpOccurred)
+    {
+        const auto ppqPos = externalClock->getLastProcessedIncomingPpqPosition();
+        const auto seqLengthInPpq = mpc::sequencer::Sequencer::tickToPpq(seq->getLastTick());
+        
+        auto newMpcPpqPos = fmod(ppqPos, seqLengthInPpq);
+        
+        while (newMpcPpqPos < 0)
+        {
+            newMpcPpqPos += seqLengthInPpq;
+        }
+
+        sequencer->move(newMpcPpqPos);
+    }
 
     bool songHasStopped = false;
     bool normalPlayHasStopped = false;

@@ -1784,3 +1784,8 @@ const bool Sequencer::shouldRelyOnExternalPpqPos()
     return mpc.isPluginModeEnabled() && syncScreen->getModeIn() == 1;
 }
 
+void Sequencer::setPpqPos(const double ppqPositionToUse)
+{
+    ppqPosition = ppqPositionToUse;
+}
+

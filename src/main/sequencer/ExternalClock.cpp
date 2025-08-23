@@ -14,6 +14,8 @@
 
 #include <Logger.hpp>
 
+#include <cassert>
+
 using namespace mpc::sequencer;
 
 ExternalClock::ExternalClock()
@@ -26,10 +28,12 @@ void ExternalClock::reset()
     previousIncomingPpqPosition = std::numeric_limits<double>::lowest();
     previousAbsolutePpqPosition = std::numeric_limits<double>::lowest();
     previousRelativePpqPosition = std::numeric_limits<double>::max();
-    lastProcessedPpqCount = 0;
+    previousTimeInSamples = std::numeric_limits<int64_t>::lowest();
+    previousBufferSize = 0;
     previousBpm = 0;
     previousPpqPositionOfLastBarStart = 0;
     ticksAreBeingProduced = false;
+    jumpOccurredInLastBuffer = false;
 }
 
 void ExternalClock::clearTicks()
@@ -43,12 +47,38 @@ const FixedVector<uint16_t, 200>& ExternalClock::getTicksForCurrentBuffer()
 }
 
 void ExternalClock::computeTicksForCurrentBuffer(
-        double ppqPosition,
-        double ppqPositionOfLastBarStart,
-        int nFrames,
-        int sampleRate,
-        double bpm)
+        const double ppqPosition,
+        const double ppqPositionOfLastBarStart,
+        const int nFrames,
+        const int sampleRate,
+        const double bpm,
+        const int64_t timeInSamples)
 {
+    bool jumpOccurred = false;
+
+    if (timeInSamples != std::numeric_limits<int64_t>::lowest())
+    {
+        if (previousTimeInSamples != std::numeric_limits<int64_t>::lowest() &&
+            previousBufferSize != 0)
+        {
+            if (timeInSamples != previousTimeInSamples + previousBufferSize &&
+                timeInSamples != previousTimeInSamples)
+            {
+                /* We have jumped backwards or forwards and need to correct the sequencer PPQ pos and the event indices in the tracks */
+                jumpOccurred = true;
+            }
+        }
+        previousTimeInSamples = timeInSamples;
+        previousBufferSize = nFrames;
+    }
+
+    if (jumpOccurred)
+    {
+        reset();
+    }
+
+    jumpOccurredInLastBuffer = jumpOccurred;
+
     previousIncomingPpqPosition = ppqPosition;
     previousSampleRate = sampleRate;
 
@@ -59,25 +89,13 @@ void ExternalClock::computeTicksForCurrentBuffer(
         previousBpm = bpm;
     }
 
-    /*
-
-       // This works as a hack for fixing the problem with VMPC2000XL's sequencer
-       // not progressing after Reaper loops back to the starting position of a loop
-       // that is smaller than the sequence.
-    while (ppqPosition < previousAbsolutePpqPosition)
-    {
-        previousAbsolutePpqPosition -= 1;
-    }
-    */
-
     auto samplesInMinute = sampleRate * 60;
     auto samplesPerBeat = samplesInMinute / bpm;
     auto ppqPerSample = 1.0 / samplesPerBeat;
 
-    lastProcessedPpqCount = nFrames * ppqPerSample;
-
     if (bpm > previousBpm)
     {
+        assert(!jumpOccurred);
         // When the tempo has increased drastically, there is the possibility of tick underflow.
         // Here we compute how many ticks should be created to compensate for this underflow.
         const double diffBetweenLastProcessedPpqAndCurrentPpq = ppqPosition - previousAbsolutePpqPosition;
@@ -105,6 +123,7 @@ void ExternalClock::computeTicksForCurrentBuffer(
         // we do not process the already processed positions.
         if (ppqPositions[sample] <= previousAbsolutePpqPosition)
         {
+            assert(!jumpOccurred);
             continue;
         }
 
@@ -139,28 +158,18 @@ bool ExternalClock::areTicksBeingProduced()
     return ticksAreBeingProduced;
 }
 
-const double ExternalClock::getLastKnownBpm()
-{
-    return previousBpm;
-}
-
-const uint32_t ExternalClock::getLastKnownSampleRate()
-{
-    return previousSampleRate;
-}
-
-const double ExternalClock::getLastKnownPpqPosition()
-{
-    return previousAbsolutePpqPosition;
-}
-
 const double ExternalClock::getLastProcessedIncomingPpqPosition()
 {
     return previousIncomingPpqPosition;
 }
 
-const double ExternalClock::getLastProcessedPpqCount()
+bool ExternalClock::didJumpOccurInLastBuffer()
 {
-    return lastProcessedPpqCount;
+    return jumpOccurredInLastBuffer;
+}
+
+void ExternalClock::resetJumpOccurredInLastBuffer()
+{
+    jumpOccurredInLastBuffer = false;
 }
 

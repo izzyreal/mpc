@@ -43,6 +43,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         bool isUndoSeqAvailable();
 
+        void setPpqPos(const double ppqPos);
         void bumpPpqPos(const double amount);
         void bumpPpqPosByTicks(const uint8_t tickCount);
 
