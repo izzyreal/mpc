@@ -38,7 +38,7 @@ using namespace mpc::sequencer;
 
 uint32_t Sequencer::ppqToTick(const double ppqPosition)
 {
-    return static_cast<uint32_t>(std::floor<double>(ppqPosition * (double) TICKS_PER_PPQ));
+    return static_cast<uint32_t>(std::floor(ppqPosition * (double) TICKS_PER_PPQ));
 }
 
 double Sequencer::tickToPpq(const uint32_t tick)
