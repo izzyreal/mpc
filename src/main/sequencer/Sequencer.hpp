@@ -26,9 +26,9 @@ namespace mpc::sequencer
 	{
 
 	public:
-        static const uint16_t TICKS_PER_PPQ = 96;
-        static uint32_t ppqToTick(const double ppqPosition);
-        static double tickToPpq(const uint32_t tick);
+        static const uint16_t TICKS_PER_QUARTER_NOTE = 96;
+        static uint32_t quarterNotesToTicks(const double quarterNotes);
+        static double ticksToQuarterNotes(const uint32_t ticks);
 
         int countInStartPos = -1;
         int countInEndPos = -1;
@@ -43,9 +43,8 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         bool isUndoSeqAvailable();
 
-        void setPpqPos(const double ppqPos);
-        void bumpPpqPos(const double amount);
-        void bumpPpqPosByTicks(const uint8_t tickCount);
+        void setPosition(const double positionQuarterNotes);
+        void bumpPositionByTicks(const uint8_t ticks);
 
 	private:
         mpc::Mpc& mpc;
@@ -69,7 +68,7 @@ namespace mpc::sequencer
 
 		bool secondSequenceEnabled = false;
 		bool undoSeqAvailable = false;
-		double playStartPpqPosition = 0.0;
+		double playStartPositionQuarterNotes = 0.0;
 
 		std::string defaultSequenceName;
 		int timeDisplayStyle = 0;
@@ -80,7 +79,7 @@ namespace mpc::sequencer
 		bool tempoSourceSequenceEnabled = false;
 
 		bool countingIn = false;
-		double ppqPosition = 0.0;
+		double positionQuarterNotes = 0.0;
 		uint64_t lastTap = 0;
 		int tapIndex = 0;
 
@@ -97,8 +96,6 @@ namespace mpc::sequencer
 		void copySequenceParameters(std::shared_ptr<Sequence> source, std::shared_ptr<Sequence> dest);
 		void copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst);
 		void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
-
-        const bool shouldRelyOnExternalPpqPos();
 
 	public:
         static void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
@@ -177,7 +174,7 @@ namespace mpc::sequencer
 		void goToNextStep();
 		void tap();
 
-        void move(const double ppqPosition);
+        void move(const double positionQuarterNotes);
 		int getTickPosition();
 		std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
 		void setActiveTrackIndex(int i);
@@ -199,7 +196,7 @@ namespace mpc::sequencer
 		void storeActiveSequenceInUndoPlaceHolder();
 		void resetUndo();
 		bool isOverDubbing();
-		const double getPlayStartPpqPosition();
+		const double getPlayStartPositionQuarterNotes();
 
 		void notify(std::string s);
 

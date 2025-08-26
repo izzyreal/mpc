@@ -36,14 +36,14 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-uint32_t Sequencer::ppqToTick(const double ppqPosition)
+uint32_t Sequencer::quarterNotesToTicks(const double quarterNotes)
 {
-    return static_cast<uint32_t>(std::floor(ppqPosition * (double) TICKS_PER_PPQ));
+    return static_cast<uint32_t>(std::floor(quarterNotes * (double) TICKS_PER_QUARTER_NOTE));
 }
 
-double Sequencer::tickToPpq(const uint32_t tick)
+double Sequencer::ticksToQuarterNotes(const uint32_t ticks)
 {
-    return tick / (double) TICKS_PER_PPQ;
+    return ticks / (double) TICKS_PER_QUARTER_NOTE;
 }
 
 uint64_t currentTimeMillis() {
@@ -323,7 +323,7 @@ void Sequencer::setActiveSequenceIndex(int i)
 	
 	if (!isPlaying())
 	{
-		ppqPosition = 0.0;
+		positionQuarterNotes = 0.0;
 		notifyTimeDisplay();
 	}
 	
@@ -434,7 +434,7 @@ void Sequencer::play(bool fromStart)
 			return;
 	}
 
-	move(ppqPosition);
+	move(positionQuarterNotes);
     
 	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
@@ -464,7 +464,7 @@ void Sequencer::play(bool fromStart)
                 move(s->getFirstTickOfBar(getCurrentBarIndex()));
             }
 
-            countInStartPos = ppqToTick(ppqPosition);
+            countInStartPos = quarterNotesToTicks(positionQuarterNotes);
             countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
 
 			countingIn = true;
@@ -525,7 +525,7 @@ void Sequencer::undoSeq()
 
 	sequences[activeSequenceIndex].swap(s);
 	
-	sequences[activeSequenceIndex]->resetTrackEventIndices(ppqToTick(ppqPosition));
+	sequences[activeSequenceIndex]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 
 	undoSeqAvailable = !undoSeqAvailable;
 	auto hw = mpc.getHardware();
@@ -626,7 +626,7 @@ void Sequencer::stop(int tick)
 
 	if (!isPlaying() && !bouncing)
 	{
-		if (ppqPosition != 0.0)
+		if (positionQuarterNotes != 0.0)
         {
             setBar(0); // real 2kxl doesn't do this
         }
@@ -676,7 +676,7 @@ void Sequencer::stop(int tick)
         countingIn = false;
     }
 
-    move(pos / (double) TICKS_PER_PPQ);
+    move(pos / (double) TICKS_PER_QUARTER_NOTE);
 
 	if (!bouncing)
     {
@@ -749,7 +749,7 @@ void Sequencer::notifyTrack()
 void Sequencer::setSequence(int i, std::shared_ptr<Sequence> s)
 {
 	sequences[i].swap(s);
-	sequences[i]->resetTrackEventIndices(ppqToTick(ppqPosition));
+	sequences[i]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 }
 
 void Sequencer::purgeAllSequences()
@@ -765,7 +765,7 @@ void Sequencer::purgeAllSequences()
 void Sequencer::purgeSequence(int i)
 {
 	sequences[i] = std::make_shared<Sequence>(mpc);
-	sequences[i]->resetTrackEventIndices(ppqToTick(ppqPosition));
+	sequences[i]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 	std::string res = defaultSequenceName;
 	res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
 	sequences[i]->setName(res);
@@ -775,7 +775,7 @@ void Sequencer::copySequence(int source, int destination)
 {
 	auto copy = copySequence(sequences[source]);
 	sequences[destination].swap(copy);
-	sequences[destination]->resetTrackEventIndices(ppqToTick(ppqPosition));
+	sequences[destination]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 	sequences[destination]->initLoop();
 }
 
@@ -1103,7 +1103,7 @@ void Sequencer::setBar(int i)
         pos = s->getLastTick();
     }
 
-	move(tickToPpq(pos));
+	move(ticksToQuarterNotes(pos));
 	
 	notifyObservers(std::string("timesignature"));
 	setBeat(0);
@@ -1142,7 +1142,7 @@ void Sequencer::setBeat(int i)
 
 	const auto denTicks = 96 * (4.0 / ts.getDenominator());
 	pos += difference * denTicks;
-	move(tickToPpq(pos));
+	move(ticksToQuarterNotes(pos));
 }
 
 void Sequencer::setClock(int i)
@@ -1177,7 +1177,7 @@ void Sequencer::setClock(int i)
     const int difference = i - getCurrentClockNumber();
 
 	pos += difference;
-	move(tickToPpq(pos));
+	move(ticksToQuarterNotes(pos));
 }
 
 int Sequencer::getLoopEnd()
@@ -1342,7 +1342,7 @@ void Sequencer::goToPreviousStep()
         prevStepIndex = 0;
     }
 
-    move((prevStepIndex * stepSize) / (double) TICKS_PER_PPQ);
+    move((prevStepIndex * stepSize) / (double) TICKS_PER_QUARTER_NOTE);
 }
 
 void Sequencer::goToNextStep()
@@ -1378,7 +1378,7 @@ void Sequencer::goToNextStep()
         nextStepIndex = stepGrid.size() - 1;
     }
 
-    move((nextStepIndex * stepSize) / (double) TICKS_PER_PPQ);
+    move((nextStepIndex * stepSize) / (double) TICKS_PER_QUARTER_NOTE);
 }
 
 void Sequencer::tap()
@@ -1445,35 +1445,25 @@ void Sequencer::tap()
 	setTempo(newTempo);
 }
 
-void Sequencer::bumpPpqPos(const double amount)
+void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
 {
-    ppqPosition += amount;
-
-    if (ppqToTick(ppqPosition) > getActiveSequence()->getLastTick())
-    {
-        ppqPosition -= tickToPpq(getActiveSequence()->getLastTick());
-    }
+    positionQuarterNotes += ticksToQuarterNotes(tickCount);
 }
 
-void Sequencer::bumpPpqPosByTicks(const uint8_t tickCount)
+void Sequencer::move(const double positionQuarterNotesToUse)
 {
-    ppqPosition += tickToPpq(tickCount);
-}
-
-void Sequencer::move(const double ppqPositionToUse)
-{
-	ppqPosition = ppqPositionToUse;
-	playStartPpqPosition = ppqPositionToUse;
+	positionQuarterNotes = positionQuarterNotesToUse;
+	playStartPositionQuarterNotes = positionQuarterNotesToUse;
 
 	const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() :
         (songMode ? sequences[getSongSequenceIndex()] : getActiveSequence());
 
-	sequence->resetTrackEventIndices(ppqToTick(ppqPosition));
+	sequence->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 
 	if (secondSequenceEnabled)
 	{
 		auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
-		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(ppqToTick(ppqPosition));
+		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 	}
 
 	notifyTimeDisplay();
@@ -1483,7 +1473,7 @@ void Sequencer::move(const double ppqPositionToUse)
 
 int Sequencer::getTickPosition()
 {
-    return ppqToTick(ppqPosition);
+    return quarterNotesToTicks(positionQuarterNotes);
 }
 
 std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
@@ -1692,9 +1682,9 @@ bool Sequencer::isOverDubbing()
     return overdubbing;
 }
 
-const double Sequencer::getPlayStartPpqPosition()
+const double Sequencer::getPlayStartPositionQuarterNotes()
 {
-    return playStartPpqPosition;
+    return playStartPositionQuarterNotes;
 }
 
 void Sequencer::notify(std::string s)
@@ -1720,7 +1710,7 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	playStartPpqPosition = 0.0;
+	playStartPositionQuarterNotes = 0.0;
     mpc.getAudioMidiServices()->getFrameSequencer()->startMetronome();
 }
 
@@ -1749,7 +1739,7 @@ void Sequencer::clearPlaceHolder()
 void Sequencer::movePlaceHolderTo(int destIndex)
 {
 	sequences[destIndex].swap(placeHolder);
-	sequences[destIndex]->resetTrackEventIndices(ppqToTick(ppqPosition));
+	sequences[destIndex]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 	clearPlaceHolder();
 }
 
@@ -1778,14 +1768,8 @@ void Sequencer::resetPlayedStepRepetitions()
 	playedStepRepetitions = 0;
 }
 
-const bool Sequencer::shouldRelyOnExternalPpqPos()
+void Sequencer::setPosition(const double positionQuarterNotesToUse)
 {
-    const auto syncScreen = mpc.screens->get<SyncScreen>("sync");
-    return mpc.isPluginModeEnabled() && syncScreen->getModeIn() == 1;
-}
-
-void Sequencer::setPpqPos(const double ppqPositionToUse)
-{
-    ppqPosition = ppqPositionToUse;
+    positionQuarterNotes = positionQuarterNotesToUse;
 }
 

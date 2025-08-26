@@ -5,13 +5,13 @@
 #endif
 
 #include "FixedVector.hpp"
+#include "Sequencer.hpp"
 
 namespace mpc::sequencer {
     class ExternalClock {
     public:
         ExternalClock();
-        void computeTicksForCurrentBuffer(const double ppqPosAtStartOfBuffer,
-                                          const double ppqPositionOfLastBarStart,
+        void computeTicksForCurrentBuffer(const double hostPositionAtStartOfBufferQuarterNotes,
                                           const int nFrames,
                                           const int sampleRate,
                                           const double bpm,
@@ -21,26 +21,22 @@ namespace mpc::sequencer {
         void reset();
         bool areTicksBeingProduced();
         
-        const double getLastProcessedIncomingPpqPosition();
-
-        void setPreviousAbsolutePpqPosition(const double ppqPosition);
+        const double getLastProcessedHostPositionQuarterNotes();
 
         bool didJumpOccurInLastBuffer();
         void resetJumpOccurredInLastBuffer();
 
     private:
-        const double resolution = 96.0;
-        const double subDiv = 1.0 / resolution;
+        const double subDiv = 1.0 / Sequencer::TICKS_PER_QUARTER_NOTE;
 
-        FixedVector<double, 65536> ppqPositions;
+        FixedVector<double, 65536> positionsInQuarterNotes;
         FixedVector<uint16_t, 200> ticks;
 
         bool ticksAreBeingProduced;
-        double previousIncomingPpqPosition;
-        double previousAbsolutePpqPosition;
-        double previousRelativePpqPosition;
+        double previousHostPositionAtStartOfBufferQuarterNotes;
+        double previousAbsolutePositionQuarterNotes;
+        double previousRelativePositionQuarterNotes;
         double previousBpm;
-        double previousPpqPositionOfLastBarStart;
         uint32_t previousSampleRate;
         int64_t previousTimeInSamples;
         uint16_t previousBufferSize;

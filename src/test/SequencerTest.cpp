@@ -95,13 +95,13 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
         while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
                track->getEvents().size() < humanTickPositions.size())
         {
-            const double lastPpqPos = clock->getLastProcessedIncomingPpqPosition();
+            const double lastPositionQuarterNotes = clock->getLastProcessedHostPositionQuarterNotes();
             const auto beatsPerFrame = 1.0 / ((1.0/(seq->getTempo()/60.0)) * SAMPLE_RATE);
-            const auto ppqPos = lastPpqPos == std::numeric_limits<double>::lowest() ? 0 : (lastPpqPos + (BUFFER_SIZE * beatsPerFrame));
+            const auto positionQuarterNotes = lastPositionQuarterNotes == std::numeric_limits<double>::lowest() ? 0 : (lastPositionQuarterNotes + (BUFFER_SIZE * beatsPerFrame));
 
             clock->resetJumpOccurredInLastBuffer();
             clock->clearTicks();
-            clock->computeTicksForCurrentBuffer(ppqPos, 0, BUFFER_SIZE, SAMPLE_RATE, seq->getTempo(), timeInSamples);
+            clock->computeTicksForCurrentBuffer(positionQuarterNotes, BUFFER_SIZE, SAMPLE_RATE, seq->getTempo(), timeInSamples);
             server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
             timeInSamples += BUFFER_SIZE;
 
@@ -236,13 +236,13 @@ TEST_CASE("Undo", "[sequencer]")
     for (int i = 0; i < 20; i++)
     {
         if (i % 2 == 0) pads[0]->push(127); else pads[0]->release();
-        const double lastPpqPos = clock->getLastProcessedIncomingPpqPosition();
+        const double lastPositionQuarterNotes = clock->getLastProcessedHostPositionQuarterNotes();
         const auto beatsPerFrame = 1.0 / ((1.0/(sequencer->getTempo()/60.0)) * SAMPLE_RATE);
-        const auto ppqPos = lastPpqPos == std::numeric_limits<double>::lowest() ? 0 : (lastPpqPos + (BUFFER_SIZE * beatsPerFrame));
+        const auto positionQuarterNotes = lastPositionQuarterNotes == std::numeric_limits<double>::lowest() ? 0 : (lastPositionQuarterNotes + (BUFFER_SIZE * beatsPerFrame));
 
         clock->resetJumpOccurredInLastBuffer();
         clock->clearTicks();
-        clock->computeTicksForCurrentBuffer(ppqPos, 0, BUFFER_SIZE, SAMPLE_RATE, sequencer->getTempo(), timeInSamples);
+        clock->computeTicksForCurrentBuffer(positionQuarterNotes, BUFFER_SIZE, SAMPLE_RATE, sequencer->getTempo(), timeInSamples);
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
         timeInSamples += BUFFER_SIZE;
     }

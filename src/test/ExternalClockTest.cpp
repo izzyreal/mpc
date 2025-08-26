@@ -23,7 +23,6 @@ double bpm = 120.0;
 double sample_rate = 44100.0;
 double frames_per_beat = sample_rate * 60 / bpm;
 double frames_per_tick = frames_per_beat / 96.0;
-const double ppqPositionOfLastBarStart = 0;
 
 void parseDoubles(const char* input, std::vector<double>& output) {
     std::stringstream ss(input);
@@ -41,12 +40,12 @@ void parseDoubles(const char* input, std::vector<double>& output) {
     }
 }
 
-void readDoublesFromFile(std::vector<double>& ppqPositions, std::string fileName)
+void readDoublesFromFile(std::vector<double>& positionsInQuarterNotes, std::string fileName)
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/ExternalClock/" + fileName);
     char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
-    parseDoubles(data, ppqPositions);
+    parseDoubles(data, positionsInQuarterNotes);
 }
 
 std::string doubleToStringWithPrecision(double value, int n) {
@@ -63,8 +62,8 @@ void printDouble(double d)
 TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 {
     const uint16_t bufferSize = 64;
-    std::vector<double> ppqPositions;
-    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-64frames-120bpm.txt");
+    std::vector<double> positions;
+    readDoublesFromFile(positions, "ableton-live-44.1khz-64frames-120bpm.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -72,9 +71,9 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
     std::vector<int32_t> ticks;
     int64_t timeInSamples = 0;
 
-    for (double ppqPosition : ppqPositions)
+    for (double position : positions)
     {
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, bufferSize, 44100, 120, timeInSamples);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, 120, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -125,8 +124,8 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", "[external-clock]")
 {
     const uint16_t bufferSize = 2048;
-    std::vector<double> ppqPositions;
-    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars.txt");
+    std::vector<double> positions;
+    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars.txt");
     std::vector<double> tempos;
     readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars-tempo-map.txt");
 
@@ -136,11 +135,11 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     std::vector<int32_t> ticks;
     int64_t timeInSamples = 0;
 
-    for (int i = 0; i < ppqPositions.size(); i++)
+    for (int i = 0; i < positions.size(); i++)
     {
-        const auto ppqPosition = ppqPositions[i];
+        const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -161,8 +160,8 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
 TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "[external-clock]")
 {
     const uint16_t bufferSize = 2048;
-    std::vector<double> ppqPositions;
-    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars.txt");
+    std::vector<double> positions;
+    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars.txt");
     std::vector<double> tempos;
     readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars-tempo-map.txt");
 
@@ -172,11 +171,11 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
     std::vector<int32_t> ticks;
     int64_t timeInSamples = 0;
 
-    for (int i = 0; i < ppqPositions.size(); i++)
+    for (int i = 0; i < positions.size(); i++)
     {
-        const auto ppqPosition = ppqPositions[i];
+        const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -196,8 +195,8 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
 TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]")
 {
     const uint16_t bufferSize = 2048;
-    std::vector<double> ppqPositions;
-    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm.txt");
+    std::vector<double> positions;
+    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm.txt");
     std::vector<double> tempos;
     readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm-tempo-map.txt");
 
@@ -207,11 +206,11 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
     std::vector<int32_t> ticks;
     int64_t timeInSamples = 0;
 
-    for (int i = 0; i < ppqPositions.size(); i++)
+    for (int i = 0; i < positions.size(); i++)
     {
-        const auto ppqPosition = ppqPositions[i];
+        const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -231,8 +230,8 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
 TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]")
 {
     const uint16_t bufferSize = 2048;
-    std::vector<double> ppqPositions;
-    readDoublesFromFile(ppqPositions, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm.txt");
+    std::vector<double> positions;
+    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm.txt");
     std::vector<double> tempos;
     readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm-tempo-map.txt");
 
@@ -242,11 +241,11 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
     std::vector<int32_t> ticks;
     int64_t timeInSamples = 0;
 
-    for (int i = 0; i < ppqPositions.size(); i++)
+    for (int i = 0; i < positions.size(); i++)
     {
-        const auto ppqPosition = ppqPositions[i];
+        const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getExternalClock()->getTicksForCurrentBuffer();
 
@@ -265,8 +264,8 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
 
 TEST_CASE("1 bar loop", "[external-clock]")
 {
-    std::vector<double> ppqPositions;
-    readDoublesFromFile(ppqPositions, "reaper-44.1khz-120bpm-1-bar-loop-ppqpos.txt");
+    std::vector<double> positions;
+    readDoublesFromFile(positions, "reaper-44.1khz-120bpm-1-bar-loop-ppqpos.txt");
 
     std::vector<double> blockSizes;
     readDoublesFromFile(blockSizes, "reaper-44.1khz-120bpm-1-bar-loop-block.txt");
@@ -289,10 +288,10 @@ TEST_CASE("1 bar loop", "[external-clock]")
 
     uint64_t cumulativeTickPos = 0;
 
-    for (int i = 0; i < ppqPositions.size(); i++)
+    for (int i = 0; i < positions.size(); i++)
     {
-        const auto ppqPosition = ppqPositions[i];
-        mpc.getExternalClock()->computeTicksForCurrentBuffer(ppqPosition, ppqPositionOfLastBarStart, blockSizes[i], 44100, 120, timeInSamples);
+        const auto position = positions[i];
+        mpc.getExternalClock()->computeTicksForCurrentBuffer(position, blockSizes[i], 44100, 120, timeInSamples);
 
         auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
         frameSeq->work(blockSizes[i]);

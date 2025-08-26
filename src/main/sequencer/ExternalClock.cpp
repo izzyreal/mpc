@@ -10,11 +10,6 @@
 #endif
 
 #include <limits>
-#include <string>
-
-#include <Logger.hpp>
-
-#include <cassert>
 
 using namespace mpc::sequencer;
 
@@ -25,13 +20,12 @@ ExternalClock::ExternalClock()
 
 void ExternalClock::reset()
 {
-    previousIncomingPpqPosition = std::numeric_limits<double>::lowest();
-    previousAbsolutePpqPosition = std::numeric_limits<double>::lowest();
-    previousRelativePpqPosition = std::numeric_limits<double>::max();
+    previousHostPositionAtStartOfBufferQuarterNotes = std::numeric_limits<double>::lowest();
+    previousAbsolutePositionQuarterNotes = std::numeric_limits<double>::lowest();
+    previousRelativePositionQuarterNotes = std::numeric_limits<double>::max();
     previousTimeInSamples = std::numeric_limits<int64_t>::lowest();
     previousBufferSize = 0;
     previousBpm = 0;
-    previousPpqPositionOfLastBarStart = 0;
     ticksAreBeingProduced = false;
     jumpOccurredInLastBuffer = false;
 }
@@ -47,8 +41,7 @@ const FixedVector<uint16_t, 200>& ExternalClock::getTicksForCurrentBuffer()
 }
 
 void ExternalClock::computeTicksForCurrentBuffer(
-        const double ppqPosition,
-        const double ppqPositionOfLastBarStart,
+        const double hostPositionAtStartOfBufferQuarterNotes,
         const int nFrames,
         const int sampleRate,
         const double bpm,
@@ -64,7 +57,8 @@ void ExternalClock::computeTicksForCurrentBuffer(
             if (timeInSamples != previousTimeInSamples + previousBufferSize &&
                 timeInSamples != previousTimeInSamples)
             {
-                /* We have jumped backwards or forwards and need to correct the sequencer PPQ pos and the event indices in the tracks */
+                // We have jumped backwards or forwards and need to correct the sequencer's
+                // position and the event indices in the tracks.
                 jumpOccurred = true;
             }
         }
@@ -79,27 +73,26 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     jumpOccurredInLastBuffer = jumpOccurred;
 
-    previousIncomingPpqPosition = ppqPosition;
+    previousHostPositionAtStartOfBufferQuarterNotes = hostPositionAtStartOfBufferQuarterNotes;
     previousSampleRate = sampleRate;
 
-    ppqPositions.clear();
+    positionsInQuarterNotes.clear();
 
     if (previousBpm == 0)
     {
         previousBpm = bpm;
     }
 
-    auto samplesInMinute = sampleRate * 60;
-    auto samplesPerBeat = samplesInMinute / bpm;
-    auto ppqPerSample = 1.0 / samplesPerBeat;
+    const auto samplesInMinute = sampleRate * 60;
+    const auto samplesPerBeat = samplesInMinute / bpm;
+    const auto quarterNotesPerSample = 1.0 / samplesPerBeat;
 
     if (bpm > previousBpm)
     {
-        assert(!jumpOccurred);
         // When the tempo has increased drastically, there is the possibility of tick underflow.
         // Here we compute how many ticks should be created to compensate for this underflow.
-        const double diffBetweenLastProcessedPpqAndCurrentPpq = ppqPosition - previousAbsolutePpqPosition;
-        const double underflowTickCount = floor(diffBetweenLastProcessedPpqAndCurrentPpq * 96);
+        const double diffBetweenLastProcessedAndCurrentPos = hostPositionAtStartOfBufferQuarterNotes - previousAbsolutePositionQuarterNotes;
+        const double underflowTickCount = floor(diffBetweenLastProcessedAndCurrentPos * Sequencer::TICKS_PER_QUARTER_NOTE);
 
         for (int i = 0; i < underflowTickCount; i++)
         {
@@ -112,44 +105,42 @@ void ExternalClock::computeTicksForCurrentBuffer(
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        ppqPositions.push_back(ppqPosition + offset);
-        offset += ppqPerSample;
+        positionsInQuarterNotes.push_back(hostPositionAtStartOfBufferQuarterNotes + offset);
+        offset += quarterNotesPerSample;
     }
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        // When the tempo has decreased drastically, some hosts report a ppqPosition that is
+        // When the tempo has decreased drastically, some hosts report a position in quarter notes that is
         // lower than what was already processed in the previous buffer. Here we make sure
         // we do not process the already processed positions.
-        if (ppqPositions[sample] <= previousAbsolutePpqPosition)
+        if (positionsInQuarterNotes[sample] <= previousAbsolutePositionQuarterNotes)
         {
-            assert(!jumpOccurred);
             continue;
         }
 
-        auto relativePosition = fmod(ppqPositions[sample], subDiv);
+        auto relativePosition = fmod(positionsInQuarterNotes[sample], subDiv);
 
         if (relativePosition < 0)
         {
             relativePosition += subDiv;
         }
 
-        if (relativePosition < previousRelativePpqPosition)
+        if (relativePosition < previousRelativePositionQuarterNotes)
         {
             ticks.push_back(sample);
         }
 
-        previousRelativePpqPosition = relativePosition;
+        previousRelativePositionQuarterNotes = relativePosition;
     }
 
-    if (ppqPositions[nFrames - 1] > previousAbsolutePpqPosition)
+    if (positionsInQuarterNotes[nFrames - 1] > previousAbsolutePositionQuarterNotes)
     {
         // This should happen any time the tempo has not drastically decreased.
-        previousAbsolutePpqPosition = ppqPositions[nFrames - 1];
+        previousAbsolutePositionQuarterNotes = positionsInQuarterNotes[nFrames - 1];
     }
 
     previousBpm = bpm;
-    previousPpqPositionOfLastBarStart = ppqPositionOfLastBarStart;
     ticksAreBeingProduced = ticksAreBeingProduced || ticks.size() > 0;
 }
 
@@ -158,9 +149,9 @@ bool ExternalClock::areTicksBeingProduced()
     return ticksAreBeingProduced;
 }
 
-const double ExternalClock::getLastProcessedIncomingPpqPosition()
+const double ExternalClock::getLastProcessedHostPositionQuarterNotes()
 {
-    return previousIncomingPpqPosition;
+    return previousHostPositionAtStartOfBufferQuarterNotes;
 }
 
 bool ExternalClock::didJumpOccurInLastBuffer()

@@ -66,13 +66,13 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
         for (int i = 0; i < DSP_CYCLE_COUNT; i++)
         {
             audioMidiServices->changeBounceStateIfRequired();
-            const double lastPpqPos = clock->getLastProcessedIncomingPpqPosition();
+            const double lastPos = clock->getLastProcessedHostPositionQuarterNotes();
             const auto beatsPerFrame = 1.0 / ((1.0/(mpc.getSequencer()->getTempo()/60.0)) * SAMPLE_RATE);
-            const auto ppqPos = lastPpqPos == std::numeric_limits<double>::lowest() ? 0 : (lastPpqPos + (BUFFER_SIZE * beatsPerFrame));
+            const auto pos = lastPos == std::numeric_limits<double>::lowest() ? 0 : (lastPos + (BUFFER_SIZE * beatsPerFrame));
 
             clock->resetJumpOccurredInLastBuffer();
             clock->clearTicks();
-            clock->computeTicksForCurrentBuffer(ppqPos, 0, BUFFER_SIZE, SAMPLE_RATE, mpc.getSequencer()->getTempo(), timeInSamples);
+            clock->computeTicksForCurrentBuffer(pos, BUFFER_SIZE, SAMPLE_RATE, mpc.getSequencer()->getTempo(), timeInSamples);
             audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {}, {0, 1});
             timeInSamples += BUFFER_SIZE;
             std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));

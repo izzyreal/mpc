@@ -102,7 +102,7 @@ bool FrameSeq::isRunning()
 
 void FrameSeq::move(int newTickPos)
 {
-    sequencer->move(Sequencer::tickToPpq(newTickPos));
+    sequencer->move(Sequencer::ticksToQuarterNotes(newTickPos));
     updateTimeDisplay();
 }
 
@@ -328,7 +328,7 @@ bool FrameSeq::processSeqLoopDisabled()
         else
         {
             sequencer->stop(seq->getLastTick());
-            sequencer->move(Sequencer::tickToPpq(seq->getLastTick()));
+            sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
         return true;
@@ -450,17 +450,17 @@ void FrameSeq::work(int nFrames)
 
     if (positionalJumpOccurred)
     {
-        const auto ppqPos = externalClock->getLastProcessedIncomingPpqPosition();
-        const auto seqLengthInPpq = mpc::sequencer::Sequencer::tickToPpq(seq->getLastTick());
+        const auto hostPositionQuarterNotes = externalClock->getLastProcessedHostPositionQuarterNotes();
+        const auto seqLengthQuarterNotes = Sequencer::ticksToQuarterNotes(seq->getLastTick());
         
-        auto newMpcPpqPos = fmod(ppqPos, seqLengthInPpq);
+        auto newMpcPositionQuarterNotes = fmod(hostPositionQuarterNotes, seqLengthQuarterNotes);
         
-        while (newMpcPpqPos < 0)
+        while (newMpcPositionQuarterNotes < 0)
         {
-            newMpcPpqPos += seqLengthInPpq;
+            newMpcPositionQuarterNotes += seqLengthQuarterNotes;
         }
 
-        sequencer->move(newMpcPpqPos);
+        sequencer->move(newMpcPositionQuarterNotes);
     }
 
     bool songHasStopped = false;
@@ -519,7 +519,7 @@ void FrameSeq::work(int nFrames)
 
         if (tickCountAtThisFrameIndex > 1)
         {
-            sequencer->bumpPpqPosByTicks(tickCountAtThisFrameIndex - 1);
+            sequencer->bumpPositionByTicks(tickCountAtThisFrameIndex - 1);
         }
 
         tickFrameOffset = frameIndex;
@@ -529,13 +529,13 @@ void FrameSeq::work(int nFrames)
 
         if (metronomeOnly)
         {
-            sequencer->bumpPpqPosByTicks(1);
+            sequencer->bumpPositionByTicks(1);
             continue;
         }
 
         if (sequencer->isCountingIn())
         {
-            sequencer->bumpPpqPosByTicks(1);
+            sequencer->bumpPositionByTicks(1);
             stopCountingInIfRequired();
             continue;
         }
@@ -578,7 +578,7 @@ void FrameSeq::work(int nFrames)
             processNoteRepeat();
         }
 
-        sequencer->bumpPpqPosByTicks(1);
+        sequencer->bumpPositionByTicks(1);
     }
 }
 
