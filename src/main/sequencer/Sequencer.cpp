@@ -1452,11 +1452,23 @@ void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
 
 void Sequencer::move(const double positionQuarterNotesToUse)
 {
+    if (positionQuarterNotes == positionQuarterNotesToUse)
+    {
+        return;
+    }
+
+    const auto songSequenceIndex = getSongSequenceIndex();
+
+    if (songMode && songSequenceIndex < 0)
+    {
+        return;
+    }
+
 	positionQuarterNotes = positionQuarterNotesToUse;
 	playStartPositionQuarterNotes = positionQuarterNotesToUse;
 
 	const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() :
-        (songMode ? sequences[getSongSequenceIndex()] : getActiveSequence());
+        (songMode ? sequences[songSequenceIndex] : getActiveSequence());
 
 	sequence->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 
@@ -1642,6 +1654,11 @@ int Sequencer::getSongSequenceIndex()
 		step = song->getStepCount() - 1;
 	}
     
+    if (step < 0)
+    {
+        return -1;
+    }
+
 	return song->getStep(step).lock()->getSequence();
 }
 
