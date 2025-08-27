@@ -451,16 +451,7 @@ void FrameSeq::work(int nFrames)
     if (positionalJumpOccurred)
     {
         const auto hostPositionQuarterNotes = externalClock->getLastProcessedHostPositionQuarterNotes();
-        const auto seqLengthQuarterNotes = Sequencer::ticksToQuarterNotes(seq->getLastTick());
-        
-        auto newMpcPositionQuarterNotes = fmod(hostPositionQuarterNotes, seqLengthQuarterNotes);
-        
-        while (newMpcPositionQuarterNotes < 0)
-        {
-            newMpcPositionQuarterNotes += seqLengthQuarterNotes;
-        }
-
-        sequencer->move(newMpcPositionQuarterNotes);
+        sequencer->move(hostPositionQuarterNotes);
     }
 
     bool songHasStopped = false;

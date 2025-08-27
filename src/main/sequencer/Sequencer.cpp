@@ -1450,13 +1450,105 @@ void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
     positionQuarterNotes += ticksToQuarterNotes(tickCount);
 }
 
-void Sequencer::move(const double positionQuarterNotesToUse)
+void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 {
-    if (positionQuarterNotes == positionQuarterNotesToUse)
+    MLOG("moveWithinSong positionQuarterNotesToUse: " + std::to_string(positionQuarterNotesToUse));
+    if (mpc.getLayeredScreen()->getCurrentScreenName() != "song")
     {
         return;
     }
 
+    const auto songScreen = mpc.screens->get<SongScreen>("song");
+    const auto song = songs[songScreen->getActiveSongIndex()];
+
+    //MLOG("Old pos: " + std::to_string(positionQuarterNotes) + ", offset: " + std::to_string(songScreen->getOffset()));
+
+    uint32_t stepStartTick;
+    uint32_t stepEndTick = 0;
+    uint64_t songEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+        const auto step = song->getStep(stepIndex);
+        const auto sequence = getSequence(step.lock()->getSequence());
+        
+        if (sequence->isUsed())
+        {
+            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+        }
+
+        songEndTick = stepEndTick;
+    }
+
+    const double songLengthQuarterNotes = ticksToQuarterNotes(songEndTick);
+
+    auto wrappedNewPosition = positionQuarterNotesToUse;
+
+    if (wrappedNewPosition < 0 || wrappedNewPosition >= songLengthQuarterNotes)
+    {
+        wrappedNewPosition = fmod(wrappedNewPosition, songLengthQuarterNotes);
+        
+        while (wrappedNewPosition < 0)
+        {
+            wrappedNewPosition += songLengthQuarterNotes;
+        }
+    }
+
+    //MLOG("Wrapped new position: " + std::to_string(wrappedNewPosition) + ", song length: " + std::to_string(songLengthQuarterNotes));
+
+    stepStartTick = 0;
+    stepEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+
+        const auto step = song->getStep(stepIndex);
+        const auto sequence = getSequence(step.lock()->getSequence());
+        
+        if (sequence->isUsed())
+        {
+            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+        }
+
+        const auto stepStartPositionQuarterNotes = ticksToQuarterNotes(stepStartTick);
+        const auto stepEndPositionQuarterNotes = ticksToQuarterNotes(stepEndTick);
+
+        if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
+            wrappedNewPosition < stepEndPositionQuarterNotes)
+        {
+            songScreen->setOffset(stepIndex - 1);
+
+            const auto offsetWithinStepQuarterNotes = wrappedNewPosition - stepStartPositionQuarterNotes;
+            const auto offsetWithinStepTicks = quarterNotesToTicks(offsetWithinStepQuarterNotes);
+
+            playedStepRepetitions = std::floor(offsetWithinStepTicks / (float) sequence->getLastTick());
+            sequence->resetTrackEventIndices(offsetWithinStepTicks % sequence->getLastTick());
+
+            const double finalPosQuarterNotes = fmod(offsetWithinStepQuarterNotes, ticksToQuarterNotes(sequence->getLastTick()));
+
+            if (finalPosQuarterNotes == positionQuarterNotes)
+            {
+                return;
+            }
+
+            positionQuarterNotes = finalPosQuarterNotes;
+            playStartPositionQuarterNotes = finalPosQuarterNotes;
+
+            //MLOG("New pos: " + std::to_string(finalPosQuarterNotes) + ", offset: " + std::to_string(songScreen->getOffset()) + ", step: " + std::to_string(stepIndex));
+
+            break;
+        }
+    }
+
+    notifyTimeDisplay();
+    notifyObservers(std::string("tempo"));
+}
+
+void Sequencer::move(const double positionQuarterNotesToUse)
+{
+    MLOG("move positionQuarterNotesToUse: " + std::to_string(positionQuarterNotesToUse));
     const auto songSequenceIndex = getSongSequenceIndex();
 
     if (songMode && songSequenceIndex < 0)
@@ -1464,21 +1556,34 @@ void Sequencer::move(const double positionQuarterNotesToUse)
         return;
     }
 
-	positionQuarterNotes = positionQuarterNotesToUse;
-	playStartPositionQuarterNotes = positionQuarterNotesToUse;
+    auto wrappedNewPosition = positionQuarterNotesToUse;
 
 	const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() :
         (songMode ? sequences[songSequenceIndex] : getActiveSequence());
 
-	sequence->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    const auto seqLengthQuarterNotes = ticksToQuarterNotes(sequence->getLastTick());
+        
+    if (wrappedNewPosition < 0 || wrappedNewPosition > seqLengthQuarterNotes)
+    {
+        wrappedNewPosition = fmod(wrappedNewPosition, seqLengthQuarterNotes);
+        
+        while (wrappedNewPosition < 0)
+        {
+            wrappedNewPosition += seqLengthQuarterNotes;
+        }
+    }
 
-	if (secondSequenceEnabled)
-	{
-		auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
-		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
-	}
+    positionQuarterNotes = wrappedNewPosition;
+    playStartPositionQuarterNotes = wrappedNewPosition;
+    sequence->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 
-	notifyTimeDisplay();
+    if (secondSequenceEnabled)
+    {
+        auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
+        sequences[secondSequenceScreen->sq]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    }
+
+    notifyTimeDisplay();
     notifyObservers(std::string("timesignature"));
     notifyObservers(std::string("tempo"));
 }
@@ -1783,10 +1888,5 @@ void Sequencer::incrementPlayedStepRepetitions()
 void Sequencer::resetPlayedStepRepetitions()
 {
 	playedStepRepetitions = 0;
-}
-
-void Sequencer::setPosition(const double positionQuarterNotesToUse)
-{
-    positionQuarterNotes = positionQuarterNotesToUse;
 }
 

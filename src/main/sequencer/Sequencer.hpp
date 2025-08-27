@@ -43,7 +43,6 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         bool isUndoSeqAvailable();
 
-        void setPosition(const double positionQuarterNotes);
         void bumpPositionByTicks(const uint8_t ticks);
 
 	private:
@@ -174,7 +173,13 @@ namespace mpc::sequencer
 		void goToNextStep();
 		void tap();
 
+        // Applies wrap-around within the active or playing sequence
         void move(const double positionQuarterNotes);
+
+        // Applies wrap-around within the current song.
+        // If the current screen is not the Song screen, it results in a no-op.
+        void moveWithinSong(const double positionQuarterNotes);
+
 		int getTickPosition();
 		std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
 		void setActiveTrackIndex(int i);
