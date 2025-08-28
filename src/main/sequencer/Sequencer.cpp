@@ -1452,7 +1452,6 @@ void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
 
 void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 {
-    MLOG("moveWithinSong positionQuarterNotesToUse: " + std::to_string(positionQuarterNotesToUse));
     if (mpc.getLayeredScreen()->getCurrentScreenName() != "song")
     {
         return;
@@ -1460,8 +1459,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 
     const auto songScreen = mpc.screens->get<SongScreen>("song");
     const auto song = songs[songScreen->getActiveSongIndex()];
-
-    //MLOG("Old pos: " + std::to_string(positionQuarterNotes) + ", offset: " + std::to_string(songScreen->getOffset()));
 
     uint32_t stepStartTick;
     uint32_t stepEndTick = 0;
@@ -1494,8 +1491,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
             wrappedNewPosition += songLengthQuarterNotes;
         }
     }
-
-    //MLOG("Wrapped new position: " + std::to_string(wrappedNewPosition) + ", song length: " + std::to_string(songLengthQuarterNotes));
 
     stepStartTick = 0;
     stepEndTick = 0;
@@ -1536,8 +1531,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
             positionQuarterNotes = finalPosQuarterNotes;
             playStartPositionQuarterNotes = finalPosQuarterNotes;
 
-            //MLOG("New pos: " + std::to_string(finalPosQuarterNotes) + ", offset: " + std::to_string(songScreen->getOffset()) + ", step: " + std::to_string(stepIndex));
-
             break;
         }
     }
@@ -1548,7 +1541,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 
 void Sequencer::move(const double positionQuarterNotesToUse)
 {
-    MLOG("move positionQuarterNotesToUse: " + std::to_string(positionQuarterNotesToUse));
     const auto songSequenceIndex = getSongSequenceIndex();
 
     if (songMode && songSequenceIndex < 0)
