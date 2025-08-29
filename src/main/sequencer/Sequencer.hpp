@@ -26,6 +26,8 @@ namespace mpc::sequencer
 	{
 
 	public:
+        enum StopMode { AT_START_OF_BUFFER, AT_START_OF_TICK };
+
         static const uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(const double quarterNotes);
         static double ticksToQuarterNotes(const uint32_t ticks);
@@ -140,7 +142,7 @@ namespace mpc::sequencer
 		void switchRecordToOverDub();
 		void overdubFromStart();
 		void stop();
-		void stop(int tick);
+		void stop(const StopMode);
 		bool isCountingIn();
 		void setCountingIn(bool b);
 		void notifyTrack();

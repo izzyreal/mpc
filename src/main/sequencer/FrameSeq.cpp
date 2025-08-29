@@ -327,7 +327,7 @@ bool FrameSeq::processSeqLoopDisabled()
         }
         else
         {
-            sequencer->stop(seq->getLastTick());
+            sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
             sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 

@@ -616,10 +616,10 @@ void Sequencer::overdubFromStart()
 
 void Sequencer::stop()
 {
-	stop(-1);
+	stop(StopMode::AT_START_OF_BUFFER);
 }
 
-void Sequencer::stop(int tick)
+void Sequencer::stop(const StopMode stopMode)
 {
 	auto ams = mpc.getAudioMidiServices();
 	bool bouncing = ams->isBouncing();
@@ -650,7 +650,8 @@ void Sequencer::stop(int tick)
         pos = s1->getLastTick();
     }
 
-	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer()->getEventFrameOffset();
+	const int frameOffset = stopMode == AT_START_OF_BUFFER ? 0 : ams->getFrameSequencer()->getEventFrameOffset();
+
 	ams->getFrameSequencer()->stop();
 	
     auto notifynextsq = false;
