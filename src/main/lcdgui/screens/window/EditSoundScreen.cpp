@@ -134,10 +134,10 @@ void EditSoundScreen::displayEdit()
         findLabel("new-name")->Hide(false);
         findField("ratio")->Hide(false);
         findLabel("ratio")->Hide(false);
-        findField("preset")->Hide(false);
-        findLabel("preset")->Hide(false);
-        findField("adjust")->Hide(false);
-        findLabel("adjust")->Hide(false);
+        findField("preset")->Hide(true);
+        findLabel("preset")->Hide(true);
+        findField("adjust")->Hide(true);
+        findLabel("adjust")->Hide(true);
         findLabel("end-margin")->Hide(true);
         findField("end-margin")->Hide(true);
         findLabel("create-new-program")->Hide(true);
