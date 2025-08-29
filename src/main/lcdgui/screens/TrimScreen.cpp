@@ -268,6 +268,7 @@ void TrimScreen::setSliderEnd(int i)
     auto sound = sampler->getSound();
     auto newValue = (int)((i / 124.0) * sound->getFrameCount());
     setEnd(newValue);
+    displayEnd();
 }
 
 void TrimScreen::setEnd(int newValue)
