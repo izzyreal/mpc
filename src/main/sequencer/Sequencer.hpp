@@ -45,6 +45,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         bool isUndoSeqAvailable();
 
+        void setPosition(const double positionQuarterNotes);
         void bumpPositionByTicks(const uint8_t ticks);
 
 	private:

@@ -1451,6 +1451,11 @@ void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
     positionQuarterNotes += ticksToQuarterNotes(tickCount);
 }
 
+void Sequencer::setPosition(const double positionQuarterNotesToUse)
+{
+    positionQuarterNotes = positionQuarterNotesToUse;
+}
+
 void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 {
     if (mpc.getLayeredScreen()->getCurrentScreenName() != "song")
