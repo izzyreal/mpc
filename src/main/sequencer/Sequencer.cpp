@@ -1636,11 +1636,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 
             const double finalPosQuarterNotes = fmod(offsetWithinStepQuarterNotes, ticksToQuarterNotes(sequence->getLastTick()));
 
-            if (finalPosQuarterNotes == positionQuarterNotes)
-            {
-                return;
-            }
-
             positionQuarterNotes = finalPosQuarterNotes;
             playStartPositionQuarterNotes = finalPosQuarterNotes;
 

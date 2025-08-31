@@ -451,7 +451,15 @@ void FrameSeq::work(int nFrames)
     if (positionalJumpOccurred)
     {
         const auto hostPositionQuarterNotes = externalClock->getLastProcessedHostPositionQuarterNotes();
-        sequencer->move(hostPositionQuarterNotes);
+
+        if (mpc.getLayeredScreen()->getCurrentScreenName() == "song")
+        {
+            sequencer->moveWithinSong(hostPositionQuarterNotes);
+        }
+        else
+        {
+            sequencer->move(hostPositionQuarterNotes);
+        }
     }
 
     bool songHasStopped = false;
