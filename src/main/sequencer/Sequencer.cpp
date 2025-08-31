@@ -1453,7 +1453,114 @@ void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
 
 void Sequencer::setPosition(const double positionQuarterNotesToUse)
 {
-    positionQuarterNotes = positionQuarterNotesToUse;
+    auto wrappedNewPosition = positionQuarterNotesToUse;
+
+    const auto songSequenceIndex = getSongSequenceIndex();
+    
+    if (songMode && songSequenceIndex == -1)
+    {
+        return;
+    }
+
+	const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() :
+        (songMode ? sequences[songSequenceIndex] : getActiveSequence());
+
+    const auto seqLengthQuarterNotes = ticksToQuarterNotes(sequence->getLastTick());
+        
+    if (wrappedNewPosition < 0 || wrappedNewPosition > seqLengthQuarterNotes)
+    {
+        wrappedNewPosition = fmod(wrappedNewPosition, seqLengthQuarterNotes);
+        
+        while (wrappedNewPosition < 0)
+        {
+            wrappedNewPosition += seqLengthQuarterNotes;
+        }
+    }
+
+    positionQuarterNotes = wrappedNewPosition;
+}
+
+void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
+{
+    if (mpc.getLayeredScreen()->getCurrentScreenName() != "song")
+    {
+        return;
+    }
+
+    const auto songScreen = mpc.screens->get<SongScreen>("song");
+    const auto song = songs[songScreen->getActiveSongIndex()];
+
+    uint32_t stepStartTick;
+    uint32_t stepEndTick = 0;
+    uint64_t songEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+        const auto step = song->getStep(stepIndex);
+        const auto sequence = getSequence(step.lock()->getSequence());
+        
+        if (sequence->isUsed())
+        {
+            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+        }
+
+        songEndTick = stepEndTick;
+    }
+
+    const double songLengthQuarterNotes = ticksToQuarterNotes(songEndTick);
+
+    auto wrappedNewPosition = positionQuarterNotesToUse;
+
+    if (wrappedNewPosition < 0 || wrappedNewPosition >= songLengthQuarterNotes)
+    {
+        wrappedNewPosition = fmod(wrappedNewPosition, songLengthQuarterNotes);
+        
+        while (wrappedNewPosition < 0)
+        {
+            wrappedNewPosition += songLengthQuarterNotes;
+        }
+    }
+
+    stepStartTick = 0;
+    stepEndTick = 0;
+
+    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
+    {
+        stepStartTick = stepEndTick;
+
+        const auto step = song->getStep(stepIndex);
+        const auto sequence = getSequence(step.lock()->getSequence());
+        
+        if (sequence->isUsed())
+        {
+            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+        }
+
+        const auto stepStartPositionQuarterNotes = ticksToQuarterNotes(stepStartTick);
+        const auto stepEndPositionQuarterNotes = ticksToQuarterNotes(stepEndTick);
+
+        if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
+            wrappedNewPosition < stepEndPositionQuarterNotes)
+        {
+            songScreen->setOffset(stepIndex - 1);
+
+            const auto offsetWithinStepQuarterNotes = wrappedNewPosition - stepStartPositionQuarterNotes;
+            const auto offsetWithinStepTicks = quarterNotesToTicks(offsetWithinStepQuarterNotes);
+
+            const double finalPosQuarterNotes = fmod(offsetWithinStepQuarterNotes, ticksToQuarterNotes(sequence->getLastTick()));
+
+            if (finalPosQuarterNotes == positionQuarterNotes)
+            {
+                return;
+            }
+
+            positionQuarterNotes = finalPosQuarterNotes;
+            playStartPositionQuarterNotes = finalPosQuarterNotes;
+
+            break;
+        }
+    }
 }
 
 void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
