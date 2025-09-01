@@ -80,7 +80,8 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (vmpcSettingsScreen->autoConvertWavs),
     0x00, // This was tap averaging, but it does not belong here
     (char) (othersScreen->getContrast()),
-    (char) (vmpcSettingsScreen->midiControlMode)
+    (char) (vmpcSettingsScreen->midiControlMode),
+    (char) (vmpcSettingsScreen->nameTypingWithKeyboardEnabled)
   };
 
   set_file_data(path, bytes);
@@ -103,7 +104,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
-  auto bytes = get_file_data(path);
+  const auto bytes = get_file_data(path);
   
   if (bytes.size() > 0) vmpcSettingsScreen->initialPadMapping = bytes[0];
   if (bytes.size() > 1) vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
@@ -121,4 +122,6 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   // for now we ignore this byte.
   if (bytes.size() > 9) othersScreen->setContrast(bytes[9]);
   if (bytes.size() > 10) vmpcSettingsScreen->midiControlMode = bytes[10];
+  if (bytes.size() > 11) vmpcSettingsScreen->nameTypingWithKeyboardEnabled = static_cast<bool>(bytes[11]);
 }
+

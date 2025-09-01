@@ -17,6 +17,7 @@ void VmpcSettingsScreen::open()
     display16LevelsEraseMode();
     displayAutoConvertWavs();
     displayMidiControlMode();
+    displayNameTypingWithKeyboard();
     ls->setFunctionKeysArrangement(midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
 }
 
@@ -71,7 +72,7 @@ void VmpcSettingsScreen::turnWheel(int i)
 {
     init();
 
-	if (param == "initial-pad-mapping")
+    if (param == "initial-pad-mapping")
 	{
 		setInitialPadMapping(initialPadMapping + i);
 	}
@@ -87,6 +88,10 @@ void VmpcSettingsScreen::turnWheel(int i)
     {
         setMidiControlMode(midiControlMode + i);
         ls->setFunctionKeysArrangement(midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
+    }
+    else if (param == "name-typing-with-keyboard")
+    {
+        setNameTypingWithKeyboard(i > 0);
     }
 }
 
@@ -151,3 +156,20 @@ int VmpcSettingsScreen::getMidiControlMode()
 {
     return midiControlMode;
 }
+
+void VmpcSettingsScreen::displayNameTypingWithKeyboard()
+{
+    findField("name-typing-with-keyboard")->setText(nameTypingWithKeyboardEnabled ? "YES" : "NO");
+}
+
+void VmpcSettingsScreen::setNameTypingWithKeyboard(const bool shouldBeEnabled)
+{
+    nameTypingWithKeyboardEnabled = shouldBeEnabled;
+    displayNameTypingWithKeyboard();
+}
+
+const bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled()
+{
+    return nameTypingWithKeyboardEnabled;
+}
+

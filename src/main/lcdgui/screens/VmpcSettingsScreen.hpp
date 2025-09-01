@@ -26,6 +26,7 @@ namespace mpc::lcdgui::screens
         void function(int) override;
 
         int getMidiControlMode();
+        const bool isNameTypingWithKeyboardEnabled();
         
 	private:
         std::shared_ptr<mpc::lcdgui::Background> easterEgg;
@@ -37,16 +38,19 @@ namespace mpc::lcdgui::screens
         int _16LevelsEraseMode = 0;
         int autoConvertWavs = 1;
         int midiControlMode = 0;
+        bool nameTypingWithKeyboardEnabled = true;
 
         void setInitialPadMapping(int i);
         void set16LevelsEraseMode(int i);
         void setAutoConvertWavs(int i);
         void setMidiControlMode(int i);
+        void setNameTypingWithKeyboard(const bool);
 
         void displayInitialPadMapping();
         void display16LevelsEraseMode();
         void displayAutoConvertWavs();
         void displayMidiControlMode();
+        void displayNameTypingWithKeyboard();
 
 		friend class mpc::sampler::Pad;
 		friend class mpc::nvram::NvRam;

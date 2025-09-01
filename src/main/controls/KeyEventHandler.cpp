@@ -7,6 +7,7 @@
 #include <controls/KbMapping.hpp>
 
 #include <lcdgui/screens/VmpcKeyboardScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <hardware/Hardware.hpp>
@@ -137,7 +138,8 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         return;
     }
 
-    const bool allowTypingOfNames = true;
+    const auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    const bool allowTypingOfNames = vmpcSettingsScreen->isNameTypingWithKeyboardEnabled();
     const auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(vmpcKeyCode);
 
     if (keyEvent.keyDown && currentScreenName == "name" && allowTypingOfNames)
@@ -147,7 +149,8 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         // usual, with some assumptions about mapping. The rest gets passed to
         // NameScreen for further processing.
         if (label != "left" && label != "right" && label != "f2" && label != "f3" && label != "f4" &&
-            label != "f5" && label != "datawheel-down" && label != "datawheel-up" && label != "main-screen")
+            label != "f5" && label != "datawheel-down" && label != "datawheel-up" && label != "main-screen" &&
+            label != "shift")
         {
             const auto nameScreen = mpc.screens->get<NameScreen>("name");
 
@@ -172,6 +175,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
 
             const auto charWithCasing = static_cast<char>(mpc.getControls()->isShiftPressed() ? toupper(keyCodeChar) : tolower(keyCodeChar));
             nameScreen->typeCharacter(charWithCasing);
+            return;
         }
     }
 
