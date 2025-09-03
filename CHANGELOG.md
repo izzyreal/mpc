@@ -1,3 +1,15 @@
+## v0.9.0 RC8 (3-9-2025)
+* [plugin] Implement musical position synchronization to the DAW. Wherever you place the play head in your DAW, VMPC2000XL positions its internal sequencer reasonably. Most likely this only works as expected if VMPC2000XL uses the same time signature as the DAW, and neither VMPC2000XL or the DAW vary the time signature anywhere in the arrangement.
+* [plugin] The DAW's play head can be repositioned while playing, and VMPC2000XL follows.
+* [plugin] Fix synchronization with Cubase. In earlier versions of VMPC2000XL this wasn't working at all.
+* [plugin] VMPC2000XL now also supports synchronizing to the DAW in Song mode.
+* [standalone] Fix individual outputs. v0.9.0.0 introduced a regression due to the complete rewrite of multibus support. This has been fixed.
+* Fix conflict between ordinary typing and typing via the pads in the Name screen.
+* Make ordinary typing configurable. See Shift + 0 for VMPC2000XL-specific settings. If `Name typing w. keybd` is set to `NO`, you can only enter names via the cursor keys and DATA wheel, or via the pads.
+* Fix small cosmetic bug when using the slider in the `TRIM` screen to change the `End` value.
+* Hide unused fields in the timestretch functionality. Timestretch in VMPC2000XL isn't nearly as good and complete as the MPC2000XL's timestretch, in particular because it doesn't implement the `Preset` and `Adjust` fields. Previously, VMPC2000XL was showing these fields, even though they are ignored by the timestretch algorithm. This is very misleading, and it probably has wasted precious time of users who would keep trying to timestretch with different settings that didn't actually make a difference in the result.
+* Allow the `Open Window` key to close the opened window, just like on the real MPC2000XL.
+
 ## v0.9.0 RC4 (29-7-2025)
 * Fix slider UI updates when moving the slider via MIDI.
 * Fix Song mode DAW synchronization.
