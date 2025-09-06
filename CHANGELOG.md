@@ -1,3 +1,6 @@
+## v0.9.0 RC9 (6-9-2025)
+* [plugin] Ensure buffers are cleared after plugin is opened. There was an issue in Reaper, and quite possibly in other hosts too, where right after opening VMPC2000XL, the multi-channel tracks were muted because the signal contained absurdly high amplitude values. This happens if a buffer is not properly cleared. This bug is now fixed.
+
 ## v0.9.0 RC8 (3-9-2025)
 * [plugin] Implement musical position synchronization to the DAW. Wherever you place the play head in your DAW, VMPC2000XL positions its internal sequencer reasonably. Most likely this only works as expected if VMPC2000XL uses the same time signature as the DAW, and neither VMPC2000XL or the DAW vary the time signature anywhere in the arrangement.
 * [plugin] The DAW's play head can be repositioned while playing, and VMPC2000XL follows.
