@@ -334,7 +334,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     {
         if (is16LevelsEnabled)
         {
-            Util::set16LevelsValues(mpc, recordNoteOnEvent, padIndexWithBank);
+            Util::set16LevelsValues(mpc, recordNoteOnEvent, padIndexWithBank % 16);
         }
 
         if (program && isSliderNote)
