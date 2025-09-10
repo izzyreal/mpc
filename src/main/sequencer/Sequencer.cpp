@@ -677,7 +677,7 @@ void Sequencer::stop(const StopMode stopMode)
         countingIn = false;
     }
 
-    move(pos / (double) TICKS_PER_QUARTER_NOTE);
+    move(ticksToQuarterNotes(pos));
 
 	if (!bouncing)
     {
@@ -1253,7 +1253,7 @@ void Sequencer::goToPreviousEvent()
         }
     }
 
-    move(newPos);
+    move(ticksToQuarterNotes(newPos));
 }
 
 void Sequencer::goToNextEvent()
@@ -1272,7 +1272,7 @@ void Sequencer::goToNextEvent()
         }
     }
 
-    move(newPos);
+    move(ticksToQuarterNotes(newPos));
 }
 
 void Sequencer::notifyTimeDisplay()
@@ -1343,7 +1343,7 @@ void Sequencer::goToPreviousStep()
         prevStepIndex = 0;
     }
 
-    move((prevStepIndex * stepSize) / (double) TICKS_PER_QUARTER_NOTE);
+    move(ticksToQuarterNotes(prevStepIndex * stepSize));
 }
 
 void Sequencer::goToNextStep()
@@ -1379,7 +1379,7 @@ void Sequencer::goToNextStep()
         nextStepIndex = stepGrid.size() - 1;
     }
 
-    move((nextStepIndex * stepSize) / (double) TICKS_PER_QUARTER_NOTE);
+    move(ticksToQuarterNotes(nextStepIndex * stepSize));
 }
 
 void Sequencer::tap()
