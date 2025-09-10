@@ -51,7 +51,7 @@ namespace mpc::audiomidi {
 
 namespace mpc::sequencer {
     class Sequencer;
-    class ExternalClock;
+    class Clock;
 }
 
 namespace mpc::sampler {
@@ -79,7 +79,7 @@ namespace mpc {
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
-        std::shared_ptr<mpc::sequencer::ExternalClock> externalClock;
+        std::shared_ptr<mpc::sequencer::Clock> clock;
         int bank = 0;
         int pad = 0;
         int note = 60;
@@ -122,7 +122,7 @@ namespace mpc {
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
         mpc::audiomidi::MidiInput* getMpcMidiInput(int i);
-        std::shared_ptr<mpc::sequencer::ExternalClock> getExternalClock();
+        std::shared_ptr<mpc::sequencer::Clock> getClock();
 
     public:
         std::shared_ptr<mpc::disk::AbstractDisk> getDisk();

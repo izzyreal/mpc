@@ -25,7 +25,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/Song.hpp>
 #include <sequencer/Step.hpp>
-#include <sequencer/ExternalClock.hpp>
+#include <sequencer/Clock.hpp>
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 

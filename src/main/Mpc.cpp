@@ -20,7 +20,7 @@
 
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <sequencer/ExternalClock.hpp>
+#include <sequencer/Clock.hpp>
 #include "engine/PreviewSoundPlayer.hpp"
 #include "engine/Drum.hpp"
 
@@ -40,7 +40,7 @@ using namespace mpc::lcdgui;
 Mpc::Mpc()
 {
     paths = std::make_shared<mpc::Paths>();
-    externalClock = std::make_shared<mpc::sequencer::ExternalClock>();
+    clock = std::make_shared<mpc::sequencer::Clock>();
 }
 
 void Mpc::init()
@@ -344,9 +344,9 @@ void Mpc::panic()
     midiOutput->panic();
 }
 
-std::shared_ptr<mpc::sequencer::ExternalClock> Mpc::getExternalClock()
+std::shared_ptr<mpc::sequencer::Clock> Mpc::getClock()
 {
-    return externalClock;
+    return clock;
 }
 
 void Mpc::setPluginModeEnabled(bool b)

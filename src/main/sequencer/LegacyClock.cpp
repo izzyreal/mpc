@@ -1,17 +1,17 @@
-#include <sequencer/OldClock.hpp>
+#include <sequencer/LegacyClock.hpp>
 
 using namespace mpc::sequencer;
 
-const double Clock::ppqn_f = 96.0;
-const double Clock::rec60 = (1.0 / 60.0);
-const double Clock::rec03 = (10.0 / 3.0);
+const double LegacyClock::ppqn_f = 96.0;
+const double LegacyClock::rec60 = (1.0 / 60.0);
+const double LegacyClock::rec03 = (10.0 / 3.0);
 
-Clock::Clock()
+LegacyClock::LegacyClock()
 {
     init(44100);
 }
 
-void Clock::init(double Fs)
+void LegacyClock::init(double Fs)
 {
 	Fs_rec = 1.0 / Fs;
 	set_bpm(120.0);
@@ -19,13 +19,13 @@ void Clock::init(double Fs)
 	reset();
 }
 
-void Clock::set_bpm(const double &BPM)
+void LegacyClock::set_bpm(const double &BPM)
 {
 	bpm = fabs(BPM);
 	omega = ((bpm)* rec60 * Fs_rec);
 }
 
-bool Clock::proc()
+bool LegacyClock::proc()
 {
 	bool tick = false;
 	double tmp = pd;
@@ -48,7 +48,7 @@ bool Clock::proc()
 	return tick;
 }
 
-void Clock::reset()
+void LegacyClock::reset()
 {
     // more than 1.0
 	lvpd = rec03;
@@ -58,7 +58,7 @@ void Clock::reset()
 	tickN = -1;
 }
 
-void Clock::zero()
+void LegacyClock::zero()
 {
 	pd = dinphase / (ppqn_f);
 	dinphase = dinphase - vpd;
@@ -66,6 +66,6 @@ void Clock::zero()
 	lvpd = -0.3;
 }
 
-double Clock::getBpm() const {
+double LegacyClock::getBpm() const {
 	return bpm;
 }

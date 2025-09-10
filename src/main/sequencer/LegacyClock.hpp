@@ -4,7 +4,7 @@
 
 namespace mpc::sequencer {
 
-    class Clock
+    class LegacyClock
     {
 
     private:
@@ -17,7 +17,7 @@ namespace mpc::sequencer {
         double Fs_rec;
 
     public:
-        Clock();
+        LegacyClock();
         void init(double Fs);
 
         void set_bpm(const double &BPM);

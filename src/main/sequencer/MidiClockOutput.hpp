@@ -4,7 +4,7 @@
 
 #include <engine/audio/server/AudioClient.hpp>
 
-#include <sequencer/OldClock.hpp>
+#include <sequencer/LegacyClock.hpp>
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>
@@ -35,7 +35,7 @@ namespace mpc::sequencer {
         std::atomic<bool> running{false};
         std::atomic_int32_t requestedSampleRate{44100};
         bool lastProcessedFrameIsMidiClockLock = false;
-        Clock clock;
+        LegacyClock clock;
         std::shared_ptr<Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
 

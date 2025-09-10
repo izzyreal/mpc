@@ -15,7 +15,7 @@
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/RepeatPad.hpp"
-#include "ExternalClock.hpp"
+#include "Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
@@ -62,7 +62,7 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
         shouldWaitForMidiClockLock = true;
     }
 
-    mpc.getExternalClock()->reset();
+    mpc.getClock()->reset();
 
     metronomeOnly = metronomeOnlyToUse;
 
@@ -437,20 +437,20 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
 
 void FrameSeq::work(int nFrames)
 {
-    const auto externalClock = mpc.getExternalClock();
+    const auto clock = mpc.getClock();
     const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
     const auto tempo = mpc.getSequencer()->getTempo();
 
-    const auto& externalClockTicks = externalClock->getTicksForCurrentBuffer();
-    const bool positionalJumpOccurred = externalClock->didJumpOccurInLastBuffer();
+    const auto& clockTicks = clock->getTicksForCurrentBuffer();
+    const bool positionalJumpOccurred = clock->didJumpOccurInLastBuffer();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
     if (positionalJumpOccurred)
     {
-        const auto hostPositionQuarterNotes = externalClock->getLastProcessedHostPositionQuarterNotes();
+        const auto hostPositionQuarterNotes = clock->getLastProcessedHostPositionQuarterNotes();
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "song")
         {
@@ -470,9 +470,9 @@ void FrameSeq::work(int nFrames)
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
 
-    for (size_t tickIndex = 0; tickIndex < externalClockTicks.size(); tickIndex++)
+    for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
     {
-        if (externalClockTicks[tickIndex] >= nFrames)
+        if (clockTicks[tickIndex] >= nFrames)
         {
             throw std::exception();
         }
@@ -503,9 +503,9 @@ void FrameSeq::work(int nFrames)
 
         size_t tickCountAtThisFrameIndex = 0;
 
-        for (size_t tickIndex = 0; tickIndex < externalClockTicks.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
         {
-            if (auto tickFrameIndex = externalClockTicks[tickIndex]; tickFrameIndex == frameIndex)
+            if (auto tickFrameIndex = clockTicks[tickIndex]; tickFrameIndex == frameIndex)
             {
                 tickCountAtThisFrameIndex++;
             }

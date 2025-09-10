@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include "sequencer/ExternalClock.hpp"
+#include "sequencer/Clock.hpp"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <controls/GlobalReleaseControls.hpp>
@@ -80,7 +80,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     auto track = seq->getActiveTrack();
 
     auto server = mpc.getAudioMidiServices()->getAudioServer();
-    auto clock = mpc.getExternalClock();
+    auto clock = mpc.getClock();
 
     server->resizeBuffers(BUFFER_SIZE);
 
@@ -231,7 +231,7 @@ TEST_CASE("Undo", "[sequencer]")
 
     int64_t timeInSamples = 0;
 
-    auto clock = mpc.getExternalClock();
+    auto clock = mpc.getClock();
 
     for (int i = 0; i < 20; i++)
     {

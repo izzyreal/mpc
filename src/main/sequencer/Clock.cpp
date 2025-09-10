@@ -1,4 +1,4 @@
-#include "ExternalClock.hpp"
+#include "Clock.hpp"
 
 #if __linux__
 #include <cmath>
@@ -13,12 +13,12 @@
 
 using namespace mpc::sequencer;
 
-ExternalClock::ExternalClock()
+Clock::Clock()
 {
     reset();
 }
 
-void ExternalClock::reset()
+void Clock::reset()
 {
     previousHostPositionAtStartOfBufferQuarterNotes = std::numeric_limits<double>::lowest();
     previousAbsolutePositionQuarterNotes = std::numeric_limits<double>::lowest();
@@ -30,17 +30,17 @@ void ExternalClock::reset()
     jumpOccurredInLastBuffer = false;
 }
 
-void ExternalClock::clearTicks()
+void Clock::clearTicks()
 {
     ticks.clear();
 }
 
-const FixedVector<uint16_t, 200>& ExternalClock::getTicksForCurrentBuffer()
+const FixedVector<uint16_t, 200>& Clock::getTicksForCurrentBuffer()
 {
     return ticks;
 }
 
-void ExternalClock::computeTicksForCurrentBuffer(
+void Clock::computeTicksForCurrentBuffer(
         const double hostPositionAtStartOfBufferQuarterNotes,
         const int nFrames,
         const int sampleRate,
@@ -144,22 +144,22 @@ void ExternalClock::computeTicksForCurrentBuffer(
     ticksAreBeingProduced = ticksAreBeingProduced || ticks.size() > 0;
 }
 
-bool ExternalClock::areTicksBeingProduced()
+bool Clock::areTicksBeingProduced()
 {
     return ticksAreBeingProduced;
 }
 
-const double ExternalClock::getLastProcessedHostPositionQuarterNotes()
+const double Clock::getLastProcessedHostPositionQuarterNotes()
 {
     return previousHostPositionAtStartOfBufferQuarterNotes;
 }
 
-bool ExternalClock::didJumpOccurInLastBuffer()
+bool Clock::didJumpOccurInLastBuffer()
 {
     return jumpOccurredInLastBuffer;
 }
 
-void ExternalClock::resetJumpOccurredInLastBuffer()
+void Clock::resetJumpOccurredInLastBuffer()
 {
     jumpOccurredInLastBuffer = false;
 }

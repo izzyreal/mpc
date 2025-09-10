@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include "sequencer/ExternalClock.hpp"
+#include "sequencer/Clock.hpp"
 #include "sequencer/Track.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
@@ -58,7 +58,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
         outputBuffer[i] = new float[BUFFER_SIZE];
     }
 
-    auto clock = mpc.getExternalClock();
+    auto clock = mpc.getClock();
 
     int64_t timeInSamples = 0;
 

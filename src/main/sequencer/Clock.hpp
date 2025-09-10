@@ -8,9 +8,9 @@
 #include "Sequencer.hpp"
 
 namespace mpc::sequencer {
-    class ExternalClock {
+    class Clock {
     public:
-        ExternalClock();
+        Clock();
         void computeTicksForCurrentBuffer(const double hostPositionAtStartOfBufferQuarterNotes,
                                           const int nFrames,
                                           const int sampleRate,
