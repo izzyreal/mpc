@@ -1,5 +1,5 @@
 ## v0.9.0 RC11 (10-9-2025)
-* [plugin] Fix crash on Intel Mac in Reaper with certain output configurations.
+* [plugin] Fix crash on Intel Mac in Reaper with certain output configurations. This may affect other systems in a similar way.
 * Fix go-to-previous/next-event. This used to work fine, but in v0.9.0.4 a regression was introduced. Now it works like it should again.
 
 ## v0.9.0 RC9 (6-9-2025)
