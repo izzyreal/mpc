@@ -25,6 +25,11 @@ namespace mpc::sequencer {
 
         bool didJumpOccurInLastBuffer();
         void resetJumpOccurredInLastBuffer();
+        
+        void generateTransportInfo(const float tempo,
+                                          const uint32_t sampleRate,
+                                          const uint16_t numSamples,
+                                          const double playStartPositionQuarterNotes);
 
     private:
         const double subDiv = 1.0 / Sequencer::TICKS_PER_QUARTER_NOTE;
