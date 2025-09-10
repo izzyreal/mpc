@@ -201,42 +201,43 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
 
 void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteOnEvent>& event, const int padIndex)
 {
-    if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+    if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
-        auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
-        
-        auto _16l_type = NoteOnEvent::VARIATION_TYPE(assign16LevelsScreen->getType());
-        auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
-        auto _16l_note = assign16LevelsScreen->getNote();
-        auto _16l_param = assign16LevelsScreen->getParameter();
-        
-        event->setNote(_16l_note);
-        event->setVariationType(_16l_type);
-        
-        if (_16l_param == 0 && event->getVelocity() != 0)
+        return;
+    }
+    auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+    
+    auto _16l_type = NoteOnEvent::VARIATION_TYPE(assign16LevelsScreen->getType());
+    auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
+    auto _16l_note = assign16LevelsScreen->getNote();
+    auto _16l_param = assign16LevelsScreen->getParameter();
+    
+    event->setNote(_16l_note);
+    event->setVariationType(_16l_type);
+    
+    if (_16l_param == 0 && event->getVelocity() != 0)
+    {
+        auto velocity = static_cast<int>((padIndex + 1) * (127.0 / 16.0));
+        event->setVelocity(velocity);
+    }
+    else if (_16l_param == 1)
+    {
+        if (_16l_type != 0)
         {
-            auto velocity = static_cast<int>((padIndex + 1) * (127.0 / 16.0));
-            event->setVelocity(velocity);
+            auto value = static_cast<int>(floor(100 / 16.0) * (padIndex + 1));
+            event->setVariationValue(value);
+            return;
         }
-        else if (_16l_param == 1)
-        {
-            if (_16l_type != 0)
-            {
-                auto value = static_cast<int>(floor(100 / 16.0) * (padIndex + 1));
-                event->setVariationValue(value);
-                return;
-            }
-            
-            auto diff = padIndex - _16l_key;
-            auto candidate = 64 + (diff * 5);
-            
-            if (candidate > 124)
-                candidate = 124;
-            else if (candidate < 4)
-                candidate = 4;
-            
-            event->setVariationValue(candidate);
-        }
+        
+        auto diff = padIndex - _16l_key;
+        auto candidate = 64 + (diff * 5);
+        
+        if (candidate > 124)
+            candidate = 124;
+        else if (candidate < 4)
+            candidate = 4;
+        
+        event->setVariationValue(candidate);
     }
 }
 
