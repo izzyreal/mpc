@@ -50,27 +50,11 @@ void VmpcMidiScreen::turnWheel(int i)
     }
     else if (column == 1)
     {
-        cmd.channel += i;
-        if (cmd.channel < -1)
-        {
-            cmd.channel = -1;
-        }
-        else if (cmd.channel > 15)
-        {
-            cmd.channel = 15;
-        }
+        cmd.channel = std::clamp(cmd.channel + i, -1, 15);
     }
     else if (column == 2)
     {
-        cmd.value += i;
-        if (cmd.value < -1)
-        {
-            cmd.value = -1;
-        }
-        else if (cmd.value > 127)
-        {
-            cmd.value = 127;
-        }
+        cmd.value = std::clamp(cmd.value + i, -1, 127);
     }
 
     updateRows();
