@@ -22,6 +22,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
+using namespace mpc::sequencer;
 
 GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
 	: BaseControls(mpc)
@@ -111,12 +112,15 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		track->finalizeNoteEventASync(recordOnEvent);
 	}
 
-	bool recWithoutPlaying = controls->isRecMainWithoutPlaying();
-	bool stepRec = controls->isStepRecording();
+	const bool recWithoutPlaying = controls->isRecMainWithoutPlaying();
+	const bool stepRec = controls->isStepRecording();
 
 	if (controls->isStepRecording()|| controls->isRecMainWithoutPlaying())
 	{
-		auto newDuration = static_cast<int>(sequencer.lock()->getTickPosition());
+        const auto metronomeOnlyTickPos = mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition();
+		auto newDuration = metronomeOnlyTickPos - recordOnEvent->getTick();
+
+        recordOnEvent->setTick(mpc.getSequencer()->getTickPosition());
 
         const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
         const bool increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
@@ -137,27 +141,33 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
             }
         }
 		
-		if (!controls->arePadsPressed()) sequencer.lock()->stopMetronomeTrack();
-
 		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(recordOnEvent, newDuration);
 
 		if ((durationHasBeenAdjusted && recWithoutPlaying) || (stepRec && increment))
 		{
-			int nextPos = sequencer.lock()->getTickPosition() + stepLength;
-			auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
-			nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
-			auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
+            if (!controls->arePadsPressed())
+            {
+                int nextPos = sequencer.lock()->getTickPosition() + stepLength;
+                auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
+                nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
+                auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
 
-			if (nextPos != 0 && nextPos < lastTick)
-			{
-				sequencer.lock()->move(nextPos);
-			}
-			else
-			{
-				sequencer.lock()->move(lastTick);
-			}
+                if (nextPos != 0 && nextPos < lastTick)
+                {
+                    sequencer.lock()->move(Sequencer::ticksToQuarterNotes(nextPos));
+                }
+                else
+                {
+                    sequencer.lock()->move(Sequencer::ticksToQuarterNotes(lastTick));
+                }
+            }
 		}
 	}
+
+    if (!controls->arePadsPressed())
+    {
+        sequencer.lock()->stopMetronomeTrack();
+    }
 }
 
 void mpc::controls::GlobalReleaseControls::handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent)

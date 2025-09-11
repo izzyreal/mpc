@@ -35,7 +35,7 @@ public:
         else throw std::overflow_error("FixedVector capacity exceeded");
     }
 
-    bool contains(const T& value) {
+    bool contains(const T& value) const {
         for (std::size_t i = 0; i < size_; ++i)
             if (data_[i] == value) return true;
         return false;

@@ -134,7 +134,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                 sequence->setLoopEnabled(false);
             }
 
-            sequencer.lock()->move(sequence->getLoopStart());
+            sequencer.lock()->move(Sequencer::ticksToQuarterNotes(sequence->getLoopStart()));
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
@@ -164,7 +164,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                 sequence->setLoopEnabled(false);
             }
 
-            sequencer.lock()->move(time0);
+            sequencer.lock()->move(Sequencer::ticksToQuarterNotes(time0));
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {

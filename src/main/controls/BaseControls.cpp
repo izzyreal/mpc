@@ -302,6 +302,8 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     mpc.getControls()->storePlayNoteEvent(padIndexWithBank, playOnEvent);
     mpc.getEventHandler()->handle(playOnEvent, track.get(), drum);
 
+    const auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
 
     if (sequencer.lock()->isRecordingOrOverdubbing())
@@ -310,24 +312,33 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     }
     else if (mpc.getControls()->isStepRecording() && (track->getBus() == 0 || isDrumNote(note)))
     {
-        recordNoteOnEvent = track->recordNoteEventSynced(sequencer.lock()->getTickPosition(), note, padVelo);
+        recordNoteOnEvent = track->recordNoteEventSynced(mpc.getSequencer()->getTickPosition(), note, padVelo);
         sequencer.lock()->playMetronomeTrack();
+        recordNoteOnEvent->setTick(frameSeq->getMetronomeOnlyTickPosition());
     }
     else if (mpc.getControls()->isRecMainWithoutPlaying())
     {
-        recordNoteOnEvent = track->recordNoteEventSynced(sequencer.lock()->getTickPosition(), note, padVelo);
-        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-        int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
+        recordNoteOnEvent = track->recordNoteEventSynced(mpc.getSequencer()->getTickPosition(), note, padVelo);
+        sequencer.lock()->playMetronomeTrack();
+        recordNoteOnEvent->setTick(frameSeq->getMetronomeOnlyTickPosition());
+
+        const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
         if (stepLength != 1)
         {
-            int bar = sequencer.lock()->getCurrentBarIndex() + 1;
-            track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
+            const int bar = sequencer.lock()->getCurrentBarIndex() + 1;
+            const auto correctedTick = track->timingCorrectTick(0,
+                                                                bar,
+                                                                mpc.getSequencer()->getTickPosition(),
+                                                                stepLength,
+                                                                timingCorrectScreen->getSwing());
 
-            if (recordNoteOnEvent->getTick() != sequencer.lock()->getTickPosition())
-                sequencer.lock()->move(recordNoteOnEvent->getTick());
+            if (sequencer.lock()->getTickPosition() != correctedTick)
+            {
+                sequencer.lock()->move(Sequencer::ticksToQuarterNotes(correctedTick));
+            }
         }
-        sequencer.lock()->playMetronomeTrack();
     }
 
     if (recordNoteOnEvent)

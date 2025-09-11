@@ -457,11 +457,11 @@ void Sequencer::play(bool fromStart)
 		{
             if (fromStart)
             {
-                move(s->getLoopStart());
+                move(ticksToQuarterNotes(s->getLoopStart()));
             }
             else
             {
-                move(s->getFirstTickOfBar(getCurrentBarIndex()));
+                move(ticksToQuarterNotes(s->getFirstTickOfBar(getCurrentBarIndex())));
             }
 
             countInStartPos = quarterNotesToTicks(positionQuarterNotes);
@@ -1932,7 +1932,6 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	playStartPositionQuarterNotes = 0.0;
     mpc.getAudioMidiServices()->getFrameSequencer()->startMetronome();
 }
 

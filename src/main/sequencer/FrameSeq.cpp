@@ -65,6 +65,7 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
     mpc.getClock()->reset();
 
     metronomeOnly = metronomeOnlyToUse;
+    metronomeOnlyTickPosition = 0;
 
     sequencerIsRunning.store(true);
 }
@@ -136,19 +137,22 @@ void FrameSeq::triggerClickIfNeeded()
     }
     else
     {
-        if (!isStepEditor && !countMetronomeScreen->getInPlay() && !sequencer->isCountingIn())
+        if (!isStepEditor &&
+            !countMetronomeScreen->getInPlay() &&
+            !sequencer->isCountingIn() &&
+            !mpc.getControls()->isRecMainWithoutPlaying())
         {
             return;
         }
     }
 
-    const auto pos = sequencer->getTickPosition();
+    const auto pos = metronomeOnly ? metronomeOnlyTickPosition : sequencer->getTickPosition();
     const auto bar = sequencer->getCurrentBarIndex();
     const auto seq = sequencer->getCurrentlyPlayingSequence();
     const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
     const auto relativePos = pos - firstTickOfBar;
 
-    if (isStepEditor && relativePos == 0)
+    if ((isStepEditor || mpc.getControls()->isRecMainWithoutPlaying()) && relativePos == 0)
     {
         return;
     }
@@ -379,7 +383,7 @@ void FrameSeq::processNoteRepeat()
 
 void FrameSeq::updateTimeDisplay()
 {
-    if (!sequencer->isCountingIn() && !metronomeOnly)
+    if (!sequencer->isCountingIn())
     {
         sequencer->notifyTimeDisplayRealtime();
         sequencer->notifyObservers(std::string("timesignature"));
@@ -438,9 +442,27 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
 void FrameSeq::work(int nFrames)
 {
     const auto clock = mpc.getClock();
-    const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+
+    if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
+    {
+        clock->processBufferInternal(sequencer->getTempo(), sampleRate, nFrames, 0);
+        const auto& ticksForCurrentBuffer = clock->getTicksForCurrentBuffer();
+
+        for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
+        {
+            if (ticksForCurrentBuffer.contains(frameIndex))
+            {
+                triggerClickIfNeeded();
+                metronomeOnlyTickPosition++;
+            }
+        }
+        
+        return;
+    }
+
+    const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const auto tempo = mpc.getSequencer()->getTempo();
 
     const auto& clockTicks = clock->getTicksForCurrentBuffer();
@@ -526,12 +548,6 @@ void FrameSeq::work(int nFrames)
         triggerClickIfNeeded();
         displayPunchRects();
 
-        if (metronomeOnly)
-        {
-            sequencer->bumpPositionByTicks(1);
-            continue;
-        }
-
         if (sequencer->isCountingIn())
         {
             sequencer->bumpPositionByTicks(1);
@@ -579,5 +595,10 @@ void FrameSeq::work(int nFrames)
 
         sequencer->bumpPositionByTicks(1);
     }
+}
+
+uint64_t FrameSeq::getMetronomeOnlyTickPosition()
+{
+    return metronomeOnlyTickPosition;
 }
 

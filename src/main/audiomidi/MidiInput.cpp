@@ -340,7 +340,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
                 track->timingCorrect(0, bar, recordMidiNoteOn, stepLength, timingCorrectScreen->getSwing());
 
                 if (recordMidiNoteOn->getTick() != sequencer->getTickPosition())
-                    sequencer->move(recordMidiNoteOn->getTick());
+                    sequencer->move(Sequencer::ticksToQuarterNotes(recordMidiNoteOn->getTick()));
             }
         }
         if (recordMidiNoteOn)
@@ -424,11 +424,11 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 
                 if (nextPos != 0 && nextPos < lastTick)
                 {
-                    sequencer->move(nextPos);
+                    sequencer->move(Sequencer::ticksToQuarterNotes(nextPos));
                 }
                 else
                 {
-                    sequencer->move(lastTick);
+                    sequencer->move(Sequencer::ticksToQuarterNotes(lastTick));
                 }
             }
         }  

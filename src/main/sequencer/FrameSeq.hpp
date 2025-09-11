@@ -90,6 +90,8 @@ namespace mpc::sequencer {
 
         void stopSequencer();
 
+        uint64_t metronomeOnlyTickPosition = 0;
+
     public:
         explicit FrameSeq(mpc::Mpc &mpc);
 
@@ -108,6 +110,8 @@ namespace mpc::sequencer {
         bool isRunning();
 
         void enqueueEventAfterNFrames(const std::function<void(unsigned int)> &event, unsigned long nFrames);
+
+        uint64_t getMetronomeOnlyTickPosition();
 
     };
 }
