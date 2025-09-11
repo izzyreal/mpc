@@ -47,6 +47,9 @@ void Clock::computeTicksForCurrentBuffer(
         const double bpm,
         const int64_t timeInSamples)
 {
+    resetJumpOccurredInLastBuffer();
+    clearTicks();
+
     bool jumpOccurred = false;
 
     if (timeInSamples != std::numeric_limits<int64_t>::lowest())
@@ -187,5 +190,44 @@ void Clock::generateTransportInfo(const float tempo,
                     sampleRate,
                     tempo,
                     std::numeric_limits<int64_t>::lowest());
+}
+
+void Clock::processBufferInternal(const float tempo,
+                                  const uint32_t sampleRate,
+                                  const uint16_t numSamples,
+                                  const double playStartPositionQuarterNotes)
+{
+        const double lastProcessedPositionQuarterNotes = getLastProcessedHostPositionQuarterNotes();
+        const auto beatsPerFrame = 1.0 / ((1.0/(tempo/60.0)) * sampleRate);
+
+        // This approach does not 100% mimic the values that Reaper produces. Although it comes close, Reaper's values are 100% the same if we would
+        // compute without accumulating quarter notes, and instead keep track of the number of buffers that already passed.
+        // I'm currently not sure if this actually needs to be addressed. My gut is that both implementations are more than accurate and correct
+        // enough for most artistic intents and purposes.
+        const auto newPositionQuarterNotes =
+            lastProcessedPositionQuarterNotes == std::numeric_limits<double>::lowest() ?
+            playStartPositionQuarterNotes :
+            (lastProcessedPositionQuarterNotes + (numSamples * beatsPerFrame));
+
+        computeTicksForCurrentBuffer(
+                    newPositionQuarterNotes,
+                    numSamples,
+                    sampleRate,
+                    tempo,
+                    std::numeric_limits<int64_t>::lowest());
+}
+
+void Clock::processBufferExternal(
+        const double hostPositionAtStartOfBufferQuarterNotes,
+        const int nFrames,
+        const int sampleRate,
+        const double bpm,
+        const int64_t timeInSamples)
+{
+    computeTicksForCurrentBuffer(hostPositionAtStartOfBufferQuarterNotes,
+                                 nFrames,
+                                 sampleRate,
+                                 bpm,
+                                 timeInSamples);
 }
 

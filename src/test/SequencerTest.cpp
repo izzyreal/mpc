@@ -80,7 +80,6 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     auto track = seq->getActiveTrack();
 
     auto server = mpc.getAudioMidiServices()->getAudioServer();
-    auto clock = mpc.getClock();
 
     server->resizeBuffers(BUFFER_SIZE);
 
@@ -95,13 +94,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
         while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
                track->getEvents().size() < humanTickPositions.size())
         {
-            const double lastPositionQuarterNotes = clock->getLastProcessedHostPositionQuarterNotes();
-            const auto beatsPerFrame = 1.0 / ((1.0/(seq->getTempo()/60.0)) * SAMPLE_RATE);
-            const auto positionQuarterNotes = lastPositionQuarterNotes == std::numeric_limits<double>::lowest() ? 0 : (lastPositionQuarterNotes + (BUFFER_SIZE * beatsPerFrame));
-
-            clock->resetJumpOccurredInLastBuffer();
-            clock->clearTicks();
-            clock->computeTicksForCurrentBuffer(positionQuarterNotes, BUFFER_SIZE, SAMPLE_RATE, seq->getTempo(), timeInSamples);
+            mpc.getClock()->processBufferInternal(seq->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
             server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
             timeInSamples += BUFFER_SIZE;
 
@@ -231,18 +224,11 @@ TEST_CASE("Undo", "[sequencer]")
 
     int64_t timeInSamples = 0;
 
-    auto clock = mpc.getClock();
-
     for (int i = 0; i < 20; i++)
     {
         if (i % 2 == 0) pads[0]->push(127); else pads[0]->release();
-        const double lastPositionQuarterNotes = clock->getLastProcessedHostPositionQuarterNotes();
-        const auto beatsPerFrame = 1.0 / ((1.0/(sequencer->getTempo()/60.0)) * SAMPLE_RATE);
-        const auto positionQuarterNotes = lastPositionQuarterNotes == std::numeric_limits<double>::lowest() ? 0 : (lastPositionQuarterNotes + (BUFFER_SIZE * beatsPerFrame));
 
-        clock->resetJumpOccurredInLastBuffer();
-        clock->clearTicks();
-        clock->computeTicksForCurrentBuffer(positionQuarterNotes, BUFFER_SIZE, SAMPLE_RATE, sequencer->getTempo(), timeInSamples);
+        mpc.getClock()->processBufferInternal(sequencer->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
         timeInSamples += BUFFER_SIZE;
     }

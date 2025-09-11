@@ -59,7 +59,7 @@ void printDouble(double d)
     printf("%s\n", doubleToStringWithPrecision(d, 15).c_str());
 }
 
-TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
+TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[clock]")
 {
     const uint16_t bufferSize = 64;
     std::vector<double> positions;
@@ -73,7 +73,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
 
     for (double position : positions)
     {
-        mpc.getClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, 120, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, 120, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
@@ -88,7 +88,6 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
             ticks.push_back(-1);
         }
 
-        mpc.getClock()->clearTicks();
         timeInSamples += bufferSize;
     }
 
@@ -121,7 +120,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[external-clock]")
     REQUIRE(ticks.size() - emptyBuffers == expectedTickCount);
 }
 
-TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", "[external-clock]")
+TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
@@ -139,7 +138,7 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
@@ -148,7 +147,6 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
-        mpc.getClock()->clearTicks();
         timeInSamples += bufferSize;
     }
 
@@ -157,7 +155,7 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     REQUIRE(ticks.size() == expectedTickCount);
 }
 
-TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "[external-clock]")
+TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
@@ -175,7 +173,7 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
@@ -184,7 +182,6 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
-        mpc.getClock()->clearTicks();
         timeInSamples += bufferSize;
     }
 
@@ -192,7 +189,7 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
     REQUIRE(ticks.size() == expectedTickCount);
 }
 
-TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]")
+TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
@@ -210,7 +207,7 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
@@ -219,7 +216,6 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
-        mpc.getClock()->clearTicks();
         timeInSamples += bufferSize;
     }
 
@@ -227,7 +223,7 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[external-clock]"
     REQUIRE(ticks.size() == expectedTickCount);
 }
 
-TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]")
+TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
@@ -245,7 +241,7 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->computeTicksForCurrentBuffer(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
         auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
@@ -254,7 +250,6 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
 
-        mpc.getClock()->clearTicks();
         timeInSamples += bufferSize;
     }
 
@@ -262,7 +257,7 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[external-clock]"
     REQUIRE(ticks.size() == expectedTickCount);
 }
 
-TEST_CASE("1 bar loop", "[external-clock]")
+TEST_CASE("1 bar loop", "[clock]")
 {
     std::vector<double> positions;
     readDoublesFromFile(positions, "reaper-44.1khz-120bpm-1-bar-loop-ppqpos.txt");
@@ -291,7 +286,7 @@ TEST_CASE("1 bar loop", "[external-clock]")
     for (int i = 0; i < positions.size(); i++)
     {
         const auto position = positions[i];
-        mpc.getClock()->computeTicksForCurrentBuffer(position, blockSizes[i], 44100, 120, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100, 120, timeInSamples);
 
         auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
         frameSeq->work(blockSizes[i]);
@@ -302,8 +297,6 @@ TEST_CASE("1 bar loop", "[external-clock]")
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
             cumulativeTickPos += 1;
         }
-
-        mpc.getClock()->clearTicks();
 
         highestTickPos = std::max<uint64_t>(highestTickPos, mpc.getSequencer()->getTickPosition());
         timeInSamples += blockSizes[i];
