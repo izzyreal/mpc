@@ -1,3 +1,9 @@
+## v0.9.0 RC12 (11-9-2025)
+* Fix crash in slider Assign screen when hitting a pad in bank B, C or D.
+* Fix 16 LEVELS handling of pads in bank B, C or D.
+* Fix issues with recording note events while the sequencer is not running. Quite a few users may already know that note events can be recorded in the Step Editor, by hitting one or more of the pads. A metronome will start playing, and by default the actual duration of how long the pad is pressed is assigned to the note event's duration. Another feature of the real MPC2000XL is that you can achieve the same, but in the Main screen. To do this, you have to hit pads while holding the REC button. Both of these features were not working well in VMPC2000XL, but now they should be fixed.
+* Fix an issue with assigning values in the VMPC2000XL-specific MIDI screen. Note and CC values were wrapping around to their lowest possible value if you would attempt to increase them beyond their highest possible value.
+
 ## v0.9.0 RC11 (10-9-2025)
 * [plugin] Fix crash on Intel Mac in Reaper with certain output configurations. This may affect other systems in a similar way.
 * Fix go-to-previous/next-event. This used to work fine, but in v0.9.0.4 a regression was introduced. Now it works like it should again.
