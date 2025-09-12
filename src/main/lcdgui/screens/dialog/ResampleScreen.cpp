@@ -78,7 +78,7 @@ void ResampleScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto snd = sampler->getSound(sampler->getSoundIndex());
+		const auto snd = sampler->getSound(sampler->getSoundIndex());
 		auto destSnd = sampler->addSound("sound");
 
         if (destSnd == nullptr)
@@ -90,7 +90,7 @@ void ResampleScreen::function(int i)
         destSnd->setSampleRate(newFs);
         destSnd->setMono(snd->isMono());
 
-		auto source = snd->getSampleData();
+		const auto source = snd->getSampleData();
 
 		if (newFs != snd->getSampleRate())
 		{
@@ -122,6 +122,12 @@ void ResampleScreen::function(int i)
 		{
             sampler::Sampler::process8Bit(destSnd->getSampleData());
 		}
+
+        const auto ratio = newFs / (float) snd->getSampleRate();
+
+        destSnd->setStart(snd->getStart() * ratio);
+        destSnd->setEnd(snd->getEnd() * ratio);
+        destSnd->setLoopTo(snd->getLoopTo() * ratio);
 
 		sampler->setSoundIndex(sampler->getSoundCount() - 1);
 		openScreen("sound");
