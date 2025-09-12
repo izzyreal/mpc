@@ -185,6 +185,7 @@ void SoundRecorder::stop()
     const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
 
     sound->setStart(preRecFramesAt44Khz);
+    sound->setLoopTo(sound->getFrameCount());
     sound->setEnd(sound->getFrameCount());
 
     mpc.getLayeredScreen()->openScreen("keep-or-retry");
