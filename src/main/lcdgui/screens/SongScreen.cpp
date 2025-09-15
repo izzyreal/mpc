@@ -194,9 +194,12 @@ void SongScreen::turnWheel(int i)
 		setActiveSongIndex(activeSongIndex + i);
 		setOffset(-1);
 		init();
+        displayLoop();
 
 		if (song->isUsed() && song->getStepCount() != 0)
-			sequencer.lock()->setActiveSequenceIndex(song->getStep(0).lock()->getSequence());
+        {
+            sequencer.lock()->setActiveSequenceIndex(song->getStep(0).lock()->getSequence());
+        }
 	}
 	else if (param == "tempo" && !sequencer.lock()->isTempoSourceSequenceEnabled())
 	{
@@ -210,7 +213,9 @@ void SongScreen::turnWheel(int i)
 	}
 	else if (param == "loop")
 	{
-		setLoop(i > 0);
+        auto song = sequencer.lock()->getSong(activeSongIndex);
+        song->setLoopEnabled(i > 0);
+        displayLoop();
 	}
 	else if (param == "step1")
 	{
@@ -276,7 +281,8 @@ void SongScreen::displayTempo()
 
 void SongScreen::displayLoop()
 {
-	findField("loop")->setText(loop ? "YES" : "NO");
+    auto song = sequencer.lock()->getSong(activeSongIndex);
+	findField("loop")->setText(song->isLoopEnabled() ? "YES" : "NO");
 }
 
 void SongScreen::displaySteps()
@@ -393,12 +399,6 @@ void SongScreen::setDefaultSongName(std::string s)
 	defaultSongName = s;
 }
 
-void SongScreen::setLoop(bool b)
-{
-	loop = b;
-	displayLoop();
-}
-
 void SongScreen::update(Observable* observable, Message message)
 {
 	const auto msg = std::get<std::string>(message);
@@ -446,7 +446,3 @@ int SongScreen::getActiveSongIndex()
 	return activeSongIndex;
 }
 
-bool SongScreen::isLoopEnabled()
-{
-	return loop;
-}

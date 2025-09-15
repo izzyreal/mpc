@@ -85,7 +85,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
         rate = static_cast<int>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
 
 		auto sequence = sequencer.lock()->getSequence(seq);
-        loopWasEnabled = sequence->isLoopEnabled();
+        seqLoopWasEnabled = sequence->isLoopEnabled();
 
 		switch (record)
 		{
@@ -93,7 +93,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		{
 			openScreen("sequencer");
 
-            if (loopWasEnabled)
+            if (seqLoopWasEnabled)
             {
                 sequence->setLoopEnabled(false);
             }
@@ -129,7 +129,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     rate,
                     recordingName);
 
-            if (loopWasEnabled)
+            if (seqLoopWasEnabled)
             {
                 sequence->setLoopEnabled(false);
             }
@@ -159,7 +159,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     rate,
                     recordingName);
 
-            if (loopWasEnabled)
+            if (seqLoopWasEnabled)
             {
                 sequence->setLoopEnabled(false);
             }
@@ -196,10 +196,12 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 			openScreen("song");
 
-			sequencer.lock()->setSongModeEnabled(true);
+            songLoopWasEnabled = mpcSong->isLoopEnabled();
 
-			auto songScreen = mpc.screens->get<SongScreen>("song");
-			songScreen->setLoop(false);
+            if (songLoopWasEnabled)
+            {
+                mpcSong->setLoopEnabled(false);
+            }
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
@@ -207,6 +209,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
             }
 			else
             {
+                sequencer.lock()->setSongModeEnabled(true);
                 sequencer.lock()->playFromStart();
             }
 

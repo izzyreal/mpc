@@ -28,6 +28,8 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
+#include <sequencer/Song.hpp>
+
 #include <string>
 
 using namespace mpc;
@@ -338,11 +340,17 @@ void AudioMidiServices::stopBouncing()
 
     auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 
-    if (directToDiskRecorderScreen->loopWasEnabled)
+    if (directToDiskRecorderScreen->seqLoopWasEnabled)
     {
         auto seq = mpc.getSequencer()->getSequence(directToDiskRecorderScreen->sq);
         seq->setLoopEnabled(true);
-        directToDiskRecorderScreen->loopWasEnabled = false;
+        directToDiskRecorderScreen->seqLoopWasEnabled = false;
+    }
+    else if (directToDiskRecorderScreen->songLoopWasEnabled)
+    {
+        auto song = mpc.getSequencer()->getSong(directToDiskRecorderScreen->song);
+        song->setLoopEnabled(true);
+        directToDiskRecorderScreen->songLoopWasEnabled = false;
     }
 }
 

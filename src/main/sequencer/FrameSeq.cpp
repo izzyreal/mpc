@@ -236,7 +236,7 @@ bool FrameSeq::processSongMode()
     auto doneRepeating = sequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
     auto reachedLastStep = step == song->getStepCount() - 1;
 
-    if (doneRepeating && songScreen->isLoopEnabled() && step == song->getLastStep())
+    if (doneRepeating && song->isLoopEnabled() && step == song->getLastStep())
     {
         sequencer->resetPlayedStepRepetitions();
         songScreen->setOffset(song->getFirstStep() - 1);

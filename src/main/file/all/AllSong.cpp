@@ -86,7 +86,7 @@ Song::Song(mpc::sequencer::Song* mpcSong)
     saveBytes[IS_USED_OFFSET] = mpcSong->isUsed() ? 1 : 0;
     saveBytes[LOOP_FIRST_STEP_INDEX_OFFSET] = mpcSong->getFirstStep();
     saveBytes[LOOP_LAST_STEP_INDEX_OFFSET] = mpcSong->getLastStep();
-    saveBytes[LOOP_ENABLED_OFFSET] = mpcSong->isLoopEnabled();
+    saveBytes[LOOP_ENABLED_OFFSET] = mpcSong->isLoopEnabled() ? 1 : 0;
 
 	for (int i = LOOP_ENABLED_OFFSET + 1; i < LENGTH; i++)
     {

@@ -48,8 +48,8 @@ namespace mpc::lcdgui::screens::window
         bool offline = false;
 		bool splitStereoIntoLeftAndRightChannel = true;
 		int sampleRate = 0;
-        bool loopWasEnabled = false;
-
+        bool seqLoopWasEnabled = false;
+        bool songLoopWasEnabled = false;
 		void setRecord(int i);
 		void setSq(int i);
 		void setSong(int i);
