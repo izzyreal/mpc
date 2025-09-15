@@ -16,16 +16,19 @@ bool Song::isLoopEnabled()
 
 void Song::setFirstStep(int i)
 {
-    if (i >= steps.size()) i = steps.size() - 1;
-    if (i < 0) i = 0;
+    const auto candidate = std::clamp(i, 0, std::max(0, getStepCount() - 1));
 
-    if (firstStep == i)
+    if (firstStep == candidate)
+    {
         return;
+    }
 
-    firstStep = i;
+    firstStep = candidate;
 
     if (firstStep > lastStep)
+    {
         setLastStep(firstStep);
+    }
 }
 
 int Song::getFirstStep()
@@ -35,17 +38,19 @@ int Song::getFirstStep()
 
 void Song::setLastStep(int i)
 {
-    if (i >= steps.size()) i = steps.size() - 1;
+    const auto candidate = std::clamp(i, 0, std::max(0, getStepCount() - 1));
 
-    if (i < 0) i = 0;
-
-    if (lastStep == i)
+    if (lastStep == candidate)
+    {
         return;
+    }
 
-	lastStep = i;
+	lastStep = candidate;
 
 	if (lastStep < firstStep)
-		setFirstStep(lastStep);	
+    {
+        setFirstStep(lastStep);
+    }
 }
 
 int Song::getLastStep()
