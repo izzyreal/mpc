@@ -7,17 +7,18 @@
 
 namespace mpc::sequencer
 {
+    bool isDrumNote(int number);
+
     class NoteOffEvent : public Event
     {
         friend class NoteOnEvent;
 
     private:
         int number = 60;
-        NoteOffEvent(){};
+        NoteOffEvent() {}
         void setNote(int i);
     public:
         int getNote();
-        bool isDrumNote();
 
         std::string getTypeName() override { return "note-off"; }
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
@@ -55,7 +56,6 @@ namespace mpc::sequencer
         int getVariationValue();
         void setVelocity(int i);
         int getVelocity();
-        bool isDrumNote();
         bool isFinalized();
         bool isPlayOnly();
 
@@ -68,54 +68,38 @@ namespace mpc::sequencer
 
 
     };
-    static bool isDrumNote(int number) { return number >= 35 && number <= 98; }
 
     class NoteOnEventPlayOnly : public NoteOnEvent
     {
     public:
-        NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i,vel) { setTick(-1); };
+        NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i,vel) { setTick(-1); }
         NoteOnEventPlayOnly(mpc::engine::midi::ShortMessage* msg) : NoteOnEvent(msg) { setTick(-1); }
-        NoteOnEventPlayOnly(const NoteOnEventPlayOnly& event) : NoteOnEvent(event) { setTick(-1); };
-        NoteOnEventPlayOnly(const NoteOnEvent& event) : NoteOnEvent(event) { setTick(-1); };
+        NoteOnEventPlayOnly(const NoteOnEventPlayOnly& event) : NoteOnEvent(event) { setTick(-1); }
+        NoteOnEventPlayOnly(const NoteOnEvent& event) : NoteOnEvent(event) { setTick(-1); }
     };
 }
+
 inline int operator+(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
 {
     assert(duration.has_value());
     return *duration + i;
 }
+
 inline int operator+(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
 {
     assert(duration.has_value());
     return *duration + i;
 }
+
 inline int operator-(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
 {
     assert(duration.has_value());
     return *duration - i;
 }
-inline int operator-(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
-{
-    assert(duration.has_value());
-    return *duration - i;
-}
+
 inline int operator*(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
 {
     assert(duration.has_value());
     return *duration * i;
 }
-inline int operator*(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
-{
-    assert(duration.has_value());
-    return *duration * i;
-}
-inline int operator/(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
-{
-    assert(duration.has_value());
-    return *duration / i;
-}
-inline int operator/(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
-{
-    assert(duration.has_value());
-    return *duration / i;
-}
+

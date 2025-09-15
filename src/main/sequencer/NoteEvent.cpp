@@ -5,6 +5,8 @@
 using namespace mpc::sequencer;
 using namespace mpc::engine::midi;
 
+bool mpc::sequencer::isDrumNote(int number) { return number >= 35 && number <= 98; }
+
 void NoteOffEvent::setNote(int i)
 {
     number = i;
@@ -14,10 +16,7 @@ int NoteOffEvent::getNote()
 {
     return number;
 }
-bool NoteOffEvent::isDrumNote()
-{
-    return number >= 35 && number <= 98;
-}
+
 std::shared_ptr<mpc::engine::midi::ShortMessage> NoteOffEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ShortMessage>();
@@ -25,7 +24,6 @@ std::shared_ptr<mpc::engine::midi::ShortMessage> NoteOffEvent::createShortMessag
     return msg;
 }
 
-//-------------
 NoteOnEvent::NoteOnEvent(int i, int vel)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
@@ -139,11 +137,6 @@ void NoteOnEvent::setVelocity(int i)
 int NoteOnEvent::getVelocity()
 {
     return velocity;
-}
-
-bool NoteOnEvent::isDrumNote()
-{
-    return number >= 35 && number <= 98;
 }
 
 bool NoteOnEvent::isFinalized()

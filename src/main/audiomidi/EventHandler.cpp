@@ -172,12 +172,16 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
 
     auto eventFrame = timeStamp != -1 ? timeStamp : frameSeq->getEventFrameOffset();
 
-    if (noteOffEvent && noteOffEvent->isDrumNote()) {
+    if (noteOffEvent && isDrumNote(noteOffEvent->getNote()))
+    {
         mpc.getDrum(drumIndex).mpcNoteOff(noteOffEvent->getNote(), eventFrame,
                                           noteOffEvent->getTick());
-    } else if (noteOnEvent && noteOnEvent->isDrumNote() &&
-               (noteOnEvent->isFinalized() || noteOnEvent->isPlayOnly())) {
-        if (!sequencer->isSoloEnabled() || track->getIndex() == sequencer->getActiveTrackIndex()) {
+    }
+    else if (noteOnEvent && isDrumNote(noteOnEvent->getNote()) &&
+               (noteOnEvent->isFinalized() || noteOnEvent->isPlayOnly()))
+    {
+        if (!sequencer->isSoloEnabled() || track->getIndex() == sequencer->getActiveTrackIndex())
+        {
             const auto newVelo = std::clamp<int>(static_cast<int>(noteOnEvent->getVelocity() *
                                                                   (track->getVelocityRatio() *
                                                                    0.01)), 1, 127);
@@ -195,43 +199,53 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
                                         SeqUtil::ticksToFrames(*duration, sequencer->getTempo(),
                                                                audioServer->getSampleRate()) : -1;
 
-            mpc.getDrum(drumIndex).mpcNoteOn
-                    (
-                            noteOnEvent->getNote(),
-                            newVelo,
-                            noteOnEvent->getVariationType(),
-                            noteOnEvent->getVariationValue(),
-                            eventFrame,
-                            true,
-                            noteOnEvent->getTick(),
-                            durationFrames
-                    );
+            mpc.getDrum(drumIndex).mpcNoteOn(noteOnEvent->getNote(),
+                                             newVelo,
+                                             noteOnEvent->getVariationType(),
+                                             noteOnEvent->getVariationValue(),
+                                             eventFrame,
+                                             true,
+                                             noteOnEvent->getTick(),
+                                             durationFrames);
         }
     }
 
-    if (audioServer->isRealTime()) {
-        auto note = noteOnEvent ? noteOnEvent->getNote() : noteOffEvent->getNote();
-        auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram());
+    if (audioServer->isRealTime())
+    {
+        const auto note = noteOnEvent ? noteOnEvent->getNote() : noteOffEvent->getNote();
+        const auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram());
         int pad = program->getPadIndexFromNote(note);
 
-        if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled()) {
+        if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+        {
             int bank = mpc.getBank();
             pad -= pad == -1 ? 0 : bank * 16;
         }
 
         bool visible(pad >= 0 && pad <= 15);
 
-        if (visible) {
+        if (visible)
+        {
             if (noteOnEvent)
-                mpc.getHardware()->getPad(pad)->notifyObservers(
-                        static_cast<int>(noteOnEvent->getVelocity() *
-                                         (track->getVelocityRatio() * 0.01)));
+            {
+                const auto padBrightness = static_cast<int>(noteOnEvent->getVelocity() *
+                                                            (track->getVelocityRatio() * 0.01));
+                mpc.getHardware()->getPad(pad)->notifyObservers(padBrightness);
+            }
             else
+            {
                 mpc.getHardware()->getPad(pad)->notifyObservers(255);
+            }
         }
-        if (noteOnEvent && noteOnEvent->isFinalized()) {
+
+        if (noteOnEvent && noteOnEvent->isFinalized())
+        {
             frameSeq->enqueueEventAfterNFrames([this, noteOnEvent, visible, pad, track](int) {
-                                                   if (visible) mpc.getHardware()->getPad(pad)->notifyObservers(255);
+
+                                                   if (visible)
+                                                   {
+                                                       mpc.getHardware()->getPad(pad)->notifyObservers(255);
+                                                   }
                                                    midiOut(noteOnEvent->getNoteOff(), track);
                                                },
                                                SeqUtil::ticksToFrames(*noteOnEvent->getDuration(),
