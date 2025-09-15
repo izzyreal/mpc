@@ -214,22 +214,20 @@ void Sampler::init() {
 void Sampler::playMetronome(unsigned int velocity, int framePos)
 {
 	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
-	auto soundNumber = -2;
 
-	if (metronomeSoundScreen->getSound() != 0)
-	{
-		auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1).getProgram();
-		auto accent = velocity == 127;
-		velocity = accent ? metronomeSoundScreen->getAccentVelo() : metronomeSoundScreen->getNormalVelo();
-		auto pad = accent ? metronomeSoundScreen->getAccentPad() : metronomeSoundScreen->getNormalPad();
-		auto note = programs[program]->getNoteFromPad(pad);
-		soundNumber = programs[program]->getNoteParameters(note)->getSoundIndex();
-	}
-	else
+	if (metronomeSoundScreen->getSound() == 0)
 	{
 		velocity *= metronomeSoundScreen->getVolume() * 0.01;
+        mpc.getBasicPlayer().mpcNoteOn(CLICK_SOUND, velocity, framePos);
+        return;
 	}
 	
+    const auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1).getProgram();
+    const auto accent = velocity == 127;
+    velocity = accent ? metronomeSoundScreen->getAccentVelo() : metronomeSoundScreen->getNormalVelo();
+    const auto pad = accent ? metronomeSoundScreen->getAccentPad() : metronomeSoundScreen->getNormalPad();
+    const auto note = programs[program]->getNoteFromPad(pad);
+    const auto soundNumber = programs[program]->getNoteParameters(note)->getSoundIndex();
 	mpc.getBasicPlayer().mpcNoteOn(soundNumber, velocity, framePos);
 }
 
@@ -247,7 +245,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo)
 	previewSound->setStart(start);
 	previewSound->setEnd(end);
 	previewSound->setLoopTo(loopTo);
-	mpc.getBasicPlayer().mpcNoteOn(-3, 127, 0);
+	mpc.getBasicPlayer().mpcNoteOn(PREVIEW_SOUND, 127, 0);
 	previewSound->setStart(oldStart);
 	previewSound->setEnd(oldEnd);
 	previewSound->setLoopTo(oldLoopTo);
@@ -702,7 +700,7 @@ void Sampler::playX()
 	int oldEnd = sound->getEnd();
 	sound->setStart(start);
 	sound->setEnd(end);
-	mpc.getBasicPlayer().mpcNoteOn(-4, 127, 0);
+	mpc.getBasicPlayer().mpcNoteOn(PLAYX_SOUND, 127, 0);
 	sound->setStart(oldStart);
 	sound->setEnd(oldEnd);
 }

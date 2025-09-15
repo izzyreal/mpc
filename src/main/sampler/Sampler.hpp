@@ -12,12 +12,21 @@ class Drum;
 
 namespace mpc::sampler
 {
+
+const int16_t PLAYX_SOUND = -4;
+const int16_t PREVIEW_SOUND = -3;
+const int16_t CLICK_SOUND = -2;
+
+// Not sure if we actually need this.
+// We should investigate if PreviewSoundPlayer::mpcNoteOn or Drum::mpcNoteOn ever
+// receive calls with `soundIndex` == -1.
+const int16_t NO_SOUND = -1;
+
 class Sound;
 class Program;
 
 class Sampler final
 {
-
 public:
     Sampler(mpc::Mpc&);
 

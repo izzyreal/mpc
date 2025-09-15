@@ -31,19 +31,19 @@ void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffse
 
 	tempVars.reset();
 
-	if (soundNumber == -4)
+	if (soundNumber == PLAYX_SOUND)
     {
 		tempVars = sampler->getPlayXSound();
 	}
-	else if (soundNumber == -3)
+	else if (soundNumber == PREVIEW_SOUND)
     {
 		tempVars = sampler->getPreviewSound();
 	}
-	else if (soundNumber == -2)
+	else if (soundNumber == CLICK_SOUND)
     {
 		tempVars = sampler->getClickSound();
 	}
-	else if (soundNumber == -1)
+	else if (soundNumber == NO_SOUND)
     {
 		tempVars = {};
 	}
