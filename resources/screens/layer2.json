@@ -526,7 +526,11 @@
  "labels" : [ "First step:", "Last step:", "Number of steps:" ],
  "x" : [ 90, 96, 60 ],
  "y" : [ 11, 33, 42 ],
- "parameters" : [ "first-step", "last-step", "number-of-steps" ],
+ "parameters" : [
+     "first-step", [ "_", "_", "_", "last-step" ],
+     "last-step", [ "_", "_", "first-step", "number-of-steps" ],
+     "number-of-steps", [ "_", "_", "last-step", "_" ]
+ ],
  "tfsize" : [ 18, 18, 18 ],
  "fblabels" : [ null, null, null, "CLOSE", null, null ],
  "fbtypes" : [ null, null, null, 0, null, null ]
