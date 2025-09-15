@@ -23,8 +23,15 @@ namespace mpc::engine {
         std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
         std::shared_ptr<mpc::engine::FaderControl> fader;
 
+        bool soundHasLoop = false;
+
+        PreviewSoundPlayer(const PreviewSoundPlayer& other) = delete;
+        PreviewSoundPlayer& operator=(const PreviewSoundPlayer& other) = delete;
+
     public:
         void finishVoice();
+        
+        void finishVoiceIfSoundIsLooping();
 
         void mpcNoteOn(int soundNumber, int velocity, int frameOffset);
 

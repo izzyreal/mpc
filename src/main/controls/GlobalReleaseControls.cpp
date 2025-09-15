@@ -97,6 +97,19 @@ void GlobalReleaseControls::simplePad(const int padIndexWithBank)
 {
 	init();
 
+    // In case we've started playing a sound in one of the `soundScreens`, and
+    // this sound is looping, we stop playing it.
+    // We do it outside the body of the below if-statement, because the user may
+    // have left the screen by the time they release the pad.
+    mpc.getBasicPlayer().finishVoiceIfSoundIsLooping();
+
+    if (collectionContainsCurrentScreen(soundScreens))
+    {
+        // We're certain we don't need further processing in this case, so we
+        // return.
+        return;
+    }
+
 	const auto controls = mpc.getControls();
 
 	controls->unpressPad(padIndexWithBank);
@@ -247,5 +260,9 @@ void GlobalReleaseControls::erase()
 	controls->setErasePressed(false);
     const auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
     sequencerScreen->releaseErase();
+}
+
+void GlobalReleaseControls::handlePadHitInTrimLoopZoneParamsScreens()
+{
 }
 

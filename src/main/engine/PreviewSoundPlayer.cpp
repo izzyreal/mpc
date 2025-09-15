@@ -24,31 +24,40 @@ PreviewSoundPlayer::PreviewSoundPlayer(
 
 void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffset)
 {
-	if (velocity == 0) {
+	if (velocity == 0)
+    {
 		return;
 	}
 
 	tempVars.reset();
 
-	if (soundNumber == -4) {
+	if (soundNumber == -4)
+    {
 		tempVars = sampler->getPlayXSound();
 	}
-	else if (soundNumber == -3) {
+	else if (soundNumber == -3)
+    {
 		tempVars = sampler->getPreviewSound();
 	}
-	else if (soundNumber == -2) {
+	else if (soundNumber == -2)
+    {
 		tempVars = sampler->getClickSound();
 	}
-	else if (soundNumber == -1) {
+	else if (soundNumber == -1)
+    {
 		tempVars = {};
 	}
-	else if (soundNumber >= 0) {
+	else if (soundNumber >= 0)
+    {
 		tempVars = sampler->getSound(soundNumber);
 	}
     
-	if (!tempVars) {
+	if (!tempVars)
+    {
 		return;
 	}
+
+    soundHasLoop = tempVars->isLoopEnabled();
 
 	fader->setValue(soundNumber == -2 ? 200 : 100);
 	voice->init(velocity, tempVars, -1, nullptr, 0, 64, -1, -1, frameOffset, soundNumber != -2, -1, -1);
@@ -56,6 +65,16 @@ void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffse
 
 void PreviewSoundPlayer::finishVoice() {
 	voice->finish(); // stops voice immediately, without a short fade-out/decay time
+}
+
+void PreviewSoundPlayer::finishVoiceIfSoundIsLooping()
+{
+    if (!soundHasLoop)
+    {
+        return;
+    }
+
+	voice->startDecay();
 }
 
 void PreviewSoundPlayer::connectVoice()

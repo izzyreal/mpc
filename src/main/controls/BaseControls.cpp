@@ -249,6 +249,12 @@ void BaseControls::various(const int note, const std::optional<int> padIndexWith
 void BaseControls::pad(const int padIndexWithBank, int velo)
 {
     init();
+
+    if (collectionContainsCurrentScreen(soundScreens))
+    {
+        handlePadHitInTrimLoopZoneParamsScreens();
+        return;
+    }
     
     auto controls = mpc.getControls();
 
@@ -980,7 +986,6 @@ void BaseControls::splitRight()
     }
 }
 
-
 bool BaseControls::currentScreenAllowsPlay()
 {
     return collectionContainsCurrentScreen(screensThatOnlyAllowPlay) ||
@@ -992,6 +997,11 @@ bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string
     return find(v.begin(),
                 v.end(),
                 ls->getCurrentScreenName()) != v.end();
+}
+
+void BaseControls::handlePadHitInTrimLoopZoneParamsScreens()
+{
+    mpc.getBasicPlayer().mpcNoteOn(sampler->getSoundIndex(), 127, 0);
 }
 
 const std::vector<std::string> BaseControls::screensThatOnlyAllowPlay {
@@ -1069,4 +1079,31 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "trim",
     "zone",
     "load-a-sound"
+};
+
+const std::vector<std::string> BaseControls::soundScreens {
+    // layer 1 (first layer, 1-based index, same level as Main screen
+    "trim",
+    "loop",
+    "zone",
+    "params",
+
+    // layer 2
+    "sound",
+    "start-fine",
+    "end-fine",
+    "loop-to-fine",
+    "loop-end-fine",
+    "zone-start-fine",
+    "zone-end-fine",
+    "number-of-zones",
+    "edit-sound",
+
+    // layer 3
+    "delete-sound",
+    "delete-all-sound",
+    "convert-sound",
+    "stereo-to-mono",
+    "mono-to-stereo",
+    "resample"
 };

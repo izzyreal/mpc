@@ -15,6 +15,7 @@ namespace mpc::controls {
 
     private:
         void handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent);
+        void handlePadHitInTrimLoopZoneParamsScreens();
 
     public:
         void overDub() override;

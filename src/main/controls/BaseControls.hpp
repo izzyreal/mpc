@@ -42,6 +42,7 @@ namespace mpc::controls {
         bool currentScreenAllowsPlay();
         bool collectionContainsCurrentScreen(const std::vector<std::string>&);
         const static std::vector<std::string> samplerScreens;
+        const static std::vector<std::string> soundScreens;
 
         bool splittable = false;
 		void splitLeft();
@@ -106,6 +107,8 @@ namespace mpc::controls {
 		const static std::vector<std::string> screensThatOnlyAllowPlay;
 		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
 		void generateNoteOn(int note, int velo, int padIndexWithBank);
+
+        void handlePadHitInTrimLoopZoneParamsScreens();
 
 		friend class mpc::lcdgui::ScreenComponent;
 		friend class GlobalReleaseControls;
