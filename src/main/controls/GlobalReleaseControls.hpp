@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <memory>
 #include "sequencer/NoteEvent.hpp"
 
@@ -12,7 +11,7 @@ namespace mpc::controls {
     {
 
     public:
-        void simplePad(int padIndexWithBank);
+        void simplePad(const int padIndexWithBank);
 
     private:
         void handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent);
@@ -30,71 +29,51 @@ namespace mpc::controls {
 
         void erase() override;
 
-        void function(int i) override;
+        void function(const int i) override;
 
         void goTo() override;
 
     public:
         // Not implemented, in case a release is triggered. We don't want BaseControls to start processing these.
-        void left() override
-        {};
+        void left() override {}
 
-        void right() override
-        {};
+        void right() override {}
 
-        void up() override
-        {};
+        void up() override {}
 
-        void down() override
-        {};
+        void down() override {}
 
-        void numpad(int i) override
-        {};
+        void numpad(int i) override {}
 
-        void pressEnter() override
-        {};
+        void pressEnter() override {}
 
-        void stop() override
-        {};
+        void stop() override {}
 
-        void playStart() override
-        {};
+        void playStart() override {}
 
-        void mainScreen() override
-        {};
+        void mainScreen() override {}
 
-        void prevStepEvent() override
-        {};
+        void prevStepEvent() override {}
 
-        void nextStepEvent() override
-        {};
+        void nextStepEvent() override {}
 
-        void prevBarStart() override
-        {};
+        void prevBarStart() override {}
 
-        void nextBarEnd() override
-        {};
+        void nextBarEnd() override {}
 
-        void nextSeq() override
-        {};
+        void nextSeq() override {}
 
-        void trackMute() override
-        {};
+        void trackMute() override {}
 
-        void bank(int i) override
-        {};
+        void bank(int i) override {}
 
-        void fullLevel() override
-        {};
+        void fullLevel() override {}
 
-        void sixteenLevels() override
-        {};
+        void sixteenLevels() override {}
 
-        void after() override
-        {};
+        void after() override {}
 
-        void undoSeq() override
-        {};
+        void undoSeq() override {}
 
     public:
         GlobalReleaseControls(mpc::Mpc &mpc);

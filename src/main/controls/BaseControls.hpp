@@ -56,13 +56,13 @@ namespace mpc::controls {
 		std::shared_ptr<mpc::lcdgui::Field> activeField;
 
 		void init();
-		int getSoundIncrement(int notch);
+		int getSoundIncrement(const int notch);
 		virtual void left();
 		virtual void right();
 		virtual void up();
 		virtual void down();
-		virtual void function(int i);
-		virtual void numpad(int i);
+		virtual void function(const int i);
+		virtual void numpad(const int i);
 		virtual void pressEnter();
 		virtual void rec();
 		virtual void overDub();
@@ -78,7 +78,7 @@ namespace mpc::controls {
 		virtual void nextBarEnd() {}
 		virtual void nextSeq();
 		virtual void trackMute();
-		virtual void bank(int i);
+		virtual void bank(const int i);
 		virtual void fullLevel();
 		virtual void sixteenLevels();
 		virtual void after();
@@ -88,8 +88,8 @@ namespace mpc::controls {
 
 		virtual bool isTypable();
 
-		void various(int note, std::optional<int> padIndexWithBank = std::nullopt);
-		void pad(int padIndexWithBank, int velo);
+		void various(const int note, const std::optional<int> padIndexWithBank = std::nullopt);
+		void pad(const int padIndexWithBank, int velo);
 
 		std::string getCurrentScreenName() { return currentScreenName; }
 

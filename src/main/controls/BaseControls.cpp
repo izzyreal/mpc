@@ -38,12 +38,12 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::sequencer;
 
-BaseControls::BaseControls(mpc::Mpc& _mpc)
-: mpc (_mpc),
-  ls (_mpc.getLayeredScreen()),
-  sampler (_mpc.getSampler()),
-  sequencer (_mpc.getSequencer()),
-  activeDrum(&_mpc.getDrum(0))
+BaseControls::BaseControls(mpc::Mpc& _mpc) :
+    mpc (_mpc),
+    ls (_mpc.getLayeredScreen()),
+    sampler (_mpc.getSampler()),
+    sequencer (_mpc.getSequencer()),
+    activeDrum(&_mpc.getDrum(0))
 {
 }
 
@@ -53,7 +53,7 @@ void BaseControls::init()
     param = ls->getFocus();
     activeField = ls->getFocusedLayer()->findField(param);
     
-    auto isSampler = collectionContainsCurrentScreen(samplerScreens);
+    const auto isSampler = collectionContainsCurrentScreen(samplerScreens);
     
     if (isSampler)
     {
@@ -66,9 +66,9 @@ void BaseControls::init()
     
     track = sequencer.lock()->getActiveTrack();
     
-    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+    const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     
-    auto drumIndex = isSampler ? drumScreen->getDrum() : track->getBus() - 1;
+    const auto drumIndex = isSampler ? drumScreen->getDrum() : track->getBus() - 1;
     
     if (drumIndex != -1)
     {
@@ -85,12 +85,7 @@ void BaseControls::left()
 {
     init();
 
-    if (!activeField)
-    {
-        return;
-    }
-    
-    if (param == "dummy")
+    if (!activeField || param == "dummy")
     {
         return;
     }
@@ -102,11 +97,10 @@ void BaseControls::right()
 {
     init();
 
-    if (!activeField)
+    if (!activeField || param == "dummy")
+    {
         return;
-    
-    if (param == "dummy")
-        return;
+    }
     
     ls->transferRight();
 }
@@ -115,11 +109,10 @@ void BaseControls::up()
 {
     init();
     
-    if (!activeField)
+    if (!activeField || param == "dummy")
+    {
         return;
-    
-    if (param == "dummy")
-        return;
+    }
     
     ls->transferUp();
 }
@@ -128,11 +121,10 @@ void BaseControls::down()
 {
     init();
     
-    if (!activeField)
+    if (!activeField || param == "dummy")
+    {
         return;
-    
-    if (param == "dummy")
-        return;
+    }
     
     ls->transferDown();
 }
@@ -140,109 +132,121 @@ void BaseControls::down()
 void BaseControls::function(int i)
 {
     init();
+
+    if (i != 3)
+    {
+        return;
+    }
     
-    switch (i)
+    auto controls = mpc.getControls();
+    controls->setF4Pressed(true);
+
+    if (ls->getFocusedLayerIndex() == 1)
     {
-        case 3:
-            auto controls = mpc.getControls();
-            controls->setF4Pressed(true);
-            if (ls->getFocusedLayerIndex() == 1)
-            {
-                if (currentScreenName == "sequence")
-                {
-                    ls->setPreviousScreenName("sequencer");
-                }
-                else if (currentScreenName == "midi-input")
-                {
-                    ls->setPreviousScreenName("sequencer");
-                }
-                else if (currentScreenName == "midi-output")
-                {
-                    ls->setPreviousScreenName("sequencer");
-                }
-                else if (currentScreenName == "edit-sound")
-                {
-                    auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
-                    ls->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
-                }
-                else if (currentScreenName == "sound")
-                {
-                    ls->setPreviousScreenName(sampler->getPreviousScreenName());
-                }
-                else if (currentScreenName == "program")
-                {
-                    ls->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
-                    mpc.setPreviousSamplerScreenName("");
-                }
-                else if (currentScreenName == "name")
-                {
-                    auto nameScreen = mpc.screens->get<NameScreen>("name");
-                    nameScreen->setEditing(false);
-                    ls->setLastFocus("name", "0");
-                }
-                else if (currentScreenName == "directory")
-                {
-                    auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
-                    ls->setPreviousScreenName(directoryScreen->previousScreenName);
-                }
-            }
-            
-            if (ls->getFocusedLayerIndex() == 1 || ls->getFocusedLayerIndex() == 2 || ls->getFocusedLayerIndex() == 3)
-                ls->openScreen(ls->getPreviousScreenName());
-            break;
+        if (currentScreenName == "sequence")
+        {
+            ls->setPreviousScreenName("sequencer");
+        }
+        else if (currentScreenName == "midi-input")
+        {
+            ls->setPreviousScreenName("sequencer");
+        }
+        else if (currentScreenName == "midi-output")
+        {
+            ls->setPreviousScreenName("sequencer");
+        }
+        else if (currentScreenName == "edit-sound")
+        {
+            const auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
+            ls->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
+        }
+        else if (currentScreenName == "sound")
+        {
+            ls->setPreviousScreenName(sampler->getPreviousScreenName());
+        }
+        else if (currentScreenName == "program")
+        {
+            ls->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
+            mpc.setPreviousSamplerScreenName("");
+        }
+        else if (currentScreenName == "name")
+        {
+            auto nameScreen = mpc.screens->get<NameScreen>("name");
+            nameScreen->setEditing(false);
+            ls->setLastFocus("name", "0");
+        }
+        else if (currentScreenName == "directory")
+        {
+            const auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+            ls->setPreviousScreenName(directoryScreen->previousScreenName);
+        }
+    }
+    
+    if (ls->getFocusedLayerIndex() == 1 ||
+        ls->getFocusedLayerIndex() == 2 ||
+        ls->getFocusedLayerIndex() == 3)
+    {
+        ls->openScreen(ls->getPreviousScreenName());
     }
 }
 
-void BaseControls::various(int note, std::optional<int> padIndexWithBank)
+void BaseControls::various(const int note, const std::optional<int> padIndexWithBank)
 {
-    if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+    if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
-        auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
-        auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
-        auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(screenComponent);
-        auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
-        auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
-        auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
-        auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
+        return;
+    }
 
-        if (isDrumNote(note) && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
+    const auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
+
+    if (isDrumNote(note) && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
+    {
+        mpc.setNote(note);
+
+        if (padIndexWithBank)
         {
-            mpc.setNote(note);
-            if (padIndexWithBank) mpc.setPad(*padIndexWithBank);
+            mpc.setPad(*padIndexWithBank);
         }
-        else if (withNotes && note >= 35)
+    }
+    else if (auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
+             withNotes && note >= 35)
+    {
+        withNotes->setNote0(note);
+    }
+    else if (auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(screenComponent);
+             assign16LevelsScreen)
+    {
+        assign16LevelsScreen->setNote(note);
+    }
+    else if (auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
+             editMultipleScreen)
+    {
+        editMultipleScreen->setChangeNoteTo(note);
+    }
+    else if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
+             stepEditorScreen && param == "fromnote" && note > 34)
+    {
+        stepEditorScreen->setFromNote(note);
+    }
+    else if (auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
+             mixerScreen && padIndexWithBank)
+    {
+        unsigned char bankStartPadIndex = mpc.getBank() * 16;
+        unsigned char bankEndPadIndex = bankStartPadIndex + 16;
+
+        if (*padIndexWithBank >= bankStartPadIndex && *padIndexWithBank < bankEndPadIndex)
         {
-            withNotes->setNote0(note);
+            mixerScreen->pressPadIndexWithoutBank(*padIndexWithBank % 16);
         }
-        else if (assign16LevelsScreen)
-        {
-            assign16LevelsScreen->setNote(note);
-        }
-        else if (editMultipleScreen)
-        {
-            editMultipleScreen->setChangeNoteTo(note);
-        }
-        else if (stepEditorScreen && param == "fromnote" && note > 34)
-        {
-            stepEditorScreen->setFromNote(note);
-        }
-        else if (mixerScreen && padIndexWithBank)
-        {
-            unsigned char bankStartPadIndex = mpc.getBank() * 16;
-            unsigned char bankEndPadIndex = bankStartPadIndex + 16;
-            if (*padIndexWithBank >= bankStartPadIndex && *padIndexWithBank < bankEndPadIndex)
-            {
-                mixerScreen->pressPadIndexWithoutBank(*padIndexWithBank % 16);
-            }
-        }
-        else if (channelSettingsScreen)
-        {
-            channelSettingsScreen->setNote(note);
-        }
+    }
+    else if (auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
+             channelSettingsScreen)
+    {
+        channelSettingsScreen->setNote(note);
     }
 }
 
-void BaseControls::pad(int padIndexWithBank, int velo)
+void BaseControls::pad(const int padIndexWithBank, int velo)
 {
     init();
     
@@ -252,30 +256,36 @@ void BaseControls::pad(int padIndexWithBank, int velo)
 
     controls->pressPad(padIndexWithBank);
 
-    if (currentScreenName == "sequencer" && (controls->isTapPressed() || controls->isNoteRepeatLocked()) && sequencer.lock()->isPlaying() && padWasNotPressed)
+    if (currentScreenName == "sequencer" &&
+        (controls->isTapPressed() || controls->isNoteRepeatLocked()) &&
+        sequencer.lock()->isPlaying() &&
+        padWasNotPressed)
     {
         return;
     }
 
-    auto hardware = mpc.getHardware();
+    const auto hardware = mpc.getHardware();
 
     if (hardware->getTopPanel()->isFullLevelEnabled())
     {
-      velo = 127;
+        velo = 127;
     }
 
     if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
+    {
         return;
+    }
     
     if (controls->isNoteRepeatLocked())
+    {
         return;
+    }
 
-    auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
-    auto velocity = velo;
+    const auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
     various(note, padIndexWithBank);
    
-    generateNoteOn(note, velocity, padIndexWithBank);
+    generateNoteOn(note, velo, padIndexWithBank);
 }
 
 void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
@@ -358,13 +368,9 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
 bool BaseControls::isTypable()
 {
-    for (auto str : typableParams)
-    {
-        if (str == param)
-            return true;
-    }
-    
-    return false;
+    return std::find(typableParams.begin(),
+                     typableParams.end(),
+                     param) != typableParams.end();
 }
 
 void BaseControls::numpad(int i)
@@ -380,7 +386,9 @@ void BaseControls::numpad(int i)
         if (isTypable())
         {
             if (!field->isTypeModeEnabled())
+            {
                 field->enableTypeMode();
+            }
             
             field->type(i);
         }
@@ -484,7 +492,9 @@ void BaseControls::pressEnter()
     auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
+    {
         ls->openScreen("save");
+    }
 }
 
 void BaseControls::rec()
@@ -507,7 +517,7 @@ void BaseControls::rec()
 
     controls->setRecLocked(false);
 
-    auto hw = mpc.getHardware();
+    const auto hw = mpc.getHardware();
     
     if (sequencer.lock()->isRecordingOrOverdubbing())
     {
@@ -541,7 +551,7 @@ void BaseControls::overDub()
 
     controls->setOverDubLocked(false);
 
-    auto hw = mpc.getHardware();
+    const auto hw = mpc.getHardware();
 
     if (sequencer.lock()->isRecordingOrOverdubbing())
     {
@@ -559,12 +569,14 @@ void BaseControls::stop()
 {
     init();
     
-    auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
-    auto ams = mpc.getAudioMidiServices();
-    auto controls = mpc.getControls();
+    const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+    const auto ams = mpc.getAudioMidiServices();
+    const auto controls = mpc.getControls();
     
     if (controls->isNoteRepeatLocked())
+    {
         controls->setNoteRepeatLocked(false);
+    }
     
     if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->record != 4 || controls->isShiftPressed()))
         ams->stopBouncingEarly();
@@ -579,7 +591,7 @@ void BaseControls::stop()
 
 void BaseControls::play()
 {
-    auto controls = mpc.getControls();
+    const auto controls = mpc.getControls();
 
     if (controls->isPlayPressed())
     {
@@ -589,7 +601,7 @@ void BaseControls::play()
     controls->setPlayPressed(true);
 
     init();
-    auto hw = mpc.getHardware();
+    const auto hw = mpc.getHardware();
     
     if (sequencer.lock()->isPlaying())
     {
@@ -646,8 +658,8 @@ void BaseControls::play()
 void BaseControls::playStart()
 {
     init();
-    auto hw = mpc.getHardware();
-    auto controls = mpc.getControls();
+    const auto hw = mpc.getHardware();
+    const auto controls = mpc.getControls();
     
     if (sequencer.lock()->isPlaying())
     {
@@ -695,15 +707,17 @@ void BaseControls::mainScreen()
 {
     init();
     
-    auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getAudioMidiServices();
     
     if (ams->isRecordingSound())
+    {
         ams->stopSoundRecorder();
-    
+    }
+
     ls->openScreen("sequencer");
     sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
     
-    auto hw = mpc.getHardware();
+    const auto hw = mpc.getHardware();
     hw->getLed("next-seq")->light(false);
     hw->getLed("track-mute")->light(false);
 }
@@ -711,7 +725,7 @@ void BaseControls::mainScreen()
 void BaseControls::tap()
 {
     init();
-    auto controls = mpc.getControls();
+    const auto controls = mpc.getControls();
 
     if (controls->isTapPressed())
     {
@@ -731,7 +745,7 @@ void BaseControls::goTo()
 
     init();
 
-    auto controls = mpc.getControls();
+    const auto controls = mpc.getControls();
     controls->setGoToPressed(true);
 
     if (currentScreenName == "sequencer")
@@ -768,9 +782,13 @@ void BaseControls::trackMute()
     {
         auto previous = ls->getPreviousScreenName();
         if (previous == "next-seq" || previous == "next-seq-pad")
+        {
             ls->openScreen("next-seq");
+        }
         else
+        {
             ls->openScreen("sequencer");
+        }
         
         mpc.getHardware()->getLed("track-mute")->light(false);
     }
@@ -798,8 +816,8 @@ void BaseControls::bank(int i)
 void BaseControls::fullLevel()
 {
     init();
-    auto hardware = mpc.getHardware();
-    auto topPanel = hardware->getTopPanel();
+    const auto hardware = mpc.getHardware();
+    const auto topPanel = hardware->getTopPanel();
     
     topPanel->setFullLevelEnabled(!topPanel->isFullLevelEnabled());
     
@@ -816,15 +834,16 @@ void BaseControls::sixteenLevels()
         return;
     }
     
-    auto hardware = mpc.getHardware();
-    auto topPanel = hardware->getTopPanel();
+    const auto hardware = mpc.getHardware();
+    const auto topPanel = hardware->getTopPanel();
     
     if (topPanel->isSixteenLevelsEnabled())
     {
         topPanel->setSixteenLevelsEnabled(false);
         hardware->getLed("sixteen-levels")->light(false);
     }
-    else {
+    else
+    {
         ls->openScreen("assign-16-levels");
     }
 }
@@ -832,9 +851,10 @@ void BaseControls::sixteenLevels()
 void BaseControls::after()
 {
     init();
-    auto hw = mpc.getHardware();
-    auto topPanel = hw->getTopPanel();
-    auto controls = mpc.getControls();
+    
+    const auto hw = mpc.getHardware();
+    const auto topPanel = hw->getTopPanel();
+    const auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
     {
@@ -849,20 +869,23 @@ void BaseControls::after()
 
 void BaseControls::shift()
 {
-    auto controls = mpc.getControls();
+    const auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
+    {
         return;
+    }
     
     controls->setShiftPressed(true);
     
     init();
-    auto focus = ls->getFocusedLayer()->findField(param);
+
+    const auto focus = ls->getFocusedLayer()->findField(param);
     
     if (focus && focus->isTypeModeEnabled())
     {
         focus->disableTypeMode();
-        auto split = focus->getActiveSplit();
+        const auto split = focus->getActiveSplit();
         
         if (split != -1)
         {
@@ -880,7 +903,8 @@ void BaseControls::undoSeq()
 void BaseControls::erase()
 {
     init();
-    auto controls = mpc.getControls();
+
+    const auto controls = mpc.getControls();
     controls->setErasePressed(true);
     
     if (!sequencer.lock()->getActiveSequence()->isUsed())
@@ -910,8 +934,8 @@ void BaseControls::splitLeft()
 {
     init();
     
-    auto field = ls->getFocusedLayer()->findField(param);
-    auto controls = mpc.getControls();
+    const auto field = ls->getFocusedLayer()->findField(param);
+    const auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())
     {
@@ -937,8 +961,9 @@ void BaseControls::splitLeft()
 void BaseControls::splitRight()
 {
     init();
-    auto field = ls->getFocusedLayer()->findField(param);
-    auto controls = mpc.getControls();
+
+    const auto field = ls->getFocusedLayer()->findField(param);
+    const auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())
     {
@@ -958,16 +983,15 @@ void BaseControls::splitRight()
 
 bool BaseControls::currentScreenAllowsPlay()
 {
-    return collectionContainsCurrentScreen(screensThatOnlyAllowPlay) || collectionContainsCurrentScreen(screensThatAllowPlayAndRecord);
+    return collectionContainsCurrentScreen(screensThatOnlyAllowPlay) ||
+           collectionContainsCurrentScreen(screensThatAllowPlayAndRecord);
 }
 
 bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string>& v)
 {
-    return find(
-            v.begin(),
-            v.end(),
-            ls->getCurrentScreenName()
-    ) != v.end();
+    return find(v.begin(),
+                v.end(),
+                ls->getCurrentScreenName()) != v.end();
 }
 
 const std::vector<std::string> BaseControls::screensThatOnlyAllowPlay {

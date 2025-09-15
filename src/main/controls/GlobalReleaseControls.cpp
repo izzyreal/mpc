@@ -31,21 +31,22 @@ GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
 
 void GlobalReleaseControls::goTo()
 {
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 	controls->setGoToPressed(false);
 }
 
-void GlobalReleaseControls::function(int i)
+void GlobalReleaseControls::function(const int i)
 {
 	init();
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 
 	switch (i)
 	{
 	case 0:
 		if (currentScreenName == "step-timing-correct")
-			ls->openScreen("step-editor");
-
+        {
+            ls->openScreen("step-editor");
+        }
 		break;
 	case 2:
 		controls->setF3Pressed(false);
@@ -70,12 +71,16 @@ void GlobalReleaseControls::function(int i)
 		controls->setF6Pressed(false);
 
 		if (!sequencer.lock()->isPlaying() && currentScreenName != "sequencer")
-			sampler->finishBasicVoice();
+        {
+            sampler->finishBasicVoice();
+        }
 
 		if (currentScreenName == "track-mute")
 		{
 			if (!sequencer.lock()->isSoloEnabled())
-				ls->setCurrentBackground("track-mute");
+            {
+                ls->setCurrentBackground("track-mute");
+            }
 
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
@@ -88,19 +93,29 @@ void GlobalReleaseControls::function(int i)
 	}
 }
 
-void GlobalReleaseControls::simplePad(int padIndexWithBank)
+void GlobalReleaseControls::simplePad(const int padIndexWithBank)
 {
 	init();
 
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 
 	controls->unpressPad(padIndexWithBank);
 
-	auto playOnEvent = controls->retrievePlayNoteEvent(padIndexWithBank);
-	if (!playOnEvent) return;
+	const auto playOnEvent = controls->retrievePlayNoteEvent(padIndexWithBank);
+	
+    if (!playOnEvent)
+    {
+        return;
+    }
+
 	handlePlayNoteOff(playOnEvent);
-	auto recordOnEvent = controls->retrieveRecordNoteEvent(padIndexWithBank);
-	if (!recordOnEvent) return;
+	
+    const auto recordOnEvent = controls->retrieveRecordNoteEvent(padIndexWithBank);
+
+	if (!recordOnEvent)
+    {
+        return;
+    }
 
 	if (sequencer.lock()->isRecordingOrOverdubbing() && controls->isErasePressed())
 	{
@@ -170,64 +185,67 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
     }
 }
 
-void mpc::controls::GlobalReleaseControls::handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent)
+void GlobalReleaseControls::handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent)
 {
 	init();
-	std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = onEvent->getNoteOff();
+	const auto noteOff = onEvent->getNoteOff();
 
-	off_event->setTick(-1);
+	noteOff->setTick(-1);
 
-	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+	const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 
     const auto drum = collectionContainsCurrentScreen(samplerScreens) ?
                       std::optional<uint8_t>(drumScreen->getDrum()) : std::optional<uint8_t>();
 
-	mpc.getEventHandler()->handle(off_event, track.get(), drum);
+	mpc.getEventHandler()->handle(noteOff, track.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()
 {
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 	controls->setOverDubPressed(false);
 }
 
 void GlobalReleaseControls::rec()
 {
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 	controls->setRecPressed(false);
 }
 
 void GlobalReleaseControls::play()
 {
-    auto controls = mpc.getControls();
+    const auto controls = mpc.getControls();
     controls->setPlayPressed(false);
 }
 
 void GlobalReleaseControls::tap()
 {
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 	controls->setTapPressed(false);
 
 	if (sequencer.lock()->isRecordingOrOverdubbing())
-		sequencer.lock()->flushTrackNoteCache();
+    {
+        sequencer.lock()->flushTrackNoteCache();
+    }
 
     if (!controls->isNoteRepeatLocked())
     {
-        auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
+        const auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
         sequencerScreen->releaseTap();
     }
 }
 
 void GlobalReleaseControls::shift()
 {
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 	controls->setShiftPressed(false);
 }
 
 void GlobalReleaseControls::erase()
 {
-	auto controls = mpc.getControls();
+	const auto controls = mpc.getControls();
 	controls->setErasePressed(false);
-    auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
+    const auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
     sequencerScreen->releaseErase();
 }
+
