@@ -45,9 +45,9 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
 
         for (auto &r: rows)
         {
-            if (r.label.length() < 4 || r.label.substr(0, 4) != "pad-") continue;
+            if (r.getMpcHardwareLabel().length() < 4 || r.getMpcHardwareLabel().substr(0, 4) != "pad-") continue;
 
-            const bool isBadOldDefault = r.isNote == false || r.value == -1;
+            const bool isBadOldDefault = r.isNote() == false || r.getNumber() == -1;
             if (isBadOldDefault) badMappingCounter += 1;
         }
 
@@ -81,9 +81,9 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
     vmpcMidiScreen->activePreset->rows.clear();
 
-    for (auto& label : labels)
+    for (auto &label : labels)
     {
-        MidiControlCommand command {label, false, -1, -1 };
+        MidiControlCommand command {label, MidiControlCommand::MidiMessageType::NOTE, -1, -1 };
 
         if (label.length() >= 4 && label.substr(0, 4) == "pad-")
         {
@@ -94,12 +94,13 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
                 pad = stoi(label.substr(4, numberStringWidth));
             } catch (const std::exception&) {}
 
-            command.isNote = true;
-            command.value = 34 + pad;
+            command.setNumber(34 + pad);
         }
         else if (label == "slider")
         {
-            command.value = 7;
+            command.setNumber(7);
+            command.setMidiMessageType(MidiControlCommand::MidiMessageType::CC);
+            command.setValue(-1);
         }
 
         vmpcMidiScreen->updateOrAddActivePresetCommand(command);
@@ -129,6 +130,10 @@ void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::p
 
     auto preset = vmpcMidiScreen->activePreset;
 
+    const uint8_t fileFormatVersion = 2;
+
+    data.push_back(static_cast<char>(fileFormatVersion));
+
     data.push_back(preset->autoloadMode);
 
     for (char i : name)
@@ -143,12 +148,12 @@ void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::p
 
     for (auto& c : preset->rows)
     {
-        MidiControlCommand r { c.label, c.isNote, c.channel, c.value };
-
-        auto rowData = r.toBytes();
+        auto rowData = c.toBytes();
 
         for (auto& b : rowData)
+        {
             data.push_back(b);
+        }
     }
 
     set_file_data(p, data);

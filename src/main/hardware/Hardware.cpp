@@ -21,7 +21,7 @@ Hardware::Hardware(mpc::Mpc& mpc)
 
     topPanel = std::make_shared<TopPanel>();
     
-    buttonLabels = { "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "play-start", "main-screen", "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap", "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "shift_#1", "shift_#2", "shift_#3", "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0 (extra)", "1 (extra)", "2 (extra)", "3 (extra)", "4 (extra)", "5 (extra)", "6 (extra)", "7 (extra)", "8 (extra)", "9 (extra)" };
+    buttonLabels = { "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "play-start", "main-screen", "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap", "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "shift_#1", "shift_#2", "shift_#3", "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0-extra", "1-extra", "2-extra", "3-extra", "4-extra", "5-extra", "6-extra", "7-extra", "8-extra", "9-extra" };
     
     for (auto& l : buttonLabels)
     {

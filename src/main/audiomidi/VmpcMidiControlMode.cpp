@@ -7,6 +7,7 @@
 #include "hardware/HwSlider.hpp"
 #include "hardware/Pot.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "nvram/MidiControlPersistence.hpp"
 
 #include <engine/midi/ShortMessage.hpp>
 
@@ -52,7 +53,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             return;
         }
 
-        vmpcMidiScreen->setLearnCandidate(isNoteOn, msg->getChannel(), msg->getData1());
+        vmpcMidiScreen->setLearnCandidate(isNoteOn, msg->getChannel(), msg->getData1(), msg->getData2());
         return;
     }
 
@@ -60,81 +61,95 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
 
     for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
     {
-        auto channelIndex = labelCommand.channel;
+        const auto channelIndex = labelCommand.getMidiChannelIndex();
 
         if (channelIndex >= 0 && msg->getChannel() != channelIndex)
         {
             continue;
         }
 
-        auto label = labelCommand.label;
-        auto isNote = labelCommand.isNote;
-        auto commandValue = labelCommand.value;
+        const auto commandNumber = labelCommand.getNumber();
 
-        if (msg->getData1() != commandValue)
+        if (commandNumber != -1 && msg->getData1() != commandNumber)
         {
             continue;
         }
 
-        auto controllerValue = msg->getData2();
+        const auto controllerValue = msg->getData2();
+        const auto label = labelCommand.getMpcHardwareLabel();
 
-        if ((isNote && (isNoteOn || isNoteOff)) ||
-            (!isNote && isControl))
+        if (isControl)
         {
-            auto hwComponent = hardware->getComponentByLabel(label);
-
-            if (label == "datawheel")
+            if (!labelCommand.isCC())
             {
-                if (previousDataWheelValue == -1)
-                {
-                    previousDataWheelValue = controllerValue;
-                }
+                continue;
+            }
 
-                if (previousDataWheelValue == 0 && controllerValue == 0)
-                {
-                    dataWheel->turn(-1);
-                }
-                else if (previousDataWheelValue == 127 && controllerValue == 127)
-                {
-                    dataWheel->turn(1);
-                }
-                else if (controllerValue - previousDataWheelValue != 0)
-                {
-                    dataWheel->turn(controllerValue - previousDataWheelValue);
-                }
+            if (labelCommand.getValue() != -1 &&
+                labelCommand.getValue() != controllerValue)
+            {
+                continue;
+            }
+        }
+
+        if ((isNoteOn || isNoteOff) && !labelCommand.isNote())
+        {
+            continue;
+        }
+
+        const auto hwComponent = hardware->getComponentByLabel(label);
+
+        if (label == "datawheel")
+        {
+            if (previousDataWheelValue == -1)
+            {
                 previousDataWheelValue = controllerValue;
             }
-            else if (label == "datawheel-up")
-            {
-                dataWheel->turn(1);
-            }
-            else if (label == "datawheel-down")
+
+            if (previousDataWheelValue == 0 && controllerValue == 0)
             {
                 dataWheel->turn(-1);
             }
-            else if (label == "slider")
+            else if (previousDataWheelValue == 127 && controllerValue == 127)
             {
-                hardware->getSlider()->setValue(controllerValue);
+                dataWheel->turn(1);
             }
-            else if (label == "rec-gain")
+            else if (controllerValue - previousDataWheelValue != 0)
             {
-                auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-                hardware->getRecPot()->setValue(normalized);
+                dataWheel->turn(controllerValue - previousDataWheelValue);
             }
-            else if (label == "main-volume")
-            {
-                auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-                hardware->getVolPot()->setValue(normalized);
-            }
-            else if (msg->getData2() == 0)
-            {
-                hwComponent->release();
-            }
-            else
-            {
-                hwComponent->push(msg->getData2());
-                hwComponent->push();
-            }
+            previousDataWheelValue = controllerValue;
+        }
+        else if (label == "datawheel-up")
+        {
+            dataWheel->turn(1);
+        }
+        else if (label == "datawheel-down")
+        {
+            dataWheel->turn(-1);
+        }
+        else if (label == "slider")
+        {
+            hardware->getSlider()->setValue(controllerValue);
+        }
+        else if (label == "rec-gain")
+        {
+            auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
+            hardware->getRecPot()->setValue(normalized);
+        }
+        else if (label == "main-volume")
+        {
+            auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
+            hardware->getVolPot()->setValue(normalized);
+        }
+        else if (msg->getData2() == 0)
+        {
+            hwComponent->release();
+        }
+        else
+        {
+            hwComponent->push(msg->getData2());
+            hwComponent->push();
         }
     }
 }
