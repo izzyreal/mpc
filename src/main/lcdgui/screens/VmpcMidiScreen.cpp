@@ -30,11 +30,14 @@ VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc& mpc, int layerIndex)
         auto typeParam = std::make_shared<Parameter>(mpc, "                ", "type" + std::to_string(i), 2, 3 + (i * 9), 4 * 6);
         addChild(typeParam);
 
-        auto channelParam = std::make_shared<Parameter>(mpc, "", "channel" + std::to_string(i), 142, 3 + (i * 9), 5 * 6);
-        addChild(channelParam);
+        auto numberParam = std::make_shared<Parameter>(mpc, "#:", "number" + std::to_string(i), 125, 3 + (i * 9), 3 * 6);
+        addChild(numberParam);
 
-        auto valueParam = std::make_shared<Parameter>(mpc, "", "value" + std::to_string(i), 182, 3 + (i * 9), 3 * 6);
+        auto valueParam = std::make_shared<Parameter>(mpc, "v:", "value" + std::to_string(i), 164, 3 + (i * 9), 3 * 6);
         addChild(valueParam);
+
+        auto channelParam = std::make_shared<Parameter>(mpc, "ch:", "channel" + std::to_string(i), 202, 3 + (i * 9), 3 * 6);
+        addChild(channelParam);
     }
 }
 
@@ -46,15 +49,19 @@ void VmpcMidiScreen::turnWheel(int i)
 
     if (column == 0)
     {
-        cmd.isNote = i > 0;
+        cmd.setMidiMessageType(i > 0 ? MidiControlCommand::MidiMessageType::NOTE : MidiControlCommand::MidiMessageType::CC);
     }
     else if (column == 1)
     {
-        cmd.channel = std::clamp(cmd.channel + i, -1, 15);
+        cmd.setNumber(std::clamp(cmd.getNumber() + i, -1, 127));
     }
     else if (column == 2)
     {
-        cmd.value = std::clamp(cmd.value + i, -1, 127);
+        cmd.setValue(std::clamp(cmd.getValue() + i, -1, 127));
+    }
+    else if (column == 3)
+    {
+        cmd.setMidiChannelIndex(std::clamp(cmd.getMidiChannelIndex() + i, -1, 15));
     }
 
     updateRows();
@@ -110,14 +117,30 @@ void VmpcMidiScreen::up()
     if (row == 0)
     {
         if (rowOffset == 0)
+        {
             return;
+        }
         
         rowOffset--;
+
+        if (activePreset->rows[row + rowOffset].isNote() &&
+            column == 2)
+        {
+            column--;
+        }
+        
         updateRows();
         return;
     }
     
     row--;
+
+    if (activePreset->rows[row + rowOffset].isNote() &&
+        column == 2)
+    {
+        column--;
+    }
+    
     updateRows();
 }
 
@@ -133,9 +156,15 @@ void VmpcMidiScreen::acceptLearnCandidate()
         return;
     }
 
-    activePreset->rows[row + rowOffset].channel = learnCandidate.channel;
-    activePreset->rows[row + rowOffset].value = learnCandidate.value;
-    activePreset->rows[row + rowOffset].isNote = learnCandidate.isNote;
+    activePreset->rows[row + rowOffset].setMidiMessageType(learnCandidate.getMidiMessageType());
+    activePreset->rows[row + rowOffset].setNumber(learnCandidate.getNumber());
+
+    if (learnCandidate.isCC())
+    {
+        activePreset->rows[row + rowOffset].setValue(learnCandidate.getValue());
+    }
+    
+    activePreset->rows[row + rowOffset].setMidiChannelIndex(learnCandidate.getMidiChannelIndex());
 }
 
 void VmpcMidiScreen::down()
@@ -149,28 +178,66 @@ void VmpcMidiScreen::down()
     if (row == 4)
     {
         if (rowOffset + 5 >= activePreset->rows.size())
+        {
             return;
+        }
         
         rowOffset++;
+
+        if (activePreset->rows[row + rowOffset].isNote() &&
+            column == 2)
+        {
+            column--;
+        }
+
         updateRows();
         return;
     }
     
     row++;
+
+    if (activePreset->rows[row + rowOffset].isNote() &&
+        column == 2)
+    {
+        column--;
+    }
+    
     updateRows();
 }
 
 void VmpcMidiScreen::left()
 {
-    if (column == 0) return;
+    if (column == 0)
+    {
+        return;
+    }
+
     column--;
+
+    if (activePreset->rows[row + rowOffset].isNote() &&
+        column == 2)
+    {
+        column--;
+    }
+    
     updateRows();
 }
 
 void VmpcMidiScreen::right()
 {
-    if (column == 2) return;
+    if (column == 3)
+    {
+        return;
+    }
+
     column++;
+
+    if (activePreset->rows[row + rowOffset].isNote() &&
+        column == 2)
+    {
+        column++;
+    }
+
     updateRows();
 }
 
@@ -302,11 +369,17 @@ void VmpcMidiScreen::mainScreen()
     ScreenComponent::mainScreen();
 }
 
-void VmpcMidiScreen::setLearnCandidate(const bool isNote, const char channelIndex, const char value)
+void VmpcMidiScreen::setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value)
 {
-    learnCandidate.isNote = isNote;
-    learnCandidate.channel = channelIndex;
-    learnCandidate.value = value;
+    learnCandidate.setMidiMessageType(isNote ? MidiControlCommand::MidiMessageType::NOTE : MidiControlCommand::MidiMessageType::CC);
+    learnCandidate.setMidiChannelIndex(channelIndex);
+    learnCandidate.setNumber(number);
+
+    if (!isNote)
+    {
+        learnCandidate.setValue(value);
+    }
+    
     updateRows();
 }
 
@@ -314,7 +387,7 @@ void VmpcMidiScreen::updateOrAddActivePresetCommand(MidiControlCommand &c)
 {
     for (auto& labelCommand : activePreset->rows)
     {
-        if (c.label == labelCommand.label)
+        if (c.getMpcHardwareLabel() == labelCommand.getMpcHardwareLabel())
         {
             labelCommand = c;
             return;
@@ -333,51 +406,77 @@ void VmpcMidiScreen::updateRows()
 {
     for (int i = 0; i < 5; i++)
     {
-        auto typeLabel = findChild<Label>("type" + std::to_string(i));
-        auto typeField = findChild<Field>("type" + std::to_string(i));
+        const auto typeLabel = findChild<Label>("type" + std::to_string(i));
+        const auto typeField = findChild<Field>("type" + std::to_string(i));
         
         int length = 15;
         
-        auto labelText = StrUtil::padRight(activePreset->rows[i + rowOffset].label, " ", length) + ":";
+        const auto labelText = StrUtil::padRight(activePreset->rows[i + rowOffset].getMpcHardwareLabel(), " ", length) + ":";
         
         typeLabel->setText(labelText);
         MidiControlCommand& cmd =
                 (learning && row == i && !learnCandidate.isEmpty()) ?
                 learnCandidate : activePreset->rows[i + rowOffset];
 
-        std::string type = cmd.isNote ? "Note" : "CC";
+        std::string type = cmd.isNote() ? "Note" : "CC";
 
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);
 
         auto channelField = findChild<Field>("channel" + std::to_string(i));
 
-        if (cmd.channel == -1)
+        if (cmd.getMidiChannelIndex() == -1)
         {
             channelField->setText("all");
         }
         else
         {
-            channelField->setText("ch " + std::to_string(cmd.channel + 1));
+            channelField->setText(std::to_string(cmd.getMidiChannelIndex() + 1));
         }
 
-        channelField->setInverted(row == i && column == 1);
+        channelField->setInverted(row == i && column == 3);
 
-        auto valueField = findChild<Field>("value" + std::to_string(i));
+        auto numberField = findChild<Field>("number" + std::to_string(i));
 
-        if (cmd.value == -1)
+        if (cmd.getNumber() == -1)
         {
-            valueField->setText("OFF");
+            numberField->setText("OFF");
         }
         else
         {
-            valueField->setTextPadded(cmd.value);
+            numberField->setTextPadded(cmd.getNumber());
+        }
+
+        numberField->setInverted(row == i && column == 1);
+
+        auto valueLabel = findChild<Label>("value" + std::to_string(i));
+        auto valueField = findChild<Field>("value" + std::to_string(i));
+
+        if (cmd.isNote())
+        {
+            valueLabel->Hide(true);
+            valueField->Hide(true);
+        }
+        else
+        {
+            if (cmd.getValue() == -1)
+            {
+                valueField->setText("all");
+            }
+            else
+            {
+                valueField->setTextPadded(cmd.getValue());
+            }
+
+            valueLabel->Hide(false);
+            valueField->Hide(false);
         }
 
         valueField->setInverted(row == i && column == 2);
 
         typeField->setBlinking(learning && i == row);
         channelField->setBlinking(learning && i == row);
+        numberField->setBlinking(learning && i == row);
         valueField->setBlinking(learning && i == row);
     }
     
