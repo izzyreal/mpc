@@ -2,6 +2,8 @@
 
 #include <sequencer/Step.hpp>
 
+#include <algorithm>
+
 using namespace mpc::sequencer;
 
 void Song::setLoopEnabled(bool b)
