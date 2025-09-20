@@ -77,12 +77,36 @@ namespace mpc::engine {
     {
 
     private:
+        VoiceState* getActiveState()
+        {
+            return active.load(std::memory_order_acquire);
+        }
+
+        const VoiceState* getActiveState() const {
+            return active.load(std::memory_order_acquire);
+        }
+        
+        VoiceState* getInactiveState()
+        {
+            VoiceState* current = active.load(std::memory_order_acquire);
+            return (current == &stateA) ? &stateB : &stateA;
+        }
+
+        void swapStates()
+        {
+            VoiceState* current = active.load(std::memory_order_relaxed);
+            VoiceState* other   = (current == &stateA) ? &stateB : &stateA;
+            active.store(other, std::memory_order_release);
+        }
+        
         const int stripNumber = -1;
         const bool basic = false;
 
         std::vector<float> frame;
 
-        VoiceState state;
+        VoiceState stateA;
+        VoiceState stateB;
+        std::atomic<VoiceState*> active { &stateA };
 
         mpc::engine::EnvelopeGenerator *staticEnv = nullptr;
         mpc::engine::EnvelopeGenerator *ampEnv = nullptr;
@@ -108,10 +132,13 @@ namespace mpc::engine {
 
         void readFrame();
         void initializeSamplerateDependents();
+        const std::vector<float> &getFrame();
 
     public:
+        // Called from audio thread
         int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
 
+        // Called from main thread
         void init(int velocity,
                   std::shared_ptr<mpc::sampler::Sound> mpcSound,
                   int note,
@@ -124,8 +151,6 @@ namespace mpc::engine {
                   bool enableEnvs,
                   int startTick,
                   int newDuration);
-
-        const std::vector<float> &getFrame();
 
         void startDecay();
 
