@@ -30,8 +30,6 @@ typedef mpc::engine::VoiceConstants C;
 Voice::Voice(const int stripNumberToUse, const bool basicToUse)
     : stripNumber(stripNumberToUse), basic(basicToUse), frame(C::EMPTY_FRAME)
 {
-    frame = C::EMPTY_FRAME;
-
     staticEnvControls = new EnvelopeControls(0, "StaticAmpEnv", C::AMPENV_OFFSET);
     staticEnv = new EnvelopeGenerator(staticEnvControls);
     shold = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[C::HOLD_INDEX]).get();
@@ -93,85 +91,85 @@ void Voice::init(
         int newStartTick,
         int newDuration)
 {
-    finished = false;
+    state.finished = false;
 
-    duration = newDuration;
+    state.duration = newDuration;
 
-    noteParameters = np;
-    startTick = newStartTick;
+    state.noteParameters = np;
+    state.startTick = newStartTick;
 
-    enableEnvs = newEnableEnvs;
-    frameOffset = newFrameOffset;
-    note = newNote;
-    velocity = newVelocity;
-    mpcSound = newMpcSound;
-    varType = newVarType;
-    varValue = newVarValue;
+    state.enableEnvs = newEnableEnvs;
+    state.frameOffset = newFrameOffset;
+    state.note = newNote;
+    state.velocity = newVelocity;
+    state.mpcSound = newMpcSound;
+    state.varType = newVarType;
+    state.varValue = newVarValue;
 
-    staticDecay = false;
-    muteInfo.setNote(muteNote);
-    muteInfo.setDrum(muteDrum);
-    veloToStart = 0;
-    attackValue = 0;
-    decayValue = 2;
-    veloToAttack = 0;
-    decayMode = 0;
-    veloToLevel = 100;
+    state.staticDecay = false;
+    state.muteInfo.setNote(muteNote);
+    state.muteInfo.setDrum(muteDrum);
+    state.veloToStart = 0;
+    state.attackValue = 0;
+    state.decayValue = 2;
+    state.veloToAttack = 0;
+    state.decayMode = 0;
+    state.veloToLevel = 100;
 
-    tune = mpcSound->getTune();
+    state.tune = state.mpcSound->getTune();
 
     if (np != nullptr)
     {
-        tune += np->getTune();
-        veloToStart = np->getVelocityToStart();
-        attackValue = np->getAttack();
-        decayValue = np->getDecay();
-        veloToAttack = np->getVelocityToAttack();
-        decayMode = np->getDecayMode();
-        veloToLevel = np->getVeloToLevel();
-        voiceOverlapMode = mpcSound->isLoopEnabled() ? 2 : np->getVoiceOverlap();
+        state.tune += np->getTune();
+        state.veloToStart = np->getVelocityToStart();
+        state.attackValue = np->getAttack();
+        state.decayValue = np->getDecay();
+        state.veloToAttack = np->getVelocityToAttack();
+        state.decayMode = np->getDecayMode();
+        state.veloToLevel = np->getVeloToLevel();
+        state.voiceOverlapMode = state.mpcSound->isLoopEnabled() ? 2 : np->getVoiceOverlap();
     }
 
-    switch (varType) {
+    switch (state.varType) {
         case 0:
-            tune += (varValue - 64) * 2;
+            state.tune += (state.varValue - 64) * 2;
             break;
         case 1:
-            decayValue = varValue;
-            decayMode = 1;
+            state.decayValue = state.varValue;
+            state.decayMode = 1;
             break;
         case 2:
-            attackValue = varValue;
+            state.attackValue = state.varValue;
             break;
     }
 
-    const auto veloFactor = velocity / 127.f;
+    const auto veloFactor = state.velocity / 127.f;
     const auto inverseVeloFactor = 1.f - veloFactor;
 
-    end = mpcSound->getEnd();
+    state.end = state.mpcSound->getEnd();
 
-    position = mpcSound->getStart() + (inverseVeloFactor * (veloToStart / 100.0) * mpcSound->getLastFrameIndex());
-    attackMs = (float) ((attackValue / 100.0) * C::MAX_ATTACK_LENGTH_MS);
-    attackMs += (float) ((veloToAttack / 100.0) * C::MAX_ATTACK_LENGTH_MS * veloFactor);
-    finalDecayValue = decayValue < 2 ? 2 : decayValue;
-    decayMs = (float) ((finalDecayValue / 100.0) * C::MAX_DECAY_LENGTH_MS);
+    state.position = state.mpcSound->getStart() + (inverseVeloFactor * (state.veloToStart / 100.0) * state.mpcSound->getLastFrameIndex());
+    state.attackMs = (float) ((state.attackValue / 100.0) * C::MAX_ATTACK_LENGTH_MS);
+    state.attackMs += (float) ((state.veloToAttack / 100.0) * C::MAX_ATTACK_LENGTH_MS * veloFactor);
+    state.finalDecayValue = state.decayValue < 2 ? 2 : state.decayValue;
+    state.decayMs = (float) ((state.finalDecayValue / 100.0) * C::MAX_DECAY_LENGTH_MS);
     staticEnv->reset();
-    veloToLevelFactor = (float) (veloToLevel * 0.01);
-    amplitude = (float) ((veloFactor * veloToLevelFactor) + 1.0f - veloToLevelFactor);
-    amplitude *= mpcSound->getSndLevel() * 0.01;
+    state.veloToLevelFactor = (float) (state.veloToLevel * 0.01);
+    state.amplitude = (float) ((veloFactor * state.veloToLevelFactor) + 1.0f - state.veloToLevelFactor);
+    state.amplitude *= state.mpcSound->getSndLevel() * 0.01;
 
     if (!basic)
     {
         ampEnv->reset();
-        filtParam = np->getFilterFrequency();
+        state.filtParam = np->getFilterFrequency();
 
-        if (varType == 3)
+        if (state.varType == 3)
         {
-            filtParam = varValue;
+            state.filtParam = state.varValue;
         }
 
-        initialFilterValue = (float) (filtParam + (veloFactor * np->getVelocityToFilterFrequency()));
-        initialFilterValue = (float) (17.0 + (initialFilterValue * 0.75));
+        state.initialFilterValue = (float) (state.filtParam + (veloFactor * np->getVelocityToFilterFrequency()));
+        state.initialFilterValue = (float) (17.0 + (state.initialFilterValue * 0.75));
         filterEnv->reset();
         fattack->setValue((float) (np->getFilterAttack() * 0.002) * C::MAX_ATTACK_LENGTH_SAMPLES);
         fhold->setValue(0);
@@ -181,30 +179,30 @@ void Voice::init(
         svfRight->update();
     }
 
-    decayCounter = 0;
+    state.decayCounter = 0;
 
     initializeSamplerateDependents();
 }
 
 void Voice::initializeSamplerateDependents()
 {
-    staticEnvControls->setSampleRate(sampleRate);
+    staticEnvControls->setSampleRate(state.sampleRate);
 
     if (!basic)
     {
-        ampEnvControls->setSampleRate(sampleRate);
-        filterEnvControls->setSampleRate(sampleRate);
+        ampEnvControls->setSampleRate(state.sampleRate);
+        filterEnvControls->setSampleRate(state.sampleRate);
     }
 
-    increment = pow(2.0, ((double) (tune) / 120.0)) * (44100.0 / sampleRate);
+    state.increment = pow(2.0, ((double) (state.tune) / 120.0)) * (44100.0 / state.sampleRate);
 
-    const auto veloFactor = 1.f - (velocity / 127.f);
-    const auto start = mpcSound->getStart() + (veloFactor * (veloToStart / 100.0) * mpcSound->getLastFrameIndex());
+    const auto veloFactor = 1.f - (state.velocity / 127.f);
+    const auto start = state.mpcSound->getStart() + (veloFactor * (state.veloToStart / 100.0) * state.mpcSound->getLastFrameIndex());
 
-    const auto playableSampleLength = mpcSound->isLoopEnabled() ? INT_MAX : (int) ((end - start) / increment);
+    const auto playableSampleLength = state.mpcSound->isLoopEnabled() ? INT_MAX : (int) ((state.end - start) / state.increment);
 
-    auto attackLengthSamples = (int) (attackMs * sampleRate * 0.001);
-    auto decayLengthSamples = (int) (decayMs * sampleRate * 0.001);
+    auto attackLengthSamples = (int) (state.attackMs * state.sampleRate * 0.001);
+    auto decayLengthSamples = (int) (state.decayMs * state.sampleRate * 0.001);
 
     if (attackLengthSamples > C::MAX_ATTACK_LENGTH_SAMPLES)
     {
@@ -216,56 +214,56 @@ void Voice::initializeSamplerateDependents()
         decayLengthSamples = C::MAX_DECAY_LENGTH_SAMPLES;
     }
 
-    auto staticEnvHoldSamples = (int) (playableSampleLength - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (sampleRate) * 0.001);
+    auto staticEnvHoldSamples = (int) (playableSampleLength - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (state.sampleRate) * 0.001);
 
-    if (duration != -1 && duration < playableSampleLength)
+    if (state.duration != -1 && state.duration < playableSampleLength)
     {
-        staticEnvHoldSamples = (int) (duration - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (sampleRate) * 0.001);
+        staticEnvHoldSamples = (int) (state.duration - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (state.sampleRate) * 0.001);
     }
 
     shold->setValue(staticEnvHoldSamples);
 
     if (!basic)
     {
-        attack->setValue(attackMs * C::ENV_TIME_RATIO);
+        attack->setValue(state.attackMs * C::ENV_TIME_RATIO);
         const auto holdLengthSamples = playableSampleLength - attackLengthSamples - decayLengthSamples;
-        hold->setValue(decayMode == 1 ? 0 : holdLengthSamples);
-        decay->setValue(decayMs * C::ENV_TIME_RATIO);
-        inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
+        hold->setValue(state.decayMode == 1 ? 0 : holdLengthSamples);
+        decay->setValue(state.decayMs * C::ENV_TIME_RATIO);
+        state.inverseNyquist = VoiceUtil::getInverseNyquist(state.sampleRate);
     }
 }
 
 const std::vector<float>& Voice::getFrame()
 {
-    if (finished)
+    if (state.finished)
     {
         return C::EMPTY_FRAME;
     }
 
-    if (frameOffset > 0)
+    if (state.frameOffset > 0)
     {
-        frameOffset--;
+        state.frameOffset--;
         return C::EMPTY_FRAME;
     }
 
-    envAmplitude = basic ? 1.0f : ampEnv->getEnvelope(false);
-    staticEnvAmp = enableEnvs ? staticEnv->getEnvelope(staticDecay) : 1.0f;
-    envAmplitude *= staticEnvAmp;
+    state.envAmplitude = basic ? 1.0f : ampEnv->getEnvelope(false);
+    state.staticEnvAmp = state.enableEnvs ? staticEnv->getEnvelope(state.staticDecay) : 1.0f;
+    state.envAmplitude *= state.staticEnvAmp;
 
     float filterFreq = 0;
 
     if (!basic)
     {
-        filterFreq = VoiceUtil::midiFreq(initialFilterValue * 1.44f) * inverseNyquist;
-        const auto filterEnvFactor = (float) (filterEnv->getEnvelope(false) * (noteParameters->getFilterEnvelopeAmount() * 0.01));
-        filterFreq += VoiceUtil::midiFreq(144) * inverseNyquist * filterEnvFactor;
+        filterFreq = VoiceUtil::midiFreq(state.initialFilterValue * 1.44f) * state.inverseNyquist;
+        const auto filterEnvFactor = (float) (filterEnv->getEnvelope(false) * (state.noteParameters->getFilterEnvelopeAmount() * 0.01));
+        filterFreq += VoiceUtil::midiFreq(144) * state.inverseNyquist * filterEnvFactor;
     }
 
     readFrame();
 
-    if (mpcSound->isMono())
+    if (state.mpcSound->isMono())
     {
-        frame[0] *= envAmplitude * amplitude;
+        frame[0] *= state.envAmplitude * state.amplitude;
 
         if (!basic)
         {
@@ -276,8 +274,8 @@ const std::vector<float>& Voice::getFrame()
     }
     else
     {
-        frame[0] *= envAmplitude * amplitude;
-        frame[1] *= envAmplitude * amplitude;
+        frame[0] *= state.envAmplitude * state.amplitude;
+        frame[1] *= state.envAmplitude * state.amplitude;
 
         if (!basic)
         {
@@ -291,26 +289,26 @@ const std::vector<float>& Voice::getFrame()
 
 void Voice::readFrame()
 {
-    if (mpcSound->isLoopEnabled() && position > end - 1)
+    if (state.mpcSound->isLoopEnabled() && state.position > state.end - 1)
     {
-        position = mpcSound->getLoopTo();
+        state.position = state.mpcSound->getLoopTo();
     }
 
-    if (((position >= (end - 1)) && !mpcSound->isLoopEnabled()) ||
+    if (((state.position >= (state.end - 1)) && !state.mpcSound->isLoopEnabled()) ||
         (staticEnv != nullptr && staticEnv->isComplete()) ||
         (ampEnv != nullptr && ampEnv->isComplete()))
     {
         frame = C::EMPTY_FRAME;
-        finished = true;
+        state.finished = true;
         return;
     }
 
-    const auto k = (int) (ceil(position));
+    const auto k = (int) (ceil(state.position));
     const auto j = k != 0 ? k - 1 : 0;
-    const auto frac = position - (double) (j);
-    const auto &sampleData = *mpcSound->getSampleData();
+    const auto frac = state.position - (double) (j);
+    const auto &sampleData = *state.mpcSound->getSampleData();
 
-    if (mpcSound->isMono())
+    if (state.mpcSound->isMono())
     {
         frame[0] = (sampleData[j] * (1.0f - frac)) + (sampleData[k] * frac);
     }
@@ -321,20 +319,20 @@ void Voice::readFrame()
         frame[1] = (sampleData[j + rOffset] * (1.0f - frac)) + (sampleData[k + rOffset] * frac);
     }
 
-    position += increment;
+    state.position += state.increment;
 }
 
 int Voice::processAudio(AudioBuffer *buffer, int nFrames)
 {
-    if (finished)
+    if (state.finished)
     {
         buffer->makeSilence();
         return AUDIO_SILENCE;
     }
 
-    if (buffer->getSampleRate() != sampleRate)
+    if (buffer->getSampleRate() != state.sampleRate)
     {
-        sampleRate = buffer->getSampleRate();
+        state.sampleRate = buffer->getSampleRate();
         initializeSamplerateDependents();
     }
 
@@ -353,21 +351,21 @@ int Voice::processAudio(AudioBuffer *buffer, int nFrames)
         left[i] = frameToUse[0] * masterLevelFactor;
         right[i] = frameToUse[1] * masterLevelFactor;
 
-        if (decayCounter != 0)
+        if (state.decayCounter != 0)
         {
-            if (decayCounter == 1)
+            if (state.decayCounter == 1)
             {
                 startDecay();
             }
 
-            decayCounter--;
+            state.decayCounter--;
         }
     }
 
-    if (finished)
+    if (state.finished)
     {
-        note = -1;
-        mpcSound = {};
+        state.note = -1;
+        state.mpcSound = {};
     }
 
     return AUDIO_OK;
@@ -375,19 +373,19 @@ int Voice::processAudio(AudioBuffer *buffer, int nFrames)
 
 void Voice::finish()
 {
-    finished = true;
+    state.finished = true;
 }
 
 void Voice::startDecay()
 {
-    staticDecay = true;
+    state.staticDecay = true;
 }
 
 void Voice::startDecay(const int offset)
 {
     if (offset > 0)
     {
-        decayCounter = offset;
+        state.decayCounter = offset;
     }
     else
     {
@@ -402,17 +400,17 @@ void Voice::setMasterLevel(const int8_t masterLevelToUse)
 
 int Voice::getNote() const
 {
-    return note;
+    return state.note;
 }
 
 bool Voice::isFinished() const
 {
-    return finished;
+    return state.finished;
 }
 
 int Voice::getVoiceOverlap() const
 {
-    return voiceOverlapMode;
+    return state.voiceOverlapMode;
 }
 
 int Voice::getStripNumber() const
@@ -422,21 +420,21 @@ int Voice::getStripNumber() const
 
 int Voice::getStartTick() const
 {
-    return startTick;
+    return state.startTick;
 }
 
 bool Voice::isDecaying() const
 {
-    return staticDecay;
+    return state.staticDecay;
 }
 
 const MuteInfo& Voice::getMuteInfo() const
 {
-    return muteInfo;
+    return state.muteInfo;
 }
 
 const NoteParameters* Voice::getNoteParameters() const
 {
-    return noteParameters;
+    return state.noteParameters;
 }
 

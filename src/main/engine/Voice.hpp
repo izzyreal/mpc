@@ -28,35 +28,67 @@ namespace mpc::engine {
 
     class MuteInfo;
 
+    class VoiceState {
+        public:
+            float sampleRate = 44100.0;
+            float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
+
+            // Voice overlap mode when the voice was triggered
+            int voiceOverlapMode;
+
+            // Pointer to currently playing note parameters
+            mpc::sampler::NoteParameters *noteParameters = nullptr;
+
+            std::shared_ptr<mpc::sampler::Sound> mpcSound;
+            int startTick = -1;
+            int tune = 0;
+            double increment = 0;
+            double position = 0;
+            float initialFilterValue = 0;
+            bool staticDecay = 0;
+            int note = -1;
+            int velocity = 0;
+            float amplitude = 0;
+            int end = 0;
+            bool finished = true;
+            mpc::engine::MuteInfo muteInfo;
+            int frameOffset = 0;
+            int decayCounter = 0;
+            bool enableEnvs = false;
+            int duration = -1;
+            int varType = 0;
+            int varValue = 0;
+            int veloToStart = 0;
+            int attackValue = 0;
+            int decayValue = 0;
+            int veloToAttack = 0;
+            int decayMode = 0;
+            int veloToLevel = 0;
+            float attackMs = 0;
+            int finalDecayValue = 0;
+            float decayMs = 0;
+            float veloToLevelFactor = 0;
+            int filtParam = 0;
+            float envAmplitude = 0;
+            float staticEnvAmp = 0;
+    };
+
     class Voice : public mpc::engine::audio::core::AudioProcess
     {
 
     private:
-        float sampleRate = 44100.0;
-        float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
+        const int stripNumber = -1;
+        const bool basic = false;
 
-        // Voice overlap mode when the voice was triggered
-        int voiceOverlapMode;
+        std::vector<float> frame;
 
-        // Pointer to currently playing note parameters
-        mpc::sampler::NoteParameters *noteParameters = nullptr;
+        VoiceState state;
 
-        std::shared_ptr<mpc::sampler::Sound> mpcSound;
-        int startTick = -1;
-        int tune = 0;
-        double increment = 0;
-        double position = 0;
         mpc::engine::EnvelopeGenerator *staticEnv = nullptr;
         mpc::engine::EnvelopeGenerator *ampEnv = nullptr;
         mpc::engine::EnvelopeGenerator *filterEnv = nullptr;
-        float initialFilterValue = 0;
-        bool staticDecay = 0;
-        int note = -1;
-        int velocity = 0;
-        float amplitude = 0;
         mpc::engine::filter::StateVariableFilter *svfLeft = nullptr;
         mpc::engine::filter::StateVariableFilter *svfRight = nullptr;
-        int end = 0;
         mpc::engine::control::LawControl *attack = nullptr;
         mpc::engine::control::LawControl *hold = nullptr;
         mpc::engine::control::LawControl *decay = nullptr;
@@ -69,31 +101,6 @@ namespace mpc::engine {
         mpc::engine::EnvelopeControls *staticEnvControls = nullptr;
         mpc::engine::EnvelopeControls *filterEnvControls = nullptr;
         mpc::engine::filter::StateVariableFilterControls *svfControls = nullptr;
-        bool finished = true;
-        int stripNumber = -1;
-
-        mpc::engine::MuteInfo muteInfo;
-        int frameOffset = 0;
-        bool basic = false;
-        int decayCounter = 0;
-        bool enableEnvs = false;
-        std::vector<float> frame;
-        int duration = -1;
-        int varType = 0;
-        int varValue = 0;
-        int veloToStart = 0;
-        int attackValue = 0;
-        int decayValue = 0;
-        int veloToAttack = 0;
-        int decayMode = 0;
-        int veloToLevel = 0;
-        float attackMs = 0;
-        int finalDecayValue = 0;
-        float decayMs = 0;
-        float veloToLevelFactor = 0;
-        int filtParam = 0;
-        float envAmplitude = 0;
-        float staticEnvAmp = 0;
 
         // The master level that is set in the Mixer Setup screen.
         // -Inf, -72, -66, -60, -54, -48, -42, -36, -30, -24, -18, -12, -6, 0, 6 or 12 dB.
