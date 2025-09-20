@@ -25,49 +25,6 @@ using namespace mpc::sampler;
 
 std::vector<float> Voice::EMPTY_FRAME = {0.f, 0.f};
 
-float Voice::getInverseNyquist(const int sampleRate)
-{
-    return 2.f / sampleRate;
-}
-
-std::vector<float>& Voice::freqTable()
-{
-    static std::vector<float> res;
-
-    if (res.empty())
-    {
-        for (auto i = 0; i < 140; i++)
-        {
-            res.push_back(midiFreqImpl(i));
-        }
-    }
-
-    return res;
-}
-
-float Voice::midiFreq(const float pitch)
-{
-    if (pitch < 0)
-    {
-        return freqTable()[0];
-    }
-
-    if (pitch >= (int)(freqTable().size()) - 1)
-    {
-        return freqTable()[(int)(freqTable().size()) - 2];
-    }
-
-    const auto idx = (int)(pitch);
-    const auto frac = pitch - idx;
-
-    return freqTable()[idx] * (1 - frac) + freqTable()[idx + 1] * frac;
-}
-
-float Voice::midiFreqImpl(const int pitch)
-{
-    return (float)(440.0 * pow(2.0, ((double)(pitch) - 69.0) / 12.0));
-}
-
 Voice::Voice(const int stripNumberToUse, const bool basicToUse)
     : stripNumber(stripNumberToUse), basic(basicToUse), frame(EMPTY_FRAME)
 {
@@ -272,7 +229,7 @@ void Voice::initializeSamplerateDependents()
         const auto holdLengthSamples = playableSampleLength - attackLengthSamples - decayLengthSamples;
         hold->setValue(decayMode == 1 ? 0 : holdLengthSamples);
         decay->setValue(decayMs * ENV_TIME_RATIO);
-        inverseNyquist = getInverseNyquist(sampleRate);
+        inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
     }
 }
 
@@ -297,9 +254,9 @@ std::vector<float>& Voice::getFrame()
 
     if (!basic)
     {
-        filterFreq = midiFreq(initialFilterValue * 1.44f) * inverseNyquist;
+        filterFreq = VoiceUtil::midiFreq(initialFilterValue * 1.44f) * inverseNyquist;
         const auto filterEnvFactor = (float) (filterEnv->getEnvelope(false) * (noteParameters->getFilterEnvelopeAmount() * 0.01));
-        filterFreq += midiFreq(144) * inverseNyquist * filterEnvFactor;
+        filterFreq += VoiceUtil::midiFreq(144) * inverseNyquist * filterEnvFactor;
     }
 
     readFrame();

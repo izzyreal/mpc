@@ -9,6 +9,7 @@
 #include <audiomidi/SoundRecorder.hpp>
 
 #include "engine/Voice.hpp"
+#include "engine/VoiceUtil.hpp"
 #include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/MixerControls.hpp>
 #include "engine/Drum.hpp"
@@ -47,7 +48,7 @@ using namespace mpc::engine;
 AudioMidiServices::AudioMidiServices(mpc::Mpc& mpcToUse)
 	: mpc(mpcToUse)
 {
-	Voice::freqTable();
+	VoiceUtil::freqTable();
     frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse);
 }
 

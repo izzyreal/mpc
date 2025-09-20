@@ -4,6 +4,7 @@
 
 #include "engine/audio/core/AudioProcess.hpp"
 #include "MuteInfo.hpp"
+#include "VoiceUtil.hpp"
 
 namespace mpc::sampler {
     class Sound;
@@ -46,12 +47,8 @@ namespace mpc::engine {
         static const int RESO_INDEX = 1;
         static constexpr float ENV_TIME_RATIO = 5.46f;
 
-        static float getInverseNyquist(const int sampleRate);
-        static float midiFreq(const float pitch);
-        static float midiFreqImpl(const int pitch);
-
         float sampleRate = 44100.0;
-        float inverseNyquist = getInverseNyquist(sampleRate);
+        float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
 
         // Voice overlap mode when the voice was triggered
         int voiceOverlapMode;
@@ -121,8 +118,6 @@ namespace mpc::engine {
         void initializeSamplerateDependents();
 
     public:
-        static std::vector<float>& freqTable();
-
         int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
 
         void init(int velocity,
