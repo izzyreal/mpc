@@ -1,5 +1,7 @@
 #include "Voice.hpp"
 
+#include "VoiceConstants.hpp"
+
 #include "sampler/NoteParameters.hpp"
 #include <sampler/Sound.hpp>
 
@@ -23,40 +25,40 @@ using namespace mpc::engine::control;
 using namespace mpc::engine::filter;
 using namespace mpc::sampler;
 
-std::vector<float> Voice::EMPTY_FRAME = {0.f, 0.f};
+typedef mpc::engine::VoiceConstants C;
 
 Voice::Voice(const int stripNumberToUse, const bool basicToUse)
-    : stripNumber(stripNumberToUse), basic(basicToUse), frame(EMPTY_FRAME)
+    : stripNumber(stripNumberToUse), basic(basicToUse), frame(C::EMPTY_FRAME)
 {
-    frame = EMPTY_FRAME;
+    frame = C::EMPTY_FRAME;
 
-    staticEnvControls = new EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
+    staticEnvControls = new EnvelopeControls(0, "StaticAmpEnv", C::AMPENV_OFFSET);
     staticEnv = new EnvelopeGenerator(staticEnvControls);
-    shold = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[HOLD_INDEX]).get();
+    shold = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[C::HOLD_INDEX]).get();
 
-    auto sattack = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[ATTACK_INDEX]).get();
-    auto sdecay = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[DECAY_INDEX]).get();
+    auto sattack = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[C::ATTACK_INDEX]).get();
+    auto sdecay = std::dynamic_pointer_cast<LawControl>(staticEnvControls->getControls()[C::DECAY_INDEX]).get();
 
-    sattack->setValue(STATIC_ATTACK_LENGTH);
-    sdecay->setValue(STATIC_DECAY_LENGTH);
+    sattack->setValue(C::STATIC_ATTACK_LENGTH);
+    sdecay->setValue(C::STATIC_DECAY_LENGTH);
 
     if (!basic)
     {
-        ampEnvControls = new EnvelopeControls(0, "AmpEnv", AMPENV_OFFSET);
-        filterEnvControls = new EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
+        ampEnvControls = new EnvelopeControls(0, "AmpEnv", C::AMPENV_OFFSET);
+        filterEnvControls = new EnvelopeControls(0, "StaticAmpEnv", C::AMPENV_OFFSET);
         ampEnv = new EnvelopeGenerator(ampEnvControls);
         filterEnv = new EnvelopeGenerator(filterEnvControls);
-        svfControls = new StateVariableFilterControls("Filter", SVF_OFFSET);
+        svfControls = new StateVariableFilterControls("Filter", C::SVF_OFFSET);
         svfControls->createControls();
         svfLeft = new StateVariableFilter(svfControls);
         svfRight = new StateVariableFilter(svfControls);
-        fattack = std::dynamic_pointer_cast<LawControl>(filterEnvControls->getControls()[ATTACK_INDEX]).get();
-        fhold = std::dynamic_pointer_cast<LawControl>(filterEnvControls->getControls()[HOLD_INDEX]).get();
-        fdecay = std::dynamic_pointer_cast<LawControl>(filterEnvControls->getControls()[DECAY_INDEX]).get();
-        attack = std::dynamic_pointer_cast<LawControl>(ampEnvControls->getControls()[ATTACK_INDEX]).get();
-        hold = std::dynamic_pointer_cast<LawControl>(ampEnvControls->getControls()[HOLD_INDEX]).get();
-        decay = std::dynamic_pointer_cast<LawControl>(ampEnvControls->getControls()[DECAY_INDEX]).get();
-        reso = std::dynamic_pointer_cast<LawControl>(svfControls->getControls()[RESO_INDEX]).get();
+        fattack = std::dynamic_pointer_cast<LawControl>(filterEnvControls->getControls()[C::ATTACK_INDEX]).get();
+        fhold = std::dynamic_pointer_cast<LawControl>(filterEnvControls->getControls()[C::HOLD_INDEX]).get();
+        fdecay = std::dynamic_pointer_cast<LawControl>(filterEnvControls->getControls()[C::DECAY_INDEX]).get();
+        attack = std::dynamic_pointer_cast<LawControl>(ampEnvControls->getControls()[C::ATTACK_INDEX]).get();
+        hold = std::dynamic_pointer_cast<LawControl>(ampEnvControls->getControls()[C::HOLD_INDEX]).get();
+        decay = std::dynamic_pointer_cast<LawControl>(ampEnvControls->getControls()[C::DECAY_INDEX]).get();
+        reso = std::dynamic_pointer_cast<LawControl>(svfControls->getControls()[C::RESO_INDEX]).get();
     }
 }
 
@@ -149,14 +151,14 @@ void Voice::init(
     end = mpcSound->getEnd();
 
     position = mpcSound->getStart() + (inverseVeloFactor * (veloToStart / 100.0) * mpcSound->getLastFrameIndex());
-    attackMs = (float) ((attackValue / 100.0) * MAX_ATTACK_LENGTH_MS);
-    attackMs += (float) ((veloToAttack / 100.0) * MAX_ATTACK_LENGTH_MS * veloFactor);
+    attackMs = (float) ((attackValue / 100.0) * C::MAX_ATTACK_LENGTH_MS);
+    attackMs += (float) ((veloToAttack / 100.0) * C::MAX_ATTACK_LENGTH_MS * veloFactor);
     finalDecayValue = decayValue < 2 ? 2 : decayValue;
-    decayMs = (float) ((finalDecayValue / 100.0) * MAX_DECAY_LENGTH_MS);
+    decayMs = (float) ((finalDecayValue / 100.0) * C::MAX_DECAY_LENGTH_MS);
     staticEnv->reset();
     veloToLevelFactor = (float) (veloToLevel * 0.01);
     amplitude = (float) ((veloFactor * veloToLevelFactor) + 1.0f - veloToLevelFactor);
-    amplitude *= (mpcSound->getSndLevel() * 0.01);
+    amplitude *= mpcSound->getSndLevel() * 0.01;
 
     if (!basic)
     {
@@ -171,9 +173,9 @@ void Voice::init(
         initialFilterValue = (float) (filtParam + (veloFactor * np->getVelocityToFilterFrequency()));
         initialFilterValue = (float) (17.0 + (initialFilterValue * 0.75));
         filterEnv->reset();
-        fattack->setValue((float) (np->getFilterAttack() * 0.002) * MAX_ATTACK_LENGTH_SAMPLES);
+        fattack->setValue((float) (np->getFilterAttack() * 0.002) * C::MAX_ATTACK_LENGTH_SAMPLES);
         fhold->setValue(0);
-        fdecay->setValue((float) (np->getFilterDecay() * 0.002) * MAX_DECAY_LENGTH_SAMPLES);
+        fdecay->setValue((float) (np->getFilterDecay() * 0.002) * C::MAX_DECAY_LENGTH_SAMPLES);
         reso->setValue((float) (0.0625 + (np->getFilterResonance() / 26.0)));
         svfLeft->update();
         svfRight->update();
@@ -204,46 +206,46 @@ void Voice::initializeSamplerateDependents()
     auto attackLengthSamples = (int) (attackMs * sampleRate * 0.001);
     auto decayLengthSamples = (int) (decayMs * sampleRate * 0.001);
 
-    if (attackLengthSamples > MAX_ATTACK_LENGTH_SAMPLES)
+    if (attackLengthSamples > C::MAX_ATTACK_LENGTH_SAMPLES)
     {
-        attackLengthSamples = (int) (MAX_ATTACK_LENGTH_SAMPLES);
+        attackLengthSamples = C::MAX_ATTACK_LENGTH_SAMPLES;
     }
 
-    if (decayLengthSamples > MAX_DECAY_LENGTH_SAMPLES)
+    if (decayLengthSamples > C::MAX_DECAY_LENGTH_SAMPLES)
     {
-        decayLengthSamples = MAX_DECAY_LENGTH_SAMPLES;
+        decayLengthSamples = C::MAX_DECAY_LENGTH_SAMPLES;
     }
 
-    auto staticEnvHoldSamples = (int) (playableSampleLength - ((STATIC_ATTACK_LENGTH + STATIC_DECAY_LENGTH) / ENV_TIME_RATIO) * (sampleRate) * 0.001);
+    auto staticEnvHoldSamples = (int) (playableSampleLength - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (sampleRate) * 0.001);
 
     if (duration != -1 && duration < playableSampleLength)
     {
-        staticEnvHoldSamples = (int) (duration - ((STATIC_ATTACK_LENGTH + STATIC_DECAY_LENGTH) / ENV_TIME_RATIO) * (sampleRate) * 0.001);
+        staticEnvHoldSamples = (int) (duration - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (sampleRate) * 0.001);
     }
 
     shold->setValue(staticEnvHoldSamples);
 
     if (!basic)
     {
-        attack->setValue(attackMs * ENV_TIME_RATIO);
+        attack->setValue(attackMs * C::ENV_TIME_RATIO);
         const auto holdLengthSamples = playableSampleLength - attackLengthSamples - decayLengthSamples;
         hold->setValue(decayMode == 1 ? 0 : holdLengthSamples);
-        decay->setValue(decayMs * ENV_TIME_RATIO);
+        decay->setValue(decayMs * C::ENV_TIME_RATIO);
         inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
     }
 }
 
-std::vector<float>& Voice::getFrame()
+const std::vector<float>& Voice::getFrame()
 {
     if (finished)
     {
-        return EMPTY_FRAME;
+        return C::EMPTY_FRAME;
     }
 
     if (frameOffset > 0)
     {
         frameOffset--;
-        return EMPTY_FRAME;
+        return C::EMPTY_FRAME;
     }
 
     envAmplitude = basic ? 1.0f : ampEnv->getEnvelope(false);
@@ -298,7 +300,7 @@ void Voice::readFrame()
         (staticEnv != nullptr && staticEnv->isComplete()) ||
         (ampEnv != nullptr && ampEnv->isComplete()))
     {
-        frame = EMPTY_FRAME;
+        frame = C::EMPTY_FRAME;
         finished = true;
         return;
     }
