@@ -12,11 +12,11 @@ namespace mpc::engine {
 
         void setDrum(int drum);
 
-        int getNote();
+        int getNote() const;
 
-        int getDrum();
+        int getDrum() const;
 
-        bool shouldMute(int otherNote, int otherDrum);
+        bool shouldMute(int otherNote, int otherDrum) const;
 
         MuteInfo();
 

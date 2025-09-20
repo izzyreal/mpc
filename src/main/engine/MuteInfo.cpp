@@ -16,17 +16,17 @@ void MuteInfo::setDrum(int drum)
     this->drum = drum;
 }
 
-int MuteInfo::getNote()
+int MuteInfo::getNote() const
 {
     return note;
 }
 
-int MuteInfo::getDrum()
+int MuteInfo::getDrum() const
 {
     return drum;
 }
 
-bool MuteInfo::shouldMute(int otherNote, int otherDrum)
+bool MuteInfo::shouldMute(int otherNote, int otherDrum) const
 {
     if (note == otherNote && drum == otherDrum)
     {

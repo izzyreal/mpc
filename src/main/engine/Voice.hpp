@@ -12,7 +12,6 @@ namespace mpc::sampler {
 
 namespace mpc::engine::control {
     class LawControl;
-    class BooleanControl;
 }
 
 namespace mpc::engine::filter {
@@ -28,19 +27,15 @@ namespace mpc::engine {
 
     class MuteInfo;
 
-    class Voice
-            : public mpc::engine::audio::core::AudioProcess
+    class Voice : public mpc::engine::audio::core::AudioProcess
     {
 
     private:
-        static float midiFreq(float pitch);
-
-        static float midiFreqImpl(int pitch);
-
-        float sampleRate = 44100.0;
-
-        constexpr static const float STATIC_ATTACK_LENGTH = 10.92f;
-        constexpr static const float STATIC_DECAY_LENGTH = 109.2f;
+        static std::vector<float> EMPTY_FRAME;
+        static const int SVF_OFFSET = 48;
+        static const int AMPENV_OFFSET = 64;
+        static constexpr float STATIC_ATTACK_LENGTH = 10.92f;
+        static constexpr float STATIC_DECAY_LENGTH = 109.2f;
         static const int MAX_ATTACK_LENGTH_MS = 3000;
         static const int MAX_DECAY_LENGTH_MS = 2600;
         static const int MAX_ATTACK_LENGTH_SAMPLES = 132300;
@@ -49,6 +44,14 @@ namespace mpc::engine {
         static const int HOLD_INDEX = 1;
         static const int DECAY_INDEX = 2;
         static const int RESO_INDEX = 1;
+        static constexpr float ENV_TIME_RATIO = 5.46f;
+
+        static float getInverseNyquist(const int sampleRate);
+        static float midiFreq(const float pitch);
+        static float midiFreqImpl(const int pitch);
+
+        float sampleRate = 44100.0;
+        float inverseNyquist = getInverseNyquist(sampleRate);
 
         // Voice overlap mode when the voice was triggered
         int voiceOverlapMode;
@@ -61,7 +64,6 @@ namespace mpc::engine {
         int tune = 0;
         double increment = 0;
         double position = 0;
-        std::vector<float> *sampleData;
         mpc::engine::EnvelopeGenerator *staticEnv = nullptr;
         mpc::engine::EnvelopeGenerator *ampEnv = nullptr;
         mpc::engine::EnvelopeGenerator *filterEnv = nullptr;
@@ -88,24 +90,12 @@ namespace mpc::engine {
         bool finished = true;
         int stripNumber = -1;
 
-    private:
-        void readFrame();
-
-        void initializeSamplerateDependents();
-
-        static float getInverseNyquist(int sampleRate)
-        { return 2.f / sampleRate; }
-
-    private:
-        static std::vector<float> EMPTY_FRAME;
         mpc::engine::MuteInfo muteInfo;
         int frameOffset = 0;
         bool basic = false;
         int decayCounter = 0;
         bool enableEnvs = false;
-        static const int SVF_OFFSET = 48;
-        static const int AMPENV_OFFSET = 64;
-        std::vector<float> tempFrame;
+        std::vector<float> frame;
         int duration = -1;
         int varType = 0;
         int varValue = 0;
@@ -122,23 +112,18 @@ namespace mpc::engine {
         int filtParam = 0;
         float envAmplitude = 0;
         float staticEnvAmp = 0;
-        double frac = 0;
-        int k = 0;
-        int j = 0;
-        std::vector<float> frame;
 
         // The master level that is set in the Mixer Setup screen.
         // -Inf, -72, -66, -60, -54, -48, -42, -36, -30, -24, -18, -12, -6, 0, 6 or 12 dB.
         std::atomic_int8_t masterLevel{0};
 
+        void readFrame();
+        void initializeSamplerateDependents();
+
     public:
-        void open() override;
+        static std::vector<float>& freqTable();
 
         int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
-
-        void close() override;
-
-        bool isFinished();
 
         void init(int velocity,
                   std::shared_ptr<mpc::sampler::Sound> mpcSound,
@@ -155,32 +140,32 @@ namespace mpc::engine {
 
         std::vector<float> &getFrame();
 
-        int getNote();
-
-        mpc::sampler::NoteParameters *getNoteParameters();
-
         void startDecay();
 
-        int getVoiceOverlap();
-
-        int getStripNumber();
-
-        int getStartTick();
-
-        bool isDecaying();
-
-        mpc::engine::MuteInfo &getMuteInfo();
-
-        void startDecay(int offset);
+        void startDecay(const int offset);
 
         void finish();
 
-        void setMasterLevel(int8_t masterLevel);
+        void setMasterLevel(const int8_t masterLevel);
 
-        static std::vector<float> &freqTable();
+        int getNote() const;
+
+        bool isFinished() const;
+
+        const mpc::sampler::NoteParameters* getNoteParameters() const;
+
+        int getVoiceOverlap() const;
+
+        int getStripNumber() const;
+
+        int getStartTick() const;
+
+        bool isDecaying() const;
+
+        const MuteInfo &getMuteInfo() const;
 
     public:
-        Voice(int stripNumber, bool basic);
+        Voice(const int stripNumber, const bool basic);
 
         ~Voice();
     };
