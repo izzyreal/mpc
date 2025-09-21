@@ -197,7 +197,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
         stopMonoOrPolyVoiceWithSameNoteParameters(np, note);
     }
 
-	voice->init(velo, sound, note, np, varType, varValue, note, drumIndex, frameOffset, true, startTick, durationFrames);
+	voice->init(velo, sound, note, np, varType, varValue, note, drumIndex, frameOffset, true, startTick, durationFrames, mixer->getSharedBuffer()->getSampleRate());
 
 	if (firstGeneration)
 	{

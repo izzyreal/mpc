@@ -89,7 +89,8 @@ void Voice::init(
         int newFrameOffset,
         bool newEnableEnvs,
         int newStartTick,
-        int newDuration)
+        int newDuration,
+        float engineSampleRate)
 {
     VoiceState *state = getInactiveState();
 
@@ -187,6 +188,8 @@ void Voice::init(
     }
 
     state->decayCounter = 0;
+
+    state->sampleRate = engineSampleRate;
 
     initializeSamplerateDependents();
 

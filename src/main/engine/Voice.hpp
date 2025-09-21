@@ -156,7 +156,8 @@ namespace mpc::engine {
                   int frameOffset,
                   bool enableEnvs,
                   int startTick,
-                  int newDuration);
+                  int newDuration,
+                  float engineSampleRate);
 
         void startDecay();
 
