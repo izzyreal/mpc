@@ -81,6 +81,11 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                         path = mpc.paths->midiControlPresetsPath() / "iRig_PADS.vmp";
                         knownControllerDetectedScreen->controllerName = "iRig_PADS";
                     }
+                    else if (name.find("MPC Studio") != std::string::npos)
+                    {
+                        path = mpc.paths->midiControlPresetsPath() / "MPC_Studio.vmp";
+                        knownControllerDetectedScreen->controllerName = "MPC_Studio";
+                    }
 
                     if (!path.empty() && fs::exists(path))
                     {
