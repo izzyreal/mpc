@@ -30,7 +30,7 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
         auto found = std::find_if(
                 activePreset->rows.begin(),
                 activePreset->rows.end(),
-                [l](const MidiControlCommand &c) { return c.label == l; });
+                [l](const MidiControlCommand &c) { return c.getMpcHardwareLabel() == l; });
 
         REQUIRE(found != activePreset->rows.end());
     }
@@ -45,17 +45,17 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
     auto controls = mpc.getActiveControls();
     controls->turnWheel(1);
     controls->right();
-    controls->turnWheel(2);
-    controls->right();
     controls->turnWheel(3);
+    controls->right();
+    controls->turnWheel(2);
     controls->function(5);
     controls->mainScreen();
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     auto t1 = controls->findChild<mpc::lcdgui::Field>("type0")->getText();
     auto t2 = controls->findChild<mpc::lcdgui::Field>("channel0")->getText();
-    auto t3 = controls->findChild<mpc::lcdgui::Field>("value0")->getText();
+    auto t3 = controls->findChild<mpc::lcdgui::Field>("number0")->getText();
     REQUIRE(t1 == "Note");
-    REQUIRE(t2 == "ch 2");
+    REQUIRE(t2 == "2");
     REQUIRE(t3 == " 38");
 }
 
@@ -68,17 +68,17 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     auto controls = mpc.getActiveControls();
     controls->turnWheel(1);
     controls->right();
-    controls->turnWheel(2);
-    controls->right();
     controls->turnWheel(3);
+    controls->right();
+    controls->turnWheel(2);
     controls->function(5);
     controls->mainScreen();
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     auto t1 = controls->findChild<mpc::lcdgui::Field>("type0")->getText();
     auto t2 = controls->findChild<mpc::lcdgui::Field>("channel0")->getText();
-    auto t3 = controls->findChild<mpc::lcdgui::Field>("value0")->getText();
+    auto t3 = controls->findChild<mpc::lcdgui::Field>("number0")->getText();
     REQUIRE(t1 == "Note");
-    REQUIRE(t2 == "ch 2");
+    REQUIRE(t2 == "2");
     REQUIRE(t3 == " 38");
 
     // Open VmpcMidiPresetsScreen
@@ -100,10 +100,10 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     REQUIRE(fs::exists(newPresetPath));
     auto preset = std::make_shared<MidiControlPreset>();
     mpc.getDisk()->readMidiControlPreset(newPresetPath, preset);
-    REQUIRE(preset->rows[0].label == "pad-1");
-    REQUIRE(preset->rows[0].value == 38);
-    REQUIRE(preset->rows[0].channel == 1);
-    REQUIRE(preset->rows[0].isNote);
+    REQUIRE(preset->rows[0].getMpcHardwareLabel() == "pad-1");
+    REQUIRE(preset->rows[0].getNumber() == 38);
+    REQUIRE(preset->rows[0].getMidiChannelIndex() == 1);
+    REQUIRE(preset->rows[0].isNote());
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     mpc.getLayeredScreen()->openScreen("vmpc-midi-presets");
@@ -128,10 +128,10 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     mpc.getDisk()->readMidiControlPreset(newPresetPath, preset);
 
     REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::AutoLoadModeYes);
-    REQUIRE(preset->rows[0].label == "pad-1");
-    REQUIRE(preset->rows[0].value == 38);
-    REQUIRE(preset->rows[0].channel == 1);
-    REQUIRE(preset->rows[0].isNote);
+    REQUIRE(preset->rows[0].getMpcHardwareLabel() == "pad-1");
+    REQUIRE(preset->rows[0].getNumber() == 38);
+    REQUIRE(preset->rows[0].getMidiChannelIndex() == 1);
+    REQUIRE(preset->rows[0].isNote());
 
     // Wait long enough for any Popup threads to have finished
     std::this_thread::sleep_for(std::chrono::milliseconds(1100));

@@ -2,7 +2,6 @@
 #include <lcdgui/ScreenComponent.hpp>
 #include "nvram/MidiControlPersistence.hpp"
 
-#include <string>
 #include <atomic>
 
 namespace mpc::audiomidi { class VmpcMidiControlMode; class MidiDeviceDetector; class AudioMidiServices; }
@@ -27,7 +26,7 @@ namespace mpc::lcdgui::screens {
         void turnWheel(int i) override;
 
         bool isLearning();
-        void setLearnCandidate(const bool isNote, const char channelIndex, const char value);
+        void setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value);
         void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand& c);
         std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
 
