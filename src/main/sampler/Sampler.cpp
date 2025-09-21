@@ -446,7 +446,7 @@ void Sampler::trimSample(int sampleNumber, int start, int end)
 void Sampler::trimSample(std::weak_ptr<Sound> sound, int start, int end)
 {
 	auto s = sound.lock();
-	auto data = s->getSampleData();
+    std::vector<float> newData = *s->getSampleData();
 	auto frameCount = s->getFrameCount();
 
 	if (end > frameCount)
@@ -454,19 +454,21 @@ void Sampler::trimSample(std::weak_ptr<Sound> sound, int start, int end)
 
 	if (s->isMono())
 	{
-		data->erase(data->begin() + end, data->end());
-		data->erase(data->begin(), data->begin() + start);
+		newData.erase(newData.begin() + end, newData.end());
+		newData.erase(newData.begin(), newData.begin() + start);
 	}
 	else
 	{
 		int startRight = start + frameCount;
 		int endRight = end + frameCount;
 
-		data->erase(data->begin() + endRight, data->end());
-		data->erase(data->begin() + frameCount, data->begin() + startRight);
-		data->erase(data->begin() + end, data->begin() + frameCount);
-		data->erase(data->begin(), data->begin() + start);
+		newData.erase(newData.begin() + endRight, newData.end());
+		newData.erase(newData.begin() + frameCount, newData.begin() + startRight);
+		newData.erase(newData.begin() + end, newData.begin() + frameCount);
+		newData.erase(newData.begin(), newData.begin() + start);
 	}
+
+    s->setSampleData(std::make_shared<std::vector<float>>(newData));
 
 	s->setStart(0);
 	s->setEnd(s->getFrameCount());
@@ -476,17 +478,18 @@ void Sampler::trimSample(std::weak_ptr<Sound> sound, int start, int end)
 void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end)
 {
 	auto s = sounds[sampleNumber];
-	auto data = s->getSampleData();
+    std::vector<float> newData = *s->getSampleData();
 	auto frameCount = s->getFrameCount();
 
 	if (!s->isMono())
 	{
 		const unsigned int startRight = start + frameCount;
 		const unsigned int endRight = end + frameCount;
-		data->erase(data->begin() + startRight, data->begin() + endRight);
+		newData.erase(newData.begin() + startRight, newData.begin() + endRight);
 	}
 
-	data->erase(data->begin() + start, data->begin() + end);
+	newData.erase(newData.begin() + start, newData.begin() + end);
+    s->setSampleData(std::make_shared<std::vector<float>>(newData));
 }
 
 std::string Sampler::getSoundSortingTypeName()
@@ -536,15 +539,15 @@ void Sampler::deleteAllSamples()
     soundIndex = 0;
 }
 
-void Sampler::process12Bit(std::vector<float>* fa)
+void Sampler::process12Bit(std::vector<float> &fa)
 {
-	for (auto j = 0; j < fa->size(); j++)
+	for (auto j = 0; j < fa.size(); j++)
 	{
-		if ((*fa)[j] != 0.0f)
+		if (fa[j] != 0.0f)
 		{
-			auto fShort = static_cast< int16_t >((*fa)[j] * 32767.4999999);
+			auto fShort = static_cast< int16_t >(fa[j] * 32767.4999999);
 
-			if ((*fa)[j] > 0.9999999f)
+			if (fa[j] > 0.9999999f)
 				fShort = 32767;
 
 			int16_t newShort = fShort;
@@ -553,22 +556,22 @@ void Sampler::process12Bit(std::vector<float>* fa)
 			newShort &= ~(1 << 2);
 			newShort &= ~(1 << 3);
 
-			(*fa)[j] = static_cast< float >(newShort / 32767.4999999);
+			fa[j] = static_cast< float >(newShort / 32767.4999999);
 		}
 		else
 		{
-			(*fa)[j] = 0;
+			fa[j] = 0;
 		}
 	}
 }
 
-void Sampler::process8Bit(std::vector<float>* fa)
+void Sampler::process8Bit(std::vector<float>& fa)
 {
-	for (auto j = 0; j < fa->size(); j++)
+	for (auto j = 0; j < fa.size(); j++)
 	{
-		if ((*fa)[j] != 0.0f)
+		if (fa[j] != 0.0f)
 		{
-			float f = (*fa)[j];
+			float f = fa[j];
 		
 			if (f < -1)
 				f = -1;
@@ -586,7 +589,7 @@ void Sampler::process8Bit(std::vector<float>* fa)
 			else if (f > 1)
 				f = 1;
 			
-			(*fa)[j] = f;
+			fa[j] = f;
 		}
 	}
 }
@@ -617,9 +620,9 @@ std::vector<float> Sampler::resampleSingleChannel(std::vector<float>& input, int
     return result;
 }
 
-void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr<Sound> destSnd)
+void Sampler::resample(std::shared_ptr<const std::vector<float>> data, int sourceRate, std::shared_ptr<Sound> destSnd)
 {
-    const auto inputFrameCount = static_cast<int>(destSnd->isMono() ? data.size() : data.size() / 2);
+    const auto inputFrameCount = static_cast<int>(destSnd->isMono() ? data->size() : data->size() / 2);
     const auto srcRatio = (double)(destSnd->getSampleRate()) / (double)(sourceRate);
     const auto outputFrameCount = static_cast<int>((floor)(inputFrameCount * srcRatio));
     const auto destinationSampleCount = destSnd->isMono() ? outputFrameCount : outputFrameCount * 2;
@@ -630,14 +633,14 @@ void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr
     
     srcData.output_frames = outputFrameCount;
 
-    auto destinationSampleData = destSnd->getSampleData();
+    auto destinationSampleData = destSnd->getMutableSampleData();
     destinationSampleData->resize(destinationSampleCount);
 
     const int numChannels = destSnd->isMono() ? 1 : 2;
 
     for (int i = 0; i < numChannels; i++)
     {
-        const auto srcArray = &data[i * inputFrameCount];
+        const auto srcArray = &(*data)[i * inputFrameCount];
         srcData.data_in = srcArray;
 
         float* destArray = &(*destinationSampleData)[i * outputFrameCount];
@@ -921,7 +924,7 @@ void Sampler::deleteSound(const std::shared_ptr<Sound>& sound)
     }
 }
 
-std::vector<float> Sampler::mergeToStereo(std::vector<float> fa0, std::vector<float> fa1)
+std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0, const std::vector<float> &fa1)
 {
 	const int newLengthFrames = fa0.size() > fa1.size() ? fa0.size() : fa1.size();
 	std::vector<float> newSampleData = std::vector<float>(newLengthFrames * 2);
@@ -945,10 +948,13 @@ std::vector<float> Sampler::mergeToStereo(std::vector<float> fa0, std::vector<fl
 			newSampleData[i + newLengthFrames] = 0;
 		}
 	}
+
 	return newSampleData;
 }
 
-void Sampler::mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest)
+void Sampler::mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
+                            std::shared_ptr<const std::vector<float>> sourceRight,
+                            std::shared_ptr<std::vector<float>> dest)
 {
 	dest->clear();
 
@@ -1029,7 +1035,7 @@ std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source, const std::
 
 	newSound->setName(sound->getName());
 	newSound->setLoopEnabled(sound->isLoopEnabled());
-	auto dest = newSound->getSampleData();
+	auto dest = newSound->getMutableSampleData();
 	auto src = sound->getSampleData();
 	dest->reserve(src->size());
 	copy(src->begin(), src->end(), back_inserter(*dest));

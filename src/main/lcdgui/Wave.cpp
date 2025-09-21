@@ -67,7 +67,7 @@ void Wave::setCenterSamplePos(unsigned int newCenterSamplePos)
 	SetDirty();
 }
 
-void Wave::setSampleData(std::vector<float>* newSampleData, bool newMono, unsigned int newView)
+void Wave::setSampleData(std::shared_ptr<const std::vector<float>> newSampleData, bool newMono, unsigned int newView)
 {
 	auto newFrameCount = newSampleData != nullptr ? (int) floor(newMono ? newSampleData->size() : (newSampleData->size() * 0.5)) : 0;
 

@@ -39,7 +39,8 @@ namespace mpc::engine {
             // Pointer to currently playing note parameters
             mpc::sampler::NoteParameters *noteParameters = nullptr;
 
-            std::shared_ptr<mpc::sampler::Sound> mpcSound;
+            // Pointer to sample data when the voice was triggered
+            std::shared_ptr<const std::vector<float>> sampleData;
             int startTick = -1;
             int tune = 0;
             double increment = 0;
@@ -49,8 +50,13 @@ namespace mpc::engine {
             int note = -1;
             int velocity = 0;
             float amplitude = 0;
+            int start = 0;
             int end = 0;
+            int loopTo = 0;
+            int lastFrameIndex = 0;
+            bool loopEnabled = false;
             bool finished = true;
+            bool isMono = false;
             mpc::engine::MuteInfo muteInfo;
             int frameOffset = 0;
             int decayCounter = 0;
@@ -140,7 +146,7 @@ namespace mpc::engine {
 
         // Called from main thread
         void init(int velocity,
-                  std::shared_ptr<mpc::sampler::Sound> mpcSound,
+                  std::shared_ptr<mpc::sampler::Sound> sound,
                   int note,
                   mpc::sampler::NoteParameters *np,
                   int varType,

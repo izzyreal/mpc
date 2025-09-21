@@ -79,7 +79,7 @@ namespace mpc::file::wav {
 
 	public:
 		int readFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToRead);
-		int writeFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToWrite);
+		int writeFrames(const std::vector<float>& sampleBuffer, unsigned long numFramesToWrite);
 		void close();
 
 	};

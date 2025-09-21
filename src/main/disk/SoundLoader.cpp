@@ -93,7 +93,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
                 sound->setName(nameWithoutExtension);
             }
 
-            sndReader->readData(*sound->getSampleData());
+            sndReader->readData(sound->getMutableSampleData());
             sound->setMono(sndReader->isMono());
             sound->setStart(sndReader->getStart());
             sound->setEnd(sndReader->getEnd());
@@ -168,7 +168,7 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
 
     int numChannels = wavFile->getNumChannels();
 
-    auto sampleData = sound->getSampleData();
+    auto sampleData = sound->getMutableSampleData();
 
     if (numChannels == 1) {
         wavFile->readFrames(*sampleData, wavFile->getNumFrames());
@@ -190,9 +190,9 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
     if (wavFile->getSampleRate() > 44100 && shouldBeConverted) {
         auto tempSound = std::make_shared<Sound>(44100);
         tempSound->setMono(numChannels == 1);
-        Sampler::resample(*sampleData, wavFile->getSampleRate(), tempSound);
-        auto tempData = *tempSound->getSampleData();
-        sampleData->swap(tempData);
+        Sampler::resample(sampleData, wavFile->getSampleRate(), tempSound);
+        auto tempData = tempSound->getMutableSampleData();
+        sampleData->swap(*tempData);
     }
 
     sound->setMono(numChannels == 1);

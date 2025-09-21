@@ -14,7 +14,7 @@ namespace mpc {
 			std::vector<float> processedData;
 
 		public:
-			virtual std::vector<float> getProcessedData();
+			virtual std::vector<float>& getProcessedData();
 
 		private:
 			void fade(int length, std::vector<float>* fa);

@@ -7,6 +7,7 @@ using namespace mpc::sampler;
 Sound::Sound(int rate)
 {
     setSampleRate(rate);
+    sampleData = std::make_shared<std::vector<float>>();
 }
 
 void Sound::setName(std::string s)
@@ -123,10 +124,14 @@ void Sound::setLoopTo(int i)
     loopTo = value;
 }
 
+void Sound::setSampleData(std::shared_ptr<std::vector<float>> newSampleData)
+{
+    sampleData = newSampleData;
+}
 
 int Sound::getLastFrameIndex()
 {
-    return (isMono() ? sampleData.size() : (sampleData.size() * 0.5)) - 1;
+    return (isMono() ? sampleData->size() : (sampleData->size() * 0.5)) - 1;
 }
 
 int Sound::getFrameCount()
@@ -154,9 +159,14 @@ int Sound::getEnd()
     return end;
 }
 
-std::vector<float>* Sound::getSampleData()
+std::shared_ptr<const std::vector<float>> Sound::getSampleData() const
 {
-    return &sampleData;
+    return sampleData;
+}
+
+std::shared_ptr<std::vector<float>> Sound::getMutableSampleData() const
+{
+    return sampleData;
 }
 
 bool Sound::isMono()
@@ -193,27 +203,27 @@ void Sound::insertFrame(std::vector<float> frame, unsigned int index)
     if (!mono) {
         if (frame.size() < 2) return;
         const unsigned int rightIndex = index + getFrameCount();
-        sampleData.insert(sampleData.begin() + rightIndex, frame[1]);
+        sampleData->insert(sampleData->begin() + rightIndex, frame[1]);
     }
 
     if (frame.size() < 1) {
         return;
     }
 
-    sampleData.insert(sampleData.begin() + index, frame[0]);
+    sampleData->insert(sampleData->begin() + index, frame[0]);
 }
 
 void Sound::insertFrames(std::vector<float>& frames, unsigned int index, uint32_t nFrames)
 {
     assert(mono);
-    sampleData.insert(sampleData.begin() + index, frames.begin(), frames.begin() + nFrames);
+    sampleData->insert(sampleData->begin() + index, frames.begin(), frames.begin() + nFrames);
 }
 
 void Sound::insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index, uint32_t nFrames)
 {
     assert(!mono);
-    sampleData.insert(sampleData.begin() + index + getFrameCount(), right.begin(), right.begin() + nFrames);
-    sampleData.insert(sampleData.begin() + index, left.begin(), left.begin() + nFrames);
+    sampleData->insert(sampleData->begin() + index + getFrameCount(), right.begin(), right.begin() + nFrames);
+    sampleData->insert(sampleData->begin() + index, left.begin(), left.begin() + nFrames);
 }
 
 void Sound::appendFrames(std::vector<float> &frames, uint32_t nFrames)
@@ -230,8 +240,8 @@ void Sound::removeFramesFromEnd(int numFramesToRemove)
 {
     if (!mono)
     {
-        sampleData.erase(sampleData.end() - getFrameCount() - numFramesToRemove, sampleData.end() - getFrameCount());
+        sampleData->erase(sampleData->end() - getFrameCount() - numFramesToRemove, sampleData->end() - getFrameCount());
     }
 
-    sampleData.erase(sampleData.end() - numFramesToRemove, sampleData.end());
+    sampleData->erase(sampleData->end() - numFramesToRemove, sampleData->end());
 }

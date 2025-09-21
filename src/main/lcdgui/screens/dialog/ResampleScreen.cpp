@@ -90,18 +90,18 @@ void ResampleScreen::function(int i)
         destSnd->setSampleRate(newFs);
         destSnd->setMono(snd->isMono());
 
-		const auto source = snd->getSampleData();
+        auto source = snd->getSampleData();
 
 		if (newFs != snd->getSampleRate())
 		{
-            sampler::Sampler::resample(*source, snd->getSampleRate(), destSnd);
+            sampler::Sampler::resample(source, snd->getSampleRate(), destSnd);
         }
 		else
 		{
-			*destSnd->getSampleData() = *source;
+			destSnd->setSampleData(std::make_shared<std::vector<float>>(*source));
 		}
 
-		for (auto& f : *destSnd->getSampleData())
+		for (auto &f : *destSnd->getMutableSampleData())
 		{
 			if (f > 1) f = 1;
 			else if (f < -1) f = -1;
@@ -116,11 +116,11 @@ void ResampleScreen::function(int i)
 
 		if (newBit == 1)
 		{
-			sampler::Sampler::process12Bit(destSnd->getSampleData());
+			sampler::Sampler::process12Bit(*destSnd->getMutableSampleData());
 		}
 		else if (newBit == 2)
 		{
-            sampler::Sampler::process8Bit(destSnd->getSampleData());
+            sampler::Sampler::process8Bit(*destSnd->getMutableSampleData());
 		}
 
         const auto ratio = newFs / (float) snd->getSampleRate();

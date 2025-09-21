@@ -57,7 +57,7 @@ TimeStretch::TimeStretch(std::vector<float> sampleData, float ratio, int sampleR
 	MLOG("actual new length: " + std::to_string(processedData.size()));
 }
 
-std::vector<float> TimeStretch::getProcessedData()
+std::vector<float>& TimeStretch::getProcessedData()
 {
     return processedData;
 }

@@ -466,7 +466,7 @@ void EditSoundScreen::function(int j)
 
 			newSample->setSampleRate(sound->getSampleRate());
 			newSample->setName(newName);
-			auto newSampleData = newSample->getSampleData();
+			auto newSampleData = newSample->getMutableSampleData();
 			newSampleData->resize(sound->getSampleData()->size());
 
 			for (int i = 0; i < newSampleData->size(); i++)
@@ -508,7 +508,7 @@ void EditSoundScreen::function(int j)
 			if (!destination->isMono())
 				newSoundSampleCount *= 2;
 
-            std::vector<float> newData(newSoundSampleCount);
+            auto newData = std::make_shared<std::vector<float>>(newSoundSampleCount);
 			int sourceFrameCounter = 0;
 			int destinationFrameCounter = 0;
 
@@ -516,26 +516,26 @@ void EditSoundScreen::function(int j)
 			{
 				if (i < destinationStartFrame)
 				{
-					newData[i] = (*destinationData)[destinationFrameCounter];
+					(*newData)[i] = (*destinationData)[destinationFrameCounter];
 
 					if (!destination->isMono())
-						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
+						(*newData)[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
 
 					destinationFrameCounter++;
 				}
 				else if (i < destinationStartFrame + sourceFrameCount)
 				{
-					newData[i] = (*sourceData)[sourceFrameCounter];
+					(*newData)[i] = (*sourceData)[sourceFrameCounter];
 
 					if (!destination->isMono())
 					{
 						if (source->isMono())
 						{
-							newData[i + newSoundFrameCount] = newData[i];
+							(*newData)[i + newSoundFrameCount] = (*newData)[i];
 						}
 						else
 						{
-							newData[i + newSoundFrameCount] = (*sourceData)[sourceFrameCounter + sourceFrameCount];
+							(*newData)[i + newSoundFrameCount] = (*sourceData)[sourceFrameCounter + sourceFrameCount];
 						}
 
 					}
@@ -543,16 +543,16 @@ void EditSoundScreen::function(int j)
 				}
 				else
 				{
-					newData[i] = (*destinationData)[destinationFrameCounter];
+					(*newData)[i] = (*destinationData)[destinationFrameCounter];
 
 					if (!destination->isMono())
-						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
+						(*newData)[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
 
 					destinationFrameCounter++;
 				}
 			}
 
-			(*destination->getSampleData()) = newData;
+            destination->setSampleData(newData);
 			destination->setEnd(newSoundFrameCount);
 			destination->setStart(0);
 			destination->setMono(destination->isMono());
@@ -597,13 +597,17 @@ void EditSoundScreen::function(int j)
 				end = zoneScreen->getZoneEnd(zone);
 			}
 
+            auto newSampleData = *sound->getSampleData();
+
 			for (int i = start; i < end; i++)
 			{
-				(*sound->getSampleData())[i] = 0.0f;
+				newSampleData[i] = 0.0f;
 
 				if (!sound->isMono())
-					(*sound->getSampleData())[(i + sound->getFrameCount())] = 0.0f;
+					newSampleData[(i + sound->getFrameCount())] = 0.0f;
 			}
+
+            sound->setSampleData(std::make_shared<std::vector<float>>(newSampleData));
 
 			openScreen(returnToScreenName);
 			break;
@@ -661,10 +665,11 @@ void EditSoundScreen::function(int j)
 					newSampleDataLeft[i] = (*sampleData)[i];
 					newSampleDataRight[i] = (*sampleData)[i + sound->getFrameCount()];
 				}
+
 				newSampleData = mpc::sampler::Sampler::mergeToStereo(newSampleDataLeft, newSampleDataRight);
 			}
 
-			sound->getSampleData()->swap(newSampleData);
+			sound->setSampleData(std::make_shared<std::vector<float>>(newSampleData));
 			openScreen(returnToScreenName);
 			break;
 		}
@@ -683,16 +688,16 @@ void EditSoundScreen::function(int j)
                 }
 
 				auto ts = mpc::sampler::TimeStretch(*sound->getSampleData(), (float)(timeStretchRatio * 0.0001), sound->getSampleRate(), timeStretchAdjust);
-				auto procData = ts.getProcessedData();
-				newSample->getSampleData()->swap(procData);
+				auto &procData = ts.getProcessedData();
+				newSample->setSampleData(std::make_shared<std::vector<float>>(procData));
 				newSample->setMono(true);
 				newSample->setName(newName);
 			}
 			else
 			{
-    	        auto newSample = sampler->addSound(sound->getSampleRate(), returnToScreenName);
+    	        auto newSound = sampler->addSound(sound->getSampleRate(), returnToScreenName);
 
-                if (newSample == nullptr)
+                if (newSound == nullptr)
                 {
                     return;
                 }
@@ -703,14 +708,13 @@ void EditSoundScreen::function(int j)
 				sampleDataRight.erase(sampleDataRight.begin(), sampleDataRight.begin() + (sampleDataRight.size() * 0.5));
 
 				auto ts0 = mpc::sampler::TimeStretch(sampleDataLeft, (float)(timeStretchRatio / 10000.0), sound->getSampleRate(), timeStretchAdjust);
-				auto newSampleDataLeft = ts0.getProcessedData();
+				auto &newSampleDataLeft = ts0.getProcessedData();
 				auto ts1 = mpc::sampler::TimeStretch(sampleDataRight, (float)(timeStretchRatio / 10000.0), sound->getSampleRate(), timeStretchAdjust);
-				auto newSampleDataRight = ts1.getProcessedData();
+				auto &newSampleDataRight = ts1.getProcessedData();
 				auto newSampleData = mpc::sampler::Sampler::mergeToStereo(newSampleDataLeft, newSampleDataRight);
-				auto newSampleDataP = newSample->getSampleData();
-				newSampleDataP->swap(newSampleData);
-				newSample->setMono(false);
-				newSample->setName(newName);
+				newSound->setSampleData(std::make_shared<std::vector<float>>(newSampleData));
+				newSound->setMono(false);
+				newSound->setName(newName);
 			}
 		}
         else if (edit == 8)
@@ -730,16 +734,16 @@ void EditSoundScreen::function(int j)
             }
 
             float peak = 0.0f;
-            auto& sampleData = *sound->getSampleData();
+            auto sampleData = sound->getSampleData();
             
             for (int i = start; i < end; i++)
             {
-                float v = std::fabs(sampleData[i]);
+                float v = std::fabs((*sampleData)[i]);
                 peak = std::fmax(peak, v);
 
                 if (!sound->isMono())
                 {
-                    v = std::fabs(sampleData[(i + sound->getFrameCount())]);
+                    v = std::fabs((*sampleData)[(i + sound->getFrameCount())]);
                     peak = std::fmax(peak, v);
                 }
             }
@@ -748,15 +752,19 @@ void EditSoundScreen::function(int j)
             
             const float factor = 1.0f / peak;
 
+            auto newSampleData = *sampleData;
+
             for (int i = start; i < end; i++)
             {
-                sampleData[i] *= factor;
+                newSampleData[i] = newSampleData[i] * factor;
 
                 if (!sound->isMono())
                 {
-                    sampleData[(i + sound->getFrameCount())] *= factor;
+                    newSampleData[(i + sound->getFrameCount())] = newSampleData[i] * factor;
                 }
             }
+
+            sound->setSampleData(std::make_shared<std::vector<float>>(newSampleData));
             
             openScreen(returnToScreenName);
             break;

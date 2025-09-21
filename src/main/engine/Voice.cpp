@@ -79,7 +79,7 @@ Voice::~Voice()
 
 void Voice::init(
         int newVelocity,
-        std::shared_ptr<Sound> newMpcSound,
+        std::shared_ptr<Sound> sound,
         int newNote,
         NoteParameters *np,
         int newVarType,
@@ -104,7 +104,6 @@ void Voice::init(
     state->frameOffset = newFrameOffset;
     state->note = newNote;
     state->velocity = newVelocity;
-    state->mpcSound = newMpcSound;
     state->varType = newVarType;
     state->varValue = newVarValue;
 
@@ -118,7 +117,7 @@ void Voice::init(
     state->decayMode = 0;
     state->veloToLevel = 100;
 
-    state->tune = state->mpcSound->getTune();
+    state->tune = sound->getTune();
 
     if (np != nullptr)
     {
@@ -129,7 +128,7 @@ void Voice::init(
         state->veloToAttack = np->getVelocityToAttack();
         state->decayMode = np->getDecayMode();
         state->veloToLevel = np->getVeloToLevel();
-        state->voiceOverlapMode = state->mpcSound->isLoopEnabled() ? 2 : np->getVoiceOverlap();
+        state->voiceOverlapMode = sound->isLoopEnabled() ? 2 : np->getVoiceOverlap();
     }
 
     switch (state->varType) {
@@ -148,9 +147,15 @@ void Voice::init(
     const auto veloFactor = state->velocity / 127.f;
     const auto inverseVeloFactor = 1.f - veloFactor;
 
-    state->end = state->mpcSound->getEnd();
+    state->start = sound->getStart();
+    state->end = sound->getEnd();
+    state->loopTo = sound->getLoopTo();
+    state->lastFrameIndex = sound->getLastFrameIndex();
+    state->loopEnabled = sound->isLoopEnabled();
+    state->isMono = sound->isMono();
+    state->sampleData = sound->getSampleData();
 
-    state->position = state->mpcSound->getStart() + (inverseVeloFactor * (state->veloToStart / 100.0) * state->mpcSound->getLastFrameIndex());
+    state->position = sound->getStart() + (inverseVeloFactor * (state->veloToStart / 100.0) * sound->getLastFrameIndex());
     state->attackMs = (float) ((state->attackValue / 100.0) * C::MAX_ATTACK_LENGTH_MS);
     state->attackMs += (float) ((state->veloToAttack / 100.0) * C::MAX_ATTACK_LENGTH_MS * veloFactor);
     state->finalDecayValue = state->decayValue < 2 ? 2 : state->decayValue;
@@ -158,7 +163,7 @@ void Voice::init(
     staticEnv->reset();
     state->veloToLevelFactor = (float) (state->veloToLevel * 0.01);
     state->amplitude = (float) ((veloFactor * state->veloToLevelFactor) + 1.0f - state->veloToLevelFactor);
-    state->amplitude *= state->mpcSound->getSndLevel() * 0.01;
+    state->amplitude *= sound->getSndLevel() * 0.01;
 
     if (!basic)
     {
@@ -203,9 +208,9 @@ void Voice::initializeSamplerateDependents()
     state->increment = pow(2.0, ((double) (state->tune) / 120.0)) * (44100.0 / state->sampleRate);
 
     const auto veloFactor = 1.f - (state->velocity / 127.f);
-    const auto start = state->mpcSound->getStart() + (veloFactor * (state->veloToStart / 100.0) * state->mpcSound->getLastFrameIndex());
+    const auto start = state->start + (veloFactor * (state->veloToStart / 100.0) * state->lastFrameIndex);
 
-    const auto playableSampleLength = state->mpcSound->isLoopEnabled() ? INT_MAX : (int) ((state->end - start) / state->increment);
+    const auto playableSampleLength = state->loopEnabled ? INT_MAX : (int) ((state->end - start) / state->increment);
 
     auto attackLengthSamples = (int) (state->attackMs * state->sampleRate * 0.001);
     auto decayLengthSamples = (int) (state->decayMs * state->sampleRate * 0.001);
@@ -269,7 +274,7 @@ const std::vector<float>& Voice::getFrame()
 
     readFrame();
 
-    if (state->mpcSound->isMono())
+    if (state->isMono)
     {
         frame[0] *= state->envAmplitude * state->amplitude;
 
@@ -299,12 +304,12 @@ void Voice::readFrame()
 {
     VoiceState *state = getActiveState();
 
-    if (state->mpcSound->isLoopEnabled() && state->position > state->end - 1)
+    if (state->loopEnabled && state->position > state->end - 1)
     {
-        state->position = state->mpcSound->getLoopTo();
+        state->position = state->loopTo;
     }
 
-    if (((state->position >= (state->end - 1)) && !state->mpcSound->isLoopEnabled()) ||
+    if (((state->position >= (state->end - 1)) && !state->loopEnabled) ||
         (staticEnv != nullptr && staticEnv->isComplete()) ||
         (ampEnv != nullptr && ampEnv->isComplete()))
     {
@@ -316,17 +321,17 @@ void Voice::readFrame()
     const auto k = (int) (ceil(state->position));
     const auto j = k != 0 ? k - 1 : 0;
     const auto frac = state->position - (double) (j);
-    const auto &sampleData = *state->mpcSound->getSampleData();
+    const auto &sampleData = state->sampleData;
 
-    if (state->mpcSound->isMono())
+    if (state->isMono)
     {
-        frame[0] = (sampleData[j] * (1.0f - frac)) + (sampleData[k] * frac);
+        frame[0] = ((*sampleData)[j] * (1.0f - frac)) + ((*sampleData)[k] * frac);
     }
     else
     {
-        frame[0] = (sampleData[j] * (1.0f - frac)) + (sampleData[k] * frac);
-        const auto rOffset = sampleData.size() * 0.5;
-        frame[1] = (sampleData[j + rOffset] * (1.0f - frac)) + (sampleData[k + rOffset] * frac);
+        frame[0] = ((*sampleData)[j] * (1.0f - frac)) + ((*sampleData)[k] * frac);
+        const auto rOffset = sampleData->size() * 0.5;
+        frame[1] = ((*sampleData)[j + rOffset] * (1.0f - frac)) + ((*sampleData)[k + rOffset] * frac);
     }
 
     state->position += state->increment;
@@ -377,7 +382,6 @@ int Voice::processAudio(AudioBuffer *buffer, int nFrames)
     if (state->finished)
     {
         state->note = -1;
-        state->mpcSound = {};
     }
 
     return AUDIO_OK;

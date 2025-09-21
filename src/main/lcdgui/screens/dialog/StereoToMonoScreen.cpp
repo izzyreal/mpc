@@ -111,8 +111,8 @@ void StereoToMonoScreen::function(int i)
 		left->setMono(true);
 		right->setMono(true);
 		
-		auto leftData = left->getSampleData();
-		auto rightData = right->getSampleData();
+		auto leftData = left->getMutableSampleData();
+		auto rightData = right->getMutableSampleData();
 
 		for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
 		{

@@ -12,7 +12,7 @@ namespace mpc::lcdgui
 	{
 
 	private:
-		std::vector<float>* sampleData{ nullptr };
+        std::shared_ptr<const std::vector<float>> sampleData;
 		bool fine{ false };
 		bool mono{ true };
 		unsigned int view = 0;
@@ -29,7 +29,7 @@ namespace mpc::lcdgui
 		void initSamplesPerPixel();
 
 	public:
-		void setSampleData(std::vector<float>* newSampleData, bool newMono, unsigned int newView);
+		void setSampleData(std::shared_ptr<const std::vector<float>> newSampleData, bool newMono, unsigned int newView);
 		void setSelection(unsigned int start, unsigned int end);
 
 	public:

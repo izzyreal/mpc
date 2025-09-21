@@ -348,7 +348,7 @@ int WavFile::readFrames(std::vector<float>& sampleBuffer, unsigned long numFrame
     return numFramesToRead;
 }
 
-int WavFile::writeFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToWrite)
+int WavFile::writeFrames(const std::vector<float>& sampleBuffer, unsigned long numFramesToWrite)
 {
     int offset = 0;
     for (auto f = 0; f < numFramesToWrite; f++) {

@@ -100,7 +100,9 @@ public:
     NoteParameters* getLastNp(Program* program);
     int getUnusedSampleCount();
     void purge();
-    void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
+    void mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
+                       std::shared_ptr<const std::vector<float>> sourceRight,
+                       std::shared_ptr<std::vector<float>> dest);
     void setDrumBusProgramIndex(int busNumber, int programIndex);
     int getDrumBusProgramIndex(int busNumber);
     int getUsedProgram(int startIndex, bool up);
@@ -117,10 +119,10 @@ public:
     void setPlayX(int i);
     int getPlayX();
 
-    static std::vector<float> mergeToStereo(std::vector<float> fa0, std::vector<float> fa1);
-    static void process12Bit(std::vector<float>* data);
-    static void process8Bit(std::vector<float>* data);
-    static void resample(std::vector<float>& data, int sourceRate, std::shared_ptr<Sound> destSnd);
+    static std::vector<float> mergeToStereo(const std::vector<float> &fa0, const std::vector<float> &fa1);
+    static void process12Bit(std::vector<float> &data);
+    static void process8Bit(std::vector<float> &data);
+    static void resample(std::shared_ptr<const std::vector<float>> data, int sourceRate, std::shared_ptr<Sound> destSnd);
     static std::vector<float> resampleSingleChannel(std::vector<float>& input, int sourceRate, int destRate);
     std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 

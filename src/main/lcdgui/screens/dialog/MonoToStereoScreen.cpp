@@ -3,6 +3,8 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
+#include <memory>
+
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
@@ -118,18 +120,18 @@ void MonoToStereoScreen::function(int j)
 
 		auto left = sampler->getSound();
 
-		std::vector<float> newSampleDataRight;
+        auto newSampleDataRight = std::make_shared<std::vector<float>>();
 
 		if (right->getSampleRate() > left->getSampleRate())
 		{
-			newSampleDataRight = std::vector<float>(left->getSampleData()->size());
+			newSampleDataRight->resize(left->getSampleData()->size());
 
-			for (int i = 0; i < newSampleDataRight.size(); i++)
-				newSampleDataRight[i] = (*right->getSampleData())[i];
+			for (int i = 0; i < newSampleDataRight->size(); i++)
+				(*newSampleDataRight)[i] = (*right->getSampleData())[i];
 		}
 		else
 		{
-			newSampleDataRight = *right->getSampleData();
+			(*newSampleDataRight) = *right->getSampleData();
 		}
 
 		auto newSound = sampler->addSound(left->getSampleRate(), "mono-to-stereo");
@@ -140,7 +142,7 @@ void MonoToStereoScreen::function(int j)
         }
 
 		newSound->setName(newStName);
-		sampler->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
+		sampler->mergeToStereo(left->getSampleData(), newSampleDataRight, newSound->getMutableSampleData());
         newSound->setMono(false);
 		openScreen("sound");
 	}

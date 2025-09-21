@@ -74,17 +74,19 @@ int SndReader::getNumberOfBeats()
     return sndHeaderReader->getNumberOfBeats();
 }
 
-void SndReader::readData(std::vector<float>& dest)
+void SndReader::readData(std::shared_ptr<std::vector<float>> dest)
 {
 	int length = sndHeaderReader->getNumberOfFrames();
 
 	bool mono = sndHeaderReader->isMono();
 
 	if (!mono)
+    {
         length *= 2;
+    }
 
-	dest.clear();
-	dest.resize(length);
+	dest->clear();
+	dest->resize(length);
 
 	auto shorts = ByteUtil::bytesToShorts(std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
 	
@@ -99,7 +101,7 @@ void SndReader::readData(std::vector<float>& dest)
 		if (f > 1)
 			f = 1.0f;
 
-		dest[i] = f;
+		(*dest)[i] = f;
 	}
 }
 

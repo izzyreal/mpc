@@ -4,6 +4,8 @@
 
 #include <Observer.hpp>
 
+#include <memory>
+
 namespace mpc::sampler {
 	class Sound : public Observable
 	{
@@ -15,11 +17,20 @@ namespace mpc::sampler {
         int sampleRate = 44100;
         int sndLevel = 100, tune = 0;
         int start = 0, end = 0, loopTo = 0;
-        std::vector<float> sampleData;
+        std::shared_ptr<std::vector<float>> sampleData;
+
+        // Should only be called on newly created sounds that are unassigned
+        void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index, uint32_t nFrames);
 
 	public:
 		void setName(std::string s);
-		std::vector<float>* getSampleData();
+        std::shared_ptr<const std::vector<float>> getSampleData() const;
+
+        // Should only be called on newly created sounds that are unassigned
+        std::shared_ptr<std::vector<float>> getMutableSampleData() const;
+
+        // Swaps the existing sampleData with another one, without destroying the existing one
+        void setSampleData(std::shared_ptr<std::vector<float>>);
 		int getTune();
 		int getStart();
 		int getEnd();
@@ -42,14 +53,18 @@ namespace mpc::sampler {
 		void setLoopEnabled(bool loopEnabled);
 		void setLoopTo(int loopTo);
 		void setTune(int tune);
+
+        // Should only be called on newly created sounds that are unassigned
 		void insertFrame(std::vector<float> frame, unsigned int index);
+        // Should only be called on newly created sounds that are unassigned
         void insertFrames(std::vector<float>& frames, unsigned int index, uint32_t nFrames);
-        void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index, uint32_t nFrames);
+        // Should only be called on newly created sounds that are unassigned
         void appendFrames(std::vector<float>& frames, uint32_t nFrames);
+        // Should only be called on newly created sounds that are unassigned
         void appendFrames(std::vector<float>& left, std::vector<float>& right, uint32_t nFrames);
+        // Should only be called on newly created sounds that are unassigned
         void removeFramesFromEnd(int numFramesToRemove);
 
-	public:
 		Sound(int rate);
 
 	};

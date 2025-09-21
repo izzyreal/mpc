@@ -26,27 +26,27 @@ TEST_CASE("Write and read non-destructively", "[snd-persistence]")
     mpc::sampler::Sound snd1(44100);
     snd1.setMono(true);
 
-    auto& inputData = *snd1.getSampleData();
+    auto inputData = snd1.getMutableSampleData();
 
     for (int i = -32768; i < 32768; i++)
     {
-        inputData.emplace_back(short_to_float(static_cast<int16_t>(i)));
+        inputData->emplace_back(short_to_float(static_cast<int16_t>(i)));
     }
 
     SndWriter sndWriter(&snd1);
     auto& writtenData = sndWriter.getSndFileArray();
     SndReader reader(writtenData);
-    std::vector<float> outputData;
+    auto outputData = std::make_shared<std::vector<float>>();
     reader.readData(outputData);
 
-    REQUIRE(outputData.size() == snd1.getSampleData()->size());
+    REQUIRE(outputData->size() == snd1.getSampleData()->size());
 
     bool allTheSame = true;
 
-    for (int i = 0; i < outputData.size(); i++)
+    for (int i = 0; i < outputData->size(); i++)
     {
-        auto v1 = inputData[i];
-        auto v2 = outputData[i];
+        auto v1 = (*inputData)[i];
+        auto v2 = (*outputData)[i];
         auto diff = v1 - v2;
 
         if (diff != 0)
