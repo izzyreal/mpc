@@ -223,6 +223,11 @@ void MidiControlCommand::setValue(const int8_t valueToUse)
     value = valueToUse;
 }
 
+void MidiControlCommand::setMpcHardwareLabel(const std::string mpcHardwareLabelToUse)
+{
+    mpcHardwareLabel = mpcHardwareLabelToUse;
+}
+
 bool MidiControlCommand::isNote() const
 {
     return midiMessageType == NOTE;

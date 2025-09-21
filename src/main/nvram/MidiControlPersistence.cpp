@@ -24,6 +24,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
         {
             auto &preset = mpc.screens->get<VmpcMidiScreen>("vmpc-midi")->activePreset;
             mpc.getDisk()->readMidiControlPreset(lastStatePath, preset);
+            healPreset(mpc, preset);
         }
         catch (const std::exception& e)
         {
@@ -55,7 +56,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
     }
 }
 
-void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
+std::shared_ptr<MidiControlPreset> MidiControlPersistence::createDefaultPreset(mpc::Mpc &mpc)
 {
     std::vector<std::string> labels;
 
@@ -78,8 +79,7 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
         labels.emplace_back(b);
     }
 
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-    vmpcMidiScreen->activePreset->rows.clear();
+    auto result = std::make_shared<MidiControlPreset>();
 
     for (auto &label : labels)
     {
@@ -103,7 +103,20 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
             command.setValue(-1);
         }
 
-        vmpcMidiScreen->updateOrAddActivePresetCommand(command);
+        result->rows.emplace_back(command);
+    }
+
+    return result;
+}
+
+void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
+{
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    vmpcMidiScreen->activePreset->rows.clear();
+
+    for (auto &row : createDefaultPreset(mpc)->rows)
+    {
+        vmpcMidiScreen->updateOrAddActivePresetCommand(row);
     }
 }
 
@@ -179,6 +192,7 @@ void MidiControlPersistence::loadFileByNameIntoPreset(
         if (e.path().stem() == name)
         {
             mpc.getDisk()->readMidiControlPreset(e.path(), preset);
+            healPreset(mpc, preset);
             break;
         }
     }
@@ -200,6 +214,7 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
 
         auto preset = mpc.midiControlPresets.emplace_back(std::make_shared<MidiControlPreset>());
         mpc.getDisk()->readMidiControlPreset(e.path(), preset);
+        healPreset(mpc, preset);
     }
 }
 
@@ -210,4 +225,39 @@ bool MidiControlPersistence::doesPresetWithNameExist(mpc::Mpc& mpc, std::string 
     return std::any_of(fs::begin(path_it), fs::end(path_it), [name](const fs::directory_entry& e){
         return !fs::is_directory(e) && StrUtil::eqIgnoreCase(e.path().stem().string(), name);
     });
+}
+
+void MidiControlPersistence::healPreset(mpc::Mpc &mpc, std::shared_ptr<MidiControlPreset> preset)
+{
+    const auto defaultPreset = createDefaultPreset(mpc);
+    const auto &defaultRows = defaultPreset->rows;
+
+    for (auto &row : preset->rows)
+    {
+        const auto label = row.getMpcHardwareLabel();
+
+        if (label.length() > 0 && label.substr(1) == " (extra)")
+        {
+            row.setMpcHardwareLabel(label.substr(0, 1) + "_extra");
+        }
+    }
+
+    for (auto defaultRow : defaultRows)
+    {
+        bool defaultRowIsPresent = false;
+
+        for (auto &row : preset->rows)
+        {
+            if (row.getMpcHardwareLabel() == defaultRow.getMpcHardwareLabel())
+            {
+                defaultRowIsPresent = true;
+                break;
+            }
+        }
+
+        if (!defaultRowIsPresent)
+        {
+            preset->rows.emplace_back(defaultRow);
+        }
+    }
 }

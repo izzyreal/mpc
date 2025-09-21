@@ -66,5 +66,7 @@ namespace mpc::nvram {
             void setNumber(const int8_t number);
 
             void setValue(const int8_t value);
+
+            void setMpcHardwareLabel(const std::string mpcHardwareLabel);
     };
 }
