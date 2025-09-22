@@ -234,16 +234,35 @@ void MidiControlPersistence::healPreset(mpc::Mpc &mpc, std::shared_ptr<MidiContr
     const auto defaultPreset = createDefaultPreset(mpc);
     const auto &defaultRows = defaultPreset->rows;
 
-    for (auto &row : preset->rows)
+    for (auto it = preset->rows.begin(); it != preset->rows.end(); )
     {
-        const auto label = row.getMpcHardwareLabel();
+        const auto label = it->getMpcHardwareLabel();
 
-        if (label.length() > 0 && label.substr(1) == " (extra)")
+        if (!label.empty() && label.substr(1) == " (extra)")
         {
-            row.setMpcHardwareLabel(label.substr(0, 1) + "_extra");
+            it->setMpcHardwareLabel(label.substr(0, 1) + "_extra");
+        }
+
+        bool labelIsValid = false;
+        for (auto &defaultRow : defaultRows)
+        {
+            if (defaultRow.getMpcHardwareLabel() == it->getMpcHardwareLabel())
+            {
+                labelIsValid = true;
+                break;
+            }
+        }
+
+        if (!labelIsValid)
+        {
+            it = preset->rows.erase(it);
+        }
+        else
+        {
+            ++it;
         }
     }
-
+    
     for (auto defaultRow : defaultRows)
     {
         bool defaultRowIsPresent = false;
