@@ -437,7 +437,18 @@ void readMidiControlPresetV1(const std::vector<char> &data, const std::shared_pt
         {
             name.push_back(c);
         }
+        
+        static constexpr char extraTag[] = "(extra)";
+        constexpr size_t extraLen = sizeof(extraTag) - 1;
 
+        if (pointer + extraLen <= data.size() &&
+            std::equal(extraTag, extraTag + extraLen, data.begin() + pointer))
+        {
+            name.push_back(' ');
+            name.append(extraTag);
+            pointer += extraLen + 1;
+        }
+        
         const bool isNote = data[pointer++] == 1;
         const char channel = data[pointer++];
         const char number = data[pointer++];
