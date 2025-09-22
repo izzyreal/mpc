@@ -1,3 +1,19 @@
+## v0.9.0 RC16 (22-9-2025)
+* Fix random crashes when hitting pads. It seems iPadOS users were most affected by this bug, but it may well have affected users on other platforms.
+* Fix sound preview when hitting pads in the TRIM/LOOP/ZONE screens. VMPC2000XL used to play whatever sound is assigned to the pad you hit, but this behaviour is incongruent with the real MPC2000XL. It should play the selected sound, regardless of which pad you hit.
+* Allow MIDI control presets to specify a value for the CC mappings. See https://vmpcdocs.izmar.nl/0.9.0.0/vmpc_specific.html#midi-control.
+* Add a bundled MIDI control preset for Akai MPC Studio.
+* Add a demo beat called "TRAIN" because the author of VMPC2000XL made this a while ago while traveling by train.
+* Set correct 'Loop to' value after recording a new sound.
+* Set correct 'St', 'End' and 'Loop to' after resampling.
+* Fix saving and loading of LOOP information of a Song.
+* Fix an issue with the initial new name when changing the name of a sound.
+* Don't reset new sample rate in the Resample screen after changing the new name.
+* Fix an issue with the playback pitch of sounds after having changed the audio engine or host's sample rate.
+* Fix audio input/output device selection bug. Sometimes when changing the input device, the output device would also be changed, and vice versa.
+* [Windows] Statically linked CRT. This means that it's not necessary anymore to install a Visual C++ Redistributable to make VMPC2000XL work on older systems.
+* [Windows 32 bit] Fix VST3 and LV2 installation path. The installer used to place these files in "C:\Program Files (x86)\Common Files\", which is incorrect. They should be placed in "C:\Program Files\Common Files\".
+
 ## v0.9.0 RC12 (11-9-2025)
 * Fix crash in slider Assign screen when hitting a pad in bank B, C or D.
 * Fix 16 LEVELS handling of pads in bank B, C or D.
