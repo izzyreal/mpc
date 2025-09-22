@@ -114,7 +114,9 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
     vmpcMidiScreen->activePreset->rows.clear();
 
-    for (auto &row : createDefaultPreset(mpc)->rows)
+    const auto defaultPreset = createDefaultPreset(mpc);
+    
+    for (auto &row : defaultPreset->rows)
     {
         vmpcMidiScreen->updateOrAddActivePresetCommand(row);
     }
