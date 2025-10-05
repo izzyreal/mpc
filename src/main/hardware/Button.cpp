@@ -145,34 +145,34 @@ void Button::push()
 	else if (label == "bank-d") {
 		screen->bank(3);
 	}
-	else if (label == "0" || label == "0-extra") {
+	else if (label == "0" || label == "0_extra") {
 		screen->numpad(0);
 	}
-	else if (label == "1" || label == "1-extra") {
+	else if (label == "1" || label == "1_extra") {
 		screen->numpad(1);
 	}
-	else if (label == "2" || label == "2-extra") {
+	else if (label == "2" || label == "2_extra") {
 		screen->numpad(2);
 	}
-	else if (label == "3" || label == "3-extra") {
+	else if (label == "3" || label == "3_extra") {
 		screen->numpad(3);
 	}
-	else if (label == "4" || label == "4-extra") {
+	else if (label == "4" || label == "4_extra") {
 		screen->numpad(4);
 	}
-	else if (label == "5" || label == "5-extra") {
+	else if (label == "5" || label == "5_extra") {
 		screen->numpad(5);
 	}
-	else if (label == "6" || label == "6-extra") {
+	else if (label == "6" || label == "6_extra") {
 		screen->numpad(6);
 	}
-	else if (label == "7" || label == "7-extra") {
+	else if (label == "7" || label == "7_extra") {
 		screen->numpad(7);
 	}
-	else if (label == "8" || label == "8-extra") {
+	else if (label == "8" || label == "8_extra") {
 		screen->numpad(8);
 	}
-	else if (label == "9" || label == "9-extra") {
+	else if (label == "9" || label == "9_extra") {
 		screen->numpad(9);
 	}
 }
