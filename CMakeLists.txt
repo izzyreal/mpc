@@ -89,10 +89,24 @@ FetchContent_Declare(readerwriterqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/readerwriterqueue
 )
 
+FetchContent_Declare(json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+    GIT_SHALLOW    ON
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json
+)
+
+FetchContent_Declare(json-schema-validator
+    GIT_REPOSITORY https://github.com/pboettch/json-schema-validator.git
+    GIT_TAG        2.3.0
+    GIT_SHALLOW    ON
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json-schema-validator
+)
+
 FetchContent_Populate(concurrentqueue)
 FetchContent_Populate(readerwriterqueue)
 
-FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders)
+FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders json json-schema-validator)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -155,7 +169,7 @@ target_include_directories(mpc PUBLIC
     ${readerwriterqueue_SOURCE_DIR}
 )
 
-target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders)
+target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")
