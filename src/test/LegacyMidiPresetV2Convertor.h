@@ -1,20 +1,30 @@
+#pragma once
+
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 using json = nlohmann::json;
 
-// Parses legacy MIDI preset binary data into JSON
-static json parseLegacyMidiPresetV1(const std::string &data)
+// Parses legacy MIDI preset V2 binary data into JSON
+static json parseLegacyMidiPresetV2(const std::string &data)
 {
     json result;
 
-    if (data.size() < 17) {
-        throw std::runtime_error("Data too short for legacy V1 header");
+    if (data.size() < 18) {
+        throw std::runtime_error("Data too short for legacy V2 header");
     }
 
-    // autoLoad is first byte
-    unsigned char autoLoadByte = static_cast<unsigned char>(data[0]);
+    // First byte is version, must be 2
+    unsigned char versionByte = static_cast<unsigned char>(data[0]);
+    if (versionByte != 2) {
+        throw std::runtime_error("Not a legacy V2 preset");
+    }
+    result["midiControllerDeviceName"] = ""; // unknown in legacy format
+    result["version"] = 0; // default
+
+    // Next byte is autoLoad
+    unsigned char autoLoadByte = static_cast<unsigned char>(data[1]);
     std::string autoLoadStr;
     switch(autoLoadByte) {
         case 0: autoLoadStr = "No"; break;
@@ -24,25 +34,26 @@ static json parseLegacyMidiPresetV1(const std::string &data)
     }
     result["autoLoad"] = autoLoadStr;
 
-    // preset name is next 16 bytes
-    std::string name = data.substr(1, 16);
-    // trim trailing spaces
-    name.erase(name.find_last_not_of(' ') + 1);
+    // Preset name is next 16 bytes
+    std::string name = data.substr(2, 16);
+    name.erase(name.find_last_not_of(' ') + 1); // trim trailing spaces
     result["name"] = name;
 
-    result["midiControllerDeviceName"] = ""; // unknown in legacy format
-    result["version"] = 0; // default
+    printf("preset name: %s\n", name.c_str());
 
-    // parse bindings
+    result["midiControllerDeviceName"] = ""; // unknown in legacy format
+
+    // Parse bindings
     std::vector<json> bindings;
-    size_t pos = 17;
+    size_t pos = 18;
     while (pos < data.size()) {
-        // read space-terminated label name
+        // Read space-terminated label name
         size_t end = data.find(' ', pos);
         if (end == std::string::npos) {
-            throw std::runtime_error("Malformed binding: no space terminator");
+            throw std::runtime_error("Malformed binding: no space terminator at pos " + std::to_string(pos));
         }
         std::string label = data.substr(pos, end - pos);
+
         pos = end + 1;
 
         if (pos + 3 > data.size()) {
@@ -52,6 +63,7 @@ static json parseLegacyMidiPresetV1(const std::string &data)
         unsigned char typeByte = static_cast<unsigned char>(data[pos++]);
         unsigned char channelByte = static_cast<unsigned char>(data[pos++]);
         unsigned char numberByte = static_cast<unsigned char>(data[pos++]);
+        unsigned char ccValueByte = static_cast<unsigned char>(data[pos++]);
 
         json binding;
         binding["labelName"] = label;
@@ -60,21 +72,23 @@ static json parseLegacyMidiPresetV1(const std::string &data)
         int midiChannel = static_cast<signed char>(channelByte); // -1..15
         binding["midiChannelIndex"] = midiChannel;
 
+        int midiValue = static_cast<signed char>(ccValueByte); // -1..127
+        binding["midiValue"] = midiValue;
+
         int midiNumber = static_cast<signed char>(numberByte);
+
         if (midiNumber == -1) {
             binding["enabled"] = false;
-            binding["midiNumber"] = 0; // placeholder
-            binding["midiValue"] = 0; // placeholder
+            binding["midiNumber"] = 0;
         } else {
             binding["enabled"] = true;
             binding["midiNumber"] = midiNumber;
-            binding["midiValue"] = 0; // legacy format doesn't have CC value
         }
 
         bindings.push_back(binding);
     }
 
     result["bindings"] = bindings;
-
     return result;
 }
+
