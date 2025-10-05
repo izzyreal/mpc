@@ -1,5 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
-#include "LegacyMidiPresetV1Convertor.h"
+#include "LegacyMidiPresetV2Convertor.h"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -31,13 +31,13 @@ inline json_validator make_validator()
     return validator;
 }
 
-TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-midi-preset-v1-conversion]") 
+TEST_CASE("Legacy preset V2 conversion validates against new schema", "[legacy-midi-preset-v2-conversion]") 
 {
     // Load legacy binary preset
-    auto data = load_resource("test/LegacyMidiPresetV1/iRig_PADS.vmp");
+    auto data = load_resource("test/LegacyMidiPresetV2/iRig_PADS.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiPresetV1(data);
+    json convertedPreset = parseLegacyMidiPresetV2(data);
 
     // Create validator from schema
     auto validator = make_validator();
