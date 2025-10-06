@@ -1,5 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 #include "LegacyMidiPresetV1Convertor.h"
+#include "LegacyMidiPresetPatcher.h"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -38,6 +39,8 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-m
 
     // Convert to JSON using the parser
     json convertedPreset = parseLegacyMidiPresetV1(data);
+    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema
     auto validator = make_validator();
@@ -51,9 +54,18 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-m
         // Print full validation error details
         std::cerr << "Schema validation failed:\n" << e.what() << "\n";
 
-        std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
+        //std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
 
         // Fail the test explicitly
         FAIL("Converted preset did not pass schema validation.");
+    }
+
+    try {
+        checkIRigPadsPreset(convertedPreset);
+
+        SUCCEED("Converted preset matches iRig PADS spec.");
+    } catch (const std::exception &e) {
+        std::cerr << "Consistency check failed:\n" << e.what() << "\n";
+        FAIL("Converted preset did not pass consistency check.");
     }
 }

@@ -68,7 +68,8 @@ static json parseLegacyMidiPresetV1(const std::string &data)
         } else {
             binding["enabled"] = true;
             binding["midiNumber"] = midiNumber;
-            binding["midiValue"] = 0; // legacy format doesn't have CC value
+            // legacy format doesn't have CC value, behaviour was assumed to like "all", so we set it to -1
+            binding["midiValue"] = -1;
         }
 
         bindings.push_back(binding);
