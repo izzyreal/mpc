@@ -37,13 +37,30 @@ static json parseLegacyMidiPresetV1(const std::string &data)
     std::vector<json> bindings;
     size_t pos = 17;
     while (pos < data.size()) {
-        // read space-terminated label name
-        size_t end = data.find(' ', pos);
-        if (end == std::string::npos) {
-            throw std::runtime_error("Malformed binding: no space terminator");
+        
+        // Check for extra labels first
+        std::string label;
+        bool isExtraLabel = false;
+        if (pos + 10 <= data.size()) {
+            std::string potentialExtra = data.substr(pos, 9);
+            if (potentialExtra.size() == 9 && 
+                potentialExtra[0] >= '0' && potentialExtra[0] <= '9' &&
+                potentialExtra.substr(1, 8) == " (extra)") {
+                label = potentialExtra;
+                pos += 10;
+                isExtraLabel = true;
+            }
         }
-        std::string label = data.substr(pos, end - pos);
-        pos = end + 1;
+
+        // If not an extra label, use original space-terminated label logic
+        if (!isExtraLabel) {
+            size_t end = data.find(' ', pos);
+            if (end == std::string::npos) {
+                throw std::runtime_error("Malformed binding: no space terminator");
+            }
+            label = data.substr(pos, end - pos);
+            pos = end + 1;
+        }
 
         if (pos + 3 > data.size()) {
             throw std::runtime_error("Unexpected end of data in binding");
