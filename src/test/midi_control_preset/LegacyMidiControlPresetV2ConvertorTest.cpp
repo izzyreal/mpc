@@ -34,7 +34,7 @@ inline json_validator make_validator()
     return validator;
 }
 
-TEST_CASE("Legacy preset V2 conversion validates against new schema", "[legacy-midi-control-preset-v2-conversion]") 
+TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema", "[legacy-midi-control-preset-v2-conversion]") 
 {
     // Load legacy binary preset
     auto data = load_resource("test/LegacyMidiControlPresetV2/iRig_PADS.vmp");
@@ -71,4 +71,43 @@ TEST_CASE("Legacy preset V2 conversion validates against new schema", "[legacy-m
         std::cerr << "Consistency check failed:\n" << e.what() << "\n";
         FAIL("Converted preset did not pass consistency check.");
     }
+}
+
+TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema", "[mpk]") 
+{
+    // Load legacy binary preset
+    auto data = load_resource("test/LegacyMidiControlPresetV2/MPK25.vmp");
+
+    // Convert to JSON using the parser
+    json convertedPreset = mpc::controls::midi::legacy::parseLegacyMidiControlPresetV2(data);
+
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v3.json"));
+    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
+
+    // Create validator from schema
+    auto validator = make_validator();
+
+    // Validate and report detailed errors
+    try {
+        validator.validate(convertedPreset);
+        // If we reach here, validation succeeded
+        SUCCEED("Converted preset passed schema validation.");
+    } catch (const std::exception &e) {
+        // Print full validation error details
+        std::cerr << "Schema validation failed:\n" << e.what() << "\n";
+
+        std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
+
+        // Fail the test explicitly
+        FAIL("Converted preset did not pass schema validation.");
+    }
+/*
+    try {
+        checkIRigPadsPreset(convertedPreset);
+
+        SUCCEED("Converted preset matches iRig PADS spec.");
+    } catch (const std::exception &e) {
+        std::cerr << "Consistency check failed:\n" << e.what() << "\n";
+        FAIL("Converted preset did not pass consistency check.");
+    }*/
 }
