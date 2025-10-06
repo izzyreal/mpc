@@ -6,6 +6,7 @@
 
 using json = nlohmann::json;
 
+namespace mpc::controls::midi::legacy {
 // Parses legacy MIDI preset V2 binary data into JSON
 static json parseLegacyMidiControlPresetV2(const std::string &data)
 {
@@ -91,4 +92,4 @@ static json parseLegacyMidiControlPresetV2(const std::string &data)
     result["bindings"] = bindings;
     return result;
 }
-
+}

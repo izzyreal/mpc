@@ -82,7 +82,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     REQUIRE(t2 == "2");
     REQUIRE(t3 == " 38");
 
-    // Open VmpcMidiControlPresetsScreen
+    // Open VmpcMidiPresetsScreen
     controls->openWindow();
 
     controls = mpc.getScreen();
