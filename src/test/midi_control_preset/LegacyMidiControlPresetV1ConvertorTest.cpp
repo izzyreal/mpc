@@ -1,12 +1,14 @@
 #include "catch2/catch_test_macros.hpp"
-#include "LegacyMidiControlPresetV1Convertor.h"
-#include "LegacyMidiControlPresetPatcher.h"
+#include "controls/midi/legacy/LegacyMidiControlPresetV1Convertor.h"
+#include "controls/midi/legacy/LegacyMidiControlPresetPatcher.h"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
 #include <string>
 #include <iostream>
 #include <set>
+
+#include "iRigPadsUtil.h"
 
 CMRC_DECLARE(mpctest);
 
@@ -24,7 +26,7 @@ inline std::string load_resource(const std::string &path)
 // Helper to create a validator from the schema resource
 inline json_validator make_validator()
 {
-    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v3.json"));
 
     // Default constructor is fine if you don't need remote $ref resolution
     json_validator validator;
@@ -39,9 +41,9 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-m
     auto data = load_resource("test/LegacyMidiControlPresetV1/iRig_PADS.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiControlPresetV1(data);
-    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
-    patchLegacyPreset(convertedPreset, schemaJson);
+    json convertedPreset = mpc::controls::midi::legacy::parseLegacyMidiControlPresetV1(data);
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v3.json"));
+    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema
     auto validator = make_validator();
@@ -77,7 +79,7 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves
     auto data = load_resource("test/LegacyMidiControlPresetV1/erroneous_extra_first_run.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiControlPresetV1(data);
+    json convertedPreset = mpc::controls::midi::legacy::parseLegacyMidiControlPresetV1(data);
 
     // Expected extra labels
     std::set<std::string> expectedLabels = {
@@ -124,8 +126,8 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves
     SUCCEED("All ' (extra)' labels parsed correctly from erroneous_extra_first_run.vmp.");
 
     // Apply patching
-    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
-    patchLegacyPreset(convertedPreset, schemaJson);
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v3.json"));
+    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
 
     // Verify that values survived under new label names
     for (int i = 0; i < 10; ++i) {
@@ -156,8 +158,8 @@ TEST_CASE("Legacy preset V1 with erroneously parsed and persisted ' (extra)' lab
     auto data = load_resource("test/LegacyMidiControlPresetV1/erroneous_extra_second_run.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiControlPresetV1(data);
-    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
+    json convertedPreset = mpc::controls::midi::legacy::parseLegacyMidiControlPresetV1(data);
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v3.json"));
 
     // Store expected values for valid bindings
     std::vector<std::pair<std::string, json>> expectedBindings = {
@@ -226,7 +228,7 @@ TEST_CASE("Legacy preset V1 with erroneously parsed and persisted ' (extra)' lab
 
     // Apply patching
 
-    patchLegacyPreset(convertedPreset, schemaJson);
+    mpc::controls::midi::legacy::patchLegacyPreset(convertedPreset, schemaJson);
     // Verify valid bindings retain their values
     for (const auto& [label, expected] : expectedBindings) {
         bool found = false;
