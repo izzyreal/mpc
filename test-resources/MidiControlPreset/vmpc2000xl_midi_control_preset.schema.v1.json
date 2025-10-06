@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://izmar.nl/vmpc2000xl_midi_preset.schema.v1.json",
+  "$id": "https://izmar.nl/vmpc2000xl_midi_control_preset.schema.v1.json",
   "title": "MIDI Control Preset",
   "type": "object",
   "required": ["version", "name", "autoLoad", "bindings"],

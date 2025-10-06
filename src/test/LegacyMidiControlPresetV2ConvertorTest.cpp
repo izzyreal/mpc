@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
-#include "LegacyMidiPresetV2Convertor.h"
-#include "LegacyMidiPresetPatcher.h"
+#include "LegacyMidiControlPresetV2Convertor.h"
+#include "LegacyMidiControlPresetPatcher.h"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -23,7 +23,7 @@ inline std::string load_resource(const std::string &path)
 // Helper to create a validator from the schema resource
 inline json_validator make_validator()
 {
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
 
     // Default constructor is fine if you don't need remote $ref resolution
     json_validator validator;
@@ -32,15 +32,15 @@ inline json_validator make_validator()
     return validator;
 }
 
-TEST_CASE("Legacy preset V2 conversion validates against new schema", "[legacy-midi-preset-v2-conversion]") 
+TEST_CASE("Legacy preset V2 conversion validates against new schema", "[legacy-midi-control-preset-v2-conversion]") 
 {
     // Load legacy binary preset
-    auto data = load_resource("test/LegacyMidiPresetV2/iRig_PADS.vmp");
+    auto data = load_resource("test/LegacyMidiControlPresetV2/iRig_PADS.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiPresetV2(data);
+    json convertedPreset = parseLegacyMidiControlPresetV2(data);
 
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
     patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema

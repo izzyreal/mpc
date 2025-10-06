@@ -20,7 +20,7 @@ inline std::string load_resource(const std::string &path)
 // Helper to create a validator from the schema resource
 inline json_validator make_validator()
 {
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
 
     // Default constructor is fine if you don't need remote $ref resolution
     json_validator validator;
@@ -29,34 +29,34 @@ inline json_validator make_validator()
     return validator;
 }
 
-TEST_CASE("Test schema is parsable", "[midi-preset-schema]")
+TEST_CASE("Test schema is parsable", "[midi-control-preset-schema]")
 {
-    auto schemaStr = load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json");
+    auto schemaStr = load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json");
     REQUIRE_NOTHROW(json::parse(schemaStr));
 }
 
-TEST_CASE("Valid MIDI preset passes validation", "[midi-preset-schema]")
+TEST_CASE("Valid MIDI preset passes validation", "[midi-control-preset-schema]")
 {
     auto validator = make_validator();
-    auto presetStr = load_resource("test/MidiPresetJson/midi-preset-valid.json");
+    auto presetStr = load_resource("test/MidiControlPreset/midi-control-preset-valid.json");
     json presetJson = json::parse(presetStr);
 
     REQUIRE_NOTHROW(validator.validate(presetJson));
 }
 
-TEST_CASE("Invalid MIDI preset fails validation", "[midi-preset-schema]")
+TEST_CASE("Invalid MIDI preset fails validation", "[midi-control-preset-schema]")
 {
     auto validator = make_validator();
-    auto presetStr = load_resource("test/MidiPresetJson/midi-preset-invalid.json");
+    auto presetStr = load_resource("test/MidiControlPreset/midi-control-preset-invalid.json");
     json presetJson = json::parse(presetStr);
 
     REQUIRE_THROWS_AS(validator.validate(presetJson), std::exception);
 }
 
-TEST_CASE("Preset name length constraint", "[midi-preset-schema]")
+TEST_CASE("Preset name length constraint", "[midi-control-preset-schema]")
 {
     auto validator = make_validator();
-    json presetJson = json::parse(load_resource("test/MidiPresetJson/midi-preset-valid.json"));
+    json presetJson = json::parse(load_resource("test/MidiControlPreset/midi-control-preset-valid.json"));
 
     // Make the name too long
     presetJson["name"] = "ThisNameIsWayTooLong";
