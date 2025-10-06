@@ -71,7 +71,7 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-m
     }
 }
 
-TEST_CASE("Legacy preset V1 parses all extra labels correctly and preserves values after patching", "[legacy-midi-preset-v1-conversion]")
+TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves values after patching", "[legacy-midi-preset-v1-conversion]")
 {
     // Load legacy binary preset with extra labels
     auto data = load_resource("test/LegacyMidiPresetV1/erroneous_extra_first_run.vmp");
@@ -93,7 +93,6 @@ TEST_CASE("Legacy preset V1 parses all extra labels correctly and preserves valu
         if (binding.contains("labelName") && binding["labelName"].is_string()) {
             std::string label = binding["labelName"].get<std::string>();
             actualLabels.insert(label);
-            printf("Found label %s\n", label.c_str());
 
             // Set interesting values for extra labels
             if (label.find("(extra)") != std::string::npos) {
@@ -122,7 +121,7 @@ TEST_CASE("Legacy preset V1 parses all extra labels correctly and preserves valu
     }
     REQUIRE(extraLabelCount == 10);
 
-    SUCCEED("All extra labels parsed correctly from erroneous_extra_first_run.vmp.");
+    SUCCEED("All ' (extra)' labels parsed correctly from erroneous_extra_first_run.vmp.");
 
     // Apply patching
     json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
@@ -151,3 +150,100 @@ TEST_CASE("Legacy preset V1 parses all extra labels correctly and preserves valu
 
     SUCCEED("All extra label values preserved after patching.");
 }
+
+TEST_CASE("Legacy preset V1 with erroneously parsed and persisted ' (extra)' labels preserves valid binding values after patching", "[legacy-midi-preset-v1-conversion]")
+{
+    auto data = load_resource("test/LegacyMidiPresetV1/erroneous_extra_second_run.vmp");
+
+    // Convert to JSON using the parser
+    json convertedPreset = parseLegacyMidiPresetV1(data);
+    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+
+    // Store expected values for valid bindings
+    std::vector<std::pair<std::string, json>> expectedBindings = {
+        {"pad-1", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 35}}},
+        {"pad-2", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 36}}},
+        {"pad-3", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 37}}},
+        {"pad-4", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 38}}},
+        {"pad-5", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 39}}},
+        {"pad-6", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 40}}},
+        {"pad-7", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 41}}},
+        {"pad-8", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 42}}},
+        {"pad-9", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 43}}},
+        {"pad-10", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 44}}},
+        {"pad-11", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 45}}},
+        {"pad-12", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 46}}},
+        {"pad-13", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 47}}},
+        {"pad-14", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 48}}},
+        {"pad-15", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 49}}},
+        {"pad-16", {{"messageType", "Note"}, {"midiChannelIndex", -1}, {"midiNumber", 50}}},
+        {"datawheel", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"datawheel-up", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"datawheel-down", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"slider", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 7}}},
+        {"rec-gain", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"main-volume", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"left", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"right", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"up", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"down", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"rec", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"overdub", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"stop", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"play", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"play-start", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"main-screen", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"prev-step-event", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"next-step-event", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"go-to", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"prev-bar-start", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"next-bar-end", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"tap", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"next-seq", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"track-mute", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"open-window", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"full-level", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"sixteen-levels", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"f1", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"f2", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"f3", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"f4", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"f5", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"f6", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"shift", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"shift_#1", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"shift_#2", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"shift_#3", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"enter", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"undo-seq", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"erase", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"after", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"bank-a", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"bank-b", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"bank-c", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 0}, {"enabled", false}}},
+        {"bank-d", {{"messageType", "CC"}, {"midiChannelIndex", -1}, {"midiNumber", 97}, {"enabled", true}}},
+    };
+
+    // Apply patching
+
+    patchLegacyPreset(convertedPreset, schemaJson);
+    // Verify valid bindings retain their values
+    for (const auto& [label, expected] : expectedBindings) {
+        bool found = false;
+        for (const auto& binding : convertedPreset["bindings"]) {
+            if (binding["labelName"] == label) {
+                found = true;
+                REQUIRE(binding["messageType"] == expected["messageType"]);
+                REQUIRE(binding["midiChannelIndex"] == expected["midiChannelIndex"]);
+                REQUIRE(binding["midiNumber"] == expected["midiNumber"]);
+                if (expected.contains("enabled")) {
+                    REQUIRE(binding["enabled"] == expected["enabled"]);
+                }
+            }
+        }
+        REQUIRE(found); // Ensure the binding exists
+    }
+
+    SUCCEED("Valid bindings preserved values after patching.");
+}
+
