@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(cmake/MpcResourceBundling.cmake)
 
@@ -225,6 +226,15 @@ target_link_libraries(mpc-tests stdc++
 endif()
 
 _bundle_resources()
+
+if (PROJECT_IS_TOP_LEVEL)
+    # Create symlink to compile_commands.json for IDE to pick it up
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+            ${CMAKE_BINARY_DIR}/compile_commands.json
+            ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+    )
+endif()
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_IGNORE_FILES
