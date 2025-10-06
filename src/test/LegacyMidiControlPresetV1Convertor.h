@@ -5,7 +5,7 @@
 using json = nlohmann::json;
 
 // Parses legacy MIDI preset binary data into JSON
-static json parseLegacyMidiPresetV1(const std::string &data)
+static json parseLegacyMidiControlPresetV1(const std::string &data)
 {
     json result;
 

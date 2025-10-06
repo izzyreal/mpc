@@ -81,7 +81,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     REQUIRE(t2 == "2");
     REQUIRE(t3 == " 38");
 
-    // Open VmpcMidiPresetsScreen
+    // Open VmpcMidiControlPresetsScreen
     controls->openWindow();
 
     controls = mpc.getActiveControls();
@@ -106,7 +106,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     REQUIRE(preset->rows[0].isNote());
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
-    mpc.getLayeredScreen()->openScreen("vmpc-midi-presets");
+    mpc.getLayeredScreen()->openScreen("vmpc-midi-control-presets");
 
     controls = mpc.getActiveControls();
 

@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
-#include "LegacyMidiPresetV1Convertor.h"
-#include "LegacyMidiPresetPatcher.h"
+#include "LegacyMidiControlPresetV1Convertor.h"
+#include "LegacyMidiControlPresetPatcher.h"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -24,7 +24,7 @@ inline std::string load_resource(const std::string &path)
 // Helper to create a validator from the schema resource
 inline json_validator make_validator()
 {
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
 
     // Default constructor is fine if you don't need remote $ref resolution
     json_validator validator;
@@ -33,14 +33,14 @@ inline json_validator make_validator()
     return validator;
 }
 
-TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-midi-preset-v1-conversion]") 
+TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-midi-control-preset-v1-conversion]") 
 {
     // Load legacy binary preset
-    auto data = load_resource("test/LegacyMidiPresetV1/iRig_PADS.vmp");
+    auto data = load_resource("test/LegacyMidiControlPresetV1/iRig_PADS.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiPresetV1(data);
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json convertedPreset = parseLegacyMidiControlPresetV1(data);
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
     patchLegacyPreset(convertedPreset, schemaJson);
 
     // Create validator from schema
@@ -71,13 +71,13 @@ TEST_CASE("Legacy preset V1 conversion validates against new schema", "[legacy-m
     }
 }
 
-TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves values after patching", "[legacy-midi-preset-v1-conversion]")
+TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves values after patching", "[legacy-midi-control-preset-v1-conversion]")
 {
     // Load legacy binary preset with extra labels
-    auto data = load_resource("test/LegacyMidiPresetV1/erroneous_extra_first_run.vmp");
+    auto data = load_resource("test/LegacyMidiControlPresetV1/erroneous_extra_first_run.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiPresetV1(data);
+    json convertedPreset = parseLegacyMidiControlPresetV1(data);
 
     // Expected extra labels
     std::set<std::string> expectedLabels = {
@@ -124,7 +124,7 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves
     SUCCEED("All ' (extra)' labels parsed correctly from erroneous_extra_first_run.vmp.");
 
     // Apply patching
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
     patchLegacyPreset(convertedPreset, schemaJson);
 
     // Verify that values survived under new label names
@@ -151,13 +151,13 @@ TEST_CASE("Legacy preset V1 parses all ' (extra)' labels correctly and preserves
     SUCCEED("All extra label values preserved after patching.");
 }
 
-TEST_CASE("Legacy preset V1 with erroneously parsed and persisted ' (extra)' labels preserves valid binding values after patching", "[legacy-midi-preset-v1-conversion]")
+TEST_CASE("Legacy preset V1 with erroneously parsed and persisted ' (extra)' labels preserves valid binding values after patching", "[legacy-midi-control-preset-v1-conversion]")
 {
-    auto data = load_resource("test/LegacyMidiPresetV1/erroneous_extra_second_run.vmp");
+    auto data = load_resource("test/LegacyMidiControlPresetV1/erroneous_extra_second_run.vmp");
 
     // Convert to JSON using the parser
-    json convertedPreset = parseLegacyMidiPresetV1(data);
-    json schemaJson = json::parse(load_resource("test/MidiPresetJson/vmpc2000xl_midi_preset.schema.v1.json"));
+    json convertedPreset = parseLegacyMidiControlPresetV1(data);
+    json schemaJson = json::parse(load_resource("test/MidiControlPreset/vmpc2000xl_midi_control_preset.schema.v1.json"));
 
     // Store expected values for valid bindings
     std::vector<std::pair<std::string, json>> expectedBindings = {

@@ -61,7 +61,7 @@ vector<string> screenNames = {
 "vmpc-record-jam",
 "vmpc-file-in-use",
 "vmpc-midi",
-"vmpc-midi-presets",
+"vmpc-midi-control-presets",
 "vmpc-discard-mapping-changes",
 "vmpc-warning-settings-ignored",
 "vmpc-known-controller-detected",
