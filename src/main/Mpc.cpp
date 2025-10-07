@@ -31,6 +31,7 @@
 #include <lcdgui/Screens.hpp>
 
 #include "MpcResourceUtil.hpp"
+#include "inputsystem/Initializer.h"
 
 #include <string>
 
@@ -154,6 +155,8 @@ void Mpc::init()
   midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
 
 	MLOG("Mpc is ready");
+
+    mpc::inputsystem::Initializer::init(inputMapper, inputController);
 }
 
 std::shared_ptr<controls::Controls> Mpc::getControls()

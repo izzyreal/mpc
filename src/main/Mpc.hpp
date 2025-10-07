@@ -16,6 +16,9 @@
 #include <string>
 #include <memory>
 
+#include "inputlogic/InputMapper.h"
+#include "controller/InputController.h"
+
 namespace mpc::engine {
     class Drum;
     class PreviewSoundPlayer;
@@ -104,6 +107,9 @@ namespace mpc {
         void panic();
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
+
+        mpc::inputlogic::InputMapper inputMapper;
+        mpc::controller::InputController inputController;
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
