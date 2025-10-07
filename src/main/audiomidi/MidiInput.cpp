@@ -13,9 +13,9 @@
 #include <hardware/HwSlider.hpp>
 #include <hardware/Pot.hpp>
 
-
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include <lcdgui/screens/VmpcMidiScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
@@ -61,7 +61,7 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
-        midiFullControl->processMidiInputEvent(mpc, msg);
+        midiFullControl->processMidiInputEvent(mpc.getHardware(), mpc.screens->get<VmpcMidiScreen>("vmpc-midi"), msg);
         return;
     }
 

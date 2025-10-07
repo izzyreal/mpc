@@ -1,12 +1,11 @@
 #include "VmpcMidiControlMode.hpp"
 
-#include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
 #include "hardware/HwPad.hpp"
 #include "hardware/DataWheel.hpp"
 #include "hardware/HwSlider.hpp"
 #include "hardware/Pot.hpp"
-#include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "lcdgui/screens/IVmpcMidiScreen.h"
 #include "nvram/MidiControlPersistence.hpp"
 
 #include <engine/midi/ShortMessage.hpp>
@@ -14,8 +13,11 @@
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::midi;
+using namespace mpc::hardware;
 
-void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi::ShortMessage* msg)
+void VmpcMidiControlMode::processMidiInputEvent(std::shared_ptr<IHardware> hardware,
+                                                std::shared_ptr<IVmpcMidiScreen> vmpcMidiScreen,
+                                                mpc::engine::midi::ShortMessage* msg)
 {
     auto status = msg->getStatus();
     auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
@@ -23,9 +25,6 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
     auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
 
     auto isChannelPressure = msg->isChannelPressure();
-
-    const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-    const auto hardware = mpc.getHardware();
 
     if (isChannelPressure)
     {
@@ -59,7 +58,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
 
     auto dataWheel = hardware->getDataWheel();
 
-    for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
+    for (auto& labelCommand : vmpcMidiScreen->getActivePreset()->rows)
     {
         const auto channelIndex = labelCommand.getMidiChannelIndex();
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IHardware.h"
 #include <Observer.hpp>
 
 #include <vector>
@@ -25,7 +26,7 @@ namespace mpc::hardware
 
 class PadAndButtonKeyboard;
 
-class Hardware final : public Observable
+class Hardware final : public Observable, public IHardware
 {
 
 private:
@@ -48,16 +49,16 @@ public:
     std::shared_ptr<TopPanel> getTopPanel();
     std::vector<std::string>& getButtonLabels();
     std::shared_ptr<HwPad> getPad(int index);
-    std::vector<std::shared_ptr<HwPad>>& getPads();
+    std::vector<std::shared_ptr<HwPad>>& getPads() override;
     std::shared_ptr<Button> getButton(std::string label);
     std::shared_ptr<Led> getLed(std::string label);
     std::vector<std::shared_ptr<Led>> getLeds();
-    std::shared_ptr<DataWheel> getDataWheel();
-    std::shared_ptr<Pot> getRecPot();
-    std::shared_ptr<Pot> getVolPot();
-    std::shared_ptr<Slider> getSlider();
+    std::shared_ptr<DataWheel> getDataWheel() override;
+    std::shared_ptr<Pot> getRecPot() override;
+    std::shared_ptr<Pot> getVolPot() override;
+    std::shared_ptr<Slider> getSlider() override;
 
-    std::shared_ptr<HwComponent> getComponentByLabel(const std::string& label);
+    std::shared_ptr<HwComponent> getComponentByLabel(const std::string& label) override;
 
     Hardware(mpc::Mpc& mpc);
 

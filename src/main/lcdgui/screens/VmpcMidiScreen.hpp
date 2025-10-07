@@ -1,5 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include "IVmpcMidiScreen.h"
 #include "nvram/MidiControlPersistence.hpp"
 
 #include <atomic>
@@ -10,7 +11,7 @@ namespace mpc::lcdgui::screens::window { class VmpcKnownControllerDetectedScreen
 namespace mpc::lcdgui::screens {
 
     class VmpcMidiScreen
-            : public mpc::lcdgui::ScreenComponent
+            : public mpc::lcdgui::ScreenComponent, public IVmpcMidiScreen
     {
     public:
         VmpcMidiScreen(mpc::Mpc&, int layerIndex);
@@ -25,10 +26,10 @@ namespace mpc::lcdgui::screens {
         void mainScreen() override;
         void turnWheel(int i) override;
 
-        bool isLearning();
-        void setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value);
+        bool isLearning() override;
+        void setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value) override;
         void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand& c);
-        std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
+        std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset() override;
 
     private:
         int row = 0;
@@ -51,7 +52,6 @@ namespace mpc::lcdgui::screens {
         void displayUpAndDown();
 
         friend class mpc::nvram::MidiControlPersistence;
-        friend class mpc::audiomidi::VmpcMidiControlMode;
         friend class mpc::audiomidi::MidiDeviceDetector;
         friend class mpc::audiomidi::AudioMidiServices;
         friend class mpc::lcdgui::screens::window::VmpcKnownControllerDetectedScreen;
