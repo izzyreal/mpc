@@ -2,9 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "TestMpc.hpp"
 #include "audiomidi/VmpcMidiControlMode.hpp"
-#include "Mpc.hpp"
 #include "engine/midi/ShortMessage.hpp"
 #include "hardware/DataWheel.hpp"
 #include "hardware/HwPad.hpp"
@@ -21,87 +19,63 @@ using namespace mpc::hardware;
 // ----------------------------------------------------
 // Mock helpers
 // ----------------------------------------------------
-struct MockPad : public HwPad {
-    MockPad(mpc::Mpc &mpc, int index) : HwPad(mpc, index) {}
+struct MockPad {
     bool pressed = false;
     int lastPressure = -1;
     bool pressedFlag = false;
     bool releasedFlag = false;
 
-    bool isPressed() override { return pressed; }
-    void setPressure(uint8_t value) override { lastPressure = value; }
-    void push(int) override { pressedFlag = true; }
-    void push() override { pressedFlag = true; }
-    void release() override { releasedFlag = true; }
+    bool isPressed() { return pressed; }
+    void setPressure(uint8_t value) { lastPressure = value; }
+    void push(uint8_t = 0) { pressedFlag = true; }
+    void release() { releasedFlag = true; }
 };
 
-struct MockDataWheel : public DataWheel {
-    MockDataWheel(mpc::Mpc &mpc) : DataWheel(mpc) {}
+struct MockDataWheel {
     int totalTurn = 0;
-    void turn(int increment, bool updateUi = false) override { totalTurn += increment; }
+    void turn(int increment, bool = false) { totalTurn += increment; }
 };
 
-struct MockSlider : public Slider {
-    MockSlider(mpc::Mpc &mpc) : Slider(mpc) {}
+struct MockSlider {
     int value = -1;
-    void setValue(int v) override { value = v; }
+    void setValue(int v) { value = v; }
 };
 
-struct MockPot : public Pot {
-    MockPot(mpc::Mpc &mpc, std::string label) : Pot(mpc, label) {}
+struct MockPot {
+    std::string label;
     int value = -1;
-    void setValue(int v) override { value = v; }
+    explicit MockPot(std::string labelToUse) : label(std::move(labelToUse)) {}
+    void setValue(int v) { value = v; }
 };
 
 struct MockHardware : public IHardware {
-    // Is not really going to be used, it's just to satisfy some base class constructors
-    mpc::Mpc mpc;
-
     std::vector<std::shared_ptr<MockPad>> pads;
-    std::vector<std::shared_ptr<HwPad>> hwPads;
-    std::vector<std::shared_ptr<HwComponent>> buttons;
     std::shared_ptr<MockDataWheel> dataWheel;
     std::shared_ptr<MockSlider> slider;
     std::shared_ptr<MockPot> recPot;
     std::shared_ptr<MockPot> volPot;
 
     MockHardware() {
-        mpc::TestMpc::initializeTestMpc(mpc);
         for (int i = 0; i < 16; i++)
-        {
-            pads.push_back(std::make_shared<MockPad>(mpc, i));
-            hwPads.push_back(pads.back());
-        }
+            pads.push_back(std::make_shared<MockPad>());
 
-        dataWheel = std::make_shared<MockDataWheel>(mpc);
-        slider = std::make_shared<MockSlider>(mpc);
-        recPot = std::make_shared<MockPot>(mpc, "rec");
-        volPot = std::make_shared<MockPot>(mpc, "vol");
+        dataWheel = std::make_shared<MockDataWheel>();
+        slider = std::make_shared<MockSlider>();
+        recPot = std::make_shared<MockPot>("rec");
+        volPot = std::make_shared<MockPot>("vol");
     }
 
-    std::vector<std::shared_ptr<HwPad>>& getPads() override
-    {
-        return hwPads;
+    std::vector<std::shared_ptr<HwPad>>& getPads() override {
+        static std::vector<std::shared_ptr<HwPad>> dummy;
+        dummy.clear();
+        return dummy;
     }
 
-    std::shared_ptr<DataWheel> getDataWheel() override { return dataWheel; }
-    std::shared_ptr<Slider> getSlider() override { return slider; }
-    std::shared_ptr<Pot> getRecPot() override { return recPot; }
-    std::shared_ptr<Pot> getVolPot() override { return volPot; }
-
-    // Only HwPad and Button are HwComponents
-    std::shared_ptr<HwComponent> getComponentByLabel(const std::string& label) override
-    {
-        for (auto &b : buttons)
-        {
-            if (b->getLabel() == label) return b;
-        }
-        for (auto &p : pads)
-        {
-            if (p->getLabel() == label) return p;
-        }
-        return {};
-    }
+    std::shared_ptr<DataWheel> getDataWheel() override { return {}; }
+    std::shared_ptr<Slider> getSlider() override { return {}; }
+    std::shared_ptr<Pot> getRecPot() override { return {}; }
+    std::shared_ptr<Pot> getVolPot() override { return {}; }
+    std::shared_ptr<HwComponent> getComponentByLabel(const std::string&) override { return {}; }
 };
 
 // ----------------------------------------------------
