@@ -16,7 +16,7 @@ namespace mpc::hardware {
 
 	public:
 		std::string getLabel();
-		void setValue(int i);
+		virtual void setValue(int i);
 		int getValue();
 
 	public:

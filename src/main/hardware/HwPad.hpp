@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <cstdint>
 
 #include <hardware/HwComponent.hpp>
 #include <Observer.hpp>
@@ -14,9 +15,7 @@ namespace mpc::controls {
 }
 
 namespace mpc::hardware {
-    class HwPad
-            : public HwComponent
-                    , public Observable
+    class HwPad : public HwComponent, public Observable
     {
 
     private:
@@ -31,8 +30,8 @@ namespace mpc::hardware {
         void setPadIndexWithBankWhenLastPressed(char padIndexWithBank);
         void push(int velo) override;
         void release() override;
-        bool isPressed();
-        void setPressure(unsigned char newPressure);
+        virtual bool isPressed();
+        virtual void setPressure(uint8_t newPressure);
         unsigned char getPressure();
 
     public:

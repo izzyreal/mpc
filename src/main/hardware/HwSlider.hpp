@@ -15,7 +15,7 @@ namespace mpc::hardware {
 
 	public:
 		Slider(mpc::Mpc& mpc);
-		void setValue(int i);
+		virtual void setValue(int i);
 		int getValue();
 
 	};
