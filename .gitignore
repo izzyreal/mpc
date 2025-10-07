@@ -1,5 +1,6 @@
 .cache/
 compile_commands.json
 build/
+build-xcode/
 editables/
 deps/
