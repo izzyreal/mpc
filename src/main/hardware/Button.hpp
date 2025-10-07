@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Observer.hpp>
-
 #include <hardware/HwComponent.hpp>
 
 #include <string>
@@ -19,7 +17,6 @@ namespace mpc::hardware {
 
 class Button
 : public mpc::hardware::HwComponent
-, public Observable
 {
     
 private:

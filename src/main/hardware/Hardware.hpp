@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Observer.hpp>
-
 #include <vector>
 #include <memory>
 #include <string>
@@ -25,7 +23,7 @@ namespace mpc::hardware
 
 class PadAndButtonKeyboard;
 
-class Hardware final : public Observable
+class Hardware final
 {
 
 private:
