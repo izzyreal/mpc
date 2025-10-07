@@ -6,7 +6,6 @@ namespace mpc { class Mpc; }
 namespace mpc::hardware {
 
 	class Slider
-		: public Observable
 	{
 
 	private:

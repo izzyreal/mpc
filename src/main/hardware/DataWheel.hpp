@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Observer.hpp>
-
 #include <functional>
 
 namespace mpc { class Mpc; }
@@ -9,7 +7,6 @@ namespace mpc { class Mpc; }
 namespace mpc::hardware
 {
 	class DataWheel
-		: public Observable
 	{
 
 	private:

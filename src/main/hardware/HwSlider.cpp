@@ -23,8 +23,6 @@ void Slider::setValue(int i)
     {
         activeControls->setSlider(value);
     }
-
-	notifyObservers(value);
 }
 
 int Slider::getValue() {
