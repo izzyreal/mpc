@@ -19,6 +19,7 @@
 #include <map>
 
 #include "engine/Drum.hpp"
+#include "sequencer/Track.hpp"
 
 namespace mpc::lcdgui
 {
@@ -42,7 +43,7 @@ namespace mpc::lcdgui
 		std::string param;
 		std::shared_ptr<mpc::sampler::Program> program;
 		std::shared_ptr<mpc::sequencer::Track> track;
-		mpc::engine::Drum& activeDrum() { return *mpc.getControls()->getBaseControls()->activeDrum; }
+		mpc::engine::Drum& activeDrum();
 
 	protected:
 		std::shared_ptr<Field> findFocus();
@@ -74,8 +75,9 @@ namespace mpc::lcdgui
 
 			controls->init();
 			param = controls->param;
-			program = controls->program;
-			track = controls->track;
+
+            program = sampler->getProgram(activeDrum().getProgram());
+			track = mpc.getSequencer()->getActiveTrack();
 		}
 
 	public:
@@ -115,7 +117,7 @@ namespace mpc::lcdgui
 
 		int getSoundIncrement(int notch) { return mpc.getControls()->getBaseControls()->getSoundIncrement(notch); }
 
-		virtual void pad(int padIndexWithBank, int velo) { mpc.getControls()->getBaseControls()->pad(padIndexWithBank, velo); }
+		virtual void pad(int padIndexWithBank, int velo);
 
 	};
 }

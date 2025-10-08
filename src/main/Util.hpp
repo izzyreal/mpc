@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "mpc_types.hpp"
+#include "sampler/PgmSlider.hpp"
 
 namespace mpc { class Mpc; }
 
@@ -19,6 +20,28 @@ namespace mpc
 	{
 
 	public:
+        struct SixteenLevelsContext {
+            const bool isSixteenLevelsEnabled;
+            const int type; // From Assign16LevelsScreen::getType()
+            const int originalKeyPad; // From Assign16LevelsScreen::getOriginalKeyPad()
+            const int note; // From Assign16LevelsScreen::getNote()
+            const int parameter; // From Assign16LevelsScreen::getParameter()
+            const int padIndexWithoutBank;
+        };
+        struct SliderNoteVariationContext {
+            const int sliderValue; // From Hardware::getSlider()->getValue()
+            const int programNote; // From Program::getSlider()->getNote()
+            const int sliderParameter; // From Program::getSlider()->getParameter()
+            const int tuneLowRange; // From Program::getSlider()->getTuneLowRange()
+            const int tuneHighRange; // From Program::getSlider()->getTuneHighRange()
+            const int decayLowRange; // From Program::getSlider()->getDecayLowRange()
+            const int decayHighRange; // From Program::getSlider()->getDecayHighRange()
+            const int attackLowRange; // From Program::getSlider()->getAttackLowRange()
+            const int attackHighRange; // From Program::getSlider()->getAttackHighRange()
+            const int filterLowRange; // From Program::getSlider()->getFilterLowRange()
+            const int filterHighRange; // From Program::getSlider()->getFilterHighRange()
+            mpc::sampler::PgmSlider *slider; 
+        };
         static std::string getFileName(const std::string& s);
 		static std::vector<std::string> splitName(const std::string& s);
 		static std::string distributeTimeSig(const std::string& s);
@@ -31,8 +54,8 @@ namespace mpc
 		static int getTextWidthInPixels(const std::string& text);
 		static void initSequence(mpc::Mpc& mpc);
 		static void initSequence(int sequenceIndex, mpc::Mpc& mpc);
-		static void set16LevelsValues(mpc::Mpc&, const std::shared_ptr<mpc::sequencer::NoteOnEvent>&, const int padIndex);
-		static void setSliderNoteVariationParameters(mpc::Mpc&, const std::weak_ptr<mpc::sequencer::NoteOnEvent>&, const std::weak_ptr<mpc::sampler::Program>&);
+		static void set16LevelsValues(const SixteenLevelsContext&, const std::shared_ptr<mpc::sequencer::NoteOnEvent>);
+		static void setSliderNoteVariationParameters(const SliderNoteVariationContext&, const std::shared_ptr<mpc::sequencer::NoteOnEvent>);
 
         static std::vector<char> vecCopyOfRange(const std::vector<char>& src, int offset, int length);
         static bool vecEquals(const std::vector<char>& a, const std::vector<char>& b);

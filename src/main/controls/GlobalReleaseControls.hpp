@@ -1,9 +1,7 @@
 #pragma once
 
-#include <memory>
-#include "sequencer/NoteEvent.hpp"
-
 #include "BaseControls.hpp"
+#include "PadReleaseContext.h"
 
 namespace mpc::controls {
     class GlobalReleaseControls
@@ -11,11 +9,7 @@ namespace mpc::controls {
     {
 
     public:
-        void simplePad(const int padIndexWithBank);
-
-    private:
-        void handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent);
-        void handlePadHitInTrimLoopZoneParamsScreens();
+        static void simplePad(PadReleaseContext&);
 
     public:
         void overDub() override;

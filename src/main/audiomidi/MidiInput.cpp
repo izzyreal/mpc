@@ -1,10 +1,13 @@
 #include "MidiInput.hpp"
+#include "controls/PadPressScreenUpdateContext.h"
+#include "lcdgui/screens/DrumScreen.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MidiOutput.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
+#include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 #include <hardware/Button.hpp>
 #include <hardware/DataWheel.hpp>
@@ -12,7 +15,7 @@
 #include <hardware/HwPad.hpp>
 #include <hardware/HwSlider.hpp>
 #include <hardware/Pot.hpp>
-
+#include <hardware/TopPanel.hpp>
 
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
@@ -313,7 +316,27 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     }
     else
     {
-        mpc.getControls()->getBaseControls()->various(playMidiNoteOn->getNote());
+        const bool allowCentralNoteAndPadUpdate = std::find(
+                mpc::controls::BaseControls::allowCentralNoteAndPadUpdateScreens.begin(),
+                mpc::controls::BaseControls::allowCentralNoteAndPadUpdateScreens.end(),
+                mpc.getLayeredScreen()->getCurrentScreenName()) != mpc::controls::BaseControls::allowCentralNoteAndPadUpdateScreens.end();
+
+        std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
+        std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
+
+        controls::PadPressScreenUpdateContext padPressScreenUpdateContext {
+            mpc.getLayeredScreen()->getCurrentScreenName(),
+            mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled(),
+            mpc::sequencer::isDrumNote(playMidiNoteOn->getNote()),
+            allowCentralNoteAndPadUpdate,
+            mpc.getActiveControls(),
+            setMpcNote,
+            setMpcPad,
+            mpc.getLayeredScreen()->getFocus(),
+            mpc.getBank()
+        };
+
+        controls::BaseControls::padPressScreenUpdate(padPressScreenUpdateContext, playMidiNoteOn->getNote());
         mpc.getEventHandler()->handleNoThru(playMidiNoteOn, track.get(), timeStamp);
         storePlayNoteEvent(std::pair<int, int>(trackNumber, playMidiNoteOn->getNote()), playMidiNoteOn);
         
@@ -343,11 +366,11 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
                     sequencer->move(Sequencer::ticksToQuarterNotes(recordMidiNoteOn->getTick()));
             }
         }
+
         if (recordMidiNoteOn)
         {
             storeRecordNoteEvent(std::pair<int, int>(trackNumber, recordMidiNoteOn->getNote()), recordMidiNoteOn);
         }
-        
     }
 }
 
@@ -369,16 +392,79 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
         : sequencer->getActiveSequence();
     auto track = s->getTrack(trackNumber);
 
-    int pad = -1;
+    int padIndexWithBank = -1;
 
     if (track->getBus() > 0)
     {
-        pad = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()))->getPadIndexFromNote(msg->getData1());
+        padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()))->getPadIndexFromNote(msg->getData1());
     }
 
-    if (pad != -1)
+    if (padIndexWithBank != -1)
     {
-        mpc.getReleaseControls()->simplePad(pad);
+        const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+        std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
+
+        const bool currentScreenIsSoundScreen = std::find(
+                mpc::controls::BaseControls::soundScreens.begin(),
+                mpc::controls::BaseControls::soundScreens.end(),
+                currentScreenName) != mpc::controls::BaseControls::soundScreens.end();
+        
+        const bool currentScreenIsSamplerScreen = std::find(
+                mpc::controls::BaseControls::samplerScreens.begin(),
+                mpc::controls::BaseControls::samplerScreens.end(),
+                currentScreenName) != mpc::controls::BaseControls::samplerScreens.end();
+
+        std::function<void(int)> controlsUnpressPad = [controls = mpc.getControls()] (int p) { controls->unpressPad(p); };
+
+        const auto playNoteEvent = mpc.getControls()->retrievePlayNoteEvent(padIndexWithBank);
+
+        const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
+
+        auto eventHandler = mpc.getEventHandler();
+
+        const auto recordNoteOnEvent = mpc.getControls()->retrieveRecordNoteEvent(padIndexWithBank);
+
+        std::function<bool()> arePadsPressed = [controls = mpc.getControls()] { return controls->arePadsPressed(); };
+
+        const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
+        const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+
+        std::function<int()> getActiveSequenceLastTick = [sequencer = sequencer] { return sequencer->getActiveSequence()->getLastTick(); };
+
+        std::function<void(double)> sequencerMoveToQuarterNotePosition = [sequencer = sequencer](double quarterNotePosition) { sequencer->move(quarterNotePosition); };
+
+        std::function<void()> sequencerStopMetronomeTrack = [sequencer = sequencer] { sequencer->stopMetronomeTrack(); };
+
+        controls::PadReleaseContext ctx {
+            padIndexWithBank,
+            finishBasicVoiceIfSoundIsLooping,
+            currentScreenIsSoundScreen,
+            currentScreenIsSamplerScreen,
+            controlsUnpressPad,
+            playNoteEvent,
+            drumScreenSelectedDrum,
+            eventHandler,
+            recordNoteOnEvent,
+            sequencer->isRecordingOrOverdubbing(),
+            mpc.getControls()->isErasePressed(),
+            sequencer->getActiveTrack(),
+            mpc.getControls()->isStepRecording(),
+            arePadsPressed,
+            mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
+            mpc.getControls()->isRecMainWithoutPlaying(),
+            sequencer->getTickPosition(),
+            stepEditOptionsScreen->getTcValuePercentage(),
+            timingCorrectScreen->getNoteValueLengthInTicks(),
+            stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
+            stepEditOptionsScreen->isAutoStepIncrementEnabled(),
+            sequencer->getCurrentBarIndex(),
+            timingCorrectScreen->getSwing(),
+            getActiveSequenceLastTick,
+            sequencerMoveToQuarterNotePosition,
+            sequencerStopMetronomeTrack
+        };
+
+        controls::GlobalReleaseControls::simplePad(ctx);
         return;
     }
     else if (auto storedRecordMidiNoteOn = retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))

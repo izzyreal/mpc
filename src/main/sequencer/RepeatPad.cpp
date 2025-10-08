@@ -6,6 +6,7 @@
 #include "audiomidi/MidiOutput.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwPad.hpp"
+#include "hardware/HwSlider.hpp"
 #include "hardware/TopPanel.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -59,13 +60,38 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
         if (program)
         {
-            mpc::Util::setSliderNoteVariationParameters(mpc, noteEvent, program);
+            auto hardwareSlider = mpc.getHardware()->getSlider();
+            auto programSlider = program->getSlider();
+
+            Util::SliderNoteVariationContext sliderNoteVariationContext {
+                hardwareSlider->getValue(),
+                programSlider->getNote(),
+                programSlider->getParameter(),
+                programSlider->getTuneLowRange(),
+                programSlider->getTuneHighRange(),
+                programSlider->getDecayLowRange(),
+                programSlider->getDecayHighRange(),
+                programSlider->getAttackLowRange(),
+                programSlider->getAttackHighRange(),
+                programSlider->getFilterLowRange(),
+                programSlider->getFilterHighRange()
+            };
+            mpc::Util::setSliderNoteVariationParameters(sliderNoteVariationContext, noteEvent);
         }
 
         if (sixteenLevels)
         {
+            Util::SixteenLevelsContext sixteenLevelsContext {
+                sixteenLevels,
+                assign16LevelsScreen->getType(),
+                assign16LevelsScreen->getOriginalKeyPad(),
+                assign16LevelsScreen->getNote(),
+                assign16LevelsScreen->getParameter(),
+                p->getIndex()
+            };
+
             noteEvent->setVelocity(127);
-            mpc::Util::set16LevelsValues(mpc, noteEvent, p->getIndex());
+            mpc::Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
             note = noteEvent->getNote();
         }
         else

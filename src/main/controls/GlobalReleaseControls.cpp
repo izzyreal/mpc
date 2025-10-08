@@ -93,75 +93,61 @@ void GlobalReleaseControls::function(const int i)
 	}
 }
 
-void GlobalReleaseControls::simplePad(const int padIndexWithBank)
+void GlobalReleaseControls::simplePad(PadReleaseContext &ctx)
 {
-	init();
-
     // In case we've started playing a sound in one of the `soundScreens`, and
     // this sound is looping, we stop playing it.
     // We do it outside the body of the below if-statement, because the user may
     // have left the screen by the time they release the pad.
-    mpc.getBasicPlayer().finishVoiceIfSoundIsLooping();
+    ctx.finishBasicVoiceIfSoundIsLooping();
 
-    if (collectionContainsCurrentScreen(soundScreens))
+    if (ctx.currentScreenIsSoundScreen)
     {
         // We're certain we don't need further processing in this case, so we
         // return.
         return;
     }
 
-	const auto controls = mpc.getControls();
+    ctx.controlsUnpressPad(ctx.padIndexWithBank);
 
-	controls->unpressPad(padIndexWithBank);
-
-	const auto playOnEvent = controls->retrievePlayNoteEvent(padIndexWithBank);
-	
-    if (!playOnEvent)
+    if (!ctx.playNoteEvent)
     {
         return;
     }
 
-	handlePlayNoteOff(playOnEvent);
-	
-    const auto recordOnEvent = controls->retrieveRecordNoteEvent(padIndexWithBank);
+	const auto noteOff = ctx.playNoteEvent->getNoteOff();
 
-	if (!recordOnEvent)
+	noteOff->setTick(-1);
+
+    const auto drum = ctx.currentScreenIsSamplerScreen ?
+                      std::optional<uint8_t>(ctx.drumScreenSelectedDrum) : std::optional<uint8_t>();
+
+	ctx.eventHandler->handle(noteOff, ctx.activeTrack.get(), drum);
+
+	if (!ctx.recordOnEvent)
     {
         return;
     }
 
-	if (sequencer.lock()->isRecordingOrOverdubbing() && controls->isErasePressed())
+	if (ctx.sequencerIsRecordingOrOverdubbing && ctx.isErasePressed)
 	{
 		return;
 	}
 
-	if (sequencer.lock()->isRecordingOrOverdubbing())
+	if (ctx.sequencerIsRecordingOrOverdubbing)
 	{
-		track->finalizeNoteEventASync(recordOnEvent);
+		ctx.activeTrack->finalizeNoteEventASync(ctx.recordOnEvent);
 	}
 
-	const bool recWithoutPlaying = controls->isRecMainWithoutPlaying();
-	const bool stepRec = controls->isStepRecording();
-
-	if (controls->isStepRecording()|| controls->isRecMainWithoutPlaying())
+	if (ctx.isStepRecording || ctx.isRecMainWithoutPlaying)
 	{
-        const auto metronomeOnlyTickPos = mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition();
-		auto newDuration = metronomeOnlyTickPos - recordOnEvent->getTick();
+		auto newDuration = ctx.metronomeOnlyTickPosition - ctx.recordOnEvent->getTick();
 
-        recordOnEvent->setTick(mpc.getSequencer()->getTickPosition());
+        ctx.recordOnEvent->setTick(ctx.sequencerTickPosition);
 
-        const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
-        const bool increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
-        const bool durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
-        const int tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
-
-        const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-
-        const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
-
-        if (stepRec && durationIsTcValue)
+        if (ctx.isStepRecording && ctx.isDurationOfRecordedNotesTcValue)
         {
-            newDuration = static_cast<int>(stepLength * (tcValuePercentage * 0.01));
+            newDuration = static_cast<int>(ctx.noteValueLengthInTicks * (ctx.tcValuePercentage * 0.01));
 
             if (newDuration < 1)
             {
@@ -169,48 +155,33 @@ void GlobalReleaseControls::simplePad(const int padIndexWithBank)
             }
         }
 		
-		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(recordOnEvent, newDuration);
+		const bool durationHasBeenAdjusted = ctx.activeTrack->finalizeNoteEventSynced(ctx.recordOnEvent, newDuration);
 
-		if ((durationHasBeenAdjusted && recWithoutPlaying) || (stepRec && increment))
+		if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying) || (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))
 		{
-            if (!controls->arePadsPressed())
+            if (!ctx.arePadsPressed())
             {
-                int nextPos = sequencer.lock()->getTickPosition() + stepLength;
-                auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
-                nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
-                auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
+                int nextPos = ctx.sequencerTickPosition + ctx.noteValueLengthInTicks;
+                auto bar = ctx.currentBarIndex + 1;
+                nextPos = ctx.activeTrack->timingCorrectTick(0, bar, nextPos, ctx.noteValueLengthInTicks, ctx.swing);
+                auto lastTick = ctx.sequencerGetActiveSequenceLastTick();
 
                 if (nextPos != 0 && nextPos < lastTick)
                 {
-                    sequencer.lock()->move(Sequencer::ticksToQuarterNotes(nextPos));
+                    ctx.sequencerMoveToQuarterNotePosition(Sequencer::ticksToQuarterNotes(nextPos));
                 }
                 else
                 {
-                    sequencer.lock()->move(Sequencer::ticksToQuarterNotes(lastTick));
+                    ctx.sequencerMoveToQuarterNotePosition(Sequencer::ticksToQuarterNotes(lastTick));
                 }
             }
 		}
 	}
 
-    if (!controls->arePadsPressed())
+    if (!ctx.arePadsPressed())
     {
-        sequencer.lock()->stopMetronomeTrack();
+        ctx.sequencerStopMetronomeTrack();
     }
-}
-
-void GlobalReleaseControls::handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent)
-{
-	init();
-	const auto noteOff = onEvent->getNoteOff();
-
-	noteOff->setTick(-1);
-
-	const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-
-    const auto drum = collectionContainsCurrentScreen(samplerScreens) ?
-                      std::optional<uint8_t>(drumScreen->getDrum()) : std::optional<uint8_t>();
-
-	mpc.getEventHandler()->handle(noteOff, track.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()
@@ -260,9 +231,5 @@ void GlobalReleaseControls::erase()
 	controls->setErasePressed(false);
     const auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
     sequencerScreen->releaseErase();
-}
-
-void GlobalReleaseControls::handlePadHitInTrimLoopZoneParamsScreens()
-{
 }
 

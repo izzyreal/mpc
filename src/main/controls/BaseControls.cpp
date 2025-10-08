@@ -42,8 +42,7 @@ BaseControls::BaseControls(mpc::Mpc& _mpc) :
     mpc (_mpc),
     ls (_mpc.getLayeredScreen()),
     sampler (_mpc.getSampler()),
-    sequencer (_mpc.getSequencer()),
-    activeDrum(&_mpc.getDrum(0))
+    sequencer (_mpc.getSequencer())
 {
 }
 
@@ -62,22 +61,6 @@ void BaseControls::init()
     else
     {
         splittable = false;
-    }
-    
-    track = sequencer.lock()->getActiveTrack();
-    
-    const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-    
-    const auto drumIndex = isSampler ? drumScreen->getDrum() : track->getBus() - 1;
-    
-    if (drumIndex != -1)
-    {
-        activeDrum = &mpc.getDrum(drumIndex);
-        program = sampler->getProgram(activeDrum->getProgram());
-    }
-    else
-    {
-        program.reset();
     }
 }
 
@@ -190,22 +173,22 @@ void BaseControls::function(int i)
     }
 }
 
-void BaseControls::various(const int note, const std::optional<int> padIndexWithBank)
+void BaseControls::padPressScreenUpdate(PadPressScreenUpdateContext&ctx, const int note, const std::optional<int> padIndexWithBank)
 {
-    if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+    if (ctx.isSixteenLevelsEnabled)
     {
         return;
     }
 
-    const auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
+    const auto screenComponent = ctx.screenComponent;
 
-    if (isDrumNote(note) && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
+    if (isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
-        mpc.setNote(note);
+        ctx.setMpcNote(note);
 
         if (padIndexWithBank)
         {
-            mpc.setPad(*padIndexWithBank);
+            ctx.setMpcPad(*padIndexWithBank);
         }
     }
     else if (auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
@@ -224,14 +207,14 @@ void BaseControls::various(const int note, const std::optional<int> padIndexWith
         editMultipleScreen->setChangeNoteTo(note);
     }
     else if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
-             stepEditorScreen && param == "fromnote" && note > 34)
+             stepEditorScreen && ctx.currentFieldName == "fromnote" && note > 34)
     {
         stepEditorScreen->setFromNote(note);
     }
     else if (auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
              mixerScreen && padIndexWithBank)
     {
-        unsigned char bankStartPadIndex = mpc.getBank() * 16;
+        unsigned char bankStartPadIndex = ctx.bank * 16;
         unsigned char bankEndPadIndex = bankStartPadIndex + 16;
 
         if (*padIndexWithBank >= bankStartPadIndex && *padIndexWithBank < bankEndPadIndex)
@@ -246,113 +229,163 @@ void BaseControls::various(const int note, const std::optional<int> padIndexWith
     }
 }
 
-void BaseControls::pad(const int padIndexWithBank, int velo)
+void BaseControls::pad(PadPushContext &ctx, const int padIndexWithBank, int velo)
 {
-    init();
-
-    if (collectionContainsCurrentScreen(soundScreens))
+    if (ctx.isSoundScreen)
     {
-        handlePadHitInTrimLoopZoneParamsScreens();
+        ctx.basicPlayer.mpcNoteOn(ctx.soundIndex, 127, 0);
         return;
     }
     
-    auto controls = mpc.getControls();
+    const auto padWasNotPressed = !ctx.controls->isPadPressed(padIndexWithBank);
 
-    const auto padWasNotPressed = !controls->isPadPressed(padIndexWithBank);
+    ctx.controls->pressPad(padIndexWithBank);
 
-    controls->pressPad(padIndexWithBank);
-
-    if (currentScreenName == "sequencer" &&
-        (controls->isTapPressed() || controls->isNoteRepeatLocked()) &&
-        sequencer.lock()->isPlaying() &&
+    if (ctx.currentScreenName == "sequencer" &&
+        (ctx.controls->isTapPressed() || ctx.controls->isNoteRepeatLocked()) &&
+        ctx.sequencer->isPlaying() &&
         padWasNotPressed)
     {
         return;
     }
 
-    const auto hardware = mpc.getHardware();
-
-    if (hardware->getTopPanel()->isFullLevelEnabled())
+    if (ctx.isFullLevelEnabled)
     {
         velo = 127;
     }
 
-    if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
+    if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed)
     {
         return;
     }
     
-    if (controls->isNoteRepeatLocked())
+    if (ctx.isNoteRepeatLocked)
     {
         return;
     }
 
-    const auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
+    const auto note = ctx.track->getBus() > 0 ? ctx.program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
-    various(note, padIndexWithBank);
-   
-    generateNoteOn(note, velo, padIndexWithBank);
+    PadPressScreenUpdateContext padPressScreenUpdateContext {
+        ctx.currentScreenName,
+        ctx.isSixteenLevelsEnabled,
+        mpc::sequencer::isDrumNote(note),
+        ctx.allowCentralNoteAndPadUpdate,
+        ctx.screenComponent, ctx.setMpcNote,
+        ctx.setMpcPad,
+        ctx.currentFieldName,
+        ctx.bank
+    };
+
+    padPressScreenUpdate(padPressScreenUpdateContext, note, padIndexWithBank);
+
+    GenerateNoteOnContext generateNoteOnContext {
+        ctx.isSixteenLevelsEnabled,
+        ctx.isRecordingOrOverdubbing,
+        ctx.isStepRecording,
+        ctx.isRecMainWithoutPlaying,
+        ctx.soundIndex,
+        ctx.trackBus,
+        ctx.currentBarIndex,
+        ctx.tickPosition,
+        ctx.noteValueLengthInTicks,
+        ctx.swing,
+        ctx.metronomeOnlyTickPosition,
+        ctx.hardware->getSlider()->getValue(),
+        ctx.drumScreenSelectedDrum,
+        ctx.currentScreenIsSamplerScreen,
+        ctx.program,
+        ctx.track,
+        ctx.sequencer,
+        ctx.controls,
+        ctx.audioMidiServices,
+        ctx.timingCorrectScreen,
+        ctx.assign16LevelsScreen,
+        ctx.eventHandler,
+        ctx.frameSequencer };
+    generateNoteOn(generateNoteOnContext, note, velo, padIndexWithBank);
 }
 
-void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
+void BaseControls::generateNoteOn(const GenerateNoteOnContext& ctx, const int note, const int velo, const int padIndexWithBank)
 {
-    init();
+    const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
 
-    const bool is16LevelsEnabled = mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled();
+    const auto playOnEvent = std::make_shared<NoteOnEventPlayOnly>(note, velo);
 
-    const auto playOnEvent = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
+    const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
 
-    Util::set16LevelsValues(mpc, playOnEvent, padIndexWithBank % 16);
+    Util::SixteenLevelsContext sixteenLevelsContext {
+        is16LevelsEnabled,
+        assign16LevelsScreen->getType(),
+        assign16LevelsScreen->getOriginalKeyPad(),
+        assign16LevelsScreen->getNote(),
+        assign16LevelsScreen->getParameter(),
+        padIndexWithBank % 16
+    };
 
-    const bool isSliderNote = program && program->getSlider()->getNote() == note;
+    Util::set16LevelsValues(sixteenLevelsContext, playOnEvent);
 
-    if (program && isSliderNote)
+    const bool isSliderNote = ctx.program && ctx.program->getSlider()->getNote() == note;
+    auto programSlider = ctx.program->getSlider();
+
+    Util::SliderNoteVariationContext sliderNoteVariationContext {
+        ctx.hardwareSliderValue,
+        programSlider->getNote(),
+        programSlider->getParameter(),
+        programSlider->getTuneLowRange(),
+        programSlider->getTuneHighRange(),
+        programSlider->getDecayLowRange(),
+        programSlider->getDecayHighRange(),
+        programSlider->getAttackLowRange(),
+        programSlider->getAttackHighRange(),
+        programSlider->getFilterLowRange(),
+        programSlider->getFilterHighRange()
+    };
+
+    if (ctx.program && isSliderNote)
     {
-        Util::setSliderNoteVariationParameters(mpc, playOnEvent, program);
+        Util::setSliderNoteVariationParameters(sliderNoteVariationContext, playOnEvent);
     }
 
-    const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-    const auto drum = collectionContainsCurrentScreen(samplerScreens) ?
-            std::optional<uint8_t>(drumScreen->getDrum()) : std::optional<uint8_t>();
+    const auto drum = ctx.currentScreenIsSamplerScreen ? 
+            std::optional<uint8_t>(ctx.drumScreenSelectedDrum) : std::optional<uint8_t>();
 
-    mpc.getControls()->storePlayNoteEvent(padIndexWithBank, playOnEvent);
-    mpc.getEventHandler()->handle(playOnEvent, track.get(), drum);
-
-    const auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+    ctx.controls->storePlayNoteEvent(padIndexWithBank, playOnEvent);
+    ctx.eventHandler->handle(playOnEvent, ctx.track.get(), drum);
 
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
 
-    if (sequencer.lock()->isRecordingOrOverdubbing())
+    if (ctx.sequencer->isRecordingOrOverdubbing())
     {
-        recordNoteOnEvent = track->recordNoteEventASync(note, padVelo);
+        recordNoteOnEvent = ctx.track->recordNoteEventASync(note, velo);
     }
-    else if (mpc.getControls()->isStepRecording() && (track->getBus() == 0 || isDrumNote(note)))
+    else if (ctx.controls->isStepRecording() && (ctx.track->getBus() == 0 || isDrumNote(note)))
     {
-        recordNoteOnEvent = track->recordNoteEventSynced(mpc.getSequencer()->getTickPosition(), note, padVelo);
-        sequencer.lock()->playMetronomeTrack();
-        recordNoteOnEvent->setTick(frameSeq->getMetronomeOnlyTickPosition());
+        recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), note, velo);
+        ctx.sequencer->playMetronomeTrack();
+        recordNoteOnEvent->setTick(ctx.frameSequencer->getMetronomeOnlyTickPosition());
     }
-    else if (mpc.getControls()->isRecMainWithoutPlaying())
+    else if (ctx.controls->isRecMainWithoutPlaying())
     {
-        recordNoteOnEvent = track->recordNoteEventSynced(mpc.getSequencer()->getTickPosition(), note, padVelo);
-        sequencer.lock()->playMetronomeTrack();
-        recordNoteOnEvent->setTick(frameSeq->getMetronomeOnlyTickPosition());
+        recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), note, velo);
+        ctx.sequencer->playMetronomeTrack();
+        recordNoteOnEvent->setTick(ctx.frameSequencer->getMetronomeOnlyTickPosition());
 
-        const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        const auto timingCorrectScreen = ctx.timingCorrectScreen;
         const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
         if (stepLength != 1)
         {
-            const int bar = sequencer.lock()->getCurrentBarIndex() + 1;
-            const auto correctedTick = track->timingCorrectTick(0,
+            const int bar = ctx.sequencer->getCurrentBarIndex() + 1;
+            const auto correctedTick = ctx.track->timingCorrectTick(0,
                                                                 bar,
-                                                                mpc.getSequencer()->getTickPosition(),
+                                                                ctx.sequencer->getTickPosition(),
                                                                 stepLength,
                                                                 timingCorrectScreen->getSwing());
 
-            if (sequencer.lock()->getTickPosition() != correctedTick)
+            if (ctx.sequencer->getTickPosition() != correctedTick)
             {
-                sequencer.lock()->move(Sequencer::ticksToQuarterNotes(correctedTick));
+                ctx.sequencer->move(Sequencer::ticksToQuarterNotes(correctedTick));
             }
         }
     }
@@ -361,14 +394,15 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     {
         if (is16LevelsEnabled)
         {
-            Util::set16LevelsValues(mpc, recordNoteOnEvent, padIndexWithBank % 16);
+            Util::set16LevelsValues(sixteenLevelsContext, recordNoteOnEvent);
         }
 
-        if (program && isSliderNote)
+        if (ctx.program && isSliderNote)
         {
-            Util::setSliderNoteVariationParameters(mpc, recordNoteOnEvent, program);
+            Util::setSliderNoteVariationParameters(sliderNoteVariationContext, recordNoteOnEvent);
         }
-        mpc.getControls()->storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
+
+        ctx.controls->storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
     }
 }
 
