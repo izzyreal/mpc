@@ -1,12 +1,15 @@
 #pragma once
 
+#include "controls/PadPushContext.h"
+#include "controls/GenerateNoteOnContext.h"
+#include "controls/PadPressScreenUpdateContext.h"
+
 #include <lcdgui/LayeredScreen.hpp>
 
 #include <sequencer/Sequencer.hpp>
 
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
 #include <sampler/NoteParameters.hpp>
 
 #include <controls/Controls.hpp>
@@ -15,16 +18,8 @@
 #include <memory>
 #include <vector>
 
-namespace mpc::engine { class Drum; }
 namespace mpc { class Mpc; }
 namespace mpc::controls { class GlobalReleaseControls; }
-
-namespace mpc::sequencer
-{
-	class Track;
-}
-
-namespace mpc::sampler { class Program; }
 
 namespace mpc::lcdgui
 {
@@ -49,9 +44,6 @@ namespace mpc::controls {
 		void splitRight();
 
 		std::vector<std::string> typableParams;
-
-		std::shared_ptr<mpc::sampler::Program> program;
-		mpc::engine::Drum* activeDrum;
 
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::shared_ptr<mpc::lcdgui::Field> activeField;
@@ -89,10 +81,12 @@ namespace mpc::controls {
 
 		virtual bool isTypable();
 
-		void various(const int note, const std::optional<int> padIndexWithBank = std::nullopt);
-		void pad(const int padIndexWithBank, int velo);
+		static void padPressScreenUpdate(PadPressScreenUpdateContext&, const int note, const std::optional<int> padIndexWithBank = std::nullopt);
+		static void pad(PadPushContext&, const int padIndexWithBank, int velo);
 
 		std::string getCurrentScreenName() { return currentScreenName; }
+
+		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
 
 	protected:
 		std::string param;
@@ -101,12 +95,11 @@ namespace mpc::controls {
 
 	private:
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
-		std::shared_ptr<mpc::sequencer::Track> track;
 		std::string currentScreenName;
 		const static std::vector<std::string> screensThatAllowPlayAndRecord;
 		const static std::vector<std::string> screensThatOnlyAllowPlay;
-		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
-		void generateNoteOn(int note, int velo, int padIndexWithBank);
+
+		static void generateNoteOn(const GenerateNoteOnContext& ctx, const int note, const int velo, const int padIndexWithBank);
 
         void handlePadHitInTrimLoopZoneParamsScreens();
 
