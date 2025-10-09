@@ -1,5 +1,6 @@
 #include "MidiInput.hpp"
 #include "controls/PadPressScreenUpdateContext.h"
+#include "controller/PadContextFactory.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 
 #include <Mpc.hpp>
@@ -297,21 +298,22 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
         : sequencer->getActiveSequence();
     auto track = s->getTrack(trackNumber);
 
-    int pad = -1;
+    int padIndexWithBank = -1;
     auto bus = track->getBus();
 
     if (bus > 0)
     {
-        pad = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
+        padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
         if (track->getIndex() < 64 && mpc.getControls()->isTapPressed() && sequencer->isPlaying())
         {
             return;
         }
     }
 
-    if (pad != -1)
+    if (padIndexWithBank != -1)
     {
-        mpc.getActiveControls()->pad(pad, playMidiNoteOn->getVelocity());
+        auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), mpc.getLayeredScreen()->getCurrentScreenName());
+        mpc::controls::BaseControls::pad(ctx, padIndexWithBank, playMidiNoteOn->getVelocity());
         return;
     }
     else
@@ -402,68 +404,7 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     if (padIndexWithBank != -1)
     {
         const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
-
-        const bool currentScreenIsSoundScreen = std::find(
-                mpc::controls::BaseControls::soundScreens.begin(),
-                mpc::controls::BaseControls::soundScreens.end(),
-                currentScreenName) != mpc::controls::BaseControls::soundScreens.end();
-        
-        const bool currentScreenIsSamplerScreen = std::find(
-                mpc::controls::BaseControls::samplerScreens.begin(),
-                mpc::controls::BaseControls::samplerScreens.end(),
-                currentScreenName) != mpc::controls::BaseControls::samplerScreens.end();
-
-        std::function<void(int)> controlsUnpressPad = [controls = mpc.getControls()] (int p) { controls->unpressPad(p); };
-
-        const auto playNoteEvent = mpc.getControls()->retrievePlayNoteEvent(padIndexWithBank);
-
-        const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
-
-        auto eventHandler = mpc.getEventHandler();
-
-        const auto recordNoteOnEvent = mpc.getControls()->retrieveRecordNoteEvent(padIndexWithBank);
-
-        std::function<bool()> arePadsPressed = [controls = mpc.getControls()] { return controls->arePadsPressed(); };
-
-        const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
-        const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-
-        std::function<int()> getActiveSequenceLastTick = [sequencer = sequencer] { return sequencer->getActiveSequence()->getLastTick(); };
-
-        std::function<void(double)> sequencerMoveToQuarterNotePosition = [sequencer = sequencer](double quarterNotePosition) { sequencer->move(quarterNotePosition); };
-
-        std::function<void()> sequencerStopMetronomeTrack = [sequencer = sequencer] { sequencer->stopMetronomeTrack(); };
-
-        controls::PadReleaseContext ctx {
-            padIndexWithBank,
-            finishBasicVoiceIfSoundIsLooping,
-            currentScreenIsSoundScreen,
-            currentScreenIsSamplerScreen,
-            controlsUnpressPad,
-            playNoteEvent,
-            drumScreenSelectedDrum,
-            eventHandler,
-            recordNoteOnEvent,
-            sequencer->isRecordingOrOverdubbing(),
-            mpc.getControls()->isErasePressed(),
-            sequencer->getActiveTrack(),
-            mpc.getControls()->isStepRecording(),
-            arePadsPressed,
-            mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
-            mpc.getControls()->isRecMainWithoutPlaying(),
-            sequencer->getTickPosition(),
-            stepEditOptionsScreen->getTcValuePercentage(),
-            timingCorrectScreen->getNoteValueLengthInTicks(),
-            stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
-            stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-            sequencer->getCurrentBarIndex(),
-            timingCorrectScreen->getSwing(),
-            getActiveSequenceLastTick,
-            sequencerMoveToQuarterNotePosition,
-            sequencerStopMetronomeTrack
-        };
-
+        auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, currentScreenName);
         controls::GlobalReleaseControls::simplePad(ctx);
         return;
     }

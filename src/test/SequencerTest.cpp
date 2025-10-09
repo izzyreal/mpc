@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include "lcdgui/screens/DrumScreen.hpp"
-#include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "sequencer/Clock.hpp"
+
+#include "controller/PadContextFactory.h"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <controls/GlobalReleaseControls.hpp>
@@ -21,72 +21,6 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
-
-mpc::controls::PadReleaseContext constructPadReleaseContext(mpc::Mpc &mpc, int padIndexWithBank)
-{
-    const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-    std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
-
-    const bool currentScreenIsSoundScreen = std::find(
-            mpc::controls::BaseControls::soundScreens.begin(),
-            mpc::controls::BaseControls::soundScreens.end(),
-            currentScreenName) != mpc::controls::BaseControls::soundScreens.end();
-    
-    const bool currentScreenIsSamplerScreen = std::find(
-            mpc::controls::BaseControls::samplerScreens.begin(),
-            mpc::controls::BaseControls::samplerScreens.end(),
-            currentScreenName) != mpc::controls::BaseControls::samplerScreens.end();
-
-    std::function<void(int)> controlsUnpressPad = [controls = mpc.getControls()] (int p) { controls->unpressPad(p); };
-
-    const auto playNoteEvent = mpc.getControls()->retrievePlayNoteEvent(padIndexWithBank);
-
-    const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
-
-    auto eventHandler = mpc.getEventHandler();
-
-    const auto recordNoteOnEvent = mpc.getControls()->retrieveRecordNoteEvent(padIndexWithBank);
-
-    std::function<bool()> arePadsPressed = [controls = mpc.getControls()] { return controls->arePadsPressed(); };
-
-    const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
-    const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-
-    std::function<int()> getActiveSequenceLastTick = [sequencer = mpc.getSequencer()] { return sequencer->getActiveSequence()->getLastTick(); };
-
-    std::function<void(double)> sequencerMoveToQuarterNotePosition = [sequencer = mpc.getSequencer()](double quarterNotePosition) { sequencer->move(quarterNotePosition); };
-
-    std::function<void()> sequencerStopMetronomeTrack = [sequencer = mpc.getSequencer()] { sequencer->stopMetronomeTrack(); };
-
-    return {
-        padIndexWithBank,
-        finishBasicVoiceIfSoundIsLooping,
-        currentScreenIsSoundScreen,
-        currentScreenIsSamplerScreen,
-        controlsUnpressPad,
-        playNoteEvent,
-        drumScreenSelectedDrum,
-        eventHandler,
-        recordNoteOnEvent,
-        mpc.getSequencer()->isRecordingOrOverdubbing(),
-        mpc.getControls()->isErasePressed(),
-        mpc.getSequencer()->getActiveTrack(),
-        mpc.getControls()->isStepRecording(),
-        arePadsPressed,
-        mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
-        mpc.getControls()->isRecMainWithoutPlaying(),
-        mpc.getSequencer()->getTickPosition(),
-        stepEditOptionsScreen->getTcValuePercentage(),
-        timingCorrectScreen->getNoteValueLengthInTicks(),
-        stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
-        stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-        mpc.getSequencer()->getCurrentBarIndex(),
-        timingCorrectScreen->getSwing(),
-        getActiveSequenceLastTick,
-        sequencerMoveToQuarterNotePosition,
-        sequencerStopMetronomeTrack
-    };
-}
 
 TEST_CASE("Next step, previous step", "[sequencer]")
 {
@@ -205,7 +139,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
                     this_thread::sleep_for(chrono::milliseconds(2));
 
-                    auto ctx = constructPadReleaseContext(mpc, 0);
+                    auto ctx = mpc::controller::PadContextFactory::buildPadReleaseContext(mpc, 0, mpc.getLayeredScreen()->getCurrentScreenName());
                     mpc::controls::GlobalReleaseControls::simplePad(ctx);
                 }
             }

@@ -4,15 +4,13 @@
 
 #include <Mpc.hpp>
 #include "hardware/Hardware.hpp"
-#include "hardware/TopPanel.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
-#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
-#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
+
+#include "controller/PadContextFactory.h"
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -100,93 +98,7 @@ void ScreenComponent::openWindow()
 
 void ScreenComponent::pad(int padIndexWithBank, int velo)
 {
-    const auto currentScreenName = name;
-    const bool isSamplerScreen = std::find(BaseControls::samplerScreens.begin(),
-                                           BaseControls::samplerScreens.end(),
-                                           currentScreenName) != BaseControls::samplerScreens.end();
-
-    const bool isSoundScreen = std::find(BaseControls::soundScreens.begin(),
-                                         BaseControls::soundScreens.end(),
-                                         currentScreenName) != BaseControls::soundScreens.end();
-
-    const bool allowCentralNoteAndPadUpdate = std::find(BaseControls::allowCentralNoteAndPadUpdateScreens.begin(),
-                                                        BaseControls::allowCentralNoteAndPadUpdateScreens.end(),
-                                                        currentScreenName) != BaseControls::allowCentralNoteAndPadUpdateScreens.end();
-    
-    const bool isFullLevelEnabled = mpc.getHardware()->getTopPanel()->isFullLevelEnabled();
-    const bool isSixteenLevelsEnabled = mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled();
-    const bool isTapPressed = mpc.getControls()->isTapPressed();
-    const bool isNoteRepeatLocked = mpc.getControls()->isNoteRepeatLocked();
-    const bool isErasePressed = mpc.getControls()->isErasePressed();
-    const bool isStepRecording = mpc.getControls()->isStepRecording();
-    const bool isRecMainWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
-    auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct");
-    auto assign16LevelsScreen = mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>("assign-16-levels");
-
-    auto activeTrack = mpc.getSequencer()->getActiveTrack();
-
-    std::shared_ptr<mpc::sampler::Program> program;
-    mpc::engine::Drum *activeDrum = nullptr;
-
-    const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum");
-    
-    const auto drumIndex = isSamplerScreen ? drumScreen->getDrum() : track->getBus() - 1;
-
-    int programNote = -1;
-    
-    if (drumIndex != -1)
-    {
-        activeDrum = &mpc.getDrum(drumIndex);
-        program = sampler->getProgram(activeDrum->getProgram());
-        programNote = program->getPad(padIndexWithBank)->getNote();
-    }
-
-    std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
-    std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
-
-    PadPushContext ctx {
-        currentScreenName,
-            isSoundScreen,
-            isFullLevelEnabled,
-            isSixteenLevelsEnabled,
-            isTapPressed,
-            isNoteRepeatLocked,
-            isErasePressed,
-            isStepRecording,
-            isRecMainWithoutPlaying,
-            mpc.getBank(),
-            mpc.getSequencer()->isPlaying(),
-            mpc.getSequencer()->isRecordingOrOverdubbing(),
-            mpc.getSequencer()->getCurrentBarIndex(),
-            mpc.getSequencer()->getTickPosition(),
-            currentScreenName == "song",
-            mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
-            timingCorrectScreen->getNoteValueLengthInTicks(),
-            timingCorrectScreen->getSwing(),
-            activeTrack->getBus(),
-            program,
-            programNote,
-            sampler->getSoundIndex(),
-            drumScreen->getDrum(),
-            isSamplerScreen,
-            activeTrack,
-            sampler,
-            mpc.getSequencer(),
-            mpc.getHardware(),
-            mpc.getAudioMidiServices(),
-            mpc.getControls(),
-            mpc.getLayeredScreen(),
-            timingCorrectScreen,
-            assign16LevelsScreen,
-            mpc.getEventHandler(),
-            mpc.getAudioMidiServices()->getFrameSequencer(),
-            mpc.getBasicPlayer(),
-            allowCentralNoteAndPadUpdate,
-            mpc.getActiveControls(),
-            setMpcNote,
-            setMpcPad,
-            mpc.getLayeredScreen()->getFocus()}; 
-
+    auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, velo, name);
     mpc::controls::BaseControls::pad(ctx, padIndexWithBank, velo);
 }
 
