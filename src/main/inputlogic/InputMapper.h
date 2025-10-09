@@ -5,7 +5,7 @@
 #include <string>
 
 namespace mpc::inputlogic {
-    class InputAction;
+    struct InputAction;
     class InputMapper {
     public:
         using Callback = std::function<void(const InputAction&)>;

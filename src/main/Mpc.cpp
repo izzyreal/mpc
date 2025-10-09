@@ -33,6 +33,7 @@
 
 #include "MpcResourceUtil.hpp"
 #include "inputsystem/Initializer.h"
+#include "controller/InputController.h"
 
 #include <string>
 
@@ -158,6 +159,7 @@ void Mpc::init()
 
 	MLOG("Mpc is ready");
 
+    inputController = std::make_shared<mpc::controller::InputController>(*this);
     mpc::inputsystem::Initializer::init(inputMapper, inputController);
 }
 
@@ -169,6 +171,11 @@ std::shared_ptr<controls::Controls> Mpc::getControls()
 std::shared_ptr<hardware::Hardware> Mpc::getHardware()
 {
 	return hardware;
+}
+
+std::shared_ptr<hardware2::Hardware2> Mpc::getHardware2()
+{
+	return hardware2;
 }
 
 std::shared_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()

@@ -17,7 +17,6 @@
 #include <memory>
 
 #include "inputlogic/InputMapper.h"
-#include "controller/InputController.h"
 
 namespace mpc::engine {
     class Drum;
@@ -30,6 +29,10 @@ namespace mpc::hardware {
 
 namespace mpc::hardware2 {
     class Hardware2;
+}
+
+namespace mpc::controller {
+    class InputControllerBase;
 }
 
 namespace mpc::disk {
@@ -114,7 +117,7 @@ namespace mpc {
         bool isPluginModeEnabled();
 
         mpc::inputlogic::InputMapper inputMapper;
-        mpc::controller::InputController inputController;
+        std::shared_ptr<mpc::controller::InputControllerBase> inputController;
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
@@ -122,6 +125,7 @@ namespace mpc {
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
         std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
         std::shared_ptr<hardware::Hardware> getHardware();
+        std::shared_ptr<hardware2::Hardware2> getHardware2();
         mpc::disk::DiskController* getDiskController();
 
     public:

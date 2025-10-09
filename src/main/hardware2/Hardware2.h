@@ -10,6 +10,8 @@
 #include "hardware/TopPanel.hpp"
 #include "hardware/Led.hpp"
 
+#include "Mpc.hpp"
+
 namespace mpc::hardware2 {
 
 class Hardware2 final {
@@ -44,10 +46,10 @@ public:
         };
 
         for (const auto& label : buttonLabels)
-            buttons[label] = std::make_shared<Button>();
+            buttons[label] = std::make_shared<Button>(mpc.inputMapper, label);
 
         for (int i = 0; i < 16; ++i)
-            pads.push_back(std::make_shared<Pad>());
+            pads.push_back(std::make_shared<Pad>(i, mpc.inputMapper));
 
         const std::vector<std::string> ledLabels = {
             "full-level", "sixteen-levels", "next-seq", "track-mute",
@@ -58,10 +60,10 @@ public:
         for (const auto& l : ledLabels)
             leds.push_back(std::make_shared<mpc::hardware::Led>(l));
 
-        dataWheel = std::make_shared<DataWheel>();
-        recPot = std::make_shared<Pot>();
-        volPot = std::make_shared<Pot>();
-        slider = std::make_shared<Slider>();
+        dataWheel = std::make_shared<DataWheel>(mpc.inputMapper);
+        recPot = std::make_shared<Pot>(mpc.inputMapper);
+        volPot = std::make_shared<Pot>(mpc.inputMapper);
+        slider = std::make_shared<Slider>(mpc.inputMapper);
     }
 
     mpc::hardware::PadAndButtonKeyboard* getPadAndButtonKeyboard() { return padAndButtonKeyboard; }

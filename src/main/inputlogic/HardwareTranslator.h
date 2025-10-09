@@ -3,7 +3,7 @@
 #include <string>
 
 namespace mpc::inputlogic {
-    class InputAction;
+    struct InputAction;
     class HardwareTranslator {
         public:
             static InputAction fromDataWheelTurn(int steps);

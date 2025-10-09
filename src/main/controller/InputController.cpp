@@ -1,9 +1,16 @@
 #include "InputController.h"
 
 #include "inputlogic/InputAction.h"
+#include "controller/PadContextFactory.h"
+#include "controls/BaseControls.hpp"
+#include "Mpc.hpp"
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic; 
+
+InputController::InputController(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
+{
+}
 
 void InputController::handleAction(const InputAction& action)
 {
@@ -28,8 +35,12 @@ bool InputController::endsWith(const std::string& s, const std::string& suffix)
 
 void InputController::handlePadPress(const InputAction& a)
 {
+    assert(a.value.has_value());
     const auto num = std::stoi(a.id.substr(4, a.id.find("-press") - 4));
-    std::printf("[logic] pad %d pressed with velocity %d\n", num, a.value.value_or(100));
+    std::printf("[logic] pad %d pressed with velocity %d\n", num, *a.value);
+    auto padIndexWithBank = num + (mpc.getBank() * 16);
+    auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, *a.value, mpc.getLayeredScreen()->getCurrentScreenName());
+    mpc::controls::BaseControls::pad(ctx, padIndexWithBank, *a.value);
 }
 
 void InputController::handlePadAftertouch(const InputAction& a)
