@@ -25,6 +25,7 @@
 #include "engine/Drum.hpp"
 
 #include <hardware/Hardware.hpp>
+#include <hardware2/Hardware2.h>
 #include <hardware/HwSlider.hpp>
 #include <hardware/Led.hpp>
 
@@ -98,6 +99,7 @@ void Mpc::init()
     mpc::Logger::l.setPath(paths->logFilePath().string());
 
     hardware = std::make_shared<hardware::Hardware>(*this);
+    hardware2 = std::make_shared<hardware2::Hardware2>(*this);
 
 	diskController = std::make_unique<mpc::disk::DiskController>(*this);
 

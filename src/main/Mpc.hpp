@@ -28,6 +28,10 @@ namespace mpc::hardware {
     class Hardware;
 }
 
+namespace mpc::hardware2 {
+    class Hardware2;
+}
+
 namespace mpc::disk {
     class AbstractDisk;
 }
@@ -82,6 +86,7 @@ namespace mpc {
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
+        std::shared_ptr<hardware2::Hardware2> hardware2;
         std::shared_ptr<mpc::sequencer::Clock> clock;
         int bank = 0;
         int pad = 0;

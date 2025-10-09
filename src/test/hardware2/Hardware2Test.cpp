@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <stdexcept>
-#include "hardware2/Hardware.h"
+#include "hardware2/HardwareComponent.h"
 
 using namespace mpc::hardware2;
 
