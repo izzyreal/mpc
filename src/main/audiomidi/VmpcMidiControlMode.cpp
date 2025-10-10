@@ -2,13 +2,11 @@
 
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
-#include "hardware/Hardware.hpp"
-#include "hardware/HwComponent.hpp"
-#include "hardware/Pot.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 
 #include <engine/midi/ShortMessage.hpp>
+#include <memory>
 
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
@@ -25,7 +23,6 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
 
     const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
     const auto hardware2 = mpc.getHardware2();
-    const auto hardware = mpc.getHardware();
 
     if (isChannelPressure)
     {
@@ -114,7 +111,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             }
         }
 
-        const auto hwComponent = hardware->getComponentByLabel(label);
+        const auto hwComponent = hardware2->getComponentByLabel(label);
 
         if (label == "datawheel")
         {
@@ -152,21 +149,31 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         else if (label == "rec-gain")
         {
             auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-            hardware->getRecPot()->setValue(normalized);
+            hardware2->getRecPot()->setValue(normalized);
         }
         else if (label == "main-volume")
         {
             auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-            hardware->getVolPot()->setValue(normalized);
+            hardware2->getVolPot()->setValue(normalized);
         }
-        else if (msg->getData2() == 0)
+        else if (auto pressable = std::dynamic_pointer_cast<mpc::hardware2::Pressable>(hwComponent))
         {
-            hwComponent->release();
-        }
-        else
-        {
-            hwComponent->push(msg->getData2());
-            hwComponent->push();
+            if (msg->getData2() == 0)
+            {
+                pressable->release();
+            }
+            else
+            {
+                if (auto withVelo = std::dynamic_pointer_cast<mpc::hardware2::VelocitySensitivePressable>(pressable))
+                {
+                    withVelo->pressWithVelocity(msg->getData2());
+                }
+                else
+                {
+                    pressable->press();
+                }
+            }
         }
     }
 }
+

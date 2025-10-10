@@ -11,7 +11,6 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <hardware/Hardware.hpp>
-#include <hardware/HwComponent.hpp>
 
 #include "KeyCodeHelper.hpp"
 #include "hardware2/Hardware2.h"
@@ -29,6 +28,7 @@ KeyEventHandler::KeyEventHandler(mpc::Mpc &mpc)
 
 void KeyEventHandler::handle(const KeyEvent &keyEvent)
 {
+    /*
     //MLOG("KeyEventHandler::handle keyEvent.rawKeyCode " + std::to_string(keyEvent.rawKeyCode) + std::string(keyEvent.keyDown ? " down" : " up"));
 
     auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
@@ -197,28 +197,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         }
         return;
     }
-
-    auto hardwareComponent = mpc.getHardware()->getComponentByLabel(label);
-
-    if (hardwareComponent)
-    {
-        if (keyEvent.keyDown)
-        {
-            if ((label.length() == 5 || label.length() == 6) && label.find("pad-") != std::string::npos)
-            {
-                hardwareComponent->push(127);
-            }
-            else
-            {
-                hardwareComponent->push();
-            }
-        }
-        else
-        {
-            hardwareComponent->release();
-        }
-    }
-    else
+    
     {
         // We have some key codes that map to themselves, not to a hardware component.
         if (label == "ctrl")
@@ -247,4 +226,5 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             mpc.getHardware2()->getDataWheel()->turn(increment);
         }
     }
+    */
 }

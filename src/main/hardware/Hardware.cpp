@@ -1,9 +1,7 @@
 #include "Hardware.hpp"
 
-#include "HwComponent.hpp"
 #include "TopPanel.hpp"
 #include "Led.hpp"
-#include "Pot.hpp"
 
 #include "PadAndButtonKeyboard.hpp"
 
@@ -21,24 +19,11 @@ Hardware::Hardware(mpc::Mpc& mpc)
     
     for (auto& l : ledLabels)
         leds.push_back(std::make_shared<Led>(l));
-    
-    recPot = std::make_shared<Pot>(mpc, "rec");
-    volPot = std::make_shared<Pot>(mpc, "vol");
 }
 
 std::shared_ptr<TopPanel> Hardware::getTopPanel()
 {
     return topPanel;
-}
-
-std::shared_ptr<Pot> Hardware::getRecPot()
-{
-    return recPot;
-}
-
-std::shared_ptr<Pot> Hardware::getVolPot()
-{
-    return volPot;
 }
 
 std::shared_ptr<Led> Hardware::getLed(std::string label)
@@ -53,19 +38,6 @@ std::shared_ptr<Led> Hardware::getLed(std::string label)
 
 std::vector<std::shared_ptr<Led>> Hardware::getLeds() {
     return leds;
-}
-
-std::shared_ptr<HwComponent> Hardware::getComponentByLabel(const std::string& label)
-{
-    for (auto& c : components)
-    {
-        if (c->getLabel() == label)
-        {
-            return c;
-        }
-    }
-    
-    return {};
 }
 
 PadAndButtonKeyboard* Hardware::getPadAndButtonKeyboard()

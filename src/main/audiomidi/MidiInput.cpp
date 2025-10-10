@@ -12,7 +12,6 @@
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
 #include <hardware/Hardware.hpp>
-#include <hardware/Pot.hpp>
 #include <hardware/TopPanel.hpp>
 
 #include <lcdgui/screens/SyncScreen.hpp>

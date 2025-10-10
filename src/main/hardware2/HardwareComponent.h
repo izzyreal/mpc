@@ -213,7 +213,7 @@ public:
     }
 };
 
-class Pot final : public Component, public Continuous<int, 0, 100> {
+class Pot final : public Component, public Continuous<int, 0, 127> {
 public:
     explicit Pot(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {

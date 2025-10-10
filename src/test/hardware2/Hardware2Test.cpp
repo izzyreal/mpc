@@ -40,15 +40,15 @@ TEST_CASE("Slider clamps values between 0 and 127", "[hardware2]") {
     REQUIRE(s.getValue() == 127);
 }
 
-TEST_CASE("Pot clamps values between 0 and 100", "[hardware2]") {
+TEST_CASE("Pot clamps values between 0 and 127", "[hardware2]") {
     ClientInputMapper mapper;
     Pot p(mapper);
     p.setValue(50);
     REQUIRE(p.getValue() == 50);
     p.setValue(-1);
     REQUIRE(p.getValue() == 0);
-    p.setValue(101);
-    REQUIRE(p.getValue() == 100);
+    p.setValue(128);
+    REQUIRE(p.getValue() == 127);
 }
 
 TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]") {
