@@ -60,18 +60,21 @@ public:
 };
 
 class VelocitySensitivePressable : public Pressable {
-    std::optional<int> lastVelocity = std::nullopt;
+    std::optional<int> velocity = std::nullopt;
 protected:
     VelocitySensitivePressable() = default;
+
+    void resetVelocity() { velocity = std::nullopt; }
+
     virtual void onPressWithVelocity(int velocity) = 0;
 
-    void doPressWithVelocity(int velocity)
+    void doPressWithVelocity(int velocityToUse)
     {
-        if (velocity < MIN_VELO || velocity > MAX_VELO) {
+        if (velocityToUse < MIN_VELO || velocityToUse > MAX_VELO) {
             throw std::invalid_argument("Velocity must be between " + std::to_string(MIN_VELO) + " and " + std::to_string(MAX_VELO));
         }
-        lastVelocity = velocity;
-        onPressWithVelocity(velocity);
+        velocity = velocityToUse;
+        onPressWithVelocity(velocityToUse);
     }
 public:
     static constexpr int MIN_VELO = 1;
@@ -79,26 +82,26 @@ public:
 
     virtual ~VelocitySensitivePressable() = default;
 
-    void pressWithVelocity(int velocity)
+    void pressWithVelocity(int velocityToUse)
     {
         if (isPressed())
         {
             return;
         }
         setPressed(true);
-        doPressWithVelocity(velocity);
+        doPressWithVelocity(velocityToUse);
     }
 
-    std::optional<int> getLastVelocity() const { return lastVelocity; }
+    std::optional<int> getVelocity() const { return velocity; }
 };
 
 class Aftertouchable {
-    std::optional<int> lastPressure = std::nullopt;
+    std::optional<int> pressure = std::nullopt;
 protected:
     Aftertouchable() = default;
     virtual void onAftertouch(int pressure) = 0;
 
-    void resetPressure() { lastPressure = std::nullopt; }
+    void resetPressure() { pressure = std::nullopt; }
 
 public:
     static constexpr int MIN_PRESSURE = 1;
@@ -106,14 +109,14 @@ public:
 
     virtual ~Aftertouchable() = default;
 
-    std::optional<int> getLastPressure() const { return lastPressure; }
+    std::optional<int> getPressure() const { return pressure; }
 
-    void aftertouch(int pressure) {
-        if (pressure < MIN_PRESSURE || pressure > MAX_PRESSURE)
+    void aftertouch(int pressureToUse) {
+        if (pressureToUse < MIN_PRESSURE || pressureToUse > MAX_PRESSURE)
             throw std::invalid_argument("Aftertouch pressure must be between " + std::to_string(MIN_PRESSURE) + " and " + std::to_string(MAX_PRESSURE));
 
-        lastPressure = pressure;
-        onAftertouch(pressure);
+        pressure = pressureToUse;
+        onAftertouch(pressureToUse);
     }
 };
 
@@ -157,6 +160,7 @@ protected:
     }
     void onRelease() override final {
         resetPressure();
+        resetVelocity();
         //mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadRelease(index));
     }
     void onPress() override final {

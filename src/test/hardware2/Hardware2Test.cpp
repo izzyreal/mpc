@@ -73,21 +73,21 @@ TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]") {
 TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware2]") {
     InputMapper mapper;
     Pad p(0, mapper);
-    REQUIRE(!p.getLastVelocity().has_value());
-    REQUIRE(!p.getLastPressure().has_value());
+    REQUIRE(!p.getVelocity().has_value());
+    REQUIRE(!p.getPressure().has_value());
     p.press();
-    REQUIRE(*p.getLastVelocity() == VelocitySensitivePressable::MAX_VELO);
-    REQUIRE(!p.getLastPressure().has_value());
+    REQUIRE(*p.getVelocity() == VelocitySensitivePressable::MAX_VELO);
+    REQUIRE(!p.getPressure().has_value());
 
     p.release();
 
-    REQUIRE(*p.getLastVelocity() == VelocitySensitivePressable::MAX_VELO);
-    REQUIRE(!p.getLastPressure().has_value());
+    REQUIRE(*p.getVelocity() == VelocitySensitivePressable::MAX_VELO);
+    REQUIRE(!p.getPressure().has_value());
 
     for (int velo = 1; velo <= 127; velo++) {
         p.pressWithVelocity(velo);
-        REQUIRE(*p.getLastVelocity() == velo);
-        REQUIRE(!p.getLastPressure().has_value());
+        REQUIRE(*p.getVelocity() == velo);
+        REQUIRE(!p.getPressure().has_value());
         for (int pressure = 1; pressure <= 127; pressure++) {
             p.aftertouch(pressure);
         }
