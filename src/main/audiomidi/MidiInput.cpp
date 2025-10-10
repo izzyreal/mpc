@@ -1,7 +1,6 @@
 #include "MidiInput.hpp"
 #include "controls/PadPressScreenUpdateContext.h"
 #include "controller/PadContextFactory.h"
-#include "lcdgui/screens/DrumScreen.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
@@ -10,10 +9,11 @@
 #include <audiomidi/VmpcMidiControlMode.hpp>
 #include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
+#include "hardware2/Hardware2.h"
+#include "hardware2/HardwareComponent.h"
 #include <hardware/Button.hpp>
 #include <hardware/DataWheel.hpp>
 #include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
 #include <hardware/HwSlider.hpp>
 #include <hardware/Pot.hpp>
 #include <hardware/TopPanel.hpp>
@@ -124,6 +124,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
     auto hardware = mpc.getHardware();
+    auto hardware2 = mpc.getHardware2();
 
     // As per MPC2000XL's MIDI implementation chart
     if (controller == 7)
@@ -232,7 +233,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     else if (func >= 12 && func < 28)
                     {
                         auto pad = func - 12;
-                        hardware->getPad(pad)->push(value);
+                        hardware2->getPad(pad)->pressWithVelocity(value);
                     }
                 }
                 else // value < 64
@@ -244,7 +245,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     else if (func >= 12 && func < 28)
                     {
                         auto pad = func - 12;
-                        hardware->getPad(pad)->release();
+                        hardware2->getPad(pad)->release();
                     }
                 }
             }
@@ -499,11 +500,11 @@ void MidiInput::handleChannelPressure(ShortMessage* msg)
 
     if (channelPressureValue > 0)
     {
-        for (auto& p: mpc.getHardware()->getPads())
+        for (auto& p: mpc.getHardware2()->getPads())
         {
         if (p->isPressed())
         {
-            p->setPressure(channelPressureValue);
+            p->aftertouch(channelPressureValue);
         }
         }
     }

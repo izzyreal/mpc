@@ -1,7 +1,7 @@
 #include "MidiControlPersistence.hpp"
 
-#include "hardware/Hardware.hpp"
-#include "hardware/HwPad.hpp"
+#include "hardware2/Hardware2.h"
+#include "hardware2/HardwareComponent.h"
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include <StrUtil.hpp>
@@ -60,11 +60,11 @@ std::shared_ptr<MidiControlPreset> MidiControlPersistence::createDefaultPreset(m
 {
     std::vector<std::string> labels;
 
-    auto hardware = mpc.getHardware();
+    auto hardware = mpc.getHardware2();
 
-    for (auto& p : hardware->getPads())
+    for (int i = 0; i < 16; i++)
     {
-        labels.push_back(p->getLabel());
+        labels.push_back("pad-" + std::to_string(i + 1));
     }
 
     labels.emplace_back("datawheel");

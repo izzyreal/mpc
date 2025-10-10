@@ -1,8 +1,9 @@
 #include "VmpcMidiControlMode.hpp"
 
+#include "hardware2/Hardware2.h"
+#include "hardware2/HardwareComponent.h"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
-#include "hardware/HwPad.hpp"
 #include "hardware/DataWheel.hpp"
 #include "hardware/HwSlider.hpp"
 #include "hardware/Pot.hpp"
@@ -25,16 +26,17 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
     auto isChannelPressure = msg->isChannelPressure();
 
     const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    const auto hardware2 = mpc.getHardware2();
     const auto hardware = mpc.getHardware();
 
     if (isChannelPressure)
     {
         if (const auto newPressure = msg->getData1(); newPressure > 0)
         {
-            for (auto& p : hardware->getPads())
+            for (auto& p : hardware2->getPads())
             {
                 if (!p->isPressed()) continue;
-                p->setPressure(newPressure);
+                p->aftertouch(newPressure);
             }
         }
 
@@ -95,6 +97,23 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         if ((isNoteOn || isNoteOff) && !labelCommand.isNote())
         {
             continue;
+        }
+
+        if (label.substr(0, 4) == "pad-")
+        {
+            assert(label.length() == 5 || label.length() == 6);
+            const auto digitsString = label.substr(4);
+            const auto padNumber = std::stoi(digitsString);
+            auto mpcPad = mpc.getHardware2()->getPad(padNumber - 1);
+
+            if (msg->getData2() > 0 && !isNoteOff)
+            {
+                mpcPad->pressWithVelocity(msg->getData2());
+            }
+            else
+            {
+                mpcPad->release();
+            }
         }
 
         const auto hwComponent = hardware->getComponentByLabel(label);

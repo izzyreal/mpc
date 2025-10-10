@@ -2,9 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
-
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 
@@ -13,7 +10,6 @@
 #include <lcdgui/Field.hpp>
 
 #include <StrUtil.hpp>
-#include <Logger.hpp>
 
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;

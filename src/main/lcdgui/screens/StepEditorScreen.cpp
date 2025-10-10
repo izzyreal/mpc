@@ -3,8 +3,7 @@
 
 #include <audiomidi/EventHandler.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
+#include "hardware2/Hardware2.h"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditMultipleScreen.hpp>
@@ -1226,12 +1225,12 @@ void StepEditorScreen::update(Observable*, Message message)
 
     if (msg == "step-editor")
 	{
-        auto& pads = mpc.getHardware()->getPads();
+        auto& pads = mpc.getHardware2()->getPads();
 
         auto anyPadIsPressed = std::any_of(
                 pads.begin(),
                 pads.end(),
-                [](const std::shared_ptr<mpc::hardware::HwPad> &p) {
+                [](const std::shared_ptr<mpc::hardware2::Pad> &p) {
                     return p->isPressed();
                 });
 

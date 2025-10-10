@@ -7,7 +7,6 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <hardware/TopPanel.hpp>
-#include <hardware/HwPad.hpp>
 
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/Track.hpp>

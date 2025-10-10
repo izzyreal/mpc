@@ -5,7 +5,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/MidiOutput.hpp"
 #include "hardware/Hardware.hpp"
-#include "hardware/HwPad.hpp"
+#include "hardware2/Hardware2.h"
 #include "hardware/HwSlider.hpp"
 #include "hardware/TopPanel.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
@@ -45,13 +45,14 @@ void RepeatPad::process(mpc::Mpc& mpc,
     auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
     auto note = assign16LevelsScreen->getNote();
 
-    for (auto& p : hardware->getPads())
+    for (auto& p : mpc.getHardware2()->getPads())
     {
         if (!p->isPressed()) continue;
 
         if (!sixteenLevels && program)
         {
-            auto padIndex = p->getPadIndexWithBankWhenLastPressed();
+            // The index should be with bank at the time the pad was pressed
+            auto padIndex = p->getIndex();
             note = program->getNoteFromPad(padIndex);
         }
 
@@ -96,7 +97,9 @@ void RepeatPad::process(mpc::Mpc& mpc,
         }
         else
         {
-            noteEvent->setVelocity(fullLevel ? 127 : p->getPressure());
+            assert(p->getPressure().has_value() || p->getVelocity().has_value());
+            const int velocityToUseIfNotFullLevel = p->getPressure().value_or(p->getVelocity().value());
+            noteEvent->setVelocity(fullLevel ? 127 : velocityToUseIfNotFullLevel);
         }
 
         noteEvent->setDuration(durationTicks);
@@ -140,9 +143,9 @@ void RepeatPad::process(mpc::Mpc& mpc,
             if (track->getBus() > 0)
             {
                 mpc.getDrum(track->getBus() - 1).mpcNoteOff(note, bufferOffset, tickPosition);
-                const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
+                //const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
 
-                padToNotify->notifyObservers(255);
+                //padToNotify->notifyObservers(255);
             }
 
             if (track->getDeviceIndex() > 0)
@@ -153,8 +156,8 @@ void RepeatPad::process(mpc::Mpc& mpc,
             }
         }, durationFrames - 1);
 
-        const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
+        //const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
 
-        padToNotify->notifyObservers(noteEvent->getVelocity());
+        //padToNotify->notifyObservers(noteEvent->getVelocity());
     }
 }

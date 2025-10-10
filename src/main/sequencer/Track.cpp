@@ -22,8 +22,8 @@
 
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
+#include "hardware2/Hardware2.h"
+#include "hardware2/HardwareComponent.h"
 #include <hardware/TopPanel.hpp>
 
 using namespace mpc::lcdgui;
@@ -529,7 +529,7 @@ void Track::playNext()
 	}
 
     const auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
-    const auto hardware = mpc.getHardware();
+    const auto hardware = mpc.getHardware2();
 
 	if (auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
@@ -557,7 +557,8 @@ void Track::playNext()
                 {
                     oneOrMorePadsArePressed = true;
 
-                    if (program->getNoteFromPad(p->getPadIndexWithBankWhenLastPressed()) == noteNumber)
+                    // The pad index should be with bank at the time the pad was pressed
+                    if (program->getNoteFromPad(p->getIndex()) == noteNumber)
                     {
                         noteIsPressed = true;
                         break;
@@ -580,32 +581,40 @@ void Track::playNext()
                     auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
                     auto _16l_type = assign16LevelsScreen->getType();
 
-                    for (auto& hwPad : hardware->getPads())
+                    for (auto& pad : hardware->getPads())
                     {
-                        if (hwPad->isPressed())
+                        if (!pad->isPressed())
                         {
-                            int wouldBeVarValue;
-                            auto padIndexWithoutBank = hwPad->getPadIndexWithBankWhenLastPressed() % 16;
+                            continue;
+                        }
 
-                            if (_16l_type == 0)
+                        int wouldBeVarValue;
+                        auto padIndexWithoutBank = pad->getIndex();
+
+                        if (_16l_type == 0)
+                        {
+                            auto diff = padIndexWithoutBank - _16l_key;
+                            auto candidate = 64 + (diff * 5);
+
+                            if (candidate > 124)
                             {
-                                auto diff = padIndexWithoutBank - _16l_key;
-                                auto candidate = 64 + (diff * 5);
-
-                                if (candidate > 124)
-                                    candidate = 124;
-                                else if (candidate < 4)
-                                    candidate = 4;
-
-                                wouldBeVarValue = static_cast<int>(candidate);
+                                candidate = 124;
                             }
-                            else
+                            else if (candidate < 4)
                             {
-                                wouldBeVarValue = static_cast<int>(floor(100 / 16.0) * padIndexWithoutBank);
+                                candidate = 4;
                             }
 
-                            if (varValue == wouldBeVarValue)
-                                _delete = true;
+                            wouldBeVarValue = static_cast<int>(candidate);
+                        }
+                        else
+                        {
+                            wouldBeVarValue = static_cast<int>(floor(100 / 16.0) * padIndexWithoutBank);
+                        }
+
+                        if (varValue == wouldBeVarValue)
+                        {
+                            _delete = true;
                         }
                     }
                 }

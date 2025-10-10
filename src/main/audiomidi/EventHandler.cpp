@@ -11,7 +11,6 @@
 #include <sequencer/SeqUtil.hpp>
 
 #include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
 #include <hardware/TopPanel.hpp>
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
@@ -230,11 +229,11 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
             {
                 const auto padBrightness = static_cast<int>(noteOnEvent->getVelocity() *
                                                             (track->getVelocityRatio() * 0.01));
-                mpc.getHardware()->getPad(pad)->notifyObservers(padBrightness);
+                //mpc.getHardware()->getPad(pad)->notifyObservers(padBrightness);
             }
             else
             {
-                mpc.getHardware()->getPad(pad)->notifyObservers(255);
+                //mpc.getHardware()->getPad(pad)->notifyObservers(255);
             }
         }
 
@@ -244,7 +243,7 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
 
                                                    if (visible)
                                                    {
-                                                       mpc.getHardware()->getPad(pad)->notifyObservers(255);
+                                                       //mpc.getHardware()->getPad(pad)->notifyObservers(255);
                                                    }
                                                    midiOut(noteOnEvent->getNoteOff(), track);
                                                },

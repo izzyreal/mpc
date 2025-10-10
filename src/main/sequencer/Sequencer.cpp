@@ -2,15 +2,13 @@
 
 #include <chrono>
 
-#include "lcdgui/screens/SyncScreen.hpp"
-
 #include <Mpc.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/MidiOutput.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
+#include "hardware2/Hardware2.h"
+#include "hardware2/HardwareComponent.h"
 
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
@@ -471,8 +469,6 @@ void Sequencer::play(bool fromStart)
 		}
 	}
 
-	auto hw = mpc.getHardware();
-	
 	if (!songMode)
 	{
 		if (!s->isUsed())
@@ -528,7 +524,6 @@ void Sequencer::undoSeq()
 	sequences[activeSequenceIndex]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 
 	undoSeqAvailable = !undoSeqAvailable;
-	auto hw = mpc.getHardware();
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
@@ -686,9 +681,8 @@ void Sequencer::stop(const StopMode stopMode)
 
 	for (int i = 0; i < 16; i++)
     {
-        auto pad = mpc.getHardware()->getPad(i);
+        auto pad = mpc.getHardware2()->getPad(i);
         pad->release();
-        pad->notifyObservers(255);
     }
 
     if (notifynextsq)

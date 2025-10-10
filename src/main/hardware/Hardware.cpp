@@ -4,7 +4,6 @@
 #include "TopPanel.hpp"
 #include "Button.hpp"
 #include "DataWheel.hpp"
-#include "HwPad.hpp"
 #include "Led.hpp"
 #include "Pot.hpp"
 #include "HwSlider.hpp"
@@ -33,12 +32,6 @@ Hardware::Hardware(mpc::Mpc& mpc)
     {
         buttons.push_back(std::make_shared<Button>(mpc, std::to_string(i)));
         components.push_back(buttons.back());
-    }
-    
-    for (int i = 0; i <= 15; i++)
-    {
-        pads.push_back(std::make_shared<HwPad>(mpc, i));
-        components.push_back(pads.back());
     }
     
     dataWheel = std::make_shared<DataWheel>(mpc);
@@ -72,16 +65,6 @@ std::shared_ptr<Pot> Hardware::getRecPot()
 std::shared_ptr<Pot> Hardware::getVolPot()
 {
     return volPot;
-}
-
-std::shared_ptr<HwPad> Hardware::getPad(int index)
-{
-    return pads[index];
-}
-
-std::vector<std::shared_ptr<HwPad>>& Hardware::getPads()
-{
-    return pads;
 }
 
 std::shared_ptr<Button> Hardware::getButton(std::string label)

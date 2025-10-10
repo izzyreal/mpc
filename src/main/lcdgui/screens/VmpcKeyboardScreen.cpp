@@ -2,9 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/HwPad.hpp>
-
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 

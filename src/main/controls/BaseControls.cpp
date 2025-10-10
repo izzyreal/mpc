@@ -5,7 +5,6 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <hardware/HwSlider.hpp>
-#include <hardware/HwPad.hpp>
 #include <hardware/TopPanel.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
@@ -846,11 +845,6 @@ void BaseControls::trackMute()
 void BaseControls::bank(int i)
 {
     mpc.setBank(i);
-
-    for (int p = 0; p < 16; p++)
-    {
-      mpc.getHardware()->getPad(p)->notifyObservers(255);
-    }
 }
 
 void BaseControls::fullLevel()

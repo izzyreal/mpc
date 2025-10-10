@@ -15,7 +15,6 @@ class DataWheel;
 class Pot;
 class Led;
 class Slider;
-class HwPad;
 }
 
 namespace mpc::hardware
@@ -32,7 +31,6 @@ private:
     std::vector<std::shared_ptr<HwComponent>> components;
 
     std::shared_ptr<TopPanel> topPanel;
-    std::vector<std::shared_ptr<HwPad>> pads;
     std::vector<std::shared_ptr<Button>> buttons;
     std::vector<std::shared_ptr<Led>> leds;
 
@@ -45,8 +43,6 @@ public:
     PadAndButtonKeyboard* getPadAndButtonKeyboard();
     std::shared_ptr<TopPanel> getTopPanel();
     std::vector<std::string>& getButtonLabels();
-    std::shared_ptr<HwPad> getPad(int index);
-    std::vector<std::shared_ptr<HwPad>>& getPads();
     std::shared_ptr<Button> getButton(std::string label);
     std::shared_ptr<Led> getLed(std::string label);
     std::vector<std::shared_ptr<Led>> getLeds();

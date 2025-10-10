@@ -3,13 +3,6 @@
 #include "Mpc.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
-#include "audiomidi/EventHandler.hpp"
-#include "audiomidi/MidiOutput.hpp"
-
-#include "hardware/Hardware.hpp"
-#include "hardware/HwPad.hpp"
-#include "hardware/TopPanel.hpp"
-#include "controls/GlobalReleaseControls.hpp"
 
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
