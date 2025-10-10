@@ -15,6 +15,7 @@
 #include <hardware/DataWheel.hpp>
 
 #include "KeyCodeHelper.hpp"
+#include "hardware2/Hardware2.h"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -180,6 +181,22 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     }
 
     //MLOG("Label associated with key code: " + label);
+
+    if (label.substr(0, 4) == "pad-")
+    {
+        const auto digitsString = label.substr(4);
+        const auto padNumber = std::stoi(digitsString);
+        auto mpcPad = mpc.getHardware2()->getPad(padNumber - 1);
+        if (keyEvent.keyDown)
+        {
+            mpcPad->pressWithVelocity(127);
+        }
+        else
+        {
+            mpcPad->release();
+        }
+        return;
+    }
 
     auto hardwareComponent = mpc.getHardware()->getComponentByLabel(label);
 
