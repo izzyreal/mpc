@@ -12,7 +12,6 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
-#include <hardware/DataWheel.hpp>
 
 #include "KeyCodeHelper.hpp"
 #include "hardware2/Hardware2.h"
@@ -184,6 +183,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
 
     if (label.substr(0, 4) == "pad-")
     {
+        
         const auto digitsString = label.substr(4);
         const auto padNumber = std::stoi(digitsString);
         auto mpcPad = mpc.getHardware2()->getPad(padNumber - 1);
@@ -244,7 +244,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             if (label.find("down") != std::string::npos)
                 increment = -increment;
 
-            mpc.getHardware()->getDataWheel()->turn(increment);
+            mpc.getHardware2()->getDataWheel()->turn(increment);
         }
     }
 }

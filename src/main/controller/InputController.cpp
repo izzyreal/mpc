@@ -5,6 +5,7 @@
 #include "controls/GlobalReleaseControls.hpp"
 #include "controls/BaseControls.hpp"
 #include "Mpc.hpp"
+#include "lcdgui/ScreenComponent.hpp"
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic; 
@@ -63,8 +64,10 @@ void InputController::handlePadAftertouch(const InputAction& a)
 
 void InputController::handleDataWheel(const InputAction& a)
 {
+    assert(a.value.has_value());
     const char* dir = a.id == "datawheel-up" ? "up" : "down";
-    std::printf("[logic] data wheel turned %s (%d)\n", dir, a.value.value_or(0));
+    std::printf("[logic] data wheel turned %s (%d)\n", dir, *a.value);
+    mpc.getActiveControls()->turnWheel(*a.value);
 }
 
 void InputController::handleSlider(const InputAction& a)

@@ -12,7 +12,6 @@
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
 #include <hardware/Button.hpp>
-#include <hardware/DataWheel.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
 #include <hardware/Pot.hpp>

@@ -3,7 +3,6 @@
 #include "HwComponent.hpp"
 #include "TopPanel.hpp"
 #include "Button.hpp"
-#include "DataWheel.hpp"
 #include "Led.hpp"
 #include "Pot.hpp"
 #include "HwSlider.hpp"
@@ -33,8 +32,6 @@ Hardware::Hardware(mpc::Mpc& mpc)
         buttons.push_back(std::make_shared<Button>(mpc, std::to_string(i)));
         components.push_back(buttons.back());
     }
-    
-    dataWheel = std::make_shared<DataWheel>(mpc);
     
     std::vector<std::string> ledLabels{ "full-level", "sixteen-levels", "next-seq", "track-mute", "pad-bank-a", "pad-bank-b", "pad-bank-c", "pad-bank-d", "after", "undo-seq", "rec", "overdub", "play" };
     
@@ -86,10 +83,6 @@ std::shared_ptr<Led> Hardware::getLed(std::string label)
 
 std::vector<std::shared_ptr<Led>> Hardware::getLeds() {
     return leds;
-}
-
-std::shared_ptr<DataWheel> Hardware::getDataWheel() {
-    return dataWheel;
 }
 
 std::shared_ptr<Slider> Hardware::getSlider() {

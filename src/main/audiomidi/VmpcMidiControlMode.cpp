@@ -4,7 +4,6 @@
 #include "hardware2/HardwareComponent.h"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
-#include "hardware/DataWheel.hpp"
 #include "hardware/HwSlider.hpp"
 #include "hardware/Pot.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
@@ -59,7 +58,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         return;
     }
 
-    auto dataWheel = hardware->getDataWheel();
+    auto dataWheel = hardware2->getDataWheel();
 
     for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
     {
