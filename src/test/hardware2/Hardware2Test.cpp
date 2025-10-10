@@ -77,17 +77,17 @@ TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware
     REQUIRE(!p.getLastPressure().has_value());
     p.press();
     REQUIRE(*p.getLastVelocity() == VelocitySensitivePressable::MAX_VELO);
-    REQUIRE(*p.getLastPressure() == VelocitySensitivePressable::MAX_VELO);
+    REQUIRE(!p.getLastPressure().has_value());
 
     p.release();
 
     REQUIRE(*p.getLastVelocity() == VelocitySensitivePressable::MAX_VELO);
-    REQUIRE(*p.getLastPressure() == VelocitySensitivePressable::MAX_VELO);
+    REQUIRE(!p.getLastPressure().has_value());
 
     for (int velo = 1; velo <= 127; velo++) {
         p.pressWithVelocity(velo);
         REQUIRE(*p.getLastVelocity() == velo);
-        REQUIRE(*p.getLastPressure() == velo);
+        REQUIRE(!p.getLastPressure().has_value());
         for (int pressure = 1; pressure <= 127; pressure++) {
             p.aftertouch(pressure);
         }

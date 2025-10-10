@@ -41,44 +41,65 @@ public:
     virtual ~Pressable() = default;
 
     void press() {
+        if (isPressed())
+        {
+            return;
+        }
         setPressed(true);
         onPress();
     }
 
     void release() {
+        if (!isPressed())
+        {
+            return;
+        }
         setPressed(false);
         onRelease();
     }
 };
 
 class VelocitySensitivePressable : public Pressable {
-    std::optional<int> lastVelocity;
+    std::optional<int> lastVelocity = std::nullopt;
 protected:
     VelocitySensitivePressable() = default;
     virtual void onPressWithVelocity(int velocity) = 0;
+
+    void doPressWithVelocity(int velocity)
+    {
+        if (velocity < MIN_VELO || velocity > MAX_VELO) {
+            throw std::invalid_argument("Velocity must be between " + std::to_string(MIN_VELO) + " and " + std::to_string(MAX_VELO));
+        }
+        lastVelocity = velocity;
+        onPressWithVelocity(velocity);
+    }
 public:
     static constexpr int MIN_VELO = 1;
     static constexpr int MAX_VELO = 127;
 
     virtual ~VelocitySensitivePressable() = default;
 
-    void pressWithVelocity(int velocity) {
-        if (velocity < MIN_VELO || velocity > MAX_VELO)
-            throw std::invalid_argument("Velocity must be between " + std::to_string(MIN_VELO) + " and " + std::to_string(MAX_VELO));
-
+    void pressWithVelocity(int velocity)
+    {
+        if (isPressed())
+        {
+            return;
+        }
         setPressed(true);
-        lastVelocity = velocity;
-        onPressWithVelocity(velocity);
+        doPressWithVelocity(velocity);
     }
 
     std::optional<int> getLastVelocity() const { return lastVelocity; }
 };
 
 class Aftertouchable {
-    std::optional<int> lastPressure;
+    std::optional<int> lastPressure = std::nullopt;
 protected:
     Aftertouchable() = default;
     virtual void onAftertouch(int pressure) = 0;
+
+    void resetPressure() { lastPressure = std::nullopt; }
+
 public:
     static constexpr int MIN_PRESSURE = 1;
     static constexpr int MAX_PRESSURE = 127;
@@ -128,14 +149,19 @@ class Pad final : public Component, public VelocitySensitivePressable, public Af
     const int index;
 protected:
     void onPressWithVelocity(int velocity) override final {
-        aftertouch(velocity);
+        // Only trigger the press event, not aftertouch
         mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadPress(index, velocity));
     }
     void onAftertouch(int pressure) override final {
         mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadAftertouch(index, pressure));
     }
-    void onRelease() override final {}
-    void onPress() override final { pressWithVelocity(MAX_VELO); }
+    void onRelease() override final {
+        resetPressure();
+        //mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadRelease(index));
+    }
+    void onPress() override final {
+        doPressWithVelocity(MAX_VELO); // Default to max velocity for non-velocity-sensitive press
+    }
 public:
     Pad(int indexToUse, mpc::inputlogic::InputMapper& mapper)
         : Component(mapper), index(indexToUse) {}
