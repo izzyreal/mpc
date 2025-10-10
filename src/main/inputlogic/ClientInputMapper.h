@@ -5,14 +5,14 @@
 #include <string>
 
 namespace mpc::inputlogic {
-    struct InputAction;
-    class InputMapper {
+    struct ClientInputAction;
+    class ClientInputMapper {
     public:
-        using Callback = std::function<void(const InputAction&)>;
+        using Callback = std::function<void(const ClientInputAction&)>;
 
         void bind(const std::string& actionId, Callback callback);
 
-        void trigger(const InputAction& action) const;
+        void trigger(const ClientInputAction& action) const;
 
     private:
         std::unordered_map<std::string, Callback> bindings;

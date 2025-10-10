@@ -16,7 +16,7 @@
 #include <string>
 #include <memory>
 
-#include "inputlogic/InputMapper.h"
+#include "inputlogic/ClientInputMapper.h"
 
 namespace mpc::engine {
     class Drum;
@@ -116,7 +116,7 @@ namespace mpc {
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
 
-        mpc::inputlogic::InputMapper inputMapper;
+        mpc::inputlogic::ClientInputMapper inputMapper;
         std::shared_ptr<mpc::controller::InputControllerBase> inputController;
 
     public:

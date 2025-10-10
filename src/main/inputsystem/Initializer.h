@@ -3,7 +3,7 @@
 #include <memory>
 
 namespace mpc::inputlogic {
-    class InputMapper;
+    class ClientInputMapper;
 }
 
 namespace mpc::controller {
@@ -13,7 +13,7 @@ namespace mpc::controller {
 namespace mpc::inputsystem {
 
 struct Initializer {
-    static void init(mpc::inputlogic::InputMapper &inputMapper, std::shared_ptr<mpc::controller::InputControllerBase> inputController);
+    static void init(mpc::inputlogic::ClientInputMapper &inputMapper, std::shared_ptr<mpc::controller::InputControllerBase> inputController);
 };
 
 } // namespace mpc::inputsystem

@@ -4,7 +4,7 @@
 #include <optional>
 
 namespace mpc::inputlogic {
-struct InputAction {
+struct ClientInputAction {
     std::string id;
     std::optional<int> value; // e.g. velocity, aftertouch, slider pos
 };

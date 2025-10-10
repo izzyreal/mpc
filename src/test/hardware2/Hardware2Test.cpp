@@ -1,20 +1,20 @@
 #include <catch2/catch_test_macros.hpp>
 #include <stdexcept>
 #include "hardware2/HardwareComponent.h"
-#include "inputlogic/InputMapper.h"
+#include "inputlogic/ClientInputMapper.h"
 
 using namespace mpc::hardware2;
 using namespace mpc::inputlogic;
 
 TEST_CASE("Button responds to press and release", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     Button b(mapper, "");
     REQUIRE_NOTHROW(b.press());
     REQUIRE_NOTHROW(b.release());
 }
 
 TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     Pad p(0, mapper);
     REQUIRE_NOTHROW(p.pressWithVelocity(VelocitySensitivePressable::MAX_VELO));
     REQUIRE_NOTHROW(p.press());
@@ -23,14 +23,14 @@ TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware2]") {
 }
 
 TEST_CASE("DataWheel turns correctly", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     DataWheel wheel(mapper);
     REQUIRE_NOTHROW(wheel.turn(1));
     REQUIRE_NOTHROW(wheel.turn(-2));
 }
 
 TEST_CASE("Slider clamps values between 0 and 127", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     Slider s(mapper);
     s.setValue(50);
     REQUIRE(s.getValue() == 50);
@@ -41,7 +41,7 @@ TEST_CASE("Slider clamps values between 0 and 127", "[hardware2]") {
 }
 
 TEST_CASE("Pot clamps values between 0 and 100", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     Pot p(mapper);
     p.setValue(50);
     REQUIRE(p.getValue() == 50);
@@ -52,7 +52,7 @@ TEST_CASE("Pot clamps values between 0 and 100", "[hardware2]") {
 }
 
 TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     Pad p(0, mapper);
     REQUIRE(!p.isPressed());
     p.press();
@@ -71,7 +71,7 @@ TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]") {
 }
 
 TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware2]") {
-    InputMapper mapper;
+    ClientInputMapper mapper;
     Pad p(0, mapper);
     REQUIRE(!p.getVelocity().has_value());
     REQUIRE(!p.getPressure().has_value());

@@ -6,16 +6,15 @@
 #include <stdexcept>
 #include <optional>
 
-#include <inputlogic/InputMapper.h>
-#include <inputlogic/HardwareTranslator.h>
-#include <inputlogic/InputAction.h>
+#include <inputlogic/ClientInputMapper.h>
+#include <inputlogic/ClientInputAction.h>
 
 namespace mpc::hardware2 {
 
 class Component {
 protected:
-    mpc::inputlogic::InputMapper& mapper;
-    explicit Component(mpc::inputlogic::InputMapper& mapperToUse) : mapper(mapperToUse) {}
+    mpc::inputlogic::ClientInputMapper& mapper;
+    explicit Component(mpc::inputlogic::ClientInputMapper& mapperToUse) : mapper(mapperToUse) {}
 public:
     virtual ~Component() = default;
     Component(const Component&) = delete;
@@ -138,13 +137,15 @@ class Button final : public Component, public Pressable {
     const std::string label;
 protected:
     void onPress() override final {
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromButtonPress(label));
+        mpc::inputlogic::ClientInputAction action{ label, std::nullopt };
+        mapper.trigger(action);
     }
     void onRelease() override final {
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromButtonRelease(label));
+        mpc::inputlogic::ClientInputAction action{ label + "-release", std::nullopt };
+        mapper.trigger(action);
     }
 public:
-    Button(mpc::inputlogic::InputMapper& mapperToUse, std::string labelToUse)
+    Button(mpc::inputlogic::ClientInputMapper& mapperToUse, std::string labelToUse)
         : Component(mapperToUse), label(std::move(labelToUse)) {}
 };
 
@@ -152,22 +153,24 @@ class Pad final : public Component, public VelocitySensitivePressable, public Af
     const int index;
 protected:
     void onPressWithVelocity(int velocity) override final {
-        // Only trigger the press event, not aftertouch
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadPress(index, velocity));
+        mpc::inputlogic::ClientInputAction action{ "pad-" + std::to_string(index) + "-press", velocity };
+        mapper.trigger(action);
     }
     void onAftertouch(int pressure) override final {
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadAftertouch(index, pressure));
+        mpc::inputlogic::ClientInputAction action{ "pad-" + std::to_string(index) + "-aftertouch", pressure };
+        mapper.trigger(action);
     }
     void onRelease() override final {
         resetPressure();
         resetVelocity();
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadRelease(index));
+        mpc::inputlogic::ClientInputAction action{ "pad-" + std::to_string(index) + "-release", std::nullopt };
+        mapper.trigger(action);
     }
     void onPress() override final {
-        doPressWithVelocity(MAX_VELO); // Default to max velocity for non-velocity-sensitive press
+        doPressWithVelocity(MAX_VELO);
     }
 public:
-    Pad(int indexToUse, mpc::inputlogic::InputMapper& mapperToUse)
+    Pad(int indexToUse, mpc::inputlogic::ClientInputMapper& mapperToUse)
         : Component(mapperToUse), index(indexToUse) {}
 
     int getIndex() const { return index; }
@@ -175,27 +178,31 @@ public:
 
 class DataWheel final : public Component {
 public:
-    explicit DataWheel(mpc::inputlogic::InputMapper& mapperToUse) : Component(mapperToUse) {}
-    void turn(int steps) { mapper.trigger(mpc::inputlogic::HardwareTranslator::fromDataWheelTurn(steps)); }
+    explicit DataWheel(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
+    void turn(int steps) {
+        mpc::inputlogic::ClientInputAction action{ "datawheel-turn", steps };
+        mapper.trigger(action);
+    }
 };
 
 class Slider final : public Component, public Continuous<int, 0, 127> {
 public:
-    explicit Slider(mpc::inputlogic::InputMapper& mapperToUse) : Component(mapperToUse) {}
+    explicit Slider(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {
         setValue(value);
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromSliderMove(value));
+        mpc::inputlogic::ClientInputAction action{ "slider-move", value };
+        mapper.trigger(action);
     }
 };
 
 class Pot final : public Component, public Continuous<int, 0, 100> {
 public:
-    explicit Pot(mpc::inputlogic::InputMapper& mapperToUse) : Component(mapperToUse) {}
+    explicit Pot(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {
         setValue(value);
-        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromButtonPress("pot-move"));
+        mpc::inputlogic::ClientInputAction action{ "pot-move", value };
+        mapper.trigger(action);
     }
 };
-
 } // namespace mpc::hardware2
 

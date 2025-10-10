@@ -31,12 +31,15 @@ ClientInputEvent HostToClientTranslator::translate(const HostInputEvent& hostEve
         switch (mouse.guiElement) {
         case MouseEvent::PAD1:
             clientEvent.component = "pad-0";
+            clientEvent.value = (1.f - mouse.normY) * 127.f;
             break;
         case MouseEvent::PAD2:
             clientEvent.component = "pad-1";
+            clientEvent.value = (1.f - mouse.normY) * 127.f;
             break;
         case MouseEvent::PAD3:
             clientEvent.component = "pad-2";
+            clientEvent.value = (1.f - mouse.normY) * 127.f;
             break;
         case MouseEvent::PLAY_BUTTON:
             clientEvent.component = "play";
