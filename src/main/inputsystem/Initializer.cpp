@@ -1,7 +1,7 @@
 #include "inputsystem/Initializer.h"
 
 #include "inputlogic/ClientInputMapper.h"
-#include "controller/InputControllerBase.h"
+#include "controller/ClientInputControllerBase.h"
 
 #include <string>
 
@@ -9,7 +9,7 @@ using namespace mpc::inputsystem;
 using namespace mpc::inputlogic;
 using namespace mpc::controller;
 
-void Initializer::init(ClientInputMapper &inputMapper, std::shared_ptr<InputControllerBase> inputController)
+void Initializer::init(ClientInputMapper &inputMapper, std::shared_ptr<ClientInputControllerBase> inputController)
 {
     for (int padNumber = 0; padNumber < 16; ++padNumber)
     {

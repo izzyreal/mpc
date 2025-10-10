@@ -1,4 +1,4 @@
-#include "InputController.h"
+#include "ClientInputController.h"
 
 #include "inputlogic/ClientInputAction.h"
 #include "controller/PadContextFactory.h"
@@ -10,11 +10,11 @@
 using namespace mpc::controller;
 using namespace mpc::inputlogic; 
 
-InputController::InputController(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
+ClientInputController::ClientInputController(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
 {
 }
 
-void InputController::handleAction(const ClientInputAction& action)
+void ClientInputController::handleAction(const ClientInputAction& action)
 {
     if (startsWith(action.id, "pad-") && endsWith(action.id, "-press")) return handlePadPress(action);
     if (startsWith(action.id, "pad-") && endsWith(action.id, "-aftertouch")) return handlePadAftertouch(action);
@@ -26,17 +26,17 @@ void InputController::handleAction(const ClientInputAction& action)
     if (endsWith(action.id, "-release")) return handleButtonRelease(action);
 }
 
-bool InputController::startsWith(const std::string& s, const std::string& prefix)
+bool ClientInputController::startsWith(const std::string& s, const std::string& prefix)
 {
     return s.size() >= prefix.size() && std::equal(prefix.begin(), prefix.end(), s.begin());
 }
 
-bool InputController::endsWith(const std::string& s, const std::string& suffix)
+bool ClientInputController::endsWith(const std::string& s, const std::string& suffix)
 {
     return s.size() >= suffix.size() && std::equal(suffix.rbegin(), suffix.rend(), s.rbegin());
 }
 
-void InputController::handlePadPress(const ClientInputAction& a)
+void ClientInputController::handlePadPress(const ClientInputAction& a)
 {
     assert(a.value.has_value());
     const auto num = std::stoi(a.id.substr(4, a.id.find("-press") - 4));
@@ -46,7 +46,7 @@ void InputController::handlePadPress(const ClientInputAction& a)
     mpc::controls::BaseControls::pad(ctx, padIndexWithBank, *a.value);
 }
 
-void InputController::handlePadRelease(const ClientInputAction& a)
+void ClientInputController::handlePadRelease(const ClientInputAction& a)
 {
     assert(!a.value.has_value());
     const auto num = std::stoi(a.id.substr(4, a.id.find("-release") - 4));
@@ -56,13 +56,13 @@ void InputController::handlePadRelease(const ClientInputAction& a)
     mpc::controls::GlobalReleaseControls::simplePad(ctx);
 }
 
-void InputController::handlePadAftertouch(const ClientInputAction& a)
+void ClientInputController::handlePadAftertouch(const ClientInputAction& a)
 {
     const auto num = std::stoi(a.id.substr(4, a.id.find("-aftertouch") - 4));
     std::printf("[logic] pad %d aftertouch pressure %d\n", num, a.value.value_or(0));
 }
 
-void InputController::handleDataWheel(const ClientInputAction& a)
+void ClientInputController::handleDataWheel(const ClientInputAction& a)
 {
     assert(a.value.has_value());
     const char* dir = a.id == "datawheel-up" ? "up" : "down";
@@ -70,22 +70,22 @@ void InputController::handleDataWheel(const ClientInputAction& a)
     mpc.getActiveControls()->turnWheel(*a.value);
 }
 
-void InputController::handleSlider(const ClientInputAction& a)
+void ClientInputController::handleSlider(const ClientInputAction& a)
 {
     std::printf("[logic] slider moved to %d\n", a.value.value_or(0));
 }
 
-void InputController::handlePot(const ClientInputAction& a)
+void ClientInputController::handlePot(const ClientInputAction& a)
 {
     std::printf("[logic] pot moved to %d\n", a.value.value_or(0));
 }
 
-void InputController::handleButtonPress(const ClientInputAction& a)
+void ClientInputController::handleButtonPress(const ClientInputAction& a)
 {
     std::printf("[logic] button %s pressed\n", a.id.c_str());
 }
 
-void InputController::handleButtonRelease(const ClientInputAction& a)
+void ClientInputController::handleButtonRelease(const ClientInputAction& a)
 {
     std::printf("[logic] button %s released\n", a.id.c_str());
 }

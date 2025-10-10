@@ -5,9 +5,9 @@ namespace mpc::inputlogic {
 }
 
 namespace mpc::controller {
-class InputControllerBase {
+class ClientInputControllerBase {
 public:
-    virtual ~InputControllerBase() = default;
+    virtual ~ClientInputControllerBase() = default;
     virtual void handleAction(const mpc::inputlogic::ClientInputAction& action) = 0;
 };
 } // namespace mpc::controller

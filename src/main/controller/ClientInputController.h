@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InputControllerBase.h"
+#include "ClientInputControllerBase.h"
 
 #include <string>
 
@@ -14,9 +14,9 @@ namespace mpc {
 
 namespace mpc::controller {
 
-class InputController : public InputControllerBase {
+class ClientInputController : public ClientInputControllerBase {
     public:
-        explicit InputController(mpc::Mpc&);
+        explicit ClientInputController(mpc::Mpc&);
         void handleAction(const mpc::inputlogic::ClientInputAction& action) override;
 
     private:

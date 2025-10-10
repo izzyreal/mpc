@@ -33,7 +33,7 @@
 
 #include "MpcResourceUtil.hpp"
 #include "inputsystem/Initializer.h"
-#include "controller/InputController.h"
+#include "controller/ClientInputController.h"
 
 #include <string>
 
@@ -159,7 +159,7 @@ void Mpc::init()
 
 	MLOG("Mpc is ready");
 
-    inputController = std::make_shared<mpc::controller::InputController>(*this);
+    inputController = std::make_shared<mpc::controller::ClientInputController>(*this);
     mpc::inputsystem::Initializer::init(inputMapper, inputController);
 }
 

@@ -32,7 +32,7 @@ namespace mpc::hardware2 {
 }
 
 namespace mpc::controller {
-    class InputControllerBase;
+    class ClientInputControllerBase;
 }
 
 namespace mpc::disk {
@@ -117,7 +117,7 @@ namespace mpc {
         bool isPluginModeEnabled();
 
         mpc::inputlogic::ClientInputMapper inputMapper;
-        std::shared_ptr<mpc::controller::InputControllerBase> inputController;
+        std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController;
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
