@@ -6,6 +6,7 @@
 #include "controls/BaseControls.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+#include "hardware2/Hardware2.h"
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic; 
@@ -59,9 +60,11 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
 
 void ClientInputController::handlePadAftertouch(const ClientInput& a)
 {
-    if (!a.index) return;
-    const auto num = *a.index;
-    std::printf("[logic] pad %d aftertouch pressure %d\n", num, a.value.value_or(0));
+    if (!a.index || !a.value) return;
+    const auto padIndex = *a.index;
+    const auto aftertouchPressure = *a.value;
+    std::printf("[logic] pad %d aftertouch pressure %d\n", padIndex, aftertouchPressure);
+    mpc.getHardware2()->getPad(padIndex)->aftertouch(aftertouchPressure);
 }
 
 void ClientInputController::handleDataWheel(const ClientInput& a)
@@ -74,7 +77,10 @@ void ClientInputController::handleDataWheel(const ClientInput& a)
 
 void ClientInputController::handleSlider(const ClientInput& a)
 {
-    std::printf("[logic] slider moved to %d\n", a.value.value_or(0));
+    if (!a.value) return;
+    const auto newSliderValue = *a.value;
+    std::printf("[logic] slider moved to %d\n", newSliderValue);
+    mpc.getActiveControls()->setSlider(newSliderValue);
 }
 
 void ClientInputController::handlePot(const ClientInput& a)

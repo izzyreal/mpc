@@ -14,20 +14,26 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, s
 {
     ClientInput clientEvent;
 
-    switch (hostEvent.source) {
+    switch (hostEvent.source){
     case HostInputEvent::MIDI: {
         const auto& midi = std::get<MidiEvent>(hostEvent.payload);
-        if (midi.messageType == MidiEvent::NOTE) {
+        if (midi.messageType == MidiEvent::NOTE)
+        {
             int padIndex = midi.data1 % 16;
-            if (midi.data2 > 0) {
+            if (midi.data2 > 0)
+            {
                 clientEvent.type = ClientInput::Type::PadPress;
                 clientEvent.index = padIndex;
                 clientEvent.value = midi.data2;
-            } else {
+            }
+            else
+            {
                 clientEvent.type = ClientInput::Type::PadRelease;
                 clientEvent.index = padIndex;
             }
-        } else if (midi.messageType == MidiEvent::CC) {
+        }
+        else if (midi.messageType == MidiEvent::CC)
+        {
             clientEvent.type = ClientInput::Type::SliderMove;
             clientEvent.value = midi.data2;
         }
@@ -37,8 +43,8 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, s
     case HostInputEvent::MOUSE: {
         const auto& mouse = std::get<MouseEvent>(hostEvent.payload);
 
-        // Handle pads (PAD1–PAD16)
-        if (mouse.guiElement >= MouseEvent::PAD1 && mouse.guiElement <= MouseEvent::PAD16) {
+        if (mouse.guiElement >= MouseEvent::PAD1 && mouse.guiElement <= MouseEvent::PAD16)
+        {
             clientEvent.index = static_cast<int>(mouse.guiElement) - static_cast<int>(MouseEvent::PAD1);
             clientEvent.type =
                 (mouse.type == MouseEvent::BUTTON_DOWN)
@@ -52,9 +58,13 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, s
                 mouse.type == MouseEvent::MOVE)
                 clientEvent.value = static_cast<int>((1.f - mouse.normY) * static_cast<float>(mpc::hardware2::Pad::MAX_VELO));
         }
-
-        // Handle regular buttons
-        else if (mouse.guiElement >= MouseEvent::CURSOR_LEFT && mouse.guiElement <= MouseEvent::NUM_9) {
+        else if (mouse.guiElement == MouseEvent::SLIDER)
+        {
+            clientEvent.type = ClientInput::Type::SliderMove;
+            clientEvent.value = mouse.normY;
+        }
+        else if (mouse.guiElement >= MouseEvent::CURSOR_LEFT && mouse.guiElement <= MouseEvent::NUM_9)
+        {
             switch (mouse.guiElement) {
                 case MouseEvent::CURSOR_LEFT:       clientEvent.label = "left"; break;
                 case MouseEvent::CURSOR_RIGHT:      clientEvent.label = "right"; break;

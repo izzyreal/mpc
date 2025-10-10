@@ -71,7 +71,8 @@ struct MouseEvent {
         NUM_9,
 
         // Misc controls
-        DATA_WHEEL
+        DATA_WHEEL,
+        SLIDER
     };
 
     struct ButtonState {
