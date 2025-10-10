@@ -7,6 +7,9 @@ namespace mpc::inputlogic {
 struct KeyEvent {
     bool keyDown;
     int rawKeyCode;
+    bool shiftDown;
+    bool ctrlDown;
+    bool altDown;
 };
 
 struct MouseEvent {

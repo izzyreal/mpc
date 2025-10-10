@@ -4,6 +4,8 @@
 #include "controls/KeyCodeHelper.hpp"
 #include "controls/KbMapping.hpp"
 
+#include "hardware2/HardwareComponent.h"
+
 #include <stdexcept>
 
 using namespace mpc::inputlogic;
@@ -48,7 +50,7 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, s
             if (mouse.type == MouseEvent::BUTTON_DOWN ||
                 mouse.type == MouseEvent::BUTTON_UP ||
                 mouse.type == MouseEvent::MOVE)
-                clientEvent.value = static_cast<int>((1.f - mouse.normY) * 127.f);
+                clientEvent.value = static_cast<int>((1.f - mouse.normY) * static_cast<float>(mpc::hardware2::Pad::MAX_VELO));
         }
 
         // Handle regular buttons
@@ -151,7 +153,11 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, s
 
         if (label.substr(0, 4) == "pad-")
         {
+            const auto digitsString = label.substr(4);
+            const auto padNumber = std::stoi(digitsString);
             clientEvent.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
+            clientEvent.index = padNumber - 1;
+            if (key.keyDown) clientEvent.value = mpc::hardware2::Pad::MAX_VELO;
         }
         else if (label == "slider")
         {
@@ -165,18 +171,14 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, s
 
             int increment = 1;
 
-            /*
-            if (mpc.getControls()->isCtrlPressed())
-                increment *= 10;
+            if (key.ctrlDown) increment *= 10;
+            if (key.altDown) increment *= 10;
+            if (key.shiftDown) increment *= 10;
 
-            if (mpc.getControls()->isAltPressed())
-                increment *= 10;
-
-            if (mpc.getControls()->isShiftPressed())
-                increment *= 10;
-            */
             if (label.find("down") != std::string::npos)
+            {
                 increment = -increment;
+            }
 
             clientEvent.value = increment;
         }
