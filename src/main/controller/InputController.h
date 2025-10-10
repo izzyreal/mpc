@@ -28,6 +28,8 @@ class InputController : public InputControllerBase {
 
         void handlePadAftertouch(const mpc::inputlogic::InputAction& a);
 
+        void handlePadRelease(const mpc::inputlogic::InputAction& a);
+
         void handleDataWheel(const mpc::inputlogic::InputAction& a);
 
         void handleSlider(const mpc::inputlogic::InputAction& a);

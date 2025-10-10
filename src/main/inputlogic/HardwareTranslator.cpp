@@ -14,6 +14,11 @@ InputAction HardwareTranslator::fromPadPress(int padIndex, int velocity)
     return InputAction{ "pad-" + std::to_string(padIndex) + "-press", velocity };
 }
 
+InputAction HardwareTranslator::fromPadRelease(int padIndex)
+{
+    return InputAction{ "pad-" + std::to_string(padIndex) + "-release", std::nullopt };
+}
+
 InputAction HardwareTranslator::fromPadAftertouch(int padIndex, int pressure)
 {
     return InputAction{ "pad-" + std::to_string(padIndex) + "-aftertouch", pressure };

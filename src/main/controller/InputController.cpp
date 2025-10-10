@@ -2,6 +2,7 @@
 
 #include "inputlogic/InputAction.h"
 #include "controller/PadContextFactory.h"
+#include "controls/GlobalReleaseControls.hpp"
 #include "controls/BaseControls.hpp"
 #include "Mpc.hpp"
 
@@ -16,6 +17,7 @@ void InputController::handleAction(const InputAction& action)
 {
     if (startsWith(action.id, "pad-") && endsWith(action.id, "-press")) return handlePadPress(action);
     if (startsWith(action.id, "pad-") && endsWith(action.id, "-aftertouch")) return handlePadAftertouch(action);
+    if (startsWith(action.id, "pad-") && endsWith(action.id, "-release")) return handlePadRelease(action);
     if (startsWith(action.id, "datawheel-")) return handleDataWheel(action);
     if (action.id == "slider-move") return handleSlider(action);
     if (action.id == "pot-move") return handlePot(action);
@@ -41,6 +43,16 @@ void InputController::handlePadPress(const InputAction& a)
     auto padIndexWithBank = num + (mpc.getBank() * 16);
     auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, *a.value, mpc.getLayeredScreen()->getCurrentScreenName());
     mpc::controls::BaseControls::pad(ctx, padIndexWithBank, *a.value);
+}
+
+void InputController::handlePadRelease(const InputAction& a)
+{
+    assert(!a.value.has_value());
+    const auto num = std::stoi(a.id.substr(4, a.id.find("-release") - 4));
+    std::printf("[logic] pad %d released\n", num);
+    auto padIndexWithBank = num + (mpc.getBank() * 16);
+    auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, mpc.getLayeredScreen()->getCurrentScreenName());
+    mpc::controls::GlobalReleaseControls::simplePad(ctx);
 }
 
 void InputController::handlePadAftertouch(const InputAction& a)

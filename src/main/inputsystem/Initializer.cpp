@@ -13,8 +13,12 @@ void Initializer::init(InputMapper &inputMapper, std::shared_ptr<InputController
 {
     for (int padNumber = 0; padNumber < 16; ++padNumber)
     {
-        const auto actionId = "pad-" + std::to_string(padNumber) + "-press";
-        inputMapper.bind(actionId, [inputController](const InputAction& a) {
+        const auto pressActionId = "pad-" + std::to_string(padNumber) + "-press";
+        inputMapper.bind(pressActionId, [inputController](const InputAction& a) {
+            inputController->handleAction(a);
+        });
+        const auto releaseActionId = "pad-" + std::to_string(padNumber) + "-release";
+        inputMapper.bind(releaseActionId, [inputController](const InputAction& a) {
             inputController->handleAction(a);
         });
     }

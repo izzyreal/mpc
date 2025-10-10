@@ -161,7 +161,7 @@ protected:
     void onRelease() override final {
         resetPressure();
         resetVelocity();
-        //mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadRelease(index));
+        mapper.trigger(mpc::inputlogic::HardwareTranslator::fromPadRelease(index));
     }
     void onPress() override final {
         doPressWithVelocity(MAX_VELO); // Default to max velocity for non-velocity-sensitive press

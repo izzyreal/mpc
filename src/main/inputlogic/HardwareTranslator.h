@@ -10,6 +10,8 @@ namespace mpc::inputlogic {
 
             static InputAction fromPadPress(int padIndex, int velocity);
 
+            static InputAction fromPadRelease(int padIndex);
+
             static InputAction fromPadAftertouch(int padIndex, int pressure);
 
             static InputAction fromSliderMove(int value);
