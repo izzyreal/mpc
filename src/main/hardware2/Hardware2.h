@@ -9,6 +9,9 @@
 #include "hardware/PadAndButtonKeyboard.hpp"
 #include "hardware/TopPanel.hpp"
 #include "hardware/Led.hpp"
+#include "inputlogic/ClientInputEvent.h"
+#include "inputlogic/HostToClientTranslator.h"
+#include "inputlogic/HostInputEvent.h"
 
 #include "Mpc.hpp"
 
@@ -66,9 +69,40 @@ public:
         slider = std::make_shared<Slider>(mpc.inputMapper);
     }
 
+    void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
+    {
+        const auto clientEvent = mpc::inputlogic::HostToClientTranslator::translate(hostEvent);
+        dispatchClientInput(clientEvent);
+    }
+
+    void dispatchClientInput(const mpc::inputlogic::ClientInputEvent& e)
+    {
+        if (e.component.rfind("pad-", 0) == 0) {
+            int index = std::stoi(e.component.substr(4));
+            if (index >= 0 && index < (int)pads.size()) {
+                auto pad = pads[index];
+                if (e.action == "press") {
+                    if (e.value) pad->pressWithVelocity(*e.value);
+                    else pad->press();
+                } else if (e.action == "release") {
+                    pad->release();
+                } else if (e.action == "aftertouch" && e.value) {
+                    pad->aftertouch(*e.value);
+                }
+            }
+        } else if (auto button = getButton(e.component)) {
+            if (e.action == "press") button->press();
+            else if (e.action == "release") button->release();
+        } else if (e.component == "datawheel") {
+            if (e.action == "turn-up") dataWheel->turn(1);
+            else if (e.action == "turn-down") dataWheel->turn(-1);
+        } else if (e.component == "slider" && e.value) {
+            slider->moveTo(*e.value);
+        }
+    }
+
     mpc::hardware::PadAndButtonKeyboard* getPadAndButtonKeyboard() { return padAndButtonKeyboard; }
     std::shared_ptr<mpc::hardware::TopPanel> getTopPanel() { return topPanel; }
-
     std::vector<std::string>& getButtonLabels() { return buttonLabels; }
 
     std::shared_ptr<Pad> getPad(int index) {
