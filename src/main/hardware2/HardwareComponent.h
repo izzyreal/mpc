@@ -144,8 +144,8 @@ protected:
         mapper.trigger(mpc::inputlogic::HardwareTranslator::fromButtonRelease(label));
     }
 public:
-    Button(mpc::inputlogic::InputMapper& mapper, std::string labelToUse)
-        : Component(mapper), label(std::move(labelToUse)) {}
+    Button(mpc::inputlogic::InputMapper& mapperToUse, std::string labelToUse)
+        : Component(mapperToUse), label(std::move(labelToUse)) {}
 };
 
 class Pad final : public Component, public VelocitySensitivePressable, public Aftertouchable {
@@ -167,21 +167,21 @@ protected:
         doPressWithVelocity(MAX_VELO); // Default to max velocity for non-velocity-sensitive press
     }
 public:
-    Pad(int indexToUse, mpc::inputlogic::InputMapper& mapper)
-        : Component(mapper), index(indexToUse) {}
+    Pad(int indexToUse, mpc::inputlogic::InputMapper& mapperToUse)
+        : Component(mapperToUse), index(indexToUse) {}
 
     int getIndex() const { return index; }
 };
 
 class DataWheel final : public Component {
 public:
-    explicit DataWheel(mpc::inputlogic::InputMapper& mapper) : Component(mapper) {}
+    explicit DataWheel(mpc::inputlogic::InputMapper& mapperToUse) : Component(mapperToUse) {}
     void turn(int steps) { mapper.trigger(mpc::inputlogic::HardwareTranslator::fromDataWheelTurn(steps)); }
 };
 
 class Slider final : public Component, public Continuous<int, 0, 127> {
 public:
-    explicit Slider(mpc::inputlogic::InputMapper& mapper) : Component(mapper) {}
+    explicit Slider(mpc::inputlogic::InputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {
         setValue(value);
         mapper.trigger(mpc::inputlogic::HardwareTranslator::fromSliderMove(value));
@@ -190,7 +190,7 @@ public:
 
 class Pot final : public Component, public Continuous<int, 0, 100> {
 public:
-    explicit Pot(mpc::inputlogic::InputMapper& mapper) : Component(mapper) {}
+    explicit Pot(mpc::inputlogic::InputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {
         setValue(value);
         mapper.trigger(mpc::inputlogic::HardwareTranslator::fromButtonPress("pot-move"));
