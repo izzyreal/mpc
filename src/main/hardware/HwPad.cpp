@@ -97,7 +97,3 @@ unsigned char HwPad::getPressure()
     return pressure;
 }
 
-void HwPad::setPadIndexWithBankWhenLastPressed(char padIndexWithBank)
-{
-  padIndexWithBankWhenLastPressed = padIndexWithBank;
-}

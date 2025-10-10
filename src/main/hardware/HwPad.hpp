@@ -28,7 +28,6 @@ namespace mpc::hardware {
     public:
         int getIndex();
         char getPadIndexWithBankWhenLastPressed();
-        void setPadIndexWithBankWhenLastPressed(char padIndexWithBank);
         void push(int velo) override;
         void release() override;
         bool isPressed();
