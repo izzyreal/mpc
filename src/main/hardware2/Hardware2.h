@@ -77,66 +77,68 @@ public:
         dispatchClientInput(clientEvent);
     }
 
-    void dispatchClientInput(const mpc::inputlogic::ClientInput& e)
+    void dispatchClientInput(const std::optional<mpc::inputlogic::ClientInput> maybeClientInput)
     {
-        // Map the typed client input to hardware component calls so physical state is simulated,
-        // then the components themselves will emit mapped actions into the mapper which the controller handles.
+        if (!maybeClientInput.has_value())
+        {
+            printf("Hardware2::dispatchClientInput received an empty ClientInput");
+            return;
+        }
+
         using ClientInput = mpc::inputlogic::ClientInput;
 
-        switch (e.type) {
+        const ClientInput &input = *maybeClientInput;
+
+        switch (input.type) {
         case ClientInput::Type::PadPress:
-            if (e.index) {
-                int index = *e.index;
+            if (input.index) {
+                int index = *input.index;
                 if (index >= 0 && index < static_cast<int>(pads.size())) {
                     auto pad = pads[index];
-                    if (e.value) pad->pressWithVelocity(*e.value);
+                    if (input.value) pad->pressWithVelocity(*input.value);
                     else pad->press();
                 }
             }
             break;
         case ClientInput::Type::PadRelease:
-            if (e.index) {
-                int index = *e.index;
+            if (input.index) {
+                int index = *input.index;
                 if (index >= 0 && index < static_cast<int>(pads.size())) {
                     pads[index]->release();
                 }
             }
             break;
         case ClientInput::Type::PadAftertouch:
-            if (e.index && e.value) {
-                int index = *e.index;
+            if (input.index && input.value) {
+                int index = *input.index;
                 if (index >= 0 && index < static_cast<int>(pads.size())) {
-                    pads[index]->aftertouch(*e.value);
+                    pads[index]->aftertouch(*input.value);
                 }
             }
             break;
         case ClientInput::Type::ButtonPress:
-            if (e.label) {
-                auto btn = getButton(*e.label);
+            if (input.label) {
+                auto btn = getButton(*input.label);
                 if (btn) btn->press();
             }
             break;
         case ClientInput::Type::ButtonRelease:
-            if (e.label) {
-                auto btn = getButton(*e.label);
+            if (input.label) {
+                auto btn = getButton(*input.label);
                 if (btn) btn->release();
             }
             break;
         case ClientInput::Type::DataWheelTurn:
-            if (e.value) {
-                dataWheel->turn(*e.value);
+            printf("data wheel\n");
+            if (input.value) {
+                dataWheel->turn(*input.value);
             }
             break;
         case ClientInput::Type::SliderMove:
-            if (e.value) slider->moveTo(*e.value);
+            printf("slider\n");
+            if (input.value) slider->moveTo(*input.value);
             break;
         case ClientInput::Type::PotMove:
-            if (e.value) {
-                // choose which pot? Host translator should indicate via label if necessary.
-                // For now, apply to volPot as an example if label "vol" else recPot if "rec"
-                // or if no label, apply to slider.
-                slider->moveTo(*e.value); // fallback
-            }
             break;
         default:
             break;
