@@ -42,6 +42,7 @@ struct MidiEvent {
     uint8_t data2;
 };
 
+/* Input events coming from the host, i.e. the machine the virtual MPC2000XL is virtualized on */
 struct HostInputEvent {
     enum Source { KEYBOARD, MOUSE, MIDI };
     Source source;

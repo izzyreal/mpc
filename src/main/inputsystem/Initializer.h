@@ -4,6 +4,7 @@
 
 namespace mpc::inputlogic {
     class ClientInputMapper;
+    struct ClientInput;
 }
 
 namespace mpc::controller {
@@ -11,9 +12,7 @@ namespace mpc::controller {
 }
 
 namespace mpc::inputsystem {
-
-struct Initializer {
-    static void init(mpc::inputlogic::ClientInputMapper &inputMapper, std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController);
-};
-
-} // namespace mpc::inputsystem
+    struct Initializer {
+        static void init(mpc::inputlogic::ClientInputMapper &inputMapper, std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController);
+    };
+}

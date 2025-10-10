@@ -1,11 +1,9 @@
 #pragma once
 
-#include "ClientInputControllerBase.h"
-
-#include <string>
+#include "controller/ClientInputControllerBase.h"
 
 namespace mpc::inputlogic {
-    struct ClientInputAction;
+    struct ClientInput;
 }
 
 namespace mpc {
@@ -14,30 +12,23 @@ namespace mpc {
 
 namespace mpc::controller {
 
+/* Controller for input going into the client, i.e. the virtualized MPC2000XL */
 class ClientInputController : public ClientInputControllerBase {
-    public:
-        explicit ClientInputController(mpc::Mpc&);
-        void handleAction(const mpc::inputlogic::ClientInputAction& action) override;
+public:
+    explicit ClientInputController(mpc::Mpc&);
+    void handleAction(const mpc::inputlogic::ClientInput& action) override;
 
-    private:
-        mpc::Mpc &mpc;
-        static bool startsWith(const std::string& s, const std::string& prefix);
-        static bool endsWith(const std::string& s, const std::string& suffix);
+private:
+    mpc::Mpc &mpc;
 
-        void handlePadPress(const mpc::inputlogic::ClientInputAction& a);
+    void handlePadPress(const mpc::inputlogic::ClientInput& a);
+    void handlePadAftertouch(const mpc::inputlogic::ClientInput& a);
+    void handlePadRelease(const mpc::inputlogic::ClientInput& a);
+    void handleDataWheel(const mpc::inputlogic::ClientInput& a);
+    void handleSlider(const mpc::inputlogic::ClientInput& a);
+    void handlePot(const mpc::inputlogic::ClientInput& a);
+    void handleButtonPress(const mpc::inputlogic::ClientInput& a);
+    void handleButtonRelease(const mpc::inputlogic::ClientInput& a);
+};
 
-        void handlePadAftertouch(const mpc::inputlogic::ClientInputAction& a);
-
-        void handlePadRelease(const mpc::inputlogic::ClientInputAction& a);
-
-        void handleDataWheel(const mpc::inputlogic::ClientInputAction& a);
-
-        void handleSlider(const mpc::inputlogic::ClientInputAction& a);
-
-        void handlePot(const mpc::inputlogic::ClientInputAction& a);
-
-        void handleButtonPress(const mpc::inputlogic::ClientInputAction& a);
-
-        void handleButtonRelease(const mpc::inputlogic::ClientInputAction& a);
-    };
 } // namespace mpc::controller

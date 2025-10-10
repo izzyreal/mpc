@@ -9,7 +9,7 @@
 #include "hardware/PadAndButtonKeyboard.hpp"
 #include "hardware/TopPanel.hpp"
 #include "hardware/Led.hpp"
-#include "inputlogic/ClientInputEvent.h"
+#include "inputlogic/ClientInput.h"
 #include "inputlogic/HostToClientTranslator.h"
 #include "inputlogic/HostInputEvent.h"
 
@@ -75,29 +75,69 @@ public:
         dispatchClientInput(clientEvent);
     }
 
-    void dispatchClientInput(const mpc::inputlogic::ClientInputEvent& e)
+    void dispatchClientInput(const mpc::inputlogic::ClientInput& e)
     {
-        if (e.component.rfind("pad-", 0) == 0) {
-            int index = std::stoi(e.component.substr(4));
-            if (index >= 0 && index < (int)pads.size()) {
-                auto pad = pads[index];
-                if (e.action == "press") {
+        // Map the typed client input to hardware component calls so physical state is simulated,
+        // then the components themselves will emit mapped actions into the mapper which the controller handles.
+        using ClientInput = mpc::inputlogic::ClientInput;
+
+        switch (e.type) {
+        case ClientInput::Type::PadPress:
+            if (e.index) {
+                int index = *e.index;
+                if (index >= 0 && index < static_cast<int>(pads.size())) {
+                    auto pad = pads[index];
                     if (e.value) pad->pressWithVelocity(*e.value);
                     else pad->press();
-                } else if (e.action == "release") {
-                    pad->release();
-                } else if (e.action == "aftertouch" && e.value) {
-                    pad->aftertouch(*e.value);
                 }
             }
-        } else if (auto button = getButton(e.component)) {
-            if (e.action == "press") button->press();
-            else if (e.action == "release") button->release();
-        } else if (e.component == "datawheel") {
-            if (e.action == "turn-up") dataWheel->turn(1);
-            else if (e.action == "turn-down") dataWheel->turn(-1);
-        } else if (e.component == "slider" && e.value) {
-            slider->moveTo(*e.value);
+            break;
+        case ClientInput::Type::PadRelease:
+            if (e.index) {
+                int index = *e.index;
+                if (index >= 0 && index < static_cast<int>(pads.size())) {
+                    pads[index]->release();
+                }
+            }
+            break;
+        case ClientInput::Type::PadAftertouch:
+            if (e.index && e.value) {
+                int index = *e.index;
+                if (index >= 0 && index < static_cast<int>(pads.size())) {
+                    pads[index]->aftertouch(*e.value);
+                }
+            }
+            break;
+        case ClientInput::Type::ButtonPress:
+            if (e.label) {
+                auto btn = getButton(*e.label);
+                if (btn) btn->press();
+            }
+            break;
+        case ClientInput::Type::ButtonRelease:
+            if (e.label) {
+                auto btn = getButton(*e.label);
+                if (btn) btn->release();
+            }
+            break;
+        case ClientInput::Type::DataWheelTurn:
+            if (e.value) {
+                dataWheel->turn(*e.value);
+            }
+            break;
+        case ClientInput::Type::SliderMove:
+            if (e.value) slider->moveTo(*e.value);
+            break;
+        case ClientInput::Type::PotMove:
+            if (e.value) {
+                // choose which pot? Host translator should indicate via label if necessary.
+                // For now, apply to volPot as an example if label "vol" else recPot if "rec"
+                // or if no label, apply to slider.
+                slider->moveTo(*e.value); // fallback
+            }
+            break;
+        default:
+            break;
         }
     }
 

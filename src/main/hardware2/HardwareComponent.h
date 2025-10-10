@@ -7,9 +7,11 @@
 #include <optional>
 
 #include <inputlogic/ClientInputMapper.h>
-#include <inputlogic/ClientInputAction.h>
+#include <inputlogic/ClientInput.h>
 
 namespace mpc::hardware2 {
+
+using namespace mpc::inputlogic;
 
 class Component {
 protected:
@@ -137,11 +139,15 @@ class Button final : public Component, public Pressable {
     const std::string label;
 protected:
     void onPress() override final {
-        mpc::inputlogic::ClientInputAction action{ label, std::nullopt };
+        ClientInput action;
+        action.type = ClientInput::Type::ButtonPress;
+        action.label = label;
         mapper.trigger(action);
     }
     void onRelease() override final {
-        mpc::inputlogic::ClientInputAction action{ label + "-release", std::nullopt };
+        ClientInput action;
+        action.type = ClientInput::Type::ButtonRelease;
+        action.label = label;
         mapper.trigger(action);
     }
 public:
@@ -153,17 +159,25 @@ class Pad final : public Component, public VelocitySensitivePressable, public Af
     const int index;
 protected:
     void onPressWithVelocity(int velocity) override final {
-        mpc::inputlogic::ClientInputAction action{ "pad-" + std::to_string(index) + "-press", velocity };
+        ClientInput action;
+        action.type = ClientInput::Type::PadPress;
+        action.index = index;
+        action.value = velocity;
         mapper.trigger(action);
     }
     void onAftertouch(int pressure) override final {
-        mpc::inputlogic::ClientInputAction action{ "pad-" + std::to_string(index) + "-aftertouch", pressure };
+        ClientInput action;
+        action.type = ClientInput::Type::PadAftertouch;
+        action.index = index;
+        action.value = pressure;
         mapper.trigger(action);
     }
     void onRelease() override final {
         resetPressure();
         resetVelocity();
-        mpc::inputlogic::ClientInputAction action{ "pad-" + std::to_string(index) + "-release", std::nullopt };
+        ClientInput action;
+        action.type = ClientInput::Type::PadRelease;
+        action.index = index;
         mapper.trigger(action);
     }
     void onPress() override final {
@@ -180,7 +194,9 @@ class DataWheel final : public Component {
 public:
     explicit DataWheel(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
     void turn(int steps) {
-        mpc::inputlogic::ClientInputAction action{ "datawheel-turn", steps };
+        ClientInput action;
+        action.type = ClientInput::Type::DataWheelTurn;
+        action.value = steps;
         mapper.trigger(action);
     }
 };
@@ -190,7 +206,9 @@ public:
     explicit Slider(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {
         setValue(value);
-        mpc::inputlogic::ClientInputAction action{ "slider-move", value };
+        ClientInput action;
+        action.type = ClientInput::Type::SliderMove;
+        action.value = value;
         mapper.trigger(action);
     }
 };
@@ -200,9 +218,10 @@ public:
     explicit Pot(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
     void moveTo(int value) {
         setValue(value);
-        mpc::inputlogic::ClientInputAction action{ "pot-move", value };
+        ClientInput action;
+        action.type = ClientInput::Type::PotMove;
+        action.value = value;
         mapper.trigger(action);
     }
 };
 } // namespace mpc::hardware2
-
