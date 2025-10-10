@@ -4,7 +4,6 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
-#include <hardware/HwSlider.hpp>
 #include <hardware/TopPanel.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
@@ -290,7 +289,7 @@ void BaseControls::pad(PadPushContext &ctx, const int padIndexWithBank, int velo
         ctx.noteValueLengthInTicks,
         ctx.swing,
         ctx.metronomeOnlyTickPosition,
-        ctx.hardware->getSlider()->getValue(),
+        ctx.hardwareSliderValue,
         ctx.drumScreenSelectedDrum,
         ctx.currentScreenIsSamplerScreen,
         ctx.program,

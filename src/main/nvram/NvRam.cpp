@@ -11,8 +11,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/HwSlider.hpp>
+#include "hardware2/Hardware2.h"
 
 #include <file/all/AllParser.hpp>
 #include <file/all/Defaults.hpp>
@@ -76,7 +75,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (vmpcAutoSaveScreen->autoLoadOnStart),
     (char) (audioMidiServices->getRecordLevel()),
     (char) (audioMidiServices->getMainLevel()),
-    (char) (mpc.getHardware()->getSlider()->getValue()),
+    (char) (mpc.getHardware2()->getSlider()->getValue()),
     (char) (vmpcSettingsScreen->autoConvertWavs),
     0x00, // This was tap averaging, but it does not belong here
     (char) (othersScreen->getContrast()),
@@ -116,7 +115,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 3) vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
   if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
   if (bytes.size() > 5) audioMidiServices->setMainLevel(bytes[5]);
-  if (bytes.size() > 6) mpc.getHardware()->getSlider()->setValue(bytes[6]);
+  if (bytes.size() > 6) mpc.getHardware2()->getSlider()->setValue(bytes[6]);
   if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
   // We used to have tap averaging here, but it doesn't belong here, so
   // for now we ignore this byte.

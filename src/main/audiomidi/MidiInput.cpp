@@ -12,7 +12,6 @@
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
 #include <hardware/Hardware.hpp>
-#include <hardware/HwSlider.hpp>
 #include <hardware/Pot.hpp>
 #include <hardware/TopPanel.hpp>
 
@@ -133,7 +132,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
         // For now, we're safe to simply invert the input, but it would be nice
         // to make this congruent with the MPD16 (assuming it's the same for
         // other controllers, but it would be nice to verify some).
-        hardware->getSlider()->setValue(127 - value);
+        hardware2->getSlider()->setValue(127 - value);
     }
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");

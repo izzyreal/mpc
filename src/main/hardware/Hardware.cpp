@@ -4,7 +4,6 @@
 #include "TopPanel.hpp"
 #include "Led.hpp"
 #include "Pot.hpp"
-#include "HwSlider.hpp"
 
 #include "PadAndButtonKeyboard.hpp"
 
@@ -25,8 +24,6 @@ Hardware::Hardware(mpc::Mpc& mpc)
     
     recPot = std::make_shared<Pot>(mpc, "rec");
     volPot = std::make_shared<Pot>(mpc, "vol");
-    
-    slider = std::make_shared<Slider>(mpc);
 }
 
 std::shared_ptr<TopPanel> Hardware::getTopPanel()
@@ -56,10 +53,6 @@ std::shared_ptr<Led> Hardware::getLed(std::string label)
 
 std::vector<std::shared_ptr<Led>> Hardware::getLeds() {
     return leds;
-}
-
-std::shared_ptr<Slider> Hardware::getSlider() {
-    return slider;
 }
 
 std::shared_ptr<HwComponent> Hardware::getComponentByLabel(const std::string& label)

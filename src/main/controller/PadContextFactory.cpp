@@ -6,6 +6,7 @@
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/TopPanel.hpp"
+#include "hardware2/Hardware2.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -60,6 +61,8 @@ PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padInde
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
     std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
+    const auto hardwareSliderValue = mpc.getHardware2()->getSlider()->getValue();
+
     return {
         currentScreenName,
         isSoundScreen,
@@ -88,7 +91,6 @@ PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padInde
         activeTrack,
         mpc.getSampler(),
         mpc.getSequencer(),
-        mpc.getHardware(),
         mpc.getAudioMidiServices(),
         mpc.getControls(),
         mpc.getLayeredScreen(),
@@ -101,7 +103,8 @@ PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padInde
         mpc.getActiveControls(),
         setMpcNote,
         setMpcPad,
-        mpc.getLayeredScreen()->getFocus()
+        mpc.getLayeredScreen()->getFocus(),
+        hardwareSliderValue
     }; 
 }
 

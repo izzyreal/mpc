@@ -4,7 +4,6 @@
 #include "hardware2/HardwareComponent.h"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
-#include "hardware/HwSlider.hpp"
 #include "hardware/Pot.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
@@ -148,7 +147,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         }
         else if (label == "slider")
         {
-            hardware->getSlider()->setValue(controllerValue);
+            hardware2->getSlider()->setValue(controllerValue);
         }
         else if (label == "rec-gain")
         {

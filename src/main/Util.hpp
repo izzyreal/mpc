@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <stdexcept>
 
 #include "mpc_types.hpp"
 #include "sampler/PgmSlider.hpp"
@@ -22,24 +21,24 @@ namespace mpc
 	public:
         struct SixteenLevelsContext {
             const bool isSixteenLevelsEnabled;
-            const int type; // From Assign16LevelsScreen::getType()
-            const int originalKeyPad; // From Assign16LevelsScreen::getOriginalKeyPad()
-            const int note; // From Assign16LevelsScreen::getNote()
-            const int parameter; // From Assign16LevelsScreen::getParameter()
+            const int type;
+            const int originalKeyPad;
+            const int note;
+            const int parameter;
             const int padIndexWithoutBank;
         };
         struct SliderNoteVariationContext {
-            const int sliderValue; // From Hardware::getSlider()->getValue()
-            const int programNote; // From Program::getSlider()->getNote()
-            const int sliderParameter; // From Program::getSlider()->getParameter()
-            const int tuneLowRange; // From Program::getSlider()->getTuneLowRange()
-            const int tuneHighRange; // From Program::getSlider()->getTuneHighRange()
-            const int decayLowRange; // From Program::getSlider()->getDecayLowRange()
-            const int decayHighRange; // From Program::getSlider()->getDecayHighRange()
-            const int attackLowRange; // From Program::getSlider()->getAttackLowRange()
-            const int attackHighRange; // From Program::getSlider()->getAttackHighRange()
-            const int filterLowRange; // From Program::getSlider()->getFilterLowRange()
-            const int filterHighRange; // From Program::getSlider()->getFilterHighRange()
+            const int sliderValue;
+            const int programNote;
+            const int sliderParameter;
+            const int tuneLowRange;
+            const int tuneHighRange;
+            const int decayLowRange;
+            const int decayHighRange;
+            const int attackLowRange;
+            const int attackHighRange;
+            const int filterLowRange;
+            const int filterHighRange;
             mpc::sampler::PgmSlider *slider; 
         };
         static std::string getFileName(const std::string& s);
@@ -62,3 +61,4 @@ namespace mpc
 
     };
 }
+

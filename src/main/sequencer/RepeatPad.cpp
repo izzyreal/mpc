@@ -6,7 +6,6 @@
 #include "audiomidi/MidiOutput.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware2/Hardware2.h"
-#include "hardware/HwSlider.hpp"
 #include "hardware/TopPanel.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -61,7 +60,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
         if (program)
         {
-            auto hardwareSlider = mpc.getHardware()->getSlider();
+            auto hardwareSlider = mpc.getHardware2()->getSlider();
             auto programSlider = program->getSlider();
 
             Util::SliderNoteVariationContext sliderNoteVariationContext {

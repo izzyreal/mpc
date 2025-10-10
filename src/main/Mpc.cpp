@@ -26,7 +26,6 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware2/Hardware2.h>
-#include <hardware/HwSlider.hpp>
 #include <hardware/Led.hpp>
 
 #include <lcdgui/Screens.hpp>

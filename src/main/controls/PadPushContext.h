@@ -26,10 +26,6 @@ namespace mpc::sequencer  {
     class FrameSeq;
 }
 
-namespace mpc::hardware {
-    class Hardware;
-}
-
 namespace mpc::audiomidi {
     class AudioMidiServices;
     class EventHandler;
@@ -79,7 +75,6 @@ namespace mpc::controls {
         std::shared_ptr<mpc::sequencer::Track> track;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
-        std::shared_ptr<mpc::hardware::Hardware> hardware;
         std::shared_ptr<mpc::audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::controls::Controls> controls;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> layeredScreen;
@@ -96,5 +91,6 @@ namespace mpc::controls {
         std::function<void(int)> setMpcPad;
 
         std::string currentFieldName;
+        int hardwareSliderValue;
     };
 }
