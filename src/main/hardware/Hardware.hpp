@@ -10,7 +10,6 @@ namespace mpc::hardware
 {
 class HwComponent;
 class TopPanel;
-class Button;
 class Pot;
 class Led;
 class Slider;
@@ -26,11 +25,9 @@ class Hardware final
 
 private:
     PadAndButtonKeyboard* padAndButtonKeyboard;
-    std::vector<std::string> buttonLabels;
     std::vector<std::shared_ptr<HwComponent>> components;
 
     std::shared_ptr<TopPanel> topPanel;
-    std::vector<std::shared_ptr<Button>> buttons;
     std::vector<std::shared_ptr<Led>> leds;
 
     std::shared_ptr<Slider> slider;
@@ -40,8 +37,6 @@ private:
 public:
     PadAndButtonKeyboard* getPadAndButtonKeyboard();
     std::shared_ptr<TopPanel> getTopPanel();
-    std::vector<std::string>& getButtonLabels();
-    std::shared_ptr<Button> getButton(std::string label);
     std::shared_ptr<Led> getLed(std::string label);
     std::vector<std::shared_ptr<Led>> getLeds();
     std::shared_ptr<Pot> getRecPot();

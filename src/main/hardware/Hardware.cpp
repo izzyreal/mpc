@@ -2,7 +2,6 @@
 
 #include "HwComponent.hpp"
 #include "TopPanel.hpp"
-#include "Button.hpp"
 #include "Led.hpp"
 #include "Pot.hpp"
 #include "HwSlider.hpp"
@@ -19,20 +18,6 @@ Hardware::Hardware(mpc::Mpc& mpc)
 
     topPanel = std::make_shared<TopPanel>();
     
-    buttonLabels = { "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "play-start", "main-screen", "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap", "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "shift_#1", "shift_#2", "shift_#3", "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0_extra", "1_extra", "2_extra", "3_extra", "4_extra", "5_extra", "6_extra", "7_extra", "8_extra", "9_extra" };
-    
-    for (auto& l : buttonLabels)
-    {
-        buttons.push_back(std::make_shared<Button>(mpc, l));
-        components.push_back(buttons.back());
-    }
-    
-    for (int i = 0; i <= 9; i++)
-    {
-        buttons.push_back(std::make_shared<Button>(mpc, std::to_string(i)));
-        components.push_back(buttons.back());
-    }
-    
     std::vector<std::string> ledLabels{ "full-level", "sixteen-levels", "next-seq", "track-mute", "pad-bank-a", "pad-bank-b", "pad-bank-c", "pad-bank-d", "after", "undo-seq", "rec", "overdub", "play" };
     
     for (auto& l : ledLabels)
@@ -42,11 +27,6 @@ Hardware::Hardware(mpc::Mpc& mpc)
     volPot = std::make_shared<Pot>(mpc, "vol");
     
     slider = std::make_shared<Slider>(mpc);
-}
-
-std::vector<std::string>& Hardware::getButtonLabels()
-{
-    return buttonLabels;
 }
 
 std::shared_ptr<TopPanel> Hardware::getTopPanel()
@@ -62,13 +42,6 @@ std::shared_ptr<Pot> Hardware::getRecPot()
 std::shared_ptr<Pot> Hardware::getVolPot()
 {
     return volPot;
-}
-
-std::shared_ptr<Button> Hardware::getButton(std::string label)
-{
-    for (auto b : buttons)
-        if (b->getLabel() == label) return b;
-    return {};
 }
 
 std::shared_ptr<Led> Hardware::getLed(std::string label)
@@ -106,3 +79,4 @@ PadAndButtonKeyboard* Hardware::getPadAndButtonKeyboard()
 {
     return padAndButtonKeyboard;
 }
+

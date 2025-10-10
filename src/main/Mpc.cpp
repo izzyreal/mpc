@@ -160,7 +160,7 @@ void Mpc::init()
 	MLOG("Mpc is ready");
 
     inputController = std::make_shared<mpc::controller::ClientInputController>(*this);
-    mpc::inputsystem::Initializer::init(inputMapper, inputController);
+    mpc::inputsystem::Initializer::init(inputMapper, inputController, hardware2->getButtonLabels());
 }
 
 std::shared_ptr<controls::Controls> Mpc::getControls()
