@@ -25,7 +25,6 @@ private:
     std::vector<std::shared_ptr<mpc::hardware::Led>> leds;
     std::shared_ptr<mpc::hardware::TopPanel> topPanel;
 
-    std::vector<std::string> buttonLabels;
     std::vector<std::shared_ptr<Pad>> pads;
     std::unordered_map<std::string, std::shared_ptr<Button>> buttons;
     std::shared_ptr<DataWheel> dataWheel;
@@ -39,19 +38,10 @@ public:
         padAndButtonKeyboard = new mpc::hardware::PadAndButtonKeyboard(mpc);
         topPanel = std::make_shared<mpc::hardware::TopPanel>();
 
-        buttonLabels = {
-            "left", "right", "up", "down", "rec", "overdub", "stop", "play", "play-start", "main-screen",
-            "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap",
-            "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels",
-            "f1", "f2", "f3", "f4", "f5", "f6", "shift", "shift_#1", "shift_#2", "shift_#3",
-            "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d",
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-            "0_extra", "1_extra", "2_extra", "3_extra", "4_extra", "5_extra",
-            "6_extra", "7_extra", "8_extra", "9_extra"
-        };
-
-        for (const auto& label : buttonLabels)
+        for (const auto &label : getButtonLabels())
+        {
             buttons[label] = std::make_shared<Button>(mpc.inputMapper, label);
+        }
 
         for (int i = 0; i < 16; ++i)
             pads.push_back(std::make_shared<Pad>(i, mpc.inputMapper));
@@ -81,7 +71,7 @@ public:
     {
         if (!maybeClientInput.has_value())
         {
-            printf("Hardware2::dispatchClientInput received an empty ClientInput");
+            printf("Hardware2::dispatchClientInput received an empty ClientInput\n");
             return;
         }
 
@@ -147,9 +137,24 @@ public:
 
     mpc::hardware::PadAndButtonKeyboard* getPadAndButtonKeyboard() { return padAndButtonKeyboard; }
     std::shared_ptr<mpc::hardware::TopPanel> getTopPanel() { return topPanel; }
-    std::vector<std::string>& getButtonLabels() { return buttonLabels; }
 
-    std::shared_ptr<Pad> getPad(int index) {
+    std::vector<std::string> getButtonLabels()
+    {
+        std::vector<std::string> result;
+
+        for (auto &[label,id] : componentLabelToId)
+        {
+            if (id >= ComponentId::CURSOR_LEFT && id <= ComponentId::NUM_9)
+            {
+                result.push_back(label);
+            }
+        }
+        
+        return result;
+    }
+
+    std::shared_ptr<Pad> getPad(int index)
+    {
         if (index < 0 || index >= static_cast<int>(pads.size())) return nullptr;
         return pads[index];
     }

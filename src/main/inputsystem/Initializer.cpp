@@ -11,7 +11,6 @@ void Initializer::init(ClientInputMapper &inputMapper,
                        std::shared_ptr<ClientInputControllerBase> inputController,
                        const std::vector<std::string> buttonLabels)
 {
-    // Bind pad handlers
     for (int padNumber = 0; padNumber < 16; ++padNumber)
     {
         inputMapper.bindPadPress(padNumber, [inputController](const ClientInput& a) {
@@ -25,17 +24,14 @@ void Initializer::init(ClientInputMapper &inputMapper,
         });
     }
 
-    // Data wheel
     inputMapper.bindDataWheel([inputController](const ClientInput& a) {
         inputController->handleAction(a);
     });
 
-    // Slider
     inputMapper.bindSlider([inputController](const ClientInput& a) {
         inputController->handleAction(a);
     });
 
-    // Pot
     inputMapper.bindPot([inputController](const ClientInput& a) {
         inputController->handleAction(a);
     });

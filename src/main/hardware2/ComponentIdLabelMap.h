@@ -121,6 +121,7 @@ namespace mpc::hardware2 {
         { ComponentId::NUM_7,           "7" },
         { ComponentId::NUM_8,           "8" },
         { ComponentId::NUM_9,           "9" },
+
         { ComponentId::DATA_WHEEL,      "datawheel" },
         { ComponentId::SLIDER,          "slider" },
         { ComponentId::REC_GAIN_POT,    "rec-gain" },
