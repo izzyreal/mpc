@@ -11,7 +11,7 @@ struct KeyEvent {
 
 struct MouseEvent {
     enum GuiElement {
-        NONE, PAD1, PAD2, PAD3, PLAY_BUTTON, STOP_BUTTON
+        NONE, PAD1, PAD2, PAD3, PLAY_BUTTON, STOP_BUTTON, DATA_WHEEL
     };
     struct ButtonState {
         bool left;
@@ -20,6 +20,7 @@ struct MouseEvent {
     };
     enum MouseEventType {
         MOVE,
+        DRAG,
         WHEEL,
         DOWN,
         UP
