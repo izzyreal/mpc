@@ -31,56 +31,46 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent) {
     case HostInputEvent::MOUSE: {
         const auto& mouse = std::get<MouseEvent>(hostEvent.payload);
 
-        switch (mouse.guiElement) {
-        case MouseEvent::PAD1:
-            clientEvent.index = 0;
-            clientEvent.type = (mouse.type == MouseEvent::DOWN)
-                                   ? ClientInput::Type::PadPress
-                                   : (mouse.type == MouseEvent::UP)
-                                         ? ClientInput::Type::PadRelease
-                                         : ClientInput::Type::PadAftertouch;
-            if (mouse.type == MouseEvent::DOWN || mouse.type == MouseEvent::UP || mouse.type == MouseEvent::MOVE)
+        // Handle pads (PAD1–PAD16)
+        if (mouse.guiElement >= MouseEvent::PAD1 && mouse.guiElement <= MouseEvent::PAD16) {
+            clientEvent.index = static_cast<int>(mouse.guiElement) - static_cast<int>(MouseEvent::PAD1);
+            clientEvent.type =
+                (mouse.type == MouseEvent::BUTTON_DOWN)
+                    ? ClientInput::Type::PadPress
+                    : (mouse.type == MouseEvent::BUTTON_UP)
+                          ? ClientInput::Type::PadRelease
+                          : ClientInput::Type::PadAftertouch;
+
+            if (mouse.type == MouseEvent::BUTTON_DOWN ||
+                mouse.type == MouseEvent::BUTTON_UP ||
+                mouse.type == MouseEvent::MOVE)
                 clientEvent.value = static_cast<int>((1.f - mouse.normY) * 127.f);
-            break;
+        }
 
-        case MouseEvent::PAD2:
-            clientEvent.index = 1;
-            clientEvent.type = (mouse.type == MouseEvent::DOWN)
-                                   ? ClientInput::Type::PadPress
-                                   : (mouse.type == MouseEvent::UP)
-                                         ? ClientInput::Type::PadRelease
-                                         : ClientInput::Type::PadAftertouch;
-            if (mouse.type == MouseEvent::DOWN || mouse.type == MouseEvent::UP || mouse.type == MouseEvent::MOVE)
-                clientEvent.value = static_cast<int>((1.f - mouse.normY) * 127.f);
-            break;
+        // Handle regular buttons
+        else if (mouse.guiElement >= MouseEvent::CURSOR_LEFT && mouse.guiElement <= MouseEvent::NUM_9) {
+            // Map enum → internal button label
+            switch (mouse.guiElement) {
+                case MouseEvent::PLAY:        clientEvent.label = "play"; break;
+                case MouseEvent::STOP:        clientEvent.label = "stop"; break;
+                case MouseEvent::REC:         clientEvent.label = "rec"; break;
+                case MouseEvent::OVERDUB:     clientEvent.label = "overdub"; break;
+                case MouseEvent::PLAY_START:  clientEvent.label = "play-start"; break;
+                case MouseEvent::MAIN_SCREEN: clientEvent.label = "main-screen"; break;
+                case MouseEvent::SHIFT:       clientEvent.label = "shift"; break;
+                default:                      clientEvent.label = "button"; break;
+            }
 
-        case MouseEvent::PAD3:
-            clientEvent.index = 2;
-            clientEvent.type = (mouse.type == MouseEvent::DOWN)
-                                   ? ClientInput::Type::PadPress
-                                   : (mouse.type == MouseEvent::UP)
-                                         ? ClientInput::Type::PadRelease
-                                         : ClientInput::Type::PadAftertouch;
-            if (mouse.type == MouseEvent::DOWN || mouse.type == MouseEvent::UP || mouse.type == MouseEvent::MOVE)
-                clientEvent.value = static_cast<int>((1.f - mouse.normY) * 127.f);
-            break;
+            if (mouse.type == MouseEvent::BUTTON_DOWN)
+                clientEvent.type = ClientInput::Type::ButtonPress;
+            else if (mouse.type == MouseEvent::BUTTON_UP)
+                clientEvent.type = ClientInput::Type::ButtonRelease;
+            else
+                return clientEvent; // Ignore non-button events for buttons
+        }
 
-        case MouseEvent::PLAY_BUTTON:
-            clientEvent.label = "play";
-            clientEvent.type = (mouse.type == MouseEvent::DOWN)
-                                   ? ClientInput::Type::ButtonPress
-                                   : ClientInput::Type::ButtonRelease;
-            break;
-
-        case MouseEvent::STOP_BUTTON:
-            clientEvent.label = "stop";
-            clientEvent.type = (mouse.type == MouseEvent::DOWN)
-                                   ? ClientInput::Type::ButtonPress
-                                   : ClientInput::Type::ButtonRelease;
-            break;
-
-        case MouseEvent::DATA_WHEEL:
-            // --- Handle all DataWheel GUI events here ---
+        // Handle data wheel
+        else if (mouse.guiElement == MouseEvent::DATA_WHEEL) {
             clientEvent.type = ClientInput::Type::DataWheelTurn;
             if (mouse.type == MouseEvent::WHEEL)
                 clientEvent.value = static_cast<int>(mouse.wheelDelta);
@@ -88,13 +78,13 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent) {
                 clientEvent.value = static_cast<int>(mouse.deltaY);
             else
                 clientEvent.value = 0;
-            break;
-
-        case MouseEvent::NONE:
-            throw std::invalid_argument("guiElement must be provided\n");
         }
 
-        // Wheel fallback (for other GUI elements)
+        else if (mouse.guiElement == MouseEvent::NONE) {
+            throw std::invalid_argument("MouseEvent.guiElement must not be NONE");
+        }
+
+        // Fallback for scroll wheel events not tied to DATA_WHEEL
         if (mouse.guiElement != MouseEvent::DATA_WHEEL && mouse.type == MouseEvent::WHEEL) {
             clientEvent.type = ClientInput::Type::DataWheelTurn;
             clientEvent.value = static_cast<int>(mouse.wheelDelta);
@@ -107,8 +97,9 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent) {
         const auto& key = std::get<KeyEvent>(hostEvent.payload);
         if (key.rawKeyCode == 32) { // Spacebar
             clientEvent.label = "play";
-            clientEvent.type = key.keyDown ? ClientInput::Type::ButtonPress
-                                           : ClientInput::Type::ButtonRelease;
+            clientEvent.type = key.keyDown
+                                   ? ClientInput::Type::ButtonPress
+                                   : ClientInput::Type::ButtonRelease;
         }
         break;
     }
