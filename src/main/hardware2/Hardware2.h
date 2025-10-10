@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 
+#include "controls/Controls.hpp"
 #include "hardware2/HardwareComponent.h"
 #include "hardware/PadAndButtonKeyboard.hpp"
 #include "hardware/TopPanel.hpp"
@@ -19,6 +20,7 @@ namespace mpc::hardware2 {
 
 class Hardware2 final {
 private:
+    mpc::Mpc &mpc;
     mpc::hardware::PadAndButtonKeyboard* padAndButtonKeyboard = nullptr;
     std::vector<std::shared_ptr<mpc::hardware::Led>> leds;
     std::shared_ptr<mpc::hardware::TopPanel> topPanel;
@@ -32,7 +34,7 @@ private:
     std::shared_ptr<Pot> volPot;
 
 public:
-    explicit Hardware2(mpc::Mpc& mpc)
+    explicit Hardware2(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
     {
         padAndButtonKeyboard = new mpc::hardware::PadAndButtonKeyboard(mpc);
         topPanel = std::make_shared<mpc::hardware::TopPanel>();
@@ -71,7 +73,7 @@ public:
 
     void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
     {
-        const auto clientEvent = mpc::inputlogic::HostToClientTranslator::translate(hostEvent);
+        const auto clientEvent = mpc::inputlogic::HostToClientTranslator::translate(hostEvent, mpc.getControls()->getKbMapping().lock());
         dispatchClientInput(clientEvent);
     }
 

@@ -1,11 +1,15 @@
 #include "inputlogic/HostToClientTranslator.h"
 #include "inputlogic/ClientInput.h"
 
+#include "controls/KeyCodeHelper.hpp"
+#include "controls/KbMapping.hpp"
+
 #include <stdexcept>
 
 using namespace mpc::inputlogic;
 
-ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent) {
+ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent, std::shared_ptr<mpc::controls::KbMapping> kbMapping)
+{
     ClientInput clientEvent;
 
     switch (hostEvent.source) {
@@ -137,13 +141,48 @@ ClientInput HostToClientTranslator::translate(const HostInputEvent& hostEvent) {
         break;
     }
 
-    case HostInputEvent::KEYBOARD: {
+    case HostInputEvent::KEYBOARD:
+    {
         const auto& key = std::get<KeyEvent>(hostEvent.payload);
-        if (key.rawKeyCode == 32) { // Spacebar
-            clientEvent.label = "play";
-            clientEvent.type = key.keyDown
-                                   ? ClientInput::Type::ButtonPress
-                                   : ClientInput::Type::ButtonRelease;
+        const auto vmpcKeyCode = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
+        const auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(vmpcKeyCode);
+
+        clientEvent.label = label;
+
+        if (label.substr(0, 4) == "pad-")
+        {
+            clientEvent.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
+        }
+        else if (label == "slider")
+        {
+            if (!key.keyDown) break;
+            clientEvent.type = ClientInput::Type::SliderMove;
+        }
+        else if (label.substr(0, std::string("datawheel-").length()) == "datawheel-")
+        {
+            if (!key.keyDown) break;
+            clientEvent.type = ClientInput::Type::DataWheelTurn;
+
+            int increment = 1;
+
+            /*
+            if (mpc.getControls()->isCtrlPressed())
+                increment *= 10;
+
+            if (mpc.getControls()->isAltPressed())
+                increment *= 10;
+
+            if (mpc.getControls()->isShiftPressed())
+                increment *= 10;
+            */
+            if (label.find("down") != std::string::npos)
+                increment = -increment;
+
+            clientEvent.value = increment;
+        }
+        else
+        {
+            clientEvent.type = key.keyDown ? ClientInput::Type::ButtonPress : ClientInput::Type::ButtonRelease;
         }
         break;
     }
