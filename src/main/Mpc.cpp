@@ -24,13 +24,12 @@
 #include "engine/PreviewSoundPlayer.hpp"
 #include "engine/Drum.hpp"
 
-#include <hardware/Hardware.hpp>
 #include <hardware2/Hardware2.h>
-#include <hardware/Led.hpp>
 
 #include <lcdgui/Screens.hpp>
 
 #include "MpcResourceUtil.hpp"
+#include "inputlogic/PadAndButtonKeyboard.hpp"
 #include "inputsystem/Initializer.h"
 #include "controller/ClientInputController.h"
 
@@ -98,8 +97,9 @@ void Mpc::init()
 
     mpc::Logger::l.setPath(paths->logFilePath().string());
 
-    hardware = std::make_shared<hardware::Hardware>(*this);
     hardware2 = std::make_shared<hardware2::Hardware2>(*this);
+
+    padAndButtonKeyboard = std::make_shared<mpc::inputlogic::PadAndButtonKeyboard>(*this);
 
 	diskController = std::make_unique<mpc::disk::DiskController>(*this);
 
@@ -165,11 +165,6 @@ void Mpc::init()
 std::shared_ptr<controls::Controls> Mpc::getControls()
 {
 	return controls;
-}
-
-std::shared_ptr<hardware::Hardware> Mpc::getHardware()
-{
-	return hardware;
 }
 
 std::shared_ptr<hardware2::Hardware2> Mpc::getHardware2()
@@ -253,10 +248,10 @@ void Mpc::setBank(int i)
 
 	notifyObservers(std::string("bank"));
 
-	hardware->getLed("pad-bank-a")->light(i == 0);
-	hardware->getLed("pad-bank-b")->light(i == 1);
-	hardware->getLed("pad-bank-c")->light(i == 2);
-	hardware->getLed("pad-bank-d")->light(i == 3);
+	hardware2->getLed("pad-bank-a")->setEnabled(i == 0);
+	hardware2->getLed("pad-bank-b")->setEnabled(i == 1);
+	hardware2->getLed("pad-bank-c")->setEnabled(i == 2);
+	hardware2->getLed("pad-bank-d")->setEnabled(i == 3);
 }
 
 int Mpc::getBank()
@@ -374,3 +369,40 @@ void Mpc::startMidiDeviceDetector()
 {
     midiDeviceDetector->start(*this);
 }
+
+bool Mpc::isAfterEnabled() const
+{
+    return afterEnabled;
+}
+
+void Mpc::setAfterEnabled(bool b)
+{
+    afterEnabled = b;
+}
+
+bool Mpc::isFullLevelEnabled() const
+{
+    return fullLevelEnabled;
+}
+
+void Mpc::setFullLevelEnabled(bool b)
+{
+    fullLevelEnabled = b;
+}
+
+bool Mpc::isSixteenLevelsEnabled() const
+{
+    return sixteenLevelsEnabled;
+}
+
+void Mpc::setSixteenLevelsEnabled(bool b)
+{
+    sixteenLevelsEnabled = b;
+}
+
+std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
+{
+    return padAndButtonKeyboard;
+}
+
+

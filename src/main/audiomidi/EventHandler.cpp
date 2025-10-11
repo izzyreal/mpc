@@ -10,9 +10,6 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/SeqUtil.hpp>
 
-#include <hardware/Hardware.hpp>
-#include <hardware/TopPanel.hpp>
-
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -215,7 +212,7 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
         const auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram());
         int pad = program->getPadIndexFromNote(note);
 
-        if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+        if (!mpc.isSixteenLevelsEnabled())
         {
             int bank = mpc.getBank();
             pad -= pad == -1 ? 0 : bank * 16;

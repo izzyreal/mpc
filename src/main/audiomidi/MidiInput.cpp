@@ -11,8 +11,6 @@
 #include <controls/GlobalReleaseControls.hpp>
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
-#include <hardware/Hardware.hpp>
-#include <hardware/TopPanel.hpp>
 
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
@@ -119,7 +117,6 @@ void MidiInput::handleControlChange(ShortMessage* msg)
     const auto value = msg->getData2();
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto hardware = mpc.getHardware();
     auto hardware2 = mpc.getHardware2();
 
     // As per MPC2000XL's MIDI implementation chart
@@ -325,7 +322,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 
         controls::PadPressScreenUpdateContext padPressScreenUpdateContext {
             mpc.getLayeredScreen()->getCurrentScreenName(),
-            mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled(),
+            mpc.isSixteenLevelsEnabled(),
             mpc::sequencer::isDrumNote(playMidiNoteOn->getNote()),
             allowCentralNoteAndPadUpdate,
             mpc.getActiveControls(),

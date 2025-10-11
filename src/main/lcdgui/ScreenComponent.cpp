@@ -3,7 +3,6 @@
 #include "Background.hpp"
 
 #include <Mpc.hpp>
-#include "hardware/Hardware.hpp"
 
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"

@@ -24,7 +24,6 @@
 
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
-#include <hardware/TopPanel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -566,7 +565,7 @@ void Track::playNext()
                 }
             }
 
-            if (!_delete && oneOrMorePadsArePressed && hardware->getTopPanel()->isSixteenLevelsEnabled())
+            if (!_delete && oneOrMorePadsArePressed && mpc.isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
                 auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");

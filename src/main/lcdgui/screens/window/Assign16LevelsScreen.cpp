@@ -2,11 +2,9 @@
 
 #include <Mpc.hpp>
 
-#include <sequencer/Track.hpp>
+#include "hardware2/Hardware2.h"
 
-#include <hardware/Hardware.hpp>
-#include <hardware/TopPanel.hpp>
-#include <hardware/Led.hpp>
+#include <sequencer/Track.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -31,8 +29,8 @@ void Assign16LevelsScreen::function(int i)
 	{
     case 4:
 	{
-		mpc.getHardware()->getTopPanel()->setSixteenLevelsEnabled(true);
-		mpc.getHardware()->getLed("sixteen-levels")->light(true);
+		mpc.setSixteenLevelsEnabled(true);
+		mpc.getHardware2()->getLed("sixteen-levels")->setEnabled(true);
 		openScreen(ls->getPreviousScreenName());
 		break;
 	}

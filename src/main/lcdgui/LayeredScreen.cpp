@@ -16,16 +16,14 @@
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
-#include <hardware/PadAndButtonKeyboard.hpp>
-#include <hardware/Hardware.hpp>
-#include <hardware/Led.hpp>
-
 #include <StrUtil.hpp>
 
 #include <cmath>
 #include <set>
 
 #include "MpcResourceUtil.hpp"
+#include "inputlogic/PadAndButtonKeyboard.hpp"
+#include "hardware2/Hardware2.h"
 
 #if __linux__
 #include <climits>
@@ -58,9 +56,13 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 		layers.push_back(layer);
 		
         if (previousLayer)
+        {
 			previousLayer->addChild(layer);
-		else
+        }
+        else
+        {
 			root->addChild(layer);
+        }
 
         previousLayer = layer;
 	}
@@ -116,9 +118,9 @@ int LayeredScreen::openScreen(std::string newScreenName)
 	}
     else if (newScreenName == "name")
     {
-        mpc.getHardware()->getPadAndButtonKeyboard()->resetPreviousPad();
-        mpc.getHardware()->getPadAndButtonKeyboard()->resetPressedZeroTimes();
-        mpc.getHardware()->getPadAndButtonKeyboard()->resetUpperCase();
+        mpc.getPadAndButtonKeyboard()->resetPreviousPad();
+        mpc.getPadAndButtonKeyboard()->resetPressedZeroTimes();
+        mpc.getPadAndButtonKeyboard()->resetUpperCase();
     }
 
     auto focus = getFocusedLayer()->findField(getFocus());
@@ -153,7 +155,7 @@ int LayeredScreen::openScreen(std::string newScreenName)
 	std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
 
 	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
-	mpc.getHardware()->getLed("overdub")->light(isOverdubScreen || mpc.getControls()->isOverDubPressed());
+	mpc.getHardware2()->getLed("overdub")->setEnabled(isOverdubScreen || mpc.getControls()->isOverDubPressed());
 
 	std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
 

@@ -2,7 +2,7 @@
 
 #include "lcdgui/screens/window/NameScreen.hpp"
 
-using namespace mpc::hardware;
+using namespace mpc::inputlogic;
 using namespace mpc::lcdgui::screens::window;
 
 PadAndButtonKeyboard::PadAndButtonKeyboard(mpc::Mpc& mpcToUse) : mpc(mpcToUse)

@@ -4,9 +4,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/EventHandler.hpp>
-#include <hardware/Hardware.hpp>
-#include <hardware/Led.hpp>
-#include <hardware/TopPanel.hpp>
 
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/Track.hpp>

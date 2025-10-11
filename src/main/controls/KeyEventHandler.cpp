@@ -4,22 +4,7 @@
 
 #include "KeyEvent.hpp"
 
-#include <controls/KbMapping.hpp>
-
-#include <lcdgui/screens/VmpcKeyboardScreen.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
-
-#include <hardware/Hardware.hpp>
-
-#include "KeyCodeHelper.hpp"
-#include "hardware2/Hardware2.h"
-
-using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
-using namespace mpc::hardware;
 
 KeyEventHandler::KeyEventHandler(mpc::Mpc &mpc)
         : mpc(mpc)

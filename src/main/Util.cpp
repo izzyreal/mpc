@@ -1,10 +1,6 @@
 #include <Util.hpp>
 
 #include <sequencer/NoteEvent.hpp>
-#include <sampler/Program.hpp>
-#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
-#include <hardware/Hardware.hpp>
-#include <hardware/TopPanel.hpp>
 
 #include <cmath>
 #include <cstdlib>

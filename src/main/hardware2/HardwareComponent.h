@@ -23,6 +23,17 @@ public:
     Component& operator=(const Component&) = delete;
 };
 
+class Led : public Component {
+    private:
+        const std::string label;
+        bool enabled = false;
+    public:
+        Led(mpc::inputlogic::ClientInputMapper& mapperToUse, const std::string labelToUse) : Component(mapperToUse), label(labelToUse) {}
+        void setEnabled(const bool enabledToUse) { enabled = enabledToUse; }
+        bool isEnabled() const { return enabled; }
+        std::string getLabel() const { return label; }
+};
+
 class PressState {
     bool pressed = false;
 protected:

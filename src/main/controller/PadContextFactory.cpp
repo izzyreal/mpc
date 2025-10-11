@@ -3,14 +3,13 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controls/BaseControls.hpp"
 
-#include "Mpc.hpp"
-#include "hardware/Hardware.hpp"
-#include "hardware/TopPanel.hpp"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
+
+#include "Mpc.hpp"
 
 using namespace mpc::controller;
 using namespace mpc::controls;
@@ -29,8 +28,8 @@ PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padInde
                                                         BaseControls::allowCentralNoteAndPadUpdateScreens.end(),
                                                         currentScreenName) != BaseControls::allowCentralNoteAndPadUpdateScreens.end();
     
-    const bool isFullLevelEnabled = mpc.getHardware()->getTopPanel()->isFullLevelEnabled();
-    const bool isSixteenLevelsEnabled = mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled();
+    const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
+    const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
     const bool isTapPressed = mpc.getControls()->isTapPressed();
     const bool isNoteRepeatLocked = mpc.getControls()->isNoteRepeatLocked();
     const bool isErasePressed = mpc.getControls()->isErasePressed();

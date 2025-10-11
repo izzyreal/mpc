@@ -23,16 +23,16 @@ namespace mpc::engine {
     class PreviewSoundPlayer;
 }
 
-namespace mpc::hardware {
-    class Hardware;
-}
-
 namespace mpc::hardware2 {
     class Hardware2;
 }
 
 namespace mpc::controller {
     class ClientInputControllerBase;
+}
+
+namespace mpc::inputlogic {
+    class PadAndButtonKeyboard;
 }
 
 namespace mpc::disk {
@@ -77,6 +77,9 @@ namespace mpc::nvram {
 namespace mpc {
     class Mpc : public Observable {
     private:
+        bool afterEnabled = false;
+        bool fullLevelEnabled = false;
+        bool sixteenLevelsEnabled = false;
         bool pluginModeEnabled = false;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<sequencer::Sequencer> sequencer;
@@ -88,7 +91,6 @@ namespace mpc {
         std::vector<audiomidi::MidiInput*> midiInputs;
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
-        std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<hardware2::Hardware2> hardware2;
         std::shared_ptr<mpc::sequencer::Clock> clock;
         int bank = 0;
@@ -116,6 +118,7 @@ namespace mpc {
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
 
+        std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> padAndButtonKeyboard;
         mpc::inputlogic::ClientInputMapper inputMapper;
         std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController;
 
@@ -124,9 +127,9 @@ namespace mpc {
         std::shared_ptr<controls::Controls> getControls();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
         std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
-        std::shared_ptr<hardware::Hardware> getHardware();
         std::shared_ptr<hardware2::Hardware2> getHardware2();
         mpc::disk::DiskController* getDiskController();
+        std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> getPadAndButtonKeyboard();
 
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
@@ -138,6 +141,13 @@ namespace mpc {
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
         mpc::audiomidi::MidiInput* getMpcMidiInput(int i);
         std::shared_ptr<mpc::sequencer::Clock> getClock();
+
+        bool isAfterEnabled() const;
+        void setAfterEnabled(bool);
+        bool isFullLevelEnabled() const;
+        void setFullLevelEnabled(bool);
+        bool isSixteenLevelsEnabled() const;
+        void setSixteenLevelsEnabled(bool);
 
     public:
         std::shared_ptr<mpc::disk::AbstractDisk> getDisk();

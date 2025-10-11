@@ -9,7 +9,7 @@
 
 namespace mpc { class Mpc; }
 
-namespace mpc::hardware {
+namespace mpc::inputlogic {
 
     class PadAndButtonKeyboard
     {

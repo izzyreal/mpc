@@ -4,9 +4,7 @@
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/MidiOutput.hpp"
-#include "hardware/Hardware.hpp"
 #include "hardware2/Hardware2.h"
-#include "hardware/TopPanel.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -37,9 +35,8 @@ void RepeatPad::process(mpc::Mpc& mpc,
         program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
     }
 
-    auto hardware = mpc.getHardware();
-    auto fullLevel = hardware->getTopPanel()->isFullLevelEnabled();
-    auto sixteenLevels = hardware->getTopPanel()->isSixteenLevelsEnabled();
+    auto fullLevel = mpc.isFullLevelEnabled();
+    auto sixteenLevels = mpc.isSixteenLevelsEnabled();
 
     auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
     auto note = assign16LevelsScreen->getNote();
@@ -137,7 +134,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
         }
 
         mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames(
-                [&mpc, track, note, noteEvent, tickPosition, sixteenLevels, hardware, program, p]
+                [&mpc, track, note, noteEvent, tickPosition, sixteenLevels, program, p]
                 (const int bufferOffset){
             if (track->getBus() > 0)
             {

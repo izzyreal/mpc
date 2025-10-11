@@ -1,7 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include "TestMpc.hpp"
-#include "hardware/Hardware.hpp"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"

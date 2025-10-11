@@ -1,10 +1,7 @@
 #include "BaseControls.hpp"
+#include "hardware2/Hardware2.h"
 
 #include <Mpc.hpp>
-
-#include <hardware/Hardware.hpp>
-#include <hardware/Led.hpp>
-#include <hardware/TopPanel.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
@@ -555,8 +552,6 @@ void BaseControls::rec()
 
     controls->setRecLocked(false);
 
-    const auto hw = mpc.getHardware();
-    
     if (sequencer.lock()->isRecordingOrOverdubbing())
     {
         sequencer.lock()->setRecording(false);
@@ -588,8 +583,6 @@ void BaseControls::overDub()
     controls->setOverDubPressed(true);
 
     controls->setOverDubLocked(false);
-
-    const auto hw = mpc.getHardware();
 
     if (sequencer.lock()->isRecordingOrOverdubbing())
     {
@@ -639,7 +632,6 @@ void BaseControls::play()
     controls->setPlayPressed(true);
 
     init();
-    const auto hw = mpc.getHardware();
     
     if (sequencer.lock()->isPlaying())
     {
@@ -696,13 +688,13 @@ void BaseControls::play()
 void BaseControls::playStart()
 {
     init();
-    const auto hw = mpc.getHardware();
-    const auto controls = mpc.getControls();
-    
+
     if (sequencer.lock()->isPlaying())
     {
         return;
     }
+
+    const auto controls = mpc.getControls();
     
     if (controls->isRecPressed())
     {
@@ -755,9 +747,9 @@ void BaseControls::mainScreen()
     ls->openScreen("sequencer");
     sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
     
-    const auto hw = mpc.getHardware();
-    hw->getLed("next-seq")->light(false);
-    hw->getLed("track-mute")->light(false);
+    const auto hw = mpc.getHardware2();
+    hw->getLed("next-seq")->setEnabled(false);
+    hw->getLed("track-mute")->setEnabled(false);
 }
 
 void BaseControls::tap()
@@ -800,15 +792,15 @@ void BaseControls::nextSeq()
         currentScreenName == "next-seq-pad")
     {
         ls->openScreen("sequencer");
-        mpc.getHardware()->getLed("next-seq")->light(false);
+        mpc.getHardware2()->getLed("next-seq")->setEnabled(false);
     }
     else if (currentScreenName == "sequencer" ||
              currentScreenName == "track-mute")
     {
         Util::initSequence(mpc);
         ls->openScreen("next-seq");
-        mpc.getHardware()->getLed("next-seq")->light(true);
-        mpc.getHardware()->getLed("track-mute")->light(false);
+        mpc.getHardware2()->getLed("next-seq")->setEnabled(true);
+        mpc.getHardware2()->getLed("track-mute")->setEnabled(false);
     }
 }
 
@@ -828,7 +820,7 @@ void BaseControls::trackMute()
             ls->openScreen("sequencer");
         }
         
-        mpc.getHardware()->getLed("track-mute")->light(false);
+        mpc.getHardware2()->getLed("track-mute")->setEnabled(false);
     }
     else if
         (currentScreenName == "next-seq" ||
@@ -837,7 +829,7 @@ void BaseControls::trackMute()
     {
         Util::initSequence(mpc);
         ls->openScreen("track-mute");
-        mpc.getHardware()->getLed("track-mute")->light(true);
+        mpc.getHardware2()->getLed("track-mute")->setEnabled(true);
     }
 }
 
@@ -848,13 +840,8 @@ void BaseControls::bank(int i)
 
 void BaseControls::fullLevel()
 {
-    init();
-    const auto hardware = mpc.getHardware();
-    const auto topPanel = hardware->getTopPanel();
-    
-    topPanel->setFullLevelEnabled(!topPanel->isFullLevelEnabled());
-    
-    hardware->getLed("full-level")->light(topPanel->isFullLevelEnabled());
+    mpc.setFullLevelEnabled(!mpc.isFullLevelEnabled());
+    mpc.getHardware2()->getLed("full-level")->setEnabled(mpc.isFullLevelEnabled());
 }
 
 void BaseControls::sixteenLevels()
@@ -867,13 +854,10 @@ void BaseControls::sixteenLevels()
         return;
     }
     
-    const auto hardware = mpc.getHardware();
-    const auto topPanel = hardware->getTopPanel();
-    
-    if (topPanel->isSixteenLevelsEnabled())
+    if (mpc.isSixteenLevelsEnabled())
     {
-        topPanel->setSixteenLevelsEnabled(false);
-        hardware->getLed("sixteen-levels")->light(false);
+        mpc.setSixteenLevelsEnabled(false);
+        mpc.getHardware2()->getLed("sixteen-levels")->setEnabled(false);
     }
     else
     {
@@ -885,8 +869,6 @@ void BaseControls::after()
 {
     init();
     
-    const auto hw = mpc.getHardware();
-    const auto topPanel = hw->getTopPanel();
     const auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
@@ -895,8 +877,8 @@ void BaseControls::after()
     }
     else
     {
-        topPanel->setAfterEnabled(!topPanel->isAfterEnabled());
-        hw->getLed("after")->light(topPanel->isAfterEnabled());
+        mpc.setAfterEnabled(!mpc.isAfterEnabled());
+        mpc.getHardware2()->getLed("after")->setEnabled(mpc.isAfterEnabled());
     }
 }
 

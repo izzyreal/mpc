@@ -7,9 +7,6 @@
 
 #include "controls/Controls.hpp"
 #include "hardware2/HardwareComponent.h"
-#include "hardware/PadAndButtonKeyboard.hpp"
-#include "hardware/TopPanel.hpp"
-#include "hardware/Led.hpp"
 #include "inputlogic/ClientInput.h"
 #include "inputlogic/HostToClientTranslator.h"
 #include "inputlogic/HostInputEvent.h"
@@ -21,9 +18,7 @@ namespace mpc::hardware2 {
 class Hardware2 final {
 private:
     mpc::Mpc &mpc;
-    mpc::hardware::PadAndButtonKeyboard* padAndButtonKeyboard = nullptr;
-    std::vector<std::shared_ptr<mpc::hardware::Led>> leds;
-    std::shared_ptr<mpc::hardware::TopPanel> topPanel;
+    std::vector<std::shared_ptr<Led>> leds;
 
     std::vector<std::shared_ptr<Pad>> pads;
     std::unordered_map<std::string, std::shared_ptr<Button>> buttons;
@@ -35,9 +30,6 @@ private:
 public:
     explicit Hardware2(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
     {
-        padAndButtonKeyboard = new mpc::hardware::PadAndButtonKeyboard(mpc);
-        topPanel = std::make_shared<mpc::hardware::TopPanel>();
-
         for (const auto &label : getButtonLabels())
         {
             buttons[label] = std::make_shared<Button>(mpc.inputMapper, label);
@@ -53,7 +45,9 @@ public:
         };
 
         for (const auto& l : ledLabels)
-            leds.push_back(std::make_shared<mpc::hardware::Led>(l));
+        {
+            leds.push_back(std::make_shared<Led>(mpc.inputMapper, l));
+        }
 
         dataWheel = std::make_shared<DataWheel>(mpc.inputMapper);
         recPot = std::make_shared<Pot>(mpc.inputMapper);
@@ -135,9 +129,6 @@ public:
         }
     }
 
-    mpc::hardware::PadAndButtonKeyboard* getPadAndButtonKeyboard() { return padAndButtonKeyboard; }
-    std::shared_ptr<mpc::hardware::TopPanel> getTopPanel() { return topPanel; }
-
     std::vector<std::string> getButtonLabels()
     {
         std::vector<std::string> result;
@@ -167,7 +158,18 @@ public:
         return nullptr;
     }
 
-    std::vector<std::shared_ptr<mpc::hardware::Led>> getLeds() { return leds; }
+    std::vector<std::shared_ptr<Led>> getLeds() { return leds; }
+
+    std::shared_ptr<Led> getLed(const std::string label)
+    {
+        for (auto &l : leds)
+        {
+            if (l->getLabel() == label) return l;
+        }
+
+        return {};
+    }
+
     std::shared_ptr<DataWheel> getDataWheel() { return dataWheel; }
     std::shared_ptr<Pot> getRecPot() { return recPot; }
     std::shared_ptr<Pot> getVolPot() { return volPot; }
