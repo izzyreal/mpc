@@ -562,6 +562,8 @@ void BaseControls::rec()
     {
         ls->openScreen("sequencer");
     }
+
+    mpc.getHardware2()->getLed("rec")->setEnabled(true);
 }
 
 void BaseControls::overDub()
@@ -594,6 +596,8 @@ void BaseControls::overDub()
     {
         ls->openScreen("sequencer");
     }
+
+    mpc.getHardware2()->getLed("overdub")->setEnabled(true);
 }
 
 void BaseControls::stop()
@@ -618,6 +622,10 @@ void BaseControls::stop()
     {
         ls->openScreen("sequencer");
     }
+
+    mpc.getHardware2()->getLed("overdub")->setEnabled(sequencer.lock()->isOverDubbing());
+    mpc.getHardware2()->getLed("rec")->setEnabled(sequencer.lock()->isRecording());
+    mpc.getHardware2()->getLed("play")->setEnabled(sequencer.lock()->isPlaying());
 }
 
 void BaseControls::play()
@@ -683,6 +691,10 @@ void BaseControls::play()
             }
         }
     }
+
+    mpc.getHardware2()->getLed("overdub")->setEnabled(sequencer.lock()->isOverDubbing());
+    mpc.getHardware2()->getLed("rec")->setEnabled(sequencer.lock()->isRecording());
+    mpc.getHardware2()->getLed("play")->setEnabled(sequencer.lock()->isPlaying());
 }
 
 void BaseControls::playStart()
@@ -731,6 +743,10 @@ void BaseControls::playStart()
             sequencer.lock()->playFromStart();
         }
     }
+
+    mpc.getHardware2()->getLed("overdub")->setEnabled(sequencer.lock()->isOverDubbing());
+    mpc.getHardware2()->getLed("rec")->setEnabled(sequencer.lock()->isRecording());
+    mpc.getHardware2()->getLed("play")->setEnabled(sequencer.lock()->isPlaying());
 }
 
 void BaseControls::mainScreen()

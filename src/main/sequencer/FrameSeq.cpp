@@ -4,6 +4,8 @@
 
 #include "audiomidi/AudioMidiServices.hpp"
 
+#include "hardware2/Hardware2.h"
+
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
@@ -302,7 +304,11 @@ bool FrameSeq::processSeqLoopEnabled()
         if (sequencer->isRecordingOrOverdubbing())
         {
             if (sequencer->isRecording())
+            {
                 sequencer->switchRecordToOverDub();
+                mpc.getHardware2()->getLed("rec")->setEnabled(false);
+                mpc.getHardware2()->getLed("overdub")->setEnabled(true);
+            }
         }
 
         return true;
@@ -325,6 +331,7 @@ bool FrameSeq::processSeqLoopDisabled()
         else
         {
             sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
+            mpc.getHardware2()->getLed("play")->setEnabled(false);
             sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
@@ -396,6 +403,9 @@ void FrameSeq::stopSequencer()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->stop();
+    mpc.getHardware2()->getLed("rec")->setEnabled(false);
+    mpc.getHardware2()->getLed("overdub")->setEnabled(false);
+    mpc.getHardware2()->getLed("play")->setEnabled(false);
     move(0);
 }
 

@@ -47,6 +47,7 @@ public:
         for (const auto& l : ledLabels)
         {
             leds.push_back(std::make_shared<Led>(mpc.inputMapper, l));
+            if (l == "bank-a") leds.back()->setEnabled(true);
         }
 
         dataWheel = std::make_shared<DataWheel>(mpc.inputMapper);

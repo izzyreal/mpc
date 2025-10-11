@@ -1,6 +1,9 @@
 #include "GlobalReleaseControls.hpp"
 
 #include <Mpc.hpp>
+
+#include "hardware2/Hardware2.h"
+
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/EventHandler.hpp>
@@ -184,12 +187,14 @@ void GlobalReleaseControls::overDub()
 {
 	const auto controls = mpc.getControls();
 	controls->setOverDubPressed(false);
+    mpc.getHardware2()->getLed("overdub")->setEnabled(sequencer.lock()->isOverDubbing());
 }
 
 void GlobalReleaseControls::rec()
 {
 	const auto controls = mpc.getControls();
 	controls->setRecPressed(false);
+    mpc.getHardware2()->getLed("rec")->setEnabled(sequencer.lock()->isRecording());
 }
 
 void GlobalReleaseControls::play()
