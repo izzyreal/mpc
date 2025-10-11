@@ -10,6 +10,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 
+#include "lcdgui/ScreenGroups.h"
 #include <lcdgui/Layer.hpp>
 
 #include <lcdgui/screens/LoadScreen.hpp>
@@ -28,6 +29,7 @@
 #include <Util.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screengroups;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
@@ -47,7 +49,7 @@ void BaseControls::init()
     param = ls->getFocus();
     activeField = ls->getFocusedLayer()->findField(param);
     
-    const auto isSampler = collectionContainsCurrentScreen(samplerScreens);
+    const auto isSampler = isSamplerScreen(mpc.getLayeredScreen()->getCurrentScreenName());
     
     if (isSampler)
     {
@@ -536,7 +538,7 @@ void BaseControls::rec()
 {
     init();
 
-    if (collectionContainsCurrentScreen(screensThatOnlyAllowPlay))
+    if (isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
     {
         return;
     }
@@ -558,7 +560,7 @@ void BaseControls::rec()
         sequencer.lock()->setOverdubbing(false);
     }
 
-    if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+    if (!isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
     {
         ls->openScreen("sequencer");
     }
@@ -570,7 +572,7 @@ void BaseControls::overDub()
 {
     init();
 
-    if (collectionContainsCurrentScreen(screensThatOnlyAllowPlay))
+    if (isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
     {
         return;
     }
@@ -592,7 +594,7 @@ void BaseControls::overDub()
         sequencer.lock()->setOverdubbing(false);
     }
 
-    if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+    if (!isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
     {
         ls->openScreen("sequencer");
     }
@@ -618,7 +620,7 @@ void BaseControls::stop()
     
     sequencer.lock()->stop();
     
-    if (!currentScreenAllowsPlay())
+    if (!isPlayScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
     {
         ls->openScreen("sequencer");
     }
@@ -656,9 +658,11 @@ void BaseControls::play()
     }
     else
     {
+        const bool currentScreenAllowsPlayAndRecord = isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName());
+
         if (controls->isRecPressed())
         {
-            if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+            if (!currentScreenAllowsPlayAndRecord)
             {
                 ls->openScreen("sequencer");
             }
@@ -667,7 +671,7 @@ void BaseControls::play()
         }
         else if (controls->isOverDubPressed())
         {
-            if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+            if (!currentScreenAllowsPlayAndRecord)
             {
                 ls->openScreen("sequencer");
             }
@@ -681,7 +685,7 @@ void BaseControls::play()
             }
             else
             {
-                if (!currentScreenAllowsPlay())
+                if (!isPlayScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
                 {
                     ls->openScreen("sequencer");
                 }
@@ -707,10 +711,12 @@ void BaseControls::playStart()
     }
 
     const auto controls = mpc.getControls();
+
+    const bool currentScreenAllowsPlayAndRecord = isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName());
     
     if (controls->isRecPressed())
     {
-        if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+        if (!currentScreenAllowsPlayAndRecord)
         {
             ls->openScreen("sequencer");
         }
@@ -719,7 +725,7 @@ void BaseControls::playStart()
     }
     else if (controls->isOverDubPressed())
     {
-        if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+        if (!currentScreenAllowsPlayAndRecord)
         {
             ls->openScreen("sequencer");
         }
@@ -734,7 +740,7 @@ void BaseControls::playStart()
         }
         else
         {
-            if (!currentScreenAllowsPlay())
+            if (!isPlayScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
             {
                 ls->openScreen("sequencer");
             }
@@ -1011,124 +1017,8 @@ void BaseControls::splitRight()
     }
 }
 
-bool BaseControls::currentScreenAllowsPlay()
-{
-    return collectionContainsCurrentScreen(screensThatOnlyAllowPlay) ||
-           collectionContainsCurrentScreen(screensThatAllowPlayAndRecord);
-}
-
-bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string>& v)
-{
-    return find(v.begin(),
-                v.end(),
-                ls->getCurrentScreenName()) != v.end();
-}
-
 void BaseControls::handlePadHitInTrimLoopZoneParamsScreens()
 {
     mpc.getBasicPlayer().mpcNoteOn(sampler->getSoundIndex(), 127, 0);
 }
 
-const std::vector<std::string> BaseControls::screensThatOnlyAllowPlay {
-    "song",
-    "track-mute",
-    "next-seq",
-    "next-seq-pad",
-    "vmpc-recording-finished"
-};
-
-const std::vector<std::string> BaseControls::allowCentralNoteAndPadUpdateScreens{
-    "program-assign",
-    "program-params",
-    "velocity-modulation",
-    "velo-env-filter",
-    "velo-pitch",
-    "mute-assign",
-    "assignment-view",
-    "keep-or-retry",
-    "load-a-sound"
-};
-
-const std::vector<std::string> BaseControls::screensThatAllowPlayAndRecord {
-    "sequencer",
-    "select-drum",
-    "select-mixer-drum",
-    "program-assign",
-    "program-params",
-    "drum", "purge",
-    "program",
-    "create-new-program",
-    "name",
-    "delete-program",
-    "delete-all-programs",
-    "assignment-view",
-    "initialize-pad-assign",
-    "copy-note-parameters",
-    "velocity-modulation",
-    "velo-env-filter",
-    "velo-pitch",
-    "mute-assign",
-    "trans",
-    "mixer",
-    "mixer-setup",
-    "channel-settings"
-};
-
-const std::vector<std::string> BaseControls::samplerScreens {
-    "create-new-program",
-    "assignment-view",
-    "auto-chromatic-assignment",
-    "copy-note-parameters",
-    "edit-sound",
-    "end-fine",
-    "init-pad-assign",
-    "keep-or-retry",
-    "loop-end-fine",
-    "loop-to-fine",
-    "mute-assign",
-    "program",
-    "start-fine",
-    "velo-env-filter",
-    "velo-pitch",
-    "velocity-modulation",
-    "zone-end-fine",
-    "zone-start-fine",
-    "drum",
-    "loop",
-    "mixer",
-    "mixer-setup",
-    "channel-settings",
-    "program-assign",
-    "program-params",
-    "select-drum",
-    "trim",
-    "zone",
-    "load-a-sound"
-};
-
-const std::vector<std::string> BaseControls::soundScreens {
-    // layer 1 (first layer, 1-based index, same level as Main screen
-    "trim",
-    "loop",
-    "zone",
-    "params",
-
-    // layer 2
-    "sound",
-    "start-fine",
-    "end-fine",
-    "loop-to-fine",
-    "loop-end-fine",
-    "zone-start-fine",
-    "zone-end-fine",
-    "number-of-zones",
-    "edit-sound",
-
-    // layer 3
-    "delete-sound",
-    "delete-all-sound",
-    "convert-sound",
-    "stereo-to-mono",
-    "mono-to-stereo",
-    "resample"
-};

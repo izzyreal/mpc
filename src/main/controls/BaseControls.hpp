@@ -86,8 +86,6 @@ namespace mpc::controls {
 
 		std::string getCurrentScreenName() { return currentScreenName; }
 
-		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
-
 	protected:
 		std::string param;
 		mpc::Mpc& mpc;
@@ -96,9 +94,6 @@ namespace mpc::controls {
 	private:
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::string currentScreenName;
-		const static std::vector<std::string> screensThatAllowPlayAndRecord;
-		const static std::vector<std::string> screensThatOnlyAllowPlay;
-
 		static void generateNoteOn(const GenerateNoteOnContext& ctx, const int note, const int velo, const int padIndexWithBank);
 
         void handlePadHitInTrimLoopZoneParamsScreens();

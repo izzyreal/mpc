@@ -1,7 +1,7 @@
 #include "controller/PadContextFactory.h"
 
+#include "lcdgui/ScreenGroups.h"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "controls/BaseControls.hpp"
 
 #include "hardware2/Hardware2.h"
 #include "lcdgui/screens/DrumScreen.hpp"
@@ -13,21 +13,13 @@
 
 using namespace mpc::controller;
 using namespace mpc::controls;
+using namespace mpc::lcdgui;
 
 PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
 {
-    const bool isSamplerScreen = std::find(BaseControls::samplerScreens.begin(),
-                                           BaseControls::samplerScreens.end(),
-                                           currentScreenName) != BaseControls::samplerScreens.end();
-
-    const bool isSoundScreen = std::find(BaseControls::soundScreens.begin(),
-                                         BaseControls::soundScreens.end(),
-                                         currentScreenName) != BaseControls::soundScreens.end();
-
-    const bool allowCentralNoteAndPadUpdate = std::find(BaseControls::allowCentralNoteAndPadUpdateScreens.begin(),
-                                                        BaseControls::allowCentralNoteAndPadUpdateScreens.end(),
-                                                        currentScreenName) != BaseControls::allowCentralNoteAndPadUpdateScreens.end();
-    
+    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
+    const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
+    const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
     const bool isTapPressed = mpc.getControls()->isTapPressed();
@@ -111,15 +103,8 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
 
-    const bool currentScreenIsSoundScreen = std::find(
-            mpc::controls::BaseControls::soundScreens.begin(),
-            mpc::controls::BaseControls::soundScreens.end(),
-            currentScreenName) != mpc::controls::BaseControls::soundScreens.end();
-    
-    const bool currentScreenIsSamplerScreen = std::find(
-            mpc::controls::BaseControls::samplerScreens.begin(),
-            mpc::controls::BaseControls::samplerScreens.end(),
-            currentScreenName) != mpc::controls::BaseControls::samplerScreens.end();
+    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
+    const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
 
     std::function<void(int)> controlsUnpressPad = [controls = mpc.getControls()] (int p) { controls->unpressPad(p); };
 
@@ -145,8 +130,8 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
     return {
         padIndexWithBank,
         finishBasicVoiceIfSoundIsLooping,
-        currentScreenIsSoundScreen,
-        currentScreenIsSamplerScreen,
+        isSoundScreen,
+        isSamplerScreen,
         controlsUnpressPad,
         playNoteEvent,
         drumScreenSelectedDrum,

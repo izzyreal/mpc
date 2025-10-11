@@ -7,6 +7,7 @@
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
+#include "lcdgui/ScreenGroups.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 
 #include "controller/PadContextFactory.h"
@@ -105,10 +106,7 @@ mpc::engine::Drum& ScreenComponent::activeDrum()
 {
     const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum");
 
-    const bool isSamplerScreen = std::find(BaseControls::samplerScreens.begin(),
-                                           BaseControls::samplerScreens.end(),
-                                           name) != BaseControls::samplerScreens.end();
-    
+    const bool isSamplerScreen = screengroups::isSamplerScreen(name);
     auto drumIndex = isSamplerScreen ? (int) (drumScreen->getDrum()) : mpc.getSequencer()->getActiveTrack()->getBus() - 1;
 
     // Should not happen (TM)

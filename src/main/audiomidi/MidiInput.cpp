@@ -7,11 +7,13 @@
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MidiOutput.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
+
 #include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
 
+#include "lcdgui/ScreenGroups.h"
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
@@ -304,24 +306,23 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
         }
     }
 
+    const std::string currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+
     if (padIndexWithBank != -1)
     {
-        auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), mpc.getLayeredScreen()->getCurrentScreenName());
+        auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
         mpc::controls::BaseControls::pad(ctx, padIndexWithBank, playMidiNoteOn->getVelocity());
         return;
     }
     else
     {
-        const bool allowCentralNoteAndPadUpdate = std::find(
-                mpc::controls::BaseControls::allowCentralNoteAndPadUpdateScreens.begin(),
-                mpc::controls::BaseControls::allowCentralNoteAndPadUpdateScreens.end(),
-                mpc.getLayeredScreen()->getCurrentScreenName()) != mpc::controls::BaseControls::allowCentralNoteAndPadUpdateScreens.end();
 
+        const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
         std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
         std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
         controls::PadPressScreenUpdateContext padPressScreenUpdateContext {
-            mpc.getLayeredScreen()->getCurrentScreenName(),
+            currentScreenName,
             mpc.isSixteenLevelsEnabled(),
             mpc::sequencer::isDrumNote(playMidiNoteOn->getNote()),
             allowCentralNoteAndPadUpdate,
