@@ -16,8 +16,6 @@ ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ZoneStartFineScreen::open()
 {
-    mpc.getControls()->getBaseControls()->typableParams = { "start" };
-
     findField("start")->enableTwoDots();
 	findLabel("lngth")->enableTwoDots();
 	displayStart();

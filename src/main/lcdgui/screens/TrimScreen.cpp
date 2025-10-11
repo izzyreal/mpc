@@ -23,8 +23,6 @@ TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TrimScreen::open()
 {
-    mpc.getControls()->getBaseControls()->typableParams = { "st", "end" };
-
     findField("view")->setAlignment(Alignment::Centered);
 	bool sound = sampler->getSound() ? true : false;
 

@@ -65,17 +65,9 @@ namespace mpc::lcdgui
 		std::map<std::string, std::vector<std::string>>& getTransferMap();
 
 	protected:
-		virtual void init() {
-	
-			auto controls = mpc.getControls()->getBaseControls();
-			
-			// Happens when loading NVRAM
-			if (!controls)
-				return;
-
-			controls->init();
-			param = controls->param;
-
+		virtual void init()
+        {
+			param = controls::BaseControls::getFocusedFieldName(mpc);
             program = sampler->getProgram(activeDrum().getProgram());
 			track = mpc.getSequencer()->getActiveTrack();
 		}

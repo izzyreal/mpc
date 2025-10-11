@@ -107,7 +107,7 @@ bool Controls::isF6Pressed()
 bool mpc::controls::Controls::isStepRecording()
 {
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-	auto currentScreenName = getBaseControls()->getCurrentScreenName();
+	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 	bool step = currentScreenName == "step-editor" && !posIsLastTick;
 	return step;
 }
@@ -116,7 +116,7 @@ bool mpc::controls::Controls::isRecMainWithoutPlaying()
 {
 	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-	auto currentScreenName = getBaseControls()->getCurrentScreenName();
+	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 	bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
 		!sequencer->isPlaying() &&
 		isRecPressed() &&

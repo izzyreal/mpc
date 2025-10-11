@@ -16,8 +16,6 @@ LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopToFineScreen::open()
 {
-    mpc.getControls()->getBaseControls()->typableParams = { "to", "lngth" };
-
     findField("loop-lngth")->setAlignment(Alignment::Centered);
 	displayTo();
 	findField("to")->enableTwoDots();

@@ -22,8 +22,6 @@ LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopScreen::open()
 {
-    mpc.getControls()->getBaseControls()->typableParams = { "to", "endlengthvalue" };
-
     findField("loop")->setAlignment(Alignment::Centered);
 	bool sound = sampler->getSound() ? true : false;
 

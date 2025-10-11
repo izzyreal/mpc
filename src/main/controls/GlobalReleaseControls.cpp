@@ -36,15 +36,15 @@ void GlobalReleaseControls::goTo()
 
 void GlobalReleaseControls::function(const int i)
 {
-	init();
 	const auto controls = mpc.getControls();
+    const auto currentScreenName = BaseControls::getCurrentScreenName(mpc);
 
 	switch (i)
 	{
 	case 0:
 		if (currentScreenName == "step-timing-correct")
         {
-            ls->openScreen("step-editor");
+            mpc.getLayeredScreen()->openScreen("step-editor");
         }
 		break;
 	case 2:
@@ -56,11 +56,11 @@ void GlobalReleaseControls::function(const int i)
 	case 4:
 		controls->setF5Pressed(false);
 
-		if (ls->getPreviousScreenName() == "load" && currentScreenName == "popup")
+		if (BaseControls::getPreviousScreenName(mpc) == "load" && currentScreenName == "popup")
 		{
-            if (ls->getLastFocus("load") == "file" || ls->getLastFocus("load") == "view")
+            if (const auto lastFocusedField = BaseControls::getLastFocusedField(mpc, "load"); lastFocusedField == "file" || lastFocusedField == "view")
             {
-                ls->openScreen("load");
+                mpc.getLayeredScreen()->openScreen("load");
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
             }
 		}
@@ -78,14 +78,14 @@ void GlobalReleaseControls::function(const int i)
 		{
 			if (!sequencer.lock()->isSoloEnabled())
             {
-                ls->setCurrentBackground("track-mute");
+                mpc.getLayeredScreen()->setCurrentBackground("track-mute");
             }
 
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
-		else if (ls->getPreviousScreenName() == "directory" && currentScreenName == "popup")
+		else if (getPreviousScreenName(mpc) == "directory" && currentScreenName == "popup")
 		{
-			ls->openScreen("directory");
+			mpc.getLayeredScreen()->openScreen("directory");
 			mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
 		}
 		break;

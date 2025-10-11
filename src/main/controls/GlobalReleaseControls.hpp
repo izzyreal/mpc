@@ -4,8 +4,7 @@
 #include "PadReleaseContext.h"
 
 namespace mpc::controls {
-    class GlobalReleaseControls
-            : public BaseControls
+    class GlobalReleaseControls : public BaseControls
     {
 
     public:

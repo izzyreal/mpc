@@ -45,8 +45,6 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SequencerScreen::open()
 {
-    mpc.getControls()->getBaseControls()->typableParams = { "tempo", "now0", "now1", "now2", "velo" };
-
 	findField("loop")->setAlignment(Alignment::Centered);
 	findField("on")->setAlignment(Alignment::Centered);
 	findField("bars")->setAlignment(Alignment::Centered);

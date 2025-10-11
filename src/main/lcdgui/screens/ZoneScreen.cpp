@@ -24,8 +24,6 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ZoneScreen::open()
 {
-    mpc.getControls()->getBaseControls()->typableParams = { "st", "end" };
-
     const bool sound = sampler->getSound() ? true : false;
 
     initZones();
