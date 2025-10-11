@@ -38,9 +38,9 @@ public:
         for (int i = 0; i < 16; ++i)
             pads.push_back(std::make_shared<Pad>(i, mpc.inputMapper));
 
-        const std::vector<std::string> ledLabels = {
+        const std::vector<std::string> ledLabels {
             "full-level", "sixteen-levels", "next-seq", "track-mute",
-            "pad-bank-a", "pad-bank-b", "pad-bank-c", "pad-bank-d",
+            "bank-a", "bank-b", "bank-c", "bank-d",
             "after", "undo-seq", "rec", "overdub", "play"
         };
 

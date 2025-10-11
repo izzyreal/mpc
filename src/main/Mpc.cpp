@@ -248,10 +248,10 @@ void Mpc::setBank(int i)
 
 	notifyObservers(std::string("bank"));
 
-	hardware2->getLed("pad-bank-a")->setEnabled(i == 0);
-	hardware2->getLed("pad-bank-b")->setEnabled(i == 1);
-	hardware2->getLed("pad-bank-c")->setEnabled(i == 2);
-	hardware2->getLed("pad-bank-d")->setEnabled(i == 3);
+	hardware2->getLed("bank-a")->setEnabled(i == 0);
+	hardware2->getLed("bank-b")->setEnabled(i == 1);
+	hardware2->getLed("bank-c")->setEnabled(i == 2);
+	hardware2->getLed("bank-d")->setEnabled(i == 3);
 }
 
 int Mpc::getBank()
