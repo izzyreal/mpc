@@ -1,12 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <string>
-#include <set>
-#include "sequencer/NoteEvent.hpp"
 
 namespace mpc
 {
@@ -16,7 +10,6 @@ namespace mpc
 namespace mpc::controls
 {
   class KbMapping;
-  class KeyEventHandler;
 }
 namespace mpc::sequencer
 {
@@ -60,8 +53,6 @@ namespace mpc::controls
         bool isStepRecording();
         bool isRecMainWithoutPlaying();
         
-        std::weak_ptr<KeyEventHandler> getKeyEventHandler();
-
         void setCtrlPressed(bool);
         void setAltPressed(bool);
         bool isCtrlPressed();
@@ -87,7 +78,5 @@ namespace mpc::controls
         bool f5Pressed = false;
         bool f6Pressed = false;
         mpc::Mpc& mpc;
-        std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
-        std::shared_ptr<KeyEventHandler> keyEventHandler;
     };
 }
