@@ -15,6 +15,42 @@ TEST_CASE("Button responds to press and release", "[hardware2]") {
     REQUIRE_NOTHROW(b.release());
 }
 
+TEST_CASE("Button pressed state toggles correctly", "[hardware2]") {
+    ClientInputMapper mapper;
+    Button b(mapper, "TEST");
+
+    REQUIRE(!b.isPressed());
+    b.press();
+    REQUIRE(b.isPressed());
+    b.release();
+    REQUIRE(!b.isPressed());
+}
+
+TEST_CASE("Led enables and disables correctly", "[hardware2]") {
+    ClientInputMapper mapper;
+    Led led(mapper, "LED1");
+
+    REQUIRE(!led.isEnabled());
+    led.setEnabled(true);
+    REQUIRE(led.isEnabled());
+    led.setEnabled(false);
+    REQUIRE(!led.isEnabled());
+}
+
+TEST_CASE("Aftertouchable throws on invalid pressures", "[hardware2]") {
+    struct TestAftertouchable : mpc::hardware2::Aftertouchable {
+        void onAftertouch(int) override {} // no-op for test
+    };
+
+    TestAftertouchable t;
+
+    REQUIRE_THROWS_AS(t.aftertouch(0), std::invalid_argument);
+    REQUIRE_THROWS_AS(t.aftertouch(128), std::invalid_argument);
+
+    REQUIRE_NOTHROW(t.aftertouch(1));
+    REQUIRE_NOTHROW(t.aftertouch(127));
+}
+
 TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware2]") {
     ClientInputMapper mapper;
     Pad p(0, mapper);
@@ -80,6 +116,12 @@ TEST_CASE("Continuous<int> clamps correctly", "[hardware2]") {
     REQUIRE(c.getValue() == 0);
 
     c.setValue(999);
+    REQUIRE(c.getValue() == 127);
+
+    c.setValue(0);
+    REQUIRE(c.getValue() == 0);
+
+    c.setValue(127);
     REQUIRE(c.getValue() == 127);
 }
 
