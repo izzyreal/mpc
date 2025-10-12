@@ -5,7 +5,6 @@
 #include "controls/PadPressScreenUpdateContext.h"
 
 #include <lcdgui/LayeredScreen.hpp>
-#include "lcdgui/Layer.hpp"
 #include "lcdgui/ScreenGroups.h"
 
 #include <sequencer/Sequencer.hpp>
@@ -26,8 +25,6 @@ namespace mpc::controls { class GlobalReleaseControls; }
 
 namespace mpc::lcdgui
 {
-	class Field;
-	class LayeredScreen;
 	class ScreenComponent;
 }
 
@@ -52,11 +49,6 @@ namespace mpc::controls {
         }
 
         static std::string getFocusedFieldName(mpc::Mpc &mpc) { return mpc.getLayeredScreen()->getFocus(); }
-
-        static std::shared_ptr<lcdgui::Field> getFocusedField(mpc::Mpc &mpc)
-        {
-            return mpc.getLayeredScreen()->getFocusedLayer()->findField(getFocusedFieldName(mpc));
-        }
 
         static bool isTypableField(const std::string screenName, const std::string fieldName)
         {

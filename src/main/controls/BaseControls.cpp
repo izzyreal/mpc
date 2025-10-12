@@ -43,7 +43,7 @@ BaseControls::BaseControls(mpc::Mpc& _mpc) :
 
 void BaseControls::left()
 {
-    if (!getFocusedField(mpc) || getFocusedFieldName(mpc) == "dummy")
+    if (!mpc.getLayeredScreen()->getFocusedField() || getFocusedFieldName(mpc) == "dummy")
     {
         return;
     }
@@ -53,7 +53,7 @@ void BaseControls::left()
 
 void BaseControls::right()
 {
-    if (!getFocusedField(mpc) || getFocusedFieldName(mpc) == "dummy")
+    if (!mpc.getLayeredScreen()->getFocusedField() || getFocusedFieldName(mpc) == "dummy")
     {
         return;
     }
@@ -63,7 +63,7 @@ void BaseControls::right()
 
 void BaseControls::up()
 {
-    if (!getFocusedField(mpc) || getFocusedFieldName(mpc) == "dummy")
+    if (!mpc.getLayeredScreen()->getFocusedField() || getFocusedFieldName(mpc) == "dummy")
     {
         return;
     }
@@ -73,7 +73,7 @@ void BaseControls::up()
 
 void BaseControls::down()
 {
-    if (!getFocusedField(mpc) || getFocusedFieldName(mpc) == "dummy")
+    if (!mpc.getLayeredScreen()->getFocusedField() || getFocusedFieldName(mpc) == "dummy")
     {
         return;
     }
@@ -385,7 +385,7 @@ void BaseControls::numpad(int i)
 
         if (isTypableField(getCurrentScreenName(mpc), fieldName))
         {
-            auto field = getFocusedField(mpc);
+            auto field = mpc.getLayeredScreen()->getFocusedField();
         
             if (!field->isTypeModeEnabled())
             {
@@ -866,7 +866,7 @@ void BaseControls::shift()
     
     controls->setShiftPressed(true);
     
-    auto field = getFocusedField(mpc);
+    auto field = mpc.getLayeredScreen()->getFocusedField();
 
     if (!field || !field->isTypeModeEnabled())
     {
@@ -932,7 +932,7 @@ void BaseControls::splitLeft()
         return;
     }
 
-    const auto field = getFocusedField(mpc);
+    const auto field = mpc.getLayeredScreen()->getFocusedField();
     
     if (field->isSplit())
     {
@@ -954,7 +954,7 @@ void BaseControls::splitRight()
         return;
     }
     
-    const auto field = getFocusedField(mpc);
+    const auto field = mpc.getLayeredScreen()->getFocusedField();
 
     if (isFieldSplittable(getCurrentScreenName(mpc), getFocusedFieldName(mpc)) && field->isSplit())
     {

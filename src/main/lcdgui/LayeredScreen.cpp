@@ -573,3 +573,10 @@ void LayeredScreen::clearScreenToReturnToWhenPressingOpenWindow()
     screenToReturnToWhenPressingOpenWindow.clear();
 }
 
+std::shared_ptr<Field> LayeredScreen::getFocusedField()
+{
+    const auto focusedLayer = getFocusedLayer();
+    const auto focusedFieldName = focusedLayer->getFocus();
+    return focusedLayer->findField(focusedFieldName);
+}
+

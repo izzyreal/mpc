@@ -91,6 +91,7 @@ namespace mpc::lcdgui {
 
 	public:
 		std::string getFocus();
+        std::shared_ptr<Field> getFocusedField();
 		bool setFocus(const std::string& focus);
 
 	public:
