@@ -21,7 +21,6 @@
 #include <unordered_map>
 
 namespace mpc { class Mpc; }
-namespace mpc::controls { class GlobalReleaseControls; }
 
 namespace mpc::lcdgui
 {
@@ -127,6 +126,5 @@ namespace mpc::controls {
         void handlePadHitInTrimLoopZoneParamsScreens();
 
 		friend class mpc::lcdgui::ScreenComponent;
-		friend class GlobalReleaseControls;
 	};
 }

@@ -209,10 +209,6 @@ std::shared_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
 	return layeredScreen->findScreenComponent();
 }
 
-std::shared_ptr<mpc::controls::GlobalReleaseControls> Mpc::getReleaseControls() {
-	return controls->getReleaseControls();
-}
-
 std::shared_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
 {
 	return diskController->getActiveDisk();

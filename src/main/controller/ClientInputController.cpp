@@ -250,46 +250,48 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
 
 void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
-    if (!a.label) return;
-    auto label = a.label.value();
+    if (!a.label)
+    {
+        return;
+    }
+
+    const auto label = a.label.value();
     std::printf("[logic] button %s released\n", a.label->c_str());
 
-    auto c = mpc.getReleaseControls();
-	
 	if (label == "shift" || label == "shift_#1" || label == "shift_#2" || label == "shift_#3") {
-		c->shift();
+		mpc::controls::GlobalReleaseControls::shift(mpc);
 	}
 	else if (label == "erase") {
-		c->erase();
+		mpc::controls::GlobalReleaseControls::erase(mpc);
 	}
 	else if (label == "f1") {
-		c->function(0);
+		mpc::controls::GlobalReleaseControls::function(mpc, 0);
 	}
 	else if (label == "f3") {
-		c->function(2);
+		mpc::controls::GlobalReleaseControls::function(mpc, 2);
 	}
 	else if (label == "f4") {
-		c->function(3);
+		mpc::controls::GlobalReleaseControls::function(mpc, 3);
 	}
 	else if (label == "f5") {
-		c->function(4);
+		mpc::controls::GlobalReleaseControls::function(mpc, 4);
 	}
 	else if (label == "f6") {
-		c->function(5);
+		mpc::controls::GlobalReleaseControls::function(mpc, 5);
 	}
 	else if (label == "rec") {
-		c->rec();
+		mpc::controls::GlobalReleaseControls::rec(mpc);
 	}
 	else if (label == "overdub") {
-		c->overDub();
+		mpc::controls::GlobalReleaseControls::overDub(mpc);
 	}
 	else if (label == "play") {
-		c->play();
+		mpc::controls::GlobalReleaseControls::play(mpc);
 	}
 	else if (label == "tap") {
-		c->tap();
+		mpc::controls::GlobalReleaseControls::tap(mpc);
 	}
 	else if (label == "go-to") {
-		c->goTo();
+		mpc::controls::GlobalReleaseControls::goTo(mpc);
 	}
 }

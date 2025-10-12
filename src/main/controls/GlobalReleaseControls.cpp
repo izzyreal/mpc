@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 
+#include "controls/PadReleaseContext.h"
 #include "hardware2/Hardware2.h"
 
 #include <audiomidi/AudioMidiServices.hpp>
@@ -23,18 +24,13 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace mpc::sequencer;
 
-GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
-	: BaseControls(mpc)
-{
-}
-
-void GlobalReleaseControls::goTo()
+void GlobalReleaseControls::goTo(mpc::Mpc &mpc)
 {
 	const auto controls = mpc.getControls();
 	controls->setGoToPressed(false);
 }
 
-void GlobalReleaseControls::function(const int i)
+void GlobalReleaseControls::function(mpc::Mpc &mpc, const int i)
 {
 	const auto controls = mpc.getControls();
     const auto currentScreenName = BaseControls::getCurrentScreenName(mpc);
@@ -67,28 +63,33 @@ void GlobalReleaseControls::function(const int i)
 
 		break;
 	case 5:
+    {
+        auto sequencer = mpc.getSequencer();
+        auto sampler = mpc.getSampler();
+
 		controls->setF6Pressed(false);
 
-		if (!sequencer.lock()->isPlaying() && currentScreenName != "sequencer")
+		if (!sequencer->isPlaying() && currentScreenName != "sequencer")
         {
             sampler->finishBasicVoice();
         }
 
 		if (currentScreenName == "track-mute")
 		{
-			if (!sequencer.lock()->isSoloEnabled())
+			if (!sequencer->isSoloEnabled())
             {
                 mpc.getLayeredScreen()->setCurrentBackground("track-mute");
             }
 
-			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
+			sequencer->setSoloEnabled(sequencer->isSoloEnabled());
 		}
-		else if (getPreviousScreenName(mpc) == "directory" && currentScreenName == "popup")
+		else if (mpc.getLayeredScreen()->getPreviousScreenName() == "directory" && currentScreenName == "popup")
 		{
 			mpc.getLayeredScreen()->openScreen("directory");
 			mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
 		}
 		break;
+    }
 	}
 }
 
@@ -183,34 +184,34 @@ void GlobalReleaseControls::simplePad(PadReleaseContext &ctx)
     }
 }
 
-void GlobalReleaseControls::overDub()
+void GlobalReleaseControls::overDub(mpc::Mpc &mpc)
 {
 	const auto controls = mpc.getControls();
 	controls->setOverDubPressed(false);
-    mpc.getHardware2()->getLed("overdub")->setEnabled(sequencer.lock()->isOverDubbing());
+    mpc.getHardware2()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverDubbing());
 }
 
-void GlobalReleaseControls::rec()
+void GlobalReleaseControls::rec(mpc::Mpc &mpc)
 {
 	const auto controls = mpc.getControls();
 	controls->setRecPressed(false);
-    mpc.getHardware2()->getLed("rec")->setEnabled(sequencer.lock()->isRecording());
+    mpc.getHardware2()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
 }
 
-void GlobalReleaseControls::play()
+void GlobalReleaseControls::play(mpc::Mpc &mpc)
 {
     const auto controls = mpc.getControls();
     controls->setPlayPressed(false);
 }
 
-void GlobalReleaseControls::tap()
+void GlobalReleaseControls::tap(mpc::Mpc &mpc)
 {
 	const auto controls = mpc.getControls();
 	controls->setTapPressed(false);
 
-	if (sequencer.lock()->isRecordingOrOverdubbing())
+	if (mpc.getSequencer()->isRecordingOrOverdubbing())
     {
-        sequencer.lock()->flushTrackNoteCache();
+        mpc.getSequencer()->flushTrackNoteCache();
     }
 
     if (!controls->isNoteRepeatLocked())
@@ -220,13 +221,13 @@ void GlobalReleaseControls::tap()
     }
 }
 
-void GlobalReleaseControls::shift()
+void GlobalReleaseControls::shift(mpc::Mpc &mpc)
 {
 	const auto controls = mpc.getControls();
 	controls->setShiftPressed(false);
 }
 
-void GlobalReleaseControls::erase()
+void GlobalReleaseControls::erase(mpc::Mpc &mpc)
 {
 	const auto controls = mpc.getControls();
 	controls->setErasePressed(false);

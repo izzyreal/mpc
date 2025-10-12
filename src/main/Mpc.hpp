@@ -41,8 +41,6 @@ namespace mpc::disk {
 
 namespace mpc::controls {
     class Controls;
-    class BaseControls;
-    class GlobalReleaseControls;
 }
 
 namespace mpc::lcdgui {
@@ -126,7 +124,6 @@ namespace mpc {
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::shared_ptr<controls::Controls> getControls();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
-        std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
         std::shared_ptr<hardware2::Hardware2> getHardware2();
         mpc::disk::DiskController* getDiskController();
         std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> getPadAndButtonKeyboard();

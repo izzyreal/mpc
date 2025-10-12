@@ -8,8 +8,6 @@
 
 #include <controls/BaseControls.hpp>
 
-#include <controls/GlobalReleaseControls.hpp>
-
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
 using namespace mpc::controls;
@@ -18,7 +16,6 @@ Controls::Controls(mpc::Mpc& _mpc) :
 	mpc(_mpc),
 	sequencer(_mpc.getSequencer()),
 	baseControls (std::make_shared<BaseControls>(_mpc)),
-	releaseControls (std::make_shared<GlobalReleaseControls>(_mpc)),
 	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
 	kbMapping (std::make_shared<KbMapping>(_mpc))
 {
@@ -230,16 +227,10 @@ std::shared_ptr<BaseControls> Controls::getBaseControls()
 	return baseControls;
 }
 
-std::shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
-{
-	return releaseControls;
-}
-
 std::weak_ptr<KbMapping> Controls::getKbMapping()
 {
     return kbMapping;
 }
-
 
 void Controls::setPlayPressed(bool b)
 {

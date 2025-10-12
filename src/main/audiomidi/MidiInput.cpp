@@ -235,7 +235,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                 {
                     if (func == 7)
                     {
-                        mpc.getReleaseControls()->tap();
+                        mpc::controls::GlobalReleaseControls::tap(mpc);
                     }
                     else if (func >= 12 && func < 28)
                     {

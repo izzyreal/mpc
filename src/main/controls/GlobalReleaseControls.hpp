@@ -1,76 +1,30 @@
 #pragma once
 
-#include "BaseControls.hpp"
-#include "PadReleaseContext.h"
+namespace mpc { class Mpc; }
 
 namespace mpc::controls {
-    class GlobalReleaseControls : public BaseControls
+    class PadReleaseContext;
+
+    class GlobalReleaseControls
     {
 
     public:
         static void simplePad(PadReleaseContext&);
 
-    public:
-        void overDub() override;
+        static void overDub(mpc::Mpc&);
 
-        void rec() override;
+        static void rec(mpc::Mpc&);
 
-        void play() override;
+        static void play(mpc::Mpc&);
 
-        void tap() override;
+        static void tap(mpc::Mpc&);
 
-        void shift() override;
+        static void shift(mpc::Mpc&);
 
-        void erase() override;
+        static void erase(mpc::Mpc&);
 
-        void function(const int i) override;
+        static void function(mpc::Mpc&, const int i);
 
-        void goTo() override;
-
-    public:
-        // Not implemented, in case a release is triggered. We don't want BaseControls to start processing these.
-        void left() override {}
-
-        void right() override {}
-
-        void up() override {}
-
-        void down() override {}
-
-        void numpad(int i) override {}
-
-        void pressEnter() override {}
-
-        void stop() override {}
-
-        void playStart() override {}
-
-        void mainScreen() override {}
-
-        void prevStepEvent() override {}
-
-        void nextStepEvent() override {}
-
-        void prevBarStart() override {}
-
-        void nextBarEnd() override {}
-
-        void nextSeq() override {}
-
-        void trackMute() override {}
-
-        void bank(int i) override {}
-
-        void fullLevel() override {}
-
-        void sixteenLevels() override {}
-
-        void after() override {}
-
-        void undoSeq() override {}
-
-    public:
-        GlobalReleaseControls(mpc::Mpc &mpc);
-
+        static void goTo(mpc::Mpc&);
     };
 }
