@@ -1,5 +1,7 @@
 #include "MidiInput.hpp"
-#include "controls/PadPressScreenUpdateContext.h"
+#include "command/PadPushCommand.h"
+#include "command/PadPushScreenUpdateCommand.h"
+#include "controls/PadPushScreenUpdateContext.h"
 #include "controller/PadContextFactory.h"
 
 #include <Mpc.hpp>
@@ -8,7 +10,6 @@
 #include <audiomidi/MidiOutput.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
 
-#include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
@@ -311,17 +312,16 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     if (padIndexWithBank != -1)
     {
         auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
-        mpc::controls::BaseControls::pad(ctx, padIndexWithBank, playMidiNoteOn->getVelocity());
+        command::PadPushCommand(ctx, padIndexWithBank, playMidiNoteOn->getVelocity()).execute();
         return;
     }
     else
     {
-
         const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
         std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
         std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
-        controls::PadPressScreenUpdateContext padPressScreenUpdateContext {
+        controls::PadPushScreenUpdateContext padPushScreenUpdateContext {
             currentScreenName,
             mpc.isSixteenLevelsEnabled(),
             mpc::sequencer::isDrumNote(playMidiNoteOn->getNote()),
@@ -333,7 +333,8 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
             mpc.getBank()
         };
 
-        controls::BaseControls::padPressScreenUpdate(padPressScreenUpdateContext, playMidiNoteOn->getNote());
+        command::PadPushScreenUpdateCommand(padPushScreenUpdateContext, playMidiNoteOn->getNote(), std::nullopt).execute();
+
         mpc.getEventHandler()->handleNoThru(playMidiNoteOn, track.get(), timeStamp);
         storePlayNoteEvent(std::pair<int, int>(trackNumber, playMidiNoteOn->getNote()), playMidiNoteOn);
         

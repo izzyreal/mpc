@@ -2,6 +2,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+#include "controls/Controls.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <disk/SoundLoader.hpp>

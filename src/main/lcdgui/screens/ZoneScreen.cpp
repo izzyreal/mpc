@@ -1,4 +1,5 @@
 #include "ZoneScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -118,12 +119,12 @@ void ZoneScreen::function(int f)
 
 void ZoneScreen::left()
 {
-    BaseControls::splitLeft(mpc);
+    command::SplitLeftCommand(mpc).execute();
 }
 
 void ZoneScreen::right()
 {
-    BaseControls::splitRight(mpc);
+    command::SplitRightCommand(mpc).execute();
 }
 
 void ZoneScreen::turnWheel(int i)

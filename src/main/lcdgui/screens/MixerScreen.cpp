@@ -1,4 +1,5 @@
 #include "MixerScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>

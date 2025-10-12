@@ -33,7 +33,7 @@ void GlobalReleaseControls::goTo(mpc::Mpc &mpc)
 void GlobalReleaseControls::function(mpc::Mpc &mpc, const int i)
 {
 	const auto controls = mpc.getControls();
-    const auto currentScreenName = BaseControls::getCurrentScreenName(mpc);
+    const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
 	switch (i)
 	{
@@ -52,9 +52,9 @@ void GlobalReleaseControls::function(mpc::Mpc &mpc, const int i)
 	case 4:
 		controls->setF5Pressed(false);
 
-		if (BaseControls::getPreviousScreenName(mpc) == "load" && currentScreenName == "popup")
+		if (mpc.getLayeredScreen()->getPreviousScreenName() == "load" && currentScreenName == "popup")
 		{
-            if (const auto lastFocusedField = BaseControls::getLastFocusedField(mpc, "load"); lastFocusedField == "file" || lastFocusedField == "view")
+            if (const auto lastFocusedField = mpc.getLayeredScreen()->getLastFocus("load"); lastFocusedField == "file" || lastFocusedField == "view")
             {
                 mpc.getLayeredScreen()->openScreen("load");
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();

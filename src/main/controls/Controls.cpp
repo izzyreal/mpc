@@ -6,8 +6,6 @@
 
 #include <Mpc.hpp>
 
-#include <controls/BaseControls.hpp>
-
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
 using namespace mpc::controls;

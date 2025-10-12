@@ -10,6 +10,7 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "Mpc.hpp"
+#include "sampler/Pad.hpp"
 
 using namespace mpc::controller;
 using namespace mpc::controls;

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "TestMpc.hpp"
+#include "controls/Controls.hpp"
 #include "sampler/Sampler.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"

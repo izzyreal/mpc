@@ -1,4 +1,5 @@
 #include "AutoChromaticAssignmentScreen.hpp"
+#include "sampler/Pad.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
 

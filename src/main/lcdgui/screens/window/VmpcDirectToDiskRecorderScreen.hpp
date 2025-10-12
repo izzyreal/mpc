@@ -16,10 +16,6 @@ namespace mpc::lcdgui::screens::dialog {
 	class VmpcRecordJamScreen;
 }
 
-namespace mpc::controls {
-	class BaseControls;
-}
-
 namespace mpc::lcdgui::screens::window
 {
 	class VmpcDirectToDiskRecorderScreen
@@ -71,7 +67,6 @@ namespace mpc::lcdgui::screens::window
 		friend class mpc::audiomidi::EventHandler;
 		friend class mpc::audiomidi::AudioMidiServices;
 		friend class mpc::lcdgui::screens::dialog::VmpcRecordJamScreen;
-		friend class mpc::controls::BaseControls;
 
 	};
 }

@@ -1,5 +1,6 @@
 #include "ApsLoader.hpp"
 #include "lcdgui/screens/PgmAssignScreen.hpp"
+#include "sampler/Pad.hpp"
 
 #include <Mpc.hpp>
 #include <disk/StdDisk.hpp>
