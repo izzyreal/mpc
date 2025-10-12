@@ -52,7 +52,7 @@ PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padInde
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
     std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
-    const auto hardwareSliderValue = mpc.getHardware2()->getSlider()->getValue();
+    const auto hardwareSliderValue = mpc.getHardware2()->getSlider()->getValueAs<int>();
 
     return {
         currentScreenName,

@@ -61,7 +61,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
             auto programSlider = program->getSlider();
 
             Util::SliderNoteVariationContext sliderNoteVariationContext {
-                hardwareSlider->getValue(),
+                hardwareSlider->getValueAs<int>(),
                 programSlider->getNote(),
                 programSlider->getParameter(),
                 programSlider->getTuneLowRange(),

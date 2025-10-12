@@ -132,16 +132,35 @@ public:
     }
 };
 
-template <typename T, T MIN, T MAX>
+template <typename T, int MIN, int MAX>
 class Continuous {
-    T value = MIN;
+    T value = static_cast<T>(MIN);
 protected:
     Continuous() = default;
+    
 public:
     virtual ~Continuous() = default;
 
-    void setValue(T v) { value = std::clamp(v, MIN, MAX); }
+    void setValue(T v) { value = std::clamp(v, static_cast<T>(MIN), static_cast<T>(MAX)); }
     T getValue() const { return value; }
+
+    std::pair<int, int> getRange() const { return { MIN, MAX }; }
+
+    template <typename T1>
+    std::pair<T1, T1> getRangeAs() const { return { static_cast<T1>(MIN), static_cast<T1>(MAX) }; }
+
+    template <typename T1>
+    T1 getValueAs() const
+    {
+        if constexpr (std::is_floating_point_v<T> && std::is_integral_v<T1>)
+        {
+            return static_cast<T1>(std::lround(value));
+        }
+        else
+        {
+            return static_cast<T1>(value);
+        }
+    }
 };
 
 // --- concrete types ---
@@ -212,16 +231,66 @@ public:
     }
 };
 
-class Slider final : public Component, public Continuous<int, 0, 127> {
+// Modeled with float value to support smooth GUI experience.
+// With an integer type we run into the problem that dragging the slider may
+// well be of a higher resolution than 128 discrete values, leading to a visible
+// jump on the first occasion that the GUI slider synchronizes with the model state.
+class Slider final : public Component, public Continuous<float, 0, 127> {
 public:
-    explicit Slider(mpc::inputlogic::ClientInputMapper& mapperToUse) : Component(mapperToUse) {}
-    void moveTo(int value) {
+    enum class Direction { UpIncreases, DownIncreases };
+private:
+    Direction direction;
+public:
+    explicit Slider(mpc::inputlogic::ClientInputMapper& mapperToUse)
+        : Component(mapperToUse),
+        // According to https://www.mpc-forums.com/viewtopic.php?p=790276#p790276
+        // the MPC2000XL's slider has value 127 at the top and 0 at the bottom.
+        // We explicitly model the direction, because it has been a frequent source
+        // of confusion for the author of VMPC2000XL.
+        direction(Direction::UpIncreases)
+    {
+    }
+    
+    // Moves the slider based on a normalized GUI Y position in [0.0, 1.0],
+    // where 0.0 represents the top of the slider GUI representation, and 1.0
+    // the bottom.
+    // Internally converts this visual Y position into the corresponding
+    // hardware value (0–127) according to the slider's direction.
+    void moveToNormalizedY(const float normalizedY)
+    {
+        auto [min, max] = getRangeAs<float>();
+
+        const float clampedY = std::clamp(normalizedY, 0.0f, 1.0f);
+
+        float value;
+
+        if (direction == Direction::UpIncreases)
+        {
+            value = (1.0f - clampedY) * max + clampedY * min;
+        }
+        else
+        {
+            value = clampedY * max + (1.0f - clampedY) * min;
+        }
+
+        moveTo(value);
+    }
+
+    void moveTo(const float value)
+    {
         setValue(value);
         ClientInput action;
         action.type = ClientInput::Type::SliderMove;
-        action.value = value;
+        action.value = getValueAs<int>();
         mapper.trigger(action);
     }
+
+    void setDirection(const Direction directionToUse)
+    {
+        direction = directionToUse;
+    }
+
+    Direction getDirection() const { return direction; }
 };
 
 class Pot final : public Component, public Continuous<int, 0, 127> {
