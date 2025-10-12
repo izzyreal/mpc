@@ -1,5 +1,6 @@
 #pragma once
 #include <sequencer/Sequence.hpp>
+#include "NoteEventStore.hpp"
 
 #include <Observer.hpp>
 
@@ -49,8 +50,11 @@ namespace mpc::sequencer
         void setPositionWithinSong(const double positionQuarterNotes);
         void bumpPositionByTicks(const uint8_t ticks);
 
+        NoteEventStore<int>& getNoteEventStore() { return noteEventStore; }
+
 	private:
         mpc::Mpc& mpc;
+        NoteEventStore<int> noteEventStore;
         bool playing = false;
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;

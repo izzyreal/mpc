@@ -7,7 +7,6 @@
 #include <string>
 #include <set>
 #include "sequencer/NoteEvent.hpp"
-#include "sequencer/NoteEventStore.hpp"
 
 namespace mpc
 {
@@ -26,7 +25,7 @@ namespace mpc::sequencer
 
 namespace mpc::controls
 {
-    class Controls : public mpc::sequencer::NoteEventStore<int> 
+    class Controls
     {
     public:
         Controls(mpc::Mpc &mpc);

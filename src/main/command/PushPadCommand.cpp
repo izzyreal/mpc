@@ -106,7 +106,7 @@ void PushPadCommand::generateNoteOn(const PushPadContext &ctx, const int note, c
     const auto drum = ctx.currentScreenIsSamplerScreen ? 
             std::optional<uint8_t>(ctx.drumScreenSelectedDrum) : std::optional<uint8_t>();
 
-    ctx.controls->storePlayNoteEvent(padIndexWithBank, playOnEvent);
+    ctx.sequencer->getNoteEventStore().storePlayNoteEvent(padIndexWithBank, playOnEvent);
     ctx.eventHandler->handle(playOnEvent, ctx.track.get(), drum);
 
     std::shared_ptr<sequencer::NoteOnEvent> recordNoteOnEvent;
@@ -158,7 +158,7 @@ void PushPadCommand::generateNoteOn(const PushPadContext &ctx, const int note, c
             Util::setSliderNoteVariationParameters(sliderNoteVariationContext, recordNoteOnEvent);
         }
 
-        ctx.controls->storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
+        ctx.sequencer->getNoteEventStore().storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
     }
 }
 

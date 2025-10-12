@@ -109,13 +109,13 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
 
     std::function<void(int)> controlsUnpressPad = [controls = mpc.getControls()] (int p) { controls->unpressPad(p); };
 
-    const auto playNoteEvent = mpc.getControls()->retrievePlayNoteEvent(padIndexWithBank);
+    const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(padIndexWithBank);
 
     const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
 
     auto eventHandler = mpc.getEventHandler();
 
-    const auto recordNoteOnEvent = mpc.getControls()->retrieveRecordNoteEvent(padIndexWithBank);
+    const auto recordNoteOnEvent = mpc.getSequencer()->getNoteEventStore().retrieveRecordNoteEvent(padIndexWithBank);
 
     std::function<bool()> arePadsPressed = [controls = mpc.getControls()] { return controls->arePadsPressed(); };
 
