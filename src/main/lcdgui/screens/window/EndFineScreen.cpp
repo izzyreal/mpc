@@ -132,12 +132,12 @@ void EndFineScreen::turnWheel(int i)
 
 void EndFineScreen::left()
 {
-	splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void EndFineScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 void EndFineScreen::pressEnter()

@@ -73,41 +73,39 @@ namespace mpc::lcdgui
 		}
 
 	public:
-		void splitLeft() { mpc.getControls()->getBaseControls()->splitLeft(); }
-		void splitRight() { mpc.getControls()->getBaseControls()->splitRight(); }
-		virtual void left() { mpc.getControls()->getBaseControls()->left(); }
-		virtual void right() { mpc.getControls()->getBaseControls()->right(); }
-		virtual void up() { mpc.getControls()->getBaseControls()->up(); }
-		virtual void down() { mpc.getControls()->getBaseControls()->down(); }
-		virtual void function(int i) { init(); mpc.getControls()->getBaseControls()->function(i); }
+		virtual void left() { mpc::controls::BaseControls::left(mpc); }
+		virtual void right() { mpc::controls::BaseControls::right(mpc); }
+		virtual void up() { mpc::controls::BaseControls::up(mpc); }
+		virtual void down() { mpc::controls::BaseControls::down(mpc); }
+		virtual void function(int i) { init(); mpc::controls::BaseControls::function(mpc, i); }
 		virtual void openWindow();
 		virtual void turnWheel(int i) {}
-		virtual void numpad(int i) { mpc.getControls()->getBaseControls()->numpad(i); }
-		virtual void pressEnter() { mpc.getControls()->getBaseControls()->pressEnter(); }
-		virtual void rec() { mpc.getControls()->getBaseControls()->rec(); }
-		virtual void overDub() { mpc.getControls()->getBaseControls()->overDub(); }
-		virtual void stop() { mpc.getControls()->getBaseControls()->stop(); }
-		virtual void play() { mpc.getControls()->getBaseControls()->play(); }
-		virtual void playStart() { mpc.getControls()->getBaseControls()->playStart(); }
-		virtual void mainScreen() { mpc.getControls()->getBaseControls()->mainScreen(); }
-		virtual void tap() { mpc.getControls()->getBaseControls()->tap(); }
-		virtual void prevStepEvent() { mpc.getControls()->getBaseControls()->prevStepEvent(); }
-		virtual void nextStepEvent() { mpc.getControls()->getBaseControls()->nextStepEvent(); }
-		virtual void goTo() { mpc.getControls()->getBaseControls()->goTo(); }
-		virtual void prevBarStart() { mpc.getControls()->getBaseControls()->prevBarStart(); }
-		virtual void nextBarEnd() { mpc.getControls()->getBaseControls()->nextBarEnd(); }
-		virtual void nextSeq() { mpc.getControls()->getBaseControls()->nextSeq(); }
-		virtual void trackMute() { mpc.getControls()->getBaseControls()->trackMute(); }
-		virtual void bank(int i) { mpc.getControls()->getBaseControls()->bank(i); }
-		virtual void fullLevel() { mpc.getControls()->getBaseControls()->fullLevel(); }
-		virtual void sixteenLevels() { mpc.getControls()->getBaseControls()->sixteenLevels(); }
-		virtual void after() { mpc.getControls()->getBaseControls()->after(); }
-		virtual void shift() { mpc.getControls()->getBaseControls()->shift(); }
-		virtual void undoSeq() { mpc.getControls()->getBaseControls()->undoSeq(); }
-		virtual void erase() { mpc.getControls()->getBaseControls()->erase(); }
+		virtual void numpad(int i) { mpc::controls::BaseControls::numpad(mpc, i); }
+		virtual void pressEnter() { mpc::controls::BaseControls::pressEnter(mpc); }
+		virtual void rec() { mpc::controls::BaseControls::rec(mpc); }
+		virtual void overDub() { mpc::controls::BaseControls::overDub(mpc); }
+		virtual void stop() { mpc::controls::BaseControls::stop(mpc); }
+		virtual void play() { mpc::controls::BaseControls::play(mpc); }
+		virtual void playStart() { mpc::controls::BaseControls::playStart(mpc); }
+		virtual void mainScreen() { mpc::controls::BaseControls::mainScreen(mpc); }
+		virtual void tap() { mpc::controls::BaseControls::tap(mpc); }
+		virtual void prevStepEvent() { }
+		virtual void nextStepEvent() { }
+		virtual void goTo() { mpc::controls::BaseControls::goTo(mpc); }
+		virtual void prevBarStart() { }
+		virtual void nextBarEnd() { }
+		virtual void nextSeq() { mpc::controls::BaseControls::nextSeq(mpc); }
+		virtual void trackMute() { mpc::controls::BaseControls::trackMute(mpc); }
+		virtual void bank(int i) { mpc::controls::BaseControls::bank(mpc, i); }
+		virtual void fullLevel() { mpc::controls::BaseControls::fullLevel(mpc); }
+		virtual void sixteenLevels() { mpc::controls::BaseControls::sixteenLevels(mpc); }
+		virtual void after() { mpc::controls::BaseControls::after(mpc); }
+		virtual void shift() { mpc::controls::BaseControls::shift(mpc); }
+		virtual void undoSeq() { mpc::controls::BaseControls::undoSeq(mpc); }
+		virtual void erase() { mpc::controls::BaseControls::erase(mpc); }
 		virtual void setSlider(int i) { }
 
-		int getSoundIncrement(int notch) { return mpc.getControls()->getBaseControls()->getSoundIncrement(notch); }
+		int getSoundIncrement(int notch) { return mpc::controls::BaseControls::getSoundIncrement(mpc.getSampler()->getSound()->getFrameCount(), notch); }
 
 		virtual void pad(int padIndexWithBank, int velo);
 

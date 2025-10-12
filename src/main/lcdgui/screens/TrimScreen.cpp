@@ -308,12 +308,12 @@ void TrimScreen::setEnd(int newValue)
 
 void TrimScreen::left()
 {
-	splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void TrimScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 // Can be called from another layer, i.e. Start Fine and End Fine windows

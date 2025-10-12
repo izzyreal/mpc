@@ -118,12 +118,12 @@ void ZoneScreen::function(int f)
 
 void ZoneScreen::left()
 {
-	splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void ZoneScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 void ZoneScreen::turnWheel(int i)

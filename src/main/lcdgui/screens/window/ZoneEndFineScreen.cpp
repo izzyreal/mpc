@@ -105,12 +105,12 @@ void ZoneEndFineScreen::turnWheel(int i)
 
 void ZoneEndFineScreen::left()
 {
-	splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void ZoneEndFineScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 void ZoneEndFineScreen::pressEnter()

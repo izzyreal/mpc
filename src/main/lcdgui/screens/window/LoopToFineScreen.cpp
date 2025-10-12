@@ -146,12 +146,12 @@ void LoopToFineScreen::turnWheel(int i)
 
 void LoopToFineScreen::left()
 {
-	splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void LoopToFineScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 void LoopToFineScreen::pressEnter()

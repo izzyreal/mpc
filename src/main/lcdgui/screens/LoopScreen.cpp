@@ -324,12 +324,12 @@ void LoopScreen::setSliderLength(int i)
 
 void LoopScreen::left()
 {
-    splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void LoopScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 void LoopScreen::pressEnter()

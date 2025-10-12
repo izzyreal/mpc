@@ -16,7 +16,6 @@
 #include <controls/Controls.hpp>
 
 #include <string>
-#include <memory>
 #include <vector>
 #include <unordered_map>
 
@@ -31,8 +30,6 @@ namespace mpc::controls {
 		
 	class BaseControls {
 	public:
-		BaseControls(mpc::Mpc&);
-
         static std::string getCurrentScreenName(mpc::Mpc &mpc) { return mpc.getLayeredScreen()->getCurrentScreenName(); }
         static std::string getPreviousScreenName(mpc::Mpc &mpc) { return mpc.getLayeredScreen()->getPreviousScreenName(); }
         static std::string getLastFocusedField(mpc::Mpc &mpc, const std::string screenName) { return mpc.getLayeredScreen()->getLastFocus(screenName); }
@@ -79,52 +76,38 @@ namespace mpc::controls {
             return typableFields.at(screenName);
         }
 
-		void splitLeft();
-		void splitRight();
-
-		int getSoundIncrement(const int notch);
-		virtual void left();
-		virtual void right();
-		virtual void up();
-		virtual void down();
-		virtual void function(const int i);
-		virtual void numpad(const int i);
-		virtual void pressEnter();
-		virtual void rec();
-		virtual void overDub();
-		virtual void stop();
-		virtual void play();
-		virtual void playStart();
-		virtual void mainScreen();
-		virtual void tap();
-		virtual void prevStepEvent() {}
-		virtual void nextStepEvent() {}
-		virtual void goTo();
-		virtual void prevBarStart() {}
-		virtual void nextBarEnd() {}
-		virtual void nextSeq();
-		virtual void trackMute();
-		virtual void bank(const int i);
-		virtual void fullLevel();
-		virtual void sixteenLevels();
-		virtual void after();
-		virtual void shift();
-		virtual void undoSeq();
-		virtual void erase();
+		static int getSoundIncrement(const int64_t frameCount, const int notch);
+        static void splitLeft(mpc::Mpc&);
+        static void splitRight(mpc::Mpc&);
+		static void left(mpc::Mpc&);
+		static void right(mpc::Mpc&);
+		static void up(mpc::Mpc&);
+		static void down(mpc::Mpc&);
+		static void function(mpc::Mpc&, const int i);
+		static void numpad(mpc::Mpc&, const int i);
+		static void pressEnter(mpc::Mpc&);
+		static void rec(mpc::Mpc&);
+		static void overDub(mpc::Mpc&);
+		static void stop(mpc::Mpc&);
+		static void play(mpc::Mpc&);
+		static void playStart(mpc::Mpc&);
+		static void mainScreen(mpc::Mpc&);
+		static void tap(mpc::Mpc&);
+		static void goTo(mpc::Mpc&);
+		static void nextSeq(mpc::Mpc&);
+		static void trackMute(mpc::Mpc&);
+		static void bank(mpc::Mpc&, const int i);
+		static void fullLevel(mpc::Mpc&);
+		static void sixteenLevels(mpc::Mpc&);
+		static void after(mpc::Mpc&);
+		static void shift(mpc::Mpc&);
+		static void undoSeq(mpc::Mpc&);
+		static void erase(mpc::Mpc&);
 
 		static void padPressScreenUpdate(PadPressScreenUpdateContext&, const int note, const std::optional<int> padIndexWithBank = std::nullopt);
 		static void pad(PadPushContext&, const int padIndexWithBank, int velo);
 
-	protected:
-		mpc::Mpc& mpc;
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-
 	private:
-		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		static void generateNoteOn(const GenerateNoteOnContext& ctx, const int note, const int velo, const int padIndexWithBank);
-
-        void handlePadHitInTrimLoopZoneParamsScreens();
-
-		friend class mpc::lcdgui::ScreenComponent;
 	};
 }

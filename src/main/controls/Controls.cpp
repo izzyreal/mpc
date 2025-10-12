@@ -15,7 +15,6 @@ using namespace mpc::controls;
 Controls::Controls(mpc::Mpc& _mpc) : 
 	mpc(_mpc),
 	sequencer(_mpc.getSequencer()),
-	baseControls (std::make_shared<BaseControls>(_mpc)),
 	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
 	kbMapping (std::make_shared<KbMapping>(_mpc))
 {
@@ -220,11 +219,6 @@ void Controls::setF5Pressed(bool b)
 void Controls::setF6Pressed(bool b)
 {
 	f6Pressed = b;
-}
-
-std::shared_ptr<BaseControls> Controls::getBaseControls()
-{
-	return baseControls;
 }
 
 std::weak_ptr<KbMapping> Controls::getKbMapping()

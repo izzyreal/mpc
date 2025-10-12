@@ -18,7 +18,6 @@ namespace mpc::controls
 {
   class KbMapping;
   class KeyEventHandler;
-  class BaseControls;
 }
 namespace mpc::sequencer
 {
@@ -70,7 +69,6 @@ namespace mpc::controls
         bool arePadsPressed();
 
         std::weak_ptr<KeyEventHandler> getKeyEventHandler();
-        std::shared_ptr<BaseControls> getBaseControls();
 
         void setCtrlPressed(bool);
         void setAltPressed(bool);
@@ -99,7 +97,6 @@ namespace mpc::controls
         mpc::Mpc& mpc;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<KeyEventHandler> keyEventHandler;
-        std::shared_ptr<BaseControls> baseControls;
         std::unordered_map<int/*index*/, int/*count*/> pressedPads;
     };
 }

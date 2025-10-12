@@ -107,12 +107,12 @@ void ZoneStartFineScreen::turnWheel(int i)
 
 void ZoneStartFineScreen::left()
 {
-	splitLeft();
+    BaseControls::splitLeft(mpc);
 }
 
 void ZoneStartFineScreen::right()
 {
-	splitRight();
+    BaseControls::splitRight(mpc);
 }
 
 void ZoneStartFineScreen::pressEnter()
