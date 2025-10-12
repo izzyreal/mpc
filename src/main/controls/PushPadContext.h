@@ -39,7 +39,7 @@ namespace mpc::controls {
 
     class Controls;
 
-    struct PadPushContext {
+    struct PushPadContext {
         std::string currentScreenName;
         bool isSoundScreen;
 

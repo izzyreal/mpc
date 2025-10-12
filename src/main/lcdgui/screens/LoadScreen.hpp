@@ -93,7 +93,6 @@ private:
     friend class mpc::lcdgui::screens::window::VmpcConvertAndLoadWavScreen;
     friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
     friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
-    friend class mpc::controls::BaseControls;
     friend class mpc::disk::AbstractDisk;
     friend class mpc::disk::StdDisk;
     friend class mpc::disk::RawDisk;

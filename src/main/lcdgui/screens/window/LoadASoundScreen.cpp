@@ -1,4 +1,5 @@
 #include "LoadASoundScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <sampler/Pad.hpp>
 

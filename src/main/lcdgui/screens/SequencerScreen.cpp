@@ -1,4 +1,5 @@
 #include "SequencerScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>

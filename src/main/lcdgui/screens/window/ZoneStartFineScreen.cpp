@@ -1,4 +1,5 @@
 #include "ZoneStartFineScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -107,12 +108,12 @@ void ZoneStartFineScreen::turnWheel(int i)
 
 void ZoneStartFineScreen::left()
 {
-    BaseControls::splitLeft(mpc);
+    command::SplitLeftCommand(mpc).execute();
 }
 
 void ZoneStartFineScreen::right()
 {
-    BaseControls::splitRight(mpc);
+    command::SplitRightCommand(mpc).execute();
 }
 
 void ZoneStartFineScreen::pressEnter()

@@ -1,4 +1,5 @@
 #include "EditSoundScreen.hpp"
+#include "sampler/Pad.hpp"
 
 #include <sampler/TimeStretch1.hpp>
 

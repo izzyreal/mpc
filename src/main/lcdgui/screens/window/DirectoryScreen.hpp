@@ -38,6 +38,7 @@ namespace mpc::lcdgui::screens::window
         DirectoryScreen(mpc::Mpc& mpc, const int layerIndex);
 
         void setPreviousScreenName(std::string newPreviousScreenName);
+        std::string getPreviousScreenName() const { return previousScreenName; }
 
         void function(int f) override;
 		void left() override;
@@ -73,7 +74,6 @@ namespace mpc::lcdgui::screens::window
 		void drawGraphicsLeft();
 		void drawGraphicsRight();
 
-		friend class mpc::controls::BaseControls;
 		friend class mpc::disk::AbstractDisk;
 		friend class mpc::lcdgui::screens::LoadScreen;
 		friend class mpc::lcdgui::screens::SaveScreen;

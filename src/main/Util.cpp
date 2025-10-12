@@ -11,7 +11,6 @@
 using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
 

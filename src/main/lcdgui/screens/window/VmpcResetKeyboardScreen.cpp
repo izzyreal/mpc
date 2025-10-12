@@ -1,4 +1,5 @@
 #include "VmpcResetKeyboardScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <controls/KbMapping.hpp>
 

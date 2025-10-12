@@ -9,7 +9,7 @@ namespace mpc::lcdgui {
 
 namespace mpc::controls {
 
-struct PadPressScreenUpdateContext {
+struct PushPadScreenUpdateContext {
     std::string currentScreenName;
     bool isSixteenLevelsEnabled;
     bool isDrumNote;

@@ -1,4 +1,5 @@
 #include "StartFineScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <lcdgui/screens/TrimScreen.hpp>
 
@@ -141,12 +142,12 @@ void StartFineScreen::turnWheel(int i)
 
 void StartFineScreen::left()
 {
-    BaseControls::splitLeft(mpc);
+    command::SplitLeftCommand(mpc).execute();
 }
 
 void StartFineScreen::right()
 {
-    BaseControls::splitRight(mpc);
+    command::SplitRightCommand(mpc).execute();
 }
 
 void StartFineScreen::pressEnter()

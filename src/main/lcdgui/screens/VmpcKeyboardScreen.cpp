@@ -10,6 +10,7 @@
 #include <lcdgui/Field.hpp>
 
 #include <controls/KbMapping.hpp>
+#include "controls/Controls.hpp"
 #include "controls/KeyCodeHelper.hpp"
 
 #include <StrUtil.hpp>

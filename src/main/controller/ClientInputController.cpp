@@ -3,7 +3,6 @@
 #include "inputlogic/ClientInput.h"
 #include "controller/PadContextFactory.h"
 #include "controls/GlobalReleaseControls.hpp"
-#include "controls/BaseControls.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "hardware2/Hardware2.h"
@@ -45,8 +44,8 @@ void ClientInputController::handlePadPress(const ClientInput& a)
     assert(a.value.has_value());
     const auto num = *a.index;
     auto padIndexWithBank = num + (mpc.getBank() * 16);
-    auto ctx = controller::PadContextFactory::buildPadPushContext(mpc, padIndexWithBank, *a.value, mpc.getLayeredScreen()->getCurrentScreenName());
-    mpc::controls::BaseControls::pad(ctx, padIndexWithBank, *a.value);
+    auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, padIndexWithBank, *a.value, mpc.getLayeredScreen()->getCurrentScreenName());
+    command::PushPadCommand(ctx, padIndexWithBank, *a.value).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)

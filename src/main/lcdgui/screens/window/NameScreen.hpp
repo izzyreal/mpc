@@ -3,8 +3,6 @@
 
 #include <functional>
 
-namespace mpc::controls { class BaseControls; }
-
 namespace mpc::lcdgui { class Underline;}
 
 namespace mpc::lcdgui::screens::window

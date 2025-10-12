@@ -1,5 +1,6 @@
 #include "TrMuteScreen.hpp"
 
+#include "controls/Controls.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;

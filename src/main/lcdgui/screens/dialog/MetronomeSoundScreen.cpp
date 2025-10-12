@@ -1,4 +1,5 @@
 #include "MetronomeSoundScreen.hpp"
+#include "sampler/Pad.hpp"
 
 #include <Mpc.hpp>
 

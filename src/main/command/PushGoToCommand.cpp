@@ -1,0 +1,20 @@
+#include "PushGoToCommand.h"
+#include "Mpc.hpp"
+#include "controls/Controls.hpp"
+#include "sequencer/Sequencer.hpp"
+
+namespace mpc::command {
+
+    PushGoToCommand::PushGoToCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+    void PushGoToCommand::execute() {
+        if (!mpc.getSequencer()->getActiveSequence()->isUsed()) return;
+
+        const auto controls = mpc.getControls();
+        controls->setGoToPressed(true);
+
+        if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer")
+            mpc.getLayeredScreen()->openScreen("locate");
+    }
+
+}

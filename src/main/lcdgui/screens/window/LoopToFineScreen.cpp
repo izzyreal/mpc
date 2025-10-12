@@ -1,4 +1,5 @@
 #include "LoopToFineScreen.hpp"
+#include "controls/Controls.hpp"
 
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -146,12 +147,12 @@ void LoopToFineScreen::turnWheel(int i)
 
 void LoopToFineScreen::left()
 {
-    BaseControls::splitLeft(mpc);
+    command::SplitLeftCommand(mpc).execute();
 }
 
 void LoopToFineScreen::right()
 {
-    BaseControls::splitRight(mpc);
+    command::SplitRightCommand(mpc).execute();
 }
 
 void LoopToFineScreen::pressEnter()

@@ -10,12 +10,13 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "Mpc.hpp"
+#include "sampler/Pad.hpp"
 
 using namespace mpc::controller;
 using namespace mpc::controls;
 using namespace mpc::lcdgui;
 
-PadPushContext PadContextFactory::buildPadPushContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
+PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
     const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);

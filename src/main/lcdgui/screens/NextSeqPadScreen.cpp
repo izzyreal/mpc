@@ -1,4 +1,5 @@
 #include "NextSeqPadScreen.hpp"
+#include "controls/Controls.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -188,3 +189,4 @@ void NextSeqPadScreen::update(Observable* observable, Message message)
 		displayNow2();
 	}
 }
+

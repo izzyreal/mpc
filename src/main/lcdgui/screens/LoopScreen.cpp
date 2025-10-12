@@ -1,4 +1,7 @@
 #include "LoopScreen.hpp"
+#include "command/SplitLeftCommand.h"
+#include "command/SplitRightCommand.h"
+#include "controls/Controls.hpp"
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -324,12 +327,12 @@ void LoopScreen::setSliderLength(int i)
 
 void LoopScreen::left()
 {
-    BaseControls::splitLeft(mpc);
+    command::SplitLeftCommand(mpc).execute();
 }
 
 void LoopScreen::right()
 {
-    BaseControls::splitRight(mpc);
+    command::SplitRightCommand(mpc).execute();
 }
 
 void LoopScreen::pressEnter()

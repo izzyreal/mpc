@@ -1,5 +1,6 @@
 #include "TrimScreen.hpp"
 
+#include "controls/Controls.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
@@ -308,12 +309,12 @@ void TrimScreen::setEnd(int newValue)
 
 void TrimScreen::left()
 {
-    BaseControls::splitLeft(mpc);
+    command::SplitLeftCommand(mpc).execute();
 }
 
 void TrimScreen::right()
 {
-    BaseControls::splitRight(mpc);
+    command::SplitRightCommand(mpc).execute();
 }
 
 // Can be called from another layer, i.e. Start Fine and End Fine windows

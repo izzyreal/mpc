@@ -1,4 +1,5 @@
 #include "OthersScreen.hpp"
+#include "controls/Controls.hpp"
 
 using namespace mpc::lcdgui::screens;
 
