@@ -2,6 +2,7 @@
 
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
+#include "MpcSpecs.h"
 
 #include <memory>
 #include <string>
@@ -52,8 +53,8 @@ public:
     int getProgramCount();
 
     /**
-     * The `programs` collection is always of size 24, where a nullptr element
-     * indicates a free slot. This method creates a new program at the first
+     * The `programs` collection is always of size MAX_PROGRAM_COUNT (which is 24 for an MPC2000XL),
+     * where a nullptr element indicates a free slot. This method creates a new program at the first
      * available slot. A nullptr is returned if all slots are occupied.
      */
     std::weak_ptr<Program> createNewProgramAddFirstAvailableSlot();
@@ -126,6 +127,9 @@ public:
     static std::vector<float> resampleSingleChannel(std::vector<float>& input, int sourceRate, int destRate);
     std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 
+    void clearAllProgramPadPressRegistries();
+    bool isAnyProgramPadRegisteredAsPressed() const;
+
 private:
     int soundIndex = 0;
     int playXMode = 0;
@@ -136,7 +140,7 @@ private:
     std::vector<int> masterPadAssign;
 
     std::vector<std::shared_ptr<Sound>> sounds;
-    std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(24);
+    std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(MAX_PROGRAM_COUNT);
     unsigned char soundSortingType = 0;
     std::vector<std::string> padNames;
     std::vector<std::string> abcd = std::vector<std::string>{ "A", "B", "C", "D" };

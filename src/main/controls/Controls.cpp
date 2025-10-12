@@ -119,16 +119,6 @@ bool mpc::controls::Controls::isRecMainWithoutPlaying()
 	return recMainWithoutPlaying;
 }
 
-bool mpc::controls::Controls::isPadPressed(int pad)
-{
-	return pressedPads.find(pad) != pressedPads.end();
-}
-
-bool mpc::controls::Controls::arePadsPressed()
-{
-	return !pressedPads.empty();
-}
-
 void Controls::setErasePressed(bool b)
 {
 	erasePressed = b;
@@ -162,31 +152,6 @@ void Controls::setTapPressed(bool b)
 void Controls::setNoteRepeatLocked(bool b)
 {
     noteRepeatLocked = b;
-}
-
-void mpc::controls::Controls::pressPad(int pad)
-{
-    if (!pressedPads.emplace(pad, 0).second)
-    {
-        pressedPads[pad]++;
-    }
-
-    assert(pressedPads.count(pad) > 0);
-}
-
-void mpc::controls::Controls::unpressPad(int pad)
-{
-	--pressedPads[pad];
-
-	if (pressedPads[pad] < 1)
-    {
-        pressedPads.erase(pad);
-    }
-}
-
-void mpc::controls::Controls::clearAllPadStates()
-{
-	pressedPads.clear();
 }
 
 void Controls::setGoToPressed(bool b)

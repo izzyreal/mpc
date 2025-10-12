@@ -13,7 +13,6 @@ namespace mpc::audiomidi {
     class EventHandler;
 }
 
-
 namespace mpc::controls {
 
 struct PadReleaseContext {
@@ -21,7 +20,7 @@ struct PadReleaseContext {
     std::function<void()> finishBasicVoiceIfSoundIsLooping;
     const bool currentScreenIsSoundScreen;
     const bool currentScreenIsSamplerScreen;
-    std::function<void(int)> controlsUnpressPad;
+    std::function<void(int)> registerProgramPadRelease;
     std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> playNoteEvent;
     const int drumScreenSelectedDrum;
     std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
@@ -30,7 +29,7 @@ struct PadReleaseContext {
     const bool isErasePressed;
     const std::shared_ptr<mpc::sequencer::Track> activeTrack;
     const bool isStepRecording;
-    const std::function<bool()> arePadsPressed;
+    const std::function<bool()> isAnyProgramPadRegisteredAsPressed;
     const uint64_t metronomeOnlyTickPosition;
     const bool isRecMainWithoutPlaying;
     const int64_t sequencerTickPosition;

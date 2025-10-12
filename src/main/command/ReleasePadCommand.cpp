@@ -16,12 +16,14 @@ void ReleasePadCommand::execute()
     ctx.finishBasicVoiceIfSoundIsLooping();
 
     if (ctx.currentScreenIsSoundScreen)
+    {
         return;
-
-    ctx.controlsUnpressPad(ctx.padIndexWithBank);
+    }
 
     if (!ctx.playNoteEvent)
+    {
         return;
+    }
 
     const auto noteOff = ctx.playNoteEvent->getNoteOff();
     noteOff->setTick(-1);
@@ -32,14 +34,22 @@ void ReleasePadCommand::execute()
 
     ctx.eventHandler->handle(noteOff, ctx.activeTrack.get(), drum);
 
+    ctx.registerProgramPadRelease(ctx.padIndexWithBank);
+
     if (!ctx.recordOnEvent)
+    {
         return;
+    }
 
     if (ctx.sequencerIsRecordingOrOverdubbing && ctx.isErasePressed)
+    {
         return;
+    }
 
     if (ctx.sequencerIsRecordingOrOverdubbing)
+    {
         ctx.activeTrack->finalizeNoteEventASync(ctx.recordOnEvent);
+    }
 
     if (ctx.isStepRecording || ctx.isRecMainWithoutPlaying)
     {
@@ -58,7 +68,7 @@ void ReleasePadCommand::execute()
         if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying)
             || (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))
         {
-            if (!ctx.arePadsPressed())
+            if (!ctx.isAnyProgramPadRegisteredAsPressed())
             {
                 int nextPos = ctx.sequencerTickPosition + ctx.noteValueLengthInTicks;
                 auto bar = ctx.currentBarIndex + 1;
@@ -74,6 +84,8 @@ void ReleasePadCommand::execute()
         }
     }
 
-    if (!ctx.arePadsPressed())
+    if (!ctx.isAnyProgramPadRegisteredAsPressed())
+    {
         ctx.sequencerStopMetronomeTrack();
+    }
 }

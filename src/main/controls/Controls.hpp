@@ -45,10 +45,6 @@ namespace mpc::controls
         void setF6Pressed(bool);
         void setNoteRepeatLocked(bool);
         
-        void pressPad(int);
-        void unpressPad(int);
-        void clearAllPadStates();
-
         bool isErasePressed();
         bool isRecPressed(bool includeLocked = true);
         bool isOverdubPressed(bool includeLocked = true);
@@ -64,9 +60,6 @@ namespace mpc::controls
         bool isStepRecording();
         bool isRecMainWithoutPlaying();
         
-        bool isPadPressed(int);
-        bool arePadsPressed();
-
         std::weak_ptr<KeyEventHandler> getKeyEventHandler();
 
         void setCtrlPressed(bool);
@@ -96,6 +89,5 @@ namespace mpc::controls
         mpc::Mpc& mpc;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<KeyEventHandler> keyEventHandler;
-        std::unordered_map<int/*index*/, int/*count*/> pressedPads;
     };
 }

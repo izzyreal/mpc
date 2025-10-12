@@ -30,19 +30,29 @@ void PushPadCommand::execute()
         return;
     }
 
-    const auto padWasNotPressed = !ctx.controls->isPadPressed(padIndexWithBank);
-    ctx.controls->pressPad(padIndexWithBank);
-
     if (ctx.currentScreenName == "sequencer" &&
         (ctx.controls->isTapPressed() || ctx.controls->isNoteRepeatLocked()) &&
-        ctx.sequencer->isPlaying() && padWasNotPressed)
+        ctx.sequencer->isPlaying() && !ctx.program->isPadRegisteredAsPressed(padIndexWithBank))
     {
         return;
     }
 
-    if (ctx.isFullLevelEnabled) velo = 127;
-    if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed) return;
-    if (ctx.isNoteRepeatLocked) return;
+    if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed)
+    {
+        return;
+    }
+
+    if (ctx.isNoteRepeatLocked)
+    {
+        return;
+    }
+
+    ctx.program->registerPadPress(padIndexWithBank);
+
+    if (ctx.isFullLevelEnabled)
+    {
+        velo = 127;
+    }
 
     const auto note = ctx.track->getBus() > 0 ? ctx.program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 

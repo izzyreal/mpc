@@ -341,7 +341,7 @@ void Mpc::setPad(unsigned char padIndexWithBank)
 
 void Mpc::panic()
 {
-    controls->clearAllPadStates();
+    sampler->clearAllProgramPadPressRegistries();
     sequencer->getNoteEventStore().clearPlayAndRecordStore();
     midiOutput->panic();
 }

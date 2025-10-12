@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
@@ -158,3 +159,35 @@ Program::~Program()
 	for (auto& np : noteParameters) delete np;
 	for (auto& p : pads) delete p;
 }
+
+void Program::registerPadPress(int padIndex)
+{
+    if (padIndex >= 0 && padIndex < static_cast<int>(pressedPadRegistry.size()))
+        pressedPadRegistry[padIndex]++;
+}
+
+void Program::registerPadRelease(int padIndex)
+{
+    if (padIndex >= 0 && padIndex < static_cast<int>(pressedPadRegistry.size())) {
+        if (--pressedPadRegistry[padIndex] < 0)
+            pressedPadRegistry[padIndex] = 0;
+    }
+}
+
+bool Program::isPadRegisteredAsPressed(int padIndex) const
+{
+    return padIndex >= 0 && padIndex < static_cast<int>(pressedPadRegistry.size())
+           && pressedPadRegistry[padIndex] > 0;
+}
+
+bool Program::isAnyPadRegisteredAsPressed() const
+{
+    return std::any_of(pressedPadRegistry.begin(), pressedPadRegistry.end(),
+                       [](int c){ return c > 0; });
+}
+
+void Program::clearPressedPadRegistry()
+{
+    pressedPadRegistry.fill(0);
+}
+

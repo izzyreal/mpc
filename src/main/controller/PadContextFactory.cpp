@@ -16,6 +16,15 @@ using namespace mpc::controller;
 using namespace mpc::controls;
 using namespace mpc::lcdgui;
 
+int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::string &currentScreenName)
+{
+    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
+    const int result = isSamplerScreen ?
+        mpc.screens->get<screens::DrumScreen>("drum")->getDrum() :
+        mpc.getSequencer()->getActiveTrack()->getBus() - 1;
+    return result;
+}
+
 PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
@@ -34,26 +43,14 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
 
     auto activeTrack = mpc.getSequencer()->getActiveTrack();
 
-    std::shared_ptr<mpc::sampler::Program> program;
-    mpc::engine::Drum *activeDrum = nullptr;
-
-    const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum");
+    const int drumIndex = getDrumIndexForCurrentScreen(mpc, currentScreenName);
+    std::shared_ptr<sampler::Program> program = drumIndex >= 0 ? mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram()) : nullptr;
     
-    const auto drumIndex = isSamplerScreen ? drumScreen->getDrum() : activeTrack->getBus() - 1;
-
-    int programNote = -1;
-    
-    if (drumIndex != -1)
-    {
-        activeDrum = &mpc.getDrum(drumIndex);
-        program = mpc.getSampler()->getProgram(activeDrum->getProgram());
-        programNote = program->getPad(padIndexWithBank)->getNote();
-    }
-
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
     std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
     const auto hardwareSliderValue = mpc.getHardware2()->getSlider()->getValueAs<int>();
+    const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
 
     return {
         currentScreenName,
@@ -76,9 +73,9 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
         timingCorrectScreen->getSwing(),
         activeTrack->getBus(),
         program,
-        programNote,
+        /*programNote*/ program != nullptr ? program->getPad(padIndexWithBank)->getNote() : -1,
         mpc.getSampler()->getSoundIndex(),
-        drumScreen->getDrum(),
+        drumScreenSelectedDrum,
         isSamplerScreen,
         activeTrack,
         mpc.getSampler(),
@@ -107,17 +104,30 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
     const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
 
-    std::function<void(int)> controlsUnpressPad = [controls = mpc.getControls()] (int p) { controls->unpressPad(p); };
+    const int drumIndex = getDrumIndexForCurrentScreen(mpc, currentScreenName);
+
+    // Ideally we'd know the program that was associated with the pad-push that is associated with the pad-release that we're building
+    // the context for. But at the moment, VMPC2000XL doesn't have a notion of which pad-push belongs to which pad-release.
+    // The key here is which screen the user was in when the pad-push occurred. So for now we'll assume this stays the same for the
+    // duration of the event.
+    std::shared_ptr<sampler::Program> program = drumIndex >= 0 ? mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram()) : nullptr;
+
+    std::function<void(int)> registerProgramPadRelease = [program = program] (int padIndexWithBank) {
+        if (program)
+        {
+            program->registerPadRelease(padIndexWithBank);
+        }
+    };
 
     const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(padIndexWithBank);
 
-    const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
+    const int drumScreenSelectedDrum = mpc.screens->get<screens::DrumScreen>("drum")->getDrum();
 
     auto eventHandler = mpc.getEventHandler();
 
     const auto recordNoteOnEvent = mpc.getSequencer()->getNoteEventStore().retrieveRecordNoteEvent(padIndexWithBank);
 
-    std::function<bool()> arePadsPressed = [controls = mpc.getControls()] { return controls->arePadsPressed(); };
+    std::function<bool()> isAnyProgramPadRegisteredAsPressed = [sampler = mpc.getSampler()] { return sampler->isAnyProgramPadRegisteredAsPressed(); };
 
     const auto stepEditOptionsScreen = mpc.screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>("step-edit-options");
     const auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct");
@@ -133,7 +143,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,
-        controlsUnpressPad,
+        registerProgramPadRelease,
         playNoteEvent,
         drumScreenSelectedDrum,
         eventHandler,
@@ -142,7 +152,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         mpc.getControls()->isErasePressed(),
         mpc.getSequencer()->getActiveTrack(),
         mpc.getControls()->isStepRecording(),
-        arePadsPressed,
+        isAnyProgramPadRegisteredAsPressed,
         mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
         mpc.getControls()->isRecMainWithoutPlaying(),
         mpc.getSequencer()->getTickPosition(),

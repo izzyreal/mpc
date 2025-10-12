@@ -422,7 +422,7 @@ void Sampler::repairProgramReferences()
             }
 
             if (!programs[pgm]) {
-                for (int programIndex = 0; programIndex < 24; programIndex++)
+                for (int programIndex = 0; programIndex < MAX_PROGRAM_COUNT; programIndex++)
                 {
                     if (programs[programIndex])
                     {
@@ -1204,3 +1204,31 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSortedSounds()
 
     return getSoundsSortedBySize();
 }
+
+void Sampler::clearAllProgramPadPressRegistries()
+{
+    for (auto &program : programs)
+    {
+        if (!program) continue;
+        program->clearPressedPadRegistry();
+    }
+}
+
+bool Sampler::isAnyProgramPadRegisteredAsPressed() const
+{
+    for (auto &p : programs)
+    {
+        if (!p)
+        {
+            continue;
+        }
+
+        if (p->isAnyPadRegisteredAsPressed())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
