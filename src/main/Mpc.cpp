@@ -97,8 +97,6 @@ void Mpc::init()
 
     mpc::Logger::l.setPath(paths->logFilePath().string());
 
-    hardware2 = std::make_shared<hardware2::Hardware2>(*this);
-
     padAndButtonKeyboard = std::make_shared<mpc::inputlogic::PadAndButtonKeyboard>(*this);
 
 	diskController = std::make_unique<mpc::disk::DiskController>(*this);
@@ -107,6 +105,10 @@ void Mpc::init()
 
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
+
+	controls = std::make_shared<controls::Controls>(*this);
+
+    hardware2 = std::make_shared<hardware2::Hardware2>(inputMapper, controls->getKbMapping().lock());
 
 	sampler = std::make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
@@ -140,8 +142,6 @@ void Mpc::init()
 
 	eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
 	MLOG("Eeventhandler created");
-
-	controls = std::make_shared<controls::Controls>(*this);
 
 	mpc::nvram::NvRam::loadUserScreenValues(*this);
 

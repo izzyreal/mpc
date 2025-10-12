@@ -6,8 +6,10 @@
 #include <unordered_map>
 
 #include "controls/Controls.hpp"
+#include "controls/KbMapping.hpp"
 #include "hardware2/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
+#include "inputlogic/ClientInputMapper.h"
 #include "inputlogic/HostToClientTranslator.h"
 #include "inputlogic/HostInputEvent.h"
 
@@ -17,7 +19,8 @@ namespace mpc::hardware2 {
 
 class Hardware2 final {
 private:
-    mpc::Mpc &mpc;
+    mpc::inputlogic::ClientInputMapper &inputMapper;
+    std::shared_ptr<mpc::controls::KbMapping> kbMapping;
     std::vector<std::shared_ptr<Led>> leds;
 
     std::vector<std::shared_ptr<Pad>> pads;
@@ -28,15 +31,18 @@ private:
     std::shared_ptr<Pot> volPot;
 
 public:
-    explicit Hardware2(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
+    explicit Hardware2(mpc::inputlogic::ClientInputMapper& inputMapperToUse,
+                       std::shared_ptr<mpc::controls::KbMapping> kbMappingToUse) :
+        inputMapper(inputMapperToUse),
+        kbMapping(kbMappingToUse)
     {
         for (const auto &label : getButtonLabels())
         {
-            buttons[label] = std::make_shared<Button>(mpc.inputMapper, label);
+            buttons[label] = std::make_shared<Button>(inputMapper, label);
         }
 
         for (int i = 0; i < 16; ++i)
-            pads.push_back(std::make_shared<Pad>(i, mpc.inputMapper));
+            pads.push_back(std::make_shared<Pad>(i, inputMapper));
 
         const std::vector<std::string> ledLabels {
             "full-level", "sixteen-levels", "next-seq", "track-mute",
@@ -46,19 +52,19 @@ public:
 
         for (const auto& l : ledLabels)
         {
-            leds.push_back(std::make_shared<Led>(mpc.inputMapper, l));
+            leds.push_back(std::make_shared<Led>(inputMapper, l));
             if (l == "bank-a") leds.back()->setEnabled(true);
         }
 
-        dataWheel = std::make_shared<DataWheel>(mpc.inputMapper);
-        recPot = std::make_shared<Pot>(mpc.inputMapper);
-        volPot = std::make_shared<Pot>(mpc.inputMapper);
-        slider = std::make_shared<Slider>(mpc.inputMapper);
+        dataWheel = std::make_shared<DataWheel>(inputMapper);
+        recPot = std::make_shared<Pot>(inputMapper);
+        volPot = std::make_shared<Pot>(inputMapper);
+        slider = std::make_shared<Slider>(inputMapper);
     }
 
     void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
     {
-        const auto clientEvent = mpc::inputlogic::HostToClientTranslator::translate(hostEvent, mpc.getControls()->getKbMapping().lock());
+        const auto clientEvent = mpc::inputlogic::HostToClientTranslator::translate(hostEvent, kbMapping);
         dispatchClientInput(clientEvent);
     }
 
