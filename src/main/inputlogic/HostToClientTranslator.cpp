@@ -16,8 +16,9 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 {
     ClientInput clientEvent;
 
-    switch (hostEvent.source){
-    case HostInputEvent::MIDI: {
+    switch (hostEvent.getSource())
+    {
+    case HostInputEvent::Source::MIDI: {
         const auto& midi = std::get<MidiEvent>(hostEvent.payload);
         if (midi.messageType == MidiEvent::NOTE)
         {
@@ -42,7 +43,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         break;
     }
 
-    case HostInputEvent::MOUSE:
+    case HostInputEvent::Source::MOUSE:
     {
         const auto& mouse = std::get<MouseEvent>(hostEvent.payload);
 
@@ -111,7 +112,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         break;
     }
 
-    case HostInputEvent::KEYBOARD:
+    case HostInputEvent::Source::KEYBOARD:
     {
         const auto& key = std::get<KeyEvent>(hostEvent.payload);
         const auto vmpcKeyCode = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);

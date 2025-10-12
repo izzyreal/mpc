@@ -51,8 +51,22 @@ struct MidiEvent {
 
 /* Input events coming from the host, i.e. the machine the virtual MPC2000XL is virtualized on */
 struct HostInputEvent {
-    enum Source { KEYBOARD, MOUSE, MIDI };
-    Source source;
+    enum class Source { KEYBOARD, MOUSE, MIDI };
+
+    explicit HostInputEvent(KeyEvent k) : payload(std::move(k)) {}
+    explicit HostInputEvent(MouseEvent m) : payload(std::move(m)) {}
+    explicit HostInputEvent(MidiEvent m) : payload(std::move(m)) {}
+
+    Source getSource() const
+    {
+        if (std::holds_alternative<KeyEvent>(payload)) return Source::KEYBOARD;
+        if (std::holds_alternative<MouseEvent>(payload)) return Source::MOUSE;
+        if (std::holds_alternative<MidiEvent>(payload)) return Source::MIDI;
+
+        // Defensive: someone added a new variant type but forgot to update getSource()
+        throw std::logic_error("HostInputEvent::getSource() encountered unknown payload type");
+    }
+
     std::variant<KeyEvent, MouseEvent, MidiEvent> payload;
 };
 

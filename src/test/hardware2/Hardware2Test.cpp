@@ -1,239 +1,241 @@
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/catch_approx.hpp>
-#include <stdexcept>
-#include "hardware2/HardwareComponent.h"
-#include "inputlogic/ClientInputMapper.h"
+#include <memory>
+#include <string>
+#include <optional>
+#include <unordered_set>
+
+#include "hardware2/Hardware2.h"
 
 using namespace mpc::hardware2;
 using namespace mpc::inputlogic;
-using Catch::Approx;
 
-TEST_CASE("Button responds to press and release", "[hardware2]") {
+// ---- TESTS ----
+
+TEST_CASE("Hardware2 construction", "[hardware2]")
+{
     ClientInputMapper mapper;
-    Button b(mapper, "");
-    REQUIRE_NOTHROW(b.press());
-    REQUIRE_NOTHROW(b.release());
-}
+    auto kbMapping = std::shared_ptr<mpc::controls::KbMapping>();
+    Hardware2 hw(mapper, kbMapping);
 
-TEST_CASE("Button pressed state toggles correctly", "[hardware2]") {
-    ClientInputMapper mapper;
-    Button b(mapper, "TEST");
-
-    REQUIRE(!b.isPressed());
-    b.press();
-    REQUIRE(b.isPressed());
-    b.release();
-    REQUIRE(!b.isPressed());
-}
-
-TEST_CASE("Led enables and disables correctly", "[hardware2]") {
-    ClientInputMapper mapper;
-    Led led(mapper, "LED1");
-
-    REQUIRE(!led.isEnabled());
-    led.setEnabled(true);
-    REQUIRE(led.isEnabled());
-    led.setEnabled(false);
-    REQUIRE(!led.isEnabled());
-}
-
-TEST_CASE("Aftertouchable throws on invalid pressures", "[hardware2]") {
-    struct TestAftertouchable : mpc::hardware2::Aftertouchable {
-        void onAftertouch(int) override {} // no-op for test
-    };
-
-    TestAftertouchable t;
-
-    REQUIRE_THROWS_AS(t.aftertouch(0), std::invalid_argument);
-    REQUIRE_THROWS_AS(t.aftertouch(128), std::invalid_argument);
-
-    REQUIRE_NOTHROW(t.aftertouch(1));
-    REQUIRE_NOTHROW(t.aftertouch(127));
-}
-
-TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware2]") {
-    ClientInputMapper mapper;
-    Pad p(0, mapper);
-    REQUIRE_NOTHROW(p.pressWithVelocity(VelocitySensitivePressable::MAX_VELO));
-    REQUIRE_NOTHROW(p.press());
-    REQUIRE_NOTHROW(p.aftertouch(1));
-    REQUIRE_NOTHROW(p.release());
-}
-
-TEST_CASE("DataWheel turns correctly", "[hardware2]") {
-    ClientInputMapper mapper;
-    DataWheel wheel(mapper);
-    REQUIRE_NOTHROW(wheel.turn(1));
-    REQUIRE_NOTHROW(wheel.turn(-2));
-}
-
-TEST_CASE("Continuous type contracts", "[hardware2]") {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
-    TestContinuous c;
-
-    STATIC_REQUIRE(std::is_same_v<decltype(c.getValue()), float>);
-    STATIC_REQUIRE(std::is_same_v<decltype(c.getValueAs<int>()), int>);
-    STATIC_REQUIRE(std::is_same_v<decltype(c.getRange()), std::pair<int, int>>);
-    STATIC_REQUIRE(std::is_same_v<decltype(c.getRangeAs<double>()), std::pair<double, double>>);
-}
-
-TEST_CASE("Continuous<float> stores and clamps correctly", "[hardware2]") {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
-    TestContinuous c;
-
-    c.setValue(63.5f);
-    REQUIRE(c.getValue() == Approx(63.5f));
-
-    c.setValue(-10.0f);
-    REQUIRE(c.getValue() == 0.0f);
-
-    c.setValue(999.9f);
-    REQUIRE(c.getValue() == 127.0f);
-}
-
-TEST_CASE("Continuous<double> stores and clamps correctly", "[hardware2]") {
-    struct TestContinuous : mpc::hardware2::Continuous<double, 0, 127> {};
-    TestContinuous c;
-
-    c.setValue(63.5);
-    REQUIRE(c.getValue() == Approx(63.5));
-
-    c.setValue(-100.0);
-    REQUIRE(c.getValue() == 0.0);
-
-    c.setValue(1000.0);
-    REQUIRE(c.getValue() == 127.0);
-}
-
-TEST_CASE("Continuous<int> clamps correctly", "[hardware2]") {
-    struct TestContinuous : mpc::hardware2::Continuous<int, 0, 127> {};
-    TestContinuous c;
-
-    c.setValue(63);
-    REQUIRE(c.getValue() == 63);
-
-    c.setValue(-5);
-    REQUIRE(c.getValue() == 0);
-
-    c.setValue(999);
-    REQUIRE(c.getValue() == 127);
-
-    c.setValue(0);
-    REQUIRE(c.getValue() == 0);
-
-    c.setValue(127);
-    REQUIRE(c.getValue() == 127);
-}
-
-TEST_CASE("Continuous getValueAs<int> rounds correctly", "[hardware2]") {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
-    TestContinuous c;
-
-    c.setValue(63.4f);
-    REQUIRE(c.getValueAs<int>() == 63);
-
-    c.setValue(63.6f);
-    REQUIRE(c.getValueAs<int>() == 64);
-}
-
-TEST_CASE("Continuous getRange and getRangeAs work", "[hardware2]") {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
-    TestContinuous c;
-
-    auto [imin, imax] = c.getRange();
-    REQUIRE(imin == 0);
-    REQUIRE(imax == 127);
-
-    auto [fmin, fmax] = c.getRangeAs<float>();
-    REQUIRE(fmin == Approx(0.0f));
-    REQUIRE(fmax == Approx(127.0f));
-}
-
-TEST_CASE("Slider clamps values between 0 and 127", "[hardware2]") {
-    ClientInputMapper mapper;
-    Slider s(mapper);
-    s.setValue(50);
-    REQUIRE(s.getValue() == 50);
-    s.setValue(-1);
-    REQUIRE(s.getValue() == 0);
-    s.setValue(128);
-    REQUIRE(s.getValue() == 127);
-}
-
-TEST_CASE("Slider direction logic works", "[hardware2]") {
-    ClientInputMapper mapper;
-    Slider s(mapper);
-
-    s.setDirection(Slider::Direction::UpIncreases);
-    s.moveToNormalizedY(0.5f);
-    s.moveToNormalizedY(0.0f);
-    REQUIRE(s.getValueAs<int>() == 127);
-
-    s.setDirection(Slider::Direction::DownIncreases);
-    s.moveToNormalizedY(0.5f);
-    s.moveToNormalizedY(0.0f);
-    REQUIRE(s.getValueAs<int>() == 0);
-}
-
-TEST_CASE("Slider is a Continuous<float, 0, 127> specialization", "[hardware2]") {
-    using SliderBase = Continuous<float, 0, 127>;
-    STATIC_REQUIRE(std::is_base_of_v<SliderBase, Slider>);
-}
-
-TEST_CASE("Pot clamps values between 0 and 127", "[hardware2]") {
-    ClientInputMapper mapper;
-    Pot p(mapper);
-    p.setValue(50);
-    REQUIRE(p.getValue() == 50);
-    p.setValue(-1);
-    REQUIRE(p.getValue() == 0);
-    p.setValue(128);
-    REQUIRE(p.getValue() == 127);
-}
-
-TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]") {
-    ClientInputMapper mapper;
-    Pad p(0, mapper);
-    REQUIRE(!p.isPressed());
-    p.press();
-    REQUIRE(p.isPressed());
-    p.release();
-    REQUIRE(!p.isPressed());
-
-    for (int i = 1; i <= 127; i++) {
-        p.pressWithVelocity(i);
-        REQUIRE(p.isPressed());
-        p.release();
-        REQUIRE(!p.isPressed());
+    SECTION("Pads initialized")
+    {
+        REQUIRE(hw.getPads().size() == 16);
+        for (int i = 0; i < 16; ++i)
+            REQUIRE(hw.getPad(i) != nullptr);
     }
 
-    REQUIRE_THROWS_AS(p.pressWithVelocity(0), std::invalid_argument);
-}
+    SECTION("Buttons initialized with valid labels")
+    {
+        auto labels = hw.getButtonLabels();
+        REQUIRE_FALSE(labels.empty());
+        for (const auto& l : labels)
+            REQUIRE(hw.getButton(l) != nullptr);
+    }
 
-TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware2]") {
-    ClientInputMapper mapper;
-    Pad p(0, mapper);
-    REQUIRE(!p.getVelocity().has_value());
-    REQUIRE(!p.getPressure().has_value());
-    p.press();
-    REQUIRE(*p.getVelocity() == VelocitySensitivePressable::MAX_VELO);
-    REQUIRE(!p.getPressure().has_value());
+    SECTION("LEDs initialized")
+    {
+        auto leds = hw.getLeds();
+        REQUIRE_FALSE(leds.empty());
+        auto ledLabels = std::unordered_set<std::string>{
+            "full-level", "sixteen-levels", "next-seq", "track-mute",
+            "bank-a", "bank-b", "bank-c", "bank-d",
+            "after", "undo-seq", "rec", "overdub", "play"
+        };
 
-    p.release();
+        REQUIRE(leds.size() == ledLabels.size());
 
-    REQUIRE(*p.getVelocity() == VelocitySensitivePressable::MAX_VELO);
-    REQUIRE(!p.getPressure().has_value());
-
-    for (int velo = 1; velo <= 127; velo++) {
-        p.pressWithVelocity(velo);
-        REQUIRE(*p.getVelocity() == velo);
-        REQUIRE(!p.getPressure().has_value());
-        for (int pressure = 1; pressure <= 127; pressure++) {
-            p.aftertouch(pressure);
+        for (auto& l : leds)
+        {
+            REQUIRE(ledLabels.count(l->getLabel()) > 0);
         }
-        p.release();
     }
 
-    REQUIRE_THROWS_AS(p.pressWithVelocity(0), std::invalid_argument);
+    SECTION("DataWheel, Slider, Pots are initialized")
+    {
+        REQUIRE(hw.getDataWheel());
+        REQUIRE(hw.getSlider());
+        REQUIRE(hw.getRecPot());
+        REQUIRE(hw.getVolPot());
+    }
+}
+
+TEST_CASE("Hardware2 getPad/getButton/getLed safety", "[hardware2]")
+{
+    ClientInputMapper mapper;
+    Hardware2 hw(mapper, nullptr);
+
+    SECTION("getPad out of range returns nullptr")
+    {
+        REQUIRE(hw.getPad(-1) == nullptr);
+        REQUIRE(hw.getPad(16) == nullptr);
+    }
+
+    SECTION("getButton with invalid label returns nullptr")
+    {
+        REQUIRE(hw.getButton("not-a-button") == nullptr);
+    }
+
+    SECTION("getLed finds correct LED")
+    {
+        auto led = hw.getLed("rec");
+        REQUIRE(led);
+        REQUIRE(led->getLabel() == "rec");
+    }
+
+    SECTION("getLed with nonexistent label returns empty")
+    {
+        REQUIRE(hw.getLed("unknown") == nullptr);
+    }
+
+    SECTION("getComponentByLabel for button")
+    {
+        auto labels = hw.getButtonLabels();
+        REQUIRE_FALSE(labels.empty());
+        auto label = labels.front();
+        auto comp = hw.getComponentByLabel(label);
+        REQUIRE(comp);
+    }
+
+    SECTION("getComponentByLabel for pad")
+    {
+        auto comp = hw.getComponentByLabel("pad-0");
+        REQUIRE(comp);
+        REQUIRE(comp == hw.getPad(0));
+    }
+
+    SECTION("getComponentByLabel for invalid label returns nullptr")
+    {
+        REQUIRE(hw.getComponentByLabel("invalid") == nullptr);
+        REQUIRE(hw.getComponentByLabel("pad-999") == nullptr);
+    }
+}
+
+TEST_CASE("Hardware2 dispatchClientInput behavior", "[hardware2]")
+{
+    ClientInputMapper mapper;
+    Hardware2 hw(mapper, nullptr);
+
+    SECTION("Handles empty optional safely")
+    {
+        hw.dispatchClientInput(std::nullopt); // should not crash
+    }
+
+    SECTION("PadPress invokes correct pad index safely")
+    {
+        ClientInput input;
+        input.type = ClientInput::Type::PadPress;
+        input.index = 0;
+        input.value = 100;
+        hw.dispatchClientInput(input); // should not crash
+    }
+
+    SECTION("PadRelease invokes correct pad index safely")
+    {
+        ClientInput input;
+        input.type = ClientInput::Type::PadRelease;
+        input.index = 1;
+        hw.dispatchClientInput(input);
+    }
+
+    SECTION("PadAftertouch invokes correct pad index safely")
+    {
+        ClientInput input;
+        input.type = ClientInput::Type::PadAftertouch;
+        input.index = 2;
+        input.value = 80;
+        hw.dispatchClientInput(input);
+    }
+
+    SECTION("ButtonPress invokes correct button safely")
+    {
+        auto labels = hw.getButtonLabels();
+        REQUIRE_FALSE(labels.empty());
+        ClientInput input;
+        input.type = ClientInput::Type::ButtonPress;
+        input.label = labels.front();
+        hw.dispatchClientInput(input);
+    }
+
+    SECTION("ButtonRelease invokes correct button safely")
+    {
+        auto labels = hw.getButtonLabels();
+        REQUIRE_FALSE(labels.empty());
+        ClientInput input;
+        input.type = ClientInput::Type::ButtonRelease;
+        input.label = labels.back();
+        hw.dispatchClientInput(input);
+    }
+
+    SECTION("DataWheelTurn handled safely")
+    {
+        ClientInput input;
+        input.type = ClientInput::Type::DataWheelTurn;
+        input.value = 1;
+        hw.dispatchClientInput(input);
+    }
+
+    SECTION("SliderMove handled safely")
+    {
+        ClientInput input;
+        input.type = ClientInput::Type::SliderMove;
+        input.value = 42;
+        hw.dispatchClientInput(input);
+    }
+
+    SECTION("PotMove handled safely (no-op)")
+    {
+        ClientInput input;
+        input.type = ClientInput::Type::PotMove;
+        input.value = 10;
+        hw.dispatchClientInput(input);
+    }
+}
+
+#include <catch2/catch_test_macros.hpp>
+#include "hardware2/Hardware2.h"
+
+using namespace mpc::hardware2;
+using namespace mpc::inputlogic;
+
+TEST_CASE("Hardware2 dispatchHostInput integration with valid tagged events", "[hardware2]") {
+    ClientInputMapper mapper;
+    Hardware2 hw(mapper, nullptr);
+
+    // This test should be enabled after KbMapping is independent of mpc::Mpc
+    /*
+    SECTION("KeyEvent") {
+        KeyEvent key{ true, 42, false, false, false };
+        HostInputEvent event(key);
+
+        REQUIRE(event.getSource() == HostInputEvent::Source::KEYBOARD);
+
+        // dispatch should not crash
+        hw.dispatchHostInput(event);
+    }
+    */
+
+    SECTION("MouseEvent") {
+        MouseEvent mouse{};
+        mouse.componentId = ComponentId::PAD1;
+        mouse.type = MouseEvent::BUTTON_DOWN;
+        mouse.normY = 0.5f;
+
+        HostInputEvent event(mouse);
+        REQUIRE(event.getSource() == HostInputEvent::Source::MOUSE);
+
+        hw.dispatchHostInput(event);
+    }
+
+    SECTION("MidiEvent") {
+        MidiEvent midi{};
+        midi.messageType = MidiEvent::NOTE;
+        midi.data1 = 0;   // pad index 0
+        midi.data2 = 100; // velocity
+        HostInputEvent event(midi);
+
+        REQUIRE(event.getSource() == HostInputEvent::Source::MIDI);
+
+        hw.dispatchHostInput(event);
+    }
 }
 

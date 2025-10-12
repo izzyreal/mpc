@@ -1,4 +1,3 @@
-// inputlogic/ClientInputMapper.h
 #pragma once
 
 #include <functional>
