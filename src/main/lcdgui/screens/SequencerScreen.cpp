@@ -858,7 +858,7 @@ void SequencerScreen::displayPunchWhileRecording()
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 	auto controls = mpc.getControls();
 
-	if (punchScreen->on && (controls->isRecPressed() || controls->isOverDubPressed()))
+	if (punchScreen->on && (controls->isRecPressed() || controls->isOverdubPressed()))
 	{
 		findBackground()->setName("sequencer");
 

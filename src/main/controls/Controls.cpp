@@ -53,7 +53,7 @@ bool Controls::isRecPressed(bool includeLocked)
 	return recPressed || (includeLocked && recLocked);
 }
 
-bool Controls::isOverDubPressed(bool includeLocked)
+bool Controls::isOverdubPressed(bool includeLocked)
 {
 	return overDubPressed || (includeLocked && overDubLocked);
 }
@@ -144,12 +144,12 @@ void Controls::setRecLocked(bool b)
 	recLocked = b;
 }
 
-void Controls::setOverDubPressed(bool b)
+void Controls::setOverdubPressed(bool b)
 {
 	overDubPressed = b;
 }
 
-void Controls::setOverDubLocked(bool b)
+void Controls::setOverdubLocked(bool b)
 {
 	overDubLocked = b;
 }

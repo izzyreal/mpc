@@ -20,7 +20,7 @@ namespace mpc::command {
             if (!currentScreenAllowsPlayAndRecord)
                 mpc.getLayeredScreen()->openScreen("sequencer");
             mpc.getSequencer()->recFromStart();
-        } else if (controls->isOverDubPressed()) {
+        } else if (controls->isOverdubPressed()) {
             if (!currentScreenAllowsPlayAndRecord)
                 mpc.getLayeredScreen()->openScreen("sequencer");
             mpc.getSequencer()->overdubFromStart();
@@ -36,7 +36,7 @@ namespace mpc::command {
             }
         }
 
-        mpc.getHardware2()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverDubbing());
+        mpc.getHardware2()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
         mpc.getHardware2()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
         mpc.getHardware2()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
     }

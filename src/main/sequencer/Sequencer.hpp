@@ -141,7 +141,7 @@ namespace mpc::sequencer
 		void rec();
 		void recFromStart();
 		void overdub();
-		void switchRecordToOverDub();
+		void switchRecordToOverdub();
 		void overdubFromStart();
 		void stop();
 		void stop(const StopMode);
@@ -204,7 +204,7 @@ namespace mpc::sequencer
 		void flushTrackNoteCache();
 		void storeActiveSequenceInUndoPlaceHolder();
 		void resetUndo();
-		bool isOverDubbing();
+		bool isOverdubbing();
 		const double getPlayStartPositionQuarterNotes();
 
 		void notify(std::string s);

@@ -1,8 +1,8 @@
 #include "controller/ClientInputController.h"
 
+#include "command/ReleasePadCommand.h"
 #include "inputlogic/ClientInput.h"
 #include "controller/PadContextFactory.h"
-#include "controls/GlobalReleaseControls.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "hardware2/Hardware2.h"
@@ -54,7 +54,7 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
     const auto num = *a.index;
     auto padIndexWithBank = num + (mpc.getBank() * 16);
     auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, mpc.getLayeredScreen()->getCurrentScreenName());
-    mpc::controls::GlobalReleaseControls::simplePad(ctx);
+    command::ReleasePadCommand(ctx).execute();
 }
 
 void ClientInputController::handlePadAftertouch(const ClientInput& a)
@@ -256,41 +256,40 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 
     const auto label = a.label.value();
     std::printf("[logic] button %s released\n", a.label->c_str());
-
 	if (label == "shift" || label == "shift_#1" || label == "shift_#2" || label == "shift_#3") {
-		mpc::controls::GlobalReleaseControls::shift(mpc);
+		command::ReleaseShiftCommand(mpc).execute();
 	}
 	else if (label == "erase") {
-		mpc::controls::GlobalReleaseControls::erase(mpc);
+		command::ReleaseEraseCommand(mpc).execute();
 	}
 	else if (label == "f1") {
-		mpc::controls::GlobalReleaseControls::function(mpc, 0);
+		command::ReleaseFunctionCommand(mpc, 0).execute();
 	}
 	else if (label == "f3") {
-		mpc::controls::GlobalReleaseControls::function(mpc, 2);
+		command::ReleaseFunctionCommand(mpc, 2).execute();
 	}
 	else if (label == "f4") {
-		mpc::controls::GlobalReleaseControls::function(mpc, 3);
+		command::ReleaseFunctionCommand(mpc, 3).execute();
 	}
 	else if (label == "f5") {
-		mpc::controls::GlobalReleaseControls::function(mpc, 4);
+		command::ReleaseFunctionCommand(mpc, 4).execute();
 	}
 	else if (label == "f6") {
-		mpc::controls::GlobalReleaseControls::function(mpc, 5);
+		command::ReleaseFunctionCommand(mpc, 5).execute();
 	}
 	else if (label == "rec") {
-		mpc::controls::GlobalReleaseControls::rec(mpc);
+		command::ReleaseRecCommand(mpc).execute();
 	}
 	else if (label == "overdub") {
-		mpc::controls::GlobalReleaseControls::overDub(mpc);
+		command::ReleaseOverdubCommand(mpc).execute();
 	}
 	else if (label == "play") {
-		mpc::controls::GlobalReleaseControls::play(mpc);
+		command::ReleasePlayCommand(mpc).execute();
 	}
 	else if (label == "tap") {
-		mpc::controls::GlobalReleaseControls::tap(mpc);
+		command::ReleaseTapCommand(mpc).execute();
 	}
 	else if (label == "go-to") {
-		mpc::controls::GlobalReleaseControls::goTo(mpc);
+		command::ReleaseGoToCommand(mpc).execute();
 	}
 }

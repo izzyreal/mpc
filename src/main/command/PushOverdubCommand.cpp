@@ -13,10 +13,10 @@ namespace mpc::command {
         if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName())) return;
 
         auto controls = mpc.getControls();
-        if (controls->isOverDubPressed(false)) return;
+        if (controls->isOverdubPressed(false)) return;
 
-        controls->setOverDubPressed(true);
-        controls->setOverDubLocked(false);
+        controls->setOverdubPressed(true);
+        controls->setOverdubLocked(false);
 
         if (mpc.getSequencer()->isRecordingOrOverdubbing()) {
             mpc.getSequencer()->setRecording(false);

@@ -305,7 +305,7 @@ bool FrameSeq::processSeqLoopEnabled()
         {
             if (sequencer->isRecording())
             {
-                sequencer->switchRecordToOverDub();
+                sequencer->switchRecordToOverdub();
                 mpc.getHardware2()->getLed("rec")->setEnabled(false);
                 mpc.getHardware2()->getLed("overdub")->setEnabled(true);
             }

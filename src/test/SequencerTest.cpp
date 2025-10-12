@@ -3,10 +3,10 @@
 #include "TestMpc.hpp"
 #include "sequencer/Clock.hpp"
 
+#include "command/ReleasePadCommand.h"
 #include "controller/PadContextFactory.h"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <controls/GlobalReleaseControls.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
@@ -140,7 +140,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                     this_thread::sleep_for(chrono::milliseconds(2));
 
                     auto ctx = mpc::controller::PadContextFactory::buildPadReleaseContext(mpc, 0, mpc.getLayeredScreen()->getCurrentScreenName());
-                    mpc::controls::GlobalReleaseControls::simplePad(ctx);
+                    mpc::command::ReleasePadCommand(ctx).execute();
                 }
             }
         }

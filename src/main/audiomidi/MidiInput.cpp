@@ -1,6 +1,8 @@
 #include "MidiInput.hpp"
 #include "command/PushPadCommand.h"
 #include "command/PushPadScreenUpdateCommand.h"
+#include "command/ReleasePadCommand.h"
+#include "command/ReleaseTapCommand.h"
 #include "controls/PushPadScreenUpdateContext.h"
 #include "controller/PadContextFactory.h"
 
@@ -10,7 +12,6 @@
 #include <audiomidi/MidiOutput.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
 
-#include <controls/GlobalReleaseControls.hpp>
 #include "hardware2/Hardware2.h"
 #include "hardware2/HardwareComponent.h"
 
@@ -203,7 +204,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     }
                     else if (func == 6)
                     {
-                        if (sequencer->isOverDubbing())
+                        if (sequencer->isOverdubbing())
                         {
                             sequencer->setOverdubbing(false);
                         }
@@ -236,7 +237,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                 {
                     if (func == 7)
                     {
-                        mpc::controls::GlobalReleaseControls::tap(mpc);
+                        command::ReleaseTapCommand(mpc).execute();
                     }
                     else if (func >= 12 && func < 28)
                     {
@@ -401,7 +402,7 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     {
         const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
         auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, currentScreenName);
-        controls::GlobalReleaseControls::simplePad(ctx);
+        command::ReleasePadCommand(ctx).execute();
         return;
     }
     else if (auto storedRecordMidiNoteOn = retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))

@@ -534,7 +534,7 @@ void Track::playNext()
     {
         note->setTrack(trackIndex);
 
-        if (sequencer->isOverDubbing() &&
+        if (sequencer->isOverdubbing() &&
             mpc.getControls()->isErasePressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) &&
             trackIndex < 64 &&

@@ -34,8 +34,8 @@ namespace mpc::controls
         void setErasePressed(bool);
         void setRecPressed(bool);
         void setRecLocked(bool);
-        void setOverDubPressed(bool);
-        void setOverDubLocked(bool);
+        void setOverdubPressed(bool);
+        void setOverdubLocked(bool);
         void setPlayPressed(bool);
         void setTapPressed(bool);
         void setGoToPressed(bool);
@@ -52,7 +52,7 @@ namespace mpc::controls
 
         bool isErasePressed();
         bool isRecPressed(bool includeLocked = true);
-        bool isOverDubPressed(bool includeLocked = true);
+        bool isOverdubPressed(bool includeLocked = true);
         bool isPlayPressed();
         bool isTapPressed();
         bool isNoteRepeatLocked();

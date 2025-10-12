@@ -587,7 +587,7 @@ void Sequencer::overdub()
 	play(false);
 }
 
-void Sequencer::switchRecordToOverDub()
+void Sequencer::switchRecordToOverdub()
 {
 	if (!recording)
     {
@@ -1893,7 +1893,7 @@ void Sequencer::resetUndo()
     undoSeqAvailable = false;
 }
 
-bool Sequencer::isOverDubbing()
+bool Sequencer::isOverdubbing()
 {
     return overdubbing;
 }
