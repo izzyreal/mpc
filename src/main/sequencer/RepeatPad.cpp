@@ -54,6 +54,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
         auto noteEvent = std::make_shared<NoteOnEvent>(note);
         noteEvent->setTick(static_cast<int>(tickPosition));
+        const bool isSliderNote = program && program->getSlider()->getNote() == note;
 
         if (program)
         {
@@ -73,6 +74,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 programSlider->getFilterLowRange(),
                 programSlider->getFilterHighRange()
             };
+
             mpc::Util::setSliderNoteVariationParameters(sliderNoteVariationContext, noteEvent);
         }
 

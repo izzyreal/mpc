@@ -39,7 +39,6 @@ namespace mpc
             const int attackHighRange;
             const int filterLowRange;
             const int filterHighRange;
-            mpc::sampler::PgmSlider *slider; 
         };
         static std::string getFileName(const std::string& s);
 		static std::vector<std::string> splitName(const std::string& s);

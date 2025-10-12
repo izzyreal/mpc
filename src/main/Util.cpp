@@ -236,12 +236,7 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx, const std::shared_
 
 void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ctx, const std::shared_ptr<NoteOnEvent> noteOnEvent)
 {
-    if (noteOnEvent->getNote() != ctx.slider->getNote())
-    {
-        return;
-    }
-
-    const auto sliderParam = NoteOnEvent::VARIATION_TYPE(ctx.slider->getParameter());
+    const auto sliderParam = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
     noteOnEvent->setVariationType(sliderParam);
     int sliderValue = ctx.sliderValue;
 
@@ -249,8 +244,8 @@ void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ct
     {
         case 0:
         {
-            auto rangeLow = ctx.slider->getTuneLowRange();
-            auto rangeHigh = ctx.slider->getTuneHighRange();
+            auto rangeLow = ctx.tuneLowRange;
+            auto rangeHigh = ctx.tuneHighRange;
 
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
@@ -261,8 +256,8 @@ void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ct
         }
         case 1:
         {
-            auto rangeLow = ctx.slider->getDecayLowRange();
-            auto rangeHigh = ctx.slider->getDecayHighRange();
+            auto rangeLow = ctx.decayLowRange;
+            auto rangeHigh = ctx.decayHighRange;
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto decayValue = (int)(sliderValue * sliderRangeRatio);
@@ -271,8 +266,8 @@ void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ct
         }
         case 2:
         {
-            auto rangeLow = ctx.slider->getAttackLowRange();
-            auto rangeHigh = ctx.slider->getAttackHighRange();
+            auto rangeLow = ctx.attackLowRange;
+            auto rangeHigh = ctx.attackHighRange;
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto attackValue = (int)(sliderValue * sliderRangeRatio);
@@ -281,8 +276,8 @@ void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ct
         }
         case 3:
         {
-            auto rangeLow = ctx.slider->getFilterLowRange();
-            auto rangeHigh = ctx.slider->getFilterHighRange();
+            auto rangeLow = ctx.filterLowRange;
+            auto rangeHigh = ctx.filterHighRange;
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto filterValue = (int)(sliderValue * sliderRangeRatio);
