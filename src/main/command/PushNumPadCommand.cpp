@@ -1,6 +1,7 @@
 #include "PushNumPadCommand.h"
 #include "Mpc.hpp"
 #include "controls/Controls.hpp"
+#include "hardware2/Hardware2.h"
 #include "lcdgui/Field.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
@@ -14,20 +15,8 @@ PushNumPadCommand::PushNumPadCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i)
 }
 
 void PushNumPadCommand::execute() {
-    auto controls = mpc.getControls();
-
-    if (!controls->isShiftPressed())
+    if (mpc.getHardware2()->getButton("shift")->isPressed())
     {
-        const auto fieldName = mpc.getLayeredScreen()->getFocus();
-
-        if (lcdgui::util::isTypableField(mpc.getLayeredScreen()->getCurrentScreenName(), fieldName))
-        {
-            auto field = mpc.getLayeredScreen()->getFocusedField();
-            if (!field->isTypeModeEnabled()) field->enableTypeMode();
-            field->type(i);
-        }
-    } else {
-        // shift cases
         switch (i) {
             case 0: mpc.getLayeredScreen()->openScreen("vmpc-settings"); break;
             case 1: if (!mpc.getSequencer()->isPlaying()) mpc.getLayeredScreen()->openScreen("song"); break;
@@ -40,6 +29,22 @@ void PushNumPadCommand::execute() {
             case 8: if (!mpc.getSequencer()->isPlaying()) mpc.getLayeredScreen()->openScreen("others"); break;
             case 9: if (!mpc.getSequencer()->isPlaying()) mpc.getLayeredScreen()->openScreen("sync"); break;
         }
+        
+        return;
+    }
+
+    const auto fieldName = mpc.getLayeredScreen()->getFocus();
+
+    if (lcdgui::util::isTypableField(mpc.getLayeredScreen()->getCurrentScreenName(), fieldName))
+    {
+        auto field = mpc.getLayeredScreen()->getFocusedField();
+
+        if (!field->isTypeModeEnabled())
+        {
+            field->enableTypeMode();
+        }
+        
+        field->type(i);
     }
 }
 

@@ -535,7 +535,7 @@ void Track::playNext()
         note->setTrack(trackIndex);
 
         if (sequencer->isOverdubbing() &&
-            mpc.getControls()->isErasePressed() &&
+            mpc.getHardware2()->getButton("erase")->isPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) &&
             trackIndex < 64 &&
             busNumber > 0)

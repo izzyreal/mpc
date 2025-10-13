@@ -100,11 +100,6 @@ void SampleScreen::function(int i)
 		}
 		break;
 	case 5:
-		if (mpc.getControls()->isF6Pressed())
-			return;
-
-		mpc.getControls()->setF6Pressed(true);
-
 		auto ams = mpc.getAudioMidiServices();
 
 		if (ams->isRecordingSound())

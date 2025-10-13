@@ -200,11 +200,6 @@ void DirectoryScreen::function(int f)
 	{
 		auto controls = mpc.getControls();
 
-		if (controls->isF6Pressed())
-			return;
-
-		controls->setF6Pressed(true);
-
 		auto file = loadScreen->getSelectedFile();
 
 		if (!file->isDirectory())

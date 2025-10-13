@@ -1,5 +1,6 @@
 #include "ZoneScreen.hpp"
 #include "controls/Controls.hpp"
+#include "hardware2/Hardware2.h"
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -107,10 +108,6 @@ void ZoneScreen::function(int f)
 	}
 	case 5:
 	{
-		if (mpc.getControls()->isF6Pressed())
-			return;
-
-		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}
@@ -196,7 +193,7 @@ void ZoneScreen::turnWheel(int i)
 
 void ZoneScreen::setSlider(int i)
 {
-    if (!mpc.getControls()->isShiftPressed())
+    if (!mpc.getHardware2()->getButton("shift")->isPressed())
     {
         return;
     }
@@ -425,7 +422,7 @@ std::vector<int> ZoneScreen::getZone()
 
 void ZoneScreen::pressEnter()
 {
-	if (mpc.getControls()->isShiftPressed())
+	if (mpc.getHardware2()->getButton("shift")->isPressed())
 	{
 		openScreen("save");
 		return;

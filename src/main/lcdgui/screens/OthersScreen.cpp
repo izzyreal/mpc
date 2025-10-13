@@ -67,7 +67,7 @@ void OthersScreen::turnWheel(int i)
 	init();
 	auto controls = mpc.getControls();
 	
-	if (mpc.getControls()->isAltPressed())
+	if (false /*mpc.getControls()->isAltPressed()*/)
 	{
 		auto increment = i > 0 ? 1 : -1;
 		setContrast(contrast + increment);

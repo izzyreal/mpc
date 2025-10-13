@@ -80,10 +80,6 @@ void LoadASoundScreen::function(int i)
 	{
 	case 2:
 	{
-		if (controls->isF3Pressed())
-			return;
-
-		controls->setF3Pressed(true);
 		auto s = sampler->getPreviewSound();
 		auto start = s->getStart();
 		auto end = s->getLastFrameIndex();

@@ -255,11 +255,10 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
     }
 
     const auto label = a.label.value();
+
     std::printf("[logic] button %s released\n", a.label->c_str());
-	if (label == "shift" || label == "shift_#1" || label == "shift_#2" || label == "shift_#3") {
-		command::ReleaseShiftCommand(mpc).execute();
-	}
-	else if (label == "erase") {
+
+	if (label == "erase") {
 		command::ReleaseEraseCommand(mpc).execute();
 	}
 	else if (label == "f1") {
@@ -283,13 +282,7 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 	else if (label == "overdub") {
 		command::ReleaseOverdubCommand(mpc).execute();
 	}
-	else if (label == "play") {
-		command::ReleasePlayCommand(mpc).execute();
-	}
 	else if (label == "tap") {
 		command::ReleaseTapCommand(mpc).execute();
-	}
-	else if (label == "go-to") {
-		command::ReleaseGoToCommand(mpc).execute();
 	}
 }

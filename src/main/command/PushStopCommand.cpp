@@ -18,7 +18,7 @@ namespace mpc::command {
         if (controls->isNoteRepeatLocked())
             controls->setNoteRepeatLocked(false);
 
-        if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 || controls->isShiftPressed()))
+        if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 || mpc.getHardware2()->getButton("shift")->isPressed()))
             ams->stopBouncingEarly();
 
         mpc.getSequencer()->stop();

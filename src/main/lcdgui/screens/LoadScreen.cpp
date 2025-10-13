@@ -4,6 +4,7 @@
 #include <audiomidi/SoundPlayer.hpp>
 #include "controls/Controls.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "hardware2/Hardware2.h"
 
 #include <disk/SoundLoader.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -131,13 +132,6 @@ void LoadScreen::function(int i)
         }
         
 		auto controls = mpc.getControls();
-
-		if (controls->isF5Pressed())
-		{
-			return;
-		}
-
-		controls->setF5Pressed(true);
 
 		auto file = getSelectedFile();
         

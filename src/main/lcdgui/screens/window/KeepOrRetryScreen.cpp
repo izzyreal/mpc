@@ -43,10 +43,6 @@ void KeepOrRetryScreen::function(int i)
             openScreen("sample");
             break;
         case 3 :
-            if (mpc.getControls()->isF4Pressed())
-            {
-                return;
-            }
             sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
             break;
         case 4:

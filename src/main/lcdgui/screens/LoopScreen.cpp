@@ -1,7 +1,7 @@
 #include "LoopScreen.hpp"
 #include "command/SplitLeftCommand.h"
 #include "command/SplitRightCommand.h"
-#include "controls/Controls.hpp"
+#include "hardware2/Hardware2.h"
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -103,10 +103,9 @@ void LoopScreen::function(int f)
 		break;
 	}
 	case 5:
-		if (mpc.getControls()->isF6Pressed())
+		if (mpc.getHardware2()->getButton("f6")->isPressed())
 			return;
 
-		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}
@@ -206,7 +205,7 @@ void LoopScreen::turnWheel(int i)
 
 void LoopScreen::setSlider(int i)
 {
-	if (!mpc.getControls()->isShiftPressed())
+	if (!mpc.getHardware2()->getButton("shift")->isPressed())
     {
         return;
     }
@@ -337,7 +336,7 @@ void LoopScreen::right()
 
 void LoopScreen::pressEnter()
 {
-	if (mpc.getControls()->isShiftPressed())
+	if (mpc.getHardware2()->getButton("shift")->isPressed())
 	{
 		openScreen("save");
 		return;

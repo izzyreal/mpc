@@ -345,7 +345,7 @@ void FrameSeq::processNoteRepeat()
 {
     auto controls = mpc.getControls();
 
-    if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
+    if (controls && (mpc.getHardware2()->getButton("tap")->isPressed() || controls->isNoteRepeatLocked()))
     {
         auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
         int swingPercentage = timingCorrectScreen->getSwing();

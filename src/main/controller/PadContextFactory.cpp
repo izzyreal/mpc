@@ -32,9 +32,9 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
-    const bool isTapPressed = mpc.getControls()->isTapPressed();
+    const bool isTapPressed = mpc.getHardware2()->getButton("tap")->isPressed();
     const bool isNoteRepeatLocked = mpc.getControls()->isNoteRepeatLocked();
-    const bool isErasePressed = mpc.getControls()->isErasePressed();
+    const bool isErasePressed = mpc.getHardware2()->getButton("erase")->isPressed();
     const bool isStepRecording = mpc.getControls()->isStepRecording();
     const bool isRecMainWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
 
@@ -149,7 +149,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         eventHandler,
         recordNoteOnEvent,
         mpc.getSequencer()->isRecordingOrOverdubbing(),
-        mpc.getControls()->isErasePressed(),
+        mpc.getHardware2()->getButton("erase")->isPressed(),
         mpc.getSequencer()->getActiveTrack(),
         mpc.getControls()->isStepRecording(),
         isAnyProgramPadRegisteredAsPressed,

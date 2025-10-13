@@ -8,17 +8,17 @@ namespace mpc::command {
     PushShiftCommand::PushShiftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushShiftCommand::execute() {
-        const auto controls = mpc.getControls();
-        if (controls->isShiftPressed()) return;
-
-        controls->setShiftPressed(true);
-
         auto field = mpc.getLayeredScreen()->getFocusedField();
-        if (!field || !field->isTypeModeEnabled()) return;
+
+        if (!field || !field->isTypeModeEnabled())
+        {
+            return;
+        }
 
         field->disableTypeMode();
 
         const auto split = field->getActiveSplit();
+
         if (split != -1) {
             field->setSplit(true);
             field->setActiveSplit(split);

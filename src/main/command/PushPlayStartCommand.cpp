@@ -1,6 +1,5 @@
 #include "PushPlayStartCommand.h"
 #include "Mpc.hpp"
-#include "controls/Controls.hpp"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/ScreenGroups.h"
 #include "sequencer/Sequencer.hpp"
@@ -12,22 +11,28 @@ namespace mpc::command {
     void PushPlayStartCommand::execute() {
         if (mpc.getSequencer()->isPlaying()) return;
 
-        const auto controls = mpc.getControls();
         const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
         const bool currentScreenAllowsPlayAndRecord = lcdgui::screengroups::isPlayAndRecordScreen(currentScreenName);
 
-        if (controls->isRecPressed()) {
+        auto hardware = mpc.getHardware2();
+
+        if (hardware->getButton("rec")->isPressed())
+        {
             if (!currentScreenAllowsPlayAndRecord)
                 mpc.getLayeredScreen()->openScreen("sequencer");
             mpc.getSequencer()->recFromStart();
-        } else if (controls->isOverdubPressed()) {
+        }
+        else if (hardware->getButton("overdub"))
+        {
             if (!currentScreenAllowsPlayAndRecord)
                 mpc.getLayeredScreen()->openScreen("sequencer");
             mpc.getSequencer()->overdubFromStart();
         } else {
-            if (controls->isShiftPressed()) {
+            if (hardware->getButton("shift"))
+            {
                 mpc.getLayeredScreen()->openScreen("vmpc-direct-to-disk-recorder");
-            } else {
+            }
+            else {
                 if (!lcdgui::screengroups::isPlayScreen(currentScreenName))
                     mpc.getLayeredScreen()->openScreen("sequencer");
 

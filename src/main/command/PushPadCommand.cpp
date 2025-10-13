@@ -31,7 +31,7 @@ void PushPadCommand::execute()
     }
 
     if (ctx.currentScreenName == "sequencer" &&
-        (ctx.controls->isTapPressed() || ctx.controls->isNoteRepeatLocked()) &&
+        (ctx.isTapPressed || ctx.controls->isNoteRepeatLocked()) &&
         ctx.sequencer->isPlaying() && !ctx.program->isPadRegisteredAsPressed(padIndexWithBank))
     {
         return;

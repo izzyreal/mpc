@@ -11,10 +11,6 @@ namespace mpc::controls
 {
   class KbMapping;
 }
-namespace mpc::sequencer
-{
-    class Sequencer;
-}
 
 namespace mpc::controls
 {
@@ -23,60 +19,27 @@ namespace mpc::controls
     public:
         Controls(mpc::Mpc &mpc);
 
-        void setErasePressed(bool);
         void setRecPressed(bool);
         void setRecLocked(bool);
         void setOverdubPressed(bool);
         void setOverdubLocked(bool);
-        void setPlayPressed(bool);
-        void setTapPressed(bool);
-        void setGoToPressed(bool);
-        void setShiftPressed(bool);
-        void setF3Pressed(bool);
-        void setF4Pressed(bool);
-        void setF5Pressed(bool);
-        void setF6Pressed(bool);
         void setNoteRepeatLocked(bool);
         
-        bool isErasePressed();
         bool isRecPressed(bool includeLocked = true);
         bool isOverdubPressed(bool includeLocked = true);
-        bool isPlayPressed();
-        bool isTapPressed();
         bool isNoteRepeatLocked();
-        bool isGoToPressed();
-        bool isShiftPressed();
-        bool isF3Pressed();
-        bool isF4Pressed();
-        bool isF5Pressed();
-        bool isF6Pressed();
         bool isStepRecording();
         bool isRecMainWithoutPlaying();
         
-        void setCtrlPressed(bool);
-        void setAltPressed(bool);
-        bool isCtrlPressed();
-        bool isAltPressed();
         std::weak_ptr<KbMapping> getKbMapping();
 
     private:
         std::shared_ptr<KbMapping> kbMapping;
-        bool ctrlPressed = false;
-        bool altPressed = false;
-        bool shiftPressed = false;
         bool recPressed = false;
         bool recLocked = false;
         bool overDubPressed = false;
         bool overDubLocked = false;
-        bool playPressed = false;
-        bool tapPressed = false;
         bool noteRepeatLocked = false;
-        bool goToPressed = false;
-        bool erasePressed = false;
-        bool f3Pressed = false;
-        bool f4Pressed = false;
-        bool f5Pressed = false;
-        bool f6Pressed = false;
         mpc::Mpc& mpc;
     };
 }

@@ -1,6 +1,5 @@
 #include "PushFunctionCommand.h"
 #include "Mpc.hpp"
-#include "controls/Controls.hpp"
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
@@ -10,10 +9,8 @@ namespace mpc::command {
     PushFunctionCommand::PushFunctionCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i) {}
 
     void PushFunctionCommand::execute() {
+        // We only handle F4 presses here
         if (i != 3) return;
-
-        auto controls = mpc.getControls();
-        controls->setF4Pressed(true);
 
         auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 

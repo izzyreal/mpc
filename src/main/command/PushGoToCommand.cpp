@@ -8,13 +8,16 @@ namespace mpc::command {
     PushGoToCommand::PushGoToCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushGoToCommand::execute() {
-        if (!mpc.getSequencer()->getActiveSequence()->isUsed()) return;
 
-        const auto controls = mpc.getControls();
-        controls->setGoToPressed(true);
+        if (!mpc.getSequencer()->getActiveSequence()->isUsed())
+        {
+            return;
+        }
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer")
+        {
             mpc.getLayeredScreen()->openScreen("locate");
+        }
     }
 
 }

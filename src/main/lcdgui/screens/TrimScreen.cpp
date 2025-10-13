@@ -1,6 +1,7 @@
 #include "TrimScreen.hpp"
 
 #include "controls/Controls.hpp"
+#include "hardware2/Hardware2.h"
 #include "lcdgui/screens/LoopScreen.hpp"
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
@@ -104,12 +105,6 @@ void TrimScreen::function(int f)
 	}
 	case 5:
 	{
-		if (mpc.getControls()->isF6Pressed())
-		{
-			return;
-		}
-
-		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}
@@ -217,7 +212,7 @@ void TrimScreen::turnWheel(int i)
 
 void TrimScreen::setSlider(int i)
 {
-	if (!mpc.getControls()->isShiftPressed())
+	if (!mpc.getHardware2()->getButton("shift")->isPressed())
     {
         return;
     }
@@ -320,7 +315,7 @@ void TrimScreen::right()
 // Can be called from another layer, i.e. Start Fine and End Fine windows
 void TrimScreen::pressEnter()
 {
-	if (mpc.getControls()->isShiftPressed())
+	if (mpc.getHardware2()->getButton("shift")->isPressed())
 	{
 		openScreen("save");
 		return;

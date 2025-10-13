@@ -302,7 +302,10 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     if (bus > 0)
     {
         padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
-        if (track->getIndex() < 64 && mpc.getControls()->isTapPressed() && sequencer->isPlaying())
+
+        if (track->getIndex() >= 64) printf("oh noes!\n");
+
+        if (track->getIndex() < 64 && mpc.getHardware2()->getButton("tap")->isPressed() && sequencer->isPlaying())
         {
             return;
         }

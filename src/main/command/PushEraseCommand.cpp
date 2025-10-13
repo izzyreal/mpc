@@ -8,12 +8,13 @@ namespace mpc::command {
     PushEraseCommand::PushEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushEraseCommand::execute() {
-        const auto controls = mpc.getControls();
-        controls->setErasePressed(true);
+        if (!mpc.getSequencer()->getActiveSequence()->isUsed() ||
+            mpc.getSequencer()->isRecordingOrOverdubbing())
+        {
+            return;
+        }
 
-        if (!mpc.getSequencer()->getActiveSequence()->isUsed()) return;
-        if (!mpc.getSequencer()->isRecordingOrOverdubbing())
-            mpc.getLayeredScreen()->openScreen("erase");
+        mpc.getLayeredScreen()->openScreen("erase");
     }
 
 }

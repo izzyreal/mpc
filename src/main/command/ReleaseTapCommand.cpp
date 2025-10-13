@@ -10,7 +10,6 @@ ReleaseTapCommand::ReleaseTapCommand(mpc::Mpc& mpc) : mpc(mpc) {}
 
 void ReleaseTapCommand::execute() {
     const auto controls = mpc.getControls();
-    controls->setTapPressed(false);
 
     if (mpc.getSequencer()->isRecordingOrOverdubbing())
         mpc.getSequencer()->flushTrackNoteCache();

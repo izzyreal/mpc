@@ -1,6 +1,8 @@
 #include "SequencerScreen.hpp"
 #include "controls/Controls.hpp"
 
+#include "hardware2/Hardware2.h"
+
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -102,11 +104,11 @@ void SequencerScreen::open()
 		ls->setFocus("nextsq");
     
     
-    const auto footerIsInvisible = !mpc.getControls()->isNoteRepeatLocked() && !(mpc.getControls()->isErasePressed() && sequencer.lock()->isRecordingOrOverdubbing());
+    const auto footerIsInvisible = !mpc.getControls()->isNoteRepeatLocked() && !(mpc.getHardware2()->getButton("erase")->isPressed() && sequencer.lock()->isRecordingOrOverdubbing());
     
     findChild("footer-label")->Hide(footerIsInvisible);
 
-    findChild("function-keys")->Hide(!footerIsInvisible || punchScreen->on || (mpc.getControls()->isErasePressed() && sequencer.lock()->isRecordingOrOverdubbing()));
+    findChild("function-keys")->Hide(!footerIsInvisible || punchScreen->on || (mpc.getHardware2()->getButton("erase")->isPressed() && sequencer.lock()->isRecordingOrOverdubbing()));
 }
 
 void SequencerScreen::erase()
@@ -119,7 +121,7 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
-    if (mpc.getControls()->isTapPressed())
+    if (mpc.getHardware2()->getButton("tap")->isPressed())
     {
         return;
     }
@@ -145,7 +147,7 @@ void SequencerScreen::tap()
 
 void SequencerScreen::shift()
 {
-    if (mpc.getControls()->isTapPressed())
+    if (mpc.getHardware2()->getButton("tap")->isPressed())
     {
         mpc.getControls()->setNoteRepeatLocked(true);
     }
@@ -907,7 +909,7 @@ void SequencerScreen::displayNextSq()
 
 void SequencerScreen::play()
 {
-    if (mpc.getControls()->isPlayPressed())
+    if (mpc.getHardware2()->getButton("play")->isPressed())
     {
         return;
     }
