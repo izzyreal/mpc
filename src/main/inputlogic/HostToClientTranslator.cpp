@@ -43,47 +43,46 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         break;
     }
 
-    case HostInputEvent::Source::MOUSE:
+    case HostInputEvent::Source::GESTURE:
     {
-        const auto& mouse = std::get<MouseEvent>(hostEvent.payload);
+        const auto& gesture = std::get<GestureEvent>(hostEvent.payload);
 
-        if (mouse.componentId == ComponentId::NONE)
+        if (gesture.componentId == ComponentId::NONE)
         {
-            throw std::invalid_argument("MouseEvent.componentId must not be NONE");
+            throw std::invalid_argument("GestureEvent.componentId must not be NONE");
         }
 
-        clientEvent.label = mpc::hardware2::componentIdToLabel.at(mouse.componentId);
+        clientEvent.label = mpc::hardware2::componentIdToLabel.at(gesture.componentId);
 
-        if (mouse.componentId >= ComponentId::PAD1 && mouse.componentId <= ComponentId::PAD16)
+        if (gesture.componentId >= ComponentId::PAD1 && gesture.componentId <= ComponentId::PAD16)
         {
-            clientEvent.index = static_cast<int>(mouse.componentId) - static_cast<int>(ComponentId::PAD1);
-            clientEvent.type =
-                (mouse.type == MouseEvent::MouseEventType::BUTTON_DOWN)
-                    ? ClientInput::Type::PadPress
-                    : (mouse.type == MouseEvent::MouseEventType::BUTTON_UP)
-                          ? ClientInput::Type::PadRelease
-                          : ClientInput::Type::PadAftertouch;
-
-            if (mouse.type == MouseEvent::MouseEventType::BUTTON_DOWN ||
-                mouse.type == MouseEvent::MouseEventType::BUTTON_UP ||
-                mouse.type == MouseEvent::MouseEventType::MOVE)
+            if (gesture.type == GestureEvent::Type::BEGIN || gesture.type == GestureEvent::Type::END)
             {
-                clientEvent.value = static_cast<int>((1.f - mouse.normY) * static_cast<float>(mpc::hardware2::Pad::MAX_VELO));
+                clientEvent.index = static_cast<int>(gesture.componentId) - static_cast<int>(ComponentId::PAD1);
+                clientEvent.type = gesture.type == GestureEvent::Type::BEGIN ?
+                    ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
+
+                if (gesture.type == GestureEvent::Type::BEGIN)
+                {
+                    clientEvent.value = static_cast<int>((1.f - gesture.normY) * static_cast<float>(mpc::hardware2::Pad::MAX_VELO));
+                }
             }
         }
-        else if (mouse.componentId == ComponentId::SLIDER)
+        else if (gesture.componentId == ComponentId::SLIDER && gesture.componentId)
         {
-            clientEvent.type = ClientInput::Type::SliderMove;
-            clientEvent.value = mouse.normY;
+            if (gesture.type == GestureEvent::Type::UPDATE)
+            {
+                clientEvent.type = ClientInput::Type::SliderMove;
+                clientEvent.value = gesture.normY;
+            }
         }
-        else if (mouse.componentId >= ComponentId::CURSOR_LEFT && mouse.componentId <= ComponentId::NUM_9)
+        else if (gesture.componentId >= ComponentId::CURSOR_LEFT && gesture.componentId <= ComponentId::NUM_9)
         {
-
-            if (mouse.type == MouseEvent::MouseEventType::BUTTON_DOWN)
+            if (gesture.type == GestureEvent::Type::BEGIN)
             {
                 clientEvent.type = ClientInput::Type::ButtonPress;
             }
-            else if (mouse.type == MouseEvent::MouseEventType::BUTTON_UP)
+            else if (gesture.type == GestureEvent::Type::END)
             {
                 clientEvent.type = ClientInput::Type::ButtonRelease;
             }
@@ -92,22 +91,17 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
                 return std::nullopt;
             }
         }
-        else if (mouse.componentId == ComponentId::DATA_WHEEL)
+        else if (gesture.componentId == ComponentId::DATA_WHEEL)
         {
-            clientEvent.type = ClientInput::Type::DataWheelTurn;
-
-            if (mouse.type == MouseEvent::MouseEventType::WHEEL)
+            if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientEvent.value = static_cast<int>(mouse.wheelDelta);
-            }
-            else if (mouse.type == MouseEvent::MouseEventType::MOVE || mouse.type == MouseEvent::MouseEventType::DRAG)
-            {
-                clientEvent.value = static_cast<int>(mouse.deltaY);
+                clientEvent.type = ClientInput::Type::DataWheelTurn;
+                clientEvent.value = gesture.stepDelta;
             }
         }
-        else if (mouse.componentId == ComponentId::NONE)
+        else if (gesture.componentId == ComponentId::NONE)
         {
-            throw std::invalid_argument("MouseEvent.componentId must not be NONE");
+            throw std::invalid_argument("GestureEvent.componentId must not be NONE");
         }
         break;
     }

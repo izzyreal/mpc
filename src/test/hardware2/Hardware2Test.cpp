@@ -214,14 +214,14 @@ TEST_CASE("Hardware2 dispatchHostInput integration with valid tagged events", "[
     }
     */
 
-    SECTION("MouseEvent") {
-        MouseEvent mouse{};
-        mouse.componentId = ComponentId::PAD1;
-        mouse.type = MouseEvent::BUTTON_DOWN;
-        mouse.normY = 0.5f;
+    SECTION("GestureEvent") {
+        GestureEvent gesture{};
+        gesture.componentId = ComponentId::PAD1;
+        gesture.type = GestureEvent::Type::BEGIN;
+        gesture.normY = 0.5f;
 
-        HostInputEvent event(mouse);
-        REQUIRE(event.getSource() == HostInputEvent::Source::MOUSE);
+        HostInputEvent event(gesture);
+        REQUIRE(event.getSource() == HostInputEvent::Source::GESTURE);
 
         hw.dispatchHostInput(event);
     }
