@@ -99,7 +99,7 @@ void ScreenComponent::openWindow()
 void ScreenComponent::pad(int padIndexWithBank, int velo)
 {
     auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, padIndexWithBank, velo, name);
-    command::PushPadCommand(ctx, padIndexWithBank, velo);
+    command::PushPadCommand(ctx, padIndexWithBank, velo).execute();
 }
 
 mpc::engine::Drum& ScreenComponent::activeDrum()
