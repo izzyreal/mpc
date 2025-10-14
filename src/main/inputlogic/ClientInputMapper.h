@@ -21,6 +21,7 @@ public:
 
     // Buttons
     void bindButtonPress(const std::string& label, Callback callback);
+    void bindButtonDoublePress(const std::string& label, Callback callback);
     void bindButtonRelease(const std::string& label, Callback callback);
 
     // Other controls
@@ -39,6 +40,7 @@ private:
     std::vector<std::optional<Callback>> padAftertouchBindings;
 
     std::unordered_map<std::string, Callback> buttonPressBindings;
+    std::unordered_map<std::string, Callback> buttonDoublePressBindings;
     std::unordered_map<std::string, Callback> buttonReleaseBindings;
 
     std::optional<Callback> dataWheelBinding;

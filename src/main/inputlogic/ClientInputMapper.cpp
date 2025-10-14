@@ -44,6 +44,11 @@ void ClientInputMapper::bindButtonPress(const std::string& label, Callback callb
     buttonPressBindings[label] = std::move(callback);
 }
 
+void ClientInputMapper::bindButtonDoublePress(const std::string& label, Callback callback)
+{
+    buttonDoublePressBindings[label] = std::move(callback);
+}
+
 void ClientInputMapper::bindButtonRelease(const std::string& label, Callback callback)
 {
     buttonReleaseBindings[label] = std::move(callback);
@@ -101,6 +106,12 @@ void ClientInputMapper::trigger(const ClientInput& action) const
         if (action.label) {
             auto it = buttonPressBindings.find(action.label.value());
             if (it != buttonPressBindings.end()) it->second(action);
+        }
+        break;
+    case ClientInput::Type::ButtonDoublePress:
+        if (action.label) {
+            auto it = buttonDoublePressBindings.find(action.label.value());
+            if (it != buttonDoublePressBindings.end()) it->second(action);
         }
         break;
     case ClientInput::Type::ButtonRelease:

@@ -1,6 +1,8 @@
 #include "Controls.hpp"
 
 #include "KbMapping.hpp"
+#include "controller/ClientInputControllerBase.h"
+#include "hardware2/Hardware2.h"
 
 #include <Mpc.hpp>
 
@@ -12,16 +14,6 @@ Controls::Controls(mpc::Mpc& _mpc) :
 	mpc(_mpc),
 	kbMapping (std::make_shared<KbMapping>(_mpc))
 {
-}
-
-bool Controls::isRecPressed(bool includeLocked)
-{
-	return recPressed || (includeLocked && recLocked);
-}
-
-bool Controls::isOverdubPressed(bool includeLocked)
-{
-	return overDubPressed || (includeLocked && overDubLocked);
 }
 
 bool Controls::isNoteRepeatLocked()
@@ -43,32 +35,15 @@ bool mpc::controls::Controls::isRecMainWithoutPlaying()
 	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+
+    const bool recIsPressedOrLocked = mpc.getHardware2()->getButton("rec")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("rec");
+
 	bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
 		!sequencer->isPlaying() &&
-		isRecPressed() &&
+		recIsPressedOrLocked &&
 		tc_note != 0 &&
 		!posIsLastTick;
 	return recMainWithoutPlaying;
-}
-
-void Controls::setRecPressed(bool b)
-{
-    recPressed = b;
-}
-
-void Controls::setRecLocked(bool b)
-{
-	recLocked = b;
-}
-
-void Controls::setOverdubPressed(bool b)
-{
-	overDubPressed = b;
-}
-
-void Controls::setOverdubLocked(bool b)
-{
-	overDubLocked = b;
 }
 
 void Controls::setNoteRepeatLocked(bool b)

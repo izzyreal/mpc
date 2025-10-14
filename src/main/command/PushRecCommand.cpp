@@ -1,5 +1,6 @@
 #include "PushRecCommand.h"
 #include "Mpc.hpp"
+#include "controller/ClientInputControllerBase.h"
 #include "controls/Controls.hpp"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/ScreenGroups.h"
@@ -9,22 +10,26 @@ namespace mpc::command {
 
     PushRecCommand::PushRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushRecCommand::execute() {
-        if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName())) return;
+    void PushRecCommand::execute()
+    {
+        mpc.inputController->buttonLockTracker.unlock("rec");
+        mpc.inputController->buttonLockTracker.unlock("overdub");
 
-        auto controls = mpc.getControls();
-        if (controls->isRecPressed(false)) return;
+        if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
+        {
+            return;
+        }
 
-        controls->setRecPressed(true);
-        controls->setRecLocked(false);
-
-        if (mpc.getSequencer()->isRecordingOrOverdubbing()) {
+        if (mpc.getSequencer()->isRecordingOrOverdubbing())
+        {
             mpc.getSequencer()->setRecording(false);
             mpc.getSequencer()->setOverdubbing(false);
         }
 
         if (!lcdgui::screengroups::isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
+        {
             mpc.getLayeredScreen()->openScreen("sequencer");
+        }
 
         mpc.getHardware2()->getLed("rec")->setEnabled(true);
     }

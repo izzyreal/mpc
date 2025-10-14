@@ -44,5 +44,8 @@ void Initializer::init(ClientInputMapper &inputMapper,
         inputMapper.bindButtonRelease(buttonLabel, [inputController](const ClientInput& a) {
             inputController->handleAction(a);
         });
+        inputMapper.bindButtonDoublePress(buttonLabel, [inputController](const ClientInput& a) {
+            inputController->handleAction(a);
+        });
     }
 }

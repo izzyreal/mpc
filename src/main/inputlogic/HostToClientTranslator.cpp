@@ -78,9 +78,25 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         }
         else if (gesture.componentId >= ComponentId::CURSOR_LEFT && gesture.componentId <= ComponentId::NUM_9)
         {
-            if (gesture.type == GestureEvent::Type::BEGIN)
+            if (gesture.type == GestureEvent::Type::REPEAT)
             {
-                clientEvent.type = ClientInput::Type::ButtonPress;
+                if (gesture.repeatCount == 2)
+                {
+                    printf("REPEAT gesture has repeat count of 2\n");
+                    clientEvent.type = ClientInput::Type::ButtonDoublePress;
+                }
+            }
+            else if (gesture.type == GestureEvent::Type::BEGIN)
+            {
+                if (gesture.repeatCount == 2)
+                {
+                    printf("BEGIN gesture has repeat count of 2\n");
+                    clientEvent.type = ClientInput::Type::ButtonDoublePress;
+                }
+                else
+                {
+                    clientEvent.type = ClientInput::Type::ButtonPress;
+                }
             }
             else if (gesture.type == GestureEvent::Type::END)
             {

@@ -33,6 +33,8 @@ void ClientInputController::handleAction(const ClientInput& action)
             return handleButtonPress(action);
         case ClientInput::Type::ButtonRelease:
             return handleButtonRelease(action);
+        case ClientInput::Type::ButtonDoublePress:
+            return handleButtonDoublePress(action);
         default:
             return;
     }
@@ -155,7 +157,8 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     else if (label == "next-bar-end") {
         screen->nextBarEnd();
     }
-    else if (label == "tap") {
+    else if (label == "tap")
+    {
         screen->tap();
     }
     else if (label == "next-seq") {
@@ -188,7 +191,8 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     else if (label == "f6") {
         screen->function(5);
     }
-    else if (label == "shift" || label == "shift_#1" || label == "shift_#2" || label == "shift_#3") {
+    else if (label == "shift")
+    {
         screen->shift();
     }
     else if (label == "enter") {
@@ -286,3 +290,33 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 		command::ReleaseTapCommand(mpc).execute();
 	}
 }
+
+void ClientInputController::handleButtonDoublePress(const mpc::inputlogic::ClientInput& input)
+{
+    if (!input.label.has_value())
+    {
+        return;
+    }
+
+    auto label = *input.label;
+
+    if (label == "rec")
+    {
+        buttonLockTracker.toggle("rec");
+        
+        if (buttonLockTracker.isLocked("rec"))
+        {
+            buttonLockTracker.unlock("overdub");
+        }
+    }
+    else if (label == "overdub")
+    {
+        buttonLockTracker.toggle("overdub");
+        
+        if (buttonLockTracker.isLocked("overdub"))
+        {
+            buttonLockTracker.unlock("rec");
+        }
+    }
+}
+

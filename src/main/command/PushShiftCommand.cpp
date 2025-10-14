@@ -1,13 +1,23 @@
 #include "PushShiftCommand.h"
 #include "Mpc.hpp"
+#include "controller/ClientInputControllerBase.h"
 #include "controls/Controls.hpp"
+#include "hardware2/Hardware2.h"
 #include "lcdgui/Field.hpp"
+#include "sequencer/Sequencer.hpp"
 
 namespace mpc::command {
 
     PushShiftCommand::PushShiftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushShiftCommand::execute() {
+        if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer" &&
+            mpc.getHardware2()->getButton("tap")->isPressed() &&
+            mpc.getSequencer()->isPlaying())
+        {
+            mpc.inputController->buttonLockTracker.lock("tap");
+        }
+
         auto field = mpc.getLayeredScreen()->getFocusedField();
 
         if (!field || !field->isTypeModeEnabled())

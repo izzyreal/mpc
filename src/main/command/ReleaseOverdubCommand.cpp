@@ -7,8 +7,8 @@ using namespace mpc::command;
 
 ReleaseOverdubCommand::ReleaseOverdubCommand(mpc::Mpc& mpc) : mpc(mpc) {}
 
-void ReleaseOverdubCommand::execute() {
-    const auto controls = mpc.getControls();
-    controls->setOverdubPressed(false);
+void ReleaseOverdubCommand::execute()
+{
     mpc.getHardware2()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
 }
+

@@ -47,6 +47,7 @@ public:
 class Pressable : public PressState {
 protected:
     Pressable() = default;
+    virtual void onDoublePress() {}
     virtual void onPress() = 0;
     virtual void onRelease() = 0;
 public:
@@ -68,6 +69,15 @@ public:
         }
         setPressed(false);
         onRelease();
+    }
+
+    void doublePress() {
+        if (isPressed())
+        {
+            return;
+        }
+        setPressed(true);
+        onDoublePress();
     }
 };
 
@@ -168,6 +178,13 @@ public:
 class Button final : public Component, public Pressable {
     const std::string label;
 protected:
+    void onDoublePress() override final {
+        ClientInput action;
+        action.type = ClientInput::Type::ButtonDoublePress;
+        action.label = label;
+        mapper.trigger(action);
+    }
+
     void onPress() override final {
         ClientInput action;
         action.type = ClientInput::Type::ButtonPress;

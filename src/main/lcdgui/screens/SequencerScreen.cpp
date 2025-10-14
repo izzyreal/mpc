@@ -1,6 +1,6 @@
 #include "SequencerScreen.hpp"
-#include "controls/Controls.hpp"
 
+#include "controller/ClientInputControllerBase.h"
 #include "hardware2/Hardware2.h"
 
 #include <sequencer/Track.hpp>
@@ -858,9 +858,12 @@ void SequencerScreen::setPunchRectOn(int i, bool b)
 void SequencerScreen::displayPunchWhileRecording()
 {
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
-	auto controls = mpc.getControls();
 
-	if (punchScreen->on && (controls->isRecPressed() || controls->isOverdubPressed()))
+    auto hardware = mpc.getHardware2();
+    auto isRecPressedOrLocked = hardware->getButton("rec")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("rec");
+    auto isOverdubPressedOrLocked = hardware->getButton("overdub")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("overdub");
+
+	if (punchScreen->on && (isRecPressedOrLocked || isOverdubPressedOrLocked))
 	{
 		findBackground()->setName("sequencer");
 

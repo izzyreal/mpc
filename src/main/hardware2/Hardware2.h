@@ -119,6 +119,12 @@ public:
                 if (btn) btn->release();
             }
             break;
+        case ClientInput::Type::ButtonDoublePress:
+            if (input.label) {
+                auto btn = getButton(*input.label);
+                if (btn) btn->doublePress();
+            }
+            break;
         case ClientInput::Type::DataWheelTurn:
             printf("data wheel\n");
             if (input.value) {
