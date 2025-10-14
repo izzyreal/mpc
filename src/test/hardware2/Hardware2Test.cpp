@@ -5,6 +5,7 @@
 #include <unordered_set>
 
 #include "hardware2/Hardware2.h"
+#include "ghc/filesystem.hpp"
 
 using namespace mpc::hardware2;
 using namespace mpc::inputlogic;
@@ -14,7 +15,7 @@ using namespace mpc::inputlogic;
 TEST_CASE("Hardware2 construction", "[hardware2]")
 {
     ClientInputMapper mapper;
-    auto kbMapping = std::shared_ptr<mpc::controls::KbMapping>();
+    auto kbMapping = std::make_shared<mpc::controls::KbMapping>(fs::temp_directory_path());
     Hardware2 hw(mapper, kbMapping);
 
     SECTION("Pads initialized")
@@ -199,10 +200,9 @@ using namespace mpc::inputlogic;
 
 TEST_CASE("Hardware2 dispatchHostInput integration with valid tagged events", "[hardware2]") {
     ClientInputMapper mapper;
-    Hardware2 hw(mapper, nullptr);
+    auto kbMapping = std::make_shared<mpc::controls::KbMapping>(fs::temp_directory_path());
+    Hardware2 hw(mapper, kbMapping);
 
-    // This test should be enabled after KbMapping is independent of mpc::Mpc
-    /*
     SECTION("KeyEvent") {
         KeyEvent key{ true, 42, false, false, false };
         HostInputEvent event(key);
@@ -212,7 +212,6 @@ TEST_CASE("Hardware2 dispatchHostInput integration with valid tagged events", "[
         // dispatch should not crash
         hw.dispatchHostInput(event);
     }
-    */
 
     SECTION("GestureEvent") {
         GestureEvent gesture{};

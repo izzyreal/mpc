@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "TestMpc.hpp"
-#include "controls/Controls.hpp"
 #include "hardware2/Hardware2.h"
 #include "sampler/Sampler.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"

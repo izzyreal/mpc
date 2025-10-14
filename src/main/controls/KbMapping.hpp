@@ -19,7 +19,7 @@ class KbMapping
 {
     
 public:
-    KbMapping(const fs::path configDirectory);
+    explicit KbMapping(const fs::path configDirectory);
 
     void initializeDefaults();
     const VmpcKeyCode getKeyCodeFromLabel(const std::string& label);
