@@ -39,10 +39,6 @@ namespace mpc::disk {
     class AbstractDisk;
 }
 
-namespace mpc::controls {
-    class Controls;
-}
-
 namespace mpc::lcdgui {
     class Screens;
     class LayeredScreen;
@@ -81,7 +77,6 @@ namespace mpc {
         bool pluginModeEnabled = false;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<sequencer::Sequencer> sequencer;
-        std::shared_ptr<controls::Controls> controls;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
@@ -122,7 +117,6 @@ namespace mpc {
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
-        std::shared_ptr<controls::Controls> getControls();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
         std::shared_ptr<hardware2::Hardware2> getHardware2();
         mpc::disk::DiskController* getDiskController();

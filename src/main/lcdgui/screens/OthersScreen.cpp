@@ -1,5 +1,4 @@
 #include "OthersScreen.hpp"
-#include "controls/Controls.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -65,7 +64,6 @@ void OthersScreen::function(int i)
 void OthersScreen::turnWheel(int i)
 {
 	init();
-	auto controls = mpc.getControls();
 	
 	if (false /*mpc.getControls()->isAltPressed()*/)
 	{

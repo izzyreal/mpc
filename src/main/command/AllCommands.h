@@ -26,7 +26,7 @@
 #include "command/PushNextSeqCommand.h"
 #include "command/PushTrackMuteCommand.h"
 #include "command/PushNumPadCommand.h"
-#include "command/PushPressEnterCommand.h"
+#include "command/PushEnterCommand.h"
 #include "command/PushPadScreenUpdateCommand.h"
 #include "command/ReleasePadCommand.h"
 #include "command/ReleaseEraseCommand.h"

@@ -10,7 +10,6 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
-#include "controls/Controls.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <Util.hpp>
@@ -198,8 +197,6 @@ void DirectoryScreen::function(int f)
     }
 	case 5:
 	{
-		auto controls = mpc.getControls();
-
 		auto file = loadScreen->getSelectedFile();
 
 		if (!file->isDirectory())

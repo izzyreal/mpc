@@ -10,8 +10,6 @@
 
 #include <disk/AbstractDisk.hpp>
 
-#include <controls/Controls.hpp>
-
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MidiDeviceDetector.hpp>
@@ -105,10 +103,10 @@ void Mpc::init()
     
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
     MLOG("Sequencer created");
+
+    inputController = std::make_shared<mpc::controller::ClientInputController>(*this);
     
-    controls = std::make_shared<controls::Controls>(*this);
-    
-    hardware2 = std::make_shared<hardware2::Hardware2>(inputMapper, controls->getKbMapping().lock());
+    hardware2 = std::make_shared<hardware2::Hardware2>(inputMapper, inputController->getKbMapping());
     
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
     MLOG("Sampler created");
@@ -156,14 +154,8 @@ void Mpc::init()
     
     MLOG("Mpc is ready");
     
-    inputController = std::make_shared<mpc::controller::ClientInputController>(*this);
     mpc::inputsystem::Initializer::init(inputMapper, inputController, hardware2->getButtonLabels());
     layeredScreen->openScreen("sequencer");
-}
-
-std::shared_ptr<controls::Controls> Mpc::getControls()
-{
-	return controls;
 }
 
 std::shared_ptr<hardware2::Hardware2> Mpc::getHardware2()
@@ -399,5 +391,4 @@ std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> Mpc::getPadAndButtonKeybo
 {
     return padAndButtonKeyboard;
 }
-
 

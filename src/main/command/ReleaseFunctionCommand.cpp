@@ -8,8 +8,8 @@ using namespace mpc::command;
 ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc& mpc, int i)
 : mpc(mpc), i(i) {}
 
-void ReleaseFunctionCommand::execute() {
-    const auto controls = mpc.getControls();
+void ReleaseFunctionCommand::execute()
+{
     const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     switch (i) {

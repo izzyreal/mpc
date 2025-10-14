@@ -1,5 +1,5 @@
 #include "VmpcResetKeyboardScreen.hpp"
-#include "controls/Controls.hpp"
+#include "controller/ClientInputControllerBase.h"
 
 #include <controls/KbMapping.hpp>
 
@@ -20,7 +20,7 @@ void VmpcResetKeyboardScreen::function(int i)
             openScreen("vmpc-keyboard");
             break;
         case 4:
-            mpc.getControls()->getKbMapping().lock()->initializeDefaults();
+            mpc.inputController->getKbMapping()->initializeDefaults();
             openScreen("vmpc-keyboard");
             break;
     }

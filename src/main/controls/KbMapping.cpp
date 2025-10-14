@@ -1,6 +1,7 @@
 #include "KbMapping.hpp"
 
-#include "Mpc.hpp"
+#include "Logger.hpp"
+
 #include <cctype>
 
 #if __APPLE__
@@ -9,14 +10,14 @@
 
 using namespace mpc::controls;
 
-KbMapping::KbMapping(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
+KbMapping::KbMapping(const fs::path configDirectoryToUse) : configDirectory(configDirectoryToUse)
 {
     importMapping();
 }
 
 void KbMapping::exportMapping()
 {
-	const auto path = mpc.paths->configPath() / "keys.txt";
+	const auto path = configDirectory / "keys.txt";
 
     const std::string version = "v1\n";
 
@@ -47,7 +48,7 @@ void KbMapping::exportMapping()
 void KbMapping::importMapping()
 {
     labelKeyMap.clear();
-    const auto path = mpc.paths->configPath() / "keys.txt";
+    const auto path = configDirectory / "keys.txt";
 
     if (!fs::exists(path))
     {

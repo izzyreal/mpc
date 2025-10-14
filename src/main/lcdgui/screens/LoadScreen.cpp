@@ -2,7 +2,6 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
-#include "controls/Controls.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "hardware2/Hardware2.h"
 
@@ -131,8 +130,6 @@ void LoadScreen::function(int i)
             return;
         }
         
-		auto controls = mpc.getControls();
-
 		auto file = getSelectedFile();
         
 		if (!file->isDirectory())

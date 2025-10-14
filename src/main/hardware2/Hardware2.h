@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 
-#include "controls/Controls.hpp"
 #include "controls/KbMapping.hpp"
 #include "hardware2/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"

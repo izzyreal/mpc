@@ -629,7 +629,6 @@ void StepEditorScreen::up()
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 1));
-		auto controls = mpc.getControls();
 
 		if (mpc.getHardware2()->getButton("shift")->isPressed() && selectionStartIndex == -1 && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber]))
 			return;
@@ -686,7 +685,6 @@ void StepEditorScreen::down()
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 1));
-		auto controls = mpc.getControls();
 
 		if (srcNumber == 3)
 		{
@@ -735,7 +733,6 @@ void StepEditorScreen::downOrUp(int increment)
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 1));
-		auto controls = mpc.getControls();
 
 		if (srcNumber + increment != -1)
 		{

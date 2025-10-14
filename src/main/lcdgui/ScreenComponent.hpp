@@ -83,7 +83,7 @@ namespace mpc::lcdgui
         virtual void openWindow();
         virtual void turnWheel(int i) {}
         virtual void numpad(int i) { command::PushNumPadCommand(mpc, i).execute(); }
-        virtual void pressEnter() { command::PushPressEnterCommand(mpc).execute(); }
+        virtual void pressEnter() { command::PushEnterCommand(mpc).execute(); }
         virtual void rec() { command::PushRecCommand(mpc).execute(); }
         virtual void overDub() { command::PushOverdubCommand(mpc).execute(); }
         virtual void stop() { command::PushStopCommand(mpc).execute(); }

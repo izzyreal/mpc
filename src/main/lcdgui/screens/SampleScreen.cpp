@@ -1,5 +1,4 @@
 #include "SampleScreen.hpp"
-#include "controls/Controls.hpp"
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>

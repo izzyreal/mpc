@@ -1,5 +1,4 @@
 #include "SndParamsScreen.hpp"
-#include "controls/Controls.hpp"
 
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>

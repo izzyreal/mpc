@@ -1,6 +1,5 @@
 #include "PushGoToCommand.h"
 #include "Mpc.hpp"
-#include "controls/Controls.hpp"
 #include "sequencer/Sequencer.hpp"
 
 namespace mpc::command {

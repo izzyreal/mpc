@@ -3,9 +3,9 @@
 
 namespace mpc::command {
 
-    class PushPressEnterCommand : public Command {
+    class PushEnterCommand : public Command {
     public:
-        explicit PushPressEnterCommand(mpc::Mpc &mpc);
+        explicit PushEnterCommand(mpc::Mpc &mpc);
         void execute() override;
 
     private:

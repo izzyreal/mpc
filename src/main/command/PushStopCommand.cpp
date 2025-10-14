@@ -2,7 +2,6 @@
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientInputControllerBase.h"
-#include "controls/Controls.hpp"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/ScreenGroups.h"
 #include "lcdgui/screens/SequencerScreen.hpp"

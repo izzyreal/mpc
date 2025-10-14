@@ -4,7 +4,6 @@
 #include "controls/GenerateNoteOnContext.h"
 #include "controls/PushPadContext.h"
 #include "controls/PushPadScreenUpdateContext.h"
-#include "controls/Controls.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/FrameSeq.hpp"

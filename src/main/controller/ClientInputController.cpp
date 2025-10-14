@@ -10,7 +10,8 @@
 using namespace mpc::controller;
 using namespace mpc::inputlogic; 
 
-ClientInputController::ClientInputController(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
+ClientInputController::ClientInputController(mpc::Mpc &mpcToUse) :
+    ClientInputControllerBase(mpcToUse.paths->configPath()), mpc(mpcToUse)
 {
 }
 

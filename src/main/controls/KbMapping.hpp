@@ -1,4 +1,7 @@
 #pragma once
+
+#include "mpc_fs.hpp"
+
 #include <vector>
 #include <utility>
 #include <vector>
@@ -16,6 +19,8 @@ class KbMapping
 {
     
 public:
+    KbMapping(const fs::path configDirectory);
+
     void initializeDefaults();
     const VmpcKeyCode getKeyCodeFromLabel(const std::string& label);
     std::string getHardwareComponentLabelAssociatedWithKeycode(const VmpcKeyCode keyCode);
@@ -25,14 +30,13 @@ public:
     void importMapping();
     std::vector<std::pair<std::string, VmpcKeyCode>>& getLabelKeyMap();
 
-    KbMapping(mpc::Mpc&);
-
     static const VmpcKeyCode getNextKeyCode(const VmpcKeyCode keyCode);
     static const VmpcKeyCode getPreviousKeyCode(const VmpcKeyCode keyCode);
 
 private:
-    mpc::Mpc& mpc;
     std::vector<std::pair<std::string, VmpcKeyCode>> labelKeyMap;
+
+    const fs::path configDirectory;
 
     const std::string magicHeader { "vmpc2000xl_keyboard_mapping" };
 };
