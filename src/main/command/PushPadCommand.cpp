@@ -46,7 +46,7 @@ void PushPadCommand::execute()
         return;
     }
 
-    ctx.program->registerPadPress(padIndexWithBank);
+    //ctx.program->registerPadPress(padIndexWithBank);
 
     if (ctx.isFullLevelEnabled)
     {

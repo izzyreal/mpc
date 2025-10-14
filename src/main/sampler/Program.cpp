@@ -191,3 +191,8 @@ void Program::clearPressedPadRegistry()
     pressedPadRegistry.fill(0);
 }
 
+int Program::getPadPressCount(int padIndex) const
+{
+    return pressedPadRegistry.at(padIndex);
+}
+

@@ -167,11 +167,15 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
     const auto audioServer = audioMidiServices->getAudioServer();
 
     auto eventFrame = timeStamp != -1 ? timeStamp : frameSeq->getEventFrameOffset();
+    const auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
+    const auto pgm = sampler->getProgram(pgmIndex);
 
     if (noteOffEvent && isDrumNote(noteOffEvent->getNote()))
     {
         mpc.getDrum(drumIndex).mpcNoteOff(noteOffEvent->getNote(), eventFrame,
                                           noteOffEvent->getTick());
+
+        pgm->registerPadRelease(pgm->getPadIndexFromNote(noteOffEvent->getNote()));
     }
     else if (noteOnEvent && isDrumNote(noteOnEvent->getNote()) &&
                (noteOnEvent->isFinalized() || noteOnEvent->isPlayOnly()))
@@ -181,8 +185,6 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
             const auto newVelo = std::clamp<int>(static_cast<int>(noteOnEvent->getVelocity() *
                                                                   (track->getVelocityRatio() *
                                                                    0.01)), 1, 127);
-            const auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
-            const auto pgm = sampler->getProgram(pgmIndex);
             const auto noteParameters = pgm->getNoteParameters(noteOnEvent->getNote());
 
             const std::shared_ptr<mpc::sampler::Sound> sound = sampler->getSound(noteParameters->getSoundIndex());
@@ -195,6 +197,7 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
                                         SeqUtil::ticksToFrames(*duration, sequencer->getTempo(),
                                                                audioServer->getSampleRate()) : -1;
 
+            pgm->registerPadPress(pgm->getPadIndexFromNote(noteOnEvent->getNote()));
             mpc.getDrum(drumIndex).mpcNoteOn(noteOnEvent->getNote(),
                                              newVelo,
                                              noteOnEvent->getVariationType(),
@@ -236,7 +239,8 @@ void EventHandler::handleDrumEvent(int timeStamp, const std::shared_ptr<mpc::seq
 
         if (noteOnEvent && noteOnEvent->isFinalized())
         {
-            frameSeq->enqueueEventAfterNFrames([this, noteOnEvent, visible, pad, track](int) {
+            frameSeq->enqueueEventAfterNFrames([this, noteOnEvent, visible, pad, track, pgm](int) {
+                                                    pgm->registerPadRelease(pgm->getPadIndexFromNote(noteOnEvent->getNote()));
 
                                                    if (visible)
                                                    {
