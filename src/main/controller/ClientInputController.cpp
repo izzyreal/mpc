@@ -123,7 +123,17 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
 {
     if (!a.label) return;
 
-    if (!mpc.getHardware2()->getButton(*a.label)->press())
+    auto button = mpc.getHardware2()->getButton(*a.label);
+
+    // The below check is necessary because the keyboard mapping routines in mpc::controls may return
+    // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
+    // input handling, we can remove this check.
+    if (!button)
+    {
+        return;
+    }
+
+    if (!button->press())
     {
         return;
     }
@@ -193,7 +203,18 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
     if (!a.label) return;
     std::printf("[logic] button %s released\n", a.label->c_str());
-    mpc.getHardware2()->getButton(*a.label)->release();
+
+    auto button = mpc.getHardware2()->getButton(*a.label);
+
+    // The below check is necessary because the keyboard mapping routines in mpc::controls may return
+    // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
+    // input handling, we can remove this check.
+    if (!button)
+    {
+        return;
+    }
+
+    button->release();
 
     const auto label = a.label.value();
     if (label == "erase") { command::ReleaseEraseCommand(mpc).execute(); }

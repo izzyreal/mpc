@@ -41,15 +41,16 @@ void RepeatPad::process(mpc::Mpc& mpc,
     auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
     auto note = assign16LevelsScreen->getNote();
 
-    for (auto& p : mpc.getHardware2()->getPads())
+    for (int padIndexWithBank = 0; padIndexWithBank < 64; ++padIndexWithBank)
     {
-        if (!p->isPressed()) continue;
+        if (!program->isPadRegisteredAsPressed(padIndexWithBank))
+        {
+            continue;
+        }
 
         if (!sixteenLevels && program)
         {
-            // The index should be with bank at the time the pad was pressed
-            auto padIndex = p->getIndex();
-            note = program->getNoteFromPad(padIndex);
+            note = program->getNoteFromPad(padIndexWithBank);
         }
 
         auto noteEvent = std::make_shared<NoteOnEvent>(note);
@@ -78,6 +79,9 @@ void RepeatPad::process(mpc::Mpc& mpc,
             mpc::Util::setSliderNoteVariationParameters(sliderNoteVariationContext, noteEvent);
         }
 
+        const int hardwarePadIndex = padIndexWithBank % 16;
+        const auto hardwarePad = mpc.getHardware2()->getPad(hardwarePadIndex);
+
         if (sixteenLevels)
         {
             Util::SixteenLevelsContext sixteenLevelsContext {
@@ -86,7 +90,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 assign16LevelsScreen->getOriginalKeyPad(),
                 assign16LevelsScreen->getNote(),
                 assign16LevelsScreen->getParameter(),
-                p->getIndex()
+                hardwarePadIndex
             };
 
             noteEvent->setVelocity(127);
@@ -95,8 +99,8 @@ void RepeatPad::process(mpc::Mpc& mpc,
         }
         else
         {
-            assert(p->getPressure().has_value() || p->getVelocity().has_value());
-            const int velocityToUseIfNotFullLevel = p->getPressure().value_or(p->getVelocity().value());
+            assert(hardwarePad->getPressure().has_value() || hardwarePad->getVelocity().has_value());
+            const int velocityToUseIfNotFullLevel = hardwarePad->getPressure().value_or(hardwarePad->getVelocity().value());
             noteEvent->setVelocity(fullLevel ? 127 : velocityToUseIfNotFullLevel);
         }
 
@@ -136,14 +140,14 @@ void RepeatPad::process(mpc::Mpc& mpc,
         }
 
         mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames(
-                [&mpc, track, note, noteEvent, tickPosition, sixteenLevels, program, p]
+                [&mpc, track, note, noteEvent, tickPosition, sixteenLevels, program, padIndexWithBank]
                 (const int bufferOffset){
             if (track->getBus() > 0)
             {
                 mpc.getDrum(track->getBus() - 1).mpcNoteOff(note, bufferOffset, tickPosition);
-                //const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
-
-                //padToNotify->notifyObservers(255);
+                // Implement ghost pad glow
+                //const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note)) : padIndexWithBank;
+                // Notify the pad of the note off/pad release
             }
 
             if (track->getDeviceIndex() > 0)
@@ -154,8 +158,8 @@ void RepeatPad::process(mpc::Mpc& mpc,
             }
         }, durationFrames - 1);
 
-        //const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
-
-        //padToNotify->notifyObservers(noteEvent->getVelocity());
+        //const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note)) : padIndexWithBank;
+        // Notify the pad of the note on/pad push, with the right velocity
     }
 }
+
