@@ -1,5 +1,6 @@
-#include "PushPlayStartCommand.h"
+#include "PushPlayCommand.h"
 #include "Mpc.hpp"
+#include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientInputControllerBase.h"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/ScreenGroups.h"
@@ -7,19 +8,33 @@
 
 namespace mpc::command {
 
-    PushPlayStartCommand::PushPlayStartCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    PushPlayCommand::PushPlayCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushPlayStartCommand::execute()
+    void PushPlayCommand::execute()
     {
-        if (mpc.getSequencer()->isPlaying())
+        auto sequencer = mpc.getSequencer();
+        auto hardware = mpc.getHardware2();
+        auto recButton = hardware->getButton("rec");
+        auto overdubButton = hardware->getButton("overdub");
+
+        if (sequencer->isPlaying())
         {
+            if (recButton->isPressed() && !sequencer->isOverdubbing())
+            {
+                sequencer->setOverdubbing(false);
+                sequencer->setRecording(true);
+            }
+            else if (overdubButton->isPressed() && !sequencer->isRecording())
+            {
+                sequencer->setOverdubbing(true);
+                sequencer->setRecording(false);
+            }
+
             return;
         }
 
         const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        const bool currentScreenAllowsPlayAndRecord = lcdgui::screengroups::isPlayAndRecordScreen(currentScreenName);
-
-        auto hardware = mpc.getHardware2();
+        const bool isPlayAndRecordScreen = lcdgui::screengroups::isPlayAndRecordScreen(currentScreenName);
 
         const auto recButtonIsPressedOrLocked = hardware->getButton("rec")->isPressed() ||
                                                 mpc.inputController->buttonLockTracker.isLocked("rec");
@@ -29,25 +44,24 @@ namespace mpc::command {
 
         if (recButtonIsPressedOrLocked)
         {
-            if (!currentScreenAllowsPlayAndRecord)
-            {
-                mpc.getLayeredScreen()->openScreen("sequencer");
-            }
-            
-            mpc.getSequencer()->recFromStart();
-        }
-        else if (overdubButtonIsPressedOrLocked)
-        {
-            if (!currentScreenAllowsPlayAndRecord)
+            if (!isPlayAndRecordScreen)
             {
                 mpc.getLayeredScreen()->openScreen("sequencer");
             }
 
-            mpc.getSequencer()->overdubFromStart();
+            sequencer->rec();
         }
-        else
+        else if (overdubButtonIsPressedOrLocked)
         {
-            if (hardware->getButton("shift")->isPressed())
+            if (!isPlayAndRecordScreen)
+            {
+                mpc.getLayeredScreen()->openScreen("sequencer");
+            }
+
+            sequencer->overdub();
+        }
+        else {
+            if (hardware->getButton("shift")->isPressed() && !mpc.getAudioMidiServices()->isBouncing())
             {
                 mpc.getLayeredScreen()->openScreen("vmpc-direct-to-disk-recorder");
             }
@@ -58,8 +72,8 @@ namespace mpc::command {
                     mpc.getLayeredScreen()->openScreen("sequencer");
                 }
 
-                mpc.getSequencer()->setSongModeEnabled(currentScreenName == "song");
-                mpc.getSequencer()->playFromStart();
+                sequencer->setSongModeEnabled(currentScreenName == "song");
+                sequencer->play();
             }
         }
 
@@ -70,5 +84,5 @@ namespace mpc::command {
         mpc.getHardware2()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
         mpc.getHardware2()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
     }
-
 }
+

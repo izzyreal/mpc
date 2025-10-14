@@ -87,7 +87,7 @@ namespace mpc::lcdgui
         virtual void rec() { command::PushRecCommand(mpc).execute(); }
         virtual void overDub() { command::PushOverdubCommand(mpc).execute(); }
         virtual void stop() { command::PushStopCommand(mpc).execute(); }
-        virtual void play() { command::PushPlayStartCommand(mpc).execute(); }
+        virtual void play() { command::PushPlayCommand(mpc).execute(); }
         virtual void playStart() { command::PushPlayStartCommand(mpc).execute(); }
         virtual void mainScreen() { command::PushMainScreenCommand(mpc).execute(); }
         virtual void tap() { command::PushTapCommand(mpc).execute(); }

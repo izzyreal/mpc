@@ -18,6 +18,7 @@
 #include "command/PushUndoSeqCommand.h"
 #include "command/PushEraseCommand.h"
 #include "command/PushMainScreenCommand.h"
+#include "command/PushPlayCommand.h"
 #include "command/PushPlayStartCommand.h"
 #include "command/SplitLeftCommand.h"
 #include "command/SplitRightCommand.h"

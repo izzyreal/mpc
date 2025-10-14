@@ -47,14 +47,14 @@ Mpc::Mpc()
 void Mpc::init()
 {
     std::vector<fs::path> requiredPaths {
-            paths->appDocumentsPath(),
-            paths->configPath(),
-            paths->storesPath(),
-            paths->defaultLocalVolumePath(),
-            paths->recordingsPath(),
-            paths->autoSavePath()
+        paths->appDocumentsPath(),
+        paths->configPath(),
+        paths->storesPath(),
+        paths->defaultLocalVolumePath(),
+        paths->recordingsPath(),
+        paths->autoSavePath()
     };
-
+    
     for (auto& p : requiredPaths)
     {
         if (!fs::exists(p))
@@ -62,14 +62,14 @@ void Mpc::init()
             fs::create_directories(p);
         }
     }
-
+    
     const std::vector<std::string> demo_files{ "TEST1/BASIC_KIT.ALL", "TEST1/BASIC_KIT.APS", "TEST1/BASIC_KIT.MID", "TEST1/BASIC_KIT.PGM",
-                                               "TEST1/HAT1.SND", "TEST1/KICK1.SND", "TEST1/SNARE4.SND", "TEST2/2PEOPLE2.SND", "TEST2/2PEOPLE3.SND", "TEST2/CLIMAX.SND",
-                                               "TEST2/FRUTZLE.ALL", "TEST2/FRUTZLE.APS", "TEST2/FRUTZLE.MID", "TEST2/FRUTZLE.PGM", "TEST2/KICKHAT3.SND",
-                                               "TEST2/KICKHAT5.SND", "TEST2/KICK_C_1.SND", "TEST2/KICK_C_2.SND", "TEST2/MOOI.SND", "TEST2/OBOE.SND",
-                                               "TEST2/PIAMA2.SND", "TEST2/PIAMA3.SND", "TEST2/RIDE.SND", "TEST2/RIDE1.SND", "TEST2/SOLOBASS.SND",
-                                               "TEST2/WOOSH.SND" };
-
+        "TEST1/HAT1.SND", "TEST1/KICK1.SND", "TEST1/SNARE4.SND", "TEST2/2PEOPLE2.SND", "TEST2/2PEOPLE3.SND", "TEST2/CLIMAX.SND",
+        "TEST2/FRUTZLE.ALL", "TEST2/FRUTZLE.APS", "TEST2/FRUTZLE.MID", "TEST2/FRUTZLE.PGM", "TEST2/KICKHAT3.SND",
+        "TEST2/KICKHAT5.SND", "TEST2/KICK_C_1.SND", "TEST2/KICK_C_2.SND", "TEST2/MOOI.SND", "TEST2/OBOE.SND",
+        "TEST2/PIAMA2.SND", "TEST2/PIAMA3.SND", "TEST2/RIDE.SND", "TEST2/RIDE1.SND", "TEST2/SOLOBASS.SND",
+        "TEST2/WOOSH.SND" };
+    
     if (!fs::exists(paths->demoDataPath()))
     {
         fs::create_directories(paths->demoDataPath() / "TEST1");
@@ -80,86 +80,85 @@ void Mpc::init()
             set_file_data(paths->demoDataPath() / demo_file, data);
         }
     }
-
+    
     fs::create_directories(paths->midiControlPresetsPath());
-
+    
     const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp" };
-
+    
     for (auto& preset : factory_midi_control_presets)
     {
         const auto data = mpc::MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
-
+        
         if (!fs::exists(paths->midiControlPresetsPath() / preset) || fs::file_size(paths->midiControlPresetsPath() / preset) != data.size())
         {
             set_file_data(paths->midiControlPresetsPath() / preset, data);
         }
     }
-
+    
     mpc::Logger::l.setPath(paths->logFilePath().string());
-
+    
     padAndButtonKeyboard = std::make_shared<mpc::inputlogic::PadAndButtonKeyboard>(*this);
-
-	diskController = std::make_unique<mpc::disk::DiskController>(*this);
-
+    
+    diskController = std::make_unique<mpc::disk::DiskController>(*this);
+    
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
-
+    
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
-	MLOG("Sequencer created");
-
-	controls = std::make_shared<controls::Controls>(*this);
-
+    MLOG("Sequencer created");
+    
+    controls = std::make_shared<controls::Controls>(*this);
+    
     hardware2 = std::make_shared<hardware2::Hardware2>(inputMapper, controls->getKbMapping().lock());
-
-	sampler = std::make_shared<mpc::sampler::Sampler>(*this);
-	MLOG("Sampler created");
-
+    
+    sampler = std::make_shared<mpc::sampler::Sampler>(*this);
+    MLOG("Sampler created");
+    
     midiInputs = { new mpc::audiomidi::MidiInput(*this, 0), new mpc::audiomidi::MidiInput(*this, 1) };
-
+    
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
-
+    
     screens = std::make_shared<Screens>(*this);
-
+    
     layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
-
+    
     /*
-    * AudioMidiServices requires sequencer to exist.
-    */
-	audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
-	MLOG("AudioMidiServices created");
-
+     * AudioMidiServices requires sequencer to exist.
+     */
+    audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
+    MLOG("AudioMidiServices created");
+    
     sequencer->init();
-	MLOG("Sequencer initialized");
-
+    MLOG("Sequencer initialized");
+    
     audioMidiServices->start();
     MLOG("AudioMidiServices started");
-
+    
     // This needs to happen before the sampler initializes initMasterPadAssign
     // which we do in Sampler::init()
     mpc::nvram::NvRam::loadVmpcSettings(*this);
-
+    
     sampler->init();
-	MLOG("Sampler initialized");
-
-	eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
-	MLOG("Eeventhandler created");
-
-	mpc::nvram::NvRam::loadUserScreenValues(*this);
-
+    MLOG("Sampler initialized");
+    
+    eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
+    MLOG("Eeventhandler created");
+    
+    mpc::nvram::NvRam::loadUserScreenValues(*this);
+    
     // We fetch all screens once so they're all cached in Screens,
     // avoiding memory allocations on the audio thread.
-	for (auto& screenName : screenNames)
+    for (auto& screenName : screenNames)
         screens->get<ScreenComponent>(screenName);
-
-  mpc::nvram::MidiControlPersistence::restoreLastState(*this);
-
-  layeredScreen->openScreen("sequencer");
-
-  midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
-
-	MLOG("Mpc is ready");
-
+    
+    mpc::nvram::MidiControlPersistence::restoreLastState(*this);
+    
+    midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
+    
+    MLOG("Mpc is ready");
+    
     inputController = std::make_shared<mpc::controller::ClientInputController>(*this);
     mpc::inputsystem::Initializer::init(inputMapper, inputController, hardware2->getButtonLabels());
+    layeredScreen->openScreen("sequencer");
 }
 
 std::shared_ptr<controls::Controls> Mpc::getControls()

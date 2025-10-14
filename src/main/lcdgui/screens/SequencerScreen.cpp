@@ -897,31 +897,23 @@ void SequencerScreen::displayNextSq()
 	findField("nextsq")->Hide(noNextSq);
 
 	if (noNextSq)
+    {
 		return;
+    }
 
 	findField("nextsq")->setTextPadded(sequencer.lock()->getNextSq() + 1);
 }
 
 void SequencerScreen::play()
 {
-    if (mpc.getHardware2()->getButton("play")->isPressed())
-    {
-        return;
-    }
-
-	displayPunchWhileRecording();
-
 	ScreenComponent::play();
+	displayPunchWhileRecording();
 }
 
 void SequencerScreen::playStart()
 {
-	if (sequencer.lock()->isPlaying())
-		return;
-
-	displayPunchWhileRecording();
-
 	ScreenComponent::playStart();
+	displayPunchWhileRecording();
 }
 
 void SequencerScreen::stop()

@@ -19,7 +19,8 @@ namespace mpc::command {
 
         mpc.inputController->unlockNoteRepeat();
 
-        if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 || mpc.getHardware2()->getButton("shift")->isPressed()))
+        if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
+                                  mpc.getHardware2()->getButton("shift")->isPressed()))
         {
             ams->stopBouncingEarly();
         }
@@ -38,5 +39,5 @@ namespace mpc::command {
         mpc.getHardware2()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
         mpc.getHardware2()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
     }
-
 }
+
