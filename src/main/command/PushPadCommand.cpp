@@ -1,7 +1,6 @@
 #include "PushPadCommand.h"
 
 #include "audiomidi/EventHandler.hpp"
-#include "controls/GenerateNoteOnContext.h"
 #include "controls/PushPadContext.h"
 #include "controls/PushPadScreenUpdateContext.h"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
@@ -56,6 +55,8 @@ void PushPadCommand::execute()
 
     const auto note = ctx.track->getBus() > 0 ? ctx.program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
+    generateNoteOn(ctx, note, velo, padIndexWithBank);
+
     PushPadScreenUpdateContext padPushScreenUpdateCtx {
         ctx.currentScreenName,
         ctx.isSixteenLevelsEnabled,
@@ -68,8 +69,6 @@ void PushPadCommand::execute()
     };
 
     PushPadScreenUpdateCommand(padPushScreenUpdateCtx, note, padIndexWithBank).execute();
-
-    generateNoteOn(ctx, note, velo, padIndexWithBank);
 }
 
 void PushPadCommand::generateNoteOn(const PushPadContext &ctx, const int note, const int velo, const int padIndexWithBank)
