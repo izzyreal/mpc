@@ -12,14 +12,13 @@ namespace mpc {
 
 namespace mpc::controller {
 
-/* Controller for input going into the client, i.e. the virtualized MPC2000XL */
 class ClientInputController : public ClientInputControllerBase {
 public:
-    explicit ClientInputController(mpc::Mpc&);
+    explicit ClientInputController(mpc::Mpc&, const fs::path keyboardMappingConfigDirectory);
     void handleAction(const mpc::inputlogic::ClientInput& action) override;
 
 private:
-    mpc::Mpc &mpc;
+    mpc::Mpc& mpc;
 
     void handlePadPress(const mpc::inputlogic::ClientInput& a);
     void handlePadAftertouch(const mpc::inputlogic::ClientInput& a);
@@ -29,7 +28,7 @@ private:
     void handlePot(const mpc::inputlogic::ClientInput& a);
     void handleButtonPress(const mpc::inputlogic::ClientInput& a);
     void handleButtonRelease(const mpc::inputlogic::ClientInput& a);
-    void handleButtonDoublePress(const mpc::inputlogic::ClientInput&);
+    void handleButtonDoublePress(const mpc::inputlogic::ClientInput& a);
 };
 
 } // namespace mpc::controller

@@ -128,6 +128,11 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         const auto vmpcKeyCode = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
         const auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(vmpcKeyCode);
 
+        if (label.empty())
+        {
+            return std::nullopt;
+        }
+        
         clientEvent.label = label;
 
         if (label.substr(0, 4) == "pad-")

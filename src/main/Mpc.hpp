@@ -16,8 +16,6 @@
 #include <string>
 #include <memory>
 
-#include "inputlogic/ClientInputMapper.h"
-
 namespace mpc::engine {
     class Drum;
     class PreviewSoundPlayer;
@@ -32,6 +30,7 @@ namespace mpc::controller {
 }
 
 namespace mpc::inputlogic {
+    struct HostInputEvent;
     class PadAndButtonKeyboard;
 }
 
@@ -112,8 +111,9 @@ namespace mpc {
         bool isPluginModeEnabled();
 
         std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> padAndButtonKeyboard;
-        mpc::inputlogic::ClientInputMapper inputMapper;
         std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController;
+
+        void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent);
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
