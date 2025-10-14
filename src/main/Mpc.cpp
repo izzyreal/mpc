@@ -28,7 +28,6 @@
 
 #include "MpcResourceUtil.hpp"
 #include "inputlogic/PadAndButtonKeyboard.hpp"
-#include "inputsystem/Initializer.h"
 #include "controller/ClientInputController.h"
 
 #include <string>
@@ -104,9 +103,9 @@ void Mpc::init()
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
     MLOG("Sequencer created");
 
-    inputController = std::make_shared<mpc::controller::ClientInputController>(*this);
+    inputController = std::make_shared<mpc::controller::ClientInputController>(*this, paths->configPath());
     
-    hardware2 = std::make_shared<hardware2::Hardware2>(inputMapper, inputController->getKbMapping());
+    hardware2 = std::make_shared<hardware2::Hardware2>();
     
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
     MLOG("Sampler created");
@@ -154,13 +153,17 @@ void Mpc::init()
     
     MLOG("Mpc is ready");
     
-    mpc::inputsystem::Initializer::init(inputMapper, inputController, hardware2->getButtonLabels());
     layeredScreen->openScreen("sequencer");
 }
 
 std::shared_ptr<hardware2::Hardware2> Mpc::getHardware2()
 {
 	return hardware2;
+}
+
+void Mpc::dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
+{
+    inputController->dispatchHostInput(hostEvent);
 }
 
 std::shared_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()

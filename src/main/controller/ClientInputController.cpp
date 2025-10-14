@@ -1,5 +1,4 @@
 #include "controller/ClientInputController.h"
-
 #include "command/ReleasePadCommand.h"
 #include "inputlogic/ClientInput.h"
 #include "controller/PadContextFactory.h"
@@ -8,10 +7,10 @@
 #include "hardware2/Hardware2.h"
 
 using namespace mpc::controller;
-using namespace mpc::inputlogic; 
+using namespace mpc::inputlogic;
 
-ClientInputController::ClientInputController(mpc::Mpc &mpcToUse) :
-    ClientInputControllerBase(mpcToUse.paths->configPath()), mpc(mpcToUse)
+ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path keyboardMappingConfigDirectory)
+    : ClientInputControllerBase(mpcToUse.paths->configPath()), mpc(mpcToUse)
 {
 }
 
@@ -19,33 +18,47 @@ void ClientInputController::handleAction(const ClientInput& action)
 {
     switch (action.type) {
         case ClientInput::Type::PadPress:
-            return handlePadPress(action);
+            handlePadPress(action);
+            break;
         case ClientInput::Type::PadAftertouch:
-            return handlePadAftertouch(action);
+            handlePadAftertouch(action);
+            break;
         case ClientInput::Type::PadRelease:
-            return handlePadRelease(action);
+            handlePadRelease(action);
+            break;
         case ClientInput::Type::DataWheelTurn:
-            return handleDataWheel(action);
+            handleDataWheel(action);
+            break;
         case ClientInput::Type::SliderMove:
-            return handleSlider(action);
+            handleSlider(action);
+            break;
         case ClientInput::Type::PotMove:
-            return handlePot(action);
+            handlePot(action);
+            break;
         case ClientInput::Type::ButtonPress:
-            return handleButtonPress(action);
+            handleButtonPress(action);
+            break;
         case ClientInput::Type::ButtonRelease:
-            return handleButtonRelease(action);
+            handleButtonRelease(action);
+            break;
         case ClientInput::Type::ButtonDoublePress:
-            return handleButtonDoublePress(action);
+            handleButtonDoublePress(action);
+            break;
         default:
-            return;
+            break;
     }
 }
 
 void ClientInputController::handlePadPress(const ClientInput& a)
 {
-    if (!a.index) return;
-    assert(a.value.has_value());
+    if (!a.index || !a.value) return;
     const auto num = *a.index;
+
+    if (!mpc.getHardware2()->getPad(num)->pressWithVelocity(*a.value))
+    {
+        return;
+    }
+
     auto padIndexWithBank = num + (mpc.getBank() * 16);
     auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, padIndexWithBank, *a.value, mpc.getLayeredScreen()->getCurrentScreenName());
     command::PushPadCommand(ctx, padIndexWithBank, *a.value).execute();
@@ -55,6 +68,7 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
 {
     if (!a.index) return;
     const auto num = *a.index;
+    mpc.getHardware2()->getPad(num)->release();
     auto padIndexWithBank = num + (mpc.getBank() * 16);
     auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, mpc.getLayeredScreen()->getCurrentScreenName());
     command::ReleasePadCommand(ctx).execute();
@@ -65,15 +79,14 @@ void ClientInputController::handlePadAftertouch(const ClientInput& a)
     if (!a.index || !a.value) return;
     const auto padIndex = *a.index;
     const auto aftertouchPressure = *a.value;
-    std::printf("[logic] pad %d aftertouch pressure %d\n", padIndex, aftertouchPressure);
     mpc.getHardware2()->getPad(padIndex)->aftertouch(aftertouchPressure);
 }
 
 void ClientInputController::handleDataWheel(const ClientInput& a)
 {
-    assert(a.value.has_value());
+    if (!a.value) return;
     const auto steps = *a.value;
-    std::printf("[logic] data wheel turned (%d)\n", steps);
+    mpc.getHardware2()->getDataWheel()->turn(steps);
     mpc.getActiveControls()->turnWheel(steps);
 }
 
@@ -81,241 +94,134 @@ void ClientInputController::handleSlider(const ClientInput& a)
 {
     if (!a.value) return;
     const auto newSliderValue = *a.value;
-    std::printf("[logic] slider moved to %d\n", newSliderValue);
+    mpc.getHardware2()->getSlider()->moveTo(static_cast<float>(newSliderValue));
     mpc.getActiveControls()->setSlider(newSliderValue);
 }
 
 void ClientInputController::handlePot(const ClientInput& a)
 {
-    std::printf("[logic] pot moved to %d\n", a.value.value_or(0));
+    if (!a.label)
+    {
+        printf("ClientInputController::handlePot invoked without label\n");
+        return;
+    }
+
+    if (!a.value) return;
+    const auto newPotValue = *a.value;
+
+    if (a.label->find("rec") != std::string::npos)
+    {
+        mpc.getHardware2()->getRecPot()->moveTo(newPotValue);
+    }
+    else if (a.label->find("main") != std::string::npos)
+    {
+        mpc.getHardware2()->getVolPot()->moveTo(newPotValue);
+    }
 }
 
 void ClientInputController::handleButtonPress(const ClientInput& a)
 {
     if (!a.label) return;
-    std::printf("[logic] button %s pressed\n", a.label->c_str());
+
+    if (!mpc.getHardware2()->getButton(*a.label)->press())
+    {
+        return;
+    }
 
     auto label = a.label.value();
     auto screen = mpc.getActiveControls();
 
-    if (label == "left") {
-        screen->left();
-    }
-    else if (label == "right") {
-        screen->right();
-    }
-    else if (label == "up") {
-        screen->up();
-    }
-    else if (label == "down") {
-        screen->down();
-    }
-    else if (label == "rec") {
-        screen->rec();
-    }
-    else if (label == "overdub") {
-        screen->overDub();
-    }
-    else if (label == "stop") {
-        screen->stop();
-    }
-    else if (label == "play") {
-        screen->play();
-    }
-    else if (label == "play-start") {
-        screen->playStart();
-    }
-    else if (label == "main-screen") {
-        screen->mainScreen();
-    }
+    if (label == "left") { screen->left(); }
+    else if (label == "right") { screen->right(); }
+    else if (label == "up") { screen->up(); }
+    else if (label == "down") { screen->down(); }
+    else if (label == "rec") { screen->rec(); }
+    else if (label == "overdub") { screen->overDub(); }
+    else if (label == "stop") { screen->stop(); }
+    else if (label == "play") { screen->play(); }
+    else if (label == "play-start") { screen->playStart(); }
+    else if (label == "main-screen") { screen->mainScreen(); }
     else if (label == "open-window") {
         auto ls = mpc.getLayeredScreen();
         auto currentScreenName = ls->getCurrentScreenName();
-
         const auto layerIndex = ls->getFocusedLayerIndex();
-
         screen->openWindow();
-
         if (currentScreenName != ls->getCurrentScreenName() &&
-                currentScreenName != "popup" &&
-                ls->getFocusedLayerIndex() > layerIndex)
-        {
+            currentScreenName != "popup" &&
+            ls->getFocusedLayerIndex() > layerIndex) {
             ls->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
         }
     }
-    else if (label == "prev-step-event") {
-        screen->prevStepEvent();
-    }
-    else if (label == "next-step-event") {
-        screen->nextStepEvent();
-    }
-    else if (label == "go-to") {
-        screen->goTo();
-    }
-    else if (label == "prev-bar-start") {
-        screen->prevBarStart();
-    }
-    else if (label == "next-bar-end") {
-        screen->nextBarEnd();
-    }
-    else if (label == "tap")
-    {
-        screen->tap();
-    }
-    else if (label == "next-seq") {
-        screen->nextSeq();
-    }
-    else if (label == "track-mute") {
-        screen->trackMute();
-    }
-    else if (label == "full-level") {
-        screen->fullLevel();
-    }
-    else if (label == "sixteen-levels") {
-        screen->sixteenLevels();
-    }
-    else if (label == "f1") {
-        screen->function(0);
-    }
-    else if (label == "f2") {
-        screen->function(1);
-    }
-    else if (label == "f3") {
-        screen->function(2);
-    }
-    else if (label == "f4") {
-        screen->function(3);
-    }
-    else if (label == "f5") {
-        screen->function(4);
-    }
-    else if (label == "f6") {
-        screen->function(5);
-    }
-    else if (label == "shift")
-    {
-        screen->shift();
-    }
-    else if (label == "enter") {
-        screen->pressEnter();
-    }
-    else if (label == "undo-seq") {
-        screen->undoSeq();
-    }
-    else if (label == "erase") {
-        screen->erase();
-    }
-    else if (label == "after") {
-        screen->after();
-    }
-    else if (label == "bank-a") {
-        screen->bank(0);
-    }
-    else if (label == "bank-b") {
-        screen->bank(1);
-    }
-    else if (label == "bank-c") {
-        screen->bank(2);
-    }
-    else if (label == "bank-d") {
-        screen->bank(3);
-    }
-    else if (label == "0" || label == "0_extra") {
-        screen->numpad(0);
-    }
-    else if (label == "1" || label == "1_extra") {
-        screen->numpad(1);
-    }
-    else if (label == "2" || label == "2_extra") {
-        screen->numpad(2);
-    }
-    else if (label == "3" || label == "3_extra") {
-        screen->numpad(3);
-    }
-    else if (label == "4" || label == "4_extra") {
-        screen->numpad(4);
-    }
-    else if (label == "5" || label == "5_extra") {
-        screen->numpad(5);
-    }
-    else if (label == "6" || label == "6_extra") {
-        screen->numpad(6);
-    }
-    else if (label == "7" || label == "7_extra") {
-        screen->numpad(7);
-    }
-    else if (label == "8" || label == "8_extra") {
-        screen->numpad(8);
-    }
-    else if (label == "9" || label == "9_extra") {
-        screen->numpad(9);
-    }
+    else if (label == "prev-step-event") { screen->prevStepEvent(); }
+    else if (label == "next-step-event") { screen->nextStepEvent(); }
+    else if (label == "go-to") { screen->goTo(); }
+    else if (label == "prev-bar-start") { screen->prevBarStart(); }
+    else if (label == "next-bar-end") { screen->nextBarEnd(); }
+    else if (label == "tap") { screen->tap(); }
+    else if (label == "next-seq") { screen->nextSeq(); }
+    else if (label == "track-mute") { screen->trackMute(); }
+    else if (label == "full-level") { screen->fullLevel(); }
+    else if (label == "sixteen-levels") { screen->sixteenLevels(); }
+    else if (label == "f1") { screen->function(0); }
+    else if (label == "f2") { screen->function(1); }
+    else if (label == "f3") { screen->function(2); }
+    else if (label == "f4") { screen->function(3); }
+    else if (label == "f5") { screen->function(4); }
+    else if (label == "f6") { screen->function(5); }
+    else if (label == "shift") { screen->shift(); }
+    else if (label == "enter") { screen->pressEnter(); }
+    else if (label == "undo-seq") { screen->undoSeq(); }
+    else if (label == "erase") { screen->erase(); }
+    else if (label == "after") { screen->after(); }
+    else if (label == "bank-a") { screen->bank(0); }
+    else if (label == "bank-b") { screen->bank(1); }
+    else if (label == "bank-c") { screen->bank(2); }
+    else if (label == "bank-d") { screen->bank(3); }
+    else if (label == "0" || label == "0_extra") { screen->numpad(0); }
+    else if (label == "1" || label == "1_extra") { screen->numpad(1); }
+    else if (label == "2" || label == "2_extra") { screen->numpad(2); }
+    else if (label == "3" || label == "3_extra") { screen->numpad(3); }
+    else if (label == "4" || label == "4_extra") { screen->numpad(4); }
+    else if (label == "5" || label == "5_extra") { screen->numpad(5); }
+    else if (label == "6" || label == "6_extra") { screen->numpad(6); }
+    else if (label == "7" || label == "7_extra") { screen->numpad(7); }
+    else if (label == "8" || label == "8_extra") { screen->numpad(8); }
+    else if (label == "9" || label == "9_extra") { screen->numpad(9); }
 }
 
 void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
-    if (!a.label)
-    {
-        return;
-    }
+    if (!a.label) return;
+    std::printf("[logic] button %s released\n", a.label->c_str());
+    mpc.getHardware2()->getButton(*a.label)->release();
 
     const auto label = a.label.value();
-
-    std::printf("[logic] button %s released\n", a.label->c_str());
-
-	if (label == "erase") {
-		command::ReleaseEraseCommand(mpc).execute();
-	}
-	else if (label == "f1") {
-		command::ReleaseFunctionCommand(mpc, 0).execute();
-	}
-	else if (label == "f3") {
-		command::ReleaseFunctionCommand(mpc, 2).execute();
-	}
-	else if (label == "f4") {
-		command::ReleaseFunctionCommand(mpc, 3).execute();
-	}
-	else if (label == "f5") {
-		command::ReleaseFunctionCommand(mpc, 4).execute();
-	}
-	else if (label == "f6") {
-		command::ReleaseFunctionCommand(mpc, 5).execute();
-	}
-	else if (label == "rec") {
-		command::ReleaseRecCommand(mpc).execute();
-	}
-	else if (label == "overdub") {
-		command::ReleaseOverdubCommand(mpc).execute();
-	}
-	else if (label == "tap") {
-		command::ReleaseTapCommand(mpc).execute();
-	}
+    if (label == "erase") { command::ReleaseEraseCommand(mpc).execute(); }
+    else if (label == "f1") { command::ReleaseFunctionCommand(mpc, 0).execute(); }
+    else if (label == "f3") { command::ReleaseFunctionCommand(mpc, 2).execute(); }
+    else if (label == "f4") { command::ReleaseFunctionCommand(mpc, 3).execute(); }
+    else if (label == "f5") { command::ReleaseFunctionCommand(mpc, 4).execute(); }
+    else if (label == "f6") { command::ReleaseFunctionCommand(mpc, 5).execute(); }
+    else if (label == "rec") { command::ReleaseRecCommand(mpc).execute(); }
+    else if (label == "overdub") { command::ReleaseOverdubCommand(mpc).execute(); }
+    else if (label == "tap") { command::ReleaseTapCommand(mpc).execute(); }
 }
 
-void ClientInputController::handleButtonDoublePress(const mpc::inputlogic::ClientInput& input)
+void ClientInputController::handleButtonDoublePress(const ClientInput& a)
 {
-    if (!input.label.has_value())
-    {
-        return;
-    }
+    if (!a.label) return;
+    mpc.getHardware2()->getButton(*a.label)->doublePress();
 
-    auto label = *input.label;
-
-    if (label == "rec")
-    {
+    auto label = *a.label;
+    if (label == "rec") {
         buttonLockTracker.toggle("rec");
-        
-        if (buttonLockTracker.isLocked("rec"))
-        {
+        if (buttonLockTracker.isLocked("rec")) {
             buttonLockTracker.unlock("overdub");
         }
     }
-    else if (label == "overdub")
-    {
+    else if (label == "overdub") {
         buttonLockTracker.toggle("overdub");
-        
-        if (buttonLockTracker.isLocked("overdub"))
-        {
+        if (buttonLockTracker.isLocked("overdub")) {
             buttonLockTracker.unlock("rec");
         }
     }

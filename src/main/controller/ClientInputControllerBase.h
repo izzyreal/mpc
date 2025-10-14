@@ -1,5 +1,7 @@
 #pragma once
 
+#include "inputlogic/HostInputEvent.h"
+#include "inputlogic/HostToClientTranslator.h"
 #include "inputlogic/ClientInput.h"
 
 #include "controller/ButtonLockTracker.h"
@@ -16,6 +18,20 @@ class ClientInputControllerBase {
         {
             kbMapping = std::make_shared<mpc::controls::KbMapping>(keyboardMappingConfigDirectory);
         }
+
+        void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
+        {
+            const auto clientInput = mpc::inputlogic::HostToClientTranslator::translate(hostEvent, kbMapping);
+
+            if (!clientInput.has_value())
+            {
+                printf("empty ClientInput\n");
+                return;
+            }
+
+            handleAction(*clientInput);
+        }
+
 
         virtual ~ClientInputControllerBase() = default;
         virtual void handleAction(const mpc::inputlogic::ClientInput& action) = 0;
