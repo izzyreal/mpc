@@ -37,16 +37,13 @@ namespace mpc::engine {
 
 namespace mpc::controls {
 
-    class Controls;
-
     struct PushPadContext {
         std::string currentScreenName;
         bool isSoundScreen;
 
         bool isFullLevelEnabled;
         bool isSixteenLevelsEnabled;
-        bool isTapPressed;
-        bool isNoteRepeatLocked;
+        bool isNoteRepeatLockedOrPressed;
         bool isErasePressed;
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
@@ -76,7 +73,6 @@ namespace mpc::controls {
         std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::audiomidi::AudioMidiServices> audioMidiServices;
-        std::shared_ptr<mpc::controls::Controls> controls;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen;
         std::shared_ptr<mpc::lcdgui::screens::window::Assign16LevelsScreen> assign16LevelsScreen;

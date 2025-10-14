@@ -94,21 +94,34 @@ void SequencerScreen::open()
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	if (sequencer.lock()->isSecondSequenceEnabled())
+    {
 		findBackground()->setName("sequencer-2nd");
+    }
 	else if (punchScreen->on && !sequencer.lock()->isRecordingOrOverdubbing())
+    {
 		findBackground()->setName("sequencer-punch-active");
+    }
 	else
+    {
 		findBackground()->setName("sequencer");
+    }
 
 	if (sequencer.lock()->getNextSq() != -1)
-		ls->setFocus("nextsq");
+    {
+        ls->setFocus("nextsq");
+    }
     
+    const bool sequencerIsRecordingOrOverdubbing = sequencer.lock()->isRecordingOrOverdubbing();
     
-    const auto footerIsInvisible = !mpc.getControls()->isNoteRepeatLocked() && !(mpc.getHardware2()->getButton("erase")->isPressed() && sequencer.lock()->isRecordingOrOverdubbing());
+    const auto footerIsInvisible = !mpc.inputController->isNoteRepeatLocked() &&
+                                   !(mpc.getHardware2()->getButton("erase")->isPressed() &&
+                                   sequencerIsRecordingOrOverdubbing);
     
     findChild("footer-label")->Hide(footerIsInvisible);
 
-    findChild("function-keys")->Hide(!footerIsInvisible || punchScreen->on || (mpc.getHardware2()->getButton("erase")->isPressed() && sequencer.lock()->isRecordingOrOverdubbing()));
+    findChild("function-keys")->Hide(!footerIsInvisible ||
+                                     punchScreen->on ||
+                                     (mpc.getHardware2()->getButton("erase")->isPressed() && sequencerIsRecordingOrOverdubbing));
 }
 
 void SequencerScreen::erase()
@@ -121,16 +134,12 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
-    if (mpc.getHardware2()->getButton("tap")->isPressed())
-    {
-        return;
-    }
+    ScreenComponent::tap();
 
     if (sequencer.lock()->isPlaying())
     {
-        if (mpc.getControls()->isNoteRepeatLocked())
+        if (mpc.inputController->isNoteRepeatLocked())
         {
-            mpc.getControls()->setNoteRepeatLocked(false);
             findChild("function-keys")->Hide(false);
             findChild("footer-label")->Hide(true);
         }
@@ -142,26 +151,9 @@ void SequencerScreen::tap()
         }
     }
     
-    ScreenComponent::tap();
 }
 
-void SequencerScreen::shift()
-{
-    if (mpc.getHardware2()->getButton("tap")->isPressed())
-    {
-        mpc.getControls()->setNoteRepeatLocked(true);
-    }
-
-    ScreenComponent::shift();
-}
-
-void SequencerScreen::releaseErase()
-{
-    findChild("footer-label")->Hide(true);
-    findChild("function-keys")->Hide(false);
-}
-
-void SequencerScreen::releaseTap()
+void SequencerScreen::hideFooterLabelAndShowFunctionKeys()
 {
     findChild("footer-label")->Hide(true);
     findChild("function-keys")->Hide(false);
@@ -934,6 +926,8 @@ void SequencerScreen::playStart()
 
 void SequencerScreen::stop()
 {
+	ScreenComponent::stop();
+
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	if (punchScreen->on)
@@ -948,15 +942,7 @@ void SequencerScreen::stop()
 
 		time0->Hide(true);
 		time1->Hide(true);
-
 	}
-
-    if (mpc.getControls()->isNoteRepeatLocked())
-    {
-        releaseTap();
-    }
-    
-	ScreenComponent::stop();
 }
 
 void SequencerScreen::rec()

@@ -10,12 +10,13 @@ namespace mpc::command {
 
     PushShiftCommand::PushShiftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushShiftCommand::execute() {
+    void PushShiftCommand::execute()
+    {
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer" &&
             mpc.getHardware2()->getButton("tap")->isPressed() &&
             mpc.getSequencer()->isPlaying())
         {
-            mpc.inputController->buttonLockTracker.lock("tap");
+            mpc.inputController->lockNoteRepeat();
         }
 
         auto field = mpc.getLayeredScreen()->getFocusedField();
@@ -29,10 +30,11 @@ namespace mpc::command {
 
         const auto split = field->getActiveSplit();
 
-        if (split != -1) {
+        if (split != -1)
+        {
             field->setSplit(true);
             field->setActiveSplit(split);
         }
     }
-
 }
+

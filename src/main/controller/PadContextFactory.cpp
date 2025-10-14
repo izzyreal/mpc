@@ -1,5 +1,6 @@
 #include "controller/PadContextFactory.h"
 
+#include "controller/ClientInputControllerBase.h"
 #include "lcdgui/ScreenGroups.h"
 #include "audiomidi/AudioMidiServices.hpp"
 
@@ -11,6 +12,7 @@
 
 #include "Mpc.hpp"
 #include "sampler/Pad.hpp"
+#include "sequencer/SeqUtil.hpp"
 
 using namespace mpc::controller;
 using namespace mpc::controls;
@@ -32,11 +34,11 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
-    const bool isTapPressed = mpc.getHardware2()->getButton("tap")->isPressed();
-    const bool isNoteRepeatLocked = mpc.getControls()->isNoteRepeatLocked();
+    const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
+                                             mpc.getHardware2()->getButton("tap")->isPressed();
     const bool isErasePressed = mpc.getHardware2()->getButton("erase")->isPressed();
     const bool isStepRecording = mpc.getControls()->isStepRecording();
-    const bool isRecMainWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
+    const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(mpc);
 
     auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct");
     auto assign16LevelsScreen = mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>("assign-16-levels");
@@ -57,8 +59,7 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
         isSoundScreen,
         isFullLevelEnabled,
         isSixteenLevelsEnabled,
-        isTapPressed,
-        isNoteRepeatLocked,
+        isNoteRepeatLockedOrPressed,
         isErasePressed,
         isStepRecording,
         isRecMainWithoutPlaying,
@@ -81,7 +82,6 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
         mpc.getSampler(),
         mpc.getSequencer(),
         mpc.getAudioMidiServices(),
-        mpc.getControls(),
         mpc.getLayeredScreen(),
         timingCorrectScreen,
         assign16LevelsScreen,
@@ -154,7 +154,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         mpc.getControls()->isStepRecording(),
         isAnyProgramPadRegisteredAsPressed,
         mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
-        mpc.getControls()->isRecMainWithoutPlaying(),
+        sequencer::SeqUtil::isRecMainWithoutPlaying(mpc),
         mpc.getSequencer()->getTickPosition(),
         stepEditOptionsScreen->getTcValuePercentage(),
         timingCorrectScreen->getNoteValueLengthInTicks(),

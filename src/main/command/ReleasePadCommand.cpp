@@ -9,7 +9,7 @@ using namespace mpc::command;
 using namespace mpc::controls;
 
 ReleasePadCommand::ReleasePadCommand(PadReleaseContext& ctx)
-: ctx(ctx) {}
+    : ctx(ctx) {}
 
 void ReleasePadCommand::execute()
 {

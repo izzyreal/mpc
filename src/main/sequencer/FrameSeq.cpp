@@ -4,6 +4,7 @@
 
 #include "audiomidi/AudioMidiServices.hpp"
 
+#include "controller/ClientInputControllerBase.h"
 #include "hardware2/Hardware2.h"
 
 #include "sequencer/Song.hpp"
@@ -21,6 +22,7 @@
 #include "lcdgui/screens/SequencerScreen.hpp"
 
 #include "Util.hpp"
+#include "sequencer/SeqUtil.hpp"
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 #include <limits>
@@ -135,7 +137,7 @@ void FrameSeq::triggerClickIfNeeded()
         if (!isStepEditor &&
             !countMetronomeScreen->getInPlay() &&
             !sequencer->isCountingIn() &&
-            !mpc.getControls()->isRecMainWithoutPlaying())
+            !SeqUtil::isRecMainWithoutPlaying(mpc))
         {
             return;
         }
@@ -147,7 +149,7 @@ void FrameSeq::triggerClickIfNeeded()
     const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
     const auto relativePos = pos - firstTickOfBar;
 
-    if ((isStepEditor || mpc.getControls()->isRecMainWithoutPlaying()) && relativePos == 0)
+    if ((isStepEditor || SeqUtil::isRecMainWithoutPlaying(mpc)) && relativePos == 0)
     {
         return;
     }
@@ -343,41 +345,44 @@ bool FrameSeq::processSeqLoopDisabled()
 
 void FrameSeq::processNoteRepeat()
 {
-    auto controls = mpc.getControls();
+    const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
+                                             mpc.getHardware2()->getButton("tap")->isPressed();
 
-    if (controls && (mpc.getHardware2()->getButton("tap")->isPressed() || controls->isNoteRepeatLocked()))
+    if (!isNoteRepeatLockedOrPressed)
     {
-        auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
-        int swingPercentage = timingCorrectScreen->getSwing();
-        int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (repeatIntervalTicks * 0.5));
-        auto shiftTiming = timingCorrectScreen->getAmount() * (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
-        auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
+        return;
+    }
 
-        bool shouldRepeatPad = false;
+    auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
+    int swingPercentage = timingCorrectScreen->getSwing();
+    int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (repeatIntervalTicks * 0.5));
+    auto shiftTiming = timingCorrectScreen->getAmount() * (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
+    auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
 
-        if (repeatIntervalTicks == 24 || repeatIntervalTicks == 48)
-        {
-            if (tickPosWithShift % (repeatIntervalTicks * 2) == swingOffset + repeatIntervalTicks ||
-                tickPosWithShift % (repeatIntervalTicks * 2) == 0)
-            {
-                shouldRepeatPad = true;
-            }
-        }
-        else if (repeatIntervalTicks != 1 && (tickPosWithShift % repeatIntervalTicks == 0))
+    bool shouldRepeatPad = false;
+
+    if (repeatIntervalTicks == 24 || repeatIntervalTicks == 48)
+    {
+        if (tickPosWithShift % (repeatIntervalTicks * 2) == swingOffset + repeatIntervalTicks ||
+            tickPosWithShift % (repeatIntervalTicks * 2) == 0)
         {
             shouldRepeatPad = true;
         }
+    }
+    else if (repeatIntervalTicks != 1 && (tickPosWithShift % repeatIntervalTicks == 0))
+    {
+        shouldRepeatPad = true;
+    }
 
-        if (shouldRepeatPad)
-        {
-            RepeatPad::process(
-                    mpc,
-                    sequencer->getTickPosition(),
-                    repeatIntervalTicks,
-                    getEventFrameOffset(),
-                    sequencer->getTempo(),
-                    static_cast<float>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate()));
-        }
+    if (shouldRepeatPad)
+    {
+        RepeatPad::process(
+                mpc,
+                sequencer->getTickPosition(),
+                repeatIntervalTicks,
+                getEventFrameOffset(),
+                sequencer->getTempo(),
+                static_cast<float>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate()));
     }
 }
 

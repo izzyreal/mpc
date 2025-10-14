@@ -3,6 +3,7 @@
 #include "command/PushPadScreenUpdateCommand.h"
 #include "command/ReleasePadCommand.h"
 #include "command/ReleaseTapCommand.h"
+#include "controller/ClientInputControllerBase.h"
 #include "controls/PushPadScreenUpdateContext.h"
 #include "controller/PadContextFactory.h"
 
@@ -28,6 +29,7 @@
 #include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
+#include "sequencer/SeqUtil.hpp"
 
 #include <engine/midi/MidiMessage.hpp>
 #include <engine/midi/ShortMessage.hpp>
@@ -299,16 +301,17 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     int padIndexWithBank = -1;
     auto bus = track->getBus();
 
+    const bool isNoteRepeatLockedOrPressed = mpc.getHardware2()->getButton("tap")->isPressed() ||
+                                             mpc.inputController->isNoteRepeatLocked();
+
     if (bus > 0)
     {
-        padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
-
-        if (track->getIndex() >= 64) printf("oh noes!\n");
-
-        if (track->getIndex() < 64 && mpc.getHardware2()->getButton("tap")->isPressed() && sequencer->isPlaying())
+        if (track->getIndex() < 64 && isNoteRepeatLockedOrPressed && sequencer->isPlaying())
         {
             return;
         }
+
+        padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
     }
 
     const std::string currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
@@ -352,7 +355,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
             recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
             sequencer->playMetronomeTrack();
         }
-        else if (mpc.getControls()->isRecMainWithoutPlaying())
+        else if (SeqUtil::isRecMainWithoutPlaying(mpc))
         {
             recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
             sequencer->playMetronomeTrack();
@@ -410,26 +413,27 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     }
     else if (auto storedRecordMidiNoteOn = retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
-        auto step = mpc.getControls()->isStepRecording();
-        auto recWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
+        auto isStepRecording = mpc.getControls()->isStepRecording();
+        auto isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(mpc);
+
         if (sequencer->isRecordingOrOverdubbing())
         {
             track->finalizeNoteEventASync(storedRecordMidiNoteOn);
         }
-        else if (step || recWithoutPlaying)
+        else if (isStepRecording || isRecMainWithoutPlaying)
         {
             auto newDuration = static_cast<int>(sequencer->getTickPosition());
 
             const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
-            const auto increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
-            const auto durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
+            const bool isAutoStepIncrementEnabled = stepEditOptionsScreen->isAutoStepIncrementEnabled();
+            const bool durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
             const auto tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
 
             const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 
             const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
-            if (step && durationIsTcValue)
+            if (isStepRecording && durationIsTcValue)
             {
                 newDuration = static_cast<int>(stepLength * (tcValuePercentage * 0.01));
 
@@ -442,7 +446,8 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
             sequencer->stopMetronomeTrack();
             bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(storedRecordMidiNoteOn, newDuration);
 
-            if ((durationHasBeenAdjusted && recWithoutPlaying) || (step && increment))
+            if ((durationHasBeenAdjusted && isRecMainWithoutPlaying) ||
+                (isStepRecording && isAutoStepIncrementEnabled))
             {
                 int nextPos = sequencer->getTickPosition() + stepLength;
                 auto bar = sequencer->getCurrentBarIndex() + 1;

@@ -31,8 +31,9 @@ void PushPadCommand::execute()
     }
 
     if (ctx.currentScreenName == "sequencer" &&
-        (ctx.isTapPressed || ctx.controls->isNoteRepeatLocked()) &&
-        ctx.sequencer->isPlaying() && !ctx.program->isPadRegisteredAsPressed(padIndexWithBank))
+        ctx.isNoteRepeatLockedOrPressed &&
+        ctx.sequencer->isPlaying() &&
+        !ctx.program->isPadRegisteredAsPressed(padIndexWithBank))
     {
         return;
     }
@@ -42,7 +43,7 @@ void PushPadCommand::execute()
         return;
     }
 
-    if (ctx.isNoteRepeatLocked)
+    if (ctx.isNoteRepeatLockedOrPressed)
     {
         return;
     }
@@ -125,13 +126,13 @@ void PushPadCommand::generateNoteOn(const PushPadContext &ctx, const int note, c
     {
         recordNoteOnEvent = ctx.track->recordNoteEventASync(note, velo);
     }
-    else if (ctx.controls->isStepRecording() && (ctx.track->getBus() == 0 || sequencer::isDrumNote(note)))
+    else if (ctx.isStepRecording && (ctx.track->getBus() == 0 || sequencer::isDrumNote(note)))
     {
         recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), note, velo);
         ctx.sequencer->playMetronomeTrack();
         recordNoteOnEvent->setTick(ctx.frameSequencer->getMetronomeOnlyTickPosition());
     }
-    else if (ctx.controls->isRecMainWithoutPlaying())
+    else if (ctx.isRecMainWithoutPlaying)
     {
         recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), note, velo);
         ctx.sequencer->playMetronomeTrack();
