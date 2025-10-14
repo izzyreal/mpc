@@ -1,6 +1,7 @@
 #include "PushStopCommand.h"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
+#include "controller/ClientInputControllerBase.h"
 #include "controls/Controls.hpp"
 #include "hardware2/Hardware2.h"
 #include "lcdgui/ScreenGroups.h"
@@ -13,13 +14,13 @@ namespace mpc::command {
     void PushStopCommand::execute() {
         const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
         const auto ams = mpc.getAudioMidiServices();
-        const auto controls = mpc.getControls();
 
-        if (controls->isNoteRepeatLocked())
-            controls->setNoteRepeatLocked(false);
+        mpc.inputController->buttonLockTracker.unlock("tap");
 
         if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 || mpc.getHardware2()->getButton("shift")->isPressed()))
+        {
             ams->stopBouncingEarly();
+        }
 
         mpc.getSequencer()->stop();
 

@@ -16,7 +16,8 @@ struct ClientInput {
         SliderMove,
         PotMove,
         ButtonPress,
-        ButtonRelease
+        ButtonRelease,
+        ButtonDoublePress
     };
 
     Type type = Type::Unknown;

@@ -80,7 +80,15 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::BEGIN)
             {
-                clientEvent.type = ClientInput::Type::ButtonPress;
+                if (gesture.repeatCount == 2)
+                {
+                    printf("gesture has repeat count of 2\n");
+                    clientEvent.type = ClientInput::Type::ButtonDoublePress;
+                }
+                else
+                {
+                    clientEvent.type = ClientInput::Type::ButtonPress;
+                }
             }
             else if (gesture.type == GestureEvent::Type::END)
             {
