@@ -244,3 +244,49 @@ TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware
     REQUIRE_THROWS_AS(p.pressWithVelocity(0), std::invalid_argument);
 }
 
+
+TEST_CASE("Pad inherits from Pressable and VelocitySensitivePressable", "[hardware2]")
+{
+    STATIC_REQUIRE(std::is_base_of_v<Pressable, Pad>);
+    STATIC_REQUIRE(std::is_base_of_v<VelocitySensitivePressable, Pad>);
+}
+
+TEST_CASE("Button inherits from Pressable", "[hardware2]")
+{
+    STATIC_REQUIRE(std::is_base_of_v<Pressable, Button>);
+}
+
+TEST_CASE("Pressable press and doublePress return correct bool", "[hardware2]")
+{
+    struct TestPressable : Pressable {};
+
+    TestPressable p;
+
+    REQUIRE(p.press() == true);
+    REQUIRE(p.isPressed() == true);
+    REQUIRE(p.press() == false); // Already pressed
+    REQUIRE(p.doublePress() == false); // Already pressed
+
+    p.release();
+    REQUIRE(p.isPressed() == false);
+    REQUIRE(p.doublePress() == true);
+    REQUIRE(p.isPressed() == true);
+    REQUIRE(p.doublePress() == false); // Already pressed
+}
+
+TEST_CASE("VelocitySensitivePressable pressWithVelocity returns correct bool", "[hardware2]")
+{
+    struct TestVelocitySensitivePressable : VelocitySensitivePressable {};
+
+    TestVelocitySensitivePressable vsp;
+
+    REQUIRE(vsp.pressWithVelocity(64) == true);
+    REQUIRE(vsp.isPressed() == true);
+    REQUIRE(vsp.pressWithVelocity(64) == false); // Already pressed
+
+    vsp.release();
+    REQUIRE(vsp.isPressed() == false);
+    REQUIRE(vsp.pressWithVelocity(127) == true);
+    REQUIRE(vsp.isPressed() == true);
+}
+
