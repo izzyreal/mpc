@@ -34,7 +34,7 @@ void ReleasePadCommand::execute()
 
     ctx.eventHandler->handle(noteOff, ctx.activeTrack.get(), drum);
 
-    ctx.registerProgramPadRelease(ctx.padIndexWithBank);
+    //ctx.registerProgramPadRelease(ctx.padIndexWithBank);
 
     if (!ctx.recordOnEvent)
     {

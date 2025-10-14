@@ -28,6 +28,7 @@ namespace mpc::sampler {
         void registerPadPress(int padIndex);
         void registerPadRelease(int padIndex);
         bool isPadRegisteredAsPressed(int padIndex) const;
+        int getPadPressCount(int padIndex) const;
         bool isAnyPadRegisteredAsPressed() const;
         void clearPressedPadRegistry();
 
