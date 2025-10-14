@@ -19,12 +19,9 @@ namespace mpc::controls
     public:
         Controls(mpc::Mpc &mpc);
 
-        bool isStepRecording();
-        
         std::weak_ptr<KbMapping> getKbMapping();
 
     private:
         std::shared_ptr<KbMapping> kbMapping;
-        mpc::Mpc& mpc;
     };
 }

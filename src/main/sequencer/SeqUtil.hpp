@@ -46,5 +46,7 @@ namespace mpc::sequencer {
                                  uint8_t copyAfterBar);
 
             static bool isRecMainWithoutPlaying(mpc::Mpc&);
+
+            static bool isStepRecording(mpc::Mpc&);
     };
 } // namespace mpc::sequencer

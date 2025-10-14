@@ -37,7 +37,7 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
                                              mpc.getHardware2()->getButton("tap")->isPressed();
     const bool isErasePressed = mpc.getHardware2()->getButton("erase")->isPressed();
-    const bool isStepRecording = mpc.getControls()->isStepRecording();
+    const bool isStepRecording = sequencer::SeqUtil::isStepRecording(mpc);
     const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(mpc);
 
     auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct");
@@ -151,7 +151,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         mpc.getSequencer()->isRecordingOrOverdubbing(),
         mpc.getHardware2()->getButton("erase")->isPressed(),
         mpc.getSequencer()->getActiveTrack(),
-        mpc.getControls()->isStepRecording(),
+        sequencer::SeqUtil::isStepRecording(mpc),
         isAnyProgramPadRegisteredAsPressed,
         mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
         sequencer::SeqUtil::isRecMainWithoutPlaying(mpc),

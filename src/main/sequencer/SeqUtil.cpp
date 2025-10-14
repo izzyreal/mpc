@@ -436,6 +436,14 @@ bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
 		recIsPressedOrLocked &&
 		tc_note != 0 &&
 		!posIsLastTick;
+
 	return recMainWithoutPlaying;
+}
+
+bool SeqUtil::isStepRecording(mpc::Mpc &mpc)
+{
+	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+	auto posIsLastTick = [&] { return mpc.getSequencer()->getTickPosition() == mpc.getSequencer()->getActiveSequence()->getLastTick(); };
+	return currentScreenName == "step-editor" && !posIsLastTick();
 }
 

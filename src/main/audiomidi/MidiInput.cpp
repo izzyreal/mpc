@@ -350,7 +350,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
         {
             recordMidiNoteOn = track->recordNoteEventASync(playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
         }
-        else if (mpc.getControls()->isStepRecording())
+        else if (SeqUtil::isStepRecording(mpc))
         {
             recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
             sequencer->playMetronomeTrack();
@@ -413,8 +413,8 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     }
     else if (auto storedRecordMidiNoteOn = retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
-        auto isStepRecording = mpc.getControls()->isStepRecording();
-        auto isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(mpc);
+        const bool isStepRecording = SeqUtil::isStepRecording(mpc);
+        const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(mpc);
 
         if (sequencer->isRecordingOrOverdubbing())
         {
@@ -469,7 +469,6 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     if (auto storedmidiNoteOn = retrievePlayNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
         mpc.getEventHandler()->handleNoThru(storedmidiNoteOn->getNoteOff(), track.get(), timeStamp);
-        return;
     }
 }
 
