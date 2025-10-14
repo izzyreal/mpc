@@ -71,15 +71,22 @@ void ReleasePadCommand::execute()
             if (!ctx.isAnyProgramPadRegisteredAsPressed())
             {
                 int nextPos = ctx.sequencerTickPosition + ctx.noteValueLengthInTicks;
+
                 auto bar = ctx.currentBarIndex + 1;
-                nextPos = ctx.activeTrack->timingCorrectTick(
-                    0, bar, nextPos, ctx.noteValueLengthInTicks, ctx.swing);
+
+                nextPos = ctx.activeTrack->timingCorrectTick(0, bar, nextPos, ctx.noteValueLengthInTicks, ctx.swing);
+
                 auto lastTick = ctx.sequencerGetActiveSequenceLastTick();
 
                 if (nextPos != 0 && nextPos < lastTick)
-                    ctx.sequencerMoveToQuarterNotePosition(sequencer::Sequencer::ticksToQuarterNotes(nextPos));
+                {
+                    const double nextPosQuarterNotes = sequencer::Sequencer::ticksToQuarterNotes(nextPos);
+                    ctx.sequencerMoveToQuarterNotePosition(nextPosQuarterNotes);
+                }
                 else
+                {
                     ctx.sequencerMoveToQuarterNotePosition(sequencer::Sequencer::ticksToQuarterNotes(lastTick));
+                }
             }
         }
     }

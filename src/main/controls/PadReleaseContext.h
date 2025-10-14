@@ -40,7 +40,7 @@ struct PadReleaseContext {
     const int currentBarIndex;
     const int swing;
     std::function<int()> sequencerGetActiveSequenceLastTick;
-    std::function<void(int)> sequencerMoveToQuarterNotePosition;
+    std::function<void(double)> sequencerMoveToQuarterNotePosition;
     std::function<void()> sequencerStopMetronomeTrack;
 };
 }
