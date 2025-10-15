@@ -338,6 +338,12 @@ void Mpc::panic()
     sampler->clearAllProgramPadPressRegistries();
     sequencer->getNoteEventStore().clearPlayAndRecordStore();
     midiOutput->panic();
+    eventHandler->clearTransposeCache();
+
+    for (auto &midiInput : midiInputs)
+    {
+        midiInput->clearNoteEventStore();
+    }
 }
 
 std::shared_ptr<mpc::sequencer::Clock> Mpc::getClock()

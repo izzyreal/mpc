@@ -105,7 +105,13 @@ public:
                        std::shared_ptr<const std::vector<float>> sourceRight,
                        std::shared_ptr<std::vector<float>> dest);
     void setDrumBusProgramIndex(int busNumber, int programIndex);
+    
+    // busNumber between 1 and 4, i.e. 1-based DRUM index
     int getDrumBusProgramIndex(int busNumber);
+
+    // busNumber between 1 and 4, i.e. 1-based DRUM index
+    std::shared_ptr<Program> getDrumBusProgram(const int busNumber);
+    
     int getUsedProgram(int startIndex, bool up);
     int checkExists(std::string soundName);
     void selectPreviousSound();

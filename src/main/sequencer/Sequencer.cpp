@@ -51,6 +51,7 @@ uint64_t currentTimeMillis() {
 Sequencer::Sequencer(mpc::Mpc& mpc)
 	: mpc (mpc)
 {
+    noteEventStore.reserve(NOTE_EVENT_STORE_CAPACITY);
 }
 
 void Sequencer::init()

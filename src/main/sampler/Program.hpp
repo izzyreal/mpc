@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MpcSpecs.h"
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
@@ -47,7 +48,7 @@ namespace mpc::sampler {
          * considered pressed. Counts automatically decrease on release and
          * are reset when the program is deleted or reloaded.
          */
-        std::array<int, 64> pressedPadRegistry {};
+        std::array<int, PROGRAM_PAD_COUNT> pressedPadRegistry {};
 
 		void init();
 

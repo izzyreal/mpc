@@ -37,6 +37,8 @@ namespace mpc::engine {
 
 namespace mpc::controls {
 
+    // Should be renamed to PressProgramPad or similar, because we're not dealing with
+    // hardware pad indices from 1 to 16 here, but with the 64 pads of a program.
     struct PushPadContext {
         std::string currentScreenName;
         bool isSoundScreen;

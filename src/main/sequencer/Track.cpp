@@ -634,7 +634,7 @@ void Track::playNext()
 
     events[eventIndex]->dontDelete = false;
 
-	mpc.getEventHandler()->handle(event, this);
+	mpc.getEventHandler()->handleFinalizedEvent(event);
     eventIndex++;
 }
 

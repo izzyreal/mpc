@@ -365,7 +365,7 @@ void StepEditorScreen::function(int i)
                 }
 			}
 		}
-		else
+        else
 		{
 			clearSelection();
 		}
@@ -1333,7 +1333,7 @@ int StepEditorScreen::getYOffset()
 void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent>&noteEvent)
 {
 	const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
-    mpc.getEventHandler()->handle(adhoc, track.get());
+    mpc.getEventHandler()->handleFinalizedNoteOn(adhoc);
 }
 
 void StepEditorScreen::resetYPosAndYOffset()

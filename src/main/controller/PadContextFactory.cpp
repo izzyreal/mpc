@@ -106,19 +106,6 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
 
     const int drumIndex = getDrumIndexForCurrentScreen(mpc, currentScreenName);
 
-    // Ideally we'd know the program that was associated with the pad-push that is associated with the pad-release that we're building
-    // the context for. But at the moment, VMPC2000XL doesn't have a notion of which pad-push belongs to which pad-release.
-    // The key here is which screen the user was in when the pad-push occurred. So for now we'll assume this stays the same for the
-    // duration of the event.
-    std::shared_ptr<sampler::Program> program = drumIndex >= 0 ? mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram()) : nullptr;
-
-    std::function<void(int)> registerProgramPadRelease = [program = program] (int padIndexWithBank) {
-        if (program)
-        {
-            program->registerPadRelease(padIndexWithBank);
-        }
-    };
-
     const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(padIndexWithBank);
 
     const int drumScreenSelectedDrum = mpc.screens->get<screens::DrumScreen>("drum")->getDrum();
@@ -143,7 +130,6 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,
-        registerProgramPadRelease,
         playNoteEvent,
         drumScreenSelectedDrum,
         eventHandler,
