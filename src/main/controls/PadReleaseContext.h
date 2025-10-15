@@ -15,12 +15,13 @@ namespace mpc::audiomidi {
 
 namespace mpc::controls {
 
+// Should be renamed to ReleaseProgramPad or similar, because we're not dealing with
+// hardware pad indices from 1 to 16 here, but with the 64 pads of a program.
 struct PadReleaseContext {
     const int padIndexWithBank;
     std::function<void()> finishBasicVoiceIfSoundIsLooping;
     const bool currentScreenIsSoundScreen;
     const bool currentScreenIsSamplerScreen;
-    std::function<void(int)> registerProgramPadRelease;
     std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> playNoteEvent;
     const int drumScreenSelectedDrum;
     std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;

@@ -46,8 +46,6 @@ void PushPadCommand::execute()
         return;
     }
 
-    //ctx.program->registerPadPress(padIndexWithBank);
-
     if (ctx.isFullLevelEnabled)
     {
         velo = 127;
@@ -112,11 +110,22 @@ void PushPadCommand::generateNoteOn(const PushPadContext &ctx, const int note, c
         Util::setSliderNoteVariationParameters(sliderNoteVariationContext, playOnEvent);
     }
 
-    const auto drum = ctx.currentScreenIsSamplerScreen ? 
-            std::optional<uint8_t>(ctx.drumScreenSelectedDrum) : std::optional<uint8_t>();
-
     ctx.sequencer->getNoteEventStore().storePlayNoteEvent(padIndexWithBank, playOnEvent);
-    ctx.eventHandler->handle(playOnEvent, ctx.track.get(), drum);
+
+    if (ctx.currentScreenIsSamplerScreen)
+    {
+        ctx.eventHandler->handleUnfinalizedNoteOn(playOnEvent, std::nullopt, std::nullopt, std::nullopt, ctx.drumScreenSelectedDrum);
+    }
+    else
+    {
+        const auto drumIndexToUse = ctx.trackBus > 0 ? std::optional<int>(ctx.trackBus - 1) : std::nullopt;
+
+        ctx.eventHandler->handleUnfinalizedNoteOn(playOnEvent,
+                                                  ctx.track->getIndex(),
+                                                  ctx.track->getDeviceIndex(),
+                                                  ctx.track->getVelocityRatio(),
+                                                  drumIndexToUse);
+    }
 
     std::shared_ptr<sequencer::NoteOnEvent> recordNoteOnEvent;
 

@@ -17,9 +17,7 @@ namespace mpc::audiomidi {
 }
 
 namespace mpc::audiomidi {
-    class MidiInput :
-        public Observable,
-        public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>>
+    class MidiInput : public Observable
     {
     private:
         int index = 0;
@@ -29,8 +27,12 @@ namespace mpc::audiomidi {
         std::unique_ptr<VmpcMidiControlMode> midiFullControl;
         std::string notify;
 
+        const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
+        mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>> noteEventStore;
+
     public:
         void transport(mpc::engine::midi::MidiMessage *msg, int timestamp);
+        void clearNoteEventStore() { noteEventStore.clearPlayAndRecordStore(); }
 
     private:
         void midiOut(sequencer::Track* track);

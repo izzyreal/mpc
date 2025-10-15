@@ -998,6 +998,18 @@ int Sampler::getDrumBusProgramIndex(int busNumber)
 	return mpc.getDrum(busNumber - 1).getProgram();
 }
 
+std::shared_ptr<Program> Sampler::getDrumBusProgram(const int busNumber)
+{
+    const auto programIndex = getDrumBusProgramIndex(busNumber);
+
+    if (programIndex >= 0 && programIndex < MAX_PROGRAM_COUNT)
+    {
+        return programs[programIndex];
+    }
+
+    return {};
+}
+
 std::shared_ptr<Sound> Sampler::getClickSound()
 {
 	return clickSound;

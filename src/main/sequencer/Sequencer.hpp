@@ -54,6 +54,7 @@ namespace mpc::sequencer
 
 	private:
         mpc::Mpc& mpc;
+        const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
         NoteEventStore<int> noteEventStore;
         bool playing = false;
 		int lastNotifiedBar = -1;

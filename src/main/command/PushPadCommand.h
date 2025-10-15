@@ -2,11 +2,13 @@
 #include "command/Command.h"
 
 namespace mpc::controls {
-struct PushPadContext;
+    struct PushPadContext;
 }
 
 namespace mpc::command {
 
+    // Should be renamed to PressProgramPad or similar, because we're not dealing with
+    // hardware pad indices from 1 to 16 here, but with the 64 pads of a program.
     class PushPadCommand : public Command {
     public:
         PushPadCommand(mpc::controls::PushPadContext &ctx, int padIndexWithBank, int velo);

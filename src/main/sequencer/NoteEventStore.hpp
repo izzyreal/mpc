@@ -10,7 +10,7 @@ namespace mpc::sequencer
     class NoteOnEventPlayOnly;
 
 	template <typename IndexType>
-	class NoteEventStore
+	class NoteEventStore final
 	{
 	private:
 		struct NoteHashFunctor
@@ -36,6 +36,12 @@ namespace mpc::sequencer
 		std::shared_ptr<NoteOnEventPlayOnly> retrievePlayNoteEvent(IndexType index);
 		void storeRecordNoteEvent(IndexType index, std::shared_ptr<NoteOnEvent> event);
 		std::shared_ptr<NoteOnEvent> retrieveRecordNoteEvent(IndexType index);
+
+        void reserve(const size_t capacity)
+        {
+            playStore.reserve(capacity);
+            recordStore.reserve(capacity);
+        }
 
 		void clearPlayAndRecordStore()
         {

@@ -4,6 +4,7 @@
 #include "controls/PadReleaseContext.h"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;
 using namespace mpc::controls;
@@ -25,16 +26,19 @@ void ReleasePadCommand::execute()
         return;
     }
 
-    const auto noteOff = ctx.playNoteEvent->getNoteOff();
-    noteOff->setTick(-1);
+    if (ctx.currentScreenIsSamplerScreen)
+    {
+        ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(ctx.playNoteEvent->getNoteOff(), std::nullopt, std::nullopt, ctx.drumScreenSelectedDrum);
+    }
+    else
+    {
+        const auto drumIndexToUse = ctx.activeTrack->getBus() > 0 ? std::optional<int>(ctx.activeTrack->getBus() - 1) : std::nullopt;
 
-    const auto drum = ctx.currentScreenIsSamplerScreen
-        ? std::optional<uint8_t>(ctx.drumScreenSelectedDrum)
-        : std::optional<uint8_t>();
-
-    ctx.eventHandler->handle(noteOff, ctx.activeTrack.get(), drum);
-
-    //ctx.registerProgramPadRelease(ctx.padIndexWithBank);
+        ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(ctx.playNoteEvent->getNoteOff(),
+                                                             ctx.activeTrack->getIndex(),
+                                                             ctx.activeTrack->getDeviceIndex(),
+                                                             drumIndexToUse);
+    }
 
     if (!ctx.recordOnEvent)
     {
@@ -96,3 +100,4 @@ void ReleasePadCommand::execute()
         ctx.sequencerStopMetronomeTrack();
     }
 }
+
