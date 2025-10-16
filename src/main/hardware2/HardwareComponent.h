@@ -158,9 +158,20 @@ public:
 };
 
 class DataWheel final : public Component {
+private:
+    const int STEP_COUNT_FOR_360_DEGREES = 100;
+    const float angleIncrementPerStep = 1.f / STEP_COUNT_FOR_360_DEGREES;
+
+    // The normalized current angle of the DATA wheel. Only affects GUI representation.
+    // 0 means the dimple is at the top, 0.25 at 90 degrees clockwise, 0.5 at 180 degrees, 0.75 at 270 degrees clockwise
+    float angle = 0.f;
 public:
     explicit DataWheel() = default;
-    void turn(int steps) {}
+    void turn(const int steps)
+    {
+        angle = std::fmod(angle + (angleIncrementPerStep * steps), 1.f);
+    }
+    float getAngle() { return angle; }
 };
 
 class Slider final : public Component, public Continuous<float, 0, 127> {
