@@ -26,11 +26,22 @@ namespace mpc::sampler {
         
 		int getPadIndexFromNote(int note);
 
-        void registerPadPress(int padIndex);
-        void registerPadRelease(int padIndex);
+        enum class PadPressSource : uint8_t {
+            PHYSICAL = 0,
+            NON_PHYSICAL = 1,
+            COUNT
+        };
+
+        bool isPadPressedBySource(int padIndex, PadPressSource source);
+
+        void registerPadPress(int padIndex, PadPressSource source);
+
+        void registerPadRelease(int padIndex, PadPressSource source); 
+
         bool isPadRegisteredAsPressed(int padIndex) const;
-        int getPadPressCount(int padIndex) const;
+
         bool isAnyPadRegisteredAsPressed() const;
+
         void clearPressedPadRegistry();
 
 	private:
@@ -41,16 +52,19 @@ namespace mpc::sampler {
 		PgmSlider* slider = nullptr;
 		int midiProgramChange = 0;
 
-        /**
-         * pressedPadRegistry tracks how many simultaneous "press" sources
-         * (MIDI, keyboard, mouse, etc.) are currently active for each of the
-         * 64 program pads (16 pads × 4 banks). A value > 0 means the pad is
-         * considered pressed. Counts automatically decrease on release and
-         * are reset when the program is deleted or reloaded.
-         */
-        std::array<int, PROGRAM_PAD_COUNT> pressedPadRegistry {};
-
 		void init();
+
+        inline constexpr size_t sourceIndex(PadPressSource s) {
+            return static_cast<size_t>(s);
+        }
+
+        struct PadPressState {
+            int totalCount = 0;
+            std::array<int, static_cast<size_t>(PadPressSource::COUNT)> sourceCount {};
+        };
+
+        std::array<PadPressState, PROGRAM_PAD_COUNT> pressedPadRegistry {};
+
 
 	public:
 		int getNumberOfSamples();

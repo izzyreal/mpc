@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
@@ -160,40 +159,44 @@ Program::~Program()
 	for (auto& p : pads) delete p;
 }
 
-void Program::registerPadPress(int padIndex)
+bool Program::isPadPressedBySource(int padIndex, PadPressSource source)
 {
-    if (padIndex >= 0 && padIndex < PROGRAM_PAD_COUNT)
-        pressedPadRegistry[padIndex]++;
+    return pressedPadRegistry[padIndex].sourceCount[sourceIndex(source)] > 0;
 }
 
-void Program::registerPadRelease(int padIndex)
+void Program::registerPadPress(int padIndex, PadPressSource source)
 {
-    if (padIndex >= 0 && padIndex < PROGRAM_PAD_COUNT)
-    {
-        if (--pressedPadRegistry[padIndex] < 0)
-            pressedPadRegistry[padIndex] = 0;
-    }
+    auto& pad = pressedPadRegistry[padIndex];
+    pad.totalCount++;
+    pad.sourceCount[sourceIndex(source)]++;
+}
+
+void Program::registerPadRelease(int padIndex, PadPressSource source)
+{
+    auto& pad = pressedPadRegistry[padIndex];
+    if (pad.totalCount > 0) pad.totalCount--;
+    auto& srcCount = pad.sourceCount[sourceIndex(source)];
+    if (srcCount > 0) srcCount--;
 }
 
 bool Program::isPadRegisteredAsPressed(int padIndex) const
 {
-    return padIndex >= 0 && padIndex < PROGRAM_PAD_COUNT
-           && pressedPadRegistry[padIndex] > 0;
+    return pressedPadRegistry[padIndex].totalCount > 0;
 }
 
 bool Program::isAnyPadRegisteredAsPressed() const
 {
-    return std::any_of(pressedPadRegistry.begin(), pressedPadRegistry.end(),
-                       [](int c){ return c > 0; });
+    for (const auto& pad : pressedPadRegistry)
+        if (pad.totalCount > 0) return true;
+    return false;
 }
 
 void Program::clearPressedPadRegistry()
 {
-    pressedPadRegistry.fill(0);
-}
-
-int Program::getPadPressCount(int padIndex) const
-{
-    return pressedPadRegistry.at(padIndex);
+    for (auto& pad : pressedPadRegistry)
+    {
+        pad.totalCount = 0;
+        pad.sourceCount.fill(0);
+    }
 }
 
