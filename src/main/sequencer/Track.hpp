@@ -9,7 +9,6 @@
 
 #include <concurrentqueue.h>
 #include <memory>
-#include <unordered_map>
 
 namespace mpc { class Mpc; }
 
@@ -17,8 +16,7 @@ namespace mpc::sequencer {
 
     class FrameSeq;
 
-class Track : 
-    public Observable
+class Track : public Observable
 {
     
 private:

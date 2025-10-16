@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sequencer/Track.hpp>
 
 #include <Mpc.hpp>
@@ -633,8 +634,7 @@ void Track::playNext()
 	}
 
     events[eventIndex]->dontDelete = false;
-
-	mpc.getEventHandler()->handleFinalizedEvent(event);
+	mpc.getEventHandler()->handleFinalizedEvent(event, this);
     eventIndex++;
 }
 

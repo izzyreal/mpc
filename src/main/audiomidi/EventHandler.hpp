@@ -29,7 +29,8 @@ namespace mpc::audiomidi {
             using NoteOnEventPlayOnly = mpc::sequencer::NoteOnEventPlayOnly;
 
         public:
-            void handleFinalizedEvent(const std::shared_ptr<Event>);
+            void handleFinalizedEvent(const std::shared_ptr<Event>,
+                                      Track *const);
 
             // Handles physical pad presses.
             //
@@ -75,8 +76,6 @@ namespace mpc::audiomidi {
                                        const std::optional<int> trackIndex,
                                        const std::optional<int> trackDevice,
                                        const std::optional<int> drumIndex);
-            
-            void handleFinalizedNoteOn(const std::shared_ptr<NoteOnEvent>);
             
             void handleNoteOffFromFinalizedNoteOn(const std::shared_ptr<NoteOffEvent>);
             
