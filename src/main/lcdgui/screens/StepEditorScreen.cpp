@@ -1333,7 +1333,7 @@ int StepEditorScreen::getYOffset()
 void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent>&noteEvent)
 {
 	const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
-    mpc.getEventHandler()->handleFinalizedNoteOn(adhoc);
+    mpc.getEventHandler()->handleFinalizedEvent(adhoc, track.get());
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
