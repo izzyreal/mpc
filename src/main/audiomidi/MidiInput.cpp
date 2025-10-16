@@ -314,7 +314,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 
     auto bus = track->getBus();
 
-    const bool isNoteRepeatLockedOrPressed = mpc.getHardware()->getButton("tap")->isPressed() ||
+    const bool isNoteRepeatLockedOrPressed = mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed() ||
                                              mpc.inputController->isNoteRepeatLocked();
 
     if (bus > 0)

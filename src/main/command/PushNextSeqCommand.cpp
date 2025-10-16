@@ -12,12 +12,12 @@ namespace mpc::command {
 
         if (currentScreenName == "next-seq" || currentScreenName == "next-seq-pad") {
             mpc.getLayeredScreen()->openScreen("sequencer");
-            mpc.getHardware()->getLed("next-seq")->setEnabled(false);
+            mpc.getHardware()->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(false);
         } else if (currentScreenName == "sequencer" || currentScreenName == "track-mute") {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen("next-seq");
-            mpc.getHardware()->getLed("next-seq")->setEnabled(true);
-            mpc.getHardware()->getLed("track-mute")->setEnabled(false);
+            mpc.getHardware()->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(true);
+            mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
         }
     }
 

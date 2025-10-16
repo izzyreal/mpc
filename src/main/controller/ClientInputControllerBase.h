@@ -66,7 +66,7 @@ class ClientInputControllerBase {
 
     protected:
         // Maps component label to accumulated delta for discretization
-        std::unordered_map<std::string, float> deltaAccumulators;
+        std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
 
     private:
         std::shared_ptr<mpc::controls::KbMapping> kbMapping;

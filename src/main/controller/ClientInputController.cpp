@@ -1,6 +1,7 @@
 #include "controller/ClientInputController.h"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "command/ReleasePadCommand.h"
+#include "hardware/ComponentId.h"
 #include "hardware/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
 #include "controller/PadContextFactory.h"
@@ -96,7 +97,7 @@ void ClientInputController::handlePadAftertouch(const ClientInput& a)
 void ClientInputController::handleDataWheel(const ClientInput& a)
 {
     if (!a.deltaValue) return;
-    float& acc = deltaAccumulators[*a.label];
+    float& acc = deltaAccumulators[a.componentId];
     acc += *a.deltaValue;
     int steps = static_cast<int>(acc);
 
@@ -127,13 +128,13 @@ void ClientInputController::handleSlider(const ClientInput& a)
 void ClientInputController::handlePot(const ClientInput& a)
 {
     std::shared_ptr<mpc::hardware::Pot> pot =
-        a.label->find("rec") != std::string::npos ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
+        a.componentId == hardware::ComponentId::REC_GAIN_POT ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
 
     pot->setValue(pot->getValue() + *a.deltaValue * 0.01f);
 
-    if (a.label->find("rec") != std::string::npos)
+    if (a.componentId == hardware::ComponentId::REC_GAIN_POT)
     {
         audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
     }
@@ -145,9 +146,7 @@ void ClientInputController::handlePot(const ClientInput& a)
 
 void ClientInputController::handleButtonPress(const ClientInput& a)
 {
-    if (!a.label) return;
-
-    auto button = mpc.getHardware()->getButton(*a.label);
+    auto button = mpc.getHardware()->getButton(a.componentId);
 
     // The below check is necessary because the keyboard mapping routines in mpc::controls may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
@@ -162,20 +161,23 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
         return;
     }
 
-    auto label = a.label.value();
     auto screen = mpc.getActiveControls();
 
-    if (label == "left") { screen->left(); }
-    else if (label == "right") { screen->right(); }
-    else if (label == "up") { screen->up(); }
-    else if (label == "down") { screen->down(); }
-    else if (label == "rec") { screen->rec(); }
-    else if (label == "overdub") { screen->overDub(); }
-    else if (label == "stop") { screen->stop(); }
-    else if (label == "play") { screen->play(); }
-    else if (label == "play-start") { screen->playStart(); }
-    else if (label == "main-screen") { screen->mainScreen(); }
-    else if (label == "open-window") {
+    using Id = hardware::ComponentId;
+
+    auto id = a.componentId;
+
+    if (id == Id::CURSOR_LEFT_OR_DIGIT) { screen->left(); }
+    else if (id == Id::CURSOR_RIGHT_OR_DIGIT) { screen->right(); }
+    else if (id == Id::CURSOR_UP) { screen->up(); }
+    else if (id == Id::CURSOR_DOWN) { screen->down(); }
+    else if (id == Id::REC) { screen->rec(); }
+    else if (id == Id::OVERDUB) { screen->overDub(); }
+    else if (id == Id::STOP) { screen->stop(); }
+    else if (id == Id::PLAY) { screen->play(); }
+    else if (id == Id::PLAY_START) { screen->playStart(); }
+    else if (id == Id::MAIN_SCREEN) { screen->mainScreen(); }
+    else if (id == Id::OPEN_WINDOW) {
         auto ls = mpc.getLayeredScreen();
         auto currentScreenName = ls->getCurrentScreenName();
         const auto layerIndex = ls->getFocusedLayerIndex();
@@ -186,48 +188,46 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
             ls->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
         }
     }
-    else if (label == "prev-step-event") { screen->prevStepEvent(); }
-    else if (label == "next-step-event") { screen->nextStepEvent(); }
-    else if (label == "go-to") { screen->goTo(); }
-    else if (label == "prev-bar-start") { screen->prevBarStart(); }
-    else if (label == "next-bar-end") { screen->nextBarEnd(); }
-    else if (label == "tap") { screen->tap(); }
-    else if (label == "next-seq") { screen->nextSeq(); }
-    else if (label == "track-mute") { screen->trackMute(); }
-    else if (label == "full-level") { screen->fullLevel(); }
-    else if (label == "sixteen-levels") { screen->sixteenLevels(); }
-    else if (label == "f1") { screen->function(0); }
-    else if (label == "f2") { screen->function(1); }
-    else if (label == "f3") { screen->function(2); }
-    else if (label == "f4") { screen->function(3); }
-    else if (label == "f5") { screen->function(4); }
-    else if (label == "f6") { screen->function(5); }
-    else if (label == "shift") { screen->shift(); }
-    else if (label == "enter") { screen->pressEnter(); }
-    else if (label == "undo-seq") { screen->undoSeq(); }
-    else if (label == "erase") { screen->erase(); }
-    else if (label == "after") { screen->after(); }
-    else if (label == "bank-a") { screen->bank(0); }
-    else if (label == "bank-b") { screen->bank(1); }
-    else if (label == "bank-c") { screen->bank(2); }
-    else if (label == "bank-d") { screen->bank(3); }
-    else if (label == "0" || label == "0_extra") { screen->numpad(0); }
-    else if (label == "1" || label == "1_extra") { screen->numpad(1); }
-    else if (label == "2" || label == "2_extra") { screen->numpad(2); }
-    else if (label == "3" || label == "3_extra") { screen->numpad(3); }
-    else if (label == "4" || label == "4_extra") { screen->numpad(4); }
-    else if (label == "5" || label == "5_extra") { screen->numpad(5); }
-    else if (label == "6" || label == "6_extra") { screen->numpad(6); }
-    else if (label == "7" || label == "7_extra") { screen->numpad(7); }
-    else if (label == "8" || label == "8_extra") { screen->numpad(8); }
-    else if (label == "9" || label == "9_extra") { screen->numpad(9); }
+    else if (id == Id::PREV_STEP_OR_EVENT) { screen->prevStepEvent(); }
+    else if (id == Id::NEXT_STEP_OR_EVENT) { screen->nextStepEvent(); }
+    else if (id == Id::GO_TO) { screen->goTo(); }
+    else if (id == Id::PREV_BAR_START) { screen->prevBarStart(); }
+    else if (id == Id::NEXT_BAR_END) { screen->nextBarEnd(); }
+    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT) { screen->tap(); }
+    else if (id == Id::NEXT_SEQ) { screen->nextSeq(); }
+    else if (id == Id::TRACK_MUTE) { screen->trackMute(); }
+    else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH) { screen->fullLevel(); }
+    else if (id == Id::SIXTEEN_LEVELS_OR_SPACE) { screen->sixteenLevels(); }
+    else if (id == Id::F1) { screen->function(0); }
+    else if (id == Id::F2) { screen->function(1); }
+    else if (id == Id::F3) { screen->function(2); }
+    else if (id == Id::F4) { screen->function(3); }
+    else if (id == Id::F5) { screen->function(4); }
+    else if (id == Id::F6) { screen->function(5); }
+    else if (id == Id::SHIFT) { screen->shift(); }
+    else if (id == Id::ENTER_OR_SAVE) { screen->pressEnter(); }
+    else if (id == Id::UNDO_SEQ) { screen->undoSeq(); }
+    else if (id == Id::ERASE) { screen->erase(); }
+    else if (id == Id::AFTER_OR_ASSIGN) { screen->after(); }
+    else if (id == Id::BANK_A) { screen->bank(0); }
+    else if (id == Id::BANK_B) { screen->bank(1); }
+    else if (id == Id::BANK_C) { screen->bank(2); }
+    else if (id == Id::BANK_D) { screen->bank(3); }
+    else if (id == Id::NUM_0_OR_VMPC) { screen->numpad(0); }
+    else if (id == Id::NUM_1_OR_SONG) { screen->numpad(1); }
+    else if (id == Id::NUM_2_OR_MISC) { screen->numpad(2); }
+    else if (id == Id::NUM_3_OR_LOAD) { screen->numpad(3); }
+    else if (id == Id::NUM_4_OR_SAMPLE) { screen->numpad(4); }
+    else if (id == Id::NUM_5_OR_TRIM) { screen->numpad(5); }
+    else if (id == Id::NUM_6_OR_PROGRAM) { screen->numpad(6); }
+    else if (id == Id::NUM_7_OR_MIXER) { screen->numpad(7); }
+    else if (id == Id::NUM_8_OR_OTHER) { screen->numpad(8); }
+    else if (id == Id::NUM_9_OR_MIDI_SYNC) { screen->numpad(9); }
 }
 
 void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
-    if (!a.label) return;
-
-    auto button = mpc.getHardware()->getButton(*a.label);
+    auto button = mpc.getHardware()->getButton(a.componentId);
 
     // The below check is necessary because the keyboard mapping routines in mpc::controls may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
@@ -239,33 +239,43 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 
     button->release();
 
-    const auto label = a.label.value();
-    if (label == "erase") { command::ReleaseEraseCommand(mpc).execute(); }
-    else if (label == "f1") { command::ReleaseFunctionCommand(mpc, 0).execute(); }
-    else if (label == "f3") { command::ReleaseFunctionCommand(mpc, 2).execute(); }
-    else if (label == "f4") { command::ReleaseFunctionCommand(mpc, 3).execute(); }
-    else if (label == "f5") { command::ReleaseFunctionCommand(mpc, 4).execute(); }
-    else if (label == "f6") { command::ReleaseFunctionCommand(mpc, 5).execute(); }
-    else if (label == "rec") { command::ReleaseRecCommand(mpc).execute(); }
-    else if (label == "overdub") { command::ReleaseOverdubCommand(mpc).execute(); }
-    else if (label == "tap") { command::ReleaseTapCommand(mpc).execute(); }
+    using Id = hardware::ComponentId;
+
+    auto id = a.componentId;
+
+    if (id == Id::ERASE) { command::ReleaseEraseCommand(mpc).execute(); }
+    else if (id == Id::F1) { command::ReleaseFunctionCommand(mpc, 0).execute(); }
+    else if (id == Id::F3) { command::ReleaseFunctionCommand(mpc, 2).execute(); }
+    else if (id == Id::F4) { command::ReleaseFunctionCommand(mpc, 3).execute(); }
+    else if (id == Id::F5) { command::ReleaseFunctionCommand(mpc, 4).execute(); }
+    else if (id == Id::F6) { command::ReleaseFunctionCommand(mpc, 5).execute(); }
+    else if (id == Id::REC) { command::ReleaseRecCommand(mpc).execute(); }
+    else if (id == Id::OVERDUB) { command::ReleaseOverdubCommand(mpc).execute(); }
+    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT) { command::ReleaseTapCommand(mpc).execute(); }
 }
 
 void ClientInputController::handleButtonDoublePress(const ClientInput& a)
 {
-    if (!a.label) return;
-    mpc.getHardware()->getButton(*a.label)->doublePress();
+    if (!mpc.getHardware()->getButton(a.componentId)->doublePress())
+    {
+        return;
+    }
 
-    auto label = *a.label;
-    if (label == "rec") {
+    if (a.componentId == hardware::ComponentId::REC)
+    {
         buttonLockTracker.toggle("rec");
-        if (buttonLockTracker.isLocked("rec")) {
+
+        if (buttonLockTracker.isLocked("rec"))
+        {
             buttonLockTracker.unlock("overdub");
         }
     }
-    else if (label == "overdub") {
+    else if (a.componentId == hardware::ComponentId::OVERDUB)
+    {
         buttonLockTracker.toggle("overdub");
-        if (buttonLockTracker.isLocked("overdub")) {
+
+        if (buttonLockTracker.isLocked("overdub"))
+        {
             buttonLockTracker.unlock("rec");
         }
     }

@@ -52,11 +52,11 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             throw std::invalid_argument("GestureEvent.componentId must not be NONE");
         }
 
-        clientInput.label = mpc::hardware::componentIdToLabel.at(gesture.componentId);
+        clientInput.componentId = gesture.componentId;
 
-        if (gesture.componentId >= ComponentId::PAD1 && gesture.componentId <= ComponentId::PAD16)
+        if (gesture.componentId >= ComponentId::PAD_1_OR_AB && gesture.componentId <= ComponentId::PAD_16_OR_PARENTHESES)
         {
-            clientInput.index = static_cast<int>(gesture.componentId) - static_cast<int>(ComponentId::PAD1);
+            clientInput.index = static_cast<int>(gesture.componentId) - static_cast<int>(ComponentId::PAD_1_OR_AB);
 
             if (gesture.type == GestureEvent::Type::BEGIN)
             {
@@ -89,7 +89,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
                 }
             }
         }
-        else if (gesture.componentId >= ComponentId::CURSOR_LEFT && gesture.componentId <= ComponentId::NUM_9)
+        else if (gesture.componentId >= ComponentId::CURSOR_LEFT_OR_DIGIT && gesture.componentId <= ComponentId::NUM_9_OR_MIDI_SYNC)
         {
             if (gesture.type == GestureEvent::Type::REPEAT)
             {
@@ -142,29 +142,27 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
     {
         const auto& key = std::get<KeyEvent>(hostEvent.payload);
         const auto vmpcKeyCode = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
-        const auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(vmpcKeyCode);
+        const auto id = kbMapping->getHardwareComponentIdAssociatedWithKeycode(vmpcKeyCode);
 
-        if (label.empty())
+        if (id == hardware::ComponentId::NONE)
         {
             return std::nullopt;
         }
         
-        clientInput.label = label;
+        clientInput.componentId = id;
 
-        if (label.substr(0, 4) == "pad-")
+        if (id >= ComponentId::PAD_1_OR_AB && id <= ComponentId::PAD_16_OR_PARENTHESES)
         {
-            const auto digitsString = label.substr(4);
-            const auto padNumber = std::stoi(digitsString);
             clientInput.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
-            clientInput.index = padNumber - 1;
+            clientInput.index = static_cast<int>(id) - static_cast<int>(ComponentId::PAD_1_OR_AB);
             if (key.keyDown) clientInput.value = mpc::hardware::Pad::MAX_VELO;
         }
-        else if (label == "slider")
+        else if (id == ComponentId::SLIDER)
         {
             if (!key.keyDown) break;
             clientInput.type = ClientInput::Type::SliderMove;
         }
-        else if (label.substr(0, std::string("datawheel-").length()) == "datawheel-")
+        else if (id == ComponentId::DATA_WHEEL)
         {
             if (!key.keyDown) break;
             clientInput.type = ClientInput::Type::DataWheelTurn;
@@ -175,9 +173,9 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             if (key.altDown) increment *= 10;
             if (key.shiftDown) increment *= 10;
 
-            if (label.find("down") != std::string::npos)
+            //if (label.find("down") != std::string::npos)
             {
-                increment = -increment;
+                //increment = -increment;
             }
 
             clientInput.deltaValue = increment;
@@ -190,9 +188,9 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
     }
     }
 
-    if (!clientInput.label)
+    if (clientInput.componentId == ComponentId::NONE)
     {
-        throw std::runtime_error("ClientInput must have a label.");
+        throw std::runtime_error("ClientInput must have a ComponentId.");
     }
 
     if (clientInput.deltaValue && clientInput.value)

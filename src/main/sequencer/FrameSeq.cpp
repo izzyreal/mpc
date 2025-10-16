@@ -308,8 +308,8 @@ bool FrameSeq::processSeqLoopEnabled()
             if (sequencer->isRecording())
             {
                 sequencer->switchRecordToOverdub();
-                mpc.getHardware()->getLed("rec")->setEnabled(false);
-                mpc.getHardware()->getLed("overdub")->setEnabled(true);
+                mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(false);
+                mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(true);
             }
         }
 
@@ -333,7 +333,7 @@ bool FrameSeq::processSeqLoopDisabled()
         else
         {
             sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
-            mpc.getHardware()->getLed("play")->setEnabled(false);
+            mpc.getHardware()->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(false);
             sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
@@ -346,7 +346,7 @@ bool FrameSeq::processSeqLoopDisabled()
 void FrameSeq::processNoteRepeat()
 {
     const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
-                                             mpc.getHardware()->getButton("tap")->isPressed();
+                                             mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
 
     if (!isNoteRepeatLockedOrPressed)
     {
@@ -408,9 +408,9 @@ void FrameSeq::stopSequencer()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->stop();
-    mpc.getHardware()->getLed("rec")->setEnabled(false);
-    mpc.getHardware()->getLed("overdub")->setEnabled(false);
-    mpc.getHardware()->getLed("play")->setEnabled(false);
+    mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(false);
+    mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(false);
+    mpc.getHardware()->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(false);
     move(0);
 }
 

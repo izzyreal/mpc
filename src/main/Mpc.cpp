@@ -27,6 +27,7 @@
 #include <lcdgui/Screens.hpp>
 
 #include "MpcResourceUtil.hpp"
+#include "hardware/ComponentId.h"
 #include "inputlogic/PadAndButtonKeyboard.hpp"
 #include "controller/ClientInputController.h"
 
@@ -229,19 +230,23 @@ audiomidi::MidiInput* Mpc::getMpcMidiInput(int i)
 void Mpc::setBank(int i)
 {
 	if (i == bank)
+    {
 		return;
+    }
 
 	if (i < 0 || i > 3)
+    {
 		return;
+    }
 
 	bank = i;
 
 	notifyObservers(std::string("bank"));
 
-	hardware->getLed("bank-a")->setEnabled(i == 0);
-	hardware->getLed("bank-b")->setEnabled(i == 1);
-	hardware->getLed("bank-c")->setEnabled(i == 2);
-	hardware->getLed("bank-d")->setEnabled(i == 3);
+	hardware->getLed(hardware::ComponentId::BANK_A_LED)->setEnabled(i == 0);
+	hardware->getLed(hardware::ComponentId::BANK_B_LED)->setEnabled(i == 1);
+	hardware->getLed(hardware::ComponentId::BANK_C_LED)->setEnabled(i == 2);
+	hardware->getLed(hardware::ComponentId::BANK_D_LED)->setEnabled(i == 3);
 }
 
 int Mpc::getBank()

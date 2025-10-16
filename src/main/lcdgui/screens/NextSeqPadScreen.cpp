@@ -45,7 +45,7 @@ void NextSeqPadScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 
-    if (sequencer.lock()->isPlaying() && mpc.getHardware()->getButton("f4")->isPressed())
+    if (sequencer.lock()->isPlaying() && mpc.getHardware()->getButton(hardware::ComponentId::F4)->isPressed())
     {
         if (!sequencer.lock()->getSequence(padIndexWithBank)->isUsed())
         {

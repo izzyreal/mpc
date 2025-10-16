@@ -1,5 +1,6 @@
 #include "VmpcMidiControlMode.hpp"
 
+#include "hardware/ComponentId.h"
 #include "hardware/Hardware.h"
 #include "hardware/HardwareComponent.h"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
@@ -111,8 +112,6 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             }
         }
 
-        const auto hwComponent = hardware->getComponentByLabel(label);
-
         if (label == "datawheel")
         {
             if (previousDataWheelValue == -1)
@@ -156,7 +155,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
             hardware->getVolPot()->setValue(normalized);
         }
-        else if (auto pressable = std::dynamic_pointer_cast<mpc::hardware::Pressable>(hwComponent))
+        else if (auto pressable = std::dynamic_pointer_cast<hardware::Pressable>(hardware->getComponent(hardware::componentLabelToId.at(label))))
         {
             if (msg->getData2() == 0)
             {

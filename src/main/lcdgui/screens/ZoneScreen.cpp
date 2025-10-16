@@ -192,7 +192,7 @@ void ZoneScreen::turnWheel(int i)
 
 void ZoneScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton("shift")->isPressed())
+    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
         return;
     }
@@ -421,7 +421,7 @@ std::vector<int> ZoneScreen::getZone()
 
 void ZoneScreen::pressEnter()
 {
-	if (mpc.getHardware()->getButton("shift")->isPressed())
+	if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
 	{
 		openScreen("save");
 		return;

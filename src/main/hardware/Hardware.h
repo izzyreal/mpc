@@ -14,9 +14,10 @@ namespace mpc::hardware {
 
 class Hardware final {
 private:
-    std::vector<std::shared_ptr<Led>> leds;
+    std::unordered_map<ComponentId, std::shared_ptr<Component>> components;
+    std::unordered_map<ComponentId, std::shared_ptr<Led>> leds;
     std::vector<std::shared_ptr<Pad>> pads;
-    std::unordered_map<std::string, std::shared_ptr<Button>> buttons;
+    std::unordered_map<ComponentId, std::shared_ptr<Button>> buttons;
     std::shared_ptr<DataWheel> dataWheel;
     std::shared_ptr<Slider> slider;
     std::shared_ptr<Pot> recPot;
@@ -25,30 +26,38 @@ private:
 public:
     explicit Hardware()
     {
-        for (const auto &label : getButtonLabels())
+        for (int i = ComponentId::CURSOR_LEFT_OR_DIGIT; i <= ComponentId::NUM_9_OR_MIDI_SYNC; i++)
         {
-            buttons[label] = std::make_shared<Button>(label);
+            const auto id = static_cast<ComponentId>(i);
+            buttons[id] = std::make_shared<Button>(id);
+            components[id] = buttons[id];
         }
 
         for (int i = 0; i < 16; ++i)
-            pads.push_back(std::make_shared<Pad>(i));
-
-        const std::vector<std::string> ledLabels {
-            "full-level", "sixteen-levels", "next-seq", "track-mute",
-            "bank-a", "bank-b", "bank-c", "bank-d",
-            "after", "undo-seq", "rec", "overdub", "play"
-        };
-
-        for (const auto& l : ledLabels)
         {
-            leds.push_back(std::make_shared<Led>(l));
-            if (l == "bank-a") leds.back()->setEnabled(true);
+            pads.push_back(std::make_shared<Pad>(i));
+            components[pads.back()->getId()] = pads.back();
+        }
+
+        for (int i = ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED; i <= ComponentId::PLAY_LED; i++)
+        {
+            const auto id = static_cast<ComponentId>(i);
+            leds[id] = std::make_shared<Led>(id);
+            components[id] = leds[id];
+            if (id == ComponentId::BANK_A_LED) leds[id]->setEnabled(true);
         }
 
         dataWheel = std::make_shared<DataWheel>();
-        recPot = std::make_shared<Pot>();
-        volPot = std::make_shared<Pot>();
+        components[dataWheel->getId()] = dataWheel;
+
+        recPot = std::make_shared<Pot>(ComponentId::REC_GAIN_POT);
+        components[recPot->getId()] = recPot;
+
+        volPot = std::make_shared<Pot>(ComponentId::MAIN_VOLUME_POT);
+        components[volPot->getId()] = volPot;
+
         slider = std::make_shared<Slider>();
+        components[slider->getId()] = slider;
     }
 
     std::vector<std::string> getButtonLabels()
@@ -57,7 +66,7 @@ public:
 
         for (auto &[label,id] : componentLabelToId)
         {
-            if (id >= ComponentId::CURSOR_LEFT && id <= ComponentId::NUM_9)
+            if (id >= ComponentId::CURSOR_LEFT_OR_DIGIT && id <= ComponentId::NUM_9_OR_MIDI_SYNC)
             {
                 result.push_back(label);
             }
@@ -68,28 +77,22 @@ public:
 
     std::shared_ptr<Pad> getPad(int index)
     {
-        if (index < 0 || index >= static_cast<int>(pads.size())) return nullptr;
+        if (index < 0 || index >= static_cast<int>(pads.size())) return {};
         return pads[index];
     }
 
     std::vector<std::shared_ptr<Pad>>& getPads() { return pads; }
 
-    std::shared_ptr<Button> getButton(const std::string& label) {
-        if (auto it = buttons.find(label); it != buttons.end())
-            return it->second;
-        return nullptr;
+    std::shared_ptr<Button> getButton(const ComponentId id)
+    {
+        if (buttons.count(id) == 0) return {};
+        return buttons[id];
     }
 
-    std::vector<std::shared_ptr<Led>> getLeds() { return leds; }
-
-    std::shared_ptr<Led> getLed(const std::string label)
+    std::shared_ptr<Led> getLed(ComponentId id)
     {
-        for (auto &l : leds)
-        {
-            if (l->getLabel() == label) return l;
-        }
-
-        return {};
+        if (leds.count(id) == 0) return {};
+        return leds[id];
     }
 
     std::shared_ptr<DataWheel> getDataWheel() { return dataWheel; }
@@ -97,15 +100,10 @@ public:
     std::shared_ptr<Pot> getVolPot() { return volPot; }
     std::shared_ptr<Slider> getSlider() { return slider; }
 
-    std::shared_ptr<Component> getComponentByLabel(const std::string& label)
+    std::shared_ptr<Component> getComponent(const ComponentId id)
     {
-        if (auto it = buttons.find(label); it != buttons.end()) return it->second;
-        if (label.rfind("pad-", 0) == 0) {
-            int index = std::stoi(label.substr(4));
-            if (index >= 0 && index < static_cast<int>(pads.size()))
-                return pads[index];
-        }
-        return nullptr;
+        if (components.count(id) == 0) return {};
+        return components[id];
     }
 };
 

@@ -30,7 +30,7 @@ namespace mpc::command {
             mpc.getLayeredScreen()->openScreen("sequencer");
         }
 
-        mpc.getHardware()->getLed("rec")->setEnabled(true);
+        mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(true);
     }
 
 }
