@@ -1,4 +1,5 @@
 #include "controller/ClientInputController.h"
+#include "audiomidi/AudioMidiServices.hpp"
 #include "command/ReleasePadCommand.h"
 #include "hardware2/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
@@ -111,42 +112,34 @@ void ClientInputController::handleSlider(const ClientInput& a)
 {
     auto slider = mpc.getHardware2()->getSlider();
 
-    if (a.value) {
-        // Absolute movement
+    if (a.value)
+    {
         slider->moveToNormalizedY(*a.value);
         mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
     }
-    else if (a.deltaValue && *a.deltaValue != 0.f) {
-        // Relative movement with accumulation
-        float& acc = deltaAccumulators[*a.label]; // create per-slider accumulator
-        acc += *a.deltaValue;
-
-        int steps = static_cast<int>(acc);
-        if (steps != 0) {
-            acc -= steps; // preserve remainder
-            slider->setValue(slider->getValue() + steps);
-            mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
-        }
+    else if (a.deltaValue && *a.deltaValue != 0.f)
+    {
+        slider->setValue(slider->getValue() + *a.deltaValue);
+        mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
     }
 }
 
 void ClientInputController::handlePot(const ClientInput& a)
 {
-    if (!a.label || !a.deltaValue || *a.deltaValue == 0.f) return;
+    std::shared_ptr<mpc::hardware2::Pot> pot =
+        a.label->find("rec") != std::string::npos ? mpc.getHardware2()->getRecPot() : mpc.getHardware2()->getVolPot();
 
-    float& acc = deltaAccumulators[*a.label];
-    acc += *a.deltaValue;
+    auto audioMidiServices = mpc.getAudioMidiServices();
 
-    int steps = static_cast<int>(acc);
-    if (steps == 0) return;
-    acc -= steps; // preserve remainder
+    pot->setValue(pot->getValue() + *a.deltaValue * 0.01f);
 
-    if (a.label->find("rec") != std::string::npos) {
-        auto pot = mpc.getHardware2()->getRecPot();
-        pot->moveTo(pot->getValue() + steps);
-    } else if (a.label->find("main") != std::string::npos) {
-        auto pot = mpc.getHardware2()->getVolPot();
-        pot->moveTo(pot->getValue() + steps);
+    if (a.label->find("rec") != std::string::npos)
+    {
+        audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
+    }
+    else
+    {
+        audioMidiServices->setMainLevel(std::round(pot->getValue() * 100.f));
     }
 }
 

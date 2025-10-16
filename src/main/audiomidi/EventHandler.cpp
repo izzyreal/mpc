@@ -20,8 +20,6 @@
 
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "lcdgui/screens/TransScreen.hpp"
-#include "lcdgui/screens/window/MidiOutputScreen.hpp"
-#include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
 
 #include <cassert>
 #include <memory>

@@ -199,10 +199,9 @@ public:
     Direction getDirection() const { return direction; }
 };
 
-class Pot final : public Component, public Continuous<float, 0, 127> {
+class Pot final : public Component, public Continuous<float, 0, 1> {
 public:
     explicit Pot() {}
-    void moveTo(const float value) { setValue(value); }
 };
 
 } // namespace mpc::hardware2
