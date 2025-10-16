@@ -94,56 +94,59 @@ void ClientInputController::handlePadAftertouch(const ClientInput& a)
 
 void ClientInputController::handleDataWheel(const ClientInput& a)
 {
-    if (!a.value) return;
-    const auto steps = *a.value;
-    mpc.getHardware2()->getDataWheel()->turn(steps);
-    mpc.getActiveControls()->turnWheel(steps);
+    if (!a.deltaValue) return;
+    float& acc = deltaAccumulators[*a.label];
+    acc += *a.deltaValue;
+    int steps = static_cast<int>(acc);
+
+    if (steps != 0)
+    {
+        acc -= steps;
+        mpc.getHardware2()->getDataWheel()->turn(steps);
+        mpc.getActiveControls()->turnWheel(steps);
+    }
 }
 
 void ClientInputController::handleSlider(const ClientInput& a)
 {
-    if (!a.value && !a.deltaValue) return;
-    
-    if (a.value && a.deltaValue && *a.deltaValue != 0.f)
-    {
-        return;
-    }
-
     auto slider = mpc.getHardware2()->getSlider();
 
-    if (a.value)
-    {
+    if (a.value) {
+        // Absolute movement
         slider->moveToNormalizedY(*a.value);
         mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
     }
-    else if (*a.deltaValue != 0.f)
-    {
-        const auto currentSliderValue = slider->getValue();
-        slider->setValue(currentSliderValue + *a.deltaValue);
-        mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
+    else if (a.deltaValue && *a.deltaValue != 0.f) {
+        // Relative movement with accumulation
+        float& acc = deltaAccumulators[*a.label]; // create per-slider accumulator
+        acc += *a.deltaValue;
+
+        int steps = static_cast<int>(acc);
+        if (steps != 0) {
+            acc -= steps; // preserve remainder
+            slider->setValue(slider->getValue() + steps);
+            mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
+        }
     }
 }
 
 void ClientInputController::handlePot(const ClientInput& a)
 {
-    if (!a.label)
-    {
-        return;
-    }
+    if (!a.label || !a.deltaValue || *a.deltaValue == 0.f) return;
 
-    if (!a.deltaValue) return;
+    float& acc = deltaAccumulators[*a.label];
+    acc += *a.deltaValue;
 
-    const float potDelta = *a.deltaValue;
+    int steps = static_cast<int>(acc);
+    if (steps == 0) return;
+    acc -= steps; // preserve remainder
 
-    if (a.label->find("rec") != std::string::npos)
-    {
+    if (a.label->find("rec") != std::string::npos) {
         auto pot = mpc.getHardware2()->getRecPot();
-        pot->moveTo(pot->getValue() + potDelta);
-    }
-    else if (a.label->find("main") != std::string::npos)
-    {
+        pot->moveTo(pot->getValue() + steps);
+    } else if (a.label->find("main") != std::string::npos) {
         auto pot = mpc.getHardware2()->getVolPot();
-        pot->moveTo(pot->getValue() + potDelta);
+        pot->moveTo(pot->getValue() + steps);
     }
 }
 

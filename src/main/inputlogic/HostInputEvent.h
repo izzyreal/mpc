@@ -19,24 +19,33 @@ struct GestureEvent
 {
     enum class Type
     {
-        BEGIN, // Initial contact: mouse button pressed or finger touched.
+        BEGIN,  // Initial contact: mouse button pressed or finger touched.
         UPDATE, // Continued motion of that same contact (mouse drag or finger move), or scroll motions without BEGIN/END.
-        END, // Termination of the same contact: corresponding mouse button released or finger lifted.
-        REPEAT // Rapid successive BEGIN, END, BEGIN, END on the same component, i.e. double/triple click/tap.
+        END,    // Termination of the same contact: corresponding mouse button released or finger lifted.
+        REPEAT  // Rapid successive BEGIN, END, BEGIN, END on the same component, i.e. double/triple click/tap.
+    };
+
+    enum class Movement
+    {
+        None,       // No movement data (e.g. BEGIN/END/REPEAT events).
+        Absolute,   // Absolute motion in normalized coordinates (e.g. mouse drag along a slider).
+        Relative    // Relative motion in continuous deltas (e.g. mouse wheel or encoder turn).
     };
 
     Type type;
 
+    // Specifies whether this event represents absolute or relative motion.
+    Movement movement = Movement::None;
+
     // Normalized pointer position in [0, 1] relative to the component's bounds
-    float normX = 0.0f;
+    // Only valid when movement == Absolute
     float normY = 0.0f;
 
-    // Only valid for UPDATE events
-    int discreteDelta = 0;
+    // Only valid for UPDATE events with movement == Relative
     float continuousDelta = 0.f;
 
     // Only valid for REPEAT events. 2 for double, 3 for triple click/tap.
-    int repeatCount;
+    int repeatCount = 0;
 
     hardware2::ComponentId componentId;
 };

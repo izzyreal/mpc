@@ -5,7 +5,6 @@
 
 namespace mpc::inputlogic {
 
-/* Unified client-side input object (merged ClientInputEvent + ClientInputAction) */
 struct ClientInput {
     enum class Type {
         Unknown,
@@ -26,10 +25,8 @@ struct ClientInput {
     // For button events: label string (e.g. "play", "stop", "rec")
     std::optional<std::string> label;
     //
-    // Optional numeric value (velocity, pressure, slider position, wheel steps...)
-    std::optional<float> value;
 
-    // continuous / float numbers (normalized slider pos, pot delta, wheel continuous delta)
+    std::optional<float> value;
     std::optional<float> deltaValue;
 };
 

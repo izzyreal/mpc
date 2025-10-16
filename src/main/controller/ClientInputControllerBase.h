@@ -64,12 +64,15 @@ class ClientInputControllerBase {
             return result;
         }
 
+    protected:
+        // Maps component label to accumulated delta for discretization
+        std::unordered_map<std::string, float> deltaAccumulators;
+
     private:
         std::shared_ptr<mpc::controls::KbMapping> kbMapping;
         //
         // Maps physical pad index 0 - 15 to info at the time the pad was pushed.
         std::unordered_map<int, PhysicalPadPress> physicalPadPresses;
-
 };
 
 } // namespace mpc::controller

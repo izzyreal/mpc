@@ -14,7 +14,7 @@ using namespace mpc::hardware2;
 
 std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostEvent, std::shared_ptr<mpc::controls::KbMapping> kbMapping)
 {
-    ClientInput clientEvent;
+    ClientInput clientInput;
 
     switch (hostEvent.getSource())
     {
@@ -25,20 +25,20 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             int padIndex = midi.data1 % 16;
             if (midi.data2 > 0)
             {
-                clientEvent.type = ClientInput::Type::PadPress;
-                clientEvent.index = padIndex;
-                clientEvent.value = midi.data2;
+                clientInput.type = ClientInput::Type::PadPress;
+                clientInput.index = padIndex;
+                clientInput.value = midi.data2;
             }
             else
             {
-                clientEvent.type = ClientInput::Type::PadRelease;
-                clientEvent.index = padIndex;
+                clientInput.type = ClientInput::Type::PadRelease;
+                clientInput.index = padIndex;
             }
         }
         else if (midi.messageType == MidiEvent::CC)
         {
-            clientEvent.type = ClientInput::Type::SliderMove;
-            clientEvent.value = midi.data2;
+            clientInput.type = ClientInput::Type::SliderMove;
+            clientInput.value = midi.data2;
         }
         break;
     }
@@ -52,35 +52,40 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             throw std::invalid_argument("GestureEvent.componentId must not be NONE");
         }
 
-        clientEvent.label = mpc::hardware2::componentIdToLabel.at(gesture.componentId);
+        clientInput.label = mpc::hardware2::componentIdToLabel.at(gesture.componentId);
 
         if (gesture.componentId >= ComponentId::PAD1 && gesture.componentId <= ComponentId::PAD16)
         {
-            if (gesture.type == GestureEvent::Type::BEGIN || gesture.type == GestureEvent::Type::END)
-            {
-                clientEvent.index = static_cast<int>(gesture.componentId) - static_cast<int>(ComponentId::PAD1);
-                clientEvent.type = gesture.type == GestureEvent::Type::BEGIN ?
-                    ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
+            clientInput.index = static_cast<int>(gesture.componentId) - static_cast<int>(ComponentId::PAD1);
 
-                if (gesture.type == GestureEvent::Type::BEGIN)
-                {
-                    clientEvent.value = static_cast<int>((1.f - gesture.normY) * static_cast<float>(mpc::hardware2::Pad::MAX_VELO));
-                }
+            if (gesture.type == GestureEvent::Type::BEGIN)
+            {
+                clientInput.type = ClientInput::Type::PadPress;
+                clientInput.value = 1.f - gesture.normY;
+            }
+            else if (gesture.type == GestureEvent::Type::END)
+            {
+                clientInput.type = ClientInput::Type::PadRelease;
+            }
+            else if (gesture.type == GestureEvent::Type::UPDATE)
+            {
+                clientInput.type = ClientInput::Type::PadAftertouch;
+                clientInput.value = 1.f - gesture.normY;
             }
         }
         else if (gesture.componentId == ComponentId::SLIDER)
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientEvent.type = ClientInput::Type::SliderMove;
+                clientInput.type = ClientInput::Type::SliderMove;
 
-                if (gesture.continuousDelta != 0.f)
+                if (gesture.movement == GestureEvent::Movement::Relative)
                 {
-                    clientEvent.deltaValue = gesture.continuousDelta;
+                    clientInput.deltaValue = gesture.continuousDelta;
                 }
-                else
+                else /* Movement::Absolute */
                 {
-                    clientEvent.value = gesture.normY;
+                    clientInput.value = gesture.normY;
                 }
             }
         }
@@ -90,23 +95,23 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             {
                 if (gesture.repeatCount == 2)
                 {
-                    clientEvent.type = ClientInput::Type::ButtonDoublePress;
+                    clientInput.type = ClientInput::Type::ButtonDoublePress;
                 }
             }
             else if (gesture.type == GestureEvent::Type::BEGIN)
             {
                 if (gesture.repeatCount == 2)
                 {
-                    clientEvent.type = ClientInput::Type::ButtonDoublePress;
+                    clientInput.type = ClientInput::Type::ButtonDoublePress;
                 }
                 else
                 {
-                    clientEvent.type = ClientInput::Type::ButtonPress;
+                    clientInput.type = ClientInput::Type::ButtonPress;
                 }
             }
             else if (gesture.type == GestureEvent::Type::END)
             {
-                clientEvent.type = ClientInput::Type::ButtonRelease;
+                clientInput.type = ClientInput::Type::ButtonRelease;
             }
             else
             {
@@ -117,8 +122,8 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientEvent.type = ClientInput::Type::DataWheelTurn;
-                clientEvent.value = gesture.discreteDelta;
+                clientInput.type = ClientInput::Type::DataWheelTurn;
+                clientInput.deltaValue = gesture.continuousDelta;
             }
         }
         else if (gesture.componentId == ComponentId::REC_GAIN_POT ||
@@ -126,8 +131,8 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientEvent.type = ClientInput::Type::PotMove;
-                clientEvent.deltaValue = gesture.continuousDelta;
+                clientInput.type = ClientInput::Type::PotMove;
+                clientInput.deltaValue = gesture.continuousDelta;
             }
         }
         break;
@@ -144,25 +149,25 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             return std::nullopt;
         }
         
-        clientEvent.label = label;
+        clientInput.label = label;
 
         if (label.substr(0, 4) == "pad-")
         {
             const auto digitsString = label.substr(4);
             const auto padNumber = std::stoi(digitsString);
-            clientEvent.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
-            clientEvent.index = padNumber - 1;
-            if (key.keyDown) clientEvent.value = mpc::hardware2::Pad::MAX_VELO;
+            clientInput.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
+            clientInput.index = padNumber - 1;
+            if (key.keyDown) clientInput.value = mpc::hardware2::Pad::MAX_VELO;
         }
         else if (label == "slider")
         {
             if (!key.keyDown) break;
-            clientEvent.type = ClientInput::Type::SliderMove;
+            clientInput.type = ClientInput::Type::SliderMove;
         }
         else if (label.substr(0, std::string("datawheel-").length()) == "datawheel-")
         {
             if (!key.keyDown) break;
-            clientEvent.type = ClientInput::Type::DataWheelTurn;
+            clientInput.type = ClientInput::Type::DataWheelTurn;
 
             int increment = 1;
 
@@ -175,16 +180,39 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
                 increment = -increment;
             }
 
-            clientEvent.value = increment;
+            clientInput.deltaValue = increment;
         }
         else
         {
-            clientEvent.type = key.keyDown ? ClientInput::Type::ButtonPress : ClientInput::Type::ButtonRelease;
+            clientInput.type = key.keyDown ? ClientInput::Type::ButtonPress : ClientInput::Type::ButtonRelease;
         }
         break;
     }
     }
 
-    return clientEvent;
+    if (!clientInput.label)
+    {
+        throw std::runtime_error("ClientInput must have a label.");
+    }
+
+    if (clientInput.deltaValue && clientInput.value)
+    {
+        throw std::runtime_error("ClientInput can have either a value, or a deltaValue, not both.");
+    }
+
+    if (clientInput.type == ClientInput::Type::ButtonPress || clientInput.type == ClientInput::Type::ButtonRelease || clientInput.type == ClientInput::Type::ButtonDoublePress)
+    {
+        if (clientInput.deltaValue || clientInput.value)
+        {
+            throw std::runtime_error("ClientInput for Button may not have a deltaValue or value.");
+        }
+    }
+
+    if (clientInput.type == ClientInput::Type::DataWheelTurn && !clientInput.deltaValue)
+    {
+        throw std::runtime_error("ClientInput for DataWheel must have a deltaValue.");
+    }
+
+    return clientInput;
 }
 

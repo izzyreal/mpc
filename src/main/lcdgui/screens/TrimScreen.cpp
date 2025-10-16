@@ -275,6 +275,8 @@ void TrimScreen::setEnd(int newValue)
     auto lowerBound = 0;
     const auto upperBound = sound->getFrameCount();
 
+    const int oldStart = sound->getStart();
+
     if (smplLngthFix)
     {
         lowerBound = oldSoundLength;
@@ -298,6 +300,11 @@ void TrimScreen::setEnd(int newValue)
     if (smplLngthFix)
     {
         sound->setStart(sound->getEnd() - oldSoundLength);
+    }
+
+    if (oldStart != sound->getStart())
+    {
+        displaySt();
     }
 }
 
