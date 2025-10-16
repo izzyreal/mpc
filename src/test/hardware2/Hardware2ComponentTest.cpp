@@ -187,6 +187,12 @@ TEST_CASE("Slider is a Continuous<float, 0, 127> specialization", "[hardware2]")
     STATIC_REQUIRE(std::is_base_of_v<SliderBase, Slider>);
 }
 
+TEST_CASE("Pot is a Continuous<float, 0, 127> specialization", "[hardware2]")
+{
+    using PotBase = Continuous<float, 0, 127>;
+    STATIC_REQUIRE(std::is_base_of_v<PotBase, Pot>);
+}
+
 TEST_CASE("Pot clamps values between 0 and 127", "[hardware2]")
 {
     Pot p;

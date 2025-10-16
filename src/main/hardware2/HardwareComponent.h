@@ -199,7 +199,7 @@ public:
     Direction getDirection() const { return direction; }
 };
 
-class Pot final : public Component, public Continuous<int, 0, 127> {
+class Pot final : public Component, public Continuous<float, 0, 127> {
 public:
     explicit Pot() {}
     void moveTo(int value) { setValue(value); }
