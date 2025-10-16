@@ -1,5 +1,6 @@
 #pragma once
 
+#include "hardware/ComponentId.h"
 #include "inputlogic/HostInputEvent.h"
 #include "inputlogic/HostToClientTranslator.h"
 #include "inputlogic/ClientInput.h"
@@ -44,9 +45,9 @@ class ClientInputControllerBase {
 
         ButtonLockTracker buttonLockTracker;
 
-        bool isNoteRepeatLocked() const { return buttonLockTracker.isLocked("note-repeat"); }
-        void lockNoteRepeat() { buttonLockTracker.lock("note-repeat"); }
-        void unlockNoteRepeat() { buttonLockTracker.unlock("note-repeat"); }
+        bool isNoteRepeatLocked() const { return buttonLockTracker.isLocked(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT); }
+        void lockNoteRepeat() { buttonLockTracker.lock(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT); }
+        void unlockNoteRepeat() { buttonLockTracker.unlock(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT); }
 
         std::shared_ptr<mpc::controls::KbMapping> getKbMapping() { return kbMapping; }
 
@@ -66,7 +67,7 @@ class ClientInputControllerBase {
 
     protected:
         // Maps component label to accumulated delta for discretization
-        std::unordered_map<std::string, float> deltaAccumulators;
+        std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
 
     private:
         std::shared_ptr<mpc::controls::KbMapping> kbMapping;

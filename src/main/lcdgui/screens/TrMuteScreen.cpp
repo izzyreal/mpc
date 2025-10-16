@@ -69,7 +69,7 @@ void TrMuteScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 	
-	if (mpc.getHardware()->getButton("f6")->isPressed() || sequencer.lock()->isSoloEnabled())
+	if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed() || sequencer.lock()->isSoloEnabled())
 	{
 		if (!sequencer.lock()->isSoloEnabled())
 			sequencer.lock()->setSoloEnabled(true);

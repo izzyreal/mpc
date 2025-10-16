@@ -1,6 +1,7 @@
 #include "PushPlayStartCommand.h"
 #include "Mpc.hpp"
 #include "controller/ClientInputControllerBase.h"
+#include "hardware/ComponentId.h"
 #include "hardware/Hardware.h"
 #include "lcdgui/ScreenGroups.h"
 #include "sequencer/Sequencer.hpp"
@@ -21,11 +22,11 @@ namespace mpc::command {
 
         auto hardware = mpc.getHardware();
 
-        const auto recButtonIsPressedOrLocked = hardware->getButton("rec")->isPressed() ||
-                                                mpc.inputController->buttonLockTracker.isLocked("rec");
+        const auto recButtonIsPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
+                                                mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
-        const auto overdubButtonIsPressedOrLocked = hardware->getButton("overdub")->isPressed() ||
-                                                    mpc.inputController->buttonLockTracker.isLocked("overdub");
+        const auto overdubButtonIsPressedOrLocked = hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
+                                                mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
 
         if (recButtonIsPressedOrLocked)
         {
@@ -47,7 +48,7 @@ namespace mpc::command {
         }
         else
         {
-            if (hardware->getButton("shift")->isPressed())
+            if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
             {
                 mpc.getLayeredScreen()->openScreen("vmpc-direct-to-disk-recorder");
             }
@@ -63,12 +64,12 @@ namespace mpc::command {
             }
         }
 
-        mpc.inputController->buttonLockTracker.unlock("rec");
-        mpc.inputController->buttonLockTracker.unlock("overdub");
+        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::REC);
+        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
-        mpc.getHardware()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
-        mpc.getHardware()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
-        mpc.getHardware()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
+        mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(mpc.getSequencer()->isOverdubbing());
+        mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(mpc.getSequencer()->isRecording());
+        mpc.getHardware()->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(mpc.getSequencer()->isPlaying());
     }
 
 }

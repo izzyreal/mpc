@@ -211,7 +211,7 @@ void TrimScreen::turnWheel(int i)
 
 void TrimScreen::setSlider(int i)
 {
-	if (!mpc.getHardware()->getButton("shift")->isPressed())
+	if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
         return;
     }
@@ -321,7 +321,7 @@ void TrimScreen::right()
 // Can be called from another layer, i.e. Start Fine and End Fine windows
 void TrimScreen::pressEnter()
 {
-	if (mpc.getHardware()->getButton("shift")->isPressed())
+	if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
 	{
 		openScreen("save");
 		return;

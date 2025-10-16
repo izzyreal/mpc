@@ -166,7 +166,7 @@ void LoopToFineScreen::pressEnter()
 
 void LoopToFineScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton("shift")->isPressed())
+    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
         return;
     }

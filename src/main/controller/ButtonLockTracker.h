@@ -3,41 +3,43 @@
 #include <unordered_map>
 #include <string>
 
+#include "hardware/ComponentId.h"
+
 namespace mpc::controller
 {
 class ButtonLockTracker {
     private:
-        std::unordered_map<std::string, bool> states;
+        std::unordered_map<hardware::ComponentId, bool> states;
 
     public:
-        void lock(const std::string& label)
+        void lock(const hardware::ComponentId id)
         {
-            states[label] = true;
+            states[id] = true;
         }
 
-        bool isLocked(const std::string& label) const noexcept
+        bool isLocked(const hardware::ComponentId id) const noexcept
         {
-            if (auto it = states.find(label); it != states.end())
+            if (auto it = states.find(id); it != states.end())
             {
                 return it->second;
             }
             return false;
         }
 
-        void unlock(const std::string& label) noexcept
+        void unlock(const hardware::ComponentId id) noexcept
         {
-            states[label] = false;
+            states[id] = false;
         }
 
-        void toggle(const std::string &label)
+        void toggle(const hardware::ComponentId id)
         {
-            if (isLocked(label))
+            if (isLocked(id))
             {
-                unlock(label);
+                unlock(id);
             }
             else
             {
-                lock(label);
+                lock(id);
             }
         }
     };

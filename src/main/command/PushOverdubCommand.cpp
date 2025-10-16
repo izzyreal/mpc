@@ -11,8 +11,8 @@ namespace mpc::command {
 
     void PushOverdubCommand::execute()
     {
-        mpc.inputController->buttonLockTracker.unlock("rec");
-        mpc.inputController->buttonLockTracker.unlock("overdub");
+        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::REC);
+        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
         if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
         {
@@ -30,7 +30,7 @@ namespace mpc::command {
             mpc.getLayeredScreen()->openScreen("sequencer");
         }
 
-        mpc.getHardware()->getLed("overdub")->setEnabled(true);
+        mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(true);
     }
 
 }

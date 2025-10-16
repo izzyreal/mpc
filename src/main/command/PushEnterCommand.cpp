@@ -8,7 +8,7 @@ namespace mpc::command {
 
     void PushEnterCommand::execute() {
         
-        if (mpc.getHardware()->getButton("shift")->isPressed())
+        if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
             mpc.getLayeredScreen()->openScreen("save");
         }

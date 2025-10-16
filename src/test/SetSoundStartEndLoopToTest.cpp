@@ -14,6 +14,7 @@
 using namespace mpc::sampler;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::hardware;
 
 const uint16_t SOUND_LENGTH = 1000;
 const uint16_t MAX_SLIDER_VALUE = 127;
@@ -75,7 +76,7 @@ TEST_CASE("TRIM screen", "[sound]")
     REQUIRE(sound->getStart() == 249);
     REQUIRE(sound->getEnd() == 499);
 
-    auto shiftButton = mpc.getHardware()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton(ComponentId::SHIFT);
     shiftButton->press();
     trimScreen->setSlider(MAX_SLIDER_VALUE);
     REQUIRE(sound->getStart() == 249);
@@ -180,7 +181,7 @@ TEST_CASE("Start fine window", "[sound]")
     REQUIRE(sound->getStart() == 1);
     REQUIRE(sound->getEnd() == SOUND_LENGTH);
 
-    auto shiftButton = mpc.getHardware()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton(ComponentId::SHIFT);
 
     shiftButton->press();
     startFineScreen->setSlider(0);
@@ -236,7 +237,7 @@ TEST_CASE("End fine window", "[sound]")
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getEnd() == SOUND_LENGTH - 1);
 
-    auto shiftButton = mpc.getHardware()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton(ComponentId::SHIFT);
     shiftButton->press();
 
     endFineScreen->setSlider(0);
@@ -329,7 +330,7 @@ TEST_CASE("LOOP screen with end", "[sound]")
     REQUIRE(sound->getLoopTo() == 249);
     REQUIRE(sound->getEnd() == 499);
 
-    auto shiftButton = mpc.getHardware()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton(ComponentId::SHIFT);
 
     shiftButton->press();
     loopScreen->setSlider(MAX_SLIDER_VALUE);

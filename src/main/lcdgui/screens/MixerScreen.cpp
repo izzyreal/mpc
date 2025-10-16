@@ -649,7 +649,7 @@ bool MixerScreen::stripHasStereoSound(int stripIndex)
 
 void MixerScreen::pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank)
 {
-    const bool shiftIsPressed = mpc.getHardware()->getButton("shift")->isPressed();
+    const bool shiftIsPressed = mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed();
 
     if (!shiftIsPressed)
     {

@@ -428,8 +428,8 @@ bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
-    const bool recIsPressedOrLocked = mpc.getHardware()->getButton("rec")->isPressed() ||
-                                      mpc.inputController->buttonLockTracker.isLocked("rec");
+    const bool recIsPressedOrLocked = mpc.getHardware()->getButton(hardware::ComponentId::REC)->isPressed() ||
+                                      mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
 	bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
 		!sequencer->isPlaying() &&

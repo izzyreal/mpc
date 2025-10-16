@@ -11,7 +11,7 @@ namespace mpc::command {
 
     void SplitRightCommand::execute() {
 
-        if (!mpc.getHardware()->getButton("shift")->isPressed())
+        if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
             PushRightCommand(mpc).execute();
             return;

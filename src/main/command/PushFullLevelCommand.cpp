@@ -8,7 +8,7 @@ namespace mpc::command {
 
     void PushFullLevelCommand::execute() {
         mpc.setFullLevelEnabled(!mpc.isFullLevelEnabled());
-        mpc.getHardware()->getLed("full-level")->setEnabled(mpc.isFullLevelEnabled());
+        mpc.getHardware()->getLed(hardware::ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(mpc.isFullLevelEnabled());
     }
 }
 

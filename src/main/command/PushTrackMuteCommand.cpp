@@ -17,11 +17,11 @@ namespace mpc::command {
             } else {
                 mpc.getLayeredScreen()->openScreen("sequencer");
             }
-            mpc.getHardware()->getLed("track-mute")->setEnabled(false);
+            mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
         } else if (currentScreenName == "next-seq" || currentScreenName == "next-seq-pad" || currentScreenName == "sequencer") {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen("track-mute");
-            mpc.getHardware()->getLed("track-mute")->setEnabled(true);
+            mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(true);
         }
     }
 

@@ -12,7 +12,7 @@ namespace mpc::command {
 
         if (mpc.isSixteenLevelsEnabled()) {
             mpc.setSixteenLevelsEnabled(false);
-            mpc.getHardware()->getLed("sixteen-levels")->setEnabled(false);
+            mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(false);
         } else {
             mpc.getLayeredScreen()->openScreen("assign-16-levels");
         }

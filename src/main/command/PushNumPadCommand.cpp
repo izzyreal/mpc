@@ -14,7 +14,7 @@ PushNumPadCommand::PushNumPadCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i)
 }
 
 void PushNumPadCommand::execute() {
-    if (mpc.getHardware()->getButton("shift")->isPressed())
+    if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
         switch (i) {
             case 0: mpc.getLayeredScreen()->openScreen("vmpc-settings"); break;

@@ -16,8 +16,8 @@ namespace mpc::command {
         mpc.getSequencer()->setSoloEnabled(mpc.getSequencer()->isSoloEnabled());
 
         const auto hw = mpc.getHardware();
-        hw->getLed("next-seq")->setEnabled(false);
-        hw->getLed("track-mute")->setEnabled(false);
+        hw->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(false);
+        hw->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
     }
 
 }

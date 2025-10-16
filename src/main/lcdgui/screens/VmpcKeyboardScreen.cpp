@@ -35,6 +35,7 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 
 void VmpcKeyboardScreen::turnWheel(int i)
 {
+    /*
     init();
     auto kbMapping = mpc.inputController->getKbMapping();
     auto label = kbMapping->getLabelKeyMap()[row + rowOffset].first;
@@ -43,6 +44,7 @@ void VmpcKeyboardScreen::turnWheel(int i)
 
     kbMapping->setKeyCodeForLabel(newKeyCode, label);
     updateRows();
+    */
 }
 
 void VmpcKeyboardScreen::open()
@@ -121,7 +123,7 @@ bool VmpcKeyboardScreen::hasMappingChanged()
 {
     auto persisted = KbMapping(mpc.paths->configPath());
     auto inMem = mpc.inputController->getKbMapping();
-
+/*
     for (auto& mapping : inMem->getLabelKeyMap())
     {
         if (inMem->getKeyCodeFromLabel(mapping.first) != persisted.getKeyCodeFromLabel(mapping.first))
@@ -137,7 +139,7 @@ bool VmpcKeyboardScreen::hasMappingChanged()
             return true;
         }
     }
-
+*/
     return false;
 }
 
@@ -187,7 +189,7 @@ void VmpcKeyboardScreen::function(int i)
                 
                 if (learnCandidate != oldKeyCode)
                 {
-                    kbMapping->setKeyCodeForLabel(learnCandidate, mapping.first);
+                    //kbMapping->setKeyCodeForLabel(learnCandidate, mapping.first);
                 }
             }
             
@@ -252,7 +254,7 @@ void VmpcKeyboardScreen::updateRows()
     auto kbMapping = mpc.inputController->getKbMapping();
     auto& labelKeyMap = kbMapping->getLabelKeyMap();
     const int MAX_LABEL_LENGTH = 15;
-
+/*
     for (int i = 0; i < 5; i++)
     {
         auto l = findChild<Label>("row" + std::to_string(i));
@@ -281,7 +283,7 @@ void VmpcKeyboardScreen::updateRows()
             f->setBlinking(false);
         }
     }
-    
+ */   
     displayUpAndDown();
 }
 

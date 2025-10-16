@@ -1,6 +1,7 @@
 #include "SequencerScreen.hpp"
 
 #include "controller/ClientInputControllerBase.h"
+#include "hardware/ComponentId.h"
 #include "hardware/Hardware.h"
 
 #include <sequencer/Track.hpp>
@@ -114,14 +115,14 @@ void SequencerScreen::open()
     const bool sequencerIsRecordingOrOverdubbing = sequencer.lock()->isRecordingOrOverdubbing();
     
     const auto footerIsInvisible = !mpc.inputController->isNoteRepeatLocked() &&
-                                   !(mpc.getHardware()->getButton("erase")->isPressed() &&
+                                   !(mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed() &&
                                    sequencerIsRecordingOrOverdubbing);
     
     findChild("footer-label")->Hide(footerIsInvisible);
 
     findChild("function-keys")->Hide(!footerIsInvisible ||
                                      punchScreen->on ||
-                                     (mpc.getHardware()->getButton("erase")->isPressed() && sequencerIsRecordingOrOverdubbing));
+                                     (mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed() && sequencerIsRecordingOrOverdubbing));
 }
 
 void SequencerScreen::erase()
@@ -852,8 +853,8 @@ void SequencerScreen::displayPunchWhileRecording()
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
     auto hardware = mpc.getHardware();
-    auto isRecPressedOrLocked = hardware->getButton("rec")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("rec");
-    auto isOverdubPressedOrLocked = hardware->getButton("overdub")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("overdub");
+    auto isRecPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() || mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+    auto isOverdubPressedOrLocked = hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() || mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
 
 	if (punchScreen->on && (isRecPressedOrLocked || isOverdubPressedOrLocked))
 	{

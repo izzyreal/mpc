@@ -103,7 +103,7 @@ void LoopScreen::function(int f)
 		break;
 	}
 	case 5:
-		if (mpc.getHardware()->getButton("f6")->isPressed())
+		if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed())
 			return;
 
 		sampler->playX();
@@ -205,7 +205,7 @@ void LoopScreen::turnWheel(int i)
 
 void LoopScreen::setSlider(int i)
 {
-	if (!mpc.getHardware()->getButton("shift")->isPressed())
+	if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
         return;
     }
@@ -336,7 +336,7 @@ void LoopScreen::right()
 
 void LoopScreen::pressEnter()
 {
-	if (mpc.getHardware()->getButton("shift")->isPressed())
+	if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
 	{
 		openScreen("save");
 		return;

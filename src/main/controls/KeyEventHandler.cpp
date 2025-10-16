@@ -158,7 +158,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
                 return;
             }
 
-            const auto charWithCasing = static_cast<char>(mpc.getHardware()->getButton("shift")->isPressed() ? toupper(keyCodeChar) : tolower(keyCodeChar));
+            const auto charWithCasing = static_cast<char>(mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed() ? toupper(keyCodeChar) : tolower(keyCodeChar));
             nameScreen->typeCharacter(charWithCasing);
             return;
         }
@@ -202,7 +202,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             if (mpc.getControls()->isAltPressed())
                 increment *= 10;
 
-            if (mpc.getHardware()->getButton("shift")->isPressed())
+            if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
                 increment *= 10;
 
             if (label.find("down") != std::string::npos)

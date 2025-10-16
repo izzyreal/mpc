@@ -35,8 +35,8 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
-                                             mpc.getHardware()->getButton("tap")->isPressed();
-    const bool isErasePressed = mpc.getHardware()->getButton("erase")->isPressed();
+                                             mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
+    const bool isErasePressed = mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed();
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(mpc);
     const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(mpc);
 
@@ -135,7 +135,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         eventHandler,
         recordNoteOnEvent,
         mpc.getSequencer()->isRecordingOrOverdubbing(),
-        mpc.getHardware()->getButton("erase")->isPressed(),
+        mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed(),
         mpc.getSequencer()->getActiveTrack(),
         sequencer::SeqUtil::isStepRecording(mpc),
         isAnyProgramPadRegisteredAsPressed,

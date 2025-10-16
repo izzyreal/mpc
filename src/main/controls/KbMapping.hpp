@@ -8,6 +8,7 @@
 #include <string>
 
 #include "KeyCodeHelper.hpp"
+#include "hardware/ComponentId.h"
 
 namespace mpc {
     class Mpc;
@@ -23,18 +24,18 @@ public:
 
     void initializeDefaults();
     const VmpcKeyCode getKeyCodeFromLabel(const std::string& label);
-    std::string getHardwareComponentLabelAssociatedWithKeycode(const VmpcKeyCode keyCode);
+    hardware::ComponentId getHardwareComponentIdAssociatedWithKeycode(const VmpcKeyCode keyCode);
     void setKeyCodeForLabel(const VmpcKeyCode keyCode, const std::string& label);
 
     void exportMapping();
     void importMapping();
-    std::vector<std::pair<std::string, VmpcKeyCode>>& getLabelKeyMap();
+    std::vector<std::pair<hardware::ComponentId, VmpcKeyCode>>& getLabelKeyMap();
 
     static const VmpcKeyCode getNextKeyCode(const VmpcKeyCode keyCode);
     static const VmpcKeyCode getPreviousKeyCode(const VmpcKeyCode keyCode);
 
 private:
-    std::vector<std::pair<std::string, VmpcKeyCode>> labelKeyMap;
+    std::vector<std::pair<hardware::ComponentId, VmpcKeyCode>> idKeyMap;
 
     const fs::path configDirectory;
 
