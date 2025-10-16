@@ -25,8 +25,12 @@ struct ClientInput {
     std::optional<int> index;
     // For button events: label string (e.g. "play", "stop", "rec")
     std::optional<std::string> label;
+    //
     // Optional numeric value (velocity, pressure, slider position, wheel steps...)
-    std::optional<int> value;
+    std::optional<float> value;
+
+    // continuous / float numbers (normalized slider pos, pot delta, wheel continuous delta)
+    std::optional<float> deltaValue;
 };
 
 } // namespace mpc::inputlogic

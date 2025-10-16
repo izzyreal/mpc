@@ -20,7 +20,7 @@ struct GestureEvent
     enum class Type
     {
         BEGIN, // Initial contact: mouse button pressed or finger touched.
-        UPDATE, // Continued motion of that same contact (mouse drag or finger move).
+        UPDATE, // Continued motion of that same contact (mouse drag or finger move), or scroll motions without BEGIN/END.
         END, // Termination of the same contact: corresponding mouse button released or finger lifted.
         REPEAT // Rapid successive BEGIN, END, BEGIN, END on the same component, i.e. double/triple click/tap.
     };
@@ -32,7 +32,8 @@ struct GestureEvent
     float normY = 0.0f;
 
     // Only valid for UPDATE events
-    int stepDelta = 0;
+    int discreteDelta = 0;
+    float continuousDelta = 0.f;
 
     // Only valid for REPEAT events. 2 for double, 3 for triple click/tap.
     int repeatCount;

@@ -68,12 +68,20 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
                 }
             }
         }
-        else if (gesture.componentId == ComponentId::SLIDER && gesture.componentId)
+        else if (gesture.componentId == ComponentId::SLIDER)
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
                 clientEvent.type = ClientInput::Type::SliderMove;
-                clientEvent.value = gesture.normY;
+
+                if (gesture.continuousDelta != 0.f)
+                {
+                    clientEvent.deltaValue = gesture.continuousDelta;
+                }
+                else
+                {
+                    clientEvent.value = gesture.normY;
+                }
             }
         }
         else if (gesture.componentId >= ComponentId::CURSOR_LEFT && gesture.componentId <= ComponentId::NUM_9)
@@ -82,7 +90,6 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             {
                 if (gesture.repeatCount == 2)
                 {
-                    printf("REPEAT gesture has repeat count of 2\n");
                     clientEvent.type = ClientInput::Type::ButtonDoublePress;
                 }
             }
@@ -90,7 +97,6 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             {
                 if (gesture.repeatCount == 2)
                 {
-                    printf("BEGIN gesture has repeat count of 2\n");
                     clientEvent.type = ClientInput::Type::ButtonDoublePress;
                 }
                 else
@@ -112,12 +118,17 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
                 clientEvent.type = ClientInput::Type::DataWheelTurn;
-                clientEvent.value = gesture.stepDelta;
+                clientEvent.value = gesture.discreteDelta;
             }
         }
-        else if (gesture.componentId == ComponentId::NONE)
+        else if (gesture.componentId == ComponentId::REC_GAIN_POT ||
+                 gesture.componentId == ComponentId::MAIN_VOLUME_POT)
         {
-            throw std::invalid_argument("GestureEvent.componentId must not be NONE");
+            if (gesture.type == GestureEvent::Type::UPDATE)
+            {
+                clientEvent.type = ClientInput::Type::PotMove;
+                clientEvent.deltaValue = gesture.continuousDelta;
+            }
         }
         break;
     }

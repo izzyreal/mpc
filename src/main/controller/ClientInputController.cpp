@@ -1,5 +1,6 @@
 #include "controller/ClientInputController.h"
 #include "command/ReleasePadCommand.h"
+#include "hardware2/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
 #include "controller/PadContextFactory.h"
 #include "Mpc.hpp"
@@ -101,30 +102,48 @@ void ClientInputController::handleDataWheel(const ClientInput& a)
 
 void ClientInputController::handleSlider(const ClientInput& a)
 {
-    if (!a.value) return;
-    const auto newSliderValue = *a.value;
-    mpc.getHardware2()->getSlider()->moveTo(static_cast<float>(newSliderValue));
-    mpc.getActiveControls()->setSlider(newSliderValue);
+    if (!a.value && !a.deltaValue) return;
+    
+    if (a.value && a.deltaValue && *a.deltaValue != 0.f)
+    {
+        return;
+    }
+
+    auto slider = mpc.getHardware2()->getSlider();
+
+    if (a.value)
+    {
+        slider->moveToNormalizedY(*a.value);
+        mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
+    }
+    else if (*a.deltaValue != 0.f)
+    {
+        const auto currentSliderValue = slider->getValue();
+        slider->setValue(currentSliderValue + *a.deltaValue);
+        mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
+    }
 }
 
 void ClientInputController::handlePot(const ClientInput& a)
 {
     if (!a.label)
     {
-        printf("ClientInputController::handlePot invoked without label\n");
         return;
     }
 
-    if (!a.value) return;
-    const auto newPotValue = *a.value;
+    if (!a.deltaValue) return;
+
+    const float potDelta = *a.deltaValue;
 
     if (a.label->find("rec") != std::string::npos)
     {
-        mpc.getHardware2()->getRecPot()->moveTo(newPotValue);
+        auto pot = mpc.getHardware2()->getRecPot();
+        pot->moveTo(pot->getValue() + potDelta);
     }
     else if (a.label->find("main") != std::string::npos)
     {
-        mpc.getHardware2()->getVolPot()->moveTo(newPotValue);
+        auto pot = mpc.getHardware2()->getVolPot();
+        pot->moveTo(pot->getValue() + potDelta);
     }
 }
 
@@ -211,7 +230,6 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
 void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
     if (!a.label) return;
-    std::printf("[logic] button %s released\n", a.label->c_str());
 
     auto button = mpc.getHardware2()->getButton(*a.label);
 

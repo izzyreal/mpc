@@ -202,7 +202,7 @@ public:
 class Pot final : public Component, public Continuous<float, 0, 127> {
 public:
     explicit Pot() {}
-    void moveTo(int value) { setValue(value); }
+    void moveTo(const float value) { setValue(value); }
 };
 
 } // namespace mpc::hardware2
