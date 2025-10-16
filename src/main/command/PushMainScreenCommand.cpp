@@ -1,7 +1,7 @@
 #include "PushMainScreenCommand.h"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 namespace mpc::command {
 
@@ -15,7 +15,7 @@ namespace mpc::command {
         mpc.getLayeredScreen()->openScreen("sequencer");
         mpc.getSequencer()->setSoloEnabled(mpc.getSequencer()->isSoloEnabled());
 
-        const auto hw = mpc.getHardware2();
+        const auto hw = mpc.getHardware();
         hw->getLed("next-seq")->setEnabled(false);
         hw->getLed("track-mute")->setEnabled(false);
     }

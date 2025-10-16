@@ -11,7 +11,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <file/all/AllParser.hpp>
 #include <file/all/Defaults.hpp>
@@ -75,7 +75,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
             (char) (vmpcAutoSaveScreen->autoLoadOnStart),
             (char) (audioMidiServices->getRecordLevel()),
             (char) (audioMidiServices->getMainLevel()),
-            (char) (mpc.getHardware2()->getSlider()->getValue()),
+            (char) (mpc.getHardware()->getSlider()->getValue()),
             (char) (vmpcSettingsScreen->autoConvertWavs),
             0x00, // This was tap averaging, but it does not belong here
             (char) (othersScreen->getContrast()),
@@ -95,9 +95,9 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
     if (!fs::exists(path))
     {
         audioMidiServices->setRecordLevel(DEFAULT_REC_GAIN);
-        mpc.getHardware2()->getRecPot()->setValue(DEFAULT_REC_GAIN * 0.01f);
+        mpc.getHardware()->getRecPot()->setValue(DEFAULT_REC_GAIN * 0.01f);
         audioMidiServices->setMainLevel(DEFAULT_MAIN_VOLUME);
-        mpc.getHardware2()->getVolPot()->setValue(DEFAULT_MAIN_VOLUME * 0.01f);
+        mpc.getHardware()->getVolPot()->setValue(DEFAULT_MAIN_VOLUME * 0.01f);
         return;
     }
 
@@ -118,16 +118,16 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
     if (bytes.size() > 4)
     {
         audioMidiServices->setRecordLevel(bytes[4]);
-        mpc.getHardware2()->getRecPot()->setValue(bytes[4] * 0.01f);
+        mpc.getHardware()->getRecPot()->setValue(bytes[4] * 0.01f);
     }
 
     if (bytes.size() > 5)
     {
         audioMidiServices->setMainLevel(bytes[5]);
-        mpc.getHardware2()->getVolPot()->setValue(bytes[5] * 0.01f);
+        mpc.getHardware()->getVolPot()->setValue(bytes[5] * 0.01f);
     }
 
-    if (bytes.size() > 6) mpc.getHardware2()->getSlider()->setValue(bytes[6]);
+    if (bytes.size() > 6) mpc.getHardware()->getSlider()->setValue(bytes[6]);
     if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
     // We used to have tap averaging here, but it doesn't belong here, so
     // for now we ignore this byte.

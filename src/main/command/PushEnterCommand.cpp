@@ -1,6 +1,6 @@
 #include "PushEnterCommand.h"
 #include "Mpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 namespace mpc::command {
 
@@ -8,7 +8,7 @@ namespace mpc::command {
 
     void PushEnterCommand::execute() {
         
-        if (mpc.getHardware2()->getButton("shift")->isPressed())
+        if (mpc.getHardware()->getButton("shift")->isPressed())
         {
             mpc.getLayeredScreen()->openScreen("save");
         }

@@ -158,7 +158,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
                 return;
             }
 
-            const auto charWithCasing = static_cast<char>(mpc.getHardware2()->getButton("shift")->isPressed() ? toupper(keyCodeChar) : tolower(keyCodeChar));
+            const auto charWithCasing = static_cast<char>(mpc.getHardware()->getButton("shift")->isPressed() ? toupper(keyCodeChar) : tolower(keyCodeChar));
             nameScreen->typeCharacter(charWithCasing);
             return;
         }
@@ -171,7 +171,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         
         const auto digitsString = label.substr(4);
         const auto padNumber = std::stoi(digitsString);
-        auto mpcPad = mpc.getHardware2()->getPad(padNumber - 1);
+        auto mpcPad = mpc.getHardware()->getPad(padNumber - 1);
         if (keyEvent.keyDown)
         {
             mpcPad->pressWithVelocity(127);
@@ -202,13 +202,13 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             if (mpc.getControls()->isAltPressed())
                 increment *= 10;
 
-            if (mpc.getHardware2()->getButton("shift")->isPressed())
+            if (mpc.getHardware()->getButton("shift")->isPressed())
                 increment *= 10;
 
             if (label.find("down") != std::string::npos)
                 increment = -increment;
 
-            mpc.getHardware2()->getDataWheel()->turn(increment);
+            mpc.getHardware()->getDataWheel()->turn(increment);
         }
     }
     */

@@ -23,7 +23,7 @@
 
 #include "MpcResourceUtil.hpp"
 #include "inputlogic/PadAndButtonKeyboard.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #if __linux__
 #include <climits>
@@ -153,7 +153,7 @@ int LayeredScreen::openScreen(std::string newScreenName)
 	std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
 
 	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
-	mpc.getHardware2()->getLed("overdub")->setEnabled(isOverdubScreen);
+	mpc.getHardware()->getLed("overdub")->setEnabled(isOverdubScreen);
 
 	std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
 

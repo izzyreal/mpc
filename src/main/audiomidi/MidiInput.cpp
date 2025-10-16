@@ -12,8 +12,8 @@
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
 
-#include "hardware2/Hardware2.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/Hardware.h"
+#include "hardware/HardwareComponent.h"
 
 #include "lcdgui/ScreenGroups.h"
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -132,7 +132,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
     const auto value = msg->getData2();
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto hardware2 = mpc.getHardware2();
+    auto hardware = mpc.getHardware();
 
     // As per MPC2000XL's MIDI implementation chart
     if (controller == 7)
@@ -143,7 +143,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
         // For now, we're safe to simply invert the input, but it would be nice
         // to make this congruent with the MPD16 (assuming it's the same for
         // other controllers, but it would be nice to verify some).
-        hardware2->getSlider()->setValue(127 - value);
+        hardware->getSlider()->setValue(127 - value);
     }
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
@@ -241,7 +241,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     else if (func >= 12 && func < 28)
                     {
                         auto pad = func - 12;
-                        hardware2->getPad(pad)->pressWithVelocity(value);
+                        hardware->getPad(pad)->pressWithVelocity(value);
                     }
                 }
                 else // value < 64
@@ -253,7 +253,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     else if (func >= 12 && func < 28)
                     {
                         auto pad = func - 12;
-                        hardware2->getPad(pad)->release();
+                        hardware->getPad(pad)->release();
                     }
                 }
             }
@@ -314,7 +314,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 
     auto bus = track->getBus();
 
-    const bool isNoteRepeatLockedOrPressed = mpc.getHardware2()->getButton("tap")->isPressed() ||
+    const bool isNoteRepeatLockedOrPressed = mpc.getHardware()->getButton("tap")->isPressed() ||
                                              mpc.inputController->isNoteRepeatLocked();
 
     if (bus > 0)
@@ -538,7 +538,7 @@ void MidiInput::handleChannelPressure(ShortMessage* msg)
 
     if (channelPressureValue > 0)
     {
-        for (auto& p: mpc.getHardware2()->getPads())
+        for (auto& p: mpc.getHardware()->getPads())
         {
         if (p->isPressed())
         {

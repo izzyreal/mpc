@@ -21,8 +21,8 @@ namespace mpc::engine {
     class PreviewSoundPlayer;
 }
 
-namespace mpc::hardware2 {
-    class Hardware2;
+namespace mpc::hardware {
+    class Hardware;
 }
 
 namespace mpc::controller {
@@ -83,7 +83,7 @@ namespace mpc {
         std::vector<audiomidi::MidiInput*> midiInputs;
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
-        std::shared_ptr<hardware2::Hardware2> hardware2;
+        std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<mpc::sequencer::Clock> clock;
         int bank = 0;
         int pad = 0;
@@ -118,7 +118,7 @@ namespace mpc {
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
-        std::shared_ptr<hardware2::Hardware2> getHardware2();
+        std::shared_ptr<hardware::Hardware> getHardware();
         mpc::disk::DiskController* getDiskController();
         std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> getPadAndButtonKeyboard();
 

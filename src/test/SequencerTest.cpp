@@ -15,8 +15,8 @@
 
 #include <file/all/Defaults.hpp>
 
-#include "hardware2/Hardware2.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/Hardware.h"
+#include "hardware/HardwareComponent.h"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
@@ -223,7 +223,7 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->recFromStart();
 
-    auto pads = mpc.getHardware2()->getPads();
+    auto pads = mpc.getHardware()->getPads();
 
     int64_t timeInSamples = 0;
 

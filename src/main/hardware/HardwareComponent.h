@@ -1,12 +1,14 @@
 #pragma once
 
+#include "ComponentId.h"
+
 #include <algorithm>
 #include <string>
 #include <cassert>
 #include <stdexcept>
 #include <optional>
 
-namespace mpc::hardware2 {
+namespace mpc::hardware {
 
 class Component {
 public:
@@ -204,4 +206,4 @@ public:
     explicit Pot() {}
 };
 
-} // namespace mpc::hardware2
+} // namespace mpc::hardware

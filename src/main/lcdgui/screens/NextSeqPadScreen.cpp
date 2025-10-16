@@ -1,6 +1,6 @@
 #include "NextSeqPadScreen.hpp"
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 using namespace mpc::lcdgui::screens;
 
@@ -45,7 +45,7 @@ void NextSeqPadScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 
-    if (sequencer.lock()->isPlaying() && mpc.getHardware2()->getButton("f4")->isPressed())
+    if (sequencer.lock()->isPlaying() && mpc.getHardware()->getButton("f4")->isPressed())
     {
         if (!sequencer.lock()->getSequence(padIndexWithBank)->isUsed())
         {

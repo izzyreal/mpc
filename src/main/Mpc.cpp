@@ -22,7 +22,7 @@
 #include "engine/PreviewSoundPlayer.hpp"
 #include "engine/Drum.hpp"
 
-#include <hardware2/Hardware2.h>
+#include <hardware/Hardware.h>
 
 #include <lcdgui/Screens.hpp>
 
@@ -105,7 +105,7 @@ void Mpc::init()
 
     inputController = std::make_shared<mpc::controller::ClientInputController>(*this, paths->configPath());
     
-    hardware2 = std::make_shared<hardware2::Hardware2>();
+    hardware = std::make_shared<hardware::Hardware>();
     
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
     MLOG("Sampler created");
@@ -156,9 +156,9 @@ void Mpc::init()
     layeredScreen->openScreen("sequencer");
 }
 
-std::shared_ptr<hardware2::Hardware2> Mpc::getHardware2()
+std::shared_ptr<hardware::Hardware> Mpc::getHardware()
 {
-	return hardware2;
+	return hardware;
 }
 
 void Mpc::dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
@@ -238,10 +238,10 @@ void Mpc::setBank(int i)
 
 	notifyObservers(std::string("bank"));
 
-	hardware2->getLed("bank-a")->setEnabled(i == 0);
-	hardware2->getLed("bank-b")->setEnabled(i == 1);
-	hardware2->getLed("bank-c")->setEnabled(i == 2);
-	hardware2->getLed("bank-d")->setEnabled(i == 3);
+	hardware->getLed("bank-a")->setEnabled(i == 0);
+	hardware->getLed("bank-b")->setEnabled(i == 1);
+	hardware->getLed("bank-c")->setEnabled(i == 2);
+	hardware->getLed("bank-d")->setEnabled(i == 3);
 }
 
 int Mpc::getBank()

@@ -5,14 +5,14 @@
 #include <vector>
 #include <unordered_map>
 
-#include "hardware2/ComponentIdLabelMap.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/ComponentId.h"
+#include "hardware/HardwareComponent.h"
 
 #include "Mpc.hpp"
 
-namespace mpc::hardware2 {
+namespace mpc::hardware {
 
-class Hardware2 final {
+class Hardware final {
 private:
     std::vector<std::shared_ptr<Led>> leds;
     std::vector<std::shared_ptr<Pad>> pads;
@@ -23,7 +23,7 @@ private:
     std::shared_ptr<Pot> volPot;
 
 public:
-    explicit Hardware2()
+    explicit Hardware()
     {
         for (const auto &label : getButtonLabels())
         {
@@ -109,4 +109,4 @@ public:
     }
 };
 
-} // namespace mpc::hardware2
+} // namespace mpc::hardware

@@ -1,7 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 
 #include "TestMpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 #include "disk/AbstractDisk.hpp"
@@ -23,7 +23,7 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 
     REQUIRE(!activePreset->rows.empty());
 
-    auto buttonLabels = mpc.getHardware2()->getButtonLabels();
+    auto buttonLabels = mpc.getHardware()->getButtonLabels();
 
     for (auto &l: buttonLabels)
     {

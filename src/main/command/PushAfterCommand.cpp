@@ -1,18 +1,18 @@
 #include "PushAfterCommand.h"
 #include "Mpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 namespace mpc::command {
 
     PushAfterCommand::PushAfterCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushAfterCommand::execute() {
-        if (mpc.getHardware2()->getButton("shift")->isPressed())
+        if (mpc.getHardware()->getButton("shift")->isPressed())
         {
             mpc.getLayeredScreen()->openScreen("assign");
         } else {
             mpc.setAfterEnabled(!mpc.isAfterEnabled());
-            mpc.getHardware2()->getLed("after")->setEnabled(mpc.isAfterEnabled());
+            mpc.getHardware()->getLed("after")->setEnabled(mpc.isAfterEnabled());
         }
     }
 

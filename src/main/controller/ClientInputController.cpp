@@ -1,12 +1,12 @@
 #include "controller/ClientInputController.h"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "command/ReleasePadCommand.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
 #include "controller/PadContextFactory.h"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic;
@@ -57,7 +57,7 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     const auto physicalPadIndex = *a.index;
 
-    if (!mpc.getHardware2()->getPad(physicalPadIndex)->pressWithVelocity(*a.value))
+    if (!mpc.getHardware()->getPad(physicalPadIndex)->pressWithVelocity(*a.value))
     {
         return;
     }
@@ -78,7 +78,7 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
 
     const auto info = registerPhysicalPadRelease(physicalPadIndex);
 
-    mpc.getHardware2()->getPad(physicalPadIndex)->release();
+    mpc.getHardware()->getPad(physicalPadIndex)->release();
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
     auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, programPadIndex, info.screenName);
@@ -90,7 +90,7 @@ void ClientInputController::handlePadAftertouch(const ClientInput& a)
     if (!a.index || !a.value) return;
     const auto padIndex = *a.index;
     const auto aftertouchPressure = *a.value;
-    mpc.getHardware2()->getPad(padIndex)->aftertouch(aftertouchPressure);
+    mpc.getHardware()->getPad(padIndex)->aftertouch(aftertouchPressure);
 }
 
 void ClientInputController::handleDataWheel(const ClientInput& a)
@@ -103,14 +103,14 @@ void ClientInputController::handleDataWheel(const ClientInput& a)
     if (steps != 0)
     {
         acc -= steps;
-        mpc.getHardware2()->getDataWheel()->turn(steps);
+        mpc.getHardware()->getDataWheel()->turn(steps);
         mpc.getActiveControls()->turnWheel(steps);
     }
 }
 
 void ClientInputController::handleSlider(const ClientInput& a)
 {
-    auto slider = mpc.getHardware2()->getSlider();
+    auto slider = mpc.getHardware()->getSlider();
 
     if (a.value)
     {
@@ -126,8 +126,8 @@ void ClientInputController::handleSlider(const ClientInput& a)
 
 void ClientInputController::handlePot(const ClientInput& a)
 {
-    std::shared_ptr<mpc::hardware2::Pot> pot =
-        a.label->find("rec") != std::string::npos ? mpc.getHardware2()->getRecPot() : mpc.getHardware2()->getVolPot();
+    std::shared_ptr<mpc::hardware::Pot> pot =
+        a.label->find("rec") != std::string::npos ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
 
@@ -147,7 +147,7 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
 {
     if (!a.label) return;
 
-    auto button = mpc.getHardware2()->getButton(*a.label);
+    auto button = mpc.getHardware()->getButton(*a.label);
 
     // The below check is necessary because the keyboard mapping routines in mpc::controls may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
@@ -227,7 +227,7 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
     if (!a.label) return;
 
-    auto button = mpc.getHardware2()->getButton(*a.label);
+    auto button = mpc.getHardware()->getButton(*a.label);
 
     // The below check is necessary because the keyboard mapping routines in mpc::controls may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
@@ -254,7 +254,7 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 void ClientInputController::handleButtonDoublePress(const ClientInput& a)
 {
     if (!a.label) return;
-    mpc.getHardware2()->getButton(*a.label)->doublePress();
+    mpc.getHardware()->getButton(*a.label)->doublePress();
 
     auto label = *a.label;
     if (label == "rec") {

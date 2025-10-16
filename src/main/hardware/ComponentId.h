@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace mpc::hardware2 {
+namespace mpc::hardware {
 
     enum ComponentId {
         NONE,

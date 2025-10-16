@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "TestMpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "sampler/Sampler.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"
@@ -75,7 +75,7 @@ TEST_CASE("TRIM screen", "[sound]")
     REQUIRE(sound->getStart() == 249);
     REQUIRE(sound->getEnd() == 499);
 
-    auto shiftButton = mpc.getHardware2()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton("shift");
     shiftButton->press();
     trimScreen->setSlider(MAX_SLIDER_VALUE);
     REQUIRE(sound->getStart() == 249);
@@ -180,7 +180,7 @@ TEST_CASE("Start fine window", "[sound]")
     REQUIRE(sound->getStart() == 1);
     REQUIRE(sound->getEnd() == SOUND_LENGTH);
 
-    auto shiftButton = mpc.getHardware2()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton("shift");
 
     shiftButton->press();
     startFineScreen->setSlider(0);
@@ -236,7 +236,7 @@ TEST_CASE("End fine window", "[sound]")
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getEnd() == SOUND_LENGTH - 1);
 
-    auto shiftButton = mpc.getHardware2()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton("shift");
     shiftButton->press();
 
     endFineScreen->setSlider(0);
@@ -329,7 +329,7 @@ TEST_CASE("LOOP screen with end", "[sound]")
     REQUIRE(sound->getLoopTo() == 249);
     REQUIRE(sound->getEnd() == 499);
 
-    auto shiftButton = mpc.getHardware2()->getButton("shift");
+    auto shiftButton = mpc.getHardware()->getButton("shift");
 
     shiftButton->press();
     loopScreen->setSlider(MAX_SLIDER_VALUE);

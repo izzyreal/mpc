@@ -4,7 +4,7 @@
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/MidiOutput.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -59,7 +59,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
         if (program)
         {
-            auto hardwareSlider = mpc.getHardware2()->getSlider();
+            auto hardwareSlider = mpc.getHardware()->getSlider();
             auto programSlider = program->getSlider();
 
             Util::SliderNoteVariationContext sliderNoteVariationContext {
@@ -80,7 +80,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
         }
 
         const int hardwarePadIndex = padIndexWithBank % 16;
-        const auto hardwarePad = mpc.getHardware2()->getPad(hardwarePadIndex);
+        const auto hardwarePad = mpc.getHardware()->getPad(hardwarePadIndex);
 
         if (sixteenLevels)
         {

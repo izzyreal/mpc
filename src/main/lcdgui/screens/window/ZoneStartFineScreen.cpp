@@ -1,5 +1,5 @@
 #include "ZoneStartFineScreen.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
@@ -128,7 +128,7 @@ void ZoneStartFineScreen::pressEnter()
 
 void ZoneStartFineScreen::setSlider(int i)
 {
-    if (!mpc.getHardware2()->getButton("shift")->isPressed())
+    if (!mpc.getHardware()->getButton("shift")->isPressed())
     {
         return;
     }

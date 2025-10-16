@@ -23,8 +23,8 @@
 
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
-#include "hardware2/Hardware2.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/Hardware.h"
+#include "hardware/HardwareComponent.h"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -529,14 +529,14 @@ void Track::playNext()
 	}
 
     const auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
-    const auto hardware = mpc.getHardware2();
+    const auto hardware = mpc.getHardware();
 
 	if (auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
         note->setTrack(trackIndex);
 
         if (sequencer->isOverdubbing() &&
-            mpc.getHardware2()->getButton("erase")->isPressed() &&
+            mpc.getHardware()->getButton("erase")->isPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) &&
             trackIndex < 64 &&
             busNumber > 0)

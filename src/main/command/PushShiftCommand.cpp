@@ -1,7 +1,7 @@
 #include "PushShiftCommand.h"
 #include "Mpc.hpp"
 #include "controller/ClientInputControllerBase.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/Field.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -12,7 +12,7 @@ namespace mpc::command {
     void PushShiftCommand::execute()
     {
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer" &&
-            mpc.getHardware2()->getButton("tap")->isPressed() &&
+            mpc.getHardware()->getButton("tap")->isPressed() &&
             mpc.getSequencer()->isPlaying())
         {
             mpc.inputController->lockNoteRepeat();

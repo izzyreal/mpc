@@ -3,7 +3,7 @@
 #include <variant>
 #include <cstdint>
 
-#include "hardware2/ComponentIdLabelMap.h"
+#include "hardware/ComponentId.h"
 
 namespace mpc::inputlogic {
 
@@ -47,7 +47,7 @@ struct GestureEvent
     // Only valid for REPEAT events. 2 for double, 3 for triple click/tap.
     int repeatCount = 0;
 
-    hardware2::ComponentId componentId;
+    hardware::ComponentId componentId;
 };
 
 struct MidiEvent {

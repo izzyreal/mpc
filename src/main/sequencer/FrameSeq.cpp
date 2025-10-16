@@ -5,7 +5,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 
 #include "controller/ClientInputControllerBase.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
@@ -308,8 +308,8 @@ bool FrameSeq::processSeqLoopEnabled()
             if (sequencer->isRecording())
             {
                 sequencer->switchRecordToOverdub();
-                mpc.getHardware2()->getLed("rec")->setEnabled(false);
-                mpc.getHardware2()->getLed("overdub")->setEnabled(true);
+                mpc.getHardware()->getLed("rec")->setEnabled(false);
+                mpc.getHardware()->getLed("overdub")->setEnabled(true);
             }
         }
 
@@ -333,7 +333,7 @@ bool FrameSeq::processSeqLoopDisabled()
         else
         {
             sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
-            mpc.getHardware2()->getLed("play")->setEnabled(false);
+            mpc.getHardware()->getLed("play")->setEnabled(false);
             sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
@@ -346,7 +346,7 @@ bool FrameSeq::processSeqLoopDisabled()
 void FrameSeq::processNoteRepeat()
 {
     const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
-                                             mpc.getHardware2()->getButton("tap")->isPressed();
+                                             mpc.getHardware()->getButton("tap")->isPressed();
 
     if (!isNoteRepeatLockedOrPressed)
     {
@@ -408,9 +408,9 @@ void FrameSeq::stopSequencer()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->stop();
-    mpc.getHardware2()->getLed("rec")->setEnabled(false);
-    mpc.getHardware2()->getLed("overdub")->setEnabled(false);
-    mpc.getHardware2()->getLed("play")->setEnabled(false);
+    mpc.getHardware()->getLed("rec")->setEnabled(false);
+    mpc.getHardware()->getLed("overdub")->setEnabled(false);
+    mpc.getHardware()->getLed("play")->setEnabled(false);
     move(0);
 }
 

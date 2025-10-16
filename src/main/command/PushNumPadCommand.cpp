@@ -1,6 +1,6 @@
 #include "PushNumPadCommand.h"
 #include "Mpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/Field.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
@@ -14,7 +14,7 @@ PushNumPadCommand::PushNumPadCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i)
 }
 
 void PushNumPadCommand::execute() {
-    if (mpc.getHardware2()->getButton("shift")->isPressed())
+    if (mpc.getHardware()->getButton("shift")->isPressed())
     {
         switch (i) {
             case 0: mpc.getLayeredScreen()->openScreen("vmpc-settings"); break;

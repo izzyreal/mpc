@@ -2,7 +2,7 @@
 #include "Mpc.hpp"
 
 #include "PushLeftCommand.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/Field.hpp"
 #include "lcdgui/LcdGuiUtil.h"
 
@@ -12,7 +12,7 @@ namespace mpc::command {
 
     void SplitLeftCommand::execute()
     {
-        if (!mpc.getHardware2()->getButton("shift")->isPressed())
+        if (!mpc.getHardware()->getButton("shift")->isPressed())
         {
             PushLeftCommand(mpc).execute();
             return;

@@ -3,16 +3,16 @@
 #include <string>
 #include <unordered_set>
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
-using namespace mpc::hardware2;
+using namespace mpc::hardware;
 using namespace mpc::inputlogic;
 
 // ---- TESTS ----
 
-TEST_CASE("Hardware2 construction", "[hardware2]")
+TEST_CASE("Hardware construction", "[hardware]")
 {
-    Hardware2 hw;
+    Hardware hw;
 
     SECTION("Pads initialized")
     {
@@ -56,9 +56,9 @@ TEST_CASE("Hardware2 construction", "[hardware2]")
     }
 }
 
-TEST_CASE("Hardware2 getPad/getButton/getLed safety", "[hardware2]")
+TEST_CASE("Hardware getPad/getButton/getLed safety", "[hardware]")
 {
-    Hardware2 hw;
+    Hardware hw;
 
     SECTION("getPad out of range returns nullptr")
     {

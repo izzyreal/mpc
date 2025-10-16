@@ -3,7 +3,7 @@
 
 #include <audiomidi/EventHandler.hpp>
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditMultipleScreen.hpp>
@@ -550,7 +550,7 @@ void StepEditorScreen::setSequencerTickPos(const std::function<void()>& tickPosS
 void StepEditorScreen::prevStepEvent()
 {
     setSequencerTickPos([&] {
-        if (mpc.getHardware2()->getButton("go-to")->isPressed())
+        if (mpc.getHardware()->getButton("go-to")->isPressed())
         {
             sequencer.lock()->goToPreviousEvent();
         }
@@ -564,7 +564,7 @@ void StepEditorScreen::prevStepEvent()
 void StepEditorScreen::nextStepEvent()
 {
     setSequencerTickPos([&]{
-        if (mpc.getHardware2()->getButton("go-to")->isPressed())
+        if (mpc.getHardware()->getButton("go-to")->isPressed())
         {
             sequencer.lock()->goToNextEvent();
         }
@@ -578,7 +578,7 @@ void StepEditorScreen::nextStepEvent()
 void StepEditorScreen::prevBarStart()
 {
     setSequencerTickPos([&]{
-        if (mpc.getHardware2()->getButton("go-to")->isPressed())
+        if (mpc.getHardware()->getButton("go-to")->isPressed())
             sequencer.lock()->setBar(0);
         else
             sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() - 1);
@@ -588,7 +588,7 @@ void StepEditorScreen::prevBarStart()
 void StepEditorScreen::nextBarEnd()
 {
     setSequencerTickPos([&]{
-        if (mpc.getHardware2()->getButton("go-to")->isPressed())
+        if (mpc.getHardware()->getButton("go-to")->isPressed())
             sequencer.lock()->setBar(sequencer.lock()->getActiveSequence()->getLastBarIndex() + 1);
         else
             sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);
@@ -630,10 +630,10 @@ void StepEditorScreen::up()
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 1));
 
-		if (mpc.getHardware2()->getButton("shift")->isPressed() && selectionStartIndex == -1 && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber]))
+		if (mpc.getHardware()->getButton("shift")->isPressed() && selectionStartIndex == -1 && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber]))
 			return;
 
-		if (!mpc.getHardware2()->getButton("shift")->isPressed() && srcNumber == 0 && yOffset == 0)
+		if (!mpc.getHardware()->getButton("shift")->isPressed() && srcNumber == 0 && yOffset == 0)
 		{
 			clearSelection();
 			auto eventType = visibleEvents[srcNumber]->getTypeName();
@@ -655,7 +655,7 @@ void StepEditorScreen::up()
 
 			ls->setFocus(lastColumn[newEventType] + std::to_string(srcNumber));
 
-			if (mpc.getHardware2()->getButton("shift")->isPressed())
+			if (mpc.getHardware()->getButton("shift")->isPressed())
 				setSelectionEndIndex(srcNumber + yOffset);
 
 			refreshSelection();
@@ -703,7 +703,7 @@ void StepEditorScreen::down()
 
 			ls->setFocus(newColumn + "3");
 
-			if (mpc.getHardware2()->getButton("shift")->isPressed() && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[3]))
+			if (mpc.getHardware()->getButton("shift")->isPressed() && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[3]))
 				setSelectionEndIndex(srcNumber + yOffset);
 
 			refreshSelection();
@@ -746,7 +746,7 @@ void StepEditorScreen::downOrUp(int increment)
 			}
 		}
 
-		if (mpc.getHardware2()->getButton("shift")->isPressed())
+		if (mpc.getHardware()->getButton("shift")->isPressed())
 		{
 			setSelectionEndIndex(srcNumber + increment + yOffset);
 		}
@@ -1215,12 +1215,12 @@ void StepEditorScreen::update(Observable*, Message message)
 
     if (msg == "step-editor")
 	{
-        auto& pads = mpc.getHardware2()->getPads();
+        auto& pads = mpc.getHardware()->getPads();
 
         auto anyPadIsPressed = std::any_of(
                 pads.begin(),
                 pads.end(),
-                [](const std::shared_ptr<mpc::hardware2::Pad> &p) {
+                [](const std::shared_ptr<mpc::hardware::Pad> &p) {
                     return p->isPressed();
                 });
 

@@ -1,16 +1,16 @@
 #include "inputlogic/HostToClientTranslator.h"
-#include "hardware2/ComponentIdLabelMap.h"
+#include "hardware/ComponentId.h"
 #include "inputlogic/ClientInput.h"
 
 #include "controls/KeyCodeHelper.hpp"
 #include "controls/KbMapping.hpp"
 
-#include "hardware2/HardwareComponent.h"
+#include "hardware/HardwareComponent.h"
 
 #include <stdexcept>
 
 using namespace mpc::inputlogic;
-using namespace mpc::hardware2;
+using namespace mpc::hardware;
 
 std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostEvent, std::shared_ptr<mpc::controls::KbMapping> kbMapping)
 {
@@ -52,7 +52,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             throw std::invalid_argument("GestureEvent.componentId must not be NONE");
         }
 
-        clientInput.label = mpc::hardware2::componentIdToLabel.at(gesture.componentId);
+        clientInput.label = mpc::hardware::componentIdToLabel.at(gesture.componentId);
 
         if (gesture.componentId >= ComponentId::PAD1 && gesture.componentId <= ComponentId::PAD16)
         {
@@ -157,7 +157,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             const auto padNumber = std::stoi(digitsString);
             clientInput.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
             clientInput.index = padNumber - 1;
-            if (key.keyDown) clientInput.value = mpc::hardware2::Pad::MAX_VELO;
+            if (key.keyDown) clientInput.value = mpc::hardware::Pad::MAX_VELO;
         }
         else if (label == "slider")
         {

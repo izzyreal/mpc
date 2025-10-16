@@ -1,6 +1,6 @@
 #include "TrMuteScreen.hpp"
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -69,7 +69,7 @@ void TrMuteScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 	
-	if (mpc.getHardware2()->getButton("f6")->isPressed() || sequencer.lock()->isSoloEnabled())
+	if (mpc.getHardware()->getButton("f6")->isPressed() || sequencer.lock()->isSoloEnabled())
 	{
 		if (!sequencer.lock()->isSoloEnabled())
 			sequencer.lock()->setSoloEnabled(true);

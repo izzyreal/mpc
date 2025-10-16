@@ -1,7 +1,7 @@
 #include "PushTrackMuteCommand.h"
 #include "Mpc.hpp"
 #include "Util.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 namespace mpc::command {
 
@@ -17,11 +17,11 @@ namespace mpc::command {
             } else {
                 mpc.getLayeredScreen()->openScreen("sequencer");
             }
-            mpc.getHardware2()->getLed("track-mute")->setEnabled(false);
+            mpc.getHardware()->getLed("track-mute")->setEnabled(false);
         } else if (currentScreenName == "next-seq" || currentScreenName == "next-seq-pad" || currentScreenName == "sequencer") {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen("track-mute");
-            mpc.getHardware2()->getLed("track-mute")->setEnabled(true);
+            mpc.getHardware()->getLed("track-mute")->setEnabled(true);
         }
     }
 

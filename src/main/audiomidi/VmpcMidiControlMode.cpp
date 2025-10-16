@@ -1,7 +1,7 @@
 #include "VmpcMidiControlMode.hpp"
 
-#include "hardware2/Hardware2.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/Hardware.h"
+#include "hardware/HardwareComponent.h"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 
@@ -22,13 +22,13 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
     auto isChannelPressure = msg->isChannelPressure();
 
     const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-    const auto hardware2 = mpc.getHardware2();
+    const auto hardware = mpc.getHardware();
 
     if (isChannelPressure)
     {
         if (const auto newPressure = msg->getData1(); newPressure > 0)
         {
-            for (auto& p : hardware2->getPads())
+            for (auto& p : hardware->getPads())
             {
                 if (!p->isPressed()) continue;
                 p->aftertouch(newPressure);
@@ -54,7 +54,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         return;
     }
 
-    auto dataWheel = hardware2->getDataWheel();
+    auto dataWheel = hardware->getDataWheel();
 
     for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
     {
@@ -99,7 +99,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             assert(label.length() == 5 || label.length() == 6);
             const auto digitsString = label.substr(4);
             const auto padNumber = std::stoi(digitsString);
-            auto mpcPad = mpc.getHardware2()->getPad(padNumber - 1);
+            auto mpcPad = mpc.getHardware()->getPad(padNumber - 1);
 
             if (msg->getData2() > 0 && !isNoteOff)
             {
@@ -111,7 +111,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             }
         }
 
-        const auto hwComponent = hardware2->getComponentByLabel(label);
+        const auto hwComponent = hardware->getComponentByLabel(label);
 
         if (label == "datawheel")
         {
@@ -144,19 +144,19 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         }
         else if (label == "slider")
         {
-            hardware2->getSlider()->setValue(controllerValue);
+            hardware->getSlider()->setValue(controllerValue);
         }
         else if (label == "rec-gain")
         {
             auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-            hardware2->getRecPot()->setValue(normalized);
+            hardware->getRecPot()->setValue(normalized);
         }
         else if (label == "main-volume")
         {
             auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-            hardware2->getVolPot()->setValue(normalized);
+            hardware->getVolPot()->setValue(normalized);
         }
-        else if (auto pressable = std::dynamic_pointer_cast<mpc::hardware2::Pressable>(hwComponent))
+        else if (auto pressable = std::dynamic_pointer_cast<mpc::hardware::Pressable>(hwComponent))
         {
             if (msg->getData2() == 0)
             {
@@ -164,7 +164,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
             }
             else
             {
-                if (auto withVelo = std::dynamic_pointer_cast<mpc::hardware2::VelocitySensitivePressable>(pressable))
+                if (auto withVelo = std::dynamic_pointer_cast<mpc::hardware::VelocitySensitivePressable>(pressable))
                 {
                     withVelo->pressWithVelocity(msg->getData2());
                 }

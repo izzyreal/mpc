@@ -2,7 +2,7 @@
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientInputControllerBase.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/ScreenGroups.h"
 #include "sequencer/Sequencer.hpp"
 
@@ -13,7 +13,7 @@ namespace mpc::command {
     void PushPlayCommand::execute()
     {
         auto sequencer = mpc.getSequencer();
-        auto hardware = mpc.getHardware2();
+        auto hardware = mpc.getHardware();
         auto recButton = hardware->getButton("rec");
         auto overdubButton = hardware->getButton("overdub");
 
@@ -80,9 +80,9 @@ namespace mpc::command {
         mpc.inputController->buttonLockTracker.unlock("rec");
         mpc.inputController->buttonLockTracker.unlock("overdub");
 
-        mpc.getHardware2()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
-        mpc.getHardware2()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
-        mpc.getHardware2()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
+        mpc.getHardware()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
+        mpc.getHardware()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
+        mpc.getHardware()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
     }
 }
 

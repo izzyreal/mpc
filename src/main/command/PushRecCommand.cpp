@@ -1,7 +1,7 @@
 #include "PushRecCommand.h"
 #include "Mpc.hpp"
 #include "controller/ClientInputControllerBase.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/ScreenGroups.h"
 #include "sequencer/Sequencer.hpp"
 
@@ -30,7 +30,7 @@ namespace mpc::command {
             mpc.getLayeredScreen()->openScreen("sequencer");
         }
 
-        mpc.getHardware2()->getLed("rec")->setEnabled(true);
+        mpc.getHardware()->getLed("rec")->setEnabled(true);
     }
 
 }

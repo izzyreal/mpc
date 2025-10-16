@@ -1,5 +1,5 @@
 #include "EndFineScreen.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/LoopScreen.hpp>
@@ -152,7 +152,7 @@ void EndFineScreen::pressEnter()
 
 void EndFineScreen::setSlider(int i)
 {
-    if (!mpc.getHardware2()->getButton("shift")->isPressed())
+    if (!mpc.getHardware()->getButton("shift")->isPressed())
     {
         return;
     }

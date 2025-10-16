@@ -1,7 +1,7 @@
 #include "SplitRightCommand.h"
 #include "Mpc.hpp"
 #include "command/PushRightCommand.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/Field.hpp"
 #include "lcdgui/LcdGuiUtil.h"
 
@@ -11,7 +11,7 @@ namespace mpc::command {
 
     void SplitRightCommand::execute() {
 
-        if (!mpc.getHardware2()->getButton("shift")->isPressed())
+        if (!mpc.getHardware()->getButton("shift")->isPressed())
         {
             PushRightCommand(mpc).execute();
             return;

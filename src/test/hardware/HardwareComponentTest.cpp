@@ -1,20 +1,20 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
 #include <stdexcept>
-#include "hardware2/HardwareComponent.h"
+#include "hardware/HardwareComponent.h"
 
-using namespace mpc::hardware2;
+using namespace mpc::hardware;
 
 using Catch::Approx;
 
-TEST_CASE("Button responds to press and release", "[hardware2]")
+TEST_CASE("Button responds to press and release", "[hardware]")
 {
     Button b("");
     REQUIRE_NOTHROW(b.press());
     REQUIRE_NOTHROW(b.release());
 }
 
-TEST_CASE("Button pressed state toggles correctly", "[hardware2]")
+TEST_CASE("Button pressed state toggles correctly", "[hardware]")
 {
     Button b("TEST");
 
@@ -25,7 +25,7 @@ TEST_CASE("Button pressed state toggles correctly", "[hardware2]")
     REQUIRE(!b.isPressed());
 }
 
-TEST_CASE("Led enables and disables correctly", "[hardware2]")
+TEST_CASE("Led enables and disables correctly", "[hardware]")
 {
     Led led("LED1");
 
@@ -36,9 +36,9 @@ TEST_CASE("Led enables and disables correctly", "[hardware2]")
     REQUIRE(!led.isEnabled());
 }
 
-TEST_CASE("Aftertouchable throws on invalid pressures", "[hardware2]")
+TEST_CASE("Aftertouchable throws on invalid pressures", "[hardware]")
 {
-    struct TestAftertouchable : mpc::hardware2::Aftertouchable {
+    struct TestAftertouchable : mpc::hardware::Aftertouchable {
         void onAftertouch(int) override {} // no-op for test
     };
 
@@ -51,7 +51,7 @@ TEST_CASE("Aftertouchable throws on invalid pressures", "[hardware2]")
     REQUIRE_NOTHROW(t.aftertouch(127));
 }
 
-TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware2]")
+TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware]")
 {
     Pad p(0);
     REQUIRE_NOTHROW(p.pressWithVelocity(VelocitySensitivePressable::MAX_VELO));
@@ -60,16 +60,16 @@ TEST_CASE("Pad responds to press, aftertouch, and release", "[hardware2]")
     REQUIRE_NOTHROW(p.release());
 }
 
-TEST_CASE("DataWheel turns correctly", "[hardware2]")
+TEST_CASE("DataWheel turns correctly", "[hardware]")
 {
     DataWheel wheel;
     REQUIRE_NOTHROW(wheel.turn(1));
     REQUIRE_NOTHROW(wheel.turn(-2));
 }
 
-TEST_CASE("Continuous type contracts", "[hardware2]")
+TEST_CASE("Continuous type contracts", "[hardware]")
 {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
+    struct TestContinuous : mpc::hardware::Continuous<float, 0, 127> {};
     TestContinuous c;
 
     STATIC_REQUIRE(std::is_same_v<decltype(c.getValue()), float>);
@@ -78,9 +78,9 @@ TEST_CASE("Continuous type contracts", "[hardware2]")
     STATIC_REQUIRE(std::is_same_v<decltype(c.getRangeAs<double>()), std::pair<double, double>>);
 }
 
-TEST_CASE("Continuous<float> stores and clamps correctly", "[hardware2]")
+TEST_CASE("Continuous<float> stores and clamps correctly", "[hardware]")
 {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
+    struct TestContinuous : mpc::hardware::Continuous<float, 0, 127> {};
     TestContinuous c;
 
     c.setValue(63.5f);
@@ -93,9 +93,9 @@ TEST_CASE("Continuous<float> stores and clamps correctly", "[hardware2]")
     REQUIRE(c.getValue() == 127.0f);
 }
 
-TEST_CASE("Continuous<double> stores and clamps correctly", "[hardware2]")
+TEST_CASE("Continuous<double> stores and clamps correctly", "[hardware]")
 {
-    struct TestContinuous : mpc::hardware2::Continuous<double, 0, 127> {};
+    struct TestContinuous : mpc::hardware::Continuous<double, 0, 127> {};
     TestContinuous c;
 
     c.setValue(63.5);
@@ -108,9 +108,9 @@ TEST_CASE("Continuous<double> stores and clamps correctly", "[hardware2]")
     REQUIRE(c.getValue() == 127.0);
 }
 
-TEST_CASE("Continuous<int> clamps correctly", "[hardware2]")
+TEST_CASE("Continuous<int> clamps correctly", "[hardware]")
 {
-    struct TestContinuous : mpc::hardware2::Continuous<int, 0, 127> {};
+    struct TestContinuous : mpc::hardware::Continuous<int, 0, 127> {};
     TestContinuous c;
 
     c.setValue(63);
@@ -129,9 +129,9 @@ TEST_CASE("Continuous<int> clamps correctly", "[hardware2]")
     REQUIRE(c.getValue() == 127);
 }
 
-TEST_CASE("Continuous getValueAs<int> rounds correctly", "[hardware2]")
+TEST_CASE("Continuous getValueAs<int> rounds correctly", "[hardware]")
 {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
+    struct TestContinuous : mpc::hardware::Continuous<float, 0, 127> {};
     TestContinuous c;
 
     c.setValue(63.4f);
@@ -141,9 +141,9 @@ TEST_CASE("Continuous getValueAs<int> rounds correctly", "[hardware2]")
     REQUIRE(c.getValueAs<int>() == 64);
 }
 
-TEST_CASE("Continuous getRange and getRangeAs work", "[hardware2]")
+TEST_CASE("Continuous getRange and getRangeAs work", "[hardware]")
 {
-    struct TestContinuous : mpc::hardware2::Continuous<float, 0, 127> {};
+    struct TestContinuous : mpc::hardware::Continuous<float, 0, 127> {};
     TestContinuous c;
 
     auto [imin, imax] = c.getRange();
@@ -155,7 +155,7 @@ TEST_CASE("Continuous getRange and getRangeAs work", "[hardware2]")
     REQUIRE(fmax == Approx(127.0f));
 }
 
-TEST_CASE("Slider clamps values between 0 and 127", "[hardware2]")
+TEST_CASE("Slider clamps values between 0 and 127", "[hardware]")
 {
     Slider s;
     s.setValue(50);
@@ -166,7 +166,7 @@ TEST_CASE("Slider clamps values between 0 and 127", "[hardware2]")
     REQUIRE(s.getValue() == 127);
 }
 
-TEST_CASE("Slider direction logic works", "[hardware2]")
+TEST_CASE("Slider direction logic works", "[hardware]")
 {
     Slider s;
 
@@ -181,30 +181,30 @@ TEST_CASE("Slider direction logic works", "[hardware2]")
     REQUIRE(s.getValueAs<int>() == 0);
 }
 
-TEST_CASE("Slider is a Continuous<float, 0, 127> specialization", "[hardware2]")
+TEST_CASE("Slider is a Continuous<float, 0, 127> specialization", "[hardware]")
 {
     using SliderBase = Continuous<float, 0, 127>;
     STATIC_REQUIRE(std::is_base_of_v<SliderBase, Slider>);
 }
 
-TEST_CASE("Pot is a Continuous<float, 0, 127> specialization", "[hardware2]")
+TEST_CASE("Pot is a Continuous<float, 0, 127> specialization", "[hardware]")
 {
-    using PotBase = Continuous<float, 0, 127>;
+    using PotBase = Continuous<float, 0, 1>;
     STATIC_REQUIRE(std::is_base_of_v<PotBase, Pot>);
 }
 
-TEST_CASE("Pot clamps values between 0 and 127", "[hardware2]")
+TEST_CASE("Pot clamps values between 0 and 1", "[hardware]")
 {
     Pot p;
-    p.setValue(50);
-    REQUIRE(p.getValue() == 50);
+    p.setValue(0.5);
+    REQUIRE(p.getValue() == 0.5);
     p.setValue(-1);
     REQUIRE(p.getValue() == 0);
-    p.setValue(128);
-    REQUIRE(p.getValue() == 127);
+    p.setValue(2);
+    REQUIRE(p.getValue() == 1);
 }
 
-TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]")
+TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware]")
 {
     Pad p(0);
     REQUIRE(!p.isPressed());
@@ -223,7 +223,7 @@ TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware2]")
     REQUIRE_THROWS_AS(p.pressWithVelocity(0), std::invalid_argument);
 }
 
-TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware2]")
+TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware]")
 {
     Pad p(0);
     REQUIRE(!p.getVelocity().has_value());
@@ -251,18 +251,18 @@ TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware
 }
 
 
-TEST_CASE("Pad inherits from Pressable and VelocitySensitivePressable", "[hardware2]")
+TEST_CASE("Pad inherits from Pressable and VelocitySensitivePressable", "[hardware]")
 {
     STATIC_REQUIRE(std::is_base_of_v<Pressable, Pad>);
     STATIC_REQUIRE(std::is_base_of_v<VelocitySensitivePressable, Pad>);
 }
 
-TEST_CASE("Button inherits from Pressable", "[hardware2]")
+TEST_CASE("Button inherits from Pressable", "[hardware]")
 {
     STATIC_REQUIRE(std::is_base_of_v<Pressable, Button>);
 }
 
-TEST_CASE("Pressable press and doublePress return correct bool", "[hardware2]")
+TEST_CASE("Pressable press and doublePress return correct bool", "[hardware]")
 {
     struct TestPressable : Pressable {};
 
@@ -280,7 +280,7 @@ TEST_CASE("Pressable press and doublePress return correct bool", "[hardware2]")
     REQUIRE(p.doublePress() == false); // Already pressed
 }
 
-TEST_CASE("VelocitySensitivePressable pressWithVelocity returns correct bool", "[hardware2]")
+TEST_CASE("VelocitySensitivePressable pressWithVelocity returns correct bool", "[hardware]")
 {
     struct TestVelocitySensitivePressable : VelocitySensitivePressable {};
 

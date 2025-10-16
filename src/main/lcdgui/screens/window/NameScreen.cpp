@@ -2,7 +2,7 @@
 
 #include "inputlogic/PadAndButtonKeyboard.hpp"
 #include "lcdgui/Underline.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;

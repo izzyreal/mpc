@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <sequencer/Track.hpp>
 
@@ -30,7 +30,7 @@ void Assign16LevelsScreen::function(int i)
     case 4:
 	{
 		mpc.setSixteenLevelsEnabled(true);
-		mpc.getHardware2()->getLed("sixteen-levels")->setEnabled(true);
+		mpc.getHardware()->getLed("sixteen-levels")->setEnabled(true);
 		openScreen(ls->getPreviousScreenName());
 		break;
 	}

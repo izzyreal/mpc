@@ -1,7 +1,7 @@
 #include "SequencerScreen.hpp"
 
 #include "controller/ClientInputControllerBase.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
@@ -114,14 +114,14 @@ void SequencerScreen::open()
     const bool sequencerIsRecordingOrOverdubbing = sequencer.lock()->isRecordingOrOverdubbing();
     
     const auto footerIsInvisible = !mpc.inputController->isNoteRepeatLocked() &&
-                                   !(mpc.getHardware2()->getButton("erase")->isPressed() &&
+                                   !(mpc.getHardware()->getButton("erase")->isPressed() &&
                                    sequencerIsRecordingOrOverdubbing);
     
     findChild("footer-label")->Hide(footerIsInvisible);
 
     findChild("function-keys")->Hide(!footerIsInvisible ||
                                      punchScreen->on ||
-                                     (mpc.getHardware2()->getButton("erase")->isPressed() && sequencerIsRecordingOrOverdubbing));
+                                     (mpc.getHardware()->getButton("erase")->isPressed() && sequencerIsRecordingOrOverdubbing));
 }
 
 void SequencerScreen::erase()
@@ -851,7 +851,7 @@ void SequencerScreen::displayPunchWhileRecording()
 {
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
-    auto hardware = mpc.getHardware2();
+    auto hardware = mpc.getHardware();
     auto isRecPressedOrLocked = hardware->getButton("rec")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("rec");
     auto isOverdubPressedOrLocked = hardware->getButton("overdub")->isPressed() || mpc.inputController->buttonLockTracker.isLocked("overdub");
 

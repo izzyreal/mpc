@@ -1,6 +1,6 @@
 #include "PushSixteenLevelsCommand.h"
 #include "Mpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 namespace mpc::command {
 
@@ -12,7 +12,7 @@ namespace mpc::command {
 
         if (mpc.isSixteenLevelsEnabled()) {
             mpc.setSixteenLevelsEnabled(false);
-            mpc.getHardware2()->getLed("sixteen-levels")->setEnabled(false);
+            mpc.getHardware()->getLed("sixteen-levels")->setEnabled(false);
         } else {
             mpc.getLayeredScreen()->openScreen("assign-16-levels");
         }

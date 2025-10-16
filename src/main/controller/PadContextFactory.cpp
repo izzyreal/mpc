@@ -4,7 +4,7 @@
 #include "lcdgui/ScreenGroups.h"
 #include "audiomidi/AudioMidiServices.hpp"
 
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -35,8 +35,8 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
-                                             mpc.getHardware2()->getButton("tap")->isPressed();
-    const bool isErasePressed = mpc.getHardware2()->getButton("erase")->isPressed();
+                                             mpc.getHardware()->getButton("tap")->isPressed();
+    const bool isErasePressed = mpc.getHardware()->getButton("erase")->isPressed();
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(mpc);
     const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(mpc);
 
@@ -51,7 +51,7 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
     std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
-    const auto hardwareSliderValue = mpc.getHardware2()->getSlider()->getValueAs<int>();
+    const auto hardwareSliderValue = mpc.getHardware()->getSlider()->getValueAs<int>();
     const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
 
     return {
@@ -135,7 +135,7 @@ PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const
         eventHandler,
         recordNoteOnEvent,
         mpc.getSequencer()->isRecordingOrOverdubbing(),
-        mpc.getHardware2()->getButton("erase")->isPressed(),
+        mpc.getHardware()->getButton("erase")->isPressed(),
         mpc.getSequencer()->getActiveTrack(),
         sequencer::SeqUtil::isStepRecording(mpc),
         isAnyProgramPadRegisteredAsPressed,

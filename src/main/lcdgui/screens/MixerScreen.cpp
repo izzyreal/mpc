@@ -1,5 +1,5 @@
 #include "MixerScreen.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
@@ -649,7 +649,7 @@ bool MixerScreen::stripHasStereoSound(int stripIndex)
 
 void MixerScreen::pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank)
 {
-    const bool shiftIsPressed = mpc.getHardware2()->getButton("shift")->isPressed();
+    const bool shiftIsPressed = mpc.getHardware()->getButton("shift")->isPressed();
 
     if (!shiftIsPressed)
     {

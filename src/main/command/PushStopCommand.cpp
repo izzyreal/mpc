@@ -2,7 +2,7 @@
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientInputControllerBase.h"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "lcdgui/ScreenGroups.h"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
@@ -19,7 +19,7 @@ namespace mpc::command {
         mpc.inputController->unlockNoteRepeat();
 
         if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
-                                  mpc.getHardware2()->getButton("shift")->isPressed()))
+                                  mpc.getHardware()->getButton("shift")->isPressed()))
         {
             ams->stopBouncingEarly();
         }
@@ -34,9 +34,9 @@ namespace mpc::command {
         const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>("sequencer");
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
 
-        mpc.getHardware2()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
-        mpc.getHardware2()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
-        mpc.getHardware2()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
+        mpc.getHardware()->getLed("overdub")->setEnabled(mpc.getSequencer()->isOverdubbing());
+        mpc.getHardware()->getLed("rec")->setEnabled(mpc.getSequencer()->isRecording());
+        mpc.getHardware()->getLed("play")->setEnabled(mpc.getSequencer()->isPlaying());
     }
 }
 

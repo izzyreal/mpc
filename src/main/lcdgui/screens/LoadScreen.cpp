@@ -3,7 +3,7 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 
 #include <disk/SoundLoader.hpp>
 #include <disk/AbstractDisk.hpp>

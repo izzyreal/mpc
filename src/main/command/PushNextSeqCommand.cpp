@@ -1,6 +1,6 @@
 #include "PushNextSeqCommand.h"
 #include "Mpc.hpp"
-#include "hardware2/Hardware2.h"
+#include "hardware/Hardware.h"
 #include "Util.hpp"
 
 namespace mpc::command {
@@ -12,12 +12,12 @@ namespace mpc::command {
 
         if (currentScreenName == "next-seq" || currentScreenName == "next-seq-pad") {
             mpc.getLayeredScreen()->openScreen("sequencer");
-            mpc.getHardware2()->getLed("next-seq")->setEnabled(false);
+            mpc.getHardware()->getLed("next-seq")->setEnabled(false);
         } else if (currentScreenName == "sequencer" || currentScreenName == "track-mute") {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen("next-seq");
-            mpc.getHardware2()->getLed("next-seq")->setEnabled(true);
-            mpc.getHardware2()->getLed("track-mute")->setEnabled(false);
+            mpc.getHardware()->getLed("next-seq")->setEnabled(true);
+            mpc.getHardware()->getLed("track-mute")->setEnabled(false);
         }
     }
 

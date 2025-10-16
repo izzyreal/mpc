@@ -7,8 +7,8 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/MidiOutput.hpp>
 
-#include "hardware2/Hardware2.h"
-#include "hardware2/HardwareComponent.h"
+#include "hardware/Hardware.h"
+#include "hardware/HardwareComponent.h"
 
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
@@ -682,7 +682,7 @@ void Sequencer::stop(const StopMode stopMode)
 
 	for (int i = 0; i < 16; i++)
     {
-        auto pad = mpc.getHardware2()->getPad(i);
+        auto pad = mpc.getHardware()->getPad(i);
         pad->release();
     }
 
