@@ -90,9 +90,9 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
             const int programPadIndex = program->getPadIndexFromNote(note); 
 
-            program->registerPadPress(programPadIndex);
+            program->registerPadPress(programPadIndex, Program::PadPressSource::NON_PHYSICAL);
 
-            frameSeq->enqueueEventAfterNFrames([program, programPadIndex](int) {program->registerPadRelease(programPadIndex);}, durationFrames);
+            frameSeq->enqueueEventAfterNFrames([program, programPadIndex](int) {program->registerPadRelease(programPadIndex, Program::PadPressSource::NON_PHYSICAL);}, durationFrames);
         }
 
         handleNoteEventMidiOut(event, track->getIndex(), track->getDeviceIndex(), track->getVelocityRatio());
@@ -101,7 +101,6 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
     {
         if (const int drumIndex = track->getBus() - 1; drumIndex >= 0)
         {
-            printf("handlign note off for track %i\n", track->getIndex());
             auto &drum = mpc.getDrum(drumIndex);
             const auto audioMidiServices = mpc.getAudioMidiServices();
             const auto frameSeq = audioMidiServices->getFrameSequencer();
@@ -110,7 +109,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
             auto sampler = mpc.getSampler();
             const auto program = sampler->getProgram(drum.getProgram());
-            program->registerPadRelease(program->getPadIndexFromNote(noteOffEvent->getNote()));
+            program->registerPadRelease(program->getPadIndexFromNote(noteOffEvent->getNote()), Program::PadPressSource::NON_PHYSICAL);
         }
 
         handleNoteEventMidiOut(event, track->getIndex(), track->getDeviceIndex(), std::nullopt);
@@ -178,7 +177,7 @@ void EventHandler::handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent> no
                                                    -1,     // Tick not relevant for realtime input
                                                    -1);    // Duration unknown
 
-        program->registerPadPress(program->getPadIndexFromNote(note));
+        program->registerPadPress(program->getPadIndexFromNote(note), Program::PadPressSource::PHYSICAL);
     }
 
     if (trackIndex.has_value() && trackDevice.has_value())
@@ -203,7 +202,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<Note
 
         drum.mpcNoteOff(note, 0, -1);
 
-        program->registerPadRelease(program->getPadIndexFromNote(note));
+        program->registerPadRelease(program->getPadIndexFromNote(note), Program::PadPressSource::PHYSICAL);
     }
 
     if (trackIndex.has_value() && trackDevice.has_value())
@@ -252,7 +251,7 @@ void EventHandler::handleMidiInputNoteOn(const std::shared_ptr<NoteOnEventPlayOn
                                                -1,     // Tick not relevant for realtime input
                                                -1);    // Duration unknown
 
-    program->registerPadPress(program->getPadIndexFromNote(note));
+    program->registerPadPress(program->getPadIndexFromNote(note), Program::PadPressSource::NON_PHYSICAL);
 }
 
 void EventHandler::handleMidiInputNoteOff(const std::shared_ptr<NoteOffEvent> noteOffEvent,
@@ -280,7 +279,7 @@ void EventHandler::handleMidiInputNoteOff(const std::shared_ptr<NoteOffEvent> no
 
     drum.mpcNoteOff(note, frameOffsetInBuffer, -1);
 
-    program->registerPadRelease(program->getPadIndexFromNote(note));
+    program->registerPadRelease(program->getPadIndexFromNote(note), Program::PadPressSource::NON_PHYSICAL);
 }
 
 /**
