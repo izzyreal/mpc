@@ -52,25 +52,34 @@ void ClientInputController::handleAction(const ClientInput& action)
 void ClientInputController::handlePadPress(const ClientInput& a)
 {
     if (!a.index || !a.value) return;
-    const auto num = *a.index;
 
-    if (!mpc.getHardware2()->getPad(num)->pressWithVelocity(*a.value))
+    const auto physicalPadIndex = *a.index;
+
+    if (!mpc.getHardware2()->getPad(physicalPadIndex)->pressWithVelocity(*a.value))
     {
         return;
     }
 
-    auto padIndexWithBank = num + (mpc.getBank() * 16);
-    auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, padIndexWithBank, *a.value, mpc.getLayeredScreen()->getCurrentScreenName());
-    command::PushPadCommand(ctx, padIndexWithBank, *a.value).execute();
+    auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
+
+    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName);
+    const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
+    auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, programPadIndex, *a.value, screenName);
+    command::PushPadCommand(ctx, programPadIndex, *a.value).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)
 {
     if (!a.index) return;
-    const auto num = *a.index;
-    mpc.getHardware2()->getPad(num)->release();
-    auto padIndexWithBank = num + (mpc.getBank() * 16);
-    auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, mpc.getLayeredScreen()->getCurrentScreenName());
+
+    const auto physicalPadIndex = *a.index;
+
+    const auto info = registerPhysicalPadRelease(physicalPadIndex);
+
+    mpc.getHardware2()->getPad(physicalPadIndex)->release();
+
+    const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
+    auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, programPadIndex, info.screenName);
     command::ReleasePadCommand(ctx).execute();
 }
 
