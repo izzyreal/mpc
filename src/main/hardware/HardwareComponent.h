@@ -16,8 +16,9 @@ namespace mpc::hardware {
             Component& operator=(const Component&) = delete;
             ComponentId getId() const { return id; }
         protected:
-            const ComponentId id;
             explicit Component(const ComponentId idToUse) : id(idToUse) {}
+        private:
+            const ComponentId id;
     };
 
     class PressState {
