@@ -485,6 +485,7 @@ void Sequencer::play(bool fromStart)
 			auto copy = copySequence(s);
 			undoPlaceHolder.swap(copy);
 			undoSeqAvailable = true;
+            mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(true);
 		}
 
 	}
@@ -524,13 +525,10 @@ void Sequencer::undoSeq()
 	sequences[activeSequenceIndex]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
 
 	undoSeqAvailable = !undoSeqAvailable;
+    
+    mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(undoSeqAvailable);
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
-}
-
-bool Sequencer::isUndoSeqAvailable()
-{
-    return undoSeqAvailable;
 }
 
 void Sequencer::playFromStart()
@@ -1885,12 +1883,15 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 	undoPlaceHolder.swap(copy);
 
 	undoSeqAvailable = true;
+    
+    mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(true);
 }
 
 void Sequencer::resetUndo()
 {
     undoPlaceHolder.reset();
     undoSeqAvailable = false;
+    mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
 bool Sequencer::isOverdubbing()

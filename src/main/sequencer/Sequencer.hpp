@@ -44,7 +44,6 @@ namespace mpc::sequencer
         void clearPlaceHolder();
         void movePlaceHolderTo(int destIndex);
         std::shared_ptr<Sequence> getPlaceHolder();
-        bool isUndoSeqAvailable();
 
         void setPosition(const double positionQuarterNotes);
         void setPositionWithinSong(const double positionQuarterNotes);
