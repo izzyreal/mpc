@@ -161,7 +161,7 @@ namespace mpc::hardware {
     class DataWheel final : public Component {
         private:
             const int STEP_COUNT_FOR_360_DEGREES = 100;
-            const float angleIncrementPerStep = 1.f / STEP_COUNT_FOR_360_DEGREES;
+            const float angleIncrementPerStep = 1.f / (float)STEP_COUNT_FOR_360_DEGREES;
 
             // The normalized current angle of the DATA wheel. Only affects GUI representation.
             // 0 means the dimple is at the top, 0.25 at 90 degrees clockwise, 0.5 at 180 degrees, 0.75 at 270 degrees clockwise
@@ -170,7 +170,11 @@ namespace mpc::hardware {
             explicit DataWheel() : Component(ComponentId::DATA_WHEEL) {}
             void turn(const int steps)
             {
-                angle = std::fmod(angle + (angleIncrementPerStep * steps), 1.f);
+                angle = angle + (angleIncrementPerStep * (float)std::clamp(steps, -20, 20));
+                    if (angle > 100.0f)
+                        angle -= std::floor(angle);
+                    else if (angle < -100.0f)
+                        angle -= std::floor(angle);
             }
             float getAngle() { return angle; }
     };

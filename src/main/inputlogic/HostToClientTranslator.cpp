@@ -124,6 +124,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             {
                 clientInput.type = ClientInput::Type::DataWheelTurn;
                 clientInput.deltaValue = gesture.continuousDelta;
+                printf("Data wheel turn with continuousDelta %f\n", gesture.continuousDelta);
             }
         }
         else if (gesture.componentId == ComponentId::REC_GAIN_POT ||
