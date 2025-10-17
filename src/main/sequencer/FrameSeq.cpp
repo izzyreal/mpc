@@ -460,7 +460,7 @@ void FrameSeq::work(int nFrames)
 
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
         {
-            if (ticksForCurrentBuffer.contains(frameIndex))
+            if (std::find(ticksForCurrentBuffer.begin(), ticksForCurrentBuffer.end(), frameIndex) != ticksForCurrentBuffer.end())
             {
                 triggerClickIfNeeded();
                 metronomeOnlyTickPosition++;

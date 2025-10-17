@@ -15,6 +15,8 @@ using namespace mpc::sequencer;
 
 Clock::Clock()
 {
+    ticks.reserve(200);
+    positionsInQuarterNotes.reserve(65536);
     reset();
 }
 
@@ -35,7 +37,7 @@ void Clock::clearTicks()
     ticks.clear();
 }
 
-const FixedVector<uint16_t, 200>& Clock::getTicksForCurrentBuffer()
+const std::vector<uint16_t>& Clock::getTicksForCurrentBuffer()
 {
     return ticks;
 }

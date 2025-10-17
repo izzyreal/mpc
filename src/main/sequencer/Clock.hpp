@@ -4,7 +4,7 @@
 #include <cstdint>
 #endif
 
-#include "FixedVector.hpp"
+#include <vector>
 #include "Sequencer.hpp"
 
 namespace mpc::sequencer {
@@ -32,7 +32,7 @@ namespace mpc::sequencer {
                       const uint16_t numSamples,
                       const double playStartPositionQuarterNotes);
 
-        const FixedVector<uint16_t, 200>& getTicksForCurrentBuffer();
+        const std::vector<uint16_t>& getTicksForCurrentBuffer();
         void reset();
         bool areTicksBeingProduced();
         
@@ -48,8 +48,8 @@ namespace mpc::sequencer {
     private:
         const double subDiv = 1.0 / Sequencer::TICKS_PER_QUARTER_NOTE;
 
-        FixedVector<double, 65536> positionsInQuarterNotes;
-        FixedVector<uint16_t, 200> ticks;
+        std::vector<double> positionsInQuarterNotes;
+        std::vector<uint16_t> ticks;
 
         bool ticksAreBeingProduced;
         double previousHostPositionAtStartOfBufferQuarterNotes;
