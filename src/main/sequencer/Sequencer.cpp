@@ -317,14 +317,6 @@ void Sequencer::setActiveSequenceIndex(int i)
 {
     i = std::clamp(i, 0, 98);
     
-    if (i == activeSequenceIndex)
-    {
-        return;
-    }
-
-	if (i < 0 || i > 98)
-		return;
-
 	activeSequenceIndex = i;
 	
 	if (!isPlaying())
