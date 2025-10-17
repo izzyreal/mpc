@@ -9,8 +9,9 @@
 
 #include "mpc_fs.hpp"
 
-#include "controls/KbMapping.hpp"
+#include "inputlogic/KeyboardBindings.h"
 #include <cassert>
+#include <memory>
 
 namespace mpc::controller {
 
@@ -22,13 +23,13 @@ class ClientInputControllerBase {
         };
 
         explicit ClientInputControllerBase(const fs::path keyboardMappingConfigDirectory)
+            : keyboardBindings(std::make_shared<mpc::inputlogic::KeyboardBindings>())
         {
-            kbMapping = std::make_shared<mpc::controls::KbMapping>(keyboardMappingConfigDirectory);
         }
 
         void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
         {
-            const auto clientInput = mpc::inputlogic::HostToClientTranslator::translate(hostEvent, kbMapping);
+            const auto clientInput = mpc::inputlogic::HostToClientTranslator::translate(hostEvent, keyboardBindings);
 
             if (!clientInput.has_value())
             {
@@ -49,7 +50,7 @@ class ClientInputControllerBase {
         void lockNoteRepeat() { buttonLockTracker.lock(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT); }
         void unlockNoteRepeat() { buttonLockTracker.unlock(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT); }
 
-        std::shared_ptr<mpc::controls::KbMapping> getKbMapping() { return kbMapping; }
+        std::shared_ptr<mpc::inputlogic::KeyboardBindings> getKeyboardBindings() { return keyboardBindings; }
 
         void registerPhysicalPadPush(const int padIndex, const int bankIndex, const std::string screenName)
         {
@@ -70,7 +71,7 @@ class ClientInputControllerBase {
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
 
     private:
-        std::shared_ptr<mpc::controls::KbMapping> kbMapping;
+        std::shared_ptr<mpc::inputlogic::KeyboardBindings> keyboardBindings;
         //
         // Maps physical pad index 0 - 15 to info at the time the pad was pushed.
         std::unordered_map<int, PhysicalPadPress> physicalPadPresses;
