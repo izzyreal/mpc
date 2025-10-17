@@ -81,7 +81,7 @@ namespace mpc::hardware {
 
     static const std::unordered_map<ComponentId, std::string> componentIdToLabel {
         { ComponentId::PAD_1_OR_AB, "pad-1-or-ab" },   { ComponentId::PAD_2_OR_CD, "pad-2-or-cd" },
-        { ComponentId::PAD_13_OR_YZ, "pad-3-or-yz" },   { ComponentId::PAD_4_OR_GH, "pad-4-or-gh" },
+        { ComponentId::PAD_3_OR_EF, "pad-3-or-ef" },   { ComponentId::PAD_4_OR_GH, "pad-4-or-gh" },
         { ComponentId::PAD_5_OR_IJ, "pad-5-or-ij" },   { ComponentId::PAD_6_OR_KL, "pad-6-or-kl" },
         { ComponentId::PAD_7_OR_MN, "pad-7-or-mn" },   { ComponentId::PAD_8_OR_OP, "pad-8-or-op" },
         { ComponentId::PAD_9_OR_QR, "pad-9-or-qr" },   { ComponentId::PAD_10_OR_ST, "pad-10-or-st" },

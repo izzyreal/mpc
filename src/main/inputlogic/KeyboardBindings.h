@@ -48,6 +48,12 @@ public:
         {
             if (binding.componentId == id)
             {
+                if (binding.direction == Direction::None)
+                {
+                    result.push_back(key);
+                    break; // only first one for non-directional bindings
+                }
+
                 if (binding.direction == Direction::Negative)
                     result.insert(result.begin(), key); // put first
                 else
@@ -69,7 +75,7 @@ public:
     }
 
 private:
-    std::unordered_map<controls::VmpcKeyCode, KeyboardBinding> bindings;
+    std::map<controls::VmpcKeyCode, KeyboardBinding> bindings;
 
     void initializeDefaults()
     {
