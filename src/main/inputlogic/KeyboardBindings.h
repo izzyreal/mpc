@@ -40,10 +40,31 @@ public:
         initializeDefaults();
     }
 
+    std::vector<mpc::controls::VmpcKeyCode> lookupComponent(hardware::ComponentId id) const
+    {
+        std::vector<mpc::controls::VmpcKeyCode> result;
+
+        for (const auto& [key, binding] : bindings)
+        {
+            if (binding.componentId == id)
+            {
+                if (binding.direction == Direction::Negative)
+                    result.insert(result.begin(), key); // put first
+                else
+                    result.push_back(key);
+            }
+        }
+
+        return result;
+    }
+
     std::optional<KeyboardBinding> lookup(controls::VmpcKeyCode key) const
     {
         if (auto it = bindings.find(key); it != bindings.end())
+        {
             return it->second;
+        }
+
         return std::nullopt;
     }
 
