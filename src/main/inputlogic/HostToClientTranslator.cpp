@@ -1,9 +1,9 @@
 #include "inputlogic/HostToClientTranslator.h"
 #include "hardware/ComponentId.h"
 #include "inputlogic/ClientInput.h"
+#include "inputlogic/KeyboardBindings.h"
 
 #include "controls/KeyCodeHelper.hpp"
-#include "controls/KbMapping.hpp"
 
 #include "hardware/HardwareComponent.h"
 
@@ -12,14 +12,14 @@
 using namespace mpc::inputlogic;
 using namespace mpc::hardware;
 
-std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostEvent, std::shared_ptr<mpc::controls::KbMapping> kbMapping)
+std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
 {
     ClientInput clientInput;
 
-    switch (hostEvent.getSource())
+    switch (hostInputEvent.getSource())
     {
     case HostInputEvent::Source::MIDI: {
-        const auto& midi = std::get<MidiEvent>(hostEvent.payload);
+        const auto& midi = std::get<MidiEvent>(hostInputEvent.payload);
         if (midi.messageType == MidiEvent::NOTE)
         {
             int padIndex = midi.data1 % 16;
@@ -45,7 +45,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
     case HostInputEvent::Source::GESTURE:
     {
-        const auto& gesture = std::get<GestureEvent>(hostEvent.payload);
+        const auto& gesture = std::get<GestureEvent>(hostInputEvent.payload);
 
         if (gesture.componentId == ComponentId::NONE)
         {
@@ -140,9 +140,16 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
     case HostInputEvent::Source::KEYBOARD:
     {
-        const auto& key = std::get<KeyEvent>(hostEvent.payload);
+        const auto& key = std::get<KeyEvent>(hostInputEvent.payload);
         const auto vmpcKeyCode = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
-        const auto id = kbMapping->getHardwareComponentIdAssociatedWithKeycode(vmpcKeyCode);
+        const auto binding = keyboardBindings->lookup(vmpcKeyCode);
+
+        if (!binding)
+        {
+            return std::nullopt;
+        }
+
+        const auto id = binding->componentId;
 
         if (id == hardware::ComponentId::NONE)
         {
@@ -167,16 +174,18 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             if (!key.keyDown) break;
             clientInput.type = ClientInput::Type::DataWheelTurn;
 
-            int increment = 1;
+            const auto direction = binding->direction;
+
+            if (direction == Direction::None)
+            {
+                std::invalid_argument("DataWheel bindings must have a Direction");
+            }
+
+            int increment = toSign(direction);
 
             if (key.ctrlDown) increment *= 10;
             if (key.altDown) increment *= 10;
             if (key.shiftDown) increment *= 10;
-
-            //if (label.find("down") != std::string::npos)
-            {
-                //increment = -increment;
-            }
 
             clientInput.deltaValue = increment;
         }

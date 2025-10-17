@@ -5,14 +5,12 @@
 
 #include <memory>
 
-namespace mpc::controls {
-    class KbMapping;
-}
-
 namespace mpc::inputlogic {
 
-struct HostToClientTranslator {
-    static std::optional<ClientInput> translate(const HostInputEvent& hostEvent, std::shared_ptr<mpc::controls::KbMapping>);
-};
+    class KeyboardBindings;
+
+    struct HostToClientTranslator {
+        static std::optional<ClientInput> translate(const HostInputEvent&, std::shared_ptr<KeyboardBindings>);
+    };
 
 } // namespace mpc::inputlogic
