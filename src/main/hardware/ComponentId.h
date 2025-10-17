@@ -135,6 +135,10 @@ namespace mpc::hardware {
         { ComponentId::NUM_7_OR_MIXER,           "7-or-mixer" },
         { ComponentId::NUM_8_OR_OTHER,           "8-or-other" },
         { ComponentId::NUM_9_OR_MIDI_SYNC,           "9-or-midi-sync" },
+        { ComponentId::DATA_WHEEL, "data-wheel" },
+        { ComponentId::SLIDER, "slider" },
+        { ComponentId::REC_GAIN_POT, "rec-gain-pot" },
+        { ComponentId::MAIN_VOLUME_POT, "main-volume-pot" },
 
         { ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED,      "full-level-or-case-switch-led" },
         { ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED,  "sixteen-levels-or-space-led" },
