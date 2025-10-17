@@ -47,6 +47,8 @@ void ClientInputController::handleAction(const ClientInput& action)
         case ClientInput::Type::ButtonDoublePress:
             handleButtonDoublePress(action);
             break;
+        case ClientInput::Type::HostFocusLost:
+            handleFocusLost();
         default:
             break;
     }
@@ -69,7 +71,7 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
-    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName);
+    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName, a.source);
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, programPadIndex, *a.value, screenName);
     command::PushPadCommand(ctx, programPadIndex, velocityToUse).execute();
@@ -282,6 +284,26 @@ void ClientInputController::handleButtonDoublePress(const ClientInput& a)
         {
             buttonLockTracker.unlock(hardware::ComponentId::REC);
         }
+    }
+}
+
+void ClientInputController::handleFocusLost()
+{
+    using Id = hardware::ComponentId;
+
+    for (int physicalPadIndex = 0; physicalPadIndex < 16; ++physicalPadIndex)
+    {
+        if (!isPhysicallyPressedDueToFocusRequiringInput(physicalPadIndex))
+        {
+            continue;
+        }
+
+        ClientInput clientInput;
+        clientInput.source = ClientInput::Source::Internal;
+        clientInput.type = ClientInput::Type::PadRelease;
+        clientInput.componentId = static_cast<Id>(Id::PAD_1_OR_AB + physicalPadIndex);
+        clientInput.index = physicalPadIndex;
+        handleAction(clientInput);
     }
 }
 

@@ -15,9 +15,28 @@ using namespace mpc::hardware;
 std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
 {
     ClientInput clientInput;
+    
+    switch (hostInputEvent.getSource())
+    {
+        case HostInputEvent::Source::MIDI:
+            clientInput.source = ClientInput::Source::HostInputMidi;
+            break;
+        case HostInputEvent::Source::KEYBOARD:
+            clientInput.source = ClientInput::Source::HostInputKeyboard;
+            break;
+        case HostInputEvent::Source::GESTURE:
+            clientInput.source = ClientInput::Source::HostInputGesture;
+            break;
+        case HostInputEvent::Source::FOCUS:
+            clientInput.source = ClientInput::Source::HostFocusEvent;
+            break;
+    }
 
     switch (hostInputEvent.getSource())
     {
+    case HostInputEvent::Source::FOCUS:
+        clientInput.type = ClientInput::Type::HostFocusLost;
+        break;
     case HostInputEvent::Source::MIDI: {
         const auto& midi = std::get<MidiEvent>(hostInputEvent.payload);
         if (midi.messageType == MidiEvent::NOTE)

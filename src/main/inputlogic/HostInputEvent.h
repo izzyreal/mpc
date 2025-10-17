@@ -7,6 +7,11 @@
 
 namespace mpc::inputlogic {
 
+struct FocusEvent {
+    enum class Type { Lost, Gained };
+    Type type;
+};
+
 struct KeyEvent {
     bool keyDown;
     int rawKeyCode;
@@ -59,23 +64,25 @@ struct MidiEvent {
 
 /* Input events coming from the host, i.e. the machine the virtual MPC2000XL is virtualized on */
 struct HostInputEvent {
-    enum class Source { KEYBOARD, GESTURE, MIDI };
+    enum class Source { KEYBOARD, GESTURE, MIDI, FOCUS };
 
     explicit HostInputEvent(KeyEvent k) : payload(std::move(k)) {}
     explicit HostInputEvent(GestureEvent g) : payload(std::move(g)) {}
     explicit HostInputEvent(MidiEvent m) : payload(std::move(m)) {}
+    explicit HostInputEvent(FocusEvent f) : payload(std::move(f)) {}
 
     Source getSource() const
     {
         if (std::holds_alternative<KeyEvent>(payload)) return Source::KEYBOARD;
         if (std::holds_alternative<GestureEvent>(payload)) return Source::GESTURE;
         if (std::holds_alternative<MidiEvent>(payload)) return Source::MIDI;
+        if (std::holds_alternative<FocusEvent>(payload)) return Source::FOCUS;
 
         // Defensive: someone added a new variant type but forgot to update getSource()
         throw std::logic_error("HostInputEvent::getSource() encountered unknown payload type");
     }
 
-    std::variant<KeyEvent, GestureEvent, MidiEvent> payload;
+    std::variant<KeyEvent, GestureEvent, MidiEvent, FocusEvent> payload;
 };
 
 } // namespace mpc::inputlogic

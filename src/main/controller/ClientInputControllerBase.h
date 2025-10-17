@@ -20,6 +20,7 @@ class ClientInputControllerBase {
         struct PhysicalPadPress {
             int bankIndex;
             std::string screenName;
+            inputlogic::ClientInput::Source inputSource;
         };
 
         explicit ClientInputControllerBase(const fs::path keyboardMappingConfigDirectory)
@@ -52,16 +53,29 @@ class ClientInputControllerBase {
 
         std::shared_ptr<mpc::inputlogic::KeyboardBindings> getKeyboardBindings() { return keyboardBindings; }
 
-        bool isPhysicallyPressed(const int physicalPadIndex, const int bankIndex)
+        bool isPhysicallyPressed(const int physicalPadIndex, const int bankIndex) const
         {
             return physicalPadPresses.count(physicalPadIndex) > 0 &&
-                physicalPadPresses[physicalPadIndex].bankIndex == bankIndex;
+                physicalPadPresses.at(physicalPadIndex).bankIndex == bankIndex;
         }
 
-        void registerPhysicalPadPush(const int padIndex, const int bankIndex, const std::string screenName)
+        bool isPhysicallyPressedDueToFocusRequiringInput(const int physicalPadIndex) const
+        {
+            if (physicalPadPresses.count(physicalPadIndex) == 0)
+            {
+                return false;
+            }
+
+            const auto pressSource = physicalPadPresses.at(physicalPadIndex).inputSource;
+
+            return pressSource == inputlogic::ClientInput::Source::HostInputKeyboard || 
+                   pressSource == inputlogic::ClientInput::Source::HostInputGesture;
+        }
+
+        void registerPhysicalPadPush(const int padIndex, const int bankIndex, const std::string screenName, const inputlogic::ClientInput::Source inputSource)
         {
             assert(physicalPadPresses.count(padIndex) == 0);
-            physicalPadPresses[padIndex] = { bankIndex, screenName };
+            physicalPadPresses[padIndex] = { bankIndex, screenName, inputSource };
         }
 
         PhysicalPadPress registerPhysicalPadRelease(const int padIndex)

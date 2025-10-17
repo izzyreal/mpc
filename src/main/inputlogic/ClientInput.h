@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <optional>
 
 #include "hardware/HardwareComponent.h"
@@ -8,6 +7,11 @@
 namespace mpc::inputlogic {
 
 struct ClientInput {
+
+    enum Source { HostInputMidi, HostInputGesture, HostInputKeyboard, HostFocusEvent, Internal };
+    
+    Source source;
+    
     enum class Type {
         Unknown,
         PadPress,
@@ -18,7 +22,8 @@ struct ClientInput {
         PotMove,
         ButtonPress,
         ButtonRelease,
-        ButtonDoublePress
+        ButtonDoublePress,
+        HostFocusLost
     };
 
     Type type = Type::Unknown;
