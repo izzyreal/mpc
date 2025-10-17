@@ -289,6 +289,7 @@ void ClientInputController::handleButtonDoublePress(const ClientInput& a)
 
 void ClientInputController::handleFocusLost()
 {
+    MLOG("============================ FOCUS LOST =======================");
     using Id = hardware::ComponentId;
 
     for (int physicalPadIndex = 0; physicalPadIndex < 16; ++physicalPadIndex)
