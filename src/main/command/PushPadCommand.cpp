@@ -14,6 +14,7 @@
 
 using namespace mpc::controls;
 using namespace mpc::command;
+using namespace mpc::sampler;
 
 PushPadCommand::PushPadCommand(PushPadContext &ctx, int padIndexWithBank, int velo)
     : ctx(ctx), padIndexWithBank(padIndexWithBank), velo(velo)
@@ -31,17 +32,12 @@ void PushPadCommand::execute()
     if (ctx.currentScreenName == "sequencer" &&
         ctx.isNoteRepeatLockedOrPressed &&
         ctx.sequencer->isPlaying() &&
-        !ctx.program->isPadRegisteredAsPressed(padIndexWithBank))
+        ctx.isPhysicallyPressed)
     {
         return;
     }
 
     if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed)
-    {
-        return;
-    }
-
-    if (ctx.isNoteRepeatLockedOrPressed)
     {
         return;
     }

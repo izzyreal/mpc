@@ -52,6 +52,12 @@ class ClientInputControllerBase {
 
         std::shared_ptr<mpc::inputlogic::KeyboardBindings> getKeyboardBindings() { return keyboardBindings; }
 
+        bool isPhysicallyPressed(const int physicalPadIndex, const int bankIndex)
+        {
+            return physicalPadPresses.count(physicalPadIndex) > 0 &&
+                physicalPadPresses[physicalPadIndex].bankIndex == bankIndex;
+        }
+
         void registerPhysicalPadPush(const int padIndex, const int bankIndex, const std::string screenName)
         {
             assert(physicalPadPresses.count(padIndex) == 0);

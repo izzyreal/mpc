@@ -4,6 +4,7 @@
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/MidiOutput.hpp"
+#include "controller/ClientInputControllerBase.h"
 #include "hardware/Hardware.h"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -12,6 +13,7 @@
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sampler;
 
 void RepeatPad::process(mpc::Mpc& mpc,
                         unsigned int tickPosition,
@@ -43,7 +45,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
     for (int padIndexWithBank = 0; padIndexWithBank < 64; ++padIndexWithBank)
     {
-        if (!program->isPadRegisteredAsPressed(padIndexWithBank))
+        if (!mpc.inputController->isPhysicallyPressed(padIndexWithBank % 16, mpc.getBank()))
         {
             continue;
         }
@@ -57,7 +59,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
         noteEvent->setTick(static_cast<int>(tickPosition));
         const bool isSliderNote = program && program->getSlider()->getNote() == note;
 
-        if (program)
+        if (program && isSliderNote)
         {
             auto hardwareSlider = mpc.getHardware()->getSlider();
             auto programSlider = program->getSlider();

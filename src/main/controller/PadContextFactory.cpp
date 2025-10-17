@@ -93,7 +93,8 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
         setMpcNote,
         setMpcPad,
         mpc.getLayeredScreen()->getFocus(),
-        hardwareSliderValue
+        hardwareSliderValue,
+        mpc.inputController->isPhysicallyPressed(padIndexWithBank % 16, mpc.getBank())
     }; 
 }
 

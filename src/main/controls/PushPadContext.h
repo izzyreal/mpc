@@ -90,5 +90,6 @@ namespace mpc::controls {
 
         std::string currentFieldName;
         int hardwareSliderValue;
+        bool isPhysicallyPressed;
     };
 }

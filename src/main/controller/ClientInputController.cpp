@@ -58,7 +58,11 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     const auto physicalPadIndex = *a.index;
 
-    if (!mpc.getHardware()->getPad(physicalPadIndex)->pressWithVelocity(*a.value))
+    const auto velocityToUse = std::clamp(*a.value * (float) hardware::VelocitySensitivePressable::MAX_VELO, (float) hardware::VelocitySensitivePressable::MIN_VELO, (float) hardware::VelocitySensitivePressable::MAX_VELO);
+
+    auto pad = mpc.getHardware()->getPad(physicalPadIndex);
+
+    if (!pad->pressWithVelocity(velocityToUse))
     {
         return;
     }
@@ -68,7 +72,7 @@ void ClientInputController::handlePadPress(const ClientInput& a)
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName);
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, programPadIndex, *a.value, screenName);
-    command::PushPadCommand(ctx, programPadIndex, *a.value).execute();
+    command::PushPadCommand(ctx, programPadIndex, velocityToUse).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)
@@ -90,8 +94,8 @@ void ClientInputController::handlePadAftertouch(const ClientInput& a)
 {
     if (!a.index || !a.value) return;
     const auto padIndex = *a.index;
-    const auto aftertouchPressure = *a.value;
-    mpc.getHardware()->getPad(padIndex)->aftertouch(aftertouchPressure);
+    const auto pressureToUse = std::clamp(*a.value * hardware::Aftertouchable::MAX_PRESSURE, (float) hardware::Aftertouchable::MIN_PRESSURE, (float) hardware::Aftertouchable::MAX_PRESSURE);
+    mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 }
 
 void ClientInputController::handleDataWheel(const ClientInput& a)

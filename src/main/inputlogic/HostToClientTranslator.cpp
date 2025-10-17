@@ -58,7 +58,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             clientInput.index = static_cast<int>(gesture.componentId) - static_cast<int>(ComponentId::PAD_1_OR_AB);
 
-            if (gesture.type == GestureEvent::Type::BEGIN)
+            if (gesture.type == GestureEvent::Type::BEGIN || gesture.type == GestureEvent::Type::REPEAT)
             {
                 clientInput.type = ClientInput::Type::PadPress;
                 clientInput.value = 1.f - gesture.normY;
@@ -124,7 +124,6 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             {
                 clientInput.type = ClientInput::Type::DataWheelTurn;
                 clientInput.deltaValue = gesture.continuousDelta;
-                printf("Data wheel turn with continuousDelta %f\n", gesture.continuousDelta);
             }
         }
         else if (gesture.componentId == ComponentId::REC_GAIN_POT ||

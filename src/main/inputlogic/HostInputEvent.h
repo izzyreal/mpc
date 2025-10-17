@@ -38,7 +38,6 @@ struct GestureEvent
     Movement movement = Movement::None;
 
     // Normalized pointer position in [0, 1] relative to the component's bounds
-    // Only valid when movement == Absolute
     float normY = 0.0f;
 
     // Only valid for UPDATE events with movement == Relative
