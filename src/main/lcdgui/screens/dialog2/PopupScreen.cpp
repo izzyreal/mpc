@@ -14,7 +14,7 @@ PopupScreen::PopupScreen(mpc::Mpc& mpc)
 
 void PopupScreen::close()
 {
-	returnToAfterInteractionScreen = "";
+	screenToReturnTo = "";
 }
 
 void PopupScreen::setText(std::string text)
@@ -44,9 +44,14 @@ void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName,
 	});
 }
 
-void PopupScreen::returnToScreenAfterInteraction(const std::string& screenName)
+void PopupScreen::setScreenToReturnTo(const std::string& screenName)
 {
-	returnToAfterInteractionScreen = screenName;
+	screenToReturnTo = screenName;
+}
+
+std::string PopupScreen::getScreenToReturnTo() const
+{
+    return screenToReturnTo;
 }
 
 PopupScreen::~PopupScreen()
@@ -54,3 +59,4 @@ PopupScreen::~PopupScreen()
 	if (returnToScreenThread.joinable())
 		returnToScreenThread.join();
 }
+

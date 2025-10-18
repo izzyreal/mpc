@@ -112,7 +112,7 @@ void MonoToStereoScreen::function(int j)
 			{
 				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 				popupScreen->setText("Name already used");
-				popupScreen->returnToScreenAfterInteraction(name);
+				popupScreen->setScreenToReturnTo(name);
 				openScreen("popup");
 				return;
 			}

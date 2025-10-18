@@ -9,12 +9,15 @@
 #include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp""
 #include "hardware/Hardware.h"
+#include <memory>
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic;
 using namespace mpc::command;
 using namespace mpc::command::context;
+using namespace mpc::lcdgui::screens::dialog2;
 
 ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path keyboardMappingConfigDirectory)
     : ClientInputControllerBase(mpcToUse.paths->configPath()), mpc(mpcToUse)
@@ -73,7 +76,16 @@ void ClientInputController::handlePadPress(const ClientInput& a)
         return;
     }
 
-    auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    auto layeredScreen = mpc.getLayeredScreen();
+    auto screen = mpc.getScreen();
+
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+        popupScreen && !popupScreen->getScreenToReturnTo().empty())
+    {
+        layeredScreen->openScreen(popupScreen->getScreenToReturnTo());
+    }
+
+    auto screenName = layeredScreen->getCurrentScreenName();
 
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName, a.source);
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
@@ -200,6 +212,13 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     }
 
     auto screen = mpc.getScreen();
+
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+        popupScreen && !popupScreen->getScreenToReturnTo().empty())
+    {
+        mpc.getLayeredScreen()->openScreen(popupScreen->getScreenToReturnTo());
+        return;
+    }
 
     using Id = hardware::ComponentId;
 
