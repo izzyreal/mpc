@@ -241,7 +241,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                         clientInput.componentId = ComponentId::TAP_TEMPO_OR_NOTE_REPEAT;
                         clientInput.type = ClientInput::Type::ButtonPressAndRelease;
                         clientInput.source = ClientInput::Source::HostInputMidi;
-                        mpc.inputController->handleAction(clientInput);
+                        mpc.inputController->handleInput(clientInput);
                     }
                     else if (func >= 8 && func < 12)
                     {

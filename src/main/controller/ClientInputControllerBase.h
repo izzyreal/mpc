@@ -38,12 +38,12 @@ class ClientInputControllerBase {
                 return;
             }
 
-            handleAction(*clientInput);
+            handleInput(*clientInput);
         }
 
 
         virtual ~ClientInputControllerBase() = default;
-        virtual void handleAction(const mpc::inputlogic::ClientInput& action) = 0;
+        virtual void handleInput(const mpc::inputlogic::ClientInput&) = 0;
 
         ButtonLockTracker buttonLockTracker;
 

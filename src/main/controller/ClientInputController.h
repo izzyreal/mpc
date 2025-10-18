@@ -15,7 +15,7 @@ namespace mpc::controller {
 class ClientInputController : public ClientInputControllerBase {
 public:
     explicit ClientInputController(mpc::Mpc&, const fs::path keyboardMappingConfigDirectory);
-    void handleAction(const mpc::inputlogic::ClientInput& action) override;
+    void handleInput(const mpc::inputlogic::ClientInput&) override;
 
 private:
     mpc::Mpc& mpc;

@@ -37,39 +37,39 @@ ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path 
 {
 }
 
-void ClientInputController::handleAction(const ClientInput& action)
+void ClientInputController::handleInput(const ClientInput& input)
 {
-    switch (action.type) {
+    switch (input.type) {
         case ClientInput::Type::PadPress:
-            handlePadPress(action);
+            handlePadPress(input);
             break;
         case ClientInput::Type::PadAftertouch:
-            handlePadAftertouch(action);
+            handlePadAftertouch(input);
             break;
         case ClientInput::Type::PadRelease:
-            handlePadRelease(action);
+            handlePadRelease(input);
             break;
         case ClientInput::Type::DataWheelTurn:
-            handleDataWheel(action);
+            handleDataWheel(input);
             break;
         case ClientInput::Type::SliderMove:
-            handleSlider(action);
+            handleSlider(input);
             break;
         case ClientInput::Type::PotMove:
-            handlePot(action);
+            handlePot(input);
             break;
         case ClientInput::Type::ButtonPress:
-            handleButtonPress(action);
+            handleButtonPress(input);
             break;
         case ClientInput::Type::ButtonRelease:
-            handleButtonRelease(action);
+            handleButtonRelease(input);
             break;
         case ClientInput::Type::ButtonDoublePress:
-            handleButtonDoublePress(action);
+            handleButtonDoublePress(input);
             break;
         case ClientInput::Type::ButtonPressAndRelease:
-            handleButtonPress(action);
-            handleButtonRelease(action);
+            handleButtonPress(input);
+            handleButtonRelease(input);
             break;
         case ClientInput::Type::HostFocusLost:
             handleFocusLost();
