@@ -14,12 +14,6 @@ NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	addChildT<Underline>();
 }
 
-void NameScreen::mainScreen()
-{
-    mainScreenAction();
-    ScreenComponent::mainScreen();
-}
-
 void NameScreen::initialize(std::string name, unsigned char nameLimitToUse,
                              const std::function<void(std::string&)>& enterActionToUse,
                              const std::string& cancelScreenToUse,

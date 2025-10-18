@@ -5,9 +5,11 @@
 
 namespace mpc::lcdgui::screengroups {
 
-// ---- Screen group definitions ----
+inline const std::vector<std::string> screensThatDontAllowOpeningMainScreen {
+    "file-exists", "vmpc-discard-mapping-changes", "vmpc-reset-keyboard"
+};
 
-inline const std::vector<std::string> screensThatOnlyAllowPlay{
+inline const std::vector<std::string> screensThatOnlyAllowPlay {
     "song",
     "track-mute",
     "next-seq",
@@ -15,7 +17,7 @@ inline const std::vector<std::string> screensThatOnlyAllowPlay{
     "vmpc-recording-finished"
 };
 
-inline const std::vector<std::string> allowCentralNoteAndPadUpdateScreens{
+inline const std::vector<std::string> allowCentralNoteAndPadUpdateScreens {
     "program-assign",
     "program-params",
     "velocity-modulation",
@@ -27,7 +29,7 @@ inline const std::vector<std::string> allowCentralNoteAndPadUpdateScreens{
     "load-a-sound"
 };
 
-inline const std::vector<std::string> screensThatAllowPlayAndRecord{
+inline const std::vector<std::string> screensThatAllowPlayAndRecord {
     "sequencer",
     "select-drum",
     "select-mixer-drum",
@@ -53,7 +55,7 @@ inline const std::vector<std::string> screensThatAllowPlayAndRecord{
     "channel-settings"
 };
 
-inline const std::vector<std::string> samplerScreens{
+inline const std::vector<std::string> samplerScreens {
     "create-new-program",
     "assignment-view",
     "auto-chromatic-assignment",
@@ -85,7 +87,7 @@ inline const std::vector<std::string> samplerScreens{
     "load-a-sound"
 };
 
-inline const std::vector<std::string> soundScreens{
+inline const std::vector<std::string> soundScreens {
     // layer 1
     "trim",
     "loop",
@@ -112,33 +114,43 @@ inline const std::vector<std::string> soundScreens{
     "resample"
 };
 
-// ---- Convenience helpers ----
+inline bool isScreenThatIsNotAllowedToOpenMainScreen(const std::string& screenName)
+{
+    return std::find(screensThatDontAllowOpeningMainScreen.begin(), screensThatDontAllowOpeningMainScreen.end(), screenName)
+           != screensThatDontAllowOpeningMainScreen.end();
+}
 
-inline bool isPlayOnlyScreen(const std::string& screenName) {
+inline bool isPlayOnlyScreen(const std::string& screenName)
+{
     return std::find(screensThatOnlyAllowPlay.begin(), screensThatOnlyAllowPlay.end(), screenName)
            != screensThatOnlyAllowPlay.end();
 }
 
-inline bool isCentralNoteAndPadUpdateScreen(const std::string& screenName) {
+inline bool isCentralNoteAndPadUpdateScreen(const std::string& screenName)
+{
     return std::find(allowCentralNoteAndPadUpdateScreens.begin(), allowCentralNoteAndPadUpdateScreens.end(), screenName)
            != allowCentralNoteAndPadUpdateScreens.end();
 }
 
-inline bool isPlayAndRecordScreen(const std::string& screenName) {
+inline bool isPlayAndRecordScreen(const std::string& screenName)
+{
     return std::find(screensThatAllowPlayAndRecord.begin(), screensThatAllowPlayAndRecord.end(), screenName)
            != screensThatAllowPlayAndRecord.end();
 }
 
-inline bool isPlayScreen(const std::string& screenName) {
+inline bool isPlayScreen(const std::string& screenName)
+{
     return isPlayOnlyScreen(screenName) || isPlayAndRecordScreen(screenName);
 }
 
-inline bool isSamplerScreen(const std::string& screenName) {
+inline bool isSamplerScreen(const std::string& screenName)
+{
     return std::find(samplerScreens.begin(), samplerScreens.end(), screenName)
            != samplerScreens.end();
 }
 
-inline bool isSoundScreen(const std::string& screenName) {
+inline bool isSoundScreen(const std::string& screenName)
+{
     return std::find(soundScreens.begin(), soundScreens.end(), screenName)
            != soundScreens.end();
 }

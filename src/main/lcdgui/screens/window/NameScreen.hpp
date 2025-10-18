@@ -22,7 +22,6 @@ public:
     void turnWheel(int j) override;
     void function(int i) override;
     void pressEnter() override;
-    void mainScreen() override;
     void numpad() {} // Block ways to leave the screen inadvertently
 
     void typeCharacter(char c);
@@ -38,11 +37,11 @@ public:
 
     void setName(std::string newName);
 
+    std::function<void()> mainScreenAction = [](){};
+
 private:
     std::function<void(std::string&)> enterAction = [](std::string&){};
     std::string cancelScreen;
-    std::function<void()> mainScreenAction = [](){};
-
     void drawUnderline();
     void initEditColors();
     void displayName();

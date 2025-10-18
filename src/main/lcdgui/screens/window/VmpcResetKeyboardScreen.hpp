@@ -8,7 +8,6 @@ class VmpcResetKeyboardScreen
     
 public:
     void function(int i) override;
-    void mainScreen() override {}
     
     VmpcResetKeyboardScreen(mpc::Mpc& mpc, const int layerIndex);
     

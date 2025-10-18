@@ -24,12 +24,6 @@ void KeepOrRetryScreen::close()
     mpc.deleteObserver(this);
 }
 
-void KeepOrRetryScreen::mainScreen() {
-    
-    sampler->deleteSound(sampler->getPreviewSound());
-    ScreenComponent::mainScreen();
-}
-
 void KeepOrRetryScreen::function(int i)
 {
     init();

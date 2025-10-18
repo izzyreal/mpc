@@ -49,7 +49,7 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
     controls->right();
     controls->turnWheel(2);
     controls->function(5);
-    controls->mainScreen();
+    mpc.getLayeredScreen()->openScreen("sequencer");
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     auto t1 = controls->findChild<mpc::lcdgui::Field>("type0")->getText();
     auto t2 = controls->findChild<mpc::lcdgui::Field>("channel0")->getText();
@@ -72,7 +72,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     controls->right();
     controls->turnWheel(2);
     controls->function(5);
-    controls->mainScreen();
+    mpc.getLayeredScreen()->openScreen("sequencer");
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     auto t1 = controls->findChild<mpc::lcdgui::Field>("type0")->getText();
     auto t2 = controls->findChild<mpc::lcdgui::Field>("channel0")->getText();

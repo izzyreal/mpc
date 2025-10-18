@@ -21,11 +21,6 @@ FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
-void FileExistsScreen::mainScreen()
-{
-	ScreenComponent::mainScreen();
-}
-
 void FileExistsScreen::function(int i)
 {
 	switch (i)

@@ -18,7 +18,6 @@ public:
     
     void function(int i) override;
     void close() override;
-    void mainScreen() override {}
 
     std::function<void()> discardAndLeave = [](){};
     std::function<void()> saveAndLeave = [](){};

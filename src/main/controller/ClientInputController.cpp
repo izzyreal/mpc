@@ -8,18 +8,26 @@
 #include "inputlogic/ClientInput.h"
 #include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
+#include "lcdgui/ScreenGroups.h"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
+#include "lcdgui/screens/VmpcKeyboardScreen.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "hardware/Hardware.h"
+#include "lcdgui/screens/window/KeepOrRetryScreen.hpp"
+#include "lcdgui/screens/window/LoadASoundScreen.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
 #include <memory>
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic;
 using namespace mpc::command;
 using namespace mpc::command::context;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
 ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path keyboardMappingConfigDirectory)
@@ -219,10 +227,12 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     }
 
     auto screen = mpc.getScreen();
+    auto layeredScreen = mpc.getLayeredScreen();
+    const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
     using Id = hardware::ComponentId;
 
-    auto id = a.componentId;
+    const auto id = a.componentId;
 
     if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screen); stepEditorScreen)
     {
@@ -251,7 +261,7 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
         popupScreen && !popupScreen->getScreenToReturnTo().empty())
     {
-        mpc.getLayeredScreen()->openScreen(popupScreen->getScreenToReturnTo());
+        layeredScreen->openScreen(popupScreen->getScreenToReturnTo());
         return;
     }
 
@@ -264,16 +274,54 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     else if (id == Id::STOP) { screen->stop(); }
     else if (id == Id::PLAY) { screen->play(); }
     else if (id == Id::PLAY_START) { screen->playStart(); }
-    else if (id == Id::MAIN_SCREEN) { screen->mainScreen(); }
-    else if (id == Id::OPEN_WINDOW) {
-        auto ls = mpc.getLayeredScreen();
-        auto currentScreenName = ls->getCurrentScreenName();
-        const auto layerIndex = ls->getFocusedLayerIndex();
+    else if (id == Id::MAIN_SCREEN)
+    {
+        if (screengroups::isScreenThatIsNotAllowedToOpenMainScreen(currentScreenName))
+        {
+            return;
+        }
+
+        if (auto vmpcKeyboardScreen = std::dynamic_pointer_cast<VmpcKeyboardScreen>(screen); vmpcKeyboardScreen)
+        {
+            if (vmpcKeyboardScreen->hasMappingChanged())
+            {
+                layeredScreen->openScreen("vmpc-discard-mapping-changes");
+                return;
+            }
+        }
+        else if (auto vmpcMidiScreen = std::dynamic_pointer_cast<VmpcMidiScreen>(screen); vmpcMidiScreen)
+        {
+            if (vmpcMidiScreen->hasMappingChanged())
+            {
+                layeredScreen->openScreen("vmpc-discard-mapping-changes");
+                return;
+            }
+        }
+        else if (auto loadASoundScreen = std::dynamic_pointer_cast<LoadASoundScreen>(screen); loadASoundScreen)
+        {
+            mpc.getSampler()->deleteSound(mpc.getSampler()->getPreviewSound());
+        }
+        else if (auto nameScreen = std::dynamic_pointer_cast<NameScreen>(screen); nameScreen)
+        {
+            nameScreen->mainScreenAction();
+        }
+        else if (auto keepOrRetryScreen = std::dynamic_pointer_cast<KeepOrRetryScreen>(screen); keepOrRetryScreen)
+        {
+            mpc.getSampler()->deleteSound(mpc.getSampler()->getPreviewSound());
+        }
+
+        PushMainScreenCommand(mpc).execute();
+    }
+    else if (id == Id::OPEN_WINDOW)
+    {
+        const auto layerIndex = layeredScreen->getFocusedLayerIndex();
         screen->openWindow();
-        if (currentScreenName != ls->getCurrentScreenName() &&
+
+        if (currentScreenName != layeredScreen->getCurrentScreenName() &&
             currentScreenName != "popup" &&
-            ls->getFocusedLayerIndex() > layerIndex) {
-            ls->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
+            layeredScreen->getFocusedLayerIndex() > layerIndex)
+        {
+            layeredScreen->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
         }
     }
     else if (id == Id::GO_TO)

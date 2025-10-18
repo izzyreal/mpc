@@ -13,7 +13,6 @@ class FileExistsScreen
 public:
     FileExistsScreen(mpc::Mpc& mpc, const int layerIndex);
     void function(int i) override;
-    void mainScreen() override;
     void numpad(int i) override {}
 
     void initialize(std::function<void()> replaceAction,

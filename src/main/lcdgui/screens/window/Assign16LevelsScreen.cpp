@@ -182,7 +182,3 @@ void Assign16LevelsScreen::displayOriginalKeyPad()
     findField("originalkeypad")->setTextPadded(originalKeyPad + 1, " ");
 }
 
-void Assign16LevelsScreen::openWindow()
-{
-    mainScreen();
-}

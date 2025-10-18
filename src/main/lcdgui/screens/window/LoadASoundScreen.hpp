@@ -16,8 +16,6 @@ namespace mpc::lcdgui::screens::window
 		void open() override;
 		void close() override;
 
-        // Block uncontrolled ways to leave this screen
-        void mainScreen() override;
         void numpad(int i) override {}
 
 		void update(Observable* observable, Message message) override;

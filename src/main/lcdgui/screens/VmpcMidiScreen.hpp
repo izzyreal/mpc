@@ -22,13 +22,13 @@ namespace mpc::lcdgui::screens {
         void right() override;
         void function(int i) override;
         void openWindow() override;
-        void mainScreen() override;
         void turnWheel(int i) override;
 
         bool isLearning();
         void setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value);
         void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand& c);
         std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
+        bool hasMappingChanged();
 
     private:
         int row = 0;
@@ -37,8 +37,6 @@ namespace mpc::lcdgui::screens {
         mpc::nvram::MidiControlCommand learnCandidate;
 
         bool learning = false;
-        bool hasMappingChanged();
-
         std::shared_ptr<mpc::nvram::MidiControlPreset> activePreset = std::make_shared<mpc::nvram::MidiControlPreset>();
         std::shared_ptr<mpc::nvram::MidiControlPreset> uneditedActivePresetCopy = std::make_shared<mpc::nvram::MidiControlPreset>();
 

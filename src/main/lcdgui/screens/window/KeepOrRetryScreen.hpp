@@ -17,7 +17,6 @@ namespace mpc::lcdgui::screens::window
         void close() override;
 		void function(int i) override;
 		void turnWheel(int i) override;
-		void mainScreen() override;
         void right() override;
 
 	private:

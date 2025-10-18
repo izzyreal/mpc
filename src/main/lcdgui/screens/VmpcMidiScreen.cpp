@@ -353,17 +353,6 @@ void VmpcMidiScreen::function(int i)
     }
 }
 
-void VmpcMidiScreen::mainScreen()
-{
-    if (hasMappingChanged())
-    {
-        openScreen("vmpc-discard-mapping-changes");
-        return;
-    }
-    
-    ScreenComponent::mainScreen();
-}
-
 void VmpcMidiScreen::setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value)
 {
     learnCandidate.setMidiMessageType(isNote ? MidiControlCommand::MidiMessageType::NOTE : MidiControlCommand::MidiMessageType::CC);

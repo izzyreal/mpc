@@ -19,12 +19,6 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
-void LoadASoundScreen::mainScreen()
-{
-    sampler->deleteSound(sampler->getPreviewSound());
-    ScreenComponent::mainScreen();
-}
-
 void LoadASoundScreen::open()
 {
 	init();

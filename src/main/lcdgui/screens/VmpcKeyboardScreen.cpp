@@ -229,17 +229,6 @@ void VmpcKeyboardScreen::function(int i)
     }
 }
 
-void VmpcKeyboardScreen::mainScreen()
-{
-    if (hasMappingChanged())
-    {
-        openScreen("vmpc-discard-mapping-changes");
-        return;
-    }
-    
-    ScreenComponent::mainScreen();
-}
-
 void VmpcKeyboardScreen::setLearnCandidate(const int rawKeyCode)
 {
     learnCandidate = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);

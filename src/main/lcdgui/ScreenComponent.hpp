@@ -89,7 +89,6 @@ namespace mpc::lcdgui
         virtual void stop() { command::PushStopCommand(mpc).execute(); }
         virtual void play() { command::PushPlayCommand(mpc).execute(); }
         virtual void playStart() { command::PushPlayStartCommand(mpc).execute(); }
-        virtual void mainScreen() { command::PushMainScreenCommand(mpc).execute(); }
         virtual void undoSeq() { command::PushUndoSeqCommand(mpc).execute(); }
         virtual void erase() { command::PushEraseCommand(mpc).execute(); }
         virtual void setSlider(int i) {}
