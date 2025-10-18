@@ -6,7 +6,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
-
+using namespace mpc::hardware;
 
 NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "name", layerIndex)
@@ -33,6 +33,8 @@ std::weak_ptr<Underline> NameScreen::findUnderline()
 
 void NameScreen::open()
 {
+    mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(!mpc.getPadAndButtonKeyboard()->isUpperCase());
+
 	for (int i = 0; i < 16; i++)
     {
         findUnderline().lock()->setState(i, false);
@@ -43,6 +45,8 @@ void NameScreen::open()
 
 void NameScreen::close()
 {
+    mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(mpc.isFullLevelEnabled());
+
     ls->setLastFocus("name", "0");
     editing = false;
 

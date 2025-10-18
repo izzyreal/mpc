@@ -6,3 +6,4 @@ namespace mpc::lcdgui::screens {
         virtual void openNameScreen() = 0;
     };
 }
+

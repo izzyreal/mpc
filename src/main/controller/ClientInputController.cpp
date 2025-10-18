@@ -8,6 +8,7 @@
 #include "inputlogic/ClientInput.h"
 #include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
+#include "inputlogic/PadAndButtonKeyboard.hpp"
 #include "lcdgui/ScreenGroups.h"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
@@ -23,6 +24,7 @@
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic;
+using namespace mpc::hardware;
 using namespace mpc::command;
 using namespace mpc::command::context;
 using namespace mpc::lcdgui;
@@ -82,34 +84,39 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     const auto physicalPadIndex = *a.index;
 
-    const auto velocityToUse = std::clamp(*a.value * (float) hardware::VelocitySensitivePressable::MAX_VELO, (float) hardware::VelocitySensitivePressable::MIN_VELO, (float) hardware::VelocitySensitivePressable::MAX_VELO);
+    const auto velocity = *a.value * (float) VelocitySensitivePressable::MAX_VELO;
+
+    const auto clampedVelocity = std::clamp(velocity,
+                                          (float) VelocitySensitivePressable::MIN_VELO,
+                                          (float) VelocitySensitivePressable::MAX_VELO);
 
     auto pad = mpc.getHardware()->getPad(physicalPadIndex);
 
-    if (!pad->pressWithVelocity(velocityToUse))
+    if (!pad->pressWithVelocity(clampedVelocity))
     {
         return;
     }
 
     auto layeredScreen = mpc.getLayeredScreen();
-    auto screen = mpc.getScreen();
-
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
-        popupScreen && !popupScreen->getScreenToReturnTo().empty())
-    {
-        layeredScreen->openScreen(popupScreen->getScreenToReturnTo());
-    }
-
-    auto screenName = layeredScreen->getCurrentScreenName();
+    const auto screenName = layeredScreen->getCurrentScreenName();
 
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName, a.source);
+
+    auto screen = mpc.getScreen();
+
+    if (auto nameScreen = std::dynamic_pointer_cast<NameScreen>(screen))
+    {
+        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(a.componentId);
+        return;
+    }
+
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, *a.value, screenName);
 
-    TriggerDrumNoteOnCommand(ctx, programPadIndex, velocityToUse).execute();
+    TriggerDrumNoteOnCommand(ctx, programPadIndex, clampedVelocity).execute();
 
-    const bool isF4Pressed = mpc.getHardware()->getButton(hardware::ComponentId::F4)->isPressed();
-    const bool isF6Pressed = mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed();
+    const bool isF4Pressed = mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
+    const bool isF6Pressed = mpc.getHardware()->getButton(ComponentId::F6)->isPressed();
 
     PushPadScreenUpdateContext padPushScreenUpdateCtx {
         ctx.isSixteenLevelsEnabled,
@@ -134,6 +141,17 @@ void ClientInputController::handlePadPress(const ClientInput& a)
     };
 
     NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note).execute();
+
+    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(screen); opensNameScreen)
+    {
+        opensNameScreen->openNameScreen();
+    }
+
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+        popupScreen && !popupScreen->getScreenToReturnTo().empty())
+    {
+        layeredScreen->openScreen(popupScreen->getScreenToReturnTo());
+    }
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)
@@ -155,22 +173,35 @@ void ClientInputController::handlePadAftertouch(const ClientInput& a)
 {
     if (!a.index || !a.value) return;
     const auto padIndex = *a.index;
-    const auto pressureToUse = std::clamp(*a.value * hardware::Aftertouchable::MAX_PRESSURE, (float) hardware::Aftertouchable::MIN_PRESSURE, (float) hardware::Aftertouchable::MAX_PRESSURE);
+    const auto pressureToUse = std::clamp(*a.value * Aftertouchable::MAX_PRESSURE, (float) Aftertouchable::MIN_PRESSURE, (float) Aftertouchable::MAX_PRESSURE);
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 }
 
 void ClientInputController::handleDataWheel(const ClientInput& a)
 {
     if (!a.deltaValue) return;
-    float& acc = deltaAccumulators[a.componentId];
-    acc += *a.deltaValue;
-    int steps = static_cast<int>(acc);
 
-    if (steps != 0)
+    float& acc = deltaAccumulators[a.componentId];
+    
+    acc += *a.deltaValue;
+
+    const int steps = static_cast<int>(acc);
+
+    if (steps == 0)
     {
-        acc -= steps;
-        mpc.getHardware()->getDataWheel()->turn(steps);
-        mpc.getScreen()->turnWheel(steps);
+        return;
+    }
+
+    acc -= steps;
+    mpc.getHardware()->getDataWheel()->turn(steps);
+
+    auto screen = mpc.getScreen();
+
+    screen->turnWheel(steps);
+
+    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(screen); opensNameScreen)
+    {
+        opensNameScreen->openNameScreen();
     }
 }
 
@@ -192,14 +223,14 @@ void ClientInputController::handleSlider(const ClientInput& a)
 
 void ClientInputController::handlePot(const ClientInput& a)
 {
-    std::shared_ptr<mpc::hardware::Pot> pot =
-        a.componentId == hardware::ComponentId::REC_GAIN_POT ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
+    std::shared_ptr<Pot> pot =
+        a.componentId == ComponentId::REC_GAIN_POT ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
 
     pot->setValue(pot->getValue() + *a.deltaValue * 0.01f);
 
-    if (a.componentId == hardware::ComponentId::REC_GAIN_POT)
+    if (a.componentId == ComponentId::REC_GAIN_POT)
     {
         audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
     }
@@ -230,7 +261,7 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     auto layeredScreen = mpc.getLayeredScreen();
     const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
-    using Id = hardware::ComponentId;
+    using Id = ComponentId;
 
     const auto id = a.componentId;
 
@@ -407,7 +438,7 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 
     button->release();
 
-    using Id = hardware::ComponentId;
+    using Id = ComponentId;
 
     auto id = a.componentId;
 
@@ -429,22 +460,22 @@ void ClientInputController::handleButtonDoublePress(const ClientInput& a)
         return;
     }
 
-    if (a.componentId == hardware::ComponentId::REC)
+    if (a.componentId == ComponentId::REC)
     {
         buttonLockTracker.toggle(a.componentId);
 
-        if (buttonLockTracker.isLocked(hardware::ComponentId::REC))
+        if (buttonLockTracker.isLocked(ComponentId::REC))
         {
-            buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
+            buttonLockTracker.unlock(ComponentId::OVERDUB);
         }
     }
-    else if (a.componentId == hardware::ComponentId::OVERDUB)
+    else if (a.componentId == ComponentId::OVERDUB)
     {
-        buttonLockTracker.toggle(hardware::ComponentId::OVERDUB);
+        buttonLockTracker.toggle(ComponentId::OVERDUB);
 
-        if (buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB))
+        if (buttonLockTracker.isLocked(ComponentId::OVERDUB))
         {
-            buttonLockTracker.unlock(hardware::ComponentId::REC);
+            buttonLockTracker.unlock(ComponentId::REC);
         }
     }
 }
@@ -459,7 +490,7 @@ void ClientInputController::handleFocusLost()
     // for pads.
     
     /*
-    using Id = hardware::ComponentId;
+    using Id = ComponentId;
 
     for (int physicalPadIndex = 0; physicalPadIndex < 16; ++physicalPadIndex)
     {

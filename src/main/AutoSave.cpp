@@ -1,6 +1,7 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
 #include "mpc_fs.hpp"
 
 #include <disk/AbstractDisk.hpp>
@@ -292,11 +293,17 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         {
             screen = mpc.screens->get<EditSoundScreen>("edit-sound")->getReturnToScreenName(); 
         }
+        else if (screen == "name")
+        {
+            screen = "sequencer";
+            previousScreen = "";
+        }
 
         if (previousScreen == "vmpc-continue-previous-session" || previousScreen == "vmpc-known-controller-detected")
         {
             previousScreen = "sequencer";
         }
+
 
         auto previousSamplerScreen = mpc.getPreviousSamplerScreenName();
         auto focus = mpc.getLayeredScreen()->getFocus();

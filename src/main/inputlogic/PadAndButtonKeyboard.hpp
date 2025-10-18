@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <string>
 
+#include "hardware/ComponentId.h"
+
 /**
  * This class handles typing a name in the NameScreen via the pads (old mobile phone style).
  */
@@ -14,25 +16,25 @@ namespace mpc::inputlogic {
     class PadAndButtonKeyboard
     {
     private:
-        static std::unordered_map<std::string, std::string> charMap();
+        static std::unordered_map<mpc::hardware::ComponentId, std::string> charMap();
 
         mpc::Mpc& mpc;
 
         bool upperCase = true;
 
-        std::unordered_map<std::string, bool> pressedZeroTimes;
+        std::unordered_map<mpc::hardware::ComponentId, bool> pressedZeroTimes;
 
-        std::string previousPad;
+        mpc::hardware::ComponentId previousPad = mpc::hardware::ComponentId::NONE;
 
     public:
         PadAndButtonKeyboard(mpc::Mpc&);
-        void pressHardwareComponent(const std::string& label);
+        void pressHardwareComponent(const mpc::hardware::ComponentId);
         void resetPreviousPad();
         void resetPressedZeroTimes();
         void resetUpperCase();
 
         const bool isUpperCase() { return upperCase; }
-
     };
 
 }
+
