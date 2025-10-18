@@ -289,12 +289,19 @@ void ClientInputController::handleButtonDoublePress(const ClientInput& a)
 
 void ClientInputController::handleFocusLost()
 {
-    MLOG("============================ FOCUS LOST =======================");
+    // Our vmpc-juce wrapper's raw keyboard module automatically iterates
+    // through all pressed keys and invokes key-up against them when the
+    // app loses focus. We could disable that, and handle it like below.
+    // But the advantage of relying the on the raw keyboard module's key-up
+    // is that it takes care of all key-presses in one go, not just the ones
+    // for pads.
+    
+    /*
     using Id = hardware::ComponentId;
 
     for (int physicalPadIndex = 0; physicalPadIndex < 16; ++physicalPadIndex)
     {
-        if (!isPhysicallyPressedDueToFocusRequiringInput(physicalPadIndex))
+        if (!isPhysicallyPressedDueToKeyboardInput(physicalPadIndex))
         {
             continue;
         }
@@ -306,5 +313,6 @@ void ClientInputController::handleFocusLost()
         clientInput.index = physicalPadIndex;
         handleAction(clientInput);
     }
+    */
 }
 

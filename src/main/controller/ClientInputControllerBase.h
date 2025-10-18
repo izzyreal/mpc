@@ -59,7 +59,7 @@ class ClientInputControllerBase {
                 physicalPadPresses.at(physicalPadIndex).bankIndex == bankIndex;
         }
 
-        bool isPhysicallyPressedDueToFocusRequiringInput(const int physicalPadIndex) const
+        bool isPhysicallyPressedDueToKeyboardInput(const int physicalPadIndex) const
         {
             if (physicalPadPresses.count(physicalPadIndex) == 0)
             {
@@ -68,8 +68,7 @@ class ClientInputControllerBase {
 
             const auto pressSource = physicalPadPresses.at(physicalPadIndex).inputSource;
 
-            return pressSource == inputlogic::ClientInput::Source::HostInputKeyboard || 
-                   pressSource == inputlogic::ClientInput::Source::HostInputGesture;
+            return pressSource == inputlogic::ClientInput::Source::HostInputKeyboard;
         }
 
         void registerPhysicalPadPush(const int padIndex, const int bankIndex, const std::string screenName, const inputlogic::ClientInput::Source inputSource)
