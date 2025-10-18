@@ -117,7 +117,7 @@ namespace mpc {
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
+        std::shared_ptr<mpc::lcdgui::ScreenComponent> getScreen();
         std::shared_ptr<hardware::Hardware> getHardware();
         mpc::disk::DiskController* getDiskController();
         std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> getPadAndButtonKeyboard();

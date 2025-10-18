@@ -466,13 +466,13 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
     REQUIRE(sound->getEnd() == 751);
 
     loopScreen->function(0); // Go to TRIM screen
-    mpc.getActiveControls()->down();
-    mpc.getActiveControls()->openWindow(); // Open Start fine window
-    mpc.getActiveControls()->down(); // Move to Smpl Length: field
-    mpc.getActiveControls()->turnWheel(1); // Set Smpl Length to FIXed
-    mpc.getActiveControls()->function(3); // Close Start fine window
-    mpc.getActiveControls()->function(1); // Open LOOP screen, and we should be back at the Lngth: 's value field
-    mpc.getActiveControls()->turnWheel(1); // Add 1 to the length
+    mpc.getScreen()->down();
+    mpc.getScreen()->openWindow(); // Open Start fine window
+    mpc.getScreen()->down(); // Move to Smpl Length: field
+    mpc.getScreen()->turnWheel(1); // Set Smpl Length to FIXed
+    mpc.getScreen()->function(3); // Close Start fine window
+    mpc.getScreen()->function(1); // Open LOOP screen, and we should be back at the Lngth: 's value field
+    mpc.getScreen()->turnWheel(1); // Add 1 to the length
 
     // Now we expect the loop-to point to have changed. When increasing the loop length,
     // the loop-to point becomes lower.
@@ -480,12 +480,12 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
     REQUIRE(sound->getLoopTo() == 499);
     REQUIRE(sound->getEnd() == 751);
 
-    mpc.getActiveControls()->openWindow(); // Open Loop End fine window
-    mpc.getActiveControls()->down();
-    mpc.getActiveControls()->down(); // Move to Loop Lngth: field
-    mpc.getActiveControls()->turnWheel(1); // Set Loop Lngth to FIXed
-    mpc.getActiveControls()->function(3); // Go back to LOOP screen, back at Lgnth: 's value field
-    mpc.getActiveControls()->turnWheel(1); // Loop Lngth is FIXed, so we expect this to be a no-op
+    mpc.getScreen()->openWindow(); // Open Loop End fine window
+    mpc.getScreen()->down();
+    mpc.getScreen()->down(); // Move to Loop Lngth: field
+    mpc.getScreen()->turnWheel(1); // Set Loop Lngth to FIXed
+    mpc.getScreen()->function(3); // Go back to LOOP screen, back at Lgnth: 's value field
+    mpc.getScreen()->turnWheel(1); // Loop Lngth is FIXed, so we expect this to be a no-op
 
     REQUIRE(sound->getStart() == 250);
     REQUIRE(sound->getLoopTo() == 499);
@@ -500,17 +500,17 @@ TEST_CASE("Loop To fine window", "[sound]")
 
     mpc.getLayeredScreen()->openScreen("loop");
 
-    mpc.getActiveControls()->down(); // Move to To: field
-    mpc.getActiveControls()->openWindow(); // Open Loop To fine window
+    mpc.getScreen()->down(); // Move to To: field
+    mpc.getScreen()->openWindow(); // Open Loop To fine window
 
-    mpc.getActiveControls()->turnWheel(-1);
+    mpc.getScreen()->turnWheel(-1);
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == SOUND_LENGTH - 1);
     REQUIRE(sound->getEnd() == SOUND_LENGTH);
 
     sound->setEnd(SOUND_LENGTH - 1);
 
-    mpc.getActiveControls()->turnWheel(1);
+    mpc.getScreen()->turnWheel(1);
     // Loop To may not change End value, contrary to how St and End may affect each other
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == SOUND_LENGTH - 1);
@@ -518,7 +518,7 @@ TEST_CASE("Loop To fine window", "[sound]")
 
     sound->setEnd(SOUND_LENGTH);
 
-    mpc.getActiveControls()->turnWheel(1);
+    mpc.getScreen()->turnWheel(1);
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == SOUND_LENGTH);
     REQUIRE(sound->getEnd() == SOUND_LENGTH);
@@ -531,8 +531,8 @@ TEST_CASE("Loop To fine window", "[sound]")
     sound->setEnd(750);
     sound->setLoopTo(500);
 
-    mpc.getActiveControls()->down(); // Move to Lngth: field
-    mpc.getActiveControls()->turnWheel(1);
+    mpc.getScreen()->down(); // Move to Lngth: field
+    mpc.getScreen()->turnWheel(1);
     // We have added 1 to the length. When sound length is VARiable,
     // which is the default and is active now, changing the length is
     // done by changing the end. When sound length is FIXed, changing
@@ -541,17 +541,17 @@ TEST_CASE("Loop To fine window", "[sound]")
     REQUIRE(sound->getLoopTo() == 500);
     REQUIRE(sound->getEnd() == 751);
 
-    mpc.getActiveControls()->function(3); // Go back to LOOP screen
-    mpc.getActiveControls()->function(0); // Go to TRIM screen
-    mpc.getActiveControls()->down();
-    mpc.getActiveControls()->openWindow(); // Open Start fine window
-    mpc.getActiveControls()->down(); // Move to Smpl Length: field
-    mpc.getActiveControls()->turnWheel(1); // Set Smpl Length to FIXed
-    mpc.getActiveControls()->function(3); // Close Start fine window
-    mpc.getActiveControls()->function(1); // Open LOOP screen, and we should be back at the To: field
+    mpc.getScreen()->function(3); // Go back to LOOP screen
+    mpc.getScreen()->function(0); // Go to TRIM screen
+    mpc.getScreen()->down();
+    mpc.getScreen()->openWindow(); // Open Start fine window
+    mpc.getScreen()->down(); // Move to Smpl Length: field
+    mpc.getScreen()->turnWheel(1); // Set Smpl Length to FIXed
+    mpc.getScreen()->function(3); // Close Start fine window
+    mpc.getScreen()->function(1); // Open LOOP screen, and we should be back at the To: field
 
-    mpc.getActiveControls()->openWindow(); // Open Loop To fine window, we should be back at the Lngth: field
-    mpc.getActiveControls()->turnWheel(1); // Add 1 to the length
+    mpc.getScreen()->openWindow(); // Open Loop To fine window, we should be back at the Lngth: field
+    mpc.getScreen()->turnWheel(1); // Add 1 to the length
 
     // Now we expect the loop-to point to have changed. When increasing the loop length,
     // the loop-to point becomes lower.
@@ -559,10 +559,10 @@ TEST_CASE("Loop To fine window", "[sound]")
     REQUIRE(sound->getLoopTo() == 499);
     REQUIRE(sound->getEnd() == 751);
 
-    mpc.getActiveControls()->down(); // Move to Loop Lngth: field
-    mpc.getActiveControls()->turnWheel(1); // Set Loop Lngth to FIXed
-    mpc.getActiveControls()->up(); // Go back to LOOP Lngth: field
-    mpc.getActiveControls()->turnWheel(1); // Loop Lngth is FIXed, so we expect this to be a no-op
+    mpc.getScreen()->down(); // Move to Loop Lngth: field
+    mpc.getScreen()->turnWheel(1); // Set Loop Lngth to FIXed
+    mpc.getScreen()->up(); // Go back to LOOP Lngth: field
+    mpc.getScreen()->turnWheel(1); // Loop Lngth is FIXed, so we expect this to be a no-op
 
     REQUIRE(sound->getStart() == 250);
     REQUIRE(sound->getLoopTo() == 499);

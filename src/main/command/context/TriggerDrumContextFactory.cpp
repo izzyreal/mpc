@@ -89,7 +89,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         mpc.getAudioMidiServices()->getFrameSequencer(),
         mpc.getBasicPlayer(),
         allowCentralNoteAndPadUpdate,
-        mpc.getActiveControls(),
+        mpc.getScreen(),
         setMpcNote,
         setMpcPad,
         mpc.getLayeredScreen()->getFocus(),

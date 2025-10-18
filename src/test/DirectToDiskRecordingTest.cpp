@@ -73,7 +73,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    mpc.getActiveControls()->function(4);
+    mpc.getScreen()->function(4);
 
     auto recordingsPath = mpc.paths->recordingsPath();
 

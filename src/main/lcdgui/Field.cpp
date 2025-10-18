@@ -171,7 +171,7 @@ void Field::setSplit(bool b)
 	if (split)
 	{
 		if (typeModeEnabled)
-			mpc.getActiveControls()->pressEnter();
+			mpc.getScreen()->pressEnter();
 
 		activeSplit = text.length() - 2;
 	}

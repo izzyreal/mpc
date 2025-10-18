@@ -42,7 +42,7 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     controls->turnWheel(1);
     controls->right();
     controls->turnWheel(3);
@@ -65,7 +65,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     controls->turnWheel(1);
     controls->right();
     controls->turnWheel(3);
@@ -84,12 +84,12 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Open VmpcMidiPresetsScreen
     controls->openWindow();
 
-    controls = mpc.getActiveControls();
+    controls = mpc.getScreen();
 
     // Open NameScreen
     controls->function(2);
 
-    controls = mpc.getActiveControls();
+    controls = mpc.getScreen();
     auto focus0 = mpc.getLayeredScreen()->getFocus();
 
     // Save the preset by pressing ENTER in NameScreen
@@ -108,7 +108,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     mpc.getLayeredScreen()->openScreen("vmpc-midi-presets");
 
-    controls = mpc.getActiveControls();
+    controls = mpc.getScreen();
 
     int nameCounter = 0;
 

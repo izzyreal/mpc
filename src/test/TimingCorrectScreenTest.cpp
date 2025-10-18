@@ -14,7 +14,7 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     auto event = mpc.getSequencer()->getActiveSequence()->getTrack(0)->recordNoteEventSynced(1, 60, 127);
     mpc.getSequencer()->getActiveSequence()->getTrack(0)->finalizeNoteEventSynced(event, 1);
     mpc.getLayeredScreen()->openScreen("timing-correct");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     controls->function(4); // DO IT
     REQUIRE(event->getTick() == 0);
 

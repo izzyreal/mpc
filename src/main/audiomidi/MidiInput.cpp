@@ -233,7 +233,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     }
                     else if (func == 7)
                     {
-                        auto activeControls = mpc.getActiveControls();
+                        auto activeControls = mpc.getScreen();
                         activeControls->tap();
                     }
                     else if (func >= 8 && func < 12)
@@ -340,7 +340,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     NoteInputScreenUpdateContext noteInputScreenUpdateContext {
         isSixteenLevelsEnabled,
         isCentralNoteAndPadUpdateScreen,
-        mpc.getActiveControls(),
+        mpc.getScreen(),
         setMpcNote,
         currentFieldName
     };

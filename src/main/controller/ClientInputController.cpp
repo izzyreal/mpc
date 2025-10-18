@@ -143,7 +143,7 @@ void ClientInputController::handleDataWheel(const ClientInput& a)
     {
         acc -= steps;
         mpc.getHardware()->getDataWheel()->turn(steps);
-        mpc.getActiveControls()->turnWheel(steps);
+        mpc.getScreen()->turnWheel(steps);
     }
 }
 
@@ -154,12 +154,12 @@ void ClientInputController::handleSlider(const ClientInput& a)
     if (a.value)
     {
         slider->moveToNormalizedY(*a.value);
-        mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
+        mpc.getScreen()->setSlider(std::round(slider->getValue()));
     }
     else if (a.deltaValue && *a.deltaValue != 0.f)
     {
         slider->setValue(slider->getValue() + *a.deltaValue);
-        mpc.getActiveControls()->setSlider(std::round(slider->getValue()));
+        mpc.getScreen()->setSlider(std::round(slider->getValue()));
     }
 }
 
@@ -199,7 +199,7 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
         return;
     }
 
-    auto screen = mpc.getActiveControls();
+    auto screen = mpc.getScreen();
 
     using Id = hardware::ComponentId;
 

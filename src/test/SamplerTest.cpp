@@ -75,7 +75,7 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
     }
 
     mpc.getLayeredScreen()->openScreen("trim");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
     REQUIRE(soundName() == "sound3          (ST)");
     controls->turnWheel(1);
@@ -124,7 +124,7 @@ TEST_CASE("Sort sounds by name", "[sampler]")
     }
 
     mpc.getLayeredScreen()->openScreen("trim");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
     REQUIRE(soundName() == "sound1          (ST)");
     controls->turnWheel(1);
@@ -175,7 +175,7 @@ TEST_CASE("Sort sounds by size", "[sampler]")
     }
 
     mpc.getLayeredScreen()->openScreen("trim");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
     REQUIRE(soundName() == "sound2          (ST)");
     controls->turnWheel(1);
@@ -209,7 +209,7 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
     REQUIRE(sampler->getSoundCount() == 3);
 
     mpc.getLayeredScreen()->openScreen("trim");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
     REQUIRE(soundName() == "sound3          (ST)");
     controls->turnWheel(1);
@@ -253,7 +253,7 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
     }
 
     mpc.getLayeredScreen()->openScreen("program-assign");
-    auto controls = mpc.getActiveControls();
+    auto controls = mpc.getScreen();
     mpc.getLayeredScreen()->setFocus("snd");
 
     REQUIRE(sampler->getSoundSortingTypeName() == "MEMORY");

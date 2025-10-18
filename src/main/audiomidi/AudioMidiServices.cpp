@@ -489,7 +489,7 @@ void AudioMidiServices::switchMidiControlMappingIfRequired()
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-midi")
         {
-            mpc.getActiveControls()->open();
+            mpc.getScreen()->open();
         }
     }
 }

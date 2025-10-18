@@ -277,7 +277,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         // We do this by pressing F4 via ...->function(3)
         if (layeredScreen->getCurrentScreenName() == "directory")
         {
-            mpc.getActiveControls()->function(3);
+            mpc.getScreen()->function(3);
             layeredScreen->setPreviousScreenName("sequencer");
         }
 

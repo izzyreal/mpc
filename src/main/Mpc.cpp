@@ -200,7 +200,7 @@ std::shared_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 
-std::shared_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
+std::shared_ptr<lcdgui::ScreenComponent> Mpc::getScreen() {
 	return layeredScreen->findScreenComponent();
 }
 
