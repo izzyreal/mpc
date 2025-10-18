@@ -25,6 +25,8 @@ namespace mpc::lcdgui::screens
 	public:
 		StepEditorScreen(mpc::Mpc& mpc, const int layerIndex);
 
+		void shift();
+
 		void prevStepEvent();
 		void nextStepEvent();
 		void prevBarStart();
@@ -36,7 +38,6 @@ namespace mpc::lcdgui::screens
 		void right() override;
 		void up() override;
 		void down() override;
-		void shift() override;
 
 		void open() override;
 		void close() override;

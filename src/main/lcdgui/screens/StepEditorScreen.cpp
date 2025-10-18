@@ -717,7 +717,6 @@ void StepEditorScreen::down()
 void StepEditorScreen::shift()
 {
 	init();
-	ScreenComponent::shift();
 
 	if (param.length() == 2)
 	{
@@ -1161,8 +1160,15 @@ void StepEditorScreen::checkSelection()
 	int row = stoi(focus.substr(1, 1));
 	int eventIndex = row + yOffset;
 
+    if (selectionStartIndex > selectionEndIndex)
+    {
+        std::swap(selectionStartIndex, selectionEndIndex);
+    }
+
 	if (eventIndex < selectionStartIndex || eventIndex > selectionEndIndex)
+    {
 		clearSelection();
+    }
 }
 
 void StepEditorScreen::setSelectedEvent(std::weak_ptr<Event> event)

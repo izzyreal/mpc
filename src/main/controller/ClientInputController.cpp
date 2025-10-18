@@ -140,7 +140,7 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screenName);
-    command::TriggerDrumNoteOffCommand(ctx).execute();
+    TriggerDrumNoteOffCommand(ctx).execute();
 }
 
 void ClientInputController::handlePadAftertouch(const ClientInput& a)
@@ -278,11 +278,11 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     }
     else if (id == Id::GO_TO)
     {
-        command::PushGoToCommand(mpc).execute();
+        PushGoToCommand(mpc).execute();
     }
     else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT)
     {
-        command::PushTapCommand(mpc).execute();
+        PushTapCommand(mpc).execute();
 
         if (auto sequencerScreen = std::dynamic_pointer_cast<SequencerScreen>(screen); sequencerScreen)
         {
@@ -290,25 +290,37 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
             sequencerScreen->tap();
         }
     }
-    else if (id == Id::NEXT_SEQ) { screen->nextSeq(); }
-    else if (id == Id::TRACK_MUTE) { screen->trackMute(); }
-    else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH) { screen->fullLevel(); }
-    else if (id == Id::SIXTEEN_LEVELS_OR_SPACE) { screen->sixteenLevels(); }
+    else if (id == Id::NEXT_SEQ)
+    {
+        PushNextSeqCommand(mpc).execute();
+    }
+    else if (id == Id::TRACK_MUTE) { PushTrackMuteCommand(mpc).execute(); }
+    else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH) { PushFullLevelCommand(mpc).execute(); }
+    else if (id == Id::SIXTEEN_LEVELS_OR_SPACE) { PushSixteenLevelsCommand(mpc).execute(); }
     else if (id == Id::F1) { screen->function(0); }
     else if (id == Id::F2) { screen->function(1); }
     else if (id == Id::F3) { screen->function(2); }
     else if (id == Id::F4) { screen->function(3); }
     else if (id == Id::F5) { screen->function(4); }
     else if (id == Id::F6) { screen->function(5); }
-    else if (id == Id::SHIFT) { screen->shift(); }
+    else if (id == Id::SHIFT)
+    {
+        PushShiftCommand(mpc).execute();
+
+        if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screen); stepEditorScreen)
+        {
+            // Start/reset event selection and update UI
+            stepEditorScreen->shift();
+        }
+    }
     else if (id == Id::ENTER_OR_SAVE) { screen->pressEnter(); }
     else if (id == Id::UNDO_SEQ) { screen->undoSeq(); }
     else if (id == Id::ERASE) { screen->erase(); }
-    else if (id == Id::AFTER_OR_ASSIGN) { screen->after(); }
-    else if (id == Id::BANK_A) { screen->bank(0); }
-    else if (id == Id::BANK_B) { screen->bank(1); }
-    else if (id == Id::BANK_C) { screen->bank(2); }
-    else if (id == Id::BANK_D) { screen->bank(3); }
+    else if (id == Id::AFTER_OR_ASSIGN) { PushAfterCommand(mpc).execute(); }
+    else if (id == Id::BANK_A) { PushBankCommand(mpc, 0).execute(); }
+    else if (id == Id::BANK_B) { PushBankCommand(mpc, 1).execute(); }
+    else if (id == Id::BANK_C) { PushBankCommand(mpc, 2).execute(); }
+    else if (id == Id::BANK_D) { PushBankCommand(mpc, 3).execute(); }
     else if (id == Id::NUM_0_OR_VMPC) { screen->numpad(0); }
     else if (id == Id::NUM_1_OR_SONG) { screen->numpad(1); }
     else if (id == Id::NUM_2_OR_MISC) { screen->numpad(2); }
@@ -339,15 +351,15 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 
     auto id = a.componentId;
 
-    if (id == Id::ERASE) { command::ReleaseEraseCommand(mpc).execute(); }
-    else if (id == Id::F1) { command::ReleaseFunctionCommand(mpc, 0).execute(); }
-    else if (id == Id::F3) { command::ReleaseFunctionCommand(mpc, 2).execute(); }
-    else if (id == Id::F4) { command::ReleaseFunctionCommand(mpc, 3).execute(); }
-    else if (id == Id::F5) { command::ReleaseFunctionCommand(mpc, 4).execute(); }
-    else if (id == Id::F6) { command::ReleaseFunctionCommand(mpc, 5).execute(); }
-    else if (id == Id::REC) { command::ReleaseRecCommand(mpc).execute(); }
-    else if (id == Id::OVERDUB) { command::ReleaseOverdubCommand(mpc).execute(); }
-    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT) { command::ReleaseTapCommand(mpc).execute(); }
+    if (id == Id::ERASE) { ReleaseEraseCommand(mpc).execute(); }
+    else if (id == Id::F1) { ReleaseFunctionCommand(mpc, 0).execute(); }
+    else if (id == Id::F3) { ReleaseFunctionCommand(mpc, 2).execute(); }
+    else if (id == Id::F4) { ReleaseFunctionCommand(mpc, 3).execute(); }
+    else if (id == Id::F5) { ReleaseFunctionCommand(mpc, 4).execute(); }
+    else if (id == Id::F6) { ReleaseFunctionCommand(mpc, 5).execute(); }
+    else if (id == Id::REC) { ReleaseRecCommand(mpc).execute(); }
+    else if (id == Id::OVERDUB) { ReleaseOverdubCommand(mpc).execute(); }
+    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT) { ReleaseTapCommand(mpc).execute(); }
 }
 
 void ClientInputController::handleButtonDoublePress(const ClientInput& a)

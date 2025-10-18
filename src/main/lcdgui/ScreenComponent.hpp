@@ -90,13 +90,6 @@ namespace mpc::lcdgui
         virtual void play() { command::PushPlayCommand(mpc).execute(); }
         virtual void playStart() { command::PushPlayStartCommand(mpc).execute(); }
         virtual void mainScreen() { command::PushMainScreenCommand(mpc).execute(); }
-        virtual void nextSeq() { command::PushNextSeqCommand(mpc).execute(); }
-        virtual void trackMute() { command::PushTrackMuteCommand(mpc).execute(); }
-        virtual void bank(int i) { command::PushBankCommand(mpc, i).execute(); }
-        virtual void fullLevel() { command::PushFullLevelCommand(mpc).execute(); }
-        virtual void sixteenLevels() { command::PushSixteenLevelsCommand(mpc).execute(); }
-        virtual void after() { command::PushAfterCommand(mpc).execute(); }
-        virtual void shift() { command::PushShiftCommand(mpc).execute(); }
         virtual void undoSeq() { command::PushUndoSeqCommand(mpc).execute(); }
         virtual void erase() { command::PushEraseCommand(mpc).execute(); }
         virtual void setSlider(int i) {}
