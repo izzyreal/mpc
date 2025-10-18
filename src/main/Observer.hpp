@@ -50,6 +50,10 @@ public:
 
     void addObserver(Observer* o)
     {
+        auto it = std::find(pendingRemovals.begin(), pendingRemovals.end(), o);
+        if (it != pendingRemovals.end())
+            pendingRemovals.erase(it);
+
         if (std::find(observers.begin(), observers.end(), o) == observers.end())
             observers.push_back(o);
     }
