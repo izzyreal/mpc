@@ -362,8 +362,20 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
         }
     }
     else if (id == Id::ENTER_OR_SAVE) { screen->pressEnter(); }
-    else if (id == Id::UNDO_SEQ) { screen->undoSeq(); }
-    else if (id == Id::ERASE) { screen->erase(); }
+    else if (id == Id::UNDO_SEQ) { PushUndoSeqCommand(mpc).execute(); }
+    else if (id == Id::ERASE)
+    {
+        PushEraseCommand(mpc).execute();
+
+        if (auto sequencerScreen = std::dynamic_pointer_cast<SequencerScreen>(screen); sequencerScreen)
+        {
+            if (mpc.getSequencer()->isOverdubbing())
+            {
+                // Pure UI update
+                sequencerScreen->erase();
+            }
+        }
+    }
     else if (id == Id::AFTER_OR_ASSIGN) { PushAfterCommand(mpc).execute(); }
     else if (id == Id::BANK_A) { PushBankCommand(mpc, 0).execute(); }
     else if (id == Id::BANK_B) { PushBankCommand(mpc, 1).execute(); }

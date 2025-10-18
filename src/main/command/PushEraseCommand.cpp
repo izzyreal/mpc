@@ -9,7 +9,7 @@ namespace mpc::command {
     void PushEraseCommand::execute()
     {
         if (!mpc.getSequencer()->getActiveSequence()->isUsed() ||
-            mpc.getSequencer()->isRecordingOrOverdubbing())
+            mpc.getSequencer()->isPlaying())
         {
             return;
         }

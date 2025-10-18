@@ -130,7 +130,6 @@ void SequencerScreen::erase()
     findChild("function-keys")->Hide(true);
     findChild("footer-label")->Hide(false);
     findChild<TextComp>("footer-label")->setText("(Hold pads or keys to erase)");
-    ScreenComponent::erase();
 }
 
 void SequencerScreen::tap()
