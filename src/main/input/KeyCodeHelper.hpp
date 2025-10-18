@@ -169,6 +169,8 @@ namespace mpc::input
             static const std::string getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode);
 
             static const int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
+            
+            static std::optional<char> getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode);
 
         private:
             static const std::map<const int, const VmpcKeyCode> platformToVmpcKeyCodes;

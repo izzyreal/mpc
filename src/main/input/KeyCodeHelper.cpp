@@ -485,7 +485,7 @@ const std::map<const VmpcKeyCode, const char> KeyCodeHelper::typableVmpcKeyCodes
     { VmpcKeyCode::VMPC_KEY_ANSI_Y, 'y' },
     { VmpcKeyCode::VMPC_KEY_ANSI_Z, 'z' },
     { VmpcKeyCode::VMPC_KEY_Space, ' ' },
-    { VmpcKeyCode::VMPC_KEY_Backspace, ' ' }
+    { VmpcKeyCode::VMPC_KEY_ANSI_Minus, '-' }
 };
 
 const VmpcKeyCode KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKeyCode)
@@ -639,6 +639,27 @@ const std::string KeyCodeHelper::guessCharactersPrintedOnKeyUnicode(const VmpcKe
     }
 
     return result;
+}
+
+std::optional<char> KeyCodeHelper::getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode)
+{
+    const auto layout = KeyboardLayout::getCurrentKeyboardLayout();
+
+    const auto platformKeyCode = getPlatformFromVmpcKeyCode(vmpcKeyCode);
+
+    if (layout.count(platformKeyCode) == 0)
+    {
+        return std::nullopt; 
+    }
+
+    auto keyCodeInfo = layout.at(platformKeyCode);
+    
+    if (auto character = keyCodeInfo.charWithShiftModifier; character.length() == 1)
+    {
+        return character[0];
+    }
+
+    return std::nullopt;
 }
 
 const std::string KeyCodeHelper::getKeyCodeString(const VmpcKeyCode vmpcKeyCode)

@@ -165,7 +165,19 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         
         if (const auto typableChar = KeyCodeHelper::getCharForTypableVmpcKeyCode(vmpcKeyCode); typableChar)
         {
-            clientInput.textInputKey = ClientInput::TextInputKey { *typableChar, key.keyDown };
+            char charToUse;
+
+            if (key.shiftDown)
+            {
+                const auto charWithShift = KeyCodeHelper::getCharWithShiftModifier(vmpcKeyCode);
+                charToUse = charWithShift.value_or(*typableChar);
+            }
+            else
+            {
+                charToUse = *typableChar;
+            }
+
+            clientInput.textInputKey = ClientInput::TextInputKey { charToUse, key.keyDown };
         }
 
         if (!binding)
