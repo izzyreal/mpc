@@ -9,6 +9,7 @@
 #include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "hardware/Hardware.h"
@@ -55,6 +56,10 @@ void ClientInputController::handleAction(const ClientInput& action)
             break;
         case ClientInput::Type::ButtonDoublePress:
             handleButtonDoublePress(action);
+            break;
+        case ClientInput::Type::ButtonPressAndRelease:
+            handleButtonPress(action);
+            handleButtonRelease(action);
             break;
         case ClientInput::Type::HostFocusLost:
             handleFocusLost();
@@ -275,7 +280,16 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
     {
         command::PushGoToCommand(mpc).execute();
     }
-    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT) { screen->tap(); }
+    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT)
+    {
+        command::PushTapCommand(mpc).execute();
+
+        if (auto sequencerScreen = std::dynamic_pointer_cast<SequencerScreen>(screen); sequencerScreen)
+        {
+            // Pure UI update
+            sequencerScreen->tap();
+        }
+    }
     else if (id == Id::NEXT_SEQ) { screen->nextSeq(); }
     else if (id == Id::TRACK_MUTE) { screen->trackMute(); }
     else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH) { screen->fullLevel(); }

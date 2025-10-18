@@ -135,8 +135,6 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
-    ScreenComponent::tap();
-
     if (sequencer.lock()->isPlaying())
     {
         if (mpc.inputController->isNoteRepeatLocked())
@@ -151,7 +149,6 @@ void SequencerScreen::tap()
             findChild<TextComp>("footer-label")->setText("(Hold pads or keys to repeat)");
         }
     }
-    
 }
 
 void SequencerScreen::hideFooterLabelAndShowFunctionKeys()

@@ -20,6 +20,8 @@ namespace mpc::lcdgui::screens
 	public:
 		SequencerScreen(mpc::Mpc& mpc, const int layerIndex);
 
+        void tap();
+
 	private:
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 
@@ -75,7 +77,6 @@ namespace mpc::lcdgui::screens
 		void rec() override;
 		void overDub() override;
         void erase() override;
-        void tap() override;
         
 		void open() override;
 		void close() override;

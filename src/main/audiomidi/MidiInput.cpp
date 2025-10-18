@@ -8,6 +8,8 @@
 #include "command/context/PushPadScreenUpdateContext.h"
 #include "command/context/TriggerDrumContextFactory.h"
 
+#include "inputlogic/ClientInput.h"
+
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
@@ -43,6 +45,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine::midi;
 using namespace mpc::command;
 using namespace mpc::command::context;
+using namespace mpc::inputlogic;
+using namespace mpc::hardware;
 
 /**
  * This class is a bit of a mess.
@@ -233,8 +237,11 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     }
                     else if (func == 7)
                     {
-                        auto activeControls = mpc.getScreen();
-                        activeControls->tap();
+                        ClientInput clientInput;
+                        clientInput.componentId = ComponentId::TAP_TEMPO_OR_NOTE_REPEAT;
+                        clientInput.type = ClientInput::Type::ButtonPressAndRelease;
+                        clientInput.source = ClientInput::Source::HostInputMidi;
+                        mpc.inputController->handleAction(clientInput);
                     }
                     else if (func >= 8 && func < 12)
                     {

@@ -23,7 +23,8 @@ struct ClientInput {
         ButtonPress,
         ButtonRelease,
         ButtonDoublePress,
-        HostFocusLost
+        HostFocusLost,
+        ButtonPressAndRelease
     };
 
     Type type = Type::Unknown;
