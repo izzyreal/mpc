@@ -8,6 +8,11 @@ namespace mpc::input {
 
 struct ClientInput {
 
+    struct TextInputKey {
+        char character;
+        bool isPress;
+    };
+
     enum Source { HostInputMidi, HostInputGesture, HostInputKeyboard, HostFocusEvent, Internal };
     
     Source source;
@@ -32,6 +37,7 @@ struct ClientInput {
     hardware::ComponentId componentId;
     std::optional<float> value;
     std::optional<float> deltaValue;
+    std::optional<TextInputKey> textInputKey;
 };
 
 } // namespace mpc::input

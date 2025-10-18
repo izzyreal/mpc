@@ -162,17 +162,36 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         const auto &key = std::get<KeyEvent>(hostInputEvent.payload);
         const auto vmpcKeyCode = KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
         const auto binding = keyboardBindings->lookup(vmpcKeyCode);
+        
+        if (const auto typableChar = KeyCodeHelper::getCharForTypableVmpcKeyCode(vmpcKeyCode); typableChar)
+        {
+            clientInput.textInputKey = ClientInput::TextInputKey { *typableChar, key.keyDown };
+        }
 
         if (!binding)
         {
-            return std::nullopt;
+            if (clientInput.textInputKey)
+            {
+                return clientInput;
+            }
+            else
+            {
+                return std::nullopt;
+            }
         }
 
         const auto id = binding->componentId;
 
         if (id == hardware::ComponentId::NONE)
         {
-            return std::nullopt;
+            if (clientInput.textInputKey)
+            {
+                return clientInput;
+            }
+            else
+            {
+                return std::nullopt;
+            }
         }
         
         clientInput.componentId = id;
@@ -216,9 +235,9 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
     }
     }
 
-    if (clientInput.componentId == ComponentId::NONE)
+    if (clientInput.componentId == ComponentId::NONE && !clientInput.textInputKey)
     {
-        throw std::runtime_error("ClientInput must have a ComponentId.");
+        throw std::runtime_error("ClientInput must have a ComponentId or textInputKey");
     }
 
     if (clientInput.deltaValue && clientInput.value)

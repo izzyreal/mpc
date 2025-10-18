@@ -39,6 +39,20 @@ ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path 
 
 void ClientInputController::handleInput(const ClientInput& input)
 {
+    if (input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
+                input.textInputKey)
+        {
+            if (input.textInputKey->isPress)
+            {
+                nameScreen->typeCharacter(input.textInputKey->character);
+            }
+
+            return;
+        }
+    }
+
     switch (input.type) {
         case ClientInput::Type::PadPress:
             handlePadPress(input);

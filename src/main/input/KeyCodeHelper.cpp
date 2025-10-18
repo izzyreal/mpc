@@ -498,11 +498,11 @@ const VmpcKeyCode KeyCodeHelper::getVmpcFromPlatformKeyCode(const int platformKe
     return platformToVmpcKeyCodes.at(platformKeyCode);
 }
 
-const char KeyCodeHelper::getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
+const std::optional<char> KeyCodeHelper::getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode)
 {
     if (typableVmpcKeyCodes.count(vmpcKeyCode) == 0)
     {
-        return 0;
+        return std::nullopt;
     }
 
     return typableVmpcKeyCodes.at(vmpcKeyCode);

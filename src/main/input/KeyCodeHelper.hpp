@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <optional>
 
 namespace mpc::input
 {
@@ -161,7 +162,7 @@ namespace mpc::input
         public:
             static const VmpcKeyCode getVmpcFromPlatformKeyCode(const int platformKeyCode);
             
-            static const char getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
+            static const std::optional<char> getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
             static const std::string guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode);
 
