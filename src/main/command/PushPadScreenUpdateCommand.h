@@ -3,19 +3,19 @@
 
 #include <optional>
 
-namespace mpc::controls {
-struct PushPadScreenUpdateContext;
+namespace mpc::command::context {
+    struct PushPadScreenUpdateContext;
 }
 
 namespace mpc::command {
 
     class PushPadScreenUpdateCommand : public Command {
     public:
-        PushPadScreenUpdateCommand(controls::PushPadScreenUpdateContext &ctx, const int note, const std::optional<int> padIndexWithBank);
+        PushPadScreenUpdateCommand(context::PushPadScreenUpdateContext &ctx, const int note, const std::optional<int> padIndexWithBank);
         void execute() override;
 
     private:
-        mpc::controls::PushPadScreenUpdateContext &ctx;
+        context::PushPadScreenUpdateContext &ctx;
         const int note;
         const std::optional<int> padIndexWithBank;
     };

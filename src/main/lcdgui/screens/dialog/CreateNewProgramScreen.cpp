@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "create-new-program", layerIndex)

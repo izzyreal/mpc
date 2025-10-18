@@ -4,7 +4,6 @@
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 
-using namespace mpc::controls;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;

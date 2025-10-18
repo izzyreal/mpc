@@ -4,7 +4,6 @@
 
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "keep-or-retry", layerIndex)

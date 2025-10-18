@@ -5,7 +5,6 @@
 #include <sampler/Pad.hpp>
 
 using namespace mpc::lcdgui::screens;
-using namespace mpc::controls;
 
 PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program-assign", layerIndex)

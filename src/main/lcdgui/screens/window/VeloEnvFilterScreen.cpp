@@ -1,7 +1,6 @@
 #include "VeloEnvFilterScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "velo-env-filter", layerIndex)

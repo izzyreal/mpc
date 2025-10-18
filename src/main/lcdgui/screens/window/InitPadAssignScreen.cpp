@@ -1,7 +1,6 @@
 #include "InitPadAssignScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 InitPadAssignScreen::InitPadAssignScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "init-pad-assign", layerIndex)

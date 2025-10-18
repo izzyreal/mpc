@@ -5,7 +5,6 @@
 #include <lcdgui/screens/LoopScreen.hpp>
 
 using namespace mpc::lcdgui;
-using namespace mpc::controls;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 

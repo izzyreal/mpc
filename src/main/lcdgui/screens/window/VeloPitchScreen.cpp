@@ -3,7 +3,6 @@
 #include <sampler/NoteParameters.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velo-pitch", layerIndex)

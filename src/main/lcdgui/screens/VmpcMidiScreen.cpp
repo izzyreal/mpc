@@ -16,7 +16,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
-using namespace mpc::controls;
 
 VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc& mpc, int layerIndex)
 : ScreenComponent(mpc, "vmpc-midi", layerIndex)

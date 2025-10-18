@@ -1,10 +1,10 @@
 #include "controller/ClientInputController.h"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "command/ReleasePadCommand.h"
+#include "command/TriggerDrumNoteOffCommand.h"
 #include "hardware/ComponentId.h"
 #include "hardware/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
-#include "controller/PadContextFactory.h"
+#include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "hardware/Hardware.h"
@@ -73,8 +73,8 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName, a.source);
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
-    auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, programPadIndex, *a.value, screenName);
-    command::PushPadCommand(ctx, programPadIndex, velocityToUse).execute();
+    auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, *a.value, screenName);
+    command::TriggerDrumNoteOnCommand(ctx, programPadIndex, velocityToUse).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)
@@ -88,8 +88,8 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
     mpc.getHardware()->getPad(physicalPadIndex)->release();
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
-    auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, programPadIndex, info.screenName);
-    command::ReleasePadCommand(ctx).execute();
+    auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screenName);
+    command::TriggerDrumNoteOffCommand(ctx).execute();
 }
 
 void ClientInputController::handlePadAftertouch(const ClientInput& a)

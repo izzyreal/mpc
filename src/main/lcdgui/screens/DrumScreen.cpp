@@ -3,7 +3,6 @@
 #include "SelectDrumScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace mpc::controls;
 
 DrumScreen::DrumScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "drum", layerIndex)

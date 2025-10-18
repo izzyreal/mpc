@@ -1,7 +1,6 @@
 #include "VelocityModulationScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velocity-modulation", layerIndex)

@@ -1,7 +1,6 @@
 #include "MuteAssignScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 MuteAssignScreen::MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mute-assign", layerIndex)

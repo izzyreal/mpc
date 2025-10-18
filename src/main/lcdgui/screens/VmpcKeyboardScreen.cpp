@@ -20,7 +20,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
-using namespace mpc::controls;
 
 VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
@@ -243,7 +242,7 @@ void VmpcKeyboardScreen::mainScreen()
 
 void VmpcKeyboardScreen::setLearnCandidate(const int rawKeyCode)
 {
-    learnCandidate = KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
+    learnCandidate = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
     updateRows();
 }
 

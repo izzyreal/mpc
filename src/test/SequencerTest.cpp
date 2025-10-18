@@ -3,8 +3,8 @@
 #include "TestMpc.hpp"
 #include "sequencer/Clock.hpp"
 
-#include "command/ReleasePadCommand.h"
-#include "controller/PadContextFactory.h"
+#include "command/TriggerDrumNoteOffCommand.h"
+#include "command/context/TriggerDrumContextFactory.h"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
@@ -139,8 +139,8 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
                     this_thread::sleep_for(chrono::milliseconds(2));
 
-                    auto ctx = mpc::controller::PadContextFactory::buildPadReleaseContext(mpc, 0, mpc.getLayeredScreen()->getCurrentScreenName());
-                    mpc::command::ReleasePadCommand(ctx).execute();
+                    auto ctx = mpc::command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, mpc.getLayeredScreen()->getCurrentScreenName());
+                    mpc::command::TriggerDrumNoteOffCommand(ctx).execute();
                 }
             }
         }

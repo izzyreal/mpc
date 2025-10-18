@@ -13,11 +13,11 @@ namespace mpc::audiomidi {
     class EventHandler;
 }
 
-namespace mpc::controls {
+namespace mpc::command::context {
 
 // Should be renamed to ReleaseProgramPad or similar, because we're not dealing with
 // hardware pad indices from 1 to 16 here, but with the 64 pads of a program.
-struct PadReleaseContext {
+struct TriggerDrumNoteOffContext {
     const int padIndexWithBank;
     std::function<void()> finishBasicVoiceIfSoundIsLooping;
     const bool currentScreenIsSoundScreen;

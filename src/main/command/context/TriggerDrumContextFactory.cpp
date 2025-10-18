@@ -1,4 +1,4 @@
-#include "controller/PadContextFactory.h"
+#include "command/context/TriggerDrumContextFactory.h"
 
 #include "controller/ClientInputControllerBase.h"
 #include "lcdgui/ScreenGroups.h"
@@ -14,8 +14,7 @@
 #include "sampler/Pad.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-using namespace mpc::controller;
-using namespace mpc::controls;
+using namespace mpc::command::context;
 using namespace mpc::lcdgui;
 
 int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::string &currentScreenName)
@@ -27,7 +26,7 @@ int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::string &currentScreen
     return result;
 }
 
-PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
+TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
     const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
@@ -98,7 +97,7 @@ PushPadContext PadContextFactory::buildPushPadContext(mpc::Mpc& mpc, int padInde
     }; 
 }
 
-PadReleaseContext PadContextFactory::buildPadReleaseContext(mpc::Mpc &mpc, const int padIndexWithBank, const std::string currentScreenName)
+TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc::Mpc &mpc, const int padIndexWithBank, const std::string currentScreenName)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
 

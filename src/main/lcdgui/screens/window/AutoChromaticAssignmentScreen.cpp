@@ -4,7 +4,6 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 using namespace mpc::sampler;
 
 AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 

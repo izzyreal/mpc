@@ -1,8 +1,8 @@
-#include "PushPadCommand.h"
+#include "TriggerDrumNoteOnCommand.h"
 
 #include "audiomidi/EventHandler.hpp"
-#include "controls/PushPadContext.h"
-#include "controls/PushPadScreenUpdateContext.h"
+#include "command/context/TriggerDrumNoteOnContext.h"
+#include "command/context/PushPadScreenUpdateContext.h"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -12,16 +12,16 @@
 #include "sampler/Pad.hpp"
 #include "Util.hpp"
 
-using namespace mpc::controls;
 using namespace mpc::command;
+using namespace mpc::command::context;
 using namespace mpc::sampler;
 
-PushPadCommand::PushPadCommand(PushPadContext &ctx, int padIndexWithBank, int velo)
+TriggerDrumNoteOnCommand::TriggerDrumNoteOnCommand(TriggerDrumNoteOnContext &ctx, int padIndexWithBank, int velo)
     : ctx(ctx), padIndexWithBank(padIndexWithBank), velo(velo)
 {
 }
 
-void PushPadCommand::execute()
+void TriggerDrumNoteOnCommand::execute()
 {
     if (ctx.isSoundScreen)
     {
@@ -65,7 +65,7 @@ void PushPadCommand::execute()
     PushPadScreenUpdateCommand(padPushScreenUpdateCtx, note, padIndexWithBank).execute();
 }
 
-void PushPadCommand::generateNoteOn(const PushPadContext &ctx, const int note, const int velo, const int padIndexWithBank)
+void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ctx, const int note, const int velo, const int padIndexWithBank)
 {
     const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
 

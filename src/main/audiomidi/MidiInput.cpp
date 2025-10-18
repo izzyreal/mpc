@@ -1,11 +1,11 @@
 #include "MidiInput.hpp"
-#include "command/PushPadCommand.h"
+#include "command/TriggerDrumNoteOnCommand.h"
 #include "command/PushPadScreenUpdateCommand.h"
-#include "command/ReleasePadCommand.h"
+#include "command/TriggerDrumNoteOffCommand.h"
 #include "command/ReleaseTapCommand.h"
 #include "controller/ClientInputControllerBase.h"
-#include "controls/PushPadScreenUpdateContext.h"
-#include "controller/PadContextFactory.h"
+#include "command/context/PushPadScreenUpdateContext.h"
+#include "command/context/TriggerDrumContextFactory.h"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
@@ -331,10 +331,10 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 
     if (padIndexWithBank != -1)
     {
-        // Are we building this correctly when we're in multi-recording setup mode? Probably not, because buildPushPadContext has its own
+        // Are we building this correctly when we're in multi-recording setup mode? Probably not, because buildTriggerDrumNoteOnContext has its own
         // track derivation.
-        auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
-        command::PushPadCommand(ctx, padIndexWithBank, playMidiNoteOn->getVelocity()).execute();
+        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
+        command::TriggerDrumNoteOnCommand(ctx, padIndexWithBank, playMidiNoteOn->getVelocity()).execute();
         return;
     }
 
@@ -343,7 +343,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
     std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
-    controls::PushPadScreenUpdateContext padPushScreenUpdateContext {
+    command::context::PushPadScreenUpdateContext padPushScreenUpdateContext {
         currentScreenName,
         mpc.isSixteenLevelsEnabled(),
         mpc::sequencer::isDrumNote(playMidiNoteOn->getNote()),
@@ -437,8 +437,8 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     if (padIndexWithBank != -1)
     {
         const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        auto ctx = controller::PadContextFactory::buildPadReleaseContext(mpc, padIndexWithBank, currentScreenName);
-        command::ReleasePadCommand(ctx).execute();
+        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, currentScreenName);
+        command::TriggerDrumNoteOffCommand(ctx).execute();
         return;
     }
     else if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))

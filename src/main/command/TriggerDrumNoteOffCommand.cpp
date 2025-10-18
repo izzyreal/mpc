@@ -1,18 +1,18 @@
-#include "ReleasePadCommand.h"
+#include "TriggerDrumNoteOffCommand.h"
 
 #include "audiomidi/EventHandler.hpp"
-#include "controls/PadReleaseContext.h"
+#include "command/context/TriggerDrumNoteOffContext.h"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;
-using namespace mpc::controls;
+using namespace mpc::command::context;
 
-ReleasePadCommand::ReleasePadCommand(PadReleaseContext& ctx)
+TriggerDrumNoteOffCommand::TriggerDrumNoteOffCommand(TriggerDrumNoteOffContext& ctx)
     : ctx(ctx) {}
 
-void ReleasePadCommand::execute()
+void TriggerDrumNoteOffCommand::execute()
 {
     ctx.finishBasicVoiceIfSoundIsLooping();
 

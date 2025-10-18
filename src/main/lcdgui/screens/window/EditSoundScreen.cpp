@@ -10,7 +10,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
-using namespace mpc::controls;
 
 EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)

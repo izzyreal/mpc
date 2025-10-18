@@ -1,6 +1,6 @@
 #include "PushPadScreenUpdateCommand.h"
 
-#include "controls/PushPadScreenUpdateContext.h"
+#include "command/context/PushPadScreenUpdateContext.h"
 
 #include "lcdgui/screens/MixerScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
@@ -11,8 +11,9 @@
 #include "sequencer/NoteEvent.hpp"
 
 using namespace mpc::command;
+using namespace mpc::command::context;
 
-PushPadScreenUpdateCommand::PushPadScreenUpdateCommand(controls::PushPadScreenUpdateContext &ctxToUse, const int noteToUse, const std::optional<int> padIndexWithBankToUse)
+PushPadScreenUpdateCommand::PushPadScreenUpdateCommand(PushPadScreenUpdateContext &ctxToUse, const int noteToUse, const std::optional<int> padIndexWithBankToUse)
     : ctx(ctxToUse), note(noteToUse), padIndexWithBank(padIndexWithBankToUse)
 {
 }

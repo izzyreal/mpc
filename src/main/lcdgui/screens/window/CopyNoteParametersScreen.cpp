@@ -1,7 +1,6 @@
 #include "CopyNoteParametersScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::controls;
 
 CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-note-parameters", layerIndex)

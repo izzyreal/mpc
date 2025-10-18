@@ -10,10 +10,9 @@
 #include "lcdgui/ScreenGroups.h"
 #include "lcdgui/screens/DrumScreen.hpp"
 
-#include "controller/PadContextFactory.h"
+#include "command/context/TriggerDrumContextFactory.h"
 
 using namespace mpc::lcdgui;
-using namespace mpc::controls;
 
 ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer)
 	: Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
@@ -98,8 +97,8 @@ void ScreenComponent::openWindow()
 
 void ScreenComponent::pad(int padIndexWithBank, int velo)
 {
-    auto ctx = controller::PadContextFactory::buildPushPadContext(mpc, padIndexWithBank, velo, name);
-    command::PushPadCommand(ctx, padIndexWithBank, velo).execute();
+    auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, velo, name);
+    command::TriggerDrumNoteOnCommand(ctx, padIndexWithBank, velo).execute();
 }
 
 mpc::engine::Drum& ScreenComponent::activeDrum()

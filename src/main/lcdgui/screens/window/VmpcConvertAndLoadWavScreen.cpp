@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace mpc::controls;
 
 VmpcConvertAndLoadWavScreen::VmpcConvertAndLoadWavScreen(mpc::Mpc& mpc, const int layerIndex)
 : ScreenComponent(mpc, "vmpc-convert-and-load-wav", layerIndex)

@@ -7,7 +7,7 @@ namespace mpc::lcdgui {
     class ScreenComponent;
 }
 
-namespace mpc::controls {
+namespace mpc::command::context {
 
 struct PushPadScreenUpdateContext {
     std::string currentScreenName;
