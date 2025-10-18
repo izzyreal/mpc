@@ -52,7 +52,8 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
 
     const auto hardwareSliderValue = mpc.getHardware()->getSlider()->getValueAs<int>();
     const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
-
+    const auto note = activeTrack->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;  
+    
     return {
         currentScreenName,
         isSoundScreen,
@@ -73,7 +74,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         timingCorrectScreen->getSwing(),
         activeTrack->getBus(),
         program,
-        /*programNote*/ program != nullptr ? program->getPad(padIndexWithBank)->getNote() : -1,
+        note,
         mpc.getSampler()->getSoundIndex(),
         drumScreenSelectedDrum,
         isSamplerScreen,

@@ -1,6 +1,7 @@
 #include "controller/ClientInputController.h"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "command/TriggerDrumNoteOffCommand.h"
+#include "command/context/PushPadScreenUpdateContext.h"
 #include "hardware/ComponentId.h"
 #include "hardware/HardwareComponent.h"
 #include "inputlogic/ClientInput.h"
@@ -11,6 +12,8 @@
 
 using namespace mpc::controller;
 using namespace mpc::inputlogic;
+using namespace mpc::command;
+using namespace mpc::command::context;
 
 ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path keyboardMappingConfigDirectory)
     : ClientInputControllerBase(mpcToUse.paths->configPath()), mpc(mpcToUse)
@@ -73,8 +76,22 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName, a.source);
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
-    auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, *a.value, screenName);
-    command::TriggerDrumNoteOnCommand(ctx, programPadIndex, velocityToUse).execute();
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, *a.value, screenName);
+
+    TriggerDrumNoteOnCommand(ctx, programPadIndex, velocityToUse).execute();
+
+    PushPadScreenUpdateContext padPushScreenUpdateCtx {
+        ctx.currentScreenName,
+        ctx.isSixteenLevelsEnabled,
+        mpc::sequencer::isDrumNote(ctx.note),
+        ctx.allowCentralNoteAndPadUpdate,
+        ctx.screenComponent, ctx.setMpcNote,
+        ctx.setMpcPad,
+        ctx.currentFieldName,
+        ctx.bank
+    };
+
+    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, ctx.note, programPadIndex).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)
@@ -88,7 +105,7 @@ void ClientInputController::handlePadRelease(const ClientInput& a)
     mpc.getHardware()->getPad(physicalPadIndex)->release();
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
-    auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screenName);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screenName);
     command::TriggerDrumNoteOffCommand(ctx).execute();
 }
 

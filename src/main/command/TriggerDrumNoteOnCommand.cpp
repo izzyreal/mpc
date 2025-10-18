@@ -2,7 +2,6 @@
 
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerDrumNoteOnContext.h"
-#include "command/context/PushPadScreenUpdateContext.h"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -47,29 +46,14 @@ void TriggerDrumNoteOnCommand::execute()
         velo = 127;
     }
 
-    const auto note = ctx.track->getBus() > 0 ? ctx.program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
-
-    generateNoteOn(ctx, note, velo, padIndexWithBank);
-
-    PushPadScreenUpdateContext padPushScreenUpdateCtx {
-        ctx.currentScreenName,
-        ctx.isSixteenLevelsEnabled,
-        mpc::sequencer::isDrumNote(note),
-        ctx.allowCentralNoteAndPadUpdate,
-        ctx.screenComponent, ctx.setMpcNote,
-        ctx.setMpcPad,
-        ctx.currentFieldName,
-        ctx.bank
-    };
-
-    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, note, padIndexWithBank).execute();
+    generateNoteOn(ctx, velo, padIndexWithBank);
 }
 
-void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ctx, const int note, const int velo, const int padIndexWithBank)
+void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ctx, const int velo, const int padIndexWithBank)
 {
     const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
 
-    const auto playOnEvent = std::make_shared<sequencer::NoteOnEventPlayOnly>(note, velo);
+    const auto playOnEvent = std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
 
     const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
 
@@ -84,7 +68,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
 
     Util::set16LevelsValues(sixteenLevelsContext, playOnEvent);
 
-    const bool isSliderNote = ctx.program && ctx.program->getSlider()->getNote() == note;
+    const bool isSliderNote = ctx.program && ctx.program->getSlider()->getNote() == ctx.note;
     auto programSlider = ctx.program->getSlider();
 
     Util::SliderNoteVariationContext sliderNoteVariationContext {
@@ -127,17 +111,17 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
 
     if (ctx.sequencer->isRecordingOrOverdubbing())
     {
-        recordNoteOnEvent = ctx.track->recordNoteEventASync(note, velo);
+        recordNoteOnEvent = ctx.track->recordNoteEventASync(ctx.note, velo);
     }
-    else if (ctx.isStepRecording && (ctx.track->getBus() == 0 || sequencer::isDrumNote(note)))
+    else if (ctx.isStepRecording && (ctx.track->getBus() == 0 || sequencer::isDrumNote(ctx.note)))
     {
-        recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), note, velo);
+        recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), ctx.note, velo);
         ctx.sequencer->playMetronomeTrack();
         recordNoteOnEvent->setTick(ctx.frameSequencer->getMetronomeOnlyTickPosition());
     }
     else if (ctx.isRecMainWithoutPlaying)
     {
-        recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), note, velo);
+        recordNoteOnEvent = ctx.track->recordNoteEventSynced(ctx.sequencer->getTickPosition(), ctx.note, velo);
         ctx.sequencer->playMetronomeTrack();
         recordNoteOnEvent->setTick(ctx.frameSequencer->getMetronomeOnlyTickPosition());
 

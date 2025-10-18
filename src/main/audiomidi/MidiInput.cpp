@@ -40,6 +40,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine::midi;
+using namespace mpc::command;
+using namespace mpc::command::context;
 
 /**
  * This class is a bit of a mess.
@@ -333,8 +335,24 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     {
         // Are we building this correctly when we're in multi-recording setup mode? Probably not, because buildTriggerDrumNoteOnContext has its own
         // track derivation.
-        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
+        auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
         command::TriggerDrumNoteOnCommand(ctx, padIndexWithBank, playMidiNoteOn->getVelocity()).execute();
+
+        const auto note = playMidiNoteOn->getNote();
+
+        PushPadScreenUpdateContext padPushScreenUpdateCtx {
+            ctx.currentScreenName,
+            ctx.isSixteenLevelsEnabled,
+            mpc::sequencer::isDrumNote(note),
+            ctx.allowCentralNoteAndPadUpdate,
+            ctx.screenComponent, ctx.setMpcNote,
+            ctx.setMpcPad,
+            ctx.currentFieldName,
+            ctx.bank
+        };
+
+        PushPadScreenUpdateCommand(padPushScreenUpdateCtx, note, padIndexWithBank).execute();
+
         return;
     }
 

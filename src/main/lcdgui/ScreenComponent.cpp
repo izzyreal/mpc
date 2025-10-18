@@ -4,6 +4,7 @@
 
 #include <Mpc.hpp>
 
+#include "command/context/PushPadScreenUpdateContext.h"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
@@ -13,6 +14,8 @@
 #include "command/context/TriggerDrumContextFactory.h"
 
 using namespace mpc::lcdgui;
+using namespace mpc::command;
+using namespace mpc::command::context;
 
 ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer)
 	: Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
@@ -95,10 +98,24 @@ void ScreenComponent::openWindow()
     layeredScreen->clearScreenToReturnToWhenPressingOpenWindow();
 }
 
-void ScreenComponent::pad(int padIndexWithBank, int velo)
+void ScreenComponent::pad(int programPadIndex, int velo)
 {
-    auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, velo, name);
-    command::TriggerDrumNoteOnCommand(ctx, padIndexWithBank, velo).execute();
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, velo, name);
+    TriggerDrumNoteOnCommand(ctx, programPadIndex, velo).execute();
+
+    PushPadScreenUpdateContext padPushScreenUpdateCtx {
+        ctx.currentScreenName,
+        ctx.isSixteenLevelsEnabled,
+        mpc::sequencer::isDrumNote(ctx.note),
+        ctx.allowCentralNoteAndPadUpdate,
+        ctx.screenComponent, ctx.setMpcNote,
+        ctx.setMpcPad,
+        ctx.currentFieldName,
+        ctx.bank
+    };
+
+    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, ctx.note, programPadIndex).execute();
+
 }
 
 mpc::engine::Drum& ScreenComponent::activeDrum()

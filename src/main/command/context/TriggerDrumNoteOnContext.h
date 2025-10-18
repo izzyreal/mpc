@@ -64,7 +64,7 @@ namespace mpc::command::context {
         int trackBus;
 
         std::shared_ptr<mpc::sampler::Program> program;
-        int programNote;
+        int note;
 
         int soundIndex;
 

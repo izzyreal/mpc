@@ -19,7 +19,7 @@ namespace mpc::command {
         int padIndexWithBank;
         int velo;
 
-        void generateNoteOn(const context::TriggerDrumNoteOnContext &ctx, int note, int velo, int padIndexWithBank);
+        void generateNoteOn(const context::TriggerDrumNoteOnContext &ctx, int velo, int padIndexWithBank);
     };
 
 } // namespace mpc::command
