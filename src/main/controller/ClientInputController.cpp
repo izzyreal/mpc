@@ -9,7 +9,8 @@
 #include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
-#include "lcdgui/screens/dialog2/PopupScreen.hpp""
+#include "lcdgui/screens/StepEditorScreen.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "hardware/Hardware.h"
 #include <memory>
 
@@ -17,6 +18,7 @@ using namespace mpc::controller;
 using namespace mpc::inputlogic;
 using namespace mpc::command;
 using namespace mpc::command::context;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;
 
 ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path keyboardMappingConfigDirectory)
@@ -213,16 +215,30 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
 
     auto screen = mpc.getScreen();
 
+    using Id = hardware::ComponentId;
+
+    auto id = a.componentId;
+
+    if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screen); stepEditorScreen)
+    {
+        if (id == Id::PREV_STEP_OR_EVENT)
+        {
+            stepEditorScreen->prevStepEvent();
+            return;
+        }
+        else if (id == Id::NEXT_STEP_OR_EVENT)
+        {
+            stepEditorScreen->nextStepEvent();
+            return;
+        }
+    }
+
     if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
         popupScreen && !popupScreen->getScreenToReturnTo().empty())
     {
         mpc.getLayeredScreen()->openScreen(popupScreen->getScreenToReturnTo());
         return;
     }
-
-    using Id = hardware::ComponentId;
-
-    auto id = a.componentId;
 
     if (id == Id::CURSOR_LEFT_OR_DIGIT) { screen->left(); }
     else if (id == Id::CURSOR_RIGHT_OR_DIGIT) { screen->right(); }
@@ -245,8 +261,6 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
             ls->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
         }
     }
-    else if (id == Id::PREV_STEP_OR_EVENT) { screen->prevStepEvent(); }
-    else if (id == Id::NEXT_STEP_OR_EVENT) { screen->nextStepEvent(); }
     else if (id == Id::GO_TO) { screen->goTo(); }
     else if (id == Id::PREV_BAR_START) { screen->prevBarStart(); }
     else if (id == Id::NEXT_BAR_END) { screen->nextBarEnd(); }

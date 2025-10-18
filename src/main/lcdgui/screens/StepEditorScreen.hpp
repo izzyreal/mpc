@@ -23,10 +23,13 @@ namespace mpc::lcdgui::screens
         void adhocPlayNoteEventsAtCurrentPosition();
 
 	public:
+		StepEditorScreen(mpc::Mpc& mpc, const int layerIndex);
+
+		void prevStepEvent();
+		void nextStepEvent();
+
 		void function(int i) override;
 		void turnWheel(int i) override;
-		void prevStepEvent() override;
-		void nextStepEvent() override;
 		void prevBarStart() override;
 		void nextBarEnd() override;
 		void left() override;
@@ -34,8 +37,6 @@ namespace mpc::lcdgui::screens
 		void up() override;
 		void down() override;
 		void shift() override;
-
-		StepEditorScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		void close() override;
