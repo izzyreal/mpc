@@ -8,7 +8,7 @@
 #include "command/context/PushPadScreenUpdateContext.h"
 #include "command/context/TriggerDrumContextFactory.h"
 
-#include "inputlogic/ClientInput.h"
+#include "input/ClientInput.h"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
@@ -45,7 +45,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine::midi;
 using namespace mpc::command;
 using namespace mpc::command::context;
-using namespace mpc::inputlogic;
+using namespace mpc::input;
 using namespace mpc::hardware;
 
 /**

@@ -1,6 +1,6 @@
 #include "NameScreen.hpp"
 
-#include "inputlogic/PadAndButtonKeyboard.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/Underline.hpp"
 #include "hardware/Hardware.h"
 

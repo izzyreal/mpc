@@ -4,7 +4,7 @@
 
 #include "hardware/HardwareComponent.h"
 
-namespace mpc::inputlogic {
+namespace mpc::input {
 
 struct ClientInput {
 
@@ -34,4 +34,4 @@ struct ClientInput {
     std::optional<float> deltaValue;
 };
 
-} // namespace mpc::inputlogic
+} // namespace mpc::input

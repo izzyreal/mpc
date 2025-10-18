@@ -81,7 +81,7 @@ namespace mpc::lcdgui
         virtual void down() { command::PushDownCommand(mpc).execute(); }
         virtual void function(int i) { init(); command::PushFunctionCommand(mpc, i).execute(); }
         virtual void openWindow();
-        virtual void turnWheel(int i) {}
+        virtual void turnWheel(int) {}
         virtual void numpad(int i) { command::PushNumPadCommand(mpc, i).execute(); }
         virtual void pressEnter() { command::PushEnterCommand(mpc).execute(); }
         virtual void rec() { command::PushRecCommand(mpc).execute(); }
@@ -89,7 +89,7 @@ namespace mpc::lcdgui
         virtual void stop() { command::PushStopCommand(mpc).execute(); }
         virtual void play() { command::PushPlayCommand(mpc).execute(); }
         virtual void playStart() { command::PushPlayStartCommand(mpc).execute(); }
-        virtual void setSlider(int i) {}
+        virtual void setSlider(int) {}
 
 		int getSoundIncrement(const int dataWheelSteps)
         {

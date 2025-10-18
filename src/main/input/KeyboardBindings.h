@@ -4,10 +4,10 @@
 #include <vector>
 #include <optional>
 
-#include "controls/KeyCodeHelper.hpp"
+#include "input/KeyCodeHelper.hpp"
 #include "hardware/ComponentId.h"
 
-namespace mpc::inputlogic
+namespace mpc::input
 {
 
 enum class Direction
@@ -23,6 +23,7 @@ constexpr int toSign(Direction d)
     {
         case Direction::Positive: return +1;
         case Direction::Negative: return -1;
+        case Direction::None:
         default:                  return 0;
     }
 }
@@ -38,12 +39,12 @@ class KeyboardBindings
 public:
     KeyboardBindings();
 
-    std::vector<mpc::controls::VmpcKeyCode> lookupComponent(hardware::ComponentId id) const;
-    std::optional<KeyboardBinding> lookup(controls::VmpcKeyCode key) const;
+    std::vector<mpc::input::VmpcKeyCode> lookupComponent(hardware::ComponentId id) const;
+    std::optional<KeyboardBinding> lookup(VmpcKeyCode key) const;
 
 private:
-    std::map<controls::VmpcKeyCode, KeyboardBinding> bindings;
+    std::map<VmpcKeyCode, KeyboardBinding> bindings;
     void initializeDefaults();
 };
 
-} // namespace mpc::inputlogic
+} // namespace mpc::input

@@ -29,7 +29,7 @@ namespace mpc::controller {
     class ClientInputControllerBase;
 }
 
-namespace mpc::inputlogic {
+namespace mpc::input {
     struct HostInputEvent;
     class PadAndButtonKeyboard;
 }
@@ -110,17 +110,17 @@ namespace mpc {
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
 
-        std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> padAndButtonKeyboard;
+        std::shared_ptr<mpc::input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController;
 
-        void dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent);
+        void dispatchHostInput(const mpc::input::HostInputEvent& hostEvent);
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getScreen();
         std::shared_ptr<hardware::Hardware> getHardware();
         mpc::disk::DiskController* getDiskController();
-        std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> getPadAndButtonKeyboard();
+        std::shared_ptr<mpc::input::PadAndButtonKeyboard> getPadAndButtonKeyboard();
 
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();

@@ -10,16 +10,17 @@
 #include <lcdgui/Field.hpp>
 
 #include "controller/ClientInputControllerBase.h"
-#include "controls/KeyCodeHelper.hpp"
+#include "input/KeyCodeHelper.hpp"
 
 #include <StrUtil.hpp>
 
-#include <controls/KeyCodeHelper.hpp>
+#include <input/KeyCodeHelper.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
+using namespace mpc::input;
 
 VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
@@ -231,7 +232,7 @@ void VmpcKeyboardScreen::function(int i)
 
 void VmpcKeyboardScreen::setLearnCandidate(const int rawKeyCode)
 {
-    learnCandidate = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
+    learnCandidate = KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
     updateRows();
 }
 

@@ -1,7 +1,7 @@
 #include "PushFullLevelCommand.h"
 #include "Mpc.hpp"
 #include "hardware/Hardware.h"
-#include "inputlogic/PadAndButtonKeyboard.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 #include <memory>

@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 
-namespace mpc::controls
+namespace mpc::input
 {
     /**
      * This class enumerates all keys that can be mapped to actions.
@@ -176,4 +176,4 @@ namespace mpc::controls
 
             static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
     };
-} // namespace mpc::controls
+} // namespace mpc::input

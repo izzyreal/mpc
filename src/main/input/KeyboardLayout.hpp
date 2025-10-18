@@ -16,7 +16,7 @@
 #include <X11/Xutil.h>
 #endif
 
-namespace mpc::controls {
+namespace mpc::input {
 
     class KeyboardLayout {
 
@@ -354,4 +354,4 @@ namespace mpc::controls {
         }
 #endif
     };
-} // namespace mpc::controls
+} // namespace mpc::input

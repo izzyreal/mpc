@@ -22,7 +22,7 @@
 #include <set>
 
 #include "MpcResourceUtil.hpp"
-#include "inputlogic/PadAndButtonKeyboard.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 #include "hardware/Hardware.h"
 
 #if __linux__

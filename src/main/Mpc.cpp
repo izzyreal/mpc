@@ -28,7 +28,7 @@
 
 #include "MpcResourceUtil.hpp"
 #include "hardware/ComponentId.h"
-#include "inputlogic/PadAndButtonKeyboard.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 #include "controller/ClientInputController.h"
 
 #include <string>
@@ -95,7 +95,7 @@ void Mpc::init()
     
     mpc::Logger::l.setPath(paths->logFilePath().string());
     
-    padAndButtonKeyboard = std::make_shared<mpc::inputlogic::PadAndButtonKeyboard>(*this);
+    padAndButtonKeyboard = std::make_shared<mpc::input::PadAndButtonKeyboard>(*this);
     
     diskController = std::make_unique<mpc::disk::DiskController>(*this);
     
@@ -162,7 +162,7 @@ std::shared_ptr<hardware::Hardware> Mpc::getHardware()
 	return hardware;
 }
 
-void Mpc::dispatchHostInput(const mpc::inputlogic::HostInputEvent& hostEvent)
+void Mpc::dispatchHostInput(const mpc::input::HostInputEvent& hostEvent)
 {
     inputController->dispatchHostInput(hostEvent);
 }
@@ -401,7 +401,7 @@ void Mpc::setSixteenLevelsEnabled(bool b)
     sixteenLevelsEnabled = b;
 }
 
-std::shared_ptr<mpc::inputlogic::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
+std::shared_ptr<mpc::input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
 {
     return padAndButtonKeyboard;
 }

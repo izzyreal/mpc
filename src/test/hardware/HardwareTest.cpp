@@ -6,7 +6,7 @@
 #include "hardware/Hardware.h"
 
 using namespace mpc::hardware;
-using namespace mpc::inputlogic;
+using namespace mpc::input;
 
 // ---- TESTS ----
 

@@ -2,21 +2,20 @@
 #include <engine/control/Control.hpp>
 
 using namespace mpc::engine::control;
-using namespace std;
 
-CompoundControl::CompoundControl(int id, string name) : Control(id, name)
+CompoundControl::CompoundControl(int id, std::string name) : Control(id, name)
 {
 }
 
-void CompoundControl::add(shared_ptr<Control> control)
+void CompoundControl::add(std::shared_ptr<Control> control)
 {
 	if (!control) return;
-	string name = control->getName();
+	std::string name = control->getName();
 	control->setParent(this);
-	controls.push_back(move(control));
+	controls.push_back(control);
 }
 
-void CompoundControl::remove(shared_ptr<Control> c)
+void CompoundControl::remove(std::shared_ptr<Control> c)
 {
 	auto control = c;
 	
@@ -35,12 +34,12 @@ void CompoundControl::remove(shared_ptr<Control> c)
 	}
 }
 
-vector<shared_ptr<Control>> CompoundControl::getControls()
+std::vector<std::shared_ptr<Control>> CompoundControl::getControls()
 {
     return controls;
 }
 
-shared_ptr<Control> CompoundControl::find(string name)
+std::shared_ptr<Control> CompoundControl::find(std::string name)
 {
 	for (auto& c : controls) {
 		if (c->getName() == name) {
@@ -50,11 +49,11 @@ shared_ptr<Control> CompoundControl::find(string name)
 	return {};
 }
 
-shared_ptr<Control> CompoundControl::deepFind(int controlId)
+std::shared_ptr<Control> CompoundControl::deepFind(int controlId)
 {
 	for (auto& c : controls) {
 
-		auto cc = dynamic_pointer_cast<CompoundControl>(c);
+		auto cc = std::dynamic_pointer_cast<CompoundControl>(c);
 
 		if (cc) {
 			auto c2 = cc->deepFind(controlId);
@@ -69,17 +68,17 @@ shared_ptr<Control> CompoundControl::deepFind(int controlId)
 	return {};
 }
 
-void CompoundControl::disambiguate(shared_ptr<CompoundControl> c)
+void CompoundControl::disambiguate(std::shared_ptr<CompoundControl> c)
 {
 	auto original = c->getName();
 	if (!find(original)) {
 		return;
 	}
 	int index = 1;
-	string str;
+	std::string str;
 	do {
 		index++;
-		str = original + " #" + (to_string(index));
+		str = original + " #" + (std::to_string(index));
 	} while (find(str));
 	c->setName(str);
 }

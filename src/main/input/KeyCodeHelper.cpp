@@ -5,7 +5,7 @@
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #if TARGET_OS_IOS
-#include "controls/UIKeyConstants.hpp"
+#include "input/UIKeyConstants.hpp"
 #else
 #include <Carbon/Carbon.h>
 #endif
@@ -16,7 +16,7 @@
 #include <X11/keysym.h>
 #endif
 
-using namespace mpc::controls;
+using namespace mpc::input;
 
 const std::map<const int, const VmpcKeyCode> KeyCodeHelper::platformToVmpcKeyCodes {
 

@@ -1,15 +1,15 @@
-#include "inputlogic/HostToClientTranslator.h"
+#include "input/HostToClientTranslator.h"
 #include "hardware/ComponentId.h"
-#include "inputlogic/ClientInput.h"
-#include "inputlogic/KeyboardBindings.h"
+#include "input/ClientInput.h"
+#include "input/KeyboardBindings.h"
 
-#include "controls/KeyCodeHelper.hpp"
+#include "input/KeyCodeHelper.hpp"
 
 #include "hardware/HardwareComponent.h"
 
 #include <stdexcept>
 
-using namespace mpc::inputlogic;
+using namespace mpc::input;
 using namespace mpc::hardware;
 
 std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
@@ -159,8 +159,8 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
     case HostInputEvent::Source::KEYBOARD:
     {
-        const auto& key = std::get<KeyEvent>(hostInputEvent.payload);
-        const auto vmpcKeyCode = controls::KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
+        const auto &key = std::get<KeyEvent>(hostInputEvent.payload);
+        const auto vmpcKeyCode = KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
         const auto binding = keyboardBindings->lookup(vmpcKeyCode);
 
         if (!binding)

@@ -1,15 +1,15 @@
-#include "inputlogic/KeyboardBindings.h"
+#include "input/KeyboardBindings.h"
 
-using namespace mpc::inputlogic;
+using namespace mpc::input;
 
 KeyboardBindings::KeyboardBindings()
 {
     initializeDefaults();
 }
 
-std::vector<mpc::controls::VmpcKeyCode> KeyboardBindings::lookupComponent(hardware::ComponentId id) const
+std::vector<mpc::input::VmpcKeyCode> KeyboardBindings::lookupComponent(hardware::ComponentId id) const
 {
-    std::vector<mpc::controls::VmpcKeyCode> result;
+    std::vector<mpc::input::VmpcKeyCode> result;
 
     for (const auto& [key, binding] : bindings)
     {
@@ -31,7 +31,7 @@ std::vector<mpc::controls::VmpcKeyCode> KeyboardBindings::lookupComponent(hardwa
     return result;
 }
 
-std::optional<KeyboardBinding> KeyboardBindings::lookup(controls::VmpcKeyCode key) const
+std::optional<KeyboardBinding> KeyboardBindings::lookup(VmpcKeyCode key) const
 {
     if (auto it = bindings.find(key); it != bindings.end())
         return it->second;
@@ -40,7 +40,7 @@ std::optional<KeyboardBinding> KeyboardBindings::lookup(controls::VmpcKeyCode ke
 
 void KeyboardBindings::initializeDefaults()
 {
-    using VmpcKeyCode = controls::VmpcKeyCode;
+    using VmpcKeyCode = VmpcKeyCode;
     using Id = hardware::ComponentId;
 
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_Minus] = { Id::DATA_WHEEL, Direction::Negative };

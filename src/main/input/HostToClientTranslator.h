@@ -1,11 +1,11 @@
 #pragma once
 
-#include "inputlogic/HostInputEvent.h"
-#include "inputlogic/ClientInput.h"
+#include "input/HostInputEvent.h"
+#include "input/ClientInput.h"
 
 #include <memory>
 
-namespace mpc::inputlogic {
+namespace mpc::input {
 
     class KeyboardBindings;
 
@@ -13,4 +13,4 @@ namespace mpc::inputlogic {
         static std::optional<ClientInput> translate(const HostInputEvent&, std::shared_ptr<KeyboardBindings>);
     };
 
-} // namespace mpc::inputlogic
+} // namespace mpc::input

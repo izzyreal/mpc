@@ -5,7 +5,7 @@
 
 #include "hardware/ComponentId.h"
 
-namespace mpc::inputlogic {
+namespace mpc::input {
 
 struct FocusEvent {
     enum class Type { Lost, Gained };
@@ -85,5 +85,5 @@ struct HostInputEvent {
     std::variant<KeyEvent, GestureEvent, MidiEvent, FocusEvent> payload;
 };
 
-} // namespace mpc::inputlogic
+} // namespace mpc::input
 

@@ -5,10 +5,10 @@
 #include "command/context/PushPadScreenUpdateContext.h"
 #include "hardware/ComponentId.h"
 #include "hardware/HardwareComponent.h"
-#include "inputlogic/ClientInput.h"
+#include "input/ClientInput.h"
 #include "command/context/TriggerDrumContextFactory.h"
 #include "Mpc.hpp"
-#include "inputlogic/PadAndButtonKeyboard.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/ScreenGroups.h"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
@@ -23,7 +23,7 @@
 #include <memory>
 
 using namespace mpc::controller;
-using namespace mpc::inputlogic;
+using namespace mpc::input;
 using namespace mpc::hardware;
 using namespace mpc::command;
 using namespace mpc::command::context;
@@ -244,7 +244,7 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
 {
     auto button = mpc.getHardware()->getButton(a.componentId);
 
-    // The below check is necessary because the keyboard mapping routines in mpc::controls may return
+    // The below check is necessary because the keyboard mapping routines in mpc::input may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
     // input handling, we can remove this check.
     if (!button)
@@ -428,7 +428,7 @@ void ClientInputController::handleButtonRelease(const ClientInput& a)
 {
     auto button = mpc.getHardware()->getButton(a.componentId);
 
-    // The below check is necessary because the keyboard mapping routines in mpc::controls may return
+    // The below check is necessary because the keyboard mapping routines in mpc::input may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
     // input handling, we can remove this check.
     if (!button)
