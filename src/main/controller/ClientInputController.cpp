@@ -231,6 +231,16 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
             stepEditorScreen->nextStepEvent();
             return;
         }
+        else if (id == Id::PREV_BAR_START)
+        {
+            stepEditorScreen->prevBarStart();
+            return;
+        }
+        else if (id == Id::NEXT_BAR_END)
+        {
+            stepEditorScreen->nextBarEnd();
+            return;
+        }
     }
 
     if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
@@ -261,9 +271,10 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
             ls->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
         }
     }
-    else if (id == Id::GO_TO) { screen->goTo(); }
-    else if (id == Id::PREV_BAR_START) { screen->prevBarStart(); }
-    else if (id == Id::NEXT_BAR_END) { screen->nextBarEnd(); }
+    else if (id == Id::GO_TO)
+    {
+        command::PushGoToCommand(mpc).execute();
+    }
     else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT) { screen->tap(); }
     else if (id == Id::NEXT_SEQ) { screen->nextSeq(); }
     else if (id == Id::TRACK_MUTE) { screen->trackMute(); }

@@ -27,11 +27,11 @@ namespace mpc::lcdgui::screens
 
 		void prevStepEvent();
 		void nextStepEvent();
+		void prevBarStart();
+		void nextBarEnd();
 
 		void function(int i) override;
 		void turnWheel(int i) override;
-		void prevBarStart() override;
-		void nextBarEnd() override;
 		void left() override;
 		void right() override;
 		void up() override;

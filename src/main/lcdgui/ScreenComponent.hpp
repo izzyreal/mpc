@@ -91,9 +91,6 @@ namespace mpc::lcdgui
         virtual void playStart() { command::PushPlayStartCommand(mpc).execute(); }
         virtual void mainScreen() { command::PushMainScreenCommand(mpc).execute(); }
         virtual void tap() { command::PushTapCommand(mpc).execute(); }
-        virtual void goTo() { command::PushGoToCommand(mpc).execute(); }
-        virtual void prevBarStart() {}
-        virtual void nextBarEnd() {}
         virtual void nextSeq() { command::PushNextSeqCommand(mpc).execute(); }
         virtual void trackMute() { command::PushTrackMuteCommand(mpc).execute(); }
         virtual void bank(int i) { command::PushBankCommand(mpc, i).execute(); }
