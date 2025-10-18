@@ -1,20 +1,21 @@
 #include "PushPadScreenUpdateCommand.h"
-
 #include "command/context/PushPadScreenUpdateContext.h"
 
+#include "lcdgui/screens/AssignScreen.hpp"
 #include "lcdgui/screens/MixerScreen.hpp"
-#include "lcdgui/screens/StepEditorScreen.hpp"
-#include "lcdgui/screens/WithTimesAndNotes.hpp"
-#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
-#include "lcdgui/screens/window/ChannelSettingsScreen.hpp"
-#include "lcdgui/screens/window/EditMultipleScreen.hpp"
-#include "sequencer/NoteEvent.hpp"
+#include "lcdgui/screens/NextSeqPadScreen.hpp"
+#include "lcdgui/screens/TrMuteScreen.hpp"
 
+#include <memory>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-PushPadScreenUpdateCommand::PushPadScreenUpdateCommand(PushPadScreenUpdateContext &ctxToUse, const int noteToUse, const std::optional<int> padIndexWithBankToUse)
-    : ctx(ctxToUse), note(noteToUse), padIndexWithBank(padIndexWithBankToUse)
+PushPadScreenUpdateCommand::PushPadScreenUpdateCommand(PushPadScreenUpdateContext& ctxToUse, int padIndexWithBankToUse)
+    : ctx(ctxToUse), padIndexWithBank(padIndexWithBankToUse)
 {
 }
 
@@ -27,50 +28,63 @@ void PushPadScreenUpdateCommand::execute()
 
     const auto screenComponent = ctx.screenComponent;
 
-    if (mpc::sequencer::isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
+    if (ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
-        ctx.setMpcNote(note);
+        ctx.setMpcPad(padIndexWithBank);
+    }
+    else if (auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent); mixerScreen)
+    {
+        const unsigned char bankStartPadIndex = ctx.bank * 16;
+        const unsigned char bankEndPadIndex = bankStartPadIndex + 16;
 
-        if (padIndexWithBank)
+        if (padIndexWithBank >= bankStartPadIndex && padIndexWithBank < bankEndPadIndex)
+            mixerScreen->pressPadIndexWithoutBank(padIndexWithBank % 16);
+    }
+    else if (auto trMuteScreen = std::dynamic_pointer_cast<TrMuteScreen>(screenComponent); trMuteScreen)
+    {
+        if (!ctx.sequencer)
+            return;
+
+        if (ctx.isF6Pressed || ctx.sequencer->isSoloEnabled())
         {
-            ctx.setMpcPad(*padIndexWithBank);
+            if (!ctx.sequencer->isSoloEnabled())
+                ctx.sequencer->setSoloEnabled(true);
+
+            ctx.sequencer->setActiveTrackIndex(padIndexWithBank);
+            trMuteScreen->findBackground()->setName("track-mute-solo-2");
+        }
+        else
+        {
+            const auto s = ctx.sequencer->getActiveSequence();
+            const auto t = s->getTrack(padIndexWithBank);
+            t->setOn(!t->isOn());
         }
     }
-    else if (auto withNotes = std::dynamic_pointer_cast<lcdgui::screens::WithTimesAndNotes>(screenComponent);
-             withNotes && note >= 35)
+    else if (auto nextSeqPadScreen = std::dynamic_pointer_cast<NextSeqPadScreen>(screenComponent); nextSeqPadScreen)
     {
-        withNotes->setNote0(note);
-    }
-    else if (auto assign16LevelsScreen = std::dynamic_pointer_cast<lcdgui::screens::window::Assign16LevelsScreen>(screenComponent);
-             assign16LevelsScreen)
-    {
-        assign16LevelsScreen->setNote(note);
-    }
-    else if (auto editMultipleScreen = std::dynamic_pointer_cast<lcdgui::screens::window::EditMultipleScreen>(screenComponent);
-             editMultipleScreen)
-    {
-        editMultipleScreen->setChangeNoteTo(note);
-    }
-    else if (auto stepEditorScreen = std::dynamic_pointer_cast<lcdgui::screens::StepEditorScreen>(screenComponent);
-             stepEditorScreen && ctx.currentFieldName == "fromnote" && note > 34)
-    {
-        stepEditorScreen->setFromNote(note);
-    }
-    else if (auto mixerScreen = std::dynamic_pointer_cast<lcdgui::screens::MixerScreen>(screenComponent);
-             mixerScreen && padIndexWithBank)
-    {
-        unsigned char bankStartPadIndex = ctx.bank * 16;
-        unsigned char bankEndPadIndex = bankStartPadIndex + 16;
+        if (!ctx.sequencer)
+            return;
 
-        if (*padIndexWithBank >= bankStartPadIndex && *padIndexWithBank < bankEndPadIndex)
+        if (ctx.sequencer->isPlaying() && ctx.isF4Pressed)
         {
-            mixerScreen->pressPadIndexWithoutBank(*padIndexWithBank % 16);
+            if (!ctx.sequencer->getSequence(padIndexWithBank)->isUsed())
+                return;
+
+            ctx.sequencer->stop();
+            ctx.sequencer->move(0);
+            ctx.sequencer->setActiveSequenceIndex(padIndexWithBank);
+            ctx.sequencer->playFromStart();
+            nextSeqPadScreen->refreshSeqs();
+            return;
         }
+
+        ctx.sequencer->setNextSqPad(padIndexWithBank);
+        nextSeqPadScreen->refreshSeqs();
     }
-    else if (auto channelSettingsScreen = std::dynamic_pointer_cast<lcdgui::screens::window::ChannelSettingsScreen>(screenComponent);
-             channelSettingsScreen)
+    else if (auto assignScreen = std::dynamic_pointer_cast<AssignScreen>(screenComponent); assignScreen)
     {
-        channelSettingsScreen->setNote(note);
+        const auto nn = ctx.program->getNoteFromPad(padIndexWithBank);
+        ctx.program->getSlider()->setAssignNote(nn);
     }
 }
 

@@ -25,7 +25,6 @@ namespace mpc::lcdgui::screens
 		EventsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
-        void pad(int padIndexWithBank, int velo) override;
 
         void performCopy(int sourceStart, int sourceEnd, int toSequenceIndex,
                          int destStart, int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1);

@@ -98,26 +98,6 @@ void ScreenComponent::openWindow()
     layeredScreen->clearScreenToReturnToWhenPressingOpenWindow();
 }
 
-void ScreenComponent::pad(int programPadIndex, int velo)
-{
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, velo, name);
-    TriggerDrumNoteOnCommand(ctx, programPadIndex, velo).execute();
-
-    PushPadScreenUpdateContext padPushScreenUpdateCtx {
-        ctx.currentScreenName,
-        ctx.isSixteenLevelsEnabled,
-        mpc::sequencer::isDrumNote(ctx.note),
-        ctx.allowCentralNoteAndPadUpdate,
-        ctx.screenComponent, ctx.setMpcNote,
-        ctx.setMpcPad,
-        ctx.currentFieldName,
-        ctx.bank
-    };
-
-    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, ctx.note, programPadIndex).execute();
-
-}
-
 mpc::engine::Drum& ScreenComponent::activeDrum()
 {
     const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum");

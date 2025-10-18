@@ -65,26 +65,6 @@ void TrMuteScreen::right()
 	// Stop right from propgating to BaseController
 }
 
-void TrMuteScreen::pad(int padIndexWithBank, int velo)
-{
-	init();
-	
-	if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed() || sequencer.lock()->isSoloEnabled())
-	{
-		if (!sequencer.lock()->isSoloEnabled())
-			sequencer.lock()->setSoloEnabled(true);
-
-		sequencer.lock()->setActiveTrackIndex(padIndexWithBank);
-		ls->setCurrentBackground("track-mute-solo-2");
-	}
-	else
-	{
-		auto s = sequencer.lock()->getActiveSequence();
-		auto t = s->getTrack(padIndexWithBank);
-		t->setOn(!t->isOn());
-	}
-}
-
 void TrMuteScreen::turnWheel(int i)
 {
 	init();

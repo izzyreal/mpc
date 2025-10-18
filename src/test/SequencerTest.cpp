@@ -20,7 +20,8 @@
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
+using namespace mpc::command;
+using namespace mpc::command::context;
 
 TEST_CASE("Next step, previous step", "[sequencer]")
 {
@@ -63,9 +64,9 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
     // The event at tick 382 is expected to be quantized to tick 0, because the sequence is one bar long.
     // Event at tick 2 will also be quantized to tick 0. Hence of the 17 ticks below, only 16 will survive.
-    vector<int> humanTickPositions{2, 23, 49, 70, 95, 124, 143, 167, 194, 218, 243, 264, 290, 310, 332, 361, 382};
+    std::vector<int> humanTickPositions{2, 23, 49, 70, 95, 124, 143, 167, 194, 218, 243, 264, 290, 310, 332, 361, 382};
 
-    vector<int> quantizedPositions{0, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360};
+    std::vector<int> quantizedPositions{0, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360};
 
     bool mainThreadBusy = true;
     bool audioThreadBusy = true;
@@ -89,7 +90,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
     int64_t timeInSamples = 0;
 
-    thread audioThread([&]() {
+    std::thread audioThread([&]() {
 
         int dspCycleCounter = 0;
 
@@ -102,11 +103,11 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
             if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
             {
-                this_thread::sleep_for(chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+            std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
                 continue;
             }
 
-            this_thread::sleep_for(chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+            std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
         }
 
         audioThreadBusy = false;
@@ -115,15 +116,17 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     int initialDelayCounter = 0;
 
     while (initialDelayCounter++ * 10 < INITIAL_EVENT_INSERTION_DELAY)
-        this_thread::sleep_for(chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     int tickPos = seq->getTickPosition();
 
     if (!seq->isRecordingOrOverdubbing())
         seq->recFromStart();
 
-    vector<int> recordedTickPos;
+    std::vector<int> recordedTickPos;
     int prevTickPos = -1;
+    
+    const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     while (tickPos < 384 && prevTickPos <= tickPos)
     {
@@ -135,17 +138,17 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
             {
                 if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
                 {
-                    mpc.getActiveControls()->pad(0, 127);
+                    auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screenName);
 
-                    this_thread::sleep_for(chrono::milliseconds(2));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
-                    auto ctx = mpc::command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, mpc.getLayeredScreen()->getCurrentScreenName());
-                    mpc::command::TriggerDrumNoteOffCommand(ctx).execute();
+                    auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screenName);
+                    TriggerDrumNoteOffCommand(noteOffCtx).execute();
                 }
             }
         }
 
-        this_thread::sleep_for(chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
         prevTickPos = tickPos;
         tickPos = seq->getTickPosition();
     }
@@ -153,7 +156,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     seq->stop();
 
     while (audioThreadBusy)
-        this_thread::sleep_for(chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     audioThread.join();
 

@@ -12,7 +12,6 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void turnWheel(int i) override;
-		void pad(int i, int velo) override;
 		void open() override;
 		void close() override;
 		void update(Observable* o, Message message) override;

@@ -1,6 +1,7 @@
 #include "controller/ClientInputController.h"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "command/TriggerDrumNoteOffCommand.h"
+#include "command/context/NoteInputScreenUpdateContext.h"
 #include "command/context/PushPadScreenUpdateContext.h"
 #include "hardware/ComponentId.h"
 #include "hardware/HardwareComponent.h"
@@ -80,18 +81,32 @@ void ClientInputController::handlePadPress(const ClientInput& a)
 
     TriggerDrumNoteOnCommand(ctx, programPadIndex, velocityToUse).execute();
 
+    const bool isF4Pressed = mpc.getHardware()->getButton(hardware::ComponentId::F4)->isPressed();
+    const bool isF6Pressed = mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed();
+
     PushPadScreenUpdateContext padPushScreenUpdateCtx {
-        ctx.currentScreenName,
         ctx.isSixteenLevelsEnabled,
-        mpc::sequencer::isDrumNote(ctx.note),
-        ctx.allowCentralNoteAndPadUpdate,
-        ctx.screenComponent, ctx.setMpcNote,
+        ctx.screenComponent,
+        ctx.program,
+        ctx.sequencer,
+        isF4Pressed,
+        isF6Pressed,
+        mpc.getBank(),
         ctx.setMpcPad,
-        ctx.currentFieldName,
-        ctx.bank
+        ctx.allowCentralNoteAndPadUpdate
     };
 
-    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, ctx.note, programPadIndex).execute();
+    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex).execute();
+
+    NoteInputScreenUpdateContext noteInputScreenUpdateContext {
+        ctx.isSixteenLevelsEnabled,
+        ctx.allowCentralNoteAndPadUpdate,
+        ctx.screenComponent,
+        ctx.setMpcNote,
+        ctx.currentFieldName
+    };
+
+    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput& a)
