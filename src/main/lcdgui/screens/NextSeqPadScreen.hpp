@@ -10,13 +10,13 @@ namespace mpc::lcdgui::screens
 	public:
 		NextSeqPadScreen(mpc::Mpc& mpc, const int layerIndex);
 
-	public:
 		void right() override;
 		void function(int i) override;
 		void update(Observable* o, Message message) override;
 		void open() override;
 		void close() override;
-        void pad(int padIndexWithBank, int velo) override;
+
+		void refreshSeqs();
 
 	private:
 		const std::vector<std::string> letters{ "A", "B", "C", "D" };
@@ -30,7 +30,6 @@ namespace mpc::lcdgui::screens
 		void displayNow0();
 		void displayNow1();
 		void displayNow2();
-		void refreshSeqs();
 
 	};
 }

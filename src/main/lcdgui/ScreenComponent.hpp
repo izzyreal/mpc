@@ -118,9 +118,6 @@ namespace mpc::lcdgui
             
             return result;
         }
-
-		virtual void pad(int padIndexWithBank, int velo);
-
 	};
 }
 

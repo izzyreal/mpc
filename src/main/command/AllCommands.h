@@ -28,6 +28,7 @@
 #include "command/PushNumPadCommand.h"
 #include "command/PushEnterCommand.h"
 #include "command/PushPadScreenUpdateCommand.h"
+#include "command/NoteInputScreenUpdateCommand.h"
 #include "command/TriggerDrumNoteOffCommand.h"
 #include "command/ReleaseEraseCommand.h"
 #include "command/ReleaseRecCommand.h"

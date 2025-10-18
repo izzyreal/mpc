@@ -41,29 +41,6 @@ void NextSeqPadScreen::right()
 	// Block ScreenComponent::right() default action. Nothing to do.
 }
 
-void NextSeqPadScreen::pad(int padIndexWithBank, int velo)
-{
-	init();
-
-    if (sequencer.lock()->isPlaying() && mpc.getHardware()->getButton(hardware::ComponentId::F4)->isPressed())
-    {
-        if (!sequencer.lock()->getSequence(padIndexWithBank)->isUsed())
-        {
-            return;
-        }
-
-        sequencer.lock()->stop();
-        sequencer.lock()->move(0);
-        sequencer.lock()->setActiveSequenceIndex(padIndexWithBank);
-        sequencer.lock()->playFromStart();
-        refreshSeqs();
-        return;
-    }
-
-	sequencer.lock()->setNextSqPad(padIndexWithBank);
-	refreshSeqs();
-}
-
 void NextSeqPadScreen::function(int i)
 {
 	init();

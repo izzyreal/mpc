@@ -1,8 +1,6 @@
 #pragma once
 #include "command/Command.h"
 
-#include <optional>
-
 namespace mpc::command::context {
     struct PushPadScreenUpdateContext;
 }
@@ -11,13 +9,12 @@ namespace mpc::command {
 
     class PushPadScreenUpdateCommand : public Command {
     public:
-        PushPadScreenUpdateCommand(context::PushPadScreenUpdateContext &ctx, const int note, const std::optional<int> padIndexWithBank);
+        PushPadScreenUpdateCommand(context::PushPadScreenUpdateContext& ctx, int padIndexWithBank);
         void execute() override;
 
     private:
-        context::PushPadScreenUpdateContext &ctx;
-        const int note;
-        const std::optional<int> padIndexWithBank;
+        context::PushPadScreenUpdateContext& ctx;
+        const int padIndexWithBank;
     };
 
 } // namespace mpc::command

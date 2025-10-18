@@ -3,6 +3,7 @@
 #include "command/PushPadScreenUpdateCommand.h"
 #include "command/TriggerDrumNoteOffCommand.h"
 #include "command/ReleaseTapCommand.h"
+#include "command/context/NoteInputScreenUpdateContext.h"
 #include "controller/ClientInputControllerBase.h"
 #include "command/context/PushPadScreenUpdateContext.h"
 #include "command/context/TriggerDrumContextFactory.h"
@@ -330,6 +331,21 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     }
 
     const std::string currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    const int note = playMidiNoteOn->getNote();
+    const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
+    const bool isCentralNoteAndPadUpdateScreen = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
+    std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
+    const std::string currentFieldName = mpc.getLayeredScreen()->getFocus();
+
+    NoteInputScreenUpdateContext noteInputScreenUpdateContext {
+        isSixteenLevelsEnabled,
+        isCentralNoteAndPadUpdateScreen,
+        mpc.getActiveControls(),
+        setMpcNote,
+        currentFieldName
+    };
+
+    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, note).execute();
 
     if (padIndexWithBank != -1)
     {
@@ -340,40 +356,25 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 
         const auto note = playMidiNoteOn->getNote();
 
+        const bool isF4Pressed = mpc.getHardware()->getButton(hardware::ComponentId::F4)->isPressed();
+        const bool isF6Pressed = mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed();
+
+
         PushPadScreenUpdateContext padPushScreenUpdateCtx {
-            ctx.currentScreenName,
             ctx.isSixteenLevelsEnabled,
-            mpc::sequencer::isDrumNote(note),
-            ctx.allowCentralNoteAndPadUpdate,
-            ctx.screenComponent, ctx.setMpcNote,
+            ctx.screenComponent,
+            ctx.program,
+            ctx.sequencer,
+            isF4Pressed,
+            isF6Pressed,
+            ctx.bank,
             ctx.setMpcPad,
-            ctx.currentFieldName,
-            ctx.bank
+            ctx.allowCentralNoteAndPadUpdate
         };
 
-        PushPadScreenUpdateCommand(padPushScreenUpdateCtx, note, padIndexWithBank).execute();
-
+        PushPadScreenUpdateCommand(padPushScreenUpdateCtx, padIndexWithBank).execute();
         return;
     }
-
-    const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
-
-    std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
-    std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
-
-    command::context::PushPadScreenUpdateContext padPushScreenUpdateContext {
-        currentScreenName,
-        mpc.isSixteenLevelsEnabled(),
-        mpc::sequencer::isDrumNote(playMidiNoteOn->getNote()),
-        allowCentralNoteAndPadUpdate,
-        mpc.getActiveControls(),
-        setMpcNote,
-        setMpcPad,
-        mpc.getLayeredScreen()->getFocus(),
-        mpc.getBank()
-    };
-
-    command::PushPadScreenUpdateCommand(padPushScreenUpdateContext, playMidiNoteOn->getNote(), std::nullopt).execute();
 
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
 

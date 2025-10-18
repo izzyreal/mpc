@@ -27,26 +27,6 @@ void EventsScreen::setNote0(int i)
     }
 }
 
-void EventsScreen::pad(int padIndexWithBank, int velo)
-{
-    ScreenComponent::pad(padIndexWithBank, velo);
-
-    init();
-
-    if (param != "note0")
-    {
-        return;
-    }
-
-    int newNote = program->getNoteFromPad(padIndexWithBank);
-
-    if (newNote >= 35)
-    {
-        note0 = newNote;
-        displayNotes();
-    }
-}
-
 void EventsScreen::open()
 {
 	sequencer.lock()->move(0);
