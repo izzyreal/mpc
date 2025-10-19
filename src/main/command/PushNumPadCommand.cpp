@@ -75,7 +75,7 @@ void PushNumPadCommand::execute()
         return;
     }
 
-    const auto fieldName = mpc.getLayeredScreen()->getFocus();
+    const auto fieldName = mpc.getLayeredScreen()->getFocusedFieldName();
 
     const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 

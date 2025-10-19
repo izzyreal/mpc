@@ -342,7 +342,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
     const bool isCentralNoteAndPadUpdateScreen = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
-    const std::string currentFieldName = mpc.getLayeredScreen()->getFocus();
+    const std::string currentFieldName = mpc.getLayeredScreen()->getFocusedFieldName();
 
     NoteInputScreenUpdateContext noteInputScreenUpdateContext {
         isSixteenLevelsEnabled,

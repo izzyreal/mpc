@@ -6,7 +6,7 @@ namespace mpc::command {
     PushUpCommand::PushUpCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushUpCommand::execute() {
-        if (!mpc.getLayeredScreen()->getFocusedField() || mpc.getLayeredScreen()->getFocus() == "dummy") {
+        if (!mpc.getLayeredScreen()->getFocusedField() || mpc.getLayeredScreen()->getFocusedFieldName() == "dummy") {
             return;
         }
 

@@ -163,7 +163,7 @@ void NameScreen::drawUnderline()
 {
 	if (editing)
 	{
-        std::string focus = ls->getFocus();
+        std::string focus = ls->getFocusedFieldName();
 	
 		if (focus.length() != 1 && focus.length() != 2)
         {

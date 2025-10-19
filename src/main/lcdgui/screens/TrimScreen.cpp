@@ -400,7 +400,7 @@ void TrimScreen::displaySnd()
 		return;
 	}
 
-	if (ls->getFocus() == "dummy")
+	if (ls->getFocusedFieldName() == "dummy")
 		ls->setFocus("snd");
 
 	auto sampleName = sound->getName();

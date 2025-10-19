@@ -90,7 +90,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     controls->function(2);
 
     controls = mpc.getScreen();
-    auto focus0 = mpc.getLayeredScreen()->getFocus();
+    auto focus0 = mpc.getLayeredScreen()->getFocusedFieldName();
 
     // Save the preset by pressing ENTER in NameScreen
     controls->function(4);

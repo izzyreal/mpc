@@ -433,24 +433,6 @@ std::vector<std::shared_ptr<Component>> Component::findHiddenChildren()
 	return result;
 }
 
-std::shared_ptr<ScreenComponent> Component::findScreenComponent()
-{
-	for (auto& c : children)
-	{
-		auto candidate = std::dynamic_pointer_cast<ScreenComponent>(c);
-		
-		if (candidate)
-			return candidate;
-
-		auto childCandidate = c->findScreenComponent();
-
-		if (childCandidate)
-			return childCandidate;
-	}
-	
-	return {};
-}
-
 std::shared_ptr<Background> Component::findBackground()
 {
     return findChild<Background>("");

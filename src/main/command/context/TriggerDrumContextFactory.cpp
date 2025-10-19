@@ -94,7 +94,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         mpc.getScreen(),
         setMpcNote,
         setMpcPad,
-        mpc.getLayeredScreen()->getFocus(),
+        mpc.getLayeredScreen()->getFocusedFieldName(),
         hardwareSliderValue,
         mpc.inputController->isPhysicallyPressed(programPadIndex % 16, mpc.getBank())
     }; 

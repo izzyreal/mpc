@@ -200,7 +200,7 @@ std::shared_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 }
 
 std::shared_ptr<lcdgui::ScreenComponent> Mpc::getScreen() {
-	return layeredScreen->findScreenComponent();
+	return layeredScreen->getCurrentScreen();
 }
 
 std::shared_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()

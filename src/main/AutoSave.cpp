@@ -286,7 +286,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
             layeredScreen->setPreviousScreenName("sequencer");
         }
 
-        std::shared_ptr<ScreenComponent> currentScreen = layeredScreen->findScreenComponent();
+        std::shared_ptr<ScreenComponent> currentScreen = layeredScreen->getCurrentScreen();
 
         auto previousScreenName = layeredScreen->getPreviousScreenName();
 
@@ -311,7 +311,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         }
 
         auto previousSamplerScreen = mpc.getPreviousSamplerScreenName();
-        auto focus = mpc.getLayeredScreen()->getFocus();
+        auto focus = mpc.getLayeredScreen()->getFocusedFieldName();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
         auto lastPressedPad = mpc.getPad();
         auto lastPressedNote = mpc.getNote();

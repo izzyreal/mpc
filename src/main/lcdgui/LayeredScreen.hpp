@@ -65,13 +65,12 @@ namespace mpc::lcdgui {
 
         void openScreen(const std::string screenName);
 
-		std::shared_ptr<ScreenComponent> findScreenComponent();
+		std::shared_ptr<ScreenComponent> getCurrentScreen();
 
 	private:
 		std::map<std::string, std::string> lastFocuses;
 		int focusedLayerIndex{ 0 };
         std::shared_ptr<ScreenComponent> currentScreen;
-		std::string currentScreenName;
 		std::string previousScreenName;
         std::string screenToReturnToWhenPressingOpenWindow;
 
@@ -104,7 +103,7 @@ namespace mpc::lcdgui {
 		void Draw();
 
 	public:
-		std::string getFocus();
+		std::string getFocusedFieldName();
         std::shared_ptr<Field> getFocusedField();
 		bool setFocus(const std::string& focus);
 

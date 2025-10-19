@@ -89,7 +89,7 @@ void PadAndButtonKeyboard::pressHardwareComponent(const ComponentId id)
 
     nameScreen->typeCharacter(charWithCasing);
 
-    if (mpc.getLayeredScreen()->getFocus() != std::to_string(15))
+    if (mpc.getLayeredScreen()->getFocusedFieldName() != std::to_string(15))
     {
         // We go back one position because typeCharacter moves one forward
         nameScreen->left();

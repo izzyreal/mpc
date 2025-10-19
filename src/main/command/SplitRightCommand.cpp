@@ -19,7 +19,7 @@ namespace mpc::command {
 
         const auto field = mpc.getLayeredScreen()->getFocusedField();
 
-        if (lcdgui::util::isFieldSplittable(mpc.getLayeredScreen()->getCurrentScreenName(), mpc.getLayeredScreen()->getFocus()) && field->isSplit())
+        if (lcdgui::util::isFieldSplittable(mpc.getLayeredScreen()->getCurrentScreenName(), mpc.getLayeredScreen()->getFocusedFieldName()) && field->isSplit())
         {
             if (!field->setActiveSplit(field->getActiveSplit() + 1))
                 field->setSplit(false);

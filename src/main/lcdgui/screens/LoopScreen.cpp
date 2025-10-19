@@ -417,7 +417,7 @@ void LoopScreen::displaySnd()
 		return;
 	}
 
-	if (ls->getFocus() == "dummy")
+	if (ls->getFocusedFieldName() == "dummy")
     {
         ls->setFocus("snd");
     }

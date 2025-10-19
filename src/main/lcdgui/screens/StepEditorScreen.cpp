@@ -375,7 +375,7 @@ void StepEditorScreen::function(int i)
 
 bool StepEditorScreen::paramIsLetter(const std::string& letter)
 {
-    return ls->getFocus().find(letter) != std::string::npos;
+    return ls->getFocusedFieldName().find(letter) != std::string::npos;
 }
 
 void StepEditorScreen::turnWheel(int i)
@@ -1149,7 +1149,7 @@ void StepEditorScreen::setSelectedEvents()
 
 void StepEditorScreen::checkSelection()
 {
-    std::string focus = ls->getFocus();
+    std::string focus = ls->getFocusedFieldName();
 
 	if (focus.length() != 2)
 	{
@@ -1371,7 +1371,7 @@ int StepEditorScreen::getActiveRow()
 {
     init();
 
-    const std::string focus = ls->getFocus();
+    const std::string focus = ls->getFocusedFieldName();
 
     if (focus.length() != 2)
     {

@@ -6,7 +6,7 @@ namespace mpc::command {
     PushLeftCommand::PushLeftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushLeftCommand::execute() {
-        if (!mpc.getLayeredScreen()->getFocusedField() || mpc.getLayeredScreen()->getFocus() == "dummy") {
+        if (!mpc.getLayeredScreen()->getFocusedField() || mpc.getLayeredScreen()->getFocusedFieldName() == "dummy") {
             return;
         }
 

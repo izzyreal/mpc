@@ -68,7 +68,7 @@ namespace mpc::lcdgui
 	protected:
 		virtual void init()
         {
-			param = mpc.getLayeredScreen()->getFocus();
+			param = mpc.getLayeredScreen()->getFocusedFieldName();
             program = sampler->getProgram(activeDrum().getProgram());
 			track = mpc.getSequencer()->getActiveTrack();
 		}

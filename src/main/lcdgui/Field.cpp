@@ -102,7 +102,7 @@ void Field::takeFocus()
 	{
 		if (name == "view")
 		{
-			auto screen = ls->findScreenComponent();
+			auto screen = ls->getCurrentScreen();
 			screen->findField("fromnote")->setInverted(true);
 			screen->findField("tonote")->setInverted(true);
 			screen->findLabel("tonote")->setInverted(true);
@@ -140,7 +140,7 @@ void Field::loseFocus(std::string next)
 	{
 		if (name == "view")
 		{
-			auto screen = ls->findScreenComponent();
+			auto screen = ls->getCurrentScreen();
 			screen->findChild<Rectangle>("")->setOn(false);
 
 			if (next != "fromnote")

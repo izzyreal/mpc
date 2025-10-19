@@ -11,7 +11,6 @@ namespace mpc::lcdgui
 	class Label;
 	class Field;
 	class Parameter;
-	class ScreenComponent;
     class Background;
 }
 
@@ -74,7 +73,6 @@ namespace mpc::lcdgui
 		std::vector<std::shared_ptr<Label>> findLabels();
 		std::vector<std::shared_ptr<Field>> findFields();
 		std::vector<std::shared_ptr<Parameter>> findParameters();
-		std::shared_ptr<ScreenComponent> findScreenComponent();
         std::shared_ptr<Background> findBackground();
         MRECT getRect();
 		std::vector<std::shared_ptr<Component>> findHiddenChildren();
