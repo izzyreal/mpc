@@ -77,7 +77,14 @@ void PushNumPadCommand::execute()
 
     const auto fieldName = mpc.getLayeredScreen()->getFocus();
 
-    if (lcdgui::util::isTypableField(mpc.getLayeredScreen()->getCurrentScreenName(), fieldName))
+    const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
+
+    if (screenName == "sequencer" && fieldName.substr(0, 3) == "now" && mpc.getSequencer()->isPlaying())
+    {
+        return;
+    }
+
+    if (lcdgui::util::isTypableField(screenName, fieldName))
     {
         auto field = mpc.getLayeredScreen()->getFocusedField();
 

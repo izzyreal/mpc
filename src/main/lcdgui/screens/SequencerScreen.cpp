@@ -575,6 +575,11 @@ void SequencerScreen::turnWheel(int i)
         setLastFocus("step-editor", "view");
     }
 
+    if (param.substr(0, 3) == "now" && sequencer.lock()->isPlaying())
+    {
+        return;
+    }
+
 	if (param == "now0")
 	{
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i);
