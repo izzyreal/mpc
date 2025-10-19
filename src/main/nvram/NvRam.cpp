@@ -12,6 +12,7 @@
 #include <audiomidi/AudioMidiServices.hpp>
 
 #include "hardware/Hardware.h"
+#include "sequencer/TimeSignature.hpp"
 
 #include <file/all/AllParser.hpp>
 #include <file/all/Defaults.hpp>
@@ -45,11 +46,14 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
     for (int i = 0; i < 64; i++)
         userScreen->setTrackName(i, defTrackNames[i]);
 
-    userScreen->setDeviceNumber(defaults.getDevices()[0]);
-    userScreen->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
-    userScreen->setPgm(defaults.getPgms()[0]);
-    userScreen->setTempo(defaults.getTempo() / 10.0);
-    userScreen->setVelo(defaults.getTrVelos()[0]);
+    userScreen->device = defaults.getDevices()[0];
+    mpc::sequencer::TimeSignature timeSignature;
+    timeSignature.setNumerator(defaults.getTimeSigNum());
+    timeSignature.setDenominator(defaults.getTimeSigDen());
+    userScreen->timeSig = timeSignature;
+    userScreen->pgm = defaults.getPgms()[0];
+    userScreen->tempo = defaults.getTempo() / 10.0;
+    userScreen->velo = defaults.getTrVelos()[0];
 }
 
 void NvRam::saveUserScreenValues(mpc::Mpc& mpc)

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <deque>
 
 #include "lcdgui/screens/Fwd.h"
 
@@ -33,6 +34,7 @@ namespace mpc::lcdgui {
 		mpc::Mpc& mpc;
 		std::unique_ptr<Component> root;
 		std::vector<std::vector<bool>> pixels = std::vector<std::vector<bool>>(248, std::vector<bool>(60));
+        std::deque<std::shared_ptr<ScreenComponent>> navigation;
 
 	public:
 		std::vector<std::vector<bool>> atlas;
@@ -69,10 +71,6 @@ namespace mpc::lcdgui {
 
 	private:
 		std::map<std::string, std::string> lastFocuses;
-		int focusedLayerIndex{ 0 };
-        std::shared_ptr<ScreenComponent> currentScreen;
-		std::string previousScreenName;
-        std::string screenToReturnToWhenPressingOpenWindow;
 
 	private:
 		FunctionKeys* getFunctionKeys();
@@ -87,9 +85,10 @@ namespace mpc::lcdgui {
 		std::string getLastFocus(std::string screenName);
 
         std::string getCurrentScreenName();
+		void setFunctionKeysArrangement(int arrangementIndex);
+
 		void setPreviousScreenName(std::string screenName);
 		std::string getPreviousScreenName();
-		void setFunctionKeysArrangement(int arrangementIndex);
 
         std::string getScreenToReturnToWhenPressingOpenWindow();
         void setScreenToReturnToWhenPressingOpenWindow(const std::string);
