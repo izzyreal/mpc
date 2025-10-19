@@ -266,7 +266,15 @@ void ClientInputController::handleButtonPress(const ClientInput& a)
         return;
     }
 
-    if (!button->press())
+    // Temporary hack. We actually want to synthesize repeat events ourselves, so we don't depend
+    // on host-generated repeats. This way the behaviour is the same for keyboard, mouse, touch and
+    // MIDI input.
+    static const auto allowRepeat = std::vector<ComponentId>{
+        ComponentId::CURSOR_UP, ComponentId::CURSOR_RIGHT_OR_DIGIT,
+            ComponentId::CURSOR_DOWN, ComponentId::CURSOR_LEFT_OR_DIGIT
+    };
+
+    if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(), a.componentId) == allowRepeat.end())
     {
         return;
     }
