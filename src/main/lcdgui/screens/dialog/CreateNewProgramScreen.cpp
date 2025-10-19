@@ -28,7 +28,7 @@ void CreateNewProgramScreen::openNameScreen()
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             newName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

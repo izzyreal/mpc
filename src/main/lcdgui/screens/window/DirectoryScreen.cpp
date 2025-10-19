@@ -132,7 +132,7 @@ void DirectoryScreen::function(int f)
             }
             
             disk->initFiles();
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
         };
 
         nameScreen->initialize(
@@ -187,7 +187,7 @@ void DirectoryScreen::function(int f)
                 counter++;
             }
 
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
             ls->setPreviousScreenName("load");
         };
 

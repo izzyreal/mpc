@@ -58,7 +58,7 @@ void ResampleScreen::openNameScreen()
             }
 
             setNewName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<ResampleScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

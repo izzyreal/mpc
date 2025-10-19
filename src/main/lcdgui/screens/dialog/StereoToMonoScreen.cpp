@@ -52,7 +52,7 @@ void StereoToMonoScreen::openNameScreen()
 
             if (isL) setNewLName(nameScreenName);
             else setNewRName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

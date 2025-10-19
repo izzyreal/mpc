@@ -111,7 +111,7 @@ void AutoChromaticAssignmentScreen::openNameScreen()
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             newName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

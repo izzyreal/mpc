@@ -80,7 +80,7 @@ void MonoToStereoScreen::openNameScreen()
             }
 
             newStName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<MonoToStereoScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

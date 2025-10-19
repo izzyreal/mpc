@@ -38,7 +38,7 @@ void MidiOutputScreen::openNameScreen()
 
         const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName) {
             sequencer.lock()->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

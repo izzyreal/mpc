@@ -64,7 +64,7 @@ void KeepOrRetryScreen::openNameScreen()
             }
 
             sampler->getPreviewSound()->setName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen(name);
+            mpc.getLayeredScreen()->openScreen<KeepOrRetryScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();

@@ -77,7 +77,7 @@ void CopySoundScreen::openNameScreen()
         }
 
         newName = nameScreenName;
-        mpc.getLayeredScreen()->openScreen(name);
+        mpc.getLayeredScreen()->openScreen<CopySoundScreen>();
     };
 
     const auto nameScreen = mpc.screens->get<NameScreen>();
