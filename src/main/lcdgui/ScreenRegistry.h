@@ -1,148 +1,150 @@
 #pragma once
+// Format: X(namespace_suffix, ClassName, "screen-name")
 
 #define SCREEN_LIST \
-    X(SequencerScreen, "sequencer") \
-    X(SequenceScreen, "sequence") \
-    X(TempoChangeScreen, "tempo-change") \
-    X(CountMetronomeScreen, "count-metronome") \
-    X(EditMultipleScreen, "edit-multiple") \
-    X(TransmitProgramChangesScreen, "transmit-program-changes") \
-    X(TimingCorrectScreen, "timing-correct") \
-    X(TimeDisplayScreen, "time-display") \
-    X(PasteEventScreen, "paste-event") \
-    X(MultiRecordingSetupScreen, "multi-recording-setup") \
-    X(MidiOutputScreen, "midi-output") \
-    X(MidiInputScreen, "midi-input") \
-    X(LoopBarsScreen, "loop-bars-window") \
-    X(InsertEventScreen, "insert-event") \
-    X(EraseAllOffTracksScreen, "erase-all-off-tracks") \
-    X(ChangeTsigScreen, "change-tsig") \
-    X(EditVelocityScreen, "edit-velocity") \
-    X(EraseScreen, "erase") \
-    X(ChangeBarsScreen, "change-bars") \
-    X(ChangeBars2Screen, "change-bars-2") \
-    X(TrackScreen, "track") \
-    X(Assign16LevelsScreen, "assign-16-levels") \
-    X(MidiInputMonitorScreen, "midi-input-monitor") \
-    X(MidiOutputMonitorScreen, "midi-output-monitor") \
-    X(MetronomeSoundScreen, "metronome-sound") \
-    X(CopySequenceScreen, "copy-sequence") \
-    X(CopyTrackScreen, "copy-track") \
-    X(DeleteSequenceScreen, "delete-sequence") \
-    X(DeleteTrackScreen, "delete-track") \
-    X(DeleteAllSequencesScreen, "delete-all-sequences") \
-    X(DeleteAllTracksScreen, "delete-all-tracks") \
-    X(NextSeqPadScreen, "next-seq-pad") \
-    X(NextSeqScreen, "next-seq") \
-    X(SongScreen, "song") \
-    X(TrMuteScreen, "track-mute") \
-    X(StepEditorScreen, "step-editor") \
-    X(EventsScreen, "events") \
-    X(BarsScreen, "bars") \
-    X(TrMoveScreen, "tr-move") \
-    X(UserScreen, "user") \
-    X(AssignScreen, "assign") \
-    X(StepTcScreen, "step-timing-correct") \
-    X(OthersScreen, "others") \
-    X(PurgeScreen, "purge") \
-    X(DrumScreen, "drum") \
-    X(TrimScreen, "trim") \
-    X(LoopScreen, "loop") \
-    X(ZoneScreen, "zone") \
-    X(NumberOfZonesScreen, "number-of-zones") \
-    X(SndParamsScreen, "params") \
-    X(PgmParamsScreen, "program-params") \
-    X(PgmAssignScreen, "program-assign") \
-    X(SelectDrumScreen, "select-drum") \
-    X(SampleScreen, "sample") \
-    X(SoundScreen, "sound") \
-    X(ConvertSoundScreen, "convert-sound") \
-    X(CopySoundScreen, "copy-sound") \
-    X(DeleteSoundScreen, "delete-sound") \
-    X(MonoToStereoScreen, "mono-to-stereo") \
-    X(ResampleScreen, "resample") \
-    X(StereoToMonoScreen, "stereo-to-mono") \
-    X(MixerScreen, "mixer") \
-    X(MixerSetupScreen, "mixer-setup") \
-    X(SelectMixerDrumScreen, "select-mixer-drum") \
-    X(FxEditScreen, "fx-edit") \
-    X(StartFineScreen, "start-fine") \
-    X(EndFineScreen, "end-fine") \
-    X(LoopToFineScreen, "loop-to-fine") \
-    X(LoopEndFineScreen, "loop-end-fine") \
-    X(ZoneStartFineScreen, "zone-start-fine") \
-    X(ZoneEndFineScreen, "zone-end-fine") \
-    X(ChannelSettingsScreen, "channel-settings") \
-    X(EditSoundScreen, "edit-sound") \
-    X(AssignmentViewScreen, "assignment-view") \
-    X(AutoChromaticAssignmentScreen, "auto-chromatic-assignment") \
-    X(CopyNoteParametersScreen, "copy-note-parameters") \
-    X(KeepOrRetryScreen, "keep-or-retry") \
-    X(MuteAssignScreen, "mute-assign") \
-    X(ProgramScreen, "program") \
-    X(VelocityModulationScreen, "velocity-modulation") \
-    X(VeloEnvFilterScreen, "velo-env-filter") \
-    X(VeloPitchScreen, "velo-pitch") \
-    X(InitPadAssignScreen, "init-pad-assign") \
-    X(CreateNewProgramScreen, "create-new-program") \
-    X(CopyProgramScreen, "copy-program") \
-    X(DeleteAllProgramsScreen, "delete-all-programs") \
-    X(DeleteAllSoundScreen, "delete-all-sound") \
-    X(DeleteProgramScreen, "delete-program") \
-    X(LoadScreen, "load") \
-    X(FormatScreen, "format") \
-    X(SetupScreen, "setup") \
-    X(SaveScreen, "save") \
-    X(DirectoryScreen, "directory") \
-    X(LoadAProgramScreen, "load-a-program") \
-    X(LoadASequenceScreen, "load-a-sequence") \
-    X(LoadASequenceFromAllScreen, "load-a-sequence-from-all") \
-    X(LoadASoundScreen, "load-a-sound") \
-    X(LoadApsFileScreen, "load-aps-file") \
-    X(Mpc2000XlAllFileScreen, "mpc2000xl-all-file") \
-    X(SaveAProgramScreen, "save-a-program") \
-    X(SaveASequenceScreen, "save-a-sequence") \
-    X(SaveASoundScreen, "save-a-sound") \
-    X(SaveAllFileScreen, "save-all-file") \
-    X(SaveApsFileScreen, "save-aps-file") \
-    X(DeleteAllFilesScreen, "delete-all-files") \
-    X(DeleteFileScreen, "delete-file") \
-    X(DeleteFolderScreen, "delete-folder") \
-    X(CantFindFileScreen, "cant-find-file") \
-    X(FileExistsScreen, "file-exists") \
-    X(NameScreen, "name") \
-    X(VmpcDisksScreen, "vmpc-disks") \
-    X(VmpcSettingsScreen, "vmpc-settings") \
-    X(VmpcDirectToDiskRecorderScreen, "vmpc-direct-to-disk-recorder") \
-    X(VmpcRecordJamScreen, "vmpc-record-jam") \
-    X(VmpcRecordingFinishedScreen, "vmpc-recording-finished") \
-    X(VerScreen, "ver") \
-    X(InitScreen, "init") \
-    X(SecondSeqScreen, "second-seq") \
-    X(TransScreen, "trans") \
-    X(TransposePermanentScreen, "transpose-permanent") \
-    X(PunchScreen, "punch") \
-    X(SyncScreen, "sync") \
-    X(PopupScreen, "popup") \
-    X(SoundMemoryScreen, "sound-memory") \
-    X(SongWindow, "song-window") \
-    X(VmpcFileInUseScreen, "vmpc-file-in-use") \
-    X(IgnoreTempoChangeScreen, "ignore-tempo-change") \
-    X(LoopSongScreen, "loop-song") \
-    X(DeleteSongScreen, "delete-song") \
-    X(DeleteAllSongScreen, "delete-all-song") \
-    X(CopySongScreen, "copy-song") \
-    X(VmpcKeyboardScreen, "vmpc-keyboard") \
-    X(VmpcMidiScreen, "vmpc-midi") \
-    X(VmpcResetKeyboardScreen, "vmpc-reset-keyboard") \
-    X(VmpcDiscardMappingChangesScreen, "vmpc-discard-mapping-changes") \
-    X(VmpcAutoSaveScreen, "vmpc-auto-save") \
-    X(MidiSwScreen, "midi-sw") \
-    X(VmpcConvertAndLoadWavScreen, "vmpc-convert-and-load-wav") \
-    X(StepEditOptionsScreen, "step-edit-options") \
-    X(VmpcMidiPresetsScreen, "vmpc-midi-presets") \
-    X(VmpcWarningSettingsIgnoredScreen, "vmpc-warning-settings-ignored") \
-    X(VmpcKnownControllerDetectedScreen, "vmpc-known-controller-detected") \
-    X(VmpcContinuePreviousSessionScreen, "vmpc-continue-previous-session") \
-    X(ConvertSongToSeqScreen, "convert-song-to-seq") \
-    X(LocateScreen, "locate")
+    X(screens, SequencerScreen, "sequencer") \
+    X(screens::window, SequenceScreen, "sequence") \
+    X(screens::window, TempoChangeScreen, "tempo-change") \
+    X(screens::window, CountMetronomeScreen, "count-metronome") \
+    X(screens::window, EditMultipleScreen, "edit-multiple") \
+    X(screens::window, TransmitProgramChangesScreen, "transmit-program-changes") \
+    X(screens::window, TimingCorrectScreen, "timing-correct") \
+    X(screens::window, TimeDisplayScreen, "time-display") \
+    X(screens::window, PasteEventScreen, "paste-event") \
+    X(screens::window, MultiRecordingSetupScreen, "multi-recording-setup") \
+    X(screens::window, MidiOutputScreen, "midi-output") \
+    X(screens::window, MidiInputScreen, "midi-input") \
+    X(screens::window, LoopBarsScreen, "loop-bars-window") \
+    X(screens::window, InsertEventScreen, "insert-event") \
+    X(screens::window, EraseAllOffTracksScreen, "erase-all-off-tracks") \
+    X(screens::window, ChangeTsigScreen, "change-tsig") \
+    X(screens::window, EditVelocityScreen, "edit-velocity") \
+    X(screens::window, EraseScreen, "erase") \
+    X(screens::window, ChangeBarsScreen, "change-bars") \
+    X(screens::window, ChangeBars2Screen, "change-bars-2") \
+    X(screens::window, TrackScreen, "track") \
+    X(screens::window, Assign16LevelsScreen, "assign-16-levels") \
+    X(screens::dialog, MidiInputMonitorScreen, "midi-input-monitor") \
+    X(screens::dialog, MidiOutputMonitorScreen, "midi-output-monitor") \
+    X(screens::dialog, MetronomeSoundScreen, "metronome-sound") \
+    X(screens::dialog, CopySequenceScreen, "copy-sequence") \
+    X(screens::dialog, CopyTrackScreen, "copy-track") \
+    X(screens::dialog, DeleteSequenceScreen, "delete-sequence") \
+    X(screens::dialog, DeleteTrackScreen, "delete-track") \
+    X(screens::dialog, DeleteAllSequencesScreen, "delete-all-sequences") \
+    X(screens::dialog, DeleteAllTracksScreen, "delete-all-tracks") \
+    X(screens, NextSeqPadScreen, "next-seq-pad") \
+    X(screens, NextSeqScreen, "next-seq") \
+    X(screens, SongScreen, "song") \
+    X(screens, TrMuteScreen, "track-mute") \
+    X(screens, StepEditorScreen, "step-editor") \
+    X(screens, EventsScreen, "events") \
+    X(screens, BarsScreen, "bars") \
+    X(screens, TrMoveScreen, "tr-move") \
+    X(screens, UserScreen, "user") \
+    X(screens, AssignScreen, "assign") \
+    X(screens::window, StepTcScreen, "step-timing-correct") \
+    X(screens, OthersScreen, "others") \
+    X(screens, PurgeScreen, "purge") \
+    X(screens, DrumScreen, "drum") \
+    X(screens, TrimScreen, "trim") \
+    X(screens, LoopScreen, "loop") \
+    X(screens, ZoneScreen, "zone") \
+    X(screens::window, NumberOfZonesScreen, "number-of-zones") \
+    X(screens, SndParamsScreen, "params") \
+    X(screens, PgmParamsScreen, "program-params") \
+    X(screens, PgmAssignScreen, "program-assign") \
+    X(screens, SelectDrumScreen, "select-drum") \
+    X(screens, SampleScreen, "sample") \
+    X(screens::window, SoundScreen, "sound") \
+    X(screens::dialog, ConvertSoundScreen, "convert-sound") \
+    X(screens::dialog, CopySoundScreen, "copy-sound") \
+    X(screens::dialog, DeleteSoundScreen, "delete-sound") \
+    X(screens::dialog, MonoToStereoScreen, "mono-to-stereo") \
+    X(screens::dialog, ResampleScreen, "resample") \
+    X(screens::dialog, StereoToMonoScreen, "stereo-to-mono") \
+    X(screens, MixerScreen, "mixer") \
+    X(screens, MixerSetupScreen, "mixer-setup") \
+    X(screens, SelectMixerDrumScreen, "select-mixer-drum") \
+    X(screens, FxEditScreen, "fx-edit") \
+    X(screens::window, StartFineScreen, "start-fine") \
+    X(screens::window, EndFineScreen, "end-fine") \
+    X(screens::window, LoopToFineScreen, "loop-to-fine") \
+    X(screens::window, LoopEndFineScreen, "loop-end-fine") \
+    X(screens::window, ZoneStartFineScreen, "zone-start-fine") \
+    X(screens::window, ZoneEndFineScreen, "zone-end-fine") \
+    X(screens::window, ChannelSettingsScreen, "channel-settings") \
+    X(screens::window, EditSoundScreen, "edit-sound") \
+    X(screens::window, AssignmentViewScreen, "assignment-view") \
+    X(screens::window, AutoChromaticAssignmentScreen, "auto-chromatic-assignment") \
+    X(screens::window, CopyNoteParametersScreen, "copy-note-parameters") \
+    X(screens::window, KeepOrRetryScreen, "keep-or-retry") \
+    X(screens::window, MuteAssignScreen, "mute-assign") \
+    X(screens::window, ProgramScreen, "program") \
+    X(screens::window, VelocityModulationScreen, "velocity-modulation") \
+    X(screens::window, VeloEnvFilterScreen, "velo-env-filter") \
+    X(screens::window, VeloPitchScreen, "velo-pitch") \
+    X(screens::window, InitPadAssignScreen, "init-pad-assign") \
+    X(screens::dialog, CreateNewProgramScreen, "create-new-program") \
+    X(screens::dialog, CopyProgramScreen, "copy-program") \
+    X(screens::dialog, DeleteAllProgramsScreen, "delete-all-programs") \
+    X(screens::dialog, DeleteAllSoundScreen, "delete-all-sound") \
+    X(screens::dialog, DeleteProgramScreen, "delete-program") \
+    X(screens, LoadScreen, "load") \
+    X(screens, FormatScreen, "format") \
+    X(screens, SetupScreen, "setup") \
+    X(screens, SaveScreen, "save") \
+    X(screens::window, DirectoryScreen, "directory") \
+    X(screens::window, LoadAProgramScreen, "load-a-program") \
+    X(screens::window, LoadASequenceScreen, "load-a-sequence") \
+    X(screens::window, LoadASequenceFromAllScreen, "load-a-sequence-from-all") \
+    X(screens::window, LoadASoundScreen, "load-a-sound") \
+    X(screens::window, LoadApsFileScreen, "load-aps-file") \
+    X(screens::window, Mpc2000XlAllFileScreen, "mpc2000xl-all-file") \
+    X(screens::window, SaveAProgramScreen, "save-a-program") \
+    X(screens::window, SaveASequenceScreen, "save-a-sequence") \
+    X(screens::window, SaveASoundScreen, "save-a-sound") \
+    X(screens::window, SaveAllFileScreen, "save-all-file") \
+    X(screens::window, SaveApsFileScreen, "save-aps-file") \
+    X(screens::window, TransposePermanentScreen, "transpose-permanent") \
+    X(screens::dialog2, DeleteAllFilesScreen, "delete-all-files") \
+    X(screens::dialog, DeleteFileScreen, "delete-file") \
+    X(screens::dialog, DeleteFolderScreen, "delete-folder") \
+    X(screens::window, CantFindFileScreen, "cant-find-file") \
+    X(screens::dialog, FileExistsScreen, "file-exists") \
+    X(screens::window, NameScreen, "name") \
+    X(screens, VmpcDisksScreen, "vmpc-disks") \
+    X(screens, VmpcSettingsScreen, "vmpc-settings") \
+    X(screens::window, VmpcDirectToDiskRecorderScreen, "vmpc-direct-to-disk-recorder") \
+    X(screens::dialog, VmpcRecordJamScreen, "vmpc-record-jam") \
+    X(screens::window, VmpcRecordingFinishedScreen, "vmpc-recording-finished") \
+    X(screens::window, VmpcResetKeyboardScreen, "vmpc-reset-keyboard") \
+    X(screens, VerScreen, "ver") \
+    X(screens, InitScreen, "init") \
+    X(screens, SecondSeqScreen, "second-seq") \
+    X(screens, TransScreen, "trans") \
+    X(screens, PunchScreen, "punch") \
+    X(screens, SyncScreen, "sync") \
+    X(screens::dialog2, PopupScreen, "popup") \
+    X(screens::window, SoundMemoryScreen, "sound-memory") \
+    X(screens::window, SongWindow, "song-window") \
+    X(screens::dialog, VmpcFileInUseScreen, "vmpc-file-in-use") \
+    X(screens::window, IgnoreTempoChangeScreen, "ignore-tempo-change") \
+    X(screens::window, LoopSongScreen, "loop-song") \
+    X(screens::dialog, DeleteSongScreen, "delete-song") \
+    X(screens::dialog, DeleteAllSongScreen, "delete-all-song") \
+    X(screens::dialog, CopySongScreen, "copy-song") \
+    X(screens, VmpcKeyboardScreen, "vmpc-keyboard") \
+    X(screens, VmpcMidiScreen, "vmpc-midi") \
+    X(screens::window, VmpcDiscardMappingChangesScreen, "vmpc-discard-mapping-changes") \
+    X(screens, VmpcAutoSaveScreen, "vmpc-auto-save") \
+    X(screens, MidiSwScreen, "midi-sw") \
+    X(screens::window, VmpcConvertAndLoadWavScreen, "vmpc-convert-and-load-wav") \
+    X(screens::window, StepEditOptionsScreen, "step-edit-options") \
+    X(screens::window, VmpcMidiPresetsScreen, "vmpc-midi-presets") \
+    X(screens::window, VmpcWarningSettingsIgnoredScreen, "vmpc-warning-settings-ignored") \
+    X(screens::window, VmpcKnownControllerDetectedScreen, "vmpc-known-controller-detected") \
+    X(screens::window, VmpcContinuePreviousSessionScreen, "vmpc-continue-previous-session") \
+    X(screens::window, ConvertSongToSeqScreen, "convert-song-to-seq") \
+    X(screens::window, LocateScreen, "locate")
+
