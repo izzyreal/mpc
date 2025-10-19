@@ -2,6 +2,8 @@
 
 #include "Logger.hpp"
 
+#include "lcdgui/ScreenNames.h"
+
 #include <lcdgui/Component.hpp>
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Info.hpp>
@@ -178,6 +180,20 @@ using namespace rapidjson;
 Screens::Screens(mpc::Mpc &mpc)
         : mpc(mpc)
 {
+}
+
+void Screens::createAndCacheAllScreens()
+{
+    for (auto screenName : screenNames)
+    {
+        if (std::find(knownUnimplementedScreens.begin(), knownUnimplementedScreens.end(), screenName) != knownUnimplementedScreens.end())
+        {
+            continue;
+        }
+        getOrCreateScreenComponent(screenName);
+    }
+
+    MLOG("Created and cached " + std::to_string(screens.size()) + " screens.");
 }
 
 std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()

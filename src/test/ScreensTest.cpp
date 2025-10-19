@@ -11,10 +11,8 @@
 #include <vector>
 #include <string>
 
-std::vector<std::string> knownProblematicScreens {
+inline const std::vector<std::string> knownProblematicScreens {
     "tempo-change", // Crashes when opened in test, works fine in app
-    "format", // missing from json layouts
-    "setup" // missing from json layouts
 };
 
 SCENARIO("All screens can be opened", "[gui]") {
@@ -39,6 +37,11 @@ SCENARIO("All screens can be opened", "[gui]") {
 
 		for (auto& screenName : screenNames)
 		{
+            if (std::find(knownUnimplementedScreens.begin(), knownUnimplementedScreens.end(), screenName) != knownUnimplementedScreens.end())
+            {
+                printf("Fix this known unimplemented screen asap: '%s'\n", screenName.c_str());
+                continue;
+            }
             if (std::find(knownProblematicScreens.begin(), knownProblematicScreens.end(), screenName) != knownProblematicScreens.end())
             {
                 printf("Fix this known problematic screen asap: '%s'\n", screenName.c_str());

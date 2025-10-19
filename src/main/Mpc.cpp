@@ -144,12 +144,9 @@ void Mpc::init()
     
     mpc::nvram::NvRam::loadUserScreenValues(*this);
     
-    // We fetch all screens once so they're all cached in Screens,
-    // avoiding memory allocations on the audio thread.
-    for (auto& screenName : screenNames)
-    {
-        screens->getOrCreateScreenComponent(screenName);
-    }
+    // We create all screens once so they're all cached in mpc::lcdgui::Screens,
+    // avoiding memory allocations and I/O on the audio thread.
+    screens->createAndCacheAllScreens();
     
     mpc::nvram::MidiControlPersistence::restoreLastState(*this);
     

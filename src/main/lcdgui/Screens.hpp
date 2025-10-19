@@ -30,6 +30,8 @@ namespace mpc::lcdgui{
 
             std::shared_ptr<ScreenComponent> getOrCreateScreenComponent(const std::string& screenName);
 
+            void createAndCacheAllScreens();
+
         private:
             struct ScreenLayout
             {
@@ -38,8 +40,6 @@ namespace mpc::lcdgui{
                 std::vector<std::shared_ptr<Component>> components;
                 std::map<std::string, std::vector<std::string>> transferMap;
             };
-
-            static std::vector<std::string> zoomScreenNames;
 
             mpc::Mpc& mpc;
 

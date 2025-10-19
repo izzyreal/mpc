@@ -3,6 +3,11 @@
 #include <vector>
 #include <string>
 
+inline const std::vector<std::string> knownUnimplementedScreens {
+    "format", // missing from json layouts
+    "setup" // missing from json layouts
+};
+
 inline const std::vector<std::string> screenNames {
     "sequencer",
     "sequence",
