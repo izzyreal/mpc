@@ -75,7 +75,8 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 
 std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen()
 {
-	return currentScreen;
+    assert(!navigation.empty());
+	return navigation.back();
 }
 
 using OpenScreenFunc = std::function<void(LayeredScreen&)>;
@@ -97,12 +98,20 @@ void LayeredScreen::openScreen(const std::string name)
 template <typename T>
 void LayeredScreen::openScreen()
 {
-	if (std::dynamic_pointer_cast<T>(currentScreen))
+	if (!navigation.empty() && std::dynamic_pointer_cast<T>(navigation.back()))
     {
         return;
     }
 
-    const auto oldFocusedLayerIndex = focusedLayerIndex;
+    if (!navigation.empty())
+    {
+        for (int i = 0; i < navigation.size(); i++)
+        {
+            assert(navigation[i]->getLayerIndex() == i);
+        }
+    }
+
+    //const auto oldFocusedLayerIndex = focusedLayerIndex;
 
     auto newScreen = mpc.screens->get<T>();
 
@@ -112,28 +121,44 @@ void LayeredScreen::openScreen()
     {
         return;
     }
-    
+
 	auto ams = mpc.getAudioMidiServices();
 
-    if (std::dynamic_pointer_cast<SongScreen>(currentScreen) && mpc.getSequencer()->isPlaying())
+    if (!navigation.empty())
     {
-        return;
-    }
-    else if (std::dynamic_pointer_cast<SampleScreen>(currentScreen))
-	{
-		ams->muteMonitor(true);
-		ams->getSoundRecorder()->setSampleScreenActive(false);
-	}
-    else if (std::dynamic_pointer_cast<EraseScreen>(currentScreen) ||
-             std::dynamic_pointer_cast<TimingCorrectScreen>(currentScreen))
-    {
-        // This field may not be visible the next time we visit this screen.
-        // Like the real 2KXL we always set focus to the first Notes: field
-        // if the current focus is hte second Notes: field.
-        if (getFocusedFieldName() == "note1")
+        if (std::dynamic_pointer_cast<SongScreen>(navigation.back()) && mpc.getSequencer()->isPlaying())
         {
-            setFocus("note0");
+            return;
         }
+        else if (std::dynamic_pointer_cast<SampleScreen>(navigation.back()))
+        {
+            ams->muteMonitor(true);
+            ams->getSoundRecorder()->setSampleScreenActive(false);
+        }
+        else if (std::dynamic_pointer_cast<EraseScreen>(navigation.back()) ||
+                 std::dynamic_pointer_cast<TimingCorrectScreen>(navigation.back()))
+        {
+            // This field may not be visible the next time we visit this screen.
+            // Like the real 2KXL we always set focus to the first Notes: field
+            // if the current focus is the second Notes: field.
+            if (getFocusedFieldName() == "note1")
+            {
+                setFocus("note0");
+            }
+        }
+
+        auto focusedFieldName = getFocusedFieldName();
+        auto focus = getFocusedLayer()->findField(focusedFieldName);
+
+        setLastFocus(navigation.back()->getName(), focusedFieldName);
+
+        if (focus)
+        {
+            focus->loseFocus("");
+        }
+
+        navigation.back()->close();
+        getFocusedLayer()->removeChild(navigation.back());
     }
 
     if (auto sampleScreen = std::dynamic_pointer_cast<SampleScreen>(newScreen); sampleScreen)
@@ -149,56 +174,49 @@ void LayeredScreen::openScreen()
         mpc.getPadAndButtonKeyboard()->resetUpperCase();
     }
 
-    if (currentScreen)
+    if (!navigation.empty() && newScreen->getLayerIndex() == navigation.back()->getLayerIndex())
     {
-        auto focusedFieldName = getFocusedFieldName();
-        auto focus = getFocusedLayer()->findField(focusedFieldName);
+        navigation.pop_back();
+        navigation.push_back(newScreen);
+    }
+    else if (!navigation.empty() && newScreen->getLayerIndex() < navigation.back()->getLayerIndex())
+    {
+        const int diff = navigation.back()->getLayerIndex() - newScreen->getLayerIndex();
 
-        setLastFocus(currentScreen->getName(), focusedFieldName);
-
-        if (focus)
+        for (int i = 0; i < diff; i++)
         {
-            focus->loseFocus("");
+            navigation.pop_back();
         }
-    }
 
-    if (!std::dynamic_pointer_cast<PopupScreen>(currentScreen))
+        assert(!navigation.empty());
+
+        navigation.pop_back();
+        navigation.push_back(newScreen);
+    }
+    else
     {
-        if (currentScreen)
-        {
-            previousScreenName = currentScreen->getName();
-        }
+        navigation.push_back(newScreen);
     }
 
-	if (currentScreen)
-	{
-		currentScreen->close();
-		getFocusedLayer()->removeChild(currentScreen);
-	}
+	getFocusedLayer()->addChild(navigation.back());
 
-    currentScreen = newScreen;
-
-	focusedLayerIndex = currentScreen->getLayerIndex();
-
-	getFocusedLayer()->addChild(currentScreen);
-
-	if (currentScreen->findFields().size() > 0)
+	if (navigation.back()->findFields().size() > 0)
     {
-		returnToLastFocus(currentScreen->getFirstField());
+		returnToLastFocus(navigation.back()->getFirstField());
     }
 
-	currentScreen->open();
+	navigation.back()->open();
 
 	const std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
 
-	const auto isOverdubScreen = std::find(overdubScreens.begin(), overdubScreens.end(), currentScreen->getName()) != overdubScreens.end();
+	const auto isOverdubScreen = std::find(overdubScreens.begin(), overdubScreens.end(), navigation.back()->getName()) != overdubScreens.end();
 	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(isOverdubScreen);
 
 	const std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
 
-	const auto isNextSeqScreen = std::find(nextSeqScreens.begin(), nextSeqScreens.end(), currentScreen->getName()) != nextSeqScreens.end();
+	const auto isNextSeqScreen = std::find(nextSeqScreens.begin(), nextSeqScreens.end(), navigation.back()->getName()) != nextSeqScreens.end();
 	
-	if (!isNextSeqScreen || (std::dynamic_pointer_cast<SequencerScreen>(currentScreen) && !mpc.getSequencer()->isPlaying()))
+	if (!isNextSeqScreen || (std::dynamic_pointer_cast<SequencerScreen>(navigation.back()) && !mpc.getSequencer()->isPlaying()))
     {
         if (mpc.getSequencer()->getNextSq() != -1)
         {
@@ -206,9 +224,9 @@ void LayeredScreen::openScreen()
         }
     }
 
-    if (focusedLayerIndex < oldFocusedLayerIndex)
+    //if (focusedLayerIndex < oldFocusedLayerIndex)
     {
-        clearScreenToReturnToWhenPressingOpenWindow();
+        //clearScreenToReturnToWhenPressingOpenWindow();
     }
 }
 
@@ -258,11 +276,12 @@ void LayeredScreen::setCurrentBackground(std::string s)
 
 void LayeredScreen::returnToLastFocus(std::string firstFieldOfCurrentScreen)
 {
-    auto lastFocus = lastFocuses.find(currentScreen->getName());
+    assert(!navigation.empty());
+    auto lastFocus = lastFocuses.find(navigation.back()->getName());
     
     if (lastFocus == end(lastFocuses))
     {
-        lastFocuses[currentScreen->getName()] = firstFieldOfCurrentScreen;
+        lastFocuses[navigation.back()->getName()] = firstFieldOfCurrentScreen;
         setFocus(firstFieldOfCurrentScreen);
         return;
     }
@@ -287,38 +306,38 @@ std::string LayeredScreen::getLastFocus(std::string screenName)
 
 std::string LayeredScreen::getCurrentScreenName()
 {
-    if (!currentScreen)
+    if (navigation.empty())
     {
         return "";
     }
 
-	return currentScreen->getName();
-}
-
-void LayeredScreen::setPreviousScreenName(std::string screenName)
-{
-	previousScreenName = screenName;
-}
-
-std::string LayeredScreen::getPreviousScreenName()
-{
-	return previousScreenName;
+	return navigation.back()->getName();
 }
 
 int LayeredScreen::getFocusedLayerIndex()
 {
-	return focusedLayerIndex;
+    if (navigation.empty())
+    {
+        return -1;
+    }
+
+	return navigation.back()->getLayerIndex();
 }
 
 std::shared_ptr<Layer> LayeredScreen::getFocusedLayer()
 {
-	return layers[focusedLayerIndex];
+	return layers[getFocusedLayerIndex()];
 }
 
 bool LayeredScreen::transfer(int direction)
 {
+    if (navigation.empty())
+    {
+        return false;
+    }
+
 	auto currentFocus = getFocusedLayer()->findField(getFocusedFieldName());
-	auto transferMap = currentScreen->getTransferMap();
+	auto transferMap = navigation.back()->getTransferMap();
 	auto mapCandidate = transferMap.find(currentFocus->getName());
 
 	if (mapCandidate == end(transferMap))
@@ -599,26 +618,37 @@ FunctionKeys* LayeredScreen::getFunctionKeys()
 	return getFocusedLayer()->getFunctionKeys();
 }
 
-std::string LayeredScreen::getScreenToReturnToWhenPressingOpenWindow()
-{
-    return screenToReturnToWhenPressingOpenWindow;
-}
-
-void LayeredScreen::setScreenToReturnToWhenPressingOpenWindow(const std::string screenToUse)
-{
-    screenToReturnToWhenPressingOpenWindow = screenToUse;
-}
-
-void LayeredScreen::clearScreenToReturnToWhenPressingOpenWindow()
-{
-    screenToReturnToWhenPressingOpenWindow.clear();
-}
-
 std::shared_ptr<Field> LayeredScreen::getFocusedField()
 {
     const auto focusedLayer = getFocusedLayer();
     const auto focusedFieldName = focusedLayer->getFocus();
     return focusedLayer->findField(focusedFieldName);
+}
+
+void LayeredScreen::setPreviousScreenName(std::string screenName)
+{
+	//previousScreenName = screenName;
+}
+
+std::string LayeredScreen::getPreviousScreenName()
+{
+	if (navigation.size() < 2) return "";
+    return navigation[navigation.size() - 2]->getName();
+}
+
+std::string LayeredScreen::getScreenToReturnToWhenPressingOpenWindow()
+{
+    return getPreviousScreenName();
+}
+
+void LayeredScreen::setScreenToReturnToWhenPressingOpenWindow(const std::string screenToUse)
+{
+    //screenToReturnToWhenPressingOpenWindow = screenToUse;
+}
+
+void LayeredScreen::clearScreenToReturnToWhenPressingOpenWindow()
+{
+    //screenToReturnToWhenPressingOpenWindow.clear();
 }
 
 #define X(ns, Class, name) template void LayeredScreen::openScreen<mpc::lcdgui::ns::Class>();
