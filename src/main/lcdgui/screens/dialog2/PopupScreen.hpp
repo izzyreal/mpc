@@ -21,7 +21,6 @@ namespace mpc::lcdgui::screens::dialog2
 
 		void returnToScreenAfterMilliSeconds(const std::string& screenName, const int delayInMs);
 		void setScreenToReturnTo(const std::string& screenName);
-        std::string getScreenToReturnTo() const;
 
 	private:
 		std::thread returnToScreenThread;
