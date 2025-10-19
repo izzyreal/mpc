@@ -44,7 +44,7 @@ void AutoChromaticAssignmentScreen::function(int i)
     switch (i)
     {
         case 3:
-        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            mpc.getLayeredScreen()->closeWindow();
             break;
         case 4:
         {

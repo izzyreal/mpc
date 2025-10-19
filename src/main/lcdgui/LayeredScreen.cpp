@@ -117,11 +117,11 @@ void LayeredScreen::openScreen()
 
     assert(newScreen);
 
-    if (!newScreen)
-    {
-        return;
-    }
+    if (newScreen) openScreenInternal(newScreen);
+}
 
+void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScreen)
+{
 	auto ams = mpc.getAudioMidiServices();
 
     if (!navigation.empty())
@@ -228,6 +228,13 @@ void LayeredScreen::openScreen()
     {
         //clearScreenToReturnToWhenPressingOpenWindow();
     }
+}
+
+void LayeredScreen::closeWindow()
+{
+    assert(navigation.size() > 1);
+    navigation.pop_back();
+    openScreenInternal(navigation.back());
 }
 
 std::vector<std::vector<bool>>* LayeredScreen::getPixels()

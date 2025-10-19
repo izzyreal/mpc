@@ -161,10 +161,9 @@ void ClientInputController::handlePadPress(const ClientInput &input)
         opensNameScreen->openNameScreen();
     }
 
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
-        popupScreen && !popupScreen->getScreenToReturnTo().empty())
+    if (std::dynamic_pointer_cast<PopupScreen>(screen))
     {
-        layeredScreen->openScreen(popupScreen->getScreenToReturnTo());
+        layeredScreen->closeWindow();
     }
 }
 
@@ -311,10 +310,9 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
         }
     }
 
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
-        popupScreen && !popupScreen->getScreenToReturnTo().empty())
+    if (std::dynamic_pointer_cast<PopupScreen>(screen))
     {
-        layeredScreen->openScreen(popupScreen->getScreenToReturnTo());
+        layeredScreen->closeWindow();
         return;
     }
 

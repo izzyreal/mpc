@@ -69,8 +69,12 @@ namespace mpc::lcdgui {
 
 		std::shared_ptr<ScreenComponent> getCurrentScreen();
 
+        void closeWindow();
+
 	private:
 		std::map<std::string, std::string> lastFocuses;
+
+        void openScreenInternal(std::shared_ptr<ScreenComponent>);
 
 	private:
 		FunctionKeys* getFunctionKeys();

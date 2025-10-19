@@ -51,8 +51,6 @@ void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
     ApsLoader::loadFromParsedAps(apsParser, mpc, withoutSounds);
     
     mpc.getSampler()->setSoundIndex(0);
-    
-    mpc.getLayeredScreen()->openScreen<LoadScreen>();
 }
 
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless, bool withoutSounds)

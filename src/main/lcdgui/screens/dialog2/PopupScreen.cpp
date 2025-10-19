@@ -39,18 +39,14 @@ void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName,
 
 	returnToScreenThread = std::thread([screenName, delayInMs, layeredScreen]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(delayInMs));
-		layeredScreen->openScreen(screenName);
+		//layeredScreen->openScreen(screenName);
+        layeredScreen->closeWindow();
 	});
 }
 
 void PopupScreen::setScreenToReturnTo(const std::string& screenName)
 {
 	screenToReturnTo = screenName;
-}
-
-std::string PopupScreen::getScreenToReturnTo() const
-{
-    return screenToReturnTo;
 }
 
 PopupScreen::~PopupScreen()

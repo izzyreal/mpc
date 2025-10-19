@@ -69,7 +69,7 @@ void StereoToMonoScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
+        mpc.getLayeredScreen()->closeWindow();
 		break;
 	case 4:
 	{
@@ -85,7 +85,7 @@ void StereoToMonoScreen::function(int i)
 				auto popupScreen = mpc.screens->get<PopupScreen>();
 				popupScreen->setText("Name already used");
 				popupScreen->setScreenToReturnTo(name);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+                mpc.getLayeredScreen()->openScreen<PopupScreen>();
 				return;
 			}
 		}
@@ -122,7 +122,7 @@ void StereoToMonoScreen::function(int i)
 		
 		left->setEnd(left->getSampleData()->size());
 		right->setEnd(right->getSampleData()->size());
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
+        mpc.getLayeredScreen()->closeWindow();
 		
 		break;
 	}
