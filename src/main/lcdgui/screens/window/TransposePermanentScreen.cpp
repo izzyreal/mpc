@@ -52,7 +52,7 @@ void TransposePermanentScreen::function(int i)
 			}
 		}
 		transScreen->setTransposeAmount(0);
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 }

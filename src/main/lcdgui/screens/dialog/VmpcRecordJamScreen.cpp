@@ -21,7 +21,7 @@ void VmpcRecordJamScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("vmpc-direct-to-disk-recorder");
+        mpc.getLayeredScreen()->openScreen<VmpcDirectToDiskRecorderScreen>();
 		break;
 	case 4:
 	{
@@ -34,12 +34,12 @@ void VmpcRecordJamScreen::function(int i)
 
 		if (ams->prepareBouncing(settings.get()))
 		{
-			openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 			ams->startBouncing();
 		}
 		else
 		{
-			openScreen("vmpc-file-in-use");
+        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
 		}
 
 		break;

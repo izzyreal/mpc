@@ -66,7 +66,7 @@ void BarsScreen::function(int j)
         case 2:
         case 3:
             eventsScreen->tab = j;
-            openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         case 4:
             break;
@@ -74,7 +74,7 @@ void BarsScreen::function(int j)
         {
             copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
             sequencer.lock()->setActiveSequenceIndex(eventsScreen->toSq);
-            openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         }
     }

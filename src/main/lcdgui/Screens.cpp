@@ -3,6 +3,7 @@
 #include "Logger.hpp"
 
 #include "lcdgui/ScreenNames.h"
+#include "lcdgui/AllScreens.h"
 
 #include <lcdgui/Component.hpp>
 #include <lcdgui/Parameter.hpp>
@@ -10,156 +11,6 @@
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <lcdgui/screens/SequencerScreen.hpp>
-#include <lcdgui/screens/AssignScreen.hpp>
-#include <lcdgui/screens/BarsScreen.hpp>
-#include <lcdgui/screens/EventsScreen.hpp>
-#include <lcdgui/screens/NextSeqPadScreen.hpp>
-#include <lcdgui/screens/NextSeqScreen.hpp>
-#include <lcdgui/screens/SongScreen.hpp>
-#include <lcdgui/screens/StepEditorScreen.hpp>
-#include <lcdgui/screens/TrMoveScreen.hpp>
-#include <lcdgui/screens/TrMuteScreen.hpp>
-#include <lcdgui/screens/UserScreen.hpp>
-#include <lcdgui/screens/OthersScreen.hpp>
-#include <lcdgui/screens/DrumScreen.hpp>
-#include <lcdgui/screens/LoopScreen.hpp>
-#include <lcdgui/screens/PgmAssignScreen.hpp>
-#include <lcdgui/screens/PgmParamsScreen.hpp>
-#include <lcdgui/screens/PurgeScreen.hpp>
-#include <lcdgui/screens/SampleScreen.hpp>
-#include <lcdgui/screens/SelectDrumScreen.hpp>
-#include <lcdgui/screens/SndParamsScreen.hpp>
-#include <lcdgui/screens/TrimScreen.hpp>
-#include <lcdgui/screens/ZoneScreen.hpp>
-#include <lcdgui/screens/MixerScreen.hpp>
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/screens/FxEditScreen.hpp>
-#include <lcdgui/screens/SelectMixerDrumScreen.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/FormatScreen.hpp>
-#include <lcdgui/screens/SetupScreen.hpp>
-#include <lcdgui/screens/SaveScreen.hpp>
-#include <lcdgui/screens/VerScreen.hpp>
-#include <lcdgui/screens/InitScreen.hpp>
-#include <lcdgui/screens/SecondSeqScreen.hpp>
-#include <lcdgui/screens/TransScreen.hpp>
-#include <lcdgui/screens/PunchScreen.hpp>
-#include <lcdgui/screens/SyncScreen.hpp>
-#include <lcdgui/screens/MidiSwScreen.hpp>
-
-#include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
-#include <lcdgui/screens/window/InitPadAssignScreen.hpp>
-#include <lcdgui/screens/window/SequenceScreen.hpp>
-#include <lcdgui/screens/window/TempoChangeScreen.hpp>
-#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
-#include <lcdgui/screens/window/EditMultipleScreen.hpp>
-#include <lcdgui/screens/window/TransmitProgramChangesScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/TimeDisplayScreen.hpp>
-#include <lcdgui/screens/window/PasteEventScreen.hpp>
-#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
-#include <lcdgui/screens/window/MidiOutputScreen.hpp>
-#include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/window/LoopBarsScreen.hpp>
-#include <lcdgui/screens/window/InsertEventScreen.hpp>
-#include <lcdgui/screens/window/EraseAllOffTracksScreen.hpp>
-#include <lcdgui/screens/window/ChangeTsigScreen.hpp>
-#include <lcdgui/screens/window/EditVelocityScreen.hpp>
-#include <lcdgui/screens/window/EraseScreen.hpp>
-#include <lcdgui/screens/window/ChangeBarsScreen.hpp>
-#include <lcdgui/screens/window/ChangeBars2Screen.hpp>
-#include <lcdgui/screens/window/TrackScreen.hpp>
-#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
-#include <lcdgui/screens/window/StepTcScreen.hpp>
-#include <lcdgui/screens/window/SoundScreen.hpp>
-#include <lcdgui/screens/window/StartFineScreen.hpp>
-#include <lcdgui/screens/window/EndFineScreen.hpp>
-#include <lcdgui/screens/window/LoopToFineScreen.hpp>
-#include <lcdgui/screens/window/LoopEndFineScreen.hpp>
-#include <lcdgui/screens/window/ZoneStartFineScreen.hpp>
-#include <lcdgui/screens/window/ZoneEndFineScreen.hpp>
-#include <lcdgui/screens/window/ChannelSettingsScreen.hpp>
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/screens/window/AssignmentViewScreen.hpp>
-#include <lcdgui/screens/window/AutoChromaticAssignmentScreen.hpp>
-#include <lcdgui/screens/window/CopyNoteParametersScreen.hpp>
-#include <lcdgui/screens/window/KeepOrRetryScreen.hpp>
-#include <lcdgui/screens/window/MuteAssignScreen.hpp>
-#include <lcdgui/screens/window/ProgramScreen.hpp>
-#include <lcdgui/screens/window/VelocityModulationScreen.hpp>
-#include <lcdgui/screens/window/VeloEnvFilterScreen.hpp>
-#include <lcdgui/screens/window/VeloPitchScreen.hpp>
-#include <lcdgui/screens/window/DirectoryScreen.hpp>
-#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
-#include <lcdgui/screens/window/LoadASequenceScreen.hpp>
-#include <lcdgui/screens/window/LoadASequenceFromAllScreen.hpp>
-#include <lcdgui/screens/window/LoadASoundScreen.hpp>
-#include <lcdgui/screens/window/LoadApsFileScreen.hpp>
-#include <lcdgui/screens/window/Mpc2000XlAllFileScreen.hpp>
-#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
-#include <lcdgui/screens/window/SaveASequenceScreen.hpp>
-#include <lcdgui/screens/window/SaveASoundScreen.hpp>
-#include <lcdgui/screens/window/SaveAllFileScreen.hpp>
-#include <lcdgui/screens/window/SaveApsFileScreen.hpp>
-#include <lcdgui/screens/window/CantFindFileScreen.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/window/TransposePermanentScreen.hpp>
-#include <lcdgui/screens/window/SoundMemoryScreen.hpp>
-#include <lcdgui/screens/window/SongWindow.hpp>
-#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
-#include <lcdgui/screens/window/LoopSongScreen.hpp>
-#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
-#include <lcdgui/screens/window/ConvertSongToSeqScreen.hpp>
-#include <lcdgui/screens/window/LocateScreen.hpp>
-#include <lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp>
-#include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
-#include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
-#include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
-#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
-#include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
-#include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include <lcdgui/screens/window/VmpcMidiPresetsScreen.hpp>
-
-#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
-#include <lcdgui/screens/dialog/MidiInputMonitorScreen.hpp>
-#include <lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp>
-#include <lcdgui/screens/dialog/CopySequenceScreen.hpp>
-#include <lcdgui/screens/dialog/CopyTrackScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteTrackScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteSequenceScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteAllSequencesScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteAllTracksScreen.hpp>
-#include <lcdgui/screens/dialog/ConvertSoundScreen.hpp>
-#include <lcdgui/screens/dialog/CopySoundScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteSoundScreen.hpp>
-#include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
-#include <lcdgui/screens/dialog/ResampleScreen.hpp>
-#include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
-#include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
-#include <lcdgui/screens/dialog/CopyProgramScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteAllProgramsScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteAllSoundScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteProgramScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteFileScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteFolderScreen.hpp>
-#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteAllSongScreen.hpp>
-#include <lcdgui/screens/dialog/DeleteSongScreen.hpp>
-#include <lcdgui/screens/dialog/CopySongScreen.hpp>
-#include <lcdgui/screens/dialog/VmpcRecordJamScreen.hpp>
-#include <lcdgui/screens/dialog/VmpcFileInUseScreen.hpp>
-
-#include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
-
-
-#include <lcdgui/screens/VmpcDisksScreen.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
-#include <lcdgui/screens/VmpcKeyboardScreen.hpp>
-#include <lcdgui/screens/VmpcMidiScreen.hpp>
-#include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 
 #include <StrUtil.hpp>
 
@@ -196,7 +47,7 @@ void Screens::createAndCacheAllScreens()
     MLOG("Created and cached " + std::to_string(screens.size()) + " screens.");
 }
 
-std::shared_ptr<ScreenComponent> Screens::getByName(const std::string name)
+std::shared_ptr<ScreenComponent> Screens::getByName1(const std::string name)
 {
     for (auto& screen : screens)
     {
@@ -527,7 +378,7 @@ static const std::map<std::string, ScreenFactory> screenFactories = {
     { "transpose-permanent", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TransposePermanentScreen>(mpc, layer); } },
     { "punch", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PunchScreen>(mpc, layer); } },
     { "sync", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SyncScreen>(mpc, layer); } },
-    { "popup", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PopupScreen>(mpc); } },
+    { "popup", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PopupScreen>(mpc, layer); } },
     { "sound-memory", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SoundMemoryScreen>(mpc, layer); } },
     { "song-window", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SongWindow>(mpc, layer); } },
     { "vmpc-file-in-use", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcFileInUseScreen>(mpc, layer); } },
@@ -554,7 +405,7 @@ static const std::map<std::string, ScreenFactory> screenFactories = {
 
 // screenName -> layerIndex
 static const std::map<std::string, int> screensWithoutLayoutJson {
-    { "popup", 4 }
+    { "popup", 3 }
 };
 
 void Screens::createAndCacheScreen(const std::string &screenName)

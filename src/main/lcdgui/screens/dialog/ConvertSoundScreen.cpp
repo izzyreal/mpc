@@ -29,23 +29,23 @@ void ConvertSoundScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		break;
 	case 4:
 		if (convert == 0)
 		{
 			if (sampler->getSound()->isMono())
 			{
-				openScreen("mono-to-stereo");
+        mpc.getLayeredScreen()->openScreen<MonoToStereoScreen>();
 			}
 			else
 			{
-				openScreen("stereo-to-mono");
+        mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
 			}
 		}
 		else
 		{
-			openScreen("resample");
+        mpc.getLayeredScreen()->openScreen<ResampleScreen>();
 		}
 	}
 }

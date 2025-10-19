@@ -37,3 +37,4 @@ int32_t MonitorInputAdapter::processAudio(mpc::engine::audio::core::AudioBuffer*
 
     return ret;
 }
+

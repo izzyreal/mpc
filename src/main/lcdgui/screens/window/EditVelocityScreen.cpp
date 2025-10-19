@@ -90,7 +90,7 @@ void EditVelocityScreen::function(int i)
 			}
 		}
 
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 }

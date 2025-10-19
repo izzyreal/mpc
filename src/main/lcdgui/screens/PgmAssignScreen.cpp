@@ -54,22 +54,22 @@ void PgmAssignScreen::function(int i)
 	{
 		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
 		selectDrumScreen->redirectScreen = "program-assign";
-		openScreen("select-drum");
+        mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
 		break;
 	}
 	case 1:
-		openScreen("program-params");
+        mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
 		break;
 	case 2:
-		openScreen("drum");
+        mpc.getLayeredScreen()->openScreen<DrumScreen>();
 		break;
 	case 3:
-		openScreen("purge");
+        mpc.getLayeredScreen()->openScreen<PurgeScreen>();
 		break;
 	case 4:
 	{
 		mpc.setPreviousSamplerScreenName("program-assign");
-		openScreen("auto-chromatic-assignment");
+        mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
 		break;
 	}
 	}
@@ -247,19 +247,19 @@ void PgmAssignScreen::openWindow()
 	if (param == "pgm")
 	{
 		mpc.setPreviousSamplerScreenName("program-assign");
-		openScreen("program");
+        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 	}
 	else if (param == "pad" || param == "pad-note")
 	{
-		openScreen("assignment-view");
+        mpc.getLayeredScreen()->openScreen<AssignmentViewScreen>();
 	}
 	else if (param == "pad-assign")
 	{
-		openScreen("init-pad-assign");
+        mpc.getLayeredScreen()->openScreen<InitPadAssignScreen>();
 	}
 	else if (param == "note")
 	{
-		openScreen("copy-note-parameters");
+        mpc.getLayeredScreen()->openScreen<CopyNoteParametersScreen>();
 	}
 	else if (param == "snd")
 	{
@@ -269,7 +269,7 @@ void PgmAssignScreen::openWindow()
 		{
             sampler->setSoundIndex(soundIndex);
 			sampler->setPreviousScreenName("program-assign");
-			openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		}
 	}
 }

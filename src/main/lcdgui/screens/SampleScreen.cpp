@@ -69,7 +69,7 @@ void SampleScreen::down()
 
 void SampleScreen::openWindow()
 {
-	openScreen("sound-memory");
+        mpc.getLayeredScreen()->openScreen<SoundMemoryScreen>();
 }
 
 void SampleScreen::function(int i)

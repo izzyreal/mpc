@@ -188,7 +188,7 @@ void SoundRecorder::stop()
     sound->setLoopTo(sound->getFrameCount());
     sound->setEnd(sound->getFrameCount());
 
-    mpc.getLayeredScreen()->openScreen("keep-or-retry");
+    mpc.getLayeredScreen()->openScreen<KeepOrRetryScreen>();
 }
 
 void SoundRecorder::cancel()

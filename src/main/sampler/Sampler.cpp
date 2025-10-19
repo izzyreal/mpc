@@ -354,7 +354,7 @@ std::shared_ptr<Sound> Sampler::addSound(
             auto popupScreen = mpc.screens->get<mpc::lcdgui::screens::dialog2::PopupScreen>();
             popupScreen->setText("Sound directory full(256max)");
             popupScreen->setScreenToReturnTo(screenToGoToIfSoundDirectoryIsFull);
-            mpc.getLayeredScreen()->openScreen("popup");
+            mpc.getLayeredScreen()->openScreen<PopupScreen>();
         }
         return {};
     }

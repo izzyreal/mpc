@@ -39,7 +39,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     auto event = seq->getTrack(0)->recordNoteEventSynced(0, 35, 127);
     seq->getTrack(0)->finalizeNoteEventSynced(event, 1);
 
-    mpc.getLayeredScreen()->openScreen("vmpc-direct-to-disk-recorder");
+    mpc.getLayeredScreen()->openScreen<VmpcDirectToDiskRecorderScreen>();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
     auto audioServer = audioMidiServices->getAudioServer();

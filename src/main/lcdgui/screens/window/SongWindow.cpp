@@ -35,13 +35,13 @@ void SongWindow::function(int i)
 	switch (i)
 	{
 	case 1:
-		openScreen("delete-song");
+        mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
 		break;
 	case 3:
-		openScreen("song");
+        mpc.getLayeredScreen()->openScreen<SongScreen>();
 		break;
 	case 4:
-		openScreen("copy-song");
+        mpc.getLayeredScreen()->openScreen<CopySongScreen>();
 		break;
 	}
 }
@@ -62,7 +62,7 @@ void SongWindow::openNameScreen()
         
         enterAction = [songScreen, this](std::string& newName) {
             songScreen->setDefaultSongName(newName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<SongWindow>();
         };
 	}
 	else
@@ -73,11 +73,11 @@ void SongWindow::openNameScreen()
         
         enterAction = [song, this](std::string& newName) {
             song->setName(newName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<SongWindow>();
         };
 	}
 
     auto nameScreen = mpc.screens->get<NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
-	openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

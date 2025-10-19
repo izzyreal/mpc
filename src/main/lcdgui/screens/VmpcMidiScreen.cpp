@@ -141,7 +141,7 @@ void VmpcMidiScreen::up()
 
 void VmpcMidiScreen::openWindow()
 {
-    openScreen("vmpc-midi-presets");
+        mpc.getLayeredScreen()->openScreen<VmpcMidiPresetsScreen>();
 }
 
 void VmpcMidiScreen::acceptLearnCandidate()
@@ -274,11 +274,11 @@ void VmpcMidiScreen::function(int i)
             {
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
-                openScreen("vmpc-discard-mapping-changes");
+        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
-            openScreen("vmpc-settings");
+        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
             break;
         case 1:
             if (learning)
@@ -290,11 +290,11 @@ void VmpcMidiScreen::function(int i)
             {
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-keyboard";
-                openScreen("vmpc-discard-mapping-changes");
+        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
-            openScreen("vmpc-keyboard");
+        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
             break;
         case 2:
             if (learning)
@@ -309,11 +309,11 @@ void VmpcMidiScreen::function(int i)
             {
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
-                openScreen("vmpc-discard-mapping-changes");
+        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
-            openScreen("vmpc-auto-save");
+        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
             break;
         case 3:
             if (learning)
@@ -334,7 +334,7 @@ void VmpcMidiScreen::function(int i)
             }
 
             auto popupScreen = mpc.screens->get<PopupScreen>();
-            openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
             if (hasMappingChanged())
             {

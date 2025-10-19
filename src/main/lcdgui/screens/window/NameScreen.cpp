@@ -133,7 +133,7 @@ void NameScreen::function(int i)
 	{
     case 3:
 	{
-        openScreen(cancelScreen);
+        mpc.getLayeredScreen()->openScreen(cancelScreen);
 		break;
 	}
 	case 4:

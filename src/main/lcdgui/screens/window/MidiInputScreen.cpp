@@ -24,7 +24,7 @@ void MidiInputScreen::open()
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();
-        openScreen("vmpc-warning-settings-ignored");
+        mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
     }
 }
 
@@ -34,7 +34,7 @@ void MidiInputScreen::function(int i)
 
 	if (i == 1)
     {
-        openScreen("midi-input-monitor");
+        mpc.getLayeredScreen()->openScreen<MidiInputMonitorScreen>();
     }
 }
 

@@ -14,10 +14,10 @@ void VerScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		openScreen("others");
+        mpc.getLayeredScreen()->openScreen<OthersScreen>();
 		break;
 	case 1:
-		openScreen("init");
+        mpc.getLayeredScreen()->openScreen<InitScreen>();
 		break;
 	}
 }

@@ -54,19 +54,19 @@ void ZoneScreen::openWindow()
 	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("zone");
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 	}
 	else if (param == "zone")
 	{
-		openScreen("number-of-zones");
+        mpc.getLayeredScreen()->openScreen<NumberOfZonesScreen>();
 	}
 	else if (param == "st")
 	{
-		openScreen("zone-start-fine");
+        mpc.getLayeredScreen()->openScreen<ZoneStartFineScreen>();
 	}
 	else if (param == "end")
 	{
-		openScreen("zone-end-fine");
+        mpc.getLayeredScreen()->openScreen<ZoneEndFineScreen>();
 	}
 }
 
@@ -77,22 +77,22 @@ void ZoneScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		openScreen("trim");
+        mpc.getLayeredScreen()->openScreen<TrimScreen>();
 		break;
 	case 1:
-		openScreen("loop");
+        mpc.getLayeredScreen()->openScreen<LoopScreen>();
 		break;
 	case 2:
 	{
         sampler->switchToNextSoundSortType();
-		openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("zone", 200);
 		break;
 	}
 	case 3:
-		openScreen("params");
+        mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
 		break;
 	case 4:
 	{
@@ -101,7 +101,7 @@ void ZoneScreen::function(int f)
 
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("zone");
-		openScreen("edit-sound");
+        mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
 		break;
 	}
 	case 5:
@@ -422,7 +422,7 @@ void ZoneScreen::pressEnter()
 {
 	if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
 	{
-		openScreen("save");
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
 		return;
 	}
 

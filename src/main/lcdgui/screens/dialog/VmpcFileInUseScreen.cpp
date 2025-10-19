@@ -13,7 +13,7 @@ void VmpcFileInUseScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("vmpc-direct-to-disk-recorder");
+        mpc.getLayeredScreen()->openScreen<VmpcDirectToDiskRecorderScreen>();
 		break;
 	}
 }

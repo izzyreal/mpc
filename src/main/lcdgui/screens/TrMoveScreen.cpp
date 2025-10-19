@@ -111,7 +111,7 @@ void TrMoveScreen::function(int i)
 	{
 		auto eventsScreen = mpc.screens->get<EventsScreen>();
 		eventsScreen->tab = i;
-		openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+		mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 		break;
 	}
 	case 4:

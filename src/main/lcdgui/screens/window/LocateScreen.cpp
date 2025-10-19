@@ -27,11 +27,11 @@ void LocateScreen::function(int i)
             std::get<1>(location) = beatIndex;
             std::get<2>(location) = clock;
 
-            openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         }
         case 3:
-            openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         case 4:
             if (param.length() == 1)
@@ -58,7 +58,7 @@ void LocateScreen::function(int i)
                 sequencer.lock()->setBeat(beatIndex);
                 sequencer.lock()->setClock(clock);
             }
-            openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         default:
             break;

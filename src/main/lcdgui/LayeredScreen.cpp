@@ -1,6 +1,8 @@
 #include "lcdgui/LayeredScreen.hpp"
 
-#include "Screens.hpp"
+#include "lcdgui/Screens.hpp"
+#include "lcdgui/AllScreens.h"
+#include "lcdgui/ScreenRegistry.h"
 
 #include "BasicStructs.hpp"
 
@@ -14,11 +16,11 @@
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/screens/SampleScreen.hpp>
 
 #include <StrUtil.hpp>
 
 #include <cmath>
+#include <memory>
 #include <set>
 
 #include "MpcResourceUtil.hpp"
@@ -31,6 +33,9 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
 
 LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)
@@ -72,53 +77,71 @@ std::shared_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 {
 	return getFocusedLayer()->findScreenComponent();
 }
+using OpenScreenFunc = std::function<void(LayeredScreen&)>;
 
-void LayeredScreen::openScreen(std::string newScreenName)
+#define X(TYPE, NAME) { NAME, [](LayeredScreen& ls){ ls.openScreen<TYPE>(); } },
+static const std::map<std::string, OpenScreenFunc> openScreenRegistry = {
+    SCREEN_LIST
+};
+#undef X
+
+void LayeredScreen::openScreen(const std::string name)
 {
-	if (currentScreenName == newScreenName)
+    if (auto it = openScreenRegistry.find(name); it != openScreenRegistry.end())
+        it->second(*this);
+    else
+        MLOG("Unknown screen name: " + name);
+}
+
+template <typename T>
+void LayeredScreen::openScreen()
+{
+	if (std::dynamic_pointer_cast<T>(currentScreen))
     {
         return;
     }
 
     const auto oldFocusedLayerIndex = focusedLayerIndex;
 
-    auto screenComponent = mpc.screens->getByName(newScreenName);
+    auto newScreen = mpc.screens->get<T>();
 
-    assert(screenComponent);
+    assert(newScreen);
 
-    if (!screenComponent)
+    if (!newScreen)
     {
         return;
     }
     
 	auto ams = mpc.getAudioMidiServices();
 
-    if (currentScreenName == "song" && mpc.getSequencer()->isPlaying())
+    if (std::dynamic_pointer_cast<SongScreen>(currentScreen) && mpc.getSequencer()->isPlaying())
     {
         return;
     }
-    else if (currentScreenName == "sample")
+    else if (std::dynamic_pointer_cast<SampleScreen>(currentScreen))
 	{
 		ams->muteMonitor(true);
 		ams->getSoundRecorder()->setSampleScreenActive(false);
 	}
-    else if (currentScreenName == "erase" || currentScreenName == "timing-correct")
+    else if (std::dynamic_pointer_cast<EraseScreen>(currentScreen) ||
+             std::dynamic_pointer_cast<TimingCorrectScreen>(currentScreen))
     {
         // This field may not be visible the next time we visit this screen.
         // Like the real 2KXL we always set focus to the first Notes: field
         // if the current focus is hte second Notes: field.
         if (getFocus() == "note1")
+        {
             setFocus("note0");
+        }
     }
 
-    if (newScreenName == "sample")
+    if (auto sampleScreen = std::dynamic_pointer_cast<SampleScreen>(newScreen); sampleScreen)
 	{
-		auto sampleScreen = mpc.screens->get<SampleScreen>();
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder()->setSampleScreenActive(true);
 	}
-    else if (newScreenName == "name")
+    else if (std::dynamic_pointer_cast<NameScreen>(newScreen))
     {
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
         mpc.getPadAndButtonKeyboard()->resetPressedZeroTimes();
@@ -130,38 +153,45 @@ void LayeredScreen::openScreen(std::string newScreenName)
     setLastFocus(currentScreenName, getFocus());
 
     if (focus)
+    {
         focus->loseFocus("");
+    }
 
-    if (currentScreenName != "popup") previousScreenName = currentScreenName;
-	currentScreenName = newScreenName;
+    if (!std::dynamic_pointer_cast<PopupScreen>(currentScreen))
+    {
+        previousScreenName = currentScreenName;
+    }
 
-	auto oldScreenComponent = getFocusedLayer()->findScreenComponent();
-
-	if (oldScreenComponent)
+	if (currentScreen)
 	{
-		oldScreenComponent->close();
-		getFocusedLayer()->removeChild(oldScreenComponent);
+		currentScreen->close();
+		getFocusedLayer()->removeChild(currentScreen);
 	}
 
-	focusedLayerIndex = screenComponent->getLayerIndex();
+    currentScreen = newScreen;
+	currentScreenName = currentScreen->getName();
 
-	getFocusedLayer()->addChild(screenComponent);
+	focusedLayerIndex = currentScreen->getLayerIndex();
 
-	if (screenComponent->findFields().size() > 0)
-		returnToLastFocus(screenComponent->getFirstField());
+	getFocusedLayer()->addChild(currentScreen);
 
-	screenComponent->open();
+	if (currentScreen->findFields().size() > 0)
+    {
+		returnToLastFocus(currentScreen->getFirstField());
+    }
 
-	std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
+	currentScreen->open();
 
-	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
+	const std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
+
+	const auto isOverdubScreen = std::find(overdubScreens.begin(), overdubScreens.end(), currentScreenName) != overdubScreens.end();
 	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(isOverdubScreen);
 
-	std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
+	const std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
 
-	auto isNextSeqScreen = find(begin(nextSeqScreens), end(nextSeqScreens), currentScreenName) != end(nextSeqScreens);
+	const auto isNextSeqScreen = std::find(nextSeqScreens.begin(), nextSeqScreens.end(), currentScreenName) != nextSeqScreens.end();
 	
-	if (!isNextSeqScreen || (currentScreenName == "sequencer" && !mpc.getSequencer()->isPlaying()))
+	if (!isNextSeqScreen || (std::dynamic_pointer_cast<SequencerScreen>(currentScreen) && !mpc.getSequencer()->isPlaying()))
     {
         if (mpc.getSequencer()->getNextSq() != -1)
         {
@@ -579,4 +609,156 @@ std::shared_ptr<Field> LayeredScreen::getFocusedField()
     const auto focusedFieldName = focusedLayer->getFocus();
     return focusedLayer->findField(focusedFieldName);
 }
+
+template void LayeredScreen::openScreen<SequencerScreen>();
+template void LayeredScreen::openScreen<AssignScreen>();
+template void LayeredScreen::openScreen<BarsScreen>();
+template void LayeredScreen::openScreen<EventsScreen>();
+template void LayeredScreen::openScreen<NextSeqPadScreen>();
+template void LayeredScreen::openScreen<NextSeqScreen>();
+template void LayeredScreen::openScreen<SongScreen>();
+template void LayeredScreen::openScreen<StepEditorScreen>();
+template void LayeredScreen::openScreen<TrMoveScreen>();
+template void LayeredScreen::openScreen<TrMuteScreen>();
+template void LayeredScreen::openScreen<UserScreen>();
+template void LayeredScreen::openScreen<OthersScreen>();
+template void LayeredScreen::openScreen<DrumScreen>();
+template void LayeredScreen::openScreen<LoopScreen>();
+template void LayeredScreen::openScreen<PgmAssignScreen>();
+template void LayeredScreen::openScreen<PgmParamsScreen>();
+template void LayeredScreen::openScreen<PurgeScreen>();
+template void LayeredScreen::openScreen<SampleScreen>();
+template void LayeredScreen::openScreen<SelectDrumScreen>();
+template void LayeredScreen::openScreen<SndParamsScreen>();
+template void LayeredScreen::openScreen<TrimScreen>();
+template void LayeredScreen::openScreen<ZoneScreen>();
+template void LayeredScreen::openScreen<MixerScreen>();
+template void LayeredScreen::openScreen<MixerSetupScreen>();
+template void LayeredScreen::openScreen<FxEditScreen>();
+template void LayeredScreen::openScreen<SelectMixerDrumScreen>();
+template void LayeredScreen::openScreen<LoadScreen>();
+template void LayeredScreen::openScreen<FormatScreen>();
+template void LayeredScreen::openScreen<SetupScreen>();
+template void LayeredScreen::openScreen<SaveScreen>();
+template void LayeredScreen::openScreen<VerScreen>();
+template void LayeredScreen::openScreen<InitScreen>();
+template void LayeredScreen::openScreen<SecondSeqScreen>();
+template void LayeredScreen::openScreen<TransScreen>();
+template void LayeredScreen::openScreen<PunchScreen>();
+template void LayeredScreen::openScreen<SyncScreen>();
+template void LayeredScreen::openScreen<MidiSwScreen>();
+
+template void LayeredScreen::openScreen<VmpcDisksScreen>();
+template void LayeredScreen::openScreen<VmpcSettingsScreen>();
+template void LayeredScreen::openScreen<VmpcKeyboardScreen>();
+template void LayeredScreen::openScreen<VmpcMidiScreen>();
+template void LayeredScreen::openScreen<VmpcAutoSaveScreen>();
+
+template void LayeredScreen::openScreen<NumberOfZonesScreen>();
+template void LayeredScreen::openScreen<InitPadAssignScreen>();
+template void LayeredScreen::openScreen<SequenceScreen>();
+template void LayeredScreen::openScreen<TempoChangeScreen>();
+template void LayeredScreen::openScreen<CountMetronomeScreen>();
+template void LayeredScreen::openScreen<EditMultipleScreen>();
+template void LayeredScreen::openScreen<TransmitProgramChangesScreen>();
+template void LayeredScreen::openScreen<TimingCorrectScreen>();
+template void LayeredScreen::openScreen<TimeDisplayScreen>();
+template void LayeredScreen::openScreen<PasteEventScreen>();
+template void LayeredScreen::openScreen<MultiRecordingSetupScreen>();
+template void LayeredScreen::openScreen<MidiOutputScreen>();
+template void LayeredScreen::openScreen<MidiInputScreen>();
+template void LayeredScreen::openScreen<LoopBarsScreen>();
+template void LayeredScreen::openScreen<InsertEventScreen>();
+template void LayeredScreen::openScreen<EraseAllOffTracksScreen>();
+template void LayeredScreen::openScreen<ChangeTsigScreen>();
+template void LayeredScreen::openScreen<EditVelocityScreen>();
+template void LayeredScreen::openScreen<EraseScreen>();
+template void LayeredScreen::openScreen<ChangeBarsScreen>();
+template void LayeredScreen::openScreen<ChangeBars2Screen>();
+template void LayeredScreen::openScreen<TrackScreen>();
+template void LayeredScreen::openScreen<Assign16LevelsScreen>();
+template void LayeredScreen::openScreen<StepTcScreen>();
+template void LayeredScreen::openScreen<SoundScreen>();
+template void LayeredScreen::openScreen<StartFineScreen>();
+template void LayeredScreen::openScreen<EndFineScreen>();
+template void LayeredScreen::openScreen<LoopToFineScreen>();
+template void LayeredScreen::openScreen<LoopEndFineScreen>();
+template void LayeredScreen::openScreen<ZoneStartFineScreen>();
+template void LayeredScreen::openScreen<ZoneEndFineScreen>();
+template void LayeredScreen::openScreen<ChannelSettingsScreen>();
+template void LayeredScreen::openScreen<EditSoundScreen>();
+template void LayeredScreen::openScreen<AssignmentViewScreen>();
+template void LayeredScreen::openScreen<AutoChromaticAssignmentScreen>();
+template void LayeredScreen::openScreen<CopyNoteParametersScreen>();
+template void LayeredScreen::openScreen<KeepOrRetryScreen>();
+template void LayeredScreen::openScreen<MuteAssignScreen>();
+template void LayeredScreen::openScreen<ProgramScreen>();
+template void LayeredScreen::openScreen<VelocityModulationScreen>();
+template void LayeredScreen::openScreen<VeloEnvFilterScreen>();
+template void LayeredScreen::openScreen<VeloPitchScreen>();
+template void LayeredScreen::openScreen<DirectoryScreen>();
+template void LayeredScreen::openScreen<LoadAProgramScreen>();
+template void LayeredScreen::openScreen<LoadASequenceScreen>();
+template void LayeredScreen::openScreen<LoadASequenceFromAllScreen>();
+template void LayeredScreen::openScreen<LoadASoundScreen>();
+template void LayeredScreen::openScreen<LoadApsFileScreen>();
+template void LayeredScreen::openScreen<Mpc2000XlAllFileScreen>();
+template void LayeredScreen::openScreen<SaveAProgramScreen>();
+template void LayeredScreen::openScreen<SaveASequenceScreen>();
+template void LayeredScreen::openScreen<SaveASoundScreen>();
+template void LayeredScreen::openScreen<SaveAllFileScreen>();
+template void LayeredScreen::openScreen<SaveApsFileScreen>();
+template void LayeredScreen::openScreen<CantFindFileScreen>();
+template void LayeredScreen::openScreen<NameScreen>();
+template void LayeredScreen::openScreen<TransposePermanentScreen>();
+template void LayeredScreen::openScreen<SoundMemoryScreen>();
+template void LayeredScreen::openScreen<SongWindow>();
+template void LayeredScreen::openScreen<IgnoreTempoChangeScreen>();
+template void LayeredScreen::openScreen<LoopSongScreen>();
+template void LayeredScreen::openScreen<StepEditOptionsScreen>();
+template void LayeredScreen::openScreen<ConvertSongToSeqScreen>();
+template void LayeredScreen::openScreen<LocateScreen>();
+
+template void LayeredScreen::openScreen<VmpcWarningSettingsIgnoredScreen>();
+template void LayeredScreen::openScreen<VmpcKnownControllerDetectedScreen>();
+template void LayeredScreen::openScreen<VmpcContinuePreviousSessionScreen>();
+template void LayeredScreen::openScreen<VmpcConvertAndLoadWavScreen>();
+template void LayeredScreen::openScreen<VmpcDiscardMappingChangesScreen>();
+template void LayeredScreen::openScreen<VmpcRecordingFinishedScreen>();
+template void LayeredScreen::openScreen<VmpcResetKeyboardScreen>();
+template void LayeredScreen::openScreen<VmpcDirectToDiskRecorderScreen>();
+template void LayeredScreen::openScreen<VmpcMidiPresetsScreen>();
+
+template void LayeredScreen::openScreen<MetronomeSoundScreen>();
+template void LayeredScreen::openScreen<MidiInputMonitorScreen>();
+template void LayeredScreen::openScreen<MidiOutputMonitorScreen>();
+template void LayeredScreen::openScreen<CopySequenceScreen>();
+template void LayeredScreen::openScreen<CopyTrackScreen>();
+template void LayeredScreen::openScreen<DeleteTrackScreen>();
+template void LayeredScreen::openScreen<DeleteSequenceScreen>();
+template void LayeredScreen::openScreen<DeleteAllSequencesScreen>();
+template void LayeredScreen::openScreen<DeleteAllTracksScreen>();
+template void LayeredScreen::openScreen<ConvertSoundScreen>();
+template void LayeredScreen::openScreen<CopySoundScreen>();
+template void LayeredScreen::openScreen<DeleteSoundScreen>();
+template void LayeredScreen::openScreen<MonoToStereoScreen>();
+template void LayeredScreen::openScreen<ResampleScreen>();
+template void LayeredScreen::openScreen<StereoToMonoScreen>();
+template void LayeredScreen::openScreen<CreateNewProgramScreen>();
+template void LayeredScreen::openScreen<CopyProgramScreen>();
+template void LayeredScreen::openScreen<DeleteAllProgramsScreen>();
+template void LayeredScreen::openScreen<DeleteAllSoundScreen>();
+template void LayeredScreen::openScreen<DeleteProgramScreen>();
+template void LayeredScreen::openScreen<DeleteFileScreen>();
+template void LayeredScreen::openScreen<DeleteFolderScreen>();
+template void LayeredScreen::openScreen<FileExistsScreen>();
+template void LayeredScreen::openScreen<DeleteAllSongScreen>();
+template void LayeredScreen::openScreen<DeleteSongScreen>();
+template void LayeredScreen::openScreen<CopySongScreen>();
+
+template void LayeredScreen::openScreen<VmpcRecordJamScreen>();
+template void LayeredScreen::openScreen<VmpcFileInUseScreen>();
+
+template void LayeredScreen::openScreen<DeleteAllFilesScreen>();
+template void LayeredScreen::openScreen<PopupScreen>();
 

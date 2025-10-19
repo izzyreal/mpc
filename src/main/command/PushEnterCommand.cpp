@@ -10,7 +10,7 @@ namespace mpc::command {
         
         if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
-            mpc.getLayeredScreen()->openScreen("save");
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
         }
     }
 

@@ -14,10 +14,10 @@ void FormatScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 		break;
 	case 1:
-		openScreen("save");
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
 		break;
 	}
 }

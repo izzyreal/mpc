@@ -5,6 +5,8 @@
 #include <string>
 #include <map>
 
+#include "lcdgui/screens/Fwd.h"
+
 #include "BMFParser.hpp"
 
 #include "BasicStructs.hpp"
@@ -51,12 +53,24 @@ namespace mpc::lcdgui {
 		void transferDown();
 		int getFocusedLayerIndex();
 		std::shared_ptr<Layer> getFocusedLayer();
-		void openScreen(std::string newScreenName);
+
+        template <typename T>
+		void openScreen();
+
+        template <typename T>
+        void openScreen(const std::shared_ptr<T>&)
+        {
+            openScreen<T>();
+        }
+
+        void openScreen(const std::string screenName);
+
 		std::shared_ptr<ScreenComponent> findScreenComponent();
 
 	private:
 		std::map<std::string, std::string> lastFocuses;
 		int focusedLayerIndex{ 0 };
+        std::shared_ptr<ScreenComponent> currentScreen;
 		std::string currentScreenName;
 		std::string previousScreenName;
         std::string screenToReturnToWhenPressingOpenWindow;

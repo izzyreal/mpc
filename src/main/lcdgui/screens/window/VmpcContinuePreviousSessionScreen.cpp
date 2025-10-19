@@ -22,12 +22,11 @@ VmpcContinuePreviousSessionScreen::VmpcContinuePreviousSessionScreen(mpc::Mpc &m
 void VmpcContinuePreviousSessionScreen::function(int i)
 {
     auto autoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
-    auto previousScreen = ls->getPreviousScreenName();
 
     switch (i) {
         case 1:
             // NO
-            openScreen(previousScreen);
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         case 2:
             // YES
@@ -36,7 +35,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
         case 3:
             // NEVER
             autoSaveScreen->setAutoLoadOnStart(0);
-            openScreen(previousScreen);
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         case 4:
             // ALWAYS

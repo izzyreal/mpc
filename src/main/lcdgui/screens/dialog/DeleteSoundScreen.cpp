@@ -19,10 +19,10 @@ void DeleteSoundScreen::function(int i)
 	switch (i)
 	{
     case 2:
-        openScreen("delete-all-sound");
+        mpc.getLayeredScreen()->openScreen<DeleteAllSoundScreen>();
         break;
     case 3:
-        openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
         break;
     case 4:
         sampler->deleteSound(sampler->getSoundIndex());
@@ -31,9 +31,9 @@ void DeleteSoundScreen::function(int i)
 			sampler->setSoundIndex(sampler->getSoundCount() - 1);
 		
 		if (sampler->getSoundCount() > 0)
-			openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		else
-			openScreen(sampler->getPreviousScreenName());
+			mpc.getLayeredScreen()->openScreen(sampler->getPreviousScreenName());
 
 		break;
     }

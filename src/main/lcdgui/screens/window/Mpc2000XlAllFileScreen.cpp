@@ -29,17 +29,17 @@ void Mpc2000XlAllFileScreen::function(int i)
         {
             auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>();
             loadASequenceFromAllScreen->sequencesFromAllFile = result.value();
-            openScreen("load-a-sequence-from-all");
+        mpc.getLayeredScreen()->openScreen<LoadASequenceFromAllScreen>();
         }
         
 		break;
 	}
 	case 3:
-		openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 		break;
 	case 4:
 	{
-        auto on_success = [&](){openScreen("load");};
+        auto on_success = [&](){mpc.getLayeredScreen()->openScreen<LoadScreen>();};
         mpc.getDisk()->readAll2(loadScreen->getSelectedFile(), on_success);
 		break;
 	}

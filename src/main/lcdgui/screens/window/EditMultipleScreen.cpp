@@ -113,7 +113,7 @@ void EditMultipleScreen::function(int i)
             }
             
             stepEditorScreen->clearSelection();
-            openScreen("step-editor");
+        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
         }
     }
 }

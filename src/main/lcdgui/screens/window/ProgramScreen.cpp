@@ -26,12 +26,12 @@ void ProgramScreen::openNameScreen()
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             program->setName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(program->getName(), 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 
@@ -53,7 +53,7 @@ void ProgramScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		openScreen("delete-program");
+        mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
 		break;
 	case 2:
 	{
@@ -62,15 +62,15 @@ void ProgramScreen::function(int i)
 			auto popupScreen = mpc.screens->get<PopupScreen>();
 			popupScreen->setText("Prog. directory full(24 max)");
 			popupScreen->setScreenToReturnTo(name);
-			openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 			return;
 		}
 		
-		openScreen("create-new-program");
+        mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
 		break;
 	}
 	case 4:
-		openScreen("copy-program");
+        mpc.getLayeredScreen()->openScreen<CopyProgramScreen>();
 		break;
 	}
 }

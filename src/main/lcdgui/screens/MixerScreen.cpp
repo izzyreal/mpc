@@ -318,7 +318,7 @@ void MixerScreen::right()
 void MixerScreen::openWindow()
 {
     init();
-    openScreen("channel-settings");
+        mpc.getLayeredScreen()->openScreen<ChannelSettingsScreen>();
 }
 
 void MixerScreen::function(int f)
@@ -333,17 +333,17 @@ void MixerScreen::function(int f)
             if (f == tab)
             {
                 lastTab = tab;
-                openScreen("select-mixer-drum");
+        mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
             }
             else {
                 setTab(f);
             }
             break;
         case 3:
-            openScreen("mixer-setup");
+        mpc.getLayeredScreen()->openScreen<MixerSetupScreen>();
             break;
             //	case 4:
-            //openScreen("fx-edit"); // Not implemented
+            //openScreen<FxEditScreen>(); // Not implemented
         case 5:
             setLink(selection.count() == 1);
             break;

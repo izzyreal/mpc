@@ -58,12 +58,12 @@ void ResampleScreen::openNameScreen()
             }
 
             setNewName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(findField("newname")->getText(), 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 
@@ -74,7 +74,7 @@ void ResampleScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		break;
 	case 4:
 	{
@@ -130,7 +130,7 @@ void ResampleScreen::function(int i)
         destSnd->setLoopTo(snd->getLoopTo() * ratio);
 
 		sampler->setSoundIndex(sampler->getSoundCount() - 1);
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		break;
 	}
 	}

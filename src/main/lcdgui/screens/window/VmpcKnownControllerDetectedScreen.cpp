@@ -31,17 +31,17 @@ void VmpcKnownControllerDetectedScreen::function(int i)
     switch (i) {
         case 1:
             // NO
-            openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         case 2:
             // YES
             vmpcMidiScreen->shouldSwitch.store(true);
-            openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         case 3:
             // NEVER
             if (preset != presets.end()) (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
-            openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         case 4:
             // ALWAYS
@@ -55,7 +55,7 @@ void VmpcKnownControllerDetectedScreen::function(int i)
                 }
             }
             vmpcMidiScreen->shouldSwitch.store(true);
-            openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         default:
             break;
@@ -75,14 +75,14 @@ void VmpcKnownControllerDetectedScreen::open()
         {
             if (p->autoloadMode == nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
             {
-                openScreen(ls->getPreviousScreenName());
+                mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
                 return;
             }
             else if (p->autoloadMode == nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
             {
                 auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
                 vmpcMidiScreen->shouldSwitch.store(true);
-                openScreen(ls->getPreviousScreenName());
+                mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
                 return;
             }
             break;

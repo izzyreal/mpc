@@ -46,12 +46,12 @@ void SaveAllFileScreen::openNameScreen()
 	{
         const auto enterAction = [this](std::string& nameScreenName) {
             fileName = nameScreenName;
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(fileName, 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
 	}
 }
 
@@ -62,7 +62,7 @@ void SaveAllFileScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("save");
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
 		break;
 	case 4:
 	{
@@ -86,14 +86,14 @@ void SaveAllFileScreen::function(int i)
                 auto nameScreen = mpc.screens->get<NameScreen>();
                 auto enterAction = [this](std::string& nameScreenName){
                     fileName = nameScreenName;
-                    openScreen(name);
+                    mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
                 };
                 nameScreen->initialize(fileName, 16, enterAction, "save");
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
-            openScreen("file-exists");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
+        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
 			return;
 		}
 		

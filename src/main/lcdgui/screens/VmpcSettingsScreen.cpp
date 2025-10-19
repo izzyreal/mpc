@@ -35,13 +35,13 @@ void VmpcSettingsScreen::function(int i)
     switch (i)
     {
         case 1:
-            openScreen("vmpc-keyboard");
+        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
             break;
         case 2:
-            openScreen("vmpc-auto-save");
+        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
             break;
         case 3:
-            openScreen("vmpc-disks");
+        mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
             break;
         case 4:
             if (midiControlMode == MidiControlMode::ORIGINAL)
@@ -49,7 +49,7 @@ void VmpcSettingsScreen::function(int i)
                 return;
             }
 
-            openScreen("vmpc-midi");
+        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
             break;
         case 5:
             if (easterEgg->IsHidden())

@@ -33,7 +33,7 @@ void FileExistsScreen::function(int i)
 		break;
 	case 4:
         initializeNameScreen();
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
 	}
 }
 

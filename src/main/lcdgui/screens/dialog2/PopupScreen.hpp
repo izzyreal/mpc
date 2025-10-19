@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::dialog2
 		void setText(std::string text);
 
 	public:
-		PopupScreen(mpc::Mpc& mpc);
+		PopupScreen(mpc::Mpc& mpc, int layer);
 		~PopupScreen();
 
 		void close() override;

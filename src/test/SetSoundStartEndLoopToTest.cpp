@@ -41,7 +41,7 @@ TEST_CASE("TRIM screen", "[sound]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
-    mpc.getLayeredScreen()->openScreen("trim");
+    mpc.getLayeredScreen()->openScreen<TrimScreen>();
 
     auto trimScreen = mpc.screens->get<TrimScreen>();
 
@@ -104,7 +104,7 @@ TEST_CASE("TRIM screen", "[sound]")
     startFineScreen->down(); // Move to Smpl length: field
     startFineScreen->turnWheel(1); // Set Smpl length from VARI to FIX
 
-    mpc.getLayeredScreen()->openScreen("trim");
+    mpc.getLayeredScreen()->openScreen<TrimScreen>();
 
     sound->setStart(250);
     sound->setEnd(500);
@@ -167,7 +167,7 @@ TEST_CASE("Start fine window", "[sound]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
-    mpc.getLayeredScreen()->openScreen("trim");
+    mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto trimScreen = mpc.screens->get<TrimScreen>();
     trimScreen->down(); // Move to St: field
     trimScreen->openWindow(); // Open Start fine window
@@ -222,7 +222,7 @@ TEST_CASE("End fine window", "[sound]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
-    mpc.getLayeredScreen()->openScreen("trim");
+    mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto trimScreen = mpc.screens->get<TrimScreen>();
     trimScreen->down(); // Move to St: field
     trimScreen->right(); // Move to End: field
@@ -277,7 +277,7 @@ TEST_CASE("LOOP screen with end", "[sound]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
-    mpc.getLayeredScreen()->openScreen("loop");
+    mpc.getLayeredScreen()->openScreen<LoopScreen>();
 
     auto loopScreen = mpc.screens->get<LoopScreen>();
 
@@ -369,7 +369,7 @@ TEST_CASE("LOOP screen with end", "[sound]")
     loopToFineScreen->down();loopToFineScreen->down(); // Move to Loop Lngth: field
     loopToFineScreen->turnWheel(1); // Set Loop Lngth from VARI to FIX
 
-    mpc.getLayeredScreen()->openScreen("loop");
+    mpc.getLayeredScreen()->openScreen<LoopScreen>();
 
     sound->setStart(0);
     sound->setLoopTo(250);
@@ -444,7 +444,7 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
-    mpc.getLayeredScreen()->openScreen("loop");
+    mpc.getLayeredScreen()->openScreen<LoopScreen>();
 
     auto loopScreen = mpc.screens->get<LoopScreen>();
 
@@ -498,7 +498,7 @@ TEST_CASE("Loop To fine window", "[sound]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sound = initSound(mpc);
 
-    mpc.getLayeredScreen()->openScreen("loop");
+    mpc.getLayeredScreen()->openScreen<LoopScreen>();
 
     mpc.getScreen()->down(); // Move to To: field
     mpc.getScreen()->openWindow(); // Open Loop To fine window

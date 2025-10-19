@@ -182,14 +182,14 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> fi
             }
         }
 
-        mpc.getLayeredScreen()->openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
         return p;
     });
 }
 
 void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name, std::string ext, int sampleSize)
 {
-    mpc.getLayeredScreen()->openScreen("popup");
+    mpc.getLayeredScreen()->openScreen<PopupScreen>();
     auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
@@ -211,7 +211,7 @@ void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
 
         cantFindFileScreen->fileName = soundFileName;
 
-        mpc.getLayeredScreen()->openScreen("cant-find-file");
+        mpc.getLayeredScreen()->openScreen<CantFindFileScreen>();
 
         while (cantFindFileScreen->waitingForUser)
             std::this_thread::sleep_for(std::chrono::milliseconds(25));

@@ -52,7 +52,7 @@ void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
     
     mpc.getSampler()->setSoundIndex(0);
     
-    mpc.getLayeredScreen()->openScreen("load");
+    mpc.getLayeredScreen()->openScreen<LoadScreen>();
 }
 
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless, bool withoutSounds)
@@ -278,7 +278,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
 
 void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
 {
-    mpc.getLayeredScreen()->openScreen("popup");
+    mpc.getLayeredScreen()->openScreen<PopupScreen>();
     auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
     
@@ -304,7 +304,7 @@ void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
         
         cantFindFileScreen->fileName = soundFileName;
         
-        mpc.getLayeredScreen()->openScreen("cant-find-file");
+        mpc.getLayeredScreen()->openScreen<CantFindFileScreen>();
         
         while (cantFindFileScreen->waitingForUser)
             std::this_thread::sleep_for(std::chrono::milliseconds(25));

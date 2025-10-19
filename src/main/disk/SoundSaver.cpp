@@ -36,7 +36,7 @@ void SoundSaver::saveSounds()
 	{
 		auto fileName = StrUtil::replaceAll(s->getName(), ' ', "");
 		
-		mpc.getLayeredScreen()->openScreen("popup");
+		mpc.getLayeredScreen()->openScreen<PopupScreen>();
 		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ext);
 
@@ -58,7 +58,7 @@ void SoundSaver::saveSounds()
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
 	}
 
-	mpc.getLayeredScreen()->openScreen("save");
+	mpc.getLayeredScreen()->openScreen<SaveScreen>();
 }
 
 SoundSaver::~SoundSaver()

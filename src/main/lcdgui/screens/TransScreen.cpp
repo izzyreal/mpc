@@ -32,11 +32,11 @@ void TransScreen::function(int i)
 	case 0: // Intentional fall-through
 	case 2:
 		punchScreen->tab = i;
-		openScreen(punchScreen->tabNames[i]);
+		mpc.getLayeredScreen()->openScreen(punchScreen->tabNames[i]);
 		break;
 	case 5:
 		//if (amount == 0) break; // does 2kxl do that?
-		openScreen("transpose-permanent");
+        mpc.getLayeredScreen()->openScreen<TransposePermanentScreen>();
 		break;
 	}
 }

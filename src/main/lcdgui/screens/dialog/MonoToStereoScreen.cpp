@@ -80,12 +80,12 @@ void MonoToStereoScreen::openNameScreen()
             }
 
             newStName = nameScreenName;
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(newStName, 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 
@@ -96,7 +96,7 @@ void MonoToStereoScreen::function(int j)
 	switch (j)
 	{
 	case 3:
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		break;
 	case 4:
 	{
@@ -113,7 +113,7 @@ void MonoToStereoScreen::function(int j)
 				auto popupScreen = mpc.screens->get<PopupScreen>();
 				popupScreen->setText("Name already used");
 				popupScreen->setScreenToReturnTo(name);
-				openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 				return;
 			}
 		}
@@ -144,7 +144,7 @@ void MonoToStereoScreen::function(int j)
 		newSound->setName(newStName);
 		sampler->mergeToStereo(left->getSampleData(), newSampleDataRight, newSound->getMutableSampleData());
         newSound->setMono(false);
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 	}
 	}
 }

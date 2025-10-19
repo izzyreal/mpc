@@ -71,9 +71,9 @@ void DirectoryScreen::function(int f)
 			return;
 
 		if (getSelectedFile()->isDirectory())
-			openScreen("delete-folder");
+        mpc.getLayeredScreen()->openScreen<DeleteFolderScreen>();
 		else
-			openScreen("delete-file");
+        mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
 
 		break;
 	case 2:
@@ -98,7 +98,7 @@ void DirectoryScreen::function(int f)
             if (!success)
             {
                 auto layeredScreen = mpc.getLayeredScreen();
-                layeredScreen->openScreen("popup");
+                layeredScreen->openScreen<PopupScreen>();
                 popupScreen->setText("File name exists !!");
                 layeredScreen->setPreviousScreenName("directory");
                 return;
@@ -132,7 +132,7 @@ void DirectoryScreen::function(int f)
             }
             
             disk->initFiles();
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         nameScreen->initialize(
@@ -141,7 +141,7 @@ void DirectoryScreen::function(int f)
                 enterAction,
                 name);
 
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
 
         break;
 	}
@@ -154,7 +154,7 @@ void DirectoryScreen::function(int f)
 
             if (!success)
             {
-                openScreen("popup");
+                mpc.getLayeredScreen()->openScreen<PopupScreen>();
                 
                 if (disk->getVolume().mode == MountMode::READ_ONLY) {
                     popupScreen->setText("Disk is read only !!");
@@ -187,12 +187,12 @@ void DirectoryScreen::function(int f)
                 counter++;
             }
 
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
             ls->setPreviousScreenName("load");
         };
 
         nameScreen->initialize("NEWFOLDR", 8, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
         break;
     }
 	case 5:
@@ -217,7 +217,7 @@ void DirectoryScreen::function(int f)
             
             auto name = file->getNameWithoutExtension();
 
-			openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
 			if (started)
 				popupScreen->setText("Playing " + name);

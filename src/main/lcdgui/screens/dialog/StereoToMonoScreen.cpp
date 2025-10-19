@@ -52,13 +52,13 @@ void StereoToMonoScreen::openNameScreen()
 
             if (isL) setNewLName(nameScreenName);
             else setNewRName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         const auto newName = isL ? newLName : newRName;
         nameScreen->initialize(newName, 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 
@@ -69,7 +69,7 @@ void StereoToMonoScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		break;
 	case 4:
 	{
@@ -85,7 +85,7 @@ void StereoToMonoScreen::function(int i)
 				auto popupScreen = mpc.screens->get<PopupScreen>();
 				popupScreen->setText("Name already used");
 				popupScreen->setScreenToReturnTo(name);
-				openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 				return;
 			}
 		}
@@ -122,7 +122,7 @@ void StereoToMonoScreen::function(int i)
 		
 		left->setEnd(left->getSampleData()->size());
 		right->setEnd(right->getSampleData()->size());
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 		
 		break;
 	}

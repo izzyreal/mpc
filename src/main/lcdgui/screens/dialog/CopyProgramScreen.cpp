@@ -26,7 +26,7 @@ void CopyProgramScreen::function(int i)
 	
 	{
 	case int(3) :
-		openScreen("program");
+        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 		break;
 	case 4:
 		if (pgm0 == pgm1)
@@ -34,7 +34,7 @@ void CopyProgramScreen::function(int i)
 
 		sampler->copyProgram(pgm0, pgm1);
             activeDrum().setProgram(pgm1);
-		openScreen("program");
+        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 		break;
 	}
 }

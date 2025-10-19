@@ -69,7 +69,7 @@ void SaveScreen::openWindow()
     {
         auto directoryScreen = mpc.screens->get<DirectoryScreen>();
         directoryScreen->previousScreenName = "save";
-        openScreen("directory");
+        mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
     }
 }
 
@@ -80,13 +80,13 @@ void SaveScreen::function(int i)
     switch (i)
     {
         case 0:
-            openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
             break;
         case 2:
-            //openScreen("format");
+            //openScreen<FormatScreen>();
             break;
         case 3:
-            //openScreen("setup");
+            //openScreen<SetupScreen>();
             break;
         case 4:
             if (param == "device")
@@ -101,7 +101,7 @@ void SaveScreen::function(int i)
                     auto popupScreen = mpc.screens->get<PopupScreen>();
                     popupScreen->setText("Device is disabled in DISKS");
                     popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
-                    openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
                     return;
                 }
 
@@ -120,7 +120,7 @@ void SaveScreen::function(int i)
                         auto popupScreen = mpc.screens->get<PopupScreen>();
                         popupScreen->setText("Error! Device seems in use");
                         popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
-                        openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
                         return;
                     }
                 }
@@ -145,7 +145,7 @@ void SaveScreen::function(int i)
             {
                 case 0:
                 {
-                    openScreen("save-all-file");
+        mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
                     break;
                 }
                 case 1:
@@ -154,13 +154,13 @@ void SaveScreen::function(int i)
                         return;
                     }
                     
-                    openScreen("save-a-sequence");
+        mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
                     break;
                 case 2:
-                    openScreen("save-aps-file");
+        mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
                     break;
                 case 3:
-                    openScreen("save-a-program");
+        mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
                     break;
                 case 4:
                     if (sampler->getSoundCount() == 0)
@@ -168,7 +168,7 @@ void SaveScreen::function(int i)
                         break;
                     }
 
-                    openScreen("save-a-sound");
+        mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
                     break;
             }
         }

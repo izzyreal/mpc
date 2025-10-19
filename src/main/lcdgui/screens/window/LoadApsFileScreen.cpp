@@ -16,11 +16,11 @@ void LoadApsFileScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 		break;
 	case 4:
 	{
-        std::function<void()> on_success = [&]() { openScreen("load"); };
+        std::function<void()> on_success = [&]() { mpc.getLayeredScreen()->openScreen<LoadScreen>(); };
 		auto loadScreen = mpc.screens->get<LoadScreen>();
         mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
         break;

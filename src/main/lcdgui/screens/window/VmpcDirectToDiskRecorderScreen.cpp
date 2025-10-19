@@ -73,7 +73,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	case 4:
 	{
@@ -91,7 +91,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		{
 		case 0:
 		{
-			openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 
             if (seqLoopWasEnabled)
             {
@@ -108,7 +108,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
-                openScreen("vmpc-file-in-use");
+        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
             }
 			else
             {
@@ -119,7 +119,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		}
 		case 1:
 		{
-			openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 
             auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
             const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
@@ -138,7 +138,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
-                openScreen("vmpc-file-in-use");
+        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
             }
 			else
             {
@@ -149,7 +149,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		}
 		case 2:
 		{
-			openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
             const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
@@ -168,7 +168,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
-                openScreen("vmpc-file-in-use");
+                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
             }
 			else
             {
@@ -194,7 +194,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     rate,
                     recordingName);
 
-			openScreen("song");
+            mpc.getLayeredScreen()->openScreen<SongScreen>();
 
             songLoopWasEnabled = mpcSong->isLoopEnabled();
 
@@ -205,7 +205,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
             {
-                openScreen("vmpc-file-in-use");
+                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
             }
 			else
             {
@@ -216,7 +216,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			break;
 		}
 		case 4:
-			openScreen("vmpc-record-jam");
+            mpc.getLayeredScreen()->openScreen<VmpcRecordJamScreen>();
 			break;
 		}
 	}

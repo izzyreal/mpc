@@ -11,12 +11,16 @@
 #include <file/sndwriter/SndWriter.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 #include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
+#include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include "lcdgui/screens/SequencerScreen.hpp"
+#include "lcdgui/Screens.hpp"
 
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
 
 #include <StrUtil.hpp>
+#include <memory>
 
 using namespace mpc;
 using namespace mpc::file::all;
@@ -162,31 +166,32 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
             mpc.getDisk()->initFiles();
         }
 
-        auto previousSamplerScreen = getStringProperty("previousSamplerScreen.txt");
-        auto screen = getStringProperty("screen.txt");
-        auto previousScreen = getStringProperty("previousScreen.txt");
-        auto focus = getStringProperty("focus.txt");
+        const auto screenName = getStringProperty("screen.txt");
+        const auto previousScreenName = getStringProperty("previousScreen.txt");
+        const auto previousSamplerScreenName = getStringProperty("previousSamplerScreen.txt");
 
-        auto layeredScreen = mpc.getLayeredScreen();
+        const auto focusName = getStringProperty("focus.txt");
 
-        auto currentScreen = layeredScreen->getCurrentScreenName();
+        const auto layeredScreen = mpc.getLayeredScreen();
+        const auto currentScreenName = layeredScreen->getCurrentScreenName();
+        const auto currentScreen = mpc.screens->getByName1("currentScreenName");
 
-        layeredScreen->openScreen(previousSamplerScreen.empty() ? "sequencer" : previousSamplerScreen);
+        layeredScreen->openScreen(previousSamplerScreenName);
         layeredScreen->Draw();
-        layeredScreen->openScreen(previousScreen);
-        layeredScreen->Draw();
-
-        layeredScreen->openScreen(screen);
+        layeredScreen->openScreen(previousScreenName);
         layeredScreen->Draw();
 
-        if (!focus.empty())
+        layeredScreen->openScreen(screenName);
+        layeredScreen->Draw();
+
+        if (!focusName.empty())
         {
-            layeredScreen->setFocus(focus);
+            layeredScreen->setFocus(focusName);
         }
 
-        if (currentScreen == "vmpc-known-controller-detected")
+        if (std::dynamic_pointer_cast<VmpcKnownControllerDetectedScreen>(currentScreen))
         {
-            layeredScreen->openScreen(currentScreen);
+            layeredScreen->openScreen(currentScreenName);
             layeredScreen->Draw();
         }
 
@@ -231,7 +236,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         // ASK
         auto vmpcContinuePreviousSessionScreen = mpc.screens->get<VmpcContinuePreviousSessionScreen>();
         vmpcContinuePreviousSessionScreen->setRestoreAutoSavedStateAction(restoreAutoSavedStateAction);
-        mpc.getLayeredScreen()->openScreen("vmpc-continue-previous-session");
+        mpc.getLayeredScreen()->openScreen<VmpcContinuePreviousSessionScreen>();
         return;
     }
 
@@ -281,28 +286,29 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
             layeredScreen->setPreviousScreenName("sequencer");
         }
 
-        auto screen = layeredScreen->getCurrentScreenName();
-        auto previousScreen = layeredScreen->getPreviousScreenName();
+        std::shared_ptr<ScreenComponent> currentScreen = layeredScreen->findScreenComponent();
 
-        if (screen == "vmpc-continue-previous-session" || screen == "vmpc-known-controller-detected")
-        {
-            screen = "sequencer";
-        }
-        else if (screen == "edit-sound")
-        {
-            screen = mpc.screens->get<EditSoundScreen>()->getReturnToScreenName(); 
-        }
-        else if (screen == "name")
-        {
-            screen = "sequencer";
-            previousScreen = "";
-        }
+        auto previousScreenName = layeredScreen->getPreviousScreenName();
 
-        if (previousScreen == "vmpc-continue-previous-session" || previousScreen == "vmpc-known-controller-detected")
+        if (std::dynamic_pointer_cast<VmpcContinuePreviousSessionScreen>(currentScreen) ||
+            std::dynamic_pointer_cast<VmpcKnownControllerDetectedScreen>(currentScreen))
         {
-            previousScreen = "sequencer";
+            currentScreen = std::dynamic_pointer_cast<ScreenComponent>(mpc.screens->get<SequencerScreen>());
+        }
+        else if (auto editSoundScreen = std::dynamic_pointer_cast<EditSoundScreen>(currentScreen))
+        {
+            currentScreen = mpc.screens->getByName1(editSoundScreen->getReturnToScreenName());
+        }
+        else if (std::dynamic_pointer_cast<NameScreen>(currentScreen))
+        {
+            currentScreen = std::dynamic_pointer_cast<ScreenComponent>(mpc.screens->get<SequencerScreen>());
+            previousScreenName = "";
         }
 
+        if (previousScreenName == "vmpc-continue-previous-session" || previousScreenName == "vmpc-known-controller-detected")
+        {
+            previousScreenName = "sequencer";
+        }
 
         auto previousSamplerScreen = mpc.getPreviousSamplerScreenName();
         auto focus = mpc.getLayeredScreen()->getFocus();
@@ -322,9 +328,9 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
             }
         };
 
-        setFileData(screenFile, screen);
-        setFileData(previousScreenFile, previousScreen);
-        setFileData(previousSamplerScreenFile, previousScreen);
+        setFileData(screenFile, currentScreen->getName());
+        setFileData(previousScreenFile, previousScreenName);
+        setFileData(previousSamplerScreenFile, previousScreenName);
         setFileData(focusFile, focus);
         setFileData(currentDirFile, currentDir);
         setFileData(soundIndexFile, {(char)soundIndex});

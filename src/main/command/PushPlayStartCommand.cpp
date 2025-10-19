@@ -32,7 +32,7 @@ namespace mpc::command {
         {
             if (!currentScreenAllowsPlayAndRecord)
             {
-                mpc.getLayeredScreen()->openScreen("sequencer");
+                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             }
             
             mpc.getSequencer()->recFromStart();
@@ -41,7 +41,7 @@ namespace mpc::command {
         {
             if (!currentScreenAllowsPlayAndRecord)
             {
-                mpc.getLayeredScreen()->openScreen("sequencer");
+                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             }
 
             mpc.getSequencer()->overdubFromStart();
@@ -50,13 +50,13 @@ namespace mpc::command {
         {
             if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
             {
-                mpc.getLayeredScreen()->openScreen("vmpc-direct-to-disk-recorder");
+                mpc.getLayeredScreen()->openScreen<VmpcDirectToDiskRecorderScreen>();
             }
             else
             {
                 if (!lcdgui::screengroups::isPlayScreen(currentScreenName))
                 {
-                    mpc.getLayeredScreen()->openScreen("sequencer");
+                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
                 }
 
                 mpc.getSequencer()->setSongModeEnabled(currentScreenName == "song");
