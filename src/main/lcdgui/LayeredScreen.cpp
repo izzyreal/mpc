@@ -73,27 +73,29 @@ std::shared_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 	return getFocusedLayer()->findScreenComponent();
 }
 
-int LayeredScreen::openScreen(std::string newScreenName)
+void LayeredScreen::openScreen(std::string newScreenName)
 {
 	if (currentScreenName == newScreenName)
     {
-        return -1;
+        return;
     }
 
     const auto oldFocusedLayerIndex = focusedLayerIndex;
 
     auto screenComponent = mpc.screens->getScreenComponent(newScreenName);
 
+    assert(screenComponent);
+
     if (!screenComponent)
     {
-        return -1;
+        return;
     }
     
 	auto ams = mpc.getAudioMidiServices();
 
     if (currentScreenName == "song" && mpc.getSequencer()->isPlaying())
     {
-        return -1;
+        return;
     }
     else if (currentScreenName == "sample")
 	{
@@ -171,8 +173,6 @@ int LayeredScreen::openScreen(std::string newScreenName)
     {
         clearScreenToReturnToWhenPressingOpenWindow();
     }
-
-	return focusedLayerIndex;
 }
 
 std::vector<std::vector<bool>>* LayeredScreen::getPixels()

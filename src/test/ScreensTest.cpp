@@ -179,13 +179,13 @@ SCENARIO("All screens can be opened", "[gui]") {
 
 		for (auto& screenName : screenNames)
 		{
-			int layerIndex = ls->openScreen(screenName);
+			ls->openScreen(screenName);
 			
 			// We do a check for the most important screen
 			if (screenName == "sequencer")
-				REQUIRE(layerIndex == 0);
+				REQUIRE(ls->getFocusedLayerIndex() == 0);
 
-			if (layerIndex == -1)
+			if (ls->getFocusedLayerIndex() == -1)
 			{
 				bad.push_back(screenName + " could not be opened.");
 				continue;

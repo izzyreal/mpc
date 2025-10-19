@@ -220,7 +220,7 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
         sampler->switchToNextSoundSortType();
     }
 
-    mpc.getLayeredScreen()->openScreen("main");
+    mpc.getLayeredScreen()->openScreen("sequencer");
     mpc.getLayeredScreen()->openScreen("trim");
 
     REQUIRE(soundName() == "sound2          (ST)");
