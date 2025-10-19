@@ -68,7 +68,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
             const auto voiceOverlap = (sound && sound->isLoopEnabled()) ? 2 : noteParameters->getVoiceOverlap();
 
-            assert(noteOnEvent->getDuration().has_value() && *noteOnEvent->getDuration() > 0);
+            assert(noteOnEvent->getDuration().has_value() && *noteOnEvent->getDuration() >= 0);
 
             const auto durationTicks = *noteOnEvent->getDuration();
 
