@@ -477,28 +477,34 @@ void ClientInputController::handleButtonRelease(const ClientInput &input)
 
 void ClientInputController::handleButtonDoublePress(const ClientInput &input)
 {
-    if (!mpc.getHardware()->getButton(input.componentId)->doublePress())
-    {
-        return;
-    }
+    auto button = mpc.getHardware()->getButton(input.componentId);
 
-    if (input.componentId == ComponentId::REC)
+    if (input.componentId == ComponentId::REC || input.componentId == ComponentId::OVERDUB)
     {
-        buttonLockTracker.toggle(input.componentId);
+        if (!button->doublePress()) return;
 
-        if (buttonLockTracker.isLocked(ComponentId::REC))
+        if (input.componentId == ComponentId::REC)
         {
-            buttonLockTracker.unlock(ComponentId::OVERDUB);
+            buttonLockTracker.toggle(input.componentId);
+
+            if (buttonLockTracker.isLocked(ComponentId::REC))
+            {
+                buttonLockTracker.unlock(ComponentId::OVERDUB);
+            }
+        }
+        else if (input.componentId == ComponentId::OVERDUB)
+        {
+            buttonLockTracker.toggle(ComponentId::OVERDUB);
+
+            if (buttonLockTracker.isLocked(ComponentId::OVERDUB))
+            {
+                buttonLockTracker.unlock(ComponentId::REC);
+            }
         }
     }
-    else if (input.componentId == ComponentId::OVERDUB)
+    else
     {
-        buttonLockTracker.toggle(ComponentId::OVERDUB);
-
-        if (buttonLockTracker.isLocked(ComponentId::OVERDUB))
-        {
-            buttonLockTracker.unlock(ComponentId::REC);
-        }
+        handleButtonPress(input);
     }
 }
 

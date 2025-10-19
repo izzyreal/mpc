@@ -112,14 +112,14 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::REPEAT)
             {
-                if (gesture.repeatCount == 2)
+                if (gesture.repeatCount >= 2)
                 {
                     clientInput.type = ClientInput::Type::ButtonDoublePress;
                 }
             }
             else if (gesture.type == GestureEvent::Type::BEGIN)
             {
-                if (gesture.repeatCount == 2)
+                if (gesture.repeatCount >= 2)
                 {
                     clientInput.type = ClientInput::Type::ButtonDoublePress;
                 }
