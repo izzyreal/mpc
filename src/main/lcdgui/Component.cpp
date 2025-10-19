@@ -225,7 +225,7 @@ void Component::removeChild(std::shared_ptr<Component> child)
 		c->removeChild(child);
 }
 
-void Component::addChildren(std::vector<std::shared_ptr<Component>> childrenToAdd)
+void Component::addChildren(std::vector<std::shared_ptr<Component>> &childrenToAdd)
 {
 	for (auto& c : childrenToAdd)
 		addChild(c);

@@ -82,7 +82,7 @@ void LayeredScreen::openScreen(std::string newScreenName)
 
     const auto oldFocusedLayerIndex = focusedLayerIndex;
 
-    auto screenComponent = mpc.screens->getScreenComponent(newScreenName);
+    auto screenComponent = mpc.screens->getOrCreateScreenComponent(newScreenName);
 
     assert(screenComponent);
 

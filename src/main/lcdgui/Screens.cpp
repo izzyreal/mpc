@@ -1,5 +1,7 @@
 #include "Screens.hpp"
 
+#include "Logger.hpp"
+
 #include <lcdgui/Component.hpp>
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Info.hpp>
@@ -163,6 +165,8 @@
 
 #include <rapidjson/document.h>
 
+#include <functional>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -233,26 +237,25 @@ std::vector<std::string> getFunctionKeyLabels(Value &functionKeyLabels)
     return labels;
 }
 
-std::pair<std::vector<std::shared_ptr<Component>>, std::map<std::string, std::vector<std::string>>>
-Screens::get(const std::string &screenName, int &foundInLayer, std::string &firstField)
+std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string& screenName)
 {
+    Screens::ScreenLayout result;
+
     for (int i = 0; i < 4; i++)
     {
         if (layerDocuments()[i]->HasMember(screenName.c_str()))
         {
-            foundInLayer = i;
+            result.layerIndex = i;
             break;
         }
     }
 
-    if (foundInLayer < 0)
+    if (result.layerIndex < 0)
     {
-        return {};
+        return std::nullopt;
     }
 
-    Value &arrangement = layerDocuments()[foundInLayer]->GetObj()[screenName.c_str()];
-
-    std::vector<std::shared_ptr<Component>> components;
+    Value &arrangement = layerDocuments()[result.layerIndex]->GetObj()[screenName.c_str()];
 
     if (arrangement.HasMember("fblabels"))
     {
@@ -281,10 +284,8 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
         }
 
         auto functionKeysComponent = std::make_unique<FunctionKeys>(mpc, "function-keys", allLabels, allTypes);
-        components.push_back(std::move(functionKeysComponent));
+        result.components.push_back(std::move(functionKeysComponent));
     }
-
-    std::map<std::string, std::vector<std::string>> transferMap;
 
     if (arrangement.HasMember("parameters"))
     {
@@ -307,9 +308,11 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
                 std::vector<std::string> parameterTransferMap;
 
                 for (int j = 0; j < parameters[i].Size(); j++)
+                {
                     parameterTransferMap.push_back(parameters[i][j].GetString());
+                }
 
-                transferMap[previous] = parameterTransferMap;
+                result.transferMap[previous] = parameterTransferMap;
                 skipCounter++;
                 continue;
             }
@@ -326,7 +329,7 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
 
             row.push_back(parameterName);
 
-            components.push_back(std::make_unique<Parameter>(
+            result.components.push_back(std::make_unique<Parameter>(
                     mpc,
                     labels[i - skipCounter].GetString(),
                     parameterName,
@@ -334,12 +337,12 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
                     y[i - skipCounter].GetInt(),
                     tfsize[i - skipCounter].GetInt()));
 
-            auto parameter = components.back();
+            auto parameter = result.components.back();
             auto field = parameter->findField(parameterName);
 
             if (i == 0)
             {
-                firstField = parameterName;
+                result.firstField = parameterName;
             }
 
             field->setNextFocus(nextFocus);
@@ -356,623 +359,208 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
 
         for (int i = 0; i < infoNames.Size(); i++)
         {
-            components.push_back(
-                    std::make_shared<Label>(mpc, infoNames[i].GetString(), "", infoX[i].GetInt(), infoY[i].GetInt(),
-                                       infoSize[i].GetInt()));
+            auto label = std::make_shared<Label>(mpc,
+                                                 infoNames[i].GetString(),
+                                                 "",
+                                                 infoX[i].GetInt(),
+                                                 infoY[i].GetInt(),
+                                                 infoSize[i].GetInt());
+            result.components.push_back(label);
         }
     }
 
-    return {components, transferMap};
+    return result;
 }
 
-std::shared_ptr <ScreenComponent> Screens::getScreenComponent(const std::string &screenName)
+using ScreenFactory = std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc&, int)>;
+
+static const std::map<std::string, ScreenFactory> screenFactories = {
+    { "sequencer", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SequencerScreen>(mpc, layer); } },
+    { "sequence", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SequenceScreen>(mpc, layer); } },
+    { "tempo-change", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TempoChangeScreen>(mpc, layer); } },
+    { "count-metronome", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CountMetronomeScreen>(mpc, layer); } },
+    { "edit-multiple", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EditMultipleScreen>(mpc, layer); } },
+    { "transmit-program-changes", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TransmitProgramChangesScreen>(mpc, layer); } },
+    { "timing-correct", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TimingCorrectScreen>(mpc, layer); } },
+    { "time-display", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TimeDisplayScreen>(mpc, layer); } },
+    { "paste-event", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PasteEventScreen>(mpc, layer); } },
+    { "multi-recording-setup", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MultiRecordingSetupScreen>(mpc, layer); } },
+    { "midi-output", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiOutputScreen>(mpc, layer); } },
+    { "midi-input", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiInputScreen>(mpc, layer); } },
+    { "loop-bars-window", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoopBarsScreen>(mpc, layer); } },
+    { "insert-event", [](mpc::Mpc& mpc, int layer){ return std::make_shared<InsertEventScreen>(mpc, layer); } },
+    { "erase-all-off-tracks", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EraseAllOffTracksScreen>(mpc, layer); } },
+    { "change-tsig", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ChangeTsigScreen>(mpc, layer); } },
+    { "edit-velocity", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EditVelocityScreen>(mpc, layer); } },
+    { "erase", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EraseScreen>(mpc, layer); } },
+    { "change-bars", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ChangeBarsScreen>(mpc, layer); } },
+    { "change-bars-2", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ChangeBars2Screen>(mpc, layer); } },
+    { "track", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TrackScreen>(mpc, layer); } },
+    { "assign-16-levels", [](mpc::Mpc& mpc, int layer){ return std::make_shared<Assign16LevelsScreen>(mpc, layer); } },
+    { "midi-input-monitor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiMonitorScreen>(mpc, "midi-input-monitor", layer); } },
+    { "midi-output-monitor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiMonitorScreen>(mpc, "midi-output-monitor", layer); } },
+    { "metronome-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MetronomeSoundScreen>(mpc, layer); } },
+    { "copy-sequence", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopySequenceScreen>(mpc, layer); } },
+    { "copy-track", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopyTrackScreen>(mpc, layer); } },
+    { "delete-sequence", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteSequenceScreen>(mpc, layer); } },
+    { "delete-track", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteTrackScreen>(mpc, layer); } },
+    { "delete-all-sequences", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteAllSequencesScreen>(mpc, layer); } },
+    { "delete-all-tracks", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteAllTracksScreen>(mpc, layer); } },
+    { "next-seq-pad", [](mpc::Mpc& mpc, int layer){ return std::make_shared<NextSeqPadScreen>(mpc, layer); } },
+    { "next-seq", [](mpc::Mpc& mpc, int layer){ return std::make_shared<NextSeqScreen>(mpc, layer); } },
+    { "song", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SongScreen>(mpc, layer); } },
+    { "track-mute", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TrMuteScreen>(mpc, layer); } },
+    { "step-editor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<StepEditorScreen>(mpc, layer); } },
+    { "events", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EventsScreen>(mpc, layer); } },
+    { "bars", [](mpc::Mpc& mpc, int layer){ return std::make_shared<BarsScreen>(mpc, layer); } },
+    { "tr-move", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TrMoveScreen>(mpc, layer); } },
+    { "user", [](mpc::Mpc& mpc, int layer){ return std::make_shared<UserScreen>(mpc, layer); } },
+    { "assign", [](mpc::Mpc& mpc, int layer){ return std::make_shared<AssignScreen>(mpc, layer); } },
+    { "step-timing-correct", [](mpc::Mpc& mpc, int layer){ return std::make_shared<StepTcScreen>(mpc, layer); } },
+    { "others", [](mpc::Mpc& mpc, int layer){ return std::make_shared<OthersScreen>(mpc, layer); } },
+    { "purge", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PurgeScreen>(mpc, layer); } },
+    { "drum", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DrumScreen>(mpc, layer); } },
+    { "trim", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TrimScreen>(mpc, layer); } },
+    { "loop", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoopScreen>(mpc, layer); } },
+    { "zone", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ZoneScreen>(mpc, layer); } },
+    { "number-of-zones", [](mpc::Mpc& mpc, int layer){ return std::make_shared<NumberOfZonesScreen>(mpc, layer); } },
+    { "params", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SndParamsScreen>(mpc, layer); } },
+    { "program-params", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PgmParamsScreen>(mpc, layer); } },
+    { "program-assign", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PgmAssignScreen>(mpc, layer); } },
+    { "select-drum", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SelectDrumScreen>(mpc, layer); } },
+    { "sample", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SampleScreen>(mpc, layer); } },
+    { "sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SoundScreen>(mpc, layer); } },
+    { "convert-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ConvertSoundScreen>(mpc, layer); } },
+    { "copy-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopySoundScreen>(mpc, layer); } },
+    { "delete-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteSoundScreen>(mpc, layer); } },
+    { "mono-to-stereo", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MonoToStereoScreen>(mpc, layer); } },
+    { "resample", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ResampleScreen>(mpc, layer); } },
+    { "stereo-to-mono", [](mpc::Mpc& mpc, int layer){ return std::make_shared<StereoToMonoScreen>(mpc, layer); } },
+    { "mixer", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MixerScreen>(mpc, layer); } },
+    { "mixer-setup", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MixerSetupScreen>(mpc, layer); } },
+    { "select-mixer-drum", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SelectMixerDrumScreen>(mpc, layer); } },
+    { "fx-edit", [](mpc::Mpc& mpc, int layer){ return std::make_shared<FxEditScreen>(mpc, layer); } },
+    { "start-fine", [](mpc::Mpc& mpc, int layer){ return std::make_shared<StartFineScreen>(mpc, layer); } },
+    { "end-fine", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EndFineScreen>(mpc, layer); } },
+    { "loop-to-fine", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoopToFineScreen>(mpc, layer); } },
+    { "loop-end-fine", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoopEndFineScreen>(mpc, layer); } },
+    { "zone-start-fine", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ZoneStartFineScreen>(mpc, layer); } },
+    { "zone-end-fine", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ZoneEndFineScreen>(mpc, layer); } },
+    { "channel-settings", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ChannelSettingsScreen>(mpc, layer); } },
+    { "edit-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<EditSoundScreen>(mpc, layer); } },
+    { "assignment-view", [](mpc::Mpc& mpc, int layer){ return std::make_shared<AssignmentViewScreen>(mpc, layer); } },
+    { "auto-chromatic-assignment", [](mpc::Mpc& mpc, int layer){ return std::make_shared<AutoChromaticAssignmentScreen>(mpc, layer); } },
+    { "copy-note-parameters", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopyNoteParametersScreen>(mpc, layer); } },
+    { "keep-or-retry", [](mpc::Mpc& mpc, int layer){ return std::make_shared<KeepOrRetryScreen>(mpc, layer); } },
+    { "mute-assign", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MuteAssignScreen>(mpc, layer); } },
+    { "program", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ProgramScreen>(mpc, layer); } },
+    { "velocity-modulation", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VelocityModulationScreen>(mpc, layer); } },
+    { "velo-env-filter", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VeloEnvFilterScreen>(mpc, layer); } },
+    { "velo-pitch", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VeloPitchScreen>(mpc, layer); } },
+    { "init-pad-assign", [](mpc::Mpc& mpc, int layer){ return std::make_shared<InitPadAssignScreen>(mpc, layer); } },
+    { "create-new-program", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CreateNewProgramScreen>(mpc, layer); } },
+    { "copy-program", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopyProgramScreen>(mpc, layer); } },
+    { "delete-all-programs", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteAllProgramsScreen>(mpc, layer); } },
+    { "delete-all-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteAllSoundScreen>(mpc, layer); } },
+    { "delete-program", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteProgramScreen>(mpc, layer); } },
+    { "load", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoadScreen>(mpc, layer); } },
+    { "format", [](mpc::Mpc& mpc, int layer){ return std::make_shared<FormatScreen>(mpc, layer); } },
+    { "setup", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SetupScreen>(mpc, layer); } },
+    { "save", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SaveScreen>(mpc, layer); } },
+    { "directory", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DirectoryScreen>(mpc, layer); } },
+    { "load-a-program", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoadAProgramScreen>(mpc, layer); } },
+    { "load-a-sequence", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoadASequenceScreen>(mpc, layer); } },
+    { "load-a-sequence-from-all", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoadASequenceFromAllScreen>(mpc, layer); } },
+    { "load-a-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoadASoundScreen>(mpc, layer); } },
+    { "load-aps-file", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoadApsFileScreen>(mpc, layer); } },
+    { "mpc2000xl-all-file", [](mpc::Mpc& mpc, int layer){ return std::make_shared<Mpc2000XlAllFileScreen>(mpc, layer); } },
+    { "save-a-program", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SaveAProgramScreen>(mpc, layer); } },
+    { "save-a-sequence", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SaveASequenceScreen>(mpc, layer); } },
+    { "save-a-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SaveASoundScreen>(mpc, layer); } },
+    { "save-all-file", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SaveAllFileScreen>(mpc, layer); } },
+    { "save-aps-file", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SaveApsFileScreen>(mpc, layer); } },
+    { "delete-all-files", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteAllFilesScreen>(mpc, layer); } },
+    { "delete-file", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteFileScreen>(mpc, layer); } },
+    { "delete-folder", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteFolderScreen>(mpc, layer); } },
+    { "cant-find-file", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CantFindFileScreen>(mpc, layer); } },
+    { "file-exists", [](mpc::Mpc& mpc, int layer){ return std::make_shared<FileExistsScreen>(mpc, layer); } },
+    { "name", [](mpc::Mpc& mpc, int layer){ return std::make_shared<NameScreen>(mpc, layer); } },
+    { "vmpc-disks", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcDisksScreen>(mpc, layer); } },
+    { "vmpc-settings", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcSettingsScreen>(mpc, layer); } },
+    { "vmpc-direct-to-disk-recorder", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcDirectToDiskRecorderScreen>(mpc, layer); } },
+    { "vmpc-record-jam", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcRecordJamScreen>(mpc, layer); } },
+    { "vmpc-recording-finished", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcRecordingFinishedScreen>(mpc, layer); } },
+    { "ver", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VerScreen>(mpc, layer); } },
+    { "init", [](mpc::Mpc& mpc, int layer){ return std::make_shared<InitScreen>(mpc, layer); } },
+    { "second-seq", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SecondSeqScreen>(mpc, layer); } },
+    { "trans", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TransScreen>(mpc, layer); } },
+    { "transpose-permanent", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TransposePermanentScreen>(mpc, layer); } },
+    { "punch", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PunchScreen>(mpc, layer); } },
+    { "sync", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SyncScreen>(mpc, layer); } },
+    { "popup", [](mpc::Mpc& mpc, int layer){ return std::make_shared<PopupScreen>(mpc); } },
+    { "sound-memory", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SoundMemoryScreen>(mpc, layer); } },
+    { "song-window", [](mpc::Mpc& mpc, int layer){ return std::make_shared<SongWindow>(mpc, layer); } },
+    { "vmpc-file-in-use", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcFileInUseScreen>(mpc, layer); } },
+    { "ignore-tempo-change", [](mpc::Mpc& mpc, int layer){ return std::make_shared<IgnoreTempoChangeScreen>(mpc, layer); } },
+    { "loop-song", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LoopSongScreen>(mpc, layer); } },
+    { "delete-song", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteSongScreen>(mpc, layer); } },
+    { "delete-all-song", [](mpc::Mpc& mpc, int layer){ return std::make_shared<DeleteAllSongScreen>(mpc, layer); } },
+    { "copy-song", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopySongScreen>(mpc, layer); } },
+    { "vmpc-keyboard", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcKeyboardScreen>(mpc, layer); } },
+    { "vmpc-midi", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcMidiScreen>(mpc, layer); } },
+    { "vmpc-reset-keyboard", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcResetKeyboardScreen>(mpc, layer); } },
+    { "vmpc-discard-mapping-changes", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcDiscardMappingChangesScreen>(mpc, layer); } },
+    { "vmpc-auto-save", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcAutoSaveScreen>(mpc, layer); } },
+    { "midi-sw", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiSwScreen>(mpc, layer); } },
+    { "vmpc-convert-and-load-wav", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcConvertAndLoadWavScreen>(mpc, layer); } },
+    { "step-edit-options", [](mpc::Mpc& mpc, int layer){ return std::make_shared<StepEditOptionsScreen>(mpc, layer); } },
+    { "vmpc-midi-presets", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcMidiPresetsScreen>(mpc, layer); } },
+    { "vmpc-warning-settings-ignored", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcWarningSettingsIgnoredScreen>(mpc, layer); } },
+    { "vmpc-known-controller-detected", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcKnownControllerDetectedScreen>(mpc, layer); } },
+    { "vmpc-continue-previous-session", [](mpc::Mpc& mpc, int layer){ return std::make_shared<VmpcContinuePreviousSessionScreen>(mpc, layer); } },
+    { "convert-song-to-seq", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ConvertSongToSeqScreen>(mpc, layer); } },
+    { "locate", [](mpc::Mpc& mpc, int layer){ return std::make_shared<LocateScreen>(mpc, layer); } },
+};
+
+// screenName -> layerIndex
+static const std::map<std::string, int> screensWithoutLayoutJson {
+    { "popup", 4 }
+};
+
+std::shared_ptr<ScreenComponent> Screens::getOrCreateScreenComponent(const std::string &screenName)
 {
-    auto candidate = screens[screenName];
-
-    if (candidate)
+    if (screens.count(screenName) > 0)
     {
-        return candidate;
+        return screens.at(screenName);
     }
 
-    std::shared_ptr <ScreenComponent> screen;
+    if (const auto screenFactory = screenFactories.find(screenName); screenFactory != screenFactories.end())
+    {
+        if (auto screenWithoutLayoutJson = screensWithoutLayoutJson.find(screenName); screenWithoutLayoutJson != screensWithoutLayoutJson.end())
+        {
+            auto screen = screenFactory->second(mpc, screenWithoutLayoutJson->second);
+            screens[screenName] = screen;
+            return screen;
+        }
 
-    int layerIndex = -1;
-    std::string firstField;
-    auto arrangement = get(screenName, layerIndex, firstField);
-    auto children = arrangement.first;
-    auto transferMap = arrangement.second;
+        auto layout = getScreenLayout(screenName);
 
-    if (screenName == "sequencer")
-    {
-        screen = std::make_shared<SequencerScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "sequence")
-    {
-        screen = std::make_shared<SequenceScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "tempo-change")
-    {
-        screen = std::make_shared<TempoChangeScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "count-metronome")
-    {
-        screen = std::make_shared<CountMetronomeScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "edit-multiple")
-    {
-        screen = std::make_shared<EditMultipleScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "transmit-program-changes")
-    {
-        screen = std::make_shared<TransmitProgramChangesScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "timing-correct")
-    {
-        screen = std::make_shared<TimingCorrectScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "time-display")
-    {
-        screen = std::make_shared<TimeDisplayScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "paste-event")
-    {
-        screen = std::make_shared<PasteEventScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "multi-recording-setup")
-    {
-        screen = std::make_shared<MultiRecordingSetupScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "midi-output")
-    {
-        screen = std::make_shared<MidiOutputScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "midi-input")
-    {
-        screen = std::make_shared<MidiInputScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "loop-bars-window")
-    {
-        screen = std::make_shared<LoopBarsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "insert-event")
-    {
-        screen = std::make_shared<InsertEventScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "erase-all-off-tracks")
-    {
-        screen = std::make_shared<EraseAllOffTracksScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "change-tsig")
-    {
-        screen = std::make_shared<ChangeTsigScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "edit-velocity")
-    {
-        screen = std::make_shared<EditVelocityScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "erase")
-    {
-        screen = std::make_shared<EraseScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "change-bars")
-    {
-        screen = std::make_shared<ChangeBarsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "change-bars-2")
-    {
-        screen = std::make_shared<ChangeBars2Screen>(mpc, layerIndex);
-    }
-    else if (screenName == "track")
-    {
-        screen = std::make_shared<TrackScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "assign-16-levels")
-    {
-        screen = std::make_shared<Assign16LevelsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "midi-input-monitor")
-    {
-        screen = std::make_shared<MidiMonitorScreen>(mpc, screenName, layerIndex);
-    }
-    else if (screenName == "midi-output-monitor")
-    {
-        screen = std::make_shared<MidiMonitorScreen>(mpc, screenName, layerIndex);
-    }
-    else if (screenName == "metronome-sound")
-    {
-        screen = std::make_shared<MetronomeSoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "copy-sequence")
-    {
-        screen = std::make_shared<CopySequenceScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "copy-track")
-    {
-        screen = std::make_shared<CopyTrackScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-sequence")
-    {
-        screen = std::make_shared<DeleteSequenceScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-track")
-    {
-        screen = std::make_shared<DeleteTrackScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-all-sequences")
-    {
-        screen = std::make_shared<DeleteAllSequencesScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-all-tracks")
-    {
-        screen = std::make_shared<DeleteAllTracksScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "next-seq-pad")
-    {
-        screen = std::make_shared<NextSeqPadScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "next-seq")
-    {
-        screen = std::make_shared<NextSeqScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "song")
-    {
-        screen = std::make_shared<SongScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "track-mute")
-    {
-        screen = std::make_shared<TrMuteScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "step-editor")
-    {
-        screen = std::make_shared<StepEditorScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "events")
-    {
-        screen = std::make_shared<EventsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "bars")
-    {
-        screen = std::make_shared<BarsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "tr-move")
-    {
-        screen = std::make_shared<TrMoveScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "user")
-    {
-        screen = std::make_shared<UserScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "assign")
-    {
-        screen = std::make_shared<AssignScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "step-timing-correct")
-    {
-        screen = std::make_shared<StepTcScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "others")
-    {
-        screen = std::make_shared<OthersScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "purge")
-    {
-        screen = std::make_shared<PurgeScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "drum")
-    {
-        screen = std::make_shared<DrumScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "trim")
-    {
-        screen = std::make_shared<TrimScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "loop")
-    {
-        screen = std::make_shared<LoopScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "zone")
-    {
-        screen = std::make_shared<ZoneScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "number-of-zones")
-    {
-        screen = std::make_shared<NumberOfZonesScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "params")
-    {
-        screen = std::make_shared<SndParamsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "program-params")
-    {
-        screen = std::make_shared<PgmParamsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "program-assign")
-    {
-        screen = std::make_shared<PgmAssignScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "select-drum")
-    {
-        screen = std::make_shared<SelectDrumScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "sample")
-    {
-        screen = std::make_shared<SampleScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "sound")
-    {
-        screen = std::make_shared<SoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "convert-sound")
-    {
-        screen = std::make_shared<ConvertSoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "copy-sound")
-    {
-        screen = std::make_shared<CopySoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-sound")
-    {
-        screen = std::make_shared<DeleteSoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "mono-to-stereo")
-    {
-        screen = std::make_shared<MonoToStereoScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "resample")
-    {
-        screen = std::make_shared<ResampleScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "stereo-to-mono")
-    {
-        screen = std::make_shared<StereoToMonoScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "mixer")
-    {
-        screen = std::make_shared<MixerScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "mixer-setup")
-    {
-        screen = std::make_shared<MixerSetupScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "select-mixer-drum")
-    {
-        screen = std::make_shared<SelectMixerDrumScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "fx-edit")
-    {
-        screen = std::make_shared<FxEditScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "start-fine")
-    {
-        screen = std::make_shared<StartFineScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "end-fine")
-    {
-        screen = std::make_shared<EndFineScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "loop-to-fine")
-    {
-        screen = std::make_shared<LoopToFineScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "loop-end-fine")
-    {
-        screen = std::make_shared<LoopEndFineScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "zone-start-fine")
-    {
-        screen = std::make_shared<ZoneStartFineScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "zone-end-fine")
-    {
-        screen = std::make_shared<ZoneEndFineScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "channel-settings")
-    {
-        screen = std::make_shared<ChannelSettingsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "edit-sound")
-    {
-        screen = std::make_shared<EditSoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "assignment-view")
-    {
-        screen = std::make_shared<AssignmentViewScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "auto-chromatic-assignment")
-    {
-        screen = std::make_shared<AutoChromaticAssignmentScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "copy-note-parameters")
-    {
-        screen = std::make_shared<CopyNoteParametersScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "keep-or-retry")
-    {
-        screen = std::make_shared<KeepOrRetryScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "mute-assign")
-    {
-        screen = std::make_shared<MuteAssignScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "program")
-    {
-        screen = std::make_shared<ProgramScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "velocity-modulation")
-    {
-        screen = std::make_shared<VelocityModulationScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "velo-env-filter")
-    {
-        screen = std::make_shared<VeloEnvFilterScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "velo-pitch")
-    {
-        screen = std::make_shared<VeloPitchScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "init-pad-assign")
-    {
-        screen = std::make_shared<InitPadAssignScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "create-new-program")
-    {
-        screen = std::make_shared<CreateNewProgramScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "copy-program")
-    {
-        screen = std::make_shared<CopyProgramScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-all-programs")
-    {
-        screen = std::make_shared<DeleteAllProgramsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-all-sound")
-    {
-        screen = std::make_shared<DeleteAllSoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-program")
-    {
-        screen = std::make_shared<DeleteProgramScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "load")
-    {
-        screen = std::make_shared<LoadScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "format")
-    {
-        screen = std::make_shared<FormatScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "setup")
-    {
-        screen = std::make_shared<SetupScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "save")
-    {
-        screen = std::make_shared<SaveScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "directory")
-    {
-        screen = std::make_shared<DirectoryScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "load-a-program")
-    {
-        screen = std::make_shared<LoadAProgramScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "load-a-sequence")
-    {
-        screen = std::make_shared<LoadASequenceScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "load-a-sequence-from-all")
-    {
-        screen = std::make_shared<LoadASequenceFromAllScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "load-a-sound")
-    {
-        screen = std::make_shared<LoadASoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "load-aps-file")
-    {
-        screen = std::make_shared<LoadApsFileScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "mpc2000xl-all-file")
-    {
-        screen = std::make_shared<Mpc2000XlAllFileScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "save-a-program")
-    {
-        screen = std::make_shared<SaveAProgramScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "save-a-sequence")
-    {
-        screen = std::make_shared<SaveASequenceScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "save-a-sound")
-    {
-        screen = std::make_shared<SaveASoundScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "save-all-file")
-    {
-        screen = std::make_shared<SaveAllFileScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "save-aps-file")
-    {
-        screen = std::make_shared<SaveApsFileScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-all-files")
-    {
-        screen = std::make_shared<DeleteAllFilesScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-file")
-    {
-        screen = std::make_shared<DeleteFileScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-folder")
-    {
-        screen = std::make_shared<DeleteFolderScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "cant-find-file")
-    {
-        screen = std::make_shared<CantFindFileScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "file-exists")
-    {
-        screen = std::make_shared<FileExistsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "name")
-    {
-        screen = std::make_shared<NameScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-disks")
-    {
-        screen = std::make_shared<VmpcDisksScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-settings")
-    {
-        screen = std::make_shared<VmpcSettingsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-direct-to-disk-recorder")
-    {
-        screen = std::make_shared<VmpcDirectToDiskRecorderScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-record-jam")
-    {
-        screen = std::make_shared<VmpcRecordJamScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-recording-finished")
-    {
-        screen = std::make_shared<VmpcRecordingFinishedScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "ver")
-    {
-        screen = std::make_shared<VerScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "init")
-    {
-        screen = std::make_shared<InitScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "second-seq")
-    {
-        screen = std::make_shared<SecondSeqScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "trans")
-    {
-        screen = std::make_shared<TransScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "transpose-permanent")
-    {
-        screen = std::make_shared<TransposePermanentScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "punch")
-    {
-        screen = std::make_shared<PunchScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "sync")
-    {
-        screen = std::make_shared<SyncScreen>(mpc, layerIndex);
-    }
+        if (!layout)
+        {
+            MLOG("Screens::getOrCreateScreenComponent has the requested screen name '" + screenName + "' in its map, and a ScreenComponent subclass for it is available in the mpc::lcdgui::screens namespace, but the layout can't be found. Most likely the layout is missing from screens/layer1.json, screens/layer2.json, screens/layer3.json or screens/layer4.json.");
+            return {};
+        }
 
-    // We break up the else-if chain due to "C1061 Compiler limit: blocks nested too deeply" on Visual Studio
-
-    if (screenName == "popup")
-    {
-        screen = std::make_shared<PopupScreen>(mpc);
-    }
-    else if (screenName == "sound-memory")
-    {
-        screen = std::make_shared<SoundMemoryScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "song-window")
-    {
-        screen = std::make_shared<SongWindow>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-file-in-use")
-    {
-        screen = std::make_shared<VmpcFileInUseScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "ignore-tempo-change")
-    {
-        screen = std::make_shared<IgnoreTempoChangeScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "loop-song")
-    {
-        screen = std::make_shared<LoopSongScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-song")
-    {
-        screen = std::make_shared<DeleteSongScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "delete-all-song")
-    {
-        screen = std::make_shared<DeleteAllSongScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "copy-song")
-    {
-        screen = std::make_shared<CopySongScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-keyboard")
-    {
-        screen = std::make_shared<VmpcKeyboardScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-midi")
-    {
-        screen = std::make_shared<VmpcMidiScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-reset-keyboard")
-    {
-        screen = std::make_shared<VmpcResetKeyboardScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-discard-mapping-changes")
-    {
-        screen = std::make_shared<VmpcDiscardMappingChangesScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-auto-save")
-    {
-        screen = std::make_shared<VmpcAutoSaveScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "midi-sw")
-    {
-        screen = std::make_shared<MidiSwScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-convert-and-load-wav")
-    {
-        screen = std::make_shared<VmpcConvertAndLoadWavScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "step-edit-options")
-    {
-        screen = std::make_shared<StepEditOptionsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-midi-presets")
-    {
-        screen = std::make_shared<VmpcMidiPresetsScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-warning-settings-ignored")
-    {
-        screen = std::make_shared<VmpcWarningSettingsIgnoredScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-known-controller-detected")
-    {
-        screen = std::make_shared<VmpcKnownControllerDetectedScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "vmpc-continue-previous-session")
-    {
-        screen = std::make_shared<VmpcContinuePreviousSessionScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "convert-song-to-seq")
-    {
-        screen = std::make_shared<ConvertSongToSeqScreen>(mpc, layerIndex);
-    }
-    else if (screenName == "locate")
-    {
-        screen = std::make_shared<LocateScreen>(mpc, layerIndex);
-    }
-
-    if (screen)
-    {
-        screen->findBackground()->addChildren(children);
-        screen->setTransferMap(transferMap);
-        screen->setFirstField(firstField);
+        auto screen = screenFactory->second(mpc, layout->layerIndex);
+        screen->findBackground()->addChildren(layout->components);
+        screen->setTransferMap(layout->transferMap);
+        screen->setFirstField(layout->firstField);
         screens[screenName] = screen;
+        return screen;
     }
 
-    return screen;
+    MLOG("Screens::getOrCreateScreenComponent is not familiar with screen name '" + screenName + "'. Add it to src/main/lcdgui/Screens.cpp");
+
+    return {};
 }
+

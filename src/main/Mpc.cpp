@@ -25,6 +25,7 @@
 #include <hardware/Hardware.h>
 
 #include <lcdgui/Screens.hpp>
+#include "lcdgui/ScreenNames.h"
 
 #include "MpcResourceUtil.hpp"
 #include "hardware/ComponentId.h"
@@ -146,7 +147,9 @@ void Mpc::init()
     // We fetch all screens once so they're all cached in Screens,
     // avoiding memory allocations on the audio thread.
     for (auto& screenName : screenNames)
-        screens->get<ScreenComponent>(screenName);
+    {
+        screens->getOrCreateScreenComponent(screenName);
+    }
     
     mpc::nvram::MidiControlPersistence::restoreLastState(*this);
     

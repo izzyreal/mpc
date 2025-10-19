@@ -66,7 +66,7 @@ namespace mpc::lcdgui
         }
 
         void removeChild(std::shared_ptr<Component> child);
-		void addChildren(std::vector<std::shared_ptr<Component>> children);
+		void addChildren(std::vector<std::shared_ptr<Component>> &children);
 		std::shared_ptr<Component> findChild(const std::string& nameOfChildToFind);
 		std::shared_ptr<Label> findLabel(const std::string& name);
 		std::shared_ptr<Field> findField(const std::string& name);
