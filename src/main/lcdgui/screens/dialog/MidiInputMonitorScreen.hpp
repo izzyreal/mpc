@@ -12,7 +12,7 @@ namespace mpc::lcdgui
 namespace mpc::lcdgui::screens::dialog
 {
 
-	class MidiMonitorScreen
+	class MidiInputMonitorScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
 
@@ -26,8 +26,8 @@ namespace mpc::lcdgui::screens::dialog
 		void update(Observable* o, Message message) override;
 
 	public:
-		MidiMonitorScreen(mpc::Mpc& mpc, const std::string& name, const int layerIndex);
-		~MidiMonitorScreen();
+		MidiInputMonitorScreen(mpc::Mpc& mpc, const int layerIndex);
+		~MidiInputMonitorScreen();
 
 		void open() override;
 		void close() override;

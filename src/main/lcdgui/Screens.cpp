@@ -116,7 +116,8 @@
 #include <lcdgui/screens/window/LocateScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
-#include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
+#include <lcdgui/screens/dialog/MidiInputMonitorScreen.hpp>
+#include <lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp>
 #include <lcdgui/screens/dialog/CopySequenceScreen.hpp>
 #include <lcdgui/screens/dialog/CopyTrackScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteTrackScreen.hpp>
@@ -397,8 +398,8 @@ static const std::map<std::string, ScreenFactory> screenFactories = {
     { "change-bars-2", [](mpc::Mpc& mpc, int layer){ return std::make_shared<ChangeBars2Screen>(mpc, layer); } },
     { "track", [](mpc::Mpc& mpc, int layer){ return std::make_shared<TrackScreen>(mpc, layer); } },
     { "assign-16-levels", [](mpc::Mpc& mpc, int layer){ return std::make_shared<Assign16LevelsScreen>(mpc, layer); } },
-    { "midi-input-monitor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiMonitorScreen>(mpc, "midi-input-monitor", layer); } },
-    { "midi-output-monitor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiMonitorScreen>(mpc, "midi-output-monitor", layer); } },
+    { "midi-input-monitor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiInputMonitorScreen>(mpc, layer); } },
+    { "midi-output-monitor", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MidiOutputMonitorScreen>(mpc, layer); } },
     { "metronome-sound", [](mpc::Mpc& mpc, int layer){ return std::make_shared<MetronomeSoundScreen>(mpc, layer); } },
     { "copy-sequence", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopySequenceScreen>(mpc, layer); } },
     { "copy-track", [](mpc::Mpc& mpc, int layer){ return std::make_shared<CopyTrackScreen>(mpc, layer); } },
