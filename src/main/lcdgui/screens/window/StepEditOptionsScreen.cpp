@@ -22,7 +22,7 @@ void StepEditOptionsScreen::function(int i)
 {
     if (i == 4)
     {
-        openScreen("step-editor");
+        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
     }
 }
 

@@ -31,7 +31,7 @@ void ChangeBarsScreen::function(int i)
 
 		seq->insertBars(numberOfBars, afterBar);
 
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 	case 4:
@@ -40,7 +40,7 @@ void ChangeBarsScreen::function(int i)
 			sequencer.lock()->move(0);
 
 		seq->deleteBars(firstBar, lastBar);
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 	}

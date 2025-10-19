@@ -28,7 +28,7 @@ void PasteEventScreen::function(int i)
 		{
 			track->cloneEventIntoTrack(event, sequencer.lock()->getTickPosition(), allowMultipleNotesOnSameTick);
 		}
-		openScreen("step-editor");
+        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
 		break;
 	}
 }

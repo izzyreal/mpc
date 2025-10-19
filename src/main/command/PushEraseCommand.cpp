@@ -14,7 +14,7 @@ namespace mpc::command {
             return;
         }
 
-        mpc.getLayeredScreen()->openScreen("erase");
+        mpc.getLayeredScreen()->openScreen<EraseScreen>();
     }
 }
 

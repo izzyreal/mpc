@@ -26,15 +26,15 @@ void CopySequenceScreen::function(int i)
 	{
 	case 2:
 		sequencer.lock()->copySequenceParameters(sq0, sq1);
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	case 3:
-		openScreen("sequence");
+        mpc.getLayeredScreen()->openScreen<SequenceScreen>();
 		break;
 	case 4:
 		sequencer.lock()->copySequence(sq0, sq1);
 		sequencer.lock()->setActiveSequenceIndex(sq1);
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 }

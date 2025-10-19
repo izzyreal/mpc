@@ -56,7 +56,7 @@ void SaveASoundScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("save");
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
 		break;
 	case 4:
 	{
@@ -83,7 +83,7 @@ void SaveASoundScreen::function(int i)
             auto popupScreen = mpc.screens->get<PopupScreen>();
             popupScreen->setText("Saving " + fileName);
             popupScreen->returnToScreenAfterMilliSeconds("save", 700);
-            mpc.getLayeredScreen()->openScreen("popup");
+            mpc.getLayeredScreen()->openScreen<PopupScreen>();
         };
 
 		if (disk->checkExists(fileName))
@@ -99,13 +99,13 @@ void SaveASoundScreen::function(int i)
 
             const auto initializeNameScreen = [this]{
                 auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string&){ openScreen(name); };
+                auto enterAction = [this](std::string&){ mpc.getLayeredScreen()->openScreen<SaveASoundScreen>(); };
                 nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
-            openScreen("file-exists");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
+        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
             return;
 		}
         saveAction();

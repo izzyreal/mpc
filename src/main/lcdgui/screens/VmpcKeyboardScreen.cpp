@@ -158,11 +158,11 @@ void VmpcKeyboardScreen::function(int i)
             {
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
-                openScreen("vmpc-discard-mapping-changes");
+        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
-            openScreen("vmpc-settings");
+        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
             break;
         case 2:
             if (learning)
@@ -177,11 +177,11 @@ void VmpcKeyboardScreen::function(int i)
             {
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
-                openScreen("vmpc-discard-mapping-changes");
+        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
-            openScreen("vmpc-auto-save");
+        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
             break;
         case 3:
             if (learning)
@@ -205,14 +205,14 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
             
-            openScreen("vmpc-reset-keyboard");
+        mpc.getLayeredScreen()->openScreen<VmpcResetKeyboardScreen>();
             break;
         case 5:
             if (learning)
                 return;
 
             auto popupScreen = mpc.screens->get<PopupScreen>();
-            openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
             if (hasMappingChanged())
             {

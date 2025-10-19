@@ -53,7 +53,7 @@ void NextSeqPadScreen::function(int i)
 		refreshSeqs();
 		break;
 	case 5:
-		openScreen("next-seq");
+        mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
 		break;
 	}
 }

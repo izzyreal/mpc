@@ -28,12 +28,12 @@ void CreateNewProgramScreen::openNameScreen()
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             newName = nameScreenName;
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(newName, 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 
@@ -69,7 +69,7 @@ void CreateNewProgramScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("program");
+        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 		break;
 	case 4:
 		auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
@@ -88,7 +88,7 @@ void CreateNewProgramScreen::function(int i)
 		}
 
             activeDrum().setProgram(index);
-		openScreen("program");
+        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 		break;
 	}
 }
@@ -105,7 +105,7 @@ void CreateNewProgramScreen::displayNewName()
 
 void CreateNewProgramScreen::setMidiProgramChange(int i)
 {
-	if (i < 1) i = 1;
+    if (i < 1) i = 1;
     else if (i > 128) i = 128;
 
 	if (midiProgramChange == i)

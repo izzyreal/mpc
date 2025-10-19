@@ -42,7 +42,7 @@ void SndParamsScreen::openWindow()
 	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("params");
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 	}
 }
 
@@ -53,18 +53,18 @@ void SndParamsScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		openScreen("trim");
+        mpc.getLayeredScreen()->openScreen<TrimScreen>();
 		break;
 	case 1:
-		openScreen("loop");
+        mpc.getLayeredScreen()->openScreen<LoopScreen>();
 		break;
 	case 2:
-		openScreen("zone");
+        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
 		break;
 	case 3:
 	{
         sampler->switchToNextSoundSortType();
-		openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("params", 200);
@@ -77,7 +77,7 @@ void SndParamsScreen::function(int f)
 
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("trim");
-		openScreen("edit-sound");
+        mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
 		break;
 	}
 	case 5:

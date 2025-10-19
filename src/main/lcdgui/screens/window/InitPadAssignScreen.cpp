@@ -40,7 +40,7 @@ void InitPadAssignScreen::function(int i)
 			program->initPadAssign();
 		}
 		
-		openScreen("program-assign");
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
 		break;
 	}
 }

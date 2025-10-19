@@ -29,11 +29,11 @@ void DeleteFileScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		openScreen("delete-all-files");
+        mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
 		break;
 	case 4:
 		auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-		openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 		
@@ -68,7 +68,7 @@ void DeleteFileScreen::deleteFile()
 		directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
 	}
 
-	openScreen("directory");
+        mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
 }
 
 DeleteFileScreen::~DeleteFileScreen()

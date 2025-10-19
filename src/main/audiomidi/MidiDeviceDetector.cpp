@@ -90,7 +90,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                     {
                         auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
                         mpc.getDisk()->readMidiControlPreset(path, vmpcMidiScreen->switchToPreset);
-                        mpc.getLayeredScreen()->openScreen("vmpc-known-controller-detected");
+                        mpc.getLayeredScreen()->openScreen<VmpcKnownControllerDetectedScreen>();
                     }
                 }
             }

@@ -14,7 +14,7 @@ void VmpcRecordingFinishedScreen::function(int i)
 	switch (i)
     {
     case 3:
-        openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         break;
     }
 }

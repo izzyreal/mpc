@@ -32,10 +32,10 @@ void SequenceScreen::function(int i)
     switch (i)
     {
         case 1:
-            openScreen("delete-sequence");
+        mpc.getLayeredScreen()->openScreen<DeleteSequenceScreen>();
             break;
         case 4:
-            openScreen("copy-sequence");
+        mpc.getLayeredScreen()->openScreen<CopySequenceScreen>();
             break;
     }
 }
@@ -53,7 +53,7 @@ void SequenceScreen::openNameScreen()
 
         enterAction = [this](std::string& nameScreenName) {
             sequencer.lock()->setDefaultSequenceName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
         };
     }
     else
@@ -62,11 +62,11 @@ void SequenceScreen::openNameScreen()
 
         enterAction = [this](std::string& nameScreenName) {
             sequencer.lock()->getActiveSequence()->setName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
         };
     }
 
     auto nameScreen = mpc.screens->get<NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
-    openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

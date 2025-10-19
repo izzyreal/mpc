@@ -117,7 +117,7 @@ void NextSeqScreen::function(int i)
     }
 	else if (i == 5)
 	{
-		openScreen("next-seq-pad");
+        mpc.getLayeredScreen()->openScreen<NextSeqPadScreen>();
 	}
 }
 

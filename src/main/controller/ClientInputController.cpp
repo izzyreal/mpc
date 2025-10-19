@@ -338,7 +338,7 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
         {
             if (vmpcKeyboardScreen->hasMappingChanged())
             {
-                layeredScreen->openScreen("vmpc-discard-mapping-changes");
+                layeredScreen->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
         }
@@ -346,7 +346,7 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
         {
             if (vmpcMidiScreen->hasMappingChanged())
             {
-                layeredScreen->openScreen("vmpc-discard-mapping-changes");
+                layeredScreen->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
         }

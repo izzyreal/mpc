@@ -336,7 +336,7 @@ void AudioMidiServices::stopBouncing()
         return;
     }
 
-	mpc.getLayeredScreen()->openScreen("vmpc-recording-finished");
+	mpc.getLayeredScreen()->openScreen<VmpcRecordingFinishedScreen>();
 	bouncing.store(false);
 
     auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();

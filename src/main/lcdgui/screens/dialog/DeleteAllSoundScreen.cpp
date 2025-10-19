@@ -14,11 +14,11 @@ void DeleteAllSoundScreen::function(int i)
 	switch (i)
 	{
 	case int(3) :
-		openScreen("delete-sound");
+        mpc.getLayeredScreen()->openScreen<DeleteSoundScreen>();
 		break;
 	case 4:
 		sampler->deleteAllSamples();
-		openScreen(sampler->getPreviousScreenName());
+		mpc.getLayeredScreen()->openScreen(sampler->getPreviousScreenName());
 		break;
 	}
 }

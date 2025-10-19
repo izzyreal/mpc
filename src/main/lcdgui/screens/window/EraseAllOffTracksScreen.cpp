@@ -29,7 +29,7 @@ void EraseAllOffTracksScreen::function(int i)
 			}
 			trackCounter++;
 		}
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 	}

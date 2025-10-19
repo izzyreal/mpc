@@ -30,12 +30,12 @@ void SoundScreen::openNameScreen()
             }
 
             sampler->getSound()->setName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(sampler->getSound()->getName(), 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
 	}
 }
 
@@ -46,13 +46,13 @@ void SoundScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		openScreen("delete-sound");
+        mpc.getLayeredScreen()->openScreen<DeleteSoundScreen>();
 		break;
 	case 2:
-		openScreen("convert-sound");
+        mpc.getLayeredScreen()->openScreen<ConvertSoundScreen>();
 		break;
 	case 4:
-		openScreen("copy-sound");
+        mpc.getLayeredScreen()->openScreen<CopySoundScreen>();
 		break;
 	}
 }

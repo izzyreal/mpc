@@ -32,7 +32,7 @@ void KeepOrRetryScreen::function(int i)
     {
         case 1:
             sampler->deleteSound(sampler->getPreviewSound());
-            openScreen("sample");
+        mpc.getLayeredScreen()->openScreen<SampleScreen>();
             break;
         case 3 :
             sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
@@ -46,7 +46,7 @@ void KeepOrRetryScreen::function(int i)
             }
 
             sampler->setSoundIndex(index);
-            openScreen("sample");
+        mpc.getLayeredScreen()->openScreen<SampleScreen>();
             break;
     }
 }
@@ -64,12 +64,12 @@ void KeepOrRetryScreen::openNameScreen()
             }
 
             sampler->getPreviewSound()->setName(nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(sampler->getPreviewSound()->getName(), 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 

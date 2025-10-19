@@ -23,19 +23,19 @@ void PurgeScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		openScreen("program-assign");
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
 		break;
 	case 1:
-		openScreen("program-params");
+        mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
 		break;
 	case 2:
-		openScreen("drum");
+        mpc.getLayeredScreen()->openScreen<DrumScreen>();
 		break;
 	case 3:
 	{
 		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
 		selectDrumScreen->redirectScreen = "purge";
-		openScreen("select-drum");
+        mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
 		break;
 	}
 	case 5:

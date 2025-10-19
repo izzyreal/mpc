@@ -15,14 +15,14 @@ void ReleaseFunctionCommand::execute()
     switch (i) {
     case 0:
         if (currentScreenName == "step-timing-correct")
-            mpc.getLayeredScreen()->openScreen("step-editor");
+            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
         break;
     case 4:
         if (mpc.getLayeredScreen()->getPreviousScreenName() == "load" && currentScreenName == "popup") {
             if (const auto lastFocusedField = mpc.getLayeredScreen()->getLastFocus("load");
                 lastFocusedField == "file" || lastFocusedField == "view")
             {
-                mpc.getLayeredScreen()->openScreen("load");
+                mpc.getLayeredScreen()->openScreen<LoadScreen>();
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
             }
         }
@@ -39,7 +39,7 @@ void ReleaseFunctionCommand::execute()
                 mpc.getLayeredScreen()->setCurrentBackground("track-mute");
             sequencer->setSoloEnabled(sequencer->isSoloEnabled());
         } else if (mpc.getLayeredScreen()->getPreviousScreenName() == "directory" && currentScreenName == "popup") {
-            mpc.getLayeredScreen()->openScreen("directory");
+            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
             mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
         }
         break;

@@ -88,7 +88,7 @@ void LoadASoundScreen::function(int i)
 	case 3:
 		sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
 		sampler->deleteSound(sampler->getPreviewSound());
-		openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 		break;
 	case 4:
 		keepSound();
@@ -133,7 +133,7 @@ void LoadASoundScreen::keepSound()
             const auto isMono = previewSound->isMono();
             sampler->replaceSound(existingSoundIndex, previewSound);
             actionAfterLoadingSound(isMono);
-            openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
         };
 
         const auto initializeNameScreen = [this, actionAfterLoadingSound, previewSound]{
@@ -147,7 +147,7 @@ void LoadASoundScreen::keepSound()
 
                 previewSound->setName(nameScreenName);
                 actionAfterLoadingSound(previewSound->isMono());
-                openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
             };
 
             auto loadScreen = mpc.screens->get<LoadScreen>();
@@ -157,13 +157,16 @@ void LoadASoundScreen::keepSound()
 
         auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
         fileExistsScreen->initialize(replaceAction, initializeNameScreen,
-                                     [this]{ sampler->deleteSound(sampler->getPreviewSound()); openScreen("load"); });
-        openScreen("file-exists");
+                                     [this]{
+                                               sampler->deleteSound(sampler->getPreviewSound());
+                                               mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                                           });
+        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
         return;
     }
 
     actionAfterLoadingSound(previewSound->isMono());
-    openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 }
 
 void LoadASoundScreen::displayAssignToNote()

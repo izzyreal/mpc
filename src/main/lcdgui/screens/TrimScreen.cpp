@@ -52,15 +52,15 @@ void TrimScreen::openWindow()
 	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("trim");
-		openScreen("sound");
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
 	}
 	else if (param == "st")
 	{
-		openScreen("start-fine");
+        mpc.getLayeredScreen()->openScreen<StartFineScreen>();
 	}
 	else if (param == "end")
 	{
-		openScreen("end-fine");
+        mpc.getLayeredScreen()->openScreen<EndFineScreen>();
 	}
 }
 
@@ -73,20 +73,20 @@ void TrimScreen::function(int f)
 	case 0:
 	{
         sampler->switchToNextSoundSortType();
-		openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("trim", 200);
 		break;
 	}
 	case 1:
-		openScreen("loop");
+        mpc.getLayeredScreen()->openScreen<LoopScreen>();
 		break;
 	case 2:
-		openScreen("zone");
+        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
 		break;
 	case 3:
-		openScreen("params");
+        mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
 		break;
 	case 4:
 	{
@@ -98,7 +98,7 @@ void TrimScreen::function(int f)
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("trim");
 		
-		openScreen("edit-sound");
+        mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
 		break;
 	}
 	case 5:
@@ -322,7 +322,7 @@ void TrimScreen::pressEnter()
 {
 	if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
 	{
-		openScreen("save");
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
 		return;
 	}
 

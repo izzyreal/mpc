@@ -33,8 +33,8 @@ void ChangeBars2Screen::function(int i)
 	switch (i)
 	{
 	case 2:
-		openScreen("sequencer"); // Required for desired screen transitions
-		openScreen("change-bars");
+		mpc.getLayeredScreen()->openScreen<SequencerScreen>(); // Required for desired screen transitions
+        mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
 		break;
 	case 4:
 	{
@@ -57,7 +57,7 @@ void ChangeBars2Screen::function(int i)
 		if (changed)
 			sequencer.lock()->move(0);
 
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 	}

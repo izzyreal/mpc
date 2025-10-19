@@ -31,7 +31,7 @@ void MidiSwScreen::open()
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();
-        openScreen("vmpc-warning-settings-ignored");
+        mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
     }
 }
 
@@ -101,7 +101,7 @@ void MidiSwScreen::function(int i)
     switch (i)
     {
         case 0:
-            openScreen("sync");
+        mpc.getLayeredScreen()->openScreen<SyncScreen>();
             break;
     }
 }

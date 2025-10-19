@@ -14,7 +14,7 @@ void SyncScreen::open()
     
     if (tab == 2)
     {
-        openScreen("midi-sw");
+        mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
         return;
     }
     
@@ -74,7 +74,7 @@ void SyncScreen::function(int i)
     {
         case 2:
             tab = 2;
-            openScreen("midi-sw");
+        mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
             break;
     }
 }

@@ -181,7 +181,7 @@ void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s, std::st
         auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("Saving " + fileName);
         popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
         return f;
     };
 
@@ -255,7 +255,7 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
 
         auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("Saving " + fileName);
-        mpc.getLayeredScreen()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
         auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
@@ -316,7 +316,7 @@ void AbstractDisk::writeAps(const std::string& fileName)
 
         auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("Saving " + fileName);
-        mpc.getLayeredScreen()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
         auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
@@ -360,7 +360,7 @@ void AbstractDisk::writeAll(const std::string& fileName)
         auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("         Saving ...");
         popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
         return f;
     };
@@ -680,5 +680,5 @@ void AbstractDisk::showPopup(mpc_io_error_msg& msg)
     }
 
     popupScreen->returnToScreenAfterMilliSeconds(currentScreenName, 1000);
-    mpc.getLayeredScreen()->openScreen("popup");
+    mpc.getLayeredScreen()->openScreen<PopupScreen>();
 }

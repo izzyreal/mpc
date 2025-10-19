@@ -386,7 +386,7 @@ void TempoChangeScreen::function(int j)
 	}
 		break;
 	case 3:
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	case 4:
 	{

@@ -15,11 +15,11 @@ void DeleteAllTracksScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("delete-track");
+        mpc.getLayeredScreen()->openScreen<DeleteTrackScreen>();
 		break;
 	case 4:
 		sequencer.lock()->getActiveSequence()->purgeAllTracks();
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 }

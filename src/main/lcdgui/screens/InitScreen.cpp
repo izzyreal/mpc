@@ -17,10 +17,10 @@ void InitScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		openScreen("others");
+        mpc.getLayeredScreen()->openScreen<OthersScreen>();
 		break;
 	case 2:
-		openScreen("ver");
+        mpc.getLayeredScreen()->openScreen<VerScreen>();
 		break;
 	case 5:
 	{
@@ -30,7 +30,7 @@ void InitScreen::function(int i)
 		auto setupScreen = mpc.screens->get<SetupScreen>();
 		setupScreen->resetPreferences();
 
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 	}

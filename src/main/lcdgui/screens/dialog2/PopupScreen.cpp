@@ -5,8 +5,8 @@
 
 using namespace mpc::lcdgui::screens::dialog2;
 
-PopupScreen::PopupScreen(mpc::Mpc& mpc)
-	: ScreenComponent(mpc, "popup", 3)
+PopupScreen::PopupScreen(mpc::Mpc& mpc, int layer)
+	: ScreenComponent(mpc, "popup", layer)
 {
 	addChild(std::make_shared<Label>(mpc, "popup", "", 43, 23, 0));
 	findChild<Label>("popup")->setInverted(true);
@@ -35,12 +35,11 @@ void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName,
         returnToScreenThread.join();
     }
 
-	auto screen = screenName;
 	auto layeredScreen = ls;
 
-	returnToScreenThread = std::thread([screen, delayInMs, layeredScreen]() {
+	returnToScreenThread = std::thread([screenName, delayInMs, layeredScreen]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(delayInMs));
-		layeredScreen->openScreen(screen);
+		layeredScreen->openScreen(screenName);
 	});
 }
 

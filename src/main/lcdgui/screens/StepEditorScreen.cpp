@@ -53,7 +53,7 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void StepEditorScreen::openWindow()
 {
-    openScreen("step-edit-options");
+        mpc.getLayeredScreen()->openScreen<StepEditOptionsScreen>();
 }
 
 
@@ -184,7 +184,7 @@ void StepEditorScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		openScreen("step-timing-correct");
+        mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
 		break;
 	case 1:
 		if (selectionStartIndex != -1)
@@ -252,7 +252,7 @@ void StepEditorScreen::function(int i)
 		if (selectionEndIndex == -1)
 		{
 			if (!posIsLastTick)
-				openScreen("insert-event");
+        mpc.getLayeredScreen()->openScreen<InsertEventScreen>();
 		}
 		else
 		{
@@ -341,14 +341,14 @@ void StepEditorScreen::function(int i)
 			setSelectedEvent(visibleEvents[row]);
 			setSelectedEvents();
 			setSelectedParameterLetter(column);
-			openScreen("edit-multiple");
+        mpc.getLayeredScreen()->openScreen<EditMultipleScreen>();
 		}
 
 		break;
 	}
 	case 4:
 		if (!placeHolder.empty())
-			openScreen("paste-event");
+        mpc.getLayeredScreen()->openScreen<PasteEventScreen>();
 		break;
 	case 5:
         if (selectionStartIndex == -1)

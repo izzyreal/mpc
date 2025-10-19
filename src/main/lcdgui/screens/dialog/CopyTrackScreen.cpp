@@ -24,13 +24,13 @@ void CopyTrackScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("track");
+        mpc.getLayeredScreen()->openScreen<TrackScreen>();
 		break;
 	case 4:
 	{
 		auto seqIndex = sequencer.lock()->getActiveSequenceIndex();
 		sequencer.lock()->copyTrack(tr0, tr1, seqIndex, seqIndex);
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 	}

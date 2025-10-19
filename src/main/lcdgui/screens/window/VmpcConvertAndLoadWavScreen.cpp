@@ -20,7 +20,7 @@ void VmpcConvertAndLoadWavScreen::function(int i)
     switch (i)
     {
         case 3:
-            openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
             break;
         case 4:
             loadRoutine();

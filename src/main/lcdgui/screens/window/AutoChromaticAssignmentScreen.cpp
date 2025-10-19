@@ -44,7 +44,7 @@ void AutoChromaticAssignmentScreen::function(int i)
     switch (i)
     {
         case 3:
-            openScreen("program-assign");
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
             break;
         case 4:
         {
@@ -73,7 +73,7 @@ void AutoChromaticAssignmentScreen::function(int i)
                 }
             }
             
-            openScreen("program-assign");
+            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
             break;
         }
     }
@@ -111,12 +111,12 @@ void AutoChromaticAssignmentScreen::openNameScreen()
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             newName = nameScreenName;
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(newName, 16, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 

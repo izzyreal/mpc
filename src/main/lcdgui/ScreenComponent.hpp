@@ -49,7 +49,6 @@ namespace mpc::lcdgui
 
 	protected:
 		std::shared_ptr<Field> findFocus();
-		void openScreen(const std::string& screenName);
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
 		const std::string getLastFocus(const std::string& screenName);
 		std::shared_ptr<Wave> findWave();

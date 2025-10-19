@@ -8,6 +8,7 @@
 
 namespace mpc {
     class Mpc;
+    class AutoSave;
 }
 
 namespace mpc::lcdgui
@@ -36,11 +37,12 @@ namespace mpc::lcdgui{
                 return {};
             }
 
-            std::shared_ptr<ScreenComponent> getByName(const std::string name);
-
             void createAndCacheAllScreens();
 
+            std::shared_ptr<ScreenComponent> getByName1(const std::string name);
+
         private:
+
             struct ScreenLayout
             {
                 int layerIndex = -1;

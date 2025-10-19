@@ -153,7 +153,7 @@ void Mpc::init()
     
     MLOG("Mpc is ready");
     
-    layeredScreen->openScreen("sequencer");
+    layeredScreen->openScreen<SequencerScreen>();
 }
 
 std::shared_ptr<hardware::Hardware> Mpc::getHardware()

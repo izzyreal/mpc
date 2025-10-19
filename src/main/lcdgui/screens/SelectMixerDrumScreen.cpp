@@ -25,10 +25,10 @@ void SelectMixerDrumScreen::function(int i)
 	{
 		auto drumScreen = mpc.screens->get<DrumScreen>();
 		drumScreen->setDrum(i);
-		openScreen("mixer");
+        mpc.getLayeredScreen()->openScreen<MixerScreen>();
 	}
 	else if (i == 4)
 	{
-		openScreen("mixer-setup");
+        mpc.getLayeredScreen()->openScreen<MixerSetupScreen>();
 	}
 }

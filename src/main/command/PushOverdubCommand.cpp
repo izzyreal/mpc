@@ -27,7 +27,7 @@ namespace mpc::command {
 
         if (!mpc.getSequencer()->isPlaying() && !lcdgui::screengroups::isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
         {
-            mpc.getLayeredScreen()->openScreen("sequencer");
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }
 
         mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(true);

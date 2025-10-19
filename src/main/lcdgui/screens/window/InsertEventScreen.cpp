@@ -40,7 +40,7 @@ void InsertEventScreen::function(int i)
 	case 4:
 		insertEvent();
         eventAddedBeforeLeavingTheScreen = true;
-		openScreen("step-editor");
+        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
 		break;
 	}
 }

@@ -38,11 +38,11 @@ void ConvertSongToSeqScreen::function(int i)
     switch (i)
     {
         case 3:
-            openScreen("song");
+            mpc.getLayeredScreen()->openScreen<SongScreen>();
             break;
         case 4:
             convertSongToSeq();
-            openScreen("song");
+            mpc.getLayeredScreen()->openScreen<SongScreen>();
             break;
     }
 }

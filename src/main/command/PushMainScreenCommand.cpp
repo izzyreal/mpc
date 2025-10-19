@@ -12,7 +12,7 @@ namespace mpc::command {
         if (ams->isRecordingSound())
             ams->stopSoundRecorder();
 
-        mpc.getLayeredScreen()->openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         mpc.getSequencer()->setSoloEnabled(mpc.getSequencer()->isSoloEnabled());
 
         const auto hw = mpc.getHardware();

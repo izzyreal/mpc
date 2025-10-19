@@ -25,13 +25,13 @@ void VmpcAutoSaveScreen::function(int i)
     switch (i)
     {
         case 0:
-            openScreen("vmpc-settings");
+        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
             break;
         case 1:
-            openScreen("vmpc-keyboard");
+        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
             break;
         case 3:
-            openScreen("vmpc-disks");
+        mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
             break;
         case 4:
         {
@@ -42,7 +42,7 @@ void VmpcAutoSaveScreen::function(int i)
                 return;
             }
 
-            openScreen("vmpc-midi");
+        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
             break;
         }
     }

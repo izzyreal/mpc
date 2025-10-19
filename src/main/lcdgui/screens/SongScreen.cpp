@@ -118,11 +118,11 @@ void SongScreen::openWindow()
 	}
 
 	if (param == "loop")
-		openScreen("loop-song");
+        mpc.getLayeredScreen()->openScreen<LoopSongScreen>();
 	else if (param == "song")
-		openScreen("song-window");
+        mpc.getLayeredScreen()->openScreen<SongWindow>();
 	else if (param == "tempo" || param == "tempo-source")
-		openScreen("ignore-tempo-change");
+        mpc.getLayeredScreen()->openScreen<IgnoreTempoChangeScreen>();
 }
 
 void SongScreen::down()
@@ -234,7 +234,7 @@ void SongScreen::function(int i)
 	switch (i)
 	{
     case 3:
-        openScreen("convert-song-to-seq");
+        mpc.getLayeredScreen()->openScreen<ConvertSongToSeqScreen>();
         break;
 	case 4:
 		if (sequencer.lock()->isPlaying())

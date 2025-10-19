@@ -15,7 +15,7 @@ namespace mpc::command {
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer")
         {
-            mpc.getLayeredScreen()->openScreen("locate");
+            mpc.getLayeredScreen()->openScreen<LocateScreen>();
         }
     }
 

@@ -28,7 +28,7 @@ namespace mpc::command {
 
         if (!lcdgui::screengroups::isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
         {
-            mpc.getLayeredScreen()->openScreen("sequencer");
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }
 
         mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(true);

@@ -54,7 +54,7 @@ void CopyNoteParametersScreen::function(int i)
 		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler->getProgram(prog1).get());
 		auto clone = source->clone(note1);
 		dest->setNoteParameters(note1, clone);
-		openScreen("program-assign");
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
 		break;
 	}
 	}

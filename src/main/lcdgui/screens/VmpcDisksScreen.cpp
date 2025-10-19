@@ -52,13 +52,13 @@ void VmpcDisksScreen::function(int i)
     switch (i)
     {
         case 0:
-            openScreen("vmpc-settings");
+        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
             break;
         case 1:
-            openScreen("vmpc-keyboard");
+        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
             break;
         case 2:
-            openScreen("vmpc-auto-save");
+        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
             break;
         case 4:
         {
@@ -69,12 +69,12 @@ void VmpcDisksScreen::function(int i)
                 return;
             }
 
-            openScreen("vmpc-midi");
+        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
             break;
         }
         case 5:
             auto popupScreen = mpc.screens->get<PopupScreen>();
-            openScreen("popup");
+        mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
             if (hasConfigChanged())
             {

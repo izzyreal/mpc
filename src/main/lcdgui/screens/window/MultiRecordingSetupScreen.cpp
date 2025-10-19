@@ -35,7 +35,7 @@ void MultiRecordingSetupScreen::function(int i)
 {
     if (i == 3)
     {
-        openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     }
 }
 
@@ -52,7 +52,7 @@ void MultiRecordingSetupScreen::open()
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();
-        openScreen("vmpc-warning-settings-ignored");
+        mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
     }
 }
 

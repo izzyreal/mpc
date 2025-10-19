@@ -14,13 +14,13 @@ void PunchScreen::open()
 {
     if (sequencer.lock()->isPlaying())
     {
-        openScreen("trans");
+        mpc.getLayeredScreen()->openScreen<TransScreen>();
         return;
     }
 
     if (tab != 0)
     {
-        openScreen(tabNames[tab]);
+        mpc.getLayeredScreen()->openScreen(tabNames[tab]);
         return;
     }
     
@@ -57,11 +57,11 @@ void PunchScreen::function(int i)
     case 1: // Intentional fall-through
     case 2:
         tab = i;
-        openScreen(tabNames[i]);
+        mpc.getLayeredScreen()->openScreen(tabNames[i]);
         break;
     case 5:
         on = !on;
-        openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         break;
     }
 }
@@ -122,12 +122,12 @@ void PunchScreen::displayBackground()
 
 void PunchScreen::rec()
 {
-    openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     ScreenComponent::rec();
 }
 
 void PunchScreen::overDub()
 {
-    openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     ScreenComponent::rec();
 }

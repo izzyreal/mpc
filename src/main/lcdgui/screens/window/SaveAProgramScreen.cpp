@@ -53,7 +53,7 @@ void SaveAProgramScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("save");
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
 		break;
 	case 4:
 	{
@@ -76,13 +76,13 @@ void SaveAProgramScreen::function(int i)
 
             const auto initializeNameScreen = [this]{
                 auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string&){ openScreen(name); };
+                auto enterAction = [this](std::string&){ mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>(); };
                 nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
-            openScreen("file-exists");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
+        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
             break;
 		}
 

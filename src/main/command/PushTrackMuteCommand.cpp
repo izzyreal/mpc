@@ -13,14 +13,14 @@ namespace mpc::command {
         if (currentScreenName == "track-mute") {
             auto previous = mpc.getLayeredScreen()->getPreviousScreenName();
             if (previous == "next-seq" || previous == "next-seq-pad") {
-                mpc.getLayeredScreen()->openScreen("next-seq");
+                mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
             } else {
-                mpc.getLayeredScreen()->openScreen("sequencer");
+                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             }
             mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
         } else if (currentScreenName == "next-seq" || currentScreenName == "next-seq-pad" || currentScreenName == "sequencer") {
             Util::initSequence(mpc);
-            mpc.getLayeredScreen()->openScreen("track-mute");
+            mpc.getLayeredScreen()->openScreen<TrMuteScreen>();
             mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(true);
         }
     }

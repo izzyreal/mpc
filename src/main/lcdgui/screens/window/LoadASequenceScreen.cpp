@@ -56,13 +56,13 @@ void LoadASequenceScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 		sequencer.lock()->clearPlaceHolder();
 		break;
 	case 4:
 		sequencer.lock()->movePlaceHolderTo(loadInto);
 		sequencer.lock()->setActiveSequenceIndex(loadInto);
-		openScreen("sequencer");
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
 		break;
 	}
 }

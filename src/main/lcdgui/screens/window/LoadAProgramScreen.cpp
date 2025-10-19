@@ -46,7 +46,7 @@ void LoadAProgramScreen::function(int i)
 		break;
 	}
 	case 3:
-		openScreen("load");
+        mpc.getLayeredScreen()->openScreen<LoadScreen>();
 		break;
 	case 4: {
         auto newProgram = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();

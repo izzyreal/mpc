@@ -21,7 +21,7 @@ void IgnoreTempoChangeScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		openScreen("song");
+        mpc.getLayeredScreen()->openScreen<SongScreen>();
 		break;
 	}
 }

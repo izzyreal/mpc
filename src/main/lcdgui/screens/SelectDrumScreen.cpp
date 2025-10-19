@@ -30,10 +30,10 @@ void SelectDrumScreen::function(int i)
 
 	if (redirectScreen.empty())
 	{
-        openScreen("program-assign");
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
 	}
 	else {
-        openScreen(redirectScreen);
+        mpc.getLayeredScreen()->openScreen(redirectScreen);
         redirectScreen = "";
 	}
 }

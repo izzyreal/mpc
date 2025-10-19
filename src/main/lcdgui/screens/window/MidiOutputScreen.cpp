@@ -38,13 +38,13 @@ void MidiOutputScreen::openNameScreen()
 
         const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName) {
             sequencer.lock()->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
-            openScreen(name);
+            mpc.getLayeredScreen()->openScreen(name);
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         auto seq = sequencer.lock()->getActiveSequence();
         nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, name);
-        openScreen("name");
+        mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 
@@ -78,7 +78,7 @@ void MidiOutputScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		openScreen("midi-output-monitor");
+        mpc.getLayeredScreen()->openScreen<MidiOutputMonitorScreen>();
 		break;
 	case 4:
         mpc.panic();

@@ -529,14 +529,14 @@ void SequencerScreen::function(int i)
 
 		Util::initSequence(mpc);
 
-		openScreen("step-editor");
+        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
 		break;
 	case 1:
 	{
 		if (sequencer.lock()->isPlaying())
 			return;
 
-		openScreen("events");
+        mpc.getLayeredScreen()->openScreen<EventsScreen>();
 		break;
 	}
 	case 2:
@@ -687,7 +687,7 @@ void SequencerScreen::turnWheel(int i)
 	{
         if (!sequencer.lock()->isPlaying())
         {
-            openScreen("change-bars-2");
+        mpc.getLayeredScreen()->openScreen<ChangeBars2Screen>();
         }
 	}
 	else if (param == "tempo")
@@ -698,7 +698,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "tsig")
 	{
-		openScreen("change-tsig");
+        mpc.getLayeredScreen()->openScreen<ChangeTsigScreen>();
 	}
 	else if (param == "tempo-source")
 	{
@@ -733,66 +733,66 @@ void SequencerScreen::openWindow()
 	if (param == "sq")
 	{
 		Util::initSequence(mpc);
-		openScreen("sequence");
+        mpc.getLayeredScreen()->openScreen<SequenceScreen>();
 	}
 	else if (param.find("now") != std::string::npos)
 	{
-		openScreen("time-display");
+        mpc.getLayeredScreen()->openScreen<TimeDisplayScreen>();
 	}
 	else if (param.find("tempo") != std::string::npos)
 	{
-		openScreen("tempo-change");
+        mpc.getLayeredScreen()->openScreen<TempoChangeScreen>();
 	}
 	else if (param == "timing")
 	{
-		openScreen("timing-correct");
+        mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
 	}
 	else if (param == "tsig")
 	{
-		openScreen("change-tsig");
+        mpc.getLayeredScreen()->openScreen<ChangeTsigScreen>();
 	}
 	else if (param == "count")
 	{
-		openScreen("count-metronome");
+        mpc.getLayeredScreen()->openScreen<CountMetronomeScreen>();
 	}
 	else if (param == "loop")
 	{
-		openScreen("loop-bars-window");
+        mpc.getLayeredScreen()->openScreen<LoopBarsScreen>();
 	}
 	else if (param == "tr")
 	{
 		if (!track->isUsed())
 			track->setUsed(true);
 
-		openScreen("track");
+        mpc.getLayeredScreen()->openScreen<TrackScreen>();
 	}
 	else if (param == "on")
 	{
-		openScreen("erase-all-off-tracks");
+        mpc.getLayeredScreen()->openScreen<EraseAllOffTracksScreen>();
 	}
 	else if (param == "pgm")
 	{
-		openScreen("transmit-program-changes");
+        mpc.getLayeredScreen()->openScreen<TransmitProgramChangesScreen>();
 	}
 	else if (param == "recordingmode")
 	{
-		openScreen("multi-recording-setup");
+        mpc.getLayeredScreen()->openScreen<MultiRecordingSetupScreen>();
 	}
 	else if (param == "bus")
 	{
-		openScreen("midi-input");
+        mpc.getLayeredScreen()->openScreen<MidiInputScreen>();
 	}
 	else if (param == "devicenumber")
 	{
-		openScreen("midi-output");
+        mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
 	}
 	else if (param == "bars")
 	{
-		openScreen("change-bars");
+        mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
 	}
 	else if (param == "velo")
     {
-		openScreen("edit-velocity");
+        mpc.getLayeredScreen()->openScreen<EditVelocityScreen>();
 	}
 }
 
