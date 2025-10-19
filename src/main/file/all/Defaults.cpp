@@ -56,7 +56,7 @@ Defaults::Defaults(mpc::Mpc& mpc)
 	setBarCount();
 	setLastTick();
 
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	auto lastBar = userScreen->lastBar;
 	
 	if (lastBar == 1)
@@ -196,7 +196,7 @@ std::vector<int> Defaults::getTrVelos()
 
 void Defaults::setTrackSettings()
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
     for (int i = 0; i < 64; i++)
 	{
         saveBytes[DEVICES_OFFSET + i] = (userScreen->device);
@@ -209,7 +209,7 @@ void Defaults::setTrackSettings()
 
 void Defaults::setLastTick()
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	auto lastTick = (userScreen->lastBar + 1) * 384;
 
 	auto b = ByteUtil::ushort2bytes(lastTick);
@@ -220,7 +220,7 @@ void Defaults::setLastTick()
 
 void Defaults::setBarCount()
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	auto ba = ByteUtil::ushort2bytes(userScreen->lastBar + 1);
 	saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
 	saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
@@ -228,14 +228,14 @@ void Defaults::setBarCount()
 
 void Defaults::setTimeSig()
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	saveBytes[TIMESIG_NUM_OFFSET] = (userScreen->timeSig.getNumerator());
 	saveBytes[TIMESIG_DEN_OFFSET] = (userScreen->timeSig.getDenominator());
 }
 
 void Defaults::setNames()
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	auto const defSeqName =StrUtil::padRight(userScreen->sequenceName, " ", AllParser::NAME_LENGTH);
 	
 	for (int i = 0; i < 16; i++)
@@ -272,7 +272,7 @@ void Defaults::setNames()
 
 void Defaults::setTempo()
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	auto tempoBytes = ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];

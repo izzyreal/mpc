@@ -22,7 +22,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
 
     auto isChannelPressure = msg->isChannelPressure();
 
-    const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
     const auto hardware = mpc.getHardware();
 
     if (isChannelPressure)

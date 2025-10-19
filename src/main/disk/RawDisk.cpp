@@ -40,7 +40,7 @@ void RawDisk::initFiles()
     files.clear();
     allFiles.clear();
 
-    auto loadScreen = mpc.screens->get<LoadScreen>("load");
+    auto loadScreen = mpc.screens->get<LoadScreen>();
 
     auto view = loadScreen->view;
     auto dirList = getDir()->akaiNameIndex;

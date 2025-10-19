@@ -13,7 +13,7 @@ SelectMixerDrumScreen::SelectMixerDrumScreen(mpc::Mpc& mpc, const int layerIndex
 
 void SelectMixerDrumScreen::open()
 {
-	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+	auto drumScreen = mpc.screens->get<DrumScreen>();
 	ls->setFunctionKeysArrangement(drumScreen->getDrum());
 }
 
@@ -23,7 +23,7 @@ void SelectMixerDrumScreen::function(int i)
 
 	if (i < 4)
 	{
-		auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+		auto drumScreen = mpc.screens->get<DrumScreen>();
 		drumScreen->setDrum(i);
 		openScreen("mixer");
 	}

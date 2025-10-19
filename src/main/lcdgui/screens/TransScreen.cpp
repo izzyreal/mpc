@@ -25,7 +25,7 @@ void TransScreen::open()
 void TransScreen::function(int i)
 {
 	init();
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+	auto punchScreen = mpc.screens->get<PunchScreen>();
 
 	switch (i)
 	{

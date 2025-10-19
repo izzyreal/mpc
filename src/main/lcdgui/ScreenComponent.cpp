@@ -100,7 +100,7 @@ void ScreenComponent::openWindow()
 
 mpc::engine::Drum& ScreenComponent::activeDrum()
 {
-    const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum");
+    const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
 
     const bool isSamplerScreen = screengroups::isSamplerScreen(name);
     auto drumIndex = isSamplerScreen ? (int) (drumScreen->getDrum()) : mpc.getSequencer()->getActiveTrack()->getBus() - 1;

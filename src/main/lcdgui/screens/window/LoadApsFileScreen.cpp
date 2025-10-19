@@ -21,7 +21,7 @@ void LoadApsFileScreen::function(int i)
 	case 4:
 	{
         std::function<void()> on_success = [&]() { openScreen("load"); };
-		auto loadScreen = mpc.screens->get<LoadScreen>("load");
+		auto loadScreen = mpc.screens->get<LoadScreen>();
         mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
         break;
 	}

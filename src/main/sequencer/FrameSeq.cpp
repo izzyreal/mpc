@@ -36,13 +36,13 @@ using namespace mpc::engine::midi;
 FrameSeq::FrameSeq(mpc::Mpc& mpc)
         : mpc(mpc),
           sequencer(mpc.getSequencer()),
-          countMetronomeScreen(mpc.screens->get<CountMetronomeScreen>("count-metronome")),
-          timingCorrectScreen(mpc.screens->get<TimingCorrectScreen>("timing-correct")),
-          sequencerScreen(mpc.screens->get<SequencerScreen>("sequencer")),
-          syncScreen(mpc.screens->get<SyncScreen>("sync")),
-          punchScreen(mpc.screens->get<PunchScreen>("punch")),
-          songScreen(mpc.screens->get<SongScreen>("song")),
-          userScreen(mpc.screens->get<UserScreen>("user")),
+          countMetronomeScreen(mpc.screens->get<CountMetronomeScreen>()),
+          timingCorrectScreen(mpc.screens->get<TimingCorrectScreen>()),
+          sequencerScreen(mpc.screens->get<SequencerScreen>()),
+          syncScreen(mpc.screens->get<SyncScreen>()),
+          punchScreen(mpc.screens->get<PunchScreen>()),
+          songScreen(mpc.screens->get<SongScreen>()),
+          userScreen(mpc.screens->get<UserScreen>()),
           midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
 {
 }

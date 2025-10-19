@@ -40,7 +40,7 @@ void CopySongScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto songScreen = mpc.screens->get<SongScreen>("song");
+		auto songScreen = mpc.screens->get<SongScreen>();
 		sequencer.lock()->copySong(songScreen->activeSongIndex, song1);
 		openScreen("song");
 		break;
@@ -52,7 +52,7 @@ void CopySongScreen::turnWheel(int i)
 {
 	init();
 
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 
 	if (param == "song0")
 	{
@@ -83,7 +83,7 @@ void CopySongScreen::setSong1(int i)
 
 void CopySongScreen::displaySong0()
 {
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
 	findField("song0")->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }

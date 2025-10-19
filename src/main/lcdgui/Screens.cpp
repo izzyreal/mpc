@@ -109,13 +109,18 @@
 #include <lcdgui/screens/window/SongWindow.hpp>
 #include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 #include <lcdgui/screens/window/LoopSongScreen.hpp>
-#include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
+#include <lcdgui/screens/window/ConvertSongToSeqScreen.hpp>
+#include <lcdgui/screens/window/LocateScreen.hpp>
 #include <lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp>
 #include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
 #include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
-#include <lcdgui/screens/window/ConvertSongToSeqScreen.hpp>
-#include <lcdgui/screens/window/LocateScreen.hpp>
+#include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
+#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
+#include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
+#include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include <lcdgui/screens/window/VmpcMidiPresetsScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiInputMonitorScreen.hpp>
@@ -156,12 +161,6 @@
 #include <lcdgui/screens/VmpcMidiScreen.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
-#include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
-#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
-#include <lcdgui/screens/window/VmpcMidiPresetsScreen.hpp>
-
 #include <StrUtil.hpp>
 
 #include "MpcResourceUtil.hpp"
@@ -190,10 +189,24 @@ void Screens::createAndCacheAllScreens()
         {
             continue;
         }
-        getOrCreateScreenComponent(screenName);
+
+        createAndCacheScreen(screenName);
     }
 
     MLOG("Created and cached " + std::to_string(screens.size()) + " screens.");
+}
+
+std::shared_ptr<ScreenComponent> Screens::getByName(const std::string name)
+{
+    for (auto& screen : screens)
+    {
+        if (screen->getName() == name)
+        {
+            return screen;
+        }
+    }
+
+    return {};
 }
 
 std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()
@@ -544,20 +557,14 @@ static const std::map<std::string, int> screensWithoutLayoutJson {
     { "popup", 4 }
 };
 
-std::shared_ptr<ScreenComponent> Screens::getOrCreateScreenComponent(const std::string &screenName)
+void Screens::createAndCacheScreen(const std::string &screenName)
 {
-    if (screens.count(screenName) > 0)
-    {
-        return screens.at(screenName);
-    }
-
     if (const auto screenFactory = screenFactories.find(screenName); screenFactory != screenFactories.end())
     {
         if (auto screenWithoutLayoutJson = screensWithoutLayoutJson.find(screenName); screenWithoutLayoutJson != screensWithoutLayoutJson.end())
         {
             auto screen = screenFactory->second(mpc, screenWithoutLayoutJson->second);
-            screens[screenName] = screen;
-            return screen;
+            screens.push_back(screen);
         }
 
         auto layout = getScreenLayout(screenName);
@@ -565,19 +572,16 @@ std::shared_ptr<ScreenComponent> Screens::getOrCreateScreenComponent(const std::
         if (!layout)
         {
             MLOG("Screens::getOrCreateScreenComponent has the requested screen name '" + screenName + "' in its map, and a ScreenComponent subclass for it is available in the mpc::lcdgui::screens namespace, but the layout can't be found. Most likely the layout is missing from screens/layer1.json, screens/layer2.json, screens/layer3.json or screens/layer4.json.");
-            return {};
+            return; 
         }
 
         auto screen = screenFactory->second(mpc, layout->layerIndex);
         screen->findBackground()->addChildren(layout->components);
         screen->setTransferMap(layout->transferMap);
         screen->setFirstField(layout->firstField);
-        screens[screenName] = screen;
-        return screen;
+        screens.push_back(screen);
     }
 
     MLOG("Screens::getOrCreateScreenComponent is not familiar with screen name '" + screenName + "'. Add it to src/main/lcdgui/Screens.cpp");
-
-    return {};
 }
 

@@ -36,7 +36,7 @@ void DrumScreen::function(int f)
         break;
     case 2:
 	{
-		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>("select-drum");
+		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
 		selectDrumScreen->redirectScreen = "drum";
 		openScreen("select-drum");
 		break;

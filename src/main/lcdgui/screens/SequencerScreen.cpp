@@ -92,7 +92,7 @@ void SequencerScreen::open()
 
 	findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
 
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+	auto punchScreen = mpc.screens->get<PunchScreen>();
 
 	if (sequencer.lock()->isSecondSequenceEnabled())
     {
@@ -163,7 +163,7 @@ void SequencerScreen::close()
 
 	if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch), nextScreen) != end(screensThatDisablePunch))
 	{
-		auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+		auto punchScreen = mpc.screens->get<PunchScreen>();
 		punchScreen->on = false;
 	}
 
@@ -352,7 +352,7 @@ std::vector<std::string> SequencerScreen::timingCorrectNames = std::vector<std::
 
 void SequencerScreen::displayTiming()
 {
-	auto noteValue = mpc.screens->get<TimingCorrectScreen>("timing-correct")->getNoteValue();
+	auto noteValue = mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
 	findField("timing")->setText(timingCorrectNames[noteValue]);
 }
 
@@ -508,7 +508,7 @@ void SequencerScreen::function(int i)
 {
 	init();
 	ScreenComponent::function(i);
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+	auto punchScreen = mpc.screens->get<PunchScreen>();
 
 	if (punchScreen->on)
 	{
@@ -620,7 +620,7 @@ void SequencerScreen::turnWheel(int i)
 		{
 			auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-			auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+			auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
 
 			if (std::dynamic_pointer_cast<NoteOnEvent>(stepEditorScreen->getVisibleEvents()[eventNumber]))
 			{
@@ -646,7 +646,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "timing")
 	{
-		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+		auto screen = mpc.screens->get<TimingCorrectScreen>();
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 		setLastFocus("timing-correct", "notevalue");
@@ -654,7 +654,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "sq")
 	{
-		auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+		auto punchScreen = mpc.screens->get<PunchScreen>();
 		
 		if (sequencer.lock()->isPlaying())
 		{
@@ -851,7 +851,7 @@ void SequencerScreen::setPunchRectOn(int i, bool b)
 
 void SequencerScreen::displayPunchWhileRecording()
 {
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+	auto punchScreen = mpc.screens->get<PunchScreen>();
 
     auto hardware = mpc.getHardware();
     auto isRecPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() || mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
@@ -922,7 +922,7 @@ void SequencerScreen::stop()
 {
 	ScreenComponent::stop();
 
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+	auto punchScreen = mpc.screens->get<PunchScreen>();
 
 	if (punchScreen->on)
 	{

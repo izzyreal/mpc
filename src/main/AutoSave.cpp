@@ -29,7 +29,7 @@ using namespace mpc::lcdgui::screens::window;
 
 void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 {
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0)
     {
@@ -229,8 +229,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1)
     {
         // ASK
-        auto vmpcContinuePreviousSessionScreen = mpc.screens->get<VmpcContinuePreviousSessionScreen>(
-                "vmpc-continue-previous-session");
+        auto vmpcContinuePreviousSessionScreen = mpc.screens->get<VmpcContinuePreviousSessionScreen>();
         vmpcContinuePreviousSessionScreen->setRestoreAutoSavedStateAction(restoreAutoSavedStateAction);
         mpc.getLayeredScreen()->openScreen("vmpc-continue-previous-session");
         return;
@@ -243,7 +242,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
 void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 {
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
 
     if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
         mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-continue-previous-session")
@@ -291,7 +290,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         }
         else if (screen == "edit-sound")
         {
-            screen = mpc.screens->get<EditSoundScreen>("edit-sound")->getReturnToScreenName(); 
+            screen = mpc.screens->get<EditSoundScreen>()->getReturnToScreenName(); 
         }
         else if (screen == "name")
         {

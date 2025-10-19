@@ -59,14 +59,14 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound>& soundToUse, int newLen
     engineSampleRate = engineSampleRateToUse;
     lengthInFramesAtEngineSampleRate = newLengthInFrames * (engineSampleRate / 44100.f);
 
-    const auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+    const auto sampleScreen = mpc.screens->get<SampleScreen>();
     const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
     
     lengthInFramesAtEngineSampleRate += preRecFramesAt44Khz * (engineSampleRate / 44100.f);
 
     cancelled = false;
 
-    mode = mpc.screens->get<SampleScreen>("sample")->getMode();
+    mode = mpc.screens->get<SampleScreen>()->getMode();
 
 	  if (mode != 2)
     {
@@ -181,7 +181,7 @@ void SoundRecorder::stop()
         sound->removeFramesFromEnd(overflowAt44Khz);
     }
 
-    const auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+    const auto sampleScreen = mpc.screens->get<SampleScreen>();
     const auto preRecFramesAt44Khz = (int) (44.1 * sampleScreen->preRec);
 
     sound->setStart(preRecFramesAt44Khz);
@@ -203,7 +203,7 @@ void SoundRecorder::setSampleScreenActive(bool active)
 
 int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
 {
-    auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+    auto sampleScreen = mpc.screens->get<SampleScreen>();
 
     if (!sampleScreenActive.load())
     {
@@ -216,7 +216,7 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
 
     lastSampleScreenActive = true;
 
-    mode = mpc.screens->get<SampleScreen>("sample")->getMode();
+    mode = mpc.screens->get<SampleScreen>()->getMode();
 
     const auto gain = inputGain * 0.01;
     float peakL = 0, peakR = 0;

@@ -17,7 +17,7 @@ void ReleaseTapCommand::execute()
 
     if (!mpc.inputController->isNoteRepeatLocked())
     {
-        const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>("sequencer");
+        const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>();
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
     }
 }

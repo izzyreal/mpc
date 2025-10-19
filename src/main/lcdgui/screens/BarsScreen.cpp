@@ -18,9 +18,9 @@ BarsScreen::BarsScreen(mpc::Mpc& mpc, const int layerIndex)
 void BarsScreen::open()
 {
     auto fromSequence = sequencer.lock()->getActiveSequence();
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
     auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
-    auto userScreen = mpc.screens->get<UserScreen>("user");
+    auto userScreen = mpc.screens->get<UserScreen>();
     auto userLastBar = userScreen->lastBar;
 
     auto lastBarIndexFrom = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
@@ -57,7 +57,7 @@ void BarsScreen::close()
 void BarsScreen::function(int j)
 {
     init();
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     switch (j)
     {
@@ -90,8 +90,8 @@ void BarsScreen::turnWheel(int i)
 {
     init();
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-    auto userScreen = mpc.screens->get<UserScreen>("user");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto userScreen = mpc.screens->get<UserScreen>();
     auto userLastBar = userScreen->lastBar;
 
     if (param == "fromsq")
@@ -167,13 +167,13 @@ void BarsScreen::turnWheel(int i)
 
 void BarsScreen::displayCopies()
 {
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
     findField("copies")->setTextPadded(eventsScreen->copies, " ");
 }
 
 void BarsScreen::displayToSq()
 {
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
     findField("tosq")->setText(std::to_string(eventsScreen->toSq + 1));
 }
 
@@ -269,7 +269,7 @@ void BarsScreen::setCopies(int i)
     if (i < 1 || i > 999)
         return;
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
     eventsScreen->copies = i;
     displayCopies();
 }

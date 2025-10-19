@@ -63,8 +63,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                     MLOG("A new MIDI device was connected: " + name);
 
                     fs::path path;
-                    auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>(
-                            "vmpc-known-controller-detected");
+                    auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>();
 
                     if (name.find("MPD16") != std::string::npos)
                     {
@@ -89,7 +88,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
 
                     if (!path.empty() && fs::exists(path))
                     {
-                        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
                         mpc.getDisk()->readMidiControlPreset(path, vmpcMidiScreen->switchToPreset);
                         mpc.getLayeredScreen()->openScreen("vmpc-known-controller-detected");
                     }

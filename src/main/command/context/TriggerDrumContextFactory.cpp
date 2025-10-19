@@ -21,7 +21,7 @@ int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::string &currentScreen
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
     const int result = isSamplerScreen ?
-        mpc.screens->get<screens::DrumScreen>("drum")->getDrum() :
+        mpc.screens->get<screens::DrumScreen>()->getDrum() :
         mpc.getSequencer()->getActiveTrack()->getBus() - 1;
     return result;
 }
@@ -39,8 +39,8 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(mpc);
     const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(mpc);
 
-    auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct");
-    auto assign16LevelsScreen = mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>("assign-16-levels");
+    auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
+    auto assign16LevelsScreen = mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>();
 
     auto activeTrack = mpc.getSequencer()->getActiveTrack();
 
@@ -51,7 +51,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     std::function<void(int)> setMpcPad = [mpc = &mpc] (int p) { mpc->setPad(p); };
 
     const auto hardwareSliderValue = mpc.getHardware()->getSlider()->getValueAs<int>();
-    const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
+    const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>()->getDrum();
     const auto note = activeTrack->getBus() > 0 ? program->getPad(programPadIndex)->getNote() : programPadIndex + 35;  
     
     return {
@@ -111,7 +111,7 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
 
     const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(programPadIndex);
 
-    const int drumScreenSelectedDrum = mpc.screens->get<screens::DrumScreen>("drum")->getDrum();
+    const int drumScreenSelectedDrum = mpc.screens->get<screens::DrumScreen>()->getDrum();
 
     auto eventHandler = mpc.getEventHandler();
 
@@ -119,8 +119,8 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
 
     std::function<bool()> isAnyProgramPadRegisteredAsPressed = [sampler = mpc.getSampler()] { return sampler->isAnyProgramPadRegisteredAsPressed(); };
 
-    const auto stepEditOptionsScreen = mpc.screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>("step-edit-options");
-    const auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct");
+    const auto stepEditOptionsScreen = mpc.screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>();
+    const auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
 
     std::function<int()> getActiveSequenceLastTick = [sequencer = mpc.getSequencer()] { return sequencer->getActiveSequence()->getLastTick(); };
 

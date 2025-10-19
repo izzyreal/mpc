@@ -13,7 +13,7 @@ NumberOfZonesScreen::NumberOfZonesScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void NumberOfZonesScreen::open()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 	numberOfZones = zoneScreen->numberOfZones;
 	displayNumberOfZones();
 }
@@ -31,7 +31,7 @@ void NumberOfZonesScreen::function(int i)
         openScreen("zone");
         break;
 	case 4:
-		auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+		auto zoneScreen = mpc.screens->get<ZoneScreen>();
 		auto sound = sampler->getSound();
 		zoneScreen->numberOfZones = numberOfZones;
 		zoneScreen->initZones();

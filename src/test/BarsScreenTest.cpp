@@ -29,7 +29,7 @@ TEST_CASE("BARS1", "[bars-screen]")
         tickPos += 24;
     }
 
-    auto barsScreen = mpc.screens->get<BarsScreen>("bars");
+    auto barsScreen = mpc.screens->get<BarsScreen>();
     int toSeqIndex = 1;
     int firstBar = 0;
     int lastBar = 0;
@@ -73,7 +73,7 @@ TEST_CASE("BARS2", "[bars-screen]")
         tickPos += 24;
     }
 
-    auto barsScreen = mpc.screens->get<BarsScreen>("bars");
+    auto barsScreen = mpc.screens->get<BarsScreen>();
     int toSeqIndex = 1;
     int firstBar = 0;
     int lastBar = 0;

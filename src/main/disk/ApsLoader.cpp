@@ -35,7 +35,7 @@ void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
     if (!file->exists())
         throw std::invalid_argument("File does not exist");
     
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;
 
     ApsParser apsParser(file->getBytes());
@@ -225,7 +225,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         drum.setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
     }
     
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
     
     auto globals = apsParser.getGlobalParameters();
     
@@ -235,11 +235,11 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     mixerSetupScreen->setIndivFxSourceDrum(globals->isIndivFxSourceDrum());
     mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
     
-    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+    auto drumScreen = mpc.screens->get<DrumScreen>();
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
     mixerSetupScreen->setMasterLevel(globals->getMasterLevel());
 
-    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
+    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>();
 
     pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
@@ -279,7 +279,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
 void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
 {
     mpc.getLayeredScreen()->openScreen("popup");
-    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+    auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
     
     if (std::dynamic_pointer_cast<StdDisk>(mpc.getDisk()))
@@ -295,7 +295,7 @@ void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int 
 
 void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
 {
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;
     
     if (!skipAll)

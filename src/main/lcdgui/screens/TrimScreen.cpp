@@ -74,7 +74,7 @@ void TrimScreen::function(int f)
 	{
         sampler->switchToNextSoundSortType();
 		openScreen("popup");
-		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("trim", 200);
 		break;
@@ -95,7 +95,7 @@ void TrimScreen::function(int f)
 			return;
 		}
 
-		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("trim");
 		
 		openScreen("edit-sound");
@@ -265,7 +265,7 @@ void TrimScreen::setSliderEnd(int i)
 
 void TrimScreen::setEnd(int newValue)
 {
-    const auto loopLengthIsFixed = mpc.screens->get<LoopScreen>("loop")->loopLngthFix;
+    const auto loopLengthIsFixed = mpc.screens->get<LoopScreen>()->loopLngthFix;
     auto sound = sampler->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();

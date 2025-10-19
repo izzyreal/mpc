@@ -46,7 +46,7 @@ void MultiRecordingSetupScreen::open()
 	displayMrsLine(1);
 	displayMrsLine(2);
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
     if (ls->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)

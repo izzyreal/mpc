@@ -20,7 +20,7 @@ void MixerSetupScreen::open()
 	displayIndivFxSource();
 	displayCopyPgmMixToDrum();
 	displayRecordMixChanges();
-	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+	auto drumScreen = mpc.screens->get<DrumScreen>();
 	ls->setFunctionKeysArrangement(drumScreen->getDrum());
 }
 
@@ -92,7 +92,7 @@ void MixerSetupScreen::function(int i)
 
 	if (i < 4)
 	{
-		auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+		auto drumScreen = mpc.screens->get<DrumScreen>();
 		drumScreen->setDrum(i);
 		//mpc.setPreviousSamplerScreenName(currentScreenName);
 		openScreen("mixer");

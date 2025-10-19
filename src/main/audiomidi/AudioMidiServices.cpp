@@ -227,7 +227,7 @@ void AudioMidiServices::createSynth()
 
     for (int i = 0; i < 4; i++)
     {
-        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
         soundPlayerChannels.emplace_back(Drum(mpc.getSampler(),
                                          i,
@@ -339,7 +339,7 @@ void AudioMidiServices::stopBouncing()
 	mpc.getLayeredScreen()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
 
-    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
     if (directToDiskRecorderScreen->seqLoopWasEnabled)
     {
@@ -428,7 +428,7 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
 // Should be called from the audio thread only!
 void AudioMidiServices::changeBounceStateIfRequired()
 {
-    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
     if (isBouncing() && !wasBouncing) {
 
@@ -479,7 +479,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
 // Should be called from the audio thread only!
 void AudioMidiServices::switchMidiControlMappingIfRequired()
 {
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
 
     if (vmpcMidiScreen->shouldSwitch.load())
     {

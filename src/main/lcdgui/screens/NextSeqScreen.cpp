@@ -81,7 +81,7 @@ void NextSeqScreen::turnWheel(int i)
 	}
 	else if (param == "timing")
 	{
-		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+		auto screen = mpc.screens->get<TimingCorrectScreen>();
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 		setLastFocus("timing-correct", "notevalue");
@@ -201,7 +201,7 @@ void NextSeqScreen::displayTempoSource()
 
 void NextSeqScreen::displayTiming()
 {
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	findField("timing")->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }

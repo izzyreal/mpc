@@ -57,7 +57,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
 
         if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100) {
 
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
             if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted) {
                 r.canBeConverted = true;

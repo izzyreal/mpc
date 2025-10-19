@@ -35,7 +35,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 {
 	saveBytes = std::vector<char>(LENGTH);
 
-	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
+	auto syncScreen = mpc.screens->get<SyncScreen>();
 
 	saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeIn());
 	saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeOut());
@@ -45,7 +45,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(syncScreen->in);
 	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(syncScreen->out);
 
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
 	{
@@ -55,7 +55,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;
 
     saveBytes[SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET] =
-            mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change")->getIgnore();
+            mpc.screens->get<IgnoreTempoChangeScreen>()->getIgnore();
 }
 
 int MidiSyncMisc::getInMode()

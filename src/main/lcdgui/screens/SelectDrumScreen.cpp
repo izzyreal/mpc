@@ -12,7 +12,7 @@ SelectDrumScreen::SelectDrumScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SelectDrumScreen::open()
 {
-	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+	auto drumScreen = mpc.screens->get<DrumScreen>();
 	ls->setFunctionKeysArrangement(drumScreen->getDrum());
 }
 
@@ -25,7 +25,7 @@ void SelectDrumScreen::function(int i)
         return;
     }
 
-	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+	auto drumScreen = mpc.screens->get<DrumScreen>();
 	drumScreen->setDrum(i);
 
 	if (redirectScreen.empty())

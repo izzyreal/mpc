@@ -29,7 +29,7 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
 	}
 	else if (param == "load-into")
 	{
-		auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
+		auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
 		loadASequenceScreen->setLoadInto(loadASequenceScreen->loadInto + i);
 		displayLoadInto();
 	}
@@ -49,7 +49,7 @@ void LoadASequenceFromAllScreen::function(int i)
 
 		if (candidate)
 		{
-			auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
+			auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
 			sequencer.lock()->setSequence(loadASequenceScreen->loadInto, candidate);
 			openScreen("load");
 		}
@@ -73,7 +73,7 @@ void LoadASequenceFromAllScreen::displayFile()
 
 void LoadASequenceFromAllScreen::displayLoadInto()
 {
-	auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
+	auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
 	findField("load-into")->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
 	findLabel("load-into0")->setText("-" + sequencer.lock()->getSequence(loadASequenceScreen->loadInto)->getName());
 }

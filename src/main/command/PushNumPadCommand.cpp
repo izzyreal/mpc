@@ -49,14 +49,14 @@ void PushNumPadCommand::execute()
             case 6: {
                 auto newDrum = mpc.getSequencer()->getActiveTrack()->getBus() - 1;
                 if (newDrum >= 0)
-                    mpc.screens->get<lcdgui::screens::DrumScreen>("drum")->setDrum(newDrum);
+                    mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(newDrum);
                 mpc.getLayeredScreen()->openScreen("select-drum");
                 break;
             }
             case 7: {
                 auto newDrum = mpc.getSequencer()->getActiveTrack()->getBus() - 1;
                 if (newDrum >= 0)
-                    mpc.screens->get<lcdgui::screens::DrumScreen>("drum")->setDrum(newDrum);
+                    mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(newDrum);
                 mpc.getLayeredScreen()->openScreen("select-mixer-drum");
                 break;
             }

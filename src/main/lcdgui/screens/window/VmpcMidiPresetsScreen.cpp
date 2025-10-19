@@ -32,19 +32,19 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
         if (MidiControlPersistence::doesPresetWithNameExist(this->mpc, presetName))
         {
             auto replaceAction = [this, presetName]{
-                auto vmpcMidiScreen = this->mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                auto vmpcMidiScreen = this->mpc.screens->get<VmpcMidiScreen>();
                 auto preset = vmpcMidiScreen->getActivePreset();
                 preset->name = presetName;
                 this->mpc.getDisk()->writeMidiControlPreset(preset);
                 MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(this->mpc);
-                auto popupScreen = this->mpc.screens->get<PopupScreen>("popup");
+                auto popupScreen = this->mpc.screens->get<PopupScreen>();
                 popupScreen->setText("Saving " + presetName);
                 popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi-presets", 1000);
                 openScreen("popup");
             };
 
             const auto initializeNameScreen = [this, presetName]{
-                auto nameScreen = this->mpc.screens->get<NameScreen>("name");
+                auto nameScreen = this->mpc.screens->get<NameScreen>();
 
                 auto enterAction = [this](std::string& nameScreenName){
                     this->checkFileExistsAndSavePresetAndShowPopup(nameScreenName);
@@ -53,18 +53,18 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
                 nameScreen->initialize(presetName, 16, enterAction, this->name);
             };
 
-            auto fileExistsScreen = this->mpc.screens->get<FileExistsScreen>("file-exists");
+            auto fileExistsScreen = this->mpc.screens->get<FileExistsScreen>();
             fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("vmpc-midi-presets");});
             openScreen("file-exists");
         }
         else
         {
-            auto vmpcMidiScreen = this->mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+            auto vmpcMidiScreen = this->mpc.screens->get<VmpcMidiScreen>();
             auto preset = vmpcMidiScreen->getActivePreset();
             preset->name = presetName;
             this->mpc.getDisk()->writeMidiControlPreset(preset);
             MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(this->mpc);
-            auto popupScreen = this->mpc.screens->get<PopupScreen>("popup");
+            auto popupScreen = this->mpc.screens->get<PopupScreen>();
             popupScreen->setText("Saving " + presetName);
             popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi-presets", 1000);
             openScreen("popup");
@@ -139,7 +139,7 @@ void VmpcMidiPresetsScreen::function(int i)
 
             if (presetIndex == -1)
             {
-                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto nameScreen = mpc.screens->get<NameScreen>();
                 nameScreen->initialize("New preset", 16, enterAction, name);
                 openScreen("name");
             }
@@ -161,11 +161,11 @@ void VmpcMidiPresetsScreen::function(int i)
             }
             else
             {
-                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
                 MidiControlPersistence::loadFileByNameIntoPreset(mpc, presets[index]->name, vmpcMidiScreen->getActivePreset());
             }
 
-            auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+            auto popupScreen = mpc.screens->get<PopupScreen>();
             popupScreen->setText("Loading " + (index == -1 ? "Default" : presets[index]->name));
             popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi-presets", 700);
             mpc.getLayeredScreen()->openScreen("popup");

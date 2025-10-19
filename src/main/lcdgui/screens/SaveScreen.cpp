@@ -67,7 +67,7 @@ void SaveScreen::openWindow()
 
     if (param == "directory")
     {
-        auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+        auto directoryScreen = mpc.screens->get<DirectoryScreen>();
         directoryScreen->previousScreenName = "save";
         openScreen("directory");
     }
@@ -98,7 +98,7 @@ void SaveScreen::function(int i)
 
                 if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
                 {
-                    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                    auto popupScreen = mpc.screens->get<PopupScreen>();
                     popupScreen->setText("Device is disabled in DISKS");
                     popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
                     openScreen("popup");
@@ -117,7 +117,7 @@ void SaveScreen::function(int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                        auto popupScreen = mpc.screens->get<PopupScreen>();
                         popupScreen->setText("Error! Device seems in use");
                         popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
                         openScreen("popup");
@@ -310,7 +310,7 @@ void SaveScreen::displayFile()
     {
         case 0:
         {
-            const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>("save-all-file");
+            const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>();
             fileName = saveAllFileScreen->fileName;
             break;
         }
@@ -323,7 +323,7 @@ void SaveScreen::displayFile()
         }
         case 2:
         {
-            const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>("save-aps-file");
+            const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>();
             fileName = saveApsFileScreen->fileName;
             break;
         }

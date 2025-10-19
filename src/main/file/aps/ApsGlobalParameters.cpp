@@ -35,14 +35,14 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 		else
 			saveBytes[i] = TEMPLATE_SOUNDS[i];
 	
-	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+	auto drumScreen = mpc.screens->get<DrumScreen>();
 
 	auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
 
-	auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
+	auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>();
 	auto const padAssignMasterVal = pgmAssignScreen->padAssign;
 
-	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 	auto const stereoMixSourceDrumVal = mixerSetupScreen->isStereoMixSourceDrum();
 	auto const indivFxSourceDrumVal = mixerSetupScreen->isIndivFxSourceDrum();
 	auto const copyPgmMixToDrumVal = mixerSetupScreen->isCopyPgmMixToDrumEnabled();

@@ -59,9 +59,9 @@ void DirectoryScreen::function(int f)
 {
 	ScreenComponent::function(f);
 	
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+	auto loadScreen = mpc.screens->get<LoadScreen>();
+	auto nameScreen = mpc.screens->get<NameScreen>();
+    auto popupScreen = mpc.screens->get<PopupScreen>();
     auto disk = mpc.getDisk();
 
 	switch (f)
@@ -252,7 +252,7 @@ void DirectoryScreen::left()
 	{
 		if (disk->moveBack())
 		{
-			auto loadScreen = mpc.screens->get<LoadScreen>("load");
+			auto loadScreen = mpc.screens->get<LoadScreen>();
 			disk->initFiles();
 			
 			loadScreen->fileLoad = 0;
@@ -319,7 +319,7 @@ void DirectoryScreen::right()
 		yPos0 = 0;
 		yOffset1 = 0;
 		
-		auto loadScreen = mpc.screens->get<LoadScreen>("load");
+		auto loadScreen = mpc.screens->get<LoadScreen>();
 		loadScreen->fileLoad = 0;
 
 		for (int i = 0; i < disk->getParentFileNames().size(); i++)
@@ -345,7 +345,7 @@ void DirectoryScreen::right()
 void DirectoryScreen::up()
 {
 	auto disk = mpc.getDisk();
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
+	auto loadScreen = mpc.screens->get<LoadScreen>();
 
 	if (xPos == 0)
 	{
@@ -425,7 +425,7 @@ void DirectoryScreen::up()
 void DirectoryScreen::down()
 {
 	auto disk = mpc.getDisk();
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
+	auto loadScreen = mpc.screens->get<LoadScreen>();
 
 	if (xPos == 0)
 	{
@@ -510,7 +510,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 
 	if (xPos == 1)
 	{
-		auto loadScreen = mpc.screens->get<LoadScreen>("load");
+		auto loadScreen = mpc.screens->get<LoadScreen>();
 		yPos = loadScreen->fileLoad - yOffset1;
 	}
 
@@ -578,7 +578,7 @@ void DirectoryScreen::refreshFocus()
 	}
 	else if (xPos == 1)
 	{
-		auto loadScreen = mpc.screens->get<LoadScreen>("load");
+		auto loadScreen = mpc.screens->get<LoadScreen>();
 		ls->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
 	}
 }

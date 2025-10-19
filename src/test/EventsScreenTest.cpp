@@ -35,7 +35,7 @@ TEST_CASE("COPY1", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -88,7 +88,7 @@ TEST_CASE("COPY2", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -147,7 +147,7 @@ TEST_CASE("COPY3", "[events-screen]")
 
     assert(tr->getEvents().size() == 8);
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -195,7 +195,7 @@ TEST_CASE("COPY4", "[events-screen]")
 
     assert(seq->getLastTick() == 384 + 288);
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     int start = 0;
     int end = 384;
@@ -242,7 +242,7 @@ TEST_CASE("COPY5", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -296,7 +296,7 @@ TEST_CASE("COPY6", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     int start = 0;
     int end = 192;

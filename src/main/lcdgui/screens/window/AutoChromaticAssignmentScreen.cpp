@@ -114,7 +114,7 @@ void AutoChromaticAssignmentScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(newName, 16, enterAction, name);
         openScreen("name");
     }

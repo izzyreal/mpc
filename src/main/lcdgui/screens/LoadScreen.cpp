@@ -87,7 +87,7 @@ void LoadScreen::function(int i)
             
             if (candidateVolume.mode == DISABLED)
             {
-                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                auto popupScreen = mpc.screens->get<PopupScreen>();
                 popupScreen->setText("Device is disabled in DISKS");
                 popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
                 openScreen("popup");
@@ -107,7 +107,7 @@ void LoadScreen::function(int i)
                 
                 if (!newDisk->getVolume().volumeStream.is_open()) {
 					mpc.getDiskController()->activeDiskIndex = oldIndex;
-					auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+					auto popupScreen = mpc.screens->get<PopupScreen>();
 					popupScreen->setText("Error! Device seems in use");
 					popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
 					openScreen("popup");
@@ -152,7 +152,7 @@ void LoadScreen::function(int i)
 			auto name = file->getNameWithoutExtension();
 
 			openScreen("popup");
-			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+			auto popupScreen = mpc.screens->get<PopupScreen>();
 
 			if (started)
             {
@@ -227,7 +227,7 @@ void LoadScreen::openWindow()
 	if (!disk)
 		return;
 
-	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+	auto directoryScreen = mpc.screens->get<DirectoryScreen>();
 	directoryScreen->previousScreenName = "load";
 	directoryScreen->findYOffset0();
 	directoryScreen->setYOffset1(fileLoad);
@@ -463,7 +463,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     soundLoader.loadSound(getSelectedFile(), result, sound, shouldBeConverted);
 
-    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+    auto popupScreen = mpc.screens->get<PopupScreen>();
 
     if (result.success)
     {
@@ -484,7 +484,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
             loadSound(shouldBeConverted2);
         };
 
-        auto convertAndLoadWavScreen = mpc.screens->get<VmpcConvertAndLoadWavScreen>("vmpc-convert-and-load-wav");
+        auto convertAndLoadWavScreen = mpc.screens->get<VmpcConvertAndLoadWavScreen>();
         convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
         openScreen("vmpc-convert-and-load-wav");
     }

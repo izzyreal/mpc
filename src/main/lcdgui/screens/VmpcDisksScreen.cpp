@@ -62,7 +62,7 @@ void VmpcDisksScreen::function(int i)
             break;
         case 4:
         {
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
             if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
             {
@@ -73,7 +73,7 @@ void VmpcDisksScreen::function(int i)
             break;
         }
         case 5:
-            auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+            auto popupScreen = mpc.screens->get<PopupScreen>();
             openScreen("popup");
 
             if (hasConfigChanged())
@@ -178,7 +178,7 @@ bool VmpcDisksScreen::hasConfigChanged()
 
 void VmpcDisksScreen::displayFunctionKeys()
 {
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
     auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
     auto newArrangement = midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1 : 0;
     newArrangement += hasConfigChanged() ? 0 : 1;

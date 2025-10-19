@@ -29,7 +29,7 @@ void LoopEndFineScreen::open()
 
 void LoopEndFineScreen::displayLoopLngth()
 {
-	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+	auto loopScreen = mpc.screens->get<LoopScreen>();
 	findField("loop-lngth")->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
@@ -45,7 +45,7 @@ void LoopEndFineScreen::displayLngthField()
 
 void LoopEndFineScreen::displayFineWave()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+	auto trimScreen = mpc.screens->get<TrimScreen>();
 
 	auto sound = sampler->getSound();
 
@@ -97,8 +97,8 @@ void LoopEndFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-    auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto trimScreen = mpc.screens->get<TrimScreen>();
 
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
@@ -155,7 +155,7 @@ void LoopEndFineScreen::right()
 
 void LoopEndFineScreen::pressEnter()
 {
-	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
+	auto loopScreen = mpc.screens->get<LoopScreen>();
 	loopScreen->pressEnter();
 	displayEnd();
 	displayLngthField();
@@ -171,8 +171,8 @@ void LoopEndFineScreen::setSlider(int i)
 
     init();
 
-    auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto trimScreen = mpc.screens->get<TrimScreen>();
 
     if (param == "end")
     {

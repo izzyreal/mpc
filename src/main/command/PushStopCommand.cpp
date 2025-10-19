@@ -13,7 +13,7 @@ namespace mpc::command {
 
     void PushStopCommand::execute()
     {
-        const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+        const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>();
         const auto ams = mpc.getAudioMidiServices();
 
         mpc.inputController->unlockNoteRepeat();
@@ -31,7 +31,7 @@ namespace mpc::command {
             mpc.getLayeredScreen()->openScreen("sequencer");
         }
 
-        const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>("sequencer");
+        const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>();
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
 
         mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(mpc.getSequencer()->isOverdubbing());

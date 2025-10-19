@@ -116,9 +116,12 @@ void Mpc::init()
     
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
     
-    screens = std::make_shared<Screens>(*this);
-    
     layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
+    
+    screens = std::make_shared<Screens>(*this);
+    // We create all screens once so they're all cached in mpc::lcdgui::Screens,
+    // avoiding memory allocations and I/O on the audio thread.
+    screens->createAndCacheAllScreens();
     
     /*
      * AudioMidiServices requires sequencer to exist.
@@ -143,10 +146,6 @@ void Mpc::init()
     MLOG("Eeventhandler created");
     
     mpc::nvram::NvRam::loadUserScreenValues(*this);
-    
-    // We create all screens once so they're all cached in mpc::lcdgui::Screens,
-    // avoiding memory allocations and I/O on the audio thread.
-    screens->createAndCacheAllScreens();
     
     mpc::nvram::MidiControlPersistence::restoreLastState(*this);
     

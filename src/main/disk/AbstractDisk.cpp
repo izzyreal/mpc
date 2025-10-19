@@ -100,7 +100,7 @@ std::vector<std::string> AbstractDisk::getParentFileNames()
 
 bool AbstractDisk::deleteSelectedFile()
 {
-    auto loadScreen = mpc.screens->get<LoadScreen>("load");
+    auto loadScreen = mpc.screens->get<LoadScreen>();
     return files[loadScreen->fileLoad]->del();
 }
 
@@ -178,7 +178,7 @@ void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s, std::st
         writer.writeToOStream(f->getOutputStream());
         flush();
         initFiles();
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("Saving " + fileName);
         popupScreen->returnToScreenAfterMilliSeconds("save", 400);
         mpc.getLayeredScreen()->openScreen("popup");
@@ -253,11 +253,11 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
         auto bytes = writer.get();
         f->setFileData(bytes);
 
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("Saving " + fileName);
         mpc.getLayeredScreen()->openScreen("popup");
 
-        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
         if (saveAProgramScreen->save != 0)
         {
@@ -314,11 +314,11 @@ void AbstractDisk::writeAps(const std::string& fileName)
         auto bytes = apsParser.getBytes();
         f->setFileData(bytes);
 
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("Saving " + fileName);
         mpc.getLayeredScreen()->openScreen("popup");
 
-        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
         if (saveAProgramScreen->save != 0 && mpc.getSampler()->getSoundCount() > 0)
         {
@@ -357,7 +357,7 @@ void AbstractDisk::writeAll(const std::string& fileName)
         flush();
         initFiles();
 
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        auto popupScreen = mpc.screens->get<PopupScreen>();
         popupScreen->setText("         Saving ...");
         popupScreen->returnToScreenAfterMilliSeconds("save", 400);
         mpc.getLayeredScreen()->openScreen("popup");
@@ -640,7 +640,7 @@ sequences_or_error AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> 
 {
     std::function<sequences_or_error()> readFunc = [this, f]{
         auto result = AllLoader::loadOnlySequencesFromFile(mpc, f.get());
-        auto loadScreen = mpc.screens->get<LoadScreen>("load");
+        auto loadScreen = mpc.screens->get<LoadScreen>();
         loadScreen->fileLoad = 0;
         return result;
     };
@@ -670,7 +670,7 @@ tl::expected<return_type, mpc_io_error_msg> AbstractDisk::performIoOrOpenErrorPo
 
 void AbstractDisk::showPopup(mpc_io_error_msg& msg)
 {
-    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+    auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText(msg);
     auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 

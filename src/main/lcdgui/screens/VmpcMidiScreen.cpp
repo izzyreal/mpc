@@ -64,7 +64,7 @@ void VmpcMidiScreen::turnWheel(int i)
 
 void VmpcMidiScreen::open()
 {
-    auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+    auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
 
     screen->discardAndLeave = [this](){
         activePreset = std::make_shared<MidiControlPreset>();
@@ -272,7 +272,7 @@ void VmpcMidiScreen::function(int i)
             
             if (hasMappingChanged())
             {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
                 openScreen("vmpc-discard-mapping-changes");
                 return;
@@ -288,7 +288,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-keyboard";
                 openScreen("vmpc-discard-mapping-changes");
                 return;
@@ -307,7 +307,7 @@ void VmpcMidiScreen::function(int i)
             
             if (hasMappingChanged())
             {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
                 openScreen("vmpc-discard-mapping-changes");
                 return;
@@ -333,7 +333,7 @@ void VmpcMidiScreen::function(int i)
                 return;
             }
 
-            auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+            auto popupScreen = mpc.screens->get<PopupScreen>();
             openScreen("popup");
 
             if (hasMappingChanged())

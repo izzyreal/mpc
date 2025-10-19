@@ -82,7 +82,7 @@ void LayeredScreen::openScreen(std::string newScreenName)
 
     const auto oldFocusedLayerIndex = focusedLayerIndex;
 
-    auto screenComponent = mpc.screens->getOrCreateScreenComponent(newScreenName);
+    auto screenComponent = mpc.screens->getByName(newScreenName);
 
     assert(screenComponent);
 
@@ -113,7 +113,7 @@ void LayeredScreen::openScreen(std::string newScreenName)
 
     if (newScreenName == "sample")
 	{
-		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+		auto sampleScreen = mpc.screens->get<SampleScreen>();
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder()->setSampleScreenActive(true);

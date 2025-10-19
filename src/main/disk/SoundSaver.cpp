@@ -37,12 +37,12 @@ void SoundSaver::saveSounds()
 		auto fileName = StrUtil::replaceAll(s->getName(), ' ', "");
 		
 		mpc.getLayeredScreen()->openScreen("popup");
-		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ext);
 
 		if (disk->checkExists(fileName + ext))
 		{
-			auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+			auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
 			if (saveAProgramScreen->replaceSameSounds)
                 disk->getFile(fileName + ext)->del(); // possibly prepend auto success =

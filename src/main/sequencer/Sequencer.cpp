@@ -59,7 +59,7 @@ void Sequencer::init()
 	lastTap = currentTimeMillis();
 	nextSq = -1;
 
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
 	
 	for (int i = 0; i < 64; i++)
@@ -113,7 +113,7 @@ void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
 	auto seq = sequences[seqIndex].get();
-	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
+	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -208,7 +208,7 @@ double Sequencer::getTempo()
 
     if (tempoSourceSequenceEnabled)
 	{
-		auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change");
+		auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>();
 
 		if (seq->isTempoChangeOn() || (songMode && !ignoreTempoChangeScreen->ignore))
 		{
@@ -405,7 +405,7 @@ void Sequencer::play(bool fromStart)
 		return;
 
     endOfSong = false;
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 	auto currentSong = songs[songScreen->getActiveSongIndex()];
 
 	std::shared_ptr<Step> currentStep;
@@ -436,7 +436,7 @@ void Sequencer::play(bool fromStart)
     
 	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
-	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
+	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>();
 	auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 || (countInMode == 1 && !isRecordingOrOverdubbing()))
@@ -688,14 +688,14 @@ void Sequencer::stop(const StopMode stopMode)
         notifyObservers(std::string("nextsqoff"));
     }
     	
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 
     if (endOfSong)
     {
         songScreen->setOffset(songScreen->getOffset() + 1);
     }
 	
-	auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+	auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
 	if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
     {
@@ -1180,7 +1180,7 @@ int Sequencer::getLoopEnd()
 
 std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 
 	if (songMode && songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
     {
@@ -1304,7 +1304,7 @@ void Sequencer::notifyTimeDisplayRealtime()
 
 void Sequencer::goToPreviousStep()
 {
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
 
 	const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
 	const auto pos = getTickPosition();
@@ -1340,7 +1340,7 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = getTickPosition();
@@ -1479,7 +1479,7 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
         return;
     }
 
-    const auto songScreen = mpc.screens->get<SongScreen>("song");
+    const auto songScreen = mpc.screens->get<SongScreen>();
     const auto song = songs[songScreen->getActiveSongIndex()];
 
     uint32_t stepStartTick;
@@ -1562,7 +1562,7 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
         return;
     }
 
-    const auto songScreen = mpc.screens->get<SongScreen>("song");
+    const auto songScreen = mpc.screens->get<SongScreen>();
     const auto song = songs[songScreen->getActiveSongIndex()];
 
     uint32_t stepStartTick;
@@ -1671,7 +1671,7 @@ void Sequencer::move(const double positionQuarterNotesToUse)
 
     if (secondSequenceEnabled)
     {
-        auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
+        auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
         sequences[secondSequenceScreen->sq]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
     }
 
@@ -1707,7 +1707,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
 	if (songMode)
     {
-        auto songScreen = mpc.screens->get<SongScreen>("song");
+        auto songScreen = mpc.screens->get<SongScreen>();
         auto song = songs[songScreen->getActiveSongIndex()];
 
         if (!song->isUsed())
@@ -1842,7 +1842,7 @@ void Sequencer::setSongModeEnabled(bool b)
 
 int Sequencer::getSongSequenceIndex()
 {
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 	auto song = songs[songScreen->getActiveSongIndex()];
 	auto step = songScreen->getOffset() + 1;
 

@@ -424,7 +424,7 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
 bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
 {
     auto sequencer = mpc.getSequencer();
-	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
+	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>()->getNoteValue();
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 

@@ -19,7 +19,7 @@ namespace mpc::command {
             if (currentScreenName == "sequence" || currentScreenName == "midi-input" || currentScreenName == "midi-output") {
                 mpc.getLayeredScreen()->setPreviousScreenName("sequencer");
             } else if (currentScreenName == "edit-sound") {
-                const auto editSoundScreen = mpc.screens->get<lcdgui::screens::window::EditSoundScreen>("edit-sound");
+                const auto editSoundScreen = mpc.screens->get<lcdgui::screens::window::EditSoundScreen>();
                 mpc.getLayeredScreen()->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
             } else if (currentScreenName == "sound") {
                 mpc.getLayeredScreen()->setPreviousScreenName(mpc.getSampler()->getPreviousScreenName());
@@ -27,11 +27,11 @@ namespace mpc::command {
                 mpc.getLayeredScreen()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
                 mpc.setPreviousSamplerScreenName("");
             } else if (currentScreenName == "name") {
-                auto nameScreen = mpc.screens->get<lcdgui::screens::window::NameScreen>("name");
+                auto nameScreen = mpc.screens->get<lcdgui::screens::window::NameScreen>();
                 nameScreen->setEditing(false);
                 mpc.getLayeredScreen()->setLastFocus("name", "0");
             } else if (currentScreenName == "directory") {
-                const auto directoryScreen = mpc.screens->get<lcdgui::screens::window::DirectoryScreen>("directory");
+                const auto directoryScreen = mpc.screens->get<lcdgui::screens::window::DirectoryScreen>();
                 mpc.getLayeredScreen()->setPreviousScreenName(directoryScreen->getPreviousScreenName());
             }
         }

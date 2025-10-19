@@ -22,7 +22,7 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
         Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
 
-        auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+        auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
 
         vmpcAutoSaveScreen->setAutoLoadOnStart(2);
 

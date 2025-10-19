@@ -32,9 +32,9 @@ void DeleteFileScreen::function(int i)
 		openScreen("delete-all-files");
 		break;
 	case 4:
-		auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+		auto directoryScreen = mpc.screens->get<DirectoryScreen>();
 		openScreen("popup");
-		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 		
 		if (deleteThread.joinable())
@@ -61,10 +61,10 @@ void DeleteFileScreen::deleteFile()
 		disk->flush();
 		disk->initFiles();
 
-		auto loadScreen = mpc.screens->get<LoadScreen>("load");
+		auto loadScreen = mpc.screens->get<LoadScreen>();
 		
 		loadScreen->setFileLoad(loadScreen->fileLoad - 1);
-		auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+		auto directoryScreen = mpc.screens->get<DirectoryScreen>();
 		directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
 	}
 

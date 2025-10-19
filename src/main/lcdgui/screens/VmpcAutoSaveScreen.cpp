@@ -15,7 +15,7 @@ void VmpcAutoSaveScreen::open()
     displayAutoSaveOnExit();
     displayAutoLoadOnStart();
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
     auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
     ls->setFunctionKeysArrangement(midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1 : 0);
 }
@@ -35,7 +35,7 @@ void VmpcAutoSaveScreen::function(int i)
             break;
         case 4:
         {
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
             if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
             {

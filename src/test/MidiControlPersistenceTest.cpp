@@ -18,7 +18,7 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
 
-    auto screen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    auto screen = mpc.screens->get<VmpcMidiScreen>();
     auto activePreset = screen->getActivePreset();
 
     REQUIRE(!activePreset->rows.empty());

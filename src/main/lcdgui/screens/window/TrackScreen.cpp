@@ -70,7 +70,7 @@ void TrackScreen::openNameScreen()
         };
     }
 
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto nameScreen = mpc.screens->get<NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequencer");
     openScreen("name");
 }

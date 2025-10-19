@@ -106,7 +106,7 @@ void Sampler::setSoundIndex(int i)
 
 	soundIndex = i;
 
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 	zoneScreen->initZones();
 }
 
@@ -213,7 +213,7 @@ void Sampler::init() {
 
 void Sampler::playMetronome(unsigned int velocity, int framePos)
 {
-	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
+	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>();
 
 	if (metronomeSoundScreen->getSound() == 0)
 	{
@@ -351,7 +351,7 @@ std::shared_ptr<Sound> Sampler::addSound(
     {
         if (!screenToGoToIfSoundDirectoryIsFull.empty())
         {
-            auto popupScreen = mpc.screens->get<mpc::lcdgui::screens::dialog2::PopupScreen>("popup");
+            auto popupScreen = mpc.screens->get<mpc::lcdgui::screens::dialog2::PopupScreen>();
             popupScreen->setText("Sound directory full(256max)");
             popupScreen->setScreenToReturnTo(screenToGoToIfSoundDirectoryIsFull);
             mpc.getLayeredScreen()->openScreen("popup");
@@ -680,7 +680,7 @@ void Sampler::playX()
 
 	if (playXMode == 1)
 	{
-		auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+		auto zoneScreen = mpc.screens->get<ZoneScreen>();
 		auto zone = zoneScreen->getZone();
 		start = zone[0];
 		end = zone[1];

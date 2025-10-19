@@ -58,7 +58,7 @@ void EventsScreen::open()
 
         if (!seq->isUsed())
         {
-            auto userScreen = mpc.screens->get<UserScreen>("user");
+            auto userScreen = mpc.screens->get<UserScreen>();
             seq->init(userScreen->lastBar);
         }
 

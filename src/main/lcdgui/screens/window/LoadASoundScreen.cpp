@@ -22,7 +22,7 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 void LoadASoundScreen::open()
 {
 	init();
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
+	auto loadScreen = mpc.screens->get<LoadScreen>();
 	findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
     assignToNote = mpc.getNote();
 	displayAssignToNote();
@@ -137,7 +137,7 @@ void LoadASoundScreen::keepSound()
         };
 
         const auto initializeNameScreen = [this, actionAfterLoadingSound, previewSound]{
-            auto nameScreen = mpc.screens->get<NameScreen>("name");
+            auto nameScreen = mpc.screens->get<NameScreen>();
 
             auto enterAction = [this, actionAfterLoadingSound, previewSound](std::string& nameScreenName){
                 if (sampler->checkExists(nameScreenName) >= 0)
@@ -150,12 +150,12 @@ void LoadASoundScreen::keepSound()
                 openScreen("load");
             };
 
-            auto loadScreen = mpc.screens->get<LoadScreen>("load");
+            auto loadScreen = mpc.screens->get<LoadScreen>();
             auto mainScreenAction = [&](){ sampler->deleteSound(sampler->getPreviewSound()); };
             nameScreen->initialize(loadScreen->getSelectedFile()->getNameWithoutExtension(), 16, enterAction, "load", mainScreenAction);
         };
 
-        auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+        auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
         fileExistsScreen->initialize(replaceAction, initializeNameScreen,
                                      [this]{ sampler->deleteSound(sampler->getPreviewSound()); openScreen("load"); });
         openScreen("file-exists");

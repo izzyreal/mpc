@@ -20,7 +20,7 @@ void TransposePermanentScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto transScreen = mpc.screens->get<TransScreen>("trans");
+		auto transScreen = mpc.screens->get<TransScreen>();
 		auto all = transScreen->tr == -1;
 
 		std::vector<int> tracks;

@@ -24,10 +24,10 @@ void InitScreen::function(int i)
 		break;
 	case 5:
 	{
-		auto userScreen = mpc.screens->get<UserScreen>("user");
+		auto userScreen = mpc.screens->get<UserScreen>();
 		userScreen->resetPreferences();
 
-		auto setupScreen = mpc.screens->get<SetupScreen>("setup");
+		auto setupScreen = mpc.screens->get<SetupScreen>();
 		setupScreen->resetPreferences();
 
 		openScreen("sequencer");

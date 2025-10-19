@@ -86,7 +86,7 @@ void ZoneScreen::function(int f)
 	{
         sampler->switchToNextSoundSortType();
 		openScreen("popup");
-		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("zone", 200);
 		break;
@@ -99,7 +99,7 @@ void ZoneScreen::function(int f)
 		if (sampler->getSoundCount() == 0)
 			return;
 
-		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("zone");
 		openScreen("edit-sound");
 		break;
@@ -239,7 +239,7 @@ void ZoneScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+	auto trimScreen = mpc.screens->get<TrimScreen>();
 	findWave()->setSampleData(sampleData, sampler->getSound()->isMono(), trimScreen->view);
 	findWave()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
@@ -440,14 +440,14 @@ void ZoneScreen::pressEnter()
 	{
 		if (param == "st")
 		{
-			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+			auto zoneScreen = mpc.screens->get<ZoneScreen>();
 			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
 			displaySt();
 			displayWave();
 		}
 		else if (param == "end")
 		{
-			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+			auto zoneScreen = mpc.screens->get<ZoneScreen>();
 			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
 			displayEnd();
 			displayWave();

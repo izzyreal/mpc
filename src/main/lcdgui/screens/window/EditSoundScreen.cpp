@@ -329,7 +329,7 @@ void EditSoundScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(newName, 16, enterAction, name);
         openScreen("name");
     }
@@ -416,7 +416,7 @@ void EditSoundScreen::function(int j)
 {
 	ScreenComponent::function(j);
 
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 
 	switch (j)
 	{

@@ -77,7 +77,7 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
         notifyObservers(notificationMessage);
     }
 
-    const auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    const auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
@@ -85,7 +85,7 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
         return;
     }
 
-    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
+    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
 
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
@@ -106,7 +106,7 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
             handleNoteOff(msg, timeStamp);
         }
 
-        switch (mpc.screens->get<MidiOutputScreen>("midi-output")->getSoftThru())
+        switch (mpc.screens->get<MidiOutputScreen>()->getSoftThru())
         {
             case 1:
                 // Soft thru:OFF
@@ -138,7 +138,7 @@ void MidiInput::handleControlChange(ShortMessage* msg)
     const auto controller = msg->getData1();
     const auto value = msg->getData2();
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
     auto hardware = mpc.getHardware();
 
     // As per MPC2000XL's MIDI implementation chart
@@ -153,8 +153,8 @@ void MidiInput::handleControlChange(ShortMessage* msg)
         hardware->getSlider()->setValue(127 - value);
     }
 
-    auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
-    auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
+    auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
+    auto midiSwScreen = mpc.screens->get<MidiSwScreen>();
 
     if (midiInputScreen->getReceiveCh() == -1 ||
         midiInputScreen->getReceiveCh() == msg->getChannel())
@@ -307,7 +307,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     
     if (sequencer->isRecordingModeMulti())
     {
-        auto mrs = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup")->getMrsLines();
+        auto mrs = mpc.screens->get<MultiRecordingSetupScreen>()->getMrsLines();
         trackNumber = mrs[msg->getChannel()]->getTrack();
     }
     else
@@ -414,7 +414,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     {
         recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
         sequencer->playMetronomeTrack();
-        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
         int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
         if (stepLength != 1)
@@ -442,7 +442,7 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 
     if (sequencer->isRecordingModeMulti())
     {
-        auto mrs = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup")->getMrsLines();
+        auto mrs = mpc.screens->get<MultiRecordingSetupScreen>()->getMrsLines();
         trackNumber = mrs[msg->getChannel()]->getTrack();
     }
     else
@@ -480,12 +480,12 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
         {
             auto newDuration = static_cast<int>(sequencer->getTickPosition());
 
-            const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
+            const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>();
             const bool isAutoStepIncrementEnabled = stepEditOptionsScreen->isAutoStepIncrementEnabled();
             const bool durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
             const auto tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
 
-            const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+            const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
 
             const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
@@ -536,7 +536,7 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 void MidiInput::handleMidiClock(ShortMessage* msg)
 {
     auto mce = std::make_shared<MidiClockEvent>(msg->getStatus());
-    auto syncScreen = mpc.screens->get<SyncScreen>("sync");
+    auto syncScreen = mpc.screens->get<SyncScreen>();
     
     if (syncScreen->in == index && syncScreen->getModeIn() != 0)
     {

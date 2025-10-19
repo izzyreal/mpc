@@ -22,7 +22,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
     {
         try
         {
-            auto &preset = mpc.screens->get<VmpcMidiScreen>("vmpc-midi")->activePreset;
+            auto &preset = mpc.screens->get<VmpcMidiScreen>()->activePreset;
             mpc.getDisk()->readMidiControlPreset(lastStatePath, preset);
             healPreset(mpc, preset);
         }
@@ -41,7 +41,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
         // bad, and if yes, we load the new and sane default mapping.
         int badMappingCounter = 0;
 
-        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
         auto &rows = vmpcMidiScreen->activePreset->rows;
 
         for (auto &r: rows)
@@ -111,7 +111,7 @@ std::shared_ptr<MidiControlPreset> MidiControlPersistence::createDefaultPreset(m
 
 void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 {
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
     vmpcMidiScreen->activePreset->rows.clear();
 
     const auto defaultPreset = createDefaultPreset(mpc);
@@ -139,7 +139,7 @@ void MidiControlPersistence::saveCurrentState(mpc::Mpc& mpc)
 
 void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::path p, std::string name)
 {
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
 
     std::vector<char> data;
 

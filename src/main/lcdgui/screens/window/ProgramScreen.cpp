@@ -29,7 +29,7 @@ void ProgramScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(program->getName(), 16, enterAction, name);
         openScreen("name");
     }
@@ -59,7 +59,7 @@ void ProgramScreen::function(int i)
 	{
 		if (sampler->getProgramCount() == 24)
 		{
-			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+			auto popupScreen = mpc.screens->get<PopupScreen>();
 			popupScreen->setText("Prog. directory full(24 max)");
 			popupScreen->setScreenToReturnTo(name);
 			openScreen("popup");

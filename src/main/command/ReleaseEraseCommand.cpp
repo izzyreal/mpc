@@ -8,7 +8,7 @@ ReleaseEraseCommand::ReleaseEraseCommand(mpc::Mpc& mpc) : mpc(mpc) {}
 
 void ReleaseEraseCommand::execute()
 {
-    const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>("sequencer");
+    const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>();
     sequencerScreen->hideFooterLabelAndShowFunctionKeys();
 }
 

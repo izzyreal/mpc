@@ -65,7 +65,7 @@ void SndParamsScreen::function(int f)
 	{
         sampler->switchToNextSoundSortType();
 		openScreen("popup");
-		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+		auto popupScreen = mpc.screens->get<PopupScreen>();
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("params", 200);
 		break;
@@ -75,7 +75,7 @@ void SndParamsScreen::function(int f)
 		if (sampler->getSoundCount() == 0)
 			return;
 
-		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("trim");
 		openScreen("edit-sound");
 		break;

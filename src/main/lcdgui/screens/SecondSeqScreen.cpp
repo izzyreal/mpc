@@ -17,7 +17,7 @@ void SecondSeqScreen::open()
 
 void SecondSeqScreen::function(int i)
 {
-    auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+    auto punchScreen = mpc.screens->get<PunchScreen>();
 
     switch (i)
     {

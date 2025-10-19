@@ -31,8 +31,8 @@ Count::Count(const std::vector<char>& b)
 
 Count::Count(mpc::Mpc& mpc)
 {
-	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
-	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
+	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>();
+	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>();
 
 	auto lSequencer = mpc.getSequencer();
 

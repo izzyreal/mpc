@@ -26,7 +26,7 @@ Sequence::Sequence(mpc::Mpc& _mpc)
 	tempoChangeTrack->setUsed(true);
 	tempoChangeTrack->setName("tempo");
 
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 
 	for (int i = 0; i < 33; i++)
 		deviceNames[i] = userScreen->getDeviceName(i);
@@ -195,7 +195,7 @@ bool Sequence::isUsed()
 
 void Sequence::init(int newLastBarIndex)
 {
-	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto userScreen = mpc.screens->get<UserScreen>();
 	initialTempo = userScreen->tempo;
 	loopEnabled = userScreen->loop;
 

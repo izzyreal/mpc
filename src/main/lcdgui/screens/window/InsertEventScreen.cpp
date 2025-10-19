@@ -54,7 +54,7 @@ void InsertEventScreen::insertEvent()
         const bool allowMultipleNotesOnSameTick = true;
 		auto noteEvent = std::make_shared<NoteOnEvent>();
         track->addEvent(sequencer.lock()->getTickPosition(), noteEvent, allowMultipleNotesOnSameTick);
-        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
         unsigned short duration = timingCorrectScreen->getNoteValueLengthInTicks();
 		noteEvent->setDuration(duration);
 		noteEvent->setNote(60);

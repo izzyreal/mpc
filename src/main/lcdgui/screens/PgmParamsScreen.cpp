@@ -44,7 +44,7 @@ void PgmParamsScreen::function(int i)
 		break;
 	case 1:
 	{	
-		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>("select-drum");
+		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
 		selectDrumScreen->redirectScreen = "program-params";
 		openScreen("select-drum");
 		break;

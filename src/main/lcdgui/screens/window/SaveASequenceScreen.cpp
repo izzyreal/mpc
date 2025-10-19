@@ -19,7 +19,7 @@ void SaveASequenceScreen::open()
 {
     if (ls->getPreviousScreenName() == "save")
     {
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->setName(sequencer.lock()->getActiveSequence()->getName());
     }
 
@@ -41,7 +41,7 @@ void SaveASequenceScreen::openNameScreen()
 {
     if (param == "file")
     {
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(sequencer.lock()->getActiveSequence()->getName(), 16, [this](std::string&) {
             openScreen(name);
         }, name);
@@ -60,7 +60,7 @@ void SaveASequenceScreen::function(int i)
 		break;
 	case 4:
     {
-        auto nameScreen = mpc.screens->get<NameScreen>("name");
+        auto nameScreen = mpc.screens->get<NameScreen>();
         auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
         auto disk = mpc.getDisk();
 
@@ -78,12 +78,12 @@ void SaveASequenceScreen::function(int i)
             };
 
             const auto initializeNameScreen = [this]{
-                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto nameScreen = mpc.screens->get<NameScreen>();
                 auto enterAction = [this](std::string&){ openScreen(name); };
                 nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
             };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
             fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
             openScreen("file-exists");
 			return;
@@ -104,7 +104,7 @@ void SaveASequenceScreen::displaySaveAs()
 
 void SaveASequenceScreen::displayFile()
 {
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
+	auto nameScreen = mpc.screens->get<NameScreen>();
 	auto name = nameScreen->getNameWithoutSpaces();
 
 	if (name.length() < 2)

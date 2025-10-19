@@ -28,7 +28,7 @@ void EndFineScreen::open()
 
 void EndFineScreen::displayFineWave()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+	auto trimScreen = mpc.screens->get<TrimScreen>();
 
 	auto sound = sampler->getSound();
 
@@ -62,7 +62,7 @@ void EndFineScreen::displayLngthLabel()
 
 void EndFineScreen::displaySmplLngth()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+	auto trimScreen = mpc.screens->get<TrimScreen>();
     findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -107,7 +107,7 @@ void EndFineScreen::turnWheel(int i)
         field->disableTypeMode();
     }
 
-    auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+    auto trimScreen = mpc.screens->get<TrimScreen>();
 
     if (param == "end")
 	{
@@ -142,7 +142,7 @@ void EndFineScreen::right()
 
 void EndFineScreen::pressEnter()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+	auto trimScreen = mpc.screens->get<TrimScreen>();
 	trimScreen->pressEnter();
 	displayEnd();
 	displayLngthLabel();
@@ -160,7 +160,7 @@ void EndFineScreen::setSlider(int i)
 
     if (param == "end")
     {
-        auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+        auto trimScreen = mpc.screens->get<TrimScreen>();
         trimScreen->setSliderEnd(i);
         displayEnd();
         displayLngthLabel();

@@ -20,7 +20,7 @@ ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex
 void ChannelSettingsScreen::open()
 {
 	init();
-	auto mixerScreen = mpc.screens->get<MixerScreen>("mixer");
+	auto mixerScreen = mpc.screens->get<MixerScreen>();
     const int padIndexWithoutBank = mixerScreen->xPos;
     const int padIndexWithBank = padIndexWithoutBank + (mpc.getBank() * 16);
     auto padNote = program->getNoteFromPad(padIndexWithBank);
@@ -38,7 +38,7 @@ std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 {
 	init();
 
-	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
 	if (mixerSetupScreen->isIndivFxSourceDrum())
 	{
@@ -55,7 +55,7 @@ std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 {
 	init();
 
-	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
 	if (mixerSetupScreen->isStereoMixSourceDrum())
 	{

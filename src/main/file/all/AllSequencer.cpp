@@ -52,14 +52,14 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
 
     saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] = mpcSequencer->isTempoSourceSequenceEnabled() ? 0x01 : 0x00;
 
-	const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+	const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
 	const auto noteValue = timingCorrectScreen->getNoteValue();
 
 	saveBytes[TC_OFFSET] = noteValue;
-    saveBytes[TIME_DISPLAY_STYLE_OFFSET] = mpc.screens->get<TimeDisplayScreen>("time-display")->getDisplayStyle();
+    saveBytes[TIME_DISPLAY_STYLE_OFFSET] = mpc.screens->get<TimeDisplayScreen>()->getDisplayStyle();
 	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = mpcSequencer->isSecondSequenceEnabled() ? 1 : 0;
 	
-	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
+	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;
 }
 

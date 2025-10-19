@@ -51,7 +51,7 @@ void doTest(mpc::Mpc& mpc,
             std::shared_ptr<sampler::Program>& p1,
             std::shared_ptr<sampler::Program>& p2)
 {
-    mpc.screens->get<LoadAProgramScreen>("load-a-program")->setLoadReplaceSameSound(replaceSameSounds);
+    mpc.screens->get<LoadAProgramScreen>()->setLoadReplaceSameSound(replaceSameSounds);
 
     prepareResources(mpc);
 
@@ -150,7 +150,7 @@ void doTestWithMissingSound(mpc::Mpc& mpc,
                             std::shared_ptr<sampler::Program>& p1,
                             std::shared_ptr<sampler::Program>& p2)
 {
-    mpc.screens->get<LoadAProgramScreen>("load-a-program")->setLoadReplaceSameSound(replaceSameSounds);
+    mpc.screens->get<LoadAProgramScreen>()->setLoadReplaceSameSound(replaceSameSounds);
 
     prepareResources(mpc);
 
@@ -185,7 +185,7 @@ void doTestWithMissingSound(mpc::Mpc& mpc,
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "cant-find-file")
         {
-            auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+            auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
             cantFindFileScreen->function(1);
             break;
         }

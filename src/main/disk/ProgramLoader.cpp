@@ -58,7 +58,7 @@ std::shared_ptr<MpcFile> findSoundFileByFilenameWithoutExtension(mpc::Mpc& mpc, 
 program_or_error
 ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> file, std::shared_ptr<mpc::sampler::Program> program)
 {
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;
 
     auto disk = mpc.getDisk();
@@ -100,7 +100,7 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> fi
                 continue;
             }
 
-            const auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
+            const auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>();
             const bool replaceExistingSameNamedSounds = loadAProgramScreen->loadReplaceSameSound;
 
             SoundLoader soundLoader(mpc, replaceExistingSameNamedSounds);
@@ -190,7 +190,7 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> fi
 void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name, std::string ext, int sampleSize)
 {
     mpc.getLayeredScreen()->openScreen("popup");
-    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+    auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
     auto sleepTime = sampleSize / 800;
@@ -203,7 +203,7 @@ void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name, s
 
 void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
 {
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;
 
     if (!skipAll) {

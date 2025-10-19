@@ -37,7 +37,7 @@ void TrMoveScreen::turnWheel(int i)
 	}
 	else if (param == "sq")
 	{
-		auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+		auto eventsScreen = mpc.screens->get<EventsScreen>();
 		eventsScreen->setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 		displaySq();
 		displayTrFields();
@@ -109,7 +109,7 @@ void TrMoveScreen::function(int i)
 	case 1:
 	case 3:
 	{
-		auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+		auto eventsScreen = mpc.screens->get<EventsScreen>();
 		eventsScreen->tab = i;
 		openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 		break;
@@ -171,7 +171,7 @@ void TrMoveScreen::displayTrLabels()
 		}
 	}
 
-	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+	auto eventsScreen = mpc.screens->get<EventsScreen>();
 	auto sequence = sequencer.lock()->getActiveSequence();
 
 	if (tr0Index >= 0)
@@ -216,7 +216,7 @@ void TrMoveScreen::displayTrLabels()
 
 void TrMoveScreen::displayTrFields()
 {
-	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+	auto eventsScreen = mpc.screens->get<EventsScreen>();
 	auto sequence = sequencer.lock()->getActiveSequence();
 	
 	if (isSelected())

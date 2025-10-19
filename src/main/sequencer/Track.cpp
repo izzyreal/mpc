@@ -363,7 +363,7 @@ int Track::getCorrectedTickPos()
     auto pos = mpc.getSequencer()->getTickPosition();
     auto correctedTickPos = -1;
 
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
     auto swingPercentage = timingCorrectScreen->getSwing();
     auto noteValueLengthInTicks = timingCorrectScreen->getNoteValueLengthInTicks();
 
@@ -510,7 +510,7 @@ void Track::playNext()
     const auto isActiveTrackIndex = trackIndex == sequencer->getActiveTrackIndex();
 	auto _delete = sequencer->isRecording() && (isActiveTrackIndex || recordingModeIsMulti) && (trackIndex < 64);
 
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
+	auto punchScreen = mpc.screens->get<PunchScreen>();
 
 	if (sequencer->isRecording() && punchScreen->on && trackIndex < 64)
 	{
@@ -568,8 +568,8 @@ void Track::playNext()
 
             if (!_delete && oneOrMorePadsArePressed && mpc.isSixteenLevelsEnabled())
             {
-                auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-                auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+                auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+                auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>();
 
                 if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
                 {

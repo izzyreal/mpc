@@ -100,7 +100,7 @@ void StepEditorScreen::open()
 
     if (previousScreen == "insert-event")
     {
-        auto insertEventScreen = mpc.screens->get<InsertEventScreen>("insert-event");
+        auto insertEventScreen = mpc.screens->get<InsertEventScreen>();
 
         if (insertEventScreen->isEventAddedBeforeLeavingTheScreen())
         {
@@ -285,7 +285,7 @@ void StepEditorScreen::function(int i)
 			if ((polyPressEvent || controlChangeEvent) && isA)
 				return;
 
-			auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>("edit-multiple");
+			auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>();
 
 			if (noteEvent && track->getBus() != 0)
 			{
@@ -400,7 +400,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param == "tcvalue")
 	{
-		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+		auto screen = mpc.screens->get<TimingCorrectScreen>();
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 	}

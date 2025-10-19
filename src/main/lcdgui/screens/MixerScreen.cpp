@@ -59,8 +59,6 @@ void MixerScreen::addMixerStrips()
         mixerStrips.emplace_back(addChildT<MixerStrip>(mpc, i));
         mixerStrips.back()->setBank(mpc.getBank());
     }
-    
-    displayMixerStrips();
 }
 
 std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
@@ -73,7 +71,7 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
         return {};
     
     auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
     
     return stereoMixSourceIsDrum ? activeDrum().getStereoMixerChannels()[note - 35] : noteParameters->getStereoMixerChannel();
@@ -89,7 +87,7 @@ std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
         return {};
     
     auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
     
     return indivFxSourceIsDrum ? activeDrum().getIndivFxMixerChannels()[note - 35] : noteParameters->getIndivFxMixerChannel();
@@ -374,7 +372,7 @@ void MixerScreen::turnWheel(int i)
         
         if (tab == 0)
         {
-            auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+            auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
             
             bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
             

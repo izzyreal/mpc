@@ -34,7 +34,7 @@ void SaveApsFileScreen::open()
 void SaveApsFileScreen::turnWheel(int i)
 {
 	init();
-	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
 	if (param == "save")
 	{
@@ -59,7 +59,7 @@ void SaveApsFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
+		auto nameScreen = mpc.screens->get<NameScreen>();
         std::string apsFileName = fileName + ".APS";
         
         auto disk = mpc.getDisk();
@@ -78,7 +78,7 @@ void SaveApsFileScreen::function(int i)
             };
 
             const auto initializeNameScreen = [this]{
-                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto nameScreen = mpc.screens->get<NameScreen>();
                 auto enterAction = [this](std::string& nameScreenName){
                     fileName = nameScreenName;
                     openScreen(name);
@@ -86,7 +86,7 @@ void SaveApsFileScreen::function(int i)
                 nameScreen->initialize(fileName, 16, enterAction, "save");
             };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
             fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
             openScreen("file-exists");
             return;
@@ -105,13 +105,13 @@ void SaveApsFileScreen::displayFile()
 
 void SaveApsFileScreen::displaySave()
 {
-	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 	findField("save")->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
-	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 	findField("replace-same-sounds")->setText(std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
 }
 
@@ -126,7 +126,7 @@ void SaveApsFileScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(fileName, 16, enterAction, name);
         openScreen("name");
     }

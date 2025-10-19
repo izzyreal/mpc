@@ -119,7 +119,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
         auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
         auto mixer = p->getStereoMixerChannel(pad);
         
-        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
+        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
         
         if (mixerSetupScreen->isStereoMixSourceDrum())
         {
@@ -316,7 +316,7 @@ void EventHandler::handleNoteEventMidiOut(const std::shared_ptr<Event> event, co
 
     if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
-        auto transScreen = mpc.screens->get<TransScreen>("trans");
+        auto transScreen = mpc.screens->get<TransScreen>();
 
         if (transScreen->transposeAmount != 0 && trackIndex < 64 && (transScreen->tr == -1 || transScreen->tr == trackIndex))
         {
@@ -361,7 +361,7 @@ void EventHandler::handleNoteEventMidiOut(const std::shared_ptr<Event> event, co
         msg = noteOffEvent->createShortMessage(midiChannel, transposeAmount);
     }
 
-    const auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+    const auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
     if (!(mpc.getAudioMidiServices()->isBouncing() && directToDiskRecorderScreen->offline) && trackDevice != 0)
     {

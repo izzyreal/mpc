@@ -33,7 +33,7 @@ void SoundScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(sampler->getSound()->getName(), 16, enterAction, name);
         openScreen("name");
 	}

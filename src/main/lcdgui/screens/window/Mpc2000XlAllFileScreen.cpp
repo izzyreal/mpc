@@ -17,7 +17,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 {
 	init();
 
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
+	auto loadScreen = mpc.screens->get<LoadScreen>();
 
 	switch (i)
 	{
@@ -27,7 +27,7 @@ void Mpc2000XlAllFileScreen::function(int i)
         
         if (result.has_value())
         {
-            auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
+            auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>();
             loadASequenceFromAllScreen->sequencesFromAllFile = result.value();
             openScreen("load-a-sequence-from-all");
         }

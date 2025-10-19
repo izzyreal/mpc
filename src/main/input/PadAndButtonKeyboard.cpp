@@ -46,7 +46,7 @@ void PadAndButtonKeyboard::pressHardwareComponent(const ComponentId id)
         return;
     }
 
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto nameScreen = mpc.screens->get<NameScreen>();
 
     if (id == ComponentId::SIXTEEN_LEVELS_OR_SPACE)
     {

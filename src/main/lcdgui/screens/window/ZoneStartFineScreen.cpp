@@ -27,8 +27,8 @@ void ZoneStartFineScreen::open()
 
 void ZoneStartFineScreen::displayFineWave()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
-	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
+	auto trimScreen = mpc.screens->get<TrimScreen>();
 
 	auto sound = sampler->getSound();
 
@@ -43,13 +43,13 @@ void ZoneStartFineScreen::displayFineWave()
 
 void ZoneStartFineScreen::displayStart()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 	findField("start")->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayLngthLabel()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 	findLabel("lngth")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
@@ -80,7 +80,7 @@ void ZoneStartFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-    auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+    auto zoneScreen = mpc.screens->get<ZoneScreen>();
 
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
@@ -117,7 +117,7 @@ void ZoneStartFineScreen::right()
 
 void ZoneStartFineScreen::pressEnter()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 	zoneScreen->pressEnter();
 
 	displayStart();
@@ -136,7 +136,7 @@ void ZoneStartFineScreen::setSlider(int i)
 
     if (param == "start")
     {
-        auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+        auto zoneScreen = mpc.screens->get<ZoneScreen>();
         zoneScreen->setSliderZoneStart(i);
         displayStart();
         displayLngthLabel();

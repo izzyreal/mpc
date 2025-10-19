@@ -83,7 +83,7 @@ void MonoToStereoScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(newStName, 16, enterAction, name);
         openScreen("name");
     }
@@ -110,7 +110,7 @@ void MonoToStereoScreen::function(int j)
 		{
 			if (s->getName() == newStName)
 			{
-				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+				auto popupScreen = mpc.screens->get<PopupScreen>();
 				popupScreen->setText("Name already used");
 				popupScreen->setScreenToReturnTo(name);
 				openScreen("popup");

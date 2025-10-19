@@ -42,7 +42,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
     auto fullLevel = mpc.isFullLevelEnabled();
     auto sixteenLevels = mpc.isSixteenLevelsEnabled();
 
-    auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+    auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>();
     auto note = assign16LevelsScreen->getNote();
 
     for (int physicalPadIndex = 0; physicalPadIndex < 16; ++physicalPadIndex)

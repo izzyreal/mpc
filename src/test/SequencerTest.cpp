@@ -213,7 +213,7 @@ TEST_CASE("Undo", "[sequencer]")
     auto sequencer = mpc.getSequencer();
     sequencer->setCountEnabled(false);
 
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(0);
 
     auto seq = sequencer->getActiveSequence();

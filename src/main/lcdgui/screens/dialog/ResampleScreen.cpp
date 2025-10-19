@@ -61,7 +61,7 @@ void ResampleScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(findField("newname")->getText(), 16, enterAction, name);
         openScreen("name");
     }

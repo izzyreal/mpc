@@ -35,7 +35,7 @@ void EditMultipleScreen::close()
 void EditMultipleScreen::function(int i)
 {
     ScreenComponent::function(i);
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     
     auto selectedEvent = stepEditorScreen->getSelectedEvent();
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
@@ -122,7 +122,7 @@ void EditMultipleScreen::turnWheel(int i)
 {
     init();
     
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     auto event = stepEditorScreen->getSelectedEvent();
     
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
@@ -191,7 +191,7 @@ void EditMultipleScreen::turnWheel(int i)
 
 void EditMultipleScreen::checkThreeParameters()
 {
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
@@ -211,7 +211,7 @@ void EditMultipleScreen::checkThreeParameters()
 
 void EditMultipleScreen::checkFiveParameters()
 {
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
@@ -236,7 +236,7 @@ void EditMultipleScreen::checkFiveParameters()
 
 void EditMultipleScreen::checkNotes()
 {
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
         auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
@@ -263,7 +263,7 @@ void EditMultipleScreen::updateEditMultiple()
 {
     init();
     
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     auto event = stepEditorScreen->getSelectedEvent();
     auto letter = stepEditorScreen->getSelectedParameterLetter();
     
@@ -395,7 +395,7 @@ void EditMultipleScreen::updateEditMultiple()
 
 void EditMultipleScreen::updateDouble()
 {
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     
     findLabel("value0")->Hide(false);
     findLabel("value1")->Hide(false);

@@ -21,7 +21,7 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(mpc::Mpc &m
 
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
     auto& presets = mpc.midiControlPresets;
     auto preset = std::find_if(
             presets.begin(),
@@ -80,7 +80,7 @@ void VmpcKnownControllerDetectedScreen::open()
             }
             else if (p->autoloadMode == nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
             {
-                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
                 vmpcMidiScreen->shouldSwitch.store(true);
                 openScreen(ls->getPreviousScreenName());
                 return;

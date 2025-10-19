@@ -18,7 +18,7 @@ using namespace mpc::engine::midi;
 MidiClockOutput::MidiClockOutput(mpc::Mpc& mpc)
         : mpc(mpc),
           sequencer(mpc.getSequencer()),
-          syncScreen(mpc.screens->get<SyncScreen>("sync")),
+          syncScreen(mpc.screens->get<SyncScreen>()),
           midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
           msg(std::make_shared<ShortMessage>())
 {

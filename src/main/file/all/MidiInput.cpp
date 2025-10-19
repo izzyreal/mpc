@@ -49,16 +49,16 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 {
 	saveBytes = std::vector<char>(LENGTH);
 
-	auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
+	auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
 
-    saveBytes[SOFT_THRU_MODE_OFFSET] = mpc.screens->get<MidiOutputScreen>("midi-output")->getSoftThru();
+    saveBytes[SOFT_THRU_MODE_OFFSET] = mpc.screens->get<MidiOutputScreen>()->getSoftThru();
 	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh() + 1);
 	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
 	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
 	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(midiInputScreen->getType());
 	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(mpc.getSequencer()->isRecordingModeMulti() ? 1 : 0);
 	
-	auto screen = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup");
+	auto screen = mpc.screens->get<MultiRecordingSetupScreen>();
 
 	for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
 	{

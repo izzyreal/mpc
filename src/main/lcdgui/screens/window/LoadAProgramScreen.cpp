@@ -33,7 +33,7 @@ void LoadAProgramScreen::function(int i)
 {
 	init();
 
-    auto selectedFile = mpc.screens->get<LoadScreen>("load")->getSelectedFile();
+    auto selectedFile = mpc.screens->get<LoadScreen>()->getSelectedFile();
     
 	switch (i)
 	{

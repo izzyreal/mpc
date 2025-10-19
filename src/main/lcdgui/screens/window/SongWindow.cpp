@@ -21,7 +21,7 @@ void SongWindow::open()
 	auto songNameFirstLetterField = findField("song-name-first-letter");
 	auto defaultSongNameFirstLetterField = findField("default-name-first-letter");
 
-	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songScreen = mpc.screens->get<SongScreen>();
 	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
 
 	songNameFirstLetterField->setText(song->getName().substr(0, 1));
@@ -54,7 +54,7 @@ void SongWindow::openNameScreen()
     std::function<void(std::string&)> enterAction;
     std::string initialNameScreenName;
 
-    auto songScreen = mpc.screens->get<SongScreen>("song");
+    auto songScreen = mpc.screens->get<SongScreen>();
 
 	if (param.find("default") != std::string::npos)
 	{
@@ -77,7 +77,7 @@ void SongWindow::openNameScreen()
         };
 	}
 
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto nameScreen = mpc.screens->get<NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
 	openScreen("name");
 }

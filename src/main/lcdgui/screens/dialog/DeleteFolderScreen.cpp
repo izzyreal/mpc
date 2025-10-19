@@ -27,9 +27,9 @@ void DeleteFolderScreen::static_deleteFolder(void* this_p)
 
 void DeleteFolderScreen::deleteFolder()
 {
-	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+	auto directoryScreen = mpc.screens->get<DirectoryScreen>();
 	openScreen("popup");
-	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+	auto popupScreen = mpc.screens->get<PopupScreen>();
 	auto file = directoryScreen->getSelectedFile();
 	auto fileName = file->getName();
 	popupScreen->setText("Delete:" + fileName);

@@ -21,7 +21,7 @@ VmpcContinuePreviousSessionScreen::VmpcContinuePreviousSessionScreen(mpc::Mpc &m
 
 void VmpcContinuePreviousSessionScreen::function(int i)
 {
-    auto autoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+    auto autoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
     auto previousScreen = ls->getPreviousScreenName();
 
     switch (i) {

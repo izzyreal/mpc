@@ -49,7 +49,7 @@ void SaveAllFileScreen::openNameScreen()
             openScreen(name);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(fileName, 16, enterAction, name);
         openScreen("name");
 	}
@@ -83,7 +83,7 @@ void SaveAllFileScreen::function(int i)
             };
 
             const auto initializeNameScreen = [this]{
-                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto nameScreen = mpc.screens->get<NameScreen>();
                 auto enterAction = [this](std::string& nameScreenName){
                     fileName = nameScreenName;
                     openScreen(name);
@@ -91,7 +91,7 @@ void SaveAllFileScreen::function(int i)
                 nameScreen->initialize(fileName, 16, enterAction, "save");
             };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
             fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
             openScreen("file-exists");
 			return;

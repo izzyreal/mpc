@@ -20,7 +20,7 @@ void PasteEventScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
 
         const bool allowMultipleNotesOnSameTick = true;
 

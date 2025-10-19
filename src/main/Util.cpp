@@ -184,7 +184,7 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
     if (sequence->isUsed())
         return;
     
-    auto userScreen = mpc.screens->get<UserScreen>("user");
+    auto userScreen = mpc.screens->get<UserScreen>();
     sequence->init(userScreen->lastBar);
     auto numberString = StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2);
     std::string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;

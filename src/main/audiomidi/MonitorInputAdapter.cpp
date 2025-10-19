@@ -11,7 +11,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::audio::core;
 
 MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc& mpc, AudioProcess* process)
-	: AudioProcessAdapter(process), sampleScreen(mpc.screens->get<SampleScreen>("sample"))
+	: AudioProcessAdapter(process), sampleScreen(mpc.screens->get<SampleScreen>())
 {
 }
 

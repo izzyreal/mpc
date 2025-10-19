@@ -13,7 +13,7 @@ LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadASequenceScreen::open()
 {
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
+	auto loadScreen = mpc.screens->get<LoadScreen>();
     auto midFile = loadScreen->getSelectedFile();
 
     if (!StrUtil::eqIgnoreCase(midFile->getExtension(), ".mid"))
