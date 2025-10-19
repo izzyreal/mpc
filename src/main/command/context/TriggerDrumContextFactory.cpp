@@ -26,7 +26,7 @@ int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::string &currentScreen
     return result;
 }
 
-TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc::Mpc& mpc, int padIndexWithBank, int velocity, const std::string currentScreenName)
+TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc::Mpc& mpc, int programPadIndex, int velocity, const std::string currentScreenName)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
     const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
@@ -52,9 +52,11 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
 
     const auto hardwareSliderValue = mpc.getHardware()->getSlider()->getValueAs<int>();
     const int drumScreenSelectedDrum = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>("drum")->getDrum();
-    const auto note = activeTrack->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;  
+    const auto note = activeTrack->getBus() > 0 ? program->getPad(programPadIndex)->getNote() : programPadIndex + 35;  
     
     return {
+        programPadIndex,
+        velocity,
         currentScreenName,
         isSoundScreen,
         isFullLevelEnabled,
@@ -94,11 +96,11 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         setMpcPad,
         mpc.getLayeredScreen()->getFocus(),
         hardwareSliderValue,
-        mpc.inputController->isPhysicallyPressed(padIndexWithBank % 16, mpc.getBank())
+        mpc.inputController->isPhysicallyPressed(programPadIndex % 16, mpc.getBank())
     }; 
 }
 
-TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc::Mpc &mpc, const int padIndexWithBank, const std::string currentScreenName)
+TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc::Mpc &mpc, const int programPadIndex, const std::string currentScreenName)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
 
@@ -107,13 +109,13 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
 
     const int drumIndex = getDrumIndexForCurrentScreen(mpc, currentScreenName);
 
-    const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(padIndexWithBank);
+    const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(programPadIndex);
 
     const int drumScreenSelectedDrum = mpc.screens->get<screens::DrumScreen>("drum")->getDrum();
 
     auto eventHandler = mpc.getEventHandler();
 
-    const auto recordNoteOnEvent = mpc.getSequencer()->getNoteEventStore().retrieveRecordNoteEvent(padIndexWithBank);
+    const auto recordNoteOnEvent = mpc.getSequencer()->getNoteEventStore().retrieveRecordNoteEvent(programPadIndex);
 
     std::function<bool()> isAnyProgramPadRegisteredAsPressed = [sampler = mpc.getSampler()] { return sampler->isAnyProgramPadRegisteredAsPressed(); };
 
@@ -127,7 +129,7 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
     std::function<void()> sequencerStopMetronomeTrack = [sequencer = mpc.getSequencer()] { sequencer->stopMetronomeTrack(); };
 
     return {
-        padIndexWithBank,
+        programPadIndex,
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,

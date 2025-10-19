@@ -125,9 +125,9 @@ void ClientInputController::handlePadPress(const ClientInput &input)
     }
 
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, *input.value, screenName);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screenName);
 
-    TriggerDrumNoteOnCommand(ctx, programPadIndex, clampedVelocity).execute();
+    TriggerDrumNoteOnCommand(ctx).execute();
 
     const bool isF4Pressed = mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
     const bool isF6Pressed = mpc.getHardware()->getButton(ComponentId::F6)->isPressed();

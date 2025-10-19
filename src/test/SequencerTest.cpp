@@ -139,6 +139,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                 if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
                 {
                     auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screenName);
+                    TriggerDrumNoteOnCommand(noteOnCtx).execute();
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
@@ -226,15 +227,25 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->recFromStart();
 
-    auto pads = mpc.getHardware()->getPads();
-
     int64_t timeInSamples = 0;
+
+    const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     for (int i = 0; i < 20; i++)
     {
-        if (i % 2 == 0) pads[0]->press(); else pads[0]->release();
+        if (i % 2 == 0)
+        {
+            auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screenName);
+            TriggerDrumNoteOnCommand(noteOnCtx).execute();
+        }
+        else
+        {
+            auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screenName);
+            TriggerDrumNoteOffCommand(noteOffCtx).execute();
+        }
 
         mpc.getClock()->processBufferInternal(sequencer->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
         timeInSamples += BUFFER_SIZE;
     }

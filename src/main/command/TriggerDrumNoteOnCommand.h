@@ -6,20 +6,15 @@ namespace mpc::command::context {
 }
 
 namespace mpc::command {
-
-    // Should be renamed to PressProgramPad or similar, because we're not dealing with
-    // hardware pad indices from 1 to 16 here, but with the 64 pads of a program.
     class TriggerDrumNoteOnCommand : public Command {
     public:
-        TriggerDrumNoteOnCommand(context::TriggerDrumNoteOnContext &ctx, int padIndexWithBank, int velo);
+        TriggerDrumNoteOnCommand(context::TriggerDrumNoteOnContext &ctx);
         void execute() override;
 
     private:
         context::TriggerDrumNoteOnContext &ctx;
-        int padIndexWithBank;
-        int velo;
 
-        void generateNoteOn(const context::TriggerDrumNoteOnContext &ctx, int velo, int padIndexWithBank);
+        void generateNoteOn(const context::TriggerDrumNoteOnContext &ctx);
     };
 
 } // namespace mpc::command

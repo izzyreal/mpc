@@ -15,8 +15,8 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 using namespace mpc::sampler;
 
-TriggerDrumNoteOnCommand::TriggerDrumNoteOnCommand(TriggerDrumNoteOnContext &ctx, int padIndexWithBank, int velo)
-    : ctx(ctx), padIndexWithBank(padIndexWithBank), velo(velo)
+TriggerDrumNoteOnCommand::TriggerDrumNoteOnCommand(TriggerDrumNoteOnContext &ctx)
+    : ctx(ctx)
 {
 }
 
@@ -41,17 +41,14 @@ void TriggerDrumNoteOnCommand::execute()
         return;
     }
 
-    if (ctx.isFullLevelEnabled)
-    {
-        velo = 127;
-    }
-
-    generateNoteOn(ctx, velo, padIndexWithBank);
+    generateNoteOn(ctx);
 }
 
-void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ctx, const int velo, const int padIndexWithBank)
+void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ctx)
 {
     const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
+
+    const auto velo = ctx.isFullLevelEnabled ? 127 : ctx.velocity;
 
     const auto playOnEvent = std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
 
@@ -63,7 +60,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
         assign16LevelsScreen->getOriginalKeyPad(),
         assign16LevelsScreen->getNote(),
         assign16LevelsScreen->getParameter(),
-        padIndexWithBank % 16
+        ctx.programPadIndex % 16
     };
 
     Util::set16LevelsValues(sixteenLevelsContext, playOnEvent);
@@ -90,7 +87,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
         Util::setSliderNoteVariationParameters(sliderNoteVariationContext, playOnEvent);
     }
 
-    ctx.sequencer->getNoteEventStore().storePlayNoteEvent(padIndexWithBank, playOnEvent);
+    ctx.sequencer->getNoteEventStore().storePlayNoteEvent(ctx.programPadIndex, playOnEvent);
 
     if (ctx.currentScreenIsSamplerScreen)
     {
@@ -156,7 +153,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
             Util::setSliderNoteVariationParameters(sliderNoteVariationContext, recordNoteOnEvent);
         }
 
-        ctx.sequencer->getNoteEventStore().storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
+        ctx.sequencer->getNoteEventStore().storeRecordNoteEvent(ctx.programPadIndex, recordNoteOnEvent);
     }
 }
 

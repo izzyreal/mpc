@@ -359,7 +359,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
         // Are we building this correctly when we're in multi-recording setup mode? Probably not, because buildTriggerDrumNoteOnContext has its own
         // track derivation.
         auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
-        command::TriggerDrumNoteOnCommand(ctx, padIndexWithBank, playMidiNoteOn->getVelocity()).execute();
+        command::TriggerDrumNoteOnCommand(ctx).execute();
 
         const auto note = playMidiNoteOn->getNote();
 
