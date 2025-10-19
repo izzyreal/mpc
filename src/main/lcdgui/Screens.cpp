@@ -6,8 +6,6 @@
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <lcdgui/screens/StaticScreen.hpp>
-
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/AssignScreen.hpp>
 #include <lcdgui/screens/BarsScreen.hpp>
@@ -878,11 +876,6 @@ std::shared_ptr <ScreenComponent> Screens::getScreenComponent(const std::string 
     if (screenName == "popup")
     {
         screen = std::make_shared<PopupScreen>(mpc);
-    }
-    else if (screenName == "mpc2000xl" || screenName == "black" || screenName == "half-black" || screenName == "empty")
-    {
-        screen = std::make_shared<StaticScreen>(mpc);
-        screen->findBackground()->setName(screenName);
     }
     else if (screenName == "sound-memory")
     {

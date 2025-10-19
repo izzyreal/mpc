@@ -13,8 +13,6 @@
 using namespace std;
 
 vector<string> screenNames = {
-"black",
-"mpc2000xl",
 "sequencer",
 "next-seq",
 "mixer",

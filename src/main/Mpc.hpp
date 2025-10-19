@@ -152,9 +152,6 @@ namespace mpc {
 
     private:
         std::vector<std::string> screenNames {
-                "tr-move",
-                "black",
-                "mpc2000xl",
                 "sequencer",
                 "next-seq",
                 "mixer",
