@@ -122,7 +122,7 @@ void LayeredScreen::openScreen()
 
 void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScreen)
 {
-	auto ams = mpc.getAudioMidiServices();
+    auto ams = mpc.getAudioMidiServices();
 
     if (!navigation.empty())
     {
@@ -198,6 +198,7 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
         navigation.push_back(newScreen);
     }
 
+    assert(!getFocusedLayer()->findChild<ScreenComponent>());
 	getFocusedLayer()->addChild(navigation.back());
 
 	if (navigation.back()->findFields().size() > 0)
@@ -233,6 +234,8 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 void LayeredScreen::closeWindow()
 {
     assert(navigation.size() > 1);
+    navigation.back()->close();
+    getFocusedLayer()->removeChild(navigation.back());
     navigation.pop_back();
     openScreenInternal(navigation.back());
 }
