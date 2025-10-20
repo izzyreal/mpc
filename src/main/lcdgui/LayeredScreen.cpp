@@ -297,7 +297,7 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 
 void LayeredScreen::navigateBackToLayer(const int layerIndex)
 {
-    while(navigation.size() > layerIndex)
+    while(navigation.size() > layerIndex + 1)
     {
         closeWindow();
     }

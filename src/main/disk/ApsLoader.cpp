@@ -263,7 +263,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
 
     if (!sound)
     {
-        return;
+        return; 
     }
 
     soundLoader.loadSound(soundFile, result, sound, shouldBeConverted);
@@ -276,19 +276,18 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
 
 void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
 {
-    mpc.getLayeredScreen()->openScreen<PopupScreen>();
-    auto popupScreen = mpc.screens->get<PopupScreen>();
-    popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
+    std::string msg = "LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
     
-    if (std::dynamic_pointer_cast<StdDisk>(mpc.getDisk()))
+    auto sleepTime = sampleSize / 800;
+    
+    if (sleepTime < 300)
     {
-        auto sleepTime = sampleSize / 800;
-        
-        if (sleepTime < 300)
-            sleepTime = 300;
-        
-        std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime * 0.2)));
+        sleepTime = 300;
     }
+    
+    mpc.getLayeredScreen()->showPopupAndAwaitInteraction(msg);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime *0.2)));
 }
 
 void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
