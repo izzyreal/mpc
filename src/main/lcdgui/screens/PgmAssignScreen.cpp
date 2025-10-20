@@ -68,7 +68,6 @@ void PgmAssignScreen::function(int i)
 		break;
 	case 4:
 	{
-		mpc.setPreviousSamplerScreenName("program-assign");
         mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
 		break;
 	}
@@ -246,7 +245,6 @@ void PgmAssignScreen::openWindow()
 	
 	if (param == "pgm")
 	{
-		mpc.setPreviousSamplerScreenName("program-assign");
         mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 	}
 	else if (param == "pad" || param == "pad-note")

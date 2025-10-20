@@ -23,9 +23,6 @@ namespace mpc::command {
                 mpc.getLayeredScreen()->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
             } else if (currentScreenName == "sound") {
                 mpc.getLayeredScreen()->setPreviousScreenName(mpc.getSampler()->getPreviousScreenName());
-            } else if (currentScreenName == "program") {
-                mpc.getLayeredScreen()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
-                mpc.setPreviousSamplerScreenName("");
             } else if (currentScreenName == "name") {
                 auto nameScreen = mpc.screens->get<lcdgui::screens::window::NameScreen>();
                 nameScreen->setEditing(false);

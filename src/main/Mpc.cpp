@@ -274,16 +274,6 @@ int Mpc::getPad()
 	return pad;
 }
 
-std::string Mpc::getPreviousSamplerScreenName()
-{
-	return previousSamplerScreenName;
-}
-
-void Mpc::setPreviousSamplerScreenName(std::string s)
-{
-	previousSamplerScreenName = s;
-}
-
 mpc::disk::DiskController* Mpc::getDiskController()
 {
     return diskController.get();

@@ -48,12 +48,11 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     const auto lastPressedNoteFile = path / "lastPressedNote.txt";
     const auto screenFile = path / "screen.txt";
     const auto previousScreenFile = path / "previousScreen.txt";
-    const auto previousSamplerScreenFile = path / "previousSamplerScreen.txt";
     const auto focusFile = path / "focus.txt";
     const auto soundsFile = path / "sounds.txt";
     const auto currentDirFile = path / "currentDir.txt";
 
-    std::vector<fs::path> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousScreenFile, previousSamplerScreenFile, focusFile, soundsFile, currentDirFile };
+    std::vector<fs::path> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousScreenFile, focusFile, soundsFile, currentDirFile };
 
     std::vector<fs::path> availableFiles;
 
@@ -168,7 +167,6 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
         const auto screenName = getStringProperty("screen.txt");
         const auto previousScreenName = getStringProperty("previousScreen.txt");
-        const auto previousSamplerScreenName = getStringProperty("previousSamplerScreen.txt");
 
         const auto focusName = getStringProperty("focus.txt");
 
@@ -176,8 +174,6 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         const auto currentScreenName = layeredScreen->getCurrentScreenName();
         const auto currentScreen = mpc.screens->getByName1("currentScreenName");
 
-        layeredScreen->openScreen(previousSamplerScreenName);
-        layeredScreen->Draw();
         layeredScreen->openScreen(previousScreenName);
         layeredScreen->Draw();
 
@@ -263,7 +259,6 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
     const auto lastPressedNoteFile = path / "lastPressedNote.txt";
     const auto screenFile = path / "screen.txt";
     const auto previousScreenFile = path / "previousScreen.txt";
-    const auto previousSamplerScreenFile = path / "previousSamplerScreen.txt";
     const auto focusFile = path / "focus.txt";
     const auto soundsFile = path / "sounds.txt";
     const auto currentDirFile = path / "currentDir.txt";
@@ -310,7 +305,6 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
             previousScreenName = "sequencer";
         }
 
-        auto previousSamplerScreen = mpc.getPreviousSamplerScreenName();
         auto focus = mpc.getLayeredScreen()->getFocusedFieldName();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
         auto lastPressedPad = mpc.getPad();
@@ -330,7 +324,6 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 
         setFileData(screenFile, currentScreen->getName());
         setFileData(previousScreenFile, previousScreenName);
-        setFileData(previousSamplerScreenFile, previousScreenName);
         setFileData(focusFile, focus);
         setFileData(currentDirFile, currentDir);
         setFileData(soundIndexFile, {(char)soundIndex});

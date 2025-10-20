@@ -89,9 +89,6 @@ namespace mpc {
         int pad = 0;
         int note = 60;
 
-        // For returning to a specific screen after for example opening the Name screen
-        std::string previousSamplerScreenName;
-
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;
         std::shared_ptr<mpc::Paths> paths;
@@ -104,8 +101,6 @@ namespace mpc {
         void setPad(unsigned char padIndexWithBank);
         int getNote();
         int getPad();
-        std::string getPreviousSamplerScreenName();
-        void setPreviousSamplerScreenName(std::string s);
         void panic();
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
