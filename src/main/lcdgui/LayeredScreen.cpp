@@ -57,7 +57,7 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 
 	for (int i = 0; i < LAYER_COUNT; i++)
 	{
-		auto layer = std::make_shared<Layer>();
+		auto layer = std::make_shared<Layer>(i);
 		layers.push_back(layer);
 		
         if (previousLayer)
@@ -107,7 +107,8 @@ void LayeredScreen::openScreen()
     {
         for (int i = 0; i < navigation.size(); i++)
         {
-            assert(navigation[i]->getLayerIndex() == i);
+            assert(navigation[i]->getLayerIndex() == i ||
+                    std::dynamic_pointer_cast<PopupScreen>(navigation[i]));
         }
     }
 
@@ -156,9 +157,6 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
         {
             focus->loseFocus("");
         }
-
-        navigation.back()->close();
-        getFocusedLayer()->removeChild(navigation.back());
     }
 
     if (auto sampleScreen = std::dynamic_pointer_cast<SampleScreen>(newScreen); sampleScreen)
@@ -174,32 +172,15 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
         mpc.getPadAndButtonKeyboard()->resetUpperCase();
     }
 
-    if (!navigation.empty() && newScreen->getLayerIndex() == navigation.back()->getLayerIndex())
+    while (!navigation.empty() && navigation.back()->getLayerIndex() >= newScreen->getLayerIndex())
     {
-        navigation.pop_back();
-        navigation.push_back(newScreen);
-    }
-    else if (!navigation.empty() && newScreen->getLayerIndex() < navigation.back()->getLayerIndex())
-    {
-        const int diff = navigation.back()->getLayerIndex() - newScreen->getLayerIndex();
-
-        for (int i = 0; i < diff; i++)
-        {
-            navigation.pop_back();
-        }
-
-        assert(!navigation.empty());
-
-        navigation.pop_back();
-        navigation.push_back(newScreen);
-    }
-    else
-    {
-        navigation.push_back(newScreen);
+        closeScreenInFocusedLayer();
     }
 
+    navigation.push_back(newScreen);
     assert(!getFocusedLayer()->findChild<ScreenComponent>());
 	getFocusedLayer()->addChild(navigation.back());
+    getFocusedLayer()->sendToBack(navigation.back());
 
 	if (navigation.back()->findFields().size() > 0)
     {
@@ -231,12 +212,25 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
     }
 }
 
-void LayeredScreen::closeWindow()
+void LayeredScreen::navigateBackToFirstLayer()
 {
-    assert(navigation.size() > 1);
+    while(navigation.size() > 1)
+    {
+        closeWindow();
+    }
+}
+
+void LayeredScreen::closeScreenInFocusedLayer()
+{
     navigation.back()->close();
     getFocusedLayer()->removeChild(navigation.back());
     navigation.pop_back();
+}
+
+void LayeredScreen::closeWindow()
+{
+    assert(navigation.size() > 1);
+    closeScreenInFocusedLayer();
     openScreenInternal(navigation.back());
 }
 
@@ -249,10 +243,10 @@ void LayeredScreen::Draw()
 {
 //	MLOG("LayeredScreen::Draw()");
 	for (auto& c : root->findHiddenChildren())
-		c->Draw(&pixels);
+        c->drawRecursive(&pixels);
 
 	root->preDrawClear(&pixels);
-	root->Draw(&pixels);
+    root->drawRecursive(&pixels);
 	return;
 }
 

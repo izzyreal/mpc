@@ -31,34 +31,39 @@ void Component::sendToBack(std::shared_ptr<Component> childToSendBack)
 }
 
 bool Component::bringToFront(Component* childToBringToFront)
-{	
-	if (childToBringToFront == nullptr)
-	{
-		return false;
-	}
+{
+    if (!childToBringToFront)
+        return false;
 
-	for (int i = 0; i < children.size(); i++)
-	{
-		if (children[i].get() == childToBringToFront)
-		{
-			auto placeHolder = children[i];
-			children.erase(begin(children) + i);
-			children.push_back(std::move(placeHolder));
+    for (int i = 0; i < children.size(); ++i)
+    {
+        if (children[i].get() == childToBringToFront)
+        {
+            auto ptr = std::move(children[i]);
+            children.erase(children.begin() + i);
+            children.push_back(std::move(ptr));
+            return true;
+        }
+    }
 
-			if (parent != nullptr)
-				parent->bringToFront(this);
+    for (auto& c : children)
+    {
+        if (c->bringToFront(childToBringToFront))
+        {
+            auto it = std::find_if(children.begin(), children.end(),
+                [&](const auto& ch) { return ch.get() == c.get(); });
 
-			return true;
-		}
-	}
+            if (it != children.end())
+            {
+                auto ptr = std::move(*it);
+                children.erase(it);
+                children.push_back(std::move(ptr));
+            }
+            return true;
+        }
+    }
 
-	for (auto& c : children)
-	{
-		if (c->bringToFront(childToBringToFront))
-			return true;
-	}
-
-	return false;
+    return false;
 }
 
 bool Component::shouldNotDraw(std::vector<std::vector<bool>>* pixels)
@@ -246,18 +251,20 @@ std::shared_ptr<Component> Component::findChild(const std::string& nameOfChildTo
 	return {};
 }
 
-void Component::Draw(std::vector<std::vector<bool>>* pixels)
+void Component::drawRecursive(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 		return;
 
-	//MLOG("Drawing " + name);
+//	MLOG("Drawing " + name);
 
 	if (hidden || !IsDirty())
 		return;
-
+    
+    Draw(pixels);
+    
 	for (auto& c : children)
-		c->Draw(pixels);
+		c->drawRecursive(pixels);
 
 	dirty = false;
 }
