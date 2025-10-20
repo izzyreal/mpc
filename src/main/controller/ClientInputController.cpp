@@ -194,18 +194,25 @@ void ClientInputController::handleDataWheel(const ClientInput &input)
 {
     if (!input.deltaValue) return;
 
-    float& acc = deltaAccumulators[input.componentId];
-    
-    acc += *input.deltaValue;
+    int steps;
 
-    const int steps = static_cast<int>(acc);
+    if (input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        steps = static_cast<int>(*input.deltaValue);
+    }
+    else
+    {
+        float& acc = deltaAccumulators[input.componentId];
+        acc += *input.deltaValue;
+        steps = static_cast<int>(acc);
+        acc -= steps;
+    }
 
     if (steps == 0)
     {
         return;
     }
 
-    acc -= steps;
     mpc.getHardware()->getDataWheel()->turn(steps);
 
     auto screen = mpc.getScreen();
