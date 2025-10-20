@@ -25,7 +25,7 @@ namespace mpc::lcdgui
 		std::string getFocus();
 
 	public:
-		Layer();
+		Layer(int index);
 
 	};
 }

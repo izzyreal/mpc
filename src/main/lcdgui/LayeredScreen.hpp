@@ -48,6 +48,8 @@ namespace mpc::lcdgui {
 		// 0 = left, 1 = right, 2 = up, 3 = down
 		bool transfer(int direction);
 
+        void closeScreenInFocusedLayer();
+
 	public:
 		void transferLeft();
 		void transferRight();
@@ -70,6 +72,8 @@ namespace mpc::lcdgui {
 		std::shared_ptr<ScreenComponent> getCurrentScreen();
 
         void closeWindow();
+
+        void navigateBackToFirstLayer();
 
 	private:
 		std::map<std::string, std::string> lastFocuses;

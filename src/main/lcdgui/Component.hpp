@@ -34,6 +34,17 @@ namespace mpc::lcdgui
 		bool shouldNotDraw(std::vector<std::vector<bool>>* pixels);
 
 	public:
+        void printTree(int depth = 0)
+        {
+            std::string space;
+            for (int i = 0; i < depth*2; i++) space.append(" ");
+            printf("%s%s\n", space.c_str(), name.c_str());
+            for (auto c : children)
+            {
+                c->printTree(depth + 1);
+            }
+        }
+        
 		template<class T>
 		std::shared_ptr<T> findChild(const std::string& nameOfChildToFind = "")
 		{
@@ -92,7 +103,8 @@ namespace mpc::lcdgui
 		Component* getParent();
 
 	public:
-		virtual void Draw(std::vector<std::vector<bool>>* pixels);
+        virtual void Draw(std::vector<std::vector<bool>>* pixels) {}
+        void drawRecursive(std::vector<std::vector<bool>>* pixels);
 		virtual void Clear(std::vector<std::vector<bool>>* pixels);
 		void preDrawClear(std::vector<std::vector<bool>>* pixels);
 

@@ -2,9 +2,11 @@
 #include "Field.hpp"
 #include "Label.hpp"
 
+#include "ScreenComponent.hpp"
+
 using namespace mpc::lcdgui;
 
-Layer::Layer() : Component("layer")
+Layer::Layer(int index) : Component("layer " + std::to_string(index))
 {
 }
 
@@ -33,7 +35,7 @@ bool Layer::setFocus(std::string fieldName)
 	focus = fieldName;
 
     newFocus->takeFocus();
-	bringToFront(newFocus.get());
+	findChild<ScreenComponent>()->bringToFront(newFocus.get());
 	return true;
 }
 
