@@ -7,7 +7,6 @@
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/Volume.hpp>
 #include <nvram/VolumesPersistence.hpp>
@@ -32,11 +31,6 @@ void SaveScreen::open()
             programIndex = i;
             break;
         }
-    }
-
-    if (ls->getPreviousScreenName() != "popup")
-    {
-        device = mpc.getDiskController()->getActiveDiskIndex();
     }
 
     findField("directory")->setLocation(200, 0);
@@ -67,8 +61,6 @@ void SaveScreen::openWindow()
 
     if (param == "directory")
     {
-        auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-        directoryScreen->previousScreenName = "save";
         mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
     }
 }
@@ -98,10 +90,7 @@ void SaveScreen::function(int i)
 
                 if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
                 {
-                    auto popupScreen = mpc.screens->get<PopupScreen>();
-                    popupScreen->setText("Device is disabled in DISKS");
-                    popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+                    ls->showPopupForMs("Device is disabled in DISKS", 2000);
                     return;
                 }
 
@@ -117,10 +106,7 @@ void SaveScreen::function(int i)
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
                         mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        auto popupScreen = mpc.screens->get<PopupScreen>();
-                        popupScreen->setText("Error! Device seems in use");
-                        popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+                        ls->showPopupForMs("Error! Device seems in use", 2000);
                         return;
                     }
                 }

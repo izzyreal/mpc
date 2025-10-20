@@ -33,22 +33,27 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EditSoundScreen::open()
 {
-    auto previous = ls->getPreviousScreenName();
     findField("create-new-program")->setAlignment(Alignment::Centered);
 
-    if (previous != "name" && sampler->getSound())
+    if (ls->isPreviousScreenNot<NameScreen>() && sampler->getSound())
     {
         auto newSoundName = sampler->getSound()->getName();
         newSoundName = sampler->addOrIncreaseNumber(newSoundName);
         setNewName(newSoundName);
     }
 
-    if (previous == "zone")
+    if (ls->isPreviousScreen<ZoneScreen>())
+    {
         setEdit(9);
-    else if (previous == "loop")
+    }
+    else if (ls->isPreviousScreen<LoopScreen>())
+    {
         setEdit(1);
-    else if (previous != "name")
+    }
+    else if (ls->isPreviousScreenNot<NameScreen>())
+    {
         setEdit(0);
+    }
 
     displayVariable();
 
@@ -378,9 +383,9 @@ static std::shared_ptr<Sound> createZone(
         ) {
     const auto overlapInFrames = (int)(endMargin * source->getSampleRate() * 0.001);
 
-    auto zone = sampler->addSound(source->getSampleRate(), "zone");
+    auto zone = sampler->addSound(source->getSampleRate());
 
-    if (zone == nullptr)
+    if (!zone)
     {
         return {};
     }
@@ -457,9 +462,9 @@ void EditSoundScreen::function(int j)
             }
             else if (edit == 2)
             {
-                auto newSample = sampler->addSound(returnToScreenName);
+                auto newSample = sampler->addSound();
 
-                if (newSample == nullptr)
+                if (!newSample)
                 {
                     return;
                 }
@@ -680,9 +685,9 @@ void EditSoundScreen::function(int j)
 
                 if (sound->isMono())
                 {
-                    auto newSample = sampler->addSound(sound->getSampleRate(), returnToScreenName);
+                    auto newSample = sampler->addSound(sound->getSampleRate());
 
-                    if (newSample == nullptr)
+                    if (!newSample)
                     {
                         return;
                     }
@@ -695,9 +700,9 @@ void EditSoundScreen::function(int j)
                 }
                 else
                 {
-                    auto newSound = sampler->addSound(sound->getSampleRate(), returnToScreenName);
+                    auto newSound = sampler->addSound(sound->getSampleRate());
 
-                    if (newSound == nullptr)
+                    if (!newSound)
                     {
                         return;
                     }

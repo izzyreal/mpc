@@ -12,7 +12,6 @@
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
 #include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <nvram/VolumesPersistence.hpp>
 
@@ -31,10 +30,7 @@ void LoadScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->getPreviousScreenName() != "popup")
-    {
-        device = mpc.getDiskController()->getActiveDiskIndex();
-    }
+    device = mpc.getDiskController()->getActiveDiskIndex();
 
     findField("directory")->setLocation(200, 0);
     displayView();
@@ -54,9 +50,13 @@ void LoadScreen::open()
     init();
 
     if (param == "device")
+    {
         ls->setFunctionKeysArrangement(device == mpc.getDiskController()->activeDiskIndex ? 0 : 2);
+    }
     else
+    {
         ls->setFunctionKeysArrangement(playable ? 1 : 0);
+    }
 }
 
 void LoadScreen::function(int i)
@@ -87,10 +87,7 @@ void LoadScreen::function(int i)
 
                     if (candidateVolume.mode == DISABLED)
                     {
-                        auto popupScreen = mpc.screens->get<PopupScreen>();
-                        popupScreen->setText("Device is disabled in DISKS");
-                        popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
-                        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+                        ls->showPopupForMs("Device is disabled in DISKS", 2000);
                         return;
                     }
 
@@ -105,12 +102,10 @@ void LoadScreen::function(int i)
 
                         newDisk->initRoot();
 
-                        if (!newDisk->getVolume().volumeStream.is_open()) {
+                        if (!newDisk->getVolume().volumeStream.is_open())
+                        {
                             mpc.getDiskController()->activeDiskIndex = oldIndex;
-                            auto popupScreen = mpc.screens->get<PopupScreen>();
-                            popupScreen->setText("Error! Device seems in use");
-                            popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
-                            mpc.getLayeredScreen()->openScreen<PopupScreen>();
+                            ls->showPopupForMs("Error! Device seems in use", 2000);
                             return;
                         }
                     }
@@ -151,18 +146,16 @@ void LoadScreen::function(int i)
 
                     auto name = file->getNameWithoutExtension();
 
-                    mpc.getLayeredScreen()->openScreen<PopupScreen>();
-                    auto popupScreen = mpc.screens->get<PopupScreen>();
-
                     if (started)
                     {
-                        popupScreen->setText("Playing " + name);
+                        ls->showPopupAndAwaitInteraction("Playing " + name);
                     }
                     else
                     {
-                        popupScreen->setText("Can't play " + name);
+                        ls->showPopupAndAwaitInteraction("Can't play " + name);
                     }
                 }
+
                 break;
             }
         case 5:
@@ -225,10 +218,11 @@ void LoadScreen::openWindow()
     auto disk = mpc.getDisk();
 
     if (!disk)
+    {
         return;
+    }
 
     auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-    directoryScreen->previousScreenName = "load";
     directoryScreen->findYOffset0();
     directoryScreen->setYOffset1(fileLoad);
     mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
@@ -454,7 +448,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     SoundLoaderResult result;
 
-    auto sound = sampler->addSound("load");
+    auto sound = sampler->addSound();
 
     if (sound == nullptr)
     {
@@ -463,16 +457,13 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     soundLoader.loadSound(getSelectedFile(), result, sound, shouldBeConverted);
 
-    auto popupScreen = mpc.screens->get<PopupScreen>();
-
     if (result.success)
     {
-        ls->openScreen<PopupScreen>();
-        auto path = fs::path(getSelectedFileName());
-        auto name = path.stem().string();
-        auto ext = path.extension().string();
-        popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + ext);
-        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
+        const auto path = fs::path(getSelectedFileName());
+        const auto name = path.stem().string();
+        const auto ext = path.extension().string();
+        const std::string msg = "LOADING " + StrUtil::padRight(name, " ", 16) + ext;
+        ls->showPopupAndThenOpen<LoadASoundScreen>(msg, 300);
         return;
     }
 

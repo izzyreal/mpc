@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 
 #include <lcdgui/Parameter.hpp>
@@ -83,7 +82,7 @@ void VmpcMidiScreen::open()
 
     screen->stayScreen = "vmpc-midi";
 
-    if (ls->getPreviousScreenName() != "vmpc-discard-mapping-changes")
+    if (ls->isPreviousScreenNot<VmpcDiscardMappingChangesScreen>())
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
 
@@ -333,21 +332,19 @@ void VmpcMidiScreen::function(int i)
                 return;
             }
 
-            auto popupScreen = mpc.screens->get<PopupScreen>();
-            mpc.getLayeredScreen()->openScreen<PopupScreen>();
+            std::string popupMsg;
 
             if (hasMappingChanged())
             {
                 MidiControlPersistence::saveCurrentState(mpc);
-                popupScreen->setText("MIDI mapping saved");
+                popupMsg = "MIDI mapping saved";
             }
             else
             {
-                popupScreen->setText("MIDI mapping unchanged");
+                popupMsg = "MIDI mapping unchanged";
             }
 
-            popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi", 1000);
-
+            ls->showPopupForMs(popupMsg, 1000);
             break;
         }
     }

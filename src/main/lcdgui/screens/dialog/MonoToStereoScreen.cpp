@@ -1,7 +1,6 @@
 #include "MonoToStereoScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <memory>
 
@@ -16,9 +15,7 @@ MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MonoToStereoScreen::open()
 {
-	auto prevScreen = ls->getPreviousScreenName();
-
-	if (sampler->getSound() && prevScreen != "name" && prevScreen != "popup")
+	if (sampler->getSound() && ls->isPreviousScreenNot<NameScreen, PopupScreen>())
 	{
 		auto name = sampler->getSound()->getName();
 		name = StrUtil::trim(name);
@@ -27,8 +24,10 @@ void MonoToStereoScreen::open()
 		newStName = name + "-S";
 	}
 
-	if (prevScreen != "name" && prevScreen != "popup")
-		ls->setFocus("lsource");
+    if (ls->isPreviousScreenNot<NameScreen, PopupScreen>())
+    {
+        ls->setFocus("lsource");
+    }
 
 	setRSource(sampler->getSoundIndex());
 	displayLSource();
@@ -110,10 +109,7 @@ void MonoToStereoScreen::function(int j)
 		{
 			if (s->getName() == newStName)
 			{
-				auto popupScreen = mpc.screens->get<PopupScreen>();
-				popupScreen->setText("Name already used");
-				popupScreen->setScreenToReturnTo(name);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+				ls->showPopupAndAwaitInteraction("Name already used");
 				return;
 			}
 		}
@@ -134,7 +130,7 @@ void MonoToStereoScreen::function(int j)
 			(*newSampleDataRight) = *right->getSampleData();
 		}
 
-		auto newSound = sampler->addSound(left->getSampleRate(), "mono-to-stereo");
+		auto newSound = sampler->addSound(left->getSampleRate());
 
         if (newSound == nullptr)
         {

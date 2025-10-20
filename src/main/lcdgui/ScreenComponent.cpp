@@ -5,6 +5,7 @@
 #include <Mpc.hpp>
 
 #include "command/context/PushPadScreenUpdateContext.h"
+#include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
@@ -81,16 +82,12 @@ const std::string ScreenComponent::getLastFocus(const std::string& screenName)
 
 void ScreenComponent::openWindow()
 {
-    auto layeredScreen = mpc.getLayeredScreen();
-
-    if (layeredScreen->getScreenToReturnToWhenPressingOpenWindow().empty() ||
-        name == "midi-output-monitor")
+    if (dynamic_cast<MidiOutputMonitorScreen*>(this))
     {
         return;
     }
-
-    layeredScreen->openScreen(layeredScreen->getScreenToReturnToWhenPressingOpenWindow());
-    layeredScreen->clearScreenToReturnToWhenPressingOpenWindow();
+    
+    mpc.getLayeredScreen()->closeWindow();
 }
 
 mpc::engine::Drum& ScreenComponent::activeDrum()

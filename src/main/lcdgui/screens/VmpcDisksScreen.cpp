@@ -3,7 +3,6 @@
 
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Screens.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <disk/DiskController.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/RawDisk.hpp>
@@ -73,8 +72,8 @@ void VmpcDisksScreen::function(int i)
             break;
         }
         case 5:
-            auto popupScreen = mpc.screens->get<PopupScreen>();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+        {
+            std::string popupMsg;
 
             if (hasConfigChanged())
             {
@@ -89,16 +88,16 @@ void VmpcDisksScreen::function(int i)
                 }
                 
                 VolumesPersistence::save(mpc);
-                popupScreen->setText("Volume configurations saved");
+                popupMsg = "Volume configurations saved";
             }
             else
             {
-                popupScreen->setText("Volume configurations unchanged");
+                popupMsg = "Volume configurations unchanged";
             }
 
-            popupScreen->returnToScreenAfterMilliSeconds("vmpc-disks", 1000);
-
+            ls->showPopupForMs(popupMsg, 1000);
             break;
+        }
     }
 }
 

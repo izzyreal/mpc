@@ -14,7 +14,6 @@ namespace mpc::lcdgui::screens::window {
         void setRestoreAutoSavedStateAction(std::function<void()>);
 
         void function(int) override;
-        void open() override;
 
     private:
         std::function<void()> restoreAutoSavedStateAction;

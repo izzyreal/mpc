@@ -3,6 +3,9 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 
+#include "lcdgui/screens/LoadScreen.hpp"
+#include "lcdgui/screens/window/DirectoryScreen.hpp"
+
 using namespace mpc::command;
 
 ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc& mpc, int i)
@@ -18,13 +21,9 @@ void ReleaseFunctionCommand::execute()
             mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
         break;
     case 4:
-        if (mpc.getLayeredScreen()->getPreviousScreenName() == "load" && currentScreenName == "popup") {
-            if (const auto lastFocusedField = mpc.getLayeredScreen()->getLastFocus("load");
-                lastFocusedField == "file" || lastFocusedField == "view")
-            {
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+        if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<LoadScreen>())
+        {
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
-            }
         }
         break;
     case 5: {
@@ -34,11 +33,16 @@ void ReleaseFunctionCommand::execute()
         if (!sequencer->isPlaying() && currentScreenName != "sequencer")
             sampler->finishBasicVoice();
 
-        if (currentScreenName == "track-mute") {
+        if (currentScreenName == "track-mute")
+        {
             if (!sequencer->isSoloEnabled())
+            {
                 mpc.getLayeredScreen()->setCurrentBackground("track-mute");
+            }
             sequencer->setSoloEnabled(sequencer->isSoloEnabled());
-        } else if (mpc.getLayeredScreen()->getPreviousScreenName() == "directory" && currentScreenName == "popup") {
+        }
+        else if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<DirectoryScreen>())
+        {
             mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
             mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
         }

@@ -2,14 +2,10 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#ifdef __linux__
-#include <pthread.h>
-#endif // __linux__
+#include <thread>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -17,62 +13,48 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-DeleteFileScreen::DeleteFileScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "delete-file", layerIndex)
+DeleteFileScreen::DeleteFileScreen(mpc::Mpc& mpc, int layerIndex)
+    : ScreenComponent(mpc, "delete-file", layerIndex)
 {
 }
 
 void DeleteFileScreen::function(int i)
 {
-	ScreenComponent::function(i);
-	
-	switch (i)
-	{
-	case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
-		break;
-	case 4:
-		auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-		auto popupScreen = mpc.screens->get<PopupScreen>();
-		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
-		
-		if (deleteThread.joinable())
-			deleteThread.join();
-		
-		deleteThread = std::thread(&DeleteFileScreen::static_delete, this);
-		break;
-	}
-}
+    ScreenComponent::function(i);
 
-void DeleteFileScreen::static_delete(void * args)
-{
-	static_cast<DeleteFileScreen*>(args)->deleteFile();
+    switch (i)
+    {
+    case 1:
+        mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
+        break;
+
+    case 4: {
+        auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+        ls->showPopupAndAwaitInteraction("Delete: " + directoryScreen->getSelectedFile()->getName());
+        std::thread([this] { deleteFile(); }).detach();
+        break;
+    }
+    }
 }
 
 void DeleteFileScreen::deleteFile()
 {
-	std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
-	auto disk = mpc.getDisk();
+    auto disk = mpc.getDisk();
 
-	if (disk->deleteSelectedFile())
-	{
-		disk->flush();
-		disk->initFiles();
+    if (disk->deleteSelectedFile())
+    {
+        disk->flush();
+        disk->initFiles();
 
-		auto loadScreen = mpc.screens->get<LoadScreen>();
-		
-		loadScreen->setFileLoad(loadScreen->fileLoad - 1);
-		auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-		directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
-	}
+        auto loadScreen = mpc.screens->get<LoadScreen>();
+        loadScreen->setFileLoad(loadScreen->fileLoad - 1);
 
-        mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+        auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+        directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
+    }
+
+    mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
 }
 
-DeleteFileScreen::~DeleteFileScreen()
-{
-	if (deleteThread.joinable())
-		deleteThread.join();
-}

@@ -26,7 +26,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
     switch (i) {
         case 1:
             // NO
-            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->navigateBackToLayer(0);
             break;
         case 2:
             // YES
@@ -35,7 +35,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
         case 3:
             // NEVER
             autoSaveScreen->setAutoLoadOnStart(0);
-            mpc.getLayeredScreen()->openScreen(ls->getPreviousScreenName());
+            mpc.getLayeredScreen()->navigateBackToLayer(0);
             break;
         case 4:
             // ALWAYS
@@ -47,11 +47,8 @@ void VmpcContinuePreviousSessionScreen::function(int i)
     }
 }
 
-void VmpcContinuePreviousSessionScreen::open()
-{
-}
-
 void VmpcContinuePreviousSessionScreen::setRestoreAutoSavedStateAction(std::function<void()> action)
 {
     restoreAutoSavedStateAction = action;
 }
+

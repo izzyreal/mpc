@@ -12,11 +12,6 @@ PopupScreen::PopupScreen(mpc::Mpc& mpc, int layer)
 	findChild<Label>("popup")->setInverted(true);
 }
 
-void PopupScreen::close()
-{
-	screenToReturnTo = "";
-}
-
 void PopupScreen::setText(std::string text)
 {
     if (text.size() > 28)
@@ -26,32 +21,5 @@ void PopupScreen::setText(std::string text)
 
 	findChild<Label>("popup")->setText(text);
 	SetDirty();
-}
-
-void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName, const int delayInMs)
-{
-	if (returnToScreenThread.joinable())
-    {
-        returnToScreenThread.join();
-    }
-
-	auto layeredScreen = ls;
-
-	returnToScreenThread = std::thread([screenName, delayInMs, layeredScreen]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(delayInMs));
-		//layeredScreen->openScreen(screenName);
-        layeredScreen->closeWindow();
-	});
-}
-
-void PopupScreen::setScreenToReturnTo(const std::string& screenName)
-{
-	screenToReturnTo = screenName;
-}
-
-PopupScreen::~PopupScreen()
-{
-	if (returnToScreenThread.joinable())
-		returnToScreenThread.join();
 }
 

@@ -6,7 +6,10 @@
 #include "hardware/Hardware.h"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/StepTcScreen.hpp>
 #include <lcdgui/screens/window/EditMultipleScreen.hpp>
+#include "lcdgui/screens/window/PasteEventScreen.hpp"
+#include "lcdgui/screens/window/InsertEventScreen.hpp"
 
 #include <lcdgui/Rectangle.hpp>
 
@@ -96,9 +99,7 @@ void StepEditorScreen::open()
 
     initVisibleEvents();
 
-	auto previousScreen = ls->getPreviousScreenName();
-
-    if (previousScreen == "insert-event")
+    if (ls->isPreviousScreen<InsertEventScreen>())
     {
         auto insertEventScreen = mpc.screens->get<InsertEventScreen>();
 
@@ -121,10 +122,7 @@ void StepEditorScreen::open()
         }
     }
 
-    if (previousScreen != "step-timing-correct" &&
-        previousScreen != "insert-event" &&
-        previousScreen != "paste-event" &&
-        previousScreen != "edit-multiple")
+    if (ls->isPreviousScreenNot<StepTcScreen, InsertEventScreen, PasteEventScreen, EditMultipleScreen>())
     {
         auto eventType = visibleEvents[0]->getTypeName();
         ls->setFocus(lastColumn[eventType] + "0");
@@ -184,7 +182,7 @@ void StepEditorScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-        mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
+        mpc.getLayeredScreen()->openScreen<StepTcScreen>();
 		break;
 	case 1:
 		if (selectionStartIndex != -1)

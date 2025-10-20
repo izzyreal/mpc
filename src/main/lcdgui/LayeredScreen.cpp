@@ -22,6 +22,7 @@
 #include <cmath>
 #include <memory>
 #include <set>
+#include <stdexcept>
 
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
@@ -73,6 +74,81 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	}
 }
 
+template <typename... Ts>
+bool LayeredScreen::isPreviousScreen() const
+{
+    if (navigation.size() < 2)
+        return false;
+
+    const auto& prev = navigation[navigation.size() - 2];
+    return ((static_cast<bool>(std::dynamic_pointer_cast<Ts>(prev))) || ...);
+}
+
+template <typename... Ts>
+bool LayeredScreen::isPreviousScreenNot() const
+{
+    if (navigation.size() < 2)
+        return false;
+
+    const auto& prev = navigation[navigation.size() - 2];
+    return (!(std::dynamic_pointer_cast<Ts>(prev)) && ...);
+}
+
+template <typename... Ts>
+bool LayeredScreen::isCurrentScreen() const
+{
+    if (navigation.size() < 1)
+        return false;
+
+    const auto& curr = navigation[navigation.size() - 1];
+    return ((static_cast<bool>(std::dynamic_pointer_cast<Ts>(curr))) || ...);
+}
+
+void LayeredScreen::showPopupForMs(const std::string msg, const int delayMs)
+{
+    auto popupScreen = mpc.screens->get<PopupScreen>();
+    popupScreen->setText(msg);
+    openScreen<PopupScreen>();
+
+    const int layerIndex = navigation.back()->getLayerIndex();
+
+    std::thread([this, delayMs, layerIndex]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        navigateBackToLayer(layerIndex);
+    }).detach();
+}
+
+template <typename T>
+void LayeredScreen::showPopupAndThenOpen(const std::string msg, const int delayMs)
+{
+    auto popupScreen = mpc.screens->get<PopupScreen>();
+    popupScreen->setText(msg);
+    openScreen<PopupScreen>();
+
+    std::thread([this, delayMs]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        openScreen<T>();
+    }).detach();
+}
+
+void LayeredScreen::showPopupAndThenReturnToLayer(const std::string msg, const int delayMs, const int layerIndex)
+{
+    auto popupScreen = mpc.screens->get<PopupScreen>();
+    popupScreen->setText(msg);
+    openScreen<PopupScreen>();
+    std::thread([this, delayMs, layerIndex]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        navigateBackToLayer(layerIndex);
+    }).detach();
+}
+
+void LayeredScreen::showPopupAndAwaitInteraction(const std::string msg)
+{
+    auto popupScreen = mpc.screens->get<PopupScreen>();
+    popupScreen->setText(msg);
+    openScreen<PopupScreen>();
+}
+
 std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen()
 {
     assert(!navigation.empty());
@@ -86,6 +162,14 @@ static const std::map<std::string, OpenScreenFunc> openScreenRegistry = {
     SCREEN_LIST
 };
 #undef X
+
+template <typename T>
+bool LayeredScreen::isCurrentScreenPopupFor() const
+{
+    return navigation.size() >= 2 &&
+        std::dynamic_pointer_cast<PopupScreen>(navigation[navigation.size() - 1]) &&
+        std::dynamic_pointer_cast<T>(navigation[navigation.size() - 2]);
+}
 
 void LayeredScreen::openScreen(const std::string name)
 {
@@ -103,17 +187,6 @@ void LayeredScreen::openScreen()
         return;
     }
 
-//    if (!navigation.empty())
-//    {
-//        for (int i = 0; i < navigation.size(); i++)
-//        {
-//            assert(navigation[i]->getLayerIndex() == i ||
-//                    std::dynamic_pointer_cast<PopupScreen>(navigation[i]));
-//        }
-//    }
-
-    //const auto oldFocusedLayerIndex = focusedLayerIndex;
-
     auto newScreen = mpc.screens->get<T>();
 
     assert(newScreen);
@@ -121,8 +194,23 @@ void LayeredScreen::openScreen()
     if (newScreen) openScreenInternal(newScreen);
 }
 
+void LayeredScreen::openPreviousScreen()
+{
+    if (!previousScreen)
+    {
+        return;
+    }
+
+    openScreenInternal(previousScreen);
+}
+
 void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScreen)
 {
+    if (!navigation.empty())
+    {
+        previousScreen = navigation.back();
+    }
+
     auto ams = mpc.getAudioMidiServices();
 
     if (!navigation.empty())
@@ -205,16 +293,11 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
             mpc.getSequencer()->setNextSq(-1);
         }
     }
-
-    //if (focusedLayerIndex < oldFocusedLayerIndex)
-    {
-        //clearScreenToReturnToWhenPressingOpenWindow();
-    }
 }
 
-void LayeredScreen::navigateBackToFirstLayer()
+void LayeredScreen::navigateBackToLayer(const int layerIndex)
 {
-    while(navigation.size() > 1)
+    while(navigation.size() > layerIndex)
     {
         closeWindow();
     }
@@ -630,32 +713,48 @@ std::shared_ptr<Field> LayeredScreen::getFocusedField()
     return focusedLayer->findField(focusedFieldName);
 }
 
-void LayeredScreen::setPreviousScreenName(std::string screenName)
+std::string LayeredScreen::getFirstLayerScreenName()
 {
-	//previousScreenName = screenName;
-}
+    if (navigation.empty() || navigation.front()->getLayerIndex() != 0)
+    {
+        throw std::runtime_error("There's no valid first layer\n");
+    }
 
-std::string LayeredScreen::getPreviousScreenName()
-{
-	if (navigation.size() < 2) return "";
-    return navigation[navigation.size() - 2]->getName();
+    return navigation.front()->getName();
 }
-
-std::string LayeredScreen::getScreenToReturnToWhenPressingOpenWindow()
-{
-    return getPreviousScreenName();
-}
-
-void LayeredScreen::setScreenToReturnToWhenPressingOpenWindow(const std::string screenToUse)
-{
-    //screenToReturnToWhenPressingOpenWindow = screenToUse;
-}
-
-void LayeredScreen::clearScreenToReturnToWhenPressingOpenWindow()
-{
-    //screenToReturnToWhenPressingOpenWindow.clear();
-}
-
-#define X(ns, Class, name) template void LayeredScreen::openScreen<mpc::lcdgui::ns::Class>();
+#define X(ns, Class, name) \
+    template void mpc::lcdgui::LayeredScreen::openScreen<mpc::lcdgui::ns::Class>(); \
+    template void mpc::lcdgui::LayeredScreen::showPopupAndThenOpen<mpc::lcdgui::ns::Class>(std::string, int); \
+    template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<mpc::lcdgui::ns::Class>() const; \
+    template bool mpc::lcdgui::LayeredScreen::isPreviousScreen<mpc::lcdgui::ns::Class>() const; \
+    template bool mpc::lcdgui::LayeredScreen::isPreviousScreenNot<mpc::lcdgui::ns::Class>() const; \
+    template bool mpc::lcdgui::LayeredScreen::isCurrentScreenPopupFor<mpc::lcdgui::ns::Class>() const;
 SCREEN_LIST
 #undef X
+
+template bool mpc::lcdgui::LayeredScreen::isPreviousScreen<mpc::lcdgui::screens::NextSeqScreen,
+                                                           mpc::lcdgui::screens::NextSeqPadScreen>() const;
+template bool mpc::lcdgui::LayeredScreen::isPreviousScreen<mpc::lcdgui::screens::NextSeqScreen,
+                                                           mpc::lcdgui::screens::NextSeqPadScreen,
+                                                           mpc::lcdgui::screens::SequencerScreen>() const;
+template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
+    mpc::lcdgui::screens::NextSeqScreen,
+    mpc::lcdgui::screens::NextSeqPadScreen,
+    mpc::lcdgui::screens::SequencerScreen>() const;
+
+// Used by MidiOutputScreen
+template bool mpc::lcdgui::LayeredScreen::isPreviousScreenNot<
+    mpc::lcdgui::screens::window::NameScreen,
+    mpc::lcdgui::screens::dialog::MidiOutputMonitorScreen>() const;
+
+// Used by MonoToStereoScreen and StereoToMonoScreen
+template bool mpc::lcdgui::LayeredScreen::isPreviousScreenNot<
+    mpc::lcdgui::screens::window::NameScreen,
+    mpc::lcdgui::screens::dialog2::PopupScreen>() const;
+
+// Used by StepEditorScreen
+template bool mpc::lcdgui::LayeredScreen::isPreviousScreenNot<
+    mpc::lcdgui::screens::window::StepTcScreen,
+    mpc::lcdgui::screens::window::InsertEventScreen,
+    mpc::lcdgui::screens::window::PasteEventScreen,
+    mpc::lcdgui::screens::window::EditMultipleScreen>() const;

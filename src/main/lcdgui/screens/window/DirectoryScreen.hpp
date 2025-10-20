@@ -37,9 +37,6 @@ namespace mpc::lcdgui::screens::window
 	public:
         DirectoryScreen(mpc::Mpc& mpc, const int layerIndex);
 
-        void setPreviousScreenName(std::string newPreviousScreenName);
-        std::string getPreviousScreenName() const { return previousScreenName; }
-
         void function(int f) override;
 		void left() override;
 		void right() override;
@@ -53,7 +50,6 @@ namespace mpc::lcdgui::screens::window
 		int yPos0 = 0;
 		int yOffset0 = 0;
 		int yOffset1 = 0;
-		std::string previousScreenName = "load";
 
 		void setFunctionKeys();
 		std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();

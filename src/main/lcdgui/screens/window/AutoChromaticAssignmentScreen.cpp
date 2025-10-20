@@ -13,7 +13,7 @@ AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, cons
 
 void AutoChromaticAssignmentScreen::open()
 {
-    if (ls->getPreviousScreenName() != "name")
+    if (ls->isPreviousScreenNot<NameScreen>())
     {
         auto letterNumber = sampler->getProgramCount() + 21;
         newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];

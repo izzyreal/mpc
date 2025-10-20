@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 
 #include <lcdgui/Parameter.hpp>
@@ -211,20 +210,19 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
 
-            auto popupScreen = mpc.screens->get<PopupScreen>();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+            std::string popupMsg;
 
             if (hasMappingChanged())
             {
                 //mpc.inputController->getKbMapping()->exportMapping();
-                //popupScreen->setText("Keyboard mapping saved");
+                popupMsg = "Keyboard mapping saved";
             }
             else
             {
-                popupScreen->setText("Keyboard mapping unchanged");
+                popupMsg = "Keyboard mapping unchanged";
             }
 
-            popupScreen->returnToScreenAfterMilliSeconds("vmpc-keyboard", 1000);
+            ls->showPopupForMs(popupMsg, 1000);
 
             break;
     }

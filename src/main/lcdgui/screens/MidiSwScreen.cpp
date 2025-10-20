@@ -1,5 +1,6 @@
 #include "MidiSwScreen.hpp"
 #include "VmpcSettingsScreen.hpp"
+#include "lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -27,7 +28,7 @@ void MidiSwScreen::open()
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-    if (ls->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+    if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();

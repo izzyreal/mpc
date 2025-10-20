@@ -76,8 +76,8 @@ public:
 
     void repairProgramReferences();
     std::vector<std::shared_ptr<Sound>>& getSounds();
-    std::shared_ptr<Sound> addSound(const std::string screenToGoToIfSoundDirectoryIsFull);
-    std::shared_ptr<Sound> addSound(const int sampleRate, const std::string screenToGoToIfSoundDirectoryIsFull);
+    std::shared_ptr<Sound> addSound();
+    std::shared_ptr<Sound> addSound(const int sampleRate);
     int getSoundCount();
     std::string getSoundName(int i);
     void replaceSound(int index, std::shared_ptr<Sound>& newSound);
@@ -118,7 +118,7 @@ public:
     void selectNextSound();
     std::vector<std::shared_ptr<mpc::engine::StereoMixer>>& getDrumStereoMixerChannels(int i);
     std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>& getDrumIndivFxMixerChannels(int i);
-    std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source, const std::string screenToGoToIfSoundDirectoryIsFull);
+    std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
     void copyProgram(const int sourceIndex, const int destIndex);
     std::vector<int>* getInitMasterPadAssign();
     std::vector<int>* getMasterPadAssign();

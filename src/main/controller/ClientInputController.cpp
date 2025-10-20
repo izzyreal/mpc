@@ -372,15 +372,7 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
     }
     else if (id == Id::OPEN_WINDOW)
     {
-        const auto layerIndex = layeredScreen->getFocusedLayerIndex();
         screen->openWindow();
-
-        if (currentScreenName != layeredScreen->getCurrentScreenName() &&
-            currentScreenName != "popup" &&
-            layeredScreen->getFocusedLayerIndex() > layerIndex)
-        {
-            layeredScreen->setScreenToReturnToWhenPressingOpenWindow(currentScreenName);
-        }
     }
     else if (id == Id::GO_TO)
     {

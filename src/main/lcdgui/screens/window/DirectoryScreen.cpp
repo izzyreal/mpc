@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -23,11 +22,6 @@ using namespace mpc::lcdgui::screens::dialog2;
 DirectoryScreen::DirectoryScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "directory", layerIndex)
 {
-}
-
-void DirectoryScreen::setPreviousScreenName(std::string newPreviousScreenName)
-{
-    previousScreenName = newPreviousScreenName;
 }
 
 void DirectoryScreen::open()
@@ -61,7 +55,6 @@ void DirectoryScreen::function(int f)
 	
 	auto loadScreen = mpc.screens->get<LoadScreen>();
 	auto nameScreen = mpc.screens->get<NameScreen>();
-    auto popupScreen = mpc.screens->get<PopupScreen>();
     auto disk = mpc.getDisk();
 
 	switch (f)
@@ -87,7 +80,7 @@ void DirectoryScreen::function(int f)
 
         auto fileName = mpc::Util::splitName(getSelectedFile()->getName())[0];
 
-        const auto enterAction = [this, fileName, file, popupScreen](std::string& nameScreenName) {
+        const auto enterAction = [this, fileName, file](std::string& nameScreenName) {
             auto ext = mpc::Util::splitName(file->getName())[1];
             
             if (ext.length() > 0) ext = "." + ext;
@@ -97,10 +90,7 @@ void DirectoryScreen::function(int f)
 
             if (!success)
             {
-                auto layeredScreen = mpc.getLayeredScreen();
-                layeredScreen->openScreen<PopupScreen>();
-                popupScreen->setText("File name exists !!");
-                layeredScreen->setPreviousScreenName("directory");
+                ls->showPopupAndAwaitInteraction("File name exists !!");
                 return;
             }
 
@@ -149,21 +139,25 @@ void DirectoryScreen::function(int f)
     {
         if (xPos == 0) return;
 
-        auto enterAction = [this, disk, loadScreen, popupScreen](std::string& nameScreenName) {
+        auto enterAction = [this, disk, loadScreen](std::string& nameScreenName) {
             bool success = disk->newFolder(StrUtil::toUpper(nameScreenName));
 
             if (!success)
             {
                 mpc.getLayeredScreen()->openScreen<PopupScreen>();
+
+                std::string msg;
                 
-                if (disk->getVolume().mode == MountMode::READ_ONLY) {
-                    popupScreen->setText("Disk is read only !!");
-                } else {
-                    popupScreen->setText("Folder name exists !!");
+                if (disk->getVolume().mode == MountMode::READ_ONLY)
+                {
+                    msg = "Disk is read only !!";
+                }
+                else
+                {
+                    msg = "Folder name exists !!";
                 }
                 
-                popupScreen->returnToScreenAfterMilliSeconds("name", 1000);
-                ls->setPreviousScreenName("directory");
+                ls->showPopupAndThenOpen<NameScreen>(msg, 1000); 
                 return;
             }
             
@@ -188,7 +182,6 @@ void DirectoryScreen::function(int f)
             }
 
             mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
-            ls->setPreviousScreenName("load");
         };
 
         nameScreen->initialize("NEWFOLDR", 8, enterAction, name);
@@ -217,12 +210,14 @@ void DirectoryScreen::function(int f)
             
             auto name = file->getNameWithoutExtension();
 
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-
 			if (started)
-				popupScreen->setText("Playing " + name);
+            {
+				ls->showPopupAndAwaitInteraction("Playing " + name);
+            }
 			else
-				popupScreen->setText("Can't play " + name);
+            {
+				ls->showPopupAndAwaitInteraction("Can't play " + name);
+            }
 		}
 
 		break;

@@ -5,7 +5,6 @@
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #ifdef __linux__
 #include <climits>
@@ -85,10 +84,7 @@ void ZoneScreen::function(int f)
 	case 2:
 	{
         sampler->switchToNextSoundSortType();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-		auto popupScreen = mpc.screens->get<PopupScreen>();
-		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
-		popupScreen->returnToScreenAfterMilliSeconds("zone", 200);
+	    ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
 		break;
 	}
 	case 3:

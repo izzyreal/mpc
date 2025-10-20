@@ -17,7 +17,7 @@ SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveAllFileScreen::open()
 {
-    if (ls->getPreviousScreenName() == "save")
+    if (ls->isPreviousScreen<SaveScreen>())
     {
         fileName = "ALL_SEQ_SONG1";
     }
@@ -93,7 +93,7 @@ void SaveAllFileScreen::function(int i)
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
             fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
-        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
 			return;
 		}
 		

@@ -55,6 +55,16 @@ namespace mpc::lcdgui {
 		void transferRight();
 		void transferUp();
 		void transferDown();
+
+        template <typename T>
+        void showPopupAndThenOpen(const std::string msg, const int delayMs);
+
+        void showPopupForMs(const std::string msg, const int delayMs);
+
+        void showPopupAndThenReturnToLayer(const std::string msg, const int delayMs, const int layerIndex);
+
+        void showPopupAndAwaitInteraction(const std::string msg);
+
 		int getFocusedLayerIndex();
 		std::shared_ptr<Layer> getFocusedLayer();
 
@@ -67,15 +77,39 @@ namespace mpc::lcdgui {
             openScreen<T>();
         }
 
+        template <typename... Ts>
+        bool isPreviousScreen() const;
+
+        template <typename... Ts>
+        bool isPreviousScreenNot() const;
+
+        template <typename... Ts>
+        bool isCurrentScreen() const;
+
+        template <typename T>
+        bool isCurrentScreenPopupFor() const;
+
         void openScreen(const std::string screenName);
 
 		std::shared_ptr<ScreenComponent> getCurrentScreen();
 
         void closeWindow();
 
-        void navigateBackToFirstLayer();
+        void navigateBackToLayer(const int layerIndex);
+
+        // Seems to only be in use by VmpcKnownControllerDetectedScreen and VmpcWarningSettingsIgnoreScreen.
+        // We'll have to see if these screens deserve a different layer index, so it's always projected
+        // on top of whatever other layers exist (i.e. a new layer, layer index 4).
+        // Avoid using this for other cases.
+        void openPreviousScreen();
 
 	private:
+        // Seems to only be in use by VmpcKnownControllerDetectedScreen and VmpcWarningSettingsIgnoreScreen.
+        // We'll have to see if these screens deserve a different layer index, so it's always projected
+        // on top of whatever other layers exist (i.e. a new layer, layer index 4).
+        // Avoid using this for other cases.
+        std::shared_ptr<ScreenComponent> previousScreen;
+
 		std::map<std::string, std::string> lastFocuses;
 
         void openScreenInternal(std::shared_ptr<ScreenComponent>);
@@ -93,14 +127,8 @@ namespace mpc::lcdgui {
 		std::string getLastFocus(std::string screenName);
 
         std::string getCurrentScreenName();
+        std::string getFirstLayerScreenName();
 		void setFunctionKeysArrangement(int arrangementIndex);
-
-		void setPreviousScreenName(std::string screenName);
-		std::string getPreviousScreenName();
-
-        std::string getScreenToReturnToWhenPressingOpenWindow();
-        void setScreenToReturnToWhenPressingOpenWindow(const std::string);
-        void clearScreenToReturnToWhenPressingOpenWindow();
 
 	public:
 		std::vector<std::vector<bool>>* getPixels();

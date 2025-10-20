@@ -13,7 +13,6 @@
 
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
@@ -313,10 +312,9 @@ std::vector<std::shared_ptr<Sound>>& Sampler::getSounds()
 	return sounds;
 }
 
-std::shared_ptr<Sound> Sampler::addSound(
-        const std::string screenToGoToIfSoundDirectoryIsFull)
+std::shared_ptr<Sound> Sampler::addSound()
 {
-        return addSound(44100, screenToGoToIfSoundDirectoryIsFull);
+        return addSound(44100);
 }
 
 /*
@@ -328,34 +326,14 @@ std::shared_ptr<Sound> Sampler::addSound(
  * caller. If there is no room, an empty shared_ptr is ultimately returned.
  * But in this case, first the PopupScreen is opened with a message to the user
  * that the sound directory is full. The popup screen awaits interaction (a
- * button push), to finally return to screenToGoToIfSoundDirectoryIsFull.
- *
- * The caller may provide an empty string for screenToGoToIfSoundDirectoryIsFull,
- * to express the fact that the caller never expects the sound directory to be
- * full. This is the case when loading an APS, which always replaces all existing
- * sounds. See mpc::disk::ApsLoader. This is also the case when restoring
- * persisted state as part of the auto-save mechanism, which also replaces all
- * existing sounds. See mpc::AutoSave. Additionally, if the mpc library is
- * consumed by a plugin implementation, such as vmpc-juce, this implementation
- * should also provide an empty string as part of its state restoration routine.
- * This can be seen in VmpcProcessor.cpp in https://github.com/izzyreal/vmpc-juce.
- * Finally, in most unit tests it makes sense to pass an empty string here.
- * When an empty string is provided, the popup screen is not opened, and the
- * function immediately returns an empty shared_ptr.
+ * button push), to finally return to the previous screen (before the popup was
+ * opened).
  */
-std::shared_ptr<Sound> Sampler::addSound(
-        const int sampleRate,
-        const std::string screenToGoToIfSoundDirectoryIsFull)
+std::shared_ptr<Sound> Sampler::addSound(const int sampleRate)
 {
     if (sounds.size() >= mpc::MAX_SOUND_COUNT_IN_MEMORY)
     {
-        if (!screenToGoToIfSoundDirectoryIsFull.empty())
-        {
-            auto popupScreen = mpc.screens->get<mpc::lcdgui::screens::dialog2::PopupScreen>();
-            popupScreen->setText("Sound directory full(256max)");
-            popupScreen->setScreenToReturnTo(screenToGoToIfSoundDirectoryIsFull);
-            mpc.getLayeredScreen()->openScreen<PopupScreen>();
-        }
+        mpc.getLayeredScreen()->showPopupAndAwaitInteraction("Sound directory full(256max)");
         return {};
     }
 
@@ -1035,12 +1013,12 @@ void Sampler::selectNextSound()
     nudgeSoundIndex(true);
 }
 
-std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source, const std::string screenToGoToIfSoundDirectoryIsFull)
+std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source)
 {
 	auto sound = source.lock();
-	auto newSound = addSound(sound->getSampleRate(), screenToGoToIfSoundDirectoryIsFull);
+	auto newSound = addSound(sound->getSampleRate());
 
-    if (newSound == nullptr)
+    if (!newSound)
     {
         return {};
     }

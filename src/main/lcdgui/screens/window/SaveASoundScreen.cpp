@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog/FileExistsScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
@@ -19,7 +18,7 @@ SaveASoundScreen::SaveASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveASoundScreen::open()
 {
-    if (ls->getPreviousScreenName() == "save")
+    if (ls->isPreviousScreen<SaveScreen>())
     {
         auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->setName(sampler->getSound()->getName());
@@ -80,10 +79,7 @@ void SaveASoundScreen::function(int i)
 
             disk->flush();
 
-            auto popupScreen = mpc.screens->get<PopupScreen>();
-            popupScreen->setText("Saving " + fileName);
-            popupScreen->returnToScreenAfterMilliSeconds("save", 700);
-            mpc.getLayeredScreen()->openScreen<PopupScreen>();
+            ls->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
         };
 
 		if (disk->checkExists(fileName))

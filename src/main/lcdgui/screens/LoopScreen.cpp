@@ -6,7 +6,6 @@
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <stdint.h>
 #include <limits.h>
@@ -79,10 +78,7 @@ void LoopScreen::function(int f)
 	case 1:
 	{
         sampler->switchToNextSoundSortType();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-		auto popupScreen = mpc.screens->get<PopupScreen>();
-		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
-		popupScreen->returnToScreenAfterMilliSeconds("loop", 200);
+		ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
 		break;
 	}
 	case 2:
@@ -94,7 +90,9 @@ void LoopScreen::function(int f)
 	case 4:
 	{
 		if (sampler->getSoundCount() == 0)
+        {
 			return;
+        }
 
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
 		editSoundScreen->setReturnToScreenName("loop");

@@ -12,9 +12,7 @@ CopySoundScreen::CopySoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CopySoundScreen::open()
 {
-	auto previousScreenName = ls->getPreviousScreenName();
-
-	if (previousScreenName != "name" && sampler->getSound())
+	if (ls->isPreviousScreenNot<NameScreen>() && sampler->getSound())
 	{
 		newName = sampler->getSound()->getName();
 		newName = sampler->addOrIncreaseNumber(newName);
@@ -35,7 +33,7 @@ void CopySoundScreen::function(int i)
 	case 4:
 	{
 		auto sound = sampler->getSound();
-		auto newSound = sampler->copySound(sound, "sound");
+		auto newSound = sampler->copySound(sound);
 
         if (newSound.lock() == nullptr)
         {

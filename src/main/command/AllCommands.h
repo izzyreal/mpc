@@ -4,7 +4,6 @@
 #include "command/PushRightCommand.h"
 #include "command/PushUpCommand.h"
 #include "command/PushDownCommand.h"
-#include "command/PushFunctionCommand.h"
 #include "command/TriggerDrumNoteOnCommand.h"
 #include "command/PushStopCommand.h"
 #include "command/PushRecCommand.h"

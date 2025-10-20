@@ -3,7 +3,6 @@
 #include "hardware/Hardware.h"
 #include "lcdgui/screens/LoopScreen.hpp"
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/Layer.hpp>
 
 #ifdef __linux__
@@ -73,10 +72,7 @@ void TrimScreen::function(int f)
 	case 0:
 	{
         sampler->switchToNextSoundSortType();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-		auto popupScreen = mpc.screens->get<PopupScreen>();
-		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
-		popupScreen->returnToScreenAfterMilliSeconds("trim", 200);
+		ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
 		break;
 	}
 	case 1:

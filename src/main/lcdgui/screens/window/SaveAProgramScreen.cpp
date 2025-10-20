@@ -18,7 +18,7 @@ SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveAProgramScreen::open()
 {
-    if (ls->getPreviousScreenName() == "save")
+    if (ls->isPreviousScreen<SaveScreen>())
     {
         auto nameScreen = mpc.screens->get<NameScreen>();
         auto saveScreen = mpc.screens->get<SaveScreen>();

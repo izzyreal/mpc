@@ -114,9 +114,9 @@ void SampleScreen::function(int i)
 		}
 		else
 		{
-			auto sound = sampler->addSound("sample");
+			auto sound = sampler->addSound();
             
-            if (sound == nullptr)
+            if (!sound)
             {
                 return;
             }

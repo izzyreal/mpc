@@ -9,8 +9,10 @@ SyncScreen::SyncScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SyncScreen::open()
 {
-    if (tab == 2 && ls->getPreviousScreenName() == "midi-sw")
+    if (tab == 2 && ls->isPreviousScreen<MidiSwScreen>())
+    {
         tab = 0;
+    }
     
     if (tab == 2)
     {

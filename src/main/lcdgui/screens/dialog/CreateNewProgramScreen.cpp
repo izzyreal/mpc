@@ -39,7 +39,7 @@ void CreateNewProgramScreen::openNameScreen()
 
 void CreateNewProgramScreen::open()
 {
-    if (ls->getPreviousScreenName() != "name")
+    if (ls->isPreviousScreenNot<NameScreen>())
     {
         auto letterIndex = 21 + 24;
         

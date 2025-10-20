@@ -46,7 +46,6 @@ void DeleteAllFilesScreen::function(int i)
 	{
 	case 3:
         mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
-		ls->setPreviousScreenName("directory");
 		break;
 	case 4:
 	{
@@ -60,6 +59,7 @@ void DeleteAllFilesScreen::function(int i)
 			directoryScreen->yOffset1 = 0;
 			mpc.getDisk()->initFiles();
 		}
+
         mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
 		break;
 	}

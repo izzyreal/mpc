@@ -1,7 +1,6 @@
 #include "SndParamsScreen.hpp"
 
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <Util.hpp>
 
@@ -64,10 +63,7 @@ void SndParamsScreen::function(int f)
 	case 3:
 	{
         sampler->switchToNextSoundSortType();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-		auto popupScreen = mpc.screens->get<PopupScreen>();
-		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
-		popupScreen->returnToScreenAfterMilliSeconds("params", 200);
+		ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
 		break;
 	}
 	case 4:

@@ -13,8 +13,6 @@ TrackScreen::TrackScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TrackScreen::open()
 {
-	ls->setPreviousScreenName("sequencer");
-
 	init();
 	auto activeTrackIndex = sequencer.lock()->getActiveTrackIndex();
 	auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);

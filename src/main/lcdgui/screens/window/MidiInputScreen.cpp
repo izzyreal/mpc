@@ -20,7 +20,7 @@ void MidiInputScreen::open()
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-    if (ls->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+    if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();

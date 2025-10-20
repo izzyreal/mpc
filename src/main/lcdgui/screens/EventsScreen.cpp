@@ -5,6 +5,7 @@
 #include <sequencer/SeqUtil.hpp>
 
 #include <lcdgui/screens/UserScreen.hpp>
+#include "lcdgui/screens/SequencerScreen.hpp"
 
 #include <Util.hpp>
 
@@ -48,7 +49,7 @@ void EventsScreen::open()
         return;
     }
 
-    auto previousScreenWasSequencer = ls->getPreviousScreenName() == "sequencer";
+    auto previousScreenWasSequencer = ls->isPreviousScreen<SequencerScreen>();
     auto seq = sequencer.lock()->getActiveSequence();
 
     if (previousScreenWasSequencer)

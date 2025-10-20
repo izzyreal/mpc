@@ -78,7 +78,7 @@ namespace mpc::lcdgui
         virtual void right() { command::PushRightCommand(mpc).execute(); }
         virtual void up() { command::PushUpCommand(mpc).execute(); }
         virtual void down() { command::PushDownCommand(mpc).execute(); }
-        virtual void function(int i) { init(); command::PushFunctionCommand(mpc, i).execute(); }
+        virtual void function(int i) { mpc.getLayeredScreen()->closeWindow(); }
         virtual void openWindow();
         virtual void turnWheel(int) {}
         virtual void numpad(int i) { command::PushNumPadCommand(mpc, i).execute(); }

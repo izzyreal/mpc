@@ -25,7 +25,6 @@
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <StrUtil.hpp>
 #include <stdexcept>
@@ -178,10 +177,7 @@ void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s, std::st
         writer.writeToOStream(f->getOutputStream());
         flush();
         initFiles();
-        auto popupScreen = mpc.screens->get<PopupScreen>();
-        popupScreen->setText("Saving " + fileName);
-        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+        mpc.getLayeredScreen()->showPopupForMs("Saving" + fileName, 400);
         return f;
     };
 
@@ -253,9 +249,7 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
         auto bytes = writer.get();
         f->setFileData(bytes);
 
-        auto popupScreen = mpc.screens->get<PopupScreen>();
-        popupScreen->setText("Saving " + fileName);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+        const std::string popupMsg = "Saving " + fileName;
 
         auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
@@ -289,12 +283,12 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
             }
             else
             {
-                popupScreen->returnToScreenAfterMilliSeconds("save", 700);
+                mpc.getLayeredScreen()->showPopupForMs(popupMsg, 700);
             }
         }
         else
         {
-            popupScreen->returnToScreenAfterMilliSeconds("save", 700);
+            mpc.getLayeredScreen()->showPopupForMs(popupMsg, 700);
         }
 
         flush();
@@ -314,10 +308,6 @@ void AbstractDisk::writeAps(const std::string& fileName)
         auto bytes = apsParser.getBytes();
         f->setFileData(bytes);
 
-        auto popupScreen = mpc.screens->get<PopupScreen>();
-        popupScreen->setText("Saving " + fileName);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-
         auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
         if (saveAProgramScreen->save != 0 && mpc.getSampler()->getSoundCount() > 0)
@@ -334,7 +324,8 @@ void AbstractDisk::writeAps(const std::string& fileName)
         }
         else
         {
-            popupScreen->returnToScreenAfterMilliSeconds("save", 700);
+            const std::string popupMsg = "Saving " + fileName;
+            mpc.getLayeredScreen()->showPopupForMs(popupMsg, 700);
         }
 
         flush();
@@ -357,11 +348,7 @@ void AbstractDisk::writeAll(const std::string& fileName)
         flush();
         initFiles();
 
-        auto popupScreen = mpc.screens->get<PopupScreen>();
-        popupScreen->setText("         Saving ...");
-        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
-
+        mpc.getLayeredScreen()->showPopupForMs("         Saving ...", 400);
         return f;
     };
 
@@ -651,6 +638,10 @@ sequences_or_error AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> 
 template<typename return_type>
 tl::expected<return_type, mpc_io_error_msg> AbstractDisk::performIoOrOpenErrorPopup(std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc)
 {
+    auto showPopup = [this](const std::string msg){
+        mpc.getLayeredScreen()->showPopupForMs(msg, 1000);
+    };
+
     try {
         tl::expected<return_type, mpc_io_error_msg> ioFuncRes = ioFunc();
 
@@ -668,17 +659,3 @@ tl::expected<return_type, mpc_io_error_msg> AbstractDisk::performIoOrOpenErrorPo
     }
 }
 
-void AbstractDisk::showPopup(mpc_io_error_msg& msg)
-{
-    auto popupScreen = mpc.screens->get<PopupScreen>();
-    popupScreen->setText(msg);
-    auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-
-    if (currentScreenName == "load-a-sequence")
-    {
-        currentScreenName = "load";
-    }
-
-    popupScreen->returnToScreenAfterMilliSeconds(currentScreenName, 1000);
-    mpc.getLayeredScreen()->openScreen<PopupScreen>();
-}
