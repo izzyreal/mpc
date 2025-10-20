@@ -334,7 +334,7 @@ void VmpcMidiScreen::function(int i)
             }
 
             auto popupScreen = mpc.screens->get<PopupScreen>();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+            mpc.getLayeredScreen()->openScreen<PopupScreen>();
 
             if (hasMappingChanged())
             {

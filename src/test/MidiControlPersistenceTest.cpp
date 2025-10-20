@@ -49,6 +49,7 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
     controls->right();
     controls->turnWheel(2);
     controls->function(5);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1100)); // Await popup closing
     mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
     auto t1 = controls->findChild<mpc::lcdgui::Field>("type0")->getText();

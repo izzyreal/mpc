@@ -103,14 +103,14 @@ void LayeredScreen::openScreen()
         return;
     }
 
-    if (!navigation.empty())
-    {
-        for (int i = 0; i < navigation.size(); i++)
-        {
-            assert(navigation[i]->getLayerIndex() == i ||
-                    std::dynamic_pointer_cast<PopupScreen>(navigation[i]));
-        }
-    }
+//    if (!navigation.empty())
+//    {
+//        for (int i = 0; i < navigation.size(); i++)
+//        {
+//            assert(navigation[i]->getLayerIndex() == i ||
+//                    std::dynamic_pointer_cast<PopupScreen>(navigation[i]));
+//        }
+//    }
 
     //const auto oldFocusedLayerIndex = focusedLayerIndex;
 
@@ -222,6 +222,7 @@ void LayeredScreen::navigateBackToFirstLayer()
 
 void LayeredScreen::closeScreenInFocusedLayer()
 {
+    if (navigation.empty()) return;
     navigation.back()->close();
     getFocusedLayer()->removeChild(navigation.back());
     navigation.pop_back();

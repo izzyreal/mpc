@@ -49,6 +49,7 @@ SCENARIO("All screens can be opened", "[gui]") {
                 continue;
             }
 
+            ls->closeScreenInFocusedLayer();
 			ls->openScreen(screenName);
 			
 			// We do a check for the most important screen
@@ -63,7 +64,7 @@ SCENARIO("All screens can be opened", "[gui]") {
             
 			auto layer = ls->getFocusedLayer();
             std::vector<std::vector<bool>> pixels(248, std::vector<bool>(60));
-			layer->Draw(&pixels);
+            layer->drawRecursive(&pixels);
 			int blackPixelCount = 0;
 
 			for (auto& column : pixels)
@@ -75,14 +76,14 @@ SCENARIO("All screens can be opened", "[gui]") {
 				}
 			}
 
-			// And another check for the most important screen
-			if (screenName == "sequencer")
-				REQUIRE(blackPixelCount > 0);
-
 			if (blackPixelCount > 0)
-				good.push_back(screenName + " has " + std::to_string(blackPixelCount) + " black pixels");
+            {
+                good.push_back(screenName + " has " + std::to_string(blackPixelCount) + " black pixels");
+            }
 			else
-				bad.push_back(screenName + " is openable, but has 0 black pixels");
+            {
+                bad.push_back(screenName + " is openable, but has 0 black pixels");
+            }
 		}
 
 		REQUIRE(bad.empty());
