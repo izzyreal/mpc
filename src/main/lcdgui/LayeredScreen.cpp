@@ -106,11 +106,11 @@ bool LayeredScreen::isCurrentScreen() const
 
 void LayeredScreen::showPopupForMs(const std::string msg, const int delayMs)
 {
+    const int layerIndex = navigation.back()->getLayerIndex();
+
     auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText(msg);
     openScreen<PopupScreen>();
-
-    const int layerIndex = navigation.back()->getLayerIndex();
 
     std::thread([this, delayMs, layerIndex]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
