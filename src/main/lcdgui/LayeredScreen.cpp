@@ -1,5 +1,6 @@
 #include "lcdgui/LayeredScreen.hpp"
 
+#include "lcdgui/ScreenGroups.h"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/AllScreens.h"
 #include "lcdgui/ScreenRegistry.h"
@@ -300,16 +301,9 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 
 	newScreen->open();
 
-	const std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
+	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(screengroups::isStepEditorScreen(newScreen->getName()));
 
-	const auto isOverdubScreen = std::find(overdubScreens.begin(), overdubScreens.end(), history.back()->getName()) != overdubScreens.end();
-	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(isOverdubScreen);
-
-	const std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
-
-	const auto isNextSeqScreen = std::find(nextSeqScreens.begin(), nextSeqScreens.end(), history.back()->getName()) != nextSeqScreens.end();
-	
-	if (!isNextSeqScreen || (std::dynamic_pointer_cast<SequencerScreen>(history.back()) && !mpc.getSequencer()->isPlaying()))
+	if (!screengroups::isNextSeqScreen(newScreen->getName()) || (std::dynamic_pointer_cast<SequencerScreen>(newScreen) && !mpc.getSequencer()->isPlaying()))
     {
         if (mpc.getSequencer()->getNextSq() != -1)
         {
