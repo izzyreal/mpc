@@ -33,6 +33,13 @@ std::weak_ptr<Underline> NameScreen::findUnderline()
 
 void NameScreen::open()
 {
+    for (auto &f : findFields())
+    {
+        f->loseFocus("");
+    }
+    
+    findField("0")->takeFocus();
+
     mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(!mpc.getPadAndButtonKeyboard()->isUpperCase());
 
 	for (int i = 0; i < 16; i++)
@@ -71,7 +78,9 @@ void NameScreen::left()
 	if (editing)
 	{
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
-        findFocus()->setInverted(false);
+        auto focus = findFocus();
+        printf("New focus: %s\n", focus->getName().c_str());
+        focus->setInverted(false);
 		drawUnderline();
 	}
 }
@@ -90,7 +99,9 @@ void NameScreen::right()
 	if (editing)
 	{
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
-        findFocus()->setInverted(false);
+        auto focus = findFocus();
+        printf("New focus: %s\n", focus->getName().c_str());
+        focus->setInverted(false);
 		drawUnderline();
 	}
 }

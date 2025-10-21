@@ -39,18 +39,6 @@ ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path 
 
 void ClientInputController::handleInput(const ClientInput &input)
 {
-    if (input.source == ClientInput::Source::HostInputKeyboard)
-    {
-        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
-                input.textInputKey)
-        {
-            if (input.textInputKey->isPress)
-            {
-                nameScreen->typeCharacter(input.textInputKey->character);
-            }
-        }
-    }
-
     switch (input.type) {
         case ClientInput::Type::PadPress:
             handlePadPress(input);
@@ -113,6 +101,19 @@ void ClientInputController::handlePadPress(const ClientInput &input)
     auto screen = layeredScreen->getCurrentScreen();
 
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
+
+    if (input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
+                input.textInputKey)
+        {
+            if (input.textInputKey->isPress)
+            {   
+                nameScreen->typeCharacter(input.textInputKey->character);
+                return;
+            }
+        }
+    }
 
     if (std::dynamic_pointer_cast<NameScreen>(screen))
     {

@@ -250,14 +250,14 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
         }
 
         auto focusedFieldName = getFocusedFieldName();
-        auto focus = getFocusedLayer()->findField(focusedFieldName);
+//        auto focus = getFocusedLayer()->findField(focusedFieldName);
 
         setLastFocus(history.back()->getName(), focusedFieldName);
 
 //        if (focus)
-        {
-            //focus->loseFocus("");
-        }
+//        {
+//            focus->loseFocus("");
+//        }
     }
 
     if (auto sampleScreen = std::dynamic_pointer_cast<SampleScreen>(newScreen); sampleScreen)
