@@ -17,6 +17,15 @@ MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MetronomeSoundScreen::open()
 {
+    // There was an issue with previous ALL parsers, which resulted in previous
+    // demo data versions to have erroneous ALL files that crashed this screen
+    // because of out of range pads. Here we make sure that doesn't
+    // happen anymore. Also the demo data has been fixed, but once the user has
+    // loaded an ALL file, this erroneous setting may have persisted into their
+    // files too.
+    if (accentPad < 0 || accentPad > 63) accentPad = 0;
+    if (normalPad < 0 || normalPad > 63) normalPad = 0;
+    
     setSound(sound);
     mpc.addObserver(this); // Subscribe to "note" messages
 }
