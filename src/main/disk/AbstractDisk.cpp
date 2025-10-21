@@ -177,7 +177,7 @@ void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s, std::st
         writer.writeToOStream(f->getOutputStream());
         flush();
         initFiles();
-        mpc.getLayeredScreen()->showPopupForMs("Saving" + fileName, 400);
+        mpc.getLayeredScreen()->showPopupAndThenReturnToLayer("Saving" + fileName, 400, 0);
         return f;
     };
 
@@ -283,12 +283,12 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
             }
             else
             {
-                mpc.getLayeredScreen()->showPopupForMs(popupMsg, 700);
+                mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(popupMsg, 700, 0);
             }
         }
         else
         {
-            mpc.getLayeredScreen()->showPopupForMs(popupMsg, 700);
+            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(popupMsg, 700, 0);
         }
 
         flush();
@@ -325,7 +325,7 @@ void AbstractDisk::writeAps(const std::string& fileName)
         else
         {
             const std::string popupMsg = "Saving " + fileName;
-            mpc.getLayeredScreen()->showPopupForMs(popupMsg, 700);
+            mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(popupMsg, 700, 0);
         }
 
         flush();
@@ -348,7 +348,7 @@ void AbstractDisk::writeAll(const std::string& fileName)
         flush();
         initFiles();
 
-        mpc.getLayeredScreen()->showPopupForMs("         Saving ...", 400);
+        mpc.getLayeredScreen()->showPopupAndThenReturnToLayer("         Saving ...", 400, 0);
         return f;
     };
 
@@ -639,7 +639,7 @@ template<typename return_type>
 tl::expected<return_type, mpc_io_error_msg> AbstractDisk::performIoOrOpenErrorPopup(std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc)
 {
     auto showPopup = [this](const std::string msg){
-        mpc.getLayeredScreen()->showPopupForMs(msg, 1000);
+        mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(msg, 1000, 0);
     };
 
     try {
