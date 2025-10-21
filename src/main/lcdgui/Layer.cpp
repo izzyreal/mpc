@@ -27,11 +27,11 @@ bool Layer::setFocus(std::string fieldName)
 	if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
 		return false;
 
-	auto oldFocus = findField(focus);
-
-	if (oldFocus)
-		oldFocus->loseFocus(fieldName);
-
+    for (auto &f : findFields())
+    {
+        f->loseFocus(fieldName);
+    }
+    
 	focus = fieldName;
 
     newFocus->takeFocus();
