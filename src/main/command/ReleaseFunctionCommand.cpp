@@ -23,7 +23,8 @@ void ReleaseFunctionCommand::execute()
     case 4:
         if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<LoadScreen>())
         {
-                mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
         }
         break;
     case 5: {
