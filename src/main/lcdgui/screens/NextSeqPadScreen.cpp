@@ -43,19 +43,26 @@ void NextSeqPadScreen::right()
 
 void NextSeqPadScreen::function(int i)
 {
-	init();
-    ScreenComponent::function(i);
-	switch (i)
-	{
-	case 4:
-		sequencer.lock()->setNextSq(-1);
-		displayNextSq();
-		refreshSeqs();
-		break;
-	case 5:
+    init();
+ 
+    if (i == 3 || i == 4)
+    {
+        auto nextSq = sequencer.lock()->getNextSq();
+        sequencer.lock()->setNextSq(-1);
+        displayNextSq();
+        
+        if (i == 3 && nextSq != -1)
+        {
+            sequencer.lock()->stop();
+            sequencer.lock()->move(0);
+            sequencer.lock()->setActiveSequenceIndex(nextSq);
+            sequencer.lock()->playFromStart();
+        }
+    }
+    else if (i == 5)
+    {
         mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
-		break;
-	}
+    }
 }
 
 void NextSeqPadScreen::displayNextSq()

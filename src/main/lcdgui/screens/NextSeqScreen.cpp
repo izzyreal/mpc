@@ -65,7 +65,9 @@ void NextSeqScreen::turnWheel(int i)
 		auto nextSq = sequencer.lock()->getNextSq();
 		
 		if (nextSq == -1 && i < 0)
-			return;
+        {
+            return;
+        }
 
 		if (nextSq == -1 && selectNextSqFromScratch)
 		{
@@ -73,7 +75,9 @@ void NextSeqScreen::turnWheel(int i)
 			selectNextSqFromScratch = false;
 		}
 		else
-			nextSq += i;
+        {
+            nextSq += i;
+        }
 
 		sequencer.lock()->setNextSq(nextSq);
 
@@ -107,7 +111,7 @@ void NextSeqScreen::function(int i)
         selectNextSqFromScratch = true;
         displayNextSq();
 
-        if (i == 3)
+        if (i == 3 && nextSq != -1)
         {
             sequencer.lock()->stop();
             sequencer.lock()->move(0);

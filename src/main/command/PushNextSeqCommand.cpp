@@ -7,18 +7,15 @@ namespace mpc::command {
 
     PushNextSeqCommand::PushNextSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushNextSeqCommand::execute() {
-        const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-
-        if (currentScreenName == "next-seq" || currentScreenName == "next-seq-pad") {
+    void PushNextSeqCommand::execute()
+    {        
+        if (mpc.getLayeredScreen()->isCurrentScreen<NextSeqScreen, NextSeqScreen>())
+        {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            mpc.getHardware()->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(false);
-        } else if (currentScreenName == "sequencer" || currentScreenName == "track-mute") {
-            Util::initSequence(mpc);
+        }
+        else if (mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen, TrMuteScreen>())
+        {
             mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
-            mpc.getHardware()->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(true);
-            mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
         }
     }
-
 }

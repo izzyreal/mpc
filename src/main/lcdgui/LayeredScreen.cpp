@@ -19,6 +19,7 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 #include <StrUtil.hpp>
+#include "Util.hpp"
 
 #include <cmath>
 #include <memory>
@@ -302,6 +303,15 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 	newScreen->open();
 
 	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(screengroups::isStepEditorScreen(newScreen));
+
+    if (std::dynamic_pointer_cast<NextSeqScreen>(newScreen))
+    {
+        mpc::Util::initSequence(mpc);
+    }
+
+    mpc.getHardware()->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(mpc.getLayeredScreen()->isCurrentScreen<NextSeqScreen, NextSeqScreen>());
+
+    mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(mpc.getLayeredScreen()->isCurrentScreen<TrMuteScreen>());
 
 	if (!screengroups::isNextSeqScreen(newScreen) ||
             (std::dynamic_pointer_cast<SequencerScreen>(newScreen) && !mpc.getSequencer()->isPlaying()))
@@ -751,10 +761,15 @@ template bool mpc::lcdgui::LayeredScreen::isPreviousScreen<mpc::lcdgui::screens:
 template bool mpc::lcdgui::LayeredScreen::isPreviousScreen<mpc::lcdgui::screens::NextSeqScreen,
                                                            mpc::lcdgui::screens::NextSeqPadScreen,
                                                            mpc::lcdgui::screens::SequencerScreen>() const;
+
 template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
     mpc::lcdgui::screens::NextSeqScreen,
     mpc::lcdgui::screens::NextSeqPadScreen,
     mpc::lcdgui::screens::SequencerScreen>() const;
+
+template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
+    mpc::lcdgui::screens::SequencerScreen,
+    mpc::lcdgui::screens::TrMuteScreen>() const;
 
 // Used by MidiOutputScreen
 template bool mpc::lcdgui::LayeredScreen::isPreviousScreenNot<
