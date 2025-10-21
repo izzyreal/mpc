@@ -730,20 +730,13 @@ std::shared_ptr<Field> LayeredScreen::getFocusedField()
 
 std::string LayeredScreen::getFirstLayerScreenName()
 {
-    if (history.empty())
+    if (auto screen = layers[0]->findChild<ScreenComponent>(); screen)
     {
-        throw std::runtime_error("Screens history is empty");
+        return screen->getName();
     }
-
-    for (int i = history.size() - 1; i >= 0; --i)
-    {
-        if (history[i]->getLayerIndex() == 0)
-        {
-            return history[i]->getName();
-        }
-    }
-
-    throw std::runtime_error("No screen with layer index 0 could be found");
+    
+    printf("No screen component found in first layer!\n");
+    return "sequencer"; // return some sane default
 }
 
 #define X(ns, Class, name) \
