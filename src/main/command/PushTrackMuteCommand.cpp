@@ -29,7 +29,8 @@ namespace mpc::command {
             
             mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
         }
-        else if (ls->isCurrentScreen<NextSeqScreen, NextSeqPadScreen, SequencerScreen>())
+        else if (ls->isCurrentScreen<NextSeqScreen, NextSeqPadScreen, SequencerScreen>() &&
+                !mpc.getSequencer()->isRecordingOrOverdubbing())
         {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen<TrMuteScreen>();
