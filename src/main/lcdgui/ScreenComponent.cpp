@@ -5,6 +5,7 @@
 #include <Mpc.hpp>
 
 #include "command/context/PushPadScreenUpdateContext.h"
+#include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
@@ -82,8 +83,18 @@ const std::string ScreenComponent::getLastFocus(const std::string& screenName)
 
 void ScreenComponent::openWindow()
 {
+    /**
+     * On the real MPC2000XL the OPEN WINDOW button can also be used to close windows.
+     * The behaviour is consistent for nearly all cases, with a few exceptions.
+     * See https://github.com/izzyreal/mpc/issues/260
+     */
     if (dynamic_cast<MidiOutputMonitorScreen*>(this))
     {
+        return;
+    }
+    else if (dynamic_cast<MetronomeSoundScreen*>(this))
+    {
+        PushMainScreenCommand(mpc).execute();
         return;
     }
     
