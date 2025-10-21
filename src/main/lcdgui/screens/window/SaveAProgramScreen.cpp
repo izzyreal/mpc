@@ -22,7 +22,7 @@ void SaveAProgramScreen::open()
     {
         auto nameScreen = mpc.screens->get<NameScreen>();
         auto saveScreen = mpc.screens->get<SaveScreen>();
-        nameScreen->setName(sampler->getProgram(saveScreen->getProgramIndex())->getName());
+        nameScreen->setNameToEdit(sampler->getProgram(saveScreen->getProgramIndex())->getName());
     }
 
     findField("replace-same-sounds")->setAlignment(Alignment::Centered);

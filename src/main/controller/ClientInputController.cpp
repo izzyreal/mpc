@@ -48,8 +48,6 @@ void ClientInputController::handleInput(const ClientInput &input)
             {
                 nameScreen->typeCharacter(input.textInputKey->character);
             }
-
-            return;
         }
     }
 

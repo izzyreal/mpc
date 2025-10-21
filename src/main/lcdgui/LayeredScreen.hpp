@@ -99,6 +99,7 @@ namespace mpc::lcdgui {
 		std::map<std::string, std::string> lastFocuses;
 
         void openScreenInternal(std::shared_ptr<ScreenComponent>);
+        void returnToLastFocus(std::shared_ptr<ScreenComponent> screen, std::string firstFieldOfThisScreen);
 
 	private:
 		FunctionKeys* getFunctionKeys();
@@ -108,7 +109,6 @@ namespace mpc::lcdgui {
 		void setCurrentBackground(std::string s);
 
 	public:
-		void returnToLastFocus(std::string firstFieldOfThisScreen);
 		void setLastFocus(std::string screenName, std::string tfName);
 		std::string getLastFocus(std::string screenName);
 

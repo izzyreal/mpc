@@ -21,7 +21,7 @@ void SaveASoundScreen::open()
     if (ls->isPreviousScreen<SaveScreen>())
     {
         auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->setName(sampler->getSound()->getName());
+        nameScreen->setNameToEdit(sampler->getSound()->getName());
     }
 
 	displayFile();

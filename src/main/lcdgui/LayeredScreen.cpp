@@ -297,7 +297,7 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 
 	if (newScreen->findFields().size() > 0)
     {
-		returnToLastFocus(newScreen->getFirstField());
+		returnToLastFocus(newScreen, newScreen->getFirstField());
     }
 
 	newScreen->open();
@@ -377,14 +377,14 @@ void LayeredScreen::setCurrentBackground(std::string s)
 	getCurrentBackground()->setName(s);
 }
 
-void LayeredScreen::returnToLastFocus(std::string firstFieldOfCurrentScreen)
+void LayeredScreen::returnToLastFocus(std::shared_ptr<ScreenComponent> screen, std::string firstFieldOfCurrentScreen)
 {
-    assert(!history.empty());
-    auto lastFocus = lastFocuses.find(history.back()->getName());
+    assert(screen);
+    auto lastFocus = lastFocuses.find(screen->getName());
     
     if (lastFocus == end(lastFocuses))
     {
-        lastFocuses[history.back()->getName()] = firstFieldOfCurrentScreen;
+        lastFocuses[screen->getName()] = firstFieldOfCurrentScreen;
         setFocus(firstFieldOfCurrentScreen);
         return;
     }

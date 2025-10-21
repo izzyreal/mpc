@@ -27,7 +27,7 @@ public:
     void typeCharacter(char c);
     void backSpace();
 
-    void initialize(std::string name, unsigned char nameLimit,
+    void initialize(std::string nameToEdit, unsigned char nameLimit,
                     const std::function<void(std::string&)>& enterAction,
                     const std::string& cancelScreen,
                     const std::function<void()>& mainScreenAction = []{});
@@ -35,7 +35,7 @@ public:
     std::string getNameWithoutSpaces();
     void setEditing(bool b);
 
-    void setName(std::string newName);
+    void setNameToEdit(std::string newNameToEdit);
 
     std::function<void()> mainScreenAction = [](){};
 
@@ -48,10 +48,10 @@ private:
     std::weak_ptr<mpc::lcdgui::Underline> findUnderline();
     
     void setNameLimit(int i);
-    void setName(std::string str, int i);
+    void setNameToEdit(std::string str, int i);
 
     void changeNameCharacter(int i, bool up);
-    std::string nameScreenName;
+    std::string nameToEdit;
     bool editing = false;
     int nameLimit = 0;
 };

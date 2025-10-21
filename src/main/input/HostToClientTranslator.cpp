@@ -163,7 +163,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         const auto vmpcKeyCode = KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
         const auto binding = keyboardBindings->lookup(vmpcKeyCode);
 
-        if (binding->componentId != ComponentId::DATA_WHEEL)
+        if (!binding || binding->componentId != ComponentId::DATA_WHEEL)
         {
             if (const auto typableChar = KeyCodeHelper::getCharForTypableVmpcKeyCode(vmpcKeyCode); typableChar)
             {
