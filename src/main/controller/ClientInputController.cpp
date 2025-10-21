@@ -39,6 +39,18 @@ ClientInputController::ClientInputController(mpc::Mpc& mpcToUse, const fs::path 
 
 void ClientInputController::handleInput(const ClientInput &input)
 {
+    if (input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
+                input.textInputKey)
+        {
+            if (input.textInputKey->isPress)
+            {
+                nameScreen->typeCharacter(input.textInputKey->character);
+            }
+        }
+    }
+
     switch (input.type) {
         case ClientInput::Type::PadPress:
             handlePadPress(input);
@@ -82,6 +94,26 @@ void ClientInputController::handlePadPress(const ClientInput &input)
 {
     if (!input.index || !input.value) return;
 
+    auto layeredScreen = mpc.getLayeredScreen();
+
+    if (layeredScreen->isCurrentScreen<NameScreen>() &&
+        input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        return;
+    }
+
+    auto screen = layeredScreen->getCurrentScreen();
+
+    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(screen); opensNameScreen)
+    {
+        opensNameScreen->openNameScreen();
+        
+        if (input.source == ClientInput::Source::HostInputKeyboard)
+        {
+            return;
+        }
+    }
+
     const auto physicalPadIndex = *input.index;
 
     const auto velocity = *input.value * (float) VelocitySensitivePressable::MAX_VELO;
@@ -97,30 +129,15 @@ void ClientInputController::handlePadPress(const ClientInput &input)
         return;
     }
 
-    auto layeredScreen = mpc.getLayeredScreen();
-    auto screen = layeredScreen->getCurrentScreen();
-
-    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
-
-    if (input.source == ClientInput::Source::HostInputKeyboard)
+    if (layeredScreen->isCurrentScreen<NameScreen>())
     {
-        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
-                input.textInputKey)
-        {
-            if (input.textInputKey->isPress)
-            {   
-                nameScreen->typeCharacter(input.textInputKey->character);
-                return;
-            }
-        }
-    }
-
-    if (std::dynamic_pointer_cast<NameScreen>(screen))
-    {
+        registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(input.componentId);
         return;
     }
 
+    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
+    
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
 
@@ -151,11 +168,6 @@ void ClientInputController::handlePadPress(const ClientInput &input)
 
     NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note).execute();
 
-    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(screen); opensNameScreen)
-    {
-        opensNameScreen->openNameScreen();
-    }
-
     if (std::dynamic_pointer_cast<PopupScreen>(screen))
     {
         layeredScreen->closeCurrentScreen();
@@ -172,6 +184,12 @@ void ClientInputController::handlePadPress(const ClientInput &input)
 void ClientInputController::handlePadRelease(const ClientInput &input)
 {
     if (!input.index) return;
+    
+    if (mpc.getLayeredScreen()->isCurrentScreen<NameScreen>() &&
+        input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        return;
+    }
 
     const auto physicalPadIndex = *input.index;
 
@@ -290,19 +308,6 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
     if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(), input.componentId) == allowRepeat.end())
     {
         return;
-    }
-
-    if (input.source == ClientInput::Source::HostInputKeyboard)
-    {
-        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
-                input.textInputKey)
-        {
-            if (input.textInputKey->isPress)
-            {   
-                nameScreen->typeCharacter(input.textInputKey->character);
-                return;
-            }
-        }
     }
 
     auto screen = mpc.getScreen();
