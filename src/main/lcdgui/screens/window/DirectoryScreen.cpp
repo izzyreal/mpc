@@ -86,6 +86,7 @@ void DirectoryScreen::function(int f)
             if (ext.length() > 0) ext = "." + ext;
 
             const auto finalNewName = StrUtil::trim(StrUtil::toUpper(nameScreenName)) + ext;
+            const bool isDirectory = file->isDirectory();
             const auto success = file->setName(finalNewName);
 
             if (!success)
@@ -97,15 +98,15 @@ void DirectoryScreen::function(int f)
             const auto disk = mpc.getDisk();
             disk->flush();
             
-            if (file->isDirectory() && getXPos() == 0)
+            if (isDirectory && getXPos() == 0)
             {
                 disk->moveBack();
                 disk->initFiles();
-                disk->moveForward(nameScreenName);
+                disk->moveForward(finalNewName);
                 disk->initFiles();
                 
                 auto parentFileNames = disk->getParentFileNames();
-                auto it = find(begin(parentFileNames), end(parentFileNames), nameScreenName);
+                auto it = find(begin(parentFileNames), end(parentFileNames), finalNewName);
                 
                 auto index = distance(begin(parentFileNames), it);
                 
