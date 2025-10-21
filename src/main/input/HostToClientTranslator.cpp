@@ -162,22 +162,25 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         const auto &key = std::get<KeyEvent>(hostInputEvent.payload);
         const auto vmpcKeyCode = KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
         const auto binding = keyboardBindings->lookup(vmpcKeyCode);
-        
-        if (const auto typableChar = KeyCodeHelper::getCharForTypableVmpcKeyCode(vmpcKeyCode); typableChar)
+
+        if (binding->componentId != ComponentId::DATA_WHEEL)
         {
-            char charToUse;
-
-            if (key.shiftDown)
+            if (const auto typableChar = KeyCodeHelper::getCharForTypableVmpcKeyCode(vmpcKeyCode); typableChar)
             {
-                const auto charWithShift = KeyCodeHelper::getCharWithShiftModifier(vmpcKeyCode);
-                charToUse = charWithShift.value_or(*typableChar);
-            }
-            else
-            {
-                charToUse = *typableChar;
-            }
+                char charToUse;
 
-            clientInput.textInputKey = ClientInput::TextInputKey { charToUse, key.keyDown };
+                if (key.shiftDown)
+                {
+                    const auto charWithShift = KeyCodeHelper::getCharWithShiftModifier(vmpcKeyCode);
+                    charToUse = charWithShift.value_or(*typableChar);
+                }
+                else
+                {
+                    charToUse = *typableChar;
+                }
+
+                clientInput.textInputKey = ClientInput::TextInputKey { charToUse, key.keyDown };
+            }
         }
 
         if (!binding)
