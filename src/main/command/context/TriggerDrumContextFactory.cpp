@@ -5,7 +5,9 @@
 #include "audiomidi/AudioMidiServices.hpp"
 
 #include "hardware/Hardware.h"
+#include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
+#include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
@@ -13,24 +15,31 @@
 #include "Mpc.hpp"
 #include "sampler/Pad.hpp"
 #include "sequencer/SeqUtil.hpp"
+#include <memory>
 
 using namespace mpc::command::context;
 using namespace mpc::lcdgui;
 
-int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::string &currentScreenName)
+int getDrumIndexForCurrentScreen(mpc::Mpc &mpc, const std::shared_ptr<ScreenComponent> screen)
 {
-    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
+    const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const int result = isSamplerScreen ?
         mpc.screens->get<screens::DrumScreen>()->getDrum() :
         mpc.getSequencer()->getActiveTrack()->getBus() - 1;
     return result;
 }
 
-TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc::Mpc& mpc, int programPadIndex, int velocity, const std::string currentScreenName)
+TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+        mpc::Mpc& mpc,
+        int programPadIndex,
+        int velocity,
+        const std::shared_ptr<ScreenComponent> screen)
 {
-    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
-    const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
-    const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
+    const bool isSequencerScreen = std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
+    const bool isSongScreen = std::dynamic_pointer_cast<SongScreen>(screen) != nullptr;
+    const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
+    const bool isSoundScreen = screengroups::isSoundScreen(screen);
+    const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(screen);
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
@@ -44,7 +53,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
 
     auto activeTrack = mpc.getSequencer()->getActiveTrack();
 
-    const int drumIndex = getDrumIndexForCurrentScreen(mpc, currentScreenName);
+    const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
     std::shared_ptr<sampler::Program> program = drumIndex >= 0 ? mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram()) : nullptr;
     
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
@@ -55,9 +64,9 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const auto note = activeTrack->getBus() > 0 ? program->getPad(programPadIndex)->getNote() : programPadIndex + 35;  
     
     return {
+        isSequencerScreen,
         programPadIndex,
         velocity,
-        currentScreenName,
         isSoundScreen,
         isFullLevelEnabled,
         isSixteenLevelsEnabled,
@@ -70,7 +79,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         mpc.getSequencer()->isRecordingOrOverdubbing(),
         mpc.getSequencer()->getCurrentBarIndex(),
         mpc.getSequencer()->getTickPosition(),
-        currentScreenName == "song",
+        isSongScreen,
         mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
         timingCorrectScreen->getNoteValueLengthInTicks(),
         timingCorrectScreen->getSwing(),
@@ -100,14 +109,17 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     }; 
 }
 
-TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc::Mpc &mpc, const int programPadIndex, const std::string currentScreenName)
+TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+        mpc::Mpc &mpc,
+        const int programPadIndex,
+        const std::shared_ptr<ScreenComponent> screen)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
 
-    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
-    const bool isSoundScreen = screengroups::isSoundScreen(currentScreenName);
+    const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
+    const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
-    const int drumIndex = getDrumIndexForCurrentScreen(mpc, currentScreenName);
+    const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
 
     const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(programPadIndex);
 

@@ -26,7 +26,7 @@ namespace mpc::command {
 
         mpc.getSequencer()->stop();
 
-        if (!lcdgui::screengroups::isPlayScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
+        if (!lcdgui::screengroups::isPlayScreen(mpc.getLayeredScreen()->getCurrentScreen()))
         {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }

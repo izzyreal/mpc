@@ -112,11 +112,9 @@ void ClientInputController::handlePadPress(const ClientInput &input)
     }
 
     auto layeredScreen = mpc.getLayeredScreen();
-    const auto screenName = layeredScreen->getCurrentScreenName();
+    auto screen = layeredScreen->getCurrentScreen();
 
-    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screenName, input.source);
-
-    auto screen = mpc.getScreen();
+    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
 
     if (auto nameScreen = std::dynamic_pointer_cast<NameScreen>(screen))
     {
@@ -125,7 +123,7 @@ void ClientInputController::handlePadPress(const ClientInput &input)
     }
 
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screenName);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
 
     TriggerDrumNoteOnCommand(ctx).execute();
 
@@ -178,7 +176,7 @@ void ClientInputController::handlePadRelease(const ClientInput &input)
     mpc.getHardware()->getPad(physicalPadIndex)->release();
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screenName);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screen);
     TriggerDrumNoteOffCommand(ctx).execute();
 }
 
@@ -287,7 +285,6 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
 
     auto screen = mpc.getScreen();
     auto layeredScreen = mpc.getLayeredScreen();
-    const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
     using Id = ComponentId;
 
@@ -334,7 +331,7 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
     else if (id == Id::PLAY_START) { screen->playStart(); }
     else if (id == Id::MAIN_SCREEN)
     {
-        if (screengroups::isScreenThatIsNotAllowedToOpenMainScreen(currentScreenName))
+        if (screengroups::isScreenThatIsNotAllowedToOpenMainScreen(screen))
         {
             return;
         }

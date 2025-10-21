@@ -10,6 +10,9 @@
 #include "mpc_fs.hpp"
 
 #include "input/KeyboardBindings.h"
+
+#include "lcdgui/ScreenComponent.hpp"
+
 #include <cassert>
 #include <memory>
 
@@ -19,7 +22,7 @@ class ClientInputControllerBase {
     public:
         struct PhysicalPadPress {
             int bankIndex;
-            std::string screenName;
+            std::shared_ptr<lcdgui::ScreenComponent> screen;
             input::ClientInput::Source inputSource;
         };
 
@@ -71,10 +74,14 @@ class ClientInputControllerBase {
             return pressSource == input::ClientInput::Source::HostInputKeyboard;
         }
 
-        void registerPhysicalPadPush(const int padIndex, const int bankIndex, const std::string screenName, const input::ClientInput::Source inputSource)
+        void registerPhysicalPadPush(
+                const int padIndex,
+                const int bankIndex,
+                const std::shared_ptr<lcdgui::ScreenComponent> screen,
+                const input::ClientInput::Source inputSource)
         {
             assert(physicalPadPresses.count(padIndex) == 0);
-            physicalPadPresses[padIndex] = { bankIndex, screenName, inputSource };
+            physicalPadPresses[padIndex] = { bankIndex, screen, inputSource };
         }
 
         PhysicalPadPress registerPhysicalPadRelease(const int padIndex)

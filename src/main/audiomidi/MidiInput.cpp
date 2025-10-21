@@ -337,10 +337,10 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
         padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
     }
 
-    const std::string currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
     const int note = playMidiNoteOn->getNote();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
-    const bool isCentralNoteAndPadUpdateScreen = screengroups::isCentralNoteAndPadUpdateScreen(currentScreenName);
+    const bool isCentralNoteAndPadUpdateScreen = screengroups::isCentralNoteAndPadUpdateScreen(currentScreen);
     std::function<void(int)> setMpcNote = [mpc = &mpc] (int n) { mpc->setNote(n); };
     const std::string currentFieldName = mpc.getLayeredScreen()->getFocusedFieldName();
 
@@ -358,7 +358,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
     {
         // Are we building this correctly when we're in multi-recording setup mode? Probably not, because buildTriggerDrumNoteOnContext has its own
         // track derivation.
-        auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreenName);
+        auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, padIndexWithBank, playMidiNoteOn->getVelocity(), currentScreen);
         command::TriggerDrumNoteOnCommand(ctx).execute();
 
         const auto note = playMidiNoteOn->getNote();
@@ -383,7 +383,7 @@ void MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
         return;
     }
 
-    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreenName);
+    const bool isSamplerScreen = screengroups::isSamplerScreen(currentScreen);
 
     if (!isSamplerScreen)
     {
@@ -462,8 +462,8 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 
     if (padIndexWithBank != -1)
     {
-        const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, currentScreenName);
+        const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
+        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, currentScreen);
         command::TriggerDrumNoteOffCommand(ctx).execute();
         return;
     }

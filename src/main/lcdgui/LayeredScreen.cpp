@@ -301,9 +301,10 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 
 	newScreen->open();
 
-	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(screengroups::isStepEditorScreen(newScreen->getName()));
+	mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(screengroups::isStepEditorScreen(newScreen));
 
-	if (!screengroups::isNextSeqScreen(newScreen->getName()) || (std::dynamic_pointer_cast<SequencerScreen>(newScreen) && !mpc.getSequencer()->isPlaying()))
+	if (!screengroups::isNextSeqScreen(newScreen) ||
+            (std::dynamic_pointer_cast<SequencerScreen>(newScreen) && !mpc.getSequencer()->isPlaying()))
     {
         if (mpc.getSequencer()->getNextSq() != -1)
         {
@@ -329,7 +330,9 @@ void LayeredScreen::Draw()
 {
 //	MLOG("LayeredScreen::Draw()");
 	for (auto& c : root->findHiddenChildren())
+    {
         c->drawRecursive(&pixels);
+    }
 
 	root->preDrawClear(&pixels);
     root->drawRecursive(&pixels);

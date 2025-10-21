@@ -28,7 +28,7 @@ void TriggerDrumNoteOnCommand::execute()
         return;
     }
 
-    if (ctx.currentScreenName == "sequencer" &&
+    if (ctx.isSequencerScreen &&
         ctx.isNoteRepeatLockedOrPressed &&
         ctx.sequencer->isPlaying() &&
         ctx.isPhysicallyPressed)
@@ -89,7 +89,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
 
     ctx.sequencer->getNoteEventStore().storePlayNoteEvent(ctx.programPadIndex, playOnEvent);
 
-    if (ctx.currentScreenIsSamplerScreen)
+    if (ctx.isSamplerScreen)
     {
         ctx.eventHandler->handleUnfinalizedNoteOn(playOnEvent, std::nullopt, std::nullopt, std::nullopt, ctx.drumScreenSelectedDrum);
     }

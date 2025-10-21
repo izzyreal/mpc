@@ -103,9 +103,8 @@ void ScreenComponent::openWindow()
 
 mpc::engine::Drum& ScreenComponent::activeDrum()
 {
+    const bool isSamplerScreen = screengroups::isSamplerScreen(ls->getCurrentScreen());
     const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
-
-    const bool isSamplerScreen = screengroups::isSamplerScreen(name);
     auto drumIndex = isSamplerScreen ? (int) (drumScreen->getDrum()) : mpc.getSequencer()->getActiveTrack()->getBus() - 1;
 
     // Should not happen (TM)

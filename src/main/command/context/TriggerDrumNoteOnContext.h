@@ -38,9 +38,9 @@ namespace mpc::engine {
 namespace mpc::command::context {
 
     struct TriggerDrumNoteOnContext {
+        bool isSequencerScreen;
         int programPadIndex;
         int velocity;
-        std::string currentScreenName;
         bool isSoundScreen;
 
         bool isFullLevelEnabled;
@@ -69,7 +69,7 @@ namespace mpc::command::context {
         int soundIndex;
 
         int drumScreenSelectedDrum;
-        bool currentScreenIsSamplerScreen;
+        bool isSamplerScreen;
 
         std::shared_ptr<mpc::sequencer::Track> track;
         std::shared_ptr<mpc::sampler::Sampler> sampler;

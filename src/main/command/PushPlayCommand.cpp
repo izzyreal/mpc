@@ -34,8 +34,8 @@ namespace mpc::command {
             return;
         }
 
-        const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        const bool isPlayAndRecordScreen = lcdgui::screengroups::isPlayAndRecordScreen(currentScreenName);
+        const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
+        const bool isPlayAndRecordScreen = lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
 
         const auto recButtonIsPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
                                                 mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
@@ -68,12 +68,12 @@ namespace mpc::command {
             }
             else
             {
-                if (!lcdgui::screengroups::isPlayScreen(currentScreenName))
+                if (!lcdgui::screengroups::isPlayScreen(currentScreen))
                 {
                     mpc.getLayeredScreen()->openScreen<SequencerScreen>();
                 }
 
-                sequencer->setSongModeEnabled(currentScreenName == "song");
+                sequencer->setSongModeEnabled(mpc.getLayeredScreen()->isCurrentScreen<SongScreen>());
                 sequencer->play();
             }
         }

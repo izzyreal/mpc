@@ -2,14 +2,17 @@
 
 #include "lcdgui/ScreenGroups.h"
 
+#include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace mpc::lcdgui::util {
 
-static std::vector<std::string> getTypableFields(const std::string screenName)
+inline const std::vector<std::string>& getTypableFields(const std::string& screenName)
 {
-    static const std::unordered_map<std::string, std::vector<std::string>> typableFields {
+    static const std::unordered_map<std::string, std::vector<std::string>> typableFields
+    {
         { "sequencer",      { "tempo", "now0", "now1", "now2", "velo" } },
         { "trim",           { "st", "end" } },
         { "loop-end-fine",  { "end", "lngth" } },
@@ -22,29 +25,54 @@ static std::vector<std::string> getTypableFields(const std::string screenName)
         { "loop",           { "to", "endlengthvalue" } },
     };
 
-    if (typableFields.count(screenName) == 0) return {};
+    static const std::vector<std::string> empty;
 
-    return typableFields.at(screenName);
+    auto it = typableFields.find(screenName);
+
+    if (it != typableFields.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        return empty;
+    }
 }
 
-static bool isTypableField(const std::string screenName, const std::string fieldName)
+inline bool isTypableField(const std::string& screenName, const std::string& fieldName)
 {
-    for (auto &f : getTypableFields(screenName))
+    for (const auto& f : getTypableFields(screenName))
     {
-        if (f == fieldName) return true;
+        if (f == fieldName)
+        {
+            return true;
+        }
     }
 
     return false;
 }
 
-static bool isFieldSplittable(const std::string screenName, const std::string fieldName)
+inline bool isFieldSplittable(const std::shared_ptr<mpc::lcdgui::ScreenComponent>& screen,
+                              const std::string& fieldName)
 {
-    return lcdgui::screengroups::isSamplerScreen(screenName) &&
-        (fieldName == "st" ||
-         fieldName == "end" ||
-         fieldName == "to" ||
-         fieldName == "endlengthvalue" ||
-         fieldName == "start");
+    using namespace mpc::lcdgui::screengroups;
+
+    if (!isSamplerScreen(screen))
+    {
+        return false;
+    }
+
+    if (fieldName == "st"
+        || fieldName == "end"
+        || fieldName == "to"
+        || fieldName == "endlengthvalue"
+        || fieldName == "start")
+    {
+        return true;
+    }
+
+    return false;
 }
-}
+
+} // namespace mpc::lcdgui::util
 

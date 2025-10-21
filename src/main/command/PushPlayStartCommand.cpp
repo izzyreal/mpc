@@ -17,8 +17,8 @@ namespace mpc::command {
             return;
         }
 
-        const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        const bool currentScreenAllowsPlayAndRecord = lcdgui::screengroups::isPlayAndRecordScreen(currentScreenName);
+        const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
+        const bool currentScreenAllowsPlayAndRecord = lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
 
         auto hardware = mpc.getHardware();
 
@@ -54,12 +54,12 @@ namespace mpc::command {
             }
             else
             {
-                if (!lcdgui::screengroups::isPlayScreen(currentScreenName))
+                if (!lcdgui::screengroups::isPlayScreen(currentScreen))
                 {
                     mpc.getLayeredScreen()->openScreen<SequencerScreen>();
                 }
 
-                mpc.getSequencer()->setSongModeEnabled(currentScreenName == "song");
+                mpc.getSequencer()->setSongModeEnabled(mpc.getLayeredScreen()->isCurrentScreen<SongScreen>());
                 mpc.getSequencer()->playFromStart();
             }
         }

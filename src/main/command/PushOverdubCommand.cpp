@@ -14,7 +14,7 @@ namespace mpc::command {
         mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::REC);
         mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
-        if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
+        if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreen()))
         {
             return;
         }
@@ -25,7 +25,7 @@ namespace mpc::command {
             mpc.getSequencer()->setOverdubbing(false);
         }
 
-        if (!mpc.getSequencer()->isPlaying() && !lcdgui::screengroups::isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreenName()))
+        if (!mpc.getSequencer()->isPlaying() && !lcdgui::screengroups::isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreen()))
         {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }
