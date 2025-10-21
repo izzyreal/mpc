@@ -13,12 +13,19 @@ ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc& mpc, int i)
 
 void ReleaseFunctionCommand::execute()
 {
-    const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-
+    const auto ls = mpc.getLayeredScreen();
     switch (i) {
     case 0:
-        if (currentScreenName == "step-timing-correct")
+        if (ls->isCurrentScreen<StepTcScreen>())
+        {
             mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+        }
+        break;
+    case 2:
+        if (ls->isCurrentScreen<LoadASoundScreen>())
+        {
+            mpc.getSampler()->finishBasicVoice();
+        }
         break;
     case 4:
         if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<LoadScreen>())
@@ -31,15 +38,18 @@ void ReleaseFunctionCommand::execute()
         auto sequencer = mpc.getSequencer();
         auto sampler = mpc.getSampler();
 
-        if (!sequencer->isPlaying() && currentScreenName != "sequencer")
+        if (!sequencer->isPlaying() && !ls->isCurrentScreen<SequencerScreen>())
+        {
             sampler->finishBasicVoice();
+        }
 
-        if (currentScreenName == "track-mute")
+        if (ls->isCurrentScreen<TrMuteScreen>())
         {
             if (!sequencer->isSoloEnabled())
             {
                 mpc.getLayeredScreen()->setCurrentBackground("track-mute");
             }
+
             sequencer->setSoloEnabled(sequencer->isSoloEnabled());
         }
         else if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<DirectoryScreen>())
