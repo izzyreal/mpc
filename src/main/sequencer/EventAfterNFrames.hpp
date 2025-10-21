@@ -7,7 +7,7 @@ namespace mpc::sequencer {
 
     struct EventAfterNFrames {
         std::atomic<bool> occupied = ATOMIC_VAR_INIT(false);
-        std::function<void(unsigned int)> f = [](unsigned int frameIndex) {};
+        std::function<void(unsigned int)> f = [](unsigned int /*frameIndex*/) {};
         unsigned long nFrames = 0;
         unsigned long frameCounter = -1;
 
@@ -18,7 +18,7 @@ namespace mpc::sequencer {
         }
 
         void reset() {
-            f = [](unsigned int frameIndex) {};
+            f = [](unsigned int /*frameIndex*/) {};
             nFrames = 0;
             frameCounter = -1;
             occupied.store(false);

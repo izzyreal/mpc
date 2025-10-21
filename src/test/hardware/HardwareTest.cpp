@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 using namespace mpc::hardware;
 using namespace mpc::input;

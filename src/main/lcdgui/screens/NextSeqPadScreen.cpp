@@ -1,6 +1,6 @@
 #include "NextSeqPadScreen.hpp"
 
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 using namespace mpc::lcdgui::screens;
 

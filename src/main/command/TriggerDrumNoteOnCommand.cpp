@@ -1,7 +1,7 @@
-#include "TriggerDrumNoteOnCommand.h"
+#include "TriggerDrumNoteOnCommand.hpp"
 
 #include "audiomidi/EventHandler.hpp"
-#include "command/context/TriggerDrumNoteOnContext.h"
+#include "command/context/TriggerDrumNoteOnContext.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/FrameSeq.hpp"

@@ -2,7 +2,6 @@
 #define _LOGGER_
 
 #pragma once
-#include <stdio.h>
 #include <string>
 
 namespace mpc {

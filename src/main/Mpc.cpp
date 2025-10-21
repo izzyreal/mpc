@@ -22,15 +22,15 @@
 #include "engine/PreviewSoundPlayer.hpp"
 #include "engine/Drum.hpp"
 
-#include <hardware/Hardware.h>
+#include <hardware/Hardware.hpp>
 
 #include <lcdgui/Screens.hpp>
-#include "lcdgui/ScreenNames.h"
+#include "lcdgui/ScreenNames.hpp"
 
 #include "MpcResourceUtil.hpp"
-#include "hardware/ComponentId.h"
+#include "hardware/ComponentId.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
-#include "controller/ClientInputController.h"
+#include "controller/ClientInputController.hpp"
 
 #include <string>
 

@@ -2,8 +2,8 @@
 
 #include "Mpc.hpp"
 
-#include "controller/ClientInputControllerBase.h"
-#include "hardware/Hardware.h"
+#include "controller/ClientInputControllerBase.hpp"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"

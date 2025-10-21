@@ -1,5 +1,5 @@
 #include "MixerScreen.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>

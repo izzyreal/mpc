@@ -1,4 +1,4 @@
-#include "PushRightCommand.h"
+#include "PushRightCommand.hpp"
 #include "Mpc.hpp"
 
 namespace mpc::command {

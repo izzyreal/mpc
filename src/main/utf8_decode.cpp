@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "utf8_decode.h"
+#include "utf8_decode.hpp"
 
 /*
 Very Strict UTF-8 Decoder

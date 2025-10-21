@@ -1,6 +1,6 @@
-#include "PushNextSeqCommand.h"
+#include "PushNextSeqCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 #include "Util.hpp"
 
 namespace mpc::command {

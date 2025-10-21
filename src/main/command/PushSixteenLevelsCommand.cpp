@@ -1,6 +1,6 @@
-#include "PushSixteenLevelsCommand.h"
+#include "PushSixteenLevelsCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 namespace mpc::command {
 

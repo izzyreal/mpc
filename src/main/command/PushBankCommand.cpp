@@ -1,4 +1,4 @@
-#include "PushBankCommand.h"
+#include "PushBankCommand.hpp"
 #include "Mpc.hpp"
 
 namespace mpc::command {

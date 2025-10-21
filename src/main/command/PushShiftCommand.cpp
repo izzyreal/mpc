@@ -1,7 +1,7 @@
-#include "PushShiftCommand.h"
+#include "PushShiftCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.h"
-#include "hardware/Hardware.h"
+#include "controller/ClientInputControllerBase.hpp"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
 #include "sequencer/Sequencer.hpp"
 

@@ -1,5 +1,4 @@
 #include <sequencer/MidiClockEvent.hpp>
-#include <assert.h>
 
 using namespace mpc::sequencer;
 

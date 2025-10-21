@@ -1,4 +1,4 @@
-#include "PushGoToCommand.h"
+#include "PushGoToCommand.hpp"
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 

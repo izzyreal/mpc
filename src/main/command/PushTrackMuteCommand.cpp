@@ -1,7 +1,7 @@
-#include "PushTrackMuteCommand.h"
+#include "PushTrackMuteCommand.hpp"
 #include "Mpc.hpp"
 #include "Util.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 #include "lcdgui/screens/NextSeqScreen.hpp"
 #include "lcdgui/screens/NextSeqPadScreen.hpp"

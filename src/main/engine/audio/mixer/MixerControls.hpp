@@ -55,7 +55,9 @@ namespace mpc::engine::audio::mixer {
 
         MixerControls(std::string name, float _smoothingFactor)
                 : MixerControls(std::move(name))
-        { smoothingFactor = _smoothingFactor; };
+        {
+            smoothingFactor = _smoothingFactor;
+        }
 
     };
 

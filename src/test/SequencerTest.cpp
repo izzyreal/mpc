@@ -3,8 +3,8 @@
 #include "TestMpc.hpp"
 #include "sequencer/Clock.hpp"
 
-#include "command/TriggerDrumNoteOffCommand.h"
-#include "command/context/TriggerDrumContextFactory.h"
+#include "command/TriggerDrumNoteOffCommand.hpp"
+#include "command/context/TriggerDrumContextFactory.hpp"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
@@ -15,8 +15,8 @@
 
 #include <file/all/Defaults.hpp>
 
-#include "hardware/Hardware.h"
-#include "hardware/HardwareComponent.h"
+#include "hardware/Hardware.hpp"
+#include "hardware/HardwareComponent.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;

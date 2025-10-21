@@ -11,7 +11,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 #include "sequencer/TimeSignature.hpp"
 
 #include <file/all/AllParser.hpp>

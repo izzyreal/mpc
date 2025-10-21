@@ -1,10 +1,10 @@
-#include "command/context/TriggerDrumContextFactory.h"
+#include "command/context/TriggerDrumContextFactory.hpp"
 
-#include "controller/ClientInputControllerBase.h"
-#include "lcdgui/ScreenGroups.h"
+#include "controller/ClientInputControllerBase.hpp"
+#include "lcdgui/ScreenGroups.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"

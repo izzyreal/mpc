@@ -1,9 +1,9 @@
-#include "SplitRightCommand.h"
+#include "SplitRightCommand.hpp"
 #include "Mpc.hpp"
-#include "command/PushRightCommand.h"
-#include "hardware/Hardware.h"
+#include "command/PushRightCommand.hpp"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
-#include "lcdgui/LcdGuiUtil.h"
+#include "lcdgui/LcdGuiUtil.hpp"
 
 namespace mpc::command {
 

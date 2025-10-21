@@ -1,4 +1,4 @@
-#include "PushUndoSeqCommand.h"
+#include "PushUndoSeqCommand.hpp"
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 

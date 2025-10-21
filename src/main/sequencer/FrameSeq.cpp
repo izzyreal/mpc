@@ -4,8 +4,8 @@
 
 #include "audiomidi/AudioMidiServices.hpp"
 
-#include "controller/ClientInputControllerBase.h"
-#include "hardware/Hardware.h"
+#include "controller/ClientInputControllerBase.hpp"
+#include "hardware/Hardware.hpp"
 
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"

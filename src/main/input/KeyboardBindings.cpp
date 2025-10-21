@@ -1,4 +1,4 @@
-#include "input/KeyboardBindings.h"
+#include "input/KeyboardBindings.hpp"
 
 using namespace mpc::input;
 

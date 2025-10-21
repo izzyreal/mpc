@@ -1,6 +1,6 @@
-#include "PushFullLevelCommand.h"
+#include "PushFullLevelCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 

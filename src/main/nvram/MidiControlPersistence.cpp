@@ -1,7 +1,7 @@
 #include "MidiControlPersistence.hpp"
 
-#include "hardware/Hardware.h"
-#include "hardware/HardwareComponent.h"
+#include "hardware/Hardware.hpp"
+#include "hardware/HardwareComponent.hpp"
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include <StrUtil.hpp>

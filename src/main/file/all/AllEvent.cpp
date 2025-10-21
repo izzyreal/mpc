@@ -17,7 +17,8 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-#include <assert.h>
+
+#include <cassert>
 #include <cmath>
 
 #include <file/BitUtil.hpp>

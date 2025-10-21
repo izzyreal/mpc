@@ -7,8 +7,8 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/MidiOutput.hpp>
 
-#include "hardware/Hardware.h"
-#include "hardware/HardwareComponent.h"
+#include "hardware/Hardware.hpp"
+#include "hardware/HardwareComponent.hpp"
 
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>

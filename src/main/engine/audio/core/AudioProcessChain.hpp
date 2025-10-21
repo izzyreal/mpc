@@ -4,8 +4,6 @@
 #include <engine/audio/core/AudioControlsChain.hpp>
 #include <engine/audio/core/AudioControls.hpp>
 
-#include <cstdint>
-
 namespace mpc::engine::audio::core {
 
     class AudioProcessChain
@@ -27,7 +25,8 @@ namespace mpc::engine::audio::core {
         virtual std::string getName();
 
     public:
-        virtual std::shared_ptr<AudioProcess> createProcess(std::shared_ptr<AudioControls> controls) {
+        virtual std::shared_ptr<AudioProcess> createProcess(std::shared_ptr<AudioControls>)
+        {
             return {};
         }
 

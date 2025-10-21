@@ -2,14 +2,6 @@
 
 #include <engine/audio/mixer/LCRControl.hpp>
 
-#define _USE_MATH_DEFINES
-
-#include <cmath>
-
-#define _USE_MATH_DEFINES
-
-#include <math.h>
-
 namespace mpc::engine::audio::mixer {
 
     class PanControl : public LCRControl

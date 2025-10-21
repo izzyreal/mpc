@@ -1,5 +1,5 @@
 #include "VmpcResetKeyboardScreen.hpp"
-#include "controller/ClientInputControllerBase.h"
+#include "controller/ClientInputControllerBase.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

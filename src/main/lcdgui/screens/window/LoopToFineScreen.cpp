@@ -1,5 +1,5 @@
 #include "LoopToFineScreen.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>

@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "hardware/ComponentId.h"
+#include "hardware/ComponentId.hpp"
 
 /**
  * This class handles typing a name in the NameScreen via the pads (old mobile phone style).

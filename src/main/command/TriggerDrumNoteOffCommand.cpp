@@ -1,7 +1,7 @@
-#include "TriggerDrumNoteOffCommand.h"
+#include "TriggerDrumNoteOffCommand.hpp"
 
 #include "audiomidi/EventHandler.hpp"
-#include "command/context/TriggerDrumNoteOffContext.h"
+#include "command/context/TriggerDrumNoteOffContext.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"

@@ -1,7 +1,7 @@
 #include "Sampler.hpp"
 
 #include <Mpc.hpp>
-#include "MpcSpecs.h"
+#include "MpcSpecs.hpp"
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/WavInputStringStream.hpp>
 

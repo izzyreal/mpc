@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MpcSpecs.h"
+#include "MpcSpecs.hpp"
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 

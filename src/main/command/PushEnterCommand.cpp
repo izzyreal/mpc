@@ -1,6 +1,6 @@
-#include "PushEnterCommand.h"
+#include "PushEnterCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 namespace mpc::command {
 

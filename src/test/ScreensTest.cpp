@@ -7,7 +7,7 @@
 #include <sampler/Sampler.hpp>
 
 #include <lcdgui/Layer.hpp>
-#include "lcdgui/ScreenNames.h"
+#include "lcdgui/ScreenNames.hpp"
 
 #include <vector>
 #include <string>

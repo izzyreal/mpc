@@ -3,7 +3,7 @@
 #include "Logger.hpp"
 
 #ifdef __APPLE__
-#include "MacBundleResources.h"
+#include "MacBundleResources.hpp"
 #define MAC_BUNDLE_RESOURCES 1
 #endif
 

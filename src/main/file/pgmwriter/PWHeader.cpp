@@ -1,6 +1,6 @@
 #include "PWHeader.hpp"
 
-#include "MpcSpecs.h"
+#include "MpcSpecs.hpp"
 #include "file/ByteUtil.hpp"
 
 #include <cassert>

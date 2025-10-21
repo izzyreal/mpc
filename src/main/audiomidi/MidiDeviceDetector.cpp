@@ -1,6 +1,5 @@
 #include "MidiDeviceDetector.hpp"
 
-#include "RtMidi.h"
 #include "Mpc.hpp"
 #include "Paths.hpp"
 
@@ -9,10 +8,10 @@
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
-#include <vector>
+#include <RtMidi.h>
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <Windows.hpp>
 #endif
 
 using namespace mpc::audiomidi;

@@ -1,6 +1,6 @@
-#include "NoteInputScreenUpdateCommand.h"
+#include "NoteInputScreenUpdateCommand.hpp"
 
-#include "command/context/NoteInputScreenUpdateContext.h"
+#include "command/context/NoteInputScreenUpdateContext.hpp"
 
 #include "lcdgui/screens/WithTimesAndNotes.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"

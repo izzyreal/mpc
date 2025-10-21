@@ -1,7 +1,7 @@
-#include "PushMainScreenCommand.h"
+#include "PushMainScreenCommand.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 namespace mpc::command {
 

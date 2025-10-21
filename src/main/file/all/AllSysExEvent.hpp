@@ -17,9 +17,9 @@ private:
     const static int DATA_OFFSET = 8;
     const static int MIX_TERMINATOR_ID_OFFSET = 28;
     const static int DATA_HEADER_ID_OFFSET = 8;
-    const static char HEADER_ID = 240;
-    const static char DATA_TERMINATOR_ID = 247;
-    const static char CHUNK_TERMINATOR_ID = 248;
+    static constexpr uint8_t HEADER_ID = 240;
+    static constexpr uint8_t DATA_TERMINATOR_ID = 247;
+    static constexpr uint8_t CHUNK_TERMINATOR_ID = 248;    
     const static int MIXER_SIGNATURE_OFFSET = 0;
     const static int MIXER_PARAMETER_OFFSET = 5;
     const static int MIXER_PAD_OFFSET = 6;

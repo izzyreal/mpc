@@ -1,6 +1,6 @@
 #include <sequencer/NoteEvent.hpp>
 #include <algorithm>
-#include "assert.h"
+#include <cassert>
 
 using namespace mpc::sequencer;
 using namespace mpc::engine::midi;

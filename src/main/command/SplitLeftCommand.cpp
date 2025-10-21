@@ -1,10 +1,10 @@
-#include "SplitLeftCommand.h"
+#include "SplitLeftCommand.hpp"
 #include "Mpc.hpp"
 
-#include "PushLeftCommand.h"
-#include "hardware/Hardware.h"
+#include "PushLeftCommand.hpp"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
-#include "lcdgui/LcdGuiUtil.h"
+#include "lcdgui/LcdGuiUtil.hpp"
 
 namespace mpc::command {
 

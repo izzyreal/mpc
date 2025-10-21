@@ -2,8 +2,8 @@
 
 #include "Logger.hpp"
 
-#include "lcdgui/ScreenNames.h"
-#include "lcdgui/AllScreens.h"
+#include "lcdgui/ScreenNames.hpp"
+#include "lcdgui/AllScreens.hpp"
 
 #include <lcdgui/Component.hpp>
 #include <lcdgui/Parameter.hpp>

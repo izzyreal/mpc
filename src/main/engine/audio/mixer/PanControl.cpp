@@ -2,6 +2,8 @@
 #include <engine/audio/mixer/MixControls.hpp>
 #include <engine/control/LinearLaw.hpp>
 
+#include <cmath>
+
 using namespace mpc::engine::audio::mixer;
 
 PanControl::PanControl()

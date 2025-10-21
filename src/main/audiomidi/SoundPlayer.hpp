@@ -4,12 +4,10 @@
 
 #include <sampler/Sound.hpp>
 
-#include "circular_buffer.hpp"
 #include <samplerate.h>
 
 #include "readerwriterqueue.h"
 
-#include <fstream>
 #include <memory>
 #include <atomic>
 #include <thread>

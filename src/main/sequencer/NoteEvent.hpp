@@ -3,7 +3,7 @@
 #include <engine/midi/ShortMessage.hpp>
 #include <optional>
 #include <memory>
-#include "assert.h"
+#include <cassert>
 
 namespace mpc::sequencer
 {

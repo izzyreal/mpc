@@ -1,6 +1,6 @@
-#include "PushTapCommand.h"
+#include "PushTapCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.h"
+#include "controller/ClientInputControllerBase.hpp"
 #include "sequencer/Sequencer.hpp"
 
 namespace mpc::command {

@@ -1,9 +1,9 @@
 #include "lcdgui/LayeredScreen.hpp"
 
-#include "lcdgui/ScreenGroups.h"
+#include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/Screens.hpp"
-#include "lcdgui/AllScreens.h"
-#include "lcdgui/ScreenRegistry.h"
+#include "lcdgui/AllScreens.hpp"
+#include "lcdgui/ScreenRegistry.hpp"
 
 #include "BasicStructs.hpp"
 
@@ -28,7 +28,7 @@
 
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 #if __linux__
 #include <climits>

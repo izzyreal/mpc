@@ -1,6 +1,6 @@
-#include "lcdgui/ScreenGroups.h"
+#include "lcdgui/ScreenGroups.hpp"
 
-#include "lcdgui/AllScreens.h"
+#include "lcdgui/AllScreens.hpp"
 #include <memory>
 
 namespace mpc::lcdgui::screengroups {

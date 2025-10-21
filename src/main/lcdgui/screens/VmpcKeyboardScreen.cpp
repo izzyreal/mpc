@@ -8,7 +8,7 @@
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>
 
-#include "controller/ClientInputControllerBase.h"
+#include "controller/ClientInputControllerBase.hpp"
 #include "input/KeyCodeHelper.hpp"
 
 #include <StrUtil.hpp>

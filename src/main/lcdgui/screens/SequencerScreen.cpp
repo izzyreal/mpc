@@ -1,8 +1,8 @@
 #include "SequencerScreen.hpp"
 
-#include "controller/ClientInputControllerBase.h"
-#include "hardware/ComponentId.h"
-#include "hardware/Hardware.h"
+#include "controller/ClientInputControllerBase.hpp"
+#include "hardware/ComponentId.hpp"
+#include "hardware/Hardware.hpp"
 
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>

@@ -4,16 +4,16 @@
 
 #include <Mpc.hpp>
 
-#include "command/context/PushPadScreenUpdateContext.h"
+#include "command/context/PushPadScreenUpdateContext.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
-#include "lcdgui/ScreenGroups.h"
+#include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 
-#include "command/context/TriggerDrumContextFactory.h"
+#include "command/context/TriggerDrumContextFactory.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::command;

@@ -1,5 +1,5 @@
 #include "ZoneScreen.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>

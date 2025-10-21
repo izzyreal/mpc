@@ -1,7 +1,7 @@
 #include "file/aps/ApsHeader.hpp"
 
 #include "file/ByteUtil.hpp"
-#include "MpcSpecs.h"
+#include "MpcSpecs.hpp"
 
 #include <cassert>
 

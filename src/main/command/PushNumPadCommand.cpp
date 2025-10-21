@@ -1,10 +1,10 @@
-#include "PushNumPadCommand.h"
+#include "PushNumPadCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
-#include "lcdgui/LcdGuiUtil.h"
+#include "lcdgui/LcdGuiUtil.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::command;

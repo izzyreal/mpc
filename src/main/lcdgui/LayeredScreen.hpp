@@ -6,7 +6,7 @@
 #include <map>
 #include <deque>
 
-#include "lcdgui/screens/Fwd.h"
+#include "lcdgui/screens/Fwd.hpp"
 
 #include "BMFParser.hpp"
 

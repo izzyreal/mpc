@@ -23,8 +23,8 @@
 
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
-#include "hardware/Hardware.h"
-#include "hardware/HardwareComponent.h"
+#include "hardware/Hardware.hpp"
+#include "hardware/HardwareComponent.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

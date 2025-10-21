@@ -1,5 +1,5 @@
-#include "PushPadScreenUpdateCommand.h"
-#include "command/context/PushPadScreenUpdateContext.h"
+#include "PushPadScreenUpdateCommand.hpp"
+#include "command/context/PushPadScreenUpdateContext.hpp"
 
 #include "lcdgui/screens/AssignScreen.hpp"
 #include "lcdgui/screens/MixerScreen.hpp"

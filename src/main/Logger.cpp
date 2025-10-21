@@ -4,6 +4,7 @@
 #include <mpc_fs.hpp>
 
 #include <string>
+#include <fstream>
 
 using namespace mpc;
 

@@ -19,7 +19,7 @@
 #include <thread>
 
 #ifdef __linux__
-#include <pthread.h>
+#include <pthread.hpp>
 #endif // __linux__
 
 using namespace mpc::sampler;

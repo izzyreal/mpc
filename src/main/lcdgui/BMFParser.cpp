@@ -6,12 +6,10 @@
 
 #include <Logger.hpp>
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <string>
 
 using namespace mpc::lcdgui;
-
-using namespace std;
 
 BMFParser::BMFParser(char* fntData, int fntSize, char* bmpData, int bmpSize)
 {
@@ -19,7 +17,7 @@ BMFParser::BMFParser(char* fntData, int fntSize, char* bmpData, int bmpSize)
 		MLOG("Loaded BMFont data correctly.\n");
     
 	Bitmap image;
-	vector<vector<Pixel>> bmp;
+    std::vector<std::vector<Pixel>> bmp;
 
     image.openFromData(bmpData, bmpSize);
     
@@ -30,7 +28,7 @@ BMFParser::BMFParser(char* fntData, int fntSize, char* bmpData, int bmpSize)
 
 	for (auto& row : bmp)
 	{
-		vector<bool> boolRow;
+        std::vector<bool> boolRow;
 		
         for (auto& column : row)
 			boolRow.push_back(!column.on);
@@ -61,7 +59,7 @@ bool BMFParser::GetBMFontData(const char* pBinary, size_t fileSize, bmfont* pBMF
 	while (!stream.isEOF())
 	{
 		uint8_t blockID = stream.getU8();
-		MLOG("Parsing font blockID " + to_string(blockID));
+		MLOG("Parsing font blockID " + std::to_string(blockID));
 		int32_t blockSize = stream.getU32();
 		switch (blockID)
 		{

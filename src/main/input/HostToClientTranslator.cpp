@@ -1,11 +1,11 @@
-#include "input/HostToClientTranslator.h"
-#include "hardware/ComponentId.h"
-#include "input/ClientInput.h"
-#include "input/KeyboardBindings.h"
+#include "input/HostToClientTranslator.hpp"
+#include "hardware/ComponentId.hpp"
+#include "input/ClientInput.hpp"
+#include "input/KeyboardBindings.hpp"
 
 #include "input/KeyCodeHelper.hpp"
 
-#include "hardware/HardwareComponent.h"
+#include "hardware/HardwareComponent.hpp"
 
 #include <stdexcept>
 

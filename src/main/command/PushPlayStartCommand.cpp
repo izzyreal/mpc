@@ -1,9 +1,9 @@
-#include "PushPlayStartCommand.h"
+#include "PushPlayStartCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.h"
-#include "hardware/ComponentId.h"
-#include "hardware/Hardware.h"
-#include "lcdgui/ScreenGroups.h"
+#include "controller/ClientInputControllerBase.hpp"
+#include "hardware/ComponentId.hpp"
+#include "hardware/Hardware.hpp"
+#include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
 namespace mpc::command {

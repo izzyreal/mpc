@@ -1,6 +1,6 @@
-#include "ReleaseOverdubCommand.h"
+#include "ReleaseOverdubCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;

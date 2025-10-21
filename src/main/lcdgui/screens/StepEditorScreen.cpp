@@ -3,7 +3,7 @@
 
 #include <audiomidi/EventHandler.hpp>
 
-#include "hardware/Hardware.h"
+#include "hardware/Hardware.hpp"
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/StepTcScreen.hpp>

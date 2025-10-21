@@ -2,7 +2,7 @@
 
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
-#include "MpcSpecs.h"
+#include "MpcSpecs.hpp"
 
 #include <memory>
 #include <string>

@@ -16,7 +16,7 @@
 #include "engine/audio/mixer/PanControl.hpp"
 #include "engine/control/CompoundControl.hpp"
 
-#include "engine/NoteEventProcessor.h"
+#include "engine/NoteEventProcessor.hpp"
 
 #include <utility>
 

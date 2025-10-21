@@ -21,7 +21,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
-#include "command/AllCommands.h"
+#include "command/AllCommands.hpp"
 
 namespace mpc::lcdgui
 {

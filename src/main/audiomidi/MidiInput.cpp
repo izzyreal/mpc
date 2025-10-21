@@ -1,24 +1,24 @@
 #include "MidiInput.hpp"
-#include "command/TriggerDrumNoteOnCommand.h"
-#include "command/PushPadScreenUpdateCommand.h"
-#include "command/TriggerDrumNoteOffCommand.h"
-#include "command/ReleaseTapCommand.h"
-#include "command/context/NoteInputScreenUpdateContext.h"
-#include "controller/ClientInputControllerBase.h"
-#include "command/context/PushPadScreenUpdateContext.h"
-#include "command/context/TriggerDrumContextFactory.h"
+#include "command/TriggerDrumNoteOnCommand.hpp"
+#include "command/PushPadScreenUpdateCommand.hpp"
+#include "command/TriggerDrumNoteOffCommand.hpp"
+#include "command/ReleaseTapCommand.hpp"
+#include "command/context/NoteInputScreenUpdateContext.hpp"
+#include "controller/ClientInputControllerBase.hpp"
+#include "command/context/PushPadScreenUpdateContext.hpp"
+#include "command/context/TriggerDrumContextFactory.hpp"
 
-#include "input/ClientInput.h"
+#include "input/ClientInput.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
 
-#include "hardware/Hardware.h"
-#include "hardware/HardwareComponent.h"
+#include "hardware/Hardware.hpp"
+#include "hardware/HardwareComponent.hpp"
 
-#include "lcdgui/ScreenGroups.h"
+#include "lcdgui/ScreenGroups.hpp"
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>

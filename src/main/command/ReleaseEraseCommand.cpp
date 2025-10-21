@@ -1,4 +1,4 @@
-#include "ReleaseEraseCommand.h"
+#include "ReleaseEraseCommand.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 

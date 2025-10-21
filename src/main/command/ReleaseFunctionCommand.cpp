@@ -1,4 +1,4 @@
-#include "ReleaseFunctionCommand.h"
+#include "ReleaseFunctionCommand.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/SoundPlayer.hpp"

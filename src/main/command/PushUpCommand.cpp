@@ -1,4 +1,4 @@
-#include "PushUpCommand.h"
+#include "PushUpCommand.hpp"
 #include "Mpc.hpp"
 
 namespace mpc::command {

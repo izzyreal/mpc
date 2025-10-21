@@ -1,14 +1,13 @@
 #include "LoopScreen.hpp"
-#include "command/SplitLeftCommand.h"
-#include "command/SplitRightCommand.h"
-#include "hardware/Hardware.h"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
+#include "hardware/Hardware.hpp"
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 
-#include <stdint.h>
-#include <limits.h>
+#include <climits>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;

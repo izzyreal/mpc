@@ -1,6 +1,6 @@
 #include "PgmHeader.hpp"
 
-#include "MpcSpecs.h"
+#include "MpcSpecs.hpp"
 
 #include "file/pgmreader/ProgramFileReader.hpp"
 

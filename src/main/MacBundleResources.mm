@@ -1,6 +1,6 @@
 #ifdef __APPLE__
 
-#include "MacBundleResources.h"
+#include "MacBundleResources.hpp"
 #import <Foundation/Foundation.h>
 #include <TargetConditionals.h>
 

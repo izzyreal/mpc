@@ -1,8 +1,8 @@
 #include "VmpcMidiControlMode.hpp"
 
-#include "hardware/ComponentId.h"
-#include "hardware/Hardware.h"
-#include "hardware/HardwareComponent.h"
+#include "hardware/ComponentId.hpp"
+#include "hardware/Hardware.hpp"
+#include "hardware/HardwareComponent.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 

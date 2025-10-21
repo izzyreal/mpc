@@ -1,4 +1,4 @@
-#include "NoteEventProcessor.h"
+#include "NoteEventProcessor.hpp"
 
 #include "Voice.hpp"
 #include "StereoMixer.hpp"
