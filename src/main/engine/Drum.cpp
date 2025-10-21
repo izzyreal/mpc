@@ -15,6 +15,9 @@
 #include "engine/audio/mixer/MainMixControls.hpp"
 #include "engine/audio/mixer/PanControl.hpp"
 #include "engine/control/CompoundControl.hpp"
+
+#include "engine/NoteEventProcessor.h"
+
 #include <utility>
 
 using namespace mpc::lcdgui::screens;
@@ -93,136 +96,6 @@ void Drum::setLastReceivedMidiVolume(int volume)
 	lastReceivedMidiVolume = volume;
 }
 
-void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOffset, bool firstGeneration, int startTick, int durationFrames)
-{
-	if (note < 35 || note > 98 || velo == 0)
-		return;
-
-	auto program = sampler->getProgram(programNumber);
-	auto np = program->getNoteParameters(note);
-
-	checkForMutes(np);
-	auto soundNumber = np->getSoundIndex();
-
-	std::shared_ptr<Voice> voice;
-
-	for (auto& v : voices)
-	{
-		if (v->isFinished())
-		{
-			voice = v;
-			break;
-		}
-	}
-
-	if (soundNumber == -1 || !voice)
-		return;
-
-	auto sound = sampler->getSound(soundNumber);
-
-	auto smc = program->getStereoMixerChannel(note - 35);
-	auto ifmc = program->getIndivFxMixerChannel(note - 35);
-
-	bool sSrcDrum = mixerSetupScreen->isStereoMixSourceDrum();
-	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
-
-	if (sSrcDrum)
-		smc = stereoMixerChannels[note - 35];
-
-	if (iSrcDrum)
-		ifmc = indivFxMixerChannels[note - 35];
-
-    auto mixerControls = mixer->getMixerControls();
-
-	auto sc = mixerControls->getStripControls(std::to_string(voice->getStripNumber()));
-
-	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))->setValue(static_cast<float>(smc->getPanning() / 100.0));
-	std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(smc->getLevel()));
-
-	sc = mixerControls->getStripControls(std::to_string(voice->getStripNumber() + 32));
-	mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-
-	//We make sure the voice strip duplicages that are used for mixing to ASSIGNABLE MIX OUT are not mixed into Main.
-	auto faderControl = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
-	faderControl->setValue(0);
-
-	if (ifmc->getOutput() > 0)
-	{
-		if (sound->isMono())
-		{
-			if (ifmc->getOutput() % 2 == 1)
-			{
-				mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(true);
-				mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(false);
-			}
-			else
-			{
-				mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(false);
-				mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(true);
-			}
-		}
-		else
-		{
-			mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(true);
-			mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(true);
-		}
-	}
-
-	/*
-	* We iterate through AUX#1 - #4 (aka ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8).
-	* We silence the aux buses that are not in use by this voice.
-	* We set the level for the MIX OUT that is in use, if any.
-	*/
-	int selectedAssignableMixOutPair = static_cast<int>(ceil((ifmc->getOutput() - 2) * 0.5));
-
-	for (int i = 0; i < 4; i++)
-	{
-		auto auxControl = std::dynamic_pointer_cast<mpc::engine::control::CompoundControl>(sc->find("AUX#" + std::to_string(i + 1)));
-		auto auxLevel = std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
-
-		if (i == selectedAssignableMixOutPair)
-		{
-			auto value = static_cast<float>(ifmc->getVolumeIndividualOut());
-			auxLevel->setValue(value);
-		}
-		else
-		{
-            auxLevel->setValue(0);
-		}
-	}
-
-    if (!sound->isLoopEnabled() && np->getVoiceOverlap() == VoiceOverlapMode::MONO)
-    {
-        stopMonoOrPolyVoiceWithSameNoteParameters(np, note);
-    }
-
-	voice->init(velo, sound, note, np, varType, varValue, note, drumIndex, frameOffset, true, startTick, durationFrames, mixer->getSharedBuffer()->getSampleRate());
-
-	if (firstGeneration)
-	{
-		if (np->getSoundGenerationMode() == 1)
-		{
-			int optA = np->getOptionalNoteA();
-			int optB = np->getOptionalNoteB();
-
-			if (optA != 34)
-			{
-				mpcNoteOn(optA, velo, varType, varValue, frameOffset, false, startTick, durationFrames);
-				simultA[note] = optA;
-			}
-
-			if (optB != 34)
-			{
-				mpcNoteOn(optB, velo, varType, varValue, frameOffset, false, startTick, durationFrames);
-				simultB[note] = optB;
-			}
-		}
-	}
-}
-
-
-
 void Drum::checkForMutes(NoteParameters* np)
 {
 	if (np->getMuteAssignA() != 34 || np->getMuteAssignB() != 34)
@@ -281,28 +154,34 @@ std::vector<std::shared_ptr<IndivFxMixer>>& Drum::getIndivFxMixerChannels()
 	return indivFxMixerChannels;
 }
 
+void Drum::mpcNoteOn(int note, int velo, int varType, int varValue,
+                     int frameOffset, bool firstGeneration,
+                     int startTick, int durationFrames)
+{
+    NoteEventProcessor::noteOn(
+        *sampler,
+        *mixer,
+        mixerSetupScreen,
+        voices,
+        stereoMixerChannels,
+        indivFxMixerChannels,
+        mixerConnections,
+        simultA,
+        simultB,
+        drumIndex,
+        programNumber,
+        note, velo, varType, varValue,
+        frameOffset, firstGeneration, startTick, durationFrames
+    );
+}
+
 void Drum::mpcNoteOff(int note, int frameOffset, int noteOnStartTick)
 {
-	if (note < 35 || note > 98)
-		return;
-
-    startDecayForNote(note, frameOffset, noteOnStartTick);
-
-	auto it = simultA.find(note);
-
-	if (it != simultA.end())
-	{
-		startDecayForNote(simultA[note], frameOffset, noteOnStartTick);
-		simultA.erase(it);
-	}
-
-	it = simultB.find(note);
-
-	if (it != simultB.end())
-	{
-		startDecayForNote(simultB[note], frameOffset, noteOnStartTick);
-		simultB.erase(it);
-	}
+    NoteEventProcessor::noteOff(
+        voices, simultA, simultB,
+        drumIndex,
+        note, frameOffset, noteOnStartTick
+    );
 }
 
 void Drum::startDecayForNote(const int note, const int frameOffset, const int noteOnStartTick)
