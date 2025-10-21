@@ -17,6 +17,6 @@ void VmpcWarningSettingsIgnoredScreen::function(int i)
     }
     else if (i == 4)
     {
-        mpc.getLayeredScreen()->openPreviousScreen();
+        mpc.getLayeredScreen()->closeCurrentScreen();
     }
 }

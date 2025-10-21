@@ -87,7 +87,7 @@ void ScreenComponent::openWindow()
         return;
     }
     
-    mpc.getLayeredScreen()->closeWindow();
+    mpc.getLayeredScreen()->closeCurrentScreen();
 }
 
 mpc::engine::Drum& ScreenComponent::activeDrum()

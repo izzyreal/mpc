@@ -34,7 +34,7 @@ namespace mpc::lcdgui {
 		mpc::Mpc& mpc;
 		std::unique_ptr<Component> root;
 		std::vector<std::vector<bool>> pixels = std::vector<std::vector<bool>>(248, std::vector<bool>(60));
-        std::deque<std::shared_ptr<ScreenComponent>> navigation;
+        std::deque<std::shared_ptr<ScreenComponent>> history;
 
 	public:
 		std::vector<std::vector<bool>> atlas;
@@ -49,8 +49,6 @@ namespace mpc::lcdgui {
 		bool transfer(int direction);
 
 	public:
-        void closeScreenInFocusedLayer();
-
 		void transferLeft();
 		void transferRight();
 		void transferUp();
@@ -93,23 +91,11 @@ namespace mpc::lcdgui {
 
 		std::shared_ptr<ScreenComponent> getCurrentScreen();
 
-        void closeWindow();
+        void closeCurrentScreen();
 
-        void navigateBackToLayer(const int layerIndex);
-
-        // Seems to only be in use by VmpcKnownControllerDetectedScreen and VmpcWarningSettingsIgnoreScreen.
-        // We'll have to see if these screens deserve a different layer index, so it's always projected
-        // on top of whatever other layers exist (i.e. a new layer, layer index 4).
-        // Avoid using this for other cases.
-        void openPreviousScreen();
+        void closeRecentScreensUntilReachingLayer(const int layerIndex);
 
 	private:
-        // Seems to only be in use by VmpcKnownControllerDetectedScreen and VmpcWarningSettingsIgnoreScreen.
-        // We'll have to see if these screens deserve a different layer index, so it's always projected
-        // on top of whatever other layers exist (i.e. a new layer, layer index 4).
-        // Avoid using this for other cases.
-        std::shared_ptr<ScreenComponent> previousScreen;
-
 		std::map<std::string, std::string> lastFocuses;
 
         void openScreenInternal(std::shared_ptr<ScreenComponent>);

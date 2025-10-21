@@ -16,11 +16,11 @@ void LoadApsFileScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->closeWindow();
+            mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         case 4:
             {
-                std::function<void()> on_success = [&]() { mpc.getLayeredScreen()->navigateBackToLayer(0); };
+                std::function<void()> on_success = [&]() { mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0); };
                 auto loadScreen = mpc.screens->get<LoadScreen>();
                 mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
                 break;

@@ -56,7 +56,7 @@ void LoadASequenceScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
+        mpc.getLayeredScreen()->closeCurrentScreen();
 		sequencer.lock()->clearPlaceHolder();
 		break;
 	case 4:

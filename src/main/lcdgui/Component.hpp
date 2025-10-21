@@ -45,26 +45,24 @@ namespace mpc::lcdgui
             }
         }
         
-		template<class T>
-		std::shared_ptr<T> findChild(const std::string& nameOfChildToFind = "")
-		{
-			for (auto& c : children)
-			{
-				if (nameOfChildToFind.empty() && std::dynamic_pointer_cast<T>(c))
-					return std::dynamic_pointer_cast<T>(c);
+        template<class T>
+        std::shared_ptr<T> findChild(const std::string& nameOfChildToFind = "")
+        {
+            for (auto& c : children)
+            {
+                auto asT = std::dynamic_pointer_cast<T>(c);
+                if (asT)
+                {
+                    if (nameOfChildToFind.empty() || c->getName() == nameOfChildToFind)
+                        return asT;
+                }
 
-				if (c->getName() == nameOfChildToFind && std::dynamic_pointer_cast<T>(c))
-					return std::dynamic_pointer_cast<T>(c);
+                if (auto candidate = c->findChild<T>(nameOfChildToFind))
+                    return candidate;
+            }
 
-				auto candidate = c->findChild<T>(nameOfChildToFind);
-
-				if (candidate)
-					return candidate;
-			}
-
-			return {};
-		}
-
+            return {};
+        }
 		std::shared_ptr<Component> addChild(std::shared_ptr<Component> child);
 
         template<typename T, typename... Args>

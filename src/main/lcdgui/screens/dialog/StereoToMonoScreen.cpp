@@ -66,7 +66,7 @@ void StereoToMonoScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-        mpc.getLayeredScreen()->closeWindow();
+        mpc.getLayeredScreen()->closeCurrentScreen();
 		break;
 	case 4:
 	{
@@ -116,8 +116,7 @@ void StereoToMonoScreen::function(int i)
 		
 		left->setEnd(left->getSampleData()->size());
 		right->setEnd(right->getSampleData()->size());
-        mpc.getLayeredScreen()->closeWindow();
-		
+        mpc.getLayeredScreen()->closeCurrentScreen();
 		break;
 	}
 	}

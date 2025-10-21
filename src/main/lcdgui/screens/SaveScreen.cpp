@@ -24,6 +24,11 @@ void SaveScreen::open()
 {
     mpc.getDisk()->initFiles();
 
+    if (ls->isPreviousScreenNot<PopupScreen>())
+    {
+        device = mpc.getDiskController()->getActiveDiskIndex();
+    }
+
     for (int i = 0; i < 24; i++)
     {
         if (sampler->getProgram(i))
@@ -90,7 +95,7 @@ void SaveScreen::function(int i)
 
                 if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
                 {
-                    ls->showPopupForMs("Device is disabled in DISKS", 2000);
+                    ls->showPopupForMs("Device is disabled in DISKS", 1000);
                     return;
                 }
 

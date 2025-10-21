@@ -31,7 +31,7 @@ void Assign16LevelsScreen::function(int i)
 	{
 		mpc.setSixteenLevelsEnabled(true);
 		mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
-		mpc.getLayeredScreen()->closeWindow();
+		mpc.getLayeredScreen()->closeCurrentScreen();
 		break;
 	}
     }

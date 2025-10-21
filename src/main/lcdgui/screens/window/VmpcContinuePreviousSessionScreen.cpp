@@ -26,7 +26,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
     switch (i) {
         case 1:
             // NO
-            mpc.getLayeredScreen()->navigateBackToLayer(0);
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
             break;
         case 2:
             // YES
@@ -35,7 +35,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
         case 3:
             // NEVER
             autoSaveScreen->setAutoLoadOnStart(0);
-            mpc.getLayeredScreen()->navigateBackToLayer(0);
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
             break;
         case 4:
             // ALWAYS

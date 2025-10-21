@@ -163,7 +163,7 @@ void ClientInputController::handlePadPress(const ClientInput &input)
 
     if (std::dynamic_pointer_cast<PopupScreen>(screen))
     {
-        layeredScreen->closeWindow();
+        layeredScreen->closeCurrentScreen();
     }
 }
 
@@ -319,7 +319,7 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
 
     if (std::dynamic_pointer_cast<PopupScreen>(screen))
     {
-        layeredScreen->closeWindow();
+        layeredScreen->closeCurrentScreen();
         return;
     }
 

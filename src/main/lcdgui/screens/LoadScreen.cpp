@@ -30,7 +30,10 @@ void LoadScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    device = mpc.getDiskController()->getActiveDiskIndex();
+    if (ls->isPreviousScreenNot<PopupScreen>())
+    {
+        device = mpc.getDiskController()->getActiveDiskIndex();
+    }
 
     findField("directory")->setLocation(200, 0);
     displayView();
@@ -87,7 +90,7 @@ void LoadScreen::function(int i)
 
                     if (candidateVolume.mode == DISABLED)
                     {
-                        ls->showPopupForMs("Device is disabled in DISKS", 2000);
+                        ls->showPopupForMs("Device is disabled in DISKS", 1000);
                         return;
                     }
 

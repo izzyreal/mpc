@@ -19,6 +19,9 @@ void VmpcConvertAndLoadWavScreen::function(int i)
 {
     switch (i)
     {
+        case 3:
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
         case 4:
             loadRoutine();
             break;
