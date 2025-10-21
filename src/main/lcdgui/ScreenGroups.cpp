@@ -1,8 +1,15 @@
 #include "lcdgui/ScreenGroups.h"
 
 #include "lcdgui/AllScreens.h"
+#include <memory>
 
 namespace mpc::lcdgui::screengroups {
+
+    bool isPadDoesNotTriggerNoteEventScreen(const std::shared_ptr<ScreenComponent>& s)
+    {
+        return std::dynamic_pointer_cast<TrMuteScreen>(s)
+            || std::dynamic_pointer_cast<NextSeqPadScreen>(s);
+    }
 
     bool isStepEditorScreen(const std::shared_ptr<ScreenComponent>& s)
     {

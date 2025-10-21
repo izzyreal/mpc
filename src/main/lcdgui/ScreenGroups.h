@@ -17,6 +17,7 @@ namespace mpc::lcdgui::screengroups {
     bool isPlayScreen(const std::shared_ptr<ScreenComponent>&);
     bool isSamplerScreen(const std::shared_ptr<ScreenComponent>&);
     bool isSoundScreen(const std::shared_ptr<ScreenComponent>&);
+    bool isPadDoesNotTriggerNoteEventScreen(const std::shared_ptr<ScreenComponent>&);
 
 } // namespace mpc::lcdgui::screengroups
 

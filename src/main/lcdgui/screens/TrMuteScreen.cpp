@@ -69,7 +69,7 @@ void TrMuteScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "sq")
+	if (param == "sq" && !sequencer.lock()->isPlaying())
 	{
 		auto oldSequence = sequencer.lock()->getActiveSequence();
 

@@ -116,7 +116,7 @@ void ClientInputController::handlePadPress(const ClientInput &input)
 
     registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
 
-    if (auto nameScreen = std::dynamic_pointer_cast<NameScreen>(screen))
+    if (std::dynamic_pointer_cast<NameScreen>(screen))
     {
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(input.componentId);
         return;
@@ -124,8 +124,6 @@ void ClientInputController::handlePadPress(const ClientInput &input)
 
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
-
-    TriggerDrumNoteOnCommand(ctx).execute();
 
     const bool isF4Pressed = mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
     const bool isF6Pressed = mpc.getHardware()->getButton(ComponentId::F6)->isPressed();
@@ -163,6 +161,13 @@ void ClientInputController::handlePadPress(const ClientInput &input)
     {
         layeredScreen->closeCurrentScreen();
     }
+
+    if (screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
+    {
+        return;
+    }
+
+    TriggerDrumNoteOnCommand(ctx).execute();
 }
 
 void ClientInputController::handlePadRelease(const ClientInput &input)
@@ -174,6 +179,11 @@ void ClientInputController::handlePadRelease(const ClientInput &input)
     const auto info = registerPhysicalPadRelease(physicalPadIndex);
 
     mpc.getHardware()->getPad(physicalPadIndex)->release();
+
+    if (screengroups::isPadDoesNotTriggerNoteEventScreen(info.screen))
+    {
+        return;
+    }
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screen);
