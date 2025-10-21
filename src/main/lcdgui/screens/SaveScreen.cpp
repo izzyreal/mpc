@@ -308,8 +308,8 @@ void SaveScreen::displayFile()
         case 1:
         {
             auto num = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
-            name = sequencer.lock()->getActiveSequence()->getName();
-            fileName = num + "-" + name;
+            const auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+            fileName = num + "-" + sequenceName;
             break;
         }
         case 2:

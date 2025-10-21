@@ -29,7 +29,7 @@ void ProgramScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(program->getName(), 16, enterAction, name);
+        nameScreen->initialize(program->getName(), 16, enterAction, "program");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }

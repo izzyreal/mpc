@@ -138,7 +138,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 						xpos += alignmentOffset;
 					}
 
-					if (w == 47 && name.find("note") != std::string::npos)
+					if (w == 47 && getName().find("note") != std::string::npos)
 					{
 						// Super hacky way to cram as much text in the amount of pixels that
 						// the original leet coders of the Akai MPC2000XL OS did. Respect.
@@ -220,11 +220,6 @@ void TextComp::setDoubleInverted(bool b)
 bool TextComp::isInverted()
 {
     return (inverted && !doubleInverted) || (!inverted && doubleInverted);
-}
-
-std::string TextComp::getName()
-{
-	return name;
 }
 
 std::string TextComp::getText()

@@ -68,7 +68,7 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 
 void FunctionKey::setText(const std::string& text)
 {
-	auto label = findChild<TextComp>(name);
+	auto label = findChild<TextComp>(getName());
 	label->setText(text);
 
 	auto stringSize = label->GetTextEntryLength();

@@ -374,7 +374,7 @@ Background* LayeredScreen::getCurrentBackground()
 
 void LayeredScreen::setCurrentBackground(std::string s)
 {
-	getCurrentBackground()->setName(s);
+	getCurrentBackground()->setBackgroundName(s);
 }
 
 void LayeredScreen::returnToLastFocus(std::shared_ptr<ScreenComponent> screen, std::string firstFieldOfCurrentScreen)

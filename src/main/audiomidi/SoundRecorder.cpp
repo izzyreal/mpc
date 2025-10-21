@@ -90,7 +90,7 @@ void SoundRecorder::start()
         return;
     }
 
-    mpc.getLayeredScreen()->getCurrentBackground()->setName("recording");
+    mpc.getLayeredScreen()->getCurrentBackground()->setBackgroundName("recording");
 
     armed = false;
     recording = true;
@@ -240,7 +240,7 @@ int SoundRecorder::processAudio(AudioBuffer* buf, int nFrames)
     if (armed && (log10(peakL) * 20 > sampleScreen->threshold || log10(peakR) * 20 > sampleScreen->threshold))
     {
         armed = false;
-        mpc.getLayeredScreen()->getCurrentBackground()->setName("recording");
+        mpc.getLayeredScreen()->getCurrentBackground()->setBackgroundName("recording");
         mpc.getAudioMidiServices()->startRecordingSound();
     }
 

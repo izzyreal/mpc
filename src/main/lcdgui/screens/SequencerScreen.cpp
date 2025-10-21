@@ -96,15 +96,15 @@ void SequencerScreen::open()
 
 	if (sequencer.lock()->isSecondSequenceEnabled())
     {
-		findBackground()->setName("sequencer-2nd");
+		findBackground()->setBackgroundName("sequencer-2nd");
     }
 	else if (punchScreen->on && !sequencer.lock()->isRecordingOrOverdubbing())
     {
-		findBackground()->setName("sequencer-punch-active");
+		findBackground()->setBackgroundName("sequencer-punch-active");
     }
 	else
     {
-		findBackground()->setName("sequencer");
+		findBackground()->setBackgroundName("sequencer");
     }
 
 	if (sequencer.lock()->getNextSq() != -1)
@@ -515,7 +515,7 @@ void SequencerScreen::function(int i)
 		if (!sequencer.lock()->isRecordingOrOverdubbing() && i == 5)
 		{
 			punchScreen->on = false;
-			findBackground()->setName("sequencer");
+			findBackground()->setBackgroundName("sequencer");
 			findChild("function-keys")->Hide(false);
 		}
 		return;
@@ -671,7 +671,7 @@ void SequencerScreen::turnWheel(int i)
 			if (punchScreen->on)
 			{
 				punchScreen->on = false;
-				findBackground()->setName("sequencer");
+				findBackground()->setBackgroundName("sequencer");
 				findChild("function-keys")->Hide(false);
 			}
 
@@ -859,7 +859,7 @@ void SequencerScreen::displayPunchWhileRecording()
 
 	if (punchScreen->on && (isRecPressedOrLocked || isOverdubPressedOrLocked))
 	{
-		findBackground()->setName("sequencer");
+		findBackground()->setBackgroundName("sequencer");
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -926,7 +926,7 @@ void SequencerScreen::stop()
 
 	if (punchScreen->on)
 	{
-		findBackground()->setName("sequencer-punch-active");
+		findBackground()->setBackgroundName("sequencer-punch-active");
 
 		for (int i = 0; i < 3; i++)
 			findChild<PunchRect>("punch-rect-" + std::to_string(i))->Hide(true);

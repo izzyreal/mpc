@@ -7,13 +7,11 @@
 
 #include <string>
 
-#include <cmath>
-
 using namespace mpc::lcdgui;
 
-Component::Component(const std::string& name)
+Component::Component(const std::string& nameToUse)
+    : name(nameToUse)
 {
-	this->name = name;
 }
 
 void Component::sendToBack(std::shared_ptr<Component> childToSendBack)

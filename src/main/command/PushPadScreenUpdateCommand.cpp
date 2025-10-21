@@ -51,7 +51,7 @@ void PushPadScreenUpdateCommand::execute()
                 ctx.sequencer->setSoloEnabled(true);
 
             ctx.sequencer->setActiveTrackIndex(padIndexWithBank);
-            trMuteScreen->findBackground()->setName("track-mute-solo-2");
+            trMuteScreen->findBackground()->setBackgroundName("track-mute-solo-2");
         }
         else
         {

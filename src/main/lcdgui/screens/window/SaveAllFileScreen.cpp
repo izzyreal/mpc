@@ -50,7 +50,7 @@ void SaveAllFileScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(fileName, 16, enterAction, name);
+        nameScreen->initialize(fileName, 16, enterAction, "save-all-file");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
 	}
 }

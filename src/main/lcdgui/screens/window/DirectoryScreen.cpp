@@ -130,7 +130,7 @@ void DirectoryScreen::function(int f)
                 getSelectedFile()->getNameWithoutExtension(),
                 file->isDirectory() ? 8 : 16,
                 enterAction,
-                name);
+                "directory");
 
         mpc.getLayeredScreen()->openScreen<NameScreen>();
 
@@ -185,7 +185,7 @@ void DirectoryScreen::function(int f)
             mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
         };
 
-        nameScreen->initialize("NEWFOLDR", 8, enterAction, name);
+        nameScreen->initialize("NEWFOLDR", 8, enterAction, "directory");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
         break;
     }

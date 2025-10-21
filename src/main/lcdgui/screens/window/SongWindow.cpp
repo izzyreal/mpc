@@ -78,6 +78,6 @@ void SongWindow::openNameScreen()
 	}
 
     auto nameScreen = mpc.screens->get<NameScreen>();
-    nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
+    nameScreen->initialize(initialNameScreenName, 16, enterAction, "song-window");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

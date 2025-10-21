@@ -192,13 +192,7 @@ void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name, s
     mpc.getLayeredScreen()->openScreen<PopupScreen>();
     auto popupScreen = mpc.screens->get<PopupScreen>();
     popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
-
-    auto sleepTime = sampleSize / 800;
-
-    if (sleepTime < 300)
-        sleepTime = 300;
-
-    std::this_thread::sleep_for(std::chrono::milliseconds((int) (sleepTime * 0.2)));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)

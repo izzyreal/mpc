@@ -277,17 +277,8 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
 void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
 {
     std::string msg = "LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
-    
-    auto sleepTime = sampleSize / 800;
-    
-    if (sleepTime < 300)
-    {
-        sleepTime = 300;
-    }
-    
     mpc.getLayeredScreen()->showPopupAndAwaitInteraction(msg);
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime *0.2)));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)

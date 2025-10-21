@@ -21,9 +21,9 @@ void Background::repaintUnobtrusive(MRECT rect)
 	SetDirty();
 }
 
-void Background::setName(const std::string& name)
+void Background::setBackgroundName(const std::string& backgroundNameToUse)
 { 
-	this->name = name;
+    backgroundName = backgroundNameToUse;
 	SetDirty();
 }
 
@@ -36,12 +36,12 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 
 	if (dirty)
 	{
-		const std::string fileName = "screens/bg/" + name + ".png";
+		const std::string fileName = "screens/bg/" + backgroundName + ".png";
 
 		unsigned int width = 248;
 		unsigned int height = 60;
 
-        if (name == "jd")
+        if (backgroundName == "jd")
         {
             height = 360;
         }
@@ -52,7 +52,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 
 		lodepng::decode(data, width, height, file_data, LCT_RGB, 8);
 
-        if (name == "jd")
+        if (backgroundName == "jd")
         {
             height = 60;
         }
@@ -91,7 +91,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 		}
 
 		// clear bottom in case height != full LCD height
-		if (name != "popup")
+		if (backgroundName != "popup")
 		{
 			for (int y = height; y < 60; y++)
 			{

@@ -44,7 +44,7 @@ void SaveASequenceScreen::openNameScreen()
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(sequencer.lock()->getActiveSequence()->getName(), 16, [this](std::string&) {
             mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
-        }, name);
+        }, "save-a-sequence");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }

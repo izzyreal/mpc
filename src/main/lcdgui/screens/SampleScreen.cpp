@@ -15,7 +15,7 @@ SampleScreen::SampleScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SampleScreen::open()
 {
-	ls->getCurrentBackground()->setName("sample");
+	ls->getCurrentBackground()->setBackgroundName("sample");
 
 	displayInput();
 	displayThreshold();
@@ -89,13 +89,13 @@ void SampleScreen::function(int i)
 		if (mpc.getAudioMidiServices()->isRecordingSound())
 		{
 			mpc.getAudioMidiServices()->stopSoundRecorder(true);
-			findBackground()->setName("sample");
+			findBackground()->setBackgroundName("sample");
 		}
 		else if (mpc.getAudioMidiServices()->getSoundRecorder()->isArmed())
 		{
 			mpc.getAudioMidiServices()->getSoundRecorder()->setArmed(false);
 			sampler->deleteSound(sampler->getSoundCount() - 1);
-			findBackground()->setName("sample");
+			findBackground()->setBackgroundName("sample");
 		}
 		break;
 	case 5:
@@ -110,7 +110,7 @@ void SampleScreen::function(int i)
 		if (ams->getSoundRecorder()->isArmed())
 		{
 			ams->startRecordingSound();
-			findBackground()->setName("recording");
+			findBackground()->setBackgroundName("recording");
 		}
 		else
 		{
@@ -125,7 +125,7 @@ void SampleScreen::function(int i)
 			auto lengthInFrames = time * (44100 * 0.1);
 			ams->getSoundRecorder()->prepare(sound, lengthInFrames, ams->getAudioServer()->getSampleRate());
 			ams->getSoundRecorder()->setArmed(true);
-			findBackground()->setName("waiting-for-input-signal");
+			findBackground()->setBackgroundName("waiting-for-input-signal");
 		}
 
 		break;

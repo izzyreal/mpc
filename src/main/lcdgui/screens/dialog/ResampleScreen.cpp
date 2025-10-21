@@ -60,7 +60,7 @@ void ResampleScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(findField("newname")->getText(), 16, enterAction, name);
+        nameScreen->initialize(findField("newname")->getText(), 16, enterAction, "resample");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }

@@ -47,7 +47,7 @@ void MidiOutputScreen::openNameScreen()
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         auto seq = sequencer.lock()->getActiveSequence();
-        nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, name);
+        nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, "midi-output");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }

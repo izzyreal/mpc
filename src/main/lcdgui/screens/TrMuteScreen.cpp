@@ -13,10 +13,10 @@ TrMuteScreen::TrMuteScreen(mpc::Mpc& mpc, const int layerIndex)
 void TrMuteScreen::open()
 {
 	if (sequencer.lock()->isSoloEnabled()) {
-		findBackground()->setName("track-mute-solo-2");
+		findBackground()->setBackgroundName("track-mute-solo-2");
 	}
 	else {
-		findBackground()->setName("track-mute");
+		findBackground()->setBackgroundName("track-mute");
 	}
 
 	for (int i = 0; i < 16; i++)

@@ -70,7 +70,7 @@ void EditSoundScreen::displayEdit()
 
     if (edit == 0)
     {
-        findBackground()->setName("edit-sound");
+        findBackground()->setBackgroundName("edit-sound");
         findField("new-name")->Hide(true);
         findLabel("new-name")->Hide(true);
         findField("ratio")->Hide(true);
@@ -86,7 +86,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 1)
     {
-        findBackground()->setName("edit-loop-from-st-to-end");
+        findBackground()->setBackgroundName("edit-loop-from-st-to-end");
         findField("new-name")->Hide(true);
         findLabel("new-name")->Hide(true);
         findField("ratio")->Hide(true);
@@ -102,7 +102,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 2 || edit == 3)
     {
-        findBackground()->setName("edit-empty");
+        findBackground()->setBackgroundName("edit-empty");
         findField("new-name")->Hide(false);
         findLabel("new-name")->Hide(false);
         findField("ratio")->Hide(true);
@@ -118,7 +118,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 4 || edit == 5 || edit == 6 || edit == 8)
     {
-        findBackground()->setName("edit-execute");
+        findBackground()->setBackgroundName("edit-execute");
         findField("new-name")->Hide(true);
         findLabel("new-name")->Hide(true);
         findField("ratio")->Hide(true);
@@ -134,7 +134,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 7)
     {
-        findBackground()->setName("edit-empty");
+        findBackground()->setBackgroundName("edit-empty");
         findField("new-name")->Hide(false);
         findLabel("new-name")->Hide(false);
         findField("ratio")->Hide(false);
@@ -151,7 +151,7 @@ void EditSoundScreen::displayEdit()
     }
     else if(edit == 9)
     {
-        findBackground()->setName("edit-empty");
+        findBackground()->setBackgroundName("edit-empty");
         findField("new-name")->Hide(true);
         findLabel("new-name")->Hide(true);
         findField("ratio")->Hide(true);
@@ -335,7 +335,7 @@ void EditSoundScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(newName, 16, enterAction, name);
+        nameScreen->initialize(newName, 16, enterAction, "edit-sound");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }

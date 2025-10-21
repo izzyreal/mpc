@@ -6,7 +6,6 @@ Label::Label(mpc::Mpc& mpc, const std::string& name, std::string text, int x, in
 	: TextComp(mpc, name)
 {
 	this->text = text;
-	this->name = name;
 	TextComp::setText(text);
 	TextComp::setSize(width + 2, 9);
 	setLocation(x - 1, y);

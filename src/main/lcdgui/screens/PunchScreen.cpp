@@ -117,7 +117,7 @@ void PunchScreen::displayBackground()
         bgName = "punch-in-out";
     }
     
-    findBackground()->setName(bgName);
+    findBackground()->setBackgroundName(bgName);
 }
 
 void PunchScreen::rec()

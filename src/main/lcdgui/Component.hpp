@@ -18,12 +18,13 @@ namespace mpc::lcdgui
 {
 	class Component
 	{
+    private:
+        const std::string name;
 
 	protected:
 		Component* parent = nullptr;
 		std::vector<std::shared_ptr<Component>> children;
 
-		std::string name;
 		bool hidden = false;
 		bool dirty = false;
 		int x = -1;

@@ -132,7 +132,7 @@ void MetronomeSoundScreen::setSound(int i)
     {
         displayVolume();
         displayOutput();
-        findBackground()->setName("metronome-sound");
+        findBackground()->setBackgroundName("metronome-sound");
     }
     else
     {
@@ -140,7 +140,7 @@ void MetronomeSoundScreen::setSound(int i)
         displayNormal();
         displayAccentVelo();
         displayNormalVelo();
-        findBackground()->setName("metronome-sound-empty");
+        findBackground()->setBackgroundName("metronome-sound-empty");
     }
 }
 

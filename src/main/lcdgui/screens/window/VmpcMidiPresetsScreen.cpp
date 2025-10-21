@@ -46,7 +46,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
                     this->checkFileExistsAndSavePresetAndShowPopup(nameScreenName);
                 };
 
-                nameScreen->initialize(presetName, 16, enterAction, this->name);
+                nameScreen->initialize(presetName, 16, enterAction, "vmpc-midi-presets");
             };
 
             auto fileExistsScreen = this->mpc.screens->get<FileExistsScreen>();
@@ -133,7 +133,7 @@ void VmpcMidiPresetsScreen::function(int i)
             if (presetIndex == -1)
             {
                 auto nameScreen = mpc.screens->get<NameScreen>();
-                nameScreen->initialize("New preset", 16, enterAction, name);
+                nameScreen->initialize("New preset", 16, enterAction, "vmpc-midi-presets");
                 mpc.getLayeredScreen()->openScreen<NameScreen>();
             }
             else

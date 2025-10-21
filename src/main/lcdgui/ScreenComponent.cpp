@@ -23,7 +23,7 @@ ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const i
 	: Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
 {
 	auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()));
-	background->setName(name);
+	background->setBackgroundName(name);
 }
 
 void ScreenComponent::setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap)

@@ -67,6 +67,6 @@ void SequenceScreen::openNameScreen()
     }
 
     auto nameScreen = mpc.screens->get<NameScreen>();
-    nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
+    nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequence");
     mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

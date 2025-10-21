@@ -127,7 +127,7 @@ void SaveApsFileScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(fileName, 16, enterAction, name);
+        nameScreen->initialize(fileName, 16, enterAction, "save-aps-file");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }

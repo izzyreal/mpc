@@ -15,10 +15,11 @@ namespace mpc::lcdgui {
         bool scrolling = false;
         bool scrollingDown = false;
         std::unique_ptr<std::thread> scrollThread;
+        std::string backgroundName;
 
 	public:
 		void repaintUnobtrusive(MRECT rect); // This is used for hiding function keys of windows and dialogs
-		void setName(const std::string& name);
+		void setBackgroundName(const std::string&);
 		void Draw(std::vector< std::vector<bool>>* pixels) override;
         void setScrolling(bool);
 		Background();

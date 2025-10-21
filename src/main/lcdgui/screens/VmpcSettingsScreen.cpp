@@ -7,7 +7,7 @@ VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 {
     easterEgg = std::make_shared<Background>();
     easterEgg->Hide(true);
-    easterEgg->setName("jd");
+    easterEgg->setBackgroundName("jd");
     addChild(easterEgg);
 }
 

@@ -21,8 +21,6 @@ using namespace mpc::lcdgui;
 Field::Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int width)
 	: TextComp(mpc, name), mpc(mpc)
 {
-	this->name = name;
-	
 	if (width == 1)
 	{
 		// We use width 0 as an indicator of wanting to be completely invisible, like dummy fields
@@ -98,6 +96,8 @@ void Field::takeFocus()
 	auto ls = mpc.getLayeredScreen();
 	csn = ls->getCurrentScreenName();
 
+    const auto name = getName();
+
 	if (csn == "step-editor")
 	{
 		if (name == "view")
@@ -138,7 +138,7 @@ void Field::loseFocus(std::string next)
 
 	if (csn == "step-editor")
 	{
-		if (name == "view")
+		if (getName() == "view")
 		{
 			auto screen = ls->getCurrentScreen();
 			screen->findChild<Rectangle>("")->setOn(false);
@@ -238,7 +238,7 @@ int Field::enter()
     
 	try
 	{
-        if (name == "tempo")
+        if (getName() == "tempo")
         {
             // UTF-8 representation of u8"\u00CB", the special dot in a tempo string
             const std::string toReplace = "\xC3\x8B";
@@ -264,7 +264,7 @@ void Field::type(int i)
 {
     auto textCopy = StrUtil::replaceAll(getText(), ' ', "");
 
-    if (name == "tempo")
+    if (getName() == "tempo")
     {
         std::string newText;
 
