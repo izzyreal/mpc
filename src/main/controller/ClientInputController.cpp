@@ -292,6 +292,19 @@ void ClientInputController::handleButtonPress(const ClientInput &input)
         return;
     }
 
+    if (input.source == ClientInput::Source::HostInputKeyboard)
+    {
+        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
+                input.textInputKey)
+        {
+            if (input.textInputKey->isPress)
+            {   
+                nameScreen->typeCharacter(input.textInputKey->character);
+                return;
+            }
+        }
+    }
+
     auto screen = mpc.getScreen();
     auto layeredScreen = mpc.getLayeredScreen();
 
