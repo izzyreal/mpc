@@ -2,6 +2,8 @@
 
 #include "Mpc.hpp"
 
+#include "DemoFiles.hpp"
+
 #include <lcdgui/ScreenComponent.hpp>
 
 #include "Paths.hpp"
@@ -62,21 +64,22 @@ void Mpc::init()
         }
     }
     
-    const std::vector<std::string> demo_files{ "TEST1/BASIC_KIT.ALL", "TEST1/BASIC_KIT.APS", "TEST1/BASIC_KIT.MID", "TEST1/BASIC_KIT.PGM",
-        "TEST1/HAT1.SND", "TEST1/KICK1.SND", "TEST1/SNARE4.SND", "TEST2/2PEOPLE2.SND", "TEST2/2PEOPLE3.SND", "TEST2/CLIMAX.SND",
-        "TEST2/FRUTZLE.ALL", "TEST2/FRUTZLE.APS", "TEST2/FRUTZLE.MID", "TEST2/FRUTZLE.PGM", "TEST2/KICKHAT3.SND",
-        "TEST2/KICKHAT5.SND", "TEST2/KICK_C_1.SND", "TEST2/KICK_C_2.SND", "TEST2/MOOI.SND", "TEST2/OBOE.SND",
-        "TEST2/PIAMA2.SND", "TEST2/PIAMA3.SND", "TEST2/RIDE.SND", "TEST2/RIDE1.SND", "TEST2/SOLOBASS.SND",
-        "TEST2/WOOSH.SND" };
-    
-    if (!fs::exists(paths->demoDataPath()))
+    fs::create_directories(paths->demoDataPath() / "TEST1");
+    fs::create_directories(paths->demoDataPath() / "TEST2");
+    fs::create_directories(paths->demoDataPath() / "TRAIN1");
+
+    for (const auto& demo_file : demo_files)
     {
-        fs::create_directories(paths->demoDataPath() / "TEST1");
-        fs::create_directories(paths->demoDataPath() / "TEST2");
-        for (auto& demo_file : demo_files)
+        const auto dst = paths->demoDataPath() / demo_file;
+        const bool should_update = !fs::exists(dst)
+            || std::find(always_update_demo_files.begin(),
+                         always_update_demo_files.end(),
+                         demo_file) != always_update_demo_files.end();
+
+        if (should_update)
         {
             const auto data = mpc::MpcResourceUtil::get_resource_data("demodata/" + demo_file);
-            set_file_data(paths->demoDataPath() / demo_file, data);
+            set_file_data(dst, data);
         }
     }
     
