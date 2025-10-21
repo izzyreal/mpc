@@ -169,9 +169,8 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         const auto focusName = getStringProperty("focus.txt");
 
         const auto layeredScreen = mpc.getLayeredScreen();
-
+        
         layeredScreen->openScreen(screenName);
-        layeredScreen->Draw();
 
         if (!focusName.empty())
         {

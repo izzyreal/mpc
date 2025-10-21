@@ -30,6 +30,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
             break;
         case 2:
             // YES
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
             restoreAutoSavedStateAction();
             break;
         case 3:
@@ -40,6 +41,7 @@ void VmpcContinuePreviousSessionScreen::function(int i)
         case 4:
             // ALWAYS
             autoSaveScreen->setAutoLoadOnStart(2);
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
             restoreAutoSavedStateAction();
             break;
         default:
