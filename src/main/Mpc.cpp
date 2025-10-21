@@ -67,6 +67,7 @@ void Mpc::init()
     fs::create_directories(paths->demoDataPath() / "TEST1");
     fs::create_directories(paths->demoDataPath() / "TEST2");
     fs::create_directories(paths->demoDataPath() / "TRAIN1");
+    fs::create_directories(paths->demoDataPath() / "RESIST");
 
     for (const auto& demo_file : demo_files)
     {
