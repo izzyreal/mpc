@@ -47,6 +47,7 @@ void ClientInputController::handleInput(const ClientInput &input)
             if (input.textInputKey->isPress)
             {
                 nameScreen->typeCharacter(input.textInputKey->character);
+                return;
             }
         }
     }
