@@ -112,7 +112,7 @@ void DirectoryScreen::function(int f)
                 
                 if (index > 4)
                 {
-                    setYOffset0(index - 5);
+                    setYOffset0(index - 4);
                     setYPos0(4);
                 }
                 else
