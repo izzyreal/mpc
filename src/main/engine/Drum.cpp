@@ -77,43 +77,6 @@ void Drum::setLastReceivedMidiVolume(int volume)
     lastReceivedMidiVolume = volume;
 }
 
-void Drum::checkForMutes(NoteParameters* np)
-{
-    if (np->getMuteAssignA() != 34 || np->getMuteAssignB() != 34)
-    {
-        for (auto& v : voices)
-        {
-            if (v->isFinished())
-                continue;
-
-            if (v->getMuteInfo().shouldMute(np->getMuteAssignA(), drumIndex)
-                    || v->getMuteInfo().shouldMute(np->getMuteAssignB(), drumIndex))
-            {
-                v->startDecay();
-            }
-        }
-    }
-}
-
-void Drum::allNotesOff()
-{
-    for (int note = 35; note <= 98; note++)
-    {
-        for (auto& voice : voices)
-        {
-            if (!voice->isFinished()
-                    && voice->getNote() == note
-                    && voice->getVoiceOverlap() == VoiceOverlapMode::NOTE_OFF
-                    && !voice->isDecaying()
-                    && drumIndex == voice->getMuteInfo().getDrum())
-            {
-                voice->startDecay(0);
-                break;
-            }
-        }
-    }
-}
-
 void Drum::allSoundOff(int frameOffset)
 {
     for (auto& voice : voices)

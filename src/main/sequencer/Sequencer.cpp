@@ -7,6 +7,7 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/MidiOutput.hpp>
 
+#include "engine/Voice.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/HardwareComponent.hpp"
 
@@ -289,9 +290,24 @@ void Sequencer::setSoloEnabled(bool b)
 
     if (soloEnabled)
     {
-        for (int i = 0; i < 4; i++)
+        auto &voices = mpc.getAudioMidiServices()->getVoices();
+        for (int drumIndex = 0; drumIndex < 4; ++drumIndex)
         {
-            mpc.getDrum(i).allNotesOff();
+            for (int note = 35; note <= 98; note++)
+            {
+                for (auto& voice : voices)
+                {
+                    if (!voice->isFinished()
+                            && voice->getNote() == note
+                            && voice->getVoiceOverlap() == sampler::VoiceOverlapMode::NOTE_OFF
+                            && !voice->isDecaying()
+                            && drumIndex == voice->getMuteInfo().getDrum())
+                    {
+                        voice->startDecay(0);
+                        break;
+                    }
+                }
+            }
         }
     }
 

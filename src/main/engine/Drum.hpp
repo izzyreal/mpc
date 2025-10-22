@@ -38,7 +38,6 @@ namespace mpc::engine
 	public:
         int getIndex() { return drumIndex; }
 		int getProgram();
-		void allNotesOff();
 		void setProgram(int i);
 		bool receivesPgmChange();
 		void setReceivePgmChange(bool b);
@@ -56,7 +55,6 @@ namespace mpc::engine
 		std::vector<std::shared_ptr<IndivFxMixer>>& getIndivFxMixerChannels();
 
 	private:
-        void checkForMutes(mpc::sampler::NoteParameters* np);
         void startDecayForNote(const int note,
                                const int frameOffset,
                                const int noteOnStartTick);
