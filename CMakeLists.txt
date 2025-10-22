@@ -29,7 +29,7 @@ FetchContent_Declare(filesystem
 
 FetchContent_Declare(tl-expected
   GIT_REPOSITORY https://github.com/TartanLlama/expected.git
-  GIT_TAG        v1.0.0
+  GIT_TAG        v1.3.1
   GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/expected
   CONFIGURE_COMMAND ""
@@ -83,6 +83,8 @@ FetchContent_Declare(json
     GIT_TAG        v3.11.3
     GIT_SHALLOW    ON
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json
+    GIT_PROGRESS   ON
+    GIT_CONFIG     advice.detachedHead=false
 )
 
 FetchContent_Declare(json-schema-validator
@@ -92,11 +94,36 @@ FetchContent_Declare(json-schema-validator
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json-schema-validator
 )
 
-FetchContent_MakeAvailable(rtmidi akaifat filesystem Catch2 libsamplerate platformfolders json json-schema-validator concurrentqueue)
+message(STATUS "Downloading rtmidi...")
+FetchContent_MakeAvailable(rtmidi)
+
+message(STATUS "Downloading akaifat...")
+FetchContent_MakeAvailable(akaifat)
+
+message(STATUS "Downloading filesystem...")
+FetchContent_MakeAvailable(filesystem)
+
+message(STATUS "Downloading Catch2...")
+FetchContent_MakeAvailable(Catch2)
+
+message(STATUS "Downloading libsamplerate...")
+FetchContent_MakeAvailable(libsamplerate)
+
+message(STATUS "Downloading platformfolders...")
+FetchContent_MakeAvailable(platformfolders)
+
+message(STATUS "Downloading json...")
+FetchContent_MakeAvailable(json)
+
+message(STATUS "Downloading json-schema-validator...")
+FetchContent_MakeAvailable(json-schema-validator)
+
+message(STATUS "Downloading concurrentqueue...")
+FetchContent_MakeAvailable(concurrentqueue)
 
 FetchContent_GetProperties(tl-expected)
-
 if(NOT tl-expected_POPULATED)
+    message(STATUS "Downloading tl-expected...")
     FetchContent_MakeAvailable(tl-expected)
 endif()
 
@@ -157,7 +184,7 @@ target_include_directories(mpc PUBLIC
 target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
 
 if(MSVC)
-	target_compile_options(mpc PRIVATE "/MP")
+  target_compile_options(mpc PRIVATE "/MP")
 endif()
 
 if(VMPC2000XL_WIN7)
