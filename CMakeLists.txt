@@ -37,17 +37,6 @@ FetchContent_Declare(tl-expected
   BUILD_COMMAND ""
 )
 
-set(RAPIDJSON_BUILD_EXAMPLES OFF)
-set(RAPIDJSON_BUILD_DOC OFF)
-set(RAPIDJSON_BUILD_TESTS OFF)
-
-FetchContent_Declare(rapidjson
-  GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
-  GIT_TAG        master
-  GIT_SHALLOW    ON
-  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rapidjson
-)
-
 set(RTMIDI_BUILD_STATIC_LIBS ON)
 set(BUILD_SHARED_LIBS OFF)
 set(RTMIDI_BUILD_TESTING OFF)
@@ -107,7 +96,7 @@ FetchContent_Declare(json-schema-validator
 FetchContent_Populate(concurrentqueue)
 FetchContent_Populate(readerwriterqueue)
 
-FetchContent_MakeAvailable(rtmidi akaifat filesystem rapidjson Catch2 libsamplerate platformfolders json json-schema-validator)
+FetchContent_MakeAvailable(rtmidi akaifat filesystem Catch2 libsamplerate platformfolders json json-schema-validator)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -162,7 +151,6 @@ add_library(mpc ${_source_list_main})
 target_include_directories(mpc PUBLIC
     ${_src_root_path_main}
     ${akaifat_SOURCE_DIR}/src/main
-    ${rapidjson_SOURCE_DIR}/include
     ${filesystem_SOURCE_DIR}/include
     ${tl-expected_SOURCE_DIR}/include
     ${libsamplerate_SOURCE_DIR}/include

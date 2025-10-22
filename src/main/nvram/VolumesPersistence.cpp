@@ -3,52 +3,57 @@
 #include "Mpc.hpp"
 #include <disk/AbstractDisk.hpp>
 
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
+#include <nlohmann/json.hpp>
 
 using namespace mpc::nvram;
 using namespace mpc::disk;
-using namespace rapidjson;
+using json = nlohmann::json;
 
-fs::path getVolumesPersistencePath(mpc::Mpc& mpc) { return mpc.paths->configPath() / "volumes.json"; }
+fs::path getVolumesPersistencePath(mpc::Mpc &mpc)
+{
+    return mpc.paths->configPath() / "volumes.json";
+}
 
 const size_t bufSize = 2048;
 
-Document read(mpc::Mpc& mpc)
+json read(mpc::Mpc &mpc)
 {
-    Document result;
+    json result;
 
     const auto path = getVolumesPersistencePath(mpc);
-    
+
     if (fs::exists(path))
     {
         const auto bytes = get_file_data(path);
-        result.Parse(bytes.data(), bytes.size());
+        try
+        {
+            result = json::parse(bytes.begin(), bytes.end());
+        }
+        catch (...)
+        {
+            result = json::object();
+        }
     }
-    
-    if (!result.IsObject())
-    {
-        result.SetObject();
-    }
-    
-    if (!result.HasMember("volumes"))
-    {
-        result.AddMember("volumes", Value().SetArray(), result.GetAllocator());
-    }
+
+    if (!result.is_object())
+        result = json::object();
+
+    if (!result.contains("volumes"))
+        result["volumes"] = json::array();
 
     return result;
 }
 
-std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc& mpc)
+std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc &mpc)
 {
-    Document doc = read(mpc);
-    Value& volumes = doc["volumes"];
+    json doc = read(mpc);
+    auto &volumes = doc["volumes"];
 
-    for (auto i = volumes.Begin(); i != volumes.End(); i++)
+    for (auto &vol : volumes)
     {
-        auto uuid = (*i)["uuid"].GetString();
-        auto isActive = (*i)["active"].GetBool();
-        
+        auto uuid = vol["uuid"].get<std::string>();
+        auto isActive = vol["active"].get<bool>();
+
         if (isActive)
             return uuid;
     }
@@ -56,77 +61,69 @@ std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc& mpc)
     return "";
 }
 
-std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs(mpc::Mpc& mpc)
+std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs(mpc::Mpc &mpc)
 {
     std::map<std::string, MountMode> persistedConfigs;
-    
-    Document doc = read(mpc);
-    Value& volumes = doc["volumes"];
-    
-    for (auto i = volumes.Begin(); i != volumes.End(); i++)
+
+    json doc = read(mpc);
+    auto &volumes = doc["volumes"];
+
+    for (auto &vol : volumes)
     {
-        auto uuid = (*i)["uuid"].GetString();
-        persistedConfigs[std::string(uuid)] = (MountMode)(*i)["mode"].GetInt();
+        auto uuid = vol["uuid"].get<std::string>();
+        persistedConfigs[uuid] = static_cast<MountMode>(vol["mode"].get<int>());
     }
-    
+
     return persistedConfigs;
 }
 
-void VolumesPersistence::save(mpc::Mpc & mpc)
+void VolumesPersistence::save(mpc::Mpc &mpc)
 {
-    Document d = read(mpc);
-        
-    Value& volumes = d["volumes"];
-    
+    json d = read(mpc);
+    auto &volumes = d["volumes"];
+
     std::vector<std::string> alreadyPersistedUUIDs;
-    
-    for (auto i = volumes.Begin(); i != volumes.End(); i++)
+
+    // Mark all inactive and collect existing UUIDs
+    for (auto &vol : volumes)
     {
-        (*i)["active"].Swap(Value().SetBool(false));
-        auto uuid = (*i)["uuid"].GetString();
-        alreadyPersistedUUIDs.emplace_back(uuid);
+        vol["active"] = false;
+        alreadyPersistedUUIDs.emplace_back(vol["uuid"].get<std::string>());
     }
-    
+
     auto activeUUID = mpc.getDisk()->getVolume().volumeUUID;
-    
     auto disks = mpc.getDisks();
-        
-    for (const auto & disk : disks)
+
+    for (const auto &disk : disks)
     {
-        auto& diskVol = disk->getVolume();
-     
+        const auto &diskVol = disk->getVolume();
         bool alreadyPersisted = std::find(begin(alreadyPersistedUUIDs), end(alreadyPersistedUUIDs), diskVol.volumeUUID) != end(alreadyPersistedUUIDs);
-        
+
         if (alreadyPersisted)
         {
-            for (auto j = volumes.GetArray().Begin(); j != volumes.GetArray().End(); j++)
+            for (auto &vol : volumes)
             {
-                auto uuid = (*j)["uuid"].GetString();
-                if (std::string(uuid) == diskVol.volumeUUID)
+                if (vol["uuid"].get<std::string>() == diskVol.volumeUUID)
                 {
-                    (*j)["mode"].Swap(Value().SetInt(diskVol.mode));
-                    (*j)["active"].Swap(Value().SetBool(uuid == activeUUID));
+                    vol["mode"] = diskVol.mode;
+                    vol["active"] = (diskVol.volumeUUID == activeUUID);
                     break;
                 }
             }
         }
         else
         {
-            Value volume(kObjectType);
-            volume.AddMember("uuid", StringRef(diskVol.volumeUUID.c_str()), d.GetAllocator());
-            volume.AddMember("mode", diskVol.mode, d.GetAllocator());
-            volume.AddMember("active", Value().SetBool(diskVol.volumeUUID == activeUUID), d.GetAllocator());
-            volumes.PushBack(volume, d.GetAllocator());
+            json volume = {
+                {"uuid", diskVol.volumeUUID},
+                {"mode", diskVol.mode},
+                {"active", diskVol.volumeUUID == activeUUID}};
+            volumes.push_back(volume);
         }
     }
 
-    StringBuffer buffer;
-
-    Writer<StringBuffer> writer(buffer);
-    d.Accept(writer);
-
-    const char* data = buffer.GetString();
-
+    const auto data = d.dump(4); // pretty print (optional)
     const auto path = getVolumesPersistencePath(mpc);
-    set_file_data(path, std::vector<char>{data, data + buffer.GetSize() });
+
+    set_file_data(path, std::vector<char>(data.begin(), data.end()));
 }
+

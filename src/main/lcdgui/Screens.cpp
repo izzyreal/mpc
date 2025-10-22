@@ -11,13 +11,10 @@
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 
-
 #include <StrUtil.hpp>
-
 #include "MpcResourceUtil.hpp"
 
-#include <rapidjson/document.h>
-
+#include <nlohmann/json.hpp>
 #include <functional>
 
 using namespace mpc::lcdgui;
@@ -25,10 +22,10 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace rapidjson;
+using json = nlohmann::json;
 
 Screens::Screens(mpc::Mpc &mpc)
-        : mpc(mpc)
+    : mpc(mpc)
 {
 }
 
@@ -37,9 +34,7 @@ void Screens::createAndCacheAllScreens()
     for (auto screenName : screenNames)
     {
         if (std::find(knownUnimplementedScreens.begin(), knownUnimplementedScreens.end(), screenName) != knownUnimplementedScreens.end())
-        {
             continue;
-        }
 
         createAndCacheScreen(screenName);
     }
@@ -49,20 +44,18 @@ void Screens::createAndCacheAllScreens()
 
 std::shared_ptr<ScreenComponent> Screens::getByName1(const std::string name)
 {
-    for (auto& screen : screens)
+    for (auto &screen : screens)
     {
         if (screen->getName() == name)
-        {
             return screen;
-        }
     }
 
     return {};
 }
 
-std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()
+std::vector<std::unique_ptr<json>> &layerDocuments()
 {
-    static std::vector<std::unique_ptr<rapidjson::Document>> result;
+    static std::vector<std::unique_ptr<json>> result;
 
     if (result.empty())
     {
@@ -71,8 +64,7 @@ std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()
             const auto path = "screens/layer" + std::to_string(i + 1) + ".json";
             auto data = mpc::MpcResourceUtil::get_resource_data(path);
 
-            auto panelDoc = std::make_unique<Document>();
-            panelDoc->Parse(&data[0], data.size());
+            auto panelDoc = std::make_unique<json>(json::parse(data.begin(), data.end()));
             result.push_back(std::move(panelDoc));
         }
     }
@@ -80,51 +72,43 @@ std::vector<std::unique_ptr<rapidjson::Document>> &layerDocuments()
     return result;
 }
 
-std::vector<int> getFunctionKeyTypes(Value &functionKeyTypes)
+std::vector<int> getFunctionKeyTypes(json &functionKeyTypes)
 {
     std::vector<int> types;
 
     for (int i = 0; i < 6; i++)
     {
-        if (functionKeyTypes[i].IsNull())
-        {
+        if (functionKeyTypes[i].is_null())
             types.push_back(-1);
-        }
         else
-        {
-            types.push_back(functionKeyTypes[i].GetInt());
-        }
+            types.push_back(functionKeyTypes[i].get<int>());
     }
 
     return types;
 }
 
-std::vector<std::string> getFunctionKeyLabels(Value &functionKeyLabels)
+std::vector<std::string> getFunctionKeyLabels(json &functionKeyLabels)
 {
     std::vector<std::string> labels;
 
     for (int i = 0; i < 6; i++)
     {
-        if (functionKeyLabels[i].IsNull())
-        {
+        if (functionKeyLabels[i].is_null())
             labels.push_back("");
-        }
         else
-        {
-            labels.push_back(functionKeyLabels[i].GetString());
-        }
+            labels.push_back(functionKeyLabels[i].get<std::string>());
     }
 
     return labels;
 }
 
-std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string& screenName)
+std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string &screenName)
 {
     Screens::ScreenLayout result;
 
     for (int i = 0; i < 4; i++)
     {
-        if (layerDocuments()[i]->HasMember(screenName.c_str()))
+        if (layerDocuments()[i]->contains(screenName))
         {
             result.layerIndex = i;
             break;
@@ -132,21 +116,19 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string&
     }
 
     if (result.layerIndex < 0)
-    {
         return std::nullopt;
-    }
 
-    Value &arrangement = layerDocuments()[result.layerIndex]->GetObj()[screenName.c_str()];
+    json &arrangement = (*layerDocuments()[result.layerIndex])[screenName];
 
-    if (arrangement.HasMember("fblabels"))
+    if (arrangement.contains("fblabels"))
     {
-        Value &functionLabels = arrangement["fblabels"];
-        Value &functionTypes = arrangement["fbtypes"];
+        json &functionLabels = arrangement["fblabels"];
+        json &functionTypes = arrangement["fbtypes"];
 
         std::vector<std::vector<std::string>> allLabels;
         std::vector<std::vector<int>> allTypes;
 
-        if (!functionLabels[0].IsArray())
+        if (!functionLabels[0].is_array())
         {
             auto labels = getFunctionKeyLabels(functionLabels);
             auto types = getFunctionKeyTypes(functionTypes);
@@ -155,7 +137,7 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string&
         }
         else
         {
-            for (int i = 0; i < functionLabels.Size(); i++)
+            for (size_t i = 0; i < functionLabels.size(); i++)
             {
                 auto labels = getFunctionKeyLabels(functionLabels[i]);
                 auto types = getFunctionKeyTypes(functionTypes[i]);
@@ -168,37 +150,31 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string&
         result.components.push_back(std::move(functionKeysComponent));
     }
 
-    if (arrangement.HasMember("parameters"))
+    if (arrangement.contains("parameters"))
     {
-        Value &parameters = arrangement["parameters"];
-        Value &labels = arrangement["labels"];
-        Value &x = arrangement["x"];
-        Value &y = arrangement["y"];
-        Value &tfsize = arrangement["tfsize"];
-
-        std::vector<std::string> row;
+        json &parameters = arrangement["parameters"];
+        json &labels = arrangement["labels"];
+        json &x = arrangement["x"];
+        json &y = arrangement["y"];
+        json &tfsize = arrangement["tfsize"];
 
         int skipCounter = 0;
-
         std::string previous;
 
-        for (int i = 0; i < parameters.Size(); i++)
+        for (size_t i = 0; i < parameters.size(); i++)
         {
-            if (parameters[i].IsArray())
+            if (parameters[i].is_array())
             {
                 std::vector<std::string> parameterTransferMap;
-
-                for (int j = 0; j < parameters[i].Size(); j++)
-                {
-                    parameterTransferMap.push_back(parameters[i][j].GetString());
-                }
+                for (auto &val : parameters[i])
+                    parameterTransferMap.push_back(val.get<std::string>());
 
                 result.transferMap[previous] = parameterTransferMap;
                 skipCounter++;
                 continue;
             }
 
-            auto parameterName = std::string(parameters[i].GetString());
+            auto parameterName = parameters[i].get<std::string>();
             auto parameterNames = StrUtil::split(parameterName, ',');
             std::string nextFocus = "_";
 
@@ -208,44 +184,40 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string&
                 nextFocus = parameterNames[1];
             }
 
-            row.push_back(parameterName);
-
             result.components.push_back(std::make_unique<Parameter>(
-                    mpc,
-                    labels[i - skipCounter].GetString(),
-                    parameterName,
-                    x[i - skipCounter].GetInt(),
-                    y[i - skipCounter].GetInt(),
-                    tfsize[i - skipCounter].GetInt()));
+                mpc,
+                labels[i - skipCounter].get<std::string>(),
+                parameterName,
+                x[i - skipCounter].get<int>(),
+                y[i - skipCounter].get<int>(),
+                tfsize[i - skipCounter].get<int>()));
 
             auto parameter = result.components.back();
             auto field = parameter->findField(parameterName);
 
             if (i == 0)
-            {
                 result.firstField = parameterName;
-            }
 
             field->setNextFocus(nextFocus);
             previous = parameterName;
         }
     }
 
-    if (arrangement.HasMember("infowidgets"))
+    if (arrangement.contains("infowidgets"))
     {
-        Value &infoNames = arrangement["infowidgets"];
-        Value &infoSize = arrangement["infosize"];
-        Value &infoX = arrangement["infox"];
-        Value &infoY = arrangement["infoy"];
+        json &infoNames = arrangement["infowidgets"];
+        json &infoSize = arrangement["infosize"];
+        json &infoX = arrangement["infox"];
+        json &infoY = arrangement["infoy"];
 
-        for (int i = 0; i < infoNames.Size(); i++)
+        for (size_t i = 0; i < infoNames.size(); i++)
         {
             auto label = std::make_shared<Label>(mpc,
-                                                 infoNames[i].GetString(),
+                                                 infoNames[i].get<std::string>(),
                                                  "",
-                                                 infoX[i].GetInt(),
-                                                 infoY[i].GetInt(),
-                                                 infoSize[i].GetInt());
+                                                 infoX[i].get<int>(),
+                                                 infoY[i].get<int>(),
+                                                 infoSize[i].get<int>());
             result.components.push_back(label);
         }
     }
@@ -253,18 +225,16 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string&
     return result;
 }
 
-using ScreenFactory = std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc&, int)>;
+using ScreenFactory = std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
 
 inline const std::map<std::string, ScreenFactory> screenFactories = {
-#define X(ns, Class, name) { name, [](mpc::Mpc& mpc, int layer){ return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer); } },
+#define X(ns, Class, name) { name, [](mpc::Mpc &mpc, int layer) { return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer); } },
 SCREEN_LIST
 #undef X
 };
 
-// screenName -> layerIndex
-static const std::map<std::string, int> screensWithoutLayoutJson {
-    { "popup", 3 }
-};
+static const std::map<std::string, int> screensWithoutLayoutJson{
+    {"popup", 3}};
 
 void Screens::createAndCacheScreen(const std::string &screenName)
 {
@@ -281,7 +251,7 @@ void Screens::createAndCacheScreen(const std::string &screenName)
         if (!layout)
         {
             MLOG("Screens::getOrCreateScreenComponent has the requested screen name '" + screenName + "' in its map, and a ScreenComponent subclass for it is available in the mpc::lcdgui::screens namespace, but the layout can't be found. Most likely the layout is missing from screens/layer1.json, screens/layer2.json, screens/layer3.json or screens/layer4.json.");
-            return; 
+            return;
         }
 
         auto screen = screenFactory->second(mpc, layout->layerIndex);
