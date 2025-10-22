@@ -84,8 +84,7 @@ void Voice::init(
         NoteParameters *np,
         int newVarType,
         int newVarValue,
-        int muteNote,
-        int muteDrum,
+        int drumIndex,
         int newFrameOffset,
         bool newEnableEnvs,
         int newStartTick,
@@ -109,8 +108,8 @@ void Voice::init(
     state->varValue = newVarValue;
 
     state->staticDecay = false;
-    state->muteInfo.setNote(muteNote);
-    state->muteInfo.setDrum(muteDrum);
+    state->muteInfo.setNote(newNote);
+    state->muteInfo.setDrum(drumIndex);
     state->veloToStart = 0;
     state->attackValue = 0;
     state->decayValue = 2;

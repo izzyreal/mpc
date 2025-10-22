@@ -7,6 +7,7 @@
 #include "controller/ClientInputControllerBase.hpp"
 #include "hardware/Hardware.hpp"
 #include "engine/DrumNoteEventHandler.hpp"
+#include "engine/DrumNoteEventContextBuilder.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -132,18 +133,13 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
                 auto &drum = mpc.getDrum(track->getBus() - 1);
 
-                DrumNoteEventHandler::noteOn(
+                auto ctx = DrumNoteEventContextBuilder::buildNoteOn(
+                    &drum,
                     mpc.getSampler(),
                     mpc.getAudioMidiServices()->getMixer(),
                     mpc.screens->get<MixerSetupScreen>(),
                     mpc.getAudioMidiServices()->getVoices(),
-                    drum.getStereoMixerChannels(),
-                    drum.getIndivFxMixerChannels(),
                     mpc.getAudioMidiServices()->getMixerConnections(),
-                    drum.getSimultA(),
-                    drum.getSimultB(),
-                    drum.getIndex(),
-                    drum.getProgram(),
                     note,
                     noteEvent->getVelocity(),
                     noteEvent->getVariationType(),
@@ -153,6 +149,8 @@ void RepeatPad::process(mpc::Mpc& mpc,
                     /*tick*/ -1,
                     voiceOverlap == 2 ? durationFrames : -1
                 );
+
+                DrumNoteEventHandler::noteOn(ctx);
 
                 program->registerPadPress(programPadIndex, PadPressSource::NON_PHYSICAL);
             }
@@ -177,15 +175,15 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 {
                     auto &drum = mpc.getDrum(track->getBus() - 1);
 
-                    DrumNoteEventHandler::noteOff(
+                    auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
+                        &drum,
                         mpc.getAudioMidiServices()->getVoices(),
-                        drum.getSimultA(),
-                        drum.getSimultB(),
-                        drum.getIndex(),
                         note,
                         bufferOffset,
                         tickPosition
                     );
+
+                    DrumNoteEventHandler::noteOff(ctx);
 
                     program->registerPadRelease(programPadIndex, PadPressSource::NON_PHYSICAL);
                 }
