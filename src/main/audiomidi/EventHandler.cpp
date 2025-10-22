@@ -118,7 +118,15 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
             const auto audioMidiServices = mpc.getAudioMidiServices();
             const auto frameSeq = audioMidiServices->getFrameSequencer();
 
-            drum.mpcNoteOff(noteOffEvent->getNote(), frameSeq->getEventFrameOffset(), noteOffEvent->getTick());
+            DrumNoteEventHandler::noteOff(
+                audioMidiServices->getVoices(),
+                drum.getSimultA(),
+                drum.getSimultB(),
+                drumIndex,
+                noteOffEvent->getNote(),
+                frameSeq->getEventFrameOffset(),
+                noteOffEvent->getTick()
+            );
 
             auto sampler = mpc.getSampler();
             const auto program = sampler->getProgram(drum.getProgram());
@@ -225,7 +233,15 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<Note
         const auto program = mpc.getSampler()->getProgram(drum.getProgram());
         const auto note = noteOffEvent->getNote();
 
-        drum.mpcNoteOff(note, 0, -1);
+        DrumNoteEventHandler::noteOff(
+            mpc.getAudioMidiServices()->getVoices(),
+            drum.getSimultA(),
+            drum.getSimultB(),
+            *drumIndex,
+            noteOffEvent->getNote(),
+            /*frameOffset*/ 0,
+            -1
+        );
 
         program->registerPadRelease(program->getPadIndexFromNote(note), Program::PadPressSource::PHYSICAL);
     }
@@ -314,7 +330,15 @@ void EventHandler::handleMidiInputNoteOff(const std::shared_ptr<NoteOffEvent> no
     const auto program = mpc.getSampler()->getProgram(drum.getProgram());
     const auto note = noteOffEvent->getNote();
 
-    drum.mpcNoteOff(note, frameOffsetInBuffer, -1);
+    DrumNoteEventHandler::noteOff(
+        mpc.getAudioMidiServices()->getVoices(),
+        drum.getSimultA(),
+        drum.getSimultB(),
+        *drumIndex,
+        note,
+        frameOffsetInBuffer,
+        -1
+    );
 
     program->registerPadRelease(program->getPadIndexFromNote(note), Program::PadPressSource::NON_PHYSICAL);
 }

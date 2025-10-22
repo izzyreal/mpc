@@ -154,15 +154,6 @@ std::vector<std::shared_ptr<IndivFxMixer>>& Drum::getIndivFxMixerChannels()
 	return indivFxMixerChannels;
 }
 
-void Drum::mpcNoteOff(int note, int frameOffset, int noteOnStartTick)
-{
-    DrumNoteEventHandler::noteOff(
-        voices, simultA, simultB,
-        drumIndex,
-        note, frameOffset, noteOnStartTick
-    );
-}
-
 void Drum::startDecayForNote(const int note, const int frameOffset, const int noteOnStartTick)
 {
     for (auto& voice : voices)

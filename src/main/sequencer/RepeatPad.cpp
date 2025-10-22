@@ -175,7 +175,18 @@ void RepeatPad::process(mpc::Mpc& mpc,
                     (const int bufferOffset){
                 if (track->getBus() > 0)
                 {
-                    mpc.getDrum(track->getBus() - 1).mpcNoteOff(note, bufferOffset, tickPosition);
+                    auto &drum = mpc.getDrum(track->getBus() - 1);
+
+                    DrumNoteEventHandler::noteOff(
+                        mpc.getAudioMidiServices()->getVoices(),
+                        drum.getSimultA(),
+                        drum.getSimultB(),
+                        drum.getIndex(),
+                        note,
+                        bufferOffset,
+                        tickPosition
+                    );
+
                     program->registerPadRelease(programPadIndex, PadPressSource::NON_PHYSICAL);
                 }
 

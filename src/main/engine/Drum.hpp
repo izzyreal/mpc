@@ -71,9 +71,6 @@ namespace mpc::engine
 		std::vector<std::shared_ptr<StereoMixer>>& getStereoMixerChannels();
 		std::vector<std::shared_ptr<IndivFxMixer>>& getIndivFxMixerChannels();
 
-	public:
-		void mpcNoteOff(int note, int frameOffset, int noteOnStartTick);
-
 	private:
         void checkForMutes(mpc::sampler::NoteParameters* np);
         void startDecayForNote(const int note,
