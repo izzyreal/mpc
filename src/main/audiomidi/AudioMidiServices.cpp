@@ -225,16 +225,11 @@ void AudioMidiServices::createSynth()
         voices.emplace_back(std::make_shared<Voice>(i + 1, false));
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int drumIndex = 0; drumIndex < 4; ++drumIndex)
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
-        soundPlayerChannels.emplace_back(Drum(mpc.getSampler(),
-                                         i,
-                                         mixer,
-                                         mixerSetupScreen.get(),
-                                         voices,
-                                         mixerConnections));
+        soundPlayerChannels.emplace_back(Drum(mpc.getSampler(), drumIndex, voices));
     }
 
     basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(mpc.getSampler(), mixer, basicVoice);

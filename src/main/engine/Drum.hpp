@@ -3,29 +3,16 @@
 #include <map>
 #include <vector>
 #include <memory>
-#include "MixerInterconnection.hpp"
-
-namespace mpc::lcdgui::screens {
-    class MixerSetupScreen;
-}
 
 namespace mpc::sampler {
     class Sampler;
     class NoteParameters;
 }
 
-namespace mpc::engine::audio::mixer {
-	class AudioMixer;
-}
-
 namespace mpc::engine {
 	class StereoMixer;
 	class IndivFxMixer;
 	class Voice;
-	class MixerInterconnection;
-}
-namespace mpc::sequencer {
-	class NoteOnEvent;
 }
 
 namespace mpc::engine
@@ -38,9 +25,6 @@ namespace mpc::engine
 		std::map<int, int> simultB;
         std::vector<std::shared_ptr<Voice>> voices;
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
-		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
-		std::vector<MixerInterconnection*>& mixerConnections;
-        mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen = nullptr;
 
 	private:
 		int drumIndex = 0;
@@ -79,12 +63,9 @@ namespace mpc::engine
         void stopMonoOrPolyVoiceWithSameNoteParameters(mpc::sampler::NoteParameters* noteParameters, int note);
 
 	public:
-		Drum(std::shared_ptr<mpc::sampler::Sampler> sampler,
-             int drumIndex,
-             std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
-             mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen,
-             std::vector<std::shared_ptr<Voice>> voices,
-             std::vector<mpc::engine::MixerInterconnection*>& mixerConnections);
-
+		Drum(std::shared_ptr<mpc::sampler::Sampler>,
+             const int drumIndex,
+             std::vector<std::shared_ptr<Voice>>&);
 	};
 }
+
