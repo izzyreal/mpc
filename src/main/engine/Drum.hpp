@@ -4,66 +4,48 @@
 #include <vector>
 #include <memory>
 
-namespace mpc::sampler {
-    class Sampler;
-    class NoteParameters;
-}
-
 namespace mpc::engine {
-	class StereoMixer;
-	class IndivFxMixer;
-	class Voice;
+    class StereoMixer;
+    class IndivFxMixer;
 }
 
 namespace mpc::engine
 {
-	class Drum final
-	{
+    class Drum final
+    {
+        public:
+            Drum(const int drumIndex);
 
-	private:
-		std::map<int, int> simultA;
-		std::map<int, int> simultB;
-        std::vector<std::shared_ptr<Voice>> voices;
-		std::shared_ptr<mpc::sampler::Sampler> sampler;
+            int getIndex() const { return drumIndex; }
+            int getProgram() const;
+            void setProgram(int programIndex);
+            bool receivesPgmChange() const;
+            void setReceivePgmChange(bool b);
+            bool receivesMidiVolume() const;
+            void setReceiveMidiVolume(bool b);
+            void setLastReceivedMidiVolume(int volume);
+            int getLastReceivedMidiVolume() const;
 
-	private:
-		int drumIndex = 0;
-		int programNumber = 0;
-		bool receivePgmChange = false;
-		bool receiveMidiVolume = false;
-		int lastReceivedMidiVolume = 127;
-		std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels;
-		std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels;
+            std::map<int, int>& getSimultA() { return simultA; }
+            std::map<int, int>& getSimultB() { return simultB; }
 
-	public:
-        int getIndex() { return drumIndex; }
-		int getProgram();
-		void setProgram(int i);
-		bool receivesPgmChange();
-		void setReceivePgmChange(bool b);
-		bool receivesMidiVolume();
-		void setReceiveMidiVolume(bool b);
-		void setLastReceivedMidiVolume(int volume);
-		int getLastReceivedMidiVolume();
+            std::vector<std::shared_ptr<StereoMixer>>& getStereoMixerChannels();
+            std::vector<std::shared_ptr<IndivFxMixer>>& getIndivFxMixerChannels();
 
-        std::map<int, int>& getSimultA() { return simultA; }
-        std::map<int, int>& getSimultB() { return simultB; }
+        private:
+            const int drumIndex;
 
-	public:
-		void allSoundOff(int frameOffset);
-		std::vector<std::shared_ptr<StereoMixer>>& getStereoMixerChannels();
-		std::vector<std::shared_ptr<IndivFxMixer>>& getIndivFxMixerChannels();
+            int programIndex = 0;
 
-	private:
-        void startDecayForNote(const int note,
-                               const int frameOffset,
-                               const int noteOnStartTick);
-        void stopMonoOrPolyVoiceWithSameNoteParameters(mpc::sampler::NoteParameters* noteParameters, int note);
+            std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels;
+            std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels;
 
-	public:
-		Drum(std::shared_ptr<mpc::sampler::Sampler>,
-             const int drumIndex,
-             std::vector<std::shared_ptr<Voice>>&);
-	};
+            std::map<int, int> simultA;
+            std::map<int, int> simultB;
+
+            bool receivePgmChange = false;
+            bool receiveMidiVolume = false;
+            int lastReceivedMidiVolume = 127;
+    };
 }
 

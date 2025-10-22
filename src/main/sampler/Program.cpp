@@ -15,13 +15,13 @@ Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* samplerToUse)
 	sampler = samplerToUse;
 	init();
 	
-	for (int i = 0; i < PROGRAM_PAD_COUNT; i++)
+	for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
 	{
 		auto n = new NoteParameters(i);
 		noteParameters.push_back(n);
 	}
 	
-	for (int i = 0; i < PROGRAM_PAD_COUNT; i++)
+	for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
 	{
 		auto p = new Pad(mpc, i);
 		pads.push_back(p);
@@ -39,7 +39,7 @@ int Program::getNumberOfSamples()
 {
     auto counter = 0;
 
-    for (int i = 0; i < PROGRAM_PAD_COUNT; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
 	{
         auto np = getNoteParameters(i + 35);
         
@@ -88,7 +88,7 @@ int Program::getPadIndexFromNote(int note)
 	if (note < 35 || note > 98)
 		return -1;
 	
-	for (int i = 0; i < PROGRAM_PAD_COUNT; i++)
+	for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
 	{
 		if (pads[i]->getNote() == note)
 			return i;
@@ -130,7 +130,7 @@ void Program::setMidiProgramChange(int i)
 
 void Program::initPadAssign()
 {
-	for (int i = 0; i < PROGRAM_PAD_COUNT; i++)
+	for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
 		pads[i]->setNote((*sampler->getInitMasterPadAssign())[i]);
 }
 

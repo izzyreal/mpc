@@ -146,7 +146,7 @@ private:
     std::vector<int> masterPadAssign;
 
     std::vector<std::shared_ptr<Sound>> sounds;
-    std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(MAX_PROGRAM_COUNT);
+    std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(Mpc2000XlSpecs::MAX_PROGRAM_COUNT);
     unsigned char soundSortingType = 0;
     std::vector<std::string> padNames;
     std::vector<std::string> abcd = std::vector<std::string>{ "A", "B", "C", "D" };

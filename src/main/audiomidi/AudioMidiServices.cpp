@@ -229,7 +229,7 @@ void AudioMidiServices::createSynth()
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
-        soundPlayerChannels.emplace_back(Drum(mpc.getSampler(), drumIndex, voices));
+        soundPlayerChannels.emplace_back(Drum(drumIndex));
     }
 
     basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(mpc.getSampler(), mixer, basicVoice);

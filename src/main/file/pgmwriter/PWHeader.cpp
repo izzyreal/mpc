@@ -23,7 +23,7 @@ void PWHeader::writeMagic()
 
 void PWHeader::setSoundCount(const uint16_t soundCount)
 {
-    assert(soundCount <= MAX_SOUND_COUNT_IN_MEMORY);
+    assert(soundCount <= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY);
     const auto soundCountBytes = mpc::file::ByteUtil::ushort2bytes(soundCount);
     headerArray[2] = soundCountBytes[0];
     headerArray[3] = soundCountBytes[1];

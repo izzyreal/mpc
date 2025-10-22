@@ -12,6 +12,10 @@ namespace mpc::engine
 {
     class DrumNoteEventHandler final
     {
+    private:
+        static constexpr float PAN_SCALE = 100.0f;
+        static constexpr int STRIP_OFFSET = 32;
+
     public:
         static void noteOn(
             std::shared_ptr<mpc::sampler::Sampler> sampler,
@@ -21,8 +25,8 @@ namespace mpc::engine
             std::vector<std::shared_ptr<mpc::engine::StereoMixer>>& drumStereoMixerChannels,
             std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>& drumIndivFxMixerChannels,
             std::vector<mpc::engine::MixerInterconnection*>& mixerConnections,
-            std::map<int,int>& simultA,
-            std::map<int,int>& simultB,
+            std::map<int, int>& simultA,
+            std::map<int, int>& simultB,
             int drumIndex,
             int programIndex,
             int note,
@@ -37,8 +41,8 @@ namespace mpc::engine
 
         static void noteOff(
             std::vector<std::shared_ptr<mpc::engine::Voice>>& voices,
-            std::map<int,int>& simultA,
-            std::map<int,int>& simultB,
+            std::map<int, int>& simultA,
+            std::map<int, int>& simultB,
             int drumIndex,
             int note,
             int frameOffset,
@@ -46,3 +50,4 @@ namespace mpc::engine
         );
     };
 }
+

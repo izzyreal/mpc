@@ -25,6 +25,7 @@
 #include <samplerate.h>
 
 #include "MpcResourceUtil.hpp"
+#include "engine/Voice.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -331,7 +332,7 @@ std::shared_ptr<Sound> Sampler::addSound()
  */
 std::shared_ptr<Sound> Sampler::addSound(const int sampleRate)
 {
-    if (sounds.size() >= mpc::MAX_SOUND_COUNT_IN_MEMORY)
+    if (sounds.size() >= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY)
     {
         mpc.getLayeredScreen()->showPopupAndAwaitInteraction("Sound directory full(256max)");
         return {};
@@ -400,7 +401,7 @@ void Sampler::repairProgramReferences()
             }
 
             if (!programs[pgm]) {
-                for (int programIndex = 0; programIndex < MAX_PROGRAM_COUNT; programIndex++)
+                for (int programIndex = 0; programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; programIndex++)
                 {
                     if (programs[programIndex])
                     {
@@ -637,7 +638,15 @@ void Sampler::resample(std::shared_ptr<const std::vector<float>> data, int sourc
 
 void Sampler::stopAllVoices(int frameOffset)
 {
-	mpc.getDrum(0).allSoundOff(frameOffset);
+    for (auto& voice : mpc.getAudioMidiServices()->getVoices())
+    {
+        if (voice->isFinished())
+        {
+            continue;
+        }
+
+        voice->startDecay(frameOffset);
+    }
 }
 
 void Sampler::finishBasicVoice()
@@ -980,7 +989,7 @@ std::shared_ptr<Program> Sampler::getDrumBusProgram(const int busNumber)
 {
     const auto programIndex = getDrumBusProgramIndex(busNumber);
 
-    if (programIndex >= 0 && programIndex < MAX_PROGRAM_COUNT)
+    if (programIndex >= 0 && programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT)
     {
         return programs[programIndex];
     }

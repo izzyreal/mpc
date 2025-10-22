@@ -63,7 +63,7 @@ namespace mpc::sampler {
             std::array<int, static_cast<size_t>(PadPressSource::COUNT)> sourceCount {};
         };
 
-        std::array<PadPressState, PROGRAM_PAD_COUNT> pressedPadRegistry {};
+        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> pressedPadRegistry {};
 
 
 	public:

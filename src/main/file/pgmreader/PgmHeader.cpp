@@ -33,7 +33,7 @@ const uint16_t PgmHeader::getSoundCount()
     const auto result =
             ByteUtil::bytes2ushort({headerArray[2], headerArray[3]});
 
-    assert(result <= MAX_SOUND_COUNT_IN_MEMORY);
+    assert(result <= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY);
 
     return result;
 }
