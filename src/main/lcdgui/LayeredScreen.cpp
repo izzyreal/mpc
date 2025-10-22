@@ -766,6 +766,10 @@ template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
     mpc::lcdgui::screens::SequencerScreen>() const;
 
 template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
+    mpc::lcdgui::screens::NextSeqScreen,
+    mpc::lcdgui::screens::NextSeqPadScreen>() const;
+
+template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
     mpc::lcdgui::screens::SequencerScreen,
     mpc::lcdgui::screens::TrMuteScreen>() const;
 
