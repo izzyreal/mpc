@@ -8,6 +8,7 @@ include(FetchContent)
 FetchContent_Declare(akaifat
   GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
   GIT_TAG        main
+  GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
@@ -76,7 +77,10 @@ FetchContent_Declare(readerwriterqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/readerwriterqueue
 )
 
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_Declare(json
+    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
 
 FetchContent_Declare(json-schema-validator
     GIT_REPOSITORY https://github.com/pboettch/json-schema-validator.git
