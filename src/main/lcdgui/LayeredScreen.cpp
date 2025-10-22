@@ -179,7 +179,6 @@ void LayeredScreen::openScreen(const std::string name)
 template <typename T>
 void LayeredScreen::openScreen()
 {
-    printf("openScreen\n");
 	if (!history.empty() && std::dynamic_pointer_cast<T>(history.back()))
     {
         return;
@@ -198,6 +197,12 @@ void LayeredScreen::closeCurrentScreen()
     
     if (auto currentScreen = getFocusedLayer()->findChild<ScreenComponent>(); currentScreen)
     {
+        if (auto focusedField = currentScreen->findFocus(); focusedField)
+        {
+            auto focusedFieldName = focusedField->getName();
+            setLastFocus(currentScreen->getName(), focusedFieldName);
+        }
+        
         currentScreen->close();
         getFocusedLayer()->removeChild(currentScreen);
     }
@@ -216,14 +221,6 @@ void LayeredScreen::closeCurrentScreen()
 
 void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScreen)
 {
-    printf("openScreenInternal\n");
-    
-    while (getFocusedLayerIndex() != -1 && getFocusedLayerIndex() > newScreen->getLayerIndex())
-    {
-        printf("focused layer index: %i, newScreen layer index: %i\n", getFocusedLayerIndex(), newScreen->getLayerIndex());
-        closeCurrentScreen();
-    }
-        
     auto ams = mpc.getAudioMidiServices();
 
     if (!history.empty())
@@ -248,18 +245,13 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
                 setFocus("note0");
             }
         }
-
-        auto focusedFieldName = getFocusedFieldName();
-//        auto focus = getFocusedLayer()->findField(focusedFieldName);
-
-        setLastFocus(history.back()->getName(), focusedFieldName);
-
-//        if (focus)
-//        {
-//            focus->loseFocus("");
-//        }
     }
-
+    
+    while (getFocusedLayerIndex() != -1 && getFocusedLayerIndex() > newScreen->getLayerIndex())
+    {
+        closeCurrentScreen();
+    }
+        
     if (auto sampleScreen = std::dynamic_pointer_cast<SampleScreen>(newScreen); sampleScreen)
 	{
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
@@ -275,6 +267,11 @@ void LayeredScreen::openScreenInternal(std::shared_ptr<ScreenComponent> newScree
 
     if (!history.empty())
     {
+        if (auto focusedField = history.back()->findFocus(); focusedField)
+        {
+            auto focusedFieldName = focusedField->getName();
+            setLastFocus(history.back()->getName(), focusedFieldName);
+        }
         history.back()->close();
     }
     
@@ -710,6 +707,7 @@ void LayeredScreen::transferUp()
 
 std::string LayeredScreen::getFocusedFieldName()
 {
+    auto focusedLayer = getFocusedLayer();
 	return getFocusedLayer()->getFocus();
 }
 

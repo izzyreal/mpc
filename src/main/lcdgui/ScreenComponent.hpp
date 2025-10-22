@@ -48,7 +48,6 @@ namespace mpc::lcdgui
 		mpc::engine::Drum& activeDrum();
 
 	protected:
-		std::shared_ptr<Field> findFocus();
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
 		const std::string getLastFocus(const std::string& screenName);
 		std::shared_ptr<Wave> findWave();
@@ -60,6 +59,7 @@ namespace mpc::lcdgui
 
 	public:
 		ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer);
+        std::shared_ptr<Field> findFocus();
 		void setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap);
 		void setFirstField(const std::string& newFirstField);
 		std::string getFirstField();
