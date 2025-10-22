@@ -116,6 +116,9 @@ FetchContent_MakeAvailable(json-schema-validator)
 message(STATUS "Downloading concurrentqueue...")
 FetchContent_MakeAvailable(concurrentqueue)
 
+message(STATUS "Downloading readerwriterqueue...")
+FetchContent_MakeAvailable(readerwriterqueue)
+
 FetchContent_GetProperties(tl-expected)
 if(NOT tl-expected_POPULATED)
     message(STATUS "Downloading tl-expected...")
