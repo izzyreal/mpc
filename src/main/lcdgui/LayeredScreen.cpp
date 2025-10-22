@@ -195,6 +195,11 @@ void LayeredScreen::closeCurrentScreen()
 {
     const int currentLayerIndex = getFocusedLayerIndex();
     
+    if (currentLayerIndex == 0)
+    {
+        return;
+    }
+    
     if (auto currentScreen = getFocusedLayer()->findChild<ScreenComponent>(); currentScreen)
     {
         if (auto focusedField = currentScreen->findFocus(); focusedField)
