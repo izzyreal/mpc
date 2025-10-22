@@ -32,8 +32,6 @@ FetchContent_Declare(tl-expected
   GIT_TAG        v1.3.1
   GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/expected
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ""
 )
 
 set(RTMIDI_BUILD_STATIC_LIBS ON)
