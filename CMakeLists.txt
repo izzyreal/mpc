@@ -76,14 +76,7 @@ FetchContent_Declare(readerwriterqueue
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/readerwriterqueue
 )
 
-FetchContent_Declare(json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG        v3.11.3
-    GIT_SHALLOW    ON
-    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json
-    GIT_PROGRESS   ON
-    GIT_CONFIG     advice.detachedHead=false
-)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
 
 FetchContent_Declare(json-schema-validator
     GIT_REPOSITORY https://github.com/pboettch/json-schema-validator.git
