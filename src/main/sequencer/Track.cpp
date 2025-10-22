@@ -635,7 +635,7 @@ void Track::playNext()
 
     events[eventIndex]->dontDelete = false;
 
-    if (isOn())
+    if (isOn() && (!sequencer->isSoloEnabled() || sequencer->getActiveTrackIndex() == trackIndex))
     {
         mpc.getEventHandler()->handleFinalizedEvent(event, this);
     }
