@@ -252,7 +252,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
     if (clientInput.componentId == ComponentId::NONE && !clientInput.textInputKey)
     {
-        throw std::runtime_error("ClientInput must have a ComponentId or textInputKey");
+        return std::nullopt;
     }
 
     if (clientInput.deltaValue && clientInput.value)
