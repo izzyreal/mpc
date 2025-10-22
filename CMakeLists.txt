@@ -15,7 +15,7 @@ set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
 
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.3.2
+  GIT_TAG        v3.11.0
   GIT_SHALLOW    ON
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/Catch2
 )
@@ -92,15 +92,12 @@ FetchContent_Declare(json-schema-validator
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json-schema-validator
 )
 
-FetchContent_Populate(concurrentqueue)
-FetchContent_Populate(readerwriterqueue)
-
-FetchContent_MakeAvailable(rtmidi akaifat filesystem Catch2 libsamplerate platformfolders json json-schema-validator)
+FetchContent_MakeAvailable(rtmidi akaifat filesystem Catch2 libsamplerate platformfolders json json-schema-validator concurrentqueue)
 
 FetchContent_GetProperties(tl-expected)
 
 if(NOT tl-expected_POPULATED)
-  FetchContent_Populate(tl-expected)
+    FetchContent_MakeAvailable(tl-expected)
 endif()
 
 project(mpc)
