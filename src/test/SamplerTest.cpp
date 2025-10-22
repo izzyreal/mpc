@@ -59,7 +59,7 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
     for (int i = 3; i > 0; i--)
     {
         auto f = mpc.getDisk()->getFile("SOUND" + std::to_string(i) + ".SND");
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
@@ -108,7 +108,7 @@ TEST_CASE("Sort sounds by name", "[sampler]")
     for (int i = 3; i > 0; i--)
     {
         auto f = mpc.getDisk()->getFile("SOUND" + std::to_string(i) + ".SND");
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
@@ -157,7 +157,7 @@ TEST_CASE("Sort sounds by size", "[sampler]")
     for (int i = 3; i > 0; i--)
     {
         auto f = mpc.getDisk()->getFile("SOUND" + std::to_string(i) + ".SND");
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
@@ -201,7 +201,7 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
     for (int i = 3; i > 0; i--)
     {
         auto f = mpc.getDisk()->getFile("SOUND" + std::to_string(i) + ".SND");
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
@@ -247,7 +247,7 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
     for (int i = 0; i < 3; i++)
     {
         auto f = mpc.getDisk()->getFile("SOUND" + std::to_string(i + 1) + ".SND");
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
@@ -296,7 +296,7 @@ TEST_CASE("Delete sound 1", "[sampler]")
 
     for (int i = 0; i < 10; i++)
     {
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
 
         if (i % 2 == 0)
@@ -320,7 +320,7 @@ TEST_CASE("Delete sound 2", "[sampler]")
 
     for (int i = 0; i < 10; i++)
     {
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
 
         if (i % 2 == 0)
@@ -344,7 +344,7 @@ TEST_CASE("Purge unused sounds", "[sampler]")
 
     for (int i = 0; i < 10; i++)
     {
-        auto s = sampler->addSound("");
+        auto s = sampler->addSound();
         assert(s != nullptr);
         s->setName("sound" + std::to_string(i));
 

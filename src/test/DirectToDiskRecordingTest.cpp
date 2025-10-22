@@ -19,7 +19,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    auto sound = mpc.getSampler()->addSound("");
+    auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
     sound->setMono(true);
 

@@ -21,7 +21,7 @@ const uint16_t MAX_SLIDER_VALUE = 127;
 
 std::shared_ptr<Sound> initSound(mpc::Mpc& mpc)
 {
-    auto sound = mpc.getSampler()->addSound("");
+    auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
     sound->setMono(true);
     std::vector<float> silence(SOUND_LENGTH);
@@ -545,12 +545,20 @@ TEST_CASE("Loop To fine window", "[sound]")
     mpc.getScreen()->function(0); // Go to TRIM screen
     mpc.getScreen()->down();
     mpc.getScreen()->openWindow(); // Open Start fine window
+
+    REQUIRE(mpc.getLayeredScreen()->isCurrentScreen<StartFineScreen>());
+
     mpc.getScreen()->down(); // Move to Smpl Length: field
     mpc.getScreen()->turnWheel(1); // Set Smpl Length to FIXed
     mpc.getScreen()->function(3); // Close Start fine window
     mpc.getScreen()->function(1); // Open LOOP screen, and we should be back at the To: field
 
+    REQUIRE(mpc.getLayeredScreen()->isCurrentScreen<LoopScreen>());
+    REQUIRE(mpc.getLayeredScreen()->getFocusedFieldName() == "to");
+
     mpc.getScreen()->openWindow(); // Open Loop To fine window, we should be back at the Lngth: field
+    REQUIRE(mpc.getLayeredScreen()->isCurrentScreen<LoopToFineScreen>());
+    REQUIRE(mpc.getLayeredScreen()->getFocusedFieldName() == "lngth");
     mpc.getScreen()->turnWheel(1); // Add 1 to the length
 
     // Now we expect the loop-to point to have changed. When increasing the loop length,

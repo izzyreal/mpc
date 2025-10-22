@@ -126,7 +126,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     std::vector<int> recordedTickPos;
     int prevTickPos = -1;
     
-    const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
 
     while (tickPos < 384 && prevTickPos <= tickPos)
     {
@@ -138,12 +138,12 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
             {
                 if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
                 {
-                    auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screenName);
+                    auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screen);
                     TriggerDrumNoteOnCommand(noteOnCtx).execute();
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
-                    auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screenName);
+                    auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen);
                     TriggerDrumNoteOffCommand(noteOffCtx).execute();
                 }
             }
@@ -229,18 +229,18 @@ TEST_CASE("Undo", "[sequencer]")
 
     int64_t timeInSamples = 0;
 
-    const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
 
     for (int i = 0; i < 20; i++)
     {
         if (i % 2 == 0)
         {
-            auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screenName);
+            auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screen);
             TriggerDrumNoteOnCommand(noteOnCtx).execute();
         }
         else
         {
-            auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screenName);
+            auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen);
             TriggerDrumNoteOffCommand(noteOffCtx).execute();
         }
 
