@@ -52,6 +52,7 @@ namespace mpc::engine
 		std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels;
 
 	public:
+        int getIndex() { return drumIndex; }
 		int getProgram();
 		void allNotesOff();
 		void setProgram(int i);
@@ -61,7 +62,9 @@ namespace mpc::engine
 		void setReceiveMidiVolume(bool b);
 		void setLastReceivedMidiVolume(int volume);
 		int getLastReceivedMidiVolume();
-		void mpcNoteOn(int note, int velo, int varType, int varValue, int frameOffset, bool firstGeneration, int startTick, int durationFrames);
+
+        std::map<int, int>& getSimultA() { return simultA; }
+        std::map<int, int>& getSimultB() { return simultB; }
 
 	public:
 		void allSoundOff(int frameOffset);

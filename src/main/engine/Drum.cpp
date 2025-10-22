@@ -16,7 +16,7 @@
 #include "engine/audio/mixer/PanControl.hpp"
 #include "engine/control/CompoundControl.hpp"
 
-#include "engine/NoteEventProcessor.hpp"
+#include "engine/DrumNoteEventHandler.hpp"
 
 #include <utility>
 
@@ -154,30 +154,9 @@ std::vector<std::shared_ptr<IndivFxMixer>>& Drum::getIndivFxMixerChannels()
 	return indivFxMixerChannels;
 }
 
-void Drum::mpcNoteOn(int note, int velo, int varType, int varValue,
-                     int frameOffset, bool firstGeneration,
-                     int startTick, int durationFrames)
-{
-    NoteEventProcessor::noteOn(
-        *sampler,
-        *mixer,
-        mixerSetupScreen,
-        voices,
-        stereoMixerChannels,
-        indivFxMixerChannels,
-        mixerConnections,
-        simultA,
-        simultB,
-        drumIndex,
-        programNumber,
-        note, velo, varType, varValue,
-        frameOffset, firstGeneration, startTick, durationFrames
-    );
-}
-
 void Drum::mpcNoteOff(int note, int frameOffset, int noteOnStartTick)
 {
-    NoteEventProcessor::noteOff(
+    DrumNoteEventHandler::noteOff(
         voices, simultA, simultB,
         drumIndex,
         note, frameOffset, noteOnStartTick

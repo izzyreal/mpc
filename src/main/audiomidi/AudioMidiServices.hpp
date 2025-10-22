@@ -127,6 +127,10 @@ namespace mpc::audiomidi
 		std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 		bool isBouncePrepared();
 
+        std::shared_ptr<engine::audio::mixer::AudioMixer> getMixer();
+        std::vector<std::shared_ptr<engine::Voice>>& getVoices();
+        std::vector<mpc::engine::MixerInterconnection*>& getMixerConnections();
+
 	public:
 		void start();
 

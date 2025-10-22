@@ -6,7 +6,9 @@
 #include "audiomidi/MidiOutput.hpp"
 #include "controller/ClientInputControllerBase.hpp"
 #include "hardware/Hardware.hpp"
+#include "engine/DrumNoteEventHandler.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Track.hpp"
@@ -14,6 +16,7 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
+using namespace mpc::engine;
 
 void RepeatPad::process(mpc::Mpc& mpc,
                         unsigned int tickPosition,
@@ -127,9 +130,29 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 const auto sound = mpc.getSampler()->getSound(noteParameters->getSoundIndex());
                 auto voiceOverlap = (sound && sound->isLoopEnabled()) ? 2 : noteParameters->getVoiceOverlap();
 
-                mpc.getDrum(track->getBus() - 1).mpcNoteOn(
-                    note, noteEvent->getVelocity(), noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrameOffset, true, -1,
-                    voiceOverlap == 2 ? durationFrames : -1);
+                auto &drum = mpc.getDrum(track->getBus() - 1);
+
+                DrumNoteEventHandler::noteOn(
+                    mpc.getSampler(),
+                    mpc.getAudioMidiServices()->getMixer(),
+                    mpc.screens->get<MixerSetupScreen>(),
+                    mpc.getAudioMidiServices()->getVoices(),
+                    drum.getStereoMixerChannels(),
+                    drum.getIndivFxMixerChannels(),
+                    mpc.getAudioMidiServices()->getMixerConnections(),
+                    drum.getSimultA(),
+                    drum.getSimultB(),
+                    drum.getIndex(),
+                    drum.getProgram(),
+                    note,
+                    noteEvent->getVelocity(),
+                    noteEvent->getVariationType(),
+                    noteEvent->getVariationValue(),
+                    eventFrameOffset,
+                    /* firstGeneration */ true, // Always true for invokers that are not DrumNoteEventHandler::noteOn itself
+                    /*tick*/ -1,
+                    voiceOverlap == 2 ? durationFrames : -1
+                );
 
                 program->registerPadPress(programPadIndex, PadPressSource::NON_PHYSICAL);
             }

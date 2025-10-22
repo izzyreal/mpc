@@ -1,4 +1,4 @@
-#include "NoteEventProcessor.hpp"
+#include "DrumNoteEventHandler.hpp"
 
 #include "Voice.hpp"
 #include "StereoMixer.hpp"
@@ -25,18 +25,18 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::sampler;
 using namespace mpc::engine::control;
 
-void NoteEventProcessor::noteOn(
-    Sampler& sampler,
-    AudioMixer& mixer,
-    MixerSetupScreen* mixerSetupScreen,
+void DrumNoteEventHandler::noteOn(
+    std::shared_ptr<Sampler> sampler,
+    std::shared_ptr<AudioMixer> mixer,
+    std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
     std::vector<std::shared_ptr<Voice>>& voices,
-    std::vector<std::shared_ptr<StereoMixer>>& stereoMixerChannels,
-    std::vector<std::shared_ptr<IndivFxMixer>>& indivFxMixerChannels,
+    std::vector<std::shared_ptr<StereoMixer>>& drumStereoMixerChannels,
+    std::vector<std::shared_ptr<IndivFxMixer>>& drumIndivFxMixerChannels,
     std::vector<MixerInterconnection*>& mixerConnections,
     std::map<int,int>& simultA,
     std::map<int,int>& simultB,
     int drumIndex,
-    int programNumber,
+    int programIndex,
     int note, int velo, int varType, int varValue,
     int frameOffset, bool firstGeneration,
     int startTick, int durationFrames
@@ -45,7 +45,7 @@ void NoteEventProcessor::noteOn(
     if (note < 35 || note > 98 || velo == 0)
         return;
 
-    auto program = sampler.getProgram(programNumber);
+    auto program = sampler->getProgram(programIndex);
     if (!program) return;
 
     auto np = program->getNoteParameters(note);
@@ -81,8 +81,12 @@ void NoteEventProcessor::noteOn(
     if (soundNumber == -1 || !voice)
         return;
 
-    auto sound = sampler.getSound(soundNumber);
-    if (!sound) return;
+    auto sound = sampler->getSound(soundNumber);
+
+    if (!sound)
+    {
+        return;
+    }
 
     auto smc = program->getStereoMixerChannel(note - 35);
     auto ifmc = program->getIndivFxMixerChannel(note - 35);
@@ -91,11 +95,16 @@ void NoteEventProcessor::noteOn(
     bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
     if (sSrcDrum)
-        smc = stereoMixerChannels[note - 35];
-    if (iSrcDrum)
-        ifmc = indivFxMixerChannels[note - 35];
+    {
+        smc = drumStereoMixerChannels[note - 35];
+    }
 
-    auto mixerControls = mixer.getMixerControls();
+    if (iSrcDrum)
+    {
+        ifmc = drumIndivFxMixerChannels[note - 35];
+    }
+
+    const auto mixerControls = mixer->getMixerControls();
 
     auto sc = mixerControls->getStripControls(std::to_string(voice->getStripNumber()));
 
@@ -172,7 +181,7 @@ void NoteEventProcessor::noteOn(
 
     voice->init(velo, sound, note, np, varType, varValue, note, drumIndex,
                 frameOffset, true, startTick, durationFrames,
-                mixer.getSharedBuffer()->getSampleRate());
+                mixer->getSharedBuffer()->getSampleRate());
 
     // --- Simultaneous notes ---
     if (firstGeneration && np->getSoundGenerationMode() == 1)
@@ -183,8 +192,8 @@ void NoteEventProcessor::noteOn(
         if (optA != 34)
         {
             noteOn(sampler, mixer, mixerSetupScreen, voices,
-                   stereoMixerChannels, indivFxMixerChannels, mixerConnections,
-                   simultA, simultB, drumIndex, programNumber,
+                   drumStereoMixerChannels, drumIndivFxMixerChannels, mixerConnections,
+                   simultA, simultB, drumIndex, programIndex,
                    optA, velo, varType, varValue, frameOffset,
                    false, startTick, durationFrames);
             simultA[note] = optA;
@@ -193,8 +202,8 @@ void NoteEventProcessor::noteOn(
         if (optB != 34)
         {
             noteOn(sampler, mixer, mixerSetupScreen, voices,
-                   stereoMixerChannels, indivFxMixerChannels, mixerConnections,
-                   simultA, simultB, drumIndex, programNumber,
+                   drumStereoMixerChannels, drumIndivFxMixerChannels, mixerConnections,
+                   simultA, simultB, drumIndex, programIndex,
                    optB, velo, varType, varValue, frameOffset,
                    false, startTick, durationFrames);
             simultB[note] = optB;
@@ -202,7 +211,7 @@ void NoteEventProcessor::noteOn(
     }
 }
 
-void NoteEventProcessor::noteOff(
+void DrumNoteEventHandler::noteOff(
     std::vector<std::shared_ptr<Voice>>& voices,
     std::map<int,int>& simultA,
     std::map<int,int>& simultB,

@@ -501,3 +501,19 @@ void AudioMidiServices::setMixerMasterLevel(int8_t dbValue)
         v->setMasterLevel(dbValue);
     }
 }
+
+std::shared_ptr<AudioMixer> AudioMidiServices::getMixer()
+{
+    return mixer;
+}
+
+std::vector<std::shared_ptr<engine::Voice>>& AudioMidiServices::getVoices()
+{
+    return voices;
+}
+
+std::vector<mpc::engine::MixerInterconnection*>& AudioMidiServices::getMixerConnections()
+{
+    return mixerConnections;
+}
+
