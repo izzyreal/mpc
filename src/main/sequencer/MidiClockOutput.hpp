@@ -49,7 +49,7 @@ namespace mpc::sequencer {
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(50);
 
         void sendMidiClockMsg(int frameIndex);
-        void enqueueEventAfterNFrames(const std::function<void(unsigned int)> &event, unsigned long nFrames);
+        void enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames);
 
         std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
 
@@ -64,7 +64,7 @@ namespace mpc::sequencer {
 
         void setSampleRate(unsigned int sampleRate);
 
-        void sendMidiSyncMsg(unsigned char status, unsigned int frameIndex);
+        void sendMidiSyncMsg(unsigned char status);
 
         bool isLastProcessedFrameMidiClockLock();
     };

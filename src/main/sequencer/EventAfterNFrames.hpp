@@ -7,18 +7,18 @@ namespace mpc::sequencer {
 
     struct EventAfterNFrames {
         std::atomic<bool> occupied = ATOMIC_VAR_INIT(false);
-        std::function<void(unsigned int)> f = [](unsigned int /*frameIndex*/) {};
+        std::function<void()> f = []() {};
         unsigned long nFrames = 0;
         unsigned long frameCounter = -1;
 
-        void init(const unsigned long &newNFrames, std::function<void(unsigned int)> callback) {
+        void init(const unsigned long &newNFrames, std::function<void()> callback) {
             occupied.store(true);
             nFrames = newNFrames;
             f = std::move(callback);
         }
 
         void reset() {
-            f = [](unsigned int /*frameIndex*/) {};
+            f = []() {};
             nFrames = 0;
             frameCounter = -1;
             occupied.store(false);

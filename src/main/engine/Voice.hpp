@@ -76,6 +76,7 @@ namespace mpc::engine {
             int filtParam = 0;
             float envAmplitude = 0;
             float staticEnvAmp = 0;
+            uint64_t noteEventId = 0;
     };
 
     class Voice : public mpc::engine::audio::core::AudioProcess
@@ -154,8 +155,11 @@ namespace mpc::engine {
                   int frameOffset,
                   bool enableEnvs,
                   int startTick,
-                  float engineSampleRate);
+                  float engineSampleRate,
+                  uint64_t noteEventId);
 
+        uint64_t getNoteEventId();
+        
         void startDecay();
 
         void startDecay(const int offset);

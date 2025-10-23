@@ -11,11 +11,12 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
+    uint64_t noteEventId,
     Drum *drum,
     std::shared_ptr<Sampler> sampler,
     std::shared_ptr<AudioMixer> mixer,
     std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
-    std::vector<std::shared_ptr<Voice>> &voices,
+    std::vector<std::shared_ptr<Voice>> *voices,
     std::vector<MixerInterconnection*> &mixerConnections,
     int note,
     int velocity,
@@ -28,11 +29,12 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
 )
 {
     DrumNoteOnContext ctx;
+    ctx.noteEventId = noteEventId;
     ctx.drum = drum;
     ctx.sampler = sampler;
     ctx.mixer = mixer;
     ctx.mixerSetupScreen = mixerSetupScreen;
-    ctx.voices = &voices;
+    ctx.voices = voices;
     ctx.mixerConnections = &mixerConnections,
     ctx.note = note;
     ctx.velocity = velocity;
@@ -46,18 +48,18 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
 }
 
 DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
+    uint64_t noteEventId,
     Drum *drum,
-    std::vector<std::shared_ptr<Voice>> &voices,
+    std::vector<std::shared_ptr<Voice>> *voices,
     int note,
-    int frameOffset,
     int noteOnStartTick
 )
 {
     DrumNoteOffContext ctx;
+    ctx.noteEventId = noteEventId;
     ctx.drum = drum;
-    ctx.voices = &voices;
+    ctx.voices = voices;
     ctx.note = note;
-    ctx.frameOffset = frameOffset;
     ctx.noteOnStartTick = noteOnStartTick;
     return ctx;
 }

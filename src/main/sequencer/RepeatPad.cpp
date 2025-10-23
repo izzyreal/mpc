@@ -134,11 +134,12 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 auto &drum = mpc.getDrum(track->getBus() - 1);
 
                 auto ctx = DrumNoteEventContextBuilder::buildNoteOn(
+                    0,
                     &drum,
                     mpc.getSampler(),
                     mpc.getAudioMidiServices()->getMixer(),
                     mpc.screens->get<MixerSetupScreen>(),
-                    mpc.getAudioMidiServices()->getVoices(),
+                    &mpc.getAudioMidiServices()->getVoices(),
                     mpc.getAudioMidiServices()->getMixerConnections(),
                     note,
                     noteEvent->getVelocity(),
@@ -170,16 +171,16 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
             mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames(
                     [&mpc, track, note, noteEvent, tickPosition, program, programPadIndex]
-                    (const int bufferOffset){
+                    { 
                 if (track->getBus() > 0)
                 {
                     auto &drum = mpc.getDrum(track->getBus() - 1);
 
                     auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
+                        0,
                         &drum,
-                        mpc.getAudioMidiServices()->getVoices(),
+                        &mpc.getAudioMidiServices()->getVoices(),
                         note,
-                        bufferOffset,
                         tickPosition
                     );
 
@@ -191,7 +192,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 if (track->getDeviceIndex() > 0)
                 {
                     const auto noteOffMsg = noteEvent->getNoteOff()->createShortMessage((track->getDeviceIndex() - 1) % 16);
-                    noteOffMsg->bufferPos = bufferOffset;
+                    //noteOffMsg->bufferPos = bufferOffset;
                     mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
                 }
             }, durationFrames - 1);

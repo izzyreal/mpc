@@ -10,10 +10,10 @@ namespace mpc::engine
 
     struct DrumNoteOffContext
     {
+        uint64_t noteEventId;
         Drum *drum;
         std::vector<std::shared_ptr<Voice>>* voices{};
         int note{};
-        int frameOffset{};
         int noteOnStartTick{};
     };
 }

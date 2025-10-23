@@ -169,7 +169,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
     }
 
     voice->init(c.velocity, sound, c.note, np, c.varType, c.varValue, c.drum->getIndex(),
-                c.frameOffset, true, c.startTick, c.mixer->getSharedBuffer()->getSampleRate());
+                c.frameOffset, true, c.startTick, c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId);
 
     if (c.firstGeneration && np->getSoundGenerationMode() == 1)
     {
@@ -179,11 +179,12 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
         if (optA != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptA = DrumNoteEventContextBuilder::buildNoteOn(
+                    c.noteEventId,
                     c.drum,
                     c.sampler,
                     c.mixer,
                     c.mixerSetupScreen,
-                    *c.voices,
+                    c.voices,
                     *c.mixerConnections,
                     optA,
                     c.velocity,
@@ -203,11 +204,12 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
         if (optB != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptB = DrumNoteEventContextBuilder::buildNoteOn(
+                    c.noteEventId,
                     c.drum,
                     c.sampler,
                     c.mixer,
                     c.mixerSetupScreen,
-                    *c.voices,
+                    c.voices,
                     *c.mixerConnections,
                     optB,
                     c.velocity,
@@ -235,7 +237,7 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
         return;
     }
 
-    auto startDecayForNote = [&](int noteToStop)
+    auto startDecayForNote = [&](int noteToStop, uint64_t noteEventId)
     {
         for (auto& voice : *c.voices)
         {
@@ -244,25 +246,26 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
                 voice->getNote() == noteToStop &&
                 voice->getVoiceOverlap() == VoiceOverlapMode::NOTE_OFF &&
                 !voice->isDecaying() &&
-                c.drum->getIndex() == voice->getMuteInfo().getDrum())
+                c.drum->getIndex() == voice->getMuteInfo().getDrum() &&
+                (c.noteEventId == 0 || voice->getNoteEventId() == noteEventId))
             {
-                voice->startDecay(c.frameOffset);
+                voice->startDecay();
                 break;
             }
         }
     };
 
-    startDecayForNote(c.note);
+    startDecayForNote(c.note, c.noteEventId);
 
     if (auto it = c.drum->getSimultA().find(c.note); it != c.drum->getSimultA().end())
     {
-        startDecayForNote(it->second);
+        startDecayForNote(it->second, c.noteEventId);
         c.drum->getSimultA().erase(it);
     }
 
     if (auto it = c.drum->getSimultB().find(c.note); it != c.drum->getSimultB().end())
     {
-        startDecayForNote(it->second);
+        startDecayForNote(it->second, c.noteEventId);
         c.drum->getSimultB().erase(it);
     }
 }

@@ -303,7 +303,7 @@ void Sequencer::setSoloEnabled(bool b)
                             && !voice->isDecaying()
                             && drumIndex == voice->getMuteInfo().getDrum())
                     {
-                        voice->startDecay(0);
+                        voice->startDecay();
                         break;
                     }
                 }
@@ -690,7 +690,7 @@ void Sequencer::stop(const StopMode stopMode)
 
 	if (!bouncing)
     {
-        mpc.getSampler()->stopAllVoices(frameOffset);
+        //mpc.getSampler()->stopAllVoices(frameOffset);
     }
 
 	for (int i = 0; i < 16; i++)

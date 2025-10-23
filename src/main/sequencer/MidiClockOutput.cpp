@@ -43,11 +43,12 @@ void MidiClockOutput::sendMidiClockMsg(int frameIndex)
     }
 }
 
-void MidiClockOutput::sendMidiSyncMsg(unsigned char status, unsigned int frameIndex)
+void MidiClockOutput::sendMidiSyncMsg(unsigned char status)
 {
     midiSyncStartStopContinueMsg->setMessage(status);
 
-    midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
+    // bufferpos should be set by FrameSeq when it's actually emitting these events, i.e. enqueueing them for host processing
+    //midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
 
     if (syncScreen->getModeOut() > 0)
     {
@@ -75,7 +76,7 @@ void MidiClockOutput::processTempoChange()
     }
 }
 
-void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void(unsigned int)>& event, unsigned long nFrames)
+void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void()>& event, unsigned long nFrames)
 {
     for (auto &e : eventsAfterNFrames)
     {
@@ -96,8 +97,8 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
 
     const unsigned int numberOfFramesBeforeMidiSyncStart = durationToNextClockInFrames - oneMsInFrames;
 
-    enqueueEventAfterNFrames([&](unsigned int frameIndex){
-        sendMidiSyncMsg(sequencer->getPlayStartPositionQuarterNotes() == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE, frameIndex);
+    enqueueEventAfterNFrames([&]{
+        sendMidiSyncMsg(sequencer->getPlayStartPositionQuarterNotes() == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE);
     }, numberOfFramesBeforeMidiSyncStart);
 }
 
@@ -116,7 +117,7 @@ void MidiClockOutput::processEventsAfterNFrames(int frameIndex)
 
         if (e.frameCounter >= e.nFrames)
         {
-            e.f(frameIndex);
+            e.f();
             e.reset();
         }
     }
@@ -162,7 +163,7 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer, int frameIndex
 
         if (wasRunning && !isRunningAtStartOfBuffer)
         {
-            sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
+            sendMidiSyncMsg(ShortMessage::STOP);
             wasRunning = false;
         }
     }

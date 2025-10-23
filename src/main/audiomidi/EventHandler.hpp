@@ -28,6 +28,8 @@ namespace mpc::audiomidi {
             using NoteOffEvent = mpc::sequencer::NoteOffEvent;
             using NoteOnEventPlayOnly = mpc::sequencer::NoteOnEventPlayOnly;
 
+            std::atomic<uint64_t> noteEventId = 1;
+        
         public:
             void handleFinalizedEvent(const std::shared_ptr<Event>,
                                       Track *const);

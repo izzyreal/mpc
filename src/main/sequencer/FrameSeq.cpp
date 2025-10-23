@@ -414,7 +414,7 @@ void FrameSeq::stopSequencer()
     move(0);
 }
 
-void FrameSeq::enqueueEventAfterNFrames(const std::function<void(unsigned int)>& event, unsigned long nFrames)
+void FrameSeq::enqueueEventAfterNFrames(const std::function<void()>& event, unsigned long nFrames)
 {
     for (auto &e : eventsAfterNFrames)
     {
@@ -441,7 +441,7 @@ void FrameSeq::processEventsAfterNFrames(int frameIndex)
 
         if (e.frameCounter >= e.nFrames)
         {
-            e.f(frameIndex);
+            e.f();
             e.reset();
         }
     }

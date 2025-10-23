@@ -109,7 +109,7 @@ namespace mpc::sequencer {
 
         bool isRunning();
 
-        void enqueueEventAfterNFrames(const std::function<void(unsigned int)> &event, unsigned long nFrames);
+        void enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames);
 
         uint64_t getMetronomeOnlyTickPosition();
 

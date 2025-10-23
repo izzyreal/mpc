@@ -88,11 +88,14 @@ void Voice::init(
         int newFrameOffset,
         bool newEnableEnvs,
         int newStartTick,
-        float engineSampleRate)
+        float engineSampleRate,
+        uint64_t noteEventId)
 {
     VoiceState *state = getInactiveState();
 
     state->finished = false;
+    
+    state->noteEventId = noteEventId;
 
     state->noteParameters = np;
     state->startTick = newStartTick;
@@ -416,6 +419,12 @@ int Voice::getNote() const
 {
     const VoiceState *state = getActiveState();
     return state->note;
+}
+
+uint64_t Voice::getNoteEventId()
+{
+    const VoiceState *state = getActiveState();
+    return state->noteEventId;
 }
 
 bool Voice::isFinished() const

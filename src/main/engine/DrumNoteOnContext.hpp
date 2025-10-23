@@ -14,6 +14,7 @@ namespace mpc::engine
 {
     struct DrumNoteOnContext
     {
+        uint64_t noteEventId;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
         std::shared_ptr<mpc::lcdgui::screens::MixerSetupScreen> mixerSetupScreen;
