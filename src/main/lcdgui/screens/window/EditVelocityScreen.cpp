@@ -144,6 +144,7 @@ void EditVelocityScreen::displayNotes()
 		}
 		else
 		{
+            auto program = getProgramOrThrow();
             auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
 		}
@@ -155,28 +156,13 @@ void EditVelocityScreen::displayNotes()
 
 void EditVelocityScreen::setEditType(int i)
 {
-	if (i < 0 || i > 3)
-	{
-		return;
-	}
-
-	editType = i;
+	editType = std::clamp(i, 0, 3);
 	displayEditType();
 }
 
 void EditVelocityScreen::setValue(int i)
 {
-	if (i < 1 || i > 200)
-	{
-		return;
-	}
-
-	if (editType != 2 && i > 127)
-	{
-		return;
-	}
-
-	value = i;
+	value = std::clamp(i, 1, editType == 2 ? 200 : 127);
 	displayValue();
 }
 

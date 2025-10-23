@@ -98,7 +98,7 @@ namespace mpc {
         void setBank(int i);
         int getBank();
         void setNote(int note);
-        void setPad(unsigned char padIndexWithBank);
+        void setPad(int padIndexWithBank);
         int getNote();
         int getPad();
         void panic();

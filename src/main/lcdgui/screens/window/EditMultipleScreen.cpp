@@ -283,6 +283,7 @@ void EditMultipleScreen::updateEditMultiple()
                 findLabel("value0")->setText(singleLabels[0]);
                 findField("value0")->setSize(6 * 6 + 1, 9);
 
+                auto program = getProgramOrThrow();
                 auto padName = sampler->getPadName(program->getPadIndexFromNote(changeNoteTo));
                 auto noteName = changeNoteTo == 34 ? "--" : std::to_string(changeNoteTo);
                 findField("value0")->setText(noteName + "/" + padName);
@@ -420,21 +421,8 @@ void EditMultipleScreen::updateDouble()
 void EditMultipleScreen::setChangeNoteTo(int i)
 {
     init();
-    
     auto midi = track->getBus() == 0;
-    
-    if (midi)
-    {
-        if (i < 0 || i > 127)
-            return;
-    }
-    else
-    {
-        if (i < 34 || i > 98)
-            return;
-    }
-    
-    changeNoteTo = i;
+    changeNoteTo = std::clamp(i, midi ? 0 : 34, midi ? 127 : 98);
     updateEditMultiple();
 }
 
@@ -452,27 +440,12 @@ void mpc::lcdgui::screens::window::EditMultipleScreen::incrementVariationType(in
 
 void EditMultipleScreen::setVariationValue(int i)
 {
-    if (i < 0 || i > 124)
-        return;
-    
-    if (variationType != NoteOnEvent::VARIATION_TYPE::TUNE_0 && i > 100)
-        i = 100;
-    
-    variationValue = i;
+    variationValue = std::clamp(i, 0, variationType == NoteOnEvent::VARIATION_TYPE::TUNE_0 ? 124 : 100);
     updateEditMultiple();
 }
 
 void EditMultipleScreen::setEditValue(int i)
 {
-    if (i < 0)
-        return;
-    
-    if (editType != 2 && i > 127)
-        return;
-    
-    if (editType == 2 && i > 200)
-        return;
-    
-    editValue = i;
+    editValue = std::clamp(i, 0, editType == 2 ? 200 : 127);
     updateEditMultiple();
 }

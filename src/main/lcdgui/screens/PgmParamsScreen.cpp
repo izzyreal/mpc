@@ -70,6 +70,7 @@ void PgmParamsScreen::turnWheel(int i)
 {
     init();
 
+    auto program = getProgramOrThrow();
     auto lastNoteParameters = sampler->getLastNp(program.get());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -210,18 +211,21 @@ void PgmParamsScreen::update(Observable* o, Message message)
 void PgmParamsScreen::displayReson()
 {
     init();
+    auto program = getProgramOrThrow();
     findField("reson")->setTextPadded(sampler->getLastNp(program.get())->getFilterResonance());
 }
 
 void PgmParamsScreen::displayFreq()
 {
     init();
+    auto program = getProgramOrThrow();
     findField("freq")->setTextPadded(sampler->getLastNp(program.get())->getFilterFrequency());
 }
 
 void PgmParamsScreen::displayAttackDecay()
 {
     init();
+    auto program = getProgramOrThrow();
     auto attack = sampler->getLastNp(program.get())->getAttack();
     auto decay = sampler->getLastNp(program.get())->getDecay();
     auto decayModeStart = sampler->getLastNp(program.get())->getDecayMode() == 1;
@@ -233,6 +237,7 @@ void PgmParamsScreen::displayAttackDecay()
 void PgmParamsScreen::displayNote()
 {
     init();
+    auto program = getProgramOrThrow();
     auto noteParameters = sampler->getLastNp(program.get());
     auto soundIndex = noteParameters->getSoundIndex();
     auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
@@ -251,6 +256,7 @@ void PgmParamsScreen::displayPgm()
 void PgmParamsScreen::displayTune()
 {
     init();
+    auto program = getProgramOrThrow();
     auto tune = sampler->getLastNp(program.get())->getTune();
     auto sign = tune < 0 ? "-" : " ";
     auto number = StrUtil::padLeft(std::to_string(abs(tune)), " ", 3);
@@ -260,6 +266,7 @@ void PgmParamsScreen::displayTune()
 void PgmParamsScreen::displayDecayMode()
 {
     init();
+    auto program = getProgramOrThrow();
     findField("dcymd")->setText(decayModes[sampler->getLastNp(program.get())->getDecayMode()]);
     displayAttackDecay();
 }
@@ -268,6 +275,7 @@ void PgmParamsScreen::displayVoiceOverlap()
 {
     init();
 
+    auto program = getProgramOrThrow();
     const auto lastNoteParameters = sampler->getLastNp(program.get());
     sampler::VoiceOverlapMode mode = lastNoteParameters->getVoiceOverlapMode();
 

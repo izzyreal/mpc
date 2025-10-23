@@ -15,43 +15,34 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens;
 
 LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "load-a-sound", layerIndex)
+    : ScreenComponent(mpc, "load-a-sound", layerIndex)
 {
 }
 
 void LoadASoundScreen::open()
 {
-	init();
-	auto loadScreen = mpc.screens->get<LoadScreen>();
-	findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
+    init();
+    auto loadScreen = mpc.screens->get<LoadScreen>();
+    findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
     assignToNote = mpc.getNote();
-	displayAssignToNote();
-	mpc.addObserver(this); // Subscribe to "note" messages
+    displayAssignToNote();
+    mpc.addObserver(this); // Subscribe to "note" messages
 }
 
 void LoadASoundScreen::close()
 {
-	mpc.deleteObserver(this);
+    mpc.deleteObserver(this);
 }
 
 void LoadASoundScreen::turnWheel(int i)
 {
-	init();
+    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "assign-to-note")
-	{
-		auto newAssignToNote = assignToNote + i;
-
-        if (newAssignToNote < 34)
-        {
-            newAssignToNote = 34;
-        }
-        else if (newAssignToNote > 98)
-        {
-            newAssignToNote = 98;
-        }
+    if (focusedFieldName == "assign-to-note")
+    {
+        const auto newAssignToNote = std::clamp(static_cast<int>(assignToNote) + i, 34, 98);
 
         if (newAssignToNote == 34)
         {
@@ -68,34 +59,34 @@ void LoadASoundScreen::turnWheel(int i)
 
 void LoadASoundScreen::function(int i)
 {
-	init();
-	
-	switch (i)
-	{
-	case 2:
-	{
-		auto s = sampler->getPreviewSound();
-		auto start = s->getStart();
-		auto end = s->getLastFrameIndex();
-		auto loopTo = -1;
+    init();
 
-		if (s->isLoopEnabled())
-		{
-			loopTo = s->getLoopTo();
-		}
+    switch (i)
+    {
+        case 2:
+            {
+                auto s = sampler->getPreviewSound();
+                auto start = s->getStart();
+                auto end = s->getLastFrameIndex();
+                auto loopTo = -1;
 
-        sampler->playPreviewSample(start, end, loopTo);
-		break;
-	}
-	case 3:
-		sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
-		sampler->deleteSound(sampler->getPreviewSound());
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
-		break;
-	case 4:
-		keepSound();
-		break;
-	}
+                if (s->isLoopEnabled())
+                {
+                    loopTo = s->getLoopTo();
+                }
+
+                sampler->playPreviewSample(start, end, loopTo);
+                break;
+            }
+        case 3:
+            sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
+            sampler->deleteSound(sampler->getPreviewSound());
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            break;
+        case 4:
+            keepSound();
+            break;
+    }
 }
 
 void LoadASoundScreen::keepSound()
@@ -122,7 +113,7 @@ void LoadASoundScreen::keepSound()
 
         if (assignToNote != 34)
         {
-            program->getNoteParameters(assignToNote)->setSoundIndex(soundIndex);
+            getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(soundIndex);
         }
 
         sampler->setSoundIndex(soundIndex);
@@ -135,7 +126,7 @@ void LoadASoundScreen::keepSound()
             const auto isMono = previewSound->isMono();
             sampler->replaceSound(existingSoundIndex, previewSound);
             actionAfterLoadingSound(isMono);
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
         };
 
         const auto initializeNameScreen = [this, actionAfterLoadingSound, previewSound]{
@@ -149,7 +140,7 @@ void LoadASoundScreen::keepSound()
 
                 previewSound->setName(nameScreenName);
                 actionAfterLoadingSound(previewSound->isMono());
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                mpc.getLayeredScreen()->openScreen<LoadScreen>();
             };
 
             auto loadScreen = mpc.screens->get<LoadScreen>();
@@ -159,33 +150,33 @@ void LoadASoundScreen::keepSound()
 
         auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
         fileExistsScreen->initialize(replaceAction, initializeNameScreen,
-                                     [this]{
-                                               sampler->deleteSound(sampler->getPreviewSound());
-                                               mpc.getLayeredScreen()->openScreen<LoadScreen>();
-                                           });
+                [this]{
+                sampler->deleteSound(sampler->getPreviewSound());
+                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                });
         mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
         return;
     }
 
     actionAfterLoadingSound(previewSound->isMono());
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
+    mpc.getLayeredScreen()->openScreen<LoadScreen>();
 }
 
 void LoadASoundScreen::displayAssignToNote()
 {
-	init();
-	auto padIndex = program->getPadIndexFromNote(assignToNote);
-	auto padName = sampler->getPadName(padIndex);
-	auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
-	findField("assign-to-note")->setText(noteName + "/" + padName);
+    init();
+    auto padIndex = getProgramOrThrow()->getPadIndexFromNote(assignToNote);
+    auto padName = sampler->getPadName(padIndex);
+    auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
+    findField("assign-to-note")->setText(noteName + "/" + padName);
 }
 
 void LoadASoundScreen::update(Observable* observable, Message message)
 {
-	const auto msg = std::get<std::string>(message);
-	if (msg == "note")
-	{
+    const auto msg = std::get<std::string>(message);
+    if (msg == "note")
+    {
         assignToNote = mpc.getNote();
-		displayAssignToNote();
-	}
+        displayAssignToNote();
+    }
 }

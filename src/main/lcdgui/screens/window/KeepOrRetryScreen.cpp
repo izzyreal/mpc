@@ -6,7 +6,7 @@
 using namespace mpc::lcdgui::screens::window;
 
 KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex) 
-: ScreenComponent(mpc, "keep-or-retry", layerIndex)
+    : ScreenComponent(mpc, "keep-or-retry", layerIndex)
 {
 }
 
@@ -27,12 +27,12 @@ void KeepOrRetryScreen::close()
 void KeepOrRetryScreen::function(int i)
 {
     init();
-    
+
     switch (i)
     {
         case 1:
             sampler->deleteSound(sampler->getPreviewSound());
-        mpc.getLayeredScreen()->openScreen<SampleScreen>();
+            mpc.getLayeredScreen()->openScreen<SampleScreen>();
             break;
         case 3 :
             sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
@@ -42,11 +42,11 @@ void KeepOrRetryScreen::function(int i)
 
             if (assignToNote != 34)
             {
-                program->getNoteParameters(assignToNote)->setSoundIndex(index);
+                getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(index);
             }
 
             sampler->setSoundIndex(index);
-        mpc.getLayeredScreen()->openScreen<SampleScreen>();
+            mpc.getLayeredScreen()->openScreen<SampleScreen>();
             break;
     }
 }
@@ -78,7 +78,7 @@ void KeepOrRetryScreen::openNameScreen()
 void KeepOrRetryScreen::right()
 {
     init();
-    
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "name-for-new-sound")
@@ -88,7 +88,7 @@ void KeepOrRetryScreen::right()
 void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
-    
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "assign-to-note")
@@ -121,7 +121,7 @@ void KeepOrRetryScreen::displayNameForNewSound()
 {
     if (!sampler->getSound())
         return;
-    
+
     findField("name-for-new-sound")->setText(sampler->getPreviewSound()->getName());
 }
 
@@ -129,7 +129,7 @@ void KeepOrRetryScreen::displayAssignToNote()
 {
     init();
     auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
-    auto padStr = sampler->getPadName(program->getPadIndexFromNote(assignToNote));
+    auto padStr = sampler->getPadName(getProgramOrThrow()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }
 

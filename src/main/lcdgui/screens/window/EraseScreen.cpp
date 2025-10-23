@@ -160,6 +160,7 @@ void EraseScreen::displayNotes()
 			findField("note0")->setText("ALL");
 		else
         {
+            auto program = getProgramOrThrow();
             auto padIndexWithBank = program->getPadIndexFromNote(note0);
             auto padName = sampler->getPadName(padIndexWithBank);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
@@ -169,19 +170,13 @@ void EraseScreen::displayNotes()
 
 void EraseScreen::setTrack(int i)
 {
-	if (i < -1 || i > 63)
-		return;
-
-	track = i;
+	track = std::clamp(i, -1, 63);
 	displayTrack();
 }
 
 void EraseScreen::setErase(int i)
 {
-	if (i < 0 || i > 2)
-		return;
-
-	erase = i;
+	erase = std::clamp(i, 0, 2);
 	displayErase();
 	displayType();
 	displayNotes();
@@ -189,10 +184,7 @@ void EraseScreen::setErase(int i)
 
 void EraseScreen::setType(int i)
 {
-	if (i < 0 || i > 6)
-		return;
-
-	type = i;
+	type = std::clamp(i, 0, 6);
 	displayType();
 	displayNotes();
 }

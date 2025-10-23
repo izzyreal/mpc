@@ -64,6 +64,7 @@ void MixerScreen::addMixerStrips()
 std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
+    auto program = getProgramOrThrow();
     const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
     
@@ -80,6 +81,7 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
+    auto program = getProgramOrThrow();
     const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
     
@@ -439,6 +441,8 @@ void MixerScreen::recordMixerEvent(int pad, int param, int value)
 
 void MixerScreen::displayStereoFaders()
 {
+    auto program = getProgramOrThrow();
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -471,6 +475,8 @@ void MixerScreen::displayStereoFaders()
 
 void MixerScreen::displayPanning()
 {
+    auto program = getProgramOrThrow();
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -503,6 +509,8 @@ void MixerScreen::displayPanning()
 
 void MixerScreen::displayIndividualOutputs()
 {
+    auto program = getProgramOrThrow();
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -541,6 +549,8 @@ void MixerScreen::displayIndividualOutputs()
 
 void MixerScreen::displayIndivFaders()
 {
+    auto program = getProgramOrThrow();
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -573,6 +583,8 @@ void MixerScreen::displayIndivFaders()
 
 void MixerScreen::displayFxPaths()
 {
+    auto program = getProgramOrThrow();
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -605,6 +617,8 @@ void MixerScreen::displayFxPaths()
 
 void MixerScreen::displayFxSendLevels()
 {
+    auto program = getProgramOrThrow();
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -637,6 +651,7 @@ void MixerScreen::displayFxSendLevels()
 
 bool MixerScreen::stripHasStereoSound(int stripIndex)
 {
+    auto program = getProgramOrThrow();
     auto pad = stripIndex + (mpc.getBank() * 16);
     auto note = program->getNoteFromPad(pad);
     auto noteParameters = program->getNoteParameters(note);

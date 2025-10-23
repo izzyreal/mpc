@@ -39,8 +39,9 @@ void InitPadAssignScreen::function(int i)
 		{
 			sampler->setMasterPadAssign(*sampler->getInitMasterPadAssign());
 		}
-		else {
-			program->initPadAssign();
+		else
+        {
+			getProgramOrThrow()->initPadAssign();
 		}
 		
         mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();

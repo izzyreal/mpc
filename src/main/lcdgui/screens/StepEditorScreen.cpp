@@ -73,8 +73,6 @@ void StepEditorScreen::open()
 
     if (track->getBus() != 0)
     {
-        int pgm = sampler->getDrumBusProgramIndex(track->getBus());
-        program = sampler->getProgram(pgm);
         findField("fromnote")->setAlignment(Alignment::None);
     }
     else
@@ -999,6 +997,7 @@ void StepEditorScreen::setViewNotesText()
         }
         else
         {
+            auto program = getProgramOrThrow();
             auto padName = sampler->getPadName(program->getPadIndexFromNote(fromNote));
             findField("fromnote")->setText(std::to_string(fromNote) + "/" + padName);
         }
@@ -1011,9 +1010,13 @@ void StepEditorScreen::setViewNotesText()
     else if (view == 3)
     {
         if (control == -1)
+        {
             findField("fromnote")->setText("   -    ALL");
+        }
         else
+        {
             findField("fromnote")->setText(StrUtil::padLeft(std::to_string(control), " ", 3) + "-" + EventRow::controlNames[control]);
+        }
     }
 
     findField("view")->setText(viewNames[view]);
@@ -1023,10 +1026,7 @@ void StepEditorScreen::setViewNotesText()
 
 void StepEditorScreen::setView(int i)
 {
-    if (i < 0 || i > 7)
-        return;
-
-    view = i;
+    view = std::clamp(i, 0, 7);
 
     displayView();
     updateComponents();
@@ -1037,13 +1037,12 @@ void StepEditorScreen::setView(int i)
 
 void StepEditorScreen::setNoteA(int i)
 {
-    if (i < 0 || i > 127)
-        return;
-
-    noteA = i;
+    noteA = std::clamp(i, 0, 127);
 
     if (noteA > noteB)
+    {
         noteB = noteA;
+    }
 
     setViewNotesText();
     initVisibleEvents();
@@ -1053,13 +1052,12 @@ void StepEditorScreen::setNoteA(int i)
 
 void StepEditorScreen::setNoteB(int i)
 {
-    if (i < 0 || i > 127)
-        return;
-
-    noteB = i;
+    noteB = std::clamp(i, 0, 127);
 
     if (noteB < noteA)
+    {
         noteA = noteB;
+    }
 
     setViewNotesText();
     initVisibleEvents();
@@ -1069,10 +1067,7 @@ void StepEditorScreen::setNoteB(int i)
 
 void StepEditorScreen::setControl(int i)
 {
-    if (i < -1 || i > 127)
-        return;
-
-    control = i;
+    control = std::clamp(i, -1, 127);
 
     setViewNotesText();
     initVisibleEvents();
@@ -1082,9 +1077,7 @@ void StepEditorScreen::setControl(int i)
 
 void StepEditorScreen::setyOffset(int i)
 {
-    if (i < 0)
-        return;
-
+    if (i < 0) i = 0;
     yOffset = i;
 
     initVisibleEvents();
@@ -1094,10 +1087,7 @@ void StepEditorScreen::setyOffset(int i)
 
 void StepEditorScreen::setFromNote(int i)
 {
-    if (i < 34 || i > 98)
-        return;
-
-    fromNote = i;
+    fromNote = std::clamp(i, 34, 98);
 
     setViewNotesText();
     displayView();
@@ -1111,7 +1101,9 @@ void StepEditorScreen::setFromNote(int i)
 void StepEditorScreen::setSelectionStartIndex(int i)
 {
     if (std::dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i]))
+    {
         return;
+    }
 
     selectionStartIndex = i;
     selectionEndIndex = i;
@@ -1130,8 +1122,7 @@ void StepEditorScreen::clearSelection()
 
 void StepEditorScreen::setSelectionEndIndex(int i)
 {
-    if (i == -1)
-        return;
+    if (i == -1) i = -1;
 
     selectionEndIndex = i;
     refreshSelection();

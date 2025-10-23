@@ -3,6 +3,7 @@
 #include "Background.hpp"
 
 #include <Mpc.hpp>
+#include <stdexcept>
 
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
@@ -157,5 +158,26 @@ std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow()
 std::string ScreenComponent::getFocusedFieldNameOrThrow()
 {
     return getFocusedFieldOrThrow()->getName();
+}
+
+std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram()
+
+{
+    const auto drumIndex = getDrumIndex();
+
+    if (!drumIndex)
+    {
+        return {};
+    }
+
+    return mpc.getSampler()->getProgram(mpc.getDrum(*drumIndex).getProgram());
+}
+
+std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()
+
+{
+    auto p = getProgram();
+    if (!p) throw std::runtime_error("Expected program");
+    return p;
 }
 

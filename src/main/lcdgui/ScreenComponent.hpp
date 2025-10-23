@@ -45,13 +45,15 @@ namespace mpc::lcdgui
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
-		std::shared_ptr<mpc::sampler::Program> program;
 		std::shared_ptr<mpc::sequencer::Track> track;
 
 		mpc::engine::Drum& activeDrum();
         std::shared_ptr<Field> getFocusedField();
         std::shared_ptr<Field> getFocusedFieldOrThrow();
         std::optional<std::string> getFocusedFieldName();
+
+        std::shared_ptr<sampler::Program> getProgram();
+        std::shared_ptr<sampler::Program> getProgramOrThrow();
 
 	protected:
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
@@ -74,7 +76,6 @@ namespace mpc::lcdgui
 	protected:
 		virtual void init()
         {
-            program = sampler->getProgram(activeDrum().getProgram());
 			track = mpc.getSequencer()->getActiveTrack();
 		}
 

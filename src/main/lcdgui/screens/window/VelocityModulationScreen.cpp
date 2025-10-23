@@ -28,6 +28,7 @@ void VelocityModulationScreen::turnWheel(int i)
 {
 	init();
 
+    auto program = getProgramOrThrow();
 	auto lastNp = sampler->getLastNp(program.get());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -56,6 +57,7 @@ void VelocityModulationScreen::turnWheel(int i)
 
 void VelocityModulationScreen::displayNote()
 {
+    auto program = getProgramOrThrow();
 	auto noteParameters = sampler->getLastNp(program.get());
 	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
@@ -72,16 +74,19 @@ void VelocityModulationScreen::displayVelo()
 
 void VelocityModulationScreen::displayVeloAttack()
 {
+    auto program = getProgramOrThrow();
 	findField("veloattack")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToAttack(), " ");
 }
 
 void VelocityModulationScreen::displayVeloStart()
 {
+    auto program = getProgramOrThrow();
 	findField("velostart")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToStart(), " ");
 }
 
 void VelocityModulationScreen::displayVeloLevel()
 {
+    auto program = getProgramOrThrow();
 	findField("velolevel")->setTextPadded(sampler->getLastNp(program.get())->getVeloToLevel(), " ");
 }
 

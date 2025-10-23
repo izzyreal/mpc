@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <sampler/NoteParameters.hpp>
 
 #include <cassert>
@@ -32,14 +33,8 @@ void NoteParameters::setSoundIndex(int i)
 
 void NoteParameters::setSoundGenMode(int i)
 {
-    if (soundGenerationMode == i)
-        return;
-
-    if (i < 0 || i > 3)
-        return;
-
-    soundGenerationMode = i;
-  }
+    soundGenerationMode = std::clamp(i, 0, 3);
+}
 
 int NoteParameters::getSoundGenerationMode()
 {
@@ -48,17 +43,23 @@ int NoteParameters::getSoundGenerationMode()
 
 void NoteParameters::setVeloRangeLower(int i)
 {
-    if (velocityRangeLower == i)
-        return;
+    velocityRangeLower = std::clamp(i, 0, 126);
 
-    if (i < 0 || i > 126)
-        return;
+    if (velocityRangeUpper <= velocityRangeLower)
+    {
+        setVeloRangeUpper(velocityRangeLower + 1);
+    }
+}
 
-    if (i > velocityRangeUpper - 2)
-        setVeloRangeUpper(i - 1);
+void NoteParameters::setVeloRangeUpper(int i)
+{
+	velocityRangeUpper = std::clamp(i, 1, 127);
 
-    velocityRangeLower = i;
- }
+    if (velocityRangeLower >= velocityRangeUpper)
+    {
+        setVeloRangeLower(velocityRangeUpper - 1);
+    }
+}
 
 int NoteParameters::getVelocityRangeLower()
 {
@@ -67,29 +68,12 @@ int NoteParameters::getVelocityRangeLower()
 
 void NoteParameters::setOptNoteA(int i)
 {
-	if (optionalNoteA == i)
-        return;
-
-	if (i < 34 || i > 98)
-        return;
-
-	optionalNoteA = i;
+	optionalNoteA = std::clamp(i, 34, 98);
 }
 
 int NoteParameters::getOptionalNoteA()
 {
     return optionalNoteA;
-}
-
-void NoteParameters::setVeloRangeUpper(int i)
-{
-	if (velocityRangeUpper == i)
-		return;
-
-	if (i < velocityRangeLower + 1 || i > 127)
-		return;
-
-	velocityRangeUpper = i;
 }
 
 int NoteParameters::getVelocityRangeUpper()
@@ -99,13 +83,7 @@ int NoteParameters::getVelocityRangeUpper()
 
 void NoteParameters::setOptionalNoteB(int i)
 {
-	if (optionalNoteB == i)
-		return;
-
-	if (i < 34 || i > 98)
-		return;
-
-	optionalNoteB = i;
+	optionalNoteB = std::clamp(i, 34, 98);
 }
 
 int NoteParameters::getOptionalNoteB()
@@ -120,15 +98,19 @@ VoiceOverlapMode NoteParameters::getVoiceOverlapMode()
 
 void NoteParameters::setVoiceOverlapMode(const VoiceOverlapMode voiceOverlapModeToUse)
 {
+    if (voiceOverlapMode != VoiceOverlapMode::MONO &&
+            voiceOverlapMode != VoiceOverlapMode::NOTE_OFF &&
+            voiceOverlapMode != VoiceOverlapMode::POLY)
+    {
+        return;
+    }
+
     voiceOverlapMode = voiceOverlapModeToUse;
  }
 
 void NoteParameters::setMuteAssignA(int i)
 {
-    if (i < 34 || i > 98)
-        return;
-
-    muteAssignA = i;
+    muteAssignA = std::clamp(i, 34, 98);
 }
 
 int NoteParameters::getMuteAssignA()
@@ -138,10 +120,7 @@ int NoteParameters::getMuteAssignA()
 
 void NoteParameters::setMuteAssignB(int i)
 {
-    if (i < 34 || i > 98)
-        return;
-
-    muteAssignB = i;
+    muteAssignB = std::clamp(i, 34, 98);
 }
 
 int NoteParameters::getMuteAssignB()
@@ -151,15 +130,7 @@ int NoteParameters::getMuteAssignB()
 
 void NoteParameters::setTune(int i)
 {
-    if (tune == i)
-        return;
-
-    if (i < -240)
-        i = -240;
-    else if (i > 240)
-        i = 240;
-
-    tune = i;
+    tune = std::clamp(i, -240, 240);
 }
 
 int NoteParameters::getTune()
@@ -169,13 +140,7 @@ int NoteParameters::getTune()
 
 void NoteParameters::setAttack(int i)
 {
-    if(attack == i)
-        return;
-
-    if(i < 0 || i > 100)
-        return;
-
-    attack = i;
+    attack = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getAttack()
@@ -185,13 +150,7 @@ int NoteParameters::getAttack()
 
 void NoteParameters::setDecay(int i)
 {
-    if (decay == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    decay = i;
+    decay = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getDecay()
@@ -201,13 +160,7 @@ int NoteParameters::getDecay()
 
 void NoteParameters::setDecayMode(int i)
 {
-    if (decayMode == i)
-        return;
-
-    if (i < 0 || i > 1)
-        return;
-
-    decayMode = i;
+    decayMode = std::clamp(i, 0, 1);
 }
 
 int NoteParameters::getDecayMode()
@@ -217,13 +170,7 @@ int NoteParameters::getDecayMode()
 
 void NoteParameters::setFilterFrequency(int i)
 {
-    if (filterFrequency == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    filterFrequency = i;
+    filterFrequency = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getFilterFrequency()
@@ -233,13 +180,7 @@ int NoteParameters::getFilterFrequency()
 
 void NoteParameters::setFilterResonance(int i)
 {
-    if (filterResonance == i)
-        return;
-
-    if (i < 0 || i > 15)
-        return;
-
-    filterResonance = i;
+    filterResonance = std::clamp(i, 0, 15);
 }
 
 int NoteParameters::getFilterResonance()
@@ -249,13 +190,7 @@ int NoteParameters::getFilterResonance()
 
 void NoteParameters::setFilterAttack(int i)
 {
-    if (filterAttack == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    filterAttack = i;
+    filterAttack = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getFilterAttack()
@@ -265,13 +200,7 @@ int NoteParameters::getFilterAttack()
 
 void NoteParameters::setFilterDecay(int i)
 {
-    if (filterDecay == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    filterDecay = i;
+    filterDecay = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getFilterDecay()
@@ -281,13 +210,7 @@ int NoteParameters::getFilterDecay()
 
 void NoteParameters::setFilterEnvelopeAmount(int i)
 {
-    if (filterEnvelopeAmount == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    filterEnvelopeAmount = i;
+    filterEnvelopeAmount = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getFilterEnvelopeAmount()
@@ -297,13 +220,7 @@ int NoteParameters::getFilterEnvelopeAmount()
 
 void NoteParameters::setVeloToLevel(int i)
 {
-    if (velocityToLevel == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    velocityToLevel = i;
+    velocityToLevel = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getVeloToLevel()
@@ -313,13 +230,7 @@ int NoteParameters::getVeloToLevel()
 
 void NoteParameters::setVelocityToAttack(int i)
 {
-    if (velocityToAttack == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    velocityToAttack = i;
+    velocityToAttack = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getVelocityToAttack()
@@ -329,13 +240,7 @@ int NoteParameters::getVelocityToAttack()
 
 void NoteParameters::setVelocityToStart(int i)
 {
-    if (velocityToStart == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    velocityToStart = i;
+    velocityToStart = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getVelocityToStart()
@@ -345,13 +250,7 @@ int NoteParameters::getVelocityToStart()
 
 void NoteParameters::setVelocityToFilterFrequency(int i)
 {
-    if (velocityToFilterFrequency == i)
-        return;
-
-    if (i < 0 || i > 100)
-        return;
-
-    velocityToFilterFrequency = i;
+    velocityToFilterFrequency = std::clamp(i, 0, 100);
 }
 
 int NoteParameters::getVelocityToFilterFrequency()
@@ -361,13 +260,7 @@ int NoteParameters::getVelocityToFilterFrequency()
 
 void NoteParameters::setSliderParameterNumber(int i)
 {
-    if (sliderParameterNumber == i)
-        return;
-
-    if (i < 0 || i > 3)
-        return;
-
-    sliderParameterNumber = i;
+    sliderParameterNumber = std::clamp(i, 0, 3);
 }
 
 int NoteParameters::getSliderParameterNumber()
@@ -377,13 +270,7 @@ int NoteParameters::getSliderParameterNumber()
 
 void NoteParameters::setVelocityToPitch(int i)
 {
-    if (velocityToPitch == i)
-        return;
-
-    if (i < -120 || i > 120)
-        return;
-
-    velocityToPitch = i;
+    velocityToPitch = std::clamp(i, -120, 120);
 }
 
 int NoteParameters::getVelocityToPitch()

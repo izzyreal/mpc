@@ -165,6 +165,7 @@ void TimingCorrectScreen::displayNotes()
         }
 		else
         {
+            auto program = getProgramOrThrow();
             auto padIndex = program->getPadIndexFromNote(note0);
             auto padName = sampler->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
@@ -198,34 +199,22 @@ void TimingCorrectScreen::displayTime()
 
 void TimingCorrectScreen::setAmount(int i)
 {
-	if (i < 0)
-	{
-		return;
-	}
+    int maxVal = 0;
 
-	if (noteValue == 0 && i > 0)
-		return;
+    switch (noteValue)
+    {
+        case 0: maxVal = 0; break;
+        case 1: maxVal = 23; break;
+        case 2: maxVal = 15; break;
+        case 3: maxVal = 11; break;
+        case 4: maxVal = 7; break;
+        case 5: maxVal = 5; break;
+        case 6: maxVal = 3; break;
+        default: maxVal = 0; break;
+    }
 
-	if (noteValue == 1 && i > 23)
-		return;
-
-	if (noteValue == 2 && i > 15)
-		return;
-
-	if (noteValue == 3 && i > 11)
-		return;
-
-	if (noteValue == 4 && i > 7)
-		return;
-
-	if (noteValue == 5 && i > 5)
-		return;
-
-	if (noteValue == 6 && i > 3)
-		return;
-
-	amount = i;
-	displayAmount();
+    amount = std::clamp(i, 0, maxVal);
+    displayAmount();
 }
 
 void TimingCorrectScreen::setShiftTimingLater(bool b)
@@ -242,12 +231,7 @@ int TimingCorrectScreen::getSwing()
 
 void TimingCorrectScreen::setSwing(int i)
 {
-	if (i < 50 || i > 75)
-	{
-		return;
-	}
-
-	swing = i;
+	swing = std::clamp(i, 50, 75);
 	displaySwing();
 }
 
@@ -263,55 +247,10 @@ int TimingCorrectScreen::getNoteValue()
 
 void TimingCorrectScreen::setNoteValue(int i)
 {
-	if (i < 0 || i > 6)
-	{
-		return;
-	}
-
-	noteValue = i;
-	
-	if (noteValue == 0)
-	{
-		setAmount(0);
-	}
-	else if (noteValue == 2)
-	{
-		if (amount > 15)
-		{
-			setAmount(15);
-		}
-	}
-	else if (noteValue == 3)
-	{
-		if (amount > 11)
-		{
-			setAmount(11);
-		}
-	}
-	else if (noteValue == 4)
-	{
-		if (amount > 7)
-		{
-			setAmount(7);
-		}
-	}
-	else if (noteValue == 5)
-	{
-		if (amount > 5)
-		{
-			setAmount(5);
-		}
-	}
-	else if (noteValue == 6)
-	{
-		if (amount > 3)
-		{
-			setAmount(3);
-		}
-	}
-	
-	init();
-	displayNoteValue();
+    noteValue = std::clamp(i, 0, 6);
+    setAmount(amount); // reclamp to new bounds
+    init();
+    displayNoteValue();
 }
 
 int TimingCorrectScreen::getAmount()

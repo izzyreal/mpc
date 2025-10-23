@@ -11,6 +11,7 @@ void CopyNoteParametersScreen::open()
 {
 	init();
 
+    auto program = getProgramOrThrow();
 	auto note = sampler->getLastNp(program.get())->getNumber();
 
 	auto programIndex = activeDrum().getProgram();
@@ -70,17 +71,20 @@ void CopyNoteParametersScreen::displayProg0()
 
 void CopyNoteParametersScreen::displayNote0()
 {
-	auto noteParameters = sampler->getLastNp(program.get());
+    auto sourceProgram = sampler->getProgram(prog0);
+	auto noteParameters = sampler->getLastNp(sourceProgram.get());
 	auto note0 = noteParameters->getNumber();
-	auto program = sampler->getProgram(prog0);
-	auto padIndex = program->getPadIndexFromNote(note0);
+	auto destProgram = sampler->getProgram(prog0);
+	auto padIndex = destProgram->getPadIndexFromNote(note0);
 	auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
 	auto noteText = note0 == -1 ? "--" : std::to_string(note0);
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 	
 	if (note0 == -1)
+    {
 		sampleName = "";
+    }
 	
 	findField("note0")->setText(noteText + "/" + padName + sampleName);
 }
@@ -101,27 +105,22 @@ void CopyNoteParametersScreen::displayNote1()
 	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 
 	if (note1 == -1)
+    {
 		sampleName = "";
+    }
 
 	findField("note1")->setText(noteText + "/" + padName + sampleName);
 }
 
-
 void CopyNoteParametersScreen::setProg0(int i)
 {
-	if (i < 0 || i >= sampler->getProgramCount())
-		return;
-	
-	prog0 = i;
+	prog0 = std::clamp(i, 0, sampler->getProgramCount());
 	displayProg0();
 }
 
 void CopyNoteParametersScreen::setProg1(int i)
 {
-	if (i < 0 || i >= sampler->getProgramCount())
-		return;
-
-	prog1 = i;
+	prog1 = std::clamp(i, 0, sampler->getProgramCount());
 	displayProg1();
 }
 
@@ -133,9 +132,6 @@ void CopyNoteParametersScreen::setNote0(int i)
 
 void CopyNoteParametersScreen::setNote1(int i)
 {
-	if (i < 0 || i > 63)
-		return;
-
-	note1 = i;
+	note1 = std::clamp(i, 0, 63);
 	displayNote1();
 }

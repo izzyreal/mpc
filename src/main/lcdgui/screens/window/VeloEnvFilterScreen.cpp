@@ -31,6 +31,7 @@ void VeloEnvFilterScreen::turnWheel(int i)
 {
     init();
 
+    auto program = getProgramOrThrow();
     auto lastNp = sampler->getLastNp(program.get());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -81,6 +82,7 @@ void VeloEnvFilterScreen::update(Observable* observable, Message message)
 
 void VeloEnvFilterScreen::displayNote()
 {
+    auto program = getProgramOrThrow();
     auto noteParameters = sampler->getLastNp(program.get());
     auto soundIndex = noteParameters->getSoundIndex();
     auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
@@ -97,6 +99,7 @@ void VeloEnvFilterScreen::displayVelo()
 
 void VeloEnvFilterScreen::displayAttack()
 {
+    auto program = getProgramOrThrow();
     auto attack = sampler->getLastNp(program.get())->getFilterAttack();
     auto decay = sampler->getLastNp(program.get())->getFilterDecay();
     findField("attack")->setTextPadded(attack, " ");
@@ -105,6 +108,7 @@ void VeloEnvFilterScreen::displayAttack()
 
 void VeloEnvFilterScreen::displayDecay()
 {
+    auto program = getProgramOrThrow();
     auto attack = sampler->getLastNp(program.get())->getFilterAttack();
     auto decay = sampler->getLastNp(program.get())->getFilterDecay();
     findField("decay")->setTextPadded(decay, " ");
@@ -113,22 +117,18 @@ void VeloEnvFilterScreen::displayDecay()
 
 void VeloEnvFilterScreen::displayAmount()
 {
+    auto program = getProgramOrThrow();
     findField("amount")->setTextPadded(sampler->getLastNp(program.get())->getFilterEnvelopeAmount(), " ");
 }
 
 void VeloEnvFilterScreen::displayVeloFreq()
 {
+    auto program = getProgramOrThrow();
     findField("velofreq")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToFilterFrequency(), " ");
 }
 
 void VeloEnvFilterScreen::setVelo(int i)
 {
-    if (i < 1 || i > 127)
-    {
-        return;
-    }
-
-    velo = i;
-
+    velo = std::clamp(i, 1, 127);
     displayVelo();
 }

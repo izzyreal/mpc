@@ -394,10 +394,7 @@ void LoadScreen::displaySize()
 
 void LoadScreen::setView(int i)
 {
-    if (i < 0 || i > 8)
-        return;
-
-    view = i;
+    view = std::clamp(i, 0, 8);
 
     mpc.getDisk()->initFiles();
 
@@ -443,7 +440,9 @@ void LoadScreen::setFileLoadWithMaxCheck(int i)
 void LoadScreen::setFileLoad(int i)
 {
     if (i < 0)
-        return;
+    {
+        i = 0;
+    }
 
     fileLoad = i;
     displayFile();

@@ -259,12 +259,7 @@ int Mpc::getBank()
 
 void Mpc::setNote(int newNote)
 {
-    if (newNote < 35 || newNote > 98)
-    {
-        return;
-    }
-
-    note = newNote;
+    note = std::clamp(newNote, 35, 98);
     notifyObservers(std::string("note"));
 }
 
@@ -319,14 +314,9 @@ Mpc::~Mpc()
     }
 }
 
-void Mpc::setPad(unsigned char padIndexWithBank)
+void Mpc::setPad(int padIndexWithBank)
 {
-    if (padIndexWithBank > 63)
-    {
-        return;
-    }
-
-    pad = padIndexWithBank;
+    pad = std::clamp(padIndexWithBank, 0, 63);
 
     notifyObservers(std::string("pad"));
 }

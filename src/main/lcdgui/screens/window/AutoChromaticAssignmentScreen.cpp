@@ -23,6 +23,7 @@ void AutoChromaticAssignmentScreen::open()
     
     init();
     
+    auto program = getProgramOrThrow();
     setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     displayOriginalKey();
     displayTune();
@@ -87,6 +88,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 
     if (focusedFieldName == "source")
     {
+        auto program = getProgramOrThrow();
         mpc.setNote(mpc.getNote() + i);
         displaySource();
         setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
@@ -126,33 +128,25 @@ void AutoChromaticAssignmentScreen::openNameScreen()
 
 void AutoChromaticAssignmentScreen::setSourceSoundIndex(int i)
 {
-    if (i < -1 || i >= sampler->getSoundCount())
-        return;
-    
-    sourceSoundIndex = i;
+    sourceSoundIndex = std::clamp(i, -1, sampler->getSoundCount() - 1);
     displaySnd();
 }
 
 void AutoChromaticAssignmentScreen::setOriginalKey(int i)
 {
-    if (i < 35 || i > 98)
-        return;
-    
-    originalKey = i;
+    originalKey = std::clamp(i, 35, 98);
     displayOriginalKey();
 }
 
 void AutoChromaticAssignmentScreen::setTune(int i)
 {
-    if (i < -240 || i > 240)
-        return;
-    
-    tune = i;
+    tune = std::clamp(i, -240, 240);
     displayTune();
 }
 
 void AutoChromaticAssignmentScreen::displaySource()
 {
+    auto program = getProgramOrThrow();
     auto note = sampler->getLastNp(program.get())->getNumber();
     auto padIndex = program->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
@@ -189,6 +183,7 @@ void AutoChromaticAssignmentScreen::update(Observable* observable, Message messa
     if (msg == "note")
     {
         displaySource();
+        auto program = getProgramOrThrow();
         setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     }
 }

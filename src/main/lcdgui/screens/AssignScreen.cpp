@@ -20,6 +20,7 @@ void AssignScreen::open()
 	displayAssignNv();
 	
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	slider->addObserver(this);
 }
@@ -27,6 +28,7 @@ void AssignScreen::open()
 void AssignScreen::close()
 {
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	slider->deleteObserver(this);
 }
@@ -34,6 +36,7 @@ void AssignScreen::close()
 void AssignScreen::turnWheel(int i)
 {
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	auto parameter = slider->getParameter();
 
@@ -93,6 +96,7 @@ void AssignScreen::turnWheel(int i)
 void AssignScreen::displayAssignNote()
 {
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	auto note = slider->getNote();
 
@@ -110,6 +114,7 @@ void AssignScreen::displayAssignNote()
 void AssignScreen::displayParameter()
 {
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	findField("parameter")->setText(typeNames[slider->getParameter()]);
 }
@@ -118,6 +123,7 @@ void AssignScreen::displayHighRange()
 {
 	int value = 0;
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	auto sign = "";
 
@@ -151,6 +157,7 @@ void AssignScreen::displayLowRange()
 	auto value = 0;
 
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	auto sign = "";
 	findField("lowrange")->setSize(19, 9);
@@ -181,6 +188,7 @@ void AssignScreen::displayLowRange()
 void AssignScreen::displayAssignNv()
 {
 	init();
+    auto program = getProgramOrThrow();
 	auto slider = program->getSlider();
 	auto assignNvString = slider->getControlChange() == 0 ? "OFF" : std::to_string(slider->getControlChange());
 	findField("assignnv")->setTextPadded(assignNvString, " ");

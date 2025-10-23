@@ -24,6 +24,7 @@ void MuteAssignScreen::close()
 void MuteAssignScreen::turnWheel(int i)
 {
     init();
+    auto program = getProgramOrThrow();
 	auto lastNoteParameters = sampler->getLastNp(program.get());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -46,6 +47,7 @@ void MuteAssignScreen::turnWheel(int i)
 
 void MuteAssignScreen::displayNote()
 {
+    auto program = getProgramOrThrow();
 	auto note = sampler->getLastNp(program.get())->getNumber();
 	auto pad = program->getPadIndexFromNote(note);
     std::string soundName = "OFF";
@@ -63,6 +65,7 @@ void MuteAssignScreen::displayNote()
 
 void MuteAssignScreen::displayNote0()
 {
+    auto program = getProgramOrThrow();
 
 	auto note0 = sampler->getLastNp(program.get())->getMuteAssignA();
 
@@ -86,6 +89,7 @@ void MuteAssignScreen::displayNote0()
 
 void MuteAssignScreen::displayNote1()
 {
+    auto program = getProgramOrThrow();
 	auto note1 = sampler->getLastNp(program.get())->getMuteAssignB();
 
 	if (note1 == 34)

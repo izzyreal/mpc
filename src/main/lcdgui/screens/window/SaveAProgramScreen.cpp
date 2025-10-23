@@ -63,9 +63,11 @@ void SaveAProgramScreen::function(int i)
 		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 		auto disk = mpc.getDisk();
 
+        auto program = getProgramOrThrow();
+
 		if (disk->checkExists(fileName))
 		{
-            auto replaceAction = [this, disk, fileName]{
+            auto replaceAction = [this, disk, fileName, program]{
                 auto success = disk->getFile(fileName)->del();
 
                 if (success)
@@ -84,7 +86,7 @@ void SaveAProgramScreen::function(int i)
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
             fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
-        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
             break;
 		}
 
@@ -96,12 +98,7 @@ void SaveAProgramScreen::function(int i)
 
 void SaveAProgramScreen::setSave(int i)
 {
-	if (i < 0 || i > 2)
-	{
-		return;
-	}
-
-	save = i;
+	save = std::clamp(i, 0, 2);
 	displaySave();
 }
 

@@ -275,10 +275,7 @@ void SaveScreen::turnWheel(int i)
 
 void SaveScreen::setType(int i)
 {
-    if (i < 0 || i > 4)
-        return;
-
-    type = i;
+    type = std::clamp(i, 0, 4);
 
     if (i == 3)
     {

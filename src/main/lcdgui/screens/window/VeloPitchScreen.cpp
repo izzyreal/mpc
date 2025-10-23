@@ -30,6 +30,7 @@ void VeloPitchScreen::turnWheel(int i)
 {
 	init();
 
+    auto program = getProgramOrThrow();
 	auto lastNp = sampler->getLastNp(program.get());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -53,6 +54,7 @@ void VeloPitchScreen::turnWheel(int i)
 
 void VeloPitchScreen::displayTune()
 {
+    auto program = getProgramOrThrow();
 	auto value = sampler->getLastNp(program.get())->getTune();
     std::string prefix = value < 0 ? "-" : " ";
 	findField("tune")->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
@@ -60,6 +62,7 @@ void VeloPitchScreen::displayTune()
 
 void VeloPitchScreen::displayVeloPitch()
 {
+    auto program = getProgramOrThrow();
 	auto value = sampler->getLastNp(program.get())->getVelocityToPitch();
     std::string prefix = value < 0 ? "-" : " ";
 	findField("velo-pitch")->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
@@ -85,6 +88,7 @@ void VeloPitchScreen::update(Observable* observable, Message message)
 
 void VeloPitchScreen::displayNote()
 {
+    auto program = getProgramOrThrow();
 	auto noteParameters = sampler->getLastNp(program.get());
 	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
