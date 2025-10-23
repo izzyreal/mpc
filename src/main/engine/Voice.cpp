@@ -88,14 +88,11 @@ void Voice::init(
         int newFrameOffset,
         bool newEnableEnvs,
         int newStartTick,
-        int newDuration,
         float engineSampleRate)
 {
     VoiceState *state = getInactiveState();
 
     state->finished = false;
-
-    state->duration = newDuration;
 
     state->noteParameters = np;
     state->startTick = newStartTick;
@@ -227,12 +224,7 @@ void Voice::initializeSamplerateDependents()
         decayLengthSamples = C::MAX_DECAY_LENGTH_SAMPLES;
     }
 
-    auto staticEnvHoldSamples = (int) (playableSampleLength - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (state->sampleRate) * 0.001);
-
-    if (state->duration != -1 && state->duration < playableSampleLength)
-    {
-        staticEnvHoldSamples = (int) (state->duration - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (state->sampleRate) * 0.001);
-    }
+    const auto staticEnvHoldSamples = (int) (playableSampleLength - ((C::STATIC_ATTACK_LENGTH + C::STATIC_DECAY_LENGTH) / C::ENV_TIME_RATIO) * (state->sampleRate) * 0.001);
 
     shold->setValue(staticEnvHoldSamples);
 

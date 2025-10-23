@@ -107,20 +107,30 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
             program->registerPadPress(programPadIndex, Program::PadPressSource::NON_PHYSICAL);
 
-            auto event = [
+            const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
+                &drum,
+                mpc.getAudioMidiServices()->getVoices(),
+                noteOnEvent->getNote(),
+                0,
+                noteOnEvent->getTick()
+            );
+
+            auto drumNoteOffEvent = [
                 program,
-                programPadIndex
+                programPadIndex,
+                noteOffCtx
             ] (int /*frameOffsetInBuffer*/)
             {
                 program->registerPadRelease(programPadIndex, Program::PadPressSource::NON_PHYSICAL);
+                DrumNoteEventHandler::noteOff(noteOffCtx);
             };
 
-            frameSeq->enqueueEventAfterNFrames(event, durationFrames);
+            frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, durationFrames);
         }
 
         handleNoteEventMidiOut(event, track->getIndex(), track->getDeviceIndex(), track->getVelocityRatio());
 
-        auto event = [
+        auto midiNoteOffEvent = [
             this,
             noteOffEvent = noteOnEvent->getNoteOff(),
             trackIndex = track->getIndex(),
@@ -130,7 +140,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
             handleNoteEventMidiOut(noteOffEvent, trackIndex, trackDeviceIndex, std::nullopt);
         };
 
-        frameSeq->enqueueEventAfterNFrames(event, durationFrames);
+        frameSeq->enqueueEventAfterNFrames(midiNoteOffEvent, durationFrames);
     }
     else if (auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event); mixerEvent != nullptr)
     {

@@ -60,7 +60,7 @@ void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffse
     soundHasLoop = tempVars->isLoopEnabled();
 
 	fader->setValue(soundNumber == -2 ? 200 : 100);
-	voice->init(velocity, tempVars, -1, nullptr, 0, 64, -1, frameOffset, soundNumber != -2, -1, -1, mixer->getSharedBuffer()->getSampleRate());
+	voice->init(velocity, tempVars, -1, nullptr, 0, 64, frameOffset, soundNumber != -2, -1, -1, mixer->getSharedBuffer()->getSampleRate());
 }
 
 void PreviewSoundPlayer::finishVoice() {

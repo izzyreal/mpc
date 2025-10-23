@@ -61,7 +61,6 @@ namespace mpc::engine {
             int frameOffset = 0;
             int decayCounter = 0;
             bool enableEnvs = false;
-            int duration = -1;
             int varType = 0;
             int varValue = 0;
             int veloToStart = 0;
@@ -155,7 +154,6 @@ namespace mpc::engine {
                   int frameOffset,
                   bool enableEnvs,
                   int startTick,
-                  int newDuration,
                   float engineSampleRate);
 
         void startDecay();

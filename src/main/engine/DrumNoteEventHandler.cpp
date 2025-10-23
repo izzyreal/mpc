@@ -169,8 +169,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
     }
 
     voice->init(c.velocity, sound, c.note, np, c.varType, c.varValue, c.drum->getIndex(),
-                c.frameOffset, true, c.startTick, c.durationFrames,
-                c.mixer->getSharedBuffer()->getSampleRate());
+                c.frameOffset, true, c.startTick, c.mixer->getSharedBuffer()->getSampleRate());
 
     if (c.firstGeneration && np->getSoundGenerationMode() == 1)
     {
