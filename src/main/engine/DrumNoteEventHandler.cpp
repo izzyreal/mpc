@@ -160,8 +160,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
     {
         for (auto& v : *c.voices)
         {
-            if (v->getNoteParameters() == np && v->getNote() == c.note &&
-                (v->getVoiceOverlapMode() == VoiceOverlapMode::POLY || v->getVoiceOverlapMode() == VoiceOverlapMode::MONO))
+            if (v->getNoteParameters() == np && v->getNote() == c.note)
             {
                 v->startDecay();
             }
