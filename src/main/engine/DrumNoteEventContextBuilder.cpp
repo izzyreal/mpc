@@ -57,7 +57,9 @@ DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
 {
     DrumNoteOffContext ctx;
     ctx.noteEventId = noteEventId;
-    ctx.drum = drum;
+    ctx.drumIndex = drum->getIndex();
+    ctx.drumSimultA = &drum->getSimultA();
+    ctx.drumSimultB = &drum->getSimultB();
     ctx.voices = voices;
     ctx.note = note;
     ctx.noteOnStartTick = noteOnStartTick;
