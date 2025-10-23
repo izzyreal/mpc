@@ -60,27 +60,29 @@ void MixerSetupScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "stereomixsource")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "stereomixsource")
 	{
 		setStereoMixSourceDrum(i > 0);
 	}
-	else if (param == "indivfxsource")
+	else if (focusedFieldName == "indivfxsource")
 	{
 		setIndivFxSourceDrum(i > 0);
 	}
-	else if (param == "copypgmmixtodrum")
+	else if (focusedFieldName == "copypgmmixtodrum")
 	{
 		setCopyPgmMixToDrumEnabled(i > 0);
 	}
-	else if (param == "recordmixchanges")
+	else if (focusedFieldName == "recordmixchanges")
 	{
 		setRecordMixChangesEnabled(i > 0);
 	}
-	else if (param == "masterlevel")
+	else if (focusedFieldName == "masterlevel")
 	{
 		setMasterLevel(masterLevel + i);
 	}
-	else if (param == "fxdrum")
+	else if (focusedFieldName == "fxdrum")
 	{
 		setFxDrum(fxDrum + i);
 	}

@@ -83,21 +83,23 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 {
     init();
     
-    if (param == "source")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "source")
     {
         mpc.setNote(mpc.getNote() + i);
         displaySource();
         setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     }
-    else if (param == "snd")
+    else if (focusedFieldName == "snd")
     {
         setSourceSoundIndex(sourceSoundIndex + i);
     }
-    else if (param == "original-key")
+    else if (focusedFieldName == "original-key")
     {
         setOriginalKey(originalKey + i);
     }
-    else if (param == "tune")
+    else if (focusedFieldName == "tune")
     {
         setTune(tune + i);
     }
@@ -107,7 +109,9 @@ void AutoChromaticAssignmentScreen::openNameScreen()
 {
     init();
 
-    if (param == "program-name")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "program-name")
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             newName = nameScreenName;

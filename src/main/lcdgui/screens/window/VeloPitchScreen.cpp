@@ -32,17 +32,19 @@ void VeloPitchScreen::turnWheel(int i)
 
 	auto lastNp = sampler->getLastNp(program.get());
 
-	if (param == "tune")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "tune")
 	{
 		lastNp->setTune(lastNp->getTune() + i);
 		displayTune();
 	}
-	else if (param == "velo-pitch")
+	else if (focusedFieldName == "velo-pitch")
 	{
 		lastNp->setVelocityToPitch(lastNp->getVelocityToPitch() + i);
 		displayVeloPitch();
 	}
-	else if (param == "note")
+	else if (focusedFieldName == "note")
 	{
 		mpc.setNote(mpc.getNote() + i);
 		// We could call all display methods here, but we instead rely on the "note" message

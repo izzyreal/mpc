@@ -64,23 +64,25 @@ void CountMetronomeScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "count-in")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "count-in")
 	{
 		setCountIn(countIn + i);
 	}
-	else if (param == "in-play")
+	else if (focusedFieldName == "in-play")
 	{
 		setInPlay(i > 0);
 	}
-	else if (param == "rate")
+	else if (focusedFieldName == "rate")
 	{
 		setRate(rate + i);
 	}
-	else if (param == "in-rec")
+	else if (focusedFieldName == "in-rec")
 	{
 		setInRec(i > 0);
 	}
-	else if (param == "wait-for-key")
+	else if (focusedFieldName == "wait-for-key")
 	{
 		setWaitForKey(i > 0);
 	}

@@ -62,15 +62,19 @@ void MultiRecordingSetupScreen::init()
 	
 	yPos = 0;
 	
-	if (param.length() == 2)
-		yPos = stoi(param.substr(1, 2));
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.length() == 2)
+		yPos = stoi(focusedFieldName.substr(1, 2));
 }
 
 void MultiRecordingSetupScreen::left()
 {
 	init();
 
-	if (param[0] == 'a')
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName[0] == 'a')
 		return;
 
 	ScreenComponent::left();
@@ -80,7 +84,9 @@ void MultiRecordingSetupScreen::right()
 {
 	init();
 
-	if (param[0] == 'c')
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName[0] == 'c')
 		return;
 
 	ScreenComponent::right();
@@ -91,19 +97,21 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 	init();
 	
 	auto seq = sequencer.lock()->getActiveSequence();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
-	if (param[0] == 'a')
+	if (focusedFieldName[0] == 'a')
 	{
 		if (i > 0)
 		{
 			if (yPos == 0)
 			{
-                std::string res = param.substr(0, 1) + std::to_string(yPos + 1);
-				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+                std::string res = focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
+				ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
 			}
 			else if (yPos == 1)
 			{
-				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+				ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
 			}
 			else if (yPos == 2)
 			{
@@ -115,16 +123,16 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 			if (yPos == 0)
 				setYOffset(yOffset - 1);
 			else if (yPos == 1)
-				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+				ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
 			else if (yPos == 2)
-				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+				ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
 		}
 	}
-	else if (param[0] == 'b')
+	else if (focusedFieldName[0] == 'b')
 	{
 		setMrsTrack(yPos + yOffset, visibleMrsLines[yPos]->getTrack() + i);
 	}
-	else if (param[0] == 'c')
+	else if (focusedFieldName[0] == 'c')
 	{
 		if (visibleMrsLines[yPos]->getTrack() != -1)
 		{
@@ -139,32 +147,36 @@ void MultiRecordingSetupScreen::up()
 {
 	init();
 
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
 	if (yPos == 0)
 	{
 		setYOffset(yOffset - 1);
 	}
 	else if (yPos == 1)
 	{
-		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
 	}
 	else if (yPos == 2)
 	{
-		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
 	}
 }
 
 void MultiRecordingSetupScreen::down()
 {
 	init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
 	if (yPos == 0)
 	{
-        std::string res = param.substr(0, 1) + std::to_string(yPos + 1);
-		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+        std::string res = focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
+		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
 	}
 	else if (yPos == 1)
 	{
-		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
 	}
 	else if (yPos == 2)
 	{
@@ -248,7 +260,8 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
 	
 	init();
-	auto displayYPos = stoi(param.substr(1, 2));
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+	auto displayYPos = stoi(focusedFieldName.substr(1, 2));
 	displayMrsLine(displayYPos);
 }
 

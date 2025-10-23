@@ -21,7 +21,9 @@ void DeleteSongScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "song")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "song")
 	{
 		auto songScreen = mpc.screens->get<SongScreen>();
 		auto candidate = songScreen->activeSongIndex + i;

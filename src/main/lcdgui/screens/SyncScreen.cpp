@@ -32,24 +32,26 @@ void SyncScreen::open()
 void SyncScreen::turnWheel(int i)
 {
     init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
-    if (param == "in")
+    if (focusedFieldName == "in")
     {
         setIn(in + i);
     }
-    else if (param == "out")
+    else if (focusedFieldName == "out")
     {
         setOut(out + i);
     }
-    else if (param == "mode-in")
+    else if (focusedFieldName == "mode-in")
     {
         setModeIn(modeIn + i);
     }
-    else if (param == "mode-out")
+    else if (focusedFieldName == "mode-out")
     {
         setModeOut(getModeOut() + i);
     }
-    else if (param == "shift-early")
+    else if (focusedFieldName == "shift-early")
     {
         if (modeIn == 1) {
             setShiftEarly(shiftEarly + i);
@@ -58,11 +60,11 @@ void SyncScreen::turnWheel(int i)
             setFrameRate(frameRate + i);
         }
     }
-    else if (param == "receive-mmc")
+    else if (focusedFieldName == "receive-mmc")
     {
         setReceiveMMCEnabled(i > 0);
     }
-    else if (param == "send-mmc")
+    else if (focusedFieldName == "send-mmc")
     {
         setSendMMCEnabled(i > 0);
     }

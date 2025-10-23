@@ -29,15 +29,17 @@ void ResampleScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "newfs")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "newfs")
 	{
 		setNewFs(newFs + i);
 	}
-	else if (param == "newbit")
+	else if (focusedFieldName == "newbit")
 	{
 		setNewBit(newBit + i);
 	}
-	else if (param == "quality")
+	else if (focusedFieldName == "quality")
 	{
 		setQuality(quality + i);
 	}
@@ -47,7 +49,9 @@ void ResampleScreen::openNameScreen()
 {
     init();
 
-    if (param == "newname")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "newname")
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))

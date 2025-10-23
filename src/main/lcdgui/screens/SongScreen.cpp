@@ -42,7 +42,9 @@ void SongScreen::up()
 {
 	init();
 	
-	if (param == "step1" || param == "sequence1" || param == "reps1")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "step1" || focusedFieldName == "sequence1" || focusedFieldName == "reps1")
 	{
 		if (offset == -1 || sequencer.lock()->isPlaying())
 			return;
@@ -60,15 +62,18 @@ void SongScreen::up()
 void SongScreen::left()
 {
 	init();
-	if (param == "sequence1")
+    
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "sequence1")
 	{
 		ls->setFocus("step1");
 	}
-	else if (param == "reps1")
+	else if (focusedFieldName == "reps1")
 	{
 		ls->setFocus("sequence1");
 	}
-	else if (param == "step1")
+	else if (focusedFieldName == "step1")
 	{
 		ls->setFocus("loop");
 	}
@@ -82,16 +87,18 @@ void SongScreen::left()
 void SongScreen::right()
 {
 	init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
-	if (param == "sequence1")
+	if (focusedFieldName == "sequence1")
 	{
 		ls->setFocus("reps1");
 	}
-	else if (param == "step1")
+	else if (focusedFieldName == "step1")
 	{
 		ls->setFocus("sequence1");
 	}
-	else if (param == "loop")
+	else if (focusedFieldName == "loop")
 	{
 		ls->setFocus("step1");
 	}
@@ -110,18 +117,20 @@ void SongScreen::openWindow()
 
 	auto song = sequencer.lock()->getSong(activeSongIndex);
 
-	if (param.find("now") == std::string::npos && !song->isUsed())
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("now") == std::string::npos && !song->isUsed())
 	{
 		song->setUsed(true);
 		auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
 		song->setName(songName);
 	}
 
-	if (param == "loop")
+	if (focusedFieldName == "loop")
         mpc.getLayeredScreen()->openScreen<LoopSongScreen>();
-	else if (param == "song")
+	else if (focusedFieldName == "song")
         mpc.getLayeredScreen()->openScreen<SongWindow>();
-	else if (param == "tempo" || param == "tempo-source")
+	else if (focusedFieldName == "tempo" || focusedFieldName == "tempo-source")
         mpc.getLayeredScreen()->openScreen<IgnoreTempoChangeScreen>();
 }
 
@@ -129,7 +138,9 @@ void SongScreen::down()
 {
 	init();
 
-	if (param == "step1" || param == "sequence1" || param == "reps1")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "step1" || focusedFieldName == "sequence1" || focusedFieldName == "reps1")
 	{	
 		auto song = sequencer.lock()->getSong(activeSongIndex);
 		
@@ -152,7 +163,9 @@ void SongScreen::turnWheel(int i)
 	
 	auto song = sequencer.lock()->getSong(activeSongIndex);
 	
-	if (param.find("sequence") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("sequence") != std::string::npos)
 	{
         if (offset + 1 > song->getStepCount() - 1)
         {
@@ -181,7 +194,7 @@ void SongScreen::turnWheel(int i)
 		displayNow2();
 		displaySteps();
 	}
-	else if (param.find("reps") != std::string::npos)
+	else if (focusedFieldName.find("reps") != std::string::npos)
 	{
 		if (offset + 1 > song->getStepCount() - 1)
 			return;
@@ -189,7 +202,7 @@ void SongScreen::turnWheel(int i)
 		song->getStep(offset + 1).lock()->setRepeats(song->getStep(offset + 1).lock()->getRepeats() + i);
 		displaySteps();
 	}
-	else if (param == "song")
+	else if (focusedFieldName == "song")
 	{
 		setActiveSongIndex(activeSongIndex + i);
 		setOffset(-1);
@@ -201,23 +214,23 @@ void SongScreen::turnWheel(int i)
             sequencer.lock()->setActiveSequenceIndex(song->getStep(0).lock()->getSequence());
         }
 	}
-	else if (param == "tempo" && !sequencer.lock()->isTempoSourceSequenceEnabled())
+	else if (focusedFieldName == "tempo" && !sequencer.lock()->isTempoSourceSequenceEnabled())
 	{
 		sequencer.lock()->setTempo(sequencer.lock()->getTempo() + (i * 0.1));
 	}
-	else if (param == "tempo-source")
+	else if (focusedFieldName == "tempo-source")
 	{
 		sequencer.lock()->setTempoSourceSequence(i > 0);
 		displayTempoSource();
 		displayTempo();
 	}
-	else if (param == "loop")
+	else if (focusedFieldName == "loop")
 	{
         auto song = sequencer.lock()->getSong(activeSongIndex);
         song->setLoopEnabled(i > 0);
         displayLoop();
 	}
-	else if (param == "step1")
+	else if (focusedFieldName == "step1")
 	{
 		setOffset(offset + i);
 	}
@@ -247,31 +260,34 @@ void SongScreen::function(int i)
 		displayNow2();
 		displayTempo();
 		break;
-	case 5:
-		if (param != "step1" && param != "sequence1")
-			return;
+	case 5: {
+            const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-		song->insertStep(offset + 1);
-		
-		auto candidate = offset + 1;
+            if (focusedFieldName != "step1" && focusedFieldName != "sequence1")
+                return;
 
-		if (candidate + 1 >= song->getStepCount())
-			candidate -= 1;
+            song->insertStep(offset + 1);
+            
+            auto candidate = offset + 1;
 
-		setOffset(candidate);
-	
-		if (!song->isUsed())
-		{
-			song->setUsed(true);
-			auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
-			song->setName(songName);
-		}
+            if (candidate + 1 >= song->getStepCount())
+                candidate -= 1;
 
-		displaySongName();
-		displaySteps();
-		displayTempo();
-		break;
-	}
+            setOffset(candidate);
+        
+            if (!song->isUsed())
+            {
+                song->setUsed(true);
+                auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
+                song->setName(songName);
+            }
+
+            displaySongName();
+            displaySteps();
+            displayTempo();
+            break;
+        }
+    }
 }
 
 void SongScreen::displayTempo()

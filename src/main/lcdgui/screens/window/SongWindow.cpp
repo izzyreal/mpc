@@ -56,7 +56,9 @@ void SongWindow::openNameScreen()
 
     auto songScreen = mpc.screens->get<SongScreen>();
 
-	if (param.find("default") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("default") != std::string::npos)
 	{
 		initialNameScreenName = songScreen->getDefaultSongName();
         

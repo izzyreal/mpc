@@ -81,7 +81,9 @@ void PgmAssignScreen::turnWheel(int i)
 	auto lastPad = sampler->getLastPad(program.get());
 	auto lastNoteParameters = sampler->getLastNp(program.get());
 
-	if (param == "pad-assign")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "pad-assign")
 	{
 		padAssign = i > 0;
 		displayPadAssign();
@@ -91,7 +93,7 @@ void PgmAssignScreen::turnWheel(int i)
 		displaySoundGenerationMode();
 		displaySoundName();
 	}
-	else if (param == "pgm")
+	else if (focusedFieldName == "pgm")
 	{
 		auto pgm = activeDrum().getProgram();
 		auto candidate = sampler->getUsedProgram(pgm, i > 0);
@@ -112,7 +114,7 @@ void PgmAssignScreen::turnWheel(int i)
 			displayVeloRangeUpper();
 		}
 	}
-	else if (param == "pad")
+	else if (focusedFieldName == "pad")
 	{
 		auto candidate = mpc.getPad() + i;
 		
@@ -131,7 +133,7 @@ void PgmAssignScreen::turnWheel(int i)
 		displaySoundGenerationMode();
 		displaySoundName();
 	}
-	else if (param == "pad-note")
+	else if (focusedFieldName == "pad-note")
 	{
 		lastPad->setNote(lastPad->getNote() + i);
 
@@ -146,7 +148,7 @@ void PgmAssignScreen::turnWheel(int i)
 		displaySoundGenerationMode();
 		displaySoundName();
 	}
-	else if (param == "note")
+	else if (focusedFieldName == "note")
 	{
 		auto candidate = mpc.getNote() + i;
 	
@@ -157,7 +159,7 @@ void PgmAssignScreen::turnWheel(int i)
         displayNote();
         displaySoundName();
     }
-	else if (param == "snd")
+	else if (focusedFieldName == "snd")
     {
         auto currentSoundIndex = lastNoteParameters->getSoundIndex();
 
@@ -212,27 +214,27 @@ void PgmAssignScreen::turnWheel(int i)
 
 		displaySoundName();
     }
-	else if (param == "mode")
+	else if (focusedFieldName == "mode")
 	{
 		lastNoteParameters->setSoundGenMode(lastNoteParameters->getSoundGenerationMode() + i);
 		displaySoundGenerationMode();
 	}
-	else if (param == "velocity-range-lower")
+	else if (focusedFieldName == "velocity-range-lower")
 	{
 		lastNoteParameters->setVeloRangeLower(lastNoteParameters->getVelocityRangeLower() + i);
 		displayVeloRangeLower();
 	}
-	else if (param == "velocity-range-upper")
+	else if (focusedFieldName == "velocity-range-upper")
 	{
 		lastNoteParameters->setVeloRangeUpper(lastNoteParameters->getVelocityRangeUpper() + i);
 		displayVeloRangeUpper();
 	}
-	else if (param == "optional-note-a")
+	else if (focusedFieldName == "optional-note-a")
 	{
 		lastNoteParameters->setOptNoteA(lastNoteParameters->getOptionalNoteA() + i);
 		displayOptionalNoteA();
 	}
-	else if (param == "optional-note-b")
+	else if (focusedFieldName == "optional-note-b")
 	{
 		lastNoteParameters->setOptionalNoteB(lastNoteParameters->getOptionalNoteB() + i);
 		displayOptionalNoteB();
@@ -243,23 +245,25 @@ void PgmAssignScreen::openWindow()
 {
 	init();
 	
-	if (param == "pgm")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "pgm")
 	{
         mpc.getLayeredScreen()->openScreen<ProgramScreen>();
 	}
-	else if (param == "pad" || param == "pad-note")
+	else if (focusedFieldName == "pad" || focusedFieldName == "pad-note")
 	{
         mpc.getLayeredScreen()->openScreen<AssignmentViewScreen>();
 	}
-	else if (param == "pad-assign")
+	else if (focusedFieldName == "pad-assign")
 	{
         mpc.getLayeredScreen()->openScreen<InitPadAssignScreen>();
 	}
-	else if (param == "note")
+	else if (focusedFieldName == "note")
 	{
         mpc.getLayeredScreen()->openScreen<CopyNoteParametersScreen>();
 	}
-	else if (param == "snd")
+	else if (focusedFieldName == "snd")
 	{
 		auto soundIndex = sampler->getLastNp(program.get())->getSoundIndex();
 

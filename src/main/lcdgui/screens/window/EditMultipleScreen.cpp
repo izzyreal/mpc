@@ -126,8 +126,10 @@ void EditMultipleScreen::turnWheel(int i)
     auto event = stepEditorScreen->getSelectedEvent();
     
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
-    if (param == "value0")
+    if (focusedFieldName == "value0")
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
         
@@ -181,7 +183,7 @@ void EditMultipleScreen::turnWheel(int i)
             setEditType(editType + i);
         }
     }
-    else if (param == "value1")
+    else if (focusedFieldName == "value1")
     {
         setEditValue(editValue + i);
     }

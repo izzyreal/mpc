@@ -21,7 +21,9 @@ void SoundScreen::openNameScreen()
 {
 	init();
 	
-	if (param == "soundname")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "soundname")
 	{
         const auto enterAction = [this](std::string& nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))

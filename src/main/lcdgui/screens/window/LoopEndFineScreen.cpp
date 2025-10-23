@@ -101,24 +101,27 @@ void LoopEndFineScreen::turnWheel(int i)
     auto trimScreen = mpc.screens->get<TrimScreen>();
 
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param);
 
-	if (field->isSplit())
+    const auto focusedField = getFocusedFieldOrThrow();
+
+	if (focusedField->isSplit())
     {
-        soundInc = field->getSplitIncrement(i >= 0);
+        soundInc = focusedField->getSplitIncrement(i >= 0);
     }
 
-	if (field->isTypeModeEnabled())
+	if (focusedField->isTypeModeEnabled())
     {
-        field->disableTypeMode();
+        focusedField->disableTypeMode();
     }
 
-	if (param == "loop-lngth")
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "loop-lngth")
 	{
 		loopScreen->loopLngthFix = i > 0;
 		displayLoopLngth();
 	}
-	else if (param == "lngth")
+	else if (focusedFieldName == "lngth")
 	{
         auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
 
@@ -127,7 +130,7 @@ void LoopEndFineScreen::turnWheel(int i)
 		displayLngthField();
 		displayFineWave();
 	}
-	else if (param == "end")
+	else if (focusedFieldName == "end")
 	{
 		auto newValue = sound->getEnd() + soundInc;
         trimScreen->setEnd(newValue);
@@ -136,7 +139,7 @@ void LoopEndFineScreen::turnWheel(int i)
 		displayLngthField();
 		displayFineWave();
 	}
-	else if (param == "playx")
+	else if (focusedFieldName == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
@@ -174,14 +177,16 @@ void LoopEndFineScreen::setSlider(int i)
     auto loopScreen = mpc.screens->get<LoopScreen>();
     auto trimScreen = mpc.screens->get<TrimScreen>();
 
-    if (param == "end")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "end")
     {
         trimScreen->setSliderEnd(i);
         displayEnd();
         displayLngthField();
         displayFineWave();
     }
-    else if (param == "lngth")
+    else if (focusedFieldName == "lngth")
     {
         loopScreen->setSliderLength(i);
         displayEnd();

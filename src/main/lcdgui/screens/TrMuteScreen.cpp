@@ -69,7 +69,9 @@ void TrMuteScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "sq" && !sequencer.lock()->isPlaying())
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "sq" && !sequencer.lock()->isPlaying())
 	{
 		auto oldSequence = sequencer.lock()->getActiveSequence();
 

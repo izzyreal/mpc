@@ -81,22 +81,29 @@ void ZoneEndFineScreen::turnWheel(int i)
 	auto zoneScreen = mpc.screens->get<ZoneScreen>();
 
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param);
 
-	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+    const auto focusedField = getFocusedFieldOrThrow();
 
-	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+	if (focusedField->isSplit())
+    {
+		soundInc = focusedField->getSplitIncrement(i >= 0);
+    }
 
-	if (param == "end")
+	if (focusedField->isTypeModeEnabled())
+    {
+		focusedField->disableTypeMode();
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "end")
 	{
 		zoneScreen->setZoneEnd(zoneScreen->zone, zoneScreen->getZoneEnd(zoneScreen->zone) + soundInc);
 		displayLngthLabel();
 		displayEnd();
 		displayFineWave();
 	}
-	else if (param == "playx")
+	else if (focusedFieldName == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
@@ -132,7 +139,9 @@ void ZoneEndFineScreen::setSlider(int i)
 
     init();
 
-    if (param == "end")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "end")
     {
         auto zoneScreen = mpc.screens->get<ZoneScreen>();
         zoneScreen->setSlider(i);

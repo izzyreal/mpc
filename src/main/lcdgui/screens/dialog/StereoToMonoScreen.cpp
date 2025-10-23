@@ -28,7 +28,9 @@ void StereoToMonoScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "stereosource")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "stereosource")
 	{
 		sampler->nudgeSoundIndex(i > 0);
 		displayStereoSource();
@@ -37,9 +39,11 @@ void StereoToMonoScreen::turnWheel(int i)
 
 void StereoToMonoScreen::openNameScreen()
 {
-    if (param == "newlname" || param == "newrname")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "newlname" || focusedFieldName == "newrname")
     {
-        const auto isL = param == "newlname";
+        const auto isL = focusedFieldName == "newlname";
 
         const auto enterAction = [this, isL](std::string& nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))

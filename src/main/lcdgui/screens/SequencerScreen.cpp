@@ -466,37 +466,40 @@ void SequencerScreen::update(Observable* o, Message message)
 void SequencerScreen::pressEnter()
 {
 	init();
-	ScreenComponent::pressEnter();
 
-	auto focusedField = findChild<Field>(param);
+    auto focusedField = getFocusedFieldOrThrow();
 
 	if (!focusedField->isTypeModeEnabled())
+    {
 		return;
+    }
 
 	auto candidate = focusedField->enter();
 
+    const auto focusedFieldName = focusedField->getName();
+
 	if (candidate != INT_MAX)
 	{
-		if (param == "now0")
+		if (focusedFieldName == "now0")
 		{
 			sequencer.lock()->setBar(candidate - 1);
 			setLastFocus("step-editor", "view");
 		}
-		else if (param == "now1")
+		else if (focusedFieldName == "now1")
 		{
 			sequencer.lock()->setBeat(candidate - 1);
 			setLastFocus("step-editor", "view");
 		}
-		else if (param == "now2")
+		else if (focusedFieldName == "now2")
 		{
 			sequencer.lock()->setClock(candidate);
 			setLastFocus("step-editor", "view");
 		}
-		else if (param == "tempo")
+		else if (focusedFieldName == "tempo")
 		{
 			sequencer.lock()->setTempo(candidate * 0.1);
 		}
-		else if (param == "velo")
+		else if (focusedFieldName == "velo")
 		{
             setTrackToUsedIfItIsCurrentlyUnused();
 			track->setVelocityRatio(candidate);
@@ -570,34 +573,36 @@ void SequencerScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.size() >= 3 && param.substr(0, 3) == "now")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.size() >= 3 && focusedFieldName.substr(0, 3) == "now")
     {
         setLastFocus("step-editor", "view");
     }
 
-    if (param.substr(0, 3) == "now" && sequencer.lock()->isPlaying())
+    if (focusedFieldName.substr(0, 3) == "now" && sequencer.lock()->isPlaying())
     {
         return;
     }
 
-	if (param == "now0")
+	if (focusedFieldName == "now0")
 	{
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i);
 	}
-	else if (param == "now1")
+	else if (focusedFieldName == "now1")
 	{
 		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatIndex() + i);
 	}
-	else if (param == "now2")
+	else if (focusedFieldName == "now2")
 	{
 		sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i);
 	}
-	else if (param == "devicenumber")
+	else if (focusedFieldName == "devicenumber")
 	{
         setTrackToUsedIfItIsCurrentlyUnused();
         track->setDeviceIndex(track->getDeviceIndex() + i);
 	}
-	else if (param == "tr")
+	else if (focusedFieldName == "tr")
 	{
 		if (i > 0)
 		{
@@ -608,7 +613,7 @@ void SequencerScreen::turnWheel(int i)
 			sequencer.lock()->trackDown();
 		}
 	}
-	else if (param == "bus")
+	else if (focusedFieldName == "bus")
 	{
         setTrackToUsedIfItIsCurrentlyUnused();
 
@@ -634,17 +639,17 @@ void SequencerScreen::turnWheel(int i)
 			}
 		}
 	}
-	else if (param == "pgm")
+	else if (focusedFieldName == "pgm")
 	{
         setTrackToUsedIfItIsCurrentlyUnused();
 		track->setProgramChange(track->getProgramChange() + i);
 	}
-	else if (param == "velo")
+	else if (focusedFieldName == "velo")
 	{
         setTrackToUsedIfItIsCurrentlyUnused();
 		track->setVelocityRatio(track->getVelocityRatio() + i);
 	}
-	else if (param == "timing")
+	else if (focusedFieldName == "timing")
 	{
 		auto screen = mpc.screens->get<TimingCorrectScreen>();
 		auto noteValue = screen->getNoteValue();
@@ -652,7 +657,7 @@ void SequencerScreen::turnWheel(int i)
 		setLastFocus("timing-correct", "notevalue");
 		displayTiming();
 	}
-	else if (param == "sq")
+	else if (focusedFieldName == "sq")
 	{
 		auto punchScreen = mpc.screens->get<PunchScreen>();
 		
@@ -678,45 +683,45 @@ void SequencerScreen::turnWheel(int i)
 			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		}
 	}
-	else if (param == "nextsq")
+	else if (focusedFieldName == "nextsq")
 	{
         if (sequencer.lock()->getNextSq() + i >= 0)
             sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 	}
-	else if (param == "bars")
+	else if (focusedFieldName == "bars")
 	{
         if (!sequencer.lock()->isPlaying())
         {
         mpc.getLayeredScreen()->openScreen<ChangeBars2Screen>();
         }
 	}
-	else if (param == "tempo")
+	else if (focusedFieldName == "tempo")
 	{
 		double oldTempo = sequencer.lock()->getTempo();
 		double newTempo = oldTempo + (i * 0.1);
 		sequencer.lock()->setTempo(newTempo);
 	}
-	else if (param == "tsig")
+	else if (focusedFieldName == "tsig")
 	{
         mpc.getLayeredScreen()->openScreen<ChangeTsigScreen>();
 	}
-	else if (param == "tempo-source")
+	else if (focusedFieldName == "tempo-source")
 	{
 		sequencer.lock()->setTempoSourceSequence(i > 0);
 	}
-	else if (param == "count")
+	else if (focusedFieldName == "count")
 	{
 		sequencer.lock()->setCountEnabled(i > 0);
 	}
-	else if (param == "loop")
+	else if (focusedFieldName == "loop")
 	{
 		sequence.lock()->setLoopEnabled(i > 0);
 	}
-	else if (param == "recordingmode")
+	else if (focusedFieldName == "recordingmode")
 	{
 		sequencer.lock()->setRecordingModeMulti(i > 0);
 	}
-	else if (param == "on")
+	else if (focusedFieldName == "on")
 	{
         setTrackToUsedIfItIsCurrentlyUnused();
 		track->setOn(i > 0);
@@ -729,68 +734,70 @@ void SequencerScreen::openWindow()
 
 	if (sequencer.lock()->isPlaying())
 		return;
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
-	if (param == "sq")
+	if (focusedFieldName == "sq")
 	{
 		Util::initSequence(mpc);
         mpc.getLayeredScreen()->openScreen<SequenceScreen>();
 	}
-	else if (param.find("now") != std::string::npos)
+	else if (focusedFieldName.find("now") != std::string::npos)
 	{
         mpc.getLayeredScreen()->openScreen<TimeDisplayScreen>();
 	}
-	else if (param.find("tempo") != std::string::npos)
+	else if (focusedFieldName.find("tempo") != std::string::npos)
 	{
         mpc.getLayeredScreen()->openScreen<TempoChangeScreen>();
 	}
-	else if (param == "timing")
+	else if (focusedFieldName == "timing")
 	{
         mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
 	}
-	else if (param == "tsig")
+	else if (focusedFieldName == "tsig")
 	{
         mpc.getLayeredScreen()->openScreen<ChangeTsigScreen>();
 	}
-	else if (param == "count")
+	else if (focusedFieldName == "count")
 	{
         mpc.getLayeredScreen()->openScreen<CountMetronomeScreen>();
 	}
-	else if (param == "loop")
+	else if (focusedFieldName == "loop")
 	{
         mpc.getLayeredScreen()->openScreen<LoopBarsScreen>();
 	}
-	else if (param == "tr")
+	else if (focusedFieldName == "tr")
 	{
 		if (!track->isUsed())
 			track->setUsed(true);
 
         mpc.getLayeredScreen()->openScreen<TrackScreen>();
 	}
-	else if (param == "on")
+	else if (focusedFieldName == "on")
 	{
         mpc.getLayeredScreen()->openScreen<EraseAllOffTracksScreen>();
 	}
-	else if (param == "pgm")
+	else if (focusedFieldName == "pgm")
 	{
         mpc.getLayeredScreen()->openScreen<TransmitProgramChangesScreen>();
 	}
-	else if (param == "recordingmode")
+	else if (focusedFieldName == "recordingmode")
 	{
         mpc.getLayeredScreen()->openScreen<MultiRecordingSetupScreen>();
 	}
-	else if (param == "bus")
+	else if (focusedFieldName == "bus")
 	{
         mpc.getLayeredScreen()->openScreen<MidiInputScreen>();
 	}
-	else if (param == "devicenumber")
+	else if (focusedFieldName == "devicenumber")
 	{
         mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
 	}
-	else if (param == "bars")
+	else if (focusedFieldName == "bars")
 	{
         mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
 	}
-	else if (param == "velo")
+	else if (focusedFieldName == "velo")
     {
         mpc.getLayeredScreen()->openScreen<EditVelocityScreen>();
 	}
@@ -950,3 +957,4 @@ void SequencerScreen::overDub()
 	Util::initSequence(mpc);
 	ScreenComponent::overDub();
 }
+

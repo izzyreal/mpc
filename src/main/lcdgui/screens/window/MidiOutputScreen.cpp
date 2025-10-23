@@ -36,7 +36,9 @@ void MidiOutputScreen::open()
 
 void MidiOutputScreen::openNameScreen()
 {
-    if (param == "firstletter")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "firstletter")
     {
         auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
 
@@ -55,7 +57,10 @@ void MidiOutputScreen::openNameScreen()
 void MidiOutputScreen::right()
 {
     init();
-    if (param == "firstletter")
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "firstletter")
         openNameScreen();
     else
         ScreenComponent::right();
@@ -65,11 +70,13 @@ void MidiOutputScreen::turnWheel(int i)
 {
 	init();
 		
-	if (param == "softthru")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "softthru")
 	{
 		setSoftThru(softThru + i);
 	}
-	else if (param == "devicenumber")
+	else if (focusedFieldName == "devicenumber")
 	{
 		setDeviceIndex(deviceIndex + i);
 	}

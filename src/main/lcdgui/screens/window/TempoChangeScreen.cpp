@@ -69,9 +69,11 @@ void TempoChangeScreen::open()
 
 	auto events = sequencer.lock()->getActiveSequence()->getTempoChangeEvents();
 
-	if (param.length() == 2)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.length() == 2)
 	{
-		auto row = stoi(param.substr(1));
+		auto row = stoi(focusedFieldName.substr(1));
 		{
 			if (row + offset >= events.size())
 			{
@@ -290,10 +292,12 @@ void TempoChangeScreen::displayTempoChange2()
 void TempoChangeScreen::left()
 {
 	init();
-	
-	if (param.length() == 2)
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.length() == 2)
 	{
-		if (param[0] == 'a')
+		if (focusedFieldName[0] == 'a')
 		{
 			ls->setFocus("tempo-change");
 			return;
@@ -306,9 +310,12 @@ void TempoChangeScreen::left()
 void TempoChangeScreen::right()
 {
 	init();
-	if (param.length() == 2)
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.length() == 2)
 	{
-		if (param[0] == 'f')
+		if (focusedFieldName[0] == 'f')
 		{
 			ls->setFocus("initial-tempo");
 			return;
@@ -324,8 +331,12 @@ void TempoChangeScreen::function(int j)
 	
 	auto yPos = -1;
 
-	if (param.length() == 2)
-		yPos = stoi(param.substr(1, 2));
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.length() == 2)
+    {
+		yPos = stoi(focusedFieldName.substr(1, 2));
+    }
 
 	auto seq = sequencer.lock()->getActiveSequence();
 
@@ -381,7 +392,7 @@ void TempoChangeScreen::function(int j)
 			if (nowDetected > offset + 3 || nowDetected < offset)
 				setOffset(nowDetected);
 
-			ls->setFocus(param.substr(0, 1) + std::to_string(nowDetected - offset));
+			ls->setFocus(focusedFieldName.substr(0, 1) + std::to_string(nowDetected - offset));
 		}
 	}
 		break;
@@ -398,7 +409,7 @@ void TempoChangeScreen::function(int j)
 		}
 		else if (tceList.size() > 1)
 		{
-			if (param.length() != 2)
+			if (focusedFieldName.length() != 2)
 				return;
 
 			auto lCurrent = current.lock();
@@ -425,7 +436,7 @@ void TempoChangeScreen::function(int j)
 		displayTempoChange1();
 		displayTempoChange2();
 
-		ls->setFocus(param);
+		ls->setFocus(focusedFieldName);
 		break;
 	}
 	}
@@ -437,10 +448,14 @@ void TempoChangeScreen::init()
 	auto seq = sequencer.lock()->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
-	if (param.length() != 2)
-		return;
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	auto yPos = stoi(param.substr(1, 2));
+	if (focusedFieldName.length() != 2)
+    {
+		return;
+    }
+
+	auto yPos = stoi(focusedFieldName.substr(1, 2));
 
 	int nextPosition = yPos + offset + 1;
 
@@ -469,13 +484,15 @@ void TempoChangeScreen::turnWheel(int j)
 	auto seq = sequencer.lock()->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
-	if (param == "tempo-change")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "tempo-change")
 	{
 		seq->setTempoChangeOn(j > 0);
 		displayTempoChangeOn();
 		return;
 	}
-	else if (param == "initial-tempo")
+	else if (focusedFieldName == "initial-tempo")
 	{
 		auto tce = tceList[0];
 		seq->setInitialTempo(seq->getInitialTempo()+ (j * 0.1));
@@ -499,38 +516,38 @@ void TempoChangeScreen::turnWheel(int j)
             mayChangePosition = false;
         }
 
-		if (mayChangePosition && param == "b" + std::to_string(i))
+		if (mayChangePosition && focusedFieldName == "b" + std::to_string(i))
 		{
 			if (j > 0)
                 event->plusOneBar(next.lock().get());
 			else
                 event->minusOneBar(previous.lock().get());
 		}
-		else if (mayChangePosition && param == "c" + std::to_string(i))
+		else if (mayChangePosition && focusedFieldName == "c" + std::to_string(i))
 		{
 			if (j > 0)
                 event->plusOneBeat(next.lock().get());
 			else
                 event->minusOneBeat(previous.lock().get());
 		}
-		else if (mayChangePosition && param == "d" + std::to_string(i))
+		else if (mayChangePosition && focusedFieldName == "d" + std::to_string(i))
 		{
 			if (j > 0)
 				event->plusOneClock(next.lock().get());
 			else
 				event->minusOneClock(previous.lock().get());
 		}
-		else if (param == "e" + std::to_string(i))
+		else if (focusedFieldName == "e" + std::to_string(i))
 		{
 			event->setRatio(event->getRatio() + j);
 		}
-		else if (param == "f" + std::to_string(i))
+		else if (focusedFieldName == "f" + std::to_string(i))
 		{
 			auto ratio = (event->getTempo() + j * 0.1) / seq->getInitialTempo();
 			event->setRatio((int)round(ratio * 1000.0));
 		}
 
-		if (param.length() == 2 && stoi(param.substr(1)) == i)
+		if (focusedFieldName.length() == 2 && stoi(focusedFieldName.substr(1)) == i)
 		{
 			if (i == 0)
 				displayTempoChange0();
@@ -551,15 +568,23 @@ void TempoChangeScreen::down()
 	auto tce1 = visibleTempoChanges[1];
 	auto tce2 = visibleTempoChanges[2];
 
-	if (param == "tempo-change")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "tempo-change")
+    {
 		ls->setFocus("e0");
-	else if (param == "initial-tempo")
+    }
+	else if (focusedFieldName == "initial-tempo")
+    {
 		ls->setFocus("f0");
+    }
 	
-	if (param.length() != 2)
+	if (focusedFieldName.length() != 2)
+    {
 		return;
+    }
 	
-	auto yPos = stoi(param.substr(1, 2));
+	auto yPos = stoi(focusedFieldName.substr(1, 2));
 
 	if ((yPos == 1 && !tce1) || (yPos == 2 && !tce2))
 	{
@@ -576,13 +601,13 @@ void TempoChangeScreen::down()
 
 		auto sequence = sequencer.lock()->getActiveSequence();
 
-		if (offset + yPos == sequence->getTempoChangeEvents().size() && param[0] != 'a')
+		if (offset + yPos == sequence->getTempoChangeEvents().size() && focusedFieldName[0] != 'a')
 			ls->setFocus("a2");
 
 		return;
 	}
 
-	auto paramToFocus = param.substr(0, 1);
+	auto paramToFocus = focusedFieldName.substr(0, 1);
 
 	if ((yPos == 0 && !tce1) || (yPos == 1 && !tce2))
 		paramToFocus = "a";
@@ -594,18 +619,22 @@ void TempoChangeScreen::up()
 {
 	init();
 
-	if (param.length() != 2)
-		return;
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	auto yPos = stoi(param.substr(1, 2));
+	if (focusedFieldName.length() != 2)
+    {
+		return;
+    }
+
+	auto yPos = stoi(focusedFieldName.substr(1, 2));
 
 	if (yPos == 0)
 	{
 		if (offset == 0)
 		{
-			if (param == "e0")
+			if (focusedFieldName == "e0")
 				ls->setFocus("tempo-change");
-			else if (param == "f0")
+			else if (focusedFieldName == "f0")
 				ls->setFocus("initial-tempo");
 
 			return;
@@ -614,7 +643,7 @@ void TempoChangeScreen::up()
 		return;
 	}
 
-	ls->setFocus(param.substr(0, 1) + std::to_string(yPos - 1));
+	ls->setFocus(focusedFieldName.substr(0, 1) + std::to_string(yPos - 1));
 	return;
 }
 

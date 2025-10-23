@@ -72,24 +72,26 @@ void VmpcSettingsScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "initial-pad-mapping")
+    const auto focusedFieldName = getFocusedFieldName();
+
+    if (focusedFieldName == "initial-pad-mapping")
 	{
 		setInitialPadMapping(initialPadMapping + i);
 	}
-    else if (param == "16-levels-erase-mode")
+    else if (focusedFieldName == "16-levels-erase-mode")
     {
         set16LevelsEraseMode(_16LevelsEraseMode + i);
     }
-    else if (param == "auto-convert-wavs")
+    else if (focusedFieldName == "auto-convert-wavs")
     {
         setAutoConvertWavs(autoConvertWavs + i);
     }
-    else if (param == "midi-control-mode")
+    else if (focusedFieldName == "midi-control-mode")
     {
         setMidiControlMode(midiControlMode + i);
         ls->setFunctionKeysArrangement(midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
     }
-    else if (param == "name-typing-with-keyboard")
+    else if (focusedFieldName == "name-typing-with-keyboard")
     {
         setNameTypingWithKeyboard(i > 0);
     }

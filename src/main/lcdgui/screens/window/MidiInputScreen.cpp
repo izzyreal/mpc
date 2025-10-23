@@ -42,27 +42,29 @@ void MidiInputScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "receivech")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "receivech")
 	{
 		setReceiveCh(receiveCh + i);
 	}
-	else if (param == "seq")
+	else if (focusedFieldName == "seq")
 	{
 		setProgChangeSeq(i > 0);
 	}
-	else if (param == "duration")
+	else if (focusedFieldName == "duration")
 	{
 		setSustainPedalToDuration(i > 0);
 	}
-	else if (param == "midifilter")
+	else if (focusedFieldName == "midifilter")
 	{
 		setMidiFilterEnabled(i > 0);
 	}
-	else if (param == "type")
+	else if (focusedFieldName == "type")
 	{
 		setType(type + i);
 	}
-	else if (param == "pass")
+	else if (focusedFieldName == "pass")
 	{
 		setPass(i > 0);
 	}

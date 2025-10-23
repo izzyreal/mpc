@@ -216,25 +216,27 @@ void MetronomeSoundScreen::turnWheel(int i)
 {
     init();
     
-    if (param == "sound") {
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "sound") {
         setSound(sound + i);
     }
-    else if (param == "volume") {
+    else if (focusedFieldName == "volume") {
         setVolume(volume + i);
     }
-    else if (param == "output") {
+    else if (focusedFieldName == "output") {
         setOutput(output + i);
     }
-    else if (param == "accent") {
+    else if (focusedFieldName == "accent") {
         setAccentPad(accentPad + i);
     }
-    else if (param == "normal") {
+    else if (focusedFieldName == "normal") {
         setNormalPad(normalPad + i);
     }
-    else if (param == "velocity-accent") {
+    else if (focusedFieldName == "velocity-accent") {
         setAccentVelo(accentVelo + i);
     }
-    else if (param == "velocity-normal") {
+    else if (focusedFieldName == "velocity-normal") {
         setNormalVelo(normalVelo + i);
     }
 }
@@ -247,9 +249,15 @@ void MetronomeSoundScreen::update(Observable* o, Message message)
 
     if (msg == "note")
     {
-        if (param == "accent")
+        const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+        if (focusedFieldName == "accent")
+        {
             setAccentPad(mpc.getPad());
-        else if (param == "normal")
+        }
+        else if (focusedFieldName == "normal")
+        {
             setNormalPad(mpc.getPad());
+        }
     }
 }

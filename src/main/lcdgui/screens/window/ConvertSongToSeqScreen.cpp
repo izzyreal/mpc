@@ -51,16 +51,18 @@ void ConvertSongToSeqScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "fromsong")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "fromsong")
     {
         const auto songScreen = mpc.screens->get<SongScreen>();
         setFromSong(songScreen->activeSongIndex + i);
     }
-    else if (param == "tosequence")
+    else if (focusedFieldName == "tosequence")
     {
         setToSequenceIndex(toSequenceIndex + i);
     }
-    else if (param == "trackstatus")
+    else if (focusedFieldName == "trackstatus")
     {
         setTrackStatus(trackStatus + i);
     }

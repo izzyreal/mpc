@@ -23,20 +23,22 @@ void CopyNoteParametersScreen::open()
 void CopyNoteParametersScreen::turnWheel(int i)
 {
     init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
-	if (param == "prog0")
+	if (focusedFieldName == "prog0")
 	{
 		setProg0(prog0 + i);
 	}
-	else if (param == "note0")
+	else if (focusedFieldName == "note0")
 	{
 		setNote0(mpc.getNote() + i);
 	}
-	else if (param == "prog1")
+	else if (focusedFieldName == "prog1")
 	{
 		setProg1(prog1 + i);
 	}
-	else if (param == "note1")
+	else if (focusedFieldName == "note1")
 	{
 		setNote1(note1 + i);
 	}

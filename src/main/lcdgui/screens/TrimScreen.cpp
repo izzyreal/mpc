@@ -48,16 +48,25 @@ void TrimScreen::openWindow()
 {
 	init();
 	
-	if (param == "snd")
+    const auto focusedField = getFocusedField();
+
+    if (!focusedField)
+    {
+        return;
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "snd")
 	{
 		sampler->setPreviousScreenName("trim");
         mpc.getLayeredScreen()->openScreen<SoundScreen>();
 	}
-	else if (param == "st")
+	else if (focusedFieldName == "st")
 	{
         mpc.getLayeredScreen()->openScreen<StartFineScreen>();
 	}
-	else if (param == "end")
+	else if (focusedFieldName == "end")
 	{
         mpc.getLayeredScreen()->openScreen<EndFineScreen>();
 	}
@@ -111,7 +120,9 @@ void TrimScreen::turnWheel(int i)
 
 	auto sound = sampler->getSound();
 
-	if (param.empty() || !sound)
+    const auto focusedField = getFocusedField();
+    
+	if (!focusedField || !sound)
     {
         return;
     }
@@ -119,15 +130,20 @@ void TrimScreen::turnWheel(int i)
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param);
 	
-	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+	if (focusedField->isSplit())
+    {
+		soundInc = focusedField->getSplitIncrement(i >= 0);
+    }
 
-	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+	if (focusedField->isTypeModeEnabled())
+    {
+		focusedField->disableTypeMode();
+    }
 
-	if (param == "st")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "st")
 	{
 		if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getFrameCount())
 			return;
@@ -149,7 +165,7 @@ void TrimScreen::turnWheel(int i)
 
 		displayWave();
 	}
-	else if (param == "end")
+	else if (focusedFieldName == "end")
 	{
 		if (smplLngthFix && sound->getEnd() + soundInc - oldLength < 0)
         {
@@ -173,16 +189,16 @@ void TrimScreen::turnWheel(int i)
 
 		displayWave();
 	}
-	else if (param == "view")
+	else if (focusedFieldName == "view")
 	{
 		setView(view + i);
 	}
-	else if (param == "playx")
+	else if (focusedFieldName == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param == "snd" && i > 0)
+	else if (focusedFieldName == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
 		displaySnd();
@@ -192,7 +208,7 @@ void TrimScreen::turnWheel(int i)
 		displayView();
 		displayWave();
 	}
-	else if (param == "snd" && i < 0)
+	else if (focusedFieldName == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displaySnd();
@@ -213,12 +229,21 @@ void TrimScreen::setSlider(int i)
     
 	init();
 
-	if (param == "st")
+    const auto focusedField = getFocusedField();
+
+    if (!focusedField)
+    {
+        return;
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "st")
 	{
         setSliderStart(i);
         displayWave();
 	}
-	else if (param == "end")
+	else if (focusedFieldName == "end")
 	{
         setSliderEnd(i);
 		displayWave();
@@ -324,18 +349,27 @@ void TrimScreen::pressEnter()
 
 	init();
 
-	auto field = ls->getFocusedLayer()->findField(param);
-	
-	if (!field->isTypeModeEnabled())
-		return;
+    auto focusedField = getFocusedField();
 
-	auto candidate = field->enter();
+    if (!focusedField)
+    {
+        return;
+    }
+	
+	if (!focusedField->isTypeModeEnabled())
+    {
+		return;
+    }
+
+	auto candidate = focusedField->enter();
 	auto sound = sampler->getSound();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
 	if (candidate != INT_MAX)
 	{
-		if (param == "st" || param == "start")
+        const auto focusedFieldName = focusedField->getName();
+
+		if (focusedFieldName == "st" || focusedFieldName == "start")
 		{
 			if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
 				candidate = sound->getFrameCount() - oldLength;
@@ -349,7 +383,7 @@ void TrimScreen::pressEnter()
 			displayEnd();
 			displayWave();
 		}
-		else if (param == "end")
+		else if (focusedFieldName == "end")
 		{
 			if (smplLngthFix && candidate - oldLength < 0)
 				candidate = oldLength;

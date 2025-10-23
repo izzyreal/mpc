@@ -42,7 +42,9 @@ void PunchScreen::turnWheel(int i)
 {
     init();
     
-	if (param == "auto-punch")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "auto-punch")
 		setAutoPunch(autoPunch + i);
 
     checkAllTimes(mpc, i);

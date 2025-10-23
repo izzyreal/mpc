@@ -15,7 +15,10 @@ void TransmitProgramChangesScreen::open()
 void TransmitProgramChangesScreen::turnWheel(int i)
 {
 	init();
-	if (param == "inthistrack")
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+	
+    if (focusedFieldName == "inthistrack")
 	{
 		transmitProgramChangesInThisTrack = i > 0;
 		displayTransmitProgramChangesInThisTrack();

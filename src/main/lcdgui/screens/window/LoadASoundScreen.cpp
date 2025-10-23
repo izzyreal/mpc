@@ -38,7 +38,9 @@ void LoadASoundScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "assign-to-note")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "assign-to-note")
 	{
 		auto newAssignToNote = assignToNote + i;
 

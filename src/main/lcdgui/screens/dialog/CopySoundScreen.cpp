@@ -52,7 +52,9 @@ void CopySoundScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "snd")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "snd")
 	{
 		sampler->nudgeSoundIndex(i > 0);
 		auto newSampleName = sampler->getSoundName(sampler->getSoundIndex());

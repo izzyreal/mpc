@@ -22,7 +22,9 @@ void LoadAProgramScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "load-replace-sound")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "load-replace-sound")
 	{
         loadReplaceSameSound = i > 0;
 		displayLoadReplaceSound();

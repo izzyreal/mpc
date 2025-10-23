@@ -20,31 +20,33 @@ void TimeDisplayScreen::turnWheel(int i)
 
     const auto startTime = sequencer.lock()->getActiveSequence()->getStartTime();
 	
-	if (param == "displaystyle")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "displaystyle")
 	{
 		setDisplayStyle(displayStyle + i);
 	}
-	else if (param == "hours")
+	else if (focusedFieldName == "hours")
 	{
         setHours(startTime.hours + i);
 	}
-	else if (param == "minutes")
+	else if (focusedFieldName == "minutes")
 	{
         setMinutes(startTime.minutes + i);
 	}
-	else if (param == "seconds")
+	else if (focusedFieldName == "seconds")
 	{
         setSeconds(startTime.seconds + i);
 	}
-	else if (param == "frames")
+	else if (focusedFieldName == "frames")
 	{
         setFrames(startTime.frames + i);
 	}
-	else if (param == "frame-decimals")
+	else if (focusedFieldName == "frame-decimals")
 	{
         setFrameDecimals(startTime.frameDecimals + i);
     }
-	else if (param == "framerate")
+	else if (focusedFieldName == "framerate")
 	{
 		setFrameRate(frameRate + i);
 	}

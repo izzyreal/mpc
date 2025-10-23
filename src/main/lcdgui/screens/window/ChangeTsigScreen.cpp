@@ -57,22 +57,24 @@ void ChangeTsigScreen::turnWheel(int i)
 
 	auto seq = sequencer.lock()->getActiveSequence();
 
-	if (param == "bar0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "bar0")
 	{
 		setBar0(bar0 + i, seq->getLastBarIndex());
 		displayBars();
 	}
-	else if (param == "bar1")
+	else if (focusedFieldName == "bar1")
 	{
 		setBar1(bar1 + i, seq->getLastBarIndex());
 		displayBars();
 	}
-	else if (param == "newtsig" && i > 0)
+	else if (focusedFieldName == "newtsig" && i > 0)
 	{
 		timesignature.increase();
 		displayNewTsig();
 	}
-	else if (param == "newtsig" && i < 0)
+	else if (focusedFieldName == "newtsig" && i < 0)
 	{
 		timesignature.decrease();
 		displayNewTsig();

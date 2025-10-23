@@ -31,7 +31,9 @@ void AssignmentViewScreen::up()
 {
 	init();
 
-	if (param.find("0") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("0") != std::string::npos)
 	{
 		return;
 	}
@@ -45,7 +47,9 @@ void AssignmentViewScreen::down()
 {
 	init();
 	
-	if (param.find("3") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("3") != std::string::npos)
 	{
 		return;
 	}
@@ -59,7 +63,9 @@ void AssignmentViewScreen::left()
 {
     init();
 	
-	if (param.find("a") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("a") != std::string::npos)
 	{
 		return;
 	}
@@ -75,7 +81,9 @@ void AssignmentViewScreen::right()
 {
 	init();
 
-	if (param.find("d") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("d") != std::string::npos)
 	{
 		return;
 	}
@@ -185,9 +193,11 @@ int AssignmentViewScreen::getPadIndexFromFocus()
 
     int padIndex = -1;
 
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
 	for (int i = 0; i < padFocusNames.size(); i++)
 	{
-		if (padFocusNames[i] == param)
+		if (padFocusNames[i] == focusedFieldName)
 		{
 			padIndex = i;
 			break;

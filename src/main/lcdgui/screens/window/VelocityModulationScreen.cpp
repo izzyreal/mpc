@@ -30,22 +30,24 @@ void VelocityModulationScreen::turnWheel(int i)
 
 	auto lastNp = sampler->getLastNp(program.get());
 
-	if (param == "veloattack")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "veloattack")
 	{
 		lastNp->setVelocityToAttack(lastNp->getVelocityToAttack() + i);
 		displayVeloAttack();
 	}
-	else if (param == "velostart")
+	else if (focusedFieldName == "velostart")
 	{
 		lastNp->setVelocityToStart(lastNp->getVelocityToStart() + i);
 		displayVeloStart();
 	}
-	else if (param == "velolevel")
+	else if (focusedFieldName == "velolevel")
 	{
 		lastNp->setVeloToLevel(lastNp->getVeloToLevel() + i);
 		displayVeloLevel();
 	}
-	else if (param == "note")
+	else if (focusedFieldName == "note")
 	{
 		mpc.setNote(mpc.getNote() + i);
 		displayNote();

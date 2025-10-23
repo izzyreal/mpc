@@ -21,7 +21,9 @@ void ProgramScreen::openNameScreen()
 {
     init();
 
-    if (param == "programname")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "programname")
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             program->setName(nameScreenName);
@@ -38,7 +40,9 @@ void ProgramScreen::turnWheel(int i)
 {
     init();
 
-	if (param == "midiprogramchange")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "midiprogramchange")
 	{
 		program->setMidiProgramChange(program->getMidiProgramChange() + i);
 		displayMidiProgramChange();

@@ -42,7 +42,9 @@ void SaveAllFileScreen::openNameScreen()
 {
 	init();
 
-	if (param == "file")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "file")
 	{
         const auto enterAction = [this](std::string& nameScreenName) {
             fileName = nameScreenName;

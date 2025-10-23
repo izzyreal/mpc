@@ -21,7 +21,9 @@ void EditVelocityScreen::setNote0(int i)
 {
     init();
 
-    if (param == "note0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "note0")
     {
         WithTimesAndNotes::setNote0(i);
     }
@@ -99,9 +101,11 @@ void EditVelocityScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "edittype")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "edittype")
 		setEditType(editType + i);
-	else if (param == "value")
+	else if (focusedFieldName == "value")
 		setValue(value + i);
 	
 	checkAllTimesAndNotes(mpc, i);

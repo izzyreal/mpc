@@ -9,6 +9,7 @@
 #include <sampler/Program.hpp>
 
 #include "engine/Drum.hpp"
+#include "lcdgui/ScreenComponent.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
@@ -16,34 +17,35 @@ using namespace mpc::lcdgui::screens;
 bool WithTimesAndNotes::checkAllTimes(mpc::Mpc& mpc, int notch, Sequence* seq)
 {
 	auto sequence = seq != nullptr ? seq : mpc.getSequencer()->getActiveSequence().get();
-	auto param = mpc.getLayeredScreen()->getFocusedFieldName();
 
-	if (param == "time0")
+    const auto focusedFieldName = mpc.getLayeredScreen()->getCurrentScreen()->getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "time0")
 	{
 		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence, time0));
 		return true;
 	}
-	else if (param == "time1")
+	else if (focusedFieldName == "time1")
 	{
 		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch, sequence, time0));
 		return true;
 	}
-	else if (param == "time2")
+	else if (focusedFieldName == "time2")
 	{
 		setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch, sequence, time0));
 		return true;
 	}
-	else if (param == "time3")
+	else if (focusedFieldName == "time3")
 	{
 		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence, time1));
 		return true;
 	}
-	else if (param == "time4")
+	else if (focusedFieldName == "time4")
 	{
 		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch, sequence, time1));
 		return true;
 	}
-	else if (param == "time5")
+	else if (focusedFieldName == "time5")
 	{
 		setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch, sequence, time1));
 		return true;
@@ -59,7 +61,9 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 	auto timesHaveChanged = checkAllTimes(mpc, notch, seq);
 	auto notesHaveChanged = false;
 
-	if (param == "note0")
+    const auto focusedFieldName = mpc.getLayeredScreen()->getCurrentScreen()->getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "note0")
 	{
 		auto track = mpc.getSequencer()->getActiveTrack().get();
 
@@ -86,7 +90,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 
 		notesHaveChanged = true;
 	}
-	else if (param == "note1")
+	else if (focusedFieldName == "note1")
 	{
 		setNote1(note1 + notch);
 		notesHaveChanged = true;

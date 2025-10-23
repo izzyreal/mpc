@@ -35,11 +35,13 @@ void SaveAProgramScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "save")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "save")
 	{
 		setSave(save + i);
 	}
-	else if (param == "replace-same-sounds")
+	else if (focusedFieldName == "replace-same-sounds")
 	{
 		replaceSameSounds = i > 0;
 		displayReplaceSameSounds();

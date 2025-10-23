@@ -124,3 +124,38 @@ mpc::engine::Drum& ScreenComponent::activeDrum()
     return mpc.getDrum(*drumIndex);
 }
 
+std::shared_ptr<Field> ScreenComponent::getFocusedField()
+{
+    for (auto &f : findFields())
+    {
+        if (f->hasFocus())
+        {
+            return f;
+        }
+    }
+
+    return {};
+}
+
+std::optional<std::string> ScreenComponent::getFocusedFieldName()
+{
+    if (auto f = getFocusedField(); f)
+    {
+        return f->getName();
+    }
+
+    return std::nullopt;
+}
+
+std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow()
+{
+    auto f = getFocusedField();
+    if (!f) throw std::runtime_error("Expected focused field");
+    return f;
+}
+
+std::string ScreenComponent::getFocusedFieldNameOrThrow()
+{
+    return getFocusedFieldOrThrow()->getName();
+}
+

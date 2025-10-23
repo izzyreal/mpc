@@ -51,32 +51,34 @@ void DrumScreen::function(int f)
 void DrumScreen::turnWheel(int i)
 {
 	init();
+    
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
-	if (param == "drum")
+	if (focusedFieldName == "drum")
 	{
 		setDrum(drum + i);
 	}
-	else if (param == "pgm")
+	else if (focusedFieldName == "pgm")
 	{
         activeDrum().setProgram(activeDrum().getProgram() + i);
 		displayPgm();
 	}
-	else if (param == "program-change")
+	else if (focusedFieldName == "program-change")
 	{
         activeDrum().setReceivePgmChange(i > 0);
 		displayPgmChange();
 	}
-	else if (param == "midi-volume")
+	else if (focusedFieldName == "midi-volume")
 	{
         activeDrum().setReceiveMidiVolume(i > 0);
 		displayMidiVolume();
 	}
-	else if (param == "current-val")
+	else if (focusedFieldName == "current-val")
 	{
         activeDrum().setLastReceivedMidiVolume(activeDrum().getLastReceivedMidiVolume() + i);
 		displayCurrentVal();
 	}
-	else if (param == "padtointernalsound")
+	else if (focusedFieldName == "padtointernalsound")
 	{
 		setPadToIntSound(i > 0);
 	}

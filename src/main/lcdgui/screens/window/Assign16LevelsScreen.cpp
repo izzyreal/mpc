@@ -41,7 +41,9 @@ void Assign16LevelsScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "note")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "note")
     {
         auto candidate = note + i;
 
@@ -56,15 +58,15 @@ void Assign16LevelsScreen::turnWheel(int i)
 
         setNote(candidate);
     }
-    else if (param == "param")
+    else if (focusedFieldName == "param")
     {
         setParam(parameter + i);
     }
-    else if (param == "type")
+    else if (focusedFieldName == "type")
     {
         setType(type + i);
     }
-    else if (param == "originalkeypad")
+    else if (focusedFieldName == "originalkeypad")
     {
         setOriginalKeyPad(originalKeyPad + i);
     }

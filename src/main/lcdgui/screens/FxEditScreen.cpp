@@ -41,7 +41,10 @@ void FxEditScreen::function(int f) {
 void FxEditScreen::turnWheel(int i)
 {
 	init();
-	if (param == "drum")
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+	
+    if (focusedFieldName == "drum")
 	{
 		auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 		mixerSetupScreen->setFxDrum(mixerSetupScreen->getFxDrum() + i);
@@ -89,7 +92,9 @@ std::vector<std::weak_ptr<Effect>> FxEditScreen::findEffects()
 }
 
 
-void FxEditScreen::checkEffects() {
+void FxEditScreen::checkEffects()
+{
+    /*
     std::string prevParam = param;
 
 	init();
@@ -112,6 +117,7 @@ void FxEditScreen::checkEffects() {
 			}
 		}
 	}
+    */
 }
 
 void FxEditScreen::displayDrum()

@@ -45,7 +45,9 @@ void LoadASequenceScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "load-into")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "load-into")
 		setLoadInto(loadInto + i);
 }
 

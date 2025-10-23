@@ -12,16 +12,18 @@ void LocateScreen::function(int i)
 {
     init();
 
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
     switch (i)
     {
         case 1:
         {
-            if (param.length() != 1)
+            if (focusedFieldName.length() != 1)
             {
                 break;
             }
 
-            const auto locationIndex = std::stoi(param) - 1;
+            const auto locationIndex = std::stoi(focusedFieldName) - 1;
             auto& location = locations[locationIndex];
             std::get<0>(location) = barIndex;
             std::get<1>(location) = beatIndex;
@@ -34,9 +36,9 @@ void LocateScreen::function(int i)
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         case 4:
-            if (param.length() == 1)
+            if (focusedFieldName.length() == 1)
             {
-                const auto locationIndex = std::stoi(param) - 1;
+                const auto locationIndex = std::stoi(focusedFieldName) - 1;
                 auto& location = locations[locationIndex];
 
                 const auto clampedBarIndex =
@@ -69,15 +71,17 @@ void LocateScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "goto0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "goto0")
     {
         setBarIndex(barIndex + i);
     }
-    else if (param == "goto1")
+    else if (focusedFieldName == "goto1")
     {
         setBeatIndex(beatIndex + i);
     }
-    else if (param == "goto2")
+    else if (focusedFieldName == "goto2")
     {
         setClock(clock + i);
     }

@@ -43,9 +43,11 @@ void CopyProgramScreen::turnWheel(int i)
 {
 	init();
 		
-	if (param == "pgm0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "pgm0")
 		setPgm0(pgm0 + i);
-	else if (param == "pgm1")
+	else if (focusedFieldName == "pgm1")
 		setPgm1(pgm1 + i);
 }
 

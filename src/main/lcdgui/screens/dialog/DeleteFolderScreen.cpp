@@ -28,7 +28,7 @@ void DeleteFolderScreen::static_deleteFolder(void* this_p)
 void DeleteFolderScreen::deleteFolder()
 {
 	auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-        mpc.getLayeredScreen()->openScreen<PopupScreen>();
+    mpc.getLayeredScreen()->openScreen<PopupScreen>();
 	auto popupScreen = mpc.screens->get<PopupScreen>();
 	auto file = directoryScreen->getSelectedFile();
 	auto fileName = file->getName();
@@ -80,7 +80,7 @@ void DeleteFolderScreen::deleteFolder()
 	}
 
     std::this_thread::sleep_for(std::chrono::milliseconds(400));
-        mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+    mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
 }
 
 void DeleteFolderScreen::function(int i)

@@ -26,21 +26,23 @@ void LoopSongScreen::turnWheel(int i)
 	auto songScreen = mpc.screens->get<SongScreen>();
 	auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
 
-	if (param == "first-step")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "first-step")
 	{
 		song->setFirstStep(song->getFirstStep() + i);
 		displayFirstStep();
 		displayLastStep();
 		displayNumberOfSteps();
 	}
-	else if (param == "last-step")
+	else if (focusedFieldName == "last-step")
 	{
 		song->setLastStep(song->getLastStep() + i);
 		displayLastStep();
 		displayFirstStep();
 		displayNumberOfSteps();
 	}
-	else if (param == "number-of-steps")
+	else if (focusedFieldName == "number-of-steps")
 	{
 		auto candidate = song->getLastStep() + i;
 		

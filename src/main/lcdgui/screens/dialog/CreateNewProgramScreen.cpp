@@ -14,7 +14,9 @@ void CreateNewProgramScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "midi-program-change")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "midi-program-change")
     {
         setMidiProgramChange(midiProgramChange + i);
     }
@@ -24,7 +26,9 @@ void CreateNewProgramScreen::openNameScreen()
 {
     init();
 
-    if (param == "new-name")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "new-name")
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             newName = nameScreenName;

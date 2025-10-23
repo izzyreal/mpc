@@ -93,7 +93,9 @@ void ChangeBars2Screen::turnWheel(int i)
 {
 	init();
 
-	if (param == "newbars")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "newbars")
 		setNewBars(newBars + i);
 }
 

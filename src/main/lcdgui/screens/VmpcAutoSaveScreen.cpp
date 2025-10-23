@@ -52,11 +52,13 @@ void VmpcAutoSaveScreen::turnWheel(int i)
 {
     init();
     
-    if (param == "auto-save-on-exit")
+    const auto focusedFieldName = getFocusedFieldName();
+
+    if (focusedFieldName == "auto-save-on-exit")
     {
         setAutoSaveOnExit(autoSaveOnExit + i);
     }
-    else if (param == "auto-load-on-start")
+    else if (focusedFieldName == "auto-load-on-start")
     {
         setAutoLoadOnStart(autoLoadOnStart + i);
     }

@@ -32,17 +32,19 @@ void SaveASoundScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "file" && i > 0)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "file" && i > 0)
 	{
 		sampler->selectPreviousSound();
         displayFile();
 	}
-	else if (param == "file" && i < 0)
+	else if (focusedFieldName == "file" && i < 0)
 	{
 		sampler->selectNextSound();
         displayFile();
 	}
-	else if (param == "file-type")
+	else if (focusedFieldName == "file-type")
 	{
 		setFileType(fileType + i);
 	}

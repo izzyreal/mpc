@@ -72,17 +72,19 @@ void PgmParamsScreen::turnWheel(int i)
 
     auto lastNoteParameters = sampler->getLastNp(program.get());
 
-    if (param == "tune")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "tune")
     {
         lastNoteParameters->setTune(lastNoteParameters->getTune() + i);
         displayTune();
     }
-    else if (param == "dcymd")
+    else if (focusedFieldName == "dcymd")
     {
         lastNoteParameters->setDecayMode(lastNoteParameters->getDecayMode() + i);
         displayDecayMode();
     }
-    else if (param == "voiceoverlap")
+    else if (focusedFieldName == "voiceoverlap")
     {
         auto s = sampler->getSound(lastNoteParameters->getSoundIndex());
 
@@ -102,27 +104,27 @@ void PgmParamsScreen::turnWheel(int i)
         
         displayVoiceOverlap();
     }
-    else if (param == "reson")
+    else if (focusedFieldName == "reson")
     {
         lastNoteParameters->setFilterResonance(lastNoteParameters->getFilterResonance() + i);
         displayReson();
     }
-    else if (param == "freq")
+    else if (focusedFieldName == "freq")
     {
         lastNoteParameters->setFilterFrequency(lastNoteParameters->getFilterFrequency() + i);
         displayFreq();
     }
-    else if (param == "decay")
+    else if (focusedFieldName == "decay")
     {
         lastNoteParameters->setDecay(lastNoteParameters->getDecay() + i);
         displayAttackDecay();
     }
-    else if (param == "attack")
+    else if (focusedFieldName == "attack")
     {
         lastNoteParameters->setAttack(lastNoteParameters->getAttack() + i);
         displayAttackDecay();
     }
-    else if (param == "pgm")
+    else if (focusedFieldName == "pgm")
     {	
         auto pgm = activeDrum().getProgram();
         auto candidate = sampler->getUsedProgram(pgm, i > 0);
@@ -140,7 +142,7 @@ void PgmParamsScreen::turnWheel(int i)
             displayVoiceOverlap();
         }
     }
-    else if(param == "note")
+    else if(focusedFieldName == "note")
     {
         auto candidate = mpc.getNote() + i;
         if (candidate > 34)
@@ -161,27 +163,29 @@ void PgmParamsScreen::openWindow()
 {
     init();
 
-    if (param == "pgm")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "pgm")
     {
         mpc.getLayeredScreen()->openScreen<ProgramScreen>();
     }
-    else if (param == "note")
+    else if (focusedFieldName == "note")
     {
         mpc.getLayeredScreen()->openScreen<CopyNoteParametersScreen>();
     }
-    else if (param == "attack" || param == "decay" || param == "dcymd")
+    else if (focusedFieldName == "attack" || focusedFieldName == "decay" || focusedFieldName == "dcymd")
     {
         mpc.getLayeredScreen()->openScreen<VelocityModulationScreen>();
     }
-    else if (param == "freq" || param == "reson")
+    else if (focusedFieldName == "freq" || focusedFieldName == "reson")
     {
         mpc.getLayeredScreen()->openScreen<VeloEnvFilterScreen>();
     }
-    else if (param == "tune")
+    else if (focusedFieldName == "tune")
     {
         mpc.getLayeredScreen()->openScreen<VeloPitchScreen>();
     }
-    else if (param == "voiceoverlap")
+    else if (focusedFieldName == "voiceoverlap")
     {
         mpc.getLayeredScreen()->openScreen<MuteAssignScreen>();
     }

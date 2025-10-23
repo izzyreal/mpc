@@ -40,27 +40,29 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 
 	checkAllTimes(mpc, i, seq);
 
-	if (param == "rate")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "rate")
 	{
 		setSampleRate(sampleRate + i);
 	}
-	if (param == "record")
+	if (focusedFieldName == "record")
 	{
 		setRecord(record + i);
 	}
-	else if (param == "sq")
+	else if (focusedFieldName == "sq")
 	{
 		setSq(sq + i);
 	}
-	else if (param == "song")
+	else if (focusedFieldName == "song")
 	{
 		setSong(song + i);
 	}
-	else if (param == "split-lr")
+	else if (focusedFieldName == "split-lr")
 	{
 		setSplitLR(i > 0);
 	}
-	else if (param == "offline")
+	else if (focusedFieldName == "offline")
 	{
 		setOffline(i > 0);
 	}

@@ -22,7 +22,9 @@ void DeleteTrackScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "tr")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "tr")
 		setTr(tr + i);
 }
 

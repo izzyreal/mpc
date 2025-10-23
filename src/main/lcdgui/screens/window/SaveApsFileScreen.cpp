@@ -36,12 +36,14 @@ void SaveApsFileScreen::turnWheel(int i)
 	init();
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
-	if (param == "save")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "save")
 	{
 		saveAProgramScreen->setSave(saveAProgramScreen->save + i);
 		displaySave();
 	}
-	else if (param == "replace-same-sounds")
+	else if (focusedFieldName == "replace-same-sounds")
 	{
 		saveAProgramScreen->replaceSameSounds = i > 0;
 		displayReplaceSameSounds();
@@ -119,7 +121,9 @@ void SaveApsFileScreen::openNameScreen()
 {
     init();
 
-    if (param == "file")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "file")
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             fileName = nameScreenName;

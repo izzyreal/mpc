@@ -18,7 +18,9 @@ void DeleteSequenceScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "sq")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "sq")
 	{
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		displaySequenceNumberName();

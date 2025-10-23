@@ -54,7 +54,9 @@ void CopySongScreen::turnWheel(int i)
 
 	auto songScreen = mpc.screens->get<SongScreen>();
 
-	if (param == "song0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "song0")
 	{
 		auto candidate = songScreen->activeSongIndex + i;
 
@@ -65,7 +67,7 @@ void CopySongScreen::turnWheel(int i)
 
 		displaySong0();
 	}
-	else if (param == "song1")
+	else if (focusedFieldName == "song1")
 	{
 		setSong1(song1 + i);
 	}

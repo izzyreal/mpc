@@ -38,7 +38,18 @@ void SndParamsScreen::openWindow()
 {
 	init();
 
-	if (param == "snd")
+    const auto focusedField = getFocusedField();
+
+	auto sound = sampler->getSound();
+
+    if (!focusedField || !sound)
+    {
+        return;
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "snd")
 	{
 		sampler->setPreviousScreenName("params");
         mpc.getLayeredScreen()->openScreen<SoundScreen>();
@@ -89,12 +100,14 @@ void SndParamsScreen::turnWheel(int i)
 	init();
 	auto sound = sampler->getSound();
 
-	if (param == "playx")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param == "snd" && i > 0)
+	else if (focusedFieldName == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
 		displayBeat();
@@ -103,7 +116,7 @@ void SndParamsScreen::turnWheel(int i)
 		displaySnd();
 		displayTune();
 	}
-	else if (param == "snd" && i < 0)
+	else if (focusedFieldName == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displayBeat();
@@ -112,18 +125,18 @@ void SndParamsScreen::turnWheel(int i)
 		displaySnd();
 		displayTune();
 	}
-	else if (param == "level")
+	else if (focusedFieldName == "level")
 	{
 		sound->setLevel(sound->getSndLevel() + i);
 		displayLevel();
 	}
-	else if (param == "tune")
+	else if (focusedFieldName == "tune")
 	{
 		sound->setTune(sound->getTune() + i);
 		displayTune();
 		displaySampleAndNewTempo();
 	}
-	else if (param == "beat")
+	else if (focusedFieldName == "beat")
 	{
 		sound->setBeatCount(sound->getBeatCount() + i);
 		displayBeat();

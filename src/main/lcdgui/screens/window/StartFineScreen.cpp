@@ -97,15 +97,22 @@ void StartFineScreen::turnWheel(int i)
 
 	auto sampleLength = sound->getFrameCount();
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param);
 
-	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+	auto focusedField = getFocusedFieldOrThrow();
 
-	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+	if (focusedField->isSplit())
+    {
+		soundInc = focusedField->getSplitIncrement(i >= 0);
+    }
 
-	if (param == "start")
+	if (focusedField->isTypeModeEnabled())
+    {
+		focusedField->disableTypeMode();
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "start")
 	{
 		auto highestStartPos = sampleLength - 1;
 		auto length = sound->getEnd() - sound->getStart();
@@ -127,12 +134,12 @@ void StartFineScreen::turnWheel(int i)
 		displayLngthLabel();
 		displayStart();
 	}
-	else if (param == "smpllngth")
+	else if (focusedFieldName == "smpllngth")
 	{
 		trimScreen->smplLngthFix = i > 0;
 		displaySmplLngth();
 	}
-	else if (param == "playx")
+	else if (focusedFieldName == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
@@ -167,7 +174,9 @@ void StartFineScreen::setSlider(int i)
 
     init();
 
-    if (param == "start")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "start")
     {
         auto trimScreen = mpc.screens->get<TrimScreen>();
         trimScreen->setSliderStart(i);

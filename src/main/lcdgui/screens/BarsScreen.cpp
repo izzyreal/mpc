@@ -94,7 +94,9 @@ void BarsScreen::turnWheel(int i)
     auto userScreen = mpc.screens->get<UserScreen>();
     auto userLastBar = userScreen->lastBar;
 
-    if (param == "fromsq")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "fromsq")
     {
         sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 
@@ -113,7 +115,7 @@ void BarsScreen::turnWheel(int i)
             setLastBar(lastBarIndex, lastBarIndex);
         }
     }
-    else if (param == "tosq")
+    else if (focusedFieldName == "tosq")
     {
         eventsScreen->setToSq(eventsScreen->toSq + i);
 
@@ -127,7 +129,7 @@ void BarsScreen::turnWheel(int i)
             setAfterBar(maxAfterBarIndex, maxAfterBarIndex);
         }
     }
-    else if (param == "afterbar")
+    else if (focusedFieldName == "afterbar")
     {
         auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
 
@@ -138,21 +140,21 @@ void BarsScreen::turnWheel(int i)
 
         setAfterBar(afterBar + i, toSequence->getLastBarIndex() + 1);
     }
-    else if (param == "firstbar")
+    else if (focusedFieldName == "firstbar")
     {
         auto fromSequence = sequencer.lock()->getActiveSequence();
         auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
 
         setFirstBar(firstBar + i, lastBarIndex);
     }
-    else if (param == "lastbar")
+    else if (focusedFieldName == "lastbar")
     {
         auto fromSequence = sequencer.lock()->getActiveSequence();
         auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
 
         setLastBar(lastBar + i, lastBarIndex);
     }
-    else if (param == "copies")
+    else if (focusedFieldName == "copies")
     {
         auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq);
 

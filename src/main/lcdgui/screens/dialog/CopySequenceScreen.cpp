@@ -42,11 +42,12 @@ void CopySequenceScreen::function(int i)
 void CopySequenceScreen::turnWheel(int i)
 {
     init();
-	if (param.find("0") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+	if (focusedFieldName.find("0") != std::string::npos)
 	{
 		setSq0(sq0 + i);
 	}
-	else if (param.find("1") != std::string::npos)
+	else if (focusedFieldName.find("1") != std::string::npos)
 	{
 		setSq1(sq1 + i);
 	}

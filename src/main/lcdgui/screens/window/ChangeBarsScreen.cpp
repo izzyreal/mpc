@@ -50,19 +50,21 @@ void ChangeBarsScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "afterbar")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "afterbar")
 	{
 		setAfterBar(afterBar + i);
 	}
-	else if (param == "numberofbars")
+	else if (focusedFieldName == "numberofbars")
 	{
 		setNumberOfBars(numberOfBars + i);
 	}
-	else if (param == "firstbar")
+	else if (focusedFieldName == "firstbar")
 	{
 		setFirstBar(firstBar + i);
 	}
-	else if (param == "lastbar")
+	else if (focusedFieldName == "lastbar")
 	{
 		setLastBar(lastBar + i);
 	}

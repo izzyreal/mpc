@@ -52,7 +52,9 @@ void LoadScreen::open()
 
     init();
 
-    if (param == "device")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "device")
     {
         ls->setFunctionKeysArrangement(device == mpc.getDiskController()->activeDiskIndex ? 0 : 2);
     }
@@ -66,7 +68,7 @@ void LoadScreen::function(int i)
 {
     init();
 
-    auto disk = mpc.getDisk();
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     switch (i)
     {
@@ -81,7 +83,7 @@ void LoadScreen::function(int i)
             break;
         case 4:
             {
-                if (param == "device")
+                if (focusedFieldName == "device")
                 {
                     if (mpc.getDiskController()->activeDiskIndex == device)
                         return;
@@ -163,6 +165,8 @@ void LoadScreen::function(int i)
             }
         case 5:
             {
+                auto disk = mpc.getDisk();
+
                 if (!disk || disk->getFileNames().empty())
                 {
                     return;
@@ -235,15 +239,17 @@ void LoadScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "view")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "view")
     {
         setView(view + i);
     }
-    else if (param == "file")
+    else if (focusedFieldName == "file")
     {
         setFileLoadWithMaxCheck(fileLoad + i);
     }
-    else if (param == "directory")
+    else if (focusedFieldName == "directory")
     {
         auto disk = mpc.getDisk();
         auto currentDir = disk->getDirectoryName();
@@ -282,7 +288,7 @@ void LoadScreen::turnWheel(int i)
             }
         }
     }
-    else if (param == "device")
+    else if (focusedFieldName == "device")
     {
         if (device + i < 0 || device + i >= mpc.getDisks().size())
             return;
@@ -500,7 +506,9 @@ void LoadScreen::up()
 {
     init();
 
-    if (param == "device")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "device")
     {
         device = mpc.getDiskController()->activeDiskIndex;
         displayDevice();

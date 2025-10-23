@@ -16,7 +16,10 @@ void InitPadAssignScreen::open()
 void InitPadAssignScreen::turnWheel(int i)
 {
     init();
-	if (param == "init-pad-assign")
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "init-pad-assign")
 	{
 		initPadAssignIsMaster = i > 0;
 		displayInitPadAssign();

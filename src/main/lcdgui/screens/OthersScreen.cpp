@@ -64,13 +64,15 @@ void OthersScreen::function(int i)
 void OthersScreen::turnWheel(int i)
 {
 	init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
 	if (false /*mpc.getControls()->isAltPressed()*/)
 	{
 		auto increment = i > 0 ? 1 : -1;
 		setContrast(contrast + increment);
 	}
-	else if (param == "tapaveraging")
+	else if (focusedFieldName == "tapaveraging")
 	{
 		setTapAveraging(tapAveraging + i);
 	}

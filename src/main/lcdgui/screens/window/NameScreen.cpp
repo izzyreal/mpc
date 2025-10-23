@@ -68,7 +68,9 @@ void NameScreen::left()
 {
 	init();
 
-	if (stoi(param) == 0)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (stoi(focusedFieldName) == 0)
     {
         return;
     }
@@ -79,7 +81,6 @@ void NameScreen::left()
 	{
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
         auto focus = findFocus();
-        printf("New focus: %s\n", focus->getName().c_str());
         focus->setInverted(false);
 		drawUnderline();
 	}
@@ -89,7 +90,9 @@ void NameScreen::right()
 {
 	init();
 
-	if (stoi(param) == nameLimit - 1)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (stoi(focusedFieldName) == nameLimit - 1)
     {
         return;
     }
@@ -110,11 +113,13 @@ void NameScreen::turnWheel(int j)
 {
 	init();
 
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
 	if (editing)
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			if (param == std::to_string(i))
+			if (focusedFieldName == std::to_string(i))
 			{
 				changeNameCharacter(i, j > 0);
 				drawUnderline();
@@ -126,7 +131,7 @@ void NameScreen::turnWheel(int j)
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			if (param == std::to_string(i))
+			if (focusedFieldName == std::to_string(i))
 			{
 				changeNameCharacter(i, j > 0);
 				editing = true;
@@ -202,8 +207,8 @@ void NameScreen::initEditColors()
 		field->setInverted(false);
     }
 
-	init();
-	findField(param)->setInverted(false);
+    const auto focusedField = getFocusedFieldOrThrow();
+	focusedField->setInverted(false);
 }
 
 void NameScreen::setNameToEdit(std::string newNameToEdit)
@@ -339,11 +344,13 @@ void NameScreen::typeCharacter(char c)
         return;
     }
 
+    const auto focusedFieldName = getFocusedFieldName();
+
     if (editing)
     {
         for (int i = 0; i < 16; i++)
         {
-            if (param == std::to_string(i))
+            if (focusedFieldName == std::to_string(i))
             {
                 if (i >= nameToEdit.length())
                 {
@@ -362,7 +369,7 @@ void NameScreen::typeCharacter(char c)
     {
         for (int i = 0; i < 16; i++)
         {
-            if (param == std::to_string(i))
+            if (focusedFieldName == std::to_string(i))
             {
                 if (i >= nameToEdit.length())
                 {
@@ -386,9 +393,11 @@ void NameScreen::backSpace()
 {
     init();
 
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
     for (int i = 1; i < 16; i++)
     {
-        if (param == std::to_string(i))
+        if (focusedFieldName == std::to_string(i))
         {
             if (i >= nameToEdit.length())
             {

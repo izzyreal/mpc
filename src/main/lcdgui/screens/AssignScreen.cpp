@@ -37,15 +37,17 @@ void AssignScreen::turnWheel(int i)
 	auto slider = program->getSlider();
 	auto parameter = slider->getParameter();
 
-	if (param == "assignnote")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "assignnote")
 	{
 		slider->setAssignNote(slider->getNote() + i);
 	}
-	else if (param == "parameter")
+	else if (focusedFieldName == "parameter")
 	{
 		slider->setParameter(slider->getParameter() + i);
 	}
-	else if (param == "highrange")
+	else if (focusedFieldName == "highrange")
 	{
 		switch (parameter)
 		{
@@ -63,7 +65,7 @@ void AssignScreen::turnWheel(int i)
 			break;
 		}
 	}
-	else if (param == "lowrange")
+	else if (focusedFieldName == "lowrange")
 	{
 		switch (parameter)
 		{
@@ -82,7 +84,7 @@ void AssignScreen::turnWheel(int i)
 		}
 
 	}
-	else if (param == "assignnv")
+	else if (focusedFieldName == "assignnv")
 	{
 		slider->setControlChange(slider->getControlChange() + i);
 	}

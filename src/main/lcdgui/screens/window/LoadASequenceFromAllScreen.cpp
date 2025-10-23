@@ -23,11 +23,13 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "file")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "file")
 	{
 		setSourceSeqIndex(sourceSeqIndex + i);
 	}
-	else if (param == "load-into")
+	else if (focusedFieldName == "load-into")
 	{
 		auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
 		loadASequenceScreen->setLoadInto(loadASequenceScreen->loadInto + i);

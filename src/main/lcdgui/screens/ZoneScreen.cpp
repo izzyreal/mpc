@@ -50,20 +50,31 @@ void ZoneScreen::openWindow()
 {
 	init();
 
-	if (param == "snd")
+    const auto focusedField = getFocusedField();
+
+    auto sound = sampler->getSound();
+
+    if (!focusedField || !sound)
+    {
+        return;
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "snd")
 	{
 		sampler->setPreviousScreenName("zone");
         mpc.getLayeredScreen()->openScreen<SoundScreen>();
 	}
-	else if (param == "zone")
+	else if (focusedFieldName == "zone")
 	{
         mpc.getLayeredScreen()->openScreen<NumberOfZonesScreen>();
 	}
-	else if (param == "st")
+	else if (focusedFieldName == "st")
 	{
         mpc.getLayeredScreen()->openScreen<ZoneStartFineScreen>();
 	}
-	else if (param == "end")
+	else if (focusedFieldName == "end")
 	{
         mpc.getLayeredScreen()->openScreen<ZoneEndFineScreen>();
 	}
@@ -124,33 +135,40 @@ void ZoneScreen::turnWheel(int i)
 
 	auto sound = sampler->getSound();
 
-	if (param.empty() || !sound)
+    const auto focusedField = getFocusedField();
+
+	if (!focusedField || !sound)
     {
         return;
     }
 
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param);
 
-	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+	if (focusedField->isSplit())
+    {
+		soundInc = focusedField->getSplitIncrement(i >= 0);
+    }
 
-	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+	if (focusedField->isTypeModeEnabled())
+    {
+		focusedField->disableTypeMode();
+    }
 
-	if (param == "st")
+    const auto focusedFieldName = focusedField->getName();
+
+	if (focusedFieldName == "st")
 	{
 		setZoneStart(zone, getZoneStart(zone) + soundInc);
 		displaySt();
 		displayWave();
 	}
-	else if (param == "end")
+	else if (focusedFieldName == "end")
 	{
 		setZoneEnd(zone, getZoneEnd(zone) + soundInc);
 		displayEnd();
 		displayWave();
 	}
-	else if (param == "zone")
+	else if (focusedFieldName == "zone")
 	{
 		setZone(zone + i);
 		displayZone();
@@ -158,12 +176,12 @@ void ZoneScreen::turnWheel(int i)
 		displayEnd();
 		displayWave();
 	}
-	else if (param == "playx")
+	else if (focusedFieldName == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param == "snd" && i > 0)
+	else if (focusedFieldName == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
         initZones();
@@ -173,7 +191,7 @@ void ZoneScreen::turnWheel(int i)
 		displayWave();
 		displayZone();
 	}
-	else if (param == "snd" && i < 0)
+	else if (focusedFieldName == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
         initZones();
@@ -194,11 +212,20 @@ void ZoneScreen::setSlider(int i)
 
     init();
 
-    if (param == "st")
+    const auto focusedField = getFocusedField();
+
+    if (!focusedField)
+    {
+        return;
+    }
+
+    const auto focusedFieldName = focusedField->getName();
+
+    if (focusedFieldName == "st")
     {
         setSliderZoneStart(i);
     }
-    else if (param == "end")
+    else if (focusedFieldName == "end")
     {
         setSliderZoneEnd(i);
     }
@@ -424,24 +451,33 @@ void ZoneScreen::pressEnter()
 
 	init();
 
-	auto field = ls->getFocusedLayer()->findField(param);
+    const auto focusedField = getFocusedField();
 
-	if (!field->isTypeModeEnabled())
+    if (!focusedField)
+    {
+        return;
+    }
+
+	if (!focusedField->isTypeModeEnabled())
+    {
 		return;
+    }
 
-	auto candidate = field->enter();
+	auto candidate = focusedField->enter();
 	auto sound = sampler->getSound();
 
 	if (candidate != INT_MAX)
 	{
-		if (param == "st")
+        const auto focusedFieldName = focusedField->getName();
+
+		if (focusedFieldName == "st")
 		{
 			auto zoneScreen = mpc.screens->get<ZoneScreen>();
 			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
 			displaySt();
 			displayWave();
 		}
-		else if (param == "end")
+		else if (focusedFieldName == "end")
 		{
 			auto zoneScreen = mpc.screens->get<ZoneScreen>();
 			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);

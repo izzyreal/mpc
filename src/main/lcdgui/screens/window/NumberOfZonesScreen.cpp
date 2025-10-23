@@ -43,7 +43,10 @@ void NumberOfZonesScreen::function(int i)
 void NumberOfZonesScreen::turnWheel(int i)
 {
 	init();
-	if (param == "number-of-zones")
+    
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "number-of-zones")
 	{
 		setNumberOfZones(numberOfZones + i);
 	}

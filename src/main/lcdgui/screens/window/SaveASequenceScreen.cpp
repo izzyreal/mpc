@@ -31,7 +31,9 @@ void SaveASequenceScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "saveas")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "saveas")
 	{
 		setSaveSequenceAs(saveSequenceAs + i);
 	}
@@ -39,7 +41,9 @@ void SaveASequenceScreen::turnWheel(int i)
 
 void SaveASequenceScreen::openNameScreen()
 {
-    if (param == "file")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "file")
     {
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(sequencer.lock()->getActiveSequence()->getName(), 16, [this](std::string&) {

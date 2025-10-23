@@ -22,7 +22,9 @@ void EventsScreen::setNote0(int i)
 {
     init();
 
-    if (param == "note0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "note0")
     {
         WithTimesAndNotes::setNote0(i);
     }
@@ -175,24 +177,26 @@ void EventsScreen::turnWheel(int i)
     {
         return;
     }
+    
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (param == "start0")
+    if (focusedFieldName == "start0")
     {
         setStart(SeqUtil::setBar(SeqUtil::getBar(toSequence.get(), start) + i, toSequence.get(), start));
     }
-    else if (param == "start1")
+    else if (focusedFieldName == "start1")
     {
         setStart(SeqUtil::setBeat(SeqUtil::getBeat(toSequence.get(), start) + i, toSequence.get(), start));
     }
-    else if (param == "start2")
+    else if (focusedFieldName == "start2")
     {
         setStart(SeqUtil::setClock(SeqUtil::getClock(toSequence.get(), start) + i, toSequence.get(), start));
     }
-    else if (param == "edit")
+    else if (focusedFieldName == "edit")
     {
         setEdit(editFunctionNumber + i);
     }
-    else if (param == "from-sq")
+    else if (focusedFieldName == "from-sq")
     {
         setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 
@@ -201,11 +205,11 @@ void EventsScreen::turnWheel(int i)
         if (time1 > fromSeq->getLastTick())
             setTime1(fromSeq->getLastTick());
     }
-    else if (param == "from-tr")
+    else if (focusedFieldName == "from-tr")
     {
         setFromTr(sequencer.lock()->getActiveTrackIndex() +i);
     }
-    else if (param == "to-sq")
+    else if (focusedFieldName == "to-sq")
     {
         setToSq(toSq + i);
         auto toSeq = sequencer.lock()->getSequence(toSq);
@@ -213,11 +217,11 @@ void EventsScreen::turnWheel(int i)
         if (start > toSeq->getLastTick())
             setStart(toSeq->getLastTick());
     }
-    else if (param == "to-tr")
+    else if (focusedFieldName == "to-tr")
     {
         setToTr(toTr + i);
     }
-    else if (param == "mode")
+    else if (focusedFieldName == "mode")
     {
         if (editFunctionNumber == 0)
         {
@@ -236,7 +240,7 @@ void EventsScreen::turnWheel(int i)
             setTransposeAmount(transposeAmount + i);
         }
     }
-    else if (param == "copies")
+    else if (focusedFieldName == "copies")
     {
         if (editFunctionNumber == 0)
         {

@@ -47,7 +47,9 @@ void SequenceScreen::openNameScreen()
     std::function<void(std::string&)> enterAction;
     std::string initialNameScreenName;
 
-    if (param.find("default") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName.find("default") != std::string::npos)
     {
         initialNameScreenName = sequencer.lock()->getDefaultSequenceName();
 

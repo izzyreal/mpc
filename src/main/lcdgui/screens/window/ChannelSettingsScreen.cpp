@@ -75,41 +75,43 @@ void ChannelSettingsScreen::turnWheel(int i)
 	auto stereoMixerChannel = getStereoMixerChannel();
 	auto indivFxMixerChannel = getIndivFxMixerChannel();
 
-	if (param == "note")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "note")
 	{
 		setNote(note + i);
 	}
-	else if (param == "stereovolume")
+	else if (focusedFieldName == "stereovolume")
 	{
 		stereoMixerChannel->setLevel(stereoMixerChannel->getLevel() + i);
 		displayStereoVolume();
 	}
-	else if (param == "individualvolume")
+	else if (focusedFieldName == "individualvolume")
 	{
 		indivFxMixerChannel->setVolumeIndividualOut(indivFxMixerChannel->getVolumeIndividualOut() + i);
 		displayIndividualVolume();
 	}
-	else if (param == "fxsendlevel")
+	else if (focusedFieldName == "fxsendlevel")
 	{
 		indivFxMixerChannel->setFxSendLevel(indivFxMixerChannel->getFxSendLevel() + i);
 		displayFxSendLevel();
 	}
-	else if (param == "panning")
+	else if (focusedFieldName == "panning")
 	{
 		stereoMixerChannel->setPanning(stereoMixerChannel->getPanning() + i);
 		displayPanning();
 	}
-	else if (param == "output")
+	else if (focusedFieldName == "output")
 	{
 		indivFxMixerChannel->setOutput(indivFxMixerChannel->getOutput() + i);
 		displayOutput();
 	}
-	else if (param == "fxpath")
+	else if (focusedFieldName == "fxpath")
 	{
 		indivFxMixerChannel->setFxPath(indivFxMixerChannel->getFxPath() + i);
 		displayFxPath();
 	}
-	else if (param == "followstereo")
+	else if (focusedFieldName == "followstereo")
 	{
 		indivFxMixerChannel->setFollowStereo(true);
 		displayFollowStereo();

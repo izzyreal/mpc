@@ -51,16 +51,18 @@ void UserScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "tempo")
+    const auto focusedFieldName = getFocusedFieldName();
+
+	if (focusedFieldName == "tempo")
 	{
 		double newTempo = tempo + (i * 0.1);
 		setTempo(newTempo);
 	}
-	else if (param == "loop")
+	else if (focusedFieldName == "loop")
 	{
 		setLoop(i > 0);
 	}
-	else if (param == "tsig")
+	else if (focusedFieldName == "tsig")
 	{
 		if (i > 0)
 		{
@@ -73,27 +75,27 @@ void UserScreen::turnWheel(int i)
 	
 		displayTsig();
 	}
-	else if (param == "bars")
+	else if (focusedFieldName == "bars")
 	{
 		setLastBar(lastBar + i);
 	}
-	else if (param == "pgm")
+	else if (focusedFieldName == "pgm")
 	{
 		setPgm(pgm + i);
 	}
-	else if (param == "recordingmode")
+	else if (focusedFieldName == "recordingmode")
 	{
 		setRecordingModeMulti(i > 0);
 	}
-	else if (param == "bus")
+	else if (focusedFieldName == "bus")
 	{
 		setBus(bus + i);
 	}
-	else if (param == "device")
+	else if (focusedFieldName == "device")
 	{
 		setDeviceNumber(device + i);
 	}
-	else if (param == "velo")
+	else if (focusedFieldName == "velo")
 	{
 		setVelo(velo + i);
 	}

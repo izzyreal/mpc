@@ -29,18 +29,21 @@ void StepEditOptionsScreen::function(int i)
 void StepEditOptionsScreen::turnWheel(int i)
 {
     init();
-    if (param == "auto-step-increment")
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+    
+    if (focusedFieldName == "auto-step-increment")
     {
         autoStepIncrementEnabled = i > 0;
         displayAutoStepIncrement();
     }
-    else if (param == "duration-of-recorded-notes")
+    else if (focusedFieldName == "duration-of-recorded-notes")
     {
         durationOfRecordedNotesTcValue = i > 0;
         displayDurationOfRecordedNotes();
         displayTcValue();
     }
-    else if (param == "tc-value")
+    else if (focusedFieldName == "tc-value")
     {
         setTcValueRecordedNotes(tcValue + i);
     }

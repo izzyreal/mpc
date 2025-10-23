@@ -114,7 +114,9 @@ void InsertEventScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "eventtype")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "eventtype")
 	{
 		setInsertEventType(insertEventType + i);
 	}

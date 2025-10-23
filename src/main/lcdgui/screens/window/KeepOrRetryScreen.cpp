@@ -55,7 +55,9 @@ void KeepOrRetryScreen::openNameScreen()
 {
     init();
 
-    if (param == "name-for-new-sound")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "name-for-new-sound")
     {
         const auto enterAction = [this](std::string &nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
@@ -77,7 +79,9 @@ void KeepOrRetryScreen::right()
 {
     init();
     
-    if (param == "name-for-new-sound")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "name-for-new-sound")
         openNameScreen();
 }
 
@@ -85,7 +89,9 @@ void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
     
-    if (param == "assign-to-note")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "assign-to-note")
     {
         auto newAssignToNote = assignToNote + i;
 

@@ -38,18 +38,20 @@ void MonoToStereoScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "lsource" && i < 0)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "lsource" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displayLSource();
 
 	}
-	else if (param == "lsource" && i > 0)
+	else if (focusedFieldName == "lsource" && i > 0)
 	{
 		sampler->selectNextSound();
 		displayLSource();
 	}
-	else if (param == "rsource")
+	else if (focusedFieldName == "rsource")
 	{
         auto nextSoundIndex = rSource;
         if (i > 0 && nextSoundIndex != sampler->getSoundCount() - 1)
@@ -70,7 +72,9 @@ void MonoToStereoScreen::openNameScreen()
 {
     init();
 
-    if (param == "newstname")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "newstname")
     {
         const auto enterAction = [this](std::string& nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))

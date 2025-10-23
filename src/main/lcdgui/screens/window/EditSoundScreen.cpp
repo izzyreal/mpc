@@ -314,7 +314,9 @@ void EditSoundScreen::right()
 {
     init();
 
-    if (param == "new-name" && (edit == 2 || edit == 7))
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "new-name" && (edit == 2 || edit == 7))
         openNameScreen();
     else
         ScreenComponent::right();
@@ -322,7 +324,9 @@ void EditSoundScreen::right()
 
 void EditSoundScreen::openNameScreen()
 {
-    if (param == "new-name" && (edit == 2 || edit == 7))
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "new-name" && (edit == 2 || edit == 7))
     {
         const auto enterAction = [this](std::string &nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
@@ -344,31 +348,33 @@ void EditSoundScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "edit")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "edit")
     {
         setEdit(edit + i);
     }
-    else if (param == "new-name" && edit == 3)
+    else if (focusedFieldName == "new-name" && edit == 3)
     {
         setInsertSndNr(insertSoundIndex + i, sampler->getSoundCount());
     }
-    else if (param == "ratio")
+    else if (focusedFieldName == "ratio")
     {
         setTimeStretchRatio(timeStretchRatio + i);
     }
-    else if (param == "preset")
+    else if (focusedFieldName == "preset")
     {
         setTimeStretchPresetNumber(timeStretchPresetIndex + i);
     }
-    else if (param == "adjust")
+    else if (focusedFieldName == "adjust")
     {
         setTimeStretchAdjust(timeStretchAdjust + i);
     }
-    else if (param == "end-margin")
+    else if (focusedFieldName == "end-margin")
     {
         setEndMargin(endMargin + i);
     }
-    else if (param == "create-new-program")
+    else if (focusedFieldName == "create-new-program")
     {
         setCreateNewProgram(i > 0);
     }

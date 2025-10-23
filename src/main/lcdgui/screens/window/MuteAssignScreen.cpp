@@ -26,16 +26,18 @@ void MuteAssignScreen::turnWheel(int i)
     init();
 	auto lastNoteParameters = sampler->getLastNp(program.get());
 
-	if (param == "note")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "note")
 	{
 		mpc.setNote(mpc.getNote() + i);
 	}
-	else if (param == "note0")
+	else if (focusedFieldName == "note0")
 	{
 		lastNoteParameters->setMuteAssignA(lastNoteParameters->getMuteAssignA() + i);
 		displayNote0();
 	}
-	else if (param == "note1")
+	else if (focusedFieldName == "note1")
 	{
 		lastNoteParameters->setMuteAssignB(lastNoteParameters->getMuteAssignB() + i);
 		displayNote1();

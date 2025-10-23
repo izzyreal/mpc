@@ -42,9 +42,10 @@ public:
     std::vector<mpc::input::VmpcKeyCode> lookupComponent(hardware::ComponentId id) const;
     std::optional<KeyboardBinding> lookup(VmpcKeyCode key) const;
 
+    void initializeDefaults();
+
 private:
     std::map<VmpcKeyCode, KeyboardBinding> bindings;
-    void initializeDefaults();
 };
 
 } // namespace mpc::input

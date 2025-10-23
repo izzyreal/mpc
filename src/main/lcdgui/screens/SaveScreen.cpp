@@ -16,7 +16,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
 SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex) 
-: ScreenComponent(mpc, "save", layerIndex)
+    : ScreenComponent(mpc, "save", layerIndex)
 {
 }
 
@@ -50,7 +50,9 @@ void SaveScreen::open()
 
     init();
 
-    if (param == "device")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "device")
     {
         findChild<FunctionKeys>("function-keys")->setActiveArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
     }
@@ -64,7 +66,9 @@ void SaveScreen::openWindow()
 {
     init();
 
-    if (param == "directory")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "directory")
     {
         mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
     }
@@ -73,11 +77,11 @@ void SaveScreen::openWindow()
 void SaveScreen::function(int i)
 {
     init();
-    
+
     switch (i)
     {
         case 0:
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
             break;
         case 2:
             //openScreen<FormatScreen>();
@@ -85,96 +89,101 @@ void SaveScreen::function(int i)
         case 3:
             //openScreen<SetupScreen>();
             break;
-        case 4:
-            if (param == "device")
-            {
-                if (mpc.getDiskController()->getActiveDiskIndex() == device)
-                    return;
+        case 4: {
+                    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-                auto& candidateVolume = mpc.getDisks()[device]->getVolume();
-
-                if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
-                {
-                    ls->showPopupForMs("Device is disabled in DISKS", 1000);
-                    return;
-                }
-
-                auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
-
-                mpc.getDiskController()->setActiveDiskIndex(device);
-                auto newDisk = mpc.getDisk();
-
-                if (newDisk->getVolume().type== mpc::disk::VolumeType::USB_VOLUME) {
-
-                    newDisk->initRoot();
-
-                    if (!newDisk->getVolume().volumeStream.is_open())
+                    if (focusedFieldName == "device")
                     {
-                        mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                        ls->showPopupForMs("Error! Device seems in use", 2000);
+                        if (mpc.getDiskController()->getActiveDiskIndex() == device)
+                            return;
+
+                        auto& candidateVolume = mpc.getDisks()[device]->getVolume();
+
+                        if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
+                        {
+                            ls->showPopupForMs("Device is disabled in DISKS", 1000);
+                            return;
+                        }
+
+                        auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
+
+                        mpc.getDiskController()->setActiveDiskIndex(device);
+                        auto newDisk = mpc.getDisk();
+
+                        if (newDisk->getVolume().type== mpc::disk::VolumeType::USB_VOLUME) {
+
+                            newDisk->initRoot();
+
+                            if (!newDisk->getVolume().volumeStream.is_open())
+                            {
+                                mpc.getDiskController()->setActiveDiskIndex(oldIndex);
+                                ls->showPopupForMs("Error! Device seems in use", 2000);
+                                return;
+                            }
+                        }
+
+                        ls->setFunctionKeysArrangement(0);
+
+                        newDisk->initFiles();
+
+                        displayFile();
+                        displaySize();
+                        displayDirectory();
+                        displayDevice();
+                        displayDeviceType();
+
+                        mpc::nvram::VolumesPersistence::save(mpc);
+
                         return;
                     }
                 }
-
-                ls->setFunctionKeysArrangement(0);
-
-                newDisk->initFiles();
-
-                displayFile();
-                displaySize();
-                displayDirectory();
-                displayDevice();
-                displayDeviceType();
-
-                mpc::nvram::VolumesPersistence::save(mpc);
-
-                return;
-            }
         case 5:
-        {
-            switch (type)
-            {
-                case 0:
                 {
-        mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
-                    break;
-                }
-                case 1:
-                    if (!sequencer.lock()->getActiveSequence()->isUsed())
+                    switch (type)
                     {
-                        return;
-                    }
-                    
-        mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
-                    break;
-                case 2:
-        mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
-                    break;
-                case 3:
-        mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
-                    break;
-                case 4:
-                    if (sampler->getSoundCount() == 0)
-                    {
-                        break;
-                    }
+                        case 0:
+                            {
+                                mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
+                                break;
+                            }
+                        case 1:
+                            if (!sequencer.lock()->getActiveSequence()->isUsed())
+                            {
+                                return;
+                            }
 
-        mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
-                    break;
-            }
-        }
+                            mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                            break;
+                        case 2:
+                            mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+                            break;
+                        case 3:
+                            mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                            break;
+                        case 4:
+                            if (sampler->getSoundCount() == 0)
+                            {
+                                break;
+                            }
+
+                            mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
+                            break;
+                    }
+                }
     }
 }
 
 void SaveScreen::turnWheel(int i)
 {
     init();
-    
-    if (param == "type")
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "type")
     {
         setType(type + i);
     }
-    else if (param == "directory")
+    else if (focusedFieldName == "directory")
     {
         auto disk = mpc.getDisk();
         auto currentDir = disk->getDirectoryName();
@@ -213,7 +222,7 @@ void SaveScreen::turnWheel(int i)
             }
         }
     }
-    else if (param == "file")
+    else if (focusedFieldName == "file")
     {
         switch (type)
         {
@@ -221,29 +230,29 @@ void SaveScreen::turnWheel(int i)
                 sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
                 break;
             case 3:
-            {
-                unsigned char counter = 0;
-
-                for (int idx = programIndex;
-                     (i < 0) ? idx >= 0 : idx < 24;
-                     (i < 0) ? idx-- : idx++)
                 {
-                    if (sampler->getProgram(idx))
-                    {
-                        programIndex = idx;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    unsigned char counter = 0;
 
-                    if (++counter == abs(i) + 1)
+                    for (int idx = programIndex;
+                            (i < 0) ? idx >= 0 : idx < 24;
+                            (i < 0) ? idx-- : idx++)
                     {
-                        break;
+                        if (sampler->getProgram(idx))
+                        {
+                            programIndex = idx;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        if (++counter == abs(i) + 1)
+                        {
+                            break;
+                        }
                     }
+                    break;
                 }
-                break;
-            }
             case 4:
                 sampler->setSoundIndex(sampler->getSoundIndex() + i);
                 break;
@@ -251,7 +260,7 @@ void SaveScreen::turnWheel(int i)
         displayFile();
         displaySize();
     }
-    else if (param == "device")
+    else if (focusedFieldName == "device")
     {
         if (device + i < 0 || device + i >= mpc.getDisks().size())
             return;
@@ -268,7 +277,7 @@ void SaveScreen::setType(int i)
 {
     if (i < 0 || i > 4)
         return;
-    
+
     type = i;
 
     if (i == 3)
@@ -296,28 +305,28 @@ void SaveScreen::displayType()
 void SaveScreen::displayFile()
 {
     std::string fileName;
-    
+
     switch (type)
     {
         case 0:
-        {
-            const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>();
-            fileName = saveAllFileScreen->fileName;
-            break;
-        }
+            {
+                const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>();
+                fileName = saveAllFileScreen->fileName;
+                break;
+            }
         case 1:
-        {
-            auto num = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
-            const auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
-            fileName = num + "-" + sequenceName;
-            break;
-        }
+            {
+                auto num = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
+                const auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+                fileName = num + "-" + sequenceName;
+                break;
+            }
         case 2:
-        {
-            const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>();
-            fileName = saveApsFileScreen->fileName;
-            break;
-        }
+            {
+                const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>();
+                fileName = saveApsFileScreen->fileName;
+                break;
+            }
         case 3:
             fileName = sampler->getProgram(programIndex)->getName();
             break;
@@ -328,7 +337,7 @@ void SaveScreen::displayFile()
             fileName = "MPC2KXL         .BIN";
             break;
     }
-    
+
     findField("file")->setText(fileName);
 }
 
@@ -336,7 +345,7 @@ void SaveScreen::displaySize()
 {
     auto seq = sequencer.lock()->getActiveSequence();
     auto size = 0;
-    
+
     switch (type)
     {
         case 0:
@@ -358,7 +367,7 @@ void SaveScreen::displaySize()
             size = 512;
             break;
     }
-    
+
     findLabel("size")->setText(StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
 }
 
@@ -397,7 +406,9 @@ void SaveScreen::up()
 {
     init();
 
-    if (param == "device")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "device")
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();

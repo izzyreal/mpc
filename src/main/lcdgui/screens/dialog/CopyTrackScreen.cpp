@@ -40,9 +40,11 @@ void CopyTrackScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.find("0") != std::string::npos)
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName.find("0") != std::string::npos)
 		setTr0(tr0 + i);
-	else if (param.find("1") != std::string::npos)
+	else if (focusedFieldName.find("1") != std::string::npos)
 		setTr1(tr1 + i);
 }
 

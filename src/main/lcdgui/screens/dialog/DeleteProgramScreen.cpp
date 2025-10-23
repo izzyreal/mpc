@@ -50,7 +50,9 @@ void DeleteProgramScreen::turnWheel(int i)
 {
     init();
 
-    if (param == "pgm")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "pgm")
 		setPgm(pgm + i);
 }
 

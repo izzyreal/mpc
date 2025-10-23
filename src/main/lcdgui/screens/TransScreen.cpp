@@ -44,16 +44,18 @@ void TransScreen::function(int i)
 void TransScreen::turnWheel(int i)
 {
 	init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
-	if (param == "tr")
+	if (focusedFieldName == "tr")
 	{
 		setTr(tr + i);
 	}
-	else if (param == "transpose-amount")
+	else if (focusedFieldName == "transpose-amount")
 	{
 		setTransposeAmount(transposeAmount + i);
 	}
-	else if (param == "bar0")
+	else if (focusedFieldName == "bar0")
 	{
 		auto candidate = bar0 + i;
 		
@@ -62,7 +64,7 @@ void TransScreen::turnWheel(int i)
 
 		setBar0(candidate);
 	}
-	else if (param == "bar1")
+	else if (focusedFieldName == "bar1")
 	{
 		auto candidate = bar1 + i;
 	

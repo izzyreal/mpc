@@ -89,19 +89,21 @@ void TimingCorrectScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param == "notevalue")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "notevalue")
 	{
 		setNoteValue(noteValue + i);
 	}
-	else if (param == "swing")
+	else if (focusedFieldName == "swing")
 	{
 		setSwing(swing + i);
 	}
-	else if (param == "shifttiming")
+	else if (focusedFieldName == "shifttiming")
 	{
 		setShiftTimingLater(i > 0);
 	}
-	else if (param == "amount")
+	else if (focusedFieldName == "amount")
 	{
 		setAmount(amount + i);
 	}
@@ -114,7 +116,9 @@ void TimingCorrectScreen::setNote0(int i)
 {
     init();
 
-    if (param == "note0")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+    if (focusedFieldName == "note0")
     {
         WithTimesAndNotes::setNote0(i);
     }

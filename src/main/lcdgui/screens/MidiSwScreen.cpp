@@ -81,10 +81,12 @@ void MidiSwScreen::setSwitches(const std::vector<std::pair<int, int>>& _switches
 void MidiSwScreen::turnWheel(int i)
 {
     init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
-    const int xPos = stoi(param.substr(param.length() - 1));
+    const int xPos = stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
     const int selectedSwitch = xOffset + xPos;
-    const int yPos = (param.substr(0, 4) == "ctrl") ? 0 : 1;
+    const int yPos = (focusedFieldName.substr(0, 4) == "ctrl") ? 0 : 1;
     auto _switch = controllerToFunctionMapping[selectedSwitch];
 
     if (yPos == 0)
@@ -110,8 +112,10 @@ void MidiSwScreen::function(int i)
 void MidiSwScreen::left()
 {
     init();
+
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
-    const int xPos = stoi(param.substr(param.length() - 1));
+    const int xPos = stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
     
     if (xPos == 0 && xOffset > 0)
     {
@@ -126,8 +130,10 @@ void MidiSwScreen::right()
 {
     init();
 
-    const int xPos = stoi(param.substr(param.length() - 1));
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
+    const int xPos = stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    
     if (xPos == 3 && xOffset < SWITCH_COUNT - 4)
     {
         setXOffset(xOffset + 1);

@@ -52,15 +52,17 @@ void EraseScreen::turnWheel(int i)
 	if (checkAllTimesAndNotes(mpc, i))
 		return;
 
-	if (param == "track")
+    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+	if (focusedFieldName == "track")
 	{
 		setTrack(track + i);
 	}
-	else if (param == "erase")
+	else if (focusedFieldName == "erase")
 	{
 		setErase(erase + i);
 	}
-	else if (param == "type")
+	else if (focusedFieldName == "type")
 	{
 		setType(type + i);
 	}
