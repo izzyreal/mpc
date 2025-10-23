@@ -12,8 +12,6 @@ namespace mpc::engine {
 
         void setDrum(int drum);
 
-        int getNote() const;
-
         int getDrum() const;
 
         bool shouldMute(int otherNote, int otherDrum) const;

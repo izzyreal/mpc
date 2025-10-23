@@ -16,11 +16,6 @@ void MuteInfo::setDrum(int drum)
     this->drum = drum;
 }
 
-int MuteInfo::getNote() const
-{
-    return note;
-}
-
 int MuteInfo::getDrum() const
 {
     return drum;
