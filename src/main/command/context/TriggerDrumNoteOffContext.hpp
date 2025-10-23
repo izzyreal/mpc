@@ -23,7 +23,7 @@ struct TriggerDrumNoteOffContext {
     const bool currentScreenIsSoundScreen;
     const bool currentScreenIsSamplerScreen;
     std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> playNoteEvent;
-    const int drumScreenSelectedDrum;
+    std::optional<int> drumIndex;
     std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
     std::shared_ptr<mpc::sequencer::NoteOnEvent> recordOnEvent;
     const bool sequencerIsRecordingOrOverdubbing;

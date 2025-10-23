@@ -454,16 +454,18 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
     auto track = sequence->getTrack(trackNumber);
 
     int padIndexWithBank = -1;
+    int drumIndex = -1;
 
     if (track->getBus() > 0)
     {
         padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()))->getPadIndexFromNote(msg->getData1());
+        drumIndex = track->getBus() - 1;
     }
 
     if (padIndexWithBank != -1)
     {
         const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
-        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, currentScreen);
+        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, drumIndex, currentScreen);
         command::TriggerDrumNoteOffCommand(ctx).execute();
         return;
     }

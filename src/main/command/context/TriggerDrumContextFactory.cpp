@@ -112,6 +112,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
 TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         mpc::Mpc &mpc,
         const int programPadIndex,
+        std::optional<int> drumIndex,
         const std::shared_ptr<ScreenComponent> screen)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
@@ -119,11 +120,7 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
-    const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
-
     const auto playNoteEvent = mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(programPadIndex);
-
-    const int drumScreenSelectedDrum = mpc.screens->get<screens::DrumScreen>()->getDrum();
 
     auto eventHandler = mpc.getEventHandler();
 
@@ -146,7 +143,7 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
         isSoundScreen,
         isSamplerScreen,
         playNoteEvent,
-        drumScreenSelectedDrum,
+        drumIndex,
         eventHandler,
         recordNoteOnEvent,
         mpc.getSequencer()->isRecordingOrOverdubbing(),

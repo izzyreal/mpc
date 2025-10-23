@@ -101,17 +101,26 @@ void ScreenComponent::openWindow()
     mpc.getLayeredScreen()->closeCurrentScreen();
 }
 
+std::optional<int> ScreenComponent::getDrumIndex()
+{
+    if (screengroups::isSamplerScreen(ls->getCurrentScreen()))
+    {
+        const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
+        return drumScreen->getDrum();
+    }
+
+    if (const int drumIndex = mpc.getSequencer()->getActiveTrack()->getBus() - 1; drumIndex >= 0)
+    {
+        return drumIndex;
+    }
+    
+    return std::nullopt;
+}
+
 mpc::engine::Drum& ScreenComponent::activeDrum()
 {
-    const bool isSamplerScreen = screengroups::isSamplerScreen(ls->getCurrentScreen());
-    const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
-    auto drumIndex = isSamplerScreen ? (int) (drumScreen->getDrum()) : mpc.getSequencer()->getActiveTrack()->getBus() - 1;
-
-    // Should not happen (TM)
-    // In all seriousness though, we should return a shared_ptr or optional here, and consumers should check the result.
-    // For now we always return a valid drum
-    if (drumIndex < 0) drumIndex = 0;
-    
-    return mpc.getDrum(drumIndex);
+    const auto drumIndex = getDrumIndex();
+    assert(drumIndex);
+    return mpc.getDrum(*drumIndex);
 }
 

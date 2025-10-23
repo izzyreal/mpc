@@ -25,6 +25,7 @@ namespace mpc::command::context {
             static TriggerDrumNoteOffContext buildTriggerDrumNoteOffContext(
                     mpc::Mpc& mpc,
                     const int programPadIndex,
+                    std::optional<int> drumIndex,
                     const std::shared_ptr<mpc::lcdgui::ScreenComponent>);
     };
 } // namespace mpc::controller

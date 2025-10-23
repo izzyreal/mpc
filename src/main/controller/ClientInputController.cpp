@@ -130,14 +130,16 @@ void ClientInputController::handlePadPress(const ClientInput &input)
         return;
     }
 
+    const auto maybeDrumIndex = screen->getDrumIndex();
+
     if (layeredScreen->isCurrentScreen<NameScreen>())
     {
-        registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
+        registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source, maybeDrumIndex);
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(input.componentId);
         return;
     }
 
-    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source);
+    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source, maybeDrumIndex);
     
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
@@ -204,7 +206,7 @@ void ClientInputController::handlePadRelease(const ClientInput &input)
     }
 
     const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.screen);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.drumIndex, info.screen);
     TriggerDrumNoteOffCommand(ctx).execute();
 }
 

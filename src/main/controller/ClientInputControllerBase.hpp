@@ -24,6 +24,7 @@ class ClientInputControllerBase {
             int bankIndex;
             std::shared_ptr<lcdgui::ScreenComponent> screen;
             input::ClientInput::Source inputSource;
+            std::optional<int> drumIndex;
         };
 
         explicit ClientInputControllerBase(const fs::path keyboardMappingConfigDirectory)
@@ -78,10 +79,11 @@ class ClientInputControllerBase {
                 const int padIndex,
                 const int bankIndex,
                 const std::shared_ptr<lcdgui::ScreenComponent> screen,
-                const input::ClientInput::Source inputSource)
+                const input::ClientInput::Source inputSource,
+                const std::optional<int> drumIndex)
         {
             assert(physicalPadPresses.count(padIndex) == 0);
-            physicalPadPresses[padIndex] = { bankIndex, screen, inputSource };
+            physicalPadPresses[padIndex] = { bankIndex, screen, inputSource, drumIndex };
         }
 
         PhysicalPadPress registerPhysicalPadRelease(const int padIndex)

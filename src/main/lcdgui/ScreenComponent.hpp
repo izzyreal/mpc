@@ -36,6 +36,8 @@ namespace mpc::lcdgui
 
 	public:
 		const int& getLayerIndex();
+
+        std::optional<int> getDrumIndex();
 		
 	protected:
 		mpc::Mpc& mpc;
