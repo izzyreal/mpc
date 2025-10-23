@@ -18,7 +18,6 @@ void SelectDrumScreen::open()
 
 void SelectDrumScreen::function(int i)
 {
-	init();
 
 	if (i > 3)
     {

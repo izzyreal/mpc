@@ -42,7 +42,6 @@ void SecondSeqScreen::function(int i)
 
 void SecondSeqScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

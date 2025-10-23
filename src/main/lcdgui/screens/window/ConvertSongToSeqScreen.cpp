@@ -49,7 +49,6 @@ void ConvertSongToSeqScreen::function(int i)
 
 void ConvertSongToSeqScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

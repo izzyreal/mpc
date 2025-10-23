@@ -40,7 +40,6 @@ void DeleteAllFilesScreen::turnWheel(int i) {
 
 void DeleteAllFilesScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

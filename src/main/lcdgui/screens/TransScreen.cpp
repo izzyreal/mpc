@@ -24,7 +24,6 @@ void TransScreen::open()
 
 void TransScreen::function(int i)
 {
-	init();
 	auto punchScreen = mpc.screens->get<PunchScreen>();
 
 	switch (i)
@@ -43,7 +42,6 @@ void TransScreen::function(int i)
 
 void TransScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	

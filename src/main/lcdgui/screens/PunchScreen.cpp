@@ -40,7 +40,6 @@ void PunchScreen::open()
 
 void PunchScreen::turnWheel(int i)
 {
-    init();
     
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -52,7 +51,6 @@ void PunchScreen::turnWheel(int i)
 
 void PunchScreen::function(int i)
 {
-    init();
 	
     switch (i)
     {

@@ -31,7 +31,6 @@ void SyncScreen::open()
 
 void SyncScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
@@ -72,7 +71,6 @@ void SyncScreen::turnWheel(int i)
 
 void SyncScreen::function(int i)
 {
-    init();
     
     switch (i)
     {

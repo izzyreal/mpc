@@ -48,7 +48,6 @@ void LoopScreen::open()
 
 void LoopScreen::openWindow()
 {
-    init();
 
     const auto focusedField = getFocusedField();
     auto sound = sampler->getSound();
@@ -77,7 +76,6 @@ void LoopScreen::openWindow()
 
 void LoopScreen::function(int f)
 {
-    init();
 
     switch (f)
     {
@@ -119,7 +117,6 @@ void LoopScreen::function(int f)
 
 void LoopScreen::turnWheel(int i)
 {
-    init();
 
     auto soundInc = getSoundIncrement(i);
     auto sound = sampler->getSound();
@@ -218,7 +215,6 @@ void LoopScreen::setSlider(int i)
         return;
     }
 
-    init();
 
     const auto focusedField = getFocusedField();
 
@@ -357,7 +353,6 @@ void LoopScreen::pressEnter()
         return;
     }
 
-    init();
 
     const auto focusedField = getFocusedField();
 

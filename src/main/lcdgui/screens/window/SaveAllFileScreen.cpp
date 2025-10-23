@@ -40,7 +40,6 @@ void SaveAllFileScreen::displayFile()
 
 void SaveAllFileScreen::openNameScreen()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -59,7 +58,6 @@ void SaveAllFileScreen::openNameScreen()
 
 void SaveAllFileScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

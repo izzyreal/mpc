@@ -91,7 +91,6 @@ void EndFineScreen::function(int i)
 
 void EndFineScreen::turnWheel(int i)
 {
-    init();
     auto sound = sampler->getSound();
 
     auto soundInc = getSoundIncrement(i);
@@ -159,7 +158,6 @@ void EndFineScreen::setSlider(int i)
         return;
     }
 
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

@@ -56,45 +56,34 @@ void MultiRecordingSetupScreen::open()
     }
 }
 
-void MultiRecordingSetupScreen::init()
-{
-	ScreenComponent::init();
-	
-	yPos = 0;
-	
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-	if (focusedFieldName.length() == 2)
-		yPos = stoi(focusedFieldName.substr(1, 2));
-}
-
 void MultiRecordingSetupScreen::left()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
 	if (focusedFieldName[0] == 'a')
-		return;
+    {
+        return;
+    }
 
 	ScreenComponent::left();
 }
 
 void MultiRecordingSetupScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
 	if (focusedFieldName[0] == 'c')
+    {
 		return;
+    }
 
 	ScreenComponent::right();
 }
 
 void MultiRecordingSetupScreen::turnWheel(int i)
 {
-	init();
 	
 	auto seq = sequencer.lock()->getActiveSequence();
 
@@ -145,8 +134,6 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 
 void MultiRecordingSetupScreen::up()
 {
-	init();
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
 	if (yPos == 0)
@@ -156,27 +143,29 @@ void MultiRecordingSetupScreen::up()
 	else if (yPos == 1)
 	{
 		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
+        --yPos;
 	}
 	else if (yPos == 2)
 	{
 		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
+        --yPos;
 	}
 }
 
 void MultiRecordingSetupScreen::down()
 {
-	init();
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
 	if (yPos == 0)
 	{
         std::string res = focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
 		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
+        ++yPos;
 	}
 	else if (yPos == 1)
 	{
 		ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
+        ++yPos;
 	}
 	else if (yPos == 2)
 	{
@@ -259,7 +248,6 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 	for (auto j = 0; j < 3; j++)
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
 	
-	init();
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	auto displayYPos = stoi(focusedFieldName.substr(1, 2));
 	displayMrsLine(displayYPos);

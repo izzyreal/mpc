@@ -34,7 +34,6 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 void VmpcKeyboardScreen::turnWheel(int i)
 {
     /*
-    init();
     auto kbMapping = mpc.inputController->getKbMapping();
     auto label = kbMapping->getLabelKeyMap()[row + rowOffset].first;
     auto oldKeyCode = kbMapping->getKeyCodeFromLabel(label);

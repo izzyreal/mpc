@@ -21,7 +21,6 @@ void SongScreen::open()
 		findField("reps" + std::to_string(i))->setAlignment(Alignment::Centered);
 	}
 
-	init();
 	displaySongName();
 	displayNow0();
 	displayNow1();
@@ -40,7 +39,6 @@ void SongScreen::close()
 
 void SongScreen::up()
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -61,7 +59,6 @@ void SongScreen::up()
 
 void SongScreen::left()
 {
-	init();
     
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -86,7 +83,6 @@ void SongScreen::left()
 
 void SongScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
@@ -113,7 +109,6 @@ void SongScreen::openWindow()
 	if (sequencer.lock()->isPlaying())
 		return;
 
-	init();
 
 	auto song = sequencer.lock()->getSong(activeSongIndex);
 
@@ -136,7 +131,6 @@ void SongScreen::openWindow()
 
 void SongScreen::down()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -159,7 +153,6 @@ void SongScreen::down()
 
 void SongScreen::turnWheel(int i)
 {
-	init();
 	
 	auto song = sequencer.lock()->getSong(activeSongIndex);
 	
@@ -206,7 +199,6 @@ void SongScreen::turnWheel(int i)
 	{
 		setActiveSongIndex(activeSongIndex + i);
 		setOffset(-1);
-		init();
         displayLoop();
 
 		if (song->isUsed() && song->getStepCount() != 0)
@@ -241,7 +233,6 @@ void SongScreen::function(int i)
 	if (sequencer.lock()->isPlaying())
 		return;
 
-	init();
 	auto song = sequencer.lock()->getSong(activeSongIndex);
 	
 	switch (i)

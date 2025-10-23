@@ -15,7 +15,6 @@ void InitPadAssignScreen::open()
 
 void InitPadAssignScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -28,7 +27,6 @@ void InitPadAssignScreen::turnWheel(int i)
 
 void InitPadAssignScreen::function(int i)
 {
-	init();
 	
 	ScreenComponent::function(i);
 

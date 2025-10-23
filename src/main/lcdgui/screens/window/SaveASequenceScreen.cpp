@@ -29,7 +29,6 @@ void SaveASequenceScreen::open()
 
 void SaveASequenceScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -55,7 +54,6 @@ void SaveASequenceScreen::openNameScreen()
 
 void SaveASequenceScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

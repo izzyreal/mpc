@@ -12,7 +12,6 @@ void DeleteProgramScreen::open()
 {
     auto allPrograms = sampler->getPrograms();
 
-    init();
 
     pgm = activeDrum().getProgram();
 
@@ -21,7 +20,6 @@ void DeleteProgramScreen::open()
 
 void DeleteProgramScreen::function(int i)
 {
-    init();
 	
 	switch (i)
     {
@@ -48,7 +46,6 @@ void DeleteProgramScreen::function(int i)
 
 void DeleteProgramScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

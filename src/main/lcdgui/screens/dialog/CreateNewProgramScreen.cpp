@@ -12,7 +12,6 @@ CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerInd
 
 void CreateNewProgramScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -24,7 +23,6 @@ void CreateNewProgramScreen::turnWheel(int i)
 
 void CreateNewProgramScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -60,7 +58,6 @@ void CreateNewProgramScreen::open()
         newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterIndex];
     }
     
-	init();
 
 	displayNewName();
 	displayMidiProgramChange();
@@ -68,7 +65,6 @@ void CreateNewProgramScreen::open()
 
 void CreateNewProgramScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

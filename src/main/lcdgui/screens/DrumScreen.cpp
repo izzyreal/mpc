@@ -13,7 +13,6 @@ void DrumScreen::open()
 {
 	findField("program-change")->setAlignment(Alignment::Centered);
 	findField("midi-volume")->setAlignment(Alignment::Centered);
-	init();
 	displayDrum();
 	displayPadToInternalSound();
 	displayPgm();
@@ -24,7 +23,6 @@ void DrumScreen::open()
 
 void DrumScreen::function(int f)
 {
-    init();
 	
 	switch (f)
 	{
@@ -50,7 +48,6 @@ void DrumScreen::function(int f)
 
 void DrumScreen::turnWheel(int i)
 {
-	init();
     
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
@@ -86,7 +83,6 @@ void DrumScreen::turnWheel(int i)
 
 void DrumScreen::displayCurrentVal()
 {
-	init();
 	findField("current-val")->setTextPadded(activeDrum().getLastReceivedMidiVolume());
 }
 
@@ -136,7 +132,6 @@ void DrumScreen::setDrum(unsigned char i)
 
 	drum = i;
 
-	init();
 
 	displayDrum();
 	displayPgm();

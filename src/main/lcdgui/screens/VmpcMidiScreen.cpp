@@ -37,7 +37,6 @@ VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc& mpc, int layerIndex)
 
 void VmpcMidiScreen::turnWheel(int i)
 {
-    init();
 
     MidiControlCommand& cmd = activePreset->rows[row + rowOffset];
 

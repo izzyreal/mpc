@@ -34,7 +34,6 @@ void VmpcDirectToDiskRecorderScreen::open()
 
 void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 {
-	init();
 
 	auto seq = sequencer.lock()->getSequence(sq).get();
 
@@ -70,7 +69,6 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 
 void VmpcDirectToDiskRecorderScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

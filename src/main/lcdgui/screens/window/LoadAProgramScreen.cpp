@@ -20,7 +20,6 @@ void LoadAProgramScreen::open()
 
 void LoadAProgramScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -33,7 +32,6 @@ void LoadAProgramScreen::turnWheel(int i)
 
 void LoadAProgramScreen::function(int i)
 {
-	init();
 
     auto selectedFile = mpc.screens->get<LoadScreen>()->getSelectedFile();
     
@@ -55,9 +53,14 @@ void LoadAProgramScreen::function(int i)
 
         mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
-        if (track->getBus() > 0) {
-            for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++) {
-                if (sampler->getProgram(pgmIndex) == newProgram) {
+        auto track = mpc.getSequencer()->getActiveTrack();
+
+        if (track->getBus() > 0)
+        {
+            for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++)
+            {
+                if (sampler->getProgram(pgmIndex) == newProgram)
+                {
                     activeDrum().setProgram(pgmIndex);
                     break;
                 }
@@ -78,3 +81,4 @@ void LoadAProgramScreen::setLoadReplaceSameSound(bool b)
 {
     loadReplaceSameSound = b;
 }
+

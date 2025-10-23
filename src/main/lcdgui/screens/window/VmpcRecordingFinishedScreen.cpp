@@ -9,7 +9,6 @@ VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(mpc::Mpc& mpc, const in
 
 void VmpcRecordingFinishedScreen::function(int i)
 {
-    init();
 
 	switch (i)
     {

@@ -14,7 +14,6 @@ void CantFindFileScreen::open()
 
 void CantFindFileScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

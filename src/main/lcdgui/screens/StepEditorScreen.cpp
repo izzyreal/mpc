@@ -69,7 +69,7 @@ void StepEditorScreen::open()
 
     lastRow = 0;
 
-    init();
+    auto track = mpc.getSequencer()->getActiveTrack();
 
     if (track->getBus() != 0)
     {
@@ -133,6 +133,7 @@ void StepEditorScreen::open()
 void StepEditorScreen::close()
 {
     sequencer.lock()->deleteObserver(this);
+    auto track = mpc.getSequencer()->getActiveTrack();
     track->deleteObserver(this);
 
     storeColumnForEventAtActiveRow();
@@ -175,7 +176,6 @@ void StepEditorScreen::close()
 
 void StepEditorScreen::function(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -225,6 +225,7 @@ void StepEditorScreen::function(int i)
 
                 if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
                 {
+                    auto track = mpc.getSequencer()->getActiveTrack();
                     for (int e = 0; e < track->getEvents().size(); e++)
                     {
                         if (track->getEvents()[e] == visibleEvents[rowIndex])
@@ -289,6 +290,7 @@ void StepEditorScreen::function(int i)
 
                     auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>();
 
+                    auto track = mpc.getSequencer()->getActiveTrack();
                     if (noteEvent && track->getBus() != 0)
                     {
                         if (isA)
@@ -382,9 +384,9 @@ bool StepEditorScreen::paramIsLetter(const std::string& letter)
 
 void StepEditorScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
+    auto track = mpc.getSequencer()->getActiveTrack();
 
     if (focusedFieldName == "view")
     {
@@ -543,6 +545,7 @@ void StepEditorScreen::setSequencerTickPos(const std::function<void()>& tickPosS
 
     if (oldTickPos != sequencer.lock()->getTickPosition())
     {
+        auto track = mpc.getSequencer()->getActiveTrack();
         track->removeDoubles();
         resetYPosAndYOffset();
         restoreColumnForEventAtActiveRow();
@@ -601,7 +604,6 @@ void StepEditorScreen::nextBarEnd()
 
 void StepEditorScreen::left()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -628,7 +630,6 @@ void StepEditorScreen::right()
 
 void StepEditorScreen::up()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -675,7 +676,6 @@ void StepEditorScreen::up()
 
 void StepEditorScreen::down()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -724,7 +724,6 @@ void StepEditorScreen::down()
 
 void StepEditorScreen::shift()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -810,12 +809,13 @@ void StepEditorScreen::refreshSelection()
 
 void StepEditorScreen::initVisibleEvents()
 {
-    init();
 
     for (auto& e : eventsAtCurrentTick)
         if (e) e->deleteObserver(this);
 
     eventsAtCurrentTick.clear();
+
+    auto track = mpc.getSequencer()->getActiveTrack();
 
     for (auto& event : track->getEvents())
     {
@@ -948,7 +948,7 @@ void StepEditorScreen::refreshEventRows()
 
 void StepEditorScreen::updateComponents()
 {
-    init();
+    auto track = mpc.getSequencer()->getActiveTrack();
 
     if (view == 1 && track->getBus() != 0)
     {
@@ -988,7 +988,7 @@ void StepEditorScreen::updateComponents()
 
 void StepEditorScreen::setViewNotesText()
 {
-    init();
+    auto track = mpc.getSequencer()->getActiveTrack();
 
     if (view == 1 && track->getBus() != 0)
     {
@@ -1188,7 +1188,6 @@ void StepEditorScreen::setSelectedParameterLetter(std::string str)
 
 void StepEditorScreen::removeEvents()
 {
-    init();
     auto firstEventIndex = selectionStartIndex;
     auto lastEventIndex = selectionEndIndex;
 
@@ -1205,6 +1204,7 @@ void StepEditorScreen::removeEvents()
             auto event = eventsAtCurrentTick[i];
             if (!std::dynamic_pointer_cast<EmptyEvent>(event))
             {
+                auto track = mpc.getSequencer()->getActiveTrack();
                 track->removeEvent(event);
             }
         }
@@ -1253,10 +1253,16 @@ void StepEditorScreen::update(Observable*, Message message)
 
         if (std::dynamic_pointer_cast<NoteOnEvent>(visibleEvents[row]))
         {
+            auto track = mpc.getSequencer()->getActiveTrack();
+
             if (track->getBus() != 0)
+            {
                 eventRow->setDrumNoteEventValues();
+            }
             else
+            {
                 eventRow->setMidiNoteEventValues();
+            }
         }
         else if (std::dynamic_pointer_cast<MixerEvent>(visibleEvents[row]))
         {
@@ -1343,12 +1349,12 @@ int StepEditorScreen::getYOffset()
 void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent>&noteEvent)
 {
     const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
+    auto track = mpc.getSequencer()->getActiveTrack();
     mpc.getEventHandler()->handleFinalizedEvent(adhoc, track.get());
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
 {
-    init();
     yOffset = 0;
 
     if (getActiveRow() <= 0)
@@ -1361,7 +1367,6 @@ void StepEditorScreen::resetYPosAndYOffset()
 
 std::string StepEditorScreen::getActiveColumn()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -1375,7 +1380,6 @@ std::string StepEditorScreen::getActiveColumn()
 
 int StepEditorScreen::getActiveRow()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -1417,6 +1421,7 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
 {
     auto tick = sequencer.lock()->getTickPosition();
+    auto track = mpc.getSequencer()->getActiveTrack();
     for (auto& e : track->getEventRange(tick, tick))
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);

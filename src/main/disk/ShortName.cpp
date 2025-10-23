@@ -40,7 +40,6 @@ ShortName::ShortName(string name, string ext)
 /*
 charset::Charset*& ShortName::ASCII()
 {
-    init();
     return ASCII_;
 }
 */

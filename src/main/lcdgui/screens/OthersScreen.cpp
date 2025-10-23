@@ -49,7 +49,6 @@ int OthersScreen::getContrast()
 
 void OthersScreen::function(int i)
 {
-	init();
 	switch (i)
 	{
 	case 1:
@@ -63,7 +62,6 @@ void OthersScreen::function(int i)
 
 void OthersScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	

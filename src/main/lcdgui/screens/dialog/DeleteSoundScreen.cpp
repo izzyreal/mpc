@@ -14,7 +14,6 @@ void DeleteSoundScreen::open()
 
 void DeleteSoundScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -41,7 +40,6 @@ void DeleteSoundScreen::function(int i)
 
 void DeleteSoundScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

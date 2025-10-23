@@ -13,7 +13,6 @@ using namespace mpc::engine;
 Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* samplerToUse)
 {
 	sampler = samplerToUse;
-	init();
 	
 	for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
 	{

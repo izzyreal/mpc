@@ -33,7 +33,6 @@ void SaveAProgramScreen::open()
 
 void SaveAProgramScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -50,7 +49,6 @@ void SaveAProgramScreen::turnWheel(int i)
 
 void SaveAProgramScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

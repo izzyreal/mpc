@@ -48,7 +48,6 @@ void NextSeqScreen::close()
 
 void NextSeqScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -104,7 +103,6 @@ void NextSeqScreen::turnWheel(int i)
 
 void NextSeqScreen::function(int i)
 {
-    init();
 
     if (i == 3 || i == 4)
     {

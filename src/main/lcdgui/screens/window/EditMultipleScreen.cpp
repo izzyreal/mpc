@@ -39,6 +39,7 @@ void EditMultipleScreen::function(int i)
     
     auto selectedEvent = stepEditorScreen->getSelectedEvent();
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
+    auto track = mpc.getSequencer()->getActiveTrack();
     
     switch (i)
     {
@@ -113,14 +114,13 @@ void EditMultipleScreen::function(int i)
             }
             
             stepEditorScreen->clearSelection();
-        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
         }
     }
 }
 
 void EditMultipleScreen::turnWheel(int i)
 {
-    init();
     
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     auto event = stepEditorScreen->getSelectedEvent();
@@ -128,6 +128,7 @@ void EditMultipleScreen::turnWheel(int i)
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
+    auto track = mpc.getSequencer()->getActiveTrack();
     
     if (focusedFieldName == "value0")
     {
@@ -137,23 +138,7 @@ void EditMultipleScreen::turnWheel(int i)
         {
             if (paramLetter == "a")
             {
-                if (changeNoteTo == 34 && i < 0)
-                {
-                    return;
-                }
-
-                auto candidate = changeNoteTo + i;
-
-                if (candidate < 35)
-                {
-                    candidate = 35;
-                }
-                else if (candidate > 98)
-                {
-                    candidate = 98;
-                }
-
-                setChangeNoteTo(candidate);
+                setChangeNoteTo(changeNoteTo + i);
             }
             else if (paramLetter == "b")
             {
@@ -171,9 +156,13 @@ void EditMultipleScreen::turnWheel(int i)
         else if (noteEvent && track->getBus() == 0)
         {
             if (paramLetter == "a")
+            {
                 setChangeNoteTo(changeNoteTo + i);
+            }
             else if (paramLetter == "b" || paramLetter == "c")
+            {
                 setEditType(editType + i);
+            }
         }
         else if (std::dynamic_pointer_cast<ProgramChangeEvent>(event)
                  || std::dynamic_pointer_cast<PolyPressureEvent>(event)
@@ -203,11 +192,17 @@ void EditMultipleScreen::checkThreeParameters()
         auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event);
         
         if (note)
+        {
             note->setVelocity(editValue);
+        }
         else if (controlChange)
+        {
             controlChange->setAmount(editValue);
+        }
         else if (polyPressure)
+        {
             polyPressure->setAmount(editValue);
+        }
     }
 }
 
@@ -250,25 +245,20 @@ void EditMultipleScreen::checkNotes()
 
 void EditMultipleScreen::setEditType(int i)
 {
-    if (i < 0 || i > 3)
-        return;
-    
-    editType = i;
-    
-    if (editType != 2 && editValue > 127)
-        editValue = 127;
-    
+    editType = std::clamp(i, 0, 3);
+    setEditValue(editValue); // re-clamp
     updateEditMultiple();
 }
 
 void EditMultipleScreen::updateEditMultiple()
 {
-    init();
     
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     auto event = stepEditorScreen->getSelectedEvent();
     auto letter = stepEditorScreen->getSelectedParameterLetter();
     
+    auto track = mpc.getSequencer()->getActiveTrack();
+
     if (std::dynamic_pointer_cast<NoteOnEvent>(event) && track->getBus() != 0)
     {
         if (letter == "a" || letter == "b" || letter == "c")
@@ -420,7 +410,7 @@ void EditMultipleScreen::updateDouble()
 
 void EditMultipleScreen::setChangeNoteTo(int i)
 {
-    init();
+    auto track = mpc.getSequencer()->getActiveTrack();
     auto midi = track->getBus() == 0;
     changeNoteTo = std::clamp(i, midi ? 0 : 34, midi ? 127 : 98);
     updateEditMultiple();

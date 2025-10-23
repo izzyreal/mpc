@@ -33,7 +33,6 @@ void SaveApsFileScreen::open()
 
 void SaveApsFileScreen::turnWheel(int i)
 {
-	init();
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -52,7 +51,6 @@ void SaveApsFileScreen::turnWheel(int i)
 
 void SaveApsFileScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{
@@ -119,7 +117,6 @@ void SaveApsFileScreen::displayReplaceSameSounds()
 
 void SaveApsFileScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

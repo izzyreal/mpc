@@ -13,7 +13,6 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PgmAssignScreen::open()
 {
-    init();
     auto program = getProgramOrThrow();
     auto lastNoteParameters = sampler->getLastNp(program.get());
     auto soundIndex = lastNoteParameters->getSoundIndex();
@@ -47,7 +46,6 @@ void PgmAssignScreen::close()
 
 void PgmAssignScreen::function(int i)
 {
-	init();
 		
 	switch (i)
 	{
@@ -77,7 +75,6 @@ void PgmAssignScreen::function(int i)
 
 void PgmAssignScreen::turnWheel(int i)
 {
-	init();
 
     auto program = getProgramOrThrow();
 	auto lastPad = sampler->getLastPad(program.get());
@@ -247,7 +244,6 @@ void PgmAssignScreen::turnWheel(int i)
 
 void PgmAssignScreen::openWindow()
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -314,13 +310,11 @@ void PgmAssignScreen::displaySoundName()
 
 void PgmAssignScreen::displayPadAssign()
 {
-	init();
 	findField("pad-assign")->setText(padAssign ? "MASTER" : "PROGRAM");
 }
 
 void PgmAssignScreen::displayPadNote()
 {
-	init();
 
     auto program = getProgramOrThrow();
 
@@ -336,7 +330,6 @@ void PgmAssignScreen::displayPadNote()
 
 void PgmAssignScreen::displaySoundGenerationMode()
 {
-	init();
 	auto sgm = -1;
 
     auto program = getProgramOrThrow();
@@ -394,7 +387,6 @@ void PgmAssignScreen::displaySoundGenerationMode()
 
 void PgmAssignScreen::displayVeloRangeUpper()
 {
-	init();
     auto program = getProgramOrThrow();
 	auto rangeB = sampler->getLastNp(program.get())->getVelocityRangeUpper();
 	findField("velocity-range-upper")->setTextPadded(rangeB, " ");
@@ -402,7 +394,6 @@ void PgmAssignScreen::displayVeloRangeUpper()
 
 void PgmAssignScreen::displayVeloRangeLower()
 {
-	init();
     auto program = getProgramOrThrow();
 	auto rangeA = sampler->getLastNp(program.get())->getVelocityRangeLower();
 	findField("velocity-range-lower")->setTextPadded(rangeA, " ");
@@ -410,7 +401,6 @@ void PgmAssignScreen::displayVeloRangeLower()
 
 void PgmAssignScreen::displayOptionalNoteA()
 {
-	init();
     auto program = getProgramOrThrow();
 	auto noteIntA = sampler->getLastNp(program.get())->getOptionalNoteA();
 	auto padIntA = program->getPadIndexFromNote(noteIntA);
@@ -421,7 +411,6 @@ void PgmAssignScreen::displayOptionalNoteA()
 
 void PgmAssignScreen::displayOptionalNoteB()
 {
-	init();
     auto program = getProgramOrThrow();
 	auto noteIntB = sampler->getLastNp(program.get())->getOptionalNoteB();
 	auto padIntB = program->getPadIndexFromNote(noteIntB);
@@ -432,14 +421,12 @@ void PgmAssignScreen::displayOptionalNoteB()
 
 void PgmAssignScreen::displayNote()
 {
-	init();
     auto program = getProgramOrThrow();
 	findField("note")->setText(std::to_string(sampler->getLastNp(program.get())->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()
 {
-	init();
 	findField("pad")->setText(sampler->getPadName(mpc.getPad()));
 }
 

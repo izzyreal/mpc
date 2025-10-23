@@ -32,40 +32,13 @@ void TempoChangeScreen::open()
 	findLabel("initial-tempo")->setLocation(140, 10);
 
 	for (auto& bar :bars)
+    {
 		bar->Hide(true);
+    }
 
-	a0Field = findField("a0");
-	a1Field = findField("a1");
-	a2Field = findField("a2");
-	b0Field = findField("b0");
-	b1Field = findField("b1");
-	b2Field = findField("b2");
-	c0Field = findField("c0");
-	c1Field = findField("c1");
-	c2Field = findField("c2");
-	d0Field = findField("d0");
-	d1Field = findField("d1");
-	d2Field = findField("d2");
-	e0Field = findField("e0");
-	e1Field = findField("e1");
-	e2Field = findField("e2");
-	f0Field = findField("f0");
-	f1Field = findField("f1");
-	f2Field = findField("f2");
-	b1Label = findLabel("b1");
-	b2Label = findLabel("b2");
-	c1Label = findLabel("c1");
-	c2Label = findLabel("c2");
-	d1Label = findLabel("d1");
-	d2Label = findLabel("d2");
-	e1Label = findLabel("e1");
-	e2Label = findLabel("e2");
-	f1Label = findLabel("f1");
-	f2Label = findLabel("f2");
-
-	a0Field->setAlignment(Alignment::Centered);
-	a1Field->setAlignment(Alignment::Centered);
-	a2Field->setAlignment(Alignment::Centered);
+	findField("a0")->setAlignment(Alignment::Centered);
+	findField("a1")->setAlignment(Alignment::Centered);
+	findField("a2")->setAlignment(Alignment::Centered);
 
 	auto events = sequencer.lock()->getActiveSequence()->getTempoChangeEvents();
 
@@ -143,20 +116,20 @@ void TempoChangeScreen::displayTempoChange0()
 	bars[0]->Hide(false);
 	
 	auto tce = visibleTempoChanges[0];
-	a0Field->setText(std::to_string(offset + 1));
+	findField("a0")->setText(std::to_string(offset + 1));
 	auto timeSig = sequence->getTimeSignature();
 	
 	int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
-	b0Field->setTextPadded(value, "0");
+	findField("b0")->setTextPadded(value, "0");
 	value = tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
-	c0Field->setTextPadded(value, "0");
+	findField("c0")->setTextPadded(value, "0");
 	value = tce->getClock(timeSig.getDenominator());
-	d0Field->setTextPadded(value, "0");
+	findField("d0")->setTextPadded(value, "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
 	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
-	e0Field->setText(ratioStr);
+	findField("e0")->setText(ratioStr);
 
 	double initialTempo = sequence->getInitialTempo();
 	int ratio = tce->getRatio();
@@ -166,63 +139,49 @@ void TempoChangeScreen::displayTempoChange0()
 	if (tempo < 30.0) tempo = 30.0;
 	else if (tempo > 300.0) tempo = 300.0;
 
-	f0Field->setText(Util::tempoString(tempo));
+	findField("f0")->setText(Util::tempoString(tempo));
 	bars[0]->setValue((tempo - 30) / 270.0);
 }
 
 void TempoChangeScreen::displayTempoChange1()
 {
 	auto tce = visibleTempoChanges[1];
+
+    findField("b1")->Hide(!tce);
+    findField("c1")->Hide(!tce);
+    findField("d1")->Hide(!tce);
+    findField("e1")->Hide(!tce);
+    findField("f1")->Hide(!tce);
+    findLabel("b1")->Hide(!tce);
+    findLabel("c1")->Hide(!tce);
+    findLabel("d1")->Hide(!tce);
+    findLabel("e1")->Hide(!tce);
+    findLabel("f1")->Hide(!tce);
+    bars[1]->Hide(!tce);
 	
 	if (!tce)
 	{
-		a1Field->setText("END");
-		b1Field->Hide(true);
-		c1Field->Hide(true);
-		d1Field->Hide(true);
-		e1Field->Hide(true);
-		f1Field->Hide(true);
-		b1Label->Hide(true);
-		c1Label->Hide(true);
-		d1Label->Hide(true);
-		e1Label->Hide(true);
-		f1Label->Hide(true);
-		bars[1]->Hide(true);
+		findField("a1")->setText("END");
 		return;
 	}
 	
-	b1Field->Hide(false);
-	c1Field->Hide(false);
-	d1Field->Hide(false);
-	e1Field->Hide(false);
-	f1Field->Hide(false);
-	b1Label->Hide(false);
-	c1Label->Hide(false);
-	d1Label->Hide(false);
-	e1Label->Hide(false);
-	f1Label->Hide(false);
-	bars[1]->Hide(false);
-
-	a1Field->setText(std::to_string(offset + 2));
+	findField("a1")->setText(std::to_string(offset + 2));
 	
 	auto sequence = sequencer.lock()->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
 
-	b1Field->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	c1Field->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	d1Field->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
+	findField("b1")->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
+	findField("c1")->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
+	findField("d1")->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
 	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
-	e1Field->setText(ratioStr);
+	findField("e1")->setText(ratioStr);
 
-	auto tempo = sequence->getInitialTempo() * (tce->getRatio() * 0.001);
+	auto tempo = std::clamp(sequence->getInitialTempo() * (tce->getRatio() * 0.001), 30.0, 300.0);
 
-	if (tempo < 30.0) tempo = 30.0;
-	else if (tempo > 300.0) tempo = 300.0;
-
-	f1Field->setText(Util::tempoString(tempo));
+	findField("f1")->setText(Util::tempoString(tempo));
 	bars[1]->setValue((tempo - 30) / 270.0);
 }
 
@@ -230,68 +189,53 @@ void TempoChangeScreen::displayTempoChange2()
 {
 	auto tce = visibleTempoChanges[2];
 	
+    findField("b2")->Hide(!tce);
+    findField("c2")->Hide(!tce);
+    findField("d2")->Hide(!tce);
+    findField("e2")->Hide(!tce);
+    findField("f2")->Hide(!tce);
+    findLabel("b2")->Hide(!tce);
+    findLabel("c2")->Hide(!tce);
+    findLabel("d2")->Hide(!tce);
+    findLabel("e2")->Hide(!tce);
+    findLabel("f2")->Hide(!tce);
+    bars[2]->Hide(!tce);
+
 	if (!tce)
 	{
 		if (!visibleTempoChanges[1])
 		{
-			a2Field->Hide(true);
+			findField("a2")->Hide(true);
 		}
 		else
 		{
-			a2Field->Hide(false);
-			a2Field->setText("END");
+			findField("a2")->Hide(false);
+			findField("a2")->setText("END");
 		}
-
-		b2Field->Hide(true);
-		c2Field->Hide(true);
-		d2Field->Hide(true);
-		e2Field->Hide(true);
-		f2Field->Hide(true);
-		b2Label->Hide(true);
-		c2Label->Hide(true);
-		d2Label->Hide(true);
-		e2Label->Hide(true);
-		f2Label->Hide(true);
-		bars[2]->Hide(true);
 		return;
 	}
 
-	b2Field->Hide(false);
-	c2Field->Hide(false);
-	d2Field->Hide(false);
-	e2Field->Hide(false);
-	f2Field->Hide(false);
-	b2Label->Hide(false);
-	c2Label->Hide(false);
-	d2Label->Hide(false);
-	e2Label->Hide(false);
-	f2Label->Hide(false);
-	bars[2]->Hide(false);
-	a2Field->setText(std::to_string(offset + 3));
+	findField("a2")->setText(std::to_string(offset + 3));
 
 	auto sequence = sequencer.lock()->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
-	b2Field->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	c2Field->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	d2Field->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
+	findField("b2")->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
+	findField("c2")->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
+	findField("d2")->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
 	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
-	e2Field->setText(ratioStr);
+	findField("e2")->setText(ratioStr);
 
-	auto tempo = sequence->getInitialTempo() * tce->getRatio() * 0.001;
+	auto tempo = std::clamp(sequence->getInitialTempo() * tce->getRatio() * 0.001, 30.0, 300.0);
 	
-	if (tempo < 30.0) tempo = 30.0;
-	else if (tempo > 300.0) tempo = 300.0;
-
-	f2Field->setText(Util::tempoString(tempo));
+	findField("f2")->setText(Util::tempoString(tempo));
 	bars[2]->setValue((tempo - 30) / 270.0);
 }
 
 void TempoChangeScreen::left()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -309,7 +253,6 @@ void TempoChangeScreen::left()
 
 void TempoChangeScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -328,6 +271,8 @@ void TempoChangeScreen::right()
 void TempoChangeScreen::function(int j)
 {
 	ScreenComponent::function(j);
+    
+    init();
 	
 	auto yPos = -1;
 
@@ -444,7 +389,6 @@ void TempoChangeScreen::function(int j)
 
 void TempoChangeScreen::init()
 {
-	ScreenComponent::init();
 	auto seq = sequencer.lock()->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
@@ -479,7 +423,6 @@ void TempoChangeScreen::init()
 
 void TempoChangeScreen::turnWheel(int j)
 {
-	init();
 	
 	auto seq = sequencer.lock()->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
@@ -563,8 +506,8 @@ void TempoChangeScreen::turnWheel(int j)
 
 void TempoChangeScreen::down()
 {
-	init();
-
+    init();
+    
 	auto tce1 = visibleTempoChanges[1];
 	auto tce2 = visibleTempoChanges[2];
 
@@ -617,8 +560,8 @@ void TempoChangeScreen::down()
 
 void TempoChangeScreen::up()
 {
-	init();
-
+    init();
+    
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
 	if (focusedFieldName.length() != 2)
@@ -649,8 +592,7 @@ void TempoChangeScreen::up()
 
 void TempoChangeScreen::setOffset(int i)
 {
-	if (i < 0)
-		return;
+    if (i < 0) i = 0;
 
 	offset = i;
 

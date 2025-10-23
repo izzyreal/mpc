@@ -30,7 +30,6 @@ void SaveASoundScreen::open()
 
 void SaveASoundScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -52,7 +51,6 @@ void SaveASoundScreen::turnWheel(int i)
 
 void SaveASoundScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

@@ -31,7 +31,6 @@ void CopySongScreen::open()
 
 void CopySongScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{
@@ -50,7 +49,6 @@ void CopySongScreen::function(int i)
 
 void CopySongScreen::turnWheel(int i)
 {
-	init();
 
 	auto songScreen = mpc.screens->get<SongScreen>();
 

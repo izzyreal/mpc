@@ -13,10 +13,10 @@ TrackScreen::TrackScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TrackScreen::open()
 {
-	init();
 	auto activeTrackIndex = sequencer.lock()->getActiveTrackIndex();
 	auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);
 
+    auto track = mpc.getSequencer()->getActiveTrack();
 	findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
 	findLabel("tracknamerest")->setText(track->getName().substr(1));
 
@@ -40,7 +40,6 @@ void TrackScreen::function(int i)
 
 void TrackScreen::openNameScreen()
 {
-    init();
     std::function<void(std::string&)> enterAction;
     std::string initialNameScreenName;
 
@@ -57,6 +56,8 @@ void TrackScreen::openNameScreen()
     }
     else
     {
+        auto track = mpc.getSequencer()->getActiveTrack();
+
         if (!track->isUsed())
         {
             track->setUsed(true);
@@ -64,13 +65,13 @@ void TrackScreen::openNameScreen()
 
         initialNameScreenName = track->getName();
 
-        enterAction = [this](std::string& newName) {
+        enterAction = [this, track](std::string& newName) {
             track->setName(newName);
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         };
     }
 
     auto nameScreen = mpc.screens->get<NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequencer");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+    mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

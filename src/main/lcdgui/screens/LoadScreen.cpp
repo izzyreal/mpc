@@ -50,7 +50,6 @@ void LoadScreen::open()
     auto ext = fs::path(getSelectedFileName()).extension().string();
     auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
 
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -66,7 +65,6 @@ void LoadScreen::open()
 
 void LoadScreen::function(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -221,7 +219,6 @@ void LoadScreen::function(int i)
 
 void LoadScreen::openWindow()
 {
-    init();
     auto disk = mpc.getDisk();
 
     if (!disk)
@@ -237,7 +234,6 @@ void LoadScreen::openWindow()
 
 void LoadScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -503,7 +499,6 @@ void LoadScreen::displayDeviceType()
 
 void LoadScreen::up()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

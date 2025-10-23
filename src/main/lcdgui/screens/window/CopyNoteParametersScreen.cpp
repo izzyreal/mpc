@@ -9,7 +9,6 @@ CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int laye
 
 void CopyNoteParametersScreen::open()
 {
-	init();
 
     auto program = getProgramOrThrow();
 	auto note = sampler->getLastNp(program.get())->getNumber();
@@ -23,7 +22,6 @@ void CopyNoteParametersScreen::open()
 
 void CopyNoteParametersScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     

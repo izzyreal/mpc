@@ -21,7 +21,6 @@ void AutoChromaticAssignmentScreen::open()
         tune = 0;
     }
     
-    init();
     
     auto program = getProgramOrThrow();
     setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
@@ -40,7 +39,6 @@ void AutoChromaticAssignmentScreen::close()
 
 void AutoChromaticAssignmentScreen::function(int i)
 {
-    init();
     
     switch (i)
     {
@@ -82,7 +80,6 @@ void AutoChromaticAssignmentScreen::function(int i)
 
 void AutoChromaticAssignmentScreen::turnWheel(int i)
 {
-    init();
     
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -109,7 +106,6 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 
 void AutoChromaticAssignmentScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

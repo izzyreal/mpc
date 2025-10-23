@@ -43,6 +43,8 @@ void TimingCorrectScreen::function(int i)
 
 		std::vector<int> noteRange(2);
 
+        auto track = mpc.getSequencer()->getActiveTrack();
+
 		if (track->getBus() != 0)
 		{
 			if (note0 == 34)
@@ -87,7 +89,6 @@ void TimingCorrectScreen::function(int i)
 
 void TimingCorrectScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -114,7 +115,6 @@ void TimingCorrectScreen::turnWheel(int i)
 
 void TimingCorrectScreen::setNote0(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -141,7 +141,7 @@ void TimingCorrectScreen::displaySwing()
 
 void TimingCorrectScreen::displayNotes()
 {
-	init();
+    auto track = mpc.getSequencer()->getActiveTrack();
 	
 	if (track->getBus() == 0)
 	{
@@ -249,7 +249,6 @@ void TimingCorrectScreen::setNoteValue(int i)
 {
     noteValue = std::clamp(i, 0, 6);
     setAmount(amount); // reclamp to new bounds
-    init();
     displayNoteValue();
 }
 

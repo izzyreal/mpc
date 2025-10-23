@@ -10,7 +10,6 @@ LocateScreen::LocateScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void LocateScreen::function(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -69,7 +68,6 @@ void LocateScreen::function(int i)
 
 void LocateScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

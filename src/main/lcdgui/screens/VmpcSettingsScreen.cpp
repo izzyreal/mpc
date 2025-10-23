@@ -70,7 +70,6 @@ void VmpcSettingsScreen::function(int i)
 
 void VmpcSettingsScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldName();
 

@@ -12,7 +12,6 @@ KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void KeepOrRetryScreen::open()
 {
-    init();
     assignToNote = 34;
     displayNameForNewSound();
     displayAssignToNote();
@@ -26,7 +25,6 @@ void KeepOrRetryScreen::close()
 
 void KeepOrRetryScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -53,7 +51,6 @@ void KeepOrRetryScreen::function(int i)
 
 void KeepOrRetryScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -77,7 +74,6 @@ void KeepOrRetryScreen::openNameScreen()
 
 void KeepOrRetryScreen::right()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -87,7 +83,6 @@ void KeepOrRetryScreen::right()
 
 void KeepOrRetryScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -127,7 +122,6 @@ void KeepOrRetryScreen::displayNameForNewSound()
 
 void KeepOrRetryScreen::displayAssignToNote()
 {
-    init();
     auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
     auto padStr = sampler->getPadName(getProgramOrThrow()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note")->setText(noteStr + "/" + padStr);

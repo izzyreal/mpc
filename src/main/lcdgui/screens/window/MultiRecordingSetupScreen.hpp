@@ -17,9 +17,6 @@ namespace mpc::lcdgui::screens::window {
 		std::vector<std::string> inNames = std::vector<std::string>(34);
 
 	public:
-		void init() override;
-
-	public:
 		void left() override;
 		void right() override;
 		void up() override;

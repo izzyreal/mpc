@@ -48,7 +48,6 @@ void SaveScreen::open()
     displayDevice();
     displayDeviceType();
 
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -64,7 +63,6 @@ void SaveScreen::open()
 
 void SaveScreen::openWindow()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -76,7 +74,6 @@ void SaveScreen::openWindow()
 
 void SaveScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -175,7 +172,6 @@ void SaveScreen::function(int i)
 
 void SaveScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -401,7 +397,6 @@ void SaveScreen::displayDeviceType()
 
 void SaveScreen::up()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

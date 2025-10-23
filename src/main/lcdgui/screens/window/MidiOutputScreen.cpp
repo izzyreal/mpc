@@ -14,10 +14,10 @@ MidiOutputScreen::MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MidiOutputScreen::open()
 {
-	init();
 
 	if (ls->isPreviousScreenNot<NameScreen, MidiOutputMonitorScreen>())
 	{
+        auto track = mpc.getSequencer()->getActiveTrack();
 		auto dev = track->getDeviceIndex();
 
 		if (dev > 0)
@@ -56,7 +56,6 @@ void MidiOutputScreen::openNameScreen()
 
 void MidiOutputScreen::right()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -68,7 +67,6 @@ void MidiOutputScreen::right()
 
 void MidiOutputScreen::turnWheel(int i)
 {
-	init();
 		
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -122,10 +120,7 @@ void MidiOutputScreen::displayDeviceName()
 
 void MidiOutputScreen::setSoftThru(int i)
 {
-	if (i < 0 || i > 4)
-		return;
-
-	softThru = i;
+	softThru = std::clamp(i, 0, 4);
 	displaySoftThru();
 }
 
@@ -136,9 +131,6 @@ int MidiOutputScreen::getSoftThru()
 
 void MidiOutputScreen::setDeviceIndex(int i)
 {
-	if (i < 0 || i > 31)
-		return;
-
-	deviceIndex = i;
+	deviceIndex = std::clamp(i, 0, 31);
 	displayDeviceName();
 }

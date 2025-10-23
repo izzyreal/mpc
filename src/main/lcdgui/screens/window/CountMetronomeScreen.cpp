@@ -62,7 +62,6 @@ void CountMetronomeScreen::function(int i)
 
 void CountMetronomeScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

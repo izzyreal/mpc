@@ -16,7 +16,6 @@ void TimeDisplayScreen::open()
 
 void TimeDisplayScreen::turnWheel(int i)
 {
-	init();
 
     const auto startTime = sequencer.lock()->getActiveSequence()->getStartTime();
 	

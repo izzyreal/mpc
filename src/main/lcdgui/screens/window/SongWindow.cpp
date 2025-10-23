@@ -48,7 +48,6 @@ void SongWindow::function(int i)
 
 void SongWindow::openNameScreen()
 {
-	init();
 
 
     std::function<void(std::string&)> enterAction;

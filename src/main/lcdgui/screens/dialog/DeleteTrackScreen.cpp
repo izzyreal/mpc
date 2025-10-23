@@ -20,7 +20,6 @@ void DeleteTrackScreen::open()
 
 void DeleteTrackScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -30,7 +29,6 @@ void DeleteTrackScreen::turnWheel(int i)
 
 void DeleteTrackScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

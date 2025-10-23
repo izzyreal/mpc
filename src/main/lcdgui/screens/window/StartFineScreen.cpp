@@ -90,7 +90,6 @@ void StartFineScreen::function(int i)
 
 void StartFineScreen::turnWheel(int i)
 {
-	init();
 	auto sound = sampler->getSound();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto trimScreen = mpc.screens->get<TrimScreen>();
@@ -172,7 +171,6 @@ void StartFineScreen::setSlider(int i)
         return;
     }
 
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

@@ -21,7 +21,6 @@ void LoopSongScreen::open()
 
 void LoopSongScreen::turnWheel(int i)
 {
-	init();
 
 	auto songScreen = mpc.screens->get<SongScreen>();
 	auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());

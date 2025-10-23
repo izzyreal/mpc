@@ -9,7 +9,6 @@ VerScreen::VerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VerScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

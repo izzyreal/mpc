@@ -36,7 +36,6 @@ void PgmParamsScreen::close()
 
 void PgmParamsScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -68,7 +67,6 @@ void PgmParamsScreen::function(int i)
 
 void PgmParamsScreen::turnWheel(int i)
 {
-    init();
 
     auto program = getProgramOrThrow();
     auto lastNoteParameters = sampler->getLastNp(program.get());
@@ -162,7 +160,6 @@ void PgmParamsScreen::turnWheel(int i)
 
 void PgmParamsScreen::openWindow()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -210,21 +207,18 @@ void PgmParamsScreen::update(Observable* o, Message message)
 
 void PgmParamsScreen::displayReson()
 {
-    init();
     auto program = getProgramOrThrow();
     findField("reson")->setTextPadded(sampler->getLastNp(program.get())->getFilterResonance());
 }
 
 void PgmParamsScreen::displayFreq()
 {
-    init();
     auto program = getProgramOrThrow();
     findField("freq")->setTextPadded(sampler->getLastNp(program.get())->getFilterFrequency());
 }
 
 void PgmParamsScreen::displayAttackDecay()
 {
-    init();
     auto program = getProgramOrThrow();
     auto attack = sampler->getLastNp(program.get())->getAttack();
     auto decay = sampler->getLastNp(program.get())->getDecay();
@@ -236,7 +230,6 @@ void PgmParamsScreen::displayAttackDecay()
 
 void PgmParamsScreen::displayNote()
 {
-    init();
     auto program = getProgramOrThrow();
     auto noteParameters = sampler->getLastNp(program.get());
     auto soundIndex = noteParameters->getSoundIndex();
@@ -249,13 +242,11 @@ void PgmParamsScreen::displayNote()
 
 void PgmParamsScreen::displayPgm()
 {
-    init();
     findField("pgm")->setTextPadded(activeDrum().getProgram() + 1, " ");
 }
 
 void PgmParamsScreen::displayTune()
 {
-    init();
     auto program = getProgramOrThrow();
     auto tune = sampler->getLastNp(program.get())->getTune();
     auto sign = tune < 0 ? "-" : " ";
@@ -265,7 +256,6 @@ void PgmParamsScreen::displayTune()
 
 void PgmParamsScreen::displayDecayMode()
 {
-    init();
     auto program = getProgramOrThrow();
     findField("dcymd")->setText(decayModes[sampler->getLastNp(program.get())->getDecayMode()]);
     displayAttackDecay();
@@ -273,7 +263,6 @@ void PgmParamsScreen::displayDecayMode()
 
 void PgmParamsScreen::displayVoiceOverlap()
 {
-    init();
 
     auto program = getProgramOrThrow();
     const auto lastNoteParameters = sampler->getLastNp(program.get());
