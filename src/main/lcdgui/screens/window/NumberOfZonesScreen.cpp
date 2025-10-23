@@ -42,7 +42,6 @@ void NumberOfZonesScreen::function(int i)
 
 void NumberOfZonesScreen::turnWheel(int i)
 {
-	init();
     
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

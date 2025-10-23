@@ -17,7 +17,6 @@ void AssignmentViewScreen::open()
 
 	ls->setFocus(getFocusFromPadIndex());
 
-	init();
 	displayAssignmentView();
 	mpc.addObserver(this); // Subscribe to "pad" and "bank" messages
 }
@@ -29,7 +28,6 @@ void AssignmentViewScreen::close()
 
 void AssignmentViewScreen::up()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -45,7 +43,6 @@ void AssignmentViewScreen::up()
 
 void AssignmentViewScreen::down()
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -61,7 +58,6 @@ void AssignmentViewScreen::down()
 
 void AssignmentViewScreen::left()
 {
-    init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -79,7 +75,6 @@ void AssignmentViewScreen::left()
 
 void AssignmentViewScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -96,7 +91,6 @@ void AssignmentViewScreen::right()
 
 void AssignmentViewScreen::turnWheel(int i)
 {
-	init();
     auto program = getProgramOrThrow();
     auto lastPad = sampler->getLastPad(program.get());
 	lastPad->setNote(lastPad->getNote() + i);
@@ -172,7 +166,6 @@ void AssignmentViewScreen::displayNote()
 
 void AssignmentViewScreen::displaySoundName()
 {
-    init();
 
     auto padIndex = getPadIndexFromFocus();
     auto program = getProgramOrThrow();
@@ -195,7 +188,6 @@ void AssignmentViewScreen::displaySoundName()
 
 int AssignmentViewScreen::getPadIndexFromFocus()
 {
-    init();
 
     int padIndex = -1;
 

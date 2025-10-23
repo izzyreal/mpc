@@ -78,7 +78,6 @@ void ZoneStartFineScreen::function(int i)
 
 void ZoneStartFineScreen::turnWheel(int i)
 {
-	init();
 	auto sound = sampler->getSound();
     auto zoneScreen = mpc.screens->get<ZoneScreen>();
 
@@ -139,7 +138,6 @@ void ZoneStartFineScreen::setSlider(int i)
         return;
     }
 
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

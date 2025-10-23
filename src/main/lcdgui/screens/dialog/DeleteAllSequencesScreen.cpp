@@ -9,7 +9,6 @@ DeleteAllSequencesScreen::DeleteAllSequencesScreen(mpc::Mpc& mpc, const int laye
 
 void DeleteAllSequencesScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

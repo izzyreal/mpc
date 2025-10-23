@@ -20,7 +20,6 @@ void CopySequenceScreen::open()
 
 void CopySequenceScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{
@@ -41,7 +40,6 @@ void CopySequenceScreen::function(int i)
 
 void CopySequenceScreen::turnWheel(int i)
 {
-    init();
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	if (focusedFieldName.find("0") != std::string::npos)
 	{

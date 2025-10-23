@@ -48,7 +48,6 @@ void ChangeBarsScreen::function(int i)
 
 void ChangeBarsScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

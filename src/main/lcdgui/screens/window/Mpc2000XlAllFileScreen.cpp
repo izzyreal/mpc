@@ -15,7 +15,6 @@ Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc& mpc, const int layerInd
 
 void Mpc2000XlAllFileScreen::function(int i)
 {
-	init();
 
 	auto loadScreen = mpc.screens->get<LoadScreen>();
 

@@ -40,7 +40,6 @@ void MidiInputScreen::function(int i)
 
 void MidiInputScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

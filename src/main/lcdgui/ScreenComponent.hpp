@@ -45,7 +45,6 @@ namespace mpc::lcdgui
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
-		std::shared_ptr<mpc::sequencer::Track> track;
 
 		mpc::engine::Drum& activeDrum();
         std::shared_ptr<Field> getFocusedField();
@@ -73,18 +72,20 @@ namespace mpc::lcdgui
 		std::string getFirstField();
 		std::map<std::string, std::vector<std::string>>& getTransferMap();
 
-	protected:
-		virtual void init()
-        {
-			track = mpc.getSequencer()->getActiveTrack();
-		}
-
 	public:
         virtual void left() { command::PushLeftCommand(mpc).execute(); }
         virtual void right() { command::PushRightCommand(mpc).execute(); }
         virtual void up() { command::PushUpCommand(mpc).execute(); }
         virtual void down() { command::PushDownCommand(mpc).execute(); }
-        virtual void function(int i) { init(); if (i == 3) mpc.getLayeredScreen()->closeCurrentScreen(); }
+        
+        virtual void function(int i)
+        {
+            if (i == 3)
+            {
+                mpc.getLayeredScreen()->closeCurrentScreen();
+            }
+        }
+        
         virtual void openWindow();
         virtual void turnWheel(int) {}
         virtual void numpad(int i) { command::PushNumPadCommand(mpc, i).execute(); }

@@ -36,7 +36,6 @@ void MonoToStereoScreen::open()
 
 void MonoToStereoScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -70,7 +69,6 @@ void MonoToStereoScreen::turnWheel(int i)
 
 void MonoToStereoScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -94,7 +92,6 @@ void MonoToStereoScreen::openNameScreen()
 
 void MonoToStereoScreen::function(int j)
 {
-	init();
 	
 	switch (j)
 	{

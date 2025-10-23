@@ -19,7 +19,6 @@ void CopyTrackScreen::open()
 
 void CopyTrackScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{
@@ -38,7 +37,6 @@ void CopyTrackScreen::function(int i)
 
 void CopyTrackScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

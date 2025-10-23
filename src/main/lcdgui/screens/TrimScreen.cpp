@@ -46,7 +46,6 @@ void TrimScreen::open()
 
 void TrimScreen::openWindow()
 {
-	init();
 	
     const auto focusedField = getFocusedField();
 
@@ -74,7 +73,6 @@ void TrimScreen::openWindow()
 
 void TrimScreen::function(int f)
 {
-	init();
 	
 	switch (f)
 	{
@@ -116,7 +114,6 @@ void TrimScreen::function(int f)
 
 void TrimScreen::turnWheel(int i)
 {
-	init();
 
 	auto sound = sampler->getSound();
 
@@ -227,7 +224,6 @@ void TrimScreen::setSlider(int i)
         return;
     }
     
-	init();
 
     const auto focusedField = getFocusedField();
 
@@ -347,7 +343,6 @@ void TrimScreen::pressEnter()
 		return;
 	}
 
-	init();
 
     auto focusedField = getFocusedField();
 

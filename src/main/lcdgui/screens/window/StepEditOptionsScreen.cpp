@@ -28,7 +28,6 @@ void StepEditOptionsScreen::function(int i)
 
 void StepEditOptionsScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     

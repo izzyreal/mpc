@@ -26,7 +26,6 @@ void StereoToMonoScreen::open()
 
 void StereoToMonoScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -65,7 +64,6 @@ void StereoToMonoScreen::openNameScreen()
 
 void StereoToMonoScreen::function(int i)
 {
-	init();
 		
 	switch (i)
 	{

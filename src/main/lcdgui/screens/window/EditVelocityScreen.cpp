@@ -19,7 +19,6 @@ EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EditVelocityScreen::setNote0(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -62,6 +61,8 @@ void EditVelocityScreen::open()
 void EditVelocityScreen::function(int i)
 {
 	ScreenComponent::function(i);
+
+    auto track = mpc.getSequencer()->getActiveTrack();
 	
 	switch (i)
 	{
@@ -99,7 +100,6 @@ void EditVelocityScreen::function(int i)
 
 void EditVelocityScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -124,7 +124,7 @@ void EditVelocityScreen::displayTime()
 
 void EditVelocityScreen::displayNotes()
 {
-	init();
+    auto track = mpc.getSequencer()->getActiveTrack();
 	
 	if (track->getBus() == 0)
 	{

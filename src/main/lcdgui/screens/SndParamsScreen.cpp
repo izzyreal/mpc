@@ -36,7 +36,6 @@ void SndParamsScreen::open()
 
 void SndParamsScreen::openWindow()
 {
-	init();
 
     const auto focusedField = getFocusedField();
 
@@ -58,7 +57,6 @@ void SndParamsScreen::openWindow()
 
 void SndParamsScreen::function(int f)
 {
-	init();
 	
 	switch (f)
 	{
@@ -97,7 +95,6 @@ void SndParamsScreen::function(int f)
 
 void SndParamsScreen::turnWheel(int i)
 {
-	init();
 	auto sound = sampler->getSound();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();

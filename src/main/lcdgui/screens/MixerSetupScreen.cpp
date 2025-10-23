@@ -58,7 +58,6 @@ void MixerSetupScreen::displayRecordMixChanges() {
 
 void MixerSetupScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -90,7 +89,6 @@ void MixerSetupScreen::turnWheel(int i)
 
 void MixerSetupScreen::function(int i)
 {
-	init();
 
 	if (i < 4)
 	{

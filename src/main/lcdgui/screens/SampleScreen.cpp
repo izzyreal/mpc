@@ -74,7 +74,6 @@ void SampleScreen::openWindow()
 
 void SampleScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -134,7 +133,6 @@ void SampleScreen::function(int i)
 
 void SampleScreen::turnWheel(int i)
 {
-    init();
     auto ams = mpc.getAudioMidiServices();
 
     if (!ams->isRecordingSound())

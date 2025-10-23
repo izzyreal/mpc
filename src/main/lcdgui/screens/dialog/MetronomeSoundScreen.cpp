@@ -202,7 +202,6 @@ void MetronomeSoundScreen::setNormalVelo(int i)
 
 void MetronomeSoundScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -214,7 +213,6 @@ void MetronomeSoundScreen::function(int i)
 
 void MetronomeSoundScreen::turnWheel(int i)
 {
-    init();
     
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -243,7 +241,6 @@ void MetronomeSoundScreen::turnWheel(int i)
 
 void MetronomeSoundScreen::update(Observable* o, Message message)
 {
-    init();
 
     const auto msg = std::get<std::string>(message);
 

@@ -10,7 +10,6 @@ VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VeloEnvFilterScreen::open()
 {
-    init();
     velo = 127;
     displayNote();
     displayAttack();
@@ -29,7 +28,6 @@ void VeloEnvFilterScreen::close()
 
 void VeloEnvFilterScreen::turnWheel(int i)
 {
-    init();
 
     auto program = getProgramOrThrow();
     auto lastNp = sampler->getLastNp(program.get());

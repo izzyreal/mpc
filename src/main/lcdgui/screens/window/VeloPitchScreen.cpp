@@ -11,7 +11,6 @@ VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VeloPitchScreen::open()
 {
-	init();
 
 	displayNote();
 	displayTune();
@@ -28,7 +27,6 @@ void VeloPitchScreen::close()
 
 void VeloPitchScreen::turnWheel(int i)
 {
-	init();
 
     auto program = getProgramOrThrow();
 	auto lastNp = sampler->getLastNp(program.get());

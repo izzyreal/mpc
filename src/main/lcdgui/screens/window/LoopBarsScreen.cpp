@@ -21,7 +21,6 @@ void LoopBarsScreen::open()
 
 void LoopBarsScreen::turnWheel(int i)
 {
-	init();
 	auto seq = sequencer.lock()->getActiveSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();

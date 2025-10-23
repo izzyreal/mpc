@@ -9,7 +9,6 @@ DeleteAllSongScreen::DeleteAllSongScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void DeleteAllSongScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

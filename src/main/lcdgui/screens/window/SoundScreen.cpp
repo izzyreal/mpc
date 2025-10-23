@@ -19,7 +19,6 @@ void SoundScreen::open()
 
 void SoundScreen::openNameScreen()
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

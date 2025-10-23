@@ -42,7 +42,6 @@ void SequenceScreen::function(int i)
 
 void SequenceScreen::openNameScreen()
 {
-    init();
 
     std::function<void(std::string&)> enterAction;
     std::string initialNameScreenName;

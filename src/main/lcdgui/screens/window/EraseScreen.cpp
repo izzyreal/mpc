@@ -47,7 +47,6 @@ void EraseScreen::open()
 
 void EraseScreen::turnWheel(int i)
 {
-	init();
 
 	if (checkAllTimesAndNotes(mpc, i))
 		return;
@@ -70,7 +69,6 @@ void EraseScreen::turnWheel(int i)
 
 void EraseScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{
@@ -128,7 +126,6 @@ void EraseScreen::displayType()
 
 void EraseScreen::displayNotes()
 {	
-	init();
 
 	if (erase != 0 && ((erase == 1 && type != 0) || (erase == 2 && type != 0)))
 	{

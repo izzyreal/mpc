@@ -97,7 +97,6 @@ void LoopToFineScreen::function(int i)
 
 void LoopToFineScreen::turnWheel(int i)
 {
-	init();
 	auto sound = sampler->getSound();
 	auto loopScreen = mpc.screens->get<LoopScreen>();
 
@@ -173,7 +172,6 @@ void LoopToFineScreen::setSlider(int i)
         return;
     }
 
-    init();
 
     auto loopScreen = mpc.screens->get<LoopScreen>();
 

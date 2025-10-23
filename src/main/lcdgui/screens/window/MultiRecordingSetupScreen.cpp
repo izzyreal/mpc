@@ -56,9 +56,9 @@ void MultiRecordingSetupScreen::open()
     }
 }
 
+/*
 void MultiRecordingSetupScreen::init()
 {
-	ScreenComponent::init();
 	
 	yPos = 0;
 	
@@ -67,10 +67,10 @@ void MultiRecordingSetupScreen::init()
 	if (focusedFieldName.length() == 2)
 		yPos = stoi(focusedFieldName.substr(1, 2));
 }
+*/
 
 void MultiRecordingSetupScreen::left()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -82,7 +82,6 @@ void MultiRecordingSetupScreen::left()
 
 void MultiRecordingSetupScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -94,7 +93,6 @@ void MultiRecordingSetupScreen::right()
 
 void MultiRecordingSetupScreen::turnWheel(int i)
 {
-	init();
 	
 	auto seq = sequencer.lock()->getActiveSequence();
 
@@ -145,7 +143,6 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 
 void MultiRecordingSetupScreen::up()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -165,7 +162,6 @@ void MultiRecordingSetupScreen::up()
 
 void MultiRecordingSetupScreen::down()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
@@ -259,7 +255,6 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 	for (auto j = 0; j < 3; j++)
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
 	
-	init();
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	auto displayYPos = stoi(focusedFieldName.substr(1, 2));
 	displayMrsLine(displayYPos);

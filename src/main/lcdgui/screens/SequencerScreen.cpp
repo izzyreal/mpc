@@ -59,9 +59,7 @@ void SequencerScreen::open()
 	findField("tempo")->setLocation(18, 11);
 	findField("tempo")->setLeftMargin(1);
 
-	init();
 	sequence = sequencer.lock()->getActiveSequence();
-	track = sequencer.lock()->getActiveTrack();
 
 	findLabel("punch-time-0")->Hide(true);
 	findLabel("punch-time-1")->Hide(true);
@@ -88,7 +86,11 @@ void SequencerScreen::open()
 
 	sequencer.lock()->addObserver(this);
 	sequence.lock()->addObserver(this);
-	track->addObserver(this);
+
+    for (auto &t : sequence.lock()->getTracks())
+    {
+        t->addObserver(this);
+    }
 
 	findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
 
@@ -171,7 +173,10 @@ void SequencerScreen::close()
 
     sequencer.lock()->deleteObserver(this);
 	sequence.lock()->deleteObserver(this);
-	track->deleteObserver(this);
+    for (auto &t : sequence.lock()->getTracks())
+    {
+        t->deleteObserver(this);
+    }
 }
 
 void SequencerScreen::displayVelo()
@@ -181,6 +186,7 @@ void SequencerScreen::displayVelo()
 
 void SequencerScreen::displayDeviceNumber()
 {
+    auto track = mpc.getSequencer()->getActiveTrack();
 	if (track->getDeviceIndex() == 0)
 	{
 		findField("devicenumber")->setText("OFF");
@@ -209,14 +215,21 @@ void SequencerScreen::displayBars()
 
 void SequencerScreen::displayPgm()
 {
+    auto track = mpc.getSequencer()->getActiveTrack();
 	if (track->getProgramChange() == 0)
+    {
 		findField("pgm")->setText("OFF");
+    }
 	else
+    {
 		findField("pgm")->setText(std::to_string(track->getProgramChange()));
+    }
 }
 
 void SequencerScreen::displayDeviceName()
 {
+    auto track = mpc.getSequencer()->getActiveTrack();
+
 	if (track->getBus() != 0)
 	{
 		if (track->getDeviceIndex() == 0)
@@ -233,9 +246,13 @@ void SequencerScreen::displayDeviceName()
 	else if (track->getBus() == 0)
 	{
 		if (track->getDeviceIndex() == 0)
-			findLabel("devicename")->setText("NewPgm-A");
+        {
+            findLabel("devicename")->setText("NewPgm-A");
+        }
 		else
+        {
 			findLabel("devicename")->setText(sequencer.lock()->getActiveSequence()->getDeviceName(track->getDeviceIndex()));
+        }
 	}
 }
 
@@ -359,16 +376,22 @@ void SequencerScreen::displayTiming()
 void SequencerScreen::update(Observable* o, Message message)
 {
 	if (sequence.lock())
+    {
 		sequence.lock()->deleteObserver(this);
+
+        for (auto &t : sequence.lock()->getTracks())
+        {
+            t->deleteObserver(this);
+        }
+    }
 	
 	sequence = sequencer.lock()->getActiveSequence();
 	sequence.lock()->addObserver(this);
 
-	if (track)
-		track->deleteObserver(this);
-
-	track = sequencer.lock()->getActiveTrack();
-	track->addObserver(this);
+    for (auto &t : sequence.lock()->getTracks())
+    {
+        t->addObserver(this);
+    }
 
     const auto msg = std::get<std::string>(message);
 
@@ -465,7 +488,6 @@ void SequencerScreen::update(Observable* o, Message message)
 
 void SequencerScreen::pressEnter()
 {
-	init();
 
     auto focusedField = getFocusedFieldOrThrow();
 
@@ -502,14 +524,13 @@ void SequencerScreen::pressEnter()
 		else if (focusedFieldName == "velo")
 		{
             setTrackToUsedIfItIsCurrentlyUnused();
-			track->setVelocityRatio(candidate);
+			mpc.getSequencer()->getActiveTrack()->setVelocityRatio(candidate);
 		}
 	}
 }
 
 void SequencerScreen::function(int i)
 {
-	init();
 	ScreenComponent::function(i);
 	auto punchScreen = mpc.screens->get<PunchScreen>();
 
@@ -543,8 +564,11 @@ void SequencerScreen::function(int i)
 		break;
 	}
 	case 2:
+    {
+        auto track = mpc.getSequencer()->getActiveTrack();
 		track->setOn(!track->isOn());
 		break;
+    }
 	case 3:
 	{
 		sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
@@ -562,6 +586,8 @@ void SequencerScreen::function(int i)
 
 void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused()
 {
+    auto track = mpc.getSequencer()->getActiveTrack();
+
 	if (!track->isUsed())
 	{
 		track->setUsed(true);
@@ -571,7 +597,6 @@ void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused()
 
 void SequencerScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -584,6 +609,8 @@ void SequencerScreen::turnWheel(int i)
     {
         return;
     }
+
+    auto track = mpc.getSequencer()->getActiveTrack();
 
 	if (focusedFieldName == "now0")
 	{
@@ -730,10 +757,10 @@ void SequencerScreen::turnWheel(int i)
 
 void SequencerScreen::openWindow()
 {
-	init();
-
 	if (sequencer.lock()->isPlaying())
+    {
 		return;
+    }
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
@@ -768,8 +795,12 @@ void SequencerScreen::openWindow()
 	}
 	else if (focusedFieldName == "tr")
 	{
+        auto track = mpc.getSequencer()->getActiveTrack();
+
 		if (!track->isUsed())
+        {
 			track->setUsed(true);
+        }
 
         mpc.getLayeredScreen()->openScreen<TrackScreen>();
 	}
@@ -881,7 +912,6 @@ void SequencerScreen::displayPunchWhileRecording()
 		time0->Hide(punchScreen->autoPunch == 1);
 		time1->Hide(punchScreen->autoPunch == 0);
 
-		init();
 
 		auto seq = sequence.lock();
 

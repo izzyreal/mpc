@@ -50,7 +50,6 @@ void VmpcAutoSaveScreen::function(int i)
 
 void VmpcAutoSaveScreen::turnWheel(int i)
 {
-    init();
     
     const auto focusedFieldName = getFocusedFieldName();
 

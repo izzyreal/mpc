@@ -11,7 +11,6 @@ DeleteAllTracksScreen::DeleteAllTracksScreen(mpc::Mpc& mpc, const int layerIndex
 
 void DeleteAllTracksScreen::function(int i)
 {
-	init();
 	switch (i)
 	{
 	case 3:

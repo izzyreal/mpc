@@ -21,7 +21,6 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadASoundScreen::open()
 {
-    init();
     auto loadScreen = mpc.screens->get<LoadScreen>();
     findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
     assignToNote = mpc.getNote();
@@ -36,7 +35,6 @@ void LoadASoundScreen::close()
 
 void LoadASoundScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -59,7 +57,6 @@ void LoadASoundScreen::turnWheel(int i)
 
 void LoadASoundScreen::function(int i)
 {
-    init();
 
     switch (i)
     {
@@ -164,7 +161,6 @@ void LoadASoundScreen::keepSound()
 
 void LoadASoundScreen::displayAssignToNote()
 {
-    init();
     auto padIndex = getProgramOrThrow()->getPadIndexFromNote(assignToNote);
     auto padName = sampler->getPadName(padIndex);
     auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));

@@ -749,6 +749,17 @@ std::string LayeredScreen::getFirstLayerScreenName()
     return "sequencer"; // return some sane default
 }
 
+void LayeredScreen::openPreviousScreen()
+{
+    if (history.size() < 2)
+    {
+        printf("There's no previous screen!\n");
+        return;
+    }
+
+    openScreen(history[history.size() - 2]);
+}
+
 #define X(ns, Class, name) \
     template void mpc::lcdgui::LayeredScreen::openScreen<mpc::lcdgui::ns::Class>(); \
     template void mpc::lcdgui::LayeredScreen::showPopupAndThenOpen<mpc::lcdgui::ns::Class>(std::string, int); \

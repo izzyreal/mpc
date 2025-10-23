@@ -16,7 +16,6 @@ void DeleteSequenceScreen::open()
 
 void DeleteSequenceScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -29,7 +28,6 @@ void DeleteSequenceScreen::turnWheel(int i)
 
 void DeleteSequenceScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

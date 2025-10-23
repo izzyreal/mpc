@@ -19,7 +19,6 @@ ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex
 
 void ChannelSettingsScreen::open()
 {
-	init();
 	auto mixerScreen = mpc.screens->get<MixerScreen>();
     const int padIndexWithoutBank = mixerScreen->xPos;
     const int padIndexWithBank = padIndexWithoutBank + (mpc.getBank() * 16);
@@ -36,7 +35,6 @@ void ChannelSettingsScreen::close()
 
 std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 {
-	init();
 
 	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
@@ -53,7 +51,6 @@ std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 
 std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 {
-	init();
 
 	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
@@ -70,7 +67,6 @@ std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 
 void ChannelSettingsScreen::turnWheel(int i)
 {
-    init();
 
 	auto stereoMixerChannel = getStereoMixerChannel();
 	auto indivFxMixerChannel = getIndivFxMixerChannel();
@@ -120,7 +116,6 @@ void ChannelSettingsScreen::turnWheel(int i)
 
 void ChannelSettingsScreen::update(Observable* o, Message message)
 {
-	init();
 
     const auto msg = std::get<std::string>(message);
 

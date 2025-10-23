@@ -14,7 +14,6 @@ void TransmitProgramChangesScreen::open()
 
 void TransmitProgramChangesScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	

@@ -70,7 +70,6 @@ namespace mpc::lcdgui::screens::window
 		void left() override;
 		void right() override;
 		void function(int j) override;
-		void init() override;
 		void turnWheel(int j) override;
 		void down() override;
 		void up() override;

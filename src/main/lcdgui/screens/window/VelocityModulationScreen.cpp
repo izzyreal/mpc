@@ -9,7 +9,6 @@ VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int laye
 
 void VelocityModulationScreen::open()
 {
-	init();
 	displayNote();
 	displayVeloAttack();
 	displayVeloStart();
@@ -26,7 +25,6 @@ void VelocityModulationScreen::close()
 
 void VelocityModulationScreen::turnWheel(int i)
 {
-	init();
 
     auto program = getProgramOrThrow();
 	auto lastNp = sampler->getLastNp(program.get());

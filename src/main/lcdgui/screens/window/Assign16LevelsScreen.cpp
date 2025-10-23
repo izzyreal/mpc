@@ -39,7 +39,6 @@ void Assign16LevelsScreen::function(int i)
 
 void Assign16LevelsScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -139,8 +138,7 @@ int Assign16LevelsScreen::getParameter()
 
 void Assign16LevelsScreen::displayNote()
 {
-    init();
-
+    auto track = mpc.getSequencer()->getActiveTrack();
     auto pgmNumber = sampler->getDrumBusProgramIndex(track->getBus());
     auto program = sampler->getProgram(pgmNumber);
     auto padIndex = program->getPadIndexFromNote(note);

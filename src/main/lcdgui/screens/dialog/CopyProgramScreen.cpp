@@ -9,7 +9,6 @@ CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CopyProgramScreen::open()
 {
-	init();
 	pgm0 = activeDrum().getProgram();
 	pgm1 = pgm0;
 
@@ -20,7 +19,6 @@ void CopyProgramScreen::open()
 
 void CopyProgramScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	
@@ -41,7 +39,6 @@ void CopyProgramScreen::function(int i)
 
 void CopyProgramScreen::turnWheel(int i)
 {
-	init();
 		
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

@@ -20,7 +20,6 @@ EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EventsScreen::setNote0(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -101,7 +100,6 @@ void EventsScreen::open()
 
 void EventsScreen::function(int i)
 {
-    init();
 
     auto fromSequence = sequencer.lock()->getActiveSequence();
     auto toSequence = sequencer.lock()->getSequence(toSq);
@@ -170,7 +168,6 @@ void EventsScreen::function(int i)
 
 void EventsScreen::turnWheel(int i)
 {
-    init();
     auto toSequence = sequencer.lock()->getSequence(toSq);
 
     if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getActiveSequence().get(), sequencer.lock()->getActiveTrack().get()))
@@ -426,7 +423,6 @@ void EventsScreen::displayEdit()
 
 void EventsScreen::displayNotes()
 {
-    init();
 
     if (sequencer.lock()->getActiveTrack()->getBus() == 0)
     {

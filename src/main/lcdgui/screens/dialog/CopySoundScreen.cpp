@@ -23,7 +23,6 @@ void CopySoundScreen::open()
 
 void CopySoundScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{
@@ -50,7 +49,6 @@ void CopySoundScreen::function(int i)
 
 void CopySoundScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -68,7 +66,6 @@ void CopySoundScreen::turnWheel(int i)
 
 void CopySoundScreen::openNameScreen()
 {
-    init();
 
     const auto enterAction = [this](std::string& nameScreenName) {
         if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))

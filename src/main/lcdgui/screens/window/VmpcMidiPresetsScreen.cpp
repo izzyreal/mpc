@@ -89,7 +89,6 @@ void VmpcMidiPresetsScreen::displayUpAndDown()
 
 void VmpcMidiPresetsScreen::turnWheel(int i)
 {
-    init();
     auto &presets = mpc.midiControlPresets;
     const int presetIndex = (row + rowOffset) - 1;
 

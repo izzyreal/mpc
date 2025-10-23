@@ -67,7 +67,6 @@ void TrMuteScreen::right()
 
 void TrMuteScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -91,7 +90,6 @@ void TrMuteScreen::turnWheel(int i)
 
 void TrMuteScreen::function(int i)
 {
-	init();
 	ScreenComponent::function(i);
 	
 	switch (i)

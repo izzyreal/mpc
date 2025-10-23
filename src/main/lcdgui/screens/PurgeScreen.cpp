@@ -18,7 +18,6 @@ void PurgeScreen::open()
 
 void PurgeScreen::function(int f)
 {
-	init();
 	
 	switch (f)
 	{

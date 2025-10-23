@@ -12,7 +12,6 @@ InitScreen::InitScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void InitScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

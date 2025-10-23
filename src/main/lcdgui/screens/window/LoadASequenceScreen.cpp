@@ -43,7 +43,6 @@ void LoadASequenceScreen::open()
 
 void LoadASequenceScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -53,7 +52,6 @@ void LoadASequenceScreen::turnWheel(int i)
 
 void LoadASequenceScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

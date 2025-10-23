@@ -9,7 +9,6 @@ MuteAssignScreen::MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MuteAssignScreen::open()
 {
-	init();
 	displayNote();
 	displayNote0();
 	displayNote1();
@@ -23,7 +22,6 @@ void MuteAssignScreen::close()
 
 void MuteAssignScreen::turnWheel(int i)
 {
-    init();
     auto program = getProgramOrThrow();
 	auto lastNoteParameters = sampler->getLastNp(program.get());
 

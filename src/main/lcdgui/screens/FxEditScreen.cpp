@@ -33,14 +33,12 @@ void FxEditScreen::open()
 }
 
 void FxEditScreen::function(int f) {
-	init();
 	switch (f) {
 	}
 }
 
 void FxEditScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 	
@@ -97,7 +95,6 @@ void FxEditScreen::checkEffects()
     /*
     std::string prevParam = param;
 
-	init();
 
 	if (prevParam != param)
 	{

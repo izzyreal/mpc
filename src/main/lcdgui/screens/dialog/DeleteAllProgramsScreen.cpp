@@ -9,7 +9,6 @@ DeleteAllProgramsScreen::DeleteAllProgramsScreen(mpc::Mpc& mpc, const int layerI
 
 void DeleteAllProgramsScreen::function(int j)
 {
-	init();
 
 	switch (j)
 	{

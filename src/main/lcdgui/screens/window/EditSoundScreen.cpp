@@ -312,7 +312,6 @@ void EditSoundScreen::setEndMargin(int i)
 
 void EditSoundScreen::right()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -346,7 +345,6 @@ void EditSoundScreen::openNameScreen()
 
 void EditSoundScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

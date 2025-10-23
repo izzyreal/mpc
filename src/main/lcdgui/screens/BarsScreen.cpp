@@ -56,7 +56,6 @@ void BarsScreen::close()
 
 void BarsScreen::function(int j)
 {
-    init();
     auto eventsScreen = mpc.screens->get<EventsScreen>();
 
     switch (j)
@@ -88,7 +87,6 @@ void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar, int
 
 void BarsScreen::turnWheel(int i)
 {
-    init();
 
     auto eventsScreen = mpc.screens->get<EventsScreen>();
     auto userScreen = mpc.screens->get<UserScreen>();

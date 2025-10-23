@@ -43,7 +43,6 @@ void NextSeqPadScreen::right()
 
 void NextSeqPadScreen::function(int i)
 {
-    init();
  
     if (i == 3 || i == 4)
     {

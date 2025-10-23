@@ -29,7 +29,6 @@ void UserScreen::open()
 
 void UserScreen::function(int i)
 {
-    init();
 	
 	switch (i)
 	{
@@ -49,7 +48,6 @@ void UserScreen::function(int i)
 
 void UserScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldName();
 
@@ -171,7 +169,6 @@ void UserScreen::displayVelo()
 
 void UserScreen::displayDeviceName()
 {
-	init();
 
 	if (bus == 0)
 	{

@@ -14,7 +14,6 @@ void ConvertSoundScreen::open()
 
 void ConvertSoundScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -26,7 +25,6 @@ void ConvertSoundScreen::turnWheel(int i)
 
 void ConvertSoundScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

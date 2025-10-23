@@ -9,7 +9,6 @@ FormatScreen::FormatScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void FormatScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

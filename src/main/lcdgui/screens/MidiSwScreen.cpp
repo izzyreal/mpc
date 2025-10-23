@@ -80,7 +80,6 @@ void MidiSwScreen::setSwitches(const std::vector<std::pair<int, int>>& _switches
 
 void MidiSwScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
@@ -99,7 +98,6 @@ void MidiSwScreen::turnWheel(int i)
 
 void MidiSwScreen::function(int i)
 {
-    init();
     
     switch (i)
     {
@@ -111,7 +109,6 @@ void MidiSwScreen::function(int i)
 
 void MidiSwScreen::left()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     
@@ -128,7 +125,6 @@ void MidiSwScreen::left()
 
 void MidiSwScreen::right()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

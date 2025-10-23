@@ -48,7 +48,6 @@ void ZoneScreen::open()
 
 void ZoneScreen::openWindow()
 {
-	init();
 
     const auto focusedField = getFocusedField();
 
@@ -82,7 +81,6 @@ void ZoneScreen::openWindow()
 
 void ZoneScreen::function(int f)
 {
-	init();
 
 	switch (f)
 	{
@@ -131,7 +129,6 @@ void ZoneScreen::right()
 
 void ZoneScreen::turnWheel(int i)
 {
-	init();
 
 	auto sound = sampler->getSound();
 
@@ -210,7 +207,6 @@ void ZoneScreen::setSlider(int i)
         return;
     }
 
-    init();
 
     const auto focusedField = getFocusedField();
 
@@ -449,7 +445,6 @@ void ZoneScreen::pressEnter()
 		return;
 	}
 
-	init();
 
     const auto focusedField = getFocusedField();
 

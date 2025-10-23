@@ -47,7 +47,7 @@ void InsertEventScreen::function(int i)
 
 void InsertEventScreen::insertEvent()
 {
-	init();
+    auto track = mpc.getSequencer()->getActiveTrack();
 
 	if (insertEventType == 0)
 	{
@@ -112,7 +112,6 @@ void InsertEventScreen::insertEvent()
 
 void InsertEventScreen::turnWheel(int i)
 {
-	init();
 	
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -124,11 +123,7 @@ void InsertEventScreen::turnWheel(int i)
 
 void InsertEventScreen::setInsertEventType(int i)
 {
-	if (i < 0 || i > 7)
-	{
-		return;
-	}
-	insertEventType = i;
+	insertEventType = std::clamp(i, 0, 7);
 	displayInsertEventType();
 }
 
@@ -136,3 +131,4 @@ bool InsertEventScreen::isEventAddedBeforeLeavingTheScreen()
 {
     return eventAddedBeforeLeavingTheScreen;
 }
+

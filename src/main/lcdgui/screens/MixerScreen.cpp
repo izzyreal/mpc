@@ -97,7 +97,6 @@ std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
 
 void MixerScreen::displayMixerStrip(int stripIndex)
 {
-    init();
     
     auto strip = mixerStrips[stripIndex];
     auto stereoMixer = getStereoMixerChannel(stripIndex);
@@ -154,7 +153,6 @@ void MixerScreen::update(Observable* o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 
-    init();
     
     if (msg == "bank")
     {
@@ -289,7 +287,6 @@ void MixerScreen::down()
 
 void MixerScreen::left()
 {
-    init();
     
     if (xPos <= 0)
     {
@@ -304,7 +301,6 @@ void MixerScreen::left()
 
 void MixerScreen::right()
 {
-    init();
     
     if (xPos >= 15)
     {
@@ -319,13 +315,11 @@ void MixerScreen::right()
 
 void MixerScreen::openWindow()
 {
-    init();
         mpc.getLayeredScreen()->openScreen<ChannelSettingsScreen>();
 }
 
 void MixerScreen::function(int f)
 {
-    init();
     
     switch (f)
     {
@@ -354,7 +348,6 @@ void MixerScreen::function(int f)
 
 void MixerScreen::turnWheel(int i)
 {
-    init();
     
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {

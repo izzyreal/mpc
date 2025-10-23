@@ -27,7 +27,6 @@ void ResampleScreen::open()
 
 void ResampleScreen::turnWheel(int i)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -47,7 +46,6 @@ void ResampleScreen::turnWheel(int i)
 
 void ResampleScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -71,7 +69,6 @@ void ResampleScreen::openNameScreen()
 
 void ResampleScreen::function(int i)
 {
-	init();
 	
 	switch (i)
 	{

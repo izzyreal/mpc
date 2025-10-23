@@ -12,14 +12,12 @@ ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ProgramScreen::open()
 {
-	init();
 	displayProgramName();
 	displayMidiProgramChange();
 }
 
 void ProgramScreen::openNameScreen()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -40,7 +38,6 @@ void ProgramScreen::openNameScreen()
 
 void ProgramScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

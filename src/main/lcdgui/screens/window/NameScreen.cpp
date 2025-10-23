@@ -66,7 +66,6 @@ void NameScreen::close()
 
 void NameScreen::left()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -88,7 +87,6 @@ void NameScreen::left()
 
 void NameScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -111,7 +109,6 @@ void NameScreen::right()
 
 void NameScreen::turnWheel(int j)
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -145,7 +142,6 @@ void NameScreen::turnWheel(int j)
 
 void NameScreen::function(int i)
 {
-    init();
 
     switch (i)
 	{
@@ -336,7 +332,6 @@ void NameScreen::displayName()
 
 void NameScreen::typeCharacter(char c)
 {
-    init();
 
     if (std::find(mpc::Mpc::akaiAsciiChar.begin(), mpc::Mpc::akaiAsciiChar.end(),
             c) == mpc::Mpc::akaiAsciiChar.end())
@@ -391,7 +386,6 @@ void NameScreen::typeCharacter(char c)
 
 void NameScreen::backSpace()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

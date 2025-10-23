@@ -25,7 +25,6 @@ void TrMoveScreen::open()
 
 void TrMoveScreen::turnWheel(int i)
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -49,7 +48,6 @@ void TrMoveScreen::turnWheel(int i)
 
 void TrMoveScreen::up()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -61,7 +59,6 @@ void TrMoveScreen::up()
 
 void TrMoveScreen::down()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -78,7 +75,6 @@ void TrMoveScreen::down()
 
 void TrMoveScreen::left()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
  
@@ -98,7 +94,6 @@ void TrMoveScreen::left()
 
 void TrMoveScreen::right()
 {
-    init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -113,7 +108,6 @@ void TrMoveScreen::right()
 
 void TrMoveScreen::function(int i)
 {
-    init();
     switch (i)
     {
         // Intentional fall-through

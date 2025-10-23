@@ -291,7 +291,6 @@ void TempoChangeScreen::displayTempoChange2()
 
 void TempoChangeScreen::left()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -309,7 +308,6 @@ void TempoChangeScreen::left()
 
 void TempoChangeScreen::right()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -442,9 +440,9 @@ void TempoChangeScreen::function(int j)
 	}
 }
 
+/*
 void TempoChangeScreen::init()
 {
-	ScreenComponent::init();
 	auto seq = sequencer.lock()->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
@@ -476,10 +474,10 @@ void TempoChangeScreen::init()
 	if (previousPosition >= 0)
 		previous = tceList[previousPosition];
 }
+*/
 
 void TempoChangeScreen::turnWheel(int j)
 {
-	init();
 	
 	auto seq = sequencer.lock()->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
@@ -563,7 +561,6 @@ void TempoChangeScreen::turnWheel(int j)
 
 void TempoChangeScreen::down()
 {
-	init();
 
 	auto tce1 = visibleTempoChanges[1];
 	auto tce2 = visibleTempoChanges[2];
@@ -617,7 +614,6 @@ void TempoChangeScreen::down()
 
 void TempoChangeScreen::up()
 {
-	init();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

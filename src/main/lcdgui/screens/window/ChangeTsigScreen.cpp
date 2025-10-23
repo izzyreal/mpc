@@ -53,7 +53,6 @@ void ChangeTsigScreen::function(int i)
 
 void ChangeTsigScreen::turnWheel(int i)
 {
-    init();
 
 	auto seq = sequencer.lock()->getActiveSequence();
 

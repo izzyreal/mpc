@@ -8,7 +8,6 @@ VmpcFileInUseScreen::VmpcFileInUseScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VmpcFileInUseScreen::function(int i)
 {
-	init();
 
 	switch (i)
 	{

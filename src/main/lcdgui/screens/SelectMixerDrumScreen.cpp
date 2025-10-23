@@ -19,7 +19,6 @@ void SelectMixerDrumScreen::open()
 
 void SelectMixerDrumScreen::function(int i)
 {
-	init();
 
 	if (i < 4)
 	{
