@@ -13,12 +13,13 @@ namespace mpc::audiomidi {
     class EventHandler;
 }
 
+namespace mpc::sampler { class Program; }
+
 namespace mpc::command::context {
 
-// Should be renamed to ReleaseProgramPad or similar, because we're not dealing with
-// hardware pad indices from 1 to 16 here, but with the 64 pads of a program.
 struct TriggerDrumNoteOffContext {
     const int padIndexWithBank;
+    std::shared_ptr<sampler::Program> program;
     std::function<void()> finishBasicVoiceIfSoundIsLooping;
     const bool currentScreenIsSoundScreen;
     const bool currentScreenIsSamplerScreen;

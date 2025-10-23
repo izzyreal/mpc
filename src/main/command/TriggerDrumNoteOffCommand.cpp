@@ -28,7 +28,7 @@ void TriggerDrumNoteOffCommand::execute()
 
     if (ctx.currentScreenIsSamplerScreen)
     {
-        ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(ctx.playNoteEvent->getNoteOff(), std::nullopt, std::nullopt, ctx.drumScreenSelectedDrum);
+        ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(ctx.playNoteEvent->getNoteOff(), std::nullopt, std::nullopt, ctx.drumScreenSelectedDrum, ctx.program);
     }
     else
     {
@@ -37,7 +37,8 @@ void TriggerDrumNoteOffCommand::execute()
         ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(ctx.playNoteEvent->getNoteOff(),
                                                              ctx.activeTrack->getIndex(),
                                                              ctx.activeTrack->getDeviceIndex(),
-                                                             drumIndexToUse);
+                                                             drumIndexToUse,
+                                                             ctx.program);
     }
 
     if (!ctx.recordOnEvent)

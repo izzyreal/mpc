@@ -35,6 +35,7 @@ namespace mpc::engine
         static DrumNoteOffContext buildNoteOff(
             uint64_t noteEventId,
             Drum *drum,
+            std::shared_ptr<sampler::Program> program,
             std::vector<std::shared_ptr<Voice>> *voices,
             int note,
             int noteOnStartTick

@@ -237,6 +237,8 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
         return;
     }
 
+    printf("Using drum %i\n", c.drumIndex);
+
     auto startDecayForNote = [&](int noteToStop, uint64_t noteEventId)
     {
         for (auto& voice : *c.voices)

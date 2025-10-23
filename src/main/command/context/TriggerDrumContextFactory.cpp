@@ -112,6 +112,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
 TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         mpc::Mpc &mpc,
         const int programPadIndex,
+        std::shared_ptr<sampler::Program> program,
         const std::shared_ptr<ScreenComponent> screen)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping = [basicPlayer = &mpc.getBasicPlayer()]() { basicPlayer->finishVoiceIfSoundIsLooping(); };
@@ -142,6 +143,7 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
 
     return {
         programPadIndex,
+        program,
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,

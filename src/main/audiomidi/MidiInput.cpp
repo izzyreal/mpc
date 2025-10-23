@@ -455,15 +455,18 @@ void MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 
     int padIndexWithBank = -1;
 
+    std::shared_ptr<Program> program;
+
     if (track->getBus() > 0)
     {
-        padIndexWithBank = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()))->getPadIndexFromNote(msg->getData1());
+        program = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus())); 
+        padIndexWithBank = program->getPadIndexFromNote(msg->getData1());
     }
 
     if (padIndexWithBank != -1)
     {
         const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
-        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, currentScreen);
+        auto ctx = command::context::TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, padIndexWithBank, program, currentScreen);
         command::TriggerDrumNoteOffCommand(ctx).execute();
         return;
     }

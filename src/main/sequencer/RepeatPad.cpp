@@ -179,6 +179,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                     auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
                         0,
                         &drum,
+                        program,
                         &mpc.getAudioMidiServices()->getVoices(),
                         note,
                         tickPosition

@@ -16,12 +16,15 @@
 #include <cassert>
 #include <memory>
 
+namespace mpc::sampler { class Program; }
+
 namespace mpc::controller {
 
 class ClientInputControllerBase {
     public:
         struct PhysicalPadPress {
             int bankIndex;
+            std::shared_ptr<sampler::Program> program;
             std::shared_ptr<lcdgui::ScreenComponent> screen;
             input::ClientInput::Source inputSource;
         };
@@ -78,10 +81,11 @@ class ClientInputControllerBase {
                 const int padIndex,
                 const int bankIndex,
                 const std::shared_ptr<lcdgui::ScreenComponent> screen,
-                const input::ClientInput::Source inputSource)
+                const input::ClientInput::Source inputSource,
+                std::shared_ptr<sampler::Program> program)
         {
             assert(physicalPadPresses.count(padIndex) == 0);
-            physicalPadPresses[padIndex] = { bankIndex, screen, inputSource };
+            physicalPadPresses[padIndex] = { bankIndex, program, screen, inputSource };
         }
 
         PhysicalPadPress registerPhysicalPadRelease(const int padIndex)

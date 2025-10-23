@@ -15,6 +15,10 @@ namespace mpc::sequencer {
     class NoteOnEventPlayOnly;
 }
 
+namespace mpc::sampler {
+    class Program;
+}
+
 namespace mpc::audiomidi {
     class EventHandler final : public Observable
     {
@@ -77,7 +81,8 @@ namespace mpc::audiomidi {
             void handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<NoteOffEvent>,
                                        const std::optional<int> trackIndex,
                                        const std::optional<int> trackDevice,
-                                       const std::optional<int> drumIndex);
+                                       const std::optional<int> drumIndex,
+                                       std::shared_ptr<sampler::Program>);
             
             void handleNoteOffFromFinalizedNoteOn(const std::shared_ptr<NoteOffEvent>);
             

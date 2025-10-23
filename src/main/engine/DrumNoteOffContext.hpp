@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+namespace mpc::sampler { class Program; }
+
 namespace mpc::engine
 {
     class Voice;
@@ -15,6 +17,7 @@ namespace mpc::engine
         int drumIndex;
         std::map<int, int> *drumSimultA;
         std::map<int, int> *drumSimultB;
+        std::shared_ptr<sampler::Program> program;
         std::vector<std::shared_ptr<Voice>>* voices{};
         int note{};
         int noteOnStartTick{};

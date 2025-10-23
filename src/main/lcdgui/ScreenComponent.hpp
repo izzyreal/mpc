@@ -65,6 +65,8 @@ namespace mpc::lcdgui
 		std::string getFirstField();
 		std::map<std::string, std::vector<std::string>>& getTransferMap();
 
+        std::shared_ptr<sampler::Program> getProgram() { return program; }
+
 	protected:
 		virtual void init()
         {

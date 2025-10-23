@@ -114,6 +114,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
                 noteEventIdToUse,
                 &drum,
+                program,
                 &mpc.getAudioMidiServices()->getVoices(),
                 noteOnEvent->getNote(),
                 noteOnEvent->getTick()
@@ -232,19 +233,21 @@ void EventHandler::handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent> no
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<NoteOffEvent> noteOffEvent,
         const std::optional<int> trackIndex,
         const std::optional<int> trackDevice,
-        const std::optional<int> drumIndex)
+        const std::optional<int> drumIndex,
+        std::shared_ptr<Program> program)
 {
     assert(noteOffEvent);
 
     if (drumIndex.has_value())
     {
+        assert(program != nullptr);
         auto &drum = mpc.getDrum(*drumIndex);
-        const auto program = mpc.getSampler()->getProgram(drum.getProgram());
         const auto note = noteOffEvent->getNote();
 
         auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
             0,
             &drum,
+            program,
             &mpc.getAudioMidiServices()->getVoices(),
             noteOffEvent->getNote(),
             -1
@@ -341,7 +344,7 @@ void EventHandler::handleMidiInputNoteOff(const std::shared_ptr<NoteOffEvent> no
     // This is a DRUM track, so we stop sample playback and register a program pad release.
 
     Drum *drum = &mpc.getDrum(*drumIndex);
-    
+
     const auto drumNoteOffEvent = [
         drum,note = noteOffEvent->getNote(),
         voices = &mpc.getAudioMidiServices()->getVoices(),
@@ -350,6 +353,7 @@ void EventHandler::handleMidiInputNoteOff(const std::shared_ptr<NoteOffEvent> no
         auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
             0,
             drum,
+            program,
             voices,
             note,
             -1

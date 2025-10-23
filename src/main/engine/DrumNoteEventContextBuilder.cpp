@@ -4,6 +4,7 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "engine/Drum.hpp"
 #include "engine/audio/mixer/AudioMixer.hpp"
+#include "sampler/Program.hpp"
 
 using namespace mpc;
 using namespace mpc::engine;
@@ -50,12 +51,14 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
 DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
     uint64_t noteEventId,
     Drum *drum,
+    std::shared_ptr<sampler::Program> program,
     std::vector<std::shared_ptr<Voice>> *voices,
     int note,
     int noteOnStartTick
 )
 {
     DrumNoteOffContext ctx;
+    ctx.program = program;
     ctx.noteEventId = noteEventId;
     ctx.drumIndex = drum->getIndex();
     ctx.drumSimultA = &drum->getSimultA();
