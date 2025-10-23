@@ -106,6 +106,9 @@ namespace mpc::disk {
         template<typename return_type>
         tl::expected<return_type, mpc_io_error_msg> performIoOrOpenErrorPopup(std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc);
 
+        template<typename return_type>
+        void performIoOrOpenErrorPopupNonReturning(std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc);
+
         wav_or_error readWavMeta(std::shared_ptr<MpcFile>);
         sound_or_error
         readWav2(std::shared_ptr<MpcFile>, std::function<sound_or_error(std::shared_ptr<mpc::file::wav::WavFile>)> onSuccess);
