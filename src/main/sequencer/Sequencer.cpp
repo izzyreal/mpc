@@ -299,7 +299,7 @@ void Sequencer::setSoloEnabled(bool b)
                 {
                     if (!voice->isFinished()
                             && voice->getNote() == note
-                            && voice->getVoiceOverlap() == sampler::VoiceOverlapMode::NOTE_OFF
+                            && voice->getVoiceOverlapMode() == sampler::VoiceOverlapMode::NOTE_OFF
                             && !voice->isDecaying()
                             && drumIndex == voice->getMuteInfo().getDrum())
                     {

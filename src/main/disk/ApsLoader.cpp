@@ -160,7 +160,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             
             destNoteParams->setSoundIndex(soundIndex);
             destNoteParams->setTune(srcNoteParams->getTune());
-            destNoteParams->setVoiceOverlap(srcNoteParams->getVoiceOverlap());
+            destNoteParams->setVoiceOverlapMode(srcNoteParams->getVoiceOverlapMode());
             destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
             destNoteParams->setAttack(srcNoteParams->getAttack());
             destNoteParams->setDecay(srcNoteParams->getDecay());

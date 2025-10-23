@@ -156,12 +156,12 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
         auxLevel->setValue(i == selectedAssignableMixOutPair ? static_cast<float>(ifmc->getVolumeIndividualOut()) : 0);
     }
 
-    if (!sound->isLoopEnabled() && np->getVoiceOverlap() == VoiceOverlapMode::MONO)
+    if (!sound->isLoopEnabled() && np->getVoiceOverlapMode() == VoiceOverlapMode::MONO)
     {
         for (auto& v : *c.voices)
         {
             if (v->getNoteParameters() == np && v->getNote() == c.note &&
-                (v->getVoiceOverlap() == VoiceOverlapMode::POLY || v->getVoiceOverlap() == VoiceOverlapMode::MONO))
+                (v->getVoiceOverlapMode() == VoiceOverlapMode::POLY || v->getVoiceOverlapMode() == VoiceOverlapMode::MONO))
             {
                 v->startDecay();
             }
@@ -244,7 +244,7 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
             if (!voice->isFinished() &&
                 voice->getStartTick() == c.noteOnStartTick &&
                 voice->getNote() == noteToStop &&
-                voice->getVoiceOverlap() == VoiceOverlapMode::NOTE_OFF &&
+                voice->getVoiceOverlapMode() == VoiceOverlapMode::NOTE_OFF &&
                 !voice->isDecaying() &&
                 c.drum->getIndex() == voice->getMuteInfo().getDrum() &&
                 (c.noteEventId == 0 || voice->getNoteEventId() == noteEventId))

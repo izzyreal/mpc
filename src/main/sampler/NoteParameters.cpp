@@ -113,17 +113,14 @@ int NoteParameters::getOptionalNoteB()
     return optionalNoteB;
 }
 
-int NoteParameters::getVoiceOverlap()
+VoiceOverlapMode NoteParameters::getVoiceOverlapMode()
 {
-    return voiceOverlap;
+    return voiceOverlapMode;
 }
 
-void NoteParameters::setVoiceOverlap(int i)
+void NoteParameters::setVoiceOverlapMode(const VoiceOverlapMode voiceOverlapModeToUse)
 {
-    if (i < 0 || i > 2)
-        return;
-
-    voiceOverlap = i;
+    voiceOverlapMode = voiceOverlapModeToUse;
  }
 
 void NoteParameters::setMuteAssignA(int i)
@@ -420,7 +417,7 @@ NoteParameters* NoteParameters::clone(const int newIndex)
 	res->setVelocityToStart(velocityToStart);
 	res->setVeloRangeLower(velocityRangeLower);
 	res->setVeloRangeUpper(velocityRangeUpper);
-	res->setVoiceOverlap(voiceOverlap);
+	res->setVoiceOverlapMode(voiceOverlapMode);
 	return res;
 }
 

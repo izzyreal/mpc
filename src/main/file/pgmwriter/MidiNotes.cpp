@@ -23,7 +23,7 @@ MidiNotes::MidiNotes(mpc::sampler::Program* program, std::vector<int> snConvTabl
 		setAlsoPlayUse1(i, nn->getOptionalNoteA());
 		setVelocityRangeUpper(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeUpper());
 		setAlsoPlayUse2(i, nn->getOptionalNoteB());
-		setVoiceOverlap(i, nn->getVoiceOverlap());
+		setVoiceOverlapMode(i, nn->getVoiceOverlapMode());
 		setMuteAssign1(i, nn->getMuteAssignA() == 34 ? 0 : nn->getMuteAssignA());
 		setMuteAssign2(i, nn->getMuteAssignB() == 34 ? 0 : nn->getMuteAssignB());
 		setTune(i, static_cast<int16_t>(nn->getTune()));
@@ -77,9 +77,9 @@ void MidiNotes::setAlsoPlayUse2(int midiNote, int alsoPlayUse2)
     midiNotesArray[(midiNote * 25) + 5] = alsoPlayUse2;
 }
 
-void MidiNotes::setVoiceOverlap(int midiNote, int voiceOverlap)
+void MidiNotes::setVoiceOverlapMode(int midiNote, const sampler::VoiceOverlapMode voiceOverlapMode)
 {
-    midiNotesArray[(midiNote * 25) + 6] = voiceOverlap;
+    midiNotesArray[(midiNote * 25) + 6] = static_cast<int>(voiceOverlapMode);
 }
 
 void MidiNotes::setMuteAssign1(int midiNote, int muteAssign1)

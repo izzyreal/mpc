@@ -128,7 +128,7 @@ void Voice::init(
         state->veloToAttack = np->getVelocityToAttack();
         state->decayMode = np->getDecayMode();
         state->veloToLevel = np->getVeloToLevel();
-        state->voiceOverlapMode = sound->isLoopEnabled() ? 2 : np->getVoiceOverlap();
+        state->voiceOverlapMode = sound->isLoopEnabled() ? VoiceOverlapMode::NOTE_OFF : np->getVoiceOverlapMode();
     }
 
     switch (state->varType) {
@@ -433,7 +433,7 @@ bool Voice::isFinished() const
     return state->finished;
 }
 
-int Voice::getVoiceOverlap() const
+VoiceOverlapMode Voice::getVoiceOverlapMode() const
 {
     const VoiceState *state = getActiveState();
     return state->voiceOverlapMode;

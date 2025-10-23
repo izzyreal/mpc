@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sampler/VoiceOverlapMode.hpp"
 #include <vector>
 
 namespace mpc::file::pgmreader
@@ -31,7 +32,7 @@ namespace mpc::file::pgmreader
 		int getAlsoPlayUse1(int midiNote);
 		int getVelocityRangeUpper(int midiNote);
 		int getAlsoPlayUse2(int midiNote);
-		int getVoiceOverlap(int midiNote);
+        sampler::VoiceOverlapMode getVoiceOverlapMode(int midiNote);
 		int getMuteAssign1(int midiNote);
 		int getMuteAssign2(int midiNote);
 		int getTune(int midiNote);

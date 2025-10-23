@@ -1,6 +1,7 @@
 #include "PgmParamsScreen.hpp"
 
 #include "SelectDrumScreen.hpp"
+#include "sampler/VoiceOverlapMode.hpp"
 
 #include <sampler/NoteParameters.hpp>
 
@@ -81,7 +82,7 @@ void PgmParamsScreen::turnWheel(int i)
         lastNoteParameters->setDecayMode(lastNoteParameters->getDecayMode() + i);
         displayDecayMode();
     }
-    else if(param == "voiceoverlap")
+    else if (param == "voiceoverlap")
     {
         auto s = sampler->getSound(lastNoteParameters->getSoundIndex());
 
@@ -90,7 +91,15 @@ void PgmParamsScreen::turnWheel(int i)
             return;
         }
 
-        lastNoteParameters->setVoiceOverlap(lastNoteParameters->getVoiceOverlap() + i);
+        using M = sampler::VoiceOverlapMode;
+
+        int modeVal = static_cast<int>(lastNoteParameters->getVoiceOverlapMode());
+        modeVal += i;
+
+        modeVal = std::clamp(modeVal, static_cast<int>(M::POLY), static_cast<int>(M::NOTE_OFF));
+
+        lastNoteParameters->setVoiceOverlapMode(static_cast<M>(modeVal));
+        
         displayVoiceOverlap();
     }
     else if (param == "reson")
@@ -256,14 +265,14 @@ void PgmParamsScreen::displayVoiceOverlap()
     init();
 
     const auto lastNoteParameters = sampler->getLastNp(program.get());
-    auto mode = lastNoteParameters->getVoiceOverlap();
+    sampler::VoiceOverlapMode mode = lastNoteParameters->getVoiceOverlapMode();
 
     const auto sound = sampler->getSound(lastNoteParameters->getSoundIndex());
 
     if (sound && sound->isLoopEnabled())
     {
-        mode = 2;
+        mode = sampler::VoiceOverlapMode::NOTE_OFF;
     }
 
-    findField("voiceoverlap")->setText(voiceOverlapModes[mode]);
+    findField("voiceoverlap")->setText(voiceOverlapModes[static_cast<int>(mode)]);
 }

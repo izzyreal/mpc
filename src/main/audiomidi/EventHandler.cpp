@@ -85,7 +85,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
             const auto sound = sampler->getSound(noteParameters->getSoundIndex());
 
-            const auto voiceOverlap = (sound && sound->isLoopEnabled()) ? 2 : noteParameters->getVoiceOverlap();
+            const auto voiceOverlapMode = (sound && sound->isLoopEnabled()) ? VoiceOverlapMode::NOTE_OFF : noteParameters->getVoiceOverlapMode();
 
             auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
                     noteEventIdToUse,
@@ -102,7 +102,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
                     eventFrameOffsetInBuffer,
                     true,
                     noteOnEvent->getTick(),
-                    voiceOverlap == 2 ? durationFrames : -1
+                    voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1
             );
 
             DrumNoteEventHandler::noteOn(ctx);

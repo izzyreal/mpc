@@ -1,3 +1,4 @@
+#include "sampler/VoiceOverlapMode.hpp"
 #include <file/pgmreader/PgmAllNoteParameters.hpp>
 
 #include <file/pgmreader/PRPads.hpp>
@@ -76,10 +77,10 @@ int PgmAllNoteParameters::getAlsoPlayUse2(int midiNote)
     return alsoPlayUse2;
 }
 
-int PgmAllNoteParameters::getVoiceOverlap(int midiNote)
+mpc::sampler::VoiceOverlapMode PgmAllNoteParameters::getVoiceOverlapMode(int midiNote)
 {
-    auto voiceOverlap = getMidiNotesArray()[(midiNote * 25) + 6];
-    return voiceOverlap;
+    auto voiceOverlapMode = getMidiNotesArray()[(midiNote * 25) + 6];
+    return static_cast<mpc::sampler::VoiceOverlapMode>(voiceOverlapMode);
 }
 
 int PgmAllNoteParameters::getMuteAssign1(int midiNote)

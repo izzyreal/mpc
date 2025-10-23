@@ -5,6 +5,7 @@
 #include "engine/audio/core/AudioProcess.hpp"
 #include "MuteInfo.hpp"
 #include "VoiceUtil.hpp"
+#include "sampler/VoiceOverlapMode.hpp"
 
 namespace mpc::sampler {
     class Sound;
@@ -34,7 +35,7 @@ namespace mpc::engine {
             float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
 
             // Voice overlap mode when the voice was triggered
-            int voiceOverlapMode;
+            sampler::VoiceOverlapMode voiceOverlapMode;
 
             // Pointer to currently playing note parameters
             mpc::sampler::NoteParameters *noteParameters = nullptr;
@@ -174,7 +175,7 @@ namespace mpc::engine {
 
         const mpc::sampler::NoteParameters* getNoteParameters() const;
 
-        int getVoiceOverlap() const;
+        sampler::VoiceOverlapMode getVoiceOverlapMode() const;
 
         int getStripNumber() const;
 

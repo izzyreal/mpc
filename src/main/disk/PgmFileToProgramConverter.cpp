@@ -81,7 +81,7 @@ void PgmFileToProgramConverter::setNoteParameters(
 		programNoteParameters->setVeloToLevel(pgmNoteParameters->getVelocityToLevel(i));
 		programNoteParameters->setVelocityToPitch(pgmNoteParameters->getVelocityToPitch(i));
 		programNoteParameters->setVelocityToStart(pgmNoteParameters->getVelocityToStart(i));
-		programNoteParameters->setVoiceOverlap(pgmNoteParameters->getVoiceOverlap(i));
+		programNoteParameters->setVoiceOverlapMode(pgmNoteParameters->getVoiceOverlapMode(i));
 	}
 }
 

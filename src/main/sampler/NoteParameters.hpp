@@ -3,13 +3,13 @@
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
+#include "sampler/VoiceOverlapMode.hpp"
+
 #include <memory>
 
 namespace mpc::sampler
 {
 	class Sampler;
-
-    enum VoiceOverlapMode { POLY, MONO, NOTE_OFF };
 
     class NoteParameters
 	{
@@ -33,7 +33,7 @@ namespace mpc::sampler
 		int getFilterDecay();
 		int getFilterResonance();
 		int getFilterEnvelopeAmount();
-		int getVoiceOverlap();
+		VoiceOverlapMode getVoiceOverlapMode();
 
 		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
 		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
@@ -47,7 +47,7 @@ namespace mpc::sampler
 		int optionalNoteA = 0;
 		int velocityRangeUpper = 0;
 		int optionalNoteB = 0;
-		int voiceOverlap = 0;
+		VoiceOverlapMode voiceOverlapMode = VoiceOverlapMode::POLY;
 		int muteAssignA = 0;
 		int muteAssignB = 0;
 		int tune = 0;
@@ -77,7 +77,7 @@ namespace mpc::sampler
 		void setVeloRangeUpper(int i);
 		int getVelocityRangeUpper();
 		void setOptionalNoteB(int i);
-		void setVoiceOverlap(int i);
+		void setVoiceOverlapMode(const VoiceOverlapMode);
 		void setMuteAssignA(int i);
 		void setMuteAssignB(int i);
 		void setTune(int i);

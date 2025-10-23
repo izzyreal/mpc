@@ -129,7 +129,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
             {
                 const auto noteParameters = program->getNoteParameters(note);
                 const auto sound = mpc.getSampler()->getSound(noteParameters->getSoundIndex());
-                auto voiceOverlap = (sound && sound->isLoopEnabled()) ? 2 : noteParameters->getVoiceOverlap();
+                auto voiceOverlap = (sound && sound->isLoopEnabled()) ? VoiceOverlapMode::NOTE_OFF : noteParameters->getVoiceOverlapMode();
 
                 auto &drum = mpc.getDrum(track->getBus() - 1);
 
@@ -148,7 +148,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                     eventFrameOffset,
                     /* firstGeneration */ true, // Always true for invokers that are not DrumNoteEventHandler::noteOn itself
                     /*tick*/ -1,
-                    voiceOverlap == 2 ? durationFrames : -1
+                    voiceOverlap == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1
                 );
 
                 DrumNoteEventHandler::noteOn(ctx);

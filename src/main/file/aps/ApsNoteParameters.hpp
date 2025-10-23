@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sampler/VoiceOverlapMode.hpp"
+
 #include <vector>
 
 namespace mpc::sampler {
@@ -18,7 +20,7 @@ namespace mpc::file::aps
 		int alsoPlay1;
 		int velocityRangeUpper;
 		int alsoPlay2;
-		int voiceOverlap;
+        sampler::VoiceOverlapMode voiceOverlapMode;
 		int mute1;
 		int mute2;
 		int tune;
@@ -41,7 +43,7 @@ namespace mpc::file::aps
 
 	public:
 		int getSoundIndex();
-		int getVoiceOverlap();
+        sampler::VoiceOverlapMode getVoiceOverlapMode();
 		int getTune();
 		int getDecayMode();
 		int getSoundGenerationMode();

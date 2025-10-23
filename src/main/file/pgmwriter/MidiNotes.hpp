@@ -6,6 +6,8 @@
 #include <cstdint>
 #endif // __linux__
 
+#include "sampler/VoiceOverlapMode.hpp"
+
 namespace mpc::sampler {
 		class Program;
 }
@@ -26,7 +28,7 @@ namespace mpc::file::pgmwriter
 		void setAlsoPlayUse1(int midiNote, int alsoPlayUse1);
 		void setVelocityRangeUpper(int midiNote, int velocityRangeUpper);
 		void setAlsoPlayUse2(int midiNote, int alsoPlayUse2);
-		void setVoiceOverlap(int midiNote, int voiceOverlap);
+		void setVoiceOverlapMode(int midiNote, const sampler::VoiceOverlapMode);
 		void setMuteAssign1(int midiNote, int muteAssign1);
 		void setMuteAssign2(int midiNote, int muteAssign2);
 		void setTune(int midiNote, int16_t tune);

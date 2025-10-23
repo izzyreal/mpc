@@ -1,3 +1,4 @@
+#include "sampler/VoiceOverlapMode.hpp"
 #include <file/aps/ApsNoteParameters.hpp>
 
 #include <sampler/NoteParameters.hpp>
@@ -17,7 +18,7 @@ ApsNoteParameters::ApsNoteParameters(const std::vector<char>& loadBytes)
 	alsoPlay1 = loadBytes[4] == 0 ? 34 : loadBytes[4];
 	velocityRangeUpper = loadBytes[5];
 	alsoPlay2 = loadBytes[6] == 0 ? 34 : loadBytes[6];
-	voiceOverlap = loadBytes[7];
+	voiceOverlapMode = static_cast<sampler::VoiceOverlapMode>(loadBytes[7]);
 	mute1 = loadBytes[8] == 0 ? 34 : loadBytes[8];
 	mute2 = loadBytes[9] == 0 ? 34 : loadBytes[9];
 	auto buf = std::vector<char>{ loadBytes[10], loadBytes[11] };
@@ -47,7 +48,7 @@ ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters* np)
 	saveBytes[4] = np->getOptionalNoteA() == 34 ? 0 : np->getOptionalNoteA();
 	saveBytes[5] = np->getVelocityRangeUpper();
 	saveBytes[6] = np->getOptionalNoteB() == 34 ? 0 : np->getOptionalNoteB();
-	saveBytes[7] = np->getVoiceOverlap();
+	saveBytes[7] = static_cast<int>(np->getVoiceOverlapMode());
 	saveBytes[8] = np->getMuteAssignA() == 34 ? 0 : np->getMuteAssignA();
 	saveBytes[9] = np->getMuteAssignB() == 34 ? 0 : np->getMuteAssignB();
 	auto buf = ByteUtil::ushort2bytes(np->getTune());
@@ -74,9 +75,9 @@ int ApsNoteParameters::getSoundIndex()
     return soundIndex;
 }
 
-int ApsNoteParameters::getVoiceOverlap()
+mpc::sampler::VoiceOverlapMode ApsNoteParameters::getVoiceOverlapMode()
 {
-    return voiceOverlap;
+    return voiceOverlapMode;
 }
 
 int ApsNoteParameters::getTune()
