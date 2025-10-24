@@ -1,6 +1,6 @@
 #include "input/HostToClientTranslator.hpp"
 #include "hardware/ComponentId.hpp"
-#include "input/ClientInput.hpp"
+#include "input/ClientHardwareEvent.hpp"
 #include "input/KeyboardBindings.hpp"
 
 #include "input/KeyCodeHelper.hpp"
@@ -12,30 +12,30 @@
 using namespace mpc::input;
 using namespace mpc::hardware;
 
-std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEvent& hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
+std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostInputEvent& hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
 {
-    ClientInput clientInput;
+    ClientHardwareEvent clientInput;
     
     switch (hostInputEvent.getSource())
     {
         case HostInputEvent::Source::MIDI:
-            clientInput.source = ClientInput::Source::HostInputMidi;
+            clientInput.source = ClientHardwareEvent::Source::HostInputMidi;
             break;
         case HostInputEvent::Source::KEYBOARD:
-            clientInput.source = ClientInput::Source::HostInputKeyboard;
+            clientInput.source = ClientHardwareEvent::Source::HostInputKeyboard;
             break;
         case HostInputEvent::Source::GESTURE:
-            clientInput.source = ClientInput::Source::HostInputGesture;
+            clientInput.source = ClientHardwareEvent::Source::HostInputGesture;
             break;
         case HostInputEvent::Source::FOCUS:
-            clientInput.source = ClientInput::Source::HostFocusEvent;
+            clientInput.source = ClientHardwareEvent::Source::HostFocusEvent;
             break;
     }
 
     switch (hostInputEvent.getSource())
     {
     case HostInputEvent::Source::FOCUS:
-        clientInput.type = ClientInput::Type::HostFocusLost;
+        clientInput.type = ClientHardwareEvent::Type::HostFocusLost;
         break;
     case HostInputEvent::Source::MIDI: {
         const auto& midi = std::get<MidiEvent>(hostInputEvent.payload);
@@ -60,16 +60,16 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
             if (gesture.type == GestureEvent::Type::BEGIN || gesture.type == GestureEvent::Type::REPEAT)
             {
-                clientInput.type = ClientInput::Type::PadPress;
+                clientInput.type = ClientHardwareEvent::Type::PadPress;
                 clientInput.value = 1.f - gesture.normY;
             }
             else if (gesture.type == GestureEvent::Type::END)
             {
-                clientInput.type = ClientInput::Type::PadRelease;
+                clientInput.type = ClientHardwareEvent::Type::PadRelease;
             }
             else if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientInput.type = ClientInput::Type::PadAftertouch;
+                clientInput.type = ClientHardwareEvent::Type::PadAftertouch;
                 clientInput.value = 1.f - gesture.normY;
             }
         }
@@ -77,7 +77,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientInput.type = ClientInput::Type::SliderMove;
+                clientInput.type = ClientHardwareEvent::Type::SliderMove;
 
                 if (gesture.movement == GestureEvent::Movement::Relative)
                 {
@@ -95,23 +95,23 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
             {
                 if (gesture.repeatCount >= 2)
                 {
-                    clientInput.type = ClientInput::Type::ButtonDoublePress;
+                    clientInput.type = ClientHardwareEvent::Type::ButtonDoublePress;
                 }
             }
             else if (gesture.type == GestureEvent::Type::BEGIN)
             {
                 if (gesture.repeatCount >= 2)
                 {
-                    clientInput.type = ClientInput::Type::ButtonDoublePress;
+                    clientInput.type = ClientHardwareEvent::Type::ButtonDoublePress;
                 }
                 else
                 {
-                    clientInput.type = ClientInput::Type::ButtonPress;
+                    clientInput.type = ClientHardwareEvent::Type::ButtonPress;
                 }
             }
             else if (gesture.type == GestureEvent::Type::END)
             {
-                clientInput.type = ClientInput::Type::ButtonRelease;
+                clientInput.type = ClientHardwareEvent::Type::ButtonRelease;
             }
             else
             {
@@ -122,7 +122,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientInput.type = ClientInput::Type::DataWheelTurn;
+                clientInput.type = ClientHardwareEvent::Type::DataWheelTurn;
                 clientInput.deltaValue = gesture.continuousDelta;
             }
         }
@@ -131,7 +131,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         {
             if (gesture.type == GestureEvent::Type::UPDATE)
             {
-                clientInput.type = ClientInput::Type::PotMove;
+                clientInput.type = ClientHardwareEvent::Type::PotMove;
                 clientInput.deltaValue = gesture.continuousDelta;
             }
         }
@@ -160,7 +160,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
                     charToUse = *typableChar;
                 }
 
-                clientInput.textInputKey = ClientInput::TextInputKey { charToUse, key.keyDown };
+                clientInput.textInputKey = ClientHardwareEvent::TextInputKey { charToUse, key.keyDown };
             }
         }
 
@@ -194,19 +194,19 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
         if (id >= ComponentId::PAD_1_OR_AB && id <= ComponentId::PAD_16_OR_PARENTHESES)
         {
-            clientInput.type = key.keyDown ? ClientInput::Type::PadPress : ClientInput::Type::PadRelease;
+            clientInput.type = key.keyDown ? ClientHardwareEvent::Type::PadPress : ClientHardwareEvent::Type::PadRelease;
             clientInput.index = static_cast<int>(id) - static_cast<int>(ComponentId::PAD_1_OR_AB);
             if (key.keyDown) clientInput.value = mpc::hardware::Pad::MAX_VELO;
         }
         else if (id == ComponentId::SLIDER)
         {
             if (!key.keyDown) break;
-            clientInput.type = ClientInput::Type::SliderMove;
+            clientInput.type = ClientHardwareEvent::Type::SliderMove;
         }
         else if (id == ComponentId::DATA_WHEEL)
         {
             if (!key.keyDown) break;
-            clientInput.type = ClientInput::Type::DataWheelTurn;
+            clientInput.type = ClientHardwareEvent::Type::DataWheelTurn;
 
             const auto direction = binding->direction;
 
@@ -225,7 +225,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         }
         else
         {
-            clientInput.type = key.keyDown ? ClientInput::Type::ButtonPress : ClientInput::Type::ButtonRelease;
+            clientInput.type = key.keyDown ? ClientHardwareEvent::Type::ButtonPress : ClientHardwareEvent::Type::ButtonRelease;
         }
         break;
     }
@@ -238,20 +238,20 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
 
     if (clientInput.deltaValue && clientInput.value)
     {
-        throw std::runtime_error("ClientInput can have either a value, or a deltaValue, not both.");
+        throw std::runtime_error("ClientHardwareEvent can have either a value, or a deltaValue, not both.");
     }
 
-    if (clientInput.type == ClientInput::Type::ButtonPress || clientInput.type == ClientInput::Type::ButtonRelease || clientInput.type == ClientInput::Type::ButtonDoublePress)
+    if (clientInput.type == ClientHardwareEvent::Type::ButtonPress || clientInput.type == ClientHardwareEvent::Type::ButtonRelease || clientInput.type == ClientHardwareEvent::Type::ButtonDoublePress)
     {
         if (clientInput.deltaValue || clientInput.value)
         {
-            throw std::runtime_error("ClientInput for Button may not have a deltaValue or value.");
+            throw std::runtime_error("ClientHardwareEvent for Button may not have a deltaValue or value.");
         }
     }
 
-    if (clientInput.type == ClientInput::Type::DataWheelTurn && !clientInput.deltaValue)
+    if (clientInput.type == ClientHardwareEvent::Type::DataWheelTurn && !clientInput.deltaValue)
     {
-        throw std::runtime_error("ClientInput for DataWheel must have a deltaValue.");
+        throw std::runtime_error("ClientHardwareEvent for DataWheel must have a deltaValue.");
     }
 
     return clientInput;

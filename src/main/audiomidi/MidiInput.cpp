@@ -4,11 +4,11 @@
 #include "command/TriggerDrumNoteOffCommand.hpp"
 #include "command/ReleaseTapCommand.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "command/context/TriggerDrumContextFactory.hpp"
 
-#include "input/ClientInput.hpp"
+#include "input/ClientHardwareEvent.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
@@ -237,10 +237,10 @@ void MidiInput::handleControlChange(ShortMessage* msg)
                     }
                     else if (func == 7)
                     {
-                        ClientInput clientInput;
+                        ClientHardwareEvent clientInput;
                         clientInput.componentId = ComponentId::TAP_TEMPO_OR_NOTE_REPEAT;
-                        clientInput.type = ClientInput::Type::ButtonPressAndRelease;
-                        clientInput.source = ClientInput::Source::HostInputMidi;
+                        clientInput.type = ClientHardwareEvent::Type::ButtonPressAndRelease;
+                        clientInput.source = ClientHardwareEvent::Source::HostInputMidi;
                         mpc.inputController->handleInput(clientInput);
                     }
                     else if (func >= 8 && func < 12)

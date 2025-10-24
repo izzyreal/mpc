@@ -1,6 +1,6 @@
 #include "PushShiftCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
 #include "sequencer/Sequencer.hpp"

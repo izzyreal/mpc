@@ -4,7 +4,7 @@
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/MidiOutput.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/Hardware.hpp"
 #include "engine/DrumNoteEventHandler.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"

@@ -1,6 +1,6 @@
 #include "ReleaseTapCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 

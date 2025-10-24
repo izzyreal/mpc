@@ -1,6 +1,6 @@
 #include "command/context/TriggerDrumContextFactory.hpp"
 
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 

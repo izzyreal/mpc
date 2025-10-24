@@ -6,7 +6,7 @@
 
 namespace mpc::input {
 
-struct ClientInput {
+struct ClientHardwareEvent {
 
     struct TextInputKey {
         char character;

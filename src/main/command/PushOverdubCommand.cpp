@@ -1,6 +1,6 @@
 #include "PushOverdubCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"

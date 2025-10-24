@@ -3,7 +3,7 @@
 #include "hardware/ComponentId.hpp"
 #include "input/HostInputEvent.hpp"
 #include "input/HostToClientTranslator.hpp"
-#include "input/ClientInput.hpp"
+#include "input/ClientHardwareEvent.hpp"
 
 #include "controller/ButtonLockTracker.hpp"
 
@@ -18,16 +18,16 @@
 
 namespace mpc::controller {
 
-class ClientInputControllerBase {
+class ClientHardwareControllerBase {
     public:
         struct PhysicalPadPress {
             int bankIndex;
             std::shared_ptr<lcdgui::ScreenComponent> screen;
-            input::ClientInput::Source inputSource;
+            input::ClientHardwareEvent::Source inputSource;
             std::optional<int> drumIndex;
         };
 
-        explicit ClientInputControllerBase(const fs::path keyboardMappingConfigDirectory)
+        explicit ClientHardwareControllerBase(const fs::path keyboardMappingConfigDirectory)
             : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>())
         {
         }
@@ -38,7 +38,7 @@ class ClientInputControllerBase {
 
             if (!clientInput.has_value())
             {
-                printf("empty ClientInput\n");
+                printf("empty ClientHardwareEvent\n");
                 return;
             }
 
@@ -46,8 +46,8 @@ class ClientInputControllerBase {
         }
 
 
-        virtual ~ClientInputControllerBase() = default;
-        virtual void handleInput(const mpc::input::ClientInput&) = 0;
+        virtual ~ClientHardwareControllerBase() = default;
+        virtual void handleInput(const mpc::input::ClientHardwareEvent&) = 0;
 
         ButtonLockTracker buttonLockTracker;
 
@@ -72,14 +72,14 @@ class ClientInputControllerBase {
 
             const auto pressSource = physicalPadPresses.at(physicalPadIndex).inputSource;
 
-            return pressSource == input::ClientInput::Source::HostInputKeyboard;
+            return pressSource == input::ClientHardwareEvent::Source::HostInputKeyboard;
         }
 
         void registerPhysicalPadPush(
                 const int padIndex,
                 const int bankIndex,
                 const std::shared_ptr<lcdgui::ScreenComponent> screen,
-                const input::ClientInput::Source inputSource,
+                const input::ClientHardwareEvent::Source inputSource,
                 const std::optional<int> drumIndex)
         {
             assert(physicalPadPresses.count(padIndex) == 0);

@@ -1,6 +1,6 @@
 #include "PushPlayStartCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"

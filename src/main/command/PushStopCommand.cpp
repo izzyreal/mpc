@@ -1,7 +1,7 @@
 #include "PushStopCommand.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"

@@ -26,7 +26,7 @@ namespace mpc::hardware {
 }
 
 namespace mpc::controller {
-    class ClientInputControllerBase;
+    class ClientHardwareControllerBase;
 }
 
 namespace mpc::input {
@@ -106,7 +106,7 @@ namespace mpc {
         bool isPluginModeEnabled();
 
         std::shared_ptr<mpc::input::PadAndButtonKeyboard> padAndButtonKeyboard;
-        std::shared_ptr<mpc::controller::ClientInputControllerBase> inputController;
+        std::shared_ptr<mpc::controller::ClientHardwareControllerBase> inputController;
 
         void dispatchHostInput(const mpc::input::HostInputEvent& hostEvent);
 

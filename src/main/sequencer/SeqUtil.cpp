@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/Sequence.hpp"

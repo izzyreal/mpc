@@ -1,6 +1,6 @@
 #include "SequencerScreen.hpp"
 
-#include "controller/ClientInputControllerBase.hpp"
+#include "controller/ClientHardwareControllerBase.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 
