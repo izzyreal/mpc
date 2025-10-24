@@ -27,7 +27,6 @@
 #include <hardware/Hardware.hpp>
 
 #include <lcdgui/Screens.hpp>
-#include "lcdgui/ScreenNames.hpp"
 
 #include "MpcResourceUtil.hpp"
 #include "hardware/ComponentId.hpp"
