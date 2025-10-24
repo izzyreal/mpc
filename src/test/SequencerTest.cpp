@@ -143,7 +143,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
-                    auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen);
+                    auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen->getDrumIndex(), screen);
                     TriggerDrumNoteOffCommand(noteOffCtx).execute();
                 }
             }
@@ -240,7 +240,7 @@ TEST_CASE("Undo", "[sequencer]")
         }
         else
         {
-            auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen);
+            auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen->getDrumIndex(), screen);
             TriggerDrumNoteOffCommand(noteOffCtx).execute();
         }
 
