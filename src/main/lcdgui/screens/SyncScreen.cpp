@@ -83,28 +83,19 @@ void SyncScreen::function(int i)
 
 void SyncScreen::setIn(int i)
 {
-    if (i < 0 || i > 1)
-        return;
-
-    in = i;
+    in = std::clamp(i, 0, 1);
     displayIn();
 }
 
 void SyncScreen::setOut(int i)
 {
-    if (i < 0 || i > 2)
-        return;
-    
-    out = i;
+    out = std::clamp(i, 0, 2);
     displayOut();
 }
 
 void SyncScreen::setShiftEarly(int i)
 {
-    if (i < 0 || i > 20)
-        return;
-    
-    shiftEarly = i;
+    shiftEarly = std::clamp(i, 0, 20);
     displayShiftEarly();
 }
 
@@ -116,21 +107,13 @@ void SyncScreen::setSendMMCEnabled(bool b)
 
 void SyncScreen::setFrameRate(int i)
 {
-    if (i < 0 || i > 29) // What are the real bounds on a2KXL?
-        return;
-    
-    frameRate = i;
+    frameRate = std::clamp(i, 0, 29); // What are the real bounds on a2KXL?
     displayShiftEarly();
 }
 
 void SyncScreen::setModeIn(unsigned char c)
 {
-    if (c < 0 || c > 2)
-    {
-        return;
-    }
-    
-    modeIn = c;
+    modeIn = std::clamp(static_cast<int>(c), 0, 2);
     displayModeIn();
     displayShiftEarly();
 }
@@ -142,13 +125,7 @@ int SyncScreen::getModeOut()
 
 void SyncScreen::setModeOut(unsigned char c)
 {
-    if (c < 0 || c > 2)
-    {
-        return;
-    }
-
-    modeOut = c;
-
+    modeOut = std::clamp(static_cast<int>(c), 0, 2);
     displayModeOut();
 }
 
