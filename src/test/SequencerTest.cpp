@@ -16,7 +16,7 @@
 #include <file/all/Defaults.hpp>
 
 #include "hardware/Hardware.hpp"
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;

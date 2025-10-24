@@ -16,7 +16,7 @@
 #include <audiomidi/VmpcMidiControlMode.hpp>
 
 #include "hardware/Hardware.hpp"
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 
 #include "lcdgui/ScreenGroups.hpp"
 #include <lcdgui/screens/SyncScreen.hpp>

@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 #include "hardware/ComponentId.hpp"
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 
 #include "Mpc.hpp"
 

@@ -2,7 +2,7 @@
 
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 

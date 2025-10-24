@@ -5,7 +5,7 @@
 
 #include "input/KeyCodeHelper.hpp"
 
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 
 #include <stdexcept>
 

@@ -9,7 +9,7 @@
 
 #include "engine/Voice.hpp"
 #include "hardware/Hardware.hpp"
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>

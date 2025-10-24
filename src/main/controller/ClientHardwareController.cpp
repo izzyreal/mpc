@@ -4,7 +4,7 @@
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "hardware/ComponentId.hpp"
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 #include "input/ClientHardwareEvent.hpp"
 #include "command/context/TriggerDrumContextFactory.hpp"
 #include "Mpc.hpp"

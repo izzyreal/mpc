@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "hardware/HardwareComponent.hpp"
+#include "hardware/Component.hpp"
 
 namespace mpc::input {
 
