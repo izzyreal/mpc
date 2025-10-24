@@ -13,7 +13,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
+EventsScreen::EventsScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "events", layerIndex)
 {
 }
@@ -106,63 +106,79 @@ void EventsScreen::function(int i)
 
     switch (i)
     {
-        // Intentional fall-through
-        case 1:
-        case 2:
-        case 3:
-            tab = i;
-            mpc.getLayeredScreen()->openScreen(tabNames[tab]);
-            break;
-        case 5:
+    // Intentional fall-through
+    case 1:
+    case 2:
+    case 3:
+        tab = i;
+        mpc.getLayeredScreen()->openScreen(tabNames[tab]);
+        break;
+    case 5:
+    {
+        auto sourceTrack = sequencer.lock()->getActiveTrack();
+
+        if (editFunctionNumber == 0)
+        {
+            performCopy(time0, time1, toSq, start, toTr, modeMerge, copies, note0, note1);
+        }
+        else if (editFunctionNumber == 1)
+        {
+            for (auto &noteEvent : sourceTrack->getNoteEvents())
             {
-                auto sourceTrack = sequencer.lock()->getActiveTrack();
-
-                if (editFunctionNumber == 0)
+                if (durationMode == 0)
                 {
-                    performCopy(time0, time1, toSq, start, toTr, modeMerge, copies, note0, note1);
+                    noteEvent->setDuration(noteEvent->getDuration() + durationValue);
                 }
-                else if (editFunctionNumber == 1)
+                else if (durationMode == 1)
                 {
-                    for (auto& noteEvent : sourceTrack->getNoteEvents()) {
-                        if (durationMode == 0) {
-                            noteEvent->setDuration(noteEvent->getDuration() + durationValue);
-                        } else if (durationMode == 1) {
-                            noteEvent->setDuration(noteEvent->getDuration() - durationValue);
-                        } else if (durationMode == 2) {
-                            noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
-                        } else if (durationMode == 3) {
-                            noteEvent->setDuration(durationValue);
-                        }
-                    }
+                    noteEvent->setDuration(noteEvent->getDuration() - durationValue);
                 }
-                else if (editFunctionNumber == 2)
+                else if (durationMode == 2)
                 {
-                    for (auto& n : sourceTrack->getNoteEvents()) {
-                        if (velocityMode == 0) {
-                            n->setVelocity(n->getVelocity() + velocityValue);
-                        } else if (velocityMode == 1) {
-                            n->setVelocity(n->getVelocity() - velocityValue);
-                        } else if (velocityMode == 2) {
-                            n->setVelocity((n->getVelocity() * velocityValue * 0.01));
-                        } else if (velocityMode == 3) {
-                            n->setVelocity(velocityValue);
-                        }
-                    }
+                    noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
                 }
-                else if (editFunctionNumber == 3)
+                else if (durationMode == 3)
                 {
-                    // The original does not process DRUM tracks.
-                    // We do, because it's nice and doesn't bother anyone,
-                    // so you won't see any filtering of that kind here.
-                    for (auto& n : sourceTrack->getNoteEvents())
-                    {
-                        n->setNote(n->getNote() + transposeAmount);
-                    }
+                    noteEvent->setDuration(durationValue);
                 }
-
-                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             }
-            break;
+        }
+        else if (editFunctionNumber == 2)
+        {
+            for (auto &n : sourceTrack->getNoteEvents())
+            {
+                if (velocityMode == 0)
+                {
+                    n->setVelocity(n->getVelocity() + velocityValue);
+                }
+                else if (velocityMode == 1)
+                {
+                    n->setVelocity(n->getVelocity() - velocityValue);
+                }
+                else if (velocityMode == 2)
+                {
+                    n->setVelocity((n->getVelocity() * velocityValue * 0.01));
+                }
+                else if (velocityMode == 3)
+                {
+                    n->setVelocity(velocityValue);
+                }
+            }
+        }
+        else if (editFunctionNumber == 3)
+        {
+            // The original does not process DRUM tracks.
+            // We do, because it's nice and doesn't bother anyone,
+            // so you won't see any filtering of that kind here.
+            for (auto &n : sourceTrack->getNoteEvents())
+            {
+                n->setNote(n->getNote() + transposeAmount);
+            }
+        }
+
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+    }
+    break;
     }
 }
 
@@ -174,7 +190,7 @@ void EventsScreen::turnWheel(int i)
     {
         return;
     }
-    
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "start0")
@@ -200,11 +216,13 @@ void EventsScreen::turnWheel(int i)
         auto fromSeq = sequencer.lock()->getActiveSequence();
 
         if (time1 > fromSeq->getLastTick())
+        {
             setTime1(fromSeq->getLastTick());
+        }
     }
     else if (focusedFieldName == "from-tr")
     {
-        setFromTr(sequencer.lock()->getActiveTrackIndex() +i);
+        setFromTr(sequencer.lock()->getActiveTrackIndex() + i);
     }
     else if (focusedFieldName == "to-sq")
     {
@@ -212,7 +230,9 @@ void EventsScreen::turnWheel(int i)
         auto toSeq = sequencer.lock()->getSequence(toSq);
 
         if (start > toSeq->getLastTick())
+        {
             setStart(toSeq->getLastTick());
+        }
     }
     else if (focusedFieldName == "to-tr")
     {
@@ -468,7 +488,9 @@ void EventsScreen::displayDrumNotes()
 void EventsScreen::setEdit(int i)
 {
     if (i < 0 || i > 3)
+    {
         return;
+    }
 
     editFunctionNumber = i;
     displayEdit();
@@ -477,7 +499,9 @@ void EventsScreen::setEdit(int i)
 void EventsScreen::setFromSq(int i)
 {
     if (i < 0 || i > 98)
+    {
         return;
+    }
 
     sequencer.lock()->setActiveSequenceIndex(i);
 
@@ -487,7 +511,9 @@ void EventsScreen::setFromSq(int i)
 void EventsScreen::setFromTr(int i)
 {
     if (i < 0 || i > 63)
+    {
         return;
+    }
 
     sequencer.lock()->setActiveTrackIndex(i);
 
@@ -497,7 +523,9 @@ void EventsScreen::setFromTr(int i)
 void EventsScreen::setToSq(int i)
 {
     if (i < 0 || i > 98)
+    {
         return;
+    }
 
     toSq = i;
     displayToSq();
@@ -506,7 +534,9 @@ void EventsScreen::setToSq(int i)
 void EventsScreen::setToTr(int i)
 {
     if (i < 0 || i > 63)
+    {
         return;
+    }
 
     toTr = i;
     displayToTr();
@@ -521,7 +551,9 @@ void EventsScreen::setModeMerge(bool b)
 void EventsScreen::setCopies(int i)
 {
     if (i < 1 || i > 999)
+    {
         return;
+    }
 
     copies = i;
     displayCopies();
@@ -530,12 +562,16 @@ void EventsScreen::setCopies(int i)
 void EventsScreen::setDurationMode(int i)
 {
     if (i < 0 || i > 3)
+    {
         return;
+    }
 
     durationMode = i;
 
     if (durationMode == 2 && durationValue > 200)
+    {
         setDuration(200);
+    }
 
     displayMode();
 }
@@ -543,12 +579,16 @@ void EventsScreen::setDurationMode(int i)
 void EventsScreen::setVelocityMode(int i)
 {
     if (i < 0 || i > 3)
+    {
         return;
+    }
 
     velocityMode = i;
 
     if (velocityMode != 2 && velocityValue > 127)
+    {
         setVelocityValue(127);
+    }
 
     displayMode();
 }
@@ -556,7 +596,9 @@ void EventsScreen::setVelocityMode(int i)
 void EventsScreen::setTransposeAmount(int i)
 {
     if (i < -12 || i > 12)
+    {
         return;
+    }
 
     transposeAmount = i;
     // Field otherwise used for displaying mode is
@@ -567,10 +609,14 @@ void EventsScreen::setTransposeAmount(int i)
 void EventsScreen::setDuration(int i)
 {
     if (i < 1 || i > 9999)
+    {
         return;
+    }
 
     if (durationMode == 2 && i > 200)
+    {
         return;
+    }
 
     durationValue = i;
     displayCopies();
@@ -579,10 +625,14 @@ void EventsScreen::setDuration(int i)
 void EventsScreen::setVelocityValue(int i)
 {
     if (i < 1 || i > 200)
+    {
         return;
+    }
 
     if (velocityMode != 2 && i > 127)
+    {
         return;
+    }
 
     velocityValue = i;
 
@@ -618,7 +668,7 @@ void EventsScreen::displayToTr()
 }
 
 void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceIndex, int destStart,
-        int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1)
+                               int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1)
 {
     const auto segLength = sourceEnd - sourceStart;
     auto sourceTrack = sequencer.lock()->getActiveTrack();
@@ -635,7 +685,9 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
     auto toSequence = sequencer.lock()->getSequence(toSequenceIndex);
 
     if (!toSequence->isUsed())
+    {
         toSequence->init(fromSequence->getLastBarIndex());
+    }
 
     auto destNumerator = -1;
     auto destDenominator = -1;
@@ -646,7 +698,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
         auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
         auto barLength = toSequence->getBarLengthsInTicks()[i];
         if (destStart >= firstTickOfBar &&
-                destStart <= firstTickOfBar + barLength)
+            destStart <= firstTickOfBar + barLength)
         {
             destNumerator = toSequence->getNumerator(i);
             destDenominator = toSequence->getDenominator(i);
@@ -657,14 +709,16 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
 
     auto minimumRequiredNewSequenceLength = destStart + (segLength);
     auto ticksToAdd = minimumRequiredNewSequenceLength - toSequence->getLastTick();
-    auto barsToAdd = (int) (ceil((float)ticksToAdd / destBarLength));
+    auto barsToAdd = (int)(ceil((float)ticksToAdd / destBarLength));
     auto initialLastBarIndex = toSequence->getLastBarIndex();
     for (int i = 0; i < barsToAdd; i++)
     {
         const auto afterBar = initialLastBarIndex + i + 1;
 
         if (afterBar >= 998)
+        {
             break;
+        }
 
         toSequence->insertBars(1, afterBar);
         toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
@@ -675,18 +729,20 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
     if (!copyModeMerge)
     {
         auto destTrackEvents = destTrack->getEvents();
-        for (auto& e : destTrackEvents)
+        for (auto &e : destTrackEvents)
         {
             auto tick = e->getTick();
 
             if (tick >= destOffset && tick < destOffset + (segLength * copyCount))
+            {
                 destTrack->removeEvent(e);
+            }
         }
     }
 
     auto sourceTrackEvents = sourceTrack->getEvents();
 
-    for (auto& e : sourceTrackEvents)
+    for (auto &e : sourceTrackEvents)
     {
         auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
 
@@ -695,17 +751,23 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
             if (sourceTrack->getBus() == 0)
             {
                 if (ne->getNote() < copyNote0 || ne->getNote() > copyNote1)
+                {
                     continue;
+                }
             }
             else
             {
                 if (copyNote0 != 34 && copyNote0 != ne->getNote())
+                {
                     continue;
+                }
             }
         }
 
         if (e->getTick() >= sourceEnd)
+        {
             break;
+        }
 
         if (e->getTick() >= sourceStart)
         {
@@ -714,7 +776,9 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
                 int tickCandidate = e->getTick() + destOffset + (copy * segLength);
 
                 if (tickCandidate >= toSequence->getLastTick())
+                {
                     break;
+                }
 
                 destTrack->cloneEventIntoTrack(e, tickCandidate);
             }

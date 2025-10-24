@@ -1,12 +1,14 @@
 #include "PushBankCommand.hpp"
 #include "Mpc.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushBankCommand::PushBankCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i) {}
 
-    void PushBankCommand::execute() {
+    void PushBankCommand::execute()
+    {
         mpc.setBank(i);
     }
 
-}
+} // namespace mpc::command

@@ -4,38 +4,42 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc
+{
 
-	namespace sampler {
-		class Sampler;
-		class Program;
-	}
+    namespace sampler
+    {
+        class Sampler;
+        class Program;
+    } // namespace sampler
 
-	namespace file {
-		namespace pgmwriter {
+    namespace file
+    {
+        namespace pgmwriter
+        {
 
-			class SampleNames
-			{
+            class SampleNames
+            {
 
-			private:
-				std::vector<char> sampleNamesArray{};
-				int numberOfSamples{};
-				std::vector<int> snConvTable{};
+            private:
+                std::vector<char> sampleNamesArray{};
+                int numberOfSamples{};
+                std::vector<int> snConvTable{};
 
-			public: 
-				std::vector<char> getSampleNamesArray();
+            public:
+                std::vector<char> getSampleNamesArray();
 
-			private:
-				void setSampleName(int sampleNumber, std::string name);
+            private:
+                void setSampleName(int sampleNumber, std::string name);
 
-			public: 
-				int getNumberOfSamples();
-				std::vector<int> getSnConvTable();
+            public:
+                int getNumberOfSamples();
+                std::vector<int> getSnConvTable();
 
-			public:
-				SampleNames(mpc::sampler::Program* program, std::weak_ptr<mpc::sampler::Sampler> sampler);
-			};
+            public:
+                SampleNames(mpc::sampler::Program *program, std::weak_ptr<mpc::sampler::Sampler> sampler);
+            };
 
-		}
-	}
-}
+        } // namespace pgmwriter
+    } // namespace file
+} // namespace mpc

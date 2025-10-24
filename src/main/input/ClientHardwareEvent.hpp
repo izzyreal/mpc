@@ -4,40 +4,51 @@
 
 #include "hardware/Component.hpp"
 
-namespace mpc::input {
+namespace mpc::input
+{
 
-struct ClientHardwareEvent {
+    struct ClientHardwareEvent
+    {
 
-    struct TextInputKey {
-        char character;
-        bool isPress;
+        struct TextInputKey
+        {
+            char character;
+            bool isPress;
+        };
+
+        enum Source
+        {
+            HostInputMidi,
+            HostInputGesture,
+            HostInputKeyboard,
+            HostFocusEvent,
+            Internal
+        };
+
+        Source source;
+
+        enum class Type
+        {
+            Unknown,
+            PadPress,
+            PadRelease,
+            PadAftertouch,
+            DataWheelTurn,
+            SliderMove,
+            PotMove,
+            ButtonPress,
+            ButtonRelease,
+            ButtonDoublePress,
+            HostFocusLost,
+            ButtonPressAndRelease
+        };
+
+        Type type = Type::Unknown;
+        std::optional<int> index;
+        hardware::ComponentId componentId;
+        std::optional<float> value;
+        std::optional<float> deltaValue;
+        std::optional<TextInputKey> textInputKey;
     };
-
-    enum Source { HostInputMidi, HostInputGesture, HostInputKeyboard, HostFocusEvent, Internal };
-    
-    Source source;
-    
-    enum class Type {
-        Unknown,
-        PadPress,
-        PadRelease,
-        PadAftertouch,
-        DataWheelTurn,
-        SliderMove,
-        PotMove,
-        ButtonPress,
-        ButtonRelease,
-        ButtonDoublePress,
-        HostFocusLost,
-        ButtonPressAndRelease
-    };
-
-    Type type = Type::Unknown;
-    std::optional<int> index;
-    hardware::ComponentId componentId;
-    std::optional<float> value;
-    std::optional<float> deltaValue;
-    std::optional<TextInputKey> textInputKey;
-};
 
 } // namespace mpc::input

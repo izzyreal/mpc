@@ -7,7 +7,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 VmpcContinuePreviousSessionScreen::VmpcContinuePreviousSessionScreen(mpc::Mpc &m, int layer)
-: ScreenComponent(m, "vmpc-continue-previous-session", layer)
+    : ScreenComponent(m, "vmpc-continue-previous-session", layer)
 {
     auto label0 = std::make_shared<Label>(mpc, "line0", "An auto-saved previous session", 24, 10, 32 * 6);
     addChild(label0);
@@ -23,29 +23,30 @@ void VmpcContinuePreviousSessionScreen::function(int i)
 {
     auto autoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
 
-    switch (i) {
-        case 1:
-            // NO
-            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-            break;
-        case 2:
-            // YES
-            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-            restoreAutoSavedStateAction();
-            break;
-        case 3:
-            // NEVER
-            autoSaveScreen->setAutoLoadOnStart(0);
-            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-            break;
-        case 4:
-            // ALWAYS
-            autoSaveScreen->setAutoLoadOnStart(2);
-            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-            restoreAutoSavedStateAction();
-            break;
-        default:
-            break;
+    switch (i)
+    {
+    case 1:
+        // NO
+        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+        break;
+    case 2:
+        // YES
+        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+        restoreAutoSavedStateAction();
+        break;
+    case 3:
+        // NEVER
+        autoSaveScreen->setAutoLoadOnStart(0);
+        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+        break;
+    case 4:
+        // ALWAYS
+        autoSaveScreen->setAutoLoadOnStart(2);
+        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+        restoreAutoSavedStateAction();
+        break;
+    default:
+        break;
     }
 }
 
@@ -53,4 +54,3 @@ void VmpcContinuePreviousSessionScreen::setRestoreAutoSavedStateAction(std::func
 {
     restoreAutoSavedStateAction = action;
 }
-

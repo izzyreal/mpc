@@ -2,9 +2,11 @@
 
 #include <string>
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
 
-    class DirectToDiskSettings {
+    class DirectToDiskSettings
+    {
 
     public:
         const int sampleRate;
@@ -18,7 +20,6 @@ namespace mpc::audiomidi {
         DirectToDiskSettings(int lengthInFrames,
                              bool splitStereoIntoLeftAndRightChannel,
                              int sampleRate,
-                             std::string  recordingName);
-
+                             std::string recordingName);
     };
-}
+} // namespace mpc::audiomidi

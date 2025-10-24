@@ -3,16 +3,15 @@
 
 namespace mpc::lcdgui::screens
 {
-	class SelectMixerDrumScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class SelectMixerDrumScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		SelectMixerDrumScreen(mpc::Mpc& mpc, const int layerIndex);
+        SelectMixerDrumScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
-
-	};
-}
+        void open() override;
+    };
+} // namespace mpc::lcdgui::screens

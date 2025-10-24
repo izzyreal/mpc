@@ -7,8 +7,10 @@
 #include <vector>
 #include "Sequencer.hpp"
 
-namespace mpc::sequencer {
-    class Clock {
+namespace mpc::sequencer
+{
+    class Clock
+    {
     public:
         Clock();
 
@@ -17,10 +19,10 @@ namespace mpc::sequencer {
          * typically a plugin host.
          */
         void processBufferExternal(const double hostPositionAtStartOfBufferQuarterNotes,
-                                          const int nFrames,
-                                          const int sampleRate,
-                                          const double bpm,
-                                          const int64_t timeInSamples);
+                                   const int nFrames,
+                                   const int sampleRate,
+                                   const double bpm,
+                                   const int64_t timeInSamples);
 
         /**
          * Generates musical position information in the absence of a host or another
@@ -28,22 +30,22 @@ namespace mpc::sequencer {
          * This is typically used by VMPC2000XL in its standalone for.
          */
         void processBufferInternal(const float tempo,
-                      const uint32_t sampleRate,
-                      const uint16_t numSamples,
-                      const double playStartPositionQuarterNotes);
+                                   const uint32_t sampleRate,
+                                   const uint16_t numSamples,
+                                   const double playStartPositionQuarterNotes);
 
-        const std::vector<uint16_t>& getTicksForCurrentBuffer();
+        const std::vector<uint16_t> &getTicksForCurrentBuffer();
         void reset();
         bool areTicksBeingProduced();
-        
+
         const double getLastProcessedHostPositionQuarterNotes();
 
         bool didJumpOccurInLastBuffer();
-        
+
         void generateTransportInfo(const float tempo,
-                                          const uint32_t sampleRate,
-                                          const uint16_t numSamples,
-                                          const double playStartPositionQuarterNotes);
+                                   const uint32_t sampleRate,
+                                   const uint16_t numSamples,
+                                   const double playStartPositionQuarterNotes);
 
     private:
         const double subDiv = 1.0 / Sequencer::TICKS_PER_QUARTER_NOTE;
@@ -68,6 +70,5 @@ namespace mpc::sequencer {
                                           const int sampleRate,
                                           const double bpm,
                                           const int64_t timeInSamples);
-
     };
-}
+} // namespace mpc::sequencer

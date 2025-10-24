@@ -9,13 +9,13 @@ using namespace mpc::engine::filter;
 using namespace std;
 
 StateVariableFilterControls::StateVariableFilterControls(string name, int idOffset)
-	: FilterControls(34, name, idOffset)
+    : FilterControls(34, name, idOffset)
 {
 }
 
-void StateVariableFilterControls::derive(mpc::engine::control::Control* c)
+void StateVariableFilterControls::derive(mpc::engine::control::Control *c)
 {
-	FilterControls::derive(c);
+    FilterControls::derive(c);
 }
 
 void StateVariableFilterControls::deriveSampleRateIndependentVariables()
@@ -25,5 +25,5 @@ void StateVariableFilterControls::deriveSampleRateIndependentVariables()
 
 float StateVariableFilterControls::deriveResonance()
 {
-    return static_cast< float >(2 * (1.0f - pow(FilterControls::deriveResonance(), 0.25)));
+    return static_cast<float>(2 * (1.0f - pow(FilterControls::deriveResonance(), 0.25)));
 }

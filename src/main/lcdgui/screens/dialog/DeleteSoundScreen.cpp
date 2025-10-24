@@ -2,7 +2,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteSoundScreen::DeleteSoundScreen(mpc::Mpc& mpc, const int layerIndex)
+DeleteSoundScreen::DeleteSoundScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-sound", layerIndex)
 {
 }
@@ -17,24 +17,30 @@ void DeleteSoundScreen::function(int i)
 
     switch (i)
     {
-        case 2:
-            mpc.getLayeredScreen()->openScreen<DeleteAllSoundScreen>();
-            break;
-        case 3:
+    case 2:
+        mpc.getLayeredScreen()->openScreen<DeleteAllSoundScreen>();
+        break;
+    case 3:
+        mpc.getLayeredScreen()->openScreen<SoundScreen>();
+        break;
+    case 4:
+        sampler->deleteSound(sampler->getSoundIndex());
+
+        if (sampler->getSoundIndex() > sampler->getSoundCount() - 1)
+        {
+            sampler->setSoundIndex(sampler->getSoundCount() - 1);
+        }
+
+        if (sampler->getSoundCount() > 0)
+        {
             mpc.getLayeredScreen()->openScreen<SoundScreen>();
-            break;
-        case 4:
-            sampler->deleteSound(sampler->getSoundIndex());
+        }
+        else
+        {
+            mpc.getLayeredScreen()->openScreen(sampler->getPreviousScreenName());
+        }
 
-            if (sampler->getSoundIndex() > sampler->getSoundCount() - 1)
-                sampler->setSoundIndex(sampler->getSoundCount() - 1);
-
-            if (sampler->getSoundCount() > 0)
-                mpc.getLayeredScreen()->openScreen<SoundScreen>();
-            else
-                mpc.getLayeredScreen()->openScreen(sampler->getPreviousScreenName());
-
-            break;
+        break;
     }
 }
 

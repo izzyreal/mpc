@@ -47,9 +47,9 @@ void Song::setLastStep(int i)
         return;
     }
 
-	lastStep = candidate;
+    lastStep = candidate;
 
-	if (lastStep < firstStep)
+    if (lastStep < firstStep)
     {
         setFirstStep(lastStep);
     }
@@ -67,31 +67,37 @@ void Song::setName(std::string str)
 
 std::string Song::getName()
 {
-	if (!used)
+    if (!used)
+    {
         return "(Unused)";
-	
+    }
+
     return name;
 }
 
 void Song::deleteStep(int stepIndex)
 {
-    if (stepIndex >= (int) steps.size())
-		return;
+    if (stepIndex >= (int)steps.size())
+    {
+        return;
+    }
 
     steps.erase(steps.begin() + stepIndex);
 
     if (lastStep >= steps.size())
+    {
         setLastStep(steps.size() - 1);
+    }
 }
 
 void Song::insertStep(int stepIndex)
 {
-	steps.insert(steps.begin() + stepIndex, std::make_shared<Step>());
+    steps.insert(steps.begin() + stepIndex, std::make_shared<Step>());
 }
 
 std::weak_ptr<Step> Song::getStep(int i)
 {
-	return steps[i];
+    return steps[i];
 }
 
 int Song::getStepCount()

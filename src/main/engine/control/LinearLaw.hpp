@@ -5,10 +5,11 @@
 
 #include <memory>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
 
     class LinearLaw
-            : public AbstractLaw
+        : public AbstractLaw
     {
 
     public:
@@ -18,6 +19,5 @@ namespace mpc::engine::control {
 
     public:
         static std::shared_ptr<LinearLaw> UNITY();
-
     };
-}
+} // namespace mpc::engine::control

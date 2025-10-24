@@ -5,7 +5,8 @@
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
     class AudioMixer;
 
     class AudioMixerBus
@@ -28,4 +29,4 @@ namespace mpc::engine::audio::mixer {
     public:
         AudioMixerBus(AudioMixer *mixer, std::shared_ptr<BusControls> busControls);
     };
-}
+} // namespace mpc::engine::audio::mixer

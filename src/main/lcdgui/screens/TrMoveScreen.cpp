@@ -7,7 +7,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-TrMoveScreen::TrMoveScreen(mpc::Mpc& mpc, const int layerIndex)
+TrMoveScreen::TrMoveScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "tr-move", layerIndex)
 {
 }
@@ -77,7 +77,7 @@ void TrMoveScreen::left()
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
- 
+
     if (focusedFieldName == "sq")
     {
         return;
@@ -110,41 +110,42 @@ void TrMoveScreen::function(int i)
 {
     switch (i)
     {
-        // Intentional fall-through
-        case 0:
-        case 1:
-        case 3:
-            {
-                auto eventsScreen = mpc.screens->get<EventsScreen>();
-                eventsScreen->tab = i;
-                mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
-                break;
-            }
-        case 4:
-            if (isSelected())
-            {
-                cancel();
-            }
+    // Intentional fall-through
+    case 0:
+    case 1:
+    case 3:
+    {
+        auto eventsScreen = mpc.screens->get<EventsScreen>();
+        eventsScreen->tab = i;
+        mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+        break;
+    }
+    case 4:
+        if (isSelected())
+        {
+            cancel();
+        }
+        break;
+    case 5:
+    {
+        const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+        if (focusedFieldName == "sq")
+        {
             break;
-        case 5: {
-                    const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        }
 
-                    if (focusedFieldName == "sq")
-                    {
-                        break;
-                    }
-
-                    if (isSelected())
-                    {
-                        auto sequence = sequencer.lock()->getActiveSequence();
-                        insert(sequence.get());
-                    }
-                    else
-                    {
-                        select();
-                    }
-                    break;
-                }
+        if (isSelected())
+        {
+            auto sequence = sequencer.lock()->getActiveSequence();
+            insert(sequence.get());
+        }
+        else
+        {
+            select();
+        }
+        break;
+    }
     }
 }
 
@@ -313,7 +314,7 @@ void TrMoveScreen::cancel()
     SetDirty();
 }
 
-void TrMoveScreen::insert(mpc::sequencer::Sequence* s)
+void TrMoveScreen::insert(mpc::sequencer::Sequence *s)
 {
     s->moveTrack(selectedTrackIndex, currentTrackIndex);
     selectedTrackIndex = -1;

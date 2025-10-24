@@ -10,36 +10,38 @@ Layer::Layer(int index) : Component("layer " + std::to_string(index))
 {
 }
 
-mpc::lcdgui::Background* Layer::getBackground()
+mpc::lcdgui::Background *Layer::getBackground()
 {
-	return findChild<Background>("").get();
+    return findChild<Background>("").get();
 }
 
-mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys()
+mpc::lcdgui::FunctionKeys *Layer::getFunctionKeys()
 {
-	return findChild<FunctionKeys>("function-keys").get();
+    return findChild<FunctionKeys>("function-keys").get();
 }
 
 bool Layer::setFocus(std::string fieldName)
 {
-	auto newFocus = findField(fieldName);
+    auto newFocus = findField(fieldName);
 
-	if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
-		return false;
+    if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
+    {
+        return false;
+    }
 
     for (auto &f : findFields())
     {
         f->loseFocus(fieldName);
     }
-    
-	focus = fieldName;
+
+    focus = fieldName;
 
     newFocus->takeFocus();
-	findChild<ScreenComponent>()->bringToFront(newFocus.get());
-	return true;
+    findChild<ScreenComponent>()->bringToFront(newFocus.get());
+    return true;
 }
 
 std::string Layer::getFocus()
 {
-	return focus;
+    return focus;
 }

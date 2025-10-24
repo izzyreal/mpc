@@ -2,12 +2,13 @@
 
 #include "engine/audio/core/AudioProcess.hpp"
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
     class MixerInterconnection;
 
     class InterconnectionInputProcess
-            : public mpc::engine::audio::core::AudioProcess
+        : public mpc::engine::audio::core::AudioProcess
     {
 
     public:
@@ -20,4 +21,4 @@ namespace mpc::engine {
     public:
         InterconnectionInputProcess(MixerInterconnection *mmi, mpc::engine::audio::core::AudioBuffer *sharedBuffer);
     };
-}
+} // namespace mpc::engine

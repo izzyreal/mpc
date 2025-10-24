@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushEraseCommand : public Command {
+    class PushEraseCommand : public Command
+    {
     public:
         explicit PushEraseCommand(mpc::Mpc &mpc);
         void execute() override;
@@ -12,4 +14,4 @@ namespace mpc::command {
         mpc::Mpc &mpc;
     };
 
-}
+} // namespace mpc::command

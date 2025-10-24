@@ -15,7 +15,9 @@ int MultiRecordingSetupLine::getIn()
 void MultiRecordingSetupLine::setTrack(int i)
 {
     if (i < -1 || i > 63)
+    {
         return;
+    }
 
     track = i;
 }

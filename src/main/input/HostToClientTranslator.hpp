@@ -5,12 +5,14 @@
 
 #include <memory>
 
-namespace mpc::input {
+namespace mpc::input
+{
 
     class KeyboardBindings;
 
-    struct HostToClientTranslator {
-        static std::optional<ClientHardwareEvent> translate(const HostInputEvent&, std::shared_ptr<KeyboardBindings>);
+    struct HostToClientTranslator
+    {
+        static std::optional<ClientHardwareEvent> translate(const HostInputEvent &, std::shared_ptr<KeyboardBindings>);
     };
 
 } // namespace mpc::input

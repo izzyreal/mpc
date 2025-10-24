@@ -18,7 +18,7 @@ TimeSignature::TimeSignature()
 TimeSignature::TimeSignature(int tick, int delta, int num, int den, int meter, int div)
     : MetaEvent(tick, delta, MetaEvent::TIME_SIGNATURE)
 {
-	setTimeSignature(num, den, meter, div);
+    setTimeSignature(num, den, meter, div);
     mLength = mpc::midi::util::VariableLengthInt(4);
 }
 
@@ -49,7 +49,7 @@ int TimeSignature::getDenominatorValue()
 
 int TimeSignature::getRealDenominator()
 {
-    return static_cast< int >(pow(2, mDenominator));
+    return static_cast<int>(pow(2, mDenominator));
 }
 
 int TimeSignature::getMeter()
@@ -67,73 +67,80 @@ int TimeSignature::getEventSize()
     return 7;
 }
 
-void TimeSignature::writeToOutputStream(std::ostream& out)
+void TimeSignature::writeToOutputStream(std::ostream &out)
 {
     MetaEvent::writeToOutputStream(out);
-    out << (char) 4;
-    out << (char) mNumerator;
-    out << (char) mDenominator;
-    out << (char) mMeter;
-    out << (char) mDivision;
+    out << (char)4;
+    out << (char)mNumerator;
+    out << (char)mDenominator;
+    out << (char)mMeter;
+    out << (char)mDivision;
 }
 
-void TimeSignature::writeToOutputStream(std::ostream& out, bool writeType)
+void TimeSignature::writeToOutputStream(std::ostream &out, bool writeType)
 {
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-std::shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData* info)
+std::shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData *info)
 {
-	if (info->length.getValue() != 4) {
-		return std::make_shared<GenericMetaEvent>(tick, delta, info);
-	}
-	int num = info->data[0];
-	int den = info->data[1];
-	int met = info->data[2];
-	int fps = info->data[3];
-	den = (int)(pow(2, den));
-	return std::make_shared<TimeSignature>(tick, delta, num, den, met, fps);
+    if (info->length.getValue() != 4)
+    {
+        return std::make_shared<GenericMetaEvent>(tick, delta, info);
+    }
+    int num = info->data[0];
+    int den = info->data[1];
+    int met = info->data[2];
+    int fps = info->data[3];
+    den = (int)(pow(2, den));
+    return std::make_shared<TimeSignature>(tick, delta, num, den, met, fps);
 }
 
 int TimeSignature::log2(int den)
 {
-	switch (den) {
-	case 2:
-		return 1;
-	case 4:
-		return 2;
-	case 8:
-		return 3;
-	case 16:
-		return 4;
-	case 32:
-		return 5;
-	}
+    switch (den)
+    {
+    case 2:
+        return 1;
+    case 4:
+        return 2;
+    case 8:
+        return 3;
+    case 16:
+        return 4;
+    case 32:
+        return 5;
+    }
 
-	return 0;
+    return 0;
 }
 
 std::string TimeSignature::toString()
 {
-	return MetaEvent::toString() + " " + std::to_string(mNumerator) + "/" + std::to_string(getRealDenominator());
+    return MetaEvent::toString() + " " + std::to_string(mNumerator) + "/" + std::to_string(getRealDenominator());
 }
 
-int TimeSignature::compareTo(mpc::midi::event::MidiEvent* other)
+int TimeSignature::compareTo(mpc::midi::event::MidiEvent *other)
 {
-    if(mTick != other->getTick()) {
+    if (mTick != other->getTick())
+    {
         return mTick < other->getTick() ? -1 : 1;
     }
-    if(mDelta.getValue() != other->getDelta()) {
+    if (mDelta.getValue() != other->getDelta())
+    {
         return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
-    if(dynamic_cast<TimeSignature*>(other) == nullptr) {
+    if (dynamic_cast<TimeSignature *>(other) == nullptr)
+    {
         return 1;
     }
-    auto o = dynamic_cast<TimeSignature*>(other);
-    if(mNumerator != o->mNumerator) {
+    auto o = dynamic_cast<TimeSignature *>(other);
+    if (mNumerator != o->mNumerator)
+    {
         return mNumerator < o->mNumerator ? -1 : 1;
     }
-    if(mDenominator != o->mDenominator) {
+    if (mDenominator != o->mDenominator)
+    {
         return mDenominator < o->mDenominator ? -1 : 1;
     }
     return 0;

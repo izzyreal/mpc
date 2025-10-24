@@ -11,7 +11,7 @@
 using namespace mpc::disk;
 using namespace mpc::file;
 
-void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc& mpc, const fs::path& p)
+void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc &mpc, const fs::path &p)
 {
     assert(fs::is_directory(p));
 
@@ -27,7 +27,7 @@ void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc& mpc, const fs::path& p)
 
     std::vector<std::string> existingNames;
 
-    for (auto& e : fs::directory_iterator(p))
+    for (auto &e : fs::directory_iterator(p))
     {
         std::string akaiName;
 
@@ -58,7 +58,7 @@ void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc& mpc, const fs::path& p)
         }
     }
 
-    for (auto& e : fs::directory_iterator(tempRoot))
+    for (auto &e : fs::directory_iterator(tempRoot))
     {
         fs::rename(e, p / e.path().filename());
     }

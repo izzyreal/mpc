@@ -4,20 +4,19 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-	class DeleteSoundScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class DeleteSoundScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
-		void turnWheel(int i) override;
+    public:
+        void function(int i) override;
+        void turnWheel(int i) override;
 
-		DeleteSoundScreen(mpc::Mpc& mpc, const int layerIndex);
+        DeleteSoundScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
 
-	private:
-		void displaySnd();
-
-	};
-}
+    private:
+        void displaySnd();
+    };
+} // namespace mpc::lcdgui::screens::dialog

@@ -6,12 +6,12 @@
 
 using namespace mpc::engine;
 
-InterconnectionOutputProcess::InterconnectionOutputProcess(mpc::engine::audio::core::AudioBuffer* sharedBuffer)
+InterconnectionOutputProcess::InterconnectionOutputProcess(mpc::engine::audio::core::AudioBuffer *sharedBuffer)
     : sharedBuffer(sharedBuffer)
 {
 }
 
-int InterconnectionOutputProcess::processAudio(mpc::engine::audio::core::AudioBuffer* buffer)
+int InterconnectionOutputProcess::processAudio(mpc::engine::audio::core::AudioBuffer *buffer)
 {
     buffer->copyFrom(sharedBuffer);
     return AUDIO_OK;

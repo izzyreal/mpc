@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushTrackMuteCommand : public Command {
+    class PushTrackMuteCommand : public Command
+    {
     public:
         explicit PushTrackMuteCommand(mpc::Mpc &mpc);
         void execute() override;
@@ -12,4 +14,4 @@ namespace mpc::command {
         mpc::Mpc &mpc;
     };
 
-}
+} // namespace mpc::command

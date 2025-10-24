@@ -4,5 +4,5 @@ using namespace mpc::sequencer;
 
 EmptyEvent::EmptyEvent()
 {
-	// very empty indeed.
+    // very empty indeed.
 }

@@ -6,12 +6,11 @@ using namespace mpc::nvram;
 MidiControlCommand::MidiControlCommand(const std::string mpcHardwareLabelToUse,
                                        const MidiMessageType midiMessageTypeToUse,
                                        const int8_t midiChannelIndexToUse,
-                                       const int8_t numberToUse) :
-    mpcHardwareLabel(std::move(mpcHardwareLabelToUse)),
-    midiMessageType(midiMessageTypeToUse),
-    midiChannelIndex(midiChannelIndexToUse),
-    number(numberToUse),
-    value(-2)
+                                       const int8_t numberToUse) : mpcHardwareLabel(std::move(mpcHardwareLabelToUse)),
+                                                                   midiMessageType(midiMessageTypeToUse),
+                                                                   midiChannelIndex(midiChannelIndexToUse),
+                                                                   number(numberToUse),
+                                                                   value(-2)
 {
     if (midiMessageType != NOTE)
     {
@@ -23,12 +22,11 @@ MidiControlCommand::MidiControlCommand(const std::string mpcHardwareLabelToUse,
                                        const MidiMessageType midiMessageTypeToUse,
                                        const int8_t midiChannelIndexToUse,
                                        const int8_t numberToUse,
-                                       const int8_t valueToUse) :
-    mpcHardwareLabel(std::move(mpcHardwareLabelToUse)),
-    midiMessageType(midiMessageTypeToUse),
-    midiChannelIndex(midiChannelIndexToUse),
-    number(numberToUse),
-    value(valueToUse)
+                                       const int8_t valueToUse) : mpcHardwareLabel(std::move(mpcHardwareLabelToUse)),
+                                                                  midiMessageType(midiMessageTypeToUse),
+                                                                  midiChannelIndex(midiChannelIndexToUse),
+                                                                  number(numberToUse),
+                                                                  value(valueToUse)
 {
     if (midiMessageType != CC)
     {
@@ -36,18 +34,17 @@ MidiControlCommand::MidiControlCommand(const std::string mpcHardwareLabelToUse,
     }
 }
 
-MidiControlCommand::MidiControlCommand(const MidiControlCommand &c) :
-    mpcHardwareLabel(c.mpcHardwareLabel),
-    midiMessageType(c.midiMessageType),
-    midiChannelIndex(c.midiChannelIndex),
-    number(c.number),
-    value(c.value)
+MidiControlCommand::MidiControlCommand(const MidiControlCommand &c) : mpcHardwareLabel(c.mpcHardwareLabel),
+                                                                      midiMessageType(c.midiMessageType),
+                                                                      midiChannelIndex(c.midiChannelIndex),
+                                                                      number(c.number),
+                                                                      value(c.value)
 {
     if (midiMessageType == NOTE && value != -2)
     {
         throw std::invalid_argument("A MidiControlCommand of type NOTE may not have a value");
     }
-    
+
     if (midiMessageType == CC && value == -2)
     {
         throw std::invalid_argument("A MidiControlCommand of type CC must have a value");
@@ -86,7 +83,7 @@ std::vector<char> MidiControlCommand::toBytes() const
     {
         throw std::invalid_argument("A MidiControlCommand of type NOTE may not have a value");
     }
-    
+
     if (midiMessageType == CC && value == -2)
     {
         throw std::invalid_argument("A MidiControlCommand of type CC must have a value");
@@ -237,4 +234,3 @@ bool MidiControlCommand::isCC() const
 {
     return midiMessageType == CC;
 }
-

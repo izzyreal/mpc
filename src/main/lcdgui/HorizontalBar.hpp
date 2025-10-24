@@ -3,18 +3,17 @@
 
 namespace mpc::lcdgui
 {
-	class HorizontalBar
-		: public Component
-	{
+    class HorizontalBar
+        : public Component
+    {
 
-	private:
-		int value;
+    private:
+        int value;
 
-	public:
-		void setValue(int value);
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
+    public:
+        void setValue(int value);
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-		HorizontalBar(MRECT rect, int value = 0);
-
-	};
-}
+        HorizontalBar(MRECT rect, int value = 0);
+    };
+} // namespace mpc::lcdgui

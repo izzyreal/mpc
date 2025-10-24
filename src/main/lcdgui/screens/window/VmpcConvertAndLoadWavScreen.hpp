@@ -3,21 +3,21 @@
 
 #include <functional>
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window
+{
 
-	class VmpcConvertAndLoadWavScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class VmpcConvertAndLoadWavScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-        VmpcConvertAndLoadWavScreen(mpc::Mpc& mpc, const int layerIndex);
+        VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc, const int layerIndex);
 
         void setLoadRoutine(std::function<void()> newLoadRoutine);
-        
+
     private:
         std::function<void()> loadRoutine;
-        
-	};
-}
+    };
+} // namespace mpc::lcdgui::screens::window

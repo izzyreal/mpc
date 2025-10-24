@@ -2,10 +2,11 @@
 
 #include "Component.hpp"
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 
     class Effect
-            : public Component
+        : public Component
     {
 
     private:
@@ -15,7 +16,6 @@ namespace mpc::lcdgui {
         void setFilled(bool b);
         void Draw(std::vector<std::vector<bool>> *pixels) override;
         Effect(MRECT rect);
-
     };
 
-}
+} // namespace mpc::lcdgui

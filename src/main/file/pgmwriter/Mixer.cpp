@@ -6,26 +6,26 @@
 using namespace mpc::file::pgmwriter;
 using namespace mpc::sampler;
 
-Mixer::Mixer(mpc::sampler::Program* program)
+Mixer::Mixer(mpc::sampler::Program *program)
 {
-	mixerArray = std::vector<char>(384 + 3);
+    mixerArray = std::vector<char>(384 + 3);
 
-	for (int i = 0; i < 64; i++)
-	{
-		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(i + 35));
-		auto smc = noteParameters->getStereoMixerChannel();
-		auto ifmc = noteParameters->getIndivFxMixerChannel();
-		setVolume(i, smc->getLevel());
-		setPan(i, smc->getPanning());
-		setVolumeIndividual(i, ifmc->getVolumeIndividualOut());
-		setOutput(i, ifmc->getOutput());
-		setEffectsSendLevel(i, ifmc->getFxSendLevel());
-		setEffectsOutput(i, ifmc->getFxPath());
-	}
+    for (int i = 0; i < 64; i++)
+    {
+        auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
+        auto smc = noteParameters->getStereoMixerChannel();
+        auto ifmc = noteParameters->getIndivFxMixerChannel();
+        setVolume(i, smc->getLevel());
+        setPan(i, smc->getPanning());
+        setVolumeIndividual(i, ifmc->getVolumeIndividualOut());
+        setOutput(i, ifmc->getOutput());
+        setEffectsSendLevel(i, ifmc->getFxSendLevel());
+        setEffectsOutput(i, ifmc->getFxPath());
+    }
 
-	mixerArray[384] = 0;
-	mixerArray[385] = 64;
-	mixerArray[386] = 0;
+    mixerArray[384] = 0;
+    mixerArray[385] = 64;
+    mixerArray[386] = 0;
 }
 
 std::vector<char> Mixer::getMixerArray()

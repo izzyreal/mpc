@@ -3,11 +3,16 @@
 #include <algorithm>
 #include <string>
 
-namespace mpc::lcdgui {
-    struct MRECT {
+namespace mpc::lcdgui
+{
+    struct MRECT
+    {
         int L, T, R, B;
 
-        MRECT() { L = T = R = B = 0; }
+        MRECT()
+        {
+            L = T = R = B = 0;
+        }
         MRECT(int l, int t, int r, int b) : L(l), T(t), R(r), B(b) {}
 
         bool Empty() const
@@ -25,26 +30,44 @@ namespace mpc::lcdgui {
             L = T = R = B = 0;
         }
 
-        bool operator==(const MRECT& rhs) const
+        bool operator==(const MRECT &rhs) const
         {
             return (L == rhs.L && T == rhs.T && R == rhs.R && B == rhs.B);
         }
 
-        bool operator!=(const MRECT& rhs) const
+        bool operator!=(const MRECT &rhs) const
         {
             return !(*this == rhs);
         }
 
-        inline int W() const { return R - L; }
-        inline int H() const { return B - T; }
-        inline float MW() const { return 0.5f * (float) (L + R); }
-        inline float MH() const { return 0.5f * (float) (T + B); }
-
-        inline MRECT Union(MRECT* pRHS)
+        inline int W() const
         {
-            if (Empty()) { return *pRHS; }
-            if (pRHS->Empty()) { return *this; }
+            return R - L;
+        }
+        inline int H() const
+        {
+            return B - T;
+        }
+        inline float MW() const
+        {
+            return 0.5f * (float)(L + R);
+        }
+        inline float MH() const
+        {
+            return 0.5f * (float)(T + B);
+        }
+
+        inline MRECT Union(MRECT *pRHS)
+        {
+            if (Empty())
+            {
+                return *pRHS;
+            }
+            if (pRHS->Empty())
+            {
+                return *this;
+            }
             return MRECT(std::min<int>(L, pRHS->L), std::min<int>(T, pRHS->T), std::max<int>(R, pRHS->R), std::max<int>(B, pRHS->B));
         }
     };
-}
+} // namespace mpc::lcdgui

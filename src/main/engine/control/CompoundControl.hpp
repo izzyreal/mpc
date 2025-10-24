@@ -5,7 +5,8 @@
 
 #include <engine/control/Control.hpp>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
     class CompoundControl : public Control
     {
     protected:
@@ -27,4 +28,4 @@ namespace mpc::engine::control {
     public:
         CompoundControl(int id, std::string name);
     };
-}
+} // namespace mpc::engine::control

@@ -8,7 +8,10 @@
 #include <iostream>
 #include <variant>
 
-namespace akaifat::fat { class AkaiFatLfnDirectoryEntry; }
+namespace akaifat::fat
+{
+    class AkaiFatLfnDirectoryEntry;
+}
 
 /*
  * An MpcFile contains either an akaifat::fat::AkaiFatLfnDirectoryEntry or a fs::path.
@@ -19,38 +22,39 @@ namespace akaifat::fat { class AkaiFatLfnDirectoryEntry; }
  * and deleting directories, etc.
  */
 
-namespace mpc::disk {
+namespace mpc::disk
+{
 
-class StdDisk;
+    class StdDisk;
 
-class MpcFile {
-    
-private:
-    bool raw = false;
-    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
-    fs::path fs_path;
-    
-    friend class StdDisk;
-        
-public:
-    // Returns an empty path if this MpcFile instance is backed by a rawEntry.
-    fs::path getPath();
-    bool isDirectory();
-    bool isFile();
-    bool exists();
-    std::string getName();
-    bool setName(std::string s);
-    unsigned long length();
-    void setFileData(std::vector<char>& data);
-    bool del();
-    std::vector<char> getBytes();
-    std::vector<std::shared_ptr<MpcFile>> listFiles();
-    std::string getNameWithoutExtension();
-    std::string getExtension();
-    std::shared_ptr<std::istream> getInputStream();
-    std::shared_ptr<std::ostream> getOutputStream();
-    
-    explicit MpcFile(const std::variant<fs::path, std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>>&);
-    
-};
-}
+    class MpcFile
+    {
+
+    private:
+        bool raw = false;
+        std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
+        fs::path fs_path;
+
+        friend class StdDisk;
+
+    public:
+        // Returns an empty path if this MpcFile instance is backed by a rawEntry.
+        fs::path getPath();
+        bool isDirectory();
+        bool isFile();
+        bool exists();
+        std::string getName();
+        bool setName(std::string s);
+        unsigned long length();
+        void setFileData(std::vector<char> &data);
+        bool del();
+        std::vector<char> getBytes();
+        std::vector<std::shared_ptr<MpcFile>> listFiles();
+        std::string getNameWithoutExtension();
+        std::string getExtension();
+        std::shared_ptr<std::istream> getInputStream();
+        std::shared_ptr<std::ostream> getOutputStream();
+
+        explicit MpcFile(const std::variant<fs::path, std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> &);
+    };
+} // namespace mpc::disk

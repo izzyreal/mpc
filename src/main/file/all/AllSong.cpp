@@ -7,15 +7,18 @@
 
 using namespace mpc::file::all;
 
-Song::Song(const std::vector<char>& loadBytes)
+Song::Song(const std::vector<char> &loadBytes)
 {
     auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 
-	for (char& c : nameBytes)
+    for (char &c : nameBytes)
     {
-		if (c == 0x00) break;
-		name.push_back(c);
-	}
+        if (c == 0x00)
+        {
+            break;
+        }
+        name.push_back(c);
+    }
 
     size_t end = name.find_last_not_of(' ');
     name = (end == std::string::npos) ? "" : name.substr(0, end + 1);
@@ -51,7 +54,7 @@ Song::Song(const std::vector<char>& loadBytes)
     isUsed = name != "(Unused)";
 }
 
-Song::Song(mpc::sequencer::Song* mpcSong)
+Song::Song(mpc::sequencer::Song *mpcSong)
 {
     auto songName = mpcSong->getName();
 
@@ -64,9 +67,9 @@ Song::Song(mpc::sequencer::Song* mpcSong)
         }
 
         saveBytes[NAME_OFFSET + i] = songName[i];
-	}
+    }
 
-	for (int i = 0; i < STEP_COUNT; i++)
+    for (int i = 0; i < STEP_COUNT; i++)
     {
         if (i >= mpcSong->getStepCount())
         {
@@ -88,7 +91,7 @@ Song::Song(mpc::sequencer::Song* mpcSong)
     saveBytes[LOOP_LAST_STEP_INDEX_OFFSET] = mpcSong->getLastStep();
     saveBytes[LOOP_ENABLED_OFFSET] = mpcSong->isLoopEnabled() ? 1 : 0;
 
-	for (int i = LOOP_ENABLED_OFFSET + 1; i < LENGTH; i++)
+    for (int i = LOOP_ENABLED_OFFSET + 1; i < LENGTH; i++)
     {
         saveBytes[i] = 0;
     }
@@ -124,7 +127,7 @@ bool Song::isLoopEnabled()
     return loopEnabled;
 }
 
-std::vector<char>& Song::getBytes()
+std::vector<char> &Song::getBytes()
 {
     return saveBytes;
 }

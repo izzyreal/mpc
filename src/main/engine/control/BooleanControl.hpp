@@ -2,7 +2,8 @@
 
 #include <engine/control/Control.hpp>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
     class BooleanControl : public Control
     {
 
@@ -16,7 +17,6 @@ namespace mpc::engine::control {
 
     public:
         BooleanControl(int id, std::string name);
-
     };
 
-}
+} // namespace mpc::engine::control

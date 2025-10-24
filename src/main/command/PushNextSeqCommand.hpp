@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushNextSeqCommand : public Command {
+    class PushNextSeqCommand : public Command
+    {
     public:
         explicit PushNextSeqCommand(mpc::Mpc &mpc);
         void execute() override;
@@ -12,4 +14,4 @@ namespace mpc::command {
         mpc::Mpc &mpc;
     };
 
-}
+} // namespace mpc::command

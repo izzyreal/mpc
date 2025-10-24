@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <engine/audio/core/Encoding.hpp>
 
-namespace mpc::engine::audio::core {
+namespace mpc::engine::audio::core
+{
 
     class AudioFormat final
     {
@@ -46,4 +47,4 @@ namespace mpc::engine::audio::core {
         virtual bool matches(AudioFormat *format);
     };
 
-}
+} // namespace mpc::engine::audio::core

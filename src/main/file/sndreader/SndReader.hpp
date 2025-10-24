@@ -8,44 +8,44 @@
 
 namespace mpc::disk
 {
-class MpcFile;
+    class MpcFile;
 }
 
 namespace mpc::file::sndreader
 {
-class SndHeaderReader;
+    class SndHeaderReader;
 }
 
 namespace mpc::file::sndreader
 {
-class SndReader
-{
-    
-private:
-    std::vector<char> sndFileArray;
-    std::shared_ptr<SndHeaderReader> sndHeaderReader;
-    
-public:
-    std::string getName();
-    bool isHeaderValid();
-    bool isMono();
+    class SndReader
+    {
 
-    int getSampleRate();
-    int getLevel();
-    int getStart();
-    int getEnd();
-    int getLoopLength();
-    bool isLoopEnabled();
-    int getTune();
-    int getNumberOfBeats();
-    void readData(std::shared_ptr<std::vector<float>>);
-    
-public:
-    std::vector<char>& getSndFileArray();
-    
-public:
-    SndReader(mpc::disk::MpcFile*);
-    
-    SndReader(const std::vector<char>& loadBytes);
-};
-}
+    private:
+        std::vector<char> sndFileArray;
+        std::shared_ptr<SndHeaderReader> sndHeaderReader;
+
+    public:
+        std::string getName();
+        bool isHeaderValid();
+        bool isMono();
+
+        int getSampleRate();
+        int getLevel();
+        int getStart();
+        int getEnd();
+        int getLoopLength();
+        bool isLoopEnabled();
+        int getTune();
+        int getNumberOfBeats();
+        void readData(std::shared_ptr<std::vector<float>>);
+
+    public:
+        std::vector<char> &getSndFileArray();
+
+    public:
+        SndReader(mpc::disk::MpcFile *);
+
+        SndReader(const std::vector<char> &loadBytes);
+    };
+} // namespace mpc::file::sndreader

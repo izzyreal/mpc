@@ -15,16 +15,16 @@ using namespace mpc;
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens::window;
 
-void prepareApsResources(mpc::Mpc& mpc)
+void prepareApsResources(mpc::Mpc &mpc)
 {
     auto disk = mpc.getDisk();
 
     auto fs = cmrc::mpctest::get_filesystem();
 
-    for (auto &&entry: fs.iterate_directory("test/ApsLoading"))
+    for (auto &&entry : fs.iterate_directory("test/ApsLoading"))
     {
         auto file = fs.open("test/ApsLoading/" + entry.filename());
-        char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
+        char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
         auto newFile = disk->newFile(entry.filename());
         std::vector<char> dataVec(data, data + file.size());
         newFile->setFileData(dataVec);
@@ -33,7 +33,7 @@ void prepareApsResources(mpc::Mpc& mpc)
     disk->initFiles();
 }
 
-void doApsTest(mpc::Mpc& mpc)
+void doApsTest(mpc::Mpc &mpc)
 {
     prepareApsResources(mpc);
 

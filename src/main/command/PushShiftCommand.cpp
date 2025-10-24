@@ -5,7 +5,8 @@
 #include "lcdgui/Field.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushShiftCommand::PushShiftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -35,5 +36,4 @@ namespace mpc::command {
             field->setActiveSplit(split);
         }
     }
-}
-
+} // namespace mpc::command

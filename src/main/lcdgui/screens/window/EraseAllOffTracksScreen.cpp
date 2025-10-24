@@ -5,32 +5,32 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-EraseAllOffTracksScreen::EraseAllOffTracksScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "erase-all-off-tracks", layerIndex)
+EraseAllOffTracksScreen::EraseAllOffTracksScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "erase-all-off-tracks", layerIndex)
 {
 }
 
 void EraseAllOffTracksScreen::function(int i)
 {
-	ScreenComponent::function(i);
+    ScreenComponent::function(i);
 
-	switch (i)
-	{
-	case 4:
-	{
-		auto seq = sequencer.lock()->getActiveSequence();
-		int trackCounter = 0;
+    switch (i)
+    {
+    case 4:
+    {
+        auto seq = sequencer.lock()->getActiveSequence();
+        int trackCounter = 0;
 
-		for (auto& track : seq->getTracks())
-		{
-			if (!track->isOn())
-			{
-				seq->purgeTrack(trackCounter);
-			}
-			trackCounter++;
-		}
+        for (auto &track : seq->getTracks())
+        {
+            if (!track->isOn())
+            {
+                seq->purgeTrack(trackCounter);
+            }
+            trackCounter++;
+        }
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-		break;
-	}
-	}
+        break;
+    }
+    }
 }

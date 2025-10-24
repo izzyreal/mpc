@@ -2,27 +2,27 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-CantFindFileScreen::CantFindFileScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "cant-find-file", layerIndex)
+CantFindFileScreen::CantFindFileScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "cant-find-file", layerIndex)
 {
 }
 
 void CantFindFileScreen::open()
 {
-	findField("file")->setText(fileName);
+    findField("file")->setText(fileName);
 }
 
 void CantFindFileScreen::function(int i)
 {
 
-	switch (i)
-	{
-	case 1:
-		skipAll = true;
-		waitingForUser = false;
-		break;
-	case 2:
-		waitingForUser = false;
-		break;
-	}
+    switch (i)
+    {
+    case 1:
+        skipAll = true;
+        waitingForUser = false;
+        break;
+    case 2:
+        waitingForUser = false;
+        break;
+    }
 }

@@ -2,14 +2,14 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-ConvertSoundScreen::ConvertSoundScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "convert-sound", layerIndex)
+ConvertSoundScreen::ConvertSoundScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "convert-sound", layerIndex)
 {
 }
 
 void ConvertSoundScreen::open()
 {
-	displayConvert();
+    displayConvert();
 }
 
 void ConvertSoundScreen::turnWheel(int i)
@@ -17,58 +17,58 @@ void ConvertSoundScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "convert")
-	{
-		setConvert(i < 0 ? 0 : 1);
-	}
+    if (focusedFieldName == "convert")
+    {
+        setConvert(i < 0 ? 0 : 1);
+    }
 }
 
 void ConvertSoundScreen::function(int i)
 {
-	
-	switch (i)
-	{
-	case 3:
+
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->openScreen<SoundScreen>();
-		break;
-	case 4:
-		if (convert == 0)
-		{
-			if (sampler->getSound()->isMono())
-			{
-        mpc.getLayeredScreen()->openScreen<MonoToStereoScreen>();
-			}
-			else
-			{
-        mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
-			}
-		}
-		else
-		{
-        mpc.getLayeredScreen()->openScreen<ResampleScreen>();
-		}
-	}
+        break;
+    case 4:
+        if (convert == 0)
+        {
+            if (sampler->getSound()->isMono())
+            {
+                mpc.getLayeredScreen()->openScreen<MonoToStereoScreen>();
+            }
+            else
+            {
+                mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
+            }
+        }
+        else
+        {
+            mpc.getLayeredScreen()->openScreen<ResampleScreen>();
+        }
+    }
 }
 
 void ConvertSoundScreen::displayConvert()
 {
-	if (!sampler->getSound())
-	{
-		return;
-	}
+    if (!sampler->getSound())
+    {
+        return;
+    }
 
-	if (convert == 0 && sampler->getSound()->isMono())
-	{
-		findField("convert")->setText("MONO TO STEREO");
-	}
-	else
-	{
-		findField("convert")->setText(convertNames[convert]);
-	}
+    if (convert == 0 && sampler->getSound()->isMono())
+    {
+        findField("convert")->setText("MONO TO STEREO");
+    }
+    else
+    {
+        findField("convert")->setText(convertNames[convert]);
+    }
 }
 
 void ConvertSoundScreen::setConvert(int i)
 {
-	convert = i;
-	displayConvert();
+    convert = i;
+    displayConvert();
 }

@@ -8,7 +8,7 @@ SndHeaderWriter::SndHeaderWriter()
     setFirstTwoBytes();
 }
 
-std::vector<char>& SndHeaderWriter::getHeaderArray()
+std::vector<char> &SndHeaderWriter::getHeaderArray()
 {
     return headerArray;
 }
@@ -19,19 +19,22 @@ void SndHeaderWriter::setFirstTwoBytes()
     headerArray[1] = 4;
 }
 
-void SndHeaderWriter::setName(const std::string& name)
+void SndHeaderWriter::setName(const std::string &name)
 {
-	std::vector<char> nameArray(16);
-	
-    for (int i = 0; i < name.length(); i++) {
+    std::vector<char> nameArray(16);
+
+    for (int i = 0; i < name.length(); i++)
+    {
         nameArray[i] = name[i];
     }
 
-    for (int i = name.length(); i < nameArray.size(); i++) {
+    for (int i = name.length(); i < nameArray.size(); i++)
+    {
         nameArray[i] = 32;
     }
 
-    for (int i = 0; i < nameArray.size(); i++) {
+    for (int i = 0; i < nameArray.size(); i++)
+    {
         headerArray[i + 2] = nameArray[i];
     }
 }
@@ -83,15 +86,16 @@ void SndHeaderWriter::setBeatCount(int i)
 
 void SndHeaderWriter::setSampleRate(int i)
 {
-	auto shortBytes = ByteUtil::short2bytes(i - 65536);
+    auto shortBytes = ByteUtil::short2bytes(i - 65536);
     headerArray[40] = shortBytes[0];
     headerArray[41] = shortBytes[1];
 }
 
 void SndHeaderWriter::putLE(int offset, int value)
 {
-	auto ba = ByteUtil::uint2bytes(value);
-    for (auto j = 0; j < ba.size(); j++) {
+    auto ba = ByteUtil::uint2bytes(value);
+    for (auto j = 0; j < ba.size(); j++)
+    {
         headerArray[j + offset] = ba[j];
     }
 }

@@ -2,17 +2,17 @@
 
 namespace mpc::sequencer
 {
-	class Step
-	{
+    class Step
+    {
 
-	private:
-		int sequence = 0;
-		int repeatCount = 1;
+    private:
+        int sequence = 0;
+        int repeatCount = 1;
 
-	public:
-		void setSequence(int i);
-		int getSequence();
-		void setRepeats(int i);
-		int getRepeats();
-	};
-}
+    public:
+        void setSequence(int i);
+        int getSequence();
+        void setRepeats(int i);
+        int getRepeats();
+    };
+} // namespace mpc::sequencer

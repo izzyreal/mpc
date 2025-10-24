@@ -4,24 +4,24 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class SaveASequenceScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
-	{
+    class SaveASequenceScreen
+        : public mpc::lcdgui::ScreenComponent,
+          public mpc::lcdgui::screens::OpensNameScreen
+    {
 
-	public:
-		void turnWheel(int i) override;
-		void function(int i) override;
+    public:
+        void turnWheel(int i) override;
+        void function(int i) override;
         void openNameScreen() override;
 
-		SaveASequenceScreen(mpc::Mpc& mpc, const int layerIndex);
-		void open() override;
+        SaveASequenceScreen(mpc::Mpc &mpc, const int layerIndex);
+        void open() override;
 
-	private:
-		void displaySaveAs();
-		void displayFile();
+    private:
+        void displaySaveAs();
+        void displayFile();
 
-		int saveSequenceAs = 1;
-		void setSaveSequenceAs(int i);
-
-	};
-}
+        int saveSequenceAs = 1;
+        void setSaveSequenceAs(int i);
+    };
+} // namespace mpc::lcdgui::screens::window

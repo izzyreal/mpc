@@ -2,8 +2,10 @@
 
 #include "Paths.hpp"
 
-namespace mpc {
-    class TestPaths : public Paths {
+namespace mpc
+{
+    class TestPaths : public Paths
+    {
 
     protected:
         fs::path appConfigHome() override;
@@ -11,4 +13,4 @@ namespace mpc {
     public:
         fs::path appDocumentsPath() override;
     };
-}
+} // namespace mpc

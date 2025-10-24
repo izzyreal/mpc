@@ -5,11 +5,11 @@
 
 using namespace mpc::lcdgui::screens::dialog2;
 
-PopupScreen::PopupScreen(mpc::Mpc& mpc, int layer)
-	: ScreenComponent(mpc, "popup", layer)
+PopupScreen::PopupScreen(mpc::Mpc &mpc, int layer)
+    : ScreenComponent(mpc, "popup", layer)
 {
-	addChild(std::make_shared<Label>(mpc, "popup", "", 43, 23, 0));
-	findChild<Label>("popup")->setInverted(true);
+    addChild(std::make_shared<Label>(mpc, "popup", "", 43, 23, 0));
+    findChild<Label>("popup")->setInverted(true);
 }
 
 void PopupScreen::setText(std::string text)
@@ -19,7 +19,6 @@ void PopupScreen::setText(std::string text)
         text = text.substr(0, 28);
     }
 
-	findChild<Label>("popup")->setText(text);
-	SetDirty();
+    findChild<Label>("popup")->setText(text);
+    SetDirty();
 }
-

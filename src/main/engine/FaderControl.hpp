@@ -4,7 +4,8 @@
 
 #include <memory>
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
     class FaderControl : public mpc::engine::control::LawControl
     {
@@ -21,7 +22,6 @@ namespace mpc::engine {
         void setValue(float value) override;
 
         FaderControl();
-
     };
 
-}
+} // namespace mpc::engine

@@ -2,8 +2,8 @@
 
 using namespace mpc::lcdgui::screens;
 
-VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "vmpc-settings", layerIndex)
+VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "vmpc-settings", layerIndex)
 {
     easterEgg = std::make_shared<Background>();
     easterEgg->Hide(true);
@@ -13,7 +13,7 @@ VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VmpcSettingsScreen::open()
 {
-	displayInitialPadMapping();
+    displayInitialPadMapping();
     display16LevelsEraseMode();
     displayAutoConvertWavs();
     displayMidiControlMode();
@@ -34,37 +34,37 @@ void VmpcSettingsScreen::function(int i)
 {
     switch (i)
     {
-        case 1:
+    case 1:
         mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-            break;
-        case 2:
+        break;
+    case 2:
         mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-            break;
-        case 3:
+        break;
+    case 3:
         mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
-            break;
-        case 4:
-            if (midiControlMode == MidiControlMode::ORIGINAL)
-            {
-                return;
-            }
+        break;
+    case 4:
+        if (midiControlMode == MidiControlMode::ORIGINAL)
+        {
+            return;
+        }
 
         mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-            break;
-        case 5:
-            if (easterEgg->IsHidden())
-            {
-                easterEgg->Hide(false);
-                bringToFront(easterEgg.get());
-                easterEgg->setScrolling(true);
-            }
-            else
-            {
-                easterEgg->setScrolling(false);
-                easterEgg->Hide(true);
-                SetDirty();
-            }
-            break;
+        break;
+    case 5:
+        if (easterEgg->IsHidden())
+        {
+            easterEgg->Hide(false);
+            bringToFront(easterEgg.get());
+            easterEgg->setScrolling(true);
+        }
+        else
+        {
+            easterEgg->setScrolling(false);
+            easterEgg->Hide(true);
+            SetDirty();
+        }
+        break;
     }
 }
 
@@ -74,9 +74,9 @@ void VmpcSettingsScreen::turnWheel(int i)
     const auto focusedFieldName = getFocusedFieldName();
 
     if (focusedFieldName == "initial-pad-mapping")
-	{
-		setInitialPadMapping(initialPadMapping + i);
-	}
+    {
+        setInitialPadMapping(initialPadMapping + i);
+    }
     else if (focusedFieldName == "16-levels-erase-mode")
     {
         set16LevelsEraseMode(_16LevelsEraseMode + i);
@@ -98,17 +98,19 @@ void VmpcSettingsScreen::turnWheel(int i)
 
 void VmpcSettingsScreen::setInitialPadMapping(int i)
 {
-	if (i < 0 || i > 1)
-		return;
+    if (i < 0 || i > 1)
+    {
+        return;
+    }
 
-	initialPadMapping = i;
+    initialPadMapping = i;
 
-	displayInitialPadMapping();
+    displayInitialPadMapping();
 }
 
 void VmpcSettingsScreen::displayInitialPadMapping()
 {
-	findField("initial-pad-mapping")->setText(initialPadMappingNames[initialPadMapping]);
+    findField("initial-pad-mapping")->setText(initialPadMappingNames[initialPadMapping]);
 }
 
 void VmpcSettingsScreen::display16LevelsEraseMode()
@@ -119,7 +121,9 @@ void VmpcSettingsScreen::display16LevelsEraseMode()
 void VmpcSettingsScreen::set16LevelsEraseMode(int i)
 {
     if (i < 0 || i > 1)
+    {
         return;
+    }
 
     _16LevelsEraseMode = i;
     display16LevelsEraseMode();
@@ -128,7 +132,9 @@ void VmpcSettingsScreen::set16LevelsEraseMode(int i)
 void VmpcSettingsScreen::setAutoConvertWavs(int i)
 {
     if (i < 0 || i > 1)
+    {
         return;
+    }
 
     autoConvertWavs = i;
     displayAutoConvertWavs();
@@ -142,7 +148,9 @@ void VmpcSettingsScreen::displayAutoConvertWavs()
 void VmpcSettingsScreen::setMidiControlMode(int i)
 {
     if (i < 0 || i > 1)
+    {
         return;
+    }
 
     midiControlMode = i;
     displayMidiControlMode();
@@ -173,4 +181,3 @@ const bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled()
 {
     return nameTypingWithKeyboardEnabled;
 }
-

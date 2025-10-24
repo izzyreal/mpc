@@ -3,41 +3,40 @@
 
 namespace mpc::midi::event::meta
 {
-	class MetaEventData;
+    class MetaEventData;
 }
 
 namespace mpc::midi::event::meta
 {
-	class Tempo
-		: public MetaEvent
-	{
+    class Tempo
+        : public MetaEvent
+    {
 
-	public:
-        static const int DEFAULT_MPQN{ 500000 };
+    public:
+        static const int DEFAULT_MPQN{500000};
 
-	private:
-		int mMPQN;
-		float mBPM;
+    private:
+        int mMPQN;
+        float mBPM;
 
-	public:
+    public:
         float getBpm();
-		void setMpqn(int m);
-		void setBpm(float b);
+        void setMpqn(int m);
+        void setBpm(float b);
 
-	public:
-		int getEventSize() override;
-		void writeToOutputStream(std::ostream& out) override;
-		void writeToOutputStream(std::ostream& out, bool writeType) override;
+    public:
+        int getEventSize() override;
+        void writeToOutputStream(std::ostream &out) override;
+        void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-	public:
-		static std::shared_ptr<MetaEvent> parseTempo(int tick, int delta, MetaEventData* info);
+    public:
+        static std::shared_ptr<MetaEvent> parseTempo(int tick, int delta, MetaEventData *info);
 
-	public:
-		virtual int compareTo(mpc::midi::event::MidiEvent* other);
+    public:
+        virtual int compareTo(mpc::midi::event::MidiEvent *other);
 
-	public:
-		Tempo();
-		Tempo(int tick, int delta, int mpqn);
-
-	};
-}
+    public:
+        Tempo();
+        Tempo(int tick, int delta, int mpqn);
+    };
+} // namespace mpc::midi::event::meta

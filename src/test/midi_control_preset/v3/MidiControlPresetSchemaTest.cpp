@@ -68,4 +68,3 @@ TEST_CASE("Preset name length constraint", "[midi-control-preset-schema-v3]")
 
     REQUIRE_NOTHROW(validator.validate(presetJson));
 }
-

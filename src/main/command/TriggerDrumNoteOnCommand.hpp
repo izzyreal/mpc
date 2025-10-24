@@ -1,12 +1,15 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command::context {
+namespace mpc::command::context
+{
     struct TriggerDrumNoteOnContext;
 }
 
-namespace mpc::command {
-    class TriggerDrumNoteOnCommand : public Command {
+namespace mpc::command
+{
+    class TriggerDrumNoteOnCommand : public Command
+    {
     public:
         TriggerDrumNoteOnCommand(context::TriggerDrumNoteOnContext &ctx);
         void execute() override;

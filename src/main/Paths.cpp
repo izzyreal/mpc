@@ -36,8 +36,8 @@ fs::path Paths::configPath()
 
 fs::path Paths::storesPath()
 {
-  static auto storesPath = appDocumentsPath() / "Volumes";
-  return storesPath;
+    static auto storesPath = appDocumentsPath() / "Volumes";
+    return storesPath;
 }
 
 fs::path Paths::defaultLocalVolumePath()
@@ -48,8 +48,8 @@ fs::path Paths::defaultLocalVolumePath()
 
 fs::path Paths::logFilePath()
 {
-  static auto logFilePath = appDocumentsPath() / "vmpc.log";
-  return logFilePath;
+    static auto logFilePath = appDocumentsPath() / "vmpc.log";
+    return logFilePath;
 }
 
 fs::path Paths::recordingsPath()

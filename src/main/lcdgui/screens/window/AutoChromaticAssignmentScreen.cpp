@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 
-AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 
-: ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
+AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
 {
 }
 
@@ -20,15 +20,14 @@ void AutoChromaticAssignmentScreen::open()
         originalKey = 67;
         tune = 0;
     }
-    
-    
+
     auto program = getProgramOrThrow();
     setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     displayOriginalKey();
     displayTune();
     displayProgramName();
     displaySource();
-    
+
     mpc.addObserver(this);
 }
 
@@ -39,48 +38,48 @@ void AutoChromaticAssignmentScreen::close()
 
 void AutoChromaticAssignmentScreen::function(int i)
 {
-    
+
     switch (i)
     {
-        case 3:
-            mpc.getLayeredScreen()->closeCurrentScreen();
-            break;
-        case 4:
+    case 3:
+        mpc.getLayeredScreen()->closeCurrentScreen();
+        break;
+    case 4:
+    {
+        auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
+        newProgram->setName(newName);
+
+        for (int j = 35; j <= 98; j++)
         {
-            auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
-            newProgram->setName(newName);
-            
-            for (int j = 35; j <= 98; j++)
-            {
-                auto pad = newProgram->getPad(j - 35);
-                pad->setNote(j);
-                auto noteParameters = new NoteParameters(j - 35);
-                newProgram->setNoteParameters(j - 35, noteParameters);
-                noteParameters->setSoundIndex(sourceSoundIndex);
-                
-                noteParameters->setTune(((j - originalKey) * 10) + tune);
-            }
-            
-            auto programs = sampler->getPrograms();
-            
-            for (int j = 0; j < programs.size(); j++)
-            {
-                if (programs[j].lock() == newProgram)
-                {
-                    activeDrum().setProgram(j);
-                    break;
-                }
-            }
-            
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-            break;
+            auto pad = newProgram->getPad(j - 35);
+            pad->setNote(j);
+            auto noteParameters = new NoteParameters(j - 35);
+            newProgram->setNoteParameters(j - 35, noteParameters);
+            noteParameters->setSoundIndex(sourceSoundIndex);
+
+            noteParameters->setTune(((j - originalKey) * 10) + tune);
         }
+
+        auto programs = sampler->getPrograms();
+
+        for (int j = 0; j < programs.size(); j++)
+        {
+            if (programs[j].lock() == newProgram)
+            {
+                activeDrum().setProgram(j);
+                break;
+            }
+        }
+
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+        break;
+    }
     }
 }
 
 void AutoChromaticAssignmentScreen::turnWheel(int i)
 {
-    
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "source")
@@ -111,7 +110,8 @@ void AutoChromaticAssignmentScreen::openNameScreen()
 
     if (focusedFieldName == "program-name")
     {
-        const auto enterAction = [this](std::string& nameScreenName) {
+        const auto enterAction = [this](std::string &nameScreenName)
+        {
             newName = nameScreenName;
             mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
         };
@@ -164,7 +164,8 @@ void AutoChromaticAssignmentScreen::displayOriginalKey()
 void AutoChromaticAssignmentScreen::displaySnd()
 {
     auto sampleName = sourceSoundIndex == -1 ? "OFF" : sampler->getSoundName(sourceSoundIndex);
-    std::string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex)->isMono() ? "" : "(ST)";
+    std::string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex)->isMono() ? ""
+                                                                                                     : "(ST)";
     findField("snd")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 void AutoChromaticAssignmentScreen::displayProgramName()
@@ -172,7 +173,7 @@ void AutoChromaticAssignmentScreen::displayProgramName()
     findField("program-name")->setText(newName);
 }
 
-void AutoChromaticAssignmentScreen::update(Observable* observable, Message message)
+void AutoChromaticAssignmentScreen::update(Observable *observable, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

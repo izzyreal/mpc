@@ -9,7 +9,7 @@
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-TriggerDrumNoteOffCommand::TriggerDrumNoteOffCommand(TriggerDrumNoteOffContext& ctx)
+TriggerDrumNoteOffCommand::TriggerDrumNoteOffCommand(TriggerDrumNoteOffContext &ctx)
     : ctx(ctx) {}
 
 void TriggerDrumNoteOffCommand::execute()
@@ -61,14 +61,16 @@ void TriggerDrumNoteOffCommand::execute()
         if (ctx.isStepRecording && ctx.isDurationOfRecordedNotesTcValue)
         {
             newDuration = static_cast<int>(ctx.noteValueLengthInTicks * (ctx.tcValuePercentage * 0.01));
-            if (newDuration < 1) newDuration = 1;
+            if (newDuration < 1)
+            {
+                newDuration = 1;
+            }
         }
 
         const bool durationHasBeenAdjusted =
             ctx.activeTrack->finalizeNoteEventSynced(ctx.recordOnEvent, newDuration);
 
-        if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying)
-            || (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))
+        if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying) || (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))
         {
             if (!ctx.isAnyProgramPadRegisteredAsPressed())
             {
@@ -98,4 +100,3 @@ void TriggerDrumNoteOffCommand::execute()
         ctx.sequencerStopMetronomeTrack();
     }
 }
-

@@ -20,63 +20,67 @@ using namespace mpc::engine::control;
 
 using namespace std;
 
-MixControls::MixControls(MixerControls* mixerControls, int stripId, shared_ptr<BusControls> busControls, bool master)
-	: AudioControls(busControls->getId(), busControls->getName())
+MixControls::MixControls(MixerControls *mixerControls, int stripId, shared_ptr<BusControls> busControls, bool master)
+    : AudioControls(busControls->getId(), busControls->getName())
 {
-	this->mixerControls = mixerControls;
-	this->busControls = busControls;
-	this->master = master;
-	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
-	auto busId = busControls->getId();
-	channelCount = 2;
+    this->mixerControls = mixerControls;
+    this->busControls = busControls;
+    this->master = master;
+    gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
+    auto busId = busControls->getId();
+    channelCount = 2;
 
-	if (channelCount > 1) {
-		if (stripId == MixerControlsIds::CHANNEL_STRIP) {
-			lcrControl = make_shared<PanControl>();
-			add(lcrControl);
-		}
-		else {
-			lcrControl = make_shared<BalanceControl>();
-			add(lcrControl);
-		}
-		derive(lcrControl.get());
-	}
+    if (channelCount > 1)
+    {
+        if (stripId == MixerControlsIds::CHANNEL_STRIP)
+        {
+            lcrControl = make_shared<PanControl>();
+            add(lcrControl);
+        }
+        else
+        {
+            lcrControl = make_shared<BalanceControl>();
+            add(lcrControl);
+        }
+        derive(lcrControl.get());
+    }
 
-	muteControl = shared_ptr<BooleanControl>(createMuteControl());
-	derive(muteControl.get());
-	add(muteControl);
+    muteControl = shared_ptr<BooleanControl>(createMuteControl());
+    derive(muteControl.get());
+    add(muteControl);
 
-	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
-	add(gainControl);
-	derive(gainControl.get());
+    gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
+    add(gainControl);
+    derive(gainControl.get());
 }
 
-MixerControls* MixControls::getMixerControls() {
-	return mixerControls;
-}
-
-float& MixControls::HALF_ROOT_TWO()
+MixerControls *MixControls::getMixerControls()
 {
-	return HALF_ROOT_TWO_;
+    return mixerControls;
 }
-float MixControls::HALF_ROOT_TWO_ = static_cast< float >((sqrt(2) / 2));
 
-void MixControls::derive(Control* c)
+float &MixControls::HALF_ROOT_TWO()
 {
-	switch (c->getId()) {
-	case MixControlIds::MUTE:
-		mute = muteControl->getValue();
-		break;
-	case MixControlIds::GAIN:
-		gain = gainControl->getGain();
-		break;
-	case MixControlIds::LCR:
-		left = lcrControl->getLeft();
-		right = lcrControl->getRight();
-		break;
-	}
+    return HALF_ROOT_TWO_;
 }
+float MixControls::HALF_ROOT_TWO_ = static_cast<float>((sqrt(2) / 2));
 
+void MixControls::derive(Control *c)
+{
+    switch (c->getId())
+    {
+    case MixControlIds::MUTE:
+        mute = muteControl->getValue();
+        break;
+    case MixControlIds::GAIN:
+        gain = gainControl->getGain();
+        break;
+    case MixControlIds::LCR:
+        left = lcrControl->getLeft();
+        right = lcrControl->getRight();
+        break;
+    }
+}
 
 bool MixControls::isMaster()
 {
@@ -90,7 +94,7 @@ bool MixControls::isMute()
 
 bool MixControls::isEnabled()
 {
-	return !isMute();
+    return !isMute();
 }
 
 float MixControls::getGain()
@@ -98,7 +102,7 @@ float MixControls::getGain()
     return gain;
 }
 
-void MixControls::getChannelGains(vector<float>* dest)
+void MixControls::getChannelGains(vector<float> *dest)
 {
     (*dest)[1] = gain * right;
     (*dest)[0] = gain * left;
@@ -109,13 +113,12 @@ float MixControls::getSmoothingFactor()
     return mixerControls->getSmoothingFactor();
 }
 
-EnumControl* MixControls::createRouteControl(int stripId)
+EnumControl *MixControls::createRouteControl(int stripId)
 {
-	return nullptr;
+    return nullptr;
 }
 
-
-BooleanControl* MixControls::createMuteControl()
+BooleanControl *MixControls::createMuteControl()
 {
     return new BooleanControl(MixControlIds::MUTE, "Mute");
 }

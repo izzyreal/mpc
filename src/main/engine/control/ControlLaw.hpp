@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <string>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
 
     class ControlLaw
     {
@@ -12,6 +13,5 @@ namespace mpc::engine::control {
         virtual int intValue(float userVal);
 
         virtual std::string getUnits();
-
     };
-}
+} // namespace mpc::engine::control

@@ -6,10 +6,12 @@
 
 #include <functional>
 
-namespace mpc::lcdgui::screens::window {
-    class VmpcContinuePreviousSessionScreen : public ScreenComponent {
+namespace mpc::lcdgui::screens::window
+{
+    class VmpcContinuePreviousSessionScreen : public ScreenComponent
+    {
     public:
-        VmpcContinuePreviousSessionScreen(mpc::Mpc&, int layer);
+        VmpcContinuePreviousSessionScreen(mpc::Mpc &, int layer);
 
         void setRestoreAutoSavedStateAction(std::function<void()>);
 
@@ -18,4 +20,4 @@ namespace mpc::lcdgui::screens::window {
     private:
         std::function<void()> restoreAutoSavedStateAction;
     };
-}
+} // namespace mpc::lcdgui::screens::window

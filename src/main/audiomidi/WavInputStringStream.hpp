@@ -2,22 +2,22 @@
 #include <sstream>
 #include <vector>
 
-static const int RIFF_CHUNK_ID{ 1179011410 };
-static const int RIFF_TYPE_ID{ 1163280727 };
-static const int FMT_CHUNK_ID{ 544501094 };
-static const int DATA_CHUNK_ID{ 1635017060 };
+static const int RIFF_CHUNK_ID{1179011410};
+static const int RIFF_TYPE_ID{1163280727};
+static const int FMT_CHUNK_ID{544501094};
+static const int DATA_CHUNK_ID{1635017060};
 
 static const int EXPECTED_HEADER_SIZE = 44;
 static const int EXPECTED_FMT_DATA_SIZE = 16;
 
-std::istringstream wav_init_istringstream(char* data, int size)
+std::istringstream wav_init_istringstream(char *data, int size)
 {
     std::istringstream result(std::string(data, data + size), std::ios::in | std::ios::binary);
     result.unsetf(std::ios_base::skipws);
-	return result;
+    return result;
 }
 
-int wav_get_LE(std::istringstream& stream, int numBytes)
+int wav_get_LE(std::istringstream &stream, int numBytes)
 {
     if (numBytes < 1 || numBytes > 4)
     {
@@ -46,33 +46,35 @@ int wav_get_LE(std::istringstream& stream, int numBytes)
     return val;
 }
 
-bool wav_read_header(std::istringstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
-{    
+bool wav_read_header(std::istringstream &stream, int &sampleRate, int &validBits, int &numChannels, int &numFrames)
+{
     stream.seekg(0, stream.end);
 
     auto tell = stream.tellg();
 
-    if (tell < EXPECTED_HEADER_SIZE) {
+    if (tell < EXPECTED_HEADER_SIZE)
+    {
         return false;
     }
 
     stream.seekg(0, stream.beg);
 
-    auto riffChunkId = wav_get_LE(stream, 4);         // Offset 0
-    auto mainChunkSize = wav_get_LE(stream, 4);       // Offset 4;
-    /*auto riffTypeId =*/ wav_get_LE(stream, 4);          // Offset 8
-    auto fmtChunkId = wav_get_LE(stream, 4);          // Offset 12
-    auto lengthOfFormatData = wav_get_LE(stream, 4);  // Offset 16
-    auto isPCM = wav_get_LE(stream, 2) == 1;          // Offset 20
-    numChannels = wav_get_LE(stream, 2);         // Offset 22
-    sampleRate = wav_get_LE(stream, 4);               // Offset 24
-    /*auto avgBytesPerSecond =*/ wav_get_LE(stream, 4);   // Offset 28
-    /*auto blockAlign =*/ wav_get_LE(stream, 2);          // Offset 32
-    validBits = wav_get_LE(stream, 2);           // Offset 34
-    if (lengthOfFormatData != 16) {
+    auto riffChunkId = wav_get_LE(stream, 4);          // Offset 0
+    auto mainChunkSize = wav_get_LE(stream, 4);        // Offset 4;
+    /*auto riffTypeId =*/wav_get_LE(stream, 4);        // Offset 8
+    auto fmtChunkId = wav_get_LE(stream, 4);           // Offset 12
+    auto lengthOfFormatData = wav_get_LE(stream, 4);   // Offset 16
+    auto isPCM = wav_get_LE(stream, 2) == 1;           // Offset 20
+    numChannels = wav_get_LE(stream, 2);               // Offset 22
+    sampleRate = wav_get_LE(stream, 4);                // Offset 24
+    /*auto avgBytesPerSecond =*/wav_get_LE(stream, 4); // Offset 28
+    /*auto blockAlign =*/wav_get_LE(stream, 2);        // Offset 32
+    validBits = wav_get_LE(stream, 2);                 // Offset 34
+    if (lengthOfFormatData != 16)
+    {
         stream.ignore(lengthOfFormatData - 16);
     }
-    auto dataChunkId = wav_get_LE(stream, 4);         // Ofset 36
+    auto dataChunkId = wav_get_LE(stream, 4); // Ofset 36
 
     // Skip fact and smpl chunks
     const int maxRetries = 10;
@@ -85,7 +87,7 @@ bool wav_read_header(std::istringstream& stream, int& sampleRate, int& validBits
         dataChunkId = wav_get_LE(stream, 4);
     }
 
-    auto dataChunkSize = wav_get_LE(stream, 4);       // Offset 40
+    auto dataChunkSize = wav_get_LE(stream, 4); // Offset 40
 
     if (riffChunkId != RIFF_CHUNK_ID)
     {
@@ -97,8 +99,8 @@ bool wav_read_header(std::istringstream& stream, int& sampleRate, int& validBits
         return false;
     }
 
-    //if (lengthOfFormatData != EXPECTED_FMT_DATA_SIZE) {
-        //return false;
+    // if (lengthOfFormatData != EXPECTED_FMT_DATA_SIZE) {
+    // return false;
     //}
 
     if (!isPCM)

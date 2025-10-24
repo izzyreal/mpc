@@ -2,7 +2,8 @@
 
 #include <cstdint>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     struct MixControlIds
     {
@@ -12,4 +13,4 @@ namespace mpc::engine::audio::mixer {
         static const int LCR{5};
     };
 
-}
+} // namespace mpc::engine::audio::mixer

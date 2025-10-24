@@ -6,7 +6,8 @@
 #include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/control/EnumControl.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class LCRControl;
 
@@ -65,4 +66,4 @@ namespace mpc::engine::audio::mixer {
     public:
         static float &HALF_ROOT_TWO();
     };
-}
+} // namespace mpc::engine::audio::mixer

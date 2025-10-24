@@ -2,7 +2,8 @@
 
 #include <engine/audio/mixer/LCRControl.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class PanControl : public LCRControl
     {
@@ -22,4 +23,4 @@ namespace mpc::engine::audio::mixer {
         PanControl();
     };
 
-}
+} // namespace mpc::engine::audio::mixer

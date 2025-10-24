@@ -9,17 +9,17 @@
 using namespace mpc::nvram;
 using namespace mpc::file::all;
 
-Defaults DefaultsParser::AllDefaultsFromFile(mpc::Mpc& mpc, fs::path p)
+Defaults DefaultsParser::AllDefaultsFromFile(mpc::Mpc &mpc, fs::path p)
 {
 
     auto data = get_file_data(std::move(p));
-	return { mpc, Util::vecCopyOfRange(data, 0, AllParser::DEFAULTS_LENGTH) };
+    return {mpc, Util::vecCopyOfRange(data, 0, AllParser::DEFAULTS_LENGTH)};
 }
 
-DefaultsParser::DefaultsParser(mpc::Mpc& mpc)
+DefaultsParser::DefaultsParser(mpc::Mpc &mpc)
 
 {
-	saveBytes = Defaults(mpc).getBytes();
+    saveBytes = Defaults(mpc).getBytes();
 }
 
 std::vector<char> DefaultsParser::getBytes()

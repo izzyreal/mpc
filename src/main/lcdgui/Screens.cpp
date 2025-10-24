@@ -34,7 +34,9 @@ void Screens::createAndCacheAllScreens()
     for (auto screenName : screenNames)
     {
         if (std::find(knownUnimplementedScreens.begin(), knownUnimplementedScreens.end(), screenName) != knownUnimplementedScreens.end())
+        {
             continue;
+        }
 
         createAndCacheScreen(screenName);
     }
@@ -47,7 +49,9 @@ std::shared_ptr<ScreenComponent> Screens::getByName1(const std::string name)
     for (auto &screen : screens)
     {
         if (screen->getName() == name)
+        {
             return screen;
+        }
     }
 
     return {};
@@ -79,9 +83,13 @@ std::vector<int> getFunctionKeyTypes(json &functionKeyTypes)
     for (int i = 0; i < 6; i++)
     {
         if (functionKeyTypes[i].is_null())
+        {
             types.push_back(-1);
+        }
         else
+        {
             types.push_back(functionKeyTypes[i].get<int>());
+        }
     }
 
     return types;
@@ -94,9 +102,13 @@ std::vector<std::string> getFunctionKeyLabels(json &functionKeyLabels)
     for (int i = 0; i < 6; i++)
     {
         if (functionKeyLabels[i].is_null())
+        {
             labels.push_back("");
+        }
         else
+        {
             labels.push_back(functionKeyLabels[i].get<std::string>());
+        }
     }
 
     return labels;
@@ -116,7 +128,9 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
     }
 
     if (result.layerIndex < 0)
+    {
         return std::nullopt;
+    }
 
     json &arrangement = (*layerDocuments()[result.layerIndex])[screenName];
 
@@ -167,7 +181,9 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
             {
                 std::vector<std::string> parameterTransferMap;
                 for (auto &val : parameters[i])
+                {
                     parameterTransferMap.push_back(val.get<std::string>());
+                }
 
                 result.transferMap[previous] = parameterTransferMap;
                 skipCounter++;
@@ -196,7 +212,9 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
             auto field = parameter->findField(parameterName);
 
             if (i == 0)
+            {
                 result.firstField = parameterName;
+            }
 
             field->setNextFocus(nextFocus);
             previous = parameterName;
@@ -228,8 +246,10 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
 using ScreenFactory = std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
 
 inline const std::map<std::string, ScreenFactory> screenFactories = {
-#define X(ns, Class, name) { name, [](mpc::Mpc &mpc, int layer) { return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer); } },
-SCREEN_LIST
+#define X(ns, Class, name) {name, [](mpc::Mpc &mpc, int layer) {                             \
+                                return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer); \
+                            }},
+    SCREEN_LIST
 #undef X
 };
 
@@ -263,4 +283,3 @@ void Screens::createAndCacheScreen(const std::string &screenName)
 
     MLOG("Screens::getOrCreateScreenComponent is not familiar with screen name '" + screenName + "'. Add it to src/main/lcdgui/Screens.cpp");
 }
-

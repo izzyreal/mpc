@@ -2,12 +2,14 @@
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushEnterCommand::PushEnterCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushEnterCommand::execute() {
-        
+    void PushEnterCommand::execute()
+    {
+
         if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
             mpc.getLayeredScreen()->openScreen<SaveScreen>();

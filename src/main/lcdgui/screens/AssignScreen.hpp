@@ -3,29 +3,27 @@
 
 namespace mpc::lcdgui::screens
 {
-	class AssignScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class AssignScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		AssignScreen(mpc::Mpc& mpc, const int layerIndex);
+    public:
+        AssignScreen(mpc::Mpc &mpc, const int layerIndex);
 
-	public:
-		void turnWheel(int i) override;
-		void open() override;
-		void close() override;
-		void update(Observable* o, Message message) override;
+    public:
+        void turnWheel(int i) override;
+        void open() override;
+        void close() override;
+        void update(Observable *o, Message message) override;
 
-	private:
-		void displayAssignNote();
-		void displayParameter();
-		void displayHighRange();
-		void displayLowRange();
-		void displayAssignNv();
+    private:
+        void displayAssignNote();
+        void displayParameter();
+        void displayHighRange();
+        void displayLowRange();
+        void displayAssignNv();
 
-	private:
-		std::vector<std::string> typeNames = { "TUNING", "DECAY", "ATTACK", "FILTER" };
-
-
-	};
-}
+    private:
+        std::vector<std::string> typeNames = {"TUNING", "DECAY", "ATTACK", "FILTER"};
+    };
+} // namespace mpc::lcdgui::screens

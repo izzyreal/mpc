@@ -6,7 +6,8 @@
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushPlayStartCommand::PushPlayStartCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -26,7 +27,7 @@ namespace mpc::command {
                                                 mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
         const auto overdubButtonIsPressedOrLocked = hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
-                                                mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+                                                    mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
 
         if (recButtonIsPressedOrLocked)
         {
@@ -34,7 +35,7 @@ namespace mpc::command {
             {
                 mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             }
-            
+
             mpc.getSequencer()->recFromStart();
         }
         else if (overdubButtonIsPressedOrLocked)
@@ -72,4 +73,4 @@ namespace mpc::command {
         mpc.getHardware()->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(mpc.getSequencer()->isPlaying());
     }
 
-}
+} // namespace mpc::command

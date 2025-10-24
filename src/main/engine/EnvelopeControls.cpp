@@ -12,38 +12,39 @@ using namespace mpc::engine::control;
 using namespace std;
 
 EnvelopeControls::EnvelopeControls(int id, string name, int idOffset)
-	: CompoundControl(id, name)
+    : CompoundControl(id, name)
 {
-	this->idOffset = idOffset;
-	createControls();
-	deriveSampleRateIndependentVariables();
-	deriveSampleRateDependentVariables();
+    this->idOffset = idOffset;
+    createControls();
+    deriveSampleRateIndependentVariables();
+    deriveSampleRateDependentVariables();
 }
 
-void EnvelopeControls::derive(Control* c)
+void EnvelopeControls::derive(Control *c)
 {
-	switch (c->getId() - idOffset) {
-	case ATTACK:
-		attack = deriveAttack();
-		break;
-	case HOLD:
-		hold = deriveHold();
-		break;
-	case DECAY:
-		decay = deriveDecay();
-		break;
-	}
+    switch (c->getId() - idOffset)
+    {
+    case ATTACK:
+        attack = deriveAttack();
+        break;
+    case HOLD:
+        hold = deriveHold();
+        break;
+    case DECAY:
+        decay = deriveDecay();
+        break;
+    }
 }
 
 void EnvelopeControls::createControls()
 {
-	attackControl = createAttackControl(0.0f);
-	holdControl = createHoldControl(0.0f);
-	decayControl = createDecayControl(0.0f);
+    attackControl = createAttackControl(0.0f);
+    holdControl = createHoldControl(0.0f);
+    decayControl = createDecayControl(0.0f);
 
-	add(unique_ptr<Control>(attackControl));
-	add(unique_ptr<Control>(holdControl));
-	add(unique_ptr<Control>(decayControl));
+    add(unique_ptr<Control>(attackControl));
+    add(unique_ptr<Control>(holdControl));
+    add(unique_ptr<Control>(decayControl));
 }
 
 void EnvelopeControls::deriveSampleRateIndependentVariables()
@@ -62,13 +63,13 @@ float EnvelopeControls::deriveHold()
     return holdControl->getValue();
 }
 
-float EnvelopeControls::LOG_0_01_ = static_cast< float >(log(0.01));
+float EnvelopeControls::LOG_0_01_ = static_cast<float>(log(0.01));
 
 float EnvelopeControls::deriveTimeFactor(float milliseconds)
 {
     double ns = milliseconds * sampleRate / 1000;
     double k = LOG_0_01_ / ns;
-    return static_cast< float >(1.0f - exp(k));
+    return static_cast<float>(1.0f - exp(k));
 }
 
 float EnvelopeControls::deriveAttack()
@@ -81,34 +82,37 @@ float EnvelopeControls::deriveDecay()
     return deriveTimeFactor(decayControl->getValue());
 }
 
-shared_ptr<ControlLaw> EnvelopeControls::ATTACK_LAW() {
-	static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 3000.0f * 4.7f, "ms");
-	return res;
-}
-
-shared_ptr<ControlLaw> EnvelopeControls::DECAY_LAW() {
-	static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 2600.0f * 4.7f, "ms");
-	return res;
-}
-
-shared_ptr<ControlLaw> EnvelopeControls::HOLD_LAW() {
-	static shared_ptr<LinearLaw> res = make_shared<LinearLaw>(0.0f, FLT_MAX, "samples");
-	return res;
-}
-
-LawControl* EnvelopeControls::createAttackControl(float init)
+shared_ptr<ControlLaw> EnvelopeControls::ATTACK_LAW()
 {
-	return new LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), init);
+    static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 3000.0f * 4.7f, "ms");
+    return res;
 }
 
-LawControl* EnvelopeControls::createHoldControl(float init)
+shared_ptr<ControlLaw> EnvelopeControls::DECAY_LAW()
 {
-	return new LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), init);
+    static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 2600.0f * 4.7f, "ms");
+    return res;
 }
 
-LawControl* EnvelopeControls::createDecayControl(float init)
+shared_ptr<ControlLaw> EnvelopeControls::HOLD_LAW()
 {
-	return new LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), init);
+    static shared_ptr<LinearLaw> res = make_shared<LinearLaw>(0.0f, FLT_MAX, "samples");
+    return res;
+}
+
+LawControl *EnvelopeControls::createAttackControl(float init)
+{
+    return new LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), init);
+}
+
+LawControl *EnvelopeControls::createHoldControl(float init)
+{
+    return new LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), init);
+}
+
+LawControl *EnvelopeControls::createDecayControl(float init)
+{
+    return new LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), init);
 }
 
 float EnvelopeControls::getAttackCoeff()
@@ -126,9 +130,11 @@ float EnvelopeControls::getDecayCoeff()
     return decay;
 }
 
-void EnvelopeControls::setSampleRate(int rate) {
-	if (sampleRate != rate) {
-		sampleRate = rate;
-		deriveSampleRateDependentVariables();
-	}
+void EnvelopeControls::setSampleRate(int rate)
+{
+    if (sampleRate != rate)
+    {
+        sampleRate = rate;
+        deriveSampleRateDependentVariables();
+    }
 }

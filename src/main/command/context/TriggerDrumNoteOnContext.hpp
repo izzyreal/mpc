@@ -5,39 +5,47 @@
 #include <cstdint>
 #include <functional>
 
-namespace mpc ::lcdgui {
+namespace mpc ::lcdgui
+{
     class LayeredScreen;
     class ScreenComponent;
-}
+} // namespace mpc::lcdgui
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window
+{
     class TimingCorrectScreen;
     class Assign16LevelsScreen;
-}
+} // namespace mpc::lcdgui::screens::window
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Sampler;
     class Program;
-}
+} // namespace mpc::sampler
 
-namespace mpc::sequencer  {
+namespace mpc::sequencer
+{
     class Sequencer;
     class Track;
     class FrameSeq;
-}
+} // namespace mpc::sequencer
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
     class AudioMidiServices;
     class EventHandler;
-}
+} // namespace mpc::audiomidi
 
-namespace mpc::engine {
+namespace mpc::engine
+{
     class PreviewSoundPlayer;
 }
 
-namespace mpc::command::context {
+namespace mpc::command::context
+{
 
-    struct TriggerDrumNoteOnContext {
+    struct TriggerDrumNoteOnContext
+    {
         bool isSequencerScreen;
         int programPadIndex;
         int velocity;
@@ -92,4 +100,4 @@ namespace mpc::command::context {
         int hardwareSliderValue;
         bool isPhysicallyPressed;
     };
-}
+} // namespace mpc::command::context

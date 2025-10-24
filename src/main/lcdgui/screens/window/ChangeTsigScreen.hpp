@@ -3,34 +3,34 @@
 
 #include <sequencer/TimeSignature.hpp>
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window
+{
 
-	class ChangeTsigScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class ChangeTsigScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
-		void turnWheel(int i) override;
+    public:
+        void function(int i) override;
+        void turnWheel(int i) override;
 
-	public:
-		ChangeTsigScreen(mpc::Mpc& mpc, const int layerIndex);
+    public:
+        ChangeTsigScreen(mpc::Mpc &mpc, const int layerIndex);
 
-	public:
-		void open() override;
+    public:
+        void open() override;
 
-	private:
-		void displayBars();
-		void displayNewTsig();
+    private:
+        void displayBars();
+        void displayNewTsig();
 
-	private:
-		mpc::sequencer::TimeSignature timesignature;
-		int bar0 = 0;
-		int bar1 = 0;
+    private:
+        mpc::sequencer::TimeSignature timesignature;
+        int bar0 = 0;
+        int bar1 = 0;
 
-	private:
-		void setBar0(int i, int max);
-		void setBar1(int i, int max);
-
-	};
-}
+    private:
+        void setBar0(int i, int max);
+        void setBar1(int i, int max);
+    };
+} // namespace mpc::lcdgui::screens::window

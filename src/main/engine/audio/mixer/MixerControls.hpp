@@ -11,10 +11,11 @@
 #include <string>
 #include "engine/FaderControl.hpp"
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class MixerControls
-            : public mpc::engine::control::CompoundControl
+        : public mpc::engine::control::CompoundControl
     {
 
     private:
@@ -50,15 +51,15 @@ namespace mpc::engine::audio::mixer {
         MixerControls(std::string name, std::string mainBusName);
 
         MixerControls(std::string name)
-                : MixerControls(std::move(name), "Main")
-        {}
+            : MixerControls(std::move(name), "Main")
+        {
+        }
 
         MixerControls(std::string name, float _smoothingFactor)
-                : MixerControls(std::move(name))
+            : MixerControls(std::move(name))
         {
             smoothingFactor = _smoothingFactor;
         }
-
     };
 
-}
+} // namespace mpc::engine::audio::mixer

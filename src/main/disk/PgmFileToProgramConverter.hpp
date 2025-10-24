@@ -5,31 +5,35 @@
 #include <string>
 #include "mpc_types.hpp"
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Sampler;
     class Program;
-}
+} // namespace mpc::sampler
 
-namespace mpc::file::pgmreader {
+namespace mpc::file::pgmreader
+{
     class ProgramFileReader;
 }
 
-namespace mpc::disk {
+namespace mpc::disk
+{
     class MpcFile;
 }
 
-namespace mpc::disk {
+namespace mpc::disk
+{
     class PgmFileToProgramConverter
     {
     public:
         static program_or_error loadFromFileAndConvert(
-                std::shared_ptr<MpcFile>,
-                std::shared_ptr<mpc::sampler::Program>,
-                std::vector<std::string>& soundNames);
+            std::shared_ptr<MpcFile>,
+            std::shared_ptr<mpc::sampler::Program>,
+            std::vector<std::string> &soundNames);
 
     private:
-        static void setSlider(mpc::file::pgmreader::ProgramFileReader&, std::shared_ptr<mpc::sampler::Program>);
-        static void setNoteParameters(mpc::file::pgmreader::ProgramFileReader&, std::shared_ptr<mpc::sampler::Program>);
-        static void setMixer(mpc::file::pgmreader::ProgramFileReader&, std::shared_ptr<mpc::sampler::Program>);
+        static void setSlider(mpc::file::pgmreader::ProgramFileReader &, std::shared_ptr<mpc::sampler::Program>);
+        static void setNoteParameters(mpc::file::pgmreader::ProgramFileReader &, std::shared_ptr<mpc::sampler::Program>);
+        static void setMixer(mpc::file::pgmreader::ProgramFileReader &, std::shared_ptr<mpc::sampler::Program>);
     };
-}
+} // namespace mpc::disk

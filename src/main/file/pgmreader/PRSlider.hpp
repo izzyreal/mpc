@@ -2,45 +2,48 @@
 
 #include <vector>
 
-namespace mpc {
-	namespace file {
-		namespace pgmreader {
+namespace mpc
+{
+    namespace file
+    {
+        namespace pgmreader
+        {
 
-			class ProgramFileReader;
+            class ProgramFileReader;
 
-			class Slider
-			{
+            class Slider
+            {
 
-			public:
-				int sampleNamesSize{ 0 };
+            public:
+                int sampleNamesSize{0};
 
-			public:
-				std::vector<char> sliderArray{};
+            public:
+                std::vector<char> sliderArray{};
 
-			private:
-				ProgramFileReader* programFile{};
+            private:
+                ProgramFileReader *programFile{};
 
-			public:
-				int getSampleNamesSize();
-				int getSliderStart();
-				int getSliderEnd();
-				std::vector<char> getSliderArray();
+            public:
+                int getSampleNamesSize();
+                int getSliderStart();
+                int getSliderEnd();
+                std::vector<char> getSliderArray();
 
-			public:
-				int getMidiNoteAssign();
-				int getTuneLow();
-				int getTuneHigh();
-				int getDecayLow();
-				int getDecayHigh();
-				int getAttackLow();
-				int getAttackHigh();
-				int getFilterLow();
-				int getFilterHigh();
-				int getControlChange();
+            public:
+                int getMidiNoteAssign();
+                int getTuneLow();
+                int getTuneHigh();
+                int getDecayLow();
+                int getDecayHigh();
+                int getAttackLow();
+                int getAttackHigh();
+                int getFilterLow();
+                int getFilterHigh();
+                int getControlChange();
 
-				Slider(ProgramFileReader* programFile);
-			};
+                Slider(ProgramFileReader *programFile);
+            };
 
-		}
-	}
-}
+        } // namespace pgmreader
+    } // namespace file
+} // namespace mpc

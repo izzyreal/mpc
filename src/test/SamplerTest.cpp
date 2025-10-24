@@ -14,7 +14,7 @@ CMRC_DECLARE(mpctest);
 using namespace mpc;
 using namespace mpc::disk;
 
-void prepareSamplerResources(mpc::Mpc& mpc)
+void prepareSamplerResources(mpc::Mpc &mpc)
 {
     auto disk = mpc.getDisk();
 
@@ -23,10 +23,10 @@ void prepareSamplerResources(mpc::Mpc& mpc)
 
     auto fs = cmrc::mpctest::get_filesystem();
 
-    for (auto &&entry: fs.iterate_directory("test/Sampler"))
+    for (auto &&entry : fs.iterate_directory("test/Sampler"))
     {
         auto file = fs.open("test/Sampler/" + entry.filename());
-        char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
+        char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
         auto newFile = disk->newFile(entry.filename());
         std::vector<char> dataVec(data, data + file.size());
         newFile->setFileData(dataVec);
@@ -44,7 +44,7 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
 
     auto sampler = mpc.getSampler();
 
-    while(sampler->getSoundSortingTypeName() != "MEMORY")
+    while (sampler->getSoundSortingTypeName() != "MEMORY")
     {
         sampler->switchToNextSoundSortType();
     }
@@ -76,7 +76,10 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto controls = mpc.getScreen();
-    auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
+    auto soundName = [&]()
+    {
+        return controls->findChild<lcdgui::Field>("snd")->getText();
+    };
     REQUIRE(soundName() == "sound3          (ST)");
     controls->turnWheel(1);
     REQUIRE(soundName() == "sound2          (ST)");
@@ -93,7 +96,7 @@ TEST_CASE("Sort sounds by name", "[sampler]")
 
     auto sampler = mpc.getSampler();
 
-    while(sampler->getSoundSortingTypeName() != "NAME")
+    while (sampler->getSoundSortingTypeName() != "NAME")
     {
         sampler->switchToNextSoundSortType();
     }
@@ -125,7 +128,10 @@ TEST_CASE("Sort sounds by name", "[sampler]")
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto controls = mpc.getScreen();
-    auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
+    auto soundName = [&]()
+    {
+        return controls->findChild<lcdgui::Field>("snd")->getText();
+    };
     REQUIRE(soundName() == "sound1          (ST)");
     controls->turnWheel(1);
     REQUIRE(soundName() == "sound2          (ST)");
@@ -142,7 +148,7 @@ TEST_CASE("Sort sounds by size", "[sampler]")
 
     auto sampler = mpc.getSampler();
 
-    while(sampler->getSoundSortingTypeName() != "SIZE")
+    while (sampler->getSoundSortingTypeName() != "SIZE")
     {
         sampler->switchToNextSoundSortType();
     }
@@ -164,7 +170,7 @@ TEST_CASE("Sort sounds by size", "[sampler]")
 
     REQUIRE(sampler->getSoundCount() == 3);
 
-    std::vector<int> expected{ 2, 3, 1 };
+    std::vector<int> expected{2, 3, 1};
 
     auto sortedSounds = sampler->getSortedSounds();
 
@@ -176,7 +182,10 @@ TEST_CASE("Sort sounds by size", "[sampler]")
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto controls = mpc.getScreen();
-    auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
+    auto soundName = [&]()
+    {
+        return controls->findChild<lcdgui::Field>("snd")->getText();
+    };
     REQUIRE(soundName() == "sound2          (ST)");
     controls->turnWheel(1);
     REQUIRE(soundName() == "sound3          (ST)");
@@ -210,12 +219,15 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto controls = mpc.getScreen();
-    auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
+    auto soundName = [&]()
+    {
+        return controls->findChild<lcdgui::Field>("snd")->getText();
+    };
     REQUIRE(soundName() == "sound3          (ST)");
     controls->turnWheel(1);
     REQUIRE(soundName() == "sound2          (ST)");
 
-    while(sampler->getSoundSortingTypeName() != "SIZE")
+    while (sampler->getSoundSortingTypeName() != "SIZE")
     {
         sampler->switchToNextSoundSortType();
     }
@@ -258,7 +270,10 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
 
     REQUIRE(sampler->getSoundSortingTypeName() == "MEMORY");
 
-    auto soundName = [&](){ return controls->findChild<lcdgui::Field>("snd")->getText(); };
+    auto soundName = [&]()
+    {
+        return controls->findChild<lcdgui::Field>("snd")->getText();
+    };
     REQUIRE(soundName() == "OFF");
     controls->turnWheel(1);
     REQUIRE(soundName() == "sound1");
@@ -270,12 +285,12 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
     controls->turnWheel(-1);
     REQUIRE(soundName() == "sound2");
 
-    while(sampler->getSoundSortingTypeName() != "SIZE")
+    while (sampler->getSoundSortingTypeName() != "SIZE")
     {
         sampler->switchToNextSoundSortType();
     }
 
-    std::vector<int> expected{ 2, 3, 1 };
+    std::vector<int> expected{2, 3, 1};
 
     auto sortedSounds = sampler->getSortedSounds();
 

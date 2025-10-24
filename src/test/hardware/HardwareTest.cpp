@@ -15,15 +15,17 @@ TEST_CASE("Hardware construction", "[hardware]")
     {
         REQUIRE(hw.getPads().size() == 16);
         for (int i = 0; i < 16; ++i)
+        {
             REQUIRE(hw.getPad(i) != nullptr);
+        }
     }
 
     SECTION("Buttons initialized with valid labels")
     {
         auto labels = hw.getButtonLabels();
         REQUIRE_FALSE(labels.empty());
-        //for (const auto& l : labels)
-            //REQUIRE(hw.getButton(l) != nullptr);
+        // for (const auto& l : labels)
+        // REQUIRE(hw.getButton(l) != nullptr);
     }
 
     SECTION("LEDs initialized")
@@ -67,7 +69,7 @@ TEST_CASE("Hardware getPad/getButton/getLed safety", "[hardware]")
 
     SECTION("getButton with invalid label returns nullptr")
     {
-        //REQUIRE(hw.getButton("not-a-button") == nullptr);
+        // REQUIRE(hw.getButton("not-a-button") == nullptr);
     }
 
     SECTION("getLed finds correct LED")
@@ -81,7 +83,7 @@ TEST_CASE("Hardware getPad/getButton/getLed safety", "[hardware]")
 
     SECTION("getLed with nonexistent label returns empty")
     {
-        //REQUIRE(hw.getLed("unknown") == nullptr);
+        // REQUIRE(hw.getLed("unknown") == nullptr);
     }
 
     SECTION("getComponentByLabel for button")
@@ -89,21 +91,20 @@ TEST_CASE("Hardware getPad/getButton/getLed safety", "[hardware]")
         auto labels = hw.getButtonLabels();
         REQUIRE_FALSE(labels.empty());
         auto label = labels.front();
-        //auto comp = hw.getComponentByLabel(label);
-       // REQUIRE(comp);
+        // auto comp = hw.getComponentByLabel(label);
+        // REQUIRE(comp);
     }
 
     SECTION("getComponentByLabel for pad")
     {
-        //auto comp = hw.getComponentByLabel("pad-0");
-        //REQUIRE(comp);
-        //REQUIRE(comp == hw.getPad(0));
+        // auto comp = hw.getComponentByLabel("pad-0");
+        // REQUIRE(comp);
+        // REQUIRE(comp == hw.getPad(0));
     }
 
     SECTION("getComponentByLabel for invalid label returns nullptr")
     {
-        //REQUIRE(hw.getComponentByLabel("invalid") == nullptr);
-        //REQUIRE(hw.getComponentByLabel("pad-999") == nullptr);
+        // REQUIRE(hw.getComponentByLabel("invalid") == nullptr);
+        // REQUIRE(hw.getComponentByLabel("pad-999") == nullptr);
     }
 }
-

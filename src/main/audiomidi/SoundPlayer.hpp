@@ -17,10 +17,14 @@ using namespace mpc::engine::audio::core;
 
 namespace mpc::audiomidi
 {
-    enum SoundPlayerFileFormat { SND, WAV };
+    enum SoundPlayerFileFormat
+    {
+        SND,
+        WAV
+    };
 
     class SoundPlayer
-            : public AudioProcess
+        : public AudioProcess
     {
 
     private:
@@ -47,20 +51,19 @@ namespace mpc::audiomidi
         std::vector<float> resampleInputBufferLeft;
         std::vector<float> resampleInputBufferRight;
         std::vector<float> resampleOutputBuffer;
-        SRC_STATE* srcLeft = nullptr;
-        SRC_STATE* srcRight = nullptr;
+        SRC_STATE *srcLeft = nullptr;
+        SRC_STATE *srcRight = nullptr;
         int srcLeftError = 0;
         int srcRightError = 0;
         std::shared_ptr<std::istream> stream;
 
     public:
-        bool start(const std::shared_ptr<std::istream>&, SoundPlayerFileFormat, int audioServerSampleRate);
-        int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
+        bool start(const std::shared_ptr<std::istream> &, SoundPlayerFileFormat, int audioServerSampleRate);
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buf, int nFrames) override;
         void enableStopEarly();
         bool isPlaying();
 
         SoundPlayer();
         ~SoundPlayer();
-
     };
-}
+} // namespace mpc::audiomidi

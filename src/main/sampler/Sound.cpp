@@ -13,17 +13,19 @@ Sound::Sound(int rate)
 void Sound::setName(std::string s)
 {
     name = s;
-    
+
     notifyObservers(std::string("samplename"));
 }
 
 void Sound::setBeatCount(int i)
 {
-    if(i < 1 || i > 32)
+    if (i < 1 || i > 32)
+    {
         return;
+    }
 
     numberOfBeats = i;
-    
+
     notifyObservers(std::string("beat"));
 }
 
@@ -39,14 +41,20 @@ std::string Sound::getName()
 
 void Sound::setLevel(int i)
 {
-    if (i < 0 || i > 200) return;
+    if (i < 0 || i > 200)
+    {
+        return;
+    }
 
     sndLevel = i;
 }
 
 void Sound::setTune(int i)
 {
-    if (i < -120 || i > 120) return;
+    if (i < -120 || i > 120)
+    {
+        return;
+    }
 
     tune = i;
 }
@@ -59,14 +67,20 @@ void Sound::setLoopEnabled(bool b)
 void Sound::setStart(int i)
 {
     auto value = i;
-    if (value < 0) {
+    if (value < 0)
+    {
         if (start == 0)
+        {
             return;
+        }
         value = 0;
     }
-    else if (value >= getFrameCount()) {
+    else if (value >= getFrameCount())
+    {
         if (start == getFrameCount())
+        {
             return;
+        }
 
         value = getFrameCount();
     }
@@ -74,24 +88,31 @@ void Sound::setStart(int i)
     start = value;
 
     if (start > end)
+    {
         setEnd(start);
+    }
 }
 
 void Sound::setEnd(int i)
 {
     auto value = i;
 
-    if (value < 0) {
+    if (value < 0)
+    {
 
         if (end == 0)
+        {
             return;
+        }
 
         value = 0;
     }
     else if (value > getFrameCount())
     {
         if (end == getFrameCount())
+        {
             return;
+        }
 
         value = getFrameCount();
     }
@@ -99,10 +120,14 @@ void Sound::setEnd(int i)
     end = value;
 
     if (end < loopTo)
+    {
         setLoopTo(end);
+    }
 
     if (end < start)
+    {
         setStart(end);
+    }
 }
 
 void Sound::setMono(bool b)
@@ -117,9 +142,13 @@ void Sound::setLoopTo(int i)
     auto value = i;
 
     if (value < 0)
+    {
         value = 0;
+    }
     else if (value > getFrameCount())
+    {
         value = getFrameCount();
+    }
 
     loopTo = value;
 }
@@ -196,30 +225,36 @@ int Sound::getSndLevel()
 
 void Sound::insertFrame(std::vector<float> frame, unsigned int index)
 {
-    if (index > getFrameCount()) {
+    if (index > getFrameCount())
+    {
         return;
     }
 
-    if (!mono) {
-        if (frame.size() < 2) return;
+    if (!mono)
+    {
+        if (frame.size() < 2)
+        {
+            return;
+        }
         const unsigned int rightIndex = index + getFrameCount();
         sampleData->insert(sampleData->begin() + rightIndex, frame[1]);
     }
 
-    if (frame.size() < 1) {
+    if (frame.size() < 1)
+    {
         return;
     }
 
     sampleData->insert(sampleData->begin() + index, frame[0]);
 }
 
-void Sound::insertFrames(std::vector<float>& frames, unsigned int index, uint32_t nFrames)
+void Sound::insertFrames(std::vector<float> &frames, unsigned int index, uint32_t nFrames)
 {
     assert(mono);
     sampleData->insert(sampleData->begin() + index, frames.begin(), frames.begin() + nFrames);
 }
 
-void Sound::insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index, uint32_t nFrames)
+void Sound::insertFrames(std::vector<float> &left, std::vector<float> &right, unsigned int index, uint32_t nFrames)
 {
     assert(!mono);
     sampleData->insert(sampleData->begin() + index + getFrameCount(), right.begin(), right.begin() + nFrames);

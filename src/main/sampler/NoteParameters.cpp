@@ -9,15 +9,15 @@ using namespace mpc::engine;
 NoteParameters::NoteParameters(const int index)
     : index(index)
 {
-	decay = 5;
-	filterFrequency = 100; 
-	velocityRangeLower = 44;
-	velocityRangeUpper = 88;
-	velocityToLevel = 100;
-	muteAssignA = 34;
-	muteAssignB = 34;
-	optionalNoteA = 34;
-	optionalNoteB = 34;
+    decay = 5;
+    filterFrequency = 100;
+    velocityRangeLower = 44;
+    velocityRangeUpper = 88;
+    velocityToLevel = 100;
+    muteAssignA = 34;
+    muteAssignB = 34;
+    optionalNoteA = 34;
+    optionalNoteB = 34;
 }
 
 int NoteParameters::getSoundIndex()
@@ -53,7 +53,7 @@ void NoteParameters::setVeloRangeLower(int i)
 
 void NoteParameters::setVeloRangeUpper(int i)
 {
-	velocityRangeUpper = std::clamp(i, 1, 127);
+    velocityRangeUpper = std::clamp(i, 1, 127);
 
     if (velocityRangeLower >= velocityRangeUpper)
     {
@@ -68,7 +68,7 @@ int NoteParameters::getVelocityRangeLower()
 
 void NoteParameters::setOptNoteA(int i)
 {
-	optionalNoteA = std::clamp(i, 34, 98);
+    optionalNoteA = std::clamp(i, 34, 98);
 }
 
 int NoteParameters::getOptionalNoteA()
@@ -83,7 +83,7 @@ int NoteParameters::getVelocityRangeUpper()
 
 void NoteParameters::setOptionalNoteB(int i)
 {
-	optionalNoteB = std::clamp(i, 34, 98);
+    optionalNoteB = std::clamp(i, 34, 98);
 }
 
 int NoteParameters::getOptionalNoteB()
@@ -99,14 +99,14 @@ VoiceOverlapMode NoteParameters::getVoiceOverlapMode()
 void NoteParameters::setVoiceOverlapMode(const VoiceOverlapMode voiceOverlapModeToUse)
 {
     if (voiceOverlapMode != VoiceOverlapMode::MONO &&
-            voiceOverlapMode != VoiceOverlapMode::NOTE_OFF &&
-            voiceOverlapMode != VoiceOverlapMode::POLY)
+        voiceOverlapMode != VoiceOverlapMode::NOTE_OFF &&
+        voiceOverlapMode != VoiceOverlapMode::POLY)
     {
         return;
     }
 
     voiceOverlapMode = voiceOverlapModeToUse;
- }
+}
 
 void NoteParameters::setMuteAssignA(int i)
 {
@@ -278,34 +278,34 @@ int NoteParameters::getVelocityToPitch()
     return velocityToPitch;
 }
 
-NoteParameters* NoteParameters::clone(const int newIndex)
+NoteParameters *NoteParameters::clone(const int newIndex)
 {
-	auto res = new NoteParameters(newIndex);
-	res->setAttack(attack);
-	res->setDecay(decay);
-	res->setDecayMode(decayMode);
-	res->setFilterAttack(filterAttack);
-	res->setFilterDecay(filterDecay);
-	res->setFilterEnvelopeAmount(filterEnvelopeAmount);
-	res->setFilterFrequency(filterFrequency);
-	res->setFilterResonance(filterResonance);
-	res->setMuteAssignA(muteAssignA);
-	res->setMuteAssignB(muteAssignB);
-	res->setOptNoteA(optionalNoteA);
-	res->setOptionalNoteB(optionalNoteB);
-	res->setSliderParameterNumber(sliderParameterNumber);
-	res->setSoundGenMode(soundGenerationMode);
-	res->setSoundIndex(soundIndex);
-	res->setTune(tune);
-	res->setVelocityToAttack(velocityToAttack);
-	res->setVelocityToFilterFrequency(velocityToFilterFrequency);
-	res->setVelocityToPitch(velocityToPitch);
-	res->setVeloToLevel(velocityToLevel);
-	res->setVelocityToStart(velocityToStart);
-	res->setVeloRangeLower(velocityRangeLower);
-	res->setVeloRangeUpper(velocityRangeUpper);
-	res->setVoiceOverlapMode(voiceOverlapMode);
-	return res;
+    auto res = new NoteParameters(newIndex);
+    res->setAttack(attack);
+    res->setDecay(decay);
+    res->setDecayMode(decayMode);
+    res->setFilterAttack(filterAttack);
+    res->setFilterDecay(filterDecay);
+    res->setFilterEnvelopeAmount(filterEnvelopeAmount);
+    res->setFilterFrequency(filterFrequency);
+    res->setFilterResonance(filterResonance);
+    res->setMuteAssignA(muteAssignA);
+    res->setMuteAssignB(muteAssignB);
+    res->setOptNoteA(optionalNoteA);
+    res->setOptionalNoteB(optionalNoteB);
+    res->setSliderParameterNumber(sliderParameterNumber);
+    res->setSoundGenMode(soundGenerationMode);
+    res->setSoundIndex(soundIndex);
+    res->setTune(tune);
+    res->setVelocityToAttack(velocityToAttack);
+    res->setVelocityToFilterFrequency(velocityToFilterFrequency);
+    res->setVelocityToPitch(velocityToPitch);
+    res->setVeloToLevel(velocityToLevel);
+    res->setVelocityToStart(velocityToStart);
+    res->setVeloRangeLower(velocityRangeLower);
+    res->setVeloRangeUpper(velocityRangeUpper);
+    res->setVoiceOverlapMode(voiceOverlapMode);
+    return res;
 }
 
 int NoteParameters::getNumber()

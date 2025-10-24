@@ -3,30 +3,32 @@
 
 #include <functional>
 
-namespace mpc::lcdgui::screens {
-class VmpcKeyboardScreen;
-class VmpcMidiScreen;
-}
-
-namespace mpc::lcdgui::screens::window {
-class VmpcDiscardMappingChangesScreen
-: public mpc::lcdgui::ScreenComponent
+namespace mpc::lcdgui::screens
 {
-    
-public:
-    VmpcDiscardMappingChangesScreen(mpc::Mpc& mpc, const int layerIndex);
-    
-    void function(int i) override;
-    void close() override;
+    class VmpcKeyboardScreen;
+    class VmpcMidiScreen;
+} // namespace mpc::lcdgui::screens
 
-    std::function<void()> discardAndLeave = [](){};
-    std::function<void()> saveAndLeave = [](){};
-    std::string stayScreen;
+namespace mpc::lcdgui::screens::window
+{
+    class VmpcDiscardMappingChangesScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-private:
-    std::string nextScreen = "sequencer";
-    
-    friend class mpc::lcdgui::screens::VmpcKeyboardScreen;
-    friend class mpc::lcdgui::screens::VmpcMidiScreen;
-};
-}
+    public:
+        VmpcDiscardMappingChangesScreen(mpc::Mpc &mpc, const int layerIndex);
+
+        void function(int i) override;
+        void close() override;
+
+        std::function<void()> discardAndLeave = []() {};
+        std::function<void()> saveAndLeave = []() {};
+        std::string stayScreen;
+
+    private:
+        std::string nextScreen = "sequencer";
+
+        friend class mpc::lcdgui::screens::VmpcKeyboardScreen;
+        friend class mpc::lcdgui::screens::VmpcMidiScreen;
+    };
+} // namespace mpc::lcdgui::screens::window

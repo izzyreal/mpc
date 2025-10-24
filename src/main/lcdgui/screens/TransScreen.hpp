@@ -4,51 +4,50 @@
 
 namespace mpc::audiomidi
 {
-	class EventHandler;
+    class EventHandler;
 }
 
 namespace mpc::lcdgui::screens::window
 {
-	class TransposePermanentScreen;
+    class TransposePermanentScreen;
 }
 
 namespace mpc::lcdgui::screens
 {
-	class TransScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class TransScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
-		void turnWheel(int i) override;
+    public:
+        void function(int i) override;
+        void turnWheel(int i) override;
 
-		void open() override;
+        void open() override;
 
-		TransScreen(mpc::Mpc& mpc, const int layerIndex);
+        TransScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void play() override;
-		void playStart() override;
-		void rec() override;
-		void overDub() override;
-		void stop() override;
+        void play() override;
+        void playStart() override;
+        void rec() override;
+        void overDub() override;
+        void stop() override;
 
-	private:
-		int tr = -1;
-		int transposeAmount = 0;
-		int bar0 = 0;
-		int bar1 = 0;
+    private:
+        int tr = -1;
+        int transposeAmount = 0;
+        int bar0 = 0;
+        int bar1 = 0;
 
-		void setTransposeAmount(int i);
-		void setTr(int i);
-		void setBar0(int i);
-		void setBar1(int i);
+        void setTransposeAmount(int i);
+        void setTr(int i);
+        void setBar0(int i);
+        void setBar1(int i);
 
-		void displayTransposeAmount();
-		void displayTr();
-		void displayBars();
+        void displayTransposeAmount();
+        void displayTr();
+        void displayBars();
 
-		friend class mpc::lcdgui::screens::window::TransposePermanentScreen;
-		friend class mpc::audiomidi::EventHandler;
-
-	};
-}
+        friend class mpc::lcdgui::screens::window::TransposePermanentScreen;
+        friend class mpc::audiomidi::EventHandler;
+    };
+} // namespace mpc::lcdgui::screens

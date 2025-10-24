@@ -11,8 +11,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "save-a-program", layerIndex)
+SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "save-a-program", layerIndex)
 {
 }
 
@@ -26,9 +26,9 @@ void SaveAProgramScreen::open()
     }
 
     findField("replace-same-sounds")->setAlignment(Alignment::Centered);
-	displayFile();
-	displaySave();
-	displayReplaceSameSounds();
+    displayFile();
+    displaySave();
+    displayReplaceSameSounds();
 }
 
 void SaveAProgramScreen::turnWheel(int i)
@@ -36,36 +36,37 @@ void SaveAProgramScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "save")
-	{
-		setSave(save + i);
-	}
-	else if (focusedFieldName == "replace-same-sounds")
-	{
-		replaceSameSounds = i > 0;
-		displayReplaceSameSounds();
-	}
+    if (focusedFieldName == "save")
+    {
+        setSave(save + i);
+    }
+    else if (focusedFieldName == "replace-same-sounds")
+    {
+        replaceSameSounds = i > 0;
+        displayReplaceSameSounds();
+    }
 }
 
 void SaveAProgramScreen::function(int i)
 {
 
-	switch (i)
-	{
-	case 3:
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->openScreen<SaveScreen>();
-		break;
-	case 4:
-	{
+        break;
+    case 4:
+    {
         auto nameScreen = mpc.screens->get<NameScreen>();
-		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
-		auto disk = mpc.getDisk();
+        auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
+        auto disk = mpc.getDisk();
 
         auto program = getProgramOrThrow();
 
-		if (disk->checkExists(fileName))
-		{
-            auto replaceAction = [this, disk, fileName, program]{
+        if (disk->checkExists(fileName))
+        {
+            auto replaceAction = [this, disk, fileName, program]
+            {
                 auto success = disk->getFile(fileName)->del();
 
                 if (success)
@@ -76,42 +77,49 @@ void SaveAProgramScreen::function(int i)
                 }
             };
 
-            const auto initializeNameScreen = [this]{
+            const auto initializeNameScreen = [this]
+            {
                 auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string&){ mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>(); };
+                auto enterAction = [this](std::string &)
+                {
+                    mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                };
                 nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                         {
+                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                         });
             mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
             break;
-		}
+        }
 
-		disk->writePgm(program, fileName);
-		break;
-	}
-	}
+        disk->writePgm(program, fileName);
+        break;
+    }
+    }
 }
 
 void SaveAProgramScreen::setSave(int i)
 {
-	save = std::clamp(i, 0, 2);
-	displaySave();
+    save = std::clamp(i, 0, 2);
+    displaySave();
 }
 
 void SaveAProgramScreen::displaySave()
 {
-	findField("save")->setText(pgmSaveNames[save]);
+    findField("save")->setText(pgmSaveNames[save]);
 }
 
 void SaveAProgramScreen::displayReplaceSameSounds()
 {
-	findField("replace-same-sounds")->setText(std::string(replaceSameSounds ? "YES" : "NO"));
+    findField("replace-same-sounds")->setText(std::string(replaceSameSounds ? "YES" : "NO"));
 }
 
 void SaveAProgramScreen::displayFile()
 {
-	auto nameScreen = mpc.screens->get<NameScreen>();
-	findLabel("file")->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
+    auto nameScreen = mpc.screens->get<NameScreen>();
+    findLabel("file")->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
 }

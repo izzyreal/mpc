@@ -17,33 +17,41 @@
 
 using namespace mpc::sequencer;
 
-int SeqUtil::getTickFromBar(int i, Sequence* s, int position)
+int SeqUtil::getTickFromBar(int i, Sequence *s, int position)
 {
-	if (i < 0)
-		return 0;
+    if (i < 0)
+    {
+        return 0;
+    }
 
-	auto difference = i - getBarFromTick(s, position);
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
+    auto difference = i - getBarFromTick(s, position);
+    auto den = s->getTimeSignature().getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
 
-	if (position + (difference * denTicks * 4) > s->getLastTick())
-		position = s->getLastTick();
-	else
-		position = position + (difference * denTicks * 4);
+    if (position + (difference * denTicks * 4) > s->getLastTick())
+    {
+        position = s->getLastTick();
+    }
+    else
+    {
+        position = position + (difference * denTicks * 4);
+    }
 
     return position;
 }
 
-int SeqUtil::getBarFromTick(Sequence* s, int position)
+int SeqUtil::getBarFromTick(Sequence *s, int position)
 {
-	if (position == 0)
-		return 0;
+    if (position == 0)
+    {
+        return 0;
+    }
 
-	auto ts = s->getTimeSignature();
-	auto num = ts.getNumerator();
-	auto den = ts.getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	auto bar = (int)(floor(position / (denTicks * num)));
+    auto ts = s->getTimeSignature();
+    auto num = ts.getNumerator();
+    auto den = ts.getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
+    auto bar = (int)(floor(position / (denTicks * num)));
 
     return bar;
 }
@@ -62,87 +70,93 @@ double SeqUtil::ticksPerSecond(const double tempo)
 
 double SeqUtil::ticksToFrames(double ticks, const double tempo, int sr)
 {
-	return (ticks * secondsPerTick(tempo) * sr);
+    return (ticks * secondsPerTick(tempo) * sr);
 }
 
-double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, int sr)
+double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick, int sr)
 {
-	double result = 0;
-	auto lastTceTick = firstTick;
+    double result = 0;
+    auto lastTceTick = firstTick;
     auto tempoChangeEvents = seq->getTempoChangeEvents();
-	auto tceSize = tempoChangeEvents.size();
+    auto tceSize = tempoChangeEvents.size();
     std::shared_ptr<TempoChangeEvent> lastTce;
 
-	if (tceSize == 0)
-	{
-		result = ticksToFrames(lastTick - firstTick, seq->getInitialTempo(), sr);
-		return result;
-	}
-	else
-	{
-		auto firstTceTick = tempoChangeEvents[0]->getTick();
+    if (tceSize == 0)
+    {
+        result = ticksToFrames(lastTick - firstTick, seq->getInitialTempo(), sr);
+        return result;
+    }
+    else
+    {
+        auto firstTceTick = tempoChangeEvents[0]->getTick();
 
         if (firstTick < firstTceTick)
-			result = ticksToFrames(firstTceTick - firstTick, seq->getInitialTempo(), sr);
-	}
+        {
+            result = ticksToFrames(firstTceTick - firstTick, seq->getInitialTempo(), sr);
+        }
+    }
 
-	for (int i = 0; i < tceSize - 1; i++)
-	{
-		auto nextTce = tempoChangeEvents[i + 1];
+    for (int i = 0; i < tceSize - 1; i++)
+    {
+        auto nextTce = tempoChangeEvents[i + 1];
 
-		if (firstTick > nextTce->getTick())
-			continue;
+        if (firstTick > nextTce->getTick())
+        {
+            continue;
+        }
 
-		if (lastTick < nextTce->getTick())
-		{
-			lastTce = nextTce;
-			break;
-		}
+        if (lastTick < nextTce->getTick())
+        {
+            lastTce = nextTce;
+            break;
+        }
 
-		auto tce = tempoChangeEvents[i];
-		result += ticksToFrames(nextTce->getTick() - lastTceTick, tce->getTempo(), sr);
-		lastTceTick = nextTce->getTick();
-	}
+        auto tce = tempoChangeEvents[i];
+        result += ticksToFrames(nextTce->getTick() - lastTceTick, tce->getTempo(), sr);
+        lastTceTick = nextTce->getTick();
+    }
 
-	if (!lastTce)
-	{
-		lastTce = tempoChangeEvents[0];
-	}
+    if (!lastTce)
+    {
+        lastTce = tempoChangeEvents[0];
+    }
 
-	result += ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
-	return (int)(ceil(result));
+    result += ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
+    return (int)(ceil(result));
 }
 
-int SeqUtil::loopFrameLength(Sequence* seq, int sr)
+int SeqUtil::loopFrameLength(Sequence *seq, int sr)
 {
     return static_cast<int>(sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
 }
 
-int SeqUtil::songFrameLength(Song* song, Sequencer* sequencer, int sr)
+int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, int sr)
 {
-	double result = 0;
-	auto steps = song->getStepCount();
+    double result = 0;
+    auto steps = song->getStepCount();
 
-	for (int i = 0; i < steps; i++)
-	{
-		for (int j = 0; j < song->getStep(i).lock()->getRepeats(); j++)
-		{
-			auto seq = sequencer->getSequence(song->getStep(i).lock()->getSequence()).get();
-			result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
-		}
-	}
+    for (int i = 0; i < steps; i++)
+    {
+        for (int j = 0; j < song->getStep(i).lock()->getRepeats(); j++)
+        {
+            auto seq = sequencer->getSequence(song->getStep(i).lock()->getSequence()).get();
+            result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
+        }
+    }
 
-	return static_cast<int>(result);
+    return static_cast<int>(result);
 }
-void SeqUtil::setTimeSignature(Sequence* sequence, int firstBarIndex, int tsLastBarIndex, int num, int den)
+void SeqUtil::setTimeSignature(Sequence *sequence, int firstBarIndex, int tsLastBarIndex, int num, int den)
 {
-	for (int i = firstBarIndex; i <= tsLastBarIndex; i++)
-		setTimeSignature(sequence, i, num, den);
+    for (int i = firstBarIndex; i <= tsLastBarIndex; i++)
+    {
+        setTimeSignature(sequence, i, num, den);
+    }
 }
 
-void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
+void SeqUtil::setTimeSignature(Sequence *sequence, int bar, int num, int den)
 {
-	const auto newDenTicks = 96 * (4.0 / den);
+    const auto newDenTicks = 96 * (4.0 / den);
 
     const auto barStart = sequence->getFirstTickOfBar(bar);
     const auto oldBarLength = sequence->getBarLengthsInTicks()[bar];
@@ -155,7 +169,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
         // if they fall outside the new new bar's region.
         for (int tick = barStart + newBarLength; tick < barStart + oldBarLength; tick++)
         {
-            for (auto& t : sequence->getTracks())
+            for (auto &t : sequence->getTracks())
             {
                 for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0; eventIndex--)
                 {
@@ -175,7 +189,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
         // shift all relevant event ticks.
         const auto nextBarStartTick = sequence->getFirstTickOfBar(bar + 1);
 
-        for (auto& t: sequence->getTracks())
+        for (auto &t : sequence->getTracks())
         {
             for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0; eventIndex--)
             {
@@ -194,104 +208,132 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
     sequence->getDenominators()[bar] = den;
 }
 
-int SeqUtil::setBar(int i, Sequence* sequence, int position)
+int SeqUtil::setBar(int i, Sequence *sequence, int position)
 {
-	if (i < 0)
-		return 0;
+    if (i < 0)
+    {
+        return 0;
+    }
 
-	auto difference = i - SeqUtil::getBar(sequence, position);
-	auto den = sequence->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
+    auto difference = i - SeqUtil::getBar(sequence, position);
+    auto den = sequence->getTimeSignature().getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
 
-	if (position + (difference * denTicks * 4) > sequence->getLastTick())
-		position = sequence->getLastTick();
-	else
-		position = position + (difference * denTicks * 4);
+    if (position + (difference * denTicks * 4) > sequence->getLastTick())
+    {
+        position = sequence->getLastTick();
+    }
+    else
+    {
+        position = position + (difference * denTicks * 4);
+    }
 
-	return position;
+    return position;
 }
 
-int SeqUtil::setBeat(int i, Sequence* s, int position)
+int SeqUtil::setBeat(int i, Sequence *s, int position)
 {
-	if (i < 0)
-		i = 0;
+    if (i < 0)
+    {
+        i = 0;
+    }
 
-	auto difference = i - SeqUtil::getBeat(s, position);
-	auto ts = s->getTimeSignature();
-	auto num = ts.getNumerator();
+    auto difference = i - SeqUtil::getBeat(s, position);
+    auto ts = s->getTimeSignature();
+    auto num = ts.getNumerator();
 
-	if (i >= num)
-		return position;
+    if (i >= num)
+    {
+        return position;
+    }
 
-	auto den = ts.getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
+    auto den = ts.getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
 
-	if (position + (difference * denTicks) > s->getLastTick())
-		position = s->getLastTick();
-	else
-		position = position + (difference * denTicks);
+    if (position + (difference * denTicks) > s->getLastTick())
+    {
+        position = s->getLastTick();
+    }
+    else
+    {
+        position = position + (difference * denTicks);
+    }
 
-	return position;
+    return position;
 }
 
-int SeqUtil::setClock(int i, Sequence* s, int position)
+int SeqUtil::setClock(int i, Sequence *s, int position)
 {
-	if (i < 0)
-		i = 0;
+    if (i < 0)
+    {
+        i = 0;
+    }
 
-	auto difference = i - getClock(s, position);
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
+    auto difference = i - getClock(s, position);
+    auto den = s->getTimeSignature().getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
 
-	if (i > denTicks - 1)
-		return position;
+    if (i > denTicks - 1)
+    {
+        return position;
+    }
 
-	if (position + difference > s->getLastTick())
-		position = s->getLastTick();
-	else
-		position = position + difference;
+    if (position + difference > s->getLastTick())
+    {
+        position = s->getLastTick();
+    }
+    else
+    {
+        position = position + difference;
+    }
 
-	return position;
+    return position;
 }
 
-int SeqUtil::getBar(Sequence* s, int position)
+int SeqUtil::getBar(Sequence *s, int position)
 {
-	if (position == 0)
-		return 0;
+    if (position == 0)
+    {
+        return 0;
+    }
 
-	auto ts = s->getTimeSignature();
-	auto num = ts.getNumerator();
-	auto den = ts.getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	auto bar = (int)(floor(position / (denTicks * num)));
-	return bar;
+    auto ts = s->getTimeSignature();
+    auto num = ts.getNumerator();
+    auto den = ts.getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
+    auto bar = (int)(floor(position / (denTicks * num)));
+    return bar;
 }
 
-int SeqUtil::getBeat(Sequence* s, int position)
+int SeqUtil::getBeat(Sequence *s, int position)
 {
-	if (position == 0)
-		return 0;
+    if (position == 0)
+    {
+        return 0;
+    }
 
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	auto beat = (int)(floor(position / (denTicks)));
-	beat = beat % den;
-	return beat;
+    auto den = s->getTimeSignature().getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
+    auto beat = (int)(floor(position / (denTicks)));
+    beat = beat % den;
+    return beat;
 }
 
-int SeqUtil::getClock(Sequence* s, int position)
+int SeqUtil::getClock(Sequence *s, int position)
 {
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
+    auto den = s->getTimeSignature().getDenominator();
+    auto denTicks = (int)(96 * (4.0 / den));
 
-	if (position == 0)
-		return 0;
+    if (position == 0)
+    {
+        return 0;
+    }
 
-	auto clock = (int)(position % (denTicks));
-	return clock;
+    auto clock = (int)(position % (denTicks));
+    return clock;
 }
 
-void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, uint8_t copyFirstBar, uint8_t copyLastBar, uint8_t copyCount, uint8_t copyAfterBar)
+void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, uint8_t copyFirstBar, uint8_t copyLastBar, uint8_t copyCount, uint8_t copyAfterBar)
 {
     const auto sequencer = mpc.getSequencer();
 
@@ -346,7 +388,9 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
     for (int i = 0; i < 999; i++)
     {
         if (i == copyFirstBar)
+        {
             break;
+        }
 
         firstTickOfFromSequence += fromSequence->getBarLengthsInTicks()[i];
     }
@@ -366,7 +410,9 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
     for (int i = 0; i < 999; i++)
     {
         if (i == copyAfterBar)
+        {
             break;
+        }
 
         firstTickOfToSequence += toSequence->getBarLengthsInTicks()[i];
     }
@@ -393,7 +439,7 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
 
         auto toSeqLastTick = toSequence->getLastTick();
 
-        for (auto& event : t1Events)
+        for (auto &event : t1Events)
         {
             auto firstCopyTick = event->getTick() + offset;
 
@@ -424,26 +470,28 @@ void SeqUtil::copyBars(mpc::Mpc& mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
 bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
 {
     auto sequencer = mpc.getSequencer();
-	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>()->getNoteValue();
-	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>()->getNoteValue();
+    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+    auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     const bool recIsPressedOrLocked = mpc.getHardware()->getButton(hardware::ComponentId::REC)->isPressed() ||
                                       mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
-	bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
-		!sequencer->isPlaying() &&
-		recIsPressedOrLocked &&
-		tc_note != 0 &&
-		!posIsLastTick;
+    bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
+                                 !sequencer->isPlaying() &&
+                                 recIsPressedOrLocked &&
+                                 tc_note != 0 &&
+                                 !posIsLastTick;
 
-	return recMainWithoutPlaying;
+    return recMainWithoutPlaying;
 }
 
 bool SeqUtil::isStepRecording(mpc::Mpc &mpc)
 {
-	auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-	auto posIsLastTick = [&] { return mpc.getSequencer()->getTickPosition() == mpc.getSequencer()->getActiveSequence()->getLastTick(); };
-	return currentScreenName == "step-editor" && !posIsLastTick();
+    auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+    auto posIsLastTick = [&]
+    {
+        return mpc.getSequencer()->getTickPosition() == mpc.getSequencer()->getActiveSequence()->getLastTick();
+    };
+    return currentScreenName == "step-editor" && !posIsLastTick();
 }
-

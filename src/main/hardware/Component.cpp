@@ -7,15 +7,24 @@ Component::Component(ComponentId idToUse) : id(idToUse) {}
 
 Component::~Component() = default;
 
-ComponentId Component::getId() const { return id; }
+ComponentId Component::getId() const
+{
+    return id;
+}
 
 PressState::PressState() = default;
 
 PressState::~PressState() = default;
 
-void PressState::setPressed(bool pressedToUse) { pressed = pressedToUse; }
+void PressState::setPressed(bool pressedToUse)
+{
+    pressed = pressedToUse;
+}
 
-bool PressState::isPressed() const { return pressed; }
+bool PressState::isPressed() const
+{
+    return pressed;
+}
 
 Pressable::Pressable() = default;
 
@@ -48,13 +57,19 @@ void Pressable::release()
     onRelease();
 }
 
-bool Pressable::doublePress() { return press(); }
+bool Pressable::doublePress()
+{
+    return press();
+}
 
 VelocitySensitivePressable::VelocitySensitivePressable() = default;
 
 VelocitySensitivePressable::~VelocitySensitivePressable() = default;
 
-void VelocitySensitivePressable::resetVelocity() { velocity = std::nullopt; }
+void VelocitySensitivePressable::resetVelocity()
+{
+    velocity = std::nullopt;
+}
 
 void VelocitySensitivePressable::doPressWithVelocity(int velocityToUse)
 {
@@ -80,7 +95,10 @@ bool VelocitySensitivePressable::pressWithVelocity(int velocityToUse)
     return true;
 }
 
-std::optional<int> VelocitySensitivePressable::getVelocity() const { return velocity; }
+std::optional<int> VelocitySensitivePressable::getVelocity() const
+{
+    return velocity;
+}
 
 Aftertouchable::Aftertouchable() = default;
 
@@ -88,9 +106,15 @@ Aftertouchable::~Aftertouchable() = default;
 
 void Aftertouchable::onAftertouch(int) {}
 
-void Aftertouchable::resetPressure() { pressure = std::nullopt; }
+void Aftertouchable::resetPressure()
+{
+    pressure = std::nullopt;
+}
 
-std::optional<int> Aftertouchable::getPressure() const { return pressure; }
+std::optional<int> Aftertouchable::getPressure() const
+{
+    return pressure;
+}
 
 void Aftertouchable::aftertouch(int pressureToUse)
 {
@@ -107,9 +131,15 @@ void Aftertouchable::aftertouch(int pressureToUse)
 
 Led::Led(ComponentId id) : Component(id) {}
 
-void Led::setEnabled(bool enabledToUse) { enabled = enabledToUse; }
+void Led::setEnabled(bool enabledToUse)
+{
+    enabled = enabledToUse;
+}
 
-bool Led::isEnabled() const { return enabled; }
+bool Led::isEnabled() const
+{
+    return enabled;
+}
 
 Button::Button(ComponentId id) : Component(id) {}
 
@@ -126,9 +156,15 @@ void Pad::onRelease()
     resetVelocity();
 }
 
-void Pad::onPress() { doPressWithVelocity(MAX_VELO); }
+void Pad::onPress()
+{
+    doPressWithVelocity(MAX_VELO);
+}
 
-int Pad::getIndex() const { return index; }
+int Pad::getIndex() const
+{
+    return index;
+}
 
 DataWheel::DataWheel() : Component(ComponentId::DATA_WHEEL) {}
 
@@ -146,7 +182,10 @@ void DataWheel::turn(int steps)
     }
 }
 
-float DataWheel::getAngle() { return angle; }
+float DataWheel::getAngle()
+{
+    return angle;
+}
 
 Slider::Slider() : Component(ComponentId::SLIDER), direction(Direction::UpIncreases) {}
 
@@ -155,14 +194,20 @@ void Slider::moveToNormalizedY(float normalizedY)
     auto [min, max] = getRangeAs<float>();
     const float clampedY = std::clamp(normalizedY, 0.0f, 1.0f);
     float value = (direction == Direction::UpIncreases)
-        ? (1.0f - clampedY) * max + clampedY * min
-        : clampedY * max + (1.0f - clampedY) * min;
+                      ? (1.0f - clampedY) * max + clampedY * min
+                      : clampedY * max + (1.0f - clampedY) * min;
     setValue(value);
 }
 
-void Slider::setDirection(Direction directionToUse) { direction = directionToUse; }
+void Slider::setDirection(Direction directionToUse)
+{
+    direction = directionToUse;
+}
 
-Slider::Direction Slider::getDirection() const { return direction; }
+Slider::Direction Slider::getDirection() const
+{
+    return direction;
+}
 
 Pot::Pot(ComponentId id) : Component(id) {}
 
@@ -173,10 +218,16 @@ void Continuous<T, MIN, MAX>::setValue(T v)
 }
 
 template <typename T, int MIN, int MAX>
-T Continuous<T, MIN, MAX>::getValue() const { return value; }
+T Continuous<T, MIN, MAX>::getValue() const
+{
+    return value;
+}
 
 template <typename T, int MIN, int MAX>
-std::pair<int, int> Continuous<T, MIN, MAX>::getRange() const { return {MIN, MAX}; }
+std::pair<int, int> Continuous<T, MIN, MAX>::getRange() const
+{
+    return {MIN, MAX};
+}
 
 template <typename T, int MIN, int MAX>
 template <typename T1>
@@ -187,4 +238,3 @@ std::pair<T1, T1> Continuous<T, MIN, MAX>::getRangeAs() const
 
 template class mpc::hardware::Continuous<float, 0, 127>;
 template class mpc::hardware::Continuous<float, 0, 1>;
- 

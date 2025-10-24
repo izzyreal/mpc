@@ -3,15 +3,14 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 
-DeleteProgramScreen::DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "delete-program", layerIndex)
+DeleteProgramScreen::DeleteProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "delete-program", layerIndex)
 {
 }
 
 void DeleteProgramScreen::open()
 {
     auto allPrograms = sampler->getPrograms();
-
 
     pgm = activeDrum().getProgram();
 
@@ -20,8 +19,8 @@ void DeleteProgramScreen::open()
 
 void DeleteProgramScreen::function(int i)
 {
-	
-	switch (i)
+
+    switch (i)
     {
     case 2:
         mpc.getLayeredScreen()->openScreen<DeleteAllProgramsScreen>();
@@ -32,13 +31,13 @@ void DeleteProgramScreen::function(int i)
     case 4:
         if (sampler->getProgramCount() > 1)
         {
-			sampler->deleteProgram(sampler->getProgram(pgm));
+            sampler->deleteProgram(sampler->getProgram(pgm));
         }
         else
         {
-			sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
-		}
-        
+            sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
+        }
+
         mpc.getLayeredScreen()->openScreen<ProgramScreen>();
         break;
     }
@@ -50,7 +49,9 @@ void DeleteProgramScreen::turnWheel(int i)
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "pgm")
-		setPgm(pgm + i);
+    {
+        setPgm(pgm + i);
+    }
 }
 
 void DeleteProgramScreen::displayPgm()
@@ -65,11 +66,14 @@ void DeleteProgramScreen::setPgm(int i)
 
     candidate = up ? candidate - 1 : candidate + 1;
 
-    do {
+    do
+    {
         candidate = up ? candidate + 1 : candidate - 1;
 
         if (candidate < 0 || candidate >= sampler->getPrograms().size())
+        {
             return;
+        }
     } while (!sampler->getProgram(candidate));
 
     pgm = candidate;

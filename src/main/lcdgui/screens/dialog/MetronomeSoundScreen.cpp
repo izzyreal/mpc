@@ -9,10 +9,10 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 
-MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "metronome-sound", layerIndex)
+MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "metronome-sound", layerIndex)
 {
-	sampler = mpc.getSampler();
+    sampler = mpc.getSampler();
 }
 
 void MetronomeSoundScreen::open()
@@ -23,9 +23,15 @@ void MetronomeSoundScreen::open()
     // happen anymore. Also the demo data has been fixed, but once the user has
     // loaded an ALL file, this erroneous setting may have persisted into their
     // files too.
-    if (accentPad < 0 || accentPad > 63) accentPad = 0;
-    if (normalPad < 0 || normalPad > 63) normalPad = 0;
-    
+    if (accentPad < 0 || accentPad > 63)
+    {
+        accentPad = 0;
+    }
+    if (normalPad < 0 || normalPad > 63)
+    {
+        normalPad = 0;
+    }
+
     setSound(sound);
     mpc.addObserver(this); // Subscribe to "note" messages
 }
@@ -65,15 +71,15 @@ void MetronomeSoundScreen::displayOutput()
 
 void MetronomeSoundScreen::displayAccent()
 {
-	auto program = sampler->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program*>(sampler->getProgram(program).get())->getPad(accentPad)->getNote();
-	findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(accentPad));
+    auto program = sampler->getDrumBusProgramIndex(sound);
+    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())->getPad(accentPad)->getNote();
+    findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
     auto program = sampler->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program*>(sampler->getProgram(program).get())->getPad(normalPad)->getNote();
+    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())->getPad(normalPad)->getNote();
     findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(normalPad));
 }
 
@@ -95,7 +101,9 @@ int MetronomeSoundScreen::getVolume()
 void MetronomeSoundScreen::setVolume(int i)
 {
     if (i < 0 || i > 100)
+    {
         return;
+    }
 
     volume = i;
     displayVolume();
@@ -109,7 +117,9 @@ int MetronomeSoundScreen::getOutput()
 void MetronomeSoundScreen::setOutput(int i)
 {
     if (i < 0 || i > 8)
+    {
         return;
+    }
 
     output = i;
     displayOutput();
@@ -123,11 +133,13 @@ int MetronomeSoundScreen::getSound()
 void MetronomeSoundScreen::setSound(int i)
 {
     if (i < 0 || i > 4)
+    {
         return;
+    }
 
     sound = i;
     displaySound();
-    
+
     if (sound == 0)
     {
         displayVolume();
@@ -152,7 +164,9 @@ int MetronomeSoundScreen::getAccentPad()
 void MetronomeSoundScreen::setAccentPad(int i)
 {
     if (i < 0 || i > 63)
+    {
         return;
+    }
 
     accentPad = i;
     displayAccent();
@@ -166,7 +180,9 @@ int MetronomeSoundScreen::getAccentVelo()
 void MetronomeSoundScreen::setAccentVelo(int i)
 {
     if (i < 1 || i > 127)
+    {
         return;
+    }
 
     accentVelo = i;
     displayAccentVelo();
@@ -180,7 +196,9 @@ int MetronomeSoundScreen::getNormalPad()
 void MetronomeSoundScreen::setNormalPad(int i)
 {
     if (i < 0 || i > 63)
+    {
         return;
+    }
 
     normalPad = i;
     displayNormal();
@@ -194,7 +212,9 @@ int MetronomeSoundScreen::getNormalVelo()
 void MetronomeSoundScreen::setNormalVelo(int i)
 {
     if (i < 1 || i > 127)
+    {
         return;
+    }
 
     normalVelo = i;
     displayNormalVelo();
@@ -213,33 +233,40 @@ void MetronomeSoundScreen::function(int i)
 
 void MetronomeSoundScreen::turnWheel(int i)
 {
-    
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "sound") {
+    if (focusedFieldName == "sound")
+    {
         setSound(sound + i);
     }
-    else if (focusedFieldName == "volume") {
+    else if (focusedFieldName == "volume")
+    {
         setVolume(volume + i);
     }
-    else if (focusedFieldName == "output") {
+    else if (focusedFieldName == "output")
+    {
         setOutput(output + i);
     }
-    else if (focusedFieldName == "accent") {
+    else if (focusedFieldName == "accent")
+    {
         setAccentPad(accentPad + i);
     }
-    else if (focusedFieldName == "normal") {
+    else if (focusedFieldName == "normal")
+    {
         setNormalPad(normalPad + i);
     }
-    else if (focusedFieldName == "velocity-accent") {
+    else if (focusedFieldName == "velocity-accent")
+    {
         setAccentVelo(accentVelo + i);
     }
-    else if (focusedFieldName == "velocity-normal") {
+    else if (focusedFieldName == "velocity-normal")
+    {
         setNormalVelo(normalVelo + i);
     }
 }
 
-void MetronomeSoundScreen::update(Observable* o, Message message)
+void MetronomeSoundScreen::update(Observable *o, Message message)
 {
 
     const auto msg = std::get<std::string>(message);

@@ -7,15 +7,15 @@
 
 using namespace mpc::file::pgmreader;
 
-ProgramName::ProgramName(ProgramFileReader* programFile) 
+ProgramName::ProgramName(ProgramFileReader *programFile)
 {
     this->programFile = programFile;
 }
 
 int ProgramName::getSampleNamesSize()
 {
-	sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
-	return sampleNamesSize;
+    sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
+    return sampleNamesSize;
 }
 
 int ProgramName::getProgramNameStart()
@@ -26,7 +26,7 @@ int ProgramName::getProgramNameStart()
 
 int ProgramName::getProgramNameEnd()
 {
-    auto programNameEnd = 4 + getSampleNamesSize() + 2+ 17;
+    auto programNameEnd = 4 + getSampleNamesSize() + 2 + 17;
     return programNameEnd;
 }
 
@@ -39,13 +39,19 @@ std::vector<char> ProgramName::getProgramNameArray()
 
 std::string ProgramName::getProgramNameASCII()
 {
-	std::string programNameASCII;
-	auto bytes = getProgramNameArray();
-	for (char c : bytes) {
-		if (c == 0x00) break;
-		programNameASCII.push_back(c);
-	}
-	if (programNameASCII.length() > 16)
-		programNameASCII = programNameASCII.substr(0, 16);
-	return programNameASCII;
+    std::string programNameASCII;
+    auto bytes = getProgramNameArray();
+    for (char c : bytes)
+    {
+        if (c == 0x00)
+        {
+            break;
+        }
+        programNameASCII.push_back(c);
+    }
+    if (programNameASCII.length() > 16)
+    {
+        programNameASCII = programNameASCII.substr(0, 16);
+    }
+    return programNameASCII;
 }

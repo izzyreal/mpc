@@ -19,11 +19,11 @@ using namespace mpc::sequencer;
 // of VMPC2000XL would, we choose a strange name that is unlikely to exist.
 const std::string filename = "SHS4CABHNAXJ9LQ.ALL";
 
-void deleteTestAllFile(const std::shared_ptr<mpc::disk::AbstractDisk>& disk)
+void deleteTestAllFile(const std::shared_ptr<mpc::disk::AbstractDisk> &disk)
 {
     disk->initFiles();
 
-    for (int i = 0; i < disk->getAllFiles().size(); i ++)
+    for (int i = 0; i < disk->getAllFiles().size(); i++)
     {
         if (disk->getFileName(i) == filename)
         {
@@ -35,7 +35,7 @@ void deleteTestAllFile(const std::shared_ptr<mpc::disk::AbstractDisk>& disk)
     }
 }
 
-void saveAndLoadTestAllFile(mpc::Mpc& mpc)
+void saveAndLoadTestAllFile(mpc::Mpc &mpc)
 {
     auto disk = mpc.getDisk();
     auto f = disk->newFile(filename);

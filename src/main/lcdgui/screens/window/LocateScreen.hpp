@@ -4,21 +4,23 @@
 #include <tuple>
 #include <vector>
 
-namespace mpc::lcdgui::screens::window {
-    class LocateScreen : public mpc::lcdgui::ScreenComponent {
+namespace mpc::lcdgui::screens::window
+{
+    class LocateScreen : public mpc::lcdgui::ScreenComponent
+    {
 
     public:
         typedef std::tuple<uint16_t, uint8_t, uint8_t> Location;
 
-        LocateScreen(mpc::Mpc& mpc, int layerIndex);
+        LocateScreen(mpc::Mpc &mpc, int layerIndex);
 
         void function(int) override;
         void turnWheel(int) override;
 
         void open() override;
 
-        void setLocations(const std::vector<Location>&);
-        std::vector<Location>& getLocations();
+        void setLocations(const std::vector<Location> &);
+        std::vector<Location> &getLocations();
 
     private:
         std::vector<Location> locations = std::vector<Location>(9, {0, 0, 0});
@@ -40,4 +42,4 @@ namespace mpc::lcdgui::screens::window {
         uint8_t getMaxBeatIndexForThisBar();
         uint8_t getMaxClockForThisBar();
     };
-}
+} // namespace mpc::lcdgui::screens::window

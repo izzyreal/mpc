@@ -62,4 +62,3 @@ void NoteInputScreenUpdateCommand::execute()
         channelSettingsScreen->setNote(note);
     }
 }
-

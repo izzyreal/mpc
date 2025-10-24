@@ -12,24 +12,24 @@
 using namespace mpc::input;
 using namespace mpc::hardware;
 
-std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostInputEvent& hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
+std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostInputEvent &hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
 {
     ClientHardwareEvent clientInput;
-    
+
     switch (hostInputEvent.getSource())
     {
-        case HostInputEvent::Source::MIDI:
-            clientInput.source = ClientHardwareEvent::Source::HostInputMidi;
-            break;
-        case HostInputEvent::Source::KEYBOARD:
-            clientInput.source = ClientHardwareEvent::Source::HostInputKeyboard;
-            break;
-        case HostInputEvent::Source::GESTURE:
-            clientInput.source = ClientHardwareEvent::Source::HostInputGesture;
-            break;
-        case HostInputEvent::Source::FOCUS:
-            clientInput.source = ClientHardwareEvent::Source::HostFocusEvent;
-            break;
+    case HostInputEvent::Source::MIDI:
+        clientInput.source = ClientHardwareEvent::Source::HostInputMidi;
+        break;
+    case HostInputEvent::Source::KEYBOARD:
+        clientInput.source = ClientHardwareEvent::Source::HostInputKeyboard;
+        break;
+    case HostInputEvent::Source::GESTURE:
+        clientInput.source = ClientHardwareEvent::Source::HostInputGesture;
+        break;
+    case HostInputEvent::Source::FOCUS:
+        clientInput.source = ClientHardwareEvent::Source::HostFocusEvent;
+        break;
     }
 
     switch (hostInputEvent.getSource())
@@ -37,15 +37,16 @@ std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostI
     case HostInputEvent::Source::FOCUS:
         clientInput.type = ClientHardwareEvent::Type::HostFocusLost;
         break;
-    case HostInputEvent::Source::MIDI: {
-        const auto& midi = std::get<MidiEvent>(hostInputEvent.payload);
+    case HostInputEvent::Source::MIDI:
+    {
+        const auto &midi = std::get<MidiEvent>(hostInputEvent.payload);
         midi.printInfo();
         break;
     }
 
     case HostInputEvent::Source::GESTURE:
     {
-        const auto& gesture = std::get<GestureEvent>(hostInputEvent.payload);
+        const auto &gesture = std::get<GestureEvent>(hostInputEvent.payload);
 
         if (gesture.componentId == ComponentId::NONE)
         {
@@ -160,7 +161,7 @@ std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostI
                     charToUse = *typableChar;
                 }
 
-                clientInput.textInputKey = ClientHardwareEvent::TextInputKey { charToUse, key.keyDown };
+                clientInput.textInputKey = ClientHardwareEvent::TextInputKey{charToUse, key.keyDown};
             }
         }
 
@@ -189,23 +190,32 @@ std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostI
                 return std::nullopt;
             }
         }
-        
+
         clientInput.componentId = id;
 
         if (id >= ComponentId::PAD_1_OR_AB && id <= ComponentId::PAD_16_OR_PARENTHESES)
         {
             clientInput.type = key.keyDown ? ClientHardwareEvent::Type::PadPress : ClientHardwareEvent::Type::PadRelease;
             clientInput.index = static_cast<int>(id) - static_cast<int>(ComponentId::PAD_1_OR_AB);
-            if (key.keyDown) clientInput.value = mpc::hardware::Pad::MAX_VELO;
+            if (key.keyDown)
+            {
+                clientInput.value = mpc::hardware::Pad::MAX_VELO;
+            }
         }
         else if (id == ComponentId::SLIDER)
         {
-            if (!key.keyDown) break;
+            if (!key.keyDown)
+            {
+                break;
+            }
             clientInput.type = ClientHardwareEvent::Type::SliderMove;
         }
         else if (id == ComponentId::DATA_WHEEL)
         {
-            if (!key.keyDown) break;
+            if (!key.keyDown)
+            {
+                break;
+            }
             clientInput.type = ClientHardwareEvent::Type::DataWheelTurn;
 
             const auto direction = binding->direction;
@@ -217,9 +227,18 @@ std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostI
 
             int increment = toSign(direction);
 
-            if (key.ctrlDown) increment *= 10;
-            if (key.altDown) increment *= 10;
-            if (key.shiftDown) increment *= 10;
+            if (key.ctrlDown)
+            {
+                increment *= 10;
+            }
+            if (key.altDown)
+            {
+                increment *= 10;
+            }
+            if (key.shiftDown)
+            {
+                increment *= 10;
+            }
 
             clientInput.deltaValue = increment;
         }
@@ -256,4 +275,3 @@ std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostI
 
     return clientInput;
 }
-

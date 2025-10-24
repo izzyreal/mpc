@@ -3,31 +3,34 @@
 #include <string>
 #include <vector>
 
-namespace mpc {
-	namespace file {
-		namespace pgmreader {
+namespace mpc
+{
+    namespace file
+    {
+        namespace pgmreader
+        {
 
-			class ProgramFileReader;
+            class ProgramFileReader;
 
-			class SoundNames
-			{
+            class SoundNames
+            {
 
-			public:
-				std::vector<char> sampleNamesArray{};
+            public:
+                std::vector<char> sampleNamesArray{};
 
-			private:
-				ProgramFileReader* programFile{};
+            private:
+                ProgramFileReader *programFile{};
 
-			public:
-				int getSampleNamesSize();
-				std::vector<char> getSampleNamesArray();
+            public:
+                int getSampleNamesSize();
+                std::vector<char> getSampleNamesArray();
 
-			public:
-				std::string getSampleName(int sampleNumber);
+            public:
+                std::string getSampleName(int sampleNumber);
 
-				SoundNames(ProgramFileReader* programFile);
-			};
+                SoundNames(ProgramFileReader *programFile);
+            };
 
-		}
-	}
-}
+        } // namespace pgmreader
+    } // namespace file
+} // namespace mpc

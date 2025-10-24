@@ -15,8 +15,8 @@ namespace mpc::engine
         int drumIndex;
         std::map<int, int> *drumSimultA;
         std::map<int, int> *drumSimultB;
-        std::vector<std::shared_ptr<Voice>>* voices{};
+        std::vector<std::shared_ptr<Voice>> *voices{};
         int note{};
         int noteOnStartTick{};
     };
-}
+} // namespace mpc::engine

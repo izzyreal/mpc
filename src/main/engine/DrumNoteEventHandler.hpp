@@ -8,7 +8,7 @@ namespace mpc::engine
     class DrumNoteEventHandler final
     {
     public:
-        static void noteOn(const DrumNoteOnContext& ctx);
-        static void noteOff(const DrumNoteOffContext& ctx);
+        static void noteOn(const DrumNoteOnContext &ctx);
+        static void noteOff(const DrumNoteOffContext &ctx);
     };
-}
+} // namespace mpc::engine

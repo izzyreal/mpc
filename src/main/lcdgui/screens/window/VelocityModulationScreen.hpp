@@ -3,26 +3,25 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class VelocityModulationScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class VelocityModulationScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void turnWheel(int i) override;
+    public:
+        void turnWheel(int i) override;
 
-		VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex);
-		
-		void open() override;
-		void close() override;
+        VelocityModulationScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void update(Observable* observable, Message message) override;
+        void open() override;
+        void close() override;
 
-	private:
-		void displayVeloAttack();
-		void displayVeloStart();
-		void displayVeloLevel();
-		void displayVelo();
-		void displayNote();
+        void update(Observable *observable, Message message) override;
 
-	};
-}
+    private:
+        void displayVeloAttack();
+        void displayVeloStart();
+        void displayVeloLevel();
+        void displayVelo();
+        void displayNote();
+    };
+} // namespace mpc::lcdgui::screens::window

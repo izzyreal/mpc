@@ -6,7 +6,7 @@
 
 using namespace mpc::command;
 
-ReleaseTapCommand::ReleaseTapCommand(mpc::Mpc& mpc) : mpc(mpc) {}
+ReleaseTapCommand::ReleaseTapCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseTapCommand::execute()
 {
@@ -21,4 +21,3 @@ void ReleaseTapCommand::execute()
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
     }
 }
-

@@ -13,28 +13,28 @@ using namespace std;
 
 NonRealTimeAudioServer::NonRealTimeAudioServer(shared_ptr<AudioServer> serverToUse)
 {
-	server = std::move(serverToUse);
-	realTime = true;
-	isRunningNonRealTime = false;
+    server = std::move(serverToUse);
+    realTime = true;
+    isRunningNonRealTime = false;
 }
 
 void NonRealTimeAudioServer::setSampleRate(int rate)
 {
-	server->setSampleRate(rate);
+    server->setSampleRate(rate);
 }
 
 void NonRealTimeAudioServer::setSharedPtr(shared_ptr<NonRealTimeAudioServer> sharedPtr)
 {
-	me = std::move(sharedPtr);
+    me = std::move(sharedPtr);
 }
 
 void NonRealTimeAudioServer::setRealTime(bool rt)
 {
     if (!isRunning())
     {
-		realTime = rt;
-		return;
-	}
+        realTime = rt;
+        return;
+    }
 
     if (realTime != rt)
     {
@@ -42,13 +42,13 @@ void NonRealTimeAudioServer::setRealTime(bool rt)
 
         realTime = rt;
 
-        for (auto& buffer : server->getBuffers())
+        for (auto &buffer : server->getBuffers())
         {
-			buffer->setRealTime(realTime);
-		}
+            buffer->setRealTime(realTime);
+        }
 
         start();
-	}
+    }
 }
 
 bool NonRealTimeAudioServer::isRealTime()
@@ -58,19 +58,19 @@ bool NonRealTimeAudioServer::isRealTime()
 
 void NonRealTimeAudioServer::start()
 {
-	if (isRunning())
+    if (isRunning())
     {
         return;
     }
 
-	if (realTime)
+    if (realTime)
     {
-		server->start();
-	}
-	else
+        server->start();
+    }
+    else
     {
         startNonRealTimeThread();
-	}
+    }
 }
 
 void NonRealTimeAudioServer::startNonRealTimeThread()
@@ -80,7 +80,10 @@ void NonRealTimeAudioServer::startNonRealTimeThread()
         nonRealTimeThread.join();
     }
 
-    nonRealTimeThread = std::thread([this]{ runNonRealTime(); });
+    nonRealTimeThread = std::thread([this]
+                                    {
+                                        runNonRealTime();
+                                    });
 }
 
 void NonRealTimeAudioServer::stop()
@@ -103,7 +106,7 @@ void NonRealTimeAudioServer::stop()
 void NonRealTimeAudioServer::stopNonRealTimeThread()
 {
     isRunningNonRealTime = false;
-    
+
     if (nonRealTimeThread.joinable())
     {
         nonRealTimeThread.join();
@@ -112,13 +115,13 @@ void NonRealTimeAudioServer::stopNonRealTimeThread()
 
 void NonRealTimeAudioServer::close()
 {
-	server->close();
+    server->close();
     server = nullptr;
 }
 
 void NonRealTimeAudioServer::setClient(shared_ptr<AudioClient> clientToUse)
 {
-	server->setClient(me);
+    server->setClient(me);
     client = clientToUse;
 }
 
@@ -128,15 +131,15 @@ bool NonRealTimeAudioServer::isRunning()
 }
 
 void NonRealTimeAudioServer::work(
-        const float* const* inputBuffer,
-        float* const* outputBuffer,
-        const int nFrames,
-        const std::vector<int8_t> &mpcMonoInputChannelIndices,
-        const std::vector<int8_t> &mpcMonoOutputChannelIndices,
-        const std::vector<int8_t> &hostInputChannelIndices,
-        const std::vector<int8_t> &hostOutputChannelIndices)
+    const float *const *inputBuffer,
+    float *const *outputBuffer,
+    const int nFrames,
+    const std::vector<int8_t> &mpcMonoInputChannelIndices,
+    const std::vector<int8_t> &mpcMonoOutputChannelIndices,
+    const std::vector<int8_t> &hostInputChannelIndices,
+    const std::vector<int8_t> &hostOutputChannelIndices)
 {
-	auto realTimeAudioServer = dynamic_pointer_cast<RealTimeAudioServer>(server);
+    auto realTimeAudioServer = dynamic_pointer_cast<RealTimeAudioServer>(server);
     realTimeAudioServer->work(inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices, mpcMonoOutputChannelIndices, hostInputChannelIndices, hostOutputChannelIndices);
 }
 
@@ -147,40 +150,40 @@ void NonRealTimeAudioServer::work(int nFrames)
 
 void NonRealTimeAudioServer::runNonRealTime()
 {
-	isRunningNonRealTime = true;
+    isRunningNonRealTime = true;
 
     while (isRunningNonRealTime)
     {
-		work(server->getBufferSize());
+        work(server->getBufferSize());
     }
 }
 
-void NonRealTimeAudioServer::removeAudioBuffer(AudioBuffer* buffer)
+void NonRealTimeAudioServer::removeAudioBuffer(AudioBuffer *buffer)
 {
-	server->removeAudioBuffer(buffer);
+    server->removeAudioBuffer(buffer);
 }
 
-AudioBuffer* NonRealTimeAudioServer::createAudioBuffer(string name)
+AudioBuffer *NonRealTimeAudioServer::createAudioBuffer(string name)
 {
-	return server->createAudioBuffer(name);
+    return server->createAudioBuffer(name);
 }
 
-IOAudioProcess* NonRealTimeAudioServer::openAudioOutput(string name)
+IOAudioProcess *NonRealTimeAudioServer::openAudioOutput(string name)
 {
     return server->openAudioOutput(name);
 }
 
-IOAudioProcess* NonRealTimeAudioServer::openAudioInput(string name)
+IOAudioProcess *NonRealTimeAudioServer::openAudioInput(string name)
 {
     return server->openAudioInput(name);
 }
 
-void NonRealTimeAudioServer::closeAudioOutput(IOAudioProcess* output)
+void NonRealTimeAudioServer::closeAudioOutput(IOAudioProcess *output)
 {
     server->closeAudioOutput(output);
 }
 
-void NonRealTimeAudioServer::closeAudioInput(IOAudioProcess* input)
+void NonRealTimeAudioServer::closeAudioInput(IOAudioProcess *input)
 {
     server->closeAudioInput(input);
 }
@@ -192,12 +195,12 @@ float NonRealTimeAudioServer::getSampleRate()
 
 void NonRealTimeAudioServer::resizeBuffers(int newSize)
 {
-	server->resizeBuffers(newSize);
+    server->resizeBuffers(newSize);
 }
 
 NonRealTimeAudioServer::~NonRealTimeAudioServer()
 {
-	if (nonRealTimeThread.joinable())
+    if (nonRealTimeThread.joinable())
     {
         nonRealTimeThread.join();
     }

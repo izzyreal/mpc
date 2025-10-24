@@ -54,21 +54,20 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
 
     const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
 
-    Util::SixteenLevelsContext sixteenLevelsContext {
+    Util::SixteenLevelsContext sixteenLevelsContext{
         is16LevelsEnabled,
         assign16LevelsScreen->getType(),
         assign16LevelsScreen->getOriginalKeyPad(),
         assign16LevelsScreen->getNote(),
         assign16LevelsScreen->getParameter(),
-        ctx.programPadIndex % 16
-    };
+        ctx.programPadIndex % 16};
 
     Util::set16LevelsValues(sixteenLevelsContext, playOnEvent);
 
     const bool isSliderNote = ctx.program && ctx.program->getSlider()->getNote() == ctx.note;
     auto programSlider = ctx.program->getSlider();
 
-    Util::SliderNoteVariationContext sliderNoteVariationContext {
+    Util::SliderNoteVariationContext sliderNoteVariationContext{
         ctx.hardwareSliderValue,
         programSlider->getNote(),
         programSlider->getParameter(),
@@ -79,8 +78,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
         programSlider->getAttackLowRange(),
         programSlider->getAttackHighRange(),
         programSlider->getFilterLowRange(),
-        programSlider->getFilterHighRange()
-    };
+        programSlider->getFilterHighRange()};
 
     if (ctx.program && isSliderNote)
     {
@@ -129,10 +127,10 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
         {
             const int bar = ctx.sequencer->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx.track->timingCorrectTick(0,
-                                                                bar,
-                                                                ctx.sequencer->getTickPosition(),
-                                                                stepLength,
-                                                                timingCorrectScreen->getSwing());
+                                                                    bar,
+                                                                    ctx.sequencer->getTickPosition(),
+                                                                    stepLength,
+                                                                    timingCorrectScreen->getSwing());
 
             if (ctx.sequencer->getTickPosition() != correctedTick)
             {
@@ -156,4 +154,3 @@ void TriggerDrumNoteOnCommand::generateNoteOn(const TriggerDrumNoteOnContext &ct
         ctx.sequencer->getNoteEventStore().storeRecordNoteEvent(ctx.programPadIndex, recordNoteOnEvent);
     }
 }
-

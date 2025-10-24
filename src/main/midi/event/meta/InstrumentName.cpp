@@ -5,7 +5,7 @@
 using namespace mpc::midi::event::meta;
 
 InstrumentName::InstrumentName(int tick, int delta, std::string name)
-: TextualMetaEvent(tick, delta, MetaEvent::INSTRUMENT_NAME, name)
+    : TextualMetaEvent(tick, delta, MetaEvent::INSTRUMENT_NAME, name)
 {
 }
 

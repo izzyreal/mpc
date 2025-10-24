@@ -4,10 +4,11 @@
 #include <engine/audio/core/AudioControlsChain.hpp>
 #include <engine/audio/core/AudioControls.hpp>
 
-namespace mpc::engine::audio::core {
+namespace mpc::engine::audio::core
+{
 
     class AudioProcessChain
-            : public AudioProcess
+        : public AudioProcess
     {
 
     public:
@@ -32,7 +33,6 @@ namespace mpc::engine::audio::core {
 
     public:
         AudioProcessChain(std::shared_ptr<AudioControlsChain> controlChain);
-
     };
 
-}
+} // namespace mpc::engine::audio::core

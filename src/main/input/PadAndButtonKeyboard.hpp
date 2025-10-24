@@ -9,16 +9,20 @@
  * This class handles typing a name in the NameScreen via the pads (old mobile phone style).
  */
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
-namespace mpc::input {
+namespace mpc::input
+{
 
     class PadAndButtonKeyboard
     {
     private:
         static std::unordered_map<mpc::hardware::ComponentId, std::string> charMap();
 
-        mpc::Mpc& mpc;
+        mpc::Mpc &mpc;
 
         bool upperCase = true;
 
@@ -27,14 +31,16 @@ namespace mpc::input {
         mpc::hardware::ComponentId previousPad = mpc::hardware::ComponentId::NONE;
 
     public:
-        PadAndButtonKeyboard(mpc::Mpc&);
+        PadAndButtonKeyboard(mpc::Mpc &);
         void pressHardwareComponent(const mpc::hardware::ComponentId);
         void resetPreviousPad();
         void resetPressedZeroTimes();
         void resetUpperCase();
 
-        const bool isUpperCase() { return upperCase; }
+        const bool isUpperCase()
+        {
+            return upperCase;
+        }
     };
 
-}
-
+} // namespace mpc::input

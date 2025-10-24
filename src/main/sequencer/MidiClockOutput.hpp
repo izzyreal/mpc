@@ -13,17 +13,25 @@
 #include <functional>
 #include <atomic>
 
-namespace mpc::engine::midi { class ShortMessage; }
+namespace mpc::engine::midi
+{
+    class ShortMessage;
+}
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window
+{
     class CountMetronomeScreen;
 
     class TimingCorrectScreen;
-}
+} // namespace mpc::lcdgui::screens::window
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 
     class Sequencer;
 
@@ -68,4 +76,4 @@ namespace mpc::sequencer {
 
         bool isLastProcessedFrameMidiClockLock();
     };
-}
+} // namespace mpc::sequencer

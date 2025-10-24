@@ -25,7 +25,7 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     for (int i = 0; i < 1000; i++)
     {
-        sound->insertFrame( {1.f}, i);
+        sound->insertFrame({1.f}, i);
     }
 
     sound->setStart(0);
@@ -47,11 +47,11 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
     audioServer->setSampleRate(SAMPLE_RATE);
     audioServer->resizeBuffers(BUFFER_SIZE);
 
-    const float** inputBuffer = new const float*[2];
+    const float **inputBuffer = new const float *[2];
     inputBuffer[0] = new float[BUFFER_SIZE];
     inputBuffer[1] = new float[BUFFER_SIZE];
 
-    float** outputBuffer = new float*[10];
+    float **outputBuffer = new float *[10];
 
     for (int i = 0; i < 10; ++i)
     {
@@ -60,16 +60,17 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     int64_t timeInSamples = 0;
 
-    auto audioThread = std::thread([&]{
-        for (int i = 0; i < DSP_CYCLE_COUNT; i++)
-        {
-            audioMidiServices->changeBounceStateIfRequired();
-            mpc.getClock()->processBufferInternal(mpc.getSequencer()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
-            audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {}, {0, 1});
-            timeInSamples += BUFFER_SIZE;
-            std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
-        }
-    });
+    auto audioThread = std::thread([&]
+                                   {
+                                       for (int i = 0; i < DSP_CYCLE_COUNT; i++)
+                                       {
+                                           audioMidiServices->changeBounceStateIfRequired();
+                                           mpc.getClock()->processBufferInternal(mpc.getSequencer()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+                                           audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {}, {0, 1});
+                                           timeInSamples += BUFFER_SIZE;
+                                           std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
+                                       }
+                                   });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -77,8 +78,10 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     auto recordingsPath = mpc.paths->recordingsPath();
 
-    for (const auto& entry : fs::directory_iterator(recordingsPath)) {
-        if (fs::is_directory(entry)) {
+    for (const auto &entry : fs::directory_iterator(recordingsPath))
+    {
+        if (fs::is_directory(entry))
+        {
             recordingsPath = entry.path();
             break;
         }
@@ -107,7 +110,10 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     for (int i = 0; i < 10; ++i)
     {
-        if (i < 2) delete[] inputBuffer[i];
+        if (i < 2)
+        {
+            delete[] inputBuffer[i];
+        }
         delete[] outputBuffer[i];
     }
 

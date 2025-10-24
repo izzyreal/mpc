@@ -11,40 +11,40 @@
 
 using namespace mpc::file::pgmreader;
 
-PgmAllNoteParameters::PgmAllNoteParameters(ProgramFileReader* programFile) 
+PgmAllNoteParameters::PgmAllNoteParameters(ProgramFileReader *programFile)
 {
-	this->programFile = programFile;
+    this->programFile = programFile;
 }
 
 int PgmAllNoteParameters::getSampleNamesSize()
 {
-	sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
-	return sampleNamesSize;
+    sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
+    return sampleNamesSize;
 }
 
 int PgmAllNoteParameters::getMidiNotesStart()
 {
-	auto midiNotesStart = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6;
-	return midiNotesStart;
+    auto midiNotesStart = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6;
+    return midiNotesStart;
 }
 
 int PgmAllNoteParameters::getMidiNotesEnd()
 {
-	auto midiNotesEnd = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6 + 1601;
-	return midiNotesEnd;
+    auto midiNotesEnd = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6 + 1601;
+    return midiNotesEnd;
 }
 
 std::vector<char> PgmAllNoteParameters::getMidiNotesArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-	midiNotesArray = Util::vecCopyOfRange(pgmFileArray, getMidiNotesStart(), getMidiNotesEnd());
-	return midiNotesArray;
+    midiNotesArray = Util::vecCopyOfRange(pgmFileArray, getMidiNotesStart(), getMidiNotesEnd());
+    return midiNotesArray;
 }
 
 int PgmAllNoteParameters::getSampleSelect(int midiNote)
 {
-	int sampleSelect = getMidiNotesArray()[(midiNote * 25) + 0];
-	return sampleSelect;
+    int sampleSelect = getMidiNotesArray()[(midiNote * 25) + 0];
+    return sampleSelect;
 }
 
 int PgmAllNoteParameters::getSoundGenerationMode(int midiNote)
@@ -97,10 +97,10 @@ int PgmAllNoteParameters::getMuteAssign2(int midiNote)
 
 int PgmAllNoteParameters::getTune(int midiNote)
 {
-	auto startPos = (midiNote * 25) + 9;
-	auto endPos = (midiNote * 25) + 11;
-	auto tuneBytes = Util::vecCopyOfRange(getMidiNotesArray(), startPos, endPos);
-	return ByteUtil::bytes2short(tuneBytes);
+    auto startPos = (midiNote * 25) + 9;
+    auto endPos = (midiNote * 25) + 11;
+    auto tuneBytes = Util::vecCopyOfRange(getMidiNotesArray(), startPos, endPos);
+    return ByteUtil::bytes2short(tuneBytes);
 }
 
 int PgmAllNoteParameters::getAttack(int midiNote)

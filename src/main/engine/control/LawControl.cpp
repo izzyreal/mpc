@@ -5,10 +5,10 @@ using namespace mpc::engine::control;
 using namespace std;
 
 LawControl::LawControl(int id, string name, shared_ptr<ControlLaw> law, float initialValue)
-	: Control(id, name)
+    : Control(id, name)
 {
-	this->law = law;
-	this->value = initialValue;
+    this->law = law;
+    this->value = initialValue;
 }
 
 float LawControl::getValue()
@@ -18,13 +18,13 @@ float LawControl::getValue()
 
 string LawControl::getValueString()
 {
-	string res1 = law->getUnits();
-	string res2 = to_string(getValue());
-	return string(res1 + res2);
+    string res1 = law->getUnits();
+    string res2 = to_string(getValue());
+    return string(res1 + res2);
 }
 
 void LawControl::setValue(float value)
 {
-	this->value = value;
-	notifyParent(this);
+    this->value = value;
+    notifyParent(this);
 }

@@ -4,26 +4,26 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class KeepOrRetryScreen
-: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
-	{
+    class KeepOrRetryScreen
+        : public mpc::lcdgui::ScreenComponent,
+          public mpc::lcdgui::screens::OpensNameScreen
+    {
 
-	public:
-        KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex);
+    public:
+        KeepOrRetryScreen(mpc::Mpc &mpc, const int layerIndex);
 
-        void update(Observable* o, Message message) override;
+        void update(Observable *o, Message message) override;
 
         void open() override;
         void close() override;
-		void function(int i) override;
-		void turnWheel(int i) override;
+        void function(int i) override;
+        void turnWheel(int i) override;
         void right() override;
 
-	private:
-		void displayNameForNewSound();
-		void displayAssignToNote();
+    private:
+        void displayNameForNewSound();
+        void displayAssignToNote();
         void openNameScreen() override;
         unsigned char assignToNote = 34;
-
-	};
-}
+    };
+} // namespace mpc::lcdgui::screens::window

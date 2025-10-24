@@ -8,8 +8,8 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-Assign16LevelsScreen::Assign16LevelsScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "assign-16-levels", layerIndex)
+Assign16LevelsScreen::Assign16LevelsScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "assign-16-levels", layerIndex)
 {
 }
 
@@ -25,15 +25,15 @@ void Assign16LevelsScreen::function(int i)
 {
     ScreenComponent::function(i);
 
-	switch (i)
-	{
+    switch (i)
+    {
     case 4:
-	{
-		mpc.setSixteenLevelsEnabled(true);
-		mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
-		mpc.getLayeredScreen()->closeCurrentScreen();
-		break;
-	}
+    {
+        mpc.setSixteenLevelsEnabled(true);
+        mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
+        mpc.getLayeredScreen()->closeCurrentScreen();
+        break;
+    }
     }
 }
 
@@ -74,12 +74,18 @@ void Assign16LevelsScreen::turnWheel(int i)
 void Assign16LevelsScreen::setNote(int newNote)
 {
     if (newNote < 34)
+    {
         newNote = 34;
+    }
     else if (newNote > 98)
+    {
         newNote = 98;
+    }
 
     if (note == newNote)
+    {
         return;
+    }
 
     note = newNote;
     displayNote();
@@ -88,10 +94,12 @@ void Assign16LevelsScreen::setNote(int newNote)
 void Assign16LevelsScreen::setParam(int i)
 {
     if (i < 0 || i > 1)
+    {
         return;
+    }
 
     parameter = i;
-    
+
     displayParameter();
     displayType();
 }
@@ -99,7 +107,9 @@ void Assign16LevelsScreen::setParam(int i)
 void Assign16LevelsScreen::setType(int i)
 {
     if (i < 0 || i > 3)
+    {
         return;
+    }
 
     type = i;
 
@@ -110,7 +120,9 @@ void Assign16LevelsScreen::setType(int i)
 void Assign16LevelsScreen::setOriginalKeyPad(int i)
 {
     if (i < 3 || i > 12)
+    {
         return;
+    }
 
     originalKeyPad = i;
     displayOriginalKeyPad();
@@ -166,7 +178,9 @@ void Assign16LevelsScreen::displayType()
     findLabel("type")->Hide(parameter != 1);
 
     if (parameter != 1)
+    {
         return;
+    }
 
     findField("type")->setText(typeNames[type]);
 }
@@ -177,8 +191,9 @@ void Assign16LevelsScreen::displayOriginalKeyPad()
     findLabel("originalkeypad")->Hide(!(parameter == 1 && type == 0));
 
     if (type != 0)
+    {
         return;
+    }
 
     findField("originalkeypad")->setTextPadded(originalKeyPad + 1, " ");
 }
-

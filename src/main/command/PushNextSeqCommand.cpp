@@ -3,12 +3,13 @@
 #include "hardware/Hardware.hpp"
 #include "Util.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushNextSeqCommand::PushNextSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
     void PushNextSeqCommand::execute()
-    {        
+    {
         if (mpc.getLayeredScreen()->isCurrentScreen<NextSeqScreen, NextSeqPadScreen>())
         {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
@@ -18,4 +19,4 @@ namespace mpc::command {
             mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
         }
     }
-}
+} // namespace mpc::command

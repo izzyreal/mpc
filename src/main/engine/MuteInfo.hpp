@@ -1,7 +1,9 @@
 #pragma once
 
-namespace mpc::engine {
-    class MuteInfo {
+namespace mpc::engine
+{
+    class MuteInfo
+    {
 
     private:
         int note{0};
@@ -17,7 +19,6 @@ namespace mpc::engine {
         bool shouldMute(int otherNote, int otherDrum) const;
 
         MuteInfo();
-
     };
 
-}
+} // namespace mpc::engine

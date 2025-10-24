@@ -4,19 +4,23 @@
 
 using namespace mpc::file::pgmwriter;
 
-PgmName::PgmName(mpc::sampler::Program* program)
+PgmName::PgmName(mpc::sampler::Program *program)
 {
-	auto ca = program->getName();
-	std::vector<char> temp(17);
-	for (int i = 0; i < ca.length(); i++)
-		temp[i] = ca[i];
+    auto ca = program->getName();
+    std::vector<char> temp(17);
+    for (int i = 0; i < ca.length(); i++)
+    {
+        temp[i] = ca[i];
+    }
 
-	for (int i = ca.length(); i < 16; i++)
-		temp[i] = 32;
+    for (int i = ca.length(); i < 16; i++)
+    {
+        temp[i] = 32;
+    }
 
-	temp[16] = 0;
-	programNameArray = temp;
-	sampleNamesSize = program->getNumberOfSamples() * 17;
+    temp[16] = 0;
+    programNameArray = temp;
+    sampleNamesSize = program->getNumberOfSamples() * 17;
 }
 
 std::vector<char> PgmName::getPgmNameArray()

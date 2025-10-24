@@ -4,7 +4,8 @@
 
 #include <memory>
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
     class MixerInterconnection
     {
@@ -33,6 +34,5 @@ namespace mpc::engine {
 
     public:
         MixerInterconnection(std::string name, mpc::engine::audio::server::AudioServer *server);
-
     };
-}
+} // namespace mpc::engine

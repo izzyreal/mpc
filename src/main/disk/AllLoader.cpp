@@ -50,13 +50,13 @@ using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
+void AllLoader::loadEverythingFromFile(mpc::Mpc &mpc, mpc::disk::MpcFile *f)
 {
     AllParser allParser(mpc, f->getBytes());
     AllLoader::loadEverythingFromAllParser(mpc, allParser);
 }
 
-void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
+void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
 {
     auto mpcSequencer = mpc.getSequencer();
     auto allSequences = allParser.getAllSequences();
@@ -70,13 +70,17 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     userScreen->setBus(defaults->getBusses()[0]);
 
     for (int i = 0; i < 33; i++)
+    {
         userScreen->setDeviceName(i, defaults->getDefaultDevNames()[i]);
+    }
 
     userScreen->setSequenceName(defaults->getDefaultSeqName());
     auto defTrackNames = defaults->getDefaultTrackNames();
 
     for (int i = 0; i < 64; i++)
+    {
         userScreen->setTrackName(i, defTrackNames[i]);
+    }
 
     userScreen->setDeviceNumber(defaults->getDevices()[0]);
     userScreen->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
@@ -88,7 +92,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 
     mpc.getSequencer()->purgeAllSequences();
 
-    for (auto& as : allSequences)
+    for (auto &as : allSequences)
     {
         if (as == nullptr)
         {
@@ -148,7 +152,9 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto multiRecordingSetupScreen = mpc.screens->get<MultiRecordingSetupScreen>();
 
     for (int i = 0; i < trackDests.size(); i++)
+    {
         multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);
+    }
 
     midiInputScreen->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
     midiInputScreen->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
@@ -235,14 +241,14 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     }
 }
 
-std::vector<std::shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
+std::vector<std::shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc &mpc, mpc::disk::MpcFile *f)
 {
     std::vector<std::shared_ptr<Sequence>> mpcSequences;
 
     AllParser allParser(mpc, f->getBytes());
-    
+
     auto allSequences = allParser.getAllSequences();
-    
+
     auto allSeqNames = allParser.getSeqNames()->getNames();
     int counter = 0;
 
@@ -253,13 +259,13 @@ std::vector<std::shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc:
             mpcSequences.push_back({});
             continue;
         }
-        
+
         auto mpcSeq = std::make_shared<Sequence>(mpc);
-        
+
         allSequences[counter++]->applyToMpcSeq(mpcSeq);
-        
+
         mpcSequences.push_back(mpcSeq);
     }
-    
+
     return mpcSequences;
 }

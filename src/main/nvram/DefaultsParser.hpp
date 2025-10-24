@@ -4,24 +4,27 @@
 
 #include <vector>
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
 namespace mpc::file::all
 {
-	class Defaults;
+    class Defaults;
 }
 
 namespace mpc::nvram
 {
 
-	class DefaultsParser
-	{
+    class DefaultsParser
+    {
 
-	public:
-		static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc& mpc, fs::path file);
-		std::vector<char> saveBytes;
-		std::vector<char> getBytes();
+    public:
+        static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc &mpc, fs::path file);
+        std::vector<char> saveBytes;
+        std::vector<char> getBytes();
 
-		DefaultsParser(mpc::Mpc& mpc);
-	};
-}
+        DefaultsParser(mpc::Mpc &mpc);
+    };
+} // namespace mpc::nvram

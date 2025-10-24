@@ -10,7 +10,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
+PgmParamsScreen::PgmParamsScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "program-params", layerIndex)
 {
     addChildT<EnvGraph>(mpc);
@@ -39,29 +39,29 @@ void PgmParamsScreen::function(int i)
 
     switch (i)
     {
-        case 0:
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-            break;
-        case 1:
-            {	
-                auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
-                selectDrumScreen->redirectScreen = "program-params";
-                mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
-                break;
-            }
-        case 2:
-            mpc.getLayeredScreen()->openScreen<DrumScreen>();
-            break;
-        case 3:
-            mpc.getLayeredScreen()->openScreen<PurgeScreen>();
-            break;
-        case 4:
-            {
-                mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
-                break;
-            }
-        case 5:
-            break;
+    case 0:
+        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+        break;
+    case 1:
+    {
+        auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+        selectDrumScreen->redirectScreen = "program-params";
+        mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+        break;
+    }
+    case 2:
+        mpc.getLayeredScreen()->openScreen<DrumScreen>();
+        break;
+    case 3:
+        mpc.getLayeredScreen()->openScreen<PurgeScreen>();
+        break;
+    case 4:
+    {
+        mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
+        break;
+    }
+    case 5:
+        break;
     }
 }
 
@@ -100,7 +100,7 @@ void PgmParamsScreen::turnWheel(int i)
         modeVal = std::clamp(modeVal, static_cast<int>(M::POLY), static_cast<int>(M::NOTE_OFF));
 
         lastNoteParameters->setVoiceOverlapMode(static_cast<M>(modeVal));
-        
+
         displayVoiceOverlap();
     }
     else if (focusedFieldName == "reson")
@@ -124,7 +124,7 @@ void PgmParamsScreen::turnWheel(int i)
         displayAttackDecay();
     }
     else if (focusedFieldName == "pgm")
-    {	
+    {
         auto pgm = activeDrum().getProgram();
         auto candidate = sampler->getUsedProgram(pgm, i > 0);
 
@@ -141,7 +141,7 @@ void PgmParamsScreen::turnWheel(int i)
             displayVoiceOverlap();
         }
     }
-    else if(focusedFieldName == "note")
+    else if (focusedFieldName == "note")
     {
         auto candidate = mpc.getNote() + i;
         if (candidate > 34)
@@ -189,7 +189,7 @@ void PgmParamsScreen::openWindow()
     }
 }
 
-void PgmParamsScreen::update(Observable* o, Message message)
+void PgmParamsScreen::update(Observable *o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

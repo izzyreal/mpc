@@ -17,8 +17,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::disk;
 using namespace mpc::nvram;
 
-VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "vmpc-disks", layerIndex)
+VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "vmpc-disks", layerIndex)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -27,7 +27,7 @@ VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
         auto typeLabel = std::make_shared<Label>(mpc, "type" + std::to_string(i), "", 74, y, 3 * 6);
         auto sizeLabel = std::make_shared<Label>(mpc, "size" + std::to_string(i), "", 104, y, 4 * 6);
         auto modeParam = std::make_shared<Parameter>(mpc, "", "mode" + std::to_string(i), 131, y + 1, 10 * 6);
-        
+
         addChild(volumeLabel);
         addChild(typeLabel);
         addChild(sizeLabel);
@@ -50,67 +50,75 @@ void VmpcDisksScreen::function(int i)
 {
     switch (i)
     {
-        case 0:
+    case 0:
         mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-            break;
-        case 1:
+        break;
+    case 1:
         mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-            break;
-        case 2:
+        break;
+    case 2:
         mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-            break;
-        case 4:
-        {
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+        break;
+    case 4:
+    {
+        auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
-            {
-                return;
-            }
+        if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+        {
+            return;
+        }
 
         mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-            break;
-        }
-        case 5:
-        {
-            std::string popupMsg;
+        break;
+    }
+    case 5:
+    {
+        std::string popupMsg;
 
-            if (hasConfigChanged())
+        if (hasConfigChanged())
+        {
+            for (auto &kv : config)
             {
-                for (auto& kv : config)
+                auto uuid = kv.first;
+                for (auto &d : mpc.getDisks())
                 {
-                    auto uuid = kv.first;
-                    for (auto& d : mpc.getDisks())
+                    if (d->getVolume().volumeUUID == uuid)
                     {
-                        if (d->getVolume().volumeUUID == uuid)
-                            d->getVolume().mode = kv.second;
+                        d->getVolume().mode = kv.second;
                     }
                 }
-                
-                VolumesPersistence::save(mpc);
-                popupMsg = "Volume configurations saved";
-            }
-            else
-            {
-                popupMsg = "Volume configurations unchanged";
             }
 
-            ls->showPopupForMs(popupMsg, 1000);
-            break;
+            VolumesPersistence::save(mpc);
+            popupMsg = "Volume configurations saved";
         }
+        else
+        {
+            popupMsg = "Volume configurations unchanged";
+        }
+
+        ls->showPopupForMs(popupMsg, 1000);
+        break;
+    }
     }
 }
 
 void VmpcDisksScreen::turnWheel(int i)
 {
-    auto& volume = mpc.getDisks()[row]->getVolume();
-    
-    if (volume.volumeUUID == "default_volume") return;
-    
+    auto &volume = mpc.getDisks()[row]->getVolume();
+
+    if (volume.volumeUUID == "default_volume")
+    {
+        return;
+    }
+
     auto current = config[volume.volumeUUID];
-    if (current + i < 0 || current + i > 2) return;
+    if (current + i < 0 || current + i > 2)
+    {
+        return;
+    }
     config[volume.volumeUUID] = static_cast<MountMode>(current + i);
-    
+
     displayRows();
     displayFunctionKeys();
 }
@@ -118,14 +126,14 @@ void VmpcDisksScreen::turnWheel(int i)
 void VmpcDisksScreen::displayRows()
 {
     auto disks = mpc.getDisks();
-    
+
     for (int i = 0; i < 4; i++)
     {
         auto volume = findChild<Label>("volume" + std::to_string(i));
         auto type = findChild<Label>("type" + std::to_string(i));
         auto size = findChild<Label>("size" + std::to_string(i));
         auto mode = findChild<Field>("mode" + std::to_string(i));
-        
+
         mode->setInverted(i == row);
 
         if (i >= disks.size())
@@ -136,42 +144,68 @@ void VmpcDisksScreen::displayRows()
             mode->setText("");
             continue;
         }
-            
+
         auto disk = disks[i];
-        
+
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
         size->setText(byte_count_to_short_string(disk->getTotalSize(), /*one_letter_suffix = */ true));
         mode->setText(Volume::modeShortName(config[disk->getVolume().volumeUUID]));
     }
-    
+
     displayUpAndDown();
 }
 
 void VmpcDisksScreen::up()
 {
-    if (row == 0 && rowOffset == 0) return;
-    if (row == 0) rowOffset--; else row--;
+    if (row == 0 && rowOffset == 0)
+    {
+        return;
+    }
+    if (row == 0)
+    {
+        rowOffset--;
+    }
+    else
+    {
+        row--;
+    }
     displayRows();
 }
 
 void VmpcDisksScreen::down()
 {
-    if (row + rowOffset + 1 >= mpc.getDisks().size()) return;
-    if (row == 3) rowOffset++; else row++;
+    if (row + rowOffset + 1 >= mpc.getDisks().size())
+    {
+        return;
+    }
+    if (row == 3)
+    {
+        rowOffset++;
+    }
+    else
+    {
+        row++;
+    }
     displayRows();
 }
 
 bool VmpcDisksScreen::hasConfigChanged()
 {
     auto persisted = VolumesPersistence::getPersistedConfigs(mpc);
-    
-    for (auto& kv : config)
+
+    for (auto &kv : config)
     {
-        if (persisted.find(kv.first) == end(persisted)) return true;
-        if (persisted[kv.first] != kv.second) return true;
+        if (persisted.find(kv.first) == end(persisted))
+        {
+            return true;
+        }
+        if (persisted[kv.first] != kv.second)
+        {
+            return true;
+        }
     }
-    
+
     return false;
 }
 
@@ -194,9 +228,9 @@ void VmpcDisksScreen::refreshConfig()
 {
     config.clear();
 
-    for (auto& d : mpc.getDisks())
+    for (auto &d : mpc.getDisks())
     {
-        auto& diskVol = d->getVolume();
+        auto &diskVol = d->getVolume();
         config[diskVol.volumeUUID] = diskVol.mode;
     }
 

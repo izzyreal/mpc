@@ -1,18 +1,18 @@
 #pragma once
 #include <engine/audio/core/AudioProcess.hpp>
 
-namespace mpc::engine::audio::core {
-class AudioProcessAdapter
-: public AudioProcess
+namespace mpc::engine::audio::core
 {
-    
-protected:
-    AudioProcess* process;
-    
-public:
-    int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
+    class AudioProcessAdapter
+        : public AudioProcess
+    {
 
-    AudioProcessAdapter(AudioProcess* process);
-    
-};
-}
+    protected:
+        AudioProcess *process;
+
+    public:
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buf, int nFrames) override;
+
+        AudioProcessAdapter(AudioProcess *process);
+    };
+} // namespace mpc::engine::audio::core

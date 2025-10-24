@@ -5,47 +5,51 @@
 
 using namespace mpc::lcdgui::screens;
 
-TrMuteScreen::TrMuteScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "track-mute", layerIndex)
+TrMuteScreen::TrMuteScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "track-mute", layerIndex)
 {
 }
 
 void TrMuteScreen::open()
 {
-	if (sequencer.lock()->isSoloEnabled()) {
-		findBackground()->setBackgroundName("track-mute-solo-2");
-	}
-	else {
-		findBackground()->setBackgroundName("track-mute");
-	}
+    if (sequencer.lock()->isSoloEnabled())
+    {
+        findBackground()->setBackgroundName("track-mute-solo-2");
+    }
+    else
+    {
+        findBackground()->setBackgroundName("track-mute");
+    }
 
-	for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 16; i++)
     {
         auto trackField = findField(std::to_string(i + 1));
         trackField->setSize(49, 9);
         trackField->setFocusable(false);
     }
 
-	displayBank();
-	displayTrackNumbers();
+    displayBank();
+    displayTrackNumbers();
 
-	sequencer.lock()->addObserver(this);
+    sequencer.lock()->addObserver(this);
 
-	auto sequence = sequencer.lock()->getActiveSequence();
-	
-	for (int i = 0; i < 64; i++)
-		sequence->getTrack(i)->addObserver(this);
+    auto sequence = sequencer.lock()->getActiveSequence();
 
-	for (int i = 0; i < 16; i++)
-	{
-		displayTrack(i);
-		setTrackColor(i);
-	}
+    for (int i = 0; i < 64; i++)
+    {
+        sequence->getTrack(i)->addObserver(this);
+    }
 
-	displaySq();
-	displayNow0();
-	displayNow1();
-	displayNow2();
+    for (int i = 0; i < 16; i++)
+    {
+        displayTrack(i);
+        setTrackColor(i);
+    }
+
+    displaySq();
+    displayNow0();
+    displayNow1();
+    displayNow2();
 
     mpc.addObserver(this);
 }
@@ -53,163 +57,173 @@ void TrMuteScreen::open()
 void TrMuteScreen::close()
 {
     mpc.deleteObserver(this);
-	sequencer.lock()->deleteObserver(this);
-	auto sequence = sequencer.lock()->getActiveSequence();
-	
-	for (int i = 0; i < 64; i++)
-		sequence->getTrack(i)->deleteObserver(this);
+    sequencer.lock()->deleteObserver(this);
+    auto sequence = sequencer.lock()->getActiveSequence();
+
+    for (int i = 0; i < 64; i++)
+    {
+        sequence->getTrack(i)->deleteObserver(this);
+    }
 }
 
 void TrMuteScreen::right()
 {
-	// Stop right from propgating to BaseController
+    // Stop right from propgating to BaseController
 }
 
 void TrMuteScreen::turnWheel(int i)
 {
-	
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "sq" && !sequencer.lock()->isPlaying())
-	{
-		auto oldSequence = sequencer.lock()->getActiveSequence();
+    if (focusedFieldName == "sq" && !sequencer.lock()->isPlaying())
+    {
+        auto oldSequence = sequencer.lock()->getActiveSequence();
 
-		for (int trackIndex = 0; trackIndex < 64; trackIndex++)
-			oldSequence->getTrack(trackIndex)->deleteObserver(this);
+        for (int trackIndex = 0; trackIndex < 64; trackIndex++)
+        {
+            oldSequence->getTrack(trackIndex)->deleteObserver(this);
+        }
 
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
-		auto newSequence = sequencer.lock()->getActiveSequence();
-		
-		for (int trackIndex = 0; trackIndex < 64; trackIndex++)
-			newSequence->getTrack(trackIndex)->addObserver(this);
+        sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+        auto newSequence = sequencer.lock()->getActiveSequence();
 
-		displaySq();
-		refreshTracks();
-	}
+        for (int trackIndex = 0; trackIndex < 64; trackIndex++)
+        {
+            newSequence->getTrack(trackIndex)->addObserver(this);
+        }
+
+        displaySq();
+        refreshTracks();
+    }
 }
 
 void TrMuteScreen::function(int i)
 {
-	ScreenComponent::function(i);
-	
-	switch (i)
-	{
-	case 5:
-		if (sequencer.lock()->isSoloEnabled())
-		{
-			ls->setCurrentBackground("track-mute");
-			sequencer.lock()->setSoloEnabled(false);
-		}
-		else
-		{
-			ls->setCurrentBackground("track-mute-solo-1");
-		}
-		break;
-	}
+    ScreenComponent::function(i);
+
+    switch (i)
+    {
+    case 5:
+        if (sequencer.lock()->isSoloEnabled())
+        {
+            ls->setCurrentBackground("track-mute");
+            sequencer.lock()->setSoloEnabled(false);
+        }
+        else
+        {
+            ls->setCurrentBackground("track-mute-solo-1");
+        }
+        break;
+    }
 }
 
 int TrMuteScreen::bankoffset()
 {
-	int bank = mpc.getBank();
-	return bank * 16;
+    int bank = mpc.getBank();
+    return bank * 16;
 }
 
 void TrMuteScreen::displayBank()
 {
-	std::vector<std::string> letters{ "A", "B", "C", "D" };
-	findLabel("bank")->setText(letters[mpc.getBank()]);
+    std::vector<std::string> letters{"A", "B", "C", "D"};
+    findLabel("bank")->setText(letters[mpc.getBank()]);
 }
 
 void TrMuteScreen::displayTrackNumbers()
 {
-	std::vector<std::string> trn{ "01-16", "17-32", "33-48", "49-64" };
-	findLabel("tracknumbers")->setText(trn[mpc.getBank()]);
+    std::vector<std::string> trn{"01-16", "17-32", "33-48", "49-64"};
+    findLabel("tracknumbers")->setText(trn[mpc.getBank()]);
 }
 
 void TrMuteScreen::displaySq()
 {
-	auto sequenceNumber = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
-	auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
-	findField("sq")->setText(sequenceNumber + "-" + sequenceName);
+    auto sequenceNumber = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
+    auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+    findField("sq")->setText(sequenceNumber + "-" + sequenceName);
 }
 
 void TrMuteScreen::displayTrack(int i)
 {
-	findField(std::to_string(i + 1))->setText(sequencer.lock()->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
+    findField(std::to_string(i + 1))->setText(sequencer.lock()->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
 }
 
 void TrMuteScreen::setTrackColor(int i)
-{	
-	if (sequencer.lock()->isSoloEnabled())
-	{
-		findField(std::to_string(i + 1))->setInverted(i + bankoffset() == sequencer.lock()->getActiveTrackIndex());
-	}
-	else
-	{
-		findField(std::to_string(i + 1))->setInverted(sequencer.lock()->getActiveSequence()->getTrack(i + bankoffset())->isOn());
-	}
+{
+    if (sequencer.lock()->isSoloEnabled())
+    {
+        findField(std::to_string(i + 1))->setInverted(i + bankoffset() == sequencer.lock()->getActiveTrackIndex());
+    }
+    else
+    {
+        findField(std::to_string(i + 1))->setInverted(sequencer.lock()->getActiveSequence()->getTrack(i + bankoffset())->isOn());
+    }
 }
 
 void TrMuteScreen::displayNow0()
 {
-	findField("now0")->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
 }
 
 void TrMuteScreen::displayNow1()
 {
-	findField("now1")->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 }
 
 void TrMuteScreen::displayNow2()
 {
-	findField("now2")->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
 }
 
 void TrMuteScreen::refreshTracks()
 {
-	for (int i = 0; i < 16; i++)
-	{
-		displayTrack(i);
-		setTrackColor(i);
-	}
+    for (int i = 0; i < 16; i++)
+    {
+        displayTrack(i);
+        setTrackColor(i);
+    }
 }
 
-void TrMuteScreen::update(Observable* o, Message message)
+void TrMuteScreen::update(Observable *o, Message message)
 {
-	const auto msg = std::get<std::string>(message);
+    const auto msg = std::get<std::string>(message);
 
-	if (msg == "soloenabled")
-	{
-		refreshTracks();
-	}
-	else if (msg == "active-track-index")
-	{
-		refreshTracks();
-	}
-	else if (msg == "bank")
-	{
-		displayBank();
-		displayTrackNumbers();
+    if (msg == "soloenabled")
+    {
+        refreshTracks();
+    }
+    else if (msg == "active-track-index")
+    {
+        refreshTracks();
+    }
+    else if (msg == "bank")
+    {
+        displayBank();
+        displayTrackNumbers();
 
-		for (int i = 0; i < 16; i++)
-			setTrackColor(i);
+        for (int i = 0; i < 16; i++)
+        {
+            setTrackColor(i);
+        }
 
-		refreshTracks();
-	}
-	else if (msg == "seqnumbername")
-	{
-		displaySq();
-		refreshTracks();
-	}
-	else if (msg == "trackon")
-	{
-		for (int i = 0; i < 16; i++)
-			setTrackColor(i);
-	}
-	else if (msg == "now" || msg == "clock")
-	{
-		displayNow0();
-		displayNow1();
-		displayNow2();
-	}
+        refreshTracks();
+    }
+    else if (msg == "seqnumbername")
+    {
+        displaySq();
+        refreshTracks();
+    }
+    else if (msg == "trackon")
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            setTrackColor(i);
+        }
+    }
+    else if (msg == "now" || msg == "clock")
+    {
+        displayNow0();
+        displayNow1();
+        displayNow2();
+    }
 }

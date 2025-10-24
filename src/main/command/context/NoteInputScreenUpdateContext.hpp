@@ -4,17 +4,21 @@
 #include <functional>
 #include <memory>
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
     class ScreenComponent;
 }
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Program;
 }
 
-namespace mpc::command::context {
+namespace mpc::command::context
+{
 
-    struct NoteInputScreenUpdateContext {
+    struct NoteInputScreenUpdateContext
+    {
         bool isSixteenLevelsEnabled;
         bool isAllowCentralNoteAndPadUpdateScreen;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;

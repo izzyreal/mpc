@@ -7,9 +7,9 @@
 
 using namespace mpc::file::aps;
 
-ApsHeader::ApsHeader(const std::vector<char>& loadBytes)
+ApsHeader::ApsHeader(const std::vector<char> &loadBytes)
 {
-	valid = loadBytes[0] == APS_HEADER_MAGIC[0] &&
+    valid = loadBytes[0] == APS_HEADER_MAGIC[0] &&
             loadBytes[1] == APS_HEADER_MAGIC[1];
 
     soundCount = mpc::file::ByteUtil::bytes2ushort({loadBytes[2], loadBytes[3]});
@@ -25,9 +25,9 @@ ApsHeader::ApsHeader(const uint16_t soundCount)
 
     const auto soundCountBytes = mpc::file::ByteUtil::ushort2bytes(soundCount);
     saveBytes[0] = 10;
-	saveBytes[1] = 5;
-	saveBytes[2] = soundCountBytes[0];
-	saveBytes[3] = soundCountBytes[1];
+    saveBytes[1] = 5;
+    saveBytes[2] = soundCountBytes[0];
+    saveBytes[3] = soundCountBytes[1];
 }
 
 bool ApsHeader::isValid() const
@@ -40,6 +40,7 @@ int ApsHeader::getSoundAmount() const
     return soundCount;
 }
 
-std::vector<char> ApsHeader::getBytes() const {
+std::vector<char> ApsHeader::getBytes() const
+{
     return saveBytes;
 }

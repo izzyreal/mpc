@@ -10,11 +10,11 @@ using namespace mpc::lcdgui::screens;
 
 TEST_CASE("COPY1", "[events-screen]")
 {
-/**
- * Before: 1 bar, 4/4, a note on the first 8 16ths.
- * Copy operation: Copy all notes of the first half of the bar to the second half.
- * After: a note on all 16ths.
- */
+    /**
+     * Before: 1 bar, 4/4, a note on the first 8 16ths.
+     * Copy operation: Copy all notes of the first half of the bar to the second half.
+     * After: a note on all 16ths.
+     */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getActiveSequence();
@@ -64,11 +64,11 @@ TEST_CASE("COPY1", "[events-screen]")
 
 TEST_CASE("COPY2", "[events-screen]")
 {
-/**
- * Before: 1 bar, 4/4, a note on the first 8 16ths, with 23 ticks "delay".
- * Copy operation: Copy all notes of the first half of the bar to the second half.
- * After: a note on all 16ths with 23 ticks "delay".
- */
+    /**
+     * Before: 1 bar, 4/4, a note on the first 8 16ths, with 23 ticks "delay".
+     * Copy operation: Copy all notes of the first half of the bar to the second half.
+     * After: a note on all 16ths with 23 ticks "delay".
+     */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getActiveSequence();
@@ -115,17 +115,16 @@ TEST_CASE("COPY2", "[events-screen]")
     }
 }
 
-
 TEST_CASE("COPY3", "[events-screen]")
 {
-/**
- * Before: 1 bar, 4/4, a note on the first 8 16ths, with 23 ticks "delay".
- * Copy operation: Copy all notes of the first half of the bar to 1 tick
- *                 after the start of the second half.
- * After: 16 notes on all 16ths with 23 ticks "delay". Now the sequence is 2
- *        bars long, because the 2 delays added up imply bleeding outside
- *        the end of the first bar.
- */
+    /**
+     * Before: 1 bar, 4/4, a note on the first 8 16ths, with 23 ticks "delay".
+     * Copy operation: Copy all notes of the first half of the bar to 1 tick
+     *                 after the start of the second half.
+     * After: 16 notes on all 16ths with 23 ticks "delay". Now the sequence is 2
+     *        bars long, because the 2 delays added up imply bleeding outside
+     *        the end of the first bar.
+     */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getActiveSequence();
@@ -171,20 +170,23 @@ TEST_CASE("COPY3", "[events-screen]")
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
-        if (i == 7) tickPos++;
+        if (i == 7)
+        {
+            tickPos++;
+        }
     }
 }
 
 TEST_CASE("COPY4", "[events-screen]")
 {
-/**
- * Let's say we have 2 empty bars: first bar is 4/4, second bar is 3/4.
- * We copy 001.01.00 to 002.01.00 to 003.01.00.
- * There is not enough space in the sequence for a 3rd bar yet.
- * This 3rd bar will be inserted, and it will get the same time signature
- * as the preceding bar, so 3/4. This still leaves 1/4th of a source bar
- * that needs to be copied, so another bar of 3/4 is inserted.
- */
+    /**
+     * Let's say we have 2 empty bars: first bar is 4/4, second bar is 3/4.
+     * We copy 001.01.00 to 002.01.00 to 003.01.00.
+     * There is not enough space in the sequence for a 3rd bar yet.
+     * This 3rd bar will be inserted, and it will get the same time signature
+     * as the preceding bar, so 3/4. This still leaves 1/4th of a source bar
+     * that needs to be copied, so another bar of 3/4 is inserted.
+     */
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -218,11 +220,11 @@ TEST_CASE("COPY4", "[events-screen]")
 
 TEST_CASE("COPY5", "[events-screen]")
 {
-/**
- * Before: A note with note noteIndex + 35 at every 16th
- * Copy operation: Replace 2nd half of the bar with the first
- * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex to 0 at note 8
- */
+    /**
+     * Before: A note with note noteIndex + 35 at every 16th
+     * Copy operation: Replace 2nd half of the bar with the first
+     * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex to 0 at note 8
+     */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getActiveSequence();
@@ -271,12 +273,12 @@ TEST_CASE("COPY5", "[events-screen]")
 
 TEST_CASE("COPY6", "[events-screen]")
 {
-/**
- * Before: A note with note noteIndex + 35 at every 16th
- * Copy operation: Merge first half of the bar into the second
- * After: 24 notes in total. The first half repeats in the second half,
- *        while the original 8 notes of the 2nd half are still there.
- */
+    /**
+     * Before: A note with note noteIndex + 35 at every 16th
+     * Copy operation: Merge first half of the bar into the second
+     * After: 24 notes in total. The first half repeats in the second half,
+     *        while the original 8 notes of the 2nd half are still there.
+     */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto seq = mpc.getSequencer()->getActiveSequence();

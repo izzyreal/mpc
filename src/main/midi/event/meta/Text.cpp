@@ -5,6 +5,6 @@
 using namespace mpc::midi::event::meta;
 
 Text::Text(int tick, int delta, std::string text)
-	: TextualMetaEvent(tick, delta, MetaEvent::TEXT_EVENT, text)
+    : TextualMetaEvent(tick, delta, MetaEvent::TEXT_EVENT, text)
 {
 }

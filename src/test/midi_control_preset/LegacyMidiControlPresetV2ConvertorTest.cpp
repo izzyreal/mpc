@@ -34,7 +34,7 @@ inline json_validator make_validator()
     return validator;
 }
 
-TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema", "[legacy-midi-control-preset-v2-conversion]") 
+TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema", "[legacy-midi-control-preset-v2-conversion]")
 {
     // Load legacy binary preset
     auto data = load_resource("test/LegacyMidiControlPresetV2/iRig_PADS.vmp");
@@ -49,31 +49,40 @@ TEST_CASE("Legacy iRig PADS preset V2 conversion validates against new schema", 
     auto validator = make_validator();
 
     // Validate and report detailed errors
-    try {
+    try
+    {
         validator.validate(convertedPreset);
         // If we reach here, validation succeeded
         SUCCEED("Converted preset passed schema validation.");
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e)
+    {
         // Print full validation error details
-        std::cerr << "Schema validation failed:\n" << e.what() << "\n";
+        std::cerr << "Schema validation failed:\n"
+                  << e.what() << "\n";
 
-        std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
+        std::cerr << "Converted JSON:\n"
+                  << convertedPreset.dump(4) << "\n";
 
         // Fail the test explicitly
         FAIL("Converted preset did not pass schema validation.");
     }
 
-    try {
+    try
+    {
         checkIRigPadsPreset(convertedPreset);
 
         SUCCEED("Converted preset matches iRig PADS spec.");
-    } catch (const std::exception &e) {
-        std::cerr << "Consistency check failed:\n" << e.what() << "\n";
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Consistency check failed:\n"
+                  << e.what() << "\n";
         FAIL("Converted preset did not pass consistency check.");
     }
 }
 
-TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema", "[mpk]") 
+TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema", "[mpk]")
 {
     // Load legacy binary preset
     auto data = load_resource("test/LegacyMidiControlPresetV2/MPK25.vmp");
@@ -88,26 +97,31 @@ TEST_CASE("Legacy MPK25 preset V2 conversion validates against new schema", "[mp
     auto validator = make_validator();
 
     // Validate and report detailed errors
-    try {
+    try
+    {
         validator.validate(convertedPreset);
         // If we reach here, validation succeeded
         SUCCEED("Converted preset passed schema validation.");
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e)
+    {
         // Print full validation error details
-        std::cerr << "Schema validation failed:\n" << e.what() << "\n";
+        std::cerr << "Schema validation failed:\n"
+                  << e.what() << "\n";
 
-        std::cerr << "Converted JSON:\n" << convertedPreset.dump(4) << "\n";
+        std::cerr << "Converted JSON:\n"
+                  << convertedPreset.dump(4) << "\n";
 
         // Fail the test explicitly
         FAIL("Converted preset did not pass schema validation.");
     }
-/*
-    try {
-        checkIRigPadsPreset(convertedPreset);
+    /*
+        try {
+            checkIRigPadsPreset(convertedPreset);
 
-        SUCCEED("Converted preset matches iRig PADS spec.");
-    } catch (const std::exception &e) {
-        std::cerr << "Consistency check failed:\n" << e.what() << "\n";
-        FAIL("Converted preset did not pass consistency check.");
-    }*/
+            SUCCEED("Converted preset matches iRig PADS spec.");
+        } catch (const std::exception &e) {
+            std::cerr << "Consistency check failed:\n" << e.what() << "\n";
+            FAIL("Converted preset did not pass consistency check.");
+        }*/
 }

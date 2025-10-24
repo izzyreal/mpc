@@ -15,9 +15,9 @@ using namespace mpc::engine;
 using namespace std;
 
 MixerControls::MixerControls(string name, string mainBusName)
-	: CompoundControl(1, name)
+    : CompoundControl(1, name)
 {
-	mainBusControls = make_shared<BusControls>(MixerControlsIds::MAIN_BUS, mainBusName);
+    mainBusControls = make_shared<BusControls>(MixerControlsIds::MAIN_BUS, mainBusName);
 }
 
 float MixerControls::getSmoothingFactor()
@@ -27,39 +27,43 @@ float MixerControls::getSmoothingFactor()
 
 void MixerControls::createAuxBusControls(string name)
 {
-	if (!canAddBusses) {
-		return;
-	}
-	auto busControls = make_shared<BusControls>(MixerControlsIds::AUX_BUS, name);
-	auxBusControls.push_back(std::move(busControls));
+    if (!canAddBusses)
+    {
+        return;
+    }
+    auto busControls = make_shared<BusControls>(MixerControlsIds::AUX_BUS, name);
+    auxBusControls.push_back(std::move(busControls));
 }
 
 shared_ptr<BusControls> MixerControls::getBusControls(string name)
 {
-	auto mbc = mainBusControls;
-	
-	auto mbcName = mbc->getName();
+    auto mbc = mainBusControls;
 
-	if (std::mismatch(mbcName.begin(), mbcName.end(), name.begin()).first == mbcName.end()) {
-		return mainBusControls;
-	}
+    auto mbcName = mbc->getName();
 
-	for (auto& busControls : auxBusControls) {
-		if (busControls->getName() == name) {
-			return busControls;
-		}
-	}
-	return {};
+    if (std::mismatch(mbcName.begin(), mbcName.end(), name.begin()).first == mbcName.end())
+    {
+        return mainBusControls;
+    }
+
+    for (auto &busControls : auxBusControls)
+    {
+        if (busControls->getName() == name)
+        {
+            return busControls;
+        }
+    }
+    return {};
 }
 
 shared_ptr<BusControls> MixerControls::getMainBusControls()
 {
-	return mainBusControls;
+    return mainBusControls;
 }
 
 vector<shared_ptr<BusControls>> MixerControls::getAuxBusControls()
 {
-	return auxBusControls;
+    return auxBusControls;
 }
 
 shared_ptr<AudioControlsChain> MixerControls::createStripControls(int id, string name)
@@ -69,36 +73,41 @@ shared_ptr<AudioControlsChain> MixerControls::createStripControls(int id, string
 
 shared_ptr<AudioControlsChain> MixerControls::createStripControls(int id, string name, bool hasMixControls)
 {
-	if (getStripControls(name)) {
-		return {};
-	}
-	auto chain = std::make_shared<AudioControlsChain>(id, name);
-	MixerControlsFactory::addMixControls(this, chain, hasMixControls);
-	addStripControls(chain);
-	return chain;
+    if (getStripControls(name))
+    {
+        return {};
+    }
+    auto chain = std::make_shared<AudioControlsChain>(id, name);
+    MixerControlsFactory::addMixControls(this, chain, hasMixControls);
+    addStripControls(chain);
+    return chain;
 }
 
 void MixerControls::addStripControls(shared_ptr<CompoundControl> cc)
 {
-	canAddBusses = false;
-	add(cc);
+    canAddBusses = false;
+    add(cc);
 }
 
 shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
 {
-	for (auto& c : getControls()) {
-		if (c->getName() == name) {
-			try {
-				return dynamic_pointer_cast<AudioControlsChain>(c);
-			}
-			catch (const bad_cast&) {
-			}
-		}
-	}
-	return {};
+    for (auto &c : getControls())
+    {
+        if (c->getName() == name)
+        {
+            try
+            {
+                return dynamic_pointer_cast<AudioControlsChain>(c);
+            }
+            catch (const bad_cast &)
+            {
+            }
+        }
+    }
+    return {};
 }
 
-FaderControl* MixerControls::createFaderControl()
+FaderControl *MixerControls::createFaderControl()
 {
     return new FaderControl();
 }

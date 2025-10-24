@@ -5,8 +5,8 @@ using namespace mpc::sequencer;
 void Event::setTick(int relativeTick)
 {
     tick = relativeTick;
-	
-	notifyObservers(std::string("tick"));
+
+    notifyObservers(std::string("tick"));
 }
 
 int Event::getTick() const
@@ -24,8 +24,8 @@ void Event::setTrack(int i)
     track = i;
 }
 
-Event::Event(const Event& event)
+Event::Event(const Event &event)
 {
-	setTick(event.getTick());
-	setTrack(event.getTrack());
+    setTick(event.getTick());
+    setTrack(event.getTrack());
 }

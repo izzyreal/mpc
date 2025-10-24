@@ -2,14 +2,18 @@
 
 #include "EnvelopeControls.hpp"
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
     class EnvelopeGenerator
     {
     public:
         enum State
         {
-            ATTACK, HOLD, DECAY, COMPLETE
+            ATTACK,
+            HOLD,
+            DECAY,
+            COMPLETE
         };
 
     private:
@@ -26,7 +30,6 @@ namespace mpc::engine {
         void reset();
 
         EnvelopeGenerator(EnvelopeControls *vars);
-
     };
 
-}
+} // namespace mpc::engine

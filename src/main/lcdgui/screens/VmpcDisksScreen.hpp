@@ -3,29 +3,29 @@
 
 #include <disk/Volume.hpp>
 
-namespace mpc::lcdgui::screens {
-class VmpcDisksScreen : public mpc::lcdgui::ScreenComponent
+namespace mpc::lcdgui::screens
 {
-public:
-    VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex);
-    void open() override;
-    void function(int i) override;
-    void turnWheel(int i) override;
-    void up() override;
-    void down() override;
+    class VmpcDisksScreen : public mpc::lcdgui::ScreenComponent
+    {
+    public:
+        VmpcDisksScreen(mpc::Mpc &mpc, const int layerIndex);
+        void open() override;
+        void function(int i) override;
+        void turnWheel(int i) override;
+        void up() override;
+        void down() override;
 
-    void refreshConfig();
+        void refreshConfig();
 
-private:
-    std::map<std::string, mpc::disk::MountMode> config;
-    int row = 0;
-    int rowOffset = 0;
+    private:
+        std::map<std::string, mpc::disk::MountMode> config;
+        int row = 0;
+        int rowOffset = 0;
 
-    void displayRows();
-    void displayFunctionKeys();
-    void displayUpAndDown();
-    
-    bool hasConfigChanged();
+        void displayRows();
+        void displayFunctionKeys();
+        void displayUpAndDown();
 
-};
-}
+        bool hasConfigChanged();
+    };
+} // namespace mpc::lcdgui::screens

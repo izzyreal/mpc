@@ -8,13 +8,14 @@
 
 using namespace mpc::command;
 
-ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc& mpc, int i)
-: mpc(mpc), i(i) {}
+ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc &mpc, int i)
+    : mpc(mpc), i(i) {}
 
 void ReleaseFunctionCommand::execute()
 {
     const auto ls = mpc.getLayeredScreen();
-    switch (i) {
+    switch (i)
+    {
     case 0:
         if (ls->isCurrentScreen<StepTcScreen>())
         {
@@ -34,7 +35,8 @@ void ReleaseFunctionCommand::execute()
             mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
         }
         break;
-    case 5: {
+    case 5:
+    {
         auto sequencer = mpc.getSequencer();
         auto sampler = mpc.getSampler();
 
@@ -58,5 +60,6 @@ void ReleaseFunctionCommand::execute()
             mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
         }
         break;
-    }}
+    }
+    }
 }

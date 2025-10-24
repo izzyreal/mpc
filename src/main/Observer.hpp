@@ -5,82 +5,91 @@
 #include <vector>
 #include <algorithm>
 
-namespace mpc {
-class Observable;
+namespace mpc
+{
+    class Observable;
 }
 
-namespace mpc {
-
-using Message = std::variant<std::string, int, std::pair<float, float>>;
-
-class Observer
+namespace mpc
 {
-public:
-    virtual void update(Observable*, Message) {}
-};
 
-class Observable
-{
-public:
-    virtual void notifyObservers()
+    using Message = std::variant<std::string, int, std::pair<float, float>>;
+
+    class Observer
     {
-        notifyObservers(nullptr);
-    }
+    public:
+        virtual void update(Observable *, Message) {}
+    };
 
-    virtual void notifyObservers(Message message)
+    class Observable
     {
-        notifying = true;
-
-        for (auto* a : observers)
+    public:
+        virtual void notifyObservers()
         {
-            // Skip any that were already scheduled for removal
-            if (std::find(pendingRemovals.begin(), pendingRemovals.end(), a) == pendingRemovals.end())
-                a->update(this, message);
+            notifyObservers(nullptr);
         }
 
-        notifying = false;
-
-        // Perform deferred removals
-        for (auto* o : pendingRemovals)
+        virtual void notifyObservers(Message message)
         {
+            notifying = true;
+
+            for (auto *a : observers)
+            {
+                // Skip any that were already scheduled for removal
+                if (std::find(pendingRemovals.begin(), pendingRemovals.end(), a) == pendingRemovals.end())
+                {
+                    a->update(this, message);
+                }
+            }
+
+            notifying = false;
+
+            // Perform deferred removals
+            for (auto *o : pendingRemovals)
+            {
+                eraseObserver(o);
+            }
+            pendingRemovals.clear();
+        }
+
+        void addObserver(Observer *o)
+        {
+            auto it = std::find(pendingRemovals.begin(), pendingRemovals.end(), o);
+            if (it != pendingRemovals.end())
+            {
+                pendingRemovals.erase(it);
+            }
+
+            if (std::find(observers.begin(), observers.end(), o) == observers.end())
+            {
+                observers.push_back(o);
+            }
+        }
+
+        void deleteObserver(Observer *o)
+        {
+            if (notifying)
+            {
+                // Mark for removal after notification
+                if (std::find(pendingRemovals.begin(), pendingRemovals.end(), o) == pendingRemovals.end())
+                {
+                    pendingRemovals.push_back(o);
+                }
+                return;
+            }
+
             eraseObserver(o);
         }
-        pendingRemovals.clear();
-    }
 
-    void addObserver(Observer* o)
-    {
-        auto it = std::find(pendingRemovals.begin(), pendingRemovals.end(), o);
-        if (it != pendingRemovals.end())
-            pendingRemovals.erase(it);
+    private:
+        std::vector<Observer *> observers;
+        std::vector<Observer *> pendingRemovals;
+        bool notifying = false;
 
-        if (std::find(observers.begin(), observers.end(), o) == observers.end())
-            observers.push_back(o);
-    }
-
-    void deleteObserver(Observer* o)
-    {
-        if (notifying)
+        void eraseObserver(Observer *o)
         {
-            // Mark for removal after notification
-            if (std::find(pendingRemovals.begin(), pendingRemovals.end(), o) == pendingRemovals.end())
-                pendingRemovals.push_back(o);
-            return;
+            observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
         }
-
-        eraseObserver(o);
-    }
-
-private:
-    std::vector<Observer*> observers;
-    std::vector<Observer*> pendingRemovals;
-    bool notifying = false;
-
-    void eraseObserver(Observer* o)
-    {
-        observers.erase(std::remove(observers.begin(), observers.end(), o), observers.end());
-    }
-};
+    };
 
 } // namespace mpc
-

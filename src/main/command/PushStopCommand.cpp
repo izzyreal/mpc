@@ -7,7 +7,8 @@
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushStopCommand::PushStopCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -38,5 +39,4 @@ namespace mpc::command {
         mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(mpc.getSequencer()->isRecording());
         mpc.getHardware()->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(mpc.getSequencer()->isPlaying());
     }
-}
-
+} // namespace mpc::command

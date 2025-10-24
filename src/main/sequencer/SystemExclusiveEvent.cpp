@@ -10,7 +10,7 @@ void SystemExclusiveEvent::setByteA(unsigned char i)
     }
 
     bytes[0] = i;
-    
+
     notifyObservers(std::string("step-editor"));
 }
 
@@ -27,7 +27,7 @@ void SystemExclusiveEvent::setByteB(unsigned char i)
     }
 
     bytes[1] = i;
-    
+
     notifyObservers(std::string("step-editor"));
 }
 
@@ -36,17 +36,17 @@ unsigned char SystemExclusiveEvent::getByteB()
     return bytes[1];
 }
 
-void SystemExclusiveEvent::setBytes(const std::vector<unsigned char>& ba)
+void SystemExclusiveEvent::setBytes(const std::vector<unsigned char> &ba)
 {
     bytes = ba;
 }
 
-const std::vector<unsigned char>& SystemExclusiveEvent::getBytes() const
+const std::vector<unsigned char> &SystemExclusiveEvent::getBytes() const
 {
     return bytes;
 }
 
-mpc::sequencer::SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent& event) : Event(event)
+mpc::sequencer::SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent &event) : Event(event)
 {
     setBytes(event.getBytes());
 }

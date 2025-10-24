@@ -4,9 +4,12 @@ using namespace mpc::sequencer;
 
 void PolyPressureEvent::setNote(int i)
 {
-    if (i < 0 || i > 127) return;
+    if (i < 0 || i > 127)
+    {
+        return;
+    }
     note = i;
-    
+
     notifyObservers(std::string("step-editor"));
 }
 
@@ -17,11 +20,13 @@ int PolyPressureEvent::getNote() const
 
 void PolyPressureEvent::setAmount(int i)
 {
-    if(i < 0 || i > 127)
+    if (i < 0 || i > 127)
+    {
         return;
+    }
 
     polyPressureValue = i;
-    
+
     notifyObservers(std::string("step-editor"));
 }
 
@@ -30,7 +35,7 @@ int PolyPressureEvent::getAmount() const
     return polyPressureValue;
 }
 
-mpc::sequencer::PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent& event) : Event(event)
+mpc::sequencer::PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent &event) : Event(event)
 {
     setAmount(event.getAmount());
     setNote(event.getNote());

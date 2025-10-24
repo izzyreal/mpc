@@ -3,8 +3,8 @@
 
 using namespace mpc::lcdgui::screens;
 
-VmpcAutoSaveScreen::VmpcAutoSaveScreen(mpc::Mpc& mpc, const int layerIndex)
-: ScreenComponent(mpc, "vmpc-auto-save", layerIndex)
+VmpcAutoSaveScreen::VmpcAutoSaveScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "vmpc-auto-save", layerIndex)
 {
 }
 
@@ -24,33 +24,33 @@ void VmpcAutoSaveScreen::function(int i)
 {
     switch (i)
     {
-        case 0:
+    case 0:
         mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-            break;
-        case 1:
+        break;
+    case 1:
         mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-            break;
-        case 3:
+        break;
+    case 3:
         mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
-            break;
-        case 4:
-        {
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+        break;
+    case 4:
+    {
+        auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
-            {
-                return;
-            }
+        if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+        {
+            return;
+        }
 
         mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-            break;
-        }
+        break;
+    }
     }
 }
 
 void VmpcAutoSaveScreen::turnWheel(int i)
 {
-    
+
     const auto focusedFieldName = getFocusedFieldName();
 
     if (focusedFieldName == "auto-save-on-exit")
@@ -66,8 +66,10 @@ void VmpcAutoSaveScreen::turnWheel(int i)
 void VmpcAutoSaveScreen::setAutoSaveOnExit(int i)
 {
     if (i < 0 || i > 1)
+    {
         return;
-    
+    }
+
     autoSaveOnExit = i;
 
     displayAutoSaveOnExit();
@@ -76,8 +78,10 @@ void VmpcAutoSaveScreen::setAutoSaveOnExit(int i)
 void VmpcAutoSaveScreen::setAutoLoadOnStart(int i)
 {
     if (i < 0 || i > 2)
+    {
         return;
-    
+    }
+
     autoLoadOnStart = i;
     displayAutoLoadOnStart();
 }

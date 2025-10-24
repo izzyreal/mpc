@@ -2,8 +2,8 @@
 
 using namespace mpc::lcdgui::screens;
 
-SyncScreen::SyncScreen(mpc::Mpc& mpc, const int layerIndex) 
-: ScreenComponent(mpc, "sync", layerIndex)
+SyncScreen::SyncScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "sync", layerIndex)
 {
 }
 
@@ -13,13 +13,13 @@ void SyncScreen::open()
     {
         tab = 0;
     }
-    
+
     if (tab == 2)
     {
         mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
         return;
     }
-    
+
     displayIn();
     displayOut();
     displayModeIn();
@@ -33,7 +33,7 @@ void SyncScreen::turnWheel(int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    
+
     if (focusedFieldName == "in")
     {
         setIn(in + i);
@@ -52,10 +52,12 @@ void SyncScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "shift-early")
     {
-        if (modeIn == 1) {
+        if (modeIn == 1)
+        {
             setShiftEarly(shiftEarly + i);
         }
-        else {
+        else
+        {
             setFrameRate(frameRate + i);
         }
     }
@@ -71,13 +73,13 @@ void SyncScreen::turnWheel(int i)
 
 void SyncScreen::function(int i)
 {
-    
+
     switch (i)
     {
-        case 2:
-            tab = 2;
+    case 2:
+        tab = 2;
         mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
-            break;
+        break;
     }
 }
 
@@ -138,7 +140,8 @@ void SyncScreen::setReceiveMMCEnabled(bool b)
 // Also used to display "Frame rate:" field}
 void SyncScreen::displayShiftEarly()
 {
-    if (modeIn == 0) {
+    if (modeIn == 0)
+    {
         findLabel("shift-early")->Hide(true);
         findField("shift-early")->Hide(true);
     }
@@ -173,7 +176,7 @@ void SyncScreen::displayIn()
 void SyncScreen::displayOut()
 {
     auto outText = " A";
-    
+
     if (out == 1)
     {
         outText = " B";
@@ -182,7 +185,7 @@ void SyncScreen::displayOut()
     {
         outText = "A/B";
     }
-    
+
     findField("out")->setText(outText);
 }
 

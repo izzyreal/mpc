@@ -2,7 +2,8 @@
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushEraseCommand::PushEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -16,5 +17,4 @@ namespace mpc::command {
 
         mpc.getLayeredScreen()->openScreen<EraseScreen>();
     }
-}
-
+} // namespace mpc::command

@@ -4,12 +4,14 @@
 
 #include <memory>
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Sound;
     class Sampler;
-}
+} // namespace mpc::sampler
 
-namespace mpc::engine {
+namespace mpc::engine
+{
     class Voice;
 
     class PreviewSoundPlayer final
@@ -25,12 +27,12 @@ namespace mpc::engine {
 
         bool soundHasLoop = false;
 
-        PreviewSoundPlayer(const PreviewSoundPlayer& other) = delete;
-        PreviewSoundPlayer& operator=(const PreviewSoundPlayer& other) = delete;
+        PreviewSoundPlayer(const PreviewSoundPlayer &other) = delete;
+        PreviewSoundPlayer &operator=(const PreviewSoundPlayer &other) = delete;
 
     public:
         void finishVoice();
-        
+
         void finishVoiceIfSoundIsLooping();
 
         void mpcNoteOn(int soundNumber, int velocity, int frameOffset);
@@ -40,6 +42,5 @@ namespace mpc::engine {
         explicit PreviewSoundPlayer(std::shared_ptr<mpc::sampler::Sampler> sampler,
                                     std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
                                     std::shared_ptr<Voice> voice);
-
     };
-}
+} // namespace mpc::engine

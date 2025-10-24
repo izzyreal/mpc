@@ -5,9 +5,10 @@ using namespace std;
 
 AudioServerProcess::AudioServerProcess(string name)
 {
-	this->name = name;
+    this->name = name;
 }
 
-string AudioServerProcess::getName() {
-	return name;
+string AudioServerProcess::getName()
+{
+    return name;
 }

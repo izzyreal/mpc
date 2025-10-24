@@ -9,7 +9,7 @@
 
 using namespace mpc::file::sndwriter;
 
-SndWriter::SndWriter(mpc::sampler::Sound* sound) 
+SndWriter::SndWriter(mpc::sampler::Sound *sound)
 {
     this->sound = sound;
     sndHeaderWriter = std::make_shared<SndHeaderWriter>();
@@ -19,18 +19,18 @@ const int SndWriter::HEADER_SIZE;
 
 void SndWriter::setValues()
 {
-	setName(sound->getName());
-	setMono(sound->isMono());
-	setFramesCount(sound->getFrameCount());
-	setSampleRate(sound->getSampleRate());
-	setLevel(sound->getSndLevel());
-	setStart(sound->getStart());
-	setEnd(sound->getEnd());
-	setLoopLength(sound->getEnd() - sound->getLoopTo());
-	setLoopEnabled(sound->isLoopEnabled());
-	setTune(sound->getTune());
-	setBeatCount(sound->getBeatCount());
-	setSampleData(*sound->getSampleData(), sound->isMono());
+    setName(sound->getName());
+    setMono(sound->isMono());
+    setFramesCount(sound->getFrameCount());
+    setSampleRate(sound->getSampleRate());
+    setLevel(sound->getSndLevel());
+    setStart(sound->getStart());
+    setEnd(sound->getEnd());
+    setLoopLength(sound->getEnd() - sound->getLoopTo());
+    setLoopEnabled(sound->isLoopEnabled());
+    setTune(sound->getTune());
+    setBeatCount(sound->getBeatCount());
+    setSampleData(*sound->getSampleData(), sound->isMono());
 }
 
 void SndWriter::setName(std::string s)
@@ -88,30 +88,32 @@ void SndWriter::setBeatCount(int i)
     sndHeaderWriter->setBeatCount(i);
 }
 
-void SndWriter::setSampleData(const std::vector<float>& fa, bool mono)
+void SndWriter::setSampleData(const std::vector<float> &fa, bool mono)
 {
-	sndFileArray = std::vector<char>(HEADER_SIZE + (fa.size() * 2));
-	auto frames = mono ? fa.size() : fa.size() * 0.5;
-	sndHeaderWriter->setFrameCount(frames);
-	
-	std::vector<char> buffer(2);
-	auto sPos = 0;
-	
-	auto bytePos = SndWriter::HEADER_SIZE;
-	for (int i = 0; i < fa.size(); i++) {
+    sndFileArray = std::vector<char>(HEADER_SIZE + (fa.size() * 2));
+    auto frames = mono ? fa.size() : fa.size() * 0.5;
+    sndHeaderWriter->setFrameCount(frames);
+
+    std::vector<char> buffer(2);
+    auto sPos = 0;
+
+    auto bytePos = SndWriter::HEADER_SIZE;
+    for (int i = 0; i < fa.size(); i++)
+    {
         auto shortres = mpc::sampleops::mean_normalized_float_to_short(fa[sPos++]);
-		buffer = ByteUtil::short2bytes(shortres);
-		sndFileArray[bytePos++] = buffer[0];
-		sndFileArray[bytePos++] = buffer[1];
-	}
+        buffer = ByteUtil::short2bytes(shortres);
+        sndFileArray[bytePos++] = buffer[0];
+        sndFileArray[bytePos++] = buffer[1];
+    }
 }
 
-std::vector<char>& SndWriter::getSndFileArray()
+std::vector<char> &SndWriter::getSndFileArray()
 {
-	auto header = sndHeaderWriter->getHeaderArray();
-	for (int i = 0; i < header.size(); i++) {
-		sndFileArray[i] = header[i];
-	}
+    auto header = sndHeaderWriter->getHeaderArray();
+    for (int i = 0; i < header.size(); i++)
+    {
+        sndFileArray[i] = header[i];
+    }
 
-	return sndFileArray;
+    return sndFileArray;
 }

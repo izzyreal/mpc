@@ -3,19 +3,18 @@
 
 namespace mpc::lcdgui
 {
-	class MixerTopBackground
-		: public Component
-	{
+    class MixerTopBackground
+        : public Component
+    {
 
-	public:
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
+    public:
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-	public:
-		MixerTopBackground(MRECT rect);
-		void setColor(bool);
+    public:
+        MixerTopBackground(MRECT rect);
+        void setColor(bool);
 
-	private:
-		bool color = true;
-
-	};
-}
+    private:
+        bool color = true;
+    };
+} // namespace mpc::lcdgui

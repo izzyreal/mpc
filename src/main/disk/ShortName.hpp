@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-namespace mpc::disk {
+namespace mpc::disk
+{
     class ShortName
     {
 
@@ -47,4 +48,4 @@ namespace mpc::disk {
         static ShortName DOT_DOT();
     };
 
-}
+} // namespace mpc::disk

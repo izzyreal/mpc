@@ -3,14 +3,13 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-	class VmpcFileInUseScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class VmpcFileInUseScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		VmpcFileInUseScreen(mpc::Mpc& mpc, int layerIndex);
-
-	};
-}
+        VmpcFileInUseScreen(mpc::Mpc &mpc, int layerIndex);
+    };
+} // namespace mpc::lcdgui::screens::dialog

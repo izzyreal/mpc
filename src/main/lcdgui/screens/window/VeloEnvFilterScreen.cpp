@@ -2,7 +2,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
+VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
     addChildT<EnvGraph>(mpc);
@@ -64,7 +64,7 @@ void VeloEnvFilterScreen::turnWheel(int i)
     }
 }
 
-void VeloEnvFilterScreen::update(Observable* observable, Message message)
+void VeloEnvFilterScreen::update(Observable *observable, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

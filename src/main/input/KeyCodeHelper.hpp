@@ -8,7 +8,7 @@ namespace mpc::input
 {
     /**
      * This class enumerates all keys that can be mapped to actions.
-     * 
+     *
      * It's an amalgamation of the most common virtual keycodes of
      * all supported platforms.
      *
@@ -17,9 +17,9 @@ namespace mpc::input
      * 1. Left shift/alt/ctrl.
      * 2. Right shift/alt/ctrl.
      * 3. Generic shift/alt/ctrl.
-     * 
+     *
      * All 3 actually have distinct keycodes.
-     * 
+     *
      * On the other supported platforms (Linux, macOS and iOS) there
      * exists no "generic" variety.
      *
@@ -36,7 +36,8 @@ namespace mpc::input
      * when reading __APPLE__ specific code that deals with virtual
      * keycodes.
      */
-    enum class VmpcKeyCode {
+    enum class VmpcKeyCode
+    {
         VMPC_KEY_UNKNOWN = -1,
 
         VMPC_KEY_ANSI_0,
@@ -159,24 +160,24 @@ namespace mpc::input
 
     class KeyCodeHelper
     {
-        public:
-            static const VmpcKeyCode getVmpcFromPlatformKeyCode(const int platformKeyCode);
-            
-            static const std::optional<char> getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
+    public:
+        static const VmpcKeyCode getVmpcFromPlatformKeyCode(const int platformKeyCode);
 
-            static const std::string guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode);
+        static const std::optional<char> getCharForTypableVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
-            static const std::string getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode);
+        static const std::string guessCharactersPrintedOnKeyUnicode(const VmpcKeyCode vmpcKeyCode);
 
-            static const int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
-            
-            static std::optional<char> getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode);
+        static const std::string getAsciiCompatibleDisplayName(const VmpcKeyCode vmpcKeyCode);
 
-        private:
-            static const std::map<const int, const VmpcKeyCode> platformToVmpcKeyCodes;
+        static const int getPlatformFromVmpcKeyCode(const VmpcKeyCode vmpcKeyCode);
 
-            static const std::map<const VmpcKeyCode, const char> typableVmpcKeyCodes;
+        static std::optional<char> getCharWithShiftModifier(const VmpcKeyCode vmpcKeyCode);
 
-            static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
+    private:
+        static const std::map<const int, const VmpcKeyCode> platformToVmpcKeyCodes;
+
+        static const std::map<const VmpcKeyCode, const char> typableVmpcKeyCodes;
+
+        static const std::string getKeyCodeString(const VmpcKeyCode keyCode);
     };
 } // namespace mpc::input

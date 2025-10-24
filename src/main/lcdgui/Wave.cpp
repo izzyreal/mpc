@@ -10,255 +10,304 @@ using namespace mpc::lcdgui;
 
 Wave::Wave() : Component("wave")
 {
-	Component::setSize(246, 27);
-	setLocation(1, 21);
+    Component::setSize(246, 27);
+    setLocation(1, 21);
 }
 
 void Wave::setFine(bool newFineEnabled)
 {
-	fine = newFineEnabled;
-	setSize(newFineEnabled ? 109 : 246, 27);
-	setLocation(newFineEnabled ? 23 : 1, newFineEnabled ? 16 : 21);
+    fine = newFineEnabled;
+    setSize(newFineEnabled ? 109 : 246, 27);
+    setLocation(newFineEnabled ? 23 : 1, newFineEnabled ? 16 : 21);
 }
 
 void Wave::zoomPlus()
 {
-	if (zoomFactor == 7)
-		return;
+    if (zoomFactor == 7)
+    {
+        return;
+    }
 
-	zoomFactor++;
-	
-	initSamplesPerPixel();
-	SetDirty();
+    zoomFactor++;
+
+    initSamplesPerPixel();
+    SetDirty();
 }
 
 void Wave::zoomMinus()
 {
-	if (zoomFactor == 1)
-		return;
+    if (zoomFactor == 1)
+    {
+        return;
+    }
 
-	zoomFactor--;
-	
-	initSamplesPerPixel();
-	SetDirty();
+    zoomFactor--;
+
+    initSamplesPerPixel();
+    SetDirty();
 }
 
 void Wave::initSamplesPerPixel()
 {
-	if (fine)
-	{
-		samplesPerPixel = 1;
-		
-		for (int i = 1; i < zoomFactor; i++)
-			samplesPerPixel *= 2;
-	}
-	else
-	{
-		samplesPerPixel = (float)frameCount / (float)w;
-        
+    if (fine)
+    {
+        samplesPerPixel = 1;
+
+        for (int i = 1; i < zoomFactor; i++)
+        {
+            samplesPerPixel *= 2;
+        }
+    }
+    else
+    {
+        samplesPerPixel = (float)frameCount / (float)w;
+
         if (samplesPerPixel < 1)
+        {
             samplesPerPixel = 1;
-	}
+        }
+    }
 }
 
 void Wave::setCenterSamplePos(unsigned int newCenterSamplePos)
 {
-	centerSamplePos = newCenterSamplePos;
-	SetDirty();
+    centerSamplePos = newCenterSamplePos;
+    SetDirty();
 }
 
 void Wave::setSampleData(std::shared_ptr<const std::vector<float>> newSampleData, bool newMono, unsigned int newView)
 {
-	auto newFrameCount = newSampleData != nullptr ? (int) floor(newMono ? newSampleData->size() : (newSampleData->size() * 0.5)) : 0;
+    auto newFrameCount = newSampleData != nullptr ? (int)floor(newMono ? newSampleData->size() : (newSampleData->size() * 0.5)) : 0;
 
-	if (sampleData == newSampleData &&
-		newFrameCount == frameCount &&
+    if (sampleData == newSampleData &&
+        newFrameCount == frameCount &&
         mono == newMono && view == newView)
-	{
-		return;
-	}
+    {
+        return;
+    }
 
-	this->sampleData = newSampleData;
+    this->sampleData = newSampleData;
 
-	if (newSampleData == nullptr)
-	{
-		frameCount = 0;
-		return;
-	}
+    if (newSampleData == nullptr)
+    {
+        frameCount = 0;
+        return;
+    }
 
-	this->mono = newMono;
-	this->view = newView;
-	
-	frameCount = newFrameCount;
-	
-	initSamplesPerPixel();
-	SetDirty();
+    this->mono = newMono;
+    this->view = newView;
+
+    frameCount = newFrameCount;
+
+    initSamplesPerPixel();
+    SetDirty();
 }
 
 void Wave::setSelection(unsigned int start, unsigned int end)
 {
-	if (selectionStart == start && selectionEnd == end)
-		return;
+    if (selectionStart == start && selectionEnd == end)
+    {
+        return;
+    }
 
-	selectionStart = start;
-	selectionEnd = end;
+    selectionStart = start;
+    selectionEnd = end;
 
-	if (selectionEnd - selectionStart < (samplesPerPixel * 2))
-		selectionEnd = selectionStart + (samplesPerPixel * 2);
+    if (selectionEnd - selectionStart < (samplesPerPixel * 2))
+    {
+        selectionEnd = selectionStart + (samplesPerPixel * 2);
+    }
 
-	SetDirty();
+    SetDirty();
 }
 
-void Wave::makeLine(LcdBitmap& bitmap, std::vector<bool>* colors, unsigned int lineX)
+void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors, unsigned int lineX)
 {
-	int offset = 0;
-	float peakPos = 0;
-	float peakNeg = 0;
-	double centerSamplePixel = 0.f;
-	
-	if (fine)
-		centerSamplePixel = (centerSamplePos / samplesPerPixel) - 1;
-	
-	int samplePos = (int)(floor((float) (lineX - (fine ? (54 - centerSamplePixel) : 0)) * samplesPerPixel));
-	offset += samplePos;
-	
-	if (!mono && view == 1)
-		offset += frameCount;
+    int offset = 0;
+    float peakPos = 0;
+    float peakNeg = 0;
+    double centerSamplePixel = 0.f;
 
-	if (offset < 0 || (mono && offset >= frameCount && !fine))
-		return;
+    if (fine)
+    {
+        centerSamplePixel = (centerSamplePos / samplesPerPixel) - 1;
+    }
 
-	if (!mono && view == 0 && offset >= frameCount && !fine)
-		return;
+    int samplePos = (int)(floor((float)(lineX - (fine ? (54 - centerSamplePixel) : 0)) * samplesPerPixel));
+    offset += samplePos;
 
-	if (!mono && view == 1 && offset < frameCount && !fine)
-		return;
+    if (!mono && view == 1)
+    {
+        offset += frameCount;
+    }
 
-	float sample;
-	
-	for (int i = 0; i < (floor)(samplesPerPixel); i++)
-	{
-		sample = (*sampleData)[offset++];
-	
-		if (sample > 0)
-		{
-			peakPos = std::fmax(peakPos, sample);
-		}
-		else if (sample < 0) {
-			peakNeg = std::fmin(peakNeg, sample);
-		}
-	}
+    if (offset < 0 || (mono && offset >= frameCount && !fine))
+    {
+        return;
+    }
 
-	bitmap.clear();
-	colors->clear();
-	
-	if (fine && lineX == 55)
-	{
-		bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 26));
-		colors->push_back(true);
-	}
+    if (!mono && view == 0 && offset >= frameCount && !fine)
+    {
+        return;
+    }
 
-	const float invisible = 1214.0 / 32768.0;
-	const float ratio = 1.0f / (1.0f - invisible);
+    if (!mono && view == 1 && offset < frameCount && !fine)
+    {
+        return;
+    }
 
-	const unsigned int posLineLength = (unsigned int) (floor(13.0 * ((peakPos - invisible) * ratio)));
-	const unsigned int negLineLength = (unsigned int)(floor(13.0 * ((std::fabs(peakNeg) - invisible) * ratio)));
+    float sample;
 
-	if (posLineLength != 13 && !(fine && lineX == 55))
-	{
-		bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 13 - (posLineLength + 1)));
-	}
+    for (int i = 0; i < (floor)(samplesPerPixel); i++)
+    {
+        sample = (*sampleData)[offset++];
 
-	if (peakPos > invisible)
-	{
-		bitmap.emplace_back(Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
-	}
+        if (sample > 0)
+        {
+            peakPos = std::fmax(peakPos, sample);
+        }
+        else if (sample < 0)
+        {
+            peakNeg = std::fmin(peakNeg, sample);
+        }
+    }
 
-	if (std::fabs(peakNeg) > invisible)
-	{
-		bitmap.emplace_back(Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
-	}
+    bitmap.clear();
+    colors->clear();
 
-	if (negLineLength != 13 && !(fine && lineX == 55))
-	{
-		bitmap.emplace_back(Bressenham::Line(lineX, 13 + (negLineLength + 1), lineX, 26));
-	}
+    if (fine && lineX == 55)
+    {
+        bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 26));
+        colors->push_back(true);
+    }
 
-	if (!fine && samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd)
-	{
-		if (posLineLength != 13)
-			colors->push_back(true);
-		
-		if (peakPos > invisible)
-			colors->push_back(false);
-		
-		if (std::fabs(peakNeg) > invisible)
-			colors->push_back(false);
-	
-		if (negLineLength != 13)
-			colors->push_back(true);
-	}
-	else
-	{
-		if (posLineLength != 13 && !(fine && lineX == 55))
-			colors->push_back(false);
-		
-		if (peakPos > invisible)
-		{
-			if (fine)
-			{
-				if ((int) floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
-					colors->push_back(false);
-				else
-					colors->push_back(true);
-			}
-			else
-			{
-				colors->push_back(true);
-			}
-		}
+    const float invisible = 1214.0 / 32768.0;
+    const float ratio = 1.0f / (1.0f - invisible);
 
-		if (std::fabs(peakNeg) > invisible)
-		{
-			if (fine)
-			{
-				if ((int) floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
-					colors->push_back(false);
-				else
-					colors->push_back(true);
-			}
-			else
-			{
-				colors->push_back(true);
-			}
-		}
+    const unsigned int posLineLength = (unsigned int)(floor(13.0 * ((peakPos - invisible) * ratio)));
+    const unsigned int negLineLength = (unsigned int)(floor(13.0 * ((std::fabs(peakNeg) - invisible) * ratio)));
 
-		if (negLineLength != 13 && !(fine && lineX == 55))
-			colors->push_back(false);
-	}
+    if (posLineLength != 13 && !(fine && lineX == 55))
+    {
+        bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 13 - (posLineLength + 1)));
+    }
+
+    if (peakPos > invisible)
+    {
+        bitmap.emplace_back(Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
+    }
+
+    if (std::fabs(peakNeg) > invisible)
+    {
+        bitmap.emplace_back(Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
+    }
+
+    if (negLineLength != 13 && !(fine && lineX == 55))
+    {
+        bitmap.emplace_back(Bressenham::Line(lineX, 13 + (negLineLength + 1), lineX, 26));
+    }
+
+    if (!fine && samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd)
+    {
+        if (posLineLength != 13)
+        {
+            colors->push_back(true);
+        }
+
+        if (peakPos > invisible)
+        {
+            colors->push_back(false);
+        }
+
+        if (std::fabs(peakNeg) > invisible)
+        {
+            colors->push_back(false);
+        }
+
+        if (negLineLength != 13)
+        {
+            colors->push_back(true);
+        }
+    }
+    else
+    {
+        if (posLineLength != 13 && !(fine && lineX == 55))
+        {
+            colors->push_back(false);
+        }
+
+        if (peakPos > invisible)
+        {
+            if (fine)
+            {
+                if ((int)floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
+                {
+                    colors->push_back(false);
+                }
+                else
+                {
+                    colors->push_back(true);
+                }
+            }
+            else
+            {
+                colors->push_back(true);
+            }
+        }
+
+        if (std::fabs(peakNeg) > invisible)
+        {
+            if (fine)
+            {
+                if ((int)floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
+                {
+                    colors->push_back(false);
+                }
+                else
+                {
+                    colors->push_back(true);
+                }
+            }
+            else
+            {
+                colors->push_back(true);
+            }
+        }
+
+        if (negLineLength != 13 && !(fine && lineX == 55))
+        {
+            colors->push_back(false);
+        }
+    }
 }
 
-void Wave::Draw(std::vector<std::vector<bool>>* pixels)
+void Wave::Draw(std::vector<std::vector<bool>> *pixels)
 {
-	if (shouldNotDraw(pixels))
-		return;
+    if (shouldNotDraw(pixels))
+    {
+        return;
+    }
 
-	if (sampleData == nullptr)
-		return;
+    if (sampleData == nullptr)
+    {
+        return;
+    }
 
-	Clear(pixels);
+    Clear(pixels);
 
-	LcdBitmap bitmap;
-	std::vector<bool> colors;
+    LcdBitmap bitmap;
+    std::vector<bool> colors;
 
-	for (int i = 0; i < w; i++)
-	{
-		makeLine(bitmap, &colors, i);
-		int counter = 0;
-		
-		for (auto& line : bitmap)
-			mpc::Util::drawLine(*pixels, line, colors[counter++], std::vector<int>{x, y});
-	}
+    for (int i = 0; i < w; i++)
+    {
+        makeLine(bitmap, &colors, i);
+        int counter = 0;
 
-	dirty = false;
+        for (auto &line : bitmap)
+        {
+            mpc::Util::drawLine(*pixels, line, colors[counter++], std::vector<int>{x, y});
+        }
+    }
+
+    dirty = false;
 }

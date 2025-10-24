@@ -3,7 +3,8 @@
 #include <engine/audio/mixer/MixControls.hpp>
 #include <engine/control/EnumControl.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class MainMixControls : public MixControls
     {
@@ -19,7 +20,6 @@ namespace mpc::engine::audio::mixer {
     public:
         MainMixControls(MixerControls *mixerControls, int stripId, std::shared_ptr<BusControls> busControls,
                         bool isMaster);
-
     };
 
-}
+} // namespace mpc::engine::audio::mixer

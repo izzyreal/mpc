@@ -2,14 +2,15 @@
 
 #include <string>
 
-namespace mpc {
+namespace mpc
+{
 
     class Mpc;
 
-    class AutoSave {
+    class AutoSave
+    {
     public:
-        static void restoreAutoSavedState(mpc::Mpc&);
-        static void storeAutoSavedState(mpc::Mpc&);
-
+        static void restoreAutoSavedState(mpc::Mpc &);
+        static void storeAutoSavedState(mpc::Mpc &);
     };
-}
+} // namespace mpc

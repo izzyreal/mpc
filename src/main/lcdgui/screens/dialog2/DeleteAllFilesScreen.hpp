@@ -3,24 +3,23 @@
 
 namespace mpc::lcdgui::screens::dialog2
 {
-	class DeleteAllFilesScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class DeleteAllFilesScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		DeleteAllFilesScreen(mpc::Mpc& mpc, const int layerIndex);
-		
-		void open() override;
-		void turnWheel(int i) override;
-		void function(int i) override;
+    public:
+        DeleteAllFilesScreen(mpc::Mpc &mpc, const int layerIndex);
 
-	private:
-		std::vector<std::string> views{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
-		
-		int delete_ = 0;
-		
-		void displayDelete();
-		void setDelete(int i);
+        void open() override;
+        void turnWheel(int i) override;
+        void function(int i) override;
 
-	};
-}
+    private:
+        std::vector<std::string> views{"All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET"};
+
+        int delete_ = 0;
+
+        void displayDelete();
+        void setDelete(int i);
+    };
+} // namespace mpc::lcdgui::screens::dialog2

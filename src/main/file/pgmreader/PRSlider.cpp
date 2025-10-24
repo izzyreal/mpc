@@ -7,26 +7,26 @@
 
 using namespace mpc::file::pgmreader;
 
-Slider::Slider(ProgramFileReader* programFile) 
+Slider::Slider(ProgramFileReader *programFile)
 {
     this->programFile = programFile;
 }
 
 int Slider::getSampleNamesSize()
 {
-	sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
-	return sampleNamesSize;
+    sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
+    return sampleNamesSize;
 }
 
 int Slider::getSliderStart()
 {
-	int sliderStart = 4 + getSampleNamesSize() + 2 + 17;
-	return sliderStart;
+    int sliderStart = 4 + getSampleNamesSize() + 2 + 17;
+    return sliderStart;
 }
 
 int Slider::getSliderEnd()
 {
-    auto sliderEnd = 4 + getSampleNamesSize() + 2+ 17+ 10+ 5;
+    auto sliderEnd = 4 + getSampleNamesSize() + 2 + 17 + 10 + 5;
     return sliderEnd;
 }
 
@@ -39,14 +39,14 @@ std::vector<char> Slider::getSliderArray()
 
 int Slider::getMidiNoteAssign()
 {
-	auto midiNoteAssign = getSliderArray()[0];
-	return midiNoteAssign;
+    auto midiNoteAssign = getSliderArray()[0];
+    return midiNoteAssign;
 }
 
 int Slider::getTuneLow()
 {
-	auto tuneLow = getSliderArray()[1];
-	return tuneLow;
+    auto tuneLow = getSliderArray()[1];
+    return tuneLow;
 }
 
 int Slider::getTuneHigh()

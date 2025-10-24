@@ -3,19 +3,18 @@
 
 namespace mpc::lcdgui
 {
-	class EventRowParameters
-		: public Component
-	{
+    class EventRowParameters
+        : public Component
+    {
 
-	public:
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
+    public:
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-		EventRowParameters(MRECT rect);
+        EventRowParameters(MRECT rect);
 
-		void setColor(bool on);
+        void setColor(bool on);
 
-	private:
-		bool color = false;
-
-	};
-}
+    private:
+        bool color = false;
+    };
+} // namespace mpc::lcdgui

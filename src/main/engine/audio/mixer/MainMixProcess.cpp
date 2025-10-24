@@ -7,22 +7,24 @@
 using namespace mpc::engine::audio::mixer;
 
 MainMixProcess::MainMixProcess(
-        const std::shared_ptr<AudioMixerStrip>& strip,
-        const std::shared_ptr<MixControls>& mixControls,
-        AudioMixer* mixer) : MixProcess(strip, mixControls)
+    const std::shared_ptr<AudioMixerStrip> &strip,
+    const std::shared_ptr<MixControls> &mixControls,
+    AudioMixer *mixer) : MixProcess(strip, mixControls)
 {
-	auto mmc = std::dynamic_pointer_cast<MainMixControls>(mixControls);
-	routeControl = mmc->getRouteControl();
-	if (routeControl != nullptr) {
-		routedStrip = mixer->getStripImpl(routeControl->getValueString());
-	}
+    auto mmc = std::dynamic_pointer_cast<MainMixControls>(mixControls);
+    routeControl = mmc->getRouteControl();
+    if (routeControl != nullptr)
+    {
+        routedStrip = mixer->getStripImpl(routeControl->getValueString());
+    }
 }
 
-AudioMixerStrip* MainMixProcess::getRoutedStrip()
+AudioMixerStrip *MainMixProcess::getRoutedStrip()
 {
-	if (routeControl != nullptr && nextRoutedStrip != nullptr) {
-		routedStrip = nextRoutedStrip;
-		nextRoutedStrip = std::shared_ptr<AudioMixerStrip>();
-	}
-	return MixProcess::getRoutedStrip();
+    if (routeControl != nullptr && nextRoutedStrip != nullptr)
+    {
+        routedStrip = nextRoutedStrip;
+        nextRoutedStrip = std::shared_ptr<AudioMixerStrip>();
+    }
+    return MixProcess::getRoutedStrip();
 }

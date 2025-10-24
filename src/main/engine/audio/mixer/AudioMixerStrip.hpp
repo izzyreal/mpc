@@ -5,10 +5,11 @@
 
 #include <memory>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class AudioMixerStrip
-            : public core::AudioProcessChain
+        : public core::AudioProcessChain
     {
 
     public:
@@ -22,7 +23,6 @@ namespace mpc::engine::audio::mixer {
         int nmixed{1};
 
     public:
-
         void setInputProcess(std::shared_ptr<AudioProcess> input);
 
         void setDirectOutputProcess(std::shared_ptr<AudioProcess> output);
@@ -48,7 +48,6 @@ namespace mpc::engine::audio::mixer {
 
     public:
         AudioMixerStrip(AudioMixer *mixer, std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> controlsChain);
-
     };
 
-}
+} // namespace mpc::engine::audio::mixer

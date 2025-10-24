@@ -6,7 +6,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
 StepEditOptionsScreen::StepEditOptionsScreen(mpc::Mpc &mpc, const int layerIndex)
-: mpc::lcdgui::ScreenComponent(mpc, "step-edit-options", layerIndex)
+    : mpc::lcdgui::ScreenComponent(mpc, "step-edit-options", layerIndex)
 {
 }
 
@@ -30,7 +30,7 @@ void StepEditOptionsScreen::turnWheel(int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    
+
     if (focusedFieldName == "auto-step-increment")
     {
         autoStepIncrementEnabled = i > 0;

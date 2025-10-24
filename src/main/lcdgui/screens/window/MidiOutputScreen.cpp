@@ -7,31 +7,31 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-MidiOutputScreen::MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "midi-output", layerIndex)
+MidiOutputScreen::MidiOutputScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "midi-output", layerIndex)
 {
 }
 
 void MidiOutputScreen::open()
 {
 
-	if (ls->isPreviousScreenNot<NameScreen, MidiOutputMonitorScreen>())
-	{
+    if (ls->isPreviousScreenNot<NameScreen, MidiOutputMonitorScreen>())
+    {
         auto track = mpc.getSequencer()->getActiveTrack();
-		auto dev = track->getDeviceIndex();
+        auto dev = track->getDeviceIndex();
 
-		if (dev > 0)
+        if (dev > 0)
         {
-			deviceIndex = dev - 1;
+            deviceIndex = dev - 1;
         }
-		else
+        else
         {
-			deviceIndex = 0;
+            deviceIndex = 0;
         }
-	}
+    }
 
-	displaySoftThru();
-	displayDeviceName();
+    displaySoftThru();
+    displayDeviceName();
 }
 
 void MidiOutputScreen::openNameScreen()
@@ -42,7 +42,8 @@ void MidiOutputScreen::openNameScreen()
     {
         auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
 
-        const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName) {
+        const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName)
+        {
             sequencer.lock()->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
             mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
         };
@@ -60,77 +61,85 @@ void MidiOutputScreen::right()
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "firstletter")
+    {
         openNameScreen();
+    }
     else
+    {
         ScreenComponent::right();
+    }
 }
 
 void MidiOutputScreen::turnWheel(int i)
 {
-		
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "softthru")
-	{
-		setSoftThru(softThru + i);
-	}
-	else if (focusedFieldName == "devicenumber")
-	{
-		setDeviceIndex(deviceIndex + i);
-	}
+    if (focusedFieldName == "softthru")
+    {
+        setSoftThru(softThru + i);
+    }
+    else if (focusedFieldName == "devicenumber")
+    {
+        setDeviceIndex(deviceIndex + i);
+    }
 }
 
 void MidiOutputScreen::function(int i)
 {
-	ScreenComponent::function(i);
-	
-	switch (i)
-	{
-	case 1:
+    ScreenComponent::function(i);
+
+    switch (i)
+    {
+    case 1:
         mpc.getLayeredScreen()->openScreen<MidiOutputMonitorScreen>();
-		break;
-	case 4:
+        break;
+    case 4:
         mpc.panic();
-		break;
-	}
+        break;
+    }
 }
 
 void MidiOutputScreen::displaySoftThru()
 {
-	findField("softthru")->setText(softThruNames[softThru]);
+    findField("softthru")->setText(softThruNames[softThru]);
 }
 
 void MidiOutputScreen::displayDeviceName()
 {
-	auto sequence = sequencer.lock()->getActiveSequence();
-	auto devName = sequence->getDeviceName(deviceIndex + 1);
-	
-	findField("firstletter")->setText(devName.substr(0, 1));
-	findLabel("devicename")->setText(devName.substr(1, devName.length()));
+    auto sequence = sequencer.lock()->getActiveSequence();
+    auto devName = sequence->getDeviceName(deviceIndex + 1);
 
-	std::string devNumber;
-	
-	if (deviceIndex >= 16)
-		devNumber = StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
-	else
-		devNumber = StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
+    findField("firstletter")->setText(devName.substr(0, 1));
+    findLabel("devicename")->setText(devName.substr(1, devName.length()));
 
-	findField("devicenumber")->setText(devNumber);
+    std::string devNumber;
+
+    if (deviceIndex >= 16)
+    {
+        devNumber = StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
+    }
+    else
+    {
+        devNumber = StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
+    }
+
+    findField("devicenumber")->setText(devNumber);
 }
 
 void MidiOutputScreen::setSoftThru(int i)
 {
-	softThru = std::clamp(i, 0, 4);
-	displaySoftThru();
+    softThru = std::clamp(i, 0, 4);
+    displaySoftThru();
 }
 
 int MidiOutputScreen::getSoftThru()
 {
-	return softThru;
+    return softThru;
 }
 
 void MidiOutputScreen::setDeviceIndex(int i)
 {
-	deviceIndex = std::clamp(i, 0, 31);
-	displayDeviceName();
+    deviceIndex = std::clamp(i, 0, 31);
+    displayDeviceName();
 }

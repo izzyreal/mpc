@@ -5,22 +5,24 @@
 #include <memory>
 #include <vector>
 
-namespace mpc { class Mpc; }
-
-namespace mpc::lcdgui
+namespace mpc
 {
-	class Label;
-	class Field;
+    class Mpc;
 }
 
 namespace mpc::lcdgui
 {
-	class Parameter
-		: public Component
-	{
+    class Label;
+    class Field;
+} // namespace mpc::lcdgui
 
-	public:
-		Parameter(mpc::Mpc& mpc, std::string labelStr, std::string name, int x, int y, int fieldWidth);
+namespace mpc::lcdgui
+{
+    class Parameter
+        : public Component
+    {
 
-	};
-}
+    public:
+        Parameter(mpc::Mpc &mpc, std::string labelStr, std::string name, int x, int y, int fieldWidth);
+    };
+} // namespace mpc::lcdgui

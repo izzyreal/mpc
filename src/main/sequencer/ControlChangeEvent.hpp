@@ -5,25 +5,26 @@
 
 namespace mpc::sequencer
 {
-	class ControlChangeEvent
-		: public Event
-	{
+    class ControlChangeEvent
+        : public Event
+    {
 
-	private:
-		int controllerNumber = 0;
-		int controllerValue = 0;
+    private:
+        int controllerNumber = 0;
+        int controllerValue = 0;
 
-	public:
-		void setController(int i);
-		int getController() const;
-		void setAmount(int i);
-		int getAmount() const;
+    public:
+        void setController(int i);
+        int getController() const;
+        void setAmount(int i);
+        int getAmount() const;
 
+        ControlChangeEvent() = default;
+        ControlChangeEvent(const ControlChangeEvent &event);
 
-		ControlChangeEvent() = default;
-		ControlChangeEvent(const ControlChangeEvent& event);
-
-		std::string getTypeName() override { return "control-change"; }
-
-	};
-}
+        std::string getTypeName() override
+        {
+            return "control-change";
+        }
+    };
+} // namespace mpc::sequencer

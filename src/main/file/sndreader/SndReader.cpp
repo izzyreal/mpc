@@ -8,12 +8,12 @@
 using namespace mpc::file::sndreader;
 using namespace mpc::sampleops;
 
-SndReader::SndReader(mpc::disk::MpcFile* soundFile)
-: SndReader(soundFile->getBytes())
+SndReader::SndReader(mpc::disk::MpcFile *soundFile)
+    : SndReader(soundFile->getBytes())
 {
 }
 
-SndReader::SndReader(const std::vector<char>& loadBytes)
+SndReader::SndReader(const std::vector<char> &loadBytes)
 {
     sndFileArray = loadBytes;
     sndHeaderReader = std::make_shared<SndHeaderReader>(this);
@@ -76,36 +76,40 @@ int SndReader::getNumberOfBeats()
 
 void SndReader::readData(std::shared_ptr<std::vector<float>> dest)
 {
-	int length = sndHeaderReader->getNumberOfFrames();
+    int length = sndHeaderReader->getNumberOfFrames();
 
-	bool mono = sndHeaderReader->isMono();
+    bool mono = sndHeaderReader->isMono();
 
-	if (!mono)
+    if (!mono)
     {
         length *= 2;
     }
 
-	dest->clear();
-	dest->resize(length);
+    dest->clear();
+    dest->resize(length);
 
-	auto shorts = ByteUtil::bytesToShorts(std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
-	
+    auto shorts = ByteUtil::bytesToShorts(std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
+
     for (int i = 0; i < length; ++i)
     {
-		short value = shorts[i];
-		auto f = short_to_float(value);
-	
-        if (f < -1)
-			f = -1.0f;
-		
-		if (f > 1)
-			f = 1.0f;
+        short value = shorts[i];
+        auto f = short_to_float(value);
 
-		(*dest)[i] = f;
-	}
+        if (f < -1)
+        {
+            f = -1.0f;
+        }
+
+        if (f > 1)
+        {
+            f = 1.0f;
+        }
+
+        (*dest)[i] = f;
+    }
 }
 
-std::vector<char>& SndReader::getSndFileArray()
+std::vector<char> &SndReader::getSndFileArray()
 {
-	return sndFileArray;
+    return sndFileArray;
 }

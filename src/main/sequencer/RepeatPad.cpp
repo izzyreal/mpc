@@ -19,7 +19,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-void RepeatPad::process(mpc::Mpc& mpc,
+void RepeatPad::process(mpc::Mpc &mpc,
                         unsigned int tickPosition,
                         int durationTicks,
                         unsigned short eventFrameOffset,
@@ -74,7 +74,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 auto hardwareSlider = mpc.getHardware()->getSlider();
                 auto programSlider = program->getSlider();
 
-                Util::SliderNoteVariationContext sliderNoteVariationContext {
+                Util::SliderNoteVariationContext sliderNoteVariationContext{
                     hardwareSlider->getValueAs<int>(),
                     programSlider->getNote(),
                     programSlider->getParameter(),
@@ -85,22 +85,20 @@ void RepeatPad::process(mpc::Mpc& mpc,
                     programSlider->getAttackLowRange(),
                     programSlider->getAttackHighRange(),
                     programSlider->getFilterLowRange(),
-                    programSlider->getFilterHighRange()
-                };
+                    programSlider->getFilterHighRange()};
 
                 mpc::Util::setSliderNoteVariationParameters(sliderNoteVariationContext, noteEvent);
             }
 
             if (sixteenLevels)
             {
-                Util::SixteenLevelsContext sixteenLevelsContext {
+                Util::SixteenLevelsContext sixteenLevelsContext{
                     sixteenLevels,
                     assign16LevelsScreen->getType(),
                     assign16LevelsScreen->getOriginalKeyPad(),
                     assign16LevelsScreen->getNote(),
                     assign16LevelsScreen->getParameter(),
-                    physicalPadIndex
-                };
+                    physicalPadIndex};
 
                 noteEvent->setVelocity(127);
                 mpc::Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
@@ -122,8 +120,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
             noteEvent->setVelocity(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
 
-            const auto durationFrames = static_cast<int>(durationTicks == -1 ? -1 :
-                                                   SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
+            const auto durationFrames = static_cast<int>(durationTicks == -1 ? -1 : SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
 
             if (track->getBus() > 0 && note != 34)
             {
@@ -148,8 +145,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
                     eventFrameOffset,
                     /* firstGeneration */ true, // Always true for invokers that are not DrumNoteEventHandler::noteOn itself
                     /*tick*/ -1,
-                    voiceOverlap == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1
-                );
+                    voiceOverlap == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1);
 
                 DrumNoteEventHandler::noteOn(ctx);
 
@@ -170,33 +166,32 @@ void RepeatPad::process(mpc::Mpc& mpc,
             }
 
             mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames(
-                    [&mpc, track, note, noteEvent, tickPosition, program, programPadIndex]
-                    { 
-                if (track->getBus() > 0)
+                [&mpc, track, note, noteEvent, tickPosition, program, programPadIndex]
                 {
-                    auto &drum = mpc.getDrum(track->getBus() - 1);
+                    if (track->getBus() > 0)
+                    {
+                        auto &drum = mpc.getDrum(track->getBus() - 1);
 
-                    auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
-                        0,
-                        &drum,
-                        &mpc.getAudioMidiServices()->getVoices(),
-                        note,
-                        tickPosition
-                    );
+                        auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
+                            0,
+                            &drum,
+                            &mpc.getAudioMidiServices()->getVoices(),
+                            note,
+                            tickPosition);
 
-                    DrumNoteEventHandler::noteOff(ctx);
+                        DrumNoteEventHandler::noteOff(ctx);
 
-                    program->registerPadRelease(programPadIndex, PadPressSource::NON_PHYSICAL);
-                }
+                        program->registerPadRelease(programPadIndex, PadPressSource::NON_PHYSICAL);
+                    }
 
-                if (track->getDeviceIndex() > 0)
-                {
-                    const auto noteOffMsg = noteEvent->getNoteOff()->createShortMessage((track->getDeviceIndex() - 1) % 16);
-                    //noteOffMsg->bufferPos = bufferOffset;
-                    mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
-                }
-            }, durationFrames - 1);
+                    if (track->getDeviceIndex() > 0)
+                    {
+                        const auto noteOffMsg = noteEvent->getNoteOff()->createShortMessage((track->getDeviceIndex() - 1) % 16);
+                        // noteOffMsg->bufferPos = bufferOffset;
+                        mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
+                    }
+                },
+                durationFrames - 1);
         }
     }
 }
-

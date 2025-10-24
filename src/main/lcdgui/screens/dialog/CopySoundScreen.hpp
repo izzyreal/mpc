@@ -4,34 +4,34 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class NameScreen;
+    class NameScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog
 {
 
-	class CopySoundScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
-	{
+    class CopySoundScreen
+        : public mpc::lcdgui::ScreenComponent,
+          public mpc::lcdgui::screens::OpensNameScreen
+    {
 
-	public:
-		void function(int i) override;
-		void turnWheel(int renamerNewName) override;
+    public:
+        void function(int i) override;
+        void turnWheel(int renamerNewName) override;
 
-		CopySoundScreen(mpc::Mpc& mpc, const int layerIndex);
+        CopySoundScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
         void openNameScreen() override;
 
-	private:
-		void displaySnd();
-		void displayNewName();
+    private:
+        void displaySnd();
+        void displayNewName();
 
-		std::string newName;
-		void setNewName(std::string s);
+        std::string newName;
+        void setNewName(std::string s);
 
-	private:
-		friend class mpc::lcdgui::screens::window::NameScreen;
-
-	};
-}
+    private:
+        friend class mpc::lcdgui::screens::window::NameScreen;
+    };
+} // namespace mpc::lcdgui::screens::dialog

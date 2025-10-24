@@ -5,16 +5,18 @@
 #include <memory>
 #include <string>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
     class ControlLaw;
 
     class LawControl;
-}
+} // namespace mpc::engine::control
 
-namespace mpc::engine::filter {
+namespace mpc::engine::filter
+{
 
     class FilterControls
-            : public mpc::engine::control::CompoundControl
+        : public mpc::engine::control::CompoundControl
     {
 
     private:
@@ -56,6 +58,5 @@ namespace mpc::engine::filter {
 
     private:
         static std::shared_ptr<mpc::engine::control::ControlLaw> SEMITONE_LAW();
-
     };
-}
+} // namespace mpc::engine::filter

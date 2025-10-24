@@ -27,7 +27,10 @@ TEST_CASE("Next step, previous step", "[sequencer]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto pos = [&]{ return mpc.getSequencer()->getTickPosition();};
+    auto pos = [&]
+    {
+        return mpc.getSequencer()->getTickPosition();
+    };
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     seq->setTimeSignature(0, 1, 32);
@@ -90,42 +93,46 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
     int64_t timeInSamples = 0;
 
-    std::thread audioThread([&]() {
+    std::thread audioThread([&]()
+                            {
+                                int dspCycleCounter = 0;
 
-        int dspCycleCounter = 0;
+                                while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
+                                       track->getEvents().size() < humanTickPositions.size())
+                                {
+                                    mpc.getClock()->processBufferInternal(seq->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+                                    server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+                                    timeInSamples += BUFFER_SIZE;
 
-        while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
-               track->getEvents().size() < humanTickPositions.size())
-        {
-            mpc.getClock()->processBufferInternal(seq->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
-            server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
-            timeInSamples += BUFFER_SIZE;
+                                    if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
+                                    {
+                                        std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+                                        continue;
+                                    }
 
-            if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
-            {
-            std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-                continue;
-            }
+                                    std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+                                }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-        }
-
-        audioThreadBusy = false;
-    });
+                                audioThreadBusy = false;
+                            });
 
     int initialDelayCounter = 0;
 
     while (initialDelayCounter++ * 10 < INITIAL_EVENT_INSERTION_DELAY)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 
     int tickPos = seq->getTickPosition();
 
     if (!seq->isRecordingOrOverdubbing())
+    {
         seq->recFromStart();
+    }
 
     std::vector<int> recordedTickPos;
     int prevTickPos = -1;
-    
+
     const auto screen = mpc.getLayeredScreen()->getCurrentScreen();
 
     while (tickPos < 384 && prevTickPos <= tickPos)
@@ -157,7 +164,9 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     seq->stop();
 
     while (audioThreadBusy)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 
     audioThread.join();
 

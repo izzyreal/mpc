@@ -11,30 +11,34 @@ using namespace std;
 
 TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 {
-	Mpc mpc;
+    Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-	REQUIRE(mpc.getSequencer());
+    REQUIRE(mpc.getSequencer());
 }
 
-SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
+SCENARIO("A Sequencer initializes correctly", "[sequencer]")
+{
 
-	GIVEN("A Sequencer") {
-		Mpc mpc;
+    GIVEN("A Sequencer")
+    {
+        Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
-		auto seq = mpc.getSequencer();
-		seq->init();
+        auto seq = mpc.getSequencer();
+        seq->init();
 
-		REQUIRE( seq->getTempo() == 120 );
-	}
+        REQUIRE(seq->getTempo() == 120);
+    }
 }
 
-SCENARIO("A Sequence initializes correctly", "[sequence]") {
+SCENARIO("A Sequence initializes correctly", "[sequence]")
+{
 
-	GIVEN("An initialized Sequence") {
-		Mpc mpc;
+    GIVEN("An initialized Sequence")
+    {
+        Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
-		mpc::sequencer::Sequence seq(mpc);
-		seq.init(1);
-	    REQUIRE( seq.getInitialTempo() == 120.0 );
-	}
+        mpc::sequencer::Sequence seq(mpc);
+        seq.init(1);
+        REQUIRE(seq.getInitialTempo() == 120.0);
+    }
 }

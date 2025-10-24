@@ -10,24 +10,42 @@
 #include <mpc_types.hpp>
 #include <mpc_fs.hpp>
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window
+{
     class LoadASequenceScreen;
     class LoadAProgramScreen;
     class LoadApsFileScreen;
     class Mpc2000XlAllFileScreen;
+} // namespace mpc::lcdgui::screens::window
+
+namespace mpc::sequencer
+{
+    class Sequence;
 }
 
-namespace mpc::sequencer { class Sequence; }
+namespace mpc::sampler
+{
+    class Program;
+    class Sound;
+} // namespace mpc::sampler
 
-namespace mpc::sampler { class Program; class Sound; }
+namespace mpc::file::wav
+{
+    class WavFile;
+}
 
-namespace mpc::file::wav { class WavFile; }
+namespace mpc::file::sndreader
+{
+    class SndReader;
+}
 
-namespace mpc::file::sndreader { class SndReader; }
-
-namespace mpc::disk {
+namespace mpc::disk
+{
 
     class MpcFile;
     class Volume;
@@ -35,11 +53,11 @@ namespace mpc::disk {
     class AbstractDisk
     {
     protected:
-        AbstractDisk(mpc::Mpc&);
+        AbstractDisk(mpc::Mpc &);
         ~AbstractDisk();
 
-        mpc::Mpc& mpc;
-        const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
+        mpc::Mpc &mpc;
+        const std::vector<std::string> extensions{"", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET"};
         std::vector<std::shared_ptr<MpcFile>> files;
         std::vector<std::shared_ptr<MpcFile>> allFiles;
         std::vector<std::shared_ptr<MpcFile>> parentFiles;
@@ -47,7 +65,7 @@ namespace mpc::disk {
         virtual int getPathDepth() = 0;
 
     public:
-        virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
+        virtual std::shared_ptr<MpcFile> newFile(const std::string &name) = 0;
         bool deleteSelectedFile();
 
         std::vector<std::string> getFileNames();
@@ -55,19 +73,19 @@ namespace mpc::disk {
         std::vector<std::string> getParentFileNames();
 
         std::shared_ptr<MpcFile> getFile(int i);
-        std::shared_ptr<MpcFile> getFile(const std::string& fileName);
-        std::vector<std::shared_ptr<MpcFile>>& getAllFiles();
+        std::shared_ptr<MpcFile> getFile(const std::string &fileName);
+        std::vector<std::shared_ptr<MpcFile>> &getAllFiles();
         std::shared_ptr<MpcFile> getParentFile(int i);
 
         void writeSnd(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
         void writeWav(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
         void writeMid(std::shared_ptr<mpc::sequencer::Sequence>, std::string fileName);
-        void writePgm(std::shared_ptr<mpc::sampler::Program>, const std::string& fileName);
-        void writeAps(const std::string& fileName);
-        void writeAll(const std::string& fileName);
+        void writePgm(std::shared_ptr<mpc::sampler::Program>, const std::string &fileName);
+        void writeAps(const std::string &fileName);
+        void writeAll(const std::string &fileName);
         void writeMidiControlPreset(std::shared_ptr<mpc::nvram::MidiControlPreset> preset);
 
-        void readMidiControlPreset(const fs::path& p, const std::shared_ptr<mpc::nvram::MidiControlPreset>&);
+        void readMidiControlPreset(const fs::path &p, const std::shared_ptr<mpc::nvram::MidiControlPreset> &);
 
         bool checkExists(std::string fileName);
         virtual bool deleteRecursive(std::weak_ptr<MpcFile>);
@@ -79,21 +97,21 @@ namespace mpc::disk {
         virtual void initFiles() = 0;
         virtual std::string getDirectoryName() = 0;
         virtual bool moveBack() = 0;
-        virtual bool moveForward(const std::string& directoryName) = 0;
+        virtual bool moveForward(const std::string &directoryName) = 0;
         virtual bool deleteAllFiles(int dwGuiDelete) = 0;
-        virtual bool newFolder(const std::string& newDirName) = 0;
+        virtual bool newFolder(const std::string &newDirName) = 0;
         virtual std::string getAbsolutePath() = 0;
         virtual std::string getTypeShortName() = 0;
 
         virtual uint64_t getTotalSize() = 0;
         virtual std::string getVolumeLabel() = 0;
-        virtual Volume& getVolume() = 0;
+        virtual Volume &getVolume() = 0;
         virtual void initRoot() = 0;
 
         void readPgm2(std::shared_ptr<MpcFile>, std::shared_ptr<mpc::sampler::Program>);
 
     private:
-        std::thread programSoundsSaveThread = std::thread([]{});
+        std::thread programSoundsSaveThread = std::thread([] {});
         std::unique_ptr<SoundSaver> soundSaver;
         std::unique_ptr<AllLoader> allLoader;
 
@@ -103,10 +121,10 @@ namespace mpc::disk {
         friend class mpc::lcdgui::screens::window::LoadApsFileScreen;
         friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
 
-        template<typename return_type>
+        template <typename return_type>
         tl::expected<return_type, mpc_io_error_msg> performIoOrOpenErrorPopup(std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc);
 
-        template<typename return_type>
+        template <typename return_type>
         void performIoOrOpenErrorPopupNonReturning(std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc);
 
         wav_or_error readWavMeta(std::shared_ptr<MpcFile>);
@@ -118,6 +136,5 @@ namespace mpc::disk {
         void readAps2(std::shared_ptr<MpcFile>, std::function<void()> on_success);
         void readAll2(std::shared_ptr<MpcFile>, std::function<void()> onSuccess);
         sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);
-
     };
-}
+} // namespace mpc::disk

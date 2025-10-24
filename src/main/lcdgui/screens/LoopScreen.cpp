@@ -14,7 +14,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
+LoopScreen::LoopScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "loop", layerIndex)
 {
     addChildT<Wave>()->setFine(false);
@@ -79,39 +79,41 @@ void LoopScreen::function(int f)
 
     switch (f)
     {
-        case 0:
-            mpc.getLayeredScreen()->openScreen<TrimScreen>();
-            break;
-        case 1:
-            {
-                sampler->switchToNextSoundSortType();
-                ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
-                break;
-            }
-        case 2:
-            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
-            break;
-        case 3:
-            mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
-            break;
-        case 4:
-            {
-                if (sampler->getSoundCount() == 0)
-                {
-                    return;
-                }
+    case 0:
+        mpc.getLayeredScreen()->openScreen<TrimScreen>();
+        break;
+    case 1:
+    {
+        sampler->switchToNextSoundSortType();
+        ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+        break;
+    }
+    case 2:
+        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+        break;
+    case 3:
+        mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
+        break;
+    case 4:
+    {
+        if (sampler->getSoundCount() == 0)
+        {
+            return;
+        }
 
-                auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
-                editSoundScreen->setReturnToScreenName("loop");
-                mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
-                break;
-            }
-        case 5:
-            if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed())
-                return;
+        auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
+        editSoundScreen->setReturnToScreenName("loop");
+        mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+        break;
+    }
+    case 5:
+        if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed())
+        {
+            return;
+        }
 
-            sampler->playX();
-            break;
+        sampler->playX();
+        break;
     }
 }
 
@@ -158,7 +160,8 @@ void LoopScreen::turnWheel(int i)
             auto trimScreen = mpc.screens->get<TrimScreen>();
             trimScreen->setEnd(newEndValue);
         }
-        else {
+        else
+        {
             auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
             setLength(newLength);
         }
@@ -214,7 +217,6 @@ void LoopScreen::setSlider(int i)
     {
         return;
     }
-
 
     const auto focusedField = getFocusedField();
 
@@ -282,8 +284,14 @@ void LoopScreen::setLoopTo(int newLoopToValue)
         upperBound = sound->getFrameCount() - oldLoopLength;
     }
 
-    if (newLoopToValue < lowerBound) newLoopToValue = lowerBound;
-    if (newLoopToValue > upperBound) newLoopToValue = upperBound;
+    if (newLoopToValue < lowerBound)
+    {
+        newLoopToValue = lowerBound;
+    }
+    if (newLoopToValue > upperBound)
+    {
+        newLoopToValue = upperBound;
+    }
 
     sound->setLoopTo(newLoopToValue);
 
@@ -353,7 +361,6 @@ void LoopScreen::pressEnter()
         return;
     }
 
-
     const auto focusedField = getFocusedField();
 
     if (!focusedField || !focusedField->isTypeModeEnabled())
@@ -373,16 +380,22 @@ void LoopScreen::pressEnter()
         if (focusedFieldName == "to")
         {
             if (loopLngthFix && candidate + oldLength > sound->getFrameCount())
+            {
                 candidate = sound->getFrameCount() - oldLength;
+            }
 
             if (candidate > sound->getEnd() && !loopLngthFix)
+            {
                 candidate = sound->getEnd();
+            }
 
             sound->setLoopTo(candidate);
             displayTo();
 
             if (loopLngthFix)
+            {
                 sound->setEnd(sound->getLoopTo() + oldLength);
+            }
 
             displayEndLengthValue();
             displayEndLength();
@@ -393,22 +406,31 @@ void LoopScreen::pressEnter()
             if ((endSelected && focusedFieldName == "endlengthvalue") || focusedFieldName == "end")
             {
                 if (loopLngthFix && candidate - oldLength < 0)
+                {
                     candidate = oldLength;
+                }
 
                 if (candidate > sound->getFrameCount())
+                {
                     candidate = sound->getFrameCount();
+                }
 
                 sound->setEnd(candidate);
 
                 if (loopLngthFix)
+                {
                     sound->setLoopTo(sound->getEnd() - oldLength);
+                }
             }
-            else {
+            else
+            {
                 auto endCandidate = sound->getLoopTo() + candidate;
 
                 // No need to check the < case
                 if (endCandidate > sound->getFrameCount())
+                {
                     endCandidate = sound->getFrameCount();
+                }
 
                 sound->setEnd(endCandidate);
             }

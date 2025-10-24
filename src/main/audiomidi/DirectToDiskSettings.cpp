@@ -11,10 +11,10 @@ DirectToDiskSettings::DirectToDiskSettings(const int lengthInFramesToUse,
                                            const bool splitStereoIntoLeftAndRightChannelToUse,
                                            const int sampleRateToUse,
                                            std::string recordingNameToUse)
-        : lengthInFrames(lengthInFramesToUse),
-          splitStereoIntoLeftAndRightChannel(splitStereoIntoLeftAndRightChannelToUse),
-          sampleRate(sampleRateToUse),
-          recordingName(std::move(recordingNameToUse))
+    : lengthInFrames(lengthInFramesToUse),
+      splitStereoIntoLeftAndRightChannel(splitStereoIntoLeftAndRightChannelToUse),
+      sampleRate(sampleRateToUse),
+      recordingName(std::move(recordingNameToUse))
 {
 }
 

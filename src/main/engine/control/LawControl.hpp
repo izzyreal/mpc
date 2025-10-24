@@ -5,10 +5,11 @@
 
 #include <memory>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
 
     class LawControl
-            : public Control
+        : public Control
     {
 
     private:
@@ -25,7 +26,6 @@ namespace mpc::engine::control {
 
     public:
         LawControl(int id, std::string name, std::shared_ptr<ControlLaw> law, float initialValue);
-
     };
 
-}
+} // namespace mpc::engine::control

@@ -3,10 +3,12 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-int ControlLaw::intValue(float userVal) {
-	return 0;
+int ControlLaw::intValue(float userVal)
+{
+    return 0;
 }
 
-string ControlLaw::getUnits() {
-	return "";
+string ControlLaw::getUnits()
+{
+    return "";
 }

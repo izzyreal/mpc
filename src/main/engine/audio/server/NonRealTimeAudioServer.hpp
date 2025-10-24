@@ -8,7 +8,8 @@
 #include <string>
 #include <vector>
 
-namespace mpc::engine::audio::server {
+namespace mpc::engine::audio::server
+{
 
     class NonRealTimeAudioServer : public AudioServer, public AudioClient
     {
@@ -75,4 +76,4 @@ namespace mpc::engine::audio::server {
         ~NonRealTimeAudioServer();
     };
 
-}
+} // namespace mpc::engine::audio::server

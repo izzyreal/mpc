@@ -5,7 +5,9 @@ using namespace mpc::sequencer;
 void Step::setSequence(int i)
 {
     if (i < 0 || i > 98)
+    {
         return;
+    }
 
     sequence = i;
 }
@@ -18,7 +20,9 @@ int Step::getSequence()
 void Step::setRepeats(int i)
 {
     if (i < 0 || i > 99)
+    {
         return;
+    }
 
     repeatCount = i;
 }

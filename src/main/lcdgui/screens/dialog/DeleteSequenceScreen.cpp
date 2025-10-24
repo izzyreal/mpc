@@ -4,49 +4,49 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteSequenceScreen::DeleteSequenceScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "delete-sequence", layerIndex)
+DeleteSequenceScreen::DeleteSequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "delete-sequence", layerIndex)
 {
 }
 
 void DeleteSequenceScreen::open()
 {
-	displaySequenceNumberName();
+    displaySequenceNumberName();
 }
 
 void DeleteSequenceScreen::turnWheel(int i)
 {
-	
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "sq")
-	{
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
-		displaySequenceNumberName();
-	}
+    if (focusedFieldName == "sq")
+    {
+        sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+        displaySequenceNumberName();
+    }
 }
 
 void DeleteSequenceScreen::function(int i)
 {
-	
-	switch (i)
-	{
-	case 2:
+
+    switch (i)
+    {
+    case 2:
         mpc.getLayeredScreen()->openScreen<DeleteAllSequencesScreen>();
-		break;
-	case 3:
+        break;
+    case 3:
         mpc.getLayeredScreen()->openScreen<SequenceScreen>();
-		break;
-	case 4:
-		sequencer.lock()->move(0);
-		sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
+        break;
+    case 4:
+        sequencer.lock()->move(0);
+        sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-		break;
-	}
+        break;
+    }
 }
 
 void DeleteSequenceScreen::displaySequenceNumberName()
 {
-	auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
-	findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequenceName);
+    auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+    findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequenceName);
 }

@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushNumPadCommand : public Command {
+    class PushNumPadCommand : public Command
+    {
     public:
         PushNumPadCommand(mpc::Mpc &mpc, int i);
         void execute() override;

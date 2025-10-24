@@ -4,7 +4,8 @@
 #include <string>
 #include <map>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
     class CompoundControl;
 
     class Control
@@ -18,7 +19,6 @@ namespace mpc::engine::control {
         int getId();
 
         CompoundControl *getParent();
-
 
     protected:
         void setParent(CompoundControl *c);
@@ -40,6 +40,5 @@ namespace mpc::engine::control {
     private:
         friend class CompoundControl;
         friend class CompoundControlChain;
-
     };
-}
+} // namespace mpc::engine::control

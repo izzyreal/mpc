@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <cmath>
 
-namespace mpc::sampleops {
+namespace mpc::sampleops
+{
 
     inline float clamp_mean_normalized_float(const float &f)
     {
@@ -14,7 +15,7 @@ namespace mpc::sampleops {
 
     inline void clamp_mean_normalized_floats(std::vector<float> &floats)
     {
-        for (auto &f: floats)
+        for (auto &f : floats)
         {
             f = clamp_mean_normalized_float(f);
         }
@@ -36,4 +37,4 @@ namespace mpc::sampleops {
     {
         return static_cast<float>(value) / 8388608.0f; // 8388608 is 2^23
     }
-}
+} // namespace mpc::sampleops

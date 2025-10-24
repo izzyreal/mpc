@@ -2,10 +2,11 @@
 
 #include <engine/control/ControlLaw.hpp>
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
 
     class AbstractLaw
-            : public ControlLaw
+        : public ControlLaw
     {
 
     protected:
@@ -19,7 +20,6 @@ namespace mpc::engine::control {
 
     public:
         AbstractLaw(float min, float max, std::string units);
-
     };
 
-}
+} // namespace mpc::engine::control

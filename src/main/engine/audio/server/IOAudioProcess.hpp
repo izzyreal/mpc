@@ -5,12 +5,11 @@
 
 namespace mpc::engine::audio::server
 {
-	class IOAudioProcess
-		: public mpc::engine::audio::core::AudioProcess
-	{
-	public:
-		std::vector<float> localBuffer;
-		virtual std::string getName() = 0;
-
-	};
-}
+    class IOAudioProcess
+        : public mpc::engine::audio::core::AudioProcess
+    {
+    public:
+        std::vector<float> localBuffer;
+        virtual std::string getName() = 0;
+    };
+} // namespace mpc::engine::audio::server

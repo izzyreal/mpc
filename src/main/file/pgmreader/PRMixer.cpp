@@ -7,33 +7,36 @@
 
 using namespace mpc::file::pgmreader;
 
-Mixer::Mixer(ProgramFileReader* programFile) 
+Mixer::Mixer(ProgramFileReader *programFile)
 {
     this->programFile = programFile;
 }
 
 int Mixer::getSampleNamesSize()
 {
-	auto sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
-	return sampleNamesSize;
+    auto sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
+    return sampleNamesSize;
 }
 
 int Mixer::getMixerStart()
 {
-	auto mixerStart = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6 + 1601;
-	return mixerStart;
+    auto mixerStart = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6 + 1601;
+    return mixerStart;
 }
 
 int Mixer::getMixerEnd()
 {
-	auto mixerEnd = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6 + 1601 + 387;
-	return mixerEnd;
+    auto mixerEnd = 4 + getSampleNamesSize() + 2 + 17 + 9 + 6 + 1601 + 387;
+    return mixerEnd;
 }
 
 std::vector<char> Mixer::getMixerArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    if (mixerArray.size() == 0) mixerArray = Util::vecCopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());
+    if (mixerArray.size() == 0)
+    {
+        mixerArray = Util::vecCopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());
+    }
     return mixerArray;
 }
 

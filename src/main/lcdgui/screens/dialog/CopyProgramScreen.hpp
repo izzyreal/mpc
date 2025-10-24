@@ -3,28 +3,27 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-	class CopyProgramScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
-	public:
-		void function(int i) override;
-		void turnWheel(int i) override;
+    class CopyProgramScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
+    public:
+        void function(int i) override;
+        void turnWheel(int i) override;
 
-		CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex);
+        CopyProgramScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
 
-	private:
-		int pgm0 = 0;
-		int pgm1 = 0;
+    private:
+        int pgm0 = 0;
+        int pgm1 = 0;
 
-		void setPgm0(int i);
-		void setPgm1(int i);
+        void setPgm0(int i);
+        void setPgm1(int i);
 
-		void displayPgm0();
-		void displayPgm1();
+        void displayPgm0();
+        void displayPgm1();
 
-		void displayFunctionKeys();
-
-	};
-}
+        void displayFunctionKeys();
+    };
+} // namespace mpc::lcdgui::screens::dialog

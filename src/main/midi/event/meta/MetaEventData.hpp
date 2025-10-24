@@ -4,17 +4,18 @@
 
 #include <sstream>
 
-namespace mpc::midi::event::meta {
+namespace mpc::midi::event::meta
+{
 
-	class MetaEventData
-	{
+    class MetaEventData
+    {
 
-	public:
-		int type = 0;
-		mpc::midi::util::VariableLengthInt length;
-		std::vector<char> data;
+    public:
+        int type = 0;
+        mpc::midi::util::VariableLengthInt length;
+        std::vector<char> data;
 
-	public:
-		MetaEventData(std::stringstream& in);
-	};
-}
+    public:
+        MetaEventData(std::stringstream &in);
+    };
+} // namespace mpc::midi::event::meta

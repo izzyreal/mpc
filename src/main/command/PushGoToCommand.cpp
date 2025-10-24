@@ -2,11 +2,13 @@
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushGoToCommand::PushGoToCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushGoToCommand::execute() {
+    void PushGoToCommand::execute()
+    {
 
         if (!mpc.getSequencer()->getActiveSequence()->isUsed())
         {
@@ -19,4 +21,4 @@ namespace mpc::command {
         }
     }
 
-}
+} // namespace mpc::command

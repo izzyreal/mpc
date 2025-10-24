@@ -7,7 +7,7 @@
 
 using namespace mpc::file::pgmwriter;
 
-PWHeader::PWHeader(int numberOfSamples) 
+PWHeader::PWHeader(int numberOfSamples)
 {
     headerArray = std::vector<char>(4);
     writeMagic();
@@ -17,8 +17,8 @@ PWHeader::PWHeader(int numberOfSamples)
 
 void PWHeader::writeMagic()
 {
-	headerArray[0] = PGM_HEADER_MAGIC[0];
-	headerArray[1] = PGM_HEADER_MAGIC[1];
+    headerArray[0] = PGM_HEADER_MAGIC[0];
+    headerArray[1] = PGM_HEADER_MAGIC[1];
 }
 
 void PWHeader::setSoundCount(const uint16_t soundCount)
@@ -31,5 +31,5 @@ void PWHeader::setSoundCount(const uint16_t soundCount)
 
 std::vector<char> PWHeader::getHeaderArray()
 {
-	return headerArray;
+    return headerArray;
 }

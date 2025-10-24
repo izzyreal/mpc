@@ -35,13 +35,13 @@ static constexpr int STRIP_OFFSET = 32;
 namespace
 {
     void handleMuteGroups(NoteParameters *noteParameters,
-            const int drumIndex,
-            const std::vector<std::shared_ptr<Voice>> *voices)
+                          const int drumIndex,
+                          const std::vector<std::shared_ptr<Voice>> *voices)
     {
         if (noteParameters->getMuteAssignA() != Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED ||
-                noteParameters->getMuteAssignB() != Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED)
+            noteParameters->getMuteAssignB() != Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED)
         {
-            for (const auto& v : *voices)
+            for (const auto &v : *voices)
             {
                 if (!v->isFinished() && (v->getMuteInfo().shouldMute(noteParameters->getMuteAssignA(), drumIndex) ||
                                          v->getMuteInfo().shouldMute(noteParameters->getMuteAssignB(), drumIndex)))
@@ -51,13 +51,13 @@ namespace
             }
         }
     }
-}
+} // namespace
 
-void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
+void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 {
     if (c.note < Mpc2000XlSpecs::FIRST_DRUM_NOTE ||
-            c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE ||
-            c.velocity == 0)
+        c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE ||
+        c.velocity == 0)
     {
         return;
     }
@@ -76,7 +76,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
 
     std::shared_ptr<Voice> voice;
 
-    for (auto& v : *c.voices)
+    for (auto &v : *c.voices)
     {
         if (v->isFinished())
         {
@@ -158,7 +158,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
 
     if (!sound->isLoopEnabled() && np->getVoiceOverlapMode() == VoiceOverlapMode::MONO)
     {
-        for (auto& v : *c.voices)
+        for (auto &v : *c.voices)
         {
             if (v->getNoteParameters() == np && v->getNote() == c.note)
             {
@@ -178,22 +178,21 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
         if (optA != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptA = DrumNoteEventContextBuilder::buildNoteOn(
-                    c.noteEventId,
-                    c.drum,
-                    c.sampler,
-                    c.mixer,
-                    c.mixerSetupScreen,
-                    c.voices,
-                    *c.mixerConnections,
-                    optA,
-                    c.velocity,
-                    c.varType,
-                    c.varValue,
-                    c.frameOffset,
-                    false,
-                    c.startTick,
-                    c.durationFrames
-            );
+                c.noteEventId,
+                c.drum,
+                c.sampler,
+                c.mixer,
+                c.mixerSetupScreen,
+                c.voices,
+                *c.mixerConnections,
+                optA,
+                c.velocity,
+                c.varType,
+                c.varValue,
+                c.frameOffset,
+                false,
+                c.startTick,
+                c.durationFrames);
 
             noteOn(ctxOptA);
 
@@ -203,22 +202,21 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
         if (optB != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptB = DrumNoteEventContextBuilder::buildNoteOn(
-                    c.noteEventId,
-                    c.drum,
-                    c.sampler,
-                    c.mixer,
-                    c.mixerSetupScreen,
-                    c.voices,
-                    *c.mixerConnections,
-                    optB,
-                    c.velocity,
-                    c.varType,
-                    c.varValue,
-                    c.frameOffset,
-                    false,
-                    c.startTick,
-                    c.durationFrames
-            );
+                c.noteEventId,
+                c.drum,
+                c.sampler,
+                c.mixer,
+                c.mixerSetupScreen,
+                c.voices,
+                *c.mixerConnections,
+                optB,
+                c.velocity,
+                c.varType,
+                c.varValue,
+                c.frameOffset,
+                false,
+                c.startTick,
+                c.durationFrames);
 
             noteOn(ctxOptB);
 
@@ -227,18 +225,17 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext& c)
     }
 }
 
-
 void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
 {
     if (c.note < Mpc2000XlSpecs::FIRST_DRUM_NOTE ||
-            c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE)
+        c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE)
     {
         return;
     }
 
     auto startDecayForNote = [&](int noteToStop, uint64_t noteEventId)
     {
-        for (auto& voice : *c.voices)
+        for (auto &voice : *c.voices)
         {
             if (!voice->isFinished() &&
                 voice->getStartTick() == c.noteOnStartTick &&
@@ -268,4 +265,3 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
         c.drumSimultB->erase(it);
     }
 }
-

@@ -8,8 +8,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "zone-start-fine", layerIndex)
+ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
     addChildT<Wave>()->setFine(true);
 }
@@ -17,40 +17,40 @@ ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 void ZoneStartFineScreen::open()
 {
     findField("start")->enableTwoDots();
-	findLabel("lngth")->enableTwoDots();
-	displayStart();
-	displayLngthLabel();
+    findLabel("lngth")->enableTwoDots();
+    displayStart();
+    displayLngthLabel();
 
-	displayPlayX();
-	displayFineWave();
+    displayPlayX();
+    displayFineWave();
 }
 
 void ZoneStartFineScreen::displayFineWave()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>();
-	auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto trimScreen = mpc.screens->get<TrimScreen>();
 
-	auto sound = sampler->getSound();
+    auto sound = sampler->getSound();
 
-	if (!sound)
-	{
-		return;
-	}
+    if (!sound)
+    {
+        return;
+    }
 
-	findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
-	findWave()->setCenterSamplePos(zoneScreen->getZoneStart(zoneScreen->zone));
+    findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+    findWave()->setCenterSamplePos(zoneScreen->getZoneStart(zoneScreen->zone));
 }
 
 void ZoneStartFineScreen::displayStart()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>();
-	findField("start")->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
+    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    findField("start")->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayLngthLabel()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>();
-	findLabel("lngth")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
+    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    findLabel("lngth")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayPlayX()
@@ -60,55 +60,55 @@ void ZoneStartFineScreen::displayPlayX()
 
 void ZoneStartFineScreen::function(int i)
 {
-	ScreenComponent::function(i);
+    ScreenComponent::function(i);
 
-	switch (i)
-	{
-	case 1:
-		findWave()->zoomPlus();
-		break;
-	case 2:
-		findWave()->zoomMinus();
-		break;
-	case 4:
-		sampler->playX();
-		break;
-	}
+    switch (i)
+    {
+    case 1:
+        findWave()->zoomPlus();
+        break;
+    case 2:
+        findWave()->zoomMinus();
+        break;
+    case 4:
+        sampler->playX();
+        break;
+    }
 }
 
 void ZoneStartFineScreen::turnWheel(int i)
 {
-	auto sound = sampler->getSound();
+    auto sound = sampler->getSound();
     auto zoneScreen = mpc.screens->get<ZoneScreen>();
 
-	auto soundInc = getSoundIncrement(i);
+    auto soundInc = getSoundIncrement(i);
 
     const auto focusedField = getFocusedFieldOrThrow();
 
-	if (focusedField->isSplit())
+    if (focusedField->isSplit())
     {
-		soundInc = focusedField->getSplitIncrement(i >= 0);
+        soundInc = focusedField->getSplitIncrement(i >= 0);
     }
 
-	if (focusedField->isTypeModeEnabled())
+    if (focusedField->isTypeModeEnabled())
     {
-		focusedField->disableTypeMode();
+        focusedField->disableTypeMode();
     }
 
     const auto focusedFieldName = focusedField->getName();
 
-	if (focusedFieldName == "start")
-	{
-		zoneScreen->setZoneStart(zoneScreen->zone, zoneScreen->getZoneStart(zoneScreen->zone) + soundInc);
-		displayStart();
-		displayLngthLabel();
-		displayFineWave();
-	}
-	else if (focusedFieldName == "playx")
-	{
-		sampler->setPlayX(sampler->getPlayX() + i);
-		displayPlayX();
-	}
+    if (focusedFieldName == "start")
+    {
+        zoneScreen->setZoneStart(zoneScreen->zone, zoneScreen->getZoneStart(zoneScreen->zone) + soundInc);
+        displayStart();
+        displayLngthLabel();
+        displayFineWave();
+    }
+    else if (focusedFieldName == "playx")
+    {
+        sampler->setPlayX(sampler->getPlayX() + i);
+        displayPlayX();
+    }
 }
 
 void ZoneStartFineScreen::left()
@@ -123,12 +123,12 @@ void ZoneStartFineScreen::right()
 
 void ZoneStartFineScreen::pressEnter()
 {
-	auto zoneScreen = mpc.screens->get<ZoneScreen>();
-	zoneScreen->pressEnter();
+    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    zoneScreen->pressEnter();
 
-	displayStart();
-	displayLngthLabel();
-	displayFineWave();
+    displayStart();
+    displayLngthLabel();
+    displayFineWave();
 }
 
 void ZoneStartFineScreen::setSlider(int i)
@@ -137,7 +137,6 @@ void ZoneStartFineScreen::setSlider(int i)
     {
         return;
     }
-
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

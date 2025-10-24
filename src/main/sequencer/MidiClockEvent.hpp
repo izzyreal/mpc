@@ -7,25 +7,27 @@
 
 namespace mpc::sequencer
 {
-	class MidiClockEvent
-		: public Event
-	{
+    class MidiClockEvent
+        : public Event
+    {
 
-	public:
-		typedef Event super;
+    public:
+        typedef Event super;
 
-	private:
-		int status{ 0 };
+    private:
+        int status{0};
 
-	public:
-		virtual int getStatus() const;
-		virtual void setStatus(int i);
+    public:
+        virtual int getStatus() const;
+        virtual void setStatus(int i);
 
-		MidiClockEvent(int statusToUse);
-		MidiClockEvent(std::shared_ptr<mpc::engine::midi::ShortMessage> msg);
-		MidiClockEvent(const MidiClockEvent&);
-		
-		std::string getTypeName() override { return "midi-clock"; }
+        MidiClockEvent(int statusToUse);
+        MidiClockEvent(std::shared_ptr<mpc::engine::midi::ShortMessage> msg);
+        MidiClockEvent(const MidiClockEvent &);
 
-	};
-}
+        std::string getTypeName() override
+        {
+            return "midi-clock";
+        }
+    };
+} // namespace mpc::sequencer

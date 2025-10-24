@@ -2,15 +2,15 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "vmpc-recording-finished", layerIndex)
+VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "vmpc-recording-finished", layerIndex)
 {
 }
 
 void VmpcRecordingFinishedScreen::function(int i)
 {
 
-	switch (i)
+    switch (i)
     {
     case 3:
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();

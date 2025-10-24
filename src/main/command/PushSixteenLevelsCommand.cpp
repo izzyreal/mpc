@@ -2,20 +2,28 @@
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushSixteenLevelsCommand::PushSixteenLevelsCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushSixteenLevelsCommand::execute() {
+    void PushSixteenLevelsCommand::execute()
+    {
         const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        if (currentScreenName != "sequencer" && currentScreenName != "assign-16-levels") return;
+        if (currentScreenName != "sequencer" && currentScreenName != "assign-16-levels")
+        {
+            return;
+        }
 
-        if (mpc.isSixteenLevelsEnabled()) {
+        if (mpc.isSixteenLevelsEnabled())
+        {
             mpc.setSixteenLevelsEnabled(false);
             mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(false);
-        } else {
+        }
+        else
+        {
             mpc.getLayeredScreen()->openScreen<Assign16LevelsScreen>();
         }
     }
 
-}
+} // namespace mpc::command

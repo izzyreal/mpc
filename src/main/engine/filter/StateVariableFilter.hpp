@@ -2,7 +2,8 @@
 
 #include "FilterControls.hpp"
 
-namespace mpc::engine::filter {
+namespace mpc::engine::filter
+{
 
     class StateVariableFilterElement;
 
@@ -25,6 +26,5 @@ namespace mpc::engine::filter {
         float update();
 
         float filter(float sample, float f);
-
     };
-}
+} // namespace mpc::engine::filter

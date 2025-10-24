@@ -3,23 +3,26 @@
 
 #include <string>
 
-namespace mpc {
-	namespace midi {
-		namespace event {
-			namespace meta {
+namespace mpc
+{
+    namespace midi
+    {
+        namespace event
+        {
+            namespace meta
+            {
 
-				class CopyrightNotice
-					: public TextualMetaEvent
-				{
+                class CopyrightNotice
+                    : public TextualMetaEvent
+                {
 
-				
-				public:
-					void setNotice(std::string t);
-					std::string getNotice();
+                public:
+                    void setNotice(std::string t);
+                    std::string getNotice();
 
-					CopyrightNotice(int tick, int delta, std::string text);
-				};
-			}
-		}
-	}
-}
+                    CopyrightNotice(int tick, int delta, std::string text);
+                };
+            } // namespace meta
+        } // namespace event
+    } // namespace midi
+} // namespace mpc

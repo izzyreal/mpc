@@ -6,22 +6,22 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 
-StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "stereo-to-mono", layerIndex)
+StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "stereo-to-mono", layerIndex)
 {
 }
 
 void StereoToMonoScreen::open()
 {
-	if (ls->isPreviousScreenNot<NameScreen, PopupScreen>())
-	{
-		updateNewNames();
-		ls->setFocus("stereosource");
-	}
-	
-	displayNewLName();
-	displayNewRName();
-	displayStereoSource();
+    if (ls->isPreviousScreenNot<NameScreen, PopupScreen>())
+    {
+        updateNewNames();
+        ls->setFocus("stereosource");
+    }
+
+    displayNewLName();
+    displayNewRName();
+    displayStereoSource();
 }
 
 void StereoToMonoScreen::turnWheel(int i)
@@ -29,11 +29,11 @@ void StereoToMonoScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "stereosource")
-	{
-		sampler->nudgeSoundIndex(i > 0);
-		displayStereoSource();
-	}
+    if (focusedFieldName == "stereosource")
+    {
+        sampler->nudgeSoundIndex(i > 0);
+        displayStereoSource();
+    }
 }
 
 void StereoToMonoScreen::openNameScreen()
@@ -44,14 +44,21 @@ void StereoToMonoScreen::openNameScreen()
     {
         const auto isL = focusedFieldName == "newlname";
 
-        const auto enterAction = [this, isL](std::string& nameScreenName) {
+        const auto enterAction = [this, isL](std::string &nameScreenName)
+        {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {
                 return;
             }
 
-            if (isL) setNewLName(nameScreenName);
-            else setNewRName(nameScreenName);
+            if (isL)
+            {
+                setNewLName(nameScreenName);
+            }
+            else
+            {
+                setNewRName(nameScreenName);
+            }
             mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
         };
 
@@ -64,36 +71,38 @@ void StereoToMonoScreen::openNameScreen()
 
 void StereoToMonoScreen::function(int i)
 {
-		
-	switch (i)
-	{
-	case 3:
+
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->closeCurrentScreen();
-		break;
-	case 4:
-	{
-		auto sound = sampler->getSound();
+        break;
+    case 4:
+    {
+        auto sound = sampler->getSound();
 
-		if (sound->isMono())
-			return;
+        if (sound->isMono())
+        {
+            return;
+        }
 
-		for (auto& s : sampler->getSounds())
-		{
-			if (s->getName() == newLName || s->getName() == newRName)
-			{
-				ls->showPopupAndAwaitInteraction("Name already used");
-				return;
-			}
-		}
+        for (auto &s : sampler->getSounds())
+        {
+            if (s->getName() == newLName || s->getName() == newRName)
+            {
+                ls->showPopupAndAwaitInteraction("Name already used");
+                return;
+            }
+        }
 
-		auto left = sampler->addSound(sound->getSampleRate());
+        auto left = sampler->addSound(sound->getSampleRate());
 
         if (left == nullptr)
         {
             return;
         }
 
-		auto right = sampler->addSound(sound->getSampleRate());
+        auto right = sampler->addSound(sound->getSampleRate());
 
         if (right == nullptr)
         {
@@ -101,83 +110,85 @@ void StereoToMonoScreen::function(int i)
             return;
         }
 
-		left->setName(newLName);
-		right->setName(newRName);
+        left->setName(newLName);
+        right->setName(newRName);
 
-		left->setMono(true);
-		right->setMono(true);
-		
-		auto leftData = left->getMutableSampleData();
-		auto rightData = right->getMutableSampleData();
+        left->setMono(true);
+        right->setMono(true);
 
-		for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
-		{
-			leftData->push_back((*sound->getSampleData())[frameIndex]);
-			rightData->push_back((*sound->getSampleData())[frameIndex + sound->getFrameCount()]);
-		}
-		
-		left->setEnd(left->getSampleData()->size());
-		right->setEnd(right->getSampleData()->size());
+        auto leftData = left->getMutableSampleData();
+        auto rightData = right->getMutableSampleData();
+
+        for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
+        {
+            leftData->push_back((*sound->getSampleData())[frameIndex]);
+            rightData->push_back((*sound->getSampleData())[frameIndex + sound->getFrameCount()]);
+        }
+
+        left->setEnd(left->getSampleData()->size());
+        right->setEnd(right->getSampleData()->size());
         mpc.getLayeredScreen()->closeCurrentScreen();
-		break;
-	}
-	}
+        break;
+    }
+    }
 }
 
 void StereoToMonoScreen::updateNewNames()
 {
-	if (! sampler->getSound() || sampler->getSound()->isMono())
-		return;
+    if (!sampler->getSound() || sampler->getSound()->isMono())
+    {
+        return;
+    }
 
-	auto name = sampler->getSound()->getName();
-	name = StrUtil::trim(name);
-	name = StrUtil::padRight(name, "_", 16);
-	name = name.substr(0, 14);
+    auto name = sampler->getSound()->getName();
+    name = StrUtil::trim(name);
+    name = StrUtil::padRight(name, "_", 16);
+    name = name.substr(0, 14);
 
-	setNewLName(name + "-L");
-	setNewRName(name + "-R");
+    setNewLName(name + "-L");
+    setNewRName(name + "-R");
 }
 
 void StereoToMonoScreen::displayStereoSource()
 {
-	auto sound = sampler->getSound();
+    auto sound = sampler->getSound();
 
-	if (!sound)
-	{
-		return;
-	}
+    if (!sound)
+    {
+        return;
+    }
 
-	findField("stereosource")->setText(sound->getName());
+    findField("stereosource")->setText(sound->getName());
 
-	if (sound->isMono())
-	{
-		ls->setFunctionKeysArrangement(1);
-		findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
-	}
-	else
-	{
-		ls->setFunctionKeysArrangement(0);
-	}
+    if (sound->isMono())
+    {
+        ls->setFunctionKeysArrangement(1);
+        findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
+    }
+    else
+    {
+        ls->setFunctionKeysArrangement(0);
+    }
 }
 
 void StereoToMonoScreen::displayNewLName()
 {
-	findField("newlname")->setText(newLName);
+    findField("newlname")->setText(newLName);
 }
 
 void StereoToMonoScreen::displayNewRName()
 {
-	findField("newrname")->setText(newRName);
+    findField("newrname")->setText(newRName);
 }
 
 void StereoToMonoScreen::setNewLName(std::string s)
 {
-	newLName = s;
-	displayNewLName();
+    newLName = s;
+    displayNewLName();
 }
 
 void StereoToMonoScreen::setNewRName(std::string s)
 {
-	newRName = s;
-	displayNewRName();
+    newRName = s;
+    displayNewRName();
 }

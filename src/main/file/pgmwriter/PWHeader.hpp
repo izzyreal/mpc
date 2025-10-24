@@ -3,12 +3,14 @@
 #include <vector>
 #include <cstdint>
 
-namespace mpc::file::pgmwriter {
+namespace mpc::file::pgmwriter
+{
 
-    class PWHeader {
+    class PWHeader
+    {
 
     private:
-        const std::vector<char> PGM_HEADER_MAGIC{ 0x07, 0x04 };
+        const std::vector<char> PGM_HEADER_MAGIC{0x07, 0x04};
         std::vector<char> headerArray;
 
     private:
@@ -22,4 +24,4 @@ namespace mpc::file::pgmwriter {
     public:
         PWHeader(int numberOfSamples);
     };
-}
+} // namespace mpc::file::pgmwriter

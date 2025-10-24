@@ -9,29 +9,31 @@
 
 using namespace mpc::lcdgui;
 
-Component::Component(const std::string& nameToUse)
+Component::Component(const std::string &nameToUse)
     : name(nameToUse)
 {
 }
 
 void Component::sendToBack(std::shared_ptr<Component> childToSendBack)
 {
-	for (int i = 0; i < children.size(); i++)
-	{
-		if (children[i] == childToSendBack)
-		{
-			auto placeHolder = children[i];
-			children.erase(begin(children) + i);
-			children.insert(children.begin(), std::move(placeHolder));
-			break;
-		}
-	}
+    for (int i = 0; i < children.size(); i++)
+    {
+        if (children[i] == childToSendBack)
+        {
+            auto placeHolder = children[i];
+            children.erase(begin(children) + i);
+            children.insert(children.begin(), std::move(placeHolder));
+            break;
+        }
+    }
 }
 
-bool Component::bringToFront(Component* childToBringToFront)
+bool Component::bringToFront(Component *childToBringToFront)
 {
     if (!childToBringToFront)
+    {
         return false;
+    }
 
     for (int i = 0; i < children.size(); ++i)
     {
@@ -44,12 +46,15 @@ bool Component::bringToFront(Component* childToBringToFront)
         }
     }
 
-    for (auto& c : children)
+    for (auto &c : children)
     {
         if (c->bringToFront(childToBringToFront))
         {
             auto it = std::find_if(children.begin(), children.end(),
-                [&](const auto& ch) { return ch.get() == c.get(); });
+                                   [&](const auto &ch)
+                                   {
+                                       return ch.get() == c.get();
+                                   });
 
             if (it != children.end())
             {
@@ -64,137 +69,155 @@ bool Component::bringToFront(Component* childToBringToFront)
     return false;
 }
 
-bool Component::shouldNotDraw(std::vector<std::vector<bool>>* pixels)
+bool Component::shouldNotDraw(std::vector<std::vector<bool>> *pixels)
 {
-	if (!IsDirty())
-	{
-		return true;
-	}
+    if (!IsDirty())
+    {
+        return true;
+    }
 
-	if (hidden)
-	{
-		Clear(pixels);
-		dirty = false;
-		return true;
-	}
+    if (hidden)
+    {
+        Clear(pixels);
+        dirty = false;
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
-std::shared_ptr<Parameter> Component::findParameter(const std::string& nameOfParameterToFind)
+std::shared_ptr<Parameter> Component::findParameter(const std::string &nameOfParameterToFind)
 {
-	for (auto& c : children)
-	{
-		auto candidate = std::dynamic_pointer_cast<Parameter>(c);
+    for (auto &c : children)
+    {
+        auto candidate = std::dynamic_pointer_cast<Parameter>(c);
 
-		if (candidate && candidate->getName() == nameOfParameterToFind)
-		{
-			return candidate;
-		}
+        if (candidate && candidate->getName() == nameOfParameterToFind)
+        {
+            return candidate;
+        }
 
-		auto secondCandidate = c->findParameter(nameOfParameterToFind);
+        auto secondCandidate = c->findParameter(nameOfParameterToFind);
 
-		if (secondCandidate)
-		{
-			return secondCandidate;
-		}
-	}
+        if (secondCandidate)
+        {
+            return secondCandidate;
+        }
+    }
 
-	return {};
+    return {};
 }
 
-
-
-std::shared_ptr<Label> Component::findLabel(const std::string& nameOfLabelToFind)
+std::shared_ptr<Label> Component::findLabel(const std::string &nameOfLabelToFind)
 {
-	for (auto& c : children)
-	{
-		auto candidate = std::dynamic_pointer_cast<Label>(c);
+    for (auto &c : children)
+    {
+        auto candidate = std::dynamic_pointer_cast<Label>(c);
 
-		if (candidate && candidate->getName() == nameOfLabelToFind)
-			return candidate;
+        if (candidate && candidate->getName() == nameOfLabelToFind)
+        {
+            return candidate;
+        }
 
-		auto secondCandidate = c->findLabel(nameOfLabelToFind);
+        auto secondCandidate = c->findLabel(nameOfLabelToFind);
 
-		if (secondCandidate)
-			return secondCandidate;
-	}
+        if (secondCandidate)
+        {
+            return secondCandidate;
+        }
+    }
 
-	return {};
+    return {};
 }
 
-std::shared_ptr<Field> Component::findField(const std::string& nameOfFieldToFind)
+std::shared_ptr<Field> Component::findField(const std::string &nameOfFieldToFind)
 {
-	for (auto& c : children)
-	{
-		auto candidate = std::dynamic_pointer_cast<Field>(c);
+    for (auto &c : children)
+    {
+        auto candidate = std::dynamic_pointer_cast<Field>(c);
 
-		if (candidate && candidate->getName() == nameOfFieldToFind)
-			return candidate;
+        if (candidate && candidate->getName() == nameOfFieldToFind)
+        {
+            return candidate;
+        }
 
-		auto secondCandidate = c->findField(nameOfFieldToFind);
+        auto secondCandidate = c->findField(nameOfFieldToFind);
 
-		if (secondCandidate)
-			return secondCandidate;
-	}
+        if (secondCandidate)
+        {
+            return secondCandidate;
+        }
+    }
 
-	return {};
+    return {};
 }
 
 std::vector<std::shared_ptr<Label>> Component::findLabels()
 {
     std::vector<std::shared_ptr<Label>> result;
 
-	for (auto& c : children)
-	{
-		auto candidate = std::dynamic_pointer_cast<Label>(c);
-		if (candidate)
-			result.push_back(candidate);
+    for (auto &c : children)
+    {
+        auto candidate = std::dynamic_pointer_cast<Label>(c);
+        if (candidate)
+        {
+            result.push_back(candidate);
+        }
 
-		for (auto& Label : c->findLabels())
-			result.push_back(Label);
-	}
+        for (auto &Label : c->findLabels())
+        {
+            result.push_back(Label);
+        }
+    }
 
-	return result;
+    return result;
 }
 
 std::vector<std::shared_ptr<Field>> Component::findFields()
 {
     std::vector<std::shared_ptr<Field>> result;
 
-	for (auto& c : children)
-	{
-		auto candidate = std::dynamic_pointer_cast<Field>(c);
+    for (auto &c : children)
+    {
+        auto candidate = std::dynamic_pointer_cast<Field>(c);
 
-		if (candidate)
-			result.push_back(candidate);
+        if (candidate)
+        {
+            result.push_back(candidate);
+        }
 
-		for (auto& field : c->findFields())
-			result.push_back(field);
-	}
-	
-	return result;
+        for (auto &field : c->findFields())
+        {
+            result.push_back(field);
+        }
+    }
+
+    return result;
 }
 
 std::vector<std::shared_ptr<Parameter>> Component::findParameters()
 {
     std::vector<std::shared_ptr<Parameter>> result;
-	
-	for (auto& c : children)
-	{
-		if (std::dynamic_pointer_cast<Parameter>(c))
-			result.push_back(std::dynamic_pointer_cast<Parameter>(c));
-		
-		for (auto& parameter : c->findParameters())
-			result.push_back(parameter);
-	}
 
-	return result;
+    for (auto &c : children)
+    {
+        if (std::dynamic_pointer_cast<Parameter>(c))
+        {
+            result.push_back(std::dynamic_pointer_cast<Parameter>(c));
+        }
+
+        for (auto &parameter : c->findParameters())
+        {
+            result.push_back(parameter);
+        }
+    }
+
+    return result;
 }
 
 std::shared_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
 {
-    if (dynamic_cast<ScreenComponent*>(this))
+    if (dynamic_cast<ScreenComponent *>(this))
     {
         auto background = findBackground();
 
@@ -204,238 +227,283 @@ std::shared_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
         }
     }
 
-	child->parent = this;
-	children.push_back(std::move(child));
-	SetDirty();
-	return children.back();
+    child->parent = this;
+    children.push_back(std::move(child));
+    SetDirty();
+    return children.back();
 }
 
 void Component::removeChild(std::shared_ptr<Component> child)
 {
-	if (!child)
-		return;
+    if (!child)
+    {
+        return;
+    }
 
-	for (auto& c : children)
-	{
-		if (c == child)
-		{
-			children.erase(find(begin(children), end(children), child));
-			return;
-		}
-	}
+    for (auto &c : children)
+    {
+        if (c == child)
+        {
+            children.erase(find(begin(children), end(children), child));
+            return;
+        }
+    }
 
-	for (auto& c : children)
-		c->removeChild(child);
+    for (auto &c : children)
+    {
+        c->removeChild(child);
+    }
 }
 
 void Component::addChildren(std::vector<std::shared_ptr<Component>> &childrenToAdd)
 {
-	for (auto& c : childrenToAdd)
-		addChild(c);
+    for (auto &c : childrenToAdd)
+    {
+        addChild(c);
+    }
 }
 
-std::shared_ptr<Component> Component::findChild(const std::string& nameOfChildToFind)
+std::shared_ptr<Component> Component::findChild(const std::string &nameOfChildToFind)
 {
-	for (auto& c : children)
-	{
-		if (c->getName() == nameOfChildToFind)
-			return c;
+    for (auto &c : children)
+    {
+        if (c->getName() == nameOfChildToFind)
+        {
+            return c;
+        }
 
-		auto candidate = c->findChild(nameOfChildToFind);
+        auto candidate = c->findChild(nameOfChildToFind);
 
-		if (candidate)
-			return candidate;
-	}
-	return {};
+        if (candidate)
+        {
+            return candidate;
+        }
+    }
+    return {};
 }
 
-void Component::drawRecursive(std::vector<std::vector<bool>>* pixels)
+void Component::drawRecursive(std::vector<std::vector<bool>> *pixels)
 {
-	if (shouldNotDraw(pixels))
-		return;
+    if (shouldNotDraw(pixels))
+    {
+        return;
+    }
 
-//	MLOG("Drawing " + name);
+    //	MLOG("Drawing " + name);
 
-	if (hidden || !IsDirty())
-		return;
-    
+    if (hidden || !IsDirty())
+    {
+        return;
+    }
+
     Draw(pixels);
-    
-	for (auto& c : children)
-		c->drawRecursive(pixels);
 
-	dirty = false;
+    for (auto &c : children)
+    {
+        c->drawRecursive(pixels);
+    }
+
+    dirty = false;
 }
 
-const std::string& Component::getName()
+const std::string &Component::getName()
 {
-	return name;
+    return name;
 }
 
-void Component::Hide(bool b) 
-{ 
-	if (hidden != b)
-	{
-		hidden = b;
-		dirty = true;
-	}
+void Component::Hide(bool b)
+{
+    if (hidden != b)
+    {
+        hidden = b;
+        dirty = true;
+    }
 
-	for (auto& c : children)
-		c->Hide(b);
+    for (auto &c : children)
+    {
+        c->Hide(b);
+    }
 }
 
 void Component::setSize(int newW, int newH)
 {
-	if (newW == w && newH == h)
-		return;
+    if (newW == w && newH == h)
+    {
+        return;
+    }
 
-	if (!(w == -1 && h == -1))
-	{
-		auto rect = getRect();
-		preDrawClearRect = preDrawClearRect.Union(&rect);
-	}
+    if (!(w == -1 && h == -1))
+    {
+        auto rect = getRect();
+        preDrawClearRect = preDrawClearRect.Union(&rect);
+    }
 
-	w = newW;
-	h = newH;
-	SetDirty();
+    w = newW;
+    h = newH;
+    SetDirty();
 }
 
 void Component::setLocation(int newX, int newY)
 {
-	if (newX == x && newY == y)
-		return;
+    if (newX == x && newY == y)
+    {
+        return;
+    }
 
-	if (!(x == -1 && y == -1))
-	{
-		auto rect = getRect();
-		preDrawClearRect = preDrawClearRect.Union(&rect);
-	}
+    if (!(x == -1 && y == -1))
+    {
+        auto rect = getRect();
+        preDrawClearRect = preDrawClearRect.Union(&rect);
+    }
 
-	x = newX;
-	y = newY;
-	SetDirty();
+    x = newX;
+    y = newY;
+    SetDirty();
 }
 
 MRECT Component::getDirtyArea()
 {
-	MRECT res;
+    MRECT res;
 
-	for (auto c : children)
-	{
-		auto rect = c->getDirtyArea();
-		res = res.Union(&rect);
-	}
+    for (auto c : children)
+    {
+        auto rect = c->getDirtyArea();
+        res = res.Union(&rect);
+    }
 
-	if (dirty)
-	{
-		auto rect = getRect();
-		res = res.Union(&rect);
+    if (dirty)
+    {
+        auto rect = getRect();
+        res = res.Union(&rect);
 
-		if (!preDrawClearRect.Empty())
-			res = res.Union(&preDrawClearRect);
-	}
+        if (!preDrawClearRect.Empty())
+        {
+            res = res.Union(&preDrawClearRect);
+        }
+    }
 
-	return res;
+    return res;
 }
 
-void Component::SetDirty(bool b) 
-{ 
-	if (hidden)
-		return;
+void Component::SetDirty(bool b)
+{
+    if (hidden)
+    {
+        return;
+    }
 
-	for (auto& c : children)
-		c->SetDirty(b);
-	
-	dirty = b;
+    for (auto &c : children)
+    {
+        c->SetDirty(b);
+    }
+
+    dirty = b;
 }
 
 bool Component::IsHidden()
-{ 
-	return hidden; 
+{
+    return hidden;
 }
 
 bool Component::IsDirty()
-{ 
-	auto dirtyChild = false;
+{
+    auto dirtyChild = false;
 
-	for (auto& c : children)
-	{
-		if (c->IsDirty())
-		{
-			dirtyChild = true;
-			break;
-		}
+    for (auto &c : children)
+    {
+        if (c->IsDirty())
+        {
+            dirtyChild = true;
+            break;
+        }
+    }
 
-	}
+    if (dirtyChild)
+    {
+        return true;
+    }
 
-	if (dirtyChild)
-		return true;
+    // if (dirty)
+    // MLOG(name + " is dirty");
 
-	//if (dirty)
-		//MLOG(name + " is dirty");
-
-	return dirty;
+    return dirty;
 }
 
 MRECT Component::getRect()
 {
-	auto x1 = std::max(0, x);
-	auto x2 = std::min(248, x + w);
-	auto y1 = std::max(0, y);
-	auto y2 = std::min(60, y + h);
-	return MRECT(x1, y1, x2, y2);
+    auto x1 = std::max(0, x);
+    auto x2 = std::min(248, x + w);
+    auto y1 = std::max(0, y);
+    auto y2 = std::min(60, y + h);
+    return MRECT(x1, y1, x2, y2);
 }
 
-void Component::Clear(std::vector<std::vector<bool>>* pixels)
+void Component::Clear(std::vector<std::vector<bool>> *pixels)
 {
-	auto r = getRect();
+    auto r = getRect();
 
-	for (int i = r.L; i < r.R; i++)
-	{
-		if (i < 0)
-			continue;
+    for (int i = r.L; i < r.R; i++)
+    {
+        if (i < 0)
+        {
+            continue;
+        }
 
-		for (int j = r.T; j < r.B; j++)
-			(*pixels)[i][j] = false;
-	}
+        for (int j = r.T; j < r.B; j++)
+        {
+            (*pixels)[i][j] = false;
+        }
+    }
 }
 
-void Component::preDrawClear(std::vector<std::vector<bool>>* pixels)
+void Component::preDrawClear(std::vector<std::vector<bool>> *pixels)
 {
-	auto r = preDrawClearRect;
+    auto r = preDrawClearRect;
 
-	for (auto& c : children)
-		c->preDrawClear(pixels);
+    for (auto &c : children)
+    {
+        c->preDrawClear(pixels);
+    }
 
-	if (r.Empty())
-		return;
+    if (r.Empty())
+    {
+        return;
+    }
 
-	for (int i = r.L; i < r.R; i++)
-	{
-		if (i < 0)
-			continue;
+    for (int i = r.L; i < r.R; i++)
+    {
+        if (i < 0)
+        {
+            continue;
+        }
 
-		for (int j = r.T; j < r.B; j++)
-			(*pixels)[i][j] = false;
-	}
+        for (int j = r.T; j < r.B; j++)
+        {
+            (*pixels)[i][j] = false;
+        }
+    }
 
-	preDrawClearRect.Clear();
+    preDrawClearRect.Clear();
 }
 
 std::vector<std::shared_ptr<Component>> Component::findHiddenChildren()
 {
     std::vector<std::shared_ptr<Component>> result;
 
-	for (auto& c : children)
-	{
-		if (c->IsHidden() && c->IsDirty())
-			result.push_back(c);
+    for (auto &c : children)
+    {
+        if (c->IsHidden() && c->IsDirty())
+        {
+            result.push_back(c);
+        }
 
-		for (auto& c1 : c->findHiddenChildren())
-			result.push_back(c1);
-	}
+        for (auto &c1 : c->findHiddenChildren())
+        {
+            result.push_back(c1);
+        }
+    }
 
-	return result;
+    return result;
 }
 
 std::shared_ptr<Background> Component::findBackground()
@@ -443,16 +511,18 @@ std::shared_ptr<Background> Component::findBackground()
     return findChild<Background>("");
 }
 
-void Component::deleteChildren(const std::string& nameOfChildrenToDelete)
+void Component::deleteChildren(const std::string &nameOfChildrenToDelete)
 {
-	for (int i = children.size() - 1; i >= 0; i--)
-	{
-		if (children[i]->getName() == nameOfChildrenToDelete)
-			children.erase(begin(children) + i);
-	}
+    for (int i = children.size() - 1; i >= 0; i--)
+    {
+        if (children[i]->getName() == nameOfChildrenToDelete)
+        {
+            children.erase(begin(children) + i);
+        }
+    }
 }
 
-Component* Component::getParent()
+Component *Component::getParent()
 {
-	return parent;
+    return parent;
 }

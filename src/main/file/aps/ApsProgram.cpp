@@ -14,93 +14,103 @@
 using namespace mpc::file::aps;
 using namespace mpc::engine;
 
-ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
+ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
 {
-	index = loadBytes[INDEX_OFFSET];
-	auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
+    index = loadBytes[INDEX_OFFSET];
+    auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
 
     name = "";
-	
-	for (char c : nameBytes)
-	{
-		if (c == 0x00)
-			break;
-		
-		name.push_back(c);
-	}
+
+    for (char c : nameBytes)
+    {
+        if (c == 0x00)
+        {
+            break;
+        }
+
+        name.push_back(c);
+    }
 
     name = StrUtil::trim(name);
 
-	slider = new ApsSlider(Util::vecCopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
-	
-	for (int i = 0; i < 64; i++)
-	{
-		int offset = NOTE_PARAMETERS_OFFSET + (i * NOTE_PARAMETERS_LENGTH);
-		noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
-	}
+    slider = new ApsSlider(Util::vecCopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
 
-	mixer = new ApsMixer(Util::vecCopyOfRange(loadBytes, MIXER_OFFSET, MIXER_END));
-	assignTable = new ApsAssignTable(Util::vecCopyOfRange(loadBytes, ASSIGN_TABLE_OFFSET, ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
+    for (int i = 0; i < 64; i++)
+    {
+        int offset = NOTE_PARAMETERS_OFFSET + (i * NOTE_PARAMETERS_LENGTH);
+        noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
+    }
+
+    mixer = new ApsMixer(Util::vecCopyOfRange(loadBytes, MIXER_OFFSET, MIXER_END));
+    assignTable = new ApsAssignTable(Util::vecCopyOfRange(loadBytes, ASSIGN_TABLE_OFFSET, ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
 }
 
-ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
+ApsProgram::ApsProgram(mpc::sampler::Program *program, int index)
 {
-	std::vector<std::vector<char>> byteList;
-	this->index = index;
-	byteList.push_back({ (char) index });
-	byteList.push_back(UNKNOWN);
-	auto programName = StrUtil::padRight(program->getName(), " ", 16);
+    std::vector<std::vector<char>> byteList;
+    this->index = index;
+    byteList.push_back({(char)index});
+    byteList.push_back(UNKNOWN);
+    auto programName = StrUtil::padRight(program->getName(), " ", 16);
 
-	for (char c : programName)
-		byteList.push_back({ c });
-	
-	byteList.push_back({ 0 }); // Name terminator
+    for (char c : programName)
+    {
+        byteList.push_back({c});
+    }
 
-	ApsSlider apsSlider(program->getSlider());
-	byteList.push_back(apsSlider.getBytes());
-	byteList.push_back({ 35, 64, 0, 26, 0 });
+    byteList.push_back({0}); // Name terminator
 
-	for (int i = 0; i < 64; i++)
-	{
-		ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(i + 35)));
-		byteList.push_back(np.getBytes());
-	}
-	
-	byteList.push_back({ 6 });
+    ApsSlider apsSlider(program->getSlider());
+    byteList.push_back(apsSlider.getBytes());
+    byteList.push_back({35, 64, 0, 26, 0});
 
-	std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels(64);
-	std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels(64);
-	
-	for (int i = 0; i < 64; i++)
-	{
+    for (int i = 0; i < 64; i++)
+    {
+        ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters *>(program->getNoteParameters(i + 35)));
+        byteList.push_back(np.getBytes());
+    }
+
+    byteList.push_back({6});
+
+    std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels(64);
+    std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels(64);
+
+    for (int i = 0; i < 64; i++)
+    {
         stereoMixerChannels[i] = program->getStereoMixerChannel(i);
         indivFxMixerChannels[i] = program->getIndivFxMixerChannel(i);
-	}
+    }
 
-	ApsMixer apsMixer(stereoMixerChannels, indivFxMixerChannels);
-	byteList.push_back(apsMixer.getBytes());
-	byteList.push_back({ 0, 64, 0 });
-	auto apsAssignTable = std::vector<int>(64);
-	
-	for (int i = 0; i < 64; i++)
-		apsAssignTable[i] = program->getNoteFromPad(i);
+    ApsMixer apsMixer(stereoMixerChannels, indivFxMixerChannels);
+    byteList.push_back(apsMixer.getBytes());
+    byteList.push_back({0, 64, 0});
+    auto apsAssignTable = std::vector<int>(64);
 
-	ApsAssignTable table(apsAssignTable);
-	byteList.push_back(table.getBytes());
-	byteList.push_back(mpc::file::pgmwriter::Pads::getFxBoardSettings());
-	auto totalSize = 0;
+    for (int i = 0; i < 64; i++)
+    {
+        apsAssignTable[i] = program->getNoteFromPad(i);
+    }
 
-	for (auto& ba : byteList)
-		totalSize += ba.size();
+    ApsAssignTable table(apsAssignTable);
+    byteList.push_back(table.getBytes());
+    byteList.push_back(mpc::file::pgmwriter::Pads::getFxBoardSettings());
+    auto totalSize = 0;
 
-	saveBytes = std::vector<char>(totalSize);
-	auto counter = 0;
+    for (auto &ba : byteList)
+    {
+        totalSize += ba.size();
+    }
 
-	for (auto& ba : byteList)
-	{
-		for (auto b : ba)
-			saveBytes[counter++] = b;
-	}
+    saveBytes = std::vector<char>(totalSize);
+    auto counter = 0;
+
+    for (auto &ba : byteList)
+    {
+        for (auto b : ba)
+        {
+            saveBytes[counter++] = b;
+        }
+    }
 }
 
 const int ApsProgram::NAME_OFFSET;
@@ -118,22 +128,22 @@ const int ApsProgram::PADDING3_LENGTH;
 const int ApsProgram::ASSIGN_TABLE_OFFSET;
 const int ApsProgram::ASSIGN_TABLE_LENGTH;
 
-ApsNoteParameters* ApsProgram::getNoteParameters(int noteIndex)
+ApsNoteParameters *ApsProgram::getNoteParameters(int noteIndex)
 {
     return noteParameters[noteIndex];
 }
 
-ApsMixer* ApsProgram::getMixer()
+ApsMixer *ApsProgram::getMixer()
 {
     return mixer;
 }
 
-ApsAssignTable* ApsProgram::getAssignTable()
+ApsAssignTable *ApsProgram::getAssignTable()
 {
     return assignTable;
 }
 
-ApsSlider* ApsProgram::getSlider()
+ApsSlider *ApsProgram::getSlider()
 {
     return slider;
 }
@@ -150,20 +160,34 @@ std::vector<char> ApsProgram::getBytes()
 
 StereoMixer ApsProgram::getStereoMixerChannel(int noteIndex)
 {
-	return mixer->getStereoMixerChannel(noteIndex);
+    return mixer->getStereoMixerChannel(noteIndex);
 }
 
 IndivFxMixer ApsProgram::getIndivFxMixerChannel(int noteIndex)
 {
-	return mixer->getIndivFxMixerChannel(noteIndex);
+    return mixer->getIndivFxMixerChannel(noteIndex);
 }
 
 ApsProgram::~ApsProgram()
 {
-	if (slider != nullptr) delete slider;
-	if (mixer != nullptr)delete mixer;
-	if (assignTable != nullptr) delete assignTable;
-	
-	for (auto& np : noteParameters)
-		if (np != nullptr) delete np;
+    if (slider != nullptr)
+    {
+        delete slider;
+    }
+    if (mixer != nullptr)
+    {
+        delete mixer;
+    }
+    if (assignTable != nullptr)
+    {
+        delete assignTable;
+    }
+
+    for (auto &np : noteParameters)
+    {
+        if (np != nullptr)
+        {
+            delete np;
+        }
+    }
 }

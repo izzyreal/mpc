@@ -16,13 +16,13 @@ using namespace mpc;
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens::window;
 
-void prepareResources(mpc::Mpc& mpc)
+void prepareResources(mpc::Mpc &mpc)
 {
     auto disk = mpc.getDisk();
 
     auto fs = cmrc::mpctest::get_filesystem();
 
-    for (auto &&entry: fs.iterate_directory("test/ProgramLoading"))
+    for (auto &&entry : fs.iterate_directory("test/ProgramLoading"))
     {
         assert(entry.is_directory());
 
@@ -31,10 +31,10 @@ void prepareResources(mpc::Mpc& mpc)
         disk->moveForward(entry.filename());
         disk->initFiles();
 
-        for (auto &&entry2: fs.iterate_directory("test/ProgramLoading/" + entry.filename()))
+        for (auto &&entry2 : fs.iterate_directory("test/ProgramLoading/" + entry.filename()))
         {
             auto file = fs.open("test/ProgramLoading/" + entry.filename() + "/" + entry2.filename());
-            char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
+            char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
             auto newFile = disk->newFile(entry2.filename());
             std::vector<char> dataVec(data, data + file.size());
             newFile->setFileData(dataVec);
@@ -45,11 +45,11 @@ void prepareResources(mpc::Mpc& mpc)
     }
 }
 
-void doTest(mpc::Mpc& mpc,
+void doTest(mpc::Mpc &mpc,
             const bool clear,
             const bool replaceSameSounds,
-            std::shared_ptr<sampler::Program>& p1,
-            std::shared_ptr<sampler::Program>& p2)
+            std::shared_ptr<sampler::Program> &p1,
+            std::shared_ptr<sampler::Program> &p2)
 {
     mpc.screens->get<LoadAProgramScreen>()->setLoadReplaceSameSound(replaceSameSounds);
 
@@ -144,11 +144,11 @@ TEST_CASE("Load 2 programs in Add to P & S mode", "[load-programs]")
     }
 }
 
-void doTestWithMissingSound(mpc::Mpc& mpc,
+void doTestWithMissingSound(mpc::Mpc &mpc,
                             const bool clear,
                             const bool replaceSameSounds,
-                            std::shared_ptr<sampler::Program>& p1,
-                            std::shared_ptr<sampler::Program>& p2)
+                            std::shared_ptr<sampler::Program> &p1,
+                            std::shared_ptr<sampler::Program> &p2)
 {
     mpc.screens->get<LoadAProgramScreen>()->setLoadReplaceSameSound(replaceSameSounds);
 
@@ -167,9 +167,10 @@ void doTestWithMissingSound(mpc::Mpc& mpc,
 
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
-    std::thread loadThread([&](){
-        ProgramLoader::loadProgram(mpc, pgmFile1, p1);
-    });
+    std::thread loadThread([&]()
+                           {
+                               ProgramLoader::loadProgram(mpc, pgmFile1, p1);
+                           });
 
     int counter = 0;
 

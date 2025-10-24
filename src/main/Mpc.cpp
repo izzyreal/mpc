@@ -46,35 +46,33 @@ Mpc::Mpc()
 
 void Mpc::init()
 {
-    std::vector<fs::path> requiredPaths {
+    std::vector<fs::path> requiredPaths{
         paths->appDocumentsPath(),
         paths->configPath(),
         paths->storesPath(),
         paths->defaultLocalVolumePath(),
         paths->recordingsPath(),
-        paths->autoSavePath()
-    };
-    
-    for (auto& p : requiredPaths)
+        paths->autoSavePath()};
+
+    for (auto &p : requiredPaths)
     {
         if (!fs::exists(p))
         {
             fs::create_directories(p);
         }
     }
-    
+
     fs::create_directories(paths->demoDataPath() / "TEST1");
     fs::create_directories(paths->demoDataPath() / "TEST2");
     fs::create_directories(paths->demoDataPath() / "TRAIN1");
     fs::create_directories(paths->demoDataPath() / "RESIST");
 
-    for (const auto& demo_file : demo_files)
+    for (const auto &demo_file : demo_files)
     {
         const auto dst = paths->demoDataPath() / demo_file;
-        const bool should_update = !fs::exists(dst)
-            || std::find(always_update_demo_files.begin(),
-                         always_update_demo_files.end(),
-                         demo_file) != always_update_demo_files.end();
+        const bool should_update = !fs::exists(dst) || std::find(always_update_demo_files.begin(),
+                                                                 always_update_demo_files.end(),
+                                                                 demo_file) != always_update_demo_files.end();
 
         if (should_update)
         {
@@ -82,89 +80,89 @@ void Mpc::init()
             set_file_data(dst, data);
         }
     }
-    
+
     fs::create_directories(paths->midiControlPresetsPath());
-    
-    const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp" };
-    
-    for (auto& preset : factory_midi_control_presets)
+
+    const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp"};
+
+    for (auto &preset : factory_midi_control_presets)
     {
         const auto data = mpc::MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
-        
+
         if (!fs::exists(paths->midiControlPresetsPath() / preset) || fs::file_size(paths->midiControlPresetsPath() / preset) != data.size())
         {
             set_file_data(paths->midiControlPresetsPath() / preset, data);
         }
     }
-    
+
     mpc::Logger::l.setPath(paths->logFilePath().string());
-    
+
     padAndButtonKeyboard = std::make_shared<mpc::input::PadAndButtonKeyboard>(*this);
-    
+
     diskController = std::make_unique<mpc::disk::DiskController>(*this);
-    
+
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
-    
+
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
     MLOG("Sequencer created");
 
     inputController = std::make_shared<mpc::controller::ClientHardwareController>(*this, paths->configPath());
-    
+
     hardware = std::make_shared<hardware::Hardware>();
-    
+
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
     MLOG("Sampler created");
-    
-    midiInputs = { new mpc::audiomidi::MidiInput(*this, 0), new mpc::audiomidi::MidiInput(*this, 1) };
-    
+
+    midiInputs = {new mpc::audiomidi::MidiInput(*this, 0), new mpc::audiomidi::MidiInput(*this, 1)};
+
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
-    
+
     layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
-    
+
     screens = std::make_shared<Screens>(*this);
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
     // avoiding memory allocations and I/O on the audio thread.
     screens->createAndCacheAllScreens();
-    
+
     /*
      * AudioMidiServices requires sequencer to exist.
      */
     audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
     MLOG("AudioMidiServices created");
-    
+
     sequencer->init();
     MLOG("Sequencer initialized");
-    
+
     audioMidiServices->start();
     MLOG("AudioMidiServices started");
-    
+
     // This needs to happen before the sampler initializes initMasterPadAssign
     // which we do in Sampler::init()
     mpc::nvram::NvRam::loadVmpcSettings(*this);
-    
+
     sampler->init();
     MLOG("Sampler initialized");
-    
+
     eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
     MLOG("Eeventhandler created");
-    
+
     mpc::nvram::NvRam::loadUserScreenValues(*this);
-    
+
     mpc::nvram::MidiControlPersistence::restoreLastState(*this);
-    
+
     midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
-    
+
     MLOG("Mpc is ready");
-    
+
     layeredScreen->openScreen<SequencerScreen>();
 }
 
 std::shared_ptr<hardware::Hardware> Mpc::getHardware()
 {
-	return hardware;
+    return hardware;
 }
 
-void Mpc::dispatchHostInput(const mpc::input::HostInputEvent& hostEvent)
+void Mpc::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
 {
     inputController->dispatchHostInput(hostEvent);
 }
@@ -179,14 +177,14 @@ std::shared_ptr<sampler::Sampler> Mpc::getSampler()
     return sampler;
 }
 
-mpc::engine::Drum& Mpc::getDrum(int i)
+mpc::engine::Drum &Mpc::getDrum(int i)
 {
-	return audioMidiServices->getDrum(i);
+    return audioMidiServices->getDrum(i);
 }
 
-mpc::engine::PreviewSoundPlayer& Mpc::getBasicPlayer()
+mpc::engine::PreviewSoundPlayer &Mpc::getBasicPlayer()
 {
-	return audioMidiServices->getBasicPlayer();
+    return audioMidiServices->getBasicPlayer();
 }
 
 std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
@@ -194,21 +192,24 @@ std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
     return audioMidiServices;
 }
 
-std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler() {
-	return eventHandler;
+std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler()
+{
+    return eventHandler;
 }
 
-std::shared_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
-	return layeredScreen;
+std::shared_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen()
+{
+    return layeredScreen;
 }
 
-std::shared_ptr<lcdgui::ScreenComponent> Mpc::getScreen() {
-	return layeredScreen->getCurrentScreen();
+std::shared_ptr<lcdgui::ScreenComponent> Mpc::getScreen()
+{
+    return layeredScreen->getCurrentScreen();
 }
 
 std::shared_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
 {
-	return diskController->getActiveDisk();
+    return diskController->getActiveDisk();
 }
 
 std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
@@ -216,44 +217,44 @@ std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
     return diskController->getDisks();
 }
 
-std::vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
-std::vector<std::string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
+std::vector<char> Mpc::akaiAsciiChar{' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}'};
+std::vector<std::string> Mpc::akaiAscii{" ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}"};
 
 std::shared_ptr<audiomidi::MidiOutput> Mpc::getMidiOutput()
 {
-	return midiOutput;
+    return midiOutput;
 }
 
-audiomidi::MidiInput* Mpc::getMpcMidiInput(int i)
+audiomidi::MidiInput *Mpc::getMpcMidiInput(int i)
 {
-	return midiInputs[i];
+    return midiInputs[i];
 }
 
 void Mpc::setBank(int i)
 {
-	if (i == bank)
+    if (i == bank)
     {
-		return;
+        return;
     }
 
-	if (i < 0 || i > 3)
+    if (i < 0 || i > 3)
     {
-		return;
+        return;
     }
 
-	bank = i;
+    bank = i;
 
-	notifyObservers(std::string("bank"));
+    notifyObservers(std::string("bank"));
 
-	hardware->getLed(hardware::ComponentId::BANK_A_LED)->setEnabled(i == 0);
-	hardware->getLed(hardware::ComponentId::BANK_B_LED)->setEnabled(i == 1);
-	hardware->getLed(hardware::ComponentId::BANK_C_LED)->setEnabled(i == 2);
-	hardware->getLed(hardware::ComponentId::BANK_D_LED)->setEnabled(i == 3);
+    hardware->getLed(hardware::ComponentId::BANK_A_LED)->setEnabled(i == 0);
+    hardware->getLed(hardware::ComponentId::BANK_B_LED)->setEnabled(i == 1);
+    hardware->getLed(hardware::ComponentId::BANK_C_LED)->setEnabled(i == 2);
+    hardware->getLed(hardware::ComponentId::BANK_D_LED)->setEnabled(i == 3);
 }
 
 int Mpc::getBank()
 {
-	return bank;
+    return bank;
 }
 
 void Mpc::setNote(int newNote)
@@ -264,15 +265,15 @@ void Mpc::setNote(int newNote)
 
 int Mpc::getNote()
 {
-	return note;
+    return note;
 }
 
 int Mpc::getPad()
 {
-	return pad;
+    return pad;
 }
 
-mpc::disk::DiskController* Mpc::getDiskController()
+mpc::disk::DiskController *Mpc::getDiskController()
 {
     return diskController.get();
 }
@@ -293,21 +294,23 @@ Mpc::~Mpc()
     }
 
     mpc::nvram::MidiControlPersistence::saveCurrentState(*this);
-	mpc::nvram::NvRam::saveUserScreenValues(*this);
-	mpc::nvram::NvRam::saveVmpcSettings(*this);
+    mpc::nvram::NvRam::saveUserScreenValues(*this);
+    mpc::nvram::NvRam::saveVmpcSettings(*this);
 
-	for (auto& m : midiInputs)
-	{
-		if (m != nullptr)
-			delete m;
-	}
+    for (auto &m : midiInputs)
+    {
+        if (m != nullptr)
+        {
+            delete m;
+        }
+    }
 
-	if (layeredScreen)
+    if (layeredScreen)
     {
         layeredScreen.reset();
     }
 
-	if (audioMidiServices)
+    if (audioMidiServices)
     {
         audioMidiServices->destroyServices();
     }
@@ -387,4 +390,3 @@ std::shared_ptr<mpc::input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
 {
     return padAndButtonKeyboard;
 }
-

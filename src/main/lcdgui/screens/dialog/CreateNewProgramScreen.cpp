@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 
-CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "create-new-program", layerIndex)
+CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "create-new-program", layerIndex)
 {
 }
 
@@ -15,7 +15,7 @@ void CreateNewProgramScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "midi-program-change")
+    if (focusedFieldName == "midi-program-change")
     {
         setMidiProgramChange(midiProgramChange + i);
     }
@@ -28,7 +28,8 @@ void CreateNewProgramScreen::openNameScreen()
 
     if (focusedFieldName == "new-name")
     {
-        const auto enterAction = [this](std::string& nameScreenName) {
+        const auto enterAction = [this](std::string &nameScreenName)
+        {
             newName = nameScreenName;
             mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
         };
@@ -44,7 +45,7 @@ void CreateNewProgramScreen::open()
     if (ls->isPreviousScreenNot<NameScreen>())
     {
         auto letterIndex = 21 + 24;
-        
+
         for (int i = 0; i < sampler->getPrograms().size(); i++)
         {
             if (!sampler->getProgram(i))
@@ -54,63 +55,70 @@ void CreateNewProgramScreen::open()
                 break;
             }
         }
-        
+
         newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterIndex];
     }
-    
 
-	displayNewName();
-	displayMidiProgramChange();
+    displayNewName();
+    displayMidiProgramChange();
 }
 
 void CreateNewProgramScreen::function(int i)
 {
-	
-	switch (i)
-	{
-	case 3:
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-		break;
-	case 4:
-		auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
-		newProgram->setName(newName);
-		newProgram->setMidiProgramChange(midiProgramChange);
-		
-		auto index = sampler->getProgramCount() - 1;
 
-		for (int j = 0; j < sampler->getPrograms().size(); j++)
-		{
-			if (sampler->getProgram(j) == newProgram)
-			{
-				index = j;
-				break;
-			}
-		}
-
-            activeDrum().setProgram(index);
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-		break;
-	}
+        break;
+    case 4:
+        auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
+        newProgram->setName(newName);
+        newProgram->setMidiProgramChange(midiProgramChange);
+
+        auto index = sampler->getProgramCount() - 1;
+
+        for (int j = 0; j < sampler->getPrograms().size(); j++)
+        {
+            if (sampler->getProgram(j) == newProgram)
+            {
+                index = j;
+                break;
+            }
+        }
+
+        activeDrum().setProgram(index);
+        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+        break;
+    }
 }
 
 void CreateNewProgramScreen::displayMidiProgramChange()
 {
-	findField("midi-program-change")->setTextPadded(midiProgramChange);
+    findField("midi-program-change")->setTextPadded(midiProgramChange);
 }
 
 void CreateNewProgramScreen::displayNewName()
 {
-	findField("new-name")->setText(newName);
+    findField("new-name")->setText(newName);
 }
 
 void CreateNewProgramScreen::setMidiProgramChange(int i)
 {
-    if (i < 1) i = 1;
-    else if (i > 128) i = 128;
+    if (i < 1)
+    {
+        i = 1;
+    }
+    else if (i > 128)
+    {
+        i = 128;
+    }
 
-	if (midiProgramChange == i)
-		return;
+    if (midiProgramChange == i)
+    {
+        return;
+    }
 
-	midiProgramChange = i;
-	displayMidiProgramChange();
+    midiProgramChange = i;
+    displayMidiProgramChange();
 }

@@ -1,12 +1,15 @@
 #include "PushDownCommand.hpp"
 #include "Mpc.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushDownCommand::PushDownCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushDownCommand::execute() {
-        if (!mpc.getLayeredScreen()->getFocusedField() || mpc.getLayeredScreen()->getFocusedFieldName() == "dummy") {
+    void PushDownCommand::execute()
+    {
+        if (!mpc.getLayeredScreen()->getFocusedField() || mpc.getLayeredScreen()->getFocusedFieldName() == "dummy")
+        {
             return;
         }
 

@@ -3,21 +3,23 @@
 
 namespace mpc::sequencer
 {
-	class ProgramChangeEvent
-		: public Event
-	{
+    class ProgramChangeEvent
+        : public Event
+    {
 
-	private:
-		int programChangeValue = 0;
+    private:
+        int programChangeValue = 0;
 
-	public:
-		void setProgram(int i);
-		int getProgram() const;
+    public:
+        void setProgram(int i);
+        int getProgram() const;
 
-		ProgramChangeEvent() = default;
-		ProgramChangeEvent(const ProgramChangeEvent& event);
+        ProgramChangeEvent() = default;
+        ProgramChangeEvent(const ProgramChangeEvent &event);
 
-		std::string getTypeName() override { return "program-change"; }
-
-	};
-}
+        std::string getTypeName() override
+        {
+            return "program-change";
+        }
+    };
+} // namespace mpc::sequencer

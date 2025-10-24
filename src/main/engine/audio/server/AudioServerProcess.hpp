@@ -4,12 +4,14 @@
 
 #include <string>
 
-namespace mpc::engine::audio {
+namespace mpc::engine::audio
+{
 
-    namespace server {
+    namespace server
+    {
 
         class AudioServerProcess
-                : public IOAudioProcess
+            : public IOAudioProcess
         {
 
         private:
@@ -21,5 +23,5 @@ namespace mpc::engine::audio {
             AudioServerProcess(std::string name);
         };
 
-    }
-}
+    } // namespace server
+} // namespace mpc::engine::audio

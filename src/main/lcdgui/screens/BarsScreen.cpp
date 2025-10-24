@@ -10,8 +10,8 @@
 
 using namespace mpc::lcdgui::screens;
 
-BarsScreen::BarsScreen(mpc::Mpc& mpc, const int layerIndex)
-        : ScreenComponent(mpc, "bars", layerIndex)
+BarsScreen::BarsScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "bars", layerIndex)
 {
 }
 
@@ -60,29 +60,29 @@ void BarsScreen::function(int j)
 
     switch (j)
     {
-        // Intentional fall-through
-        case 0:
-        case 2:
-        case 3:
-            eventsScreen->tab = j;
-            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
-            break;
-        case 4:
-            break;
-        case 5:
-        {
-            copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
-            sequencer.lock()->setActiveSequenceIndex(eventsScreen->toSq);
+    // Intentional fall-through
+    case 0:
+    case 2:
+    case 3:
+        eventsScreen->tab = j;
+        mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+        break;
+    case 4:
+        break;
+    case 5:
+    {
+        copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
+        sequencer.lock()->setActiveSequenceIndex(eventsScreen->toSq);
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            break;
-        }
+        break;
+    }
     }
 }
 
 void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar, int copyCount, int copyAfterBar)
 {
     const auto fromSequenceIndex = sequencer.lock()->getActiveSequenceIndex();
-    mpc::sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex,toSeqIndex, copyFirstBar, copyLastBar, copyCount, copyAfterBar);
+    mpc::sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex, copyFirstBar, copyLastBar, copyCount, copyAfterBar);
 }
 
 void BarsScreen::turnWheel(int i)
@@ -216,7 +216,9 @@ void BarsScreen::setLastBar(int i, int max)
     lastBar = i;
 
     if (lastBar < firstBar)
+    {
         setFirstBar(lastBar, max);
+    }
 
     displayLastBar();
 }
@@ -239,7 +241,9 @@ void BarsScreen::setFirstBar(int i, int max)
     firstBar = i;
 
     if (firstBar > lastBar)
+    {
         setLastBar(firstBar, max);
+    }
 
     displayFirstBar();
 }
@@ -267,7 +271,9 @@ void BarsScreen::setAfterBar(int i, int max)
 void BarsScreen::setCopies(int i)
 {
     if (i < 1 || i > 999)
+    {
         return;
+    }
 
     auto eventsScreen = mpc.screens->get<EventsScreen>();
     eventsScreen->copies = i;

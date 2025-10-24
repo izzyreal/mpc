@@ -1,40 +1,42 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::nvram { class NvRam; }
+namespace mpc::nvram
+{
+    class NvRam;
+}
 
 namespace mpc::lcdgui::screens
 {
-class VmpcAutoSaveScreen
-: public mpc::lcdgui::ScreenComponent
-{
+    class VmpcAutoSaveScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-public:
-    void turnWheel(int i) override;
-    
-    VmpcAutoSaveScreen(mpc::Mpc& mpc, const int layerIndex);
-    
-    void open() override;
-    void function(int) override;
-    
-private:
-    const std::vector<std::string> autoSaveOnExitNames{ "Disabled", "Enabled" };
-    const std::vector<std::string> autoLoadOnStartNames{ "Disabled", "Ask", "Enabled" };
-    
-    int autoSaveOnExit = 1;
-    int autoLoadOnStart = 1;
-    
-    void displayAutoSaveOnExit();
-    void displayAutoLoadOnStart();
+    public:
+        void turnWheel(int i) override;
 
-    friend class mpc::nvram::NvRam;
+        VmpcAutoSaveScreen(mpc::Mpc &mpc, const int layerIndex);
 
-public:
-    void setAutoSaveOnExit(int i);
-    void setAutoLoadOnStart(int i);
-    
-    int getAutoSaveOnExit();
-    int getAutoLoadOnStart();
+        void open() override;
+        void function(int) override;
 
-};
-}
+    private:
+        const std::vector<std::string> autoSaveOnExitNames{"Disabled", "Enabled"};
+        const std::vector<std::string> autoLoadOnStartNames{"Disabled", "Ask", "Enabled"};
+
+        int autoSaveOnExit = 1;
+        int autoLoadOnStart = 1;
+
+        void displayAutoSaveOnExit();
+        void displayAutoLoadOnStart();
+
+        friend class mpc::nvram::NvRam;
+
+    public:
+        void setAutoSaveOnExit(int i);
+        void setAutoLoadOnStart(int i);
+
+        int getAutoSaveOnExit();
+        int getAutoLoadOnStart();
+    };
+} // namespace mpc::lcdgui::screens

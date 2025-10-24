@@ -3,31 +3,33 @@
 #include <memory>
 #include <vector>
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
 namespace mpc::sampler
 {
-	class Pad
-	{
+    class Pad
+    {
 
-	private:
-		static std::vector<int> originalPadNotes;
+    private:
+        static std::vector<int> originalPadNotes;
 
-	public:
-		static std::vector<int>& getPadNotes(mpc::Mpc& mpc);
+    public:
+        static std::vector<int> &getPadNotes(mpc::Mpc &mpc);
 
-	private:
-		mpc::Mpc& mpc;
-		int note = 0;
-		int index = 0;
+    private:
+        mpc::Mpc &mpc;
+        int note = 0;
+        int index = 0;
 
-	public:
-		void setNote(int i);
-		int getNote();
-		int getIndex();
+    public:
+        void setNote(int i);
+        int getNote();
+        int getIndex();
 
-	public:
-		Pad(mpc::Mpc& mpc, int indexToUse);
-
-	};
-}
+    public:
+        Pad(mpc::Mpc &mpc, int indexToUse);
+    };
+} // namespace mpc::sampler

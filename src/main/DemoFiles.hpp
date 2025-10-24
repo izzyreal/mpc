@@ -3,12 +3,12 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc
+{
     inline const std::vector<std::string> always_update_demo_files{
         "TEST1/BASIC_KIT.ALL",
         "TEST2/FRUTZLE.ALL",
-        "TRAIN1/ALL_SEQ_SONG1.ALL"
-    };
+        "TRAIN1/ALL_SEQ_SONG1.ALL"};
 
     inline const std::vector<std::string> demo_files{
         "TEST1/BASIC_KIT.ALL", "TEST1/BASIC_KIT.APS", "TEST1/BASIC_KIT.MID", "TEST1/BASIC_KIT.PGM",
@@ -26,6 +26,5 @@ namespace mpc {
         "RESIST/ITSNUFFIN.SND", "RESIST/JON1.SND", "RESIST/JON2.SND",
         "RESIST/JON3.SND", "RESIST/JON4.SND", "RESIST/OUTOFCONTROL.SND",
         "RESIST/RESIST.ALL", "RESIST/RESIST.APS", "RESIST/SOONENUF.SND",
-        "RESIST/WHENAMETCHU.SND"
-    };
+        "RESIST/WHENAMETCHU.SND"};
 } // namespace mpc

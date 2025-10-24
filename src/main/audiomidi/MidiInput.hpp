@@ -10,13 +10,18 @@
 
 #include <memory>
 
-namespace mpc::engine::midi { class ShortMessage; }
+namespace mpc::engine::midi
+{
+    class ShortMessage;
+}
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
     class MidiOutput;
 }
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
     class MidiInput : public Observable
     {
     private:
@@ -28,28 +33,30 @@ namespace mpc::audiomidi {
         std::string notify;
 
         const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
-        mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>> noteEventStore;
+        mpc::sequencer::NoteEventStore<std::pair<int /*track*/, int /*note*/>> noteEventStore;
 
     public:
         void transport(mpc::engine::midi::MidiMessage *msg, int timestamp);
-        void clearNoteEventStore() { noteEventStore.clearPlayAndRecordStore(); }
+        void clearNoteEventStore()
+        {
+            noteEventStore.clearPlayAndRecordStore();
+        }
 
     private:
-        void midiOut(sequencer::Track* track);
+        void midiOut(sequencer::Track *track);
 
-        void transportOmni(mpc::engine::midi::MidiMessage *msg, const std::string& outputLetter);
-        
-        void handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
-        void handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
+        void transportOmni(mpc::engine::midi::MidiMessage *msg, const std::string &outputLetter);
 
-        void handleMidiClock(mpc::engine::midi::ShortMessage* msg);
+        void handleNoteOn(mpc::engine::midi::ShortMessage *msg, const int &timeStamp);
+        void handleNoteOff(mpc::engine::midi::ShortMessage *msg, const int &timeStamp);
 
-        void handleControlChange(mpc::engine::midi::ShortMessage* msg);
+        void handleMidiClock(mpc::engine::midi::ShortMessage *msg);
 
-        void handleChannelPressure(mpc::engine::midi::ShortMessage* msg);
+        void handleControlChange(mpc::engine::midi::ShortMessage *msg);
+
+        void handleChannelPressure(mpc::engine::midi::ShortMessage *msg);
 
     public:
         MidiInput(mpc::Mpc &mpc, int index);
-
     };
-}
+} // namespace mpc::audiomidi

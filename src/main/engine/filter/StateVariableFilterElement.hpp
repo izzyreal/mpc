@@ -1,6 +1,7 @@
 #pragma once
 
-namespace mpc::engine::filter {
+namespace mpc::engine::filter
+{
 
     class StateVariableFilterElement
     {
@@ -17,4 +18,4 @@ namespace mpc::engine::filter {
         float filter(float in, float freq, float damp);
     };
 
-}
+} // namespace mpc::engine::filter

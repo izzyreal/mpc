@@ -13,15 +13,20 @@
 #include <functional>
 #include <atomic>
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window
+{
     class CountMetronomeScreen;
 
     class TimingCorrectScreen;
-}
+} // namespace mpc::lcdgui::screens::window
 
-namespace mpc::lcdgui::screens {
+namespace mpc::lcdgui::screens
+{
     class SequencerScreen;
 
     class UserScreen;
@@ -29,9 +34,10 @@ namespace mpc::lcdgui::screens {
     class PunchScreen;
 
     class SongScreen;
-}
+} // namespace mpc::lcdgui::screens
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 
     class Sequencer;
 
@@ -112,6 +118,5 @@ namespace mpc::sequencer {
         void enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames);
 
         uint64_t getMetronomeOnlyTickPosition();
-
     };
-}
+} // namespace mpc::sequencer

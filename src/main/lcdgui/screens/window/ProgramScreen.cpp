@@ -5,15 +5,15 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "program", layerIndex)
+ProgramScreen::ProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "program", layerIndex)
 {
 }
 
 void ProgramScreen::open()
 {
-	displayProgramName();
-	displayMidiProgramChange();
+    displayProgramName();
+    displayMidiProgramChange();
 }
 
 void ProgramScreen::openNameScreen()
@@ -25,7 +25,8 @@ void ProgramScreen::openNameScreen()
     {
         auto program = getProgramOrThrow();
 
-        const auto enterAction = [this, program](std::string& nameScreenName) {
+        const auto enterAction = [this, program](std::string &nameScreenName)
+        {
             program->setName(nameScreenName);
             mpc.getLayeredScreen()->openScreen<ProgramScreen>();
         };
@@ -41,48 +42,48 @@ void ProgramScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "midiprogramchange")
-	{
+    if (focusedFieldName == "midiprogramchange")
+    {
         auto program = getProgramOrThrow();
-		program->setMidiProgramChange(program->getMidiProgramChange() + i);
-		displayMidiProgramChange();
-	}
+        program->setMidiProgramChange(program->getMidiProgramChange() + i);
+        displayMidiProgramChange();
+    }
 }
 
 void ProgramScreen::function(int i)
 {
-	ScreenComponent::function(i);
+    ScreenComponent::function(i);
 
-	switch (i)
-	{
-	case 1:
+    switch (i)
+    {
+    case 1:
         mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
-		break;
-	case 2:
-	{
-		if (sampler->getProgramCount() == 24)
-		{
-			ls->showPopupAndAwaitInteraction("Prog. directory full(24 max)");
-			return;
-		}
-		
+        break;
+    case 2:
+    {
+        if (sampler->getProgramCount() == 24)
+        {
+            ls->showPopupAndAwaitInteraction("Prog. directory full(24 max)");
+            return;
+        }
+
         mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
-		break;
-	}
-	case 4:
+        break;
+    }
+    case 4:
         mpc.getLayeredScreen()->openScreen<CopyProgramScreen>();
-		break;
-	}
+        break;
+    }
 }
 
 void ProgramScreen::displayProgramName()
 {
     auto program = getProgramOrThrow();
-	findField("programname")->setText(program->getName());
+    findField("programname")->setText(program->getName());
 }
 
 void ProgramScreen::displayMidiProgramChange()
 {
     auto program = getProgramOrThrow();
-	findField("midiprogramchange")->setTextPadded(program->getMidiProgramChange(), " ");
+    findField("midiprogramchange")->setTextPadded(program->getMidiProgramChange(), " ");
 }

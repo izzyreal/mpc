@@ -2,7 +2,8 @@
 
 #include <cstdint>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     struct MixerControlsIds
     {
@@ -12,4 +13,4 @@ namespace mpc::engine::audio::mixer {
         static const int AUX_BUS{126};
         static const int MAIN_BUS{127};
     };
-}
+} // namespace mpc::engine::audio::mixer

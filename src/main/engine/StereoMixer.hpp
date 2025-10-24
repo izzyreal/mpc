@@ -1,22 +1,22 @@
 #pragma once
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
-		class StereoMixer
-		{
+    class StereoMixer
+    {
 
-		private:
-			int panning = 0;
-			int level = 0;
+    private:
+        int panning = 0;
+        int level = 0;
 
-		public:
-			void setPanning(int i);
-			int getPanning();
-			void setLevel(int i);
-			int getLevel();
+    public:
+        void setPanning(int i);
+        int getPanning();
+        void setLevel(int i);
+        int getLevel();
 
-		public:
-			StereoMixer();
-
-		};
-}
+    public:
+        StereoMixer();
+    };
+} // namespace mpc::engine

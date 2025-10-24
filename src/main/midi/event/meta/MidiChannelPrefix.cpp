@@ -9,10 +9,10 @@
 using namespace mpc::midi::event::meta;
 
 MidiChannelPrefix::MidiChannelPrefix(int tick, int delta, int channel)
-	: MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX)
+    : MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX)
 {
-	mChannel = channel;
-	mLength = mpc::midi::util::VariableLengthInt(4);
+    mChannel = channel;
+    mLength = mpc::midi::util::VariableLengthInt(4);
 }
 
 void MidiChannelPrefix::setChannel(int c)
@@ -30,23 +30,24 @@ int MidiChannelPrefix::getEventSize()
     return 4;
 }
 
-void MidiChannelPrefix::writeToOutputStream(std::ostream& out)
+void MidiChannelPrefix::writeToOutputStream(std::ostream &out)
 {
     MetaEvent::writeToOutputStream(out);
-    out << (char) 1;
-    out << (char) mChannel;
+    out << (char)1;
+    out << (char)mChannel;
 }
 
-std::shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta, MetaEventData* info)
+std::shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta, MetaEventData *info)
 {
-	if (info->length.getValue() != 1) {
-		return std::make_shared<GenericMetaEvent>(tick, delta, info);
-	}
-	int channel = info->data[0];
-	return std::make_shared<MidiChannelPrefix>(tick, delta, channel);
+    if (info->length.getValue() != 1)
+    {
+        return std::make_shared<GenericMetaEvent>(tick, delta, info);
+    }
+    int channel = info->data[0];
+    return std::make_shared<MidiChannelPrefix>(tick, delta, channel);
 }
 
-int MidiChannelPrefix::compareTo(mpc::midi::event::MidiEvent* other)
+int MidiChannelPrefix::compareTo(mpc::midi::event::MidiEvent *other)
 {
     return 0;
 }

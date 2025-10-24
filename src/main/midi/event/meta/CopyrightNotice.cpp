@@ -5,7 +5,7 @@
 using namespace mpc::midi::event::meta;
 
 CopyrightNotice::CopyrightNotice(int tick, int delta, std::string text)
-: TextualMetaEvent(tick, delta, MetaEvent::COPYRIGHT_NOTICE, text)
+    : TextualMetaEvent(tick, delta, MetaEvent::COPYRIGHT_NOTICE, text)
 {
 }
 

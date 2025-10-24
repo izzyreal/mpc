@@ -7,7 +7,8 @@
 
 namespace mpc::controller
 {
-class ButtonLockTracker {
+    class ButtonLockTracker
+    {
     private:
         std::unordered_map<hardware::ComponentId, bool> states;
 

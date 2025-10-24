@@ -17,8 +17,8 @@ using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-SoundLoader::SoundLoader(mpc::Mpc& mpcToUse, bool replaceToUse)
-: mpc (mpcToUse), replace (replaceToUse)
+SoundLoader::SoundLoader(mpc::Mpc &mpcToUse, bool replaceToUse)
+    : mpc(mpcToUse), replace(replaceToUse)
 {
 }
 
@@ -27,16 +27,16 @@ void SoundLoader::setPreview(bool b)
     preview = b;
 }
 
-void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, std::shared_ptr<Sound> sound, const bool shouldBeConverted)
+void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r, std::shared_ptr<Sound> sound, const bool shouldBeConverted)
 {
     const std::string soundFileName = f->getName();
     const std::string extension = f->getExtension();
     const std::string nameWithoutExtension = f->getNameWithoutExtension();
-    
+
     auto sampler = mpc.getSampler();
- 
+
     sound_or_error soundOrError;
-  
+
     int16_t existingSoundIndex;
 
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
@@ -44,7 +44,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
         existingSoundIndex = sampler->checkExists(nameWithoutExtension);
         bool willBeConverted = shouldBeConverted;
         wav_or_error wavMetaOrError = mpc.getDisk()->readWavMeta(f);
-        
+
         if (!wavMetaOrError.has_value())
         {
             return;
@@ -55,11 +55,13 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
         const auto bitDepth = wavMeta->getValidBits();
         const auto sampleRate = wavMeta->getSampleRate();
 
-        if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100) {
+        if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100)
+        {
 
             auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-            if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted) {
+            if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted)
+            {
                 r.canBeConverted = true;
                 return;
             }
@@ -67,7 +69,8 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
             willBeConverted = true;
         }
 
-        auto onSuccess = [&](std::shared_ptr<WavFile> wavFile){
+        auto onSuccess = [&](std::shared_ptr<WavFile> wavFile)
+        {
             return onReadWavSuccess(wavFile, nameWithoutExtension, sound, willBeConverted);
         };
 
@@ -75,8 +78,8 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {
-        auto onSndReaderSuccess = [sampler, sound, nameWithoutExtension, &existingSoundIndex](std::shared_ptr<SndReader> sndReader) -> sound_or_error {
-
+        auto onSndReaderSuccess = [sampler, sound, nameWithoutExtension, &existingSoundIndex](std::shared_ptr<SndReader> sndReader) -> sound_or_error
+        {
             if (!sndReader->isHeaderValid())
             {
                 return tl::make_unexpected(mpc_io_error_msg{"Invalid SND header"});
@@ -113,9 +116,9 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
     {
         return;
     }
-    
+
     r.success = true;
-    
+
     if (preview)
     {
         return;
@@ -127,9 +130,10 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
         {
             auto existingSound = sampler->getSound(existingSoundIndex);
 
-            soundOrError.map([existingSoundIndex, sampler, sound](std::shared_ptr<Sound> s) {
-                sampler->replaceSound(existingSoundIndex, s);
-            });
+            soundOrError.map([existingSoundIndex, sampler, sound](std::shared_ptr<Sound> s)
+                             {
+                                 sampler->replaceSound(existingSoundIndex, s);
+                             });
         }
         else
         {
@@ -143,12 +147,14 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
                                              std::shared_ptr<mpc::sampler::Sound> sound,
                                              const bool shouldBeConverted)
 {
-    if (wavFile->getValidBits() != 16 && !shouldBeConverted) {
+    if (wavFile->getValidBits() != 16 && !shouldBeConverted)
+    {
         wavFile->close();
         return tl::make_unexpected(mpc_io_error_msg{"Non-16bit,enable autoconvert"});
     }
 
-    if ((wavFile->getSampleRate() < 8000 || wavFile->getSampleRate() > 44100) && !shouldBeConverted) {
+    if ((wavFile->getSampleRate() < 8000 || wavFile->getSampleRate() > 44100) && !shouldBeConverted)
+    {
         wavFile->close();
         return tl::make_unexpected(mpc_io_error_msg{"Samplerate has to be < 44100"});
     }
@@ -170,9 +176,12 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
 
     auto sampleData = sound->getMutableSampleData();
 
-    if (numChannels == 1) {
+    if (numChannels == 1)
+    {
         wavFile->readFrames(*sampleData, wavFile->getNumFrames());
-    } else {
+    }
+    else
+    {
         std::vector<float> interleaved;
         wavFile->readFrames(interleaved, wavFile->getNumFrames());
 
@@ -187,7 +196,8 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
         }
     }
 
-    if (wavFile->getSampleRate() > 44100 && shouldBeConverted) {
+    if (wavFile->getSampleRate() > 44100 && shouldBeConverted)
+    {
         auto tempSound = std::make_shared<Sound>(44100);
         tempSound->setMono(numChannels == 1);
         Sampler::resample(sampleData, wavFile->getSampleRate(), tempSound);
@@ -197,7 +207,8 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
 
     sound->setMono(numChannels == 1);
 
-    if (wavFile->getNumSampleLoops() > 0) {
+    if (wavFile->getNumSampleLoops() > 0)
+    {
         auto &sampleLoop = wavFile->getSampleLoop();
         const bool hasBeenConverted = wavFile->getSampleRate() > 44100 && shouldBeConverted;
         const float conversionRatio = wavFile->getSampleRate() / 44100.0;
@@ -214,15 +225,19 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
         sound->setLoopTo(0);
     }
 
-    const auto tuneFactor = (float) (sound->getSampleRate() / 44100.0);
-    const auto rateToTuneBase = (float) (pow(2, (1.0 / 12.0)));
+    const auto tuneFactor = (float)(sound->getSampleRate() / 44100.0);
+    const auto rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
 
-    int tune = (int) (floor(log(tuneFactor) / log(rateToTuneBase) * 10.0));
+    int tune = (int)(floor(log(tuneFactor) / log(rateToTuneBase) * 10.0));
 
     if (tune < -120)
+    {
         tune = -120;
+    }
     else if (tune > 120)
+    {
         tune = 120;
+    }
 
     sound->setTune(tune);
     return sound;

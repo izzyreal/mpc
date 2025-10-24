@@ -25,12 +25,15 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 
     auto buttonLabels = mpc.getHardware()->getButtonLabels();
 
-    for (auto &l: buttonLabels)
+    for (auto &l : buttonLabels)
     {
         auto found = std::find_if(
-                activePreset->rows.begin(),
-                activePreset->rows.end(),
-                [l](const MidiControlCommand &c) { return c.getMpcHardwareLabel() == l; });
+            activePreset->rows.begin(),
+            activePreset->rows.end(),
+            [l](const MidiControlCommand &c)
+            {
+                return c.getMpcHardwareLabel() == l;
+            });
 
         REQUIRE(found != activePreset->rows.end());
     }
@@ -116,7 +119,10 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     while (controls->findChild<mpc::lcdgui::Field>("name" + std::to_string(nameCounter++))->getText().find("New_preset") == std::string::npos)
     {
         controls->down();
-        if (nameCounter == 4) nameCounter = 3;
+        if (nameCounter == 4)
+        {
+            nameCounter = 3;
+        }
     }
 
     controls->right();

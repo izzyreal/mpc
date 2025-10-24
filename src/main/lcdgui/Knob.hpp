@@ -3,23 +3,22 @@
 
 namespace mpc::lcdgui
 {
-	class Knob
-		: public Component
-	{
+    class Knob
+        : public Component
+    {
 
-	private:
-		int value{ 32 };
-		bool color{ true };
+    private:
+        int value{32};
+        bool color{true};
 
-	public:
-		void setValue(int newValue);
-		void setColor(bool on);
+    public:
+        void setValue(int newValue);
+        void setColor(bool on);
 
-	public:
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
+    public:
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-	public:
-		Knob(MRECT rect);
-
-	};
-}
+    public:
+        Knob(MRECT rect);
+    };
+} // namespace mpc::lcdgui

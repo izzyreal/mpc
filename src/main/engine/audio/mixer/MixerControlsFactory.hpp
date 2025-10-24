@@ -2,7 +2,8 @@
 
 #include <engine/audio/mixer/MixerControls.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class MixerControlsFactory
     {
@@ -15,6 +16,5 @@ namespace mpc::engine::audio::mixer {
         static void
         addMixControls(MixerControls *mixerControls, std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> controls,
                        bool hasMixControls);
-
     };
-}
+} // namespace mpc::engine::audio::mixer

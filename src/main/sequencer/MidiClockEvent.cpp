@@ -10,9 +10,9 @@ mpc::sequencer::MidiClockEvent::MidiClockEvent(std::shared_ptr<mpc::engine::midi
 {
 }
 
-mpc::sequencer::MidiClockEvent::MidiClockEvent(const MidiClockEvent& event) : Event(event)
+mpc::sequencer::MidiClockEvent::MidiClockEvent(const MidiClockEvent &event) : Event(event)
 {
-	setStatus(event.getStatus());
+    setStatus(event.getStatus());
 }
 
 int MidiClockEvent::getStatus() const

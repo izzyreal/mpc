@@ -10,42 +10,49 @@ using namespace mpc::engine::audio::core;
 
 AudioProcessChain::AudioProcessChain(shared_ptr<AudioControlsChain> controlChain)
 {
-	this->controlChain = controlChain;
+    this->controlChain = controlChain;
 }
 
 void AudioProcessChain::open()
 {
-	for (auto& control : controlChain->getControls()) {
+    for (auto &control : controlChain->getControls())
+    {
 
-		auto candidate = dynamic_pointer_cast<AudioControls>(control);
+        auto candidate = dynamic_pointer_cast<AudioControls>(control);
 
-		if (candidate) {
-			auto p = createProcess(candidate);
-			if (p != nullptr) {
+        if (candidate)
+        {
+            auto p = createProcess(candidate);
+            if (p != nullptr)
+            {
                 processes.push_back(p);
-				p->open();
-			}
-		}
-	}
+                p->open();
+            }
+        }
+    }
 }
 
-int AudioProcessChain::processAudio(AudioBuffer* buffer, int nFrames)
+int AudioProcessChain::processAudio(AudioBuffer *buffer, int nFrames)
 {
-	for (auto& p : processes)
+    for (auto &p : processes)
     {
         p->processAudio(buffer, nFrames);
-	}
+    }
 
-	return AUDIO_OK;
+    return AUDIO_OK;
 }
 
 void AudioProcessChain::close()
 {
-	for (auto& p : processes) {
-		if (!p) continue;
-		p->close();
-	}
-	processes.clear();
+    for (auto &p : processes)
+    {
+        if (!p)
+        {
+            continue;
+        }
+        p->close();
+    }
+    processes.clear();
 }
 
 string AudioProcessChain::getName()

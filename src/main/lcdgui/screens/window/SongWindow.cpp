@@ -8,77 +8,78 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-SongWindow::SongWindow(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "song-window", layerIndex)
+SongWindow::SongWindow(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "song-window", layerIndex)
 {
 }
 
 void SongWindow::open()
 {
-	auto songNameRestLabel = findLabel("song-name-rest");
-	auto defaultSongNameRestLabel = findLabel("default-name-rest");
+    auto songNameRestLabel = findLabel("song-name-rest");
+    auto defaultSongNameRestLabel = findLabel("default-name-rest");
 
-	auto songNameFirstLetterField = findField("song-name-first-letter");
-	auto defaultSongNameFirstLetterField = findField("default-name-first-letter");
+    auto songNameFirstLetterField = findField("song-name-first-letter");
+    auto defaultSongNameFirstLetterField = findField("default-name-first-letter");
 
-	auto songScreen = mpc.screens->get<SongScreen>();
-	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
+    auto songScreen = mpc.screens->get<SongScreen>();
+    auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
 
-	songNameFirstLetterField->setText(song->getName().substr(0, 1));
-	defaultSongNameFirstLetterField->setText(songScreen->defaultSongName.substr(0, 1));
-	songNameRestLabel->setText(song->getName().substr(1));
-	defaultSongNameRestLabel->setText(songScreen->defaultSongName.substr(1));
+    songNameFirstLetterField->setText(song->getName().substr(0, 1));
+    defaultSongNameFirstLetterField->setText(songScreen->defaultSongName.substr(0, 1));
+    songNameRestLabel->setText(song->getName().substr(1));
+    defaultSongNameRestLabel->setText(songScreen->defaultSongName.substr(1));
 }
 
 void SongWindow::function(int i)
 {
-	switch (i)
-	{
-	case 1:
+    switch (i)
+    {
+    case 1:
         mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
-		break;
-	case 3:
+        break;
+    case 3:
         mpc.getLayeredScreen()->openScreen<SongScreen>();
-		break;
-	case 4:
+        break;
+    case 4:
         mpc.getLayeredScreen()->openScreen<CopySongScreen>();
-		break;
-	}
+        break;
+    }
 }
 
 void SongWindow::openNameScreen()
 {
 
-
-    std::function<void(std::string&)> enterAction;
+    std::function<void(std::string &)> enterAction;
     std::string initialNameScreenName;
 
     auto songScreen = mpc.screens->get<SongScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName.find("default") != std::string::npos)
-	{
-		initialNameScreenName = songScreen->getDefaultSongName();
-        
-        enterAction = [songScreen, this](std::string& newName) {
+    if (focusedFieldName.find("default") != std::string::npos)
+    {
+        initialNameScreenName = songScreen->getDefaultSongName();
+
+        enterAction = [songScreen, this](std::string &newName)
+        {
             songScreen->setDefaultSongName(newName);
             mpc.getLayeredScreen()->openScreen<SongWindow>();
         };
-	}
-	else
-	{
+    }
+    else
+    {
         const auto songIndex = songScreen->getActiveSongIndex();
         const auto song = sequencer.lock()->getSong(songIndex);
-		initialNameScreenName = song->getName();
-        
-        enterAction = [song, this](std::string& newName) {
+        initialNameScreenName = song->getName();
+
+        enterAction = [song, this](std::string &newName)
+        {
             song->setName(newName);
             mpc.getLayeredScreen()->openScreen<SongWindow>();
         };
-	}
+    }
 
     auto nameScreen = mpc.screens->get<NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "song-window");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+    mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

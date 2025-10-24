@@ -1,6 +1,7 @@
 #pragma once
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
     class IndivFxMixer
     {
@@ -35,6 +36,5 @@ namespace mpc::engine {
 
     public:
         IndivFxMixer();
-
     };
-}
+} // namespace mpc::engine

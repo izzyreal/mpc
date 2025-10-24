@@ -2,8 +2,8 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "copy-note-parameters", layerIndex)
+CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "copy-note-parameters", layerIndex)
 {
 }
 
@@ -11,125 +11,125 @@ void CopyNoteParametersScreen::open()
 {
 
     auto program = getProgramOrThrow();
-	auto note = sampler->getLastNp(program.get())->getNumber();
+    auto note = sampler->getLastNp(program.get())->getNumber();
 
-	auto programIndex = activeDrum().getProgram();
-	setProg0(programIndex);
-	setNote0(note);
-	setProg1(programIndex);
-	setNote1(note - 35);
+    auto programIndex = activeDrum().getProgram();
+    setProg0(programIndex);
+    setNote0(note);
+    setProg1(programIndex);
+    setNote1(note - 35);
 }
 
 void CopyNoteParametersScreen::turnWheel(int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    
-	if (focusedFieldName == "prog0")
-	{
-		setProg0(prog0 + i);
-	}
-	else if (focusedFieldName == "note0")
-	{
-		setNote0(mpc.getNote() + i);
-	}
-	else if (focusedFieldName == "prog1")
-	{
-		setProg1(prog1 + i);
-	}
-	else if (focusedFieldName == "note1")
-	{
-		setNote1(note1 + i);
-	}
+
+    if (focusedFieldName == "prog0")
+    {
+        setProg0(prog0 + i);
+    }
+    else if (focusedFieldName == "note0")
+    {
+        setNote0(mpc.getNote() + i);
+    }
+    else if (focusedFieldName == "prog1")
+    {
+        setProg1(prog1 + i);
+    }
+    else if (focusedFieldName == "note1")
+    {
+        setNote1(note1 + i);
+    }
 }
 
 void CopyNoteParametersScreen::function(int i)
 {
-	ScreenComponent::function(i);
-	
-	switch (i)
-	{
-	case 4:
-	{
-		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler->getProgram(prog0)->getNoteParameters(mpc.getNote()));
-		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler->getProgram(prog1).get());
-		auto clone = source->clone(note1);
-		dest->setNoteParameters(note1, clone);
+    ScreenComponent::function(i);
+
+    switch (i)
+    {
+    case 4:
+    {
+        auto source = dynamic_cast<mpc::sampler::NoteParameters *>(sampler->getProgram(prog0)->getNoteParameters(mpc.getNote()));
+        auto dest = dynamic_cast<mpc::sampler::Program *>(sampler->getProgram(prog1).get());
+        auto clone = source->clone(note1);
+        dest->setNoteParameters(note1, clone);
         mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-		break;
-	}
-	}
+        break;
+    }
+    }
 }
 
 void CopyNoteParametersScreen::displayProg0()
 {
-	auto program = sampler->getProgram(prog0);
-	findField("prog0")->setText(StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" + program->getName());
+    auto program = sampler->getProgram(prog0);
+    findField("prog0")->setText(StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote0()
 {
     auto sourceProgram = sampler->getProgram(prog0);
-	auto noteParameters = sampler->getLastNp(sourceProgram.get());
-	auto note0 = noteParameters->getNumber();
-	auto destProgram = sampler->getProgram(prog0);
-	auto padIndex = destProgram->getPadIndexFromNote(note0);
-	auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
-	auto noteText = note0 == -1 ? "--" : std::to_string(note0);
-	auto padName = sampler->getPadName(padIndex);
-	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
-	
-	if (note0 == -1)
+    auto noteParameters = sampler->getLastNp(sourceProgram.get());
+    auto note0 = noteParameters->getNumber();
+    auto destProgram = sampler->getProgram(prog0);
+    auto padIndex = destProgram->getPadIndexFromNote(note0);
+    auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
+    auto noteText = note0 == -1 ? "--" : std::to_string(note0);
+    auto padName = sampler->getPadName(padIndex);
+    auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
+
+    if (note0 == -1)
     {
-		sampleName = "";
+        sampleName = "";
     }
-	
-	findField("note0")->setText(noteText + "/" + padName + sampleName);
+
+    findField("note0")->setText(noteText + "/" + padName + sampleName);
 }
 
 void CopyNoteParametersScreen::displayProg1()
 {
-	auto program = sampler->getProgram(prog1);
-	findField("prog1")->setText(StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" + program->getName());
+    auto program = sampler->getProgram(prog1);
+    findField("prog1")->setText(StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote1()
 {
-	auto program = sampler->getProgram(prog1);
-	auto padIndex = program->getPadIndexFromNote(note1 + 35);
-	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
-	auto noteText = note1 == -1 ? "--" : std::to_string(note1 + 35);
-	auto padName = sampler->getPadName(padIndex);
-	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
+    auto program = sampler->getProgram(prog1);
+    auto padIndex = program->getPadIndexFromNote(note1 + 35);
+    auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
+    auto noteText = note1 == -1 ? "--" : std::to_string(note1 + 35);
+    auto padName = sampler->getPadName(padIndex);
+    auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 
-	if (note1 == -1)
+    if (note1 == -1)
     {
-		sampleName = "";
+        sampleName = "";
     }
 
-	findField("note1")->setText(noteText + "/" + padName + sampleName);
+    findField("note1")->setText(noteText + "/" + padName + sampleName);
 }
 
 void CopyNoteParametersScreen::setProg0(int i)
 {
-	prog0 = std::clamp(i, 0, sampler->getProgramCount());
-	displayProg0();
+    prog0 = std::clamp(i, 0, sampler->getProgramCount());
+    displayProg0();
 }
 
 void CopyNoteParametersScreen::setProg1(int i)
 {
-	prog1 = std::clamp(i, 0, sampler->getProgramCount());
-	displayProg1();
+    prog1 = std::clamp(i, 0, sampler->getProgramCount());
+    displayProg1();
 }
 
 void CopyNoteParametersScreen::setNote0(int i)
 {
-	mpc.setNote(i);
-	displayNote0();
+    mpc.setNote(i);
+    displayNote0();
 }
 
 void CopyNoteParametersScreen::setNote1(int i)
 {
-	note1 = std::clamp(i, 0, 63);
-	displayNote1();
+    note1 = std::clamp(i, 0, 63);
+    displayNote1();
 }

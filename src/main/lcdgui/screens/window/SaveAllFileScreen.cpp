@@ -10,8 +10,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "save-all-file", layerIndex)
+SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "save-all-file", layerIndex)
 {
 }
 
@@ -22,19 +22,19 @@ void SaveAllFileScreen::open()
         fileName = "ALL_SEQ_SONG1";
     }
 
-	displayFile();
+    displayFile();
 }
 
 void SaveAllFileScreen::displayFile()
 {
-	if (fileName.empty())
+    if (fileName.empty())
     {
         findField("file")->setText("");
         findLabel("file1")->setText("");
         return;
     }
 
-	findField("file")->setText(fileName.substr(0, 1));
+    findField("file")->setText(fileName.substr(0, 1));
     findLabel("file1")->setText(StrUtil::padRight(fileName.substr(1), " ", 15) + ".ALL");
 }
 
@@ -43,9 +43,10 @@ void SaveAllFileScreen::openNameScreen()
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "file")
-	{
-        const auto enterAction = [this](std::string& nameScreenName) {
+    if (focusedFieldName == "file")
+    {
+        const auto enterAction = [this](std::string &nameScreenName)
+        {
             fileName = nameScreenName;
             mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
         };
@@ -53,25 +54,26 @@ void SaveAllFileScreen::openNameScreen()
         const auto nameScreen = mpc.screens->get<NameScreen>();
         nameScreen->initialize(fileName, 16, enterAction, "save-all-file");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
-	}
+    }
 }
 
 void SaveAllFileScreen::function(int i)
 {
 
-	switch (i)
-	{
-	case 3:
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->openScreen<SaveScreen>();
-		break;
-	case 4:
-	{
-		auto allFileName = fileName + ".ALL";
-		auto disk = mpc.getDisk();
+        break;
+    case 4:
+    {
+        auto allFileName = fileName + ".ALL";
+        auto disk = mpc.getDisk();
 
-		if (disk->checkExists(allFileName))
-		{
-            auto replaceAction = [disk, allFileName]{
+        if (disk->checkExists(allFileName))
+        {
+            auto replaceAction = [disk, allFileName]
+            {
                 auto success = disk->getFile(allFileName)->del();
 
                 if (success)
@@ -82,9 +84,11 @@ void SaveAllFileScreen::function(int i)
                 }
             };
 
-            const auto initializeNameScreen = [this]{
+            const auto initializeNameScreen = [this]
+            {
                 auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string& nameScreenName){
+                auto enterAction = [this](std::string &nameScreenName)
+                {
                     fileName = nameScreenName;
                     mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
                 };
@@ -92,13 +96,16 @@ void SaveAllFileScreen::function(int i)
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                         {
+                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                         });
             mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
-			return;
-		}
-		
+            return;
+        }
+
         disk->writeAll(allFileName);
         break;
-	}
-	}
+    }
+    }
 }

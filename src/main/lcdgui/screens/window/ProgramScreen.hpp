@@ -4,21 +4,21 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class ProgramScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
-	{
+    class ProgramScreen
+        : public mpc::lcdgui::ScreenComponent,
+          public mpc::lcdgui::screens::OpensNameScreen
+    {
 
-	public:
-		void turnWheel(int i) override;
-		void function(int i) override;
+    public:
+        void turnWheel(int i) override;
+        void function(int i) override;
         void openNameScreen() override;
 
-		ProgramScreen(mpc::Mpc& mpc, const int layerIndex);
-		void open() override;
+        ProgramScreen(mpc::Mpc &mpc, const int layerIndex);
+        void open() override;
 
-	private:
-		void displayProgramName();
-		void displayMidiProgramChange();
-
-	};
-}
+    private:
+        void displayProgramName();
+        void displayMidiProgramChange();
+    };
+} // namespace mpc::lcdgui::screens::window

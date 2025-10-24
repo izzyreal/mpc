@@ -5,7 +5,7 @@
 
 using namespace mpc::command;
 
-ReleaseRecCommand::ReleaseRecCommand(mpc::Mpc& mpc) : mpc(mpc) {}
+ReleaseRecCommand::ReleaseRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseRecCommand::execute()
 {

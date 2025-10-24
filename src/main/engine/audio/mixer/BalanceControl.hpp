@@ -2,7 +2,8 @@
 
 #include <engine/audio/mixer/LCRControl.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
     class BalanceControl : public LCRControl
     {
     private:
@@ -18,7 +19,6 @@ namespace mpc::engine::audio::mixer {
 
     public:
         BalanceControl();
-
     };
 
-}
+} // namespace mpc::engine::audio::mixer

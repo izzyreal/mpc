@@ -5,15 +5,21 @@ using namespace std;
 
 AudioBuffer::AudioBuffer(string name, int channelCount, int sampleCount, float sampleRate) : FloatSampleBuffer(channelCount, sampleCount, sampleRate)
 {
-	this->name = name;
-	realTime = true;
+    this->name = name;
+    realTime = true;
 }
 
-const bool AudioBuffer::isSilent() {
-    for (int c = 0; c < getChannelCount(); c++) {
-        auto& data = getChannel(c);
-        for (int s = 0; s < getSampleCount(); s++) {
-            if (data[s] != 0) return false;
+const bool AudioBuffer::isSilent()
+{
+    for (int c = 0; c < getChannelCount(); c++)
+    {
+        auto &data = getChannel(c);
+        for (int s = 0; s < getSampleCount(); s++)
+        {
+            if (data[s] != 0)
+            {
+                return false;
+            }
         }
     }
     return true;
@@ -21,23 +27,30 @@ const bool AudioBuffer::isSilent() {
 
 string AudioBuffer::getName()
 {
-   return name;
+    return name;
 }
 
 void AudioBuffer::setChannelCount(int count)
 {
-	if (count == getChannelCount()) return;
+    if (count == getChannelCount())
+    {
+        return;
+    }
 
-	if (count < getChannelCount()) {
-		for (auto ch = getChannelCount() - 1; ch > count - 1; ch--) {
-			removeChannel(ch);
-		}
-	}
-	else {
-		while (getChannelCount() < count) {
-			addChannel(false);
-		}
-	}
+    if (count < getChannelCount())
+    {
+        for (auto ch = getChannelCount() - 1; ch > count - 1; ch--)
+        {
+            removeChannel(ch);
+        }
+    }
+    else
+    {
+        while (getChannelCount() < count)
+        {
+            addChannel(false);
+        }
+    }
 }
 
 bool AudioBuffer::isRealTime()
@@ -53,10 +66,11 @@ void AudioBuffer::setRealTime(bool realTime)
 void AudioBuffer::swap(int a, int b)
 {
     auto ns = getSampleCount();
-    auto& asamples = getChannel(a);
-    auto& bsamples = getChannel(b);
+    auto &asamples = getChannel(a);
+    auto &bsamples = getChannel(b);
     float tmp;
-    for (auto s = 0; s < ns; s++) {
+    for (auto s = 0; s < ns; s++)
+    {
         tmp = asamples[s];
         asamples[s] = bsamples[s];
         bsamples[s] = tmp;
@@ -65,31 +79,37 @@ void AudioBuffer::swap(int a, int b)
 
 float AudioBuffer::square()
 {
-	auto ns = getSampleCount();
-	auto nc = getChannelCount();
-	auto sumOfSquares = 0.0f;
+    auto ns = getSampleCount();
+    auto nc = getChannelCount();
+    auto sumOfSquares = 0.0f;
 
-	for (auto c = 0; c < nc; c++) {
-		auto& samples = getChannel(c);
-		for (auto s = 0; s < ns; s++) {
-			auto sample = samples[s];
-			sumOfSquares += sample * sample;
-		}
-	}
-	return sumOfSquares / (nc * ns);
+    for (auto c = 0; c < nc; c++)
+    {
+        auto &samples = getChannel(c);
+        for (auto s = 0; s < ns; s++)
+        {
+            auto sample = samples[s];
+            sumOfSquares += sample * sample;
+        }
+    }
+    return sumOfSquares / (nc * ns);
 }
 
-
-void AudioBuffer::copyFrom(AudioBuffer* src)
+void AudioBuffer::copyFrom(AudioBuffer *src)
 {
-    if(src == nullptr) return;
+    if (src == nullptr)
+    {
+        return;
+    }
     auto nc = getChannelCount();
     auto ns = getSampleCount();
-    for (auto c = 0; c < nc; c++) {
-        auto& from = src->getChannel(c);
-        auto& to = getChannel(c);
-        for (auto s = 0; s < ns; s++) {
-           to[s] = from[s];
+    for (auto c = 0; c < nc; c++)
+    {
+        auto &from = src->getChannel(c);
+        auto &to = getChannel(c);
+        for (auto s = 0; s < ns; s++)
+        {
+            to[s] = from[s];
         }
     }
 }

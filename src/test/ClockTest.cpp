@@ -24,31 +24,39 @@ double sample_rate = 44100.0;
 double frames_per_beat = sample_rate * 60 / bpm;
 double frames_per_tick = frames_per_beat / 96.0;
 
-void parseDoubles(const char* input, std::vector<double>& output) {
+void parseDoubles(const char *input, std::vector<double> &output)
+{
     std::stringstream ss(input);
     std::string line;
 
-    while (std::getline(ss, line)) {
-        try {
+    while (std::getline(ss, line))
+    {
+        try
+        {
             double value = std::stod(line);
             output.push_back(value);
-        } catch (const std::invalid_argument& e) {
+        }
+        catch (const std::invalid_argument &e)
+        {
             std::cerr << "Invalid argument: " << e.what() << '\n';
-        } catch (const std::out_of_range& e) {
+        }
+        catch (const std::out_of_range &e)
+        {
             std::cerr << "Out of range: " << e.what() << '\n';
         }
     }
 }
 
-void readDoublesFromFile(std::vector<double>& positionsInQuarterNotes, std::string fileName)
+void readDoublesFromFile(std::vector<double> &positionsInQuarterNotes, std::string fileName)
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/Clock/" + fileName);
-    char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
+    char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
     parseDoubles(data, positionsInQuarterNotes);
 }
 
-std::string doubleToStringWithPrecision(double value, int n) {
+std::string doubleToStringWithPrecision(double value, int n)
+{
     std::ostringstream out;
     out << std::fixed << std::setprecision(n) << value;
     return out.str();
@@ -75,7 +83,7 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[clock]")
     {
         mpc.getClock()->processBufferExternal(position, bufferSize, 44100, 120, timeInSamples);
 
-        auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
@@ -93,7 +101,10 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[clock]")
 
     for (int tick = 1; tick < ticks.size(); tick++)
     {
-        if (ticks[tick] == -1) continue;
+        if (ticks[tick] == -1)
+        {
+            continue;
+        }
 
         int i = 1;
 
@@ -140,7 +151,7 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
         const auto tempo = tempos[i];
         mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
-        auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
@@ -175,7 +186,7 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
         const auto tempo = tempos[i];
         mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
-        auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
@@ -209,7 +220,7 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[clock]")
         const auto tempo = tempos[i];
         mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
-        auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
@@ -243,7 +254,7 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[clock]")
         const auto tempo = tempos[i];
         mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
 
-        auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
@@ -290,7 +301,7 @@ TEST_CASE("1 bar loop", "[clock]")
 
         auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
         frameSeq->work(blockSizes[i]);
-        auto& ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
 
         for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
         {
@@ -304,4 +315,3 @@ TEST_CASE("1 bar loop", "[clock]")
 
     printf("highestTickPos: %i, cumulativeTickPos: %i\n", highestTickPos, cumulativeTickPos);
 }
-

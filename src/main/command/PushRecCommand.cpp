@@ -6,7 +6,8 @@
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushRecCommand::PushRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -34,4 +35,4 @@ namespace mpc::command {
         mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(true);
     }
 
-}
+} // namespace mpc::command

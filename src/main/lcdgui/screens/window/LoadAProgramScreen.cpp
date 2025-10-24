@@ -8,14 +8,14 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-LoadAProgramScreen::LoadAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "load-a-program", layerIndex)
+LoadAProgramScreen::LoadAProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "load-a-program", layerIndex)
 {
 }
 
 void LoadAProgramScreen::open()
 {
-	displayLoadReplaceSound();
+    displayLoadReplaceSound();
 }
 
 void LoadAProgramScreen::turnWheel(int i)
@@ -23,32 +23,33 @@ void LoadAProgramScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "load-replace-sound")
-	{
+    if (focusedFieldName == "load-replace-sound")
+    {
         loadReplaceSameSound = i > 0;
-		displayLoadReplaceSound();
-	}
+        displayLoadReplaceSound();
+    }
 }
 
 void LoadAProgramScreen::function(int i)
 {
 
     auto selectedFile = mpc.screens->get<LoadScreen>()->getSelectedFile();
-    
-	switch (i)
-	{
-	case 2:
-	{
+
+    switch (i)
+    {
+    case 2:
+    {
         mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/true);
         mpc.getSampler()->deleteAllSamples();
 
         mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->getProgram(0));
-		break;
-	}
-	case 3:
+        break;
+    }
+    case 3:
         mpc.getLayeredScreen()->openScreen<LoadScreen>();
-		break;
-	case 4: {
+        break;
+    case 4:
+    {
         auto newProgram = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
         mpc.getDisk()->readPgm2(selectedFile, newProgram);
@@ -69,16 +70,15 @@ void LoadAProgramScreen::function(int i)
 
         break;
     }
-	}
+    }
 }
 
 void LoadAProgramScreen::displayLoadReplaceSound()
 {
-	findField("load-replace-sound")->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));
+    findField("load-replace-sound")->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));
 }
 
 void LoadAProgramScreen::setLoadReplaceSameSound(bool b)
 {
     loadReplaceSameSound = b;
 }
-

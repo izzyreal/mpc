@@ -8,7 +8,8 @@
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/TrMuteScreen.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushTrackMuteCommand::PushTrackMuteCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -26,16 +27,15 @@ namespace mpc::command {
             {
                 ls->openScreen<SequencerScreen>();
             }
-            
+
             mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
         }
         else if (ls->isCurrentScreen<NextSeqScreen, NextSeqPadScreen, SequencerScreen>() &&
-                !mpc.getSequencer()->isRecordingOrOverdubbing())
+                 !mpc.getSequencer()->isRecordingOrOverdubbing())
         {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen<TrMuteScreen>();
             mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(true);
         }
     }
-}
-
+} // namespace mpc::command

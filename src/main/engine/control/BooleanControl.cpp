@@ -9,10 +9,11 @@ BooleanControl::BooleanControl(int id, string name) : Control(id, name)
 
 void BooleanControl::setValue(bool value)
 {
-	if (value != this->value) {
-		this->value = value;
-		notifyParent(this);
-	}
+    if (value != this->value)
+    {
+        this->value = value;
+        notifyParent(this);
+    }
 }
 
 bool BooleanControl::getValue()

@@ -3,45 +3,45 @@
 
 #include <vector>
 
-namespace mpc::engine::midi {
-class ShortMessage final : public MidiMessage
+namespace mpc::engine::midi
 {
-    
-public:
-    static const int CHANNEL_PRESSURE{ 208 };
-    static const int CONTINUE{ 251 };
-    static const int CONTROL_CHANGE{ 176 };
-    static const int NOTE_OFF{ 128 };
-    static const int NOTE_ON{ 144 };
-    static const int POLY_PRESSURE{ 160 };
-    static const int START{ 250 };
-    static const int STOP{ 252 };
-    static const int TIMING_CLOCK{ 248 };
+    class ShortMessage final : public MidiMessage
+    {
 
-public:
-    int getChannel();
-    int getCommand();
-    int getData1();
-    int getData2();
-    bool isNoteOn();
-    bool isNoteOff();
-    bool isMidiClock();
-    bool isControlChange();
-    bool isChannelPressure();
-    
-public:
-    int getDataLength(int status);
-    
-public:
-    void setMessage(int status);
-    void setMessage(int status, int data1, int data2);
-    void setMessage(int command, int channel, int data1, int data2);
+    public:
+        static const int CHANNEL_PRESSURE{208};
+        static const int CONTINUE{251};
+        static const int CONTROL_CHANGE{176};
+        static const int NOTE_OFF{128};
+        static const int NOTE_ON{144};
+        static const int POLY_PRESSURE{160};
+        static const int START{250};
+        static const int STOP{252};
+        static const int TIMING_CLOCK{248};
 
-    ShortMessage();
-    explicit ShortMessage(const std::vector<char>& data);
-    
-public:
-    void setMessage(const std::vector<char>& data, int length) override;
-    
-};
-}
+    public:
+        int getChannel();
+        int getCommand();
+        int getData1();
+        int getData2();
+        bool isNoteOn();
+        bool isNoteOff();
+        bool isMidiClock();
+        bool isControlChange();
+        bool isChannelPressure();
+
+    public:
+        int getDataLength(int status);
+
+    public:
+        void setMessage(int status);
+        void setMessage(int status, int data1, int data2);
+        void setMessage(int command, int channel, int data1, int data2);
+
+        ShortMessage();
+        explicit ShortMessage(const std::vector<char> &data);
+
+    public:
+        void setMessage(const std::vector<char> &data, int length) override;
+    };
+} // namespace mpc::engine::midi

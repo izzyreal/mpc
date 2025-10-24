@@ -5,17 +5,16 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class LoadApsFileScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class LoadApsFileScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	private:
-		std::unique_ptr<mpc::disk::ApsLoader> apsLoader;
+    private:
+        std::unique_ptr<mpc::disk::ApsLoader> apsLoader;
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		LoadApsFileScreen(mpc::Mpc& mpc, const int layerIndex);
-
-	};
-}
+        LoadApsFileScreen(mpc::Mpc &mpc, const int layerIndex);
+    };
+} // namespace mpc::lcdgui::screens::window

@@ -5,21 +5,23 @@
 
 namespace mpc::sequencer
 {
-	class ChannelPressureEvent
-		: public Event
-	{
+    class ChannelPressureEvent
+        : public Event
+    {
 
-	private:
-		int channelPressureValue{ 0 };
+    private:
+        int channelPressureValue{0};
 
-	public:
-		void setAmount(int i);
-		int getAmount() const ;
+    public:
+        void setAmount(int i);
+        int getAmount() const;
 
-		ChannelPressureEvent() = default;
-		ChannelPressureEvent(const ChannelPressureEvent& event);
+        ChannelPressureEvent() = default;
+        ChannelPressureEvent(const ChannelPressureEvent &event);
 
-		std::string getTypeName() override { return "channel-pressure"; }
-
-	};
-}
+        std::string getTypeName() override
+        {
+            return "channel-pressure";
+        }
+    };
+} // namespace mpc::sequencer

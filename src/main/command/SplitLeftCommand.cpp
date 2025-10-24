@@ -6,7 +6,8 @@
 #include "lcdgui/Field.hpp"
 #include "lcdgui/LcdGuiUtil.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     SplitLeftCommand::SplitLeftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -19,14 +20,19 @@ namespace mpc::command {
         }
 
         if (!lcdgui::util::isFieldSplittable(mpc.getLayeredScreen()->getCurrentScreen(), mpc.getLayeredScreen()->getFocusedFieldName()))
+        {
             return;
+        }
 
         const auto field = mpc.getLayeredScreen()->getFocusedField();
-        if (field->isSplit()) {
+        if (field->isSplit())
+        {
             field->setActiveSplit(field->getActiveSplit() - 1);
-        } else {
+        }
+        else
+        {
             field->setSplit(true);
         }
     }
 
-}
+} // namespace mpc::command

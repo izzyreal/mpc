@@ -11,7 +11,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-NextSeqScreen::NextSeqScreen(mpc::Mpc& mpc, const int layerIndex)
+NextSeqScreen::NextSeqScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "next-seq", layerIndex)
 {
 }
@@ -36,9 +36,13 @@ void NextSeqScreen::open()
     sequencer.lock()->addObserver(this);
 
     if (sequencer.lock()->getNextSq() == -1)
+    {
         ls->setFocus("sq");
+    }
     else
+    {
         ls->setFocus("nextsq");
+    }
 }
 
 void NextSeqScreen::close()
@@ -59,7 +63,9 @@ void NextSeqScreen::turnWheel(int i)
             ls->setFocus("nextsq");
         }
         else
+        {
             sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+        }
     }
     else if (focusedFieldName == "nextsq")
     {
@@ -184,18 +190,24 @@ void NextSeqScreen::displayTempoLabel()
 {
     auto currentRatio = -1;
     auto sequence = sequencer.lock()->isPlaying() ? sequencer.lock()->getCurrentlyPlayingSequence() : sequencer.lock()->getActiveSequence();
-    for (auto& e : sequence->getTempoChangeEvents())
+    for (auto &e : sequence->getTempoChangeEvents())
     {
         if (e->getTick() > sequencer.lock()->getTickPosition())
+        {
             break;
+        }
 
         currentRatio = e->getRatio();
     }
 
     if (currentRatio != 1000)
+    {
         findLabel("tempo")->setText(u8"c\u00C0:");
+    }
     else
+    {
         findLabel("tempo")->setText(u8" \u00C0:");
+    }
 }
 
 void NextSeqScreen::displayTempoSource()
@@ -210,7 +222,7 @@ void NextSeqScreen::displayTiming()
     findField("timing")->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }
 
-void NextSeqScreen::update(Observable* o, Message message)
+void NextSeqScreen::update(Observable *o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

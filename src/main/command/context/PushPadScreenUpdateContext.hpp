@@ -3,16 +3,25 @@
 #include <memory>
 #include <functional>
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
     class ScreenComponent;
 }
 
-namespace mpc::sequencer { class Sequencer; }
-namespace mpc::sampler { class Program; }
+namespace mpc::sequencer
+{
+    class Sequencer;
+}
+namespace mpc::sampler
+{
+    class Program;
+}
 
-namespace mpc::command::context {
+namespace mpc::command::context
+{
 
-    struct PushPadScreenUpdateContext {
+    struct PushPadScreenUpdateContext
+    {
         bool isSixteenLevelsEnabled;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
         std::shared_ptr<sampler::Program> program;
@@ -25,4 +34,3 @@ namespace mpc::command::context {
     };
 
 } // namespace mpc::command::context
-

@@ -51,11 +51,11 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     const auto soundsFile = path / "sounds.txt";
     const auto currentDirFile = path / "currentDir.txt";
 
-    std::vector<fs::path> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, focusFile, soundsFile, currentDirFile };
+    std::vector<fs::path> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, focusFile, soundsFile, currentDirFile};
 
     std::vector<fs::path> availableFiles;
 
-    for (auto &f: files)
+    for (auto &f : files)
     {
         if (fs::exists(f))
         {
@@ -68,8 +68,8 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         return;
     }
 
-    const auto restoreAutoSavedStateAction = [&mpc, availableFiles, path] {
-
+    const auto restoreAutoSavedStateAction = [&mpc, availableFiles, path]
+    {
         std::map<fs::path, std::vector<char>> processInOrder;
 
         for (auto &f : availableFiles)
@@ -97,7 +97,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
             {
                 auto soundNames = StrUtil::split(std::string(data.begin(), data.end()), '\n');
 
-                for (auto &soundName: soundNames)
+                for (auto &soundName : soundNames)
                 {
                     const auto soundPath = mpc.paths->autoSavePath() / soundName;
 
@@ -130,7 +130,8 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
             }
         }
 
-        const auto setIntProperty = [&processInOrder, path](const std::string& prop, const std::function<void(int v)>& setter) {
+        const auto setIntProperty = [&processInOrder, path](const std::string &prop, const std::function<void(int v)> &setter)
+        {
             if (processInOrder.find(path / prop) != processInOrder.end())
             {
                 std::vector<char> str = processInOrder[path / prop];
@@ -138,27 +139,43 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
                 {
                     auto value = str[0];
                     setter(value);
-                } catch (const std::exception &)
-                {}
+                }
+                catch (const std::exception &)
+                {
+                }
             }
         };
 
-        const auto getStringProperty = [&processInOrder, path](const std::string& prop) -> std::string {
+        const auto getStringProperty = [&processInOrder, path](const std::string &prop) -> std::string
+        {
             if (processInOrder.find(path / prop) != processInOrder.end())
             {
                 return {processInOrder[path / prop].begin(), processInOrder[path / prop].end()};
-            } else return {};
+            }
+            else
+            {
+                return {};
+            }
         };
 
-        setIntProperty("soundIndex.txt", [&mpc](int v){mpc.getSampler()->setSoundIndex(v);});
-        setIntProperty("lastPressedNote.txt", [&mpc](int v){mpc.setNote(v);});
-        setIntProperty("lastPressedPad.txt", [&mpc](int v){mpc.setPad(v);});
+        setIntProperty("soundIndex.txt", [&mpc](int v)
+                       {
+                           mpc.getSampler()->setSoundIndex(v);
+                       });
+        setIntProperty("lastPressedNote.txt", [&mpc](int v)
+                       {
+                           mpc.setNote(v);
+                       });
+        setIntProperty("lastPressedPad.txt", [&mpc](int v)
+                       {
+                           mpc.setPad(v);
+                       });
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
 
         auto relativePath = fs::relative(currentDir, mpc.paths->defaultLocalVolumePath());
 
-        for (auto& pathSegment : relativePath)
+        for (auto &pathSegment : relativePath)
         {
             mpc.getDisk()->moveForward(pathSegment.string());
             mpc.getDisk()->initFiles();
@@ -169,7 +186,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         const auto focusName = getStringProperty("focus.txt");
 
         const auto layeredScreen = mpc.getLayeredScreen();
-        
+
         layeredScreen->openScreen(screenName);
 
         if (!focusName.empty())
@@ -179,14 +196,14 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
         // Sometimes after a crash sounds are not loaded.
         // The below is to prevent further crashing.
-        for (auto& p : mpc.getSampler()->getPrograms())
+        for (auto &p : mpc.getSampler()->getPrograms())
         {
             if (!p.lock())
             {
                 continue;
             }
-            
-            for (auto& n : p.lock()->getNotesParameters())
+
+            for (auto &n : p.lock()->getNotesParameters())
             {
                 if (n->getSoundIndex() >= mpc.getSampler()->getSoundCount())
                 {
@@ -246,8 +263,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
     const auto soundsFile = path / "sounds.txt";
     const auto currentDirFile = path / "currentDir.txt";
 
-    std::function<void()> storeAutoSavedStateAction = [&](){
-
+    std::function<void()> storeAutoSavedStateAction = [&]()
+    {
         auto layeredScreen = mpc.getLayeredScreen();
 
         std::string currentScreen = layeredScreen->getFirstLayerScreenName();
@@ -258,7 +275,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         auto lastPressedNote = mpc.getNote();
         auto currentDir = mpc.getDisk()->getAbsolutePath();
 
-        auto setFileData = [](const fs::path& p, const std::string& data) {
+        auto setFileData = [](const fs::path &p, const std::string &data)
+        {
             if (data.empty())
             {
                 fs::remove(p);
@@ -285,10 +303,10 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 
         std::string soundNames;
 
-        for (auto& sound : sounds)
+        for (auto &sound : sounds)
         {
             SndWriter sndWriter(sound.get());
-            auto& data = sndWriter.getSndFileArray();
+            auto &data = sndWriter.getSndFileArray();
             auto soundFilePath = path / (sound->getName() + ".SND");
             set_file_data(soundFilePath, data);
             soundNames = soundNames.append(sound->getName() + ".SND\n");

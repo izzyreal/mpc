@@ -2,10 +2,11 @@
 
 #include "engine/audio/core/AudioProcess.hpp"
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
     class InterconnectionOutputProcess
-            : public mpc::engine::audio::core::AudioProcess
+        : public mpc::engine::audio::core::AudioProcess
     {
 
     public:
@@ -16,7 +17,6 @@ namespace mpc::engine {
 
     public:
         InterconnectionOutputProcess(mpc::engine::audio::core::AudioBuffer *sharedBuffer);
-
     };
 
-}
+} // namespace mpc::engine

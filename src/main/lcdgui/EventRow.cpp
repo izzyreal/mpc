@@ -30,9 +30,9 @@
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 
-std::vector<std::string> EventRow::controlNames{ "BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1", "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON" };
+std::vector<std::string> EventRow::controlNames{"BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1", "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON"};
 
-EventRow::EventRow(mpc::Mpc& mpc, int rowIndex)
+EventRow::EventRow(mpc::Mpc &mpc, int rowIndex)
     : Component("event-row-" + std::to_string(rowIndex)), rowIndex(rowIndex), mpc(mpc)
 {
     int w1 = 194;
@@ -174,11 +174,11 @@ void EventRow::setSystemExclusiveEventValues()
     }
 
     char byteA[3];
-    sprintf(byteA, "%X", see->getByteA()); //convert number to hex
+    sprintf(byteA, "%X", see->getByteA()); // convert number to hex
     fields[0]->setText(StrUtil::padLeft(std::string(byteA), "0", 2));
 
     char byteB[3];
-    sprintf(byteB, "%X", see->getByteB()); //convert number to hex
+    sprintf(byteB, "%X", see->getByteB()); // convert number to hex
     fields[1]->setText(StrUtil::padLeft(std::string(byteB), "0", 2));
 
     horizontalBar->Hide(true);
@@ -193,7 +193,9 @@ void EventRow::setSystemExclusiveEventValues()
 void EventRow::setPolyPressureEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
     auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(event.lock());
 
@@ -219,9 +221,11 @@ void EventRow::setPolyPressureEventValues()
 void EventRow::setChannelPressureEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
-    auto cpe = std::dynamic_pointer_cast< ChannelPressureEvent>(event.lock());
+    auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(event.lock());
     fields[0]->Hide(false);
     labels[0]->Hide(false);
     fields[0]->setText(StrUtil::padLeft(std::to_string(cpe->getAmount()), " ", 3));
@@ -239,9 +243,11 @@ void EventRow::setChannelPressureEventValues()
 void EventRow::setControlChangeEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
-    auto cce = std::dynamic_pointer_cast< ControlChangeEvent>(event.lock());
+    auto cce = std::dynamic_pointer_cast<ControlChangeEvent>(event.lock());
 
     for (int i = 0; i < 2; i++)
     {
@@ -266,7 +272,9 @@ void EventRow::setControlChangeEventValues()
 void EventRow::setMiscEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
     auto parameterValue = 0;
 
@@ -274,7 +282,9 @@ void EventRow::setMiscEventValues()
     auto programChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event.lock());
 
     if (pitchBendEvent != nullptr)
+    {
         parameterValue = pitchBendEvent->getAmount();
+    }
 
     if (programChangeEvent)
     {
@@ -293,15 +303,15 @@ void EventRow::setMiscEventValues()
 
     if (pitchBendEvent)
     {
-        if(parameterValue > 0)
+        if (parameterValue > 0)
         {
             fields[0]->setText("+" + StrUtil::padLeft(std::to_string(parameterValue), " ", 4));
         }
-        else if(parameterValue < 0)
+        else if (parameterValue < 0)
         {
             fields[0]->setText("-" + StrUtil::padLeft(std::to_string(abs(parameterValue)), " ", 4));
         }
-        else if(parameterValue == 0)
+        else if (parameterValue == 0)
         {
             fields[0]->setText("    0");
         }
@@ -319,7 +329,9 @@ void EventRow::setMiscEventValues()
 void EventRow::setMixerEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
     auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event.lock());
 
@@ -334,7 +346,9 @@ void EventRow::setMixerEventValues()
     auto sampler = mpc.getSampler();
 
     if (bus == 0)
+    {
         return;
+    }
 
     auto program = sampler->getProgram(sampler->getDrumBusProgramIndex(bus));
     auto nn = program->getPad(mixerEvent->getPad())->getNote();
@@ -348,12 +362,16 @@ void EventRow::setMixerEventValues()
         auto panning = "L";
 
         if (mixerEvent->getValue() > 50)
+        {
             panning = "R";
+        }
 
         fields[2]->setText(panning + StrUtil::padLeft(std::to_string(abs(mixerEvent->getValue() - 50)), " ", 2));
 
         if (mixerEvent->getValue() == 50)
+        {
             fields[2]->setText("0  ");
+        }
     }
     else
     {
@@ -375,7 +393,9 @@ void EventRow::setMixerEventValues()
 void EventRow::setDrumNoteEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
     auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 
@@ -410,9 +430,13 @@ void EventRow::setDrumNoteEventValues()
         auto noteVarValue = (ne->getVariationValue() * 2) - 128;
 
         if (noteVarValue < -120)
+        {
             noteVarValue = -120;
+        }
         else if (noteVarValue > 120)
+        {
             noteVarValue = 120;
+        }
 
         if (noteVarValue == 0)
         {
@@ -432,7 +456,9 @@ void EventRow::setDrumNoteEventValues()
         auto noteVarValue = ne->getVariationValue();
 
         if (noteVarValue > 100)
+        {
             noteVarValue = 100;
+        }
 
         fields[2]->setText(StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
         fields[2]->setSize(3 * 6 + 1, 9);
@@ -445,7 +471,9 @@ void EventRow::setDrumNoteEventValues()
         auto noteVarValue = ne->getVariationValue() - 50;
 
         if (noteVarValue > 50)
+        {
             noteVarValue = 50;
+        }
 
         if (noteVarValue < 0)
         {
@@ -471,7 +499,9 @@ void EventRow::setDrumNoteEventValues()
 void EventRow::setMidiNoteEventValues()
 {
     if (!event.lock())
+    {
         return;
+    }
 
     auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 
@@ -503,7 +533,10 @@ void EventRow::setColors()
     {
         if (isEmptyEvent())
         {
-            if (i == 0) labels[i]->setInverted(false);
+            if (i == 0)
+            {
+                labels[i]->setInverted(false);
+            }
             fields[i]->setDoubleInverted(false);
 
             continue;
@@ -514,13 +547,15 @@ void EventRow::setColors()
     }
 }
 
-void EventRow::setLabelTexts(const std::vector<std::string>& labelTexts)
+void EventRow::setLabelTexts(const std::vector<std::string> &labelTexts)
 {
     for (int i = 0; i < labelTexts.size(); i++)
+    {
         labels[i]->setText(labelTexts[i]);
+    }
 }
 
-void EventRow::setSizesAndLocations(const std::vector<int>& xPositions, const std::vector<int>& fieldWidths)
+void EventRow::setSizesAndLocations(const std::vector<int> &xPositions, const std::vector<int> &fieldWidths)
 {
     for (int i = 0; i < xPositions.size(); i++)
     {

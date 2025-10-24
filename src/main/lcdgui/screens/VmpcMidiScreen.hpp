@@ -4,16 +4,25 @@
 
 #include <atomic>
 
-namespace mpc::audiomidi { class VmpcMidiControlMode; class MidiDeviceDetector; class AudioMidiServices; }
-namespace mpc::lcdgui::screens::window { class VmpcKnownControllerDetectedScreen; }
+namespace mpc::audiomidi
+{
+    class VmpcMidiControlMode;
+    class MidiDeviceDetector;
+    class AudioMidiServices;
+} // namespace mpc::audiomidi
+namespace mpc::lcdgui::screens::window
+{
+    class VmpcKnownControllerDetectedScreen;
+}
 
-namespace mpc::lcdgui::screens {
+namespace mpc::lcdgui::screens
+{
 
     class VmpcMidiScreen
-            : public mpc::lcdgui::ScreenComponent
+        : public mpc::lcdgui::ScreenComponent
     {
     public:
-        VmpcMidiScreen(mpc::Mpc&, int layerIndex);
+        VmpcMidiScreen(mpc::Mpc &, int layerIndex);
 
         void open() override;
         void up() override;
@@ -26,7 +35,7 @@ namespace mpc::lcdgui::screens {
 
         bool isLearning();
         void setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value);
-        void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand& c);
+        void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand &c);
         std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
         bool hasMappingChanged();
 
@@ -54,4 +63,4 @@ namespace mpc::lcdgui::screens {
         friend class mpc::audiomidi::AudioMidiServices;
         friend class mpc::lcdgui::screens::window::VmpcKnownControllerDetectedScreen;
     };
-}
+} // namespace mpc::lcdgui::screens

@@ -6,38 +6,40 @@
 
 using namespace mpc::midi::event::meta;
 
-GenericMetaEvent::GenericMetaEvent(int tick, int delta, MetaEventData* info) 
-	: MetaEvent(tick, delta, info->type)
+GenericMetaEvent::GenericMetaEvent(int tick, int delta, MetaEventData *info)
+    : MetaEvent(tick, delta, info->type)
 {
-	mData = info->data;
-	mLength = info->length;
+    mData = info->data;
+    mLength = info->length;
 }
 
 int GenericMetaEvent::getEventSize()
 {
-	return 1 + 1 + mLength.getByteCount() + mLength.getValue();
+    return 1 + 1 + mLength.getByteCount() + mLength.getValue();
 }
 
-void GenericMetaEvent::writeToOutputStream(std::ostream& out)
+void GenericMetaEvent::writeToOutputStream(std::ostream &out)
 {
-	MetaEvent::writeToOutputStream(out);
-	auto length = mLength.getBytes();
-	out.write(&length[0], length.size());
-	out.write(&mData[0], mData.size());
+    MetaEvent::writeToOutputStream(out);
+    auto length = mLength.getBytes();
+    out.write(&length[0], length.size());
+    out.write(&mData[0], mData.size());
 }
 
-void GenericMetaEvent::writeToOutputStream(std::ostream& out, bool writeType)
+void GenericMetaEvent::writeToOutputStream(std::ostream &out, bool writeType)
 {
-	MetaEvent::writeToOutputStream(out, writeType);
+    MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int GenericMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
+int GenericMetaEvent::compareTo(mpc::midi::event::MidiEvent *other)
 {
-	if (mTick != other->getTick()) {
-		return mTick < other->getTick() ? -1 : 1;
-	}
-	if (mDelta.getValue() != other->getDelta()) {
-		return mDelta.getValue() < other->getDelta() ? 1 : -1;
-	}
-	return 1;
+    if (mTick != other->getTick())
+    {
+        return mTick < other->getTick() ? -1 : 1;
+    }
+    if (mDelta.getValue() != other->getDelta())
+    {
+        return mDelta.getValue() < other->getDelta() ? 1 : -1;
+    }
+    return 1;
 }

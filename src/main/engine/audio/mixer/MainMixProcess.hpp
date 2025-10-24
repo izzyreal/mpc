@@ -2,7 +2,8 @@
 
 #include <engine/audio/mixer/MixProcess.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class MixControls;
 
@@ -18,8 +19,7 @@ namespace mpc::engine::audio::mixer {
         AudioMixerStrip *getRoutedStrip() override;
 
     public:
-        MainMixProcess(const std::shared_ptr<AudioMixerStrip>& strip, const std::shared_ptr<MixControls>& mixControls, AudioMixer *mixer);
-
+        MainMixProcess(const std::shared_ptr<AudioMixerStrip> &strip, const std::shared_ptr<MixControls> &mixControls, AudioMixer *mixer);
     };
 
-}
+} // namespace mpc::engine::audio::mixer

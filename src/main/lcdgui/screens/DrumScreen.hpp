@@ -3,12 +3,12 @@
 
 namespace mpc::lcdgui::screens
 {
-	class DrumScreen : public mpc::lcdgui::ScreenComponent
-	{
-	public:
-        DrumScreen(mpc::Mpc& mpc, const int layerIndex);
+    class DrumScreen : public mpc::lcdgui::ScreenComponent
+    {
+    public:
+        DrumScreen(mpc::Mpc &mpc, const int layerIndex);
         void function(int f) override;
-		void turnWheel(int i) override;
+        void turnWheel(int i) override;
         void open() override;
 
         void setDrum(unsigned char i);
@@ -17,15 +17,14 @@ namespace mpc::lcdgui::screens
         bool isPadToIntSound();
 
     private:
-		void displayCurrentVal();
-		void displayDrum();
-		void displayPadToInternalSound();
-		void displayPgm();
-		void displayPgmChange();
-		void displayMidiVolume();
+        void displayCurrentVal();
+        void displayDrum();
+        void displayPadToInternalSound();
+        void displayPgm();
+        void displayPgmChange();
+        void displayMidiVolume();
 
-		bool padToInternalSound = true;
-		unsigned char drum = 0;
-
-	};
-}
+        bool padToInternalSound = true;
+        unsigned char drum = 0;
+    };
+} // namespace mpc::lcdgui::screens

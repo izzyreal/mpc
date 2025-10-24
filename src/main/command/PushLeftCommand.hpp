@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushLeftCommand : public Command {
+    class PushLeftCommand : public Command
+    {
     public:
         explicit PushLeftCommand(mpc::Mpc &mpc);
         void execute() override;

@@ -4,10 +4,13 @@ using namespace mpc::sequencer;
 
 void MixerEvent::setParameter(int i)
 {
-	if (i < 0 || i > 3) return;
-	mixerParameter = i;
-	
-	notifyObservers(std::string("step-editor"));
+    if (i < 0 || i > 3)
+    {
+        return;
+    }
+    mixerParameter = i;
+
+    notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getParameter() const
@@ -17,10 +20,13 @@ int MixerEvent::getParameter() const
 
 void MixerEvent::setPadNumber(int i)
 {
-    if(i < 0 || i > 63) return;
+    if (i < 0 || i > 63)
+    {
+        return;
+    }
 
     padNumber = i;
-    
+
     notifyObservers(std::string("step-editor"));
 }
 
@@ -31,10 +37,13 @@ int MixerEvent::getPad() const
 
 void MixerEvent::setValue(int i)
 {
-    if(i < 0 || i > 100) return;
+    if (i < 0 || i > 100)
+    {
+        return;
+    }
 
     mixerParameterValue = i;
-    
+
     notifyObservers(std::string("step-editor"));
 }
 
@@ -43,10 +52,9 @@ int MixerEvent::getValue() const
     return mixerParameterValue;
 }
 
-mpc::sequencer::MixerEvent::MixerEvent(const MixerEvent& event) : Event(event)
+mpc::sequencer::MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
 {
     setPadNumber(event.getPad());
     setParameter(event.getParameter());
     setValue(event.getValue());
 }
-

@@ -15,9 +15,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 
-
-EditMultipleScreen::EditMultipleScreen(mpc::Mpc& mpc, const int layerIndex)
-: ScreenComponent(mpc, "edit-multiple", layerIndex)
+EditMultipleScreen::EditMultipleScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "edit-multiple", layerIndex)
 {
 }
 
@@ -36,104 +35,122 @@ void EditMultipleScreen::function(int i)
 {
     ScreenComponent::function(i);
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
-    
+
     auto selectedEvent = stepEditorScreen->getSelectedEvent();
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
     auto track = mpc.getSequencer()->getActiveTrack();
-    
+
     switch (i)
     {
-        case 4:
-        {
-            auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(selectedEvent);
-            
-            if (noteEvent && track->getBus() != 0)
-            {
-                if (paramLetter == "a")
-                {
-                    checkNotes();
-                }
-                else if (paramLetter == "b")
-                {
-                    for (auto& event : stepEditorScreen->getSelectedEvents())
-                    {
-                        auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-                        if (_noteEvent)
-                            _noteEvent->setVariationType(variationType);
-                    }
-                }
-                else if (paramLetter == "c")
-                {
-                    for (auto& event : stepEditorScreen->getSelectedEvents())
-                    {
-                        auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+    case 4:
+    {
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(selectedEvent);
 
-                        if (_noteEvent)
-                            _noteEvent->setVariationValue(variationValue);
+        if (noteEvent && track->getBus() != 0)
+        {
+            if (paramLetter == "a")
+            {
+                checkNotes();
+            }
+            else if (paramLetter == "b")
+            {
+                for (auto &event : stepEditorScreen->getSelectedEvents())
+                {
+                    auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+                    if (_noteEvent)
+                    {
+                        _noteEvent->setVariationType(variationType);
                     }
                 }
-                else if (paramLetter == "d")
-                {
-                    checkFiveParameters();
-                }
-                else if (paramLetter == "e")
-                {
-                    checkThreeParameters();
-                }
             }
-            
-            if (noteEvent && track->getBus() == 0)
+            else if (paramLetter == "c")
             {
-                if (paramLetter == "a")
-                    checkNotes();
-                else if (paramLetter == "b")
-                    checkFiveParameters();
-                else if (paramLetter == "c")
-                    checkThreeParameters();
+                for (auto &event : stepEditorScreen->getSelectedEvents())
+                {
+                    auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+
+                    if (_noteEvent)
+                    {
+                        _noteEvent->setVariationValue(variationValue);
+                    }
+                }
             }
-            
-            if (std::dynamic_pointer_cast<ControlChangeEvent>(selectedEvent))
-            {
-                if (paramLetter == "a")
-                    checkFiveParameters();
-                else if (paramLetter == "b")
-                    checkThreeParameters();
-            }
-            
-            if (std::dynamic_pointer_cast<ProgramChangeEvent>(selectedEvent) || std::dynamic_pointer_cast<ChannelPressureEvent>(selectedEvent))
+            else if (paramLetter == "d")
             {
                 checkFiveParameters();
             }
-            
-            if (std::dynamic_pointer_cast<PolyPressureEvent>(selectedEvent))
+            else if (paramLetter == "e")
             {
-                if (paramLetter == "a")
-                    checkFiveParameters();
-                else if (paramLetter == "b")
-                    checkThreeParameters();
+                checkThreeParameters();
             }
-            
-            stepEditorScreen->clearSelection();
-            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
         }
+
+        if (noteEvent && track->getBus() == 0)
+        {
+            if (paramLetter == "a")
+            {
+                checkNotes();
+            }
+            else if (paramLetter == "b")
+            {
+                checkFiveParameters();
+            }
+            else if (paramLetter == "c")
+            {
+                checkThreeParameters();
+            }
+        }
+
+        if (std::dynamic_pointer_cast<ControlChangeEvent>(selectedEvent))
+        {
+            if (paramLetter == "a")
+            {
+                checkFiveParameters();
+            }
+            else if (paramLetter == "b")
+            {
+                checkThreeParameters();
+            }
+        }
+
+        if (std::dynamic_pointer_cast<ProgramChangeEvent>(selectedEvent) || std::dynamic_pointer_cast<ChannelPressureEvent>(selectedEvent))
+        {
+            checkFiveParameters();
+        }
+
+        if (std::dynamic_pointer_cast<PolyPressureEvent>(selectedEvent))
+        {
+            if (paramLetter == "a")
+            {
+                checkFiveParameters();
+            }
+            else if (paramLetter == "b")
+            {
+                checkThreeParameters();
+            }
+        }
+
+        stepEditorScreen->clearSelection();
+        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+    }
     }
 }
 
 void EditMultipleScreen::turnWheel(int i)
 {
-    
+
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     auto event = stepEditorScreen->getSelectedEvent();
-    
+
     auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     auto track = mpc.getSequencer()->getActiveTrack();
-    
+
     if (focusedFieldName == "value0")
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-        
+
         if (noteEvent && track->getBus() != 0)
         {
             if (paramLetter == "a")
@@ -164,10 +181,7 @@ void EditMultipleScreen::turnWheel(int i)
                 setEditType(editType + i);
             }
         }
-        else if (std::dynamic_pointer_cast<ProgramChangeEvent>(event)
-                 || std::dynamic_pointer_cast<PolyPressureEvent>(event)
-                 || std::dynamic_pointer_cast<ChannelPressureEvent>(event)
-                 || std::dynamic_pointer_cast<ControlChangeEvent>(event))
+        else if (std::dynamic_pointer_cast<ProgramChangeEvent>(event) || std::dynamic_pointer_cast<PolyPressureEvent>(event) || std::dynamic_pointer_cast<ChannelPressureEvent>(event) || std::dynamic_pointer_cast<ControlChangeEvent>(event))
         {
             setEditType(editType + i);
         }
@@ -176,21 +190,21 @@ void EditMultipleScreen::turnWheel(int i)
     {
         setEditValue(editValue + i);
     }
-    
+
     updateEditMultiple();
 }
 
 void EditMultipleScreen::checkThreeParameters()
 {
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
-    
-    for (auto& event : stepEditorScreen->getSelectedEvents())
+
+    for (auto &event : stepEditorScreen->getSelectedEvents())
     {
-        
+
         auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
         auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event);
         auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event);
-        
+
         if (note)
         {
             note->setVelocity(editValue);
@@ -209,37 +223,49 @@ void EditMultipleScreen::checkThreeParameters()
 void EditMultipleScreen::checkFiveParameters()
 {
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
-    
-    for (auto& event : stepEditorScreen->getSelectedEvents())
+
+    for (auto &event : stepEditorScreen->getSelectedEvents())
     {
         auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
         auto programChange = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
         auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event);
         auto channelPressure = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
         auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event);
-        
+
         if (note)
+        {
             note->setDuration(editValue);
+        }
         else if (programChange)
+        {
             programChange->setProgram(editValue);
+        }
         else if (controlChange)
+        {
             controlChange->setController(editValue);
+        }
         else if (channelPressure)
+        {
             channelPressure->setAmount(editValue);
+        }
         else if (polyPressure)
+        {
             polyPressure->setNote(editValue);
+        }
     }
 }
 
 void EditMultipleScreen::checkNotes()
 {
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
-    for (auto& event : stepEditorScreen->getSelectedEvents())
+    for (auto &event : stepEditorScreen->getSelectedEvents())
     {
         auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
-        
+
         if (note)
+        {
             note->setNote(changeNoteTo);
+        }
     }
 }
 
@@ -252,11 +278,11 @@ void EditMultipleScreen::setEditType(int i)
 
 void EditMultipleScreen::updateEditMultiple()
 {
-    
+
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
     auto event = stepEditorScreen->getSelectedEvent();
     auto letter = stepEditorScreen->getSelectedParameterLetter();
-    
+
     auto track = mpc.getSequencer()->getActiveTrack();
 
     if (std::dynamic_pointer_cast<NoteOnEvent>(event) && track->getBus() != 0)
@@ -267,7 +293,7 @@ void EditMultipleScreen::updateEditMultiple()
             findField("value1")->Hide(true);
             findLabel("value0")->Hide(false);
             findLabel("value0")->setLocation(xPosSingle, yPosSingle);
-            
+
             if (letter == "a")
             {
                 findLabel("value0")->setText(singleLabels[0]);
@@ -287,13 +313,13 @@ void EditMultipleScreen::updateEditMultiple()
             else if (letter == "c")
             {
                 findLabel("value0")->setText(singleLabels[2]);
-                
+
                 if (variationType == NoteOnEvent::VARIATION_TYPE::TUNE_0)
                 {
                     findField("value0")->setSize(4 * 6 + 1, 9);
                     findField("value0")->setLocation(45, findField("value0")->getY());
                     auto noteVarValue = (variationValue * 2) - 128;
-                    
+
                     if (noteVarValue < -120)
                     {
                         noteVarValue = -120;
@@ -302,7 +328,7 @@ void EditMultipleScreen::updateEditMultiple()
                     {
                         noteVarValue = 120;
                     }
-                    
+
                     if (noteVarValue == 0)
                     {
                         findField("value0")->setTextPadded(0, " ");
@@ -316,14 +342,16 @@ void EditMultipleScreen::updateEditMultiple()
                         findField("value0")->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
                     }
                 }
-                
+
                 if (variationType == NoteOnEvent::VARIATION_TYPE::DECAY_1 || variationType == NoteOnEvent::VARIATION_TYPE::ATTACK_2)
                 {
                     auto noteVarValue = variationValue;
-                    
+
                     if (noteVarValue > 100)
+                    {
                         noteVarValue = 100;
-                    
+                    }
+
                     findField("value0")->setText(StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
                     findField("value0")->setSize(3 * 6 + 1, 9);
                     findField("value0")->setLocation(51, findField("value0")->getY());
@@ -332,21 +360,29 @@ void EditMultipleScreen::updateEditMultiple()
                 {
                     findField("value0")->setSize(4 * 6 + 1, 9);
                     findField("value0")->setLocation(45, findField("value0")->getY());
-                    
+
                     auto noteVarValue = variationValue - 50;
-                    
+
                     if (noteVarValue > 50)
+                    {
                         noteVarValue = 50;
-                    
+                    }
+
                     if (noteVarValue < 0)
+                    {
                         findField("value0")->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 2));
+                    }
                     else if (noteVarValue > 0)
+                    {
                         findField("value0")->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 2));
+                    }
                     else
+                    {
                         findField("value0")->setTextPadded("0", " ");
+                    }
                 }
             }
-            
+
             findLabel("value0")->setSize(findLabel("value0")->getText().length() * 6 + 1, 9);
             findField("value0")->Hide(false);
             findField("value0")->setLocation(xPosSingle + findLabel("value0")->getW(), yPosSingle);
@@ -356,7 +392,7 @@ void EditMultipleScreen::updateEditMultiple()
             updateDouble();
         }
     }
-    
+
     if (std::dynamic_pointer_cast<NoteOnEvent>(event) && track->getBus() == 0)
     {
         if (letter == "a")
@@ -377,10 +413,7 @@ void EditMultipleScreen::updateEditMultiple()
             updateDouble();
         }
     }
-    if (std::dynamic_pointer_cast<ProgramChangeEvent>(event)
-        || std::dynamic_pointer_cast<PolyPressureEvent>(event)
-        || std::dynamic_pointer_cast<ChannelPressureEvent>(event)
-        || std::dynamic_pointer_cast<ControlChangeEvent>(event))
+    if (std::dynamic_pointer_cast<ProgramChangeEvent>(event) || std::dynamic_pointer_cast<PolyPressureEvent>(event) || std::dynamic_pointer_cast<ChannelPressureEvent>(event) || std::dynamic_pointer_cast<ControlChangeEvent>(event))
     {
         updateDouble();
     }
@@ -389,7 +422,7 @@ void EditMultipleScreen::updateEditMultiple()
 void EditMultipleScreen::updateDouble()
 {
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
-    
+
     findLabel("value0")->Hide(false);
     findLabel("value1")->Hide(false);
     findField("value0")->Hide(false);
@@ -424,7 +457,7 @@ void EditMultipleScreen::setVariationType(NoteOnEvent::VARIATION_TYPE type)
 
 void mpc::lcdgui::screens::window::EditMultipleScreen::incrementVariationType(int i)
 {
-    variationType = mpc::sequencer::NoteOnEvent::VARIATION_TYPE(std::clamp(i,0,3));
+    variationType = mpc::sequencer::NoteOnEvent::VARIATION_TYPE(std::clamp(i, 0, 3));
     updateEditMultiple();
 }
 

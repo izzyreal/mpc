@@ -33,12 +33,12 @@ using namespace mpc::midi::event;
 using namespace mpc::sequencer;
 
 MidiReader::MidiReader(std::shared_ptr<std::istream> istream, std::weak_ptr<Sequence> _dest)
-        : dest (_dest)
+    : dest(_dest)
 {
     midiFile = std::make_unique<mpc::midi::MidiFile>(istream);
 }
 
-void MidiReader::parseSequence(mpc::Mpc& mpc)
+void MidiReader::parseSequence(mpc::Mpc &mpc)
 {
     auto lSequencer = mpc.getSequencer();
     auto midiTracks = midiFile->getTracks();
@@ -55,27 +55,37 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
     bool isMpc2000XlMidiFile = false;
 
-    for (auto& event : midiTracks[0].lock()->getEvents())
+    for (auto &event : midiTracks[0].lock()->getEvents())
     {
         if (const auto textEvent = std::dynamic_pointer_cast<meta::Text>(event.lock()); textEvent)
         {
             auto text = textEvent->getText();
 
             if (text.find("LOOP=ON") != std::string::npos)
+            {
                 sequence->setLoopEnabled(true);
+            }
             else if (text.find("LOOP=OFF") != std::string::npos)
+            {
                 sequence->setLoopEnabled(false);
+            }
 
             if (text.find("TEMPO=ON") != std::string::npos)
+            {
                 lSequencer->setTempoSourceSequence(true);
+            }
             else if (text.find("TEMPO=OFF") != std::string::npos)
+            {
                 lSequencer->setTempoSourceSequence(false);
+            }
 
             firstLoopBar = stoi(text.substr(15, 18));
             lastLoopBar = -1;
 
             if (isInteger(text.substr(23, 26)))
+            {
                 lastLoopBar = stoi(text.substr(23, 26));
+            }
         }
         else if (const auto trackNameEvent = std::dynamic_pointer_cast<meta::TrackName>(event.lock());
                  trackNameEvent && trackNameEvent->getTrackName().find("MPC2000XL 1.00  ") != std::string::npos)
@@ -112,7 +122,9 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
     }
 
     if (timeSignatures.size() == 1)
+    {
         lengthInTicks = midiTracks[0].lock()->getEndOfTrackDelta();
+    }
 
     int accumLength = 0;
     int barCounter = 0;
@@ -123,7 +135,9 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         std::shared_ptr<meta::TimeSignature> next;
 
         if (timeSignatures.size() > i + 1)
+        {
             next = timeSignatures[i + 1].lock();
+        }
 
         if (next)
         {
@@ -171,10 +185,11 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         auto trackIndex = isMpc2000XlMidiFile ? i - 1 : i;
         auto deviceIndex = 0;
 
-        for (auto& e: mt->getEvents())
+        for (auto &e : mt->getEvents())
         {
             auto textEvent = std::dynamic_pointer_cast<meta::Text>(e.lock());
-            if (textEvent) {
+            if (textEvent)
+            {
                 auto text = textEvent->getText();
                 if (text.find(trackDataPrefix) != std::string::npos)
                 {
@@ -199,7 +214,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
         if (isMpc2000XlMidiFile)
         {
-            for (auto& me : mt->getEvents())
+            for (auto &me : mt->getEvents())
             {
                 auto noteOff = std::dynamic_pointer_cast<NoteOff>(me.lock());
                 auto noteOn = std::dynamic_pointer_cast<NoteOn>(me.lock());
@@ -247,7 +262,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         }
         else // if !isMpc2000XlMidiFile
         {
-            for (auto &me: mt->getEvents())
+            for (auto &me : mt->getEvents())
             {
                 auto noteOff = std::dynamic_pointer_cast<NoteOff>(me.lock());
                 auto noteOn = std::dynamic_pointer_cast<NoteOn>(me.lock());
@@ -266,7 +281,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
             }
         }
 
-        for (auto& n: noteOns)
+        for (auto &n : noteOns)
         {
             auto noteOn = track->recordNoteEventSynced(n->getTick(), n->getNote(), n->getVelocity());
 
@@ -315,13 +330,13 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
             }
         }
 
-        for (auto& me : mt->getEvents())
+        for (auto &me : mt->getEvents())
         {
             if (const auto sysEx = std::dynamic_pointer_cast<mpc::midi::event::SystemExclusiveEvent>(me.lock()); sysEx)
             {
                 auto sysExEventBytes = sysEx->getData();
 
-                if (sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 && sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 && sysExEventBytes[3] == 69 && sysExEventBytes[7] == (char) 247)
+                if (sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 && sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 && sysExEventBytes[3] == 69 && sysExEventBytes[7] == (char)247)
                 {
                     auto mixerEvent = std::make_shared<MixerEvent>();
                     track->addEvent(sysEx->getTick(), mixerEvent);
@@ -393,7 +408,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
 bool MidiReader::isInteger(std::string s)
 {
-    for (auto& c : s)
+    for (auto &c : s)
     {
         if (!std::isdigit(c))
         {
@@ -408,13 +423,16 @@ int MidiReader::getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<Ch
 {
     int counter = 0;
 
-    for (auto& no : allNotes)
+    for (auto &no : allNotes)
     {
-        auto  noteOn = std::dynamic_pointer_cast<NoteOn>(no);
+        auto noteOn = std::dynamic_pointer_cast<NoteOn>(no);
 
         if (noteOn)
         {
-            if (noteOn->getNoteValue() == noteValue) counter++;
+            if (noteOn->getNoteValue() == noteValue)
+            {
+                counter++;
+            }
         }
     }
 
@@ -425,8 +443,13 @@ int MidiReader::getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<Note
 {
     int counter = 0;
 
-    for (auto& ne : allNotes)
-        if (ne->getNote() == noteValue) counter++;
+    for (auto &ne : allNotes)
+    {
+        if (ne->getNote() == noteValue)
+        {
+            counter++;
+        }
+    }
 
     return counter;
 }

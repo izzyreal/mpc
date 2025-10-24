@@ -13,7 +13,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-DeleteFileScreen::DeleteFileScreen(mpc::Mpc& mpc, int layerIndex)
+DeleteFileScreen::DeleteFileScreen(mpc::Mpc &mpc, int layerIndex)
     : ScreenComponent(mpc, "delete-file", layerIndex)
 {
 }
@@ -28,10 +28,15 @@ void DeleteFileScreen::function(int i)
         mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
         break;
 
-    case 4: {
+    case 4:
+    {
         auto directoryScreen = mpc.screens->get<DirectoryScreen>();
         ls->showPopupAndAwaitInteraction("Delete: " + directoryScreen->getSelectedFile()->getName());
-        std::thread([this] { deleteFile(); }).detach();
+        std::thread([this]
+                    {
+                        deleteFile();
+                    })
+            .detach();
         break;
     }
     }
@@ -57,4 +62,3 @@ void DeleteFileScreen::deleteFile()
 
     mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
 }
-

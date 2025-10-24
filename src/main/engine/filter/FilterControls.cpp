@@ -9,70 +9,72 @@ using namespace mpc::engine::control;
 using namespace std;
 
 FilterControls::FilterControls(int id, string name, int idOffset)
-	: CompoundControl(id, name)
+    : CompoundControl(id, name)
 {
-	this->idOffset = idOffset;
-	createControls();
-	deriveSampleRateIndependentVariables();
+    this->idOffset = idOffset;
+    createControls();
+    deriveSampleRateIndependentVariables();
 }
 
-shared_ptr<ControlLaw> FilterControls::SEMITONE_LAW() {
-	static shared_ptr<ControlLaw> res = make_shared<LinearLaw>(-48.f, 96.f, "semitones");
-	return res;
+shared_ptr<ControlLaw> FilterControls::SEMITONE_LAW()
+{
+    static shared_ptr<ControlLaw> res = make_shared<LinearLaw>(-48.f, 96.f, "semitones");
+    return res;
 }
 
-void FilterControls::derive(Control* c)
+void FilterControls::derive(Control *c)
 {
-	switch (c->getId() - idOffset) {
-	case FREQUENCY:
-		cutoff = deriveCutoff();
-		break;
-	case RESONANCE:
-		resonance = deriveResonance();
-		break;
-	}
+    switch (c->getId() - idOffset)
+    {
+    case FREQUENCY:
+        cutoff = deriveCutoff();
+        break;
+    case RESONANCE:
+        resonance = deriveResonance();
+        break;
+    }
 }
 
 void FilterControls::createControls()
 {
-	cutoffControl = createCutoffControl();
-	add(shared_ptr<Control>(cutoffControl));
-	resonanceControl = createResonanceControl();
-	add(shared_ptr<Control>(resonanceControl));
+    cutoffControl = createCutoffControl();
+    add(shared_ptr<Control>(cutoffControl));
+    resonanceControl = createResonanceControl();
+    add(shared_ptr<Control>(resonanceControl));
 }
 
 void FilterControls::deriveSampleRateIndependentVariables()
 {
-	resonance = deriveResonance();
-	cutoff = deriveCutoff();
+    resonance = deriveResonance();
+    cutoff = deriveCutoff();
 }
 
 float FilterControls::deriveResonance()
 {
-	return resonanceControl->getValue();
+    return resonanceControl->getValue();
 }
 
 float FilterControls::deriveCutoff()
 {
-	return cutoffControl->getValue();
+    return cutoffControl->getValue();
 }
 
-LawControl* FilterControls::createCutoffControl()
+LawControl *FilterControls::createCutoffControl()
 {
-	return new LawControl(FREQUENCY + idOffset, "Cutoff", SEMITONE_LAW(), 0.0f);
+    return new LawControl(FREQUENCY + idOffset, "Cutoff", SEMITONE_LAW(), 0.0f);
 }
 
-LawControl* FilterControls::createResonanceControl()
+LawControl *FilterControls::createResonanceControl()
 {
-	return new LawControl(RESONANCE + idOffset, "Resonance", LinearLaw::UNITY(), 0.25f);
+    return new LawControl(RESONANCE + idOffset, "Resonance", LinearLaw::UNITY(), 0.25f);
 }
 
 float FilterControls::getCutoff()
 {
-	return cutoff;
+    return cutoff;
 }
 
 float FilterControls::getResonance()
 {
-	return resonance;
+    return resonance;
 }

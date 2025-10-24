@@ -8,30 +8,29 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class LoopEndFineScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class LoopEndFineScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		LoopEndFineScreen(mpc::Mpc& mpc, const int layerIndex);
+    public:
+        LoopEndFineScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
-		
-		void function(int i) override;
-		void turnWheel(int i) override;
-		void left() override;
-		void right() override;
-		void pressEnter() override;
+        void open() override;
+
+        void function(int i) override;
+        void turnWheel(int i) override;
+        void left() override;
+        void right() override;
+        void pressEnter() override;
         void setSlider(int) override;
 
-	private:
-		void displayLoopLngth();
-		void displayLngthField();
-		void displayFineWave();
-		void displayEnd();
-		void displayPlayX();
+    private:
+        void displayLoopLngth();
+        void displayLngthField();
+        void displayFineWave();
+        void displayEnd();
+        void displayPlayX();
 
-		const std::vector<std::string> playXNames{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
-
-	};
-}
+        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END"};
+    };
+} // namespace mpc::lcdgui::screens::window

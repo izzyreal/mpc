@@ -6,6 +6,6 @@ using namespace mpc::engine::audio::mixer;
 using namespace std;
 
 BusControls::BusControls(int id, string name)
-	: AudioControls(id, name)
+    : AudioControls(id, name)
 {
 }

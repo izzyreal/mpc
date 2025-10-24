@@ -59,13 +59,12 @@ void Drum::setLastReceivedMidiVolume(int volume)
     lastReceivedMidiVolume = std::clamp(volume, 0, 127);
 }
 
-std::vector<std::shared_ptr<StereoMixer>>& Drum::getStereoMixerChannels()
+std::vector<std::shared_ptr<StereoMixer>> &Drum::getStereoMixerChannels()
 {
     return stereoMixerChannels;
 }
 
-std::vector<std::shared_ptr<IndivFxMixer>>& Drum::getIndivFxMixerChannels()
+std::vector<std::shared_ptr<IndivFxMixer>> &Drum::getIndivFxMixerChannels()
 {
     return indivFxMixerChannels;
 }
-

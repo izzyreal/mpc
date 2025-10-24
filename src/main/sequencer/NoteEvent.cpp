@@ -5,7 +5,10 @@
 using namespace mpc::sequencer;
 using namespace mpc::engine::midi;
 
-bool mpc::sequencer::isDrumNote(int number) { return number >= 35 && number <= 98; }
+bool mpc::sequencer::isDrumNote(int number)
+{
+    return number >= 35 && number <= 98;
+}
 
 void NoteOffEvent::setNote(int i)
 {
@@ -31,12 +34,12 @@ NoteOnEvent::NoteOnEvent(int i, int vel)
     setVelocity(vel);
 }
 
-NoteOnEvent::NoteOnEvent(mpc::engine::midi::ShortMessage* msg) : NoteOnEvent(msg->getData1(), msg->getData2())
+NoteOnEvent::NoteOnEvent(mpc::engine::midi::ShortMessage *msg) : NoteOnEvent(msg->getData1(), msg->getData2())
 {
     assert(msg->getCommand() == ShortMessage::NOTE_ON);
 }
 
-NoteOnEvent::NoteOnEvent(const NoteOnEvent& event) : Event(event)
+NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
     setNote(event.number);
@@ -78,7 +81,10 @@ int NoteOnEvent::getNote()
 
 void NoteOnEvent::setDuration(Duration d)
 {
-    if (d) duration = static_cast<int>(std::clamp(*d,0,9999));
+    if (d)
+    {
+        duration = static_cast<int>(std::clamp(*d, 0, 9999));
+    }
     notifyObservers(std::string("step-editor"));
 }
 
@@ -146,5 +152,5 @@ bool NoteOnEvent::isFinalized()
 
 bool NoteOnEvent::isPlayOnly()
 {
-    return dynamic_cast<NoteOnEventPlayOnly*>(this) != nullptr;
+    return dynamic_cast<NoteOnEventPlayOnly *>(this) != nullptr;
 }

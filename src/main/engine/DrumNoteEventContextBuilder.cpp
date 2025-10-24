@@ -17,7 +17,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
     std::shared_ptr<AudioMixer> mixer,
     std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
     std::vector<std::shared_ptr<Voice>> *voices,
-    std::vector<MixerInterconnection*> &mixerConnections,
+    std::vector<MixerInterconnection *> &mixerConnections,
     int note,
     int velocity,
     int varType,
@@ -25,8 +25,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
     int frameOffset,
     bool firstGeneration,
     int startTick,
-    int durationFrames
-)
+    int durationFrames)
 {
     DrumNoteOnContext ctx;
     ctx.noteEventId = noteEventId;
@@ -52,8 +51,7 @@ DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
     Drum *drum,
     std::vector<std::shared_ptr<Voice>> *voices,
     int note,
-    int noteOnStartTick
-)
+    int noteOnStartTick)
 {
     DrumNoteOffContext ctx;
     ctx.noteEventId = noteEventId;
@@ -65,4 +63,3 @@ DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
     ctx.noteOnStartTick = noteOnStartTick;
     return ctx;
 }
-

@@ -16,59 +16,71 @@
 #include <string>
 #include <memory>
 
-namespace mpc::engine {
+namespace mpc::engine
+{
     class Drum;
     class PreviewSoundPlayer;
-}
+} // namespace mpc::engine
 
-namespace mpc::hardware {
+namespace mpc::hardware
+{
     class Hardware;
 }
 
-namespace mpc::controller {
+namespace mpc::controller
+{
     class ClientHardwareControllerBase;
 }
 
-namespace mpc::input {
+namespace mpc::input
+{
     struct HostInputEvent;
     class PadAndButtonKeyboard;
-}
+} // namespace mpc::input
 
-namespace mpc::disk {
+namespace mpc::disk
+{
     class AbstractDisk;
 }
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
     class Screens;
     class LayeredScreen;
     class ScreenComponent;
-}
+} // namespace mpc::lcdgui
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
     class EventHandler;
     class AudioMidiServices;
     class MidiInput;
     class MidiOutput;
     class MidiDeviceDetector;
-}
+} // namespace mpc::audiomidi
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
     class Sequencer;
     class Clock;
-}
+} // namespace mpc::sequencer
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Sampler;
 }
 
-namespace mpc::nvram {
+namespace mpc::nvram
+{
     struct MidiControlPreset;
     // Presets available in the default preset path,
     // loaded into memory, and maintained as presets are changed, added or deleted.
-}
+} // namespace mpc::nvram
 
-namespace mpc {
-    class Mpc : public Observable {
+namespace mpc
+{
+    class Mpc : public Observable
+    {
     private:
         bool afterEnabled = false;
         bool fullLevelEnabled = false;
@@ -80,7 +92,7 @@ namespace mpc {
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::audiomidi::MidiDeviceDetector> midiDeviceDetector;
-        std::vector<audiomidi::MidiInput*> midiInputs;
+        std::vector<audiomidi::MidiInput *> midiInputs;
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
@@ -108,24 +120,24 @@ namespace mpc {
         std::shared_ptr<mpc::input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<mpc::controller::ClientHardwareControllerBase> inputController;
 
-        void dispatchHostInput(const mpc::input::HostInputEvent& hostEvent);
+        void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getScreen();
         std::shared_ptr<hardware::Hardware> getHardware();
-        mpc::disk::DiskController* getDiskController();
+        mpc::disk::DiskController *getDiskController();
         std::shared_ptr<mpc::input::PadAndButtonKeyboard> getPadAndButtonKeyboard();
 
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        mpc::engine::Drum& getDrum(int i);
-        mpc::engine::PreviewSoundPlayer& getBasicPlayer();
+        mpc::engine::Drum &getDrum(int i);
+        mpc::engine::PreviewSoundPlayer &getBasicPlayer();
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
-        mpc::audiomidi::MidiInput* getMpcMidiInput(int i);
+        mpc::audiomidi::MidiInput *getMpcMidiInput(int i);
         std::shared_ptr<mpc::sequencer::Clock> getClock();
 
         bool isAfterEnabled() const;
@@ -145,5 +157,4 @@ namespace mpc {
         static std::vector<char> akaiAsciiChar;
         static std::vector<std::string> akaiAscii;
     };
-}
-
+} // namespace mpc

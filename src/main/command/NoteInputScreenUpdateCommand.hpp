@@ -1,13 +1,16 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command::context {
+namespace mpc::command::context
+{
     struct NoteInputScreenUpdateContext;
 }
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class NoteInputScreenUpdateCommand : public Command {
+    class NoteInputScreenUpdateCommand : public Command
+    {
     public:
         NoteInputScreenUpdateCommand(context::NoteInputScreenUpdateContext &ctx, const int note);
         void execute() override;

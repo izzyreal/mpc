@@ -7,13 +7,14 @@ using namespace mpc::engine;
 using namespace mpc::engine::control;
 
 FaderControl::FaderControl()
-	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 100.f)
+    : LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 100.f)
 {
 }
 
-std::shared_ptr<ControlLaw> FaderControl::MPC_FADER_LAW() {
-	static auto res = std::make_shared<LinearLaw>(0.f, 100.f, "");
-	return res;
+std::shared_ptr<ControlLaw> FaderControl::MPC_FADER_LAW()
+{
+    static auto res = std::make_shared<LinearLaw>(0.f, 100.f, "");
+    return res;
 }
 
 void FaderControl::setValue(float value)
@@ -24,6 +25,5 @@ void FaderControl::setValue(float value)
 
 float FaderControl::getGain()
 {
-	return gain;
+    return gain;
 }
-

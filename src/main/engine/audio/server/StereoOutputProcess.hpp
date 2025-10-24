@@ -4,13 +4,12 @@
 
 namespace mpc::engine::audio::server
 {
-	class StereoOutputProcess
-		: public AudioServerProcess
-	{
+    class StereoOutputProcess
+        : public AudioServerProcess
+    {
 
-	public:
-		int processAudio(mpc::engine::audio::core::AudioBuffer* buffer, int nFrames) override;
-		StereoOutputProcess(std::string name);
-
-	};
-}
+    public:
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
+        StereoOutputProcess(std::string name);
+    };
+} // namespace mpc::engine::audio::server

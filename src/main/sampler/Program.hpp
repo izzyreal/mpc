@@ -6,27 +6,33 @@
 
 #include <memory>
 
-namespace mpc::engine {
-	class StereoMixer;
-	class IndivFxMixer;
+namespace mpc::engine
+{
+    class StereoMixer;
+    class IndivFxMixer;
+} // namespace mpc::engine
+
+namespace mpc
+{
+    class Mpc;
 }
 
-namespace mpc { class Mpc; }
+namespace mpc::sampler
+{
 
-namespace mpc::sampler {
+    class Pad;
 
-	class Pad;
+    class Program
+    {
 
-	class Program
-	{
+    public:
+        std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int noteIndex);
+        std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int noteIndex);
 
-	public:
-		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int noteIndex);
-		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int noteIndex);
-        
-		int getPadIndexFromNote(int note);
+        int getPadIndexFromNote(int note);
 
-        enum class PadPressSource : uint8_t {
+        enum class PadPressSource : uint8_t
+        {
             PHYSICAL = 0,
             NON_PHYSICAL = 1,
             COUNT
@@ -36,7 +42,7 @@ namespace mpc::sampler {
 
         void registerPadPress(int padIndex, PadPressSource source);
 
-        void registerPadRelease(int padIndex, PadPressSource source); 
+        void registerPadRelease(int padIndex, PadPressSource source);
 
         bool isPadRegisteredAsPressed(int padIndex) const;
 
@@ -44,46 +50,46 @@ namespace mpc::sampler {
 
         void clearPressedPadRegistry();
 
-	private:
-		Sampler* sampler = nullptr;
-		std::string name;
-		std::vector<NoteParameters*> noteParameters;
-		std::vector<Pad*> pads;
-		PgmSlider* slider = nullptr;
-		int midiProgramChange = 0;
+    private:
+        Sampler *sampler = nullptr;
+        std::string name;
+        std::vector<NoteParameters *> noteParameters;
+        std::vector<Pad *> pads;
+        PgmSlider *slider = nullptr;
+        int midiProgramChange = 0;
 
-		void init();
+        void init();
 
-        inline constexpr size_t sourceIndex(PadPressSource s) {
+        inline constexpr size_t sourceIndex(PadPressSource s)
+        {
             return static_cast<size_t>(s);
         }
 
-        struct PadPressState {
+        struct PadPressState
+        {
             int totalCount = 0;
-            std::array<int, static_cast<size_t>(PadPressSource::COUNT)> sourceCount {};
+            std::array<int, static_cast<size_t>(PadPressSource::COUNT)> sourceCount{};
         };
 
-        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> pressedPadRegistry {};
+        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> pressedPadRegistry{};
 
+    public:
+        int getNumberOfSamples();
+        void setName(std::string s);
+        std::string getName();
+        Pad *getPad(int i);
+        std::vector<NoteParameters *> getNotesParameters();
+        NoteParameters *getNoteParameters(int note);
+        mpc::sampler::PgmSlider *getSlider();
+        void setNoteParameters(int i, NoteParameters *noteParameters);
+        int getMidiProgramChange();
+        void setMidiProgramChange(int i);
+        void initPadAssign();
+        int getNoteFromPad(int i);
+        std::vector<int> getPadIndicesFromNote(const int note);
 
-	public:
-		int getNumberOfSamples();
-		void setName(std::string s);
-		std::string getName();
-		Pad* getPad(int i);
-		std::vector<NoteParameters*> getNotesParameters();
-        NoteParameters* getNoteParameters(int note);
-        mpc::sampler::PgmSlider* getSlider();
-		void setNoteParameters(int i, NoteParameters* noteParameters);
-		int getMidiProgramChange();
-		void setMidiProgramChange(int i);
-		void initPadAssign();
-		int getNoteFromPad(int i);
-		std::vector<int> getPadIndicesFromNote(const int note);
-
-	public:
-		Program(mpc::Mpc& mpc, mpc::sampler::Sampler* samplerToUse);
-		~Program();
-
-	};
-}
+    public:
+        Program(mpc::Mpc &mpc, mpc::sampler::Sampler *samplerToUse);
+        ~Program();
+    };
+} // namespace mpc::sampler

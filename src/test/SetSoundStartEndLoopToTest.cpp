@@ -19,7 +19,7 @@ using namespace mpc::hardware;
 const uint16_t SOUND_LENGTH = 1000;
 const uint16_t MAX_SLIDER_VALUE = 127;
 
-std::shared_ptr<Sound> initSound(mpc::Mpc& mpc)
+std::shared_ptr<Sound> initSound(mpc::Mpc &mpc)
 {
     auto sound = mpc.getSampler()->addSound();
     assert(sound != nullptr);
@@ -101,7 +101,7 @@ TEST_CASE("TRIM screen", "[sound]")
 
     auto startFineScreen = mpc.screens->get<StartFineScreen>();
 
-    startFineScreen->down(); // Move to Smpl length: field
+    startFineScreen->down();       // Move to Smpl length: field
     startFineScreen->turnWheel(1); // Set Smpl length from VARI to FIX
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
@@ -169,7 +169,7 @@ TEST_CASE("Start fine window", "[sound]")
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto trimScreen = mpc.screens->get<TrimScreen>();
-    trimScreen->down(); // Move to St: field
+    trimScreen->down();       // Move to St: field
     trimScreen->openWindow(); // Open Start fine window
     auto startFineScreen = mpc.screens->get<StartFineScreen>();
     // Try to decrease Start by 1, but it's expected to be at 0 so shouldn't go any lower
@@ -197,7 +197,7 @@ TEST_CASE("Start fine window", "[sound]")
     sound->setStart(250);
     sound->setEnd(500);
 
-    startFineScreen->down(); // Move to Smpl length: field
+    startFineScreen->down();       // Move to Smpl length: field
     startFineScreen->turnWheel(1); // Set Smpl length from VARI to FIX
 
     startFineScreen->up();
@@ -224,8 +224,8 @@ TEST_CASE("End fine window", "[sound]")
 
     mpc.getLayeredScreen()->openScreen<TrimScreen>();
     auto trimScreen = mpc.screens->get<TrimScreen>();
-    trimScreen->down(); // Move to St: field
-    trimScreen->right(); // Move to End: field
+    trimScreen->down();       // Move to St: field
+    trimScreen->right();      // Move to End: field
     trimScreen->openWindow(); // Open End fine window
     auto endFineScreen = mpc.screens->get<EndFineScreen>();
     // Try to increase End by 1, but it's expected to be at SOUND_LENGTH so shouldn't go any higher
@@ -253,7 +253,7 @@ TEST_CASE("End fine window", "[sound]")
     sound->setStart(250);
     sound->setEnd(500);
 
-    endFineScreen->down(); // Move to Smpl length: field
+    endFineScreen->down();       // Move to Smpl length: field
     endFineScreen->turnWheel(1); // Set Smpl length from VARI to FIX
 
     endFineScreen->up();
@@ -293,7 +293,7 @@ TEST_CASE("LOOP screen with end", "[sound]")
     // Loop To may not change End value, contrary to how St and End may affect each other
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == SOUND_LENGTH - 1);
-    REQUIRE(sound->getEnd() == SOUND_LENGTH -1);
+    REQUIRE(sound->getEnd() == SOUND_LENGTH - 1);
 
     sound->setEnd(SOUND_LENGTH);
 
@@ -318,13 +318,15 @@ TEST_CASE("LOOP screen with end", "[sound]")
     sound->setLoopTo(250);
     sound->setEnd(500);
 
-    loopScreen->left();loopScreen->left(); // Move back to To: field
+    loopScreen->left();
+    loopScreen->left(); // Move back to To: field
     loopScreen->turnWheel(-1);
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == 249);
     REQUIRE(sound->getEnd() == 500);
 
-    loopScreen->right();loopScreen->right(); // Move back to End: field
+    loopScreen->right();
+    loopScreen->right(); // Move back to End: field
     loopScreen->turnWheel(-1);
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == 249);
@@ -339,7 +341,8 @@ TEST_CASE("LOOP screen with end", "[sound]")
     REQUIRE(sound->getEnd() == SOUND_LENGTH);
 
     shiftButton->release();
-    loopScreen->left();loopScreen->left(); // Back to To: field
+    loopScreen->left();
+    loopScreen->left(); // Back to To: field
 
     shiftButton->press();
     loopScreen->setSlider(0);
@@ -366,7 +369,8 @@ TEST_CASE("LOOP screen with end", "[sound]")
 
     auto loopToFineScreen = mpc.screens->get<LoopToFineScreen>();
 
-    loopToFineScreen->down();loopToFineScreen->down(); // Move to Loop Lngth: field
+    loopToFineScreen->down();
+    loopToFineScreen->down();       // Move to Loop Lngth: field
     loopToFineScreen->turnWheel(1); // Set Loop Lngth from VARI to FIX
 
     mpc.getLayeredScreen()->openScreen<LoopScreen>();
@@ -382,7 +386,8 @@ TEST_CASE("LOOP screen with end", "[sound]")
     REQUIRE(sound->getLoopTo() == 251);
     REQUIRE(sound->getEnd() == 501);
 
-    loopScreen->right();loopScreen->right(); // Move to End: field
+    loopScreen->right();
+    loopScreen->right(); // Move to End: field
     loopScreen->turnWheel(-1);
     REQUIRE(sound->getStart() == 0);
     REQUIRE(sound->getLoopTo() == 250);
@@ -398,7 +403,8 @@ TEST_CASE("LOOP screen with end", "[sound]")
     REQUIRE(sound->getLoopTo() == 0);
     REQUIRE(sound->getEnd() == 250);
 
-    loopScreen->left();loopScreen->left(); // Move to To: field
+    loopScreen->left();
+    loopScreen->left(); // Move to To: field
     loopScreen->turnWheel(750);
 
     // And this should be a no-op too
@@ -422,7 +428,8 @@ TEST_CASE("LOOP screen with end", "[sound]")
     REQUIRE(sound->getEnd() == SOUND_LENGTH);
 
     shiftButton->release();
-    loopScreen->right();loopScreen->right(); // Move to End: field
+    loopScreen->right();
+    loopScreen->right(); // Move to End: field
 
     shiftButton->press();
     loopScreen->setSlider(0);
@@ -449,9 +456,9 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
     auto loopScreen = mpc.screens->get<LoopScreen>();
 
     loopScreen->down();
-    loopScreen->right(); // Move to Lngth: field (label)
+    loopScreen->right();       // Move to Lngth: field (label)
     loopScreen->turnWheel(-1); // Set End: field to Lngth: field
-    loopScreen->right(); // Move to Lngth: field (value)
+    loopScreen->right();       // Move to Lngth: field (value)
     sound->setStart(250);
     sound->setEnd(750);
     sound->setLoopTo(500);
@@ -468,10 +475,10 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
     loopScreen->function(0); // Go to TRIM screen
     mpc.getScreen()->down();
     mpc.getScreen()->openWindow(); // Open Start fine window
-    mpc.getScreen()->down(); // Move to Smpl Length: field
+    mpc.getScreen()->down();       // Move to Smpl Length: field
     mpc.getScreen()->turnWheel(1); // Set Smpl Length to FIXed
-    mpc.getScreen()->function(3); // Close Start fine window
-    mpc.getScreen()->function(1); // Open LOOP screen, and we should be back at the Lngth: 's value field
+    mpc.getScreen()->function(3);  // Close Start fine window
+    mpc.getScreen()->function(1);  // Open LOOP screen, and we should be back at the Lngth: 's value field
     mpc.getScreen()->turnWheel(1); // Add 1 to the length
 
     // Now we expect the loop-to point to have changed. When increasing the loop length,
@@ -482,9 +489,9 @@ TEST_CASE("LOOP screen with loop length manipulation", "[sound]")
 
     mpc.getScreen()->openWindow(); // Open Loop End fine window
     mpc.getScreen()->down();
-    mpc.getScreen()->down(); // Move to Loop Lngth: field
+    mpc.getScreen()->down();       // Move to Loop Lngth: field
     mpc.getScreen()->turnWheel(1); // Set Loop Lngth to FIXed
-    mpc.getScreen()->function(3); // Go back to LOOP screen, back at Lgnth: 's value field
+    mpc.getScreen()->function(3);  // Go back to LOOP screen, back at Lgnth: 's value field
     mpc.getScreen()->turnWheel(1); // Loop Lngth is FIXed, so we expect this to be a no-op
 
     REQUIRE(sound->getStart() == 250);
@@ -500,7 +507,7 @@ TEST_CASE("Loop To fine window", "[sound]")
 
     mpc.getLayeredScreen()->openScreen<LoopScreen>();
 
-    mpc.getScreen()->down(); // Move to To: field
+    mpc.getScreen()->down();       // Move to To: field
     mpc.getScreen()->openWindow(); // Open Loop To fine window
 
     mpc.getScreen()->turnWheel(-1);
@@ -548,10 +555,10 @@ TEST_CASE("Loop To fine window", "[sound]")
 
     REQUIRE(mpc.getLayeredScreen()->isCurrentScreen<StartFineScreen>());
 
-    mpc.getScreen()->down(); // Move to Smpl Length: field
+    mpc.getScreen()->down();       // Move to Smpl Length: field
     mpc.getScreen()->turnWheel(1); // Set Smpl Length to FIXed
-    mpc.getScreen()->function(3); // Close Start fine window
-    mpc.getScreen()->function(1); // Open LOOP screen, and we should be back at the To: field
+    mpc.getScreen()->function(3);  // Close Start fine window
+    mpc.getScreen()->function(1);  // Open LOOP screen, and we should be back at the To: field
 
     REQUIRE(mpc.getLayeredScreen()->isCurrentScreen<LoopScreen>());
     REQUIRE(mpc.getLayeredScreen()->getFocusedFieldName() == "to");
@@ -567,9 +574,9 @@ TEST_CASE("Loop To fine window", "[sound]")
     REQUIRE(sound->getLoopTo() == 499);
     REQUIRE(sound->getEnd() == 751);
 
-    mpc.getScreen()->down(); // Move to Loop Lngth: field
+    mpc.getScreen()->down();       // Move to Loop Lngth: field
     mpc.getScreen()->turnWheel(1); // Set Loop Lngth to FIXed
-    mpc.getScreen()->up(); // Go back to LOOP Lngth: field
+    mpc.getScreen()->up();         // Go back to LOOP Lngth: field
     mpc.getScreen()->turnWheel(1); // Loop Lngth is FIXed, so we expect this to be a no-op
 
     REQUIRE(sound->getStart() == 250);

@@ -36,10 +36,14 @@ json read(mpc::Mpc &mpc)
     }
 
     if (!result.is_object())
+    {
         result = json::object();
+    }
 
     if (!result.contains("volumes"))
+    {
         result["volumes"] = json::array();
+    }
 
     return result;
 }
@@ -55,7 +59,9 @@ std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc &mpc)
         auto isActive = vol["active"].get<bool>();
 
         if (isActive)
+        {
             return uuid;
+        }
     }
 
     return "";
@@ -126,4 +132,3 @@ void VolumesPersistence::save(mpc::Mpc &mpc)
 
     set_file_data(path, std::vector<char>(data.begin(), data.end()));
 }
-

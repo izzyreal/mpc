@@ -2,21 +2,22 @@
 
 #include <vector>
 
-namespace mpc::file::all {
-class Header
+namespace mpc::file::all
 {
-public:
-    std::vector<char> loadBytes;
-    std::vector<char> saveBytes;
-    
-public:
-    std::vector<char>& getHeaderArray();
-    bool verifyFileID();
-    
-public:
-    std::vector<char>& getBytes();
-    
-    Header(const std::vector<char>& loadBytes);
-    Header();
-};
-}
+    class Header
+    {
+    public:
+        std::vector<char> loadBytes;
+        std::vector<char> saveBytes;
+
+    public:
+        std::vector<char> &getHeaderArray();
+        bool verifyFileID();
+
+    public:
+        std::vector<char> &getBytes();
+
+        Header(const std::vector<char> &loadBytes);
+        Header();
+    };
+} // namespace mpc::file::all

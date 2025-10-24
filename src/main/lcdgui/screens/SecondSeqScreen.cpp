@@ -4,8 +4,8 @@
 
 using namespace mpc::lcdgui::screens;
 
-SecondSeqScreen::SecondSeqScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "second-seq", layerIndex)
+SecondSeqScreen::SecondSeqScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "second-seq", layerIndex)
 {
 }
 
@@ -30,10 +30,10 @@ void SecondSeqScreen::function(int i)
         if (sequencer.lock()->isSecondSequenceEnabled())
         {
             sequencer.lock()->setSecondSequenceEnabled(false);
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             return;
         }
- 
+
         sequencer.lock()->setSecondSequenceEnabled(true);
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         break;
@@ -45,17 +45,21 @@ void SecondSeqScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "sq")
-		setSq(sq + i);
+    if (focusedFieldName == "sq")
+    {
+        setSq(sq + i);
+    }
 }
 
 void SecondSeqScreen::setSq(int i)
 {
     if (i < 0 || i > 98)
+    {
         return;
-    
+    }
+
     sq = i;
-    
+
     displaySq();
     displayFunctionKeys();
 }
@@ -70,7 +74,11 @@ void SecondSeqScreen::displaySq()
 void SecondSeqScreen::displayFunctionKeys()
 {
     if (sequencer.lock()->isSecondSequenceEnabled())
+    {
         ls->setFunctionKeysArrangement(2);
+    }
     else
+    {
         ls->setFunctionKeysArrangement(0);
+    }
 }

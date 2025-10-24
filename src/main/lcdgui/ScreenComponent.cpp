@@ -20,66 +20,68 @@ using namespace mpc::lcdgui;
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer)
-	: Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
+ScreenComponent::ScreenComponent(mpc::Mpc &mpc, const std::string &name, const int layer)
+    : Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
 {
-	auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()));
-	background->setBackgroundName(name);
+    auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()));
+    background->setBackgroundName(name);
 }
 
-void ScreenComponent::setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap)
+void ScreenComponent::setTransferMap(const std::map<std::string, std::vector<std::string>> &newTransferMap)
 {
-	transferMap = newTransferMap;
+    transferMap = newTransferMap;
 }
 
-std::map<std::string, std::vector<std::string>>& ScreenComponent::getTransferMap()
+std::map<std::string, std::vector<std::string>> &ScreenComponent::getTransferMap()
 {
-	return transferMap;
+    return transferMap;
 }
 
-void ScreenComponent::setFirstField(const std::string& newFirstField)
+void ScreenComponent::setFirstField(const std::string &newFirstField)
 {
-	firstField = newFirstField;
+    firstField = newFirstField;
 }
 
 std::string ScreenComponent::getFirstField()
 {
-	return firstField;
+    return firstField;
 }
 
 std::shared_ptr<Wave> ScreenComponent::findWave()
 {
-	return findChild<Wave>("wave");
+    return findChild<Wave>("wave");
 }
 
 std::shared_ptr<EnvGraph> ScreenComponent::findEnvGraph()
 {
-	return findChild<EnvGraph>("env-graph");
+    return findChild<EnvGraph>("env-graph");
 }
 
-const int& ScreenComponent::getLayerIndex()
+const int &ScreenComponent::getLayerIndex()
 {
-	return layer;
+    return layer;
 }
 
 std::shared_ptr<Field> ScreenComponent::findFocus()
 {
-	for (auto& field : findFields())
-	{
-		if (field->hasFocus())
-			return field;
-	}
-	return {};
+    for (auto &field : findFields())
+    {
+        if (field->hasFocus())
+        {
+            return field;
+        }
+    }
+    return {};
 }
 
-void ScreenComponent::setLastFocus(const std::string& screenName, const std::string& newLastFocus)
+void ScreenComponent::setLastFocus(const std::string &screenName, const std::string &newLastFocus)
 {
-	mpc.getLayeredScreen()->setLastFocus(screenName, newLastFocus);
+    mpc.getLayeredScreen()->setLastFocus(screenName, newLastFocus);
 }
 
-const std::string ScreenComponent::getLastFocus(const std::string& screenName)
+const std::string ScreenComponent::getLastFocus(const std::string &screenName)
 {
-	return mpc.getLayeredScreen()->getLastFocus(screenName);
+    return mpc.getLayeredScreen()->getLastFocus(screenName);
 }
 
 void ScreenComponent::openWindow()
@@ -89,16 +91,16 @@ void ScreenComponent::openWindow()
      * The behaviour is consistent for nearly all cases, with a few exceptions.
      * See https://github.com/izzyreal/mpc/issues/260
      */
-    if (dynamic_cast<MidiOutputMonitorScreen*>(this))
+    if (dynamic_cast<MidiOutputMonitorScreen *>(this))
     {
         return;
     }
-    else if (dynamic_cast<MetronomeSoundScreen*>(this))
+    else if (dynamic_cast<MetronomeSoundScreen *>(this))
     {
         PushMainScreenCommand(mpc).execute();
         return;
     }
-    
+
     mpc.getLayeredScreen()->closeCurrentScreen();
 }
 
@@ -114,11 +116,11 @@ std::optional<int> ScreenComponent::getDrumIndex()
     {
         return drumIndex;
     }
-    
+
     return std::nullopt;
 }
 
-mpc::engine::Drum& ScreenComponent::activeDrum()
+mpc::engine::Drum &ScreenComponent::activeDrum()
 {
     const auto drumIndex = getDrumIndex();
     assert(drumIndex);
@@ -151,7 +153,10 @@ std::optional<std::string> ScreenComponent::getFocusedFieldName()
 std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow()
 {
     auto f = getFocusedField();
-    if (!f) throw std::runtime_error("Expected focused field");
+    if (!f)
+    {
+        throw std::runtime_error("Expected focused field");
+    }
     return f;
 }
 
@@ -177,7 +182,9 @@ std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()
 
 {
     auto p = getProgram();
-    if (!p) throw std::runtime_error("Expected program");
+    if (!p)
+    {
+        throw std::runtime_error("Expected program");
+    }
     return p;
 }
-

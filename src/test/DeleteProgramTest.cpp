@@ -22,5 +22,4 @@ TEST_CASE("Delete program", "[program]")
 
     sampler->deleteProgram(sampler->getProgram(0));
     REQUIRE(mpc.getDrum(0).getProgram() == 1);
-
 }

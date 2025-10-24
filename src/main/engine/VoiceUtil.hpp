@@ -2,16 +2,15 @@
 
 #include <vector>
 
-namespace mpc::engine {
+namespace mpc::engine
+{
 
-    class VoiceUtil 
+    class VoiceUtil
     {
     public:
         static float getInverseNyquist(const int sampleRate);
         static float midiFreq(const float pitch);
         static float midiFreqImpl(const int pitch);
-        static std::vector<float>& freqTable();
-
+        static std::vector<float> &freqTable();
     };
-}
-
+} // namespace mpc::engine

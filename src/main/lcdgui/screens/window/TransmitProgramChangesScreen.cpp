@@ -2,34 +2,34 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-TransmitProgramChangesScreen::TransmitProgramChangesScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "transmit-program-changes", layerIndex)
+TransmitProgramChangesScreen::TransmitProgramChangesScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "transmit-program-changes", layerIndex)
 {
 }
 
 void TransmitProgramChangesScreen::open()
 {
-	displayTransmitProgramChangesInThisTrack();
+    displayTransmitProgramChangesInThisTrack();
 }
 
 void TransmitProgramChangesScreen::turnWheel(int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-	
+
     if (focusedFieldName == "inthistrack")
-	{
-		transmitProgramChangesInThisTrack = i > 0;
-		displayTransmitProgramChangesInThisTrack();
-	}
+    {
+        transmitProgramChangesInThisTrack = i > 0;
+        displayTransmitProgramChangesInThisTrack();
+    }
 }
 
 void TransmitProgramChangesScreen::displayTransmitProgramChangesInThisTrack()
 {
-	findField("inthistrack")->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
+    findField("inthistrack")->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
 }
 
 bool TransmitProgramChangesScreen::isTransmitProgramChangesInThisTrackEnabled()
 {
-	return transmitProgramChangesInThisTrack;
+    return transmitProgramChangesInThisTrack;
 }

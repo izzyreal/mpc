@@ -5,10 +5,9 @@
 
 using namespace mpc::command;
 
-ReleaseOverdubCommand::ReleaseOverdubCommand(mpc::Mpc& mpc) : mpc(mpc) {}
+ReleaseOverdubCommand::ReleaseOverdubCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseOverdubCommand::execute()
 {
     mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(mpc.getSequencer()->isOverdubbing());
 }
-

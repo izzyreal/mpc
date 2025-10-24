@@ -2,10 +2,11 @@
 
 #include "FilterControls.hpp"
 
-namespace mpc::engine::filter {
+namespace mpc::engine::filter
+{
 
     class StateVariableFilterControls
-            : public FilterControls
+        : public FilterControls
     {
     public:
         void derive(mpc::engine::control::Control *c) override;
@@ -18,4 +19,4 @@ namespace mpc::engine::filter {
         StateVariableFilterControls(std::string name, int idOffset);
     };
 
-}
+} // namespace mpc::engine::filter

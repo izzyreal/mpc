@@ -2,7 +2,8 @@
 
 #include <vector>
 
-namespace mpc::engine::midi {
+namespace mpc::engine::midi
+{
     class MidiMessage
     {
     public:
@@ -21,6 +22,5 @@ namespace mpc::engine::midi {
         virtual void setMessage(const std::vector<char> &data, int length);
 
         explicit MidiMessage(const std::vector<char> &data);
-
     };
-}
+} // namespace mpc::engine::midi

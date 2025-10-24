@@ -3,14 +3,13 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-	class VmpcRecordJamScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class VmpcRecordJamScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		VmpcRecordJamScreen(mpc::Mpc& mpc, int layerIndex);
-
-	};
-}
+        VmpcRecordJamScreen(mpc::Mpc &mpc, int layerIndex);
+    };
+} // namespace mpc::lcdgui::screens::dialog

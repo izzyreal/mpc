@@ -2,12 +2,17 @@
 
 #include "lcdgui/ScreenComponent.hpp"
 
-namespace mpc::audiomidi { class MidiDeviceDetector; }
+namespace mpc::audiomidi
+{
+    class MidiDeviceDetector;
+}
 
-namespace mpc::lcdgui::screens::window {
-    class VmpcKnownControllerDetectedScreen : public ScreenComponent {
+namespace mpc::lcdgui::screens::window
+{
+    class VmpcKnownControllerDetectedScreen : public ScreenComponent
+    {
     public:
-        VmpcKnownControllerDetectedScreen(mpc::Mpc&, int layer);
+        VmpcKnownControllerDetectedScreen(mpc::Mpc &, int layer);
 
         void function(int) override;
         void open() override;
@@ -19,4 +24,4 @@ namespace mpc::lcdgui::screens::window {
 
         friend class mpc::audiomidi::MidiDeviceDetector;
     };
-}
+} // namespace mpc::lcdgui::screens::window

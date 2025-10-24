@@ -3,29 +3,29 @@
 #include <string>
 #include <vector>
 
-namespace mpc::sampler {
-	class Program;
+namespace mpc::sampler
+{
+    class Program;
 }
 
 namespace mpc::file::pgmwriter
 {
-	class Pads
-	{
+    class Pads
+    {
 
+    private:
+        std::vector<char> padsArray;
+        static std::string fxBoardSettings; // dummy -- not implemented in any way -- just to fool anybody who's trying to read the product of this parser
 
-	private:
-		std::vector<char> padsArray;
-		static std::string fxBoardSettings; // dummy -- not implemented in any way -- just to fool anybody who's trying to read the product of this parser
+    public:
+        std::vector<char> getPadsArray();
 
-	public:
-		std::vector<char> getPadsArray();
+    private:
+        void setPadMidiNote(int pad, int padMidiNote);
 
-	private:
-		void setPadMidiNote(int pad, int padMidiNote);
+    public:
+        static std::vector<char> getFxBoardSettings();
 
-	public:
-		static std::vector<char> getFxBoardSettings();
-
-		Pads(mpc::sampler::Program* program);
-	};
-}
+        Pads(mpc::sampler::Program *program);
+    };
+} // namespace mpc::file::pgmwriter

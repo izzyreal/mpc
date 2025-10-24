@@ -4,7 +4,8 @@
 
 #include <vector>
 
-namespace mpc::engine::audio::core {
+namespace mpc::engine::audio::core
+{
 
     class AudioControlsChain : public mpc::engine::control::CompoundControlChain
     {
@@ -15,6 +16,5 @@ namespace mpc::engine::audio::core {
 
     public:
         AudioControlsChain(int id, std::string name);
-
     };
-}
+} // namespace mpc::engine::audio::core

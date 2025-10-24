@@ -4,14 +4,13 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-	class DeleteAllSequencesScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class DeleteAllSequencesScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		DeleteAllSequencesScreen(mpc::Mpc& mpc, const int layerIndex);
-
-	};
-}
+        DeleteAllSequencesScreen(mpc::Mpc &mpc, const int layerIndex);
+    };
+} // namespace mpc::lcdgui::screens::dialog

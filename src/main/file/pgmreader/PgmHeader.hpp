@@ -3,14 +3,16 @@
 #include <vector>
 #include <cstdint>
 
-namespace mpc::file::pgmreader {
+namespace mpc::file::pgmreader
+{
 
     class ProgramFileReader;
 
-    class PgmHeader {
+    class PgmHeader
+    {
 
     private:
-        const std::vector<char> PGM_HEADER_MAGIC{ 0x07, 0x04 };
+        const std::vector<char> PGM_HEADER_MAGIC{0x07, 0x04};
         std::vector<char> headerArray;
 
     public:
@@ -23,4 +25,4 @@ namespace mpc::file::pgmreader {
 
         PgmHeader(ProgramFileReader *programFile);
     };
-}
+} // namespace mpc::file::pgmreader

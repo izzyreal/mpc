@@ -3,14 +3,13 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class VmpcRecordingFinishedScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class VmpcRecordingFinishedScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		VmpcRecordingFinishedScreen(mpc::Mpc& mpc, const int layerIndex);
-
-	};
-}
+        VmpcRecordingFinishedScreen(mpc::Mpc &mpc, const int layerIndex);
+    };
+} // namespace mpc::lcdgui::screens::window

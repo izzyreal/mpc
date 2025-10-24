@@ -33,17 +33,17 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::engine::midi;
 
-FrameSeq::FrameSeq(mpc::Mpc& mpc)
-        : mpc(mpc),
-          sequencer(mpc.getSequencer()),
-          countMetronomeScreen(mpc.screens->get<CountMetronomeScreen>()),
-          timingCorrectScreen(mpc.screens->get<TimingCorrectScreen>()),
-          sequencerScreen(mpc.screens->get<SequencerScreen>()),
-          syncScreen(mpc.screens->get<SyncScreen>()),
-          punchScreen(mpc.screens->get<PunchScreen>()),
-          songScreen(mpc.screens->get<SongScreen>()),
-          userScreen(mpc.screens->get<UserScreen>()),
-          midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
+FrameSeq::FrameSeq(mpc::Mpc &mpc)
+    : mpc(mpc),
+      sequencer(mpc.getSequencer()),
+      countMetronomeScreen(mpc.screens->get<CountMetronomeScreen>()),
+      timingCorrectScreen(mpc.screens->get<TimingCorrectScreen>()),
+      sequencerScreen(mpc.screens->get<SequencerScreen>()),
+      syncScreen(mpc.screens->get<SyncScreen>()),
+      punchScreen(mpc.screens->get<PunchScreen>()),
+      songScreen(mpc.screens->get<SongScreen>()),
+      userScreen(mpc.screens->get<UserScreen>()),
+      midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
 {
 }
 
@@ -159,20 +159,27 @@ void FrameSeq::triggerClickIfNeeded()
 
     switch (countMetronomeScreen->getRate())
     {
-        case 1:
-            denTicks *= 2.0f / 3.f; break;
-        case 2:
-            denTicks *= 1.0f / 2; break;
-        case 3:
-            denTicks *= 1.0f / 3; break;
-        case 4:
-            denTicks *= 1.0f / 4; break;
-        case 5:
-            denTicks *= 1.0f / 6; break;
-        case 6:
-            denTicks *= 1.0f / 8; break;
-        case 7:
-            denTicks *= 1.0f / 12; break;
+    case 1:
+        denTicks *= 2.0f / 3.f;
+        break;
+    case 2:
+        denTicks *= 1.0f / 2;
+        break;
+    case 3:
+        denTicks *= 1.0f / 3;
+        break;
+    case 4:
+        denTicks *= 1.0f / 4;
+        break;
+    case 5:
+        denTicks *= 1.0f / 6;
+        break;
+    case 6:
+        denTicks *= 1.0f / 8;
+        break;
+    case 7:
+        denTicks *= 1.0f / 12;
+        break;
     }
 
     if (relativePos % static_cast<int>(denTicks) == 0)
@@ -192,7 +199,8 @@ void FrameSeq::displayPunchRects()
         auto punchInTime = punchScreen->time0;
         auto punchOutTime = punchScreen->time1;
 
-        if (punchIn && sequencer->getTickPosition() == punchInTime) {
+        if (punchIn && sequencer->getTickPosition() == punchInTime)
+        {
             sequencerScreen->setPunchRectOn(0, false);
             sequencerScreen->setPunchRectOn(1, true);
         }
@@ -295,10 +303,14 @@ bool FrameSeq::processSeqLoopEnabled()
         }
 
         if (punch && punchOut)
+        {
             sequencerScreen->setPunchRectOn(2, false);
+        }
 
         if (punch && punchOut && !punchIn)
+        {
             sequencerScreen->setPunchRectOn(1, true);
+        }
 
         sequencer->playToTick(sequencer->getTickPosition());
         move(seq->getLoopStart());
@@ -377,12 +389,12 @@ void FrameSeq::processNoteRepeat()
     if (shouldRepeatPad)
     {
         RepeatPad::process(
-                mpc,
-                sequencer->getTickPosition(),
-                repeatIntervalTicks,
-                getEventFrameOffset(),
-                sequencer->getTempo(),
-                static_cast<float>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate()));
+            mpc,
+            sequencer->getTickPosition(),
+            repeatIntervalTicks,
+            getEventFrameOffset(),
+            sequencer->getTempo(),
+            static_cast<float>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate()));
     }
 }
 
@@ -414,7 +426,7 @@ void FrameSeq::stopSequencer()
     move(0);
 }
 
-void FrameSeq::enqueueEventAfterNFrames(const std::function<void()>& event, unsigned long nFrames)
+void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames)
 {
     for (auto &e : eventsAfterNFrames)
     {
@@ -433,9 +445,12 @@ void FrameSeq::setSampleRate(unsigned int sampleRate)
 
 void FrameSeq::processEventsAfterNFrames(int frameIndex)
 {
-    for (auto& e : eventsAfterNFrames)
+    for (auto &e : eventsAfterNFrames)
     {
-        if (!e.occupied.load()) continue;
+        if (!e.occupied.load())
+        {
+            continue;
+        }
 
         e.frameCounter += 1;
 
@@ -456,7 +471,7 @@ void FrameSeq::work(int nFrames)
     if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
     {
         clock->processBufferInternal(sequencer->getTempo(), sampleRate, nFrames, 0);
-        const auto& ticksForCurrentBuffer = clock->getTicksForCurrentBuffer();
+        const auto &ticksForCurrentBuffer = clock->getTicksForCurrentBuffer();
 
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
         {
@@ -466,14 +481,14 @@ void FrameSeq::work(int nFrames)
                 metronomeOnlyTickPosition++;
             }
         }
-        
+
         return;
     }
 
     const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
     const auto tempo = mpc.getSequencer()->getTempo();
 
-    const auto& clockTicks = clock->getTicksForCurrentBuffer();
+    const auto &clockTicks = clock->getTicksForCurrentBuffer();
     const bool positionalJumpOccurred = clock->didJumpOccurInLastBuffer();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
@@ -609,4 +624,3 @@ uint64_t FrameSeq::getMetronomeOnlyTickPosition()
 {
     return metronomeOnlyTickPosition;
 }
-

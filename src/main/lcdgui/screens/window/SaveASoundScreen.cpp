@@ -11,8 +11,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 
-SaveASoundScreen::SaveASoundScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "save-a-sound", layerIndex)
+SaveASoundScreen::SaveASoundScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "save-a-sound", layerIndex)
 {
 }
 
@@ -24,47 +24,48 @@ void SaveASoundScreen::open()
         nameScreen->setNameToEdit(sampler->getSound()->getName());
     }
 
-	displayFile();
-	displayFileType();
+    displayFile();
+    displayFileType();
 }
 
 void SaveASoundScreen::turnWheel(int i)
 {
-	
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "file" && i > 0)
-	{
-		sampler->selectPreviousSound();
+    if (focusedFieldName == "file" && i > 0)
+    {
+        sampler->selectPreviousSound();
         displayFile();
-	}
-	else if (focusedFieldName == "file" && i < 0)
-	{
-		sampler->selectNextSound();
+    }
+    else if (focusedFieldName == "file" && i < 0)
+    {
+        sampler->selectNextSound();
         displayFile();
-	}
-	else if (focusedFieldName == "file-type")
-	{
-		setFileType(fileType + i);
-	}
+    }
+    else if (focusedFieldName == "file-type")
+    {
+        setFileType(fileType + i);
+    }
 }
 
 void SaveASoundScreen::function(int i)
 {
-	
-	switch (i)
-	{
-	case 3:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-		break;
-	case 4:
-	{
-		auto disk = mpc.getDisk();
-		auto s = sampler->getSound();
-		auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
-		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) + ext;
 
-        auto saveAction = [this, disk, s, fileName] {
+    switch (i)
+    {
+    case 3:
+        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+        break;
+    case 4:
+    {
+        auto disk = mpc.getDisk();
+        auto s = sampler->getSound();
+        auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
+        auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) + ext;
+
+        auto saveAction = [this, disk, s, fileName]
+        {
             disk->flush();
             disk->initFiles();
 
@@ -82,9 +83,10 @@ void SaveASoundScreen::function(int i)
             ls->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
         };
 
-		if (disk->checkExists(fileName))
-		{
-            auto replaceAction = [saveAction, disk, fileName]{
+        if (disk->checkExists(fileName))
+        {
+            auto replaceAction = [saveAction, disk, fileName]
+            {
                 auto success = disk->getFile(fileName)->del();
 
                 if (success)
@@ -93,38 +95,47 @@ void SaveASoundScreen::function(int i)
                 }
             };
 
-            const auto initializeNameScreen = [this]{
+            const auto initializeNameScreen = [this]
+            {
                 auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string&){ mpc.getLayeredScreen()->openScreen<SaveASoundScreen>(); };
+                auto enterAction = [this](std::string &)
+                {
+                    mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
+                };
                 nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ mpc.getLayeredScreen()->openScreen<SaveScreen>(); });
-        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                         {
+                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                         });
+            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
             return;
-		}
+        }
         saveAction();
         break;
-	}
-	}
+    }
+    }
 }
 
 void SaveASoundScreen::setFileType(int i)
 {
-	if (i < 0 || i > 1)
-		return;
+    if (i < 0 || i > 1)
+    {
+        return;
+    }
 
-	fileType = i;
-	displayFileType();
+    fileType = i;
+    displayFileType();
 }
 
 void SaveASoundScreen::displayFileType()
 {
-	findField("file-type")->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
+    findField("file-type")->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
 }
 
 void SaveASoundScreen::displayFile()
 {
-	findField("file")->setText(mpc.screens->get<NameScreen>()->getNameWithoutSpaces());
+    findField("file")->setText(mpc.screens->get<NameScreen>()->getNameWithoutSpaces());
 }

@@ -6,13 +6,13 @@ using namespace mpc::engine;
 
 StereoMixer::StereoMixer()
 {
-	panning = 50;
-	level = 100;
+    panning = 50;
+    level = 100;
 }
 
 void StereoMixer::setPanning(int i)
 {
-	panning = std::clamp(i, 0, 100);
+    panning = std::clamp(i, 0, 100);
 }
 
 int StereoMixer::getPanning()
@@ -22,7 +22,7 @@ int StereoMixer::getPanning()
 
 void StereoMixer::setLevel(int i)
 {
-	level = std::clamp(i, 0, 100);
+    level = std::clamp(i, 0, 100);
 }
 
 int StereoMixer::getLevel()

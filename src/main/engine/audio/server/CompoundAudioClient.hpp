@@ -5,10 +5,11 @@
 #include <vector>
 #include <memory>
 
-namespace mpc::engine::audio::server {
+namespace mpc::engine::audio::server
+{
 
     class CompoundAudioClient final
-            : public AudioClient
+        : public AudioClient
     {
 
     private:
@@ -22,4 +23,4 @@ namespace mpc::engine::audio::server {
         void remove(AudioClient *client);
     };
 
-}
+} // namespace mpc::engine::audio::server

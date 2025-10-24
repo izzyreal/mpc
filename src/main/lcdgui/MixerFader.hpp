@@ -3,21 +3,20 @@
 
 namespace mpc::lcdgui
 {
-	class MixerFader
-		: public Component
-	{
+    class MixerFader
+        : public Component
+    {
 
-	private:
-		int value{ 100 };
-		bool color = true;
+    private:
+        int value{100};
+        bool color = true;
 
-	public:
-		void setValue(int value);
-		void setColor(bool on);
+    public:
+        void setValue(int value);
+        void setColor(bool on);
 
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-		MixerFader(MRECT rect);
-
-	};
-}
+        MixerFader(MRECT rect);
+    };
+} // namespace mpc::lcdgui

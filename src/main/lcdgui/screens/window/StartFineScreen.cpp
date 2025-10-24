@@ -7,60 +7,66 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "start-fine", layerIndex)
+StartFineScreen::StartFineScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "start-fine", layerIndex)
 {
     addChildT<Wave>()->setFine(true);
 }
 
 void StartFineScreen::open()
 {
-	findField("smpllngth")->setAlignment(Alignment::Centered);
-	displayStart();
-	findField("start")->enableTwoDots();
-	displayLngthLabel();
-	findLabel("lngth")->enableTwoDots();
-	displaySmplLngth();
-	displayPlayX();
-	displayFineWave();
+    findField("smpllngth")->setAlignment(Alignment::Centered);
+    displayStart();
+    findField("start")->enableTwoDots();
+    displayLngthLabel();
+    findLabel("lngth")->enableTwoDots();
+    displaySmplLngth();
+    displayPlayX();
+    displayFineWave();
 }
 
 void StartFineScreen::displayFineWave()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<TrimScreen>();
 
-	auto sound = sampler->getSound();
+    auto sound = sampler->getSound();
 
-	if (!sound)
-		return;
+    if (!sound)
+    {
+        return;
+    }
 
-	findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
-	findWave()->setCenterSamplePos(sound->getStart());
+    findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+    findWave()->setCenterSamplePos(sound->getStart());
 }
 
 void StartFineScreen::displayStart()
 {
-	auto sound = sampler->getSound();
+    auto sound = sampler->getSound();
 
-	if (!sound)
-		return;
+    if (!sound)
+    {
+        return;
+    }
 
-	findField("start")->setTextPadded(sound->getStart(), " ");
+    findField("start")->setTextPadded(sound->getStart(), " ");
 }
 
 void StartFineScreen::displayLngthLabel()
 {
-	auto sound = sampler->getSound();
+    auto sound = sampler->getSound();
 
-	if (!sound)
-		return;
+    if (!sound)
+    {
+        return;
+    }
 
-	findLabel("lngth")->setTextPadded(sound->getEnd() - sound->getStart(), " ");
+    findLabel("lngth")->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
 
 void StartFineScreen::displaySmplLngth()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<TrimScreen>();
     findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -72,77 +78,81 @@ void StartFineScreen::displayPlayX()
 void StartFineScreen::function(int i)
 {
 
-	ScreenComponent::function(i);
+    ScreenComponent::function(i);
 
-	switch (i)
-	{
-	case 1:
-		findWave()->zoomPlus();
-		break;
-	case 2:
-		findWave()->zoomMinus();
-		break;
-	case 4:
-		sampler->playX();
-		break;
-	}
+    switch (i)
+    {
+    case 1:
+        findWave()->zoomPlus();
+        break;
+    case 2:
+        findWave()->zoomMinus();
+        break;
+    case 4:
+        sampler->playX();
+        break;
+    }
 }
 
 void StartFineScreen::turnWheel(int i)
 {
-	auto sound = sampler->getSound();
-	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-	auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto sound = sampler->getSound();
+    auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
+    auto trimScreen = mpc.screens->get<TrimScreen>();
 
-	auto sampleLength = sound->getFrameCount();
-	auto soundInc = getSoundIncrement(i);
+    auto sampleLength = sound->getFrameCount();
+    auto soundInc = getSoundIncrement(i);
 
-	auto focusedField = getFocusedFieldOrThrow();
+    auto focusedField = getFocusedFieldOrThrow();
 
-	if (focusedField->isSplit())
+    if (focusedField->isSplit())
     {
-		soundInc = focusedField->getSplitIncrement(i >= 0);
+        soundInc = focusedField->getSplitIncrement(i >= 0);
     }
 
-	if (focusedField->isTypeModeEnabled())
+    if (focusedField->isTypeModeEnabled())
     {
-		focusedField->disableTypeMode();
+        focusedField->disableTypeMode();
     }
 
     const auto focusedFieldName = focusedField->getName();
 
-	if (focusedFieldName == "start")
-	{
-		auto highestStartPos = sampleLength - 1;
-		auto length = sound->getEnd() - sound->getStart();
+    if (focusedFieldName == "start")
+    {
+        auto highestStartPos = sampleLength - 1;
+        auto length = sound->getEnd() - sound->getStart();
 
-		if (trimScreen->smplLngthFix)
-		{
-			highestStartPos -= startEndLength;
+        if (trimScreen->smplLngthFix)
+        {
+            highestStartPos -= startEndLength;
 
-			if (sound->getStart() + soundInc > highestStartPos)
-				return;
-		}
+            if (sound->getStart() + soundInc > highestStartPos)
+            {
+                return;
+            }
+        }
 
-		sound->setStart(sound->getStart() + soundInc);
+        sound->setStart(sound->getStart() + soundInc);
 
-		if (trimScreen->smplLngthFix)
-			sound->setEnd(sound->getStart() + length);
+        if (trimScreen->smplLngthFix)
+        {
+            sound->setEnd(sound->getStart() + length);
+        }
 
-		displayFineWave();
-		displayLngthLabel();
-		displayStart();
-	}
-	else if (focusedFieldName == "smpllngth")
-	{
-		trimScreen->smplLngthFix = i > 0;
-		displaySmplLngth();
-	}
-	else if (focusedFieldName == "playx")
-	{
-		sampler->setPlayX(sampler->getPlayX() + i);
-		displayPlayX();
-	}
+        displayFineWave();
+        displayLngthLabel();
+        displayStart();
+    }
+    else if (focusedFieldName == "smpllngth")
+    {
+        trimScreen->smplLngthFix = i > 0;
+        displaySmplLngth();
+    }
+    else if (focusedFieldName == "playx")
+    {
+        sampler->setPlayX(sampler->getPlayX() + i);
+        displayPlayX();
+    }
 }
 
 void StartFineScreen::left()
@@ -157,11 +167,11 @@ void StartFineScreen::right()
 
 void StartFineScreen::pressEnter()
 {
-	auto trimScreen = mpc.screens->get<TrimScreen>();
-	trimScreen->pressEnter();
-	displayStart();
-	displayLngthLabel();
-	displayFineWave();
+    auto trimScreen = mpc.screens->get<TrimScreen>();
+    trimScreen->pressEnter();
+    displayStart();
+    displayLngthLabel();
+    displayFineWave();
 }
 
 void StartFineScreen::setSlider(int i)
@@ -170,7 +180,6 @@ void StartFineScreen::setSlider(int i)
     {
         return;
     }
-
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

@@ -5,7 +5,8 @@
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushOverdubCommand::PushOverdubCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -33,4 +34,4 @@ namespace mpc::command {
         mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(true);
     }
 
-}
+} // namespace mpc::command

@@ -3,34 +3,33 @@
 
 namespace mpc::lcdgui::screens
 {
-	class LoadScreen;
+    class LoadScreen;
 }
 
 namespace mpc::lcdgui::screens::window
 {
     class LoadASequenceFromAllScreen;
 
-	class LoadASequenceScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class LoadASequenceScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void turnWheel(int i) override;
-		void function(int i) override;
+    public:
+        void turnWheel(int i) override;
+        void function(int i) override;
 
-		LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex);
+        LoadASequenceScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
 
-	private:
-		int loadInto = 0;
-		void setLoadInto(int i);
+    private:
+        int loadInto = 0;
+        void setLoadInto(int i);
 
-		void displayLoadInto();
-		void displayFile();
+        void displayLoadInto();
+        void displayFile();
 
-		friend class LoadASequenceFromAllScreen;
-		friend class mpc::lcdgui::screens::LoadScreen;
-
-	};
-}
+        friend class LoadASequenceFromAllScreen;
+        friend class mpc::lcdgui::screens::LoadScreen;
+    };
+} // namespace mpc::lcdgui::screens::window

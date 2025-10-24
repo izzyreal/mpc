@@ -15,12 +15,12 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 using namespace mpc::engine::midi;
 
-MidiClockOutput::MidiClockOutput(mpc::Mpc& mpc)
-        : mpc(mpc),
-          sequencer(mpc.getSequencer()),
-          syncScreen(mpc.screens->get<SyncScreen>()),
-          midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
-          msg(std::make_shared<ShortMessage>())
+MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
+    : mpc(mpc),
+      sequencer(mpc.getSequencer()),
+      syncScreen(mpc.screens->get<SyncScreen>()),
+      midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
+      msg(std::make_shared<ShortMessage>())
 {
     msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
@@ -30,14 +30,17 @@ void MidiClockOutput::sendMidiClockMsg(int frameIndex)
     auto clockMsg = std::make_shared<mpc::engine::midi::ShortMessage>();
     clockMsg->setMessage(ShortMessage::TIMING_CLOCK);
 
-    if (syncScreen->getModeOut() > 0) {
+    if (syncScreen->getModeOut() > 0)
+    {
         clockMsg->bufferPos = frameIndex;
 
-        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2) {
+        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
+        {
             mpc.getMidiOutput()->enqueueMessageOutputA(clockMsg);
         }
 
-        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2) {
+        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
+        {
             mpc.getMidiOutput()->enqueueMessageOutputB(clockMsg);
         }
     }
@@ -48,7 +51,7 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status)
     midiSyncStartStopContinueMsg->setMessage(status);
 
     // bufferpos should be set by FrameSeq when it's actually emitting these events, i.e. enqueueing them for host processing
-    //midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
+    // midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
 
     if (syncScreen->getModeOut() > 0)
     {
@@ -76,7 +79,7 @@ void MidiClockOutput::processTempoChange()
     }
 }
 
-void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void()>& event, unsigned long nFrames)
+void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames)
 {
     for (auto &e : eventsAfterNFrames)
     {
@@ -91,15 +94,17 @@ void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void()>& even
 void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
 {
     const auto durationToNextClockInFrames =
-            static_cast<unsigned int>(SeqUtil::ticksToFrames(4, clock.getBpm(), static_cast<float>(clock.getSampleRate())));
+        static_cast<unsigned int>(SeqUtil::ticksToFrames(4, clock.getBpm(), static_cast<float>(clock.getSampleRate())));
 
     const auto oneMsInFrames = static_cast<unsigned int>(clock.getSampleRate() / 1000.f);
 
     const unsigned int numberOfFramesBeforeMidiSyncStart = durationToNextClockInFrames - oneMsInFrames;
 
-    enqueueEventAfterNFrames([&]{
-        sendMidiSyncMsg(sequencer->getPlayStartPositionQuarterNotes() == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE);
-    }, numberOfFramesBeforeMidiSyncStart);
+    enqueueEventAfterNFrames([&]
+                             {
+                                 sendMidiSyncMsg(sequencer->getPlayStartPositionQuarterNotes() == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE);
+                             },
+                             numberOfFramesBeforeMidiSyncStart);
 }
 
 void MidiClockOutput::setSampleRate(unsigned int sampleRate)
@@ -109,9 +114,12 @@ void MidiClockOutput::setSampleRate(unsigned int sampleRate)
 
 void MidiClockOutput::processEventsAfterNFrames(int frameIndex)
 {
-    for (auto& e : eventsAfterNFrames)
+    for (auto &e : eventsAfterNFrames)
     {
-        if (!e.occupied.load()) continue;
+        if (!e.occupied.load())
+        {
+            continue;
+        }
 
         e.frameCounter += 1;
 

@@ -34,7 +34,7 @@ TEST_CASE("Write and read non-destructively", "[snd-persistence]")
     }
 
     SndWriter sndWriter(&snd1);
-    auto& writtenData = sndWriter.getSndFileArray();
+    auto &writtenData = sndWriter.getSndFileArray();
     SndReader reader(writtenData);
     auto outputData = std::make_shared<std::vector<float>>();
     reader.readData(outputData);

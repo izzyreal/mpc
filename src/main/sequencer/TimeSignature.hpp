@@ -2,10 +2,11 @@
 
 #include <Observer.hpp>
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 
     class TimeSignature
-            : public Observable
+        : public Observable
     {
 
     private:
@@ -25,4 +26,4 @@ namespace mpc::sequencer {
 
         void decrease();
     };
-}
+} // namespace mpc::sequencer

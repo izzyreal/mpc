@@ -7,9 +7,9 @@
 using namespace mpc::midi::event::meta;
 
 EndOfTrack::EndOfTrack(int tick, int delta)
-	: MetaEvent(tick, delta, MetaEvent::END_OF_TRACK)
+    : MetaEvent(tick, delta, MetaEvent::END_OF_TRACK)
 {
-	mLength = mpc::midi::util::VariableLengthInt(0);
+    mLength = mpc::midi::util::VariableLengthInt(0);
 }
 
 int EndOfTrack::getEventSize()
@@ -17,30 +17,30 @@ int EndOfTrack::getEventSize()
     return 3;
 }
 
-void EndOfTrack::writeToOutputStream(std::ostream& out)
+void EndOfTrack::writeToOutputStream(std::ostream &out)
 {
-	MetaEvent::writeToOutputStream(out);
-	out << (char) 0x00;
+    MetaEvent::writeToOutputStream(out);
+    out << (char)0x00;
 }
 
-
-void EndOfTrack::writeToOutputStream(std::ostream& out, bool writeType)
+void EndOfTrack::writeToOutputStream(std::ostream &out, bool writeType)
 {
-	MetaEvent::writeToOutputStream(out, writeType);
+    MetaEvent::writeToOutputStream(out, writeType);
 }
 
-
-int EndOfTrack::compareTo(mpc::midi::event::MidiEvent* other)
+int EndOfTrack::compareTo(mpc::midi::event::MidiEvent *other)
 {
-	if (mTick != other->getTick()) {
-		return mTick < other->getTick() ? -1 : 1;
-	}
-	if (mDelta.getValue() != other->getDelta()) {
-		return mDelta.getValue() < other->getDelta() ? 1 : -1;
-	}
-	if (dynamic_cast<EndOfTrack*>(other) == nullptr) {
-		return 1;
-	}
-	return 0;
+    if (mTick != other->getTick())
+    {
+        return mTick < other->getTick() ? -1 : 1;
+    }
+    if (mDelta.getValue() != other->getDelta())
+    {
+        return mDelta.getValue() < other->getDelta() ? 1 : -1;
+    }
+    if (dynamic_cast<EndOfTrack *>(other) == nullptr)
+    {
+        return 1;
+    }
+    return 0;
 }
-

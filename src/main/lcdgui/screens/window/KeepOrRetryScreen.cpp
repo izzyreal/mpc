@@ -2,10 +2,9 @@
 
 #include "lcdgui/screens/window/NameScreen.hpp"
 
-
 using namespace mpc::lcdgui::screens::window;
 
-KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex) 
+KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "keep-or-retry", layerIndex)
 {
 }
@@ -28,24 +27,24 @@ void KeepOrRetryScreen::function(int i)
 
     switch (i)
     {
-        case 1:
-            sampler->deleteSound(sampler->getPreviewSound());
-            mpc.getLayeredScreen()->openScreen<SampleScreen>();
-            break;
-        case 3 :
-            sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
-            break;
-        case 4:
-            auto index = sampler->getSoundCount() - 1;
+    case 1:
+        sampler->deleteSound(sampler->getPreviewSound());
+        mpc.getLayeredScreen()->openScreen<SampleScreen>();
+        break;
+    case 3:
+        sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
+        break;
+    case 4:
+        auto index = sampler->getSoundCount() - 1;
 
-            if (assignToNote != 34)
-            {
-                getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(index);
-            }
+        if (assignToNote != 34)
+        {
+            getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(index);
+        }
 
-            sampler->setSoundIndex(index);
-            mpc.getLayeredScreen()->openScreen<SampleScreen>();
-            break;
+        sampler->setSoundIndex(index);
+        mpc.getLayeredScreen()->openScreen<SampleScreen>();
+        break;
     }
 }
 
@@ -56,7 +55,8 @@ void KeepOrRetryScreen::openNameScreen()
 
     if (focusedFieldName == "name-for-new-sound")
     {
-        const auto enterAction = [this](std::string &nameScreenName) {
+        const auto enterAction = [this](std::string &nameScreenName)
+        {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {
                 return;
@@ -78,7 +78,9 @@ void KeepOrRetryScreen::right()
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "name-for-new-sound")
+    {
         openNameScreen();
+    }
 }
 
 void KeepOrRetryScreen::turnWheel(int i)
@@ -115,7 +117,9 @@ void KeepOrRetryScreen::turnWheel(int i)
 void KeepOrRetryScreen::displayNameForNewSound()
 {
     if (!sampler->getSound())
+    {
         return;
+    }
 
     findField("name-for-new-sound")->setText(sampler->getPreviewSound()->getName());
 }
@@ -127,7 +131,7 @@ void KeepOrRetryScreen::displayAssignToNote()
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }
 
-void KeepOrRetryScreen::update(Observable* o, Message message)
+void KeepOrRetryScreen::update(Observable *o, Message message)
 {
     const auto msg = std::get<std::string>(message);
 

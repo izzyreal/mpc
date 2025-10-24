@@ -3,31 +3,31 @@
 
 namespace mpc::lcdgui::screens
 {
-	class NextSeqScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class NextSeqScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void turnWheel(int i) override;
-		void function(int i) override;
+    public:
+        void turnWheel(int i) override;
+        void function(int i) override;
 
-		NextSeqScreen(mpc::Mpc& mpc, const int layerIndex);
-		
-		void update(Observable*, Message) override;
-		void open() override;
-		void close() override;
+        NextSeqScreen(mpc::Mpc &mpc, const int layerIndex);
 
-	private:
-		bool selectNextSqFromScratch = true;
+        void update(Observable *, Message) override;
+        void open() override;
+        void close() override;
 
-		void displaySq();
-		void displayNextSq();
-		void displayNow0();
-		void displayNow1();
-		void displayNow2();
-		void displayTempo();
-		void displayTempoLabel();
-		void displayTempoSource();
-		void displayTiming();
-	};
-}
+    private:
+        bool selectNextSqFromScratch = true;
+
+        void displaySq();
+        void displayNextSq();
+        void displayNow0();
+        void displayNow1();
+        void displayNow2();
+        void displayTempo();
+        void displayTempoLabel();
+        void displayTempoSource();
+        void displayTiming();
+    };
+} // namespace mpc::lcdgui::screens

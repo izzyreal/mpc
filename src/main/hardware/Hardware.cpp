@@ -22,7 +22,10 @@ Hardware::Hardware()
         const auto id = static_cast<ComponentId>(i);
         leds[id] = std::make_shared<Led>(id);
         components[id] = leds[id];
-        if (id == ComponentId::BANK_A_LED) leds[id]->setEnabled(true);
+        if (id == ComponentId::BANK_A_LED)
+        {
+            leds[id]->setEnabled(true);
+        }
     }
 
     dataWheel = std::make_shared<DataWheel>();
@@ -55,24 +58,33 @@ std::vector<std::string> Hardware::getButtonLabels()
 
 std::shared_ptr<Pad> Hardware::getPad(int index)
 {
-    if (index < 0 || index >= static_cast<int>(pads.size())) return {};
+    if (index < 0 || index >= static_cast<int>(pads.size()))
+    {
+        return {};
+    }
     return pads[static_cast<size_t>(index)];
 }
 
-std::vector<std::shared_ptr<Pad>>& Hardware::getPads()
+std::vector<std::shared_ptr<Pad>> &Hardware::getPads()
 {
     return pads;
 }
 
 std::shared_ptr<Button> Hardware::getButton(ComponentId id)
 {
-    if (buttons.count(id) == 0) return {};
+    if (buttons.count(id) == 0)
+    {
+        return {};
+    }
     return buttons[id];
 }
 
 std::shared_ptr<Led> Hardware::getLed(ComponentId id)
 {
-    if (leds.count(id) == 0) return {};
+    if (leds.count(id) == 0)
+    {
+        return {};
+    }
     return leds[id];
 }
 
@@ -98,6 +110,9 @@ std::shared_ptr<Slider> Hardware::getSlider()
 
 std::shared_ptr<Component> Hardware::getComponent(ComponentId id)
 {
-    if (components.count(id) == 0) return {};
+    if (components.count(id) == 0)
+    {
+        return {};
+    }
     return components[id];
 }

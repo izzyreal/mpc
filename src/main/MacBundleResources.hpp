@@ -4,11 +4,13 @@
 
 #include <string>
 
-namespace mpc {
-    class MacBundleResources {
+namespace mpc
+{
+    class MacBundleResources
+    {
     public:
         static std::string getResourcePath(const std::string &resourceName);
     };
-}
+} // namespace mpc
 
 #endif

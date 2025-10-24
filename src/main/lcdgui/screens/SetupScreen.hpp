@@ -3,31 +3,31 @@
 
 namespace mpc::lcdgui::screens
 {
-	class InitScreen;
+    class InitScreen;
 }
 
 namespace mpc::lcdgui::screens
 {
-	class SetupScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
-	public:
-		SetupScreen(mpc::Mpc& mpc, const int layerIndex);
+    class SetupScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
+    public:
+        SetupScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
 
-	private:
-		int diskDevice = 0;
-		int autoLoadType = 0;
+    private:
+        int diskDevice = 0;
+        int autoLoadType = 0;
 
-		void setDiskDevice(int i);
-		void setAutoLoadType(int i);
+        void setDiskDevice(int i);
+        void setAutoLoadType(int i);
 
-		void displayDiskDevice();
-		void displayAutoLoadType();
+        void displayDiskDevice();
+        void displayAutoLoadType();
 
-		void resetPreferences();
+        void resetPreferences();
 
-		friend class InitScreen;
-	};
-}
+        friend class InitScreen;
+    };
+} // namespace mpc::lcdgui::screens

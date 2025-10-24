@@ -21,8 +21,10 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     event->setTick(1);
 
     mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
-    controls->down(); controls->down(); controls->down(); // Move to 'Notes:' field.
+    controls->down();
+    controls->down();
+    controls->down();       // Move to 'Notes:' field.
     controls->turnWheel(1); // 'Notes:' was 'ALL', here we set it to '35/A01'.
-    controls->function(4); // DO IT
+    controls->function(4);  // DO IT
     REQUIRE(event->getTick() == 1);
 }

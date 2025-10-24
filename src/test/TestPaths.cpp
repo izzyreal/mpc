@@ -7,5 +7,6 @@ fs::path mpc::TestPaths::appConfigHome()
 
 fs::path mpc::TestPaths::appDocumentsPath()
 {
-    return fs::temp_directory_path() / "VMPC2000XL-test";;
+    return fs::temp_directory_path() / "VMPC2000XL-test";
+    ;
 }

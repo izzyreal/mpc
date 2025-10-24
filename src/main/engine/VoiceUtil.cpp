@@ -9,7 +9,7 @@ float VoiceUtil::getInverseNyquist(const int sampleRate)
     return 2.f / sampleRate;
 }
 
-std::vector<float>& VoiceUtil::freqTable()
+std::vector<float> &VoiceUtil::freqTable()
 {
     static std::vector<float> res;
 
@@ -44,6 +44,5 @@ float VoiceUtil::midiFreq(const float pitch)
 
 float VoiceUtil::midiFreqImpl(const int pitch)
 {
-    return (float)(440.0 * pow(2.0, ((double)(pitch) - 69.0) / 12.0));
+    return (float)(440.0 * pow(2.0, ((double)(pitch)-69.0) / 12.0));
 }
-

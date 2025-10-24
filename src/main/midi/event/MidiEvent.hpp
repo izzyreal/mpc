@@ -9,39 +9,39 @@
 
 namespace mpc::midi::event
 {
-	class MidiEvent
-	{
-	public:
-		int mTick = 0;
-		mpc::midi::util::VariableLengthInt mDelta;
+    class MidiEvent
+    {
+    public:
+        int mTick = 0;
+        mpc::midi::util::VariableLengthInt mDelta;
 
-	public:
-		virtual int getTick();
-		virtual int getDelta();
-		virtual void setDelta(int d);
+    public:
+        virtual int getTick();
+        virtual int getDelta();
+        virtual void setDelta(int d);
 
-	public:
-		virtual int getEventSize() = 0;
+    public:
+        virtual int getEventSize() = 0;
 
-	public:
-		virtual int getSize();
-		virtual bool requiresStatusByte(MidiEvent* prevEvent);
-		virtual void writeToOutputStream(std::ostream& out, bool writeType);
+    public:
+        virtual int getSize();
+        virtual bool requiresStatusByte(MidiEvent *prevEvent);
+        virtual void writeToOutputStream(std::ostream &out, bool writeType);
 
-	private:
-		static int sId;
-		static int sType;
-		static int sChannel;
+    private:
+        static int sId;
+        static int sType;
+        static int sChannel;
 
-	public:
-		static std::shared_ptr<MidiEvent> parseEvent(int tick, int delta, std::stringstream& in);
+    public:
+        static std::shared_ptr<MidiEvent> parseEvent(int tick, int delta, std::stringstream &in);
 
-	private:
-		static bool verifyIdentifier(int id);
+    private:
+        static bool verifyIdentifier(int id);
 
-	public:
-		virtual std::string toString();
+    public:
+        virtual std::string toString();
 
-		MidiEvent(int tick, int delta);
-	};
-}
+        MidiEvent(int tick, int delta);
+    };
+} // namespace mpc::midi::event

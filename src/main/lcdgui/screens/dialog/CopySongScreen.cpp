@@ -7,89 +7,96 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-CopySongScreen::CopySongScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "copy-song", layerIndex)
+CopySongScreen::CopySongScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "copy-song", layerIndex)
 {
 }
 
 void CopySongScreen::open()
 {
-	song1 = 0;
+    song1 = 0;
 
-	for (int i = 0; i < 20; i++)
-	{
-		if (!sequencer.lock()->getSong(i)->isUsed())
-		{
-			song1 = i;
-			break;
-		}
-	}
+    for (int i = 0; i < 20; i++)
+    {
+        if (!sequencer.lock()->getSong(i)->isUsed())
+        {
+            song1 = i;
+            break;
+        }
+    }
 
-	displaySong0();
-	displaySong1();
+    displaySong0();
+    displaySong1();
 }
 
 void CopySongScreen::function(int i)
 {
-	
-	switch (i)
-	{
-	case 3:
+
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->openScreen<SongWindow>();
-		break;
-	case 4:
-	{
-		auto songScreen = mpc.screens->get<SongScreen>();
-		sequencer.lock()->copySong(songScreen->activeSongIndex, song1);
+        break;
+    case 4:
+    {
+        auto songScreen = mpc.screens->get<SongScreen>();
+        sequencer.lock()->copySong(songScreen->activeSongIndex, song1);
         mpc.getLayeredScreen()->openScreen<SongScreen>();
-		break;
-	}
-	}
+        break;
+    }
+    }
 }
 
 void CopySongScreen::turnWheel(int i)
 {
 
-	auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<SongScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "song0")
-	{
-		auto candidate = songScreen->activeSongIndex + i;
+    if (focusedFieldName == "song0")
+    {
+        auto candidate = songScreen->activeSongIndex + i;
 
-		if (candidate < 0) candidate = 0;
-		if (candidate > 19) candidate = 19;
+        if (candidate < 0)
+        {
+            candidate = 0;
+        }
+        if (candidate > 19)
+        {
+            candidate = 19;
+        }
 
-		songScreen->activeSongIndex = candidate;
+        songScreen->activeSongIndex = candidate;
 
-		displaySong0();
-	}
-	else if (focusedFieldName == "song1")
-	{
-		setSong1(song1 + i);
-	}
+        displaySong0();
+    }
+    else if (focusedFieldName == "song1")
+    {
+        setSong1(song1 + i);
+    }
 }
 
 void CopySongScreen::setSong1(int i)
 {
-	if (i < 0 || i > 19)
-		return;
+    if (i < 0 || i > 19)
+    {
+        return;
+    }
 
-	song1 = i;
-	displaySong1();
+    song1 = i;
+    displaySong1();
 }
-
 
 void CopySongScreen::displaySong0()
 {
-	auto songScreen = mpc.screens->get<SongScreen>();
-	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
-	findField("song0")->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
+    auto songScreen = mpc.screens->get<SongScreen>();
+    auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
+    findField("song0")->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 
 void CopySongScreen::displaySong1()
 {
-	auto song = sequencer.lock()->getSong(song1);
-	findField("song1")->setText(StrUtil::padLeft(std::to_string(song1 + 1), "0", 2) + "-" + song->getName());
+    auto song = sequencer.lock()->getSong(song1);
+    findField("song1")->setText(StrUtil::padLeft(std::to_string(song1 + 1), "0", 2) + "-" + song->getName());
 }

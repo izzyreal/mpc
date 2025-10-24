@@ -2,18 +2,22 @@
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushAfterCommand::PushAfterCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
-    void PushAfterCommand::execute() {
+    void PushAfterCommand::execute()
+    {
         if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
             mpc.getLayeredScreen()->openScreen<AssignScreen>();
-        } else {
+        }
+        else
+        {
             mpc.setAfterEnabled(!mpc.isAfterEnabled());
             mpc.getHardware()->getLed(hardware::ComponentId::AFTER_OR_ASSIGN_LED)->setEnabled(mpc.isAfterEnabled());
         }
     }
 
-}
+} // namespace mpc::command

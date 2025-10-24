@@ -4,7 +4,8 @@
 #include <engine/audio/mixer/MixControls.hpp>
 #include <engine/audio/mixer/AudioMixerStrip.hpp>
 
-namespace mpc::engine::audio::mixer {
+namespace mpc::engine::audio::mixer
+{
 
     class MixProcess : public mpc::engine::audio::core::AudioProcess
     {
@@ -26,7 +27,7 @@ namespace mpc::engine::audio::mixer {
         int processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
 
     public:
-        MixProcess(const std::shared_ptr<AudioMixerStrip>& strip, const std::shared_ptr<MixControls>& mixControls);
+        MixProcess(const std::shared_ptr<AudioMixerStrip> &strip, const std::shared_ptr<MixControls> &mixControls);
     };
 
-}
+} // namespace mpc::engine::audio::mixer

@@ -4,22 +4,21 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-	class DeleteTrackScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class DeleteTrackScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void turnWheel(int i) override;
-		void function(int i) override;
+    public:
+        void turnWheel(int i) override;
+        void function(int i) override;
 
-		DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex);
+        DeleteTrackScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
 
-	private:
-		int tr = 0;
-		void setTr(int i);
-		void displayTr();
-
-	};
-}
+    private:
+        int tr = 0;
+        void setTr(int i);
+        void displayTr();
+    };
+} // namespace mpc::lcdgui::screens::dialog

@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 
     class LegacyClock
     {
@@ -23,7 +24,9 @@ namespace mpc::sequencer {
         void set_bpm(const double &BPM);
 
         double getSampleRate() const
-        { return 1.0 / Fs_rec; }
+        {
+            return 1.0 / Fs_rec;
+        }
 
         bool proc();
 
@@ -34,4 +37,4 @@ namespace mpc::sequencer {
         double getBpm() const;
     };
 
-}
+} // namespace mpc::sequencer

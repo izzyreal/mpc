@@ -13,7 +13,7 @@ using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::midi;
 
-void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi::ShortMessage* msg)
+void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi::ShortMessage *msg)
 {
     auto status = msg->getStatus();
     auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
@@ -29,9 +29,12 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
     {
         if (const auto newPressure = msg->getData1(); newPressure > 0)
         {
-            for (auto& p : hardware->getPads())
+            for (auto &p : hardware->getPads())
             {
-                if (!p->isPressed()) continue;
+                if (!p->isPressed())
+                {
+                    continue;
+                }
                 p->aftertouch(newPressure);
             }
         }
@@ -57,7 +60,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
 
     auto dataWheel = hardware->getDataWheel();
 
-    for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
+    for (auto &labelCommand : vmpcMidiScreen->activePreset->rows)
     {
         const auto channelIndex = labelCommand.getMidiChannelIndex();
 
@@ -175,4 +178,3 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         }
     }
 }
-

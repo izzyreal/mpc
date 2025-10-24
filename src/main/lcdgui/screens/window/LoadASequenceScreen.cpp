@@ -6,14 +6,14 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "load-a-sequence", layerIndex)
+LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "load-a-sequence", layerIndex)
 {
 }
 
 void LoadASequenceScreen::open()
 {
-	auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<LoadScreen>();
     auto midFile = loadScreen->getSelectedFile();
 
     if (!StrUtil::eqIgnoreCase(midFile->getExtension(), ".mid"))
@@ -22,18 +22,20 @@ void LoadASequenceScreen::open()
     }
 
     sequence_or_error parsedMidFile = mpc.getDisk()->readMid2(midFile);
-    
+
     if (parsedMidFile.has_value())
     {
         auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
         int index;
-        
+
         for (index = 0; index < 98; index++)
         {
             if (find(begin(usedSeqs), end(usedSeqs), index) == end(usedSeqs))
+            {
                 break;
+            }
         }
-        
+
         loadInto = index;
         displayFile();
     }
@@ -43,47 +45,51 @@ void LoadASequenceScreen::open()
 
 void LoadASequenceScreen::turnWheel(int i)
 {
-	
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "load-into")
-		setLoadInto(loadInto + i);
+    if (focusedFieldName == "load-into")
+    {
+        setLoadInto(loadInto + i);
+    }
 }
 
 void LoadASequenceScreen::function(int i)
 {
-	
-	switch (i)
-	{
-	case 3:
+
+    switch (i)
+    {
+    case 3:
         mpc.getLayeredScreen()->closeCurrentScreen();
-		sequencer.lock()->clearPlaceHolder();
-		break;
-	case 4:
-		sequencer.lock()->movePlaceHolderTo(loadInto);
-		sequencer.lock()->setActiveSequenceIndex(loadInto);
+        sequencer.lock()->clearPlaceHolder();
+        break;
+    case 4:
+        sequencer.lock()->movePlaceHolderTo(loadInto);
+        sequencer.lock()->setActiveSequenceIndex(loadInto);
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-		break;
-	}
+        break;
+    }
 }
 
 void LoadASequenceScreen::setLoadInto(int i)
 {
-	if (i < 0 || i > 98)
-		return;
+    if (i < 0 || i > 98)
+    {
+        return;
+    }
 
     loadInto = i;
-	displayLoadInto();
+    displayLoadInto();
 }
 
 void LoadASequenceScreen::displayLoadInto()
 {
-	findField("load-into")->setTextPadded(loadInto + 1, "0");
-	findLabel("name")->setText("-" + sequencer.lock()->getSequence(loadInto)->getName());
+    findField("load-into")->setTextPadded(loadInto + 1, "0");
+    findLabel("name")->setText("-" + sequencer.lock()->getSequence(loadInto)->getName());
 }
 
 void LoadASequenceScreen::displayFile()
 {
-	auto s = sequencer.lock()->getPlaceHolder();
-	findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
+    auto s = sequencer.lock()->getPlaceHolder();
+    findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
 }

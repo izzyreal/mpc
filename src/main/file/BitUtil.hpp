@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-namespace mpc::file {
+namespace mpc::file
+{
 
     class BitUtil
     {
@@ -18,4 +19,4 @@ namespace mpc::file {
         static char setBits(int8_t mask, char byte, bool newValue);
     };
 
-}
+} // namespace mpc::file

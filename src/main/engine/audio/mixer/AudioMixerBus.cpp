@@ -5,14 +5,14 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine::audio::mixer;
 using namespace std;
 
-AudioMixerBus::AudioMixerBus(AudioMixer* mixer, shared_ptr<BusControls> busControls)
+AudioMixerBus::AudioMixerBus(AudioMixer *mixer, shared_ptr<BusControls> busControls)
 {
-	auto lBusControls = busControls;
+    auto lBusControls = busControls;
     name = lBusControls->getName();
-	buffer = mixer->createBuffer(name);
+    buffer = mixer->createBuffer(name);
 }
 
-AudioBuffer* AudioMixerBus::getBuffer()
+AudioBuffer *AudioMixerBus::getBuffer()
 {
     return buffer;
 }
@@ -29,9 +29,13 @@ void AudioMixerBus::silence()
 
 void AudioMixerBus::write(int nFrames)
 {
-	if (!output) return;
+    if (!output)
+    {
+        return;
+    }
 
-	if (output) {
-		output->processAudio(buffer, nFrames);
-	}
+    if (output)
+    {
+        output->processAudio(buffer, nFrames);
+    }
 }

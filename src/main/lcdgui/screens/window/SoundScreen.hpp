@@ -4,23 +4,23 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class SoundScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
-	{
+    class SoundScreen
+        : public mpc::lcdgui::ScreenComponent,
+          public mpc::lcdgui::screens::OpensNameScreen
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
         void openNameScreen() override;
 
-		SoundScreen(mpc::Mpc& mpc, const int layerIndex);
+        SoundScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
+        void open() override;
 
-	private:
-		void displaySoundName();
-		void displayType();
-		void displayRate();
-		void displaySize();
-
-	};
-}
+    private:
+        void displaySoundName();
+        void displayType();
+        void displayRate();
+        void displaySize();
+    };
+} // namespace mpc::lcdgui::screens::window

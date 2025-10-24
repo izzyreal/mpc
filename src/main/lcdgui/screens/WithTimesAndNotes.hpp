@@ -1,39 +1,44 @@
 #pragma once
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
 namespace mpc::sequencer
 {
-	class Sequence;
-	class Track;
-}
+    class Sequence;
+    class Track;
+} // namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-	class WithTimesAndNotes
-	{
+    class WithTimesAndNotes
+    {
 
-	protected:
-		int time0 = 0;
-		int time1 = 0;
-		int note0 = 34;
-		int note1 = 127;
+    protected:
+        int time0 = 0;
+        int time1 = 0;
+        int note0 = 34;
+        int note1 = 127;
 
-	public:
-		void setTime0(int newTime0);
-		void setTime1(int newTime1);
-		
-		virtual void setNote0(int note);
-		void setNote1(int note);
+    public:
+        void setTime0(int newTime0);
+        void setTime1(int newTime1);
 
-	protected:
-		virtual void displayNotes() = 0;
-		virtual void displayDrumNotes() { displayNotes(); }
-		virtual void displayTime() = 0;
+        virtual void setNote0(int note);
+        void setNote1(int note);
 
-	public:
-		bool checkAllTimes(mpc::Mpc& mpc, int notch, mpc::sequencer::Sequence* sequence = nullptr);
-		bool checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, mpc::sequencer::Sequence* sequence = nullptr, mpc::sequencer::Track* track = nullptr);
+    protected:
+        virtual void displayNotes() = 0;
+        virtual void displayDrumNotes()
+        {
+            displayNotes();
+        }
+        virtual void displayTime() = 0;
 
-	};
-}
+    public:
+        bool checkAllTimes(mpc::Mpc &mpc, int notch, mpc::sequencer::Sequence *sequence = nullptr);
+        bool checkAllTimesAndNotes(mpc::Mpc &mpc, int notch, mpc::sequencer::Sequence *sequence = nullptr, mpc::sequencer::Track *track = nullptr);
+    };
+} // namespace mpc::lcdgui::screens

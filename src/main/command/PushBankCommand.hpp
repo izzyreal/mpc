@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushBankCommand : public Command {
+    class PushBankCommand : public Command
+    {
     public:
         PushBankCommand(mpc::Mpc &mpc, int i);
         void execute() override;
@@ -13,4 +15,4 @@ namespace mpc::command {
         int i;
     };
 
-}
+} // namespace mpc::command

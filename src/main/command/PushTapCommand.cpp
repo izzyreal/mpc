@@ -3,7 +3,8 @@
 #include "controller/ClientHardwareControllerBase.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushTapCommand::PushTapCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -12,5 +13,4 @@ namespace mpc::command {
         mpc.inputController->unlockNoteRepeat();
         mpc.getSequencer()->tap();
     }
-}
-
+} // namespace mpc::command

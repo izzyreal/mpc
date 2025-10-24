@@ -3,13 +3,15 @@
 
 namespace mpc::sequencer
 {
-	class EmptyEvent
-		: public Event
-	{
+    class EmptyEvent
+        : public Event
+    {
 
-	public:
-		EmptyEvent();
-		std::string getTypeName() override { return "empty"; }
-
-	};
-}
+    public:
+        EmptyEvent();
+        std::string getTypeName() override
+        {
+            return "empty";
+        }
+    };
+} // namespace mpc::sequencer

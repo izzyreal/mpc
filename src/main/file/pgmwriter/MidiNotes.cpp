@@ -5,61 +5,65 @@
 
 using namespace mpc::file::pgmwriter;
 
-MidiNotes::MidiNotes(mpc::sampler::Program* program, std::vector<int> snConvTable)
+MidiNotes::MidiNotes(mpc::sampler::Program *program, std::vector<int> snConvTable)
 {
-	midiNotesArray = std::vector<char>(1601);
-	
-	for (int i = 0; i < 64; i++)
-	{
-		auto nn = program->getNoteParameters(i + 35);
+    midiNotesArray = std::vector<char>(1601);
 
-		if (nn->getSoundIndex() == -1)
-			setSampleSelect(i, 255);
-		else
-			setSampleSelect(i, snConvTable[nn->getSoundIndex()]);
+    for (int i = 0; i < 64; i++)
+    {
+        auto nn = program->getNoteParameters(i + 35);
 
-		setSoundGenerationMode(i, nn->getSoundGenerationMode());
-		setVelocityRangeLower(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeLower());
-		setAlsoPlayUse1(i, nn->getOptionalNoteA());
-		setVelocityRangeUpper(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeUpper());
-		setAlsoPlayUse2(i, nn->getOptionalNoteB());
-		setVoiceOverlapMode(i, nn->getVoiceOverlapMode());
-		setMuteAssign1(i, nn->getMuteAssignA() == 34 ? 0 : nn->getMuteAssignA());
-		setMuteAssign2(i, nn->getMuteAssignB() == 34 ? 0 : nn->getMuteAssignB());
-		setTune(i, static_cast<int16_t>(nn->getTune()));
-		setAttack(i, nn->getAttack());
-		setDecay(i, nn->getDecay());
-		setDecayMode(i, nn->getDecayMode());
-		setCutoff(i, nn->getFilterFrequency());
-		setResonance(i, nn->getFilterResonance());
-		setVelEnvToFiltAtt(i, nn->getFilterAttack());
-		setVelEnvToFiltDec(i, nn->getFilterDecay());
-		setVelEnvToFiltAmt(i, nn->getFilterEnvelopeAmount());
-		setVelocityToLevel(i, nn->getVeloToLevel());
-		setVelocityToAttack(i, nn->getVelocityToAttack());
-		setVelocityToStart(i, nn->getVelocityToStart());
-		setVelocityToCutoff(i, nn->getVelocityToFilterFrequency());
-		setSliderParameter(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getSliderParameterNumber());
-		setVelocityToPitch(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityToPitch());
-	}
+        if (nn->getSoundIndex() == -1)
+        {
+            setSampleSelect(i, 255);
+        }
+        else
+        {
+            setSampleSelect(i, snConvTable[nn->getSoundIndex()]);
+        }
 
-	midiNotesArray[1600] = 6;
+        setSoundGenerationMode(i, nn->getSoundGenerationMode());
+        setVelocityRangeLower(i, dynamic_cast<mpc::sampler::NoteParameters *>(nn)->getVelocityRangeLower());
+        setAlsoPlayUse1(i, nn->getOptionalNoteA());
+        setVelocityRangeUpper(i, dynamic_cast<mpc::sampler::NoteParameters *>(nn)->getVelocityRangeUpper());
+        setAlsoPlayUse2(i, nn->getOptionalNoteB());
+        setVoiceOverlapMode(i, nn->getVoiceOverlapMode());
+        setMuteAssign1(i, nn->getMuteAssignA() == 34 ? 0 : nn->getMuteAssignA());
+        setMuteAssign2(i, nn->getMuteAssignB() == 34 ? 0 : nn->getMuteAssignB());
+        setTune(i, static_cast<int16_t>(nn->getTune()));
+        setAttack(i, nn->getAttack());
+        setDecay(i, nn->getDecay());
+        setDecayMode(i, nn->getDecayMode());
+        setCutoff(i, nn->getFilterFrequency());
+        setResonance(i, nn->getFilterResonance());
+        setVelEnvToFiltAtt(i, nn->getFilterAttack());
+        setVelEnvToFiltDec(i, nn->getFilterDecay());
+        setVelEnvToFiltAmt(i, nn->getFilterEnvelopeAmount());
+        setVelocityToLevel(i, nn->getVeloToLevel());
+        setVelocityToAttack(i, nn->getVelocityToAttack());
+        setVelocityToStart(i, nn->getVelocityToStart());
+        setVelocityToCutoff(i, nn->getVelocityToFilterFrequency());
+        setSliderParameter(i, dynamic_cast<mpc::sampler::NoteParameters *>(nn)->getSliderParameterNumber());
+        setVelocityToPitch(i, dynamic_cast<mpc::sampler::NoteParameters *>(nn)->getVelocityToPitch());
+    }
+
+    midiNotesArray[1600] = 6;
 }
 
 void MidiNotes::setSampleSelect(int midiNote, int sampleNumber)
 {
-	char sampleSelect = sampleNumber;
-	midiNotesArray[(midiNote * 25) + 0] = sampleSelect;
+    char sampleSelect = sampleNumber;
+    midiNotesArray[(midiNote * 25) + 0] = sampleSelect;
 }
 
 void MidiNotes::setSoundGenerationMode(int midiNote, int soundGenerationMode)
 {
-	midiNotesArray[(midiNote * 25) + 1] = soundGenerationMode;
+    midiNotesArray[(midiNote * 25) + 1] = soundGenerationMode;
 }
 
 void MidiNotes::setVelocityRangeLower(int midiNote, int velocityRangeLower)
 {
-	midiNotesArray[(midiNote * 25) + 2] = velocityRangeLower;
+    midiNotesArray[(midiNote * 25) + 2] = velocityRangeLower;
 }
 
 void MidiNotes::setAlsoPlayUse1(int midiNote, int alsoPlayUse1)
@@ -168,8 +172,8 @@ void MidiNotes::setVelocityToPitch(int midiNote, int velocityToPitch)
     midiNotesArray[(midiNote * 25) + 24] = velocityToPitch;
 }
 
-void MidiNotes::setShort(std::vector<char>& ca, int offset, int16_t s)
+void MidiNotes::setShort(std::vector<char> &ca, int offset, int16_t s)
 {
-	ca[offset] = s;
-	ca[offset + 1] = s >> 8;
+    ca[offset] = s;
+    ca[offset + 1] = s >> 8;
 }

@@ -24,4 +24,3 @@ void PushFullLevelCommand::execute()
     mpc.setFullLevelEnabled(!mpc.isFullLevelEnabled());
     mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(mpc.isFullLevelEnabled());
 }
-

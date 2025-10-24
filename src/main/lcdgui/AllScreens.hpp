@@ -151,4 +151,3 @@
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
-

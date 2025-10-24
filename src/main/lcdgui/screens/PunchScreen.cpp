@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-PunchScreen::PunchScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "punch", layerIndex)
+PunchScreen::PunchScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "punch", layerIndex)
 {
 }
 
@@ -23,9 +23,9 @@ void PunchScreen::open()
         mpc.getLayeredScreen()->openScreen(tabNames[tab]);
         return;
     }
-    
+
     auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
-    
+
     if (lastTick < time0 || lastTick < time1 || (time0 == 0 && time1 == 0))
     {
         setTime0(0);
@@ -40,18 +40,20 @@ void PunchScreen::open()
 
 void PunchScreen::turnWheel(int i)
 {
-    
+
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "auto-punch")
-		setAutoPunch(autoPunch + i);
+    if (focusedFieldName == "auto-punch")
+    {
+        setAutoPunch(autoPunch + i);
+    }
 
     checkAllTimes(mpc, i);
 }
 
 void PunchScreen::function(int i)
 {
-	
+
     switch (i)
     {
     case 1: // Intentional fall-through
@@ -69,7 +71,9 @@ void PunchScreen::function(int i)
 void PunchScreen::setAutoPunch(int i)
 {
     if (i < 0 || i > 2)
+    {
         return;
+    }
 
     autoPunch = i;
 
@@ -108,26 +112,27 @@ void PunchScreen::displayTime()
 void PunchScreen::displayBackground()
 {
     std::string bgName = "punch-in";
-    
+
     if (autoPunch == 1)
     {
         bgName = "punch-out";
     }
-    else if (autoPunch == 2) {
+    else if (autoPunch == 2)
+    {
         bgName = "punch-in-out";
     }
-    
+
     findBackground()->setBackgroundName(bgName);
 }
 
 void PunchScreen::rec()
 {
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     ScreenComponent::rec();
 }
 
 void PunchScreen::overDub()
 {
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     ScreenComponent::rec();
 }

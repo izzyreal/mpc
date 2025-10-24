@@ -4,12 +4,15 @@
 
 using namespace mpc::file::pgmwriter;
 
-Slider::Slider(mpc::sampler::Program* program) 
+Slider::Slider(mpc::sampler::Program *program)
 {
-	sliderArray = std::vector<char>(15);
-    if(program->getSlider()->getNote() == 34) {
+    sliderArray = std::vector<char>(15);
+    if (program->getSlider()->getNote() == 34)
+    {
         setMidiNoteAssign(0);
-    } else {
+    }
+    else
+    {
         setMidiNoteAssign(program->getSlider()->getNote());
     }
     setTuneLow(program->getSlider()->getTuneLowRange());

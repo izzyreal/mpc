@@ -4,15 +4,15 @@
 
 namespace mpc::engine::control
 {
-	class CompoundControlChain
-		: public CompoundControl
-	{
-
-	public:
-		void add(std::shared_ptr<Control> control) override;
-		virtual void add(int index, std::shared_ptr<Control> control);
+    class CompoundControlChain
+        : public CompoundControl
+    {
 
     public:
-		CompoundControlChain(int id, std::string name);
-	};
-}
+        void add(std::shared_ptr<Control> control) override;
+        virtual void add(int index, std::shared_ptr<Control> control);
+
+    public:
+        CompoundControlChain(int id, std::string name);
+    };
+} // namespace mpc::engine::control

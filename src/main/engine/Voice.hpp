@@ -7,105 +7,111 @@
 #include "VoiceUtil.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
     class Sound;
     class NoteParameters;
-}
+} // namespace mpc::sampler
 
-namespace mpc::engine::control {
+namespace mpc::engine::control
+{
     class LawControl;
 }
 
-namespace mpc::engine::filter {
+namespace mpc::engine::filter
+{
     class StateVariableFilter;
 
     class StateVariableFilterControls;
-}
+} // namespace mpc::engine::filter
 
-namespace mpc::engine {
+namespace mpc::engine
+{
     class EnvelopeGenerator;
 
     class EnvelopeControls;
 
     class MuteInfo;
 
-    class VoiceState {
-        public:
-            float sampleRate = 44100.0;
-            float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
+    class VoiceState
+    {
+    public:
+        float sampleRate = 44100.0;
+        float inverseNyquist = VoiceUtil::getInverseNyquist(sampleRate);
 
-            // Voice overlap mode when the voice was triggered
-            sampler::VoiceOverlapMode voiceOverlapMode;
+        // Voice overlap mode when the voice was triggered
+        sampler::VoiceOverlapMode voiceOverlapMode;
 
-            // Pointer to currently playing note parameters
-            mpc::sampler::NoteParameters *noteParameters = nullptr;
+        // Pointer to currently playing note parameters
+        mpc::sampler::NoteParameters *noteParameters = nullptr;
 
-            // Pointer to sample data when the voice was triggered
-            std::shared_ptr<const std::vector<float>> sampleData;
-            int startTick = -1;
-            int tune = 0;
-            double increment = 0;
-            double position = 0;
-            float initialFilterValue = 0;
-            bool staticDecay = 0;
-            int note = -1;
-            int velocity = 0;
-            float amplitude = 0;
-            int start = 0;
-            int end = 0;
-            int loopTo = 0;
-            int lastFrameIndex = 0;
-            bool loopEnabled = false;
-            bool finished = true;
-            bool isMono = false;
-            mpc::engine::MuteInfo muteInfo;
-            int frameOffset = 0;
-            int decayCounter = 0;
-            bool enableEnvs = false;
-            int varType = 0;
-            int varValue = 0;
-            int veloToStart = 0;
-            int attackValue = 0;
-            int decayValue = 0;
-            int veloToAttack = 0;
-            int decayMode = 0;
-            int veloToLevel = 0;
-            float attackMs = 0;
-            int finalDecayValue = 0;
-            float decayMs = 0;
-            float veloToLevelFactor = 0;
-            int filtParam = 0;
-            float envAmplitude = 0;
-            float staticEnvAmp = 0;
-            uint64_t noteEventId = 0;
+        // Pointer to sample data when the voice was triggered
+        std::shared_ptr<const std::vector<float>> sampleData;
+        int startTick = -1;
+        int tune = 0;
+        double increment = 0;
+        double position = 0;
+        float initialFilterValue = 0;
+        bool staticDecay = 0;
+        int note = -1;
+        int velocity = 0;
+        float amplitude = 0;
+        int start = 0;
+        int end = 0;
+        int loopTo = 0;
+        int lastFrameIndex = 0;
+        bool loopEnabled = false;
+        bool finished = true;
+        bool isMono = false;
+        mpc::engine::MuteInfo muteInfo;
+        int frameOffset = 0;
+        int decayCounter = 0;
+        bool enableEnvs = false;
+        int varType = 0;
+        int varValue = 0;
+        int veloToStart = 0;
+        int attackValue = 0;
+        int decayValue = 0;
+        int veloToAttack = 0;
+        int decayMode = 0;
+        int veloToLevel = 0;
+        float attackMs = 0;
+        int finalDecayValue = 0;
+        float decayMs = 0;
+        float veloToLevelFactor = 0;
+        int filtParam = 0;
+        float envAmplitude = 0;
+        float staticEnvAmp = 0;
+        uint64_t noteEventId = 0;
     };
 
     class Voice : public mpc::engine::audio::core::AudioProcess
     {
 
     private:
-        VoiceState* getActiveState()
+        VoiceState *getActiveState()
         {
             return active.load(std::memory_order_acquire);
         }
 
-        const VoiceState* getActiveState() const {
+        const VoiceState *getActiveState() const
+        {
             return active.load(std::memory_order_acquire);
         }
-        
-        VoiceState* getInactiveState()
+
+        VoiceState *getInactiveState()
         {
-            VoiceState* current = active.load(std::memory_order_acquire);
+            VoiceState *current = active.load(std::memory_order_acquire);
             return (current == &stateA) ? &stateB : &stateA;
         }
 
         void swapStates()
         {
-            VoiceState* current = active.load(std::memory_order_relaxed);
-            VoiceState* other   = (current == &stateA) ? &stateB : &stateA;
+            VoiceState *current = active.load(std::memory_order_relaxed);
+            VoiceState *other = (current == &stateA) ? &stateB : &stateA;
             active.store(other, std::memory_order_release);
         }
-        
+
         const int stripNumber = -1;
         const bool basic = false;
 
@@ -113,7 +119,7 @@ namespace mpc::engine {
 
         VoiceState stateA;
         VoiceState stateB;
-        std::atomic<VoiceState*> active { &stateA };
+        std::atomic<VoiceState *> active{&stateA};
 
         mpc::engine::EnvelopeGenerator *staticEnv = nullptr;
         mpc::engine::EnvelopeGenerator *ampEnv = nullptr;
@@ -160,7 +166,7 @@ namespace mpc::engine {
                   uint64_t noteEventId);
 
         uint64_t getNoteEventId();
-        
+
         void startDecay();
 
         void startDecay(const int offset);
@@ -173,7 +179,7 @@ namespace mpc::engine {
 
         bool isFinished() const;
 
-        const mpc::sampler::NoteParameters* getNoteParameters() const;
+        const mpc::sampler::NoteParameters *getNoteParameters() const;
 
         sampler::VoiceOverlapMode getVoiceOverlapMode() const;
 
@@ -191,4 +197,4 @@ namespace mpc::engine {
         ~Voice();
     };
 
-}
+} // namespace mpc::engine

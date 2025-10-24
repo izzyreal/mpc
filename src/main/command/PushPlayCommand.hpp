@@ -1,9 +1,11 @@
 #pragma once
 #include "command/Command.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
-    class PushPlayCommand : public Command {
+    class PushPlayCommand : public Command
+    {
     public:
         explicit PushPlayCommand(mpc::Mpc &mpc);
         void execute() override;
@@ -12,5 +14,4 @@ namespace mpc::command {
         mpc::Mpc &mpc;
     };
 
-}
-
+} // namespace mpc::command

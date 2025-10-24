@@ -10,42 +10,45 @@
 namespace mpc::input
 {
 
-enum class Direction
-{
-    None,
-    Positive,
-    Negative
-};
-
-constexpr int toSign(Direction d)
-{
-    switch (d)
+    enum class Direction
     {
-        case Direction::Positive: return +1;
-        case Direction::Negative: return -1;
+        None,
+        Positive,
+        Negative
+    };
+
+    constexpr int toSign(Direction d)
+    {
+        switch (d)
+        {
+        case Direction::Positive:
+            return +1;
+        case Direction::Negative:
+            return -1;
         case Direction::None:
-        default:                  return 0;
+        default:
+            return 0;
+        }
     }
-}
 
-struct KeyboardBinding
-{
-    hardware::ComponentId componentId;
-    Direction direction = Direction::None;
-};
+    struct KeyboardBinding
+    {
+        hardware::ComponentId componentId;
+        Direction direction = Direction::None;
+    };
 
-class KeyboardBindings
-{
-public:
-    KeyboardBindings();
+    class KeyboardBindings
+    {
+    public:
+        KeyboardBindings();
 
-    std::vector<mpc::input::VmpcKeyCode> lookupComponent(hardware::ComponentId id) const;
-    std::optional<KeyboardBinding> lookup(VmpcKeyCode key) const;
+        std::vector<mpc::input::VmpcKeyCode> lookupComponent(hardware::ComponentId id) const;
+        std::optional<KeyboardBinding> lookup(VmpcKeyCode key) const;
 
-    void initializeDefaults();
+        void initializeDefaults();
 
-private:
-    std::map<VmpcKeyCode, KeyboardBinding> bindings;
-};
+    private:
+        std::map<VmpcKeyCode, KeyboardBinding> bindings;
+    };
 
 } // namespace mpc::input

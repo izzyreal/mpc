@@ -8,7 +8,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
+EndFineScreen::EndFineScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "end-fine", layerIndex)
 {
     addChildT<Wave>()->setFine(true);
@@ -33,19 +33,22 @@ void EndFineScreen::displayFineWave()
     auto sound = sampler->getSound();
 
     if (!sound)
+    {
         return;
+    }
 
     findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
     findWave()->setCenterSamplePos(sound->getEnd());
 }
-
 
 void EndFineScreen::displayEnd()
 {
     auto sound = sampler->getSound();
 
     if (!sound)
+    {
         return;
+    }
 
     findField("end")->setTextPadded(sound->getEnd(), " ");
 }
@@ -55,7 +58,9 @@ void EndFineScreen::displayLngthLabel()
     auto sound = sampler->getSound();
 
     if (!sound)
+    {
         return;
+    }
 
     findLabel("lngth")->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
@@ -77,15 +82,15 @@ void EndFineScreen::function(int i)
 
     switch (i)
     {
-        case 1:
-            findWave()->zoomPlus();
-            break;
-        case 2:
-            findWave()->zoomMinus();
-            break;
-        case 4:
-            sampler->playX();
-            break;
+    case 1:
+        findWave()->zoomPlus();
+        break;
+    case 2:
+        findWave()->zoomMinus();
+        break;
+    case 4:
+        sampler->playX();
+        break;
     }
 }
 
@@ -157,7 +162,6 @@ void EndFineScreen::setSlider(int i)
     {
         return;
     }
-
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

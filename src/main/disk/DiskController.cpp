@@ -15,15 +15,15 @@ using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
-DiskController::DiskController(mpc::Mpc& _mpc)
-: mpc (_mpc)
+DiskController::DiskController(mpc::Mpc &_mpc)
+    : mpc(_mpc)
 {
 }
 
 void DiskController::initDisks()
 {
     disks.emplace_back(std::make_shared<StdDisk>(mpc));
-    auto& defaultVolume = disks.back()->getVolume();
+    auto &defaultVolume = disks.back()->getVolume();
     defaultVolume.volumeUUID = "default_volume";
     defaultVolume.type = LOCAL_DIRECTORY;
     defaultVolume.mode = READ_WRITE;
@@ -31,21 +31,21 @@ void DiskController::initDisks()
     defaultVolume.localDirectoryPath = mpc.paths->defaultLocalVolumePath().string();
     defaultVolume.volumeSize = fs::space(defaultVolume.localDirectoryPath).capacity;
     disks.back()->initRoot();
-    
+
     MLOG("Disk root initialized");
 
     detectRawUsbVolumes();
 
     auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID(mpc);
     MLOG("Persisted UUID: " + persistedActiveUUID);
-    
+
     for (int i = 0; i < disks.size(); i++)
     {
         MLOG("\nIterating through disks: " + std::to_string(i));
         MLOG("Absolute path: " + disks[i]->getAbsolutePath());
 
         auto uuid = disks[i]->getVolume().volumeUUID;
-        
+
         MLOG("UUID: " + uuid);
 
         if (uuid == persistedActiveUUID)
@@ -54,7 +54,7 @@ void DiskController::initDisks()
             break;
         }
     }
-    
+
     auto activeDisk = getActiveDisk();
 
     MLOG("Active disk is set to the one with absolute path: " + activeDisk->getAbsolutePath());
@@ -89,7 +89,7 @@ std::shared_ptr<AbstractDisk> DiskController::getActiveDisk()
     return disks[activeDiskIndex];
 }
 
-std::vector<std::shared_ptr<AbstractDisk>>& DiskController::getDisks()
+std::vector<std::shared_ptr<AbstractDisk>> &DiskController::getDisks()
 {
     return disks;
 }
@@ -111,10 +111,12 @@ void DiskController::detectRawUsbVolumes()
 
     MLOG("RemovableVolumes instantiated");
 
-    class SimpleChangeListener : public VolumeChangeListener {
+    class SimpleChangeListener : public VolumeChangeListener
+    {
     public:
         std::vector<RemovableVolume> volumes;
-        void processChange(RemovableVolume v) override {
+        void processChange(RemovableVolume v) override
+        {
             volumes.push_back(v);
         }
     };
@@ -144,7 +146,7 @@ void DiskController::detectRawUsbVolumes()
         {
             bool isConnected = false;
 
-            for (auto& v : listener.volumes)
+            for (auto &v : listener.volumes)
             {
                 if (v.volumeUUID == d->getVolume().volumeUUID)
                 {
@@ -160,13 +162,13 @@ void DiskController::detectRawUsbVolumes()
         }
     }
 
-    for (auto& v : listener.volumes)
+    for (auto &v : listener.volumes)
     {
         MLOG("Discovered volume UUID " + v.volumeUUID);
 
         bool alreadyInitialized = false;
 
-        for (auto& d : disks)
+        for (auto &d : disks)
         {
             if (d->getVolume().volumeUUID == v.volumeUUID)
             {
@@ -182,14 +184,18 @@ void DiskController::detectRawUsbVolumes()
 
         disks.emplace_back(std::make_shared<RawDisk>(mpc));
         auto disk = disks.back();
-        auto& volume = disk->getVolume();
+        auto &volume = disk->getVolume();
 
         volume.type = USB_VOLUME;
 
         if (persistedConfigs.find(v.volumeUUID) == end(persistedConfigs))
+        {
             volume.mode = DISABLED;
+        }
         else
+        {
             volume.mode = persistedConfigs[v.volumeUUID];
+        }
 
         volume.volumePath = v.deviceName;
         volume.label = v.volumeName;

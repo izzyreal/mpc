@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <engine/audio/core/AudioBuffer.hpp>
 
-namespace mpc::engine::audio::core {
+namespace mpc::engine::audio::core
+{
 
     class AudioProcess
     {
@@ -15,11 +16,15 @@ namespace mpc::engine::audio::core {
         virtual void open() {}
 
         virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer)
-        { return processAudio(buffer, buffer->getSampleCount()); }
+        {
+            return processAudio(buffer, buffer->getSampleCount());
+        }
 
         virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int)
-        { return processAudio(buffer); }
+        {
+            return processAudio(buffer);
+        }
 
         virtual void close() {}
     };
-}
+} // namespace mpc::engine::audio::core

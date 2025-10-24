@@ -3,17 +3,18 @@
 
 #include <string>
 
-namespace mpc::midi::event::meta {
+namespace mpc::midi::event::meta
+{
 
-	class TrackName
-		: public TextualMetaEvent
-	{
+    class TrackName
+        : public TextualMetaEvent
+    {
 
-	public:
-		void setName(std::string name);
-		std::string getTrackName();
+    public:
+        void setName(std::string name);
+        std::string getTrackName();
 
-	public:
-		TrackName(int tick, int delta, std::string name);
-	};
-}
+    public:
+        TrackName(int tick, int delta, std::string name);
+    };
+} // namespace mpc::midi::event::meta

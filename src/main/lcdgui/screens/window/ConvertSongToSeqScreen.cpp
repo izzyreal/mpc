@@ -11,7 +11,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-ConvertSongToSeqScreen::ConvertSongToSeqScreen(mpc::Mpc& mpc, const int layerIndex)
+ConvertSongToSeqScreen::ConvertSongToSeqScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "convert-song-to-seq", layerIndex)
 {
 }
@@ -37,13 +37,13 @@ void ConvertSongToSeqScreen::function(int i)
 {
     switch (i)
     {
-        case 3:
-            mpc.getLayeredScreen()->openScreen<SongScreen>();
-            break;
-        case 4:
-            convertSongToSeq();
-            mpc.getLayeredScreen()->openScreen<SongScreen>();
-            break;
+    case 3:
+        mpc.getLayeredScreen()->openScreen<SongScreen>();
+        break;
+    case 4:
+        convertSongToSeq();
+        mpc.getLayeredScreen()->openScreen<SongScreen>();
+        break;
     }
 }
 
@@ -113,13 +113,13 @@ void ConvertSongToSeqScreen::displayTrackStatus()
 
 void eraseOffTracks(const int firstBarToRemove,
                     const int firstBarToKeep,
-                    const std::shared_ptr<Sequence>& sourceSequence,
-                    const std::shared_ptr<Sequence>& destinationSequence)
+                    const std::shared_ptr<Sequence> &sourceSequence,
+                    const std::shared_ptr<Sequence> &destinationSequence)
 {
     const auto startTick = destinationSequence->getFirstTickOfBar(firstBarToRemove);
     const auto endTick = destinationSequence->getFirstTickOfBar(firstBarToKeep);
 
-    for (auto& track: destinationSequence->getTracks())
+    for (auto &track : destinationSequence->getTracks())
     {
         if (sourceSequence->getTrack(track->getIndex())->isOn())
         {
@@ -207,7 +207,7 @@ void ConvertSongToSeqScreen::convertSongToSeq()
                 }
             }
 
-            for (auto& sourceTrack : sourceSequence->getTracks())
+            for (auto &sourceTrack : sourceSequence->getTracks())
             {
                 const auto midiChannel = sourceTrack->getDeviceIndex() - 1;
 
@@ -236,7 +236,7 @@ void ConvertSongToSeqScreen::convertSongToSeq()
                 const auto destinationFirstBarIndex = destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
                 const auto destinationFirstBarStartTick = destinationSequence->getFirstTickOfBar(destinationFirstBarIndex);
 
-                for (auto& sourceEvent : sourceTrack->getEvents())
+                for (auto &sourceEvent : sourceTrack->getEvents())
                 {
                     const auto destinationTick = destinationFirstBarStartTick + sourceEvent->getTick();
                     destinationTrack->cloneEventIntoTrack(sourceEvent, destinationTick, true);

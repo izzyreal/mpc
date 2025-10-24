@@ -3,7 +3,8 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "hardware/Hardware.hpp"
 
-namespace mpc::command {
+namespace mpc::command
+{
 
     PushMainScreenCommand::PushMainScreenCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -23,5 +24,4 @@ namespace mpc::command {
         hw->getLed(hardware::ComponentId::NEXT_SEQ_LED)->setEnabled(false);
         hw->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
     }
-}
-
+} // namespace mpc::command

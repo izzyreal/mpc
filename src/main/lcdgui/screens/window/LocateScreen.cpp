@@ -4,7 +4,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
 LocateScreen::LocateScreen(mpc::Mpc &mpc, const int layerIndex)
-        : ScreenComponent(mpc, "locate", layerIndex)
+    : ScreenComponent(mpc, "locate", layerIndex)
 {
 }
 
@@ -15,54 +15,54 @@ void LocateScreen::function(int i)
 
     switch (i)
     {
-        case 1:
+    case 1:
+    {
+        if (focusedFieldName.length() != 1)
         {
-            if (focusedFieldName.length() != 1)
-            {
-                break;
-            }
-
-            const auto locationIndex = std::stoi(focusedFieldName) - 1;
-            auto& location = locations[locationIndex];
-            std::get<0>(location) = barIndex;
-            std::get<1>(location) = beatIndex;
-            std::get<2>(location) = clock;
-
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         }
-        case 3:
+
+        const auto locationIndex = std::stoi(focusedFieldName) - 1;
+        auto &location = locations[locationIndex];
+        std::get<0>(location) = barIndex;
+        std::get<1>(location) = beatIndex;
+        std::get<2>(location) = clock;
+
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            break;
-        case 4:
-            if (focusedFieldName.length() == 1)
-            {
-                const auto locationIndex = std::stoi(focusedFieldName) - 1;
-                auto& location = locations[locationIndex];
-
-                const auto clampedBarIndex =
-                        std::clamp<uint16_t>(std::get<0>(location), 0, getMaxBarIndexForThisSequence());
-
-                const auto clampedBeatIndex =
-                        std::clamp<uint8_t>(std::get<1>(location), 0, getMaxBeatIndexForThisBar());
-
-                const auto clampedClock =
-                        std::clamp<uint8_t>(std::get<2>(location), 0, getMaxClockForThisBar());
-
-                sequencer.lock()->setBar(clampedBarIndex);
-                sequencer.lock()->setBeat(clampedBeatIndex);
-                sequencer.lock()->setClock(clampedClock);
-            }
-            else
-            {
-                sequencer.lock()->setBar(barIndex);
-                sequencer.lock()->setBeat(beatIndex);
-                sequencer.lock()->setClock(clock);
-            }
+        break;
+    }
+    case 3:
         mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            break;
-        default:
-            break;
+        break;
+    case 4:
+        if (focusedFieldName.length() == 1)
+        {
+            const auto locationIndex = std::stoi(focusedFieldName) - 1;
+            auto &location = locations[locationIndex];
+
+            const auto clampedBarIndex =
+                std::clamp<uint16_t>(std::get<0>(location), 0, getMaxBarIndexForThisSequence());
+
+            const auto clampedBeatIndex =
+                std::clamp<uint8_t>(std::get<1>(location), 0, getMaxBeatIndexForThisBar());
+
+            const auto clampedClock =
+                std::clamp<uint8_t>(std::get<2>(location), 0, getMaxClockForThisBar());
+
+            sequencer.lock()->setBar(clampedBarIndex);
+            sequencer.lock()->setBeat(clampedBeatIndex);
+            sequencer.lock()->setClock(clampedClock);
+        }
+        else
+        {
+            sequencer.lock()->setBar(barIndex);
+            sequencer.lock()->setBeat(beatIndex);
+            sequencer.lock()->setClock(clock);
+        }
+        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+        break;
+    default:
+        break;
     }
 }
 
@@ -128,7 +128,7 @@ void LocateScreen::displayLocations()
 
         const auto locationStr = locationBarStr + "." + locationBeatStr + "." + locationClockStr;
 
-        findField(std::to_string(i+1))->setText(locationStr);
+        findField(std::to_string(i + 1))->setText(locationStr);
     }
 }
 
@@ -207,7 +207,7 @@ uint8_t LocateScreen::getMaxClockForThisBar()
     return 96 * (4.0 / sequencer.lock()->getActiveSequence()->getDenominator(barIndex)) - 1;
 }
 
-void LocateScreen::setLocations(const std::vector<Location>& newLocations)
+void LocateScreen::setLocations(const std::vector<Location> &newLocations)
 {
     assert(newLocations.size() == 9);
     locations = newLocations;

@@ -25,28 +25,29 @@
 
 namespace mpc::lcdgui
 {
-	class ScreenComponent
-		: public Component, public Observer
-	{
+    class ScreenComponent
+        : public Component,
+          public Observer
+    {
 
-	private:
-		const int layer;
-		std::map<std::string, std::vector<std::string>> transferMap;
-		std::string firstField;
+    private:
+        const int layer;
+        std::map<std::string, std::vector<std::string>> transferMap;
+        std::string firstField;
 
-	public:
-		const int& getLayerIndex();
+    public:
+        const int &getLayerIndex();
 
         std::optional<int> getDrumIndex();
         std::string getFocusedFieldNameOrThrow();
-		
-	protected:
-		mpc::Mpc& mpc;
-		std::shared_ptr<mpc::sampler::Sampler> sampler;
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 
-		mpc::engine::Drum& activeDrum();
+    protected:
+        mpc::Mpc &mpc;
+        std::shared_ptr<mpc::sampler::Sampler> sampler;
+        std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+        std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
+
+        mpc::engine::Drum &activeDrum();
         std::shared_ptr<Field> getFocusedField();
         std::shared_ptr<Field> getFocusedFieldOrThrow();
         std::optional<std::string> getFocusedFieldName();
@@ -54,30 +55,42 @@ namespace mpc::lcdgui
         std::shared_ptr<sampler::Program> getProgram();
         std::shared_ptr<sampler::Program> getProgramOrThrow();
 
-	protected:
-		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
-		const std::string getLastFocus(const std::string& screenName);
-		std::shared_ptr<Wave> findWave();
-		std::shared_ptr<EnvGraph> findEnvGraph();
+    protected:
+        void setLastFocus(const std::string &screenName, const std::string &newLastFocus);
+        const std::string getLastFocus(const std::string &screenName);
+        std::shared_ptr<Wave> findWave();
+        std::shared_ptr<EnvGraph> findEnvGraph();
 
-	public:
-		virtual void open() {}
-		virtual void close() {}
+    public:
+        virtual void open() {}
+        virtual void close() {}
 
-	public:
-		ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer);
+    public:
+        ScreenComponent(mpc::Mpc &mpc, const std::string &name, const int layer);
         std::shared_ptr<Field> findFocus();
-		void setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap);
-		void setFirstField(const std::string& newFirstField);
-		std::string getFirstField();
-		std::map<std::string, std::vector<std::string>>& getTransferMap();
+        void setTransferMap(const std::map<std::string, std::vector<std::string>> &newTransferMap);
+        void setFirstField(const std::string &newFirstField);
+        std::string getFirstField();
+        std::map<std::string, std::vector<std::string>> &getTransferMap();
 
-	public:
-        virtual void left() { command::PushLeftCommand(mpc).execute(); }
-        virtual void right() { command::PushRightCommand(mpc).execute(); }
-        virtual void up() { command::PushUpCommand(mpc).execute(); }
-        virtual void down() { command::PushDownCommand(mpc).execute(); }
-        
+    public:
+        virtual void left()
+        {
+            command::PushLeftCommand(mpc).execute();
+        }
+        virtual void right()
+        {
+            command::PushRightCommand(mpc).execute();
+        }
+        virtual void up()
+        {
+            command::PushUpCommand(mpc).execute();
+        }
+        virtual void down()
+        {
+            command::PushDownCommand(mpc).execute();
+        }
+
         virtual void function(int i)
         {
             if (i == 3)
@@ -85,29 +98,49 @@ namespace mpc::lcdgui
                 mpc.getLayeredScreen()->closeCurrentScreen();
             }
         }
-        
+
         virtual void openWindow();
         virtual void turnWheel(int) {}
-        virtual void numpad(int i) { command::PushNumPadCommand(mpc, i).execute(); }
-        virtual void pressEnter() { command::PushEnterCommand(mpc).execute(); }
-        virtual void rec() { command::PushRecCommand(mpc).execute(); }
-        virtual void overDub() { command::PushOverdubCommand(mpc).execute(); }
-        virtual void stop() { command::PushStopCommand(mpc).execute(); }
-        virtual void play() { command::PushPlayCommand(mpc).execute(); }
-        virtual void playStart() { command::PushPlayStartCommand(mpc).execute(); }
+        virtual void numpad(int i)
+        {
+            command::PushNumPadCommand(mpc, i).execute();
+        }
+        virtual void pressEnter()
+        {
+            command::PushEnterCommand(mpc).execute();
+        }
+        virtual void rec()
+        {
+            command::PushRecCommand(mpc).execute();
+        }
+        virtual void overDub()
+        {
+            command::PushOverdubCommand(mpc).execute();
+        }
+        virtual void stop()
+        {
+            command::PushStopCommand(mpc).execute();
+        }
+        virtual void play()
+        {
+            command::PushPlayCommand(mpc).execute();
+        }
+        virtual void playStart()
+        {
+            command::PushPlayStartCommand(mpc).execute();
+        }
         virtual void setSlider(int) {}
 
-		int getSoundIncrement(const int dataWheelSteps)
+        int getSoundIncrement(const int dataWheelSteps)
         {
             auto result = dataWheelSteps;
-            
+
             if (std::abs(result) != 1)
             {
                 result *= (int)(ceil(mpc.getSampler()->getSound()->getFrameCount() / 15000.f));
             }
-            
+
             return result;
         }
-	};
-}
-
+    };
+} // namespace mpc::lcdgui

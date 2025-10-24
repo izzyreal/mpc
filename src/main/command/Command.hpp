@@ -1,8 +1,12 @@
 #pragma once
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
-namespace mpc::command {
+namespace mpc::command
+{
     class Command
     {
     public:

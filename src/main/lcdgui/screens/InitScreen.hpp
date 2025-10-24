@@ -3,13 +3,13 @@
 
 namespace mpc::lcdgui::screens
 {
-	class InitScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class InitScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void function(int i) override;
+    public:
+        void function(int i) override;
 
-		InitScreen(mpc::Mpc& mpc, const int layerIndex);
-	};
-}
+        InitScreen(mpc::Mpc &mpc, const int layerIndex);
+    };
+} // namespace mpc::lcdgui::screens

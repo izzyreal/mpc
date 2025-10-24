@@ -16,8 +16,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc& mpc, int layerIndex)
-: ScreenComponent(mpc, "vmpc-midi", layerIndex)
+VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc &mpc, int layerIndex)
+    : ScreenComponent(mpc, "vmpc-midi", layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
@@ -38,7 +38,7 @@ VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc& mpc, int layerIndex)
 void VmpcMidiScreen::turnWheel(int i)
 {
 
-    MidiControlCommand& cmd = activePreset->rows[row + rowOffset];
+    MidiControlCommand &cmd = activePreset->rows[row + rowOffset];
 
     if (column == 0)
     {
@@ -64,10 +64,11 @@ void VmpcMidiScreen::open()
 {
     auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
 
-    screen->discardAndLeave = [this](){
+    screen->discardAndLeave = [this]()
+    {
         activePreset = std::make_shared<MidiControlPreset>();
 
-        for (auto& presetRow : uneditedActivePresetCopy->rows)
+        for (auto &presetRow : uneditedActivePresetCopy->rows)
         {
             activePreset->rows.emplace_back(presetRow);
         }
@@ -75,7 +76,8 @@ void VmpcMidiScreen::open()
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
     };
 
-    screen->saveAndLeave = [this](){
+    screen->saveAndLeave = [this]()
+    {
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
     };
 
@@ -85,7 +87,7 @@ void VmpcMidiScreen::open()
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
 
-        for (auto& presetRow : activePreset->rows)
+        for (auto &presetRow : activePreset->rows)
         {
             uneditedActivePresetCopy->rows.emplace_back(presetRow);
         }
@@ -93,7 +95,7 @@ void VmpcMidiScreen::open()
 
     findChild<Label>("up")->setText("\u00C7");
     findChild<Label>("down")->setText("\u00C6");
-    
+
     setLearning(false);
     learnCandidate.reset();
     updateRows();
@@ -106,14 +108,14 @@ void VmpcMidiScreen::up()
         acceptLearnCandidate();
         learnCandidate.reset();
     }
-    
+
     if (row == 0)
     {
         if (rowOffset == 0)
         {
             return;
         }
-        
+
         rowOffset--;
 
         if (activePreset->rows[row + rowOffset].isNote() &&
@@ -121,11 +123,11 @@ void VmpcMidiScreen::up()
         {
             column--;
         }
-        
+
         updateRows();
         return;
     }
-    
+
     row--;
 
     if (activePreset->rows[row + rowOffset].isNote() &&
@@ -133,13 +135,13 @@ void VmpcMidiScreen::up()
     {
         column--;
     }
-    
+
     updateRows();
 }
 
 void VmpcMidiScreen::openWindow()
 {
-        mpc.getLayeredScreen()->openScreen<VmpcMidiPresetsScreen>();
+    mpc.getLayeredScreen()->openScreen<VmpcMidiPresetsScreen>();
 }
 
 void VmpcMidiScreen::acceptLearnCandidate()
@@ -156,7 +158,7 @@ void VmpcMidiScreen::acceptLearnCandidate()
     {
         activePreset->rows[row + rowOffset].setValue(learnCandidate.getValue());
     }
-    
+
     activePreset->rows[row + rowOffset].setMidiChannelIndex(learnCandidate.getMidiChannelIndex());
 }
 
@@ -167,14 +169,14 @@ void VmpcMidiScreen::down()
         acceptLearnCandidate();
         learnCandidate.reset();
     }
-    
+
     if (row == 4)
     {
         if (rowOffset + 5 >= activePreset->rows.size())
         {
             return;
         }
-        
+
         rowOffset++;
 
         if (activePreset->rows[row + rowOffset].isNote() &&
@@ -186,7 +188,7 @@ void VmpcMidiScreen::down()
         updateRows();
         return;
     }
-    
+
     row++;
 
     if (activePreset->rows[row + rowOffset].isNote() &&
@@ -194,7 +196,7 @@ void VmpcMidiScreen::down()
     {
         column--;
     }
-    
+
     updateRows();
 }
 
@@ -212,7 +214,7 @@ void VmpcMidiScreen::left()
     {
         column--;
     }
-    
+
     updateRows();
 }
 
@@ -262,90 +264,92 @@ bool VmpcMidiScreen::hasMappingChanged()
 
 void VmpcMidiScreen::function(int i)
 {
-    switch(i)
+    switch (i)
     {
-        case 0:
-            if (learning)
-                return;
-            
-            if (hasMappingChanged())
-            {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-settings";
-        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-                return;
-            }
+    case 0:
+        if (learning)
+        {
+            return;
+        }
+
+        if (hasMappingChanged())
+        {
+            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+            screen->nextScreen = "vmpc-settings";
+            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+            return;
+        }
 
         mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-            break;
-        case 1:
-            if (learning)
-            {
-                return;
-            }
+        break;
+    case 1:
+        if (learning)
+        {
+            return;
+        }
 
-            if (hasMappingChanged())
-            {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-keyboard";
-        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-                return;
-            }
+        if (hasMappingChanged())
+        {
+            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+            screen->nextScreen = "vmpc-keyboard";
+            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+            return;
+        }
 
         mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-            break;
-        case 2:
-            if (learning)
-            {
-                setLearning(false);
-                learnCandidate.reset();
-                updateRows();
-                return;
-            }
-            
-            if (hasMappingChanged())
-            {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-auto-save";
-        mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-                return;
-            }
+        break;
+    case 2:
+        if (learning)
+        {
+            setLearning(false);
+            learnCandidate.reset();
+            updateRows();
+            return;
+        }
+
+        if (hasMappingChanged())
+        {
+            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+            screen->nextScreen = "vmpc-auto-save";
+            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+            return;
+        }
 
         mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-            break;
-        case 3:
-            if (learning)
-            {
-                acceptLearnCandidate();
-            }
-            
-            setLearning(!learning);
-            learnCandidate.reset();
-
-            updateRows();
-            break;
-        case 5:
+        break;
+    case 3:
+        if (learning)
         {
-            if (learning)
-            {
-                return;
-            }
-
-            std::string popupMsg;
-
-            if (hasMappingChanged())
-            {
-                MidiControlPersistence::saveCurrentState(mpc);
-                popupMsg = "MIDI mapping saved";
-            }
-            else
-            {
-                popupMsg = "MIDI mapping unchanged";
-            }
-
-            ls->showPopupForMs(popupMsg, 1000);
-            break;
+            acceptLearnCandidate();
         }
+
+        setLearning(!learning);
+        learnCandidate.reset();
+
+        updateRows();
+        break;
+    case 5:
+    {
+        if (learning)
+        {
+            return;
+        }
+
+        std::string popupMsg;
+
+        if (hasMappingChanged())
+        {
+            MidiControlPersistence::saveCurrentState(mpc);
+            popupMsg = "MIDI mapping saved";
+        }
+        else
+        {
+            popupMsg = "MIDI mapping unchanged";
+        }
+
+        ls->showPopupForMs(popupMsg, 1000);
+        break;
+    }
     }
 }
 
@@ -359,13 +363,13 @@ void VmpcMidiScreen::setLearnCandidate(const bool isNote, const int8_t channelIn
     {
         learnCandidate.setValue(value);
     }
-    
+
     updateRows();
 }
 
 void VmpcMidiScreen::updateOrAddActivePresetCommand(MidiControlCommand &c)
 {
-    for (auto& labelCommand : activePreset->rows)
+    for (auto &labelCommand : activePreset->rows)
     {
         if (c.getMpcHardwareLabel() == labelCommand.getMpcHardwareLabel())
         {
@@ -388,15 +392,14 @@ void VmpcMidiScreen::updateRows()
     {
         const auto typeLabel = findChild<Label>("type" + std::to_string(i));
         const auto typeField = findChild<Field>("type" + std::to_string(i));
-        
+
         int length = 15;
-        
+
         const auto labelText = StrUtil::padRight(activePreset->rows[i + rowOffset].getMpcHardwareLabel(), " ", length) + ":";
-        
+
         typeLabel->setText(labelText);
-        MidiControlCommand& cmd =
-                (learning && row == i && !learnCandidate.isEmpty()) ?
-                learnCandidate : activePreset->rows[i + rowOffset];
+        MidiControlCommand &cmd =
+            (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : activePreset->rows[i + rowOffset];
 
         std::string type = cmd.isNote() ? "Note" : "CC";
 
@@ -459,7 +462,7 @@ void VmpcMidiScreen::updateRows()
         numberField->setBlinking(learning && i == row);
         valueField->setBlinking(learning && i == row);
     }
-    
+
     displayUpAndDown();
 }
 

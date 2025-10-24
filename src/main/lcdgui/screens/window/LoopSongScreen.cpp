@@ -7,72 +7,74 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-LoopSongScreen::LoopSongScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "loop-song", layerIndex)
+LoopSongScreen::LoopSongScreen(mpc::Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "loop-song", layerIndex)
 {
 }
 
 void LoopSongScreen::open()
 {
-	displayFirstStep();
-	displayLastStep();
-	displayNumberOfSteps();
+    displayFirstStep();
+    displayLastStep();
+    displayNumberOfSteps();
 }
 
 void LoopSongScreen::turnWheel(int i)
 {
 
-	auto songScreen = mpc.screens->get<SongScreen>();
-	auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
+    auto songScreen = mpc.screens->get<SongScreen>();
+    auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-	if (focusedFieldName == "first-step")
-	{
-		song->setFirstStep(song->getFirstStep() + i);
-		displayFirstStep();
-		displayLastStep();
-		displayNumberOfSteps();
-	}
-	else if (focusedFieldName == "last-step")
-	{
-		song->setLastStep(song->getLastStep() + i);
-		displayLastStep();
-		displayFirstStep();
-		displayNumberOfSteps();
-	}
-	else if (focusedFieldName == "number-of-steps")
-	{
-		auto candidate = song->getLastStep() + i;
-		
-		if (candidate < song->getFirstStep())
-			return;
+    if (focusedFieldName == "first-step")
+    {
+        song->setFirstStep(song->getFirstStep() + i);
+        displayFirstStep();
+        displayLastStep();
+        displayNumberOfSteps();
+    }
+    else if (focusedFieldName == "last-step")
+    {
+        song->setLastStep(song->getLastStep() + i);
+        displayLastStep();
+        displayFirstStep();
+        displayNumberOfSteps();
+    }
+    else if (focusedFieldName == "number-of-steps")
+    {
+        auto candidate = song->getLastStep() + i;
 
-		song->setLastStep(candidate);
+        if (candidate < song->getFirstStep())
+        {
+            return;
+        }
 
-		displayLastStep();
-		displayNumberOfSteps();
-	}
+        song->setLastStep(candidate);
+
+        displayLastStep();
+        displayNumberOfSteps();
+    }
 }
 
 void LoopSongScreen::displayFirstStep()
 {
-	auto songScreen = mpc.screens->get<SongScreen>();
-	auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
-	findField("first-step")->setTextPadded(std::to_string(song->getFirstStep() + 1));
+    auto songScreen = mpc.screens->get<SongScreen>();
+    auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
+    findField("first-step")->setTextPadded(std::to_string(song->getFirstStep() + 1));
 }
 
 void LoopSongScreen::displayLastStep()
 {
-	auto songScreen = mpc.screens->get<SongScreen>();
-	auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
+    auto songScreen = mpc.screens->get<SongScreen>();
+    auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
 
-	findField("last-step")->setTextPadded(std::to_string(song->getLastStep() + 1));
+    findField("last-step")->setTextPadded(std::to_string(song->getLastStep() + 1));
 }
 
 void LoopSongScreen::displayNumberOfSteps()
 {
-	auto songScreen = mpc.screens->get<SongScreen>();
-	auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
-	findField("number-of-steps")->setTextPadded(std::to_string(song->getLastStep() - song->getFirstStep() + 1));
+    auto songScreen = mpc.screens->get<SongScreen>();
+    auto song = sequencer.lock()->getSong(songScreen->getActiveSongIndex());
+    findField("number-of-steps")->setTextPadded(std::to_string(song->getLastStep() - song->getFirstStep() + 1));
 }

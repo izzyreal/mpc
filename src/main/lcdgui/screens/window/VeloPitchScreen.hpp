@@ -3,24 +3,24 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class VeloPitchScreen
-		: public mpc::lcdgui::ScreenComponent
-	{
+    class VeloPitchScreen
+        : public mpc::lcdgui::ScreenComponent
+    {
 
-	public:
-		void turnWheel(int i) override;
+    public:
+        void turnWheel(int i) override;
 
-		VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex);
+        VeloPitchScreen(mpc::Mpc &mpc, const int layerIndex);
 
-		void open() override;
-		void close() override;
+        void open() override;
+        void close() override;
 
-		void update(Observable* observable, Message message) override;
+        void update(Observable *observable, Message message) override;
 
-	private:
-		void displayVelo();
-		void displayNote();
-		void displayVeloPitch();
-		void displayTune();
-	};
-}
+    private:
+        void displayVelo();
+        void displayNote();
+        void displayVeloPitch();
+        void displayTune();
+    };
+} // namespace mpc::lcdgui::screens::window

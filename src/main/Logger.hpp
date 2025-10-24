@@ -4,25 +4,26 @@
 #pragma once
 #include <string>
 
-namespace mpc {
+namespace mpc
+{
 
-	class Logger {
+    class Logger
+    {
 
-	private:
-		std::string path;
+    private:
+        std::string path;
 
-	public:
-		static Logger l;
+    public:
+        static Logger l;
 
-	public:
-		void log(std::string s);
-		void setPath(std::string s);
+    public:
+        void log(std::string s);
+        void setPath(std::string s);
 
-	public:
-		Logger();
-
-	};
-}
+    public:
+        Logger();
+    };
+} // namespace mpc
 
 #define MLOG(arg) (mpc::Logger::l.log(arg))
 #endif
