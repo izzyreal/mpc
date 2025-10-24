@@ -1,12 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
 #include <string>
-#include <unordered_set>
 
 #include "hardware/Hardware.hpp"
 
 using namespace mpc::hardware;
-using namespace mpc::input;
 
 // ---- TESTS ----
 
