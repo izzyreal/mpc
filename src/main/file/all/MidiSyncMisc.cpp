@@ -1,14 +1,14 @@
-#include <file/all/MidiSyncMisc.hpp>
+#include "file/all/MidiSyncMisc.hpp"
 
 #include <Mpc.hpp>
-#include <file/all/AllParser.hpp>
+#include "file/all/AllParser.hpp"
 
 #include <StrUtil.hpp>
 #include <Util.hpp>
 
-#include <lcdgui/screens/SongScreen.hpp>
-#include <lcdgui/screens/SyncScreen.hpp>
-#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
+#include "lcdgui/screens/SongScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
+#include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;

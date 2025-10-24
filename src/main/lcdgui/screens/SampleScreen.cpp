@@ -1,8 +1,8 @@
 #include "SampleScreen.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/SoundRecorder.hpp>
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/SoundRecorder.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <cmath>
 

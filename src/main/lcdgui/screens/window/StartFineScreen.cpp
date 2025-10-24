@@ -1,7 +1,7 @@
 #include "StartFineScreen.hpp"
 #include "hardware/Hardware.hpp"
 
-#include <lcdgui/screens/TrimScreen.hpp>
+#include "lcdgui/screens/TrimScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

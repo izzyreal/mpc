@@ -1,12 +1,12 @@
-#include <midi/MidiTrack.hpp>
+#include "midi/MidiTrack.hpp"
 
-#include <midi/event/MidiEvent.hpp>
-#include <midi/event/NoteOn.hpp>
-#include <midi/event/meta/EndOfTrack.hpp>
-#include <midi/event/meta/Tempo.hpp>
-#include <midi/event/meta/TimeSignatureEvent.hpp>
-#include <midi/util/MidiUtil.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/MidiEvent.hpp"
+#include "midi/event/NoteOn.hpp"
+#include "midi/event/meta/EndOfTrack.hpp"
+#include "midi/event/meta/Tempo.hpp"
+#include "midi/event/meta/TimeSignatureEvent.hpp"
+#include "midi/util/MidiUtil.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 #include <stdexcept>
 #include <sstream>

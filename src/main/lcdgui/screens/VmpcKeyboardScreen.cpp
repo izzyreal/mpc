@@ -2,18 +2,18 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
+#include "lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp"
 
-#include <lcdgui/Parameter.hpp>
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Field.hpp>
+#include "lcdgui/Parameter.hpp"
+#include "lcdgui/Label.hpp"
+#include "lcdgui/Field.hpp"
 
 #include "controller/ClientHardwareControllerBase.hpp"
 #include "input/KeyCodeHelper.hpp"
 
 #include <StrUtil.hpp>
 
-#include <input/KeyCodeHelper.hpp>
+#include "input/KeyCodeHelper.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;

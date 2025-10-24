@@ -1,6 +1,6 @@
 #include "ChangeTsigScreen.hpp"
 
-#include <sequencer/Sequence.hpp>
+#include "sequencer/Sequence.hpp"
 
 #include <StrUtil.hpp>
 

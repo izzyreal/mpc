@@ -1,7 +1,7 @@
-#include <midi/event/SystemExclusive.hpp>
+#include "midi/event/SystemExclusive.hpp"
 
-#include <midi/event/MidiEvent.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/MidiEvent.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event;
 

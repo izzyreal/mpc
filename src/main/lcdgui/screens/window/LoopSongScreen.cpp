@@ -1,8 +1,8 @@
 #include "LoopSongScreen.hpp"
 
-#include <lcdgui/screens/SongScreen.hpp>
+#include "lcdgui/screens/SongScreen.hpp"
 
-#include <sequencer/Song.hpp>
+#include "sequencer/Song.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

@@ -6,11 +6,11 @@
 
 #include "AkaiFileRenamer.hpp"
 
-#include <disk/MpcFile.hpp>
+#include "disk/MpcFile.hpp"
 
-#include <file/AkaiName.hpp>
+#include "file/AkaiName.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
 
 #include <StrUtil.hpp>
 

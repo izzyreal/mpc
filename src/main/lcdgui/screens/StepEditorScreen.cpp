@@ -1,27 +1,27 @@
 #include "StepEditorScreen.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 
-#include <audiomidi/EventHandler.hpp>
+#include "audiomidi/EventHandler.hpp"
 
 #include "hardware/Hardware.hpp"
 
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/StepTcScreen.hpp>
-#include <lcdgui/screens/window/EditMultipleScreen.hpp>
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/window/StepTcScreen.hpp"
+#include "lcdgui/screens/window/EditMultipleScreen.hpp"
 #include "lcdgui/screens/window/PasteEventScreen.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 
-#include <lcdgui/Rectangle.hpp>
+#include "lcdgui/Rectangle.hpp"
 
-#include <sequencer/ChannelPressureEvent.hpp>
-#include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/PitchBendEvent.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/PitchBendEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 
 #include <Util.hpp>
 

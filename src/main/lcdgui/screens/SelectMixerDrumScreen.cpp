@@ -1,7 +1,7 @@
 #include "SelectMixerDrumScreen.hpp"
 
-#include <lcdgui/screens/DrumScreen.hpp>
-#include <lcdgui/screens/MixerScreen.hpp>
+#include "lcdgui/screens/DrumScreen.hpp"
+#include "lcdgui/screens/MixerScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

@@ -1,6 +1,6 @@
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Pad.hpp>
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sampler/Pad.hpp"
 
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"

@@ -1,7 +1,7 @@
-#include <file/pgmwriter/Mixer.hpp>
+#include "file/pgmwriter/Mixer.hpp"
 
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
+#include "sampler/Pad.hpp"
+#include "sampler/Program.hpp"
 
 using namespace mpc::file::pgmwriter;
 using namespace mpc::sampler;

@@ -1,7 +1,7 @@
-#include <file/pgmwriter/SampleNames.hpp>
+#include "file/pgmwriter/SampleNames.hpp"
 
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
 
 #include <set>
 

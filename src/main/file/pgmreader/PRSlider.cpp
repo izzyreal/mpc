@@ -1,7 +1,7 @@
-#include <file/pgmreader/PRSlider.hpp>
+#include "file/pgmreader/PRSlider.hpp"
 
-#include <file/pgmreader/ProgramFileReader.hpp>
-#include <file/pgmreader/SoundNames.hpp>
+#include "file/pgmreader/ProgramFileReader.hpp"
+#include "file/pgmreader/SoundNames.hpp"
 
 #include <Util.hpp>
 

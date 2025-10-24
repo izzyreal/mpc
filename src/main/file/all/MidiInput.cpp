@@ -4,9 +4,9 @@
 
 #include "file/BitUtil.hpp"
 
-#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
-#include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/window/MidiOutputScreen.hpp>
+#include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/window/MidiOutputScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

@@ -1,6 +1,6 @@
-#include <engine/audio/mixer/PanControl.hpp>
-#include <engine/audio/mixer/MixControls.hpp>
-#include <engine/control/LinearLaw.hpp>
+#include "engine/audio/mixer/PanControl.hpp"
+#include "engine/audio/mixer/MixControls.hpp"
+#include "engine/control/LinearLaw.hpp"
 
 #include <cmath>
 

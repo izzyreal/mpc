@@ -1,8 +1,8 @@
 #include "EditVelocityScreen.hpp"
 
-#include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/Track.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/SeqUtil.hpp"
 
 #include <Util.hpp>
 

@@ -6,14 +6,14 @@
 #include "command/TriggerDrumNoteOffCommand.hpp"
 #include "command/context/TriggerDrumContextFactory.hpp"
 
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
-#include <file/all/Defaults.hpp>
+#include "file/all/Defaults.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"

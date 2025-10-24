@@ -1,9 +1,9 @@
-#include <file/pgmwriter/Pads.hpp>
+#include "file/pgmwriter/Pads.hpp"
 
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
+#include "sampler/Pad.hpp"
+#include "sampler/Program.hpp"
 
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 
 using namespace mpc::file::pgmwriter;
 

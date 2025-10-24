@@ -1,13 +1,13 @@
-#include <file/pgmwriter/PgmWriter.hpp>
+#include "file/pgmwriter/PgmWriter.hpp"
 
-#include <file/pgmwriter/PWHeader.hpp>
-#include <file/pgmwriter/MidiNotes.hpp>
-#include <file/pgmwriter/Mixer.hpp>
-#include <file/pgmwriter/Pads.hpp>
-#include <file/pgmwriter/PgmName.hpp>
-#include <file/pgmwriter/SampleNames.hpp>
-#include <file/pgmwriter/PWSlider.hpp>
-#include <sampler/Program.hpp>
+#include "file/pgmwriter/PWHeader.hpp"
+#include "file/pgmwriter/MidiNotes.hpp"
+#include "file/pgmwriter/Mixer.hpp"
+#include "file/pgmwriter/Pads.hpp"
+#include "file/pgmwriter/PgmName.hpp"
+#include "file/pgmwriter/SampleNames.hpp"
+#include "file/pgmwriter/PWSlider.hpp"
+#include "sampler/Program.hpp"
 
 using namespace mpc::file::pgmwriter;
 

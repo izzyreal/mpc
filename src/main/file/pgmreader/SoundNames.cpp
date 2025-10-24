@@ -1,7 +1,7 @@
-#include <file/pgmreader/SoundNames.hpp>
+#include "file/pgmreader/SoundNames.hpp"
 
-#include <file/pgmreader/PgmHeader.hpp>
-#include <file/pgmreader/ProgramFileReader.hpp>
+#include "file/pgmreader/PgmHeader.hpp"
+#include "file/pgmreader/ProgramFileReader.hpp"
 
 #include <Util.hpp>
 

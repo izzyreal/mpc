@@ -1,4 +1,4 @@
-#include <lcdgui/MixerFaderBackground.hpp>
+#include "lcdgui/MixerFaderBackground.hpp"
 
 using namespace mpc::lcdgui;
 

@@ -5,11 +5,11 @@
 #include "lcdgui/ScreenNames.hpp"
 #include "lcdgui/AllScreens.hpp"
 
-#include <lcdgui/Component.hpp>
-#include <lcdgui/Parameter.hpp>
-#include <lcdgui/Info.hpp>
-#include <lcdgui/FunctionKeys.hpp>
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/Component.hpp"
+#include "lcdgui/Parameter.hpp"
+#include "lcdgui/Info.hpp"
+#include "lcdgui/FunctionKeys.hpp"
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <StrUtil.hpp>
 #include "MpcResourceUtil.hpp"

@@ -1,6 +1,6 @@
 #include "BalanceControl.hpp"
 
-#include <engine/control/LinearLaw.hpp>
+#include "engine/control/LinearLaw.hpp"
 
 using namespace mpc::engine::audio::mixer;
 

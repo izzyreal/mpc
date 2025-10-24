@@ -1,14 +1,14 @@
 #include "MixerScreen.hpp"
 #include "hardware/Hardware.hpp"
 
-#include <lcdgui/screens/DrumScreen.hpp>
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/Knob.hpp>
+#include "lcdgui/screens/DrumScreen.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/Knob.hpp"
 
-#include <sampler/Pad.hpp>
+#include "sampler/Pad.hpp"
 
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/Track.hpp>
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;

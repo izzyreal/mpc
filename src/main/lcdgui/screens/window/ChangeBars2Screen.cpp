@@ -1,6 +1,6 @@
 #include "ChangeBars2Screen.hpp"
 
-#include <sequencer/Sequence.hpp>
+#include "sequencer/Sequence.hpp"
 
 #include <StrUtil.hpp>
 

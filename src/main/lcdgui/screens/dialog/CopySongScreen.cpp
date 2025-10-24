@@ -1,7 +1,7 @@
 #include "CopySongScreen.hpp"
 
-#include <sequencer/Song.hpp>
-#include <lcdgui/screens/SongScreen.hpp>
+#include "sequencer/Song.hpp"
+#include "lcdgui/screens/SongScreen.hpp"
 
 #include <StrUtil.hpp>
 

@@ -1,4 +1,4 @@
-#include <sequencer/PitchBendEvent.hpp>
+#include "sequencer/PitchBendEvent.hpp"
 
 using namespace mpc::sequencer;
 

@@ -1,11 +1,11 @@
-#include <file/all/Defaults.hpp>
+#include "file/all/Defaults.hpp"
 
 #include <Util.hpp>
-#include <file/all/AllParser.hpp>
+#include "file/all/AllParser.hpp"
 
-#include <lcdgui/screens/UserScreen.hpp>
+#include "lcdgui/screens/UserScreen.hpp"
 
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 #include <StrUtil.hpp>
 
 using namespace mpc::file::all;

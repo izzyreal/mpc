@@ -1,4 +1,4 @@
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "sequencer/SystemExclusiveEvent.hpp"
 
 using namespace mpc::sequencer;
 

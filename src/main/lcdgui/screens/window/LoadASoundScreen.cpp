@@ -1,14 +1,14 @@
 #include "LoadASoundScreen.hpp"
 
-#include <sampler/Pad.hpp>
+#include "sampler/Pad.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
-#include <disk/MpcFile.hpp>
+#include "disk/MpcFile.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
+#include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;

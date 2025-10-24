@@ -2,19 +2,19 @@
 
 #include <Mpc.hpp>
 #include "MpcSpecs.hpp"
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/WavInputStringStream.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/WavInputStringStream.hpp"
 
-#include <sampler/NoteParameters.hpp>
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
-#include <sampler/Sound.hpp>
-#include <sequencer/Track.hpp>
+#include "sampler/NoteParameters.hpp"
+#include "sampler/Pad.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sound.hpp"
+#include "sequencer/Track.hpp"
 
-#include <lcdgui/screens/ZoneScreen.hpp>
-#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+#include "lcdgui/screens/ZoneScreen.hpp"
+#include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include "engine/PreviewSoundPlayer.hpp"
 #include "engine/StereoMixer.hpp"

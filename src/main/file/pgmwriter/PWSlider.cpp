@@ -1,6 +1,6 @@
-#include <file/pgmwriter/PWSlider.hpp>
+#include "file/pgmwriter/PWSlider.hpp"
 
-#include <sampler/Program.hpp>
+#include "sampler/Program.hpp"
 
 using namespace mpc::file::pgmwriter;
 

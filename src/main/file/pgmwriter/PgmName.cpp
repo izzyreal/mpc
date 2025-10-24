@@ -1,6 +1,6 @@
-#include <file/pgmwriter/PgmName.hpp>
+#include "file/pgmwriter/PgmName.hpp"
 
-#include <sampler/Program.hpp>
+#include "sampler/Program.hpp"
 
 using namespace mpc::file::pgmwriter;
 

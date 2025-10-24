@@ -2,8 +2,8 @@
 
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/Layer.hpp>
+#include "lcdgui/screens/window/EditSoundScreen.hpp"
+#include "lcdgui/Layer.hpp"
 
 #ifdef __linux__
 #include <climits>

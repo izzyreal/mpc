@@ -1,9 +1,9 @@
 #include "ChannelSettingsScreen.hpp"
 
-#include <sampler/Pad.hpp>
+#include "sampler/Pad.hpp"
 
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/screens/MixerScreen.hpp>
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/screens/MixerScreen.hpp"
 
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"

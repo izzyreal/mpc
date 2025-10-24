@@ -1,8 +1,8 @@
-#include <midi/event/MidiEvent.hpp>
+#include "midi/event/MidiEvent.hpp"
 
-#include <midi/event/ChannelEvent.hpp>
-#include <midi/event/SystemExclusive.hpp>
-#include <midi/event/meta/MetaEvent.hpp>
+#include "midi/event/ChannelEvent.hpp"
+#include "midi/event/SystemExclusive.hpp"
+#include "midi/event/meta/MetaEvent.hpp"
 
 #include <Logger.hpp>
 

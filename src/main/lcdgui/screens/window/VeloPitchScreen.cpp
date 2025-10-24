@@ -1,6 +1,6 @@
 #include "VeloPitchScreen.hpp"
 
-#include <sampler/NoteParameters.hpp>
+#include "sampler/NoteParameters.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

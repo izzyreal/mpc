@@ -1,7 +1,7 @@
-#include <file/pgmwriter/MidiNotes.hpp>
+#include "file/pgmwriter/MidiNotes.hpp"
 
-#include <sampler/NoteParameters.hpp>
-#include <sampler/Program.hpp>
+#include "sampler/NoteParameters.hpp"
+#include "sampler/Program.hpp"
 
 using namespace mpc::file::pgmwriter;
 

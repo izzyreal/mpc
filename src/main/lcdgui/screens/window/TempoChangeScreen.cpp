@@ -1,11 +1,11 @@
 #include "TempoChangeScreen.hpp"
 
-#include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/TimeSignature.hpp>
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/TimeSignature.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
-#include <lcdgui/HorizontalBar2.hpp>
+#include "lcdgui/HorizontalBar2.hpp"
 
 #include <Util.hpp>
 

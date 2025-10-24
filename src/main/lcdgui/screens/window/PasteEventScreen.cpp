@@ -1,8 +1,8 @@
 #include "PasteEventScreen.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
-#include <lcdgui/screens/StepEditorScreen.hpp>
+#include "lcdgui/screens/StepEditorScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

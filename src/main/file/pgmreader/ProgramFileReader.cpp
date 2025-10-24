@@ -1,13 +1,13 @@
-#include <file/pgmreader/ProgramFileReader.hpp>
+#include "file/pgmreader/ProgramFileReader.hpp"
 
-#include <disk/MpcFile.hpp>
-#include <file/pgmreader/PRMixer.hpp>
-#include <file/pgmreader/PRPads.hpp>
-#include <file/pgmreader/PgmAllNoteParameters.hpp>
-#include <file/pgmreader/PgmHeader.hpp>
-#include <file/pgmreader/ProgramName.hpp>
-#include <file/pgmreader/PRSlider.hpp>
-#include <file/pgmreader/SoundNames.hpp>
+#include "disk/MpcFile.hpp"
+#include "file/pgmreader/PRMixer.hpp"
+#include "file/pgmreader/PRPads.hpp"
+#include "file/pgmreader/PgmAllNoteParameters.hpp"
+#include "file/pgmreader/PgmHeader.hpp"
+#include "file/pgmreader/ProgramName.hpp"
+#include "file/pgmreader/PRSlider.hpp"
+#include "file/pgmreader/SoundNames.hpp"
 
 using namespace mpc::file::pgmreader;
 

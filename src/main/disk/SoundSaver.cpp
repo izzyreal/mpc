@@ -1,12 +1,12 @@
-#include <disk/SoundSaver.hpp>
+#include "disk/SoundSaver.hpp"
 
 #include <Mpc.hpp>
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
-#include <sampler/Sound.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "disk/MpcFile.hpp"
+#include "sampler/Sound.hpp"
 
-#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
+#include "lcdgui/screens/window/SaveAProgramScreen.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 
 #include <StrUtil.hpp>
 

@@ -1,9 +1,9 @@
 #include "SndHeaderReader.hpp"
 
-#include <file/sndreader/SndReader.hpp>
+#include "file/sndreader/SndReader.hpp"
 
 #include <Util.hpp>
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 #include <StrUtil.hpp>
 
 using namespace mpc::file::sndreader;

@@ -1,12 +1,12 @@
 #include <Util.hpp>
 
-#include <sequencer/NoteEvent.hpp>
+#include "sequencer/NoteEvent.hpp"
 
 #include <cmath>
 #include <cstdlib>
 
 #include <StrUtil.hpp>
-#include <lcdgui/screens/UserScreen.hpp>
+#include "lcdgui/screens/UserScreen.hpp"
 
 using namespace mpc;
 using namespace mpc::lcdgui;

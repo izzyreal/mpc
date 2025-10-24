@@ -1,6 +1,6 @@
 #include "DeleteAllTracksScreen.hpp"
 
-#include <sequencer/Sequence.hpp>
+#include "sequencer/Sequence.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 

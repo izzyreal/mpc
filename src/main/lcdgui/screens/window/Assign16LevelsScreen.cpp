@@ -4,7 +4,7 @@
 
 #include "hardware/Hardware.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

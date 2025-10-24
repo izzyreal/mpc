@@ -1,7 +1,7 @@
-#include <file/all/BarList.hpp>
+#include "file/all/BarList.hpp"
 
-#include <file/all/Bar.hpp>
-#include <sequencer/Sequence.hpp>
+#include "file/all/Bar.hpp"
+#include "sequencer/Sequence.hpp"
 
 #include <Util.hpp>
 

@@ -4,8 +4,8 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/SecondSeqScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include "lcdgui/screens/SecondSeqScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;

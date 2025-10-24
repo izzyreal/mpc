@@ -1,15 +1,15 @@
-#include <engine/audio/mixer/AudioMixerStrip.hpp>
+#include "engine/audio/mixer/AudioMixerStrip.hpp"
 
-#include <engine/audio/core/AudioBuffer.hpp>
-#include <engine/audio/core/AudioControls.hpp>
-#include <engine/audio/core/AudioControlsChain.hpp>
-#include <engine/audio/core/AudioProcess.hpp>
+#include "engine/audio/core/AudioBuffer.hpp"
+#include "engine/audio/core/AudioControls.hpp"
+#include "engine/audio/core/AudioControlsChain.hpp"
+#include "engine/audio/core/AudioProcess.hpp"
 
-#include <engine/audio/mixer/AudioMixer.hpp>
-#include <engine/audio/mixer/AudioMixerBus.hpp>
-#include <engine/audio/mixer/MainMixProcess.hpp>
-#include <engine/audio/mixer/MixControls.hpp>
-#include <engine/audio/mixer/MixerControlsIds.hpp>
+#include "engine/audio/mixer/AudioMixer.hpp"
+#include "engine/audio/mixer/AudioMixerBus.hpp"
+#include "engine/audio/mixer/MainMixProcess.hpp"
+#include "engine/audio/mixer/MixControls.hpp"
+#include "engine/audio/mixer/MixerControlsIds.hpp"
 
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;

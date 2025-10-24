@@ -1,4 +1,4 @@
-#include <sequencer/MidiClockEvent.hpp>
+#include "sequencer/MidiClockEvent.hpp"
 
 using namespace mpc::sequencer;
 

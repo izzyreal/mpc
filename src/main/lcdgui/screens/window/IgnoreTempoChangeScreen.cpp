@@ -1,6 +1,6 @@
 #include "IgnoreTempoChangeScreen.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

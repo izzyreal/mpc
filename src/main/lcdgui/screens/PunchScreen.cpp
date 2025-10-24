@@ -1,6 +1,6 @@
 #include "PunchScreen.hpp"
 
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/SeqUtil.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;

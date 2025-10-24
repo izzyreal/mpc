@@ -1,8 +1,8 @@
-#include <midi/event/meta/EndOfTrack.hpp>
+#include "midi/event/meta/EndOfTrack.hpp"
 
-#include <midi/event/MidiEvent.hpp>
-#include <midi/event/meta/MetaEvent.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/MidiEvent.hpp"
+#include "midi/event/meta/MetaEvent.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event::meta;
 

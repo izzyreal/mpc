@@ -3,10 +3,10 @@
 
 #include "TestMpc.hpp"
 
-#include <sequencer/Sequencer.hpp>
-#include <sampler/Sampler.hpp>
+#include "sequencer/Sequencer.hpp"
+#include "sampler/Sampler.hpp"
 
-#include <lcdgui/Layer.hpp>
+#include "lcdgui/Layer.hpp"
 #include "lcdgui/ScreenNames.hpp"
 
 #include <vector>

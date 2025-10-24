@@ -2,11 +2,11 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
+#include "lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp"
 
-#include <lcdgui/Parameter.hpp>
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Field.hpp>
+#include "lcdgui/Parameter.hpp"
+#include "lcdgui/Label.hpp"
+#include "lcdgui/Field.hpp"
 
 #include <StrUtil.hpp>
 

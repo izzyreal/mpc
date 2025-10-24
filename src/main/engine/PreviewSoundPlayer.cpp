@@ -2,7 +2,7 @@
 
 #include "Voice.hpp"
 
-#include <sampler/Sampler.hpp>
+#include "sampler/Sampler.hpp"
 #include "FaderControl.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 #include <utility>

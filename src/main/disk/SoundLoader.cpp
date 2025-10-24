@@ -1,12 +1,12 @@
-#include <disk/SoundLoader.hpp>
+#include "disk/SoundLoader.hpp"
 
 #include <Mpc.hpp>
-#include <disk/MpcFile.hpp>
-#include <disk/AbstractDisk.hpp>
-#include <file/wav/WavFile.hpp>
-#include <file/sndreader/SndReader.hpp>
-#include <sampler/Sound.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include "disk/MpcFile.hpp"
+#include "disk/AbstractDisk.hpp"
+#include "file/wav/WavFile.hpp"
+#include "file/sndreader/SndReader.hpp"
+#include "sampler/Sound.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 #include <StrUtil.hpp>
 

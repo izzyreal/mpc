@@ -1,6 +1,6 @@
-#include <engine/audio/server/StereoOutputProcess.hpp>
+#include "engine/audio/server/StereoOutputProcess.hpp"
 
-#include <engine/audio/core/AudioBuffer.hpp>
+#include "engine/audio/core/AudioBuffer.hpp"
 
 using namespace mpc::engine::audio::server;
 using namespace std;

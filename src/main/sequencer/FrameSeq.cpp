@@ -15,7 +15,7 @@
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/PunchScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
@@ -24,7 +24,7 @@
 #include "Util.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include <limits>
 
 using namespace mpc::lcdgui;

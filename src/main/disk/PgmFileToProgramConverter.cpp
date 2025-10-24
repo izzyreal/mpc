@@ -1,20 +1,20 @@
-#include <disk/PgmFileToProgramConverter.hpp>
+#include "disk/PgmFileToProgramConverter.hpp"
 
-#include <file/pgmreader/PRMixer.hpp>
-#include <file/pgmreader/PRPads.hpp>
-#include <file/pgmreader/PgmAllNoteParameters.hpp>
-#include <file/pgmreader/PgmHeader.hpp>
-#include <file/pgmreader/ProgramFileReader.hpp>
-#include <file/pgmreader/ProgramName.hpp>
-#include <file/pgmreader/PRSlider.hpp>
-#include <file/pgmreader/SoundNames.hpp>
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
-#include <sampler/PgmSlider.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/NoteParameters.hpp>
+#include "file/pgmreader/PRMixer.hpp"
+#include "file/pgmreader/PRPads.hpp"
+#include "file/pgmreader/PgmAllNoteParameters.hpp"
+#include "file/pgmreader/PgmHeader.hpp"
+#include "file/pgmreader/ProgramFileReader.hpp"
+#include "file/pgmreader/ProgramName.hpp"
+#include "file/pgmreader/PRSlider.hpp"
+#include "file/pgmreader/SoundNames.hpp"
+#include "sampler/Pad.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/PgmSlider.hpp"
+#include "sampler/Sampler.hpp"
+#include "sampler/NoteParameters.hpp"
 
-#include <disk/MpcFile.hpp>
+#include "disk/MpcFile.hpp"
 
 #include "StrUtil.hpp"
 

@@ -1,4 +1,4 @@
-#include <sequencer/ChannelPressureEvent.hpp>
+#include "sequencer/ChannelPressureEvent.hpp"
 
 using namespace mpc::sequencer;
 

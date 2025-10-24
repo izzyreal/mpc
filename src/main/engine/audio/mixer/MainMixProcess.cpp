@@ -1,8 +1,8 @@
-#include <engine/audio/mixer/MainMixProcess.hpp>
-#include <engine/audio/mixer/AudioMixer.hpp>
-#include <engine/audio/mixer/AudioMixerStrip.hpp>
-#include <engine/audio/mixer/MixControls.hpp>
-#include <engine/audio/mixer/MainMixControls.hpp>
+#include "engine/audio/mixer/MainMixProcess.hpp"
+#include "engine/audio/mixer/AudioMixer.hpp"
+#include "engine/audio/mixer/AudioMixerStrip.hpp"
+#include "engine/audio/mixer/MixControls.hpp"
+#include "engine/audio/mixer/MainMixControls.hpp"
 
 using namespace mpc::engine::audio::mixer;
 

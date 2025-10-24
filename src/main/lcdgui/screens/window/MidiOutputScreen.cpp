@@ -1,9 +1,9 @@
 #include "MidiOutputScreen.hpp"
 
-#include <audiomidi/MidiOutput.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
+#include "audiomidi/MidiOutput.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

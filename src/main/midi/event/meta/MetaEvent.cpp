@@ -1,22 +1,22 @@
-#include <midi/event/meta/MetaEvent.hpp>
+#include "midi/event/meta/MetaEvent.hpp"
 
-#include <midi/event/meta/CopyrightNotice.hpp>
-#include <midi/event/meta/CuePoint.hpp>
-#include <midi/event/meta/EndOfTrack.hpp>
-#include <midi/event/meta/GenericMetaEvent.hpp>
-#include <midi/event/meta/InstrumentName.hpp>
-#include <midi/event/meta/KeySignature.hpp>
-#include <midi/event/meta/Marker.hpp>
-#include <midi/event/meta/MetaEventData.hpp>
-#include <midi/event/meta/MidiChannelPrefix.hpp>
-#include <midi/event/meta/SequenceNumber.hpp>
-#include <midi/event/meta/SequencerSpecificEvent.hpp>
-#include <midi/event/meta/SmpteOffset.hpp>
-#include <midi/event/meta/Tempo.hpp>
-#include <midi/event/meta/Text.hpp>
-#include <midi/event/meta/TimeSignatureEvent.hpp>
-#include <midi/event/meta/TrackName.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/meta/CopyrightNotice.hpp"
+#include "midi/event/meta/CuePoint.hpp"
+#include "midi/event/meta/EndOfTrack.hpp"
+#include "midi/event/meta/GenericMetaEvent.hpp"
+#include "midi/event/meta/InstrumentName.hpp"
+#include "midi/event/meta/KeySignature.hpp"
+#include "midi/event/meta/Marker.hpp"
+#include "midi/event/meta/MetaEventData.hpp"
+#include "midi/event/meta/MidiChannelPrefix.hpp"
+#include "midi/event/meta/SequenceNumber.hpp"
+#include "midi/event/meta/SequencerSpecificEvent.hpp"
+#include "midi/event/meta/SmpteOffset.hpp"
+#include "midi/event/meta/Tempo.hpp"
+#include "midi/event/meta/Text.hpp"
+#include "midi/event/meta/TimeSignatureEvent.hpp"
+#include "midi/event/meta/TrackName.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event::meta;
 

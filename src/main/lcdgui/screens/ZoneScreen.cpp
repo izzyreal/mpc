@@ -1,10 +1,10 @@
 #include "ZoneScreen.hpp"
 #include "hardware/Hardware.hpp"
 
-#include <lcdgui/Layer.hpp>
-#include <lcdgui/screens/TrimScreen.hpp>
-#include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include "lcdgui/Layer.hpp"
+#include "lcdgui/screens/TrimScreen.hpp"
+#include "lcdgui/screens/window/NumberOfZonesScreen.hpp"
+#include "lcdgui/screens/window/EditSoundScreen.hpp"
 
 #ifdef __linux__
 #include <climits>

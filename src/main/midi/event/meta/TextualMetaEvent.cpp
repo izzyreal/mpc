@@ -1,7 +1,7 @@
-#include <midi/event/meta/TextualMetaEvent.hpp>
+#include "midi/event/meta/TextualMetaEvent.hpp"
 
-#include <midi/event/MidiEvent.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/MidiEvent.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event::meta;
 

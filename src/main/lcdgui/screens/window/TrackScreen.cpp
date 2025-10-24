@@ -1,8 +1,8 @@
 #include "TrackScreen.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
-#include <lcdgui/screens/window/NameScreen.hpp>
+#include "lcdgui/screens/window/NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

@@ -1,6 +1,6 @@
 #include "NumberOfZonesScreen.hpp"
 
-#include <lcdgui/screens/ZoneScreen.hpp>
+#include "lcdgui/screens/ZoneScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

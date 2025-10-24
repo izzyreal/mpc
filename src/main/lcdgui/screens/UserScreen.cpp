@@ -1,8 +1,8 @@
 #include "UserScreen.hpp"
 
-#include <lcdgui/screens/EventsScreen.hpp>
+#include "lcdgui/screens/EventsScreen.hpp"
 
-#include <nvram/NvRam.hpp>
+#include "nvram/NvRam.hpp"
 
 #include <Util.hpp>
 

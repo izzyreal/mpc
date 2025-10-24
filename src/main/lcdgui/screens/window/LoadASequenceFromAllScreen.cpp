@@ -1,8 +1,8 @@
 #include "LoadASequenceFromAllScreen.hpp"
 
-#include <sequencer/Sequence.hpp>
+#include "sequencer/Sequence.hpp"
 
-#include <lcdgui/screens/window/LoadASequenceScreen.hpp>
+#include "lcdgui/screens/window/LoadASequenceScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

@@ -1,8 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/Sequence.hpp>
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 
 #include <string>
 

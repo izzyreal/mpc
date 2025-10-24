@@ -1,7 +1,7 @@
-#include <lcdgui/screens/window/EraseAllOffTracksScreen.hpp>
+#include "lcdgui/screens/window/EraseAllOffTracksScreen.hpp"
 
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Track.hpp>
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

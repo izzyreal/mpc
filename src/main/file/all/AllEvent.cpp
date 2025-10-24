@@ -8,21 +8,21 @@
 #include "AllProgramChangeEvent.hpp"
 #include "AllSysExEvent.hpp"
 
-#include <sequencer/ChannelPressureEvent.hpp>
-#include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/Event.hpp>
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/PitchBendEvent.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/Event.hpp"
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/PitchBendEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 
 #include <cassert>
 #include <cmath>
 
-#include <file/BitUtil.hpp>
-#include <file/ByteUtil.hpp>
+#include "file/BitUtil.hpp"
+#include "file/ByteUtil.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;

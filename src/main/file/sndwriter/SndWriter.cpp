@@ -1,9 +1,9 @@
-#include <file/sndwriter/SndWriter.hpp>
+#include "file/sndwriter/SndWriter.hpp"
 
-#include <file/sndwriter/SndHeaderWriter.hpp>
-#include <sampler/Sound.hpp>
+#include "file/sndwriter/SndHeaderWriter.hpp"
+#include "sampler/Sound.hpp"
 
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 
 #include <SampleOps.hpp>
 

@@ -1,9 +1,9 @@
-#include <engine/audio/mixer/MixerControlsFactory.hpp>
+#include "engine/audio/mixer/MixerControlsFactory.hpp"
 
-#include <engine/audio/mixer/MainMixControls.hpp>
-#include <engine/audio/mixer/MixControls.hpp>
-#include <engine/audio/mixer/MixerControlsIds.hpp>
-#include <engine/control/CompoundControl.hpp>
+#include "engine/audio/mixer/MainMixControls.hpp"
+#include "engine/audio/mixer/MixControls.hpp"
+#include "engine/audio/mixer/MixerControlsIds.hpp"
+#include "engine/control/CompoundControl.hpp"
 
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;

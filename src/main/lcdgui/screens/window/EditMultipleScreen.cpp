@@ -1,12 +1,12 @@
 #include "EditMultipleScreen.hpp"
 
-#include <sequencer/ChannelPressureEvent.hpp>
-#include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
 
-#include <lcdgui/screens/StepEditorScreen.hpp>
+#include "lcdgui/screens/StepEditorScreen.hpp"
 
 #include <Util.hpp>
 

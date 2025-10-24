@@ -1,7 +1,7 @@
 #include "FxEditScreen.hpp"
 
-#include <lcdgui/Effect.hpp>
-#include <lcdgui/screens/MixerSetupScreen.hpp>
+#include "lcdgui/Effect.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

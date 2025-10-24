@@ -1,14 +1,14 @@
-#include <file/all/SequenceNames.hpp>
+#include "file/all/SequenceNames.hpp"
 
 #include <Mpc.hpp>
-#include <file/all/AllParser.hpp>
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "file/all/AllParser.hpp"
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 #include <StrUtil.hpp>
 #include <Util.hpp>
 

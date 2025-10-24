@@ -1,12 +1,12 @@
-#include <file/all/Misc.hpp>
+#include "file/all/Misc.hpp"
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
-#include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/OthersScreen.hpp>
-#include <lcdgui/screens/SyncScreen.hpp>
-#include <lcdgui/screens/MidiSwScreen.hpp>
+#include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
+#include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/OthersScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
+#include "lcdgui/screens/MidiSwScreen.hpp"
 
 #include "file/ByteUtil.hpp"
 

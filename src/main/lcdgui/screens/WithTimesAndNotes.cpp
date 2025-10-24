@@ -1,12 +1,12 @@
 #include "WithTimesAndNotes.hpp"
 
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/SeqUtil.hpp"
 
-#include <sampler/Sampler.hpp>
-#include <sampler/Program.hpp>
+#include "sampler/Sampler.hpp"
+#include "sampler/Program.hpp"
 
 #include "engine/Drum.hpp"
 #include "lcdgui/ScreenComponent.hpp"

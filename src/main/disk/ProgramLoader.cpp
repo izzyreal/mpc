@@ -1,18 +1,18 @@
-#include <disk/ProgramLoader.hpp>
+#include "disk/ProgramLoader.hpp"
 
 #include <Mpc.hpp>
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/StdDisk.hpp>
-#include <disk/MpcFile.hpp>
-#include <disk/PgmFileToProgramConverter.hpp>
-#include <disk/SoundLoader.hpp>
-#include <sampler/Program.hpp>
-#include <sequencer/Track.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "disk/StdDisk.hpp"
+#include "disk/MpcFile.hpp"
+#include "disk/PgmFileToProgramConverter.hpp"
+#include "disk/SoundLoader.hpp"
+#include "sampler/Program.hpp"
+#include "sequencer/Track.hpp"
 
-#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
-#include <lcdgui/screens/window/CantFindFileScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
+#include "lcdgui/screens/window/LoadAProgramScreen.hpp"
+#include "lcdgui/screens/window/CantFindFileScreen.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 
 #include <StrUtil.hpp>
 

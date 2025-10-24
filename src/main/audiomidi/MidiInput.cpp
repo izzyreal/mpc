@@ -11,30 +11,30 @@
 #include "input/ClientHardwareEvent.hpp"
 
 #include <Mpc.hpp>
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/EventHandler.hpp>
-#include <audiomidi/VmpcMidiControlMode.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/EventHandler.hpp"
+#include "audiomidi/VmpcMidiControlMode.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
 #include "lcdgui/ScreenGroups.hpp"
-#include <lcdgui/screens/SyncScreen.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
-#include <lcdgui/screens/MidiSwScreen.hpp>
-#include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/window/MidiOutputScreen.hpp>
-#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
+#include "lcdgui/screens/SyncScreen.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
+#include "lcdgui/screens/MidiSwScreen.hpp"
+#include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/window/MidiOutputScreen.hpp"
+#include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 
-#include <sequencer/MidiClockEvent.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
+#include "sequencer/MidiClockEvent.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/NoteEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-#include <engine/midi/MidiMessage.hpp>
-#include <engine/midi/ShortMessage.hpp>
+#include "engine/midi/MidiMessage.hpp"
+#include "engine/midi/ShortMessage.hpp"
 
 using namespace mpc::audiomidi;
 using namespace mpc::sequencer;

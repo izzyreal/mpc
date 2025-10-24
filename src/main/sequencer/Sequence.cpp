@@ -2,12 +2,12 @@
 
 #include <Mpc.hpp>
 
-#include <sequencer/Track.hpp>
-#include <sequencer/SeqUtil.hpp>
-#include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/TimeSignature.hpp>
+#include "sequencer/Track.hpp"
+#include "sequencer/SeqUtil.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/TimeSignature.hpp"
 
-#include <lcdgui/screens/UserScreen.hpp>
+#include "lcdgui/screens/UserScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

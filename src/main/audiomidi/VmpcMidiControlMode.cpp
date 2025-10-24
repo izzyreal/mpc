@@ -6,7 +6,7 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 
-#include <engine/midi/ShortMessage.hpp>
+#include "engine/midi/ShortMessage.hpp"
 #include <memory>
 
 using namespace mpc::audiomidi;

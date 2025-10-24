@@ -1,8 +1,8 @@
-#include <file/pgmreader/PRPads.hpp>
+#include "file/pgmreader/PRPads.hpp"
 
-#include <file/pgmreader/PgmAllNoteParameters.hpp>
-#include <file/pgmreader/ProgramFileReader.hpp>
-#include <file/pgmreader/SoundNames.hpp>
+#include "file/pgmreader/PgmAllNoteParameters.hpp"
+#include "file/pgmreader/ProgramFileReader.hpp"
+#include "file/pgmreader/SoundNames.hpp"
 
 #include <Util.hpp>
 

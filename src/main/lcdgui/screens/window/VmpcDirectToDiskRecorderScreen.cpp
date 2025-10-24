@@ -1,13 +1,13 @@
 #include "VmpcDirectToDiskRecorderScreen.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/DirectToDiskSettings.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/DirectToDiskSettings.hpp"
 
-#include <sequencer/Song.hpp>
-#include <sequencer/SeqUtil.hpp>
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "sequencer/Song.hpp"
+#include "sequencer/SeqUtil.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
-#include <lcdgui/screens/SongScreen.hpp>
+#include "lcdgui/screens/SongScreen.hpp"
 
 using namespace mpc;
 using namespace mpc::audiomidi;

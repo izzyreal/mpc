@@ -1,11 +1,11 @@
-#include <lcdgui/MixerStrip.hpp>
+#include "lcdgui/MixerStrip.hpp"
 
-#include <lcdgui/Knob.hpp>
-#include <lcdgui/Label.hpp>
-#include <lcdgui/MixerFaderBackground.hpp>
-#include <lcdgui/MixerTopBackground.hpp>
-#include <lcdgui/MixerFader.hpp>
-#include <lcdgui/screens/MixerScreen.hpp>
+#include "lcdgui/Knob.hpp"
+#include "lcdgui/Label.hpp"
+#include "lcdgui/MixerFaderBackground.hpp"
+#include "lcdgui/MixerTopBackground.hpp"
+#include "lcdgui/MixerFader.hpp"
+#include "lcdgui/screens/MixerScreen.hpp"
 
 #include <StrUtil.hpp>
 

@@ -3,8 +3,8 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/Background.hpp>
-#include <sampler/Program.hpp>
+#include "lcdgui/Background.hpp"
+#include "sampler/Program.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;

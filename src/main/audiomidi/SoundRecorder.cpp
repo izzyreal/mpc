@@ -1,8 +1,8 @@
-#include <audiomidi/SoundRecorder.hpp>
+#include "audiomidi/SoundRecorder.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
 
-#include <lcdgui/screens/SampleScreen.hpp>
+#include "lcdgui/screens/SampleScreen.hpp"
 
 #include <SampleOps.hpp>
 

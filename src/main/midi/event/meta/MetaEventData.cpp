@@ -1,4 +1,4 @@
-#include <midi/event/meta/MetaEventData.hpp>
+#include "midi/event/meta/MetaEventData.hpp"
 
 using namespace mpc::midi::event::meta;
 

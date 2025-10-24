@@ -2,7 +2,7 @@
 
 #include "PunchScreen.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;
 

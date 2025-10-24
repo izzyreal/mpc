@@ -1,9 +1,9 @@
-#include <disk/RawDisk.hpp>
+#include "disk/RawDisk.hpp"
 
 #include <Mpc.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
 
-#include <disk/MpcFile.hpp>
+#include "disk/MpcFile.hpp"
 
 #include <util/VolumeMounter.h>
 

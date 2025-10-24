@@ -1,6 +1,6 @@
 #include "SoundMemoryScreen.hpp"
 
-#include <lcdgui/PunchRect.hpp>
+#include "lcdgui/PunchRect.hpp"
 
 #include <StrUtil.hpp>
 

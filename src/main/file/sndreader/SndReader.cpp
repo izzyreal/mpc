@@ -1,7 +1,7 @@
-#include <file/sndreader/SndReader.hpp>
+#include "file/sndreader/SndReader.hpp"
 
-#include <disk/MpcFile.hpp>
-#include <file/sndreader/SndHeaderReader.hpp>
+#include "disk/MpcFile.hpp"
+#include "file/sndreader/SndHeaderReader.hpp"
 
 #include <SampleOps.hpp>
 

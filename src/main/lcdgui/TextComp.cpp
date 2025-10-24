@@ -2,8 +2,8 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Field.hpp>
+#include "lcdgui/Label.hpp"
+#include "lcdgui/Field.hpp"
 
 #include <Util.hpp>
 

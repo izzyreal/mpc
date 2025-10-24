@@ -1,7 +1,7 @@
 #include "LoadAProgramScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "lcdgui/screens/LoadScreen.hpp"
 
 #include "sequencer/Track.hpp"
 

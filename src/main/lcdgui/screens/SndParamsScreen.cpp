@@ -1,6 +1,6 @@
 #include "SndParamsScreen.hpp"
 
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include "lcdgui/screens/window/EditSoundScreen.hpp"
 
 #include <Util.hpp>
 

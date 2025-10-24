@@ -1,9 +1,9 @@
 #include "TransposePermanentScreen.hpp"
 
-#include <lcdgui/screens/TransScreen.hpp>
+#include "lcdgui/screens/TransScreen.hpp"
 
-#include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
+#include "sequencer/Track.hpp"
+#include "sequencer/NoteEvent.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

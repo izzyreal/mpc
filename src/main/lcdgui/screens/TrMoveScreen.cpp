@@ -2,7 +2,7 @@
 
 #include "EventsScreen.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

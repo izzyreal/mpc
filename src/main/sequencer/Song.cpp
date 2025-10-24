@@ -1,6 +1,6 @@
-#include <sequencer/Song.hpp>
+#include "sequencer/Song.hpp"
 
-#include <sequencer/Step.hpp>
+#include "sequencer/Step.hpp"
 
 #include <algorithm>
 

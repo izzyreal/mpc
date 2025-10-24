@@ -1,7 +1,7 @@
 #include "AllPolyPressureEvent.hpp"
 
-#include <file/all/AllEvent.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
+#include "file/all/AllEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;

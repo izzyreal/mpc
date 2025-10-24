@@ -1,9 +1,9 @@
 #include "DeleteFileScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
-#include <lcdgui/screens/window/DirectoryScreen.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "disk/MpcFile.hpp"
+#include "lcdgui/screens/window/DirectoryScreen.hpp"
+#include "lcdgui/screens/LoadScreen.hpp"
 
 #include <thread>
 

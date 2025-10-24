@@ -4,17 +4,17 @@
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 
-#include <sequencer/Track.hpp>
-#include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/TimeSignature.hpp>
+#include "sequencer/Track.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/TimeSignature.hpp"
 
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/StepEditorScreen.hpp>
-#include <lcdgui/screens/PunchScreen.hpp>
-#include <lcdgui/PunchRect.hpp>
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/StepEditorScreen.hpp"
+#include "lcdgui/screens/PunchScreen.hpp"
+#include "lcdgui/PunchRect.hpp"
 
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/SeqUtil.hpp"
 #include <Util.hpp>
 
 #ifdef __linux__

@@ -1,7 +1,7 @@
 #include "MidiOutputMonitorScreen.hpp"
 
 #include <Mpc.hpp>
-#include <audiomidi/EventHandler.hpp>
+#include "audiomidi/EventHandler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;

@@ -1,4 +1,4 @@
-#include <sequencer/EmptyEvent.hpp>
+#include "sequencer/EmptyEvent.hpp"
 
 using namespace mpc::sequencer;
 

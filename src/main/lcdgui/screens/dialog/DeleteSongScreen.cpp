@@ -1,7 +1,7 @@
 #include "DeleteSongScreen.hpp"
 
-#include <lcdgui/screens/SongScreen.hpp>
-#include <sequencer/Song.hpp>
+#include "lcdgui/screens/SongScreen.hpp"
+#include "sequencer/Song.hpp"
 
 #include <StrUtil.hpp>
 

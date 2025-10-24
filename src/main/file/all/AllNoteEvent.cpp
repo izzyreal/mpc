@@ -3,9 +3,9 @@
 #include "AllEvent.hpp"
 #include "AllSequence.hpp"
 
-#include <sequencer/NoteEvent.hpp>
+#include "sequencer/NoteEvent.hpp"
 
-#include <file/BitUtil.hpp>
+#include "file/BitUtil.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;

@@ -1,14 +1,14 @@
 #include "DirectoryScreen.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
 
-#include <disk/MpcFile.hpp>
-#include <disk/AbstractDisk.hpp>
-#include <disk/Volume.hpp>
+#include "disk/MpcFile.hpp"
+#include "disk/AbstractDisk.hpp"
+#include "disk/Volume.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/SoundPlayer.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/SoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <Util.hpp>

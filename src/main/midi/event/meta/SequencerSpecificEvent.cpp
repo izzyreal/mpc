@@ -1,9 +1,9 @@
-#include <midi/event/meta/SequencerSpecificEvent.hpp>
+#include "midi/event/meta/SequencerSpecificEvent.hpp"
 
-#include <midi/event/MidiEvent.hpp>
-#include <midi/event/meta/MetaEvent.hpp>
-#include <midi/util/MidiUtil.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/MidiEvent.hpp"
+#include "midi/event/meta/MetaEvent.hpp"
+#include "midi/util/MidiUtil.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event::meta;
 

@@ -3,9 +3,9 @@
 #include "SelectDrumScreen.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 
-#include <sampler/NoteParameters.hpp>
+#include "sampler/NoteParameters.hpp"
 
-#include <lcdgui/EnvGraph.hpp>
+#include "lcdgui/EnvGraph.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

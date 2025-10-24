@@ -1,9 +1,9 @@
-#include <sampler/Pad.hpp>
+#include "sampler/Pad.hpp"
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/PgmAssignScreen.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include "lcdgui/screens/PgmAssignScreen.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 using namespace mpc::sampler;
 using namespace mpc::lcdgui;

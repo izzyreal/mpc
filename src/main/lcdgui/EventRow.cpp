@@ -2,26 +2,26 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include <lcdgui/Layer.hpp>
-#include <lcdgui/HorizontalBar.hpp>
-#include <lcdgui/Field.hpp>
-#include <lcdgui/Label.hpp>
+#include "lcdgui/Layer.hpp"
+#include "lcdgui/HorizontalBar.hpp"
+#include "lcdgui/Field.hpp"
+#include "lcdgui/Label.hpp"
 
-#include <lcdgui/EventRowParameters.hpp>
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
+#include "lcdgui/EventRowParameters.hpp"
+#include "sampler/Pad.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
 
-#include <sequencer/ChannelPressureEvent.hpp>
-#include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/EmptyEvent.hpp>
-#include <sequencer/Event.hpp>
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/PitchBendEvent.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/EmptyEvent.hpp"
+#include "sequencer/Event.hpp"
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/PitchBendEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 #include "engine/Drum.hpp"
 
 #include <cmath>

@@ -1,12 +1,12 @@
-#include <file/aps/ApsProgram.hpp>
+#include "file/aps/ApsProgram.hpp"
 
-#include <file/aps/ApsAssignTable.hpp>
-#include <file/aps/ApsNoteParameters.hpp>
-#include <file/aps/ApsSlider.hpp>
-#include <file/pgmwriter/Pads.hpp>
+#include "file/aps/ApsAssignTable.hpp"
+#include "file/aps/ApsNoteParameters.hpp"
+#include "file/aps/ApsSlider.hpp"
+#include "file/pgmwriter/Pads.hpp"
 #include "engine/StereoMixer.hpp"
-#include <sampler/Program.hpp>
-#include <sampler/Pad.hpp>
+#include "sampler/Program.hpp"
+#include "sampler/Pad.hpp"
 
 #include <StrUtil.hpp>
 #include <Util.hpp>

@@ -1,4 +1,4 @@
-#include <engine/control/LinearLaw.hpp>
+#include "engine/control/LinearLaw.hpp"
 
 using namespace mpc::engine::control;
 using namespace std;

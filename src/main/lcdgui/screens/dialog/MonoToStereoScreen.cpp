@@ -1,6 +1,6 @@
 #include "MonoToStereoScreen.hpp"
 
-#include <lcdgui/screens/window/NameScreen.hpp>
+#include "lcdgui/screens/window/NameScreen.hpp"
 
 #include <memory>
 

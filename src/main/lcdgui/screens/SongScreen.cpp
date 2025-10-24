@@ -1,7 +1,7 @@
 #include "SongScreen.hpp"
 
-#include <sequencer/Step.hpp>
-#include <sequencer/Song.hpp>
+#include "sequencer/Step.hpp"
+#include "sequencer/Song.hpp"
 
 #include <Util.hpp>
 

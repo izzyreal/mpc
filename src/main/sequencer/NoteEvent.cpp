@@ -1,4 +1,4 @@
-#include <sequencer/NoteEvent.hpp>
+#include "sequencer/NoteEvent.hpp"
 #include <algorithm>
 #include <cassert>
 

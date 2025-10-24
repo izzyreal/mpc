@@ -1,12 +1,12 @@
 #include "EditSoundScreen.hpp"
 #include "sampler/Pad.hpp"
 
-#include <sampler/TimeStretch1.hpp>
+#include "sampler/TimeStretch1.hpp"
 
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
-#include <lcdgui/screens/ZoneScreen.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
+#include "lcdgui/screens/ZoneScreen.hpp"
+#include "lcdgui/screens/window/NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;

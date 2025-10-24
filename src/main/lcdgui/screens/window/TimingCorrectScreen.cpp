@@ -1,7 +1,7 @@
 #include "TimingCorrectScreen.hpp"
 
-#include <sequencer/Track.hpp>
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/Track.hpp"
+#include "sequencer/SeqUtil.hpp"
 
 #include <Util.hpp>
 

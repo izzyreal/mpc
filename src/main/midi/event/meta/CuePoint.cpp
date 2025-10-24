@@ -1,6 +1,6 @@
-#include <midi/event/meta/CuePoint.hpp>
+#include "midi/event/meta/CuePoint.hpp"
 
-#include <midi/event/meta/MetaEvent.hpp>
+#include "midi/event/meta/MetaEvent.hpp"
 
 using namespace mpc::midi::event::meta;
 

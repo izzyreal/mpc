@@ -2,34 +2,34 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <Mpc.hpp>
-#include <audiomidi/DirectToDiskSettings.hpp>
-#include <audiomidi/DiskRecorder.hpp>
-#include <audiomidi/MonitorInputAdapter.hpp>
-#include <audiomidi/SoundPlayer.hpp>
-#include <audiomidi/SoundRecorder.hpp>
+#include "audiomidi/DirectToDiskSettings.hpp"
+#include "audiomidi/DiskRecorder.hpp"
+#include "audiomidi/MonitorInputAdapter.hpp"
+#include "audiomidi/SoundPlayer.hpp"
+#include "audiomidi/SoundRecorder.hpp"
 
 #include "engine/Voice.hpp"
 #include "engine/VoiceUtil.hpp"
 #include "engine/FaderControl.hpp"
-#include <engine/audio/mixer/MixerControls.hpp>
+#include "engine/audio/mixer/MixerControls.hpp"
 #include "engine/Drum.hpp"
 
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
-#include <engine/audio/mixer/AudioMixer.hpp>
-#include <engine/audio/mixer/AudioMixerBus.hpp>
-#include <engine/audio/mixer/MixerControlsFactory.hpp>
-#include <engine/audio/mixer/MainMixControls.hpp>
+#include "engine/audio/mixer/AudioMixer.hpp"
+#include "engine/audio/mixer/AudioMixerBus.hpp"
+#include "engine/audio/mixer/MixerControlsFactory.hpp"
+#include "engine/audio/mixer/MainMixControls.hpp"
 
-#include <engine/audio/server/CompoundAudioClient.hpp>
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
-#include <engine/audio/server/RealTimeAudioServer.hpp>
+#include "engine/audio/server/CompoundAudioClient.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "engine/audio/server/RealTimeAudioServer.hpp"
 
-#include <engine/control/CompoundControl.hpp>
-#include <engine/control/BooleanControl.hpp>
+#include "engine/control/CompoundControl.hpp"
+#include "engine/control/BooleanControl.hpp"
 
-#include <sequencer/Song.hpp>
+#include "sequencer/Song.hpp"
 
 #include <string>
 

@@ -1,27 +1,27 @@
 #include <iostream>
-#include <sequencer/Track.hpp>
+#include "sequencer/Track.hpp"
 
 #include <Mpc.hpp>
-#include <audiomidi/EventHandler.hpp>
+#include "audiomidi/EventHandler.hpp"
 
-#include <sequencer/Event.hpp>
-#include <sequencer/Sequence.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/MidiClockEvent.hpp>
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/PitchBendEvent.hpp>
-#include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/ChannelPressureEvent.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "sequencer/Event.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/MidiClockEvent.hpp"
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/PitchBendEvent.hpp"
+#include "sequencer/ControlChangeEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/ChannelPressureEvent.hpp"
+#include "sequencer/PolyPressureEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 
-#include <lcdgui/screens/PunchScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+#include "lcdgui/screens/PunchScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"

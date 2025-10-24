@@ -1,4 +1,4 @@
-#include <sequencer/MixerEvent.hpp>
+#include "sequencer/MixerEvent.hpp"
 
 using namespace mpc::sequencer;
 

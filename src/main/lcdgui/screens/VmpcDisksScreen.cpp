@@ -1,13 +1,13 @@
 #include "VmpcDisksScreen.hpp"
 #include "VmpcSettingsScreen.hpp"
 
-#include <lcdgui/Parameter.hpp>
-#include <lcdgui/Screens.hpp>
-#include <disk/DiskController.hpp>
-#include <disk/AbstractDisk.hpp>
-#include <disk/RawDisk.hpp>
-#include <disk/StdDisk.hpp>
-#include <nvram/VolumesPersistence.hpp>
+#include "lcdgui/Parameter.hpp"
+#include "lcdgui/Screens.hpp"
+#include "disk/DiskController.hpp"
+#include "disk/AbstractDisk.hpp"
+#include "disk/RawDisk.hpp"
+#include "disk/StdDisk.hpp"
+#include "nvram/VolumesPersistence.hpp"
 
 #include <StrUtil.hpp>
 

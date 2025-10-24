@@ -1,7 +1,7 @@
-#include <engine/audio/core/FloatSampleTools.hpp>
+#include "engine/audio/core/FloatSampleTools.hpp"
 
-#include <engine/audio/core/Encoding.hpp>
-#include <engine/audio/core/AudioFormat.hpp>
+#include "engine/audio/core/Encoding.hpp"
+#include "engine/audio/core/AudioFormat.hpp"
 
 #include <cstdio>
 #include <cstdlib>

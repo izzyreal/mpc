@@ -4,8 +4,8 @@
 #include "AllSequence.hpp"
 #include "Util.hpp"
 
-#include <sequencer/MixerEvent.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
+#include "sequencer/MixerEvent.hpp"
+#include "sequencer/SystemExclusiveEvent.hpp"
 
 #include <cmath>
 

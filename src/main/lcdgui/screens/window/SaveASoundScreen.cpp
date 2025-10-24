@@ -1,10 +1,10 @@
 #include "SaveASoundScreen.hpp"
 
-#include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
+#include "lcdgui/screens/window/NameScreen.hpp"
+#include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "disk/MpcFile.hpp"
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens::window;

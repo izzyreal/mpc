@@ -8,7 +8,7 @@
 
 #include "sequencer/SeqUtil.hpp"
 
-#include <engine/midi/ShortMessage.hpp>
+#include "engine/midi/ShortMessage.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

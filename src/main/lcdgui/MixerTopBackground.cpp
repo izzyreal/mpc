@@ -1,4 +1,4 @@
-#include <lcdgui/MixerTopBackground.hpp>
+#include "lcdgui/MixerTopBackground.hpp"
 
 using namespace mpc::lcdgui;
 

@@ -6,10 +6,10 @@
 #include "MixerInterconnection.hpp"
 #include "FaderControl.hpp"
 
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/NoteParameters.hpp>
-#include <sampler/Sound.hpp>
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "sampler/Sampler.hpp"
+#include "sampler/NoteParameters.hpp"
+#include "sampler/Sound.hpp"
 
 #include "engine/audio/mixer/AudioMixer.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"

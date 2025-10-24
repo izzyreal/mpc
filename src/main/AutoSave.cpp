@@ -4,15 +4,15 @@
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "mpc_fs.hpp"
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/ApsLoader.hpp>
-#include <file/aps/ApsParser.hpp>
-#include <file/sndreader/SndReader.hpp>
-#include <file/sndwriter/SndWriter.hpp>
-#include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
-#include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
-#include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "disk/ApsLoader.hpp"
+#include "file/aps/ApsParser.hpp"
+#include "file/sndreader/SndReader.hpp"
+#include "file/sndwriter/SndWriter.hpp"
+#include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
+#include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
+#include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
+#include "lcdgui/screens/window/EditSoundScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/Screens.hpp"
 

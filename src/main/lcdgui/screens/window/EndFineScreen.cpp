@@ -1,8 +1,8 @@
 #include "EndFineScreen.hpp"
 #include "hardware/Hardware.hpp"
 
-#include <lcdgui/screens/TrimScreen.hpp>
-#include <lcdgui/screens/LoopScreen.hpp>
+#include "lcdgui/screens/TrimScreen.hpp"
+#include "lcdgui/screens/LoopScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

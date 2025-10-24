@@ -12,11 +12,11 @@
 #include "Field.hpp"
 #include "Component.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/SoundRecorder.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/SoundRecorder.hpp"
 
-#include <lcdgui/Layer.hpp>
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/Layer.hpp"
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <StrUtil.hpp>
 #include "Util.hpp"

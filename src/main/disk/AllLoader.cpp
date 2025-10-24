@@ -1,46 +1,46 @@
 #include "AllLoader.hpp"
 
 #include <Mpc.hpp>
-#include <file/all/AllParser.hpp>
-#include <file/all/Bar.hpp>
-#include <file/all/BarList.hpp>
-#include <file/all/Count.hpp>
-#include <file/all/Defaults.hpp>
-#include <file/all/MidiInput.hpp>
-#include <file/all/MidiSyncMisc.hpp>
-#include <file/all/Misc.hpp>
-#include <file/all/AllSequence.hpp>
-#include <file/all/SequenceNames.hpp>
-#include <file/all/AllSequencer.hpp>
-#include <file/all/AllSong.hpp>
-#include <file/all/Tracks.hpp>
-#include <file/all/Header.hpp>
+#include "file/all/AllParser.hpp"
+#include "file/all/Bar.hpp"
+#include "file/all/BarList.hpp"
+#include "file/all/Count.hpp"
+#include "file/all/Defaults.hpp"
+#include "file/all/MidiInput.hpp"
+#include "file/all/MidiSyncMisc.hpp"
+#include "file/all/Misc.hpp"
+#include "file/all/AllSequence.hpp"
+#include "file/all/SequenceNames.hpp"
+#include "file/all/AllSequencer.hpp"
+#include "file/all/AllSong.hpp"
+#include "file/all/Tracks.hpp"
+#include "file/all/Header.hpp"
 
-#include <disk/MpcFile.hpp>
+#include "disk/MpcFile.hpp"
 
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/Song.hpp>
-#include <sequencer/Step.hpp>
-#include <sequencer/TempoChangeEvent.hpp>
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/Song.hpp"
+#include "sequencer/Step.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
 
-#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
-#include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/window/MidiOutputScreen.hpp>
-#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
+#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/window/MidiOutputScreen.hpp"
+#include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/TimeDisplayScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/window/LocateScreen.hpp"
-#include <lcdgui/screens/SecondSeqScreen.hpp>
-#include <lcdgui/screens/SongScreen.hpp>
-#include <lcdgui/screens/OthersScreen.hpp>
-#include <lcdgui/screens/SyncScreen.hpp>
-#include <lcdgui/screens/UserScreen.hpp>
-#include <lcdgui/screens/MidiSwScreen.hpp>
+#include "lcdgui/screens/SecondSeqScreen.hpp"
+#include "lcdgui/screens/SongScreen.hpp"
+#include "lcdgui/screens/OthersScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
+#include "lcdgui/screens/UserScreen.hpp"
+#include "lcdgui/screens/MidiSwScreen.hpp"
 
-#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+#include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

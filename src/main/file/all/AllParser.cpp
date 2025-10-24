@@ -4,21 +4,21 @@
 
 #include <Mpc.hpp>
 
-#include <file/all/Count.hpp>
-#include <file/all/Defaults.hpp>
-#include <file/all/Header.hpp>
-#include <file/all/MidiInput.hpp>
-#include <file/all/MidiSyncMisc.hpp>
-#include <file/all/Misc.hpp>
-#include <file/all/AllSequence.hpp>
-#include <file/all/SequenceNames.hpp>
-#include <file/all/AllSequencer.hpp>
-#include <file/all/AllSong.hpp>
+#include "file/all/Count.hpp"
+#include "file/all/Defaults.hpp"
+#include "file/all/Header.hpp"
+#include "file/all/MidiInput.hpp"
+#include "file/all/MidiSyncMisc.hpp"
+#include "file/all/Misc.hpp"
+#include "file/all/AllSequence.hpp"
+#include "file/all/SequenceNames.hpp"
+#include "file/all/AllSequencer.hpp"
+#include "file/all/AllSong.hpp"
 
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 
 #include <Util.hpp>
 

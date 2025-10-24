@@ -1,6 +1,6 @@
 #include "StepTcScreen.hpp"
 
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;

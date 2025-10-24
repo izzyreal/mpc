@@ -1,9 +1,9 @@
 #include "sampler/VoiceOverlapMode.hpp"
-#include <file/aps/ApsNoteParameters.hpp>
+#include "file/aps/ApsNoteParameters.hpp"
 
-#include <sampler/NoteParameters.hpp>
+#include "sampler/NoteParameters.hpp"
 
-#include <file/ByteUtil.hpp>
+#include "file/ByteUtil.hpp"
 
 #include <cassert>
 

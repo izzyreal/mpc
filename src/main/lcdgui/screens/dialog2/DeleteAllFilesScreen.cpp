@@ -1,9 +1,9 @@
 #include "DeleteAllFilesScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
+#include "disk/AbstractDisk.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
+#include "lcdgui/screens/window/DirectoryScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;

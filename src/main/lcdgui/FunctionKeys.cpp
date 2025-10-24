@@ -1,7 +1,7 @@
 #include "FunctionKeys.hpp"
 
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Background.hpp>
+#include "lcdgui/Label.hpp"
+#include "lcdgui/Background.hpp"
 
 #include <Mpc.hpp>
 

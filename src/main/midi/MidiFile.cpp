@@ -1,6 +1,6 @@
-#include <midi/MidiFile.hpp>
-#include <midi/MidiTrack.hpp>
-#include <midi/util/MidiUtil.hpp>
+#include "midi/MidiFile.hpp"
+#include "midi/MidiTrack.hpp"
+#include "midi/util/MidiUtil.hpp"
 
 #include <sstream>
 

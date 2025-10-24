@@ -3,9 +3,9 @@
 #include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 
-#include <lcdgui/Layer.hpp>
-#include <lcdgui/screens/TrimScreen.hpp>
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include "lcdgui/Layer.hpp"
+#include "lcdgui/screens/TrimScreen.hpp"
+#include "lcdgui/screens/window/EditSoundScreen.hpp"
 
 #include <climits>
 

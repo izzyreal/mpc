@@ -1,6 +1,6 @@
-#include <midi/event/NoteOff.hpp>
+#include "midi/event/NoteOff.hpp"
 
-#include <midi/event/ChannelEvent.hpp>
+#include "midi/event/ChannelEvent.hpp"
 
 using namespace mpc::midi::event;
 

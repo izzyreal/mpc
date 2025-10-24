@@ -1,13 +1,13 @@
 #include "ApsGlobalParameters.hpp"
 
 #include <Mpc.hpp>
-#include <file/aps/ApsParser.hpp>
+#include "file/aps/ApsParser.hpp"
 
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/screens/DrumScreen.hpp>
-#include <lcdgui/screens/PgmAssignScreen.hpp>
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/screens/DrumScreen.hpp"
+#include "lcdgui/screens/PgmAssignScreen.hpp"
 
-#include <file/BitUtil.hpp>
+#include "file/BitUtil.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens; 

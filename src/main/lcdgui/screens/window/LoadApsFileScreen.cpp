@@ -1,7 +1,7 @@
 #include "LoadApsFileScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
+#include "disk/AbstractDisk.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

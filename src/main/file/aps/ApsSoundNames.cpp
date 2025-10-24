@@ -1,7 +1,7 @@
-#include <file/aps/ApsSoundNames.hpp>
+#include "file/aps/ApsSoundNames.hpp"
 
-#include <file/aps/ApsParser.hpp>
-#include <sampler/Sampler.hpp>
+#include "file/aps/ApsParser.hpp"
+#include "sampler/Sampler.hpp"
 
 #include <StrUtil.hpp>
 

@@ -3,7 +3,7 @@
 #include <Mpc.hpp>
 #include <SampleOps.hpp>
 
-#include <lcdgui/screens/SampleScreen.hpp>
+#include "lcdgui/screens/SampleScreen.hpp"
 
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;

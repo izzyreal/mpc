@@ -1,4 +1,4 @@
-#include <engine/control/AbstractLaw.hpp>
+#include "engine/control/AbstractLaw.hpp"
 
 using namespace mpc::engine::control;
 using namespace std;

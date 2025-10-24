@@ -1,10 +1,10 @@
 #include "EventsScreen.hpp"
 
-#include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
-#include <sequencer/SeqUtil.hpp>
+#include "sequencer/Track.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/SeqUtil.hpp"
 
-#include <lcdgui/screens/UserScreen.hpp>
+#include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
 #include <Util.hpp>

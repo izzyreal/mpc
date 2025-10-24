@@ -1,7 +1,7 @@
 #include "AllProgramChangeEvent.hpp"
 
-#include <file/all/AllEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
+#include "file/all/AllEvent.hpp"
+#include "sequencer/ProgramChangeEvent.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;

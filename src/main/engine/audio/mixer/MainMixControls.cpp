@@ -1,9 +1,9 @@
-#include <engine/audio/mixer/MainMixControls.hpp>
-#include <engine/control/EnumControl.hpp>
-#include <engine/audio/mixer/MixerControls.hpp>
-#include <engine/audio/mixer/MixerControlsIds.hpp>
-#include <engine/audio/mixer/MixControlIds.hpp>
-#include <engine/control/Control.hpp>
+#include "engine/audio/mixer/MainMixControls.hpp"
+#include "engine/control/EnumControl.hpp"
+#include "engine/audio/mixer/MixerControls.hpp"
+#include "engine/audio/mixer/MixerControlsIds.hpp"
+#include "engine/audio/mixer/MixControlIds.hpp"
+#include "engine/control/Control.hpp"
 
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::control;

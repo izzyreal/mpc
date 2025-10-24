@@ -1,11 +1,11 @@
-#include <midi/event/meta/Tempo.hpp>
+#include "midi/event/meta/Tempo.hpp"
 
-#include <midi/event/MidiEvent.hpp>
-#include <midi/event/meta/GenericMetaEvent.hpp>
-#include <midi/event/meta/MetaEventData.hpp>
-#include <midi/event/meta/MetaEvent.hpp>
-#include <midi/util/MidiUtil.hpp>
-#include <midi/util/VariableLengthInt.hpp>
+#include "midi/event/MidiEvent.hpp"
+#include "midi/event/meta/GenericMetaEvent.hpp"
+#include "midi/event/meta/MetaEventData.hpp"
+#include "midi/event/meta/MetaEvent.hpp"
+#include "midi/util/MidiUtil.hpp"
+#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event::meta;
 

@@ -3,20 +3,20 @@
 #include "sampler/Pad.hpp"
 
 #include <Mpc.hpp>
-#include <disk/StdDisk.hpp>
-#include <disk/MpcFile.hpp>
-#include <disk/SoundLoader.hpp>
-#include <file/aps/ApsNoteParameters.hpp>
-#include <file/aps/ApsParser.hpp>
-#include <file/aps/ApsSlider.hpp>
+#include "disk/StdDisk.hpp"
+#include "disk/MpcFile.hpp"
+#include "disk/SoundLoader.hpp"
+#include "file/aps/ApsNoteParameters.hpp"
+#include "file/aps/ApsParser.hpp"
+#include "file/aps/ApsSlider.hpp"
 
-#include <sampler/NoteParameters.hpp>
-#include <sampler/PgmSlider.hpp>
+#include "sampler/NoteParameters.hpp"
+#include "sampler/PgmSlider.hpp"
 
-#include <lcdgui/screens/DrumScreen.hpp>
-#include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
-#include <lcdgui/screens/window/CantFindFileScreen.hpp>
+#include "lcdgui/screens/DrumScreen.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
+#include "lcdgui/screens/window/CantFindFileScreen.hpp"
 
 #include <StrUtil.hpp>
 

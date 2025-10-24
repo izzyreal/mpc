@@ -1,9 +1,9 @@
 #include "Mpc2000XlAllFileScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
+#include "disk/AbstractDisk.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/LoadASequenceFromAllScreen.hpp>
+#include "lcdgui/screens/LoadScreen.hpp"
+#include "lcdgui/screens/window/LoadASequenceFromAllScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

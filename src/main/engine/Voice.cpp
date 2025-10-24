@@ -3,7 +3,7 @@
 #include "VoiceConstants.hpp"
 
 #include "sampler/NoteParameters.hpp"
-#include <sampler/Sound.hpp>
+#include "sampler/Sound.hpp"
 
 #include "EnvelopeControls.hpp"
 #include "EnvelopeGenerator.hpp"

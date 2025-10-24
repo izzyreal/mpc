@@ -1,6 +1,6 @@
-#include <midi/event/NoteAftertouch.hpp>
+#include "midi/event/NoteAftertouch.hpp"
 
-#include <midi/event/ChannelEvent.hpp>
+#include "midi/event/ChannelEvent.hpp"
 
 using namespace mpc::midi::event;
 

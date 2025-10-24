@@ -4,29 +4,29 @@
 
 #include <Mpc.hpp>
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/MidiOutput.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/MidiOutput.hpp"
 
 #include "engine/Voice.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
-#include <lcdgui/screens/SongScreen.hpp>
-#include <lcdgui/screens/SecondSeqScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
-#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
-#include <lcdgui/screens/UserScreen.hpp>
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include "lcdgui/screens/SongScreen.hpp"
+#include "lcdgui/screens/SecondSeqScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
+#include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
+#include "lcdgui/screens/UserScreen.hpp"
+#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
-#include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/FrameSeq.hpp>
-#include <sequencer/Track.hpp>
-#include <sequencer/Song.hpp>
-#include <sequencer/Step.hpp>
-#include <sequencer/Clock.hpp>
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/FrameSeq.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/Song.hpp"
+#include "sequencer/Step.hpp"
+#include "sequencer/Clock.hpp"
 
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <StrUtil.hpp>
 

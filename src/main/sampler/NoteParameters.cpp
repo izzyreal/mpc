@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <sampler/NoteParameters.hpp>
+#include "sampler/NoteParameters.hpp"
 
 #include <cassert>
 

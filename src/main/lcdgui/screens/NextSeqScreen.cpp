@@ -1,9 +1,9 @@
 #include "NextSeqScreen.hpp"
 
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/SequencerScreen.hpp>
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/SequencerScreen.hpp"
 
-#include <sequencer/TempoChangeEvent.hpp>
+#include "sequencer/TempoChangeEvent.hpp"
 
 #include <Util.hpp>
 

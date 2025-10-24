@@ -1,4 +1,4 @@
-#include <sequencer/TimeSignature.hpp>
+#include "sequencer/TimeSignature.hpp"
 
 using namespace mpc::sequencer;
 

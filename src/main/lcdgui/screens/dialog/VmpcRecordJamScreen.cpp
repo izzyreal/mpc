@@ -1,9 +1,9 @@
 #include "VmpcRecordJamScreen.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/DirectToDiskSettings.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/DirectToDiskSettings.hpp"
 
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;

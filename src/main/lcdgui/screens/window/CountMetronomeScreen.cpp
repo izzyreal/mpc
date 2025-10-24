@@ -1,6 +1,6 @@
 #include "CountMetronomeScreen.hpp"
 
-#include <lcdgui/Label.hpp>
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

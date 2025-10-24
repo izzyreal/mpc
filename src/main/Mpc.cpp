@@ -4,29 +4,29 @@
 
 #include "DemoFiles.hpp"
 
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include "Paths.hpp"
-#include <nvram/NvRam.hpp>
-#include <nvram/MidiControlPersistence.hpp>
+#include "nvram/NvRam.hpp"
+#include "nvram/MidiControlPersistence.hpp"
 
-#include <disk/AbstractDisk.hpp>
+#include "disk/AbstractDisk.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/EventHandler.hpp>
-#include <audiomidi/MidiDeviceDetector.hpp>
-#include <audiomidi/MidiInput.hpp>
-#include <audiomidi/MidiOutput.hpp>
+#include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/EventHandler.hpp"
+#include "audiomidi/MidiDeviceDetector.hpp"
+#include "audiomidi/MidiInput.hpp"
+#include "audiomidi/MidiOutput.hpp"
 
-#include <sampler/Sampler.hpp>
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/Clock.hpp>
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Clock.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 #include "engine/Drum.hpp"
 
-#include <hardware/Hardware.hpp>
+#include "hardware/Hardware.hpp"
 
-#include <lcdgui/Screens.hpp>
+#include "lcdgui/Screens.hpp"
 
 #include "MpcResourceUtil.hpp"
 #include "hardware/ComponentId.hpp"

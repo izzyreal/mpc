@@ -1,10 +1,10 @@
 #include "DeleteFolderScreen.hpp"
 
-#include <lcdgui/screens/window/DirectoryScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
+#include "lcdgui/screens/window/DirectoryScreen.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
+#include "disk/AbstractDisk.hpp"
+#include "disk/MpcFile.hpp"
 
 #ifdef __linux__
 #include <pthread.hpp>
