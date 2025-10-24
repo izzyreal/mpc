@@ -29,7 +29,6 @@ private:
     void handleButtonPress(const mpc::input::ClientInput& a);
     void handleButtonRelease(const mpc::input::ClientInput& a);
     void handleButtonDoublePress(const mpc::input::ClientInput& a);
-    void handleFocusLost();
 };
 
 } // namespace mpc::controller
