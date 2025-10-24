@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include "hardware/Component.hpp"
+#include "hardware/ComponentId.hpp"
 
-namespace mpc::input
+namespace mpc::client::event
 {
 
     struct ClientHardwareEvent

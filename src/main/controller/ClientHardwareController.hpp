@@ -1,11 +1,7 @@
 #pragma once
 
 #include "controller/ClientHardwareControllerBase.hpp"
-
-namespace mpc::input
-{
-    struct ClientHardwareEvent;
-}
+#include "client/event/ClientHardwareEvent.hpp"
 
 namespace mpc
 {
@@ -19,20 +15,20 @@ namespace mpc::controller
     {
     public:
         explicit ClientHardwareController(mpc::Mpc &, const fs::path keyboardMappingConfigDirectory);
-        void handleInput(const mpc::input::ClientHardwareEvent &) override;
+        void handleInput(const client::event::ClientHardwareEvent &) override;
 
     private:
         mpc::Mpc &mpc;
 
-        void handlePadPress(const mpc::input::ClientHardwareEvent &a);
-        void handlePadAftertouch(const mpc::input::ClientHardwareEvent &a);
-        void handlePadRelease(const mpc::input::ClientHardwareEvent &a);
-        void handleDataWheel(const mpc::input::ClientHardwareEvent &a);
-        void handleSlider(const mpc::input::ClientHardwareEvent &a);
-        void handlePot(const mpc::input::ClientHardwareEvent &a);
-        void handleButtonPress(const mpc::input::ClientHardwareEvent &a);
-        void handleButtonRelease(const mpc::input::ClientHardwareEvent &a);
-        void handleButtonDoublePress(const mpc::input::ClientHardwareEvent &a);
+        void handlePadPress(const client::event::ClientHardwareEvent &);
+        void handlePadAftertouch(const client::event::ClientHardwareEvent &);
+        void handlePadRelease(const client::event::ClientHardwareEvent &);
+        void handleDataWheel(const client::event::ClientHardwareEvent &);
+        void handleSlider(const client::event::ClientHardwareEvent &);
+        void handlePot(const client::event::ClientHardwareEvent &);
+        void handleButtonPress(const client::event::ClientHardwareEvent &);
+        void handleButtonRelease(const client::event::ClientHardwareEvent &);
+        void handleButtonDoublePress(const client::event::ClientHardwareEvent &);
     };
 
 } // namespace mpc::controller

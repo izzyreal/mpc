@@ -3,7 +3,7 @@
 #include "hardware/ComponentId.hpp"
 #include "input/HostInputEvent.hpp"
 #include "input/HostToClientTranslator.hpp"
-#include "input/ClientHardwareEvent.hpp"
+#include "client/event/ClientHardwareEvent.hpp"
 
 #include "controller/ButtonLockTracker.hpp"
 
@@ -26,7 +26,7 @@ namespace mpc::controller
         {
             int bankIndex;
             std::shared_ptr<lcdgui::ScreenComponent> screen;
-            input::ClientHardwareEvent::Source inputSource;
+            client::event::ClientHardwareEvent::Source inputSource;
             std::optional<int> drumIndex;
         };
 
@@ -49,7 +49,7 @@ namespace mpc::controller
         }
 
         virtual ~ClientHardwareControllerBase() = default;
-        virtual void handleInput(const mpc::input::ClientHardwareEvent &) = 0;
+        virtual void handleInput(const mpc::client::event::ClientHardwareEvent &) = 0;
 
         ButtonLockTracker buttonLockTracker;
 
@@ -86,14 +86,14 @@ namespace mpc::controller
 
             const auto pressSource = physicalPadPresses.at(physicalPadIndex).inputSource;
 
-            return pressSource == input::ClientHardwareEvent::Source::HostInputKeyboard;
+            return pressSource == client::event::ClientHardwareEvent::Source::HostInputKeyboard;
         }
 
         void registerPhysicalPadPush(
             const int padIndex,
             const int bankIndex,
             const std::shared_ptr<lcdgui::ScreenComponent> screen,
-            const input::ClientHardwareEvent::Source inputSource,
+            const client::event::ClientHardwareEvent::Source inputSource,
             const std::optional<int> drumIndex)
         {
             assert(physicalPadPresses.count(padIndex) == 0);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "input/HostInputEvent.hpp"
-#include "input/ClientHardwareEvent.hpp"
+#include "client/event/ClientHardwareEvent.hpp"
 
 #include <memory>
 
@@ -12,7 +12,7 @@ namespace mpc::input
 
     struct HostToClientTranslator
     {
-        static std::optional<ClientHardwareEvent> translate(const HostInputEvent &, std::shared_ptr<KeyboardBindings>);
+        static std::optional<client::event::ClientHardwareEvent> translate(const HostInputEvent &, std::shared_ptr<KeyboardBindings>);
     };
 
 } // namespace mpc::input

@@ -5,7 +5,7 @@
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Component.hpp"
-#include "input/ClientHardwareEvent.hpp"
+#include "client/event/ClientHardwareEvent.hpp"
 #include "command/context/TriggerDrumContextFactory.hpp"
 #include "Mpc.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
@@ -24,6 +24,7 @@
 
 using namespace mpc::controller;
 using namespace mpc::input;
+using namespace mpc::client::event;
 using namespace mpc::hardware;
 using namespace mpc::command;
 using namespace mpc::command::context;

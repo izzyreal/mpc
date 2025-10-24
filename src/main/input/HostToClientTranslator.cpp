@@ -1,6 +1,6 @@
 #include "input/HostToClientTranslator.hpp"
 #include "hardware/ComponentId.hpp"
-#include "input/ClientHardwareEvent.hpp"
+#include "client/event/ClientHardwareEvent.hpp"
 #include "input/KeyboardBindings.hpp"
 
 #include "input/KeyCodeHelper.hpp"
@@ -10,9 +10,12 @@
 #include <stdexcept>
 
 using namespace mpc::input;
+using namespace mpc::client::event;
 using namespace mpc::hardware;
 
-std::optional<ClientHardwareEvent> HostToClientTranslator::translate(const HostInputEvent &hostInputEvent, std::shared_ptr<KeyboardBindings> keyboardBindings)
+std::optional<ClientHardwareEvent> HostToClientTranslator::translate(
+        const HostInputEvent &hostInputEvent,
+        std::shared_ptr<KeyboardBindings> keyboardBindings)
 {
     ClientHardwareEvent clientInput;
 
