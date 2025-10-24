@@ -1,7 +1,8 @@
 #pragma once
 
 #include <variant>
-#include <cstdint>
+
+#include "input/MidiEvent.hpp"
 
 #include "hardware/ComponentId.hpp"
 
@@ -54,13 +55,6 @@ struct GestureEvent
     hardware::ComponentId componentId;
 };
 
-struct MidiEvent {
-    enum MessageType { CC, NOTE };
-    MessageType messageType;
-    uint8_t statusByte;
-    uint8_t data1;
-    uint8_t data2;
-};
 
 /* Input events coming from the host, i.e. the machine the virtual MPC2000XL is virtualized on */
 struct HostInputEvent {

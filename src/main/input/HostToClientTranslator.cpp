@@ -39,26 +39,7 @@ std::optional<ClientInput> HostToClientTranslator::translate(const HostInputEven
         break;
     case HostInputEvent::Source::MIDI: {
         const auto& midi = std::get<MidiEvent>(hostInputEvent.payload);
-        if (midi.messageType == MidiEvent::NOTE)
-        {
-            int padIndex = midi.data1 % 16;
-            if (midi.data2 > 0)
-            {
-                clientInput.type = ClientInput::Type::PadPress;
-                clientInput.index = padIndex;
-                clientInput.value = midi.data2;
-            }
-            else
-            {
-                clientInput.type = ClientInput::Type::PadRelease;
-                clientInput.index = padIndex;
-            }
-        }
-        else if (midi.messageType == MidiEvent::CC)
-        {
-            clientInput.type = ClientInput::Type::SliderMove;
-            clientInput.value = midi.data2;
-        }
+        midi.printInfo();
         break;
     }
 
