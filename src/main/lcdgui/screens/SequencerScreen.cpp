@@ -1,6 +1,7 @@
 #include "SequencerScreen.hpp"
 
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 
@@ -116,7 +117,7 @@ void SequencerScreen::open()
 
     const bool sequencerIsRecordingOrOverdubbing = sequencer.lock()->isRecordingOrOverdubbing();
 
-    const auto footerIsInvisible = !mpc.inputController->isNoteRepeatLocked() &&
+    const auto footerIsInvisible = !mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked() &&
                                    !(mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed() &&
                                      sequencerIsRecordingOrOverdubbing);
 
@@ -136,7 +137,7 @@ void SequencerScreen::tap()
 {
     if (sequencer.lock()->isPlaying())
     {
-        if (mpc.inputController->isNoteRepeatLocked())
+        if (mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked())
         {
             findChild("function-keys")->Hide(false);
             findChild("footer-label")->Hide(true);
@@ -921,8 +922,8 @@ void SequencerScreen::displayPunchWhileRecording()
     auto punchScreen = mpc.screens->get<PunchScreen>();
 
     auto hardware = mpc.getHardware();
-    auto isRecPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() || mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
-    auto isOverdubPressedOrLocked = hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() || mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+    auto isRecPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() || mpc.clientEventController->clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+    auto isOverdubPressedOrLocked = hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() || mpc.clientEventController->clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
 
     if (punchScreen->on && (isRecPressedOrLocked || isOverdubPressedOrLocked))
     {

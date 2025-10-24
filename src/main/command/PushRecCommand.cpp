@@ -1,6 +1,7 @@
 #include "PushRecCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
@@ -13,8 +14,8 @@ namespace mpc::command
 
     void PushRecCommand::execute()
     {
-        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::REC);
-        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
+        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::REC);
+        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
         if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreen()))
         {

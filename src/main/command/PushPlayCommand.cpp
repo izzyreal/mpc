@@ -1,7 +1,8 @@
 #include "PushPlayCommand.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
@@ -39,10 +40,10 @@ namespace mpc::command
         const bool isPlayAndRecordScreen = lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
 
         const auto recButtonIsPressedOrLocked = hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
-                                                mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+                                                mpc.clientEventController->clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
         const auto overdubButtonIsPressedOrLocked = hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
-                                                    mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+                                                    mpc.clientEventController->clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
 
         if (recButtonIsPressedOrLocked)
         {
@@ -80,8 +81,8 @@ namespace mpc::command
             }
         }
 
-        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::REC);
-        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
+        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::REC);
+        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
         mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(mpc.getSequencer()->isOverdubbing());
         mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(mpc.getSequencer()->isRecording());

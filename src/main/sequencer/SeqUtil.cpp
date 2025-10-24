@@ -2,7 +2,8 @@
 
 #include "Mpc.hpp"
 
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/Sequence.hpp"
@@ -475,7 +476,7 @@ bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
     auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     const bool recIsPressedOrLocked = mpc.getHardware()->getButton(hardware::ComponentId::REC)->isPressed() ||
-                                      mpc.inputController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+                                      mpc.clientEventController->clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
     bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
                                  !sequencer->isPlaying() &&

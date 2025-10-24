@@ -4,7 +4,6 @@
 #include "command/TriggerDrumNoteOffCommand.hpp"
 #include "command/ReleaseTapCommand.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "command/context/TriggerDrumContextFactory.hpp"
 
@@ -15,6 +14,8 @@
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/VmpcMidiControlMode.hpp"
 
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
@@ -241,7 +242,7 @@ void MidiInput::handleControlChange(ShortMessage *msg)
                         clientInput.componentId = ComponentId::TAP_TEMPO_OR_NOTE_REPEAT;
                         clientInput.type = client::event::ClientHardwareEvent::Type::ButtonPressAndRelease;
                         clientInput.source = client::event::ClientHardwareEvent::Source::HostInputMidi;
-                        mpc.inputController->handleInput(clientInput);
+                        //mpc.clientEventController->clientHardwareEventController->handleInput(clientInput);
                     }
                     else if (func >= 8 && func < 12)
                     {
@@ -325,7 +326,7 @@ void MidiInput::handleNoteOn(ShortMessage *msg, const int &timeStamp)
     auto bus = track->getBus();
 
     const bool isNoteRepeatLockedOrPressed = mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed() ||
-                                             mpc.inputController->isNoteRepeatLocked();
+                                             mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked();
 
     if (bus > 0)
     {

@@ -20,7 +20,7 @@ namespace mpc::engine
 {
     class Drum;
     class PreviewSoundPlayer;
-} // namespace mpc::engine
+}
 
 namespace mpc::hardware
 {
@@ -29,14 +29,14 @@ namespace mpc::hardware
 
 namespace mpc::controller
 {
-    class ClientHardwareControllerBase;
+    class ClientEventController;
 }
 
 namespace mpc::input
 {
     struct HostInputEvent;
     class PadAndButtonKeyboard;
-} // namespace mpc::input
+}
 
 namespace mpc::disk
 {
@@ -118,7 +118,7 @@ namespace mpc
         bool isPluginModeEnabled();
 
         std::shared_ptr<mpc::input::PadAndButtonKeyboard> padAndButtonKeyboard;
-        std::shared_ptr<mpc::controller::ClientHardwareControllerBase> inputController;
+        std::shared_ptr<mpc::controller::ClientEventController> clientEventController;
 
         void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
 

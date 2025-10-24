@@ -1,6 +1,7 @@
 #include "PushOverdubCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -12,8 +13,8 @@ namespace mpc::command
 
     void PushOverdubCommand::execute()
     {
-        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::REC);
-        mpc.inputController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
+        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::REC);
+        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
         if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreen()))
         {

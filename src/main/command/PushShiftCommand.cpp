@@ -1,6 +1,7 @@
 #include "PushShiftCommand.hpp"
 #include "Mpc.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -16,7 +17,7 @@ namespace mpc::command
             mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed() &&
             mpc.getSequencer()->isPlaying())
         {
-            mpc.inputController->lockNoteRepeat();
+            mpc.clientEventController->clientHardwareEventController->lockNoteRepeat();
         }
 
         auto field = mpc.getLayeredScreen()->getFocusedField();

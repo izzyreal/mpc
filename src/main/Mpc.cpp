@@ -31,7 +31,7 @@
 #include "MpcResourceUtil.hpp"
 #include "hardware/ComponentId.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
-#include "controller/ClientHardwareController.hpp"
+#include "controller/ClientEventController.hpp"
 
 #include <string>
 
@@ -106,7 +106,7 @@ void Mpc::init()
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
     MLOG("Sequencer created");
 
-    inputController = std::make_shared<mpc::controller::ClientHardwareController>(*this, paths->configPath());
+    clientEventController = std::make_shared<mpc::controller::ClientEventController>(*this);
 
     hardware = std::make_shared<hardware::Hardware>();
 
@@ -164,7 +164,7 @@ std::shared_ptr<hardware::Hardware> Mpc::getHardware()
 
 void Mpc::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
 {
-    inputController->dispatchHostInput(hostEvent);
+    clientEventController->dispatchHostInput(hostEvent);
 }
 
 std::shared_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()

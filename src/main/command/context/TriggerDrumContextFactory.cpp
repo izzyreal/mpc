@@ -1,6 +1,7 @@
 #include "command/context/TriggerDrumContextFactory.hpp"
 
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 
@@ -40,7 +41,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(screen);
     const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
     const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
-    const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
+    const bool isNoteRepeatLockedOrPressed = mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked() ||
                                              mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
     const bool isErasePressed = mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed();
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(mpc);
@@ -109,7 +110,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         setMpcPad,
         mpc.getLayeredScreen()->getFocusedFieldName(),
         hardwareSliderValue,
-        mpc.inputController->isPhysicallyPressed(programPadIndex % 16, mpc.getBank())};
+        mpc.clientEventController->clientHardwareEventController->isPhysicallyPressed(programPadIndex % 16, mpc.getBank())};
 }
 
 TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(

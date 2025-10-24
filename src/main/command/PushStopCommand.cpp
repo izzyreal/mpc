@@ -1,7 +1,8 @@
 #include "PushStopCommand.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
@@ -17,7 +18,7 @@ namespace mpc::command
         const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>();
         const auto ams = mpc.getAudioMidiServices();
 
-        mpc.inputController->unlockNoteRepeat();
+        mpc.clientEventController->clientHardwareEventController->unlockNoteRepeat();
 
         if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
                                   mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed()))

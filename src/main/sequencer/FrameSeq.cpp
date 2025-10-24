@@ -4,7 +4,8 @@
 
 #include "audiomidi/AudioMidiServices.hpp"
 
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "sequencer/Song.hpp"
@@ -357,7 +358,7 @@ bool FrameSeq::processSeqLoopDisabled()
 
 void FrameSeq::processNoteRepeat()
 {
-    const bool isNoteRepeatLockedOrPressed = mpc.inputController->isNoteRepeatLocked() ||
+    const bool isNoteRepeatLockedOrPressed = mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked() ||
                                              mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
 
     if (!isNoteRepeatLockedOrPressed)

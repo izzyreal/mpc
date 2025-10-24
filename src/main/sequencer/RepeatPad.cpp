@@ -4,7 +4,8 @@
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/MidiOutput.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "engine/DrumNoteEventHandler.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
@@ -53,7 +54,7 @@ void RepeatPad::process(mpc::Mpc &mpc,
     {
         for (int bankIndex = 0; bankIndex < 4; ++bankIndex)
         {
-            if (!mpc.inputController->isPhysicallyPressed(physicalPadIndex, bankIndex))
+            if (!mpc.clientEventController->clientHardwareEventController->isPhysicallyPressed(physicalPadIndex, bankIndex))
             {
                 continue;
             }

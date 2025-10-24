@@ -1,4 +1,5 @@
-#include "controller/ClientHardwareController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
+
 #include "audiomidi/AudioMidiServices.hpp"
 #include "command/TriggerDrumNoteOffCommand.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
@@ -8,18 +9,19 @@
 #include "client/event/ClientHardwareEvent.hpp"
 #include "command/context/TriggerDrumContextFactory.hpp"
 #include "Mpc.hpp"
+#include "hardware/Hardware.hpp"
+#include "input/PadAndButtonKeyboard.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/ScreenGroups.hpp"
-#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
 #include "lcdgui/screens/VmpcKeyboardScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/KeepOrRetryScreen.hpp"
 #include "lcdgui/screens/window/LoadASoundScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+
 #include <memory>
 
 using namespace mpc::controller;
@@ -33,67 +35,67 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-ClientHardwareController::ClientHardwareController(mpc::Mpc &mpcToUse, const fs::path keyboardMappingConfigDirectory)
-    : ClientHardwareControllerBase(mpcToUse.paths->configPath()), mpc(mpcToUse)
+ClientHardwareEventController::ClientHardwareEventController(mpc::Mpc &mpcToUse)
+    : mpc(mpcToUse)
 {
 }
 
-void ClientHardwareController::handleInput(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handleClientHardwareEvent(const ClientHardwareEvent &event)
 {
-    if (input.source == ClientHardwareEvent::Source::HostInputKeyboard)
+    if (event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
-                                                                                            input.textInputKey)
+                                                                                            event.textInputKey)
         {
-            if (input.textInputKey->isPress)
+            if (event.textInputKey->isPress)
             {
-                nameScreen->typeCharacter(input.textInputKey->character);
+                nameScreen->typeCharacter(event.textInputKey->character);
                 return;
             }
         }
     }
 
-    switch (input.type)
+    switch (event.type)
     {
     case ClientHardwareEvent::Type::PadPress:
-        handlePadPress(input);
+        handlePadPress(event);
         break;
     case ClientHardwareEvent::Type::PadAftertouch:
-        handlePadAftertouch(input);
+        handlePadAftertouch(event);
         break;
     case ClientHardwareEvent::Type::PadRelease:
-        handlePadRelease(input);
+        handlePadRelease(event);
         break;
     case ClientHardwareEvent::Type::DataWheelTurn:
-        handleDataWheel(input);
+        handleDataWheel(event);
         break;
     case ClientHardwareEvent::Type::SliderMove:
-        handleSlider(input);
+        handleSlider(event);
         break;
     case ClientHardwareEvent::Type::PotMove:
-        handlePot(input);
+        handlePot(event);
         break;
     case ClientHardwareEvent::Type::ButtonPress:
-        handleButtonPress(input);
+        handleButtonPress(event);
         break;
     case ClientHardwareEvent::Type::ButtonRelease:
-        handleButtonRelease(input);
+        handleButtonRelease(event);
         break;
     case ClientHardwareEvent::Type::ButtonDoublePress:
-        handleButtonDoublePress(input);
+        handleButtonDoublePress(event);
         break;
     case ClientHardwareEvent::Type::ButtonPressAndRelease:
-        handleButtonPress(input);
-        handleButtonRelease(input);
+        handleButtonPress(event);
+        handleButtonRelease(event);
         break;
     default:
         break;
     }
 }
 
-void ClientHardwareController::handlePadPress(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &event)
 {
-    if (!input.index || !input.value)
+    if (!event.index || !event.value)
     {
         return;
     }
@@ -101,7 +103,7 @@ void ClientHardwareController::handlePadPress(const ClientHardwareEvent &input)
     auto layeredScreen = mpc.getLayeredScreen();
 
     if (layeredScreen->isCurrentScreen<NameScreen>() &&
-        input.source == ClientHardwareEvent::Source::HostInputKeyboard)
+        event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         return;
     }
@@ -112,15 +114,15 @@ void ClientHardwareController::handlePadPress(const ClientHardwareEvent &input)
     {
         opensNameScreen->openNameScreen();
 
-        if (input.source == ClientHardwareEvent::Source::HostInputKeyboard)
+        if (event.source == ClientHardwareEvent::Source::HostInputKeyboard)
         {
             return;
         }
     }
 
-    const auto physicalPadIndex = *input.index;
+    const auto physicalPadIndex = *event.index;
 
-    const auto velocity = *input.value * (float)VelocitySensitivePressable::MAX_VELO;
+    const auto velocity = *event.value * (float)VelocitySensitivePressable::MAX_VELO;
 
     const auto clampedVelocity = std::clamp(velocity,
                                             (float)VelocitySensitivePressable::MIN_VELO,
@@ -137,12 +139,12 @@ void ClientHardwareController::handlePadPress(const ClientHardwareEvent &input)
 
     if (layeredScreen->isCurrentScreen<NameScreen>())
     {
-        registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source, maybeDrumIndex);
-        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(input.componentId);
+        registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, event.source, maybeDrumIndex);
+        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(event.componentId);
         return;
     }
 
-    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, input.source, maybeDrumIndex);
+    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, event.source, maybeDrumIndex);
 
     const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
@@ -185,20 +187,20 @@ void ClientHardwareController::handlePadPress(const ClientHardwareEvent &input)
     TriggerDrumNoteOnCommand(ctx).execute();
 }
 
-void ClientHardwareController::handlePadRelease(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handlePadRelease(const ClientHardwareEvent &event)
 {
-    if (!input.index)
+    if (!event.index)
     {
         return;
     }
 
     if (mpc.getLayeredScreen()->isCurrentScreen<NameScreen>() &&
-        input.source == ClientHardwareEvent::Source::HostInputKeyboard)
+        event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         return;
     }
 
-    const auto physicalPadIndex = *input.index;
+    const auto physicalPadIndex = *event.index;
 
     const auto info = registerPhysicalPadRelease(physicalPadIndex);
 
@@ -214,34 +216,34 @@ void ClientHardwareController::handlePadRelease(const ClientHardwareEvent &input
     TriggerDrumNoteOffCommand(ctx).execute();
 }
 
-void ClientHardwareController::handlePadAftertouch(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handlePadAftertouch(const ClientHardwareEvent &event)
 {
-    if (!input.index || !input.value)
+    if (!event.index || !event.value)
     {
         return;
     }
-    const auto padIndex = *input.index;
-    const auto pressureToUse = std::clamp(*input.value * Aftertouchable::MAX_PRESSURE, (float)Aftertouchable::MIN_PRESSURE, (float)Aftertouchable::MAX_PRESSURE);
+    const auto padIndex = *event.index;
+    const auto pressureToUse = std::clamp(*event.value * Aftertouchable::MAX_PRESSURE, (float)Aftertouchable::MIN_PRESSURE, (float)Aftertouchable::MAX_PRESSURE);
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 }
 
-void ClientHardwareController::handleDataWheel(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handleDataWheel(const ClientHardwareEvent &event)
 {
-    if (!input.deltaValue)
+    if (!event.deltaValue)
     {
         return;
     }
 
     int steps;
 
-    if (input.source == ClientHardwareEvent::Source::HostInputKeyboard)
+    if (event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
-        steps = static_cast<int>(*input.deltaValue);
+        steps = static_cast<int>(*event.deltaValue);
     }
     else
     {
-        float &acc = deltaAccumulators[input.componentId];
-        acc += *input.deltaValue;
+        float &acc = deltaAccumulators[event.componentId];
+        acc += *event.deltaValue;
         steps = static_cast<int>(acc);
         acc -= steps;
     }
@@ -263,32 +265,32 @@ void ClientHardwareController::handleDataWheel(const ClientHardwareEvent &input)
     }
 }
 
-void ClientHardwareController::handleSlider(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handleSlider(const ClientHardwareEvent &event)
 {
     auto slider = mpc.getHardware()->getSlider();
 
-    if (input.value)
+    if (event.value)
     {
-        slider->moveToNormalizedY(*input.value);
+        slider->moveToNormalizedY(*event.value);
         mpc.getScreen()->setSlider(std::round(slider->getValue()));
     }
-    else if (input.deltaValue && *input.deltaValue != 0.f)
+    else if (event.deltaValue && *event.deltaValue != 0.f)
     {
-        slider->setValue(slider->getValue() + *input.deltaValue);
+        slider->setValue(slider->getValue() + *event.deltaValue);
         mpc.getScreen()->setSlider(std::round(slider->getValue()));
     }
 }
 
-void ClientHardwareController::handlePot(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handlePot(const ClientHardwareEvent &event)
 {
     std::shared_ptr<Pot> pot =
-        input.componentId == ComponentId::REC_GAIN_POT ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
+        event.componentId == ComponentId::REC_GAIN_POT ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
 
-    pot->setValue(pot->getValue() + *input.deltaValue * 0.01f);
+    pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
 
-    if (input.componentId == ComponentId::REC_GAIN_POT)
+    if (event.componentId == ComponentId::REC_GAIN_POT)
     {
         audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
     }
@@ -298,13 +300,13 @@ void ClientHardwareController::handlePot(const ClientHardwareEvent &input)
     }
 }
 
-void ClientHardwareController::handleButtonPress(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent &event)
 {
-    auto button = mpc.getHardware()->getButton(input.componentId);
+    auto button = mpc.getHardware()->getButton(event.componentId);
 
-    // The below check is necessary because the keyboard mapping routines in mpc::input may return
+    // The below check is necessary because the keyboard mapping routines in mpc::event may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
-    // input handling, we can remove this check.
+    // event handling, we can remove this check.
     if (!button)
     {
         return;
@@ -312,12 +314,12 @@ void ClientHardwareController::handleButtonPress(const ClientHardwareEvent &inpu
 
     // Temporary hack. We actually want to synthesize repeat events ourselves, so we don't depend
     // on host-generated repeats. This way the behaviour is the same for keyboard, mouse, touch and
-    // MIDI input.
+    // MIDI event.
     static const auto allowRepeat = std::vector<ComponentId>{
         ComponentId::CURSOR_UP, ComponentId::CURSOR_RIGHT_OR_DIGIT,
         ComponentId::CURSOR_DOWN, ComponentId::CURSOR_LEFT_OR_DIGIT};
 
-    if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(), input.componentId) == allowRepeat.end())
+    if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(), event.componentId) == allowRepeat.end())
     {
         return;
     }
@@ -327,7 +329,7 @@ void ClientHardwareController::handleButtonPress(const ClientHardwareEvent &inpu
 
     using Id = ComponentId;
 
-    const auto id = input.componentId;
+    const auto id = event.componentId;
 
     if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screen); stepEditorScreen)
     {
@@ -584,13 +586,13 @@ void ClientHardwareController::handleButtonPress(const ClientHardwareEvent &inpu
     }
 }
 
-void ClientHardwareController::handleButtonRelease(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handleButtonRelease(const ClientHardwareEvent &event)
 {
-    auto button = mpc.getHardware()->getButton(input.componentId);
+    auto button = mpc.getHardware()->getButton(event.componentId);
 
-    // The below check is necessary because the keyboard mapping routines in mpc::input may return
+    // The below check is necessary because the keyboard mapping routines in mpc::event may return
     // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
-    // input handling, we can remove this check.
+    // event handling, we can remove this check.
     if (!button)
     {
         return;
@@ -600,7 +602,7 @@ void ClientHardwareController::handleButtonRelease(const ClientHardwareEvent &in
 
     using Id = ComponentId;
 
-    auto id = input.componentId;
+    auto id = event.componentId;
 
     if (id == Id::ERASE)
     {
@@ -640,27 +642,27 @@ void ClientHardwareController::handleButtonRelease(const ClientHardwareEvent &in
     }
 }
 
-void ClientHardwareController::handleButtonDoublePress(const ClientHardwareEvent &input)
+void ClientHardwareEventController::handleButtonDoublePress(const ClientHardwareEvent &event)
 {
-    auto button = mpc.getHardware()->getButton(input.componentId);
+    auto button = mpc.getHardware()->getButton(event.componentId);
 
-    if (input.componentId == ComponentId::REC || input.componentId == ComponentId::OVERDUB)
+    if (event.componentId == ComponentId::REC || event.componentId == ComponentId::OVERDUB)
     {
         if (!button->doublePress())
         {
             return;
         }
 
-        if (input.componentId == ComponentId::REC)
+        if (event.componentId == ComponentId::REC)
         {
-            buttonLockTracker.toggle(input.componentId);
+            buttonLockTracker.toggle(event.componentId);
 
             if (buttonLockTracker.isLocked(ComponentId::REC))
             {
                 buttonLockTracker.unlock(ComponentId::OVERDUB);
             }
         }
-        else if (input.componentId == ComponentId::OVERDUB)
+        else if (event.componentId == ComponentId::OVERDUB)
         {
             buttonLockTracker.toggle(ComponentId::OVERDUB);
 
@@ -672,6 +674,6 @@ void ClientHardwareController::handleButtonDoublePress(const ClientHardwareEvent
     }
     else
     {
-        handleButtonPress(input);
+        handleButtonPress(event);
     }
 }

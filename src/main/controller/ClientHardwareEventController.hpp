@@ -1,55 +1,28 @@
 #pragma once
 
 #include "hardware/ComponentId.hpp"
-#include "input/HostInputEvent.hpp"
-#include "input/HostToClientTranslator.hpp"
+
 #include "client/event/ClientHardwareEvent.hpp"
+#include "client/event/PhysicalPadPress.hpp"
 
 #include "controller/ButtonLockTracker.hpp"
-
-#include "mpc_fs.hpp"
-
-#include "input/KeyboardBindings.hpp"
 
 #include "lcdgui/ScreenComponent.hpp"
 
 #include <cassert>
 #include <memory>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::controller
 {
 
-    class ClientHardwareControllerBase
+    class ClientHardwareEventController
     {
     public:
-        struct PhysicalPadPress
-        {
-            int bankIndex;
-            std::shared_ptr<lcdgui::ScreenComponent> screen;
-            client::event::ClientHardwareEvent::Source inputSource;
-            std::optional<int> drumIndex;
-        };
+        ClientHardwareEventController(mpc::Mpc &);
 
-        explicit ClientHardwareControllerBase(const fs::path keyboardMappingConfigDirectory)
-            : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>())
-        {
-        }
-
-        void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
-        {
-            const auto clientInput = mpc::input::HostToClientTranslator::translate(hostEvent, keyboardBindings);
-
-            if (!clientInput.has_value())
-            {
-                printf("empty ClientHardwareEvent\n");
-                return;
-            }
-
-            handleInput(*clientInput);
-        }
-
-        virtual ~ClientHardwareControllerBase() = default;
-        virtual void handleInput(const mpc::client::event::ClientHardwareEvent &) = 0;
+        void handleClientHardwareEvent(const mpc::client::event::ClientHardwareEvent &event);
 
         ButtonLockTracker buttonLockTracker;
 
@@ -64,11 +37,6 @@ namespace mpc::controller
         void unlockNoteRepeat()
         {
             buttonLockTracker.unlock(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
-        }
-
-        std::shared_ptr<mpc::input::KeyboardBindings> getKeyboardBindings()
-        {
-            return keyboardBindings;
         }
 
         bool isPhysicallyPressed(const int physicalPadIndex, const int bankIndex) const
@@ -100,7 +68,7 @@ namespace mpc::controller
             physicalPadPresses[padIndex] = {bankIndex, screen, inputSource, drumIndex};
         }
 
-        PhysicalPadPress registerPhysicalPadRelease(const int padIndex)
+        client::event::PhysicalPadPress registerPhysicalPadRelease(const int padIndex)
         {
             assert(physicalPadPresses.count(padIndex) == 1);
             const auto result = physicalPadPresses[padIndex];
@@ -113,10 +81,20 @@ namespace mpc::controller
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
 
     private:
-        std::shared_ptr<mpc::input::KeyboardBindings> keyboardBindings;
-        //
+        void handlePadPress(const client::event::ClientHardwareEvent &);
+        void handlePadAftertouch(const client::event::ClientHardwareEvent &);
+        void handlePadRelease(const client::event::ClientHardwareEvent &);
+        void handleDataWheel(const client::event::ClientHardwareEvent &);
+        void handleSlider(const client::event::ClientHardwareEvent &);
+        void handlePot(const client::event::ClientHardwareEvent &);
+        void handleButtonPress(const client::event::ClientHardwareEvent &);
+        void handleButtonRelease(const client::event::ClientHardwareEvent &);
+        void handleButtonDoublePress(const client::event::ClientHardwareEvent &);
+        
         // Maps physical pad index 0 - 15 to info at the time the pad was pushed.
-        std::unordered_map<int, PhysicalPadPress> physicalPadPresses;
+        std::unordered_map<int, client::event::PhysicalPadPress> physicalPadPresses;
+
+        mpc::Mpc &mpc;
     };
 
 } // namespace mpc::controller

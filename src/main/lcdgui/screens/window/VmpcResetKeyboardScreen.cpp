@@ -1,5 +1,5 @@
 #include "VmpcResetKeyboardScreen.hpp"
-#include "controller/ClientHardwareControllerBase.hpp"
+#include "controller/ClientEventController.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -18,7 +18,7 @@ void VmpcResetKeyboardScreen::function(int i)
         mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
         break;
     case 4:
-        mpc.inputController->getKeyboardBindings()->initializeDefaults();
+        mpc.clientEventController->getKeyboardBindings()->initializeDefaults();
         mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
         break;
     }
