@@ -7,6 +7,11 @@
 #include "ClientMidiInputSynchronizationController.hpp"
 #include "lcdgui/screens/MidiSwScreen.hpp"
 
+namespace mpc::sequencer
+{
+    class Sequencer;
+}
+
 namespace mpc::controller
 {
     class ClientHardwareEventController;
@@ -22,7 +27,7 @@ namespace mpc::controller
         std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
 
     public:
-        ClientMidiEventController(std::shared_ptr<ClientHardwareEventController>, std::shared_ptr<lcdgui::screens::MidiSwScreen>);
+        ClientMidiEventController(std::shared_ptr<ClientHardwareEventController>, std::shared_ptr<lcdgui::screens::MidiSwScreen>, std::shared_ptr<sequencer::Sequencer>);
 
         void handleClientMidiEvent(const mpc::client::event::ClientMidiEvent &);
     };

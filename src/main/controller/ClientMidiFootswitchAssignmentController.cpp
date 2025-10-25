@@ -15,30 +15,98 @@ using namespace mpc::hardware;
 
 ClientMidiFootswitchAssignmentController::ClientMidiFootswitchAssignmentController(
         std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
-        std::shared_ptr<MidiSwScreen> midiSwScreenToUse)
+        std::shared_ptr<MidiSwScreen> midiSwScreenToUse,
+        std::shared_ptr<sequencer::Sequencer> sequencerToUse)
     : clientHardwareEventController(clientHardwareEventControllerToUse),
-    midiSwScreen(midiSwScreenToUse)
+    midiSwScreen(midiSwScreenToUse),
+    sequencer(sequencerToUse)
 {
+}
+
+void ClientMidiFootswitchAssignmentController::pressButton(hardware::ComponentId componentId)
+{
+    ClientHardwareEvent ev;
+    ev.source = ClientHardwareEvent::Source::HostInputMidi;
+    ev.componentId = componentId;
+    ev.type = ClientHardwareEvent::Type::ButtonPress;
+    clientHardwareEventController->handleClientHardwareEvent(ev);
+}
+
+void ClientMidiFootswitchAssignmentController::releaseButton(hardware::ComponentId componentId)
+{
+    ClientHardwareEvent ev;
+    ev.source = ClientHardwareEvent::Source::HostInputMidi;
+    ev.componentId = componentId;
+    ev.type = ClientHardwareEvent::Type::ButtonRelease;
+    clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
 void ClientMidiFootswitchAssignmentController::triggerDualButtonCombo(ComponentId first, ComponentId second)
 {
-    ClientHardwareEvent firstEv;
-    firstEv.componentId = first;
-    firstEv.source = ClientHardwareEvent::Source::HostInputMidi;
-    firstEv.type = ClientHardwareEvent::Type::ButtonPress;
-    clientHardwareEventController->handleClientHardwareEvent(firstEv);
+    pressButton(first);
+    pressButton(second);
+    releaseButton(second);
+    releaseButton(first);
+}
 
-    ClientHardwareEvent secondEv;
-    secondEv.componentId = second;
-    secondEv.source = ClientHardwareEvent::Source::HostInputMidi;
-    secondEv.type = ClientHardwareEvent::Type::ButtonPress;
-    clientHardwareEventController->handleClientHardwareEvent(secondEv);
+void ClientMidiFootswitchAssignmentController::handleStopToPlay()
+{
+    pressButton(ComponentId::PLAY);
+    releaseButton(ComponentId::PLAY);
+}
 
-    secondEv.type = ClientHardwareEvent::Type::ButtonRelease;
-    clientHardwareEventController->handleClientHardwareEvent(secondEv);
-    firstEv.type = ClientHardwareEvent::Type::ButtonRelease;
-    clientHardwareEventController->handleClientHardwareEvent(firstEv);
+void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
+{
+    pressButton(ComponentId::REC);
+    releaseButton(ComponentId::REC);
+}
+
+void ClientMidiFootswitchAssignmentController::handleRecPunch()
+{
+    std::cout << "[FootswitchAssignment] Handling REC/PUNCH" << std::endl;
+    
+    if (!sequencer->isPlaying())
+    {
+        // STOP mode -> PLAY mode
+        handleStopToPlay();
+    }
+    else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
+    {
+        // PLAY mode -> REC (Punch-in) mode
+        pressButton(ComponentId::REC);
+        pressButton(ComponentId::PLAY);
+        releaseButton(ComponentId::PLAY);
+        releaseButton(ComponentId::REC);
+    }
+    else if (sequencer->isRecording())
+    {
+        // REC mode -> PLAY (Punch-out) mode
+        handleRecordingToPlay();
+    }
+}
+
+void ClientMidiFootswitchAssignmentController::handleOdubPunch()
+{
+    std::cout << "[FootswitchAssignment] Handling ODUB/PNCH" << std::endl;
+    
+    if (!sequencer->isPlaying())
+    {
+        // STOP mode -> PLAY mode
+        handleStopToPlay();
+    }
+    else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
+    {
+        // PLAY mode -> OVERDUB (Punch-in) mode
+        pressButton(ComponentId::OVERDUB);
+        pressButton(ComponentId::PLAY);
+        releaseButton(ComponentId::PLAY);
+        releaseButton(ComponentId::OVERDUB);
+    }
+    else if (sequencer->isOverdubbing())
+    {
+        // OVERDUB mode -> PLAY (Punch-out) mode
+        handleRecordingToPlay();
+    }
 }
 
 void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent &e)
@@ -153,9 +221,19 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
             continue;
         }
-        else if (fn == "REC/PUNCH" || fn == "ODUB/PNCH")
+        else if (fn == "REC/PUNCH")
         {
-            std::cout << "[FootswitchAssignment] Stub for multi-button combo: " << fn << std::endl;
+            if (pressed)
+            {
+                handleRecPunch();
+            }
+        }
+        else if (fn == "ODUB/PNCH")
+        {
+            if (pressed)
+            {
+                handleOdubPunch();
+            }
         }
     }
 }

@@ -7,10 +7,11 @@ using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
 
 ClientMidiEventController::ClientMidiEventController(std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
-                                                     std::shared_ptr<MidiSwScreen> midiSwScreen)
+                                                     std::shared_ptr<MidiSwScreen> midiSwScreen,
+                                                     std::shared_ptr<sequencer::Sequencer> sequencer)
     : clientHardwareEventController(clientHardwareEventControllerToUse)
 {
-    footswitchController = std::make_shared<ClientMidiFootswitchAssignmentController>(clientHardwareEventController, midiSwScreen);
+    footswitchController = std::make_shared<ClientMidiFootswitchAssignmentController>(clientHardwareEventController, midiSwScreen, sequencer);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)

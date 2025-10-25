@@ -12,7 +12,7 @@ ClientEventController::ClientEventController(mpc::Mpc &mpc)
     : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>())
 {
     clientHardwareEventController = std::make_shared<ClientHardwareEventController>(mpc);
-    clientMidiEventController = std::make_shared<ClientMidiEventController>(clientHardwareEventController, mpc.screens->get<MidiSwScreen>());
+    clientMidiEventController = std::make_shared<ClientMidiEventController>(clientHardwareEventController, mpc.screens->get<MidiSwScreen>(), mpc.getSequencer());
 }
 
 void ClientEventController::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
