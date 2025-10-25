@@ -1,6 +1,9 @@
 #pragma once
 
-#include "../client/event/ClientMidiEvent.hpp"
+#include "client/event/ClientMidiEvent.hpp"
+
+#include "hardware/ComponentId.hpp"
+
 #include <memory>
 
 namespace mpc::lcdgui::screens
@@ -24,5 +27,7 @@ namespace mpc::controller
     private:
         std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
         std::shared_ptr<lcdgui::screens::MidiSwScreen> midiSwScreen;
+
+        void triggerDualButtonCombo(hardware::ComponentId first, hardware::ComponentId second);
     };
 } // namespace mpc::controller
