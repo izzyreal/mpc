@@ -109,6 +109,12 @@ namespace mpc::sequencer
         int activeTrackIndex = 0;
         double tempo = 120.0;
         int nextSq = -1;
+        
+        // Punch properties
+        bool punchEnabled = false;
+        int autoPunchMode = 0;
+        int punchInTime = 0;
+        int punchOutTime = 0;
 
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         void play(bool fromStart);
@@ -230,5 +236,15 @@ namespace mpc::sequencer
         void setOverdubbing(bool b);
         void playMetronomeTrack();
         void stopMetronomeTrack();
+        
+        // Punch property getters and setters
+        bool isPunchEnabled();
+        void setPunchEnabled(bool enabled);
+        int getAutoPunchMode();
+        void setAutoPunchMode(int mode);
+        int getPunchInTime();
+        void setPunchInTime(int time);
+        int getPunchOutTime();
+        void setPunchOutTime(int time);
     };
 } // namespace mpc::sequencer

@@ -2064,3 +2064,46 @@ void Sequencer::resetPlayedStepRepetitions()
 {
     playedStepRepetitions = 0;
 }
+
+bool Sequencer::isPunchEnabled()
+{
+    return punchEnabled;
+}
+
+void Sequencer::setPunchEnabled(bool enabled)
+{
+    punchEnabled = enabled;
+}
+
+int Sequencer::getAutoPunchMode()
+{
+    return autoPunchMode;
+}
+
+void Sequencer::setAutoPunchMode(int mode)
+{
+    if (mode >= 0 && mode <= 2)
+    {
+        autoPunchMode = mode;
+    }
+}
+
+int Sequencer::getPunchInTime()
+{
+    return punchInTime;
+}
+
+void Sequencer::setPunchInTime(int time)
+{
+    punchInTime = time;
+}
+
+int Sequencer::getPunchOutTime()
+{
+    return punchOutTime;
+}
+
+void Sequencer::setPunchOutTime(int time)
+{
+    punchOutTime = time;
+}
