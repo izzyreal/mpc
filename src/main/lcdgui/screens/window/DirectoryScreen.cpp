@@ -59,191 +59,191 @@ void DirectoryScreen::function(int f)
 
     switch (f)
     {
-    case 1:
-        if (!getSelectedFile())
-        {
-            return;
-        }
-
-        if (getSelectedFile()->isDirectory())
-        {
-            mpc.getLayeredScreen()->openScreen<DeleteFolderScreen>();
-        }
-        else
-        {
-            mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
-        }
-
-        break;
-    case 2:
-    {
-        auto file = getSelectedFile();
-
-        if (!file)
-        {
-            return;
-        }
-
-        auto fileName = mpc::Util::splitName(getSelectedFile()->getName())[0];
-
-        const auto enterAction = [this, fileName, file](std::string &nameScreenName)
-        {
-            auto ext = mpc::Util::splitName(file->getName())[1];
-
-            if (ext.length() > 0)
-            {
-                ext = "." + ext;
-            }
-
-            const auto finalNewName = StrUtil::trim(StrUtil::toUpper(nameScreenName)) + ext;
-            const bool isDirectory = file->isDirectory();
-            const auto success = file->setName(finalNewName);
-
-            if (!success)
-            {
-                ls->showPopupAndAwaitInteraction("File name exists !!");
-                return;
-            }
-
-            const auto disk = mpc.getDisk();
-            disk->flush();
-
-            if (isDirectory && getXPos() == 0)
-            {
-                disk->moveBack();
-                disk->initFiles();
-                disk->moveForward(finalNewName);
-                disk->initFiles();
-
-                auto parentFileNames = disk->getParentFileNames();
-                auto it = find(begin(parentFileNames), end(parentFileNames), finalNewName);
-
-                auto index = distance(begin(parentFileNames), it);
-
-                if (index > 4)
-                {
-                    setYOffset0(index - 4);
-                    setYPos0(4);
-                }
-                else
-                {
-                    setYOffset0(0);
-                    setYPos0(index);
-                }
-            }
-
-            disk->initFiles();
-            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
-        };
-
-        nameScreen->initialize(
-            getSelectedFile()->getNameWithoutExtension(),
-            file->isDirectory() ? 8 : 16,
-            enterAction,
-            "directory");
-
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
-
-        break;
-    }
-    case 4:
-    {
-        if (xPos == 0)
-        {
-            return;
-        }
-
-        auto enterAction = [this, disk, loadScreen](std::string &nameScreenName)
-        {
-            bool success = disk->newFolder(StrUtil::toUpper(nameScreenName));
-
-            if (!success)
-            {
-                mpc.getLayeredScreen()->openScreen<PopupScreen>();
-
-                std::string msg;
-
-                if (disk->getVolume().mode == MountMode::READ_ONLY)
-                {
-                    msg = "Disk is read only !!";
-                }
-                else
-                {
-                    msg = "Folder name exists !!";
-                }
-
-                ls->showPopupAndThenOpen<NameScreen>(msg, 1000);
-                return;
-            }
-
-            disk->flush();
-            disk->initFiles();
-            auto counter = 0;
-
-            for (int i = 0; i < disk->getFileNames().size(); i++)
-            {
-                if (disk->getFileName(i) == StrUtil::toUpper(nameScreenName))
-                {
-                    loadScreen->setFileLoad(counter);
-
-                    if (counter > 4)
-                    {
-                        yOffset1 = counter - 4;
-                    }
-                    else
-                    {
-                        yOffset1 = 0;
-                    }
-
-                    break;
-                }
-                counter++;
-            }
-
-            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
-        };
-
-        nameScreen->initialize("NEWFOLDR", 8, enterAction, "directory");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
-        break;
-    }
-    case 5:
-    {
-        auto file = loadScreen->getSelectedFile();
-
-        if (!file->isDirectory())
-        {
-            auto ext = fs::path(file->getName()).extension().string();
-
-            bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
-            bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
-
-            if (!isWav && !isSnd)
+        case 1:
+            if (!getSelectedFile())
             {
                 return;
             }
 
-            const auto audioServerSampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
-
-            bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(
-                file->getInputStream(),
-                isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV,
-                audioServerSampleRate);
-
-            auto name = file->getNameWithoutExtension();
-
-            if (started)
+            if (getSelectedFile()->isDirectory())
             {
-                ls->showPopupAndAwaitInteraction("Playing " + name);
+                mpc.getLayeredScreen()->openScreen<DeleteFolderScreen>();
             }
             else
             {
-                ls->showPopupAndAwaitInteraction("Can't play " + name);
+                mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
             }
-        }
 
-        break;
-    }
+            break;
+        case 2:
+        {
+            auto file = getSelectedFile();
+
+            if (!file)
+            {
+                return;
+            }
+
+            auto fileName = mpc::Util::splitName(getSelectedFile()->getName())[0];
+
+            const auto enterAction = [this, fileName, file](std::string &nameScreenName)
+            {
+                auto ext = mpc::Util::splitName(file->getName())[1];
+
+                if (ext.length() > 0)
+                {
+                    ext = "." + ext;
+                }
+
+                const auto finalNewName = StrUtil::trim(StrUtil::toUpper(nameScreenName)) + ext;
+                const bool isDirectory = file->isDirectory();
+                const auto success = file->setName(finalNewName);
+
+                if (!success)
+                {
+                    ls->showPopupAndAwaitInteraction("File name exists !!");
+                    return;
+                }
+
+                const auto disk = mpc.getDisk();
+                disk->flush();
+
+                if (isDirectory && getXPos() == 0)
+                {
+                    disk->moveBack();
+                    disk->initFiles();
+                    disk->moveForward(finalNewName);
+                    disk->initFiles();
+
+                    auto parentFileNames = disk->getParentFileNames();
+                    auto it = find(begin(parentFileNames), end(parentFileNames), finalNewName);
+
+                    auto index = distance(begin(parentFileNames), it);
+
+                    if (index > 4)
+                    {
+                        setYOffset0(index - 4);
+                        setYPos0(4);
+                    }
+                    else
+                    {
+                        setYOffset0(0);
+                        setYPos0(index);
+                    }
+                }
+
+                disk->initFiles();
+                mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+            };
+
+            nameScreen->initialize(
+                getSelectedFile()->getNameWithoutExtension(),
+                file->isDirectory() ? 8 : 16,
+                enterAction,
+                "directory");
+
+            mpc.getLayeredScreen()->openScreen<NameScreen>();
+
+            break;
+        }
+        case 4:
+        {
+            if (xPos == 0)
+            {
+                return;
+            }
+
+            auto enterAction = [this, disk, loadScreen](std::string &nameScreenName)
+            {
+                bool success = disk->newFolder(StrUtil::toUpper(nameScreenName));
+
+                if (!success)
+                {
+                    mpc.getLayeredScreen()->openScreen<PopupScreen>();
+
+                    std::string msg;
+
+                    if (disk->getVolume().mode == MountMode::READ_ONLY)
+                    {
+                        msg = "Disk is read only !!";
+                    }
+                    else
+                    {
+                        msg = "Folder name exists !!";
+                    }
+
+                    ls->showPopupAndThenOpen<NameScreen>(msg, 1000);
+                    return;
+                }
+
+                disk->flush();
+                disk->initFiles();
+                auto counter = 0;
+
+                for (int i = 0; i < disk->getFileNames().size(); i++)
+                {
+                    if (disk->getFileName(i) == StrUtil::toUpper(nameScreenName))
+                    {
+                        loadScreen->setFileLoad(counter);
+
+                        if (counter > 4)
+                        {
+                            yOffset1 = counter - 4;
+                        }
+                        else
+                        {
+                            yOffset1 = 0;
+                        }
+
+                        break;
+                    }
+                    counter++;
+                }
+
+                mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+            };
+
+            nameScreen->initialize("NEWFOLDR", 8, enterAction, "directory");
+            mpc.getLayeredScreen()->openScreen<NameScreen>();
+            break;
+        }
+        case 5:
+        {
+            auto file = loadScreen->getSelectedFile();
+
+            if (!file->isDirectory())
+            {
+                auto ext = fs::path(file->getName()).extension().string();
+
+                bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
+                bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
+
+                if (!isWav && !isSnd)
+                {
+                    return;
+                }
+
+                const auto audioServerSampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+
+                bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(
+                    file->getInputStream(),
+                    isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV,
+                    audioServerSampleRate);
+
+                auto name = file->getNameWithoutExtension();
+
+                if (started)
+                {
+                    ls->showPopupAndAwaitInteraction("Playing " + name);
+                }
+                else
+                {
+                    ls->showPopupAndAwaitInteraction("Can't play " + name);
+                }
+            }
+
+            break;
+        }
     }
 }
 

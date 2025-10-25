@@ -95,56 +95,56 @@ void MonoToStereoScreen::function(int j)
 
     switch (j)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
-        break;
-    case 4:
-    {
-        auto right = sampler->getSortedSounds()[rSource].first;
-        if (!sampler->getSound()->isMono() || !right->isMono())
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            break;
+        case 4:
         {
-            return;
-        }
-
-        for (auto &s : sampler->getSounds())
-        {
-            if (s->getName() == newStName)
+            auto right = sampler->getSortedSounds()[rSource].first;
+            if (!sampler->getSound()->isMono() || !right->isMono())
             {
-                ls->showPopupAndAwaitInteraction("Name already used");
                 return;
             }
-        }
 
-        auto left = sampler->getSound();
-
-        auto newSampleDataRight = std::make_shared<std::vector<float>>();
-
-        if (right->getSampleRate() > left->getSampleRate())
-        {
-            newSampleDataRight->resize(left->getSampleData()->size());
-
-            for (int i = 0; i < newSampleDataRight->size(); i++)
+            for (auto &s : sampler->getSounds())
             {
-                (*newSampleDataRight)[i] = (*right->getSampleData())[i];
+                if (s->getName() == newStName)
+                {
+                    ls->showPopupAndAwaitInteraction("Name already used");
+                    return;
+                }
             }
-        }
-        else
-        {
-            (*newSampleDataRight) = *right->getSampleData();
-        }
 
-        auto newSound = sampler->addSound(left->getSampleRate());
+            auto left = sampler->getSound();
 
-        if (newSound == nullptr)
-        {
-            return;
+            auto newSampleDataRight = std::make_shared<std::vector<float>>();
+
+            if (right->getSampleRate() > left->getSampleRate())
+            {
+                newSampleDataRight->resize(left->getSampleData()->size());
+
+                for (int i = 0; i < newSampleDataRight->size(); i++)
+                {
+                    (*newSampleDataRight)[i] = (*right->getSampleData())[i];
+                }
+            }
+            else
+            {
+                (*newSampleDataRight) = *right->getSampleData();
+            }
+
+            auto newSound = sampler->addSound(left->getSampleRate());
+
+            if (newSound == nullptr)
+            {
+                return;
+            }
+
+            newSound->setName(newStName);
+            sampler->mergeToStereo(left->getSampleData(), newSampleDataRight, newSound->getMutableSampleData());
+            newSound->setMono(false);
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
         }
-
-        newSound->setName(newStName);
-        sampler->mergeToStereo(left->getSampleData(), newSampleDataRight, newSound->getMutableSampleData());
-        newSound->setMono(false);
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
-    }
     }
 }
 

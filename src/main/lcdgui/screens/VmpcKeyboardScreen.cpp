@@ -148,88 +148,88 @@ void VmpcKeyboardScreen::function(int i)
 {
     switch (i)
     {
-    case 0:
-        if (learning)
-        {
-            return;
-        }
+        case 0:
+            if (learning)
+            {
+                return;
+            }
 
-        if (hasMappingChanged())
-        {
-            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-            screen->nextScreen = "vmpc-settings";
-            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-            return;
-        }
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                screen->nextScreen = "vmpc-settings";
+                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                return;
+            }
 
-        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-        break;
-    case 2:
-        if (learning)
-        {
-            setLearning(false);
+            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            break;
+        case 2:
+            if (learning)
+            {
+                setLearning(false);
+                setLearnCandidate(-1);
+                updateRows();
+                return;
+            }
+
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                screen->nextScreen = "vmpc-auto-save";
+                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                return;
+            }
+
+            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            break;
+        case 3:
+            if (learning)
+            {
+                // const auto kbMapping = mpc.clientEventController->clientHardwareEventController->getKbMapping();
+                // const auto mapping = kbMapping->getLabelKeyMap()[row + rowOffset];
+                // const auto oldKeyCode = mapping.second;
+
+                // if (learnCandidate != oldKeyCode)
+                {
+                    // kbMapping->setKeyCodeForLabel(learnCandidate, mapping.first);
+                }
+            }
+
+            setLearning(!learning);
+
             setLearnCandidate(-1);
             updateRows();
-            return;
-        }
-
-        if (hasMappingChanged())
-        {
-            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-            screen->nextScreen = "vmpc-auto-save";
-            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-            return;
-        }
-
-        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-        break;
-    case 3:
-        if (learning)
-        {
-            // const auto kbMapping = mpc.clientEventController->clientHardwareEventController->getKbMapping();
-            // const auto mapping = kbMapping->getLabelKeyMap()[row + rowOffset];
-            // const auto oldKeyCode = mapping.second;
-
-            // if (learnCandidate != oldKeyCode)
+            break;
+        case 4:
+            if (learning)
             {
-                // kbMapping->setKeyCodeForLabel(learnCandidate, mapping.first);
+                return;
             }
-        }
 
-        setLearning(!learning);
+            mpc.getLayeredScreen()->openScreen<VmpcResetKeyboardScreen>();
+            break;
+        case 5:
+            if (learning)
+            {
+                return;
+            }
 
-        setLearnCandidate(-1);
-        updateRows();
-        break;
-    case 4:
-        if (learning)
-        {
-            return;
-        }
+            std::string popupMsg;
 
-        mpc.getLayeredScreen()->openScreen<VmpcResetKeyboardScreen>();
-        break;
-    case 5:
-        if (learning)
-        {
-            return;
-        }
+            if (hasMappingChanged())
+            {
+                // mpc.clientEventController->clientHardwareEventController->getKbMapping()->exportMapping();
+                popupMsg = "Keyboard mapping saved";
+            }
+            else
+            {
+                popupMsg = "Keyboard mapping unchanged";
+            }
 
-        std::string popupMsg;
+            ls->showPopupForMs(popupMsg, 1000);
 
-        if (hasMappingChanged())
-        {
-            // mpc.clientEventController->clientHardwareEventController->getKbMapping()->exportMapping();
-            popupMsg = "Keyboard mapping saved";
-        }
-        else
-        {
-            popupMsg = "Keyboard mapping unchanged";
-        }
-
-        ls->showPopupForMs(popupMsg, 1000);
-
-        break;
+            break;
     }
 }
 

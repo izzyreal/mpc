@@ -27,13 +27,13 @@ void Assign16LevelsScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-    {
-        mpc.setSixteenLevelsEnabled(true);
-        mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    }
+        case 4:
+        {
+            mpc.setSixteenLevelsEnabled(true);
+            mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        }
     }
 }
 

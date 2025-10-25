@@ -12,7 +12,10 @@
 #include <cassert>
 #include <memory>
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
 namespace mpc::controller
 {
@@ -90,7 +93,7 @@ namespace mpc::controller
         void handleButtonPress(const client::event::ClientHardwareEvent &);
         void handleButtonRelease(const client::event::ClientHardwareEvent &);
         void handleButtonDoublePress(const client::event::ClientHardwareEvent &);
-        
+
         // Maps physical pad index 0 - 15 to info at the time the pad was pushed.
         std::unordered_map<int, client::event::PhysicalPadPress> physicalPadPresses;
 

@@ -37,18 +37,18 @@ std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     {
         switch (bytes[EVENT_ID_OFFSET])
         {
-        case POLY_PRESSURE_ID:
-            return AllPolyPressureEvent::bytesToMpcEvent(bytes);
-        case CONTROL_CHANGE_ID:
-            return AllControlChangeEvent::bytesToMpcEvent(bytes);
-        case PGM_CHANGE_ID:
-            return AllPolyPressureEvent::bytesToMpcEvent(bytes);
-        case CH_PRESSURE_ID:
-            return AllChannelPressureEvent::bytesToMpcEvent(bytes);
-        case PITCH_BEND_ID:
-            return AllPitchBendEvent::bytesToMpcEvent(bytes);
-        case SYS_EX_ID:
-            return AllSysExEvent::bytesToMpcEvent(bytes);
+            case POLY_PRESSURE_ID:
+                return AllPolyPressureEvent::bytesToMpcEvent(bytes);
+            case CONTROL_CHANGE_ID:
+                return AllControlChangeEvent::bytesToMpcEvent(bytes);
+            case PGM_CHANGE_ID:
+                return AllPolyPressureEvent::bytesToMpcEvent(bytes);
+            case CH_PRESSURE_ID:
+                return AllChannelPressureEvent::bytesToMpcEvent(bytes);
+            case PITCH_BEND_ID:
+                return AllPitchBendEvent::bytesToMpcEvent(bytes);
+            case SYS_EX_ID:
+                return AllSysExEvent::bytesToMpcEvent(bytes);
         }
     }
 

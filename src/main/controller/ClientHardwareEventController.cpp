@@ -57,39 +57,39 @@ void ClientHardwareEventController::handleClientHardwareEvent(const ClientHardwa
 
     switch (event.type)
     {
-    case ClientHardwareEvent::Type::PadPress:
-        handlePadPress(event);
-        break;
-    case ClientHardwareEvent::Type::PadAftertouch:
-        handlePadAftertouch(event);
-        break;
-    case ClientHardwareEvent::Type::PadRelease:
-        handlePadRelease(event);
-        break;
-    case ClientHardwareEvent::Type::DataWheelTurn:
-        handleDataWheel(event);
-        break;
-    case ClientHardwareEvent::Type::SliderMove:
-        handleSlider(event);
-        break;
-    case ClientHardwareEvent::Type::PotMove:
-        handlePot(event);
-        break;
-    case ClientHardwareEvent::Type::ButtonPress:
-        handleButtonPress(event);
-        break;
-    case ClientHardwareEvent::Type::ButtonRelease:
-        handleButtonRelease(event);
-        break;
-    case ClientHardwareEvent::Type::ButtonDoublePress:
-        handleButtonDoublePress(event);
-        break;
-    case ClientHardwareEvent::Type::ButtonPressAndRelease:
-        handleButtonPress(event);
-        handleButtonRelease(event);
-        break;
-    default:
-        break;
+        case ClientHardwareEvent::Type::PadPress:
+            handlePadPress(event);
+            break;
+        case ClientHardwareEvent::Type::PadAftertouch:
+            handlePadAftertouch(event);
+            break;
+        case ClientHardwareEvent::Type::PadRelease:
+            handlePadRelease(event);
+            break;
+        case ClientHardwareEvent::Type::DataWheelTurn:
+            handleDataWheel(event);
+            break;
+        case ClientHardwareEvent::Type::SliderMove:
+            handleSlider(event);
+            break;
+        case ClientHardwareEvent::Type::PotMove:
+            handlePot(event);
+            break;
+        case ClientHardwareEvent::Type::ButtonPress:
+            handleButtonPress(event);
+            break;
+        case ClientHardwareEvent::Type::ButtonRelease:
+            handleButtonRelease(event);
+            break;
+        case ClientHardwareEvent::Type::ButtonDoublePress:
+            handleButtonDoublePress(event);
+            break;
+        case ClientHardwareEvent::Type::ButtonPressAndRelease:
+            handleButtonPress(event);
+            handleButtonRelease(event);
+            break;
+        default:
+            break;
     }
 }
 

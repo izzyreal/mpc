@@ -79,41 +79,41 @@ void LoopScreen::function(int f)
 
     switch (f)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<TrimScreen>();
-        break;
-    case 1:
-    {
-        sampler->switchToNextSoundSortType();
-        ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
-        break;
-    }
-    case 2:
-        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
-        break;
-    case 4:
-    {
-        if (sampler->getSoundCount() == 0)
+        case 0:
+            mpc.getLayeredScreen()->openScreen<TrimScreen>();
+            break;
+        case 1:
         {
-            return;
+            sampler->switchToNextSoundSortType();
+            ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            break;
         }
-
-        auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
-        editSoundScreen->setReturnToScreenName("loop");
-        mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
-        break;
-    }
-    case 5:
-        if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed())
+        case 2:
+            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
+            break;
+        case 4:
         {
-            return;
-        }
+            if (sampler->getSoundCount() == 0)
+            {
+                return;
+            }
 
-        sampler->playX();
-        break;
+            auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
+            editSoundScreen->setReturnToScreenName("loop");
+            mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+            break;
+        }
+        case 5:
+            if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed())
+            {
+                return;
+            }
+
+            sampler->playX();
+            break;
     }
 }
 

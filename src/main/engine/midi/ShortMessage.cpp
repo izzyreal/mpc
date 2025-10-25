@@ -80,41 +80,41 @@ int ShortMessage::getDataLength(int status)
     // system common and system real-time messages
     switch (status)
     {
-    case 0xF6: // Tune Request
-    case 0xF7: // EOX
-               // System real-time messages
-    case 0xF8: // Timing Clock
-    case 0xF9: // Undefined
-    case 0xFA: // Start
-    case 0xFB: // Continue
-    case 0xFC: // Stop
-    case 0xFD: // Undefined
-    case 0xFE: // Active Sensing
-    case 0xFF: // System Reset
-        return 0;
-    case 0xF1: // MTC Quarter Frame
-    case 0xF3: // Song Select
-        return 1;
-    case 0xF2: // Song Position Pointer
-        return 2;
-    default:
-        break;
+        case 0xF6: // Tune Request
+        case 0xF7: // EOX
+                   // System real-time messages
+        case 0xF8: // Timing Clock
+        case 0xF9: // Undefined
+        case 0xFA: // Start
+        case 0xFB: // Continue
+        case 0xFC: // Stop
+        case 0xFD: // Undefined
+        case 0xFE: // Active Sensing
+        case 0xFF: // System Reset
+            return 0;
+        case 0xF1: // MTC Quarter Frame
+        case 0xF3: // Song Select
+            return 1;
+        case 0xF2: // Song Position Pointer
+            return 2;
+        default:
+            break;
     }
 
     // channel voice and mode messages
     switch (status & 0xF0)
     {
-    case 0x80:
-    case 0x90:
-    case 0xA0:
-    case 0xB0:
-    case 0xE0:
-        return 2;
-    case 0xC0:
-    case 0xD0:
-        return 1;
-    default:
-        return -1;
+        case 0x80:
+        case 0x90:
+        case 0xA0:
+        case 0xB0:
+        case 0xE0:
+            return 2;
+        case 0xC0:
+        case 0xD0:
+            return 1;
+        default:
+            return -1;
     }
 }
 

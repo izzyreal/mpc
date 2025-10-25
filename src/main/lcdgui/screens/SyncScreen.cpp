@@ -76,10 +76,10 @@ void SyncScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-        tab = 2;
-        mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
-        break;
+        case 2:
+            tab = 2;
+            mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
+            break;
     }
 }
 

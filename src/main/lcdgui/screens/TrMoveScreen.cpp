@@ -110,42 +110,42 @@ void TrMoveScreen::function(int i)
 {
     switch (i)
     {
-    // Intentional fall-through
-    case 0:
-    case 1:
-    case 3:
-    {
-        auto eventsScreen = mpc.screens->get<EventsScreen>();
-        eventsScreen->tab = i;
-        mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
-        break;
-    }
-    case 4:
-        if (isSelected())
+        // Intentional fall-through
+        case 0:
+        case 1:
+        case 3:
         {
-            cancel();
-        }
-        break;
-    case 5:
-    {
-        const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-        if (focusedFieldName == "sq")
-        {
+            auto eventsScreen = mpc.screens->get<EventsScreen>();
+            eventsScreen->tab = i;
+            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
+        case 4:
+            if (isSelected())
+            {
+                cancel();
+            }
+            break;
+        case 5:
+        {
+            const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-        if (isSelected())
-        {
-            auto sequence = sequencer.lock()->getActiveSequence();
-            insert(sequence.get());
+            if (focusedFieldName == "sq")
+            {
+                break;
+            }
+
+            if (isSelected())
+            {
+                auto sequence = sequencer.lock()->getActiveSequence();
+                insert(sequence.get());
+            }
+            else
+            {
+                select();
+            }
+            break;
         }
-        else
-        {
-            select();
-        }
-        break;
-    }
     }
 }
 

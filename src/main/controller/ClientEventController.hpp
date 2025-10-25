@@ -5,13 +5,18 @@
 #include "input/HostToClientTranslator.hpp"
 #include "input/KeyboardBindings.hpp"
 
-namespace mpc { class Mpc; }
+namespace mpc
+{
+    class Mpc;
+}
 
-namespace mpc::controller {
+namespace mpc::controller
+{
 
     class ClientHardwareEventController;
 
-    class ClientEventController {
+    class ClientEventController
+    {
 
     public:
         ClientEventController(mpc::Mpc &);
@@ -30,4 +35,4 @@ namespace mpc::controller {
     private:
         std::shared_ptr<mpc::input::KeyboardBindings> keyboardBindings;
     };
-}
+} // namespace mpc::controller

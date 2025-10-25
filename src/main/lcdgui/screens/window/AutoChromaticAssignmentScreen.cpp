@@ -41,39 +41,39 @@ void AutoChromaticAssignmentScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    case 4:
-    {
-        auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
-        newProgram->setName(newName);
-
-        for (int j = 35; j <= 98; j++)
+        case 3:
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        case 4:
         {
-            auto pad = newProgram->getPad(j - 35);
-            pad->setNote(j);
-            auto noteParameters = new NoteParameters(j - 35);
-            newProgram->setNoteParameters(j - 35, noteParameters);
-            noteParameters->setSoundIndex(sourceSoundIndex);
+            auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
+            newProgram->setName(newName);
 
-            noteParameters->setTune(((j - originalKey) * 10) + tune);
-        }
-
-        auto programs = sampler->getPrograms();
-
-        for (int j = 0; j < programs.size(); j++)
-        {
-            if (programs[j].lock() == newProgram)
+            for (int j = 35; j <= 98; j++)
             {
-                activeDrum().setProgram(j);
-                break;
-            }
-        }
+                auto pad = newProgram->getPad(j - 35);
+                pad->setNote(j);
+                auto noteParameters = new NoteParameters(j - 35);
+                newProgram->setNoteParameters(j - 35, noteParameters);
+                noteParameters->setSoundIndex(sourceSoundIndex);
 
-        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-        break;
-    }
+                noteParameters->setTune(((j - originalKey) * 10) + tune);
+            }
+
+            auto programs = sampler->getPrograms();
+
+            for (int j = 0; j < programs.size(); j++)
+            {
+                if (programs[j].lock() == newProgram)
+                {
+                    activeDrum().setProgram(j);
+                    break;
+                }
+            }
+
+            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            break;
+        }
     }
 }
 

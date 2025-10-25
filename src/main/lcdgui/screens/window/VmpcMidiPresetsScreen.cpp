@@ -132,49 +132,49 @@ void VmpcMidiPresetsScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-    {
-        const int presetIndex = (row + rowOffset) - 1;
-
-        std::function<void(std::string &)> enterAction;
-
-        enterAction = [this](std::string &nameScreenName)
+        case 2:
         {
-            checkFileExistsAndSavePresetAndShowPopup(nameScreenName);
-        };
+            const int presetIndex = (row + rowOffset) - 1;
 
-        if (presetIndex == -1)
-        {
-            auto nameScreen = mpc.screens->get<NameScreen>();
-            nameScreen->initialize("New preset", 16, enterAction, "vmpc-midi-presets");
-            mpc.getLayeredScreen()->openScreen<NameScreen>();
+            std::function<void(std::string &)> enterAction;
+
+            enterAction = [this](std::string &nameScreenName)
+            {
+                checkFileExistsAndSavePresetAndShowPopup(nameScreenName);
+            };
+
+            if (presetIndex == -1)
+            {
+                auto nameScreen = mpc.screens->get<NameScreen>();
+                nameScreen->initialize("New preset", 16, enterAction, "vmpc-midi-presets");
+                mpc.getLayeredScreen()->openScreen<NameScreen>();
+            }
+            else
+            {
+                checkFileExistsAndSavePresetAndShowPopup(presets[presetIndex]->name);
+            }
+            break;
         }
-        else
+        case 3:
+            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            break;
+        case 4:
         {
-            checkFileExistsAndSavePresetAndShowPopup(presets[presetIndex]->name);
-        }
-        break;
-    }
-    case 3:
-        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-        break;
-    case 4:
-    {
-        auto index = (row + rowOffset) - 1;
+            auto index = (row + rowOffset) - 1;
 
-        if (index == -1)
-        {
-            MidiControlPersistence::loadDefaultMapping(mpc);
-        }
-        else
-        {
-            auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
-            MidiControlPersistence::loadFileByNameIntoPreset(mpc, presets[index]->name, vmpcMidiScreen->getActivePreset());
-        }
+            if (index == -1)
+            {
+                MidiControlPersistence::loadDefaultMapping(mpc);
+            }
+            else
+            {
+                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
+                MidiControlPersistence::loadFileByNameIntoPreset(mpc, presets[index]->name, vmpcMidiScreen->getActivePreset());
+            }
 
-        ls->showPopupAndThenOpen<VmpcMidiPresetsScreen>("Loading " + (index == -1 ? "Default" : presets[index]->name), 700);
-        break;
-    }
+            ls->showPopupAndThenOpen<VmpcMidiPresetsScreen>("Loading " + (index == -1 ? "Default" : presets[index]->name), 700);
+            break;
+        }
     }
 }
 

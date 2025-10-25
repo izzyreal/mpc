@@ -51,4 +51,4 @@ namespace mpc::client::event
         std::optional<TextInputKey> textInputKey;
     };
 
-} // namespace mpc::input
+} // namespace mpc::client::event

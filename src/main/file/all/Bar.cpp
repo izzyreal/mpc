@@ -33,18 +33,18 @@ int Bar::getDenominator()
     auto result = 0;
     switch (ticksPerBeat)
     {
-    case 96:
-        result = 4;
-        break;
-    case 48:
-        result = 8;
-        break;
-    case 24:
-        result = 16;
-        break;
-    case 12:
-        result = 32;
-        break;
+        case 96:
+            result = 4;
+            break;
+        case 48:
+            result = 8;
+            break;
+        case 24:
+            result = 16;
+            break;
+        case 12:
+            result = 32;
+            break;
     }
 
     return result;

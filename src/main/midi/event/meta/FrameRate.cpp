@@ -24,14 +24,14 @@ FrameRate *FrameRate::fromInt(int val)
 {
     switch (val)
     {
-    case 0:
-        return FRAME_RATE_24;
-    case 1:
-        return FRAME_RATE_25;
-    case 2:
-        return FRAME_RATE_30_DROP;
-    case 3:
-        return FRAME_RATE_30;
+        case 0:
+            return FRAME_RATE_24;
+        case 1:
+            return FRAME_RATE_25;
+        case 2:
+            return FRAME_RATE_30_DROP;
+        case 3:
+            return FRAME_RATE_30;
     }
     return nullptr;
 }

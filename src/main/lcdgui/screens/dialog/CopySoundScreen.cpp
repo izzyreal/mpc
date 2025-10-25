@@ -26,24 +26,24 @@ void CopySoundScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
-        break;
-    case 4:
-    {
-        auto sound = sampler->getSound();
-        auto newSound = sampler->copySound(sound);
-
-        if (newSound.lock() == nullptr)
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            break;
+        case 4:
         {
-            return;
-        }
+            auto sound = sampler->getSound();
+            auto newSound = sampler->copySound(sound);
 
-        newSound.lock()->setName(newName);
-        sampler->setSoundIndex(sampler->getSoundCount() - 1);
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
-        break;
-    }
+            if (newSound.lock() == nullptr)
+            {
+                return;
+            }
+
+            newSound.lock()->setName(newName);
+            sampler->setSoundIndex(sampler->getSoundCount() - 1);
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            break;
+        }
     }
 }
 

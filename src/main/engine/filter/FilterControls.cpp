@@ -26,12 +26,12 @@ void FilterControls::derive(Control *c)
 {
     switch (c->getId() - idOffset)
     {
-    case FREQUENCY:
-        cutoff = deriveCutoff();
-        break;
-    case RESONANCE:
-        resonance = deriveResonance();
-        break;
+        case FREQUENCY:
+            cutoff = deriveCutoff();
+            break;
+        case RESONANCE:
+            resonance = deriveResonance();
+            break;
     }
 }
 

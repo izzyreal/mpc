@@ -21,22 +21,22 @@ void SecondSeqScreen::function(int i)
 
     switch (i)
     {
-    case 0: // Intentional fall-through
-    case 1:
-        punchScreen->tab = i;
-        mpc.getLayeredScreen()->openScreen(punchScreen->tabNames[i]);
-        break;
-    case 5:
-        if (sequencer.lock()->isSecondSequenceEnabled())
-        {
-            sequencer.lock()->setSecondSequenceEnabled(false);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            return;
-        }
+        case 0: // Intentional fall-through
+        case 1:
+            punchScreen->tab = i;
+            mpc.getLayeredScreen()->openScreen(punchScreen->tabNames[i]);
+            break;
+        case 5:
+            if (sequencer.lock()->isSecondSequenceEnabled())
+            {
+                sequencer.lock()->setSecondSequenceEnabled(false);
+                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+                return;
+            }
 
-        sequencer.lock()->setSecondSequenceEnabled(true);
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+            sequencer.lock()->setSecondSequenceEnabled(true);
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }
 

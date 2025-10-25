@@ -27,16 +27,16 @@ void NumberOfZonesScreen::function(int i)
 {
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
-        break;
-    case 4:
-        auto zoneScreen = mpc.screens->get<ZoneScreen>();
-        auto sound = sampler->getSound();
-        zoneScreen->numberOfZones = numberOfZones;
-        zoneScreen->initZones();
-        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
-        break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            break;
+        case 4:
+            auto zoneScreen = mpc.screens->get<ZoneScreen>();
+            auto sound = sampler->getSound();
+            zoneScreen->numberOfZones = numberOfZones;
+            zoneScreen->initZones();
+            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            break;
     }
 }
 

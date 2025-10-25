@@ -50,56 +50,56 @@ void VmpcDisksScreen::function(int i)
 {
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-        break;
-    case 1:
-        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-        break;
-    case 2:
-        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-        break;
-    case 4:
-    {
-        auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-
-        if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+        case 0:
+            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            break;
+        case 2:
+            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            break;
+        case 4:
         {
-            return;
-        }
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-        break;
-    }
-    case 5:
-    {
-        std::string popupMsg;
-
-        if (hasConfigChanged())
-        {
-            for (auto &kv : config)
+            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
             {
-                auto uuid = kv.first;
-                for (auto &d : mpc.getDisks())
-                {
-                    if (d->getVolume().volumeUUID == uuid)
-                    {
-                        d->getVolume().mode = kv.second;
-                    }
-                }
+                return;
             }
 
-            VolumesPersistence::save(mpc);
-            popupMsg = "Volume configurations saved";
+            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            break;
         }
-        else
+        case 5:
         {
-            popupMsg = "Volume configurations unchanged";
-        }
+            std::string popupMsg;
 
-        ls->showPopupForMs(popupMsg, 1000);
-        break;
-    }
+            if (hasConfigChanged())
+            {
+                for (auto &kv : config)
+                {
+                    auto uuid = kv.first;
+                    for (auto &d : mpc.getDisks())
+                    {
+                        if (d->getVolume().volumeUUID == uuid)
+                        {
+                            d->getVolume().mode = kv.second;
+                        }
+                    }
+                }
+
+                VolumesPersistence::save(mpc);
+                popupMsg = "Volume configurations saved";
+            }
+            else
+            {
+                popupMsg = "Volume configurations unchanged";
+            }
+
+            ls->showPopupForMs(popupMsg, 1000);
+            break;
+        }
     }
 }
 

@@ -25,28 +25,28 @@ void VmpcContinuePreviousSessionScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        // NO
-        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-        break;
-    case 2:
-        // YES
-        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-        restoreAutoSavedStateAction();
-        break;
-    case 3:
-        // NEVER
-        autoSaveScreen->setAutoLoadOnStart(0);
-        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-        break;
-    case 4:
-        // ALWAYS
-        autoSaveScreen->setAutoLoadOnStart(2);
-        mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
-        restoreAutoSavedStateAction();
-        break;
-    default:
-        break;
+        case 1:
+            // NO
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+            break;
+        case 2:
+            // YES
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+            restoreAutoSavedStateAction();
+            break;
+        case 3:
+            // NEVER
+            autoSaveScreen->setAutoLoadOnStart(0);
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+            break;
+        case 4:
+            // ALWAYS
+            autoSaveScreen->setAutoLoadOnStart(2);
+            mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+            restoreAutoSavedStateAction();
+            break;
+        default:
+            break;
     }
 }
 

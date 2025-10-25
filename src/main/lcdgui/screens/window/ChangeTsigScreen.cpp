@@ -28,26 +28,26 @@ void ChangeTsigScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-        auto sequence = sequencer.lock()->getActiveSequence();
+        case 4:
+            auto sequence = sequencer.lock()->getActiveSequence();
 
-        auto barLengths = sequence->getBarLengthsInTicks();
+            auto barLengths = sequence->getBarLengthsInTicks();
 
-        sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(), timesignature.getDenominator());
+            sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(), timesignature.getDenominator());
 
-        auto &newBarLengths = sequence->getBarLengthsInTicks();
+            auto &newBarLengths = sequence->getBarLengthsInTicks();
 
-        for (int j = 0; j < barLengths.size(); j++)
-        {
-            if (barLengths[j] != newBarLengths[j])
+            for (int j = 0; j < barLengths.size(); j++)
             {
-                sequencer.lock()->move(0); // Only reset sequencer position when a bar length has changed
-                break;
+                if (barLengths[j] != newBarLengths[j])
+                {
+                    sequencer.lock()->move(0); // Only reset sequencer position when a bar length has changed
+                    break;
+                }
             }
-        }
 
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }
 

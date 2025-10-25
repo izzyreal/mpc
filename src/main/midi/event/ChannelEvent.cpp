@@ -52,11 +52,11 @@ int ChannelEvent::getEventSize()
 {
     switch (mType)
     {
-    case PROGRAM_CHANGE:
-    case CHANNEL_AFTERTOUCH:
-        return 2;
-    default:
-        return 3;
+        case PROGRAM_CHANGE:
+        case CHANNEL_AFTERTOUCH:
+            return 2;
+        default:
+            return 3;
     }
 }
 
@@ -107,22 +107,22 @@ std::shared_ptr<ChannelEvent> ChannelEvent::parseChannelEvent(int tick, int delt
     }
     switch (type)
     {
-    case NOTE_OFF:
-        return std::make_shared<NoteOff>(tick, delta, channel, val1, val2);
-    case NOTE_ON:
-        return std::make_shared<NoteOn>(tick, delta, channel, val1, val2);
-    case NOTE_AFTERTOUCH:
-        return std::make_shared<NoteAftertouch>(tick, delta, channel, val1, val2);
-    case CONTROLLER:
-        return std::make_shared<Controller>(tick, delta, channel, val1, val2);
-    case PROGRAM_CHANGE:
-        return std::make_shared<ProgramChange>(tick, delta, channel, val1);
-    case CHANNEL_AFTERTOUCH:
-        return std::make_shared<ChannelAftertouch>(tick, delta, channel, val1);
-    case PITCH_BEND:
-        return std::make_shared<PitchBend>(tick, delta, channel, val1, val2);
-    default:
-        return std::make_shared<ChannelEvent>(tick, delta, type, channel, val1, val2);
+        case NOTE_OFF:
+            return std::make_shared<NoteOff>(tick, delta, channel, val1, val2);
+        case NOTE_ON:
+            return std::make_shared<NoteOn>(tick, delta, channel, val1, val2);
+        case NOTE_AFTERTOUCH:
+            return std::make_shared<NoteAftertouch>(tick, delta, channel, val1, val2);
+        case CONTROLLER:
+            return std::make_shared<Controller>(tick, delta, channel, val1, val2);
+        case PROGRAM_CHANGE:
+            return std::make_shared<ProgramChange>(tick, delta, channel, val1);
+        case CHANNEL_AFTERTOUCH:
+            return std::make_shared<ChannelAftertouch>(tick, delta, channel, val1);
+        case PITCH_BEND:
+            return std::make_shared<PitchBend>(tick, delta, channel, val1, val2);
+        default:
+            return std::make_shared<ChannelEvent>(tick, delta, type, channel, val1, val2);
     }
 }
 

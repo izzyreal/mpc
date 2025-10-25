@@ -33,39 +33,39 @@ void VmpcKnownControllerDetectedScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        // NO
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    case 2:
-        // YES
-        vmpcMidiScreen->shouldSwitch.store(true);
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    case 3:
-        // NEVER
-        if (preset != presets.end())
-        {
-            (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
-        }
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    case 4:
-        // ALWAYS
-        if (preset != presets.end())
-        {
-            if ((*preset)->autoloadMode != nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+        case 1:
+            // NO
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        case 2:
+            // YES
+            vmpcMidiScreen->shouldSwitch.store(true);
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        case 3:
+            // NEVER
+            if (preset != presets.end())
             {
-                (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
-                mpc.getDisk()->writeMidiControlPreset(*preset);
-                nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
+                (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
             }
-        }
-        vmpcMidiScreen->shouldSwitch.store(true);
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    default:
-        break;
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        case 4:
+            // ALWAYS
+            if (preset != presets.end())
+            {
+                if ((*preset)->autoloadMode != nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+                {
+                    (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
+                    mpc.getDisk()->writeMidiControlPreset(*preset);
+                    nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
+                }
+            }
+            vmpcMidiScreen->shouldSwitch.store(true);
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        default:
+            break;
     }
 }
 

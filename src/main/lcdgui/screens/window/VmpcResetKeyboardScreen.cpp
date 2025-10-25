@@ -14,12 +14,12 @@ void VmpcResetKeyboardScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-        break;
-    case 4:
-        mpc.clientEventController->getKeyboardBindings()->initializeDefaults();
-        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-        break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            break;
+        case 4:
+            mpc.clientEventController->getKeyboardBindings()->initializeDefaults();
+            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            break;
     }
 }

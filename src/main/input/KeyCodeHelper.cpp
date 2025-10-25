@@ -532,93 +532,93 @@ const std::string getDescriptorIfCommonForAsciiAndUnicode(const VmpcKeyCode vmpc
 
     switch (vmpcKeyCode)
     {
-    // Bespoke descriptors for keys that don't produce characters.
-    // Below descriptors are used for simple ASCII-based display, like the
-    // virtual MPC2000XL's LCD screen, as well as for Unicode-based text
-    // rendering in a more graphically advanced UI.
-    case VmpcKeyCode::VMPC_KEY_Space:
-        result = "Space";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Shift:
-        result = "Shift";
-        break;
-    case VmpcKeyCode::VMPC_KEY_LeftShift:
-        result = "Left shift";
-        break;
-    case VmpcKeyCode::VMPC_KEY_RightShift:
-        result = "Right shift";
-        break;
-    case VmpcKeyCode::VMPC_KEY_OptionOrAlt:
-        result = "Option/Alt";
-        break;
-    case VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt:
-        result = "Left option/alt";
-        break;
-    case VmpcKeyCode::VMPC_KEY_RightOptionOrAlt:
-        result = "Right option/alt";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Control:
-        result = "Control";
-        break;
-    case VmpcKeyCode::VMPC_KEY_LeftControl:
-        result = "Left control";
-        break;
-    case VmpcKeyCode::VMPC_KEY_RightControl:
-        result = "Right control";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Escape:
-        result = "Escape";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Return:
-        result = "Return";
-        break;
-    case VmpcKeyCode::VMPC_KEY_PageUp:
-        result = "Page up";
-        break;
-    case VmpcKeyCode::VMPC_KEY_PageDown:
-        result = "Page down";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Home:
-        result = "Home";
-        break;
-    case VmpcKeyCode::VMPC_KEY_End:
-        result = "End";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Delete:
-        result = "Delete";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Insert:
-        result = "Insert";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Tab:
-        result = "Tab";
-        break;
-    case VmpcKeyCode::VMPC_KEY_CapsLock:
-        result = "Caps lock";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Function:
-        result = "Function";
-        break;
-    case VmpcKeyCode::VMPC_KEY_LeftMeta:
-        result = "Left meta";
-        break;
-    case VmpcKeyCode::VMPC_KEY_RightMeta:
-        result = "Right meta";
-        break;
-    case VmpcKeyCode::VMPC_KEY_Backspace:
-        result = "Backspace";
-        break;
-    case VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear:
-        result = "Keypad num lock";
-        break;
-    case VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter:
-        result = "Keypad enter";
-        break;
-    case VmpcKeyCode::VMPC_KEY_UNKNOWN:
-        result = "<none>";
-        break;
-    default:
-        break;
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are used for simple ASCII-based display, like the
+        // virtual MPC2000XL's LCD screen, as well as for Unicode-based text
+        // rendering in a more graphically advanced UI.
+        case VmpcKeyCode::VMPC_KEY_Space:
+            result = "Space";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Shift:
+            result = "Shift";
+            break;
+        case VmpcKeyCode::VMPC_KEY_LeftShift:
+            result = "Left shift";
+            break;
+        case VmpcKeyCode::VMPC_KEY_RightShift:
+            result = "Right shift";
+            break;
+        case VmpcKeyCode::VMPC_KEY_OptionOrAlt:
+            result = "Option/Alt";
+            break;
+        case VmpcKeyCode::VMPC_KEY_LeftOptionOrAlt:
+            result = "Left option/alt";
+            break;
+        case VmpcKeyCode::VMPC_KEY_RightOptionOrAlt:
+            result = "Right option/alt";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Control:
+            result = "Control";
+            break;
+        case VmpcKeyCode::VMPC_KEY_LeftControl:
+            result = "Left control";
+            break;
+        case VmpcKeyCode::VMPC_KEY_RightControl:
+            result = "Right control";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Escape:
+            result = "Escape";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Return:
+            result = "Return";
+            break;
+        case VmpcKeyCode::VMPC_KEY_PageUp:
+            result = "Page up";
+            break;
+        case VmpcKeyCode::VMPC_KEY_PageDown:
+            result = "Page down";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Home:
+            result = "Home";
+            break;
+        case VmpcKeyCode::VMPC_KEY_End:
+            result = "End";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Delete:
+            result = "Delete";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Insert:
+            result = "Insert";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Tab:
+            result = "Tab";
+            break;
+        case VmpcKeyCode::VMPC_KEY_CapsLock:
+            result = "Caps lock";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Function:
+            result = "Function";
+            break;
+        case VmpcKeyCode::VMPC_KEY_LeftMeta:
+            result = "Left meta";
+            break;
+        case VmpcKeyCode::VMPC_KEY_RightMeta:
+            result = "Right meta";
+            break;
+        case VmpcKeyCode::VMPC_KEY_Backspace:
+            result = "Backspace";
+            break;
+        case VmpcKeyCode::VMPC_KEY_ANSI_KeypadNumLockOrClear:
+            result = "Keypad num lock";
+            break;
+        case VmpcKeyCode::VMPC_KEY_ANSI_KeypadEnter:
+            result = "Keypad enter";
+            break;
+        case VmpcKeyCode::VMPC_KEY_UNKNOWN:
+            result = "<none>";
+            break;
+        default:
+            break;
     }
 
     return result;
@@ -637,42 +637,42 @@ const std::string KeyCodeHelper::getAsciiCompatibleDisplayName(const VmpcKeyCode
 
     switch (vmpcKeyCode)
     {
-    // Bespoke descriptors for keys that don't produce characters.
-    // Below descriptors are only used for simple ASCII-based display, like the
-    // virtual MPC2000XL's LCD screen.
-    case VmpcKeyCode::VMPC_KEY_LeftArrow:
-        result = "Left arrow";
-        break;
-    case VmpcKeyCode::VMPC_KEY_UpArrow:
-        result = "Up arrow";
-        break;
-    case VmpcKeyCode::VMPC_KEY_RightArrow:
-        result = "Right arrow";
-        break;
-    case VmpcKeyCode::VMPC_KEY_DownArrow:
-        result = "Down arrow";
-        break;
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are only used for simple ASCII-based display, like the
+        // virtual MPC2000XL's LCD screen.
+        case VmpcKeyCode::VMPC_KEY_LeftArrow:
+            result = "Left arrow";
+            break;
+        case VmpcKeyCode::VMPC_KEY_UpArrow:
+            result = "Up arrow";
+            break;
+        case VmpcKeyCode::VMPC_KEY_RightArrow:
+            result = "Right arrow";
+            break;
+        case VmpcKeyCode::VMPC_KEY_DownArrow:
+            result = "Down arrow";
+            break;
 
-    // Keys that produce characters, but a descriptor should be used as display name
-    case VmpcKeyCode::VMPC_KEY_ANSI_Grave:
-        result = "Grave accent";
-        break;
-    case VmpcKeyCode::VMPC_KEY_ISO_Section:
-        result = "Section";
-        break;
-    case VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma:
-        result = ", (numpad)";
-        break;
+        // Keys that produce characters, but a descriptor should be used as display name
+        case VmpcKeyCode::VMPC_KEY_ANSI_Grave:
+            result = "Grave accent";
+            break;
+        case VmpcKeyCode::VMPC_KEY_ISO_Section:
+            result = "Section";
+            break;
+        case VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma:
+            result = ", (numpad)";
+            break;
 
-    default:
-        result = getKeyCodeString(vmpcKeyCode);
-        if (static_cast<int>(vmpcKeyCode) >= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0) &&
-            static_cast<int>(vmpcKeyCode) <= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma))
-        {
-            result += " (numpad)";
-        }
+        default:
+            result = getKeyCodeString(vmpcKeyCode);
+            if (static_cast<int>(vmpcKeyCode) >= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_Keypad0) &&
+                static_cast<int>(vmpcKeyCode) <= static_cast<int>(VmpcKeyCode::VMPC_KEY_ANSI_KeypadComma))
+            {
+                result += " (numpad)";
+            }
 
-        break;
+            break;
     }
 
     if (result.size() == 2)
@@ -696,23 +696,23 @@ const std::string KeyCodeHelper::guessCharactersPrintedOnKeyUnicode(const VmpcKe
 
     switch (vmpcKeyCode)
     {
-    // Bespoke descriptors for keys that don't produce characters.
-    // Below descriptors are only used for Unicode-based text rendering.
-    case VmpcKeyCode::VMPC_KEY_LeftArrow:
-        result = "\u2190";
-        break;
-    case VmpcKeyCode::VMPC_KEY_UpArrow:
-        result = "\u2191";
-        break;
-    case VmpcKeyCode::VMPC_KEY_RightArrow:
-        result = "\u2192";
-        break;
-    case VmpcKeyCode::VMPC_KEY_DownArrow:
-        result = "\u2193";
-        break;
+        // Bespoke descriptors for keys that don't produce characters.
+        // Below descriptors are only used for Unicode-based text rendering.
+        case VmpcKeyCode::VMPC_KEY_LeftArrow:
+            result = "\u2190";
+            break;
+        case VmpcKeyCode::VMPC_KEY_UpArrow:
+            result = "\u2191";
+            break;
+        case VmpcKeyCode::VMPC_KEY_RightArrow:
+            result = "\u2192";
+            break;
+        case VmpcKeyCode::VMPC_KEY_DownArrow:
+            result = "\u2193";
+            break;
 
-    default:
-        result = getKeyCodeString(vmpcKeyCode);
+        default:
+            result = getKeyCodeString(vmpcKeyCode);
     }
 
     return result;

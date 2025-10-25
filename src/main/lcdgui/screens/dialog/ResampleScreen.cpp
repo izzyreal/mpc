@@ -73,78 +73,78 @@ void ResampleScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
-        break;
-    case 4:
-    {
-        const auto snd = sampler->getSound(sampler->getSoundIndex());
-        auto destSnd = sampler->addSound();
-
-        if (destSnd == nullptr)
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            break;
+        case 4:
         {
-            return;
-        }
+            const auto snd = sampler->getSound(sampler->getSoundIndex());
+            auto destSnd = sampler->addSound();
 
-        destSnd->setName(newName);
-        destSnd->setSampleRate(newFs);
-        destSnd->setMono(snd->isMono());
-
-        auto source = snd->getSampleData();
-
-        if (newFs != snd->getSampleRate())
-        {
-            sampler::Sampler::resample(source, snd->getSampleRate(), destSnd);
-        }
-        else
-        {
-            destSnd->setSampleData(std::make_shared<std::vector<float>>(*source));
-        }
-
-        for (auto &f : *destSnd->getMutableSampleData())
-        {
-            if (f > 1)
+            if (destSnd == nullptr)
             {
-                f = 1;
+                return;
             }
-            else if (f < -1)
+
+            destSnd->setName(newName);
+            destSnd->setSampleRate(newFs);
+            destSnd->setMono(snd->isMono());
+
+            auto source = snd->getSampleData();
+
+            if (newFs != snd->getSampleRate())
             {
-                f = -1;
+                sampler::Sampler::resample(source, snd->getSampleRate(), destSnd);
             }
-        }
+            else
+            {
+                destSnd->setSampleData(std::make_shared<std::vector<float>>(*source));
+            }
 
-        destSnd->setName(newName);
-        const int diff = newFs - snd->getSampleRate();
-        int newTuning = static_cast<int>(diff * (120.f / newFs));
-        if (newTuning < -120)
-        {
-            newTuning = -120;
-        }
-        else if (newTuning > 120)
-        {
-            newTuning = 120;
-        }
-        destSnd->setTune(newTuning);
+            for (auto &f : *destSnd->getMutableSampleData())
+            {
+                if (f > 1)
+                {
+                    f = 1;
+                }
+                else if (f < -1)
+                {
+                    f = -1;
+                }
+            }
 
-        if (newBit == 1)
-        {
-            sampler::Sampler::process12Bit(*destSnd->getMutableSampleData());
+            destSnd->setName(newName);
+            const int diff = newFs - snd->getSampleRate();
+            int newTuning = static_cast<int>(diff * (120.f / newFs));
+            if (newTuning < -120)
+            {
+                newTuning = -120;
+            }
+            else if (newTuning > 120)
+            {
+                newTuning = 120;
+            }
+            destSnd->setTune(newTuning);
+
+            if (newBit == 1)
+            {
+                sampler::Sampler::process12Bit(*destSnd->getMutableSampleData());
+            }
+            else if (newBit == 2)
+            {
+                sampler::Sampler::process8Bit(*destSnd->getMutableSampleData());
+            }
+
+            const auto ratio = newFs / (float)snd->getSampleRate();
+
+            destSnd->setStart(snd->getStart() * ratio);
+            destSnd->setEnd(snd->getEnd() * ratio);
+            destSnd->setLoopTo(snd->getLoopTo() * ratio);
+
+            sampler->setSoundIndex(sampler->getSoundCount() - 1);
+            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            break;
         }
-        else if (newBit == 2)
-        {
-            sampler::Sampler::process8Bit(*destSnd->getMutableSampleData());
-        }
-
-        const auto ratio = newFs / (float)snd->getSampleRate();
-
-        destSnd->setStart(snd->getStart() * ratio);
-        destSnd->setEnd(snd->getEnd() * ratio);
-        destSnd->setLoopTo(snd->getLoopTo() * ratio);
-
-        sampler->setSoundIndex(sampler->getSoundCount() - 1);
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
-        break;
-    }
     }
 }
 

@@ -32,36 +32,36 @@ void ChangeBars2Screen::function(int i)
 
     switch (i)
     {
-    case 2:
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>(); // Required for desired screen transitions
-        mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
-        break;
-    case 4:
-    {
-        auto lastBarIndex = seq->getLastBarIndex();
-        auto changed = false;
-
-        if (newBars < lastBarIndex)
+        case 2:
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>(); // Required for desired screen transitions
+            mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
+            break;
+        case 4:
         {
-            seq->deleteBars(newBars + 1, lastBarIndex);
-            lastBarIndex = seq->getLastBarIndex();
-            changed = true;
-        }
+            auto lastBarIndex = seq->getLastBarIndex();
+            auto changed = false;
 
-        if (newBars > lastBarIndex)
-        {
-            seq->insertBars(newBars - lastBarIndex, lastBarIndex + 1);
-            changed = true;
-        }
+            if (newBars < lastBarIndex)
+            {
+                seq->deleteBars(newBars + 1, lastBarIndex);
+                lastBarIndex = seq->getLastBarIndex();
+                changed = true;
+            }
 
-        if (changed)
-        {
-            sequencer.lock()->move(0);
-        }
+            if (newBars > lastBarIndex)
+            {
+                seq->insertBars(newBars - lastBarIndex, lastBarIndex + 1);
+                changed = true;
+            }
 
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    }
+            if (changed)
+            {
+                sequencer.lock()->move(0);
+            }
+
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
+        }
     }
 }
 

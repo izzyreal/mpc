@@ -60,22 +60,22 @@ void BarsScreen::function(int j)
 
     switch (j)
     {
-    // Intentional fall-through
-    case 0:
-    case 2:
-    case 3:
-        eventsScreen->tab = j;
-        mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
-        break;
-    case 4:
-        break;
-    case 5:
-    {
-        copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
-        sequencer.lock()->setActiveSequenceIndex(eventsScreen->toSq);
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    }
+        // Intentional fall-through
+        case 0:
+        case 2:
+        case 3:
+            eventsScreen->tab = j;
+            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            break;
+        case 4:
+            break;
+        case 5:
+        {
+            copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
+            sequencer.lock()->setActiveSequenceIndex(eventsScreen->toSq);
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
+        }
     }
 }
 

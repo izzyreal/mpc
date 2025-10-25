@@ -31,17 +31,17 @@ void DeleteSequenceScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-        mpc.getLayeredScreen()->openScreen<DeleteAllSequencesScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SequenceScreen>();
-        break;
-    case 4:
-        sequencer.lock()->move(0);
-        sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+        case 2:
+            mpc.getLayeredScreen()->openScreen<DeleteAllSequencesScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
+            break;
+        case 4:
+            sequencer.lock()->move(0);
+            sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }
 

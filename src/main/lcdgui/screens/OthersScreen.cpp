@@ -51,12 +51,12 @@ void OthersScreen::function(int i)
 {
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<InitScreen>();
-        break;
-    case 2:
-        mpc.getLayeredScreen()->openScreen<VerScreen>();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<InitScreen>();
+            break;
+        case 2:
+            mpc.getLayeredScreen()->openScreen<VerScreen>();
+            break;
     }
 }
 

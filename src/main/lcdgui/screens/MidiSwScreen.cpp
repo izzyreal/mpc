@@ -108,9 +108,9 @@ void MidiSwScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<SyncScreen>();
-        break;
+        case 0:
+            mpc.getLayeredScreen()->openScreen<SyncScreen>();
+            break;
     }
 }
 

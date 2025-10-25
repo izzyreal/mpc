@@ -12,13 +12,13 @@ void DeleteAllSequencesScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<DeleteSequenceScreen>();
-        break;
-    case 4:
-        sequencer.lock()->move(0);
-        sequencer.lock()->purgeAllSequences();
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<DeleteSequenceScreen>();
+            break;
+        case 4:
+            sequencer.lock()->move(0);
+            sequencer.lock()->purgeAllSequences();
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }

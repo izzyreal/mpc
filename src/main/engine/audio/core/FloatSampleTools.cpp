@@ -82,14 +82,14 @@ int FloatSampleTools::getSampleSize(int formatType)
 {
     switch (formatType & F_SAMPLE_WIDTH_MASK)
     {
-    case F_8:
-        return 1;
-    case F_16:
-        return 2;
-    case F_24:
-        return 3;
-    case F_32:
-        return 4;
+        case F_8:
+            return 1;
+        case F_16:
+            return 2;
+        case F_24:
+            return 3;
+        case F_32:
+            return 4;
     }
     return 0;
 }
@@ -99,18 +99,18 @@ std::string FloatSampleTools::formatType2Str(int formatType)
     std::string result = std::to_string(formatType) + ": ";
     switch (formatType & F_SAMPLE_WIDTH_MASK)
     {
-    case F_8:
-        result = result.append("8bit");
-        break;
-    case F_16:
-        result = result.append("16bit");
-        break;
-    case F_24:
-        result = result.append("24bit");
-        break;
-    case F_32:
-        result = result.append("32bit");
-        break;
+        case F_8:
+            result = result.append("8bit");
+            break;
+        case F_16:
+            result = result.append("16bit");
+            break;
+        case F_24:
+            result = result.append("24bit");
+            break;
+        case F_32:
+            result = result.append("32bit");
+            break;
     }
 
     bool signed_ = (formatType & F_SIGNED) == F_SIGNED;
@@ -166,33 +166,33 @@ void FloatSampleTools::byte2floatGeneric(const std::vector<char> &input, int inB
     {
         switch (formatType)
         {
-        case CT_8S:
-            output[outIndex] = input[inIndex] * invTwoPower7;
-            break;
-        case CT_8U:
-            output[outIndex] = ((input[inIndex] & 255) - 128) * invTwoPower7;
-            break;
-        case CT_16SB:
-            output[outIndex] = ((input[inIndex] << 8) | (input[inIndex + 1] & 255)) * invTwoPower15;
-            break;
-        case CT_16SL:
-            output[outIndex] = ((input[inIndex + 1] << 8) | (input[inIndex] & 255)) * invTwoPower15;
-            break;
-        case CT_24SB:
-            output[outIndex] = ((input[inIndex] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex + 2] & 255)) * invTwoPower23;
-            break;
-        case CT_24SL:
-            output[outIndex] = ((input[inIndex + 2] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower23;
-            break;
-        case CT_32SB:
-            output[outIndex] = ((input[inIndex] << 24) | ((input[inIndex + 1] & 255) << 16) | ((input[inIndex + 2] & 255) << 8) | (input[inIndex + 3] & 255)) * invTwoPower31;
-            break;
-        case CT_32SL:
-            output[outIndex] = ((input[inIndex + 3] << 24) | ((input[inIndex + 2] & 255) << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower31;
-            break;
-        default:
-            std::string description = "unsupported format=" + formatType2Str(formatType);
-            printf("ERROR: %s", description.c_str());
+            case CT_8S:
+                output[outIndex] = input[inIndex] * invTwoPower7;
+                break;
+            case CT_8U:
+                output[outIndex] = ((input[inIndex] & 255) - 128) * invTwoPower7;
+                break;
+            case CT_16SB:
+                output[outIndex] = ((input[inIndex] << 8) | (input[inIndex + 1] & 255)) * invTwoPower15;
+                break;
+            case CT_16SL:
+                output[outIndex] = ((input[inIndex + 1] << 8) | (input[inIndex] & 255)) * invTwoPower15;
+                break;
+            case CT_24SB:
+                output[outIndex] = ((input[inIndex] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex + 2] & 255)) * invTwoPower23;
+                break;
+            case CT_24SL:
+                output[outIndex] = ((input[inIndex + 2] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower23;
+                break;
+            case CT_32SB:
+                output[outIndex] = ((input[inIndex] << 24) | ((input[inIndex + 1] & 255) << 16) | ((input[inIndex + 2] & 255) << 8) | (input[inIndex + 3] & 255)) * invTwoPower31;
+                break;
+            case CT_32SL:
+                output[outIndex] = ((input[inIndex + 3] << 24) | ((input[inIndex + 2] & 255) << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower31;
+                break;
+            default:
+                std::string description = "unsupported format=" + formatType2Str(formatType);
+                printf("ERROR: %s", description.c_str());
         }
     }
 }
@@ -321,51 +321,51 @@ void FloatSampleTools::float2byteGeneric(std::vector<float> &input, int inOffset
 
         switch (formatType)
         {
-        case CT_8S:
-            output[outIndex] = quantize8(input[inIndex] * twoPower7, ditherBits);
-            break;
-        case CT_8U:
-            output[outIndex] = quantize8((input[inIndex] * twoPower7), ditherBits) + 128;
-            break;
-        case CT_16SB:
-            iSample = quantize16(input[inIndex] * twoPower15, ditherBits);
-            output[outIndex] = iSample >> 8;
-            output[outIndex + 1] = iSample & 255;
-            break;
-        case CT_16SL:
-            iSample = quantize16(input[inIndex] * twoPower15, ditherBits);
-            output[outIndex + 1] = (char)(iSample >> 8);
-            output[outIndex] = (char)(iSample & 255);
-            break;
-        case CT_24SB:
-            iSample = quantize24(input[inIndex] * twoPower23, ditherBits);
-            output[outIndex] = iSample >> 16;
-            output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
-            output[outIndex + 2] = iSample & 255;
-            break;
-        case CT_24SL:
-            iSample = quantize24(input[inIndex] * twoPower23, ditherBits);
-            output[outIndex + 2] = iSample >> 16;
-            output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
-            output[outIndex] = iSample & 255;
-            break;
-        case CT_32SB:
-            iSample = quantize32(input[inIndex] * twoPower31, ditherBits);
-            output[outIndex] = iSample >> 24;
-            output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 16) & 255;
-            output[outIndex + 2] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
-            output[outIndex + 3] = iSample & 255;
-            break;
-        case CT_32SL:
-            iSample = quantize32(input[inIndex] * twoPower31, ditherBits);
-            output[outIndex + 3] = iSample >> 24;
-            output[outIndex + 2] = static_cast<int>(static_cast<uint32_t>(iSample) >> 16) & 255;
-            output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
-            output[outIndex] = iSample & 255;
-            break;
-        default:
-            std::string description = "unsupported format=" + formatType2Str(formatType);
-            printf("ERROR: %s", description.c_str());
+            case CT_8S:
+                output[outIndex] = quantize8(input[inIndex] * twoPower7, ditherBits);
+                break;
+            case CT_8U:
+                output[outIndex] = quantize8((input[inIndex] * twoPower7), ditherBits) + 128;
+                break;
+            case CT_16SB:
+                iSample = quantize16(input[inIndex] * twoPower15, ditherBits);
+                output[outIndex] = iSample >> 8;
+                output[outIndex + 1] = iSample & 255;
+                break;
+            case CT_16SL:
+                iSample = quantize16(input[inIndex] * twoPower15, ditherBits);
+                output[outIndex + 1] = (char)(iSample >> 8);
+                output[outIndex] = (char)(iSample & 255);
+                break;
+            case CT_24SB:
+                iSample = quantize24(input[inIndex] * twoPower23, ditherBits);
+                output[outIndex] = iSample >> 16;
+                output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
+                output[outIndex + 2] = iSample & 255;
+                break;
+            case CT_24SL:
+                iSample = quantize24(input[inIndex] * twoPower23, ditherBits);
+                output[outIndex + 2] = iSample >> 16;
+                output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
+                output[outIndex] = iSample & 255;
+                break;
+            case CT_32SB:
+                iSample = quantize32(input[inIndex] * twoPower31, ditherBits);
+                output[outIndex] = iSample >> 24;
+                output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 16) & 255;
+                output[outIndex + 2] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
+                output[outIndex + 3] = iSample & 255;
+                break;
+            case CT_32SL:
+                iSample = quantize32(input[inIndex] * twoPower31, ditherBits);
+                output[outIndex + 3] = iSample >> 24;
+                output[outIndex + 2] = static_cast<int>(static_cast<uint32_t>(iSample) >> 16) & 255;
+                output[outIndex + 1] = static_cast<int>(static_cast<uint32_t>(iSample) >> 8) & 255;
+                output[outIndex] = iSample & 255;
+                break;
+            default:
+                std::string description = "unsupported format=" + formatType2Str(formatType);
+                printf("ERROR: %s", description.c_str());
         }
     }
 }

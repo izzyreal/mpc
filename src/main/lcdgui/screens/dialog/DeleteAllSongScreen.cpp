@@ -12,17 +12,17 @@ void DeleteAllSongScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
-        break;
-    case 4:
+        case 3:
+            mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
+            break;
+        case 4:
 
-        for (int j = 0; j < 20; j++)
-        {
-            sequencer.lock()->deleteSong(j);
-        }
+            for (int j = 0; j < 20; j++)
+            {
+                sequencer.lock()->deleteSong(j);
+            }
 
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }

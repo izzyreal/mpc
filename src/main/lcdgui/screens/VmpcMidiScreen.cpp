@@ -266,90 +266,90 @@ void VmpcMidiScreen::function(int i)
 {
     switch (i)
     {
-    case 0:
-        if (learning)
-        {
-            return;
-        }
+        case 0:
+            if (learning)
+            {
+                return;
+            }
 
-        if (hasMappingChanged())
-        {
-            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-            screen->nextScreen = "vmpc-settings";
-            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-            return;
-        }
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                screen->nextScreen = "vmpc-settings";
+                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                return;
+            }
 
-        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-        break;
-    case 1:
-        if (learning)
-        {
-            return;
-        }
+            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            break;
+        case 1:
+            if (learning)
+            {
+                return;
+            }
 
-        if (hasMappingChanged())
-        {
-            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-            screen->nextScreen = "vmpc-keyboard";
-            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-            return;
-        }
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                screen->nextScreen = "vmpc-keyboard";
+                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                return;
+            }
 
-        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-        break;
-    case 2:
-        if (learning)
-        {
-            setLearning(false);
+            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            break;
+        case 2:
+            if (learning)
+            {
+                setLearning(false);
+                learnCandidate.reset();
+                updateRows();
+                return;
+            }
+
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                screen->nextScreen = "vmpc-auto-save";
+                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                return;
+            }
+
+            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            break;
+        case 3:
+            if (learning)
+            {
+                acceptLearnCandidate();
+            }
+
+            setLearning(!learning);
             learnCandidate.reset();
+
             updateRows();
-            return;
-        }
-
-        if (hasMappingChanged())
+            break;
+        case 5:
         {
-            auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
-            screen->nextScreen = "vmpc-auto-save";
-            mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
-            return;
+            if (learning)
+            {
+                return;
+            }
+
+            std::string popupMsg;
+
+            if (hasMappingChanged())
+            {
+                MidiControlPersistence::saveCurrentState(mpc);
+                popupMsg = "MIDI mapping saved";
+            }
+            else
+            {
+                popupMsg = "MIDI mapping unchanged";
+            }
+
+            ls->showPopupForMs(popupMsg, 1000);
+            break;
         }
-
-        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-        break;
-    case 3:
-        if (learning)
-        {
-            acceptLearnCandidate();
-        }
-
-        setLearning(!learning);
-        learnCandidate.reset();
-
-        updateRows();
-        break;
-    case 5:
-    {
-        if (learning)
-        {
-            return;
-        }
-
-        std::string popupMsg;
-
-        if (hasMappingChanged())
-        {
-            MidiControlPersistence::saveCurrentState(mpc);
-            popupMsg = "MIDI mapping saved";
-        }
-        else
-        {
-            popupMsg = "MIDI mapping unchanged";
-        }
-
-        ls->showPopupForMs(popupMsg, 1000);
-        break;
-    }
     }
 }
 

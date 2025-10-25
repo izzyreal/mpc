@@ -24,27 +24,27 @@ void VmpcAutoSaveScreen::function(int i)
 {
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-        break;
-    case 1:
-        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
-        break;
-    case 4:
-    {
-        auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-
-        if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+        case 0:
+            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
+            break;
+        case 4:
         {
-            return;
-        }
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-        break;
-    }
+            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+            {
+                return;
+            }
+
+            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            break;
+        }
     }
 }
 

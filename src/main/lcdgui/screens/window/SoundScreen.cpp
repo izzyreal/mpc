@@ -47,15 +47,15 @@ void SoundScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteSoundScreen>();
-        break;
-    case 2:
-        mpc.getLayeredScreen()->openScreen<ConvertSoundScreen>();
-        break;
-    case 4:
-        mpc.getLayeredScreen()->openScreen<CopySoundScreen>();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<DeleteSoundScreen>();
+            break;
+        case 2:
+            mpc.getLayeredScreen()->openScreen<ConvertSoundScreen>();
+            break;
+        case 4:
+            mpc.getLayeredScreen()->openScreen<CopySoundScreen>();
+            break;
     }
 }
 

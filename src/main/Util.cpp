@@ -272,48 +272,48 @@ void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ct
 
     switch (sliderParam)
     {
-    case 0:
-    {
-        auto rangeLow = ctx.tuneLowRange;
-        auto rangeHigh = ctx.tuneHighRange;
+        case 0:
+        {
+            auto rangeLow = ctx.tuneLowRange;
+            auto rangeHigh = ctx.tuneHighRange;
 
-        auto sliderRange = rangeHigh - rangeLow;
-        auto sliderRangeRatio = sliderRange / 128.0;
-        auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
-        tuneValue += (120 - rangeHigh) / 2;
-        noteOnEvent->setVariationValue(tuneValue);
-        break;
-    }
-    case 1:
-    {
-        auto rangeLow = ctx.decayLowRange;
-        auto rangeHigh = ctx.decayHighRange;
-        auto sliderRange = rangeHigh - rangeLow;
-        auto sliderRangeRatio = sliderRange / 128.0;
-        auto decayValue = (int)(sliderValue * sliderRangeRatio);
-        noteOnEvent->setVariationValue(decayValue);
-        break;
-    }
-    case 2:
-    {
-        auto rangeLow = ctx.attackLowRange;
-        auto rangeHigh = ctx.attackHighRange;
-        auto sliderRange = rangeHigh - rangeLow;
-        auto sliderRangeRatio = sliderRange / 128.0;
-        auto attackValue = (int)(sliderValue * sliderRangeRatio);
-        noteOnEvent->setVariationValue(attackValue);
-        break;
-    }
-    case 3:
-    {
-        auto rangeLow = ctx.filterLowRange;
-        auto rangeHigh = ctx.filterHighRange;
-        auto sliderRange = rangeHigh - rangeLow;
-        auto sliderRangeRatio = sliderRange / 128.0;
-        auto filterValue = (int)(sliderValue * sliderRangeRatio);
-        noteOnEvent->setVariationValue(filterValue);
-        break;
-    }
+            auto sliderRange = rangeHigh - rangeLow;
+            auto sliderRangeRatio = sliderRange / 128.0;
+            auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
+            tuneValue += (120 - rangeHigh) / 2;
+            noteOnEvent->setVariationValue(tuneValue);
+            break;
+        }
+        case 1:
+        {
+            auto rangeLow = ctx.decayLowRange;
+            auto rangeHigh = ctx.decayHighRange;
+            auto sliderRange = rangeHigh - rangeLow;
+            auto sliderRangeRatio = sliderRange / 128.0;
+            auto decayValue = (int)(sliderValue * sliderRangeRatio);
+            noteOnEvent->setVariationValue(decayValue);
+            break;
+        }
+        case 2:
+        {
+            auto rangeLow = ctx.attackLowRange;
+            auto rangeHigh = ctx.attackHighRange;
+            auto sliderRange = rangeHigh - rangeLow;
+            auto sliderRangeRatio = sliderRange / 128.0;
+            auto attackValue = (int)(sliderValue * sliderRangeRatio);
+            noteOnEvent->setVariationValue(attackValue);
+            break;
+        }
+        case 3:
+        {
+            auto rangeLow = ctx.filterLowRange;
+            auto rangeHigh = ctx.filterHighRange;
+            auto sliderRange = rangeHigh - rangeLow;
+            auto sliderRangeRatio = sliderRange / 128.0;
+            auto filterValue = (int)(sliderValue * sliderRangeRatio);
+            noteOnEvent->setVariationValue(filterValue);
+            break;
+        }
     }
 }
 

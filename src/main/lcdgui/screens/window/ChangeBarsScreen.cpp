@@ -24,29 +24,29 @@ void ChangeBarsScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-    {
-        if (numberOfBars > 0 && afterBar <= seq->getLastBarIndex())
+        case 1:
         {
-            sequencer.lock()->move(0);
+            if (numberOfBars > 0 && afterBar <= seq->getLastBarIndex())
+            {
+                sequencer.lock()->move(0);
+            }
+
+            seq->insertBars(numberOfBars, afterBar);
+
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
         }
-
-        seq->insertBars(numberOfBars, afterBar);
-
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    }
-    case 4:
-    {
-        if (firstBar <= seq->getLastBarIndex())
+        case 4:
         {
-            sequencer.lock()->move(0);
-        }
+            if (firstBar <= seq->getLastBarIndex())
+            {
+                sequencer.lock()->move(0);
+            }
 
-        seq->deleteBars(firstBar, lastBar);
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    }
+            seq->deleteBars(firstBar, lastBar);
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
+        }
     }
 }
 

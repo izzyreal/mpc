@@ -32,18 +32,18 @@ void InitPadAssignScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-        if (initPadAssignIsMaster)
-        {
-            sampler->setMasterPadAssign(*sampler->getInitMasterPadAssign());
-        }
-        else
-        {
-            getProgramOrThrow()->initPadAssign();
-        }
+        case 4:
+            if (initPadAssignIsMaster)
+            {
+                sampler->setMasterPadAssign(*sampler->getInitMasterPadAssign());
+            }
+            else
+            {
+                getProgramOrThrow()->initPadAssign();
+            }
 
-        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-        break;
+            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            break;
     }
 }
 

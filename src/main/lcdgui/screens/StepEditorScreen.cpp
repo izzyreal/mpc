@@ -199,215 +199,215 @@ void StepEditorScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<StepTcScreen>();
-        break;
-    case 1:
-        if (selectionStartIndex != -1)
-        {
-            // CopySelectedNotes
-            setSelectedEvents();
-            placeHolder = selectedEvents;
-            clearSelection();
-        }
-        else if (selectionStartIndex == -1 && focusedFieldName.length() == 2)
-        {
-            // CopySelectedNote
-            auto eventIndex = getActiveRow();
-            auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex]);
-
-            if (!maybeEmptyEvent)
+        case 0:
+            mpc.getLayeredScreen()->openScreen<StepTcScreen>();
+            break;
+        case 1:
+            if (selectionStartIndex != -1)
             {
-                placeHolder = {visibleEvents[eventIndex]};
+                // CopySelectedNotes
+                setSelectedEvents();
+                placeHolder = selectedEvents;
+                clearSelection();
             }
-        }
-        break;
-    case 2:
-    {
-        if (focusedFieldName.length() != 2)
-        {
-            return;
-        }
-
-        const auto rowIndex = getActiveRow();
-        const auto srcLetter = getActiveColumn();
-        std::string eventType = visibleEvents[rowIndex]->getTypeName();
-        lastColumn[eventType] = srcLetter;
-
-        if (selectionStartIndex != -1)
-        {
-            removeEvents();
-            ls->setFocus("a0");
-            return;
-        }
-
-        if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
-        {
-            auto track = mpc.getSequencer()->getActiveTrack();
-            for (int e = 0; e < track->getEvents().size(); e++)
+            else if (selectionStartIndex == -1 && focusedFieldName.length() == 2)
             {
-                if (track->getEvents()[e] == visibleEvents[rowIndex])
+                // CopySelectedNote
+                auto eventIndex = getActiveRow();
+                auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex]);
+
+                if (!maybeEmptyEvent)
                 {
-                    track->removeEvent(e);
-                    break;
+                    placeHolder = {visibleEvents[eventIndex]};
                 }
             }
-
-            if (rowIndex == 2 && yOffset > 0)
-            {
-                yOffset--;
-            }
-        }
-
-        initVisibleEvents();
-        refreshEventRows();
-        refreshSelection();
-
-        eventType = visibleEvents[rowIndex]->getTypeName();
-
-        ls->setFocus(lastColumn[eventType] + std::to_string(rowIndex));
-        break;
-    }
-    case 3:
-    {
-        bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence()->getLastTick();
-
-        if (selectionEndIndex == -1)
+            break;
+        case 2:
         {
-            if (!posIsLastTick)
-            {
-                mpc.getLayeredScreen()->openScreen<InsertEventScreen>();
-            }
-        }
-        else
-        {
-            auto row = getActiveRow();
-
-            auto event = visibleEvents[row];
-
-            auto pitchEvent = std::dynamic_pointer_cast<PitchBendEvent>(event);
-            auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
-            auto sysexEvent = std::dynamic_pointer_cast<SystemExclusiveEvent>(event);
-            auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(event);
-
-            if (pitchEvent || mixerEvent || sysexEvent || maybeEmptyEvent)
+            if (focusedFieldName.length() != 2)
             {
                 return;
             }
 
-            auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-            auto pgmChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
-            auto chPressEvent = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
-            auto polyPressEvent = std::dynamic_pointer_cast<PolyPressureEvent>(event);
-            auto controlChangeEvent = std::dynamic_pointer_cast<ControlChangeEvent>(event);
+            const auto rowIndex = getActiveRow();
+            const auto srcLetter = getActiveColumn();
+            std::string eventType = visibleEvents[rowIndex]->getTypeName();
+            lastColumn[eventType] = srcLetter;
 
-            auto column = getActiveColumn();
-
-            bool isA = column == "a";
-            bool isB = column == "b";
-            bool isC = column == "c";
-            bool isD = column == "d";
-            bool isE = column == "e";
-
-            if ((polyPressEvent || controlChangeEvent) && isA)
+            if (selectionStartIndex != -1)
             {
+                removeEvents();
+                ls->setFocus("a0");
                 return;
             }
 
-            auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>();
-
-            auto track = mpc.getSequencer()->getActiveTrack();
-            if (noteEvent && track->getBus() != 0)
+            if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
             {
-                if (isA)
+                auto track = mpc.getSequencer()->getActiveTrack();
+                for (int e = 0; e < track->getEvents().size(); e++)
                 {
-                    editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
+                    if (track->getEvents()[e] == visibleEvents[rowIndex])
+                    {
+                        track->removeEvent(e);
+                        break;
+                    }
                 }
-                else if (isB)
+
+                if (rowIndex == 2 && yOffset > 0)
                 {
-                    editMultipleScreen->setVariationType(noteEvent->getVariationType());
-                }
-                else if (isC)
-                {
-                    editMultipleScreen->setVariationType(noteEvent->getVariationType());
-                    editMultipleScreen->setVariationValue(noteEvent->getVariationValue());
-                }
-                else if (isD)
-                {
-                    editMultipleScreen->setEditValue(*noteEvent->getDuration());
-                }
-                else if (isE)
-                {
-                    editMultipleScreen->setEditValue(noteEvent->getVelocity());
+                    yOffset--;
                 }
             }
 
-            if (noteEvent && track->getBus() == 0)
-            {
-                if (isA)
-                {
-                    editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
-                }
-                else if (isB)
-                {
-                    editMultipleScreen->setEditValue(*noteEvent->getDuration());
-                }
-                else if (isC)
-                {
-                    editMultipleScreen->setEditValue(noteEvent->getVelocity());
-                }
-            }
-            else if (pgmChangeEvent)
-            {
-                editMultipleScreen->setEditValue(0);
-            }
-            else if (chPressEvent)
-            {
-                editMultipleScreen->setEditValue(chPressEvent->getAmount());
-            }
-            else if (polyPressEvent)
-            {
-                editMultipleScreen->setEditValue(polyPressEvent->getAmount());
-            }
-            else if (controlChangeEvent)
-            {
-                editMultipleScreen->setEditValue(controlChangeEvent->getAmount());
-            }
+            initVisibleEvents();
+            refreshEventRows();
+            refreshSelection();
 
-            setSelectedEvent(visibleEvents[row]);
-            setSelectedEvents();
-            setSelectedParameterLetter(column);
-            mpc.getLayeredScreen()->openScreen<EditMultipleScreen>();
+            eventType = visibleEvents[rowIndex]->getTypeName();
+
+            ls->setFocus(lastColumn[eventType] + std::to_string(rowIndex));
+            break;
         }
+        case 3:
+        {
+            bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence()->getLastTick();
 
-        break;
-    }
-    case 4:
-        if (!placeHolder.empty())
-        {
-            mpc.getLayeredScreen()->openScreen<PasteEventScreen>();
-        }
-        break;
-    case 5:
-        if (selectionStartIndex == -1)
-        {
-            if (focusedFieldName.length() == 2)
+            if (selectionEndIndex == -1)
             {
-                auto eventNumber = getActiveRow();
-                auto event = visibleEvents[eventNumber];
+                if (!posIsLastTick)
+                {
+                    mpc.getLayeredScreen()->openScreen<InsertEventScreen>();
+                }
+            }
+            else
+            {
+                auto row = getActiveRow();
+
+                auto event = visibleEvents[row];
+
+                auto pitchEvent = std::dynamic_pointer_cast<PitchBendEvent>(event);
+                auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
+                auto sysexEvent = std::dynamic_pointer_cast<SystemExclusiveEvent>(event);
+                auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(event);
+
+                if (pitchEvent || mixerEvent || sysexEvent || maybeEmptyEvent)
+                {
+                    return;
+                }
+
                 auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+                auto pgmChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
+                auto chPressEvent = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
+                auto polyPressEvent = std::dynamic_pointer_cast<PolyPressureEvent>(event);
+                auto controlChangeEvent = std::dynamic_pointer_cast<ControlChangeEvent>(event);
 
-                if (noteEvent)
+                auto column = getActiveColumn();
+
+                bool isA = column == "a";
+                bool isB = column == "b";
+                bool isC = column == "c";
+                bool isD = column == "d";
+                bool isE = column == "e";
+
+                if ((polyPressEvent || controlChangeEvent) && isA)
                 {
-                    adhocPlayNoteEvent(noteEvent);
+                    return;
+                }
+
+                auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>();
+
+                auto track = mpc.getSequencer()->getActiveTrack();
+                if (noteEvent && track->getBus() != 0)
+                {
+                    if (isA)
+                    {
+                        editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
+                    }
+                    else if (isB)
+                    {
+                        editMultipleScreen->setVariationType(noteEvent->getVariationType());
+                    }
+                    else if (isC)
+                    {
+                        editMultipleScreen->setVariationType(noteEvent->getVariationType());
+                        editMultipleScreen->setVariationValue(noteEvent->getVariationValue());
+                    }
+                    else if (isD)
+                    {
+                        editMultipleScreen->setEditValue(*noteEvent->getDuration());
+                    }
+                    else if (isE)
+                    {
+                        editMultipleScreen->setEditValue(noteEvent->getVelocity());
+                    }
+                }
+
+                if (noteEvent && track->getBus() == 0)
+                {
+                    if (isA)
+                    {
+                        editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
+                    }
+                    else if (isB)
+                    {
+                        editMultipleScreen->setEditValue(*noteEvent->getDuration());
+                    }
+                    else if (isC)
+                    {
+                        editMultipleScreen->setEditValue(noteEvent->getVelocity());
+                    }
+                }
+                else if (pgmChangeEvent)
+                {
+                    editMultipleScreen->setEditValue(0);
+                }
+                else if (chPressEvent)
+                {
+                    editMultipleScreen->setEditValue(chPressEvent->getAmount());
+                }
+                else if (polyPressEvent)
+                {
+                    editMultipleScreen->setEditValue(polyPressEvent->getAmount());
+                }
+                else if (controlChangeEvent)
+                {
+                    editMultipleScreen->setEditValue(controlChangeEvent->getAmount());
+                }
+
+                setSelectedEvent(visibleEvents[row]);
+                setSelectedEvents();
+                setSelectedParameterLetter(column);
+                mpc.getLayeredScreen()->openScreen<EditMultipleScreen>();
+            }
+
+            break;
+        }
+        case 4:
+            if (!placeHolder.empty())
+            {
+                mpc.getLayeredScreen()->openScreen<PasteEventScreen>();
+            }
+            break;
+        case 5:
+            if (selectionStartIndex == -1)
+            {
+                if (focusedFieldName.length() == 2)
+                {
+                    auto eventNumber = getActiveRow();
+                    auto event = visibleEvents[eventNumber];
+                    auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+
+                    if (noteEvent)
+                    {
+                        adhocPlayNoteEvent(noteEvent);
+                    }
                 }
             }
-        }
-        else
-        {
-            clearSelection();
-        }
-        break;
+            else
+            {
+                clearSelection();
+            }
+            break;
     }
 }
 

@@ -53,53 +53,53 @@ void SaveApsFileScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        break;
-    case 4:
-    {
-        auto nameScreen = mpc.screens->get<NameScreen>();
-        std::string apsFileName = fileName + ".APS";
-
-        auto disk = mpc.getDisk();
-
-        if (disk->checkExists(apsFileName))
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            break;
+        case 4:
         {
-            auto replaceAction = [this, disk, apsFileName]
-            {
-                auto success = disk->getFile(apsFileName)->del();
+            auto nameScreen = mpc.screens->get<NameScreen>();
+            std::string apsFileName = fileName + ".APS";
 
-                if (success)
-                {
-                    disk->flush();
-                    disk->initFiles();
-                    disk->writeAps(apsFileName);
-                }
-            };
+            auto disk = mpc.getDisk();
 
-            const auto initializeNameScreen = [this]
+            if (disk->checkExists(apsFileName))
             {
-                auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string &nameScreenName)
+                auto replaceAction = [this, disk, apsFileName]
                 {
-                    fileName = nameScreenName;
-                    mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+                    auto success = disk->getFile(apsFileName)->del();
+
+                    if (success)
+                    {
+                        disk->flush();
+                        disk->initFiles();
+                        disk->writeAps(apsFileName);
+                    }
                 };
-                nameScreen->initialize(fileName, 16, enterAction, "save");
-            };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                         {
-                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                         });
-            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
-            return;
+                const auto initializeNameScreen = [this]
+                {
+                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto enterAction = [this](std::string &nameScreenName)
+                    {
+                        fileName = nameScreenName;
+                        mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+                    };
+                    nameScreen->initialize(fileName, 16, enterAction, "save");
+                };
+
+                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                             {
+                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                             });
+                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                return;
+            }
+
+            disk->writeAps(apsFileName);
+            break;
         }
-
-        disk->writeAps(apsFileName);
-        break;
-    }
     }
 }
 

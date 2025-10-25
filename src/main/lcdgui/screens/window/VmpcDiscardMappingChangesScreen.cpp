@@ -18,19 +18,19 @@ void VmpcDiscardMappingChangesScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        // stay
-        mpc.getLayeredScreen()->openScreen(stayScreen);
-        break;
-    case 4:
-        // discard and leave
-        discardAndLeave();
-        mpc.getLayeredScreen()->openScreen(nextScreen);
-        break;
-    case 5:
-        // save and leave
-        saveAndLeave();
-        mpc.getLayeredScreen()->openScreen(nextScreen);
-        break;
+        case 3:
+            // stay
+            mpc.getLayeredScreen()->openScreen(stayScreen);
+            break;
+        case 4:
+            // discard and leave
+            discardAndLeave();
+            mpc.getLayeredScreen()->openScreen(nextScreen);
+            break;
+        case 5:
+            // save and leave
+            saveAndLeave();
+            mpc.getLayeredScreen()->openScreen(nextScreen);
+            break;
     }
 }

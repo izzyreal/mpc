@@ -34,16 +34,16 @@ void CopySongScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SongWindow>();
-        break;
-    case 4:
-    {
-        auto songScreen = mpc.screens->get<SongScreen>();
-        sequencer.lock()->copySong(songScreen->activeSongIndex, song1);
-        mpc.getLayeredScreen()->openScreen<SongScreen>();
-        break;
-    }
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SongWindow>();
+            break;
+        case 4:
+        {
+            auto songScreen = mpc.screens->get<SongScreen>();
+            sequencer.lock()->copySong(songScreen->activeSongIndex, song1);
+            mpc.getLayeredScreen()->openScreen<SongScreen>();
+            break;
+        }
     }
 }
 

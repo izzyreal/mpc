@@ -52,53 +52,53 @@ void SaveAProgramScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        break;
-    case 4:
-    {
-        auto nameScreen = mpc.screens->get<NameScreen>();
-        auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
-        auto disk = mpc.getDisk();
-
-        auto program = getProgramOrThrow();
-
-        if (disk->checkExists(fileName))
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            break;
+        case 4:
         {
-            auto replaceAction = [this, disk, fileName, program]
-            {
-                auto success = disk->getFile(fileName)->del();
+            auto nameScreen = mpc.screens->get<NameScreen>();
+            auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
+            auto disk = mpc.getDisk();
 
-                if (success)
-                {
-                    disk->flush();
-                    disk->initFiles();
-                    disk->writePgm(program, fileName);
-                }
-            };
+            auto program = getProgramOrThrow();
 
-            const auto initializeNameScreen = [this]
+            if (disk->checkExists(fileName))
             {
-                auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string &)
+                auto replaceAction = [this, disk, fileName, program]
                 {
-                    mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                    auto success = disk->getFile(fileName)->del();
+
+                    if (success)
+                    {
+                        disk->flush();
+                        disk->initFiles();
+                        disk->writePgm(program, fileName);
+                    }
                 };
-                nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
-            };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                         {
-                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                         });
-            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                const auto initializeNameScreen = [this]
+                {
+                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto enterAction = [this](std::string &)
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                    };
+                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                };
+
+                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                             {
+                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                             });
+                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                break;
+            }
+
+            disk->writePgm(program, fileName);
             break;
         }
-
-        disk->writePgm(program, fileName);
-        break;
-    }
     }
 }
 

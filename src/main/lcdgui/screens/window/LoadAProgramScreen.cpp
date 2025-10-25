@@ -37,39 +37,39 @@ void LoadAProgramScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-    {
-        mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/true);
-        mpc.getSampler()->deleteAllSamples();
-
-        mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->getProgram(0));
-        break;
-    }
-    case 3:
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
-        break;
-    case 4:
-    {
-        auto newProgram = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
-
-        mpc.getDisk()->readPgm2(selectedFile, newProgram);
-
-        auto track = mpc.getSequencer()->getActiveTrack();
-
-        if (track->getBus() > 0)
+        case 2:
         {
-            for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++)
+            mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/true);
+            mpc.getSampler()->deleteAllSamples();
+
+            mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->getProgram(0));
+            break;
+        }
+        case 3:
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            break;
+        case 4:
+        {
+            auto newProgram = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+
+            mpc.getDisk()->readPgm2(selectedFile, newProgram);
+
+            auto track = mpc.getSequencer()->getActiveTrack();
+
+            if (track->getBus() > 0)
             {
-                if (sampler->getProgram(pgmIndex) == newProgram)
+                for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++)
                 {
-                    activeDrum().setProgram(pgmIndex);
-                    break;
+                    if (sampler->getProgram(pgmIndex) == newProgram)
+                    {
+                        activeDrum().setProgram(pgmIndex);
+                        break;
+                    }
                 }
             }
-        }
 
-        break;
-    }
+            break;
+        }
     }
 }
 

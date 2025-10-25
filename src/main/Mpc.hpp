@@ -20,7 +20,7 @@ namespace mpc::engine
 {
     class Drum;
     class PreviewSoundPlayer;
-}
+} // namespace mpc::engine
 
 namespace mpc::hardware
 {
@@ -36,7 +36,7 @@ namespace mpc::input
 {
     struct HostInputEvent;
     class PadAndButtonKeyboard;
-}
+} // namespace mpc::input
 
 namespace mpc::disk
 {

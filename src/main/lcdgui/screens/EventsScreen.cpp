@@ -106,79 +106,79 @@ void EventsScreen::function(int i)
 
     switch (i)
     {
-    // Intentional fall-through
-    case 1:
-    case 2:
-    case 3:
-        tab = i;
-        mpc.getLayeredScreen()->openScreen(tabNames[tab]);
+        // Intentional fall-through
+        case 1:
+        case 2:
+        case 3:
+            tab = i;
+            mpc.getLayeredScreen()->openScreen(tabNames[tab]);
+            break;
+        case 5:
+        {
+            auto sourceTrack = sequencer.lock()->getActiveTrack();
+
+            if (editFunctionNumber == 0)
+            {
+                performCopy(time0, time1, toSq, start, toTr, modeMerge, copies, note0, note1);
+            }
+            else if (editFunctionNumber == 1)
+            {
+                for (auto &noteEvent : sourceTrack->getNoteEvents())
+                {
+                    if (durationMode == 0)
+                    {
+                        noteEvent->setDuration(noteEvent->getDuration() + durationValue);
+                    }
+                    else if (durationMode == 1)
+                    {
+                        noteEvent->setDuration(noteEvent->getDuration() - durationValue);
+                    }
+                    else if (durationMode == 2)
+                    {
+                        noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
+                    }
+                    else if (durationMode == 3)
+                    {
+                        noteEvent->setDuration(durationValue);
+                    }
+                }
+            }
+            else if (editFunctionNumber == 2)
+            {
+                for (auto &n : sourceTrack->getNoteEvents())
+                {
+                    if (velocityMode == 0)
+                    {
+                        n->setVelocity(n->getVelocity() + velocityValue);
+                    }
+                    else if (velocityMode == 1)
+                    {
+                        n->setVelocity(n->getVelocity() - velocityValue);
+                    }
+                    else if (velocityMode == 2)
+                    {
+                        n->setVelocity((n->getVelocity() * velocityValue * 0.01));
+                    }
+                    else if (velocityMode == 3)
+                    {
+                        n->setVelocity(velocityValue);
+                    }
+                }
+            }
+            else if (editFunctionNumber == 3)
+            {
+                // The original does not process DRUM tracks.
+                // We do, because it's nice and doesn't bother anyone,
+                // so you won't see any filtering of that kind here.
+                for (auto &n : sourceTrack->getNoteEvents())
+                {
+                    n->setNote(n->getNote() + transposeAmount);
+                }
+            }
+
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+        }
         break;
-    case 5:
-    {
-        auto sourceTrack = sequencer.lock()->getActiveTrack();
-
-        if (editFunctionNumber == 0)
-        {
-            performCopy(time0, time1, toSq, start, toTr, modeMerge, copies, note0, note1);
-        }
-        else if (editFunctionNumber == 1)
-        {
-            for (auto &noteEvent : sourceTrack->getNoteEvents())
-            {
-                if (durationMode == 0)
-                {
-                    noteEvent->setDuration(noteEvent->getDuration() + durationValue);
-                }
-                else if (durationMode == 1)
-                {
-                    noteEvent->setDuration(noteEvent->getDuration() - durationValue);
-                }
-                else if (durationMode == 2)
-                {
-                    noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
-                }
-                else if (durationMode == 3)
-                {
-                    noteEvent->setDuration(durationValue);
-                }
-            }
-        }
-        else if (editFunctionNumber == 2)
-        {
-            for (auto &n : sourceTrack->getNoteEvents())
-            {
-                if (velocityMode == 0)
-                {
-                    n->setVelocity(n->getVelocity() + velocityValue);
-                }
-                else if (velocityMode == 1)
-                {
-                    n->setVelocity(n->getVelocity() - velocityValue);
-                }
-                else if (velocityMode == 2)
-                {
-                    n->setVelocity((n->getVelocity() * velocityValue * 0.01));
-                }
-                else if (velocityMode == 3)
-                {
-                    n->setVelocity(velocityValue);
-                }
-            }
-        }
-        else if (editFunctionNumber == 3)
-        {
-            // The original does not process DRUM tracks.
-            // We do, because it's nice and doesn't bother anyone,
-            // so you won't see any filtering of that kind here.
-            for (auto &n : sourceTrack->getNoteEvents())
-            {
-                n->setNote(n->getNote() + transposeAmount);
-            }
-        }
-
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-    }
-    break;
     }
 }
 

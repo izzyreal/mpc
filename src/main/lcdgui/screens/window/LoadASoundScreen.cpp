@@ -60,29 +60,29 @@ void LoadASoundScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-    {
-        auto s = sampler->getPreviewSound();
-        auto start = s->getStart();
-        auto end = s->getLastFrameIndex();
-        auto loopTo = -1;
-
-        if (s->isLoopEnabled())
+        case 2:
         {
-            loopTo = s->getLoopTo();
-        }
+            auto s = sampler->getPreviewSound();
+            auto start = s->getStart();
+            auto end = s->getLastFrameIndex();
+            auto loopTo = -1;
 
-        sampler->playPreviewSample(start, end, loopTo);
-        break;
-    }
-    case 3:
-        sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
-        sampler->deleteSound(sampler->getPreviewSound());
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
-        break;
-    case 4:
-        keepSound();
-        break;
+            if (s->isLoopEnabled())
+            {
+                loopTo = s->getLoopTo();
+            }
+
+            sampler->playPreviewSample(start, end, loopTo);
+            break;
+        }
+        case 3:
+            sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
+            sampler->deleteSound(sampler->getPreviewSound());
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            break;
+        case 4:
+            keepSound();
+            break;
     }
 }
 

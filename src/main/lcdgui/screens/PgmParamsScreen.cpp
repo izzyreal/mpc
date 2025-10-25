@@ -39,29 +39,29 @@ void PgmParamsScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-        break;
-    case 1:
-    {
-        auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
-        selectDrumScreen->redirectScreen = "program-params";
-        mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
-        break;
-    }
-    case 2:
-        mpc.getLayeredScreen()->openScreen<DrumScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<PurgeScreen>();
-        break;
-    case 4:
-    {
-        mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
-        break;
-    }
-    case 5:
-        break;
+        case 0:
+            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            break;
+        case 1:
+        {
+            auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+            selectDrumScreen->redirectScreen = "program-params";
+            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+            break;
+        }
+        case 2:
+            mpc.getLayeredScreen()->openScreen<DrumScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<PurgeScreen>();
+            break;
+        case 4:
+        {
+            mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
+            break;
+        }
+        case 5:
+            break;
     }
 }
 

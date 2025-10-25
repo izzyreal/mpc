@@ -251,54 +251,54 @@ void SongScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<ConvertSongToSeqScreen>();
-        break;
-    case 4:
-        if (sequencer.lock()->isPlaying())
+        case 3:
+            mpc.getLayeredScreen()->openScreen<ConvertSongToSeqScreen>();
+            break;
+        case 4:
+            if (sequencer.lock()->isPlaying())
+            {
+                return;
+            }
+
+            song->deleteStep(offset + 1);
+            displaySteps();
+            displayNow0();
+            displayNow1();
+            displayNow2();
+            displayTempo();
+            break;
+        case 5:
         {
-            return;
+            const auto focusedFieldName = getFocusedFieldNameOrThrow();
+
+            if (focusedFieldName != "step1" && focusedFieldName != "sequence1")
+            {
+                return;
+            }
+
+            song->insertStep(offset + 1);
+
+            auto candidate = offset + 1;
+
+            if (candidate + 1 >= song->getStepCount())
+            {
+                candidate -= 1;
+            }
+
+            setOffset(candidate);
+
+            if (!song->isUsed())
+            {
+                song->setUsed(true);
+                auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
+                song->setName(songName);
+            }
+
+            displaySongName();
+            displaySteps();
+            displayTempo();
+            break;
         }
-
-        song->deleteStep(offset + 1);
-        displaySteps();
-        displayNow0();
-        displayNow1();
-        displayNow2();
-        displayTempo();
-        break;
-    case 5:
-    {
-        const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-        if (focusedFieldName != "step1" && focusedFieldName != "sequence1")
-        {
-            return;
-        }
-
-        song->insertStep(offset + 1);
-
-        auto candidate = offset + 1;
-
-        if (candidate + 1 >= song->getStepCount())
-        {
-            candidate -= 1;
-        }
-
-        setOffset(candidate);
-
-        if (!song->isUsed())
-        {
-            song->setUsed(true);
-            auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
-            song->setName(songName);
-        }
-
-        displaySongName();
-        displaySteps();
-        displayTempo();
-        break;
-    }
     }
 }
 

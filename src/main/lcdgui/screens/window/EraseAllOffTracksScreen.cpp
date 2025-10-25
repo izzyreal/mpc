@@ -16,21 +16,21 @@ void EraseAllOffTracksScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-    {
-        auto seq = sequencer.lock()->getActiveSequence();
-        int trackCounter = 0;
-
-        for (auto &track : seq->getTracks())
+        case 4:
         {
-            if (!track->isOn())
+            auto seq = sequencer.lock()->getActiveSequence();
+            int trackCounter = 0;
+
+            for (auto &track : seq->getTracks())
             {
-                seq->purgeTrack(trackCounter);
+                if (!track->isOn())
+                {
+                    seq->purgeTrack(trackCounter);
+                }
+                trackCounter++;
             }
-            trackCounter++;
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
         }
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    }
     }
 }

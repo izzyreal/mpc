@@ -75,28 +75,28 @@ void MidiInputScreen::displayPass()
 
     switch (type)
     {
-    case 0:
-        pass = notePassEnabled;
-        break;
-    case 1:
-        pass = pitchBendPassEnabled;
-        break;
-    case 2:
-        pass = pgmChangePassEnabled;
-        break;
-    case 3:
-        pass = chPressurePassEnabled;
-        break;
-    case 4:
-        pass = polyPressurePassEnabled;
-        break;
-    case 5:
-        pass = exclusivePassEnabled;
-        break;
-    default:
-        const uint8_t ccIndex = type - 6;
-        pass = ccPassEnabled[ccIndex];
-        break;
+        case 0:
+            pass = notePassEnabled;
+            break;
+        case 1:
+            pass = pitchBendPassEnabled;
+            break;
+        case 2:
+            pass = pgmChangePassEnabled;
+            break;
+        case 3:
+            pass = chPressurePassEnabled;
+            break;
+        case 4:
+            pass = polyPressurePassEnabled;
+            break;
+        case 5:
+            pass = exclusivePassEnabled;
+            break;
+        default:
+            const uint8_t ccIndex = type - 6;
+            pass = ccPassEnabled[ccIndex];
+            break;
     }
 
     findField("pass")->setText(pass ? "YES" : "NO");
@@ -219,28 +219,28 @@ void MidiInputScreen::setPass(bool b)
 {
     switch (type)
     {
-    case 0:
-        notePassEnabled = b;
-        break;
-    case 1:
-        pitchBendPassEnabled = b;
-        break;
-    case 2:
-        pgmChangePassEnabled = b;
-        break;
-    case 3:
-        chPressurePassEnabled = b;
-        break;
-    case 4:
-        polyPressurePassEnabled = b;
-        break;
-    case 5:
-        exclusivePassEnabled = b;
-        break;
-    default:
-        const uint8_t ccIndex = type - 6;
-        ccPassEnabled[ccIndex] = b;
-        break;
+        case 0:
+            notePassEnabled = b;
+            break;
+        case 1:
+            pitchBendPassEnabled = b;
+            break;
+        case 2:
+            pgmChangePassEnabled = b;
+            break;
+        case 3:
+            chPressurePassEnabled = b;
+            break;
+        case 4:
+            polyPressurePassEnabled = b;
+            break;
+        case 5:
+            exclusivePassEnabled = b;
+            break;
+        default:
+            const uint8_t ccIndex = type - 6;
+            ccPassEnabled[ccIndex] = b;
+            break;
     }
 
     displayPass();

@@ -37,53 +37,53 @@ void TimingCorrectScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-    {
-        sequencer.lock()->storeActiveSequenceInUndoPlaceHolder();
-
-        std::vector<int> noteRange(2);
-
-        auto track = mpc.getSequencer()->getActiveTrack();
-
-        if (track->getBus() != 0)
+        case 4:
         {
-            if (note0 == 34)
+            sequencer.lock()->storeActiveSequenceInUndoPlaceHolder();
+
+            std::vector<int> noteRange(2);
+
+            auto track = mpc.getSequencer()->getActiveTrack();
+
+            if (track->getBus() != 0)
             {
-                noteRange[0] = 0;
-                noteRange[1] = 127;
+                if (note0 == 34)
+                {
+                    noteRange[0] = 0;
+                    noteRange[1] = 127;
+                }
+                else
+                {
+                    noteRange[0] = note0;
+                    noteRange[1] = note0;
+                }
             }
             else
             {
                 noteRange[0] = note0;
-                noteRange[1] = note0;
+                noteRange[1] = note1;
             }
-        }
-        else
-        {
-            noteRange[0] = note0;
-            noteRange[1] = note1;
-        }
 
-        auto eventRange = track->getEventRange(time0, time1);
+            auto eventRange = track->getEventRange(time0, time1);
 
-        auto sequence = sequencer.lock()->getActiveSequence();
+            auto sequence = sequencer.lock()->getActiveSequence();
 
-        for (auto &e : eventRange)
-        {
-            if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+            for (auto &e : eventRange)
             {
-                if (noteEvent->getNote() >= noteRange[0] && noteEvent->getNote() <= noteRange[1])
+                if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
                 {
-                    track->shiftTiming(e, shiftTimingLater, amount, sequence->getLastTick());
+                    if (noteEvent->getNote() >= noteRange[0] && noteEvent->getNote() <= noteRange[1])
+                    {
+                        track->shiftTiming(e, shiftTimingLater, amount, sequence->getLastTick());
+                    }
                 }
             }
+
+            track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(), swing, noteRange[0], noteRange[1]);
+
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
         }
-
-        track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(), swing, noteRange[0], noteRange[1]);
-
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    }
     }
 }
 
@@ -203,30 +203,30 @@ void TimingCorrectScreen::setAmount(int i)
 
     switch (noteValue)
     {
-    case 0:
-        maxVal = 0;
-        break;
-    case 1:
-        maxVal = 23;
-        break;
-    case 2:
-        maxVal = 15;
-        break;
-    case 3:
-        maxVal = 11;
-        break;
-    case 4:
-        maxVal = 7;
-        break;
-    case 5:
-        maxVal = 5;
-        break;
-    case 6:
-        maxVal = 3;
-        break;
-    default:
-        maxVal = 0;
-        break;
+        case 0:
+            maxVal = 0;
+            break;
+        case 1:
+            maxVal = 23;
+            break;
+        case 2:
+            maxVal = 15;
+            break;
+        case 3:
+            maxVal = 11;
+            break;
+        case 4:
+            maxVal = 7;
+            break;
+        case 5:
+            maxVal = 5;
+            break;
+        case 6:
+            maxVal = 3;
+            break;
+        default:
+            maxVal = 0;
+            break;
     }
 
     amount = std::clamp(i, 0, maxVal);

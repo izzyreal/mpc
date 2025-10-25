@@ -60,38 +60,38 @@ void SndParamsScreen::function(int f)
 
     switch (f)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<TrimScreen>();
-        break;
-    case 1:
-        mpc.getLayeredScreen()->openScreen<LoopScreen>();
-        break;
-    case 2:
-        mpc.getLayeredScreen()->openScreen<ZoneScreen>();
-        break;
-    case 3:
-    {
-        sampler->switchToNextSoundSortType();
-        ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
-        break;
-    }
-    case 4:
-    {
-        if (sampler->getSoundCount() == 0)
+        case 0:
+            mpc.getLayeredScreen()->openScreen<TrimScreen>();
+            break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<LoopScreen>();
+            break;
+        case 2:
+            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            break;
+        case 3:
         {
-            return;
+            sampler->switchToNextSoundSortType();
+            ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            break;
         }
+        case 4:
+        {
+            if (sampler->getSoundCount() == 0)
+            {
+                return;
+            }
 
-        auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
-        editSoundScreen->setReturnToScreenName("trim");
-        mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
-        break;
-    }
-    case 5:
-    {
-        sampler->playX();
-        break;
-    }
+            auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
+            editSoundScreen->setReturnToScreenName("trim");
+            mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+            break;
+        }
+        case 5:
+        {
+            sampler->playX();
+            break;
+        }
     }
 }
 

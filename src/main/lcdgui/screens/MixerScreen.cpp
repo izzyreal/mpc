@@ -336,27 +336,27 @@ void MixerScreen::function(int f)
 
     switch (f)
     {
-    case 0:
-    case 1:
-    case 2: // Intentional fall-through
-        if (f == tab)
-        {
-            lastTab = tab;
-            mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
-        }
-        else
-        {
-            setTab(f);
-        }
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<MixerSetupScreen>();
-        break;
-        //	case 4:
-        // openScreen<FxEditScreen>(); // Not implemented
-    case 5:
-        setLink(selection.count() == 1);
-        break;
+        case 0:
+        case 1:
+        case 2: // Intentional fall-through
+            if (f == tab)
+            {
+                lastTab = tab;
+                mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
+            }
+            else
+            {
+                setTab(f);
+            }
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<MixerSetupScreen>();
+            break;
+            //	case 4:
+            // openScreen<FxEditScreen>(); // Not implemented
+        case 5:
+            setLink(selection.count() == 1);
+            break;
     }
 }
 

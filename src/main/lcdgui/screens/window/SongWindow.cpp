@@ -34,15 +34,15 @@ void SongWindow::function(int i)
 {
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SongScreen>();
-        break;
-    case 4:
-        mpc.getLayeredScreen()->openScreen<CopySongScreen>();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SongScreen>();
+            break;
+        case 4:
+            mpc.getLayeredScreen()->openScreen<CopySongScreen>();
+            break;
     }
 }
 

@@ -34,18 +34,18 @@ void DeleteTrackScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-        mpc.getLayeredScreen()->openScreen<DeleteAllTracksScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<TrackScreen>();
-        break;
-    case 4:
-    {
-        auto s = sequencer.lock()->getActiveSequence();
-        s->purgeTrack(tr);
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-    }
+        case 2:
+            mpc.getLayeredScreen()->openScreen<DeleteAllTracksScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<TrackScreen>();
+            break;
+        case 4:
+        {
+            auto s = sequencer.lock()->getActiveSequence();
+            s->purgeTrack(tr);
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+        }
     }
 }
 

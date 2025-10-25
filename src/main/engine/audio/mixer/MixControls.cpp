@@ -69,16 +69,16 @@ void MixControls::derive(Control *c)
 {
     switch (c->getId())
     {
-    case MixControlIds::MUTE:
-        mute = muteControl->getValue();
-        break;
-    case MixControlIds::GAIN:
-        gain = gainControl->getGain();
-        break;
-    case MixControlIds::LCR:
-        left = lcrControl->getLeft();
-        right = lcrControl->getRight();
-        break;
+        case MixControlIds::MUTE:
+            mute = muteControl->getValue();
+            break;
+        case MixControlIds::GAIN:
+            gain = gainControl->getGain();
+            break;
+        case MixControlIds::LCR:
+            left = lcrControl->getLeft();
+            right = lcrControl->getRight();
+            break;
     }
 }
 

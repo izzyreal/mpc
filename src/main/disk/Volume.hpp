@@ -65,14 +65,14 @@ namespace mpc::disk
         {
             switch (type)
             {
-            case LOCAL_DIRECTORY:
-                return "DIR";
-            case USB_VOLUME:
-                return "USB";
-            case DISK_IMAGE:
-                return "IMG";
-            default:
-                return " ? ";
+                case LOCAL_DIRECTORY:
+                    return "DIR";
+                case USB_VOLUME:
+                    return "USB";
+                case DISK_IMAGE:
+                    return "IMG";
+                default:
+                    return " ? ";
             }
         }
 
@@ -80,14 +80,14 @@ namespace mpc::disk
         {
             switch (m)
             {
-            case DISABLED:
-                return "DISABLED";
-            case READ_ONLY:
-                return "READ-ONLY";
-            case READ_WRITE:
-                return "READ/WRITE";
-            default:
-                return "UNKNOWN";
+                case DISABLED:
+                    return "DISABLED";
+                case READ_ONLY:
+                    return "READ-ONLY";
+                case READ_WRITE:
+                    return "READ/WRITE";
+                default:
+                    return "UNKNOWN";
             }
         }
 

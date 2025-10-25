@@ -133,16 +133,16 @@ void Voice::init(
 
     switch (state->varType)
     {
-    case 0:
-        state->tune += (state->varValue - 64) * 2;
-        break;
-    case 1:
-        state->decayValue = state->varValue;
-        state->decayMode = 1;
-        break;
-    case 2:
-        state->attackValue = state->varValue;
-        break;
+        case 0:
+            state->tune += (state->varValue - 64) * 2;
+            break;
+        case 1:
+            state->decayValue = state->varValue;
+            state->decayMode = 1;
+            break;
+        case 2:
+            state->attackValue = state->varValue;
+            break;
     }
 
     const auto veloFactor = state->velocity / 127.f;

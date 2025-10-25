@@ -93,14 +93,14 @@ void DeleteFolderScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-        if (deleteFolderThread.joinable())
-        {
-            deleteFolderThread.join();
-        }
+        case 4:
+            if (deleteFolderThread.joinable())
+            {
+                deleteFolderThread.join();
+            }
 
-        deleteFolderThread = std::thread(&DeleteFolderScreen::static_deleteFolder, this);
-        break;
+            deleteFolderThread = std::thread(&DeleteFolderScreen::static_deleteFolder, this);
+            break;
     }
 }
 

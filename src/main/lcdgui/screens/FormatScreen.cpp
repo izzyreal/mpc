@@ -12,11 +12,11 @@ void FormatScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
-        break;
-    case 1:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        break;
+        case 0:
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            break;
     }
 }

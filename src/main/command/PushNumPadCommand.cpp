@@ -19,84 +19,84 @@ void PushNumPadCommand::execute()
     {
         switch (i)
         {
-        case 0:
-        {
-            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
-            break;
-        }
-        case 1:
-        {
-            if (!mpc.getSequencer()->isPlaying())
+            case 0:
             {
-                mpc.getLayeredScreen()->openScreen<SongScreen>();
+                mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+                break;
             }
-            break;
-        }
-        case 2:
-        {
-            mpc.getLayeredScreen()->openScreen<PunchScreen>();
-            break;
-        }
-        case 3:
-        {
-            if (!mpc.getSequencer()->isPlaying())
+            case 1:
             {
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                if (!mpc.getSequencer()->isPlaying())
+                {
+                    mpc.getLayeredScreen()->openScreen<SongScreen>();
+                }
+                break;
             }
-            break;
-        }
-        case 4:
-        {
-            if (!mpc.getSequencer()->isPlaying())
+            case 2:
             {
-                mpc.getLayeredScreen()->openScreen<SampleScreen>();
+                mpc.getLayeredScreen()->openScreen<PunchScreen>();
+                break;
             }
-            break;
-        }
-        case 5:
-        {
-            if (!mpc.getSequencer()->isPlaying())
+            case 3:
             {
-                mpc.getLayeredScreen()->openScreen<TrimScreen>();
+                if (!mpc.getSequencer()->isPlaying())
+                {
+                    mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                }
+                break;
             }
-            break;
-        }
-        case 6:
-        {
-            auto newDrum = mpc.getSequencer()->getActiveTrack()->getBus() - 1;
-            if (newDrum >= 0)
+            case 4:
             {
-                mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(newDrum);
+                if (!mpc.getSequencer()->isPlaying())
+                {
+                    mpc.getLayeredScreen()->openScreen<SampleScreen>();
+                }
+                break;
             }
-            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
-            break;
-        }
-        case 7:
-        {
-            auto newDrum = mpc.getSequencer()->getActiveTrack()->getBus() - 1;
-            if (newDrum >= 0)
+            case 5:
             {
-                mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(newDrum);
+                if (!mpc.getSequencer()->isPlaying())
+                {
+                    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+                }
+                break;
             }
-            mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
-            break;
-        }
-        case 8:
-        {
-            if (!mpc.getSequencer()->isPlaying())
+            case 6:
             {
-                mpc.getLayeredScreen()->openScreen<OthersScreen>();
+                auto newDrum = mpc.getSequencer()->getActiveTrack()->getBus() - 1;
+                if (newDrum >= 0)
+                {
+                    mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(newDrum);
+                }
+                mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+                break;
             }
-            break;
-        }
-        case 9:
-        {
-            if (!mpc.getSequencer()->isPlaying())
+            case 7:
             {
-                mpc.getLayeredScreen()->openScreen<SyncScreen>();
+                auto newDrum = mpc.getSequencer()->getActiveTrack()->getBus() - 1;
+                if (newDrum >= 0)
+                {
+                    mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(newDrum);
+                }
+                mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
+                break;
             }
-            break;
-        }
+            case 8:
+            {
+                if (!mpc.getSequencer()->isPlaying())
+                {
+                    mpc.getLayeredScreen()->openScreen<OthersScreen>();
+                }
+                break;
+            }
+            case 9:
+            {
+                if (!mpc.getSequencer()->isPlaying())
+                {
+                    mpc.getLayeredScreen()->openScreen<SyncScreen>();
+                }
+                break;
+            }
         }
 
         return;

@@ -33,4 +33,3 @@ void ClientEventController::handleClientEvent(const client::event::ClientEvent &
         clientHardwareEventController->handleClientHardwareEvent(std::get<ClientHardwareEvent>(e.payload));
     }
 }
-

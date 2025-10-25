@@ -301,115 +301,115 @@ void TempoChangeScreen::function(int j)
 
     switch (j)
     {
-    case 1:
-        if (yPos + offset >= tceList.size())
-        {
-            return;
-        }
-
-        // The initial tempo change event can't be removed.
-        if (offset + yPos == 0)
-        {
-            return;
-        }
-
-        seq->removeTempoChangeEvent(offset + yPos);
-
-        if (offset + yPos == static_cast<int>(tceList.size()) - 1)
-        {
-            setOffset(offset - 1);
-        }
-
-        initVisibleEvents();
-
-        displayTempoChange0();
-        displayTempoChange1();
-        displayTempoChange2();
-
-        ls->setFocus("a" + std::to_string(yPos));
-        break;
-    case 2:
-    {
-        auto nowDetected = -1;
-        for (int i = 0; i < tceList.size(); i++)
-        {
-            if (tceList[i]->getTick() == sequencer.lock()->getTickPosition())
+        case 1:
+            if (yPos + offset >= tceList.size())
             {
-                nowDetected = i;
-                break;
+                return;
+            }
+
+            // The initial tempo change event can't be removed.
+            if (offset + yPos == 0)
+            {
+                return;
+            }
+
+            seq->removeTempoChangeEvent(offset + yPos);
+
+            if (offset + yPos == static_cast<int>(tceList.size()) - 1)
+            {
+                setOffset(offset - 1);
+            }
+
+            initVisibleEvents();
+
+            displayTempoChange0();
+            displayTempoChange1();
+            displayTempoChange2();
+
+            ls->setFocus("a" + std::to_string(yPos));
+            break;
+        case 2:
+        {
+            auto nowDetected = -1;
+            for (int i = 0; i < tceList.size(); i++)
+            {
+                if (tceList[i]->getTick() == sequencer.lock()->getTickPosition())
+                {
+                    nowDetected = i;
+                    break;
+                }
+            }
+
+            if (nowDetected == -1)
+            {
+                std::shared_ptr<Event> tce = seq->addTempoChangeEvent(sequencer.lock()->getTickPosition());
+                initVisibleEvents();
+                displayTempoChange0();
+                displayTempoChange1();
+                displayTempoChange2();
+
+                ls->setFocus(std::string("a" + std::to_string(yPos)));
+            }
+            else
+            {
+                if (nowDetected > offset + 3 || nowDetected < offset)
+                {
+                    setOffset(nowDetected);
+                }
+
+                ls->setFocus(focusedFieldName.substr(0, 1) + std::to_string(nowDetected - offset));
             }
         }
-
-        if (nowDetected == -1)
+        break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
+        case 4:
         {
-            std::shared_ptr<Event> tce = seq->addTempoChangeEvent(sequencer.lock()->getTickPosition());
+            tceList = seq->getTempoChangeEvents();
+
+            if (tceList.size() == 1)
+            {
+                seq->addTempoChangeEvent(seq->getLastTick() - 1);
+            }
+            else if (tceList.size() > 1)
+            {
+                if (focusedFieldName.length() != 2)
+                {
+                    return;
+                }
+
+                auto lCurrent = current.lock();
+                auto lPrevious = previous.lock();
+
+                if (yPos + offset == 0)
+                {
+                    if (lCurrent->getTick() == 1)
+                    {
+                        return;
+                    }
+
+                    seq->addTempoChangeEvent(next.lock()->getTick() - 1);
+                }
+                else if (yPos + offset > 0)
+                {
+                    if (lCurrent->getTick() - 1 == lPrevious->getTick())
+                    {
+                        return;
+                    }
+
+                    seq->addTempoChangeEvent(lCurrent->getTick() - 1);
+                }
+            }
+
             initVisibleEvents();
             displayTempoChange0();
             displayTempoChange1();
             displayTempoChange2();
 
-            ls->setFocus(std::string("a" + std::to_string(yPos)));
+            ls->setFocus(focusedFieldName);
+            break;
         }
-        else
-        {
-            if (nowDetected > offset + 3 || nowDetected < offset)
-            {
-                setOffset(nowDetected);
-            }
-
-            ls->setFocus(focusedFieldName.substr(0, 1) + std::to_string(nowDetected - offset));
-        }
-    }
-    break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    case 4:
-    {
-        tceList = seq->getTempoChangeEvents();
-
-        if (tceList.size() == 1)
-        {
-            seq->addTempoChangeEvent(seq->getLastTick() - 1);
-        }
-        else if (tceList.size() > 1)
-        {
-            if (focusedFieldName.length() != 2)
-            {
-                return;
-            }
-
-            auto lCurrent = current.lock();
-            auto lPrevious = previous.lock();
-
-            if (yPos + offset == 0)
-            {
-                if (lCurrent->getTick() == 1)
-                {
-                    return;
-                }
-
-                seq->addTempoChangeEvent(next.lock()->getTick() - 1);
-            }
-            else if (yPos + offset > 0)
-            {
-                if (lCurrent->getTick() - 1 == lPrevious->getTick())
-                {
-                    return;
-                }
-
-                seq->addTempoChangeEvent(lCurrent->getTick() - 1);
-            }
-        }
-
-        initVisibleEvents();
-        displayTempoChange0();
-        displayTempoChange1();
-        displayTempoChange2();
-
-        ls->setFocus(focusedFieldName);
-        break;
-    }
     }
 }
 

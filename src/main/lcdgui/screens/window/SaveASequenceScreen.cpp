@@ -59,53 +59,53 @@ void SaveASequenceScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        break;
-    case 4:
-    {
-        auto nameScreen = mpc.screens->get<NameScreen>();
-        auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
-        auto disk = mpc.getDisk();
-
-        if (disk->checkExists(fileName))
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            break;
+        case 4:
         {
-            auto replaceAction = [this, disk, fileName]
-            {
-                auto success = disk->getFile(fileName)->del();
+            auto nameScreen = mpc.screens->get<NameScreen>();
+            auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
+            auto disk = mpc.getDisk();
 
-                if (success)
-                {
-                    disk->flush();
-                    disk->initFiles();
-                    disk->writeMid(sequencer.lock()->getActiveSequence(), fileName);
-                }
-            };
-
-            const auto initializeNameScreen = [this]
+            if (disk->checkExists(fileName))
             {
-                auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string &)
+                auto replaceAction = [this, disk, fileName]
                 {
-                    mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                    auto success = disk->getFile(fileName)->del();
+
+                    if (success)
+                    {
+                        disk->flush();
+                        disk->initFiles();
+                        disk->writeMid(sequencer.lock()->getActiveSequence(), fileName);
+                    }
                 };
-                nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
-            };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                         {
-                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                         });
-            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
-            return;
+                const auto initializeNameScreen = [this]
+                {
+                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto enterAction = [this](std::string &)
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                    };
+                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                };
+
+                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                             {
+                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                             });
+                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                return;
+            }
+
+            auto seq = sequencer.lock()->getActiveSequence();
+
+            disk->writeMid(seq, fileName);
+            break;
         }
-
-        auto seq = sequencer.lock()->getActiveSequence();
-
-        disk->writeMid(seq, fileName);
-        break;
-    }
     }
 }
 

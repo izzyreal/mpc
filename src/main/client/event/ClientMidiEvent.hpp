@@ -145,4 +145,4 @@ namespace mpc::client::event
 
         void printInfo() const noexcept;
     };
-} // namespace mpc::input
+} // namespace mpc::client::event

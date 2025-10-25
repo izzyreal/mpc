@@ -27,24 +27,24 @@ void KeepOrRetryScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        sampler->deleteSound(sampler->getPreviewSound());
-        mpc.getLayeredScreen()->openScreen<SampleScreen>();
-        break;
-    case 3:
-        sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
-        break;
-    case 4:
-        auto index = sampler->getSoundCount() - 1;
+        case 1:
+            sampler->deleteSound(sampler->getPreviewSound());
+            mpc.getLayeredScreen()->openScreen<SampleScreen>();
+            break;
+        case 3:
+            sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
+            break;
+        case 4:
+            auto index = sampler->getSoundCount() - 1;
 
-        if (assignToNote != 34)
-        {
-            getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(index);
-        }
+            if (assignToNote != 34)
+            {
+                getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(index);
+            }
 
-        sampler->setSoundIndex(index);
-        mpc.getLayeredScreen()->openScreen<SampleScreen>();
-        break;
+            sampler->setSoundIndex(index);
+            mpc.getLayeredScreen()->openScreen<SampleScreen>();
+            break;
     }
 }
 

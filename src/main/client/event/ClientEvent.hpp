@@ -4,9 +4,11 @@
 
 #include <utility>
 
-namespace mpc::client::event {
+namespace mpc::client::event
+{
 
-    struct ClientEvent {
+    struct ClientEvent
+    {
         std::variant<ClientHardwareEvent> payload;
     };
-} //namespace mpc::client::event
+} // namespace mpc::client::event

@@ -42,97 +42,97 @@ void EditMultipleScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-    {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(selectedEvent);
-
-        if (noteEvent && track->getBus() != 0)
+        case 4:
         {
-            if (paramLetter == "a")
+            auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(selectedEvent);
+
+            if (noteEvent && track->getBus() != 0)
             {
-                checkNotes();
-            }
-            else if (paramLetter == "b")
-            {
-                for (auto &event : stepEditorScreen->getSelectedEvents())
+                if (paramLetter == "a")
                 {
-                    auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-                    if (_noteEvent)
+                    checkNotes();
+                }
+                else if (paramLetter == "b")
+                {
+                    for (auto &event : stepEditorScreen->getSelectedEvents())
                     {
-                        _noteEvent->setVariationType(variationType);
+                        auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+                        if (_noteEvent)
+                        {
+                            _noteEvent->setVariationType(variationType);
+                        }
                     }
                 }
-            }
-            else if (paramLetter == "c")
-            {
-                for (auto &event : stepEditorScreen->getSelectedEvents())
+                else if (paramLetter == "c")
                 {
-                    auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-                    if (_noteEvent)
+                    for (auto &event : stepEditorScreen->getSelectedEvents())
                     {
-                        _noteEvent->setVariationValue(variationValue);
+                        auto _noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+
+                        if (_noteEvent)
+                        {
+                            _noteEvent->setVariationValue(variationValue);
+                        }
                     }
                 }
+                else if (paramLetter == "d")
+                {
+                    checkFiveParameters();
+                }
+                else if (paramLetter == "e")
+                {
+                    checkThreeParameters();
+                }
             }
-            else if (paramLetter == "d")
+
+            if (noteEvent && track->getBus() == 0)
+            {
+                if (paramLetter == "a")
+                {
+                    checkNotes();
+                }
+                else if (paramLetter == "b")
+                {
+                    checkFiveParameters();
+                }
+                else if (paramLetter == "c")
+                {
+                    checkThreeParameters();
+                }
+            }
+
+            if (std::dynamic_pointer_cast<ControlChangeEvent>(selectedEvent))
+            {
+                if (paramLetter == "a")
+                {
+                    checkFiveParameters();
+                }
+                else if (paramLetter == "b")
+                {
+                    checkThreeParameters();
+                }
+            }
+
+            if (std::dynamic_pointer_cast<ProgramChangeEvent>(selectedEvent) || std::dynamic_pointer_cast<ChannelPressureEvent>(selectedEvent))
             {
                 checkFiveParameters();
             }
-            else if (paramLetter == "e")
-            {
-                checkThreeParameters();
-            }
-        }
 
-        if (noteEvent && track->getBus() == 0)
-        {
-            if (paramLetter == "a")
+            if (std::dynamic_pointer_cast<PolyPressureEvent>(selectedEvent))
             {
-                checkNotes();
+                if (paramLetter == "a")
+                {
+                    checkFiveParameters();
+                }
+                else if (paramLetter == "b")
+                {
+                    checkThreeParameters();
+                }
             }
-            else if (paramLetter == "b")
-            {
-                checkFiveParameters();
-            }
-            else if (paramLetter == "c")
-            {
-                checkThreeParameters();
-            }
-        }
 
-        if (std::dynamic_pointer_cast<ControlChangeEvent>(selectedEvent))
-        {
-            if (paramLetter == "a")
-            {
-                checkFiveParameters();
-            }
-            else if (paramLetter == "b")
-            {
-                checkThreeParameters();
-            }
+            stepEditorScreen->clearSelection();
+            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
         }
-
-        if (std::dynamic_pointer_cast<ProgramChangeEvent>(selectedEvent) || std::dynamic_pointer_cast<ChannelPressureEvent>(selectedEvent))
-        {
-            checkFiveParameters();
-        }
-
-        if (std::dynamic_pointer_cast<PolyPressureEvent>(selectedEvent))
-        {
-            if (paramLetter == "a")
-            {
-                checkFiveParameters();
-            }
-            else if (paramLetter == "b")
-            {
-                checkThreeParameters();
-            }
-        }
-
-        stepEditorScreen->clearSelection();
-        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
-    }
     }
 }
 

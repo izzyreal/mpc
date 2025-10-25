@@ -31,12 +31,12 @@ void SequenceScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteSequenceScreen>();
-        break;
-    case 4:
-        mpc.getLayeredScreen()->openScreen<CopySequenceScreen>();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<DeleteSequenceScreen>();
+            break;
+        case 4:
+            mpc.getLayeredScreen()->openScreen<CopySequenceScreen>();
+            break;
     }
 }
 

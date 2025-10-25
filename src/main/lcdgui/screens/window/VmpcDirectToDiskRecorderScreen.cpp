@@ -72,154 +72,154 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    case 4:
-    {
-        auto seq = sq;
-        std::vector<int> rates{44100, 48000, 88200};
-        auto rate = rates[sampleRate];
-
-        //		if (!offline)
-        rate = static_cast<int>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
-
-        auto sequence = sequencer.lock()->getSequence(seq);
-        seqLoopWasEnabled = sequence->isLoopEnabled();
-
-        switch (record)
-        {
-        case 0:
-        {
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-
-            if (seqLoopWasEnabled)
-            {
-                sequence->setLoopEnabled(false);
-            }
-
-            const auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
-            const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
-            const auto settings = std::make_unique<DirectToDiskSettings>(
-                lengthInFrames,
-                splitStereoIntoLeftAndRightChannel,
-                rate,
-                recordingName);
-
-            if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-            {
-                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
-            }
-            else
-            {
-                sequencer.lock()->playFromStart();
-            }
-
-            break;
-        }
-        case 1:
-        {
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-
-            auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
-            const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
-            auto settings = std::make_unique<DirectToDiskSettings>(
-                lengthInFrames,
-                splitStereoIntoLeftAndRightChannel,
-                rate,
-                recordingName);
-
-            if (seqLoopWasEnabled)
-            {
-                sequence->setLoopEnabled(false);
-            }
-
-            sequencer.lock()->move(Sequencer::ticksToQuarterNotes(sequence->getLoopStart()));
-
-            if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-            {
-                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
-            }
-            else
-            {
-                sequencer.lock()->play();
-            }
-
-            break;
-        }
-        case 2:
-        {
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-
-            auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
-            const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
-            auto settings = std::make_unique<DirectToDiskSettings>(
-                lengthInFrames,
-                splitStereoIntoLeftAndRightChannel,
-                rate,
-                recordingName);
-
-            if (seqLoopWasEnabled)
-            {
-                sequence->setLoopEnabled(false);
-            }
-
-            sequencer.lock()->move(Sequencer::ticksToQuarterNotes(time0));
-
-            if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-            {
-                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
-            }
-            else
-            {
-                sequencer.lock()->play();
-            }
-
-            break;
-        }
         case 3:
-        {
-            auto mpcSong = sequencer.lock()->getSong(song);
-
-            if (!mpcSong->isUsed())
-            {
-                return;
-            }
-
-            const auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
-            const auto recordingName = mpcSong->getName() + "-" + DirectToDiskSettings::getTimeStamp();
-            auto settings = std::make_unique<DirectToDiskSettings>(
-                lengthInFrames,
-                splitStereoIntoLeftAndRightChannel,
-                rate,
-                recordingName);
-
-            mpc.getLayeredScreen()->openScreen<SongScreen>();
-
-            songLoopWasEnabled = mpcSong->isLoopEnabled();
-
-            if (songLoopWasEnabled)
-            {
-                mpcSong->setLoopEnabled(false);
-            }
-
-            if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
-            {
-                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
-            }
-            else
-            {
-                sequencer.lock()->setSongModeEnabled(true);
-                sequencer.lock()->playFromStart();
-            }
-
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
-        }
         case 4:
-            mpc.getLayeredScreen()->openScreen<VmpcRecordJamScreen>();
-            break;
+        {
+            auto seq = sq;
+            std::vector<int> rates{44100, 48000, 88200};
+            auto rate = rates[sampleRate];
+
+            //		if (!offline)
+            rate = static_cast<int>(mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
+
+            auto sequence = sequencer.lock()->getSequence(seq);
+            seqLoopWasEnabled = sequence->isLoopEnabled();
+
+            switch (record)
+            {
+                case 0:
+                {
+                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+
+                    if (seqLoopWasEnabled)
+                    {
+                        sequence->setLoopEnabled(false);
+                    }
+
+                    const auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
+                    const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+                    const auto settings = std::make_unique<DirectToDiskSettings>(
+                        lengthInFrames,
+                        splitStereoIntoLeftAndRightChannel,
+                        rate,
+                        recordingName);
+
+                    if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
+                    {
+                        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
+                    }
+                    else
+                    {
+                        sequencer.lock()->playFromStart();
+                    }
+
+                    break;
+                }
+                case 1:
+                {
+                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+
+                    auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
+                    const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+                    auto settings = std::make_unique<DirectToDiskSettings>(
+                        lengthInFrames,
+                        splitStereoIntoLeftAndRightChannel,
+                        rate,
+                        recordingName);
+
+                    if (seqLoopWasEnabled)
+                    {
+                        sequence->setLoopEnabled(false);
+                    }
+
+                    sequencer.lock()->move(Sequencer::ticksToQuarterNotes(sequence->getLoopStart()));
+
+                    if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
+                    {
+                        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
+                    }
+                    else
+                    {
+                        sequencer.lock()->play();
+                    }
+
+                    break;
+                }
+                case 2:
+                {
+                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+
+                    auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
+                    const auto recordingName = sequence->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+                    auto settings = std::make_unique<DirectToDiskSettings>(
+                        lengthInFrames,
+                        splitStereoIntoLeftAndRightChannel,
+                        rate,
+                        recordingName);
+
+                    if (seqLoopWasEnabled)
+                    {
+                        sequence->setLoopEnabled(false);
+                    }
+
+                    sequencer.lock()->move(Sequencer::ticksToQuarterNotes(time0));
+
+                    if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
+                    {
+                        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
+                    }
+                    else
+                    {
+                        sequencer.lock()->play();
+                    }
+
+                    break;
+                }
+                case 3:
+                {
+                    auto mpcSong = sequencer.lock()->getSong(song);
+
+                    if (!mpcSong->isUsed())
+                    {
+                        return;
+                    }
+
+                    const auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
+                    const auto recordingName = mpcSong->getName() + "-" + DirectToDiskSettings::getTimeStamp();
+                    auto settings = std::make_unique<DirectToDiskSettings>(
+                        lengthInFrames,
+                        splitStereoIntoLeftAndRightChannel,
+                        rate,
+                        recordingName);
+
+                    mpc.getLayeredScreen()->openScreen<SongScreen>();
+
+                    songLoopWasEnabled = mpcSong->isLoopEnabled();
+
+                    if (songLoopWasEnabled)
+                    {
+                        mpcSong->setLoopEnabled(false);
+                    }
+
+                    if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
+                    {
+                        mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
+                    }
+                    else
+                    {
+                        sequencer.lock()->setSongModeEnabled(true);
+                        sequencer.lock()->playFromStart();
+                    }
+
+                    break;
+                }
+                case 4:
+                    mpc.getLayeredScreen()->openScreen<VmpcRecordJamScreen>();
+                    break;
+            }
         }
-    }
     }
 }
 

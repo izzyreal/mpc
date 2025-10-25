@@ -19,18 +19,18 @@ void PasteEventScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-        auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
+        case 4:
+            auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
 
-        const bool allowMultipleNotesOnSameTick = true;
+            const bool allowMultipleNotesOnSameTick = true;
 
-        auto sequencer = mpc.getSequencer();
+            auto sequencer = mpc.getSequencer();
 
-        for (auto &event : stepEditorScreen->getPlaceHolder())
-        {
-            sequencer->getActiveTrack()->cloneEventIntoTrack(event, sequencer->getTickPosition(), allowMultipleNotesOnSameTick);
-        }
-        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
-        break;
+            for (auto &event : stepEditorScreen->getPlaceHolder())
+            {
+                sequencer->getActiveTrack()->cloneEventIntoTrack(event, sequencer->getTickPosition(), allowMultipleNotesOnSameTick);
+            }
+            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+            break;
     }
 }

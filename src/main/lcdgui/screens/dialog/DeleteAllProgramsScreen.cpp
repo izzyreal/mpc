@@ -12,14 +12,14 @@ void DeleteAllProgramsScreen::function(int j)
 
     switch (j)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
-        break;
-    case 4:
-    {
-        sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
-        mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
-        break;
-    }
+        case 3:
+            mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
+            break;
+        case 4:
+        {
+            sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
+            mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
+            break;
+        }
     }
 }

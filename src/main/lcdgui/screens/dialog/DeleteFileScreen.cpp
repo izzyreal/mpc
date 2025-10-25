@@ -24,21 +24,21 @@ void DeleteFileScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
+            break;
 
-    case 4:
-    {
-        auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-        ls->showPopupAndAwaitInteraction("Delete: " + directoryScreen->getSelectedFile()->getName());
-        std::thread([this]
-                    {
-                        deleteFile();
-                    })
-            .detach();
-        break;
-    }
+        case 4:
+        {
+            auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+            ls->showPopupAndAwaitInteraction("Delete: " + directoryScreen->getSelectedFile()->getName());
+            std::thread([this]
+                        {
+                            deleteFile();
+                        })
+                .detach();
+            break;
+        }
     }
 }
 

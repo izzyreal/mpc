@@ -83,15 +83,15 @@ void LoopToFineScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        findWave()->zoomPlus();
-        break;
-    case 2:
-        findWave()->zoomMinus();
-        break;
-    case 4:
-        sampler->playX();
-        break;
+        case 1:
+            findWave()->zoomPlus();
+            break;
+        case 2:
+            findWave()->zoomMinus();
+            break;
+        case 4:
+            sampler->playX();
+            break;
     }
 }
 

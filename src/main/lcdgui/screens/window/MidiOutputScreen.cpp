@@ -91,12 +91,12 @@ void MidiOutputScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<MidiOutputMonitorScreen>();
-        break;
-    case 4:
-        mpc.panic();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<MidiOutputMonitorScreen>();
+            break;
+        case 4:
+            mpc.panic();
+            break;
     }
 }
 

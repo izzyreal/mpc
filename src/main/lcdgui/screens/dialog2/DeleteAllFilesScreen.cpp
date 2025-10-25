@@ -44,24 +44,24 @@ void DeleteAllFilesScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
-        break;
-    case 4:
-    {
-        auto success = mpc.getDisk()->deleteAllFiles(delete_);
-
-        if (success)
+        case 3:
+            mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
+            break;
+        case 4:
         {
-            auto loadScreen = mpc.screens->get<LoadScreen>();
-            auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-            loadScreen->fileLoad = 0;
-            directoryScreen->yOffset1 = 0;
-            mpc.getDisk()->initFiles();
-        }
+            auto success = mpc.getDisk()->deleteAllFiles(delete_);
 
-        mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
-        break;
-    }
+            if (success)
+            {
+                auto loadScreen = mpc.screens->get<LoadScreen>();
+                auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+                loadScreen->fileLoad = 0;
+                directoryScreen->yOffset1 = 0;
+                mpc.getDisk()->initFiles();
+            }
+
+            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+            break;
+        }
     }
 }

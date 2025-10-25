@@ -69,156 +69,156 @@ void LoadScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        break;
-    case 2:
-        // openScreen<FormatScreen>();
-        break;
-    case 3:
-        // openScreen<SetupScreen>();
-        break;
-    case 4:
-    {
-        if (focusedFieldName == "device")
+        case 1:
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            break;
+        case 2:
+            // openScreen<FormatScreen>();
+            break;
+        case 3:
+            // openScreen<SetupScreen>();
+            break;
+        case 4:
         {
-            if (mpc.getDiskController()->activeDiskIndex == device)
+            if (focusedFieldName == "device")
             {
-                return;
-            }
-
-            auto &candidateVolume = mpc.getDisks()[device]->getVolume();
-
-            if (candidateVolume.mode == DISABLED)
-            {
-                ls->showPopupForMs("Device is disabled in DISKS", 1000);
-                return;
-            }
-
-            auto oldIndex = mpc.getDiskController()->activeDiskIndex;
-
-            mpc.getDiskController()->activeDiskIndex = device;
-            auto newDisk = mpc.getDisk();
-
-            fileLoad = 0;
-
-            if (newDisk->getVolume().type == USB_VOLUME)
-            {
-
-                newDisk->initRoot();
-
-                if (!newDisk->getVolume().volumeStream.is_open())
+                if (mpc.getDiskController()->activeDiskIndex == device)
                 {
-                    mpc.getDiskController()->activeDiskIndex = oldIndex;
-                    ls->showPopupForMs("Error! Device seems in use", 2000);
                     return;
                 }
-            }
 
-            ls->setFunctionKeysArrangement(0);
+                auto &candidateVolume = mpc.getDisks()[device]->getVolume();
 
-            newDisk->initFiles();
+                if (candidateVolume.mode == DISABLED)
+                {
+                    ls->showPopupForMs("Device is disabled in DISKS", 1000);
+                    return;
+                }
 
-            displayFile();
-            displaySize();
-            displayDirectory();
-            displayDevice();
-            displayDeviceType();
+                auto oldIndex = mpc.getDiskController()->activeDiskIndex;
 
-            mpc::nvram::VolumesPersistence::save(mpc);
-
-            return;
-        }
-
-        auto file = getSelectedFile();
-
-        if (!file->isDirectory())
-        {
-
-            auto ext = fs::path(file->getName()).extension().string();
-
-            bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
-            bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
-
-            if (!isWav && !isSnd)
-            {
-                return;
-            }
-
-            const auto audioServerSampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
-
-            bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(
-                file->getInputStream(),
-                isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV,
-                audioServerSampleRate);
-
-            auto name = file->getNameWithoutExtension();
-
-            if (started)
-            {
-                ls->showPopupAndAwaitInteraction("Playing " + name);
-            }
-            else
-            {
-                ls->showPopupAndAwaitInteraction("Can't play " + name);
-            }
-        }
-
-        break;
-    }
-    case 5:
-    {
-        auto disk = mpc.getDisk();
-
-        if (!disk || disk->getFileNames().empty())
-        {
-            return;
-        }
-
-        auto selectedFile = getSelectedFile();
-        auto ext = fs::path(selectedFile->getName()).extension().string();
-
-        if (isSelectedFileDirectory())
-        {
-            if (disk->moveForward(getSelectedFile()->getName()))
-            {
-                mpc.getDisk()->initFiles();
+                mpc.getDiskController()->activeDiskIndex = device;
+                auto newDisk = mpc.getDisk();
 
                 fileLoad = 0;
 
-                displayView();
-                displayDirectory();
+                if (newDisk->getVolume().type == USB_VOLUME)
+                {
+
+                    newDisk->initRoot();
+
+                    if (!newDisk->getVolume().volumeStream.is_open())
+                    {
+                        mpc.getDiskController()->activeDiskIndex = oldIndex;
+                        ls->showPopupForMs("Error! Device seems in use", 2000);
+                        return;
+                    }
+                }
+
+                ls->setFunctionKeysArrangement(0);
+
+                newDisk->initFiles();
+
                 displayFile();
                 displaySize();
+                displayDirectory();
+                displayDevice();
+                displayDeviceType();
 
-                auto ext = fs::path(getSelectedFileName()).extension().string();
-                auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
-                ls->setFunctionKeysArrangement(playable ? 1 : 0);
+                mpc::nvram::VolumesPersistence::save(mpc);
+
+                return;
             }
+
+            auto file = getSelectedFile();
+
+            if (!file->isDirectory())
+            {
+
+                auto ext = fs::path(file->getName()).extension().string();
+
+                bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
+                bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
+
+                if (!isWav && !isSnd)
+                {
+                    return;
+                }
+
+                const auto audioServerSampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+
+                bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(
+                    file->getInputStream(),
+                    isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV,
+                    audioServerSampleRate);
+
+                auto name = file->getNameWithoutExtension();
+
+                if (started)
+                {
+                    ls->showPopupAndAwaitInteraction("Playing " + name);
+                }
+                else
+                {
+                    ls->showPopupAndAwaitInteraction("Can't play " + name);
+                }
+            }
+
+            break;
         }
-        else if (StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav"))
+        case 5:
         {
-            const bool shouldBeConverted = false;
-            loadSound(shouldBeConverted);
+            auto disk = mpc.getDisk();
+
+            if (!disk || disk->getFileNames().empty())
+            {
+                return;
+            }
+
+            auto selectedFile = getSelectedFile();
+            auto ext = fs::path(selectedFile->getName()).extension().string();
+
+            if (isSelectedFileDirectory())
+            {
+                if (disk->moveForward(getSelectedFile()->getName()))
+                {
+                    mpc.getDisk()->initFiles();
+
+                    fileLoad = 0;
+
+                    displayView();
+                    displayDirectory();
+                    displayFile();
+                    displaySize();
+
+                    auto ext = fs::path(getSelectedFileName()).extension().string();
+                    auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
+                    ls->setFunctionKeysArrangement(playable ? 1 : 0);
+                }
+            }
+            else if (StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav"))
+            {
+                const bool shouldBeConverted = false;
+                loadSound(shouldBeConverted);
+            }
+            else if (StrUtil::eqIgnoreCase(ext, ".pgm"))
+            {
+                mpc.getLayeredScreen()->openScreen<LoadAProgramScreen>();
+            }
+            else if (StrUtil::eqIgnoreCase(ext, ".mid"))
+            {
+                mpc.getLayeredScreen()->openScreen<LoadASequenceScreen>();
+            }
+            else if (StrUtil::eqIgnoreCase(ext, ".all"))
+            {
+                mpc.getLayeredScreen()->openScreen<Mpc2000XlAllFileScreen>();
+            }
+            else if (StrUtil::eqIgnoreCase(ext, ".aps"))
+            {
+                mpc.getLayeredScreen()->openScreen<LoadApsFileScreen>();
+            }
+            break;
         }
-        else if (StrUtil::eqIgnoreCase(ext, ".pgm"))
-        {
-            mpc.getLayeredScreen()->openScreen<LoadAProgramScreen>();
-        }
-        else if (StrUtil::eqIgnoreCase(ext, ".mid"))
-        {
-            mpc.getLayeredScreen()->openScreen<LoadASequenceScreen>();
-        }
-        else if (StrUtil::eqIgnoreCase(ext, ".all"))
-        {
-            mpc.getLayeredScreen()->openScreen<Mpc2000XlAllFileScreen>();
-        }
-        else if (StrUtil::eqIgnoreCase(ext, ".aps"))
-        {
-            mpc.getLayeredScreen()->openScreen<LoadApsFileScreen>();
-        }
-        break;
-    }
     }
 }
 

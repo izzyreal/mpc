@@ -225,9 +225,9 @@ void MetronomeSoundScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<CountMetronomeScreen>();
-        break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<CountMetronomeScreen>();
+            break;
     }
 }
 

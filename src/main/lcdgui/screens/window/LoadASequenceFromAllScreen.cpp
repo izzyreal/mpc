@@ -41,19 +41,19 @@ void LoadASequenceFromAllScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<Mpc2000XlAllFileScreen>();
-        break;
-    case 4:
-        auto candidate = sequencesFromAllFile[sourceSeqIndex];
+        case 3:
+            mpc.getLayeredScreen()->openScreen<Mpc2000XlAllFileScreen>();
+            break;
+        case 4:
+            auto candidate = sequencesFromAllFile[sourceSeqIndex];
 
-        if (candidate)
-        {
-            auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
-            sequencer.lock()->setSequence(loadASequenceScreen->loadInto, candidate);
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
-        }
-        break;
+            if (candidate)
+            {
+                auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
+                sequencer.lock()->setSequence(loadASequenceScreen->loadInto, candidate);
+                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            }
+            break;
     }
 }
 

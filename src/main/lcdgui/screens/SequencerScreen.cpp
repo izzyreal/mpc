@@ -557,44 +557,44 @@ void SequencerScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        if (sequencer.lock()->isPlaying())
+        case 0:
+            if (sequencer.lock()->isPlaying())
+            {
+                return;
+            }
+
+            Util::initSequence(mpc);
+
+            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+            break;
+        case 1:
         {
-            return;
+            if (sequencer.lock()->isPlaying())
+            {
+                return;
+            }
+
+            mpc.getLayeredScreen()->openScreen<EventsScreen>();
+            break;
         }
-
-        Util::initSequence(mpc);
-
-        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
-        break;
-    case 1:
-    {
-        if (sequencer.lock()->isPlaying())
+        case 2:
         {
-            return;
+            auto track = mpc.getSequencer()->getActiveTrack();
+            track->setOn(!track->isOn());
+            break;
         }
-
-        mpc.getLayeredScreen()->openScreen<EventsScreen>();
-        break;
-    }
-    case 2:
-    {
-        auto track = mpc.getSequencer()->getActiveTrack();
-        track->setOn(!track->isOn());
-        break;
-    }
-    case 3:
-    {
-        sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
-        findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
-        break;
-    }
-    case 4:
-        sequencer.lock()->trackDown();
-        break;
-    case 5:
-        sequencer.lock()->trackUp();
-        break;
+        case 3:
+        {
+            sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
+            findChild<TextComp>("fk3")->setBlinking(sequencer.lock()->isSoloEnabled());
+            break;
+        }
+        case 4:
+            sequencer.lock()->trackDown();
+            break;
+        case 5:
+            sequencer.lock()->trackUp();
+            break;
     }
 }
 

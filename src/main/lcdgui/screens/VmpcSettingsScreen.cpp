@@ -34,37 +34,37 @@ void VmpcSettingsScreen::function(int i)
 {
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
-        break;
-    case 2:
-        mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
-        break;
-    case 4:
-        if (midiControlMode == MidiControlMode::ORIGINAL)
-        {
-            return;
-        }
+        case 1:
+            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            break;
+        case 2:
+            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
+            break;
+        case 4:
+            if (midiControlMode == MidiControlMode::ORIGINAL)
+            {
+                return;
+            }
 
-        mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
-        break;
-    case 5:
-        if (easterEgg->IsHidden())
-        {
-            easterEgg->Hide(false);
-            bringToFront(easterEgg.get());
-            easterEgg->setScrolling(true);
-        }
-        else
-        {
-            easterEgg->setScrolling(false);
-            easterEgg->Hide(true);
-            SetDirty();
-        }
-        break;
+            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            break;
+        case 5:
+            if (easterEgg->IsHidden())
+            {
+                easterEgg->Hide(false);
+                bringToFront(easterEgg.get());
+                easterEgg->setScrolling(true);
+            }
+            else
+            {
+                easterEgg->setScrolling(false);
+                easterEgg->Hide(true);
+                SetDirty();
+            }
+            break;
     }
 }
 

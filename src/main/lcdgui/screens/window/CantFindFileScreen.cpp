@@ -17,12 +17,12 @@ void CantFindFileScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        skipAll = true;
-        waitingForUser = false;
-        break;
-    case 2:
-        waitingForUser = false;
-        break;
+        case 1:
+            skipAll = true;
+            waitingForUser = false;
+            break;
+        case 2:
+            waitingForUser = false;
+            break;
     }
 }

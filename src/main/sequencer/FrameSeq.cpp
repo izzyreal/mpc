@@ -160,27 +160,27 @@ void FrameSeq::triggerClickIfNeeded()
 
     switch (countMetronomeScreen->getRate())
     {
-    case 1:
-        denTicks *= 2.0f / 3.f;
-        break;
-    case 2:
-        denTicks *= 1.0f / 2;
-        break;
-    case 3:
-        denTicks *= 1.0f / 3;
-        break;
-    case 4:
-        denTicks *= 1.0f / 4;
-        break;
-    case 5:
-        denTicks *= 1.0f / 6;
-        break;
-    case 6:
-        denTicks *= 1.0f / 8;
-        break;
-    case 7:
-        denTicks *= 1.0f / 12;
-        break;
+        case 1:
+            denTicks *= 2.0f / 3.f;
+            break;
+        case 2:
+            denTicks *= 1.0f / 2;
+            break;
+        case 3:
+            denTicks *= 1.0f / 3;
+            break;
+        case 4:
+            denTicks *= 1.0f / 4;
+            break;
+        case 5:
+            denTicks *= 1.0f / 6;
+            break;
+        case 6:
+            denTicks *= 1.0f / 8;
+            break;
+        case 7:
+            denTicks *= 1.0f / 12;
+            break;
     }
 
     if (relativePos % static_cast<int>(denTicks) == 0)

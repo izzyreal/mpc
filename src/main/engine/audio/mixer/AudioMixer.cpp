@@ -173,18 +173,18 @@ std::shared_ptr<AudioMixerStrip> AudioMixer::createStrip(std::shared_ptr<AudioCo
 
     switch (controls->getId())
     {
-    case MixerControlsIds::CHANNEL_STRIP:
-        channelStrips.push_back(strip);
-        break;
-    case MixerControlsIds::AUX_STRIP:
-        auxStrips.push_back(strip);
-        break;
-    case MixerControlsIds::MAIN_STRIP:
-        if (!mainStrip)
-        {
-            mainStrip = strip;
-        }
-        break;
+        case MixerControlsIds::CHANNEL_STRIP:
+            channelStrips.push_back(strip);
+            break;
+        case MixerControlsIds::AUX_STRIP:
+            auxStrips.push_back(strip);
+            break;
+        case MixerControlsIds::MAIN_STRIP:
+            if (!mainStrip)
+            {
+                mainStrip = strip;
+            }
+            break;
     }
 
     try

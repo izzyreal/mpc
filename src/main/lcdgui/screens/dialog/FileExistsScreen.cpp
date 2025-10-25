@@ -24,15 +24,15 @@ void FileExistsScreen::function(int i)
 {
     switch (i)
     {
-    case 2:
-        replaceAction();
-        break;
-    case 3:
-        cancelAction();
-        break;
-    case 4:
-        initializeNameScreen();
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        case 2:
+            replaceAction();
+            break;
+        case 3:
+            cancelAction();
+            break;
+        case 4:
+            initializeNameScreen();
+            mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
 

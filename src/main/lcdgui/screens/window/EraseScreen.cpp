@@ -74,13 +74,13 @@ void EraseScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
-    case 4:
-        doErase();
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
+        case 4:
+            doErase();
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }
 

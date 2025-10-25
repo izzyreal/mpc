@@ -22,3 +22,5 @@ InsertBraces: true
 AllowShortLambdasOnASingleLine: Empty
 ContinuationIndentWidth: 4
 
+IndentCaseLabels: true
+

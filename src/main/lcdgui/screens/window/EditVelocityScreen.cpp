@@ -65,35 +65,35 @@ void EditVelocityScreen::function(int i)
 
     switch (i)
     {
-    case 4:
-        for (auto &event : track->getEvents())
-        {
-            if (auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event))
+        case 4:
+            for (auto &event : track->getEvents())
             {
-                if (ne->getTick() >= time0 && ne->getTick() <= time1)
+                if (auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event))
                 {
-                    if (editType == 0)
+                    if (ne->getTick() >= time0 && ne->getTick() <= time1)
                     {
-                        ne->setVelocity(ne->getVelocity() + value);
-                    }
-                    else if (editType == 1)
-                    {
-                        ne->setVelocity(ne->getVelocity() - value);
-                    }
-                    else if (editType == 2)
-                    {
-                        ne->setVelocity(ne->getVelocity() * (value / 100.0));
-                    }
-                    else if (editType == 3)
-                    {
-                        ne->setVelocity(value);
+                        if (editType == 0)
+                        {
+                            ne->setVelocity(ne->getVelocity() + value);
+                        }
+                        else if (editType == 1)
+                        {
+                            ne->setVelocity(ne->getVelocity() - value);
+                        }
+                        else if (editType == 2)
+                        {
+                            ne->setVelocity(ne->getVelocity() * (value / 100.0));
+                        }
+                        else if (editType == 3)
+                        {
+                            ne->setVelocity(value);
+                        }
                     }
                 }
             }
-        }
 
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }
 

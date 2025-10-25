@@ -24,15 +24,15 @@ void EnvelopeControls::derive(Control *c)
 {
     switch (c->getId() - idOffset)
     {
-    case ATTACK:
-        attack = deriveAttack();
-        break;
-    case HOLD:
-        hold = deriveHold();
-        break;
-    case DECAY:
-        decay = deriveDecay();
-        break;
+        case ATTACK:
+            attack = deriveAttack();
+            break;
+        case HOLD:
+            hold = deriveHold();
+            break;
+        case DECAY:
+            decay = deriveDecay();
+            break;
     }
 }
 

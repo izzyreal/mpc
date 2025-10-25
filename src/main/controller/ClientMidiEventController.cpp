@@ -11,4 +11,3 @@ void handleClientMidiEvent(const ClientMidiEvent &e)
 {
     e.printInfo();
 }
-

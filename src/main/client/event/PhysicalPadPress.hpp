@@ -5,9 +5,13 @@
 #include <memory>
 #include <optional>
 
-namespace mpc::lcdgui { class ScreenComponent; }
+namespace mpc::lcdgui
+{
+    class ScreenComponent;
+}
 
-namespace mpc::client::event {
+namespace mpc::client::event
+{
 
     struct PhysicalPadPress
     {
@@ -17,4 +21,4 @@ namespace mpc::client::event {
         std::optional<int> drumIndex;
     };
 
-}
+} // namespace mpc::client::event

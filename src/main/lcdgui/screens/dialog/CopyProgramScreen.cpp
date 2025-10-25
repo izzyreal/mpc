@@ -23,19 +23,19 @@ void CopyProgramScreen::function(int i)
     switch (i)
 
     {
-    case int(3):
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-        break;
-    case 4:
-        if (pgm0 == pgm1)
-        {
-            return;
-        }
+        case int(3):
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            break;
+        case 4:
+            if (pgm0 == pgm1)
+            {
+                return;
+            }
 
-        sampler->copyProgram(pgm0, pgm1);
-        activeDrum().setProgram(pgm1);
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-        break;
+            sampler->copyProgram(pgm0, pgm1);
+            activeDrum().setProgram(pgm1);
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            break;
     }
 }
 

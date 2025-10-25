@@ -32,16 +32,16 @@ void UserScreen::function(int i)
 
     switch (i)
     {
-    // Intentional fall-through
-    case 0:
-    case 1:
-    case 2:
-    {
-        auto eventsScreen = mpc.screens->get<EventsScreen>();
-        eventsScreen->tab = i;
-        mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
-        break;
-    }
+        // Intentional fall-through
+        case 0:
+        case 1:
+        case 2:
+        {
+            auto eventsScreen = mpc.screens->get<EventsScreen>();
+            eventsScreen->tab = i;
+            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            break;
+        }
     }
 }
 

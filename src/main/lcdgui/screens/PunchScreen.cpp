@@ -56,15 +56,15 @@ void PunchScreen::function(int i)
 
     switch (i)
     {
-    case 1: // Intentional fall-through
-    case 2:
-        tab = i;
-        mpc.getLayeredScreen()->openScreen(tabNames[i]);
-        break;
-    case 5:
-        on = !on;
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        break;
+        case 1: // Intentional fall-through
+        case 2:
+            tab = i;
+            mpc.getLayeredScreen()->openScreen(tabNames[i]);
+            break;
+        case 5:
+            on = !on;
+            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            break;
     }
 }
 

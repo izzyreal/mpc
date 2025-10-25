@@ -56,23 +56,23 @@ void ProgramScreen::function(int i)
 
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
-        break;
-    case 2:
-    {
-        if (sampler->getProgramCount() == 24)
+        case 1:
+            mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
+            break;
+        case 2:
         {
-            ls->showPopupAndAwaitInteraction("Prog. directory full(24 max)");
-            return;
-        }
+            if (sampler->getProgramCount() == 24)
+            {
+                ls->showPopupAndAwaitInteraction("Prog. directory full(24 max)");
+                return;
+            }
 
-        mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
-        break;
-    }
-    case 4:
-        mpc.getLayeredScreen()->openScreen<CopyProgramScreen>();
-        break;
+            mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
+            break;
+        }
+        case 4:
+            mpc.getLayeredScreen()->openScreen<CopyProgramScreen>();
+            break;
     }
 }
 

@@ -22,24 +22,24 @@ void DeleteProgramScreen::function(int i)
 
     switch (i)
     {
-    case 2:
-        mpc.getLayeredScreen()->openScreen<DeleteAllProgramsScreen>();
-        break;
-    case 3:
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-        break;
-    case 4:
-        if (sampler->getProgramCount() > 1)
-        {
-            sampler->deleteProgram(sampler->getProgram(pgm));
-        }
-        else
-        {
-            sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
-        }
+        case 2:
+            mpc.getLayeredScreen()->openScreen<DeleteAllProgramsScreen>();
+            break;
+        case 3:
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            break;
+        case 4:
+            if (sampler->getProgramCount() > 1)
+            {
+                sampler->deleteProgram(sampler->getProgram(pgm));
+            }
+            else
+            {
+                sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
+            }
 
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-        break;
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            break;
     }
 }
 

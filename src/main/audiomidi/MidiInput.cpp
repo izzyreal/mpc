@@ -109,19 +109,19 @@ void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 
         switch (mpc.screens->get<MidiOutputScreen>()->getSoftThru())
         {
-        case 1:
-            // Soft thru:OFF
-            break;
-        case 2:
-            transportOmni(midiMsg, "a");
-            break;
-        case 3:
-            transportOmni(midiMsg, "b");
-            break;
-        case 4:
-            transportOmni(midiMsg, "a");
-            transportOmni(midiMsg, "b");
-            break;
+            case 1:
+                // Soft thru:OFF
+                break;
+            case 2:
+                transportOmni(midiMsg, "a");
+                break;
+            case 3:
+                transportOmni(midiMsg, "b");
+                break;
+            case 4:
+                transportOmni(midiMsg, "a");
+                transportOmni(midiMsg, "b");
+                break;
         }
     }
     else if (msg->isControlChange())
@@ -242,7 +242,7 @@ void MidiInput::handleControlChange(ShortMessage *msg)
                         clientInput.componentId = ComponentId::TAP_TEMPO_OR_NOTE_REPEAT;
                         clientInput.type = client::event::ClientHardwareEvent::Type::ButtonPressAndRelease;
                         clientInput.source = client::event::ClientHardwareEvent::Source::HostInputMidi;
-                        //mpc.clientEventController->clientHardwareEventController->handleInput(clientInput);
+                        // mpc.clientEventController->clientHardwareEventController->handleInput(clientInput);
                     }
                     else if (func >= 8 && func < 12)
                     {
@@ -545,17 +545,17 @@ void MidiInput::handleMidiClock(ShortMessage *msg)
     {
         switch (mce->getStatus())
         {
-        case ShortMessage::START:
-            sequencer->playFromStart();
-            break;
-        case ShortMessage::CONTINUE:
-            sequencer->play();
-            break;
-        case ShortMessage::STOP:
-            sequencer->stop();
-            break;
-        case ShortMessage::TIMING_CLOCK:
-            break;
+            case ShortMessage::START:
+                sequencer->playFromStart();
+                break;
+            case ShortMessage::CONTINUE:
+                sequencer->play();
+                break;
+            case ShortMessage::STOP:
+                sequencer->stop();
+                break;
+            case ShortMessage::TIMING_CLOCK:
+                break;
         }
     }
 }

@@ -54,68 +54,68 @@ void SaveASoundScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        break;
-    case 4:
-    {
-        auto disk = mpc.getDisk();
-        auto s = sampler->getSound();
-        auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
-        auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) + ext;
-
-        auto saveAction = [this, disk, s, fileName]
+        case 3:
+            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            break;
+        case 4:
         {
-            disk->flush();
-            disk->initFiles();
+            auto disk = mpc.getDisk();
+            auto s = sampler->getSound();
+            auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
+            auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) + ext;
 
-            if (fileType == 0)
+            auto saveAction = [this, disk, s, fileName]
             {
-                disk->writeSnd(s, fileName);
-            }
-            else
-            {
-                disk->writeWav(s, fileName);
-            }
+                disk->flush();
+                disk->initFiles();
 
-            disk->flush();
-
-            ls->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
-        };
-
-        if (disk->checkExists(fileName))
-        {
-            auto replaceAction = [saveAction, disk, fileName]
-            {
-                auto success = disk->getFile(fileName)->del();
-
-                if (success)
+                if (fileType == 0)
                 {
-                    saveAction();
+                    disk->writeSnd(s, fileName);
                 }
-            };
-
-            const auto initializeNameScreen = [this]
-            {
-                auto nameScreen = mpc.screens->get<NameScreen>();
-                auto enterAction = [this](std::string &)
+                else
                 {
-                    mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
-                };
-                nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                    disk->writeWav(s, fileName);
+                }
+
+                disk->flush();
+
+                ls->showPopupAndThenReturnToLayer("Saving " + fileName, 700, 0);
             };
 
-            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                         {
-                                             mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                         });
-            mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
-            return;
+            if (disk->checkExists(fileName))
+            {
+                auto replaceAction = [saveAction, disk, fileName]
+                {
+                    auto success = disk->getFile(fileName)->del();
+
+                    if (success)
+                    {
+                        saveAction();
+                    }
+                };
+
+                const auto initializeNameScreen = [this]
+                {
+                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto enterAction = [this](std::string &)
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
+                    };
+                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                };
+
+                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
+                                             {
+                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                                             });
+                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                return;
+            }
+            saveAction();
+            break;
         }
-        saveAction();
-        break;
-    }
     }
 }
 

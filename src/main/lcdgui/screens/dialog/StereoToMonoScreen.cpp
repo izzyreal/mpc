@@ -74,62 +74,62 @@ void StereoToMonoScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    case 4:
-    {
-        auto sound = sampler->getSound();
-
-        if (sound->isMono())
+        case 3:
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
+        case 4:
         {
-            return;
-        }
+            auto sound = sampler->getSound();
 
-        for (auto &s : sampler->getSounds())
-        {
-            if (s->getName() == newLName || s->getName() == newRName)
+            if (sound->isMono())
             {
-                ls->showPopupAndAwaitInteraction("Name already used");
                 return;
             }
+
+            for (auto &s : sampler->getSounds())
+            {
+                if (s->getName() == newLName || s->getName() == newRName)
+                {
+                    ls->showPopupAndAwaitInteraction("Name already used");
+                    return;
+                }
+            }
+
+            auto left = sampler->addSound(sound->getSampleRate());
+
+            if (left == nullptr)
+            {
+                return;
+            }
+
+            auto right = sampler->addSound(sound->getSampleRate());
+
+            if (right == nullptr)
+            {
+                sampler->deleteSound(left);
+                return;
+            }
+
+            left->setName(newLName);
+            right->setName(newRName);
+
+            left->setMono(true);
+            right->setMono(true);
+
+            auto leftData = left->getMutableSampleData();
+            auto rightData = right->getMutableSampleData();
+
+            for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
+            {
+                leftData->push_back((*sound->getSampleData())[frameIndex]);
+                rightData->push_back((*sound->getSampleData())[frameIndex + sound->getFrameCount()]);
+            }
+
+            left->setEnd(left->getSampleData()->size());
+            right->setEnd(right->getSampleData()->size());
+            mpc.getLayeredScreen()->closeCurrentScreen();
+            break;
         }
-
-        auto left = sampler->addSound(sound->getSampleRate());
-
-        if (left == nullptr)
-        {
-            return;
-        }
-
-        auto right = sampler->addSound(sound->getSampleRate());
-
-        if (right == nullptr)
-        {
-            sampler->deleteSound(left);
-            return;
-        }
-
-        left->setName(newLName);
-        right->setName(newRName);
-
-        left->setMono(true);
-        right->setMono(true);
-
-        auto leftData = left->getMutableSampleData();
-        auto rightData = right->getMutableSampleData();
-
-        for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
-        {
-            leftData->push_back((*sound->getSampleData())[frameIndex]);
-            rightData->push_back((*sound->getSampleData())[frameIndex + sound->getFrameCount()]);
-        }
-
-        left->setEnd(left->getSampleData()->size());
-        right->setEnd(right->getSampleData()->size());
-        mpc.getLayeredScreen()->closeCurrentScreen();
-        break;
-    }
     }
 }
 

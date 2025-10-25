@@ -68,28 +68,28 @@ void CreateNewProgramScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-        break;
-    case 4:
-        auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
-        newProgram->setName(newName);
-        newProgram->setMidiProgramChange(midiProgramChange);
+        case 3:
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            break;
+        case 4:
+            auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
+            newProgram->setName(newName);
+            newProgram->setMidiProgramChange(midiProgramChange);
 
-        auto index = sampler->getProgramCount() - 1;
+            auto index = sampler->getProgramCount() - 1;
 
-        for (int j = 0; j < sampler->getPrograms().size(); j++)
-        {
-            if (sampler->getProgram(j) == newProgram)
+            for (int j = 0; j < sampler->getPrograms().size(); j++)
             {
-                index = j;
-                break;
+                if (sampler->getProgram(j) == newProgram)
+                {
+                    index = j;
+                    break;
+                }
             }
-        }
 
-        activeDrum().setProgram(index);
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
-        break;
+            activeDrum().setProgram(index);
+            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            break;
     }
 }
 

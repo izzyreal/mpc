@@ -21,13 +21,13 @@ namespace mpc::input
     {
         switch (d)
         {
-        case Direction::Positive:
-            return +1;
-        case Direction::Negative:
-            return -1;
-        case Direction::None:
-        default:
-            return 0;
+            case Direction::Positive:
+                return +1;
+            case Direction::Negative:
+                return -1;
+            case Direction::None:
+            default:
+                return 0;
         }
     }
 

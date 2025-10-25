@@ -26,22 +26,22 @@ void DrumScreen::function(int f)
 
     switch (f)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
-        break;
-    case 1:
-        mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
-        break;
-    case 2:
-    {
-        auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
-        selectDrumScreen->redirectScreen = "drum";
-        mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
-        break;
-    }
-    case 3:
-        mpc.getLayeredScreen()->openScreen<PurgeScreen>();
-        break;
+        case 0:
+            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
+            break;
+        case 2:
+        {
+            auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+            selectDrumScreen->redirectScreen = "drum";
+            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+            break;
+        }
+        case 3:
+            mpc.getLayeredScreen()->openScreen<PurgeScreen>();
+            break;
     }
 }
 

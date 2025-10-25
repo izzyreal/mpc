@@ -314,15 +314,15 @@ float FloatSampleBuffer::getConvertDitherBits(int newFormatType)
 
     switch (ditherMode)
     {
-    case DITHER_MODE_AUTOMATIC:
-        doDither = (originalFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK) > (newFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK);
-        break;
-    case DITHER_MODE_ON:
-        doDither = true;
-        break;
-    case DITHER_MODE_OFF:
-        doDither = false;
-        break;
+        case DITHER_MODE_AUTOMATIC:
+            doDither = (originalFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK) > (newFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK);
+            break;
+        case DITHER_MODE_ON:
+            doDither = true;
+            break;
+        case DITHER_MODE_OFF:
+            doDither = false;
+            break;
     }
 
     return doDither ? ditherBits : 0.0f;

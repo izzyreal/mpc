@@ -84,59 +84,59 @@ void SampleScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        if (mpc.getAudioMidiServices()->isRecordingSound())
-        {
-            return;
-        }
-
-        peakL = 0.f;
-        peakR = 0.f;
-        break;
-    case 4:
-        if (mpc.getAudioMidiServices()->isRecordingSound())
-        {
-            mpc.getAudioMidiServices()->stopSoundRecorder(true);
-            findBackground()->setBackgroundName("sample");
-        }
-        else if (mpc.getAudioMidiServices()->getSoundRecorder()->isArmed())
-        {
-            mpc.getAudioMidiServices()->getSoundRecorder()->setArmed(false);
-            sampler->deleteSound(sampler->getSoundCount() - 1);
-            findBackground()->setBackgroundName("sample");
-        }
-        break;
-    case 5:
-        auto ams = mpc.getAudioMidiServices();
-
-        if (ams->isRecordingSound())
-        {
-            ams->stopSoundRecorder();
-            return;
-        }
-
-        if (ams->getSoundRecorder()->isArmed())
-        {
-            ams->startRecordingSound();
-            findBackground()->setBackgroundName("recording");
-        }
-        else
-        {
-            auto sound = sampler->addSound();
-
-            if (!sound)
+        case 0:
+            if (mpc.getAudioMidiServices()->isRecordingSound())
             {
                 return;
             }
 
-            sound->setName(sampler->addOrIncreaseNumber("sound1"));
-            auto lengthInFrames = time * (44100 * 0.1);
-            ams->getSoundRecorder()->prepare(sound, lengthInFrames, ams->getAudioServer()->getSampleRate());
-            ams->getSoundRecorder()->setArmed(true);
-            findBackground()->setBackgroundName("waiting-for-input-signal");
-        }
+            peakL = 0.f;
+            peakR = 0.f;
+            break;
+        case 4:
+            if (mpc.getAudioMidiServices()->isRecordingSound())
+            {
+                mpc.getAudioMidiServices()->stopSoundRecorder(true);
+                findBackground()->setBackgroundName("sample");
+            }
+            else if (mpc.getAudioMidiServices()->getSoundRecorder()->isArmed())
+            {
+                mpc.getAudioMidiServices()->getSoundRecorder()->setArmed(false);
+                sampler->deleteSound(sampler->getSoundCount() - 1);
+                findBackground()->setBackgroundName("sample");
+            }
+            break;
+        case 5:
+            auto ams = mpc.getAudioMidiServices();
 
-        break;
+            if (ams->isRecordingSound())
+            {
+                ams->stopSoundRecorder();
+                return;
+            }
+
+            if (ams->getSoundRecorder()->isArmed())
+            {
+                ams->startRecordingSound();
+                findBackground()->setBackgroundName("recording");
+            }
+            else
+            {
+                auto sound = sampler->addSound();
+
+                if (!sound)
+                {
+                    return;
+                }
+
+                sound->setName(sampler->addOrIncreaseNumber("sound1"));
+                auto lengthInFrames = time * (44100 * 0.1);
+                ams->getSoundRecorder()->prepare(sound, lengthInFrames, ams->getAudioServer()->getSampleRate());
+                ams->getSoundRecorder()->setArmed(true);
+                findBackground()->setBackgroundName("waiting-for-input-signal");
+            }
+
+            break;
     }
 }
 

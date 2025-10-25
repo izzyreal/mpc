@@ -104,17 +104,17 @@ void TrMuteScreen::function(int i)
 
     switch (i)
     {
-    case 5:
-        if (sequencer.lock()->isSoloEnabled())
-        {
-            ls->setCurrentBackground("track-mute");
-            sequencer.lock()->setSoloEnabled(false);
-        }
-        else
-        {
-            ls->setCurrentBackground("track-mute-solo-1");
-        }
-        break;
+        case 5:
+            if (sequencer.lock()->isSoloEnabled())
+            {
+                ls->setCurrentBackground("track-mute");
+                sequencer.lock()->setSoloEnabled(false);
+            }
+            else
+            {
+                ls->setCurrentBackground("track-mute-solo-1");
+            }
+            break;
     }
 }
 

@@ -51,36 +51,36 @@ void AssignScreen::turnWheel(int i)
     {
         switch (parameter)
         {
-        case 0:
-            slider->setTuneHighRange(slider->getTuneHighRange() + i);
-            break;
-        case 1:
-            slider->setDecayHighRange(slider->getDecayHighRange() + i);
-            break;
-        case 2:
-            slider->setAttackHighRange(slider->getAttackHighRange() + i);
-            break;
-        case 3:
-            slider->setFilterHighRange(slider->getFilterHighRange() + i);
-            break;
+            case 0:
+                slider->setTuneHighRange(slider->getTuneHighRange() + i);
+                break;
+            case 1:
+                slider->setDecayHighRange(slider->getDecayHighRange() + i);
+                break;
+            case 2:
+                slider->setAttackHighRange(slider->getAttackHighRange() + i);
+                break;
+            case 3:
+                slider->setFilterHighRange(slider->getFilterHighRange() + i);
+                break;
         }
     }
     else if (focusedFieldName == "lowrange")
     {
         switch (parameter)
         {
-        case 0:
-            slider->setTuneLowRange(slider->getTuneLowRange() + i);
-            break;
-        case 1:
-            slider->setDecayLowRange(slider->getDecayLowRange() + i);
-            break;
-        case 2:
-            slider->setAttackLowRange(slider->getAttackLowRange() + i);
-            break;
-        case 3:
-            slider->setFilterLowRange(slider->getFilterLowRange() + i);
-            break;
+            case 0:
+                slider->setTuneLowRange(slider->getTuneLowRange() + i);
+                break;
+            case 1:
+                slider->setDecayLowRange(slider->getDecayLowRange() + i);
+                break;
+            case 2:
+                slider->setAttackLowRange(slider->getAttackLowRange() + i);
+                break;
+            case 3:
+                slider->setFilterLowRange(slider->getFilterLowRange() + i);
+                break;
         }
     }
     else if (focusedFieldName == "assignnv")
@@ -124,22 +124,22 @@ void AssignScreen::displayHighRange()
 
     switch (slider->getParameter())
     {
-    case 0:
-        value = slider->getTuneHighRange();
-        sign = value < 0 ? "-" : " ";
-        findField("highrange")->setSize(25, 9);
-        break;
-    case 1:
-        value = slider->getDecayHighRange();
-        break;
-    case 2:
-        value = slider->getAttackHighRange();
-        break;
-    case 3:
-        value = slider->getFilterHighRange();
-        findField("highrange")->setSize(25, 9);
-        sign = value < 0 ? "-" : " ";
-        break;
+        case 0:
+            value = slider->getTuneHighRange();
+            sign = value < 0 ? "-" : " ";
+            findField("highrange")->setSize(25, 9);
+            break;
+        case 1:
+            value = slider->getDecayHighRange();
+            break;
+        case 2:
+            value = slider->getAttackHighRange();
+            break;
+        case 3:
+            value = slider->getFilterHighRange();
+            findField("highrange")->setSize(25, 9);
+            sign = value < 0 ? "-" : " ";
+            break;
     }
 
     findField("highrange")->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
@@ -156,22 +156,22 @@ void AssignScreen::displayLowRange()
 
     switch (slider->getParameter())
     {
-    case 0:
-        value = slider->getTuneLowRange();
-        sign = value < 0 ? "-" : " ";
-        findField("lowrange")->setSize(25, 9);
-        break;
-    case 1:
-        value = slider->getDecayLowRange();
-        break;
-    case 2:
-        value = slider->getAttackLowRange();
-        break;
-    case 3:
-        value = slider->getFilterLowRange();
-        sign = value < 0 ? "-" : " ";
-        findField("lowrange")->setSize(25, 9);
-        break;
+        case 0:
+            value = slider->getTuneLowRange();
+            sign = value < 0 ? "-" : " ";
+            findField("lowrange")->setSize(25, 9);
+            break;
+        case 1:
+            value = slider->getDecayLowRange();
+            break;
+        case 2:
+            value = slider->getAttackLowRange();
+            break;
+        case 3:
+            value = slider->getFilterLowRange();
+            sign = value < 0 ? "-" : " ";
+            findField("lowrange")->setSize(25, 9);
+            break;
     }
 
     findField("lowrange")->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));

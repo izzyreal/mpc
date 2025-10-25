@@ -29,12 +29,12 @@ void TrackScreen::function(int i)
     ScreenComponent::function(i);
     switch (i)
     {
-    case 1:
-        mpc.getLayeredScreen()->openScreen<DeleteTrackScreen>();
-        break;
-    case 4:
-        mpc.getLayeredScreen()->openScreen<CopyTrackScreen>();
-        break;
+        case 1:
+            mpc.getLayeredScreen()->openScreen<DeleteTrackScreen>();
+            break;
+        case 4:
+            mpc.getLayeredScreen()->openScreen<CopyTrackScreen>();
+            break;
     }
 }
 

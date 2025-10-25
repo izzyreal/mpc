@@ -145,19 +145,19 @@ void NameScreen::function(int i)
 
     switch (i)
     {
-    case 3:
-    {
-        mpc.getLayeredScreen()->openScreen(cancelScreen);
-        break;
-    }
-    case 4:
-        auto newName = getNameWithoutSpaces();
-        if (newName.empty())
+        case 3:
         {
-            return;
+            mpc.getLayeredScreen()->openScreen(cancelScreen);
+            break;
         }
-        enterAction(newName);
-        break;
+        case 4:
+            auto newName = getNameWithoutSpaces();
+            if (newName.empty())
+            {
+                return;
+            }
+            enterAction(newName);
+            break;
     }
 }
 

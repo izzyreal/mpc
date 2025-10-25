@@ -76,100 +76,100 @@ void SaveScreen::function(int i)
 
     switch (i)
     {
-    case 0:
-        mpc.getLayeredScreen()->openScreen<LoadScreen>();
-        break;
-    case 2:
-        // openScreen<FormatScreen>();
-        break;
-    case 3:
-        // openScreen<SetupScreen>();
-        break;
-    case 4:
-    {
-        const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-        if (focusedFieldName == "device")
-        {
-            if (mpc.getDiskController()->getActiveDiskIndex() == device)
-            {
-                return;
-            }
-
-            auto &candidateVolume = mpc.getDisks()[device]->getVolume();
-
-            if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
-            {
-                ls->showPopupForMs("Device is disabled in DISKS", 1000);
-                return;
-            }
-
-            auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
-
-            mpc.getDiskController()->setActiveDiskIndex(device);
-            auto newDisk = mpc.getDisk();
-
-            if (newDisk->getVolume().type == mpc::disk::VolumeType::USB_VOLUME)
-            {
-
-                newDisk->initRoot();
-
-                if (!newDisk->getVolume().volumeStream.is_open())
-                {
-                    mpc.getDiskController()->setActiveDiskIndex(oldIndex);
-                    ls->showPopupForMs("Error! Device seems in use", 2000);
-                    return;
-                }
-            }
-
-            ls->setFunctionKeysArrangement(0);
-
-            newDisk->initFiles();
-
-            displayFile();
-            displaySize();
-            displayDirectory();
-            displayDevice();
-            displayDeviceType();
-
-            mpc::nvram::VolumesPersistence::save(mpc);
-
-            return;
-        }
-    }
-    case 5:
-    {
-        switch (type)
-        {
         case 0:
-        {
-            mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
-            break;
-        }
-        case 1:
-            if (!sequencer.lock()->getActiveSequence()->isUsed())
-            {
-                return;
-            }
-
-            mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+            mpc.getLayeredScreen()->openScreen<LoadScreen>();
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+            // openScreen<FormatScreen>();
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+            // openScreen<SetupScreen>();
             break;
         case 4:
-            if (sampler->getSoundCount() == 0)
-            {
-                break;
-            }
+        {
+            const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-            mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
-            break;
+            if (focusedFieldName == "device")
+            {
+                if (mpc.getDiskController()->getActiveDiskIndex() == device)
+                {
+                    return;
+                }
+
+                auto &candidateVolume = mpc.getDisks()[device]->getVolume();
+
+                if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
+                {
+                    ls->showPopupForMs("Device is disabled in DISKS", 1000);
+                    return;
+                }
+
+                auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
+
+                mpc.getDiskController()->setActiveDiskIndex(device);
+                auto newDisk = mpc.getDisk();
+
+                if (newDisk->getVolume().type == mpc::disk::VolumeType::USB_VOLUME)
+                {
+
+                    newDisk->initRoot();
+
+                    if (!newDisk->getVolume().volumeStream.is_open())
+                    {
+                        mpc.getDiskController()->setActiveDiskIndex(oldIndex);
+                        ls->showPopupForMs("Error! Device seems in use", 2000);
+                        return;
+                    }
+                }
+
+                ls->setFunctionKeysArrangement(0);
+
+                newDisk->initFiles();
+
+                displayFile();
+                displaySize();
+                displayDirectory();
+                displayDevice();
+                displayDeviceType();
+
+                mpc::nvram::VolumesPersistence::save(mpc);
+
+                return;
+            }
         }
-    }
+        case 5:
+        {
+            switch (type)
+            {
+                case 0:
+                {
+                    mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
+                    break;
+                }
+                case 1:
+                    if (!sequencer.lock()->getActiveSequence()->isUsed())
+                    {
+                        return;
+                    }
+
+                    mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                    break;
+                case 2:
+                    mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+                    break;
+                case 3:
+                    mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                    break;
+                case 4:
+                    if (sampler->getSoundCount() == 0)
+                    {
+                        break;
+                    }
+
+                    mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
+                    break;
+            }
+        }
     }
 }
 
@@ -226,36 +226,36 @@ void SaveScreen::turnWheel(int i)
     {
         switch (type)
         {
-        case 1:
-            sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
-            break;
-        case 3:
-        {
-            unsigned char counter = 0;
-
-            for (int idx = programIndex;
-                 (i < 0) ? idx >= 0 : idx < 24;
-                 (i < 0) ? idx-- : idx++)
+            case 1:
+                sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+                break;
+            case 3:
             {
-                if (sampler->getProgram(idx))
-                {
-                    programIndex = idx;
-                }
-                else
-                {
-                    continue;
-                }
+                unsigned char counter = 0;
 
-                if (++counter == abs(i) + 1)
+                for (int idx = programIndex;
+                     (i < 0) ? idx >= 0 : idx < 24;
+                     (i < 0) ? idx-- : idx++)
                 {
-                    break;
+                    if (sampler->getProgram(idx))
+                    {
+                        programIndex = idx;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    if (++counter == abs(i) + 1)
+                    {
+                        break;
+                    }
                 }
+                break;
             }
-            break;
-        }
-        case 4:
-            sampler->setSoundIndex(sampler->getSoundIndex() + i);
-            break;
+            case 4:
+                sampler->setSoundIndex(sampler->getSoundIndex() + i);
+                break;
         }
         displayFile();
         displaySize();
@@ -307,34 +307,34 @@ void SaveScreen::displayFile()
 
     switch (type)
     {
-    case 0:
-    {
-        const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>();
-        fileName = saveAllFileScreen->fileName;
-        break;
-    }
-    case 1:
-    {
-        auto num = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
-        const auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
-        fileName = num + "-" + sequenceName;
-        break;
-    }
-    case 2:
-    {
-        const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>();
-        fileName = saveApsFileScreen->fileName;
-        break;
-    }
-    case 3:
-        fileName = sampler->getProgram(programIndex)->getName();
-        break;
-    case 4:
-        fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound()->getName());
-        break;
-    case 5:
-        fileName = "MPC2KXL         .BIN";
-        break;
+        case 0:
+        {
+            const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>();
+            fileName = saveAllFileScreen->fileName;
+            break;
+        }
+        case 1:
+        {
+            auto num = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
+            const auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+            fileName = num + "-" + sequenceName;
+            break;
+        }
+        case 2:
+        {
+            const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>();
+            fileName = saveApsFileScreen->fileName;
+            break;
+        }
+        case 3:
+            fileName = sampler->getProgram(programIndex)->getName();
+            break;
+        case 4:
+            fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound()->getName());
+            break;
+        case 5:
+            fileName = "MPC2KXL         .BIN";
+            break;
     }
 
     findField("file")->setText(fileName);
@@ -347,24 +347,24 @@ void SaveScreen::displaySize()
 
     switch (type)
     {
-    case 0:
-        size = sequencer.lock()->getUsedSequenceCount() * 25;
-        break;
-    case 1:
-        size = seq->isUsed() ? 10 + static_cast<int>(seq->getEventCount() * 0.001) : -1;
-        break;
-    case 2:
-        size = sampler->getProgramCount() * 4;
-        break;
-    case 3:
-        size = 4;
-        break;
-    case 4:
-        size = sampler->getSoundCount() == 0 ? -1 : (sampler->getSound()->getSampleData()->size() * 2 * 0.001);
-        break;
-    case 5:
-        size = 512;
-        break;
+        case 0:
+            size = sequencer.lock()->getUsedSequenceCount() * 25;
+            break;
+        case 1:
+            size = seq->isUsed() ? 10 + static_cast<int>(seq->getEventCount() * 0.001) : -1;
+            break;
+        case 2:
+            size = sampler->getProgramCount() * 4;
+            break;
+        case 3:
+            size = 4;
+            break;
+        case 4:
+            size = sampler->getSoundCount() == 0 ? -1 : (sampler->getSound()->getSampleData()->size() * 2 * 0.001);
+            break;
+        case 5:
+            size = 512;
+            break;
     }
 
     findLabel("size")->setText(StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
