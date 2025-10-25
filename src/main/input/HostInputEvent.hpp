@@ -2,7 +2,7 @@
 
 #include <variant>
 
-#include "input/MidiEvent.hpp"
+#include "client/event/ClientMidiEvent.hpp"
 
 #include "hardware/ComponentId.hpp"
 
@@ -75,7 +75,7 @@ namespace mpc::input
 
         explicit HostInputEvent(KeyEvent k) : payload(std::move(k)) {}
         explicit HostInputEvent(GestureEvent g) : payload(std::move(g)) {}
-        explicit HostInputEvent(MidiEvent m) : payload(std::move(m)) {}
+        explicit HostInputEvent(client::event::ClientMidiEvent m) : payload(std::move(m)) {}
         explicit HostInputEvent(FocusEvent f) : payload(std::move(f)) {}
 
         Source getSource() const
@@ -88,7 +88,7 @@ namespace mpc::input
             {
                 return Source::GESTURE;
             }
-            if (std::holds_alternative<MidiEvent>(payload))
+            if (std::holds_alternative<client::event::ClientMidiEvent>(payload))
             {
                 return Source::MIDI;
             }
@@ -101,7 +101,7 @@ namespace mpc::input
             throw std::logic_error("HostInputEvent::getSource() encountered unknown payload type");
         }
 
-        std::variant<KeyEvent, GestureEvent, MidiEvent, FocusEvent> payload;
+        std::variant<KeyEvent, GestureEvent, client::event::ClientMidiEvent, FocusEvent> payload;
     };
 
 } // namespace mpc::input

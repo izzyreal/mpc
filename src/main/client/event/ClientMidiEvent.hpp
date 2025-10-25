@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-namespace mpc::input
+namespace mpc::client::event
 {
-    struct MidiEvent
+    struct ClientMidiEvent
     {
         enum MessageType
         {
@@ -29,8 +29,8 @@ namespace mpc::input
         double bufferOffset{};
 
     public:
-        MidiEvent() = default;
-        MidiEvent(MessageType type, int d1 = 0, int d2 = 0)
+        ClientMidiEvent() = default;
+        ClientMidiEvent(MessageType type, int d1 = 0, int d2 = 0)
             : messageType(type), data1(static_cast<uint8_t>(d1)), data2(static_cast<uint8_t>(d2)) {}
 
         MessageType getMessageType() const noexcept

@@ -1,13 +1,13 @@
-#include "input/MidiEvent.hpp"
+#include "client/event/ClientMidiEvent.hpp"
 
 #include "Logger.hpp"
 
 #include <cstdio>
 #include <string>
 
-using namespace mpc::input;
+using namespace mpc::client::event;
 
-void MidiEvent::printInfo() const noexcept
+void ClientMidiEvent::printInfo() const noexcept
 {
     static const char *typeNames[] = {
         "NOTE_ON", "NOTE_OFF", "CONTROLLER", "AFTERTOUCH",

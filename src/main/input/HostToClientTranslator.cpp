@@ -42,7 +42,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
         break;
     case HostInputEvent::Source::MIDI:
     {
-        const auto &midi = std::get<MidiEvent>(hostInputEvent.payload);
+        const auto &midi = std::get<ClientMidiEvent>(hostInputEvent.payload);
         midi.printInfo();
         break;
     }
