@@ -7,7 +7,8 @@ ClientMidiEventController::ClientMidiEventController()
 {
 }
 
-void handleClientMidiEvent(const ClientMidiEvent &)
+void handleClientMidiEvent(const ClientMidiEvent &e)
 {
+    e.printInfo();
 }
 
