@@ -1,16 +1,20 @@
 #include "controller/ClientMidiEventController.hpp"
 #include <iostream>
+#include <memory>
 
 using namespace mpc::controller;
 using namespace mpc::client::event;
+using namespace mpc::lcdgui::screens;
 
-ClientMidiEventController::ClientMidiEventController()
+ClientMidiEventController::ClientMidiEventController(std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
+                                                     std::shared_ptr<MidiSwScreen> midiSwScreen)
+    : clientHardwareEventController(clientHardwareEventControllerToUse)
 {
+    footswitchController = std::make_shared<ClientMidiFootswitchAssignmentController>(clientHardwareEventController, midiSwScreen);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
-    printf("foo\n");
     e.printInfo();
 
     switch (e.getMessageType())
@@ -28,7 +32,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     case ClientMidiEvent::CONTROLLER:
         soundGeneratorController.handleEvent(e);
         sequencerController.handleEvent(e);
-        footswitchController.handleEvent(e);
+        footswitchController->handleEvent(e);
         break;
 
     case ClientMidiEvent::MIDI_CLOCK:

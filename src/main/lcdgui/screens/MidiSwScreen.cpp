@@ -158,3 +158,9 @@ void MidiSwScreen::setXOffset(int i)
     displaySwitchLabels();
     displayCtrlsAndFunctions();
 }
+
+const std::vector<std::string> &MidiSwScreen::getFunctionNames()
+{
+    return functionNames;
+}
+
