@@ -14,7 +14,7 @@ void MidiSwScreen::initializeDefaultMapping()
 {
     for (int i = 0; i < SWITCH_COUNT; i++)
     {
-        controllerToFunctionMapping.push_back({0, 0});
+        controllerToFunctionMapping.push_back({-1, 0});
     }
 }
 
@@ -57,7 +57,7 @@ void MidiSwScreen::displayCtrlsAndFunctions()
         auto functionField = findChild<Field>("function" + std::to_string(i));
 
         auto ctrl = association.first;
-        ctrlField->setText(ctrl == 0 ? "OFF" : std::to_string(ctrl - 1));
+        ctrlField->setText(ctrl == -1 ? "OFF" : std::to_string(ctrl));
 
         auto fn = association.second;
         functionField->setText(functionNames[fn]);

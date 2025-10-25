@@ -31,9 +31,9 @@ Misc::Misc(const std::vector<char> &b)
 
     for (int i = 0; i < 4; i++)
     {
-        auto ctrl = b[MIDI_SWITCH_OFFSET + (i * 2)];
+        auto ctrl = static_cast<int>(b[MIDI_SWITCH_OFFSET + (i * 2)]);
         auto func = b[MIDI_SWITCH_OFFSET + (i * 2) + 1];
-        switches[i] = std::pair(ctrl, func);
+        switches[i] = std::pair(ctrl == 0xFF ? -1 : ctrl, func);
     }
 
     autoStepInc = b[AUTO_STEP_INCREMENT_OFFSET] > 0;
@@ -77,7 +77,7 @@ Misc::Misc(mpc::Mpc &mpc)
     {
         auto ctrl = midiSwScreen->getSwitch(i).first;
         auto func = midiSwScreen->getSwitch(i).second;
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] = (char)ctrl;
+        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] = ctrl == - 1 ? 0xFF : ctrl;
         saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)func;
     }
 
