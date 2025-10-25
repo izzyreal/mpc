@@ -14,6 +14,7 @@ namespace mpc::controller
 {
 
     class ClientHardwareEventController;
+    class ClientMidiEventController;
 
     class ClientEventController
     {
@@ -33,6 +34,7 @@ namespace mpc::controller
         std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
 
     private:
+        std::shared_ptr<ClientMidiEventController> clientMidiEventController;
         std::shared_ptr<mpc::input::KeyboardBindings> keyboardBindings;
     };
 } // namespace mpc::controller

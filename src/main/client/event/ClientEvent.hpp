@@ -1,6 +1,7 @@
 #pragma once
 
 #include "client/event/ClientHardwareEvent.hpp"
+#include "client/event/ClientMidiEvent.hpp"
 
 #include <utility>
 
@@ -9,6 +10,6 @@ namespace mpc::client::event
 
     struct ClientEvent
     {
-        std::variant<ClientHardwareEvent> payload;
+        std::variant<ClientHardwareEvent, ClientMidiEvent> payload;
     };
 } // namespace mpc::client::event

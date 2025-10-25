@@ -17,13 +17,16 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
     const HostInputEvent &hostInputEvent,
     std::shared_ptr<KeyboardBindings> keyboardBindings)
 {
+    if (hostInputEvent.getSource() == HostInputEvent::Source::MIDI)
+    {
+        const auto &midi = std::get<ClientMidiEvent>(hostInputEvent.payload);
+        return ClientEvent{midi};
+    }
+
     ClientHardwareEvent clientHardwareEvent;
 
     switch (hostInputEvent.getSource())
     {
-        case HostInputEvent::Source::MIDI:
-            clientHardwareEvent.source = ClientHardwareEvent::Source::HostInputMidi;
-            break;
         case HostInputEvent::Source::KEYBOARD:
             clientHardwareEvent.source = ClientHardwareEvent::Source::HostInputKeyboard;
             break;
@@ -33,6 +36,9 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
         case HostInputEvent::Source::FOCUS:
             clientHardwareEvent.source = ClientHardwareEvent::Source::HostFocusEvent;
             break;
+        case HostInputEvent::Source::MIDI:
+        default:
+            break;
     }
 
     switch (hostInputEvent.getSource())
@@ -40,12 +46,6 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
         case HostInputEvent::Source::FOCUS:
             clientHardwareEvent.type = ClientHardwareEvent::Type::HostFocusLost;
             break;
-        case HostInputEvent::Source::MIDI:
-        {
-            const auto &midi = std::get<ClientMidiEvent>(hostInputEvent.payload);
-            midi.printInfo();
-            break;
-        }
 
         case HostInputEvent::Source::GESTURE:
         {
@@ -251,6 +251,10 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             }
             break;
         }
+
+        case HostInputEvent::Source::MIDI:
+        default:
+            break;
     }
 
     if (clientHardwareEvent.componentId == ComponentId::NONE && !clientHardwareEvent.textInputKey)
