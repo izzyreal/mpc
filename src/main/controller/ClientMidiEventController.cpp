@@ -1,14 +1,13 @@
-#pragma once
+#include "controller/ClientMidiEventController.hpp"
 
-#include "../client/event/ClientMidiEvent.hpp"
+using namespace mpc::controller;
+using namespace mpc::client::event;
 
-namespace mpc::controller {
-    class ClientMidiEventController {
-    public:
-        ClientMidiEventController();
+ClientMidiEventController::ClientMidiEventController()
+{
+}
 
-        void handleClientMidiEvent(const mpc::client::event::ClientMidiEvent &);
+void handleClientMidiEvent(const ClientMidiEvent &)
+{
+}
 
-
-    };
-} // namespace mpc::controller
