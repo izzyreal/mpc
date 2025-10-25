@@ -10,8 +10,8 @@ namespace mpc::sequencer
     {
         std::atomic<bool> occupied = ATOMIC_VAR_INIT(false);
         std::function<void()> f = []() {};
-        unsigned long nFrames = 0;
-        unsigned long frameCounter = -1;
+        int64_t nFrames = 0;
+        int64_t frameCounter = -1;
 
         void init(const unsigned long &newNFrames, std::function<void()> callback)
         {
