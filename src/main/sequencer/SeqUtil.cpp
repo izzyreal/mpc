@@ -213,7 +213,7 @@ int SeqUtil::setBar(int i, Sequence *sequence, int position)
 {
     if (i < 0)
     {
-        return 0;
+        i = 0;
     }
 
     auto difference = i - SeqUtil::getBar(sequence, position);
@@ -239,14 +239,15 @@ int SeqUtil::setBeat(int i, Sequence *s, int position)
         i = 0;
     }
 
-    auto difference = i - SeqUtil::getBeat(s, position);
     auto ts = s->getTimeSignature();
     auto num = ts.getNumerator();
 
     if (i >= num)
     {
-        return position;
+        i = num - 1;
     }
+
+    auto difference = i - SeqUtil::getBeat(s, position);
 
     auto den = ts.getDenominator();
     auto denTicks = (int)(96 * (4.0 / den));
@@ -270,14 +271,15 @@ int SeqUtil::setClock(int i, Sequence *s, int position)
         i = 0;
     }
 
-    auto difference = i - getClock(s, position);
     auto den = s->getTimeSignature().getDenominator();
     auto denTicks = (int)(96 * (4.0 / den));
 
-    if (i > denTicks - 1)
+    if (i >= denTicks)
     {
-        return position;
+        i = denTicks - 1;
     }
+
+    auto difference = i - getClock(s, position);
 
     if (position + difference > s->getLastTick())
     {

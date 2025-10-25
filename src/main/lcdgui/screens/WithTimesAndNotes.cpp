@@ -103,12 +103,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc &mpc, int notch, Sequence
 
 void WithTimesAndNotes::setNote0(int i)
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    note0 = i;
+    note0 = std::clamp(i, 0, 127);
 
     if (note0 > note1)
     {
@@ -120,12 +115,7 @@ void WithTimesAndNotes::setNote0(int i)
 
 void WithTimesAndNotes::setNote1(int i)
 {
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    note1 = i;
+    note1 = std::clamp(i, 0, 127);
 
     if (note1 < note0)
     {
