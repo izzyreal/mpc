@@ -25,6 +25,8 @@ namespace mpc::lcdgui::screens
 
         static const int SWITCH_COUNT = 40;
 
+        const std::vector<std::string> &getFunctionNames();
+
     private:
         int xOffset = 0;
 

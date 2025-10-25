@@ -106,8 +106,6 @@ void Mpc::init()
     sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
     MLOG("Sequencer created");
 
-    clientEventController = std::make_shared<mpc::controller::ClientEventController>(*this);
-
     hardware = std::make_shared<hardware::Hardware>();
 
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
@@ -123,6 +121,8 @@ void Mpc::init()
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
     // avoiding memory allocations and I/O on the audio thread.
     screens->createAndCacheAllScreens();
+
+    clientEventController = std::make_shared<mpc::controller::ClientEventController>(*this);
 
     /*
      * AudioMidiServices requires sequencer to exist.

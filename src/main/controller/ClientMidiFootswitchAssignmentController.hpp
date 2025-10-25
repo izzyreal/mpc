@@ -1,14 +1,28 @@
 #pragma once
 
 #include "../client/event/ClientMidiEvent.hpp"
-#include <iostream>
+#include <memory>
+
+namespace mpc::lcdgui::screens
+{
+    class MidiSwScreen;
+}
 
 namespace mpc::controller
 {
+    class ClientHardwareEventController;
+
     class ClientMidiFootswitchAssignmentController
     {
     public:
-        ClientMidiFootswitchAssignmentController() = default;
+        ClientMidiFootswitchAssignmentController(
+                std::shared_ptr<ClientHardwareEventController>,
+                std::shared_ptr<lcdgui::screens::MidiSwScreen>);
+
         void handleEvent(const mpc::client::event::ClientMidiEvent &);
+
+    private:
+        std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
+        std::shared_ptr<lcdgui::screens::MidiSwScreen> midiSwScreen;
     };
 } // namespace mpc::controller
