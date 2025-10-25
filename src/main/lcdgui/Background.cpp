@@ -2,7 +2,7 @@
 
 #include "MpcResourceUtil.hpp"
 
-#include "LodePNG.hpp"
+#include "lodepng.h"
 
 using namespace mpc::lcdgui;
 

@@ -89,6 +89,12 @@ FetchContent_Declare(json-schema-validator
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/json-schema-validator
 )
 
+FetchContent_Declare(lodepng
+    URL https://github.com/lvandeve/lodepng/archive/refs/heads/master.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/lodepng
+)
+
 message(STATUS "Downloading rtmidi...")
 FetchContent_MakeAvailable(rtmidi)
 
@@ -124,6 +130,9 @@ if(NOT tl-expected_POPULATED)
     message(STATUS "Downloading tl-expected...")
     FetchContent_MakeAvailable(tl-expected)
 endif()
+
+message(STATUS "Downloading lodepng...")
+FetchContent_MakeAvailable(lodepng)
 
 project(mpc)
 
@@ -179,7 +188,14 @@ target_include_directories(mpc PUBLIC
     ${readerwriterqueue_SOURCE_DIR}
 )
 
-target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator)
+add_library(lodepng
+    ${lodepng_SOURCE_DIR}/lodepng.cpp
+    ${lodepng_SOURCE_DIR}/lodepng.h
+)
+
+target_include_directories(lodepng PUBLIC ${lodepng_SOURCE_DIR})
+
+target_link_libraries(mpc akaifat ghc_filesystem rtmidi samplerate platform_folders nlohmann_json::nlohmann_json nlohmann_json_schema_validator lodepng)
 
 if(MSVC)
   target_compile_options(mpc PRIVATE "/MP")
