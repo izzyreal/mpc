@@ -38,8 +38,6 @@ namespace mpc::lcdgui::screens
     private:
         const std::vector<std::string> tabNames{"punch", "trans", "second-seq"};
         const std::vector<std::string> autoPunchNames{"PUNCH IN ONLY", "PUNCH OUT ONLY", "PUNCH IN OUT"};
-        int autoPunch = 0;
-        bool on = false;
         int tab = 0;
 
         void setAutoPunch(int i);

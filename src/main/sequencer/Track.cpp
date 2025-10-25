@@ -551,25 +551,23 @@ void Track::playNext()
     const auto isActiveTrackIndex = trackIndex == sequencer->getActiveTrackIndex();
     auto _delete = sequencer->isRecording() && (isActiveTrackIndex || recordingModeIsMulti) && (trackIndex < 64);
 
-    auto punchScreen = mpc.screens->get<PunchScreen>();
-
-    if (sequencer->isRecording() && punchScreen->on && trackIndex < 64)
+    if (sequencer->isRecording() && sequencer->isPunchEnabled() && trackIndex < 64)
     {
         auto pos = sequencer->getTickPosition();
 
         _delete = false;
 
-        if (punchScreen->autoPunch == 0 && pos >= punchScreen->time0)
+        if (sequencer->getAutoPunchMode() == 0 && pos >= sequencer->getPunchInTime())
         {
             _delete = true;
         }
 
-        if (punchScreen->autoPunch == 1 && pos < punchScreen->time1)
+        if (sequencer->getAutoPunchMode() == 1 && pos < sequencer->getPunchOutTime())
         {
             _delete = true;
         }
 
-        if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
+        if (sequencer->getAutoPunchMode() == 2 && pos >= sequencer->getPunchInTime() && pos < sequencer->getPunchOutTime())
         {
             _delete = true;
         }

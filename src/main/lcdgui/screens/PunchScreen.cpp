@@ -26,16 +26,16 @@ void PunchScreen::open()
 
     auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
 
-    if (lastTick < time0 || lastTick < time1 || (time0 == 0 && time1 == 0))
+    if (lastTick < sequencer.lock()->getPunchInTime() || lastTick < sequencer.lock()->getPunchOutTime() || (sequencer.lock()->getPunchInTime() == 0 && sequencer.lock()->getPunchOutTime() == 0))
     {
-        setTime0(0);
-        setTime1(sequencer.lock()->getActiveSequence()->getLastTick());
+        sequencer.lock()->setPunchInTime(0);
+        sequencer.lock()->setPunchOutTime(sequencer.lock()->getActiveSequence()->getLastTick());
     }
 
     displayBackground();
     displayAutoPunch();
 
-    ls->setFunctionKeysArrangement(on);
+    ls->setFunctionKeysArrangement(sequencer.lock()->isPunchEnabled());
 }
 
 void PunchScreen::turnWheel(int i)
@@ -45,10 +45,14 @@ void PunchScreen::turnWheel(int i)
 
     if (focusedFieldName == "auto-punch")
     {
-        setAutoPunch(autoPunch + i);
+        setAutoPunch(sequencer.lock()->getAutoPunchMode() + i);
     }
 
     checkAllTimes(mpc, i);
+    
+    // Sync punch times with Sequencer
+    sequencer.lock()->setPunchInTime(time0);
+    sequencer.lock()->setPunchOutTime(time1);
 }
 
 void PunchScreen::function(int i)
@@ -62,7 +66,7 @@ void PunchScreen::function(int i)
             mpc.getLayeredScreen()->openScreen(tabNames[i]);
             break;
         case 5:
-            on = !on;
+            sequencer.lock()->setPunchEnabled(!sequencer.lock()->isPunchEnabled());
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
     }
@@ -75,7 +79,7 @@ void PunchScreen::setAutoPunch(int i)
         return;
     }
 
-    autoPunch = i;
+    sequencer.lock()->setAutoPunchMode(i);
 
     displayAutoPunch();
     displayTime();
@@ -84,7 +88,7 @@ void PunchScreen::setAutoPunch(int i)
 
 void PunchScreen::displayAutoPunch()
 {
-    findField("auto-punch")->setText(autoPunchNames[autoPunch]);
+    findField("auto-punch")->setText(autoPunchNames[sequencer.lock()->getAutoPunchMode()]);
 }
 
 void PunchScreen::displayTime()
@@ -93,31 +97,31 @@ void PunchScreen::displayTime()
 
     for (int i = 0; i < 3; i++)
     {
-        findField("time" + std::to_string(i))->Hide(autoPunch == 1);
-        findLabel("time" + std::to_string(i))->Hide(autoPunch == 1);
-        findField("time" + std::to_string(i + 3))->Hide(autoPunch == 0);
-        findLabel("time" + std::to_string(i + 3))->Hide(autoPunch == 0);
+        findField("time" + std::to_string(i))->Hide(sequencer.lock()->getAutoPunchMode() == 1);
+        findLabel("time" + std::to_string(i))->Hide(sequencer.lock()->getAutoPunchMode() == 1);
+        findField("time" + std::to_string(i + 3))->Hide(sequencer.lock()->getAutoPunchMode() == 0);
+        findLabel("time" + std::to_string(i + 3))->Hide(sequencer.lock()->getAutoPunchMode() == 0);
     }
 
-    findLabel("time3")->Hide(autoPunch != 2);
+    findLabel("time3")->Hide(sequencer.lock()->getAutoPunchMode() != 2);
 
-    findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1, "0");
-    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
-    findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBar(sequence, time1) + 1, "0");
-    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
-    findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
+    findField("time0")->setTextPadded(SeqUtil::getBar(sequence, sequencer.lock()->getPunchInTime()) + 1, "0");
+    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, sequencer.lock()->getPunchInTime()) + 1, "0");
+    findField("time2")->setTextPadded(SeqUtil::getClock(sequence, sequencer.lock()->getPunchInTime()), "0");
+    findField("time3")->setTextPadded(SeqUtil::getBar(sequence, sequencer.lock()->getPunchOutTime()) + 1, "0");
+    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, sequencer.lock()->getPunchOutTime()) + 1, "0");
+    findField("time5")->setTextPadded(SeqUtil::getClock(sequence, sequencer.lock()->getPunchOutTime()), "0");
 }
 
 void PunchScreen::displayBackground()
 {
     std::string bgName = "punch-in";
 
-    if (autoPunch == 1)
+    if (sequencer.lock()->getAutoPunchMode() == 1)
     {
         bgName = "punch-out";
     }
-    else if (autoPunch == 2)
+    else if (sequencer.lock()->getAutoPunchMode() == 2)
     {
         bgName = "punch-in-out";
     }

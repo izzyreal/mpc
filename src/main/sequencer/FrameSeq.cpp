@@ -191,14 +191,14 @@ void FrameSeq::triggerClickIfNeeded()
 
 void FrameSeq::displayPunchRects()
 {
-    auto punch = punchScreen->on && sequencer->isRecordingOrOverdubbing();
+    auto punch = sequencer->isPunchEnabled() && sequencer->isRecordingOrOverdubbing();
 
     if (punch)
     {
-        bool punchIn = punchScreen->autoPunch == 0 || punchScreen->autoPunch == 2;
-        bool punchOut = punchScreen->autoPunch == 1 || punchScreen->autoPunch == 2;
-        auto punchInTime = punchScreen->time0;
-        auto punchOutTime = punchScreen->time1;
+        bool punchIn = sequencer->getAutoPunchMode() == 0 || sequencer->getAutoPunchMode() == 2;
+        bool punchOut = sequencer->getAutoPunchMode() == 1 || sequencer->getAutoPunchMode() == 2;
+        auto punchInTime = sequencer->getPunchInTime();
+        auto punchOutTime = sequencer->getPunchOutTime();
 
         if (punchIn && sequencer->getTickPosition() == punchInTime)
         {
@@ -293,9 +293,9 @@ bool FrameSeq::processSeqLoopEnabled()
 
     if (sequencer->getTickPosition() >= seq->getLoopEnd() - 1)
     {
-        auto punch = punchScreen->on && sequencer->isRecordingOrOverdubbing();
-        bool punchIn = punchScreen->autoPunch == 0 || punchScreen->autoPunch == 2;
-        bool punchOut = punchScreen->autoPunch == 1 || punchScreen->autoPunch == 2;
+        auto punch = sequencer->isPunchEnabled() && sequencer->isRecordingOrOverdubbing();
+        bool punchIn = sequencer->getAutoPunchMode() == 0 || sequencer->getAutoPunchMode() == 2;
+        bool punchOut = sequencer->getAutoPunchMode() == 1 || sequencer->getAutoPunchMode() == 2;
 
         if (punch && punchIn)
         {
