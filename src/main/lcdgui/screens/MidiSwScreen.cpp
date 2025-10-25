@@ -164,3 +164,8 @@ const std::vector<std::string> &MidiSwScreen::getFunctionNames()
     return functionNames;
 }
 
+const std::vector<std::pair<int, int>> &MidiSwScreen::getSwitches()
+{
+    return controllerToFunctionMapping;
+}
+

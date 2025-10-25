@@ -22,6 +22,8 @@ namespace mpc::lcdgui::screens
         void left() override;
         void right() override;
         std::pair<int, int> getSwitch(int index);
+        
+        const std::vector<std::pair<int, int>> &getSwitches();
 
         static const int SWITCH_COUNT = 40;
 
