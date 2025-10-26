@@ -131,13 +131,23 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
     {
         if (switchCC != controller) continue;
 
-        const std::string &fn = midiSwScreen->getFunctionNames()[functionIndex];
+        const std::string &functionName = midiSwScreen->getFunctionNames()[functionIndex];
+        
+        std::string trimmedFunctionName = functionName;
+        trimmedFunctionName.erase(0, trimmedFunctionName.find_first_not_of(" \t"));
+        trimmedFunctionName.erase(trimmedFunctionName.find_last_not_of(" \t") + 1);
 
-        if (fn.rfind("PAD", 0) == 0) // " PAD  1" .. " PAD 16"
+        if (trimmedFunctionName.rfind("PAD", 0) == 0)
         {
             ClientHardwareEvent ev;
             ev.source = ClientHardwareEvent::Source::HostInputMidi;
-            const int padNum = std::stoi(fn.substr(6)); // extract 1–16
+
+            std::string rest = trimmedFunctionName.substr(3);
+            rest.erase(0, rest.find_first_not_of(" \t"));
+            rest.erase(rest.find_last_not_of(" \t") + 1);
+
+            const int padNum = std::stoi(rest);
+
             ev.componentId = static_cast<ComponentId>(static_cast<int>(ComponentId::PAD_1_OR_AB) + padNum - 1);
             ev.index = padNum - 1;
             ev.type = pressed ? ClientHardwareEvent::Type::PadPress : ClientHardwareEvent::Type::PadRelease;
@@ -153,43 +163,43 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
         std::optional<ComponentId> id;
 
-        if (fn == "PLAY STRT")
+        if (functionName == "PLAY STRT")
         {
             id = ComponentId::PLAY_START;
         }
-        else if (fn == "PLAY")
+        else if (functionName == "PLAY")
         {
             id = ComponentId::PLAY;
         }
-        else if (fn == "STOP")
+        else if (functionName == "STOP")
         {
             id = ComponentId::STOP;
         }
-        else if (fn == "TAP")
+        else if (functionName == "TAP")
         {
             id = ComponentId::TAP_TEMPO_OR_NOTE_REPEAT;
         }
-        else if (fn == "PAD BNK A")
+        else if (functionName == "PAD BNK A")
         {
             id = ComponentId::BANK_A;
         }
-        else if (fn == "PAD BNK B")
+        else if (functionName == "PAD BNK B")
         {
             id = ComponentId::BANK_B;
         }
-        else if (fn == "PAD BNK C")
+        else if (functionName == "PAD BNK C")
         {
             id = ComponentId::BANK_C;
         }
-        else if (fn == "PAD BNK D")
+        else if (functionName == "PAD BNK D")
         {
             id = ComponentId::BANK_D;
         }
 
-        else if (fn.rfind("F", 0) == 0 || fn.find("   F") != std::string::npos)
+        else if (functionName.rfind("F", 0) == 0 || functionName.find("   F") != std::string::npos)
         {
             // "   F1".."   F6"
-            const int fNum = std::stoi(fn.substr(fn.find('F') + 1));
+            const int fNum = std::stoi(functionName.substr(functionName.find('F') + 1));
             id = static_cast<ComponentId>(static_cast<int>(ComponentId::F1) + fNum - 1);
         }
 
@@ -203,7 +213,7 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
             continue;
         }
 
-        if (fn == "REC+PLAY")
+        if (functionName == "REC+PLAY")
         {
             if (pressed)
             {
@@ -212,7 +222,7 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
             continue;
         }
-        else if (fn == "ODUB+PLAY")
+        else if (functionName == "ODUB+PLAY")
         {
             if (pressed)
             {
@@ -221,14 +231,14 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
             continue;
         }
-        else if (fn == "REC/PUNCH")
+        else if (functionName == "REC/PUNCH")
         {
             if (pressed)
             {
                 handleRecPunch();
             }
         }
-        else if (fn == "ODUB/PNCH")
+        else if (functionName == "ODUB/PNCH")
         {
             if (pressed)
             {
