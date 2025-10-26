@@ -7,7 +7,6 @@
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "controller/ClientEventController.hpp"
-#include "hardware/ComponentId.hpp"
 #include "sequencer/Track.hpp"
 
 #include <iostream>
