@@ -15,7 +15,6 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiDeviceDetector.hpp"
-#include "audiomidi/MidiInput.hpp"
 #include "audiomidi/MidiOutput.hpp"
 
 #include "sampler/Sampler.hpp"
@@ -110,8 +109,6 @@ void Mpc::init()
 
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
     MLOG("Sampler created");
-
-    midiInputs = {new mpc::audiomidi::MidiInput(*this, 0), new mpc::audiomidi::MidiInput(*this, 1)};
 
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
 

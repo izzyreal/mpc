@@ -31,6 +31,8 @@ namespace mpc::controller
             return keyboardBindings;
         }
 
+        std::shared_ptr<ClientMidiEventController> getClientMidiEventController();
+
         std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
 
     private:

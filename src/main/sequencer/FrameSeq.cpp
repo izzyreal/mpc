@@ -124,7 +124,16 @@ void FrameSeq::triggerClickIfNeeded()
         return;
     }
 
-    const bool isStepEditor = mpc.getLayeredScreen()->getCurrentScreenName() == "step-editor";
+    const bool isStepEditor = mpc.getLayeredScreen()->isCurrentScreen<StepEditorScreen>();
+
+    const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+
+    const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
+            sequencer,
+            timingCorrectScreen,
+            currentScreenName,
+            mpc.getHardware()->getButton(hardware::ComponentId::REC),
+            mpc.clientEventController->clientHardwareEventController);
 
     if (sequencer->isRecordingOrOverdubbing())
     {
@@ -135,10 +144,11 @@ void FrameSeq::triggerClickIfNeeded()
     }
     else
     {
+
         if (!isStepEditor &&
             !countMetronomeScreen->getInPlay() &&
             !sequencer->isCountingIn() &&
-            !SeqUtil::isRecMainWithoutPlaying(mpc))
+            !isRecMainWithoutPlaying)
         {
             return;
         }
@@ -150,7 +160,7 @@ void FrameSeq::triggerClickIfNeeded()
     const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
     const auto relativePos = pos - firstTickOfBar;
 
-    if ((isStepEditor || SeqUtil::isRecMainWithoutPlaying(mpc)) && relativePos == 0)
+    if ((isStepEditor || isRecMainWithoutPlaying) && relativePos == 0)
     {
         return;
     }

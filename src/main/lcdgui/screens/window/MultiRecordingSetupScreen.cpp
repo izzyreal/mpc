@@ -236,15 +236,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 
 void MultiRecordingSetupScreen::setYOffset(int i)
 {
-    if (i < 0)
-    {
-        return;
-    }
-
-    if (i + 3 > mrsLines.size())
-    {
-        return;
-    }
+    i = std::clamp(i, 0, static_cast<int>(mrsLines.size()) - 3);
 
     visibleMrsLines = std::vector<MultiRecordingSetupLine *>(3);
     yOffset = i;

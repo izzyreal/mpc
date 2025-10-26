@@ -14,12 +14,7 @@ int MultiRecordingSetupLine::getIn()
 
 void MultiRecordingSetupLine::setTrack(int i)
 {
-    if (i < -1 || i > 63)
-    {
-        return;
-    }
-
-    track = i;
+    track = std::clamp(i, -1, 63);
 }
 
 int MultiRecordingSetupLine::getTrack()

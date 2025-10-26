@@ -470,15 +470,18 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
     }
 }
 
-bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
+bool SeqUtil::isRecMainWithoutPlaying(
+    std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
+    const std::string& currentScreenName,
+    std::shared_ptr<mpc::hardware::Button> recButton,
+    std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController)
 {
-    auto sequencer = mpc.getSequencer();
-    auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>()->getNoteValue();
+    auto tc_note = timingCorrectScreen->getNoteValue();
     bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-    auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
-    const bool recIsPressedOrLocked = mpc.getHardware()->getButton(hardware::ComponentId::REC)->isPressed() ||
-                                      mpc.clientEventController->clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+    const bool recIsPressedOrLocked = recButton->isPressed() || 
+                                      clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
     bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
                                  !sequencer->isPlaying() &&
@@ -489,12 +492,11 @@ bool SeqUtil::isRecMainWithoutPlaying(mpc::Mpc &mpc)
     return recMainWithoutPlaying;
 }
 
-bool SeqUtil::isStepRecording(mpc::Mpc &mpc)
+bool SeqUtil::isStepRecording(const std::string &currentScreenName, std::shared_ptr<Sequencer> sequencer)
 {
-    auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
     auto posIsLastTick = [&]
     {
-        return mpc.getSequencer()->getTickPosition() == mpc.getSequencer()->getActiveSequence()->getLastTick();
+        return sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
     };
     return currentScreenName == "step-editor" && !posIsLastTick();
 }
