@@ -473,14 +473,14 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
 bool SeqUtil::isRecMainWithoutPlaying(
     std::shared_ptr<Sequencer> sequencer,
     std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
-    const std::string& currentScreenName,
+    const std::string &currentScreenName,
     std::shared_ptr<mpc::hardware::Button> recButton,
     std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController)
 {
     auto tc_note = timingCorrectScreen->getNoteValue();
     bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
-    const bool recIsPressedOrLocked = recButton->isPressed() || 
+    const bool recIsPressedOrLocked = recButton->isPressed() ||
                                       clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
 
     bool recMainWithoutPlaying = currentScreenName == "sequencer" &&

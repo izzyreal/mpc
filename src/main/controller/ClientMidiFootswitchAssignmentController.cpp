@@ -14,12 +14,12 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::hardware;
 
 ClientMidiFootswitchAssignmentController::ClientMidiFootswitchAssignmentController(
-        std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
-        std::shared_ptr<MidiSwScreen> midiSwScreenToUse,
-        std::shared_ptr<sequencer::Sequencer> sequencerToUse)
+    std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
+    std::shared_ptr<MidiSwScreen> midiSwScreenToUse,
+    std::shared_ptr<sequencer::Sequencer> sequencerToUse)
     : clientHardwareEventController(clientHardwareEventControllerToUse),
-    midiSwScreen(midiSwScreenToUse),
-    sequencer(sequencerToUse)
+      midiSwScreen(midiSwScreenToUse),
+      sequencer(sequencerToUse)
 {
 }
 
@@ -64,7 +64,7 @@ void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
 void ClientMidiFootswitchAssignmentController::handleRecPunch()
 {
     std::cout << "[FootswitchAssignment] Handling REC/PUNCH" << std::endl;
-    
+
     if (!sequencer->isPlaying())
     {
         // STOP mode -> PLAY mode
@@ -88,7 +88,7 @@ void ClientMidiFootswitchAssignmentController::handleRecPunch()
 void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 {
     std::cout << "[FootswitchAssignment] Handling ODUB/PNCH" << std::endl;
-    
+
     if (!sequencer->isPlaying())
     {
         // STOP mode -> PLAY mode
@@ -129,10 +129,13 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
     for (auto [switchCC, functionIndex] : midiSwScreen->getSwitches())
     {
-        if (switchCC != controller) continue;
+        if (switchCC != controller)
+        {
+            continue;
+        }
 
         const std::string &functionName = midiSwScreen->getFunctionNames()[functionIndex];
-        
+
         std::string trimmedFunctionName = functionName;
         trimmedFunctionName.erase(0, trimmedFunctionName.find_first_not_of(" \t"));
         trimmedFunctionName.erase(trimmedFunctionName.find_last_not_of(" \t") + 1);
@@ -247,4 +250,3 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
         }
     }
 }
-

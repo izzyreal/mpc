@@ -129,11 +129,11 @@ void FrameSeq::triggerClickIfNeeded()
     const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
-            sequencer,
-            timingCorrectScreen,
-            currentScreenName,
-            mpc.getHardware()->getButton(hardware::ComponentId::REC),
-            mpc.clientEventController->clientHardwareEventController);
+        sequencer,
+        timingCorrectScreen,
+        currentScreenName,
+        mpc.getHardware()->getButton(hardware::ComponentId::REC),
+        mpc.clientEventController->clientHardwareEventController);
 
     if (sequencer->isRecordingOrOverdubbing())
     {

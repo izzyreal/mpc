@@ -69,7 +69,7 @@ namespace mpc::sequencer
         static bool isRecMainWithoutPlaying(
             std::shared_ptr<Sequencer> sequencer,
             std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
-            const std::string& currentScreenName,
+            const std::string &currentScreenName,
             std::shared_ptr<mpc::hardware::Button> recButton,
             std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController);
 

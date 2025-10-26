@@ -24,9 +24,9 @@ namespace mpc::controller
     {
     public:
         ClientMidiFootswitchAssignmentController(
-                std::shared_ptr<ClientHardwareEventController>,
-                std::shared_ptr<lcdgui::screens::MidiSwScreen>,
-                std::shared_ptr<sequencer::Sequencer>);
+            std::shared_ptr<ClientHardwareEventController>,
+            std::shared_ptr<lcdgui::screens::MidiSwScreen>,
+            std::shared_ptr<sequencer::Sequencer>);
 
         void handleEvent(const mpc::client::event::ClientMidiEvent &);
 
@@ -38,7 +38,7 @@ namespace mpc::controller
         void triggerDualButtonCombo(hardware::ComponentId first, hardware::ComponentId second);
         void handleRecPunch();
         void handleOdubPunch();
-        
+
         void pressButton(hardware::ComponentId componentId);
         void releaseButton(hardware::ComponentId componentId);
         void handleStopToPlay();

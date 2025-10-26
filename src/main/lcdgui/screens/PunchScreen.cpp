@@ -27,8 +27,8 @@ void PunchScreen::open()
     auto lastTick = sequencer.lock()->getActiveSequence()->getLastTick();
 
     if (lastTick < sequencer.lock()->getPunchInTime() ||
-            lastTick < sequencer.lock()->getPunchOutTime() ||
-            (sequencer.lock()->getPunchInTime() == 0 && sequencer.lock()->getPunchOutTime() == 0))
+        lastTick < sequencer.lock()->getPunchOutTime() ||
+        (sequencer.lock()->getPunchInTime() == 0 && sequencer.lock()->getPunchOutTime() == 0))
     {
         sequencer.lock()->setPunchInTime(0);
         sequencer.lock()->setPunchOutTime(sequencer.lock()->getActiveSequence()->getLastTick());
@@ -156,4 +156,3 @@ const std::vector<std::string> &PunchScreen::getTabNames() const
 {
     return tabNames;
 }
-

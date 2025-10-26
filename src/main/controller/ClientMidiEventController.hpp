@@ -19,7 +19,7 @@ namespace mpc::lcdgui::screens::window
     class MidiInputScreen;
     class MultiRecordingSetupScreen;
     class TimingCorrectScreen;
-}
+} // namespace mpc::lcdgui::screens::window
 
 namespace mpc::audiomidi
 {
@@ -47,19 +47,18 @@ namespace mpc::controller
         std::function<std::string()> getCurrentScreenName;
 
     public:
-        ClientMidiEventController(std::shared_ptr<ClientHardwareEventController>, 
-                                 std::shared_ptr<lcdgui::screens::MidiSwScreen>, 
-                                 std::shared_ptr<sequencer::Sequencer>,
-                                 std::shared_ptr<lcdgui::screens::window::MidiInputScreen>,
-                                 std::shared_ptr<audiomidi::EventHandler>,
-                                 std::shared_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>,
-                                 std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>,
-                                 std::shared_ptr<hardware::Button>,
-                                 std::function<std::string()> getCurrentScreenName);
+        ClientMidiEventController(std::shared_ptr<ClientHardwareEventController>,
+                                  std::shared_ptr<lcdgui::screens::MidiSwScreen>,
+                                  std::shared_ptr<sequencer::Sequencer>,
+                                  std::shared_ptr<lcdgui::screens::window::MidiInputScreen>,
+                                  std::shared_ptr<audiomidi::EventHandler>,
+                                  std::shared_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>,
+                                  std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>,
+                                  std::shared_ptr<hardware::Button>,
+                                  std::function<std::string()> getCurrentScreenName);
 
         std::shared_ptr<ClientMidiSoundGeneratorController> getSoundGeneratorController();
 
         void handleClientMidiEvent(const mpc::client::event::ClientMidiEvent &);
     };
 } // namespace mpc::controller
-

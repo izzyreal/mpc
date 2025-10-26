@@ -17,16 +17,18 @@ ClientEventController::ClientEventController(mpc::Mpc &mpc)
 {
     clientHardwareEventController = std::make_shared<ClientHardwareEventController>(mpc);
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
-        clientHardwareEventController, 
-        mpc.screens->get<MidiSwScreen>(), 
+        clientHardwareEventController,
+        mpc.screens->get<MidiSwScreen>(),
         mpc.getSequencer(),
         mpc.screens->get<MidiInputScreen>(),
         mpc.getEventHandler(),
         mpc.screens->get<MultiRecordingSetupScreen>(),
         mpc.screens->get<TimingCorrectScreen>(),
         mpc.getHardware()->getButton(hardware::ComponentId::REC),
-        [layeredScreen = mpc.getLayeredScreen()] { return layeredScreen->getCurrentScreenName(); }
-    );
+        [layeredScreen = mpc.getLayeredScreen()]
+        {
+            return layeredScreen->getCurrentScreenName();
+        });
 }
 
 void ClientEventController::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
@@ -58,4 +60,3 @@ std::shared_ptr<ClientMidiEventController> ClientEventController::getClientMidiE
 {
     return clientMidiEventController;
 }
-

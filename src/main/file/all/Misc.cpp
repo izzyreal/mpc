@@ -77,7 +77,7 @@ Misc::Misc(mpc::Mpc &mpc)
     {
         auto ctrl = midiSwScreen->getSwitch(i).first;
         auto func = midiSwScreen->getSwitch(i).second;
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] = ctrl == - 1 ? 0xFF : ctrl;
+        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] = ctrl == -1 ? 0xFF : ctrl;
         saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)func;
     }
 

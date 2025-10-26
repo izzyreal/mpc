@@ -109,7 +109,7 @@ namespace mpc::sequencer
         int activeTrackIndex = 0;
         double tempo = 120.0;
         int nextSq = -1;
-        
+
         // Punch properties
         bool punchEnabled = false;
         int autoPunchMode = 0;
@@ -236,7 +236,7 @@ namespace mpc::sequencer
         void setOverdubbing(bool b);
         void playMetronomeTrack();
         void stopMetronomeTrack();
-        
+
         // Punch property getters and setters
         bool isPunchEnabled();
         void setPunchEnabled(bool enabled);

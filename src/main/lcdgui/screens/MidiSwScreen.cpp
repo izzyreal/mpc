@@ -168,4 +168,3 @@ const std::vector<std::pair<int, int>> &MidiSwScreen::getSwitches()
 {
     return controllerToFunctionMapping;
 }
-

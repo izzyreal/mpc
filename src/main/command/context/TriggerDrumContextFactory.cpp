@@ -47,11 +47,11 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(screen->getName(), mpc.getSequencer());
 
     const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(
-            mpc.getSequencer(),
-            mpc.screens->get<TimingCorrectScreen>(),
-            screen->getName(),
-            mpc.getHardware()->getButton(hardware::ComponentId::REC),
-            mpc.clientEventController->clientHardwareEventController);
+        mpc.getSequencer(),
+        mpc.screens->get<TimingCorrectScreen>(),
+        screen->getName(),
+        mpc.getHardware()->getButton(hardware::ComponentId::REC),
+        mpc.clientEventController->clientHardwareEventController);
 
     auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
     auto assign16LevelsScreen = mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>();
@@ -165,11 +165,11 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(screen->getName(), mpc.getSequencer());
 
     const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(
-            mpc.getSequencer(),
-            mpc.screens->get<TimingCorrectScreen>(),
-            screen->getName(),
-            mpc.getHardware()->getButton(hardware::ComponentId::REC),
-            mpc.clientEventController->clientHardwareEventController);
+        mpc.getSequencer(),
+        mpc.screens->get<TimingCorrectScreen>(),
+        screen->getName(),
+        mpc.getHardware()->getButton(hardware::ComponentId::REC),
+        mpc.clientEventController->clientHardwareEventController);
 
     return {
         programPadIndex,
