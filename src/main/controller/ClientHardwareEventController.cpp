@@ -4,6 +4,7 @@
 #include "command/TriggerDrumNoteOffCommand.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
+#include "controller/ClientEventController.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Component.hpp"
 #include "client/event/ClientHardwareEvent.hpp"
@@ -137,16 +138,18 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
 
     const auto maybeDrumIndex = screen->getDrumIndex();
 
+    const Bank activeBank = mpc.clientEventController->getActiveBank();
+
     if (layeredScreen->isCurrentScreen<NameScreen>())
     {
-        registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, event.source, maybeDrumIndex);
+        registerPhysicalPadPush(physicalPadIndex, activeBank, screen, event.source, maybeDrumIndex);
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(event.componentId);
         return;
     }
 
-    registerPhysicalPadPush(physicalPadIndex, mpc.getBank(), screen, event.source, maybeDrumIndex);
+    registerPhysicalPadPush(physicalPadIndex, activeBank, screen, event.source, maybeDrumIndex);
 
-    const auto programPadIndex = physicalPadIndex + (mpc.getBank() * 16);
+    const auto programPadIndex = physicalPadIndex + (static_cast<int>(activeBank) * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
 
     const bool isF4Pressed = mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
@@ -159,8 +162,8 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
         ctx.sequencer,
         isF4Pressed,
         isF6Pressed,
-        mpc.getBank(),
-        ctx.setMpcPad,
+        mpc.clientEventController->getActiveBank(),
+        ctx.setSelectedPad,
         ctx.allowCentralNoteAndPadUpdate};
 
     PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex).execute();
@@ -169,7 +172,7 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
         ctx.isSixteenLevelsEnabled,
         ctx.allowCentralNoteAndPadUpdate,
         ctx.screenComponent,
-        ctx.setMpcNote,
+        ctx.setSelectedNote,
         ctx.currentFieldName};
 
     NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note).execute();
@@ -211,7 +214,7 @@ void ClientHardwareEventController::handlePadRelease(const ClientHardwareEvent &
         return;
     }
 
-    const auto programPadIndex = physicalPadIndex + (info.bankIndex * 16);
+    const auto programPadIndex = physicalPadIndex + (static_cast<int>(info.bank) * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.drumIndex, info.screen);
     TriggerDrumNoteOffCommand(ctx).execute();
 }
@@ -463,11 +466,11 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     }
     else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH)
     {
-        PushFullLevelCommand(mpc).execute();
+        PushFullLevelCommand(layeredScreen, mpc.getPadAndButtonKeyboard(), mpc.getHardware(), mpc.clientEventController).execute();
     }
     else if (id == Id::SIXTEEN_LEVELS_OR_SPACE)
     {
-        PushSixteenLevelsCommand(mpc).execute();
+        PushSixteenLevelsCommand(layeredScreen, mpc.clientEventController, mpc.getHardware()).execute();
     }
     else if (id == Id::F1)
     {
@@ -526,23 +529,23 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     }
     else if (id == Id::AFTER_OR_ASSIGN)
     {
-        PushAfterCommand(mpc).execute();
+        PushAfterCommand(mpc.clientEventController, layeredScreen, mpc.getHardware()).execute();
     }
     else if (id == Id::BANK_A)
     {
-        PushBankCommand(mpc, 0).execute();
+        PushBankCommand(mpc.clientEventController, Bank::A).execute();
     }
     else if (id == Id::BANK_B)
     {
-        PushBankCommand(mpc, 1).execute();
+        PushBankCommand(mpc.clientEventController, Bank::B).execute();
     }
     else if (id == Id::BANK_C)
     {
-        PushBankCommand(mpc, 2).execute();
+        PushBankCommand(mpc.clientEventController, Bank::C).execute();
     }
     else if (id == Id::BANK_D)
     {
-        PushBankCommand(mpc, 3).execute();
+        PushBankCommand(mpc.clientEventController, Bank::D).execute();
     }
     else if (id == Id::NUM_0_OR_VMPC)
     {

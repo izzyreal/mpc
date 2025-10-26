@@ -1,5 +1,6 @@
 #include "TrMuteScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "sequencer/Track.hpp"
 
@@ -51,12 +52,12 @@ void TrMuteScreen::open()
     displayNow1();
     displayNow2();
 
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
 }
 
 void TrMuteScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
     sequencer.lock()->deleteObserver(this);
     auto sequence = sequencer.lock()->getActiveSequence();
 
@@ -120,20 +121,22 @@ void TrMuteScreen::function(int i)
 
 int TrMuteScreen::bankoffset()
 {
-    int bank = mpc.getBank();
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
     return bank * 16;
 }
 
 void TrMuteScreen::displayBank()
 {
     std::vector<std::string> letters{"A", "B", "C", "D"};
-    findLabel("bank")->setText(letters[mpc.getBank()]);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    findLabel("bank")->setText(letters[bank]);
 }
 
 void TrMuteScreen::displayTrackNumbers()
 {
     std::vector<std::string> trn{"01-16", "17-32", "33-48", "49-64"};
-    findLabel("tracknumbers")->setText(trn[mpc.getBank()]);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    findLabel("tracknumbers")->setText(trn[bank]);
 }
 
 void TrMuteScreen::displaySq()

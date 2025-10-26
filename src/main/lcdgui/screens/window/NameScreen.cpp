@@ -1,5 +1,6 @@
 #include "NameScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/Underline.hpp"
 #include "hardware/Hardware.hpp"
@@ -52,7 +53,7 @@ void NameScreen::open()
 
 void NameScreen::close()
 {
-    mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(mpc.isFullLevelEnabled());
+    mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(mpc.clientEventController->isFullLevelEnabled());
 
     ls->setLastFocus("name", "0");
     editing = false;

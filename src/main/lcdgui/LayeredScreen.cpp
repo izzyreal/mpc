@@ -29,6 +29,8 @@
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "hardware/Hardware.hpp"
+#include "lcdgui/screens/SequencerScreen.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #if __linux__
 #include <climits>
@@ -809,6 +811,10 @@ template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
 template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
     mpc::lcdgui::screens::SequencerScreen,
     mpc::lcdgui::screens::TrMuteScreen>() const;
+
+template bool mpc::lcdgui::LayeredScreen::isCurrentScreen<
+    mpc::lcdgui::screens::SequencerScreen,
+    mpc::lcdgui::screens::window::Assign16LevelsScreen>() const;
 
 // Used by MidiOutputScreen
 template bool mpc::lcdgui::LayeredScreen::isPreviousScreenNot<

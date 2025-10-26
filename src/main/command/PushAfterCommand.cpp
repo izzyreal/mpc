@@ -1,22 +1,36 @@
 #include "PushAfterCommand.hpp"
-#include "Mpc.hpp"
+
+#include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
+#include "lcdgui/LayeredScreen.hpp"
+
+using namespace mpc::controller;
+using namespace mpc::hardware;
+using namespace mpc::lcdgui;
 
 namespace mpc::command
 {
 
-    PushAfterCommand::PushAfterCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    PushAfterCommand::PushAfterCommand(
+            std::shared_ptr<controller::ClientEventController> controllerToUse,
+            std::shared_ptr<lcdgui::LayeredScreen> layeredScreenToUse,
+            std::shared_ptr<hardware::Hardware> hardwareToUse) :
+        controller(controllerToUse),
+        layeredScreen(layeredScreenToUse),
+        hardware(hardwareToUse)
+    {
+    }
 
     void PushAfterCommand::execute()
     {
-        if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
-            mpc.getLayeredScreen()->openScreen<AssignScreen>();
+            layeredScreen->openScreen<AssignScreen>();
         }
         else
         {
-            mpc.setAfterEnabled(!mpc.isAfterEnabled());
-            mpc.getHardware()->getLed(hardware::ComponentId::AFTER_OR_ASSIGN_LED)->setEnabled(mpc.isAfterEnabled());
+            controller->setAfterEnabled(!controller->isAfterEnabled());
+            hardware->getLed(hardware::ComponentId::AFTER_OR_ASSIGN_LED)->setEnabled(controller->isAfterEnabled());
         }
     }
 

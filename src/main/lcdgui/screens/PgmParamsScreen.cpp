@@ -1,6 +1,7 @@
 #include "PgmParamsScreen.hpp"
 
 #include "SelectDrumScreen.hpp"
+#include "controller/ClientEventController.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 
 #include "sampler/NoteParameters.hpp"
@@ -18,7 +19,7 @@ PgmParamsScreen::PgmParamsScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void PgmParamsScreen::open()
 {
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
     displayPgm();
     displayNote();
     displayDecayMode();
@@ -31,7 +32,7 @@ void PgmParamsScreen::open()
 
 void PgmParamsScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void PgmParamsScreen::function(int i)
@@ -143,10 +144,10 @@ void PgmParamsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note")
     {
-        auto candidate = mpc.getNote() + i;
+        auto candidate = mpc.clientEventController->getSelectedNote() + i;
         if (candidate > 34)
         {
-            mpc.setNote(candidate);
+            mpc.clientEventController->setSelectedNote(candidate);
             displayAttackDecay();
             displayDecayMode();
             displayFreq();

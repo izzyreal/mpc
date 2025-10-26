@@ -1,5 +1,6 @@
 #include "LoadASoundScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
 #include "sequencer/Track.hpp"
@@ -23,19 +24,18 @@ void LoadASoundScreen::open()
 {
     auto loadScreen = mpc.screens->get<LoadScreen>();
     findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
-    assignToNote = mpc.getNote();
+    assignToNote = mpc.clientEventController->getSelectedNote();
     displayAssignToNote();
-    mpc.addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
 }
 
 void LoadASoundScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void LoadASoundScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "assign-to-note")
@@ -44,20 +44,19 @@ void LoadASoundScreen::turnWheel(int i)
 
         if (newAssignToNote == 34)
         {
-            mpc.setNote(35);
+            mpc.clientEventController->setSelectedNote(35);
             assignToNote = newAssignToNote;
             displayAssignToNote();
         }
         else
         {
-            mpc.setNote(newAssignToNote);
+            mpc.clientEventController->setSelectedNote(newAssignToNote);
         }
     }
 }
 
 void LoadASoundScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
@@ -183,7 +182,7 @@ void LoadASoundScreen::update(Observable *observable, Message message)
     const auto msg = std::get<std::string>(message);
     if (msg == "note")
     {
-        assignToNote = mpc.getNote();
+        assignToNote = mpc.clientEventController->getSelectedNote();
         displayAssignToNote();
     }
 }

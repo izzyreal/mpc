@@ -30,11 +30,11 @@ void PushPadScreenUpdateCommand::execute()
 
     if (ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
-        ctx.setMpcPad(padIndexWithBank);
+        ctx.setSelectedPad(padIndexWithBank);
     }
     else if (auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent); mixerScreen)
     {
-        const unsigned char bankStartPadIndex = ctx.bank * 16;
+        const unsigned char bankStartPadIndex = static_cast<int>(ctx.bank) * 16;
         const unsigned char bankEndPadIndex = bankStartPadIndex + 16;
 
         if (padIndexWithBank >= bankStartPadIndex && padIndexWithBank < bankEndPadIndex)

@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 
+#include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "sequencer/Track.hpp"
@@ -29,7 +30,7 @@ void Assign16LevelsScreen::function(int i)
     {
         case 4:
         {
-            mpc.setSixteenLevelsEnabled(true);
+            mpc.clientEventController->setSixteenLevelsEnabled(true);
             mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
@@ -39,7 +40,6 @@ void Assign16LevelsScreen::function(int i)
 
 void Assign16LevelsScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "note")
@@ -93,25 +93,14 @@ void Assign16LevelsScreen::setNote(int newNote)
 
 void Assign16LevelsScreen::setParam(int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    parameter = i;
-
+    parameter = std::clamp(i, 0, 1);
     displayParameter();
     displayType();
 }
 
 void Assign16LevelsScreen::setType(int i)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-
-    type = i;
+    type = std::clamp(i, 0, 3);
 
     displayType();
     displayOriginalKeyPad();
@@ -119,12 +108,7 @@ void Assign16LevelsScreen::setType(int i)
 
 void Assign16LevelsScreen::setOriginalKeyPad(int i)
 {
-    if (i < 3 || i > 12)
-    {
-        return;
-    }
-
-    originalKeyPad = i;
+    originalKeyPad = std::clamp(i, 3, 12);
     displayOriginalKeyPad();
 }
 

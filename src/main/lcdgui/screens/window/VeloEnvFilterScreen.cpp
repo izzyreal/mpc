@@ -1,4 +1,5 @@
 #include "VeloEnvFilterScreen.hpp"
+#include "controller/ClientEventController.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -18,17 +19,16 @@ void VeloEnvFilterScreen::open()
     displayVeloFreq();
     displayVelo();
 
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
 }
 
 void VeloEnvFilterScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void VeloEnvFilterScreen::turnWheel(int i)
 {
-
     auto program = getProgramOrThrow();
     auto lastNp = sampler->getLastNp(program.get());
 
@@ -56,7 +56,7 @@ void VeloEnvFilterScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note")
     {
-        mpc.setNote(mpc.getNote() + i);
+        mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
     }
     else if (focusedFieldName == "velo")
     {

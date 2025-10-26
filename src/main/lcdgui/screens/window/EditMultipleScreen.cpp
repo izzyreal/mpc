@@ -1,5 +1,6 @@
 #include "EditMultipleScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/Track.hpp"
@@ -23,12 +24,12 @@ EditMultipleScreen::EditMultipleScreen(mpc::Mpc &mpc, const int layerIndex)
 void EditMultipleScreen::open()
 {
     updateEditMultiple();
-    mpc.addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
 }
 
 void EditMultipleScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void EditMultipleScreen::function(int i)

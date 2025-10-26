@@ -1,5 +1,6 @@
 #include "VeloPitchScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sampler/NoteParameters.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -11,23 +12,21 @@ VeloPitchScreen::VeloPitchScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void VeloPitchScreen::open()
 {
-
     displayNote();
     displayTune();
     displayVeloPitch();
     displayVelo();
 
-    mpc.addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
 }
 
 void VeloPitchScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void VeloPitchScreen::turnWheel(int i)
 {
-
     auto program = getProgramOrThrow();
     auto lastNp = sampler->getLastNp(program.get());
 
@@ -45,7 +44,7 @@ void VeloPitchScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note")
     {
-        mpc.setNote(mpc.getNote() + i);
+        mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
         // We could call all display methods here, but we instead rely on the "note" message
     }
 }

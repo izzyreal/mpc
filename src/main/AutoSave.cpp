@@ -1,6 +1,7 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
+#include "controller/ClientEventController.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "mpc_fs.hpp"
 
@@ -164,11 +165,11 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
                        });
         setIntProperty("lastPressedNote.txt", [&mpc](int v)
                        {
-                           mpc.setNote(v);
+                           mpc.clientEventController->setSelectedNote(v);
                        });
         setIntProperty("lastPressedPad.txt", [&mpc](int v)
                        {
-                           mpc.setPad(v);
+                           mpc.clientEventController->setSelectedPad(v);
                        });
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
@@ -271,8 +272,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 
         auto focus = mpc.getLayeredScreen()->getFocusedFieldName();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
-        auto lastPressedPad = mpc.getPad();
-        auto lastPressedNote = mpc.getNote();
+        auto lastPressedPad = mpc.clientEventController->getSelectedPad();
+        auto lastPressedNote = mpc.clientEventController->getSelectedNote();
         auto currentDir = mpc.getDisk()->getAbsolutePath();
 
         auto setFileData = [](const fs::path &p, const std::string &data)

@@ -224,49 +224,6 @@ std::shared_ptr<audiomidi::MidiOutput> Mpc::getMidiOutput()
     return midiOutput;
 }
 
-void Mpc::setBank(int i)
-{
-    if (i == bank)
-    {
-        return;
-    }
-
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-
-    bank = i;
-
-    notifyObservers(std::string("bank"));
-
-    hardware->getLed(hardware::ComponentId::BANK_A_LED)->setEnabled(i == 0);
-    hardware->getLed(hardware::ComponentId::BANK_B_LED)->setEnabled(i == 1);
-    hardware->getLed(hardware::ComponentId::BANK_C_LED)->setEnabled(i == 2);
-    hardware->getLed(hardware::ComponentId::BANK_D_LED)->setEnabled(i == 3);
-}
-
-int Mpc::getBank()
-{
-    return bank;
-}
-
-void Mpc::setNote(int newNote)
-{
-    note = std::clamp(newNote, 35, 98);
-    notifyObservers(std::string("note"));
-}
-
-int Mpc::getNote()
-{
-    return note;
-}
-
-int Mpc::getPad()
-{
-    return pad;
-}
-
 mpc::disk::DiskController *Mpc::getDiskController()
 {
     return diskController.get();
@@ -302,13 +259,6 @@ Mpc::~Mpc()
     }
 }
 
-void Mpc::setPad(int padIndexWithBank)
-{
-    pad = std::clamp(padIndexWithBank, 0, 63);
-
-    notifyObservers(std::string("pad"));
-}
-
 void Mpc::panic()
 {
     sampler->clearAllProgramPadPressRegistries();
@@ -336,36 +286,6 @@ bool Mpc::isPluginModeEnabled()
 void Mpc::startMidiDeviceDetector()
 {
     midiDeviceDetector->start(*this);
-}
-
-bool Mpc::isAfterEnabled() const
-{
-    return afterEnabled;
-}
-
-void Mpc::setAfterEnabled(bool b)
-{
-    afterEnabled = b;
-}
-
-bool Mpc::isFullLevelEnabled() const
-{
-    return fullLevelEnabled;
-}
-
-void Mpc::setFullLevelEnabled(bool b)
-{
-    fullLevelEnabled = b;
-}
-
-bool Mpc::isSixteenLevelsEnabled() const
-{
-    return sixteenLevelsEnabled;
-}
-
-void Mpc::setSixteenLevelsEnabled(bool b)
-{
-    sixteenLevelsEnabled = b;
 }
 
 std::shared_ptr<mpc::input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()

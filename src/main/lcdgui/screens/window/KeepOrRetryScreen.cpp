@@ -1,5 +1,6 @@
 #include "KeepOrRetryScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -14,12 +15,12 @@ void KeepOrRetryScreen::open()
     assignToNote = 34;
     displayNameForNewSound();
     displayAssignToNote();
-    mpc.addObserver(this); // Subscribe to "note" message
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" message
 }
 
 void KeepOrRetryScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void KeepOrRetryScreen::function(int i)
@@ -50,7 +51,6 @@ void KeepOrRetryScreen::function(int i)
 
 void KeepOrRetryScreen::openNameScreen()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "name-for-new-sound")
@@ -74,7 +74,6 @@ void KeepOrRetryScreen::openNameScreen()
 
 void KeepOrRetryScreen::right()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "name-for-new-sound")
@@ -85,7 +84,6 @@ void KeepOrRetryScreen::right()
 
 void KeepOrRetryScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "assign-to-note")
@@ -103,13 +101,13 @@ void KeepOrRetryScreen::turnWheel(int i)
 
         if (newAssignToNote == 34)
         {
-            mpc.setNote(35);
+            mpc.clientEventController->setSelectedNote(35);
             assignToNote = newAssignToNote;
             displayAssignToNote();
         }
         else
         {
-            mpc.setNote(newAssignToNote);
+            mpc.clientEventController->setSelectedNote(newAssignToNote);
         }
     }
 }
@@ -137,7 +135,7 @@ void KeepOrRetryScreen::update(Observable *o, Message message)
 
     if (msg == "note")
     {
-        assignToNote = mpc.getNote();
+        assignToNote = mpc.clientEventController->getSelectedNote();
         displayAssignToNote();
     }
 }

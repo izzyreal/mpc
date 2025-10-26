@@ -1,4 +1,5 @@
 #include "MixerScreen.hpp"
+#include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/screens/DrumScreen.hpp"
@@ -44,26 +45,29 @@ void MixerScreen::open()
         mixerStrips[padIndex]->setSelection(selection[padIndex] ? yPos : -1);
     }
 
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
 }
 
 void MixerScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void MixerScreen::addMixerStrips()
 {
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int i = 0; i < 16; i++)
     {
         mixerStrips.emplace_back(addChildT<MixerStrip>(mpc, i));
-        mixerStrips.back()->setBank(mpc.getBank());
+        mixerStrips.back()->setBank(bank);
     }
 }
 
 std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 {
-    const auto padIndex = index + (mpc.getBank() * 16);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const auto padIndex = index + (bank * 16);
     auto program = getProgramOrThrow();
     const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
@@ -82,7 +86,8 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 
 std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
 {
-    const auto padIndex = index + (mpc.getBank() * 16);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const auto padIndex = index + (bank * 16);
     auto program = getProgramOrThrow();
     const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
@@ -106,7 +111,9 @@ void MixerScreen::displayMixerStrip(int stripIndex)
     auto stereoMixer = getStereoMixerChannel(stripIndex);
     auto indivFxMixer = getIndivFxMixerChannel(stripIndex);
 
-    strip->setBank(mpc.getBank());
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
+    strip->setBank(bank);
 
     if (!stereoMixer || !indivFxMixer)
     {
@@ -164,12 +171,13 @@ void MixerScreen::displayMixerStrips()
 void MixerScreen::update(Observable *o, Message message)
 {
     const auto msg = std::get<std::string>(message);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
 
     if (msg == "bank")
     {
         for (auto &m : mixerStrips)
         {
-            m->setBank(mpc.getBank());
+            m->setBank(bank);
         }
 
         displayMixerStrips();
@@ -249,14 +257,9 @@ int MixerScreen::getTab()
 
 void MixerScreen::setXPos(unsigned char newXPos)
 {
-    if (newXPos < 0 || newXPos > 15)
-    {
-        return;
-    }
-
     if (selection.all())
     {
-        xPos = newXPos;
+        xPos = std::clamp(static_cast<int>(newXPos), 0, 15);
         return;
     }
 
@@ -267,7 +270,7 @@ void MixerScreen::setXPos(unsigned char newXPos)
         m->setSelection(-1);
     }
 
-    xPos = newXPos;
+    xPos = std::clamp(static_cast<int>(newXPos), 0, 15);
 
     selection.set(xPos);
     mixerStrips[xPos]->setSelection(yPos);
@@ -275,12 +278,7 @@ void MixerScreen::setXPos(unsigned char newXPos)
 
 void MixerScreen::setYPos(int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    yPos = i;
+    yPos = std::clamp(i, 0, 1);
 
     for (int i = 0; i < 16; i++)
     {
@@ -308,8 +306,9 @@ void MixerScreen::left()
 
     setXPos(xPos - 1);
 
-    auto newPad = xPos + (mpc.getBank() * 16);
-    mpc.setPad(newPad);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    auto newPad = xPos + (bank * 16);
+    mpc.clientEventController->setSelectedPad(newPad);
 }
 
 void MixerScreen::right()
@@ -322,8 +321,9 @@ void MixerScreen::right()
 
     setXPos(xPos + 1);
 
-    const auto newPadIndexWithBank = xPos + (mpc.getBank() * 16);
-    mpc.setPad(newPadIndexWithBank);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const auto newPadIndexWithBank = xPos + (bank * 16);
+    mpc.clientEventController->setSelectedPad(newPadIndexWithBank);
 }
 
 void MixerScreen::openWindow()
@@ -381,9 +381,11 @@ void MixerScreen::turnWheel(int i)
 
         if (tab == 0)
         {
-            auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+            const auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
-            bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+            const bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+
+            const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
 
             if (yPos == 0)
             {
@@ -391,7 +393,7 @@ void MixerScreen::turnWheel(int i)
 
                 if (record)
                 {
-                    recordMixerEvent(padIndex + (mpc.getBank() * 16), 1, stereoMixer->getPanning());
+                    recordMixerEvent(padIndex + (bank * 16), 1, stereoMixer->getPanning());
                 }
 
                 displayPanning();
@@ -402,7 +404,7 @@ void MixerScreen::turnWheel(int i)
 
                 if (record)
                 {
-                    recordMixerEvent(padIndex + (mpc.getBank() * 16), 0, stereoMixer->getLevel());
+                    recordMixerEvent(padIndex + (bank * 16), 0, stereoMixer->getLevel());
                 }
 
                 displayStereoFaders();
@@ -450,6 +452,8 @@ void MixerScreen::displayStereoFaders()
 {
     auto program = getProgramOrThrow();
 
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -458,15 +462,15 @@ void MixerScreen::displayStereoFaders()
         }
 
         const auto stereoMixer = getStereoMixerChannel(padIndex);
-        const auto padWithBankIndex = padIndex + (mpc.getBank() * 16);
+        const auto padWithBankIndex = padIndex + (bank * 16);
         const auto note = program->getNoteFromPad(padWithBankIndex);
         const auto padsWithSameNote = program->getPadIndicesFromNote(note);
 
         for (auto &p : padsWithSameNote)
         {
-            auto strip = mixerStrips[p - (mpc.getBank() * 16)];
+            auto strip = mixerStrips[p - (bank * 16)];
 
-            if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
+            if (p >= (bank * 16) && p < ((bank + 1) * 16))
             {
                 if (!stereoMixer)
                 {
@@ -484,6 +488,8 @@ void MixerScreen::displayPanning()
 {
     auto program = getProgramOrThrow();
 
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -492,15 +498,15 @@ void MixerScreen::displayPanning()
         }
 
         const auto stereoMixer = getStereoMixerChannel(padIndex);
-        const auto padIndexWithBank = padIndex + (mpc.getBank() * 16);
+        const auto padIndexWithBank = padIndex + (bank * 16);
         const auto note = program->getNoteFromPad(padIndexWithBank);
         const auto padsWithSameNote = program->getPadIndicesFromNote(note);
 
         for (auto &p : padsWithSameNote)
         {
-            auto strip = mixerStrips[p - (mpc.getBank() * 16)];
+            auto strip = mixerStrips[p - (bank * 16)];
 
-            if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
+            if (p >= (bank * 16) && p < ((bank + 1) * 16))
             {
                 if (!stereoMixer)
                 {
@@ -518,6 +524,8 @@ void MixerScreen::displayIndividualOutputs()
 {
     auto program = getProgramOrThrow();
 
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -528,16 +536,16 @@ void MixerScreen::displayIndividualOutputs()
         const auto stereoMixer = getStereoMixerChannel(padIndex);
         const auto indivFxMixer = getIndivFxMixerChannel(padIndex);
 
-        const auto padIndexWithBank = padIndex + (mpc.getBank() * 16);
+        const auto padIndexWithBank = padIndex + (bank * 16);
         const auto note = program->getNoteFromPad(padIndexWithBank);
         const auto padsWithSameNote = program->getPadIndicesFromNote(note);
 
         for (auto &p : padsWithSameNote)
         {
-            const auto stripIndex = p - (mpc.getBank() * 16);
+            const auto stripIndex = p - (bank * 16);
             auto strip = mixerStrips[stripIndex];
 
-            if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
+            if (p >= (bank * 16) && p < ((bank + 1) * 16))
             {
                 if (!stereoMixer)
                 {
@@ -562,6 +570,8 @@ void MixerScreen::displayIndivFaders()
 {
     auto program = getProgramOrThrow();
 
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -570,15 +580,15 @@ void MixerScreen::displayIndivFaders()
         }
 
         const auto indivFxMixer = getIndivFxMixerChannel(padIndex);
-        const auto padIndexWithBank = padIndex + (mpc.getBank() * 16);
+        const auto padIndexWithBank = padIndex + (bank * 16);
         const auto note = program->getNoteFromPad(padIndexWithBank);
         const auto padsWithSameNote = program->getPadIndicesFromNote(note);
 
         for (auto &p : padsWithSameNote)
         {
-            auto strip = mixerStrips[p - (mpc.getBank() * 16)];
+            auto strip = mixerStrips[p - (bank * 16)];
 
-            if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
+            if (p >= (bank * 16) && p < ((bank + 1) * 16))
             {
                 if (!indivFxMixer)
                 {
@@ -596,6 +606,8 @@ void MixerScreen::displayFxPaths()
 {
     auto program = getProgramOrThrow();
 
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -604,15 +616,15 @@ void MixerScreen::displayFxPaths()
         }
 
         const auto indivFxMixer = getIndivFxMixerChannel(padIndex);
-        const auto padIndexWithBank = padIndex + (mpc.getBank() * 16);
+        const auto padIndexWithBank = padIndex + (bank * 16);
         const auto note = program->getNoteFromPad(padIndexWithBank);
         const auto padsWithSameNote = program->getPadIndicesFromNote(note);
 
         for (auto &p : padsWithSameNote)
         {
-            auto strip = mixerStrips[p - (mpc.getBank() * 16)];
+            auto strip = mixerStrips[p - (bank * 16)];
 
-            if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
+            if (p >= (bank * 16) && p < ((bank + 1) * 16))
             {
                 if (!indivFxMixer)
                 {
@@ -630,6 +642,8 @@ void MixerScreen::displayFxSendLevels()
 {
     auto program = getProgramOrThrow();
 
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
         if (!selection[padIndex])
@@ -638,15 +652,15 @@ void MixerScreen::displayFxSendLevels()
         }
 
         const auto indivFxMixer = getIndivFxMixerChannel(padIndex);
-        const auto padIndexWithBank = padIndex + (mpc.getBank() * 16);
+        const auto padIndexWithBank = padIndex + (bank * 16);
         const auto note = program->getNoteFromPad(padIndexWithBank);
         const auto padsWithSameNote = program->getPadIndicesFromNote(note);
 
         for (auto &p : padsWithSameNote)
         {
-            auto strip = mixerStrips[p - (mpc.getBank() * 16)];
+            auto strip = mixerStrips[p - (bank * 16)];
 
-            if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
+            if (p >= (bank * 16) && p < ((bank + 1) * 16))
             {
                 if (!indivFxMixer)
                 {
@@ -663,7 +677,8 @@ void MixerScreen::displayFxSendLevels()
 bool MixerScreen::stripHasStereoSound(int stripIndex)
 {
     auto program = getProgramOrThrow();
-    auto pad = stripIndex + (mpc.getBank() * 16);
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    auto pad = stripIndex + (bank * 16);
     auto note = program->getNoteFromPad(pad);
     auto noteParameters = program->getNoteParameters(note);
     auto soundIndex = noteParameters->getSoundIndex();

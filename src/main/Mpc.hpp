@@ -6,8 +6,6 @@
 
 #include <disk/DiskController.hpp>
 
-#include <Observer.hpp>
-
 #include <Logger.hpp>
 
 #include "Paths.hpp"
@@ -78,13 +76,13 @@ namespace mpc::nvram
 
 namespace mpc
 {
-    class Mpc : public Observable
+    class Mpc
     {
+    public:
+
     private:
-        bool afterEnabled = false;
-        bool fullLevelEnabled = false;
-        bool sixteenLevelsEnabled = false;
         bool pluginModeEnabled = false;
+
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<sampler::Sampler> sampler;
@@ -95,9 +93,6 @@ namespace mpc
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<mpc::sequencer::Clock> clock;
-        int bank = 0;
-        int pad = 0;
-        int note = 60;
 
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;
@@ -105,12 +100,6 @@ namespace mpc
         std::vector<std::shared_ptr<nvram::MidiControlPreset>> midiControlPresets;
         void init();
         void startMidiDeviceDetector();
-        void setBank(int i);
-        int getBank();
-        void setNote(int note);
-        void setPad(int padIndexWithBank);
-        int getNote();
-        int getPad();
         void panic();
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
@@ -136,13 +125,6 @@ namespace mpc
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
         std::shared_ptr<mpc::sequencer::Clock> getClock();
-
-        bool isAfterEnabled() const;
-        void setAfterEnabled(bool);
-        bool isFullLevelEnabled() const;
-        void setFullLevelEnabled(bool);
-        bool isSixteenLevelsEnabled() const;
-        void setSixteenLevelsEnabled(bool);
 
     public:
         std::shared_ptr<mpc::disk::AbstractDisk> getDisk();

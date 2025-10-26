@@ -34,7 +34,7 @@ void NoteInputScreenUpdateCommand::execute()
 
     if (mpc::sequencer::isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
-        ctx.setMpcNote(note);
+        ctx.setSelectedNote(note);
     }
     else if (auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
              withNotes && note >= 35)

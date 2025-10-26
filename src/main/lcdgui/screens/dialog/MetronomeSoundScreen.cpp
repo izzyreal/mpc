@@ -1,4 +1,5 @@
 #include "MetronomeSoundScreen.hpp"
+#include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
 #include <Mpc.hpp>
@@ -33,12 +34,12 @@ void MetronomeSoundScreen::open()
     }
 
     setSound(sound);
-    mpc.addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
 }
 
 void MetronomeSoundScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void MetronomeSoundScreen::displaySound()
@@ -100,12 +101,7 @@ int MetronomeSoundScreen::getVolume()
 
 void MetronomeSoundScreen::setVolume(int i)
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
-    volume = i;
+    volume = std::clamp(i, 0, 100);
     displayVolume();
 }
 
@@ -116,12 +112,7 @@ int MetronomeSoundScreen::getOutput()
 
 void MetronomeSoundScreen::setOutput(int i)
 {
-    if (i < 0 || i > 8)
-    {
-        return;
-    }
-
-    output = i;
+    output = std::clamp(i, 0, 8);
     displayOutput();
 }
 
@@ -132,12 +123,7 @@ int MetronomeSoundScreen::getSound()
 
 void MetronomeSoundScreen::setSound(int i)
 {
-    if (i < 0 || i > 4)
-    {
-        return;
-    }
-
-    sound = i;
+    sound = std::clamp(i, 0, 4);
     displaySound();
 
     if (sound == 0)
@@ -163,12 +149,7 @@ int MetronomeSoundScreen::getAccentPad()
 
 void MetronomeSoundScreen::setAccentPad(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    accentPad = i;
+    accentPad = std::clamp(i, 0, 63);
     displayAccent();
 }
 
@@ -179,12 +160,7 @@ int MetronomeSoundScreen::getAccentVelo()
 
 void MetronomeSoundScreen::setAccentVelo(int i)
 {
-    if (i < 1 || i > 127)
-    {
-        return;
-    }
-
-    accentVelo = i;
+    accentVelo = std::clamp(i, 1, 127);
     displayAccentVelo();
 }
 
@@ -195,12 +171,7 @@ int MetronomeSoundScreen::getNormalPad()
 
 void MetronomeSoundScreen::setNormalPad(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    normalPad = i;
+    normalPad = std::clamp(i, 0, 63);
     displayNormal();
 }
 
@@ -211,18 +182,12 @@ int MetronomeSoundScreen::getNormalVelo()
 
 void MetronomeSoundScreen::setNormalVelo(int i)
 {
-    if (i < 1 || i > 127)
-    {
-        return;
-    }
-
-    normalVelo = i;
+    normalVelo = std::clamp(i, 1, 127);
     displayNormalVelo();
 }
 
 void MetronomeSoundScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
@@ -233,7 +198,6 @@ void MetronomeSoundScreen::function(int i)
 
 void MetronomeSoundScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "sound")
@@ -268,7 +232,6 @@ void MetronomeSoundScreen::turnWheel(int i)
 
 void MetronomeSoundScreen::update(Observable *o, Message message)
 {
-
     const auto msg = std::get<std::string>(message);
 
     if (msg == "note")
@@ -277,11 +240,11 @@ void MetronomeSoundScreen::update(Observable *o, Message message)
 
         if (focusedFieldName == "accent")
         {
-            setAccentPad(mpc.getPad());
+            setAccentPad(mpc.clientEventController->getSelectedPad());
         }
         else if (focusedFieldName == "normal")
         {
-            setNormalPad(mpc.getPad());
+            setNormalPad(mpc.clientEventController->getSelectedPad());
         }
     }
 }

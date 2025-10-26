@@ -1,4 +1,5 @@
 #include "AssignmentViewScreen.hpp"
+#include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
 #include <StrUtil.hpp>
@@ -18,12 +19,12 @@ void AssignmentViewScreen::open()
     ls->setFocus(getFocusFromPadIndex());
 
     displayAssignmentView();
-    mpc.addObserver(this); // Subscribe to "pad" and "bank" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "pad" and "bank" messages
 }
 
 void AssignmentViewScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void AssignmentViewScreen::up()
@@ -36,9 +37,9 @@ void AssignmentViewScreen::up()
         return;
     }
 
-    auto padIndex = mpc.getPad() + 4;
+    auto padIndex = mpc.clientEventController->getSelectedPad() + 4;
     ls->setFocus(padFocusNames[padIndex % 16]);
-    mpc.setPad(padIndex);
+    mpc.clientEventController->setSelectedPad(padIndex);
 }
 
 void AssignmentViewScreen::down()
@@ -51,14 +52,13 @@ void AssignmentViewScreen::down()
         return;
     }
 
-    auto padIndex = mpc.getPad() - 4;
+    auto padIndex = mpc.clientEventController->getSelectedPad() - 4;
     ls->setFocus(padFocusNames[padIndex % 16]);
-    mpc.setPad(padIndex);
+    mpc.clientEventController->setSelectedPad(padIndex);
 }
 
 void AssignmentViewScreen::left()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.find("a") != std::string::npos)
@@ -68,14 +68,13 @@ void AssignmentViewScreen::left()
 
     ScreenComponent::left();
 
-    auto padIndex = mpc.getPad() - 1;
+    auto padIndex = mpc.clientEventController->getSelectedPad() - 1;
     ls->setFocus(padFocusNames[padIndex % 16]);
-    mpc.setPad(padIndex);
+    mpc.clientEventController->setSelectedPad(padIndex);
 }
 
 void AssignmentViewScreen::right()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.find("d") != std::string::npos)
@@ -84,9 +83,9 @@ void AssignmentViewScreen::right()
     }
 
     ScreenComponent::right();
-    auto padIndex = mpc.getPad() + 1;
+    auto padIndex = mpc.clientEventController->getSelectedPad() + 1;
     ls->setFocus(padFocusNames[padIndex % 16]);
-    mpc.setPad(padIndex);
+    mpc.clientEventController->setSelectedPad(padIndex);
 }
 
 void AssignmentViewScreen::turnWheel(int i)
@@ -135,7 +134,8 @@ void AssignmentViewScreen::displayAssignmentView()
 void AssignmentViewScreen::displayPad(int i)
 {
     auto program = getProgramOrThrow();
-    auto note = program->getPad(i + (16 * mpc.getBank()))->getNote();
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    auto note = program->getPad(i + (16 * bank))->getNote();
 
     std::string sampleName;
 
@@ -155,7 +155,8 @@ void AssignmentViewScreen::displayPad(int i)
 
 void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 {
-    findLabel("info0")->setText("Bank:" + letters[mpc.getBank()] + " Note:");
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    findLabel("info0")->setText("Bank:" + letters[bank] + " Note:");
 }
 
 void AssignmentViewScreen::displayNote()
@@ -190,7 +191,6 @@ void AssignmentViewScreen::displaySoundName()
 
 int AssignmentViewScreen::getPadIndexFromFocus()
 {
-
     int padIndex = -1;
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -209,7 +209,7 @@ int AssignmentViewScreen::getPadIndexFromFocus()
 
 std::string AssignmentViewScreen::getFocusFromPadIndex()
 {
-    auto padIndex = mpc.getPad();
+    auto padIndex = mpc.clientEventController->getSelectedPad();
 
     while (padIndex > 15)
     {
@@ -218,3 +218,4 @@ std::string AssignmentViewScreen::getFocusFromPadIndex()
 
     return padFocusNames[padIndex];
 }
+

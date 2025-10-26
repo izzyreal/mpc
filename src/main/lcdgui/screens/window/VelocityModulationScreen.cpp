@@ -1,4 +1,5 @@
 #include "VelocityModulationScreen.hpp"
+#include "controller/ClientEventController.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -15,12 +16,12 @@ void VelocityModulationScreen::open()
     displayVeloLevel();
     displayVelo();
 
-    mpc.addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
 }
 
 void VelocityModulationScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void VelocityModulationScreen::turnWheel(int i)
@@ -48,7 +49,7 @@ void VelocityModulationScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note")
     {
-        mpc.setNote(mpc.getNote() + i);
+        mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
         displayNote();
     }
 }

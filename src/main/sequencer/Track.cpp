@@ -4,6 +4,7 @@
 #include <Mpc.hpp>
 #include "audiomidi/EventHandler.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/NoteEvent.hpp"
@@ -611,7 +612,7 @@ void Track::playNext()
                 }
             }
 
-            if (!_delete && oneOrMorePadsArePressed && mpc.isSixteenLevelsEnabled())
+            if (!_delete && oneOrMorePadsArePressed && mpc.clientEventController->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
                 auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>();
@@ -844,7 +845,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, i
 
     if ((stepLength == 24 || stepLength == 48) && (tick + stepLength) % (stepLength * 2) == 0 && swingPercentage > 50)
     {
-        const int swingOffset = ((swingPercentage - 50.f) / 25.f) * (stepLength / 2);
+        const int swingOffset = ((swingPercentage - 50.f) / 25.f) * (stepLength / 2.f);
         tick += swingOffset;
     }
 

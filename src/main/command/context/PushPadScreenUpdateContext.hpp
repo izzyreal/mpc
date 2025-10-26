@@ -1,5 +1,7 @@
 #pragma once
 
+#include "controller/Bank.hpp"
+
 #include <memory>
 #include <functional>
 
@@ -28,8 +30,8 @@ namespace mpc::command::context
         std::shared_ptr<sequencer::Sequencer> sequencer;
         bool isF4Pressed;
         bool isF6Pressed;
-        int bank;
-        std::function<void(int)> setMpcPad;
+        controller::Bank bank;
+        std::function<void(int)> setSelectedPad;
         bool isAllowCentralNoteAndPadUpdateScreen;
     };
 

@@ -1,4 +1,5 @@
 #include "AutoChromaticAssignmentScreen.hpp"
+#include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
 #include "lcdgui/screens/window/NameScreen.hpp"
@@ -28,12 +29,12 @@ void AutoChromaticAssignmentScreen::open()
     displayProgramName();
     displaySource();
 
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
 }
 
 void AutoChromaticAssignmentScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void AutoChromaticAssignmentScreen::function(int i)
@@ -85,7 +86,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
     if (focusedFieldName == "source")
     {
         auto program = getProgramOrThrow();
-        mpc.setNote(mpc.getNote() + i);
+        mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
         displaySource();
         setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     }

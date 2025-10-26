@@ -1,5 +1,7 @@
 #pragma once
 
+#include "controller/Bank.hpp"
+
 #include <memory>
 #include <string>
 #include <cstdint>
@@ -58,7 +60,7 @@ namespace mpc::command::context
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
 
-        int bank;
+        controller::Bank bank;
 
         bool isSequencerPlaying;
         bool isRecordingOrOverdubbing;
@@ -93,8 +95,8 @@ namespace mpc::command::context
 
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
-        std::function<void(int)> setMpcNote;
-        std::function<void(int)> setMpcPad;
+        std::function<void(int)> setSelectedNote;
+        std::function<void(int)> setSelectedPad;
 
         std::string currentFieldName;
         int hardwareSliderValue;

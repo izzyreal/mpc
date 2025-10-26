@@ -39,8 +39,8 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate = screengroups::isCentralNoteAndPadUpdateScreen(screen);
-    const bool isFullLevelEnabled = mpc.isFullLevelEnabled();
-    const bool isSixteenLevelsEnabled = mpc.isSixteenLevelsEnabled();
+    const bool isFullLevelEnabled = mpc.clientEventController->isFullLevelEnabled();
+    const bool isSixteenLevelsEnabled = mpc.clientEventController->isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed = mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked() ||
                                              mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
     const bool isErasePressed = mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed();
@@ -61,13 +61,13 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
     std::shared_ptr<sampler::Program> program = drumIndex >= 0 ? mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram()) : nullptr;
 
-    std::function<void(int)> setMpcNote = [mpc = &mpc](int n)
+    std::function<void(int)> setSelectedNote = [controller = mpc.clientEventController](int n)
     {
-        mpc->setNote(n);
+        controller->setSelectedNote(n);
     };
-    std::function<void(int)> setMpcPad = [mpc = &mpc](int p)
+    std::function<void(int)> setSelectedPad = [controller = mpc.clientEventController](int p)
     {
-        mpc->setPad(p);
+        controller->setSelectedPad(p);
     };
 
     const auto hardwareSliderValue = mpc.getHardware()->getSlider()->getValueAs<int>();
@@ -85,7 +85,7 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         isErasePressed,
         isStepRecording,
         isRecMainWithoutPlaying,
-        mpc.getBank(),
+        mpc.clientEventController->getActiveBank(),
         mpc.getSequencer()->isPlaying(),
         mpc.getSequencer()->isRecordingOrOverdubbing(),
         mpc.getSequencer()->getCurrentBarIndex(),
@@ -112,11 +112,11 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
         mpc.getBasicPlayer(),
         allowCentralNoteAndPadUpdate,
         mpc.getScreen(),
-        setMpcNote,
-        setMpcPad,
+        setSelectedNote,
+        setSelectedPad,
         mpc.getLayeredScreen()->getFocusedFieldName(),
         hardwareSliderValue,
-        mpc.clientEventController->clientHardwareEventController->isPhysicallyPressed(programPadIndex % 16, mpc.getBank())};
+        mpc.clientEventController->clientHardwareEventController->isPhysicallyPressed(programPadIndex % 16, mpc.clientEventController->getActiveBank())};
 }
 
 TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(

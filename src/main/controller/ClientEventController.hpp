@@ -6,6 +6,11 @@
 #include "input/KeyboardBindings.hpp"
 
 #include "sequencer/RecordingMode.hpp"
+
+#include "controller/Bank.hpp"
+
+#include "Observer.hpp"
+
 #include <memory>
 
 namespace mpc
@@ -35,7 +40,7 @@ namespace mpc::controller
     class ClientHardwareEventController;
     class ClientMidiEventController;
 
-    class ClientEventController : public std::enable_shared_from_this<ClientEventController>
+    class ClientEventController : public std::enable_shared_from_this<ClientEventController>, public mpc::Observable
     {
 
     public:
@@ -60,6 +65,19 @@ namespace mpc::controller
 
         sequencer::RecordingMode determineRecordingMode() const;
 
+        bool isAfterEnabled() const;
+        void setAfterEnabled(bool);
+        bool isFullLevelEnabled() const;
+        void setFullLevelEnabled(bool);
+        bool isSixteenLevelsEnabled() const;
+        void setSixteenLevelsEnabled(bool);
+        void setActiveBank(const Bank);
+        Bank getActiveBank() const;
+        void setSelectedNote(int note);
+        void setSelectedPad(int padIndexWithBank);
+        int getSelectedNote() const;
+        int getSelectedPad() const;
+
     private:
         mpc::Mpc &mpc;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
@@ -68,5 +86,13 @@ namespace mpc::controller
         std::shared_ptr<lcdgui::Screens> screens;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<hardware::Hardware> hardware;
+
+        bool afterEnabled = false;
+        bool fullLevelEnabled = false;
+        bool sixteenLevelsEnabled = false;
+        
+        Bank activeBank = Bank::A;
+        int selectedPad = 0;
+        int selectedNote = 60;
     };
 } // namespace mpc::controller

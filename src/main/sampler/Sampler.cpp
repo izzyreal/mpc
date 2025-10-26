@@ -5,6 +5,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/WavInputStringStream.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sampler/NoteParameters.hpp"
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
@@ -101,12 +102,7 @@ void Sampler::nudgeSoundIndex(bool up)
 
 void Sampler::setSoundIndex(int i)
 {
-    if (i < 0 || i >= sounds.size())
-    {
-        return;
-    }
-
-    soundIndex = i;
+    soundIndex = std::clamp(i, 0, static_cast<int>(sounds.size() - 1));
 
     auto zoneScreen = mpc.screens->get<ZoneScreen>();
     zoneScreen->initZones();
@@ -836,12 +832,12 @@ std::string Sampler::addOrIncreaseNumber2(std::string s)
 
 Pad *Sampler::getLastPad(Program *program)
 {
-    return program->getPad(mpc.getPad());
+    return program->getPad(mpc.clientEventController->getSelectedPad());
 }
 
 NoteParameters *Sampler::getLastNp(Program *program)
 {
-    return dynamic_cast<mpc::sampler::NoteParameters *>(program->getNoteParameters(mpc.getNote()));
+    return dynamic_cast<mpc::sampler::NoteParameters *>(program->getNoteParameters(mpc.clientEventController->getSelectedNote()));
 }
 
 std::vector<std::shared_ptr<Sound>> Sampler::getUsedSounds()

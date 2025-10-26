@@ -2,6 +2,7 @@
 
 #include "SelectDrumScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -25,7 +26,7 @@ void PgmAssignScreen::open()
     findField("pad-assign")->setAlignment(Alignment::Centered);
     findField("pad-assign")->setLocation(194, 11);
 
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
     displayNote();
     displayOptionalNoteA();
     displayOptionalNoteB();
@@ -41,7 +42,7 @@ void PgmAssignScreen::open()
 
 void PgmAssignScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void PgmAssignScreen::function(int i)
@@ -115,7 +116,7 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "pad")
     {
-        auto candidate = mpc.getPad() + i;
+        auto candidate = mpc.clientEventController->getSelectedPad() + i;
 
         if (candidate < 0 || candidate > 63)
         {
@@ -123,8 +124,8 @@ void PgmAssignScreen::turnWheel(int i)
         }
 
         auto nextNote = program->getPad(candidate)->getNote();
-        mpc.setNote(nextNote);
-        mpc.setPad(candidate);
+        mpc.clientEventController->setSelectedNote(nextNote);
+        mpc.clientEventController->setSelectedPad(candidate);
         displayPad();
         displayNote();
         displayOptionalNoteA();
@@ -138,7 +139,7 @@ void PgmAssignScreen::turnWheel(int i)
     {
         lastPad->setNote(lastPad->getNote() + i);
 
-        mpc.setNote(lastPad->getNote());
+        mpc.clientEventController->setSelectedNote(lastPad->getNote());
 
         displayPad();
         displayNote();
@@ -151,13 +152,14 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note")
     {
-        auto candidate = mpc.getNote() + i;
+        auto candidate = mpc.clientEventController->getSelectedNote() + i;
 
         if (candidate < 35)
         {
             candidate = 35;
         }
-        mpc.setNote(candidate);
+
+        mpc.clientEventController->setSelectedNote(candidate);
         displayNote();
         displaySoundName();
     }
@@ -434,7 +436,7 @@ void PgmAssignScreen::displayNote()
 
 void PgmAssignScreen::displayPad()
 {
-    findField("pad")->setText(sampler->getPadName(mpc.getPad()));
+    findField("pad")->setText(sampler->getPadName(mpc.clientEventController->getSelectedPad()));
 }
 
 void PgmAssignScreen::update(Observable *o, Message message)

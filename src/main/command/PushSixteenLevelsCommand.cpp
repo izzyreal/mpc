@@ -1,29 +1,40 @@
 #include "PushSixteenLevelsCommand.hpp"
-#include "Mpc.hpp"
+
+#include "lcdgui/LayeredScreen.hpp"
+#include "controller/ClientEventController.hpp"
+
 #include "hardware/Hardware.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+using namespace mpc::controller;
+using namespace mpc::hardware;
+
+PushSixteenLevelsCommand::PushSixteenLevelsCommand(
+        std::shared_ptr<LayeredScreen> layeredScreenToUse,
+        std::shared_ptr<ClientEventController> controllerToUse,
+        std::shared_ptr<Hardware> hardwareToUse)
+    : layeredScreen(layeredScreenToUse),
+    controller(controllerToUse),
+    hardware(hardwareToUse)
 {
+}
 
-    PushSixteenLevelsCommand::PushSixteenLevelsCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushSixteenLevelsCommand::execute()
+void PushSixteenLevelsCommand::execute()
+{
+    if (!layeredScreen->isCurrentScreen<SequencerScreen, Assign16LevelsScreen>())
     {
-        const auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
-        if (currentScreenName != "sequencer" && currentScreenName != "assign-16-levels")
-        {
-            return;
-        }
-
-        if (mpc.isSixteenLevelsEnabled())
-        {
-            mpc.setSixteenLevelsEnabled(false);
-            mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(false);
-        }
-        else
-        {
-            mpc.getLayeredScreen()->openScreen<Assign16LevelsScreen>();
-        }
+        return;
     }
 
-} // namespace mpc::command
+    if (controller->isSixteenLevelsEnabled())
+    {
+        controller->setSixteenLevelsEnabled(false);
+        hardware->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(false);
+    }
+    else
+    {
+        layeredScreen->openScreen<Assign16LevelsScreen>();
+    }
+}
+

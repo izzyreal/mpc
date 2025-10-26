@@ -1,5 +1,6 @@
 #include "NextSeqPadScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -27,13 +28,13 @@ void NextSeqPadScreen::open()
     displayNextSq();
 
     sequencer.lock()->addObserver(this);
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
 }
 
 void NextSeqPadScreen::close()
 {
     sequencer.lock()->deleteObserver(this);
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void NextSeqPadScreen::right()
@@ -81,18 +82,18 @@ void NextSeqPadScreen::displayNextSq()
 
 int NextSeqPadScreen::bankOffset()
 {
-    return mpc.getBank() * 16;
+    return static_cast<int>(mpc.clientEventController->getActiveBank()) * 16;
 }
 
 void NextSeqPadScreen::displayBank()
 {
-    findLabel("bank")->setText(letters[mpc.getBank()]);
+    findLabel("bank")->setText(letters[static_cast<int>(mpc.clientEventController->getActiveBank())]);
 }
 
 void NextSeqPadScreen::displaySeqNumbers()
 {
     std::vector<std::string> seqn{"01-16", "17-32", "33-48", "49-64"};
-    findLabel("seqnumbers")->setText(seqn[mpc.getBank()]);
+    findLabel("seqnumbers")->setText(seqn[static_cast<int>(mpc.clientEventController->getActiveBank())]);
 }
 
 void NextSeqPadScreen::displaySq()

@@ -1,14 +1,18 @@
 #include "PushBankCommand.hpp"
-#include "Mpc.hpp"
+
+#include "controller/ClientEventController.hpp"
+
+using namespace mpc::controller;
 
 namespace mpc::command
 {
 
-    PushBankCommand::PushBankCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i) {}
+    PushBankCommand::PushBankCommand(std::shared_ptr<ClientEventController> controllerToUse, const Bank bankToUse)
+        : controller(controllerToUse), bank(bankToUse) {}
 
     void PushBankCommand::execute()
     {
-        mpc.setBank(i);
+        controller->setActiveBank(bank);
     }
 
 } // namespace mpc::command

@@ -105,3 +105,73 @@ std::shared_ptr<LayeredScreen> ClientEventController::getLayeredScreen()
     return layeredScreen;
 }
 
+void ClientEventController::setSelectedPad(int padIndexWithBank)
+{
+    selectedPad = std::clamp(padIndexWithBank, 0, 63);
+
+    notifyObservers(std::string("pad"));
+}
+
+void ClientEventController::setActiveBank(const Bank activeBankToUse)
+{
+    activeBank = activeBankToUse;
+
+    notifyObservers(std::string("bank"));
+
+    hardware->getLed(hardware::ComponentId::BANK_A_LED)->setEnabled(activeBank == Bank::A);
+    hardware->getLed(hardware::ComponentId::BANK_B_LED)->setEnabled(activeBank == Bank::B);
+    hardware->getLed(hardware::ComponentId::BANK_C_LED)->setEnabled(activeBank == Bank::C);
+    hardware->getLed(hardware::ComponentId::BANK_D_LED)->setEnabled(activeBank == Bank::D);
+}
+
+Bank ClientEventController::getActiveBank() const
+{
+    return activeBank;
+}
+
+void ClientEventController::setSelectedNote(const int selectedNoteToUse)
+{
+    selectedNote = std::clamp(selectedNoteToUse, 35, 98);
+    notifyObservers(std::string("note"));
+}
+
+int ClientEventController::getSelectedNote() const
+{
+    return selectedNote;
+}
+
+int ClientEventController::getSelectedPad() const
+{
+    return selectedPad;
+}
+
+bool ClientEventController::isAfterEnabled() const
+{
+    return afterEnabled;
+}
+
+void ClientEventController::setAfterEnabled(bool b)
+{
+    afterEnabled = b;
+}
+
+bool ClientEventController::isFullLevelEnabled() const
+{
+    return fullLevelEnabled;
+}
+
+void ClientEventController::setFullLevelEnabled(bool b)
+{
+    fullLevelEnabled = b;
+}
+
+bool ClientEventController::isSixteenLevelsEnabled() const
+{
+    return sixteenLevelsEnabled;
+}
+
+void ClientEventController::setSixteenLevelsEnabled(bool b)
+{
+    sixteenLevelsEnabled = b;
+}
+

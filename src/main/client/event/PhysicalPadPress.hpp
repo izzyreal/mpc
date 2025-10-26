@@ -2,6 +2,8 @@
 
 #include "client/event/ClientHardwareEvent.hpp"
 
+#include "controller/Bank.hpp"
+
 #include <memory>
 #include <optional>
 
@@ -15,7 +17,7 @@ namespace mpc::client::event
 
     struct PhysicalPadPress
     {
-        int bankIndex;
+        controller::Bank bank;
         std::shared_ptr<lcdgui::ScreenComponent> screen;
         client::event::ClientHardwareEvent::Source inputSource;
         std::optional<int> drumIndex;

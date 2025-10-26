@@ -42,10 +42,10 @@ namespace mpc::controller
             buttonLockTracker.unlock(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
         }
 
-        bool isPhysicallyPressed(const int physicalPadIndex, const int bankIndex) const
+        bool isPhysicallyPressed(const int physicalPadIndex, const Bank bank) const
         {
             return physicalPadPresses.count(physicalPadIndex) > 0 &&
-                   physicalPadPresses.at(physicalPadIndex).bankIndex == bankIndex;
+                   physicalPadPresses.at(physicalPadIndex).bank == bank;
         }
 
         bool isPhysicallyPressedDueToKeyboardInput(const int physicalPadIndex) const
@@ -62,13 +62,13 @@ namespace mpc::controller
 
         void registerPhysicalPadPush(
             const int padIndex,
-            const int bankIndex,
+            const Bank bank,
             const std::shared_ptr<lcdgui::ScreenComponent> screen,
             const client::event::ClientHardwareEvent::Source inputSource,
             const std::optional<int> drumIndex)
         {
             assert(physicalPadPresses.count(padIndex) == 0);
-            physicalPadPresses[padIndex] = {bankIndex, screen, inputSource, drumIndex};
+            physicalPadPresses[padIndex] = {bank, screen, inputSource, drumIndex};
         }
 
         client::event::PhysicalPadPress registerPhysicalPadRelease(const int padIndex)

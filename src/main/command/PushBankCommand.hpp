@@ -1,5 +1,15 @@
 #pragma once
+
 #include "command/Command.hpp"
+
+#include "controller/Bank.hpp"
+
+#include <memory>
+
+namespace mpc::controller
+{
+    class ClientEventController;
+}
 
 namespace mpc::command
 {
@@ -7,12 +17,12 @@ namespace mpc::command
     class PushBankCommand : public Command
     {
     public:
-        PushBankCommand(mpc::Mpc &mpc, int i);
+        PushBankCommand(std::shared_ptr<controller::ClientEventController>, const controller::Bank);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
-        int i;
+        std::shared_ptr<controller::ClientEventController> controller;
+        const controller::Bank bank;
     };
 
 } // namespace mpc::command

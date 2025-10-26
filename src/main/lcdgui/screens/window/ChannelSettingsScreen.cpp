@@ -1,5 +1,6 @@
 #include "ChannelSettingsScreen.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"
@@ -19,23 +20,23 @@ ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc &mpc, const int layerIndex
 
 void ChannelSettingsScreen::open()
 {
+    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
     auto mixerScreen = mpc.screens->get<MixerScreen>();
     const int padIndexWithoutBank = mixerScreen->xPos;
-    const int padIndexWithBank = padIndexWithoutBank + (mpc.getBank() * 16);
+    const int padIndexWithBank = padIndexWithoutBank + (bank * 16);
     auto padNote = getProgramOrThrow()->getNoteFromPad(padIndexWithBank);
     note = padNote == 34 ? 35 : padNote;
     displayChannel();
-    mpc.addObserver(this);
+    mpc.clientEventController->addObserver(this);
 }
 
 void ChannelSettingsScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 {
-
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
     if (mixerSetupScreen->isIndivFxSourceDrum())
@@ -51,7 +52,6 @@ std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 
 std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 {
-
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
     if (mixerSetupScreen->isStereoMixSourceDrum())
@@ -67,7 +67,6 @@ std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 
 void ChannelSettingsScreen::turnWheel(int i)
 {
-
     auto stereoMixerChannel = getStereoMixerChannel();
     auto indivFxMixerChannel = getIndivFxMixerChannel();
 
@@ -116,12 +115,11 @@ void ChannelSettingsScreen::turnWheel(int i)
 
 void ChannelSettingsScreen::update(Observable *o, Message message)
 {
-
     const auto msg = std::get<std::string>(message);
 
     if (msg == "note")
     {
-        setNote(mpc.getNote());
+        setNote(mpc.clientEventController->getSelectedNote());
     }
     else if (msg == "bank")
     {
@@ -207,8 +205,9 @@ void ChannelSettingsScreen::displayPanning()
         panning = "R";
     }
 
-    findField("panning")->setText(
-        panning + StrUtil::padLeft(std::to_string(abs(normalizedPan)), " ", 2));
+    const auto panningText = panning + StrUtil::padLeft(std::to_string(abs(normalizedPan)), " ", 2);
+
+    findField("panning")->setText(panningText);
 }
 
 void ChannelSettingsScreen::displayOutput()

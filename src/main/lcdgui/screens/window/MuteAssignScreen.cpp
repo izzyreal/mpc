@@ -1,4 +1,5 @@
 #include "MuteAssignScreen.hpp"
+#include "controller/ClientEventController.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -12,12 +13,12 @@ void MuteAssignScreen::open()
     displayNote();
     displayNote0();
     displayNote1();
-    mpc.addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
 }
 
 void MuteAssignScreen::close()
 {
-    mpc.deleteObserver(this);
+    mpc.clientEventController->deleteObserver(this);
 }
 
 void MuteAssignScreen::turnWheel(int i)
@@ -29,7 +30,7 @@ void MuteAssignScreen::turnWheel(int i)
 
     if (focusedFieldName == "note")
     {
-        mpc.setNote(mpc.getNote() + i);
+        mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
     }
     else if (focusedFieldName == "note0")
     {

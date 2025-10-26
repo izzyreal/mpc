@@ -1,6 +1,8 @@
 #include "CopyNoteParametersScreen.hpp"
+#include "controller/ClientEventController.hpp"
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sampler;
 
 CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-note-parameters", layerIndex)
@@ -31,7 +33,7 @@ void CopyNoteParametersScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note0")
     {
-        setNote0(mpc.getNote() + i);
+        setNote0(mpc.clientEventController->getSelectedNote() + i);
     }
     else if (focusedFieldName == "prog1")
     {
@@ -51,8 +53,8 @@ void CopyNoteParametersScreen::function(int i)
     {
         case 4:
         {
-            auto source = dynamic_cast<mpc::sampler::NoteParameters *>(sampler->getProgram(prog0)->getNoteParameters(mpc.getNote()));
-            auto dest = dynamic_cast<mpc::sampler::Program *>(sampler->getProgram(prog1).get());
+            auto source = sampler->getProgram(prog0)->getNoteParameters(mpc.clientEventController->getSelectedNote());
+            auto dest = sampler->getProgram(prog1);
             auto clone = source->clone(note1);
             dest->setNoteParameters(note1, clone);
             mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
@@ -124,7 +126,7 @@ void CopyNoteParametersScreen::setProg1(int i)
 
 void CopyNoteParametersScreen::setNote0(int i)
 {
-    mpc.setNote(i);
+    mpc.clientEventController->setSelectedNote(i);
     displayNote0();
 }
 

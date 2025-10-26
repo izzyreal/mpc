@@ -44,8 +44,8 @@ void RepeatPad::process(mpc::Mpc &mpc,
         program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
     }
 
-    auto fullLevel = mpc.isFullLevelEnabled();
-    auto sixteenLevels = mpc.isSixteenLevelsEnabled();
+    const auto fullLevel = mpc.clientEventController->isFullLevelEnabled();
+    const auto sixteenLevels = mpc.clientEventController->isSixteenLevelsEnabled();
 
     auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>();
     auto note = assign16LevelsScreen->getNote();
@@ -54,7 +54,7 @@ void RepeatPad::process(mpc::Mpc &mpc,
     {
         for (int bankIndex = 0; bankIndex < 4; ++bankIndex)
         {
-            if (!mpc.clientEventController->clientHardwareEventController->isPhysicallyPressed(physicalPadIndex, bankIndex))
+            if (!mpc.clientEventController->clientHardwareEventController->isPhysicallyPressed(physicalPadIndex, mpc.clientEventController->getActiveBank()))
             {
                 continue;
             }
