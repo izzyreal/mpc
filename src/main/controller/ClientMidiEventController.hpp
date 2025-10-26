@@ -1,33 +1,63 @@
 #pragma once
 
-#include "../client/event/ClientMidiEvent.hpp"
+#include "client/event/ClientMidiEvent.hpp"
 #include "ClientMidiSoundGeneratorController.hpp"
 #include "ClientMidiSequencerController.hpp"
 #include "ClientMidiFootswitchAssignmentController.hpp"
 #include "ClientMidiInputSynchronizationController.hpp"
 #include "lcdgui/screens/MidiSwScreen.hpp"
 
+#include "Observer.hpp"
+
 namespace mpc::sequencer
 {
     class Sequencer;
+}
+
+namespace mpc::lcdgui::screens::window
+{
+    class MidiInputScreen;
+    class MultiRecordingSetupScreen;
+    class TimingCorrectScreen;
+}
+
+namespace mpc::audiomidi
+{
+    class EventHandler;
+}
+
+namespace mpc::hardware
+{
+    class Button;
 }
 
 namespace mpc::controller
 {
     class ClientHardwareEventController;
 
-    class ClientMidiEventController
+    class ClientMidiEventController : public Observable
     {
     private:
-        ClientMidiSoundGeneratorController soundGeneratorController;
+        std::shared_ptr<ClientMidiSoundGeneratorController> soundGeneratorController;
         ClientMidiSequencerController sequencerController;
         std::shared_ptr<ClientMidiFootswitchAssignmentController> footswitchController;
         ClientMidiInputSynchronizationController syncController;
 
         std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
+        std::function<std::string()> getCurrentScreenName;
 
     public:
-        ClientMidiEventController(std::shared_ptr<ClientHardwareEventController>, std::shared_ptr<lcdgui::screens::MidiSwScreen>, std::shared_ptr<sequencer::Sequencer>);
+        ClientMidiEventController(std::shared_ptr<ClientHardwareEventController>, 
+                                 std::shared_ptr<lcdgui::screens::MidiSwScreen>, 
+                                 std::shared_ptr<sequencer::Sequencer>,
+                                 std::shared_ptr<lcdgui::screens::window::MidiInputScreen>,
+                                 std::shared_ptr<audiomidi::EventHandler>,
+                                 std::shared_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>,
+                                 std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>,
+                                 std::shared_ptr<hardware::Button>,
+                                 std::function<std::string()> getCurrentScreenName);
+
+        std::shared_ptr<ClientMidiSoundGeneratorController> getSoundGeneratorController();
 
         void handleClientMidiEvent(const mpc::client::event::ClientMidiEvent &);
     };

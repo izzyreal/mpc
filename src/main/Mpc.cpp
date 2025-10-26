@@ -4,6 +4,7 @@
 
 #include "DemoFiles.hpp"
 
+#include "controller/ClientMidiEventController.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 #include "Paths.hpp"
@@ -15,7 +16,6 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiDeviceDetector.hpp"
-#include "audiomidi/MidiInput.hpp"
 #include "audiomidi/MidiOutput.hpp"
 
 #include "sampler/Sampler.hpp"
@@ -111,8 +111,6 @@ void Mpc::init()
     sampler = std::make_shared<mpc::sampler::Sampler>(*this);
     MLOG("Sampler created");
 
-    midiInputs = {new mpc::audiomidi::MidiInput(*this, 0), new mpc::audiomidi::MidiInput(*this, 1)};
-
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
 
     layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
@@ -121,6 +119,9 @@ void Mpc::init()
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
     // avoiding memory allocations and I/O on the audio thread.
     screens->createAndCacheAllScreens();
+
+    eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
+    MLOG("EventHandler created");
 
     clientEventController = std::make_shared<mpc::controller::ClientEventController>(*this);
 
@@ -142,9 +143,6 @@ void Mpc::init()
 
     sampler->init();
     MLOG("Sampler initialized");
-
-    eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
-    MLOG("Eeventhandler created");
 
     mpc::nvram::NvRam::loadUserScreenValues(*this);
 
@@ -225,11 +223,6 @@ std::shared_ptr<audiomidi::MidiOutput> Mpc::getMidiOutput()
     return midiOutput;
 }
 
-audiomidi::MidiInput *Mpc::getMpcMidiInput(int i)
-{
-    return midiInputs[i];
-}
-
 void Mpc::setBank(int i)
 {
     if (i == bank)
@@ -297,14 +290,6 @@ Mpc::~Mpc()
     mpc::nvram::NvRam::saveUserScreenValues(*this);
     mpc::nvram::NvRam::saveVmpcSettings(*this);
 
-    for (auto &m : midiInputs)
-    {
-        if (m != nullptr)
-        {
-            delete m;
-        }
-    }
-
     if (layeredScreen)
     {
         layeredScreen.reset();
@@ -329,11 +314,7 @@ void Mpc::panic()
     sequencer->getNoteEventStore().clearPlayAndRecordStore();
     midiOutput->panic();
     eventHandler->clearTransposeCache();
-
-    for (auto &midiInput : midiInputs)
-    {
-        midiInput->clearNoteEventStore();
-    }
+    clientEventController->getClientMidiEventController()->getSoundGeneratorController()->clearNoteEventStore();
 }
 
 std::shared_ptr<mpc::sequencer::Clock> Mpc::getClock()

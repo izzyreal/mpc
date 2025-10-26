@@ -2,7 +2,8 @@
 
 #include <Mpc.hpp>
 #include "audiomidi/EventHandler.hpp"
-#include "audiomidi/MidiInput.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientMidiEventController.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;
@@ -14,14 +15,12 @@ MidiInputMonitorScreen::MidiInputMonitorScreen(mpc::Mpc &mpc, const int layerInd
 
 void MidiInputMonitorScreen::open()
 {
-    mpc.getMpcMidiInput(0)->addObserver(this);
-    mpc.getMpcMidiInput(1)->addObserver(this);
+    mpc.clientEventController->getClientMidiEventController()->addObserver(this);
 }
 
 void MidiInputMonitorScreen::close()
 {
-    mpc.getMpcMidiInput(0)->deleteObserver(this);
-    mpc.getMpcMidiInput(1)->deleteObserver(this);
+    mpc.clientEventController->getClientMidiEventController()->deleteObserver(this);
 
     if (blinkThread.joinable())
     {

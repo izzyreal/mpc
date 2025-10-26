@@ -136,12 +136,7 @@ void MidiInputScreen::displayReceiveCh()
 
 void MidiInputScreen::setReceiveCh(int i)
 {
-    if (i < -1 || i > 15)
-    {
-        return;
-    }
-
-    receiveCh = i;
+    receiveCh = std::clamp(i, -1, 15);
     displayReceiveCh();
 }
 
@@ -200,12 +195,7 @@ bool MidiInputScreen::isMidiFilterEnabled()
 
 void MidiInputScreen::setType(int i)
 {
-    if (i < 0 || i > 134)
-    {
-        return;
-    }
-
-    type = i;
+    type = std::clamp(i, 0, 134);
     displayType();
     displayPass();
 }

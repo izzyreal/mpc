@@ -54,7 +54,6 @@ namespace mpc::audiomidi
 {
     class EventHandler;
     class AudioMidiServices;
-    class MidiInput;
     class MidiOutput;
     class MidiDeviceDetector;
 } // namespace mpc::audiomidi
@@ -92,7 +91,6 @@ namespace mpc
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::audiomidi::MidiDeviceDetector> midiDeviceDetector;
-        std::vector<audiomidi::MidiInput *> midiInputs;
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
@@ -137,7 +135,6 @@ namespace mpc
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
-        mpc::audiomidi::MidiInput *getMpcMidiInput(int i);
         std::shared_ptr<mpc::sequencer::Clock> getClock();
 
         bool isAfterEnabled() const;

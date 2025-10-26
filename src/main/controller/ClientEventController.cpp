@@ -1,8 +1,12 @@
-#pragma once
-
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
+#include "hardware/Hardware.hpp"
+#include "lcdgui/screens/window/MidiInputScreen.hpp"
+#include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "hardware/ComponentId.hpp"
+
 #include <variant>
 
 using namespace mpc::controller;
@@ -12,7 +16,17 @@ ClientEventController::ClientEventController(mpc::Mpc &mpc)
     : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>())
 {
     clientHardwareEventController = std::make_shared<ClientHardwareEventController>(mpc);
-    clientMidiEventController = std::make_shared<ClientMidiEventController>(clientHardwareEventController, mpc.screens->get<MidiSwScreen>(), mpc.getSequencer());
+    clientMidiEventController = std::make_shared<ClientMidiEventController>(
+        clientHardwareEventController, 
+        mpc.screens->get<MidiSwScreen>(), 
+        mpc.getSequencer(),
+        mpc.screens->get<MidiInputScreen>(),
+        mpc.getEventHandler(),
+        mpc.screens->get<MultiRecordingSetupScreen>(),
+        mpc.screens->get<TimingCorrectScreen>(),
+        mpc.getHardware()->getButton(hardware::ComponentId::REC),
+        [layeredScreen = mpc.getLayeredScreen()] { return layeredScreen->getCurrentScreenName(); }
+    );
 }
 
 void ClientEventController::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
@@ -39,3 +53,9 @@ void ClientEventController::handleClientEvent(const client::event::ClientEvent &
         clientMidiEventController->handleClientMidiEvent(std::get<ClientMidiEvent>(e.payload));
     }
 }
+
+std::shared_ptr<ClientMidiEventController> ClientEventController::getClientMidiEventController()
+{
+    return clientMidiEventController;
+}
+

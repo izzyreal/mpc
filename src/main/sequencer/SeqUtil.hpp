@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 namespace mpc
 {
@@ -13,6 +14,21 @@ namespace mpc::sequencer
     class Sequence;
     class Song;
 } // namespace mpc::sequencer
+
+namespace mpc::lcdgui::screens::window
+{
+    class TimingCorrectScreen;
+}
+
+namespace mpc::hardware
+{
+    class Button;
+}
+
+namespace mpc::controller
+{
+    class ClientHardwareEventController;
+}
 
 namespace mpc::sequencer
 {
@@ -50,8 +66,13 @@ namespace mpc::sequencer
                              uint8_t copyCount,
                              uint8_t copyAfterBar);
 
-        static bool isRecMainWithoutPlaying(mpc::Mpc &);
+        static bool isRecMainWithoutPlaying(
+            std::shared_ptr<Sequencer> sequencer,
+            std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
+            const std::string& currentScreenName,
+            std::shared_ptr<mpc::hardware::Button> recButton,
+            std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController);
 
-        static bool isStepRecording(mpc::Mpc &);
+        static bool isStepRecording(const std::string &currentScreenName, std::shared_ptr<Sequencer>);
     };
 } // namespace mpc::sequencer

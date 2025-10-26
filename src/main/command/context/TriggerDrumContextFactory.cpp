@@ -44,8 +44,14 @@ TriggerDrumNoteOnContext TriggerDrumContextFactory::buildTriggerDrumNoteOnContex
     const bool isNoteRepeatLockedOrPressed = mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked() ||
                                              mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
     const bool isErasePressed = mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed();
-    const bool isStepRecording = sequencer::SeqUtil::isStepRecording(mpc);
-    const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(mpc);
+    const bool isStepRecording = sequencer::SeqUtil::isStepRecording(screen->getName(), mpc.getSequencer());
+
+    const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(
+            mpc.getSequencer(),
+            mpc.screens->get<TimingCorrectScreen>(),
+            screen->getName(),
+            mpc.getHardware()->getButton(hardware::ComponentId::REC),
+            mpc.clientEventController->clientHardwareEventController);
 
     auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
     auto assign16LevelsScreen = mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>();
@@ -156,6 +162,15 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
         sequencer->stopMetronomeTrack();
     };
 
+    const bool isStepRecording = sequencer::SeqUtil::isStepRecording(screen->getName(), mpc.getSequencer());
+
+    const bool isRecMainWithoutPlaying = sequencer::SeqUtil::isRecMainWithoutPlaying(
+            mpc.getSequencer(),
+            mpc.screens->get<TimingCorrectScreen>(),
+            screen->getName(),
+            mpc.getHardware()->getButton(hardware::ComponentId::REC),
+            mpc.clientEventController->clientHardwareEventController);
+
     return {
         programPadIndex,
         finishBasicVoiceIfSoundIsLooping,
@@ -168,10 +183,10 @@ TriggerDrumNoteOffContext TriggerDrumContextFactory::buildTriggerDrumNoteOffCont
         mpc.getSequencer()->isRecordingOrOverdubbing(),
         mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed(),
         mpc.getSequencer()->getActiveTrack(),
-        sequencer::SeqUtil::isStepRecording(mpc),
+        isStepRecording,
         isAnyProgramPadRegisteredAsPressed,
         mpc.getAudioMidiServices()->getFrameSequencer()->getMetronomeOnlyTickPosition(),
-        sequencer::SeqUtil::isRecMainWithoutPlaying(mpc),
+        isRecMainWithoutPlaying,
         mpc.getSequencer()->getTickPosition(),
         stepEditOptionsScreen->getTcValuePercentage(),
         timingCorrectScreen->getNoteValueLengthInTicks(),
