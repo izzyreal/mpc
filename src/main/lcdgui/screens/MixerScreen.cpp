@@ -55,12 +55,10 @@ void MixerScreen::close()
 
 void MixerScreen::addMixerStrips()
 {
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
-
     for (int i = 0; i < 16; i++)
     {
         mixerStrips.emplace_back(addChildT<MixerStrip>(mpc, i));
-        mixerStrips.back()->setBank(bank);
+        mixerStrips.back()->setBank(0);
     }
 }
 
