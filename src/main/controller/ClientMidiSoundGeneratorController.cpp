@@ -6,8 +6,7 @@
 #include "audiomidi/EventHandler.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/SeqUtil.hpp"
-#include "controller/ClientHardwareEventController.hpp"
+#include "controller/ClientEventController.hpp"
 #include "hardware/ComponentId.hpp"
 #include "sequencer/Track.hpp"
 
@@ -21,15 +20,18 @@ using namespace mpc::audiomidi;
 using namespace mpc::sequencer;
 
 ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
+    std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<EventHandler> eventHandler,
-    std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<Sequencer> sequencerToUse,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
-    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen,
-    std::shared_ptr<ClientHardwareEventController> clientHardwareEventController,
-    std::shared_ptr<mpc::hardware::Button> recButton,
-    std::function<std::string()> getCurrentScreenNameToUse)
-    : midiInputScreen(midiInputScreen), eventHandler(eventHandler), sequencer(sequencer), multiRecordingSetupScreen(multiRecordingSetupScreen), timingCorrectScreen(timingCorrectScreen), clientHardwareEventController(clientHardwareEventController), recButton(recButton), getCurrentScreenName(getCurrentScreenNameToUse)
+    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
+    : midiInputScreen(midiInputScreen),
+    eventHandler(eventHandler),
+    sequencer(sequencerToUse),
+    multiRecordingSetupScreen(multiRecordingSetupScreen),
+    timingCorrectScreen(timingCorrectScreen),
+    clientEventController(clientEventController)
 {
     noteEventStore.reserve(NOTE_EVENT_STORE_CAPACITY);
 }
@@ -61,15 +63,14 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
 
     const auto type = e.getMessageType();
-    const auto currentScreenName = getCurrentScreenName();
 
     if (type == MessageType::NOTE_ON)
     {
-        handleNoteOnEvent(e, currentScreenName);
+        handleNoteOnEvent(e);
     }
     else if (type == MessageType::NOTE_OFF)
     {
-        handleNoteOffEvent(e, currentScreenName);
+        handleNoteOffEvent(e);
     }
     else if (type == MessageType::CONTROLLER && e.getControllerNumber() == 7)
     {
@@ -151,24 +152,7 @@ bool ClientMidiSoundGeneratorController::shouldProcessEvent(const ClientMidiEven
     }
 }
 
-RecordingMode ClientMidiSoundGeneratorController::determineRecordingMode(const std::string &currentScreenName) const
-{
-    if (sequencer->isRecordingOrOverdubbing())
-    {
-        return RecordingMode::Overdub;
-    }
-    if (SeqUtil::isStepRecording(currentScreenName, sequencer))
-    {
-        return RecordingMode::Step;
-    }
-    if (SeqUtil::isRecMainWithoutPlaying(sequencer, timingCorrectScreen, currentScreenName, recButton, clientHardwareEventController))
-    {
-        return RecordingMode::RecMainWithoutPlaying;
-    }
-    return RecordingMode::None;
-}
-
-void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent &e, const std::string &currentScreenName)
+void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent &e)
 {
     const int note = e.getNoteNumber();
     if (note < 35 || note > 98)
@@ -197,7 +181,7 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent
 
     auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(noteOnEvent->getNote(), noteOnEvent->getVelocity());
 
-    auto mode = determineRecordingMode(currentScreenName);
+    auto mode = clientEventController->determineRecordingMode();
 
     switch (mode)
     {
@@ -241,7 +225,7 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent
     }
 }
 
-void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEvent &e, const std::string &currentScreenName)
+void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEvent &e)
 {
     const int note = e.getNoteNumber();
 
@@ -259,7 +243,7 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEven
     // finalize recorded note if exists
     if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(std::pair<int, int>(trackIndex, note)))
     {
-        auto mode = determineRecordingMode(currentScreenName);
+        auto mode = clientEventController->determineRecordingMode();
 
         switch (mode)
         {

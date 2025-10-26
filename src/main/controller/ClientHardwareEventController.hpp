@@ -84,6 +84,8 @@ namespace mpc::controller
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
 
     private:
+        mpc::Mpc &mpc;
+
         void handlePadPress(const client::event::ClientHardwareEvent &);
         void handlePadAftertouch(const client::event::ClientHardwareEvent &);
         void handlePadRelease(const client::event::ClientHardwareEvent &);
@@ -97,7 +99,6 @@ namespace mpc::controller
         // Maps physical pad index 0 - 15 to info at the time the pad was pushed.
         std::unordered_map<int, client::event::PhysicalPadPress> physicalPadPresses;
 
-        mpc::Mpc &mpc;
     };
 
 } // namespace mpc::controller

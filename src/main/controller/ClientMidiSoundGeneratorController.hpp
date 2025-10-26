@@ -3,11 +3,8 @@
 #include "client/event/ClientMidiEvent.hpp"
 
 #include "sequencer/NoteEventStore.hpp"
-#include "sequencer/RecordingMode.hpp"
 
-#include <functional>
 #include <memory>
-#include <string>
 
 namespace mpc::lcdgui::screens::window
 {
@@ -34,7 +31,7 @@ namespace mpc::hardware
 
 namespace mpc::controller
 {
-    class ClientHardwareEventController;
+    class ClientEventController;
 }
 
 namespace mpc::controller
@@ -42,14 +39,13 @@ namespace mpc::controller
     class ClientMidiSoundGeneratorController
     {
     public:
-        ClientMidiSoundGeneratorController(std::shared_ptr<mpc::lcdgui::screens::window::MidiInputScreen> midiInputScreen,
+        ClientMidiSoundGeneratorController(std::shared_ptr<mpc::controller::ClientEventController> clientEventController,
+                                           std::shared_ptr<mpc::lcdgui::screens::window::MidiInputScreen> midiInputScreen,
                                            std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler,
                                            std::shared_ptr<mpc::sequencer::Sequencer> sequencer,
                                            std::shared_ptr<mpc::lcdgui::screens::window::MultiRecordingSetupScreen> multiRecordingSetupScreen,
-                                           std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
-                                           std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController,
-                                           std::shared_ptr<mpc::hardware::Button> recButton,
-                                           std::function<std::string()> getCurrentScreenName);
+                                           std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen);
+
         void handleEvent(const mpc::client::event::ClientMidiEvent &);
         void clearNoteEventStore();
 
@@ -59,19 +55,16 @@ namespace mpc::controller
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::screens::window::MultiRecordingSetupScreen> multiRecordingSetupScreen;
         std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen;
-        std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController;
-        std::shared_ptr<mpc::hardware::Button> recButton;
-        std::function<std::string()> getCurrentScreenName;
+        std::shared_ptr<mpc::controller::ClientEventController> clientEventController;
 
         const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
         mpc::sequencer::NoteEventStore<std::pair<int /*track*/, int /*note*/>> noteEventStore;
 
-        std::optional<int> getTrackIndexForEvent(const mpc::client::event::ClientMidiEvent &e) const;
+        std::optional<int> getTrackIndexForEvent(const mpc::client::event::ClientMidiEvent &) const;
         std::shared_ptr<mpc::sequencer::Track> getTrackForIndex(int trackIndex) const;
-        bool shouldProcessEvent(const mpc::client::event::ClientMidiEvent &e) const;
-        sequencer::RecordingMode determineRecordingMode(const std::string &currentScreenName) const;
+        bool shouldProcessEvent(const mpc::client::event::ClientMidiEvent &) const;
 
-        void handleNoteOnEvent(const mpc::client::event::ClientMidiEvent &e, const std::string &currentScreenName);
-        void handleNoteOffEvent(const mpc::client::event::ClientMidiEvent &e, const std::string &currentScreenName);
+        void handleNoteOnEvent(const mpc::client::event::ClientMidiEvent &);
+        void handleNoteOffEvent(const mpc::client::event::ClientMidiEvent &);
     };
 } // namespace mpc::controller
