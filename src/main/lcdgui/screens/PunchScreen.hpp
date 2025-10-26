@@ -3,19 +3,6 @@
 
 #include <lcdgui/screens/WithTimesAndNotes.hpp>
 
-namespace mpc::sequencer
-{
-    class FrameSeq;
-    class Track;
-} // namespace mpc::sequencer
-
-namespace mpc::lcdgui::screens
-{
-    class SequencerScreen;
-    class TransScreen;
-    class SecondSeqScreen;
-} // namespace mpc::lcdgui::screens
-
 namespace mpc::lcdgui::screens
 {
 
@@ -35,6 +22,10 @@ namespace mpc::lcdgui::screens
         void rec() override;
         void overDub() override;
 
+        int getActiveTab() const;
+        void setActiveTab(const int);
+        const std::vector<std::string> &getTabNames() const;
+
     private:
         const std::vector<std::string> tabNames{"punch", "trans", "second-seq"};
         const std::vector<std::string> autoPunchNames{"PUNCH IN ONLY", "PUNCH OUT ONLY", "PUNCH IN OUT"};
@@ -47,11 +38,5 @@ namespace mpc::lcdgui::screens
 
         void displayTime() override;
         void displayNotes() override {}
-
-        friend class SequencerScreen;
-        friend class TransScreen;
-        friend class SecondSeqScreen;
-        friend class mpc::sequencer::FrameSeq;
-        friend class mpc::sequencer::Track;
     };
 } // namespace mpc::lcdgui::screens

@@ -23,8 +23,8 @@ void SecondSeqScreen::function(int i)
     {
         case 0: // Intentional fall-through
         case 1:
-            punchScreen->tab = i;
-            mpc.getLayeredScreen()->openScreen(punchScreen->tabNames[i]);
+            punchScreen->setActiveTab(i);
+            mpc.getLayeredScreen()->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
             if (sequencer.lock()->isSecondSequenceEnabled())
@@ -53,13 +53,7 @@ void SecondSeqScreen::turnWheel(int i)
 
 void SecondSeqScreen::setSq(int i)
 {
-    if (i < 0 || i > 98)
-    {
-        return;
-    }
-
-    sq = i;
-
+    sq = std::clamp(i, 0, 98);
     displaySq();
     displayFunctionKeys();
 }

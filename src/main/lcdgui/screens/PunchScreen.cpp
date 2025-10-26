@@ -141,3 +141,19 @@ void PunchScreen::overDub()
     mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     ScreenComponent::rec();
 }
+
+int PunchScreen::getActiveTab() const
+{
+    return tab;
+}
+
+void PunchScreen::setActiveTab(const int tabToUse)
+{
+    tab = tabToUse;
+}
+
+const std::vector<std::string> &PunchScreen::getTabNames() const
+{
+    return tabNames;
+}
+

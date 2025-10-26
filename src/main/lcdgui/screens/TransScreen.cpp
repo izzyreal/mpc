@@ -30,8 +30,8 @@ void TransScreen::function(int i)
     {
         case 0: // Intentional fall-through
         case 2:
-            punchScreen->tab = i;
-            mpc.getLayeredScreen()->openScreen(punchScreen->tabNames[i]);
+            punchScreen->setActiveTab(i);
+            mpc.getLayeredScreen()->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
             // if (amount == 0) break; // does 2kxl do that?
@@ -79,24 +79,13 @@ void TransScreen::turnWheel(int i)
 
 void TransScreen::setTransposeAmount(int i)
 {
-    if (i < -12 || i > 12)
-    {
-        return;
-    }
-
-    transposeAmount = i;
-
+    transposeAmount = std::clamp(i, -12, 12);
     displayTransposeAmount();
 }
 
 void TransScreen::setTr(int i)
 {
-    if (i < -1 || i > 63)
-    {
-        return;
-    }
-
-    tr = i;
+    tr = std::clamp(i, -1, 63);
     displayTr();
 }
 
@@ -104,7 +93,7 @@ void TransScreen::setBar0(int i)
 {
     if (i < 0)
     {
-        return;
+        i = 0;
     }
 
     bar0 = i;
@@ -121,7 +110,7 @@ void TransScreen::setBar1(int i)
 {
     if (i < 0)
     {
-        return;
+        i = 0;
     }
 
     bar1 = i;
