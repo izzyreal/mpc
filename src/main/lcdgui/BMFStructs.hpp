@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
+#include <vector>
 
 namespace mpc::lcdgui
 {
@@ -107,7 +109,7 @@ namespace mpc::lcdgui
         }
         int8_t getS8()
         {
-            int8_t value = currentU8();
+            int8_t value = static_cast<int8_t>(currentU8());
             pos += 1;
             return value;
         }
@@ -117,7 +119,7 @@ namespace mpc::lcdgui
         }
         int16_t getS16()
         {
-            int16_t value = currentU16();
+            int16_t value = static_cast<int16_t>(currentU16());
             pos += 2;
             return value;
         }
@@ -127,7 +129,7 @@ namespace mpc::lcdgui
         }
         int32_t getS32()
         {
-            int32_t value = currentU32();
+            int32_t value = static_cast<int32_t>(currentU32());
             pos += 4;
             return value;
         }

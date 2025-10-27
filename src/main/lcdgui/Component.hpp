@@ -109,7 +109,7 @@ namespace mpc::lcdgui
         Component *getParent();
 
     public:
-        virtual void Draw(std::vector<std::vector<bool>> *pixels) {}
+        virtual void Draw(std::vector<std::vector<bool>> * /*pixels*/) {}
         void drawRecursive(std::vector<std::vector<bool>> *pixels);
         virtual void Clear(std::vector<std::vector<bool>> *pixels);
         void preDrawClear(std::vector<std::vector<bool>> *pixels);

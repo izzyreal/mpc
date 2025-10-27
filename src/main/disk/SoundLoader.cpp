@@ -130,7 +130,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r, st
         {
             auto existingSound = sampler->getSound(existingSoundIndex);
 
-            soundOrError.map([existingSoundIndex, sampler, sound](std::shared_ptr<Sound> s)
+            (void) soundOrError.map([existingSoundIndex, sampler, sound](std::shared_ptr<Sound> s)
                              {
                                  sampler->replaceSound(existingSoundIndex, s);
                              });

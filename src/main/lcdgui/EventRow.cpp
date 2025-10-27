@@ -174,11 +174,11 @@ void EventRow::setSystemExclusiveEventValues()
     }
 
     char byteA[3];
-    sprintf(byteA, "%X", see->getByteA()); // convert number to hex
+    std::snprintf(byteA, sizeof(byteA), "%02X", see->getByteA());
     fields[0]->setText(StrUtil::padLeft(std::string(byteA), "0", 2));
 
     char byteB[3];
-    sprintf(byteB, "%X", see->getByteB()); // convert number to hex
+    std::snprintf(byteB, sizeof(byteB), "%02X", see->getByteB());
     fields[1]->setText(StrUtil::padLeft(std::string(byteB), "0", 2));
 
     horizontalBar->Hide(true);

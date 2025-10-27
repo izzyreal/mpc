@@ -35,7 +35,7 @@ inline std::vector<char> get_file_data(const fs::path &p)
     std::ifstream::pos_type fileSize = ifs.tellg();
     ifs.seekg(0, std::ios::beg);
 
-    std::vector<char> bytes(fileSize);
+    std::vector<char> bytes(static_cast<size_t>(fileSize));
     ifs.read(bytes.data(), fileSize);
 
     return bytes;
