@@ -107,7 +107,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         isErasePressed,
         isStepRecording,
         isRecMainWithoutPlaying,
-        mpc.clientEventController->getActiveBank(),
         mpc.getSequencer()->isPlaying(),
         mpc.getSequencer()->isRecordingOrOverdubbing(),
         mpc.getSequencer()->getCurrentBarIndex(),

@@ -60,8 +60,6 @@ namespace mpc::command::context
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
 
-        controller::Bank bank;
-
         bool isSequencerPlaying;
         bool isRecordingOrOverdubbing;
         int currentBarIndex;
