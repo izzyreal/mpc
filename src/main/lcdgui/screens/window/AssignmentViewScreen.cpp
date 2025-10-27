@@ -218,4 +218,3 @@ std::string AssignmentViewScreen::getFocusFromPadIndex()
 
     return padFocusNames[padIndex];
 }
-

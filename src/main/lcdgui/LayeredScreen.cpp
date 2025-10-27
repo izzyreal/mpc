@@ -357,7 +357,7 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
 void LayeredScreen::timerCallback()
 {
     //	MLOG("LayeredScreen::timerCallback()");
-    
+
     if (auto currentScreen = getCurrentScreen(); currentScreen)
     {
         currentScreen->timerCallback();

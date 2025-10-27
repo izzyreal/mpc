@@ -15,7 +15,7 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc &mpc, const int layerIndex)
 void PgmAssignScreen::open()
 {
     auto program = getProgramOrThrow();
-    auto selectedPad =  program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
     auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
     auto soundIndex = selectedNoteParameters->getSoundIndex();
 
@@ -79,7 +79,7 @@ void PgmAssignScreen::turnWheel(int i)
 {
     auto program = getProgramOrThrow();
 
-    auto selectedPad =  program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
     auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -328,7 +328,7 @@ void PgmAssignScreen::displayPadNote()
 {
 
     auto program = getProgramOrThrow();
-    auto selectedPad =  program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
 
     if (selectedPad->getNote() == 34)
     {

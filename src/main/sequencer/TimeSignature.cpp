@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-TimeSignature::TimeSignature(const TimeSignature& other)
+TimeSignature::TimeSignature(const TimeSignature &other)
     : numerator(other.numerator), denominator(other.denominator)
 {
 }
@@ -60,7 +60,9 @@ void TimeSignature::decrease()
     {
         case 4:
             if (numerator != 1)
+            {
                 --numerator;
+            }
             break;
         case 8:
         case 16:
@@ -78,4 +80,3 @@ void TimeSignature::decrease()
             }
     }
 }
-

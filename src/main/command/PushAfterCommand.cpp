@@ -12,12 +12,11 @@ namespace mpc::command
 {
 
     PushAfterCommand::PushAfterCommand(
-            std::shared_ptr<controller::ClientEventController> controllerToUse,
-            std::shared_ptr<lcdgui::LayeredScreen> layeredScreenToUse,
-            std::shared_ptr<hardware::Hardware> hardwareToUse) :
-        controller(controllerToUse),
-        layeredScreen(layeredScreenToUse),
-        hardware(hardwareToUse)
+        std::shared_ptr<controller::ClientEventController> controllerToUse,
+        std::shared_ptr<lcdgui::LayeredScreen> layeredScreenToUse,
+        std::shared_ptr<hardware::Hardware> hardwareToUse) : controller(controllerToUse),
+                                                             layeredScreen(layeredScreenToUse),
+                                                             hardware(hardwareToUse)
     {
     }
 

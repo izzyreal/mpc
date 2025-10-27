@@ -30,10 +30,10 @@ namespace mpc::command
     {
     public:
         explicit PushFullLevelCommand(
-                std::shared_ptr<lcdgui::LayeredScreen>,
-                std::shared_ptr<input::PadAndButtonKeyboard>,
-                std::shared_ptr<hardware::Hardware>,
-                std::shared_ptr<controller::ClientEventController>);
+            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::shared_ptr<input::PadAndButtonKeyboard>,
+            std::shared_ptr<hardware::Hardware>,
+            std::shared_ptr<controller::ClientEventController>);
         void execute() override;
 
     private:

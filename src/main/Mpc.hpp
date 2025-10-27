@@ -79,7 +79,6 @@ namespace mpc
     class Mpc
     {
     public:
-
     private:
         bool pluginModeEnabled = false;
 

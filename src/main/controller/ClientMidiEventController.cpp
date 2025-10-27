@@ -19,7 +19,7 @@ ClientMidiEventController::ClientMidiEventController(std::shared_ptr<ClientEvent
                                                      std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
                                                      std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
     : clientEventController(clientEventControllerToUse),
-    clientHardwareEventController(clientHardwareEventControllerToUse)
+      clientHardwareEventController(clientHardwareEventControllerToUse)
 {
     footswitchController = std::make_shared<ClientMidiFootswitchAssignmentController>(clientHardwareEventController, midiSwScreen, sequencer);
 
@@ -79,4 +79,3 @@ std::shared_ptr<ClientMidiSoundGeneratorController> ClientMidiEventController::g
 {
     return soundGeneratorController;
 }
-

@@ -1,53 +1,48 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <utility>
 #include <type_traits>
 
-namespace mpc::lcdgui {
-
-    template <typename T>
-    using PropertyGetter = std::function<T()>;
-
-    template <typename T>
-    using GuiUpdater = std::function<void(const T&)>;
-
+namespace mpc::lcdgui
+{
     struct ReactiveBinding
     {
-        struct Concept {
-            virtual ~Concept() = default;
-            virtual void refresh() = 0;
-        };
+        std::function<void()> refreshFn;
 
-        template <typename T>
-        struct Model final : Concept {
-            PropertyGetter<T> get;
-            GuiUpdater<T> update;
-            T lastValue{};
-            void refresh() override {
-                const T current = get();
-                if (current != lastValue) {
-                    lastValue = current;
-                    update(current);
-                }
-            }
-        };
+        ReactiveBinding() = default;
 
-        std::unique_ptr<Concept> self;
-
-        template <typename Getter, typename Updater>
-        ReactiveBinding(Getter getter, Updater updater)
+        template <
+            typename Getter,
+            typename Updater,
+            typename T = std::invoke_result_t<Getter>,
+            std::enable_if_t<
+                std::is_invocable_r_v<T, Getter> &&
+                    std::is_invocable_v<Updater, const T &>,
+                int> = 0>
+        ReactiveBinding(Getter &&getter, Updater &&updater)
         {
-            using T = std::invoke_result_t<Getter>;
-            auto model = std::make_unique<Model<T>>();
-            model->get = getter;
-            model->update = updater;
-            self = std::move(model);
+            T lastValue{};
+
+            refreshFn = [get = std::forward<Getter>(getter),
+                         upd = std::forward<Updater>(updater),
+                         prev = std::move(lastValue)]() mutable
+            {
+                const T current = get();
+                if (current != prev)
+                {
+                    prev = current;
+                    upd(current);
+                }
+            };
         }
 
-        void refresh() { if (self) self->refresh(); }
+        void refresh() const
+        {
+            if (refreshFn)
+            {
+                refreshFn();
+            }
+        }
     };
-
 } // namespace mpc::lcdgui
-

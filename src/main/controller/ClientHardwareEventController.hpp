@@ -98,7 +98,6 @@ namespace mpc::controller
 
         // Maps physical pad index 0 - 15 to info at the time the pad was pushed.
         std::unordered_map<int, client::event::PhysicalPadPress> physicalPadPresses;
-
     };
 
 } // namespace mpc::controller

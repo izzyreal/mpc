@@ -23,11 +23,11 @@ using namespace mpc::lcdgui;
 
 ClientEventController::ClientEventController(mpc::Mpc &mpcToUse)
     : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>()),
-    mpc(mpcToUse),
-    sequencer(mpc.getSequencer()),
-    screens(mpc.screens),
-    layeredScreen(mpc.getLayeredScreen()),
-    hardware(mpc.getHardware())
+      mpc(mpcToUse),
+      sequencer(mpc.getSequencer()),
+      screens(mpc.screens),
+      layeredScreen(mpc.getLayeredScreen()),
+      hardware(mpc.getHardware())
 {
 }
 
@@ -88,11 +88,11 @@ RecordingMode ClientEventController::determineRecordingMode() const
     }
 
     if (SeqUtil::isRecMainWithoutPlaying(
-                sequencer,
-                screens->get<TimingCorrectScreen>(),
-                layeredScreen->getCurrentScreenName(),
-                hardware->getButton(ComponentId::REC),
-                clientHardwareEventController))
+            sequencer,
+            screens->get<TimingCorrectScreen>(),
+            layeredScreen->getCurrentScreenName(),
+            hardware->getButton(ComponentId::REC),
+            clientHardwareEventController))
     {
         return RecordingMode::RecMainWithoutPlaying;
     }
@@ -174,4 +174,3 @@ void ClientEventController::setSixteenLevelsEnabled(bool b)
 {
     sixteenLevelsEnabled = b;
 }
-

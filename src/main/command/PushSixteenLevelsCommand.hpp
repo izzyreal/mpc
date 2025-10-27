@@ -25,9 +25,9 @@ namespace mpc::command
     {
     public:
         explicit PushSixteenLevelsCommand(
-                std::shared_ptr<lcdgui::LayeredScreen>,
-                std::shared_ptr<controller::ClientEventController>,
-                std::shared_ptr<hardware::Hardware>);
+            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::shared_ptr<controller::ClientEventController>,
+            std::shared_ptr<hardware::Hardware>);
         void execute() override;
 
     private:

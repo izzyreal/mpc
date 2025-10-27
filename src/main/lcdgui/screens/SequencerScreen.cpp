@@ -67,100 +67,167 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
         displayDeviceName();
     };
 
-    addReactiveBinding({[&]{ return sequencer->getActiveSequenceIndex(); },
-            [displaySequenceProps, displayTrackProps](auto){
-            displaySequenceProps();
-            displayTrackProps();
-        }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequenceIndex();
+                        },
+                        [displaySequenceProps, displayTrackProps](auto)
+                        {
+                            displaySequenceProps();
+                            displayTrackProps();
+                        }});
 
-    addReactiveBinding({[&]{ return sequencer->getActiveSequence()->isUsed(); },
-            [displaySequenceProps, displayTrackProps](auto){
-            displaySequenceProps();
-            displayTrackProps();
-        }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequence()->isUsed();
+                        },
+                        [displaySequenceProps, displayTrackProps](auto)
+                        {
+                            displaySequenceProps();
+                            displayTrackProps();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->isCountEnabled(); },
-            [&](auto){
-            displayCount();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isCountEnabled();
+                        },
+                        [&](auto)
+                        {
+                            displayCount();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveSequence()->isLoopEnabled(); },
-            [&](auto){
-            displayLoop();
-            }});
-    
-    addReactiveBinding({[&] { return sequencer->isRecordingModeMulti(); },
-            [&](auto){
-            displayRecordingMode();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequence()->isLoopEnabled();
+                        },
+                        [&](auto)
+                        {
+                            displayLoop();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveTrack()->isOn(); },
-            [&](auto){
-            displayOn();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isRecordingModeMulti();
+                        },
+                        [&](auto)
+                        {
+                            displayRecordingMode();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getTickPosition(); },
-            [&](auto){
-            displayNow0();
-            displayNow1();
-            displayNow2();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrack()->isOn();
+                        },
+                        [&](auto)
+                        {
+                            displayOn();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getTempo(); },
-            [&](auto){
-            displayTempo();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->isTempoSourceSequenceEnabled(); },
-            [&](auto){
-            displayTempoSource();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTempo();
+                        },
+                        [&](auto)
+                        {
+                            displayTempo();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getProgramChange(); },
-            [&](auto){
-            displayPgm();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isTempoSourceSequenceEnabled();
+                        },
+                        [&](auto)
+                        {
+                            displayTempoSource();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveSequence()->getTimeSignature(); },
-            [&](auto){
-            displayTsig();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrack()->getProgramChange();
+                        },
+                        [&](auto)
+                        {
+                            displayPgm();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getVelocityRatio(); },
-            [&](auto){
-            displayVelo();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequence()->getTimeSignature();
+                        },
+                        [&](auto)
+                        {
+                            displayTsig();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getBus(); },
-            [&](auto){
-            displayBus();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrack()->getVelocityRatio();
+                        },
+                        [&](auto)
+                        {
+                            displayVelo();
+                        }});
 
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrack()->getBus();
+                        },
+                        [&](auto)
+                        {
+                            displayBus();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getDeviceIndex(); },
-            [&](auto){
-            displayDeviceNumber();
-            displayDeviceName();
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrack()->getDeviceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displayDeviceNumber();
+                            displayDeviceName();
+                        }});
 
-    addReactiveBinding({[&]{ return sequencer->getActiveTrackIndex(); },
-            [displayTrackProps](auto){
-            displayTrackProps();
-        }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrackIndex();
+                        },
+                        [displayTrackProps](auto)
+                        {
+                            displayTrackProps();
+                        }});
 
-    addReactiveBinding({[&]{ return sequencer->getActiveTrack()->isUsed(); },
-            [displayTrackProps](auto){
-            displayTrackProps();
-        }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrack()->isUsed();
+                        },
+                        [displayTrackProps](auto)
+                        {
+                            displayTrackProps();
+                        }});
 
-    addReactiveBinding({[&] { return sequencer->getNextSq(); },
-            [&](auto nextSqIndex){
-            displayNextSq();
-            if (nextSqIndex != -1)
-            {
-                ls->setFocus("nextsq");
-            }
-            }});
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getNextSq();
+                        },
+                        [&](auto nextSqIndex)
+                        {
+                            displayNextSq();
+                            if (nextSqIndex != -1)
+                            {
+                                ls->setFocus("nextsq");
+                            }
+                        }});
 }
 
 void SequencerScreen::open()

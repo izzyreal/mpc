@@ -27,7 +27,7 @@ namespace mpc::lcdgui
 {
     class LayeredScreen;
     class Screens;
-}
+} // namespace mpc::lcdgui
 
 namespace mpc::hardware
 {
@@ -90,7 +90,7 @@ namespace mpc::controller
         bool afterEnabled = false;
         bool fullLevelEnabled = false;
         bool sixteenLevelsEnabled = false;
-        
+
         Bank activeBank = Bank::A;
         int selectedPad = 0;
         int selectedNote = 60;

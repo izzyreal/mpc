@@ -62,7 +62,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
         const auto audioServer = audioMidiServices->getAudioServer();
 
-        const auto durationFrames = SeqUtil::ticksToFrames(durationTicks, mpc.getSequencer()->getTempo(),         audioServer->getSampleRate());
+        const auto durationFrames = SeqUtil::ticksToFrames(durationTicks, mpc.getSequencer()->getTempo(), audioServer->getSampleRate());
 
         const auto frameSeq = audioMidiServices->getFrameSequencer();
         const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
@@ -231,7 +231,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<Note
 {
     assert(noteOffEvent);
 
-    if (drumIndex.has_value() && isDrumNote(noteOffEvent->getNote() ))
+    if (drumIndex.has_value() && isDrumNote(noteOffEvent->getNote()))
     {
         auto &drum = mpc.getDrum(*drumIndex);
         const auto program = mpc.getSampler()->getProgram(drum.getProgram());

@@ -134,4 +134,3 @@ void VeloEnvFilterScreen::setVelo(int i)
     velo = std::clamp(i, 1, 127);
     displayVelo();
 }
-

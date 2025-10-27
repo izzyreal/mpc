@@ -69,7 +69,7 @@ void CopyNoteParametersScreen::displayNote0()
 {
     auto sourceProgram = sampler->getProgram(prog0);
     auto note0 = mpc.clientEventController->getSelectedNote();
-    auto selectedNoteParameters = sourceProgram->getNoteParameters(note0); 
+    auto selectedNoteParameters = sourceProgram->getNoteParameters(note0);
     auto destProgram = sampler->getProgram(prog0);
     auto padIndex = destProgram->getPadIndexFromNote(note0);
     auto soundIndex = note0 != -1 ? selectedNoteParameters->getSoundIndex() : -1;

@@ -18,7 +18,6 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
         auto saveTarget = std::make_shared<mpc::DirectorySaveTarget>(autosaveDir);
         mpc::AutoSave::restoreAutoSavedStateWithTarget(mpc, saveTarget);
         mpc::AutoSave::storeAutoSavedStateWithTarget(mpc, saveTarget);
-
     }
 
     {

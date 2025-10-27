@@ -2,7 +2,8 @@
 
 namespace mpc::controller
 {
-    enum class Bank {
+    enum class Bank
+    {
         A = 0,
         B = 1,
         C = 2,

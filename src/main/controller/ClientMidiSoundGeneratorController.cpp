@@ -26,11 +26,11 @@ ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
     : midiInputScreen(midiInputScreen),
-    eventHandler(eventHandler),
-    sequencer(sequencerToUse),
-    multiRecordingSetupScreen(multiRecordingSetupScreen),
-    timingCorrectScreen(timingCorrectScreen),
-    clientEventController(clientEventController)
+      eventHandler(eventHandler),
+      sequencer(sequencerToUse),
+      multiRecordingSetupScreen(multiRecordingSetupScreen),
+      timingCorrectScreen(timingCorrectScreen),
+      clientEventController(clientEventController)
 {
     noteEventStore.reserve(NOTE_EVENT_STORE_CAPACITY);
 }
