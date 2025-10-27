@@ -1,14 +1,14 @@
 #pragma once
-#include <sequencer/Sequence.hpp>
+#include "sequencer/Sequence.hpp"
 #include "NoteEventStore.hpp"
+#include "Observer.hpp"
 
-#include <Observer.hpp>
+#include <readerwriterqueue.h>
 
 #include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
-#include <cmath>
 #include <cstdint>
 
 namespace mpc::engine::midi
@@ -28,11 +28,15 @@ namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
+    struct GuiEvent{};
+
     class Sequencer final
         : public Observable
     {
 
     public:
+        moodycamel::ReaderWriterQueue<GuiEvent> guiEventQueue;
+
         enum StopMode
         {
             AT_START_OF_BUFFER,
@@ -74,8 +78,10 @@ namespace mpc::sequencer
         int lastNotifiedClock = -1;
         std::shared_ptr<Sequence> placeHolder;
         bool metronomeOnly = false;
+
         int activeSequenceIndex = 0;
         int currentlyPlayingSequenceIndex = 0;
+
         bool songMode = false;
         int playedStepRepetitions = 0; // Part of SONG mode
         bool endOfSong = false;

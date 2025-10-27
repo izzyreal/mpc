@@ -377,6 +377,8 @@ MRECT LayeredScreen::getDirtyArea()
 
 bool LayeredScreen::IsDirty()
 {
+    static int counter = 0;
+    printf("is dirty %i\n", counter++);
     return root->IsDirty();
 }
 
