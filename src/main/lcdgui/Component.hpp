@@ -35,6 +35,8 @@ namespace mpc::lcdgui
         bool shouldNotDraw(std::vector<std::vector<bool>> *pixels);
 
     public:
+        virtual void timerCallback() {}
+
         void printTree(int depth = 0)
         {
             std::string space;
