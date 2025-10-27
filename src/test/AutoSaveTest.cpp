@@ -1,3 +1,4 @@
+#include "DirectorySaveTarget.hpp"
 #include "catch2/catch_test_macros.hpp"
 
 #include "TestMpc.hpp"
@@ -13,9 +14,11 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
     {
         Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
+        const auto autosaveDir = mpc.paths->autoSavePath();
+        auto saveTarget = std::make_shared<mpc::DirectorySaveTarget>(autosaveDir);
+        mpc::AutoSave::restoreAutoSavedStateWithTarget(mpc, saveTarget);
+        mpc::AutoSave::storeAutoSavedStateWithTarget(mpc, saveTarget);
 
-        mpc::AutoSave::restoreAutoSavedState(mpc);
-        mpc::AutoSave::storeAutoSavedState(mpc);
     }
 
     {
@@ -25,7 +28,8 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
         auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
 
         vmpcAutoSaveScreen->setAutoLoadOnStart(2);
-
-        REQUIRE_NOTHROW(mpc::AutoSave::restoreAutoSavedState(mpc));
+        const auto autosaveDir = mpc.paths->autoSavePath();
+        auto saveTarget = std::make_shared<mpc::DirectorySaveTarget>(autosaveDir);
+        REQUIRE_NOTHROW(mpc::AutoSave::restoreAutoSavedStateWithTarget(mpc, saveTarget));
     }
 }
