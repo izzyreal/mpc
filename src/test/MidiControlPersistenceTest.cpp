@@ -27,13 +27,12 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
 
     for (auto &l : buttonLabels)
     {
-        auto found = std::find_if(
-            activePreset->rows.begin(),
-            activePreset->rows.end(),
-            [l](const MidiControlCommand &c)
-            {
-                return c.getMpcHardwareLabel() == l;
-            });
+        auto found =
+            std::find_if(activePreset->rows.begin(), activePreset->rows.end(),
+                         [l](const MidiControlCommand &c)
+                         {
+                             return c.getMpcHardwareLabel() == l;
+                         });
 
         REQUIRE(found != activePreset->rows.end());
     }
@@ -52,7 +51,8 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
     controls->right();
     controls->turnWheel(2);
     controls->function(5);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1100)); // Await popup closing
+    std::this_thread::sleep_for(
+        std::chrono::milliseconds(1100)); // Await popup closing
     mpc.getLayeredScreen()->openScreen<SequencerScreen>();
     mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
     auto t1 = controls->findChild<mpc::lcdgui::Field>("type0")->getText();
@@ -99,7 +99,8 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Save the preset by pressing ENTER in NameScreen
     controls->function(4);
 
-    const auto newPresetPath = mpc.paths->midiControlPresetsPath() / "New_preset.vmp";
+    const auto newPresetPath =
+        mpc.paths->midiControlPresetsPath() / "New_preset.vmp";
 
     REQUIRE(fs::exists(newPresetPath));
     auto preset = std::make_shared<MidiControlPreset>();
@@ -116,7 +117,11 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 
     int nameCounter = 0;
 
-    while (controls->findChild<mpc::lcdgui::Field>("name" + std::to_string(nameCounter++))->getText().find("New_preset") == std::string::npos)
+    while (controls
+               ->findChild<mpc::lcdgui::Field>("name" +
+                                               std::to_string(nameCounter++))
+               ->getText()
+               .find("New_preset") == std::string::npos)
     {
         controls->down();
         if (nameCounter == 4)
@@ -134,7 +139,8 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     preset = std::make_shared<MidiControlPreset>();
     mpc.getDisk()->readMidiControlPreset(newPresetPath, preset);
 
-    REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::AutoLoadModeYes);
+    REQUIRE(preset->autoloadMode ==
+            MidiControlPreset::AutoLoadMode::AutoLoadModeYes);
     REQUIRE(preset->rows[0].getMpcHardwareLabel() == "pad-1");
     REQUIRE(preset->rows[0].getNumber() == 38);
     REQUIRE(preset->rows[0].getMidiChannelIndex() == 1);

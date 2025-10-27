@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class VmpcRecordingFinishedScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcRecordingFinishedScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

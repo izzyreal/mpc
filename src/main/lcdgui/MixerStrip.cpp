@@ -24,11 +24,15 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
     selection = -1;
 
     auto x1 = 4 + (columnIndex * 15);
-    addChild(std::move(std::make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
-    addChild(std::move(std::make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
+    addChild(std::move(
+        std::make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
+    addChild(std::move(
+        std::make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
 
     auto x2 = 5 + (columnIndex * 15);
-    findChild("mixer-top-background")->addChild(std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
+    findChild("mixer-top-background")
+        ->addChild(
+            std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
 
     for (int i = 0; i < 5; i++)
     {
@@ -46,7 +50,8 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
             yPos -= 13;
         }
 
-        auto label = std::make_shared<Label>(mpc, std::to_string(i), "", xPos, yPos, 5);
+        auto label =
+            std::make_shared<Label>(mpc, std::to_string(i), "", xPos, yPos, 5);
 
         if (i < 2)
         {
@@ -59,7 +64,8 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
     }
 
     auto x3 = 12 + (columnIndex * 15);
-    findMixerFaderBackground()->addChild(std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
+    findMixerFaderBackground()->addChild(
+        std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
 
     auto padName = StrUtil::padLeft(std::to_string(columnIndex + 1), "0", 2);
     findLabel("3")->setText(padName.substr(0, 1));
@@ -169,7 +175,8 @@ void MixerStrip::setValueAString(std::string str)
         if (str.length() == 1)
         {
             findLabel("0")->setText(str);
-            findLabel("0")->setLocation(xPos0indiv[columnIndex] + 2, yPos0indiv + 2);
+            findLabel("0")->setLocation(xPos0indiv[columnIndex] + 2,
+                                        yPos0indiv + 2);
             findLabel("1")->Hide(true);
         }
         else if (str.length() == 2)
@@ -191,12 +198,14 @@ void MixerStrip::setValueAString(std::string str)
 
 std::shared_ptr<MixerFader> MixerStrip::findMixerFader()
 {
-    return std::dynamic_pointer_cast<MixerFader>(findChild("mixer-fader-background")->findChild("mixer-fader"));
+    return std::dynamic_pointer_cast<MixerFader>(
+        findChild("mixer-fader-background")->findChild("mixer-fader"));
 }
 
 std::shared_ptr<Knob> MixerStrip::findKnob()
 {
-    return std::dynamic_pointer_cast<Knob>(findChild("mixer-top-background")->findChild("knob"));
+    return std::dynamic_pointer_cast<Knob>(
+        findChild("mixer-top-background")->findChild("knob"));
 }
 
 std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()

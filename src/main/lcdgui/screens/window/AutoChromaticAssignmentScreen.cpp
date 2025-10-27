@@ -7,7 +7,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 
-AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc &mpc, const int layerIndex)
+AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(
+    mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
 {
 }
@@ -23,7 +24,8 @@ void AutoChromaticAssignmentScreen::open()
     }
 
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     setSourceSoundIndex(selectedNoteParameters->getSoundIndex());
     displayOriginalKey();
     displayTune();
@@ -48,7 +50,8 @@ void AutoChromaticAssignmentScreen::function(int i)
             break;
         case 4:
         {
-            auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
+            auto newProgram =
+                sampler->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
 
             for (int j = 35; j <= 98; j++)
@@ -86,9 +89,11 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
     if (focusedFieldName == "source")
     {
         auto program = getProgramOrThrow();
-        mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
+        mpc.clientEventController->setSelectedNote(
+            mpc.clientEventController->getSelectedNote() + i);
         displaySource();
-        auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+        auto selectedNoteParameters = program->getNoteParameters(
+            mpc.clientEventController->getSelectedNote());
         setSourceSoundIndex(selectedNoteParameters->getSoundIndex());
     }
     else if (focusedFieldName == "snd")
@@ -118,7 +123,8 @@ void AutoChromaticAssignmentScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(newName, 16, enterAction, "auto-chromatic-assignment");
+        nameScreen->initialize(newName, 16, enterAction,
+                               "auto-chromatic-assignment");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
@@ -153,20 +159,26 @@ void AutoChromaticAssignmentScreen::displaySource()
 void AutoChromaticAssignmentScreen::displayTune()
 {
     std::string prefix = tune < 0 ? "-" : " ";
-    findField("tune")->setText(prefix + StrUtil::padLeft(std::to_string(abs(tune)), " ", 3));
+    findField("tune")->setText(
+        prefix + StrUtil::padLeft(std::to_string(abs(tune)), " ", 3));
 }
 
 void AutoChromaticAssignmentScreen::displayOriginalKey()
 {
     auto padName = sampler->getPadName(originalKey - 35);
-    findField("original-key")->setText(std::to_string(originalKey) + "/" + padName);
+    findField("original-key")
+        ->setText(std::to_string(originalKey) + "/" + padName);
 }
 
 void AutoChromaticAssignmentScreen::displaySnd()
 {
-    auto sampleName = sourceSoundIndex == -1 ? "OFF" : sampler->getSoundName(sourceSoundIndex);
-    std::string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex)->isMono() ? ""
-                                                                                                     : "(ST)";
+    auto sampleName = sourceSoundIndex == -1
+                          ? "OFF"
+                          : sampler->getSoundName(sourceSoundIndex);
+    std::string stereo = sourceSoundIndex == -1 ? ""
+                         : sampler->getSound(sourceSoundIndex)->isMono()
+                             ? ""
+                             : "(ST)";
     findField("snd")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 void AutoChromaticAssignmentScreen::displayProgramName()
@@ -174,7 +186,8 @@ void AutoChromaticAssignmentScreen::displayProgramName()
     findField("program-name")->setText(newName);
 }
 
-void AutoChromaticAssignmentScreen::update(Observable *observable, Message message)
+void AutoChromaticAssignmentScreen::update(Observable *observable,
+                                           Message message)
 {
     const auto msg = std::get<std::string>(message);
 
@@ -182,7 +195,8 @@ void AutoChromaticAssignmentScreen::update(Observable *observable, Message messa
     {
         displaySource();
         auto program = getProgramOrThrow();
-        auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+        auto selectedNoteParameters = program->getNoteParameters(
+            mpc.clientEventController->getSelectedNote());
         setSourceSoundIndex(selectedNoteParameters->getSoundIndex());
     }
 }

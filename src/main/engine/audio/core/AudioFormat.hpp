@@ -10,10 +10,12 @@ namespace mpc::engine::audio::core
     {
 
     public:
-        AudioFormat(float sampleRate, int sampleSizeInBits, int channels, bool signed_, bool bigEndian);
+        AudioFormat(float sampleRate, int sampleSizeInBits, int channels,
+                    bool signed_, bool bigEndian);
 
-        AudioFormat(Encoding *encoding, float sampleRate, int sampleSizeInBits, int channels, int frameSize,
-                    float frameRate, bool bigEndian);
+        AudioFormat(Encoding *encoding, float sampleRate, int sampleSizeInBits,
+                    int channels, int frameSize, float frameRate,
+                    bool bigEndian);
 
     protected:
         bool bigEndian = {false};

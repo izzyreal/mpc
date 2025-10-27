@@ -36,13 +36,9 @@ void SetupScreen::setDiskDevice(int i)
     displayDiskDevice();
 }
 
-void SetupScreen::displayDiskDevice()
-{
-}
+void SetupScreen::displayDiskDevice() {}
 
-void SetupScreen::displayAutoLoadType()
-{
-}
+void SetupScreen::displayAutoLoadType() {}
 
 void SetupScreen::resetPreferences()
 {

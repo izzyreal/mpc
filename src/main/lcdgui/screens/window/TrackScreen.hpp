@@ -5,9 +5,8 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class TrackScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class TrackScreen : public mpc::lcdgui::ScreenComponent,
+                        public mpc::lcdgui::screens::OpensNameScreen
     {
     public:
         void openNameScreen() override;

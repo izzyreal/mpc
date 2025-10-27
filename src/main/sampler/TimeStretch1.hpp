@@ -20,13 +20,15 @@ namespace mpc
 
         private:
             void fade(int length, std::vector<float> *fa);
-            std::vector<float> seg(std::vector<float> *src, int length, int offset);
+            std::vector<float> seg(std::vector<float> *src, int length,
+                                   int offset);
 
         private:
             virtual float value(int length, int index);
 
         public:
-            TimeStretch(std::vector<float> sampleData, float ratio, int sampleRate, int adjust);
+            TimeStretch(std::vector<float> sampleData, float ratio,
+                        int sampleRate, int adjust);
         };
 
     } // namespace sampler

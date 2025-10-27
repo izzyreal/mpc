@@ -40,14 +40,14 @@ void LocateScreen::function(int i)
                 const auto locationIndex = std::stoi(focusedFieldName) - 1;
                 auto &location = locations[locationIndex];
 
-                const auto clampedBarIndex =
-                    std::clamp<uint16_t>(std::get<0>(location), 0, getMaxBarIndexForThisSequence());
+                const auto clampedBarIndex = std::clamp<uint16_t>(
+                    std::get<0>(location), 0, getMaxBarIndexForThisSequence());
 
-                const auto clampedBeatIndex =
-                    std::clamp<uint8_t>(std::get<1>(location), 0, getMaxBeatIndexForThisBar());
+                const auto clampedBeatIndex = std::clamp<uint8_t>(
+                    std::get<1>(location), 0, getMaxBeatIndexForThisBar());
 
-                const auto clampedClock =
-                    std::clamp<uint8_t>(std::get<2>(location), 0, getMaxClockForThisBar());
+                const auto clampedClock = std::clamp<uint8_t>(
+                    std::get<2>(location), 0, getMaxClockForThisBar());
 
                 sequencer->setBar(clampedBarIndex);
                 sequencer->setBeat(clampedBeatIndex);
@@ -99,17 +99,20 @@ void LocateScreen::open()
 
 void LocateScreen::displayBar()
 {
-    findField("goto0")->setText(StrUtil::padLeft(std::to_string(barIndex + 1), "0", 3));
+    findField("goto0")->setText(
+        StrUtil::padLeft(std::to_string(barIndex + 1), "0", 3));
 }
 
 void LocateScreen::displayBeat()
 {
-    findField("goto1")->setText(StrUtil::padLeft(std::to_string(beatIndex + 1), "0", 2));
+    findField("goto1")->setText(
+        StrUtil::padLeft(std::to_string(beatIndex + 1), "0", 2));
 }
 
 void LocateScreen::displayClock()
 {
-    findField("goto2")->setText(StrUtil::padLeft(std::to_string(clock), "0", 2));
+    findField("goto2")->setText(
+        StrUtil::padLeft(std::to_string(clock), "0", 2));
 }
 
 void LocateScreen::displayLocations()
@@ -122,11 +125,15 @@ void LocateScreen::displayLocations()
         const auto locationBeatIndex = std::get<1>(location);
         const auto locationClock = std::get<2>(location);
 
-        const auto locationBarStr = StrUtil::padLeft(std::to_string(locationBarIndex + 1), "0", 3);
-        const auto locationBeatStr = StrUtil::padLeft(std::to_string(locationBeatIndex + 1), "0", 2);
-        const auto locationClockStr = StrUtil::padLeft(std::to_string(locationClock), "0", 2);
+        const auto locationBarStr =
+            StrUtil::padLeft(std::to_string(locationBarIndex + 1), "0", 3);
+        const auto locationBeatStr =
+            StrUtil::padLeft(std::to_string(locationBeatIndex + 1), "0", 2);
+        const auto locationClockStr =
+            StrUtil::padLeft(std::to_string(locationClock), "0", 2);
 
-        const auto locationStr = locationBarStr + "." + locationBeatStr + "." + locationClockStr;
+        const auto locationStr =
+            locationBarStr + "." + locationBeatStr + "." + locationClockStr;
 
         findField(std::to_string(i + 1))->setText(locationStr);
     }
@@ -194,7 +201,8 @@ void LocateScreen::setClock(int8_t newClock)
 
 uint16_t LocateScreen::getMaxBarIndexForThisSequence()
 {
-    return std::clamp<uint16_t>(sequencer->getActiveSequence()->getLastBarIndex() + 1, 0, 998);
+    return std::clamp<uint16_t>(
+        sequencer->getActiveSequence()->getLastBarIndex() + 1, 0, 998);
 }
 
 uint8_t LocateScreen::getMaxBeatIndexForThisBar()
@@ -204,7 +212,9 @@ uint8_t LocateScreen::getMaxBeatIndexForThisBar()
 
 uint8_t LocateScreen::getMaxClockForThisBar()
 {
-    return 96 * (4.0 / sequencer->getActiveSequence()->getDenominator(barIndex)) - 1;
+    return 96 * (4.0 /
+                 sequencer->getActiveSequence()->getDenominator(barIndex)) -
+           1;
 }
 
 void LocateScreen::setLocations(const std::vector<Location> &newLocations)

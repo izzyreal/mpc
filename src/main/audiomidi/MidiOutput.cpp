@@ -17,22 +17,28 @@ void MidiOutput::panic()
     }
 }
 
-void MidiOutput::enqueueMessageOutputA(std::shared_ptr<mpc::engine::midi::ShortMessage> msg)
+void MidiOutput::enqueueMessageOutputA(
+    std::shared_ptr<mpc::engine::midi::ShortMessage> msg)
 {
     outputQueueA.enqueue(msg);
 }
 
-void MidiOutput::enqueueMessageOutputB(std::shared_ptr<mpc::engine::midi::ShortMessage> msg)
+void MidiOutput::enqueueMessageOutputB(
+    std::shared_ptr<mpc::engine::midi::ShortMessage> msg)
 {
     outputQueueB.enqueue(msg);
 }
 
-unsigned char MidiOutput::dequeueOutputA(std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>> &buf)
+unsigned char MidiOutput::dequeueOutputA(
+    std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>> &buf)
 {
-    return static_cast<unsigned char>(outputQueueA.try_dequeue_bulk(buf.begin(), buf.size()));
+    return static_cast<unsigned char>(
+        outputQueueA.try_dequeue_bulk(buf.begin(), buf.size()));
 }
 
-unsigned char MidiOutput::dequeueOutputB(std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>> &buf)
+unsigned char MidiOutput::dequeueOutputB(
+    std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>> &buf)
 {
-    return static_cast<unsigned char>(outputQueueB.try_dequeue_bulk(buf.begin(), buf.size()));
+    return static_cast<unsigned char>(
+        outputQueueB.try_dequeue_bulk(buf.begin(), buf.size()));
 }

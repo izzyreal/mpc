@@ -33,14 +33,17 @@ void KeepOrRetryScreen::function(int i)
             mpc.getLayeredScreen()->openScreen<SampleScreen>();
             break;
         case 3:
-            sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
+            sampler->playPreviewSample(
+                0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
             break;
         case 4:
             auto index = sampler->getSoundCount() - 1;
 
             if (assignToNote != 34)
             {
-                getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(index);
+                getProgramOrThrow()
+                    ->getNoteParameters(assignToNote)
+                    ->setSoundIndex(index);
             }
 
             sampler->setSoundIndex(index);
@@ -67,7 +70,8 @@ void KeepOrRetryScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(sampler->getPreviewSound()->getName(), 16, enterAction, "keep-or-retry");
+        nameScreen->initialize(sampler->getPreviewSound()->getName(), 16,
+                               enterAction, "keep-or-retry");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
@@ -119,13 +123,15 @@ void KeepOrRetryScreen::displayNameForNewSound()
         return;
     }
 
-    findField("name-for-new-sound")->setText(sampler->getPreviewSound()->getName());
+    findField("name-for-new-sound")
+        ->setText(sampler->getPreviewSound()->getName());
 }
 
 void KeepOrRetryScreen::displayAssignToNote()
 {
     auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
-    auto padStr = sampler->getPadName(getProgramOrThrow()->getPadIndexFromNote(assignToNote));
+    auto padStr = sampler->getPadName(
+        getProgramOrThrow()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }
 

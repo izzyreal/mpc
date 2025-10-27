@@ -72,7 +72,8 @@ void SndParamsScreen::function(int f)
         case 3:
         {
             sampler->switchToNextSoundSortType();
-            ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            ls->showPopupForMs(
+                "Sorting by " + sampler->getSoundSortingTypeName(), 200);
             break;
         }
         case 4:

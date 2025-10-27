@@ -26,7 +26,9 @@ void prepareSamplerResources(mpc::Mpc &mpc)
     for (auto &&entry : fs.iterate_directory("test/Sampler"))
     {
         auto file = fs.open("test/Sampler/" + entry.filename());
-        char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
+        char *data =
+            (char *)std::string_view(file.begin(), file.end() - file.begin())
+                .data();
         auto newFile = disk->newFile(entry.filename());
         std::vector<char> dataVec(data, data + file.size());
         newFile->setFileData(dataVec);
@@ -258,7 +260,8 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
 
     for (int i = 0; i < 3; i++)
     {
-        auto f = mpc.getDisk()->getFile("SOUND" + std::to_string(i + 1) + ".SND");
+        auto f =
+            mpc.getDisk()->getFile("SOUND" + std::to_string(i + 1) + ".SND");
         auto s = sampler->addSound();
         assert(s != nullptr);
         soundLoader.loadSound(f, r, s, shouldBeConverted);

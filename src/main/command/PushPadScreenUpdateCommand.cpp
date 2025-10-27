@@ -14,7 +14,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-PushPadScreenUpdateCommand::PushPadScreenUpdateCommand(PushPadScreenUpdateContext &ctxToUse, int padIndexWithBankToUse)
+PushPadScreenUpdateCommand::PushPadScreenUpdateCommand(
+    PushPadScreenUpdateContext &ctxToUse, int padIndexWithBankToUse)
     : ctx(ctxToUse), padIndexWithBank(padIndexWithBankToUse)
 {
 }
@@ -32,17 +33,22 @@ void PushPadScreenUpdateCommand::execute()
     {
         ctx.setSelectedPad(padIndexWithBank);
     }
-    else if (auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent); mixerScreen)
+    else if (auto mixerScreen =
+                 std::dynamic_pointer_cast<MixerScreen>(screenComponent);
+             mixerScreen)
     {
         const unsigned char bankStartPadIndex = static_cast<int>(ctx.bank) * 16;
         const unsigned char bankEndPadIndex = bankStartPadIndex + 16;
 
-        if (padIndexWithBank >= bankStartPadIndex && padIndexWithBank < bankEndPadIndex)
+        if (padIndexWithBank >= bankStartPadIndex &&
+            padIndexWithBank < bankEndPadIndex)
         {
             mixerScreen->pressPadIndexWithoutBank(padIndexWithBank % 16);
         }
     }
-    else if (auto trMuteScreen = std::dynamic_pointer_cast<TrMuteScreen>(screenComponent); trMuteScreen)
+    else if (auto trMuteScreen =
+                 std::dynamic_pointer_cast<TrMuteScreen>(screenComponent);
+             trMuteScreen)
     {
         if (!ctx.sequencer)
         {
@@ -57,7 +63,8 @@ void PushPadScreenUpdateCommand::execute()
             }
 
             ctx.sequencer->setActiveTrackIndex(padIndexWithBank);
-            trMuteScreen->findBackground()->setBackgroundName("track-mute-solo-2");
+            trMuteScreen->findBackground()->setBackgroundName(
+                "track-mute-solo-2");
         }
         else
         {
@@ -66,7 +73,9 @@ void PushPadScreenUpdateCommand::execute()
             t->setOn(!t->isOn());
         }
     }
-    else if (auto nextSeqPadScreen = std::dynamic_pointer_cast<NextSeqPadScreen>(screenComponent); nextSeqPadScreen)
+    else if (auto nextSeqPadScreen =
+                 std::dynamic_pointer_cast<NextSeqPadScreen>(screenComponent);
+             nextSeqPadScreen)
     {
         if (!ctx.sequencer)
         {
@@ -91,7 +100,9 @@ void PushPadScreenUpdateCommand::execute()
         ctx.sequencer->setNextSqPad(padIndexWithBank);
         nextSeqPadScreen->refreshSeqs();
     }
-    else if (auto assignScreen = std::dynamic_pointer_cast<AssignScreen>(screenComponent); assignScreen)
+    else if (auto assignScreen =
+                 std::dynamic_pointer_cast<AssignScreen>(screenComponent);
+             assignScreen)
     {
         const auto nn = ctx.program->getNoteFromPad(padIndexWithBank);
         ctx.program->getSlider()->setAssignNote(nn);

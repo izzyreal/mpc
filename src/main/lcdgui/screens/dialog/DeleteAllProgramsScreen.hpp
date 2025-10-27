@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class DeleteAllProgramsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class DeleteAllProgramsScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         void function(int j) override;

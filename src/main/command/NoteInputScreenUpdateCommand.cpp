@@ -18,7 +18,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-NoteInputScreenUpdateCommand::NoteInputScreenUpdateCommand(NoteInputScreenUpdateContext &ctxToUse, const int noteToUse)
+NoteInputScreenUpdateCommand::NoteInputScreenUpdateCommand(
+    NoteInputScreenUpdateContext &ctxToUse, const int noteToUse)
     : ctx(ctxToUse), note(noteToUse)
 {
 }
@@ -32,31 +33,40 @@ void NoteInputScreenUpdateCommand::execute()
 
     const auto screenComponent = ctx.screenComponent;
 
-    if (mpc::sequencer::isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
+    if (mpc::sequencer::isDrumNote(note) &&
+        ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
         ctx.setSelectedNote(note);
     }
-    else if (auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
+    else if (auto withNotes =
+                 std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
              withNotes && note >= 35)
     {
         withNotes->setNote0(note);
     }
-    else if (auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(screenComponent);
+    else if (auto assign16LevelsScreen =
+                 std::dynamic_pointer_cast<Assign16LevelsScreen>(
+                     screenComponent);
              assign16LevelsScreen)
     {
         assign16LevelsScreen->setNote(note);
     }
-    else if (auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
+    else if (auto editMultipleScreen =
+                 std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
              editMultipleScreen)
     {
         editMultipleScreen->setChangeNoteTo(note);
     }
-    else if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
-             stepEditorScreen && ctx.currentFieldName == "fromnote" && note > 34)
+    else if (auto stepEditorScreen =
+                 std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
+             stepEditorScreen && ctx.currentFieldName == "fromnote" &&
+             note > 34)
     {
         stepEditorScreen->setFromNote(note);
     }
-    else if (auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
+    else if (auto channelSettingsScreen =
+                 std::dynamic_pointer_cast<ChannelSettingsScreen>(
+                     screenComponent);
              channelSettingsScreen)
     {
         channelSettingsScreen->setNote(note);

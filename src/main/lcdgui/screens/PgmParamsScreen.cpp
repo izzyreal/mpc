@@ -70,7 +70,8 @@ void PgmParamsScreen::turnWheel(int i)
 {
 
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -81,7 +82,8 @@ void PgmParamsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "dcymd")
     {
-        selectedNoteParameters->setDecayMode(selectedNoteParameters->getDecayMode() + i);
+        selectedNoteParameters->setDecayMode(
+            selectedNoteParameters->getDecayMode() + i);
         displayDecayMode();
     }
     else if (focusedFieldName == "voiceoverlap")
@@ -95,10 +97,12 @@ void PgmParamsScreen::turnWheel(int i)
 
         using M = sampler::VoiceOverlapMode;
 
-        int modeVal = static_cast<int>(selectedNoteParameters->getVoiceOverlapMode());
+        int modeVal =
+            static_cast<int>(selectedNoteParameters->getVoiceOverlapMode());
         modeVal += i;
 
-        modeVal = std::clamp(modeVal, static_cast<int>(M::POLY), static_cast<int>(M::NOTE_OFF));
+        modeVal = std::clamp(modeVal, static_cast<int>(M::POLY),
+                             static_cast<int>(M::NOTE_OFF));
 
         selectedNoteParameters->setVoiceOverlapMode(static_cast<M>(modeVal));
 
@@ -106,22 +110,26 @@ void PgmParamsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "reson")
     {
-        selectedNoteParameters->setFilterResonance(selectedNoteParameters->getFilterResonance() + i);
+        selectedNoteParameters->setFilterResonance(
+            selectedNoteParameters->getFilterResonance() + i);
         displayReson();
     }
     else if (focusedFieldName == "freq")
     {
-        selectedNoteParameters->setFilterFrequency(selectedNoteParameters->getFilterFrequency() + i);
+        selectedNoteParameters->setFilterFrequency(
+            selectedNoteParameters->getFilterFrequency() + i);
         displayFreq();
     }
     else if (focusedFieldName == "decay")
     {
-        selectedNoteParameters->setDecay(selectedNoteParameters->getDecay() + i);
+        selectedNoteParameters->setDecay(selectedNoteParameters->getDecay() +
+                                         i);
         displayAttackDecay();
     }
     else if (focusedFieldName == "attack")
     {
-        selectedNoteParameters->setAttack(selectedNoteParameters->getAttack() + i);
+        selectedNoteParameters->setAttack(selectedNoteParameters->getAttack() +
+                                          i);
         displayAttackDecay();
     }
     else if (focusedFieldName == "pgm")
@@ -171,7 +179,8 @@ void PgmParamsScreen::openWindow()
     {
         mpc.getLayeredScreen()->openScreen<CopyNoteParametersScreen>();
     }
-    else if (focusedFieldName == "attack" || focusedFieldName == "decay" || focusedFieldName == "dcymd")
+    else if (focusedFieldName == "attack" || focusedFieldName == "decay" ||
+             focusedFieldName == "dcymd")
     {
         mpc.getLayeredScreen()->openScreen<VelocityModulationScreen>();
     }
@@ -208,21 +217,26 @@ void PgmParamsScreen::update(Observable *o, Message message)
 void PgmParamsScreen::displayReson()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
-    findField("reson")->setTextPadded(selectedNoteParameters->getFilterResonance());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
+    findField("reson")->setTextPadded(
+        selectedNoteParameters->getFilterResonance());
 }
 
 void PgmParamsScreen::displayFreq()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
-    findField("freq")->setTextPadded(selectedNoteParameters->getFilterFrequency());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
+    findField("freq")->setTextPadded(
+        selectedNoteParameters->getFilterFrequency());
 }
 
 void PgmParamsScreen::displayAttackDecay()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto attack = selectedNoteParameters->getAttack();
     auto decay = selectedNoteParameters->getDecay();
     auto decayModeStart = selectedNoteParameters->getDecayMode() == 1;
@@ -234,13 +248,20 @@ void PgmParamsScreen::displayAttackDecay()
 void PgmParamsScreen::displayNote()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto soundIndex = selectedNoteParameters->getSoundIndex();
-    auto padIndex = program->getPadIndexFromNote(selectedNoteParameters->getNumber());
+    auto padIndex =
+        program->getPadIndexFromNote(selectedNoteParameters->getNumber());
     auto padName = sampler->getPadName(padIndex);
-    auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-    std::string stereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)" : "";
-    findField("note")->setText(std::to_string(selectedNoteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    auto sampleName =
+        soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
+    std::string stereo =
+        soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
+                                                                     : "";
+    findField("note")->setText(
+        std::to_string(selectedNoteParameters->getNumber()) + "/" + padName +
+        "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void PgmParamsScreen::displayPgm()
@@ -251,7 +272,8 @@ void PgmParamsScreen::displayPgm()
 void PgmParamsScreen::displayTune()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto tune = selectedNoteParameters->getTune();
     auto sign = tune < 0 ? "-" : " ";
     auto number = StrUtil::padLeft(std::to_string(abs(tune)), " ", 3);
@@ -261,23 +283,29 @@ void PgmParamsScreen::displayTune()
 void PgmParamsScreen::displayDecayMode()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
-    findField("dcymd")->setText(decayModes[selectedNoteParameters->getDecayMode()]);
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
+    findField("dcymd")->setText(
+        decayModes[selectedNoteParameters->getDecayMode()]);
     displayAttackDecay();
 }
 
 void PgmParamsScreen::displayVoiceOverlap()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
-    sampler::VoiceOverlapMode mode = selectedNoteParameters->getVoiceOverlapMode();
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
+    sampler::VoiceOverlapMode mode =
+        selectedNoteParameters->getVoiceOverlapMode();
 
-    const auto sound = sampler->getSound(selectedNoteParameters->getSoundIndex());
+    const auto sound =
+        sampler->getSound(selectedNoteParameters->getSoundIndex());
 
     if (sound && sound->isLoopEnabled())
     {
         mode = sampler::VoiceOverlapMode::NOTE_OFF;
     }
 
-    findField("voiceoverlap")->setText(voiceOverlapModes[static_cast<int>(mode)]);
+    findField("voiceoverlap")
+        ->setText(voiceOverlapModes[static_cast<int>(mode)]);
 }

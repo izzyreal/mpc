@@ -13,13 +13,13 @@
 
 namespace mpc::lcdgui::screens
 {
-    class StepEditorScreen
-        : public mpc::lcdgui::ScreenComponent
+    class StepEditorScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:
         void downOrUp(int increment);
-        void adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent);
+        void adhocPlayNoteEvent(
+            const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent);
         void adhocPlayNoteEventsAtCurrentPosition();
 
     public:
@@ -64,8 +64,11 @@ namespace mpc::lcdgui::screens
 
     private:
         int playSingleEventCounter = 0;
-        const std::vector<std::string> viewNames{"ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
-        const std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
+        const std::vector<std::string> viewNames{
+            "ALL EVENTS",  "NOTES",       "PITCH BEND", "CTRL:",
+            "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
+        const std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent =
+            std::make_shared<mpc::sequencer::EmptyEvent>();
         std::vector<std::shared_ptr<mpc::sequencer::Event>> visibleEvents;
         std::vector<std::shared_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
         std::vector<std::shared_ptr<mpc::sequencer::Event>> placeHolder;
@@ -103,7 +106,8 @@ namespace mpc::lcdgui::screens
 
     public:
         std::vector<std::shared_ptr<mpc::sequencer::Event>> &getVisibleEvents();
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> &getSelectedEvents();
+        std::vector<std::shared_ptr<mpc::sequencer::Event>> &
+        getSelectedEvents();
         std::shared_ptr<mpc::sequencer::Event> getSelectedEvent();
         std::string getSelectedParameterLetter();
         void clearSelection();

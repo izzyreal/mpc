@@ -37,7 +37,8 @@ namespace mpc
                 std::vector<int> getSnConvTable();
 
             public:
-                SampleNames(mpc::sampler::Program *program, std::weak_ptr<mpc::sampler::Sampler> sampler);
+                SampleNames(mpc::sampler::Program *program,
+                            std::weak_ptr<mpc::sampler::Sampler> sampler);
             };
 
         } // namespace pgmwriter

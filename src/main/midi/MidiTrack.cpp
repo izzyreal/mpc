@@ -140,7 +140,8 @@ void MidiTrack::setEndOfTrackDelta(int delta)
     mEndOfTrackDelta = delta;
 }
 
-void MidiTrack::insertNote(int channel, int pitch, int velocity, int tick, int duration)
+void MidiTrack::insertNote(int channel, int pitch, int velocity, int tick,
+                           int duration)
 {
     insertEvent(std::make_shared<NoteOn>(tick, channel, pitch, velocity));
     insertEvent(std::make_shared<NoteOn>(tick + duration, channel, pitch, 0));
@@ -155,7 +156,8 @@ void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
     }
     if (mClosed)
     {
-        // npc(::java::lang::System::err())->println(u"Error: Cannot add an event to a closed track."_j);
+        // npc(::java::lang::System::err())->println(u"Error: Cannot add an
+        // event to a closed track."_j);
         return;
     }
     std::shared_ptr<MidiEvent> prev;
@@ -198,7 +200,9 @@ void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
     {
         if (next)
         {
-            throw std::invalid_argument("Attempting to insert EndOfTrack before an existing event. Use closeTrack() when finished with MidiTrack.");
+            throw std::invalid_argument(
+                "Attempting to insert EndOfTrack before an existing event. Use "
+                "closeTrack() when finished with MidiTrack.");
         }
         mClosed = true;
     }
@@ -245,10 +249,12 @@ void MidiTrack::closeTrack()
     int lastTick = 0;
     if (mEvents.size() > 0)
     {
-        auto last = std::dynamic_pointer_cast<MidiEvent>(*std::next(mEvents.begin(), (int)(mEvents.size()) - 1));
+        auto last = std::dynamic_pointer_cast<MidiEvent>(
+            *std::next(mEvents.begin(), (int)(mEvents.size()) - 1));
         lastTick = last->getTick();
     }
-    insertEvent(std::make_shared<meta::EndOfTrack>(lastTick + mEndOfTrackDelta, 0));
+    insertEvent(
+        std::make_shared<meta::EndOfTrack>(lastTick + mEndOfTrackDelta, 0));
 }
 
 void MidiTrack::recalculateSize()
@@ -288,7 +294,8 @@ void MidiTrack::writeToOutputStream(std::shared_ptr<std::ostream> stream)
 
     for (auto &event : mEvents)
     {
-        event->writeToOutputStream(*stream.get(), event->requiresStatusByte(lastEvent.get()));
+        event->writeToOutputStream(*stream.get(),
+                                   event->requiresStatusByte(lastEvent.get()));
         lastEvent = event;
     }
 }

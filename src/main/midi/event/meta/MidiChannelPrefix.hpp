@@ -8,8 +8,7 @@ namespace mpc::midi::event::meta
 
 namespace mpc::midi::event::meta
 {
-    class MidiChannelPrefix
-        : public MetaEvent
+    class MidiChannelPrefix : public MetaEvent
     {
 
     private:
@@ -24,7 +23,8 @@ namespace mpc::midi::event::meta
 
     public:
         void writeToOutputStream(std::ostream &out) override;
-        static std::shared_ptr<MetaEvent> parseMidiChannelPrefix(int tick, int delta, MetaEventData *info);
+        static std::shared_ptr<MetaEvent>
+        parseMidiChannelPrefix(int tick, int delta, MetaEventData *info);
         virtual int compareTo(mpc::midi::event::MidiEvent *other);
 
         MidiChannelPrefix(int tick, int delta, int channel);

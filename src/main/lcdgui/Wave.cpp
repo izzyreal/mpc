@@ -75,12 +75,17 @@ void Wave::setCenterSamplePos(unsigned int newCenterSamplePos)
     SetDirty();
 }
 
-void Wave::setSampleData(std::shared_ptr<const std::vector<float>> newSampleData, bool newMono, unsigned int newView)
+void Wave::setSampleData(
+    std::shared_ptr<const std::vector<float>> newSampleData, bool newMono,
+    unsigned int newView)
 {
-    auto newFrameCount = newSampleData != nullptr ? (int)floor(newMono ? newSampleData->size() : (newSampleData->size() * 0.5)) : 0;
+    auto newFrameCount =
+        newSampleData != nullptr
+            ? (int)floor(newMono ? newSampleData->size()
+                                 : (newSampleData->size() * 0.5))
+            : 0;
 
-    if (sampleData == newSampleData &&
-        newFrameCount == frameCount &&
+    if (sampleData == newSampleData && newFrameCount == frameCount &&
         mono == newMono && view == newView)
     {
         return;
@@ -121,7 +126,8 @@ void Wave::setSelection(unsigned int start, unsigned int end)
     SetDirty();
 }
 
-void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors, unsigned int lineX)
+void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors,
+                    unsigned int lineX)
 {
     int offset = 0;
     float peakPos = 0;
@@ -133,7 +139,9 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors, unsigned int l
         centerSamplePixel = (centerSamplePos / samplesPerPixel) - 1;
     }
 
-    int samplePos = (int)(floor((float)(lineX - (fine ? (54 - centerSamplePixel) : 0)) * samplesPerPixel));
+    int samplePos =
+        (int)(floor((float)(lineX - (fine ? (54 - centerSamplePixel) : 0)) *
+                    samplesPerPixel));
     offset += samplePos;
 
     if (!mono && view == 1)
@@ -184,30 +192,37 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors, unsigned int l
     const float invisible = 1214.0 / 32768.0;
     const float ratio = 1.0f / (1.0f - invisible);
 
-    const unsigned int posLineLength = (unsigned int)(floor(13.0 * ((peakPos - invisible) * ratio)));
-    const unsigned int negLineLength = (unsigned int)(floor(13.0 * ((std::fabs(peakNeg) - invisible) * ratio)));
+    const unsigned int posLineLength =
+        (unsigned int)(floor(13.0 * ((peakPos - invisible) * ratio)));
+    const unsigned int negLineLength = (unsigned int)(floor(
+        13.0 * ((std::fabs(peakNeg) - invisible) * ratio)));
 
     if (posLineLength != 13 && !(fine && lineX == 55))
     {
-        bitmap.emplace_back(Bressenham::Line(lineX, 0, lineX, 13 - (posLineLength + 1)));
+        bitmap.emplace_back(
+            Bressenham::Line(lineX, 0, lineX, 13 - (posLineLength + 1)));
     }
 
     if (peakPos > invisible)
     {
-        bitmap.emplace_back(Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
+        bitmap.emplace_back(
+            Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
     }
 
     if (std::fabs(peakNeg) > invisible)
     {
-        bitmap.emplace_back(Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
+        bitmap.emplace_back(
+            Bressenham::Line(lineX, 13, lineX, 13 + negLineLength));
     }
 
     if (negLineLength != 13 && !(fine && lineX == 55))
     {
-        bitmap.emplace_back(Bressenham::Line(lineX, 13 + (negLineLength + 1), lineX, 26));
+        bitmap.emplace_back(
+            Bressenham::Line(lineX, 13 + (negLineLength + 1), lineX, 26));
     }
 
-    if (!fine && samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd)
+    if (!fine && samplePos >= selectionStart &&
+        samplePos + samplesPerPixel < selectionEnd)
     {
         if (posLineLength != 13)
         {
@@ -240,7 +255,8 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors, unsigned int l
         {
             if (fine)
             {
-                if ((int)floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
+                if ((int)floor(samplePos + samplesPerPixel) >= frameCount ||
+                    lineX == 55)
                 {
                     colors->push_back(false);
                 }
@@ -259,7 +275,8 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors, unsigned int l
         {
             if (fine)
             {
-                if ((int)floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
+                if ((int)floor(samplePos + samplesPerPixel) >= frameCount ||
+                    lineX == 55)
                 {
                     colors->push_back(false);
                 }
@@ -305,7 +322,8 @@ void Wave::Draw(std::vector<std::vector<bool>> *pixels)
 
         for (auto &line : bitmap)
         {
-            mpc::Util::drawLine(*pixels, line, colors[counter++], std::vector<int>{x, y});
+            mpc::Util::drawLine(*pixels, line, colors[counter++],
+                                std::vector<int>{x, y});
         }
     }
 

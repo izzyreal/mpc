@@ -7,8 +7,7 @@
 
 namespace mpc::engine::audio::core
 {
-    class AudioBuffer
-        : public FloatSampleBuffer
+    class AudioBuffer : public FloatSampleBuffer
     {
 
     private:
@@ -33,6 +32,7 @@ namespace mpc::engine::audio::core
         const bool isSilent();
 
     public:
-        AudioBuffer(std::string name, int channelCount, int sampleCount, float sampleRate);
+        AudioBuffer(std::string name, int channelCount, int sampleCount,
+                    float sampleRate);
     };
 } // namespace mpc::engine::audio::core

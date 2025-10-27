@@ -98,19 +98,23 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
 
     private:
-        static std::vector<std::shared_ptr<mpc::sequencer::Event>> readEvents(const std::vector<char> &seqBytes);
-        static std::vector<std::vector<char>> readEventSegments(const std::vector<char> &seqBytes);
+        static std::vector<std::shared_ptr<mpc::sequencer::Event>>
+        readEvents(const std::vector<char> &seqBytes);
+        static std::vector<std::vector<char>>
+        readEventSegments(const std::vector<char> &seqBytes);
         double getTempoDouble(const std::vector<char> &bytePair);
 
     public:
-        static int getNumberOfEventSegmentsForThisSeq(const std::vector<char> &seqBytes);
+        static int
+        getNumberOfEventSegmentsForThisSeq(const std::vector<char> &seqBytes);
         virtual int getEventAmount();
 
     private:
         static int getSegmentCount(mpc::sequencer::Sequence *seq);
         void setUnknown32BitInt(mpc::sequencer::Sequence *seq);
         void setBarCount(int i);
-        std::vector<char> createEventSegmentsChunk(mpc::sequencer::Sequence *seq);
+        std::vector<char>
+        createEventSegmentsChunk(mpc::sequencer::Sequence *seq);
         void setTempoDouble(double tempoForSaveBytes);
         void setLastTick(mpc::sequencer::Sequence *seq);
 

@@ -6,14 +6,14 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class MultiRecordingSetupScreen
-        : public mpc::lcdgui::ScreenComponent
+    class MultiRecordingSetupScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:
         int yPos = 0;
         int yOffset = 0;
-        std::vector<MultiRecordingSetupLine> mrsLines = std::vector<MultiRecordingSetupLine>(34);
+        std::vector<MultiRecordingSetupLine> mrsLines =
+            std::vector<MultiRecordingSetupLine>(34);
         std::vector<MultiRecordingSetupLine *> visibleMrsLines;
         std::vector<std::string> inNames = std::vector<std::string>(34);
 

@@ -37,7 +37,8 @@ namespace mpc::lcdgui
     private:
         mpc::Mpc &mpc;
         std::unique_ptr<Component> root;
-        std::vector<std::vector<bool>> pixels = std::vector<std::vector<bool>>(248, std::vector<bool>(60));
+        std::vector<std::vector<bool>> pixels =
+            std::vector<std::vector<bool>>(248, std::vector<bool>(60));
         std::deque<std::shared_ptr<ScreenComponent>> history;
 
     public:
@@ -63,33 +64,29 @@ namespace mpc::lcdgui
 
         void showPopupForMs(const std::string msg, const int delayMs);
 
-        void showPopupAndThenReturnToLayer(const std::string msg, const int delayMs, const int layerIndex);
+        void showPopupAndThenReturnToLayer(const std::string msg,
+                                           const int delayMs,
+                                           const int layerIndex);
 
         void showPopupAndAwaitInteraction(const std::string msg);
 
         int getFocusedLayerIndex();
         std::shared_ptr<Layer> getFocusedLayer();
 
-        template <typename T>
-        void openScreen();
+        template <typename T> void openScreen();
 
-        template <typename T>
-        void openScreen(const std::shared_ptr<T> &)
+        template <typename T> void openScreen(const std::shared_ptr<T> &)
         {
             openScreen<T>();
         }
 
-        template <typename... Ts>
-        bool isPreviousScreen() const;
+        template <typename... Ts> bool isPreviousScreen() const;
 
-        template <typename... Ts>
-        bool isPreviousScreenNot() const;
+        template <typename... Ts> bool isPreviousScreenNot() const;
 
-        template <typename... Ts>
-        bool isCurrentScreen() const;
+        template <typename... Ts> bool isCurrentScreen() const;
 
-        template <typename T>
-        bool isCurrentScreenPopupFor() const;
+        template <typename T> bool isCurrentScreenPopupFor() const;
 
         void openScreen(const std::string screenName);
 
@@ -107,7 +104,8 @@ namespace mpc::lcdgui
         std::map<std::string, std::string> lastFocuses;
 
         void openScreenInternal(std::shared_ptr<ScreenComponent>);
-        void returnToLastFocus(std::shared_ptr<ScreenComponent> screen, std::string firstFieldOfThisScreen);
+        void returnToLastFocus(std::shared_ptr<ScreenComponent> screen,
+                               std::string firstFieldOfThisScreen);
 
     private:
         FunctionKeys *getFunctionKeys();

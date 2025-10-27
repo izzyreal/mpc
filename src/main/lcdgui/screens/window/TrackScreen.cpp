@@ -47,11 +47,13 @@ void TrackScreen::openNameScreen()
 
     if (focusedFieldName.find("default") != std::string::npos)
     {
-        initialNameScreenName = sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex());
+        initialNameScreenName =
+            sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex());
 
         enterAction = [this](std::string &nameScreenName)
         {
-            sequencer->setDefaultTrackName(nameScreenName, sequencer->getActiveTrackIndex());
+            sequencer->setDefaultTrackName(nameScreenName,
+                                           sequencer->getActiveTrackIndex());
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         };
     }

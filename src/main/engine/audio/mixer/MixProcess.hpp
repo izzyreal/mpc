@@ -24,10 +24,12 @@ namespace mpc::engine::audio::mixer
         virtual AudioMixerStrip *getRoutedStrip();
 
     public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
+        int
+        processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
 
     public:
-        MixProcess(const std::shared_ptr<AudioMixerStrip> &strip, const std::shared_ptr<MixControls> &mixControls);
+        MixProcess(const std::shared_ptr<AudioMixerStrip> &strip,
+                   const std::shared_ptr<MixControls> &mixControls);
     };
 
 } // namespace mpc::engine::audio::mixer

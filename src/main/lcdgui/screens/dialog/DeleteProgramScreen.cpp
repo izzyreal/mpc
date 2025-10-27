@@ -56,7 +56,9 @@ void DeleteProgramScreen::turnWheel(int i)
 
 void DeleteProgramScreen::displayPgm()
 {
-    findField("pgm")->setText(StrUtil::padLeft(std::to_string(pgm + 1), " ", 2) + "-" + sampler->getProgram(pgm)->getName());
+    findField("pgm")->setText(
+        StrUtil::padLeft(std::to_string(pgm + 1), " ", 2) + "-" +
+        sampler->getProgram(pgm)->getName());
 }
 
 void DeleteProgramScreen::setPgm(int i)

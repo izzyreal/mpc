@@ -10,20 +10,22 @@
 namespace mpc::lcdgui::util
 {
 
-    inline const std::vector<std::string> &getTypableFields(const std::string &screenName)
+    inline const std::vector<std::string> &
+    getTypableFields(const std::string &screenName)
     {
-        static const std::unordered_map<std::string, std::vector<std::string>> typableFields{
-            {"sequencer", {"tempo", "now0", "now1", "now2", "velo"}},
-            {"trim", {"st", "end"}},
-            {"loop-end-fine", {"end", "lngth"}},
-            {"start-fine", {"start"}},
-            {"zone-end-fine", {"end"}},
-            {"end-fine", {"end"}},
-            {"zone-start-fine", {"start"}},
-            {"loop-to-fine", {"to", "lngth"}},
-            {"zone", {"st", "end"}},
-            {"loop", {"to", "endlengthvalue"}},
-        };
+        static const std::unordered_map<std::string, std::vector<std::string>>
+            typableFields{
+                {"sequencer", {"tempo", "now0", "now1", "now2", "velo"}},
+                {"trim", {"st", "end"}},
+                {"loop-end-fine", {"end", "lngth"}},
+                {"start-fine", {"start"}},
+                {"zone-end-fine", {"end"}},
+                {"end-fine", {"end"}},
+                {"zone-start-fine", {"start"}},
+                {"loop-to-fine", {"to", "lngth"}},
+                {"zone", {"st", "end"}},
+                {"loop", {"to", "endlengthvalue"}},
+            };
 
         static const std::vector<std::string> empty;
 
@@ -39,7 +41,8 @@ namespace mpc::lcdgui::util
         }
     }
 
-    inline bool isTypableField(const std::string &screenName, const std::string &fieldName)
+    inline bool isTypableField(const std::string &screenName,
+                               const std::string &fieldName)
     {
         for (const auto &f : getTypableFields(screenName))
         {
@@ -52,8 +55,9 @@ namespace mpc::lcdgui::util
         return false;
     }
 
-    inline bool isFieldSplittable(const std::shared_ptr<mpc::lcdgui::ScreenComponent> &screen,
-                                  const std::string &fieldName)
+    inline bool isFieldSplittable(
+        const std::shared_ptr<mpc::lcdgui::ScreenComponent> &screen,
+        const std::string &fieldName)
     {
         using namespace mpc::lcdgui::screengroups;
 
@@ -62,7 +66,8 @@ namespace mpc::lcdgui::util
             return false;
         }
 
-        if (fieldName == "st" || fieldName == "end" || fieldName == "to" || fieldName == "endlengthvalue" || fieldName == "start")
+        if (fieldName == "st" || fieldName == "end" || fieldName == "to" ||
+            fieldName == "endlengthvalue" || fieldName == "start")
         {
             return true;
         }

@@ -4,9 +4,8 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveASequenceScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class SaveASequenceScreen : public mpc::lcdgui::ScreenComponent,
+                                public mpc::lcdgui::screens::OpensNameScreen
     {
 
     public:

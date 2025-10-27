@@ -5,7 +5,8 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-StepEditOptionsScreen::StepEditOptionsScreen(mpc::Mpc &mpc, const int layerIndex)
+StepEditOptionsScreen::StepEditOptionsScreen(mpc::Mpc &mpc,
+                                             const int layerIndex)
     : mpc::lcdgui::ScreenComponent(mpc, "step-edit-options", layerIndex)
 {
 }
@@ -93,12 +94,14 @@ void StepEditOptionsScreen::setTcValueRecordedNotes(int i)
 
 void StepEditOptionsScreen::displayAutoStepIncrement()
 {
-    findField("auto-step-increment")->setText(autoStepIncrementEnabled ? "YES" : "NO");
+    findField("auto-step-increment")
+        ->setText(autoStepIncrementEnabled ? "YES" : "NO");
 }
 
 void StepEditOptionsScreen::displayDurationOfRecordedNotes()
 {
-    findField("duration-of-recorded-notes")->setText(durationOfRecordedNotesTcValue ? "TC VALUE:" : "AS PLAYED");
+    findField("duration-of-recorded-notes")
+        ->setText(durationOfRecordedNotesTcValue ? "TC VALUE:" : "AS PLAYED");
 }
 
 void StepEditOptionsScreen::displayTcValue()

@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class VmpcRecordJamScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcRecordJamScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

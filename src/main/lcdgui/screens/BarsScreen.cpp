@@ -23,8 +23,10 @@ void BarsScreen::open()
     auto userScreen = mpc.screens->get<UserScreen>();
     auto userLastBar = userScreen->lastBar;
 
-    auto lastBarIndexFrom = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
-    auto maxAfterBarIndex = toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
+    auto lastBarIndexFrom =
+        fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+    auto maxAfterBarIndex =
+        toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
 
     if (firstBar > lastBarIndexFrom)
     {
@@ -65,13 +67,15 @@ void BarsScreen::function(int j)
         case 2:
         case 3:
             eventsScreen->tab = j;
-            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            mpc.getLayeredScreen()->openScreen(
+                eventsScreen->tabNames[eventsScreen->tab]);
             break;
         case 4:
             break;
         case 5:
         {
-            copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
+            copyBars(eventsScreen->toSq, firstBar, lastBar,
+                     eventsScreen->copies, afterBar);
             sequencer->setActiveSequenceIndex(eventsScreen->toSq);
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
@@ -79,10 +83,13 @@ void BarsScreen::function(int j)
     }
 }
 
-void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar, int copyCount, int copyAfterBar)
+void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar,
+                          int copyCount, int copyAfterBar)
 {
     const auto fromSequenceIndex = sequencer->getActiveSequenceIndex();
-    mpc::sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex, copyFirstBar, copyLastBar, copyCount, copyAfterBar);
+    mpc::sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex,
+                                      copyFirstBar, copyLastBar, copyCount,
+                                      copyAfterBar);
 }
 
 void BarsScreen::turnWheel(int i)
@@ -96,12 +103,15 @@ void BarsScreen::turnWheel(int i)
 
     if (focusedFieldName == "fromsq")
     {
-        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
+        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
+                                          i);
 
         displayFromSq();
 
         auto fromSequence = sequencer->getActiveSequence();
-        auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+        auto lastBarIndex = fromSequence->isUsed()
+                                ? fromSequence->getLastBarIndex()
+                                : userLastBar;
 
         if (firstBar > lastBarIndex)
         {
@@ -120,7 +130,8 @@ void BarsScreen::turnWheel(int i)
         displayToSq();
 
         auto toSequence = sequencer->getSequence(eventsScreen->toSq);
-        auto maxAfterBarIndex = toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
+        auto maxAfterBarIndex =
+            toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
 
         if (afterBar > maxAfterBarIndex)
         {
@@ -141,14 +152,18 @@ void BarsScreen::turnWheel(int i)
     else if (focusedFieldName == "firstbar")
     {
         auto fromSequence = sequencer->getActiveSequence();
-        auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+        auto lastBarIndex = fromSequence->isUsed()
+                                ? fromSequence->getLastBarIndex()
+                                : userLastBar;
 
         setFirstBar(firstBar + i, lastBarIndex);
     }
     else if (focusedFieldName == "lastbar")
     {
         auto fromSequence = sequencer->getActiveSequence();
-        auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+        auto lastBarIndex = fromSequence->isUsed()
+                                ? fromSequence->getLastBarIndex()
+                                : userLastBar;
 
         setLastBar(lastBar + i, lastBarIndex);
     }
@@ -179,7 +194,8 @@ void BarsScreen::displayToSq()
 
 void BarsScreen::displayFromSq()
 {
-    findField("fromsq")->setText(std::to_string(sequencer->getActiveSequenceIndex() + 1));
+    findField("fromsq")->setText(
+        std::to_string(sequencer->getActiveSequenceIndex() + 1));
 }
 
 void BarsScreen::displayAfterBar()

@@ -1,7 +1,7 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
 UseTab: Never
-ColumnLimit: 0
+ColumnLimit: 80
 
 BreakBeforeBraces: Allman
 SpaceBeforeParens: ControlStatements

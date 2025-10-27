@@ -31,7 +31,8 @@ void PunchScreen::open()
         (sequencer->getPunchInTime() == 0 && sequencer->getPunchOutTime() == 0))
     {
         sequencer->setPunchInTime(0);
-        sequencer->setPunchOutTime(sequencer->getActiveSequence()->getLastTick());
+        sequencer->setPunchOutTime(
+            sequencer->getActiveSequence()->getLastTick());
         setTime1(sequencer->getActiveSequence()->getLastTick());
     }
 
@@ -89,7 +90,8 @@ void PunchScreen::setAutoPunch(int i)
 
 void PunchScreen::displayAutoPunch()
 {
-    findField("auto-punch")->setText(autoPunchNames[sequencer->getAutoPunchMode()]);
+    findField("auto-punch")
+        ->setText(autoPunchNames[sequencer->getAutoPunchMode()]);
 }
 
 void PunchScreen::displayTime()
@@ -98,19 +100,27 @@ void PunchScreen::displayTime()
 
     for (int i = 0; i < 3; i++)
     {
-        findField("time" + std::to_string(i))->Hide(sequencer->getAutoPunchMode() == 1);
-        findLabel("time" + std::to_string(i))->Hide(sequencer->getAutoPunchMode() == 1);
-        findField("time" + std::to_string(i + 3))->Hide(sequencer->getAutoPunchMode() == 0);
-        findLabel("time" + std::to_string(i + 3))->Hide(sequencer->getAutoPunchMode() == 0);
+        findField("time" + std::to_string(i))
+            ->Hide(sequencer->getAutoPunchMode() == 1);
+        findLabel("time" + std::to_string(i))
+            ->Hide(sequencer->getAutoPunchMode() == 1);
+        findField("time" + std::to_string(i + 3))
+            ->Hide(sequencer->getAutoPunchMode() == 0);
+        findLabel("time" + std::to_string(i + 3))
+            ->Hide(sequencer->getAutoPunchMode() == 0);
     }
 
     findLabel("time3")->Hide(sequencer->getAutoPunchMode() != 2);
 
-    findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1, "0");
-    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+    findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1,
+                                      "0");
+    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
+                                      "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBar(sequence, time1) + 1, "0");
-    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+    findField("time3")->setTextPadded(SeqUtil::getBar(sequence, time1) + 1,
+                                      "0");
+    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1,
+                                      "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 

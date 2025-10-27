@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class TransposePermanentScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TransposePermanentScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         void function(int i) override;

@@ -21,7 +21,8 @@ Drum::Drum(const int drumIndexToUse) : drumIndex(drumIndexToUse)
 
 void Drum::setProgram(int programIndexToUse)
 {
-    programIndex = std::clamp(programIndexToUse, 0, Mpc2000XlSpecs::MAX_PROGRAM_COUNT - 1);
+    programIndex =
+        std::clamp(programIndexToUse, 0, Mpc2000XlSpecs::MAX_PROGRAM_COUNT - 1);
 }
 
 int Drum::getProgram() const

@@ -37,7 +37,8 @@ void EndFineScreen::displayFineWave()
         return;
     }
 
-    findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+    findWave()->setSampleData(sound->getSampleData(), sound->isMono(),
+                              trimScreen->view);
     findWave()->setCenterSamplePos(sound->getEnd());
 }
 
@@ -158,7 +159,9 @@ void EndFineScreen::pressEnter()
 
 void EndFineScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    if (!mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed())
     {
         return;
     }

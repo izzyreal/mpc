@@ -119,10 +119,13 @@ void StereoToMonoScreen::function(int i)
             auto leftData = left->getMutableSampleData();
             auto rightData = right->getMutableSampleData();
 
-            for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
+            for (int frameIndex = 0; frameIndex < sound->getFrameCount();
+                 frameIndex++)
             {
                 leftData->push_back((*sound->getSampleData())[frameIndex]);
-                rightData->push_back((*sound->getSampleData())[frameIndex + sound->getFrameCount()]);
+                rightData->push_back(
+                    (*sound->getSampleData())[frameIndex +
+                                              sound->getFrameCount()]);
             }
 
             left->setEnd(left->getSampleData()->size());
@@ -163,7 +166,8 @@ void StereoToMonoScreen::displayStereoSource()
     if (sound->isMono())
     {
         ls->setFunctionKeysArrangement(1);
-        findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
+        findBackground()->repaintUnobtrusive(
+            findChild<FunctionKey>("fk4")->getRect());
     }
     else
     {

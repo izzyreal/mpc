@@ -25,7 +25,9 @@ namespace mpc::audiomidi
         std::shared_ptr<mpc::lcdgui::screens::SampleScreen> sampleScreen;
 
     public:
-        int32_t processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
-        MonitorInputAdapter(mpc::Mpc &mpc, mpc::engine::audio::core::AudioProcess *process);
+        int32_t processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+                             int nFrames) override;
+        MonitorInputAdapter(mpc::Mpc &mpc,
+                            mpc::engine::audio::core::AudioProcess *process);
     };
 } // namespace mpc::audiomidi

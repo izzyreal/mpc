@@ -9,7 +9,8 @@
 
 const char ID[] = {0x01, 0x04, '\0'};
 
-const int ID_INDEX = 0;               // 2 byte ANSI string of a number greater than '10' and equal to or smaller than '15'
+const int ID_INDEX = 0; // 2 byte ANSI string of a number greater than '10' and
+                        // equal to or smaller than '15'
 const int NAME_INDEX = 2;             // 16 byte ISO-8859 string
 const int NAME_TERMINATOR_INDEX = 18; // 0x00
 const int LEVEL_INDEX = 19;           // byte
@@ -23,13 +24,15 @@ const int LOOP_ENABLED_INDEX = 38;    // 1 byte, 1 if true
 const int BEAT_COUNT_INDEX = 39;      // 1 byte
 const int SAMPLE_RATE_INDEX = 40;     // 2 byte unsigned short
 
-void snd_read_bytes(std::shared_ptr<std::istream> stream, const std::vector<char> &bytes, const int maxLength)
+void snd_read_bytes(std::shared_ptr<std::istream> stream,
+                    const std::vector<char> &bytes, const int maxLength)
 {
     auto byteCountToRead = std::min((int)bytes.size(), maxLength);
     stream->read((char *)(&bytes[0]), byteCountToRead);
 }
 
-std::string snd_get_string(std::shared_ptr<std::istream> stream, const int maxLength)
+std::string snd_get_string(std::shared_ptr<std::istream> stream,
+                           const int maxLength)
 {
     std::vector<char> buffer(maxLength);
     snd_read_bytes(stream, buffer, maxLength);
@@ -50,7 +53,8 @@ uint16_t snd_get_unsigned_short_LE(std::shared_ptr<std::istream> stream)
 {
     char buffer[2];
     stream->read(buffer, 2);
-    return static_cast<uint16_t>(((buffer[1] & 0xFF) << 8) | (buffer[0] & 0xFF));
+    return static_cast<uint16_t>(((buffer[1] & 0xFF) << 8) |
+                                 (buffer[0] & 0xFF));
 }
 
 int snd_get_LE(std::shared_ptr<std::istream> stream, int numBytes)
@@ -86,7 +90,8 @@ char snd_get_char(std::shared_ptr<std::istream> stream)
     return *buf;
 }
 
-bool snd_read_header(std::shared_ptr<std::istream> stream, int &sampleRate, int &validBits, int &numChannels, int &numFrames)
+bool snd_read_header(std::shared_ptr<std::istream> stream, int &sampleRate,
+                     int &validBits, int &numChannels, int &numFrames)
 {
     auto sndId = snd_get_string(stream, 2);
 

@@ -6,10 +6,10 @@
 
 using namespace mpc::engine::audio::mixer;
 
-MainMixProcess::MainMixProcess(
-    const std::shared_ptr<AudioMixerStrip> &strip,
-    const std::shared_ptr<MixControls> &mixControls,
-    AudioMixer *mixer) : MixProcess(strip, mixControls)
+MainMixProcess::MainMixProcess(const std::shared_ptr<AudioMixerStrip> &strip,
+                               const std::shared_ptr<MixControls> &mixControls,
+                               AudioMixer *mixer)
+    : MixProcess(strip, mixControls)
 {
     auto mmc = std::dynamic_pointer_cast<MainMixControls>(mixControls);
     routeControl = mmc->getRouteControl();

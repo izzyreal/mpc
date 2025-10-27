@@ -79,9 +79,7 @@ Return UTF8_ERROR if it is not a contination byte.
 static int cont()
 {
     int c = get();
-    return ((c & 0xC0) == 0x80)
-               ? (c & 0x3F)
-               : UTF8_ERROR;
+    return ((c & 0xC0) == 0x80) ? (c & 0x3F) : UTF8_ERROR;
 }
 
 /*
@@ -110,9 +108,7 @@ The character offset matches the byte offset if the text is strictly ASCII.
 */
 int utf8_decode_at_character()
 {
-    return (the_char > 0)
-               ? the_char - 1
-               : 0;
+    return (the_char > 0) ? the_char - 1 : 0;
 }
 
 /*

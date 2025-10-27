@@ -4,8 +4,7 @@
 
 using namespace mpc::midi::util;
 
-VariableLengthInt::VariableLengthInt()
-    : VariableLengthInt::VariableLengthInt(0)
+VariableLengthInt::VariableLengthInt() : VariableLengthInt::VariableLengthInt(0)
 {
 }
 

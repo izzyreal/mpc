@@ -46,9 +46,11 @@ namespace mpc::engine::audio::server
 
         bool isRunning() override;
 
-        mpc::engine::audio::core::AudioBuffer *createAudioBuffer(std::string name) override;
+        mpc::engine::audio::core::AudioBuffer *
+        createAudioBuffer(std::string name) override;
 
-        void removeAudioBuffer(mpc::engine::audio::core::AudioBuffer *buffer) override;
+        void removeAudioBuffer(
+            mpc::engine::audio::core::AudioBuffer *buffer) override;
 
         IOAudioProcess *openAudioOutput(std::string name) override;
 
@@ -65,8 +67,7 @@ namespace mpc::engine::audio::server
         void resizeBuffers(int newSize) override;
 
         void work(int nFrames) override;
-        void work(const float *const *inputBuffer,
-                  float *const *outputBuffer,
+        void work(const float *const *inputBuffer, float *const *outputBuffer,
                   const int nFrames,
                   const std::vector<int8_t> &mpcMonoInputChannelIndices,
                   const std::vector<int8_t> &mpcMonoOutputChannelIndices,

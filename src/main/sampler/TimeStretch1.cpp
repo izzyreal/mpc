@@ -4,7 +4,8 @@
 
 using namespace mpc::sampler;
 
-TimeStretch::TimeStretch(std::vector<float> sampleData, float ratio, int sampleRate, int adjust)
+TimeStretch::TimeStretch(std::vector<float> sampleData, float ratio,
+                         int sampleRate, int adjust)
 {
     int oldLength = sampleData.size();
 
@@ -45,8 +46,10 @@ TimeStretch::TimeStretch(std::vector<float> sampleData, float ratio, int sampleR
             float f1 = segment[i];
             if (currentPos != 0)
             {
-                float f2 = processedData[processedData.size() - (fadeLength - i)];
-                processedData[processedData.size() - (fadeLength - i)] = f1 + f2;
+                float f2 =
+                    processedData[processedData.size() - (fadeLength - i)];
+                processedData[processedData.size() - (fadeLength - i)] =
+                    f1 + f2;
             }
             else
             {
@@ -67,7 +70,8 @@ std::vector<float> &TimeStretch::getProcessedData()
     return processedData;
 }
 
-std::vector<float> TimeStretch::seg(std::vector<float> *src, int length, int offset)
+std::vector<float> TimeStretch::seg(std::vector<float> *src, int length,
+                                    int offset)
 {
     std::vector<float> res;
     for (int i = 0; i < length; i++)
@@ -97,6 +101,7 @@ void TimeStretch::fade(int length, std::vector<float> *fa)
 
 float TimeStretch::value(int length, int index)
 {
-    // return 0.5f * (1.0f - static_cast< float >(cos(TWO_PI * index / (length - 1.0f))));
+    // return 0.5f * (1.0f - static_cast< float >(cos(TWO_PI * index / (length
+    // - 1.0f))));
     return 0;
 }

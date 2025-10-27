@@ -62,7 +62,10 @@ void SaveASoundScreen::function(int i)
             auto disk = mpc.getDisk();
             auto s = sampler->getSound();
             auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
-            auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) + ext;
+            auto fileName =
+                mpc::Util::getFileName(
+                    mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) +
+                ext;
 
             auto saveAction = [this, disk, s, fileName]
             {
@@ -102,14 +105,17 @@ void SaveASoundScreen::function(int i)
                     {
                         mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
                     };
-                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(),
+                                           16, enterAction, "save");
                 };
 
                 auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                             {
-                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                             });
+                fileExistsScreen->initialize(
+                    replaceAction, initializeNameScreen,
+                    [this]
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                    });
                 mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
                 return;
             }
@@ -132,10 +138,12 @@ void SaveASoundScreen::setFileType(int i)
 
 void SaveASoundScreen::displayFileType()
 {
-    findField("file-type")->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
+    findField("file-type")
+        ->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
 }
 
 void SaveASoundScreen::displayFile()
 {
-    findField("file")->setText(mpc.screens->get<NameScreen>()->getNameWithoutSpaces());
+    findField("file")->setText(
+        mpc.screens->get<NameScreen>()->getNameWithoutSpaces());
 }

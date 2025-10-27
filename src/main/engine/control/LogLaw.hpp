@@ -5,8 +5,7 @@
 namespace mpc::engine::control
 {
 
-    class LogLaw
-        : public AbstractLaw
+    class LogLaw : public AbstractLaw
     {
 
     private:

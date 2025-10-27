@@ -26,8 +26,10 @@ namespace mpc::sampler
     {
 
     public:
-        std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int noteIndex);
-        std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int noteIndex);
+        std::shared_ptr<mpc::engine::StereoMixer>
+        getStereoMixerChannel(int noteIndex);
+        std::shared_ptr<mpc::engine::IndivFxMixer>
+        getIndivFxMixerChannel(int noteIndex);
 
         int getPadIndexFromNote(int note);
 
@@ -68,10 +70,12 @@ namespace mpc::sampler
         struct PadPressState
         {
             int totalCount = 0;
-            std::array<int, static_cast<size_t>(PadPressSource::COUNT)> sourceCount{};
+            std::array<int, static_cast<size_t>(PadPressSource::COUNT)>
+                sourceCount{};
         };
 
-        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT> pressedPadRegistry{};
+        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
+            pressedPadRegistry{};
 
     public:
         int getNumberOfSamples();

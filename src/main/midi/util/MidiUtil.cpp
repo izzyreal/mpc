@@ -33,7 +33,8 @@ vector<char> MidiUtil::intToBytes(int val, int byteCount)
     return buffer;
 }
 
-bool MidiUtil::bytesEqual(std::vector<char> buf1, std::vector<char> buf2, int off, int len)
+bool MidiUtil::bytesEqual(std::vector<char> buf1, std::vector<char> buf2,
+                          int off, int len)
 {
     for (int i = off; i < off + len; i++)
     {

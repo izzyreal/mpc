@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class CopyProgramScreen
-        : public mpc::lcdgui::ScreenComponent
+    class CopyProgramScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         void function(int i) override;

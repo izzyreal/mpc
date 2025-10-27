@@ -23,10 +23,13 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc &mpc, const int layerIndex)
 void LoadASoundScreen::open()
 {
     auto loadScreen = mpc.screens->get<LoadScreen>();
-    findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
+    findLabel("filename")
+        ->setText("File:" +
+                  loadScreen->getSelectedFile()->getNameWithoutExtension());
     assignToNote = mpc.clientEventController->getSelectedNote();
     displayAssignToNote();
-    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(
+        this); // Subscribe to "note" messages
 }
 
 void LoadASoundScreen::close()
@@ -40,7 +43,8 @@ void LoadASoundScreen::turnWheel(int i)
 
     if (focusedFieldName == "assign-to-note")
     {
-        const auto newAssignToNote = std::clamp(static_cast<int>(assignToNote) + i, 34, 98);
+        const auto newAssignToNote =
+            std::clamp(static_cast<int>(assignToNote) + i, 34, 98);
 
         if (newAssignToNote == 34)
         {
@@ -75,7 +79,9 @@ void LoadASoundScreen::function(int i)
             break;
         }
         case 3:
-            sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
+            sampler->finishBasicVoice(); // Here we make sure the sound is not
+                                         // being played, so it can be removed
+                                         // from memory.
             sampler->deleteSound(sampler->getPreviewSound());
             mpc.getLayeredScreen()->openScreen<LoadScreen>();
             break;
@@ -113,7 +119,9 @@ void LoadASoundScreen::keepSound()
 
         if (assignToNote != 34)
         {
-            getProgramOrThrow()->getNoteParameters(assignToNote)->setSoundIndex(soundIndex);
+            getProgramOrThrow()
+                ->getNoteParameters(assignToNote)
+                ->setSoundIndex(soundIndex);
         }
 
         sampler->setSoundIndex(soundIndex);
@@ -130,11 +138,13 @@ void LoadASoundScreen::keepSound()
             mpc.getLayeredScreen()->openScreen<LoadScreen>();
         };
 
-        const auto initializeNameScreen = [this, actionAfterLoadingSound, previewSound]
+        const auto initializeNameScreen =
+            [this, actionAfterLoadingSound, previewSound]
         {
             auto nameScreen = mpc.screens->get<NameScreen>();
 
-            auto enterAction = [this, actionAfterLoadingSound, previewSound](std::string &nameScreenName)
+            auto enterAction = [this, actionAfterLoadingSound,
+                                previewSound](std::string &nameScreenName)
             {
                 if (sampler->checkExists(nameScreenName) >= 0)
                 {
@@ -151,16 +161,19 @@ void LoadASoundScreen::keepSound()
             {
                 sampler->deleteSound(sampler->getPreviewSound());
             };
-            nameScreen->initialize(loadScreen->getSelectedFile()->getNameWithoutExtension(), 16, enterAction, "load", mainScreenAction);
+            nameScreen->initialize(
+                loadScreen->getSelectedFile()->getNameWithoutExtension(), 16,
+                enterAction, "load", mainScreenAction);
         };
 
         auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-        fileExistsScreen->initialize(replaceAction, initializeNameScreen,
-                                     [this]
-                                     {
-                                         sampler->deleteSound(sampler->getPreviewSound());
-                                         mpc.getLayeredScreen()->openScreen<LoadScreen>();
-                                     });
+        fileExistsScreen->initialize(
+            replaceAction, initializeNameScreen,
+            [this]
+            {
+                sampler->deleteSound(sampler->getPreviewSound());
+                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            });
         mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
         return;
     }
@@ -173,7 +186,8 @@ void LoadASoundScreen::displayAssignToNote()
 {
     auto padIndex = getProgramOrThrow()->getPadIndexFromNote(assignToNote);
     auto padName = sampler->getPadName(padIndex);
-    auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
+    auto noteName =
+        std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
     findField("assign-to-note")->setText(noteName + "/" + padName);
 }
 

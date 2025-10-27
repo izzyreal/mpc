@@ -39,8 +39,9 @@ namespace mpc::engine
 
         void connectVoice();
 
-        explicit PreviewSoundPlayer(std::shared_ptr<mpc::sampler::Sampler> sampler,
-                                    std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
-                                    std::shared_ptr<Voice> voice);
+        explicit PreviewSoundPlayer(
+            std::shared_ptr<mpc::sampler::Sampler> sampler,
+            std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
+            std::shared_ptr<Voice> voice);
     };
 } // namespace mpc::engine

@@ -20,19 +20,24 @@ using namespace mpc::lcdgui;
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-ScreenComponent::ScreenComponent(mpc::Mpc &mpc, const std::string &name, const int layer)
-    : Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
+ScreenComponent::ScreenComponent(mpc::Mpc &mpc, const std::string &name,
+                                 const int layer)
+    : Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()),
+      sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
 {
-    auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()));
+    auto background = std::dynamic_pointer_cast<Background>(
+        addChild(std::make_shared<Background>()));
     background->setBackgroundName(name);
 }
 
-void ScreenComponent::setTransferMap(const std::map<std::string, std::vector<std::string>> &newTransferMap)
+void ScreenComponent::setTransferMap(
+    const std::map<std::string, std::vector<std::string>> &newTransferMap)
 {
     transferMap = newTransferMap;
 }
 
-std::map<std::string, std::vector<std::string>> &ScreenComponent::getTransferMap()
+std::map<std::string, std::vector<std::string>> &
+ScreenComponent::getTransferMap()
 {
     return transferMap;
 }
@@ -74,7 +79,8 @@ std::shared_ptr<Field> ScreenComponent::findFocus()
     return {};
 }
 
-void ScreenComponent::setLastFocus(const std::string &screenName, const std::string &newLastFocus)
+void ScreenComponent::setLastFocus(const std::string &screenName,
+                                   const std::string &newLastFocus)
 {
     mpc.getLayeredScreen()->setLastFocus(screenName, newLastFocus);
 }
@@ -87,9 +93,9 @@ const std::string ScreenComponent::getLastFocus(const std::string &screenName)
 void ScreenComponent::openWindow()
 {
     /**
-     * On the real MPC2000XL the OPEN WINDOW button can also be used to close windows.
-     * The behaviour is consistent for nearly all cases, with a few exceptions.
-     * See https://github.com/izzyreal/mpc/issues/260
+     * On the real MPC2000XL the OPEN WINDOW button can also be used to close
+     * windows. The behaviour is consistent for nearly all cases, with a few
+     * exceptions. See https://github.com/izzyreal/mpc/issues/260
      */
     if (dynamic_cast<MidiOutputMonitorScreen *>(this))
     {
@@ -108,11 +114,14 @@ std::optional<int> ScreenComponent::getDrumIndex()
 {
     if (screengroups::isSamplerScreen(ls->getCurrentScreen()))
     {
-        const auto drumScreen = mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
+        const auto drumScreen =
+            mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
         return drumScreen->getDrum();
     }
 
-    if (const int drumIndex = mpc.getSequencer()->getActiveTrack()->getBus() - 1; drumIndex >= 0)
+    if (const int drumIndex =
+            mpc.getSequencer()->getActiveTrack()->getBus() - 1;
+        drumIndex >= 0)
     {
         return drumIndex;
     }

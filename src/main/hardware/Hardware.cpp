@@ -4,7 +4,8 @@ using namespace mpc::hardware;
 
 Hardware::Hardware()
 {
-    for (int i = ComponentId::CURSOR_LEFT_OR_DIGIT; i <= ComponentId::NUM_9_OR_MIDI_SYNC; i++)
+    for (int i = ComponentId::CURSOR_LEFT_OR_DIGIT;
+         i <= ComponentId::NUM_9_OR_MIDI_SYNC; i++)
     {
         const auto id = static_cast<ComponentId>(i);
         buttons[id] = std::make_shared<Button>(id);
@@ -17,7 +18,8 @@ Hardware::Hardware()
         components[pads.back()->getId()] = pads.back();
     }
 
-    for (int i = ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED; i <= ComponentId::PLAY_LED; i++)
+    for (int i = ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED;
+         i <= ComponentId::PLAY_LED; i++)
     {
         const auto id = static_cast<ComponentId>(i);
         leds[id] = std::make_shared<Led>(id);
@@ -47,7 +49,8 @@ std::vector<std::string> Hardware::getButtonLabels()
 
     for (auto &[label, id] : componentLabelToId)
     {
-        if (id >= ComponentId::CURSOR_LEFT_OR_DIGIT && id <= ComponentId::NUM_9_OR_MIDI_SYNC)
+        if (id >= ComponentId::CURSOR_LEFT_OR_DIGIT &&
+            id <= ComponentId::NUM_9_OR_MIDI_SYNC)
         {
             result.push_back(label);
         }

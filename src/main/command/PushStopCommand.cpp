@@ -15,29 +15,42 @@ namespace mpc::command
 
     void PushStopCommand::execute()
     {
-        const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>();
+        const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<
+            lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>();
         const auto ams = mpc.getAudioMidiServices();
 
-        mpc.clientEventController->clientHardwareEventController->unlockNoteRepeat();
+        mpc.clientEventController->clientHardwareEventController
+            ->unlockNoteRepeat();
 
-        if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
-                                  mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed()))
+        if (ams->isBouncing() &&
+            (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
+             mpc.getHardware()
+                 ->getButton(hardware::ComponentId::SHIFT)
+                 ->isPressed()))
         {
             ams->stopBouncingEarly();
         }
 
         mpc.getSequencer()->stop();
 
-        if (!lcdgui::screengroups::isPlayScreen(mpc.getLayeredScreen()->getCurrentScreen()))
+        if (!lcdgui::screengroups::isPlayScreen(
+                mpc.getLayeredScreen()->getCurrentScreen()))
         {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }
 
-        const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>();
+        const auto sequencerScreen =
+            mpc.screens->get<lcdgui::screens::SequencerScreen>();
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
 
-        mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(mpc.getSequencer()->isOverdubbing());
-        mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(mpc.getSequencer()->isRecording());
-        mpc.getHardware()->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(mpc.getSequencer()->isPlaying());
+        mpc.getHardware()
+            ->getLed(hardware::ComponentId::OVERDUB_LED)
+            ->setEnabled(mpc.getSequencer()->isOverdubbing());
+        mpc.getHardware()
+            ->getLed(hardware::ComponentId::REC_LED)
+            ->setEnabled(mpc.getSequencer()->isRecording());
+        mpc.getHardware()
+            ->getLed(hardware::ComponentId::PLAY_LED)
+            ->setEnabled(mpc.getSequencer()->isPlaying());
     }
 } // namespace mpc::command

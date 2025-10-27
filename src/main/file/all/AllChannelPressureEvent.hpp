@@ -17,7 +17,9 @@ namespace mpc::file::all
         const static int AMOUNT_OFFSET = 5;
 
     public:
-        static std::shared_ptr<mpc::sequencer::ChannelPressureEvent> bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::ChannelPressureEvent>);
+        static std::shared_ptr<mpc::sequencer::ChannelPressureEvent>
+        bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(
+            std::shared_ptr<mpc::sequencer::ChannelPressureEvent>);
     };
 } // namespace mpc::file::all

@@ -2,7 +2,8 @@
 
 using namespace mpc::lcdgui;
 
-Label::Label(mpc::Mpc &mpc, const std::string &name, std::string text, int x, int y, int width)
+Label::Label(mpc::Mpc &mpc, const std::string &name, std::string text, int x,
+             int y, int width)
     : TextComp(mpc, name)
 {
     this->text = text;

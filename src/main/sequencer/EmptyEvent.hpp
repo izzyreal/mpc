@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class EmptyEvent
-        : public Event
+    class EmptyEvent : public Event
     {
 
     public:

@@ -17,7 +17,9 @@ namespace mpc::file::all
         const static int PROGRAM_OFFSET = 5;
 
     public:
-        static std::shared_ptr<mpc::sequencer::ProgramChangeEvent> bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::ProgramChangeEvent>);
+        static std::shared_ptr<mpc::sequencer::ProgramChangeEvent>
+        bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char> mpcEventToBytes(
+            std::shared_ptr<mpc::sequencer::ProgramChangeEvent>);
     };
 } // namespace mpc::file::all

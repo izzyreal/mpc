@@ -92,11 +92,16 @@ void CopySongScreen::displaySong0()
 {
     auto songScreen = mpc.screens->get<SongScreen>();
     auto song = sequencer->getSong(songScreen->activeSongIndex);
-    findField("song0")->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
+    findField("song0")->setText(
+        StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",
+                         2) +
+        "-" + song->getName());
 }
 
 void CopySongScreen::displaySong1()
 {
     auto song = sequencer->getSong(song1);
-    findField("song1")->setText(StrUtil::padLeft(std::to_string(song1 + 1), "0", 2) + "-" + song->getName());
+    findField("song1")->setText(
+        StrUtil::padLeft(std::to_string(song1 + 1), "0", 2) + "-" +
+        song->getName());
 }

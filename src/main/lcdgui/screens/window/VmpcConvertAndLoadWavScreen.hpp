@@ -6,8 +6,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class VmpcConvertAndLoadWavScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcConvertAndLoadWavScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

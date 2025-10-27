@@ -20,10 +20,14 @@ std::int16_t ByteUtil::bytes2short(std::vector<char> ca)
 std::uint32_t ByteUtil::bytes2uint(std::vector<char> quartet)
 {
     std::uint32_t result = 0;
-    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[3])) << 24;
-    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[2])) << 16;
-    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[1])) << 8;
-    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[0]));
+    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[3]))
+              << 24;
+    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[2]))
+              << 16;
+    result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[1]))
+              << 8;
+    result |=
+        static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[0]));
     return result;
 }
 
@@ -53,7 +57,8 @@ std::vector<char> ByteUtil::short2bytes(std::int16_t n)
     return res;
 }
 
-std::vector<char> ByteUtil::stitchByteArrays(const std::vector<std::vector<char>> &byteArrays)
+std::vector<char>
+ByteUtil::stitchByteArrays(const std::vector<std::vector<char>> &byteArrays)
 {
     unsigned int totalSize = 0;
     for (const auto &ba : byteArrays)

@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoopSongScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoopSongScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

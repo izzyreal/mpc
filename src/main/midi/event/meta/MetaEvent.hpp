@@ -9,8 +9,7 @@
 namespace mpc::midi::event::meta
 {
 
-    class MetaEvent
-        : public mpc::midi::event::MidiEvent
+    class MetaEvent : public mpc::midi::event::MidiEvent
     {
 
     protected:
@@ -22,7 +21,8 @@ namespace mpc::midi::event::meta
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
     public:
-        static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta, std::stringstream &in);
+        static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta,
+                                                         std::stringstream &in);
         static const int SEQUENCE_NUMBER{0};
         static const int TEXT_EVENT{1};
         static const int COPYRIGHT_NOTICE{2};

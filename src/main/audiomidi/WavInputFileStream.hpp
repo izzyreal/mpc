@@ -34,7 +34,9 @@ int wav_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)
     return val;
 }
 
-bool wav_read_header(const std::shared_ptr<std::istream> &stream, int &sampleRate, int &validBits, int &numChannels, int &numFrames)
+bool wav_read_header(const std::shared_ptr<std::istream> &stream,
+                     int &sampleRate, int &validBits, int &numChannels,
+                     int &numFrames)
 {
     stream->seekg(0, stream->end);
 

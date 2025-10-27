@@ -6,7 +6,8 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc &mpc, const int layerIndex)
+MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc &mpc,
+                                                     const int layerIndex)
     : ScreenComponent(mpc, "multi-recording-setup", layerIndex)
 {
     for (int i = 0; i < 34; i++)
@@ -29,7 +30,8 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc &mpc, const int la
 
         if (i > 16 && i < 33)
         {
-            inNames[i] = "2-" + StrUtil::padLeft(std::to_string(i - 16), "0", 2);
+            inNames[i] =
+                "2-" + StrUtil::padLeft(std::to_string(i - 16), "0", 2);
         }
 
         if (i == 33)
@@ -57,7 +59,8 @@ void MultiRecordingSetupScreen::open()
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
     if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
-        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+        vmpcSettingsScreen->midiControlMode ==
+            VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();
         mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
@@ -103,12 +106,15 @@ void MultiRecordingSetupScreen::turnWheel(int i)
         {
             if (yPos == 0)
             {
-                std::string res = focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
-                ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
+                std::string res =
+                    focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
+                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                    std::to_string(yPos + 1)));
             }
             else if (yPos == 1)
             {
-                ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
+                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                    std::to_string(yPos + 1)));
             }
             else if (yPos == 2)
             {
@@ -123,11 +129,13 @@ void MultiRecordingSetupScreen::turnWheel(int i)
             }
             else if (yPos == 1)
             {
-                ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
+                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                    std::to_string(yPos - 1)));
             }
             else if (yPos == 2)
             {
-                ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
+                ls->setFocus(focusedFieldName.substr(0, 1).append(
+                    std::to_string(yPos - 1)));
             }
         }
     }
@@ -156,12 +164,14 @@ void MultiRecordingSetupScreen::up()
     }
     else if (yPos == 1)
     {
-        ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
+        ls->setFocus(
+            focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
         --yPos;
     }
     else if (yPos == 2)
     {
-        ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
+        ls->setFocus(
+            focusedFieldName.substr(0, 1).append(std::to_string(yPos - 1)));
         --yPos;
     }
 }
@@ -172,13 +182,16 @@ void MultiRecordingSetupScreen::down()
 
     if (yPos == 0)
     {
-        std::string res = focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
-        ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
+        std::string res =
+            focusedFieldName.substr(0, 1) + std::to_string(yPos + 1);
+        ls->setFocus(
+            focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
         ++yPos;
     }
     else if (yPos == 1)
     {
-        ls->setFocus(focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
+        ls->setFocus(
+            focusedFieldName.substr(0, 1).append(std::to_string(yPos + 1)));
         ++yPos;
     }
     else if (yPos == 2)

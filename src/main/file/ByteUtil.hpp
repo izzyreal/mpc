@@ -17,7 +17,8 @@ namespace mpc::file
 
         static std::vector<short> bytesToShorts(std::vector<char> src);
 
-        static std::vector<char> stitchByteArrays(const std::vector<std::vector<char>> &byteArrays);
+        static std::vector<char>
+        stitchByteArrays(const std::vector<std::vector<char>> &byteArrays);
 
         static char hexToByte(const std::string &charPair);
         static std::vector<char> hexToBytes(std::string charPairs);

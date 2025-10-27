@@ -5,7 +5,9 @@
 #include <cmath>
 
 #include <ghc/filesystem.hpp>
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && __cplusplus >= 201703L)) && defined(__has_include)
+#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) ||                         \
+     (defined(__cplusplus) && __cplusplus >= 201703L)) &&                      \
+    defined(__has_include)
 #if __has_include(<filesystem>) && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500)
 #ifdef __APPLE__
 #include <TargetConditionals.hpp>
@@ -53,9 +55,11 @@ inline void set_file_data(const fs::path &p, const std::string &bytes)
     ofs.write(bytes.data(), std::streamsize(bytes.size()));
 }
 
-inline std::string byte_count_to_short_string(uintmax_t byte_count, bool one_letter_suffix = false)
+inline std::string byte_count_to_short_string(uintmax_t byte_count,
+                                              bool one_letter_suffix = false)
 {
-    const static std::vector<std::string> units = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+    const static std::vector<std::string> units = {"B",  "KB", "MB", "GB", "TB",
+                                                   "PB", "EB", "ZB", "YB"};
     size_t unit = 0;
 
     auto adjustedSize = byte_count;
@@ -71,5 +75,6 @@ inline std::string byte_count_to_short_string(uintmax_t byte_count, bool one_let
         adjustedSize /= denominator;
     }
 
-    return std::to_string(static_cast<int>(floor(adjustedSize))) + (one_letter_suffix ? units[unit].substr(0, 1) : units[unit]);
+    return std::to_string(static_cast<int>(floor(adjustedSize))) +
+           (one_letter_suffix ? units[unit].substr(0, 1) : units[unit]);
 }

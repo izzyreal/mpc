@@ -13,7 +13,9 @@ namespace mpc::command
     void SplitRightCommand::execute()
     {
 
-        if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        if (!mpc.getHardware()
+                 ->getButton(hardware::ComponentId::SHIFT)
+                 ->isPressed())
         {
             PushRightCommand(mpc).execute();
             return;
@@ -21,7 +23,10 @@ namespace mpc::command
 
         const auto field = mpc.getLayeredScreen()->getFocusedField();
 
-        if (lcdgui::util::isFieldSplittable(mpc.getLayeredScreen()->getCurrentScreen(), mpc.getLayeredScreen()->getFocusedFieldName()) && field->isSplit())
+        if (lcdgui::util::isFieldSplittable(
+                mpc.getLayeredScreen()->getCurrentScreen(),
+                mpc.getLayeredScreen()->getFocusedFieldName()) &&
+            field->isSplit())
         {
             if (!field->setActiveSplit(field->getActiveSplit() + 1))
             {

@@ -10,11 +10,13 @@ namespace mpc::command
 
     void PushNextSeqCommand::execute()
     {
-        if (mpc.getLayeredScreen()->isCurrentScreen<NextSeqScreen, NextSeqPadScreen>())
+        if (mpc.getLayeredScreen()
+                ->isCurrentScreen<NextSeqScreen, NextSeqPadScreen>())
         {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }
-        else if (mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen, TrMuteScreen>())
+        else if (mpc.getLayeredScreen()
+                     ->isCurrentScreen<SequencerScreen, TrMuteScreen>())
         {
             mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
         }

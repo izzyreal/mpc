@@ -10,8 +10,7 @@ namespace mpc
 namespace mpc::lcdgui::screens
 {
 
-    class VmpcKeyboardScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcKeyboardScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -31,7 +30,8 @@ namespace mpc::lcdgui::screens
     private:
         int row = 0;
         int rowOffset = 0;
-        mpc::input::VmpcKeyCode learnCandidate = mpc::input::VmpcKeyCode::VMPC_KEY_UNKNOWN;
+        mpc::input::VmpcKeyCode learnCandidate =
+            mpc::input::VmpcKeyCode::VMPC_KEY_UNKNOWN;
 
         bool learning = false;
         void setLearning(bool b);

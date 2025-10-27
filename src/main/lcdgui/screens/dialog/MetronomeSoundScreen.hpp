@@ -23,8 +23,7 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class MetronomeSoundScreen
-        : public mpc::lcdgui::ScreenComponent
+    class MetronomeSoundScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -38,7 +37,8 @@ namespace mpc::lcdgui::screens::dialog
         void update(Observable *o, Message message) override;
 
     private:
-        std::vector<std::string> soundNames = {"CLICK", "DRUM1", "DRUM2", "DRUM3", "DRUM4"};
+        std::vector<std::string> soundNames = {"CLICK", "DRUM1", "DRUM2",
+                                               "DRUM3", "DRUM4"};
 
     private:
         void displaySound();

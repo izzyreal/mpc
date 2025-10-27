@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class VeloEnvFilterScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VeloEnvFilterScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

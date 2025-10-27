@@ -6,8 +6,7 @@ namespace mpc::midi::event::meta
 
     class MetaEventData;
 
-    class GenericMetaEvent
-        : public MetaEvent
+    class GenericMetaEvent : public MetaEvent
     {
 
     private:

@@ -18,5 +18,6 @@ inline const std::vector<std::string> screenNames = {
 
 static bool isValidScreenName(const std::string screenName)
 {
-    return std::find(screenNames.begin(), screenNames.end(), screenName) != screenNames.end();
+    return std::find(screenNames.begin(), screenNames.end(), screenName) !=
+           screenNames.end();
 }

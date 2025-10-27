@@ -24,7 +24,9 @@ void prepareApsResources(mpc::Mpc &mpc)
     for (auto &&entry : fs.iterate_directory("test/ApsLoading"))
     {
         auto file = fs.open("test/ApsLoading/" + entry.filename());
-        char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
+        char *data =
+            (char *)std::string_view(file.begin(), file.end() - file.begin())
+                .data();
         auto newFile = disk->newFile(entry.filename());
         std::vector<char> dataVec(data, data + file.size());
         newFile->setFileData(dataVec);

@@ -19,8 +19,7 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-    class Field
-        : public TextComp
+    class Field : public TextComp
     {
 
     private:

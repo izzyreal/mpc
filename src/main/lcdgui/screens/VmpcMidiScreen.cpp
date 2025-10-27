@@ -21,16 +21,21 @@ VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc &mpc, int layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
-        auto typeParam = std::make_shared<Parameter>(mpc, "                ", "type" + std::to_string(i), 2, 3 + (i * 9), 4 * 6);
+        auto typeParam = std::make_shared<Parameter>(mpc, "                ",
+                                                     "type" + std::to_string(i),
+                                                     2, 3 + (i * 9), 4 * 6);
         addChild(typeParam);
 
-        auto numberParam = std::make_shared<Parameter>(mpc, "#:", "number" + std::to_string(i), 125, 3 + (i * 9), 3 * 6);
+        auto numberParam = std::make_shared<Parameter>(
+            mpc, "#:", "number" + std::to_string(i), 125, 3 + (i * 9), 3 * 6);
         addChild(numberParam);
 
-        auto valueParam = std::make_shared<Parameter>(mpc, "v:", "value" + std::to_string(i), 164, 3 + (i * 9), 3 * 6);
+        auto valueParam = std::make_shared<Parameter>(
+            mpc, "v:", "value" + std::to_string(i), 164, 3 + (i * 9), 3 * 6);
         addChild(valueParam);
 
-        auto channelParam = std::make_shared<Parameter>(mpc, "ch:", "channel" + std::to_string(i), 202, 3 + (i * 9), 3 * 6);
+        auto channelParam = std::make_shared<Parameter>(
+            mpc, "ch:", "channel" + std::to_string(i), 202, 3 + (i * 9), 3 * 6);
         addChild(channelParam);
     }
 }
@@ -42,7 +47,8 @@ void VmpcMidiScreen::turnWheel(int i)
 
     if (column == 0)
     {
-        cmd.setMidiMessageType(i > 0 ? MidiControlCommand::MidiMessageType::NOTE : MidiControlCommand::MidiMessageType::CC);
+        cmd.setMidiMessageType(i > 0 ? MidiControlCommand::MidiMessageType::NOTE
+                                     : MidiControlCommand::MidiMessageType::CC);
     }
     else if (column == 1)
     {
@@ -54,7 +60,8 @@ void VmpcMidiScreen::turnWheel(int i)
     }
     else if (column == 3)
     {
-        cmd.setMidiChannelIndex(std::clamp(cmd.getMidiChannelIndex() + i, -1, 15));
+        cmd.setMidiChannelIndex(
+            std::clamp(cmd.getMidiChannelIndex() + i, -1, 15));
     }
 
     updateRows();
@@ -118,8 +125,7 @@ void VmpcMidiScreen::up()
 
         rowOffset--;
 
-        if (activePreset->rows[row + rowOffset].isNote() &&
-            column == 2)
+        if (activePreset->rows[row + rowOffset].isNote() && column == 2)
         {
             column--;
         }
@@ -130,8 +136,7 @@ void VmpcMidiScreen::up()
 
     row--;
 
-    if (activePreset->rows[row + rowOffset].isNote() &&
-        column == 2)
+    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
     {
         column--;
     }
@@ -151,7 +156,8 @@ void VmpcMidiScreen::acceptLearnCandidate()
         return;
     }
 
-    activePreset->rows[row + rowOffset].setMidiMessageType(learnCandidate.getMidiMessageType());
+    activePreset->rows[row + rowOffset].setMidiMessageType(
+        learnCandidate.getMidiMessageType());
     activePreset->rows[row + rowOffset].setNumber(learnCandidate.getNumber());
 
     if (learnCandidate.isCC())
@@ -159,7 +165,8 @@ void VmpcMidiScreen::acceptLearnCandidate()
         activePreset->rows[row + rowOffset].setValue(learnCandidate.getValue());
     }
 
-    activePreset->rows[row + rowOffset].setMidiChannelIndex(learnCandidate.getMidiChannelIndex());
+    activePreset->rows[row + rowOffset].setMidiChannelIndex(
+        learnCandidate.getMidiChannelIndex());
 }
 
 void VmpcMidiScreen::down()
@@ -179,8 +186,7 @@ void VmpcMidiScreen::down()
 
         rowOffset++;
 
-        if (activePreset->rows[row + rowOffset].isNote() &&
-            column == 2)
+        if (activePreset->rows[row + rowOffset].isNote() && column == 2)
         {
             column--;
         }
@@ -191,8 +197,7 @@ void VmpcMidiScreen::down()
 
     row++;
 
-    if (activePreset->rows[row + rowOffset].isNote() &&
-        column == 2)
+    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
     {
         column--;
     }
@@ -209,8 +214,7 @@ void VmpcMidiScreen::left()
 
     column--;
 
-    if (activePreset->rows[row + rowOffset].isNote() &&
-        column == 2)
+    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
     {
         column--;
     }
@@ -227,8 +231,7 @@ void VmpcMidiScreen::right()
 
     column++;
 
-    if (activePreset->rows[row + rowOffset].isNote() &&
-        column == 2)
+    if (activePreset->rows[row + rowOffset].isNote() && column == 2)
     {
         column++;
     }
@@ -274,9 +277,11 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                auto screen =
+                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
-                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                mpc.getLayeredScreen()
+                    ->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
@@ -290,9 +295,11 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                auto screen =
+                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-keyboard";
-                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                mpc.getLayeredScreen()
+                    ->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
@@ -309,9 +316,11 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                auto screen =
+                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
-                mpc.getLayeredScreen()->openScreen<VmpcDiscardMappingChangesScreen>();
+                mpc.getLayeredScreen()
+                    ->openScreen<VmpcDiscardMappingChangesScreen>();
                 return;
             }
 
@@ -353,9 +362,13 @@ void VmpcMidiScreen::function(int i)
     }
 }
 
-void VmpcMidiScreen::setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value)
+void VmpcMidiScreen::setLearnCandidate(const bool isNote,
+                                       const int8_t channelIndex,
+                                       const int8_t number, const int8_t value)
 {
-    learnCandidate.setMidiMessageType(isNote ? MidiControlCommand::MidiMessageType::NOTE : MidiControlCommand::MidiMessageType::CC);
+    learnCandidate.setMidiMessageType(
+        isNote ? MidiControlCommand::MidiMessageType::NOTE
+               : MidiControlCommand::MidiMessageType::CC);
     learnCandidate.setMidiChannelIndex(channelIndex);
     learnCandidate.setNumber(number);
 
@@ -395,11 +408,17 @@ void VmpcMidiScreen::updateRows()
 
         int length = 15;
 
-        const auto labelText = StrUtil::padRight(activePreset->rows[i + rowOffset].getMpcHardwareLabel(), " ", length) + ":";
+        const auto labelText =
+            StrUtil::padRight(
+                activePreset->rows[i + rowOffset].getMpcHardwareLabel(), " ",
+                length) +
+            ":";
 
         typeLabel->setText(labelText);
         MidiControlCommand &cmd =
-            (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : activePreset->rows[i + rowOffset];
+            (learning && row == i && !learnCandidate.isEmpty())
+                ? learnCandidate
+                : activePreset->rows[i + rowOffset];
 
         std::string type = cmd.isNote() ? "Note" : "CC";
 
@@ -414,7 +433,8 @@ void VmpcMidiScreen::updateRows()
         }
         else
         {
-            channelField->setText(std::to_string(cmd.getMidiChannelIndex() + 1));
+            channelField->setText(
+                std::to_string(cmd.getMidiChannelIndex() + 1));
         }
 
         channelField->setInverted(row == i && column == 3);

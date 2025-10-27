@@ -37,9 +37,11 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     seq->setTimeSignature(1, 4, 4);
     REQUIRE(pos() == 0);
     mpc.getSequencer()->goToNextStep();
-    // TODO User-friendlier would be if the next step starts at the beginning of a bar, which is not the
-    //  case with the above timesignatures (first bar 1/32, second bar 4/4) on the real MPC2000XL.
-    //  So the below is according to spec, but maybe we can do the user-friendlier variety at some point.
+    // TODO User-friendlier would be if the next step starts at the beginning of
+    // a bar, which is not the
+    //  case with the above timesignatures (first bar 1/32, second bar 4/4) on
+    //  the real MPC2000XL. So the below is according to spec, but maybe we can
+    //  do the user-friendlier variety at some point.
     REQUIRE(pos() == 24);
     mpc.getSequencer()->goToNextStep();
     REQUIRE(pos() == 48);
@@ -57,19 +59,26 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 {
     const int SAMPLE_RATE = 44100;
     const int BUFFER_SIZE = 512;
-    const int PROCESS_BLOCK_INTERVAL = 12; // Approximate duration of 512 frames at 44100khz
+    const int PROCESS_BLOCK_INTERVAL =
+        12; // Approximate duration of 512 frames at 44100khz
     const int AUDIO_THREAD_TIMEOUT = 4000;
     const int RECORD_DELAY = 500;
     const int INITIAL_EVENT_INSERTION_DELAY = 500;
 
-    //                      1                   2                   3                   4                   1... <loop>
-    // Quantized positions: 0  , 24 , 48 , 72 , 96 , 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360, 384
+    //                      1                   2                   3 4 1...
+    //                      <loop>
+    // Quantized positions: 0  , 24 , 48 , 72 , 96 , 120, 144, 168, 192, 216,
+    // 240, 264, 288, 312, 336, 360, 384
 
-    // The event at tick 382 is expected to be quantized to tick 0, because the sequence is one bar long.
-    // Event at tick 2 will also be quantized to tick 0. Hence of the 17 ticks below, only 16 will survive.
-    std::vector<int> humanTickPositions{2, 23, 49, 70, 95, 124, 143, 167, 194, 218, 243, 264, 290, 310, 332, 361, 382};
+    // The event at tick 382 is expected to be quantized to tick 0, because the
+    // sequence is one bar long. Event at tick 2 will also be quantized to tick
+    // 0. Hence of the 17 ticks below, only 16 will survive.
+    std::vector<int> humanTickPositions{2,   23,  49,  70,  95,  124,
+                                        143, 167, 194, 218, 243, 264,
+                                        290, 310, 332, 361, 382};
 
-    std::vector<int> quantizedPositions{0, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360};
+    std::vector<int> quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
+                                        192, 216, 240, 264, 288, 312, 336, 360};
 
     bool mainThreadBusy = true;
     bool audioThreadBusy = true;
@@ -93,28 +102,33 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
     int64_t timeInSamples = 0;
 
-    std::thread audioThread([&]()
-                            {
-                                int dspCycleCounter = 0;
+    std::thread audioThread(
+        [&]()
+        {
+            int dspCycleCounter = 0;
 
-                                while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
-                                       track->getEvents().size() < humanTickPositions.size())
-                                {
-                                    mpc.getClock()->processBufferInternal(seq->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
-                                    server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
-                                    timeInSamples += BUFFER_SIZE;
+            while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL <
+                       AUDIO_THREAD_TIMEOUT &&
+                   track->getEvents().size() < humanTickPositions.size())
+            {
+                mpc.getClock()->processBufferInternal(
+                    seq->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+                server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
+                timeInSamples += BUFFER_SIZE;
 
-                                    if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
-                                    {
-                                        std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-                                        continue;
-                                    }
+                if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
+                {
+                    std::this_thread::sleep_for(
+                        std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+                    continue;
+                }
 
-                                    std::this_thread::sleep_for(std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-                                }
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
+            }
 
-                                audioThreadBusy = false;
-                            });
+            audioThreadBusy = false;
+        });
 
     int initialDelayCounter = 0;
 
@@ -143,14 +157,18 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
             if (tickPos >= hTickPos && tickPos < hTickPos + 24)
             {
-                if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
+                if (find(begin(recordedTickPos), end(recordedTickPos),
+                         hTickPos) == end(recordedTickPos))
                 {
-                    auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screen);
+                    auto noteOnCtx = TriggerDrumContextFactory::
+                        buildTriggerDrumNoteOnContext(mpc, 0, 127, screen);
                     TriggerDrumNoteOnCommand(noteOnCtx).execute();
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
-                    auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen->getDrumIndex(), screen);
+                    auto noteOffCtx = TriggerDrumContextFactory::
+                        buildTriggerDrumNoteOffContext(
+                            mpc, 0, screen->getDrumIndex(), screen);
                     TriggerDrumNoteOffCommand(noteOffCtx).execute();
                 }
             }
@@ -244,16 +262,21 @@ TEST_CASE("Undo", "[sequencer]")
     {
         if (i % 2 == 0)
         {
-            auto noteOnCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, 0, 127, screen);
+            auto noteOnCtx =
+                TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+                    mpc, 0, 127, screen);
             TriggerDrumNoteOnCommand(noteOnCtx).execute();
         }
         else
         {
-            auto noteOffCtx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, 0, screen->getDrumIndex(), screen);
+            auto noteOffCtx =
+                TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+                    mpc, 0, screen->getDrumIndex(), screen);
             TriggerDrumNoteOffCommand(noteOffCtx).execute();
         }
 
-        mpc.getClock()->processBufferInternal(sequencer->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+        mpc.getClock()->processBufferInternal(sequencer->getTempo(),
+                                              SAMPLE_RATE, BUFFER_SIZE, 0);
 
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
         timeInSamples += BUFFER_SIZE;

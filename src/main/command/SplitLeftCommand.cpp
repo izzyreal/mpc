@@ -13,13 +13,17 @@ namespace mpc::command
 
     void SplitLeftCommand::execute()
     {
-        if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        if (!mpc.getHardware()
+                 ->getButton(hardware::ComponentId::SHIFT)
+                 ->isPressed())
         {
             PushLeftCommand(mpc).execute();
             return;
         }
 
-        if (!lcdgui::util::isFieldSplittable(mpc.getLayeredScreen()->getCurrentScreen(), mpc.getLayeredScreen()->getFocusedFieldName()))
+        if (!lcdgui::util::isFieldSplittable(
+                mpc.getLayeredScreen()->getCurrentScreen(),
+                mpc.getLayeredScreen()->getFocusedFieldName()))
         {
             return;
         }

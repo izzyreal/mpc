@@ -15,8 +15,9 @@ using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-// Since we're writing the ALL file to the same directory as a production instance
-// of VMPC2000XL would, we choose a strange name that is unlikely to exist.
+// Since we're writing the ALL file to the same directory as a production
+// instance of VMPC2000XL would, we choose a strange name that is unlikely to
+// exist.
 const std::string filename = "SHS4CABHNAXJ9LQ.ALL";
 
 void deleteTestAllFile(const std::shared_ptr<mpc::disk::AbstractDisk> &disk)

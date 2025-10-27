@@ -4,8 +4,7 @@
 
 namespace mpc::engine::control
 {
-    class CompoundControlChain
-        : public CompoundControl
+    class CompoundControlChain : public CompoundControl
     {
 
     public:

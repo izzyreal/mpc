@@ -82,7 +82,8 @@ void EditVelocityScreen::function(int i)
                         }
                         else if (editType == 2)
                         {
-                            ne->setVelocity(ne->getVelocity() * (value / 100.0));
+                            ne->setVelocity(ne->getVelocity() *
+                                            (value / 100.0));
                         }
                         else if (editType == 3)
                         {
@@ -117,11 +118,15 @@ void EditVelocityScreen::turnWheel(int i)
 void EditVelocityScreen::displayTime()
 {
     auto sequence = sequencer->getActiveSequence().get();
-    findField("time0")->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
-    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+    findField("time0")->setTextPadded(
+        SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
+    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
+                                      "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
-    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+    findField("time3")->setTextPadded(
+        SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
+    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1,
+                                      "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 
@@ -134,8 +139,12 @@ void EditVelocityScreen::displayNotes()
         findField("note0")->setSize(47, 9);
         findLabel("note1")->Hide(false);
         findField("note1")->Hide(false);
-        findField("note0")->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-        findField("note1")->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+        findField("note0")->setText(
+            StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
+            mpc::Util::noteNames()[note0] + u8"\u00D4");
+        findField("note1")->setText(
+            StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
+            mpc::Util::noteNames()[note1] + u8"\u00D4");
     }
     else
     {
@@ -148,7 +157,8 @@ void EditVelocityScreen::displayNotes()
         else
         {
             auto program = getProgramOrThrow();
-            auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
+            auto padName =
+                sampler->getPadName(program->getPadIndexFromNote(note0));
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
 

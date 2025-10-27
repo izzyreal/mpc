@@ -14,10 +14,13 @@ namespace mpc::command
     void PushShiftCommand::execute()
     {
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer" &&
-            mpc.getHardware()->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)->isPressed() &&
+            mpc.getHardware()
+                ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
+                ->isPressed() &&
             mpc.getSequencer()->isPlaying())
         {
-            mpc.clientEventController->clientHardwareEventController->lockNoteRepeat();
+            mpc.clientEventController->clientHardwareEventController
+                ->lockNoteRepeat();
         }
 
         auto field = mpc.getLayeredScreen()->getFocusedField();

@@ -105,11 +105,15 @@ void EraseScreen::displayTrack()
 void EraseScreen::displayTime()
 {
     auto sequence = sequencer->getActiveSequence().get();
-    findField("time0")->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
-    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+    findField("time0")->setTextPadded(
+        SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
+    findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
+                                      "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
-    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+    findField("time3")->setTextPadded(
+        SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
+    findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1,
+                                      "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 
@@ -150,8 +154,14 @@ void EraseScreen::displayNotes()
     if (bus == 0)
     {
         findField("note0")->setSize(47, 9);
-        findField("note0")->setText((StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0]) + ")");
-        findField("note1")->setText((StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1]) + ")");
+        findField("note0")->setText(
+            (StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
+             mpc::Util::noteNames()[note0]) +
+            ")");
+        findField("note1")->setText(
+            (StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
+             mpc::Util::noteNames()[note1]) +
+            ")");
     }
     else
     {
@@ -206,14 +216,18 @@ void EraseScreen::doErase()
 
     const auto selectedType = eventTypes[type];
 
-    for (auto trackIndex = firstTrackIndex; trackIndex <= lastTrackIndex; trackIndex++)
+    for (auto trackIndex = firstTrackIndex; trackIndex <= lastTrackIndex;
+         trackIndex++)
     {
         const auto seqTrack = seq->getTrack(trackIndex);
 
-        for (auto eventIndex = static_cast<int>(seqTrack->getEvents().size()) - 1; eventIndex >= 0; eventIndex--)
+        for (auto eventIndex =
+                 static_cast<int>(seqTrack->getEvents().size()) - 1;
+             eventIndex >= 0; eventIndex--)
         {
             const auto event = seqTrack->getEvent(eventIndex);
-            const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+            const auto noteEvent =
+                std::dynamic_pointer_cast<NoteOnEvent>(event);
 
             if (event->getTick() >= time0 && event->getTick() < time1)
             {
@@ -224,7 +238,8 @@ void EraseScreen::doErase()
                     if (noteEvent)
                     {
                         const auto nn = noteEvent->getNote();
-                        if ((midi && nn >= noteA && nn <= noteB) || (!midi && (noteA <= 34 || noteA == nn)))
+                        if ((midi && nn >= noteA && nn <= noteB) ||
+                            (!midi && (noteA <= 34 || noteA == nn)))
                         {
                             seqTrack->removeEvent(eventIndex);
                         }

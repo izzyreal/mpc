@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class LoopBarsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoopBarsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -24,16 +24,15 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using json = nlohmann::json;
 
-Screens::Screens(mpc::Mpc &mpc)
-    : mpc(mpc)
-{
-}
+Screens::Screens(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void Screens::createAndCacheAllScreens()
 {
     for (auto screenName : screenNames)
     {
-        if (std::find(knownUnimplementedScreens.begin(), knownUnimplementedScreens.end(), screenName) != knownUnimplementedScreens.end())
+        if (std::find(knownUnimplementedScreens.begin(),
+                      knownUnimplementedScreens.end(),
+                      screenName) != knownUnimplementedScreens.end())
         {
             continue;
         }
@@ -68,7 +67,8 @@ std::vector<std::unique_ptr<json>> &layerDocuments()
             const auto path = "screens/layer" + std::to_string(i + 1) + ".json";
             auto data = mpc::MpcResourceUtil::get_resource_data(path);
 
-            auto panelDoc = std::make_unique<json>(json::parse(data.begin(), data.end()));
+            auto panelDoc =
+                std::make_unique<json>(json::parse(data.begin(), data.end()));
             result.push_back(std::move(panelDoc));
         }
     }
@@ -114,7 +114,8 @@ std::vector<std::string> getFunctionKeyLabels(json &functionKeyLabels)
     return labels;
 }
 
-std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string &screenName)
+std::optional<Screens::ScreenLayout>
+Screens::getScreenLayout(const std::string &screenName)
 {
     Screens::ScreenLayout result;
 
@@ -160,7 +161,8 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
             }
         }
 
-        auto functionKeysComponent = std::make_unique<FunctionKeys>(mpc, "function-keys", allLabels, allTypes);
+        auto functionKeysComponent = std::make_unique<FunctionKeys>(
+            mpc, "function-keys", allLabels, allTypes);
         result.components.push_back(std::move(functionKeysComponent));
     }
 
@@ -201,11 +203,8 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
             }
 
             result.components.push_back(std::make_unique<Parameter>(
-                mpc,
-                labels[i - skipCounter].get<std::string>(),
-                parameterName,
-                x[i - skipCounter].get<int>(),
-                y[i - skipCounter].get<int>(),
+                mpc, labels[i - skipCounter].get<std::string>(), parameterName,
+                x[i - skipCounter].get<int>(), y[i - skipCounter].get<int>(),
                 tfsize[i - skipCounter].get<int>()));
 
             auto parameter = result.components.back();
@@ -230,12 +229,9 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
 
         for (size_t i = 0; i < infoNames.size(); i++)
         {
-            auto label = std::make_shared<Label>(mpc,
-                                                 infoNames[i].get<std::string>(),
-                                                 "",
-                                                 infoX[i].get<int>(),
-                                                 infoY[i].get<int>(),
-                                                 infoSize[i].get<int>());
+            auto label = std::make_shared<Label>(
+                mpc, infoNames[i].get<std::string>(), "", infoX[i].get<int>(),
+                infoY[i].get<int>(), infoSize[i].get<int>());
             result.components.push_back(label);
         }
     }
@@ -243,26 +239,32 @@ std::optional<Screens::ScreenLayout> Screens::getScreenLayout(const std::string 
     return result;
 }
 
-using ScreenFactory = std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
+using ScreenFactory =
+    std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
 
 inline const std::map<std::string, ScreenFactory> screenFactories = {
-#define X(ns, Class, name) {name, [](mpc::Mpc &mpc, int layer) {                             \
-                                return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer); \
-                            }},
+#define X(ns, Class, name)                                                     \
+    {name, [](mpc::Mpc &mpc, int layer)                                        \
+     {                                                                         \
+         return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer);          \
+     }},
     SCREEN_LIST
 #undef X
 };
 
-static const std::map<std::string, int> screensWithoutLayoutJson{
-    {"popup", 3}};
+static const std::map<std::string, int> screensWithoutLayoutJson{{"popup", 3}};
 
 void Screens::createAndCacheScreen(const std::string &screenName)
 {
-    if (const auto screenFactory = screenFactories.find(screenName); screenFactory != screenFactories.end())
+    if (const auto screenFactory = screenFactories.find(screenName);
+        screenFactory != screenFactories.end())
     {
-        if (auto screenWithoutLayoutJson = screensWithoutLayoutJson.find(screenName); screenWithoutLayoutJson != screensWithoutLayoutJson.end())
+        if (auto screenWithoutLayoutJson =
+                screensWithoutLayoutJson.find(screenName);
+            screenWithoutLayoutJson != screensWithoutLayoutJson.end())
         {
-            auto screen = screenFactory->second(mpc, screenWithoutLayoutJson->second);
+            auto screen =
+                screenFactory->second(mpc, screenWithoutLayoutJson->second);
             screens.push_back(screen);
         }
 
@@ -270,7 +272,15 @@ void Screens::createAndCacheScreen(const std::string &screenName)
 
         if (!layout)
         {
-            MLOG("Screens::getOrCreateScreenComponent has the requested screen name '" + screenName + "' in its map, and a ScreenComponent subclass for it is available in the mpc::lcdgui::screens namespace, but the layout can't be found. Most likely the layout is missing from screens/layer1.json, screens/layer2.json, screens/layer3.json or screens/layer4.json.");
+            MLOG(
+                "Screens::getOrCreateScreenComponent has the requested screen "
+                "name '" +
+                screenName +
+                "' in its map, and a ScreenComponent subclass for it is "
+                "available in the mpc::lcdgui::screens namespace, but the "
+                "layout can't be found. Most likely the layout is missing from "
+                "screens/layer1.json, screens/layer2.json, screens/layer3.json "
+                "or screens/layer4.json.");
             return;
         }
 
@@ -281,5 +291,8 @@ void Screens::createAndCacheScreen(const std::string &screenName)
         screens.push_back(screen);
     }
 
-    MLOG("Screens::getOrCreateScreenComponent is not familiar with screen name '" + screenName + "'. Add it to src/main/lcdgui/Screens.cpp");
+    MLOG(
+        "Screens::getOrCreateScreenComponent is not familiar with screen name "
+        "'" +
+        screenName + "'. Add it to src/main/lcdgui/Screens.cpp");
 }

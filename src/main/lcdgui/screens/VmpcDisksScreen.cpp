@@ -23,10 +23,14 @@ VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc &mpc, const int layerIndex)
     for (int i = 0; i < 4; i++)
     {
         const int y = 11 + (i * 9);
-        auto volumeLabel = std::make_shared<Label>(mpc, "volume" + std::to_string(i), "", 2, y, 11 * 6);
-        auto typeLabel = std::make_shared<Label>(mpc, "type" + std::to_string(i), "", 74, y, 3 * 6);
-        auto sizeLabel = std::make_shared<Label>(mpc, "size" + std::to_string(i), "", 104, y, 4 * 6);
-        auto modeParam = std::make_shared<Parameter>(mpc, "", "mode" + std::to_string(i), 131, y + 1, 10 * 6);
+        auto volumeLabel = std::make_shared<Label>(
+            mpc, "volume" + std::to_string(i), "", 2, y, 11 * 6);
+        auto typeLabel = std::make_shared<Label>(
+            mpc, "type" + std::to_string(i), "", 74, y, 3 * 6);
+        auto sizeLabel = std::make_shared<Label>(
+            mpc, "size" + std::to_string(i), "", 104, y, 4 * 6);
+        auto modeParam = std::make_shared<Parameter>(
+            mpc, "", "mode" + std::to_string(i), 131, y + 1, 10 * 6);
 
         addChild(volumeLabel);
         addChild(typeLabel);
@@ -63,7 +67,8 @@ void VmpcDisksScreen::function(int i)
         {
             auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+            if (vmpcSettingsScreen->getMidiControlMode() ==
+                VmpcSettingsScreen::MidiControlMode::ORIGINAL)
             {
                 return;
             }
@@ -149,8 +154,10 @@ void VmpcDisksScreen::displayRows()
 
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
-        size->setText(byte_count_to_short_string(disk->getTotalSize(), /*one_letter_suffix = */ true));
-        mode->setText(Volume::modeShortName(config[disk->getVolume().volumeUUID]));
+        size->setText(byte_count_to_short_string(
+            disk->getTotalSize(), /*one_letter_suffix = */ true));
+        mode->setText(
+            Volume::modeShortName(config[disk->getVolume().volumeUUID]));
     }
 
     displayUpAndDown();
@@ -213,7 +220,9 @@ void VmpcDisksScreen::displayFunctionKeys()
 {
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
     auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
-    auto newArrangement = midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1 : 0;
+    auto newArrangement =
+        midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
+                                                                         : 0;
     newArrangement += hasConfigChanged() ? 0 : 1;
     ls->setFunctionKeysArrangement(newArrangement);
 }

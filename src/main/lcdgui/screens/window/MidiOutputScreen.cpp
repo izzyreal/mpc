@@ -42,15 +42,18 @@ void MidiOutputScreen::openNameScreen()
     {
         auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
 
-        const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName)
+        const auto enterAction =
+            [this, renameDeviceIndex](std::string &nameScreenName)
         {
-            sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
+            sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex,
+                                                          nameScreenName);
             mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
         auto seq = sequencer->getActiveSequence();
-        nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, "midi-output");
+        nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8,
+                               enterAction, "midi-output");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
@@ -117,11 +120,13 @@ void MidiOutputScreen::displayDeviceName()
 
     if (deviceIndex >= 16)
     {
-        devNumber = StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
+        devNumber =
+            StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
     }
     else
     {
-        devNumber = StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
+        devNumber =
+            StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
     }
 
     findField("devicenumber")->setText(devNumber);

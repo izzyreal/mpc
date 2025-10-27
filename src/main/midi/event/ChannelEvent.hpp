@@ -5,8 +5,7 @@
 namespace mpc::midi::event
 {
 
-    class ChannelEvent
-        : public MidiEvent
+    class ChannelEvent : public MidiEvent
     {
 
     public:
@@ -26,8 +25,11 @@ namespace mpc::midi::event
     public:
         virtual int compareTo(MidiEvent *other);
         virtual bool requiresStatusByte(MidiEvent *prevEvent) override;
-        virtual void writeToOutputStream(std::ostream &out, bool writeType) override;
-        static std::shared_ptr<ChannelEvent> parseChannelEvent(int tick, int delta, int type, int channel, std::stringstream &in);
+        virtual void writeToOutputStream(std::ostream &out,
+                                         bool writeType) override;
+        static std::shared_ptr<ChannelEvent>
+        parseChannelEvent(int tick, int delta, int type, int channel,
+                          std::stringstream &in);
 
     public:
         static const int NOTE_OFF{8};
@@ -40,6 +42,7 @@ namespace mpc::midi::event
 
     public:
         ChannelEvent(int tick, int type, int channel, int param1, int param2);
-        ChannelEvent(int tick, int delta, int type, int channel, int param1, int param2);
+        ChannelEvent(int tick, int delta, int type, int channel, int param1,
+                     int param2);
     };
 } // namespace mpc::midi::event

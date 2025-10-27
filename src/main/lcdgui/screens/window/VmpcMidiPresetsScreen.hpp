@@ -11,8 +11,7 @@ namespace mpc::lcdgui::screens::window
 
     class VmpcKnownControllerDetectedScreen;
 
-    class VmpcMidiPresetsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcMidiPresetsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -27,7 +26,8 @@ namespace mpc::lcdgui::screens::window
         void right() override;
 
     private:
-        std::function<void(std::string &)> checkFileExistsAndSavePresetAndShowPopup;
+        std::function<void(std::string &)>
+            checkFileExistsAndSavePresetAndShowPopup;
         int row = 0;
         int rowOffset = 0;
         unsigned char column = 0;
@@ -38,6 +38,7 @@ namespace mpc::lcdgui::screens::window
 
         std::vector<std::string> autoLoadModeNames{"NO", "ASK", "YES"};
 
-        friend class mpc::lcdgui::screens::window::VmpcKnownControllerDetectedScreen;
+        friend class mpc::lcdgui::screens::window::
+            VmpcKnownControllerDetectedScreen;
     };
 } // namespace mpc::lcdgui::screens::window

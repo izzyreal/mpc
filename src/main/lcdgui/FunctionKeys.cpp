@@ -95,8 +95,7 @@ void FunctionKey::setType(const int newType)
     SetDirty();
 }
 
-FunctionKeys::FunctionKeys(mpc::Mpc &mpc,
-                           const std::string &name,
+FunctionKeys::FunctionKeys(mpc::Mpc &mpc, const std::string &name,
                            std::vector<std::vector<std::string>> allTexts,
                            std::vector<std::vector<int>> allTypes)
     : Component(name)
@@ -111,12 +110,14 @@ FunctionKeys::FunctionKeys(mpc::Mpc &mpc,
     {
         for (int i = 0; i < texts2.size(); i++)
         {
-            if (!texts2[i].empty() && (firstFunctionKey == -1 || i < firstFunctionKey))
+            if (!texts2[i].empty() &&
+                (firstFunctionKey == -1 || i < firstFunctionKey))
             {
                 firstFunctionKey = i;
             }
 
-            if (firstFunctionKey != -1 && !texts2[i].empty() && i > lastFunctionKey)
+            if (firstFunctionKey != -1 && !texts2[i].empty() &&
+                i > lastFunctionKey)
             {
                 lastFunctionKey = i;
             }
@@ -127,7 +128,8 @@ FunctionKeys::FunctionKeys(mpc::Mpc &mpc,
     {
         for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
         {
-            addChild(std::make_shared<FunctionKey>(mpc, "fk" + std::to_string(i), xPoses[i]));
+            addChild(std::make_shared<FunctionKey>(
+                mpc, "fk" + std::to_string(i), xPoses[i]));
         }
     }
 

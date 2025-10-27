@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui
 {
-    class HorizontalBar2
-        : public Component
+    class HorizontalBar2 : public Component
     {
 
     private:

@@ -24,10 +24,12 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::pgmreader;
 
-void PgmFileToProgramConverter::setSlider(ProgramFileReader &reader, std::shared_ptr<Program> program)
+void PgmFileToProgramConverter::setSlider(ProgramFileReader &reader,
+                                          std::shared_ptr<Program> program)
 {
     auto slider = reader.getSlider();
-    auto nn = slider->getMidiNoteAssign() == 0 ? 34 : slider->getMidiNoteAssign();
+    auto nn =
+        slider->getMidiNoteAssign() == 0 ? 34 : slider->getMidiNoteAssign();
     auto pgmSlider = dynamic_cast<PgmSlider *>(program->getSlider());
     pgmSlider->setAssignNote(nn);
     pgmSlider->setAttackHighRange(slider->getAttackHigh());
@@ -42,8 +44,7 @@ void PgmFileToProgramConverter::setSlider(ProgramFileReader &reader, std::shared
 }
 
 void PgmFileToProgramConverter::setNoteParameters(
-    ProgramFileReader &reader,
-    std::shared_ptr<Program> program)
+    ProgramFileReader &reader, std::shared_ptr<Program> program)
 {
     auto pgmNoteParameters = reader.getAllNoteParameters();
     auto pgmPads = reader.getPads();
@@ -55,43 +56,66 @@ void PgmFileToProgramConverter::setNoteParameters(
         auto note = padNote == -1 ? 34 : padNote;
         program->getPad(i)->setNote(note);
 
-        programNoteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
+        programNoteParameters =
+            dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
         programNoteParameters->setAttack(pgmNoteParameters->getAttack(i));
         programNoteParameters->setDecay(pgmNoteParameters->getDecay(i));
         programNoteParameters->setDecayMode(pgmNoteParameters->getDecayMode(i));
-        programNoteParameters->setFilterAttack(pgmNoteParameters->getVelEnvToFiltAtt(i));
-        programNoteParameters->setFilterDecay(pgmNoteParameters->getVelEnvToFiltDec(i));
-        programNoteParameters->setFilterEnvelopeAmount(pgmNoteParameters->getVelEnvToFiltAmt(i));
-        programNoteParameters->setFilterFrequency(pgmNoteParameters->getCutoff(i));
-        programNoteParameters->setFilterResonance(pgmNoteParameters->getResonance(i));
-        programNoteParameters->setMuteAssignA(pgmNoteParameters->getMuteAssign1(i));
-        programNoteParameters->setMuteAssignB(pgmNoteParameters->getMuteAssign2(i));
-        programNoteParameters->setOptNoteA(pgmNoteParameters->getAlsoPlayUse1(i));
-        programNoteParameters->setOptionalNoteB(pgmNoteParameters->getAlsoPlayUse2(i));
+        programNoteParameters->setFilterAttack(
+            pgmNoteParameters->getVelEnvToFiltAtt(i));
+        programNoteParameters->setFilterDecay(
+            pgmNoteParameters->getVelEnvToFiltDec(i));
+        programNoteParameters->setFilterEnvelopeAmount(
+            pgmNoteParameters->getVelEnvToFiltAmt(i));
+        programNoteParameters->setFilterFrequency(
+            pgmNoteParameters->getCutoff(i));
+        programNoteParameters->setFilterResonance(
+            pgmNoteParameters->getResonance(i));
+        programNoteParameters->setMuteAssignA(
+            pgmNoteParameters->getMuteAssign1(i));
+        programNoteParameters->setMuteAssignB(
+            pgmNoteParameters->getMuteAssign2(i));
+        programNoteParameters->setOptNoteA(
+            pgmNoteParameters->getAlsoPlayUse1(i));
+        programNoteParameters->setOptionalNoteB(
+            pgmNoteParameters->getAlsoPlayUse2(i));
 
         auto sampleSelect = pgmNoteParameters->getSampleSelect(i);
-        programNoteParameters->setSoundIndex(sampleSelect == 255 ? -1 : sampleSelect);
-        programNoteParameters->setSliderParameterNumber(pgmNoteParameters->getSliderParameter(i));
-        programNoteParameters->setSoundGenMode(pgmNoteParameters->getSoundGenerationMode(i));
+        programNoteParameters->setSoundIndex(
+            sampleSelect == 255 ? -1 : sampleSelect);
+        programNoteParameters->setSliderParameterNumber(
+            pgmNoteParameters->getSliderParameter(i));
+        programNoteParameters->setSoundGenMode(
+            pgmNoteParameters->getSoundGenerationMode(i));
         programNoteParameters->setTune(pgmNoteParameters->getTune(i));
-        programNoteParameters->setVeloRangeLower(pgmNoteParameters->getVelocityRangeLower(i));
-        programNoteParameters->setVeloRangeUpper(pgmNoteParameters->getVelocityRangeUpper(i));
-        programNoteParameters->setVelocityToAttack(pgmNoteParameters->getVelocityToAttack(i));
-        programNoteParameters->setVelocityToFilterFrequency(pgmNoteParameters->getVelocityToCutoff(i));
-        programNoteParameters->setVeloToLevel(pgmNoteParameters->getVelocityToLevel(i));
-        programNoteParameters->setVelocityToPitch(pgmNoteParameters->getVelocityToPitch(i));
-        programNoteParameters->setVelocityToStart(pgmNoteParameters->getVelocityToStart(i));
-        programNoteParameters->setVoiceOverlapMode(pgmNoteParameters->getVoiceOverlapMode(i));
+        programNoteParameters->setVeloRangeLower(
+            pgmNoteParameters->getVelocityRangeLower(i));
+        programNoteParameters->setVeloRangeUpper(
+            pgmNoteParameters->getVelocityRangeUpper(i));
+        programNoteParameters->setVelocityToAttack(
+            pgmNoteParameters->getVelocityToAttack(i));
+        programNoteParameters->setVelocityToFilterFrequency(
+            pgmNoteParameters->getVelocityToCutoff(i));
+        programNoteParameters->setVeloToLevel(
+            pgmNoteParameters->getVelocityToLevel(i));
+        programNoteParameters->setVelocityToPitch(
+            pgmNoteParameters->getVelocityToPitch(i));
+        programNoteParameters->setVelocityToStart(
+            pgmNoteParameters->getVelocityToStart(i));
+        programNoteParameters->setVoiceOverlapMode(
+            pgmNoteParameters->getVoiceOverlapMode(i));
     }
 }
 
-void PgmFileToProgramConverter::setMixer(ProgramFileReader &reader, std::shared_ptr<Program> program)
+void PgmFileToProgramConverter::setMixer(ProgramFileReader &reader,
+                                         std::shared_ptr<Program> program)
 {
     auto pgmMixer = reader.getMixer();
 
     for (int i = 0; i < 64; i++)
     {
-        auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
+        auto noteParameters =
+            dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
         auto smc = noteParameters->getStereoMixerChannel();
         auto ifmc = noteParameters->getIndivFxMixerChannel();
 
@@ -104,8 +128,7 @@ void PgmFileToProgramConverter::setMixer(ProgramFileReader &reader, std::shared_
 }
 
 program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
-    std::shared_ptr<MpcFile> f,
-    std::shared_ptr<mpc::sampler::Program> program,
+    std::shared_ptr<MpcFile> f, std::shared_ptr<mpc::sampler::Program> program,
     std::vector<std::string> &soundNames)
 {
     if (!f->exists())
@@ -127,7 +150,8 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
         soundNames.push_back(pgmSoundNames->getSampleName(i));
     }
 
-    const std::string programNameInData = StrUtil::trim(reader.getProgramName()->getProgramNameASCII());
+    const std::string programNameInData =
+        StrUtil::trim(reader.getProgramName()->getProgramNameASCII());
 
     if (StrUtil::eqIgnoreCase(programNameInData, f->getNameWithoutExtension()))
     {

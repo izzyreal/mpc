@@ -68,7 +68,8 @@ void LoopScreen::openWindow()
     {
         mpc.getLayeredScreen()->openScreen<LoopToFineScreen>();
     }
-    else if (focusedFieldName == "endlength" || focusedFieldName == "endlengthvalue")
+    else if (focusedFieldName == "endlength" ||
+             focusedFieldName == "endlengthvalue")
     {
         mpc.getLayeredScreen()->openScreen<LoopEndFineScreen>();
     }
@@ -85,7 +86,8 @@ void LoopScreen::function(int f)
         case 1:
         {
             sampler->switchToNextSoundSortType();
-            ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            ls->showPopupForMs(
+                "Sorting by " + sampler->getSoundSortingTypeName(), 200);
             break;
         }
         case 2:
@@ -107,7 +109,9 @@ void LoopScreen::function(int f)
             break;
         }
         case 5:
-            if (mpc.getHardware()->getButton(hardware::ComponentId::F6)->isPressed())
+            if (mpc.getHardware()
+                    ->getButton(hardware::ComponentId::F6)
+                    ->isPressed())
             {
                 return;
             }
@@ -213,7 +217,9 @@ void LoopScreen::turnWheel(int i)
 
 void LoopScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    if (!mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed())
     {
         return;
     }
@@ -258,14 +264,17 @@ void LoopScreen::setSliderLoopTo(int i)
 {
     auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
-    auto newLoopToValue = (int)((i / 124.0) * (loopLngthFix ? (sound->getFrameCount() - oldLength) : sound->getEnd()));
+    auto newLoopToValue =
+        (int)((i / 124.0) * (loopLngthFix ? (sound->getFrameCount() - oldLength)
+                                          : sound->getEnd()));
     setLoopTo(newLoopToValue);
 }
 
 void LoopScreen::setLoopTo(int newLoopToValue)
 {
     const auto loopLengthIsFixed = loopLngthFix;
-    const auto soundLengthIsFixed = mpc.screens->get<TrimScreen>()->smplLngthFix;
+    const auto soundLengthIsFixed =
+        mpc.screens->get<TrimScreen>()->smplLngthFix;
     auto sound = sampler->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();
@@ -316,7 +325,8 @@ void LoopScreen::setLength(int newLength)
         return;
     }
 
-    const auto soundLengthIsFixed = mpc.screens->get<TrimScreen>()->smplLngthFix;
+    const auto soundLengthIsFixed =
+        mpc.screens->get<TrimScreen>()->smplLngthFix;
 
     if (newLength < 0)
     {
@@ -401,9 +411,11 @@ void LoopScreen::pressEnter()
             displayEndLength();
             displayWave();
         }
-        else if (focusedFieldName == "endlengthvalue" || focusedFieldName == "end")
+        else if (focusedFieldName == "endlengthvalue" ||
+                 focusedFieldName == "end")
         {
-            if ((endSelected && focusedFieldName == "endlengthvalue") || focusedFieldName == "end")
+            if ((endSelected && focusedFieldName == "endlengthvalue") ||
+                focusedFieldName == "end")
             {
                 if (loopLngthFix && candidate - oldLength < 0)
                 {
@@ -507,7 +519,8 @@ void LoopScreen::displayEndLengthValue()
 
     auto sound = sampler->getSound();
 
-    auto text = std::to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
+    auto text = std::to_string(
+        endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
     findField("endlengthvalue")->setTextPadded(text, " ");
 }
 

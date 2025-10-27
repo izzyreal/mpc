@@ -6,8 +6,7 @@
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-NoteParameters::NoteParameters(const int index)
-    : index(index)
+NoteParameters::NoteParameters(const int index) : index(index)
 {
     decay = 5;
     filterFrequency = 100;
@@ -96,7 +95,8 @@ VoiceOverlapMode NoteParameters::getVoiceOverlapMode()
     return voiceOverlapMode;
 }
 
-void NoteParameters::setVoiceOverlapMode(const VoiceOverlapMode voiceOverlapModeToUse)
+void NoteParameters::setVoiceOverlapMode(
+    const VoiceOverlapMode voiceOverlapModeToUse)
 {
     if (voiceOverlapMode != VoiceOverlapMode::MONO &&
         voiceOverlapMode != VoiceOverlapMode::NOTE_OFF &&

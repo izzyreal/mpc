@@ -11,7 +11,8 @@ namespace mpc::engine
     {
 
     private:
-        static std::shared_ptr<mpc::engine::control::ControlLaw> MPC_FADER_LAW();
+        static std::shared_ptr<mpc::engine::control::ControlLaw>
+        MPC_FADER_LAW();
 
     protected:
         float gain = 0.0f;

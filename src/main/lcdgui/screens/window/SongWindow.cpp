@@ -19,13 +19,15 @@ void SongWindow::open()
     auto defaultSongNameRestLabel = findLabel("default-name-rest");
 
     auto songNameFirstLetterField = findField("song-name-first-letter");
-    auto defaultSongNameFirstLetterField = findField("default-name-first-letter");
+    auto defaultSongNameFirstLetterField =
+        findField("default-name-first-letter");
 
     auto songScreen = mpc.screens->get<SongScreen>();
     auto song = sequencer->getSong(songScreen->activeSongIndex);
 
     songNameFirstLetterField->setText(song->getName().substr(0, 1));
-    defaultSongNameFirstLetterField->setText(songScreen->defaultSongName.substr(0, 1));
+    defaultSongNameFirstLetterField->setText(
+        songScreen->defaultSongName.substr(0, 1));
     songNameRestLabel->setText(song->getName().substr(1));
     defaultSongNameRestLabel->setText(songScreen->defaultSongName.substr(1));
 }
@@ -80,6 +82,7 @@ void SongWindow::openNameScreen()
     }
 
     auto nameScreen = mpc.screens->get<NameScreen>();
-    nameScreen->initialize(initialNameScreenName, 16, enterAction, "song-window");
+    nameScreen->initialize(initialNameScreenName, 16, enterAction,
+                           "song-window");
     mpc.getLayeredScreen()->openScreen<NameScreen>();
 }

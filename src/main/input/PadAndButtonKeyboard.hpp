@@ -6,7 +6,8 @@
 #include "hardware/ComponentId.hpp"
 
 /**
- * This class handles typing a name in the NameScreen via the pads (old mobile phone style).
+ * This class handles typing a name in the NameScreen via the pads (old mobile
+ * phone style).
  */
 
 namespace mpc
@@ -20,7 +21,8 @@ namespace mpc::input
     class PadAndButtonKeyboard
     {
     private:
-        static std::unordered_map<mpc::hardware::ComponentId, std::string> charMap();
+        static std::unordered_map<mpc::hardware::ComponentId, std::string>
+        charMap();
 
         mpc::Mpc &mpc;
 
@@ -28,7 +30,8 @@ namespace mpc::input
 
         std::unordered_map<mpc::hardware::ComponentId, bool> pressedZeroTimes;
 
-        mpc::hardware::ComponentId previousPad = mpc::hardware::ComponentId::NONE;
+        mpc::hardware::ComponentId previousPad =
+            mpc::hardware::ComponentId::NONE;
 
     public:
         PadAndButtonKeyboard(mpc::Mpc &);

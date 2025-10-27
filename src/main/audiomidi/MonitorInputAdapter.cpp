@@ -11,11 +11,14 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::audio::core;
 
 MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc &mpc, AudioProcess *process)
-    : AudioProcessAdapter(process), sampleScreen(mpc.screens->get<SampleScreen>())
+    : AudioProcessAdapter(process),
+      sampleScreen(mpc.screens->get<SampleScreen>())
 {
 }
 
-int32_t MonitorInputAdapter::processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames)
+int32_t
+MonitorInputAdapter::processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+                                  int nFrames)
 {
     const auto ret = process->processAudio(buffer, nFrames);
 

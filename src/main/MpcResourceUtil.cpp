@@ -23,7 +23,8 @@ std::vector<char> get_resource_data_from_mac_os_bundle(const std::string &path)
 #include <string_view>
 CMRC_DECLARE(mpc);
 
-std::vector<char> get_resource_data_from_in_memory_filesystem(const std::string &path)
+std::vector<char>
+get_resource_data_from_in_memory_filesystem(const std::string &path)
 {
     const auto file = cmrc::mpc::get_filesystem().open(path.c_str());
     const auto data = std::string_view(file.begin(), file.size()).data();

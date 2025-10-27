@@ -15,9 +15,7 @@ namespace mpc::lcdgui::screens::window
 
     private:
         std::vector<std::string> trackStatusNames{
-            "REFERENCED TO 1ST SQ",
-            "OFF TRACKS IGNORED",
-            "MERGED ON MIDI CH."};
+            "REFERENCED TO 1ST SQ", "OFF TRACKS IGNORED", "MERGED ON MIDI CH."};
 
         uint8_t toSequenceIndex = 0;
         uint8_t trackStatus = 0;

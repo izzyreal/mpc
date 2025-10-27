@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui
 {
-    class Knob
-        : public Component
+    class Knob : public Component
     {
 
     private:

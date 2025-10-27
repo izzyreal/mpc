@@ -9,10 +9,7 @@
 
 using namespace mpc::lcdgui;
 
-Component::Component(const std::string &nameToUse)
-    : name(nameToUse)
-{
-}
+Component::Component(const std::string &nameToUse) : name(nameToUse) {}
 
 void Component::addReactiveBinding(ReactiveBinding b)
 {
@@ -91,7 +88,8 @@ bool Component::shouldNotDraw(std::vector<std::vector<bool>> *pixels)
     return false;
 }
 
-std::shared_ptr<Parameter> Component::findParameter(const std::string &nameOfParameterToFind)
+std::shared_ptr<Parameter>
+Component::findParameter(const std::string &nameOfParameterToFind)
 {
     for (auto &c : children)
     {
@@ -113,7 +111,8 @@ std::shared_ptr<Parameter> Component::findParameter(const std::string &nameOfPar
     return {};
 }
 
-std::shared_ptr<Label> Component::findLabel(const std::string &nameOfLabelToFind)
+std::shared_ptr<Label>
+Component::findLabel(const std::string &nameOfLabelToFind)
 {
     for (auto &c : children)
     {
@@ -135,7 +134,8 @@ std::shared_ptr<Label> Component::findLabel(const std::string &nameOfLabelToFind
     return {};
 }
 
-std::shared_ptr<Field> Component::findField(const std::string &nameOfFieldToFind)
+std::shared_ptr<Field>
+Component::findField(const std::string &nameOfFieldToFind)
 {
     for (auto &c : children)
     {
@@ -260,7 +260,8 @@ void Component::removeChild(std::shared_ptr<Component> child)
     }
 }
 
-void Component::addChildren(std::vector<std::shared_ptr<Component>> &childrenToAdd)
+void Component::addChildren(
+    std::vector<std::shared_ptr<Component>> &childrenToAdd)
 {
     for (auto &c : childrenToAdd)
     {
@@ -268,7 +269,8 @@ void Component::addChildren(std::vector<std::shared_ptr<Component>> &childrenToA
     }
 }
 
-std::shared_ptr<Component> Component::findChild(const std::string &nameOfChildToFind)
+std::shared_ptr<Component>
+Component::findChild(const std::string &nameOfChildToFind)
 {
     for (auto &c : children)
     {

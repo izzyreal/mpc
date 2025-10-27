@@ -8,8 +8,7 @@ namespace mpc
         namespace event
         {
 
-            class Controller
-                : public ChannelEvent
+            class Controller : public ChannelEvent
             {
 
             public:
@@ -18,8 +17,10 @@ namespace mpc
                 void setControllerType(int t);
                 void setValue(int v);
 
-                Controller(int tick, int channel, int controllerType, int value);
-                Controller(int tick, int delta, int channel, int controllerType, int value);
+                Controller(int tick, int channel, int controllerType,
+                           int value);
+                Controller(int tick, int delta, int channel, int controllerType,
+                           int value);
             };
 
         } // namespace event

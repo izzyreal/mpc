@@ -6,9 +6,8 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class EditVelocityScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::WithTimesAndNotes
+    class EditVelocityScreen : public mpc::lcdgui::ScreenComponent,
+                               public mpc::lcdgui::screens::WithTimesAndNotes
     {
 
     public:
@@ -23,7 +22,8 @@ namespace mpc::lcdgui::screens::window
     private:
         int editType = 0;
         int value = 0;
-        std::vector<std::string> editTypeNames = {"ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL"};
+        std::vector<std::string> editTypeNames = {"ADD VALUE", "SUB VALUE",
+                                                  "MULT VAL%", "SET TO VAL"};
 
     private:
         void setEditType(int i);

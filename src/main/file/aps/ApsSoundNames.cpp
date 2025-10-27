@@ -15,7 +15,9 @@ ApsSoundNames::ApsSoundNames(const std::vector<char> &loadBytes)
 
     while (sound < loadBytes.size() / ApsParser::SOUND_NAME_LENGTH)
     {
-        auto nameBytes = Util::vecCopyOfRange(loadBytes, sound * ApsParser::SOUND_NAME_LENGTH, (sound * ApsParser::SOUND_NAME_LENGTH) + NAME_STRING_LENGTH);
+        auto nameBytes = Util::vecCopyOfRange(
+            loadBytes, sound * ApsParser::SOUND_NAME_LENGTH,
+            (sound * ApsParser::SOUND_NAME_LENGTH) + NAME_STRING_LENGTH);
 
         std::string nameStr;
         for (char c : nameBytes)
@@ -34,13 +36,15 @@ ApsSoundNames::ApsSoundNames(const std::vector<char> &loadBytes)
 
 ApsSoundNames::ApsSoundNames(mpc::sampler::Sampler *sampler)
 {
-    saveBytes = std::vector<char>(sampler->getSoundCount() * ApsParser::SOUND_NAME_LENGTH);
+    saveBytes = std::vector<char>(sampler->getSoundCount() *
+                                  ApsParser::SOUND_NAME_LENGTH);
     for (int i = 0; i < sampler->getSoundCount(); i++)
     {
         int offset = i * ApsParser::SOUND_NAME_LENGTH;
         for (int j = 0; j < NAME_STRING_LENGTH; j++)
         {
-            saveBytes[offset + j] = StrUtil::padRight(sampler->getSound(i)->getName(), " ", NAME_STRING_LENGTH)[j];
+            saveBytes[offset + j] = StrUtil::padRight(
+                sampler->getSound(i)->getName(), " ", NAME_STRING_LENGTH)[j];
         }
 
         saveBytes[offset + NAME_STRING_LENGTH] = ApsParser::NAME_TERMINATOR;

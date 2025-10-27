@@ -18,8 +18,7 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens
 {
 
-    class VmpcMidiScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcMidiScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         VmpcMidiScreen(mpc::Mpc &, int layerIndex);
@@ -34,7 +33,8 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
         bool isLearning();
-        void setLearnCandidate(const bool isNote, const int8_t channelIndex, const int8_t number, const int8_t value);
+        void setLearnCandidate(const bool isNote, const int8_t channelIndex,
+                               const int8_t number, const int8_t value);
         void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand &c);
         std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
         bool hasMappingChanged();
@@ -46,11 +46,15 @@ namespace mpc::lcdgui::screens
         mpc::nvram::MidiControlCommand learnCandidate;
 
         bool learning = false;
-        std::shared_ptr<mpc::nvram::MidiControlPreset> activePreset = std::make_shared<mpc::nvram::MidiControlPreset>();
-        std::shared_ptr<mpc::nvram::MidiControlPreset> uneditedActivePresetCopy = std::make_shared<mpc::nvram::MidiControlPreset>();
+        std::shared_ptr<mpc::nvram::MidiControlPreset> activePreset =
+            std::make_shared<mpc::nvram::MidiControlPreset>();
+        std::shared_ptr<mpc::nvram::MidiControlPreset>
+            uneditedActivePresetCopy =
+                std::make_shared<mpc::nvram::MidiControlPreset>();
 
         std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
-        std::shared_ptr<mpc::nvram::MidiControlPreset> switchToPreset = std::make_shared<mpc::nvram::MidiControlPreset>();
+        std::shared_ptr<mpc::nvram::MidiControlPreset> switchToPreset =
+            std::make_shared<mpc::nvram::MidiControlPreset>();
 
         void setLearning(bool b);
         void acceptLearnCandidate();
@@ -61,6 +65,7 @@ namespace mpc::lcdgui::screens
         friend class mpc::audiomidi::VmpcMidiControlMode;
         friend class mpc::audiomidi::MidiDeviceDetector;
         friend class mpc::audiomidi::AudioMidiServices;
-        friend class mpc::lcdgui::screens::window::VmpcKnownControllerDetectedScreen;
+        friend class mpc::lcdgui::screens::window::
+            VmpcKnownControllerDetectedScreen;
     };
 } // namespace mpc::lcdgui::screens

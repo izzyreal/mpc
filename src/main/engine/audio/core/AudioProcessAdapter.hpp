@@ -3,15 +3,15 @@
 
 namespace mpc::engine::audio::core
 {
-    class AudioProcessAdapter
-        : public AudioProcess
+    class AudioProcessAdapter : public AudioProcess
     {
 
     protected:
         AudioProcess *process;
 
     public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf, int nFrames) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
+                         int nFrames) override;
 
         AudioProcessAdapter(AudioProcess *process);
     };

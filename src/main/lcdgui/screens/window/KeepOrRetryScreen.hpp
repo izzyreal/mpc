@@ -4,9 +4,8 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class KeepOrRetryScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class KeepOrRetryScreen : public mpc::lcdgui::ScreenComponent,
+                              public mpc::lcdgui::screens::OpensNameScreen
     {
 
     public:

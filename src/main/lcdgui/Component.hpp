@@ -79,7 +79,8 @@ namespace mpc::lcdgui
                 auto asT = std::dynamic_pointer_cast<T>(c);
                 if (asT)
                 {
-                    if (nameOfChildToFind.empty() || c->getName() == nameOfChildToFind)
+                    if (nameOfChildToFind.empty() ||
+                        c->getName() == nameOfChildToFind)
                     {
                         return asT;
                     }
@@ -105,7 +106,8 @@ namespace mpc::lcdgui
 
         void removeChild(std::shared_ptr<Component> child);
         void addChildren(std::vector<std::shared_ptr<Component>> &children);
-        std::shared_ptr<Component> findChild(const std::string &nameOfChildToFind);
+        std::shared_ptr<Component>
+        findChild(const std::string &nameOfChildToFind);
         std::shared_ptr<Label> findLabel(const std::string &name);
         std::shared_ptr<Field> findField(const std::string &name);
         std::shared_ptr<Parameter> findParameter(const std::string &name);

@@ -20,16 +20,20 @@ void VmpcRecordJamScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<VmpcDirectToDiskRecorderScreen>();
+            mpc.getLayeredScreen()
+                ->openScreen<VmpcDirectToDiskRecorderScreen>();
             break;
         case 4:
         {
             const auto minutes = 60;
             const auto ams = mpc.getAudioMidiServices();
-            const auto rate = static_cast<int>(ams->getAudioServer()->getSampleRate());
+            const auto rate =
+                static_cast<int>(ams->getAudioServer()->getSampleRate());
             const auto lengthInFrames = rate * 60 * minutes;
-            const auto recordingName = "Jam-" + DirectToDiskSettings::getTimeStamp();
-            const auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, false, rate, recordingName);
+            const auto recordingName =
+                "Jam-" + DirectToDiskSettings::getTimeStamp();
+            const auto settings = std::make_unique<DirectToDiskSettings>(
+                lengthInFrames, false, rate, recordingName);
 
             if (ams->prepareBouncing(settings.get()))
             {

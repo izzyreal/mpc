@@ -10,8 +10,7 @@ namespace mpc::disk
 {
     class MpcFile;
 
-    class StdDisk
-        : public AbstractDisk
+    class StdDisk : public AbstractDisk
     {
 
     public:
@@ -26,7 +25,8 @@ namespace mpc::disk
         std::shared_ptr<MpcFile> getParentDir();
 
     public:
-        std::shared_ptr<MpcFile> newFile(const std::string &newFileName) override;
+        std::shared_ptr<MpcFile>
+        newFile(const std::string &newFileName) override;
         void initFiles() override;
         std::string getDirectoryName() override;
         bool moveBack() override;

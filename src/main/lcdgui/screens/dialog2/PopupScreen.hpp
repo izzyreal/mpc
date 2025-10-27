@@ -5,8 +5,7 @@
 
 namespace mpc::lcdgui::screens::dialog2
 {
-    class PopupScreen
-        : public ScreenComponent
+    class PopupScreen : public ScreenComponent
     {
     public:
         PopupScreen(mpc::Mpc &mpc, int layer);

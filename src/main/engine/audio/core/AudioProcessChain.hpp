@@ -7,8 +7,7 @@
 namespace mpc::engine::audio::core
 {
 
-    class AudioProcessChain
-        : public AudioProcess
+    class AudioProcessChain : public AudioProcess
     {
 
     public:
@@ -19,14 +18,16 @@ namespace mpc::engine::audio::core
         void open() override;
 
     public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+                         int nFrames) override;
 
         void close() override;
 
         virtual std::string getName();
 
     public:
-        virtual std::shared_ptr<AudioProcess> createProcess(std::shared_ptr<AudioControls>)
+        virtual std::shared_ptr<AudioProcess>
+        createProcess(std::shared_ptr<AudioControls>)
         {
             return {};
         }

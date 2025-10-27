@@ -8,8 +8,7 @@ namespace mpc
         namespace event
         {
 
-            class NoteOn
-                : public ChannelEvent
+            class NoteOn : public ChannelEvent
             {
 
             public:
@@ -22,7 +21,8 @@ namespace mpc
                 virtual void setVelocity(int v);
 
                 NoteOn(int tick, int channel, int note, int velocity);
-                NoteOn(int tick, int delta, int channel, int note, int velocity);
+                NoteOn(int tick, int delta, int channel, int note,
+                       int velocity);
             };
 
         } // namespace event

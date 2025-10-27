@@ -29,7 +29,9 @@ namespace mpc::disk
         void saveSounds();
 
     public:
-        SoundSaver(mpc::Mpc &mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds, bool wav);
+        SoundSaver(mpc::Mpc &mpc,
+                   std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds,
+                   bool wav);
         ~SoundSaver();
     };
 } // namespace mpc::disk

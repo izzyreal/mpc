@@ -4,8 +4,7 @@
 namespace mpc::lcdgui
 {
 
-    class Rectangle
-        : public Component
+    class Rectangle : public Component
     {
 
     private:

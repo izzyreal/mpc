@@ -11,8 +11,7 @@ namespace mpc
 
 namespace mpc::lcdgui
 {
-    class EnvGraph
-        : public Component
+    class EnvGraph : public Component
     {
 
     private:

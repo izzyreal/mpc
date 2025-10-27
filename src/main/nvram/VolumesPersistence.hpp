@@ -16,7 +16,8 @@ namespace mpc::nvram
     {
     public:
         static void save(mpc::Mpc &);
-        static std::map<std::string, mpc::disk::MountMode> getPersistedConfigs(mpc::Mpc &);
+        static std::map<std::string, mpc::disk::MountMode>
+        getPersistedConfigs(mpc::Mpc &);
         static std::string getPersistedActiveUUID(mpc::Mpc &);
     };
 } // namespace mpc::nvram

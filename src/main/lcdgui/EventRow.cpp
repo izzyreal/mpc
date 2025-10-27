@@ -30,10 +30,138 @@
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 
-std::vector<std::string> EventRow::controlNames{"BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1", "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON"};
+std::vector<std::string> EventRow::controlNames{"BANK SEL MSB",
+                                                "MOD WHEEL",
+                                                "BREATH CONT",
+                                                "03",
+                                                "FOOT CONTROL",
+                                                "PORTA TIME",
+                                                "DATA ENTRY",
+                                                "MAIN VOLUME",
+                                                "BALANCE",
+                                                "09",
+                                                "PAN",
+                                                "EXPRESSION",
+                                                "EFFECT 1",
+                                                "EFFECT 2",
+                                                "14",
+                                                "15",
+                                                "GEN.PUR. 1",
+                                                "GEN.PUR. 2",
+                                                "GEN.PUR. 3",
+                                                "GEN.PUR. 4",
+                                                "20",
+                                                "21",
+                                                "22",
+                                                "23",
+                                                "24",
+                                                "25",
+                                                "26",
+                                                "27",
+                                                "28",
+                                                "29",
+                                                "30",
+                                                "31",
+                                                "BANK SEL LSB",
+                                                "MOD WHEL LSB",
+                                                "BREATH LSB",
+                                                "35",
+                                                "FOOT CNT LSB",
+                                                "PORT TIME LS",
+                                                "DATA ENT LSB",
+                                                "MAIN VOL LSB",
+                                                "BALANCE LSB",
+                                                "41",
+                                                "PAN LSB",
+                                                "EXPRESS LSB",
+                                                "EFFECT 1 LSB",
+                                                "EFFECT 2 MSB",
+                                                "46",
+                                                "47",
+                                                "GEN.PUR.1 LS",
+                                                "GEN.PUR.2 LS",
+                                                "GEN.PUR.3 LS",
+                                                "GEN.PUR.4 LS",
+                                                "52",
+                                                "53",
+                                                "54",
+                                                "55",
+                                                "56",
+                                                "57",
+                                                "58",
+                                                "59",
+                                                "60",
+                                                "61",
+                                                "62",
+                                                "63",
+                                                "SUSTAIN PDL",
+                                                "PORTA PEDAL",
+                                                "SOSTENUTO",
+                                                "SOFT PEDAL",
+                                                "LEGATO FT SW",
+                                                "HOLD 2",
+                                                "SOUND VARI",
+                                                "TIMBER/HARMO",
+                                                "RELEASE TIME",
+                                                "ATTACK TIME",
+                                                "BRIGHTNESS",
+                                                "SOUND CONT 6",
+                                                "SOUND CONT 7",
+                                                "SOUND CONT 8",
+                                                "SOUND CONT 9",
+                                                "SOUND CONT10",
+                                                "GEN.PUR. 5",
+                                                "GEN.PUR. 6",
+                                                "GEN.PUR. 7",
+                                                "GEN.PUR. 8",
+                                                "PORTA CNTRL",
+                                                "85",
+                                                "86",
+                                                "87",
+                                                "88",
+                                                "89",
+                                                "90",
+                                                "EXT EFF DPTH",
+                                                "TREMOLO DPTH",
+                                                "CHORUS DEPTH",
+                                                " DETUNE DEPTH",
+                                                "PHASER DEPTH",
+                                                "DATA INCRE",
+                                                "DATA DECRE",
+                                                "NRPN LSB",
+                                                "NRPN MSB",
+                                                "RPN LSB",
+                                                "RPN MSB",
+                                                "102",
+                                                "103",
+                                                "104",
+                                                "105",
+                                                "106",
+                                                "107",
+                                                "108",
+                                                "109",
+                                                "110",
+                                                "111",
+                                                "112",
+                                                "113",
+                                                "114",
+                                                "115",
+                                                "116",
+                                                "117",
+                                                "118",
+                                                "119",
+                                                "ALL SND OFF",
+                                                "RESET CONTRL",
+                                                "LOCAL ON/OFF",
+                                                "ALL NOTE OFF",
+                                                "OMNI OFF",
+                                                "OMNI ON",
+                                                "MONO MODE ON",
+                                                "POLY MODE ON"};
 
 EventRow::EventRow(mpc::Mpc &mpc, int rowIndex)
-    : Component("event-row-" + std::to_string(rowIndex)), rowIndex(rowIndex), mpc(mpc)
+    : Component("event-row-" + std::to_string(rowIndex)), rowIndex(rowIndex),
+      mpc(mpc)
 {
     int w1 = 194;
     int h1 = 9;
@@ -45,10 +173,16 @@ EventRow::EventRow(mpc::Mpc &mpc, int rowIndex)
 
     for (int i = 4; i >= 0; i--)
     {
-        auto label = parameters->addChild(std::make_shared<Label>(mpc, letters[i] + std::to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1));
+        auto label = parameters->addChild(std::make_shared<Label>(
+            mpc, letters[i] + std::to_string(rowIndex), drumNoteEventLabels[i],
+            drumNoteEventXPos[i] + 1, rowIndex * 9 + 12,
+            drumNoteEventLabels[i].length() * 6 + 1));
         labels.insert(begin(labels), std::dynamic_pointer_cast<Label>(label));
 
-        auto tf = parameters->addChild(std::make_shared<Field>(mpc, letters[i] + std::to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i]));
+        auto tf = parameters->addChild(std::make_shared<Field>(
+            mpc, letters[i] + std::to_string(rowIndex),
+            drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1,
+            rowIndex * 9 + 12, drumNoteEventSizes[i]));
 
         fields.insert(begin(fields), std::dynamic_pointer_cast<Field>(tf));
     }
@@ -59,7 +193,8 @@ EventRow::EventRow(mpc::Mpc &mpc, int rowIndex)
     w1 = 50;
 
     MRECT horizontalBarRect = MRECT(x1, y1, x1 + w1, y1 + h1);
-    horizontalBar = std::dynamic_pointer_cast<HorizontalBar>(addChild(std::make_shared<HorizontalBar>(horizontalBarRect)));
+    horizontalBar = std::dynamic_pointer_cast<HorizontalBar>(
+        addChild(std::make_shared<HorizontalBar>(horizontalBarRect)));
     horizontalBar->Hide(true);
 
     setColors();
@@ -119,7 +254,8 @@ void EventRow::init()
     else if (std::dynamic_pointer_cast<ChannelPressureEvent>(event.lock()))
     {
         setLabelTexts(channelPressureEventLabels);
-        setSizesAndLocations(channelPressureEventXPos, channelPressureEventSizes);
+        setSizesAndLocations(channelPressureEventXPos,
+                             channelPressureEventSizes);
         setChannelPressureEventValues();
     }
     else if (std::dynamic_pointer_cast<PolyPressureEvent>(event.lock()))
@@ -205,8 +341,11 @@ void EventRow::setPolyPressureEventValues()
         labels[i]->Hide(false);
     }
 
-    fields[0]->setText(StrUtil::padLeft(std::to_string(ppe->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ppe->getNote()] + ")");
-    fields[1]->setText(StrUtil::padLeft(std::to_string(ppe->getAmount()), " ", 3));
+    fields[0]->setText(
+        StrUtil::padLeft(std::to_string(ppe->getNote()), " ", 3) + "(" +
+        mpc::Util::noteNames()[ppe->getNote()] + ")");
+    fields[1]->setText(
+        StrUtil::padLeft(std::to_string(ppe->getAmount()), " ", 3));
 
     horizontalBar->setValue(ppe->getAmount());
     horizontalBar->Hide(false);
@@ -228,7 +367,8 @@ void EventRow::setChannelPressureEventValues()
     auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(event.lock());
     fields[0]->Hide(false);
     labels[0]->Hide(false);
-    fields[0]->setText(StrUtil::padLeft(std::to_string(cpe->getAmount()), " ", 3));
+    fields[0]->setText(
+        StrUtil::padLeft(std::to_string(cpe->getAmount()), " ", 3));
 
     horizontalBar->setValue(cpe->getAmount());
     horizontalBar->Hide(false);
@@ -256,7 +396,8 @@ void EventRow::setControlChangeEventValues()
     }
 
     fields[0]->setText(controlNames[cce->getController()]);
-    fields[1]->setText(StrUtil::padLeft(std::to_string(cce->getAmount()), " ", 3));
+    fields[1]->setText(
+        StrUtil::padLeft(std::to_string(cce->getAmount()), " ", 3));
 
     auto lHorizontalBar = horizontalBar;
     lHorizontalBar->setValue(cce->getAmount());
@@ -278,8 +419,10 @@ void EventRow::setMiscEventValues()
 
     auto parameterValue = 0;
 
-    auto pitchBendEvent = std::dynamic_pointer_cast<PitchBendEvent>(event.lock());
-    auto programChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event.lock());
+    auto pitchBendEvent =
+        std::dynamic_pointer_cast<PitchBendEvent>(event.lock());
+    auto programChangeEvent =
+        std::dynamic_pointer_cast<ProgramChangeEvent>(event.lock());
 
     if (pitchBendEvent != nullptr)
     {
@@ -299,17 +442,21 @@ void EventRow::setMiscEventValues()
         labels[i]->Hide(false);
     }
 
-    fields[0]->setText(StrUtil::padLeft(std::to_string(parameterValue), " ", 3));
+    fields[0]->setText(
+        StrUtil::padLeft(std::to_string(parameterValue), " ", 3));
 
     if (pitchBendEvent)
     {
         if (parameterValue > 0)
         {
-            fields[0]->setText("+" + StrUtil::padLeft(std::to_string(parameterValue), " ", 4));
+            fields[0]->setText(
+                "+" + StrUtil::padLeft(std::to_string(parameterValue), " ", 4));
         }
         else if (parameterValue < 0)
         {
-            fields[0]->setText("-" + StrUtil::padLeft(std::to_string(abs(parameterValue)), " ", 4));
+            fields[0]->setText(
+                "-" +
+                StrUtil::padLeft(std::to_string(abs(parameterValue)), " ", 4));
         }
         else if (parameterValue == 0)
         {
@@ -354,7 +501,8 @@ void EventRow::setMixerEventValues()
     auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
     auto padName = sampler->getPadName(mixerEvent->getPad());
-    fields[1]->setText(std::string(nn == 34 ? "--" : std::to_string(nn)) + "/" + padName);
+    fields[1]->setText(std::string(nn == 34 ? "--" : std::to_string(nn)) + "/" +
+                       padName);
 
     if (mixerEvent->getParameter() == 1)
     {
@@ -366,7 +514,10 @@ void EventRow::setMixerEventValues()
             panning = "R";
         }
 
-        fields[2]->setText(panning + StrUtil::padLeft(std::to_string(abs(mixerEvent->getValue() - 50)), " ", 2));
+        fields[2]->setText(
+            panning +
+            StrUtil::padLeft(std::to_string(abs(mixerEvent->getValue() - 50)),
+                             " ", 2));
 
         if (mixerEvent->getValue() == 50)
         {
@@ -376,7 +527,8 @@ void EventRow::setMixerEventValues()
     else
     {
         labels[2]->setText("L:");
-        fields[2]->setText(StrUtil::padLeft(std::to_string(mixerEvent->getValue()), " ", 3));
+        fields[2]->setText(
+            StrUtil::padLeft(std::to_string(mixerEvent->getValue()), " ", 3));
     }
 
     auto lHorizontalBar = horizontalBar;
@@ -414,8 +566,10 @@ void EventRow::setDrumNoteEventValues()
         if (bus != 0)
         {
             auto sampler = mpc.getSampler();
-            auto program = sampler->getProgram(sampler->getDrumBusProgramIndex(bus));
-            auto padName = sampler->getPadName(program->getPadIndexFromNote(ne->getNote()));
+            auto program =
+                sampler->getProgram(sampler->getDrumBusProgramIndex(bus));
+            auto padName = sampler->getPadName(
+                program->getPadIndexFromNote(ne->getNote()));
             fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);
         }
     }
@@ -444,11 +598,14 @@ void EventRow::setDrumNoteEventValues()
         }
         else if (noteVarValue < 0)
         {
-            fields[2]->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 3));
+            fields[2]->setText(
+                "-" +
+                StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 3));
         }
         else if (noteVarValue > 0)
         {
-            fields[2]->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
+            fields[2]->setText(
+                "+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
         }
     }
     else if (ne->getVariationType() == 1 || ne->getVariationType() == 2)
@@ -460,7 +617,8 @@ void EventRow::setDrumNoteEventValues()
             noteVarValue = 100;
         }
 
-        fields[2]->setText(StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
+        fields[2]->setText(
+            StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
         fields[2]->setSize(3 * 6 + 1, 9);
         fields[2]->setLocation(90 + 6, fields[2]->getY());
     }
@@ -477,11 +635,14 @@ void EventRow::setDrumNoteEventValues()
 
         if (noteVarValue < 0)
         {
-            fields[2]->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 2));
+            fields[2]->setText(
+                "-" +
+                StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 2));
         }
         else if (noteVarValue > 0)
         {
-            fields[2]->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 2));
+            fields[2]->setText(
+                "+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 2));
         }
         else
         {
@@ -489,8 +650,10 @@ void EventRow::setDrumNoteEventValues()
         }
     }
 
-    fields[3]->setText(StrUtil::padLeft(std::to_string(ne->getDuration().value_or(1)), " ", 4));
-    fields[4]->setText(StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));
+    fields[3]->setText(StrUtil::padLeft(
+        std::to_string(ne->getDuration().value_or(1)), " ", 4));
+    fields[4]->setText(
+        StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));
 
     horizontalBar->setValue(ne->getVelocity());
     horizontalBar->Hide(false);
@@ -511,8 +674,10 @@ void EventRow::setMidiNoteEventValues()
         labels[i]->Hide(false);
     }
 
-    fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
-    fields[1]->setText(StrUtil::padLeft(std::to_string(*ne->getDuration()), " ", 4));
+    fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) +
+                       "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
+    fields[1]->setText(
+        StrUtil::padLeft(std::to_string(*ne->getDuration()), " ", 4));
     fields[2]->setText(std::to_string(ne->getVelocity()));
 
     horizontalBar->setValue(ne->getVelocity());
@@ -555,7 +720,8 @@ void EventRow::setLabelTexts(const std::vector<std::string> &labelTexts)
     }
 }
 
-void EventRow::setSizesAndLocations(const std::vector<int> &xPositions, const std::vector<int> &fieldWidths)
+void EventRow::setSizesAndLocations(const std::vector<int> &xPositions,
+                                    const std::vector<int> &fieldWidths)
 {
     for (int i = 0; i < xPositions.size(); i++)
     {
@@ -565,7 +731,8 @@ void EventRow::setSizesAndLocations(const std::vector<int> &xPositions, const st
         auto labelTextLength = label->getText().length();
 
         tf->setSize((fieldWidths[i] * 6) + 1, 9);
-        tf->setLocation(xPositions[i] + (labelTextLength * 6) - 1, 11 + (rowIndex * 9));
+        tf->setLocation(xPositions[i] + (labelTextLength * 6) - 1,
+                        11 + (rowIndex * 9));
 
         label->setSize(labelTextLength * 6, 9);
         label->setLocation(xPositions[i] - 1, 11 + (rowIndex * 9));

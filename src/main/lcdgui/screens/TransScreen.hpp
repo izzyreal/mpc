@@ -14,8 +14,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
 {
-    class TransScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TransScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -15,8 +15,7 @@ namespace mpc::engine::control
 namespace mpc::engine::filter
 {
 
-    class FilterControls
-        : public mpc::engine::control::CompoundControl
+    class FilterControls : public mpc::engine::control::CompoundControl
     {
 
     private:

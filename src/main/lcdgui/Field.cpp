@@ -23,7 +23,8 @@ Field::Field(mpc::Mpc &mpc, const std::string &name, int x, int y, int width)
 {
     if (width == 1)
     {
-        // We use width 0 as an indicator of wanting to be completely invisible, like dummy fields
+        // We use width 0 as an indicator of wanting to be completely invisible,
+        // like dummy fields
         width = 0;
     }
 
@@ -220,7 +221,8 @@ int Field::getActiveSplit()
 
 int Field::getSplitIncrement(bool positive)
 {
-    static const std::vector<int> splitInc{10000000, 1000000, 100000, 10000, 1000, 100, 10, 1};
+    static const std::vector<int> splitInc{10000000, 1000000, 100000, 10000,
+                                           1000,     100,     10,     1};
     return splitInc[activeSplit] * (positive ? 1 : -1);
 }
 
@@ -272,10 +274,12 @@ int Field::enter()
     {
         if (getName() == "tempo")
         {
-            // UTF-8 representation of u8"\u00CB", the special dot in a tempo string
+            // UTF-8 representation of u8"\u00CB", the special dot in a tempo
+            // string
             const std::string toReplace = "\xC3\x8B";
             const size_t pos = text.find(toReplace);
-            value = stoi(std::string(text).replace(pos, toReplace.length(), ""));
+            value =
+                stoi(std::string(text).replace(pos, toReplace.length(), ""));
         }
         else
         {
@@ -306,7 +310,8 @@ void Field::type(int i)
         }
         else
         {
-            // UTF-8 representation of u8"\u00CB", the special dot in a tempo string
+            // UTF-8 representation of u8"\u00CB", the special dot in a tempo
+            // string
             std::string toReplace = "\xC3\x8B";
             size_t pos = textCopy.find(toReplace);
 

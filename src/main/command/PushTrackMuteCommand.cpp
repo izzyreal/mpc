@@ -28,14 +28,19 @@ namespace mpc::command
                 ls->openScreen<SequencerScreen>();
             }
 
-            mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(false);
+            mpc.getHardware()
+                ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
+                ->setEnabled(false);
         }
-        else if (ls->isCurrentScreen<NextSeqScreen, NextSeqPadScreen, SequencerScreen>() &&
+        else if (ls->isCurrentScreen<NextSeqScreen, NextSeqPadScreen,
+                                     SequencerScreen>() &&
                  !mpc.getSequencer()->isRecordingOrOverdubbing())
         {
             Util::initSequence(mpc);
             mpc.getLayeredScreen()->openScreen<TrMuteScreen>();
-            mpc.getHardware()->getLed(hardware::ComponentId::TRACK_MUTE_LED)->setEnabled(true);
+            mpc.getHardware()
+                ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
+                ->setEnabled(true);
         }
     }
 } // namespace mpc::command

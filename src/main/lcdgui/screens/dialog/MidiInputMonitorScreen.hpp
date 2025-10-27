@@ -12,14 +12,14 @@ namespace mpc::lcdgui
 namespace mpc::lcdgui::screens::dialog
 {
 
-    class MidiInputMonitorScreen
-        : public mpc::lcdgui::ScreenComponent
+    class MidiInputMonitorScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:
         std::thread blinkThread;
         void runBlinkThread(std::weak_ptr<mpc::lcdgui::Label> label);
-        static void static_blink(void *args, std::weak_ptr<mpc::lcdgui::Label> label);
+        static void static_blink(void *args,
+                                 std::weak_ptr<mpc::lcdgui::Label> label);
 
     public:
         void initTimer(std::weak_ptr<mpc::lcdgui::Label> label);

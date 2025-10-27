@@ -42,7 +42,8 @@ void LoopToFineScreen::displayLngthField()
         return;
     }
 
-    findField("lngth")->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
+    findField("lngth")->setTextPadded(sound->getEnd() - sound->getLoopTo(),
+                                      " ");
 }
 
 void LoopToFineScreen::displayFineWave()
@@ -55,7 +56,8 @@ void LoopToFineScreen::displayFineWave()
         return;
     }
 
-    findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+    findWave()->setSampleData(sound->getSampleData(), sound->isMono(),
+                              trimScreen->view);
     findWave()->setCenterSamplePos(sound->getLoopTo());
 }
 
@@ -167,7 +169,9 @@ void LoopToFineScreen::pressEnter()
 
 void LoopToFineScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    if (!mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed())
     {
         return;
     }

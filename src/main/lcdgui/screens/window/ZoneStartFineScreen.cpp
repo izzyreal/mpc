@@ -37,20 +37,25 @@ void ZoneStartFineScreen::displayFineWave()
         return;
     }
 
-    findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+    findWave()->setSampleData(sound->getSampleData(), sound->isMono(),
+                              trimScreen->view);
     findWave()->setCenterSamplePos(zoneScreen->getZoneStart(zoneScreen->zone));
 }
 
 void ZoneStartFineScreen::displayStart()
 {
     auto zoneScreen = mpc.screens->get<ZoneScreen>();
-    findField("start")->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
+    findField("start")->setTextPadded(
+        zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayLngthLabel()
 {
     auto zoneScreen = mpc.screens->get<ZoneScreen>();
-    findLabel("lngth")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
+    findLabel("lngth")->setTextPadded(
+        zoneScreen->getZoneEnd(zoneScreen->zone) -
+            zoneScreen->getZoneStart(zoneScreen->zone),
+        " ");
 }
 
 void ZoneStartFineScreen::displayPlayX()
@@ -99,7 +104,9 @@ void ZoneStartFineScreen::turnWheel(int i)
 
     if (focusedFieldName == "start")
     {
-        zoneScreen->setZoneStart(zoneScreen->zone, zoneScreen->getZoneStart(zoneScreen->zone) + soundInc);
+        zoneScreen->setZoneStart(zoneScreen->zone,
+                                 zoneScreen->getZoneStart(zoneScreen->zone) +
+                                     soundInc);
         displayStart();
         displayLngthLabel();
         displayFineWave();
@@ -133,7 +140,9 @@ void ZoneStartFineScreen::pressEnter()
 
 void ZoneStartFineScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    if (!mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed())
     {
         return;
     }

@@ -16,7 +16,8 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc &mpc)
 {
     loadDefaultMapping(mpc);
 
-    const auto lastStatePath = mpc.paths->configPath() / "midicontrolmapping.vmp";
+    const auto lastStatePath =
+        mpc.paths->configPath() / "midicontrolmapping.vmp";
 
     if (fs::exists(lastStatePath))
     {
@@ -28,17 +29,19 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc &mpc)
         }
         catch (const std::exception &e)
         {
-            MLOG("Error while loading NVRAM MIDI control preset: " + std::string(e.what()));
+            MLOG("Error while loading NVRAM MIDI control preset: " +
+                 std::string(e.what()));
             MLOG("The default preset will be loaded instead.");
             loadDefaultMapping(mpc);
         }
     }
 
     {
-        // Temporary hack introduced in v0.5.0.1 (v0.5.0-RC1) to address the fact
-        // that people have persisted the insane default preset that was introduced
-        // by v0.5.0.0 (v0.5.0-RC0). We check if at least 4 of the pad mappings are
-        // bad, and if yes, we load the new and sane default mapping.
+        // Temporary hack introduced in v0.5.0.1 (v0.5.0-RC1) to address the
+        // fact that people have persisted the insane default preset that was
+        // introduced by v0.5.0.0 (v0.5.0-RC0). We check if at least 4 of the
+        // pad mappings are bad, and if yes, we load the new and sane default
+        // mapping.
         int badMappingCounter = 0;
 
         auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
@@ -46,12 +49,14 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc &mpc)
 
         for (auto &r : rows)
         {
-            if (r.getMpcHardwareLabel().length() < 4 || r.getMpcHardwareLabel().substr(0, 4) != "pad-")
+            if (r.getMpcHardwareLabel().length() < 4 ||
+                r.getMpcHardwareLabel().substr(0, 4) != "pad-")
             {
                 continue;
             }
 
-            const bool isBadOldDefault = r.isNote() == false || r.getNumber() == -1;
+            const bool isBadOldDefault =
+                r.isNote() == false || r.getNumber() == -1;
             if (isBadOldDefault)
             {
                 badMappingCounter += 1;
@@ -65,7 +70,8 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc &mpc)
     }
 }
 
-std::shared_ptr<MidiControlPreset> MidiControlPersistence::createDefaultPreset(mpc::Mpc &mpc)
+std::shared_ptr<MidiControlPreset>
+MidiControlPersistence::createDefaultPreset(mpc::Mpc &mpc)
 {
     std::vector<std::string> labels;
 
@@ -92,7 +98,8 @@ std::shared_ptr<MidiControlPreset> MidiControlPersistence::createDefaultPreset(m
 
     for (auto &label : labels)
     {
-        MidiControlCommand command{label, MidiControlCommand::MidiMessageType::NOTE, -1, -1};
+        MidiControlCommand command{
+            label, MidiControlCommand::MidiMessageType::NOTE, -1, -1};
 
         if (label.length() >= 4 && label.substr(0, 4) == "pad-")
         {
@@ -145,12 +152,16 @@ void MidiControlPersistence::saveCurrentState(mpc::Mpc &mpc)
     }
     catch (const std::exception &e)
     {
-        MLOG("Error while saving NVRAM MIDI control preset: " + std::string(e.what()));
-        MLOG("If the error persists, delete " + path.string() + ", if it exists.");
+        MLOG("Error while saving NVRAM MIDI control preset: " +
+             std::string(e.what()));
+        MLOG("If the error persists, delete " + path.string() +
+             ", if it exists.");
     }
 }
 
-void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::path p, std::string name)
+void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc,
+                                                            fs::path p,
+                                                            std::string name)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
 
@@ -188,9 +199,7 @@ void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::p
 }
 
 void MidiControlPersistence::loadFileByNameIntoPreset(
-    mpc::Mpc &mpc,
-    std::string name,
-    std::shared_ptr<MidiControlPreset> preset)
+    mpc::Mpc &mpc, std::string name, std::shared_ptr<MidiControlPreset> preset)
 {
     auto presetsPath = mpc.paths->midiControlPresetsPath();
 
@@ -221,28 +230,35 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc &mpc)
 
     for (auto &e : fs::directory_iterator(presetsPath))
     {
-        if (fs::is_directory(e) || !StrUtil::eqIgnoreCase(e.path().extension().string(), ".vmp"))
+        if (fs::is_directory(e) ||
+            !StrUtil::eqIgnoreCase(e.path().extension().string(), ".vmp"))
         {
             continue;
         }
 
-        auto preset = mpc.midiControlPresets.emplace_back(std::make_shared<MidiControlPreset>());
+        auto preset = mpc.midiControlPresets.emplace_back(
+            std::make_shared<MidiControlPreset>());
         mpc.getDisk()->readMidiControlPreset(e.path(), preset);
         healPreset(mpc, preset);
     }
 }
 
-bool MidiControlPersistence::doesPresetWithNameExist(mpc::Mpc &mpc, std::string name)
+bool MidiControlPersistence::doesPresetWithNameExist(mpc::Mpc &mpc,
+                                                     std::string name)
 {
     auto path_it = fs::directory_iterator(mpc.paths->midiControlPresetsPath());
 
-    return std::any_of(fs::begin(path_it), fs::end(path_it), [name](const fs::directory_entry &e)
+    return std::any_of(fs::begin(path_it), fs::end(path_it),
+                       [name](const fs::directory_entry &e)
                        {
-                           return !fs::is_directory(e) && StrUtil::eqIgnoreCase(e.path().stem().string(), name);
+                           return !fs::is_directory(e) &&
+                                  StrUtil::eqIgnoreCase(
+                                      e.path().stem().string(), name);
                        });
 }
 
-void MidiControlPersistence::healPreset(mpc::Mpc &mpc, std::shared_ptr<MidiControlPreset> preset)
+void MidiControlPersistence::healPreset(
+    mpc::Mpc &mpc, std::shared_ptr<MidiControlPreset> preset)
 {
     const auto defaultPreset = createDefaultPreset(mpc);
     const auto &defaultRows = defaultPreset->rows;

@@ -5,8 +5,7 @@
 
 namespace mpc::lcdgui
 {
-    class Underline
-        : public Component
+    class Underline : public Component
     {
 
     private:

@@ -20,7 +20,8 @@ namespace mpc::engine::audio::core
             return processAudio(buffer, buffer->getSampleCount());
         }
 
-        virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int)
+        virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+                                 int)
         {
             return processAudio(buffer);
         }

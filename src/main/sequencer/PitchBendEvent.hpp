@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class PitchBendEvent
-        : public Event
+    class PitchBendEvent : public Event
     {
 
     private:

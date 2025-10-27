@@ -17,7 +17,8 @@ using namespace mpc::engine;
 ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
 {
     index = loadBytes[INDEX_OFFSET];
-    auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
+    auto nameBytes =
+        Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
 
     name = "";
 
@@ -33,16 +34,21 @@ ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
 
     name = StrUtil::trim(name);
 
-    slider = new ApsSlider(Util::vecCopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
+    slider = new ApsSlider(Util::vecCopyOfRange(loadBytes, SLIDER_OFFSET,
+                                                SLIDER_OFFSET + SLIDER_LENGTH));
 
     for (int i = 0; i < 64; i++)
     {
         int offset = NOTE_PARAMETERS_OFFSET + (i * NOTE_PARAMETERS_LENGTH);
-        noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
+        noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(
+            loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
     }
 
-    mixer = new ApsMixer(Util::vecCopyOfRange(loadBytes, MIXER_OFFSET, MIXER_END));
-    assignTable = new ApsAssignTable(Util::vecCopyOfRange(loadBytes, ASSIGN_TABLE_OFFSET, ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
+    mixer =
+        new ApsMixer(Util::vecCopyOfRange(loadBytes, MIXER_OFFSET, MIXER_END));
+    assignTable = new ApsAssignTable(
+        Util::vecCopyOfRange(loadBytes, ASSIGN_TABLE_OFFSET,
+                             ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
 }
 
 ApsProgram::ApsProgram(mpc::sampler::Program *program, int index)
@@ -66,7 +72,8 @@ ApsProgram::ApsProgram(mpc::sampler::Program *program, int index)
 
     for (int i = 0; i < 64; i++)
     {
-        ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters *>(program->getNoteParameters(i + 35)));
+        ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters *>(
+            program->getNoteParameters(i + 35)));
         byteList.push_back(np.getBytes());
     }
 

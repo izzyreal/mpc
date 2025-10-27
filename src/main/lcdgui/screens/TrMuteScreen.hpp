@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-    class TrMuteScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TrMuteScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -33,7 +33,8 @@ void ChangeTsigScreen::function(int i)
 
             auto barLengths = sequence->getBarLengthsInTicks();
 
-            sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(), timesignature.getDenominator());
+            sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(),
+                                       timesignature.getDenominator());
 
             auto &newBarLengths = sequence->getBarLengthsInTicks();
 
@@ -41,7 +42,8 @@ void ChangeTsigScreen::function(int i)
             {
                 if (barLengths[j] != newBarLengths[j])
                 {
-                    sequencer->move(0); // Only reset sequencer position when a bar length has changed
+                    sequencer->move(0); // Only reset sequencer position when a
+                                        // bar length has changed
                     break;
                 }
             }
@@ -93,8 +95,11 @@ void ChangeTsigScreen::displayNewTsig()
         return;
     }
 
-    auto result = StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +
-                  "/" + StrUtil::padLeft(std::to_string(timesignature.getDenominator()), " ", 2);
+    auto result =
+        StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +
+        "/" +
+        StrUtil::padLeft(std::to_string(timesignature.getDenominator()), " ",
+                         2);
     findField("newtsig")->setText(result);
 }
 

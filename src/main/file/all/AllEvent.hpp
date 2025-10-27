@@ -34,7 +34,9 @@ namespace mpc::file::all
         static int readTick(const std::vector<char> &);
         static void writeTick(std::vector<char> &, int);
 
-        static std::shared_ptr<mpc::sequencer::Event> bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(const std::shared_ptr<mpc::sequencer::Event> &);
+        static std::shared_ptr<mpc::sequencer::Event>
+        bytesToMpcEvent(const std::vector<char> &);
+        static std::vector<char>
+        mpcEventToBytes(const std::shared_ptr<mpc::sequencer::Event> &);
     };
 } // namespace mpc::file::all

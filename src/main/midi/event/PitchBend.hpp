@@ -8,8 +8,7 @@ namespace mpc
         namespace event
         {
 
-            class PitchBend
-                : public ChannelEvent
+            class PitchBend : public ChannelEvent
             {
 
             public:

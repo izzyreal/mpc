@@ -6,9 +6,7 @@
 
 using namespace mpc::lcdgui;
 
-Layer::Layer(int index) : Component("layer " + std::to_string(index))
-{
-}
+Layer::Layer(int index) : Component("layer " + std::to_string(index)) {}
 
 mpc::lcdgui::Background *Layer::getBackground()
 {

@@ -12,8 +12,7 @@ namespace mpc
             namespace meta
             {
 
-                class Marker
-                    : public TextualMetaEvent
+                class Marker : public TextualMetaEvent
                 {
 
                 public:

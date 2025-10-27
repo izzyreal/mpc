@@ -4,7 +4,8 @@
 
 using namespace mpc::midi::event::meta;
 
-Marker::Marker(int tick, int delta, std::string marker) : TextualMetaEvent(tick, delta, MetaEvent::MARKER, marker)
+Marker::Marker(int tick, int delta, std::string marker)
+    : TextualMetaEvent(tick, delta, MetaEvent::MARKER, marker)
 {
 }
 

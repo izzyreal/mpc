@@ -87,28 +87,37 @@ int NextSeqPadScreen::bankOffset()
 
 void NextSeqPadScreen::displayBank()
 {
-    findLabel("bank")->setText(letters[static_cast<int>(mpc.clientEventController->getActiveBank())]);
+    findLabel("bank")->setText(
+        letters[static_cast<int>(mpc.clientEventController->getActiveBank())]);
 }
 
 void NextSeqPadScreen::displaySeqNumbers()
 {
     std::vector<std::string> seqn{"01-16", "17-32", "33-48", "49-64"};
-    findLabel("seqnumbers")->setText(seqn[static_cast<int>(mpc.clientEventController->getActiveBank())]);
+    findLabel("seqnumbers")
+        ->setText(
+            seqn[static_cast<int>(mpc.clientEventController->getActiveBank())]);
 }
 
 void NextSeqPadScreen::displaySq()
 {
-    findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequencer->getActiveSequence()->getName());
+    findField("sq")->setText(
+        StrUtil::padLeft(
+            std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) +
+        "-" + sequencer->getActiveSequence()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(int i)
 {
-    findField(std::to_string(i + 1))->setText(sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
+    findField(std::to_string(i + 1))
+        ->setText(
+            sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
 }
 
 void NextSeqPadScreen::setSeqColor(int i)
 {
-    findField(std::to_string(i + 1))->setInverted(i + bankOffset() == sequencer->getNextSq());
+    findField(std::to_string(i + 1))
+        ->setInverted(i + bankOffset() == sequencer->getNextSq());
 }
 
 void NextSeqPadScreen::displayNow0()

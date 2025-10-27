@@ -20,10 +20,12 @@ int NoteOffEvent::getNote()
     return number;
 }
 
-std::shared_ptr<mpc::engine::midi::ShortMessage> NoteOffEvent::createShortMessage(int channel, int transpose)
+std::shared_ptr<mpc::engine::midi::ShortMessage>
+NoteOffEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ShortMessage>();
-    msg->setMessage(ShortMessage::NOTE_OFF, channel, std::clamp(getNote() + transpose, 0, 127), 0);
+    msg->setMessage(ShortMessage::NOTE_OFF, channel,
+                    std::clamp(getNote() + transpose, 0, 127), 0);
     return msg;
 }
 
@@ -34,7 +36,8 @@ NoteOnEvent::NoteOnEvent(int i, int vel)
     setVelocity(vel);
 }
 
-NoteOnEvent::NoteOnEvent(mpc::engine::midi::ShortMessage *msg) : NoteOnEvent(msg->getData1(), msg->getData2())
+NoteOnEvent::NoteOnEvent(mpc::engine::midi::ShortMessage *msg)
+    : NoteOnEvent(msg->getData1(), msg->getData2())
 {
     assert(msg->getCommand() == ShortMessage::NOTE_ON);
 }
@@ -49,10 +52,12 @@ NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
     setVariationValue(event.variationValue);
 }
 
-std::shared_ptr<mpc::engine::midi::ShortMessage> NoteOnEvent::createShortMessage(int channel, int transpose)
+std::shared_ptr<mpc::engine::midi::ShortMessage>
+NoteOnEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ShortMessage>();
-    msg->setMessage(ShortMessage::NOTE_ON, channel, std::clamp(getNote() + transpose, 0, 127), getVelocity());
+    msg->setMessage(ShortMessage::NOTE_ON, channel,
+                    std::clamp(getNote() + transpose, 0, 127), getVelocity());
     return msg;
 }
 
@@ -106,7 +111,8 @@ NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType()
 
 void NoteOnEvent::incrementVariationType(int amount)
 {
-    variationType = VARIATION_TYPE(std::clamp(int(variationType) + amount, 0, 3));
+    variationType =
+        VARIATION_TYPE(std::clamp(int(variationType) + amount, 0, 3));
     notifyObservers(std::string("step-editor"));
 }
 

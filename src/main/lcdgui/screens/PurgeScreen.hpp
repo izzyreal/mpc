@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens
 {
 
-    class PurgeScreen
-        : public mpc::lcdgui::ScreenComponent
+    class PurgeScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

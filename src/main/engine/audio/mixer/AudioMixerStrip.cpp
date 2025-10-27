@@ -15,7 +15,8 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-AudioMixerStrip::AudioMixerStrip(AudioMixer *mixer, std::shared_ptr<AudioControlsChain> controlsChain)
+AudioMixerStrip::AudioMixerStrip(
+    AudioMixer *mixer, std::shared_ptr<AudioControlsChain> controlsChain)
     : AudioProcessChain(controlsChain)
 {
     silenceCountdown = silenceCount;
@@ -43,7 +44,8 @@ void AudioMixerStrip::setInputProcess(std::shared_ptr<AudioProcess> input)
     }
 }
 
-void AudioMixerStrip::setDirectOutputProcess(std::shared_ptr<AudioProcess> output)
+void AudioMixerStrip::setDirectOutputProcess(
+    std::shared_ptr<AudioProcess> output)
 {
     auto oldOutput = directOutput;
     if (output)
@@ -135,7 +137,8 @@ bool AudioMixerStrip::processBuffer(int nFrames)
     return true;
 }
 
-std::shared_ptr<AudioProcess> AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
+std::shared_ptr<AudioProcess>
+AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
 {
     auto mixControls = dynamic_pointer_cast<MixControls>(controls);
 
@@ -145,7 +148,8 @@ std::shared_ptr<AudioProcess> AudioMixerStrip::createProcess(std::shared_ptr<Aud
         if (mixControls->getName() == mixer->getMainBus()->getName())
         {
             routedStrip = mixer->getMainStrip();
-            return std::make_shared<MainMixProcess>(routedStrip, mixControls, mixer);
+            return std::make_shared<MainMixProcess>(routedStrip, mixControls,
+                                                    mixer);
         }
         else
         {
@@ -157,7 +161,8 @@ std::shared_ptr<AudioProcess> AudioMixerStrip::createProcess(std::shared_ptr<Aud
     return AudioProcessChain::createProcess(controls);
 }
 
-int AudioMixerStrip::mix(mpc::engine::audio::core::AudioBuffer *bufferToMix, vector<float> &gain)
+int AudioMixerStrip::mix(mpc::engine::audio::core::AudioBuffer *bufferToMix,
+                         vector<float> &gain)
 {
     auto doMix = buffer != bufferToMix;
     auto snc = bufferToMix->getChannelCount();

@@ -15,14 +15,17 @@ void SequenceScreen::open()
     auto defaultSequenceNameRestLabel = findLabel("defaultnamerest");
 
     auto sequenceNameFirstLetterField = findField("sequencenamefirstletter");
-    auto defaultSequenceNameFirstLetterField = findField("defaultnamefirstletter");
+    auto defaultSequenceNameFirstLetterField =
+        findField("defaultnamefirstletter");
 
     auto seq = sequencer->getActiveSequence();
 
     sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
-    defaultSequenceNameFirstLetterField->setText(sequencer->getDefaultSequenceName().substr(0, 1));
+    defaultSequenceNameFirstLetterField->setText(
+        sequencer->getDefaultSequenceName().substr(0, 1));
     sequenceNameRestLabel->setText(seq->getName().substr(1));
-    defaultSequenceNameRestLabel->setText(sequencer->getDefaultSequenceName().substr(1));
+    defaultSequenceNameRestLabel->setText(
+        sequencer->getDefaultSequenceName().substr(1));
 }
 
 void SequenceScreen::function(int i)

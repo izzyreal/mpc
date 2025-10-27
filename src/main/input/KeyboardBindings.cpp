@@ -7,7 +7,8 @@ KeyboardBindings::KeyboardBindings()
     initializeDefaults();
 }
 
-std::vector<mpc::input::VmpcKeyCode> KeyboardBindings::lookupComponent(hardware::ComponentId id) const
+std::vector<mpc::input::VmpcKeyCode>
+KeyboardBindings::lookupComponent(hardware::ComponentId id) const
 {
     std::vector<mpc::input::VmpcKeyCode> result;
 
@@ -49,8 +50,10 @@ void KeyboardBindings::initializeDefaults()
     using VmpcKeyCode = VmpcKeyCode;
     using Id = hardware::ComponentId;
 
-    bindings[VmpcKeyCode::VMPC_KEY_ANSI_Minus] = {Id::DATA_WHEEL, Direction::Negative};
-    bindings[VmpcKeyCode::VMPC_KEY_ANSI_Equal] = {Id::DATA_WHEEL, Direction::Positive};
+    bindings[VmpcKeyCode::VMPC_KEY_ANSI_Minus] = {Id::DATA_WHEEL,
+                                                  Direction::Negative};
+    bindings[VmpcKeyCode::VMPC_KEY_ANSI_Equal] = {Id::DATA_WHEEL,
+                                                  Direction::Positive};
 
     // Navigation
     bindings[VmpcKeyCode::VMPC_KEY_LeftArrow] = {Id::CURSOR_LEFT_OR_DIGIT};
@@ -141,7 +144,9 @@ void KeyboardBindings::initializeDefaults()
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_M] = {Id::PAD_11_OR_UV};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_Comma] = {Id::PAD_12_OR_WX};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_G] = {Id::PAD_13_OR_YZ};
-    bindings[VmpcKeyCode::VMPC_KEY_ANSI_H] = {Id::PAD_14_OR_AMPERSAND_OCTOTHORPE};
-    bindings[VmpcKeyCode::VMPC_KEY_ANSI_J] = {Id::PAD_15_OR_HYPHEN_EXCLAMATION_MARK};
+    bindings[VmpcKeyCode::VMPC_KEY_ANSI_H] = {
+        Id::PAD_14_OR_AMPERSAND_OCTOTHORPE};
+    bindings[VmpcKeyCode::VMPC_KEY_ANSI_J] = {
+        Id::PAD_15_OR_HYPHEN_EXCLAMATION_MARK};
     bindings[VmpcKeyCode::VMPC_KEY_ANSI_K] = {Id::PAD_16_OR_PARENTHESES};
 }

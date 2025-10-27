@@ -86,7 +86,8 @@ void TrMuteScreen::turnWheel(int i)
             oldSequence->getTrack(trackIndex)->deleteObserver(this);
         }
 
-        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
+        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
+                                          i);
         auto newSequence = sequencer->getActiveSequence();
 
         for (int trackIndex = 0; trackIndex < 64; trackIndex++)
@@ -121,45 +122,57 @@ void TrMuteScreen::function(int i)
 
 int TrMuteScreen::bankoffset()
 {
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     return bank * 16;
 }
 
 void TrMuteScreen::displayBank()
 {
     std::vector<std::string> letters{"A", "B", "C", "D"};
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     findLabel("bank")->setText(letters[bank]);
 }
 
 void TrMuteScreen::displayTrackNumbers()
 {
     std::vector<std::string> trn{"01-16", "17-32", "33-48", "49-64"};
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     findLabel("tracknumbers")->setText(trn[bank]);
 }
 
 void TrMuteScreen::displaySq()
 {
-    auto sequenceNumber = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
+    auto sequenceNumber = StrUtil::padLeft(
+        std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
     auto sequenceName = sequencer->getActiveSequence()->getName();
     findField("sq")->setText(sequenceNumber + "-" + sequenceName);
 }
 
 void TrMuteScreen::displayTrack(int i)
 {
-    findField(std::to_string(i + 1))->setText(sequencer->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
+    findField(std::to_string(i + 1))
+        ->setText(sequencer->getActiveSequence()
+                      ->getTrack(i + bankoffset())
+                      ->getName()
+                      .substr(0, 8));
 }
 
 void TrMuteScreen::setTrackColor(int i)
 {
     if (sequencer->isSoloEnabled())
     {
-        findField(std::to_string(i + 1))->setInverted(i + bankoffset() == sequencer->getActiveTrackIndex());
+        findField(std::to_string(i + 1))
+            ->setInverted(i + bankoffset() == sequencer->getActiveTrackIndex());
     }
     else
     {
-        findField(std::to_string(i + 1))->setInverted(sequencer->getActiveSequence()->getTrack(i + bankoffset())->isOn());
+        findField(std::to_string(i + 1))
+            ->setInverted(sequencer->getActiveSequence()
+                              ->getTrack(i + bankoffset())
+                              ->isOn());
     }
 }
 

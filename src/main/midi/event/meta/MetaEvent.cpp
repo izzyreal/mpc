@@ -38,7 +38,8 @@ void MetaEvent::writeToOutputStream(std::ostream &out)
     out << (char)mType;
 }
 
-std::shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, std::stringstream &in)
+std::shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta,
+                                                     std::stringstream &in)
 {
     auto eventData = MetaEventData(in);
     auto isText = false;
@@ -90,9 +91,11 @@ std::shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, std::s
             case CUE_POINT:
                 return std::make_shared<CuePoint>(tick, delta, text);
             case SEQUENCER_SPECIFIC:
-                return std::make_shared<SequencerSpecificEvent>(tick, delta, eventData.data);
+                return std::make_shared<SequencerSpecificEvent>(tick, delta,
+                                                                eventData.data);
             default:
-                return std::make_shared<GenericMetaEvent>(tick, delta, &eventData);
+                return std::make_shared<GenericMetaEvent>(tick, delta,
+                                                          &eventData);
         }
     }
 
@@ -101,7 +104,8 @@ std::shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, std::s
         case SEQUENCE_NUMBER:
             return SequenceNumber::parseSequenceNumber(tick, delta, &eventData);
         case MIDI_CHANNEL_PREFIX:
-            return MidiChannelPrefix::parseMidiChannelPrefix(tick, delta, &eventData);
+            return MidiChannelPrefix::parseMidiChannelPrefix(tick, delta,
+                                                             &eventData);
         case END_OF_TRACK:
             return std::make_shared<EndOfTrack>(tick, delta);
         case TEMPO:

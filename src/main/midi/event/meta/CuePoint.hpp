@@ -10,8 +10,7 @@ namespace mpc
             namespace meta
             {
 
-                class CuePoint
-                    : public TextualMetaEvent
+                class CuePoint : public TextualMetaEvent
                 {
 
                 public:

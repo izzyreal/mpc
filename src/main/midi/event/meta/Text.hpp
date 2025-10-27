@@ -4,8 +4,7 @@
 namespace mpc::midi::event::meta
 {
 
-    class Text
-        : public TextualMetaEvent
+    class Text : public TextualMetaEvent
     {
 
     public:

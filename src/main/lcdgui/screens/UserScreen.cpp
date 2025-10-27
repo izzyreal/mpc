@@ -39,7 +39,8 @@ void UserScreen::function(int i)
         {
             auto eventsScreen = mpc.screens->get<EventsScreen>();
             eventsScreen->tab = i;
-            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            mpc.getLayeredScreen()->openScreen(
+                eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
     }
@@ -153,7 +154,8 @@ void UserScreen::displayDeviceNumber()
 
     if (device >= 17)
     {
-        findField("device")->setTextPadded(std::to_string(device - 16) + "B", " ");
+        findField("device")->setTextPadded(std::to_string(device - 16) + "B",
+                                           " ");
     }
     else
     {
@@ -184,7 +186,9 @@ void UserScreen::displayDeviceName()
     {
         if (device == 0)
         {
-            auto programName = sampler->getProgram(mpc.getDrum(bus - 1).getProgram())->getName();
+            auto programName =
+                sampler->getProgram(mpc.getDrum(bus - 1).getProgram())
+                    ->getName();
             findLabel("devicename")->setText(programName);
         }
         else
@@ -209,7 +213,8 @@ void UserScreen::resetPreferences()
 
     for (int i = 0; i < 64; i++)
     {
-        trackNames.push_back(std::string("Track-" + StrUtil::padLeft(std::to_string((int)(i + 1)), "0", 2)));
+        trackNames.push_back(std::string(
+            "Track-" + StrUtil::padLeft(std::to_string((int)(i + 1)), "0", 2)));
     }
 
     lastBar = 1;
@@ -222,7 +227,8 @@ void UserScreen::resetPreferences()
 
     for (int i = 1; i < 33; i++)
     {
-        deviceNames.push_back("Device" + StrUtil::padLeft(std::to_string(i), "0", 2));
+        deviceNames.push_back("Device" +
+                              StrUtil::padLeft(std::to_string(i), "0", 2));
     }
 }
 

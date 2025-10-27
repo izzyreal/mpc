@@ -67,7 +67,8 @@ std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc &mpc)
     return "";
 }
 
-std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs(mpc::Mpc &mpc)
+std::map<std::string, MountMode>
+VolumesPersistence::getPersistedConfigs(mpc::Mpc &mpc)
 {
     std::map<std::string, MountMode> persistedConfigs;
 
@@ -103,7 +104,9 @@ void VolumesPersistence::save(mpc::Mpc &mpc)
     for (const auto &disk : disks)
     {
         const auto &diskVol = disk->getVolume();
-        bool alreadyPersisted = std::find(begin(alreadyPersistedUUIDs), end(alreadyPersistedUUIDs), diskVol.volumeUUID) != end(alreadyPersistedUUIDs);
+        bool alreadyPersisted =
+            std::find(begin(alreadyPersistedUUIDs), end(alreadyPersistedUUIDs),
+                      diskVol.volumeUUID) != end(alreadyPersistedUUIDs);
 
         if (alreadyPersisted)
         {
@@ -119,10 +122,9 @@ void VolumesPersistence::save(mpc::Mpc &mpc)
         }
         else
         {
-            json volume = {
-                {"uuid", diskVol.volumeUUID},
-                {"mode", diskVol.mode},
-                {"active", diskVol.volumeUUID == activeUUID}};
+            json volume = {{"uuid", diskVol.volumeUUID},
+                           {"mode", diskVol.mode},
+                           {"active", diskVol.volumeUUID == activeUUID}};
             volumes.push_back(volume);
         }
     }

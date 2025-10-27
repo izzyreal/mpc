@@ -40,7 +40,8 @@ MidiInput::MidiInput(const std::vector<char> &b)
         const auto currentCcPassEnabled = b[CC_PASS_ENABLED_OFFSET + i];
         for (int j = 0; j < 8; j++)
         {
-            ccPassEnabled[ccPassEnabledCounter++] = BitUtil::isBitOn(currentCcPassEnabled, j);
+            ccPassEnabled[ccPassEnabledCounter++] =
+                BitUtil::isBitOn(currentCcPassEnabled, j);
         }
     }
 }
@@ -51,26 +52,39 @@ MidiInput::MidiInput(mpc::Mpc &mpc)
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
 
-    saveBytes[SOFT_THRU_MODE_OFFSET] = mpc.screens->get<MidiOutputScreen>()->getSoftThru();
-    saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh() + 1);
-    saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
-    saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
-    saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(midiInputScreen->getType());
-    saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(mpc.getSequencer()->isRecordingModeMulti() ? 1 : 0);
+    saveBytes[SOFT_THRU_MODE_OFFSET] =
+        mpc.screens->get<MidiOutputScreen>()->getSoftThru();
+    saveBytes[RECEIVE_CH_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->getReceiveCh() + 1);
+    saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(
+        midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
+    saveBytes[FILTER_ENABLED_OFFSET] =
+        static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
+    saveBytes[FILTER_TYPE_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->getType());
+    saveBytes[MULTI_REC_ENABLED_OFFSET] =
+        static_cast<int8_t>(mpc.getSequencer()->isRecordingModeMulti() ? 1 : 0);
 
     auto screen = mpc.screens->get<MultiRecordingSetupScreen>();
 
     for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
     {
-        saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] = static_cast<int8_t>(screen->getMrsLines()[i]->getTrack() + 1);
+        saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] =
+            static_cast<int8_t>(screen->getMrsLines()[i]->getTrack() + 1);
     }
 
-    saveBytes[NOTE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isNotePassEnabled() ? 1 : 0);
-    saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isPitchBendPassEnabled() ? 1 : 0);
-    saveBytes[PGM_CHANGE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isPgmChangePassEnabled() ? 1 : 0);
-    saveBytes[CH_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isChPressurePassEnabled() ? 1 : 0);
-    saveBytes[POLY_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isPolyPressurePassEnabled() ? 1 : 0);
-    saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(midiInputScreen->isExclusivePassEnabled() ? 1 : 0);
+    saveBytes[NOTE_PASS_ENABLED_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->isNotePassEnabled() ? 1 : 0);
+    saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->isPitchBendPassEnabled() ? 1 : 0);
+    saveBytes[PGM_CHANGE_PASS_ENABLED_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->isPgmChangePassEnabled() ? 1 : 0);
+    saveBytes[CH_PRESSURE_PASS_ENABLED_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->isChPressurePassEnabled() ? 1 : 0);
+    saveBytes[POLY_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(
+        midiInputScreen->isPolyPressurePassEnabled() ? 1 : 0);
+    saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] =
+        static_cast<int8_t>(midiInputScreen->isExclusivePassEnabled() ? 1 : 0);
 
     for (int i = 0; i < 16; i++)
     {
@@ -78,9 +92,11 @@ MidiInput::MidiInput(mpc::Mpc &mpc)
 
         for (int j = 0; j < 8; j++)
         {
-            const bool currentCcPassEnabled = midiInputScreen->getCcPassEnabled()[(i * 8) + j];
+            const bool currentCcPassEnabled =
+                midiInputScreen->getCcPassEnabled()[(i * 8) + j];
 
-            currentCcPassByte = BitUtil::setBit(currentCcPassByte, j, currentCcPassEnabled);
+            currentCcPassByte =
+                BitUtil::setBit(currentCcPassByte, j, currentCcPassEnabled);
         }
 
         saveBytes[CC_PASS_ENABLED_OFFSET + i] = currentCcPassByte;

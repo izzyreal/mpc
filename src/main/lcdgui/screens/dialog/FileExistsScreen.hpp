@@ -10,8 +10,7 @@ namespace mpc::sampler
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class FileExistsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class FileExistsScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         FileExistsScreen(mpc::Mpc &mpc, const int layerIndex);

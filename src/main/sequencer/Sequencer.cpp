@@ -37,7 +37,8 @@ using namespace mpc::sequencer;
 
 uint32_t Sequencer::quarterNotesToTicks(const double quarterNotes)
 {
-    return static_cast<uint32_t>(std::floor(quarterNotes * (double)TICKS_PER_QUARTER_NOTE));
+    return static_cast<uint32_t>(
+        std::floor(quarterNotes * (double)TICKS_PER_QUARTER_NOTE));
 }
 
 double Sequencer::ticksToQuarterNotes(const uint32_t ticks)
@@ -47,11 +48,12 @@ double Sequencer::ticksToQuarterNotes(const uint32_t ticks)
 
 uint64_t currentTimeMillis()
 {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+        .count();
 }
 
-Sequencer::Sequencer(mpc::Mpc &mpc)
-    : mpc(mpc)
+Sequencer::Sequencer(mpc::Mpc &mpc) : mpc(mpc)
 {
     noteEventStore.reserve(NOTE_EVENT_STORE_CAPACITY);
 }
@@ -117,7 +119,8 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 
 void Sequencer::playToTick(int targetTick)
 {
-    auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
+    auto seqIndex =
+        songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
     auto seq = sequences[seqIndex].get();
     auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
 
@@ -125,7 +128,10 @@ void Sequencer::playToTick(int targetTick)
     {
         if (i == 1)
         {
-            if (!secondSequenceEnabled || metronomeOnly || secondSequenceScreen->sq == seqIndex) // Real 2KXL would play all events twice for the last clause
+            if (!secondSequenceEnabled || metronomeOnly ||
+                secondSequenceScreen->sq ==
+                    seqIndex) // Real 2KXL would play all events twice for the
+                              // last clause
             {
                 break;
             }
@@ -234,9 +240,11 @@ double Sequencer::getTempo()
 
     if (tempoSourceSequenceEnabled)
     {
-        auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>();
+        auto ignoreTempoChangeScreen =
+            mpc.screens->get<IgnoreTempoChangeScreen>();
 
-        if (seq->isTempoChangeOn() || (songMode && !ignoreTempoChangeScreen->ignore))
+        if (seq->isTempoChangeOn() ||
+            (songMode && !ignoreTempoChangeScreen->ignore))
         {
             if (tce)
             {
@@ -334,7 +342,11 @@ void Sequencer::setSoloEnabled(bool b)
             {
                 for (auto &voice : voices)
                 {
-                    if (!voice->isFinished() && voice->getNote() == note && voice->getVoiceOverlapMode() == sampler::VoiceOverlapMode::NOTE_OFF && !voice->isDecaying() && drumIndex == voice->getMuteInfo().getDrum())
+                    if (!voice->isFinished() && voice->getNote() == note &&
+                        voice->getVoiceOverlapMode() ==
+                            sampler::VoiceOverlapMode::NOTE_OFF &&
+                        !voice->isDecaying() &&
+                        drumIndex == voice->getMuteInfo().getDrum())
                     {
                         voice->startDecay();
                         break;
@@ -508,7 +520,8 @@ void Sequencer::play(bool fromStart)
     auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>();
     auto countInMode = countMetronomeScreen->getCountInMode();
 
-    if (!countEnabled || countInMode == 0 || (countInMode == 1 && !isRecordingOrOverdubbing()))
+    if (!countEnabled || countInMode == 0 ||
+        (countInMode == 1 && !isRecordingOrOverdubbing()))
     {
         if (fromStart)
         {
@@ -520,7 +533,8 @@ void Sequencer::play(bool fromStart)
 
     if (countEnabled && !songMode)
     {
-        if (countInMode == 2 || (countInMode == 1 && (isRecordingOrOverdubbing())))
+        if (countInMode == 2 ||
+            (countInMode == 1 && (isRecordingOrOverdubbing())))
         {
             if (fromStart)
             {
@@ -528,7 +542,8 @@ void Sequencer::play(bool fromStart)
             }
             else
             {
-                move(ticksToQuarterNotes(s->getFirstTickOfBar(getCurrentBarIndex())));
+                move(ticksToQuarterNotes(
+                    s->getFirstTickOfBar(getCurrentBarIndex())));
             }
 
             countInStartPos = quarterNotesToTicks(positionQuarterNotes);
@@ -554,7 +569,9 @@ void Sequencer::play(bool fromStart)
             auto copy = copySequence(s);
             undoPlaceHolder.swap(copy);
             undoSeqAvailable = true;
-            mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(true);
+            mpc.getHardware()
+                ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+                ->setEnabled(true);
         }
     }
 
@@ -590,13 +607,17 @@ void Sequencer::undoSeq()
 
     sequences[activeSequenceIndex].swap(s);
 
-    sequences[activeSequenceIndex]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    sequences[activeSequenceIndex]->resetTrackEventIndices(
+        quarterNotesToTicks(positionQuarterNotes));
 
     undoSeqAvailable = !undoSeqAvailable;
 
-    mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(undoSeqAvailable);
+    mpc.getHardware()
+        ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+        ->setEnabled(undoSeqAvailable);
 
-    setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
+    setActiveSequenceIndex(
+        getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
 
 void Sequencer::playFromStart()
@@ -711,7 +732,10 @@ void Sequencer::stop(const StopMode stopMode)
         pos = s1->getLastTick();
     }
 
-    const int frameOffset = stopMode == AT_START_OF_BUFFER ? 0 : ams->getFrameSequencer()->getEventFrameOffset();
+    const int frameOffset =
+        stopMode == AT_START_OF_BUFFER
+            ? 0
+            : ams->getFrameSequencer()->getEventFrameOffset();
 
     ams->getFrameSequencer()->stop();
 
@@ -722,8 +746,8 @@ void Sequencer::stop(const StopMode stopMode)
         notifynextsq = true;
         nextSq = -1;
 
-        // This is called from the audio thread, should be called from the UI thread instead.
-        // stop() is called by FrameSeq.
+        // This is called from the audio thread, should be called from the UI
+        // thread instead. stop() is called by FrameSeq.
         mpc.getLayeredScreen()->setFocus("sq");
     }
 
@@ -763,7 +787,8 @@ void Sequencer::stop(const StopMode stopMode)
         songScreen->setOffset(songScreen->getOffset() + 1);
     }
 
-    auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
+    auto vmpcDirectToDiskRecorderScreen =
+        mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
     if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
     {
@@ -810,7 +835,8 @@ void Sequencer::notifyTrack()
 void Sequencer::setSequence(int i, std::shared_ptr<Sequence> s)
 {
     sequences[i].swap(s);
-    sequences[i]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    sequences[i]->resetTrackEventIndices(
+        quarterNotesToTicks(positionQuarterNotes));
 }
 
 void Sequencer::purgeAllSequences()
@@ -826,7 +852,8 @@ void Sequencer::purgeAllSequences()
 void Sequencer::purgeSequence(int i)
 {
     sequences[i] = std::make_shared<Sequence>(mpc);
-    sequences[i]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    sequences[i]->resetTrackEventIndices(
+        quarterNotesToTicks(positionQuarterNotes));
     std::string res = defaultSequenceName;
     res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
     sequences[i]->setName(res);
@@ -836,7 +863,8 @@ void Sequencer::copySequence(int source, int destination)
 {
     auto copy = copySequence(sequences[source]);
     sequences[destination].swap(copy);
-    sequences[destination]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    sequences[destination]->resetTrackEventIndices(
+        quarterNotesToTicks(positionQuarterNotes));
     sequences[destination]->initLoop();
 }
 
@@ -845,7 +873,8 @@ void Sequencer::copySequenceParameters(const int source, const int dest)
     copySequenceParameters(sequences[source], sequences[dest]);
 }
 
-std::shared_ptr<Sequence> Sequencer::copySequence(std::shared_ptr<Sequence> source)
+std::shared_ptr<Sequence>
+Sequencer::copySequence(std::shared_ptr<Sequence> source)
 {
     auto copy = std::make_shared<Sequence>(mpc);
     copy->init(source->getLastBarIndex());
@@ -866,7 +895,8 @@ std::shared_ptr<Sequence> Sequencer::copySequence(std::shared_ptr<Sequence> sour
     return copy;
 }
 
-void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source, std::shared_ptr<Sequence> dest)
+void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source,
+                                       std::shared_ptr<Sequence> dest)
 {
     dest->setName(source->getName());
     dest->setLoopEnabled(source->isLoopEnabled());
@@ -874,13 +904,15 @@ void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source, std::sh
     dest->setDeviceNames(source->getDeviceNames());
     dest->setInitialTempo(source->getInitialTempo());
     dest->setBarLengths(source->getBarLengthsInTicks());
-    dest->setNumeratorsAndDenominators(source->getNumerators(), source->getDenominators());
+    dest->setNumeratorsAndDenominators(source->getNumerators(),
+                                       source->getDenominators());
     dest->setLoopStart(source->getLoopStart());
     dest->setLoopEnd(source->getLoopEnd());
     copyTempoChangeEvents(source, dest);
 }
 
-void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst)
+void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src,
+                                      std::shared_ptr<Sequence> dst)
 {
     for (auto &e1 : src->getTempoChangeEvents())
     {
@@ -889,15 +921,18 @@ void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared
     }
 }
 
-void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex)
+void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex,
+                          int sourceSequenceIndex, int destinationSequenceIndex)
 {
-    if (sourceSequenceIndex == destinationSequenceIndex && sourceTrackIndex == destinationTrackIndex)
+    if (sourceSequenceIndex == destinationSequenceIndex &&
+        sourceTrackIndex == destinationTrackIndex)
     {
         return;
     }
 
     auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
-    auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex);
+    auto dest =
+        sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex);
     copyTrack(src, dest);
 }
 
@@ -935,7 +970,8 @@ void Sequencer::copySong(const int source, const int dest)
     s1->setLoopEnabled(s0->isLoopEnabled());
 }
 
-void Sequencer::copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest)
+void Sequencer::copyTrack(std::shared_ptr<Track> src,
+                          std::shared_ptr<Track> dest)
 {
     if (src == dest)
     {
@@ -952,7 +988,8 @@ void Sequencer::copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> des
     copyTrackParameters(src, dest);
 }
 
-void Sequencer::copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest)
+void Sequencer::copyTrackParameters(std::shared_ptr<Track> source,
+                                    std::shared_ptr<Track> dest)
 {
     dest->setUsed(source->isUsed());
     dest->setOn(source->isOn());
@@ -1063,7 +1100,8 @@ int Sequencer::getCurrentBeatIndex()
 
 int Sequencer::getCurrentClockNumber()
 {
-    auto sequence = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
+    auto sequence =
+        isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 
     auto clock = getTickPosition();
 
@@ -1259,9 +1297,11 @@ std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
     auto songScreen = mpc.screens->get<SongScreen>();
 
-    if (songMode && songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
+    if (songMode &&
+        songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
     {
-        return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex() : activeSequenceIndex];
+        return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
+                                                     : activeSequenceIndex];
     }
 
     return sequences[activeSequenceIndex];
@@ -1385,7 +1425,9 @@ void Sequencer::goToPreviousStep()
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = getTickPosition();
-    const auto stepCount = static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) + 1;
+    const auto stepCount =
+        static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) +
+        1;
     std::vector<int> stepGrid(stepCount);
 
     for (int i = 0; i < stepGrid.size(); i++)
@@ -1422,7 +1464,8 @@ void Sequencer::goToNextStep()
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = getTickPosition();
 
-    std::vector<int> stepGrid(ceil(getActiveSequence()->getLastTick() / stepSize));
+    std::vector<int> stepGrid(
+        ceil(getActiveSequence()->getLastTick() / stepSize));
 
     for (int i = 0; i < stepGrid.size(); i++)
     {
@@ -1531,9 +1574,12 @@ void Sequencer::setPosition(const double positionQuarterNotesToUse)
         return;
     }
 
-    const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() : (songMode ? sequences[songSequenceIndex] : getActiveSequence());
+    const auto sequence = isPlaying() ? getCurrentlyPlayingSequence()
+                                      : (songMode ? sequences[songSequenceIndex]
+                                                  : getActiveSequence());
 
-    const auto seqLengthQuarterNotes = ticksToQuarterNotes(sequence->getLastTick());
+    const auto seqLengthQuarterNotes =
+        ticksToQuarterNotes(sequence->getLastTick());
 
     if (wrappedNewPosition < 0 || wrappedNewPosition > seqLengthQuarterNotes)
     {
@@ -1570,7 +1616,8 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
 
         if (sequence->isUsed())
         {
-            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+            stepEndTick = stepStartTick +
+                          (sequence->getLastTick() * step.lock()->getRepeats());
         }
 
         songEndTick = stepEndTick;
@@ -1602,21 +1649,28 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
 
         if (sequence->isUsed())
         {
-            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+            stepEndTick = stepStartTick +
+                          (sequence->getLastTick() * step.lock()->getRepeats());
         }
 
-        const auto stepStartPositionQuarterNotes = ticksToQuarterNotes(stepStartTick);
-        const auto stepEndPositionQuarterNotes = ticksToQuarterNotes(stepEndTick);
+        const auto stepStartPositionQuarterNotes =
+            ticksToQuarterNotes(stepStartTick);
+        const auto stepEndPositionQuarterNotes =
+            ticksToQuarterNotes(stepEndTick);
 
         if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
             wrappedNewPosition < stepEndPositionQuarterNotes)
         {
             songScreen->setOffset(stepIndex - 1);
 
-            const auto offsetWithinStepQuarterNotes = wrappedNewPosition - stepStartPositionQuarterNotes;
-            const auto offsetWithinStepTicks = quarterNotesToTicks(offsetWithinStepQuarterNotes);
+            const auto offsetWithinStepQuarterNotes =
+                wrappedNewPosition - stepStartPositionQuarterNotes;
+            const auto offsetWithinStepTicks =
+                quarterNotesToTicks(offsetWithinStepQuarterNotes);
 
-            const double finalPosQuarterNotes = fmod(offsetWithinStepQuarterNotes, ticksToQuarterNotes(sequence->getLastTick()));
+            const double finalPosQuarterNotes =
+                fmod(offsetWithinStepQuarterNotes,
+                     ticksToQuarterNotes(sequence->getLastTick()));
 
             if (finalPosQuarterNotes == positionQuarterNotes)
             {
@@ -1653,7 +1707,8 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 
         if (sequence->isUsed())
         {
-            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+            stepEndTick = stepStartTick +
+                          (sequence->getLastTick() * step.lock()->getRepeats());
         }
 
         songEndTick = stepEndTick;
@@ -1685,24 +1740,33 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 
         if (sequence->isUsed())
         {
-            stepEndTick = stepStartTick + (sequence->getLastTick() * step.lock()->getRepeats());
+            stepEndTick = stepStartTick +
+                          (sequence->getLastTick() * step.lock()->getRepeats());
         }
 
-        const auto stepStartPositionQuarterNotes = ticksToQuarterNotes(stepStartTick);
-        const auto stepEndPositionQuarterNotes = ticksToQuarterNotes(stepEndTick);
+        const auto stepStartPositionQuarterNotes =
+            ticksToQuarterNotes(stepStartTick);
+        const auto stepEndPositionQuarterNotes =
+            ticksToQuarterNotes(stepEndTick);
 
         if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
             wrappedNewPosition < stepEndPositionQuarterNotes)
         {
             songScreen->setOffset(stepIndex - 1);
 
-            const auto offsetWithinStepQuarterNotes = wrappedNewPosition - stepStartPositionQuarterNotes;
-            const auto offsetWithinStepTicks = quarterNotesToTicks(offsetWithinStepQuarterNotes);
+            const auto offsetWithinStepQuarterNotes =
+                wrappedNewPosition - stepStartPositionQuarterNotes;
+            const auto offsetWithinStepTicks =
+                quarterNotesToTicks(offsetWithinStepQuarterNotes);
 
-            playedStepRepetitions = std::floor(offsetWithinStepTicks / (float)sequence->getLastTick());
-            sequence->resetTrackEventIndices(offsetWithinStepTicks % sequence->getLastTick());
+            playedStepRepetitions = std::floor(offsetWithinStepTicks /
+                                               (float)sequence->getLastTick());
+            sequence->resetTrackEventIndices(offsetWithinStepTicks %
+                                             sequence->getLastTick());
 
-            const double finalPosQuarterNotes = fmod(offsetWithinStepQuarterNotes, ticksToQuarterNotes(sequence->getLastTick()));
+            const double finalPosQuarterNotes =
+                fmod(offsetWithinStepQuarterNotes,
+                     ticksToQuarterNotes(sequence->getLastTick()));
 
             positionQuarterNotes = finalPosQuarterNotes;
             playStartPositionQuarterNotes = finalPosQuarterNotes;
@@ -1726,9 +1790,12 @@ void Sequencer::move(const double positionQuarterNotesToUse)
 
     auto wrappedNewPosition = positionQuarterNotesToUse;
 
-    const auto sequence = isPlaying() ? getCurrentlyPlayingSequence() : (songMode ? sequences[songSequenceIndex] : getActiveSequence());
+    const auto sequence = isPlaying() ? getCurrentlyPlayingSequence()
+                                      : (songMode ? sequences[songSequenceIndex]
+                                                  : getActiveSequence());
 
-    const auto seqLengthQuarterNotes = ticksToQuarterNotes(sequence->getLastTick());
+    const auto seqLengthQuarterNotes =
+        ticksToQuarterNotes(sequence->getLastTick());
 
     if (wrappedNewPosition < 0 || wrappedNewPosition > seqLengthQuarterNotes)
     {
@@ -1747,7 +1814,8 @@ void Sequencer::move(const double positionQuarterNotesToUse)
     if (secondSequenceEnabled)
     {
         auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
-        sequences[secondSequenceScreen->sq]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+        sequences[secondSequenceScreen->sq]->resetTrackEventIndices(
+            quarterNotesToTicks(positionQuarterNotes));
     }
 
     notifyTimeDisplay();
@@ -1790,9 +1858,14 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
             return -1;
         }
 
-        const auto seqIndexShouldBeDerivedFromSongStep = songMode && songScreen->getOffset() + 1 < song->getStepCount();
+        const auto seqIndexShouldBeDerivedFromSongStep =
+            songMode && songScreen->getOffset() + 1 < song->getStepCount();
 
-        auto songSeqIndex = seqIndexShouldBeDerivedFromSongStep ? song->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
+        auto songSeqIndex = seqIndexShouldBeDerivedFromSongStep
+                                ? song->getStep(songScreen->getOffset() + 1)
+                                      .lock()
+                                      ->getSequence()
+                                : -1;
         return songSeqIndex;
     }
 
@@ -1814,7 +1887,8 @@ int Sequencer::getFirstUsedSeqDown(int from, bool unused)
 {
     for (int i = from; i >= 0; i--)
     {
-        auto candidate = unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
+        auto candidate =
+            unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
         if (candidate)
         {
@@ -1829,7 +1903,8 @@ int Sequencer::getFirstUsedSeqUp(int from, bool unused)
 {
     for (int i = from; i < 99; i++)
     {
-        auto candidate = unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
+        auto candidate =
+            unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
         if (candidate)
         {
@@ -1965,14 +2040,18 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 
     undoSeqAvailable = true;
 
-    mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(true);
+    mpc.getHardware()
+        ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+        ->setEnabled(true);
 }
 
 void Sequencer::resetUndo()
 {
     undoPlaceHolder.reset();
     undoSeqAvailable = false;
-    mpc.getHardware()->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
+    mpc.getHardware()
+        ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+        ->setEnabled(false);
 }
 
 bool Sequencer::isOverdubbing()
@@ -2036,7 +2115,8 @@ void Sequencer::clearPlaceHolder()
 void Sequencer::movePlaceHolderTo(int destIndex)
 {
     sequences[destIndex].swap(placeHolder);
-    sequences[destIndex]->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    sequences[destIndex]->resetTrackEventIndices(
+        quarterNotesToTicks(positionQuarterNotes));
     clearPlaceHolder();
 }
 

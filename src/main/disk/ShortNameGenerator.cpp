@@ -26,7 +26,10 @@ bool ShortNameGenerator::validChar(char toTest)
         return true;
     }
 
-    return (toTest == '_' || toTest == '^' || toTest == '$' || toTest == '~' || toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' || toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' || toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`');
+    return (toTest == '_' || toTest == '^' || toTest == '$' || toTest == '~' ||
+            toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' ||
+            toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' ||
+            toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`');
 }
 
 bool ShortNameGenerator::isSkipChar(char c)
@@ -110,28 +113,33 @@ ShortName ShortNameGenerator::generateShortName(const string &longFullName)
     string shortExt = (longExt.length() > 3) ? longExt.substr(0, 3) : longExt;
 
     if (forceSuffix || (longName.length() > 8) ||
-        find(usedNames.begin(), usedNames.end(), ShortName(longName, shortExt).asSimpleString()) != usedNames.end())
+        find(usedNames.begin(), usedNames.end(),
+             ShortName(longName, shortExt).asSimpleString()) != usedNames.end())
     {
 
-        auto const maxLongIdx = static_cast<int>(longName.length() < 8 ? longName.length() : 8);
+        auto const maxLongIdx =
+            static_cast<int>(longName.length() < 8 ? longName.length() : 8);
 
         for (int i = 1; i < 99999; i++)
         {
 
             string serial = "~" + to_string(i);
             int serialLen = static_cast<int>(serial.length());
-            int trimIndex = maxLongIdx < 8 - serialLen ? maxLongIdx : 8 - serialLen;
+            int trimIndex =
+                maxLongIdx < 8 - serialLen ? maxLongIdx : 8 - serialLen;
 
             auto const shortName = longName.substr(0, trimIndex) + serial;
             ShortName result(shortName, shortExt);
 
-            if (find(usedNames.begin(), usedNames.end(), result.asSimpleString()) == usedNames.end())
+            if (find(usedNames.begin(), usedNames.end(),
+                     result.asSimpleString()) == usedNames.end())
             {
                 return result;
             }
         }
 
-        string error = "Short name generation ran out of serials for " + longFullName + ", returning original!";
+        string error = "Short name generation ran out of serials for " +
+                       longFullName + ", returning original!";
         return longFullName;
     }
 

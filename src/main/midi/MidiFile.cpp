@@ -127,6 +127,8 @@ void MidiFile::initFromBuffer(std::vector<char> &buffer)
 
     if (mResolution != 96)
     {
-        MLOG("Developer warning: non-96ppq MIDI file was loaded. Most likely the event positions are incorrect.");
+        MLOG(
+            "Developer warning: non-96ppq MIDI file was loaded. Most likely "
+            "the event positions are incorrect.");
     }
 }

@@ -35,7 +35,8 @@ std::vector<char> Mixer::getMixerArray()
     auto pgmFileArray = programFile->readProgramFileArray();
     if (mixerArray.size() == 0)
     {
-        mixerArray = Util::vecCopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());
+        mixerArray =
+            Util::vecCopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());
     }
     return mixerArray;
 }

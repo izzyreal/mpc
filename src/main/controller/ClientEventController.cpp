@@ -23,32 +23,29 @@ using namespace mpc::lcdgui;
 
 ClientEventController::ClientEventController(mpc::Mpc &mpcToUse)
     : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>()),
-      mpc(mpcToUse),
-      sequencer(mpc.getSequencer()),
-      screens(mpc.screens),
-      layeredScreen(mpc.getLayeredScreen()),
-      hardware(mpc.getHardware())
+      mpc(mpcToUse), sequencer(mpc.getSequencer()), screens(mpc.screens),
+      layeredScreen(mpc.getLayeredScreen()), hardware(mpc.getHardware())
 {
 }
 
 void ClientEventController::init()
 {
-    clientHardwareEventController = std::make_shared<ClientHardwareEventController>(mpc);
+    clientHardwareEventController =
+        std::make_shared<ClientHardwareEventController>(mpc);
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
-        shared_from_this(),
-        clientHardwareEventController,
-        screens->get<MidiSwScreen>(),
-        sequencer,
-        screens->get<MidiInputScreen>(),
-        mpc.getEventHandler(),
+        shared_from_this(), clientHardwareEventController,
+        screens->get<MidiSwScreen>(), sequencer,
+        screens->get<MidiInputScreen>(), mpc.getEventHandler(),
         screens->get<MultiRecordingSetupScreen>(),
         screens->get<TimingCorrectScreen>());
 }
 
-void ClientEventController::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
+void ClientEventController::dispatchHostInput(
+    const mpc::input::HostInputEvent &hostEvent)
 {
-    const auto clientEvent = mpc::input::HostToClientTranslator::translate(hostEvent, keyboardBindings);
+    const auto clientEvent = mpc::input::HostToClientTranslator::translate(
+        hostEvent, keyboardBindings);
 
     if (!clientEvent.has_value())
     {
@@ -59,19 +56,23 @@ void ClientEventController::dispatchHostInput(const mpc::input::HostInputEvent &
     handleClientEvent(*clientEvent);
 }
 
-void ClientEventController::handleClientEvent(const client::event::ClientEvent &e)
+void ClientEventController::handleClientEvent(
+    const client::event::ClientEvent &e)
 {
     if (std::holds_alternative<ClientHardwareEvent>(e.payload))
     {
-        clientHardwareEventController->handleClientHardwareEvent(std::get<ClientHardwareEvent>(e.payload));
+        clientHardwareEventController->handleClientHardwareEvent(
+            std::get<ClientHardwareEvent>(e.payload));
     }
     else if (std::holds_alternative<ClientMidiEvent>(e.payload))
     {
-        clientMidiEventController->handleClientMidiEvent(std::get<ClientMidiEvent>(e.payload));
+        clientMidiEventController->handleClientMidiEvent(
+            std::get<ClientMidiEvent>(e.payload));
     }
 }
 
-std::shared_ptr<ClientMidiEventController> ClientEventController::getClientMidiEventController()
+std::shared_ptr<ClientMidiEventController>
+ClientEventController::getClientMidiEventController()
 {
     return clientMidiEventController;
 }
@@ -82,17 +83,17 @@ RecordingMode ClientEventController::determineRecordingMode() const
     {
         return RecordingMode::Overdub;
     }
-    if (SeqUtil::isStepRecording(layeredScreen->getCurrentScreenName(), sequencer))
+    if (SeqUtil::isStepRecording(layeredScreen->getCurrentScreenName(),
+                                 sequencer))
     {
         return RecordingMode::Step;
     }
 
-    if (SeqUtil::isRecMainWithoutPlaying(
-            sequencer,
-            screens->get<TimingCorrectScreen>(),
-            layeredScreen->getCurrentScreenName(),
-            hardware->getButton(ComponentId::REC),
-            clientHardwareEventController))
+    if (SeqUtil::isRecMainWithoutPlaying(sequencer,
+                                         screens->get<TimingCorrectScreen>(),
+                                         layeredScreen->getCurrentScreenName(),
+                                         hardware->getButton(ComponentId::REC),
+                                         clientHardwareEventController))
     {
         return RecordingMode::RecMainWithoutPlaying;
     }
@@ -118,10 +119,14 @@ void ClientEventController::setActiveBank(const Bank activeBankToUse)
 
     notifyObservers(std::string("bank"));
 
-    hardware->getLed(hardware::ComponentId::BANK_A_LED)->setEnabled(activeBank == Bank::A);
-    hardware->getLed(hardware::ComponentId::BANK_B_LED)->setEnabled(activeBank == Bank::B);
-    hardware->getLed(hardware::ComponentId::BANK_C_LED)->setEnabled(activeBank == Bank::C);
-    hardware->getLed(hardware::ComponentId::BANK_D_LED)->setEnabled(activeBank == Bank::D);
+    hardware->getLed(hardware::ComponentId::BANK_A_LED)
+        ->setEnabled(activeBank == Bank::A);
+    hardware->getLed(hardware::ComponentId::BANK_B_LED)
+        ->setEnabled(activeBank == Bank::B);
+    hardware->getLed(hardware::ComponentId::BANK_C_LED)
+        ->setEnabled(activeBank == Bank::C);
+    hardware->getLed(hardware::ComponentId::BANK_D_LED)
+        ->setEnabled(activeBank == Bank::D);
 }
 
 Bank ClientEventController::getActiveBank() const

@@ -6,8 +6,7 @@
 namespace mpc::midi::event::meta
 {
 
-    class TrackName
-        : public TextualMetaEvent
+    class TrackName : public TextualMetaEvent
     {
 
     public:

@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class StepEditOptionsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class StepEditOptionsScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         StepEditOptionsScreen(mpc::Mpc &mpc, const int layerIndex);

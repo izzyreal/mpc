@@ -17,7 +17,8 @@ namespace mpc::engine::control
         void setValue(const std::variant<int, std::string> &value);
 
         std::string getValueString() override;
-        EnumControl(int id, std::string name, const std::variant<int, std::string> &value);
+        EnumControl(int id, std::string name,
+                    const std::variant<int, std::string> &value);
     };
 
 } // namespace mpc::engine::control

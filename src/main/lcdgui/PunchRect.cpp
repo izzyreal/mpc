@@ -2,8 +2,7 @@
 
 using namespace mpc::lcdgui;
 
-PunchRect::PunchRect(const std::string &name, MRECT rect)
-    : Component(name)
+PunchRect::PunchRect(const std::string &name, MRECT rect) : Component(name)
 {
     w = rect.W();
     h = rect.H();
@@ -26,7 +25,8 @@ void PunchRect::Draw(std::vector<std::vector<bool>> *pixels)
             {
                 (*pixels)[x1][y1] = true;
             }
-            else if (on && ((y1 % 2 == 0 && x1 % 2 == 0) || (y1 % 2 == 1 && x1 % 2 == 1)))
+            else if (on && ((y1 % 2 == 0 && x1 % 2 == 0) ||
+                            (y1 % 2 == 1 && x1 % 2 == 1)))
             {
                 (*pixels)[x1][y1] = true;
             }

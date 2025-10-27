@@ -9,7 +9,8 @@ using namespace mpc::file::all;
 
 Song::Song(const std::vector<char> &loadBytes)
 {
-    auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
+    auto nameBytes = Util::vecCopyOfRange(loadBytes, NAME_OFFSET,
+                                          NAME_OFFSET + AllParser::NAME_LENGTH);
 
     for (char &c : nameBytes)
     {
@@ -23,7 +24,8 @@ Song::Song(const std::vector<char> &loadBytes)
     size_t end = name.find_last_not_of(' ');
     name = (end == std::string::npos) ? "" : name.substr(0, end + 1);
 
-    auto stepsBytes = Util::vecCopyOfRange(loadBytes, FIRST_STEP_OFFSET, FIRST_STEP_OFFSET + STEPS_LENGTH);
+    auto stepsBytes = Util::vecCopyOfRange(loadBytes, FIRST_STEP_OFFSET,
+                                           FIRST_STEP_OFFSET + STEPS_LENGTH);
 
     for (int i = 0; i < STEPS_LENGTH; i += STEP_LENGTH)
     {
@@ -74,13 +76,16 @@ Song::Song(mpc::sequencer::Song *mpcSong)
         if (i >= mpcSong->getStepCount())
         {
             saveBytes[FIRST_STEP_OFFSET + (i * 2)] = static_cast<char>(0xFF);
-            saveBytes[FIRST_STEP_OFFSET + (i * 2) + 1] = static_cast<char>(0xFF);
+            saveBytes[FIRST_STEP_OFFSET + (i * 2) + 1] =
+                static_cast<char>(0xFF);
             continue;
         }
 
         auto step = mpcSong->getStep(i).lock();
-        saveBytes[FIRST_STEP_OFFSET + (i * 2)] = static_cast<char>(step->getSequence());
-        saveBytes[FIRST_STEP_OFFSET + (i * 2) + 1] = static_cast<char>(step->getRepeats());
+        saveBytes[FIRST_STEP_OFFSET + (i * 2)] =
+            static_cast<char>(step->getSequence());
+        saveBytes[FIRST_STEP_OFFSET + (i * 2) + 1] =
+            static_cast<char>(step->getRepeats());
     }
 
     saveBytes[STEPS_TERMINATOR_OFFSET] = static_cast<char>(0xFF);

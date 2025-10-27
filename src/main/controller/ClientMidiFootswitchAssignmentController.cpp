@@ -13,17 +13,19 @@ using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::hardware;
 
-ClientMidiFootswitchAssignmentController::ClientMidiFootswitchAssignmentController(
-    std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
-    std::shared_ptr<MidiSwScreen> midiSwScreenToUse,
-    std::shared_ptr<sequencer::Sequencer> sequencerToUse)
+ClientMidiFootswitchAssignmentController::
+    ClientMidiFootswitchAssignmentController(
+        std::shared_ptr<ClientHardwareEventController>
+            clientHardwareEventControllerToUse,
+        std::shared_ptr<MidiSwScreen> midiSwScreenToUse,
+        std::shared_ptr<sequencer::Sequencer> sequencerToUse)
     : clientHardwareEventController(clientHardwareEventControllerToUse),
-      midiSwScreen(midiSwScreenToUse),
-      sequencer(sequencerToUse)
+      midiSwScreen(midiSwScreenToUse), sequencer(sequencerToUse)
 {
 }
 
-void ClientMidiFootswitchAssignmentController::pressButton(hardware::ComponentId componentId)
+void ClientMidiFootswitchAssignmentController::pressButton(
+    hardware::ComponentId componentId)
 {
     ClientHardwareEvent ev;
     ev.source = ClientHardwareEvent::Source::HostInputMidi;
@@ -32,7 +34,8 @@ void ClientMidiFootswitchAssignmentController::pressButton(hardware::ComponentId
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientMidiFootswitchAssignmentController::releaseButton(hardware::ComponentId componentId)
+void ClientMidiFootswitchAssignmentController::releaseButton(
+    hardware::ComponentId componentId)
 {
     ClientHardwareEvent ev;
     ev.source = ClientHardwareEvent::Source::HostInputMidi;
@@ -41,7 +44,8 @@ void ClientMidiFootswitchAssignmentController::releaseButton(hardware::Component
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientMidiFootswitchAssignmentController::triggerDualButtonCombo(ComponentId first, ComponentId second)
+void ClientMidiFootswitchAssignmentController::triggerDualButtonCombo(
+    ComponentId first, ComponentId second)
 {
     pressButton(first);
     pressButton(second);
@@ -109,10 +113,12 @@ void ClientMidiFootswitchAssignmentController::handleOdubPunch()
     }
 }
 
-void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent &e)
+void ClientMidiFootswitchAssignmentController::handleEvent(
+    const ClientMidiEvent &e)
 {
-    std::cout << "[FootswitchAssignment] Handling event type " << e.getMessageType()
-              << " on channel " << e.getChannel() << std::endl;
+    std::cout << "[FootswitchAssignment] Handling event type "
+              << e.getMessageType() << " on channel " << e.getChannel()
+              << std::endl;
 
     if (e.getMessageType() != ClientMidiEvent::MessageType::CONTROLLER)
     {
@@ -125,7 +131,8 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
     const bool pressed = value >= 64;
 
     std::cout << "\n[FootswitchAssignment] Handling controller " << controller
-              << " (val=" << value << (pressed ? ", pressed" : ", released") << ")\n";
+              << " (val=" << value << (pressed ? ", pressed" : ", released")
+              << ")\n";
 
     for (auto [switchCC, functionIndex] : midiSwScreen->getSwitches())
     {
@@ -134,11 +141,14 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
             continue;
         }
 
-        const std::string &functionName = midiSwScreen->getFunctionNames()[functionIndex];
+        const std::string &functionName =
+            midiSwScreen->getFunctionNames()[functionIndex];
 
         std::string trimmedFunctionName = functionName;
-        trimmedFunctionName.erase(0, trimmedFunctionName.find_first_not_of(" \t"));
-        trimmedFunctionName.erase(trimmedFunctionName.find_last_not_of(" \t") + 1);
+        trimmedFunctionName.erase(0,
+                                  trimmedFunctionName.find_first_not_of(" \t"));
+        trimmedFunctionName.erase(trimmedFunctionName.find_last_not_of(" \t") +
+                                  1);
 
         if (trimmedFunctionName.rfind("PAD", 0) == 0)
         {
@@ -151,9 +161,11 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
             const int padNum = std::stoi(rest);
 
-            ev.componentId = static_cast<ComponentId>(static_cast<int>(ComponentId::PAD_1_OR_AB) + padNum - 1);
+            ev.componentId = static_cast<ComponentId>(
+                static_cast<int>(ComponentId::PAD_1_OR_AB) + padNum - 1);
             ev.index = padNum - 1;
-            ev.type = pressed ? ClientHardwareEvent::Type::PadPress : ClientHardwareEvent::Type::PadRelease;
+            ev.type = pressed ? ClientHardwareEvent::Type::PadPress
+                              : ClientHardwareEvent::Type::PadRelease;
 
             if (pressed)
             {
@@ -199,11 +211,14 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
             id = ComponentId::BANK_D;
         }
 
-        else if (functionName.rfind("F", 0) == 0 || functionName.find("   F") != std::string::npos)
+        else if (functionName.rfind("F", 0) == 0 ||
+                 functionName.find("   F") != std::string::npos)
         {
             // "   F1".."   F6"
-            const int fNum = std::stoi(functionName.substr(functionName.find('F') + 1));
-            id = static_cast<ComponentId>(static_cast<int>(ComponentId::F1) + fNum - 1);
+            const int fNum =
+                std::stoi(functionName.substr(functionName.find('F') + 1));
+            id = static_cast<ComponentId>(static_cast<int>(ComponentId::F1) +
+                                          fNum - 1);
         }
 
         if (id)
@@ -211,7 +226,8 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
             ClientHardwareEvent ev;
             ev.componentId = *id;
             ev.source = ClientHardwareEvent::Source::HostInputMidi;
-            ev.type = pressed ? ClientHardwareEvent::Type::ButtonPress : ClientHardwareEvent::Type::ButtonRelease;
+            ev.type = pressed ? ClientHardwareEvent::Type::ButtonPress
+                              : ClientHardwareEvent::Type::ButtonRelease;
             clientHardwareEventController->handleClientHardwareEvent(ev);
             continue;
         }

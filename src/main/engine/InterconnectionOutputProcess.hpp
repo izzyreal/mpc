@@ -10,13 +10,15 @@ namespace mpc::engine
     {
 
     public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
+        int
+        processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
 
     private:
         mpc::engine::audio::core::AudioBuffer *sharedBuffer{nullptr};
 
     public:
-        InterconnectionOutputProcess(mpc::engine::audio::core::AudioBuffer *sharedBuffer);
+        InterconnectionOutputProcess(
+            mpc::engine::audio::core::AudioBuffer *sharedBuffer);
     };
 
 } // namespace mpc::engine

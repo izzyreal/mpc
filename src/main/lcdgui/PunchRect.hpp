@@ -4,8 +4,7 @@
 namespace mpc::lcdgui
 {
 
-    class PunchRect
-        : public Component
+    class PunchRect : public Component
     {
 
     private:

@@ -63,5 +63,6 @@ void DeleteTrackScreen::setTr(int i)
 void DeleteTrackScreen::displayTr()
 {
     auto trackName = sequencer->getActiveSequence()->getTrack(tr)->getName();
-    findField("tr")->setText(StrUtil::padLeft(std::to_string(tr + 1), "0", 2) + "-" + trackName);
+    findField("tr")->setText(StrUtil::padLeft(std::to_string(tr + 1), "0", 2) +
+                             "-" + trackName);
 }

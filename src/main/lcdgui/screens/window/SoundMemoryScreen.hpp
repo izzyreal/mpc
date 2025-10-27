@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class SoundMemoryScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SoundMemoryScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         SoundMemoryScreen(mpc::Mpc &mpc, const int layerIndex);

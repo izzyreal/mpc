@@ -9,7 +9,8 @@
 
 #include <thread>
 
-TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-disk-recording]")
+TEST_CASE("Direct to disk recording does not start with silence",
+          "[direct-to-disk-recording]")
 {
     const int BUFFER_SIZE = 512;
     const int SAMPLE_RATE = 44100;
@@ -60,17 +61,22 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     int64_t timeInSamples = 0;
 
-    auto audioThread = std::thread([&]
-                                   {
-                                       for (int i = 0; i < DSP_CYCLE_COUNT; i++)
-                                       {
-                                           audioMidiServices->changeBounceStateIfRequired();
-                                           mpc.getClock()->processBufferInternal(mpc.getSequencer()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
-                                           audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {}, {0, 1}, {}, {0, 1});
-                                           timeInSamples += BUFFER_SIZE;
-                                           std::this_thread::sleep_for(std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
-                                       }
-                                   });
+    auto audioThread = std::thread(
+        [&]
+        {
+            for (int i = 0; i < DSP_CYCLE_COUNT; i++)
+            {
+                audioMidiServices->changeBounceStateIfRequired();
+                mpc.getClock()->processBufferInternal(
+                    mpc.getSequencer()->getTempo(), SAMPLE_RATE, BUFFER_SIZE,
+                    0);
+                audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {},
+                                  {0, 1}, {}, {0, 1});
+                timeInSamples += BUFFER_SIZE;
+                std::this_thread::sleep_for(
+                    std::chrono::microseconds(DSP_CYCLE_DURATION_MICROSECONDS));
+            }
+        });
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -93,7 +99,8 @@ TEST_CASE("Direct to disk recording does not start with silence", "[direct-to-di
 
     REQUIRE(fs::exists(recordingPath));
 
-    auto wavInputStream = std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
+    auto wavInputStream =
+        std::make_shared<std::ifstream>(recordingPath, std::ios::binary);
 
     auto wavOrError = mpc::file::wav::WavFile::readWavStream(wavInputStream);
 

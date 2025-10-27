@@ -31,27 +31,19 @@ namespace mpc::engine
     {
     public:
         static DrumNoteOnContext buildNoteOn(
-            uint64_t noteEventId,
-            Drum *drum,
+            uint64_t noteEventId, Drum *drum,
             std::shared_ptr<mpc::sampler::Sampler> sampler,
             std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
-            std::shared_ptr<mpc::lcdgui::screens::MixerSetupScreen> mixerSetupScreen,
+            std::shared_ptr<mpc::lcdgui::screens::MixerSetupScreen>
+                mixerSetupScreen,
             std::vector<std::shared_ptr<Voice>> *voices,
-            std::vector<MixerInterconnection *> &mixerConnections,
-            int note,
-            int velocity,
-            int varType,
-            int varValue,
-            int frameOffset,
-            bool firstGeneration,
-            int startTick,
-            int durationFrames);
+            std::vector<MixerInterconnection *> &mixerConnections, int note,
+            int velocity, int varType, int varValue, int frameOffset,
+            bool firstGeneration, int startTick, int durationFrames);
 
-        static DrumNoteOffContext buildNoteOff(
-            uint64_t noteEventId,
-            Drum *drum,
-            std::vector<std::shared_ptr<Voice>> *voices,
-            int note,
-            int noteOnStartTick);
+        static DrumNoteOffContext
+        buildNoteOff(uint64_t noteEventId, Drum *drum,
+                     std::vector<std::shared_ptr<Voice>> *voices, int note,
+                     int noteOnStartTick);
     };
 } // namespace mpc::engine

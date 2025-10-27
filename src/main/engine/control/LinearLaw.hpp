@@ -8,8 +8,7 @@
 namespace mpc::engine::control
 {
 
-    class LinearLaw
-        : public AbstractLaw
+    class LinearLaw : public AbstractLaw
     {
 
     public:

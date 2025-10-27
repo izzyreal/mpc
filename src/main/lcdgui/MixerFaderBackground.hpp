@@ -4,8 +4,7 @@
 namespace mpc::lcdgui
 {
 
-    class MixerFaderBackground
-        : public Component
+    class MixerFaderBackground : public Component
     {
 
     public:

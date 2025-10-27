@@ -14,9 +14,8 @@ namespace mpc::lcdgui::screens::dialog
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveApsFileScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class SaveApsFileScreen : public mpc::lcdgui::ScreenComponent,
+                              public mpc::lcdgui::screens::OpensNameScreen
     {
     public:
         SaveApsFileScreen(mpc::Mpc &mpc, const int layerIndex);
@@ -28,7 +27,8 @@ namespace mpc::lcdgui::screens::window
         void open() override;
 
     private:
-        const std::vector<std::string> apsSaveNames{"APS ONLY", "WITH SOUNDS", "WITH .WAV"};
+        const std::vector<std::string> apsSaveNames{"APS ONLY", "WITH SOUNDS",
+                                                    "WITH .WAV"};
 
         std::string fileName = "ALL_PGMS";
 

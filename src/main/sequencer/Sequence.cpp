@@ -210,7 +210,8 @@ void Sequence::init(int newLastBarIndex)
 
     initLoop();
 
-    setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
+    setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(),
+                     userScreen->timeSig.getDenominator());
     used = true;
 }
 
@@ -389,7 +390,8 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
         for (auto &e : events)
         {
-            if (e->getTick() >= deleteFirstTick && e->getTick() < deleteLastTick)
+            if (e->getTick() >= deleteFirstTick &&
+                e->getTick() < deleteLastTick)
             {
                 t->removeEvent(e);
             }
@@ -568,7 +570,8 @@ void Sequence::insertBars(int barCount, int afterBar)
     }
 }
 
-bool trackIndexComparator(const std::shared_ptr<Track> &t0, const std::shared_ptr<Track> &t1)
+bool trackIndexComparator(const std::shared_ptr<Track> &t0,
+                          const std::shared_ptr<Track> &t1)
 {
     return t0->getIndex() < t1->getIndex();
 }
@@ -668,7 +671,8 @@ std::vector<int> &Sequence::getDenominators()
     return denominators;
 }
 
-void Sequence::setNumeratorsAndDenominators(std::vector<int> &newNumerators, std::vector<int> &newDenominators)
+void Sequence::setNumeratorsAndDenominators(std::vector<int> &newNumerators,
+                                            std::vector<int> &newDenominators)
 {
     numerators = newNumerators;
     denominators = newDenominators;

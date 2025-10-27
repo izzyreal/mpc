@@ -35,7 +35,8 @@ namespace mpc::sequencer
     class SeqUtil
     {
     public:
-        static void setTimeSignature(Sequence *, int firstBarIndex, int lastBarIndex, int num, int den);
+        static void setTimeSignature(Sequence *, int firstBarIndex,
+                                     int lastBarIndex, int num, int den);
         static void setTimeSignature(Sequence *, int bar, int num, int den);
         static int getTickFromBar(int i, Sequence *s, int position);
         static int getBarFromTick(Sequence *, int position);
@@ -54,25 +55,26 @@ namespace mpc::sequencer
         static double ticksToFrames(double ticks, const double tempo, int sr);
 
     public:
-        static double sequenceFrameLength(Sequence *, int firstTick, int lastTick, int sr);
+        static double sequenceFrameLength(Sequence *, int firstTick,
+                                          int lastTick, int sr);
         static int loopFrameLength(Sequence *, int sr);
         static int songFrameLength(Song *song, Sequencer *, int sr);
 
-        static void copyBars(mpc::Mpc &,
-                             uint8_t fromSeqIndex,
-                             uint8_t toSeqIndex,
-                             uint8_t copyFirstBar,
-                             uint8_t copyLastBar,
-                             uint8_t copyCount,
+        static void copyBars(mpc::Mpc &, uint8_t fromSeqIndex,
+                             uint8_t toSeqIndex, uint8_t copyFirstBar,
+                             uint8_t copyLastBar, uint8_t copyCount,
                              uint8_t copyAfterBar);
 
         static bool isRecMainWithoutPlaying(
             std::shared_ptr<Sequencer> sequencer,
-            std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
+            std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
+                timingCorrectScreen,
             const std::string &currentScreenName,
             std::shared_ptr<mpc::hardware::Button> recButton,
-            std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController);
+            std::shared_ptr<mpc::controller::ClientHardwareEventController>
+                clientHardwareEventController);
 
-        static bool isStepRecording(const std::string &currentScreenName, std::shared_ptr<Sequencer>);
+        static bool isStepRecording(const std::string &currentScreenName,
+                                    std::shared_ptr<Sequencer>);
     };
 } // namespace mpc::sequencer

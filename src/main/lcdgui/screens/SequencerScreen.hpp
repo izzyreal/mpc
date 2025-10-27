@@ -12,8 +12,7 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-    class SequencerScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SequencerScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -77,10 +76,10 @@ namespace mpc::lcdgui::screens
 
         void setPunchRectOn(int i, bool b);
 
-        // During certain erase and note repeat scenarios, the function keys are hidden
-        // and replaced by a bespoke label. `hideFooterLabelAndShowFunctionKeys` is
-        // invoked when the function keys should be shown again, and the
-        // the bespoke label hidden.
+        // During certain erase and note repeat scenarios, the function keys are
+        // hidden and replaced by a bespoke label.
+        // `hideFooterLabelAndShowFunctionKeys` is invoked when the function
+        // keys should be shown again, and the the bespoke label hidden.
         void hideFooterLabelAndShowFunctionKeys();
     };
 } // namespace mpc::lcdgui::screens

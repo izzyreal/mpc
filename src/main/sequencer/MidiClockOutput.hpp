@@ -53,11 +53,14 @@ namespace mpc::sequencer
         mpc::Mpc &mpc;
         unsigned char midiClockTickCounter = 0;
         bool wasRunning = false;
-        std::shared_ptr<mpc::engine::midi::ShortMessage> midiSyncStartStopContinueMsg;
-        std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(50);
+        std::shared_ptr<mpc::engine::midi::ShortMessage>
+            midiSyncStartStopContinueMsg;
+        std::vector<EventAfterNFrames> eventsAfterNFrames =
+            std::vector<EventAfterNFrames>(50);
 
         void sendMidiClockMsg(int frameIndex);
-        void enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames);
+        void enqueueEventAfterNFrames(const std::function<void()> &event,
+                                      unsigned long nFrames);
 
         std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
 

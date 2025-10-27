@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-    class SaveScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SaveScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -21,10 +20,8 @@ namespace mpc::lcdgui::screens
 
     private:
         const std::vector<std::string> types{
-            u8"Save All Sequences\u00CE&\u00CESongs",
-            "Save a Sequence",
-            u8"Save All Programs\u00CE&\u00CESounds",
-            "Save a Program & Sounds",
+            u8"Save All Sequences\u00CE&\u00CESongs", "Save a Sequence",
+            u8"Save All Programs\u00CE&\u00CESounds", "Save a Program & Sounds",
             "Save a Sound"};
 
         int type = 0;

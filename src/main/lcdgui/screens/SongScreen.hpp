@@ -15,8 +15,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
 {
-    class SongScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SongScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:

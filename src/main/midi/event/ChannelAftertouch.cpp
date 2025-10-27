@@ -4,11 +4,15 @@
 
 using namespace mpc::midi::event;
 
-ChannelAftertouch::ChannelAftertouch(int tick, int channel, int amount) : ChannelEvent(tick, ChannelEvent::CHANNEL_AFTERTOUCH, channel, amount, 0)
+ChannelAftertouch::ChannelAftertouch(int tick, int channel, int amount)
+    : ChannelEvent(tick, ChannelEvent::CHANNEL_AFTERTOUCH, channel, amount, 0)
 {
 }
 
-ChannelAftertouch::ChannelAftertouch(int tick, int delta, int channel, int amount) : ChannelEvent(tick, delta, ChannelEvent::CHANNEL_AFTERTOUCH, channel, amount, 0)
+ChannelAftertouch::ChannelAftertouch(int tick, int delta, int channel,
+                                     int amount)
+    : ChannelEvent(tick, delta, ChannelEvent::CHANNEL_AFTERTOUCH, channel,
+                   amount, 0)
 {
 }
 

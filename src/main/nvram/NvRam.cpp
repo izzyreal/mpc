@@ -127,7 +127,8 @@ void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
         vmpcAutoSaveScreen->autoSaveOnExit = bytes[2];
     }
 
-    // I've removed Ask mode out of the equation, so any auto-persisted values over 1 are now invalid.
+    // I've removed Ask mode out of the equation, so any auto-persisted values
+    // over 1 are now invalid.
     if (vmpcAutoSaveScreen->autoSaveOnExit == 2)
     {
         vmpcAutoSaveScreen->autoSaveOnExit = 1;
@@ -169,6 +170,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
     }
     if (bytes.size() > 11)
     {
-        vmpcSettingsScreen->nameTypingWithKeyboardEnabled = static_cast<bool>(bytes[11]);
+        vmpcSettingsScreen->nameTypingWithKeyboardEnabled =
+            static_cast<bool>(bytes[11]);
     }
 }

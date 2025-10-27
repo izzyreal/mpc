@@ -6,7 +6,8 @@
 
 using namespace mpc::engine::control;
 
-EnumControl::EnumControl(int id, std::string name, const std::variant<int, std::string> &valueToUse)
+EnumControl::EnumControl(int id, std::string name,
+                         const std::variant<int, std::string> &valueToUse)
     : Control(id, std::move(name)), value(valueToUse)
 {
 }

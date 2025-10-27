@@ -64,7 +64,8 @@ int MidiEvent::sId = -1;
 int MidiEvent::sType = -1;
 int MidiEvent::sChannel = -1;
 
-std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, std::stringstream &in)
+std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta,
+                                                 std::stringstream &in)
 {
     auto reset = false;
 
@@ -80,7 +81,8 @@ std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, std::strin
 
     if (sType >= 8 && sType <= 14)
     {
-        return ChannelEvent::parseChannelEvent(tick, delta, sType, sChannel, in);
+        return ChannelEvent::parseChannelEvent(tick, delta, sType, sChannel,
+                                               in);
     }
     else if (sId == 255)
     {
@@ -95,7 +97,8 @@ std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, std::strin
     }
     else
     {
-        std::string error = "Unable to handle status byte, skipping: " + std::to_string(sId);
+        std::string error =
+            "Unable to handle status byte, skipping: " + std::to_string(sId);
         if (reset)
         {
             in.ignore(1);
@@ -137,5 +140,6 @@ bool MidiEvent::verifyIdentifier(int id)
 
 std::string MidiEvent::toString()
 {
-    return std::to_string(mTick) + " (" + std::to_string(mDelta.getValue()) + "): " + typeid(this).name();
+    return std::to_string(mTick) + " (" + std::to_string(mDelta.getValue()) +
+           "): " + typeid(this).name();
 }

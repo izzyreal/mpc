@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class TimeDisplayScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TimeDisplayScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -33,7 +32,8 @@ namespace mpc::lcdgui::screens::window
         int getDisplayStyle();
 
     private:
-        std::vector<std::string> displayStyleNames{"BAR,BEAT,CLOCK", "HOUR,MINUTE,SEC"};
+        std::vector<std::string> displayStyleNames{"BAR,BEAT,CLOCK",
+                                                   "HOUR,MINUTE,SEC"};
         std::vector<std::string> frameRateNames = {"24", "25", "30D", "30"};
         int displayStyle = 0;
         int frameRate = 0;

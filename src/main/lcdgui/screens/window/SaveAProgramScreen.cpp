@@ -22,7 +22,8 @@ void SaveAProgramScreen::open()
     {
         auto nameScreen = mpc.screens->get<NameScreen>();
         auto saveScreen = mpc.screens->get<SaveScreen>();
-        nameScreen->setNameToEdit(sampler->getProgram(saveScreen->getProgramIndex())->getName());
+        nameScreen->setNameToEdit(
+            sampler->getProgram(saveScreen->getProgramIndex())->getName());
     }
 
     findField("replace-same-sounds")->setAlignment(Alignment::Centered);
@@ -58,7 +59,9 @@ void SaveAProgramScreen::function(int i)
         case 4:
         {
             auto nameScreen = mpc.screens->get<NameScreen>();
-            auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
+            auto fileName =
+                mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
+                ".PGM";
             auto disk = mpc.getDisk();
 
             auto program = getProgramOrThrow();
@@ -82,16 +85,20 @@ void SaveAProgramScreen::function(int i)
                     auto nameScreen = mpc.screens->get<NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                        mpc.getLayeredScreen()
+                            ->openScreen<SaveAProgramScreen>();
                     };
-                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(),
+                                           16, enterAction, "save");
                 };
 
                 auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                             {
-                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                             });
+                fileExistsScreen->initialize(
+                    replaceAction, initializeNameScreen,
+                    [this]
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                    });
                 mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
                 break;
             }
@@ -115,7 +122,8 @@ void SaveAProgramScreen::displaySave()
 
 void SaveAProgramScreen::displayReplaceSameSounds()
 {
-    findField("replace-same-sounds")->setText(std::string(replaceSameSounds ? "YES" : "NO"));
+    findField("replace-same-sounds")
+        ->setText(std::string(replaceSameSounds ? "YES" : "NO"));
 }
 
 void SaveAProgramScreen::displayFile()

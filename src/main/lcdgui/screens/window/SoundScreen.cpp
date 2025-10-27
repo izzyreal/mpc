@@ -36,7 +36,8 @@ void SoundScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(sampler->getSound()->getName(), 16, enterAction, "sound");
+        nameScreen->initialize(sampler->getSound()->getName(), 16, enterAction,
+                               "sound");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
@@ -82,7 +83,8 @@ void SoundScreen::displayType()
         return;
     }
 
-    findLabel("type")->setText("Type:" + std::string(sound->isMono() ? "MONO" : "STEREO"));
+    findLabel("type")->setText(
+        "Type:" + std::string(sound->isMono() ? "MONO" : "STEREO"));
 }
 
 void SoundScreen::displayRate()
@@ -95,7 +97,8 @@ void SoundScreen::displayRate()
         return;
     }
 
-    findLabel("rate")->setText("Rate: " + std::to_string(sound->getSampleRate()) + "Hz");
+    findLabel("rate")->setText(
+        "Rate: " + std::to_string(sound->getSampleRate()) + "Hz");
 }
 
 void SoundScreen::displaySize()
@@ -108,5 +111,9 @@ void SoundScreen::displaySize()
         return;
     }
 
-    findLabel("size")->setText("Size:" + StrUtil::padLeft(std::to_string(sound->getSampleData()->size() / 500), " ", 4) + "kbytes");
+    findLabel("size")->setText(
+        "Size:" +
+        StrUtil::padLeft(std::to_string(sound->getSampleData()->size() / 500),
+                         " ", 4) +
+        "kbytes");
 }

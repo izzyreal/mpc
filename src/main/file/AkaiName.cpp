@@ -13,7 +13,9 @@ bool AkaiName::isAkaiName(const std::string &name)
     return name == generate(name);
 }
 
-std::vector<char> AkaiName::allowedSpecialCharacters = {'_', '^', '$', '~', '!', '#', '%', '&', '-', '{', '}', '(', ')', '@', '\\', '`'};
+std::vector<char> AkaiName::allowedSpecialCharacters = {
+    '_', '^', '$', '~', '!', '#', '%',  '&',
+    '-', '{', '}', '(', ')', '@', '\\', '`'};
 
 bool AkaiName::isValidChar(const char &c)
 {
@@ -27,10 +29,9 @@ bool AkaiName::isValidChar(const char &c)
         return true;
     }
 
-    return find(
-               AkaiName::allowedSpecialCharacters.begin(),
-               AkaiName::allowedSpecialCharacters.end(),
-               c) != AkaiName::allowedSpecialCharacters.end();
+    return find(AkaiName::allowedSpecialCharacters.begin(),
+                AkaiName::allowedSpecialCharacters.end(),
+                c) != AkaiName::allowedSpecialCharacters.end();
 }
 
 bool AkaiName::isCharThatShouldBeRemoved(const char &c)
@@ -78,7 +79,8 @@ std::string AkaiName::removeLeadingPeriod(const std::string &s)
     return s;
 }
 
-std::string AkaiName::generate(const std::string &name, const std::vector<std::string> &usedNames)
+std::string AkaiName::generate(const std::string &name,
+                               const std::vector<std::string> &usedNames)
 {
     auto nameWithoutLeadingPeriod = StrUtil::toUpper(removeLeadingPeriod(name));
 
@@ -105,7 +107,8 @@ std::string AkaiName::generate(const std::string &name, const std::vector<std::s
 
     auto firstCandidate = longName + "." + shortExt;
 
-    if (find(usedNames.begin(), usedNames.end(), firstCandidate) != usedNames.end())
+    if (find(usedNames.begin(), usedNames.end(), firstCandidate) !=
+        usedNames.end())
     {
 
         int maxLongIdx = longName.length() < 16 ? longName.length() : 16;
@@ -114,13 +117,15 @@ std::string AkaiName::generate(const std::string &name, const std::vector<std::s
         {
             auto serial = "~" + std::to_string(i);
             int serialLen = serial.length();
-            int trimIndex = maxLongIdx < 16 - serialLen ? maxLongIdx : 16 - serialLen;
+            int trimIndex =
+                maxLongIdx < 16 - serialLen ? maxLongIdx : 16 - serialLen;
 
             auto nameWithSerial = longName.substr(0, trimIndex) + serial;
 
             auto secondCandidate = nameWithSerial + "." + shortExt;
 
-            if (find(usedNames.begin(), usedNames.end(), secondCandidate) == usedNames.end())
+            if (find(usedNames.begin(), usedNames.end(), secondCandidate) ==
+                usedNames.end())
             {
                 return secondCandidate;
             }

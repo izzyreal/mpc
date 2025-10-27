@@ -4,11 +4,14 @@
 
 using namespace mpc::midi::event;
 
-ProgramChange::ProgramChange(int tick, int channel, int program) : ChannelEvent(tick, ChannelEvent::PROGRAM_CHANGE, channel, program, 0)
+ProgramChange::ProgramChange(int tick, int channel, int program)
+    : ChannelEvent(tick, ChannelEvent::PROGRAM_CHANGE, channel, program, 0)
 {
 }
 
-ProgramChange::ProgramChange(int tick, int delta, int channel, int program) : ChannelEvent(tick, delta, ChannelEvent::PROGRAM_CHANGE, channel, program, 0)
+ProgramChange::ProgramChange(int tick, int delta, int channel, int program)
+    : ChannelEvent(tick, delta, ChannelEvent::PROGRAM_CHANGE, channel, program,
+                   0)
 {
 }
 

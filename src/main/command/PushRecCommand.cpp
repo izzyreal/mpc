@@ -14,10 +14,13 @@ namespace mpc::command
 
     void PushRecCommand::execute()
     {
-        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::REC);
-        mpc.clientEventController->clientHardwareEventController->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
+        mpc.clientEventController->clientHardwareEventController
+            ->buttonLockTracker.unlock(hardware::ComponentId::REC);
+        mpc.clientEventController->clientHardwareEventController
+            ->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
 
-        if (lcdgui::screengroups::isPlayOnlyScreen(mpc.getLayeredScreen()->getCurrentScreen()))
+        if (lcdgui::screengroups::isPlayOnlyScreen(
+                mpc.getLayeredScreen()->getCurrentScreen()))
         {
             return;
         }
@@ -28,12 +31,15 @@ namespace mpc::command
             mpc.getSequencer()->setOverdubbing(false);
         }
 
-        if (!lcdgui::screengroups::isPlayAndRecordScreen(mpc.getLayeredScreen()->getCurrentScreen()))
+        if (!lcdgui::screengroups::isPlayAndRecordScreen(
+                mpc.getLayeredScreen()->getCurrentScreen()))
         {
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         }
 
-        mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(true);
+        mpc.getHardware()
+            ->getLed(hardware::ComponentId::REC_LED)
+            ->setEnabled(true);
     }
 
 } // namespace mpc::command

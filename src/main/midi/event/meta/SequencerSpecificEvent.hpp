@@ -5,8 +5,7 @@
 namespace mpc::midi::event::meta
 {
 
-    class SequencerSpecificEvent
-        : public MetaEvent
+    class SequencerSpecificEvent : public MetaEvent
     {
     private:
         std::vector<char> mData;

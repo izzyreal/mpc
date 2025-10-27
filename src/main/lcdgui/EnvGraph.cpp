@@ -8,8 +8,7 @@
 
 using namespace mpc::lcdgui;
 
-EnvGraph::EnvGraph(mpc::Mpc &mpc)
-    : Component("env-graph"), mpc(mpc)
+EnvGraph::EnvGraph(mpc::Mpc &mpc) : Component("env-graph"), mpc(mpc)
 {
     Component::setSize(190, 40);
     setLocation(10, 10);
@@ -76,7 +75,8 @@ void EnvGraph::Draw(std::vector<std::vector<bool>> *pixels)
 
     for (auto &c : coordinates)
     {
-        auto linePixels = Bressenham::Line(c[0] + xoff, c[1] + yoff, c[2] + xoff, c[3] + yoff);
+        auto linePixels = Bressenham::Line(c[0] + xoff, c[1] + yoff,
+                                           c[2] + xoff, c[3] + yoff);
         mpc::Util::drawLine(*pixels, linePixels, true);
     }
     dirty = false;

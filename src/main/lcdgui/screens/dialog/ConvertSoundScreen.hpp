@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class ConvertSoundScreen
-        : public mpc::lcdgui::ScreenComponent
+    class ConvertSoundScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -16,7 +15,8 @@ namespace mpc::lcdgui::screens::dialog
         void open() override;
 
     private:
-        const std::vector<std::string> convertNames{"STEREO TO MONO", "RE-SAMPLE"};
+        const std::vector<std::string> convertNames{"STEREO TO MONO",
+                                                    "RE-SAMPLE"};
         void displayConvert();
 
         int convert = 0;

@@ -14,9 +14,9 @@ namespace mpc::command
     PushAfterCommand::PushAfterCommand(
         std::shared_ptr<controller::ClientEventController> controllerToUse,
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreenToUse,
-        std::shared_ptr<hardware::Hardware> hardwareToUse) : controller(controllerToUse),
-                                                             layeredScreen(layeredScreenToUse),
-                                                             hardware(hardwareToUse)
+        std::shared_ptr<hardware::Hardware> hardwareToUse)
+        : controller(controllerToUse), layeredScreen(layeredScreenToUse),
+          hardware(hardwareToUse)
     {
     }
 
@@ -29,7 +29,8 @@ namespace mpc::command
         else
         {
             controller->setAfterEnabled(!controller->isAfterEnabled());
-            hardware->getLed(hardware::ComponentId::AFTER_OR_ASSIGN_LED)->setEnabled(controller->isAfterEnabled());
+            hardware->getLed(hardware::ComponentId::AFTER_OR_ASSIGN_LED)
+                ->setEnabled(controller->isAfterEnabled());
         }
     }
 

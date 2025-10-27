@@ -4,9 +4,8 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class TimingCorrectScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::WithTimesAndNotes
+    class TimingCorrectScreen : public mpc::lcdgui::ScreenComponent,
+                                public mpc::lcdgui::screens::WithTimesAndNotes
     {
 
     public:
@@ -30,8 +29,10 @@ namespace mpc::lcdgui::screens::window
         void displayTime() override;
 
     private:
-        const std::vector<std::string> noteValueNames = {"OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)"};
-        const std::vector<unsigned char> noteValueLengthsInTicks{1, 48, 32, 24, 16, 12, 8};
+        const std::vector<std::string> noteValueNames = {
+            "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)"};
+        const std::vector<unsigned char> noteValueLengthsInTicks{1,  48, 32, 24,
+                                                                 16, 12, 8};
         bool shiftTimingLater = false;
         int swing = 50;
         int amount = 0;

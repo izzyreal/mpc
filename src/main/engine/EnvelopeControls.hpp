@@ -5,8 +5,7 @@
 namespace mpc::engine
 {
 
-    class EnvelopeControls
-        : public mpc::engine::control::CompoundControl
+    class EnvelopeControls : public mpc::engine::control::CompoundControl
     {
 
     private:

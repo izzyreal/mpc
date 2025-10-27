@@ -23,17 +23,20 @@ namespace mpc::file::all
         static const int NAME_OFFSET = 0;
 
         /**
-         * Each step in a song is 2 bytes. The first byte is the sequence index (0 - 99),
-         * the second byte is the number of repeats.
+         * Each step in a song is 2 bytes. The first byte is the sequence index
+         * (0 - 99), the second byte is the number of repeats.
          */
-        static const int FIRST_STEP_OFFSET = NAME_OFFSET + AllParser::NAME_LENGTH;
+        static const int FIRST_STEP_OFFSET =
+            NAME_OFFSET + AllParser::NAME_LENGTH;
         static const int STEPS_LENGTH = 500;
         static const int STEP_LENGTH = 2;
         static const int STEP_COUNT = 250;
-        static const int STEPS_TERMINATOR_OFFSET = FIRST_STEP_OFFSET + (STEP_COUNT * STEP_LENGTH);
+        static const int STEPS_TERMINATOR_OFFSET =
+            FIRST_STEP_OFFSET + (STEP_COUNT * STEP_LENGTH);
         static const int IS_USED_OFFSET = STEPS_TERMINATOR_OFFSET + 2;
         static const int LOOP_FIRST_STEP_INDEX_OFFSET = IS_USED_OFFSET + 1;
-        static const int LOOP_LAST_STEP_INDEX_OFFSET = LOOP_FIRST_STEP_INDEX_OFFSET + 1;
+        static const int LOOP_LAST_STEP_INDEX_OFFSET =
+            LOOP_FIRST_STEP_INDEX_OFFSET + 1;
         static const int LOOP_ENABLED_OFFSET = LOOP_LAST_STEP_INDEX_OFFSET + 1;
 
     private:

@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class VmpcFileInUseScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcFileInUseScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

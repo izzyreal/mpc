@@ -37,7 +37,9 @@ void MidiChannelPrefix::writeToOutputStream(std::ostream &out)
     out << (char)mChannel;
 }
 
-std::shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta, MetaEventData *info)
+std::shared_ptr<MetaEvent>
+MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta,
+                                          MetaEventData *info)
 {
     if (info->length.getValue() != 1)
     {

@@ -66,9 +66,8 @@ namespace mpc::lcdgui
     };
     struct bmfont_stream
     {
-        bmfont_stream(uint8_t *pBuffer, size_t _size) : pos(0),
-                                                        size(_size),
-                                                        pByteData(pBuffer)
+        bmfont_stream(uint8_t *pBuffer, size_t _size)
+            : pos(0), size(_size), pByteData(pBuffer)
         {
         }
         // Unsigned
@@ -94,7 +93,9 @@ namespace mpc::lcdgui
         }
         uint32_t currentU32()
         {
-            return (uint32_t)((pByteData[pos + 3] << 24) | (pByteData[pos + 2] << 16) | (pByteData[pos + 1] << 8) | pByteData[pos]);
+            return (uint32_t)((pByteData[pos + 3] << 24) |
+                              (pByteData[pos + 2] << 16) |
+                              (pByteData[pos + 1] << 8) | pByteData[pos]);
         }
         uint32_t getU32()
         {
@@ -125,7 +126,9 @@ namespace mpc::lcdgui
         }
         int32_t currentS32()
         {
-            return (int32_t)((pByteData[pos + 3] << 24) | (pByteData[pos + 2] << 16) | (pByteData[pos + 1] << 8) | pByteData[pos]);
+            return (int32_t)((pByteData[pos + 3] << 24) |
+                             (pByteData[pos + 2] << 16) |
+                             (pByteData[pos + 1] << 8) | pByteData[pos]);
         }
         int32_t getS32()
         {

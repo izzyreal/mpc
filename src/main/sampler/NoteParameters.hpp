@@ -39,8 +39,10 @@ namespace mpc::sampler
         std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
 
     private:
-        std::shared_ptr<mpc::engine::StereoMixer> stereoMixerChannel = std::make_shared<mpc::engine::StereoMixer>();
-        std::shared_ptr<mpc::engine::IndivFxMixer> indivFxMixerChannel = std::make_shared<mpc::engine::IndivFxMixer>();
+        std::shared_ptr<mpc::engine::StereoMixer> stereoMixerChannel =
+            std::make_shared<mpc::engine::StereoMixer>();
+        std::shared_ptr<mpc::engine::IndivFxMixer> indivFxMixerChannel =
+            std::make_shared<mpc::engine::IndivFxMixer>();
         int soundIndex = -1;
         int soundGenerationMode = 0;
         int velocityRangeLower = 0;

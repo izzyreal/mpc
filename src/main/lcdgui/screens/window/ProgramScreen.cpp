@@ -63,7 +63,8 @@ void ProgramScreen::function(int i)
         {
             if (sampler->getProgramCount() == 24)
             {
-                ls->showPopupAndAwaitInteraction("Prog. directory full(24 max)");
+                ls->showPopupAndAwaitInteraction(
+                    "Prog. directory full(24 max)");
                 return;
             }
 
@@ -85,5 +86,6 @@ void ProgramScreen::displayProgramName()
 void ProgramScreen::displayMidiProgramChange()
 {
     auto program = getProgramOrThrow();
-    findField("midiprogramchange")->setTextPadded(program->getMidiProgramChange(), " ");
+    findField("midiprogramchange")
+        ->setTextPadded(program->getMidiProgramChange(), " ");
 }

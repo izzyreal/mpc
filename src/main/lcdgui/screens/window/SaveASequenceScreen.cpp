@@ -45,11 +45,13 @@ void SaveASequenceScreen::openNameScreen()
     if (focusedFieldName == "file")
     {
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(sequencer->getActiveSequence()->getName(), 16, [this](std::string &)
-                               {
-                                   mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
-                               },
-                               "save-a-sequence");
+        nameScreen->initialize(
+            sequencer->getActiveSequence()->getName(), 16,
+            [this](std::string &)
+            {
+                mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+            },
+            "save-a-sequence");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
@@ -65,7 +67,9 @@ void SaveASequenceScreen::function(int i)
         case 4:
         {
             auto nameScreen = mpc.screens->get<NameScreen>();
-            auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
+            auto fileName =
+                mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
+                ".MID";
             auto disk = mpc.getDisk();
 
             if (disk->checkExists(fileName))
@@ -78,7 +82,8 @@ void SaveASequenceScreen::function(int i)
                     {
                         disk->flush();
                         disk->initFiles();
-                        disk->writeMid(sequencer->getActiveSequence(), fileName);
+                        disk->writeMid(sequencer->getActiveSequence(),
+                                       fileName);
                     }
                 };
 
@@ -87,16 +92,20 @@ void SaveASequenceScreen::function(int i)
                     auto nameScreen = mpc.screens->get<NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                        mpc.getLayeredScreen()
+                            ->openScreen<SaveASequenceScreen>();
                     };
-                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+                    nameScreen->initialize(nameScreen->getNameWithoutSpaces(),
+                                           16, enterAction, "save");
                 };
 
                 auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                             {
-                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                             });
+                fileExistsScreen->initialize(
+                    replaceAction, initializeNameScreen,
+                    [this]
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                    });
                 mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
                 return;
             }
@@ -111,7 +120,8 @@ void SaveASequenceScreen::function(int i)
 
 void SaveASequenceScreen::displaySaveAs()
 {
-    findField("saveas")->setText("MIDI FILE TYPE " + std::to_string(saveSequenceAs));
+    findField("saveas")->setText("MIDI FILE TYPE " +
+                                 std::to_string(saveSequenceAs));
 }
 
 void SaveASequenceScreen::displayFile()

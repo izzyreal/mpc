@@ -44,22 +44,26 @@ void MixerSetupScreen::displayFxDrum()
 
 void MixerSetupScreen::displayStereoMixSource()
 {
-    findField("stereomixsource")->setText(isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
+    findField("stereomixsource")
+        ->setText(isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
 void MixerSetupScreen::displayIndivFxSource()
 {
-    findField("indivfxsource")->setText(isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
+    findField("indivfxsource")
+        ->setText(isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
 void MixerSetupScreen::displayCopyPgmMixToDrum()
 {
-    findField("copypgmmixtodrum")->setText(isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
+    findField("copypgmmixtodrum")
+        ->setText(isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
 }
 
 void MixerSetupScreen::displayRecordMixChanges()
 {
-    findField("recordmixchanges")->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
+    findField("recordmixchanges")
+        ->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
 }
 
 void MixerSetupScreen::turnWheel(int i)
@@ -117,7 +121,8 @@ void MixerSetupScreen::setMasterLevel(int i)
     }
     masterLevel = i;
 
-    mpc.getAudioMidiServices()->setMixerMasterLevel(masterLevelValues[masterLevel + 13]);
+    mpc.getAudioMidiServices()->setMixerMasterLevel(
+        masterLevelValues[masterLevel + 13]);
 
     displayMasterLevel();
 }

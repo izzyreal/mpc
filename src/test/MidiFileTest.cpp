@@ -52,8 +52,11 @@ SCENARIO("A MidiFile can be written", "[file]")
         midiReader.parseSequence(mpc);
 
         REQUIRE(sequence->getTrack(0)->getEvents().size() == 1);
-        REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(sequence->getTrack(0)->getEvents()[0]));
-        REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(sequence->getTrack(0)->getEvents()[0])->getNote() == 37);
+        REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(
+            sequence->getTrack(0)->getEvents()[0]));
+        REQUIRE(std::dynamic_pointer_cast<NoteOnEvent>(
+                    sequence->getTrack(0)->getEvents()[0])
+                    ->getNote() == 37);
         REQUIRE(sequence->getTrack(0)->getDeviceIndex() == 2);
         REQUIRE(sequence->getTrack(1)->getDeviceIndex() == 0);
     }

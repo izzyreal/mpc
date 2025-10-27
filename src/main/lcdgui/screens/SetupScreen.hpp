@@ -8,8 +8,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class SetupScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SetupScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         SetupScreen(mpc::Mpc &mpc, const int layerIndex);

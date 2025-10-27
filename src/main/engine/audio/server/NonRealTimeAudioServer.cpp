@@ -11,7 +11,8 @@ using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-NonRealTimeAudioServer::NonRealTimeAudioServer(shared_ptr<AudioServer> serverToUse)
+NonRealTimeAudioServer::NonRealTimeAudioServer(
+    shared_ptr<AudioServer> serverToUse)
 {
     server = std::move(serverToUse);
     realTime = true;
@@ -23,7 +24,8 @@ void NonRealTimeAudioServer::setSampleRate(int rate)
     server->setSampleRate(rate);
 }
 
-void NonRealTimeAudioServer::setSharedPtr(shared_ptr<NonRealTimeAudioServer> sharedPtr)
+void NonRealTimeAudioServer::setSharedPtr(
+    shared_ptr<NonRealTimeAudioServer> sharedPtr)
 {
     me = std::move(sharedPtr);
 }
@@ -80,10 +82,11 @@ void NonRealTimeAudioServer::startNonRealTimeThread()
         nonRealTimeThread.join();
     }
 
-    nonRealTimeThread = std::thread([this]
-                                    {
-                                        runNonRealTime();
-                                    });
+    nonRealTimeThread = std::thread(
+        [this]
+        {
+            runNonRealTime();
+        });
 }
 
 void NonRealTimeAudioServer::stop()
@@ -131,16 +134,18 @@ bool NonRealTimeAudioServer::isRunning()
 }
 
 void NonRealTimeAudioServer::work(
-    const float *const *inputBuffer,
-    float *const *outputBuffer,
-    const int nFrames,
-    const std::vector<int8_t> &mpcMonoInputChannelIndices,
+    const float *const *inputBuffer, float *const *outputBuffer,
+    const int nFrames, const std::vector<int8_t> &mpcMonoInputChannelIndices,
     const std::vector<int8_t> &mpcMonoOutputChannelIndices,
     const std::vector<int8_t> &hostInputChannelIndices,
     const std::vector<int8_t> &hostOutputChannelIndices)
 {
-    auto realTimeAudioServer = dynamic_pointer_cast<RealTimeAudioServer>(server);
-    realTimeAudioServer->work(inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices, mpcMonoOutputChannelIndices, hostInputChannelIndices, hostOutputChannelIndices);
+    auto realTimeAudioServer =
+        dynamic_pointer_cast<RealTimeAudioServer>(server);
+    realTimeAudioServer->work(
+        inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices,
+        mpcMonoOutputChannelIndices, hostInputChannelIndices,
+        hostOutputChannelIndices);
 }
 
 void NonRealTimeAudioServer::work(int nFrames)

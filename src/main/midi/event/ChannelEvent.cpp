@@ -11,12 +11,14 @@
 
 using namespace mpc::midi::event;
 
-ChannelEvent::ChannelEvent(int tick, int type, int channel, int param1, int param2)
+ChannelEvent::ChannelEvent(int tick, int type, int channel, int param1,
+                           int param2)
     : ChannelEvent(tick, 0, type, channel, param1, param2)
 {
 }
 
-ChannelEvent::ChannelEvent(int tick, int delta, int type, int channel, int param1, int param2)
+ChannelEvent::ChannelEvent(int tick, int delta, int type, int channel,
+                           int param1, int param2)
     : MidiEvent(tick, delta)
 {
     mType = type & 0x0F;
@@ -62,7 +64,8 @@ int ChannelEvent::getEventSize()
 
 int ChannelEvent::compareTo(MidiEvent *o)
 {
-    return 1; // hack to emulate MPC2000XL MID writing. this makes sure the event order is not changed after they are added
+    return 1; // hack to emulate MPC2000XL MID writing. this makes sure the
+              // event order is not changed after they are added
 }
 
 bool ChannelEvent::requiresStatusByte(MidiEvent *prevEvent)
@@ -97,7 +100,9 @@ void ChannelEvent::writeToOutputStream(std::ostream &out, bool writeType)
     }
 }
 
-std::shared_ptr<ChannelEvent> ChannelEvent::parseChannelEvent(int tick, int delta, int type, int channel, std::stringstream &in)
+std::shared_ptr<ChannelEvent>
+ChannelEvent::parseChannelEvent(int tick, int delta, int type, int channel,
+                                std::stringstream &in)
 {
     int val1 = in.get();
     int val2 = 0;
@@ -112,17 +117,22 @@ std::shared_ptr<ChannelEvent> ChannelEvent::parseChannelEvent(int tick, int delt
         case NOTE_ON:
             return std::make_shared<NoteOn>(tick, delta, channel, val1, val2);
         case NOTE_AFTERTOUCH:
-            return std::make_shared<NoteAftertouch>(tick, delta, channel, val1, val2);
+            return std::make_shared<NoteAftertouch>(tick, delta, channel, val1,
+                                                    val2);
         case CONTROLLER:
-            return std::make_shared<Controller>(tick, delta, channel, val1, val2);
+            return std::make_shared<Controller>(tick, delta, channel, val1,
+                                                val2);
         case PROGRAM_CHANGE:
             return std::make_shared<ProgramChange>(tick, delta, channel, val1);
         case CHANNEL_AFTERTOUCH:
-            return std::make_shared<ChannelAftertouch>(tick, delta, channel, val1);
+            return std::make_shared<ChannelAftertouch>(tick, delta, channel,
+                                                       val1);
         case PITCH_BEND:
-            return std::make_shared<PitchBend>(tick, delta, channel, val1, val2);
+            return std::make_shared<PitchBend>(tick, delta, channel, val1,
+                                               val2);
         default:
-            return std::make_shared<ChannelEvent>(tick, delta, type, channel, val1, val2);
+            return std::make_shared<ChannelEvent>(tick, delta, type, channel,
+                                                  val1, val2);
     }
 }
 

@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class Event
-        : public Observable
+    class Event : public Observable
     {
     public:
         bool dontDelete = false;

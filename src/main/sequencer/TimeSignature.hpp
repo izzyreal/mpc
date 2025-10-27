@@ -13,7 +13,8 @@ namespace mpc::sequencer
         TimeSignature(const TimeSignature &other);
         bool operator!=(const TimeSignature &other) const
         {
-            return numerator != other.numerator || denominator != other.denominator;
+            return numerator != other.numerator ||
+                   denominator != other.denominator;
         }
         void setNumerator(int i);
         int getNumerator();

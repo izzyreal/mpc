@@ -85,11 +85,13 @@ void LoadASequenceScreen::setLoadInto(int i)
 void LoadASequenceScreen::displayLoadInto()
 {
     findField("load-into")->setTextPadded(loadInto + 1, "0");
-    findLabel("name")->setText("-" + sequencer->getSequence(loadInto)->getName());
+    findLabel("name")->setText("-" +
+                               sequencer->getSequence(loadInto)->getName());
 }
 
 void LoadASequenceScreen::displayFile()
 {
     auto s = sequencer->getPlaceHolder();
-    findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
+    findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) +
+                               ".MID");
 }

@@ -17,7 +17,9 @@ void VmpcAutoSaveScreen::open()
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
     auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
-    ls->setFunctionKeysArrangement(midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1 : 0);
+    ls->setFunctionKeysArrangement(
+        midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
+                                                                         : 0);
 }
 
 void VmpcAutoSaveScreen::function(int i)
@@ -37,7 +39,8 @@ void VmpcAutoSaveScreen::function(int i)
         {
             auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
-            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+            if (vmpcSettingsScreen->getMidiControlMode() ==
+                VmpcSettingsScreen::MidiControlMode::ORIGINAL)
             {
                 return;
             }
@@ -88,12 +91,14 @@ void VmpcAutoSaveScreen::setAutoLoadOnStart(int i)
 
 void VmpcAutoSaveScreen::displayAutoSaveOnExit()
 {
-    findField("auto-save-on-exit")->setText(autoSaveOnExitNames[autoSaveOnExit]);
+    findField("auto-save-on-exit")
+        ->setText(autoSaveOnExitNames[autoSaveOnExit]);
 }
 
 void VmpcAutoSaveScreen::displayAutoLoadOnStart()
 {
-    findField("auto-load-on-start")->setText(autoLoadOnStartNames[autoLoadOnStart]);
+    findField("auto-load-on-start")
+        ->setText(autoLoadOnStartNames[autoLoadOnStart]);
 }
 
 int VmpcAutoSaveScreen::getAutoSaveOnExit()

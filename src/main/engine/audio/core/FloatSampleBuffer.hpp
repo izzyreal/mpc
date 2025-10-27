@@ -34,20 +34,25 @@ namespace mpc::engine::audio::core
 
     protected:
         void init(int channelCount, int sampleCount, float sampleRate);
-        void init(int channelCount, int sampleCount, float sampleRate, bool lazy);
+        void init(int channelCount, int sampleCount, float sampleRate,
+                  bool lazy);
 
     public:
         void insertChannel(int index, bool silent);
         void insertChannel(int index, bool silent, bool lazy);
-        void initFromByteArray_(const std::vector<char> &buffer, int offset, int byteCount, AudioFormat *format);
-        void initFromByteArray_(const std::vector<char> &buffer, int offset, int byteCount, AudioFormat *format, bool lazy);
+        void initFromByteArray_(const std::vector<char> &buffer, int offset,
+                                int byteCount, AudioFormat *format);
+        void initFromByteArray_(const std::vector<char> &buffer, int offset,
+                                int byteCount, AudioFormat *format, bool lazy);
 
         void reset();
         void reset(int channels, int sampleCount, float sampleRate);
         int getByteArrayBufferSize(AudioFormat *format);
         int getByteArrayBufferSize(AudioFormat *format, int lenInSamples);
 
-        int convertToByteArray_(int readOffset, int lenInSamples, std::vector<char> &buffer, int writeOffset, AudioFormat *format);
+        int convertToByteArray_(int readOffset, int lenInSamples,
+                                std::vector<char> &buffer, int writeOffset,
+                                AudioFormat *format);
 
         void changeSampleCount(int newSampleCount, bool keepOldSamples);
         void makeSilence();

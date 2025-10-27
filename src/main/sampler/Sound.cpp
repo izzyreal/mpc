@@ -248,17 +248,22 @@ void Sound::insertFrame(std::vector<float> frame, unsigned int index)
     sampleData->insert(sampleData->begin() + index, frame[0]);
 }
 
-void Sound::insertFrames(std::vector<float> &frames, unsigned int index, uint32_t nFrames)
+void Sound::insertFrames(std::vector<float> &frames, unsigned int index,
+                         uint32_t nFrames)
 {
     assert(mono);
-    sampleData->insert(sampleData->begin() + index, frames.begin(), frames.begin() + nFrames);
+    sampleData->insert(sampleData->begin() + index, frames.begin(),
+                       frames.begin() + nFrames);
 }
 
-void Sound::insertFrames(std::vector<float> &left, std::vector<float> &right, unsigned int index, uint32_t nFrames)
+void Sound::insertFrames(std::vector<float> &left, std::vector<float> &right,
+                         unsigned int index, uint32_t nFrames)
 {
     assert(!mono);
-    sampleData->insert(sampleData->begin() + index + getFrameCount(), right.begin(), right.begin() + nFrames);
-    sampleData->insert(sampleData->begin() + index, left.begin(), left.begin() + nFrames);
+    sampleData->insert(sampleData->begin() + index + getFrameCount(),
+                       right.begin(), right.begin() + nFrames);
+    sampleData->insert(sampleData->begin() + index, left.begin(),
+                       left.begin() + nFrames);
 }
 
 void Sound::appendFrames(std::vector<float> &frames, uint32_t nFrames)
@@ -266,7 +271,8 @@ void Sound::appendFrames(std::vector<float> &frames, uint32_t nFrames)
     insertFrames(frames, getFrameCount(), nFrames);
 }
 
-void Sound::appendFrames(std::vector<float> &left, std::vector<float> &right, uint32_t nFrames)
+void Sound::appendFrames(std::vector<float> &left, std::vector<float> &right,
+                         uint32_t nFrames)
 {
     insertFrames(left, right, getFrameCount(), nFrames);
 }
@@ -275,7 +281,9 @@ void Sound::removeFramesFromEnd(int numFramesToRemove)
 {
     if (!mono)
     {
-        sampleData->erase(sampleData->end() - getFrameCount() - numFramesToRemove, sampleData->end() - getFrameCount());
+        sampleData->erase(sampleData->end() - getFrameCount() -
+                              numFramesToRemove,
+                          sampleData->end() - getFrameCount());
     }
 
     sampleData->erase(sampleData->end() - numFramesToRemove, sampleData->end());

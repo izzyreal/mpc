@@ -8,8 +8,7 @@ namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
-    class TempoChangeEvent
-        : public Event
+    class TempoChangeEvent : public Event
     {
 
     private:

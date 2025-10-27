@@ -12,8 +12,8 @@ TEST_CASE("COPY1", "[events-screen]")
 {
     /**
      * Before: 1 bar, 4/4, a note on the first 8 16ths.
-     * Copy operation: Copy all notes of the first half of the bar to the second half.
-     * After: a note on all 16ths.
+     * Copy operation: Copy all notes of the first half of the bar to the second
+     * half. After: a note on all 16ths.
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -47,7 +47,8 @@ TEST_CASE("COPY1", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge,
+                              copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -55,7 +56,8 @@ TEST_CASE("COPY1", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -66,8 +68,8 @@ TEST_CASE("COPY2", "[events-screen]")
 {
     /**
      * Before: 1 bar, 4/4, a note on the first 8 16ths, with 23 ticks "delay".
-     * Copy operation: Copy all notes of the first half of the bar to the second half.
-     * After: a note on all 16ths with 23 ticks "delay".
+     * Copy operation: Copy all notes of the first half of the bar to the second
+     * half. After: a note on all 16ths with 23 ticks "delay".
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -100,7 +102,8 @@ TEST_CASE("COPY2", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge,
+                              copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -108,7 +111,8 @@ TEST_CASE("COPY2", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -158,7 +162,8 @@ TEST_CASE("COPY3", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge,
+                              copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -166,7 +171,8 @@ TEST_CASE("COPY3", "[events-screen]")
 
     for (int i = 0; i < 15; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -209,7 +215,8 @@ TEST_CASE("COPY4", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge,
+                              copies, note0, note1);
 
     REQUIRE(seq->getLastTick() == 384 + 288 + 288 + 288);
     REQUIRE(seq->getBarLengthsInTicks()[0] == 384);
@@ -223,7 +230,8 @@ TEST_CASE("COPY5", "[events-screen]")
     /**
      * Before: A note with note noteIndex + 35 at every 16th
      * Copy operation: Replace 2nd half of the bar with the first
-     * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex to 0 at note 8
+     * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex
+     * to 0 at note 8
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -256,7 +264,8 @@ TEST_CASE("COPY5", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge,
+                              copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 16);
 
@@ -264,7 +273,8 @@ TEST_CASE("COPY5", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -310,7 +320,8 @@ TEST_CASE("COPY6", "[events-screen]")
     int note0 = 34;
     int note1 = 0;
 
-    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge,
+                              copies, note0, note1);
 
     REQUIRE(tr->getEvents().size() == 24);
 
@@ -318,7 +329,8 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
+        auto noteEvent =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + i);
         tickPos += 24;
@@ -328,8 +340,10 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 8; i < 16; i++)
     {
-        auto e1 = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(eventIndex++));
-        auto e2 = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(eventIndex++));
+        auto e1 =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(eventIndex++));
+        auto e2 =
+            std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(eventIndex++));
         REQUIRE(e1->getTick() == tickPos);
         REQUIRE(e1->getNote() == 35 + i);
         REQUIRE(e2->getTick() == tickPos);

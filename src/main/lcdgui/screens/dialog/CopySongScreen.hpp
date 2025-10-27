@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class CopySongScreen
-        : public mpc::lcdgui::ScreenComponent
+    class CopySongScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

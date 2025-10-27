@@ -16,7 +16,8 @@ namespace mpc::disk
         std::vector<char> nameBytes{};
 
     private:
-        static std::vector<char> toCharArray_(std::string name, std::string ext);
+        static std::vector<char> toCharArray_(std::string name,
+                                              std::string ext);
         void init();
 
     public:
@@ -30,7 +31,8 @@ namespace mpc::disk
     private:
         static void checkValidName(std::string name);
         static void checkValidExt(std::string ext);
-        static void checkString(std::string str, std::string strType, int minLength, int maxLength);
+        static void checkString(std::string str, std::string strType,
+                                int minLength, int maxLength);
 
     public:
         int hashCode();

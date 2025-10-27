@@ -25,8 +25,7 @@ namespace mpc::lcdgui
     public:
         Screens(mpc::Mpc &mpc);
 
-        template <typename T>
-        std::shared_ptr<T> get()
+        template <typename T> std::shared_ptr<T> get()
         {
             for (auto &screen : screens)
             {
@@ -56,7 +55,8 @@ namespace mpc::lcdgui
 
         std::vector<std::shared_ptr<ScreenComponent>> screens;
 
-        std::optional<ScreenLayout> getScreenLayout(const std::string &screenName);
+        std::optional<ScreenLayout>
+        getScreenLayout(const std::string &screenName);
         void createAndCacheScreen(const std::string &screenName);
     };
 } // namespace mpc::lcdgui

@@ -12,7 +12,8 @@ using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;
 
-AudioMixer::AudioMixer(const std::shared_ptr<MixerControls> &controlsToUse, const std::shared_ptr<AudioServer> &serverToUse)
+AudioMixer::AudioMixer(const std::shared_ptr<MixerControls> &controlsToUse,
+                       const std::shared_ptr<AudioServer> &serverToUse)
     : controls(controlsToUse), server(serverToUse)
 {
     sharedAudioBuffer = server->createAudioBuffer("Mixer (shared)");
@@ -83,7 +84,9 @@ void AudioMixer::work(int nFrames)
     writeBusBuffers(nFrames);
 }
 
-void AudioMixer::evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate, int nFrames)
+void AudioMixer::evaluateStrips(
+    std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate,
+    int nFrames)
 {
     for (auto &strip : stripsToEvaluate)
     {
@@ -91,7 +94,8 @@ void AudioMixer::evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>> &s
     }
 }
 
-void AudioMixer::silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence)
+void AudioMixer::silenceStrips(
+    std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence)
 {
     for (auto &strip : stripsToSilence)
     {
@@ -123,7 +127,8 @@ void AudioMixer::createBusses(std::shared_ptr<MixerControls> mixerControls)
     busses.push_back(mainBus);
 }
 
-std::shared_ptr<AudioMixerBus> AudioMixer::createBus(std::shared_ptr<BusControls> busControls)
+std::shared_ptr<AudioMixerBus>
+AudioMixer::createBus(std::shared_ptr<BusControls> busControls)
 {
     return std::make_shared<AudioMixerBus>(this, busControls);
 }
@@ -158,7 +163,8 @@ void AudioMixer::createStrips(std::shared_ptr<MixerControls> mixerControls)
 {
     for (auto &control : mixerControls->getControls())
     {
-        auto candidate = std::dynamic_pointer_cast<core::AudioControlsChain>(control);
+        auto candidate =
+            std::dynamic_pointer_cast<core::AudioControlsChain>(control);
         if (candidate)
         {
             createStrip(candidate);
@@ -166,7 +172,8 @@ void AudioMixer::createStrips(std::shared_ptr<MixerControls> mixerControls)
     }
 }
 
-std::shared_ptr<AudioMixerStrip> AudioMixer::createStrip(std::shared_ptr<AudioControlsChain> controls)
+std::shared_ptr<AudioMixerStrip>
+AudioMixer::createStrip(std::shared_ptr<AudioControlsChain> controls)
 {
 
     auto strip = std::make_shared<AudioMixerStrip>(this, controls);

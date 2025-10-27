@@ -4,10 +4,10 @@
 
 namespace mpc::lcdgui
 {
-#define X(ns, Class, name) \
-    namespace ns           \
-    {                      \
-        class Class;       \
+#define X(ns, Class, name)                                                     \
+    namespace ns                                                               \
+    {                                                                          \
+        class Class;                                                           \
     }
     SCREEN_LIST
 #undef X

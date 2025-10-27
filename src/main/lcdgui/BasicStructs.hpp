@@ -22,7 +22,8 @@ namespace mpc::lcdgui
 
         inline std::string getInfo() const
         {
-            return "x " + std::to_string(L) + ", y " + std::to_string(T) + ", w " + std::to_string(W()) + ", h " + std::to_string(H());
+            return "x " + std::to_string(L) + ", y " + std::to_string(T) +
+                   ", w " + std::to_string(W()) + ", h " + std::to_string(H());
         }
 
         void Clear()
@@ -67,7 +68,8 @@ namespace mpc::lcdgui
             {
                 return *this;
             }
-            return MRECT(std::min<int>(L, pRHS->L), std::min<int>(T, pRHS->T), std::max<int>(R, pRHS->R), std::max<int>(B, pRHS->B));
+            return MRECT(std::min<int>(L, pRHS->L), std::min<int>(T, pRHS->T),
+                         std::max<int>(R, pRHS->R), std::max<int>(B, pRHS->B));
         }
     };
 } // namespace mpc::lcdgui

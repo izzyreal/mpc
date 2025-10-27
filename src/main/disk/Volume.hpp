@@ -100,7 +100,8 @@ namespace mpc::disk
         {
             if (type == LOCAL_DIRECTORY)
             {
-                return std::make_shared<mpc::disk::MpcFile>(fs::path(localDirectoryPath));
+                return std::make_shared<mpc::disk::MpcFile>(
+                    fs::path(localDirectoryPath));
             }
             return {};
         }
@@ -109,14 +110,19 @@ namespace mpc::disk
         {
             if (type == USB_VOLUME && mode != DISABLED)
             {
-                volumeStream = akaifat::util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
+                volumeStream = akaifat::util::VolumeMounter::mount(
+                    volumePath, mode == READ_ONLY);
 
                 if (volumeStream.is_open())
                 {
-                    volumeDevice = std::make_shared<akaifat::ImageBlockDevice>(volumeStream, volumeSize);
-                    volumeFs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(akaifat::FileSystemFactory::createAkai(volumeDevice, mode == READ_ONLY));
+                    volumeDevice = std::make_shared<akaifat::ImageBlockDevice>(
+                        volumeStream, volumeSize);
+                    volumeFs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(
+                        akaifat::FileSystemFactory::createAkai(
+                            volumeDevice, mode == READ_ONLY));
 
-                    return std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(volumeFs->getRoot());
+                    return std::dynamic_pointer_cast<
+                        akaifat::fat::AkaiFatLfnDirectory>(volumeFs->getRoot());
                 }
             }
             return {};

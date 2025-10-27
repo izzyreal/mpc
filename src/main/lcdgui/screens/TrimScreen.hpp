@@ -21,8 +21,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class TrimScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TrimScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -43,7 +42,8 @@ namespace mpc::lcdgui::screens
         void open() override;
 
     private:
-        const std::vector<std::string> playXNames = {"ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END"};
+        const std::vector<std::string> playXNames = {"ALL", "ZONE", "BEFOR ST",
+                                                     "BEFOR TO", "AFTR END"};
         void displaySnd();
         void displayPlayX();
         void displaySt();

@@ -25,9 +25,7 @@
 
 namespace mpc::lcdgui
 {
-    class ScreenComponent
-        : public Component,
-          public Observer
+    class ScreenComponent : public Component, public Observer
     {
 
     private:
@@ -56,7 +54,8 @@ namespace mpc::lcdgui
         std::shared_ptr<sampler::Program> getProgramOrThrow();
 
     protected:
-        void setLastFocus(const std::string &screenName, const std::string &newLastFocus);
+        void setLastFocus(const std::string &screenName,
+                          const std::string &newLastFocus);
         const std::string getLastFocus(const std::string &screenName);
         std::shared_ptr<Wave> findWave();
         std::shared_ptr<EnvGraph> findEnvGraph();
@@ -66,9 +65,12 @@ namespace mpc::lcdgui
         virtual void close() {}
 
     public:
-        ScreenComponent(mpc::Mpc &mpc, const std::string &name, const int layer);
+        ScreenComponent(mpc::Mpc &mpc, const std::string &name,
+                        const int layer);
         std::shared_ptr<Field> findFocus();
-        void setTransferMap(const std::map<std::string, std::vector<std::string>> &newTransferMap);
+        void
+        setTransferMap(const std::map<std::string, std::vector<std::string>>
+                           &newTransferMap);
         void setFirstField(const std::string &newFirstField);
         std::string getFirstField();
         std::map<std::string, std::vector<std::string>> &getTransferMap();
@@ -137,7 +139,8 @@ namespace mpc::lcdgui
 
             if (std::abs(result) != 1)
             {
-                result *= (int)(ceil(mpc.getSampler()->getSound()->getFrameCount() / 15000.f));
+                result *= (int)(ceil(
+                    mpc.getSampler()->getSound()->getFrameCount() / 15000.f));
             }
 
             return result;

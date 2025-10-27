@@ -5,8 +5,7 @@
 namespace mpc::engine::filter
 {
 
-    class StateVariableFilterControls
-        : public FilterControls
+    class StateVariableFilterControls : public FilterControls
     {
     public:
         void derive(mpc::engine::control::Control *c) override;

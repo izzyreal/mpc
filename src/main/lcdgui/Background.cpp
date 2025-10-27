@@ -6,8 +6,7 @@
 
 using namespace mpc::lcdgui;
 
-Background::Background()
-    : Component("background")
+Background::Background() : Component("background")
 {
     x = 0;
     y = 0;
@@ -46,8 +45,10 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
             height = 360;
         }
 
-        const auto file_data_char = MpcResourceUtil::get_resource_data(fileName);
-        std::vector<unsigned char> file_data(file_data_char.begin(), file_data_char.end());
+        const auto file_data_char =
+            MpcResourceUtil::get_resource_data(fileName);
+        std::vector<unsigned char> file_data(file_data_char.begin(),
+                                             file_data_char.end());
         std::vector<unsigned char> data;
 
         lodepng::decode(data, width, height, file_data, LCT_RGB, 8);
@@ -71,7 +72,8 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
             {
                 if (unobtrusive)
                 {
-                    if (x < unobtrusiveRect.L || x > unobtrusiveRect.R || y < unobtrusiveRect.T || y > unobtrusiveRect.B)
+                    if (x < unobtrusiveRect.L || x > unobtrusiveRect.R ||
+                        y < unobtrusiveRect.T || y > unobtrusiveRect.B)
                     {
                         byteCounter += 3;
                         continue;
@@ -125,32 +127,33 @@ void Background::setScrolling(bool b)
     else
     {
         scrollingDown = true;
-        scrollThread = std::make_unique<std::thread>([&]
-                                                     {
-                                                         while (scrolling)
-                                                         {
-                                                             std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        scrollThread = std::make_unique<std::thread>(
+            [&]
+            {
+                while (scrolling)
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-                                                             if (scrollingDown)
-                                                             {
-                                                                 scrollOffset += 1;
-                                                             }
-                                                             else if (scrolling)
-                                                             {
-                                                                 scrollOffset -= 1;
-                                                             }
+                    if (scrollingDown)
+                    {
+                        scrollOffset += 1;
+                    }
+                    else if (scrolling)
+                    {
+                        scrollOffset -= 1;
+                    }
 
-                                                             if (scrollOffset >= 300)
-                                                             {
-                                                                 scrollingDown = false;
-                                                             }
-                                                             else if (scrollOffset <= 0)
-                                                             {
-                                                                 scrollingDown = true;
-                                                             }
+                    if (scrollOffset >= 300)
+                    {
+                        scrollingDown = false;
+                    }
+                    else if (scrollOffset <= 0)
+                    {
+                        scrollingDown = true;
+                    }
 
-                                                             SetDirty();
-                                                         }
-                                                     });
+                    SetDirty();
+                }
+            });
     }
 }

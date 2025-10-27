@@ -10,9 +10,9 @@ using namespace mpc::client::event;
 void ClientMidiEvent::printInfo() const noexcept
 {
     static const char *typeNames[] = {
-        "NOTE_ON", "NOTE_OFF", "CONTROLLER", "AFTERTOUCH",
-        "CHANNEL_PRESSURE", "MIDI_CLOCK", "MIDI_START",
-        "MIDI_STOP", "MIDI_CONTINUE", "PROGRAM_CHANGE", "PITCH_WHEEL"};
+        "NOTE_ON",          "NOTE_OFF",       "CONTROLLER", "AFTERTOUCH",
+        "CHANNEL_PRESSURE", "MIDI_CLOCK",     "MIDI_START", "MIDI_STOP",
+        "MIDI_CONTINUE",    "PROGRAM_CHANGE", "PITCH_WHEEL"};
 
     std::string msg = "MIDI Event: " + std::string(typeNames[messageType]) +
                       " | Ch: " + std::to_string(channel) +

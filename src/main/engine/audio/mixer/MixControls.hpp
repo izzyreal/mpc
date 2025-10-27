@@ -53,12 +53,14 @@ namespace mpc::engine::audio::mixer
         float getSmoothingFactor();
 
     public:
-        virtual mpc::engine::control::EnumControl *createRouteControl(int stripId);
+        virtual mpc::engine::control::EnumControl *
+        createRouteControl(int stripId);
 
         virtual mpc::engine::control::BooleanControl *createMuteControl();
 
     public:
-        MixControls(MixerControls *mixerControls, int stripId, std::shared_ptr<BusControls> busControls, bool isMaster);
+        MixControls(MixerControls *mixerControls, int stripId,
+                    std::shared_ptr<BusControls> busControls, bool isMaster);
 
     public:
         std::string getName() override;

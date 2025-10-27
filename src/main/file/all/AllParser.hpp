@@ -85,7 +85,8 @@ namespace mpc::file::all
         mpc::Mpc &mpc;
 
         // Dangerous method, as the caller relies on the argument being a copy
-        std::vector<AllSequence *> readSequences(std::vector<char> trimmedSeqsArray);
+        std::vector<AllSequence *>
+        readSequences(std::vector<char> trimmedSeqsArray);
 
     public:
         std::vector<char> &getBytes();

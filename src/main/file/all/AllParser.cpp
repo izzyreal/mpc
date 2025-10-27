@@ -29,7 +29,8 @@ AllParser::AllParser(mpc::Mpc &_mpc, const std::vector<char> &loadBytes)
 {
     if (loadBytes.size() >= HEADER_OFFSET + HEADER_LENGTH)
     {
-        header = new Header(Util::vecCopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+        header = new Header(Util::vecCopyOfRange(
+            loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
     }
 
     if (header == nullptr || !header->verifyFileID())
@@ -37,25 +38,35 @@ AllParser::AllParser(mpc::Mpc &_mpc, const std::vector<char> &loadBytes)
         throw std::invalid_argument("Invalid ALL file header ID");
     }
 
-    defaults = new Defaults(mpc, Util::vecCopyOfRange(loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
-    sequencer = new AllSequencer(Util::vecCopyOfRange(loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + AllSequencer::LENGTH));
-    count = new Count(Util::vecCopyOfRange(loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
-    midiInput = new MidiInput(Util::vecCopyOfRange(loadBytes, MIDI_INPUT_OFFSET, MIDI_INPUT_OFFSET + MidiInput::LENGTH));
-    midiSyncMisc = new MidiSyncMisc(Util::vecCopyOfRange(loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
-    misc = new Misc(Util::vecCopyOfRange(loadBytes, MISC_OFFSET, MISC_OFFSET + Misc::LENGTH));
-    seqNames = new SequenceNames(Util::vecCopyOfRange(loadBytes, SEQUENCE_NAMES_OFFSET, SEQUENCE_NAMES_OFFSET + SequenceNames::LENGTH));
+    defaults = new Defaults(
+        mpc, Util::vecCopyOfRange(loadBytes, DEFAULTS_OFFSET,
+                                  DEFAULTS_OFFSET + DEFAULTS_LENGTH));
+    sequencer = new AllSequencer(Util::vecCopyOfRange(
+        loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + AllSequencer::LENGTH));
+    count = new Count(Util::vecCopyOfRange(loadBytes, COUNT_OFFSET,
+                                           COUNT_OFFSET + COUNT_LENGTH));
+    midiInput = new MidiInput(Util::vecCopyOfRange(
+        loadBytes, MIDI_INPUT_OFFSET, MIDI_INPUT_OFFSET + MidiInput::LENGTH));
+    midiSyncMisc = new MidiSyncMisc(Util::vecCopyOfRange(
+        loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
+    misc = new Misc(Util::vecCopyOfRange(loadBytes, MISC_OFFSET,
+                                         MISC_OFFSET + Misc::LENGTH));
+    seqNames = new SequenceNames(
+        Util::vecCopyOfRange(loadBytes, SEQUENCE_NAMES_OFFSET,
+                             SEQUENCE_NAMES_OFFSET + SequenceNames::LENGTH));
 
     for (int i = 0; i < 20; i++)
     {
         int offset = SONGS_OFFSET + (i * Song::LENGTH);
-        songs[i] = new Song(Util::vecCopyOfRange(loadBytes, offset, offset + Song::LENGTH));
+        songs[i] = new Song(
+            Util::vecCopyOfRange(loadBytes, offset, offset + Song::LENGTH));
     }
 
-    sequences = readSequences(Util::vecCopyOfRange(loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
+    sequences = readSequences(
+        Util::vecCopyOfRange(loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
-AllParser::AllParser(mpc::Mpc &_mpc)
-    : mpc(_mpc)
+AllParser::AllParser(mpc::Mpc &_mpc) : mpc(_mpc)
 {
     std::vector<std::vector<char>> chunks;
     chunks.push_back(Header().getBytes());
@@ -97,7 +108,8 @@ AllParser::AllParser(mpc::Mpc &_mpc)
     for (int i = 0; i < usedSeqs.size(); i++)
     {
         auto seq = usedSeqs[i];
-        AllSequence allSeq(seq.get(), mpcSequencer->getUsedSequenceIndexes()[i] + 1);
+        AllSequence allSeq(seq.get(),
+                           mpcSequencer->getUsedSequenceIndexes()[i] + 1);
         chunks.push_back(allSeq.getBytes());
     }
 
@@ -201,7 +213,8 @@ std::vector<mpc::file::all::Song *> AllParser::getSongs()
     return songs;
 }
 
-std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeqsArray)
+std::vector<AllSequence *>
+AllParser::readSequences(std::vector<char> trimmedSeqsArray)
 {
     const int totalSeqChunkLength = trimmedSeqsArray.size();
 
@@ -223,7 +236,8 @@ std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeq
             continue;
         }
 
-        eventSegments = AllSequence::getNumberOfEventSegmentsForThisSeq(trimmedSeqsArray);
+        eventSegments =
+            AllSequence::getNumberOfEventSegmentsForThisSeq(trimmedSeqsArray);
         currentSeqEnd = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
 
         if (currentSeqEnd > trimmedSeqsArray.size())
@@ -231,7 +245,8 @@ std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeq
             currentSeqEnd -= 8;
         }
 
-        auto currentSeqArray = Util::vecCopyOfRange(trimmedSeqsArray, 0, currentSeqEnd);
+        auto currentSeqArray =
+            Util::vecCopyOfRange(trimmedSeqsArray, 0, currentSeqEnd);
         auto as = new AllSequence(currentSeqArray);
         seqs.push_back(as);
         read += currentSeqEnd;
@@ -239,7 +254,9 @@ std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeq
 
         if (totalSeqChunkLength - read >= EMPTY_SEQ_LENGTH - 16)
         {
-            trimmedSeqsArray = Util::vecCopyOfRange(trimmedSeqsArray, currentSeqEnd - (multiplier * EVENT_LENGTH), trimmedSeqsArray.size());
+            trimmedSeqsArray = Util::vecCopyOfRange(
+                trimmedSeqsArray, currentSeqEnd - (multiplier * EVENT_LENGTH),
+                trimmedSeqsArray.size());
         }
         else
         {

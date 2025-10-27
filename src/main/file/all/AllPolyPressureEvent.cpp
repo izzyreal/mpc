@@ -6,7 +6,8 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<PolyPressureEvent> AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+std::shared_ptr<PolyPressureEvent>
+AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     auto event = std::make_shared<PolyPressureEvent>();
 
@@ -18,7 +19,8 @@ std::shared_ptr<PolyPressureEvent> AllPolyPressureEvent::bytesToMpcEvent(const s
     return event;
 }
 
-std::vector<char> AllPolyPressureEvent::mpcEventToBytes(std::shared_ptr<PolyPressureEvent> event)
+std::vector<char>
+AllPolyPressureEvent::mpcEventToBytes(std::shared_ptr<PolyPressureEvent> event)
 {
     std::vector<char> bytes(8);
 

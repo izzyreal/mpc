@@ -8,7 +8,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-TransposePermanentScreen::TransposePermanentScreen(mpc::Mpc &mpc, const int layerIndex)
+TransposePermanentScreen::TransposePermanentScreen(mpc::Mpc &mpc,
+                                                   const int layerIndex)
     : ScreenComponent(mpc, "transpose-permanent", layerIndex)
 {
 }

@@ -93,7 +93,8 @@ void ZoneScreen::function(int f)
         case 2:
         {
             sampler->switchToNextSoundSortType();
-            ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            ls->showPopupForMs(
+                "Sorting by " + sampler->getSoundSortingTypeName(), 200);
             break;
         }
         case 3:
@@ -204,7 +205,9 @@ void ZoneScreen::turnWheel(int i)
 
 void ZoneScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    if (!mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed())
     {
         return;
     }
@@ -241,7 +244,8 @@ void ZoneScreen::setSliderZoneEnd(int i)
 {
     const auto sound = sampler->getSound();
     const auto minZoneEnd = zones[zone][0];
-    const auto maxZoneEnd = zone == (numberOfZones - 1) ? sound->getFrameCount() : zones[zone + 1][1];
+    const auto maxZoneEnd = zone == (numberOfZones - 1) ? sound->getFrameCount()
+                                                        : zones[zone + 1][1];
     const auto rangeLength = maxZoneEnd - minZoneEnd;
     const auto newZoneEnd = ((i / 124.0) * rangeLength) + minZoneEnd;
     setZoneEnd(zone, static_cast<int>(newZoneEnd));
@@ -260,7 +264,8 @@ void ZoneScreen::displayWave()
 
     auto sampleData = sound->getSampleData();
     auto trimScreen = mpc.screens->get<TrimScreen>();
-    findWave()->setSampleData(sampleData, sampler->getSound()->isMono(), trimScreen->view);
+    findWave()->setSampleData(sampleData, sampler->getSound()->isMono(),
+                              trimScreen->view);
     findWave()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
 

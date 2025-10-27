@@ -72,18 +72,22 @@ void LoopBarsScreen::displayLastBar()
     }
     else
     {
-        findField("lastbar")->setText(std::to_string(seq->getLastLoopBarIndex() + 1));
+        findField("lastbar")->setText(
+            std::to_string(seq->getLastLoopBarIndex() + 1));
     }
 }
 
 void LoopBarsScreen::displayNumberOfBars()
 {
     auto seq = sequencer->getActiveSequence();
-    findField("numberofbars")->setText(std::to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
+    findField("numberofbars")
+        ->setText(std::to_string(seq->getLastLoopBarIndex() -
+                                 seq->getFirstLoopBarIndex() + 1));
 }
 
 void LoopBarsScreen::displayFirstBar()
 {
     auto seq = sequencer->getActiveSequence();
-    findField("firstbar")->setText(std::to_string(seq->getFirstLoopBarIndex() + 1));
+    findField("firstbar")
+        ->setText(std::to_string(seq->getFirstLoopBarIndex() + 1));
 }

@@ -15,10 +15,7 @@ using namespace mpc::lcdgui::screens;
 using namespace akaifat::util;
 using namespace akaifat::fat;
 
-RawDisk::RawDisk(mpc::Mpc &_mpc)
-    : AbstractDisk(_mpc)
-{
-}
+RawDisk::RawDisk(mpc::Mpc &_mpc) : AbstractDisk(_mpc) {}
 
 RawDisk::~RawDisk()
 {
@@ -30,7 +27,8 @@ RawDisk::~RawDisk()
         }
         catch (const std::exception &)
         {
-            MLOG("Failed to unmount " + volume.volumePath + " from VMPC2000XL and mount it back to the host OS!");
+            MLOG("Failed to unmount " + volume.volumePath +
+                 " from VMPC2000XL and mount it back to the host OS!");
         }
     }
 }
@@ -47,7 +45,8 @@ void RawDisk::initFiles()
 
     for (auto &f : dirList)
     {
-        if ((f.first.length() > 0 && f.first[0] == '.') || f.first == ".." || f.first == "")
+        if ((f.first.length() > 0 && f.first[0] == '.') || f.first == ".." ||
+            f.first == "")
         {
             continue;
         }
@@ -82,7 +81,8 @@ void RawDisk::initParentFiles()
         return;
     }
 
-    auto parent = std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(path[path.size() - 1]->getParent());
+    auto parent = std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(
+        path[path.size() - 1]->getParent());
 
     for (auto &kv : parent->akaiNameIndex)
     {
@@ -120,7 +120,9 @@ bool RawDisk::moveBack()
 bool RawDisk::moveForward(const std::string &directoryName)
 {
     std::string dirNameCopy = directoryName;
-    std::shared_ptr<AkaiFatLfnDirectoryEntry> entry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(getDir()->getEntry(dirNameCopy));
+    std::shared_ptr<AkaiFatLfnDirectoryEntry> entry =
+        std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(
+            getDir()->getEntry(dirNameCopy));
 
     if (!entry || entry->isFile())
     {
@@ -143,7 +145,8 @@ std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getDir()
         return root;
     }
 
-    return std::dynamic_pointer_cast<AkaiFatLfnDirectory>(path[path.size() - 1]->getDirectory());
+    return std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
+        path[path.size() - 1]->getDirectory());
 }
 
 bool RawDisk::deleteAllFiles(int extension)
@@ -156,7 +159,8 @@ bool RawDisk::deleteAllFiles(int extension)
 
         if (!f->isDirectory())
         {
-            if (extension == 0 || StrUtil::hasEnding(f->getName(), extensions[extension]))
+            if (extension == 0 ||
+                StrUtil::hasEnding(f->getName(), extensions[extension]))
             {
                 filesToDelete.push_back(f);
             }
@@ -192,8 +196,10 @@ bool RawDisk::newFolder(const std::string &newDirName)
 
 std::shared_ptr<MpcFile> RawDisk::newFile(const std::string &newFileName)
 {
-    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
-    auto newEntry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(getDir()->addFile(copy));
+    std::string copy =
+        StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
+    auto newEntry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(
+        getDir()->addFile(copy));
     return std::make_shared<MpcFile>(newEntry);
 }
 

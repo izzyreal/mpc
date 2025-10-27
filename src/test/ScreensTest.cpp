@@ -42,14 +42,20 @@ SCENARIO("All screens can be opened", "[gui]")
 
         for (auto &screenName : screenNames)
         {
-            if (std::find(knownUnimplementedScreens.begin(), knownUnimplementedScreens.end(), screenName) != knownUnimplementedScreens.end())
+            if (std::find(knownUnimplementedScreens.begin(),
+                          knownUnimplementedScreens.end(),
+                          screenName) != knownUnimplementedScreens.end())
             {
-                printf("Fix this known unimplemented screen asap: '%s'\n", screenName.c_str());
+                printf("Fix this known unimplemented screen asap: '%s'\n",
+                       screenName.c_str());
                 continue;
             }
-            if (std::find(knownProblematicScreens.begin(), knownProblematicScreens.end(), screenName) != knownProblematicScreens.end())
+            if (std::find(knownProblematicScreens.begin(),
+                          knownProblematicScreens.end(),
+                          screenName) != knownProblematicScreens.end())
             {
-                printf("Fix this known problematic screen asap: '%s'\n", screenName.c_str());
+                printf("Fix this known problematic screen asap: '%s'\n",
+                       screenName.c_str());
                 continue;
             }
 
@@ -85,11 +91,14 @@ SCENARIO("All screens can be opened", "[gui]")
 
             if (blackPixelCount > 0)
             {
-                good.push_back(screenName + " has " + std::to_string(blackPixelCount) + " black pixels");
+                good.push_back(screenName + " has " +
+                               std::to_string(blackPixelCount) +
+                               " black pixels");
             }
             else
             {
-                bad.push_back(screenName + " is openable, but has 0 black pixels");
+                bad.push_back(screenName +
+                              " is openable, but has 0 black pixels");
             }
         }
 

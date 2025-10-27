@@ -5,18 +5,17 @@
 #include <mutex>
 
 /**
- * Important Usage Note: This library reserves one spare entry for queue-full detection
- * Otherwise, corner cases and detecting difference between full/empty is hard.
- * You are not seeing an accidental off-by-one.
+ * Important Usage Note: This library reserves one spare entry for queue-full
+ * detection Otherwise, corner cases and detecting difference between full/empty
+ * is hard. You are not seeing an accidental off-by-one.
  */
 
-template <class T>
-class circular_buffer
+template <class T> class circular_buffer
 {
 
 public:
-    circular_buffer(size_t size) : buf_(std::unique_ptr<T[]>(new T[size])),
-                                   size_(size)
+    circular_buffer(size_t size)
+        : buf_(std::unique_ptr<T[]>(new T[size])), size_(size)
     {
         // empty constructor
     }

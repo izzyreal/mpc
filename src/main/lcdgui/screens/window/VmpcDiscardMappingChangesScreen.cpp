@@ -2,7 +2,8 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VmpcDiscardMappingChangesScreen::VmpcDiscardMappingChangesScreen(mpc::Mpc &mpc, const int layerIndex)
+VmpcDiscardMappingChangesScreen::VmpcDiscardMappingChangesScreen(
+    mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-discard-mapping-changes", layerIndex)
 {
 }

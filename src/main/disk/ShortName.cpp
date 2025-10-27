@@ -8,7 +8,8 @@ using namespace std;
 void ShortName::init()
 {
     // ASCII_ = ::java::nio::charset::Charset::forName("ASCII"_j);
-    ILLEGAL_CHARS_ = vector<char>({34, 42, 43, 44, 46, 47, 58, 59, 60, 61, 62, 63, 91, 92, 93, 124});
+    ILLEGAL_CHARS_ = vector<char>(
+        {34, 42, 43, 44, 46, 47, 58, 59, 60, 61, 62, 63, 91, 92, 93, 124});
 }
 
 ShortName::ShortName(string nameExt)
@@ -155,16 +156,19 @@ ShortName ShortName::parse(vector<char> data)
     /*
     auto const nameArr = new ::char16_tArray(8);
     for (auto i = 0; i < npc(nameArr)->length; i++) {
-            (*nameArr)[i] = static_cast< char16_t >(LittleEndian::getUInt8(data, i));
+            (*nameArr)[i] = static_cast< char16_t >(LittleEndian::getUInt8(data,
+    i));
     }
     if(LittleEndian::getUInt8(data, 0) == 5) {
             (*nameArr)[0] = static_cast< char16_t >(229);
     }
     auto const extArr = new ::char16_tArray(3);
     for (auto i = 0; i < npc(extArr)->length; i++) {
-            (*extArr)[i] = static_cast< char16_t >(LittleEndian::getUInt8(data, 8 + i));
+            (*extArr)[i] = static_cast< char16_t >(LittleEndian::getUInt8(data,
+    8 + i));
     }
-    return new ShortName((new ::String(nameArr))->trim(), (new ::String(extArr))->trim());
+    return new ShortName((new ::String(nameArr))->trim(), (new
+    ::String(extArr))->trim());
     */
     return ShortName("parsedum", "my");
 }
@@ -178,7 +182,8 @@ string ShortName::asSimpleString()
 {
     // auto const name = (new ::String(this->nameBytes, 0, 8, ASCII_))->trim();
     // auto const ext = (new ::String(this->nameBytes, 8, 3, ASCII_))->trim();
-    // return npc(ext)->isEmpty() ? name : ::StringBuilder().append(name)->append("."_j)
+    // return npc(ext)->isEmpty() ? name :
+    // ::StringBuilder().append(name)->append("."_j)
     //     ->append(ext)->toString();
     string name = "";
     for (int i = 0; i < 8; i++)
@@ -210,20 +215,27 @@ void ShortName::checkValidExt(string ext)
     checkString(ext, "extension", 0, 3);
 }
 
-void ShortName::checkString(string str, string strType, int minLength, int maxLength)
+void ShortName::checkString(string str, string strType, int minLength,
+                            int maxLength)
 {
     /*
     if(str == nullptr)
-            throw new ::IllegalArgumentException(::StringBuilder().append(strType)->append(" is null"_j);
+            throw new
+    ::IllegalArgumentException(::StringBuilder().append(strType)->append(" is
+    null"_j);
 
     if(npc(str)->length() < minLength)
-            throw new ::IllegalArgumentException(::StringBuilder().append(strType)->append(" must have at least "_j)
+            throw new
+    ::IllegalArgumentException(::StringBuilder().append(strType)->append(" must
+    have at least "_j)
                     ->append(minLength)
                     ->append(" characters: "_j)
                     ->append(str);
 
     if(npc(str)->length() > maxLength)
-            throw new ::IllegalArgumentException(::StringBuilder().append(strType)->append(" has more than "_j)
+            throw new
+    ::IllegalArgumentException(::StringBuilder().append(strType)->append(" has
+    more than "_j)
                     ->append(maxLength)
                     ->append(" characters: "_j)
                     ->append(str);
@@ -262,7 +274,9 @@ void ShortName::checkValidChars(vector<char> chars)
         {
             if (toTest == ILLEGAL_CHARS_[j])
             {
-                string error = "illegal character " + string({ILLEGAL_CHARS_[j]}) + " at " + to_string(i);
+                string error = "illegal character " +
+                               string({ILLEGAL_CHARS_[j]}) + " at " +
+                               to_string(i);
                 return;
             }
         }

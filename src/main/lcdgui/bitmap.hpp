@@ -18,8 +18,8 @@ namespace mpc::lcdgui
     /**
      * @brief Represents a single Pixel in the image.
      *
-     * A Pixel has a single bit value that is a zero (white) or a one (black). So,
-     * this class essentially encapsulates a 2D array of bools.
+     * A Pixel has a single bit value that is a zero (white) or a one (black).
+     * So, this class essentially encapsulates a 2D array of bools.
      **/
     struct Pixel
     {
@@ -51,11 +51,11 @@ namespace mpc::lcdgui
         void open(fs::path p);
 
         /**
-         * @brief Validates whether or not the current matrix of pixels represents a
-         * proper image.
+         * @brief Validates whether or not the current matrix of pixels
+         * represents a proper image.
          *
-         * Tests for non-zero-size rows and consistent non-zero-size columns for each
-         * row.
+         * Tests for non-zero-size rows and consistent non-zero-size columns for
+         * each row.
          *
          * @return boolean value of whether or not the matrix is a valid image
          **/
@@ -69,8 +69,8 @@ namespace mpc::lcdgui
         PixelMatrix toPixelMatrix() const;
 
         /**
-         * @brief Overwrites the current bitmap with that represented by a matrix
-         * of pixels.
+         * @brief Overwrites the current bitmap with that represented by a
+         * matrix of pixels.
          *
          * Does _not_ validate that the new matrix of pixels is a proper image.
          *

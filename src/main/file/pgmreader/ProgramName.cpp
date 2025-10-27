@@ -33,7 +33,8 @@ int ProgramName::getProgramNameEnd()
 std::vector<char> ProgramName::getProgramNameArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    programNameArray = Util::vecCopyOfRange(pgmFileArray, getProgramNameStart(), getProgramNameEnd());
+    programNameArray = Util::vecCopyOfRange(pgmFileArray, getProgramNameStart(),
+                                            getProgramNameEnd());
     return programNameArray;
 }
 

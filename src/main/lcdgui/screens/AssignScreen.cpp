@@ -98,12 +98,15 @@ void AssignScreen::displayAssignNote()
     auto padIndex = program->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
 
-    auto soundIndex = note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
-    auto soundName = soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
+    auto soundIndex =
+        note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
+    auto soundName =
+        soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
     auto noteName = note == 34 ? "--" : std::to_string(note);
 
-    findField("assignnote")->setText(noteName + "/" + padName + "-" + soundName);
+    findField("assignnote")
+        ->setText(noteName + "/" + padName + "-" + soundName);
 }
 
 void AssignScreen::displayParameter()
@@ -142,7 +145,8 @@ void AssignScreen::displayHighRange()
             break;
     }
 
-    findField("highrange")->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
+    findField("highrange")
+        ->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayLowRange()
@@ -174,14 +178,17 @@ void AssignScreen::displayLowRange()
             break;
     }
 
-    findField("lowrange")->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
+    findField("lowrange")
+        ->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayAssignNv()
 {
     auto program = getProgramOrThrow();
     auto slider = program->getSlider();
-    auto assignNvString = slider->getControlChange() == 0 ? "OFF" : std::to_string(slider->getControlChange());
+    auto assignNvString = slider->getControlChange() == 0
+                              ? "OFF"
+                              : std::to_string(slider->getControlChange());
     findField("assignnv")->setTextPadded(assignNvString, " ");
 }
 

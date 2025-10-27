@@ -51,7 +51,8 @@ bool BitUtil::isBitOn(unsigned char b, int i)
     return false;
 }
 
-unsigned char BitUtil::stitchBytes(unsigned char b1, vector<int> usedBits1, unsigned char b2, vector<int> usedBits2)
+unsigned char BitUtil::stitchBytes(unsigned char b1, vector<int> usedBits1,
+                                   unsigned char b2, vector<int> usedBits2)
 {
     auto byte1occupiesstart = usedBits1[0] == 0;
     if (byte1occupiesstart)

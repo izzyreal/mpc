@@ -11,8 +11,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class SelectDrumScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SelectDrumScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

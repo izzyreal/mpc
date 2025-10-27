@@ -6,8 +6,7 @@
 namespace mpc::midi::event
 {
 
-    class SystemExclusiveEvent
-        : public MidiEvent
+    class SystemExclusiveEvent : public MidiEvent
     {
 
     private:
@@ -27,6 +26,7 @@ namespace mpc::midi::event
 
     public:
         SystemExclusiveEvent(int type, int tick, std::vector<char> data);
-        SystemExclusiveEvent(int type, int tick, int delta, std::vector<char> data);
+        SystemExclusiveEvent(int type, int tick, int delta,
+                             std::vector<char> data);
     };
 } // namespace mpc::midi::event

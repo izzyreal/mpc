@@ -40,7 +40,8 @@ namespace mpc::lcdgui::screens::window
         int getRecord();
 
     private:
-        const std::vector<std::string> recordNames{"SEQUENCE", "LOOP", "CUSTOM RANGE", "SONG", "JAM"};
+        const std::vector<std::string> recordNames{
+            "SEQUENCE", "LOOP", "CUSTOM RANGE", "SONG", "JAM"};
         int record = 0;
         int sq = 0;
         int song = 0;

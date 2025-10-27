@@ -13,8 +13,7 @@ namespace mpc::lcdgui::screens
 
     class TrimScreen;
 
-    class LoopScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoopScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -37,7 +36,8 @@ namespace mpc::lcdgui::screens
         void setLength(int);
 
     private:
-        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END"};
+        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
+                                                  "BEFOR TO", "AFTR END"};
         void displaySnd();
         void displayPlayX();
         void displayTo();

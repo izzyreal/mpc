@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class NumberOfZonesScreen
-        : public mpc::lcdgui::ScreenComponent
+    class NumberOfZonesScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

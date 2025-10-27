@@ -19,7 +19,8 @@ void AssignmentViewScreen::open()
     ls->setFocus(getFocusFromPadIndex());
 
     displayAssignmentView();
-    mpc.clientEventController->addObserver(this); // Subscribe to "pad" and "bank" messages
+    mpc.clientEventController->addObserver(
+        this); // Subscribe to "pad" and "bank" messages
 }
 
 void AssignmentViewScreen::close()
@@ -91,7 +92,8 @@ void AssignmentViewScreen::right()
 void AssignmentViewScreen::turnWheel(int i)
 {
     auto program = getProgramOrThrow();
-    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedPad =
+        program->getPad(mpc.clientEventController->getSelectedPad());
     selectedPad->setNote(selectedPad->getNote() + i);
     displayNote();
     displaySoundName();
@@ -134,7 +136,8 @@ void AssignmentViewScreen::displayAssignmentView()
 void AssignmentViewScreen::displayPad(int i)
 {
     auto program = getProgramOrThrow();
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     auto note = program->getPad(i + (16 * bank))->getNote();
 
     std::string sampleName;
@@ -142,7 +145,8 @@ void AssignmentViewScreen::displayPad(int i)
     if (note != 34)
     {
         auto sampleNumber = program->getNoteParameters(note)->getSoundIndex();
-        sampleName = sampleNumber != -1 ? sampler->getSoundName(sampleNumber) : "--";
+        sampleName =
+            sampleNumber != -1 ? sampler->getSoundName(sampleNumber) : "--";
 
         if (sampleName.length() > 8)
         {
@@ -155,7 +159,8 @@ void AssignmentViewScreen::displayPad(int i)
 
 void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 {
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     findLabel("info0")->setText("Bank:" + letters[bank] + " Note:");
 }
 
@@ -182,11 +187,15 @@ void AssignmentViewScreen::displaySoundName()
 
     const int soundIndex = program->getNoteParameters(note)->getSoundIndex();
 
-    std::string soundName = soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
+    std::string soundName =
+        soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
 
-    std::string stereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)" : "";
+    std::string stereo =
+        soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
+                                                                     : "";
 
-    findLabel("info2")->setText("=" + StrUtil::padRight(soundName, " ", 16) + stereo);
+    findLabel("info2")->setText("=" + StrUtil::padRight(soundName, " ", 16) +
+                                stereo);
 }
 
 int AssignmentViewScreen::getPadIndexFromFocus()

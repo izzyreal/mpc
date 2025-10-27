@@ -11,7 +11,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-ConvertSongToSeqScreen::ConvertSongToSeqScreen(mpc::Mpc &mpc, const int layerIndex)
+ConvertSongToSeqScreen::ConvertSongToSeqScreen(mpc::Mpc &mpc,
+                                               const int layerIndex)
     : ScreenComponent(mpc, "convert-song-to-seq", layerIndex)
 {
 }
@@ -91,9 +92,11 @@ void ConvertSongToSeqScreen::setTrackStatus(int8_t newValue)
 
 void ConvertSongToSeqScreen::displayFromSong()
 {
-    const auto activeSongIndex = mpc.screens->get<SongScreen>()->getActiveSongIndex();
+    const auto activeSongIndex =
+        mpc.screens->get<SongScreen>()->getActiveSongIndex();
     const auto activeSong = sequencer->getSong(activeSongIndex);
-    const auto songIndexString = StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
+    const auto songIndexString =
+        StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
     const auto songName = activeSong->getName();
     findField("fromsong")->setText(songIndexString + "-" + songName);
 }
@@ -101,7 +104,8 @@ void ConvertSongToSeqScreen::displayFromSong()
 void ConvertSongToSeqScreen::displayToSequence()
 {
     const auto activeSequence = sequencer->getSequence(toSequenceIndex);
-    const auto sequenceIndexString = StrUtil::padLeft(std::to_string(toSequenceIndex + 1), "0", 2);
+    const auto sequenceIndexString =
+        StrUtil::padLeft(std::to_string(toSequenceIndex + 1), "0", 2);
     const auto sequenceName = activeSequence->getName();
     findField("tosequence")->setText(sequenceIndexString + "-" + sequenceName);
 }
@@ -111,12 +115,12 @@ void ConvertSongToSeqScreen::displayTrackStatus()
     findField("trackstatus")->setText(trackStatusNames[trackStatus]);
 }
 
-void eraseOffTracks(const int firstBarToRemove,
-                    const int firstBarToKeep,
+void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
                     const std::shared_ptr<Sequence> &sourceSequence,
                     const std::shared_ptr<Sequence> &destinationSequence)
 {
-    const auto startTick = destinationSequence->getFirstTickOfBar(firstBarToRemove);
+    const auto startTick =
+        destinationSequence->getFirstTickOfBar(firstBarToRemove);
     const auto endTick = destinationSequence->getFirstTickOfBar(firstBarToKeep);
 
     for (auto &track : destinationSequence->getTracks())
@@ -158,7 +162,8 @@ void ConvertSongToSeqScreen::convertSongToSeq()
         const auto step = song->getStep(stepIndex).lock();
         const auto sourceSequenceIndex = step->getSequence();
         const auto sourceSequence = sequencer->getSequence(sourceSequenceIndex);
-        const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep = destinationSequence->getLastBarIndex();
+        const auto destinationSequenceLastBarIndexBeforeProcessingCurrentStep =
+            destinationSequence->getLastBarIndex();
 
         if (!sourceSequence->isUsed())
         {
@@ -167,40 +172,59 @@ void ConvertSongToSeqScreen::convertSongToSeq()
 
         if (stepIndex == 0)
         {
-            destinationSequence->setInitialTempo(sourceSequence->getInitialTempo());
+            destinationSequence->setInitialTempo(
+                sourceSequence->getInitialTempo());
         }
 
-        const auto sourceSequencelastBarIndex = sourceSequence->getLastBarIndex();
+        const auto sourceSequencelastBarIndex =
+            sourceSequence->getLastBarIndex();
         const auto repeatCount = step->getRepeats();
 
         if (trackStatus == 0 || trackStatus == 1)
         {
-            SeqUtil::copyBars(mpc, sourceSequenceIndex, toSequenceIndex, 0, sourceSequencelastBarIndex, repeatCount, destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
+            SeqUtil::copyBars(
+                mpc, sourceSequenceIndex, toSequenceIndex, 0,
+                sourceSequencelastBarIndex, repeatCount,
+                destinationSequenceLastBarIndexBeforeProcessingCurrentStep);
 
             if (trackStatus == 1)
             {
-                const auto firstBarIndexToRemove = destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
-                const auto addedBarCount = sourceSequence->getBarCount() * repeatCount;
-                const auto firstBarIndexToKeep = firstBarIndexToRemove + addedBarCount;
+                const auto firstBarIndexToRemove =
+                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
+                const auto addedBarCount =
+                    sourceSequence->getBarCount() * repeatCount;
+                const auto firstBarIndexToKeep =
+                    firstBarIndexToRemove + addedBarCount;
 
-                eraseOffTracks(firstBarIndexToRemove, firstBarIndexToKeep, sourceSequence, destinationSequence);
+                eraseOffTracks(firstBarIndexToRemove, firstBarIndexToKeep,
+                               sourceSequence, destinationSequence);
             }
         }
         else /* if (trackStatus == 3) */
         {
-            { // Append bars with correct time signatures to destination sequence
-                const auto barCountToAdd = sourceSequence->getBarCount() * repeatCount;
-                destinationSequence->setLastBarIndex(destinationSequenceLastBarIndexBeforeProcessingCurrentStep + barCountToAdd);
-                auto destinationBarIndex = destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
+            { // Append bars with correct time signatures to destination
+              // sequence
+                const auto barCountToAdd =
+                    sourceSequence->getBarCount() * repeatCount;
+                destinationSequence->setLastBarIndex(
+                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep +
+                    barCountToAdd);
+                auto destinationBarIndex =
+                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
 
                 for (int repetition = 0; repetition < repeatCount; repetition++)
                 {
-                    for (int barCounter = 0; barCounter < sourceSequence->getBarCount(); barCounter++)
+                    for (int barCounter = 0;
+                         barCounter < sourceSequence->getBarCount();
+                         barCounter++)
                     {
-                        const auto numerator = sourceSequence->getNumerator(barCounter);
-                        const auto denominator = sourceSequence->getDenominator(barCounter);
+                        const auto numerator =
+                            sourceSequence->getNumerator(barCounter);
+                        const auto denominator =
+                            sourceSequence->getDenominator(barCounter);
 
-                        destinationSequence->setTimeSignature(destinationBarIndex, numerator, denominator);
+                        destinationSequence->setTimeSignature(
+                            destinationBarIndex, numerator, denominator);
 
                         destinationBarIndex++;
                     }
@@ -216,30 +240,39 @@ void ConvertSongToSeqScreen::convertSongToSeq()
                 if (midiChannel >= 0)
                 {
                     // copy to track indexes 0 - 31
-                    destinationTrack = destinationSequence->getTrack(midiChannel);
+                    destinationTrack =
+                        destinationSequence->getTrack(midiChannel);
                 }
                 else
                 {
-                    // copy to destination track indexes 32 - 35 as per source track drum bus
+                    // copy to destination track indexes 32 - 35 as per source
+                    // track drum bus
                     const auto drumBusIndex = sourceTrack->getBus() - 1;
 
                     if (drumBusIndex < 0)
                     {
-                        // The source track has neither a MIDI out device, nor a DRUM bus.
-                        // Nothing to copy to the destination sequence in this case.
+                        // The source track has neither a MIDI out device, nor a
+                        // DRUM bus. Nothing to copy to the destination sequence
+                        // in this case.
                         continue;
                     }
 
-                    destinationTrack = destinationSequence->getTrack(32 + drumBusIndex);
+                    destinationTrack =
+                        destinationSequence->getTrack(32 + drumBusIndex);
                 }
 
-                const auto destinationFirstBarIndex = destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
-                const auto destinationFirstBarStartTick = destinationSequence->getFirstTickOfBar(destinationFirstBarIndex);
+                const auto destinationFirstBarIndex =
+                    destinationSequenceLastBarIndexBeforeProcessingCurrentStep;
+                const auto destinationFirstBarStartTick =
+                    destinationSequence->getFirstTickOfBar(
+                        destinationFirstBarIndex);
 
                 for (auto &sourceEvent : sourceTrack->getEvents())
                 {
-                    const auto destinationTick = destinationFirstBarStartTick + sourceEvent->getTick();
-                    destinationTrack->cloneEventIntoTrack(sourceEvent, destinationTick, true);
+                    const auto destinationTick =
+                        destinationFirstBarStartTick + sourceEvent->getTick();
+                    destinationTrack->cloneEventIntoTrack(
+                        sourceEvent, destinationTick, true);
                 }
             }
         }
@@ -251,12 +284,14 @@ void ConvertSongToSeqScreen::convertSongToSeq()
         return;
     }
 
-    destinationSequence->setLastBarIndex(destinationSequence->getLastBarIndex() - 1);
+    destinationSequence->setLastBarIndex(
+        destinationSequence->getLastBarIndex() - 1);
 
     if (trackStatus == 0 || trackStatus == 1)
     {
         const auto referenceStep = song->getStep(0).lock();
-        const auto referenceSequence = sequencer->getSequence(referenceStep->getSequence());
+        const auto referenceSequence =
+            sequencer->getSequence(referenceStep->getSequence());
 
         for (int trackIndex = 0; trackIndex < 64; trackIndex++)
         {

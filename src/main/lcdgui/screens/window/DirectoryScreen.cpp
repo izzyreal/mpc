@@ -38,7 +38,8 @@ void DirectoryScreen::setFunctionKeys()
     if (getSelectedFile())
     {
         auto ext = fs::path(getSelectedFile()->getName()).extension().string();
-        auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
+        auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
+                        StrUtil::eqIgnoreCase(ext, ".wav");
         ls->setFunctionKeysArrangement(playable ? 1 : 0);
     }
     else
@@ -46,7 +47,8 @@ void DirectoryScreen::setFunctionKeys()
         ls->setFunctionKeysArrangement(0);
     }
 
-    findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk5")->getRect());
+    findBackground()->repaintUnobtrusive(
+        findChild<FunctionKey>("fk5")->getRect());
 }
 
 void DirectoryScreen::function(int f)
@@ -84,9 +86,11 @@ void DirectoryScreen::function(int f)
                 return;
             }
 
-            auto fileName = mpc::Util::splitName(getSelectedFile()->getName())[0];
+            auto fileName =
+                mpc::Util::splitName(getSelectedFile()->getName())[0];
 
-            const auto enterAction = [this, fileName, file](std::string &nameScreenName)
+            const auto enterAction =
+                [this, fileName, file](std::string &nameScreenName)
             {
                 auto ext = mpc::Util::splitName(file->getName())[1];
 
@@ -95,7 +99,8 @@ void DirectoryScreen::function(int f)
                     ext = "." + ext;
                 }
 
-                const auto finalNewName = StrUtil::trim(StrUtil::toUpper(nameScreenName)) + ext;
+                const auto finalNewName =
+                    StrUtil::trim(StrUtil::toUpper(nameScreenName)) + ext;
                 const bool isDirectory = file->isDirectory();
                 const auto success = file->setName(finalNewName);
 
@@ -116,7 +121,8 @@ void DirectoryScreen::function(int f)
                     disk->initFiles();
 
                     auto parentFileNames = disk->getParentFileNames();
-                    auto it = find(begin(parentFileNames), end(parentFileNames), finalNewName);
+                    auto it = find(begin(parentFileNames), end(parentFileNames),
+                                   finalNewName);
 
                     auto index = distance(begin(parentFileNames), it);
 
@@ -136,11 +142,9 @@ void DirectoryScreen::function(int f)
                 mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
             };
 
-            nameScreen->initialize(
-                getSelectedFile()->getNameWithoutExtension(),
-                file->isDirectory() ? 8 : 16,
-                enterAction,
-                "directory");
+            nameScreen->initialize(getSelectedFile()->getNameWithoutExtension(),
+                                   file->isDirectory() ? 8 : 16, enterAction,
+                                   "directory");
 
             mpc.getLayeredScreen()->openScreen<NameScreen>();
 
@@ -153,9 +157,11 @@ void DirectoryScreen::function(int f)
                 return;
             }
 
-            auto enterAction = [this, disk, loadScreen](std::string &nameScreenName)
+            auto enterAction =
+                [this, disk, loadScreen](std::string &nameScreenName)
             {
-                bool success = disk->newFolder(StrUtil::toUpper(nameScreenName));
+                bool success =
+                    disk->newFolder(StrUtil::toUpper(nameScreenName));
 
                 if (!success)
                 {
@@ -182,7 +188,8 @@ void DirectoryScreen::function(int f)
 
                 for (int i = 0; i < disk->getFileNames().size(); i++)
                 {
-                    if (disk->getFileName(i) == StrUtil::toUpper(nameScreenName))
+                    if (disk->getFileName(i) ==
+                        StrUtil::toUpper(nameScreenName))
                     {
                         loadScreen->setFileLoad(counter);
 
@@ -223,12 +230,16 @@ void DirectoryScreen::function(int f)
                     return;
                 }
 
-                const auto audioServerSampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+                const auto audioServerSampleRate = mpc.getAudioMidiServices()
+                                                       ->getAudioServer()
+                                                       ->getSampleRate();
 
-                bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(
-                    file->getInputStream(),
-                    isSnd ? audiomidi::SoundPlayerFileFormat::SND : audiomidi::SoundPlayerFileFormat::WAV,
-                    audioServerSampleRate);
+                bool started =
+                    mpc.getAudioMidiServices()->getSoundPlayer()->start(
+                        file->getInputStream(),
+                        isSnd ? audiomidi::SoundPlayerFileFormat::SND
+                              : audiomidi::SoundPlayerFileFormat::WAV,
+                        audioServerSampleRate);
 
                 auto name = file->getNameWithoutExtension();
 
@@ -331,7 +342,8 @@ void DirectoryScreen::right()
     {
         auto disk = mpc.getDisk();
 
-        if (!getSelectedFile() || disk->getFileNames().size() == 0 || !getSelectedFile()->isDirectory())
+        if (!getSelectedFile() || disk->getFileNames().size() == 0 ||
+            !getSelectedFile()->isDirectory())
         {
             return;
         }
@@ -408,7 +420,8 @@ void DirectoryScreen::up()
             return;
         }
 
-        auto newDirectoryName = disk->getParentFileNames()[yPos0 - 1 + yOffset0];
+        auto newDirectoryName =
+            disk->getParentFileNames()[yPos0 - 1 + yOffset0];
 
         if (disk->moveBack())
         {
@@ -493,7 +506,8 @@ void DirectoryScreen::down()
             return;
         }
 
-        auto newDirectoryName = disk->getParentFileNames()[yPos0 + 1 + yOffset0];
+        auto newDirectoryName =
+            disk->getParentFileNames()[yPos0 + 1 + yOffset0];
 
         if (disk->moveBack())
         {
@@ -703,7 +717,8 @@ void DirectoryScreen::drawGraphicsLeft()
     a4->setText(" ");
 
     auto fc = getFirstColumn();
-    std::vector<std::string> currentDirIcons{u8"\u00EF", u8"\u00F1", u8"\u00F0"};
+    std::vector<std::string> currentDirIcons{u8"\u00EF", u8"\u00F1",
+                                             u8"\u00F0"};
     std::vector<std::string> dirIcons{u8"\u00EA", u8"\u00EB", u8"\u00EC"};
 
     std::string notRootDash = u8"\u00ED";
@@ -775,7 +790,8 @@ void DirectoryScreen::drawGraphicsLeft()
         return;
     }
 
-    std::vector<std::shared_ptr<mpc::lcdgui::Label>> aLabels{a0, a1, a2, a3, a4};
+    std::vector<std::shared_ptr<mpc::lcdgui::Label>> aLabels{a0, a1, a2, a3,
+                                                             a4};
 
     if (size - yOffset0 <= 4)
     {

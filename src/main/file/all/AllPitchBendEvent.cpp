@@ -8,13 +8,16 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<PitchBendEvent> AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+std::shared_ptr<PitchBendEvent>
+AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     auto event = std::make_shared<PitchBendEvent>();
     event->setTick(AllEvent::readTick(bytes));
     event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
 
-    auto candidate = ByteUtil::bytes2ushort(std::vector<char>{bytes[AMOUNT_OFFSET], bytes[AMOUNT_OFFSET + 1]}) - 16384;
+    auto candidate = ByteUtil::bytes2ushort(std::vector<char>{
+                         bytes[AMOUNT_OFFSET], bytes[AMOUNT_OFFSET + 1]}) -
+                     16384;
 
     if (candidate < -8192)
     {
@@ -26,7 +29,8 @@ std::shared_ptr<PitchBendEvent> AllPitchBendEvent::bytesToMpcEvent(const std::ve
     return event;
 }
 
-std::vector<char> AllPitchBendEvent::mpcEventToBytes(std::shared_ptr<PitchBendEvent> event)
+std::vector<char>
+AllPitchBendEvent::mpcEventToBytes(std::shared_ptr<PitchBendEvent> event)
 {
     std::vector<char> bytes(8);
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PITCH_BEND_ID;

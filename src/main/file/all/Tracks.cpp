@@ -24,7 +24,8 @@ Tracks::Tracks(const std::vector<char> &loadBytes)
         auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
         std::string name;
 
-        for (char c : Util::vecCopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH))
+        for (char c : Util::vecCopyOfRange(loadBytes, offset,
+                                           offset + AllParser::NAME_LENGTH))
         {
             if (c == 0x00)
             {
@@ -48,7 +49,8 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
         for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
         {
             auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-            auto name = StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
+            auto name = StrUtil::padRight(t->getActualName(), " ",
+                                          AllParser::NAME_LENGTH);
             saveBytes[offset + j] = name[j];
         }
 
@@ -100,7 +102,8 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
     saveBytes[LAST_TICK_BYTE3_OFFSET] = (large);
 
     auto unknown32BitIntBytes1 = ByteUtil::uint2bytes(10000000);
-    auto unknown32BitIntBytes2 = ByteUtil::uint2bytes((int)(seq->getLastTick() * 5208.333333333333));
+    auto unknown32BitIntBytes2 =
+        ByteUtil::uint2bytes((int)(seq->getLastTick() * 5208.333333333333));
 
     for (int j = 0; j < 4; j++)
     {
@@ -114,7 +117,8 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
     }
 }
 
-std::vector<char> Tracks::PADDING1 = std::vector<char>{(char)232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)232, 3};
+std::vector<char> Tracks::PADDING1 = std::vector<char>{
+    (char)232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)232, 3};
 
 int Tracks::getDevice(int i)
 {

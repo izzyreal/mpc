@@ -15,7 +15,8 @@ MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void MonoToStereoScreen::open()
 {
-    if (sampler->getSound() && ls->isPreviousScreenNot<NameScreen, PopupScreen>())
+    if (sampler->getSound() &&
+        ls->isPreviousScreenNot<NameScreen, PopupScreen>())
     {
         auto name = sampler->getSound()->getName();
         name = StrUtil::trim(name);
@@ -141,7 +142,8 @@ void MonoToStereoScreen::function(int j)
             }
 
             newSound->setName(newStName);
-            sampler->mergeToStereo(left->getSampleData(), newSampleDataRight, newSound->getMutableSampleData());
+            sampler->mergeToStereo(left->getSampleData(), newSampleDataRight,
+                                   newSound->getMutableSampleData());
             newSound->setMono(false);
             mpc.getLayeredScreen()->openScreen<SoundScreen>();
         }
@@ -164,7 +166,8 @@ void MonoToStereoScreen::displayLSource()
     else
     {
         ls->setFunctionKeysArrangement(1);
-        findChild<Background>("")->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
+        findChild<Background>("")->repaintUnobtrusive(
+            findChild<FunctionKey>("fk4")->getRect());
     }
 }
 
@@ -187,7 +190,8 @@ void MonoToStereoScreen::displayRSource()
     else
     {
         ls->setFunctionKeysArrangement(1);
-        findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
+        findBackground()->repaintUnobtrusive(
+            findChild<FunctionKey>("fk4")->getRect());
     }
 }
 

@@ -7,7 +7,8 @@
 
 using namespace mpc::file::pgmwriter;
 
-SampleNames::SampleNames(mpc::sampler::Program *program, std::weak_ptr<mpc::sampler::Sampler> sampler)
+SampleNames::SampleNames(mpc::sampler::Program *program,
+                         std::weak_ptr<mpc::sampler::Sampler> sampler)
 {
     std::vector<int> list;
 

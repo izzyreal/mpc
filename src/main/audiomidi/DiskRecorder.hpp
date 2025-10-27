@@ -25,17 +25,19 @@ namespace mpc
 namespace mpc::audiomidi
 {
 
-    class DiskRecorder
-        : public mpc::engine::audio::core::AudioProcessAdapter
+    class DiskRecorder : public mpc::engine::audio::core::AudioProcessAdapter
 
     {
 
     private:
         mpc::Mpc &mpc;
-        const int BUFFER_SIZE = 192000; // Number of frames for 1 second at 192khz
+        const int BUFFER_SIZE =
+            192000; // Number of frames for 1 second at 192khz
         std::thread writeThread;
-        moodycamel::ReaderWriterQueue<float> ringBufferLeft = moodycamel::ReaderWriterQueue<float>(0);
-        moodycamel::ReaderWriterQueue<float> ringBufferRight = moodycamel::ReaderWriterQueue<float>(0);
+        moodycamel::ReaderWriterQueue<float> ringBufferLeft =
+            moodycamel::ReaderWriterQueue<float>(0);
+        moodycamel::ReaderWriterQueue<float> ringBufferRight =
+            moodycamel::ReaderWriterQueue<float>(0);
         std::vector<float> bufferLeft;
         std::vector<float> bufferRight;
 
@@ -43,7 +45,8 @@ namespace mpc::audiomidi
         std::vector<char> byteBufferRight;
         std::vector<char> stereoByteBuffer;
 
-        static const std::vector<std::pair<std::string, std::string>> fileNamesMono;
+        static const std::vector<std::pair<std::string, std::string>>
+            fileNamesMono;
         static const std::vector<std::string> fileNamesStereo;
 
         int index = 0;
@@ -63,11 +66,15 @@ namespace mpc::audiomidi
     public:
         bool start();
         bool stopEarly();
-        bool prepare(int lengthInFrames, int sampleRate, bool isStereo, fs::path destinationDirectory);
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf, int nFrames) override;
+        bool prepare(int lengthInFrames, int sampleRate, bool isStereo,
+                     fs::path destinationDirectory);
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
+                         int nFrames) override;
 
     public:
-        DiskRecorder(mpc::Mpc &, mpc::engine::audio::core::AudioProcess *process, int index);
+        DiskRecorder(mpc::Mpc &,
+                     mpc::engine::audio::core::AudioProcess *process,
+                     int index);
         ~DiskRecorder();
     };
 } // namespace mpc::audiomidi

@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui
 {
-    class MixerFader
-        : public Component
+    class MixerFader : public Component
     {
 
     private:

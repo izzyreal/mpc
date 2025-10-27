@@ -9,9 +9,7 @@
 
 using namespace mpc::midi::event::meta;
 
-Tempo::Tempo() : Tempo(0, 0, DEFAULT_MPQN)
-{
-}
+Tempo::Tempo() : Tempo(0, 0, DEFAULT_MPQN) {}
 
 Tempo::Tempo(int tick, int delta, int mpqn)
     : MetaEvent(tick, delta, MetaEvent::TEMPO)
@@ -57,7 +55,8 @@ void Tempo::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-std::shared_ptr<MetaEvent> Tempo::parseTempo(int tick, int delta, MetaEventData *info)
+std::shared_ptr<MetaEvent> Tempo::parseTempo(int tick, int delta,
+                                             MetaEventData *info)
 {
     if (info->length.getValue() != 3)
     {

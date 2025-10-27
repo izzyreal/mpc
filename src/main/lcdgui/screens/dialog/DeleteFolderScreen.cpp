@@ -99,7 +99,8 @@ void DeleteFolderScreen::function(int i)
                 deleteFolderThread.join();
             }
 
-            deleteFolderThread = std::thread(&DeleteFolderScreen::static_deleteFolder, this);
+            deleteFolderThread =
+                std::thread(&DeleteFolderScreen::static_deleteFolder, this);
             break;
     }
 }

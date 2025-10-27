@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class ProgramChangeEvent
-        : public Event
+    class ProgramChangeEvent : public Event
     {
 
     private:

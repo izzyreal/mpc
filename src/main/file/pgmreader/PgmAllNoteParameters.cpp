@@ -37,7 +37,8 @@ int PgmAllNoteParameters::getMidiNotesEnd()
 std::vector<char> PgmAllNoteParameters::getMidiNotesArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    midiNotesArray = Util::vecCopyOfRange(pgmFileArray, getMidiNotesStart(), getMidiNotesEnd());
+    midiNotesArray = Util::vecCopyOfRange(pgmFileArray, getMidiNotesStart(),
+                                          getMidiNotesEnd());
     return midiNotesArray;
 }
 
@@ -77,7 +78,8 @@ int PgmAllNoteParameters::getAlsoPlayUse2(int midiNote)
     return alsoPlayUse2;
 }
 
-mpc::sampler::VoiceOverlapMode PgmAllNoteParameters::getVoiceOverlapMode(int midiNote)
+mpc::sampler::VoiceOverlapMode
+PgmAllNoteParameters::getVoiceOverlapMode(int midiNote)
 {
     auto voiceOverlapMode = getMidiNotesArray()[(midiNote * 25) + 6];
     return static_cast<mpc::sampler::VoiceOverlapMode>(voiceOverlapMode);
@@ -99,7 +101,8 @@ int PgmAllNoteParameters::getTune(int midiNote)
 {
     auto startPos = (midiNote * 25) + 9;
     auto endPos = (midiNote * 25) + 11;
-    auto tuneBytes = Util::vecCopyOfRange(getMidiNotesArray(), startPos, endPos);
+    auto tuneBytes =
+        Util::vecCopyOfRange(getMidiNotesArray(), startPos, endPos);
     return ByteUtil::bytes2short(tuneBytes);
 }
 

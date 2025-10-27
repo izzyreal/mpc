@@ -19,7 +19,9 @@ namespace mpc::engine::audio::mixer
         AudioMixerStrip *getRoutedStrip() override;
 
     public:
-        MainMixProcess(const std::shared_ptr<AudioMixerStrip> &strip, const std::shared_ptr<MixControls> &mixControls, AudioMixer *mixer);
+        MainMixProcess(const std::shared_ptr<AudioMixerStrip> &strip,
+                       const std::shared_ptr<MixControls> &mixControls,
+                       AudioMixer *mixer);
     };
 
 } // namespace mpc::engine::audio::mixer

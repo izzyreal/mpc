@@ -5,12 +5,14 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-VmpcConvertAndLoadWavScreen::VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc, const int layerIndex)
+VmpcConvertAndLoadWavScreen::VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc,
+                                                         const int layerIndex)
     : ScreenComponent(mpc, "vmpc-convert-and-load-wav", layerIndex)
 {
 }
 
-void VmpcConvertAndLoadWavScreen::setLoadRoutine(std::function<void()> newLoadRoutine)
+void VmpcConvertAndLoadWavScreen::setLoadRoutine(
+    std::function<void()> newLoadRoutine)
 {
     loadRoutine = newLoadRoutine;
 }

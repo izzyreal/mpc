@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class MuteAssignScreen
-        : public mpc::lcdgui::ScreenComponent
+    class MuteAssignScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

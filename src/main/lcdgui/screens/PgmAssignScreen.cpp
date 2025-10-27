@@ -15,8 +15,10 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc &mpc, const int layerIndex)
 void PgmAssignScreen::open()
 {
     auto program = getProgramOrThrow();
-    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedPad =
+        program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto soundIndex = selectedNoteParameters->getSoundIndex();
 
     if (soundIndex != -1)
@@ -79,8 +81,10 @@ void PgmAssignScreen::turnWheel(int i)
 {
     auto program = getProgramOrThrow();
 
-    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedPad =
+        program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -221,29 +225,34 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "mode")
     {
-        selectedNoteParameters->setSoundGenMode(selectedNoteParameters->getSoundGenerationMode() + i);
+        selectedNoteParameters->setSoundGenMode(
+            selectedNoteParameters->getSoundGenerationMode() + i);
         displaySoundGenerationMode();
     }
     else if (focusedFieldName == "velocity-range-lower")
     {
-        selectedNoteParameters->setVeloRangeLower(selectedNoteParameters->getVelocityRangeLower() + i);
+        selectedNoteParameters->setVeloRangeLower(
+            selectedNoteParameters->getVelocityRangeLower() + i);
         displayVeloRangeLower();
         displayVeloRangeUpper();
     }
     else if (focusedFieldName == "velocity-range-upper")
     {
-        selectedNoteParameters->setVeloRangeUpper(selectedNoteParameters->getVelocityRangeUpper() + i);
+        selectedNoteParameters->setVeloRangeUpper(
+            selectedNoteParameters->getVelocityRangeUpper() + i);
         displayVeloRangeLower();
         displayVeloRangeUpper();
     }
     else if (focusedFieldName == "optional-note-a")
     {
-        selectedNoteParameters->setOptNoteA(selectedNoteParameters->getOptionalNoteA() + i);
+        selectedNoteParameters->setOptNoteA(
+            selectedNoteParameters->getOptionalNoteA() + i);
         displayOptionalNoteA();
     }
     else if (focusedFieldName == "optional-note-b")
     {
-        selectedNoteParameters->setOptionalNoteB(selectedNoteParameters->getOptionalNoteB() + i);
+        selectedNoteParameters->setOptionalNoteB(
+            selectedNoteParameters->getOptionalNoteB() + i);
         displayOptionalNoteB();
     }
 }
@@ -271,7 +280,8 @@ void PgmAssignScreen::openWindow()
     else if (focusedFieldName == "snd")
     {
         auto program = getProgramOrThrow();
-        auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+        auto selectedNoteParameters = program->getNoteParameters(
+            mpc.clientEventController->getSelectedNote());
         auto soundIndex = selectedNoteParameters->getSoundIndex();
 
         if (soundIndex != -1)
@@ -286,13 +296,17 @@ void PgmAssignScreen::openWindow()
 void PgmAssignScreen::displayPgm()
 {
     auto program = getProgramOrThrow();
-    findField("pgm")->setText(StrUtil::padLeft(std::to_string(activeDrum().getProgram() + 1), " ", 2) + "-" + program->getName());
+    findField("pgm")->setText(
+        StrUtil::padLeft(std::to_string(activeDrum().getProgram() + 1), " ",
+                         2) +
+        "-" + program->getName());
 }
 
 void PgmAssignScreen::displaySoundName()
 {
     auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto soundIndex = selectedNoteParameters->getSoundIndex();
 
     if (soundIndex == -1)
@@ -328,7 +342,8 @@ void PgmAssignScreen::displayPadNote()
 {
 
     auto program = getProgramOrThrow();
-    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedPad =
+        program->getPad(mpc.clientEventController->getSelectedPad());
 
     if (selectedPad->getNote() == 34)
     {
@@ -345,7 +360,8 @@ void PgmAssignScreen::displaySoundGenerationMode()
     auto sgm = -1;
 
     auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    const auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
 
     if (selectedNoteParameters != nullptr)
     {
@@ -402,7 +418,8 @@ void PgmAssignScreen::displayVeloRangeUpper()
 {
     auto program = getProgramOrThrow();
 
-    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    const auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto rangeB = selectedNoteParameters->getVelocityRangeUpper();
     findField("velocity-range-upper")->setTextPadded(rangeB, " ");
 }
@@ -410,7 +427,8 @@ void PgmAssignScreen::displayVeloRangeUpper()
 void PgmAssignScreen::displayVeloRangeLower()
 {
     auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    const auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto rangeA = selectedNoteParameters->getVelocityRangeLower();
     findField("velocity-range-lower")->setTextPadded(rangeA, " ");
 }
@@ -418,7 +436,8 @@ void PgmAssignScreen::displayVeloRangeLower()
 void PgmAssignScreen::displayOptionalNoteA()
 {
     auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    const auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto noteIntA = selectedNoteParameters->getOptionalNoteA();
     auto padIntA = program->getPadIndexFromNote(noteIntA);
     auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
@@ -429,7 +448,8 @@ void PgmAssignScreen::displayOptionalNoteA()
 void PgmAssignScreen::displayOptionalNoteB()
 {
     auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    const auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
     auto noteIntB = selectedNoteParameters->getOptionalNoteB();
     auto padIntB = program->getPadIndexFromNote(noteIntB);
     auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
@@ -440,13 +460,16 @@ void PgmAssignScreen::displayOptionalNoteB()
 void PgmAssignScreen::displayNote()
 {
     auto program = getProgramOrThrow();
-    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
-    findField("note")->setText(std::to_string(selectedNoteParameters->getNumber()));
+    const auto selectedNoteParameters = program->getNoteParameters(
+        mpc.clientEventController->getSelectedNote());
+    findField("note")->setText(
+        std::to_string(selectedNoteParameters->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()
 {
-    findField("pad")->setText(sampler->getPadName(mpc.clientEventController->getSelectedPad()));
+    findField("pad")->setText(
+        sampler->getPadName(mpc.clientEventController->getSelectedPad()));
 }
 
 void PgmAssignScreen::update(Observable *o, Message message)

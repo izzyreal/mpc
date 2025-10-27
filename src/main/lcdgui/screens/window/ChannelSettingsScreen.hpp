@@ -9,8 +9,7 @@ namespace mpc::engine
 
 namespace mpc::lcdgui::screens::window
 {
-    class ChannelSettingsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class ChannelSettingsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -27,8 +26,10 @@ namespace mpc::lcdgui::screens::window
 
     private:
         int note = 35;
-        const std::vector<std::string> fxPathNames{"--", "M1", "M2", "R1", "R2"};
-        const std::vector<std::string> stereoNamesSlash{"-", "1/2", "1/2", "3/4", "3/4", "5/6", "5/6", "7/8", "7/8"};
+        const std::vector<std::string> fxPathNames{"--", "M1", "M2", "R1",
+                                                   "R2"};
+        const std::vector<std::string> stereoNamesSlash{
+            "-", "1/2", "1/2", "3/4", "3/4", "5/6", "5/6", "7/8", "7/8"};
         void displayNoteField();
         void displayStereoVolume();
         void displayIndividualVolume();

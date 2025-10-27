@@ -71,7 +71,8 @@ namespace mpc::nvram
 {
     struct MidiControlPreset;
     // Presets available in the default preset path,
-    // loaded into memory, and maintained as presets are changed, added or deleted.
+    // loaded into memory, and maintained as presets are changed, added or
+    // deleted.
 } // namespace mpc::nvram
 
 namespace mpc
@@ -96,7 +97,8 @@ namespace mpc
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;
         std::shared_ptr<mpc::Paths> paths;
-        std::vector<std::shared_ptr<nvram::MidiControlPreset>> midiControlPresets;
+        std::vector<std::shared_ptr<nvram::MidiControlPreset>>
+            midiControlPresets;
         void init();
         void startMidiDeviceDetector();
         void panic();
@@ -104,7 +106,8 @@ namespace mpc
         bool isPluginModeEnabled();
 
         std::shared_ptr<mpc::input::PadAndButtonKeyboard> padAndButtonKeyboard;
-        std::shared_ptr<mpc::controller::ClientEventController> clientEventController;
+        std::shared_ptr<mpc::controller::ClientEventController>
+            clientEventController;
 
         void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
 
@@ -113,7 +116,8 @@ namespace mpc
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getScreen();
         std::shared_ptr<hardware::Hardware> getHardware();
         mpc::disk::DiskController *getDiskController();
-        std::shared_ptr<mpc::input::PadAndButtonKeyboard> getPadAndButtonKeyboard();
+        std::shared_ptr<mpc::input::PadAndButtonKeyboard>
+        getPadAndButtonKeyboard();
 
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();

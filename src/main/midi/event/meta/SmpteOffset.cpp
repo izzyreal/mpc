@@ -9,7 +9,8 @@
 
 using namespace mpc::midi::event::meta;
 
-SmpteOffset::SmpteOffset(int tick, int delta, FrameRate *fps, int hour, int min, int sec, int fr, int subfr)
+SmpteOffset::SmpteOffset(int tick, int delta, FrameRate *fps, int hour, int min,
+                         int sec, int fr, int subfr)
     : MetaEvent(tick, delta, MetaEvent::SMPTE_OFFSET)
 {
     mFrameRate = fps;
@@ -107,7 +108,8 @@ void SmpteOffset::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-std::shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta, MetaEventData *info)
+std::shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta,
+                                                         MetaEventData *info)
 {
     if (info->length.getValue() != 5)
     {
@@ -121,7 +123,8 @@ std::shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta, Me
     int sec = info->data[2];
     int frm = info->data[3];
     int sub = info->data[4];
-    return std::make_shared<SmpteOffset>(tick, delta, fps, hour, min, sec, frm, sub);
+    return std::make_shared<SmpteOffset>(tick, delta, fps, hour, min, sec, frm,
+                                         sub);
 }
 
 int SmpteOffset::compareTo(mpc::midi::event::MidiEvent *other)

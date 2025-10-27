@@ -6,8 +6,7 @@
 namespace mpc::engine::audio::core
 {
 
-    class AudioControls
-        : public control::CompoundControl
+    class AudioControls : public control::CompoundControl
     {
 
     public:

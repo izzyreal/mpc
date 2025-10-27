@@ -47,11 +47,14 @@ void parseDoubles(const char *input, std::vector<double> &output)
     }
 }
 
-void readDoublesFromFile(std::vector<double> &positionsInQuarterNotes, std::string fileName)
+void readDoublesFromFile(std::vector<double> &positionsInQuarterNotes,
+                         std::string fileName)
 {
     auto fs = cmrc::mpctest::get_filesystem();
     auto file = fs.open("test/Clock/" + fileName);
-    char *data = (char *)std::string_view(file.begin(), file.end() - file.begin()).data();
+    char *data =
+        (char *)std::string_view(file.begin(), file.end() - file.begin())
+            .data();
     parseDoubles(data, positionsInQuarterNotes);
 }
 
@@ -81,11 +84,14 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[clock]")
 
     for (double position : positions)
     {
-        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, 120, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, 120,
+                                              timeInSamples);
 
-        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer =
+            mpc.getClock()->getTicksForCurrentBuffer();
 
-        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size();
+             tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
@@ -131,13 +137,18 @@ TEST_CASE("16 bars, 120bpm constant, 44.1khz, 64 frames", "[clock]")
     REQUIRE(ticks.size() - emptyBuffers == expectedTickCount);
 }
 
-TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", "[clock]")
+TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames",
+          "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
-    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars.txt");
+    readDoublesFromFile(
+        positions,
+        "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars.txt");
     std::vector<double> tempos;
-    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-linear-16-bars-tempo-map.txt");
+    readDoublesFromFile(tempos,
+                        "ableton-live-44.1khz-2048frames-300bpm-to-30bpm-"
+                        "linear-16-bars-tempo-map.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -149,11 +160,14 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100,
+                                              tempo, timeInSamples);
 
-        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer =
+            mpc.getClock()->getTicksForCurrentBuffer();
 
-        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size();
+             tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
@@ -166,13 +180,18 @@ TEST_CASE("16 bars, linear descent from 300bpm to 30bpm, 44.1khz, 2048 frames", 
     REQUIRE(ticks.size() == expectedTickCount);
 }
 
-TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "[clock]")
+TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames",
+          "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
-    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars.txt");
+    readDoublesFromFile(
+        positions,
+        "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars.txt");
     std::vector<double> tempos;
-    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-linear-16-bars-tempo-map.txt");
+    readDoublesFromFile(tempos,
+                        "ableton-live-44.1khz-2048frames-30bpm-to-300bpm-"
+                        "linear-16-bars-tempo-map.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -184,11 +203,14 @@ TEST_CASE("16 bars, linear ascent from 30bpm to 300bpm, 44.1khz, 2048 frames", "
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100,
+                                              tempo, timeInSamples);
 
-        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer =
+            mpc.getClock()->getTicksForCurrentBuffer();
 
-        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size();
+             tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
@@ -204,9 +226,13 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
-    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm.txt");
+    readDoublesFromFile(
+        positions,
+        "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm.txt");
     std::vector<double> tempos;
-    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm-tempo-map.txt");
+    readDoublesFromFile(
+        tempos,
+        "ableton-live-44.1khz-2048frames-2bars30bpm-2bars300bpm-tempo-map.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -218,11 +244,14 @@ TEST_CASE("2 bars 30bpm, 2bars 300bpm, 44.1khz, 2048 frames", "[clock]")
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100,
+                                              tempo, timeInSamples);
 
-        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer =
+            mpc.getClock()->getTicksForCurrentBuffer();
 
-        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size();
+             tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
@@ -238,9 +267,13 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[clock]")
 {
     const uint16_t bufferSize = 2048;
     std::vector<double> positions;
-    readDoublesFromFile(positions, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm.txt");
+    readDoublesFromFile(
+        positions,
+        "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm.txt");
     std::vector<double> tempos;
-    readDoublesFromFile(tempos, "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm-tempo-map.txt");
+    readDoublesFromFile(
+        tempos,
+        "ableton-live-44.1khz-2048frames-2bars300bpm-2bars30bpm-tempo-map.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -252,11 +285,14 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[clock]")
     {
         const auto position = positions[i];
         const auto tempo = tempos[i];
-        mpc.getClock()->processBufferExternal(position, bufferSize, 44100, tempo, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, bufferSize, 44100,
+                                              tempo, timeInSamples);
 
-        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer =
+            mpc.getClock()->getTicksForCurrentBuffer();
 
-        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size();
+             tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
         }
@@ -271,10 +307,12 @@ TEST_CASE("2 bars 300bpm, 2bars 30bpm, 44.1khz, 2048 frames", "[clock]")
 TEST_CASE("1 bar loop", "[clock]")
 {
     std::vector<double> positions;
-    readDoublesFromFile(positions, "reaper-44.1khz-120bpm-1-bar-loop-ppqpos.txt");
+    readDoublesFromFile(positions,
+                        "reaper-44.1khz-120bpm-1-bar-loop-ppqpos.txt");
 
     std::vector<double> blockSizes;
-    readDoublesFromFile(blockSizes, "reaper-44.1khz-120bpm-1-bar-loop-block.txt");
+    readDoublesFromFile(blockSizes,
+                        "reaper-44.1khz-120bpm-1-bar-loop-block.txt");
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
@@ -297,21 +335,26 @@ TEST_CASE("1 bar loop", "[clock]")
     for (int i = 0; i < positions.size(); i++)
     {
         const auto position = positions[i];
-        mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100, 120, timeInSamples);
+        mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100,
+                                              120, timeInSamples);
 
         auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
         frameSeq->work(blockSizes[i]);
-        auto &ticksForCurrentBuffer = mpc.getClock()->getTicksForCurrentBuffer();
+        auto &ticksForCurrentBuffer =
+            mpc.getClock()->getTicksForCurrentBuffer();
 
-        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size(); tickIndex++)
+        for (size_t tickIndex = 0; tickIndex < ticksForCurrentBuffer.size();
+             tickIndex++)
         {
             ticks.push_back(ticksForCurrentBuffer[tickIndex]);
             cumulativeTickPos += 1;
         }
 
-        highestTickPos = std::max<uint64_t>(highestTickPos, mpc.getSequencer()->getTickPosition());
+        highestTickPos = std::max<uint64_t>(
+            highestTickPos, mpc.getSequencer()->getTickPosition());
         timeInSamples += blockSizes[i];
     }
 
-    printf("highestTickPos: %i, cumulativeTickPos: %i\n", highestTickPos, cumulativeTickPos);
+    printf("highestTickPos: %i, cumulativeTickPos: %i\n", highestTickPos,
+           cumulativeTickPos);
 }

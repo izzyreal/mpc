@@ -33,8 +33,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
 {
-    class VmpcSettingsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcSettingsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -56,9 +55,12 @@ namespace mpc::lcdgui::screens
 
     private:
         std::shared_ptr<mpc::lcdgui::Background> easterEgg;
-        const std::vector<std::string> initialPadMappingNames{"VMPC2000XL", "ORIGINAL"};
-        const std::vector<std::string> _16LevelsEraseModeNames{"All levels", "Only pressed level"};
-        const std::vector<std::string> midiControlModeNames{"VMPC, see MIDI tab", "ORIGINAL"};
+        const std::vector<std::string> initialPadMappingNames{"VMPC2000XL",
+                                                              "ORIGINAL"};
+        const std::vector<std::string> _16LevelsEraseModeNames{
+            "All levels", "Only pressed level"};
+        const std::vector<std::string> midiControlModeNames{
+            "VMPC, see MIDI tab", "ORIGINAL"};
 
         int initialPadMapping = 0;
         int _16LevelsEraseMode = 0;

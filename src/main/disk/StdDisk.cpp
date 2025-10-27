@@ -19,10 +19,7 @@ using namespace mpc::file;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-StdDisk::StdDisk(mpc::Mpc &mpc)
-    : AbstractDisk(mpc)
-{
-}
+StdDisk::StdDisk(mpc::Mpc &mpc) : AbstractDisk(mpc) {}
 
 void StdDisk::close()
 {
@@ -54,7 +51,8 @@ void StdDisk::initFiles()
         {
             std::string name = f->getName();
 
-            if (f->isFile() && name.find('.') != std::string::npos && name.substr(name.length() - 3) == extensions[view])
+            if (f->isFile() && name.find('.') != std::string::npos &&
+                name.substr(name.length() - 3) == extensions[view])
             {
                 files.push_back(f);
             }
@@ -66,7 +64,8 @@ void StdDisk::initFiles()
     }
 
     std::sort(files.begin(), files.end(),
-              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2)
+              [](const std::shared_ptr<MpcFile> &f1,
+                 const std::shared_ptr<MpcFile> &f2)
               {
                   return f1->getName() < f2->getName();
               });
@@ -80,7 +79,8 @@ void StdDisk::initFiles()
     initParentFiles();
 
     std::sort(parentFiles.begin(), parentFiles.end(),
-              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2)
+              [](const std::shared_ptr<MpcFile> &f1,
+                 const std::shared_ptr<MpcFile> &f2)
               {
                   return f1->getName() < f2->getName();
               });
@@ -133,7 +133,8 @@ bool StdDisk::moveForward(const std::string &directoryName)
     bool success = false;
     for (auto &f : files)
     {
-        if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName)))
+        if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()),
+                                  StrUtil::trim(directoryName)))
         {
             path.push_back(f->getName());
             success = true;
@@ -235,7 +236,8 @@ bool StdDisk::deleteAllFiles(int extensionIndex)
     {
         if (!f->isDirectory())
         {
-            if (extensionIndex == 0 || StrUtil::hasEnding(f->getName(), extensions[extensionIndex]))
+            if (extensionIndex == 0 ||
+                StrUtil::hasEnding(f->getName(), extensions[extensionIndex]))
             {
                 success = f->del();
             }
@@ -251,7 +253,8 @@ bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> f)
 
 bool StdDisk::newFolder(const std::string &newDirName)
 {
-    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
+    std::string copy =
+        StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
     auto new_path = getDir()->fs_path;
     new_path.append(copy);
     return fs::create_directory(new_path);
@@ -259,7 +262,8 @@ bool StdDisk::newFolder(const std::string &newDirName)
 
 std::shared_ptr<MpcFile> StdDisk::newFile(const std::string &newFileName)
 {
-    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
+    std::string copy =
+        StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
     auto new_path = getDir()->fs_path;
     new_path.append(copy);
     auto result = std::make_shared<MpcFile>(new_path);

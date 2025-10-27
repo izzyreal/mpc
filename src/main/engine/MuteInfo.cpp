@@ -2,9 +2,7 @@
 
 using namespace mpc::engine;
 
-MuteInfo::MuteInfo()
-{
-}
+MuteInfo::MuteInfo() {}
 
 void MuteInfo::setNote(int note)
 {

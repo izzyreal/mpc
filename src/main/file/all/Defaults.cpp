@@ -13,19 +13,25 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 std::vector<char> Defaults::UNKNOWN1 = {1, 0, 0, 1, 1, 0};
-std::vector<char> Defaults::UNKNOWN2 = {0, 0, (char)0xFF, (char)0xFF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32};
+std::vector<char> Defaults::UNKNOWN2 = {
+    0, 0, (char)0xFF, (char)0xFF, 1, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
+    0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
+    0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
+    0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
+    0, 0, 0,          0,          0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32};
 
-Defaults::Defaults(mpc::Mpc &mpc, const std::vector<char> &loadBytes)
-    : mpc(mpc)
+Defaults::Defaults(mpc::Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
 {
     parseNames(loadBytes);
 
-    auto tempoBytes = std::vector<char>{loadBytes[TEMPO_BYTE1_OFFSET], loadBytes[TEMPO_BYTE2_OFFSET]};
+    auto tempoBytes = std::vector<char>{loadBytes[TEMPO_BYTE1_OFFSET],
+                                        loadBytes[TEMPO_BYTE2_OFFSET]};
     tempo = ByteUtil::bytes2ushort(tempoBytes);
     timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
     timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
 
-    auto barCountBytes = std::vector<char>{loadBytes[BAR_COUNT_BYTE1_OFFSET], loadBytes[BAR_COUNT_BYTE2_OFFSET]};
+    auto barCountBytes = std::vector<char>{loadBytes[BAR_COUNT_BYTE1_OFFSET],
+                                           loadBytes[BAR_COUNT_BYTE2_OFFSET]};
 
     barCount = ByteUtil::bytes2ushort(barCountBytes);
     loopEnabled = loadBytes[LOOP_ENABLED_OFFSET] == 0x01;
@@ -40,8 +46,7 @@ Defaults::Defaults(mpc::Mpc &mpc, const std::vector<char> &loadBytes)
     }
 }
 
-Defaults::Defaults(mpc::Mpc &mpc)
-    : mpc(mpc)
+Defaults::Defaults(mpc::Mpc &mpc) : mpc(mpc)
 {
     saveBytes = std::vector<char>(AllParser::DEFAULTS_LENGTH);
 
@@ -73,7 +78,8 @@ Defaults::Defaults(mpc::Mpc &mpc)
     {
         for (int j = 0; j < 4; j++)
         {
-            saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes[j];
+            saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] =
+                unknownNumberBytes[j];
         }
     }
 
@@ -91,7 +97,9 @@ void Defaults::parseNames(std::vector<char> loadBytes)
 {
     std::vector<char> stringBuffer;
 
-    stringBuffer = Util::vecCopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
+    stringBuffer =
+        Util::vecCopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET,
+                             DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
 
     defaultSeqName = "";
 
@@ -110,7 +118,8 @@ void Defaults::parseNames(std::vector<char> loadBytes)
     for (int i = 0; i < 33; i++)
     {
         offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
-        stringBuffer = Util::vecCopyOfRange(loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
+        stringBuffer = Util::vecCopyOfRange(
+            loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
         std::string s;
 
         for (char c : stringBuffer)
@@ -129,7 +138,8 @@ void Defaults::parseNames(std::vector<char> loadBytes)
     for (int i = 0; i < 64; i++)
     {
         offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-        stringBuffer = Util::vecCopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH);
+        stringBuffer = Util::vecCopyOfRange(loadBytes, offset,
+                                            offset + AllParser::NAME_LENGTH);
         std::string s;
 
         for (char c : stringBuffer)
@@ -247,7 +257,8 @@ void Defaults::setTimeSig()
 void Defaults::setNames()
 {
     auto userScreen = mpc.screens->get<UserScreen>();
-    auto const defSeqName = StrUtil::padRight(userScreen->sequenceName, " ", AllParser::NAME_LENGTH);
+    auto const defSeqName = StrUtil::padRight(userScreen->sequenceName, " ",
+                                              AllParser::NAME_LENGTH);
 
     for (int i = 0; i < 16; i++)
     {
@@ -259,7 +270,8 @@ void Defaults::setNames()
     for (int i = 0; i < 33; i++)
     {
         auto const defDevName = userScreen->getDeviceName(i);
-        stringBuffer = StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
+        stringBuffer =
+            StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
         auto offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 
         for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
@@ -270,7 +282,8 @@ void Defaults::setNames()
     for (int i = 0; i < 64; i++)
     {
         auto const defTrackName = userScreen->getTrackName(i);
-        stringBuffer = StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
+        stringBuffer =
+            StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
         auto offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 
         for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
@@ -283,7 +296,8 @@ void Defaults::setNames()
 void Defaults::setTempo()
 {
     auto userScreen = mpc.screens->get<UserScreen>();
-    auto tempoBytes = ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
+    auto tempoBytes =
+        ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
     saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
     saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];
 }

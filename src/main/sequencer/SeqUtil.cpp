@@ -74,7 +74,8 @@ double SeqUtil::ticksToFrames(double ticks, const double tempo, int sr)
     return (ticks * secondsPerTick(tempo) * sr);
 }
 
-double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick, int sr)
+double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick,
+                                    int sr)
 {
     double result = 0;
     auto lastTceTick = firstTick;
@@ -84,7 +85,8 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick, 
 
     if (tceSize == 0)
     {
-        result = ticksToFrames(lastTick - firstTick, seq->getInitialTempo(), sr);
+        result =
+            ticksToFrames(lastTick - firstTick, seq->getInitialTempo(), sr);
         return result;
     }
     else
@@ -93,7 +95,8 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick, 
 
         if (firstTick < firstTceTick)
         {
-            result = ticksToFrames(firstTceTick - firstTick, seq->getInitialTempo(), sr);
+            result = ticksToFrames(firstTceTick - firstTick,
+                                   seq->getInitialTempo(), sr);
         }
     }
 
@@ -113,7 +116,8 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick, 
         }
 
         auto tce = tempoChangeEvents[i];
-        result += ticksToFrames(nextTce->getTick() - lastTceTick, tce->getTempo(), sr);
+        result += ticksToFrames(nextTce->getTick() - lastTceTick,
+                                tce->getTempo(), sr);
         lastTceTick = nextTce->getTick();
     }
 
@@ -122,13 +126,15 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick, 
         lastTce = tempoChangeEvents[0];
     }
 
-    result += ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
+    result +=
+        ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
     return (int)(ceil(result));
 }
 
 int SeqUtil::loopFrameLength(Sequence *seq, int sr)
 {
-    return static_cast<int>(sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
+    return static_cast<int>(
+        sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
 }
 
 int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, int sr)
@@ -140,14 +146,17 @@ int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, int sr)
     {
         for (int j = 0; j < song->getStep(i).lock()->getRepeats(); j++)
         {
-            auto seq = sequencer->getSequence(song->getStep(i).lock()->getSequence()).get();
+            auto seq =
+                sequencer->getSequence(song->getStep(i).lock()->getSequence())
+                    .get();
             result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
         }
     }
 
     return static_cast<int>(result);
 }
-void SeqUtil::setTimeSignature(Sequence *sequence, int firstBarIndex, int tsLastBarIndex, int num, int den)
+void SeqUtil::setTimeSignature(Sequence *sequence, int firstBarIndex,
+                               int tsLastBarIndex, int num, int den)
 {
     for (int i = firstBarIndex; i <= tsLastBarIndex; i++)
     {
@@ -168,11 +177,13 @@ void SeqUtil::setTimeSignature(Sequence *sequence, int bar, int num, int den)
     {
         // The bar will be cropped, so we may have to remove some events
         // if they fall outside the new new bar's region.
-        for (int tick = barStart + newBarLength; tick < barStart + oldBarLength; tick++)
+        for (int tick = barStart + newBarLength; tick < barStart + oldBarLength;
+             tick++)
         {
             for (auto &t : sequence->getTracks())
             {
-                for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0; eventIndex--)
+                for (int eventIndex = t->getEvents().size() - 1;
+                     eventIndex >= 0; eventIndex--)
                 {
                     if (t->getEvent(eventIndex)->getTick() == tick)
                     {
@@ -192,11 +203,13 @@ void SeqUtil::setTimeSignature(Sequence *sequence, int bar, int num, int den)
 
         for (auto &t : sequence->getTracks())
         {
-            for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0; eventIndex--)
+            for (int eventIndex = t->getEvents().size() - 1; eventIndex >= 0;
+                 eventIndex--)
             {
                 auto event = t->getEvent(eventIndex);
 
-                if (event->getTick() >= nextBarStartTick && event->getTick() < sequence->getLastTick())
+                if (event->getTick() >= nextBarStartTick &&
+                    event->getTick() < sequence->getLastTick())
                 {
                     event->setTick(event->getTick() + tickShift);
                 }
@@ -336,7 +349,9 @@ int SeqUtil::getClock(Sequence *s, int position)
     return clock;
 }
 
-void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, uint8_t copyFirstBar, uint8_t copyLastBar, uint8_t copyCount, uint8_t copyAfterBar)
+void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex,
+                       uint8_t copyFirstBar, uint8_t copyLastBar,
+                       uint8_t copyCount, uint8_t copyAfterBar)
 {
     const auto sequencer = mpc.getSequencer();
 
@@ -375,7 +390,10 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
 
     for (int i = 0; i < numberOfDestinationBars; i++)
     {
-        toSequence->setTimeSignature(i + copyAfterBar, fromSequence->getNumerator(sourceBarCounter + copyFirstBar), fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
+        toSequence->setTimeSignature(
+            i + copyAfterBar,
+            fromSequence->getNumerator(sourceBarCounter + copyFirstBar),
+            fromSequence->getDenominator(sourceBarCounter + copyFirstBar));
 
         sourceBarCounter++;
 
@@ -420,7 +438,8 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
         firstTickOfToSequence += toSequence->getBarLengthsInTicks()[i];
     }
 
-    const auto segmentLengthTicks = lastTickOfFromSequence - firstTickOfFromSequence;
+    const auto segmentLengthTicks =
+        lastTickOfFromSequence - firstTickOfFromSequence;
     const auto offset = firstTickOfToSequence - firstTickOfFromSequence;
 
     for (int i = 0; i < 64; i++)
@@ -432,7 +451,8 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
             continue;
         }
 
-        auto t1Events = t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
+        auto t1Events =
+            t1->getEventRange(firstTickOfFromSequence, lastTickOfFromSequence);
         auto t2 = toSequence->getTrack(i);
 
         if (!t2->isUsed())
@@ -472,31 +492,36 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex, 
 
 bool SeqUtil::isRecMainWithoutPlaying(
     std::shared_ptr<Sequencer> sequencer,
-    std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen,
+    std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
+        timingCorrectScreen,
     const std::string &currentScreenName,
     std::shared_ptr<mpc::hardware::Button> recButton,
-    std::shared_ptr<mpc::controller::ClientHardwareEventController> clientHardwareEventController)
+    std::shared_ptr<mpc::controller::ClientHardwareEventController>
+        clientHardwareEventController)
 {
     auto tc_note = timingCorrectScreen->getNoteValue();
-    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+    bool posIsLastTick = sequencer->getTickPosition() ==
+                         sequencer->getActiveSequence()->getLastTick();
 
-    const bool recIsPressedOrLocked = recButton->isPressed() ||
-                                      clientHardwareEventController->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+    const bool recIsPressedOrLocked =
+        recButton->isPressed() ||
+        clientHardwareEventController->buttonLockTracker.isLocked(
+            hardware::ComponentId::REC);
 
-    bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
-                                 !sequencer->isPlaying() &&
-                                 recIsPressedOrLocked &&
-                                 tc_note != 0 &&
-                                 !posIsLastTick;
+    bool recMainWithoutPlaying =
+        currentScreenName == "sequencer" && !sequencer->isPlaying() &&
+        recIsPressedOrLocked && tc_note != 0 && !posIsLastTick;
 
     return recMainWithoutPlaying;
 }
 
-bool SeqUtil::isStepRecording(const std::string &currentScreenName, std::shared_ptr<Sequencer> sequencer)
+bool SeqUtil::isStepRecording(const std::string &currentScreenName,
+                              std::shared_ptr<Sequencer> sequencer)
 {
     auto posIsLastTick = [&]
     {
-        return sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+        return sequencer->getTickPosition() ==
+               sequencer->getActiveSequence()->getLastTick();
     };
     return currentScreenName == "step-editor" && !posIsLastTick();
 }

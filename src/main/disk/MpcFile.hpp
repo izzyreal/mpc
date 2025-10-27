@@ -14,12 +14,13 @@ namespace akaifat::fat
 }
 
 /*
- * An MpcFile contains either an akaifat::fat::AkaiFatLfnDirectoryEntry or a fs::path.
- * Check each implementation for how low-level file IO is handled.
+ * An MpcFile contains either an akaifat::fat::AkaiFatLfnDirectoryEntry or a
+ * fs::path. Check each implementation for how low-level file IO is handled.
  *
- * The MpcFile sits at the same level as the AbstractDisk -- it lives in the world of the virtual MPC2000XL
- * and is directly consumable by the application for loading and saving songs, sounds, sequences, creating
- * and deleting directories, etc.
+ * The MpcFile sits at the same level as the AbstractDisk -- it lives in the
+ * world of the virtual MPC2000XL and is directly consumable by the application
+ * for loading and saving songs, sounds, sequences, creating and deleting
+ * directories, etc.
  */
 
 namespace mpc::disk
@@ -38,7 +39,8 @@ namespace mpc::disk
         friend class StdDisk;
 
     public:
-        // Returns an empty path if this MpcFile instance is backed by a rawEntry.
+        // Returns an empty path if this MpcFile instance is backed by a
+        // rawEntry.
         fs::path getPath();
         bool isDirectory();
         bool isFile();
@@ -55,6 +57,9 @@ namespace mpc::disk
         std::shared_ptr<std::istream> getInputStream();
         std::shared_ptr<std::ostream> getOutputStream();
 
-        explicit MpcFile(const std::variant<fs::path, std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> &);
+        explicit MpcFile(
+            const std::variant<
+                fs::path,
+                std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> &);
     };
 } // namespace mpc::disk

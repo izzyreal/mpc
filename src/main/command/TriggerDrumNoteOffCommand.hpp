@@ -14,7 +14,8 @@ namespace mpc::command
         context::TriggerDrumNoteOffContext &ctx;
 
     public:
-        explicit TriggerDrumNoteOffCommand(context::TriggerDrumNoteOffContext &ctx);
+        explicit TriggerDrumNoteOffCommand(
+            context::TriggerDrumNoteOffContext &ctx);
         void execute() override;
     };
 } // namespace mpc::command

@@ -25,10 +25,12 @@ MidiSyncMisc::MidiSyncMisc(const std::vector<char> &b)
     input = b[INPUT_OFFSET];
     output = b[OUTPUT_OFFSET];
 
-    auto stringBuffer = Util::vecCopyOfRange(b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
+    auto stringBuffer = Util::vecCopyOfRange(
+        b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
     defSongName = std::string(stringBuffer.begin(), stringBuffer.end());
 
-    songModeIgnoreTempoChangeEventsInSequence = b[SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET] == 0x01;
+    songModeIgnoreTempoChangeEventsInSequence =
+        b[SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET] == 0x01;
 }
 
 MidiSyncMisc::MidiSyncMisc(mpc::Mpc &mpc)
@@ -40,7 +42,8 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc &mpc)
     saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeIn());
     saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeOut());
     saveBytes[SHIFT_EARLY_OFFSET] = static_cast<int8_t>(syncScreen->shiftEarly);
-    saveBytes[SEND_MMC_OFFSET] = static_cast<int8_t>((syncScreen->sendMMCEnabled ? 1 : 0));
+    saveBytes[SEND_MMC_OFFSET] =
+        static_cast<int8_t>((syncScreen->sendMMCEnabled ? 1 : 0));
     saveBytes[FRAME_RATE_OFFSET] = static_cast<int8_t>(syncScreen->frameRate);
     saveBytes[INPUT_OFFSET] = static_cast<int8_t>(syncScreen->in);
     saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(syncScreen->out);
@@ -49,7 +52,8 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc &mpc)
 
     for (int i = 0; i < AllParser::NAME_LENGTH; i++)
     {
-        saveBytes[DEF_SONG_NAME_OFFSET + i] = StrUtil::padRight(songScreen->getDefaultSongName(), " ", 16)[i];
+        saveBytes[DEF_SONG_NAME_OFFSET + i] =
+            StrUtil::padRight(songScreen->getDefaultSongName(), " ", 16)[i];
     }
 
     saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;

@@ -27,9 +27,7 @@ namespace mpc
 
 namespace mpc::audiomidi
 {
-    class SoundRecorder
-        : public AudioProcess,
-          public Observable
+    class SoundRecorder : public AudioProcess, public Observable
     {
 
     private:
@@ -47,14 +45,22 @@ namespace mpc::audiomidi
 
         std::vector<MonoResampler> resamplers = std::vector<MonoResampler>(2);
 
-        std::vector<float> leftChannelCopy = std::vector<float>(INTERNAL_BUF_SIZE);
-        std::vector<float> rightChannelCopy = std::vector<float>(INTERNAL_BUF_SIZE);
-        circular_buffer<float> ringBufferLeft = circular_buffer<float>(INTERNAL_BUF_SIZE);
-        circular_buffer<float> ringBufferRight = circular_buffer<float>(INTERNAL_BUF_SIZE);
-        std::vector<float> unresampledLeft = std::vector<float>(INTERNAL_BUF_SIZE);
-        std::vector<float> unresampledRight = std::vector<float>(INTERNAL_BUF_SIZE);
-        std::vector<float> resampledLeft = std::vector<float>(INTERNAL_BUF_SIZE);
-        std::vector<float> resampledRight = std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> leftChannelCopy =
+            std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> rightChannelCopy =
+            std::vector<float>(INTERNAL_BUF_SIZE);
+        circular_buffer<float> ringBufferLeft =
+            circular_buffer<float>(INTERNAL_BUF_SIZE);
+        circular_buffer<float> ringBufferRight =
+            circular_buffer<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> unresampledLeft =
+            std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> unresampledRight =
+            std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> resampledLeft =
+            std::vector<float>(INTERNAL_BUF_SIZE);
+        std::vector<float> resampledRight =
+            std::vector<float>(INTERNAL_BUF_SIZE);
 
         int recordedFrameCountAtEngineSampleRate = 0;
         int engineSampleRate = 44100;
@@ -66,11 +72,13 @@ namespace mpc::audiomidi
 
     public:
         void setSampleScreenActive(bool active);
-        void prepare(const std::shared_ptr<Sound> &, int newLengthInFrames, int engineSampleRate);
+        void prepare(const std::shared_ptr<Sound> &, int newLengthInFrames,
+                     int engineSampleRate);
         void start();
         void stop();
         void cancel();
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf, int nFrames) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
+                         int nFrames) override;
         bool isRecording();
         unsigned int getInputGain();
         void setInputGain(unsigned int);

@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class VelocityModulationScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VelocityModulationScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

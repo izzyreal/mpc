@@ -6,9 +6,7 @@
 namespace mpc::lcdgui::screens
 {
 
-    class OthersScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public Observable
+    class OthersScreen : public mpc::lcdgui::ScreenComponent, public Observable
     {
 
     private:

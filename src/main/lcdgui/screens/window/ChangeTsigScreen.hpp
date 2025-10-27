@@ -6,8 +6,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class ChangeTsigScreen
-        : public mpc::lcdgui::ScreenComponent
+    class ChangeTsigScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -25,11 +25,14 @@ namespace mpc::engine::audio::server
 
     public:
         virtual void resizeBuffers(int newSize);
-        virtual mpc::engine::audio::core::AudioBuffer *createAudioBuffer(std::string name);
-        virtual void removeAudioBuffer(mpc::engine::audio::core::AudioBuffer *buffer);
+        virtual mpc::engine::audio::core::AudioBuffer *
+        createAudioBuffer(std::string name);
+        virtual void
+        removeAudioBuffer(mpc::engine::audio::core::AudioBuffer *buffer);
 
     public:
-        const std::vector<mpc::engine::audio::core::AudioBuffer *> &getBuffers();
+        const std::vector<mpc::engine::audio::core::AudioBuffer *> &
+        getBuffers();
         const unsigned int getBufferSize();
 
     public:

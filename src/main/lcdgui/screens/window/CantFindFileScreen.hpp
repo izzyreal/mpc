@@ -9,8 +9,7 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens::window
 {
-    class CantFindFileScreen
-        : public mpc::lcdgui::ScreenComponent
+    class CantFindFileScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         void function(int i) override;

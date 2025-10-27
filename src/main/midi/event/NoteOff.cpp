@@ -4,11 +4,13 @@
 
 using namespace mpc::midi::event;
 
-NoteOff::NoteOff(int tick, int channel, int note, int velocity) : ChannelEvent(tick, ChannelEvent::NOTE_OFF, channel, note, velocity)
+NoteOff::NoteOff(int tick, int channel, int note, int velocity)
+    : ChannelEvent(tick, ChannelEvent::NOTE_OFF, channel, note, velocity)
 {
 }
 
-NoteOff::NoteOff(int tick, int delta, int channel, int note, int velocity) : ChannelEvent(tick, delta, ChannelEvent::NOTE_OFF, channel, note, velocity)
+NoteOff::NoteOff(int tick, int delta, int channel, int note, int velocity)
+    : ChannelEvent(tick, delta, ChannelEvent::NOTE_OFF, channel, note, velocity)
 {
 }
 

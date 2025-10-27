@@ -5,8 +5,7 @@
 
 namespace mpc::sequencer
 {
-    class ChannelPressureEvent
-        : public Event
+    class ChannelPressureEvent : public Event
     {
 
     private:

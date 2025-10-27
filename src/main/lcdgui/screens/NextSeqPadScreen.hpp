@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-    class NextSeqPadScreen
-        : public mpc::lcdgui::ScreenComponent
+    class NextSeqPadScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -33,7 +33,9 @@ void ChangeBars2Screen::function(int i)
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>(); // Required for desired screen transitions
+            mpc.getLayeredScreen()
+                ->openScreen<SequencerScreen>(); // Required for desired screen
+                                                 // transitions
             mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
             break;
         case 4:
@@ -72,7 +74,8 @@ void ChangeBars2Screen::displayNewBars()
     auto message0 = findLabel("message0");
     auto message1 = findLabel("message1");
 
-    findField("newbars")->setText(StrUtil::padLeft(std::to_string(newBars + 1), " ", 3));
+    findField("newbars")->setText(
+        StrUtil::padLeft(std::to_string(newBars + 1), " ", 3));
 
     if (newBars == seq->getLastBarIndex())
     {

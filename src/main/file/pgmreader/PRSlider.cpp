@@ -33,7 +33,8 @@ int Slider::getSliderEnd()
 std::vector<char> Slider::getSliderArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-    sliderArray = Util::vecCopyOfRange(pgmFileArray, getSliderStart(), getSliderEnd());
+    sliderArray =
+        Util::vecCopyOfRange(pgmFileArray, getSliderStart(), getSliderEnd());
     return sliderArray;
 }
 

@@ -6,8 +6,7 @@
 namespace mpc::lcdgui
 {
 
-    class Background
-        : public Component
+    class Background : public Component
     {
 
     private:
@@ -19,7 +18,8 @@ namespace mpc::lcdgui
         std::string backgroundName;
 
     public:
-        void repaintUnobtrusive(MRECT rect); // This is used for hiding function keys of windows and dialogs
+        void repaintUnobtrusive(MRECT rect); // This is used for hiding function
+                                             // keys of windows and dialogs
         void setBackgroundName(const std::string &);
         void Draw(std::vector<std::vector<bool>> *pixels) override;
         void setScrolling(bool);

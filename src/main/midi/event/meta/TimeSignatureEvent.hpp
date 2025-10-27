@@ -8,8 +8,7 @@ namespace mpc::midi::event::meta
 
 namespace mpc::midi::event::meta
 {
-    class TimeSignature
-        : public MetaEvent
+    class TimeSignature : public MetaEvent
     {
 
     public:
@@ -40,7 +39,8 @@ namespace mpc::midi::event::meta
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
     public:
-        static std::shared_ptr<MetaEvent> parseTimeSignature(int tick, int delta, MetaEventData *info);
+        static std::shared_ptr<MetaEvent>
+        parseTimeSignature(int tick, int delta, MetaEventData *info);
 
     private:
         int log2(int den);
@@ -51,6 +51,7 @@ namespace mpc::midi::event::meta
 
     public:
         TimeSignature();
-        TimeSignature(int tick, int delta, int num, int den, int meter, int div);
+        TimeSignature(int tick, int delta, int num, int den, int meter,
+                      int div);
     };
 } // namespace mpc::midi::event::meta

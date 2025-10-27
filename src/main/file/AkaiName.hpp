@@ -22,6 +22,8 @@ namespace mpc::file
         static bool isValidChar(const char &toTest);
 
     public:
-        static std::string generate(const std::string &name, const std::vector<std::string> &usedNames = std::vector<std::string>());
+        static std::string generate(const std::string &name,
+                                    const std::vector<std::string> &usedNames =
+                                        std::vector<std::string>());
     };
 } // namespace mpc::file

@@ -6,9 +6,8 @@
 namespace mpc::lcdgui::screens
 {
 
-    class PunchScreen
-        : public mpc::lcdgui::ScreenComponent,
-          private mpc::lcdgui::screens::WithTimesAndNotes
+    class PunchScreen : public mpc::lcdgui::ScreenComponent,
+                        private mpc::lcdgui::screens::WithTimesAndNotes
     {
 
     public:
@@ -28,7 +27,8 @@ namespace mpc::lcdgui::screens
 
     private:
         const std::vector<std::string> tabNames{"punch", "trans", "second-seq"};
-        const std::vector<std::string> autoPunchNames{"PUNCH IN ONLY", "PUNCH OUT ONLY", "PUNCH IN OUT"};
+        const std::vector<std::string> autoPunchNames{
+            "PUNCH IN ONLY", "PUNCH OUT ONLY", "PUNCH IN OUT"};
         int tab = 0;
 
         void setAutoPunch(int i);

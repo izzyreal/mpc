@@ -78,12 +78,14 @@ Pad *Program::getPad(int i)
 
 std::shared_ptr<StereoMixer> Program::getStereoMixerChannel(int noteIndex)
 {
-    return std::dynamic_pointer_cast<StereoMixer>(noteParameters[noteIndex]->getStereoMixerChannel());
+    return std::dynamic_pointer_cast<StereoMixer>(
+        noteParameters[noteIndex]->getStereoMixerChannel());
 }
 
 std::shared_ptr<IndivFxMixer> Program::getIndivFxMixerChannel(int noteIndex)
 {
-    return std::dynamic_pointer_cast<IndivFxMixer>(noteParameters[noteIndex]->getIndivFxMixerChannel());
+    return std::dynamic_pointer_cast<IndivFxMixer>(
+        noteParameters[noteIndex]->getIndivFxMixerChannel());
 }
 
 int Program::getPadIndexFromNote(int note)

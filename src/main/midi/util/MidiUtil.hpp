@@ -16,7 +16,9 @@ namespace mpc
             public:
                 static int bytesToInt(std::vector<char> buff, int off, int len);
                 static std::vector<char> intToBytes(int val, int byteCount);
-                static bool bytesEqual(std::vector<char> buf1, std::vector<char> buf2, int off, int len);
+                static bool bytesEqual(std::vector<char> buf1,
+                                       std::vector<char> buf2, int off,
+                                       int len);
 
             private:
                 static std::string HEX;

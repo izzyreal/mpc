@@ -40,7 +40,9 @@ namespace mpc::controller
     class ClientHardwareEventController;
     class ClientMidiEventController;
 
-    class ClientEventController : public std::enable_shared_from_this<ClientEventController>, public mpc::Observable
+    class ClientEventController
+        : public std::enable_shared_from_this<ClientEventController>,
+          public mpc::Observable
     {
 
     public:
@@ -57,9 +59,11 @@ namespace mpc::controller
             return keyboardBindings;
         }
 
-        std::shared_ptr<ClientMidiEventController> getClientMidiEventController();
+        std::shared_ptr<ClientMidiEventController>
+        getClientMidiEventController();
 
-        std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
+        std::shared_ptr<ClientHardwareEventController>
+            clientHardwareEventController;
 
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
 

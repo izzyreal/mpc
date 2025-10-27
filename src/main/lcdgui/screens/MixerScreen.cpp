@@ -64,7 +64,8 @@ void MixerScreen::addMixerStrips()
 
 std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 {
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     const auto padIndex = index + (bank * 16);
     auto program = getProgramOrThrow();
     const auto pad = program->getPad(padIndex);
@@ -75,16 +76,20 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
         return {};
     }
 
-    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+    auto noteParameters =
+        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
 
-    return stereoMixSourceIsDrum ? activeDrum().getStereoMixerChannels()[note - 35] : noteParameters->getStereoMixerChannel();
+    return stereoMixSourceIsDrum
+               ? activeDrum().getStereoMixerChannels()[note - 35]
+               : noteParameters->getStereoMixerChannel();
 }
 
 std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
 {
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     const auto padIndex = index + (bank * 16);
     auto program = getProgramOrThrow();
     const auto pad = program->getPad(padIndex);
@@ -95,11 +100,14 @@ std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
         return {};
     }
 
-    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+    auto noteParameters =
+        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
-    return indivFxSourceIsDrum ? activeDrum().getIndivFxMixerChannels()[note - 35] : noteParameters->getIndivFxMixerChannel();
+    return indivFxSourceIsDrum
+               ? activeDrum().getIndivFxMixerChannels()[note - 35]
+               : noteParameters->getIndivFxMixerChannel();
 }
 
 void MixerScreen::displayMixerStrip(int stripIndex)
@@ -109,7 +117,8 @@ void MixerScreen::displayMixerStrip(int stripIndex)
     auto stereoMixer = getStereoMixerChannel(stripIndex);
     auto indivFxMixer = getIndivFxMixerChannel(stripIndex);
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     strip->setBank(bank);
 
@@ -169,7 +178,8 @@ void MixerScreen::displayMixerStrips()
 void MixerScreen::update(Observable *o, Message message)
 {
     const auto msg = std::get<std::string>(message);
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     if (msg == "bank")
     {
@@ -304,7 +314,8 @@ void MixerScreen::left()
 
     setXPos(xPos - 1);
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     auto newPad = xPos + (bank * 16);
     mpc.clientEventController->setSelectedPad(newPad);
 }
@@ -319,7 +330,8 @@ void MixerScreen::right()
 
     setXPos(xPos + 1);
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     const auto newPadIndexWithBank = xPos + (bank * 16);
     mpc.clientEventController->setSelectedPad(newPadIndexWithBank);
 }
@@ -373,7 +385,8 @@ void MixerScreen::turnWheel(int i)
 
         if (!stereoMixer || !indivFxMixer)
         {
-            // The selected pad's mixer strip is empty, because no note is assigned to the pad.
+            // The selected pad's mixer strip is empty, because no note is
+            // assigned to the pad.
             continue;
         }
 
@@ -381,9 +394,11 @@ void MixerScreen::turnWheel(int i)
         {
             const auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
-            const bool record = sequencer->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+            const bool record = sequencer->isRecordingOrOverdubbing() &&
+                                mixerSetupScreen->isRecordMixChangesEnabled();
 
-            const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+            const int bank =
+                static_cast<int>(mpc.clientEventController->getActiveBank());
 
             if (yPos == 0)
             {
@@ -391,7 +406,8 @@ void MixerScreen::turnWheel(int i)
 
                 if (record)
                 {
-                    recordMixerEvent(padIndex + (bank * 16), 1, stereoMixer->getPanning());
+                    recordMixerEvent(padIndex + (bank * 16), 1,
+                                     stereoMixer->getPanning());
                 }
 
                 displayPanning();
@@ -402,7 +418,8 @@ void MixerScreen::turnWheel(int i)
 
                 if (record)
                 {
-                    recordMixerEvent(padIndex + (bank * 16), 0, stereoMixer->getLevel());
+                    recordMixerEvent(padIndex + (bank * 16), 0,
+                                     stereoMixer->getLevel());
                 }
 
                 displayStereoFaders();
@@ -417,7 +434,8 @@ void MixerScreen::turnWheel(int i)
             }
             else if (yPos == 1)
             {
-                indivFxMixer->setVolumeIndividualOut(indivFxMixer->getVolumeIndividualOut() + i);
+                indivFxMixer->setVolumeIndividualOut(
+                    indivFxMixer->getVolumeIndividualOut() + i);
                 displayIndivFaders();
             }
         }
@@ -430,7 +448,8 @@ void MixerScreen::turnWheel(int i)
             }
             else if (yPos == 1)
             {
-                indivFxMixer->setFxSendLevel(indivFxMixer->getFxSendLevel() + i);
+                indivFxMixer->setFxSendLevel(indivFxMixer->getFxSendLevel() +
+                                             i);
                 displayFxSendLevels();
             }
         }
@@ -450,7 +469,8 @@ void MixerScreen::displayStereoFaders()
 {
     auto program = getProgramOrThrow();
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
@@ -486,7 +506,8 @@ void MixerScreen::displayPanning()
 {
     auto program = getProgramOrThrow();
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
@@ -522,7 +543,8 @@ void MixerScreen::displayIndividualOutputs()
 {
     auto program = getProgramOrThrow();
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
@@ -553,11 +575,13 @@ void MixerScreen::displayIndividualOutputs()
 
                 if (stripHasStereoSound(stripIndex))
                 {
-                    strip->setValueAString(stereoNames[indivFxMixer->getOutput()]);
+                    strip->setValueAString(
+                        stereoNames[indivFxMixer->getOutput()]);
                 }
                 else
                 {
-                    strip->setValueAString(monoNames[indivFxMixer->getOutput()]);
+                    strip->setValueAString(
+                        monoNames[indivFxMixer->getOutput()]);
                 }
             }
         }
@@ -568,7 +592,8 @@ void MixerScreen::displayIndivFaders()
 {
     auto program = getProgramOrThrow();
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
@@ -604,7 +629,8 @@ void MixerScreen::displayFxPaths()
 {
     auto program = getProgramOrThrow();
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
@@ -640,7 +666,8 @@ void MixerScreen::displayFxSendLevels()
 {
     auto program = getProgramOrThrow();
 
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
 
     for (int padIndex = 0; padIndex < 16; padIndex++)
     {
@@ -675,7 +702,8 @@ void MixerScreen::displayFxSendLevels()
 bool MixerScreen::stripHasStereoSound(int stripIndex)
 {
     auto program = getProgramOrThrow();
-    const int bank = static_cast<int>(mpc.clientEventController->getActiveBank());
+    const int bank =
+        static_cast<int>(mpc.clientEventController->getActiveBank());
     auto pad = stripIndex + (bank * 16);
     auto note = program->getNoteFromPad(pad);
     auto noteParameters = program->getNoteParameters(note);
@@ -685,7 +713,8 @@ bool MixerScreen::stripHasStereoSound(int stripIndex)
 
 void MixerScreen::pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank)
 {
-    const bool shiftIsPressed = mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed();
+    const bool shiftIsPressed =
+        mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed();
 
     if (!shiftIsPressed)
     {

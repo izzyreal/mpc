@@ -16,9 +16,11 @@ void ReleaseTapCommand::execute()
         mpc.getSequencer()->flushTrackNoteCache();
     }
 
-    if (!mpc.clientEventController->clientHardwareEventController->isNoteRepeatLocked())
+    if (!mpc.clientEventController->clientHardwareEventController
+             ->isNoteRepeatLocked())
     {
-        const auto sequencerScreen = mpc.screens->get<lcdgui::screens::SequencerScreen>();
+        const auto sequencerScreen =
+            mpc.screens->get<lcdgui::screens::SequencerScreen>();
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
     }
 }

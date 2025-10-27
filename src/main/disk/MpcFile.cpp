@@ -9,14 +9,19 @@
 using namespace mpc::disk;
 using namespace akaifat::fat;
 
-MpcFile::MpcFile(const std::variant<fs::path, std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> &fileObject)
+MpcFile::MpcFile(
+    const std::variant<fs::path,
+                       std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>>
+        &fileObject)
 {
     if (auto fsPath = std::get_if<fs::path>(&fileObject))
     {
         fs_path = *fsPath;
         return;
     }
-    else if (auto akaiEntry = std::get_if<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(&fileObject))
+    else if (auto akaiEntry =
+                 std::get_if<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(
+                     &fileObject))
     {
         rawEntry = *akaiEntry;
         raw = true;
@@ -37,7 +42,8 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
 
     if (raw)
     {
-        auto dir = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(rawEntry->getDirectory());
+        auto dir = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
+            rawEntry->getDirectory());
 
         for (auto &kv : dir->akaiNameIndex)
         {
@@ -48,7 +54,8 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
     {
         std::error_code ec;
         for (auto pathIterator = fs::directory_iterator(fs_path, ec);
-             pathIterator != fs::directory_iterator(); pathIterator.increment(ec))
+             pathIterator != fs::directory_iterator();
+             pathIterator.increment(ec))
         {
             if (!ec)
             {
@@ -255,7 +262,8 @@ std::vector<char> MpcFile::getBytes()
         }
         catch (const std::exception &e)
         {
-            MLOG("Exception while getting file bytes: " + std::string(e.what()));
+            MLOG("Exception while getting file bytes: " +
+                 std::string(e.what()));
         }
     }
     else
@@ -272,11 +280,14 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
 {
     if (raw)
     {
-        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
+        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(
+                   rawEntry->getFile())
+            ->getInputStream();
     }
     else
     {
-        return std::make_shared<std::ifstream>(fs_path, std::ios::in | std::ios::binary);
+        return std::make_shared<std::ifstream>(fs_path,
+                                               std::ios::in | std::ios::binary);
     }
 }
 
@@ -284,11 +295,14 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
 {
     if (raw)
     {
-        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getOutputStream();
+        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(
+                   rawEntry->getFile())
+            ->getOutputStream();
     }
     else
     {
-        return std::make_shared<std::ofstream>(fs_path, std::ios::out | std::ios::binary);
+        return std::make_shared<std::ofstream>(fs_path, std::ios::out |
+                                                            std::ios::binary);
     }
 }
 

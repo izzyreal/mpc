@@ -49,10 +49,13 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc &mpc)
     auto const padAssignMasterVal = pgmAssignScreen->padAssign;
 
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
-    auto const stereoMixSourceDrumVal = mixerSetupScreen->isStereoMixSourceDrum();
+    auto const stereoMixSourceDrumVal =
+        mixerSetupScreen->isStereoMixSourceDrum();
     auto const indivFxSourceDrumVal = mixerSetupScreen->isIndivFxSourceDrum();
-    auto const copyPgmMixToDrumVal = mixerSetupScreen->isCopyPgmMixToDrumEnabled();
-    auto const recordMixChangesVal = mixerSetupScreen->isRecordMixChangesEnabled();
+    auto const copyPgmMixToDrumVal =
+        mixerSetupScreen->isCopyPgmMixToDrumEnabled();
+    auto const recordMixChangesVal =
+        mixerSetupScreen->isRecordMixChangesEnabled();
     auto const masterLevelVal = mixerSetupScreen->getMasterLevel();
     auto const fxDrumVal = mixerSetupScreen->getFxDrum();
 
@@ -66,8 +69,10 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc &mpc)
     saveBytes[6] = masterLevelVal;
 }
 
-std::vector<char> ApsGlobalParameters::TEMPLATE_NO_SOUNDS = {127, (char)(254 & 0xff), 124, (char)(238 & 0xff), 0, 0, 0, 64};
-std::vector<char> ApsGlobalParameters::TEMPLATE_SOUNDS = {'\x03', '\x38', '\x00', '\xa1', 0, 0, 0, 64};
+std::vector<char> ApsGlobalParameters::TEMPLATE_NO_SOUNDS = {
+    127, (char)(254 & 0xff), 124, (char)(238 & 0xff), 0, 0, 0, 64};
+std::vector<char> ApsGlobalParameters::TEMPLATE_SOUNDS = {
+    '\x03', '\x38', '\x00', '\xa1', 0, 0, 0, 64};
 
 int ApsGlobalParameters::readFxDrum(char b)
 {

@@ -20,8 +20,7 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens
 {
-    class SyncScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SyncScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -41,7 +40,8 @@ namespace mpc::lcdgui::screens
         unsigned char modeOut = 0;
 
     private:
-        const std::vector<std::string> modeNames{"OFF", "MIDI CLOCK", "TIME CODE"};
+        const std::vector<std::string> modeNames{"OFF", "MIDI CLOCK",
+                                                 "TIME CODE"};
 
         int tab = 0;
 

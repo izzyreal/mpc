@@ -10,8 +10,7 @@ namespace mpc::engine::audio
     namespace server
     {
 
-        class AudioServerProcess
-            : public IOAudioProcess
+        class AudioServerProcess : public IOAudioProcess
         {
 
         private:

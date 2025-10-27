@@ -38,13 +38,15 @@ void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc &mpc, const fs::path &p)
 
         if (fs::is_directory(e))
         {
-            const auto tidyString = ShortNameGenerator::tidyString(e.path().filename().string());
+            const auto tidyString =
+                ShortNameGenerator::tidyString(e.path().filename().string());
             ShortNameGenerator generator(existingNames);
             akaiName = generator.generateShortName(tidyString).asSimpleString();
         }
         else
         {
-            akaiName = AkaiName::generate(e.path().filename().string(), existingNames);
+            akaiName =
+                AkaiName::generate(e.path().filename().string(), existingNames);
         }
 
         if (akaiName != e.path().filename().string())

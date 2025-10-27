@@ -31,7 +31,10 @@ namespace mpc::client::event
     public:
         ClientMidiEvent() = default;
         ClientMidiEvent(MessageType type, int d1 = 0, int d2 = 0)
-            : messageType(type), data1(static_cast<uint8_t>(d1)), data2(static_cast<uint8_t>(d2)) {}
+            : messageType(type), data1(static_cast<uint8_t>(d1)),
+              data2(static_cast<uint8_t>(d2))
+        {
+        }
 
         MessageType getMessageType() const noexcept
         {

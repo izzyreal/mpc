@@ -23,8 +23,7 @@ namespace mpc::audiomidi
         WAV
     };
 
-    class SoundPlayer
-        : public AudioProcess
+    class SoundPlayer : public AudioProcess
     {
 
     private:
@@ -46,8 +45,10 @@ namespace mpc::audiomidi
 
         std::atomic_bool playing = false;
         std::string filePath;
-        moodycamel::ReaderWriterQueue<float> bufferLeft = moodycamel::ReaderWriterQueue<float>(60000);
-        moodycamel::ReaderWriterQueue<float> bufferRight = moodycamel::ReaderWriterQueue<float>(60000);
+        moodycamel::ReaderWriterQueue<float> bufferLeft =
+            moodycamel::ReaderWriterQueue<float>(60000);
+        moodycamel::ReaderWriterQueue<float> bufferRight =
+            moodycamel::ReaderWriterQueue<float>(60000);
         std::vector<float> resampleInputBufferLeft;
         std::vector<float> resampleInputBufferRight;
         std::vector<float> resampleOutputBuffer;
@@ -58,8 +59,10 @@ namespace mpc::audiomidi
         std::shared_ptr<std::istream> stream;
 
     public:
-        bool start(const std::shared_ptr<std::istream> &, SoundPlayerFileFormat, int audioServerSampleRate);
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf, int nFrames) override;
+        bool start(const std::shared_ptr<std::istream> &, SoundPlayerFileFormat,
+                   int audioServerSampleRate);
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
+                         int nFrames) override;
         void enableStopEarly();
         bool isPlaying();
 

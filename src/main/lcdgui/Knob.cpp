@@ -7,8 +7,7 @@
 
 using namespace mpc::lcdgui;
 
-Knob::Knob(MRECT rect)
-    : Component("knob")
+Knob::Knob(MRECT rect) : Component("knob")
 {
     Component::setSize(rect.W(), rect.H());
     setLocation(rect.L, rect.T);
@@ -59,7 +58,8 @@ void Knob::Draw(std::vector<std::vector<bool>> *pixels)
     float angleToRadians = ((float)(angle) / 180.0) * 3.14159265;
     int x0 = (int)(radius * cos(angleToRadians));
     int y0 = (int)(radius * sin(angleToRadians));
-    lines.emplace_back(Bressenham::Line(5, 5, x0 + radiusInt + 1, y0 + radiusInt + 1));
+    lines.emplace_back(
+        Bressenham::Line(5, 5, x0 + radiusInt + 1, y0 + radiusInt + 1));
 
     std::vector<bool> colors(lines.size(), color);
 

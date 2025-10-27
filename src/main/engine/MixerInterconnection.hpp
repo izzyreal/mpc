@@ -19,9 +19,11 @@ namespace mpc::engine
         bool rightEnabled{true};
 
     public:
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess> getInputProcess();
+        std::shared_ptr<mpc::engine::audio::core::AudioProcess>
+        getInputProcess();
 
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess> getOutputProcess();
+        std::shared_ptr<mpc::engine::audio::core::AudioProcess>
+        getOutputProcess();
 
     public:
         void setLeftEnabled(bool b);
@@ -33,6 +35,7 @@ namespace mpc::engine
         bool isRightEnabled();
 
     public:
-        MixerInterconnection(std::string name, mpc::engine::audio::server::AudioServer *server);
+        MixerInterconnection(std::string name,
+                             mpc::engine::audio::server::AudioServer *server);
     };
 } // namespace mpc::engine

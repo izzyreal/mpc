@@ -47,12 +47,9 @@ Mpc::Mpc()
 void Mpc::init()
 {
     std::vector<fs::path> requiredPaths{
-        paths->appDocumentsPath(),
-        paths->configPath(),
-        paths->storesPath(),
-        paths->defaultLocalVolumePath(),
-        paths->recordingsPath(),
-        paths->autoSavePath()};
+        paths->appDocumentsPath(), paths->configPath(),
+        paths->storesPath(),       paths->defaultLocalVolumePath(),
+        paths->recordingsPath(),   paths->autoSavePath()};
 
     for (auto &p : requiredPaths)
     {
@@ -70,26 +67,33 @@ void Mpc::init()
     for (const auto &demo_file : demo_files)
     {
         const auto dst = paths->demoDataPath() / demo_file;
-        const bool should_update = !fs::exists(dst) || std::find(always_update_demo_files.begin(),
-                                                                 always_update_demo_files.end(),
-                                                                 demo_file) != always_update_demo_files.end();
+        const bool should_update =
+            !fs::exists(dst) ||
+            std::find(always_update_demo_files.begin(),
+                      always_update_demo_files.end(),
+                      demo_file) != always_update_demo_files.end();
 
         if (should_update)
         {
-            const auto data = mpc::MpcResourceUtil::get_resource_data("demodata/" + demo_file);
+            const auto data = mpc::MpcResourceUtil::get_resource_data(
+                "demodata/" + demo_file);
             set_file_data(dst, data);
         }
     }
 
     fs::create_directories(paths->midiControlPresetsPath());
 
-    const std::vector<std::string> factory_midi_control_presets{"MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp"};
+    const std::vector<std::string> factory_midi_control_presets{
+        "MPD16.vmp", "MPD218.vmp", "iRig_PADS.vmp"};
 
     for (auto &preset : factory_midi_control_presets)
     {
-        const auto data = mpc::MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
+        const auto data = mpc::MpcResourceUtil::get_resource_data(
+            "midicontrolpresets/" + preset);
 
-        if (!fs::exists(paths->midiControlPresetsPath() / preset) || fs::file_size(paths->midiControlPresetsPath() / preset) != data.size())
+        if (!fs::exists(paths->midiControlPresetsPath() / preset) ||
+            fs::file_size(paths->midiControlPresetsPath() / preset) !=
+                data.size())
         {
             set_file_data(paths->midiControlPresetsPath() / preset, data);
         }
@@ -97,7 +101,8 @@ void Mpc::init()
 
     mpc::Logger::l.setPath(paths->logFilePath().string());
 
-    padAndButtonKeyboard = std::make_shared<mpc::input::PadAndButtonKeyboard>(*this);
+    padAndButtonKeyboard =
+        std::make_shared<mpc::input::PadAndButtonKeyboard>(*this);
 
     diskController = std::make_unique<mpc::disk::DiskController>(*this);
 
@@ -123,13 +128,15 @@ void Mpc::init()
     eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
 
-    clientEventController = std::make_shared<mpc::controller::ClientEventController>(*this);
+    clientEventController =
+        std::make_shared<mpc::controller::ClientEventController>(*this);
     clientEventController->init();
 
     /*
      * AudioMidiServices requires sequencer to exist.
      */
-    audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
+    audioMidiServices =
+        std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
     MLOG("AudioMidiServices created");
 
     sequencer->init();
@@ -216,8 +223,20 @@ std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
     return diskController->getDisks();
 }
 
-std::vector<char> Mpc::akaiAsciiChar{' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}'};
-std::vector<std::string> Mpc::akaiAscii{" ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}"};
+std::vector<char> Mpc::akaiAsciiChar{
+    ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2',
+    '3', '4', '5', '6', '7', '8', '9',  '@', 'A', 'B', 'C', 'D', 'E',
+    'F', 'G', 'H', 'I', 'J', 'K', 'L',  'M', 'N', 'O', 'P', 'Q', 'R',
+    'S', 'T', 'U', 'V', 'W', 'X', 'Y',  'Z', '_', 'a', 'b', 'c', 'd',
+    'e', 'f', 'g', 'h', 'i', 'j', 'k',  'l', 'm', 'n', 'o', 'p', 'q',
+    'r', 's', 't', 'u', 'v', 'w', 'x',  'y', 'z', '{', '}'};
+std::vector<std::string> Mpc::akaiAscii{
+    " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2",
+    "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E",
+    "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+    "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d",
+    "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
+    "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}"};
 
 std::shared_ptr<audiomidi::MidiOutput> Mpc::getMidiOutput()
 {
@@ -265,7 +284,9 @@ void Mpc::panic()
     sequencer->getNoteEventStore().clearPlayAndRecordStore();
     midiOutput->panic();
     eventHandler->clearTransposeCache();
-    clientEventController->getClientMidiEventController()->getSoundGeneratorController()->clearNoteEventStore();
+    clientEventController->getClientMidiEventController()
+        ->getSoundGeneratorController()
+        ->clearNoteEventStore();
 }
 
 std::shared_ptr<mpc::sequencer::Clock> Mpc::getClock()

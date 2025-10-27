@@ -7,7 +7,8 @@
 
 using namespace mpc::midi::event::meta;
 
-SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<char> data)
+SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta,
+                                               std::vector<char> data)
     : MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC)
 {
     mData = data;
@@ -38,7 +39,8 @@ void SequencerSpecificEvent::writeToOutputStream(std::ostream &out)
     out.write(&mData[0], mData.size());
 }
 
-void SequencerSpecificEvent::writeToOutputStream(std::ostream &out, bool writeType)
+void SequencerSpecificEvent::writeToOutputStream(std::ostream &out,
+                                                 bool writeType)
 {
     MetaEvent::writeToOutputStream(out, writeType);
 }

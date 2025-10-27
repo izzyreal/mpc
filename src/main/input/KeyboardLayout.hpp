@@ -29,7 +29,8 @@ namespace mpc::input
         };
 
     public:
-        static const std::map<const int, const KeyCodeInfo> getCurrentKeyboardLayout()
+        static const std::map<const int, const KeyCodeInfo>
+        getCurrentKeyboardLayout()
         {
             const std::vector<std::string> modifierNames{"", "Shift"};
 #ifdef _WIN32
@@ -44,39 +45,48 @@ namespace mpc::input
                 WCHAR buffer[10] = {0};
                 std::wstring symbols;
 
-                if (ToUnicodeEx(vk, MapVirtualKeyEx(vk, MAPVK_VK_TO_VSC, layout), keyState, buffer, 10, 0, layout) > 0)
+                if (ToUnicodeEx(vk,
+                                MapVirtualKeyEx(vk, MAPVK_VK_TO_VSC, layout),
+                                keyState, buffer, 10, 0, layout) > 0)
                 {
                     symbols = buffer;
                 }
 
                 if (!symbols.empty())
                 {
-                    charWithoutModifiers = std::string(symbols.begin(), symbols.end());
+                    charWithoutModifiers =
+                        std::string(symbols.begin(), symbols.end());
                 }
 
                 symbols.clear();
 
                 keyState[VK_SHIFT] = 0x80;
 
-                if (ToUnicodeEx(vk, MapVirtualKeyEx(vk, MAPVK_VK_TO_VSC, layout), keyState, buffer, 10, 0, layout) > 0)
+                if (ToUnicodeEx(vk,
+                                MapVirtualKeyEx(vk, MAPVK_VK_TO_VSC, layout),
+                                keyState, buffer, 10, 0, layout) > 0)
                 {
                     symbols = buffer;
                 }
 
                 if (!symbols.empty())
                 {
-                    charWithShiftModifier = std::string(symbols.begin(), symbols.end());
+                    charWithShiftModifier =
+                        std::string(symbols.begin(), symbols.end());
                 }
 
-                if (!charWithoutModifiers.empty() || !charWithShiftModifier.empty())
+                if (!charWithoutModifiers.empty() ||
+                    !charWithShiftModifier.empty())
                 {
-                    result.emplace(vk, KeyCodeInfo{charWithoutModifiers, charWithShiftModifier});
+                    result.emplace(vk, KeyCodeInfo{charWithoutModifiers,
+                                                   charWithShiftModifier});
                 }
             }
             return result;
 #elif defined(__APPLE__) && (TARGET_OS_OSX == 1)
             std::map<const int, const KeyCodeInfo> result;
-            const TISInputSourceRef inputSource = TISCopyCurrentKeyboardLayoutInputSource();
+            const TISInputSourceRef inputSource =
+                TISCopyCurrentKeyboardLayoutInputSource();
 
             if (!inputSource)
             {
@@ -88,12 +98,14 @@ namespace mpc::input
 
             if (pthread_main_np())
             {
-                layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(inputSource, kTISPropertyUnicodeKeyLayoutData));
+                layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(
+                    inputSource, kTISPropertyUnicodeKeyLayoutData));
             }
             else
             {
                 dispatch_sync(dispatch_get_main_queue(), ^{
-                  layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(inputSource, kTISPropertyUnicodeKeyLayoutData));
+                  layoutData = static_cast<CFDataRef>(TISGetInputSourceProperty(
+                      inputSource, kTISPropertyUnicodeKeyLayoutData));
                 });
             }
 
@@ -103,7 +115,9 @@ namespace mpc::input
                 return {};
             }
 
-            const UCKeyboardLayout *keyboardLayout = reinterpret_cast<const UCKeyboardLayout *>(CFDataGetBytePtr(layoutData));
+            const UCKeyboardLayout *keyboardLayout =
+                reinterpret_cast<const UCKeyboardLayout *>(
+                    CFDataGetBytePtr(layoutData));
 
             if (!keyboardLayout)
             {
@@ -126,15 +140,9 @@ namespace mpc::input
                     UniCharCount length = 0;
 
                     OSStatus status = UCKeyTranslate(
-                        keyboardLayout,
-                        vk,
-                        kUCKeyActionDown,
-                        modifiers >> 8,
-                        LMGetKbdType(),
-                        kUCKeyTranslateNoDeadKeysMask,
-                        &keysDown,
-                        sizeof(chars) / sizeof(chars[0]),
-                        &length,
+                        keyboardLayout, vk, kUCKeyActionDown, modifiers >> 8,
+                        LMGetKbdType(), kUCKeyTranslateNoDeadKeysMask,
+                        &keysDown, sizeof(chars) / sizeof(chars[0]), &length,
                         chars);
 
                     if (status == noErr)
@@ -163,12 +171,14 @@ namespace mpc::input
                     }
                 }
 
-                if (charWithoutModifiers.empty() && charWithShiftModifier.empty())
+                if (charWithoutModifiers.empty() &&
+                    charWithShiftModifier.empty())
                 {
                     continue;
                 }
 
-                result.emplace(vk, KeyCodeInfo{charWithoutModifiers, charWithShiftModifier});
+                result.emplace(vk, KeyCodeInfo{charWithoutModifiers,
+                                               charWithShiftModifier});
             }
             return result;
 #elif defined(__APPLE__) && (TARGET_OS_IOS == 1)
@@ -215,16 +225,22 @@ namespace mpc::input
 
             std::map<const int, const KeyCodeInfo> specialCharacters{
                 {UIKeyConstants::UIKeyboardHIDUsageKeyboardHyphen, {"-", "_"}},
-                {UIKeyConstants::UIKeyboardHIDUsageKeyboardEqualSign, {"=", "+"}},
-                {UIKeyConstants::UIKeyboardHIDUsageKeyboardOpenBracket, {"[", "{"}},
-                {UIKeyConstants::UIKeyboardHIDUsageKeyboardCloseBracket, {"]", "}"}},
-                {UIKeyConstants::UIKeyboardHIDUsageKeyboardBackslash, {"\\", "|"}},
-                {UIKeyConstants::UIKeyboardHIDUsageKeyboardSemicolon, {";", ":"}},
+                {UIKeyConstants::UIKeyboardHIDUsageKeyboardEqualSign,
+                 {"=", "+"}},
+                {UIKeyConstants::UIKeyboardHIDUsageKeyboardOpenBracket,
+                 {"[", "{"}},
+                {UIKeyConstants::UIKeyboardHIDUsageKeyboardCloseBracket,
+                 {"]", "}"}},
+                {UIKeyConstants::UIKeyboardHIDUsageKeyboardBackslash,
+                 {"\\", "|"}},
+                {UIKeyConstants::UIKeyboardHIDUsageKeyboardSemicolon,
+                 {";", ":"}},
                 {UIKeyConstants::UIKeyboardHIDUsageKeyboardQuote, {"'", "\""}},
                 {UIKeyConstants::UIKeyboardHIDUsageKeyboardComma, {",", "<"}},
                 {UIKeyConstants::UIKeyboardHIDUsageKeyboardPeriod, {".", ">"}},
                 {UIKeyConstants::UIKeyboardHIDUsageKeyboardSlash, {"/", "?"}},
-                {UIKeyConstants::UIKeyboardHIDUsageKeyboardNonUSBackslash, {"§", "±"}}};
+                {UIKeyConstants::UIKeyboardHIDUsageKeyboardNonUSBackslash,
+                 {"§", "±"}}};
 
             std::map<const int, const KeyCodeInfo> keypad{
                 {UIKeyConstants::UIKeyboardHIDUsageKeypad0, {"0", "0"}},
@@ -256,7 +272,8 @@ namespace mpc::input
             Display *display = XOpenDisplay(nullptr);
             if (display)
             {
-                XkbDescPtr xkb = XkbGetMap(display, XkbAllClientInfoMask, XkbUseCoreKbd);
+                XkbDescPtr xkb =
+                    XkbGetMap(display, XkbAllClientInfoMask, XkbUseCoreKbd);
 
                 if (xkb)
                 {
@@ -279,7 +296,9 @@ namespace mpc::input
                             event.keycode = XKeysymToKeycode(display, vk);
                             event.state = modifierName.empty() ? 0 : ShiftMask;
                             event.window = DefaultRootWindow(display);
-                            int len = XLookupString(&event, buffer, sizeof(buffer), nullptr, nullptr);
+                            int len =
+                                XLookupString(&event, buffer, sizeof(buffer),
+                                              nullptr, nullptr);
 
                             if (len > 0)
                             {
@@ -312,9 +331,12 @@ namespace mpc::input
                             }
                         }
 
-                        if (!charWithoutModifiers.empty() || !charWithShiftModifier.empty())
+                        if (!charWithoutModifiers.empty() ||
+                            !charWithShiftModifier.empty())
                         {
-                            result.emplace(vk, KeyCodeInfo{charWithoutModifiers, charWithShiftModifier});
+                            result.emplace(vk,
+                                           KeyCodeInfo{charWithoutModifiers,
+                                                       charWithShiftModifier});
                         }
                     }
 
@@ -333,19 +355,18 @@ namespace mpc::input
         static std::string convertUniCharToUTF8(UniChar ch)
         {
             CFStringRef cfString = CFStringCreateWithBytes(
-                kCFAllocatorDefault,
-                reinterpret_cast<const UInt8 *>(&ch),
-                sizeof(ch),
-                kCFStringEncodingUTF16,
-                false);
+                kCFAllocatorDefault, reinterpret_cast<const UInt8 *>(&ch),
+                sizeof(ch), kCFStringEncodingUTF16, false);
 
             if (cfString)
             {
                 CFIndex length = CFStringGetLength(cfString);
-                CFIndex maxLength = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
+                CFIndex maxLength = CFStringGetMaximumSizeForEncoding(
+                    length, kCFStringEncodingUTF8);
                 char *utf8String = new char[maxLength + 1];
 
-                if (CFStringGetCString(cfString, utf8String, maxLength + 1, kCFStringEncodingUTF8))
+                if (CFStringGetCString(cfString, utf8String, maxLength + 1,
+                                       kCFStringEncodingUTF8))
                 {
                     std::string result(utf8String);
                     delete[] utf8String;

@@ -12,7 +12,8 @@ namespace mpc::command
     class NoteInputScreenUpdateCommand : public Command
     {
     public:
-        NoteInputScreenUpdateCommand(context::NoteInputScreenUpdateContext &ctx, const int note);
+        NoteInputScreenUpdateCommand(context::NoteInputScreenUpdateContext &ctx,
+                                     const int note);
         void execute() override;
 
     private:

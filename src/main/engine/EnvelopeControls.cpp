@@ -84,19 +84,22 @@ float EnvelopeControls::deriveDecay()
 
 shared_ptr<ControlLaw> EnvelopeControls::ATTACK_LAW()
 {
-    static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 3000.0f * 4.7f, "ms");
+    static shared_ptr<LogLaw> res =
+        make_shared<LogLaw>(0.0000001f, 3000.0f * 4.7f, "ms");
     return res;
 }
 
 shared_ptr<ControlLaw> EnvelopeControls::DECAY_LAW()
 {
-    static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 2600.0f * 4.7f, "ms");
+    static shared_ptr<LogLaw> res =
+        make_shared<LogLaw>(0.0000001f, 2600.0f * 4.7f, "ms");
     return res;
 }
 
 shared_ptr<ControlLaw> EnvelopeControls::HOLD_LAW()
 {
-    static shared_ptr<LinearLaw> res = make_shared<LinearLaw>(0.0f, FLT_MAX, "samples");
+    static shared_ptr<LinearLaw> res =
+        make_shared<LinearLaw>(0.0f, FLT_MAX, "samples");
     return res;
 }
 

@@ -5,7 +5,8 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 
-CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc &mpc,
+                                               const int layerIndex)
     : ScreenComponent(mpc, "create-new-program", layerIndex)
 {
 }
@@ -72,7 +73,8 @@ void CreateNewProgramScreen::function(int i)
             mpc.getLayeredScreen()->openScreen<ProgramScreen>();
             break;
         case 4:
-            auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
+            auto newProgram =
+                sampler->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
             newProgram->setMidiProgramChange(midiProgramChange);
 

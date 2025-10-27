@@ -4,8 +4,7 @@
 
 using namespace mpc::lcdgui;
 
-HorizontalBar2::HorizontalBar2(MRECT rect)
-    : Component("horizontal-bar")
+HorizontalBar2::HorizontalBar2(MRECT rect) : Component("horizontal-bar")
 {
     setSize(rect.W(), rect.H());
     setLocation(rect.L, rect.T);

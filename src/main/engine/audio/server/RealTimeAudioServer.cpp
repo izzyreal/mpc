@@ -71,7 +71,9 @@ void RealTimeAudioServer::resizeBuffers(int newSize)
 }
 
 // For compatibility with the PortAudio framework
-void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount)
+void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer,
+                               int nFrames, int inputChannelCount,
+                               int outputChannelCount)
 {
     if (!running)
     {
@@ -79,7 +81,8 @@ void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer, int nFra
     }
 
     int sampleCounter = 0;
-    const int inputsToProcess = min((int)(inputChannelCount * 0.5), (int)activeInputs.size());
+    const int inputsToProcess =
+        min((int)(inputChannelCount * 0.5), (int)activeInputs.size());
 
     for (int frame = 0; frame < nFrames; frame++)
     {
@@ -106,19 +109,19 @@ void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer, int nFra
             }
 
             *outputBuffer++ = activeOutputs[output]->localBuffer[(frame * 2)];
-            *outputBuffer++ = activeOutputs[output]->localBuffer[(frame * 2) + 1];
+            *outputBuffer++ =
+                activeOutputs[output]->localBuffer[(frame * 2) + 1];
         }
     }
 }
 
 // For compatibility with JUCE 7.0.5+
-void RealTimeAudioServer::work(const float *const *inputBuffer,
-                               float *const *outputBuffer,
-                               int nFrames,
-                               const std::vector<int8_t> &mpcMonoInputChannelIndices,
-                               const std::vector<int8_t> &mpcMonoOutputChannelIndices,
-                               const std::vector<int8_t> &hostInputChannelIndices,
-                               const std::vector<int8_t> &hostOutputChannelIndices)
+void RealTimeAudioServer::work(
+    const float *const *inputBuffer, float *const *outputBuffer, int nFrames,
+    const std::vector<int8_t> &mpcMonoInputChannelIndices,
+    const std::vector<int8_t> &mpcMonoOutputChannelIndices,
+    const std::vector<int8_t> &hostInputChannelIndices,
+    const std::vector<int8_t> &hostOutputChannelIndices)
 {
     if (!running)
     {
@@ -127,14 +130,16 @@ void RealTimeAudioServer::work(const float *const *inputBuffer,
 
     for (int i = 0; i < mpcMonoInputChannelIndices.size(); i++)
     {
-        const auto mpcStereoInputIndex = static_cast<int>(std::floor(mpcMonoInputChannelIndices[i] / 2.f));
+        const auto mpcStereoInputIndex =
+            static_cast<int>(std::floor(mpcMonoInputChannelIndices[i] / 2.f));
         auto &vmpcInput = activeInputs[mpcStereoInputIndex];
         const auto localBufferFrameOffset = mpcMonoInputChannelIndices[i] % 2;
         const auto &hostBuffer = inputBuffer[hostInputChannelIndices[i]];
 
         for (int frame = 0; frame < nFrames; frame++)
         {
-            const auto localBufferFrameIndex = (frame * 2) + localBufferFrameOffset;
+            const auto localBufferFrameIndex =
+                (frame * 2) + localBufferFrameOffset;
             vmpcInput->localBuffer[localBufferFrameIndex] = hostBuffer[frame];
         }
     }
@@ -143,14 +148,16 @@ void RealTimeAudioServer::work(const float *const *inputBuffer,
 
     for (int i = 0; i < mpcMonoOutputChannelIndices.size(); i++)
     {
-        const auto mpcStereoOutputIndex = static_cast<int>(std::floor(mpcMonoOutputChannelIndices[i] / 2.f));
+        const auto mpcStereoOutputIndex =
+            static_cast<int>(std::floor(mpcMonoOutputChannelIndices[i] / 2.f));
         const auto &vmpcOutput = activeOutputs[mpcStereoOutputIndex];
         const auto localBufferFrameOffset = mpcMonoOutputChannelIndices[i] % 2;
         auto &hostBuffer = outputBuffer[hostOutputChannelIndices[i]];
 
         for (int frame = 0; frame < nFrames; frame++)
         {
-            const auto localBufferFrameIndex = (frame * 2) + localBufferFrameOffset;
+            const auto localBufferFrameIndex =
+                (frame * 2) + localBufferFrameOffset;
             hostBuffer[frame] = vmpcOutput->localBuffer[localBufferFrameIndex];
         }
     }

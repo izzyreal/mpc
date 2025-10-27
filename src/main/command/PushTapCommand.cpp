@@ -11,7 +11,8 @@ namespace mpc::command
 
     void PushTapCommand::execute()
     {
-        mpc.clientEventController->clientHardwareEventController->unlockNoteRepeat();
+        mpc.clientEventController->clientHardwareEventController
+            ->unlockNoteRepeat();
         mpc.getSequencer()->tap();
     }
 } // namespace mpc::command

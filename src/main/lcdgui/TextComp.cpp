@@ -93,8 +93,10 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     if (alignment == Alignment::Centered && !textuallyAligned)
     {
-        auto charsToAlignCount = std::min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
-        auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
+        auto charsToAlignCount = std::min(
+            int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+        auto charsToAlign =
+            StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
         textToRender = charsToAlign + text.substr(charsToAlignCount);
         auto charsWidthInPixels = mpc::Util::getTextWidthInPixels(charsToAlign);
         alignmentOffset = (alignmentEndX - charsWidthInPixels) * 0.5;
@@ -152,8 +154,9 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
                     if (w == 47 && getName().find("note") != std::string::npos)
                     {
-                        // Super hacky way to cram as much text in the amount of pixels that
-                        // the original leet coders of the Akai MPC2000XL OS did. Respect.
+                        // Super hacky way to cram as much text in the amount of
+                        // pixels that the original leet coders of the Akai
+                        // MPC2000XL OS did. Respect.
                         xpos -= 1;
                     }
 
@@ -166,7 +169,8 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
                     if (field != nullptr && field->isSplit())
                     {
-                        (*pixels)[xpos][ypos] = charCounter > field->getActiveSplit();
+                        (*pixels)[xpos][ypos] =
+                            charCounter > field->getActiveSplit();
                     }
                 }
             }
@@ -182,9 +186,12 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
     {
         for (auto xPos : std::vector<int>{12, 30})
         {
-            bool doubleInverted = field != nullptr && field->isSplit() && field->getActiveSplit() + 2 <= xPos / 6;
+            bool doubleInverted = field != nullptr && field->isSplit() &&
+                                  field->getActiveSplit() + 2 <= xPos / 6;
 
-            const bool color = (field != nullptr && field->isTypeModeEnabled()) ? false : !(inverted && !doubleInverted);
+            const bool color = (field != nullptr && field->isTypeModeEnabled())
+                                   ? false
+                                   : !(inverted && !doubleInverted);
 
             if (w > xPos)
             {
@@ -255,8 +262,10 @@ void TextComp::setText(const std::string &s)
 
     if (alignment == Alignment::Centered && alignmentEndX != w)
     {
-        auto charsToAlignCount = std::min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
-        auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
+        auto charsToAlignCount = std::min(
+            int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+        auto charsToAlign =
+            StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
 
         if ((charsToAlignCount - charsToAlign.length()) % 2 == 0)
         {
@@ -273,7 +282,8 @@ void TextComp::setText(const std::string &s)
                 text.insert(text.begin() + i, charsToAlign[i - nudge]);
             }
 
-            for (int i = nudge + charsToAlign.length(); i < charsToAlignCount; i++)
+            for (int i = nudge + charsToAlign.length(); i < charsToAlignCount;
+                 i++)
             {
                 text.insert(text.begin() + i, ' ');
             }

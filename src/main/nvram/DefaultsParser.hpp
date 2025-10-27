@@ -21,7 +21,8 @@ namespace mpc::nvram
     {
 
     public:
-        static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc &mpc, fs::path file);
+        static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc &mpc,
+                                                            fs::path file);
         std::vector<char> saveBytes;
         std::vector<char> getBytes();
 

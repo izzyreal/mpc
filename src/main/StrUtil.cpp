@@ -8,7 +8,8 @@
 
 using namespace mpc;
 
-std::string StrUtil::replaceAll(std::string str, char c, std::string replacement)
+std::string StrUtil::replaceAll(std::string str, char c,
+                                std::string replacement)
 {
     if (replacement.length() > 1)
     {
@@ -139,7 +140,8 @@ std::string StrUtil::TrimDecimals(const std::string &str, int count)
 
         std::string copy = str;
         const int index = static_cast<int>(str.find("."));
-        const int numberOfDecimalsFound = static_cast<int>(str.length()) - index + 1;
+        const int numberOfDecimalsFound =
+            static_cast<int>(str.length()) - index + 1;
         if (numberOfDecimalsFound <= count)
         {
             // Trimming is not possible
@@ -160,11 +162,13 @@ std::string StrUtil::TrimDecimals(double d, int count)
     return TrimDecimals(std::to_string(d), count);
 }
 
-bool StrUtil::hasEnding(std::string const &fullString, std::string const &ending)
+bool StrUtil::hasEnding(std::string const &fullString,
+                        std::string const &ending)
 {
     if (fullString.length() >= ending.length())
     {
-        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+        return (0 == fullString.compare(fullString.length() - ending.length(),
+                                        ending.length(), ending));
     }
     else
     {

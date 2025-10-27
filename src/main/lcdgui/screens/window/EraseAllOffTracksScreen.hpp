@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class EraseAllOffTracksScreen
-        : public mpc::lcdgui::ScreenComponent
+    class EraseAllOffTracksScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

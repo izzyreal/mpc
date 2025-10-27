@@ -76,7 +76,8 @@ TEST_CASE("Continuous type contracts", "[hardware]")
     STATIC_REQUIRE(std::is_same_v<decltype(c.getValue()), float>);
     STATIC_REQUIRE(std::is_same_v<decltype(c.getValueAs<int>()), int>);
     STATIC_REQUIRE(std::is_same_v<decltype(c.getRange()), std::pair<int, int>>);
-    STATIC_REQUIRE(std::is_same_v<decltype(c.getRangeAs<double>()), std::pair<double, double>>);
+    STATIC_REQUIRE(std::is_same_v<decltype(c.getRangeAs<double>()),
+std::pair<double, double>>);
 }
 
 TEST_CASE("Continuous<float> stores and clamps correctly", "[hardware]")
@@ -224,7 +225,8 @@ TEST_CASE("Pad is in pressed and non-pressed state correctly", "[hardware]")
     REQUIRE_THROWS_AS(p.pressWithVelocity(0), std::invalid_argument);
 }
 
-TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware]")
+TEST_CASE("Pad registers velocity and aftertouch pressure correctly",
+"[hardware]")
 {
     Pad p(0);
     REQUIRE(!p.getVelocity().has_value());
@@ -252,7 +254,8 @@ TEST_CASE("Pad registers velocity and aftertouch pressure correctly", "[hardware
 }
 
 
-TEST_CASE("Pad inherits from Pressable and VelocitySensitivePressable", "[hardware]")
+TEST_CASE("Pad inherits from Pressable and VelocitySensitivePressable",
+"[hardware]")
 {
     STATIC_REQUIRE(std::is_base_of_v<Pressable, Pad>);
     STATIC_REQUIRE(std::is_base_of_v<VelocitySensitivePressable, Pad>);
@@ -281,7 +284,8 @@ TEST_CASE("Pressable press and doublePress return correct bool", "[hardware]")
     REQUIRE(p.doublePress() == false); // Already pressed
 }
 
-TEST_CASE("VelocitySensitivePressable pressWithVelocity returns correct bool", "[hardware]")
+TEST_CASE("VelocitySensitivePressable pressWithVelocity returns correct bool",
+"[hardware]")
 {
     struct TestVelocitySensitivePressable : VelocitySensitivePressable {};
 

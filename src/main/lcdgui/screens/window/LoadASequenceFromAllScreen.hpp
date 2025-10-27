@@ -8,8 +8,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadASequenceFromAllScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoadASequenceFromAllScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -26,7 +25,8 @@ namespace mpc::lcdgui::screens::window
         void displayFile();
         void displayLoadInto();
 
-        std::vector<std::shared_ptr<mpc::sequencer::Sequence>> sequencesFromAllFile;
+        std::vector<std::shared_ptr<mpc::sequencer::Sequence>>
+            sequencesFromAllFile;
 
         friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
     };

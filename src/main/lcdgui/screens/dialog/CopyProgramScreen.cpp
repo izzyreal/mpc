@@ -92,7 +92,8 @@ void CopyProgramScreen::setPgm1(int i)
 void CopyProgramScreen::displayPgm0()
 {
     auto programName = sampler->getProgram(pgm0)->getName();
-    findField("pgm0")->setText(StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
+    findField("pgm0")->setText(
+        StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1()
@@ -100,7 +101,8 @@ void CopyProgramScreen::displayPgm1()
     auto program1 = sampler->getProgram(pgm1);
 
     auto programName = program1 ? program1->getName() : "(no program)";
-    findField("pgm1")->setText(StrUtil::padLeft(std::to_string(pgm1 + 1), " ", 2) + "-" + programName);
+    findField("pgm1")->setText(
+        StrUtil::padLeft(std::to_string(pgm1 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayFunctionKeys()

@@ -101,7 +101,8 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int eventIndex = 0; eventIndex < 8; eventIndex++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(toSeq->getTrack(0)->getEvent(eventIndex));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(
+            toSeq->getTrack(0)->getEvent(eventIndex));
 
         REQUIRE(noteEvent->getTick() == eventIndex * 24);
         REQUIRE(noteEvent->getNote() == eventIndex + 35);

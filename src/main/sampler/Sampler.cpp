@@ -34,10 +34,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-Sampler::Sampler(mpc::Mpc &mpc)
-    : mpc(mpc)
-{
-}
+Sampler::Sampler(mpc::Mpc &mpc) : mpc(mpc) {}
 
 std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
@@ -123,7 +120,8 @@ std::shared_ptr<Sound> Sampler::getSound()
         }
 
         // This is a bit of a hack, depending on what the real 2KXL does.
-        // For now this will work fine to get some kind of sane index here after loading an APS, PGM, SND or WAV into an empty sampler.
+        // For now this will work fine to get some kind of sane index here after
+        // loading an APS, PGM, SND or WAV into an empty sampler.
         soundIndex = 0;
     }
 
@@ -145,12 +143,14 @@ void Sampler::setPreviousScreenName(std::string s)
     previousScreenName = s;
 }
 
-std::vector<std::shared_ptr<StereoMixer>> &Sampler::getDrumStereoMixerChannels(int i)
+std::vector<std::shared_ptr<StereoMixer>> &
+Sampler::getDrumStereoMixerChannels(int i)
 {
     return mpc.getDrum(i).getStereoMixerChannels();
 }
 
-std::vector<std::shared_ptr<IndivFxMixer>> &Sampler::getDrumIndivFxMixerChannels(int i)
+std::vector<std::shared_ptr<IndivFxMixer>> &
+Sampler::getDrumIndivFxMixerChannels(int i)
 {
     return mpc.getDrum(i).getIndivFxMixerChannels();
 }
@@ -196,7 +196,9 @@ void Sampler::init()
 
     if (clickData.size() != 146)
     {
-        MLOG("Warning: click.wav does not exist or doesn't have the correct size!");
+        MLOG(
+            "Warning: click.wav does not exist or doesn't have the correct "
+            "size!");
     }
     else
     {
@@ -209,7 +211,8 @@ void Sampler::init()
             for (int i = 0; i < numFrames; i++)
             {
                 float frame = wav_get_LE(stream, 2) / 32768.0;
-                clickSound->insertFrame(std::vector<float>{frame}, clickSound->getFrameCount());
+                clickSound->insertFrame(std::vector<float>{frame},
+                                        clickSound->getFrameCount());
             }
         }
         clickSound->setEnd(numFrames);
@@ -229,12 +232,16 @@ void Sampler::playMetronome(unsigned int velocity, int framePos)
         return;
     }
 
-    const auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1).getProgram();
+    const auto program =
+        mpc.getDrum(metronomeSoundScreen->getSound() - 1).getProgram();
     const auto accent = velocity == 127;
-    velocity = accent ? metronomeSoundScreen->getAccentVelo() : metronomeSoundScreen->getNormalVelo();
-    const auto pad = accent ? metronomeSoundScreen->getAccentPad() : metronomeSoundScreen->getNormalPad();
+    velocity = accent ? metronomeSoundScreen->getAccentVelo()
+                      : metronomeSoundScreen->getNormalVelo();
+    const auto pad = accent ? metronomeSoundScreen->getAccentPad()
+                            : metronomeSoundScreen->getNormalPad();
     const auto note = programs[program]->getNoteFromPad(pad);
-    const auto soundNumber = programs[program]->getNoteParameters(note)->getSoundIndex();
+    const auto soundNumber =
+        programs[program]->getNoteParameters(note)->getSoundIndex();
     mpc.getBasicPlayer().mpcNoteOn(soundNumber, velocity, framePos);
 }
 
@@ -343,7 +350,8 @@ std::shared_ptr<Sound> Sampler::addSound(const int sampleRate)
 {
     if (sounds.size() >= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY)
     {
-        mpc.getLayeredScreen()->showPopupAndAwaitInteraction("Sound directory full(256max)");
+        mpc.getLayeredScreen()->showPopupAndAwaitInteraction(
+            "Sound directory full(256max)");
         return {};
     }
 
@@ -414,7 +422,9 @@ void Sampler::repairProgramReferences()
 
             if (!programs[pgm])
             {
-                for (int programIndex = 0; programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; programIndex++)
+                for (int programIndex = 0;
+                     programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
+                     programIndex++)
                 {
                     if (programs[programIndex])
                     {
@@ -457,7 +467,8 @@ void Sampler::trimSample(std::weak_ptr<Sound> sound, int start, int end)
         int endRight = end + frameCount;
 
         newData.erase(newData.begin() + endRight, newData.end());
-        newData.erase(newData.begin() + frameCount, newData.begin() + startRight);
+        newData.erase(newData.begin() + frameCount,
+                      newData.begin() + startRight);
         newData.erase(newData.begin() + end, newData.begin() + frameCount);
         newData.erase(newData.begin(), newData.begin() + start);
     }
@@ -469,7 +480,8 @@ void Sampler::trimSample(std::weak_ptr<Sound> sound, int start, int end)
     s->setLoopTo(s->getFrameCount());
 }
 
-void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end)
+void Sampler::deleteSection(const unsigned int sampleNumber,
+                            const unsigned int start, const unsigned int end)
 {
     auto s = sounds[sampleNumber];
     std::vector<float> newData = *s->getSampleData();
@@ -608,7 +620,8 @@ void Sampler::process8Bit(std::vector<float> &fa)
     }
 }
 
-std::vector<float> Sampler::resampleSingleChannel(std::vector<float> &input, int sourceRate, int destRate)
+std::vector<float> Sampler::resampleSingleChannel(std::vector<float> &input,
+                                                  int sourceRate, int destRate)
 {
     const auto ratio = (double)destRate / sourceRate;
     const auto outputFrameCount = static_cast<int>(ceil(input.size() * ratio));
@@ -634,12 +647,17 @@ std::vector<float> Sampler::resampleSingleChannel(std::vector<float> &input, int
     return result;
 }
 
-void Sampler::resample(std::shared_ptr<const std::vector<float>> data, int sourceRate, std::shared_ptr<Sound> destSnd)
+void Sampler::resample(std::shared_ptr<const std::vector<float>> data,
+                       int sourceRate, std::shared_ptr<Sound> destSnd)
 {
-    const auto inputFrameCount = static_cast<int>(destSnd->isMono() ? data->size() : data->size() / 2);
-    const auto srcRatio = (double)(destSnd->getSampleRate()) / (double)(sourceRate);
-    const auto outputFrameCount = static_cast<int>((floor)(inputFrameCount * srcRatio));
-    const auto destinationSampleCount = destSnd->isMono() ? outputFrameCount : outputFrameCount * 2;
+    const auto inputFrameCount =
+        static_cast<int>(destSnd->isMono() ? data->size() : data->size() / 2);
+    const auto srcRatio =
+        (double)(destSnd->getSampleRate()) / (double)(sourceRate);
+    const auto outputFrameCount =
+        static_cast<int>((floor)(inputFrameCount * srcRatio));
+    const auto destinationSampleCount =
+        destSnd->isMono() ? outputFrameCount : outputFrameCount * 2;
 
     SRC_DATA srcData;
     srcData.input_frames = inputFrameCount;
@@ -865,10 +883,12 @@ void Sampler::purge()
     {
         auto maybeUnusedSound = sounds[i];
 
-        const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUnusedSound](const std::shared_ptr<Sound> &sound)
-                                 {
-                                     return sound == maybeUnusedSound;
-                                 });
+        const auto pos =
+            find_if(begin(usedSounds), end(usedSounds),
+                    [&maybeUnusedSound](const std::shared_ptr<Sound> &sound)
+                    {
+                        return sound == maybeUnusedSound;
+                    });
 
         if (pos == usedSounds.end())
         {
@@ -954,9 +974,11 @@ void Sampler::deleteSound(const std::shared_ptr<Sound> &sound)
     }
 }
 
-std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0, const std::vector<float> &fa1)
+std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0,
+                                          const std::vector<float> &fa1)
 {
-    const int newLengthFrames = fa0.size() > fa1.size() ? fa0.size() : fa1.size();
+    const int newLengthFrames =
+        fa0.size() > fa1.size() ? fa0.size() : fa1.size();
     std::vector<float> newSampleData = std::vector<float>(newLengthFrames * 2);
 
     for (int i = 0; i < newLengthFrames; i++)
@@ -983,9 +1005,10 @@ std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0, const s
     return newSampleData;
 }
 
-void Sampler::mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
-                            std::shared_ptr<const std::vector<float>> sourceRight,
-                            std::shared_ptr<std::vector<float>> dest)
+void Sampler::mergeToStereo(
+    std::shared_ptr<const std::vector<float>> sourceLeft,
+    std::shared_ptr<const std::vector<float>> sourceRight,
+    std::shared_ptr<std::vector<float>> dest)
 {
     dest->clear();
 
@@ -1050,7 +1073,8 @@ int Sampler::checkExists(std::string soundName)
 {
     for (int i = 0; i < getSoundCount(); i++)
     {
-        if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(soundName, ' ', ""), getSoundName(i)))
+        if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(soundName, ' ', ""),
+                                  getSoundName(i)))
         {
             return i;
         }
@@ -1106,7 +1130,9 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 
     for (int i = 0; i < 64; i++)
     {
-        auto copy = dynamic_cast<NoteParameters *>(src->getNoteParameters(i + 35))->clone(i);
+        auto copy =
+            dynamic_cast<NoteParameters *>(src->getNoteParameters(i + 35))
+                ->clone(i);
         dest->setNoteParameters(i, copy);
 
         auto mc1 = dest->getIndivFxMixerChannel(i);
@@ -1191,7 +1217,8 @@ bool Sampler::isSoundNameOccupied(const std::string &name)
 {
     for (auto &s : sounds)
     {
-        if (StrUtil::eqIgnoreCase(StrUtil::trim(s->getName()), StrUtil::trim(name)))
+        if (StrUtil::eqIgnoreCase(StrUtil::trim(s->getName()),
+                                  StrUtil::trim(name)))
         {
             return true;
         }
@@ -1200,7 +1227,8 @@ bool Sampler::isSoundNameOccupied(const std::string &name)
     return false;
 }
 
-std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSoundsSortedByName()
+std::vector<std::pair<std::shared_ptr<Sound>, int>>
+Sampler::getSoundsSortedByName()
 {
     std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
 
@@ -1209,9 +1237,9 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSoundsSortedByNa
         result.push_back({sounds[i], i});
     }
 
-    std::sort(result.begin(),
-              result.end(),
-              [](const std::pair<std::shared_ptr<Sound>, int> s1, const std::pair<std::shared_ptr<Sound>, int> s2) -> bool
+    std::sort(result.begin(), result.end(),
+              [](const std::pair<std::shared_ptr<Sound>, int> s1,
+                 const std::pair<std::shared_ptr<Sound>, int> s2) -> bool
               {
                   return s1.first->getName() < s2.first->getName();
               });
@@ -1219,7 +1247,8 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSoundsSortedByNa
     return result;
 }
 
-std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSoundsSortedBySize()
+std::vector<std::pair<std::shared_ptr<Sound>, int>>
+Sampler::getSoundsSortedBySize()
 {
     std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
 
@@ -1228,9 +1257,9 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSoundsSortedBySi
         result.push_back({sounds[i], i});
     }
 
-    std::sort(result.begin(),
-              result.end(),
-              [](const std::pair<std::shared_ptr<Sound>, int> s1, const std::pair<std::shared_ptr<Sound>, int> s2) -> bool
+    std::sort(result.begin(), result.end(),
+              [](const std::pair<std::shared_ptr<Sound>, int> s1,
+                 const std::pair<std::shared_ptr<Sound>, int> s2) -> bool
               {
                   return s1.first->getFrameCount() < s2.first->getFrameCount();
               });

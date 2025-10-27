@@ -2,8 +2,7 @@
 
 using namespace mpc::lcdgui;
 
-Rectangle::Rectangle(const std::string &name, MRECT rect)
-    : Component(name)
+Rectangle::Rectangle(const std::string &name, MRECT rect) : Component(name)
 {
     w = rect.W();
     h = rect.H();

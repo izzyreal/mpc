@@ -31,11 +31,13 @@ namespace mpc::controller
         void handleEvent(const mpc::client::event::ClientMidiEvent &);
 
     private:
-        std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
+        std::shared_ptr<ClientHardwareEventController>
+            clientHardwareEventController;
         std::shared_ptr<lcdgui::screens::MidiSwScreen> midiSwScreen;
         std::shared_ptr<sequencer::Sequencer> sequencer;
 
-        void triggerDualButtonCombo(hardware::ComponentId first, hardware::ComponentId second);
+        void triggerDualButtonCombo(hardware::ComponentId first,
+                                    hardware::ComponentId second);
         void handleRecPunch();
         void handleOdubPunch();
 

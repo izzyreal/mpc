@@ -6,16 +6,20 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(mpc::Mpc &m, int layer)
+VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
+    mpc::Mpc &m, int layer)
     : ScreenComponent(m, "vmpc-known-controller-detected", layer)
 {
-    auto label0 = std::make_shared<Label>(mpc, "line0", "It looks like you have connected", 24, 10, 32 * 6);
+    auto label0 = std::make_shared<Label>(
+        mpc, "line0", "It looks like you have connected", 24, 10, 32 * 6);
     addChild(label0);
     auto label1 = std::make_shared<Label>(mpc, "line1", "", 24, 19, 32 * 6);
     addChild(label1);
-    auto label2 = std::make_shared<Label>(mpc, "line2", "Do you want to switch active MIDI", 24, 28, 32 * 6);
+    auto label2 = std::make_shared<Label>(
+        mpc, "line2", "Do you want to switch active MIDI", 24, 28, 32 * 6);
     addChild(label2);
-    auto label3 = std::make_shared<Label>(mpc, "line3", "mapping to this controller?", 24, 37, 32 * 6);
+    auto label3 = std::make_shared<Label>(
+        mpc, "line3", "mapping to this controller?", 24, 37, 32 * 6);
     addChild(label3);
 }
 
@@ -24,8 +28,7 @@ void VmpcKnownControllerDetectedScreen::function(int i)
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
     auto &presets = mpc.midiControlPresets;
     auto preset = std::find_if(
-        presets.begin(),
-        presets.end(),
+        presets.begin(), presets.end(),
         [this](const std::shared_ptr<nvram::MidiControlPreset> &p)
         {
             return controllerName.find(p->name) != std::string::npos;
@@ -46,7 +49,8 @@ void VmpcKnownControllerDetectedScreen::function(int i)
             // NEVER
             if (preset != presets.end())
             {
-                (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
+                (*preset)->autoloadMode =
+                    nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo;
             }
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
@@ -54,11 +58,14 @@ void VmpcKnownControllerDetectedScreen::function(int i)
             // ALWAYS
             if (preset != presets.end())
             {
-                if ((*preset)->autoloadMode != nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+                if ((*preset)->autoloadMode !=
+                    nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
                 {
-                    (*preset)->autoloadMode = nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
+                    (*preset)->autoloadMode =
+                        nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes;
                     mpc.getDisk()->writeMidiControlPreset(*preset);
-                    nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
+                    nvram::MidiControlPersistence::
+                        loadAllPresetsFromDiskIntoMemory(mpc);
                 }
             }
             vmpcMidiScreen->shouldSwitch.store(true);
@@ -80,12 +87,14 @@ void VmpcKnownControllerDetectedScreen::open()
     {
         if (controllerName.find(p->name) != std::string::npos)
         {
-            if (p->autoloadMode == nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
+            if (p->autoloadMode ==
+                nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeNo)
             {
                 mpc.getLayeredScreen()->closeCurrentScreen();
                 return;
             }
-            else if (p->autoloadMode == nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+            else if (p->autoloadMode ==
+                     nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
             {
                 auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
                 vmpcMidiScreen->shouldSwitch.store(true);

@@ -89,10 +89,12 @@ void SaveApsFileScreen::function(int i)
                 };
 
                 auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                             {
-                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                             });
+                fileExistsScreen->initialize(
+                    replaceAction, initializeNameScreen,
+                    [this]
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                    });
                 mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
                 return;
             }
@@ -117,7 +119,9 @@ void SaveApsFileScreen::displaySave()
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
     auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
-    findField("replace-same-sounds")->setText(std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
+    findField("replace-same-sounds")
+        ->setText(
+            std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
 }
 
 void SaveApsFileScreen::openNameScreen()

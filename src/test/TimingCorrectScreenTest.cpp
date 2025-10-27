@@ -11,8 +11,14 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     mpc.getSequencer()->getActiveSequence()->init(1);
-    auto event = mpc.getSequencer()->getActiveSequence()->getTrack(0)->recordNoteEventSynced(1, 60, 127);
-    mpc.getSequencer()->getActiveSequence()->getTrack(0)->finalizeNoteEventSynced(event, 1);
+    auto event = mpc.getSequencer()
+                     ->getActiveSequence()
+                     ->getTrack(0)
+                     ->recordNoteEventSynced(1, 60, 127);
+    mpc.getSequencer()
+        ->getActiveSequence()
+        ->getTrack(0)
+        ->finalizeNoteEventSynced(event, 1);
     mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
     auto controls = mpc.getScreen();
     controls->function(4); // DO IT

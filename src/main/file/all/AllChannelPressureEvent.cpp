@@ -6,7 +6,8 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<ChannelPressureEvent> AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+std::shared_ptr<ChannelPressureEvent>
+AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     auto event = std::make_shared<ChannelPressureEvent>();
 
@@ -17,7 +18,8 @@ std::shared_ptr<ChannelPressureEvent> AllChannelPressureEvent::bytesToMpcEvent(c
     return event;
 }
 
-std::vector<char> AllChannelPressureEvent::mpcEventToBytes(std::shared_ptr<ChannelPressureEvent> event)
+std::vector<char> AllChannelPressureEvent::mpcEventToBytes(
+    std::shared_ptr<ChannelPressureEvent> event)
 {
     std::vector<char> bytes(8);
 

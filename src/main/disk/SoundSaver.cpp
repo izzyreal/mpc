@@ -17,8 +17,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-SoundSaver::SoundSaver(mpc::Mpc &_mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds, bool _wav)
-    : mpc(_mpc), sounds(_sounds), wav(_wav), saveSoundsThread(std::thread(&SoundSaver::static_saveSounds, this))
+SoundSaver::SoundSaver(
+    mpc::Mpc &_mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds,
+    bool _wav)
+    : mpc(_mpc), sounds(_sounds), wav(_wav),
+      saveSoundsThread(std::thread(&SoundSaver::static_saveSounds, this))
 {
 }
 
@@ -38,7 +41,8 @@ void SoundSaver::saveSounds()
 
         mpc.getLayeredScreen()->openScreen<PopupScreen>();
         auto popupScreen = mpc.screens->get<PopupScreen>();
-        popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ext);
+        popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) +
+                             ext);
 
         if (disk->checkExists(fileName + ext))
         {
@@ -46,7 +50,8 @@ void SoundSaver::saveSounds()
 
             if (saveAProgramScreen->replaceSameSounds)
             {
-                disk->getFile(fileName + ext)->del(); // possibly prepend auto success =
+                disk->getFile(fileName + ext)
+                    ->del(); // possibly prepend auto success =
             }
             else
             {

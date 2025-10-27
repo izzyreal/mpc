@@ -14,7 +14,8 @@ using namespace mpc::sequencer;
 
 std::vector<char> AllSysExEvent::MIXER_SIGNATURE = {(char)240, 71, 0, 68, 69};
 
-std::shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+std::shared_ptr<Event>
+AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     int byteCount = bytes[BYTE_COUNT_OFFSET];
 
@@ -27,7 +28,10 @@ std::shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const std::vector<char> &b
         sysexLoadData[i] = bytes[DATA_OFFSET + i];
     }
 
-    if (Util::vecEquals(Util::vecCopyOfRange(sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE))
+    if (Util::vecEquals(Util::vecCopyOfRange(
+                            sysexLoadData, MIXER_SIGNATURE_OFFSET,
+                            MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()),
+                        MIXER_SIGNATURE))
     {
         event = std::make_shared<MixerEvent>();
         auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
@@ -46,7 +50,8 @@ std::shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const std::vector<char> &b
     else
     {
         event = std::make_shared<SystemExclusiveEvent>();
-        auto sysExEvent = std::dynamic_pointer_cast<SystemExclusiveEvent>(event);
+        auto sysExEvent =
+            std::dynamic_pointer_cast<SystemExclusiveEvent>(event);
         // sysExEvent->setBytes(sysexLoadData);
         sysExEvent->setTick(AllEvent::readTick(bytes));
     }
@@ -77,7 +82,8 @@ std::vector<char> AllSysExEvent::mpcEventToBytes(std::shared_ptr<Event> event)
             bytes[DATA_OFFSET + i] = MIXER_SIGNATURE[i];
         }
 
-        bytes[DATA_OFFSET + MIXER_PAD_OFFSET] = static_cast<int8_t>(mixerEvent->getPad());
+        bytes[DATA_OFFSET + MIXER_PAD_OFFSET] =
+            static_cast<int8_t>(mixerEvent->getPad());
         auto paramCandidate = mixerEvent->getParameter();
 
         if (paramCandidate == 3)
@@ -87,7 +93,8 @@ std::vector<char> AllSysExEvent::mpcEventToBytes(std::shared_ptr<Event> event)
 
         paramCandidate++;
         bytes[DATA_OFFSET + MIXER_PARAMETER_OFFSET] = (char)(paramCandidate);
-        bytes[DATA_OFFSET + MIXER_VALUE_OFFSET] = (char)(mixerEvent->getValue());
+        bytes[DATA_OFFSET + MIXER_VALUE_OFFSET] =
+            (char)(mixerEvent->getValue());
         bytes[DATA_OFFSET + MIXER_VALUE_OFFSET + 1] = DATA_TERMINATOR_ID;
         bytes[MIX_TERMINATOR_ID_OFFSET] = CHUNK_TERMINATOR_ID;
     }
@@ -96,9 +103,12 @@ std::vector<char> AllSysExEvent::mpcEventToBytes(std::shared_ptr<Event> event)
         AllEvent::writeTick(bytes, sysExEvent->getTick());
         int dataSize = sysExEvent->getBytes().size();
         int dataSegments = static_cast<int>(dataSize / 8.0);
-        bytes = std::vector<char>((dataSegments + 2) * AllSequence::EVENT_SEG_LENGTH);
+        bytes = std::vector<char>((dataSegments + 2) *
+                                  AllSequence::EVENT_SEG_LENGTH);
         bytes[AllEvent::TRACK_OFFSET] = (char)(event->getTrack());
-        bytes[AllEvent::TRACK_OFFSET + ((dataSegments + 1) * AllSequence::EVENT_SEG_LENGTH)] = (char)(event->getTrack());
+        bytes[AllEvent::TRACK_OFFSET +
+              ((dataSegments + 1) * AllSequence::EVENT_SEG_LENGTH)] =
+            (char)(event->getTrack());
         bytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
         bytes[BYTE_COUNT_OFFSET] = (char)(dataSize);
 

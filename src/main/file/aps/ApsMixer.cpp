@@ -21,7 +21,8 @@ ApsMixer::ApsMixer(const std::vector<char> &loadBytes)
     }
 }
 
-ApsMixer::ApsMixer(std::vector<std::shared_ptr<StereoMixer>> &smcs, std::vector<std::shared_ptr<IndivFxMixer>> &ifmcs)
+ApsMixer::ApsMixer(std::vector<std::shared_ptr<StereoMixer>> &smcs,
+                   std::vector<std::shared_ptr<IndivFxMixer>> &ifmcs)
 {
     for (int i = 0; i < 64; i++)
     {
@@ -30,9 +31,11 @@ ApsMixer::ApsMixer(std::vector<std::shared_ptr<StereoMixer>> &smcs, std::vector<
         saveBytes[(i * 6) + 0] = (int8_t)(indivFxMixerChannel->getFxPath());
         saveBytes[(i * 6) + 1] = (int8_t)(mixerChannel->getLevel());
         saveBytes[(i * 6) + 2] = (int8_t)((mixerChannel->getPanning()));
-        saveBytes[(i * 6) + 3] = (int8_t)(indivFxMixerChannel->getVolumeIndividualOut());
+        saveBytes[(i * 6) + 3] =
+            (int8_t)(indivFxMixerChannel->getVolumeIndividualOut());
         saveBytes[(i * 6) + 4] = (int8_t)(indivFxMixerChannel->getOutput());
-        saveBytes[(i * 6) + 5] = (int8_t)(indivFxMixerChannel->getFxSendLevel());
+        saveBytes[(i * 6) + 5] =
+            (int8_t)(indivFxMixerChannel->getFxSendLevel());
     }
 }
 

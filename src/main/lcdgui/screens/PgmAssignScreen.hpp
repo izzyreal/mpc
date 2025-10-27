@@ -14,8 +14,7 @@ namespace mpc::file::aps
 namespace mpc::lcdgui::screens
 {
 
-    class PgmAssignScreen
-        : public mpc::lcdgui::ScreenComponent
+    class PgmAssignScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -31,7 +30,8 @@ namespace mpc::lcdgui::screens
         void setPadAssign(bool isMaster);
 
     private:
-        const std::vector<std::string> soundGenerationModes{"NORMAL", "SIMULT", "VEL SW", "DCY SW"};
+        const std::vector<std::string> soundGenerationModes{"NORMAL", "SIMULT",
+                                                            "VEL SW", "DCY SW"};
         bool padAssign = false;
         void displayPgm();
         void displaySoundName();

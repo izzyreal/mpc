@@ -65,5 +65,8 @@ void DeleteSongScreen::displaySong()
 {
     auto songScreen = mpc.screens->get<SongScreen>();
     auto song = sequencer->getSong(songScreen->activeSongIndex);
-    findField("song")->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
+    findField("song")->setText(
+        StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",
+                         2) +
+        "-" + song->getName());
 }

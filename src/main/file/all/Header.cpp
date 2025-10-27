@@ -6,10 +6,7 @@
 
 using namespace mpc::file::all;
 
-Header::Header(const std::vector<char> &_loadBytes)
-    : loadBytes(_loadBytes)
-{
-}
+Header::Header(const std::vector<char> &_loadBytes) : loadBytes(_loadBytes) {}
 
 Header::Header()
 {

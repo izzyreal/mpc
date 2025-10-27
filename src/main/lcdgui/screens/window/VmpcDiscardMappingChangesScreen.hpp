@@ -11,8 +11,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens::window
 {
-    class VmpcDiscardMappingChangesScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcDiscardMappingChangesScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

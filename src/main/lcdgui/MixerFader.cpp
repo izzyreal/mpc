@@ -4,8 +4,7 @@
 
 using namespace mpc::lcdgui;
 
-MixerFader::MixerFader(MRECT rect)
-    : Component("mixer-fader")
+MixerFader::MixerFader(MRECT rect) : Component("mixer-fader")
 {
     setSize(rect.W(), rect.H());
     setLocation(rect.L, rect.T);

@@ -144,7 +144,8 @@ bool Led::isEnabled() const
 Button::Button(ComponentId id) : Component(id) {}
 
 Pad::Pad(int indexToUse)
-    : Component(static_cast<ComponentId>(ComponentId::PAD_1_OR_AB + indexToUse)),
+    : Component(
+          static_cast<ComponentId>(ComponentId::PAD_1_OR_AB + indexToUse)),
       index(indexToUse)
 {
     assert(index >= 0 && index < 16);
@@ -187,7 +188,10 @@ float DataWheel::getAngle()
     return angle;
 }
 
-Slider::Slider() : Component(ComponentId::SLIDER), direction(Direction::UpIncreases) {}
+Slider::Slider()
+    : Component(ComponentId::SLIDER), direction(Direction::UpIncreases)
+{
+}
 
 void Slider::moveToNormalizedY(float normalizedY)
 {

@@ -7,14 +7,14 @@
 
 using namespace mpc::audiomidi;
 
-DirectToDiskSettings::DirectToDiskSettings(const int lengthInFramesToUse,
-                                           const bool splitStereoIntoLeftAndRightChannelToUse,
-                                           const int sampleRateToUse,
-                                           std::string recordingNameToUse)
+DirectToDiskSettings::DirectToDiskSettings(
+    const int lengthInFramesToUse,
+    const bool splitStereoIntoLeftAndRightChannelToUse,
+    const int sampleRateToUse, std::string recordingNameToUse)
     : lengthInFrames(lengthInFramesToUse),
-      splitStereoIntoLeftAndRightChannel(splitStereoIntoLeftAndRightChannelToUse),
-      sampleRate(sampleRateToUse),
-      recordingName(std::move(recordingNameToUse))
+      splitStereoIntoLeftAndRightChannel(
+          splitStereoIntoLeftAndRightChannelToUse),
+      sampleRate(sampleRateToUse), recordingName(std::move(recordingNameToUse))
 {
 }
 

@@ -63,7 +63,8 @@ void ResampleScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(findField("newname")->getText(), 16, enterAction, "resample");
+        nameScreen->initialize(findField("newname")->getText(), 16, enterAction,
+                               "resample");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
 }
@@ -94,11 +95,13 @@ void ResampleScreen::function(int i)
 
             if (newFs != snd->getSampleRate())
             {
-                sampler::Sampler::resample(source, snd->getSampleRate(), destSnd);
+                sampler::Sampler::resample(source, snd->getSampleRate(),
+                                           destSnd);
             }
             else
             {
-                destSnd->setSampleData(std::make_shared<std::vector<float>>(*source));
+                destSnd->setSampleData(
+                    std::make_shared<std::vector<float>>(*source));
             }
 
             for (auto &f : *destSnd->getMutableSampleData())
@@ -128,7 +131,8 @@ void ResampleScreen::function(int i)
 
             if (newBit == 1)
             {
-                sampler::Sampler::process12Bit(*destSnd->getMutableSampleData());
+                sampler::Sampler::process12Bit(
+                    *destSnd->getMutableSampleData());
             }
             else if (newBit == 2)
             {

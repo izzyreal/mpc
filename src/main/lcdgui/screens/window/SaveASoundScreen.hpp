@@ -8,8 +8,7 @@ namespace mpc::lcdgui::screens::dialog
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveASoundScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SaveASoundScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

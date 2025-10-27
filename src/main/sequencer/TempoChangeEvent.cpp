@@ -16,7 +16,9 @@ TempoChangeEvent::TempoChangeEvent(Sequence *parent, int ratio)
     this->parent = parent;
 }
 
-mpc::sequencer::TempoChangeEvent::TempoChangeEvent(const TempoChangeEvent &event) : Event(event)
+mpc::sequencer::TempoChangeEvent::TempoChangeEvent(
+    const TempoChangeEvent &event)
+    : Event(event)
 {
     setRatio(event.getRatio());
 }
@@ -68,7 +70,8 @@ void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
 
 void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
 {
-    tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick), SeqUtil::getBeat(parent, tick) + 1);
+    tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick),
+                                      SeqUtil::getBeat(parent, tick) + 1);
 
     if (tick >= parent->getLastTick())
     {
@@ -88,7 +91,8 @@ void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
 
 void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
 {
-    tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick), SeqUtil::getBeat(parent, tick) - 1);
+    tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick),
+                                      SeqUtil::getBeat(parent, tick) - 1);
 
     if (tick < 0)
     {

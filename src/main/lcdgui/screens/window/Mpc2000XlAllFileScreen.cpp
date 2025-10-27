@@ -8,7 +8,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc &mpc, const int layerIndex)
+Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc &mpc,
+                                               const int layerIndex)
     : ScreenComponent(mpc, "mpc2000xl-all-file", layerIndex)
 {
 }
@@ -22,13 +23,17 @@ void Mpc2000XlAllFileScreen::function(int i)
     {
         case 2:
         {
-            auto result = mpc.getDisk()->readSequencesFromAll2(loadScreen->getSelectedFile());
+            auto result = mpc.getDisk()->readSequencesFromAll2(
+                loadScreen->getSelectedFile());
 
             if (result.has_value())
             {
-                auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>();
-                loadASequenceFromAllScreen->sequencesFromAllFile = result.value();
-                mpc.getLayeredScreen()->openScreen<LoadASequenceFromAllScreen>();
+                auto loadASequenceFromAllScreen =
+                    mpc.screens->get<LoadASequenceFromAllScreen>();
+                loadASequenceFromAllScreen->sequencesFromAllFile =
+                    result.value();
+                mpc.getLayeredScreen()
+                    ->openScreen<LoadASequenceFromAllScreen>();
             }
 
             break;

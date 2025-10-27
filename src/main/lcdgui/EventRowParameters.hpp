@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui
 {
-    class EventRowParameters
-        : public Component
+    class EventRowParameters : public Component
     {
 
     public:

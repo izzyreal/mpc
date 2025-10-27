@@ -11,7 +11,8 @@ ApsDrumConfiguration::ApsDrumConfiguration(const std::vector<char> &loadBytes)
     receiveMidiVolume = BitUtil::getBits(loadBytes[3])[7] == '1';
 }
 
-ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange, bool recMidiVolume)
+ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange,
+                                           bool recMidiVolume)
 {
     saveBytes = std::vector<char>(12);
     for (int i = 0; i < 9; i++)
@@ -30,7 +31,8 @@ ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange, bool 
     saveBytes[5] = program;
 }
 
-std::vector<char> ApsDrumConfiguration::TEMPLATE = std::vector<char>{0, 0, 1, 1, 127, 0, 1, 1, 127};
+std::vector<char> ApsDrumConfiguration::TEMPLATE =
+    std::vector<char>{0, 0, 1, 1, 127, 0, 1, 1, 127};
 std::vector<char> ApsDrumConfiguration::PADDING = std::vector<char>{64, 0, 6};
 
 int ApsDrumConfiguration::getProgram()

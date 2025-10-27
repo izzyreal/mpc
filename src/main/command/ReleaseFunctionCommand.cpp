@@ -9,7 +9,9 @@
 using namespace mpc::command;
 
 ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc &mpc, int i)
-    : mpc(mpc), i(i) {}
+    : mpc(mpc), i(i)
+{
+}
 
 void ReleaseFunctionCommand::execute()
 {
@@ -40,7 +42,8 @@ void ReleaseFunctionCommand::execute()
             auto sequencer = mpc.getSequencer();
             auto sampler = mpc.getSampler();
 
-            if (!sequencer->isPlaying() && !ls->isCurrentScreen<SequencerScreen>())
+            if (!sequencer->isPlaying() &&
+                !ls->isCurrentScreen<SequencerScreen>())
             {
                 sampler->finishBasicVoice();
             }
@@ -54,7 +57,8 @@ void ReleaseFunctionCommand::execute()
 
                 sequencer->setSoloEnabled(sequencer->isSoloEnabled());
             }
-            else if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<DirectoryScreen>())
+            else if (mpc.getLayeredScreen()
+                         ->isCurrentScreenPopupFor<DirectoryScreen>())
             {
                 mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();

@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class PolyPressureEvent
-        : public Event
+    class PolyPressureEvent : public Event
     {
 
     private:

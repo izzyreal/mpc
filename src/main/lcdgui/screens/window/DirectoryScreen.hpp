@@ -31,8 +31,7 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens::window
 {
-    class DirectoryScreen
-        : public mpc::lcdgui::ScreenComponent
+    class DirectoryScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
         DirectoryScreen(mpc::Mpc &mpc, const int layerIndex);

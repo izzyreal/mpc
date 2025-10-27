@@ -40,8 +40,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class UserScreen
-        : public mpc::lcdgui::ScreenComponent
+    class UserScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -54,7 +53,8 @@ namespace mpc::lcdgui::screens
         void open() override;
 
     private:
-        std::vector<std::string> busNames{"MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4"};
+        std::vector<std::string> busNames{"MIDI", "DRUM1", "DRUM2", "DRUM3",
+                                          "DRUM4"};
 
         void displayTempo();
         void displayLoop();

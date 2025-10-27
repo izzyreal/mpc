@@ -4,9 +4,8 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class SongWindow
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class SongWindow : public mpc::lcdgui::ScreenComponent,
+                       public mpc::lcdgui::screens::OpensNameScreen
     {
 
     public:

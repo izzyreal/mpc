@@ -12,8 +12,7 @@ namespace mpc
 
 namespace mpc::lcdgui
 {
-    class FunctionKey
-        : public Component
+    class FunctionKey : public Component
     {
 
     public:
@@ -24,8 +23,7 @@ namespace mpc::lcdgui
         void setType(const int newType);
     };
 
-    class FunctionKeys
-        : public Component
+    class FunctionKeys : public Component
     {
 
     private:
@@ -36,6 +34,8 @@ namespace mpc::lcdgui
 
     public:
         void setActiveArrangement(int i);
-        FunctionKeys(mpc::Mpc &mpc, const std::string &name, std::vector<std::vector<std::string>> texts, std::vector<std::vector<int>> types);
+        FunctionKeys(mpc::Mpc &mpc, const std::string &name,
+                     std::vector<std::vector<std::string>> texts,
+                     std::vector<std::vector<int>> types);
     };
 } // namespace mpc::lcdgui

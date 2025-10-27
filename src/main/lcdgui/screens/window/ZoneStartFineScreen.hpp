@@ -14,8 +14,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens::window
 {
-    class ZoneStartFineScreen
-        : public mpc::lcdgui::ScreenComponent
+    class ZoneStartFineScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -36,6 +35,7 @@ namespace mpc::lcdgui::screens::window
         void displayLngthLabel();
         void displayPlayX();
 
-        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END"};
+        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
+                                                  "BEFOR TO", "AFTR END"};
     };
 } // namespace mpc::lcdgui::screens::window

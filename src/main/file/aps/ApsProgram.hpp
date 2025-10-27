@@ -50,7 +50,8 @@ namespace mpc::file::aps
         std::string name;
         int index;
         ApsSlider *slider = nullptr;
-        std::vector<ApsNoteParameters *> noteParameters = std::vector<ApsNoteParameters *>(64);
+        std::vector<ApsNoteParameters *> noteParameters =
+            std::vector<ApsNoteParameters *>(64);
         ApsMixer *mixer = nullptr;
         ApsAssignTable *assignTable = nullptr;
         std::vector<char> saveBytes;

@@ -14,8 +14,7 @@ namespace mpc::disk
 
     class MpcFile;
 
-    class RawDisk
-        : public AbstractDisk
+    class RawDisk : public AbstractDisk
     {
     public:
         RawDisk(mpc::Mpc &);
@@ -24,12 +23,14 @@ namespace mpc::disk
     private:
         void initParentFiles();
         Volume volume;
-        std::vector<std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> path;
+        std::vector<std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>>
+            path;
         std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> root;
         std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getDir();
 
     public:
-        std::shared_ptr<MpcFile> newFile(const std::string &newFileName) override;
+        std::shared_ptr<MpcFile>
+        newFile(const std::string &newFileName) override;
         void initFiles() override;
         std::string getDirectoryName() override;
         bool moveBack() override;

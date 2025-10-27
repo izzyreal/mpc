@@ -6,7 +6,8 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 
-std::shared_ptr<ProgramChangeEvent> AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
+std::shared_ptr<ProgramChangeEvent>
+AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 {
     auto event = std::make_shared<ProgramChangeEvent>();
 
@@ -17,7 +18,8 @@ std::shared_ptr<ProgramChangeEvent> AllProgramChangeEvent::bytesToMpcEvent(const
     return event;
 }
 
-std::vector<char> AllProgramChangeEvent::mpcEventToBytes(std::shared_ptr<ProgramChangeEvent> event)
+std::vector<char> AllProgramChangeEvent::mpcEventToBytes(
+    std::shared_ptr<ProgramChangeEvent> event)
 {
     std::vector<char> bytes(8);
 

@@ -8,8 +8,7 @@
 namespace mpc::engine::audio::mixer
 {
 
-    class AudioMixerStrip
-        : public core::AudioProcessChain
+    class AudioMixerStrip : public core::AudioProcessChain
     {
 
     public:
@@ -39,15 +38,21 @@ namespace mpc::engine::audio::mixer
     public:
         bool processBuffer(int nFrames);
 
-        int mix(mpc::engine::audio::core::AudioBuffer *bufferToMix, std::vector<float> &gain);
+        int mix(mpc::engine::audio::core::AudioBuffer *bufferToMix,
+                std::vector<float> &gain);
 
     public:
-        std::shared_ptr<AudioProcess> createProcess(std::shared_ptr<mpc::engine::audio::core::AudioControls> controls) override;
+        std::shared_ptr<AudioProcess> createProcess(
+            std::shared_ptr<mpc::engine::audio::core::AudioControls> controls)
+            override;
 
         void close() override;
 
     public:
-        AudioMixerStrip(AudioMixer *mixer, std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> controlsChain);
+        AudioMixerStrip(
+            AudioMixer *mixer,
+            std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+                controlsChain);
     };
 
 } // namespace mpc::engine::audio::mixer

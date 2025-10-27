@@ -34,7 +34,8 @@ void MetronomeSoundScreen::open()
     }
 
     setSound(sound);
-    mpc.clientEventController->addObserver(this); // Subscribe to "note" messages
+    mpc.clientEventController->addObserver(
+        this); // Subscribe to "note" messages
 }
 
 void MetronomeSoundScreen::close()
@@ -73,15 +74,21 @@ void MetronomeSoundScreen::displayOutput()
 void MetronomeSoundScreen::displayAccent()
 {
     auto program = sampler->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())->getPad(accentPad)->getNote();
-    findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(accentPad));
+    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())
+                    ->getPad(accentPad)
+                    ->getNote();
+    findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) +
+                                 "/" + sampler->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
     auto program = sampler->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())->getPad(normalPad)->getNote();
-    findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(normalPad));
+    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())
+                    ->getPad(normalPad)
+                    ->getNote();
+    findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) +
+                                 "/" + sampler->getPadName(normalPad));
 }
 
 void MetronomeSoundScreen::displayAccentVelo()

@@ -33,16 +33,21 @@ namespace mpc::input
         enum class Type
         {
             BEGIN,  // Initial contact: mouse button pressed or finger touched.
-            UPDATE, // Continued motion of that same contact (mouse drag or finger move), or scroll motions without BEGIN/END.
-            END,    // Termination of the same contact: corresponding mouse button released or finger lifted.
-            REPEAT  // Rapid successive BEGIN, END, BEGIN, END on the same component, i.e. double/triple click/tap.
+            UPDATE, // Continued motion of that same contact (mouse drag or
+                    // finger move), or scroll motions without BEGIN/END.
+            END, // Termination of the same contact: corresponding mouse button
+                 // released or finger lifted.
+            REPEAT // Rapid successive BEGIN, END, BEGIN, END on the same
+                   // component, i.e. double/triple click/tap.
         };
 
         enum class Movement
         {
             None,     // No movement data (e.g. BEGIN/END/REPEAT events).
-            Absolute, // Absolute motion in normalized coordinates (e.g. mouse drag along a slider).
-            Relative  // Relative motion in continuous deltas (e.g. mouse wheel or encoder turn).
+            Absolute, // Absolute motion in normalized coordinates (e.g. mouse
+                      // drag along a slider).
+            Relative  // Relative motion in continuous deltas (e.g. mouse wheel
+                      // or encoder turn).
         };
 
         Type type;
@@ -50,7 +55,8 @@ namespace mpc::input
         // Specifies whether this event represents absolute or relative motion.
         Movement movement = Movement::None;
 
-        // Normalized pointer position in [0, 1] relative to the component's bounds
+        // Normalized pointer position in [0, 1] relative to the component's
+        // bounds
         float normY = 0.0f;
 
         // Only valid for UPDATE events with movement == Relative
@@ -62,7 +68,8 @@ namespace mpc::input
         hardware::ComponentId componentId;
     };
 
-    /* Input events coming from the host, i.e. the machine the virtual MPC2000XL is virtualized on */
+    /* Input events coming from the host, i.e. the machine the virtual MPC2000XL
+     * is virtualized on */
     struct HostInputEvent
     {
         enum class Source
@@ -75,7 +82,10 @@ namespace mpc::input
 
         explicit HostInputEvent(KeyEvent k) : payload(std::move(k)) {}
         explicit HostInputEvent(GestureEvent g) : payload(std::move(g)) {}
-        explicit HostInputEvent(client::event::ClientMidiEvent m) : payload(std::move(m)) {}
+        explicit HostInputEvent(client::event::ClientMidiEvent m)
+            : payload(std::move(m))
+        {
+        }
         explicit HostInputEvent(FocusEvent f) : payload(std::move(f)) {}
 
         Source getSource() const
@@ -97,11 +107,15 @@ namespace mpc::input
                 return Source::FOCUS;
             }
 
-            // Defensive: someone added a new variant type but forgot to update getSource()
-            throw std::logic_error("HostInputEvent::getSource() encountered unknown payload type");
+            // Defensive: someone added a new variant type but forgot to update
+            // getSource()
+            throw std::logic_error(
+                "HostInputEvent::getSource() encountered unknown payload type");
         }
 
-        std::variant<KeyEvent, GestureEvent, client::event::ClientMidiEvent, FocusEvent> payload;
+        std::variant<KeyEvent, GestureEvent, client::event::ClientMidiEvent,
+                     FocusEvent>
+            payload;
     };
 
 } // namespace mpc::input

@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class TransmitProgramChangesScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TransmitProgramChangesScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

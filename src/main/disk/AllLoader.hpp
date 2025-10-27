@@ -30,7 +30,9 @@ namespace mpc::disk
     {
     public:
         static void loadEverythingFromFile(mpc::Mpc &, mpc::disk::MpcFile *);
-        static void loadEverythingFromAllParser(mpc::Mpc &, mpc::file::all::AllParser &);
-        static std::vector<std::shared_ptr<mpc::sequencer::Sequence>> loadOnlySequencesFromFile(mpc::Mpc &, mpc::disk::MpcFile *);
+        static void loadEverythingFromAllParser(mpc::Mpc &,
+                                                mpc::file::all::AllParser &);
+        static std::vector<std::shared_ptr<mpc::sequencer::Sequence>>
+        loadOnlySequencesFromFile(mpc::Mpc &, mpc::disk::MpcFile *);
     };
 } // namespace mpc::disk

@@ -9,9 +9,8 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class CreateNewProgramScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class CreateNewProgramScreen : public mpc::lcdgui::ScreenComponent,
+                                   public mpc::lcdgui::screens::OpensNameScreen
     {
     public:
         void function(int i) override;

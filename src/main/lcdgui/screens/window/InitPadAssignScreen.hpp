@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class InitPadAssignScreen
-        : public mpc::lcdgui::ScreenComponent
+    class InitPadAssignScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:

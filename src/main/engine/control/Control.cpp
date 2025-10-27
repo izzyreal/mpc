@@ -35,9 +35,7 @@ void Control::notifyParent(Control *c)
     }
 }
 
-void Control::derive(Control *obj)
-{
-}
+void Control::derive(Control *obj) {}
 
 std::string Control::getName()
 {

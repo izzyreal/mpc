@@ -88,7 +88,8 @@ void SndReader::readData(std::shared_ptr<std::vector<float>> dest)
     dest->clear();
     dest->resize(length);
 
-    auto shorts = ByteUtil::bytesToShorts(std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
+    auto shorts = ByteUtil::bytesToShorts(
+        std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
 
     for (int i = 0; i < length; ++i)
     {

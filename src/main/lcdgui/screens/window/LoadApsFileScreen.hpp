@@ -5,8 +5,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadApsFileScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoadApsFileScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:

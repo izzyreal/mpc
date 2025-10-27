@@ -8,8 +8,7 @@ namespace mpc::midi::event::meta
 
 namespace mpc::midi::event::meta
 {
-    class Tempo
-        : public MetaEvent
+    class Tempo : public MetaEvent
     {
 
     public:
@@ -30,7 +29,8 @@ namespace mpc::midi::event::meta
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
     public:
-        static std::shared_ptr<MetaEvent> parseTempo(int tick, int delta, MetaEventData *info);
+        static std::shared_ptr<MetaEvent> parseTempo(int tick, int delta,
+                                                     MetaEventData *info);
 
     public:
         virtual int compareTo(mpc::midi::event::MidiEvent *other);

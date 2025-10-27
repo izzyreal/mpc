@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class DeleteFolderScreen
-        : public mpc::lcdgui::ScreenComponent
+    class DeleteFolderScreen : public mpc::lcdgui::ScreenComponent
     {
     private:
         std::thread deleteFolderThread{};

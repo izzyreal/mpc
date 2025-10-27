@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-    class TrMoveScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TrMoveScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

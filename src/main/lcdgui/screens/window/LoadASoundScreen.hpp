@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadASoundScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoadASoundScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:

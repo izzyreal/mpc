@@ -5,7 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-IgnoreTempoChangeScreen::IgnoreTempoChangeScreen(mpc::Mpc &mpc, const int layerIndex)
+IgnoreTempoChangeScreen::IgnoreTempoChangeScreen(mpc::Mpc &mpc,
+                                                 const int layerIndex)
     : ScreenComponent(mpc, "ignore-tempo-change", layerIndex)
 {
 }

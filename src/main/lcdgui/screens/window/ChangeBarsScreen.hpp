@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class ChangeBarsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class ChangeBarsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

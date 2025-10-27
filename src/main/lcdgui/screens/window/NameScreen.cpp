@@ -15,10 +15,11 @@ NameScreen::NameScreen(mpc::Mpc &mpc, const int layerIndex)
     addChildT<Underline>();
 }
 
-void NameScreen::initialize(std::string newNameToEdit, unsigned char nameLimitToUse,
-                            const std::function<void(std::string &)> &enterActionToUse,
-                            const std::string &cancelScreenToUse,
-                            const std::function<void()> &mainScreenActionToUse)
+void NameScreen::initialize(
+    std::string newNameToEdit, unsigned char nameLimitToUse,
+    const std::function<void(std::string &)> &enterActionToUse,
+    const std::string &cancelScreenToUse,
+    const std::function<void()> &mainScreenActionToUse)
 {
     setNameToEdit(newNameToEdit);
     setNameLimit(nameLimitToUse);
@@ -41,7 +42,9 @@ void NameScreen::open()
 
     findField("0")->takeFocus();
 
-    mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(!mpc.getPadAndButtonKeyboard()->isUpperCase());
+    mpc.getHardware()
+        ->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)
+        ->setEnabled(!mpc.getPadAndButtonKeyboard()->isUpperCase());
 
     for (int i = 0; i < 16; i++)
     {
@@ -53,7 +56,9 @@ void NameScreen::open()
 
 void NameScreen::close()
 {
-    mpc.getHardware()->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)->setEnabled(mpc.clientEventController->isFullLevelEnabled());
+    mpc.getHardware()
+        ->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)
+        ->setEnabled(mpc.clientEventController->isFullLevelEnabled());
 
     ls->setLastFocus("name", "0");
     editing = false;
@@ -292,7 +297,8 @@ void NameScreen::changeNameCharacter(int i, bool up)
         s = mpc::Mpc::akaiAscii[stringCounter + change];
     }
 
-    nameToEdit = nameToEdit.substr(0, i).append(s).append(nameToEdit.substr(i + 1, nameToEdit.length()));
+    nameToEdit = nameToEdit.substr(0, i).append(s).append(
+        nameToEdit.substr(i + 1, nameToEdit.length()));
     displayName();
 }
 
@@ -349,7 +355,8 @@ void NameScreen::displayName()
 void NameScreen::typeCharacter(char c)
 {
 
-    if (std::find(mpc::Mpc::akaiAsciiChar.begin(), mpc::Mpc::akaiAsciiChar.end(),
+    if (std::find(mpc::Mpc::akaiAsciiChar.begin(),
+                  mpc::Mpc::akaiAsciiChar.end(),
                   c) == mpc::Mpc::akaiAsciiChar.end())
     {
         return;

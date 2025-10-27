@@ -87,8 +87,7 @@ namespace mpc::hardware
         void aftertouch(int pressureToUse);
     };
 
-    template <typename T, int MIN, int MAX>
-    class Continuous
+    template <typename T, int MIN, int MAX> class Continuous
     {
     private:
         T value = static_cast<T>(MIN);
@@ -102,11 +101,9 @@ namespace mpc::hardware
         T getValue() const;
         std::pair<int, int> getRange() const;
 
-        template <typename T1>
-        std::pair<T1, T1> getRangeAs() const;
+        template <typename T1> std::pair<T1, T1> getRangeAs() const;
 
-        template <typename T1>
-        T1 getValueAs() const
+        template <typename T1> T1 getValueAs() const
         {
             if constexpr (std::is_floating_point_v<T> && std::is_integral_v<T1>)
             {
@@ -136,7 +133,9 @@ namespace mpc::hardware
         explicit Button(ComponentId id);
     };
 
-    class Pad final : public Component, public VelocitySensitivePressable, public Aftertouchable
+    class Pad final : public Component,
+                      public VelocitySensitivePressable,
+                      public Aftertouchable
     {
     private:
         const int index;
@@ -154,7 +153,8 @@ namespace mpc::hardware
     {
     private:
         const int STEP_COUNT_FOR_360_DEGREES = 100;
-        const float angleIncrementPerStep = 1.f / (float)STEP_COUNT_FOR_360_DEGREES;
+        const float angleIncrementPerStep =
+            1.f / (float)STEP_COUNT_FOR_360_DEGREES;
         float angle = 0.f;
 
     public:

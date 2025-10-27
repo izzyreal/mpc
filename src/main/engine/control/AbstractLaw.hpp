@@ -5,8 +5,7 @@
 namespace mpc::engine::control
 {
 
-    class AbstractLaw
-        : public ControlLaw
+    class AbstractLaw : public ControlLaw
     {
 
     protected:

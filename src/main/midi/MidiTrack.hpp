@@ -40,7 +40,8 @@ namespace mpc::midi
         int getLengthInTicks();
         int getEndOfTrackDelta();
         void setEndOfTrackDelta(int delta);
-        void insertNote(int channel, int pitch, int velocity, int tick, int duration);
+        void insertNote(int channel, int pitch, int velocity, int tick,
+                        int duration);
         void insertEvent(std::weak_ptr<mpc::midi::event::MidiEvent> newEvent);
         bool removeEvent(mpc::midi::event::MidiEvent *E);
         void closeTrack();

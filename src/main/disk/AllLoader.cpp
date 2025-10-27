@@ -83,7 +83,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     }
 
     userScreen->setDeviceNumber(defaults->getDevices()[0]);
-    userScreen->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
+    userScreen->setTimeSig(defaults->getTimeSigNum(),
+                           defaults->getTimeSigDen());
     userScreen->setPgm(defaults->getPgms()[0]);
     userScreen->setTempo(defaults->getTempo() * 0.1);
     userScreen->setVelo(defaults->getTrVelos()[0]);
@@ -109,7 +110,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     mpcSequencer->setActiveTrackIndex(allParserSequencer->track);
     mpcSequencer->setTempoSourceSequence(false);
     mpcSequencer->setTempo(allParserSequencer->masterTempo);
-    mpcSequencer->setTempoSourceSequence(allParserSequencer->tempoSourceIsSequence);
+    mpcSequencer->setTempoSourceSequence(
+        allParserSequencer->tempoSourceIsSequence);
 
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(allParserSequencer->tc);
@@ -138,40 +140,51 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
 
     auto midiInput = allParser.getMidiInput();
 
-    mpc.screens->get<MidiOutputScreen>()->setSoftThru(midiInput->getSoftThruMode());
+    mpc.screens->get<MidiOutputScreen>()->setSoftThru(
+        midiInput->getSoftThruMode());
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
 
     midiInputScreen->setReceiveCh(midiInput->getReceiveCh() - 1);
     midiInputScreen->setType(midiInput->getFilterType());
     midiInputScreen->setMidiFilterEnabled(midiInput->isFilterEnabled());
-    midiInputScreen->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
+    midiInputScreen->setSustainPedalToDuration(
+        midiInput->isSustainPedalToDurationEnabled());
 
     auto trackDests = midiInput->getMultiRecTrackDests();
 
-    auto multiRecordingSetupScreen = mpc.screens->get<MultiRecordingSetupScreen>();
+    auto multiRecordingSetupScreen =
+        mpc.screens->get<MultiRecordingSetupScreen>();
 
     for (int i = 0; i < trackDests.size(); i++)
     {
         multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);
     }
 
-    midiInputScreen->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
-    midiInputScreen->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
+    midiInputScreen->setChPressurePassEnabled(
+        midiInput->isChPressurePassEnabled());
+    midiInputScreen->setExclusivePassEnabled(
+        midiInput->isExclusivePassEnabled());
     mpcSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
     midiInputScreen->setNotePassEnabled(midiInput->isNotePassEnabled());
-    midiInputScreen->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
-    midiInputScreen->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
-    midiInputScreen->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
+    midiInputScreen->setPgmChangePassEnabled(
+        midiInput->isPgmChangePassEnabled());
+    midiInputScreen->setPitchBendPassEnabled(
+        midiInput->isPitchBendPassEnabled());
+    midiInputScreen->setPolyPressurePassEnabled(
+        midiInput->isPolyPressurePassEnabled());
     midiInputScreen->getCcPassEnabled() = midiInput->getCcPassEnabled();
 
     auto midiSyncMisc = allParser.getMidiSync();
 
     auto misc = allParser.getMisc();
     auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>();
-    stepEditOptionsScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
-    stepEditOptionsScreen->setDurationOfRecordedNotesTcValue(misc->isDurationOfRecNotesTc());
-    stepEditOptionsScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
+    stepEditOptionsScreen->setAutoStepIncrementEnabled(
+        misc->isAutoStepIncEnabled());
+    stepEditOptionsScreen->setDurationOfRecordedNotesTcValue(
+        misc->isDurationOfRecNotesTc());
+    stepEditOptionsScreen->setTcValueRecordedNotes(
+        misc->getDurationTcPercentage());
     midiInputScreen->setProgChangeSeq(misc->isPgmChToSeqEnabled());
 
     auto locateScreen = mpc.screens->get<LocateScreen>();
@@ -200,7 +213,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     syncScreen->shiftEarly = midiSyncMisc->getShiftEarly();
     syncScreen->frameRate = midiSyncMisc->getFrameRate();
 
-    mpcSequencer->setSecondSequenceEnabled(allParserSequencer->secondSeqEnabled);
+    mpcSequencer->setSecondSequenceEnabled(
+        allParserSequencer->secondSeqEnabled);
 
     auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
     secondSequenceScreen->sq = allParserSequencer->secondSeqIndex;
@@ -209,7 +223,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     songScreen->setOffset(-1);
     songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
     auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>();
-    ignoreTempoChangeScreen->setIgnore(midiSyncMisc->getSongModeIgnoreTempoChangeEvents());
+    ignoreTempoChangeScreen->setIgnore(
+        midiSyncMisc->getSongModeIgnoreTempoChangeEvents());
 
     auto songs = allParser.getSongs();
 
@@ -241,7 +256,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     }
 }
 
-std::vector<std::shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc &mpc, mpc::disk::MpcFile *f)
+std::vector<std::shared_ptr<Sequence>>
+AllLoader::loadOnlySequencesFromFile(mpc::Mpc &mpc, mpc::disk::MpcFile *f)
 {
     std::vector<std::shared_ptr<Sequence>> mpcSequences;
 

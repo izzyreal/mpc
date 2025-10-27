@@ -9,8 +9,7 @@ namespace mpc
         namespace event
         {
 
-            class NoteAftertouch
-                : public ChannelEvent
+            class NoteAftertouch : public ChannelEvent
             {
 
             public:
@@ -20,7 +19,8 @@ namespace mpc
                 void setAmount(int a);
 
                 NoteAftertouch(int tick, int channel, int note, int amount);
-                NoteAftertouch(int tick, int delta, int channel, int note, int amount);
+                NoteAftertouch(int tick, int delta, int channel, int note,
+                               int amount);
             };
 
         } // namespace event

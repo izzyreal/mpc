@@ -79,7 +79,8 @@ void TrimScreen::function(int f)
         case 0:
         {
             sampler->switchToNextSoundSortType();
-            ls->showPopupForMs("Sorting by " + sampler->getSoundSortingTypeName(), 200);
+            ls->showPopupForMs(
+                "Sorting by " + sampler->getSoundSortingTypeName(), 200);
             break;
         }
         case 1:
@@ -142,7 +143,8 @@ void TrimScreen::turnWheel(int i)
 
     if (focusedFieldName == "st")
     {
-        if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getFrameCount())
+        if (smplLngthFix &&
+            sound->getStart() + soundInc + oldLength > sound->getFrameCount())
         {
             return;
         }
@@ -221,7 +223,9 @@ void TrimScreen::turnWheel(int i)
 
 void TrimScreen::setSlider(int i)
 {
-    if (!mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
+    if (!mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed())
     {
         return;
     }
@@ -253,7 +257,8 @@ void TrimScreen::setSliderStart(int i)
     auto const oldLength = sound->getEnd() - sound->getStart();
     auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
 
-    auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
+    auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength
+                               : sound->getFrameCount();
 
     if (candidatePos > maxPos)
     {

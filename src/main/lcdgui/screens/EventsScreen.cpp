@@ -119,7 +119,8 @@ void EventsScreen::function(int i)
 
             if (editFunctionNumber == 0)
             {
-                performCopy(time0, time1, toSq, start, toTr, modeMerge, copies, note0, note1);
+                performCopy(time0, time1, toSq, start, toTr, modeMerge, copies,
+                            note0, note1);
             }
             else if (editFunctionNumber == 1)
             {
@@ -127,15 +128,18 @@ void EventsScreen::function(int i)
                 {
                     if (durationMode == 0)
                     {
-                        noteEvent->setDuration(noteEvent->getDuration() + durationValue);
+                        noteEvent->setDuration(noteEvent->getDuration() +
+                                               durationValue);
                     }
                     else if (durationMode == 1)
                     {
-                        noteEvent->setDuration(noteEvent->getDuration() - durationValue);
+                        noteEvent->setDuration(noteEvent->getDuration() -
+                                               durationValue);
                     }
                     else if (durationMode == 2)
                     {
-                        noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
+                        noteEvent->setDuration(noteEvent->getDuration() *
+                                               durationValue * 0.01);
                     }
                     else if (durationMode == 3)
                     {
@@ -157,7 +161,8 @@ void EventsScreen::function(int i)
                     }
                     else if (velocityMode == 2)
                     {
-                        n->setVelocity((n->getVelocity() * velocityValue * 0.01));
+                        n->setVelocity(
+                            (n->getVelocity() * velocityValue * 0.01));
                     }
                     else if (velocityMode == 3)
                     {
@@ -186,7 +191,8 @@ void EventsScreen::turnWheel(int i)
 {
     auto toSequence = sequencer->getSequence(toSq);
 
-    if (checkAllTimesAndNotes(mpc, i, sequencer->getActiveSequence().get(), sequencer->getActiveTrack().get()))
+    if (checkAllTimesAndNotes(mpc, i, sequencer->getActiveSequence().get(),
+                              sequencer->getActiveTrack().get()))
     {
         return;
     }
@@ -195,15 +201,19 @@ void EventsScreen::turnWheel(int i)
 
     if (focusedFieldName == "start0")
     {
-        setStart(SeqUtil::setBar(SeqUtil::getBar(toSequence.get(), start) + i, toSequence.get(), start));
+        setStart(SeqUtil::setBar(SeqUtil::getBar(toSequence.get(), start) + i,
+                                 toSequence.get(), start));
     }
     else if (focusedFieldName == "start1")
     {
-        setStart(SeqUtil::setBeat(SeqUtil::getBeat(toSequence.get(), start) + i, toSequence.get(), start));
+        setStart(SeqUtil::setBeat(SeqUtil::getBeat(toSequence.get(), start) + i,
+                                  toSequence.get(), start));
     }
     else if (focusedFieldName == "start2")
     {
-        setStart(SeqUtil::setClock(SeqUtil::getClock(toSequence.get(), start) + i, toSequence.get(), start));
+        setStart(
+            SeqUtil::setClock(SeqUtil::getClock(toSequence.get(), start) + i,
+                              toSequence.get(), start));
     }
     else if (focusedFieldName == "edit")
     {
@@ -277,19 +287,26 @@ void EventsScreen::turnWheel(int i)
 void EventsScreen::displayStart()
 {
     auto seq = sequencer->getSequence(toSq);
-    findField("start0")->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1, "0");
-    findField("start1")->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1, "0");
-    findField("start2")->setTextPadded(SeqUtil::getClock(seq.get(), start), "0");
+    findField("start0")->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1,
+                                       "0");
+    findField("start1")->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1,
+                                       "0");
+    findField("start2")->setTextPadded(SeqUtil::getClock(seq.get(), start),
+                                       "0");
 }
 
 void EventsScreen::displayTime()
 {
     auto seq = sequencer->getActiveSequence();
-    findField("time0")->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1, "0");
-    findField("time1")->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1, "0");
+    findField("time0")->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1,
+                                      "0");
+    findField("time1")->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1,
+                                      "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(seq.get(), time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBar(seq.get(), time1) + 1, "0");
-    findField("time4")->setTextPadded(SeqUtil::getBeat(seq.get(), time1) + 1, "0");
+    findField("time3")->setTextPadded(SeqUtil::getBar(seq.get(), time1) + 1,
+                                      "0");
+    findField("time4")->setTextPadded(SeqUtil::getBeat(seq.get(), time1) + 1,
+                                      "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(seq.get(), time1), "0");
 }
 
@@ -335,7 +352,8 @@ void EventsScreen::displayMode()
         }
         else
         {
-            findField("mode")->setTextPadded("+" + std::to_string(transposeAmount));
+            findField("mode")->setTextPadded("+" +
+                                             std::to_string(transposeAmount));
         }
     }
 }
@@ -464,8 +482,12 @@ void EventsScreen::displayNotes()
 
 void EventsScreen::displayMidiNotes()
 {
-    findField("note0")->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-    findField("note1")->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+    findField("note0")->setText(
+        StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
+        mpc::Util::noteNames()[note0] + u8"\u00D4");
+    findField("note1")->setText(
+        StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
+        mpc::Util::noteNames()[note1] + u8"\u00D4");
 }
 
 void EventsScreen::displayDrumNotes()
@@ -477,7 +499,8 @@ void EventsScreen::displayDrumNotes()
     else
     {
         auto track = sequencer->getActiveTrack();
-        auto program = sampler->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
+        auto program =
+            sampler->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
 
         auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
         auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
@@ -649,7 +672,8 @@ void EventsScreen::setStart(int i)
 
 void EventsScreen::displayFromSq()
 {
-    findField("from-sq")->setTextPadded(sequencer->getActiveSequenceIndex() + 1);
+    findField("from-sq")->setTextPadded(sequencer->getActiveSequenceIndex() +
+                                        1);
 }
 
 void EventsScreen::displayFromTr()
@@ -667,8 +691,10 @@ void EventsScreen::displayToTr()
     findField("to-tr")->setTextPadded(toTr + 1);
 }
 
-void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceIndex, int destStart,
-                               int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1)
+void EventsScreen::performCopy(int sourceStart, int sourceEnd,
+                               int toSequenceIndex, int destStart,
+                               int toTrackIndex, bool copyModeMerge,
+                               int copyCount, int copyNote0, int copyNote1)
 {
     const auto segLength = sourceEnd - sourceStart;
     auto sourceTrack = sequencer->getActiveTrack();
@@ -708,7 +734,8 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
     }
 
     auto minimumRequiredNewSequenceLength = destStart + (segLength);
-    auto ticksToAdd = minimumRequiredNewSequenceLength - toSequence->getLastTick();
+    auto ticksToAdd =
+        minimumRequiredNewSequenceLength - toSequence->getLastTick();
     auto barsToAdd = (int)(ceil((float)ticksToAdd / destBarLength));
     auto initialLastBarIndex = toSequence->getLastBarIndex();
     for (int i = 0; i < barsToAdd; i++)
@@ -733,7 +760,8 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
         {
             auto tick = e->getTick();
 
-            if (tick >= destOffset && tick < destOffset + (segLength * copyCount))
+            if (tick >= destOffset &&
+                tick < destOffset + (segLength * copyCount))
             {
                 destTrack->removeEvent(e);
             }
@@ -773,7 +801,8 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
         {
             for (int copy = 0; copy < copyCount; copy++)
             {
-                int tickCandidate = e->getTick() + destOffset + (copy * segLength);
+                int tickCandidate =
+                    e->getTick() + destOffset + (copy * segLength);
 
                 if (tickCandidate >= toSequence->getLastTick())
                 {

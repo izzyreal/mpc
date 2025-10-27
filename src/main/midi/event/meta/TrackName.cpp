@@ -4,7 +4,8 @@
 
 using namespace mpc::midi::event::meta;
 
-TrackName::TrackName(int tick, int delta, std::string name) : TextualMetaEvent(tick, delta, MetaEvent::TRACK_NAME, name)
+TrackName::TrackName(int tick, int delta, std::string name)
+    : TextualMetaEvent(tick, delta, MetaEvent::TRACK_NAME, name)
 {
 }
 

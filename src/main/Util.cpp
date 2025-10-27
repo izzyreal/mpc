@@ -80,8 +80,7 @@ std::string Util::distributeTimeSig(const std::string &s)
     return s0 + "/" + s1;
 }
 
-void Util::drawLine(std::vector<std::vector<bool>> &pixels,
-                    const LcdLine &line,
+void Util::drawLine(std::vector<std::vector<bool>> &pixels, const LcdLine &line,
                     const bool color)
 {
     for (auto &l : line)
@@ -90,10 +89,8 @@ void Util::drawLine(std::vector<std::vector<bool>> &pixels,
     }
 }
 
-void Util::drawLine(std::vector<std::vector<bool>> &pixels,
-                    const LcdLine &line,
-                    const bool color,
-                    const std::vector<int> &offsetxy)
+void Util::drawLine(std::vector<std::vector<bool>> &pixels, const LcdLine &line,
+                    const bool color, const std::vector<int> &offsetxy)
 {
     for (auto &l : line)
     {
@@ -102,8 +99,7 @@ void Util::drawLine(std::vector<std::vector<bool>> &pixels,
 }
 
 void Util::drawLines(std::vector<std::vector<bool>> &pixels,
-                     const LcdBitmap &bitmap,
-                     const std::vector<bool> &colors,
+                     const LcdBitmap &bitmap, const std::vector<bool> &colors,
                      const std::vector<int> &offsetxy)
 {
     int colorCounter = 0;
@@ -124,7 +120,9 @@ std::vector<std::string> &Util::noteNames()
         int octave = -2;
         int noteCounter = 0;
 
-        std::vector<std::string> someNoteNames{"C.", "C#", "D.", "D#", "E.", "F.", "F#", "G.", "G#", "A.", "A#", "B."};
+        std::vector<std::string> someNoteNames{"C.", "C#", "D.", "D#",
+                                               "E.", "F.", "F#", "G.",
+                                               "G#", "A.", "A#", "B."};
 
         for (int j = 0; j < 128; j++)
         {
@@ -213,13 +211,16 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)
 
     auto userScreen = mpc.screens->get<UserScreen>();
     sequence->init(userScreen->lastBar);
-    auto numberString = StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2);
-    std::string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;
+    auto numberString =
+        StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2);
+    std::string name =
+        StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;
     sequence->setName(name);
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
-void Util::set16LevelsValues(const SixteenLevelsContext &ctx, const std::shared_ptr<NoteOnEvent> event)
+void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
+                             const std::shared_ptr<NoteOnEvent> event)
 {
     if (!ctx.isSixteenLevelsEnabled)
     {
@@ -236,14 +237,16 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx, const std::shared_
 
     if (_16l_param == 0 && event->getVelocity() != 0)
     {
-        auto velocity = static_cast<int>((ctx.padIndexWithoutBank + 1) * (127.0 / 16.0));
+        auto velocity =
+            static_cast<int>((ctx.padIndexWithoutBank + 1) * (127.0 / 16.0));
         event->setVelocity(velocity);
     }
     else if (_16l_param == 1)
     {
         if (_16l_type != 0)
         {
-            auto value = static_cast<int>(floor(100 / 16.0) * (ctx.padIndexWithoutBank + 1));
+            auto value = static_cast<int>(floor(100 / 16.0) *
+                                          (ctx.padIndexWithoutBank + 1));
             event->setVariationValue(value);
             return;
         }
@@ -264,7 +267,9 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx, const std::shared_
     }
 }
 
-void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ctx, const std::shared_ptr<NoteOnEvent> noteOnEvent)
+void Util::setSliderNoteVariationParameters(
+    const SliderNoteVariationContext &ctx,
+    const std::shared_ptr<NoteOnEvent> noteOnEvent)
 {
     const auto sliderParam = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
     noteOnEvent->setVariationType(sliderParam);
@@ -317,7 +322,8 @@ void Util::setSliderNoteVariationParameters(const SliderNoteVariationContext &ct
     }
 }
 
-std::vector<char> Util::vecCopyOfRange(const std::vector<char> &src, int offset, int endOffset)
+std::vector<char> Util::vecCopyOfRange(const std::vector<char> &src, int offset,
+                                       int endOffset)
 {
     return {begin(src) + offset, begin(src) + endOffset};
 }

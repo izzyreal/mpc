@@ -20,7 +20,8 @@ using namespace mpc::engine::control;
 
 using namespace std;
 
-MixControls::MixControls(MixerControls *mixerControls, int stripId, shared_ptr<BusControls> busControls, bool master)
+MixControls::MixControls(MixerControls *mixerControls, int stripId,
+                         shared_ptr<BusControls> busControls, bool master)
     : AudioControls(busControls->getId(), busControls->getName())
 {
     this->mixerControls = mixerControls;

@@ -59,7 +59,8 @@ namespace mpc::audiomidi
         mpc::Mpc &mpc;
         std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
         std::atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess> monitorInputAdapter;
+        std::shared_ptr<mpc::engine::audio::core::AudioProcess>
+            monitorInputAdapter;
 
     public:
         const bool isBouncing();
@@ -83,21 +84,26 @@ namespace mpc::audiomidi
         bool bouncePrepared = false;
         bool wasRecordingSound = false;
         bool wasBouncing = false;
-        std::vector<std::shared_ptr<mpc::engine::control::CompoundControl>> soundPlayerChannelControls;
+        std::vector<std::shared_ptr<mpc::engine::control::CompoundControl>>
+            soundPlayerChannelControls;
         std::vector<mpc::engine::Drum> soundPlayerChannels;
-        std::unique_ptr<mpc::engine::PreviewSoundPlayer> basicSoundPlayerChannel;
+        std::unique_ptr<mpc::engine::PreviewSoundPlayer>
+            basicSoundPlayerChannel;
         std::vector<std::shared_ptr<mpc::engine::Voice>> voices;
         std::vector<mpc::engine::MixerInterconnection *> mixerConnections;
         std::shared_ptr<mpc::engine::Voice> basicVoice;
         std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
-        std::shared_ptr<mpc::engine::audio::server::NonRealTimeAudioServer> offlineServer;
-        std::shared_ptr<mpc::engine::audio::system::DefaultAudioSystem> audioSystem;
+        std::shared_ptr<mpc::engine::audio::server::NonRealTimeAudioServer>
+            offlineServer;
+        std::shared_ptr<mpc::engine::audio::system::DefaultAudioSystem>
+            audioSystem;
         std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
         std::shared_ptr<mpc::engine::audio::mixer::MixerControls> mixerControls;
         std::shared_ptr<mpc::engine::audio::server::CompoundAudioClient> cac;
         std::shared_ptr<MidiOutput> midiOutput;
         mpc::engine::audio::server::IOAudioProcess *inputProcess = nullptr;
-        std::vector<mpc::engine::audio::server::IOAudioProcess *> outputProcesses;
+        std::vector<mpc::engine::audio::server::IOAudioProcess *>
+            outputProcesses;
         std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
         std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
         std::shared_ptr<SoundRecorder> soundRecorder;

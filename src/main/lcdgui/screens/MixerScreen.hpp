@@ -23,8 +23,7 @@ namespace mpc::engine
 
 namespace mpc::lcdgui::screens
 {
-    class MixerScreen
-        : public mpc::lcdgui::ScreenComponent
+    class MixerScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -46,9 +45,12 @@ namespace mpc::lcdgui::screens
         void setXPos(unsigned char newXPos);
 
     private:
-        const std::vector<std::string> fxPathNames{"--", "M1", "M2", "R1", "R2"};
-        const std::vector<std::string> stereoNames{"-", "12", "12", "34", "34", "56", "56", "78", "78"};
-        const std::vector<std::string> monoNames{"-", "1", "2", "3", "4", "5", "6", "7", "8"};
+        const std::vector<std::string> fxPathNames{"--", "M1", "M2", "R1",
+                                                   "R2"};
+        const std::vector<std::string> stereoNames{"-",  "12", "12", "34", "34",
+                                                   "56", "56", "78", "78"};
+        const std::vector<std::string> monoNames{"-", "1", "2", "3", "4",
+                                                 "5", "6", "7", "8"};
 
     private:
         int tab = 0;
@@ -70,9 +72,11 @@ namespace mpc::lcdgui::screens
         void displayFxPaths();
         void displayFxSendLevels();
 
-        std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int index);
+        std::shared_ptr<mpc::engine::StereoMixer>
+        getStereoMixerChannel(int index);
 
-        std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int index);
+        std::shared_ptr<mpc::engine::IndivFxMixer>
+        getIndivFxMixerChannel(int index);
 
         bool stripHasStereoSound(int stripIndex);
 

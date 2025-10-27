@@ -15,10 +15,7 @@ using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
-DiskController::DiskController(mpc::Mpc &_mpc)
-    : mpc(_mpc)
-{
-}
+DiskController::DiskController(mpc::Mpc &_mpc) : mpc(_mpc) {}
 
 void DiskController::initDisks()
 {
@@ -28,8 +25,10 @@ void DiskController::initDisks()
     defaultVolume.type = LOCAL_DIRECTORY;
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "DEFAULT";
-    defaultVolume.localDirectoryPath = mpc.paths->defaultLocalVolumePath().string();
-    defaultVolume.volumeSize = fs::space(defaultVolume.localDirectoryPath).capacity;
+    defaultVolume.localDirectoryPath =
+        mpc.paths->defaultLocalVolumePath().string();
+    defaultVolume.volumeSize =
+        fs::space(defaultVolume.localDirectoryPath).capacity;
     disks.back()->initRoot();
 
     MLOG("Disk root initialized");
@@ -57,7 +56,8 @@ void DiskController::initDisks()
 
     auto activeDisk = getActiveDisk();
 
-    MLOG("Active disk is set to the one with absolute path: " + activeDisk->getAbsolutePath());
+    MLOG("Active disk is set to the one with absolute path: " +
+         activeDisk->getAbsolutePath());
 
     if (std::dynamic_pointer_cast<RawDisk>(activeDisk))
     {

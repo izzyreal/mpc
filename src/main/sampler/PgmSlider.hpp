@@ -3,8 +3,7 @@
 
 namespace mpc::sampler
 {
-    class PgmSlider
-        : public Observable
+    class PgmSlider : public Observable
     {
 
     private:

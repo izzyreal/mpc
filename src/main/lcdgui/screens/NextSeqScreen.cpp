@@ -59,12 +59,14 @@ void NextSeqScreen::turnWheel(int i)
     {
         if (sequencer->isPlaying())
         {
-            sequencer->setNextSq(sequencer->getCurrentlyPlayingSequenceIndex() + i);
+            sequencer->setNextSq(sequencer->getCurrentlyPlayingSequenceIndex() +
+                                 i);
             ls->setFocus("nextsq");
         }
         else
         {
-            sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
+            sequencer->setActiveSequenceIndex(
+                sequencer->getActiveSequenceIndex() + i);
         }
     }
     else if (focusedFieldName == "nextsq")
@@ -137,14 +139,17 @@ void NextSeqScreen::displaySq()
 
     if (sequencer->isPlaying())
     {
-        result.append(StrUtil::padLeft(std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
+        result.append(StrUtil::padLeft(
+            std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1),
+            "0", 2));
         result.append("-");
         result.append(sequencer->getCurrentlyPlayingSequence()->getName());
         findField("sq")->setText(result);
     }
     else
     {
-        result.append(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+        result.append(StrUtil::padLeft(
+            std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
         result.append("-");
         result.append(sequencer->getActiveSequence()->getName());
         findField("sq")->setText(result);
@@ -159,7 +164,9 @@ void NextSeqScreen::displayNextSq()
     if (nextSq != -1)
     {
         auto seqName = sequencer->getSequence(nextSq)->getName();
-        res = StrUtil::padLeft(std::to_string(sequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
+        res = StrUtil::padLeft(std::to_string(sequencer->getNextSq() + 1), "0",
+                               2) +
+              "-" + seqName;
     }
 
     findField("nextsq")->setText(res);
@@ -189,7 +196,9 @@ void NextSeqScreen::displayTempo()
 void NextSeqScreen::displayTempoLabel()
 {
     auto currentRatio = -1;
-    auto sequence = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence() : sequencer->getActiveSequence();
+    auto sequence = sequencer->isPlaying()
+                        ? sequencer->getCurrentlyPlayingSequence()
+                        : sequencer->getActiveSequence();
     for (auto &e : sequence->getTempoChangeEvents())
     {
         if (e->getTick() > sequencer->getTickPosition())
@@ -212,14 +221,17 @@ void NextSeqScreen::displayTempoLabel()
 
 void NextSeqScreen::displayTempoSource()
 {
-    findField("tempo-source")->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
+    findField("tempo-source")
+        ->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)"
+                                                            : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming()
 {
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
     auto noteValue = timingCorrectScreen->getNoteValue();
-    findField("timing")->setText(SequencerScreen::timingCorrectNames[noteValue]);
+    findField("timing")->setText(
+        SequencerScreen::timingCorrectNames[noteValue]);
 }
 
 void NextSeqScreen::update(Observable *o, Message message)

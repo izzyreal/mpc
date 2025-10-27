@@ -10,8 +10,7 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens::window
 {
-    class NameScreen
-        : public mpc::lcdgui::ScreenComponent
+    class NameScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -30,7 +29,11 @@ namespace mpc::lcdgui::screens::window
         void typeCharacter(char c);
         void backSpace();
 
-        void initialize(std::string nameToEdit, unsigned char nameLimit, const std::function<void(std::string &)> &enterAction, const std::string &cancelScreen, const std::function<void()> &mainScreenAction = [] {});
+        void initialize(
+            std::string nameToEdit, unsigned char nameLimit,
+            const std::function<void(std::string &)> &enterAction,
+            const std::string &cancelScreen,
+            const std::function<void()> &mainScreenAction = [] {});
 
         std::string getNameWithoutSpaces();
         void setEditing(bool b);

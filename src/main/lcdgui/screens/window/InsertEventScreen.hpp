@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class InsertEventScreen
-        : public mpc::lcdgui::ScreenComponent
+    class InsertEventScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -18,7 +17,9 @@ namespace mpc::lcdgui::screens::window
 
     private:
         bool eventAddedBeforeLeavingTheScreen = false;
-        std::vector<std::string> eventTypeNames = {"NOTE", "PITCH BEND", "CONTROL CHANGE", "PROGRAM CHANGE", "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE", "MIXER"};
+        std::vector<std::string> eventTypeNames = {
+            "NOTE",        "PITCH BEND",    "CONTROL CHANGE", "PROGRAM CHANGE",
+            "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE",      "MIXER"};
         int insertEventType = 0;
         void setInsertEventType(int i);
         void displayInsertEventType();

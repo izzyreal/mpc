@@ -5,7 +5,8 @@
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-AudioFormat::AudioFormat(float sampleRate, int sampleSizeInBits, int channels, bool signed_, bool bigEndian)
+AudioFormat::AudioFormat(float sampleRate, int sampleSizeInBits, int channels,
+                         bool signed_, bool bigEndian)
 {
 
     encoding = signed_ ? Encoding::PCM_SIGNED() : Encoding::PCM_UNSIGNED();
@@ -17,7 +18,9 @@ AudioFormat::AudioFormat(float sampleRate, int sampleSizeInBits, int channels, b
     this->bigEndian = bigEndian;
 }
 
-AudioFormat::AudioFormat(Encoding *encoding, float sampleRate, int sampleSizeInBits, int channels, int frameSize, float frameRate, bool bigEndian)
+AudioFormat::AudioFormat(Encoding *encoding, float sampleRate,
+                         int sampleSizeInBits, int channels, int frameSize,
+                         float frameRate, bool bigEndian)
 {
     this->sampleRate = sampleRate;
     this->sampleSizeInBits = sampleSizeInBits;
@@ -65,15 +68,19 @@ bool AudioFormat::isBigEndian()
 
 bool AudioFormat::matches(AudioFormat *fmt)
 {
-    if (encoding != fmt->encoding || channels != fmt->channels || sampleSizeInBits != fmt->sampleSizeInBits || frameSize != fmt->frameSize)
+    if (encoding != fmt->encoding || channels != fmt->channels ||
+        sampleSizeInBits != fmt->sampleSizeInBits ||
+        frameSize != fmt->frameSize)
     {
         return false;
     }
-    if (sampleRate != NOT_SPECIFIED && fmt->sampleRate != NOT_SPECIFIED && sampleRate != fmt->sampleRate)
+    if (sampleRate != NOT_SPECIFIED && fmt->sampleRate != NOT_SPECIFIED &&
+        sampleRate != fmt->sampleRate)
     {
         return false;
     }
-    if (frameRate != NOT_SPECIFIED && fmt->frameRate != NOT_SPECIFIED && frameRate != fmt->frameRate)
+    if (frameRate != NOT_SPECIFIED && fmt->frameRate != NOT_SPECIFIED &&
+        frameRate != fmt->frameRate)
     {
         return false;
     }

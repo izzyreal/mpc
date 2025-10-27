@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class PasteEventScreen
-        : public mpc::lcdgui::ScreenComponent
+    class PasteEventScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

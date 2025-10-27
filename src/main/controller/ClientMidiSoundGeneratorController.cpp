@@ -25,8 +25,7 @@ ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
     std::shared_ptr<Sequencer> sequencerToUse,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
-    : midiInputScreen(midiInputScreen),
-      eventHandler(eventHandler),
+    : midiInputScreen(midiInputScreen), eventHandler(eventHandler),
       sequencer(sequencerToUse),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen),
@@ -93,7 +92,8 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
 }
 
-std::optional<int> ClientMidiSoundGeneratorController::getTrackIndexForEvent(const ClientMidiEvent &e) const
+std::optional<int> ClientMidiSoundGeneratorController::getTrackIndexForEvent(
+    const ClientMidiEvent &e) const
 {
     if (sequencer->isRecordingModeMulti())
     {
@@ -107,13 +107,16 @@ std::optional<int> ClientMidiSoundGeneratorController::getTrackIndexForEvent(con
     return sequencer->getActiveTrackIndex();
 }
 
-std::shared_ptr<mpc::sequencer::Track> ClientMidiSoundGeneratorController::getTrackForIndex(int trackIndex) const
+std::shared_ptr<mpc::sequencer::Track>
+ClientMidiSoundGeneratorController::getTrackForIndex(int trackIndex) const
 {
-    auto seq = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence() : sequencer->getActiveSequence();
+    auto seq = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
+                                      : sequencer->getActiveSequence();
     return seq->getTrack(trackIndex);
 }
 
-bool ClientMidiSoundGeneratorController::shouldProcessEvent(const ClientMidiEvent &e) const
+bool ClientMidiSoundGeneratorController::shouldProcessEvent(
+    const ClientMidiEvent &e) const
 {
     using MessageType = ClientMidiEvent::MessageType;
 
@@ -140,7 +143,8 @@ bool ClientMidiSoundGeneratorController::shouldProcessEvent(const ClientMidiEven
         {
             const int ccNumber = e.getControllerNumber();
             const auto &ccPassEnabled = midiInputScreen->getCcPassEnabled();
-            if (ccNumber < 0 || ccNumber >= static_cast<int>(ccPassEnabled.size()))
+            if (ccNumber < 0 ||
+                ccNumber >= static_cast<int>(ccPassEnabled.size()))
             {
                 return false;
             }
@@ -151,7 +155,8 @@ bool ClientMidiSoundGeneratorController::shouldProcessEvent(const ClientMidiEven
     }
 }
 
-void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent &e)
+void ClientMidiSoundGeneratorController::handleNoteOnEvent(
+    const ClientMidiEvent &e)
 {
     const int note = e.getNoteNumber();
     if (note < 35 || note > 98)
@@ -167,18 +172,25 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent
     }
     int trackIndex = *trackIndexOpt;
 
-    auto noteOnEvent = std::make_shared<NoteOnEventPlayOnly>(note, e.getVelocity());
+    auto noteOnEvent =
+        std::make_shared<NoteOnEventPlayOnly>(note, e.getVelocity());
 
     auto track = getTrackForIndex(trackIndex);
     const int trackDevice = track->getDeviceIndex();
     const int trackVelocityRatio = track->getVelocityRatio();
-    const std::optional<int> drumIndex = track->getBus() > 0 ? std::optional<int>(track->getBus() - 1) : std::nullopt;
+    const std::optional<int> drumIndex =
+        track->getBus() > 0 ? std::optional<int>(track->getBus() - 1)
+                            : std::nullopt;
 
-    eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(), trackIndex, trackDevice, trackVelocityRatio, drumIndex);
+    eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(),
+                                        trackIndex, trackDevice,
+                                        trackVelocityRatio, drumIndex);
 
-    noteEventStore.storePlayNoteEvent(std::pair<int, int>(trackIndex, noteOnEvent->getNote()), noteOnEvent);
+    noteEventStore.storePlayNoteEvent(
+        std::pair<int, int>(trackIndex, noteOnEvent->getNote()), noteOnEvent);
 
-    auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(noteOnEvent->getNote(), noteOnEvent->getVelocity());
+    auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(
+        noteOnEvent->getNote(), noteOnEvent->getVelocity());
 
     auto mode = clientEventController->determineRecordingMode();
 
@@ -186,29 +198,36 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent
     {
         case RecordingMode::Overdub:
         {
-            recordMidiNoteOn = track->recordNoteEventASync(noteOnEvent->getNote(), noteOnEvent->getVelocity());
+            recordMidiNoteOn = track->recordNoteEventASync(
+                noteOnEvent->getNote(), noteOnEvent->getVelocity());
             break;
         }
         case RecordingMode::Step:
         {
-            recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), noteOnEvent->getNote(), noteOnEvent->getVelocity());
+            recordMidiNoteOn = track->recordNoteEventSynced(
+                sequencer->getTickPosition(), noteOnEvent->getNote(),
+                noteOnEvent->getVelocity());
             sequencer->playMetronomeTrack();
             break;
         }
         case RecordingMode::RecMainWithoutPlaying:
         {
-            recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), noteOnEvent->getNote(), noteOnEvent->getVelocity());
+            recordMidiNoteOn = track->recordNoteEventSynced(
+                sequencer->getTickPosition(), noteOnEvent->getNote(),
+                noteOnEvent->getVelocity());
             sequencer->playMetronomeTrack();
 
             int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
             if (stepLength != 1)
             {
                 int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordMidiNoteOn, stepLength, timingCorrectScreen->getSwing());
+                track->timingCorrect(0, bar, recordMidiNoteOn, stepLength,
+                                     timingCorrectScreen->getSwing());
 
                 if (recordMidiNoteOn->getTick() != sequencer->getTickPosition())
                 {
-                    sequencer->move(Sequencer::ticksToQuarterNotes(recordMidiNoteOn->getTick()));
+                    sequencer->move(Sequencer::ticksToQuarterNotes(
+                        recordMidiNoteOn->getTick()));
                 }
             }
             break;
@@ -220,11 +239,14 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(const ClientMidiEvent
 
     if (recordMidiNoteOn)
     {
-        noteEventStore.storeRecordNoteEvent(std::pair<int, int>(trackIndex, recordMidiNoteOn->getNote()), recordMidiNoteOn);
+        noteEventStore.storeRecordNoteEvent(
+            std::pair<int, int>(trackIndex, recordMidiNoteOn->getNote()),
+            recordMidiNoteOn);
     }
 }
 
-void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEvent &e)
+void ClientMidiSoundGeneratorController::handleNoteOffEvent(
+    const ClientMidiEvent &e)
 {
     const int note = e.getNoteNumber();
 
@@ -237,10 +259,13 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEven
 
     auto track = getTrackForIndex(trackIndex);
     const int trackDevice = track->getDeviceIndex();
-    const std::optional<int> drumIndex = track->getBus() > 0 ? std::optional<int>(track->getBus() - 1) : std::nullopt;
+    const std::optional<int> drumIndex =
+        track->getBus() > 0 ? std::optional<int>(track->getBus() - 1)
+                            : std::nullopt;
 
     // finalize recorded note if exists
-    if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(std::pair<int, int>(trackIndex, note)))
+    if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(
+            std::pair<int, int>(trackIndex, note)))
     {
         auto mode = clientEventController->determineRecordingMode();
 
@@ -253,32 +278,42 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEven
             }
             case RecordingMode::Step:
             {
-                int newDuration = static_cast<int>(sequencer->getTickPosition());
+                int newDuration =
+                    static_cast<int>(sequencer->getTickPosition());
                 sequencer->stopMetronomeTrack();
-                track->finalizeNoteEventSynced(storedRecordMidiNoteOn, newDuration);
+                track->finalizeNoteEventSynced(storedRecordMidiNoteOn,
+                                               newDuration);
                 break;
             }
             case RecordingMode::RecMainWithoutPlaying:
             {
-                int newDuration = static_cast<int>(sequencer->getTickPosition());
+                int newDuration =
+                    static_cast<int>(sequencer->getTickPosition());
                 sequencer->stopMetronomeTrack();
-                bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(storedRecordMidiNoteOn, newDuration);
+                bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(
+                    storedRecordMidiNoteOn, newDuration);
 
                 if (durationHasBeenAdjusted)
                 {
-                    int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
+                    int stepLength =
+                        timingCorrectScreen->getNoteValueLengthInTicks();
                     int nextPos = sequencer->getTickPosition() + stepLength;
                     int bar = sequencer->getCurrentBarIndex() + 1;
-                    nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
-                    auto lastTick = sequencer->getActiveSequence()->getLastTick();
+                    nextPos = track->timingCorrectTick(
+                        0, bar, nextPos, stepLength,
+                        timingCorrectScreen->getSwing());
+                    auto lastTick =
+                        sequencer->getActiveSequence()->getLastTick();
 
                     if (nextPos != 0 && nextPos < lastTick)
                     {
-                        sequencer->move(Sequencer::ticksToQuarterNotes(nextPos));
+                        sequencer->move(
+                            Sequencer::ticksToQuarterNotes(nextPos));
                     }
                     else
                     {
-                        sequencer->move(Sequencer::ticksToQuarterNotes(lastTick));
+                        sequencer->move(
+                            Sequencer::ticksToQuarterNotes(lastTick));
                     }
                 }
                 break;
@@ -289,8 +324,11 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(const ClientMidiEven
         }
     }
 
-    if (auto storedNoteOnEvent = noteEventStore.retrievePlayNoteEvent(std::pair<int, int>(trackIndex, note)))
+    if (auto storedNoteOnEvent = noteEventStore.retrievePlayNoteEvent(
+            std::pair<int, int>(trackIndex, note)))
     {
-        eventHandler->handleMidiInputNoteOff(storedNoteOnEvent->getNoteOff(), e.getBufferOffset(), trackIndex, trackDevice, drumIndex);
+        eventHandler->handleMidiInputNoteOff(storedNoteOnEvent->getNoteOff(),
+                                             e.getBufferOffset(), trackIndex,
+                                             trackDevice, drumIndex);
     }
 }

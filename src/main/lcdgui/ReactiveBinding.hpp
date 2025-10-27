@@ -12,14 +12,11 @@ namespace mpc::lcdgui
 
         ReactiveBinding() = default;
 
-        template <
-            typename Getter,
-            typename Updater,
-            typename T = std::invoke_result_t<Getter>,
-            std::enable_if_t<
-                std::is_invocable_r_v<T, Getter> &&
-                    std::is_invocable_v<Updater, const T &>,
-                int> = 0>
+        template <typename Getter, typename Updater,
+                  typename T = std::invoke_result_t<Getter>,
+                  std::enable_if_t<std::is_invocable_r_v<T, Getter> &&
+                                       std::is_invocable_v<Updater, const T &>,
+                                   int> = 0>
         ReactiveBinding(Getter &&getter, Updater &&updater)
         {
             T lastValue{};

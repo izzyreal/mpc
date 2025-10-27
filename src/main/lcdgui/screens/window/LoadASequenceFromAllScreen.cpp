@@ -7,7 +7,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-LoadASequenceFromAllScreen::LoadASequenceFromAllScreen(mpc::Mpc &mpc, const int layerIndex)
+LoadASequenceFromAllScreen::LoadASequenceFromAllScreen(mpc::Mpc &mpc,
+                                                       const int layerIndex)
     : ScreenComponent(mpc, "load-a-sequence-from-all", layerIndex)
 {
 }
@@ -49,8 +50,10 @@ void LoadASequenceFromAllScreen::function(int i)
 
             if (candidate)
             {
-                auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
-                sequencer->setSequence(loadASequenceScreen->loadInto, candidate);
+                auto loadASequenceScreen =
+                    mpc.screens->get<LoadASequenceScreen>();
+                sequencer->setSequence(loadASequenceScreen->loadInto,
+                                       candidate);
                 mpc.getLayeredScreen()->openScreen<LoadScreen>();
             }
             break;
@@ -76,8 +79,12 @@ void LoadASequenceFromAllScreen::displayFile()
 void LoadASequenceFromAllScreen::displayLoadInto()
 {
     auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
-    findField("load-into")->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
-    findLabel("load-into0")->setText("-" + sequencer->getSequence(loadASequenceScreen->loadInto)->getName());
+    findField("load-into")
+        ->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
+    findLabel("load-into0")
+        ->setText(
+            "-" +
+            sequencer->getSequence(loadASequenceScreen->loadInto)->getName());
 }
 
 void LoadASequenceFromAllScreen::setSourceSeqIndex(int i)

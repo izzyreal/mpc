@@ -15,7 +15,8 @@ namespace mpc
     public:
         explicit DirectorySaveTarget(fs::path basePath);
 
-        void setFileData(const fs::path &path, const std::vector<char> &data) override;
+        void setFileData(const fs::path &path,
+                         const std::vector<char> &data) override;
 
         std::vector<char> getFileData(const fs::path &path) const override;
 

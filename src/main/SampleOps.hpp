@@ -24,7 +24,8 @@ namespace mpc::sampleops
     inline int16_t mean_normalized_float_to_short(const float &f)
     {
         float scaled = f * 32768.0f;
-        float clamped = std::max<float>(-32768.0f, std::min<float>(scaled, 32767.0f));
+        float clamped =
+            std::max<float>(-32768.0f, std::min<float>(scaled, 32767.0f));
         return static_cast<int16_t>(std::roundf(clamped));
     }
 

@@ -117,7 +117,8 @@ void TrMoveScreen::function(int i)
         {
             auto eventsScreen = mpc.screens->get<EventsScreen>();
             eventsScreen->tab = i;
-            mpc.getLayeredScreen()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+            mpc.getLayeredScreen()->openScreen(
+                eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
         case 4:
@@ -187,7 +188,8 @@ void TrMoveScreen::displayTrLabels()
     if (tr0Index >= 0)
     {
         tr0Name = sequence->getTrack(tr0Index)->getName();
-        tr0 += "Tr:" + StrUtil::padLeft(std::to_string(tr0Index + 1), "0", 2) + "-" + tr0Name;
+        tr0 += "Tr:" + StrUtil::padLeft(std::to_string(tr0Index + 1), "0", 2) +
+               "-" + tr0Name;
     }
     else
     {
@@ -196,7 +198,8 @@ void TrMoveScreen::displayTrLabels()
     if (tr1Index < 64)
     {
         tr1Name = sequence->getTrack(tr1Index)->getName();
-        tr1 += "Tr:" + StrUtil::padLeft(std::to_string(tr1Index + 1), "0", 2) + "-" + tr1Name;
+        tr1 += "Tr:" + StrUtil::padLeft(std::to_string(tr1Index + 1), "0", 2) +
+               "-" + tr1Name;
     }
     else
     {
@@ -242,7 +245,10 @@ void TrMoveScreen::displayTrFields()
             tr0Name = StrUtil::padRight(tr0Name, " ", 9) + u8"\u00CD";
         }
 
-        findField("tr")->setText("Tr:" + StrUtil::padLeft(std::to_string(selectedTrackIndex + 1), "0", 2) + "-" + tr0Name);
+        findField("tr")->setText(
+            "Tr:" +
+            StrUtil::padLeft(std::to_string(selectedTrackIndex + 1), "0", 2) +
+            "-" + tr0Name);
     }
     else
     {
@@ -250,7 +256,8 @@ void TrMoveScreen::displayTrFields()
         findLabel("tomove")->Hide(false);
         findField("tr")->setLocation(108, 26);
         auto trackName = sequence->getTrack(currentTrackIndex)->getName();
-        auto trackIndex = StrUtil::padLeft(std::to_string(currentTrackIndex + 1), "0", 2);
+        auto trackIndex =
+            StrUtil::padLeft(std::to_string(currentTrackIndex + 1), "0", 2);
         findField("tr")->setText("Tr:" + trackIndex + "-" + trackName);
     }
 }
@@ -258,7 +265,8 @@ void TrMoveScreen::displayTrFields()
 void TrMoveScreen::displaySq()
 {
     auto sequence = sequencer->getActiveSequence();
-    findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+    findField("sq")->setText(StrUtil::padLeft(
+        std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
     auto sequenceName = "-" + sequence->getName();
     findLabel("sq-name")->setText(sequenceName);
 }

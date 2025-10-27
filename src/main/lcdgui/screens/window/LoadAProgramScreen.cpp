@@ -42,7 +42,8 @@ void LoadAProgramScreen::function(int i)
             mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/true);
             mpc.getSampler()->deleteAllSamples();
 
-            mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->getProgram(0));
+            mpc.getDisk()->readPgm2(selectedFile,
+                                    mpc.getSampler()->getProgram(0));
             break;
         }
         case 3:
@@ -50,7 +51,9 @@ void LoadAProgramScreen::function(int i)
             break;
         case 4:
         {
-            auto newProgram = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+            auto newProgram = mpc.getSampler()
+                                  ->createNewProgramAddFirstAvailableSlot()
+                                  .lock();
 
             mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
@@ -75,7 +78,8 @@ void LoadAProgramScreen::function(int i)
 
 void LoadAProgramScreen::displayLoadReplaceSound()
 {
-    findField("load-replace-sound")->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));
+    findField("load-replace-sound")
+        ->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));
 }
 
 void LoadAProgramScreen::setLoadReplaceSameSound(bool b)

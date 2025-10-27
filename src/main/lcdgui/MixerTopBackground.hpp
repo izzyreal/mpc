@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui
 {
-    class MixerTopBackground
-        : public Component
+    class MixerTopBackground : public Component
     {
 
     public:

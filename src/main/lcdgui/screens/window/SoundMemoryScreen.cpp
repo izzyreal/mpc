@@ -29,7 +29,8 @@ void SoundMemoryScreen::displayFreeMemoryTime()
         total -= (s->getSampleData()->size() * 2);
     }
 
-    auto time = StrUtil::padLeft(StrUtil::TrimDecimals(total / 176400.0, 1), " ", 6);
+    auto time =
+        StrUtil::padLeft(StrUtil::TrimDecimals(total / 176400.0, 1), " ", 6);
     findLabel("free-memory-time")->setText("Free memory(time):" + time);
 }
 

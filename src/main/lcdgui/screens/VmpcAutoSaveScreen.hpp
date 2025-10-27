@@ -8,8 +8,7 @@ namespace mpc::nvram
 
 namespace mpc::lcdgui::screens
 {
-    class VmpcAutoSaveScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VmpcAutoSaveScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -21,8 +20,10 @@ namespace mpc::lcdgui::screens
         void function(int) override;
 
     private:
-        const std::vector<std::string> autoSaveOnExitNames{"Disabled", "Enabled"};
-        const std::vector<std::string> autoLoadOnStartNames{"Disabled", "Ask", "Enabled"};
+        const std::vector<std::string> autoSaveOnExitNames{"Disabled",
+                                                           "Enabled"};
+        const std::vector<std::string> autoLoadOnStartNames{"Disabled", "Ask",
+                                                            "Enabled"};
 
         int autoSaveOnExit = 1;
         int autoLoadOnStart = 1;

@@ -21,7 +21,8 @@ void MidiInputScreen::open()
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
     if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
-        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+        vmpcSettingsScreen->midiControlMode ==
+            VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();
         mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();

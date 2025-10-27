@@ -3,7 +3,8 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-VmpcWarningSettingsIgnoredScreen::VmpcWarningSettingsIgnoredScreen(mpc::Mpc &m, int layer)
+VmpcWarningSettingsIgnoredScreen::VmpcWarningSettingsIgnoredScreen(mpc::Mpc &m,
+                                                                   int layer)
     : ScreenComponent(m, "vmpc-warning-settings-ignored", layer)
 {
 }

@@ -111,7 +111,8 @@ namespace mpc::sequencer
         int getNumerator(int i);
         std::vector<int> &getBarLengthsInTicks();
         void setBarLengths(std::vector<int> &);
-        void setNumeratorsAndDenominators(std::vector<int> &numerators, std::vector<int> &denominators);
+        void setNumeratorsAndDenominators(std::vector<int> &numerators,
+                                          std::vector<int> &denominators);
         void deleteBars(int firstBar, int lBar);
         void insertBars(int numberOfBars, int afterBar);
         void moveTrack(int source, int destination);

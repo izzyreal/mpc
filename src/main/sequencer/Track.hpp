@@ -29,10 +29,16 @@ namespace mpc::sequencer
 
         std::vector<std::shared_ptr<Event>> events;
 
-        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>> queuedNoteOnEvents = moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>(20);
-        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>> queuedNoteOffEvents = moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>(20);
-        std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteOnEvent>>(20);
-        std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteOffEvent>>(20);
+        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>
+            queuedNoteOnEvents =
+                moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>(20);
+        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>
+            queuedNoteOffEvents =
+                moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>(20);
+        std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns =
+            std::vector<std::shared_ptr<NoteOnEvent>>(20);
+        std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs =
+            std::vector<std::shared_ptr<NoteOffEvent>>(20);
 
         Sequence *parent{nullptr};
 
@@ -60,13 +66,21 @@ namespace mpc::sequencer
         int getCorrectedTickPos();
 
     public:
-        bool insertEventWhileRetainingSort(const std::shared_ptr<Event> &event, bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
-        std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note, int velocity);
-        bool finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event, int duration);
-        std::shared_ptr<NoteOnEvent> recordNoteEventASync(unsigned char note, unsigned char velocity);
+        bool insertEventWhileRetainingSort(
+            const std::shared_ptr<Event> &event,
+            bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
+        std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note,
+                                                           int velocity);
+        bool finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
+                                     int duration);
+        std::shared_ptr<NoteOnEvent>
+        recordNoteEventASync(unsigned char note, unsigned char velocity);
         void finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent> &event);
-        void addEvent(int tick, const std::shared_ptr<Event> &event, bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
-        void cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick, bool allowMultipleNotesOnSameTick = false);
+        void
+        addEvent(int tick, const std::shared_ptr<Event> &event,
+                 bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
+        void cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
+                                 bool allowMultipleNotesOnSameTick = false);
         void removeEvent(int i);
         void removeEvent(const std::shared_ptr<Event> &event);
         void removeEvents();
@@ -89,10 +103,13 @@ namespace mpc::sequencer
         bool isUsed();
 
     public:
-        std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);
+        std::vector<std::shared_ptr<Event>> getEventRange(int startTick,
+                                                          int endTick);
 
         // Do not call from audio thread
-        void correctTimeRange(int startPos, int endPos, int stepLength, int swingPercentage, int lowestNote, int highestNote);
+        void correctTimeRange(int startPos, int endPos, int stepLength,
+                              int swingPercentage, int lowestNote,
+                              int highestNote);
 
     public:
         // Do not call from audio thread
@@ -103,12 +120,17 @@ namespace mpc::sequencer
 
     public:
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents();
-        void timingCorrect(int fromBar, int toBar, const std::shared_ptr<NoteOnEvent> &noteEvent, int stepLength, int swingPercentage);
-        int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, int swingPercentage);
+        void timingCorrect(int fromBar, int toBar,
+                           const std::shared_ptr<NoteOnEvent> &noteEvent,
+                           int stepLength, int swingPercentage);
+        int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
+                              int swingPercentage);
 
-        // void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
+        // void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int
+        // noteValue, int percentage, std::vector<int>& noteRange);
 
-        void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later, int amount, int lastTick);
+        void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later,
+                         int amount, int lastTick);
 
         std::string getActualName();
 

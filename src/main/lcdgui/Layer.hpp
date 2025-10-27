@@ -11,8 +11,7 @@
 namespace mpc::lcdgui
 {
 
-    class Layer
-        : public Component
+    class Layer : public Component
     {
 
     private:

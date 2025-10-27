@@ -2,7 +2,8 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-TransmitProgramChangesScreen::TransmitProgramChangesScreen(mpc::Mpc &mpc, const int layerIndex)
+TransmitProgramChangesScreen::TransmitProgramChangesScreen(mpc::Mpc &mpc,
+                                                           const int layerIndex)
     : ScreenComponent(mpc, "transmit-program-changes", layerIndex)
 {
 }
@@ -26,7 +27,8 @@ void TransmitProgramChangesScreen::turnWheel(int i)
 
 void TransmitProgramChangesScreen::displayTransmitProgramChangesInThisTrack()
 {
-    findField("inthistrack")->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
+    findField("inthistrack")
+        ->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
 }
 
 bool TransmitProgramChangesScreen::isTransmitProgramChangesInThisTrackEnabled()

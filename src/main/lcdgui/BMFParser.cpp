@@ -58,10 +58,11 @@ void BMFParser::OrderCharsByID(std::vector<bmfont_char> *chars)
     }
 }
 
-bool BMFParser::GetBMFontData(const char *pBinary, size_t fileSize, bmfont *pBMFont)
+bool BMFParser::GetBMFontData(const char *pBinary, size_t fileSize,
+                              bmfont *pBMFont)
 {
-    if (!((pBinary[0] == 'B' && pBinary[1] == 'M' &&
-           pBinary[2] == 'F' && pBinary[3] == 3)))
+    if (!((pBinary[0] == 'B' && pBinary[1] == 'M' && pBinary[2] == 'F' &&
+           pBinary[3] == 3)))
     {
         return false;
     }

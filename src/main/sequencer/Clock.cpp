@@ -22,8 +22,10 @@ Clock::Clock()
 
 void Clock::reset()
 {
-    previousHostPositionAtStartOfBufferQuarterNotes = std::numeric_limits<double>::lowest();
-    previousAbsolutePositionQuarterNotes = std::numeric_limits<double>::lowest();
+    previousHostPositionAtStartOfBufferQuarterNotes =
+        std::numeric_limits<double>::lowest();
+    previousAbsolutePositionQuarterNotes =
+        std::numeric_limits<double>::lowest();
     previousRelativePositionQuarterNotes = std::numeric_limits<double>::max();
     previousTimeInSamples = std::numeric_limits<int64_t>::lowest();
     previousBufferSize = 0;
@@ -43,11 +45,8 @@ const std::vector<uint16_t> &Clock::getTicksForCurrentBuffer()
 }
 
 void Clock::computeTicksForCurrentBuffer(
-    const double hostPositionAtStartOfBufferQuarterNotes,
-    const int nFrames,
-    const int sampleRate,
-    const double bpm,
-    const int64_t timeInSamples)
+    const double hostPositionAtStartOfBufferQuarterNotes, const int nFrames,
+    const int sampleRate, const double bpm, const int64_t timeInSamples)
 {
     resetJumpOccurredInLastBuffer();
     clearTicks();
@@ -62,8 +61,8 @@ void Clock::computeTicksForCurrentBuffer(
             if (timeInSamples != previousTimeInSamples + previousBufferSize &&
                 timeInSamples != previousTimeInSamples)
             {
-                // We have jumped backwards or forwards and need to correct the sequencer's
-                // position and the event indices in the tracks.
+                // We have jumped backwards or forwards and need to correct the
+                // sequencer's position and the event indices in the tracks.
                 jumpOccurred = true;
             }
         }
@@ -78,7 +77,8 @@ void Clock::computeTicksForCurrentBuffer(
 
     jumpOccurredInLastBuffer = jumpOccurred;
 
-    previousHostPositionAtStartOfBufferQuarterNotes = hostPositionAtStartOfBufferQuarterNotes;
+    previousHostPositionAtStartOfBufferQuarterNotes =
+        hostPositionAtStartOfBufferQuarterNotes;
     previousSampleRate = sampleRate;
 
     positionsInQuarterNotes.clear();
@@ -94,14 +94,20 @@ void Clock::computeTicksForCurrentBuffer(
 
     if (bpm > previousBpm)
     {
-        // When the tempo has increased drastically, there is the possibility of tick underflow.
-        // Here we compute how many ticks should be created to compensate for this underflow.
-        const double diffBetweenLastProcessedAndCurrentPos = hostPositionAtStartOfBufferQuarterNotes - previousAbsolutePositionQuarterNotes;
-        const double underflowTickCount = floor(diffBetweenLastProcessedAndCurrentPos * Sequencer::TICKS_PER_QUARTER_NOTE);
+        // When the tempo has increased drastically, there is the possibility of
+        // tick underflow. Here we compute how many ticks should be created to
+        // compensate for this underflow.
+        const double diffBetweenLastProcessedAndCurrentPos =
+            hostPositionAtStartOfBufferQuarterNotes -
+            previousAbsolutePositionQuarterNotes;
+        const double underflowTickCount =
+            floor(diffBetweenLastProcessedAndCurrentPos *
+                  Sequencer::TICKS_PER_QUARTER_NOTE);
 
         for (int i = 0; i < underflowTickCount; i++)
         {
-            // All underflowing ticks will be played back at sample index 0 within this buffer.
+            // All underflowing ticks will be played back at sample index 0
+            // within this buffer.
             ticks.push_back(0);
         }
     }
@@ -110,16 +116,19 @@ void Clock::computeTicksForCurrentBuffer(
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        positionsInQuarterNotes.push_back(hostPositionAtStartOfBufferQuarterNotes + offset);
+        positionsInQuarterNotes.push_back(
+            hostPositionAtStartOfBufferQuarterNotes + offset);
         offset += quarterNotesPerSample;
     }
 
     for (int sample = 0; sample < nFrames; ++sample)
     {
-        // When the tempo has decreased drastically, some hosts report a position in quarter notes that is
-        // lower than what was already processed in the previous buffer. Here we make sure
-        // we do not process the already processed positions.
-        if (positionsInQuarterNotes[sample] <= previousAbsolutePositionQuarterNotes)
+        // When the tempo has decreased drastically, some hosts report a
+        // position in quarter notes that is lower than what was already
+        // processed in the previous buffer. Here we make sure we do not process
+        // the already processed positions.
+        if (positionsInQuarterNotes[sample] <=
+            previousAbsolutePositionQuarterNotes)
         {
             continue;
         }
@@ -139,10 +148,12 @@ void Clock::computeTicksForCurrentBuffer(
         previousRelativePositionQuarterNotes = relativePosition;
     }
 
-    if (positionsInQuarterNotes[nFrames - 1] > previousAbsolutePositionQuarterNotes)
+    if (positionsInQuarterNotes[nFrames - 1] >
+        previousAbsolutePositionQuarterNotes)
     {
         // This should happen any time the tempo has not drastically decreased.
-        previousAbsolutePositionQuarterNotes = positionsInQuarterNotes[nFrames - 1];
+        previousAbsolutePositionQuarterNotes =
+            positionsInQuarterNotes[nFrames - 1];
     }
 
     previousBpm = bpm;
@@ -169,62 +180,64 @@ void Clock::resetJumpOccurredInLastBuffer()
     jumpOccurredInLastBuffer = false;
 }
 
-void Clock::generateTransportInfo(const float tempo,
-                                  const uint32_t sampleRate,
+void Clock::generateTransportInfo(const float tempo, const uint32_t sampleRate,
                                   const uint16_t numSamples,
                                   const double playStartPositionQuarterNotes)
 {
-    const double lastProcessedPositionQuarterNotes = getLastProcessedHostPositionQuarterNotes();
+    const double lastProcessedPositionQuarterNotes =
+        getLastProcessedHostPositionQuarterNotes();
     const auto beatsPerFrame = 1.0 / ((1.0 / (tempo / 60.0)) * sampleRate);
 
-    // This approach does not 100% mimic the values that Reaper produces. Although it comes close, Reaper's values are 100% the same if we would
-    // compute without accumulating quarter notes, and instead keep track of the number of buffers that already passed.
-    // I'm currently not sure if this actually needs to be addressed. My gut is that both implementations are more than accurate and correct
-    // enough for most artistic intents and purposes.
+    // This approach does not 100% mimic the values that Reaper produces.
+    // Although it comes close, Reaper's values are 100% the same if we would
+    // compute without accumulating quarter notes, and instead keep track of the
+    // number of buffers that already passed. I'm currently not sure if this
+    // actually needs to be addressed. My gut is that both implementations are
+    // more than accurate and correct enough for most artistic intents and
+    // purposes.
     const auto newPositionQuarterNotes =
-        lastProcessedPositionQuarterNotes == std::numeric_limits<double>::lowest() ? playStartPositionQuarterNotes : (lastProcessedPositionQuarterNotes + (numSamples * beatsPerFrame));
+        lastProcessedPositionQuarterNotes ==
+                std::numeric_limits<double>::lowest()
+            ? playStartPositionQuarterNotes
+            : (lastProcessedPositionQuarterNotes +
+               (numSamples * beatsPerFrame));
 
-    computeTicksForCurrentBuffer(
-        newPositionQuarterNotes,
-        numSamples,
-        sampleRate,
-        tempo,
-        std::numeric_limits<int64_t>::lowest());
+    computeTicksForCurrentBuffer(newPositionQuarterNotes, numSamples,
+                                 sampleRate, tempo,
+                                 std::numeric_limits<int64_t>::lowest());
 }
 
-void Clock::processBufferInternal(const float tempo,
-                                  const uint32_t sampleRate,
+void Clock::processBufferInternal(const float tempo, const uint32_t sampleRate,
                                   const uint16_t numSamples,
                                   const double playStartPositionQuarterNotes)
 {
-    const double lastProcessedPositionQuarterNotes = getLastProcessedHostPositionQuarterNotes();
+    const double lastProcessedPositionQuarterNotes =
+        getLastProcessedHostPositionQuarterNotes();
     const auto beatsPerFrame = 1.0 / ((1.0 / (tempo / 60.0)) * sampleRate);
 
-    // This approach does not 100% mimic the values that Reaper produces. Although it comes close, Reaper's values are 100% the same if we would
-    // compute without accumulating quarter notes, and instead keep track of the number of buffers that already passed.
-    // I'm currently not sure if this actually needs to be addressed. My gut is that both implementations are more than accurate and correct
-    // enough for most artistic intents and purposes.
+    // This approach does not 100% mimic the values that Reaper produces.
+    // Although it comes close, Reaper's values are 100% the same if we would
+    // compute without accumulating quarter notes, and instead keep track of the
+    // number of buffers that already passed. I'm currently not sure if this
+    // actually needs to be addressed. My gut is that both implementations are
+    // more than accurate and correct enough for most artistic intents and
+    // purposes.
     const auto newPositionQuarterNotes =
-        lastProcessedPositionQuarterNotes == std::numeric_limits<double>::lowest() ? playStartPositionQuarterNotes : (lastProcessedPositionQuarterNotes + (numSamples * beatsPerFrame));
+        lastProcessedPositionQuarterNotes ==
+                std::numeric_limits<double>::lowest()
+            ? playStartPositionQuarterNotes
+            : (lastProcessedPositionQuarterNotes +
+               (numSamples * beatsPerFrame));
 
-    computeTicksForCurrentBuffer(
-        newPositionQuarterNotes,
-        numSamples,
-        sampleRate,
-        tempo,
-        std::numeric_limits<int64_t>::lowest());
+    computeTicksForCurrentBuffer(newPositionQuarterNotes, numSamples,
+                                 sampleRate, tempo,
+                                 std::numeric_limits<int64_t>::lowest());
 }
 
 void Clock::processBufferExternal(
-    const double hostPositionAtStartOfBufferQuarterNotes,
-    const int nFrames,
-    const int sampleRate,
-    const double bpm,
-    const int64_t timeInSamples)
+    const double hostPositionAtStartOfBufferQuarterNotes, const int nFrames,
+    const int sampleRate, const double bpm, const int64_t timeInSamples)
 {
     computeTicksForCurrentBuffer(hostPositionAtStartOfBufferQuarterNotes,
-                                 nFrames,
-                                 sampleRate,
-                                 bpm,
-                                 timeInSamples);
+                                 nFrames, sampleRate, bpm, timeInSamples);
 }

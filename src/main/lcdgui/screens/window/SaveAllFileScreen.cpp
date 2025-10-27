@@ -35,7 +35,8 @@ void SaveAllFileScreen::displayFile()
     }
 
     findField("file")->setText(fileName.substr(0, 1));
-    findLabel("file1")->setText(StrUtil::padRight(fileName.substr(1), " ", 15) + ".ALL");
+    findLabel("file1")->setText(StrUtil::padRight(fileName.substr(1), " ", 15) +
+                                ".ALL");
 }
 
 void SaveAllFileScreen::openNameScreen()
@@ -96,10 +97,12 @@ void SaveAllFileScreen::function(int i)
                 };
 
                 auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-                fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]
-                                             {
-                                                 mpc.getLayeredScreen()->openScreen<SaveScreen>();
-                                             });
+                fileExistsScreen->initialize(
+                    replaceAction, initializeNameScreen,
+                    [this]
+                    {
+                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                    });
                 mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
                 return;
             }

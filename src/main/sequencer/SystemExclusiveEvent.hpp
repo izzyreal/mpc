@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class SystemExclusiveEvent
-        : public Event
+    class SystemExclusiveEvent : public Event
     {
 
     private:

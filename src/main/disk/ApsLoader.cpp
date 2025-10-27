@@ -44,7 +44,10 @@ void ApsLoader::load(mpc::Mpc &mpc, std::shared_ptr<MpcFile> file)
 
     if (!apsParser.isHeaderValid())
     {
-        MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
+        MLOG(
+            "The APS file you're trying to load does not have a valid ID. The "
+            "first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 "
+            "APS files start with 0A 04 and are not supported (yet?).");
 
         throw std::runtime_error("Invalid APS header");
     }
@@ -55,7 +58,8 @@ void ApsLoader::load(mpc::Mpc &mpc, std::shared_ptr<MpcFile> file)
     mpc.getSampler()->setSoundIndex(0);
 }
 
-void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc, bool headless, bool withoutSounds)
+void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
+                                  bool headless, bool withoutSounds)
 {
     auto sampler = mpc.getSampler();
     auto disk = mpc.getDisk();
@@ -77,11 +81,14 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc, bool head
         {
             auto ext = "snd";
             std::shared_ptr<MpcFile> soundFile;
-            std::string soundFileName = StrUtil::replaceAll(apsParser.getSoundNames()[i], ' ', "");
+            std::string soundFileName =
+                StrUtil::replaceAll(apsParser.getSoundNames()[i], ' ', "");
 
             for (auto &f : disk->getAllFiles())
             {
-                if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
+                if (StrUtil::eqIgnoreCase(
+                        StrUtil::replaceAll(f->getName(), ' ', ""),
+                        soundFileName + ".SND"))
                 {
                     soundFile = f;
                     break;
@@ -92,7 +99,9 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc, bool head
             {
                 for (auto &f : disk->getAllFiles())
                 {
-                    if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
+                    if (StrUtil::eqIgnoreCase(
+                            StrUtil::replaceAll(f->getName(), ' ', ""),
+                            soundFileName + ".WAV"))
                     {
                         soundFile = f;
                         ext = "wav";
@@ -134,61 +143,84 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc, bool head
         {
             newProgram->getPad(noteIndex)->setNote(assignTable[noteIndex]);
 
-            auto sourceStereoMixerChannel = apsProgram->getStereoMixerChannel(noteIndex);
-            auto sourceIndivFxMixerChannel = apsProgram->getIndivFxMixerChannel(noteIndex);
+            auto sourceStereoMixerChannel =
+                apsProgram->getStereoMixerChannel(noteIndex);
+            auto sourceIndivFxMixerChannel =
+                apsProgram->getIndivFxMixerChannel(noteIndex);
 
-            auto destNoteParams = dynamic_cast<NoteParameters *>(newProgram->getNoteParameters(noteIndex + 35));
+            auto destNoteParams = dynamic_cast<NoteParameters *>(
+                newProgram->getNoteParameters(noteIndex + 35));
             auto destStereoMixerCh = destNoteParams->getStereoMixerChannel();
             auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel();
 
             destIndivFxCh->setFxPath(sourceIndivFxMixerChannel.getFxPath());
             destStereoMixerCh->setLevel(sourceStereoMixerChannel.getLevel());
-            destStereoMixerCh->setPanning(sourceStereoMixerChannel.getPanning());
-            destIndivFxCh->setVolumeIndividualOut(sourceIndivFxMixerChannel.getVolumeIndividualOut());
-            destIndivFxCh->setFxSendLevel(sourceIndivFxMixerChannel.getFxSendLevel());
+            destStereoMixerCh->setPanning(
+                sourceStereoMixerChannel.getPanning());
+            destIndivFxCh->setVolumeIndividualOut(
+                sourceIndivFxMixerChannel.getVolumeIndividualOut());
+            destIndivFxCh->setFxSendLevel(
+                sourceIndivFxMixerChannel.getFxSendLevel());
             destIndivFxCh->setOutput(sourceIndivFxMixerChannel.getOutput());
 
             auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
 
             auto soundIndex = srcNoteParams->getSoundIndex();
 
-            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
+            if (find(begin(unavailableSoundIndices),
+                     end(unavailableSoundIndices),
+                     soundIndex) != end(unavailableSoundIndices))
             {
                 soundIndex = -1;
             }
 
-            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices))
+            if (soundIndex != -1 &&
+                finalSoundIndices.find(soundIndex) != end(finalSoundIndices))
             {
                 soundIndex = finalSoundIndices[soundIndex];
             }
 
             destNoteParams->setSoundIndex(soundIndex);
             destNoteParams->setTune(srcNoteParams->getTune());
-            destNoteParams->setVoiceOverlapMode(srcNoteParams->getVoiceOverlapMode());
+            destNoteParams->setVoiceOverlapMode(
+                srcNoteParams->getVoiceOverlapMode());
             destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
             destNoteParams->setAttack(srcNoteParams->getAttack());
             destNoteParams->setDecay(srcNoteParams->getDecay());
-            destNoteParams->setFilterAttack(srcNoteParams->getVelocityToFilterAttack());
-            destNoteParams->setFilterDecay(srcNoteParams->getVelocityToFilterDecay());
-            destNoteParams->setFilterEnvelopeAmount(srcNoteParams->getVelocityToFilterAmount());
-            destNoteParams->setFilterFrequency(srcNoteParams->getCutoffFrequency());
+            destNoteParams->setFilterAttack(
+                srcNoteParams->getVelocityToFilterAttack());
+            destNoteParams->setFilterDecay(
+                srcNoteParams->getVelocityToFilterDecay());
+            destNoteParams->setFilterEnvelopeAmount(
+                srcNoteParams->getVelocityToFilterAmount());
+            destNoteParams->setFilterFrequency(
+                srcNoteParams->getCutoffFrequency());
             destNoteParams->setFilterResonance(srcNoteParams->getResonance());
             destNoteParams->setMuteAssignA(srcNoteParams->getMute1());
             destNoteParams->setMuteAssignB(srcNoteParams->getMute2());
             destNoteParams->setOptNoteA(srcNoteParams->getAlsoPlay1());
             destNoteParams->setOptionalNoteB(srcNoteParams->getAlsoPlay2());
-            destNoteParams->setSliderParameterNumber(srcNoteParams->getSliderParameter());
-            destNoteParams->setSoundGenMode(srcNoteParams->getSoundGenerationMode());
-            destNoteParams->setVelocityToStart(srcNoteParams->getVelocityToStart());
-            destNoteParams->setVelocityToAttack(srcNoteParams->getVelocityToAttack());
-            destNoteParams->setVelocityToFilterFrequency(srcNoteParams->getVelocityToFilterFrequency());
+            destNoteParams->setSliderParameterNumber(
+                srcNoteParams->getSliderParameter());
+            destNoteParams->setSoundGenMode(
+                srcNoteParams->getSoundGenerationMode());
+            destNoteParams->setVelocityToStart(
+                srcNoteParams->getVelocityToStart());
+            destNoteParams->setVelocityToAttack(
+                srcNoteParams->getVelocityToAttack());
+            destNoteParams->setVelocityToFilterFrequency(
+                srcNoteParams->getVelocityToFilterFrequency());
             destNoteParams->setVeloToLevel(srcNoteParams->getVelocityToLevel());
-            destNoteParams->setVeloRangeLower(srcNoteParams->getVelocityRangeLower());
-            destNoteParams->setVeloRangeUpper(srcNoteParams->getVelocityRangeUpper());
-            destNoteParams->setVelocityToPitch(srcNoteParams->getVelocityToPitch());
+            destNoteParams->setVeloRangeLower(
+                srcNoteParams->getVelocityRangeLower());
+            destNoteParams->setVeloRangeUpper(
+                srcNoteParams->getVelocityRangeUpper());
+            destNoteParams->setVelocityToPitch(
+                srcNoteParams->getVelocityToPitch());
         }
 
-        auto slider = dynamic_cast<mpc::sampler::PgmSlider *>(newProgram->getSlider());
+        auto slider =
+            dynamic_cast<mpc::sampler::PgmSlider *>(newProgram->getSlider());
         slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
         slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
         slider->setControlChange(apsProgram->getSlider()->getProgramChange());
@@ -223,16 +255,20 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc, bool head
 
         auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
         drum.setProgram(pgm);
-        drum.setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
-        drum.setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
+        drum.setReceivePgmChange(
+            apsParser.getDrumConfiguration(i)->getReceivePgmChange());
+        drum.setReceiveMidiVolume(
+            apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
     }
 
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
     auto globals = apsParser.getGlobalParameters();
 
-    mixerSetupScreen->setRecordMixChangesEnabled(globals->isRecordMixChangesEnabled());
-    mixerSetupScreen->setCopyPgmMixToDrumEnabled(globals->isCopyPgmMixToDrumEnabled());
+    mixerSetupScreen->setRecordMixChangesEnabled(
+        globals->isRecordMixChangesEnabled());
+    mixerSetupScreen->setCopyPgmMixToDrumEnabled(
+        globals->isCopyPgmMixToDrumEnabled());
     mixerSetupScreen->setFxDrum(globals->getFxDrum());
     mixerSetupScreen->setIndivFxSourceDrum(globals->isIndivFxSourceDrum());
     mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
@@ -246,10 +282,8 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc, bool head
     pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
 
-void ApsLoader::loadSound(mpc::Mpc &mpc,
-                          std::string soundFileName,
-                          std::string ext,
-                          std::weak_ptr<MpcFile> _soundFile,
+void ApsLoader::loadSound(mpc::Mpc &mpc, std::string soundFileName,
+                          std::string ext, std::weak_ptr<MpcFile> _soundFile,
                           bool headless)
 {
     auto soundFile = _soundFile.lock();
@@ -278,9 +312,12 @@ void ApsLoader::loadSound(mpc::Mpc &mpc,
     }
 }
 
-void ApsLoader::showPopup(mpc::Mpc &mpc, std::string name, std::string ext, int sampleSize)
+void ApsLoader::showPopup(mpc::Mpc &mpc, std::string name, std::string ext,
+                          int sampleSize)
 {
-    std::string msg = "LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
+    std::string msg =
+        "LOADING " +
+        StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
     mpc.getLayeredScreen()->showPopupAndAwaitInteraction(msg);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }

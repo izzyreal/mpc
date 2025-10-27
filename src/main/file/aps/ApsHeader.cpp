@@ -12,7 +12,8 @@ ApsHeader::ApsHeader(const std::vector<char> &loadBytes)
     valid = loadBytes[0] == APS_HEADER_MAGIC[0] &&
             loadBytes[1] == APS_HEADER_MAGIC[1];
 
-    soundCount = mpc::file::ByteUtil::bytes2ushort({loadBytes[2], loadBytes[3]});
+    soundCount =
+        mpc::file::ByteUtil::bytes2ushort({loadBytes[2], loadBytes[3]});
 
     assert(soundCount <= Mpc2000XlSpecs::MAX_SOUND_COUNT_IN_MEMORY);
 }

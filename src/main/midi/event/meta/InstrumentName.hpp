@@ -10,8 +10,7 @@ namespace mpc
             namespace meta
             {
 
-                class InstrumentName
-                    : public TextualMetaEvent
+                class InstrumentName : public TextualMetaEvent
                 {
 
                 public:

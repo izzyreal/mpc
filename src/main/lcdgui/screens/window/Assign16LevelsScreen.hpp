@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class Assign16LevelsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class Assign16LevelsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -15,7 +14,8 @@ namespace mpc::lcdgui::screens::window
         Assign16LevelsScreen(mpc::Mpc &mpc, const int layerIndex);
 
     private:
-        const std::vector<std::string> typeNames{"TUNING", "DECAY", "ATTACK", "FILTER"};
+        const std::vector<std::string> typeNames{"TUNING", "DECAY", "ATTACK",
+                                                 "FILTER"};
         const std::vector<std::string> paramNames{"VELOCITY", "NOTE VAR"};
 
         int note = 35;

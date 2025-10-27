@@ -5,12 +5,12 @@
 using namespace mpc::engine::audio::server;
 using namespace std;
 
-StereoOutputProcess::StereoOutputProcess(string name)
-    : AudioServerProcess(name)
+StereoOutputProcess::StereoOutputProcess(string name) : AudioServerProcess(name)
 {
 }
 
-int StereoOutputProcess::processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames)
+int StereoOutputProcess::processAudio(
+    mpc::engine::audio::core::AudioBuffer *buffer, int nFrames)
 {
 
     if (!buffer->isRealTime())

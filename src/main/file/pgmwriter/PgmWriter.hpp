@@ -27,6 +27,7 @@ namespace mpc::file::pgmwriter
     public:
         std::vector<char> get();
 
-        PgmWriter(mpc::sampler::Program *program, std::weak_ptr<mpc::sampler::Sampler> sampler);
+        PgmWriter(mpc::sampler::Program *program,
+                  std::weak_ptr<mpc::sampler::Sampler> sampler);
     };
 } // namespace mpc::file::pgmwriter

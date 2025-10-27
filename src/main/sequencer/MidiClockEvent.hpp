@@ -7,8 +7,7 @@
 
 namespace mpc::sequencer
 {
-    class MidiClockEvent
-        : public Event
+    class MidiClockEvent : public Event
     {
 
     public:

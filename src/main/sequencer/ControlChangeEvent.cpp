@@ -35,7 +35,9 @@ int ControlChangeEvent::getAmount() const
     return controllerValue;
 }
 
-mpc::sequencer::ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent &event) : Event(event)
+mpc::sequencer::ControlChangeEvent::ControlChangeEvent(
+    const ControlChangeEvent &event)
+    : Event(event)
 {
     setAmount(event.getAmount());
     setController(event.getController());

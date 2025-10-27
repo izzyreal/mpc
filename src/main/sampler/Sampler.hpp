@@ -20,8 +20,8 @@ namespace mpc::sampler
     const int16_t CLICK_SOUND = -2;
 
     // Not sure if we actually need this.
-    // We should investigate if PreviewSoundPlayer::mpcNoteOn or Drum::mpcNoteOn ever
-    // receive calls with `soundIndex` == -1.
+    // We should investigate if PreviewSoundPlayer::mpcNoteOn or Drum::mpcNoteOn
+    // ever receive calls with `soundIndex` == -1.
     const int16_t NO_SOUND = -1;
 
     class Sound;
@@ -54,9 +54,10 @@ namespace mpc::sampler
         int getProgramCount();
 
         /**
-         * The `programs` collection is always of size MAX_PROGRAM_COUNT (which is 24 for an MPC2000XL),
-         * where a nullptr element indicates a free slot. This method creates a new program at the first
-         * available slot. A nullptr is returned if all slots are occupied.
+         * The `programs` collection is always of size MAX_PROGRAM_COUNT (which
+         * is 24 for an MPC2000XL), where a nullptr element indicates a free
+         * slot. This method creates a new program at the first available slot.
+         * A nullptr is returned if all slots are occupied.
          */
         std::weak_ptr<Program> createNewProgramAddFirstAvailableSlot();
 
@@ -89,7 +90,8 @@ namespace mpc::sampler
         void deleteSound(const std::shared_ptr<Sound> &sound);
         void deleteSoundWithoutRepairingPrograms(std::shared_ptr<Sound> sound);
         void trimSample(int sampleNumber, int start, int end);
-        void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
+        void deleteSection(const unsigned int sampleNumber,
+                           const unsigned int start, const unsigned int end);
         void switchToNextSoundSortType();
         std::string getSoundSortingTypeName();
         void deleteAllSamples();
@@ -100,9 +102,10 @@ namespace mpc::sampler
         std::string addOrIncreaseNumber(std::string s);
         int getUnusedSampleCount();
         void purge();
-        void mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
-                           std::shared_ptr<const std::vector<float>> sourceRight,
-                           std::shared_ptr<std::vector<float>> dest);
+        void
+        mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
+                      std::shared_ptr<const std::vector<float>> sourceRight,
+                      std::shared_ptr<std::vector<float>> dest);
         void setDrumBusProgramIndex(int busNumber, int programIndex);
 
         // busNumber between 1 and 4, i.e. 1-based DRUM index
@@ -115,8 +118,10 @@ namespace mpc::sampler
         int checkExists(std::string soundName);
         void selectPreviousSound();
         void selectNextSound();
-        std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &getDrumStereoMixerChannels(int i);
-        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &getDrumIndivFxMixerChannels(int i);
+        std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &
+        getDrumStereoMixerChannels(int i);
+        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &
+        getDrumIndivFxMixerChannels(int i);
         std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
         void copyProgram(const int sourceIndex, const int destIndex);
         std::vector<int> *getInitMasterPadAssign();
@@ -125,11 +130,15 @@ namespace mpc::sampler
         void setPlayX(int i);
         int getPlayX();
 
-        static std::vector<float> mergeToStereo(const std::vector<float> &fa0, const std::vector<float> &fa1);
+        static std::vector<float> mergeToStereo(const std::vector<float> &fa0,
+                                                const std::vector<float> &fa1);
         static void process12Bit(std::vector<float> &data);
         static void process8Bit(std::vector<float> &data);
-        static void resample(std::shared_ptr<const std::vector<float>> data, int sourceRate, std::shared_ptr<Sound> destSnd);
-        static std::vector<float> resampleSingleChannel(std::vector<float> &input, int sourceRate, int destRate);
+        static void resample(std::shared_ptr<const std::vector<float>> data,
+                             int sourceRate, std::shared_ptr<Sound> destSnd);
+        static std::vector<float>
+        resampleSingleChannel(std::vector<float> &input, int sourceRate,
+                              int destRate);
         std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 
         void clearAllProgramPadPressRegistries();
@@ -145,17 +154,23 @@ namespace mpc::sampler
         std::vector<int> masterPadAssign;
 
         std::vector<std::shared_ptr<Sound>> sounds;
-        std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(Mpc2000XlSpecs::MAX_PROGRAM_COUNT);
+        std::vector<std::shared_ptr<Program>> programs =
+            std::vector<std::shared_ptr<Program>>(
+                Mpc2000XlSpecs::MAX_PROGRAM_COUNT);
         unsigned char soundSortingType = 0;
         std::vector<std::string> padNames;
-        std::vector<std::string> abcd = std::vector<std::string>{"A", "B", "C", "D"};
+        std::vector<std::string> abcd =
+            std::vector<std::string>{"A", "B", "C", "D"};
         std::shared_ptr<Sound> clickSound;
-        std::vector<std::string> sortNames = std::vector<std::string>{"MEMORY", "NAME", "SIZE"};
+        std::vector<std::string> sortNames =
+            std::vector<std::string>{"MEMORY", "NAME", "SIZE"};
         std::vector<std::shared_ptr<Sound>> getUsedSounds();
         int getLastInt(std::string s);
         std::string addOrIncreaseNumber2(std::string s);
         void trimSample(std::weak_ptr<Sound>, int start, int end);
-        std::vector<std::pair<std::shared_ptr<Sound>, int>> getSoundsSortedByName();
-        std::vector<std::pair<std::shared_ptr<Sound>, int>> getSoundsSortedBySize();
+        std::vector<std::pair<std::shared_ptr<Sound>, int>>
+        getSoundsSortedByName();
+        std::vector<std::pair<std::shared_ptr<Sound>, int>>
+        getSoundsSortedBySize();
     };
 } // namespace mpc::sampler

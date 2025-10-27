@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-    class InitScreen
-        : public mpc::lcdgui::ScreenComponent
+    class InitScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -9,6 +9,10 @@ ReleaseRecCommand::ReleaseRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseRecCommand::execute()
 {
-    mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(mpc.getSequencer()->isRecording());
-    mpc.getHardware()->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(mpc.getSequencer()->isOverdubbing());
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::REC_LED)
+        ->setEnabled(mpc.getSequencer()->isRecording());
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::OVERDUB_LED)
+        ->setEnabled(mpc.getSequencer()->isOverdubbing());
 }

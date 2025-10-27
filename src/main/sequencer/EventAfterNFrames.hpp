@@ -13,7 +13,8 @@ namespace mpc::sequencer
         int64_t nFrames = 0;
         int64_t frameCounter = -1;
 
-        void init(const unsigned long &newNFrames, std::function<void()> callback)
+        void init(const unsigned long &newNFrames,
+                  std::function<void()> callback)
         {
             occupied.store(true);
             nFrames = newNFrames;

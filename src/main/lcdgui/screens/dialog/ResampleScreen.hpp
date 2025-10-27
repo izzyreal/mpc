@@ -9,9 +9,8 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class ResampleScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class ResampleScreen : public mpc::lcdgui::ScreenComponent,
+                           public mpc::lcdgui::screens::OpensNameScreen
     {
 
     public:
@@ -24,8 +23,10 @@ namespace mpc::lcdgui::screens::dialog
         void open() override;
 
     private:
-        const std::vector<std::string> qualityNames = std::vector<std::string>{"LOW", "MED", "HIGH"};
-        const std::vector<std::string> bitNames = std::vector<std::string>{"16", "12", "8"};
+        const std::vector<std::string> qualityNames =
+            std::vector<std::string>{"LOW", "MED", "HIGH"};
+        const std::vector<std::string> bitNames =
+            std::vector<std::string>{"16", "12", "8"};
 
         void displayNewFs();
         void displayQuality();

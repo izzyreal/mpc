@@ -14,8 +14,7 @@ namespace mpc
 namespace mpc::lcdgui
 {
 
-    class Info
-        : public Component
+    class Info : public Component
     {
 
     public:

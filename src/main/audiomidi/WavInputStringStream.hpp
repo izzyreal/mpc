@@ -12,7 +12,8 @@ static const int EXPECTED_FMT_DATA_SIZE = 16;
 
 std::istringstream wav_init_istringstream(char *data, int size)
 {
-    std::istringstream result(std::string(data, data + size), std::ios::in | std::ios::binary);
+    std::istringstream result(std::string(data, data + size),
+                              std::ios::in | std::ios::binary);
     result.unsetf(std::ios_base::skipws);
     return result;
 }
@@ -46,7 +47,8 @@ int wav_get_LE(std::istringstream &stream, int numBytes)
     return val;
 }
 
-bool wav_read_header(std::istringstream &stream, int &sampleRate, int &validBits, int &numChannels, int &numFrames)
+bool wav_read_header(std::istringstream &stream, int &sampleRate,
+                     int &validBits, int &numChannels, int &numFrames)
 {
     stream.seekg(0, stream.end);
 

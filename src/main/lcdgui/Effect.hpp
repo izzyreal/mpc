@@ -5,8 +5,7 @@
 namespace mpc::lcdgui
 {
 
-    class Effect
-        : public Component
+    class Effect : public Component
     {
 
     private:

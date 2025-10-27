@@ -5,8 +5,7 @@
 
 namespace mpc::midi::event::meta
 {
-    class EndOfTrack
-        : public MetaEvent
+    class EndOfTrack : public MetaEvent
     {
 
     public:

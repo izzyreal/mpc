@@ -49,5 +49,6 @@ void InitPadAssignScreen::function(int i)
 
 void InitPadAssignScreen::displayInitPadAssign()
 {
-    findField("init-pad-assign")->setText(initPadAssignIsMaster ? "MASTER" : "PROGRAM");
+    findField("init-pad-assign")
+        ->setText(initPadAssignIsMaster ? "MASTER" : "PROGRAM");
 }

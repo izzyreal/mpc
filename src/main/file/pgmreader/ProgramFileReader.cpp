@@ -11,7 +11,8 @@
 
 using namespace mpc::file::pgmreader;
 
-ProgramFileReader::ProgramFileReader(std::weak_ptr<mpc::disk::MpcFile> _programFile)
+ProgramFileReader::ProgramFileReader(
+    std::weak_ptr<mpc::disk::MpcFile> _programFile)
     : programFile(_programFile)
 {
     pgmHeader = new PgmHeader(this);

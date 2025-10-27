@@ -3,9 +3,12 @@
 using namespace mpc;
 
 DirectorySaveTarget::DirectorySaveTarget(fs::path basePath)
-    : basePath(std::move(basePath)) {}
+    : basePath(std::move(basePath))
+{
+}
 
-void DirectorySaveTarget::setFileData(const fs::path &path, const std::vector<char> &data)
+void DirectorySaveTarget::setFileData(const fs::path &path,
+                                      const std::vector<char> &data)
 {
     const auto absPath = basePath / path;
     if (data.empty())

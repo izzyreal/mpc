@@ -41,12 +41,14 @@ ClientHardwareEventController::ClientHardwareEventController(mpc::Mpc &mpcToUse)
 {
 }
 
-void ClientHardwareEventController::handleClientHardwareEvent(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handleClientHardwareEvent(
+    const ClientHardwareEvent &event)
 {
     if (event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
-        if (const auto nameScreen = std::dynamic_pointer_cast<NameScreen>(mpc.getScreen()); nameScreen &&
-                                                                                            event.textInputKey)
+        if (const auto nameScreen =
+                std::dynamic_pointer_cast<NameScreen>(mpc.getScreen());
+            nameScreen && event.textInputKey)
         {
             if (event.textInputKey->isPress)
             {
@@ -94,7 +96,8 @@ void ClientHardwareEventController::handleClientHardwareEvent(const ClientHardwa
     }
 }
 
-void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handlePadPress(
+    const ClientHardwareEvent &event)
 {
     if (!event.index || !event.value)
     {
@@ -111,7 +114,9 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
 
     auto screen = layeredScreen->getCurrentScreen();
 
-    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(screen); opensNameScreen)
+    if (auto opensNameScreen =
+            std::dynamic_pointer_cast<OpensNameScreen>(screen);
+        opensNameScreen)
     {
         opensNameScreen->openNameScreen();
 
@@ -123,11 +128,12 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
 
     const auto physicalPadIndex = *event.index;
 
-    const auto velocity = *event.value * (float)VelocitySensitivePressable::MAX_VELO;
+    const auto velocity =
+        *event.value * (float)VelocitySensitivePressable::MAX_VELO;
 
-    const auto clampedVelocity = std::clamp(velocity,
-                                            (float)VelocitySensitivePressable::MIN_VELO,
-                                            (float)VelocitySensitivePressable::MAX_VELO);
+    const auto clampedVelocity =
+        std::clamp(velocity, (float)VelocitySensitivePressable::MIN_VELO,
+                   (float)VelocitySensitivePressable::MAX_VELO);
 
     auto pad = mpc.getHardware()->getPad(physicalPadIndex);
 
@@ -142,18 +148,25 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
 
     if (layeredScreen->isCurrentScreen<NameScreen>())
     {
-        registerPhysicalPadPush(physicalPadIndex, activeBank, screen, event.source, maybeDrumIndex);
-        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(event.componentId);
+        registerPhysicalPadPush(physicalPadIndex, activeBank, screen,
+                                event.source, maybeDrumIndex);
+        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
+            event.componentId);
         return;
     }
 
-    registerPhysicalPadPush(physicalPadIndex, activeBank, screen, event.source, maybeDrumIndex);
+    registerPhysicalPadPush(physicalPadIndex, activeBank, screen, event.source,
+                            maybeDrumIndex);
 
-    const auto programPadIndex = physicalPadIndex + (static_cast<int>(activeBank) * 16);
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(mpc, programPadIndex, clampedVelocity, screen);
+    const auto programPadIndex =
+        physicalPadIndex + (static_cast<int>(activeBank) * 16);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+        mpc, programPadIndex, clampedVelocity, screen);
 
-    const bool isF4Pressed = mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
-    const bool isF6Pressed = mpc.getHardware()->getButton(ComponentId::F6)->isPressed();
+    const bool isF4Pressed =
+        mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
+    const bool isF6Pressed =
+        mpc.getHardware()->getButton(ComponentId::F6)->isPressed();
 
     PushPadScreenUpdateContext padPushScreenUpdateCtx{
         ctx.isSixteenLevelsEnabled,
@@ -166,16 +179,15 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
         ctx.setSelectedPad,
         ctx.allowCentralNoteAndPadUpdate};
 
-    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex).execute();
+    PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex)
+        .execute();
 
     NoteInputScreenUpdateContext noteInputScreenUpdateContext{
-        ctx.isSixteenLevelsEnabled,
-        ctx.allowCentralNoteAndPadUpdate,
-        ctx.screenComponent,
-        ctx.setSelectedNote,
-        ctx.currentFieldName};
+        ctx.isSixteenLevelsEnabled, ctx.allowCentralNoteAndPadUpdate,
+        ctx.screenComponent, ctx.setSelectedNote, ctx.currentFieldName};
 
-    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note).execute();
+    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note)
+        .execute();
 
     if (std::dynamic_pointer_cast<PopupScreen>(screen))
     {
@@ -190,7 +202,8 @@ void ClientHardwareEventController::handlePadPress(const ClientHardwareEvent &ev
     TriggerDrumNoteOnCommand(ctx).execute();
 }
 
-void ClientHardwareEventController::handlePadRelease(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handlePadRelease(
+    const ClientHardwareEvent &event)
 {
     if (!event.index)
     {
@@ -214,23 +227,30 @@ void ClientHardwareEventController::handlePadRelease(const ClientHardwareEvent &
         return;
     }
 
-    const auto programPadIndex = physicalPadIndex + (static_cast<int>(info.bank) * 16);
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(mpc, programPadIndex, info.drumIndex, info.screen);
+    const auto programPadIndex =
+        physicalPadIndex + (static_cast<int>(info.bank) * 16);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+        mpc, programPadIndex, info.drumIndex, info.screen);
     TriggerDrumNoteOffCommand(ctx).execute();
 }
 
-void ClientHardwareEventController::handlePadAftertouch(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handlePadAftertouch(
+    const ClientHardwareEvent &event)
 {
     if (!event.index || !event.value)
     {
         return;
     }
     const auto padIndex = *event.index;
-    const auto pressureToUse = std::clamp(*event.value * Aftertouchable::MAX_PRESSURE, (float)Aftertouchable::MIN_PRESSURE, (float)Aftertouchable::MAX_PRESSURE);
+    const auto pressureToUse =
+        std::clamp(*event.value * Aftertouchable::MAX_PRESSURE,
+                   (float)Aftertouchable::MIN_PRESSURE,
+                   (float)Aftertouchable::MAX_PRESSURE);
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 }
 
-void ClientHardwareEventController::handleDataWheel(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handleDataWheel(
+    const ClientHardwareEvent &event)
 {
     if (!event.deltaValue)
     {
@@ -262,13 +282,16 @@ void ClientHardwareEventController::handleDataWheel(const ClientHardwareEvent &e
 
     screen->turnWheel(steps);
 
-    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(screen); opensNameScreen)
+    if (auto opensNameScreen =
+            std::dynamic_pointer_cast<OpensNameScreen>(screen);
+        opensNameScreen)
     {
         opensNameScreen->openNameScreen();
     }
 }
 
-void ClientHardwareEventController::handleSlider(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handleSlider(
+    const ClientHardwareEvent &event)
 {
     auto slider = mpc.getHardware()->getSlider();
 
@@ -286,8 +309,9 @@ void ClientHardwareEventController::handleSlider(const ClientHardwareEvent &even
 
 void ClientHardwareEventController::handlePot(const ClientHardwareEvent &event)
 {
-    std::shared_ptr<Pot> pot =
-        event.componentId == ComponentId::REC_GAIN_POT ? mpc.getHardware()->getRecPot() : mpc.getHardware()->getVolPot();
+    std::shared_ptr<Pot> pot = event.componentId == ComponentId::REC_GAIN_POT
+                                   ? mpc.getHardware()->getRecPot()
+                                   : mpc.getHardware()->getVolPot();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
 
@@ -303,26 +327,29 @@ void ClientHardwareEventController::handlePot(const ClientHardwareEvent &event)
     }
 }
 
-void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handleButtonPress(
+    const ClientHardwareEvent &event)
 {
     auto button = mpc.getHardware()->getButton(event.componentId);
 
-    // The below check is necessary because the keyboard mapping routines in mpc::event may return
-    // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
-    // event handling, we can remove this check.
+    // The below check is necessary because the keyboard mapping routines in
+    // mpc::event may return labels like "ctrl" and "alt" rather than component
+    // labels. After we've improved the keyboard event handling, we can remove
+    // this check.
     if (!button)
     {
         return;
     }
 
-    // Temporary hack. We actually want to synthesize repeat events ourselves, so we don't depend
-    // on host-generated repeats. This way the behaviour is the same for keyboard, mouse, touch and
-    // MIDI event.
+    // Temporary hack. We actually want to synthesize repeat events ourselves,
+    // so we don't depend on host-generated repeats. This way the behaviour is
+    // the same for keyboard, mouse, touch and MIDI event.
     static const auto allowRepeat = std::vector<ComponentId>{
         ComponentId::CURSOR_UP, ComponentId::CURSOR_RIGHT_OR_DIGIT,
         ComponentId::CURSOR_DOWN, ComponentId::CURSOR_LEFT_OR_DIGIT};
 
-    if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(), event.componentId) == allowRepeat.end())
+    if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(),
+                                      event.componentId) == allowRepeat.end())
     {
         return;
     }
@@ -334,7 +361,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
 
     const auto id = event.componentId;
 
-    if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screen); stepEditorScreen)
+    if (auto stepEditorScreen =
+            std::dynamic_pointer_cast<StepEditorScreen>(screen);
+        stepEditorScreen)
     {
         if (id == Id::PREV_STEP_OR_EVENT)
         {
@@ -407,7 +436,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
             return;
         }
 
-        if (auto vmpcKeyboardScreen = std::dynamic_pointer_cast<VmpcKeyboardScreen>(screen); vmpcKeyboardScreen)
+        if (auto vmpcKeyboardScreen =
+                std::dynamic_pointer_cast<VmpcKeyboardScreen>(screen);
+            vmpcKeyboardScreen)
         {
             if (vmpcKeyboardScreen->hasMappingChanged())
             {
@@ -415,7 +446,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
                 return;
             }
         }
-        else if (auto vmpcMidiScreen = std::dynamic_pointer_cast<VmpcMidiScreen>(screen); vmpcMidiScreen)
+        else if (auto vmpcMidiScreen =
+                     std::dynamic_pointer_cast<VmpcMidiScreen>(screen);
+                 vmpcMidiScreen)
         {
             if (vmpcMidiScreen->hasMappingChanged())
             {
@@ -423,15 +456,21 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
                 return;
             }
         }
-        else if (auto loadASoundScreen = std::dynamic_pointer_cast<LoadASoundScreen>(screen); loadASoundScreen)
+        else if (auto loadASoundScreen =
+                     std::dynamic_pointer_cast<LoadASoundScreen>(screen);
+                 loadASoundScreen)
         {
             mpc.getSampler()->deleteSound(mpc.getSampler()->getPreviewSound());
         }
-        else if (auto nameScreen = std::dynamic_pointer_cast<NameScreen>(screen); nameScreen)
+        else if (auto nameScreen =
+                     std::dynamic_pointer_cast<NameScreen>(screen);
+                 nameScreen)
         {
             nameScreen->mainScreenAction();
         }
-        else if (auto keepOrRetryScreen = std::dynamic_pointer_cast<KeepOrRetryScreen>(screen); keepOrRetryScreen)
+        else if (auto keepOrRetryScreen =
+                     std::dynamic_pointer_cast<KeepOrRetryScreen>(screen);
+                 keepOrRetryScreen)
         {
             mpc.getSampler()->deleteSound(mpc.getSampler()->getPreviewSound());
         }
@@ -450,7 +489,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     {
         PushTapCommand(mpc).execute();
 
-        if (auto sequencerScreen = std::dynamic_pointer_cast<SequencerScreen>(screen); sequencerScreen)
+        if (auto sequencerScreen =
+                std::dynamic_pointer_cast<SequencerScreen>(screen);
+            sequencerScreen)
         {
             // Pure UI update
             sequencerScreen->tap();
@@ -466,11 +507,15 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     }
     else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH)
     {
-        PushFullLevelCommand(layeredScreen, mpc.getPadAndButtonKeyboard(), mpc.getHardware(), mpc.clientEventController).execute();
+        PushFullLevelCommand(layeredScreen, mpc.getPadAndButtonKeyboard(),
+                             mpc.getHardware(), mpc.clientEventController)
+            .execute();
     }
     else if (id == Id::SIXTEEN_LEVELS_OR_SPACE)
     {
-        PushSixteenLevelsCommand(layeredScreen, mpc.clientEventController, mpc.getHardware()).execute();
+        PushSixteenLevelsCommand(layeredScreen, mpc.clientEventController,
+                                 mpc.getHardware())
+            .execute();
     }
     else if (id == Id::F1)
     {
@@ -500,7 +545,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     {
         PushShiftCommand(mpc).execute();
 
-        if (auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screen); stepEditorScreen)
+        if (auto stepEditorScreen =
+                std::dynamic_pointer_cast<StepEditorScreen>(screen);
+            stepEditorScreen)
         {
             // Start/reset event selection and update UI
             stepEditorScreen->shift();
@@ -518,7 +565,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     {
         PushEraseCommand(mpc).execute();
 
-        if (auto sequencerScreen = std::dynamic_pointer_cast<SequencerScreen>(screen); sequencerScreen)
+        if (auto sequencerScreen =
+                std::dynamic_pointer_cast<SequencerScreen>(screen);
+            sequencerScreen)
         {
             if (mpc.getSequencer()->isOverdubbing())
             {
@@ -529,7 +578,9 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     }
     else if (id == Id::AFTER_OR_ASSIGN)
     {
-        PushAfterCommand(mpc.clientEventController, layeredScreen, mpc.getHardware()).execute();
+        PushAfterCommand(mpc.clientEventController, layeredScreen,
+                         mpc.getHardware())
+            .execute();
     }
     else if (id == Id::BANK_A)
     {
@@ -589,13 +640,15 @@ void ClientHardwareEventController::handleButtonPress(const ClientHardwareEvent 
     }
 }
 
-void ClientHardwareEventController::handleButtonRelease(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handleButtonRelease(
+    const ClientHardwareEvent &event)
 {
     auto button = mpc.getHardware()->getButton(event.componentId);
 
-    // The below check is necessary because the keyboard mapping routines in mpc::event may return
-    // labels like "ctrl" and "alt" rather than component labels. After we've improved the keyboard
-    // event handling, we can remove this check.
+    // The below check is necessary because the keyboard mapping routines in
+    // mpc::event may return labels like "ctrl" and "alt" rather than component
+    // labels. After we've improved the keyboard event handling, we can remove
+    // this check.
     if (!button)
     {
         return;
@@ -645,11 +698,13 @@ void ClientHardwareEventController::handleButtonRelease(const ClientHardwareEven
     }
 }
 
-void ClientHardwareEventController::handleButtonDoublePress(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handleButtonDoublePress(
+    const ClientHardwareEvent &event)
 {
     auto button = mpc.getHardware()->getButton(event.componentId);
 
-    if (event.componentId == ComponentId::REC || event.componentId == ComponentId::OVERDUB)
+    if (event.componentId == ComponentId::REC ||
+        event.componentId == ComponentId::OVERDUB)
     {
         if (!button->doublePress())
         {

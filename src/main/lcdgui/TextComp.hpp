@@ -20,8 +20,7 @@ namespace mpc::lcdgui
         Centered
     };
 
-    class TextComp
-        : public Component
+    class TextComp : public Component
     {
     private:
         mpc::Mpc &mpc;

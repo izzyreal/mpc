@@ -18,7 +18,8 @@ FilterControls::FilterControls(int id, string name, int idOffset)
 
 shared_ptr<ControlLaw> FilterControls::SEMITONE_LAW()
 {
-    static shared_ptr<ControlLaw> res = make_shared<LinearLaw>(-48.f, 96.f, "semitones");
+    static shared_ptr<ControlLaw> res =
+        make_shared<LinearLaw>(-48.f, 96.f, "semitones");
     return res;
 }
 
@@ -66,7 +67,8 @@ LawControl *FilterControls::createCutoffControl()
 
 LawControl *FilterControls::createResonanceControl()
 {
-    return new LawControl(RESONANCE + idOffset, "Resonance", LinearLaw::UNITY(), 0.25f);
+    return new LawControl(RESONANCE + idOffset, "Resonance", LinearLaw::UNITY(),
+                          0.25f);
 }
 
 float FilterControls::getCutoff()

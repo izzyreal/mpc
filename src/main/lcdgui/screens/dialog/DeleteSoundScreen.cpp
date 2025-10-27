@@ -37,7 +37,8 @@ void DeleteSoundScreen::function(int i)
             }
             else
             {
-                mpc.getLayeredScreen()->openScreen(sampler->getPreviousScreenName());
+                mpc.getLayeredScreen()->openScreen(
+                    sampler->getPreviousScreenName());
             }
 
             break;

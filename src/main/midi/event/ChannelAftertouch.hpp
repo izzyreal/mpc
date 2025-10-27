@@ -8,8 +8,7 @@ namespace mpc
         namespace event
         {
 
-            class ChannelAftertouch
-                : public ChannelEvent
+            class ChannelAftertouch : public ChannelEvent
             {
 
             public:

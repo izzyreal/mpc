@@ -8,8 +8,7 @@
 namespace mpc::engine::audio::mixer
 {
 
-    class BusControls
-        : public mpc::engine::audio::core::AudioControls
+    class BusControls : public mpc::engine::audio::core::AudioControls
     {
 
     public:

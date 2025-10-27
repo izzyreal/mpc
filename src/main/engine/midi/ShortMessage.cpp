@@ -5,8 +5,7 @@
 using namespace std;
 using namespace mpc::engine::midi;
 
-ShortMessage::ShortMessage()
-    : ShortMessage(vector<char>(3))
+ShortMessage::ShortMessage() : ShortMessage(vector<char>(3))
 {
     data[0] = (NOTE_ON & 0xFF);
     data[1] = 64;
@@ -14,10 +13,7 @@ ShortMessage::ShortMessage()
     length = 3;
 }
 
-ShortMessage::ShortMessage(const vector<char> &data)
-    : MidiMessage(data)
-{
-}
+ShortMessage::ShortMessage(const vector<char> &data) : MidiMessage(data) {}
 
 int ShortMessage::getChannel()
 {
@@ -60,19 +56,22 @@ bool mpc::engine::midi::ShortMessage::isNoteOff()
 bool mpc::engine::midi::ShortMessage::isMidiClock()
 {
     const auto s = getStatus();
-    return s == ShortMessage::TIMING_CLOCK || s == ShortMessage::START || s == ShortMessage::STOP || s == ShortMessage::CONTINUE;
+    return s == ShortMessage::TIMING_CLOCK || s == ShortMessage::START ||
+           s == ShortMessage::STOP || s == ShortMessage::CONTINUE;
 }
 
 bool mpc::engine::midi::ShortMessage::isControlChange()
 {
     const auto s = getStatus();
-    return s >= ShortMessage::CONTROL_CHANGE && s < ShortMessage::CONTROL_CHANGE + 16;
+    return s >= ShortMessage::CONTROL_CHANGE &&
+           s < ShortMessage::CONTROL_CHANGE + 16;
 }
 
 bool mpc::engine::midi::ShortMessage::isChannelPressure()
 {
     const auto s = getStatus();
-    return s >= ShortMessage::CHANNEL_PRESSURE && s < ShortMessage::CHANNEL_PRESSURE + 16;
+    return s >= ShortMessage::CHANNEL_PRESSURE &&
+           s < ShortMessage::CHANNEL_PRESSURE + 16;
 }
 
 int ShortMessage::getDataLength(int status)
@@ -123,7 +122,8 @@ void ShortMessage::setMessage(int status)
     int dataLength = getDataLength(status);
     if (dataLength != 0)
     {
-        string error = "Status byte; " + to_string(status) + " requires " + to_string(dataLength) + " data bytes";
+        string error = "Status byte; " + to_string(status) + " requires " +
+                       to_string(dataLength) + " data bytes";
         return;
     }
     setMessage(status, 0, 0);
@@ -131,7 +131,8 @@ void ShortMessage::setMessage(int status)
 
 void ShortMessage::setMessage(int status, int data1, int data2)
 {
-    int dataLength = getDataLength(status); // can throw InvalidMidiDataException
+    int dataLength =
+        getDataLength(status); // can throw InvalidMidiDataException
     if (dataLength > 0)
     {
         if (data1 < 0 || data1 > 127)

@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class Mpc2000XlAllFileScreen
-        : public mpc::lcdgui::ScreenComponent
+    class Mpc2000XlAllFileScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

@@ -34,7 +34,8 @@ namespace mpc::midi::event
         static int sChannel;
 
     public:
-        static std::shared_ptr<MidiEvent> parseEvent(int tick, int delta, std::stringstream &in);
+        static std::shared_ptr<MidiEvent> parseEvent(int tick, int delta,
+                                                     std::stringstream &in);
 
     private:
         static bool verifyIdentifier(int id);

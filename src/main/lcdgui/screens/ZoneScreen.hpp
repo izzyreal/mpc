@@ -21,8 +21,7 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens
 {
 
-    class ZoneScreen
-        : public mpc::lcdgui::ScreenComponent
+    class ZoneScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -49,7 +48,8 @@ namespace mpc::lcdgui::screens
         void displayZone();
 
     private:
-        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END"};
+        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
+                                                  "BEFOR TO", "AFTR END"};
         int numberOfZones = 16;
         uint32_t numberOfFramesAtLastZoneInitialization = 0;
         std::vector<std::vector<int>> zones;

@@ -14,8 +14,7 @@
 namespace mpc::engine::audio::mixer
 {
 
-    class MixerControls
-        : public mpc::engine::control::CompoundControl
+    class MixerControls : public mpc::engine::control::CompoundControl
     {
 
     private:
@@ -43,15 +42,15 @@ namespace mpc::engine::audio::mixer
 
         void addStripControls(std::shared_ptr<CompoundControl> cc);
 
-        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> getStripControls(std::string name);
+        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+        getStripControls(std::string name);
 
         mpc::engine::FaderControl *createFaderControl();
 
     public:
         MixerControls(std::string name, std::string mainBusName);
 
-        MixerControls(std::string name)
-            : MixerControls(std::move(name), "Main")
+        MixerControls(std::string name) : MixerControls(std::move(name), "Main")
         {
         }
 

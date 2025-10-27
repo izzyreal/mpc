@@ -12,8 +12,7 @@ namespace mpc
             namespace meta
             {
 
-                class CopyrightNotice
-                    : public TextualMetaEvent
+                class CopyrightNotice : public TextualMetaEvent
                 {
 
                 public:

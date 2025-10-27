@@ -13,12 +13,16 @@ using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::engine::midi;
 
-void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi::ShortMessage *msg)
+void VmpcMidiControlMode::processMidiInputEvent(
+    mpc::Mpc &mpc, mpc::engine::midi::ShortMessage *msg)
 {
     auto status = msg->getStatus();
-    auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
-    auto isNoteOn = status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
-    auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
+    auto isControl = status >= ShortMessage::CONTROL_CHANGE &&
+                     status < ShortMessage::CONTROL_CHANGE + 16;
+    auto isNoteOn =
+        status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
+    auto isNoteOff = status >= ShortMessage::NOTE_OFF &&
+                     status < ShortMessage::NOTE_OFF + 16;
 
     auto isChannelPressure = msg->isChannelPressure();
 
@@ -54,7 +58,8 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi
             return;
         }
 
-        vmpcMidiScreen->setLearnCandidate(isNoteOn, msg->getChannel(), msg->getData1(), msg->getData2());
+        vmpcMidiScreen->setLearnCandidate(isNoteOn, msg->getChannel(),
+                                          msg->getData1(), msg->getData2());
         return;
     }
 
@@ -150,15 +155,20 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi
         }
         else if (label == "rec-gain")
         {
-            auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
+            auto normalized =
+                static_cast<unsigned char>(controllerValue / 1.27f);
             hardware->getRecPot()->setValue(normalized);
         }
         else if (label == "main-volume")
         {
-            auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
+            auto normalized =
+                static_cast<unsigned char>(controllerValue / 1.27f);
             hardware->getVolPot()->setValue(normalized);
         }
-        else if (auto pressable = std::dynamic_pointer_cast<hardware::Pressable>(hardware->getComponent(hardware::componentLabelToId.at(label))))
+        else if (auto pressable =
+                     std::dynamic_pointer_cast<hardware::Pressable>(
+                         hardware->getComponent(
+                             hardware::componentLabelToId.at(label))))
         {
             if (msg->getData2() == 0)
             {
@@ -166,7 +176,8 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi
             }
             else
             {
-                if (auto withVelo = std::dynamic_pointer_cast<mpc::hardware::VelocitySensitivePressable>(pressable))
+                if (auto withVelo = std::dynamic_pointer_cast<
+                        mpc::hardware::VelocitySensitivePressable>(pressable))
                 {
                     withVelo->pressWithVelocity(msg->getData2());
                 }

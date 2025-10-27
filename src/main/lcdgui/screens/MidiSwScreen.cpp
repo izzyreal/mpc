@@ -31,7 +31,8 @@ void MidiSwScreen::open()
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
 
     if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
-        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+        vmpcSettingsScreen->midiControlMode ==
+            VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         ls->Draw();
         mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
@@ -66,7 +67,8 @@ void MidiSwScreen::displayCtrlsAndFunctions()
 
 void MidiSwScreen::setSwitch(const int index, const std::pair<int, int> _switch)
 {
-    if (_switch.first < 0 || _switch.first > 128 || _switch.second < 0 || _switch.second >= functionNames.size())
+    if (_switch.first < 0 || _switch.first > 128 || _switch.second < 0 ||
+        _switch.second >= functionNames.size())
     {
         return;
     }
@@ -76,7 +78,8 @@ void MidiSwScreen::setSwitch(const int index, const std::pair<int, int> _switch)
     displayCtrlsAndFunctions();
 }
 
-void MidiSwScreen::setSwitches(const std::vector<std::pair<int, int>> &_switches)
+void MidiSwScreen::setSwitches(
+    const std::vector<std::pair<int, int>> &_switches)
 {
     controllerToFunctionMapping = _switches;
 }
@@ -86,7 +89,8 @@ void MidiSwScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    const int xPos = stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    const int xPos =
+        stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
     const int selectedSwitch = xOffset + xPos;
     const int yPos = (focusedFieldName.substr(0, 4) == "ctrl") ? 0 : 1;
     auto _switch = controllerToFunctionMapping[selectedSwitch];
@@ -119,7 +123,8 @@ void MidiSwScreen::left()
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    const int xPos = stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    const int xPos =
+        stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
 
     if (xPos == 0 && xOffset > 0)
     {
@@ -135,7 +140,8 @@ void MidiSwScreen::right()
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    const int xPos = stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    const int xPos =
+        stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
 
     if (xPos == 3 && xOffset < SWITCH_COUNT - 4)
     {

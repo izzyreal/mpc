@@ -20,7 +20,8 @@ Misc::Misc(const std::vector<char> &b)
     for (int i = 0; i < 9; i++)
     {
         const auto locationOffset = LOCATIONS_OFFSET + (i * 4);
-        const uint16_t locationBarIndex = ByteUtil::bytes2ushort({b[locationOffset], b[locationOffset + 1]});
+        const uint16_t locationBarIndex =
+            ByteUtil::bytes2ushort({b[locationOffset], b[locationOffset + 1]});
         const uint8_t locationBeatIndex = b[locationOffset + 2];
         const uint8_t locationClock = b[locationOffset + 3];
         locations[i] = {locationBarIndex, locationBeatIndex, locationClock};
@@ -52,7 +53,8 @@ Misc::Misc(mpc::Mpc &mpc)
 
     for (int i = 0; i < 9; i++)
     {
-        const auto locationBarBytes = ByteUtil::ushort2bytes(std::get<0>(locationsToPersist[i]));
+        const auto locationBarBytes =
+            ByteUtil::ushort2bytes(std::get<0>(locationsToPersist[i]));
         const auto locationBeatByte = std::get<1>(locationsToPersist[i]);
         const auto locationClockByte = std::get<2>(locationsToPersist[i]);
         const auto locationOffset = LOCATIONS_OFFSET + (i * 4);
@@ -69,7 +71,8 @@ Misc::Misc(mpc::Mpc &mpc)
 
     auto syncScreen = mpc.screens->get<SyncScreen>();
 
-    saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(syncScreen->receiveMMCEnabled ? 1 : 0);
+    saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] =
+        (char)(syncScreen->receiveMMCEnabled ? 1 : 0);
 
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>();
 
@@ -81,11 +84,16 @@ Misc::Misc(mpc::Mpc &mpc)
         saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)func;
     }
 
-    saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditOptionsScreen->isAutoStepIncrementEnabled() ? 1 : 0);
-    saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(stepEditOptionsScreen->isDurationOfRecordedNotesTcValue() ? 1 : 0);
-    saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(stepEditOptionsScreen->getTcValuePercentage());
+    saveBytes[AUTO_STEP_INCREMENT_OFFSET] =
+        (char)(stepEditOptionsScreen->isAutoStepIncrementEnabled() ? 1 : 0);
+    saveBytes[DURATION_OF_REC_NOTES_OFFSET] =
+        (char)(stepEditOptionsScreen->isDurationOfRecordedNotesTcValue() ? 1
+                                                                         : 0);
+    saveBytes[DURATION_TC_PERCENTAGE_OFFSET] =
+        (char)(stepEditOptionsScreen->getTcValuePercentage());
     const auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
-    saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = midiInputScreen->getProgChangeSeq() ? 0x01 : 0x00;
+    saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] =
+        midiInputScreen->getProgChangeSeq() ? 0x01 : 0x00;
 }
 
 int Misc::getTapAvg()

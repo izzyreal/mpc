@@ -8,8 +8,7 @@ namespace mpc
         namespace event
         {
 
-            class ProgramChange
-                : public ChannelEvent
+            class ProgramChange : public ChannelEvent
             {
 
             public:

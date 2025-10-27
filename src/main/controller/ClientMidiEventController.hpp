@@ -40,25 +40,30 @@ namespace mpc::controller
     {
     private:
         std::shared_ptr<ClientEventController> clientEventController;
-        std::shared_ptr<ClientMidiSoundGeneratorController> soundGeneratorController;
+        std::shared_ptr<ClientMidiSoundGeneratorController>
+            soundGeneratorController;
 
         ClientMidiSequencerController sequencerController;
-        std::shared_ptr<ClientMidiFootswitchAssignmentController> footswitchController;
+        std::shared_ptr<ClientMidiFootswitchAssignmentController>
+            footswitchController;
         ClientMidiInputSynchronizationController syncController;
 
-        std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
+        std::shared_ptr<ClientHardwareEventController>
+            clientHardwareEventController;
 
     public:
-        ClientMidiEventController(std::shared_ptr<ClientEventController>,
-                                  std::shared_ptr<ClientHardwareEventController>,
-                                  std::shared_ptr<lcdgui::screens::MidiSwScreen>,
-                                  std::shared_ptr<sequencer::Sequencer>,
-                                  std::shared_ptr<lcdgui::screens::window::MidiInputScreen>,
-                                  std::shared_ptr<audiomidi::EventHandler>,
-                                  std::shared_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>,
-                                  std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>);
+        ClientMidiEventController(
+            std::shared_ptr<ClientEventController>,
+            std::shared_ptr<ClientHardwareEventController>,
+            std::shared_ptr<lcdgui::screens::MidiSwScreen>,
+            std::shared_ptr<sequencer::Sequencer>,
+            std::shared_ptr<lcdgui::screens::window::MidiInputScreen>,
+            std::shared_ptr<audiomidi::EventHandler>,
+            std::shared_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>,
+            std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>);
 
-        std::shared_ptr<ClientMidiSoundGeneratorController> getSoundGeneratorController();
+        std::shared_ptr<ClientMidiSoundGeneratorController>
+        getSoundGeneratorController();
 
         void handleClientMidiEvent(const mpc::client::event::ClientMidiEvent &);
     };

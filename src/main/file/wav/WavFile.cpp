@@ -43,7 +43,9 @@ int WavFile::getValidBits()
     return validBits;
 }
 
-WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream, int numChannels, int numFrames, int validBits, int sampleRate)
+WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream,
+                                int numChannels, int numFrames, int validBits,
+                                int sampleRate)
 {
     WavFile result;
     result.oStream = _ostream;
@@ -57,7 +59,8 @@ WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream, int numC
 
     if (numChannels < 1 || numChannels > 65535)
     {
-        throw std::invalid_argument("Illegal number of channels, valid range 1 to 65536");
+        throw std::invalid_argument(
+            "Illegal number of channels, valid range 1 to 65536");
     }
 
     if (numFrames < 0)
@@ -67,7 +70,8 @@ WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream, int numC
 
     if (validBits < 2 || validBits > 65535)
     {
-        throw std::invalid_argument("Illegal number of valid bits, valid range 2 to 65536");
+        throw std::invalid_argument(
+            "Illegal number of valid bits, valid range 2 to 65536");
     }
 
     if (sampleRate < 0)
@@ -176,7 +180,8 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 
         if (bytesRead != 8)
         {
-            return tl::make_unexpected(mpc_io_error_msg{"Could not read chunk header"});
+            return tl::make_unexpected(
+                mpc_io_error_msg{"Could not read chunk header"});
         }
 
         auto chunkID = getLE(result->buffer, 0, 4);
@@ -190,11 +195,13 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 
             totalBytesRead += chunkSize;
 
-            auto compressionCode = static_cast<int>(getLE(result->buffer, 0, 2));
+            auto compressionCode =
+                static_cast<int>(getLE(result->buffer, 0, 2));
 
             if (compressionCode != 1)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Compressed WAV unsupported"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Compressed WAV unsupported"});
             }
 
             result->numChannels = static_cast<int>(getLE(result->buffer, 2, 2));
@@ -204,29 +211,35 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 
             if (result->numChannels == 0)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Zero channels in WAV header"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Zero channels in WAV header"});
             }
 
             if (result->blockAlign == 0)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Block align in header is 0"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Block align in header is 0"});
             }
 
             if (result->validBits < 2)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Valid bits in header below 2"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Valid bits in header below 2"});
             }
 
             if (result->validBits > 64)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Valid bits in header over 64"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Valid bits in header over 64"});
             }
 
             result->bytesPerSample = (result->validBits + 7) / 8;
 
-            if (result->bytesPerSample * result->numChannels != result->blockAlign)
+            if (result->bytesPerSample * result->numChannels !=
+                result->blockAlign)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Bad block align for format"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Bad block align for format"});
             }
 
             numChunkBytes -= 16;
@@ -240,12 +253,14 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
         {
             if (!foundFormat)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Data before format chunk"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Data before format chunk"});
             }
 
             if (chunkSize % result->blockAlign != 0)
             {
-                return tl::make_unexpected(mpc_io_error_msg{"Bad data size for block align"});
+                return tl::make_unexpected(
+                    mpc_io_error_msg{"Bad data size for block align"});
             }
 
             result->numFrames = chunkSize / result->blockAlign;
@@ -260,17 +275,24 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 
             totalBytesRead += chunkSize;
 
-            result->numSampleLoops = static_cast<int>(getLE(result->buffer, NUM_SAMPLE_LOOPS, 4));
+            result->numSampleLoops =
+                static_cast<int>(getLE(result->buffer, NUM_SAMPLE_LOOPS, 4));
 
             if (result->numSampleLoops > 0)
             {
                 // For now we just take the first sample loop
-                result->sampleLoop.cuePointId = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET, 4));
-                result->sampleLoop.type = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 4, 4));
-                result->sampleLoop.start = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 8, 4));
-                result->sampleLoop.end = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 12, 4));
-                result->sampleLoop.fraction = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 16, 4));
-                result->sampleLoop.playCount = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 20, 4));
+                result->sampleLoop.cuePointId = static_cast<int>(
+                    getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET, 4));
+                result->sampleLoop.type = static_cast<int>(
+                    getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 4, 4));
+                result->sampleLoop.start = static_cast<int>(
+                    getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 8, 4));
+                result->sampleLoop.end = static_cast<int>(
+                    getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 12, 4));
+                result->sampleLoop.fraction = static_cast<int>(
+                    getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 16, 4));
+                result->sampleLoop.playCount = static_cast<int>(
+                    getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 20, 4));
             }
         }
         else
@@ -282,7 +304,8 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 
     if (!foundData)
     {
-        return tl::make_unexpected(mpc_io_error_msg{"Did not find a data chunk"});
+        return tl::make_unexpected(
+            mpc_io_error_msg{"Did not find a data chunk"});
     }
 
     if (result->validBits > 8)
@@ -303,7 +326,8 @@ wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
     return result;
 }
 
-unsigned long WavFile::getLE(std::vector<char> &buffer, unsigned long pos, int numBytes)
+unsigned long WavFile::getLE(std::vector<char> &buffer, unsigned long pos,
+                             int numBytes)
 {
     numBytes--;
     pos += numBytes;
@@ -315,7 +339,8 @@ unsigned long WavFile::getLE(std::vector<char> &buffer, unsigned long pos, int n
     return val;
 }
 
-void WavFile::putLE(int val, std::vector<char> &buffer, unsigned long pos, int numBytes)
+void WavFile::putLE(int val, std::vector<char> &buffer, unsigned long pos,
+                    int numBytes)
 {
     for (auto b = 0; b < numBytes; b++)
     {
@@ -370,7 +395,8 @@ int WavFile::readSample()
     return val;
 }
 
-int WavFile::readFrames(std::vector<float> &sampleBuffer, unsigned long numFramesToRead)
+int WavFile::readFrames(std::vector<float> &sampleBuffer,
+                        unsigned long numFramesToRead)
 {
     int offset = 0;
 
@@ -388,7 +414,8 @@ int WavFile::readFrames(std::vector<float> &sampleBuffer, unsigned long numFrame
         for (auto c = 0; c < numChannels; c++)
         {
             auto v = readSample();
-            sampleBuffer[offset] = floatOffset + static_cast<double>(v) / floatScale;
+            sampleBuffer[offset] =
+                floatOffset + static_cast<double>(v) / floatScale;
             offset++;
         }
         frameCounter++;
@@ -396,7 +423,8 @@ int WavFile::readFrames(std::vector<float> &sampleBuffer, unsigned long numFrame
     return numFramesToRead;
 }
 
-int WavFile::writeFrames(const std::vector<float> &sampleBuffer, unsigned long numFramesToWrite)
+int WavFile::writeFrames(const std::vector<float> &sampleBuffer,
+                         unsigned long numFramesToWrite)
 {
     int offset = 0;
     for (auto f = 0; f < numFramesToWrite; f++)
@@ -408,7 +436,8 @@ int WavFile::writeFrames(const std::vector<float> &sampleBuffer, unsigned long n
 
         for (auto c = 0; c < numChannels; c++)
         {
-            writeSample(static_cast<int>(floatScale * (floatOffset + sampleBuffer[offset])));
+            writeSample(static_cast<int>(floatScale *
+                                         (floatOffset + sampleBuffer[offset])));
             offset++;
         }
         frameCounter++;

@@ -10,8 +10,7 @@ namespace mpc::audiomidi
 
 namespace mpc::lcdgui::screens
 {
-    class SampleScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SampleScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -30,7 +29,13 @@ namespace mpc::lcdgui::screens
         void update(Observable *observable, Message message) override;
 
     private:
-        std::map<int, int> vuPosToDb{{0, -63}, {1, -59}, {2, -55}, {3, -51}, {4, -47}, {5, -43}, {6, -39}, {7, -35}, {8, -34}, {9, -33}, {10, -31}, {11, -29}, {12, -27}, {13, -25}, {14, -23}, {15, -21}, {16, -19}, {17, -17}, {18, -15}, {19, -14}, {20, -13}, {21, -12}, {22, -11}, {23, -10}, {24, -9}, {25, -8}, {26, -7}, {27, -6}, {28, -5}, {29, -4}, {30, -3}, {31, -2}, {32, -1}, {33, 0}};
+        std::map<int, int> vuPosToDb{
+            {0, -63},  {1, -59},  {2, -55},  {3, -51},  {4, -47},  {5, -43},
+            {6, -39},  {7, -35},  {8, -34},  {9, -33},  {10, -31}, {11, -29},
+            {12, -27}, {13, -25}, {14, -23}, {15, -21}, {16, -19}, {17, -17},
+            {18, -15}, {19, -14}, {20, -13}, {21, -12}, {22, -11}, {23, -10},
+            {24, -9},  {25, -8},  {26, -7},  {27, -6},  {28, -5},  {29, -4},
+            {30, -3},  {31, -2},  {32, -1},  {33, 0}};
         int input = 0;
         int threshold = -20;
         int mode = 2;
@@ -69,7 +74,8 @@ namespace mpc::lcdgui::screens
 
         std::vector<std::string> inputNames{"ANALOG", "DIGITAL"};
         std::vector<std::string> modeNames{"MONO L", "MONO R", "STEREO"};
-        std::vector<std::string> monitorNames{"OFF", "L/R", "1/2", "3/4", "5/6", "7/8"};
+        std::vector<std::string> monitorNames{"OFF", "L/R", "1/2",
+                                              "3/4", "5/6", "7/8"};
 
         friend class mpc::audiomidi::SoundRecorder;
     };

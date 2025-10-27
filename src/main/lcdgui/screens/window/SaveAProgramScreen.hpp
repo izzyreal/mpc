@@ -15,8 +15,7 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveAProgramScreen
-        : public mpc::lcdgui::ScreenComponent
+    class SaveAProgramScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -27,7 +26,8 @@ namespace mpc::lcdgui::screens::window
         void open() override;
 
     private:
-        const std::vector<std::string> pgmSaveNames{"PROGRAM ONLY", "WITH SOUNDS", "WITH .WAV"};
+        const std::vector<std::string> pgmSaveNames{"PROGRAM ONLY",
+                                                    "WITH SOUNDS", "WITH .WAV"};
 
         bool replaceSameSounds = false;
 

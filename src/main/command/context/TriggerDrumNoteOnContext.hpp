@@ -86,8 +86,10 @@ namespace mpc::command::context
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> layeredScreen;
-        std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen;
-        std::shared_ptr<mpc::lcdgui::screens::window::Assign16LevelsScreen> assign16LevelsScreen;
+        std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
+            timingCorrectScreen;
+        std::shared_ptr<mpc::lcdgui::screens::window::Assign16LevelsScreen>
+            assign16LevelsScreen;
         std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
         std::shared_ptr<mpc::sequencer::FrameSeq> frameSequencer;
 

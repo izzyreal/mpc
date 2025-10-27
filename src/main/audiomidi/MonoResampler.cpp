@@ -14,11 +14,10 @@ MonoResampler::~MonoResampler()
     src_delete(state);
 }
 
-uint32_t MonoResampler::resample(
-    const std::vector<float> &inputData,
-    std::vector<float> &output,
-    int sourceSampleRate,
-    int maxNumInputFramesToProcess)
+uint32_t MonoResampler::resample(const std::vector<float> &inputData,
+                                 std::vector<float> &output,
+                                 int sourceSampleRate,
+                                 int maxNumInputFramesToProcess)
 {
     const auto ratio = 44100.f / sourceSampleRate;
 

@@ -52,7 +52,10 @@ void SaveScreen::open()
 
     if (focusedFieldName == "device")
     {
-        findChild<FunctionKeys>("function-keys")->setActiveArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
+        findChild<FunctionKeys>("function-keys")
+            ->setActiveArrangement(
+                device == mpc.getDiskController()->getActiveDiskIndex() ? 0
+                                                                        : 1);
     }
     else
     {
@@ -109,7 +112,8 @@ void SaveScreen::function(int i)
                 mpc.getDiskController()->setActiveDiskIndex(device);
                 auto newDisk = mpc.getDisk();
 
-                if (newDisk->getVolume().type == mpc::disk::VolumeType::USB_VOLUME)
+                if (newDisk->getVolume().type ==
+                    mpc::disk::VolumeType::USB_VOLUME)
                 {
 
                     newDisk->initRoot();
@@ -216,7 +220,8 @@ void SaveScreen::turnWheel(int i)
                 }
                 else
                 {
-                    // From the user's perspective we stay where we are if the above moveForward call fails.
+                    // From the user's perspective we stay where we are if the
+                    // above moveForward call fails.
                     disk->moveForward(currentDir);
                 }
             }
@@ -227,14 +232,14 @@ void SaveScreen::turnWheel(int i)
         switch (type)
         {
             case 1:
-                sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
+                sequencer->setActiveSequenceIndex(
+                    sequencer->getActiveSequenceIndex() + i);
                 break;
             case 3:
             {
                 unsigned char counter = 0;
 
-                for (int idx = programIndex;
-                     (i < 0) ? idx >= 0 : idx < 24;
+                for (int idx = programIndex; (i < 0) ? idx >= 0 : idx < 24;
                      (i < 0) ? idx-- : idx++)
                 {
                     if (sampler->getProgram(idx))
@@ -270,7 +275,8 @@ void SaveScreen::turnWheel(int i)
         device += i;
         displayDevice();
         displayDeviceType();
-        ls->setFunctionKeysArrangement(mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
+        ls->setFunctionKeysArrangement(
+            mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
         return;
     }
 }
@@ -309,20 +315,24 @@ void SaveScreen::displayFile()
     {
         case 0:
         {
-            const auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>();
+            const auto saveAllFileScreen =
+                mpc.screens->get<SaveAllFileScreen>();
             fileName = saveAllFileScreen->fileName;
             break;
         }
         case 1:
         {
-            auto num = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
+            auto num = StrUtil::padLeft(
+                std::to_string(sequencer->getActiveSequenceIndex() + 1), "0",
+                2);
             const auto sequenceName = sequencer->getActiveSequence()->getName();
             fileName = num + "-" + sequenceName;
             break;
         }
         case 2:
         {
-            const auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>();
+            const auto saveApsFileScreen =
+                mpc.screens->get<SaveApsFileScreen>();
             fileName = saveApsFileScreen->fileName;
             break;
         }
@@ -330,7 +340,9 @@ void SaveScreen::displayFile()
             fileName = sampler->getProgram(programIndex)->getName();
             break;
         case 4:
-            fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound()->getName());
+            fileName = std::string(sampler->getSoundCount() == 0
+                                       ? " (No sound)"
+                                       : sampler->getSound()->getName());
             break;
         case 5:
             fileName = "MPC2KXL         .BIN";
@@ -351,7 +363,9 @@ void SaveScreen::displaySize()
             size = sequencer->getUsedSequenceCount() * 25;
             break;
         case 1:
-            size = seq->isUsed() ? 10 + static_cast<int>(seq->getEventCount() * 0.001) : -1;
+            size = seq->isUsed()
+                       ? 10 + static_cast<int>(seq->getEventCount() * 0.001)
+                       : -1;
             break;
         case 2:
             size = sampler->getProgramCount() * 4;
@@ -360,14 +374,18 @@ void SaveScreen::displaySize()
             size = 4;
             break;
         case 4:
-            size = sampler->getSoundCount() == 0 ? -1 : (sampler->getSound()->getSampleData()->size() * 2 * 0.001);
+            size = sampler->getSoundCount() == 0
+                       ? -1
+                       : (sampler->getSound()->getSampleData()->size() * 2 *
+                          0.001);
             break;
         case 5:
             size = 512;
             break;
     }
 
-    findLabel("size")->setText(StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
+    findLabel("size")->setText(
+        StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
 }
 
 void SaveScreen::displayFree()
@@ -380,7 +398,9 @@ void SaveScreen::displayFree()
     }
     catch (fs::filesystem_error &)
     {
-        MLOG("An exception occurred when SaveScreen::displayFree was trying to query available space!");
+        MLOG(
+            "An exception occurred when SaveScreen::displayFree was trying to "
+            "query available space!");
     }
 
     const auto text = byte_count_to_short_string(availableSpaceInBytes);
@@ -401,7 +421,8 @@ void SaveScreen::displayDevice()
 void SaveScreen::displayDeviceType()
 {
     auto deviceTypeLabel = findChild<Label>("device-type");
-    deviceTypeLabel->setText(mpc.getDisks()[device]->getVolume().typeShortName());
+    deviceTypeLabel->setText(
+        mpc.getDisks()[device]->getVolume().typeShortName());
 }
 
 void SaveScreen::up()

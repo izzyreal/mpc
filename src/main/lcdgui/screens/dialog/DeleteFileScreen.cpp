@@ -31,11 +31,13 @@ void DeleteFileScreen::function(int i)
         case 4:
         {
             auto directoryScreen = mpc.screens->get<DirectoryScreen>();
-            ls->showPopupAndAwaitInteraction("Delete: " + directoryScreen->getSelectedFile()->getName());
-            std::thread([this]
-                        {
-                            deleteFile();
-                        })
+            ls->showPopupAndAwaitInteraction(
+                "Delete: " + directoryScreen->getSelectedFile()->getName());
+            std::thread(
+                [this]
+                {
+                    deleteFile();
+                })
                 .detach();
             break;
         }

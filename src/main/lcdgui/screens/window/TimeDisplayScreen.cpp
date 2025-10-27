@@ -59,11 +59,17 @@ void TimeDisplayScreen::displayDisplayStyle()
 void TimeDisplayScreen::displayStartTime()
 {
     const auto startTime = sequencer->getActiveSequence()->getStartTime();
-    findField("hours")->setText(StrUtil::padLeft(std::to_string(startTime.hours), "0", 2));
-    findField("minutes")->setText(StrUtil::padLeft(std::to_string(startTime.minutes), "0", 2));
-    findField("seconds")->setText(StrUtil::padLeft(std::to_string(startTime.seconds), "0", 2));
-    findField("frames")->setText(StrUtil::padLeft(std::to_string(startTime.frames), "0", 2));
-    findField("frame-decimals")->setText(StrUtil::padLeft(std::to_string(startTime.frameDecimals), "0", 2));
+    findField("hours")->setText(
+        StrUtil::padLeft(std::to_string(startTime.hours), "0", 2));
+    findField("minutes")->setText(
+        StrUtil::padLeft(std::to_string(startTime.minutes), "0", 2));
+    findField("seconds")->setText(
+        StrUtil::padLeft(std::to_string(startTime.seconds), "0", 2));
+    findField("frames")->setText(
+        StrUtil::padLeft(std::to_string(startTime.frames), "0", 2));
+    findField("frame-decimals")
+        ->setText(
+            StrUtil::padLeft(std::to_string(startTime.frameDecimals), "0", 2));
 }
 
 void TimeDisplayScreen::displayFrameRate()
@@ -83,31 +89,36 @@ void TimeDisplayScreen::setDisplayStyle(int i)
 
 void TimeDisplayScreen::setHours(int i)
 {
-    sequencer->getActiveSequence()->getStartTime().hours = std::clamp<uint8_t>(i, 0, 23);
+    sequencer->getActiveSequence()->getStartTime().hours =
+        std::clamp<uint8_t>(i, 0, 23);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setMinutes(int i)
 {
-    sequencer->getActiveSequence()->getStartTime().minutes = std::clamp<uint8_t>(i, 0, 59);
+    sequencer->getActiveSequence()->getStartTime().minutes =
+        std::clamp<uint8_t>(i, 0, 59);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setSeconds(int i)
 {
-    sequencer->getActiveSequence()->getStartTime().seconds = std::clamp<uint8_t>(i, 0, 59);
+    sequencer->getActiveSequence()->getStartTime().seconds =
+        std::clamp<uint8_t>(i, 0, 59);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setFrames(int i)
 {
-    sequencer->getActiveSequence()->getStartTime().frames = std::clamp<uint8_t>(i, 0, 29);
+    sequencer->getActiveSequence()->getStartTime().frames =
+        std::clamp<uint8_t>(i, 0, 29);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setFrameDecimals(int i)
 {
-    sequencer->getActiveSequence()->getStartTime().frameDecimals = std::clamp<uint8_t>(i, 0, 99);
+    sequencer->getActiveSequence()->getStartTime().frameDecimals =
+        std::clamp<uint8_t>(i, 0, 99);
     displayStartTime();
 }
 

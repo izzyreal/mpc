@@ -4,7 +4,8 @@
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;
 
-MixProcess::MixProcess(const std::shared_ptr<AudioMixerStrip> &strip, const std::shared_ptr<MixControls> &mixControls)
+MixProcess::MixProcess(const std::shared_ptr<AudioMixerStrip> &strip,
+                       const std::shared_ptr<MixControls> &mixControls)
 {
     if (!strip)
     {
@@ -35,7 +36,8 @@ int MixProcess::processAudio(AudioBuffer *buffer)
         mixControls->getChannelGains(&channelGains);
         for (auto c = 0; c < channelGains.size(); c++)
         {
-            smoothedChannelGains[c] += smoothingFactor * (channelGains[c] - smoothedChannelGains[c]);
+            smoothedChannelGains[c] +=
+                smoothingFactor * (channelGains[c] - smoothedChannelGains[c]);
         }
         getRoutedStrip()->mix(buffer, smoothedChannelGains);
         //}

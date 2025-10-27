@@ -13,8 +13,7 @@ namespace mpc::engine::audio::mixer
 
     class AudioMixerBus;
 
-    class AudioMixer final
-        : public mpc::engine::audio::server::AudioClient
+    class AudioMixer final : public mpc::engine::audio::server::AudioClient
     {
 
     private:
@@ -51,15 +50,19 @@ namespace mpc::engine::audio::mixer
         void work(int nFrames) override;
 
     private:
-        static void evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate, int nFrames);
+        static void evaluateStrips(
+            std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate,
+            int nFrames);
 
-        static void silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence);
+        static void silenceStrips(
+            std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence);
 
         void writeBusBuffers(int nFrames);
 
         void createBusses(std::shared_ptr<MixerControls> mixerControls);
 
-        std::shared_ptr<AudioMixerBus> createBus(std::shared_ptr<BusControls> busControls);
+        std::shared_ptr<AudioMixerBus>
+        createBus(std::shared_ptr<BusControls> busControls);
 
     public:
         std::shared_ptr<AudioMixerBus> getBus(std::string name);
@@ -71,12 +74,17 @@ namespace mpc::engine::audio::mixer
     public:
         void createStrips(std::shared_ptr<MixerControls> mixerControls);
 
-        std::shared_ptr<AudioMixerStrip> createStrip(std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> controls);
+        std::shared_ptr<AudioMixerStrip> createStrip(
+            std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+                controls);
 
     public:
         void close();
 
     public:
-        AudioMixer(const std::shared_ptr<MixerControls> &controls, const std::shared_ptr<mpc::engine::audio::server::AudioServer> &server);
+        AudioMixer(
+            const std::shared_ptr<MixerControls> &controls,
+            const std::shared_ptr<mpc::engine::audio::server::AudioServer>
+                &server);
     };
 } // namespace mpc::engine::audio::mixer

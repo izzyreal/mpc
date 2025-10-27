@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-    class CopyTrackScreen
-        : public mpc::lcdgui::ScreenComponent
+    class CopyTrackScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

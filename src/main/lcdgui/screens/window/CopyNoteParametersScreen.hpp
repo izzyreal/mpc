@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class CopyNoteParametersScreen
-        : public mpc::lcdgui::ScreenComponent
+    class CopyNoteParametersScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

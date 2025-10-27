@@ -33,7 +33,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
+void AutoSave::restoreAutoSavedStateWithTarget(
+    Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0)
@@ -42,8 +43,9 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
     }
 
     const std::vector<fs::path> files{
-        "APS.APS", "ALL.ALL", "soundIndex.txt", "selectedPad.txt", "selectedNote.txt",
-        "screen.txt", "focus.txt", "sounds.txt", "currentDir.txt"};
+        "APS.APS",         "ALL.ALL",          "soundIndex.txt",
+        "selectedPad.txt", "selectedNote.txt", "screen.txt",
+        "focus.txt",       "sounds.txt",       "currentDir.txt"};
 
     std::vector<fs::path> availableFiles;
     for (const auto &f : files)
@@ -84,7 +86,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
             }
             else if (f == "sounds.txt")
             {
-                auto soundNames = StrUtil::split(std::string(data.begin(), data.end()), '\n');
+                auto soundNames =
+                    StrUtil::split(std::string(data.begin(), data.end()), '\n');
                 for (auto &soundName : soundNames)
                 {
                     if (soundName.empty())
@@ -93,7 +96,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
                     }
                     auto soundData = saveTarget->getFileData(soundName);
                     SndReader sndReader(soundData);
-                    auto sound = mpc.getSampler()->addSound(sndReader.getSampleRate());
+                    auto sound =
+                        mpc.getSampler()->addSound(sndReader.getSampleRate());
                     if (!sound)
                     {
                         break;
@@ -105,7 +109,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
                     sound->setLevel(sndReader.getLevel());
                     sound->setStart(sndReader.getStart());
                     sound->setEnd(sndReader.getEnd());
-                    sound->setLoopTo(sound->getEnd() - sndReader.getLoopLength());
+                    sound->setLoopTo(sound->getEnd() -
+                                     sndReader.getLoopLength());
                     sound->setBeatCount(sndReader.getNumberOfBeats());
                     sound->setLoopEnabled(sndReader.isLoopEnabled());
                 }
@@ -116,7 +121,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
             }
         }
 
-        const auto setIntProperty = [&](const std::string &file, const std::function<void(int)> &setter)
+        const auto setIntProperty =
+            [&](const std::string &file, const std::function<void(int)> &setter)
         {
             if (processInOrder.count(file))
             {
@@ -130,24 +136,29 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
             {
                 return std::string{};
             }
-            return std::string(processInOrder[file].begin(), processInOrder[file].end());
+            return std::string(processInOrder[file].begin(),
+                               processInOrder[file].end());
         };
 
-        setIntProperty("soundIndex.txt", [&](int v)
+        setIntProperty("soundIndex.txt",
+                       [&](int v)
                        {
                            mpc.getSampler()->setSoundIndex(v);
                        });
-        setIntProperty("selectedNote.txt", [&](int v)
+        setIntProperty("selectedNote.txt",
+                       [&](int v)
                        {
                            mpc.clientEventController->setSelectedNote(v);
                        });
-        setIntProperty("selectedPad.txt", [&](int v)
+        setIntProperty("selectedPad.txt",
+                       [&](int v)
                        {
                            mpc.clientEventController->setSelectedPad(v);
                        });
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
-        auto relativePath = fs::relative(currentDir, mpc.paths->defaultLocalVolumePath());
+        auto relativePath =
+            fs::relative(currentDir, mpc.paths->defaultLocalVolumePath());
         for (auto &seg : relativePath)
         {
             mpc.getDisk()->moveForward(seg.string());
@@ -195,7 +206,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1)
     {
-        auto confirmScreen = mpc.screens->get<VmpcContinuePreviousSessionScreen>();
+        auto confirmScreen =
+            mpc.screens->get<VmpcContinuePreviousSessionScreen>();
         confirmScreen->setRestoreAutoSavedStateAction(restoreAction);
         mpc.getLayeredScreen()->openScreen<VmpcContinuePreviousSessionScreen>();
         return;
@@ -204,12 +216,14 @@ void AutoSave::restoreAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTar
     restoreAction();
 }
 
-void AutoSave::storeAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
+void AutoSave::storeAutoSavedStateWithTarget(
+    Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
 
     if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
-        mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-continue-previous-session")
+        mpc.getLayeredScreen()->getCurrentScreenName() ==
+            "vmpc-continue-previous-session")
     {
         return;
     }
@@ -224,9 +238,11 @@ void AutoSave::storeAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTarge
         auto selectedNote = mpc.clientEventController->getSelectedNote();
         auto currentDir = mpc.getDisk()->getAbsolutePath();
 
-        saveTarget->setFileData("screen.txt", {currentScreen.begin(), currentScreen.end()});
+        saveTarget->setFileData("screen.txt",
+                                {currentScreen.begin(), currentScreen.end()});
         saveTarget->setFileData("focus.txt", {focus.begin(), focus.end()});
-        saveTarget->setFileData("currentDir.txt", {currentDir.begin(), currentDir.end()});
+        saveTarget->setFileData("currentDir.txt",
+                                {currentDir.begin(), currentDir.end()});
         saveTarget->setFileData("soundIndex.txt", {(char)soundIndex});
         saveTarget->setFileData("selectedNote.txt", {(char)selectedNote});
         saveTarget->setFileData("selectedPad.txt", {(char)selectedPad});
@@ -241,7 +257,9 @@ void AutoSave::storeAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTarge
         {
             SndWriter sndWriter(sound.get());
             const auto sndPath = sound->getName() + ".SND";
-            saveTarget->setFileData(sndPath, {sndWriter.getSndFileArray().begin(), sndWriter.getSndFileArray().end()});
+            saveTarget->setFileData(sndPath,
+                                    {sndWriter.getSndFileArray().begin(),
+                                     sndWriter.getSndFileArray().end()});
             soundNames += sndPath + "\n";
         }
 
@@ -250,7 +268,8 @@ void AutoSave::storeAutoSavedStateWithTarget(Mpc &mpc, std::shared_ptr<SaveTarge
             saveTarget->setFileData("ALL.ALL", allParser.getBytes());
         }
 
-        saveTarget->setFileData("sounds.txt", {soundNames.begin(), soundNames.end()});
+        saveTarget->setFileData("sounds.txt",
+                                {soundNames.begin(), soundNames.end()});
     };
 
     storeAction();

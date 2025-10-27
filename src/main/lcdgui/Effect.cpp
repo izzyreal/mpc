@@ -4,8 +4,7 @@
 
 using namespace mpc::lcdgui;
 
-Effect::Effect(MRECT rect)
-    : Component("effect")
+Effect::Effect(MRECT rect) : Component("effect")
 {
     setSize(rect.W(), rect.H());
     setLocation(rect.L, rect.T);

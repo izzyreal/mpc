@@ -50,8 +50,10 @@ namespace mpc::file::aps
         std::unique_ptr<ApsName> apsName;
         std::unique_ptr<ApsGlobalParameters> globalParameters;
         std::unique_ptr<ApsAssignTable> maTable;
-        std::vector<std::unique_ptr<ApsMixer>> drumMixers = std::vector<std::unique_ptr<ApsMixer>>(4);
-        std::vector<std::unique_ptr<ApsDrumConfiguration>> drumConfigurations = std::vector<std::unique_ptr<ApsDrumConfiguration>>(4);
+        std::vector<std::unique_ptr<ApsMixer>> drumMixers =
+            std::vector<std::unique_ptr<ApsMixer>>(4);
+        std::vector<std::unique_ptr<ApsDrumConfiguration>> drumConfigurations =
+            std::vector<std::unique_ptr<ApsDrumConfiguration>>(4);
         std::vector<std::unique_ptr<ApsProgram>> programs;
         std::vector<char> saveBytes;
 

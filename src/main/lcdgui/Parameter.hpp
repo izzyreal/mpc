@@ -18,11 +18,11 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-    class Parameter
-        : public Component
+    class Parameter : public Component
     {
 
     public:
-        Parameter(mpc::Mpc &mpc, std::string labelStr, std::string name, int x, int y, int fieldWidth);
+        Parameter(mpc::Mpc &mpc, std::string labelStr, std::string name, int x,
+                  int y, int fieldWidth);
     };
 } // namespace mpc::lcdgui

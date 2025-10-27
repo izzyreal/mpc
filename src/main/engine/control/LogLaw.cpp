@@ -8,7 +8,8 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-LogLaw::LogLaw(float min, float max, string units) : AbstractLaw(min, max, units)
+LogLaw::LogLaw(float min, float max, string units)
+    : AbstractLaw(min, max, units)
 {
     assert(min != 0.f);
     assert(max != 0.f);
@@ -23,5 +24,6 @@ int LogLaw::intValue(float userVal)
     {
         userVal = 1;
     }
-    return static_cast<int>(0.5f + ((resolution - 1) * (log10(userVal) - logMin) / logSpan));
+    return static_cast<int>(
+        0.5f + ((resolution - 1) * (log10(userVal) - logMin) / logSpan));
 }

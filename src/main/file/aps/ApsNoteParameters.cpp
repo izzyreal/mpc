@@ -11,7 +11,8 @@ using namespace mpc::file::aps;
 
 ApsNoteParameters::ApsNoteParameters(const std::vector<char> &loadBytes)
 {
-    soundIndex = loadBytes[0] == '\xff' ? -1 : static_cast<unsigned char>(loadBytes[0]);
+    soundIndex =
+        loadBytes[0] == '\xff' ? -1 : static_cast<unsigned char>(loadBytes[0]);
     assert(soundIndex >= -1);
     soundGenerationMode = loadBytes[2];
     velocityRangeLower = loadBytes[3];

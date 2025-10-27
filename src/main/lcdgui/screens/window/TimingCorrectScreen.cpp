@@ -72,14 +72,17 @@ void TimingCorrectScreen::function(int i)
             {
                 if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
                 {
-                    if (noteEvent->getNote() >= noteRange[0] && noteEvent->getNote() <= noteRange[1])
+                    if (noteEvent->getNote() >= noteRange[0] &&
+                        noteEvent->getNote() <= noteRange[1])
                     {
-                        track->shiftTiming(e, shiftTimingLater, amount, sequence->getLastTick());
+                        track->shiftTiming(e, shiftTimingLater, amount,
+                                           sequence->getLastTick());
                     }
                 }
             }
 
-            track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(), swing, noteRange[0], noteRange[1]);
+            track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(),
+                                    swing, noteRange[0], noteRange[1]);
 
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
@@ -148,8 +151,12 @@ void TimingCorrectScreen::displayNotes()
         findField("note0")->setAlignment(Alignment::Centered, 18);
         findField("note0")->setLocation(62, 40);
         findField("note0")->setSize(47, 9);
-        findField("note0")->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-        findField("note1")->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+        findField("note0")->setText(
+            StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
+            mpc::Util::noteNames()[note0] + u8"\u00D4");
+        findField("note1")->setText(
+            StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
+            mpc::Util::noteNames()[note1] + u8"\u00D4");
         findLabel("note1")->Hide(false);
         findField("note1")->Hide(false);
     }
@@ -189,10 +196,12 @@ void TimingCorrectScreen::displayAmount()
 void TimingCorrectScreen::displayTime()
 {
     auto s = sequencer->getActiveSequence().get();
-    findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1, "0");
+    findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1,
+                                      "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(s, time0), "0");
-    findField("time3")->setTextPadded(SeqUtil::getBarFromTick(s, time1) + 1, "0");
+    findField("time3")->setTextPadded(SeqUtil::getBarFromTick(s, time1) + 1,
+                                      "0");
     findField("time4")->setTextPadded(SeqUtil::getBeat(s, time1) + 1, "0");
     findField("time5")->setTextPadded(SeqUtil::getClock(s, time1), "0");
 }

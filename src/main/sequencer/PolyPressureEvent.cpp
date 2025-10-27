@@ -35,7 +35,9 @@ int PolyPressureEvent::getAmount() const
     return polyPressureValue;
 }
 
-mpc::sequencer::PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent &event) : Event(event)
+mpc::sequencer::PolyPressureEvent::PolyPressureEvent(
+    const PolyPressureEvent &event)
+    : Event(event)
 {
     setAmount(event.getAmount());
     setNote(event.getNote());

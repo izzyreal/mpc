@@ -19,9 +19,8 @@ namespace mpc::lcdgui::screens::dialog
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveAllFileScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class SaveAllFileScreen : public mpc::lcdgui::ScreenComponent,
+                              public mpc::lcdgui::screens::OpensNameScreen
     {
 
     public:

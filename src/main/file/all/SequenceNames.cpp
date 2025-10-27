@@ -22,7 +22,8 @@ SequenceNames::SequenceNames(const std::vector<char> &b)
     {
         int offset = i * ENTRY_LENGTH;
         std::string stringBuffer = "";
-        auto nameBytes = Util::vecCopyOfRange(b, offset, offset + AllParser::NAME_LENGTH);
+        auto nameBytes =
+            Util::vecCopyOfRange(b, offset, offset + AllParser::NAME_LENGTH);
 
         for (char c : nameBytes)
         {
@@ -34,7 +35,9 @@ SequenceNames::SequenceNames(const std::vector<char> &b)
         }
         names[i] = stringBuffer;
 
-        auto usednessBytes = Util::vecCopyOfRange(b, offset + AllParser::NAME_LENGTH, offset + AllParser::NAME_LENGTH + 2);
+        auto usednessBytes =
+            Util::vecCopyOfRange(b, offset + AllParser::NAME_LENGTH,
+                                 offset + AllParser::NAME_LENGTH + 2);
         usednesses[i] = usednessBytes[0] != 0 || usednessBytes[1] != 0;
     }
 }
@@ -73,7 +76,8 @@ SequenceNames::SequenceNames(mpc::Mpc &mpc)
 
             auto eventCountBytes = ByteUtil::ushort2bytes(lastEventIndex);
             saveBytes[offset + LAST_EVENT_INDEX_OFFSET] = eventCountBytes[0];
-            saveBytes[offset + LAST_EVENT_INDEX_OFFSET + 1] = eventCountBytes[1];
+            saveBytes[offset + LAST_EVENT_INDEX_OFFSET + 1] =
+                eventCountBytes[1];
         }
     }
 }
@@ -106,7 +110,9 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence *seq)
 
         for (auto &e : track->getEvents())
         {
-            auto sysEx = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e);
+            auto sysEx =
+                std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(
+                    e);
 
             if (sysEx)
             {

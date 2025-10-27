@@ -27,6 +27,7 @@ namespace mpc::file::aps
 
     public:
         ApsDrumConfiguration(const std::vector<char> &loadBytes);
-        ApsDrumConfiguration(int program, bool recPgmChange, bool recMidiVolume);
+        ApsDrumConfiguration(int program, bool recPgmChange,
+                             bool recMidiVolume);
     };
 } // namespace mpc::file::aps

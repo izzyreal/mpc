@@ -34,17 +34,21 @@ static constexpr int STRIP_OFFSET = 32;
 
 namespace
 {
-    void handleMuteGroups(NoteParameters *noteParameters,
-                          const int drumIndex,
+    void handleMuteGroups(NoteParameters *noteParameters, const int drumIndex,
                           const std::vector<std::shared_ptr<Voice>> *voices)
     {
-        if (noteParameters->getMuteAssignA() != Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED ||
-            noteParameters->getMuteAssignB() != Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED)
+        if (noteParameters->getMuteAssignA() !=
+                Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED ||
+            noteParameters->getMuteAssignB() !=
+                Mpc2000XlSpecs::MUTE_ASSIGN_DISABLED)
         {
             for (const auto &v : *voices)
             {
-                if (!v->isFinished() && (v->getMuteInfo().shouldMute(noteParameters->getMuteAssignA(), drumIndex) ||
-                                         v->getMuteInfo().shouldMute(noteParameters->getMuteAssignB(), drumIndex)))
+                if (!v->isFinished() &&
+                    (v->getMuteInfo().shouldMute(
+                         noteParameters->getMuteAssignA(), drumIndex) ||
+                     v->getMuteInfo().shouldMute(
+                         noteParameters->getMuteAssignB(), drumIndex)))
                 {
                     v->startDecay();
                 }
@@ -56,8 +60,7 @@ namespace
 void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 {
     if (c.note < Mpc2000XlSpecs::FIRST_DRUM_NOTE ||
-        c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE ||
-        c.velocity == 0)
+        c.note > Mpc2000XlSpecs::LAST_DRUM_NOTE || c.velocity == 0)
     {
         return;
     }
@@ -97,29 +100,39 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         return;
     }
 
-    auto smc = program->getStereoMixerChannel(c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
-    auto ifmc = program->getIndivFxMixerChannel(c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
+    auto smc = program->getStereoMixerChannel(c.note -
+                                              Mpc2000XlSpecs::FIRST_DRUM_NOTE);
+    auto ifmc = program->getIndivFxMixerChannel(
+        c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
 
     if (c.mixerSetupScreen->isStereoMixSourceDrum())
     {
-        smc = c.drum->getStereoMixerChannels().at(c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
+        smc = c.drum->getStereoMixerChannels().at(
+            c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
     }
 
     if (c.mixerSetupScreen->isIndivFxSourceDrum())
     {
-        ifmc = c.drum->getIndivFxMixerChannels().at(c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
+        ifmc = c.drum->getIndivFxMixerChannels().at(
+            c.note - Mpc2000XlSpecs::FIRST_DRUM_NOTE);
     }
 
     auto mixerControls = c.mixer->getMixerControls();
     auto stripNumber = voice->getStripNumber();
-    auto mainStrip = mixerControls->getStripControls(std::to_string(stripNumber));
-    auto mmc = std::dynamic_pointer_cast<MainMixControls>(mainStrip->find("Main"));
+    auto mainStrip =
+        mixerControls->getStripControls(std::to_string(stripNumber));
+    auto mmc =
+        std::dynamic_pointer_cast<MainMixControls>(mainStrip->find("Main"));
 
-    std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))->setValue(static_cast<float>(smc->getPanning() / PAN_SCALE));
-    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(smc->getLevel()));
+    std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))
+        ->setValue(static_cast<float>(smc->getPanning() / PAN_SCALE));
+    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
+        ->setValue(static_cast<float>(smc->getLevel()));
 
-    auto duplicateStrip = mixerControls->getStripControls(std::to_string(stripNumber + STRIP_OFFSET));
-    mmc = std::dynamic_pointer_cast<MainMixControls>(duplicateStrip->find("Main"));
+    auto duplicateStrip = mixerControls->getStripControls(
+        std::to_string(stripNumber + STRIP_OFFSET));
+    mmc = std::dynamic_pointer_cast<MainMixControls>(
+        duplicateStrip->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(0);
 
     if (ifmc->getOutput() > 0)
@@ -147,16 +160,23 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         }
     }
 
-    int selectedAssignableMixOutPair = static_cast<int>(ceil((ifmc->getOutput() - 2) * 0.5));
+    int selectedAssignableMixOutPair =
+        static_cast<int>(ceil((ifmc->getOutput() - 2) * 0.5));
 
     for (int i = 0; i < 4; i++)
     {
-        auto auxControl = std::dynamic_pointer_cast<CompoundControl>(mainStrip->find("AUX#" + std::to_string(i + 1)));
-        auto auxLevel = std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
-        auxLevel->setValue(i == selectedAssignableMixOutPair ? static_cast<float>(ifmc->getVolumeIndividualOut()) : 0);
+        auto auxControl = std::dynamic_pointer_cast<CompoundControl>(
+            mainStrip->find("AUX#" + std::to_string(i + 1)));
+        auto auxLevel =
+            std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
+        auxLevel->setValue(
+            i == selectedAssignableMixOutPair
+                ? static_cast<float>(ifmc->getVolumeIndividualOut())
+                : 0);
     }
 
-    if (!sound->isLoopEnabled() && np->getVoiceOverlapMode() == VoiceOverlapMode::MONO)
+    if (!sound->isLoopEnabled() &&
+        np->getVoiceOverlapMode() == VoiceOverlapMode::MONO)
     {
         for (auto &v : *c.voices)
         {
@@ -167,8 +187,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         }
     }
 
-    voice->init(c.velocity, sound, c.note, np, c.varType, c.varValue, c.drum->getIndex(),
-                c.frameOffset, true, c.startTick, c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId);
+    voice->init(c.velocity, sound, c.note, np, c.varType, c.varValue,
+                c.drum->getIndex(), c.frameOffset, true, c.startTick,
+                c.mixer->getSharedBuffer()->getSampleRate(), c.noteEventId);
 
     if (c.firstGeneration && np->getSoundGenerationMode() == 1)
     {
@@ -178,20 +199,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         if (optA != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptA = DrumNoteEventContextBuilder::buildNoteOn(
-                c.noteEventId,
-                c.drum,
-                c.sampler,
-                c.mixer,
-                c.mixerSetupScreen,
-                c.voices,
-                *c.mixerConnections,
-                optA,
-                c.velocity,
-                c.varType,
-                c.varValue,
-                c.frameOffset,
-                false,
-                c.startTick,
+                c.noteEventId, c.drum, c.sampler, c.mixer, c.mixerSetupScreen,
+                c.voices, *c.mixerConnections, optA, c.velocity, c.varType,
+                c.varValue, c.frameOffset, false, c.startTick,
                 c.durationFrames);
 
             noteOn(ctxOptA);
@@ -202,20 +212,9 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         if (optB != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
             auto ctxOptB = DrumNoteEventContextBuilder::buildNoteOn(
-                c.noteEventId,
-                c.drum,
-                c.sampler,
-                c.mixer,
-                c.mixerSetupScreen,
-                c.voices,
-                *c.mixerConnections,
-                optB,
-                c.velocity,
-                c.varType,
-                c.varValue,
-                c.frameOffset,
-                false,
-                c.startTick,
+                c.noteEventId, c.drum, c.sampler, c.mixer, c.mixerSetupScreen,
+                c.voices, *c.mixerConnections, optB, c.velocity, c.varType,
+                c.varValue, c.frameOffset, false, c.startTick,
                 c.durationFrames);
 
             noteOn(ctxOptB);

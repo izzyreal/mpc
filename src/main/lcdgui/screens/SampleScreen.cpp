@@ -131,7 +131,9 @@ void SampleScreen::function(int i)
 
                 sound->setName(sampler->addOrIncreaseNumber("sound1"));
                 auto lengthInFrames = time * (44100 * 0.1);
-                ams->getSoundRecorder()->prepare(sound, lengthInFrames, ams->getAudioServer()->getSampleRate());
+                ams->getSoundRecorder()->prepare(
+                    sound, lengthInFrames,
+                    ams->getAudioServer()->getSampleRate());
                 ams->getSoundRecorder()->setArmed(true);
                 findBackground()->setBackgroundName("waiting-for-input-signal");
             }
@@ -250,7 +252,8 @@ void SampleScreen::displayInput()
 
 void SampleScreen::displayThreshold()
 {
-    auto thresholdText = threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
+    auto thresholdText =
+        threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
     findField("threshold")->setTextPadded(thresholdText);
 }
 
@@ -262,7 +265,8 @@ void SampleScreen::displayMode()
 void SampleScreen::displayTime()
 {
     auto timeText = std::to_string(time);
-    timeText = timeText.substr(0, timeText.length() - 1) + "." + timeText.substr(timeText.length() - 1);
+    timeText = timeText.substr(0, timeText.length() - 1) + "." +
+               timeText.substr(timeText.length() - 1);
     findField("time")->setTextPadded(timeText);
 }
 
@@ -294,10 +298,13 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
         bool normall = vuPosToDb[i] <= levell;
         bool normalr = vuPosToDb[i] <= levelr;
 
-        bool thresholdHit = threshold >= vuPosToDb[i] && (i == 33 || threshold < vuPosToDb[i + 1]);
+        bool thresholdHit = threshold >= vuPosToDb[i] &&
+                            (i == 33 || threshold < vuPosToDb[i + 1]);
 
-        bool peakl = peaklValue >= vuPosToDb[i] && (i == 33 || peaklValue < vuPosToDb[i + 1]);
-        bool peakr = peakrValue >= vuPosToDb[i] && (i == 33 || peakrValue < vuPosToDb[i + 1]);
+        bool peakl = peaklValue >= vuPosToDb[i] &&
+                     (i == 33 || peaklValue < vuPosToDb[i + 1]);
+        bool peakr = peakrValue >= vuPosToDb[i] &&
+                     (i == 33 || peakrValue < vuPosToDb[i + 1]);
 
         if (thresholdHit && peakl)
         {
@@ -357,8 +364,12 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
         rString += r;
     }
 
-    findLabel("vuleft")->setText((mode == 0 || mode == 2) ? lString : "                                  ");
-    findLabel("vuright")->setText((mode == 1 || mode == 2) ? rString : "                                  ");
+    findLabel("vuleft")->setText((mode == 0 || mode == 2)
+                                     ? lString
+                                     : "                                  ");
+    findLabel("vuright")->setText((mode == 1 || mode == 2)
+                                      ? rString
+                                      : "                                  ");
 }
 
 int SampleScreen::getMode()

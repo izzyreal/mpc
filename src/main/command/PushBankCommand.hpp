@@ -17,7 +17,8 @@ namespace mpc::command
     class PushBankCommand : public Command
     {
     public:
-        PushBankCommand(std::shared_ptr<controller::ClientEventController>, const controller::Bank);
+        PushBankCommand(std::shared_ptr<controller::ClientEventController>,
+                        const controller::Bank);
         void execute() override;
 
     private:

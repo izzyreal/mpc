@@ -8,8 +8,7 @@
 namespace mpc::engine::audio::server
 {
 
-    class CompoundAudioClient final
-        : public AudioClient
+    class CompoundAudioClient final : public AudioClient
     {
 
     private:

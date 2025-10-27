@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class VeloPitchScreen
-        : public mpc::lcdgui::ScreenComponent
+    class VeloPitchScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

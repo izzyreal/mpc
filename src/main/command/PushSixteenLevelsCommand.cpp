@@ -14,15 +14,15 @@ PushSixteenLevelsCommand::PushSixteenLevelsCommand(
     std::shared_ptr<LayeredScreen> layeredScreenToUse,
     std::shared_ptr<ClientEventController> controllerToUse,
     std::shared_ptr<Hardware> hardwareToUse)
-    : layeredScreen(layeredScreenToUse),
-      controller(controllerToUse),
+    : layeredScreen(layeredScreenToUse), controller(controllerToUse),
       hardware(hardwareToUse)
 {
 }
 
 void PushSixteenLevelsCommand::execute()
 {
-    if (!layeredScreen->isCurrentScreen<SequencerScreen, Assign16LevelsScreen>())
+    if (!layeredScreen
+             ->isCurrentScreen<SequencerScreen, Assign16LevelsScreen>())
     {
         return;
     }
@@ -30,7 +30,8 @@ void PushSixteenLevelsCommand::execute()
     if (controller->isSixteenLevelsEnabled())
     {
         controller->setSixteenLevelsEnabled(false);
-        hardware->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(false);
+        hardware->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)
+            ->setEnabled(false);
     }
     else
     {

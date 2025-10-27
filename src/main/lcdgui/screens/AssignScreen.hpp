@@ -3,8 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-    class AssignScreen
-        : public mpc::lcdgui::ScreenComponent
+    class AssignScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -24,6 +23,7 @@ namespace mpc::lcdgui::screens
         void displayAssignNv();
 
     private:
-        std::vector<std::string> typeNames = {"TUNING", "DECAY", "ATTACK", "FILTER"};
+        std::vector<std::string> typeNames = {"TUNING", "DECAY", "ATTACK",
+                                              "FILTER"};
     };
 } // namespace mpc::lcdgui::screens

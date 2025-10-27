@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens
 {
 
-    class PgmParamsScreen
-        : public mpc::lcdgui::ScreenComponent
+    class PgmParamsScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -30,6 +29,7 @@ namespace mpc::lcdgui::screens
         void displayVoiceOverlap();
 
         std::vector<std::string> decayModes = {"END", "START"};
-        std::vector<std::string> voiceOverlapModes = {"POLY", "MONO", "NOTE OFF"};
+        std::vector<std::string> voiceOverlapModes = {"POLY", "MONO",
+                                                      "NOTE OFF"};
     };
 } // namespace mpc::lcdgui::screens

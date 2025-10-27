@@ -16,52 +16,66 @@ using namespace mpc::lcdgui::screens;
 
 bool WithTimesAndNotes::checkAllTimes(mpc::Mpc &mpc, int notch, Sequence *seq)
 {
-    auto sequence = seq != nullptr ? seq : mpc.getSequencer()->getActiveSequence().get();
+    auto sequence =
+        seq != nullptr ? seq : mpc.getSequencer()->getActiveSequence().get();
 
-    const auto focusedFieldName = mpc.getLayeredScreen()->getCurrentScreen()->getFocusedFieldNameOrThrow();
+    const auto focusedFieldName = mpc.getLayeredScreen()
+                                      ->getCurrentScreen()
+                                      ->getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "time0")
     {
-        setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence, time0));
+        setTime0(SeqUtil::getTickFromBar(
+            (SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence,
+            time0));
         return true;
     }
     else if (focusedFieldName == "time1")
     {
-        setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch, sequence, time0));
+        setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch,
+                                  sequence, time0));
         return true;
     }
     else if (focusedFieldName == "time2")
     {
-        setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch, sequence, time0));
+        setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch,
+                                   sequence, time0));
         return true;
     }
     else if (focusedFieldName == "time3")
     {
-        setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence, time1));
+        setTime1(SeqUtil::getTickFromBar(
+            (SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence,
+            time1));
         return true;
     }
     else if (focusedFieldName == "time4")
     {
-        setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch, sequence, time1));
+        setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch,
+                                  sequence, time1));
         return true;
     }
     else if (focusedFieldName == "time5")
     {
-        setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch, sequence, time1));
+        setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch,
+                                   sequence, time1));
         return true;
     }
 
     return false;
 }
 
-bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc &mpc, int notch, Sequence *seq, Track *_track)
+bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc &mpc, int notch,
+                                              Sequence *seq, Track *_track)
 {
     auto param = mpc.getLayeredScreen()->getFocusedFieldName();
 
     auto timesHaveChanged = checkAllTimes(mpc, notch, seq);
     auto notesHaveChanged = false;
 
-    const auto focusedFieldName = mpc.getLayeredScreen()->getCurrentScreen()->getFocusedFieldNameOrThrow();
+    const auto focusedFieldName = mpc.getLayeredScreen()
+                                      ->getCurrentScreen()
+                                      ->getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "note0")
     {

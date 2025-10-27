@@ -4,11 +4,13 @@
 
 using namespace mpc::midi::event;
 
-PitchBend::PitchBend(int tick, int channel, int lsb, int msb) : ChannelEvent(tick, ChannelEvent::PITCH_BEND, channel, lsb, msb)
+PitchBend::PitchBend(int tick, int channel, int lsb, int msb)
+    : ChannelEvent(tick, ChannelEvent::PITCH_BEND, channel, lsb, msb)
 {
 }
 
-PitchBend::PitchBend(int tick, int delta, int channel, int lsb, int msb) : ChannelEvent(tick, delta, ChannelEvent::PITCH_BEND, channel, lsb, msb)
+PitchBend::PitchBend(int tick, int delta, int channel, int lsb, int msb)
+    : ChannelEvent(tick, delta, ChannelEvent::PITCH_BEND, channel, lsb, msb)
 {
 }
 

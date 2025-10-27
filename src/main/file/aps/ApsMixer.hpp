@@ -36,6 +36,7 @@ namespace mpc::file::aps
 
     public:
         ApsMixer(const std::vector<char> &loadBytes);
-        ApsMixer(std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &smc, std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &ifmc);
+        ApsMixer(std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &smc,
+                 std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &ifmc);
     };
 } // namespace mpc::file::aps

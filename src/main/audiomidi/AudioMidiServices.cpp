@@ -45,8 +45,7 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::control;
 using namespace mpc::engine;
 
-AudioMidiServices::AudioMidiServices(mpc::Mpc &mpcToUse)
-    : mpc(mpcToUse)
+AudioMidiServices::AudioMidiServices(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
 {
     VoiceUtil::freqTable();
     frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse);
@@ -73,14 +72,12 @@ void AudioMidiServices::start()
     createSynth();
 
     inputProcess = server->openAudioInput("RECORD IN");
-    monitorInputAdapter = std::make_shared<MonitorInputAdapter>(mpc, inputProcess);
+    monitorInputAdapter =
+        std::make_shared<MonitorInputAdapter>(mpc, inputProcess);
 
     const std::vector<std::string> outputNames{
-        "STEREO OUT",
-        "ASSIGNABLE MIX OUT 1/2",
-        "ASSIGNABLE MIX OUT 3/4",
-        "ASSIGNABLE MIX OUT 5/6",
-        "ASSIGNABLE MIX OUT 7/8"};
+        "STEREO OUT", "ASSIGNABLE MIX OUT 1/2", "ASSIGNABLE MIX OUT 3/4",
+        "ASSIGNABLE MIX OUT 5/6", "ASSIGNABLE MIX OUT 7/8"};
 
     for (int i = 0; i < 5; i++)
     {
@@ -95,7 +92,8 @@ void AudioMidiServices::start()
     mixer->getStrip(std::string("67"))->setInputProcess(soundPlayer);
     auto sc = mixer->getMixerControls()->getStripControls("67");
     auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(100));
+    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
+        ->setValue(static_cast<float>(100));
 
     cac = std::make_shared<CompoundAudioClient>();
     cac->add(frameSeq.get());
@@ -113,7 +111,8 @@ void AudioMidiServices::setMonitorLevel(int level)
 {
     auto sc = mixer->getMixerControls()->getStripControls("66");
     auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(level));
+    std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
+        ->setValue(static_cast<float>(level));
 }
 
 void AudioMidiServices::muteMonitor(bool mute)
@@ -150,13 +149,17 @@ void AudioMidiServices::setupMixer()
     mixerControls->createAuxBusControls("AUX#4");
 
     // L/R represents STEREO OUT L/R
-    MixerControlsFactory::createBusStrips(std::dynamic_pointer_cast<MixerControls>(mixerControls), "L-R");
+    MixerControlsFactory::createBusStrips(
+        std::dynamic_pointer_cast<MixerControls>(mixerControls), "L-R");
 
     /*
-     * There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
-     * There's one channel for the PreviewSoundPlayer, which plays the metronome, preview and playX sounds. This is strip 65.
-     * Finally there's one channel to receive and monitor sampler input, this is strip 66, and one for playing quick previews, on strip 67.
-     * Hence nMixerChans = 67
+     * There are 32 voices. Each voice has one channel for mixing to STEREO OUT
+     * L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are
+     * strips 1-64. There's one channel for the PreviewSoundPlayer, which plays
+     * the metronome, preview and playX sounds. This is strip 65. Finally
+     * there's one channel to receive and monitor sampler input, this is strip
+     * 66, and one for playing quick previews, on strip 67. Hence nMixerChans =
+     * 67
      */
     int nMixerChans = 67;
     MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
@@ -176,7 +179,8 @@ int AudioMidiServices::getMainLevel()
 {
     auto sc = mixer->getMixerControls()->getStripControls("L-R");
     auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
-    auto val = std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->getValue();
+    auto val =
+        std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->getValue();
     return (int)(val);
 }
 
@@ -192,22 +196,25 @@ int AudioMidiServices::getRecordLevel()
     /*
     // This is how we can get monitor output level
     auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
-    auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-    return static_cast<int>(std::dynamic_pointer_cast<FaderControl>(mmc->find("Level").lock())->getValue());
+    auto mmc =
+    std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock()); return
+    static_cast<int>(std::dynamic_pointer_cast<FaderControl>(mmc->find("Level").lock())->getValue());
     */
 }
 
 void AudioMidiServices::setAssignableMixOutLevels()
 {
     /*
-     * We have to make sure the ASSIGNABLE MIX OUTs are audible. They're fixed at value 100.
+     * We have to make sure the ASSIGNABLE MIX OUTs are audible. They're fixed
+     * at value 100.
      */
     for (auto j = 1; j <= 4; j++)
     {
         std::string name = "AUX#" + std::to_string(j);
         auto sc = mixer->getMixerControls()->getStripControls(name);
         auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find(name));
-        std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->setValue(100);
+        std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))
+            ->setValue(100);
     }
 }
 
@@ -237,7 +244,8 @@ void AudioMidiServices::createSynth()
         soundPlayerChannels.emplace_back(Drum(drumIndex));
     }
 
-    basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(mpc.getSampler(), mixer, basicVoice);
+    basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(
+        mpc.getSampler(), mixer, basicVoice);
 }
 
 void AudioMidiServices::connectVoices()
@@ -247,7 +255,8 @@ void AudioMidiServices::connectVoices()
         auto ams1 = mixer->getStrip(std::to_string(j + 1));
         auto voice = voices[j];
         ams1->setInputProcess(voice);
-        mixerConnections.emplace_back(new MixerInterconnection("con" + std::to_string(j), server.get()));
+        mixerConnections.emplace_back(
+            new MixerInterconnection("con" + std::to_string(j), server.get()));
         auto &mi = mixerConnections.back();
         ams1->setDirectOutputProcess(mi->getInputProcess());
         auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
@@ -261,7 +270,8 @@ void AudioMidiServices::initializeDiskRecorders()
 {
     for (int i = 0; i < outputProcesses.size(); i++)
     {
-        auto diskRecorder = std::make_shared<DiskRecorder>(mpc, outputProcesses[i], i);
+        auto diskRecorder =
+            std::make_shared<DiskRecorder>(mpc, outputProcesses[i], i);
 
         diskRecorders.push_back(diskRecorder);
 
@@ -271,7 +281,8 @@ void AudioMidiServices::initializeDiskRecorders()
         }
         else
         {
-            mixer->getStrip(std::string("AUX#" + std::to_string(i)))->setDirectOutputProcess(diskRecorders.back());
+            mixer->getStrip(std::string("AUX#" + std::to_string(i)))
+                ->setDirectOutputProcess(diskRecorders.back());
         }
     }
 }
@@ -296,7 +307,8 @@ void AudioMidiServices::closeIO()
 
 bool AudioMidiServices::prepareBouncing(DirectToDiskSettings *settings)
 {
-    const auto destinationDirectory = mpc.paths->recordingsPath() / settings->recordingName;
+    const auto destinationDirectory =
+        mpc.paths->recordingsPath() / settings->recordingName;
 
     fs::create_directory(destinationDirectory);
 
@@ -304,11 +316,9 @@ bool AudioMidiServices::prepareBouncing(DirectToDiskSettings *settings)
     {
         auto eapa = diskRecorders[i];
 
-        if (!eapa->prepare(
-                settings->lengthInFrames,
-                settings->sampleRate,
-                !settings->splitStereoIntoLeftAndRightChannel,
-                destinationDirectory))
+        if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate,
+                           !settings->splitStereoIntoLeftAndRightChannel,
+                           destinationDirectory))
         {
             return false;
         }
@@ -339,17 +349,20 @@ void AudioMidiServices::stopBouncing()
     mpc.getLayeredScreen()->openScreen<VmpcRecordingFinishedScreen>();
     bouncing.store(false);
 
-    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
+    auto directToDiskRecorderScreen =
+        mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
     if (directToDiskRecorderScreen->seqLoopWasEnabled)
     {
-        auto seq = mpc.getSequencer()->getSequence(directToDiskRecorderScreen->sq);
+        auto seq =
+            mpc.getSequencer()->getSequence(directToDiskRecorderScreen->sq);
         seq->setLoopEnabled(true);
         directToDiskRecorderScreen->seqLoopWasEnabled = false;
     }
     else if (directToDiskRecorderScreen->songLoopWasEnabled)
     {
-        auto song = mpc.getSequencer()->getSong(directToDiskRecorderScreen->song);
+        auto song =
+            mpc.getSequencer()->getSong(directToDiskRecorderScreen->song);
         song->setLoopEnabled(true);
         directToDiskRecorderScreen->songLoopWasEnabled = false;
     }
@@ -431,7 +444,8 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
 // Should be called from the audio thread only!
 void AudioMidiServices::changeBounceStateIfRequired()
 {
-    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
+    auto directToDiskRecorderScreen =
+        mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
 
     if (isBouncing() && !wasBouncing)
     {
@@ -441,7 +455,8 @@ void AudioMidiServices::changeBounceStateIfRequired()
         if (directToDiskRecorderScreen->isOffline())
         {
             //            std::vector<int> rates{ 44100, 48000, 88200 };
-            //            auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
+            //            auto rate =
+            //            rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
             //            frameSeq->setSampleRate(offlineServer->getSampleRate());
             frameSeq->start();
 
@@ -516,7 +531,8 @@ std::vector<std::shared_ptr<engine::Voice>> &AudioMidiServices::getVoices()
     return voices;
 }
 
-std::vector<mpc::engine::MixerInterconnection *> &AudioMidiServices::getMixerConnections()
+std::vector<mpc::engine::MixerInterconnection *> &
+AudioMidiServices::getMixerConnections()
 {
     return mixerConnections;
 }

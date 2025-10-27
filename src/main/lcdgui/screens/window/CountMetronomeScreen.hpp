@@ -7,13 +7,14 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class CountMetronomeScreen
-        : public mpc::lcdgui::ScreenComponent
+    class CountMetronomeScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:
         std::vector<std::string> countInNames = {"OFF", "REC ONLY", "REC+PLAY"};
-        std::vector<std::string> rateNames = {"1/4", "1/4(3)", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)"};
+        std::vector<std::string> rateNames = {"1/4",    "1/4(3)", "1/8",
+                                              "1/8(3)", "1/16",   "1/16(3)",
+                                              "1/32",   "1/32(3)"};
 
         int countIn = 1;
         bool inPlay = false;

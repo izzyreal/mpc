@@ -4,8 +4,7 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-    class DeleteAllTracksScreen
-        : public mpc::lcdgui::ScreenComponent
+    class DeleteAllTracksScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

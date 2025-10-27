@@ -39,8 +39,7 @@ namespace mpc::lcdgui::screens::dialog
 
 namespace mpc::lcdgui::screens
 {
-    class LoadScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoadScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -56,7 +55,9 @@ namespace mpc::lcdgui::screens
         std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
 
     private:
-        const std::vector<std::string> views{"All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET"};
+        const std::vector<std::string> views{"All Files", ".SND", ".PGM",
+                                             ".APS",      ".MID", ".ALL",
+                                             ".WAV",      ".SEQ", ".SET"};
 
         int view = 0;
         int fileLoad = 0;

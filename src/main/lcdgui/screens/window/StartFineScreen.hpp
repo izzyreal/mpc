@@ -8,8 +8,7 @@
 
 namespace mpc::lcdgui::screens::window
 {
-    class StartFineScreen
-        : public mpc::lcdgui::ScreenComponent
+    class StartFineScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:
@@ -25,7 +24,8 @@ namespace mpc::lcdgui::screens::window
         void setSlider(int) override;
 
     private:
-        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END"};
+        const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
+                                                  "BEFOR TO", "AFTR END"};
         void displayFineWave();
         void displayStart();
         void displaySmplLngth();

@@ -8,8 +8,7 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens::window
 {
-    class IgnoreTempoChangeScreen
-        : public mpc::lcdgui::ScreenComponent
+    class IgnoreTempoChangeScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

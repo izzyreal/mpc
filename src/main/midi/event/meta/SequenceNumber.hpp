@@ -6,8 +6,7 @@ namespace mpc::midi::event::meta
 
     class MetaEventData;
 
-    class SequenceNumber
-        : public MetaEvent
+    class SequenceNumber : public MetaEvent
     {
 
     private:
@@ -19,7 +18,8 @@ namespace mpc::midi::event::meta
         int getSequenceNumber();
 
     public:
-        static std::shared_ptr<MetaEvent> parseSequenceNumber(int tick, int delta, MetaEventData *info);
+        static std::shared_ptr<MetaEvent>
+        parseSequenceNumber(int tick, int delta, MetaEventData *info);
 
     public:
         void writeToOutputStream(std::ostream &out) override;

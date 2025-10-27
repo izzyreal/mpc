@@ -57,7 +57,8 @@ void TransScreen::turnWheel(int i)
     {
         auto candidate = bar0 + i;
 
-        if (candidate < 0 || candidate > sequencer->getActiveSequence()->getLastBarIndex())
+        if (candidate < 0 ||
+            candidate > sequencer->getActiveSequence()->getLastBarIndex())
         {
             return;
         }
@@ -68,7 +69,8 @@ void TransScreen::turnWheel(int i)
     {
         auto candidate = bar1 + i;
 
-        if (candidate < 0 || candidate > sequencer->getActiveSequence()->getLastBarIndex())
+        if (candidate < 0 ||
+            candidate > sequencer->getActiveSequence()->getLastBarIndex())
         {
             return;
         }
@@ -130,7 +132,9 @@ void TransScreen::displayTransposeAmount()
 
 void TransScreen::displayTr()
 {
-    auto trName = std::string(tr == -1 ? "ALL" : sequencer->getActiveSequence()->getTrack(tr)->getName());
+    auto trName = std::string(
+        tr == -1 ? "ALL"
+                 : sequencer->getActiveSequence()->getTrack(tr)->getName());
     findField("tr")->setTextPadded(tr + 1, "0");
     findLabel("track-name")->setText(trName);
 }

@@ -10,36 +10,39 @@ using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-ClientMidiEventController::ClientMidiEventController(std::shared_ptr<ClientEventController> clientEventControllerToUse,
-                                                     std::shared_ptr<ClientHardwareEventController> clientHardwareEventControllerToUse,
-                                                     std::shared_ptr<MidiSwScreen> midiSwScreen,
-                                                     std::shared_ptr<sequencer::Sequencer> sequencer,
-                                                     std::shared_ptr<MidiInputScreen> midiInputScreen,
-                                                     std::shared_ptr<audiomidi::EventHandler> eventHandler,
-                                                     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
-                                                     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
+ClientMidiEventController::ClientMidiEventController(
+    std::shared_ptr<ClientEventController> clientEventControllerToUse,
+    std::shared_ptr<ClientHardwareEventController>
+        clientHardwareEventControllerToUse,
+    std::shared_ptr<MidiSwScreen> midiSwScreen,
+    std::shared_ptr<sequencer::Sequencer> sequencer,
+    std::shared_ptr<MidiInputScreen> midiInputScreen,
+    std::shared_ptr<audiomidi::EventHandler> eventHandler,
+    std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
+    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
     : clientEventController(clientEventControllerToUse),
       clientHardwareEventController(clientHardwareEventControllerToUse)
 {
-    footswitchController = std::make_shared<ClientMidiFootswitchAssignmentController>(clientHardwareEventController, midiSwScreen, sequencer);
+    footswitchController =
+        std::make_shared<ClientMidiFootswitchAssignmentController>(
+            clientHardwareEventController, midiSwScreen, sequencer);
 
     // Create the sound generator controller with the passed dependencies
-    soundGeneratorController = std::make_shared<ClientMidiSoundGeneratorController>(
-        clientEventController,
-        midiInputScreen,
-        eventHandler,
-        sequencer,
-        multiRecordingSetupScreen,
-        timingCorrectScreen);
+    soundGeneratorController =
+        std::make_shared<ClientMidiSoundGeneratorController>(
+            clientEventController, midiInputScreen, eventHandler, sequencer,
+            multiRecordingSetupScreen, timingCorrectScreen);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
     e.printInfo();
 
-    if (clientEventController->getLayeredScreen()->getCurrentScreenName() == "midi-input-monitor")
+    if (clientEventController->getLayeredScreen()->getCurrentScreenName() ==
+        "midi-input-monitor")
     {
-        const auto notificationMessage = std::string("a") + std::to_string(e.getChannel());
+        const auto notificationMessage =
+            std::string("a") + std::to_string(e.getChannel());
         notifyObservers(notificationMessage);
     }
 
@@ -75,7 +78,8 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     }
 }
 
-std::shared_ptr<ClientMidiSoundGeneratorController> ClientMidiEventController::getSoundGeneratorController()
+std::shared_ptr<ClientMidiSoundGeneratorController>
+ClientMidiEventController::getSoundGeneratorController()
 {
     return soundGeneratorController;
 }

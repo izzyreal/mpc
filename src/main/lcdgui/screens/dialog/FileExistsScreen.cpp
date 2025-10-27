@@ -36,8 +36,10 @@ void FileExistsScreen::function(int i)
     }
 }
 
-void FileExistsScreen::initialize(std::function<void()> replaceActionToUse, std::function<void()> initializeNameScreenToUse,
-                                  std::function<void()> cancelActionToUse)
+void FileExistsScreen::initialize(
+    std::function<void()> replaceActionToUse,
+    std::function<void()> initializeNameScreenToUse,
+    std::function<void()> cancelActionToUse)
 {
     replaceAction = replaceActionToUse;
     initializeNameScreen = initializeNameScreenToUse;

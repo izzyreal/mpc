@@ -107,13 +107,15 @@ void TempoChangeScreen::initVisibleEvents()
 void TempoChangeScreen::displayInitialTempo()
 {
     auto seq = sequencer->getActiveSequence();
-    findField("initial-tempo")->setText(Util::tempoString(seq->getInitialTempo()));
+    findField("initial-tempo")
+        ->setText(Util::tempoString(seq->getInitialTempo()));
 }
 
 void TempoChangeScreen::displayTempoChangeOn()
 {
     auto sequence = sequencer->getActiveSequence();
-    findField("tempo-change")->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
+    findField("tempo-change")
+        ->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
 }
 
 void TempoChangeScreen::displayTempoChange0()
@@ -125,7 +127,8 @@ void TempoChangeScreen::displayTempoChange0()
     findField("a0")->setText(std::to_string(offset + 1));
     auto timeSig = sequence->getTimeSignature();
 
-    int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
+    int value =
+        tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
     findField("b0")->setTextPadded(value, "0");
     value = tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
     findField("c0")->setTextPadded(value, "0");
@@ -182,16 +185,21 @@ void TempoChangeScreen::displayTempoChange1()
     auto sequence = sequencer->getActiveSequence();
     auto timeSig = sequence->getTimeSignature();
 
-    findField("b1")->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-    findField("c1")->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-    findField("d1")->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
+    findField("b1")->setTextPadded(
+        tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
+    findField("c1")->setTextPadded(
+        tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1,
+        "0");
+    findField("d1")->setTextPadded(tce->getClock(timeSig.getDenominator()),
+                                   "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
     ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
     ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
     findField("e1")->setText(ratioStr);
 
-    auto tempo = std::clamp(sequence->getInitialTempo() * (tce->getRatio() * 0.001), 30.0, 300.0);
+    auto tempo = std::clamp(
+        sequence->getInitialTempo() * (tce->getRatio() * 0.001), 30.0, 300.0);
 
     findField("f1")->setText(Util::tempoString(tempo));
     bars[1]->setValue((tempo - 30) / 270.0);
@@ -231,16 +239,21 @@ void TempoChangeScreen::displayTempoChange2()
 
     auto sequence = sequencer->getActiveSequence();
     auto timeSig = sequence->getTimeSignature();
-    findField("b2")->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-    findField("c2")->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-    findField("d2")->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
+    findField("b2")->setTextPadded(
+        tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
+    findField("c2")->setTextPadded(
+        tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1,
+        "0");
+    findField("d2")->setTextPadded(tce->getClock(timeSig.getDenominator()),
+                                   "0");
 
     std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
     ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
     ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
     findField("e2")->setText(ratioStr);
 
-    auto tempo = std::clamp(sequence->getInitialTempo() * tce->getRatio() * 0.001, 30.0, 300.0);
+    auto tempo = std::clamp(
+        sequence->getInitialTempo() * tce->getRatio() * 0.001, 30.0, 300.0);
 
     findField("f2")->setText(Util::tempoString(tempo));
     bars[2]->setValue((tempo - 30) / 270.0);
@@ -342,7 +355,8 @@ void TempoChangeScreen::function(int j)
 
             if (nowDetected == -1)
             {
-                std::shared_ptr<Event> tce = seq->addTempoChangeEvent(sequencer->getTickPosition());
+                std::shared_ptr<Event> tce =
+                    seq->addTempoChangeEvent(sequencer->getTickPosition());
                 initVisibleEvents();
                 displayTempoChange0();
                 displayTempoChange1();
@@ -357,7 +371,8 @@ void TempoChangeScreen::function(int j)
                     setOffset(nowDetected);
                 }
 
-                ls->setFocus(focusedFieldName.substr(0, 1) + std::to_string(nowDetected - offset));
+                ls->setFocus(focusedFieldName.substr(0, 1) +
+                             std::to_string(nowDetected - offset));
             }
         }
         break;
@@ -504,7 +519,8 @@ void TempoChangeScreen::turnWheel(int j)
                 event->minusOneBar(previous.lock().get());
             }
         }
-        else if (mayChangePosition && focusedFieldName == "c" + std::to_string(i))
+        else if (mayChangePosition &&
+                 focusedFieldName == "c" + std::to_string(i))
         {
             if (j > 0)
             {
@@ -515,7 +531,8 @@ void TempoChangeScreen::turnWheel(int j)
                 event->minusOneBeat(previous.lock().get());
             }
         }
-        else if (mayChangePosition && focusedFieldName == "d" + std::to_string(i))
+        else if (mayChangePosition &&
+                 focusedFieldName == "d" + std::to_string(i))
         {
             if (j > 0)
             {
@@ -536,7 +553,8 @@ void TempoChangeScreen::turnWheel(int j)
             event->setRatio((int)round(ratio * 1000.0));
         }
 
-        if (focusedFieldName.length() == 2 && stoi(focusedFieldName.substr(1)) == i)
+        if (focusedFieldName.length() == 2 &&
+            stoi(focusedFieldName.substr(1)) == i)
         {
             if (i == 0)
             {
@@ -596,7 +614,8 @@ void TempoChangeScreen::down()
 
         auto sequence = sequencer->getActiveSequence();
 
-        if (offset + yPos == sequence->getTempoChangeEvents().size() && focusedFieldName[0] != 'a')
+        if (offset + yPos == sequence->getTempoChangeEvents().size() &&
+            focusedFieldName[0] != 'a')
         {
             ls->setFocus("a2");
         }

@@ -28,8 +28,7 @@ namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
-    class Sequencer final
-        : public Observable
+    class Sequencer final : public Observable
     {
 
     public:
@@ -80,8 +79,10 @@ namespace mpc::sequencer
         int playedStepRepetitions = 0; // Part of SONG mode
         bool endOfSong = false;
 
-        std::vector<std::shared_ptr<Sequence>> sequences = std::vector<std::shared_ptr<Sequence>>(99);
-        std::vector<std::shared_ptr<Song>> songs = std::vector<std::shared_ptr<Song>>(20);
+        std::vector<std::shared_ptr<Sequence>> sequences =
+            std::vector<std::shared_ptr<Sequence>>(99);
+        std::vector<std::shared_ptr<Song>> songs =
+            std::vector<std::shared_ptr<Song>>(20);
         std::vector<uint64_t> taps{0, 0, 0, 0};
 
         std::shared_ptr<Sequence> undoPlaceHolder;
@@ -118,20 +119,25 @@ namespace mpc::sequencer
 
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         void play(bool fromStart);
-        std::shared_ptr<Sequence> copySequence(std::shared_ptr<Sequence> source);
-        void copySequenceParameters(std::shared_ptr<Sequence> source, std::shared_ptr<Sequence> dest);
-        void copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst);
+        std::shared_ptr<Sequence>
+        copySequence(std::shared_ptr<Sequence> source);
+        void copySequenceParameters(std::shared_ptr<Sequence> source,
+                                    std::shared_ptr<Sequence> dest);
+        void copyTempoChangeEvents(std::shared_ptr<Sequence> src,
+                                   std::shared_ptr<Sequence> dst);
         void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
 
     public:
-        static void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
+        static void copyTrackParameters(std::shared_ptr<Track> source,
+                                        std::shared_ptr<Track> dest);
         void notifyTimeDisplay();
         void notifyTimeDisplayRealtime();
         void init();
         void setTempo(double newTempo);
         double getTempo();
         bool isTempoSourceSequenceEnabled();
-        void setTempoSourceSequence(bool b, const bool shouldNotifyObservers = true);
+        void setTempoSourceSequence(bool b,
+                                    const bool shouldNotifyObservers = true);
         bool isRecordingOrOverdubbing();
         bool isRecording();
         bool isSoloEnabled();
@@ -179,7 +185,8 @@ namespace mpc::sequencer
         void copySong(const int source, const int dest);
 
     public:
-        void copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex);
+        void copyTrack(int sourceTrackIndex, int destinationTrackIndex,
+                       int sourceSequenceIndex, int destinationSequenceIndex);
         std::vector<std::string> &getDefaultTrackNames();
         std::string getDefaultTrackName(int i);
         void setDefaultTrackName(std::string s, int i);

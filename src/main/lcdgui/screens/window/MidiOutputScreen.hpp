@@ -5,9 +5,8 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class MidiOutputScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class MidiOutputScreen : public mpc::lcdgui::ScreenComponent,
+                             public mpc::lcdgui::screens::OpensNameScreen
     {
 
     public:
@@ -25,7 +24,8 @@ namespace mpc::lcdgui::screens::window
     private:
         int softThru = 0;
         int deviceIndex = 1;
-        std::vector<std::string> softThruNames = {"OFF", "AS TRACK", "OMNI-A", "OMNI-B", "OMNI-AB"};
+        std::vector<std::string> softThruNames = {"OFF", "AS TRACK", "OMNI-A",
+                                                  "OMNI-B", "OMNI-AB"};
         void displaySoftThru();
         void displayDeviceName();
         void setDeviceIndex(int i);

@@ -82,15 +82,18 @@ namespace mpc::sequencer
         void processNoteRepeat();
 
     private:
-        std::shared_ptr<mpc::lcdgui::screens::window::CountMetronomeScreen> countMetronomeScreen;
-        std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen;
+        std::shared_ptr<mpc::lcdgui::screens::window::CountMetronomeScreen>
+            countMetronomeScreen;
+        std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
+            timingCorrectScreen;
         std::shared_ptr<mpc::lcdgui::screens::SequencerScreen> sequencerScreen;
         std::shared_ptr<mpc::lcdgui::screens::UserScreen> userScreen;
         std::shared_ptr<mpc::lcdgui::screens::PunchScreen> punchScreen;
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 
         mpc::Mpc &mpc;
-        std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(50);
+        std::vector<EventAfterNFrames> eventsAfterNFrames =
+            std::vector<EventAfterNFrames>(50);
 
         void move(int newTickPos);
 
@@ -115,7 +118,8 @@ namespace mpc::sequencer
 
         bool isRunning();
 
-        void enqueueEventAfterNFrames(const std::function<void()> &event, unsigned long nFrames);
+        void enqueueEventAfterNFrames(const std::function<void()> &event,
+                                      unsigned long nFrames);
 
         uint64_t getMetronomeOnlyTickPosition();
     };

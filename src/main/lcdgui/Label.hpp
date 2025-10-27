@@ -13,6 +13,7 @@ namespace mpc::lcdgui
     class Label : public TextComp
     {
     public:
-        Label(mpc::Mpc &mpc, const std::string &name, std::string text, int x, int y, int width);
+        Label(mpc::Mpc &mpc, const std::string &name, std::string text, int x,
+              int y, int width);
     };
 } // namespace mpc::lcdgui

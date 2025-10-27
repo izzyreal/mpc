@@ -19,7 +19,6 @@ namespace mpc::audiomidi
     public:
         DirectToDiskSettings(int lengthInFrames,
                              bool splitStereoIntoLeftAndRightChannel,
-                             int sampleRate,
-                             std::string recordingName);
+                             int sampleRate, std::string recordingName);
     };
 } // namespace mpc::audiomidi

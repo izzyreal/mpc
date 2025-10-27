@@ -5,8 +5,7 @@
 
 namespace mpc::sequencer
 {
-    class ControlChangeEvent
-        : public Event
+    class ControlChangeEvent : public Event
     {
 
     private:

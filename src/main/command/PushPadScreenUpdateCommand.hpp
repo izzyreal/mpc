@@ -12,7 +12,8 @@ namespace mpc::command
     class PushPadScreenUpdateCommand : public Command
     {
     public:
-        PushPadScreenUpdateCommand(context::PushPadScreenUpdateContext &ctx, int padIndexWithBank);
+        PushPadScreenUpdateCommand(context::PushPadScreenUpdateContext &ctx,
+                                   int padIndexWithBank);
         void execute() override;
 
     private:

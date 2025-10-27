@@ -3,8 +3,7 @@
 
 namespace mpc::sequencer
 {
-    class MixerEvent
-        : public Event
+    class MixerEvent : public Event
     {
 
     private:

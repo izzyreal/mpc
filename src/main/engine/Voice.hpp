@@ -140,7 +140,8 @@ namespace mpc::engine
         mpc::engine::filter::StateVariableFilterControls *svfControls = nullptr;
 
         // The master level that is set in the Mixer Setup screen.
-        // -Inf, -72, -66, -60, -54, -48, -42, -36, -30, -24, -18, -12, -6, 0, 6 or 12 dB.
+        // -Inf, -72, -66, -60, -54, -48, -42, -36, -30, -24, -18, -12, -6, 0, 6
+        // or 12 dB.
         std::atomic_int8_t masterLevel{0};
 
         void readFrame();
@@ -149,21 +150,14 @@ namespace mpc::engine
 
     public:
         // Called from audio thread
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+                         int nFrames) override;
 
         // Called from main thread
-        void init(int velocity,
-                  std::shared_ptr<mpc::sampler::Sound> sound,
-                  int note,
-                  mpc::sampler::NoteParameters *np,
-                  int varType,
-                  int varValue,
-                  int drumIndex,
-                  int frameOffset,
-                  bool enableEnvs,
-                  int startTick,
-                  float engineSampleRate,
-                  uint64_t noteEventId);
+        void init(int velocity, std::shared_ptr<mpc::sampler::Sound> sound,
+                  int note, mpc::sampler::NoteParameters *np, int varType,
+                  int varValue, int drumIndex, int frameOffset, bool enableEnvs,
+                  int startTick, float engineSampleRate, uint64_t noteEventId);
 
         uint64_t getNoteEventId();
 

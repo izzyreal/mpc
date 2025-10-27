@@ -12,9 +12,8 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class EventsScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public WithTimesAndNotes
+    class EventsScreen : public mpc::lcdgui::ScreenComponent,
+                         public WithTimesAndNotes
     {
 
     public:
@@ -28,7 +27,8 @@ namespace mpc::lcdgui::screens
         void open() override;
 
         void performCopy(int sourceStart, int sourceEnd, int toSequenceIndex,
-                         int destStart, int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1);
+                         int destStart, int toTrackIndex, bool copyModeMerge,
+                         int copyCount, int copyNote0, int copyNote1);
 
     private:
         void displayTime() override;
@@ -48,9 +48,12 @@ namespace mpc::lcdgui::screens
     private:
         bool setNote1X = true;
         int tab = 0;
-        const std::vector<std::string> tabNames{"events", "bars", "tr-move", "user"};
-        const std::vector<std::string> modeNames{"ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL"};
-        const std::vector<std::string> functionNames{"COPY", "DURATION", "VELOCITY", "TRANSPOSE"};
+        const std::vector<std::string> tabNames{"events", "bars", "tr-move",
+                                                "user"};
+        const std::vector<std::string> modeNames{"ADD VALUE", "SUB VALUE",
+                                                 "MULTI VAL%", "SET TO VAL"};
+        const std::vector<std::string> functionNames{"COPY", "DURATION",
+                                                     "VELOCITY", "TRANSPOSE"};
         bool modeMerge = false;
         int editFunctionNumber = 0;
         int toSq = 0;

@@ -5,10 +5,7 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-LcdLine Bressenham::Line(int x1,
-                         int y1,
-                         int const x2,
-                         int const y2)
+LcdLine Bressenham::Line(int x1, int y1, int const x2, int const y2)
 {
     LcdLine res;
 

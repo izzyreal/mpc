@@ -52,16 +52,19 @@ struct bmpfile_header
  */
 struct bmpfile_dib_info
 {
-    uint32_t header_size;          ///< The size of this header.
-    int32_t width;                 ///< Width of the image, in pixels.
-    int32_t height;                ///< Height of the image, in pixels.
-    uint16_t num_planes;           ///< Number of planes. Almost always 1.
-    uint16_t bits_per_pixel;       ///< Bits per pixel. Can be 0, 1, 4, 8, 16, 24, or 32.
-    uint32_t compression;          ///< https://msdn.microsoft.com/en-us/library/cc250415.aspx
-    uint32_t bmp_byte_size;        ///< The size of the image in bytes.
-    int32_t hres;                  ///< Horizontal resolution, pixels/meter
-    int32_t vres;                  ///< Vertical resolution, pixels/meter
-    uint32_t num_colors;           ///< The number of color indices used in the color table.
+    uint32_t header_size; ///< The size of this header.
+    int32_t width;        ///< Width of the image, in pixels.
+    int32_t height;       ///< Height of the image, in pixels.
+    uint16_t num_planes;  ///< Number of planes. Almost always 1.
+    uint16_t
+        bits_per_pixel; ///< Bits per pixel. Can be 0, 1, 4, 8, 16, 24, or 32.
+    uint32_t
+        compression; ///< https://msdn.microsoft.com/en-us/library/cc250415.aspx
+    uint32_t bmp_byte_size; ///< The size of the image in bytes.
+    int32_t hres;           ///< Horizontal resolution, pixels/meter
+    int32_t vres;           ///< Vertical resolution, pixels/meter
+    uint32_t
+        num_colors; ///< The number of color indices used in the color table.
     uint32_t num_important_colors; ///< The number of colors used by the bitmap.
 };
 
@@ -147,15 +150,13 @@ void Bitmap::openFromData(char *data, const int size)
         {
             std::cout << "BMP data does not have a good color palette"
                       << " for monochrome display;"
-                      << " its first reserved bits are not 0."
-                      << std::endl;
+                      << " its first reserved bits are not 0." << std::endl;
         }
         else if (color2.reserved != 0)
         {
             std::cout << "BMP data does not have a good color palette"
                       << " for monochrome display;"
-                      << " its second reserved bits are not 0."
-                      << std::endl;
+                      << " its second reserved bits are not 0." << std::endl;
         }
         else // All clear! Bitmap is (probably) in proper format.
         {
@@ -214,11 +215,10 @@ void Bitmap::openFromData(char *data, const int size)
                 }
 
                 // Then we cover the bits we missed at the end.
-                for (int rev_bit = 0;
-                     rev_bit < dib_info.width % 8;
-                     ++rev_bit)
+                for (int rev_bit = 0; rev_bit < dib_info.width % 8; ++rev_bit)
                 {
-                    high = (row_data.get()[dib_info.width / 8] & (1 << (7 - rev_bit))) != 0;
+                    high = (row_data.get()[dib_info.width / 8] &
+                            (1 << (7 - rev_bit))) != 0;
                     row_pixels.push_back(Pixel(high));
                 }
 
@@ -257,37 +257,61 @@ void Bitmap::open(fs::path p)
         else
         {
             bmpfile_header header;
-            fileStream.read(reinterpret_cast<char *>(&header.file_size), sizeof(header.file_size));
-            fileStream.read(reinterpret_cast<char *>(&header.creator1), sizeof(header.creator1));
-            fileStream.read(reinterpret_cast<char *>(&header.creator2), sizeof(header.creator2));
-            fileStream.read(reinterpret_cast<char *>(&header.bmp_offset), sizeof(header.bmp_offset));
+            fileStream.read(reinterpret_cast<char *>(&header.file_size),
+                            sizeof(header.file_size));
+            fileStream.read(reinterpret_cast<char *>(&header.creator1),
+                            sizeof(header.creator1));
+            fileStream.read(reinterpret_cast<char *>(&header.creator2),
+                            sizeof(header.creator2));
+            fileStream.read(reinterpret_cast<char *>(&header.bmp_offset),
+                            sizeof(header.bmp_offset));
 
             bmpfile_dib_info dib_info;
 
-            fileStream.read(reinterpret_cast<char *>(&dib_info.header_size), sizeof(dib_info.header_size));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.width), sizeof(dib_info.width));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.height), sizeof(dib_info.height));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.num_planes), sizeof(dib_info.num_planes));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.bits_per_pixel), sizeof(dib_info.bits_per_pixel));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.compression), sizeof(dib_info.compression));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.bmp_byte_size), sizeof(dib_info.bmp_byte_size));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.hres), sizeof(dib_info.hres));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.vres), sizeof(dib_info.vres));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.num_colors), sizeof(dib_info.num_colors));
-            fileStream.read(reinterpret_cast<char *>(&dib_info.num_important_colors), sizeof(dib_info.num_important_colors));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.header_size),
+                            sizeof(dib_info.header_size));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.width),
+                            sizeof(dib_info.width));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.height),
+                            sizeof(dib_info.height));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.num_planes),
+                            sizeof(dib_info.num_planes));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.bits_per_pixel),
+                            sizeof(dib_info.bits_per_pixel));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.compression),
+                            sizeof(dib_info.compression));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.bmp_byte_size),
+                            sizeof(dib_info.bmp_byte_size));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.hres),
+                            sizeof(dib_info.hres));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.vres),
+                            sizeof(dib_info.vres));
+            fileStream.read(reinterpret_cast<char *>(&dib_info.num_colors),
+                            sizeof(dib_info.num_colors));
+            fileStream.read(
+                reinterpret_cast<char *>(&dib_info.num_important_colors),
+                sizeof(dib_info.num_important_colors));
 
             // Read the 2-color palette for monochrome
             bmpfile_color_table color1;
-            fileStream.read(reinterpret_cast<char *>(&color1.blue), sizeof(color1.blue));
-            fileStream.read(reinterpret_cast<char *>(&color1.green), sizeof(color1.green));
-            fileStream.read(reinterpret_cast<char *>(&color1.red), sizeof(color1.red));
-            fileStream.read(reinterpret_cast<char *>(&color1.reserved), sizeof(color1.reserved));
+            fileStream.read(reinterpret_cast<char *>(&color1.blue),
+                            sizeof(color1.blue));
+            fileStream.read(reinterpret_cast<char *>(&color1.green),
+                            sizeof(color1.green));
+            fileStream.read(reinterpret_cast<char *>(&color1.red),
+                            sizeof(color1.red));
+            fileStream.read(reinterpret_cast<char *>(&color1.reserved),
+                            sizeof(color1.reserved));
 
             bmpfile_color_table color2;
-            fileStream.read(reinterpret_cast<char *>(&color2.blue), sizeof(color2.blue));
-            fileStream.read(reinterpret_cast<char *>(&color2.green), sizeof(color2.green));
-            fileStream.read(reinterpret_cast<char *>(&color2.red), sizeof(color2.red));
-            fileStream.read(reinterpret_cast<char *>(&color2.reserved), sizeof(color2.reserved));
+            fileStream.read(reinterpret_cast<char *>(&color2.blue),
+                            sizeof(color2.blue));
+            fileStream.read(reinterpret_cast<char *>(&color2.green),
+                            sizeof(color2.green));
+            fileStream.read(reinterpret_cast<char *>(&color2.red),
+                            sizeof(color2.red));
+            fileStream.read(reinterpret_cast<char *>(&color2.reserved),
+                            sizeof(color2.reserved));
 
             // Only support for 1-bit images
             if (dib_info.bits_per_pixel != 1)
@@ -309,8 +333,7 @@ void Bitmap::open(fs::path p)
             {
                 std::cout << p << " does not have a good color palette"
                           << " for monochrome display;"
-                          << " its first reserved bits are not 0."
-                          << std::endl;
+                          << " its first reserved bits are not 0." << std::endl;
             }
             else if (color2.reserved != 0)
             {
@@ -371,11 +394,11 @@ void Bitmap::open(fs::path p)
                     }
 
                     // Then we cover the bits we missed at the end.
-                    for (int rev_bit = 0;
-                         rev_bit < dib_info.width % 8;
+                    for (int rev_bit = 0; rev_bit < dib_info.width % 8;
                          ++rev_bit)
                     {
-                        high = (row_data.get()[dib_info.width / 8] & (1 << (7 - rev_bit))) != 0;
+                        high = (row_data.get()[dib_info.width / 8] &
+                                (1 << (7 - rev_bit))) != 0;
                         row_pixels.emplace_back(high);
                     }
 

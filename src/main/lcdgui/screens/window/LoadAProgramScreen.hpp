@@ -13,8 +13,7 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadAProgramScreen
-        : public mpc::lcdgui::ScreenComponent
+    class LoadAProgramScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

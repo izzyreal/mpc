@@ -8,8 +8,7 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens
 {
-    class FxEditScreen
-        : public mpc::lcdgui::ScreenComponent
+    class FxEditScreen : public mpc::lcdgui::ScreenComponent
     {
 
     public:

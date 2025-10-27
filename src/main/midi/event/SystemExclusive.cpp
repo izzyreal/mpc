@@ -5,12 +5,14 @@
 
 using namespace mpc::midi::event;
 
-SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, std::vector<char> data)
+SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick,
+                                           std::vector<char> data)
     : SystemExclusiveEvent(type, tick, 0, data)
 {
 }
 
-SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta, std::vector<char> data)
+SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta,
+                                           std::vector<char> data)
     : MidiEvent(tick, delta)
 {
     mType = type & 255;
@@ -38,7 +40,8 @@ bool SystemExclusiveEvent::requiresStatusByte(MidiEvent *prevEvent)
     return true;
 }
 
-void SystemExclusiveEvent::writeToOutputStream(std::ostream &out, bool writeType)
+void SystemExclusiveEvent::writeToOutputStream(std::ostream &out,
+                                               bool writeType)
 {
     MidiEvent::writeToOutputStream(out, writeType);
     out << (char)mType;

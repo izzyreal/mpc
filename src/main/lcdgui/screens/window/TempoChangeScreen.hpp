@@ -16,13 +16,13 @@ namespace mpc::sequencer
 namespace mpc::lcdgui::screens::window
 {
 
-    class TempoChangeScreen
-        : public mpc::lcdgui::ScreenComponent
+    class TempoChangeScreen : public mpc::lcdgui::ScreenComponent
     {
 
     private:
         std::vector<std::shared_ptr<mpc::lcdgui::HorizontalBar2>> bars;
-        std::vector<std::shared_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
+        std::vector<std::shared_ptr<mpc::sequencer::TempoChangeEvent>>
+            visibleTempoChanges;
 
     private:
         void initVisibleEvents();

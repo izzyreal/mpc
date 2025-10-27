@@ -31,7 +31,9 @@ void Assign16LevelsScreen::function(int i)
         case 4:
         {
             mpc.clientEventController->setSixteenLevelsEnabled(true);
-            mpc.getHardware()->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(true);
+            mpc.getHardware()
+                ->getLed(hardware::ComponentId::SIXTEEN_LEVELS_OR_SPACE_LED)
+                ->setEnabled(true);
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         }
@@ -141,8 +143,10 @@ void Assign16LevelsScreen::displayNote()
 
     auto padName = sampler->getPadName(padIndex);
 
-    auto soundIndex = note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
-    auto soundName = soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
+    auto soundIndex =
+        note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
+    auto soundName =
+        soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
     auto noteName = note == 34 ? "--" : std::to_string(note);
 

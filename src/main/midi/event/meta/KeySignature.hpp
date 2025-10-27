@@ -5,8 +5,7 @@ namespace mpc::midi::event::meta
 {
     class MetaEventData;
 
-    class KeySignature
-        : public MetaEvent
+    class KeySignature : public MetaEvent
     {
 
     public:
@@ -29,7 +28,8 @@ namespace mpc::midi::event::meta
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
     public:
-        static std::shared_ptr<MetaEvent> parseKeySignature(int tick, int delta, MetaEventData *info);
+        static std::shared_ptr<MetaEvent>
+        parseKeySignature(int tick, int delta, MetaEventData *info);
         int compareTo(mpc::midi::event::MidiEvent *other);
 
     public:

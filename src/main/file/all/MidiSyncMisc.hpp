@@ -26,7 +26,8 @@ namespace mpc::file::all
         static const int INPUT_OFFSET = 5;
         static const int OUTPUT_OFFSET = 6;
         static const int DEF_SONG_NAME_OFFSET = 7;
-        static const int SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET = 23;
+        static const int
+            SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET = 23;
 
     public:
         int inMode;

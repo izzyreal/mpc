@@ -4,11 +4,16 @@
 
 using namespace mpc::midi::event;
 
-Controller::Controller(int tick, int channel, int controllerType, int value) : ChannelEvent(tick, ChannelEvent::CONTROLLER, channel, controllerType, value)
+Controller::Controller(int tick, int channel, int controllerType, int value)
+    : ChannelEvent(tick, ChannelEvent::CONTROLLER, channel, controllerType,
+                   value)
 {
 }
 
-Controller::Controller(int tick, int delta, int channel, int controllerType, int value) : ChannelEvent(tick, delta, ChannelEvent::CONTROLLER, channel, controllerType, value)
+Controller::Controller(int tick, int delta, int channel, int controllerType,
+                       int value)
+    : ChannelEvent(tick, delta, ChannelEvent::CONTROLLER, channel,
+                   controllerType, value)
 {
 }
 

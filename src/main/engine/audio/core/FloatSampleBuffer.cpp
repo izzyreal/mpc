@@ -9,21 +9,25 @@ FloatSampleBuffer::FloatSampleBuffer()
     init(0, 0, 1);
 }
 
-FloatSampleBuffer::FloatSampleBuffer(int channelCount, int sampleCount, float sampleRate)
+FloatSampleBuffer::FloatSampleBuffer(int channelCount, int sampleCount,
+                                     float sampleRate)
 {
     init(channelCount, sampleCount, sampleRate, LAZY_DEFAULT);
 }
 
-void FloatSampleBuffer::init(int channelCount, int sampleCount, float sampleRate)
+void FloatSampleBuffer::init(int channelCount, int sampleCount,
+                             float sampleRate)
 {
     init(channelCount, sampleCount, sampleRate, LAZY_DEFAULT);
 }
 
-void FloatSampleBuffer::init(int channelCount, int sampleCount, float sampleRate, bool lazy)
+void FloatSampleBuffer::init(int channelCount, int sampleCount,
+                             float sampleRate, bool lazy)
 {
     if (channelCount < 0 || sampleCount < 0)
     {
-        std::string error = "invalid parameters in initialization of FloatSampleBuffer.";
+        std::string error =
+            "invalid parameters in initialization of FloatSampleBuffer.";
         printf("ERROR: %s\n", error.c_str());
         return;
     }
@@ -34,7 +38,8 @@ void FloatSampleBuffer::init(int channelCount, int sampleCount, float sampleRate
     }
 }
 
-void FloatSampleBuffer::createChannels(int channelCount, int sampleCount, bool lazy)
+void FloatSampleBuffer::createChannels(int channelCount, int sampleCount,
+                                       bool lazy)
 {
     this->sampleCount = sampleCount;
     this->channelCount = 0;
@@ -52,12 +57,16 @@ void FloatSampleBuffer::createChannels(int channelCount, int sampleCount, bool l
     }
 }
 
-void FloatSampleBuffer::initFromByteArray_(const std::vector<char> &buffer, int offset, int byteCount, AudioFormat *format)
+void FloatSampleBuffer::initFromByteArray_(const std::vector<char> &buffer,
+                                           int offset, int byteCount,
+                                           AudioFormat *format)
 {
     initFromByteArray_(buffer, offset, byteCount, format, LAZY_DEFAULT);
 }
 
-void FloatSampleBuffer::initFromByteArray_(const std::vector<char> &buffer, int offset, int byteCount, AudioFormat *format, bool lazy)
+void FloatSampleBuffer::initFromByteArray_(const std::vector<char> &buffer,
+                                           int offset, int byteCount,
+                                           AudioFormat *format, bool lazy)
 {
     if (offset + byteCount > buffer.size())
     {
@@ -66,7 +75,8 @@ void FloatSampleBuffer::initFromByteArray_(const std::vector<char> &buffer, int 
     auto thisSampleCount = byteCount / format->getFrameSize();
     init(format->getChannels(), thisSampleCount, format->getSampleRate(), lazy);
     originalFormatType = FloatSampleTools::getFormatType(format);
-    FloatSampleTools::byte2float(buffer, offset, channels, 0, sampleCount, format);
+    FloatSampleTools::byte2float(buffer, offset, channels, 0, sampleCount,
+                                 format);
 }
 
 void FloatSampleBuffer::reset()
@@ -84,37 +94,46 @@ int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat *format)
     return getByteArrayBufferSize(format, getSampleCount());
 }
 
-int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat *format, int lenInSamples)
+int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat *format,
+                                              int lenInSamples)
 {
     return format->getFrameSize() * lenInSamples;
 }
 
-int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples, std::vector<char> &buffer, int writeOffset, AudioFormat *format)
+int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples,
+                                           std::vector<char> &buffer,
+                                           int writeOffset, AudioFormat *format)
 {
     int byteCount = getByteArrayBufferSize(format, lenInSamples);
     if (writeOffset + byteCount > buffer.size())
     {
-        std::string error = "FloatSampleBuffer.convertToByteArray: buffer too small.";
+        std::string error =
+            "FloatSampleBuffer.convertToByteArray: buffer too small.";
         printf("ERROR: %s\n", error.c_str());
         return -1;
     }
     if (format->getSampleRate() != getSampleRate())
     {
-        std::string error = "FloatSampleBuffer.convertToByteArray: different samplerates.";
+        std::string error =
+            "FloatSampleBuffer.convertToByteArray: different samplerates.";
         printf("ERROR: %s\n", error.c_str());
         return -1;
     }
     if (format->getChannels() != getChannelCount())
     {
-        std::string error = "FloatSampleBuffer.convertToByteArray: different channel count.";
+        std::string error =
+            "FloatSampleBuffer.convertToByteArray: different channel count.";
         printf("ERROR: %s\n", error.c_str());
         return -1;
     }
-    FloatSampleTools::float2byte(channels, readOffset, buffer, writeOffset, lenInSamples, format, getConvertDitherBits(FloatSampleTools::getFormatType(format)));
+    FloatSampleTools::float2byte(
+        channels, readOffset, buffer, writeOffset, lenInSamples, format,
+        getConvertDitherBits(FloatSampleTools::getFormatType(format)));
     return byteCount;
 }
 
-void FloatSampleBuffer::changeSampleCount(int newSampleCount, bool keepOldSamples)
+void FloatSampleBuffer::changeSampleCount(int newSampleCount,
+                                          bool keepOldSamples)
 {
     auto oldSampleCount = getSampleCount();
     if (oldSampleCount == newSampleCount)
@@ -135,7 +154,8 @@ void FloatSampleBuffer::changeSampleCount(int newSampleCount, bool keepOldSample
 
     if (keepOldSamples)
     {
-        auto copyCount = newSampleCount < oldSampleCount ? newSampleCount : oldSampleCount;
+        auto copyCount =
+            newSampleCount < oldSampleCount ? newSampleCount : oldSampleCount;
         for (auto ch = 0; ch < getChannelCount(); ch++)
         {
             for (int i = 0; i < copyCount; i++)
@@ -193,7 +213,8 @@ void FloatSampleBuffer::insertChannel(int index, bool silent, bool lazy)
         {
             auto thisChannel = channels[ch];
 
-            if ((lazy && thisChannel.size() >= getSampleCount()) || (!lazy && thisChannel.size() == getSampleCount()))
+            if ((lazy && thisChannel.size() >= getSampleCount()) ||
+                (!lazy && thisChannel.size() == getSampleCount()))
             {
                 newChannel = thisChannel;
                 channels.erase(channels.begin() + ch);
@@ -253,12 +274,15 @@ void FloatSampleBuffer::copy(int sourceIndex, int destIndex, int length)
     }
 }
 
-void FloatSampleBuffer::copy(int channel, int sourceIndex, int destIndex, int length)
+void FloatSampleBuffer::copy(int channel, int sourceIndex, int destIndex,
+                             int length)
 {
     auto &data = getChannel(channel);
     auto bufferCount = getSampleCount();
 
-    if (sourceIndex + length > bufferCount || destIndex + length > bufferCount || sourceIndex < 0 || destIndex < 0 || length < 0)
+    if (sourceIndex + length > bufferCount ||
+        destIndex + length > bufferCount || sourceIndex < 0 || destIndex < 0 ||
+        length < 0)
     {
         std::string error = "parameters exceed buffer size";
         printf("ERROR: %s\n", error.c_str());
@@ -300,7 +324,10 @@ std::vector<float> &FloatSampleBuffer::getChannel(int channel)
 {
     if (channel < 0 || channel >= getChannelCount())
     {
-        std::string error = "FloatSampleBuffer: invalid channel index " + std::to_string(channel) + " was provided, only up to index " + std::to_string(channels.size() - 1) + " available.";
+        std::string error = "FloatSampleBuffer: invalid channel index " +
+                            std::to_string(channel) +
+                            " was provided, only up to index " +
+                            std::to_string(channels.size() - 1) + " available.";
         printf("ERROR: %s\n", error.c_str());
         throw new std::invalid_argument(error);
     }
@@ -315,7 +342,9 @@ float FloatSampleBuffer::getConvertDitherBits(int newFormatType)
     switch (ditherMode)
     {
         case DITHER_MODE_AUTOMATIC:
-            doDither = (originalFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK) > (newFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK);
+            doDither =
+                (originalFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK) >
+                (newFormatType & FloatSampleTools::F_SAMPLE_WIDTH_MASK);
             break;
         case DITHER_MODE_ON:
             doDither = true;

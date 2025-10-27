@@ -46,27 +46,29 @@ namespace mpc::input
         UIKeyboardHIDUsageKeyboard9 = 0x26, /* 9 or ( */
         UIKeyboardHIDUsageKeyboard0 = 0x27, /* 0 or ) */
 
-        UIKeyboardHIDUsageKeyboardReturnOrEnter = 0x28,       /* Return (Enter) */
-        UIKeyboardHIDUsageKeyboardEscape = 0x29,              /* Escape */
-        UIKeyboardHIDUsageKeyboardDeleteOrBackspace = 0x2A,   /* Delete (Backspace) */
-        UIKeyboardHIDUsageKeyboardTab = 0x2B,                 /* Tab */
-        UIKeyboardHIDUsageKeyboardSpacebar = 0x2C,            /* Spacebar */
-        UIKeyboardHIDUsageKeyboardHyphen = 0x2D,              /* - or _ */
-        UIKeyboardHIDUsageKeyboardEqualSign = 0x2E,           /* = or + */
-        UIKeyboardHIDUsageKeyboardOpenBracket = 0x2F,         /* [ or { */
-        UIKeyboardHIDUsageKeyboardCloseBracket = 0x30,        /* ] or } */
-        UIKeyboardHIDUsageKeyboardBackslash = 0x31,           /* \ or | */
-        UIKeyboardHIDUsageKeyboardNonUSPound = 0x32,          /* Non-US # or _ */
-                                                              /* Typical language mappings: US: \| Belg: μ`£ FrCa: <}> Dan:’* Dutch: <> Fren:*μ
-                                                                                            Ger: #’ Ital: ù§ LatAm: }`] Nor:,* Span: }Ç Swed: ,*
-                                                                                            Swiss: $£ UK: #~. */
-        UIKeyboardHIDUsageKeyboardSemicolon = 0x33,           /* ; or : */
-        UIKeyboardHIDUsageKeyboardQuote = 0x34,               /* ' or " */
-        UIKeyboardHIDUsageKeyboardGraveAccentAndTilde = 0x35, /* Grave Accent and Tilde */
-        UIKeyboardHIDUsageKeyboardComma = 0x36,               /* , or < */
-        UIKeyboardHIDUsageKeyboardPeriod = 0x37,              /* . or > */
-        UIKeyboardHIDUsageKeyboardSlash = 0x38,               /* / or ? */
-        UIKeyboardHIDUsageKeyboardCapsLock = 0x39,            /* Caps Lock */
+        UIKeyboardHIDUsageKeyboardReturnOrEnter = 0x28, /* Return (Enter) */
+        UIKeyboardHIDUsageKeyboardEscape = 0x29,        /* Escape */
+        UIKeyboardHIDUsageKeyboardDeleteOrBackspace =
+            0x2A,                                      /* Delete (Backspace) */
+        UIKeyboardHIDUsageKeyboardTab = 0x2B,          /* Tab */
+        UIKeyboardHIDUsageKeyboardSpacebar = 0x2C,     /* Spacebar */
+        UIKeyboardHIDUsageKeyboardHyphen = 0x2D,       /* - or _ */
+        UIKeyboardHIDUsageKeyboardEqualSign = 0x2E,    /* = or + */
+        UIKeyboardHIDUsageKeyboardOpenBracket = 0x2F,  /* [ or { */
+        UIKeyboardHIDUsageKeyboardCloseBracket = 0x30, /* ] or } */
+        UIKeyboardHIDUsageKeyboardBackslash = 0x31,    /* \ or | */
+        UIKeyboardHIDUsageKeyboardNonUSPound = 0x32,   /* Non-US # or _ */
+        /* Typical language mappings: US: \| Belg: μ`£ FrCa: <}> Dan:’* Dutch:
+           <> Fren:*μ Ger: #’ Ital: ù§ LatAm: }`] Nor:,* Span: }Ç Swed: ,*
+                                      Swiss: $£ UK: #~. */
+        UIKeyboardHIDUsageKeyboardSemicolon = 0x33, /* ; or : */
+        UIKeyboardHIDUsageKeyboardQuote = 0x34,     /* ' or " */
+        UIKeyboardHIDUsageKeyboardGraveAccentAndTilde =
+            0x35,                                  /* Grave Accent and Tilde */
+        UIKeyboardHIDUsageKeyboardComma = 0x36,    /* , or < */
+        UIKeyboardHIDUsageKeyboardPeriod = 0x37,   /* . or > */
+        UIKeyboardHIDUsageKeyboardSlash = 0x38,    /* / or ? */
+        UIKeyboardHIDUsageKeyboardCapsLock = 0x39, /* Caps Lock */
 
         /* Function keys */
         UIKeyboardHIDUsageKeyboardF1 = 0x3A,            /* F1 */
@@ -96,31 +98,31 @@ namespace mpc::input
         UIKeyboardHIDUsageKeyboardUpArrow = 0x52,       /* Up Arrow */
 
         /* Keypad (numpad) keys */
-        UIKeyboardHIDUsageKeypadNumLock = 0x53,          /* Keypad NumLock or Clear */
-        UIKeyboardHIDUsageKeypadSlash = 0x54,            /* Keypad / */
-        UIKeyboardHIDUsageKeypadAsterisk = 0x55,         /* Keypad * */
-        UIKeyboardHIDUsageKeypadHyphen = 0x56,           /* Keypad - */
-        UIKeyboardHIDUsageKeypadPlus = 0x57,             /* Keypad + */
-        UIKeyboardHIDUsageKeypadEnter = 0x58,            /* Keypad Enter */
-        UIKeyboardHIDUsageKeypad1 = 0x59,                /* Keypad 1 or End */
-        UIKeyboardHIDUsageKeypad2 = 0x5A,                /* Keypad 2 or Down Arrow */
-        UIKeyboardHIDUsageKeypad3 = 0x5B,                /* Keypad 3 or Page Down */
-        UIKeyboardHIDUsageKeypad4 = 0x5C,                /* Keypad 4 or Left Arrow */
-        UIKeyboardHIDUsageKeypad5 = 0x5D,                /* Keypad 5 */
-        UIKeyboardHIDUsageKeypad6 = 0x5E,                /* Keypad 6 or Right Arrow */
-        UIKeyboardHIDUsageKeypad7 = 0x5F,                /* Keypad 7 or Home */
-        UIKeyboardHIDUsageKeypad8 = 0x60,                /* Keypad 8 or Up Arrow */
-        UIKeyboardHIDUsageKeypad9 = 0x61,                /* Keypad 9 or Page Up */
-        UIKeyboardHIDUsageKeypad0 = 0x62,                /* Keypad 0 or Insert */
-        UIKeyboardHIDUsageKeypadPeriod = 0x63,           /* Keypad . or Delete */
+        UIKeyboardHIDUsageKeypadNumLock = 0x53,  /* Keypad NumLock or Clear */
+        UIKeyboardHIDUsageKeypadSlash = 0x54,    /* Keypad / */
+        UIKeyboardHIDUsageKeypadAsterisk = 0x55, /* Keypad * */
+        UIKeyboardHIDUsageKeypadHyphen = 0x56,   /* Keypad - */
+        UIKeyboardHIDUsageKeypadPlus = 0x57,     /* Keypad + */
+        UIKeyboardHIDUsageKeypadEnter = 0x58,    /* Keypad Enter */
+        UIKeyboardHIDUsageKeypad1 = 0x59,        /* Keypad 1 or End */
+        UIKeyboardHIDUsageKeypad2 = 0x5A,        /* Keypad 2 or Down Arrow */
+        UIKeyboardHIDUsageKeypad3 = 0x5B,        /* Keypad 3 or Page Down */
+        UIKeyboardHIDUsageKeypad4 = 0x5C,        /* Keypad 4 or Left Arrow */
+        UIKeyboardHIDUsageKeypad5 = 0x5D,        /* Keypad 5 */
+        UIKeyboardHIDUsageKeypad6 = 0x5E,        /* Keypad 6 or Right Arrow */
+        UIKeyboardHIDUsageKeypad7 = 0x5F,        /* Keypad 7 or Home */
+        UIKeyboardHIDUsageKeypad8 = 0x60,        /* Keypad 8 or Up Arrow */
+        UIKeyboardHIDUsageKeypad9 = 0x61,        /* Keypad 9 or Page Up */
+        UIKeyboardHIDUsageKeypad0 = 0x62,        /* Keypad 0 or Insert */
+        UIKeyboardHIDUsageKeypadPeriod = 0x63,   /* Keypad . or Delete */
         UIKeyboardHIDUsageKeyboardNonUSBackslash = 0x64, /* Non-US \ or | */
-                                                         /* On Apple ISO keyboards, this is the section symbol (§/±) */
-                                                         /* Typical language mappings: Belg:<\> FrCa:«°» Dan:<\> Dutch:]|[ Fren:<> Ger:<|>
-                                                                                       Ital:<> LatAm:<> Nor:<> Span:<> Swed:<|> Swiss:<\>
-                                                                                       UK:\| Brazil: \|. */
-        UIKeyboardHIDUsageKeyboardApplication = 0x65,    /* Application */
-        UIKeyboardHIDUsageKeyboardPower = 0x66,          /* Power */
-        UIKeyboardHIDUsageKeypadEqualSign = 0x67,        /* Keypad = */
+        /* On Apple ISO keyboards, this is the section symbol (§/±) */
+        /* Typical language mappings: Belg:<\> FrCa:«°» Dan:<\> Dutch:]|[
+           Fren:<> Ger:<|> Ital:<> LatAm:<> Nor:<> Span:<> Swed:<|> Swiss:<\>
+                                      UK:\| Brazil: \|. */
+        UIKeyboardHIDUsageKeyboardApplication = 0x65, /* Application */
+        UIKeyboardHIDUsageKeyboardPower = 0x66,       /* Power */
+        UIKeyboardHIDUsageKeypadEqualSign = 0x67,     /* Keypad = */
 
         /* Additional keys */
         UIKeyboardHIDUsageKeyboardF13 = 0x68,        /* F13 */
@@ -150,15 +152,20 @@ namespace mpc::input
         UIKeyboardHIDUsageKeyboardVolumeUp = 0x80,   /* Volume Up */
         UIKeyboardHIDUsageKeyboardVolumeDown = 0x81, /* Volume Down */
 
-        UIKeyboardHIDUsageKeyboardLockingCapsLock = 0x82,   /* Locking Caps Lock */
-        UIKeyboardHIDUsageKeyboardLockingNumLock = 0x83,    /* Locking Num Lock */
-                                                            /* Implemented as a locking key; sent as a toggle button. Available for legacy support;
-                                                               however, most systems should use the non-locking version of this key. */
-        UIKeyboardHIDUsageKeyboardLockingScrollLock = 0x84, /* Locking Scroll Lock */
-        UIKeyboardHIDUsageKeypadComma = 0x85,               /* Keypad Comma */
-        UIKeyboardHIDUsageKeypadEqualSignAS400 = 0x86,      /* Keypad Equal Sign for AS/400 */
+        UIKeyboardHIDUsageKeyboardLockingCapsLock =
+            0x82,                                        /* Locking Caps Lock */
+        UIKeyboardHIDUsageKeyboardLockingNumLock = 0x83, /* Locking Num Lock */
+        /* Implemented as a locking key; sent as a toggle button. Available for
+           legacy support; however, most systems should use the non-locking
+           version of this key. */
+        UIKeyboardHIDUsageKeyboardLockingScrollLock =
+            0x84,                             /* Locking Scroll Lock */
+        UIKeyboardHIDUsageKeypadComma = 0x85, /* Keypad Comma */
+        UIKeyboardHIDUsageKeypadEqualSignAS400 =
+            0x86, /* Keypad Equal Sign for AS/400 */
 
-        /* See the footnotes in the USB specification for what keys these are commonly mapped to.
+        /* See the footnotes in the USB specification for what keys these are
+         * commonly mapped to.
          * https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf */
         UIKeyboardHIDUsageKeyboardInternational1 = 0x87, /* International1 */
         UIKeyboardHIDUsageKeyboardInternational2 = 0x88, /* International2 */
@@ -170,41 +177,48 @@ namespace mpc::input
         UIKeyboardHIDUsageKeyboardInternational8 = 0x8E, /* International8 */
         UIKeyboardHIDUsageKeyboardInternational9 = 0x8F, /* International9 */
 
-        /* LANG1: On Apple keyboard for Japanese, this is the kana switch (かな) key */
+        /* LANG1: On Apple keyboard for Japanese, this is the kana switch (かな)
+           key */
         /* On Korean keyboards, this is the Hangul/English toggle key. */
         UIKeyboardHIDUsageKeyboardLANG1 = 0x90, /* LANG1 */
 
-        /* LANG2: On Apple keyboards for Japanese, this is the alphanumeric (英数) key */
+        /* LANG2: On Apple keyboards for Japanese, this is the alphanumeric
+           (英数) key */
         /* On Korean keyboards, this is the Hanja conversion key. */
         UIKeyboardHIDUsageKeyboardLANG2 = 0x91, /* LANG2 */
 
-        /* LANG3: Defines the Katakana key for Japanese USB word-processing keyboards. */
+        /* LANG3: Defines the Katakana key for Japanese USB word-processing
+           keyboards. */
         UIKeyboardHIDUsageKeyboardLANG3 = 0x92, /* LANG3 */
 
-        /* LANG4: Defines the Hiragana key for Japanese USB word-processing keyboards. */
+        /* LANG4: Defines the Hiragana key for Japanese USB word-processing
+           keyboards. */
         UIKeyboardHIDUsageKeyboardLANG4 = 0x93, /* LANG4 */
 
-        /* LANG5: Defines the Zenkaku/Hankaku key for Japanese USB word-processing keyboards. */
+        /* LANG5: Defines the Zenkaku/Hankaku key for Japanese USB
+           word-processing keyboards. */
         UIKeyboardHIDUsageKeyboardLANG5 = 0x94, /* LANG5 */
 
-        /* LANG6-9: Reserved for language-specific functions, such as Front End Processors and Input Method Editors. */
+        /* LANG6-9: Reserved for language-specific functions, such as Front End
+           Processors and Input Method Editors. */
         UIKeyboardHIDUsageKeyboardLANG6 = 0x95, /* LANG6 */
         UIKeyboardHIDUsageKeyboardLANG7 = 0x96, /* LANG7 */
         UIKeyboardHIDUsageKeyboardLANG8 = 0x97, /* LANG8 */
         UIKeyboardHIDUsageKeyboardLANG9 = 0x98, /* LANG9 */
 
-        UIKeyboardHIDUsageKeyboardAlternateErase = 0x99,    /* AlternateErase */
-        UIKeyboardHIDUsageKeyboardSysReqOrAttention = 0x9A, /* SysReq/Attention */
-        UIKeyboardHIDUsageKeyboardCancel = 0x9B,            /* Cancel */
-        UIKeyboardHIDUsageKeyboardClear = 0x9C,             /* Clear */
-        UIKeyboardHIDUsageKeyboardPrior = 0x9D,             /* Prior */
-        UIKeyboardHIDUsageKeyboardReturn = 0x9E,            /* Return */
-        UIKeyboardHIDUsageKeyboardSeparator = 0x9F,         /* Separator */
-        UIKeyboardHIDUsageKeyboardOut = 0xA0,               /* Out */
-        UIKeyboardHIDUsageKeyboardOper = 0xA1,              /* Oper */
-        UIKeyboardHIDUsageKeyboardClearOrAgain = 0xA2,      /* Clear/Again */
-        UIKeyboardHIDUsageKeyboardCrSelOrProps = 0xA3,      /* CrSel/Props */
-        UIKeyboardHIDUsageKeyboardExSel = 0xA4,             /* ExSel */
+        UIKeyboardHIDUsageKeyboardAlternateErase = 0x99, /* AlternateErase */
+        UIKeyboardHIDUsageKeyboardSysReqOrAttention =
+            0x9A,                                      /* SysReq/Attention */
+        UIKeyboardHIDUsageKeyboardCancel = 0x9B,       /* Cancel */
+        UIKeyboardHIDUsageKeyboardClear = 0x9C,        /* Clear */
+        UIKeyboardHIDUsageKeyboardPrior = 0x9D,        /* Prior */
+        UIKeyboardHIDUsageKeyboardReturn = 0x9E,       /* Return */
+        UIKeyboardHIDUsageKeyboardSeparator = 0x9F,    /* Separator */
+        UIKeyboardHIDUsageKeyboardOut = 0xA0,          /* Out */
+        UIKeyboardHIDUsageKeyboardOper = 0xA1,         /* Oper */
+        UIKeyboardHIDUsageKeyboardClearOrAgain = 0xA2, /* Clear/Again */
+        UIKeyboardHIDUsageKeyboardCrSelOrProps = 0xA3, /* CrSel/Props */
+        UIKeyboardHIDUsageKeyboardExSel = 0xA4,        /* ExSel */
 
         /* 0xA5-0xDF: Reserved */
 
@@ -225,10 +239,12 @@ namespace mpc::input
         UIKeyboardHIDUsageKeyboardHanja = UIKeyboardHIDUsageKeyboardLANG2,
 
         UIKeyboardHIDUsageKeyboardKanaSwitch = UIKeyboardHIDUsageKeyboardLANG1,
-        UIKeyboardHIDUsageKeyboardAlphanumericSwitch = UIKeyboardHIDUsageKeyboardLANG2,
+        UIKeyboardHIDUsageKeyboardAlphanumericSwitch =
+            UIKeyboardHIDUsageKeyboardLANG2,
         UIKeyboardHIDUsageKeyboardKatakana = UIKeyboardHIDUsageKeyboardLANG3,
         UIKeyboardHIDUsageKeyboardHiragana = UIKeyboardHIDUsageKeyboardLANG4,
-        UIKeyboardHIDUsageKeyboardZenkakuHankakuKanji = UIKeyboardHIDUsageKeyboardLANG5,
+        UIKeyboardHIDUsageKeyboardZenkakuHankakuKanji =
+            UIKeyboardHIDUsageKeyboardLANG5,
     };
 
 } // namespace mpc::input
