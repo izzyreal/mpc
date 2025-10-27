@@ -2,13 +2,14 @@
 
 using namespace mpc::sequencer;
 
+TimeSignature::TimeSignature(const TimeSignature& other)
+    : numerator(other.numerator), denominator(other.denominator)
+{
+}
+
 void TimeSignature::setNumerator(int i)
 {
     numerator = i;
-
-    notifyObservers(std::string("timesignature"));
-
-    notifyObservers(std::string("beat"));
 }
 
 int TimeSignature::getNumerator()
@@ -19,10 +20,6 @@ int TimeSignature::getNumerator()
 void TimeSignature::setDenominator(int i)
 {
     denominator = i;
-
-    notifyObservers(std::string("timesignature"));
-
-    notifyObservers(std::string("beat"));
 }
 
 int TimeSignature::getDenominator()
@@ -32,26 +29,26 @@ int TimeSignature::getDenominator()
 
 void TimeSignature::increase()
 {
-    switch (getDenominator())
+    switch (denominator)
     {
         case 4:
         case 8:
         case 16:
-            if (getNumerator() != 16)
+            if (numerator != 16)
             {
-                setNumerator(getNumerator() + 1);
+                ++numerator;
                 break;
             }
             else
             {
-                setNumerator(1);
-                setDenominator(getDenominator() * 2);
+                numerator = 1;
+                denominator *= 2;
                 break;
             }
         case 32:
-            if (getNumerator() != 32)
+            if (numerator != 32)
             {
-                setNumerator(getNumerator() + 1);
+                ++numerator;
                 break;
             }
     }
@@ -59,27 +56,26 @@ void TimeSignature::increase()
 
 void TimeSignature::decrease()
 {
-    switch (getDenominator())
+    switch (denominator)
     {
         case 4:
-            if (getNumerator() != 1)
-            {
-                setNumerator(getNumerator() - 1);
-            }
+            if (numerator != 1)
+                --numerator;
             break;
         case 8:
         case 16:
         case 32:
-            if (getNumerator() == 1)
+            if (numerator == 1)
             {
-                setNumerator(16);
-                setDenominator(getDenominator() / 2);
+                numerator = 16;
+                denominator /= 2;
                 break;
             }
             else
             {
-                setNumerator(getNumerator() - 1);
+                --numerator;
                 break;
             }
     }
 }
+

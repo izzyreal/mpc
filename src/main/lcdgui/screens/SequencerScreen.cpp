@@ -47,16 +47,16 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
     footerLabel->setSize(footerLabel->GetTextEntryLength() * 6, 8);
     footerLabel->Hide(true);
 
-    auto displaySequenceProperties = [&]
+    auto displaySequenceProps = [&]
     {
         displaySq();
-        //displayTsig();
-        //displayBars();
-        //displayTempo();
-        //displayLoop();
+        displayTsig();
+        displayBars();
+        displayTempo();
+        displayLoop();
     };
 
-    auto displayTrackProperties = [&]
+    auto displayTrackProps = [&]
     {
         displayTr();
         displayOn();
@@ -67,23 +67,99 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
         displayDeviceName();
     };
 
-    addReactiveBinding({[&]{ return sequencer->getActiveSequenceIndex(); }, [&](auto){
-            //displaySequenceProperties();
-            //displayTrackProperties();
+    addReactiveBinding({[&]{ return sequencer->getActiveSequenceIndex(); },
+            [displaySequenceProps, displayTrackProps](auto){
+            displaySequenceProps();
+            displayTrackProps();
+        }});
+
+    addReactiveBinding({[&]{ return sequencer->getActiveSequence()->isUsed(); },
+            [displaySequenceProps, displayTrackProps](auto){
+            displaySequenceProps();
+            displayTrackProps();
+        }});
+
+    addReactiveBinding({[&] { return sequencer->isCountEnabled(); },
+            [&](auto){
+            displayCount();
             }});
 
-    addReactiveBinding({[&]{ return sequencer->getActiveSequence()->isUsed(); }, [&](auto){
-            displaySq();
-            //displaySequenceProperties();
-            //displayTrackProperties();
+    addReactiveBinding({[&] { return sequencer->getActiveSequence()->isLoopEnabled(); },
+            [&](auto){
+            displayLoop();
+            }});
+    
+    addReactiveBinding({[&] { return sequencer->isRecordingModeMulti(); },
+            [&](auto){
+            displayRecordingMode();
             }});
 
-    addReactiveBinding({[&]{ return sequencer->getActiveTrackIndex(); }, [&](auto){
-            //displayTrackProperties();
+    addReactiveBinding({[&] { return sequencer->getActiveTrack()->isOn(); },
+            [&](auto){
+            displayOn();
             }});
 
-    addReactiveBinding({[&]{ return sequencer->getActiveTrack()->isUsed(); }, [&](auto){
-            //displayTrackProperties();
+    addReactiveBinding({[&] { return sequencer->getTickPosition(); },
+            [&](auto){
+            displayNow0();
+            displayNow1();
+            displayNow2();
+            }});
+
+    addReactiveBinding({[&] { return sequencer->getTempo(); },
+            [&](auto){
+            displayTempo();
+            }});
+
+    addReactiveBinding({[&] { return sequencer->isTempoSourceSequenceEnabled(); },
+            [&](auto){
+            displayTempoSource();
+            }});
+
+    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getProgramChange(); },
+            [&](auto){
+            displayPgm();
+            }});
+
+    addReactiveBinding({[&] { return sequencer->getActiveSequence()->getTimeSignature(); },
+            [&](auto){
+            displayTsig();
+            }});
+
+    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getVelocityRatio(); },
+            [&](auto){
+            displayVelo();
+            }});
+
+    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getBus(); },
+            [&](auto){
+            displayBus();
+            }});
+
+
+    addReactiveBinding({[&] { return sequencer->getActiveTrack()->getDeviceIndex(); },
+            [&](auto){
+            displayDeviceNumber();
+            displayDeviceName();
+            }});
+
+    addReactiveBinding({[&]{ return sequencer->getActiveTrackIndex(); },
+            [displayTrackProps](auto){
+            displayTrackProps();
+        }});
+
+    addReactiveBinding({[&]{ return sequencer->getActiveTrack()->isUsed(); },
+            [displayTrackProps](auto){
+            displayTrackProps();
+        }});
+
+    addReactiveBinding({[&] { return sequencer->getNextSq(); },
+            [&](auto nextSqIndex){
+            displayNextSq();
+            if (nextSqIndex != -1)
+            {
+                ls->setFocus("nextsq");
+            }
             }});
 }
 
@@ -98,8 +174,6 @@ void SequencerScreen::open()
     findLabel("tempo")->setSize(12, 9);
     findField("tempo")->setLocation(18, 11);
     findField("tempo")->setLeftMargin(1);
-
-    sequence = sequencer->getActiveSequence();
 
     findLabel("punch-time-0")->Hide(true);
     findLabel("punch-time-1")->Hide(true);
@@ -123,14 +197,6 @@ void SequencerScreen::open()
     displayBus();
     displayDeviceNumber();
     displayNextSq();
-
-    sequencer->addObserver(this);
-    sequence.lock()->addObserver(this);
-
-    for (auto &t : sequence.lock()->getTracks())
-    {
-        t->addObserver(this);
-    }
 
     findChild<TextComp>("fk3")->setBlinking(sequencer->isSoloEnabled());
 
@@ -207,13 +273,6 @@ void SequencerScreen::close()
     }
 
     sequencer->resetUndo();
-
-    sequencer->deleteObserver(this);
-    sequence.lock()->deleteObserver(this);
-    for (auto &t : sequence.lock()->getTracks())
-    {
-        t->deleteObserver(this);
-    }
 }
 
 void SequencerScreen::displayVelo()
@@ -382,7 +441,7 @@ void SequencerScreen::displayRecordingMode()
 void SequencerScreen::displayTsig()
 {
     std::string result;
-    auto ts = sequence.lock()->getTimeSignature();
+    auto ts = sequencer->getActiveSequence()->getTimeSignature();
     result.append(std::to_string(ts.getNumerator()));
     result.append("/");
     result.append(std::to_string(ts.getDenominator()));
@@ -391,7 +450,7 @@ void SequencerScreen::displayTsig()
 
 void SequencerScreen::displayLoop()
 {
-    findField("loop")->setText(sequence.lock()->isLoopEnabled() ? "ON" : "OFF");
+    findField("loop")->setText(sequencer->getActiveSequence()->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void SequencerScreen::displayOn()
@@ -419,120 +478,6 @@ void SequencerScreen::displayTiming()
 {
     auto noteValue = mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
     findField("timing")->setText(timingCorrectNames[noteValue]);
-}
-
-void SequencerScreen::update(Observable *o, Message message)
-{
-    return;
-    if (sequence.lock())
-    {
-        sequence.lock()->deleteObserver(this);
-
-        for (auto &t : sequence.lock()->getTracks())
-        {
-            t->deleteObserver(this);
-        }
-    }
-
-    sequence = sequencer->getActiveSequence();
-    sequence.lock()->addObserver(this);
-
-    for (auto &t : sequence.lock()->getTracks())
-    {
-        t->addObserver(this);
-    }
-
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "nextsqvalue")
-    {
-        displayNextSq();
-    }
-    else if (msg == "nextsq")
-    {
-        displayNextSq();
-        ls->setFocus("nextsq");
-    }
-    else if (msg == "nextsqoff")
-    {
-        displayNextSq();
-    }
-    else if (msg == "count")
-    {
-        displayCount();
-    }
-    else if (msg == "tracknumbername")
-    {
-        displayTr();
-        displayOn();
-    }
-    else if (msg == "seqnumbername")
-    {
-        displaySq();
-    }
-    else if (msg == "loop")
-    {
-        displayLoop();
-    }
-    else if (msg == "recordingmode")
-    {
-        displayRecordingMode();
-    }
-    else if (msg == "numberofbars")
-    {
-        displayBars();
-    }
-    else if (msg == "trackon")
-    {
-        displayOn();
-    }
-    else if (msg == "bar")
-    {
-        displayNow0();
-        displayTempoLabel();
-    }
-    else if (msg == "beat")
-    {
-        displayNow1();
-        displayTempoLabel();
-    }
-    else if (msg == "clock")
-    {
-        displayNow2();
-        displayTempoLabel();
-    }
-    else if (msg == "tempo")
-    {
-        displayTempo();
-    }
-    else if (msg == "tempo-source")
-    {
-        displayTempoSource();
-    }
-    else if (msg == "timesignature")
-    {
-        displayTsig();
-    }
-    else if (msg == "programchange")
-    {
-        displayPgm();
-    }
-    else if (msg == "velocityratio")
-    {
-        displayVelo();
-    }
-    else if (msg == "bus")
-    {
-        displayBus();
-    }
-    else if (msg == "device")
-    {
-        displayDeviceNumber();
-    }
-    else if (msg == "devicename")
-    {
-        displayDeviceName();
-    }
 }
 
 void SequencerScreen::pressEnter()
@@ -793,7 +738,7 @@ void SequencerScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "loop")
     {
-        sequence.lock()->setLoopEnabled(i > 0);
+        sequencer->getActiveSequence()->setLoopEnabled(i > 0);
     }
     else if (focusedFieldName == "recordingmode")
     {
@@ -975,7 +920,7 @@ void SequencerScreen::displayPunchWhileRecording()
         time0->Hide(sequencer->getAutoPunchMode() == 1);
         time1->Hide(sequencer->getAutoPunchMode() == 0);
 
-        auto seq = sequence.lock();
+        auto seq = sequencer->getActiveSequence();
 
         auto text1 = StrUtil::padLeft(std::to_string(SeqUtil::getBar(seq.get(), sequencer->getPunchInTime()) + 1), "0", 3);
         auto text2 = StrUtil::padLeft(std::to_string(SeqUtil::getBeat(seq.get(), sequencer->getPunchInTime()) + 1), "0", 2);

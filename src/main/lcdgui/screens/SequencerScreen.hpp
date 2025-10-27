@@ -1,7 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <memory>
 #include <vector>
 #include <functional>
 
@@ -24,8 +23,6 @@ namespace mpc::lcdgui::screens
         void tap();
 
     private:
-        std::weak_ptr<mpc::sequencer::Sequence> sequence;
-
         void setTrackToUsedIfItIsCurrentlyUnused();
         void displaySq();
         void displayTempoSource();
@@ -62,8 +59,6 @@ namespace mpc::lcdgui::screens
         void displayNextSq();
 
     public:
-        void update(Observable *o, Message message) override;
-
         void pressEnter() override;
         void function(int i) override;
         void turnWheel(int i) override;
