@@ -6,8 +6,12 @@
 #include "audiomidi/EventHandler.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "controller/ClientEventController.hpp"
 #include "sequencer/Track.hpp"
+
+#include "sampler/Sampler.hpp"
+#include "sampler/Program.hpp"
+
+#include "controller/ClientEventController.hpp"
 
 #include <iostream>
 #include <optional>
@@ -17,16 +21,19 @@ using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::audiomidi;
 using namespace mpc::sequencer;
+using namespace mpc::sampler;
 
 ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
     std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<EventHandler> eventHandler,
     std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<Sampler> sampler,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
     : midiInputScreen(midiInputScreen), eventHandler(eventHandler),
       sequencer(sequencer),
+      sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen),
       clientEventController(clientEventController)
@@ -107,12 +114,41 @@ std::optional<int> ClientMidiSoundGeneratorController::getTrackIndexForEvent(
     return sequencer->getActiveTrackIndex();
 }
 
-std::shared_ptr<mpc::sequencer::Track>
+std::shared_ptr<Track>
 ClientMidiSoundGeneratorController::getTrackForIndex(int trackIndex) const
 {
     auto seq = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
                                       : sequencer->getActiveSequence();
     return seq->getTrack(trackIndex);
+}
+
+std::shared_ptr<Program> ClientMidiSoundGeneratorController::getProgramForEvent(
+    const ClientMidiEvent &e) const
+{
+    if (auto drumIndex = getDrumIndexForEvent(e); drumIndex)
+    {
+        //sampler->getProgram();
+    }
+    return {};
+}
+
+std::optional<int> ClientMidiSoundGeneratorController::getDrumIndexForEvent(
+    const ClientMidiEvent &e) const
+{
+    auto trackIndexOpt = getTrackIndexForEvent(e);
+    if (!trackIndexOpt)
+    {
+        return std::nullopt;
+    }
+
+    auto track = getTrackForIndex(*trackIndexOpt);
+    if (!track)
+    {
+        return std::nullopt;
+    }
+
+    return track->getBus() > 0 ? std::optional<int>(track->getBus() - 1)
+                               : std::nullopt;
 }
 
 bool ClientMidiSoundGeneratorController::shouldProcessEvent(
@@ -165,7 +201,6 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
     }
 
     auto trackIndexOpt = getTrackIndexForEvent(e);
-
     if (!trackIndexOpt)
     {
         return;
@@ -178,9 +213,7 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
     auto track = getTrackForIndex(trackIndex);
     const int trackDevice = track->getDeviceIndex();
     const int trackVelocityRatio = track->getVelocityRatio();
-    const std::optional<int> drumIndex =
-        track->getBus() > 0 ? std::optional<int>(track->getBus() - 1)
-                            : std::nullopt;
+    const auto drumIndex = getDrumIndexForEvent(e);
 
     eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(),
                                         trackIndex, trackDevice,
@@ -259,9 +292,7 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 
     auto track = getTrackForIndex(trackIndex);
     const int trackDevice = track->getDeviceIndex();
-    const std::optional<int> drumIndex =
-        track->getBus() > 0 ? std::optional<int>(track->getBus() - 1)
-                            : std::nullopt;
+    const auto drumIndex = getDrumIndexForEvent(e);
 
     // finalize recorded note if exists
     if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(

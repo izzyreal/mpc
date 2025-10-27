@@ -9,19 +9,22 @@ using namespace mpc::controller;
 using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sequencer;
+using namespace mpc::sampler;
 
 ClientMidiEventController::ClientMidiEventController(
-    std::shared_ptr<ClientEventController> clientEventControllerToUse,
+    std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<ClientHardwareEventController>
-        clientHardwareEventControllerToUse,
+        clientHardwareEventController,
     std::shared_ptr<MidiSwScreen> midiSwScreen,
-    std::shared_ptr<sequencer::Sequencer> sequencer,
+    std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<Sampler> sampler,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<audiomidi::EventHandler> eventHandler,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
-    : clientEventController(clientEventControllerToUse),
-      clientHardwareEventController(clientHardwareEventControllerToUse)
+    : clientEventController(clientEventController),
+      clientHardwareEventController(clientHardwareEventController)
 {
     footswitchController =
         std::make_shared<ClientMidiFootswitchAssignmentController>(
@@ -30,7 +33,7 @@ ClientMidiEventController::ClientMidiEventController(
     // Create the sound generator controller with the passed dependencies
     soundGeneratorController =
         std::make_shared<ClientMidiSoundGeneratorController>(
-            clientEventController, midiInputScreen, eventHandler, sequencer,
+            clientEventController, midiInputScreen, eventHandler, sequencer, sampler,
             multiRecordingSetupScreen, timingCorrectScreen);
 }
 

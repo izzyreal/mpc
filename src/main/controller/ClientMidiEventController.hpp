@@ -14,6 +14,11 @@ namespace mpc::sequencer
     class Sequencer;
 }
 
+namespace mpc::sampler
+{
+    class Sampler;
+}
+
 namespace mpc::lcdgui::screens::window
 {
     class MidiInputScreen;
@@ -39,6 +44,16 @@ namespace mpc::controller
     class ClientMidiEventController : public Observable
     {
     private:
+        using MidiEvent = mpc::client::event::ClientMidiEvent;
+        using Sequencer = mpc::sequencer::Sequencer;
+        using Sampler = mpc::sampler::Sampler;
+        using EventHandler = mpc::audiomidi::EventHandler;
+        using MidiInputScreen = mpc::lcdgui::screens::window::MidiInputScreen;
+        using MultiRecordingSetupScreen =
+            mpc::lcdgui::screens::window::MultiRecordingSetupScreen;
+        using TimingCorrectScreen =
+            mpc::lcdgui::screens::window::TimingCorrectScreen;
+
         std::shared_ptr<ClientEventController> clientEventController;
         std::shared_ptr<ClientMidiSoundGeneratorController>
             soundGeneratorController;
@@ -55,12 +70,13 @@ namespace mpc::controller
         ClientMidiEventController(
             std::shared_ptr<ClientEventController>,
             std::shared_ptr<ClientHardwareEventController>,
-            std::shared_ptr<lcdgui::screens::MidiSwScreen>,
-            std::shared_ptr<sequencer::Sequencer>,
-            std::shared_ptr<lcdgui::screens::window::MidiInputScreen>,
-            std::shared_ptr<audiomidi::EventHandler>,
-            std::shared_ptr<lcdgui::screens::window::MultiRecordingSetupScreen>,
-            std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>);
+            std::shared_ptr<MidiSwScreen>,
+            std::shared_ptr<Sequencer>,
+            std::shared_ptr<Sampler>,
+            std::shared_ptr<MidiInputScreen>,
+            std::shared_ptr<EventHandler>,
+            std::shared_ptr<MultiRecordingSetupScreen>,
+            std::shared_ptr<TimingCorrectScreen>);
 
         std::shared_ptr<ClientMidiSoundGeneratorController>
         getSoundGeneratorController();
