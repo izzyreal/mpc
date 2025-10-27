@@ -1,5 +1,4 @@
 #pragma once
-#include <Observer.hpp>
 #include <Mpc.hpp>
 
 #include <memory>
@@ -22,7 +21,6 @@ namespace mpc::sequencer
 {
 
     class Sequence final
-        : public Observable
     {
     public:
         struct StartTime
