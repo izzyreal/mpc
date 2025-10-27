@@ -14,7 +14,6 @@ public:
     virtual std::vector<char> getFileData(const fs::path& path) const = 0;
     virtual bool exists(const fs::path& path) const = 0;
     virtual std::uintmax_t fileSize(const fs::path& path) const = 0;
-    virtual void remove(const fs::path& path) = 0;
 };
 
 } // namespace mpc

@@ -30,7 +30,3 @@ std::uintmax_t DirectorySaveTarget::fileSize(const fs::path& path) const
     return fs::file_size(basePath / path);
 }
 
-void DirectorySaveTarget::remove(const fs::path& path)
-{
-    fs::remove(basePath / path);
-}

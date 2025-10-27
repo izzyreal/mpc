@@ -33,13 +33,10 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
+void AutoSave::restoreAutoSavedStateWithTarget(Mpc& mpc, std::shared_ptr<SaveTarget> saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0) return;
-
-    auto saveTarget = std::make_shared<DirectorySaveTarget>(mpc.paths->autoSavePath());
-    const auto base = saveTarget->getBasePath();
 
     const std::vector<fs::path> files{
         "APS.APS", "ALL.ALL", "soundIndex.txt", "selectedPad.txt", "selectedNote.txt",
@@ -53,7 +50,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
     if (availableFiles.empty()) return;
 
-    const auto restoreAction = [&mpc, saveTarget, availableFiles, base]
+    const auto restoreAction = [&mpc, saveTarget, availableFiles]
     {
         std::map<fs::path, std::vector<char>> processInOrder;
 
@@ -158,14 +155,13 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     restoreAction();
 }
 
-void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
+void AutoSave::storeAutoSavedStateWithTarget(Mpc& mpc, std::shared_ptr<SaveTarget> saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
+
     if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
         mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-continue-previous-session")
         return;
-
-    auto saveTarget = std::make_shared<DirectorySaveTarget>(mpc.paths->autoSavePath());
 
     const auto storeAction = [&]()
     {

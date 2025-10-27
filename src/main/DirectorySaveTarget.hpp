@@ -14,11 +14,13 @@ namespace mpc {
         explicit DirectorySaveTarget(fs::path basePath);
 
         void setFileData(const fs::path& path, const std::vector<char>& data) override;
-        std::vector<char> getFileData(const fs::path& path) const override;
-        bool exists(const fs::path& path) const override;
-        std::uintmax_t fileSize(const fs::path& path) const override;
-        void remove(const fs::path& path) override;
 
+        std::vector<char> getFileData(const fs::path& path) const override;
+        
+        bool exists(const fs::path& path) const override;
+        
+        std::uintmax_t fileSize(const fs::path& path) const override;
+        
         const fs::path& getBasePath() const { return basePath; }
     };
 
