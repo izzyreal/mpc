@@ -91,8 +91,9 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                     programSlider->getFilterLowRange(),
                     programSlider->getFilterHighRange()};
 
-                mpc::Util::setSliderNoteVariationParameters(
-                    sliderNoteVariationContext, noteEvent);
+                    auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
+                    noteEvent->setVariationType(type);
+                    noteEvent->setVariationValue(value);
             }
 
             if (sixteenLevels)

@@ -3,10 +3,12 @@
 #include "Mpc.hpp"
 
 #include "audiomidi/MidiOutput.hpp"
+#include "controller/ClientEventController.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
 
+#include "hardware/Hardware.hpp"
 #include "sequencer/Bus.hpp"
 #include "engine/DrumNoteEventHandler.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
@@ -20,6 +22,8 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
+
+#include "Util.hpp"
 
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "lcdgui/screens/TransScreen.hpp"
@@ -102,14 +106,52 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                     ? VoiceOverlapMode::NOTE_OFF
                     : noteParameters->getVoiceOverlapMode();
 
+            int variationTypeToUse = noteOnEvent->getVariationType();
+            int variationValueToUse = noteOnEvent->getVariationValue();
+
+            const bool isSliderNote =
+                program && program->getSlider()->getNote() == note;
+
+            if (mpc.clientEventController->isAfterEnabled() && isSliderNote)
+            {
+                auto programSlider = program->getSlider();
+
+                Util::SliderNoteVariationContext sliderNoteVariationContext{
+                    mpc.getHardware()->getSlider()->getValueAs<int>(),
+                    programSlider->getNote(),
+                    programSlider->getParameter(),
+                    programSlider->getTuneLowRange(),
+                    programSlider->getTuneHighRange(),
+                    programSlider->getDecayLowRange(),
+                    programSlider->getDecayHighRange(),
+                    programSlider->getAttackLowRange(),
+                    programSlider->getAttackHighRange(),
+                    programSlider->getFilterLowRange(),
+                    programSlider->getFilterHighRange()};
+
+                const auto sliderValue = mpc.getHardware()->getSlider()->getValue();
+
+                auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
+                variationTypeToUse = type;
+                variationValueToUse = value;
+
+                if (mpc.getSequencer()->isOverdubbing())
+                {
+                    noteOnEvent->setVariationType(type);
+                    noteOnEvent->setVariationValue(variationValueToUse);
+                }
+            }
+
             auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
                 noteEventIdToUse, drumBus, mpc.getSampler(),
                 mpc.getAudioMidiServices()->getMixer(),
                 mpc.screens->get<MixerSetupScreen>(),
                 &mpc.getAudioMidiServices()->getVoices(),
                 mpc.getAudioMidiServices()->getMixerConnections(), note,
-                velocityToUse, noteOnEvent->getVariationType(),
-                noteOnEvent->getVariationValue(), eventFrameOffsetInBuffer,
+                velocityToUse,
+                variationTypeToUse,
+                variationValueToUse,
+                eventFrameOffsetInBuffer,
                 true, noteOnEvent->getTick(),
                 voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames
                                                                : -1);

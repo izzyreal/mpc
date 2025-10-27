@@ -267,15 +267,13 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
     }
 }
 
-void Util::setSliderNoteVariationParameters(
-    const SliderNoteVariationContext &ctx,
-    const std::shared_ptr<NoteOnEvent> noteOnEvent)
+std::pair<NoteOnEvent::VARIATION_TYPE, int> Util::getSliderNoteVariationTypeAndValue(
+    const SliderNoteVariationContext &ctx)
 {
-    const auto sliderParam = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
-    noteOnEvent->setVariationType(sliderParam);
+    const auto variationType = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
     int sliderValue = ctx.sliderValue;
 
-    switch (sliderParam)
+    switch (variationType)
     {
         case 0:
         {
@@ -286,8 +284,7 @@ void Util::setSliderNoteVariationParameters(
             auto sliderRangeRatio = sliderRange / 128.0;
             auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
             tuneValue += (120 - rangeHigh) / 2;
-            noteOnEvent->setVariationValue(tuneValue);
-            break;
+            return {variationType, tuneValue};
         }
         case 1:
         {
@@ -296,8 +293,7 @@ void Util::setSliderNoteVariationParameters(
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto decayValue = (int)(sliderValue * sliderRangeRatio);
-            noteOnEvent->setVariationValue(decayValue);
-            break;
+            return {variationType, decayValue};
         }
         case 2:
         {
@@ -306,8 +302,7 @@ void Util::setSliderNoteVariationParameters(
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto attackValue = (int)(sliderValue * sliderRangeRatio);
-            noteOnEvent->setVariationValue(attackValue);
-            break;
+            return {variationType, attackValue};
         }
         case 3:
         {
@@ -316,10 +311,11 @@ void Util::setSliderNoteVariationParameters(
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto filterValue = (int)(sliderValue * sliderRangeRatio);
-            noteOnEvent->setVariationValue(filterValue);
-            break;
+            return {variationType, filterValue};
         }
     }
+
+    return {NoteOnEvent::VARIATION_TYPE::TUNE_0, 0};
 }
 
 std::vector<char> Util::vecCopyOfRange(const std::vector<char> &src, int offset,

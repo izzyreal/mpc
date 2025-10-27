@@ -84,8 +84,9 @@ void TriggerDrumNoteOnCommand::generateNoteOn(
 
     if (ctx.program && isSliderNote)
     {
-        Util::setSliderNoteVariationParameters(sliderNoteVariationContext,
-                                               playOnEvent);
+        auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
+        playOnEvent->setVariationType(type);
+        playOnEvent->setVariationValue(value);
     }
 
     ctx.sequencer->getNoteEventStore().storePlayNoteEvent(ctx.programPadIndex,
@@ -158,8 +159,9 @@ void TriggerDrumNoteOnCommand::generateNoteOn(
 
         if (ctx.program && isSliderNote)
         {
-            Util::setSliderNoteVariationParameters(sliderNoteVariationContext,
-                                                   recordNoteOnEvent);
+            auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
+            recordNoteOnEvent->setVariationType(type);
+            recordNoteOnEvent->setVariationValue(value);
         }
 
         ctx.sequencer->getNoteEventStore().storeRecordNoteEvent(
