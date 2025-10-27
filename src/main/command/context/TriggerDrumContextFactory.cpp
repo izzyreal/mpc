@@ -8,7 +8,6 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
-#include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
@@ -37,7 +36,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     const std::shared_ptr<ScreenComponent> screen)
 {
     const bool isSequencerScreen = mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
-    const bool isSongScreen = mpc.getLayeredScreen()->isCurrentScreen<SongScreen>();
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
@@ -108,7 +106,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         isStepRecording,
         isRecMainWithoutPlaying,
         mpc.getSequencer()->isRecordingOrOverdubbing(),
-        isSongScreen,
         mpc.getAudioMidiServices()
             ->getFrameSequencer()
             ->getMetronomeOnlyTickPosition(),
