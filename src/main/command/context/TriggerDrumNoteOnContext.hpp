@@ -102,6 +102,6 @@ namespace mpc::command::context
 
         std::string currentFieldName;
         int hardwareSliderValue;
-        bool isPhysicallyPressed;
+        bool isProgramPadPressed;
     };
 } // namespace mpc::command::context

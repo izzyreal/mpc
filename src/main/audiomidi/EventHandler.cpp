@@ -4,6 +4,7 @@
 
 #include "audiomidi/MidiOutput.hpp"
 #include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
@@ -14,6 +15,7 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/ScreenGroups.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 
@@ -158,8 +160,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
             DrumNoteEventHandler::noteOn(ctx);
 
-            program->registerPadPress(programPadIndex,
-                                      Program::PadPressSource::NON_PHYSICAL);
+            program->registerPadPress(programPadIndex, velocityToUse,
+                                      Program::PadPressSource::SEQUENCED);
 
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
                 noteEventIdToUse, drumBus,
@@ -169,7 +171,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
             auto drumNoteOffEvent = [program, programPadIndex, noteOffCtx]
             {
                 program->registerPadRelease(
-                    programPadIndex, Program::PadPressSource::NON_PHYSICAL);
+                    programPadIndex, Program::PadPressSource::SEQUENCED);
                 DrumNoteEventHandler::noteOff(noteOffCtx);
             };
 
@@ -252,9 +254,6 @@ void EventHandler::handleUnfinalizedNoteOn(
             noteOnEvent->getVariationValue(), 0, true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
-
-        program->registerPadPress(program->getPadIndexFromNote(note),
-                                  Program::PadPressSource::PHYSICAL);
     }
 
     if (trackIndex.has_value() && trackDevice.has_value())
@@ -286,9 +285,6 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
             noteOffEvent->getNote(), -1);
 
         DrumNoteEventHandler::noteOff(ctx);
-
-        program->registerPadRelease(program->getPadIndexFromNote(note),
-                                    Program::PadPressSource::PHYSICAL);
     }
 
     if (trackIndex.has_value() && trackDevice.has_value())
@@ -332,6 +328,32 @@ void EventHandler::handleMidiInputNoteOn(
     const auto velocityToUse =
         std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
+    program->registerPadPress(program->getPadIndexFromNote(note), velocityToUse,
+                              Program::PadPressSource::MIDI);
+
+    const bool isSoundScreen = lcdgui::screengroups::isSoundScreen(mpc.getLayeredScreen()->getCurrentScreen());
+
+    if (isSoundScreen)
+    {
+        mpc.getBasicPlayer().mpcNoteOn(mpc.getSampler()->getSoundIndex(), 127, 0);
+        return;
+    }
+
+    const bool isSequencerScreen = mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
+
+    const bool isNoteRepeatLockedOrPressed =
+        mpc.clientEventController->clientHardwareEventController
+            ->isNoteRepeatLocked() ||
+        mpc.getHardware()
+            ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
+            ->isPressed();
+
+    if (isSequencerScreen && isNoteRepeatLockedOrPressed &&
+        mpc.getSequencer()->isPlaying())
+    {
+        return;
+    }
+
     auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
         0, drumBus, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
         mpc.screens->get<MixerSetupScreen>(),
@@ -341,9 +363,6 @@ void EventHandler::handleMidiInputNoteOn(
         frameOffsetInBuffer, true, -1, -1);
 
     DrumNoteEventHandler::noteOn(ctx);
-
-    program->registerPadPress(program->getPadIndexFromNote(note),
-                              Program::PadPressSource::NON_PHYSICAL);
 }
 
 void EventHandler::handleMidiInputNoteOff(
@@ -390,7 +409,7 @@ void EventHandler::handleMidiInputNoteOff(
 
         DrumNoteEventHandler::noteOff(ctx);
         program->registerPadRelease(program->getPadIndexFromNote(note),
-                                    Program::PadPressSource::NON_PHYSICAL);
+                                    Program::PadPressSource::MIDI);
     };
 
     frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);

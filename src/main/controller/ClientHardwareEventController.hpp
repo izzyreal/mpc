@@ -88,6 +88,13 @@ namespace mpc::controller
             return result;
         }
 
+        client::event::PhysicalPadPress
+        retrievePhysicalPadPress(const int padIndex)
+        {
+            assert(physicalPadPresses.count(padIndex) == 1);
+            return physicalPadPresses[padIndex];
+        }
+
     protected:
         // Maps component label to accumulated delta for discretization
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;

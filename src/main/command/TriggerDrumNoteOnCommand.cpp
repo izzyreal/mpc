@@ -30,7 +30,7 @@ void TriggerDrumNoteOnCommand::execute()
     }
 
     if (ctx.isSequencerScreen && ctx.isNoteRepeatLockedOrPressed &&
-        ctx.sequencer->isPlaying() && ctx.isPhysicallyPressed)
+        ctx.sequencer->isPlaying())
     {
         return;
     }

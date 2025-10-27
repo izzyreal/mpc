@@ -163,6 +163,11 @@ void ClientHardwareEventController::handlePadPress(
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         mpc, programPadIndex, clampedVelocity, screen);
 
+    auto program = screen->getProgram();
+
+    program->registerPadPress(program->getPadIndexFromNote(ctx.note), clampedVelocity,
+                              sampler::Program::PadPressSource::PHYSICAL);
+
     const bool isF4Pressed =
         mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
     const bool isF6Pressed =
@@ -219,6 +224,10 @@ void ClientHardwareEventController::handlePadRelease(
     const auto physicalPadIndex = *event.index;
 
     const auto info = registerPhysicalPadRelease(physicalPadIndex);
+    auto program = info.screen->getProgram();
+
+    program->registerPadRelease(physicalPadIndex + static_cast<int>(info.bank) * 16,
+                                sampler::Program::PadPressSource::PHYSICAL);
 
     mpc.getHardware()->getPad(physicalPadIndex)->release();
 
@@ -246,7 +255,15 @@ void ClientHardwareEventController::handlePadAftertouch(
         std::clamp(*event.value * Aftertouchable::MAX_PRESSURE,
                    (float)Aftertouchable::MIN_PRESSURE,
                    (float)Aftertouchable::MAX_PRESSURE);
+
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
+
+    auto physicalPadPress = retrievePhysicalPadPress(padIndex);
+
+    if (auto program = physicalPadPress.screen->getProgram(); program)
+    {
+        program->registerPadAfterTouch(padIndex + static_cast<int>(physicalPadPress.bank) * 16, pressureToUse);
+    }
 }
 
 void ClientHardwareEventController::handleDataWheel(

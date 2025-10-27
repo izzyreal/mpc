@@ -36,10 +36,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     mpc::Mpc &mpc, int programPadIndex, int velocity,
     const std::shared_ptr<ScreenComponent> screen)
 {
-    const bool isSequencerScreen =
-        std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
-    const bool isSongScreen =
-        std::dynamic_pointer_cast<SongScreen>(screen) != nullptr;
+    const bool isSequencerScreen = mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
+    const bool isSongScreen = mpc.getLayeredScreen()->isCurrentScreen<SongScreen>();
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
@@ -142,9 +140,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         setSelectedPad,
         mpc.getLayeredScreen()->getFocusedFieldName(),
         hardwareSliderValue,
-        mpc.clientEventController->clientHardwareEventController
-            ->isPhysicallyPressed(programPadIndex % 16,
-                                  mpc.clientEventController->getActiveBank())};
+        program->isPadRegisteredAsPressed(programPadIndex)
+    };
 }
 
 TriggerDrumNoteOffContext

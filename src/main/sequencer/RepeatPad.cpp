@@ -53,15 +53,12 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
     {
         for (int bankIndex = 0; bankIndex < 4; ++bankIndex)
         {
-            if (!mpc.clientEventController->clientHardwareEventController
-                     ->isPhysicallyPressed(
-                         physicalPadIndex,
-                         mpc.clientEventController->getActiveBank()))
+            const int programPadIndex = physicalPadIndex + bankIndex * 16;
+
+            if (!program->isPadRegisteredAsPressed(programPadIndex))
             {
                 continue;
             }
-
-            const int programPadIndex = physicalPadIndex + bankIndex * 16;
 
             if (!sixteenLevels && program)
             {
@@ -112,13 +109,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             }
             else
             {
-                const auto hardwarePad =
-                    mpc.getHardware()->getPad(physicalPadIndex);
-                assert(hardwarePad->getPressure().has_value() ||
-                       hardwarePad->getVelocity().has_value());
-                const int velocityToUseIfNotFullLevel =
-                    hardwarePad->getPressure().value_or(
-                        hardwarePad->getVelocity().value());
+                const int velocityToUseIfNotFullLevel = program->getPressedPadAfterTouchOrVelocity(programPadIndex);
                 noteEvent->setVelocity(fullLevel ? 127
                                                  : velocityToUseIfNotFullLevel);
             }
@@ -166,8 +157,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                 DrumNoteEventHandler::noteOn(ctx);
 
-                program->registerPadPress(programPadIndex,
-                                          PadPressSource::NON_PHYSICAL);
+                program->registerPadPress(programPadIndex, noteEvent->getVelocity(),
+                                          PadPressSource::GENERATED);
             }
 
             if (track->getDeviceIndex() > 0)
@@ -201,7 +192,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                             DrumNoteEventHandler::noteOff(ctx);
 
                             program->registerPadRelease(
-                                programPadIndex, PadPressSource::NON_PHYSICAL);
+                                programPadIndex, PadPressSource::GENERATED);
                         }
 
                         if (track->getDeviceIndex() > 0)
