@@ -3,6 +3,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(cmake/MpcResourceBundling.cmake)
 include(cmake/lodepng.cmake)
+include(cmake/ClangFormat.cmake)
 
 include(FetchContent)
 
@@ -257,33 +258,6 @@ if (PROJECT_IS_TOP_LEVEL)
         COMMAND ${CMAKE_COMMAND} -E create_symlink
             ${CMAKE_BINARY_DIR}/compile_commands.json
             ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
-    )
-endif()
-
-find_program(CLANG_FORMAT clang-format)
-
-if(CLANG_FORMAT)
-    message(STATUS "clang-format found: ${CLANG_FORMAT}")
-else()
-    message(WARNING "clang-format not found! Code style checks and formatting targets will be skipped.")
-endif()
-
-if(CLANG_FORMAT)
-    file(GLOB_RECURSE ALL_CXX_SOURCE_FILES
-        "${CMAKE_SOURCE_DIR}/src/*.cpp"
-        "${CMAKE_SOURCE_DIR}/src/*.hpp"
-        "${CMAKE_SOURCE_DIR}/include/*.h"
-        "${CMAKE_SOURCE_DIR}/include/*.hpp"
-    )
-
-    add_custom_target(format
-        COMMAND ${CLANG_FORMAT} -i ${ALL_CXX_SOURCE_FILES}
-        COMMENT "Formatting all source files with clang-format"
-    )
-
-    add_custom_target(check-format
-        COMMAND ${CLANG_FORMAT} --dry-run --Werror ${ALL_CXX_SOURCE_FILES}
-        COMMENT "Checking code style with clang-format"
     )
 endif()
 
