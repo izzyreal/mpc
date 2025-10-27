@@ -114,7 +114,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         activeTrack,
         mpc.getSampler(),
         mpc.getSequencer(),
-        mpc.getLayeredScreen(),
         timingCorrectScreen,
         assign16LevelsScreen,
         mpc.getEventHandler(),
@@ -125,8 +124,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         setSelectedNote,
         setSelectedPad,
         mpc.getLayeredScreen()->getFocusedFieldName(),
-        hardwareSliderValue,
-        program->isPadRegisteredAsPressed(programPadIndex)
+        hardwareSliderValue
     };
 }
 
