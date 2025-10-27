@@ -56,19 +56,11 @@ int Sequence::getLoopEnd()
 
 void Sequence::setFirstLoopBarIndex(int i)
 {
-    if (i < 0 || i > lastBarIndex)
-    {
-        return;
-    }
-
-    firstLoopBarIndex = i;
-
-    notifyObservers(std::string("firstloopbar"));
+    firstLoopBarIndex = std::clamp(i, 0, lastLoopBarIndex);
 
     if (i > lastLoopBarIndex)
     {
         lastLoopBarIndex = i;
-        notifyObservers(std::string("lastloopbar"));
     }
 }
 
@@ -81,7 +73,7 @@ void Sequence::setLastLoopBarIndex(int i)
 {
     if (i < 0)
     {
-        return;
+        i = 0;
     }
 
     if (lastLoopBarEnd)
@@ -90,8 +82,6 @@ void Sequence::setLastLoopBarIndex(int i)
         {
             lastLoopBarEnd = false;
             lastLoopBarIndex = lastBarIndex;
-
-            notifyObservers(std::string("lastloopbar"));
             return;
         }
         else
@@ -104,23 +94,17 @@ void Sequence::setLastLoopBarIndex(int i)
         if (i > lastBarIndex)
         {
             lastLoopBarEnd = true;
-            notifyObservers(std::string("lastloopbar"));
         }
         else
         {
-            notifyObservers(std::string("lastloopbar"));
-
             if (i < firstLoopBarIndex)
             {
                 firstLoopBarIndex = i;
-                notifyObservers(std::string("firstloopbar"));
             }
         }
     }
 
     lastLoopBarIndex = i;
-
-    notifyObservers(std::string("lastloopbar"));
 }
 
 int Sequence::getLastLoopBarIndex()
@@ -186,8 +170,6 @@ int Sequence::getBarCount()
 void Sequence::setLoopEnabled(bool b)
 {
     loopEnabled = b;
-
-    notifyObservers(std::string("loop"));
 }
 
 std::shared_ptr<Track> Sequence::getTrack(int i)
@@ -298,8 +280,6 @@ void Sequence::setInitialTempo(const double newInitialTempo)
     {
         this->initialTempo = 300.0;
     }
-
-    notifyObservers(std::string("initial-tempo"));
 }
 
 void Sequence::removeTempoChangeEvent(int i)
@@ -315,7 +295,6 @@ bool Sequence::isTempoChangeOn()
 void Sequence::setTempoChangeOn(bool b)
 {
     tempoChangeOn = b;
-    notifyObservers(std::string("tempochangeon"));
 }
 
 int Sequence::getLastTick()
@@ -587,10 +566,6 @@ void Sequence::insertBars(int barCount, int afterBar)
     {
         setUsed(true);
     }
-
-    notifyObservers(std::string("numberofbars"));
-    notifyObservers(std::string("tempo"));
-    notifyObservers(std::string("timesignature"));
 }
 
 bool trackIndexComparator(const std::shared_ptr<Track> &t0, const std::shared_ptr<Track> &t1)

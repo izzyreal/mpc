@@ -130,6 +130,7 @@ namespace mpc::lcdgui
         void setDirty();
         MRECT getDirtyArea();
         void Draw();
+        void timerCallback();
 
     public:
         std::string getFocusedFieldName();

@@ -27,14 +27,14 @@ void SecondSeqScreen::function(int i)
             mpc.getLayeredScreen()->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
-            if (sequencer.lock()->isSecondSequenceEnabled())
+            if (sequencer->isSecondSequenceEnabled())
             {
-                sequencer.lock()->setSecondSequenceEnabled(false);
+                sequencer->setSecondSequenceEnabled(false);
                 mpc.getLayeredScreen()->openScreen<SequencerScreen>();
                 return;
             }
 
-            sequencer.lock()->setSecondSequenceEnabled(true);
+            sequencer->setSecondSequenceEnabled(true);
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
     }
@@ -60,14 +60,14 @@ void SecondSeqScreen::setSq(int i)
 
 void SecondSeqScreen::displaySq()
 {
-    auto sqName = sequencer.lock()->getSequence(sq)->getName();
+    auto sqName = sequencer->getSequence(sq)->getName();
     findField("sq")->setTextPadded(sq + 1, "0");
     findLabel("sequence-name")->setText("-" + sqName);
 }
 
 void SecondSeqScreen::displayFunctionKeys()
 {
-    if (sequencer.lock()->isSecondSequenceEnabled())
+    if (sequencer->isSecondSequenceEnabled())
     {
         ls->setFunctionKeysArrangement(2);
     }

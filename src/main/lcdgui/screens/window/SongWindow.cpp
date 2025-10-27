@@ -22,7 +22,7 @@ void SongWindow::open()
     auto defaultSongNameFirstLetterField = findField("default-name-first-letter");
 
     auto songScreen = mpc.screens->get<SongScreen>();
-    auto song = sequencer.lock()->getSong(songScreen->activeSongIndex);
+    auto song = sequencer->getSong(songScreen->activeSongIndex);
 
     songNameFirstLetterField->setText(song->getName().substr(0, 1));
     defaultSongNameFirstLetterField->setText(songScreen->defaultSongName.substr(0, 1));
@@ -69,7 +69,7 @@ void SongWindow::openNameScreen()
     else
     {
         const auto songIndex = songScreen->getActiveSongIndex();
-        const auto song = sequencer.lock()->getSong(songIndex);
+        const auto song = sequencer->getSong(songIndex);
         initialNameScreenName = song->getName();
 
         enterAction = [song, this](std::string &newName)

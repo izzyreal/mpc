@@ -31,7 +31,7 @@ void EventsScreen::setNote0(int i)
 
 void EventsScreen::open()
 {
-    sequencer.lock()->move(0);
+    sequencer->move(0);
 
     auto note1Field = findField("note1");
 
@@ -51,12 +51,12 @@ void EventsScreen::open()
     }
 
     auto previousScreenWasSequencer = ls->isPreviousScreen<SequencerScreen>();
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     if (previousScreenWasSequencer)
     {
-        setFromTr(sequencer.lock()->getActiveTrackIndex());
-        setToTr(sequencer.lock()->getActiveTrackIndex());
+        setFromTr(sequencer->getActiveTrackIndex());
+        setToTr(sequencer->getActiveTrackIndex());
 
         if (!seq->isUsed())
         {
@@ -64,7 +64,7 @@ void EventsScreen::open()
             seq->init(userScreen->lastBar);
         }
 
-        setToSq(sequencer.lock()->getActiveSequenceIndex());
+        setToSq(sequencer->getActiveSequenceIndex());
         time0 = 0;
         time1 = seq->getLastTick();
         start = 0;
@@ -81,7 +81,7 @@ void EventsScreen::open()
             time1 = 0;
         }
 
-        auto toSeqLastTick = sequencer.lock()->getSequence(toSq)->getLastTick();
+        auto toSeqLastTick = sequencer->getSequence(toSq)->getLastTick();
 
         if (start > toSeqLastTick)
         {
@@ -101,8 +101,8 @@ void EventsScreen::open()
 void EventsScreen::function(int i)
 {
 
-    auto fromSequence = sequencer.lock()->getActiveSequence();
-    auto toSequence = sequencer.lock()->getSequence(toSq);
+    auto fromSequence = sequencer->getActiveSequence();
+    auto toSequence = sequencer->getSequence(toSq);
 
     switch (i)
     {
@@ -115,7 +115,7 @@ void EventsScreen::function(int i)
             break;
         case 5:
         {
-            auto sourceTrack = sequencer.lock()->getActiveTrack();
+            auto sourceTrack = sequencer->getActiveTrack();
 
             if (editFunctionNumber == 0)
             {
@@ -184,9 +184,9 @@ void EventsScreen::function(int i)
 
 void EventsScreen::turnWheel(int i)
 {
-    auto toSequence = sequencer.lock()->getSequence(toSq);
+    auto toSequence = sequencer->getSequence(toSq);
 
-    if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getActiveSequence().get(), sequencer.lock()->getActiveTrack().get()))
+    if (checkAllTimesAndNotes(mpc, i, sequencer->getActiveSequence().get(), sequencer->getActiveTrack().get()))
     {
         return;
     }
@@ -211,9 +211,9 @@ void EventsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "from-sq")
     {
-        setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
+        setFromSq(sequencer->getActiveSequenceIndex() + i);
 
-        auto fromSeq = sequencer.lock()->getActiveSequence();
+        auto fromSeq = sequencer->getActiveSequence();
 
         if (time1 > fromSeq->getLastTick())
         {
@@ -222,12 +222,12 @@ void EventsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "from-tr")
     {
-        setFromTr(sequencer.lock()->getActiveTrackIndex() + i);
+        setFromTr(sequencer->getActiveTrackIndex() + i);
     }
     else if (focusedFieldName == "to-sq")
     {
         setToSq(toSq + i);
-        auto toSeq = sequencer.lock()->getSequence(toSq);
+        auto toSeq = sequencer->getSequence(toSq);
 
         if (start > toSeq->getLastTick())
         {
@@ -276,7 +276,7 @@ void EventsScreen::turnWheel(int i)
 
 void EventsScreen::displayStart()
 {
-    auto seq = sequencer.lock()->getSequence(toSq);
+    auto seq = sequencer->getSequence(toSq);
     findField("start0")->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1, "0");
     findField("start1")->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1, "0");
     findField("start2")->setTextPadded(SeqUtil::getClock(seq.get(), start), "0");
@@ -284,7 +284,7 @@ void EventsScreen::displayStart()
 
 void EventsScreen::displayTime()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     findField("time0")->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1, "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(seq.get(), time0), "0");
@@ -444,7 +444,7 @@ void EventsScreen::displayEdit()
 void EventsScreen::displayNotes()
 {
 
-    if (sequencer.lock()->getActiveTrack()->getBus() == 0)
+    if (sequencer->getActiveTrack()->getBus() == 0)
     {
         findField("note0")->setSize(47, 9);
         findField("note1")->Hide(false);
@@ -476,7 +476,7 @@ void EventsScreen::displayDrumNotes()
     }
     else
     {
-        auto track = sequencer.lock()->getActiveTrack();
+        auto track = sequencer->getActiveTrack();
         auto program = sampler->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
 
         auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
@@ -503,7 +503,7 @@ void EventsScreen::setFromSq(int i)
         return;
     }
 
-    sequencer.lock()->setActiveSequenceIndex(i);
+    sequencer->setActiveSequenceIndex(i);
 
     displayFromSq();
 }
@@ -515,7 +515,7 @@ void EventsScreen::setFromTr(int i)
         return;
     }
 
-    sequencer.lock()->setActiveTrackIndex(i);
+    sequencer->setActiveTrackIndex(i);
 
     displayFromTr();
 }
@@ -649,12 +649,12 @@ void EventsScreen::setStart(int i)
 
 void EventsScreen::displayFromSq()
 {
-    findField("from-sq")->setTextPadded(sequencer.lock()->getActiveSequenceIndex() + 1);
+    findField("from-sq")->setTextPadded(sequencer->getActiveSequenceIndex() + 1);
 }
 
 void EventsScreen::displayFromTr()
 {
-    findField("from-tr")->setTextPadded(sequencer.lock()->getActiveTrackIndex() + 1);
+    findField("from-tr")->setTextPadded(sequencer->getActiveTrackIndex() + 1);
 }
 
 void EventsScreen::displayToSq()
@@ -671,9 +671,9 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
                                int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1)
 {
     const auto segLength = sourceEnd - sourceStart;
-    auto sourceTrack = sequencer.lock()->getActiveTrack();
+    auto sourceTrack = sequencer->getActiveTrack();
 
-    auto fromSequence = sequencer.lock()->getActiveSequence();
+    auto fromSequence = sequencer->getActiveSequence();
 
     if (!fromSequence->isUsed())
     {
@@ -682,7 +682,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
 
     auto destOffset = destStart - sourceStart;
 
-    auto toSequence = sequencer.lock()->getSequence(toSequenceIndex);
+    auto toSequence = sequencer->getSequence(toSequenceIndex);
 
     if (!toSequence->isUsed())
     {
@@ -785,5 +785,5 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
         }
     }
 
-    sequencer.lock()->setActiveSequenceIndex(toSequenceIndex);
+    sequencer->setActiveSequenceIndex(toSequenceIndex);
 }

@@ -14,6 +14,11 @@ Component::Component(const std::string &nameToUse)
 {
 }
 
+void Component::addReactiveBinding(ReactiveBinding b)
+{
+    reactiveBindings.push_back(std::move(b));
+}
+
 void Component::sendToBack(std::shared_ptr<Component> childToSendBack)
 {
     for (int i = 0; i < children.size(); i++)

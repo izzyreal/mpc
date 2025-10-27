@@ -29,7 +29,7 @@ void EditVelocityScreen::setNote0(int i)
 
 void EditVelocityScreen::open()
 {
-    auto bus = sequencer.lock()->getActiveTrack()->getBus();
+    auto bus = sequencer->getActiveTrack()->getBus();
 
     if (bus == 0)
     {
@@ -46,7 +46,7 @@ void EditVelocityScreen::open()
 
     findField("note1")->setLocation(116, 42);
 
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -116,7 +116,7 @@ void EditVelocityScreen::turnWheel(int i)
 
 void EditVelocityScreen::displayTime()
 {
-    auto sequence = sequencer.lock()->getActiveSequence().get();
+    auto sequence = sequencer->getActiveSequence().get();
     findField("time0")->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");

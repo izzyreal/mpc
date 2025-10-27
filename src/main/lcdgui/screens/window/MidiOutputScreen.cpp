@@ -44,12 +44,12 @@ void MidiOutputScreen::openNameScreen()
 
         const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName)
         {
-            sequencer.lock()->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
+            sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
             mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
         };
 
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        auto seq = sequencer.lock()->getActiveSequence();
+        auto seq = sequencer->getActiveSequence();
         nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, "midi-output");
         mpc.getLayeredScreen()->openScreen<NameScreen>();
     }
@@ -107,7 +107,7 @@ void MidiOutputScreen::displaySoftThru()
 
 void MidiOutputScreen::displayDeviceName()
 {
-    auto sequence = sequencer.lock()->getActiveSequence();
+    auto sequence = sequencer->getActiveSequence();
     auto devName = sequence->getDeviceName(deviceIndex + 1);
 
     findField("firstletter")->setText(devName.substr(0, 1));

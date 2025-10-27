@@ -354,6 +354,16 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
     return &pixels;
 }
 
+void LayeredScreen::timerCallback()
+{
+    //	MLOG("LayeredScreen::timerCallback()");
+    
+    if (auto currentScreen = getCurrentScreen(); currentScreen)
+    {
+        currentScreen->timerCallback();
+    }
+}
+
 void LayeredScreen::Draw()
 {
     //	MLOG("LayeredScreen::Draw()");

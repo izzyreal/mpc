@@ -13,7 +13,7 @@ TrMuteScreen::TrMuteScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void TrMuteScreen::open()
 {
-    if (sequencer.lock()->isSoloEnabled())
+    if (sequencer->isSoloEnabled())
     {
         findBackground()->setBackgroundName("track-mute-solo-2");
     }
@@ -32,9 +32,9 @@ void TrMuteScreen::open()
     displayBank();
     displayTrackNumbers();
 
-    sequencer.lock()->addObserver(this);
+    sequencer->addObserver(this);
 
-    auto sequence = sequencer.lock()->getActiveSequence();
+    auto sequence = sequencer->getActiveSequence();
 
     for (int i = 0; i < 64; i++)
     {
@@ -58,8 +58,8 @@ void TrMuteScreen::open()
 void TrMuteScreen::close()
 {
     mpc.clientEventController->deleteObserver(this);
-    sequencer.lock()->deleteObserver(this);
-    auto sequence = sequencer.lock()->getActiveSequence();
+    sequencer->deleteObserver(this);
+    auto sequence = sequencer->getActiveSequence();
 
     for (int i = 0; i < 64; i++)
     {
@@ -77,17 +77,17 @@ void TrMuteScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "sq" && !sequencer.lock()->isPlaying())
+    if (focusedFieldName == "sq" && !sequencer->isPlaying())
     {
-        auto oldSequence = sequencer.lock()->getActiveSequence();
+        auto oldSequence = sequencer->getActiveSequence();
 
         for (int trackIndex = 0; trackIndex < 64; trackIndex++)
         {
             oldSequence->getTrack(trackIndex)->deleteObserver(this);
         }
 
-        sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
-        auto newSequence = sequencer.lock()->getActiveSequence();
+        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
+        auto newSequence = sequencer->getActiveSequence();
 
         for (int trackIndex = 0; trackIndex < 64; trackIndex++)
         {
@@ -106,10 +106,10 @@ void TrMuteScreen::function(int i)
     switch (i)
     {
         case 5:
-            if (sequencer.lock()->isSoloEnabled())
+            if (sequencer->isSoloEnabled())
             {
                 ls->setCurrentBackground("track-mute");
-                sequencer.lock()->setSoloEnabled(false);
+                sequencer->setSoloEnabled(false);
             }
             else
             {
@@ -141,41 +141,41 @@ void TrMuteScreen::displayTrackNumbers()
 
 void TrMuteScreen::displaySq()
 {
-    auto sequenceNumber = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
-    auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+    auto sequenceNumber = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
+    auto sequenceName = sequencer->getActiveSequence()->getName();
     findField("sq")->setText(sequenceNumber + "-" + sequenceName);
 }
 
 void TrMuteScreen::displayTrack(int i)
 {
-    findField(std::to_string(i + 1))->setText(sequencer.lock()->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
+    findField(std::to_string(i + 1))->setText(sequencer->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
 }
 
 void TrMuteScreen::setTrackColor(int i)
 {
-    if (sequencer.lock()->isSoloEnabled())
+    if (sequencer->isSoloEnabled())
     {
-        findField(std::to_string(i + 1))->setInverted(i + bankoffset() == sequencer.lock()->getActiveTrackIndex());
+        findField(std::to_string(i + 1))->setInverted(i + bankoffset() == sequencer->getActiveTrackIndex());
     }
     else
     {
-        findField(std::to_string(i + 1))->setInverted(sequencer.lock()->getActiveSequence()->getTrack(i + bankoffset())->isOn());
+        findField(std::to_string(i + 1))->setInverted(sequencer->getActiveSequence()->getTrack(i + bankoffset())->isOn());
     }
 }
 
 void TrMuteScreen::displayNow0()
 {
-    findField("now0")->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
 void TrMuteScreen::displayNow1()
 {
-    findField("now1")->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void TrMuteScreen::displayNow2()
 {
-    findField("now2")->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
 void TrMuteScreen::refreshTracks()

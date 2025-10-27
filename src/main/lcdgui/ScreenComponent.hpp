@@ -44,7 +44,7 @@ namespace mpc::lcdgui
     protected:
         mpc::Mpc &mpc;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
-        std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+        std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 
         mpc::engine::Drum &activeDrum();

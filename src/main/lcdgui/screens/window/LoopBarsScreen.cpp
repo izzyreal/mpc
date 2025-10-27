@@ -21,7 +21,7 @@ void LoopBarsScreen::open()
 
 void LoopBarsScreen::turnWheel(int i)
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -64,7 +64,7 @@ void LoopBarsScreen::turnWheel(int i)
 
 void LoopBarsScreen::displayLastBar()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     if (seq->isLastLoopBarEnd())
     {
@@ -78,12 +78,12 @@ void LoopBarsScreen::displayLastBar()
 
 void LoopBarsScreen::displayNumberOfBars()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     findField("numberofbars")->setText(std::to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
 }
 
 void LoopBarsScreen::displayFirstBar()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     findField("firstbar")->setText(std::to_string(seq->getFirstLoopBarIndex() + 1));
 }
