@@ -9,11 +9,6 @@ namespace mpc::lcdgui
     class ScreenComponent;
 }
 
-namespace mpc::sampler
-{
-    class Program;
-}
-
 namespace mpc::command::context
 {
 
