@@ -19,7 +19,7 @@ void DeleteAllSongScreen::function(int i)
 
             for (int j = 0; j < 20; j++)
             {
-                sequencer.lock()->deleteSong(j);
+                sequencer->deleteSong(j);
             }
 
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();

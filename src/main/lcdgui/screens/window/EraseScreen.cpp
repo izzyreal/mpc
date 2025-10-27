@@ -16,7 +16,7 @@ EraseScreen::EraseScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-    auto bus = sequencer.lock()->getActiveTrack()->getBus();
+    auto bus = sequencer->getActiveTrack()->getBus();
 
     if (bus == 0)
     {
@@ -35,7 +35,7 @@ void EraseScreen::open()
 
     setTime0(0);
 
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     setTime1(seq->getLastTick());
 
     displayErase();
@@ -94,7 +94,7 @@ void EraseScreen::displayTrack()
     }
     else
     {
-        auto sequence = sequencer.lock()->getActiveSequence();
+        auto sequence = sequencer->getActiveSequence();
         trackName = sequence->getTrack(track)->getActualName();
     }
 
@@ -104,7 +104,7 @@ void EraseScreen::displayTrack()
 
 void EraseScreen::displayTime()
 {
-    auto sequence = sequencer.lock()->getActiveSequence().get();
+    auto sequence = sequencer->getActiveSequence().get();
     findField("time0")->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
     findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
@@ -140,7 +140,7 @@ void EraseScreen::displayNotes()
         return;
     }
 
-    auto bus = sequencer.lock()->getActiveTrack()->getBus();
+    auto bus = sequencer->getActiveTrack()->getBus();
 
     findField("note0")->Hide(false);
     findLabel("note0")->Hide(false);
@@ -197,12 +197,12 @@ void EraseScreen::doErase()
     const auto firstTrackIndex = track < 0 ? 0 : track;
     const auto lastTrackIndex = track < 0 ? 63 : track;
 
-    const auto midi = sequencer.lock()->getActiveTrack()->getBus() == 0;
+    const auto midi = sequencer->getActiveTrack()->getBus() == 0;
 
     const auto noteA = note0;
     const auto noteB = midi ? note1 : -1;
 
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     const auto selectedType = eventTypes[type];
 

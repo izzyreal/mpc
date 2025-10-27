@@ -27,8 +27,8 @@ void CopyTrackScreen::function(int i)
             break;
         case 4:
         {
-            auto seqIndex = sequencer.lock()->getActiveSequenceIndex();
-            sequencer.lock()->copyTrack(tr0, tr1, seqIndex, seqIndex);
+            auto seqIndex = sequencer->getActiveSequenceIndex();
+            sequencer->copyTrack(tr0, tr1, seqIndex, seqIndex);
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
         }
@@ -74,14 +74,14 @@ void CopyTrackScreen::setTr1(int i)
 
 void CopyTrackScreen::displayTr0()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     auto tr0Name = seq->getTrack(tr0)->getName();
     findField("tr0")->setText(StrUtil::padLeft(std::to_string(tr0 + 1), "0", 2) + "-" + tr0Name);
 }
 
 void CopyTrackScreen::displayTr1()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     auto tr1Name = seq->getTrack(tr1)->getName();
     findField("tr1")->setText(StrUtil::padLeft(std::to_string(tr1 + 1), "0", 2) + "-" + tr1Name);
 }

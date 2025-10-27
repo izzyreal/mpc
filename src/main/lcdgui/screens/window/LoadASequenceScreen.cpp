@@ -25,7 +25,7 @@ void LoadASequenceScreen::open()
 
     if (parsedMidFile.has_value())
     {
-        auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
+        auto usedSeqs = sequencer->getUsedSequenceIndexes();
         int index;
 
         for (index = 0; index < 98; index++)
@@ -61,11 +61,11 @@ void LoadASequenceScreen::function(int i)
     {
         case 3:
             mpc.getLayeredScreen()->closeCurrentScreen();
-            sequencer.lock()->clearPlaceHolder();
+            sequencer->clearPlaceHolder();
             break;
         case 4:
-            sequencer.lock()->movePlaceHolderTo(loadInto);
-            sequencer.lock()->setActiveSequenceIndex(loadInto);
+            sequencer->movePlaceHolderTo(loadInto);
+            sequencer->setActiveSequenceIndex(loadInto);
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
     }
@@ -85,11 +85,11 @@ void LoadASequenceScreen::setLoadInto(int i)
 void LoadASequenceScreen::displayLoadInto()
 {
     findField("load-into")->setTextPadded(loadInto + 1, "0");
-    findLabel("name")->setText("-" + sequencer.lock()->getSequence(loadInto)->getName());
+    findLabel("name")->setText("-" + sequencer->getSequence(loadInto)->getName());
 }
 
 void LoadASequenceScreen::displayFile()
 {
-    auto s = sequencer.lock()->getPlaceHolder();
+    auto s = sequencer->getPlaceHolder();
     findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
 }

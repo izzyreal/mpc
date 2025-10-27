@@ -13,8 +13,8 @@ TrackScreen::TrackScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void TrackScreen::open()
 {
-    auto activeTrackIndex = sequencer.lock()->getActiveTrackIndex();
-    auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);
+    auto activeTrackIndex = sequencer->getActiveTrackIndex();
+    auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
 
     auto track = mpc.getSequencer()->getActiveTrack();
     findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
@@ -47,11 +47,11 @@ void TrackScreen::openNameScreen()
 
     if (focusedFieldName.find("default") != std::string::npos)
     {
-        initialNameScreenName = sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex());
+        initialNameScreenName = sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex());
 
         enterAction = [this](std::string &nameScreenName)
         {
-            sequencer.lock()->setDefaultTrackName(nameScreenName, sequencer.lock()->getActiveTrackIndex());
+            sequencer->setDefaultTrackName(nameScreenName, sequencer->getActiveTrackIndex());
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
         };
     }

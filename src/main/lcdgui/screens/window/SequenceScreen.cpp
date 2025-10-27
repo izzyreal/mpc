@@ -17,12 +17,12 @@ void SequenceScreen::open()
     auto sequenceNameFirstLetterField = findField("sequencenamefirstletter");
     auto defaultSequenceNameFirstLetterField = findField("defaultnamefirstletter");
 
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
-    defaultSequenceNameFirstLetterField->setText(sequencer.lock()->getDefaultSequenceName().substr(0, 1));
+    defaultSequenceNameFirstLetterField->setText(sequencer->getDefaultSequenceName().substr(0, 1));
     sequenceNameRestLabel->setText(seq->getName().substr(1));
-    defaultSequenceNameRestLabel->setText(sequencer.lock()->getDefaultSequenceName().substr(1));
+    defaultSequenceNameRestLabel->setText(sequencer->getDefaultSequenceName().substr(1));
 }
 
 void SequenceScreen::function(int i)
@@ -50,21 +50,21 @@ void SequenceScreen::openNameScreen()
 
     if (focusedFieldName.find("default") != std::string::npos)
     {
-        initialNameScreenName = sequencer.lock()->getDefaultSequenceName();
+        initialNameScreenName = sequencer->getDefaultSequenceName();
 
         enterAction = [this](std::string &nameScreenName)
         {
-            sequencer.lock()->setDefaultSequenceName(nameScreenName);
+            sequencer->setDefaultSequenceName(nameScreenName);
             mpc.getLayeredScreen()->openScreen<SequenceScreen>();
         };
     }
     else
     {
-        initialNameScreenName = sequencer.lock()->getActiveSequence()->getName();
+        initialNameScreenName = sequencer->getActiveSequence()->getName();
 
         enterAction = [this](std::string &nameScreenName)
         {
-            sequencer.lock()->getActiveSequence()->setName(nameScreenName);
+            sequencer->getActiveSequence()->setName(nameScreenName);
             mpc.getLayeredScreen()->openScreen<SequenceScreen>();
         };
     }

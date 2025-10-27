@@ -147,7 +147,7 @@ void SaveScreen::function(int i)
                     break;
                 }
                 case 1:
-                    if (!sequencer.lock()->getActiveSequence()->isUsed())
+                    if (!sequencer->getActiveSequence()->isUsed())
                     {
                         return;
                     }
@@ -227,7 +227,7 @@ void SaveScreen::turnWheel(int i)
         switch (type)
         {
             case 1:
-                sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+                sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
                 break;
             case 3:
             {
@@ -315,8 +315,8 @@ void SaveScreen::displayFile()
         }
         case 1:
         {
-            auto num = StrUtil::padLeft(std::to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
-            const auto sequenceName = sequencer.lock()->getActiveSequence()->getName();
+            auto num = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
+            const auto sequenceName = sequencer->getActiveSequence()->getName();
             fileName = num + "-" + sequenceName;
             break;
         }
@@ -342,13 +342,13 @@ void SaveScreen::displayFile()
 
 void SaveScreen::displaySize()
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     auto size = 0;
 
     switch (type)
     {
         case 0:
-            size = sequencer.lock()->getUsedSequenceCount() * 25;
+            size = sequencer->getUsedSequenceCount() * 25;
             break;
         case 1:
             size = seq->isUsed() ? 10 + static_cast<int>(seq->getEventCount() * 0.001) : -1;

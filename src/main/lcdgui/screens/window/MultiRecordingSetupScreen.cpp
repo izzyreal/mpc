@@ -93,7 +93,7 @@ void MultiRecordingSetupScreen::right()
 void MultiRecordingSetupScreen::turnWheel(int i)
 {
 
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -189,7 +189,7 @@ void MultiRecordingSetupScreen::down()
 
 void MultiRecordingSetupScreen::displayMrsLine(int i)
 {
-    auto seq = sequencer.lock()->getActiveSequence();
+    auto seq = sequencer->getActiveSequence();
     auto trackIndex = visibleMrsLines[i]->getTrack();
 
     auto aField = findField("a" + std::to_string(i));

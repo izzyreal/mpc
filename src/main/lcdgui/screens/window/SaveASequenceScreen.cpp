@@ -20,7 +20,7 @@ void SaveASequenceScreen::open()
     if (ls->isPreviousScreen<SaveScreen>())
     {
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->setNameToEdit(sequencer.lock()->getActiveSequence()->getName());
+        nameScreen->setNameToEdit(sequencer->getActiveSequence()->getName());
     }
 
     displaySaveAs();
@@ -45,7 +45,7 @@ void SaveASequenceScreen::openNameScreen()
     if (focusedFieldName == "file")
     {
         const auto nameScreen = mpc.screens->get<NameScreen>();
-        nameScreen->initialize(sequencer.lock()->getActiveSequence()->getName(), 16, [this](std::string &)
+        nameScreen->initialize(sequencer->getActiveSequence()->getName(), 16, [this](std::string &)
                                {
                                    mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
                                },
@@ -78,7 +78,7 @@ void SaveASequenceScreen::function(int i)
                     {
                         disk->flush();
                         disk->initFiles();
-                        disk->writeMid(sequencer.lock()->getActiveSequence(), fileName);
+                        disk->writeMid(sequencer->getActiveSequence(), fileName);
                     }
                 };
 
@@ -101,7 +101,7 @@ void SaveASequenceScreen::function(int i)
                 return;
             }
 
-            auto seq = sequencer.lock()->getActiveSequence();
+            auto seq = sequencer->getActiveSequence();
 
             disk->writeMid(seq, fileName);
             break;

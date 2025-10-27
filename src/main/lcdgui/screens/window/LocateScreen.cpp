@@ -49,15 +49,15 @@ void LocateScreen::function(int i)
                 const auto clampedClock =
                     std::clamp<uint8_t>(std::get<2>(location), 0, getMaxClockForThisBar());
 
-                sequencer.lock()->setBar(clampedBarIndex);
-                sequencer.lock()->setBeat(clampedBeatIndex);
-                sequencer.lock()->setClock(clampedClock);
+                sequencer->setBar(clampedBarIndex);
+                sequencer->setBeat(clampedBeatIndex);
+                sequencer->setClock(clampedClock);
             }
             else
             {
-                sequencer.lock()->setBar(barIndex);
-                sequencer.lock()->setBeat(beatIndex);
-                sequencer.lock()->setClock(clock);
+                sequencer->setBar(barIndex);
+                sequencer->setBeat(beatIndex);
+                sequencer->setClock(clock);
             }
             mpc.getLayeredScreen()->openScreen<SequencerScreen>();
             break;
@@ -87,9 +87,9 @@ void LocateScreen::turnWheel(int i)
 
 void LocateScreen::open()
 {
-    barIndex = sequencer.lock()->getCurrentBarIndex();
-    beatIndex = sequencer.lock()->getCurrentBeatIndex();
-    clock = sequencer.lock()->getCurrentClockNumber();
+    barIndex = sequencer->getCurrentBarIndex();
+    beatIndex = sequencer->getCurrentBeatIndex();
+    clock = sequencer->getCurrentClockNumber();
 
     displayBar();
     displayBeat();
@@ -194,17 +194,17 @@ void LocateScreen::setClock(int8_t newClock)
 
 uint16_t LocateScreen::getMaxBarIndexForThisSequence()
 {
-    return std::clamp<uint16_t>(sequencer.lock()->getActiveSequence()->getLastBarIndex() + 1, 0, 998);
+    return std::clamp<uint16_t>(sequencer->getActiveSequence()->getLastBarIndex() + 1, 0, 998);
 }
 
 uint8_t LocateScreen::getMaxBeatIndexForThisBar()
 {
-    return sequencer.lock()->getActiveSequence()->getNumerator(barIndex) - 1;
+    return sequencer->getActiveSequence()->getNumerator(barIndex) - 1;
 }
 
 uint8_t LocateScreen::getMaxClockForThisBar()
 {
-    return 96 * (4.0 / sequencer.lock()->getActiveSequence()->getDenominator(barIndex)) - 1;
+    return 96 * (4.0 / sequencer->getActiveSequence()->getDenominator(barIndex)) - 1;
 }
 
 void LocateScreen::setLocations(const std::vector<Location> &newLocations)
