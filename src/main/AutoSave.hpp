@@ -2,7 +2,6 @@
 
 namespace mpc
 {
-
     class Mpc;
 
     class AutoSave
