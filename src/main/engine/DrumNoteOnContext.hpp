@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <vector>
-#include <map>
 
 namespace mpc::sampler
 {
@@ -15,8 +14,6 @@ namespace mpc::lcdgui::screens
 namespace mpc::engine
 {
     class Voice;
-    class StereoMixer;
-    class IndivFxMixer;
     class MixerInterconnection;
 } // namespace mpc::engine
 namespace mpc::engine::audio::mixer
@@ -39,8 +36,6 @@ namespace mpc::engine
             mixerSetupScreen;
         std::vector<std::shared_ptr<Voice>> *voices{};
         std::vector<MixerInterconnection *> *mixerConnections{};
-        std::map<int, int> *simultA{};
-        std::map<int, int> *simultB{};
         std::shared_ptr<sequencer::DrumBus> drum;
         int note{};
         int velocity{};
