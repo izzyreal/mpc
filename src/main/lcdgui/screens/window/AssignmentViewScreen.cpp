@@ -91,11 +91,11 @@ void AssignmentViewScreen::right()
 void AssignmentViewScreen::turnWheel(int i)
 {
     auto program = getProgramOrThrow();
-    auto lastPad = sampler->getLastPad(program.get());
-    lastPad->setNote(lastPad->getNote() + i);
+    auto selectedPad = program->getPad(mpc.clientEventController->getSelectedPad());
+    selectedPad->setNote(selectedPad->getNote() + i);
     displayNote();
     displaySoundName();
-    displayPad(lastPad->getIndex() % 16);
+    displayPad(selectedPad->getIndex() % 16);
 }
 
 void AssignmentViewScreen::update(Observable *o, Message message)

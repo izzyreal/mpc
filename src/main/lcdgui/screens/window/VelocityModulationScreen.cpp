@@ -26,25 +26,24 @@ void VelocityModulationScreen::close()
 
 void VelocityModulationScreen::turnWheel(int i)
 {
-
     auto program = getProgramOrThrow();
-    auto lastNp = sampler->getLastNp(program.get());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "veloattack")
     {
-        lastNp->setVelocityToAttack(lastNp->getVelocityToAttack() + i);
+        selectedNoteParameters->setVelocityToAttack(selectedNoteParameters->getVelocityToAttack() + i);
         displayVeloAttack();
     }
     else if (focusedFieldName == "velostart")
     {
-        lastNp->setVelocityToStart(lastNp->getVelocityToStart() + i);
+        selectedNoteParameters->setVelocityToStart(selectedNoteParameters->getVelocityToStart() + i);
         displayVeloStart();
     }
     else if (focusedFieldName == "velolevel")
     {
-        lastNp->setVeloToLevel(lastNp->getVeloToLevel() + i);
+        selectedNoteParameters->setVeloToLevel(selectedNoteParameters->getVeloToLevel() + i);
         displayVeloLevel();
     }
     else if (focusedFieldName == "note")
@@ -57,13 +56,13 @@ void VelocityModulationScreen::turnWheel(int i)
 void VelocityModulationScreen::displayNote()
 {
     auto program = getProgramOrThrow();
-    auto noteParameters = sampler->getLastNp(program.get());
-    auto soundIndex = noteParameters->getSoundIndex();
-    auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto soundIndex = selectedNoteParameters->getSoundIndex();
+    auto padIndex = program->getPadIndexFromNote(selectedNoteParameters->getNumber());
     auto padName = sampler->getPadName(padIndex);
     auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
     std::string stereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)" : "";
-    findField("note")->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    findField("note")->setText(std::to_string(selectedNoteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void VelocityModulationScreen::displayVelo()
@@ -74,19 +73,22 @@ void VelocityModulationScreen::displayVelo()
 void VelocityModulationScreen::displayVeloAttack()
 {
     auto program = getProgramOrThrow();
-    findField("veloattack")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToAttack(), " ");
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    findField("veloattack")->setTextPadded(selectedNoteParameters->getVelocityToAttack(), " ");
 }
 
 void VelocityModulationScreen::displayVeloStart()
 {
     auto program = getProgramOrThrow();
-    findField("velostart")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToStart(), " ");
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    findField("velostart")->setTextPadded(selectedNoteParameters->getVelocityToStart(), " ");
 }
 
 void VelocityModulationScreen::displayVeloLevel()
 {
     auto program = getProgramOrThrow();
-    findField("velolevel")->setTextPadded(sampler->getLastNp(program.get())->getVeloToLevel(), " ");
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    findField("velolevel")->setTextPadded(selectedNoteParameters->getVeloToLevel(), " ");
 }
 
 void VelocityModulationScreen::update(Observable *observable, Message message)

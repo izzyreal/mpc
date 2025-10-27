@@ -830,16 +830,6 @@ std::string Sampler::addOrIncreaseNumber2(std::string s)
     return res;
 }
 
-Pad *Sampler::getLastPad(Program *program)
-{
-    return program->getPad(mpc.clientEventController->getSelectedPad());
-}
-
-NoteParameters *Sampler::getLastNp(Program *program)
-{
-    return dynamic_cast<mpc::sampler::NoteParameters *>(program->getNoteParameters(mpc.clientEventController->getSelectedNote()));
-}
-
 std::vector<std::shared_ptr<Sound>> Sampler::getUsedSounds()
 {
     std::set<std::shared_ptr<Sound>> usedSounds;

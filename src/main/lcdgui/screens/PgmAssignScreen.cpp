@@ -15,8 +15,9 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc &mpc, const int layerIndex)
 void PgmAssignScreen::open()
 {
     auto program = getProgramOrThrow();
-    auto lastNoteParameters = sampler->getLastNp(program.get());
-    auto soundIndex = lastNoteParameters->getSoundIndex();
+    auto selectedPad =  program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto soundIndex = selectedNoteParameters->getSoundIndex();
 
     if (soundIndex != -1)
     {
@@ -76,10 +77,10 @@ void PgmAssignScreen::function(int i)
 
 void PgmAssignScreen::turnWheel(int i)
 {
-
     auto program = getProgramOrThrow();
-    auto lastPad = sampler->getLastPad(program.get());
-    auto lastNoteParameters = sampler->getLastNp(program.get());
+
+    auto selectedPad =  program->getPad(mpc.clientEventController->getSelectedPad());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -137,9 +138,9 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "pad-note")
     {
-        lastPad->setNote(lastPad->getNote() + i);
+        selectedPad->setNote(selectedPad->getNote() + i);
 
-        mpc.clientEventController->setSelectedNote(lastPad->getNote());
+        mpc.clientEventController->setSelectedNote(selectedPad->getNote());
 
         displayPad();
         displayNote();
@@ -165,7 +166,7 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "snd")
     {
-        auto currentSoundIndex = lastNoteParameters->getSoundIndex();
+        auto currentSoundIndex = selectedNoteParameters->getSoundIndex();
 
         if (currentSoundIndex == -1 && (i < 0 || sampler->getSoundCount() == 0))
         {
@@ -174,7 +175,7 @@ void PgmAssignScreen::turnWheel(int i)
 
         if (currentSoundIndex == 0 && i < 0)
         {
-            lastNoteParameters->setSoundIndex(-1);
+            selectedNoteParameters->setSoundIndex(-1);
             displaySoundName();
             return;
         }
@@ -212,7 +213,7 @@ void PgmAssignScreen::turnWheel(int i)
 
         auto nextMemoryIndex = sortedSounds[nextSortedIndex].second;
 
-        lastNoteParameters->setSoundIndex(nextMemoryIndex);
+        selectedNoteParameters->setSoundIndex(nextMemoryIndex);
 
         sampler->setSoundIndex(nextMemoryIndex);
 
@@ -220,36 +221,35 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "mode")
     {
-        lastNoteParameters->setSoundGenMode(lastNoteParameters->getSoundGenerationMode() + i);
+        selectedNoteParameters->setSoundGenMode(selectedNoteParameters->getSoundGenerationMode() + i);
         displaySoundGenerationMode();
     }
     else if (focusedFieldName == "velocity-range-lower")
     {
-        lastNoteParameters->setVeloRangeLower(lastNoteParameters->getVelocityRangeLower() + i);
+        selectedNoteParameters->setVeloRangeLower(selectedNoteParameters->getVelocityRangeLower() + i);
         displayVeloRangeLower();
         displayVeloRangeUpper();
     }
     else if (focusedFieldName == "velocity-range-upper")
     {
-        lastNoteParameters->setVeloRangeUpper(lastNoteParameters->getVelocityRangeUpper() + i);
+        selectedNoteParameters->setVeloRangeUpper(selectedNoteParameters->getVelocityRangeUpper() + i);
         displayVeloRangeLower();
         displayVeloRangeUpper();
     }
     else if (focusedFieldName == "optional-note-a")
     {
-        lastNoteParameters->setOptNoteA(lastNoteParameters->getOptionalNoteA() + i);
+        selectedNoteParameters->setOptNoteA(selectedNoteParameters->getOptionalNoteA() + i);
         displayOptionalNoteA();
     }
     else if (focusedFieldName == "optional-note-b")
     {
-        lastNoteParameters->setOptionalNoteB(lastNoteParameters->getOptionalNoteB() + i);
+        selectedNoteParameters->setOptionalNoteB(selectedNoteParameters->getOptionalNoteB() + i);
         displayOptionalNoteB();
     }
 }
 
 void PgmAssignScreen::openWindow()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "pgm")
@@ -271,7 +271,8 @@ void PgmAssignScreen::openWindow()
     else if (focusedFieldName == "snd")
     {
         auto program = getProgramOrThrow();
-        auto soundIndex = sampler->getLastNp(program.get())->getSoundIndex();
+        auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+        auto soundIndex = selectedNoteParameters->getSoundIndex();
 
         if (soundIndex != -1)
         {
@@ -291,22 +292,23 @@ void PgmAssignScreen::displayPgm()
 void PgmAssignScreen::displaySoundName()
 {
     auto program = getProgramOrThrow();
-    int sndNumber = sampler->getLastNp(program.get())->getSoundIndex();
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto soundIndex = selectedNoteParameters->getSoundIndex();
 
-    if (sndNumber == -1)
+    if (soundIndex == -1)
     {
         findField("snd")->setText("OFF");
         findLabel("issoundstereo")->setText("    ");
     }
     else
     {
-        auto name = sampler->getSoundName(sndNumber);
+        auto name = sampler->getSoundName(soundIndex);
         findField("snd")->setText(name);
     }
 
-    if (sampler->getSoundCount() != 0 && sndNumber != -1)
+    if (sampler->getSoundCount() != 0 && soundIndex != -1)
     {
-        if (sampler->getSound(sndNumber)->isMono())
+        if (sampler->getSound(soundIndex)->isMono())
         {
             findLabel("issoundstereo")->setText("    ");
         }
@@ -326,14 +328,15 @@ void PgmAssignScreen::displayPadNote()
 {
 
     auto program = getProgramOrThrow();
+    auto selectedPad =  program->getPad(mpc.clientEventController->getSelectedPad());
 
-    if (sampler->getLastPad(program.get())->getNote() == 34)
+    if (selectedPad->getNote() == 34)
     {
         findField("pad-note")->setText("--");
     }
     else
     {
-        findField("pad-note")->setText(std::to_string(sampler->getLastPad(program.get())->getNote()));
+        findField("pad-note")->setText(std::to_string(selectedPad->getNote()));
     }
 }
 
@@ -342,10 +345,11 @@ void PgmAssignScreen::displaySoundGenerationMode()
     auto sgm = -1;
 
     auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
 
-    if (sampler->getLastNp(program.get()) != nullptr)
+    if (selectedNoteParameters != nullptr)
     {
-        sgm = sampler->getLastNp(program.get())->getSoundGenerationMode();
+        sgm = selectedNoteParameters->getSoundGenerationMode();
         findField("mode")->setText(soundGenerationModes[sgm]);
 
         if (sgm != 0)
@@ -381,7 +385,7 @@ void PgmAssignScreen::displaySoundGenerationMode()
         }
     }
 
-    if (sampler->getLastNp(program.get()) == nullptr || sgm == -1 || sgm == 0)
+    if (selectedNoteParameters == nullptr || sgm == -1 || sgm == 0)
     {
         findLabel("velocity-range-lower")->Hide(true);
         findField("velocity-range-lower")->Hide(true);
@@ -397,21 +401,25 @@ void PgmAssignScreen::displaySoundGenerationMode()
 void PgmAssignScreen::displayVeloRangeUpper()
 {
     auto program = getProgramOrThrow();
-    auto rangeB = sampler->getLastNp(program.get())->getVelocityRangeUpper();
+
+    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto rangeB = selectedNoteParameters->getVelocityRangeUpper();
     findField("velocity-range-upper")->setTextPadded(rangeB, " ");
 }
 
 void PgmAssignScreen::displayVeloRangeLower()
 {
     auto program = getProgramOrThrow();
-    auto rangeA = sampler->getLastNp(program.get())->getVelocityRangeLower();
+    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto rangeA = selectedNoteParameters->getVelocityRangeLower();
     findField("velocity-range-lower")->setTextPadded(rangeA, " ");
 }
 
 void PgmAssignScreen::displayOptionalNoteA()
 {
     auto program = getProgramOrThrow();
-    auto noteIntA = sampler->getLastNp(program.get())->getOptionalNoteA();
+    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto noteIntA = selectedNoteParameters->getOptionalNoteA();
     auto padIntA = program->getPadIndexFromNote(noteIntA);
     auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
     auto padA = sampler->getPadName(padIntA);
@@ -421,7 +429,8 @@ void PgmAssignScreen::displayOptionalNoteA()
 void PgmAssignScreen::displayOptionalNoteB()
 {
     auto program = getProgramOrThrow();
-    auto noteIntB = sampler->getLastNp(program.get())->getOptionalNoteB();
+    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto noteIntB = selectedNoteParameters->getOptionalNoteB();
     auto padIntB = program->getPadIndexFromNote(noteIntB);
     auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
     auto padB = sampler->getPadName(padIntB);
@@ -431,7 +440,8 @@ void PgmAssignScreen::displayOptionalNoteB()
 void PgmAssignScreen::displayNote()
 {
     auto program = getProgramOrThrow();
-    findField("note")->setText(std::to_string(sampler->getLastNp(program.get())->getNumber()));
+    const auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    findField("note")->setText(std::to_string(selectedNoteParameters->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()

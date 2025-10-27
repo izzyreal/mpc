@@ -28,18 +28,18 @@ void VeloPitchScreen::close()
 void VeloPitchScreen::turnWheel(int i)
 {
     auto program = getProgramOrThrow();
-    auto lastNp = sampler->getLastNp(program.get());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "tune")
     {
-        lastNp->setTune(lastNp->getTune() + i);
+        selectedNoteParameters->setTune(selectedNoteParameters->getTune() + i);
         displayTune();
     }
     else if (focusedFieldName == "velo-pitch")
     {
-        lastNp->setVelocityToPitch(lastNp->getVelocityToPitch() + i);
+        selectedNoteParameters->setVelocityToPitch(selectedNoteParameters->getVelocityToPitch() + i);
         displayVeloPitch();
     }
     else if (focusedFieldName == "note")
@@ -52,7 +52,8 @@ void VeloPitchScreen::turnWheel(int i)
 void VeloPitchScreen::displayTune()
 {
     auto program = getProgramOrThrow();
-    auto value = sampler->getLastNp(program.get())->getTune();
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto value = selectedNoteParameters->getTune();
     std::string prefix = value < 0 ? "-" : " ";
     findField("tune")->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
@@ -60,7 +61,8 @@ void VeloPitchScreen::displayTune()
 void VeloPitchScreen::displayVeloPitch()
 {
     auto program = getProgramOrThrow();
-    auto value = sampler->getLastNp(program.get())->getVelocityToPitch();
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto value = selectedNoteParameters->getVelocityToPitch();
     std::string prefix = value < 0 ? "-" : " ";
     findField("velo-pitch")->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
@@ -85,11 +87,11 @@ void VeloPitchScreen::update(Observable *observable, Message message)
 void VeloPitchScreen::displayNote()
 {
     auto program = getProgramOrThrow();
-    auto noteParameters = sampler->getLastNp(program.get());
-    auto soundIndex = noteParameters->getSoundIndex();
-    auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto soundIndex = selectedNoteParameters->getSoundIndex();
+    auto padIndex = program->getPadIndexFromNote(selectedNoteParameters->getNumber());
     auto padName = sampler->getPadName(padIndex);
     auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
     std::string stereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)" : "";
-    findField("note")->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    findField("note")->setText(std::to_string(selectedNoteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }

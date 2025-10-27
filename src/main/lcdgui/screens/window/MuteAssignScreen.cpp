@@ -24,7 +24,7 @@ void MuteAssignScreen::close()
 void MuteAssignScreen::turnWheel(int i)
 {
     auto program = getProgramOrThrow();
-    auto lastNoteParameters = sampler->getLastNp(program.get());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -34,12 +34,12 @@ void MuteAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "note0")
     {
-        lastNoteParameters->setMuteAssignA(lastNoteParameters->getMuteAssignA() + i);
+        selectedNoteParameters->setMuteAssignA(selectedNoteParameters->getMuteAssignA() + i);
         displayNote0();
     }
     else if (focusedFieldName == "note1")
     {
-        lastNoteParameters->setMuteAssignB(lastNoteParameters->getMuteAssignB() + i);
+        selectedNoteParameters->setMuteAssignB(selectedNoteParameters->getMuteAssignB() + i);
         displayNote1();
     }
 }
@@ -47,26 +47,27 @@ void MuteAssignScreen::turnWheel(int i)
 void MuteAssignScreen::displayNote()
 {
     auto program = getProgramOrThrow();
-    auto note = sampler->getLastNp(program.get())->getNumber();
-    auto pad = program->getPadIndexFromNote(note);
+    auto selectedNote = mpc.clientEventController->getSelectedNote();
+    auto pad = program->getPadIndexFromNote(selectedNote);
     std::string soundName = "OFF";
 
     auto padName = sampler->getPadName(pad);
-    auto sound = program->getNoteParameters(note)->getSoundIndex();
+    auto sound = program->getNoteParameters(selectedNote)->getSoundIndex();
 
     if (sound != -1)
     {
         soundName = sampler->getSoundName(sound);
     }
 
-    findField("note")->setText(std::to_string(note) + "/" + padName + "-" + soundName);
+    findField("note")->setText(std::to_string(selectedNote) + "/" + padName + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote0()
 {
     auto program = getProgramOrThrow();
 
-    auto note0 = sampler->getLastNp(program.get())->getMuteAssignA();
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto note0 = selectedNoteParameters->getMuteAssignA();
 
     if (note0 == 34)
     {
@@ -89,7 +90,8 @@ void MuteAssignScreen::displayNote0()
 void MuteAssignScreen::displayNote1()
 {
     auto program = getProgramOrThrow();
-    auto note1 = sampler->getLastNp(program.get())->getMuteAssignB();
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    auto note1 = selectedNoteParameters->getMuteAssignB();
 
     if (note1 == 34)
     {

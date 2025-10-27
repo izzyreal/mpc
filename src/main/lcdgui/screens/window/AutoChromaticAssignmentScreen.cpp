@@ -23,7 +23,8 @@ void AutoChromaticAssignmentScreen::open()
     }
 
     auto program = getProgramOrThrow();
-    setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
+    auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+    setSourceSoundIndex(selectedNoteParameters->getSoundIndex());
     displayOriginalKey();
     displayTune();
     displayProgramName();
@@ -80,7 +81,6 @@ void AutoChromaticAssignmentScreen::function(int i)
 
 void AutoChromaticAssignmentScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "source")
@@ -88,7 +88,8 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
         auto program = getProgramOrThrow();
         mpc.clientEventController->setSelectedNote(mpc.clientEventController->getSelectedNote() + i);
         displaySource();
-        setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
+        auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+        setSourceSoundIndex(selectedNoteParameters->getSoundIndex());
     }
     else if (focusedFieldName == "snd")
     {
@@ -106,7 +107,6 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 
 void AutoChromaticAssignmentScreen::openNameScreen()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "program-name")
@@ -144,7 +144,7 @@ void AutoChromaticAssignmentScreen::setTune(int i)
 void AutoChromaticAssignmentScreen::displaySource()
 {
     auto program = getProgramOrThrow();
-    auto note = sampler->getLastNp(program.get())->getNumber();
+    auto note = mpc.clientEventController->getSelectedNote();
     auto padIndex = program->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
     findField("source")->setText(std::to_string(note) + "/" + padName);
@@ -182,6 +182,7 @@ void AutoChromaticAssignmentScreen::update(Observable *observable, Message messa
     {
         displaySource();
         auto program = getProgramOrThrow();
-        setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
+        auto selectedNoteParameters = program->getNoteParameters(mpc.clientEventController->getSelectedNote());
+        setSourceSoundIndex(selectedNoteParameters->getSoundIndex());
     }
 }

@@ -98,8 +98,6 @@ namespace mpc::sampler
         void playX();
         int getFreeSampleSpace();
         std::string addOrIncreaseNumber(std::string s);
-        Pad *getLastPad(Program *program);
-        NoteParameters *getLastNp(Program *program);
         int getUnusedSampleCount();
         void purge();
         void mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,

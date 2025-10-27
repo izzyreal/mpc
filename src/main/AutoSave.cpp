@@ -45,14 +45,14 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     const auto apsFile = path / "APS.APS";
     const auto allFile = path / "ALL.ALL";
     const auto soundIndexFile = path / "soundIndex.txt";
-    const auto lastPressedPadFile = path / "lastPressedPad.txt";
-    const auto lastPressedNoteFile = path / "lastPressedNote.txt";
+    const auto selectedPadFile = path / "selectedPad.txt";
+    const auto selectedNoteFile = path / "selectedNote.txt";
     const auto screenFile = path / "screen.txt";
     const auto focusFile = path / "focus.txt";
     const auto soundsFile = path / "sounds.txt";
     const auto currentDirFile = path / "currentDir.txt";
 
-    std::vector<fs::path> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, focusFile, soundsFile, currentDirFile};
+    std::vector<fs::path> files{apsFile, allFile, soundIndexFile, selectedPadFile, selectedNoteFile, screenFile, focusFile, soundsFile, currentDirFile};
 
     std::vector<fs::path> availableFiles;
 
@@ -163,11 +163,11 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
                        {
                            mpc.getSampler()->setSoundIndex(v);
                        });
-        setIntProperty("lastPressedNote.txt", [&mpc](int v)
+        setIntProperty("selectedNote.txt", [&mpc](int v)
                        {
                            mpc.clientEventController->setSelectedNote(v);
                        });
-        setIntProperty("lastPressedPad.txt", [&mpc](int v)
+        setIntProperty("selectedPad.txt", [&mpc](int v)
                        {
                            mpc.clientEventController->setSelectedPad(v);
                        });
@@ -257,8 +257,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
     const auto apsFile = path / "APS.APS";
     const auto allFile = path / "ALL.ALL";
     const auto soundIndexFile = path / "soundIndex.txt";
-    const auto lastPressedPadFile = path / "lastPressedPad.txt";
-    const auto lastPressedNoteFile = path / "lastPressedNote.txt";
+    const auto selectedPadFile = path / "selectedPad.txt";
+    const auto selectedNoteFile = path / "selectedNote.txt";
     const auto screenFile = path / "screen.txt";
     const auto focusFile = path / "focus.txt";
     const auto soundsFile = path / "sounds.txt";
@@ -272,8 +272,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 
         auto focus = mpc.getLayeredScreen()->getFocusedFieldName();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
-        auto lastPressedPad = mpc.clientEventController->getSelectedPad();
-        auto lastPressedNote = mpc.clientEventController->getSelectedNote();
+        auto selectedPad = mpc.clientEventController->getSelectedPad();
+        auto selectedNote = mpc.clientEventController->getSelectedNote();
         auto currentDir = mpc.getDisk()->getAbsolutePath();
 
         auto setFileData = [](const fs::path &p, const std::string &data)
@@ -292,8 +292,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         setFileData(focusFile, focus);
         setFileData(currentDirFile, currentDir);
         setFileData(soundIndexFile, {(char)soundIndex});
-        setFileData(lastPressedNoteFile, {(char)lastPressedNote});
-        setFileData(lastPressedPadFile, {(char)lastPressedPad});
+        setFileData(selectedNoteFile, {(char)selectedNote});
+        setFileData(selectedPadFile, {(char)selectedPad});
 
         {
             ApsParser apsParser(mpc, "stateinfo");

@@ -11,20 +11,16 @@ CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc &mpc, const int laye
 
 void CopyNoteParametersScreen::open()
 {
-
     auto program = getProgramOrThrow();
-    auto note = sampler->getLastNp(program.get())->getNumber();
-
     auto programIndex = activeDrum().getProgram();
     setProg0(programIndex);
-    setNote0(note);
+    setNote0(mpc.clientEventController->getSelectedNote());
     setProg1(programIndex);
-    setNote1(note - 35);
+    setNote1(mpc.clientEventController->getSelectedNote() - 35);
 }
 
 void CopyNoteParametersScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "prog0")
@@ -72,11 +68,11 @@ void CopyNoteParametersScreen::displayProg0()
 void CopyNoteParametersScreen::displayNote0()
 {
     auto sourceProgram = sampler->getProgram(prog0);
-    auto noteParameters = sampler->getLastNp(sourceProgram.get());
-    auto note0 = noteParameters->getNumber();
+    auto note0 = mpc.clientEventController->getSelectedNote();
+    auto selectedNoteParameters = sourceProgram->getNoteParameters(note0); 
     auto destProgram = sampler->getProgram(prog0);
     auto padIndex = destProgram->getPadIndexFromNote(note0);
-    auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
+    auto soundIndex = note0 != -1 ? selectedNoteParameters->getSoundIndex() : -1;
     auto noteText = note0 == -1 ? "--" : std::to_string(note0);
     auto padName = sampler->getPadName(padIndex);
     auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
