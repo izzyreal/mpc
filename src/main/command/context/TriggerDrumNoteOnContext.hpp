@@ -58,7 +58,6 @@ namespace mpc::command::context
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
         bool isRecordingOrOverdubbing;
-        uint64_t metronomeOnlyTickPosition;
         int noteValueLengthInTicks;
         int swing;
 
