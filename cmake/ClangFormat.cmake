@@ -14,12 +14,12 @@ if(CLANG_FORMAT)
         "${CMAKE_SOURCE_DIR}/include/*.hpp"
     )
 
-    add_custom_target(format
+    add_custom_target(format-mpc
         COMMAND ${CLANG_FORMAT} -i ${ALL_CXX_SOURCE_FILES}
         COMMENT "Formatting all source files with clang-format"
     )
 
-    add_custom_target(check-format
+    add_custom_target(check-format-mpc
         COMMAND ${CLANG_FORMAT} --dry-run --Werror ${ALL_CXX_SOURCE_FILES}
         COMMENT "Checking code style with clang-format"
     )
