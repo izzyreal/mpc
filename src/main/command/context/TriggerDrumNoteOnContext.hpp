@@ -57,8 +57,6 @@ namespace mpc::command::context
         bool isErasePressed;
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
-
-        bool isSequencerPlaying;
         bool isRecordingOrOverdubbing;
         int currentBarIndex;
         int64_t tickPosition;
