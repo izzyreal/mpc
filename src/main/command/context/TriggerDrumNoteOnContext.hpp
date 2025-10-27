@@ -63,15 +63,12 @@ namespace mpc::command::context
         std::shared_ptr<mpc::sampler::Program> program;
         int note;
 
-        int soundIndex;
-
         int drumScreenSelectedDrum;
         bool isSamplerScreen;
 
         std::shared_ptr<mpc::sequencer::Track> track;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
-        std::shared_ptr<mpc::audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
             timingCorrectScreen;

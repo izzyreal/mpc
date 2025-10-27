@@ -25,7 +25,7 @@ void TriggerDrumNoteOnCommand::execute()
 {
     if (ctx.isSoundScreen)
     {
-        ctx.basicPlayer.mpcNoteOn(ctx.soundIndex, 127, 0);
+        ctx.basicPlayer.mpcNoteOn(ctx.sampler->getSoundIndex(), 127, 0);
         return;
     }
 
