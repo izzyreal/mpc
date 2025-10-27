@@ -58,9 +58,6 @@ namespace mpc::command::context
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
         bool isRecordingOrOverdubbing;
-        int noteValueLengthInTicks;
-        int swing;
-
         int trackBus;
 
         std::shared_ptr<mpc::sampler::Program> program;
