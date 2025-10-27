@@ -17,10 +17,11 @@ PushFullLevelCommand::PushFullLevelCommand(
         std::shared_ptr<LayeredScreen> layeredScreenToUse,
         std::shared_ptr<PadAndButtonKeyboard> padAndButtonKeyboardToUse,
         std::shared_ptr<Hardware> hardwareToUse,
-        std::shared_ptr<ClientEventController> controller)
+        std::shared_ptr<ClientEventController> controllerToUse)
     : layeredScreen(layeredScreenToUse),
     padAndButtonKeyboard(padAndButtonKeyboardToUse),
-    hardware(hardwareToUse)
+    hardware(hardwareToUse),
+    controller(controllerToUse)
 {
 }
 
