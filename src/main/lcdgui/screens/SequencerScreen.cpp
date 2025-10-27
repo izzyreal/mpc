@@ -423,11 +423,11 @@ void SequencerScreen::displayDeviceName()
 {
     auto track = mpc.getSequencer()->getActiveTrack();
 
-    if (track->getBus() != 0)
+    if (auto drumBus = sequencer->getBus<DrumBus>(track->getBus()); drumBus)
     {
         if (track->getDeviceIndex() == 0)
         {
-            int pgm = sampler->getDrumBusProgramIndex(track->getBus());
+            int pgm = drumBus->getProgram();
             auto p = sampler->getProgram(pgm);
             findLabel("devicename")->setText(p->getName());
         }
@@ -438,7 +438,7 @@ void SequencerScreen::displayDeviceName()
                     track->getDeviceIndex()));
         }
     }
-    else if (track->getBus() == 0)
+    else
     {
         if (track->getDeviceIndex() == 0)
         {

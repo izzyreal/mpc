@@ -89,7 +89,7 @@ void CreateNewProgramScreen::function(int i)
                 }
             }
 
-            activeDrum().setProgram(index);
+            getActiveDrumBus()->setProgram(index);
             mpc.getLayeredScreen()->openScreen<ProgramScreen>();
             break;
     }

@@ -43,7 +43,7 @@ std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 
     if (mixerSetupScreen->isIndivFxSourceDrum())
     {
-        return activeDrum().getIndivFxMixerChannels()[note - 35];
+        return getActiveDrumBus()->getIndivFxMixerChannels()[note - 35];
     }
     else
     {
@@ -59,7 +59,7 @@ std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 
     if (mixerSetupScreen->isStereoMixSourceDrum())
     {
-        return activeDrum().getStereoMixerChannels()[note - 35];
+        return getActiveDrumBus()->getStereoMixerChannels()[note - 35];
     }
     else
     {

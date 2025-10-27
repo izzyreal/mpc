@@ -13,7 +13,7 @@ CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc &mpc,
 void CopyNoteParametersScreen::open()
 {
     auto program = getProgramOrThrow();
-    auto programIndex = activeDrum().getProgram();
+    auto programIndex = getActiveDrumBus()->getProgram();
     setProg0(programIndex);
     setNote0(mpc.clientEventController->getSelectedNote());
     setProg1(programIndex);

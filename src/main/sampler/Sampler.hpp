@@ -7,21 +7,14 @@
 #include <memory>
 #include <string>
 
-namespace mpc::engine
-{
-    class Drum;
-}
-
 namespace mpc::sampler
 {
-
     const int16_t PLAYX_SOUND = -4;
     const int16_t PREVIEW_SOUND = -3;
     const int16_t CLICK_SOUND = -2;
 
     // Not sure if we actually need this.
-    // We should investigate if PreviewSoundPlayer::mpcNoteOn or Drum::mpcNoteOn
-    // ever receive calls with `soundIndex` == -1.
+    // We should investigate if this is ever used
     const int16_t NO_SOUND = -1;
 
     class Sound;
@@ -106,22 +99,11 @@ namespace mpc::sampler
         mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
                       std::shared_ptr<const std::vector<float>> sourceRight,
                       std::shared_ptr<std::vector<float>> dest);
-        void setDrumBusProgramIndex(int busNumber, int programIndex);
-
-        // busNumber between 1 and 4, i.e. 1-based DRUM index
-        int getDrumBusProgramIndex(int busNumber);
-
-        // busNumber between 1 and 4, i.e. 1-based DRUM index
-        std::shared_ptr<Program> getDrumBusProgram(const int busNumber);
 
         int getUsedProgram(int startIndex, bool up);
         int checkExists(std::string soundName);
         void selectPreviousSound();
         void selectNextSound();
-        std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &
-        getDrumStereoMixerChannels(int i);
-        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &
-        getDrumIndivFxMixerChannels(int i);
         std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
         void copyProgram(const int sourceIndex, const int destIndex);
         std::vector<int> *getInitMasterPadAssign();

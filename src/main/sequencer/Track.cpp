@@ -600,17 +600,17 @@ void Track::playNext()
     {
         note->setTrack(trackIndex);
 
-        if (sequencer->isOverdubbing() &&
+        if (auto drumBus = sequencer->getBus<DrumBus>(busNumber);
+                sequencer->isOverdubbing() &&
             mpc.getHardware()
                 ->getButton(hardware::ComponentId::ERASE)
                 ->isPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
-            busNumber > 0)
+            drumBus)
         {
             const auto sampler = mpc.getSampler();
 
-            const std::shared_ptr<mpc::sampler::Program> program =
-                sampler->getProgram(sampler->getDrumBusProgramIndex(busNumber));
+            auto program = sampler->getProgram(drumBus->getProgram());
 
             const auto noteNumber = note->getNote();
 

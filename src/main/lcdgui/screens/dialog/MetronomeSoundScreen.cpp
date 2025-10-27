@@ -2,13 +2,16 @@
 #include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
-#include <Mpc.hpp>
+#include "sequencer/Bus.hpp"
+
+#include "Mpc.hpp"
 
 #include "lcdgui/Background.hpp"
 #include "sampler/Program.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
+using namespace mpc::sequencer;
 
 MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "metronome-sound", layerIndex)
@@ -73,20 +76,18 @@ void MetronomeSoundScreen::displayOutput()
 
 void MetronomeSoundScreen::displayAccent()
 {
-    auto program = sampler->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())
-                    ->getPad(accentPad)
-                    ->getNote();
+    auto drumBus = sequencer->getBus<DrumBus>(sound);
+    auto program = drumBus->getProgram();
+    auto note = sampler->getProgram(program)->getPad(accentPad)->getNote();
     findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) +
                                  "/" + sampler->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
-    auto program = sampler->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program *>(sampler->getProgram(program).get())
-                    ->getPad(normalPad)
-                    ->getNote();
+    auto drumBus = sequencer->getBus<DrumBus>(sound);
+    auto program = drumBus->getProgram();
+    auto note = sampler->getProgram(program)->getPad(normalPad)->getNote();
     findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) +
                                  "/" + sampler->getPadName(normalPad));
 }

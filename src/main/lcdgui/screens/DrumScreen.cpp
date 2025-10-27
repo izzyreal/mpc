@@ -56,23 +56,23 @@ void DrumScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        activeDrum().setProgram(activeDrum().getProgram() + i);
+        getActiveDrumBus()->setProgram(getActiveDrumBus()->getProgram() + i);
         displayPgm();
     }
     else if (focusedFieldName == "program-change")
     {
-        activeDrum().setReceivePgmChange(i > 0);
+        getActiveDrumBus()->setReceivePgmChange(i > 0);
         displayPgmChange();
     }
     else if (focusedFieldName == "midi-volume")
     {
-        activeDrum().setReceiveMidiVolume(i > 0);
+        getActiveDrumBus()->setReceiveMidiVolume(i > 0);
         displayMidiVolume();
     }
     else if (focusedFieldName == "current-val")
     {
-        activeDrum().setLastReceivedMidiVolume(
-            activeDrum().getLastReceivedMidiVolume() + i);
+        getActiveDrumBus()->setLastReceivedMidiVolume(
+            getActiveDrumBus()->getLastReceivedMidiVolume() + i);
         displayCurrentVal();
     }
     else if (focusedFieldName == "padtointernalsound")
@@ -84,7 +84,7 @@ void DrumScreen::turnWheel(int i)
 void DrumScreen::displayCurrentVal()
 {
     findField("current-val")
-        ->setTextPadded(activeDrum().getLastReceivedMidiVolume());
+        ->setTextPadded(getActiveDrumBus()->getLastReceivedMidiVolume());
 }
 
 void DrumScreen::displayDrum()
@@ -99,7 +99,7 @@ void DrumScreen::displayPadToInternalSound()
 
 void DrumScreen::displayPgm()
 {
-    auto pn = activeDrum().getProgram();
+    auto pn = getActiveDrumBus()->getProgram();
     findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) +
                               "-" + sampler->getProgram(pn)->getName());
 }
@@ -107,13 +107,13 @@ void DrumScreen::displayPgm()
 void DrumScreen::displayPgmChange()
 {
     findField("program-change")
-        ->setText(activeDrum().receivesPgmChange() ? "RECEIVE" : "IGNORE");
+        ->setText(getActiveDrumBus()->receivesPgmChange() ? "RECEIVE" : "IGNORE");
 }
 
 void DrumScreen::displayMidiVolume()
 {
     findField("midi-volume")
-        ->setText(activeDrum().receivesMidiVolume() ? "RECEIVE" : "IGNORE");
+        ->setText(getActiveDrumBus()->receivesMidiVolume() ? "RECEIVE" : "IGNORE");
 }
 
 bool DrumScreen::isPadToIntSound()

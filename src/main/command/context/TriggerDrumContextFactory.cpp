@@ -76,7 +76,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
     std::shared_ptr<sampler::Program> program =
         drumIndex >= 0
-            ? mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram())
+            ? mpc.getSampler()->getProgram(mpc.getSequencer()->getDrumBus(drumIndex)->getProgram())
             : nullptr;
 
     std::function<void(int)> setSelectedNote =

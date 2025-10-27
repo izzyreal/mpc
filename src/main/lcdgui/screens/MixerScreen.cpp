@@ -82,7 +82,7 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
 
     return stereoMixSourceIsDrum
-               ? activeDrum().getStereoMixerChannels()[note - 35]
+               ? getActiveDrumBus()->getStereoMixerChannels()[note - 35]
                : noteParameters->getStereoMixerChannel();
 }
 
@@ -106,7 +106,7 @@ std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
     return indivFxSourceIsDrum
-               ? activeDrum().getIndivFxMixerChannels()[note - 35]
+               ? getActiveDrumBus()->getIndivFxMixerChannels()[note - 35]
                : noteParameters->getIndivFxMixerChannel();
 }
 

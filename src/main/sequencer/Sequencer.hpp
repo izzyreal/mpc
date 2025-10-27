@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <cmath>
 #include <cstdint>
 
 namespace mpc::engine::midi
@@ -23,6 +22,8 @@ namespace mpc
 
 namespace mpc::sequencer
 {
+    class Bus;
+    class DrumBus;
     class Song;
 }
 
@@ -63,8 +64,13 @@ namespace mpc::sequencer
             return noteEventStore;
         }
 
+        template <typename T>
+        std::shared_ptr<T> getBus(const int busIndex);
+        std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex);
+
     private:
         mpc::Mpc &mpc;
+        std::vector<std::shared_ptr<Bus>> buses;
         const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
         NoteEventStore<int> noteEventStore;
         bool playing = false;

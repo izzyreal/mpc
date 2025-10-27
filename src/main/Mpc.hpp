@@ -16,7 +16,6 @@
 
 namespace mpc::engine
 {
-    class Drum;
     class PreviewSoundPlayer;
 } // namespace mpc::engine
 
@@ -122,7 +121,6 @@ namespace mpc
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        mpc::engine::Drum &getDrum(int i);
         mpc::engine::PreviewSoundPlayer &getBasicPlayer();
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();

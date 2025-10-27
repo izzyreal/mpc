@@ -16,7 +16,7 @@
 #include <string>
 #include <map>
 
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -45,7 +45,7 @@ namespace mpc::lcdgui
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 
-        mpc::engine::Drum &activeDrum();
+        std::shared_ptr<mpc::sequencer::DrumBus> getActiveDrumBus();
         std::shared_ptr<Field> getFocusedField();
         std::shared_ptr<Field> getFocusedFieldOrThrow();
         std::optional<std::string> getFocusedFieldName();

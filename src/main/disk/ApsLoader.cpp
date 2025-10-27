@@ -233,17 +233,17 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
         slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
         auto m = apsParser.getDrumMixers()[i];
-        auto &drum = mpc.getDrum(i);
+        auto drum = mpc.getSequencer()->getDrumBus(i);
 
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
             auto apssmc = m->getStereoMixerChannel(noteIndex);
             auto apsifmc = m->getIndivFxMixerChannel(noteIndex);
-            auto drumsmc = drum.getStereoMixerChannels()[noteIndex];
-            auto drumifmc = drum.getIndivFxMixerChannels()[noteIndex];
+            auto drumsmc = drum->getStereoMixerChannels()[noteIndex];
+            auto drumifmc = drum->getIndivFxMixerChannels()[noteIndex];
 
             drumifmc->setFxPath(apsifmc.getFxPath());
             drumsmc->setLevel(apssmc.getLevel());
@@ -254,10 +254,10 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
         }
 
         auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
-        drum.setProgram(pgm);
-        drum.setReceivePgmChange(
+        drum->setProgram(pgm);
+        drum->setReceivePgmChange(
             apsParser.getDrumConfiguration(i)->getReceivePgmChange());
-        drum.setReceiveMidiVolume(
+        drum->setReceiveMidiVolume(
             apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
     }
 

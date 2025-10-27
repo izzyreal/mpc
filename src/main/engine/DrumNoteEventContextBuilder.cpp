@@ -2,16 +2,17 @@
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
 #include "engine/audio/mixer/AudioMixer.hpp"
 
 using namespace mpc;
 using namespace mpc::engine;
+using namespace mpc::sequencer;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
-    uint64_t noteEventId, Drum *drum, std::shared_ptr<Sampler> sampler,
+    uint64_t noteEventId, std::shared_ptr<DrumBus> drum, std::shared_ptr<Sampler> sampler,
     std::shared_ptr<AudioMixer> mixer,
     std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
     std::vector<std::shared_ptr<Voice>> *voices,
@@ -38,7 +39,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
 }
 
 DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
-    uint64_t noteEventId, Drum *drum,
+    uint64_t noteEventId, std::shared_ptr<DrumBus> drum,
     std::vector<std::shared_ptr<Voice>> *voices, int note, int noteOnStartTick)
 {
     DrumNoteOffContext ctx;

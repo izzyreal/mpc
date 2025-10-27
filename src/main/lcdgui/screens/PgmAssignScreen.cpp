@@ -100,12 +100,12 @@ void PgmAssignScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        auto pgm = activeDrum().getProgram();
+        auto pgm = getActiveDrumBus()->getProgram();
         auto candidate = sampler->getUsedProgram(pgm, i > 0);
 
         if (candidate != pgm)
         {
-            activeDrum().setProgram(candidate);
+            getActiveDrumBus()->setProgram(candidate);
             displayNote();
             displayOptionalNoteA();
             displayOptionalNoteB();
@@ -297,7 +297,7 @@ void PgmAssignScreen::displayPgm()
 {
     auto program = getProgramOrThrow();
     findField("pgm")->setText(
-        StrUtil::padLeft(std::to_string(activeDrum().getProgram() + 1), " ",
+        StrUtil::padLeft(std::to_string(getActiveDrumBus()->getProgram() + 1), " ",
                          2) +
         "-" + program->getName());
 }

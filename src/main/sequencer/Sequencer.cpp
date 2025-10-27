@@ -19,6 +19,7 @@
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
+#include "sequencer/Bus.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
@@ -29,6 +30,7 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include <StrUtil.hpp>
+#include <memory>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -60,6 +62,16 @@ Sequencer::Sequencer(mpc::Mpc &mpc) : mpc(mpc)
 
 void Sequencer::init()
 {
+    for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT; ++midiBusIndex)
+    {
+        buses.emplace_back(std::make_shared<MidiBus>());
+    }
+
+    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT; ++drumBusIndex)
+    {
+        buses.emplace_back(std::make_shared<DrumBus>(drumBusIndex));
+    }
+    
     lastTap = currentTimeMillis();
     nextSq = -1;
 
@@ -2187,3 +2199,27 @@ void Sequencer::setPunchOutTime(int time)
 {
     punchOutTime = time;
 }
+
+template <typename T>
+std::shared_ptr<T> Sequencer::getBus(const int busIndex)
+{
+    if (busIndex < 0 || busIndex >= buses.size())
+    {
+        return {};
+    }
+
+    auto result = std::dynamic_pointer_cast<T>(buses[busIndex]);
+    return result;
+}
+
+std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex)
+{
+    assert(drumBusIndex >= 0 || drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT);
+    auto result = std::dynamic_pointer_cast<DrumBus>(buses[drumBusIndex + 1]);
+    assert(result);
+    return result;
+}
+
+template std::shared_ptr<MidiBus> Sequencer::getBus(const int busIndex);
+template std::shared_ptr<DrumBus> Sequencer::getBus(const int busIndex);
+

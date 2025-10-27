@@ -4,12 +4,14 @@
 #include "sampler/TimeStretch1.hpp"
 
 #include "sequencer/Track.hpp"
+#include "sequencer/Bus.hpp"
 
 #include "lcdgui/screens/ZoneScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
+using namespace mpc::sequencer;
 
 EditSoundScreen::EditSoundScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)
@@ -895,10 +897,9 @@ void EditSoundScreen::function(int j)
                         sequencer->getActiveSequenceIndex());
                     auto t = sequencer->getActiveTrack();
 
-                    if (t->getBus() != 0)
+                    if (auto drumBus = sequencer->getBus<DrumBus>(t->getBus()); drumBus)
                     {
-                        mpc.getDrum(t->getBus() - 1)
-                            .setProgram(sampler->getProgramCount() - 1);
+                        drumBus->setProgram(sampler->getProgramCount() - 1);
                     }
                 }
             }

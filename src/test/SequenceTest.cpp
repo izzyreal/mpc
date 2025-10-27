@@ -5,7 +5,7 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;

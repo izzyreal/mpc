@@ -8,7 +8,7 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 using namespace mpc::sequencer;

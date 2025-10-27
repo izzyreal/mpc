@@ -22,7 +22,6 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Clock.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
-#include "engine/Drum.hpp"
 
 #include "hardware/Hardware.hpp"
 
@@ -181,11 +180,6 @@ std::shared_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()
 std::shared_ptr<sampler::Sampler> Mpc::getSampler()
 {
     return sampler;
-}
-
-mpc::engine::Drum &Mpc::getDrum(int i)
-{
-    return audioMidiServices->getDrum(i);
 }
 
 mpc::engine::PreviewSoundPlayer &Mpc::getBasicPlayer()

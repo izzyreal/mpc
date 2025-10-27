@@ -499,8 +499,10 @@ void EventsScreen::displayDrumNotes()
     else
     {
         auto track = sequencer->getActiveTrack();
+        auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+        assert(drumBus);
         auto program =
-            sampler->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
+            sampler->getProgram(drumBus->getProgram());
 
         auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
         auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
@@ -510,58 +512,31 @@ void EventsScreen::displayDrumNotes()
 
 void EventsScreen::setEdit(int i)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-
-    editFunctionNumber = i;
+    editFunctionNumber = std::clamp(i, 0, 3);
     displayEdit();
 }
 
 void EventsScreen::setFromSq(int i)
 {
-    if (i < 0 || i > 98)
-    {
-        return;
-    }
-
-    sequencer->setActiveSequenceIndex(i);
-
+    sequencer->setActiveSequenceIndex(std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)));
     displayFromSq();
 }
 
 void EventsScreen::setFromTr(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    sequencer->setActiveTrackIndex(i);
-
+    sequencer->setActiveTrackIndex(std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX)));
     displayFromTr();
 }
 
 void EventsScreen::setToSq(int i)
 {
-    if (i < 0 || i > 98)
-    {
-        return;
-    }
-
-    toSq = i;
+    toSq = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     displayToSq();
 }
 
 void EventsScreen::setToTr(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    toTr = i;
+    toTr = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX));
     displayToTr();
 }
 
@@ -573,23 +548,13 @@ void EventsScreen::setModeMerge(bool b)
 
 void EventsScreen::setCopies(int i)
 {
-    if (i < 1 || i > 999)
-    {
-        return;
-    }
-
-    copies = i;
+    copies = std::clamp(i, 1, 999);
     displayCopies();
 }
 
 void EventsScreen::setDurationMode(int i)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-
-    durationMode = i;
+    durationMode = std::clamp(i, 0, 3);
 
     if (durationMode == 2 && durationValue > 200)
     {
@@ -601,12 +566,7 @@ void EventsScreen::setDurationMode(int i)
 
 void EventsScreen::setVelocityMode(int i)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-
-    velocityMode = i;
+    velocityMode = std::clamp(i, 0, 3);
 
     if (velocityMode != 2 && velocityValue > 127)
     {
@@ -618,12 +578,7 @@ void EventsScreen::setVelocityMode(int i)
 
 void EventsScreen::setTransposeAmount(int i)
 {
-    if (i < -12 || i > 12)
-    {
-        return;
-    }
-
-    transposeAmount = i;
+    transposeAmount = std::clamp(i, -12, 12);
     // Field otherwise used for displaying mode is
     // replaced by an "Amount:" field.
     displayMode();
@@ -631,33 +586,13 @@ void EventsScreen::setTransposeAmount(int i)
 
 void EventsScreen::setDuration(int i)
 {
-    if (i < 1 || i > 9999)
-    {
-        return;
-    }
-
-    if (durationMode == 2 && i > 200)
-    {
-        return;
-    }
-
-    durationValue = i;
+    durationValue = std::clamp(i, 1, durationMode == 2 ? 200 : Mpc2000XlSpecs::MAX_NOTE_EVENT_DURATION);
     displayCopies();
 }
 
 void EventsScreen::setVelocityValue(int i)
 {
-    if (i < 1 || i > 200)
-    {
-        return;
-    }
-
-    if (velocityMode != 2 && i > 127)
-    {
-        return;
-    }
-
-    velocityValue = i;
+    velocityValue = std::clamp(i, 1, velocityMode == 2 ? 200 : 127);
 
     // Field otherwise used for displaying "Copies:" is
     // replaced by a "Value:" field.

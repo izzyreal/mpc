@@ -9,7 +9,7 @@ CopyProgramScreen::CopyProgramScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void CopyProgramScreen::open()
 {
-    pgm0 = activeDrum().getProgram();
+    pgm0 = getActiveDrumBus()->getProgram();
     pgm1 = pgm0;
 
     displayPgm0();
@@ -33,7 +33,7 @@ void CopyProgramScreen::function(int i)
             }
 
             sampler->copyProgram(pgm0, pgm1);
-            activeDrum().setProgram(pgm1);
+            getActiveDrumBus()->setProgram(pgm1);
             mpc.getLayeredScreen()->openScreen<ProgramScreen>();
             break;
     }

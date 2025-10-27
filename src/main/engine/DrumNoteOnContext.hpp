@@ -23,9 +23,9 @@ namespace mpc::engine::audio::mixer
 {
     class AudioMixer;
 }
-namespace mpc::engine
+namespace mpc::sequencer
 {
-    class Drum;
+    class DrumBus;
 }
 
 namespace mpc::engine
@@ -41,7 +41,7 @@ namespace mpc::engine
         std::vector<MixerInterconnection *> *mixerConnections{};
         std::map<int, int> *simultA{};
         std::map<int, int> *simultB{};
-        Drum *drum;
+        std::shared_ptr<sequencer::DrumBus> drum;
         int note{};
         int velocity{};
         int varType{};

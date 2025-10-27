@@ -33,13 +33,13 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
     auto sequencer = mpc.getSequencer();
     auto track = sequencer->getActiveTrack();
+    auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
 
     std::shared_ptr<mpc::sampler::Program> program;
 
-    if (track->getBus() > 0)
+    if (drumBus)
     {
-        program = mpc.getSampler()->getProgram(
-            mpc.getDrum(track->getBus() - 1).getProgram());
+        program = mpc.getSampler()->getProgram(drumBus->getProgram());
     }
 
     const auto fullLevel = mpc.clientEventController->isFullLevelEnabled();
@@ -138,7 +138,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                     ? -1
                     : SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
 
-            if (track->getBus() > 0 && note != 34)
+            if (drumBus && note != 34)
             {
                 const auto noteParameters = program->getNoteParameters(note);
                 const auto sound =
@@ -147,10 +147,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                                         ? VoiceOverlapMode::NOTE_OFF
                                         : noteParameters->getVoiceOverlapMode();
 
-                auto &drum = mpc.getDrum(track->getBus() - 1);
-
                 auto ctx = DrumNoteEventContextBuilder::buildNoteOn(
-                    0, &drum, mpc.getSampler(),
+                    0, drumBus, mpc.getSampler(),
                     mpc.getAudioMidiServices()->getMixer(),
                     mpc.screens->get<MixerSetupScreen>(),
                     &mpc.getAudioMidiServices()->getVoices(),
@@ -189,15 +187,13 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                 ->getFrameSequencer()
                 ->enqueueEventAfterNFrames(
                     [&mpc, track, note, noteEvent, tickPosition, program,
-                     programPadIndex]
+                     programPadIndex, drumBus]
                     {
-                        if (track->getBus() > 0)
+                        if (drumBus)
                         {
-                            auto &drum = mpc.getDrum(track->getBus() - 1);
-
                             auto ctx =
                                 DrumNoteEventContextBuilder::buildNoteOff(
-                                    0, &drum,
+                                    0, drumBus,
                                     &mpc.getAudioMidiServices()->getVoices(),
                                     note, tickPosition);
 
@@ -212,7 +208,6 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                             const auto noteOffMsg =
                                 noteEvent->getNoteOff()->createShortMessage(
                                     (track->getDeviceIndex() - 1) % 16);
-                            // noteOffMsg->bufferPos = bufferOffset;
                             mpc.getMidiOutput()->enqueueMessageOutputA(
                                 noteOffMsg);
                         }
@@ -221,3 +216,4 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         }
     }
 }
+

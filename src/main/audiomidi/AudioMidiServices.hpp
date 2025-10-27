@@ -5,10 +5,8 @@
 
 #include <engine/audio/mixer/AudioMixer.hpp>
 #include "engine/MixerInterconnection.hpp"
-#include "engine/Drum.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 
-#include <set>
 #include <memory>
 #include <atomic>
 
@@ -86,7 +84,6 @@ namespace mpc::audiomidi
         bool wasBouncing = false;
         std::vector<std::shared_ptr<mpc::engine::control::CompoundControl>>
             soundPlayerChannelControls;
-        std::vector<mpc::engine::Drum> soundPlayerChannels;
         std::unique_ptr<mpc::engine::PreviewSoundPlayer>
             basicSoundPlayerChannel;
         std::vector<std::shared_ptr<mpc::engine::Voice>> voices;
@@ -126,7 +123,6 @@ namespace mpc::audiomidi
         void setRecordLevel(int i);
         int getRecordLevel();
         void muteMonitor(bool mute);
-        mpc::engine::Drum &getDrum(int i);
         mpc::engine::PreviewSoundPlayer &getBasicPlayer();
         void initializeDiskRecorders();
         void closeIO();

@@ -1,6 +1,8 @@
 #include "Assign16LevelsScreen.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
+
+#include "sequencer/Bus.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -8,6 +10,7 @@
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sequencer;
 
 Assign16LevelsScreen::Assign16LevelsScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "assign-16-levels", layerIndex)
@@ -137,8 +140,9 @@ int Assign16LevelsScreen::getParameter()
 void Assign16LevelsScreen::displayNote()
 {
     auto track = mpc.getSequencer()->getActiveTrack();
-    auto pgmNumber = sampler->getDrumBusProgramIndex(track->getBus());
-    auto program = sampler->getProgram(pgmNumber);
+    auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+    assert(drumBus);
+    auto program = sampler->getProgram(drumBus->getProgram());
     auto padIndex = program->getPadIndexFromNote(note);
 
     auto padName = sampler->getPadName(padIndex);

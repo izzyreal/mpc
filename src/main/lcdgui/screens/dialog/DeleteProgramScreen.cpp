@@ -12,7 +12,7 @@ void DeleteProgramScreen::open()
 {
     auto allPrograms = sampler->getPrograms();
 
-    pgm = activeDrum().getProgram();
+    pgm = getActiveDrumBus()->getProgram();
 
     displayPgm();
 }

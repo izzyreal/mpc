@@ -2,12 +2,12 @@
 
 #include "Mpc.hpp"
 
+#include "audiomidi/MidiOutput.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
 
-#include "audiomidi/MidiOutput.hpp"
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
 #include "engine/DrumNoteEventHandler.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
@@ -73,14 +73,16 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
         const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
 
         const uint64_t noteEventIdToUse = noteEventId++;
-        const int drumIndex = track->getBus() - 1;
-        auto &drum = mpc.getDrum(drumIndex);
+        auto drumBus = mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+
+        assert(drumBus);
+
         auto sampler = mpc.getSampler();
-        const auto program = sampler->getProgram(drum.getProgram());
+        const auto program = sampler->getProgram(drumBus->getProgram());
         const auto note = noteOnEvent->getNote();
         const int programPadIndex = program->getPadIndexFromNote(note);
 
-        if (drumIndex >= 0 && isDrumNote(noteOnEvent->getNote()) &&
+        if (isDrumNote(noteOnEvent->getNote()) &&
             programPadIndex >= 0)
         {
             const auto velocityWithTrackVelocityRatioApplied =
@@ -101,7 +103,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                     : noteParameters->getVoiceOverlapMode();
 
             auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
-                noteEventIdToUse, &drum, mpc.getSampler(),
+                noteEventIdToUse, drumBus, mpc.getSampler(),
                 mpc.getAudioMidiServices()->getMixer(),
                 mpc.screens->get<MixerSetupScreen>(),
                 &mpc.getAudioMidiServices()->getVoices(),
@@ -118,7 +120,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                                       Program::PadPressSource::NON_PHYSICAL);
 
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
-                noteEventIdToUse, &drum,
+                noteEventIdToUse, drumBus,
                 &mpc.getAudioMidiServices()->getVoices(),
                 noteOnEvent->getNote(), noteOnEvent->getTick());
 
@@ -153,24 +155,15 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
     {
         auto pad = mixerEvent->getPad();
         auto sampler = mpc.getSampler();
-        auto p = sampler->getProgram(
-            sampler->getDrumBusProgramIndex(track->getBus()));
-        auto mixer = p->getStereoMixerChannel(pad);
+        auto drumBus = mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+
+        assert(drumBus);
+
+        auto program = sampler->getProgram(drumBus->getProgram());
 
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
 
-        if (mixerSetupScreen->isStereoMixSourceDrum())
-        {
-            if (const int drumIndex = track->getBus() - 1; drumIndex >= 0)
-            {
-                auto &drum = mpc.getDrum(drumIndex);
-                mixer = drum.getStereoMixerChannels()[pad];
-            }
-            else
-            {
-                return;
-            }
-        }
+        auto mixer = mixerSetupScreen->isStereoMixSourceDrum() ? drumBus->getStereoMixerChannels()[pad] : program->getStereoMixerChannel(pad);
 
         if (mixerEvent->getParameter() == 0)
         {
@@ -196,8 +189,9 @@ void EventHandler::handleUnfinalizedNoteOn(
 
     if (drumIndex.has_value() && isDrumNote(noteOnEvent->getNote()))
     {
-        auto &drum = mpc.getDrum(*drumIndex);
-        const auto program = mpc.getSampler()->getProgram(drum.getProgram());
+        auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+        assert(drumBus);
+        const auto program = mpc.getSampler()->getProgram(drumBus->getProgram());
         const auto note = noteOnEvent->getNote();
 
         const auto velocityWithTrackVelocityRatioApplied =
@@ -208,7 +202,7 @@ void EventHandler::handleUnfinalizedNoteOn(
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
         auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
-            0, &drum, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
+            0, drumBus, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
             mpc.screens->get<MixerSetupScreen>(),
             &mpc.getAudioMidiServices()->getVoices(),
             mpc.getAudioMidiServices()->getMixerConnections(), note,
@@ -238,12 +232,15 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
 
     if (drumIndex.has_value() && isDrumNote(noteOffEvent->getNote()))
     {
-        auto &drum = mpc.getDrum(*drumIndex);
-        const auto program = mpc.getSampler()->getProgram(drum.getProgram());
+        auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+
+        assert(drumBus);
+
+        const auto program = mpc.getSampler()->getProgram(drumBus->getProgram());
         const auto note = noteOffEvent->getNote();
 
         auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
-            0, &drum, &mpc.getAudioMidiServices()->getVoices(),
+            0, drumBus, &mpc.getAudioMidiServices()->getVoices(),
             noteOffEvent->getNote(), -1);
 
         DrumNoteEventHandler::noteOff(ctx);
@@ -280,8 +277,11 @@ void EventHandler::handleMidiInputNoteOn(
 
     // This is a DRUM track, so we trigger sample playback and register a
     // program pad press.
-    auto &drum = mpc.getDrum(*drumIndex);
-    const auto program = mpc.getSampler()->getProgram(drum.getProgram());
+    auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+
+    assert(drumBus);
+
+    const auto program = mpc.getSampler()->getProgram(drumBus->getProgram());
     const auto note = noteOnEvent->getNote();
 
     const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(
@@ -291,7 +291,7 @@ void EventHandler::handleMidiInputNoteOn(
         std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
     auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
-        0, &drum, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
+        0, drumBus, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
         mpc.screens->get<MixerSetupScreen>(),
         &mpc.getAudioMidiServices()->getVoices(),
         mpc.getAudioMidiServices()->getMixerConnections(), note, velocityToUse,
@@ -334,14 +334,16 @@ void EventHandler::handleMidiInputNoteOff(
     // This is a DRUM track, so we stop sample playback and register a program
     // pad release.
 
-    Drum *drum = &mpc.getDrum(*drumIndex);
+    auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+
+    assert(drumBus);
 
     const auto drumNoteOffEvent =
-        [drum, note = noteOffEvent->getNote(),
+        [drumBus, note = noteOffEvent->getNote(),
          voices = &mpc.getAudioMidiServices()->getVoices(),
-         program = mpc.getSampler()->getProgram(drum->getProgram())]
+         program = mpc.getSampler()->getProgram(drumBus->getProgram())]
     {
-        auto ctx = DrumNoteEventContextBuilder::buildNoteOff(0, drum, voices,
+        auto ctx = DrumNoteEventContextBuilder::buildNoteOff(0, drumBus, voices,
                                                              note, -1);
 
         DrumNoteEventHandler::noteOff(ctx);

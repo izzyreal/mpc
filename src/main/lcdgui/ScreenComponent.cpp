@@ -2,12 +2,12 @@
 
 #include "Background.hpp"
 
-#include <Mpc.hpp>
-#include <stdexcept>
+#include "Mpc.hpp"
 
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
+#include "sequencer/Bus.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
@@ -16,9 +16,12 @@
 
 #include "command/context/TriggerDrumContextFactory.hpp"
 
+#include <stdexcept>
+
 using namespace mpc::lcdgui;
 using namespace mpc::command;
 using namespace mpc::command::context;
+using namespace mpc::sequencer;
 
 ScreenComponent::ScreenComponent(mpc::Mpc &mpc, const std::string &name,
                                  const int layer)
@@ -129,11 +132,11 @@ std::optional<int> ScreenComponent::getDrumIndex()
     return std::nullopt;
 }
 
-mpc::engine::Drum &ScreenComponent::activeDrum()
+std::shared_ptr<DrumBus> ScreenComponent::getActiveDrumBus()
 {
     const auto drumIndex = getDrumIndex();
     assert(drumIndex);
-    return mpc.getDrum(*drumIndex);
+    return sequencer->getDrumBus(*drumIndex);
 }
 
 std::shared_ptr<Field> ScreenComponent::getFocusedField()
@@ -184,7 +187,7 @@ std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram()
         return {};
     }
 
-    return mpc.getSampler()->getProgram(mpc.getDrum(*drumIndex).getProgram());
+    return mpc.getSampler()->getProgram(sequencer->getDrumBus(*drumIndex)->getProgram());
 }
 
 std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()

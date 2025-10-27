@@ -29,7 +29,6 @@ void UserScreen::open()
 
 void UserScreen::function(int i)
 {
-
     switch (i)
     {
         // Intentional fall-through
@@ -48,7 +47,6 @@ void UserScreen::function(int i)
 
 void UserScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldName();
 
     if (focusedFieldName == "tempo")
@@ -187,7 +185,7 @@ void UserScreen::displayDeviceName()
         if (device == 0)
         {
             auto programName =
-                sampler->getProgram(mpc.getDrum(bus - 1).getProgram())
+                sampler->getProgram(mpc.getSequencer()->getDrumBus(bus - 1)->getProgram())
                     ->getName();
             findLabel("devicename")->setText(programName);
         }
@@ -259,85 +257,45 @@ void UserScreen::setTempo(const double newTempo)
 
 void UserScreen::setLoop(bool b)
 {
-    if (loop == b)
-    {
-        return;
-    }
-
     loop = b;
     displayLoop();
 }
 
 void UserScreen::setBus(int i)
 {
-    if (i < 0 || i > 4)
-    {
-        return;
-    }
-
-    bus = i;
-
+    bus = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::TOTAL_BUS_COUNT));
     displayBus();
     displayDeviceName();
 }
 
 void UserScreen::setDeviceNumber(int i)
 {
-    if (i < 0 || i > 33)
-    {
-        return;
-    }
-
-    device = i;
+    device = std::clamp(i, 0, 33);
     displayDeviceNumber();
     displayDeviceName();
 }
 
 void UserScreen::setRecordingModeMulti(bool b)
 {
-    if (recordingModeMulti == b)
-    {
-        return;
-    }
-
     recordingModeMulti = b;
     displayRecordingMode();
 }
 
 void UserScreen::setLastBar(int i)
 {
-    if (i < 0 || i > 998)
-    {
-        return;
-    }
-
-    lastBar = i;
+    lastBar = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
     displayBars();
 }
 
 void UserScreen::setPgm(int i)
 {
-    if (i < 0 || i > 128)
-    {
-        return;
-    }
-
-    pgm = i;
+    pgm = std::clamp(i, 0, 128);
     displayPgm();
 }
 
 void UserScreen::setVelo(int i)
 {
-    if (i < 1)
-    {
-        i = 1;
-    }
-    else if (i > 200)
-    {
-        i = 200;
-    }
-
-    velo = i;
+    velo = std::clamp(i, 1, 200);
     displayVelo();
 }
 

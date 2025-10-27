@@ -21,8 +21,9 @@
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
 
 #include <cmath>
 #include <StrUtil.hpp>
@@ -491,13 +492,17 @@ void EventRow::setMixerEventValues()
     fields[0]->setText(mixerParamNames[mixerEvent->getParameter()]);
 
     auto sampler = mpc.getSampler();
+    auto sequencer = mpc.getSequencer();
 
-    if (bus == 0)
+    auto drumBus = sequencer->getBus<DrumBus>(bus);
+
+    if (drumBus)
     {
         return;
     }
 
-    auto program = sampler->getProgram(sampler->getDrumBusProgramIndex(bus));
+
+    auto program = sampler->getProgram(drumBus->getProgram());
     auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
     auto padName = sampler->getPadName(mixerEvent->getPad());
@@ -563,11 +568,11 @@ void EventRow::setDrumNoteEventValues()
     }
     else
     {
-        if (bus != 0)
+        if (auto drumBus = mpc.getSequencer()->getBus<DrumBus>(bus); drumBus)
         {
             auto sampler = mpc.getSampler();
             auto program =
-                sampler->getProgram(sampler->getDrumBusProgramIndex(bus));
+                sampler->getProgram(drumBus->getProgram());
             auto padName = sampler->getPadName(
                 program->getPadIndexFromNote(ne->getNote()));
             fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);

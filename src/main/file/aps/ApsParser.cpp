@@ -5,7 +5,8 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/Pad.hpp"
-#include "engine/Drum.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <Util.hpp>
 
@@ -89,13 +90,16 @@ ApsParser::ApsParser(mpc::Mpc &mpc, std::string apsNameString)
     chunks.push_back(masterTable.getBytes());
     chunks.push_back(std::vector<char>{4, 0, (char)136, 1, 64, 0, 6});
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
-        ApsMixer mixer(sampler->getDrumStereoMixerChannels(i),
-                       sampler->getDrumIndivFxMixerChannels(i));
-        ApsDrumConfiguration drumConfig(sampler->getDrumBusProgramIndex(i + 1),
-                                        mpc.getDrum(i).receivesPgmChange(),
-                                        mpc.getDrum(i).receivesMidiVolume());
+        auto drumBus = mpc.getSequencer()->getDrumBus(i);
+        
+        ApsMixer mixer(drumBus->getStereoMixerChannels(),
+                       drumBus->getIndivFxMixerChannels());
+
+        ApsDrumConfiguration drumConfig(drumBus->getProgram(),
+                                        drumBus->receivesPgmChange(),
+                                        drumBus->receivesMidiVolume());
 
         chunks.push_back(mixer.getBytes());
 

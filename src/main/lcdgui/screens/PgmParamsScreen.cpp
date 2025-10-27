@@ -134,12 +134,12 @@ void PgmParamsScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "pgm")
     {
-        auto pgm = activeDrum().getProgram();
+        auto pgm = getActiveDrumBus()->getProgram();
         auto candidate = sampler->getUsedProgram(pgm, i > 0);
 
         if (candidate != pgm)
         {
-            activeDrum().setProgram(candidate);
+            getActiveDrumBus()->setProgram(candidate);
             displayPgm();
             displayAttackDecay();
             displayDecayMode();
@@ -266,7 +266,7 @@ void PgmParamsScreen::displayNote()
 
 void PgmParamsScreen::displayPgm()
 {
-    findField("pgm")->setTextPadded(activeDrum().getProgram() + 1, " ");
+    findField("pgm")->setTextPadded(getActiveDrumBus()->getProgram() + 1, " ");
 }
 
 void PgmParamsScreen::displayTune()

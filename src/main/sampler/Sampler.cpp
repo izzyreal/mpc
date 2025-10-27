@@ -23,15 +23,19 @@
 
 #include <StrUtil.hpp>
 
-#include <samplerate.h>
-
 #include "MpcResourceUtil.hpp"
 #include "engine/Voice.hpp"
+
+#include <memory>
+#include <set>
+
+#include <samplerate.h>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
+using namespace mpc::sequencer;
 using namespace mpc::engine;
 
 Sampler::Sampler(mpc::Mpc &mpc) : mpc(mpc) {}
@@ -143,18 +147,6 @@ void Sampler::setPreviousScreenName(std::string s)
     previousScreenName = s;
 }
 
-std::vector<std::shared_ptr<StereoMixer>> &
-Sampler::getDrumStereoMixerChannels(int i)
-{
-    return mpc.getDrum(i).getStereoMixerChannels();
-}
-
-std::vector<std::shared_ptr<IndivFxMixer>> &
-Sampler::getDrumIndivFxMixerChannels(int i)
-{
-    return mpc.getDrum(i).getIndivFxMixerChannels();
-}
-
 std::vector<int> *Sampler::getInitMasterPadAssign()
 {
     return &initMasterPadAssign;
@@ -232,16 +224,20 @@ void Sampler::playMetronome(unsigned int velocity, int framePos)
         return;
     }
 
-    const auto program =
-        mpc.getDrum(metronomeSoundScreen->getSound() - 1).getProgram();
+    const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(metronomeSoundScreen->getSound());
+
+    assert(drumBus);
+
+    const auto programIndex = drumBus->getProgram();
+
     const auto accent = velocity == 127;
     velocity = accent ? metronomeSoundScreen->getAccentVelo()
                       : metronomeSoundScreen->getNormalVelo();
     const auto pad = accent ? metronomeSoundScreen->getAccentPad()
                             : metronomeSoundScreen->getNormalPad();
-    const auto note = programs[program]->getNoteFromPad(pad);
+    const auto note = programs[programIndex]->getNoteFromPad(pad);
     const auto soundNumber =
-        programs[program]->getNoteParameters(note)->getSoundIndex();
+        programs[programIndex]->getNoteParameters(note)->getSoundIndex();
     mpc.getBasicPlayer().mpcNoteOn(soundNumber, velocity, framePos);
 }
 
@@ -298,9 +294,10 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
 
             if (repairDrumPrograms)
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
                 {
-                    setDrumBusProgramIndex(i + 1, 0);
+                    auto drumBus = mpc.getSequencer()->getDrumBus(i);
+                    drumBus->setProgram(0);
                 }
             }
             return p;
@@ -407,7 +404,8 @@ void Sampler::repairProgramReferences()
 {
     for (int busIndex = 1; busIndex < 5; busIndex++)
     {
-        auto pgm = getDrumBusProgramIndex(busIndex);
+        auto drumBus = mpc.getSequencer()->getBus<DrumBus>(busIndex);
+        auto pgm = drumBus->getProgram();
 
         if (!programs[pgm])
         {
@@ -434,7 +432,7 @@ void Sampler::repairProgramReferences()
                 }
             }
 
-            setDrumBusProgramIndex(busIndex, pgm);
+            drumBus->setProgram(pgm);
         }
     }
 }
@@ -1040,28 +1038,6 @@ void Sampler::mergeToStereo(
             dest->push_back(0);
         }
     }
-}
-
-void Sampler::setDrumBusProgramIndex(int busNumber, int programIndex)
-{
-    mpc.getDrum(busNumber - 1).setProgram(programIndex);
-}
-
-int Sampler::getDrumBusProgramIndex(int busNumber)
-{
-    return mpc.getDrum(busNumber - 1).getProgram();
-}
-
-std::shared_ptr<Program> Sampler::getDrumBusProgram(const int busNumber)
-{
-    const auto programIndex = getDrumBusProgramIndex(busNumber);
-
-    if (programIndex >= 0 && programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT)
-    {
-        return programs[programIndex];
-    }
-
-    return {};
 }
 
 std::shared_ptr<Sound> Sampler::getClickSound()

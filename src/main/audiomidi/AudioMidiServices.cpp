@@ -12,7 +12,6 @@
 #include "engine/VoiceUtil.hpp"
 #include "engine/FaderControl.hpp"
 #include "engine/audio/mixer/MixerControls.hpp"
-#include "engine/Drum.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
@@ -218,11 +217,6 @@ void AudioMidiServices::setAssignableMixOutLevels()
     }
 }
 
-Drum &AudioMidiServices::getDrum(int i)
-{
-    return soundPlayerChannels[i];
-}
-
 PreviewSoundPlayer &AudioMidiServices::getBasicPlayer()
 {
     return *basicSoundPlayerChannel.get();
@@ -235,13 +229,6 @@ void AudioMidiServices::createSynth()
     for (int i = 0; i < 32; i++)
     {
         voices.emplace_back(std::make_shared<Voice>(i + 1, false));
-    }
-
-    for (int drumIndex = 0; drumIndex < 4; ++drumIndex)
-    {
-        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
-
-        soundPlayerChannels.emplace_back(Drum(drumIndex));
     }
 
     basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(

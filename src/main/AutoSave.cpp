@@ -194,12 +194,12 @@ void AutoSave::restoreAutoSavedStateWithTarget(
             mpc.getSampler()->addProgram(0);
         }
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
         {
-            auto d = mpc.getDrum(i);
-            if (!mpc.getSampler()->getProgram(d.getProgram()))
+            auto d = mpc.getSequencer()->getDrumBus(i);
+            if (!mpc.getSampler()->getProgram(d->getProgram()))
             {
-                d.setProgram(0);
+                d->setProgram(0);
             }
         }
     };
