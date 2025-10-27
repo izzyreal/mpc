@@ -62,21 +62,23 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
 
         const auto audioServer = audioMidiServices->getAudioServer();
 
-        const auto durationFrames = SeqUtil::ticksToFrames(durationTicks, mpc.getSequencer()->getTempo(),
-                                                           audioServer->getSampleRate());
+        const auto durationFrames = SeqUtil::ticksToFrames(durationTicks, mpc.getSequencer()->getTempo(),         audioServer->getSampleRate());
 
         const auto frameSeq = audioMidiServices->getFrameSequencer();
         const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
 
         const uint64_t noteEventIdToUse = noteEventId++;
+        const int drumIndex = track->getBus() - 1;
+        auto &drum = mpc.getDrum(drumIndex);
+        auto sampler = mpc.getSampler();
+        const auto program = sampler->getProgram(drum.getProgram());
+        const auto note = noteOnEvent->getNote();
+        const int programPadIndex = program->getPadIndexFromNote(note);
 
-        if (const int drumIndex = track->getBus() - 1; drumIndex >= 0)
+        if (drumIndex >= 0 &&
+            isDrumNote(noteOnEvent->getNote()) &&
+            programPadIndex >= 0)
         {
-            auto &drum = mpc.getDrum(drumIndex);
-            auto sampler = mpc.getSampler();
-            const auto program = sampler->getProgram(drum.getProgram());
-            const auto note = noteOnEvent->getNote();
-
             const auto velocityWithTrackVelocityRatioApplied =
                 static_cast<int>(noteOnEvent->getVelocity() * (track->getVelocityRatio() * 0.01f));
 
@@ -105,8 +107,6 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event, Trac
                 voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1);
 
             DrumNoteEventHandler::noteOn(ctx);
-
-            const int programPadIndex = program->getPadIndexFromNote(note);
 
             program->registerPadPress(programPadIndex, Program::PadPressSource::NON_PHYSICAL);
 
@@ -184,7 +184,7 @@ void EventHandler::handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent> no
 
     const uint64_t noteEventIdToUse = noteEventId++;
 
-    if (drumIndex.has_value())
+    if (drumIndex.has_value() && isDrumNote(noteOnEvent->getNote()))
     {
         auto &drum = mpc.getDrum(*drumIndex);
         const auto program = mpc.getSampler()->getProgram(drum.getProgram());
@@ -231,7 +231,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<Note
 {
     assert(noteOffEvent);
 
-    if (drumIndex.has_value())
+    if (drumIndex.has_value() && isDrumNote(noteOffEvent->getNote() ))
     {
         auto &drum = mpc.getDrum(*drumIndex);
         const auto program = mpc.getSampler()->getProgram(drum.getProgram());
