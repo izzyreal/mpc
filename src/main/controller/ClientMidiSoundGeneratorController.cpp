@@ -22,11 +22,11 @@ ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
     std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<EventHandler> eventHandler,
-    std::shared_ptr<Sequencer> sequencerToUse,
+    std::shared_ptr<Sequencer> sequencer,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
     : midiInputScreen(midiInputScreen), eventHandler(eventHandler),
-      sequencer(sequencerToUse),
+      sequencer(sequencer),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen),
       clientEventController(clientEventController)

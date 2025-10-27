@@ -40,17 +40,12 @@ namespace mpc::controller
     {
     public:
         ClientMidiSoundGeneratorController(
-            std::shared_ptr<mpc::controller::ClientEventController>
-                clientEventController,
-            std::shared_ptr<mpc::lcdgui::screens::window::MidiInputScreen>
-                midiInputScreen,
-            std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler,
-            std::shared_ptr<mpc::sequencer::Sequencer> sequencer,
-            std::shared_ptr<
-                mpc::lcdgui::screens::window::MultiRecordingSetupScreen>
-                multiRecordingSetupScreen,
-            std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
-                timingCorrectScreen);
+            std::shared_ptr<mpc::controller::ClientEventController>,
+            std::shared_ptr<mpc::lcdgui::screens::window::MidiInputScreen>,
+            std::shared_ptr<mpc::audiomidi::EventHandler>,
+            std::shared_ptr<mpc::sequencer::Sequencer>,
+            std::shared_ptr<mpc::lcdgui::screens::window::MultiRecordingSetupScreen>,
+            std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>);
 
         void handleEvent(const mpc::client::event::ClientMidiEvent &);
         void clearNoteEventStore();
