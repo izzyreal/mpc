@@ -108,7 +108,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         isStepRecording,
         isRecMainWithoutPlaying,
         mpc.getSequencer()->isRecordingOrOverdubbing(),
-        mpc.getSequencer()->getCurrentBarIndex(),
         mpc.getSequencer()->getTickPosition(),
         isSongScreen,
         mpc.getAudioMidiServices()

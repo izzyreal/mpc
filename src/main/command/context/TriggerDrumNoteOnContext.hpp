@@ -58,7 +58,6 @@ namespace mpc::command::context
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
         bool isRecordingOrOverdubbing;
-        int currentBarIndex;
         int64_t tickPosition;
         bool songModeEnabled;
         uint64_t metronomeOnlyTickPosition;
