@@ -192,7 +192,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
             mpc.clientEventController->clientHardwareEventController);
 
     return {
-        programPadIndex,
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,

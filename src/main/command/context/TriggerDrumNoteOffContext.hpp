@@ -23,7 +23,6 @@ namespace mpc::command::context
     // of a program.
     struct TriggerDrumNoteOffContext
     {
-        const int padIndexWithBank;
         std::function<void()> finishBasicVoiceIfSoundIsLooping;
         const bool currentScreenIsSoundScreen;
         const bool currentScreenIsSamplerScreen;
