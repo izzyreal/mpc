@@ -6,6 +6,7 @@
 #include "engine/IndivFxMixer.hpp"
 
 #include <Mpc.hpp>
+#include <stdexcept>
 
 using namespace mpc::sampler;
 using namespace mpc::engine;
@@ -187,11 +188,27 @@ bool Program::isPadPressedBySource(int padIndex, PadPressSource source)
     return pressedPadRegistry[padIndex].sourceCount[sourceIndex(source)] > 0;
 }
 
-void Program::registerPadPress(int padIndex, PadPressSource source)
+int Program::getPressedPadAfterTouchOrVelocity(int padIndex)
+{
+    if (!isPadRegisteredAsPressed(padIndex))
+    {
+        throw std::invalid_argument("The queried pad must be pressed");
+    }
+
+    return pressedPadRegistry[padIndex].mostRecentAftertouch.value_or(pressedPadRegistry[padIndex].velocity);
+}
+
+void Program::registerPadPress(int padIndex, int velocity, PadPressSource source)
 {
     auto &pad = pressedPadRegistry[padIndex];
     pad.totalCount++;
     pad.sourceCount[sourceIndex(source)]++;
+}
+
+void Program::registerPadAfterTouch(int padIndex, int afterTouch)
+{
+    auto &pad = pressedPadRegistry[padIndex];
+    pad.mostRecentAftertouch = afterTouch;
 }
 
 void Program::registerPadRelease(int padIndex, PadPressSource source)

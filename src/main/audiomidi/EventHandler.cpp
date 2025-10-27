@@ -158,8 +158,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
             DrumNoteEventHandler::noteOn(ctx);
 
-            program->registerPadPress(programPadIndex,
-                                      Program::PadPressSource::NON_PHYSICAL);
+            program->registerPadPress(programPadIndex, velocityToUse,
+                                      Program::PadPressSource::SEQUENCED);
 
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
                 noteEventIdToUse, drumBus,
@@ -169,7 +169,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
             auto drumNoteOffEvent = [program, programPadIndex, noteOffCtx]
             {
                 program->registerPadRelease(
-                    programPadIndex, Program::PadPressSource::NON_PHYSICAL);
+                    programPadIndex, Program::PadPressSource::SEQUENCED);
                 DrumNoteEventHandler::noteOff(noteOffCtx);
             };
 
@@ -252,9 +252,6 @@ void EventHandler::handleUnfinalizedNoteOn(
             noteOnEvent->getVariationValue(), 0, true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
-
-        program->registerPadPress(program->getPadIndexFromNote(note),
-                                  Program::PadPressSource::PHYSICAL);
     }
 
     if (trackIndex.has_value() && trackDevice.has_value())
@@ -286,9 +283,6 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
             noteOffEvent->getNote(), -1);
 
         DrumNoteEventHandler::noteOff(ctx);
-
-        program->registerPadRelease(program->getPadIndexFromNote(note),
-                                    Program::PadPressSource::PHYSICAL);
     }
 
     if (trackIndex.has_value() && trackDevice.has_value())
@@ -342,8 +336,8 @@ void EventHandler::handleMidiInputNoteOn(
 
     DrumNoteEventHandler::noteOn(ctx);
 
-    program->registerPadPress(program->getPadIndexFromNote(note),
-                              Program::PadPressSource::NON_PHYSICAL);
+    program->registerPadPress(program->getPadIndexFromNote(note), velocityToUse,
+                              Program::PadPressSource::MIDI);
 }
 
 void EventHandler::handleMidiInputNoteOff(
@@ -390,7 +384,7 @@ void EventHandler::handleMidiInputNoteOff(
 
         DrumNoteEventHandler::noteOff(ctx);
         program->registerPadRelease(program->getPadIndexFromNote(note),
-                                    Program::PadPressSource::NON_PHYSICAL);
+                                    Program::PadPressSource::MIDI);
     };
 
     frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);

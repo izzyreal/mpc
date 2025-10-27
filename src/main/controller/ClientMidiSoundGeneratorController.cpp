@@ -93,11 +93,13 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
     else if (type == MessageType::CHANNEL_PRESSURE)
     {
-        // TODO: handle channel pressure
+
     }
     else if (type == MessageType::AFTERTOUCH)
     {
         // TODO: poly aftertouch
+        // Seems like the MPC2000XL does not implement poly aftertouch reception as per the MIDI implementation char.
+        // Double check on the real 2KXL...
     }
     else if (type == MessageType::PROGRAM_CHANGE)
     {
