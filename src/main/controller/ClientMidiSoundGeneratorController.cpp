@@ -56,6 +56,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     if (!sequencer->isRecordingModeMulti())
     {
         const int receiveCh = midiInputScreen->getReceiveCh();
+
         if (receiveCh != -1 && e.getChannel() != receiveCh)
         {
             return;
@@ -69,6 +70,9 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
 
     const auto type = e.getMessageType();
 
+    const auto program = getProgramForEvent(e);
+    const auto sliderControllerNumber = program->getSlider()->getControlChange();
+
     if (type == MessageType::NOTE_ON)
     {
         handleNoteOnEvent(e);
@@ -77,9 +81,15 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     {
         handleNoteOffEvent(e);
     }
-    else if (type == MessageType::CONTROLLER && e.getControllerNumber() == 7)
+    else if (type == MessageType::CONTROLLER && e.getControllerNumber() == sliderControllerNumber)
     {
-        // TODO: handle CC7 / note variation slider
+        // Verify on real 2KXL: what is the 0-based and 1-based range for this property of the program?
+        ClientHardwareEvent event;
+        event.source = ClientHardwareEvent::Source::Internal;
+        event.componentId = hardware::ComponentId::SLIDER;
+        event.type = ClientHardwareEvent::Type::SliderMove;
+        event.value = 1.f - (e.getControllerValue() / 127.f);
+        clientEventController->handleClientEvent(ClientEvent{event});
     }
     else if (type == MessageType::CHANNEL_PRESSURE)
     {
@@ -127,8 +137,9 @@ std::shared_ptr<Program> ClientMidiSoundGeneratorController::getProgramForEvent(
 {
     if (auto drumIndex = getDrumIndexForEvent(e); drumIndex)
     {
-        //sampler->getProgram();
+        return sampler->getProgram(sequencer->getDrumBus(*drumIndex)->getProgram());
     }
+
     return {};
 }
 

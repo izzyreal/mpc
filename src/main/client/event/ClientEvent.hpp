@@ -3,11 +3,10 @@
 #include "client/event/ClientHardwareEvent.hpp"
 #include "client/event/ClientMidiEvent.hpp"
 
-#include <utility>
+#include <variant>
 
 namespace mpc::client::event
 {
-
     struct ClientEvent
     {
         std::variant<ClientHardwareEvent, ClientMidiEvent> payload;

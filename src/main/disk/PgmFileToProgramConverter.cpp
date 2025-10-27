@@ -30,7 +30,7 @@ void PgmFileToProgramConverter::setSlider(ProgramFileReader &reader,
     auto slider = reader.getSlider();
     auto nn =
         slider->getMidiNoteAssign() == 0 ? 34 : slider->getMidiNoteAssign();
-    auto pgmSlider = dynamic_cast<PgmSlider *>(program->getSlider());
+    auto pgmSlider = program->getSlider();
     pgmSlider->setAssignNote(nn);
     pgmSlider->setAttackHighRange(slider->getAttackHigh());
     pgmSlider->setAttackLowRange(slider->getAttackLow());

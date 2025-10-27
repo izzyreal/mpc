@@ -28,7 +28,7 @@ void ClientMidiFootswitchAssignmentController::pressButton(
     hardware::ComponentId componentId)
 {
     ClientHardwareEvent ev;
-    ev.source = ClientHardwareEvent::Source::HostInputMidi;
+    ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = componentId;
     ev.type = ClientHardwareEvent::Type::ButtonPress;
     clientHardwareEventController->handleClientHardwareEvent(ev);
@@ -38,7 +38,7 @@ void ClientMidiFootswitchAssignmentController::releaseButton(
     hardware::ComponentId componentId)
 {
     ClientHardwareEvent ev;
-    ev.source = ClientHardwareEvent::Source::HostInputMidi;
+    ev.source = ClientHardwareEvent::Source::Internal;
     ev.componentId = componentId;
     ev.type = ClientHardwareEvent::Type::ButtonRelease;
     clientHardwareEventController->handleClientHardwareEvent(ev);
@@ -153,7 +153,7 @@ void ClientMidiFootswitchAssignmentController::handleEvent(
         if (trimmedFunctionName.rfind("PAD", 0) == 0)
         {
             ClientHardwareEvent ev;
-            ev.source = ClientHardwareEvent::Source::HostInputMidi;
+            ev.source = ClientHardwareEvent::Source::Internal;
 
             std::string rest = trimmedFunctionName.substr(3);
             rest.erase(0, rest.find_first_not_of(" \t"));
@@ -225,7 +225,7 @@ void ClientMidiFootswitchAssignmentController::handleEvent(
         {
             ClientHardwareEvent ev;
             ev.componentId = *id;
-            ev.source = ClientHardwareEvent::Source::HostInputMidi;
+            ev.source = ClientHardwareEvent::Source::Internal;
             ev.type = pressed ? ClientHardwareEvent::Type::ButtonPress
                               : ClientHardwareEvent::Type::ButtonRelease;
             clientHardwareEventController->handleClientHardwareEvent(ev);

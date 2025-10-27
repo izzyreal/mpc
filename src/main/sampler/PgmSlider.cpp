@@ -1,17 +1,14 @@
 #include "sampler/PgmSlider.hpp"
 
+#include <algorithm> // for std::clamp
+
 using namespace mpc::sampler;
 
 void PgmSlider::setAssignNote(int i)
 {
-    if (i < 34 || i > 98)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 34, 98);
     assignNote = i;
-
-    notifyObservers(std::string("assignnote"));
+    notifyObservers("assignnote");
 }
 
 int PgmSlider::getNote()
@@ -21,19 +18,12 @@ int PgmSlider::getNote()
 
 void PgmSlider::setTuneLowRange(int i)
 {
-    if (i < -120 || i > 120)
-    {
-        return;
-    }
-
+    i = std::clamp(i, -120, 120);
     tuneLowRange = i;
-
-    notifyObservers(std::string("lowrange"));
+    notifyObservers("lowrange");
 
     if (tuneLowRange > tuneHighRange)
-    {
         setTuneHighRange(tuneLowRange);
-    }
 }
 
 int PgmSlider::getTuneLowRange()
@@ -43,18 +33,12 @@ int PgmSlider::getTuneLowRange()
 
 void PgmSlider::setTuneHighRange(int i)
 {
-    if (i < -120 || i > 120)
-    {
-        return;
-    }
-
+    i = std::clamp(i, -120, 120);
     tuneHighRange = i;
+    notifyObservers("highrange");
 
-    notifyObservers(std::string("highrange"));
     if (tuneHighRange < tuneLowRange)
-    {
         setTuneLowRange(tuneHighRange);
-    }
 }
 
 int PgmSlider::getTuneHighRange()
@@ -64,19 +48,12 @@ int PgmSlider::getTuneHighRange()
 
 void PgmSlider::setDecayLowRange(int i)
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 0, 100);
     decayLowRange = i;
-
-    notifyObservers(std::string("lowrange"));
+    notifyObservers("lowrange");
 
     if (decayLowRange > decayHighRange)
-    {
         setDecayHighRange(decayLowRange);
-    }
 }
 
 int PgmSlider::getDecayLowRange()
@@ -86,19 +63,12 @@ int PgmSlider::getDecayLowRange()
 
 void PgmSlider::setDecayHighRange(int i)
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 0, 100);
     decayHighRange = i;
-
-    notifyObservers(std::string("highrange"));
+    notifyObservers("highrange");
 
     if (decayHighRange < decayLowRange)
-    {
         setDecayLowRange(decayHighRange);
-    }
 }
 
 int PgmSlider::getDecayHighRange()
@@ -108,19 +78,12 @@ int PgmSlider::getDecayHighRange()
 
 void PgmSlider::setAttackLowRange(int i)
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 0, 100);
     attackLowRange = i;
-
-    notifyObservers(std::string("lowrange"));
+    notifyObservers("lowrange");
 
     if (attackLowRange > attackHighRange)
-    {
         setAttackHighRange(attackLowRange);
-    }
 }
 
 int PgmSlider::getAttackLowRange()
@@ -130,19 +93,12 @@ int PgmSlider::getAttackLowRange()
 
 void PgmSlider::setAttackHighRange(int i)
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 0, 100);
     attackHighRange = i;
-
-    notifyObservers(std::string("highrange"));
+    notifyObservers("highrange");
 
     if (attackHighRange < attackLowRange)
-    {
         setAttackLowRange(attackHighRange);
-    }
 }
 
 int PgmSlider::getAttackHighRange()
@@ -152,19 +108,12 @@ int PgmSlider::getAttackHighRange()
 
 void PgmSlider::setFilterLowRange(int i)
 {
-    if (i < -50 || i > 50)
-    {
-        return;
-    }
-
+    i = std::clamp(i, -50, 50);
     filterLowRange = i;
-
-    notifyObservers(std::string("lowrange"));
+    notifyObservers("lowrange");
 
     if (filterLowRange > filterHighRange)
-    {
         setFilterHighRange(filterLowRange);
-    }
 }
 
 int PgmSlider::getFilterLowRange()
@@ -174,19 +123,12 @@ int PgmSlider::getFilterLowRange()
 
 void PgmSlider::setFilterHighRange(int i)
 {
-    if (i < -50 || i > 50)
-    {
-        return;
-    }
-
+    i = std::clamp(i, -50, 50);
     filterHighRange = i;
-
-    notifyObservers(std::string("highrange"));
+    notifyObservers("highrange");
 
     if (filterHighRange < filterLowRange)
-    {
         setFilterLowRange(filterHighRange);
-    }
 }
 
 int PgmSlider::getFilterHighRange()
@@ -196,14 +138,9 @@ int PgmSlider::getFilterHighRange()
 
 void PgmSlider::setControlChange(int i)
 {
-    if (i < 0 || i > 128)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 0, 128);
     controlChange = i;
-
-    notifyObservers(std::string("controlchange"));
+    notifyObservers("controlchange");
 }
 
 int PgmSlider::getControlChange()
@@ -218,12 +155,8 @@ int PgmSlider::getParameter()
 
 void PgmSlider::setParameter(int i)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
-
+    i = std::clamp(i, 0, 3);
     parameter = i;
-
-    notifyObservers(std::string("parameter"));
+    notifyObservers("parameter");
 }
+
