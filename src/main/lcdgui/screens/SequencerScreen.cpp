@@ -46,6 +46,45 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
     footerLabel->setText("(Hold pads or keys to repeat)");
     footerLabel->setSize(footerLabel->GetTextEntryLength() * 6, 8);
     footerLabel->Hide(true);
+
+    auto displaySequenceProperties = [&]
+    {
+        displaySq();
+        //displayTsig();
+        //displayBars();
+        //displayTempo();
+        //displayLoop();
+    };
+
+    auto displayTrackProperties = [&]
+    {
+        displayTr();
+        displayOn();
+        displayPgm();
+        displayVelo();
+        displayBus();
+        displayDeviceNumber();
+        displayDeviceName();
+    };
+
+    addReactiveBinding({[&]{ return sequencer.lock()->getActiveSequenceIndex(); }, [&](auto){
+            //displaySequenceProperties();
+            //displayTrackProperties();
+            }});
+
+    addReactiveBinding({[&]{ return sequencer.lock()->getActiveSequence()->isUsed(); }, [&](auto){
+            displaySq();
+            //displaySequenceProperties();
+            //displayTrackProperties();
+            }});
+
+    addReactiveBinding({[&]{ return sequencer.lock()->getActiveTrackIndex(); }, [&](auto){
+            //displayTrackProperties();
+            }});
+
+    addReactiveBinding({[&]{ return sequencer.lock()->getActiveTrack()->isUsed(); }, [&](auto){
+            //displayTrackProperties();
+            }});
 }
 
 void SequencerScreen::open()
@@ -384,6 +423,7 @@ void SequencerScreen::displayTiming()
 
 void SequencerScreen::update(Observable *o, Message message)
 {
+    return;
     if (sequence.lock())
     {
         sequence.lock()->deleteObserver(this);
@@ -497,7 +537,6 @@ void SequencerScreen::update(Observable *o, Message message)
 
 void SequencerScreen::pressEnter()
 {
-
     auto focusedField = getFocusedFieldOrThrow();
 
     if (!focusedField->isTypeModeEnabled())
@@ -608,7 +647,6 @@ void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused()
 
 void SequencerScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.size() >= 3 && focusedFieldName.substr(0, 3) == "now")

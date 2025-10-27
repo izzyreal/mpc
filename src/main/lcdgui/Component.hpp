@@ -2,6 +2,8 @@
 
 #include "BasicStructs.hpp"
 
+#include "lcdgui/ReactiveBinding.hpp"
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -20,6 +22,7 @@ namespace mpc::lcdgui
     {
     private:
         const std::string name;
+        std::vector<ReactiveBinding> reactiveBindings;
 
     protected:
         Component *parent = nullptr;
@@ -34,8 +37,25 @@ namespace mpc::lcdgui
 
         bool shouldNotDraw(std::vector<std::vector<bool>> *pixels);
 
+        void addReactiveBinding(ReactiveBinding);
+
     public:
-        virtual void timerCallback() {}
+        void timerCallback()
+        {
+            for (auto &b : reactiveBindings)
+            {
+                b.refresh();
+            }
+
+            onTimerCallback();
+
+            for (auto &c : children)
+            {
+                c->onTimerCallback();
+            }
+        }
+
+        virtual void onTimerCallback() {}
 
         void printTree(int depth = 0)
         {
