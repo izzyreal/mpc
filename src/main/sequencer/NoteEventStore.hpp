@@ -9,6 +9,25 @@ namespace mpc::sequencer
     class NoteOnEvent;
     class NoteOnEventPlayOnly;
 
+    struct MidiInputNoteKey
+    {
+        int track;
+        int channel;
+        int note;
+
+        bool operator==(const MidiInputNoteKey& o) const noexcept
+        {
+            return track == o.track && channel == o.channel && note == o.note;
+        }
+
+        bool operator<(const MidiInputNoteKey& o) const noexcept
+        {
+            if (track != o.track) return track < o.track;
+            if (channel != o.channel) return channel < o.channel;
+            return note < o.note;
+        }
+    };
+
     template <typename IndexType> class NoteEventStore final
     {
     private:
@@ -24,6 +43,14 @@ namespace mpc::sequencer
             template <typename T1> std::size_t operator()(const T1 &p) const
             {
                 return std::hash<T1>{}(p);
+            }
+
+            std::size_t operator()(const MidiInputNoteKey &k) const
+            {
+                size_t h1 = std::hash<int>{}(k.track);
+                size_t h2 = std::hash<int>{}(k.channel);
+                size_t h3 = std::hash<int>{}(k.note);
+                return h1 ^ (h2 << 1) ^ (h3 << 2);
             }
         };
 

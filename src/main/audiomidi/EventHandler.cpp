@@ -160,8 +160,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
             DrumNoteEventHandler::noteOn(ctx);
 
-            program->registerPadPress(programPadIndex, velocityToUse,
-                                      Program::PadPressSource::SEQUENCED);
+            program->registerNonMidiNoteOn(note, velocityToUse, programPadIndex,
+                                      Program::NoteEventSource::SEQUENCED);
 
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
                 noteEventIdToUse, drumBus,
@@ -170,8 +170,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
             auto drumNoteOffEvent = [program, programPadIndex, noteOffCtx]
             {
-                program->registerPadRelease(
-                    programPadIndex, Program::PadPressSource::SEQUENCED);
+                program->registerNonMidiNoteOff(noteOffCtx.note,
+                    programPadIndex, Program::NoteEventSource::SEQUENCED);
                 DrumNoteEventHandler::noteOff(noteOffCtx);
             };
 
@@ -294,7 +294,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
     }
 }
 
-void EventHandler::handleMidiInputNoteOn(
+void EventHandler::handleMidiInputNoteOn(const int midiChannelIndex,
     const std::shared_ptr<NoteOnEventPlayOnly> noteOnEvent,
     const int frameOffsetInBuffer, const int trackIndex, const int trackDevice,
     const int trackVelocityRatio, const std::optional<int> drumIndex)
@@ -328,8 +328,7 @@ void EventHandler::handleMidiInputNoteOn(
     const auto velocityToUse =
         std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
-    program->registerPadPress(program->getPadIndexFromNote(note), velocityToUse,
-                              Program::PadPressSource::MIDI);
+    program->registerMidiNoteOn(midiChannelIndex, note, velocityToUse, program->getPadIndexFromNote(note), Program::NoteEventSource::MIDI);
 
     const bool isSoundScreen = lcdgui::screengroups::isSoundScreen(mpc.getLayeredScreen()->getCurrentScreen());
 
@@ -366,6 +365,7 @@ void EventHandler::handleMidiInputNoteOn(
 }
 
 void EventHandler::handleMidiInputNoteOff(
+    const int midiChannelIndex,
     const std::shared_ptr<NoteOffEvent> noteOffEvent,
     const int frameOffsetInBuffer, const int trackIndex, const int trackDevice,
     const std::optional<int> drumIndex)
@@ -402,14 +402,14 @@ void EventHandler::handleMidiInputNoteOff(
     const auto drumNoteOffEvent =
         [drumBus, note = noteOffEvent->getNote(),
          voices = &mpc.getAudioMidiServices()->getVoices(),
-         program = mpc.getSampler()->getProgram(drumBus->getProgram())]
+         program = mpc.getSampler()->getProgram(drumBus->getProgram()), midiChannelIndex]
     {
         auto ctx = DrumNoteEventContextBuilder::buildNoteOff(0, drumBus, voices,
                                                              note, -1);
 
         DrumNoteEventHandler::noteOff(ctx);
-        program->registerPadRelease(program->getPadIndexFromNote(note),
-                                    Program::PadPressSource::MIDI);
+        program->registerMidiNoteOff(midiChannelIndex, note, program->getPadIndexFromNote(note),
+                                    Program::NoteEventSource::MIDI);
     };
 
     frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);

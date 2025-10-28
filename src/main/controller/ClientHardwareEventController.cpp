@@ -164,8 +164,8 @@ void ClientHardwareEventController::handlePadPress(
 
     auto program = screen->getProgram();
 
-    program->registerPadPress(program->getPadIndexFromNote(ctx.note), clampedVelocity,
-                              sampler::Program::PadPressSource::PHYSICAL);
+    program->registerNonMidiNoteOn(ctx.note, clampedVelocity, program->getPadIndexFromNote(ctx.note),
+                              sampler::Program::NoteEventSource::PHYSICAL);
 
     const bool isF4Pressed =
         mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
@@ -224,9 +224,11 @@ void ClientHardwareEventController::handlePadRelease(
 
     const auto info = registerPhysicalPadRelease(physicalPadIndex);
     auto program = info.screen->getProgram();
+    auto programPadIndex = physicalPadIndex + static_cast<int>(info.bank) * 16;
+    auto note = program->getNoteFromPad(programPadIndex);
 
-    program->registerPadRelease(physicalPadIndex + static_cast<int>(info.bank) * 16,
-                                sampler::Program::PadPressSource::PHYSICAL);
+    program->registerNonMidiNoteOff(note, programPadIndex,
+                                sampler::Program::NoteEventSource::PHYSICAL);
 
     mpc.getHardware()->getPad(physicalPadIndex)->release();
 
@@ -235,8 +237,6 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    const auto programPadIndex =
-        physicalPadIndex + (static_cast<int>(info.bank) * 16);
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         mpc, programPadIndex, info.drumIndex, info.screen);
     TriggerDrumNoteOffCommand(ctx).execute();
@@ -261,7 +261,9 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     if (auto program = physicalPadPress.screen->getProgram(); program)
     {
-        program->registerPadAfterTouch(padIndex + static_cast<int>(physicalPadPress.bank) * 16, pressureToUse);
+        const auto programPadIndex = padIndex + static_cast<int>(physicalPadPress.bank) * 16;
+        const auto note = program->getNoteFromPad(programPadIndex);
+        program->registerNonMidiNoteAfterTouch(note, pressureToUse, programPadIndex);
     }
 }
 

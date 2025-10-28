@@ -10,7 +10,6 @@
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sound.hpp"
-#include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/ZoneScreen.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
@@ -1274,7 +1273,7 @@ void Sampler::clearAllProgramPadPressRegistries()
         {
             continue;
         }
-        program->clearPressedPadRegistry();
+        program->clearActiveNoteRegistry();
     }
 }
 

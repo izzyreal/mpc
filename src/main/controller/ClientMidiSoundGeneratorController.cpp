@@ -53,10 +53,11 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     std::cout << "[SoundGenerator] Handling event type " << e.getMessageType()
               << " on channel " << e.getChannel() << std::endl;
 
+    const auto type = e.getMessageType();
+
     if (!sequencer->isRecordingModeMulti())
     {
         const int receiveCh = midiInputScreen->getReceiveCh();
-
         if (receiveCh != -1 && e.getChannel() != receiveCh)
         {
             return;
@@ -68,10 +69,9 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
         return;
     }
 
-    const auto type = e.getMessageType();
-
     const auto program = getProgramForEvent(e);
-    const auto sliderControllerNumber = program->getSlider()->getControlChange();
+    const auto sliderControllerNumber =
+        program ? program->getSlider()->getControlChange() : -1;
 
     if (type == MessageType::NOTE_ON)
     {
@@ -83,7 +83,6 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
     else if (type == MessageType::CONTROLLER && e.getControllerNumber() == sliderControllerNumber)
     {
-        // Verify on real 2KXL: what is the 0-based and 1-based range for this property of the program?
         ClientHardwareEvent event;
         event.source = ClientHardwareEvent::Source::Internal;
         event.componentId = hardware::ComponentId::SLIDER;
@@ -94,27 +93,21 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     else if (type == MessageType::CHANNEL_PRESSURE)
     {
         auto pressure = e.getChannelPressure();
-        for (auto &p : sampler->getPrograms())
+        if (program)
         {
-            if (!p.lock()) continue;
-            for (int i = 0; i < 64; i ++)
+            for (int programPadIndex = 0; programPadIndex < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; ++programPadIndex)
             {
-                p.lock()->registerPadAfterTouch(i, pressure);
+                program->registerMidiNoteAfterTouch(e.getChannel(), program->getNoteFromPad(programPadIndex), pressure, programPadIndex);
             }
         }
     }
     else if (type == MessageType::AFTERTOUCH)
     {
-        // TODO: poly aftertouch
-        // Seems like the MPC2000XL does not implement poly aftertouch reception as per the MIDI implementation char.
-        // Double check on the real 2KXL...
         auto pressure = e.getAftertouchValue();
-        for (auto &p : sampler->getPrograms())
         {
-            if (!p.lock()) continue;
-            for (int i = 0; i < 64; i ++)
+            if (program)
             {
-                p.lock()->registerPadAfterTouch(i, pressure);
+                program->registerMidiNoteAfterTouch(e.getChannel(), e.getNoteNumber(), pressure, program->getPadIndexFromNote(e.getNoteNumber()));
             }
         }
     }
@@ -153,8 +146,8 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
     else if (type == MessageType::CONTROLLER && e.getControllerNumber() == 123)
     {
-        // TODO
-        // Send early note offs
+        // TODO: All Notes Off per channel
+        // Could iterate through noteEventStore and send offs for matching channel
     }
 }
 
@@ -179,7 +172,7 @@ ClientMidiSoundGeneratorController::getTrackForEvent(const ClientMidiEvent &e) c
     if (auto trackIndex = getTrackIndexForEvent(e); trackIndex)
     {
         auto seq = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
-                                              : sequencer->getActiveSequence();
+                                          : sequencer->getActiveSequence();
         return seq->getTrack(*trackIndex);
     }
 
@@ -269,13 +262,13 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
     }
 
     auto track = getTrackForEvent(e);
-
     if (!track)
     {
         return;
     }
 
     const auto trackIndex = track->getIndex();
+    const int channel = e.getChannel();
 
     auto noteOnEvent =
         std::make_shared<NoteOnEventPlayOnly>(note, e.getVelocity());
@@ -284,12 +277,12 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
     const int trackVelocityRatio = track->getVelocityRatio();
     const auto drumIndex = getDrumIndexForEvent(e);
 
-    eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(),
+    eventHandler->handleMidiInputNoteOn(channel, noteOnEvent, e.getBufferOffset(),
                                         trackIndex, trackDevice,
                                         trackVelocityRatio, drumIndex);
 
-    noteEventStore.storePlayNoteEvent(
-        std::pair<int, int>(trackIndex, noteOnEvent->getNote()), noteOnEvent);
+    MidiInputNoteKey key{trackIndex, channel, noteOnEvent->getNote()};
+    noteEventStore.storePlayNoteEvent(key, noteOnEvent);
 
     auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(
         noteOnEvent->getNote(), noteOnEvent->getVelocity());
@@ -341,9 +334,7 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
 
     if (recordMidiNoteOn)
     {
-        noteEventStore.storeRecordNoteEvent(
-            std::pair<int, int>(trackIndex, recordMidiNoteOn->getNote()),
-            recordMidiNoteOn);
+        noteEventStore.storeRecordNoteEvent(key, recordMidiNoteOn);
     }
 }
 
@@ -351,22 +342,21 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
     const ClientMidiEvent &e)
 {
     const int note = e.getNoteNumber();
+    const int channel = e.getChannel();
 
     auto track = getTrackForEvent(e);
-
     if (!track)
     {
         return;
     }
 
     int trackIndex = track->getIndex();
-
     const int trackDevice = track->getDeviceIndex();
     const auto drumIndex = getDrumIndexForEvent(e);
 
-    // finalize recorded note if exists
-    if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(
-            std::pair<int, int>(trackIndex, note)))
+    MidiInputNoteKey key{trackIndex, channel, note};
+
+    if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(key))
     {
         auto mode = clientEventController->determineRecordingMode();
 
@@ -425,10 +415,9 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
         }
     }
 
-    if (auto storedNoteOnEvent = noteEventStore.retrievePlayNoteEvent(
-            std::pair<int, int>(trackIndex, note)))
+    if (auto storedNoteOnEvent = noteEventStore.retrievePlayNoteEvent(key))
     {
-        eventHandler->handleMidiInputNoteOff(storedNoteOnEvent->getNoteOff(),
+        eventHandler->handleMidiInputNoteOff(e.getChannel(), storedNoteOnEvent->getNoteOff(),
                                              e.getBufferOffset(), trackIndex,
                                              trackDevice, drumIndex);
     }

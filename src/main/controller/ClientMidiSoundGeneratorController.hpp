@@ -49,7 +49,6 @@ namespace mpc::controller
             mpc::lcdgui::screens::window::MultiRecordingSetupScreen;
         using TimingCorrectScreen =
             mpc::lcdgui::screens::window::TimingCorrectScreen;
-        using NoteKey = std::pair<int /*track*/, int /*note*/>;
 
     public:
         ClientMidiSoundGeneratorController(
@@ -73,7 +72,7 @@ namespace mpc::controller
         std::shared_ptr<ClientEventController> clientEventController;
 
         const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
-        mpc::sequencer::NoteEventStore<NoteKey> noteEventStore;
+        mpc::sequencer::NoteEventStore<sequencer::MidiInputNoteKey> noteEventStore;
 
         std::optional<int> getTrackIndexForEvent(const MidiEvent &) const;
         std::shared_ptr<Track> getTrackForEvent(const MidiEvent &) const;

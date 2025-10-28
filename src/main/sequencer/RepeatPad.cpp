@@ -29,7 +29,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         return;
     }
 
-    using PadPressSource = mpc::sampler::Program::PadPressSource;
+    using NoteEventSource = mpc::sampler::Program::NoteEventSource;
 
     auto sequencer = mpc.getSequencer();
     auto track = sequencer->getActiveTrack();
@@ -157,8 +157,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                 DrumNoteEventHandler::noteOn(ctx);
 
-                program->registerPadPress(programPadIndex, noteEvent->getVelocity(),
-                                          PadPressSource::GENERATED);
+                program->registerNonMidiNoteOn(note, noteEvent->getVelocity(), programPadIndex,
+                                          NoteEventSource::GENERATED);
             }
 
             if (track->getDeviceIndex() > 0)
@@ -191,8 +191,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                             DrumNoteEventHandler::noteOff(ctx);
 
-                            program->registerPadRelease(
-                                programPadIndex, PadPressSource::GENERATED);
+                            program->registerNonMidiNoteOff(note,
+                                programPadIndex, NoteEventSource::GENERATED);
                         }
 
                         if (track->getDeviceIndex() > 0)

@@ -1,16 +1,21 @@
 #pragma once
 
-#include "MpcSpecs.hpp"
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
 #include <memory>
+#include <optional>
+#include <unordered_map>
+#include <array>
+#include <vector>
+#include <string>
+#include <utility> // for std::pair
 
 namespace mpc::engine
 {
     class StereoMixer;
     class IndivFxMixer;
-} // namespace mpc::engine
+}
 
 namespace mpc
 {
@@ -33,7 +38,7 @@ namespace mpc::sampler
 
         int getPadIndexFromNote(int note);
 
-        enum class PadPressSource : uint8_t
+        enum class NoteEventSource : uint8_t
         {
             PHYSICAL = 0,
             SEQUENCED = 1,
@@ -42,21 +47,27 @@ namespace mpc::sampler
             COUNT
         };
 
-        bool isPadPressedBySource(int padIndex, PadPressSource source);
-
+        bool isPadPressedBySource(int padIndex, NoteEventSource source);
         int getPressedPadAfterTouchOrVelocity(int padIndex);
-
-        void registerPadPress(int padIndex, int velocity, PadPressSource source);
-
-        void registerPadRelease(int padIndex, PadPressSource source);
-
-        void registerPadAfterTouch(int padIndex, int afterTouch);
-
         bool isPadRegisteredAsPressed(int padIndex) const;
-
         bool isAnyPadRegisteredAsPressed() const;
+        void clearActiveNoteRegistry();
 
-        void clearPressedPadRegistry();
+        // --- Registration (MIDI-aware)
+        void registerMidiNoteOn(int midiChannel, int noteNumber, int velocity,
+                                int programPadIndex, NoteEventSource source);
+        void registerMidiNoteOff(int midiChannel, int noteNumber,
+                                 int programPadIndex, NoteEventSource source);
+        void registerMidiNoteAfterTouch(int midiChannel, int noteNumber,
+                                        int afterTouch, int programPadIndex);
+
+        // --- Registration (non-MIDI)
+        void registerNonMidiNoteOn(int noteNumber, int velocity,
+                                   int programPadIndex, NoteEventSource source);
+        void registerNonMidiNoteOff(int noteNumber, int programPadIndex,
+                                    NoteEventSource source);
+        void registerNonMidiNoteAfterTouch(int noteNumber, int afterTouch,
+                                           int programPadIndex);
 
     private:
         Sampler *sampler = nullptr;
@@ -68,25 +79,52 @@ namespace mpc::sampler
 
         void init();
 
-        inline constexpr size_t sourceIndex(PadPressSource s)
-        {
+        inline constexpr size_t sourceIndex(NoteEventSource s) {
             return static_cast<size_t>(s);
         }
 
-        struct PadPressState
-        {
+        struct ActiveNoteState {
             int totalCount = 0;
-            std::array<int, static_cast<size_t>(PadPressSource::COUNT)>
-                sourceCount{};
-
+            std::array<int, static_cast<size_t>(NoteEventSource::COUNT)> sourceCount{};
             int velocity = 0;
-            // In case of multiple sources, we only remember the most recently received
-            // aftertouch for this pad press.
             std::optional<int> mostRecentAftertouch = std::nullopt;
+            int note = -1;
+            int padIndex = -1;
         };
 
-        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
-            pressedPadRegistry{};
+        inline void updateState(ActiveNoteState &state, int velocity, std::optional<int> afterTouch) {
+            if (velocity >= 0)
+                state.velocity = velocity;
+            if (afterTouch.has_value())
+                state.mostRecentAftertouch = afterTouch;
+        }
+
+        inline void incrementState(ActiveNoteState &s, NoteEventSource src, int velocity)
+        {
+            s.totalCount++;
+            s.sourceCount[sourceIndex(src)]++;
+            s.velocity = velocity;
+            s.mostRecentAftertouch.reset();
+        }
+
+        inline void decrementState(ActiveNoteState &s, NoteEventSource src)
+        {
+            if (s.totalCount > 0)
+                s.totalCount--;
+            auto &count = s.sourceCount[sourceIndex(src)];
+            if (count > 0)
+                count--;
+            if (s.totalCount == 0)
+            {
+                s.sourceCount.fill(0);
+                s.mostRecentAftertouch.reset();
+                s.padIndex = -1;
+                s.note = -1;
+            }
+        }
+
+        std::array<ActiveNoteState, 128> noteRegistry{};
+        std::array<ActiveNoteState, 64> padRegistry{};
 
     public:
         int getNumberOfSamples();
@@ -103,8 +141,8 @@ namespace mpc::sampler
         int getNoteFromPad(int i);
         std::vector<int> getPadIndicesFromNote(const int note);
 
-    public:
         Program(mpc::Mpc &mpc, mpc::sampler::Sampler *samplerToUse);
         ~Program();
     };
 } // namespace mpc::sampler
+

@@ -5,7 +5,9 @@
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
+#include "MpcSpecs.hpp"
+
 #include <stdexcept>
 
 using namespace mpc::sampler;
@@ -183,71 +185,125 @@ Program::~Program()
     }
 }
 
-bool Program::isPadPressedBySource(int padIndex, PadPressSource source)
+bool Program::isPadPressedBySource(int padIndex, NoteEventSource source)
 {
-    return pressedPadRegistry[padIndex].sourceCount[sourceIndex(source)] > 0;
+    if (padIndex < 0 || padIndex >= static_cast<int>(padRegistry.size()))
+        return false;
+    const auto &state = padRegistry[padIndex];
+    return state.sourceCount[sourceIndex(source)] > 0;
 }
 
 int Program::getPressedPadAfterTouchOrVelocity(int padIndex)
 {
-    if (!isPadRegisteredAsPressed(padIndex))
-    {
-        throw std::invalid_argument("The queried pad must be pressed");
-    }
+    if (padIndex < 0 || padIndex >= static_cast<int>(padRegistry.size()))
+        throw std::invalid_argument("Invalid pad index");
 
-    return pressedPadRegistry[padIndex].mostRecentAftertouch.value_or(pressedPadRegistry[padIndex].velocity);
-}
+    const auto &state = padRegistry[padIndex];
+    if (state.totalCount == 0)
+        throw std::invalid_argument("Queried pad must be pressed");
 
-void Program::registerPadPress(int padIndex, int velocity, PadPressSource source)
-{
-    auto &pad = pressedPadRegistry[padIndex];
-    pad.totalCount++;
-    pad.velocity = velocity;
-    pad.sourceCount[sourceIndex(source)]++;
-}
-
-void Program::registerPadAfterTouch(int padIndex, int afterTouch)
-{
-    auto &pad = pressedPadRegistry[padIndex];
-    pad.mostRecentAftertouch = afterTouch;
-}
-
-void Program::registerPadRelease(int padIndex, PadPressSource source)
-{
-    auto &pad = pressedPadRegistry[padIndex];
-    if (pad.totalCount > 0)
-    {
-        pad.totalCount--;
-    }
-    auto &srcCount = pad.sourceCount[sourceIndex(source)];
-    if (srcCount > 0)
-    {
-        srcCount--;
-    }
+    return state.mostRecentAftertouch.value_or(state.velocity);
 }
 
 bool Program::isPadRegisteredAsPressed(int padIndex) const
 {
-    return pressedPadRegistry[padIndex].totalCount > 0;
+    if (padIndex < 0 || padIndex >= static_cast<int>(padRegistry.size()))
+        return false;
+    return padRegistry[padIndex].totalCount > 0;
 }
 
 bool Program::isAnyPadRegisteredAsPressed() const
 {
-    for (const auto &pad : pressedPadRegistry)
-    {
-        if (pad.totalCount > 0)
-        {
+    for (const auto &s : padRegistry)
+        if (s.totalCount > 0)
             return true;
-        }
-    }
     return false;
 }
 
-void Program::clearPressedPadRegistry()
+void Program::clearActiveNoteRegistry()
 {
-    for (auto &pad : pressedPadRegistry)
+    for (auto &s : noteRegistry)
     {
-        pad.totalCount = 0;
-        pad.sourceCount.fill(0);
+        s.totalCount = 0;
+        s.sourceCount.fill(0);
+        s.mostRecentAftertouch.reset();
+        s.velocity = 0;
+        s.padIndex = -1;
+        s.note = -1;
+    }
+
+    for (auto &s : padRegistry)
+    {
+        s.totalCount = 0;
+        s.sourceCount.fill(0);
+        s.mostRecentAftertouch.reset();
+        s.velocity = 0;
+        s.padIndex = -1;
+        s.note = -1;
     }
 }
+
+void Program::registerMidiNoteOn(int midiChannel, int noteNumber, int velocity,
+                                 int programPadIndex, NoteEventSource source)
+{
+    if (noteNumber >= 0 && noteNumber < 128)
+    {
+        auto &note = noteRegistry[noteNumber];
+        note.note = noteNumber;
+        note.padIndex = programPadIndex;
+        incrementState(note, source, velocity);
+    }
+
+    if (programPadIndex >= 0 && programPadIndex < static_cast<int>(padRegistry.size()))
+    {
+        auto &pad = padRegistry[programPadIndex];
+        pad.padIndex = programPadIndex;
+        pad.note = noteNumber;
+        incrementState(pad, source, velocity);
+    }
+
+    (void)midiChannel;
+}
+
+void Program::registerMidiNoteOff(int midiChannel, int noteNumber,
+                                  int programPadIndex, NoteEventSource source)
+{
+    if (noteNumber >= 0 && noteNumber < 128)
+        decrementState(noteRegistry[noteNumber], source);
+
+    if (programPadIndex >= 0 && programPadIndex < static_cast<int>(padRegistry.size()))
+        decrementState(padRegistry[programPadIndex], source);
+
+    (void)midiChannel;
+}
+
+void Program::registerMidiNoteAfterTouch(int midiChannel, int noteNumber,
+                                         int afterTouch, int programPadIndex)
+{
+    if (noteNumber >= 0 && noteNumber < 128)
+        noteRegistry[noteNumber].mostRecentAftertouch = afterTouch;
+
+    if (programPadIndex >= 0 && programPadIndex < static_cast<int>(padRegistry.size()))
+        padRegistry[programPadIndex].mostRecentAftertouch = afterTouch;
+
+    (void)midiChannel;
+}
+
+void Program::registerNonMidiNoteOn(int noteNumber, int velocity,
+                                    int programPadIndex, NoteEventSource source)
+{
+    registerMidiNoteOn(-1, noteNumber, velocity, programPadIndex, source);
+}
+
+void Program::registerNonMidiNoteOff(int noteNumber, int programPadIndex,
+                                     NoteEventSource source)
+{
+    registerMidiNoteOff(-1, noteNumber, programPadIndex, source);
+}
+
+void Program::registerNonMidiNoteAfterTouch(int noteNumber, int afterTouch,
+                                            int programPadIndex)
+{
+    registerMidiNoteAfterTouch(-1, noteNumber, afterTouch, programPadIndex);
+}
+
