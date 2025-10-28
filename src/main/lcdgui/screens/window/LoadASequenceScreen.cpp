@@ -1,7 +1,9 @@
 #include "LoadASequenceScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "lcdgui/Label.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;

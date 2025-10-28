@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 #include <Observer.hpp>
 
 #include <memory>

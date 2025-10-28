@@ -3,8 +3,6 @@
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
-#include <cstdint>
-
 using namespace mpc::file::aps;
 using namespace mpc::engine;
 

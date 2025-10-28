@@ -23,11 +23,12 @@
 
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
-#include "lcdgui/screens/window/LoadAProgramScreen.hpp"
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 
 #include <StrUtil.hpp>
 #include <stdexcept>
+
+#include "Logger.hpp"
 
 using namespace mpc::disk;
 

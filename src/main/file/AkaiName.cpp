@@ -1,7 +1,6 @@
 #include "AkaiName.hpp"
 #include <StrUtil.hpp>
 
-#include <cmath>
 #include <algorithm>
 
 #include <Logger.hpp>

@@ -5,6 +5,7 @@
 #include "nvram/MidiControlPersistence.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "NameScreen.hpp"
+#include "lcdgui/Label.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;

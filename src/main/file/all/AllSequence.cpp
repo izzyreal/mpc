@@ -12,13 +12,10 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
 
 #include "file/ByteUtil.hpp"
 #include <StrUtil.hpp>
 #include <Util.hpp>
-
-#include <cmath>
 
 #ifdef __linux__
 #include <climits>

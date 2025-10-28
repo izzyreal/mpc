@@ -1,5 +1,6 @@
 #include "TrimScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"

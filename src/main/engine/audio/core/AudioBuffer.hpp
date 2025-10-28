@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include <memory>
-
 namespace mpc::engine::audio::core
 {
     class AudioBuffer : public FloatSampleBuffer

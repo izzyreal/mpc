@@ -1,7 +1,5 @@
 #include "MonoResampler.hpp"
 
-#include <cmath>
-
 using namespace mpc::audiomidi;
 
 MonoResampler::MonoResampler()

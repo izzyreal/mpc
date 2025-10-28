@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <engine/audio/core/AudioBuffer.hpp>
 
 namespace mpc::engine::audio::core

@@ -10,8 +10,6 @@
 #include <StrUtil.hpp>
 #include <utf8_decode.hpp>
 
-#include <cmath>
-
 #ifdef __linux
 #include <cstring>
 #endif

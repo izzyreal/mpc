@@ -9,6 +9,8 @@
 
 #include <util/RemovableVolumes.h>
 
+#include "Logger.hpp"
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::nvram;

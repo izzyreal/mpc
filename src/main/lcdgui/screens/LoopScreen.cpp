@@ -9,6 +9,8 @@
 
 #include <climits>
 
+#include "StrUtil.hpp"
+
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;

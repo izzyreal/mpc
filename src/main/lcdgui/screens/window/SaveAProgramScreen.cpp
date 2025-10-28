@@ -7,6 +7,7 @@
 
 #include <Util.hpp>
 #include "disk/AbstractDisk.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
@@ -68,7 +69,7 @@ void SaveAProgramScreen::function(int i)
 
             if (disk->checkExists(fileName))
             {
-                auto replaceAction = [this, disk, fileName, program]
+                auto replaceAction = [disk, fileName, program]
                 {
                     auto success = disk->getFile(fileName)->del();
 

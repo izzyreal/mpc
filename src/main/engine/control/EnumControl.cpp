@@ -1,7 +1,6 @@
 #include "engine/control/EnumControl.hpp"
 
 #include <utility>
-#include <vector>
 #include <string>
 
 using namespace mpc::engine::control;

@@ -26,6 +26,7 @@
 #include <set>
 #include <stdexcept>
 
+#include "Logger.hpp"
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "hardware/Hardware.hpp"

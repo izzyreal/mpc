@@ -15,7 +15,6 @@
 #include "file/all/AllSequencer.hpp"
 #include "file/all/AllSong.hpp"
 
-#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
 #include "file/ByteUtil.hpp"

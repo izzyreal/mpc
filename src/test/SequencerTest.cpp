@@ -13,9 +13,6 @@
 
 #include "sequencer/Track.hpp"
 
-#include "file/all/Defaults.hpp"
-
-#include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
 using namespace mpc::sequencer;

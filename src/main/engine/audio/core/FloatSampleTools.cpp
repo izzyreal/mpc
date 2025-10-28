@@ -3,7 +3,6 @@
 #include "engine/audio/core/Encoding.hpp"
 #include "engine/audio/core/AudioFormat.hpp"
 
-#include <cstdio>
 #include <cstdlib>
 
 using namespace mpc::engine::audio::core;

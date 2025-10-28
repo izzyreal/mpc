@@ -1,5 +1,7 @@
 #include "SoundScreen.hpp"
 
+#include "StrUtil.hpp"
+#include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;

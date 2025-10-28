@@ -16,7 +16,6 @@
 #include "midi/event/meta/Text.hpp"
 #include "midi/event/meta/TimeSignatureEvent.hpp"
 #include "midi/event/meta/TrackName.hpp"
-#include "midi/util/VariableLengthInt.hpp"
 
 using namespace mpc::midi::event::meta;
 

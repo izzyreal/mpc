@@ -4,8 +4,11 @@
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
 #include <Util.hpp>
+
+#include "StrUtil.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/AbstractDisk.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;

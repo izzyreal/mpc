@@ -2,6 +2,7 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "disk/AbstractDisk.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

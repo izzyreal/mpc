@@ -7,8 +7,6 @@
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
 
-#include <cmath>
-
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 

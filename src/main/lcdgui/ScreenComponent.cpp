@@ -8,13 +8,10 @@
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
-
-#include "command/context/TriggerDrumContextFactory.hpp"
 
 #include <stdexcept>
 

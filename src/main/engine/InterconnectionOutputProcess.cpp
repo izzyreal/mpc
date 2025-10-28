@@ -2,8 +2,6 @@
 
 #include "engine/audio/core/AudioBuffer.hpp"
 
-#include "engine/audio/mixer/MixerControlsFactory.hpp"
-
 using namespace mpc::engine;
 
 InterconnectionOutputProcess::InterconnectionOutputProcess(

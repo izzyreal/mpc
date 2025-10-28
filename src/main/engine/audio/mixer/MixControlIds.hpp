@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstdint>
-
 namespace mpc::engine::audio::mixer
 {
 

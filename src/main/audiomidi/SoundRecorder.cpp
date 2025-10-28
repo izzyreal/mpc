@@ -6,8 +6,6 @@
 
 #include <SampleOps.hpp>
 
-#include <cmath>
-
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;

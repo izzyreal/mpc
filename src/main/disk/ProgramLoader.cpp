@@ -3,12 +3,10 @@
 #include <Mpc.hpp>
 
 #include "disk/AbstractDisk.hpp"
-#include "disk/StdDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/PgmFileToProgramConverter.hpp"
 #include "disk/SoundLoader.hpp"
 #include "sampler/Program.hpp"
-#include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/window/LoadAProgramScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"

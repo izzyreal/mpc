@@ -4,8 +4,6 @@
 
 #include "Bressenham.hpp"
 
-#include <cmath>
-
 using namespace mpc::lcdgui;
 
 Wave::Wave() : Component("wave")

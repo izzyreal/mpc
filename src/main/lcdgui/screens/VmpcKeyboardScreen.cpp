@@ -6,12 +6,6 @@
 
 #include "lcdgui/Parameter.hpp"
 #include "lcdgui/Label.hpp"
-#include "lcdgui/Field.hpp"
-
-#include "controller/ClientEventController.hpp"
-#include "input/KeyCodeHelper.hpp"
-
-#include <StrUtil.hpp>
 
 #include "input/KeyCodeHelper.hpp"
 

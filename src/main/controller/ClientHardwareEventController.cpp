@@ -12,7 +12,6 @@
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
-#include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"

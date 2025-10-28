@@ -1,12 +1,9 @@
 #pragma once
-#include "Parameter.hpp"
 #include "Component.hpp"
-#include "Info.hpp"
 #include "Background.hpp"
 #include "FunctionKeys.hpp"
 
 #include <string>
-#include <memory>
 
 namespace mpc::lcdgui
 {

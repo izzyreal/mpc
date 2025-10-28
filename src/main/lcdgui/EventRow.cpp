@@ -25,7 +25,6 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 #include "sequencer/Bus.hpp"
 
-#include <cmath>
 #include <StrUtil.hpp>
 
 using namespace mpc::lcdgui;

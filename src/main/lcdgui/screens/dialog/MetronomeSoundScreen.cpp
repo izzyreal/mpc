@@ -7,6 +7,7 @@
 #include "Mpc.hpp"
 
 #include "lcdgui/Background.hpp"
+#include "lcdgui/Label.hpp"
 #include "sampler/Program.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;

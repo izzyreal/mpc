@@ -13,6 +13,14 @@
 
 #include <Util.hpp>
 
+#include "StrUtil.hpp"
+#include "lcdgui/FunctionKeys.hpp"
+#include "lcdgui/Label.hpp"
+
+namespace mpc::lcdgui {
+    class FunctionKey;
+}
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

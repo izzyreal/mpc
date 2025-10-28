@@ -1,5 +1,7 @@
 #include "TimeDisplayScreen.hpp"
 
+#include "StrUtil.hpp"
+
 using namespace mpc::lcdgui::screens::window;
 
 TimeDisplayScreen::TimeDisplayScreen(mpc::Mpc &mpc, const int layerIndex)

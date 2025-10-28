@@ -1,8 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <memory>
-
 namespace mpc::lcdgui::screens::window
 {
     class StartFineScreen;

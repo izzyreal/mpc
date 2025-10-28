@@ -2,13 +2,10 @@
 
 #include "EventAfterNFrames.hpp"
 
-#include <engine/audio/server/AudioClient.hpp>
-
 #include <sequencer/LegacyClock.hpp>
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>
-#include <utility>
 #include <vector>
 #include <functional>
 #include <atomic>

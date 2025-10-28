@@ -6,8 +6,6 @@
 #include "midi/event/meta/MetaEvent.hpp"
 #include "midi/util/VariableLengthInt.hpp"
 
-#include <cmath>
-
 using namespace mpc::midi::event::meta;
 
 TimeSignature::TimeSignature()

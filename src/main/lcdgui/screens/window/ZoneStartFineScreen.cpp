@@ -1,5 +1,6 @@
 #include "ZoneStartFineScreen.hpp"
 #include "hardware/Hardware.hpp"
+#include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/ZoneScreen.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"

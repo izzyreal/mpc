@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <cstdint>
 
 namespace mpc::engine::midi
 {

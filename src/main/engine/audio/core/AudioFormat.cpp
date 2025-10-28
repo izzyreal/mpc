@@ -1,7 +1,5 @@
 #include "engine/audio/core/AudioFormat.hpp"
 
-#include <cmath>
-
 using namespace mpc::engine::audio::core;
 using namespace std;
 

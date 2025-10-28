@@ -2,11 +2,6 @@
 
 #include "nvram/MidiControlPersistence.hpp"
 
-#include "disk/AbstractDisk.hpp"
-#include "disk/MpcFile.hpp"
-
-#include "file/all/AllParser.hpp"
-
 #include "lcdgui/screens/window/SaveASoundScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;

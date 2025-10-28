@@ -1,6 +1,8 @@
 #include "MidiOutputScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "audiomidi/MidiOutput.hpp"
+#include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 #include "sequencer/Track.hpp"

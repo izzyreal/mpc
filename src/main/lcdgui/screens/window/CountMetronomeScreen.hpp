@@ -1,7 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <memory>
 #include <vector>
 #include <string>
 

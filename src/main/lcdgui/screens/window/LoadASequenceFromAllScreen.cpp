@@ -1,5 +1,6 @@
 #include "LoadASequenceFromAllScreen.hpp"
 
+#include "lcdgui/Label.hpp"
 #include "sequencer/Sequence.hpp"
 
 #include "lcdgui/screens/window/LoadASequenceScreen.hpp"

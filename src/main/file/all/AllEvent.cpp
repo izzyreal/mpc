@@ -19,7 +19,6 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 
 #include <cassert>
-#include <cmath>
 
 #include "file/BitUtil.hpp"
 #include "file/ByteUtil.hpp"

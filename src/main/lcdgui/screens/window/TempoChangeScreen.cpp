@@ -9,6 +9,9 @@
 
 #include <Util.hpp>
 
+#include "StrUtil.hpp"
+#include "lcdgui/Label.hpp"
+
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 

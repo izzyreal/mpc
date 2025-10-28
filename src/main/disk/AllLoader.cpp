@@ -1,9 +1,9 @@
 #include "AllLoader.hpp"
 
 #include <Mpc.hpp>
+
+#include "StrUtil.hpp"
 #include "file/all/AllParser.hpp"
-#include "file/all/Bar.hpp"
-#include "file/all/BarList.hpp"
 #include "file/all/Count.hpp"
 #include "file/all/Defaults.hpp"
 #include "file/all/MidiInput.hpp"
@@ -13,8 +13,6 @@
 #include "file/all/SequenceNames.hpp"
 #include "file/all/AllSequencer.hpp"
 #include "file/all/AllSong.hpp"
-#include "file/all/Tracks.hpp"
-#include "file/all/Header.hpp"
 
 #include "disk/MpcFile.hpp"
 
@@ -22,7 +20,6 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"

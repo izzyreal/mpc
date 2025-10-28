@@ -1,10 +1,12 @@
 #include "MultiRecordingSetupLine.hpp"
 
+#include <algorithm>
+
 using namespace mpc::lcdgui::screens::window;
 
-void MultiRecordingSetupLine::setIn(int in)
+void MultiRecordingSetupLine::setIn(int inToUse)
 {
-    this->in = in;
+    in = inToUse;
 }
 
 int MultiRecordingSetupLine::getIn()

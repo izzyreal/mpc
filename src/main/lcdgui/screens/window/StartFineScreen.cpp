@@ -1,5 +1,6 @@
 #include "StartFineScreen.hpp"
 #include "hardware/Hardware.hpp"
+#include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/TrimScreen.hpp"
 

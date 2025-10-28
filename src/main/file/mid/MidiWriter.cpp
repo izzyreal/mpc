@@ -18,7 +18,6 @@
 #include "midi/event/meta/Text.hpp"
 #include "midi/event/meta/TimeSignatureEvent.hpp"
 #include "midi/event/meta/TrackName.hpp"
-#include <Util.hpp>
 #include "disk/AbstractDisk.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"

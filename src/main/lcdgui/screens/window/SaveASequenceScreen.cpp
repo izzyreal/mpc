@@ -6,6 +6,7 @@
 #include <Util.hpp>
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;

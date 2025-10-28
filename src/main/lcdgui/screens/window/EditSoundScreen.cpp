@@ -1,4 +1,7 @@
 #include "EditSoundScreen.hpp"
+
+#include "StrUtil.hpp"
+#include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
 
 #include "sampler/TimeStretch1.hpp"

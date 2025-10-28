@@ -3,7 +3,6 @@
 #include <engine/audio/core/AudioProcessAdapter.hpp>
 #include <engine/audio/core/AudioBuffer.hpp>
 
-#include <string>
 #include <memory>
 
 namespace mpc

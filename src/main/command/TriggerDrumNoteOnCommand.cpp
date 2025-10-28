@@ -8,7 +8,6 @@
 #include "sequencer/Sequencer.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 #include "sampler/Program.hpp"
-#include "sampler/Pad.hpp"
 #include "Util.hpp"
 
 using namespace mpc::command;

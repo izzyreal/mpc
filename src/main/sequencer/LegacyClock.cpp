@@ -1,5 +1,7 @@
 #include "sequencer/LegacyClock.hpp"
 
+#include <cmath>
+
 using namespace mpc::sequencer;
 
 const double LegacyClock::ppqn_f = 96.0;

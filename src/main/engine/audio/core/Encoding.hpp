@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <cstdint>
 
 namespace mpc::engine::audio::core
 {

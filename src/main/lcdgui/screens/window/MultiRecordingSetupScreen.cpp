@@ -1,5 +1,6 @@
 #include "MultiRecordingSetupScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 #include "sequencer/Track.hpp"

@@ -19,7 +19,6 @@
 
 #include "MpcSpecs.hpp"
 
-#include <cmath>
 #include <utility>
 
 using namespace mpc;

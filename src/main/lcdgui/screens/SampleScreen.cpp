@@ -3,8 +3,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/SoundRecorder.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
-
-#include <cmath>
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens;
 

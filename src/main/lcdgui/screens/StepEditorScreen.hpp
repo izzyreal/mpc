@@ -1,7 +1,5 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/EventRow.hpp>
-#include <lcdgui/EventRowParameters.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/EmptyEvent.hpp>

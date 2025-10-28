@@ -9,8 +9,6 @@
 #include <StrUtil.hpp>
 #include <Util.hpp>
 
-#include <cmath>
-
 using namespace mpc::file::all;
 
 Tracks::Tracks(const std::vector<char> &loadBytes)

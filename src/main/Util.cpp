@@ -2,9 +2,6 @@
 
 #include "sequencer/NoteEvent.hpp"
 
-#include <cmath>
-#include <cstdlib>
-
 #include <StrUtil.hpp>
 #include "lcdgui/screens/UserScreen.hpp"
 

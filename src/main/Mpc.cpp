@@ -21,18 +21,18 @@
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Clock.hpp"
-#include "engine/PreviewSoundPlayer.hpp"
 
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/Screens.hpp"
 
 #include "MpcResourceUtil.hpp"
-#include "hardware/ComponentId.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "controller/ClientEventController.hpp"
 
 #include <string>
+
+#include "Logger.hpp"
 
 using namespace mpc;
 using namespace mpc::lcdgui;

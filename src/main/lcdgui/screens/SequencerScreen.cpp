@@ -18,6 +18,9 @@
 #include "sequencer/SeqUtil.hpp"
 #include <Util.hpp>
 
+#include "StrUtil.hpp"
+#include "lcdgui/Label.hpp"
+
 #ifdef __linux__
 #include <climits>
 #endif

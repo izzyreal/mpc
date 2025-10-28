@@ -3,8 +3,6 @@
 #include <Util.hpp>
 #include "Bressenham.hpp"
 
-#include <cmath>
-
 using namespace mpc::lcdgui;
 
 Knob::Knob(MRECT rect) : Component("knob")

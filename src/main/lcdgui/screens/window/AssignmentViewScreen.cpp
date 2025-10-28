@@ -4,6 +4,8 @@
 
 #include <StrUtil.hpp>
 
+#include "lcdgui/Label.hpp"
+
 using namespace mpc::lcdgui::screens::window;
 
 AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc &mpc, const int layerIndex)

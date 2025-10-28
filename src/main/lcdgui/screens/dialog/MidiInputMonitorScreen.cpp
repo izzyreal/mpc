@@ -4,6 +4,7 @@
 #include "audiomidi/EventHandler.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;

@@ -5,10 +5,6 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-#include "sampler/Sampler.hpp"
-#include "sampler/Program.hpp"
-
-#include "sequencer/Bus.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 using namespace mpc::sequencer;

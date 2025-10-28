@@ -12,9 +12,6 @@
 #include "file/sndwriter/SndWriter.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
-#include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
-#include "lcdgui/screens/window/EditSoundScreen.hpp"
-#include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/Screens.hpp"
 
 #include "disk/AllLoader.hpp"

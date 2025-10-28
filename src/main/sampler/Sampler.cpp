@@ -31,6 +31,8 @@
 
 #include <samplerate.h>
 
+#include "Logger.hpp"
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;

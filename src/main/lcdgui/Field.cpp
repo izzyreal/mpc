@@ -10,11 +10,11 @@
 
 #include <stdexcept>
 
+#include "Label.hpp"
+
 #ifdef __linux__
 #include <climits>
 #endif // __linux__
-
-#include <stdexcept>
 
 using namespace mpc::lcdgui;
 

@@ -10,6 +10,8 @@
 
 #include <RtMidi.h>
 
+#include "Logger.hpp"
+
 #ifdef _WIN32
 #include <Windows.hpp>
 #endif

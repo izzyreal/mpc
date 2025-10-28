@@ -1,7 +1,5 @@
 #include "Bressenham.hpp"
 
-#include <cstdlib>
-
 using namespace mpc::lcdgui;
 using namespace std;
 

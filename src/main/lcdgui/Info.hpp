@@ -3,7 +3,6 @@
 
 #include "Component.hpp"
 
-#include <memory>
 #include <string>
 
 namespace mpc

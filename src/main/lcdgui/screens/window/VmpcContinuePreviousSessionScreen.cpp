@@ -1,6 +1,7 @@
 #include "VmpcContinuePreviousSessionScreen.hpp"
 
 #include "../VmpcAutoSaveScreen.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

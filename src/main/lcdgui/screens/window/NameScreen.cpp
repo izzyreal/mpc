@@ -1,5 +1,6 @@
 #include "NameScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/Underline.hpp"

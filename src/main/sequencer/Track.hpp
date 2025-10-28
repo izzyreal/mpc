@@ -4,7 +4,6 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteEvent.hpp"
-#include "sequencer/NoteEventStore.hpp"
 #include "Observer.hpp"
 
 #include <concurrentqueue.h>

@@ -1,5 +1,6 @@
 #include "SongWindow.hpp"
 
+#include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 

@@ -8,7 +8,6 @@
 #include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>
-#include <utility>
 #include <vector>
 #include <functional>
 #include <atomic>

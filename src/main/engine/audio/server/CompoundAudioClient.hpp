@@ -3,7 +3,6 @@
 #include <engine/audio/server/AudioClient.hpp>
 
 #include <vector>
-#include <memory>
 
 namespace mpc::engine::audio::server
 {

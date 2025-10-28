@@ -2,8 +2,6 @@
 #include "StereoInputProcess.hpp"
 #include "StereoOutputProcess.hpp"
 
-#include <cmath>
-
 using namespace mpc::engine::audio::server;
 using namespace std;
 

@@ -1,5 +1,7 @@
 #include "controller/ClientMidiSequencerController.hpp"
 
+#include <iostream>
+
 using namespace mpc::controller;
 using namespace mpc::client::event;
 

@@ -1,7 +1,7 @@
 #include "ChannelSettingsScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
-#include "sampler/Pad.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/MixerScreen.hpp"

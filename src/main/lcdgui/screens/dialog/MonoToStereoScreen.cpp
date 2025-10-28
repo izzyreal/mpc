@@ -4,6 +4,13 @@
 
 #include <memory>
 
+#include "StrUtil.hpp"
+#include "lcdgui/FunctionKeys.hpp"
+
+namespace mpc::lcdgui {
+    class FunctionKey;
+}
+
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;

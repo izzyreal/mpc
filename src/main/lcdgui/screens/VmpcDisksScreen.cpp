@@ -6,10 +6,9 @@
 #include "disk/DiskController.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/RawDisk.hpp"
-#include "disk/StdDisk.hpp"
 #include "nvram/VolumesPersistence.hpp"
 
-#include <StrUtil.hpp>
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;

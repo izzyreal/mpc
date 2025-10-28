@@ -6,7 +6,6 @@
 #include "file/pgmwriter/Pads.hpp"
 #include "engine/StereoMixer.hpp"
 #include "sampler/Program.hpp"
-#include "sampler/Pad.hpp"
 
 #include <StrUtil.hpp>
 #include <Util.hpp>

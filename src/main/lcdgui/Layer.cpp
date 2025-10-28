@@ -1,6 +1,5 @@
 #include "Layer.hpp"
 #include "Field.hpp"
-#include "Label.hpp"
 
 #include "ScreenComponent.hpp"
 

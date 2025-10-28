@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.hpp"
 
-#include <memory>
 #include <vector>
 
 namespace mpc

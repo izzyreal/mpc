@@ -1,5 +1,7 @@
 #include "LocateScreen.hpp"
 
+#include "StrUtil.hpp"
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 

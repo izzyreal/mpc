@@ -2,8 +2,6 @@
 
 #include "TextComp.hpp"
 
-#include <memory>
-#include <cstdint>
 #include <string>
 #include <vector>
 

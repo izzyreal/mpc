@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "Logger.hpp"
+#include "StrUtil.hpp"
 #include "sequencer/Track.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/window/SaveAllFileScreen.hpp"
@@ -9,6 +11,8 @@
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/Volume.hpp"
+#include "lcdgui/FunctionKeys.hpp"
+#include "lcdgui/Label.hpp"
 #include "nvram/VolumesPersistence.hpp"
 
 using namespace mpc::lcdgui::screens;

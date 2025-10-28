@@ -2,7 +2,6 @@
 
 #include "Mpc.hpp"
 
-#include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -13,8 +12,6 @@
 #include "sequencer/Song.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
-
-#include <cmath>
 
 using namespace mpc::sequencer;
 

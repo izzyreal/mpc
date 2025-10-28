@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <string>
-#include <cstdint>
 #include <functional>
 
 namespace mpc ::lcdgui

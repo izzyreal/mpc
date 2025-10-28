@@ -11,8 +11,6 @@
 #include "engine/control/EnumControl.hpp"
 #include "engine/control/BooleanControl.hpp"
 
-#include <cmath>
-
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;
 using namespace mpc::engine;

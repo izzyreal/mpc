@@ -8,9 +8,7 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
 #include <cstdint>
-#include <cmath>
 
 #include "bitmap.hpp"
 

@@ -15,12 +15,13 @@
 
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
-#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
 
 #include <StrUtil.hpp>
 
 #include <stdexcept>
+
+#include "Logger.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

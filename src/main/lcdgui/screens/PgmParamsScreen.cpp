@@ -1,6 +1,7 @@
 #include "PgmParamsScreen.hpp"
 
 #include "SelectDrumScreen.hpp"
+#include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 

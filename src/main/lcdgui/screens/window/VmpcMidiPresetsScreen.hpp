@@ -1,6 +1,5 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
-#include "nvram/MidiControlPersistence.hpp"
 
 #include <vector>
 #include <string>

@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "mpc_types.hpp"
-#include "sampler/PgmSlider.hpp"
 #include "sequencer/NoteEvent.hpp"
 
 namespace mpc

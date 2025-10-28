@@ -2,9 +2,7 @@
 
 #include "mpc_types.hpp"
 
-#include <memory>
 #include <vector>
-#include <string>
 
 namespace mpc
 {

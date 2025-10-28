@@ -1,11 +1,12 @@
 #include "LoadASoundScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
-#include "sampler/Pad.hpp"
 
 #include "sequencer/Track.hpp"
 
 #include "disk/MpcFile.hpp"
+#include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"

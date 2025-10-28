@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 #include <string>
-#include "engine/FaderControl.hpp"
 
 namespace mpc::engine::audio::mixer
 {

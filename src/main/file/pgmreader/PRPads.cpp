@@ -6,7 +6,6 @@
 
 #include <Util.hpp>
 
-#include <Util.hpp>
 using namespace mpc::file::pgmreader;
 
 Pads::Pads(ProgramFileReader *programFile)

@@ -9,6 +9,8 @@
 
 #include <cassert>
 
+#include "Logger.hpp"
+
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
 

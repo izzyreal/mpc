@@ -1,5 +1,6 @@
 #include "VeloPitchScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 #include "sampler/NoteParameters.hpp"
 

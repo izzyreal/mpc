@@ -13,11 +13,9 @@
 #include "engine/FaderControl.hpp"
 #include "engine/audio/mixer/MixerControls.hpp"
 
-#include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
 #include "engine/audio/mixer/AudioMixer.hpp"
-#include "engine/audio/mixer/AudioMixerBus.hpp"
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 

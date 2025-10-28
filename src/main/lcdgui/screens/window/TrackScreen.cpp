@@ -1,5 +1,6 @@
 #include "TrackScreen.hpp"
 
+#include "lcdgui/Label.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/window/NameScreen.hpp"

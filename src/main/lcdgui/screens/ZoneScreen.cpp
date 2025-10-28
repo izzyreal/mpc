@@ -1,4 +1,6 @@
 #include "ZoneScreen.hpp"
+
+#include "StrUtil.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/Layer.hpp"

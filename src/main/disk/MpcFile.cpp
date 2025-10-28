@@ -1,7 +1,5 @@
 #include "disk/MpcFile.hpp"
 
-#include <StrUtil.hpp>
-
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
 #include <Logger.hpp>

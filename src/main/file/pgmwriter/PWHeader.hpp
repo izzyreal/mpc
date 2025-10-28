@@ -1,11 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <cstdint>
 
 namespace mpc::file::pgmwriter
 {
-
     class PWHeader
     {
 

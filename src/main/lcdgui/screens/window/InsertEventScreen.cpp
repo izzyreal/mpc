@@ -3,7 +3,6 @@
 
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
-#include "sequencer/Event.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"

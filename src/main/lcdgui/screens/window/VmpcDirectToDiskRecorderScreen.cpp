@@ -1,11 +1,13 @@
 #include "VmpcDirectToDiskRecorderScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/DirectToDiskSettings.hpp"
 
 #include "sequencer/Song.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/SongScreen.hpp"
 

@@ -4,8 +4,6 @@
 #include "midi/event/SystemExclusive.hpp"
 #include "midi/event/meta/MetaEvent.hpp"
 
-#include <Logger.hpp>
-
 using namespace mpc::midi::event;
 
 MidiEvent::MidiEvent(int tick, int delta)

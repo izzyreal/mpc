@@ -9,7 +9,6 @@
 #include "lcdgui/screens/window/StepTcScreen.hpp"
 #include "lcdgui/screens/window/EditMultipleScreen.hpp"
 #include "lcdgui/screens/window/PasteEventScreen.hpp"
-#include "lcdgui/screens/window/InsertEventScreen.hpp"
 
 #include "lcdgui/Rectangle.hpp"
 
@@ -24,6 +23,10 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 
 #include <Util.hpp>
+
+#include "StrUtil.hpp"
+#include "lcdgui/EventRow.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

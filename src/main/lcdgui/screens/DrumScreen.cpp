@@ -1,6 +1,7 @@
 #include "DrumScreen.hpp"
 
 #include "SelectDrumScreen.hpp"
+#include "StrUtil.hpp"
 
 using namespace mpc::lcdgui::screens;
 

@@ -12,8 +12,6 @@
 #include <StrUtil.hpp>
 #include <Util.hpp>
 
-#include <cmath>
-
 using namespace mpc::file::all;
 
 SequenceNames::SequenceNames(const std::vector<char> &b)

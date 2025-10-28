@@ -1,5 +1,6 @@
 #include "PunchScreen.hpp"
 
+#include "lcdgui/Label.hpp"
 #include "sequencer/SeqUtil.hpp"
 
 using namespace mpc::lcdgui::screens;

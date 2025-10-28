@@ -6,8 +6,6 @@
 
 #include <disk/DiskController.hpp>
 
-#include <Logger.hpp>
-
 #include "Paths.hpp"
 
 #include <vector>

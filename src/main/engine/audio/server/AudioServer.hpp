@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <cstdint>
 
 namespace mpc::engine::audio::server
 {

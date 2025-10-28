@@ -1,6 +1,5 @@
 #include "DirectToDiskSettings.hpp"
 
-#include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <utility>

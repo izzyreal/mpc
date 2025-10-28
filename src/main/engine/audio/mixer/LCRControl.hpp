@@ -1,7 +1,6 @@
 #pragma once
 
 #include <engine/control/LawControl.hpp>
-#include <vector>
 #include <engine/control/ControlLaw.hpp>
 
 namespace mpc::engine::audio::mixer

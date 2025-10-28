@@ -1,5 +1,7 @@
 #include "SyncScreen.hpp"
 
+#include "lcdgui/Label.hpp"
+
 using namespace mpc::lcdgui::screens;
 
 SyncScreen::SyncScreen(mpc::Mpc &mpc, const int layerIndex)

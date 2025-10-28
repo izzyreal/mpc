@@ -1,13 +1,14 @@
 #include "LoadScreen.hpp"
 
+#include "StrUtil.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
-#include "hardware/Hardware.hpp"
 
 #include "disk/SoundLoader.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "lcdgui/screens/window/LoadASequenceScreen.hpp"
@@ -197,9 +198,9 @@ void LoadScreen::function(int i)
                     displayFile();
                     displaySize();
 
-                    auto ext =
+                    auto ext1 =
                         fs::path(getSelectedFileName()).extension().string();
-                    auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
+                    auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
                                     StrUtil::eqIgnoreCase(ext, ".wav");
                     ls->setFunctionKeysArrangement(playable ? 1 : 0);
                 }

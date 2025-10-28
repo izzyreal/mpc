@@ -1,7 +1,5 @@
 #include "PushNextSeqCommand.hpp"
 #include "Mpc.hpp"
-#include "hardware/Hardware.hpp"
-#include "Util.hpp"
 
 namespace mpc::command
 {

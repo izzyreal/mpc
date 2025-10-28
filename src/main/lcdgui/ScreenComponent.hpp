@@ -4,13 +4,9 @@
 
 #include "Screens.hpp"
 #include "Field.hpp"
-#include "Label.hpp"
-#include "FunctionKeys.hpp"
 #include "Background.hpp"
 #include "Wave.hpp"
 #include "EnvGraph.hpp"
-
-#include <StrUtil.hpp>
 
 #include <memory>
 #include <string>

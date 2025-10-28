@@ -5,6 +5,8 @@
 
 #include <Util.hpp>
 
+#include "StrUtil.hpp"
+
 using namespace mpc::lcdgui::screens;
 
 SongScreen::SongScreen(mpc::Mpc &mpc, const int layerIndex)

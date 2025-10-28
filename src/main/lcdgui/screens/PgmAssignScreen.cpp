@@ -1,8 +1,10 @@
 #include "PgmAssignScreen.hpp"
 
 #include "SelectDrumScreen.hpp"
+#include "StrUtil.hpp"
 
 #include "controller/ClientEventController.hpp"
+#include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
 
 using namespace mpc::lcdgui::screens;

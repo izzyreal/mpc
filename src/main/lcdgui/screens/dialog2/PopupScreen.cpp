@@ -1,6 +1,5 @@
 #include "PopupScreen.hpp"
 
-#include "lcdgui/Background.hpp"
 #include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens::dialog2;

@@ -1,8 +1,6 @@
 #include "StateVariableFilter.hpp"
 #include "StateVariableFilterElement.hpp"
 
-#include <cmath>
-
 using namespace mpc::engine::filter;
 
 StateVariableFilter::StateVariableFilter(FilterControls *variables)

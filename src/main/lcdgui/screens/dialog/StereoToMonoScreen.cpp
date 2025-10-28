@@ -1,6 +1,12 @@
 #include "StereoToMonoScreen.hpp"
 
+#include "StrUtil.hpp"
+#include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+
+namespace mpc::lcdgui {
+    class FunctionKey;
+}
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;

@@ -5,7 +5,6 @@
 #include <Mpc.hpp>
 
 #include "audiomidi/AudioMidiServices.hpp"
-#include "audiomidi/MidiOutput.hpp"
 
 #include "engine/Voice.hpp"
 #include "hardware/Hardware.hpp"
@@ -25,7 +24,6 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
-#include "sequencer/Clock.hpp"
 
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 

@@ -5,6 +5,8 @@
 
 #include <SampleOps.hpp>
 
+#include "file/ByteUtil.hpp"
+
 using namespace mpc::file::sndreader;
 using namespace mpc::sampleops;
 

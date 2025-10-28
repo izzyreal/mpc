@@ -2,9 +2,10 @@
 
 #include "lcdgui/screens/EventsScreen.hpp"
 
-#include "nvram/NvRam.hpp"
-
 #include <Util.hpp>
+
+#include "StrUtil.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui::screens;
 

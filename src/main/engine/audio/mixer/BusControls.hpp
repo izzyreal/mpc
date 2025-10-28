@@ -3,7 +3,6 @@
 #include <engine/audio/core/AudioControls.hpp>
 
 #include <string>
-#include <memory>
 
 namespace mpc::engine::audio::mixer
 {

@@ -2,7 +2,6 @@
 
 #include <ios>
 #include <vector>
-#include <cmath>
 
 #include <ghc/filesystem.hpp>
 #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) ||                         \
@@ -21,7 +20,6 @@ namespace fs = std::filesystem;
 #endif
 
 #ifndef GHC_USE_STD_FS
-#include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 #endif
 

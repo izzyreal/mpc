@@ -1,5 +1,7 @@
 #include "DeleteProgramScreen.hpp"
 
+#include "StrUtil.hpp"
+
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 

@@ -1,9 +1,6 @@
 #include "StateVariableFilterControls.hpp"
 #include "engine/control/Control.hpp"
-#include "engine/control/LawControl.hpp"
 #include "engine/control/LinearLaw.hpp"
-
-#include <cmath>
 
 using namespace mpc::engine::filter;
 using namespace std;

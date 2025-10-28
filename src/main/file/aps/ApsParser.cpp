@@ -4,7 +4,6 @@
 
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
-#include "sampler/Pad.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 

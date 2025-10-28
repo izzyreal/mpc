@@ -1,8 +1,6 @@
 #pragma once
 #include <sequencer/Event.hpp>
 
-#include <memory>
-
 namespace mpc::sequencer
 {
     class ControlChangeEvent : public Event

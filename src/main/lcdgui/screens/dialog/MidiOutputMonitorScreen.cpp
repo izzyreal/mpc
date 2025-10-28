@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 #include "audiomidi/EventHandler.hpp"
+#include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;

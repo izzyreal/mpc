@@ -1,5 +1,7 @@
 #include "CopyProgramScreen.hpp"
 
+#include "StrUtil.hpp"
+
 using namespace mpc::lcdgui::screens::dialog;
 
 CopyProgramScreen::CopyProgramScreen(mpc::Mpc &mpc, const int layerIndex)

@@ -1,4 +1,6 @@
 #include "VelocityModulationScreen.hpp"
+
+#include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 
 using namespace mpc::lcdgui::screens::window;

@@ -355,6 +355,6 @@ TEST_CASE("1 bar loop", "[clock]")
         timeInSamples += blockSizes[i];
     }
 
-    printf("highestTickPos: %i, cumulativeTickPos: %i\n", highestTickPos,
+    printf("highestTickPos: %llu, cumulativeTickPos: %llu\n", highestTickPos,
            cumulativeTickPos);
 }
