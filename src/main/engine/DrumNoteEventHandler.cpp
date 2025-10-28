@@ -124,7 +124,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
         std::dynamic_pointer_cast<MainMixControls>(mainStrip->find("Main"));
 
     std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))
-        ->setValue(static_cast<float>(smc->getPanning() / PAN_SCALE));
+        ->setValue(static_cast<float>(smc->getPanning()) / PAN_SCALE);
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(smc->getLevel()));
 
@@ -177,7 +177,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
     if (!sound->isLoopEnabled() &&
         np->getVoiceOverlapMode() == VoiceOverlapMode::MONO)
     {
-        for (auto &v : *c.voices)
+        for (const auto &v : *c.voices)
         {
             if (v->getNoteParameters() == np && v->getNote() == c.note)
             {
@@ -233,7 +233,7 @@ void DrumNoteEventHandler::noteOff(const DrumNoteOffContext &c)
 
     auto startDecayForNote = [&](int noteToStop, uint64_t noteEventId)
     {
-        for (auto &voice : *c.voices)
+        for (const auto &voice : *c.voices)
         {
             if (!voice->isFinished() &&
                 voice->getStartTick() == c.noteOnStartTick &&

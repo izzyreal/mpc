@@ -1,13 +1,25 @@
 #pragma once
 
+#include <memory>
 #include <functional>
 #include <cstdint>
+
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+
+namespace mpc::sampler
+{
+    class Program;
+}
 
 namespace mpc::sequencer
 {
     class NoteOnEventPlayOnly;
     class NoteOnEvent;
     class Track;
+    class DrumBus;
 } // namespace mpc::sequencer
 
 namespace mpc::audiomidi
@@ -17,12 +29,12 @@ namespace mpc::audiomidi
 
 namespace mpc::command::context
 {
-
-    // Should be renamed to ReleaseProgramPad or similar, because we're not
-    // dealing with hardware pad indices from 1 to 16 here, but with the 64 pads
-    // of a program.
     struct TriggerDrumNoteOffContext
     {
+        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        std::shared_ptr<sequencer::DrumBus> drumBus;
+        std::shared_ptr<sampler::Program> program;
+        int programPadIndex;
         std::function<void()> finishBasicVoiceIfSoundIsLooping;
         const bool currentScreenIsSoundScreen;
         const bool currentScreenIsSamplerScreen;

@@ -1265,33 +1265,3 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSortedSounds()
 
     return getSoundsSortedBySize();
 }
-
-void Sampler::clearAllProgramPadPressRegistries()
-{
-    for (auto &program : programs)
-    {
-        if (!program)
-        {
-            continue;
-        }
-        program->clearPressedPadRegistry();
-    }
-}
-
-bool Sampler::isAnyProgramPadRegisteredAsPressed() const
-{
-    for (auto &p : programs)
-    {
-        if (!p)
-        {
-            continue;
-        }
-
-        if (p->isAnyPadRegisteredAsPressed())
-        {
-            return true;
-        }
-    }
-
-    return false;
-}

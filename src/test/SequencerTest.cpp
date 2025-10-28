@@ -165,7 +165,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
                     auto noteOffCtx = TriggerDrumContextFactory::
                         buildTriggerDrumNoteOffContext(
-                            mpc, 0, screen->getDrumIndex(), screen);
+                            mpc, 0, screen->getDrumIndex(), screen, 60);
                     TriggerDrumNoteOffCommand(noteOffCtx).execute();
                 }
             }
@@ -268,7 +268,7 @@ TEST_CASE("Undo", "[sequencer]")
         {
             auto noteOffCtx =
                 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-                    mpc, 0, screen->getDrumIndex(), screen);
+                    mpc, 0, screen->getDrumIndex(), screen, 60);
             TriggerDrumNoteOffCommand(noteOffCtx).execute();
         }
 

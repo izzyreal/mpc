@@ -1,6 +1,5 @@
 #pragma once
 
-#include "MpcSpecs.hpp"
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
@@ -33,31 +32,6 @@ namespace mpc::sampler
 
         int getPadIndexFromNote(int note);
 
-        enum class PadPressSource : uint8_t
-        {
-            PHYSICAL = 0,
-            SEQUENCED = 1,
-            MIDI = 2,
-            GENERATED = 3,
-            COUNT
-        };
-
-        bool isPadPressedBySource(int padIndex, PadPressSource source);
-
-        int getPressedPadAfterTouchOrVelocity(int padIndex);
-
-        void registerPadPress(int padIndex, int velocity, PadPressSource source);
-
-        void registerPadRelease(int padIndex, PadPressSource source);
-
-        void registerPadAfterTouch(int padIndex, int afterTouch);
-
-        bool isPadRegisteredAsPressed(int padIndex) const;
-
-        bool isAnyPadRegisteredAsPressed() const;
-
-        void clearPressedPadRegistry();
-
     private:
         Sampler *sampler = nullptr;
         std::string name;
@@ -67,26 +41,6 @@ namespace mpc::sampler
         int midiProgramChange = 0;
 
         void init();
-
-        inline constexpr size_t sourceIndex(PadPressSource s)
-        {
-            return static_cast<size_t>(s);
-        }
-
-        struct PadPressState
-        {
-            int totalCount = 0;
-            std::array<int, static_cast<size_t>(PadPressSource::COUNT)>
-                sourceCount{};
-
-            int velocity = 0;
-            // In case of multiple sources, we only remember the most recently received
-            // aftertouch for this pad press.
-            std::optional<int> mostRecentAftertouch = std::nullopt;
-        };
-
-        std::array<PadPressState, Mpc2000XlSpecs::PROGRAM_PAD_COUNT>
-            pressedPadRegistry{};
 
     public:
         int getNumberOfSamples();

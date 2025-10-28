@@ -17,6 +17,9 @@
 #include "sequencer/SeqUtil.hpp"
 #include <memory>
 
+#include "eventregistry/EventRegistry.hpp"
+#include "lcdgui/screens/window/EditMultipleScreen.hpp"
+
 using namespace mpc::command::context;
 using namespace mpc::lcdgui;
 
@@ -70,9 +73,10 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     auto activeTrack = mpc.getSequencer()->getActiveTrack();
 
     const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
+    const auto drumBus = mpc.getSequencer()->getDrumBus(drumIndex);
     std::shared_ptr<sampler::Program> program =
         drumIndex >= 0
-            ? mpc.getSampler()->getProgram(mpc.getSequencer()->getDrumBus(drumIndex)->getProgram())
+            ? mpc.getSampler()->getProgram(drumBus->getProgram())
             : nullptr;
 
     std::function<void(int)> setSelectedNote =
@@ -95,6 +99,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
                           : programPadIndex + 35;
 
     return {
+        mpc.eventRegistry,
         isSequencerScreen,
         programPadIndex,
         velocity,
@@ -130,8 +135,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
 
 TriggerDrumNoteOffContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-    mpc::Mpc &mpc, const int programPadIndex, std::optional<int> drumIndex,
-    const std::shared_ptr<ScreenComponent> screen)
+    mpc::Mpc &mpc, const int programPadIndex, int drumIndex,
+    const std::shared_ptr<ScreenComponent> screen, const int note, std::shared_ptr<sampler::Program> program, std::shared_ptr<sequencer::Track> activeTrack)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping =
         [basicPlayer = &mpc.getBasicPlayer()]()
@@ -142,20 +147,18 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
-    const auto playNoteEvent =
-        mpc.getSequencer()->getNoteEventStore().retrievePlayNoteEvent(
-            programPadIndex);
+    const auto registryPlayNoteEvent =
+        mpc.eventRegistry->retrievePlayNoteEvent(note);
 
     auto eventHandler = mpc.getEventHandler();
 
-    const auto recordNoteOnEvent =
-        mpc.getSequencer()->getNoteEventStore().retrieveRecordNoteEvent(
-            programPadIndex);
+    const auto registryRecordNoteOnEvent =
+        mpc.eventRegistry->retrieveRecordNoteEvent(note);
 
     std::function<bool()> isAnyProgramPadRegisteredAsPressed =
-        [sampler = mpc.getSampler()]
+        [registry = mpc.eventRegistry]
     {
-        return sampler->isAnyProgramPadRegisteredAsPressed();
+        return registry->isAnyProgramPadPressed();
     };
 
     const auto stepEditOptionsScreen =
@@ -191,17 +194,30 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
             mpc.getHardware()->getButton(hardware::ComponentId::REC),
             mpc.clientEventController->clientHardwareEventController);
 
+    std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
+
+    if (registryRecordNoteOnEvent)
+    {
+        recordNoteOnEvent = std::make_shared<sequencer::NoteOnEvent>(registryRecordNoteOnEvent->noteNumber, *registryRecordNoteOnEvent->velocity);
+    }
+
+    std::shared_ptr<sequencer::DrumBus> drumBus = mpc.getSequencer()->getDrumBus(drumIndex);
+
     return {
+        mpc.eventRegistry,
+        drumBus,
+        program,
+        programPadIndex,
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,
-        playNoteEvent,
+        std::make_shared<sequencer::NoteOnEventPlayOnly>(registryPlayNoteEvent->noteNumber, *registryPlayNoteEvent->velocity),
         drumIndex,
         eventHandler,
         recordNoteOnEvent,
         mpc.getSequencer()->isRecordingOrOverdubbing(),
         mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed(),
-        mpc.getSequencer()->getActiveTrack(),
+        activeTrack,
         isStepRecording,
         isAnyProgramPadRegisteredAsPressed,
         mpc.getAudioMidiServices()

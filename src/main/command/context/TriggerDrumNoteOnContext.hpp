@@ -4,6 +4,11 @@
 #include <string>
 #include <functional>
 
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+
 namespace mpc ::lcdgui
 {
     class LayeredScreen;
@@ -45,6 +50,7 @@ namespace mpc::command::context
 
     struct TriggerDrumNoteOnContext
     {
+        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         bool isSequencerScreen;
         int programPadIndex;
         int velocity;

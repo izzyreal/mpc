@@ -5,7 +5,9 @@
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
-#include <Mpc.hpp>
+#include "MpcSpecs.hpp"
+#include "Mpc.hpp"
+
 #include <stdexcept>
 
 using namespace mpc::sampler;
@@ -183,71 +185,3 @@ Program::~Program()
     }
 }
 
-bool Program::isPadPressedBySource(int padIndex, PadPressSource source)
-{
-    return pressedPadRegistry[padIndex].sourceCount[sourceIndex(source)] > 0;
-}
-
-int Program::getPressedPadAfterTouchOrVelocity(int padIndex)
-{
-    if (!isPadRegisteredAsPressed(padIndex))
-    {
-        throw std::invalid_argument("The queried pad must be pressed");
-    }
-
-    return pressedPadRegistry[padIndex].mostRecentAftertouch.value_or(pressedPadRegistry[padIndex].velocity);
-}
-
-void Program::registerPadPress(int padIndex, int velocity, PadPressSource source)
-{
-    auto &pad = pressedPadRegistry[padIndex];
-    pad.totalCount++;
-    pad.velocity = velocity;
-    pad.sourceCount[sourceIndex(source)]++;
-}
-
-void Program::registerPadAfterTouch(int padIndex, int afterTouch)
-{
-    auto &pad = pressedPadRegistry[padIndex];
-    pad.mostRecentAftertouch = afterTouch;
-}
-
-void Program::registerPadRelease(int padIndex, PadPressSource source)
-{
-    auto &pad = pressedPadRegistry[padIndex];
-    if (pad.totalCount > 0)
-    {
-        pad.totalCount--;
-    }
-    auto &srcCount = pad.sourceCount[sourceIndex(source)];
-    if (srcCount > 0)
-    {
-        srcCount--;
-    }
-}
-
-bool Program::isPadRegisteredAsPressed(int padIndex) const
-{
-    return pressedPadRegistry[padIndex].totalCount > 0;
-}
-
-bool Program::isAnyPadRegisteredAsPressed() const
-{
-    for (const auto &pad : pressedPadRegistry)
-    {
-        if (pad.totalCount > 0)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void Program::clearPressedPadRegistry()
-{
-    for (auto &pad : pressedPadRegistry)
-    {
-        pad.totalCount = 0;
-        pad.sourceCount.fill(0);
-    }
-}

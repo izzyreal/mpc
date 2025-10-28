@@ -4,6 +4,7 @@
 
 #include "DemoFiles.hpp"
 
+#include "eventregistry/EventRegistry.hpp"
 #include "controller/ClientMidiEventController.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
@@ -127,6 +128,7 @@ void Mpc::init()
     eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
 
+    eventRegistry = std::make_shared<eventregistry::EventRegistry>();
     clientEventController =
         std::make_shared<mpc::controller::ClientEventController>(*this);
     clientEventController->init();
@@ -274,13 +276,9 @@ Mpc::~Mpc()
 
 void Mpc::panic()
 {
-    sampler->clearAllProgramPadPressRegistries();
-    sequencer->getNoteEventStore().clearPlayAndRecordStore();
+    eventRegistry->clear();
     midiOutput->panic();
     eventHandler->clearTransposeCache();
-    clientEventController->getClientMidiEventController()
-        ->getSoundGeneratorController()
-        ->clearNoteEventStore();
 }
 
 std::shared_ptr<mpc::sequencer::Clock> Mpc::getClock()

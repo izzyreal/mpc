@@ -1,6 +1,5 @@
 #pragma once
 #include <sequencer/Sequence.hpp>
-#include "NoteEventStore.hpp"
 
 #include <Observer.hpp>
 
@@ -58,11 +57,6 @@ namespace mpc::sequencer
         void setPositionWithinSong(const double positionQuarterNotes);
         void bumpPositionByTicks(const uint8_t ticks);
 
-        NoteEventStore<int> &getNoteEventStore()
-        {
-            return noteEventStore;
-        }
-
         template <typename T>
         std::shared_ptr<T> getBus(const int busIndex);
         std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex);
@@ -70,8 +64,6 @@ namespace mpc::sequencer
     private:
         mpc::Mpc &mpc;
         std::vector<std::shared_ptr<Bus>> buses;
-        const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
-        NoteEventStore<int> noteEventStore;
         bool playing = false;
         int lastNotifiedBar = -1;
         int lastNotifiedBeat = -1;

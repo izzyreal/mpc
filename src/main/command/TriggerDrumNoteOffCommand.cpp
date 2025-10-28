@@ -2,9 +2,11 @@
 
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerDrumNoteOffContext.hpp"
+#include "eventregistry/EventRegistry.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::command;
 using namespace mpc::command::context;
@@ -106,6 +108,18 @@ void TriggerDrumNoteOffCommand::execute()
             }
         }
     }
+
+    ctx.eventRegistry->registerNonMidiNoteOff(
+        eventregistry::Source::VirtualMpcHardware,
+        ctx.drumBus, ctx.playNoteEvent->getNote(),
+        ctx.activeTrack->getIndex());
+
+    ctx.eventRegistry->registerNonMidiProgramPadRelease(
+        eventregistry::Source::VirtualMpcHardware,
+        ctx.drumBus,
+        ctx.program,
+        ctx.programPadIndex,
+        ctx.activeTrack->getIndex());
 
     if (!ctx.isAnyProgramPadRegisteredAsPressed())
     {
