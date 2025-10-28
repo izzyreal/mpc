@@ -1,7 +1,6 @@
 #pragma once
 
 #include "client/event/ClientMidiEvent.hpp"
-#include "sequencer/NoteEventStore.hpp"
 
 #include <memory>
 #include <optional>
@@ -61,7 +60,6 @@ namespace mpc::controller
             std::shared_ptr<TimingCorrectScreen>);
 
         void handleEvent(const MidiEvent &);
-        void clearNoteEventStore();
 
     private:
         std::shared_ptr<MidiInputScreen> midiInputScreen;
@@ -71,9 +69,6 @@ namespace mpc::controller
         std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen;
         std::shared_ptr<TimingCorrectScreen> timingCorrectScreen;
         std::shared_ptr<ClientEventController> clientEventController;
-
-        const size_t NOTE_EVENT_STORE_CAPACITY = 8192;
-        mpc::sequencer::NoteEventStore<NoteKey> noteEventStore;
 
         std::optional<int> getTrackIndexForEvent(const MidiEvent &) const;
         std::shared_ptr<Track> getTrackForEvent(const MidiEvent &) const;

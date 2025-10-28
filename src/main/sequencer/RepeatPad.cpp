@@ -29,7 +29,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         return;
     }
 
-    using PadPressSource = mpc::sampler::Program::PadPressSource;
+    // using PadPressSource = mpc::sampler::Program::PadPressSource;
 
     auto sequencer = mpc.getSequencer();
     auto track = sequencer->getActiveTrack();
@@ -55,7 +55,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         {
             const int programPadIndex = physicalPadIndex + bankIndex * 16;
 
-            if (!program->isPadRegisteredAsPressed(programPadIndex))
+            // if (!program->isPadRegisteredAsPressed(programPadIndex))
             {
                 continue;
             }
@@ -109,9 +109,9 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             }
             else
             {
-                const int velocityToUseIfNotFullLevel = program->getPressedPadAfterTouchOrVelocity(programPadIndex);
-                noteEvent->setVelocity(fullLevel ? 127
-                                                 : velocityToUseIfNotFullLevel);
+                // const int velocityToUseIfNotFullLevel = program->getPressedPadAfterTouchOrVelocity(programPadIndex);
+                // noteEvent->setVelocity(fullLevel ? 127
+                //                                  : velocityToUseIfNotFullLevel);
             }
 
             noteEvent->setDuration(durationTicks);
@@ -157,8 +157,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                 DrumNoteEventHandler::noteOn(ctx);
 
-                program->registerPadPress(programPadIndex, noteEvent->getVelocity(),
-                                          PadPressSource::GENERATED);
+                // program->registerPadPress(programPadIndex, noteEvent->getVelocity(),
+                //                           PadPressSource::GENERATED);
             }
 
             if (track->getDeviceIndex() > 0)
@@ -191,8 +191,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                             DrumNoteEventHandler::noteOff(ctx);
 
-                            program->registerPadRelease(
-                                programPadIndex, PadPressSource::GENERATED);
+                            // program->registerPadRelease(
+                            //     programPadIndex, PadPressSource::GENERATED);
                         }
 
                         if (track->getDeviceIndex() > 0)

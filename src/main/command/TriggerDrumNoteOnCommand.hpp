@@ -16,8 +16,6 @@ namespace mpc::command
 
     private:
         context::TriggerDrumNoteOnContext &ctx;
-
-        void generateNoteOn(const context::TriggerDrumNoteOnContext &ctx);
     };
 
 } // namespace mpc::command

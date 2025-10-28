@@ -22,6 +22,11 @@ namespace mpc::hardware
     class Hardware;
 }
 
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+
 namespace mpc::controller
 {
     class ClientEventController;
@@ -101,6 +106,8 @@ namespace mpc
         void panic();
         void setPluginModeEnabled(bool);
         bool isPluginModeEnabled();
+
+        std::shared_ptr<mpc::eventregistry::EventRegistry> eventRegistry;
 
         std::shared_ptr<mpc::input::PadAndButtonKeyboard> padAndButtonKeyboard;
         std::shared_ptr<mpc::controller::ClientEventController>

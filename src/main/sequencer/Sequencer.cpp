@@ -55,7 +55,6 @@ uint64_t currentTimeMillis()
 
 Sequencer::Sequencer(mpc::Mpc &mpc) : mpc(mpc)
 {
-    noteEventStore.reserve(NOTE_EVENT_STORE_CAPACITY);
 }
 
 void Sequencer::init()
@@ -2218,6 +2217,7 @@ std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex)
     return result;
 }
 
+template std::shared_ptr<Bus> Sequencer::getBus(const int busIndex);
 template std::shared_ptr<MidiBus> Sequencer::getBus(const int busIndex);
 template std::shared_ptr<DrumBus> Sequencer::getBus(const int busIndex);
 

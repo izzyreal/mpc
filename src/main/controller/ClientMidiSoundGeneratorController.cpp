@@ -38,12 +38,6 @@ ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
       timingCorrectScreen(timingCorrectScreen),
       clientEventController(clientEventController)
 {
-    noteEventStore.reserve(NOTE_EVENT_STORE_CAPACITY);
-}
-
-void ClientMidiSoundGeneratorController::clearNoteEventStore()
-{
-    noteEventStore.clearPlayAndRecordStore();
 }
 
 void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
@@ -99,7 +93,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
             if (!p.lock()) continue;
             for (int i = 0; i < 64; i ++)
             {
-                p.lock()->registerPadAfterTouch(i, pressure);
+                // p.lock()->registerPadAfterTouch(i, pressure);
             }
         }
     }
@@ -114,7 +108,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
             if (!p.lock()) continue;
             for (int i = 0; i < 64; i ++)
             {
-                p.lock()->registerPadAfterTouch(i, pressure);
+                // p.lock()->registerPadAfterTouch(i, pressure);
             }
         }
     }
@@ -284,12 +278,12 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
     const int trackVelocityRatio = track->getVelocityRatio();
     const auto drumIndex = getDrumIndexForEvent(e);
 
-    eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(),
-                                        trackIndex, trackDevice,
-                                        trackVelocityRatio, drumIndex);
-
-    noteEventStore.storePlayNoteEvent(
-        std::pair<int, int>(trackIndex, noteOnEvent->getNote()), noteOnEvent);
+    // eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(),
+    //                                     trackIndex, trackDevice,
+    //                                     trackVelocityRatio, drumIndex);
+    //
+    // noteEventStore.storePlayNoteEvent(
+    //     std::pair<int, int>(trackIndex, noteOnEvent->getNote()), noteOnEvent);
 
     auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(
         noteOnEvent->getNote(), noteOnEvent->getVelocity());
@@ -341,9 +335,9 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
 
     if (recordMidiNoteOn)
     {
-        noteEventStore.storeRecordNoteEvent(
-            std::pair<int, int>(trackIndex, recordMidiNoteOn->getNote()),
-            recordMidiNoteOn);
+        // noteEventStore.storeRecordNoteEvent(
+        //     std::pair<int, int>(trackIndex, recordMidiNoteOn->getNote()),
+        //     recordMidiNoteOn);
     }
 }
 
@@ -365,71 +359,71 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
     const auto drumIndex = getDrumIndexForEvent(e);
 
     // finalize recorded note if exists
-    if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(
-            std::pair<int, int>(trackIndex, note)))
-    {
-        auto mode = clientEventController->determineRecordingMode();
-
-        switch (mode)
-        {
-            case RecordingMode::Overdub:
-            {
-                track->finalizeNoteEventASync(storedRecordMidiNoteOn);
-                break;
-            }
-            case RecordingMode::Step:
-            {
-                int newDuration =
-                    static_cast<int>(sequencer->getTickPosition());
-                sequencer->stopMetronomeTrack();
-                track->finalizeNoteEventSynced(storedRecordMidiNoteOn,
-                                               newDuration);
-                break;
-            }
-            case RecordingMode::RecMainWithoutPlaying:
-            {
-                int newDuration =
-                    static_cast<int>(sequencer->getTickPosition());
-                sequencer->stopMetronomeTrack();
-                bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(
-                    storedRecordMidiNoteOn, newDuration);
-
-                if (durationHasBeenAdjusted)
-                {
-                    int stepLength =
-                        timingCorrectScreen->getNoteValueLengthInTicks();
-                    int nextPos = sequencer->getTickPosition() + stepLength;
-                    int bar = sequencer->getCurrentBarIndex() + 1;
-                    nextPos = track->timingCorrectTick(
-                        0, bar, nextPos, stepLength,
-                        timingCorrectScreen->getSwing());
-                    auto lastTick =
-                        sequencer->getActiveSequence()->getLastTick();
-
-                    if (nextPos != 0 && nextPos < lastTick)
-                    {
-                        sequencer->move(
-                            Sequencer::ticksToQuarterNotes(nextPos));
-                    }
-                    else
-                    {
-                        sequencer->move(
-                            Sequencer::ticksToQuarterNotes(lastTick));
-                    }
-                }
-                break;
-            }
-            case RecordingMode::None:
-            default:
-                break;
-        }
-    }
-
-    if (auto storedNoteOnEvent = noteEventStore.retrievePlayNoteEvent(
-            std::pair<int, int>(trackIndex, note)))
-    {
-        eventHandler->handleMidiInputNoteOff(storedNoteOnEvent->getNoteOff(),
-                                             e.getBufferOffset(), trackIndex,
-                                             trackDevice, drumIndex);
-    }
+    // if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(
+    //         std::pair<int, int>(trackIndex, note)))
+    // {
+    //     auto mode = clientEventController->determineRecordingMode();
+    //
+    //     switch (mode)
+    //     {
+    //         case RecordingMode::Overdub:
+    //         {
+    //             track->finalizeNoteEventASync(storedRecordMidiNoteOn);
+    //             break;
+    //         }
+    //         case RecordingMode::Step:
+    //         {
+    //             int newDuration =
+    //                 static_cast<int>(sequencer->getTickPosition());
+    //             sequencer->stopMetronomeTrack();
+    //             track->finalizeNoteEventSynced(storedRecordMidiNoteOn,
+    //                                            newDuration);
+    //             break;
+    //         }
+    //         case RecordingMode::RecMainWithoutPlaying:
+    //         {
+    //             int newDuration =
+    //                 static_cast<int>(sequencer->getTickPosition());
+    //             sequencer->stopMetronomeTrack();
+    //             bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(
+    //                 storedRecordMidiNoteOn, newDuration);
+    //
+    //             if (durationHasBeenAdjusted)
+    //             {
+    //                 int stepLength =
+    //                     timingCorrectScreen->getNoteValueLengthInTicks();
+    //                 int nextPos = sequencer->getTickPosition() + stepLength;
+    //                 int bar = sequencer->getCurrentBarIndex() + 1;
+    //                 nextPos = track->timingCorrectTick(
+    //                     0, bar, nextPos, stepLength,
+    //                     timingCorrectScreen->getSwing());
+    //                 auto lastTick =
+    //                     sequencer->getActiveSequence()->getLastTick();
+    //
+    //                 if (nextPos != 0 && nextPos < lastTick)
+    //                 {
+    //                     sequencer->move(
+    //                         Sequencer::ticksToQuarterNotes(nextPos));
+    //                 }
+    //                 else
+    //                 {
+    //                     sequencer->move(
+    //                         Sequencer::ticksToQuarterNotes(lastTick));
+    //                 }
+    //             }
+    //             break;
+    //         }
+    //         case RecordingMode::None:
+    //         default:
+    //             break;
+    //     }
+    // }
+    //
+    // if (auto storedNoteOnEvent = noteEventStore.retrievePlayNoteEvent(
+    //         std::pair<int, int>(trackIndex, note)))
+    // {
+    //     eventHandler->handleMidiInputNoteOff(storedNoteOnEvent->getNoteOff(),
+    //                                          e.getBufferOffset(), trackIndex,
+    //                                          trackDevice, drumIndex);
+    // }
 }

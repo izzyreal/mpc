@@ -18,6 +18,11 @@ namespace mpc
     class Mpc;
 }
 
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+
 namespace mpc::sequencer
 {
     class Sequencer;

@@ -9,6 +9,7 @@
 #include "engine/PreviewSoundPlayer.hpp"
 #include "sampler/Program.hpp"
 #include "Util.hpp"
+#include "eventregistry/EventRegistry.hpp"
 
 using namespace mpc::command;
 using namespace mpc::command::context;
@@ -39,17 +40,11 @@ void TriggerDrumNoteOnCommand::execute()
         return;
     }
 
-    generateNoteOn(ctx);
-}
-
-void TriggerDrumNoteOnCommand::generateNoteOn(
-    const TriggerDrumNoteOnContext &ctx)
-{
     const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
 
     const auto velo = ctx.isFullLevelEnabled ? 127 : ctx.velocity;
 
-    const auto playOnEvent =
+    const auto noteOnEvent =
         std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
 
     const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
@@ -62,7 +57,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(
         assign16LevelsScreen->getParameter(),
         ctx.programPadIndex % 16};
 
-    Util::set16LevelsValues(sixteenLevelsContext, playOnEvent);
+    Util::set16LevelsValues(sixteenLevelsContext, noteOnEvent);
 
     const bool isSliderNote =
         ctx.program && ctx.program->getSlider()->getNote() == ctx.note;
@@ -84,16 +79,13 @@ void TriggerDrumNoteOnCommand::generateNoteOn(
     if (ctx.program && isSliderNote)
     {
         auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
-        playOnEvent->setVariationType(type);
-        playOnEvent->setVariationValue(value);
+        noteOnEvent->setVariationType(type);
+        noteOnEvent->setVariationValue(value);
     }
-
-    ctx.sequencer->getNoteEventStore().storePlayNoteEvent(ctx.programPadIndex,
-                                                          playOnEvent);
 
     if (ctx.isSamplerScreen)
     {
-        ctx.eventHandler->handleUnfinalizedNoteOn(playOnEvent, std::nullopt,
+        ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent, std::nullopt,
                                                   std::nullopt, std::nullopt,
                                                   ctx.drumScreenSelectedDrum);
     }
@@ -104,7 +96,7 @@ void TriggerDrumNoteOnCommand::generateNoteOn(
                                         : std::nullopt;
 
         ctx.eventHandler->handleUnfinalizedNoteOn(
-            playOnEvent, ctx.track->getIndex(), ctx.track->getDeviceIndex(),
+            noteOnEvent, ctx.track->getIndex(), ctx.track->getDeviceIndex(),
             ctx.track->getVelocityRatio(), drumIndexToUse);
     }
 
@@ -162,8 +154,26 @@ void TriggerDrumNoteOnCommand::generateNoteOn(
             recordNoteOnEvent->setVariationType(type);
             recordNoteOnEvent->setVariationValue(value);
         }
+    }
 
-        ctx.sequencer->getNoteEventStore().storeRecordNoteEvent(
-            ctx.programPadIndex, recordNoteOnEvent);
+    ctx.eventRegistry->registerNonMidiProgramPadPress(
+        eventregistry::Source::VirtualMpcHardware,
+        ctx.screenComponent,
+        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus),
+        ctx.program,
+        ctx.programPadIndex,
+        noteOnEvent->getVelocity(),
+        ctx.track->getIndex());
+
+    auto registryNoteOn = ctx.eventRegistry->registerNonMidiNoteOn(
+        eventregistry::Source::VirtualMpcHardware,
+        ctx.screenComponent,
+        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus),
+        ctx.note, noteOnEvent->getVelocity(),
+        ctx.track->getIndex());
+
+    if (recordNoteOnEvent)
+    {
+        registryNoteOn->recordNoteEvent = recordNoteOnEvent;
     }
 }

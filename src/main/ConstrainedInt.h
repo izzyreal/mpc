@@ -15,6 +15,8 @@ public:
             throw std::out_of_range("Value out of range");
     }
 
+    constexpr ConstrainedInt() : value(Min) {}
+
     constexpr IntType get() const { return value; }
     constexpr operator IntType() const { return value; }
 };

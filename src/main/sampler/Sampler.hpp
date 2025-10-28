@@ -123,9 +123,6 @@ namespace mpc::sampler
                               int destRate);
         std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 
-        void clearAllProgramPadPressRegistries();
-        bool isAnyProgramPadRegisteredAsPressed() const;
-
     private:
         int soundIndex = 0;
         int playXMode = 0;
