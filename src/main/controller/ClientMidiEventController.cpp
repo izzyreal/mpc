@@ -41,8 +41,7 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
     e.printInfo();
 
-    if (clientEventController->getLayeredScreen()->getCurrentScreenName() ==
-        "midi-input-monitor")
+    if (clientEventController->getLayeredScreen()->isCurrentScreen<MidiInputMonitorScreen>())
     {
         const auto notificationMessage =
             std::string("a") + std::to_string(e.getChannel());

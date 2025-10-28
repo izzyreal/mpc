@@ -22,6 +22,7 @@ namespace mpc::sequencer
 {
     class Sequencer;
     class Track;
+    class DrumBus;
 } // namespace mpc::sequencer
 
 namespace mpc::sampler
@@ -75,12 +76,13 @@ namespace mpc::controller
         mpc::sequencer::NoteEventStore<NoteKey> noteEventStore;
 
         std::optional<int> getTrackIndexForEvent(const MidiEvent &) const;
-        std::shared_ptr<Track> getTrackForIndex(int trackIndex) const;
+        std::shared_ptr<Track> getTrackForEvent(const MidiEvent &) const;
         bool shouldProcessEvent(const MidiEvent &) const;
 
         std::optional<int> getDrumIndex(const std::shared_ptr<Track> &) const;
         std::shared_ptr<Program> getProgramForEvent(const MidiEvent &) const;
         std::optional<int> getDrumIndexForEvent(const MidiEvent &) const;
+        std::shared_ptr<sequencer::DrumBus> getDrumBusForEvent(const MidiEvent &) const;
 
         void handleNoteOnEvent(const MidiEvent &);
         void handleNoteOffEvent(const MidiEvent &);

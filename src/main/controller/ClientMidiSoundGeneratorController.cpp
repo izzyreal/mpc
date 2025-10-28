@@ -120,11 +120,41 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
     else if (type == MessageType::PROGRAM_CHANGE)
     {
-        // TODO: program change
+        if (midiInputScreen->getProgChangeSeq())
+        {
+            if (e.getProgramNumber() >= 0 && e.getProgramNumber() <= Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)
+            {
+                if (sequencer->isPlaying())
+                {
+                    if (!sequencer->isRecordingOrOverdubbing() && sequencer->getSequence(e.getProgramNumber())->isUsed())
+                    {
+                        if (clientEventController->getLayeredScreen()->isCurrentScreen<NextSeqScreen, NextSeqPadScreen, SequencerScreen>())
+                        {
+                            sequencer->setNextSq(e.getProgramNumber());
+                        }
+                    }
+                }
+                else
+                {
+                    sequencer->setActiveTrackIndex(e.getProgramNumber());
+                }
+            }
+        }
+        else
+        {
+            if (auto drumBus = getDrumBusForEvent(e); drumBus)
+            {
+                if (sampler->getProgram(e.getProgramNumber()))
+                {
+                    drumBus->setProgram(e.getProgramNumber());
+                }
+            }
+        }
     }
     else if (type == MessageType::CONTROLLER && e.getControllerNumber() == 123)
     {
-        // TODO: all notes off
+        // TODO
+        // Send early note offs
     }
 }
 
@@ -144,11 +174,25 @@ std::optional<int> ClientMidiSoundGeneratorController::getTrackIndexForEvent(
 }
 
 std::shared_ptr<Track>
-ClientMidiSoundGeneratorController::getTrackForIndex(int trackIndex) const
+ClientMidiSoundGeneratorController::getTrackForEvent(const ClientMidiEvent &e) const
 {
-    auto seq = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
-                                      : sequencer->getActiveSequence();
-    return seq->getTrack(trackIndex);
+    if (auto trackIndex = getTrackIndexForEvent(e); trackIndex)
+    {
+        auto seq = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
+                                              : sequencer->getActiveSequence();
+        return seq->getTrack(*trackIndex);
+    }
+
+    return {};
+}
+
+std::shared_ptr<DrumBus> ClientMidiSoundGeneratorController::getDrumBusForEvent(const ClientMidiEvent &e) const
+{
+    if (auto drumIndex = getDrumIndexForEvent(e); drumIndex)
+    {
+        return sequencer->getDrumBus(*drumIndex);
+    }
+    return {};
 }
 
 std::shared_ptr<Program> ClientMidiSoundGeneratorController::getProgramForEvent(
@@ -165,13 +209,7 @@ std::shared_ptr<Program> ClientMidiSoundGeneratorController::getProgramForEvent(
 std::optional<int> ClientMidiSoundGeneratorController::getDrumIndexForEvent(
     const ClientMidiEvent &e) const
 {
-    auto trackIndexOpt = getTrackIndexForEvent(e);
-    if (!trackIndexOpt)
-    {
-        return std::nullopt;
-    }
-
-    auto track = getTrackForIndex(*trackIndexOpt);
+    auto track = getTrackForEvent(e);
     if (!track)
     {
         return std::nullopt;
@@ -230,17 +268,18 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
         return;
     }
 
-    auto trackIndexOpt = getTrackIndexForEvent(e);
-    if (!trackIndexOpt)
+    auto track = getTrackForEvent(e);
+
+    if (!track)
     {
         return;
     }
-    int trackIndex = *trackIndexOpt;
+
+    const auto trackIndex = track->getIndex();
 
     auto noteOnEvent =
         std::make_shared<NoteOnEventPlayOnly>(note, e.getVelocity());
 
-    auto track = getTrackForIndex(trackIndex);
     const int trackDevice = track->getDeviceIndex();
     const int trackVelocityRatio = track->getVelocityRatio();
     const auto drumIndex = getDrumIndexForEvent(e);
@@ -313,14 +352,15 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 {
     const int note = e.getNoteNumber();
 
-    auto trackIndexOpt = getTrackIndexForEvent(e);
-    if (!trackIndexOpt)
+    auto track = getTrackForEvent(e);
+
+    if (!track)
     {
         return;
     }
-    int trackIndex = *trackIndexOpt;
 
-    auto track = getTrackForIndex(trackIndex);
+    int trackIndex = track->getIndex();
+
     const int trackDevice = track->getDeviceIndex();
     const auto drumIndex = getDrumIndexForEvent(e);
 
