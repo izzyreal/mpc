@@ -94,7 +94,6 @@ void EventRegistry::registerProgramPadAftertouch(
 {
     assert(bus && program);
 
-    printf("Registering pad pressure: %i\n", pressure.get());
     for (auto &e : programPadEvents)
     {
         if (e->padIndex == padIndex && e->source == source)
@@ -132,7 +131,6 @@ NoteEventPtr EventRegistry::registerNoteOn(
 void EventRegistry::registerNoteAftertouch(Source source, NoteNumber noteNumber,
                                            Pressure pressure)
 {
-    printf("Registering note pressure: %i\n", pressure.get());
     for (auto &e : noteEvents)
     {
         if (e->noteNumber == noteNumber && e->source == source &&
@@ -190,7 +188,6 @@ VelocityOrPressure EventRegistry::getPressedProgramPadAfterTouchOrVelocity(
 
     if (result)
     {
-        printf("returning %i\n", result.value());
         return *result;
     }
 
