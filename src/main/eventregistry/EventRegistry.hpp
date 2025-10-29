@@ -197,7 +197,7 @@ namespace mpc::eventregistry
         void enqueue(EventMessage &&);
         void publishSnapshotToBuffer(struct Snapshot *dst) noexcept;
 
-        bool drainInboundQueue() noexcept;
+        void drainQueue() noexcept;
         void applyMessage(const EventMessage &msg) noexcept;
     };
 

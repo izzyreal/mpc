@@ -310,7 +310,7 @@ void EventRegistry::publishSnapshotToBuffer(Snapshot *dst) noexcept
 
 void EventRegistry::publishSnapshot() noexcept
 {
-    drainInboundQueue();
+    drainQueue();
 
     Snapshot *cur =
         std::atomic_load_explicit(&snapshotPtr, std::memory_order_acquire);
@@ -435,20 +435,14 @@ PhysicalPadEventPtr EventRegistry::SnapshotView::retrievePhysicalPadEvent(
     return nullptr;
 }
 
-bool EventRegistry::drainInboundQueue() noexcept
+void EventRegistry::drainQueue() noexcept
 {
     EventMessage msg;
-    bool processed = false;
-
-    printf("draining inbound queue\n");
-
     while (queue.try_dequeue(msg))
     {
         printf("Applying msg\n");
         applyMessage(msg);
-        processed = true;
     }
-    return processed;
 }
 
 void EventRegistry::applyMessage(const EventMessage &msg) noexcept
