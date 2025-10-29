@@ -34,24 +34,24 @@ void TriggerDrumNoteOffCommand::execute()
     if (ctx.currentScreenIsSamplerScreen)
     {
         ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.noteOffEvent, std::nullopt, std::nullopt, ctx.drumIndex);
+            ctx.noteOffEvent, nullptr, std::nullopt, ctx.drumIndex);
     }
     else
     {
         ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.noteOffEvent, ctx.activeTrack->getIndex(),
-            ctx.activeTrack->getDeviceIndex(), ctx.drumIndex);
+            ctx.noteOffEvent, ctx.track,
+            ctx.track->getDeviceIndex(), ctx.drumIndex);
     }
 
     ctx.eventRegistry->registerNoteOff(
         eventregistry::Source::VirtualMpcHardware,
-        ctx.drumBus, ctx.noteOffEvent->getNote(), ctx.activeTrack->getIndex(),
+        ctx.drumBus, ctx.noteOffEvent->getNote(), ctx.track,
         std::nullopt);
 
     ctx.eventRegistry->registerProgramPadRelease(
         eventregistry::Source::VirtualMpcHardware,
         ctx.drumBus, ctx.program, ctx.programPadIndex,
-        ctx.activeTrack->getIndex(), std::nullopt);
+        ctx.track, std::nullopt);
 
     if (!ctx.recordOnEvent)
     {
@@ -65,7 +65,7 @@ void TriggerDrumNoteOffCommand::execute()
 
     if (ctx.sequencerIsRecordingOrOverdubbing)
     {
-        ctx.activeTrack->finalizeNoteEventASync(ctx.recordOnEvent);
+        ctx.track->finalizeNoteEventASync(ctx.recordOnEvent);
     }
 
     if (ctx.isStepRecording || ctx.isRecMainWithoutPlaying)
@@ -85,7 +85,7 @@ void TriggerDrumNoteOffCommand::execute()
         }
 
         const bool durationHasBeenAdjusted =
-            ctx.activeTrack->finalizeNoteEventSynced(ctx.recordOnEvent,
+            ctx.track->finalizeNoteEventSynced(ctx.recordOnEvent,
                                                      newDuration);
 
         if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying) ||
@@ -98,7 +98,7 @@ void TriggerDrumNoteOffCommand::execute()
 
                 auto bar = ctx.currentBarIndex + 1;
 
-                nextPos = ctx.activeTrack->timingCorrectTick(
+                nextPos = ctx.track->timingCorrectTick(
                     0, bar, nextPos, ctx.noteValueLengthInTicks, ctx.swing);
 
                 auto lastTick = ctx.sequencerGetActiveSequenceLastTick();

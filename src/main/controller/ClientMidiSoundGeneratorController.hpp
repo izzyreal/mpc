@@ -5,6 +5,11 @@
 #include <memory>
 #include <optional>
 
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+
 namespace mpc::lcdgui::screens::window
 {
     class MidiInputScreen;
@@ -17,11 +22,22 @@ namespace mpc::audiomidi
     class EventHandler;
 }
 
+namespace mpc::hardware
+{
+    class Hardware;
+}
+
+namespace mpc::engine
+{
+    class PreviewSoundPlayer;
+}
+
 namespace mpc::sequencer
 {
     class Sequencer;
     class Track;
     class DrumBus;
+    class FrameSeq;
 } // namespace mpc::sequencer
 
 namespace mpc::sampler
@@ -29,6 +45,12 @@ namespace mpc::sampler
     class Sampler;
     class Program;
 } // namespace mpc::sampler
+
+namespace mpc::lcdgui
+{
+    class LayeredScreen;
+    class Screens;
+}
 
 namespace mpc::controller
 {
@@ -52,15 +74,23 @@ namespace mpc::controller
 
     public:
         ClientMidiSoundGeneratorController(
+            std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<ClientEventController>,
             std::shared_ptr<MidiInputScreen>, std::shared_ptr<EventHandler>,
             std::shared_ptr<Sequencer>, std::shared_ptr<Sampler>,
             std::shared_ptr<MultiRecordingSetupScreen>,
-            std::shared_ptr<TimingCorrectScreen>);
+            std::shared_ptr<TimingCorrectScreen>,
+            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::shared_ptr<hardware::Hardware>,
+            std::shared_ptr<lcdgui::Screens>,
+            std::shared_ptr<sequencer::FrameSeq>,
+            engine::PreviewSoundPlayer *
+            );
 
         void handleEvent(const MidiEvent &);
 
     private:
+        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         std::shared_ptr<MidiInputScreen> midiInputScreen;
         std::shared_ptr<EventHandler> eventHandler;
         std::shared_ptr<Sequencer> sequencer;
@@ -68,6 +98,11 @@ namespace mpc::controller
         std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen;
         std::shared_ptr<TimingCorrectScreen> timingCorrectScreen;
         std::shared_ptr<ClientEventController> clientEventController;
+        std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
+        std::shared_ptr<hardware::Hardware> hardware;
+        std::shared_ptr<lcdgui::Screens> screens;
+        std::shared_ptr<sequencer::FrameSeq> frameSequencer;
+        engine::PreviewSoundPlayer *previewSoundPlayer;
 
         std::optional<int> getTrackIndexForEvent(const MidiEvent &) const;
         std::shared_ptr<Track> getTrackForEvent(const MidiEvent &) const;

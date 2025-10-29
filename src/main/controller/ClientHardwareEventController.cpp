@@ -165,7 +165,7 @@ void ClientHardwareEventController::handlePadPress(
     mpc.eventRegistry->registerPhysicalPadPress(
         eventregistry::Source::VirtualMpcHardware, screen,
         mpc.getSequencer()->getBus<sequencer::Bus>(track->getBus()),
-        physicalPadIndex, clampedVelocity, track, static_cast<int>(activeBank),
+        physicalPadIndex, clampedVelocity, track.get(), static_cast<int>(activeBank),
         note);
 
     if (layeredScreen->isCurrentScreen<NameScreen>())
@@ -175,8 +175,7 @@ void ClientHardwareEventController::handlePadPress(
         return;
     }
 
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
-        mpc, programPadIndex, clampedVelocity, screen);
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(layeredScreen, mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(), mpc.eventRegistry, mpc.getEventHandler(), mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(), programPadIndex, clampedVelocity, screen);
 
     const bool isF4Pressed =
         mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
@@ -257,8 +256,7 @@ void ClientHardwareEventController::handlePadRelease(
     if (info->note)
     {
         assert(drumIndex);
-        auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-            mpc, programPadIndex, *drumIndex, info->screen,
+        auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(&mpc.getBasicPlayer(), mpc.eventRegistry, mpc.getEventHandler(), mpc.screens, mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController, mpc.getAudioMidiServices()->getFrameSequencer(), programPadIndex, *drumIndex, info->screen,
             *info->note, info->program, info->track);
         TriggerDrumNoteOffCommand(ctx).execute();
     }
@@ -289,7 +287,7 @@ void ClientHardwareEventController::handlePadAftertouch(
             eventregistry::Source::VirtualMpcHardware,
             physicalPadEvent->bus, physicalPadEvent->program,
             padIndex + (physicalPadEvent->bank * 16), pressureToUse,
-            physicalPadEvent->track->getIndex());
+            physicalPadEvent->track);
     }
 
     if (physicalPadEvent->note)

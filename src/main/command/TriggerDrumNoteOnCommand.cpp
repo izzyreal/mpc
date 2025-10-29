@@ -24,7 +24,7 @@ void TriggerDrumNoteOnCommand::execute()
 {
     if (ctx.isSoundScreen)
     {
-        ctx.basicPlayer.mpcNoteOn(ctx.sampler->getSoundIndex(), 127, 0);
+        ctx.previewSoundPlayer->mpcNoteOn(ctx.sampler->getSoundIndex(), 127, 0);
         return;
     }
 
@@ -37,14 +37,14 @@ void TriggerDrumNoteOnCommand::execute()
         eventregistry::Source::VirtualMpcHardware,
         ctx.screenComponent,
         ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.program,
-        ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track->getIndex(),
+        ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track,
         std::nullopt);
 
     auto registryNoteOn = ctx.eventRegistry->registerNoteOn(
         eventregistry::Source::VirtualMpcHardware,
         ctx.screenComponent,
         ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.note,
-        noteOnEvent->getVelocity(), ctx.track->getIndex(), std::nullopt);
+        noteOnEvent->getVelocity(), ctx.track, std::nullopt, ctx.program);
 
     if (ctx.isSequencerScreen && ctx.isNoteRepeatLockedOrPressed &&
         ctx.sequencer->isPlaying())
@@ -98,7 +98,7 @@ void TriggerDrumNoteOnCommand::execute()
 
     if (ctx.isSamplerScreen)
     {
-        ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent, std::nullopt,
+        ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent, nullptr,
                                                   std::nullopt, std::nullopt,
                                                   ctx.drumScreenSelectedDrum);
     }
@@ -109,7 +109,7 @@ void TriggerDrumNoteOnCommand::execute()
                                         : std::nullopt;
 
         ctx.eventHandler->handleUnfinalizedNoteOn(
-            noteOnEvent, ctx.track->getIndex(), ctx.track->getDeviceIndex(),
+            noteOnEvent, ctx.track, ctx.track->getDeviceIndex(),
             ctx.track->getVelocityRatio(), drumIndexToUse);
     }
 

@@ -71,7 +71,7 @@ namespace mpc::command::context
         int drumScreenSelectedDrum;
         bool isSamplerScreen;
 
-        std::shared_ptr<mpc::sequencer::Track> track;
+        mpc::sequencer::Track *track;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
@@ -81,7 +81,7 @@ namespace mpc::command::context
         std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
         std::shared_ptr<mpc::sequencer::FrameSeq> frameSequencer;
 
-        mpc::engine::PreviewSoundPlayer &basicPlayer;
+        mpc::engine::PreviewSoundPlayer *previewSoundPlayer;
 
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;

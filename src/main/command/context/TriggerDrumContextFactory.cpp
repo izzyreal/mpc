@@ -12,7 +12,6 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
-#include "Mpc.hpp"
 #include "sampler/Pad.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include <memory>
@@ -21,86 +20,103 @@
 #include "lcdgui/screens/window/EditMultipleScreen.hpp"
 
 using namespace mpc::command::context;
+using namespace mpc::controller;
 using namespace mpc::lcdgui;
+using namespace mpc::sequencer;
+using namespace mpc::hardware;
+using namespace mpc::sampler;
+using namespace mpc::eventregistry;
+using namespace mpc::audiomidi;
+using namespace mpc::engine;
 
-int getDrumIndexForCurrentScreen(mpc::Mpc &mpc,
-                                 const std::shared_ptr<ScreenComponent> screen)
+int getDrumIndexForCurrentScreen(std::shared_ptr<Sequencer> sequencer,
+                                 const std::shared_ptr<ScreenComponent> screen,
+                                 std::shared_ptr<Screens> screens)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const int result = isSamplerScreen
-                           ? mpc.screens->get<screens::DrumScreen>()->getDrum()
-                           : mpc.getSequencer()->getActiveTrack()->getBus() - 1;
+                           ? screens->get<screens::DrumScreen>()->getDrum()
+                           : sequencer->getActiveTrack()->getBus() - 1;
     return result;
 }
 
 TriggerDrumNoteOnContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
-
-    mpc::Mpc &mpc, int programPadIndex, int velocity,
+        std::shared_ptr<LayeredScreen> layeredScreen,
+        std::shared_ptr<ClientEventController> controller,
+        std::shared_ptr<Hardware> hardware,
+        std::shared_ptr<Sequencer> sequencer,
+        std::shared_ptr<Screens> screens,
+        std::shared_ptr<Sampler> sampler,
+        std::shared_ptr<EventRegistry> eventRegistry,
+        std::shared_ptr<EventHandler> eventHandler,
+        std::shared_ptr<FrameSeq> frameSequencer,
+        PreviewSoundPlayer *previewSoundPlayer,
+    int programPadIndex, int velocity,
     const std::shared_ptr<ScreenComponent> screen)
 {
     const bool isSequencerScreen =
-        mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
+        layeredScreen->isCurrentScreen<SequencerScreen>();
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
         screengroups::isCentralNoteAndPadUpdateScreen(screen);
     const bool isFullLevelEnabled =
-        mpc.clientEventController->isFullLevelEnabled();
+        controller->isFullLevelEnabled();
     const bool isSixteenLevelsEnabled =
-        mpc.clientEventController->isSixteenLevelsEnabled();
+        controller->isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed =
-        mpc.clientEventController->clientHardwareEventController
+        controller->clientHardwareEventController
             ->isNoteRepeatLocked() ||
-        mpc.getHardware()
+        hardware
             ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
             ->isPressed();
     const bool isErasePressed =
-        mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed();
+        hardware->getButton(hardware::ComponentId::ERASE)->isPressed();
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(
-        screen->getName(), mpc.getSequencer());
+        screen->getName(), sequencer);
 
     const bool isRecMainWithoutPlaying =
         sequencer::SeqUtil::isRecMainWithoutPlaying(
-            mpc.getSequencer(), mpc.screens->get<TimingCorrectScreen>(),
+            sequencer, screens->get<TimingCorrectScreen>(),
             screen->getName(),
-            mpc.getHardware()->getButton(hardware::ComponentId::REC),
-            mpc.clientEventController->clientHardwareEventController);
+            hardware->getButton(hardware::ComponentId::REC),
+            controller->clientHardwareEventController);
 
     auto timingCorrectScreen =
-        mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
+        screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
     auto assign16LevelsScreen =
-        mpc.screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>();
+        screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>();
 
-    auto activeTrack = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack().get();
 
-    const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
-    const auto drumBus = mpc.getSequencer()->getDrumBus(drumIndex);
+    const int drumIndex = getDrumIndexForCurrentScreen(sequencer, screen, screens);
+    const auto drumBus = sequencer->getDrumBus(drumIndex);
     std::shared_ptr<sampler::Program> program =
-        drumIndex >= 0 ? mpc.getSampler()->getProgram(drumBus->getProgram())
+        drumIndex >= 0 ? sampler->getProgram(drumBus->getProgram())
                        : nullptr;
 
     std::function<void(int)> setSelectedNote =
-        [controller = mpc.clientEventController](int n)
+        [controller](int n)
     {
         controller->setSelectedNote(n);
     };
     std::function<void(int)> setSelectedPad =
-        [controller = mpc.clientEventController](int p)
+        [controller](int p)
     {
         controller->setSelectedPad(p);
     };
 
     const auto hardwareSliderValue =
-        mpc.getHardware()->getSlider()->getValueAs<int>();
+        hardware->getSlider()->getValueAs<int>();
     const int drumScreenSelectedDrum =
-        mpc.screens->get<mpc::lcdgui::screens::DrumScreen>()->getDrum();
-    const auto note = activeTrack->getBus() > 0
+        screens->get<mpc::lcdgui::screens::DrumScreen>()->getDrum();
+    const auto note = track->getBus() > 0
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
     return {
-            mpc.eventRegistry,
+            eventRegistry,
             isSequencerScreen,
             programPadIndex,
             velocity,
@@ -111,95 +127,100 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
             isErasePressed,
             isStepRecording,
             isRecMainWithoutPlaying,
-            mpc.getSequencer()->isRecordingOrOverdubbing(),
-            activeTrack->getBus(),
+            sequencer->isRecordingOrOverdubbing(),
+            track->getBus(),
             program,
             note,
             drumScreenSelectedDrum,
             isSamplerScreen,
-            activeTrack,
-            mpc.getSampler(),
-            mpc.getSequencer(),
+            track,
+            sampler,
+            sequencer,
             timingCorrectScreen,
             assign16LevelsScreen,
-            mpc.getEventHandler(),
-            mpc.getAudioMidiServices()->getFrameSequencer(),
-            mpc.getBasicPlayer(),
+            eventHandler,
+            frameSequencer,
+            previewSoundPlayer,
             allowCentralNoteAndPadUpdate,
-            mpc.getScreen(),
+            screen,
             setSelectedNote,
             setSelectedPad,
-            mpc.getLayeredScreen()->getFocusedFieldName(),
+            layeredScreen->getFocusedFieldName(),
             hardwareSliderValue};
 }
 
 TriggerDrumNoteOffContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-
-    mpc::Mpc &mpc, const int programPadIndex, int drumIndex,
+        PreviewSoundPlayer *previewSoundPlayer,
+        std::shared_ptr<EventRegistry> eventRegistry,
+        std::shared_ptr<EventHandler> eventHandler,
+        std::shared_ptr<Screens> screens,
+        std::shared_ptr<Sequencer> sequencer,
+        std::shared_ptr<Hardware> hardware,
+        std::shared_ptr<ClientEventController> controller,
+        std::shared_ptr<FrameSeq> frameSequencer,
+    const int programPadIndex, int drumIndex,
     const std::shared_ptr<ScreenComponent> screen, const int note,
     std::shared_ptr<sampler::Program> program,
-    std::shared_ptr<sequencer::Track> activeTrack)
+    Track *track)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping =
-        [basicPlayer = &mpc.getBasicPlayer()]()
+        [previewSoundPlayer]()
     {
-        basicPlayer->finishVoiceIfSoundIsLooping();
+        previewSoundPlayer->finishVoiceIfSoundIsLooping();
     };
 
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
-    auto eventHandler = mpc.getEventHandler();
-
-    const auto registrySnapshot = mpc.eventRegistry->getSnapshot();
+    const auto registrySnapshot = eventRegistry->getSnapshot();
     const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
         registrySnapshot.retrieveRecordNoteEvent(note);
 
     std::function<bool()> isAnyProgramPadRegisteredAsPressed =
-        [registry = mpc.eventRegistry]()
+        [eventRegistry]()
     {
-        return registry->getSnapshot().isAnyProgramPadPressed();
+        return eventRegistry->getSnapshot().isAnyProgramPadPressed();
     };
 
     const auto stepEditOptionsScreen =
-        mpc.screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>();
+        screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>();
     const auto timingCorrectScreen =
-        mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
+        screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
 
     std::function<int()> getActiveSequenceLastTick =
-        [sequencer = mpc.getSequencer()]
+        [sequencer]
     {
         return sequencer->getActiveSequence()->getLastTick();
     };
 
     std::function<void(double)> sequencerMoveToQuarterNotePosition =
-        [sequencer = mpc.getSequencer()](double quarterNotePosition)
+        [sequencer = sequencer](double quarterNotePosition)
     {
         sequencer->move(quarterNotePosition);
     };
 
     std::function<void()> sequencerStopMetronomeTrack =
-        [sequencer = mpc.getSequencer()]
+        [sequencer = sequencer]
     {
         sequencer->stopMetronomeTrack();
     };
 
     const bool isStepRecording = sequencer::SeqUtil::isStepRecording(
-        screen->getName(), mpc.getSequencer());
+        screen->getName(), sequencer);
 
     const bool isRecMainWithoutPlaying =
         sequencer::SeqUtil::isRecMainWithoutPlaying(
-            mpc.getSequencer(), mpc.screens->get<TimingCorrectScreen>(),
+            sequencer, screens->get<TimingCorrectScreen>(),
             screen->getName(),
-            mpc.getHardware()->getButton(hardware::ComponentId::REC),
-            mpc.clientEventController->clientHardwareEventController);
+            hardware->getButton(hardware::ComponentId::REC),
+            controller->clientHardwareEventController);
 
     std::shared_ptr<sequencer::DrumBus> drumBus =
-        mpc.getSequencer()->getDrumBus(drumIndex);
+        sequencer->getDrumBus(drumIndex);
 
     return {
-        mpc.eventRegistry,
+        eventRegistry,
         drumBus,
         program,
         programPadIndex,
@@ -210,21 +231,19 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         drumIndex,
         eventHandler,
         sequencerRecordNoteOnEvent,
-        mpc.getSequencer()->isRecordingOrOverdubbing(),
-        mpc.getHardware()->getButton(hardware::ComponentId::ERASE)->isPressed(),
-        activeTrack,
+        sequencer->isRecordingOrOverdubbing(),
+        hardware->getButton(hardware::ComponentId::ERASE)->isPressed(),
+        track,
         isStepRecording,
         isAnyProgramPadRegisteredAsPressed,
-        mpc.getAudioMidiServices()
-            ->getFrameSequencer()
-            ->getMetronomeOnlyTickPosition(),
+        frameSequencer->getMetronomeOnlyTickPosition(),
         isRecMainWithoutPlaying,
-        mpc.getSequencer()->getTickPosition(),
+        sequencer->getTickPosition(),
         stepEditOptionsScreen->getTcValuePercentage(),
         timingCorrectScreen->getNoteValueLengthInTicks(),
         stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
         stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-        mpc.getSequencer()->getCurrentBarIndex(),
+        sequencer->getCurrentBarIndex(),
         timingCorrectScreen->getSwing(),
         getActiveSequenceLastTick,
         sequencerMoveToQuarterNotePosition,

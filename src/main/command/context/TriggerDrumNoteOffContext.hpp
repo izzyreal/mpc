@@ -44,7 +44,7 @@ namespace mpc::command::context
         std::shared_ptr<mpc::sequencer::NoteOnEvent> recordOnEvent;
         const bool sequencerIsRecordingOrOverdubbing;
         const bool isErasePressed;
-        const std::shared_ptr<mpc::sequencer::Track> activeTrack;
+        sequencer::Track *track;
         const bool isStepRecording;
         const std::function<bool()> isAnyProgramPadRegisteredAsPressed;
         const uint64_t metronomeOnlyTickPosition;

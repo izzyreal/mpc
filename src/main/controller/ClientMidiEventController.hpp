@@ -9,14 +9,31 @@
 
 #include "Observer.hpp"
 
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+
 namespace mpc::sequencer
 {
     class Sequencer;
+    class FrameSeq;
+}
+
+namespace mpc::engine
+{
+    class PreviewSoundPlayer;
 }
 
 namespace mpc::sampler
 {
     class Sampler;
+}
+
+namespace mpc::lcdgui
+{
+    class Screens;
+    class LayeredScreen;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -33,6 +50,7 @@ namespace mpc::audiomidi
 
 namespace mpc::hardware
 {
+    class Hardware;
     class Button;
 }
 
@@ -68,13 +86,20 @@ namespace mpc::controller
 
     public:
         ClientMidiEventController(
+            std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<ClientEventController>,
             std::shared_ptr<ClientHardwareEventController>,
             std::shared_ptr<MidiSwScreen>, std::shared_ptr<Sequencer>,
             std::shared_ptr<Sampler>, std::shared_ptr<MidiInputScreen>,
             std::shared_ptr<EventHandler>,
             std::shared_ptr<MultiRecordingSetupScreen>,
-            std::shared_ptr<TimingCorrectScreen>);
+            std::shared_ptr<TimingCorrectScreen>,
+            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::shared_ptr<hardware::Hardware>,
+            std::shared_ptr<lcdgui::Screens>,
+            std::shared_ptr<sequencer::FrameSeq>,
+            engine::PreviewSoundPlayer *);
+
 
         std::shared_ptr<ClientMidiSoundGeneratorController>
         getSoundGeneratorController();

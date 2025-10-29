@@ -164,13 +164,13 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                 eventregistry::Source::Sequence,
                 mpc.getLayeredScreen()->getCurrentScreen(), ctx.drum,
                 noteOnEvent->getNote(), noteOnEvent->getVelocity(),
-                noteOnEvent->getTrack(), std::nullopt);
+                track, std::nullopt, program);
 
             auto registryPadEvent = mpc.eventRegistry->registerProgramPadPress(
                 registryNoteEvent->source,
                 registryNoteEvent->screen, registryNoteEvent->bus, program,
                 programPadIndex, *registryNoteEvent->velocity,
-                registryNoteEvent->trackIndex, std::nullopt);
+                registryNoteEvent->track, std::nullopt);
 
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
                 noteEventIdToUse, drumBus,
@@ -179,17 +179,17 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
             auto drumNoteOffEvent = [bus = registryNoteEvent->bus,
                                      note = registryNoteEvent->noteNumber,
-                                     trackIndex = registryNoteEvent->trackIndex,
+                                     track = registryNoteEvent->track,
                                      eventRegistry = mpc.eventRegistry, program,
                                      programPadIndex, noteOffCtx]
             {
                 eventRegistry->registerNoteOff(
-                    eventregistry::Source::Sequence, bus, note, trackIndex,
+                    eventregistry::Source::Sequence, bus, note, track,
                     std::nullopt);
 
                 eventRegistry->registerProgramPadRelease(
                     eventregistry::Source::Sequence, bus, program,
-                    programPadIndex, trackIndex, std::nullopt);
+                    programPadIndex, track, std::nullopt);
 
                 DrumNoteEventHandler::noteOff(noteOffCtx);
             };
@@ -198,15 +198,15 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                 drumNoteOffEvent, durationFrames + eventFrameOffsetInBuffer);
         }
 
-        handleNoteEventMidiOut(event, track->getIndex(),
+        handleNoteEventMidiOut(event, track,
                                track->getDeviceIndex(),
                                track->getVelocityRatio());
 
         auto midiNoteOffEvent = [this, noteOffEvent = noteOnEvent->getNoteOff(),
-                                 trackIndex = track->getIndex(),
+                                 track,
                                  trackDeviceIndex = track->getDeviceIndex()]
         {
-            handleNoteEventMidiOut(noteOffEvent, trackIndex, trackDeviceIndex,
+            handleNoteEventMidiOut(noteOffEvent, track, trackDeviceIndex,
                                    std::nullopt);
         };
 
@@ -243,7 +243,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
 void EventHandler::handleUnfinalizedNoteOn(
     const std::shared_ptr<NoteOnEvent> noteOnEvent,
-    const std::optional<int> trackIndex, const std::optional<int> trackDevice,
+    Track *track,
+    const std::optional<int> trackDevice,
     const std::optional<int> trackVelocityRatio,
     const std::optional<int> drumIndex)
 {
@@ -279,9 +280,9 @@ void EventHandler::handleUnfinalizedNoteOn(
         DrumNoteEventHandler::noteOn(ctx);
     }
 
-    if (trackIndex.has_value() && trackDevice.has_value())
+    if (track != nullptr && trackDevice.has_value())
     {
-        handleNoteEventMidiOut(noteOnEvent, *trackIndex, *trackDevice,
+        handleNoteEventMidiOut(noteOnEvent, track, *trackDevice,
                                trackVelocityRatio);
     }
 }
@@ -289,7 +290,7 @@ void EventHandler::handleUnfinalizedNoteOn(
 // Input from physical pad releases
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
     const std::shared_ptr<NoteOffEvent> noteOffEvent,
-    const std::optional<int> trackIndex, const std::optional<int> trackDevice,
+    Track *track, const std::optional<int> trackDevice,
     const std::optional<int> drumIndex)
 {
     assert(noteOffEvent);
@@ -311,9 +312,9 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         DrumNoteEventHandler::noteOff(ctx);
     }
 
-    if (trackIndex.has_value() && trackDevice.has_value())
+    if (track != nullptr && trackDevice.has_value())
     {
-        handleNoteEventMidiOut(noteOffEvent, *trackIndex, *trackDevice,
+        handleNoteEventMidiOut(noteOffEvent, track, *trackDevice,
                                std::nullopt);
     }
 }
@@ -322,13 +323,13 @@ void EventHandler::handleMidiInputNoteOn(
 
     const int midiChannel,
     const std::shared_ptr<NoteOnEventPlayOnly> noteOnEvent,
-    const int frameOffsetInBuffer, const int trackIndex, const int trackDevice,
+    const int frameOffsetInBuffer, Track *track, const int trackDevice,
     const int trackVelocityRatio, const std::optional<int> drumIndex)
 {
     assert(noteOnEvent);
     assert(!noteOnEvent->isFinalized());
 
-    handleNoteEventMidiOut(noteOnEvent, trackIndex, trackDevice,
+    handleNoteEventMidiOut(noteOnEvent, track, trackDevice,
                            trackVelocityRatio);
 
     if (!drumIndex.has_value())
@@ -359,12 +360,12 @@ void EventHandler::handleMidiInputNoteOn(
         eventregistry::Source::MidiInput,
         mpc.getLayeredScreen()->getCurrentScreen(), drumBus,
         noteOnEvent->getNote(), noteOnEvent->getVelocity(),
-        noteOnEvent->getTrack(), midiChannel);
+        track, midiChannel, program);
 
     auto registryPadEvent = mpc.eventRegistry->registerProgramPadPress(
         registryNoteEvent->source, registryNoteEvent->screen,
         registryNoteEvent->bus, program, programPadIndex,
-        *registryNoteEvent->velocity, registryNoteEvent->trackIndex,
+        *registryNoteEvent->velocity, registryNoteEvent->track,
         midiChannel);
 
     const bool isSoundScreen = lcdgui::screengroups::isSoundScreen(
@@ -407,15 +408,15 @@ void EventHandler::handleMidiInputNoteOn(
 void EventHandler::handleMidiInputNoteOff(
 
     const int midiChannel, const std::shared_ptr<NoteOffEvent> noteOffEvent,
-    const int frameOffsetInBuffer, const int trackIndex, const int trackDevice,
+    const int frameOffsetInBuffer, Track *track, const int trackDevice,
     const std::optional<int> drumIndex)
 {
     assert(noteOffEvent);
 
     const auto noteOffMidiOutEvent =
-        [this, noteOffEvent, trackIndex, trackDevice]
+        [this, noteOffEvent, track, trackDevice]
     {
-        handleNoteEventMidiOut(noteOffEvent, trackIndex, trackDevice,
+        handleNoteEventMidiOut(noteOffEvent, track, trackDevice,
                                std::nullopt);
     };
 
@@ -444,7 +445,7 @@ void EventHandler::handleMidiInputNoteOff(
          note = noteOffEvent->getNote(),
          voices = &mpc.getAudioMidiServices()->getVoices(),
          program = mpc.getSampler()->getProgram(drumBus->getProgram()),
-         trackIndex]
+         track]
     {
         auto ctx = DrumNoteEventContextBuilder::buildNoteOff(0, drumBus, voices,
                                                              note, -1);
@@ -453,14 +454,13 @@ void EventHandler::handleMidiInputNoteOff(
         auto registryEvent =
             eventRegistry->getSnapshot().retrievePlayNoteEvent(note);
         eventRegistry->registerNoteOff(eventregistry::Source::MidiInput,
-                                       drumBus, ctx.note, midiChannel,
-                                       trackIndex);
+                                       drumBus, ctx.note, track, midiChannel);
 
         const auto programPadIndex = program->getPadIndexFromNote(ctx.note);
 
         eventRegistry->registerProgramPadRelease(
             registryEvent->source, registryEvent->bus, program,
-            programPadIndex, registryEvent->trackIndex, midiChannel);
+            programPadIndex, registryEvent->track, midiChannel);
     };
 
     frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);
@@ -483,7 +483,7 @@ void EventHandler::handleMidiInputNoteOff(
  * handleNoteEventMidiOut at the appropriate time.
  */
 void EventHandler::handleNoteEventMidiOut(
-    const std::shared_ptr<Event> event, const int trackIndex,
+    const std::shared_ptr<Event> event, Track *track,
     const int trackDevice, const std::optional<int> trackVelocityRatio)
 {
     assert(std::dynamic_pointer_cast<NoteOnEvent>(event) ||
@@ -511,8 +511,8 @@ void EventHandler::handleNoteEventMidiOut(
     {
         auto transScreen = mpc.screens->get<TransScreen>();
 
-        if (transScreen->transposeAmount != 0 && trackIndex < 64 &&
-            (transScreen->tr == -1 || transScreen->tr == trackIndex))
+        if (transScreen->transposeAmount != 0 && track->getIndex() < 64 &&
+            (transScreen->tr == -1 || transScreen->tr == track->getIndex()))
         {
             transposeAmount = transScreen->transposeAmount;
             transposeCache[noteOnEvent->getNoteOff()] = transposeAmount;
@@ -536,10 +536,10 @@ void EventHandler::handleNoteEventMidiOut(
         if (noteOnEvent->isFinalized())
         {
             frameSeq->enqueueEventAfterNFrames(
-                [this, noteOnEvent, trackIndex, trackDevice]
+                [this, noteOnEvent, track, trackDevice]
                 {
                     handleNoteEventMidiOut(noteOnEvent->getNoteOff(),
-                                           trackIndex, trackDevice,
+                                           track, trackDevice,
                                            std::nullopt);
                 },
                 SeqUtil::ticksToFrames(*noteOnEvent->getDuration(),
@@ -551,7 +551,7 @@ void EventHandler::handleNoteEventMidiOut(
     {
         auto candidate = transposeCache.find(noteOffEvent);
 
-        if (candidate != end(transposeCache) && trackIndex < 64)
+        if (candidate != end(transposeCache) && track->getIndex() < 64)
         {
             transposeAmount = candidate->second;
             transposeCache.erase(candidate);

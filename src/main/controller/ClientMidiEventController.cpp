@@ -5,14 +5,19 @@
 #include <iostream>
 #include <memory>
 
+using namespace mpc::eventregistry;
 using namespace mpc::controller;
 using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
+using namespace mpc::lcdgui;
+using namespace mpc::hardware;
+using namespace mpc::engine;
 
 ClientMidiEventController::ClientMidiEventController(
+    std::shared_ptr<EventRegistry> eventRegistry,
     std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<ClientHardwareEventController>
         clientHardwareEventController,
@@ -21,7 +26,13 @@ ClientMidiEventController::ClientMidiEventController(
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<audiomidi::EventHandler> eventHandler,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
-    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
+    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen,
+    std::shared_ptr<LayeredScreen> layeredScreen,
+    std::shared_ptr<Hardware> hardware,
+    std::shared_ptr<Screens> screens,
+    std::shared_ptr<FrameSeq> frameSequencer,
+    PreviewSoundPlayer *previewSoundPlayer
+    )
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController)
 {
@@ -32,8 +43,10 @@ ClientMidiEventController::ClientMidiEventController(
     // Create the sound generator controller with the passed dependencies
     soundGeneratorController =
         std::make_shared<ClientMidiSoundGeneratorController>(
+                eventRegistry,
             clientEventController, midiInputScreen, eventHandler, sequencer,
-            sampler, multiRecordingSetupScreen, timingCorrectScreen);
+            sampler, multiRecordingSetupScreen, timingCorrectScreen,
+            layeredScreen, hardware, screens, frameSequencer, previewSoundPlayer);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)

@@ -1,5 +1,6 @@
 #include "controller/ClientMidiSoundGeneratorController.hpp"
 
+#include "eventregistry/EventRegistry.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -13,28 +14,47 @@
 
 #include "controller/ClientEventController.hpp"
 
+#include "command/context/TriggerDrumContextFactory.hpp"
+
 #include <iostream>
 #include <optional>
 
+using namespace mpc::eventregistry;
 using namespace mpc::controller;
 using namespace mpc::client::event;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::audiomidi;
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
+using namespace mpc::command::context;
 
 ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
+    std::shared_ptr<EventRegistry> eventRegistry,    
     std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<EventHandler> eventHandler,
     std::shared_ptr<Sequencer> sequencer, std::shared_ptr<Sampler> sampler,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
-    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen)
-    : midiInputScreen(midiInputScreen), eventHandler(eventHandler),
-      sequencer(sequencer), sampler(sampler),
+    std::shared_ptr<TimingCorrectScreen> timingCorrectScreen,
+    std::shared_ptr<LayeredScreen> layeredScreen,
+    std::shared_ptr<hardware::Hardware> hardware,
+    std::shared_ptr<lcdgui::Screens> screens,
+    std::shared_ptr<sequencer::FrameSeq> frameSequencer,
+    engine::PreviewSoundPlayer *previewSoundPlayer
+    )
+    : eventRegistry(eventRegistry),
+      midiInputScreen(midiInputScreen),
+      eventHandler(eventHandler),
+      sequencer(sequencer),
+      sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen),
-      clientEventController(clientEventController)
+      clientEventController(clientEventController),
+      layeredScreen(layeredScreen),
+      hardware(hardware),
+      screens(screens),
+      previewSoundPlayer(previewSoundPlayer)
 {
 }
 
@@ -89,15 +109,22 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     else if (type == MessageType::CHANNEL_PRESSURE)
     {
         auto pressure = e.getChannelPressure();
+        auto track = getTrackForEvent(e);
+        auto bus = sequencer->getBus<Bus>(track->getBus());
+
         for (auto &p : sampler->getPrograms())
         {
-            if (!p.lock())
+            if (auto program = p.lock(); program)
             {
-                continue;
-            }
-            for (int i = 0; i < 64; i++)
-            {
-                // p.lock()->registerPadAfterTouch(i, pressure);
+                for (int programPadIndex = 0; programPadIndex < 64; ++programPadIndex)
+                {
+                    eventRegistry->registerProgramPadAftertouch(eventregistry::Source::MidiInput, bus, program, programPadIndex, pressure, track.get());
+
+                    if (auto note = program->getNoteFromPad(programPadIndex); note != -1)
+                    {
+                        eventRegistry->registerNoteAftertouch(eventregistry::Source::MidiInput, note, pressure);
+                    }
+                }
             }
         }
     }
@@ -107,15 +134,17 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
         // Seems like the MPC2000XL does not implement poly aftertouch reception
         // as per the MIDI implementation char. Double check on the real 2KXL...
         auto pressure = e.getAftertouchValue();
-        for (auto &p : sampler->getPrograms())
+        auto note = e.getAftertouchNote();
+        auto track = getTrackForEvent(e);
+        auto bus = sequencer->getBus<Bus>(track->getBus());
+        auto registrySnapshot = eventRegistry->getSnapshot();
+        eventRegistry->registerNoteAftertouch(eventregistry::Source::MidiInput, note, pressure);
+
+        if (auto program = getProgramForEvent(e); program)
         {
-            if (!p.lock())
+            if (auto programPadIndex = program->getPadIndexFromNote(note); programPadIndex != -1)
             {
-                continue;
-            }
-            for (int i = 0; i < 64; i++)
-            {
-                // p.lock()->registerPadAfterTouch(i, pressure);
+                eventRegistry->registerProgramPadAftertouch(eventregistry::Source::MidiInput, bus, program, programPadIndex, pressure, track.get());
             }
         }
     }
@@ -272,6 +301,7 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
     const ClientMidiEvent &e)
 {
     const int note = e.getNoteNumber();
+
     if (note < 35 || note > 98)
     {
         return;
@@ -284,28 +314,27 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
         return;
     }
 
-    const auto trackIndex = track->getIndex();
+    auto program = getProgramForEvent(e);
 
-    auto noteOnEvent =
-        std::make_shared<NoteOnEventPlayOnly>(note, e.getVelocity());
+    if (!program)
+    {
+        return;
+    }
 
-    const int trackDevice = track->getDeviceIndex();
-    const int trackVelocityRatio = track->getVelocityRatio();
-    const auto drumIndex = getDrumIndexForEvent(e);
+    const int programPadIndex = program->getPadIndexFromNote(note);
 
-    // eventHandler->handleMidiInputNoteOn(noteOnEvent, e.getBufferOffset(),
-    //                                     trackIndex, trackDevice,
-    //                                     trackVelocityRatio, drumIndex);
-    //
-    // noteEventStore.storePlayNoteEvent(
-    //     std::pair<int, int>(trackIndex, noteOnEvent->getNote()),
-    //     noteOnEvent);
+    if (programPadIndex == -1)
+    {
+        return;
+    }
 
-    auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(
-        noteOnEvent->getNote(), noteOnEvent->getVelocity());
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(layeredScreen, clientEventController, hardware, sequencer, screens, sampler, eventRegistry, eventHandler, frameSequencer, previewSoundPlayer, programPadIndex, e.getVelocity(), layeredScreen->getCurrentScreen());
+
+    command::TriggerDrumNoteOnCommand(ctx).execute();
+
+    /*
 
     auto mode = clientEventController->determineRecordingMode();
-
     switch (mode)
     {
         case RecordingMode::Overdub:
@@ -354,7 +383,7 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
         // noteEventStore.storeRecordNoteEvent(
         //     std::pair<int, int>(trackIndex, recordMidiNoteOn->getNote()),
         //     recordMidiNoteOn);
-    }
+    }*/
 }
 
 void ClientMidiSoundGeneratorController::handleNoteOffEvent(
@@ -371,8 +400,34 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 
     int trackIndex = track->getIndex();
 
-    const int trackDevice = track->getDeviceIndex();
-    const auto drumIndex = getDrumIndexForEvent(e);
+    auto program = getProgramForEvent(e);
+
+    if (!program)
+    {
+        return;
+    }
+
+    const int programPadIndex = program->getPadIndexFromNote(note);
+
+    if (programPadIndex == -1)
+    {
+        return;
+    }
+
+    auto snapshot = eventRegistry->getSnapshot();
+
+    auto noteEventInfo = snapshot.retrieveNoteEvent(note, eventregistry::Source::MidiInput);
+
+    auto drumBus = std::dynamic_pointer_cast<DrumBus>(noteEventInfo->bus);
+
+    if (!drumBus)
+    {
+        return;
+    }
+
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(previewSoundPlayer, eventRegistry, eventHandler, screens, sequencer, hardware, clientEventController, frameSequencer, programPadIndex, drumBus->getIndex(), noteEventInfo->screen, note, noteEventInfo->program, noteEventInfo->track); 
+
+    command::TriggerDrumNoteOffCommand(ctx).execute();
 
     // finalize recorded note if exists
     // if (auto storedRecordMidiNoteOn = noteEventStore.retrieveRecordNoteEvent(

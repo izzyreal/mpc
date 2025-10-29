@@ -3,6 +3,9 @@
 #include <stdexcept>
 
 using namespace mpc::eventregistry;
+using namespace mpc::lcdgui;
+using namespace mpc::sampler;
+using namespace mpc::sequencer;
 
 namespace
 {
@@ -67,9 +70,9 @@ void EventRegistry::enqueue(EventMessage &&msg)
 }
 
 PhysicalPadEventPtr EventRegistry::registerPhysicalPadPress(
-    Source source, std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-    std::shared_ptr<mpc::sequencer::Bus> bus, PhysicalPadIndex padIndex,
-    Velocity velocity, std::shared_ptr<sequencer::Track> track, int bank,
+    Source source, std::shared_ptr<ScreenComponent> screen,
+    std::shared_ptr<Bus> bus, PhysicalPadIndex padIndex,
+    Velocity velocity, Track *track, int bank,
     std::optional<int> note)
 {
     printf("registering physical pad press\n");
@@ -91,7 +94,7 @@ PhysicalPadEventPtr EventRegistry::registerPhysicalPadPress(
 void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
                                                   Pressure pressure)
 {
-    printf("registering physical pad aftertouch\n");
+    printf("registering physical pad aftertouch for pad index %i\n", padIndex.get());
 
     const auto snapshotView = getSnapshot();
 
@@ -104,6 +107,7 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
                      {},
                      {},
                      pressure});
+            return;
         }
     }
 
@@ -129,10 +133,10 @@ EventRegistry::registerPhysicalPadRelease(PhysicalPadIndex padIndex)
 }
 
 ProgramPadEventPtr EventRegistry::registerProgramPadPress(
-    Source source, std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-    std::shared_ptr<mpc::sequencer::Bus> bus,
-    std::shared_ptr<mpc::sampler::Program> program, ProgramPadIndex padIndex,
-    Velocity velocity, std::optional<TrackIndex> trackIndex,
+    Source source, std::shared_ptr<ScreenComponent> screen,
+    std::shared_ptr<Bus> bus,
+    std::shared_ptr<Program> program, ProgramPadIndex padIndex,
+    Velocity velocity, Track *track,
     std::optional<MidiChannel> midiChannel)
 {
     assert(screen && bus && program);
@@ -143,7 +147,7 @@ ProgramPadEventPtr EventRegistry::registerProgramPadPress(
     e->padIndex = padIndex;
     e->source = source;
     e->screen = screen;
-    e->trackIndex = trackIndex;
+    e->track = track;
     e->bus = bus;
     e->program = program;
     e->velocity = velocity;
@@ -153,9 +157,9 @@ ProgramPadEventPtr EventRegistry::registerProgramPadPress(
 }
 
 void EventRegistry::registerProgramPadAftertouch(
-    Source source, std::shared_ptr<mpc::sequencer::Bus> bus,
-    std::shared_ptr<mpc::sampler::Program> program, ProgramPadIndex padIndex,
-    Pressure pressure, std::optional<TrackIndex> trackIndex)
+    Source source, std::shared_ptr<Bus> bus,
+    std::shared_ptr<Program> program, ProgramPadIndex padIndex,
+    Pressure pressure, Track *track)
 {
     assert(bus && program);
 
@@ -175,15 +179,12 @@ void EventRegistry::registerProgramPadAftertouch(
             return;
         }
     }
-
-    throw std::invalid_argument(
-        "registerProgramPadAftertouch called without matching press");
 }
 
 void EventRegistry::registerProgramPadRelease(
-    Source source, std::shared_ptr<mpc::sequencer::Bus> bus,
-    std::shared_ptr<mpc::sampler::Program> program, ProgramPadIndex padIndex,
-    std::optional<TrackIndex> trackIndex,
+    Source source, std::shared_ptr<Bus> bus,
+    std::shared_ptr<Program> program, ProgramPadIndex padIndex,
+    Track *track,
     std::optional<MidiChannel> midiChannel)
 {
     assert(bus && program);
@@ -210,10 +211,11 @@ void EventRegistry::registerProgramPadRelease(
 }
 
 NoteEventPtr EventRegistry::registerNoteOn(
-    Source source, std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-    std::shared_ptr<mpc::sequencer::Bus> bus, NoteNumber noteNumber,
-    Velocity velocity, std::optional<TrackIndex> trackIndex,
-    std::optional<MidiChannel> midiChannel)
+    Source source, std::shared_ptr<ScreenComponent> screen,
+    std::shared_ptr<Bus> bus, NoteNumber noteNumber,
+    Velocity velocity, Track *track,
+    std::optional<MidiChannel> midiChannel,
+    std::shared_ptr<Program> program)
 {
     printf("registering note on\n");
     assert(screen && bus);
@@ -221,10 +223,11 @@ NoteEventPtr EventRegistry::registerNoteOn(
     e->noteNumber = noteNumber;
     e->source = source;
     e->screen = screen;
-    e->trackIndex = trackIndex;
+    e->track = track;
     e->bus = bus;
     e->velocity = velocity;
     e->midiChannel = midiChannel;
+    e->program = program;
     enqueue({EventMessage::Type::NoteOn, {}, {}, e});
     return e;
 }
@@ -244,15 +247,12 @@ void EventRegistry::registerNoteAftertouch(Source source, NoteNumber noteNumber,
             return;
         }
     }
-
-    throw std::invalid_argument(
-        "registerNoteAftertouch called without matching note on");
 }
 
 void EventRegistry::registerNoteOff(Source source,
-                                    std::shared_ptr<mpc::sequencer::Bus> bus,
+                                    std::shared_ptr<Bus> bus,
                                     NoteNumber noteNumber,
-                                    std::optional<TrackIndex> trackIndex,
+                                    Track *track,
                                     std::optional<MidiChannel> midiChannel)
 {
     assert(bus);
@@ -409,30 +409,44 @@ EventRegistry::SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
     return nullptr;
 }
 
-std::shared_ptr<mpc::sequencer::NoteOnEvent>
+std::shared_ptr<NoteOnEvent>
 EventRegistry::SnapshotView::retrieveRecordNoteEvent(NoteNumber note) const
 {
-    for (auto &e : snap->noteEvents)
+    for (const auto &e : snap->noteEvents)
     {
         if (e->noteNumber == note && e->recordNoteEvent)
         {
             return *e->recordNoteEvent;
         }
     }
-    return nullptr;
+    return {};
 }
 
 PhysicalPadEventPtr EventRegistry::SnapshotView::retrievePhysicalPadEvent(
     PhysicalPadIndex idx) const
 {
-    for (auto &e : snap->physicalPadEvents)
+    for (const auto &e : snap->physicalPadEvents)
     {
         if (e->padIndex == idx)
         {
             return e;
         }
     }
-    return nullptr;
+    return {};
+}
+
+NoteEventPtr
+EventRegistry::SnapshotView::retrieveNoteEvent(NoteNumber note, Source src) const
+{
+    for (const auto &e : snap->noteEvents)
+    {
+        if (e->noteNumber == note &&
+                e->source == src)
+        {
+            return e;
+        }
+    }
+    return {};
 }
 
 void EventRegistry::drainQueue() noexcept

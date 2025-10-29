@@ -59,7 +59,7 @@ namespace mpc::audiomidi
         // derived from the active track.
         void
         handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent>,
-                                const std::optional<int> trackIndex,
+                                Track *,
                                 const std::optional<int> trackDevice,
                                 const std::optional<int> trackVelocityRatio,
                                 const std::optional<int> drumIndex);
@@ -85,7 +85,7 @@ namespace mpc::audiomidi
         // derived from the active track.
         void
         handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<NoteOffEvent>,
-                                           const std::optional<int> trackIndex,
+                                           Track *,
                                            const std::optional<int> trackDevice,
                                            const std::optional<int> drumIndex);
 
@@ -103,7 +103,7 @@ namespace mpc::audiomidi
         void handleMidiInputNoteOn(const int midiChannel,
                                    const std::shared_ptr<NoteOnEventPlayOnly>,
                                    const int frameOffsetInBuffer,
-                                   const int trackIndex, const int trackDevice,
+                                   Track *, const int trackDevice,
                                    const int trackVelocityRatio,
                                    const std::optional<int> drumIndex);
 
@@ -118,7 +118,7 @@ namespace mpc::audiomidi
         void handleMidiInputNoteOff(const int midiChannel,
                                     const std::shared_ptr<NoteOffEvent>,
                                     const int frameOffsetInBuffer,
-                                    const int trackIndex, const int trackDevice,
+                                    Track *, const int trackDevice,
                                     const std::optional<int> drumIndex);
 
         /**
@@ -140,7 +140,7 @@ namespace mpc::audiomidi
         // non-null
         void
         handleNoteEventMidiOut(const std::shared_ptr<Event>,
-                               const int trackIndex, const int trackDevice,
+                               Track *, const int trackDevice,
                                const std::optional<int> trackVelocityRatio);
 
         /**

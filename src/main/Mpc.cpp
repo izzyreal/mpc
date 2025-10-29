@@ -129,15 +129,17 @@ void Mpc::init()
     MLOG("EventHandler created");
 
     eventRegistry = std::make_shared<eventregistry::EventRegistry>();
+
     clientEventController =
         std::make_shared<mpc::controller::ClientEventController>(*this);
-    clientEventController->init();
-
     /*
      * AudioMidiServices requires sequencer to exist.
      */
     audioMidiServices =
         std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
+
+    clientEventController->init();
+
     MLOG("AudioMidiServices created");
 
     sequencer->init();
