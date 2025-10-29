@@ -26,7 +26,7 @@ void TriggerDrumNoteOffCommand::execute()
         return;
     }
 
-    if (!ctx.playNoteEvent)
+    if (!ctx.noteOffEvent)
     {
         return;
     }
@@ -34,19 +34,19 @@ void TriggerDrumNoteOffCommand::execute()
     if (ctx.currentScreenIsSamplerScreen)
     {
         ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.playNoteEvent->getNoteOff(), std::nullopt, std::nullopt,
+            ctx.noteOffEvent, std::nullopt, std::nullopt,
             ctx.drumIndex);
     }
     else
     {
         ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.playNoteEvent->getNoteOff(), ctx.activeTrack->getIndex(),
+            ctx.noteOffEvent, ctx.activeTrack->getIndex(),
             ctx.activeTrack->getDeviceIndex(), ctx.drumIndex);
     }
 
     ctx.eventRegistry->registerNoteOff(
         eventregistry::Source::VirtualMpcHardware, ctx.drumBus,
-        ctx.playNoteEvent->getNote(), ctx.activeTrack->getIndex(),
+        ctx.noteOffEvent->getNote(), ctx.activeTrack->getIndex(),
         std::nullopt);
 
     ctx.eventRegistry->registerProgramPadRelease(

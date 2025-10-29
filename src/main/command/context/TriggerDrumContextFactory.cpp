@@ -147,9 +147,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
-    const auto registryPlayNoteEvent =
-        mpc.eventRegistry->retrievePlayNoteEvent(note);
-
     auto eventHandler = mpc.getEventHandler();
 
     const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
@@ -205,9 +202,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,
-        std::make_shared<sequencer::NoteOnEventPlayOnly>(
-            registryPlayNoteEvent->noteNumber,
-            *registryPlayNoteEvent->velocity),
+        std::make_shared<sequencer::NoteOffEvent>(note),
         drumIndex,
         eventHandler,
         sequencerRecordNoteOnEvent,

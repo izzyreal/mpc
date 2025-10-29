@@ -28,6 +28,22 @@ void TriggerDrumNoteOnCommand::execute()
         return;
     }
 
+    const auto velo = ctx.isFullLevelEnabled ? 127 : ctx.velocity;
+
+    const auto noteOnEvent =
+        std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
+
+    ctx.eventRegistry->registerProgramPadPress(
+        eventregistry::Source::VirtualMpcHardware, ctx.screenComponent,
+        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.program,
+        ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track->getIndex(),
+        std::nullopt);
+
+    auto registryNoteOn = ctx.eventRegistry->registerNoteOn(
+        eventregistry::Source::VirtualMpcHardware, ctx.screenComponent,
+        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.note,
+        noteOnEvent->getVelocity(), ctx.track->getIndex(), std::nullopt);
+
     if (ctx.isSequencerScreen && ctx.isNoteRepeatLockedOrPressed &&
         ctx.sequencer->isPlaying())
     {
@@ -40,11 +56,6 @@ void TriggerDrumNoteOnCommand::execute()
     }
 
     const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
-
-    const auto velo = ctx.isFullLevelEnabled ? 127 : ctx.velocity;
-
-    const auto noteOnEvent =
-        std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
 
     const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
 
@@ -156,17 +167,6 @@ void TriggerDrumNoteOnCommand::execute()
             recordNoteOnEvent->setVariationValue(value);
         }
     }
-
-    ctx.eventRegistry->registerProgramPadPress(
-        eventregistry::Source::VirtualMpcHardware, ctx.screenComponent,
-        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.program,
-        ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track->getIndex(),
-        std::nullopt);
-
-    auto registryNoteOn = ctx.eventRegistry->registerNoteOn(
-        eventregistry::Source::VirtualMpcHardware, ctx.screenComponent,
-        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.note,
-        noteOnEvent->getVelocity(), ctx.track->getIndex(), std::nullopt);
 
     if (recordNoteOnEvent)
     {

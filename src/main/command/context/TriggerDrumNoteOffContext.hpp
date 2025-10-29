@@ -16,8 +16,8 @@ namespace mpc::sampler
 
 namespace mpc::sequencer
 {
-    class NoteOnEventPlayOnly;
     class NoteOnEvent;
+    class NoteOffEvent;
     class Track;
     class DrumBus;
 } // namespace mpc::sequencer
@@ -38,7 +38,7 @@ namespace mpc::command::context
         std::function<void()> finishBasicVoiceIfSoundIsLooping;
         const bool currentScreenIsSoundScreen;
         const bool currentScreenIsSamplerScreen;
-        std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> playNoteEvent;
+        std::shared_ptr<mpc::sequencer::NoteOffEvent> noteOffEvent;
         std::optional<int> drumIndex;
         std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
         std::shared_ptr<mpc::sequencer::NoteOnEvent> recordOnEvent;

@@ -19,6 +19,10 @@ namespace mpc::sequencer
         void setNote(int i);
 
     public:
+        NoteOffEvent(int numberToUse)
+        {
+            number = numberToUse;
+        }
         int getNote();
 
         std::string getTypeName() override
