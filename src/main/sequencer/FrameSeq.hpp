@@ -45,6 +45,8 @@ namespace mpc::sequencer
     class FrameSeq : public mpc::engine::audio::server::AudioClient
     {
     private:
+        static constexpr uint16_t eventRegistrySnapshotPublishIntervalFrames = 100;
+        uint16_t eventRegistrySnapshotPublishFrameCounter = 0;
         std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;
         bool shouldWaitForMidiClockLock = false;

@@ -6,6 +6,7 @@
 
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
+#include "eventregistry/EventRegistry.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "sequencer/Song.hpp"
@@ -566,6 +567,13 @@ void FrameSeq::work(int nFrames)
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
+        if (eventRegistrySnapshotPublishFrameCounter++ >=
+                eventRegistrySnapshotPublishIntervalFrames)
+        {
+            eventRegistrySnapshotPublishFrameCounter = 0;
+            mpc.eventRegistry->publishSnapshot();
+        }
+
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex);
 

@@ -2,9 +2,9 @@
 
 #define NOMINMAX
 
-#include <lcdgui/LayeredScreen.hpp>
+#include "lcdgui/LayeredScreen.hpp"
 
-#include <disk/DiskController.hpp>
+#include "disk/DiskController.hpp"
 
 #include "Paths.hpp"
 

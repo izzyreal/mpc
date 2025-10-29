@@ -35,6 +35,7 @@ int getDrumIndexForCurrentScreen(mpc::Mpc &mpc,
 
 TriggerDrumNoteOnContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+
     mpc::Mpc &mpc, int programPadIndex, int velocity,
     const std::shared_ptr<ScreenComponent> screen)
 {
@@ -98,7 +99,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
-    return {mpc.eventRegistry,
+    return {
+            mpc.eventRegistry,
             isSequencerScreen,
             programPadIndex,
             velocity,
@@ -133,6 +135,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
 
 TriggerDrumNoteOffContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+
     mpc::Mpc &mpc, const int programPadIndex, int drumIndex,
     const std::shared_ptr<ScreenComponent> screen, const int note,
     std::shared_ptr<sampler::Program> program,
@@ -149,13 +152,14 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
 
     auto eventHandler = mpc.getEventHandler();
 
+    const auto registrySnapshot = mpc.eventRegistry->getSnapshot();
     const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
-        mpc.eventRegistry->retrieveRecordNoteEvent(note);
+        registrySnapshot.retrieveRecordNoteEvent(note);
 
     std::function<bool()> isAnyProgramPadRegisteredAsPressed =
-        [registry = mpc.eventRegistry]
+        [registry = mpc.eventRegistry]()
     {
-        return registry->isAnyProgramPadPressed();
+        return registry->getSnapshot().isAnyProgramPadPressed();
     };
 
     const auto stepEditOptionsScreen =

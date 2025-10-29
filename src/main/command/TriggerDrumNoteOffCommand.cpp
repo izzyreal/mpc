@@ -44,12 +44,14 @@ void TriggerDrumNoteOffCommand::execute()
     }
 
     ctx.eventRegistry->registerNoteOff(
-        eventregistry::Source::VirtualMpcHardware, ctx.drumBus,
-        ctx.noteOffEvent->getNote(), ctx.activeTrack->getIndex(), std::nullopt);
+        eventregistry::Source::VirtualMpcHardware,
+        ctx.drumBus, ctx.noteOffEvent->getNote(), ctx.activeTrack->getIndex(),
+        std::nullopt);
 
     ctx.eventRegistry->registerProgramPadRelease(
-        eventregistry::Source::VirtualMpcHardware, ctx.drumBus, ctx.program,
-        ctx.programPadIndex, ctx.activeTrack->getIndex(), std::nullopt);
+        eventregistry::Source::VirtualMpcHardware,
+        ctx.drumBus, ctx.program, ctx.programPadIndex,
+        ctx.activeTrack->getIndex(), std::nullopt);
 
     if (!ctx.recordOnEvent)
     {
