@@ -6,7 +6,6 @@
 
 namespace mpc::client::event
 {
-
     struct ClientHardwareEvent
     {
 

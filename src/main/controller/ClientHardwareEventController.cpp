@@ -172,7 +172,6 @@ void ClientHardwareEventController::handlePadPress(
     {
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
             event.componentId);
-        mpc.eventRegistry->publishSnapshot();
         return;
     }
 
@@ -212,13 +211,10 @@ void ClientHardwareEventController::handlePadPress(
 
     if (screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
-        mpc.eventRegistry->publishSnapshot();
         return;
     }
 
     TriggerDrumNoteOnCommand(ctx).execute();
-
-    mpc.eventRegistry->publishSnapshot();
 }
 
 void ClientHardwareEventController::handlePadRelease(
@@ -237,8 +233,8 @@ void ClientHardwareEventController::handlePadRelease(
 
     const auto physicalPadIndex = *event.index;
 
-    const auto info =
-        mpc.eventRegistry->registerPhysicalPadRelease(physicalPadIndex);
+    const auto info = mpc.eventRegistry->registerPhysicalPadRelease(
+        physicalPadIndex);
 
     const auto programPadIndex =
         physicalPadIndex + static_cast<int>(info->bank) * 16;
@@ -247,7 +243,6 @@ void ClientHardwareEventController::handlePadRelease(
 
     if (screengroups::isPadDoesNotTriggerNoteEventScreen(info->screen))
     {
-        mpc.eventRegistry->publishSnapshot();
         return;
     }
 
@@ -263,11 +258,10 @@ void ClientHardwareEventController::handlePadRelease(
     {
         assert(drumIndex);
         auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-            mpc, programPadIndex, *drumIndex, info->screen, *info->note,
-            info->program, info->track);
+            mpc, programPadIndex, *drumIndex, info->screen,
+            *info->note, info->program, info->track);
         TriggerDrumNoteOffCommand(ctx).execute();
     }
-    mpc.eventRegistry->publishSnapshot();
 }
 
 void ClientHardwareEventController::handlePadAftertouch(
@@ -285,25 +279,25 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
     mpc.eventRegistry->registerPhysicalPadAftertouch(padIndex, pressureToUse);
-    auto physicalPadEvent =
-        mpc.eventRegistry->retrievePhysicalPadEvent(padIndex);
+
+    auto physicalPadEvent = mpc.eventRegistry->getSnapshot()
+                                .retrievePhysicalPadEvent(padIndex);
 
     if (physicalPadEvent->program)
     {
         mpc.eventRegistry->registerProgramPadAftertouch(
-            eventregistry::Source::VirtualMpcHardware, physicalPadEvent->bus,
-            physicalPadEvent->program, padIndex + (physicalPadEvent->bank * 16),
-            pressureToUse, physicalPadEvent->track->getIndex());
+            eventregistry::Source::VirtualMpcHardware,
+            physicalPadEvent->bus, physicalPadEvent->program,
+            padIndex + (physicalPadEvent->bank * 16), pressureToUse,
+            physicalPadEvent->track->getIndex());
     }
 
     if (physicalPadEvent->note)
     {
         mpc.eventRegistry->registerNoteAftertouch(
-            eventregistry::Source::VirtualMpcHardware, *physicalPadEvent->note,
-            pressureToUse);
+            eventregistry::Source::VirtualMpcHardware,
+            *physicalPadEvent->note, pressureToUse);
     }
-
-    mpc.eventRegistry->publishSnapshot();
 }
 
 void ClientHardwareEventController::handleDataWheel(

@@ -113,8 +113,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         else
         {
             const int velocityToUseIfNotFullLevel =
-                snapshot.getPressedProgramPadAfterTouchOrVelocity(
-                    padIndex);
+                snapshot.getPressedProgramPadAfterTouchOrVelocity(padIndex);
 
             noteEvent->setVelocity(fullLevel ? 127
                                              : velocityToUseIfNotFullLevel);

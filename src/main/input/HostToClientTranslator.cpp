@@ -40,6 +40,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                 ClientHardwareEvent::Source::HostFocusEvent;
             break;
         case HostInputEvent::Source::MIDI:
+            // Handled above
         default:
             break;
     }
