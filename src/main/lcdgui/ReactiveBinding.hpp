@@ -3,6 +3,7 @@
 #include <functional>
 #include <utility>
 #include <type_traits>
+#include <optional>
 
 namespace mpc::lcdgui
 {
@@ -23,10 +24,10 @@ namespace mpc::lcdgui
 
             refreshFn = [get = std::forward<Getter>(getter),
                          upd = std::forward<Updater>(updater),
-                         prev = std::move(lastValue)]() mutable
+                         prev = std::optional<T>()]() mutable
             {
                 const T current = get();
-                if (current != prev)
+                if (!prev.has_value() || current != prev)
                 {
                     prev = current;
                     upd(current);
