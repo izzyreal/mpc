@@ -279,13 +279,22 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
     mpc.eventRegistry->registerPhysicalPadAftertouch(padIndex, pressureToUse);
+    auto physicalPadEvent =
+        mpc.eventRegistry->retrievePhysicalPadEvent(padIndex);
 
-    if (auto physicalPadPress =
-            mpc.eventRegistry->retrievePhysicalPadEvent(padIndex);
-        physicalPadPress->note)
+    if (physicalPadEvent->program)
     {
-        mpc.eventRegistry->registerNoteAftertouch(*physicalPadPress->note,
-                                                  pressureToUse);
+        mpc.eventRegistry->registerProgramPadAftertouch(
+            eventregistry::Source::VirtualMpcHardware, physicalPadEvent->bus,
+            physicalPadEvent->program, padIndex + (physicalPadEvent->bank * 16),
+            pressureToUse, physicalPadEvent->track->getIndex());
+    }
+
+    if (physicalPadEvent->note)
+    {
+        mpc.eventRegistry->registerNoteAftertouch(
+            eventregistry::Source::VirtualMpcHardware, *physicalPadEvent->note,
+            pressureToUse);
     }
 }
 

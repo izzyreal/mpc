@@ -136,7 +136,7 @@ namespace mpc::eventregistry
             std::shared_ptr<mpc::sequencer::Bus>, NoteNumber, Velocity,
             std::optional<TrackIndex>, std::optional<MidiChannel>);
 
-        void registerNoteAftertouch(NoteNumber, Pressure);
+        void registerNoteAftertouch(Source source, NoteNumber, Pressure);
 
         void registerNoteOff(Source, std::shared_ptr<mpc::sequencer::Bus>,
                              NoteNumber, std::optional<TrackIndex>,

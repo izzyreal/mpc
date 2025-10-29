@@ -56,10 +56,9 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
 {
     for (auto &e : physicalPadEvents)
     {
-        if (e->padIndex == padIndex)
+        if (e->padIndex == padIndex && e->source != Source::NoteRepeat)
         {
             e->pressure = pressure;
-            break;
         }
     }
 }
@@ -95,9 +94,10 @@ void EventRegistry::registerProgramPadAftertouch(
 {
     assert(bus && program);
 
+    printf("Registering pad pressure: %i\n", pressure.get());
     for (auto &e : programPadEvents)
     {
-        if (e->padIndex == padIndex)
+        if (e->padIndex == padIndex && e->source == source)
         {
             e->pressure = pressure;
             return;
@@ -129,17 +129,23 @@ NoteEventPtr EventRegistry::registerNoteOn(
     return e;
 }
 
-void EventRegistry::registerNoteAftertouch(NoteNumber noteNumber,
+void EventRegistry::registerNoteAftertouch(Source source, NoteNumber noteNumber,
                                            Pressure pressure)
 {
+    printf("Registering note pressure: %i\n", pressure.get());
     for (auto &e : noteEvents)
     {
-        if (e->noteNumber == noteNumber)
+        if (e->noteNumber == noteNumber && e->source == source &&
+            e->source != Source::NoteRepeat)
         {
             e->pressure = pressure;
-            break;
+            return;
         }
     }
+
+    throw std::invalid_argument(
+        "This method should only be called for program pads that are "
+        "pressed\n");
 }
 
 bool EventRegistry::isProgramPadPressedBySource(ProgramPadIndex padIndex,
@@ -160,6 +166,8 @@ VelocityOrPressure EventRegistry::getPressedProgramPadAfterTouchOrVelocity(
 {
     assert(isProgramPadPressed(padIndex));
 
+    std::optional<VelocityOrPressure> result;
+
     for (const auto &e : programPadEvents)
     {
         if (e->source == Source::NoteRepeat)
@@ -171,11 +179,19 @@ VelocityOrPressure EventRegistry::getPressedProgramPadAfterTouchOrVelocity(
         {
             if (e->pressure)
             {
-                return *e->pressure;
+                result = *e->pressure;
             }
-
-            return e->velocity;
+            else if (!result)
+            {
+                result = e->velocity;
+            }
         }
+    }
+
+    if (result)
+    {
+        printf("returning %i\n", result.value());
+        return *result;
     }
 
     throw std::invalid_argument(

@@ -166,7 +166,6 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                 mpc.getLayeredScreen()->getCurrentScreen(), drumBus, program,
                 padIndex, noteEvent->getVelocity(), track->getIndex(),
                 std::nullopt);
-
         }
 
         if (track->getDeviceIndex() > 0)
@@ -179,9 +178,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
         mpc.eventRegistry->registerNoteOn(
             eventregistry::Source::NoteRepeat,
-            mpc.getLayeredScreen()->getCurrentScreen(), drumBus, 
-            padIndex, noteEvent->getVelocity(), track->getIndex(),
-            std::nullopt);
+            mpc.getLayeredScreen()->getCurrentScreen(), drumBus, padIndex,
+            noteEvent->getVelocity(), track->getIndex(), std::nullopt);
 
         if (sequencer->isRecordingOrOverdubbing())
         {
@@ -217,11 +215,9 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                         mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
                     }
 
-
                     mpc.eventRegistry->registerNoteOff(
-                        eventregistry::Source::NoteRepeat, drumBus,
-                        padIndex, track->getIndex(), std::nullopt);
-
+                        eventregistry::Source::NoteRepeat, drumBus, padIndex,
+                        track->getIndex(), std::nullopt);
                 },
                 durationFrames - 1);
     }
