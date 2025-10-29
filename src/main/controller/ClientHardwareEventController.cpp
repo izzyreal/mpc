@@ -172,6 +172,7 @@ void ClientHardwareEventController::handlePadPress(
     {
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
             event.componentId);
+        mpc.eventRegistry->publishSnapshot();
         return;
     }
 
@@ -211,10 +212,13 @@ void ClientHardwareEventController::handlePadPress(
 
     if (screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
+        mpc.eventRegistry->publishSnapshot();
         return;
     }
 
     TriggerDrumNoteOnCommand(ctx).execute();
+
+    mpc.eventRegistry->publishSnapshot();
 }
 
 void ClientHardwareEventController::handlePadRelease(
@@ -243,6 +247,7 @@ void ClientHardwareEventController::handlePadRelease(
 
     if (screengroups::isPadDoesNotTriggerNoteEventScreen(info->screen))
     {
+        mpc.eventRegistry->publishSnapshot();
         return;
     }
 
@@ -262,6 +267,7 @@ void ClientHardwareEventController::handlePadRelease(
             info->program, info->track);
         TriggerDrumNoteOffCommand(ctx).execute();
     }
+    mpc.eventRegistry->publishSnapshot();
 }
 
 void ClientHardwareEventController::handlePadAftertouch(
@@ -296,6 +302,8 @@ void ClientHardwareEventController::handlePadAftertouch(
             eventregistry::Source::VirtualMpcHardware, *physicalPadEvent->note,
             pressureToUse);
     }
+
+    mpc.eventRegistry->publishSnapshot();
 }
 
 void ClientHardwareEventController::handleDataWheel(

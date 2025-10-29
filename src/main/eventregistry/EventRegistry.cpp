@@ -27,6 +27,17 @@ EventRegistry::EventRegistry()
     physicalPadEvents.reserve(CAPACITY);
     programPadEvents.reserve(CAPACITY);
     noteEvents.reserve(CAPACITY);
+
+    snapA.physicalPadEvents.reserve(CAPACITY);
+    snapA.programPadEvents.reserve(CAPACITY);
+    snapA.noteEvents.reserve(CAPACITY);
+
+    snapB.physicalPadEvents.reserve(CAPACITY);
+    snapB.programPadEvents.reserve(CAPACITY);
+    snapB.noteEvents.reserve(CAPACITY);
+
+    // snapshotPtr already initialized to &snapA in header; ensure memory order
+    std::atomic_store_explicit(&snapshotPtr, &snapA, std::memory_order_release);
 }
 
 PhysicalPadEventPtr EventRegistry::registerPhysicalPadPress(
@@ -351,3 +362,83 @@ namespace
         }
     }
 } // namespace
+
+void EventRegistry::publishSnapshotToBuffer(Snapshot *dst) noexcept
+{
+    // copy current working vectors into dst
+    dst->physicalPadEvents = physicalPadEvents;
+    dst->programPadEvents  = programPadEvents;
+    dst->noteEvents        = noteEvents;
+}
+
+void EventRegistry::publishSnapshot() noexcept
+{
+    // choose inactive buffer
+    Snapshot* cur = std::atomic_load_explicit(&snapshotPtr, std::memory_order_acquire);
+    Snapshot* inactive = (cur == &snapA) ? &snapB : &snapA;
+
+    // copy into inactive (safe: nobody reads inactive until we swap)
+    publishSnapshotToBuffer(inactive);
+
+    // publish by swapping active pointer
+    std::atomic_store_explicit(&snapshotPtr, inactive, std::memory_order_release);
+}
+
+EventRegistry::SnapshotView EventRegistry::getSnapshot() const noexcept
+{
+    Snapshot* s = std::atomic_load_explicit(&snapshotPtr, std::memory_order_acquire);
+    return SnapshotView(s);
+}
+bool EventRegistry::SnapshotView::isProgramPadPressedBySource(ProgramPadIndex idx, Source src) const
+{
+    for (auto& e : snap->programPadEvents)
+        if (e->padIndex == idx && e->source == src)
+            return true;
+    return false;
+}
+
+VelocityOrPressure EventRegistry::SnapshotView::getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const
+{
+    for (auto& e : snap->programPadEvents)
+        if (e->padIndex == idx)
+            return e->pressure.has_value() ? *e->pressure : VelocityOrPressure(e->velocity);
+    return VelocityOrPressure(0);
+}
+
+bool EventRegistry::SnapshotView::isProgramPadPressed(ProgramPadIndex idx) const
+{
+    for (auto& e : snap->programPadEvents)
+        if (e->padIndex == idx)
+            return true;
+    return false;
+}
+
+bool EventRegistry::SnapshotView::isAnyProgramPadPressed() const
+{
+    return !snap->programPadEvents.empty();
+}
+
+NoteEventPtr EventRegistry::SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
+{
+    for (auto& e : snap->noteEvents)
+        if (e->noteNumber == note)
+            return e;
+    return nullptr;
+}
+
+std::shared_ptr<mpc::sequencer::NoteOnEvent>
+EventRegistry::SnapshotView::retrieveRecordNoteEvent(NoteNumber note) const
+{
+    for (auto& e : snap->noteEvents)
+        if (e->noteNumber == note && e->recordNoteEvent)
+            return *e->recordNoteEvent;
+    return nullptr;
+}
+
+PhysicalPadEventPtr EventRegistry::SnapshotView::retrievePhysicalPadEvent(PhysicalPadIndex idx) const
+{
+    for (auto& e : snap->physicalPadEvents)
+        if (e->padIndex == idx)
+            return e;
+    return nullptr;
+}

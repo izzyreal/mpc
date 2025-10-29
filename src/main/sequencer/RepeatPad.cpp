@@ -48,10 +48,12 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
     auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>();
     auto note = assign16LevelsScreen->getNote();
 
+    auto snapshot = mpc.eventRegistry->getSnapshot();
+
     for (int padIndex = 0; padIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
          ++padIndex)
     {
-        if (!mpc.eventRegistry->isProgramPadPressed(padIndex))
+        if (!snapshot.isProgramPadPressed(padIndex))
         {
             continue;
         }
@@ -91,7 +93,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         }
 
         const bool isPhysicallyPressed =
-            mpc.eventRegistry->retrievePhysicalPadEvent(padIndex % 16)->bank ==
+            snapshot.retrievePhysicalPadEvent(padIndex % 16)->bank ==
             padIndex / 16;
 
         if (sixteenLevels && isPhysicallyPressed)
@@ -111,7 +113,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
         else
         {
             const int velocityToUseIfNotFullLevel =
-                mpc.eventRegistry->getPressedProgramPadAfterTouchOrVelocity(
+                snapshot.getPressedProgramPadAfterTouchOrVelocity(
                     padIndex);
 
             noteEvent->setVelocity(fullLevel ? 127
@@ -161,11 +163,13 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
             DrumNoteEventHandler::noteOn(ctx);
 
-            mpc.eventRegistry->registerProgramPadPress(
+            /*
+            snapshot->registerProgramPadPress(
                 eventregistry::Source::NoteRepeat,
                 mpc.getLayeredScreen()->getCurrentScreen(), drumBus, program,
                 padIndex, noteEvent->getVelocity(), track->getIndex(),
                 std::nullopt);
+                */
         }
 
         if (track->getDeviceIndex() > 0)
@@ -176,10 +180,12 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
         }
 
-        mpc.eventRegistry->registerNoteOn(
+        /*
+        snapshot->registerNoteOn(
             eventregistry::Source::NoteRepeat,
             mpc.getLayeredScreen()->getCurrentScreen(), drumBus, padIndex,
             noteEvent->getVelocity(), track->getIndex(), std::nullopt);
+            */
 
         if (sequencer->isRecordingOrOverdubbing())
         {
@@ -202,9 +208,11 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                         DrumNoteEventHandler::noteOff(ctx);
 
-                        mpc.eventRegistry->registerProgramPadRelease(
+                        /*
+                        snapshot->registerProgramPadRelease(
                             eventregistry::Source::NoteRepeat, drumBus, program,
                             padIndex, track->getIndex(), std::nullopt);
+                            */
                     }
 
                     if (track->getDeviceIndex() > 0)
@@ -215,9 +223,11 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                         mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
                     }
 
-                    mpc.eventRegistry->registerNoteOff(
+                    /*
+                    snapshot->registerNoteOff(
                         eventregistry::Source::NoteRepeat, drumBus, padIndex,
                         track->getIndex(), std::nullopt);
+                        */
                 },
                 durationFrames - 1);
     }
