@@ -108,13 +108,15 @@ void DrumScreen::displayPgm()
 void DrumScreen::displayPgmChange()
 {
     findField("program-change")
-        ->setText(getActiveDrumBus()->receivesPgmChange() ? "RECEIVE" : "IGNORE");
+        ->setText(getActiveDrumBus()->receivesPgmChange() ? "RECEIVE"
+                                                          : "IGNORE");
 }
 
 void DrumScreen::displayMidiVolume()
 {
     findField("midi-volume")
-        ->setText(getActiveDrumBus()->receivesMidiVolume() ? "RECEIVE" : "IGNORE");
+        ->setText(getActiveDrumBus()->receivesMidiVolume() ? "RECEIVE"
+                                                           : "IGNORE");
 }
 
 bool DrumScreen::isPadToIntSound()

@@ -299,8 +299,8 @@ void PgmAssignScreen::displayPgm()
 {
     auto program = getProgramOrThrow();
     findField("pgm")->setText(
-        StrUtil::padLeft(std::to_string(getActiveDrumBus()->getProgram() + 1), " ",
-                         2) +
+        StrUtil::padLeft(std::to_string(getActiveDrumBus()->getProgram() + 1),
+                         " ", 2) +
         "-" + program->getName());
 }
 

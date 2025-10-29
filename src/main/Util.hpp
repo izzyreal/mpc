@@ -73,7 +73,8 @@ namespace mpc
         set16LevelsValues(const SixteenLevelsContext &,
                           const std::shared_ptr<mpc::sequencer::NoteOnEvent>);
 
-        static std::pair<sequencer::NoteOnEvent::VARIATION_TYPE, int> getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);
+        static std::pair<sequencer::NoteOnEvent::VARIATION_TYPE, int>
+        getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);
 
         static std::vector<char> vecCopyOfRange(const std::vector<char> &src,
                                                 int offset, int length);

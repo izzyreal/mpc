@@ -12,8 +12,8 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
-    uint64_t noteEventId, std::shared_ptr<DrumBus> drum, std::shared_ptr<Sampler> sampler,
-    std::shared_ptr<AudioMixer> mixer,
+    uint64_t noteEventId, std::shared_ptr<DrumBus> drum,
+    std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> mixer,
     std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
     std::vector<std::shared_ptr<Voice>> *voices,
     std::vector<MixerInterconnection *> &mixerConnections, int note,

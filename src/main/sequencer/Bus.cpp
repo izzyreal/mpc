@@ -10,8 +10,7 @@
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-DrumBus::DrumBus(const int drumIndexToUse)
-    : drumIndex(drumIndexToUse)
+DrumBus::DrumBus(const int drumIndexToUse) : drumIndex(drumIndexToUse)
 {
     receivePgmChange = true;
     receiveMidiVolume = true;
@@ -69,22 +68,22 @@ void DrumBus::setLastReceivedMidiVolume(int volume)
     lastReceivedMidiVolume = std::clamp(volume, 0, 127);
 }
 
-std::map<int, int>& DrumBus::getSimultA()
+std::map<int, int> &DrumBus::getSimultA()
 {
     return simultA;
 }
 
-std::map<int, int>& DrumBus::getSimultB()
+std::map<int, int> &DrumBus::getSimultB()
 {
     return simultB;
 }
 
-std::vector<std::shared_ptr<StereoMixer>>& DrumBus::getStereoMixerChannels()
+std::vector<std::shared_ptr<StereoMixer>> &DrumBus::getStereoMixerChannels()
 {
     return stereoMixerChannels;
 }
 
-std::vector<std::shared_ptr<IndivFxMixer>>& DrumBus::getIndivFxMixerChannels()
+std::vector<std::shared_ptr<IndivFxMixer>> &DrumBus::getIndivFxMixerChannels()
 {
     return indivFxMixerChannels;
 }

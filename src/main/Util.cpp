@@ -264,8 +264,8 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
     }
 }
 
-std::pair<NoteOnEvent::VARIATION_TYPE, int> Util::getSliderNoteVariationTypeAndValue(
-    const SliderNoteVariationContext &ctx)
+std::pair<NoteOnEvent::VARIATION_TYPE, int>
+Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
 {
     const auto variationType = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
     int sliderValue = ctx.sliderValue;

@@ -17,7 +17,8 @@
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
     class FunctionKey;
 }
 

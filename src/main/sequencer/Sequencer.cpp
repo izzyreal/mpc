@@ -53,22 +53,22 @@ uint64_t currentTimeMillis()
         .count();
 }
 
-Sequencer::Sequencer(mpc::Mpc &mpc) : mpc(mpc)
-{
-}
+Sequencer::Sequencer(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void Sequencer::init()
 {
-    for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT; ++midiBusIndex)
+    for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT;
+         ++midiBusIndex)
     {
         buses.emplace_back(std::make_shared<MidiBus>());
     }
 
-    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT; ++drumBusIndex)
+    for (int drumBusIndex = 0; drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT;
+         ++drumBusIndex)
     {
         buses.emplace_back(std::make_shared<DrumBus>(drumBusIndex));
     }
-    
+
     lastTap = currentTimeMillis();
     nextSq = -1;
 
@@ -2197,8 +2197,7 @@ void Sequencer::setPunchOutTime(int time)
     punchOutTime = time;
 }
 
-template <typename T>
-std::shared_ptr<T> Sequencer::getBus(const int busIndex)
+template <typename T> std::shared_ptr<T> Sequencer::getBus(const int busIndex)
 {
     if (busIndex < 0 || busIndex >= buses.size())
     {
@@ -2220,4 +2219,3 @@ std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex)
 template std::shared_ptr<Bus> Sequencer::getBus(const int busIndex);
 template std::shared_ptr<MidiBus> Sequencer::getBus(const int busIndex);
 template std::shared_ptr<DrumBus> Sequencer::getBus(const int busIndex);
-

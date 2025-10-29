@@ -38,7 +38,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     mpc::Mpc &mpc, int programPadIndex, int velocity,
     const std::shared_ptr<ScreenComponent> screen)
 {
-    const bool isSequencerScreen = mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
+    const bool isSequencerScreen =
+        mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
@@ -75,9 +76,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     const int drumIndex = getDrumIndexForCurrentScreen(mpc, screen);
     const auto drumBus = mpc.getSequencer()->getDrumBus(drumIndex);
     std::shared_ptr<sampler::Program> program =
-        drumIndex >= 0
-            ? mpc.getSampler()->getProgram(drumBus->getProgram())
-            : nullptr;
+        drumIndex >= 0 ? mpc.getSampler()->getProgram(drumBus->getProgram())
+                       : nullptr;
 
     std::function<void(int)> setSelectedNote =
         [controller = mpc.clientEventController](int n)
@@ -98,45 +98,45 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
-    return {
-        mpc.eventRegistry,
-        isSequencerScreen,
-        programPadIndex,
-        velocity,
-        isSoundScreen,
-        isFullLevelEnabled,
-        isSixteenLevelsEnabled,
-        isNoteRepeatLockedOrPressed,
-        isErasePressed,
-        isStepRecording,
-        isRecMainWithoutPlaying,
-        mpc.getSequencer()->isRecordingOrOverdubbing(),
-        activeTrack->getBus(),
-        program,
-        note,
-        drumScreenSelectedDrum,
-        isSamplerScreen,
-        activeTrack,
-        mpc.getSampler(),
-        mpc.getSequencer(),
-        timingCorrectScreen,
-        assign16LevelsScreen,
-        mpc.getEventHandler(),
-        mpc.getAudioMidiServices()->getFrameSequencer(),
-        mpc.getBasicPlayer(),
-        allowCentralNoteAndPadUpdate,
-        mpc.getScreen(),
-        setSelectedNote,
-        setSelectedPad,
-        mpc.getLayeredScreen()->getFocusedFieldName(),
-        hardwareSliderValue
-    };
+    return {mpc.eventRegistry,
+            isSequencerScreen,
+            programPadIndex,
+            velocity,
+            isSoundScreen,
+            isFullLevelEnabled,
+            isSixteenLevelsEnabled,
+            isNoteRepeatLockedOrPressed,
+            isErasePressed,
+            isStepRecording,
+            isRecMainWithoutPlaying,
+            mpc.getSequencer()->isRecordingOrOverdubbing(),
+            activeTrack->getBus(),
+            program,
+            note,
+            drumScreenSelectedDrum,
+            isSamplerScreen,
+            activeTrack,
+            mpc.getSampler(),
+            mpc.getSequencer(),
+            timingCorrectScreen,
+            assign16LevelsScreen,
+            mpc.getEventHandler(),
+            mpc.getAudioMidiServices()->getFrameSequencer(),
+            mpc.getBasicPlayer(),
+            allowCentralNoteAndPadUpdate,
+            mpc.getScreen(),
+            setSelectedNote,
+            setSelectedPad,
+            mpc.getLayeredScreen()->getFocusedFieldName(),
+            hardwareSliderValue};
 }
 
 TriggerDrumNoteOffContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     mpc::Mpc &mpc, const int programPadIndex, int drumIndex,
-    const std::shared_ptr<ScreenComponent> screen, const int note, std::shared_ptr<sampler::Program> program, std::shared_ptr<sequencer::Track> activeTrack)
+    const std::shared_ptr<ScreenComponent> screen, const int note,
+    std::shared_ptr<sampler::Program> program,
+    std::shared_ptr<sequencer::Track> activeTrack)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping =
         [basicPlayer = &mpc.getBasicPlayer()]()
@@ -194,7 +194,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
             mpc.getHardware()->getButton(hardware::ComponentId::REC),
             mpc.clientEventController->clientHardwareEventController);
 
-    std::shared_ptr<sequencer::DrumBus> drumBus = mpc.getSequencer()->getDrumBus(drumIndex);
+    std::shared_ptr<sequencer::DrumBus> drumBus =
+        mpc.getSequencer()->getDrumBus(drumIndex);
 
     return {
         mpc.eventRegistry,
@@ -204,7 +205,9 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         finishBasicVoiceIfSoundIsLooping,
         isSoundScreen,
         isSamplerScreen,
-        std::make_shared<sequencer::NoteOnEventPlayOnly>(registryPlayNoteEvent->noteNumber, *registryPlayNoteEvent->velocity),
+        std::make_shared<sequencer::NoteOnEventPlayOnly>(
+            registryPlayNoteEvent->noteNumber,
+            *registryPlayNoteEvent->velocity),
         drumIndex,
         eventHandler,
         sequencerRecordNoteOnEvent,

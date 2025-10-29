@@ -92,7 +92,7 @@ ApsParser::ApsParser(mpc::Mpc &mpc, std::string apsNameString)
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
         auto drumBus = mpc.getSequencer()->getDrumBus(i);
-        
+
         ApsMixer mixer(drumBus->getStereoMixerChannels(),
                        drumBus->getIndivFxMixerChannels());
 

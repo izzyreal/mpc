@@ -18,10 +18,10 @@ namespace mpc::sequencer
         virtual ~Bus() = default;
 
         Bus() = default;
-        Bus(const Bus&) = delete;
-        Bus& operator=(const Bus&) = delete;
-        Bus(Bus&&) = delete;
-        Bus& operator=(Bus&&) = delete;
+        Bus(const Bus &) = delete;
+        Bus &operator=(const Bus &) = delete;
+        Bus(Bus &&) = delete;
+        Bus &operator=(Bus &&) = delete;
     };
 
     class DrumBus final : public Bus
@@ -44,18 +44,22 @@ namespace mpc::sequencer
         void setLastReceivedMidiVolume(int volume);
         int getLastReceivedMidiVolume() const;
 
-        std::map<int, int>& getSimultA();
-        std::map<int, int>& getSimultB();
+        std::map<int, int> &getSimultA();
+        std::map<int, int> &getSimultB();
 
-        std::vector<std::shared_ptr<mpc::engine::StereoMixer>>& getStereoMixerChannels();
-        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>& getIndivFxMixerChannels();
+        std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &
+        getStereoMixerChannels();
+        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &
+        getIndivFxMixerChannels();
 
     private:
         const int drumIndex;
         int programIndex = 0;
 
-        std::vector<std::shared_ptr<mpc::engine::StereoMixer>> stereoMixerChannels;
-        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> indivFxMixerChannels;
+        std::vector<std::shared_ptr<mpc::engine::StereoMixer>>
+            stereoMixerChannels;
+        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>
+            indivFxMixerChannels;
 
         std::map<int, int> simultA;
         std::map<int, int> simultB;
@@ -71,11 +75,10 @@ namespace mpc::sequencer
         MidiBus() = default;
         ~MidiBus() override = default;
 
-        MidiBus(const MidiBus&) = delete;
-        MidiBus& operator=(const MidiBus&) = delete;
-        MidiBus(MidiBus&&) = delete;
-        MidiBus& operator=(MidiBus&&) = delete;
+        MidiBus(const MidiBus &) = delete;
+        MidiBus &operator=(const MidiBus &) = delete;
+        MidiBus(MidiBus &&) = delete;
+        MidiBus &operator=(MidiBus &&) = delete;
     };
 
 } // namespace mpc::sequencer
-

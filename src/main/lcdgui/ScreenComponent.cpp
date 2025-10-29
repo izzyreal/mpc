@@ -184,7 +184,8 @@ std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram()
         return {};
     }
 
-    return mpc.getSampler()->getProgram(sequencer->getDrumBus(*drumIndex)->getProgram());
+    return mpc.getSampler()->getProgram(
+        sequencer->getDrumBus(*drumIndex)->getProgram());
 }
 
 std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()

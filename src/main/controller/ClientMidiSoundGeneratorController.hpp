@@ -28,7 +28,7 @@ namespace mpc::sampler
 {
     class Sampler;
     class Program;
-}
+} // namespace mpc::sampler
 
 namespace mpc::controller
 {
@@ -54,8 +54,7 @@ namespace mpc::controller
         ClientMidiSoundGeneratorController(
             std::shared_ptr<ClientEventController>,
             std::shared_ptr<MidiInputScreen>, std::shared_ptr<EventHandler>,
-            std::shared_ptr<Sequencer>,
-            std::shared_ptr<Sampler>,
+            std::shared_ptr<Sequencer>, std::shared_ptr<Sampler>,
             std::shared_ptr<MultiRecordingSetupScreen>,
             std::shared_ptr<TimingCorrectScreen>);
 
@@ -77,7 +76,8 @@ namespace mpc::controller
         std::optional<int> getDrumIndex(const std::shared_ptr<Track> &) const;
         std::shared_ptr<Program> getProgramForEvent(const MidiEvent &) const;
         std::optional<int> getDrumIndexForEvent(const MidiEvent &) const;
-        std::shared_ptr<sequencer::DrumBus> getDrumBusForEvent(const MidiEvent &) const;
+        std::shared_ptr<sequencer::DrumBus>
+        getDrumBusForEvent(const MidiEvent &) const;
 
         void handleNoteOnEvent(const MidiEvent &);
         void handleNoteOffEvent(const MidiEvent &);

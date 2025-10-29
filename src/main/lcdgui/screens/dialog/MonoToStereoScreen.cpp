@@ -7,7 +7,8 @@
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
     class FunctionKey;
 }
 

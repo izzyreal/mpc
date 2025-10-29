@@ -600,7 +600,7 @@ void Track::playNext()
         note->setTrack(trackIndex);
 
         if (auto drumBus = sequencer->getBus<DrumBus>(busNumber);
-                sequencer->isOverdubbing() &&
+            sequencer->isOverdubbing() &&
             mpc.getHardware()
                 ->getButton(hardware::ComponentId::ERASE)
                 ->isPressed() &&

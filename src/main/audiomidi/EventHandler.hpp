@@ -100,7 +100,8 @@ namespace mpc::audiomidi
         //
         // When not in one of the sampler screens, it's possible the track is
         // not a DRUM track, in which case drumIndex is std::nullopt.
-        void handleMidiInputNoteOn(const int midiChannel, const std::shared_ptr<NoteOnEventPlayOnly>,
+        void handleMidiInputNoteOn(const int midiChannel,
+                                   const std::shared_ptr<NoteOnEventPlayOnly>,
                                    const int frameOffsetInBuffer,
                                    const int trackIndex, const int trackDevice,
                                    const int trackVelocityRatio,
@@ -114,7 +115,8 @@ namespace mpc::audiomidi
         //
         // When not in one of the sampler screens, it's possible the track is
         // not a DRUM track, in which case drumIndex is std::nullopt.
-        void handleMidiInputNoteOff(const int midiChannel, const std::shared_ptr<NoteOffEvent>,
+        void handleMidiInputNoteOff(const int midiChannel,
+                                    const std::shared_ptr<NoteOffEvent>,
                                     const int frameOffsetInBuffer,
                                     const int trackIndex, const int trackDevice,
                                     const std::optional<int> drumIndex);

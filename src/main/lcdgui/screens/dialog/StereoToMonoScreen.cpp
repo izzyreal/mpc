@@ -4,7 +4,8 @@
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
     class FunctionKey;
 }
 

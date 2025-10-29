@@ -22,7 +22,7 @@ namespace mpc::sequencer
     class Track;
     class Bus;
     class NoteOnEvent;
-}
+} // namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
@@ -31,12 +31,12 @@ namespace mpc::eventregistry
     struct NoteEvent;
 
     using PhysicalPadEventPtr = std::shared_ptr<PhysicalPadEvent>;
-    using ProgramPadEventPtr  = std::shared_ptr<ProgramPadEvent>;
-    using NoteEventPtr        = std::shared_ptr<NoteEvent>;
+    using ProgramPadEventPtr = std::shared_ptr<ProgramPadEvent>;
+    using NoteEventPtr = std::shared_ptr<NoteEvent>;
 
     using PhysicalPadEventPtrs = std::vector<PhysicalPadEventPtr>;
-    using ProgramPadEventPtrs  = std::vector<ProgramPadEventPtr>;
-    using NoteEventPtrs        = std::vector<NoteEventPtr>;
+    using ProgramPadEventPtrs = std::vector<ProgramPadEventPtr>;
+    using NoteEventPtrs = std::vector<NoteEventPtr>;
 
     using PhysicalPadIndex = ConstrainedInt<uint8_t, 0, 15>;
     using Velocity = ConstrainedInt<uint8_t, 0, 127>;
@@ -46,13 +46,15 @@ namespace mpc::eventregistry
     using Pressure = ConstrainedInt<uint8_t, 0, 127>;
     using NoteNumber = ConstrainedInt<uint8_t, 0, 127>;
     using DrumNoteNumber = ConstrainedInt<uint8_t, 34, 98>;
+    using VelocityOrPressure = ConstrainedInt<uint8_t, 0, 127>;
 
     enum class Source
     {
         VirtualMpcHardware,
         Sequence,
         MidiInput,
-        AdhocGenerated
+        StepEditor,
+        NoteRepeat
     };
 
     struct PhysicalPadEvent
@@ -71,24 +73,20 @@ namespace mpc::eventregistry
 
     struct ProgramPadEvent
     {
-        enum class Type { Press, Aftertouch, Release };
         ProgramPadIndex padIndex;
-        Type type{};
         Source source{};
         std::optional<MidiChannel> midiChannel;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
         std::optional<TrackIndex> trackIndex;
         std::shared_ptr<mpc::sequencer::Bus> bus;
         std::shared_ptr<mpc::sampler::Program> program;
-        std::optional<Velocity> velocity;
+        Velocity velocity;
         std::optional<Pressure> pressure;
     };
 
     struct NoteEvent
     {
-        enum class Type { On, Aftertouch, Off };
         NoteNumber noteNumber;
-        Type type{};
         Source source{};
         std::optional<MidiChannel> midiChannel;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
@@ -104,116 +102,63 @@ namespace mpc::eventregistry
     public:
         EventRegistry();
 
-        PhysicalPadEventPtr registerPhysicalPadPress(Source source,
-                                                            std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-                                                            std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                            PhysicalPadIndex padIndex,
-                                                            Velocity velocity,
-                                                            std::shared_ptr<sequencer::Track> track,
-                                                            int bank,
-                                                            std::optional<int> note);
+        PhysicalPadEventPtr registerPhysicalPadPress(
+            Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
+            std::shared_ptr<mpc::sequencer::Bus>, PhysicalPadIndex padIndex,
+            Velocity, std::shared_ptr<sequencer::Track>, int bank,
+            std::optional<int> note);
 
-        void registerPhysicalPadAftertouch(Source source,
-                                                                 std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                                 PhysicalPadIndex padIndex,
-                                                                 Pressure pressure,
-                                                                 std::optional<TrackIndex> trackIndex);
+        void registerPhysicalPadAftertouch(PhysicalPadIndex padIndex, Pressure);
 
-        PhysicalPadEventPtr registerPhysicalPadRelease(PhysicalPadIndex padIndex);
+        PhysicalPadEventPtr
+        registerPhysicalPadRelease(PhysicalPadIndex padIndex);
 
-        ProgramPadEventPtr registerNonMidiProgramPadPress(Source source,
-                                                          std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-                                                          std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                          std::shared_ptr<mpc::sampler::Program> program,
-                                                          ProgramPadIndex padIndex,
-                                                          Velocity velocity,
-                                                          std::optional<TrackIndex> trackIndex);
+        ProgramPadEventPtr registerProgramPadPress(
+            Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
+            std::shared_ptr<mpc::sequencer::Bus>,
+            std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
+            Velocity, std::optional<TrackIndex>, std::optional<MidiChannel>);
 
-        void registerNonMidiProgramPadAftertouch(Source source,
-                                                               std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                               std::shared_ptr<mpc::sampler::Program> program,
-                                                               ProgramPadIndex padIndex,
-                                                               Pressure pressure,
-                                                               std::optional<TrackIndex> trackIndex);
+        void registerProgramPadAftertouch(
+            Source, std::shared_ptr<mpc::sequencer::Bus>,
+            std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
+            Pressure, std::optional<TrackIndex>);
 
-        void registerNonMidiProgramPadRelease(Source source,
-                                                            std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                            std::shared_ptr<mpc::sampler::Program> program,
-                                                            ProgramPadIndex padIndex,
-                                                            std::optional<TrackIndex> trackIndex);
+        void registerProgramPadRelease(Source,
+                                       std::shared_ptr<mpc::sequencer::Bus>,
+                                       std::shared_ptr<mpc::sampler::Program>,
+                                       ProgramPadIndex padIndex,
+                                       std::optional<TrackIndex>,
+                                       std::optional<MidiChannel>);
 
-        NoteEventPtr registerNonMidiNoteOn(Source source,
-                                           std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-                                           std::shared_ptr<mpc::sequencer::Bus> bus,
-                                           NoteNumber noteNumber,
-                                           Velocity velocity,
-                                           std::optional<TrackIndex> trackIndex);
+        NoteEventPtr registerNoteOn(
+            Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
+            std::shared_ptr<mpc::sequencer::Bus>, NoteNumber, Velocity,
+            std::optional<TrackIndex>, std::optional<MidiChannel>);
 
-        void registerNonMidiNoteAftertouch(Source source,
-                                                   std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                   NoteNumber noteNumber,
-                                                   Pressure pressure,
-                                                   std::optional<TrackIndex> trackIndex);
+        void registerNoteAftertouch(NoteNumber, Pressure);
 
-        void registerNonMidiNoteOff(Source source,
-                                            std::shared_ptr<mpc::sequencer::Bus> bus,
-                                            NoteNumber noteNumber,
-                                            std::optional<TrackIndex> trackIndex);
+        void registerNoteOff(Source, std::shared_ptr<mpc::sequencer::Bus>,
+                             NoteNumber, std::optional<TrackIndex>,
+                             std::optional<MidiChannel>);
 
-        ProgramPadEventPtr registerMidiProgramPadPress(Source source,
-                                                       std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-                                                       std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                       std::shared_ptr<mpc::sampler::Program> program,
-                                                       ProgramPadIndex padIndex,
-                                                       Velocity velocity,
-                                                       std::optional<MidiChannel> midiChannel,
-                                                       std::optional<TrackIndex> trackIndex);
+        bool isProgramPadPressedBySource(ProgramPadIndex, Source) const;
 
-        void registerMidiProgramPadAftertouch(Source source,
-                                                            std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                            std::shared_ptr<mpc::sampler::Program> program,
-                                                            ProgramPadIndex padIndex,
-                                                            Pressure pressure,
-                                                            std::optional<MidiChannel> midiChannel,
-                                                            std::optional<TrackIndex> trackIndex);
+        // Excludes program pad presses that are generated by the note repeat
+        // feature
+        VelocityOrPressure
+            getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
 
-        void registerMidiProgramPadRelease(Source source,
-                                                         std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                         std::shared_ptr<mpc::sampler::Program> program,
-                                                         ProgramPadIndex padIndex,
-                                                         std::optional<MidiChannel> midiChannel,
-                                                         std::optional<TrackIndex> trackIndex);
-
-        NoteEventPtr registerMidiNoteOn(Source source,
-                                        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen,
-                                        std::shared_ptr<mpc::sequencer::Bus> bus,
-                                        NoteNumber noteNumber,
-                                        Velocity velocity,
-                                        std::optional<MidiChannel> midiChannel,
-                                        std::optional<TrackIndex> trackIndex);
-
-        void registerMidiNoteAftertouch(Source source,
-                                                std::shared_ptr<mpc::sequencer::Bus> bus,
-                                                NoteNumber noteNumber,
-                                                Pressure pressure,
-                                                std::optional<MidiChannel> midiChannel,
-                                                std::optional<TrackIndex> trackIndex);
-
-        void registerMidiNoteOff(Source source,
-                                         std::shared_ptr<mpc::sequencer::Bus> bus,
-                                         NoteNumber noteNumber,
-                                         std::optional<MidiChannel> midiChannel,
-                                         std::optional<TrackIndex> trackIndex);
-
-        bool isProgramPadPressedBySource(ProgramPadIndex padIndex, Source source) const;
-        std::optional<int> getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex padIndex) const;
         bool isProgramPadPressed(ProgramPadIndex padIndex) const;
         bool isAnyProgramPadPressed() const;
 
         void clear();
 
-        NoteEventPtr retrievePlayNoteEvent(NoteNumber noteNumber) const;
-        std::shared_ptr<sequencer::NoteOnEvent> retrieveRecordNoteEvent(NoteNumber noteNumber) const;
+        NoteEventPtr retrievePlayNoteEvent(NoteNumber) const;
+        std::shared_ptr<sequencer::NoteOnEvent>
+            retrieveRecordNoteEvent(NoteNumber) const;
+
+        PhysicalPadEventPtr retrievePhysicalPadEvent(PhysicalPadIndex) const;
 
     private:
         const size_t CAPACITY = 8192;
@@ -222,5 +167,4 @@ namespace mpc::eventregistry
         ProgramPadEventPtrs programPadEvents;
         NoteEventPtrs noteEvents;
     };
-}
-
+} // namespace mpc::eventregistry

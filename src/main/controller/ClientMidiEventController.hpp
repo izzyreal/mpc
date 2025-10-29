@@ -70,10 +70,8 @@ namespace mpc::controller
         ClientMidiEventController(
             std::shared_ptr<ClientEventController>,
             std::shared_ptr<ClientHardwareEventController>,
-            std::shared_ptr<MidiSwScreen>,
-            std::shared_ptr<Sequencer>,
-            std::shared_ptr<Sampler>,
-            std::shared_ptr<MidiInputScreen>,
+            std::shared_ptr<MidiSwScreen>, std::shared_ptr<Sequencer>,
+            std::shared_ptr<Sampler>, std::shared_ptr<MidiInputScreen>,
             std::shared_ptr<EventHandler>,
             std::shared_ptr<MultiRecordingSetupScreen>,
             std::shared_ptr<TimingCorrectScreen>);

@@ -186,7 +186,9 @@ void UserScreen::displayDeviceName()
         if (device == 0)
         {
             auto programName =
-                sampler->getProgram(mpc.getSequencer()->getDrumBus(bus - 1)->getProgram())
+                sampler
+                    ->getProgram(
+                        mpc.getSequencer()->getDrumBus(bus - 1)->getProgram())
                     ->getName();
             findLabel("devicename")->setText(programName);
         }
@@ -284,7 +286,8 @@ void UserScreen::setRecordingModeMulti(bool b)
 
 void UserScreen::setLastBar(int i)
 {
-    lastBar = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
+    lastBar =
+        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
     displayBars();
 }
 

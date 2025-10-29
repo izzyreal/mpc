@@ -67,7 +67,7 @@ void doTest(mpc::Mpc &mpc, const bool clear, const bool replaceSameSounds,
     mpc.getSampler()->deleteAllSamples();
 
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
-    (void) ProgramLoader::loadProgram(mpc, pgmFile1, p1);
+    (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1);
 
     REQUIRE(mpc.getSampler()->getProgram(0) == p1);
     REQUIRE(mpc.getSampler()->getProgramCount() == 1);
@@ -95,7 +95,7 @@ void doTest(mpc::Mpc &mpc, const bool clear, const bool replaceSameSounds,
     auto pgmFile2 = disk->getFile("PROGRAM2.PGM");
     p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
-    (void) ProgramLoader::loadProgram(mpc, pgmFile2, p2);
+    (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2);
 }
 
 TEST_CASE("Load 2 programs in Clear P & S mode", "[load-programs]")
@@ -173,7 +173,7 @@ void doTestWithMissingSound(mpc::Mpc &mpc, const bool clear,
     std::thread loadThread(
         [&]()
         {
-            (void) ProgramLoader::loadProgram(mpc, pgmFile1, p1);
+            (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1);
         });
 
     int counter = 0;
@@ -226,7 +226,7 @@ void doTestWithMissingSound(mpc::Mpc &mpc, const bool clear,
     auto pgmFile2 = disk->getFile("PROGRAM2.PGM");
     p2 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
-    (void) ProgramLoader::loadProgram(mpc, pgmFile2, p2);
+    (void)ProgramLoader::loadProgram(mpc, pgmFile2, p2);
 }
 
 TEST_CASE("Load 2 programs in Add to P & S mode, 1 missing sound",

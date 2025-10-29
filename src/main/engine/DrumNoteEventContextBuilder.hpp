@@ -47,7 +47,8 @@ namespace mpc::engine
             bool firstGeneration, int startTick, int durationFrames);
 
         static DrumNoteOffContext
-        buildNoteOff(uint64_t noteEventId, std::shared_ptr<sequencer::DrumBus> drum,
+        buildNoteOff(uint64_t noteEventId,
+                     std::shared_ptr<sequencer::DrumBus> drum,
                      std::vector<std::shared_ptr<Voice>> *voices, int note,
                      int noteOnStartTick);
     };

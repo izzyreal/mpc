@@ -23,7 +23,7 @@ namespace mpc::sequencer
     class Bus;
     class DrumBus;
     class Song;
-}
+} // namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
@@ -57,8 +57,7 @@ namespace mpc::sequencer
         void setPositionWithinSong(const double positionQuarterNotes);
         void bumpPositionByTicks(const uint8_t ticks);
 
-        template <typename T>
-        std::shared_ptr<T> getBus(const int busIndex);
+        template <typename T> std::shared_ptr<T> getBus(const int busIndex);
         std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex);
 
     private:

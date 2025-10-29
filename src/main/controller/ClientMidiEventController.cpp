@@ -17,8 +17,7 @@ ClientMidiEventController::ClientMidiEventController(
     std::shared_ptr<ClientHardwareEventController>
         clientHardwareEventController,
     std::shared_ptr<MidiSwScreen> midiSwScreen,
-    std::shared_ptr<Sequencer> sequencer,
-    std::shared_ptr<Sampler> sampler,
+    std::shared_ptr<Sequencer> sequencer, std::shared_ptr<Sampler> sampler,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<audiomidi::EventHandler> eventHandler,
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
@@ -33,15 +32,16 @@ ClientMidiEventController::ClientMidiEventController(
     // Create the sound generator controller with the passed dependencies
     soundGeneratorController =
         std::make_shared<ClientMidiSoundGeneratorController>(
-            clientEventController, midiInputScreen, eventHandler, sequencer, sampler,
-            multiRecordingSetupScreen, timingCorrectScreen);
+            clientEventController, midiInputScreen, eventHandler, sequencer,
+            sampler, multiRecordingSetupScreen, timingCorrectScreen);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
     e.printInfo();
 
-    if (clientEventController->getLayeredScreen()->isCurrentScreen<MidiInputMonitorScreen>())
+    if (clientEventController->getLayeredScreen()
+            ->isCurrentScreen<MidiInputMonitorScreen>())
     {
         const auto notificationMessage =
             std::string("a") + std::to_string(e.getChannel());

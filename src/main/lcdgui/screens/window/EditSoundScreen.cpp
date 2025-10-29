@@ -900,7 +900,8 @@ void EditSoundScreen::function(int j)
                         sequencer->getActiveSequenceIndex());
                     auto t = sequencer->getActiveTrack();
 
-                    if (auto drumBus = sequencer->getBus<DrumBus>(t->getBus()); drumBus)
+                    if (auto drumBus = sequencer->getBus<DrumBus>(t->getBus());
+                        drumBus)
                     {
                         drumBus->setProgram(sampler->getProgramCount() - 1);
                     }

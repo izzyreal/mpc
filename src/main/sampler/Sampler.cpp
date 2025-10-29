@@ -226,7 +226,8 @@ void Sampler::playMetronome(unsigned int velocity, int framePos)
         return;
     }
 
-    const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(metronomeSoundScreen->getSound());
+    const auto drumBus =
+        mpc.getSequencer()->getBus<DrumBus>(metronomeSoundScreen->getSound());
 
     assert(drumBus);
 

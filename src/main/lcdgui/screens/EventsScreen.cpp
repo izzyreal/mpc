@@ -504,8 +504,7 @@ void EventsScreen::displayDrumNotes()
         auto track = sequencer->getActiveTrack();
         auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
         assert(drumBus);
-        auto program =
-            sampler->getProgram(drumBus->getProgram());
+        auto program = sampler->getProgram(drumBus->getProgram());
 
         auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
         auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
@@ -521,19 +520,22 @@ void EventsScreen::setEdit(int i)
 
 void EventsScreen::setFromSq(int i)
 {
-    sequencer->setActiveSequenceIndex(std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)));
+    sequencer->setActiveSequenceIndex(std::clamp(
+        i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)));
     displayFromSq();
 }
 
 void EventsScreen::setFromTr(int i)
 {
-    sequencer->setActiveTrackIndex(std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX)));
+    sequencer->setActiveTrackIndex(
+        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX)));
     displayFromTr();
 }
 
 void EventsScreen::setToSq(int i)
 {
-    toSq = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
+    toSq =
+        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     displayToSq();
 }
 
@@ -589,7 +591,9 @@ void EventsScreen::setTransposeAmount(int i)
 
 void EventsScreen::setDuration(int i)
 {
-    durationValue = std::clamp(i, 1, durationMode == 2 ? 200 : Mpc2000XlSpecs::MAX_NOTE_EVENT_DURATION);
+    durationValue = std::clamp(
+        i, 1,
+        durationMode == 2 ? 200 : Mpc2000XlSpecs::MAX_NOTE_EVENT_DURATION);
     displayCopies();
 }
 

@@ -7,7 +7,6 @@
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
-#include "sampler/Program.hpp"
 #include "Util.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
@@ -78,7 +77,8 @@ void TriggerDrumNoteOnCommand::execute()
 
     if (ctx.program && isSliderNote)
     {
-        auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
+        auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
+            sliderNoteVariationContext);
         noteOnEvent->setVariationType(type);
         noteOnEvent->setVariationValue(value);
     }
@@ -150,27 +150,23 @@ void TriggerDrumNoteOnCommand::execute()
 
         if (ctx.program && isSliderNote)
         {
-            auto [type, value] = Util::getSliderNoteVariationTypeAndValue(sliderNoteVariationContext);
+            auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
+                sliderNoteVariationContext);
             recordNoteOnEvent->setVariationType(type);
             recordNoteOnEvent->setVariationValue(value);
         }
     }
 
-    ctx.eventRegistry->registerNonMidiProgramPadPress(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.screenComponent,
-        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus),
-        ctx.program,
-        ctx.programPadIndex,
-        noteOnEvent->getVelocity(),
-        ctx.track->getIndex());
+    ctx.eventRegistry->registerProgramPadPress(
+        eventregistry::Source::VirtualMpcHardware, ctx.screenComponent,
+        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.program,
+        ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track->getIndex(),
+        std::nullopt);
 
-    auto registryNoteOn = ctx.eventRegistry->registerNonMidiNoteOn(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.screenComponent,
-        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus),
-        ctx.note, noteOnEvent->getVelocity(),
-        ctx.track->getIndex());
+    auto registryNoteOn = ctx.eventRegistry->registerNoteOn(
+        eventregistry::Source::VirtualMpcHardware, ctx.screenComponent,
+        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.note,
+        noteOnEvent->getVelocity(), ctx.track->getIndex(), std::nullopt);
 
     if (recordNoteOnEvent)
     {

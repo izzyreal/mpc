@@ -23,7 +23,9 @@ void PgmSlider::setTuneLowRange(int i)
     notifyObservers("lowrange");
 
     if (tuneLowRange > tuneHighRange)
+    {
         setTuneHighRange(tuneLowRange);
+    }
 }
 
 int PgmSlider::getTuneLowRange()
@@ -38,7 +40,9 @@ void PgmSlider::setTuneHighRange(int i)
     notifyObservers("highrange");
 
     if (tuneHighRange < tuneLowRange)
+    {
         setTuneLowRange(tuneHighRange);
+    }
 }
 
 int PgmSlider::getTuneHighRange()
@@ -53,7 +57,9 @@ void PgmSlider::setDecayLowRange(int i)
     notifyObservers("lowrange");
 
     if (decayLowRange > decayHighRange)
+    {
         setDecayHighRange(decayLowRange);
+    }
 }
 
 int PgmSlider::getDecayLowRange()
@@ -68,7 +74,9 @@ void PgmSlider::setDecayHighRange(int i)
     notifyObservers("highrange");
 
     if (decayHighRange < decayLowRange)
+    {
         setDecayLowRange(decayHighRange);
+    }
 }
 
 int PgmSlider::getDecayHighRange()
@@ -83,7 +91,9 @@ void PgmSlider::setAttackLowRange(int i)
     notifyObservers("lowrange");
 
     if (attackLowRange > attackHighRange)
+    {
         setAttackHighRange(attackLowRange);
+    }
 }
 
 int PgmSlider::getAttackLowRange()
@@ -98,7 +108,9 @@ void PgmSlider::setAttackHighRange(int i)
     notifyObservers("highrange");
 
     if (attackHighRange < attackLowRange)
+    {
         setAttackLowRange(attackHighRange);
+    }
 }
 
 int PgmSlider::getAttackHighRange()
@@ -113,7 +125,9 @@ void PgmSlider::setFilterLowRange(int i)
     notifyObservers("lowrange");
 
     if (filterLowRange > filterHighRange)
+    {
         setFilterHighRange(filterLowRange);
+    }
 }
 
 int PgmSlider::getFilterLowRange()
@@ -128,7 +142,9 @@ void PgmSlider::setFilterHighRange(int i)
     notifyObservers("highrange");
 
     if (filterHighRange < filterLowRange)
+    {
         setFilterLowRange(filterHighRange);
+    }
 }
 
 int PgmSlider::getFilterHighRange()
@@ -159,4 +175,3 @@ void PgmSlider::setParameter(int i)
     parameter = i;
     notifyObservers("parameter");
 }
-

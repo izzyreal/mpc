@@ -44,6 +44,16 @@ void TriggerDrumNoteOffCommand::execute()
             ctx.activeTrack->getDeviceIndex(), ctx.drumIndex);
     }
 
+    ctx.eventRegistry->registerNoteOff(
+        eventregistry::Source::VirtualMpcHardware, ctx.drumBus,
+        ctx.playNoteEvent->getNote(), ctx.activeTrack->getIndex(),
+        std::nullopt);
+
+    ctx.eventRegistry->registerProgramPadRelease(
+        eventregistry::Source::VirtualMpcHardware, ctx.drumBus, ctx.program,
+        ctx.programPadIndex, ctx.activeTrack->getIndex(),
+        std::nullopt);
+
     if (!ctx.recordOnEvent)
     {
         return;
@@ -108,18 +118,6 @@ void TriggerDrumNoteOffCommand::execute()
             }
         }
     }
-
-    ctx.eventRegistry->registerNonMidiNoteOff(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.drumBus, ctx.playNoteEvent->getNote(),
-        ctx.activeTrack->getIndex());
-
-    ctx.eventRegistry->registerNonMidiProgramPadRelease(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.drumBus,
-        ctx.program,
-        ctx.programPadIndex,
-        ctx.activeTrack->getIndex());
 
     if (!ctx.isAnyProgramPadRegisteredAsPressed())
     {
