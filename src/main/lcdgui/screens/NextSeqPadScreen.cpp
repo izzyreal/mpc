@@ -10,6 +10,57 @@ using namespace mpc::lcdgui::screens;
 NextSeqPadScreen::NextSeqPadScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "next-seq-pad", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getNextSq();
+                        },
+                        [&](auto)
+                        {
+                            displaySq();
+                            displayNextSq();
+                            refreshSeqs();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return mpc.clientEventController->getActiveBank();
+                        },
+                        [&](auto)
+                        {
+                            displayBank();
+                            displaySeqNumbers();
+                            refreshSeqs();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isSoloEnabled();
+                        },
+                        [&](auto)
+                        {
+                            refreshSeqs();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displaySq();
+                            refreshSeqs();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
 }
 
 void NextSeqPadScreen::open()
@@ -28,15 +79,6 @@ void NextSeqPadScreen::open()
     displayBank();
     displaySeqNumbers();
     displayNextSq();
-
-    sequencer->addObserver(this);
-    mpc.clientEventController->addObserver(this);
-}
-
-void NextSeqPadScreen::close()
-{
-    sequencer->deleteObserver(this);
-    mpc.clientEventController->deleteObserver(this);
 }
 
 void NextSeqPadScreen::right()
@@ -143,45 +185,5 @@ void NextSeqPadScreen::refreshSeqs()
     {
         displaySeq(i);
         setSeqColor(i);
-    }
-}
-
-void NextSeqPadScreen::update(Observable *observable, Message message)
-{
-    const auto msg = std::get<std::string>(message);
-    if (msg == "bank")
-    {
-        displayBank();
-        displaySeqNumbers();
-
-        for (int i = 0; i < 16; i++)
-        {
-            displaySeq(i);
-        }
-    }
-    else if (msg == "soloenabled")
-    {
-        refreshSeqs();
-    }
-    else if (msg == "seqnumbername")
-    {
-        displaySq();
-        refreshSeqs();
-    }
-    else if (msg == "nextsqoff")
-    {
-        refreshSeqs();
-        displayNextSq();
-    }
-    else if (msg == "nextsqvalue" || msg == "nextsq")
-    {
-        refreshSeqs();
-        displayNextSq();
-    }
-    else if (msg == "now" || msg == "clock")
-    {
-        displayNow0();
-        displayNow1();
-        displayNow2();
     }
 }

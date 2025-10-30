@@ -11,9 +11,7 @@ namespace mpc::lcdgui::screens
 
         void right() override;
         void function(int i) override;
-        void update(Observable *o, Message message) override;
         void open() override;
-        void close() override;
 
         void refreshSeqs();
 
