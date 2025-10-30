@@ -42,17 +42,14 @@ int getDrumIndexForCurrentScreen(std::shared_ptr<Sequencer> sequencer,
 
 TriggerDrumNoteOnContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
-        std::shared_ptr<LayeredScreen> layeredScreen,
-        std::shared_ptr<ClientEventController> controller,
-        std::shared_ptr<Hardware> hardware,
-        std::shared_ptr<Sequencer> sequencer,
-        std::shared_ptr<Screens> screens,
-        std::shared_ptr<Sampler> sampler,
-        std::shared_ptr<EventRegistry> eventRegistry,
-        std::shared_ptr<EventHandler> eventHandler,
-        std::shared_ptr<FrameSeq> frameSequencer,
-        PreviewSoundPlayer *previewSoundPlayer,
-    int programPadIndex, int velocity,
+    eventregistry::Source source, std::shared_ptr<LayeredScreen> layeredScreen,
+    std::shared_ptr<ClientEventController> controller,
+    std::shared_ptr<Hardware> hardware, std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<Screens> screens, std::shared_ptr<Sampler> sampler,
+    std::shared_ptr<EventRegistry> eventRegistry,
+    std::shared_ptr<EventHandler> eventHandler,
+    std::shared_ptr<FrameSeq> frameSequencer,
+    PreviewSoundPlayer *previewSoundPlayer, int programPadIndex, int velocity,
     const std::shared_ptr<ScreenComponent> screen)
 {
     const bool isSequencerScreen =
@@ -61,25 +58,20 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
         screengroups::isCentralNoteAndPadUpdateScreen(screen);
-    const bool isFullLevelEnabled =
-        controller->isFullLevelEnabled();
-    const bool isSixteenLevelsEnabled =
-        controller->isSixteenLevelsEnabled();
+    const bool isFullLevelEnabled = controller->isFullLevelEnabled();
+    const bool isSixteenLevelsEnabled = controller->isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed =
-        controller->clientHardwareEventController
-            ->isNoteRepeatLocked() ||
-        hardware
-            ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
+        controller->clientHardwareEventController->isNoteRepeatLocked() ||
+        hardware->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
             ->isPressed();
     const bool isErasePressed =
         hardware->getButton(hardware::ComponentId::ERASE)->isPressed();
-    const bool isStepRecording = sequencer::SeqUtil::isStepRecording(
-        screen->getName(), sequencer);
+    const bool isStepRecording =
+        sequencer::SeqUtil::isStepRecording(screen->getName(), sequencer);
 
     const bool isRecMainWithoutPlaying =
         sequencer::SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<TimingCorrectScreen>(),
-            screen->getName(),
+            sequencer, screens->get<TimingCorrectScreen>(), screen->getName(),
             hardware->getButton(hardware::ComponentId::REC),
             controller->clientHardwareEventController);
 
@@ -90,32 +82,29 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
 
     auto track = sequencer->getActiveTrack().get();
 
-    const int drumIndex = getDrumIndexForCurrentScreen(sequencer, screen, screens);
+    const int drumIndex =
+        getDrumIndexForCurrentScreen(sequencer, screen, screens);
     const auto drumBus = sequencer->getDrumBus(drumIndex);
     std::shared_ptr<sampler::Program> program =
-        drumIndex >= 0 ? sampler->getProgram(drumBus->getProgram())
-                       : nullptr;
+        drumIndex >= 0 ? sampler->getProgram(drumBus->getProgram()) : nullptr;
 
-    std::function<void(int)> setSelectedNote =
-        [controller](int n)
+    std::function<void(int)> setSelectedNote = [controller](int n)
     {
         controller->setSelectedNote(n);
     };
-    std::function<void(int)> setSelectedPad =
-        [controller](int p)
+    std::function<void(int)> setSelectedPad = [controller](int p)
     {
         controller->setSelectedPad(p);
     };
 
-    const auto hardwareSliderValue =
-        hardware->getSlider()->getValueAs<int>();
+    const auto hardwareSliderValue = hardware->getSlider()->getValueAs<int>();
     const int drumScreenSelectedDrum =
         screens->get<mpc::lcdgui::screens::DrumScreen>()->getDrum();
     const auto note = track->getBus() > 0
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
-    return {
+    return {source,
             eventRegistry,
             isSequencerScreen,
             programPadIndex,
@@ -151,18 +140,15 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
 
 TriggerDrumNoteOffContext
 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-        PreviewSoundPlayer *previewSoundPlayer,
-        std::shared_ptr<EventRegistry> eventRegistry,
-        std::shared_ptr<EventHandler> eventHandler,
-        std::shared_ptr<Screens> screens,
-        std::shared_ptr<Sequencer> sequencer,
-        std::shared_ptr<Hardware> hardware,
-        std::shared_ptr<ClientEventController> controller,
-        std::shared_ptr<FrameSeq> frameSequencer,
-    const int programPadIndex, int drumIndex,
-    const std::shared_ptr<ScreenComponent> screen, const int note,
-    std::shared_ptr<sampler::Program> program,
-    Track *track)
+    eventregistry::Source source, PreviewSoundPlayer *previewSoundPlayer,
+    std::shared_ptr<EventRegistry> eventRegistry,
+    std::shared_ptr<EventHandler> eventHandler,
+    std::shared_ptr<Screens> screens, std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<Hardware> hardware,
+    std::shared_ptr<ClientEventController> controller,
+    std::shared_ptr<FrameSeq> frameSequencer, const int programPadIndex,
+    int drumIndex, const std::shared_ptr<ScreenComponent> screen,
+    const int note, std::shared_ptr<sampler::Program> program, Track *track)
 {
     std::function<void()> finishBasicVoiceIfSoundIsLooping =
         [previewSoundPlayer]()
@@ -177,8 +163,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
         registrySnapshot.retrieveRecordNoteEvent(note);
 
-    std::function<bool()> isAnyProgramPadRegisteredAsPressed =
-        [eventRegistry]()
+    std::function<bool()> isAnyProgramPadRegisteredAsPressed = [eventRegistry]()
     {
         return eventRegistry->getSnapshot().isAnyProgramPadPressed();
     };
@@ -188,8 +173,7 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     const auto timingCorrectScreen =
         screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
 
-    std::function<int()> getActiveSequenceLastTick =
-        [sequencer]
+    std::function<int()> getActiveSequenceLastTick = [sequencer]
     {
         return sequencer->getActiveSequence()->getLastTick();
     };
@@ -200,52 +184,50 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
         sequencer->move(quarterNotePosition);
     };
 
-    std::function<void()> sequencerStopMetronomeTrack =
-        [sequencer = sequencer]
+    std::function<void()> sequencerStopMetronomeTrack = [sequencer = sequencer]
     {
         sequencer->stopMetronomeTrack();
     };
 
-    const bool isStepRecording = sequencer::SeqUtil::isStepRecording(
-        screen->getName(), sequencer);
+    const bool isStepRecording =
+        sequencer::SeqUtil::isStepRecording(screen->getName(), sequencer);
 
     const bool isRecMainWithoutPlaying =
         sequencer::SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<TimingCorrectScreen>(),
-            screen->getName(),
+            sequencer, screens->get<TimingCorrectScreen>(), screen->getName(),
             hardware->getButton(hardware::ComponentId::REC),
             controller->clientHardwareEventController);
 
     std::shared_ptr<sequencer::DrumBus> drumBus =
         sequencer->getDrumBus(drumIndex);
 
-    return {
-        eventRegistry,
-        drumBus,
-        program,
-        programPadIndex,
-        finishBasicVoiceIfSoundIsLooping,
-        isSoundScreen,
-        isSamplerScreen,
-        std::make_shared<sequencer::NoteOffEvent>(note),
-        drumIndex,
-        eventHandler,
-        sequencerRecordNoteOnEvent,
-        sequencer->isRecordingOrOverdubbing(),
-        hardware->getButton(hardware::ComponentId::ERASE)->isPressed(),
-        track,
-        isStepRecording,
-        isAnyProgramPadRegisteredAsPressed,
-        frameSequencer->getMetronomeOnlyTickPosition(),
-        isRecMainWithoutPlaying,
-        sequencer->getTickPosition(),
-        stepEditOptionsScreen->getTcValuePercentage(),
-        timingCorrectScreen->getNoteValueLengthInTicks(),
-        stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
-        stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-        sequencer->getCurrentBarIndex(),
-        timingCorrectScreen->getSwing(),
-        getActiveSequenceLastTick,
-        sequencerMoveToQuarterNotePosition,
-        sequencerStopMetronomeTrack};
+    return {source,
+            eventRegistry,
+            drumBus,
+            program,
+            programPadIndex,
+            finishBasicVoiceIfSoundIsLooping,
+            isSoundScreen,
+            isSamplerScreen,
+            std::make_shared<sequencer::NoteOffEvent>(note),
+            drumIndex,
+            eventHandler,
+            sequencerRecordNoteOnEvent,
+            sequencer->isRecordingOrOverdubbing(),
+            hardware->getButton(hardware::ComponentId::ERASE)->isPressed(),
+            track,
+            isStepRecording,
+            isAnyProgramPadRegisteredAsPressed,
+            frameSequencer->getMetronomeOnlyTickPosition(),
+            isRecMainWithoutPlaying,
+            sequencer->getTickPosition(),
+            stepEditOptionsScreen->getTcValuePercentage(),
+            timingCorrectScreen->getNoteValueLengthInTicks(),
+            stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
+            stepEditOptionsScreen->isAutoStepIncrementEnabled(),
+            sequencer->getCurrentBarIndex(),
+            timingCorrectScreen->getSwing(),
+            getActiveSequenceLastTick,
+            sequencerMoveToQuarterNotePosition,
+            sequencerStopMetronomeTrack};
 }

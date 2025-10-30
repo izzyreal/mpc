@@ -58,8 +58,7 @@ namespace mpc::audiomidi
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
         void
-        handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent>,
-                                Track *,
+        handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent>, Track *,
                                 const std::optional<int> trackDevice,
                                 const std::optional<int> trackVelocityRatio,
                                 const std::optional<int> drumIndex);
@@ -102,8 +101,8 @@ namespace mpc::audiomidi
         // not a DRUM track, in which case drumIndex is std::nullopt.
         void handleMidiInputNoteOn(const int midiChannel,
                                    const std::shared_ptr<NoteOnEventPlayOnly>,
-                                   const int frameOffsetInBuffer,
-                                   Track *, const int trackDevice,
+                                   const int frameOffsetInBuffer, Track *,
+                                   const int trackDevice,
                                    const int trackVelocityRatio,
                                    const std::optional<int> drumIndex);
 
@@ -117,8 +116,8 @@ namespace mpc::audiomidi
         // not a DRUM track, in which case drumIndex is std::nullopt.
         void handleMidiInputNoteOff(const int midiChannel,
                                     const std::shared_ptr<NoteOffEvent>,
-                                    const int frameOffsetInBuffer,
-                                    Track *, const int trackDevice,
+                                    const int frameOffsetInBuffer, Track *,
+                                    const int trackDevice,
                                     const std::optional<int> drumIndex);
 
         /**
@@ -139,8 +138,8 @@ namespace mpc::audiomidi
         // trackVelocityRatio is std::nullopt for note off events, else must be
         // non-null
         void
-        handleNoteEventMidiOut(const std::shared_ptr<Event>,
-                               Track *, const int trackDevice,
+        handleNoteEventMidiOut(const std::shared_ptr<Event>, Track *,
+                               const int trackDevice,
                                const std::optional<int> trackVelocityRatio);
 
         /**

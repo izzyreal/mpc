@@ -34,15 +34,13 @@ void TriggerDrumNoteOnCommand::execute()
         std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
 
     ctx.eventRegistry->registerProgramPadPress(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.screenComponent,
+        ctx.source, ctx.screenComponent,
         ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.program,
         ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track,
         std::nullopt);
 
     auto registryNoteOn = ctx.eventRegistry->registerNoteOn(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.screenComponent,
+        ctx.source, ctx.screenComponent,
         ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.note,
         noteOnEvent->getVelocity(), ctx.track, std::nullopt, ctx.program);
 

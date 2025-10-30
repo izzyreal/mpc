@@ -1,5 +1,6 @@
 #pragma once
 
+#include "eventregistry/EventRegistry.hpp"
 #include <memory>
 #include <string>
 #include <functional>
@@ -50,6 +51,7 @@ namespace mpc::command::context
 
     struct TriggerDrumNoteOnContext
     {
+        eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         bool isSequencerScreen;
         int programPadIndex;

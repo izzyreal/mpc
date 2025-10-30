@@ -28,11 +28,9 @@ ClientMidiEventController::ClientMidiEventController(
     std::shared_ptr<MultiRecordingSetupScreen> multiRecordingSetupScreen,
     std::shared_ptr<TimingCorrectScreen> timingCorrectScreen,
     std::shared_ptr<LayeredScreen> layeredScreen,
-    std::shared_ptr<Hardware> hardware,
-    std::shared_ptr<Screens> screens,
+    std::shared_ptr<Hardware> hardware, std::shared_ptr<Screens> screens,
     std::shared_ptr<FrameSeq> frameSequencer,
-    PreviewSoundPlayer *previewSoundPlayer
-    )
+    PreviewSoundPlayer *previewSoundPlayer)
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController)
 {
@@ -43,10 +41,10 @@ ClientMidiEventController::ClientMidiEventController(
     // Create the sound generator controller with the passed dependencies
     soundGeneratorController =
         std::make_shared<ClientMidiSoundGeneratorController>(
-                eventRegistry,
-            clientEventController, midiInputScreen, eventHandler, sequencer,
-            sampler, multiRecordingSetupScreen, timingCorrectScreen,
-            layeredScreen, hardware, screens, frameSequencer, previewSoundPlayer);
+            eventRegistry, clientEventController, midiInputScreen, eventHandler,
+            sequencer, sampler, multiRecordingSetupScreen, timingCorrectScreen,
+            layeredScreen, hardware, screens, frameSequencer,
+            previewSoundPlayer);
 }
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)

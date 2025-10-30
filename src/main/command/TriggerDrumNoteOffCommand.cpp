@@ -39,19 +39,17 @@ void TriggerDrumNoteOffCommand::execute()
     else
     {
         ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.noteOffEvent, ctx.track,
-            ctx.track->getDeviceIndex(), ctx.drumIndex);
+            ctx.noteOffEvent, ctx.track, ctx.track->getDeviceIndex(),
+            ctx.drumIndex);
     }
 
-    ctx.eventRegistry->registerNoteOff(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.drumBus, ctx.noteOffEvent->getNote(), ctx.track,
-        std::nullopt);
+    ctx.eventRegistry->registerNoteOff(ctx.source, ctx.drumBus,
+                                       ctx.noteOffEvent->getNote(), ctx.track,
+                                       std::nullopt);
 
     ctx.eventRegistry->registerProgramPadRelease(
-        eventregistry::Source::VirtualMpcHardware,
-        ctx.drumBus, ctx.program, ctx.programPadIndex,
-        ctx.track, std::nullopt);
+        ctx.source, ctx.drumBus, ctx.program, ctx.programPadIndex, ctx.track,
+        std::nullopt);
 
     if (!ctx.recordOnEvent)
     {
@@ -85,8 +83,7 @@ void TriggerDrumNoteOffCommand::execute()
         }
 
         const bool durationHasBeenAdjusted =
-            ctx.track->finalizeNoteEventSynced(ctx.recordOnEvent,
-                                                     newDuration);
+            ctx.track->finalizeNoteEventSynced(ctx.recordOnEvent, newDuration);
 
         if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying) ||
             (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))

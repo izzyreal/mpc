@@ -138,8 +138,6 @@ void Mpc::init()
     audioMidiServices =
         std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 
-    clientEventController->init();
-
     MLOG("AudioMidiServices created");
 
     sequencer->init();
@@ -147,6 +145,8 @@ void Mpc::init()
 
     audioMidiServices->start();
     MLOG("AudioMidiServices started");
+
+    clientEventController->init();
 
     // This needs to happen before the sampler initializes initMasterPadAssign
     // which we do in Sampler::init()

@@ -568,7 +568,7 @@ void FrameSeq::work(int nFrames)
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
         if (eventRegistrySnapshotPublishFrameCounter++ >=
-                eventRegistrySnapshotPublishIntervalFrames)
+            eventRegistrySnapshotPublishIntervalFrames)
         {
             eventRegistrySnapshotPublishFrameCounter = 0;
             mpc.eventRegistry->publishSnapshot();

@@ -50,7 +50,7 @@ namespace mpc::lcdgui
 {
     class LayeredScreen;
     class Screens;
-}
+} // namespace mpc::lcdgui
 
 namespace mpc::controller
 {
@@ -83,9 +83,7 @@ namespace mpc::controller
             std::shared_ptr<lcdgui::LayeredScreen>,
             std::shared_ptr<hardware::Hardware>,
             std::shared_ptr<lcdgui::Screens>,
-            std::shared_ptr<sequencer::FrameSeq>,
-            engine::PreviewSoundPlayer *
-            );
+            std::shared_ptr<sequencer::FrameSeq>, engine::PreviewSoundPlayer *);
 
         void handleEvent(const MidiEvent &);
 

@@ -92,9 +92,11 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             noteEvent->setVariationValue(value);
         }
 
+        const auto physicalPadPressInfo =
+            snapshot.retrievePhysicalPadEvent(padIndex % 16);
+
         const bool isPhysicallyPressed =
-            snapshot.retrievePhysicalPadEvent(padIndex % 16)->bank ==
-            padIndex / 16;
+            physicalPadPressInfo && physicalPadPressInfo->bank == padIndex / 16;
 
         if (sixteenLevels && isPhysicallyPressed)
         {

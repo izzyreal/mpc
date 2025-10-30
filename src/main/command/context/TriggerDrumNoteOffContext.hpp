@@ -1,5 +1,6 @@
 #pragma once
 
+#include "eventregistry/EventRegistry.hpp"
 #include <memory>
 #include <functional>
 #include <cstdint>
@@ -31,6 +32,7 @@ namespace mpc::command::context
 {
     struct TriggerDrumNoteOffContext
     {
+        eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         std::shared_ptr<sequencer::DrumBus> drumBus;
         std::shared_ptr<sampler::Program> program;

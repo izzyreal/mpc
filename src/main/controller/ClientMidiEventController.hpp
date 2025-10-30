@@ -18,7 +18,7 @@ namespace mpc::sequencer
 {
     class Sequencer;
     class FrameSeq;
-}
+} // namespace mpc::sequencer
 
 namespace mpc::engine
 {
@@ -34,7 +34,7 @@ namespace mpc::lcdgui
 {
     class Screens;
     class LayeredScreen;
-}
+} // namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens::window
 {
@@ -52,7 +52,7 @@ namespace mpc::hardware
 {
     class Hardware;
     class Button;
-}
+} // namespace mpc::hardware
 
 namespace mpc::controller
 {
@@ -97,9 +97,7 @@ namespace mpc::controller
             std::shared_ptr<lcdgui::LayeredScreen>,
             std::shared_ptr<hardware::Hardware>,
             std::shared_ptr<lcdgui::Screens>,
-            std::shared_ptr<sequencer::FrameSeq>,
-            engine::PreviewSoundPlayer *);
-
+            std::shared_ptr<sequencer::FrameSeq>, engine::PreviewSoundPlayer *);
 
         std::shared_ptr<ClientMidiSoundGeneratorController>
         getSoundGeneratorController();

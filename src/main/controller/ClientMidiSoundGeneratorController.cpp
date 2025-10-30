@@ -30,7 +30,7 @@ using namespace mpc::sampler;
 using namespace mpc::command::context;
 
 ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
-    std::shared_ptr<EventRegistry> eventRegistry,    
+    std::shared_ptr<EventRegistry> eventRegistry,
     std::shared_ptr<ClientEventController> clientEventController,
     std::shared_ptr<MidiInputScreen> midiInputScreen,
     std::shared_ptr<EventHandler> eventHandler,
@@ -41,20 +41,14 @@ ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
     std::shared_ptr<hardware::Hardware> hardware,
     std::shared_ptr<lcdgui::Screens> screens,
     std::shared_ptr<sequencer::FrameSeq> frameSequencer,
-    engine::PreviewSoundPlayer *previewSoundPlayer
-    )
-    : eventRegistry(eventRegistry),
-      midiInputScreen(midiInputScreen),
-      eventHandler(eventHandler),
-      sequencer(sequencer),
-      sampler(sampler),
+    engine::PreviewSoundPlayer *previewSoundPlayer)
+    : eventRegistry(eventRegistry), midiInputScreen(midiInputScreen),
+      eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen),
       clientEventController(clientEventController),
-      layeredScreen(layeredScreen),
-      hardware(hardware),
-      screens(screens),
-      previewSoundPlayer(previewSoundPlayer)
+      layeredScreen(layeredScreen), hardware(hardware), screens(screens),
+      previewSoundPlayer(previewSoundPlayer), frameSequencer(frameSequencer)
 {
 }
 
@@ -116,13 +110,18 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
         {
             if (auto program = p.lock(); program)
             {
-                for (int programPadIndex = 0; programPadIndex < 64; ++programPadIndex)
+                for (int programPadIndex = 0; programPadIndex < 64;
+                     ++programPadIndex)
                 {
-                    eventRegistry->registerProgramPadAftertouch(eventregistry::Source::MidiInput, bus, program, programPadIndex, pressure, track.get());
+                    eventRegistry->registerProgramPadAftertouch(
+                        eventregistry::Source::MidiInput, bus, program,
+                        programPadIndex, pressure, track.get());
 
-                    if (auto note = program->getNoteFromPad(programPadIndex); note != -1)
+                    if (auto note = program->getNoteFromPad(programPadIndex);
+                        note != -1)
                     {
-                        eventRegistry->registerNoteAftertouch(eventregistry::Source::MidiInput, note, pressure);
+                        eventRegistry->registerNoteAftertouch(
+                            eventregistry::Source::MidiInput, note, pressure);
                     }
                 }
             }
@@ -138,13 +137,17 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
         auto track = getTrackForEvent(e);
         auto bus = sequencer->getBus<Bus>(track->getBus());
         auto registrySnapshot = eventRegistry->getSnapshot();
-        eventRegistry->registerNoteAftertouch(eventregistry::Source::MidiInput, note, pressure);
+        eventRegistry->registerNoteAftertouch(eventregistry::Source::MidiInput,
+                                              note, pressure);
 
         if (auto program = getProgramForEvent(e); program)
         {
-            if (auto programPadIndex = program->getPadIndexFromNote(note); programPadIndex != -1)
+            if (auto programPadIndex = program->getPadIndexFromNote(note);
+                programPadIndex != -1)
             {
-                eventRegistry->registerProgramPadAftertouch(eventregistry::Source::MidiInput, bus, program, programPadIndex, pressure, track.get());
+                eventRegistry->registerProgramPadAftertouch(
+                    eventregistry::Source::MidiInput, bus, program,
+                    programPadIndex, pressure, track.get());
             }
         }
     }
@@ -328,7 +331,11 @@ void ClientMidiSoundGeneratorController::handleNoteOnEvent(
         return;
     }
 
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(layeredScreen, clientEventController, hardware, sequencer, screens, sampler, eventRegistry, eventHandler, frameSequencer, previewSoundPlayer, programPadIndex, e.getVelocity(), layeredScreen->getCurrentScreen());
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+        eventregistry::Source::MidiInput, layeredScreen, clientEventController,
+        hardware, sequencer, screens, sampler, eventRegistry, eventHandler,
+        frameSequencer, previewSoundPlayer, programPadIndex, e.getVelocity(),
+        layeredScreen->getCurrentScreen());
 
     command::TriggerDrumNoteOnCommand(ctx).execute();
 
@@ -416,7 +423,14 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 
     auto snapshot = eventRegistry->getSnapshot();
 
-    auto noteEventInfo = snapshot.retrieveNoteEvent(note, eventregistry::Source::MidiInput);
+    auto noteEventInfo =
+        snapshot.retrieveNoteEvent(note, eventregistry::Source::MidiInput);
+
+    if (!noteEventInfo)
+    {
+        printf("no noteEventInfo found!\n");
+        return;
+    }
 
     auto drumBus = std::dynamic_pointer_cast<DrumBus>(noteEventInfo->bus);
 
@@ -425,7 +439,12 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
         return;
     }
 
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(previewSoundPlayer, eventRegistry, eventHandler, screens, sequencer, hardware, clientEventController, frameSequencer, programPadIndex, drumBus->getIndex(), noteEventInfo->screen, note, noteEventInfo->program, noteEventInfo->track); 
+    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+        eventregistry::Source::MidiInput, previewSoundPlayer, eventRegistry,
+        eventHandler, screens, sequencer, hardware, clientEventController,
+        frameSequencer, programPadIndex, drumBus->getIndex(),
+        noteEventInfo->screen, note, noteEventInfo->program,
+        noteEventInfo->track);
 
     command::TriggerDrumNoteOffCommand(ctx).execute();
 

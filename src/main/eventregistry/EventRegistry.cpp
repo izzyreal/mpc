@@ -71,9 +71,8 @@ void EventRegistry::enqueue(EventMessage &&msg)
 
 PhysicalPadEventPtr EventRegistry::registerPhysicalPadPress(
     Source source, std::shared_ptr<ScreenComponent> screen,
-    std::shared_ptr<Bus> bus, PhysicalPadIndex padIndex,
-    Velocity velocity, Track *track, int bank,
-    std::optional<int> note)
+    std::shared_ptr<Bus> bus, PhysicalPadIndex padIndex, Velocity velocity,
+    Track *track, int bank, std::optional<int> note)
 {
     printf("registering physical pad press\n");
     assert(screen && bus);
@@ -94,7 +93,8 @@ PhysicalPadEventPtr EventRegistry::registerPhysicalPadPress(
 void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
                                                   Pressure pressure)
 {
-    printf("registering physical pad aftertouch for pad index %i\n", padIndex.get());
+    printf("registering physical pad aftertouch for pad index %i\n",
+           padIndex.get());
 
     const auto snapshotView = getSnapshot();
 
@@ -111,7 +111,7 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
         }
     }
 
-    throw std::invalid_argument("No matching pad for aftertouch");
+    // throw std::invalid_argument("No matching pad for aftertouch");
 }
 
 PhysicalPadEventPtr
@@ -134,9 +134,8 @@ EventRegistry::registerPhysicalPadRelease(PhysicalPadIndex padIndex)
 
 ProgramPadEventPtr EventRegistry::registerProgramPadPress(
     Source source, std::shared_ptr<ScreenComponent> screen,
-    std::shared_ptr<Bus> bus,
-    std::shared_ptr<Program> program, ProgramPadIndex padIndex,
-    Velocity velocity, Track *track,
+    std::shared_ptr<Bus> bus, std::shared_ptr<Program> program,
+    ProgramPadIndex padIndex, Velocity velocity, Track *track,
     std::optional<MidiChannel> midiChannel)
 {
     assert(screen && bus && program);
@@ -157,9 +156,8 @@ ProgramPadEventPtr EventRegistry::registerProgramPadPress(
 }
 
 void EventRegistry::registerProgramPadAftertouch(
-    Source source, std::shared_ptr<Bus> bus,
-    std::shared_ptr<Program> program, ProgramPadIndex padIndex,
-    Pressure pressure, Track *track)
+    Source source, std::shared_ptr<Bus> bus, std::shared_ptr<Program> program,
+    ProgramPadIndex padIndex, Pressure pressure, Track *track)
 {
     assert(bus && program);
 
@@ -182,9 +180,8 @@ void EventRegistry::registerProgramPadAftertouch(
 }
 
 void EventRegistry::registerProgramPadRelease(
-    Source source, std::shared_ptr<Bus> bus,
-    std::shared_ptr<Program> program, ProgramPadIndex padIndex,
-    Track *track,
+    Source source, std::shared_ptr<Bus> bus, std::shared_ptr<Program> program,
+    ProgramPadIndex padIndex, Track *track,
     std::optional<MidiChannel> midiChannel)
 {
     assert(bus && program);
@@ -212,9 +209,8 @@ void EventRegistry::registerProgramPadRelease(
 
 NoteEventPtr EventRegistry::registerNoteOn(
     Source source, std::shared_ptr<ScreenComponent> screen,
-    std::shared_ptr<Bus> bus, NoteNumber noteNumber,
-    Velocity velocity, Track *track,
-    std::optional<MidiChannel> midiChannel,
+    std::shared_ptr<Bus> bus, NoteNumber noteNumber, Velocity velocity,
+    Track *track, std::optional<MidiChannel> midiChannel,
     std::shared_ptr<Program> program)
 {
     printf("registering note on\n");
@@ -249,10 +245,8 @@ void EventRegistry::registerNoteAftertouch(Source source, NoteNumber noteNumber,
     }
 }
 
-void EventRegistry::registerNoteOff(Source source,
-                                    std::shared_ptr<Bus> bus,
-                                    NoteNumber noteNumber,
-                                    Track *track,
+void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
+                                    NoteNumber noteNumber, Track *track,
                                     std::optional<MidiChannel> midiChannel)
 {
     assert(bus);
@@ -435,13 +429,12 @@ PhysicalPadEventPtr EventRegistry::SnapshotView::retrievePhysicalPadEvent(
     return {};
 }
 
-NoteEventPtr
-EventRegistry::SnapshotView::retrieveNoteEvent(NoteNumber note, Source src) const
+NoteEventPtr EventRegistry::SnapshotView::retrieveNoteEvent(NoteNumber note,
+                                                            Source src) const
 {
     for (const auto &e : snap->noteEvents)
     {
-        if (e->noteNumber == note &&
-                e->source == src)
+        if (e->noteNumber == note && e->source == src)
         {
             return e;
         }

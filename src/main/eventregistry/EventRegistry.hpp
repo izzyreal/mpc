@@ -163,11 +163,11 @@ namespace mpc::eventregistry
                                        sequencer::Track *,
                                        std::optional<MidiChannel>);
 
-        NoteEventPtr registerNoteOn(
-            Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
-            std::shared_ptr<mpc::sequencer::Bus>, NoteNumber, Velocity,
-            sequencer::Track *, std::optional<MidiChannel>,
-            std::shared_ptr<sampler::Program>);
+        NoteEventPtr
+        registerNoteOn(Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
+                       std::shared_ptr<mpc::sequencer::Bus>, NoteNumber,
+                       Velocity, sequencer::Track *, std::optional<MidiChannel>,
+                       std::shared_ptr<sampler::Program>);
 
         void registerNoteAftertouch(Source, NoteNumber, Pressure);
         void registerNoteOff(Source, std::shared_ptr<mpc::sequencer::Bus>,
@@ -219,8 +219,7 @@ namespace mpc::eventregistry
         PhysicalPadEventPtr
         retrievePhysicalPadEvent(PhysicalPadIndex idx) const;
 
-        NoteEventPtr
-        retrieveNoteEvent(NoteNumber note, Source src) const;
+        NoteEventPtr retrieveNoteEvent(NoteNumber note, Source src) const;
 
         bool valid() const noexcept
         {
