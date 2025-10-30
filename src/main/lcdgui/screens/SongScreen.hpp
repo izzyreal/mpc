@@ -17,22 +17,10 @@ namespace mpc::lcdgui::screens
 {
     class SongScreen : public mpc::lcdgui::ScreenComponent
     {
-
-    private:
-        int offset = -1;
-        int activeSongIndex = 0;
-        std::string defaultSongName = "Song";
-
-        void setActiveSongIndex(int i);
-
     public:
-        void setOffset(int i);
-        void setDefaultSongName(std::string s);
-        std::string getDefaultSongName();
-        int getOffset();
-        int getActiveSongIndex();
+        SongScreen(mpc::Mpc &mpc, const int layerIndex);
 
-    public:
+        void open() override;
         void up() override;
         void down() override;
         void left() override;
@@ -41,13 +29,19 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
         void function(int i) override;
 
-        SongScreen(mpc::Mpc &mpc, const int layerIndex);
-
-        void open() override;
-        void close() override;
-        void update(Observable *, Message message) override;
+        void setOffset(int i);
+        void setDefaultSongName(std::string s);
+        std::string getDefaultSongName();
+        int getOffset();
+        int getActiveSongIndex();
 
     private:
+        int offset = -1;
+        int activeSongIndex = 0;
+        std::string defaultSongName = "Song";
+
+        void setActiveSongIndex(int i);
+
         void displayTempo();
         void displayLoop();
         void displaySteps();

@@ -12,11 +12,52 @@ using namespace mpc::lcdgui::screens;
 SongScreen::SongScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "song", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTempo();
+                        },
+                        [&](auto)
+                        {
+                            displayTempo();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isPlaying();
+                        },
+                        [&](auto isPlaying)
+                        {
+                            findField("sequence1")->setBlinking(isPlaying);
+                            findField("reps1")->setBlinking(isPlaying);
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
 }
 
 void SongScreen::open()
 {
     findField("loop")->setAlignment(Alignment::Centered);
+
     for (int i = 0; i < 3; i++)
     {
         findField("step" + std::to_string(i))
@@ -33,17 +74,10 @@ void SongScreen::open()
     displayTempo();
     displayLoop();
     displaySteps();
-    sequencer->addObserver(this);
-}
-
-void SongScreen::close()
-{
-    sequencer->deleteObserver(this);
 }
 
 void SongScreen::up()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "step1" || focusedFieldName == "sequence1" ||
@@ -66,7 +100,6 @@ void SongScreen::up()
 
 void SongScreen::left()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "sequence1")
@@ -89,7 +122,6 @@ void SongScreen::left()
 
 void SongScreen::right()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "sequence1")
@@ -146,7 +178,6 @@ void SongScreen::openWindow()
 
 void SongScreen::down()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "step1" || focusedFieldName == "sequence1" ||
@@ -171,7 +202,6 @@ void SongScreen::down()
 
 void SongScreen::turnWheel(int i)
 {
-
     auto song = sequencer->getSong(activeSongIndex);
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -205,6 +235,7 @@ void SongScreen::turnWheel(int i)
         sequencer->setBar(0);
         displayNow0();
         displayNow1();
+
         displayNow2();
         displaySteps();
     }
@@ -453,12 +484,7 @@ void SongScreen::setOffset(int i)
 
 void SongScreen::setActiveSongIndex(int i)
 {
-    if (i < 0 || i > 19)
-    {
-        return;
-    }
-
-    activeSongIndex = i;
+    activeSongIndex = std::clamp(i, 0, 19);
 
     displaySongName();
     displaySteps();
@@ -472,38 +498,6 @@ void SongScreen::setActiveSongIndex(int i)
 void SongScreen::setDefaultSongName(std::string s)
 {
     defaultSongName = s;
-}
-
-void SongScreen::update(Observable *observable, Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "bar")
-    {
-        displayNow0();
-    }
-    else if (msg == "beat")
-    {
-        displayNow1();
-    }
-    else if (msg == "clock")
-    {
-        displayNow2();
-    }
-    else if (msg == "tempo")
-    {
-        displayTempo();
-    }
-    else if (msg == "play")
-    {
-        findField("sequence1")->setBlinking(true);
-        findField("reps1")->setBlinking(true);
-    }
-    else if (msg == "stop")
-    {
-        findField("sequence1")->setBlinking(false);
-        findField("reps1")->setBlinking(false);
-    }
 }
 
 std::string SongScreen::getDefaultSongName()

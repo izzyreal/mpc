@@ -271,4 +271,3 @@ void NextSeqScreen::displayTiming()
     findField("timing")->setText(
         SequencerScreen::timingCorrectNames[noteValue]);
 }
-

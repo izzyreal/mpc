@@ -62,10 +62,6 @@ namespace mpc::sequencer
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
 
-        void updateTimeDisplay();
-
-        void processTempoChange();
-
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames();
 

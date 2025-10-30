@@ -100,7 +100,6 @@ bool FrameSeq::isRunning()
 void FrameSeq::move(int newTickPos)
 {
     sequencer->move(Sequencer::ticksToQuarterNotes(newTickPos));
-    updateTimeDisplay();
 }
 
 std::shared_ptr<Sequence> FrameSeq::switchToNextSequence()
@@ -429,24 +428,6 @@ void FrameSeq::processNoteRepeat()
     }
 }
 
-void FrameSeq::updateTimeDisplay()
-{
-    if (!sequencer->isCountingIn())
-    {
-        sequencer->notifyTimeDisplayRealtime();
-        sequencer->notifyObservers(std::string("timesignature"));
-    }
-}
-
-void FrameSeq::processTempoChange()
-{
-    if (previousTempo != sequencer->getTempo())
-    {
-        previousTempo = sequencer->getTempo();
-        sequencer->notify("tempo");
-    }
-}
-
 void FrameSeq::stopSequencer()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
@@ -564,8 +545,6 @@ void FrameSeq::work(int nFrames)
     bool songHasStopped = false;
     bool normalPlayHasStopped = false;
 
-    processTempoChange();
-
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
 
@@ -640,8 +619,6 @@ void FrameSeq::work(int nFrames)
             stopCountingInIfRequired();
             continue;
         }
-
-        updateTimeDisplay();
 
         if (sequencer->getTickPosition() >= seq->getLastTick() - 1 &&
             !sequencer->isSongModeEnabled() && sequencer->getNextSq() != -1)

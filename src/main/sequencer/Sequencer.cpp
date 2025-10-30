@@ -206,7 +206,6 @@ void Sequencer::setTempo(double newTempo)
         {
             tempo = newTempo;
         }
-        notifyObservers(std::string("tempo"));
         return;
     }
 
@@ -224,8 +223,6 @@ void Sequencer::setTempo(double newTempo)
     {
         s->setInitialTempo(newTempo);
     }
-
-    notifyObservers(std::string("tempo"));
 }
 
 double Sequencer::getTempo()
@@ -307,15 +304,9 @@ bool Sequencer::isTempoSourceSequenceEnabled()
     return tempoSourceSequenceEnabled;
 }
 
-void Sequencer::setTempoSourceSequence(bool b, const bool shouldNotifyObservers)
+void Sequencer::setTempoSourceSequence(bool b)
 {
     tempoSourceSequenceEnabled = b;
-
-    if (shouldNotifyObservers)
-    {
-        notifyObservers(std::string("tempo-source"));
-        notifyObservers(std::string("tempo"));
-    }
 }
 
 bool Sequencer::isRecordingOrOverdubbing()
@@ -364,8 +355,6 @@ void Sequencer::setSoloEnabled(bool b)
             }
         }
     }
-
-    notifyObservers(std::string("soloenabled"));
 }
 
 std::shared_ptr<Sequence> Sequencer::getSequence(int i)
@@ -392,15 +381,7 @@ void Sequencer::setActiveSequenceIndex(int i)
     if (!isPlaying())
     {
         positionQuarterNotes = 0.0;
-        notifyTimeDisplay();
     }
-
-    notifyObservers(std::string("seqnumbername"));
-    notifyObservers(std::string("timesignature"));
-    notifyObservers(std::string("numberofbars"));
-    notifyObservers(std::string("tempo"));
-    notifyObservers(std::string("loop"));
-    notifyTrack();
 }
 
 bool Sequencer::isCountEnabled()
@@ -411,8 +392,6 @@ bool Sequencer::isCountEnabled()
 void Sequencer::setCountEnabled(bool b)
 {
     countEnabled = b;
-
-    notifyObservers(std::string("count"));
 }
 
 void Sequencer::setTimeDisplayStyle(int i)
@@ -428,8 +407,6 @@ int Sequencer::getTimeDisplayStyle()
 void Sequencer::setRecordingModeMulti(bool b)
 {
     recordingModeMulti = b;
-
-    notifyObservers(std::string("recordingmode"));
 }
 
 bool Sequencer::isRecordingModeMulti()
@@ -449,7 +426,6 @@ void Sequencer::trackUp()
         return;
     }
     activeTrackIndex++;
-    notifyTrack();
 }
 
 void Sequencer::trackDown()
@@ -459,7 +435,6 @@ void Sequencer::trackDown()
         return;
     }
     activeTrackIndex--;
-    notifyTrack();
 }
 
 bool Sequencer::isPlaying()
@@ -593,8 +568,6 @@ void Sequencer::play(bool fromStart)
     {
         ams->getFrameSequencer()->start();
     }
-
-    notifyObservers(std::string("play"));
 }
 
 void Sequencer::undoSeq()
@@ -623,9 +596,6 @@ void Sequencer::undoSeq()
     mpc.getHardware()
         ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
-
-    setActiveSequenceIndex(
-        getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
 
 void Sequencer::playFromStart()
@@ -726,6 +696,7 @@ void Sequencer::stop(const StopMode stopMode)
 
     playedStepRepetitions = 0;
     songMode = false;
+    nextSq = -1;
 
     lastNotifiedBar = -1;
     lastNotifiedBeat = -1;
@@ -746,18 +717,6 @@ void Sequencer::stop(const StopMode stopMode)
             : ams->getFrameSequencer()->getEventFrameOffset();
 
     ams->getFrameSequencer()->stop();
-
-    auto notifynextsq = false;
-
-    if (nextSq != -1)
-    {
-        notifynextsq = true;
-        nextSq = -1;
-
-        // This is called from the audio thread, should be called from the UI
-        // thread instead. stop() is called by FrameSeq.
-        mpc.getLayeredScreen()->setFocus("sq");
-    }
 
     recording = false;
     overdubbing = false;
@@ -783,11 +742,6 @@ void Sequencer::stop(const StopMode stopMode)
         pad->release();
     }
 
-    if (notifynextsq)
-    {
-        notifyObservers(std::string("nextsqoff"));
-    }
-
     auto songScreen = mpc.screens->get<SongScreen>();
 
     if (endOfSong)
@@ -802,8 +756,6 @@ void Sequencer::stop(const StopMode stopMode)
     {
         ams->stopBouncing();
     }
-
-    notifyObservers(std::string("stop"));
 }
 
 bool Sequencer::isCountingIn()
@@ -820,24 +772,6 @@ void Sequencer::setCountingIn(bool b)
         countInStartPos = -1;
         countInEndPos = -1;
     }
-}
-
-void Sequencer::notifyTrack()
-{
-
-    notifyObservers(std::string("tracknumbername"));
-
-    notifyObservers(std::string("trackon"));
-
-    notifyObservers(std::string("programchange"));
-
-    notifyObservers(std::string("velocityratio"));
-
-    notifyObservers(std::string("bus"));
-
-    notifyObservers(std::string("device"));
-
-    notifyObservers(std::string("devicename"));
 }
 
 void Sequencer::setSequence(int i, std::shared_ptr<Sequence> s)
@@ -1227,7 +1161,6 @@ void Sequencer::setBar(int i)
 
     move(ticksToQuarterNotes(pos));
 
-    notifyObservers(std::string("timesignature"));
     setBeat(0);
     setClock(0);
 }
@@ -1396,41 +1329,6 @@ void Sequencer::goToNextEvent()
     }
 
     move(ticksToQuarterNotes(newPos));
-}
-
-void Sequencer::notifyTimeDisplay()
-{
-    notifyObservers(std::string("bar"));
-    notifyObservers(std::string("beat"));
-    notifyObservers(std::string("clock"));
-}
-
-void Sequencer::notifyTimeDisplayRealtime()
-{
-    int bar = getCurrentBarIndex();
-    int beat = getCurrentBeatIndex();
-    int clock = getCurrentClockNumber();
-
-    if (lastNotifiedBar != bar)
-    {
-
-        notifyObservers(std::string("bar"));
-        lastNotifiedBar = bar;
-    }
-
-    if (lastNotifiedBeat != beat)
-    {
-
-        notifyObservers(std::string("beat"));
-        lastNotifiedBeat = beat;
-    }
-
-    if (lastNotifiedClock != clock)
-    {
-
-        notifyObservers(std::string("clock"));
-        lastNotifiedClock = clock;
-    }
 }
 
 void Sequencer::goToPreviousStep()
@@ -1788,9 +1686,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
             break;
         }
     }
-
-    notifyTimeDisplay();
-    notifyObservers(std::string("tempo"));
 }
 
 void Sequencer::move(const double positionQuarterNotesToUse)
@@ -1831,10 +1726,6 @@ void Sequencer::move(const double positionQuarterNotesToUse)
         sequences[secondSequenceScreen->sq]->resetTrackEventIndices(
             quarterNotesToTicks(positionQuarterNotes));
     }
-
-    notifyTimeDisplay();
-    notifyObservers(std::string("timesignature"));
-    notifyObservers(std::string("tempo"));
 }
 
 int Sequencer::getTickPosition()
@@ -1857,7 +1748,6 @@ std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 void Sequencer::setActiveTrackIndex(int i)
 {
     activeTrackIndex = i;
-    notifyObservers(std::string("active-track-index"));
 }
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
@@ -1940,11 +1830,11 @@ void Sequencer::setNextSq(int i)
         i = 98;
     }
 
-    auto firstNotification = nextSq == -1;
+    auto startingFromScratch = nextSq == -1;
 
     auto up = i > nextSq;
 
-    if (firstNotification)
+    if (startingFromScratch)
     {
         up = i > currentlyPlayingSequenceIndex;
     }
@@ -1957,19 +1847,6 @@ void Sequencer::setNextSq(int i)
     }
 
     nextSq = candidate;
-
-    if (nextSq == -1)
-    {
-        notifyObservers(std::string("nextsqoff"));
-    }
-    else if (firstNotification)
-    {
-        notifyObservers(std::string("nextsq"));
-    }
-    else
-    {
-        notifyObservers(std::string("nextsqvalue"));
-    }
 }
 
 void Sequencer::setNextSqPad(int i)
@@ -1977,22 +1854,10 @@ void Sequencer::setNextSqPad(int i)
     if (!sequences[i]->isUsed())
     {
         nextSq = -1;
-        notifyObservers(std::string("nextsqoff"));
         return;
     }
 
-    auto firstNotification = nextSq == -1;
-
     nextSq = i;
-
-    if (firstNotification)
-    {
-        notifyObservers(std::string("nextsq"));
-    }
-    else
-    {
-        notifyObservers(std::string("nextsqvalue"));
-    }
 }
 
 std::shared_ptr<Song> Sequencer::getSong(int i)
@@ -2076,11 +1941,6 @@ bool Sequencer::isOverdubbing()
 const double Sequencer::getPlayStartPositionQuarterNotes()
 {
     return playStartPositionQuarterNotes;
-}
-
-void Sequencer::notify(std::string s)
-{
-    notifyObservers(s);
 }
 
 void Sequencer::setRecording(bool b)

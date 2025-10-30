@@ -1,8 +1,6 @@
 #pragma once
 #include <sequencer/Sequence.hpp>
 
-#include <Observer.hpp>
-
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -27,7 +25,7 @@ namespace mpc::sequencer
 
 namespace mpc::sequencer
 {
-    class Sequencer final : public Observable
+    class Sequencer final
     {
 
     public:
@@ -126,14 +124,11 @@ namespace mpc::sequencer
     public:
         static void copyTrackParameters(std::shared_ptr<Track> source,
                                         std::shared_ptr<Track> dest);
-        void notifyTimeDisplay();
-        void notifyTimeDisplayRealtime();
         void init();
         void setTempo(double newTempo);
         double getTempo();
         bool isTempoSourceSequenceEnabled();
-        void setTempoSourceSequence(bool b,
-                                    const bool shouldNotifyObservers = true);
+        void setTempoSourceSequence(bool b);
         bool isRecordingOrOverdubbing();
         bool isRecording();
         bool isSoloEnabled();
@@ -172,7 +167,6 @@ namespace mpc::sequencer
         void stop(const StopMode);
         bool isCountingIn();
         void setCountingIn(bool b);
-        void notifyTrack();
         void setSequence(int i, std::shared_ptr<Sequence> s);
         void purgeAllSequences();
         void purgeSequence(int i);
@@ -232,8 +226,6 @@ namespace mpc::sequencer
         void resetUndo();
         bool isOverdubbing();
         const double getPlayStartPositionQuarterNotes();
-
-        void notify(std::string s);
 
         void setRecording(bool b);
         void setOverdubbing(bool b);
