@@ -110,8 +110,6 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
             return;
         }
     }
-
-    // throw std::invalid_argument("No matching pad for aftertouch");
 }
 
 PhysicalPadEventPtr
@@ -202,9 +200,6 @@ void EventRegistry::registerProgramPadRelease(
             return;
         }
     }
-
-    throw std::invalid_argument(
-        "registerProgramPadRelease called without matching press");
 }
 
 NoteEventPtr EventRegistry::registerNoteOn(
@@ -267,9 +262,6 @@ void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
             return;
         }
     }
-
-    throw std::invalid_argument(
-        "registerNoteOff called without matching note on");
 }
 
 void EventRegistry::clear()
