@@ -75,6 +75,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc &mpc)
 std::shared_ptr<MidiControlPreset>
 MidiControlPersistence::createDefaultPreset(mpc::Mpc &mpc)
 {
+    /*
     std::vector<std::string> labels;
 
     auto hardware = mpc.getHardware();
@@ -129,6 +130,8 @@ MidiControlPersistence::createDefaultPreset(mpc::Mpc &mpc)
     }
 
     return result;
+    */
+    return std::make_shared<MidiControlPreset>();
 }
 
 void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
