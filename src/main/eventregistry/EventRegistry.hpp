@@ -1,6 +1,12 @@
 #pragma once
 
-#include "ConstrainedInt.h"
+#include "IntTypes.hpp"
+
+#include "eventregistry/Source.hpp"
+#include "eventregistry/EventTypes.hpp"
+#include "eventregistry/EventMessage.hpp"
+
+#include "eventregistry/SnapshotView.hpp"
 
 #include <concurrentqueue.h>
 
@@ -28,123 +34,9 @@ namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
-    struct ProgramPadEvent;
-    struct PhysicalPadPressEvent;
-    struct PhysicalPadReleaseEvent;
-    struct NoteEvent;
-
-    using PhysicalPadPressEventPtr = std::shared_ptr<PhysicalPadPressEvent>;
-    using PhysicalPadReleaseEventPtr = std::shared_ptr<PhysicalPadReleaseEvent>;
-    using ProgramPadEventPtr = std::shared_ptr<ProgramPadEvent>;
-    using NoteEventPtr = std::shared_ptr<NoteEvent>;
-
     using PhysicalPadPressEventPtrs = std::vector<PhysicalPadPressEventPtr>;
     using ProgramPadEventPtrs = std::vector<ProgramPadEventPtr>;
     using NoteEventPtrs = std::vector<NoteEventPtr>;
-
-    using PhysicalPadIndex = ConstrainedInt<uint8_t, 0, 15>;
-    using Velocity = ConstrainedInt<uint8_t, 0, 127>;
-    using ProgramPadIndex = ConstrainedInt<uint8_t, 0, 63>;
-    using MidiChannel = ConstrainedInt<uint8_t, 0, 15>;
-    using Pressure = ConstrainedInt<uint8_t, 0, 127>;
-    using NoteNumber = ConstrainedInt<uint8_t, 0, 127>;
-    using DrumNoteNumber = ConstrainedInt<uint8_t, 34, 98>;
-    using VelocityOrPressure = ConstrainedInt<uint8_t, 0, 127>;
-
-    enum class Source
-    {
-        VirtualMpcHardware,
-        Sequence,
-        MidiInput,
-        StepEditor,
-        NoteRepeat
-    };
-
-    struct PhysicalPadPressEvent
-    {
-        PhysicalPadIndex padIndex;
-        Source source{};
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Bus> bus;
-        Velocity velocity;
-        std::optional<Pressure> pressure;
-        int bank{};
-        std::optional<int> note;
-        std::shared_ptr<mpc::sampler::Program> program;
-    };
-
-    struct PhysicalPadReleaseEvent
-    {
-        PhysicalPadIndex padIndex;
-        Source source{};
-    };
-
-    struct ProgramPadEvent
-    {
-        ProgramPadIndex padIndex;
-        Source source{};
-        std::optional<MidiChannel> midiChannel;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Bus> bus;
-        std::shared_ptr<mpc::sampler::Program> program;
-        Velocity velocity;
-        std::optional<Pressure> pressure;
-    };
-
-    struct NoteEvent
-    {
-        NoteNumber noteNumber;
-        Source source{};
-        std::optional<MidiChannel> midiChannel;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Bus> bus;
-        std::optional<Velocity> velocity;
-        std::optional<Pressure> pressure;
-        std::optional<std::shared_ptr<mpc::sequencer::NoteOnEvent>>
-            recordNoteEvent;
-        std::shared_ptr<mpc::sampler::Program> program;
-    };
-
-    struct EventMessage
-    {
-        enum class Type
-        {
-            PhysicalPadPress,
-            PhysicalPadAftertouch,
-            PhysicalPadRelease,
-            ProgramPadPress,
-            ProgramPadAftertouch,
-            ProgramPadRelease,
-            NoteOn,
-            NoteAftertouch,
-            NoteOff,
-            Clear
-        } type;
-
-        PhysicalPadPressEventPtr physicalPadPress;
-        ProgramPadEventPtr programPad;
-        NoteEventPtr noteEvent;
-        PhysicalPadReleaseEventPtr physicalPadRelease;
-
-        std::optional<Pressure> pressure;
-        std::function<void(void *)> action = [](void *) {};
-
-        EventMessage() = default;
-        EventMessage(const EventMessage&) = delete;
-        EventMessage& operator=(const EventMessage&) = delete;
-        EventMessage(EventMessage&&) noexcept = default;
-        EventMessage& operator=(EventMessage&&) noexcept = default;
-    };
-
-    struct Snapshot
-    {
-        PhysicalPadPressEventPtrs physicalPadPressEvents;
-        ProgramPadEventPtrs programPadEvents;
-        NoteEventPtrs noteEvents;
-    };
 
     class EventRegistry
     {
@@ -195,7 +87,6 @@ namespace mpc::eventregistry
 
         void clear();
 
-        class SnapshotView;
         SnapshotView getSnapshot() noexcept;
 
         // Called from the audio thread only
@@ -219,46 +110,5 @@ namespace mpc::eventregistry
         void publishSnapshotToBuffer(struct Snapshot *dst) noexcept;
 
         void applyMessage(const EventMessage &msg) noexcept;
-    };
-
-    class EventRegistry::SnapshotView
-    {
-    public:
-        explicit SnapshotView(const Snapshot *s) noexcept : snap(s) {}
-
-        bool isProgramPadPressedBySource(ProgramPadIndex idx, Source src) const;
-        VelocityOrPressure
-        getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
-        bool isProgramPadPressed(ProgramPadIndex idx) const;
-        int getTotalPressedProgramPadCount() const;
-
-        NoteEventPtr retrievePlayNoteEvent(NoteNumber note) const;
-        std::shared_ptr<sequencer::NoteOnEvent>
-        retrieveRecordNoteEvent(NoteNumber note) const;
-
-        PhysicalPadPressEventPtr
-        retrievePhysicalPadPressEvent(PhysicalPadIndex idx) const;
-
-        NoteEventPtr retrieveNoteEvent(NoteNumber note, Source src) const;
-
-        bool valid() const noexcept
-        {
-            return snap != nullptr;
-        }
-
-        void printStats()
-        {
-            printf("===== EventRegistry Stats =======\n");
-            printf("physicalPadPressEvent count: %zu\n",
-                   snap->physicalPadPressEvents.size());
-            printf("programPadEvent  count: %zu\n",
-                   snap->programPadEvents.size());
-            printf("noteEvent        count: %zu\n", snap->noteEvents.size());
-            printf("=================================\n");
-        }
-
-    private:
-        const Snapshot *snap{};
-        friend class EventRegistry;
     };
 } // namespace mpc::eventregistry
