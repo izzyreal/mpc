@@ -150,7 +150,6 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
         }
     }
 
-    notifyObservers(std::string("step-editor"));
 }
 
 // This is called from the UI thread. Results in incorrect tickpos.
@@ -183,7 +182,6 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note,
         onEvent->setTrack(this->getIndex());
         onEvent->setTick(tick);
         insertEventWhileRetainingSort(onEvent);
-        notifyObservers(std::string("step-editor"));
         return onEvent;
     }
     else
@@ -199,7 +197,6 @@ bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
 {
     auto old_duration = event->getDuration();
     event->setDuration(duration);
-    notifyObservers(std::string("adjust-duration"));
     return old_duration != duration;
 }
 
@@ -216,7 +213,6 @@ void Track::addEvent(int tick, const std::shared_ptr<Event> &event,
     insertEventWhileRetainingSort(
         event, allowMultipleNoteEventsWithSameNoteOnSameTick);
 
-    notifyObservers(std::string("step-editor"));
 }
 
 void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
@@ -274,14 +270,12 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
     }
 
     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
-    notifyObservers(std::string("step-editor"));
 }
 
 void Track::removeEvent(int i)
 {
     events.erase(events.begin() + i);
 
-    notifyObservers(std::string("step-editor"));
 }
 
 void Track::removeEvents()

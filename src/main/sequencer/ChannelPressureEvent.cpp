@@ -10,7 +10,6 @@ void ChannelPressureEvent::setAmount(int i)
     }
     channelPressureValue = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int ChannelPressureEvent::getAmount() const

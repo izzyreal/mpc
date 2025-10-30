@@ -10,7 +10,6 @@ void MixerEvent::setParameter(int i)
     }
     mixerParameter = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getParameter() const
@@ -27,7 +26,6 @@ void MixerEvent::setPadNumber(int i)
 
     padNumber = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getPad() const
@@ -44,7 +42,6 @@ void MixerEvent::setValue(int i)
 
     mixerParameterValue = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getValue() const

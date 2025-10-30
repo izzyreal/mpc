@@ -11,7 +11,6 @@ void PitchBendEvent::setAmount(int i)
 
     pitchBendAmount = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int PitchBendEvent::getAmount() const

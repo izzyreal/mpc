@@ -10,7 +10,6 @@ void ControlChangeEvent::setController(int i)
     }
     controllerNumber = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int ControlChangeEvent::getController() const
@@ -27,7 +26,6 @@ void ControlChangeEvent::setAmount(int i)
 
     controllerValue = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int ControlChangeEvent::getAmount() const

@@ -76,7 +76,6 @@ void NoteOnEvent::setNote(int i)
 {
     number = std::clamp(i, 0, 127);
     noteOff->setNote(number);
-    notifyObservers(std::string("step-editor"));
 }
 
 int NoteOnEvent::getNote() const
@@ -90,7 +89,6 @@ void NoteOnEvent::setDuration(Duration d)
     {
         duration = static_cast<int>(std::clamp(*d, 0, 9999));
     }
-    notifyObservers(std::string("step-editor"));
 }
 
 NoteOnEvent::Duration NoteOnEvent::getDuration() const
@@ -101,7 +99,6 @@ NoteOnEvent::Duration NoteOnEvent::getDuration() const
 void NoteOnEvent::resetDuration()
 {
     duration = std::nullopt;
-    notifyObservers(std::string("step-editor"));
 }
 
 NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType() const
@@ -113,13 +110,11 @@ void NoteOnEvent::incrementVariationType(int amount)
 {
     variationType =
         VARIATION_TYPE(std::clamp(int(variationType) + amount, 0, 3));
-    notifyObservers(std::string("step-editor"));
 }
 
 void NoteOnEvent::setVariationType(VARIATION_TYPE type)
 {
     variationType = type;
-    notifyObservers(std::string("step-editor"));
 }
 
 void NoteOnEvent::setVariationValue(int i)
@@ -132,7 +127,6 @@ void NoteOnEvent::setVariationValue(int i)
     {
         variationValue = std::clamp(i, 0, 100);
     }
-    notifyObservers(std::string("step-editor"));
 }
 
 int NoteOnEvent::getVariationValue() const
@@ -143,7 +137,6 @@ int NoteOnEvent::getVariationValue() const
 void NoteOnEvent::setVelocity(int i)
 {
     velocity = std::clamp(i, 1, 127);
-    notifyObservers(std::string("step-editor"));
 }
 
 int NoteOnEvent::getVelocity() const

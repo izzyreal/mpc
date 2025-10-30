@@ -10,7 +10,6 @@ void PolyPressureEvent::setNote(int i)
     }
     note = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int PolyPressureEvent::getNote() const
@@ -27,7 +26,6 @@ void PolyPressureEvent::setAmount(int i)
 
     polyPressureValue = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int PolyPressureEvent::getAmount() const

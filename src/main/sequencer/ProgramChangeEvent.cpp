@@ -10,7 +10,6 @@ void ProgramChangeEvent::setProgram(int i)
     }
     programChangeValue = i;
 
-    notifyObservers(std::string("step-editor"));
 }
 
 int ProgramChangeEvent::getProgram() const

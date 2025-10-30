@@ -400,7 +400,6 @@ void Sequencer::setActiveSequenceIndex(int i)
     notifyObservers(std::string("numberofbars"));
     notifyObservers(std::string("tempo"));
     notifyObservers(std::string("loop"));
-    notifyObservers(std::string("step-editor"));
     notifyTrack();
 }
 
