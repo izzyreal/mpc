@@ -226,6 +226,15 @@ namespace mpc::eventregistry
             return snap != nullptr;
         }
 
+        void printStats()
+        {
+            printf("===== EventRegistry Stats =======\n");
+            printf("physicalPadEvent count: %zu\n", snap->physicalPadEvents.size());
+            printf("programPadEvent  count: %zu\n", snap->programPadEvents.size());
+            printf("noteEvent        count: %zu\n", snap->noteEvents.size());
+            printf("=================================\n");
+        }
+
     private:
         const Snapshot *snap{};
         friend class EventRegistry;

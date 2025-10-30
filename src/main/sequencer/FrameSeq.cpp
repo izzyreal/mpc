@@ -492,6 +492,8 @@ void FrameSeq::work(int nFrames)
     const auto sampleRate =
         mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
 
+    mpc.eventRegistry->getSnapshot().printStats();
+
     if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
     {
         clock->processBufferInternal(sequencer->getTempo(), sampleRate, nFrames,
