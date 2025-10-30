@@ -500,8 +500,6 @@ void FrameSeq::work(int nFrames)
 
         for (uint16_t frameIndex = 0; frameIndex < nFrames; frameIndex++)
         {
-            processEventsAfterNFrames();
-
             if (std::find(ticksForCurrentBuffer.begin(),
                           ticksForCurrentBuffer.end(),
                           frameIndex) != ticksForCurrentBuffer.end())
