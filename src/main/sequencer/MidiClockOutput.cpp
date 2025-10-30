@@ -21,6 +21,7 @@ MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
       midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
       msg(std::make_shared<ShortMessage>())
 {
+    tempEventQueue.reserve(100);
     msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
 
@@ -81,17 +82,13 @@ void MidiClockOutput::processTempoChange()
     }
 }
 
-void MidiClockOutput::enqueueEventAfterNFrames(
-    const std::function<void()> &event, unsigned long nFrames)
+void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void()> &event,
+                                        unsigned long nFrames)
 {
-    for (auto &e : eventsAfterNFrames)
-    {
-        if (!e.occupied.load())
-        {
-            e.init(nFrames, event);
-            break;
-        }
-    }
+    EventAfterNFrames e;
+    e.f = event;
+    e.nFrames = nFrames;
+    eventQueue.enqueue(std::move(e));
 }
 
 void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
@@ -121,23 +118,25 @@ void MidiClockOutput::setSampleRate(unsigned int sampleRate)
     requestedSampleRate = sampleRate;
 }
 
-void MidiClockOutput::processEventsAfterNFrames(int frameIndex)
+void MidiClockOutput::processEventsAfterNFrames()
 {
-    for (auto &e : eventsAfterNFrames)
+    EventAfterNFrames batch[100];
+
+    size_t count = eventQueue.try_dequeue_bulk(batch, 100);
+
+    tempEventQueue.clear();
+
+    for (size_t i = 0; i < count; ++i)
     {
-        if (!e.occupied.load())
-        {
-            continue;
-        }
-
-        e.frameCounter += 1;
-
-        if (e.frameCounter >= e.nFrames)
-        {
+        auto &e = batch[i];
+        if (++e.frameCounter >= e.nFrames)
             e.f();
-            e.reset();
-        }
+        else
+            tempEventQueue.push_back(std::move(e));
     }
+
+    for (auto &e : tempEventQueue)
+        eventQueue.enqueue(std::move(e));
 }
 
 void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
@@ -150,7 +149,7 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
         return;
     }
 
-    processEventsAfterNFrames(frameIndex);
+    processEventsAfterNFrames();
 
     if (!clock.proc())
     {

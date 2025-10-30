@@ -5,8 +5,9 @@
 #include <sequencer/LegacyClock.hpp>
 #include "lcdgui/screens/SyncScreen.hpp"
 
+#include <concurrentqueue.h>
+
 #include <memory>
-#include <vector>
 #include <functional>
 #include <atomic>
 
@@ -45,15 +46,16 @@ namespace mpc::sequencer
         std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
 
         // Has to be called exactly once for each frameIndex
-        void processEventsAfterNFrames(int frameIndex);
+        void processEventsAfterNFrames();
 
         mpc::Mpc &mpc;
         unsigned char midiClockTickCounter = 0;
         bool wasRunning = false;
         std::shared_ptr<mpc::engine::midi::ShortMessage>
             midiSyncStartStopContinueMsg;
-        std::vector<EventAfterNFrames> eventsAfterNFrames =
-            std::vector<EventAfterNFrames>(50);
+
+        moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue = moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
+        std::vector<EventAfterNFrames> tempEventQueue;
 
         void sendMidiClockMsg(int frameIndex);
         void enqueueEventAfterNFrames(const std::function<void()> &event,

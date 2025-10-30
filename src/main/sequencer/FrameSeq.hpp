@@ -2,10 +2,12 @@
 
 #include "EventAfterNFrames.hpp"
 
-#include <engine/audio/server/AudioClient.hpp>
+#include "engine/audio/server/AudioClient.hpp"
 
 #include "MidiClockOutput.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
+
+#include <concurrentqueue.h>
 
 #include <memory>
 #include <vector>
@@ -65,7 +67,7 @@ namespace mpc::sequencer
         void processTempoChange();
 
         // Has to be called exactly once for each frameIndex
-        void processEventsAfterNFrames(int frameIndex);
+        void processEventsAfterNFrames();
 
         void triggerClickIfNeeded();
 
@@ -94,8 +96,8 @@ namespace mpc::sequencer
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 
         mpc::Mpc &mpc;
-        std::vector<EventAfterNFrames> eventsAfterNFrames =
-            std::vector<EventAfterNFrames>(50);
+        moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue = moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
+        std::vector<EventAfterNFrames> tempEventQueue;
 
         void move(int newTickPos);
 

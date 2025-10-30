@@ -43,6 +43,7 @@ FrameSeq::FrameSeq(mpc::Mpc &mpc)
       userScreen(mpc.screens->get<UserScreen>()),
       midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
 {
+    tempEventQueue.reserve(100);
 }
 
 void FrameSeq::start(const bool metronomeOnlyToUse)
@@ -465,14 +466,10 @@ void FrameSeq::stopSequencer()
 void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
                                         unsigned long nFrames)
 {
-    for (auto &e : eventsAfterNFrames)
-    {
-        if (!e.occupied.load())
-        {
-            e.init(nFrames, event);
-            break;
-        }
-    }
+    EventAfterNFrames e;
+    e.f = event;
+    e.nFrames = nFrames;
+    eventQueue.enqueue(std::move(e));
 }
 
 void FrameSeq::setSampleRate(unsigned int sampleRate)
@@ -480,23 +477,25 @@ void FrameSeq::setSampleRate(unsigned int sampleRate)
     requestedSampleRate = sampleRate;
 }
 
-void FrameSeq::processEventsAfterNFrames(int frameIndex)
+void FrameSeq::processEventsAfterNFrames()
 {
-    for (auto &e : eventsAfterNFrames)
+    EventAfterNFrames batch[100];
+
+    size_t count = eventQueue.try_dequeue_bulk(batch, 100);
+
+    tempEventQueue.clear();
+
+    for (size_t i = 0; i < count; ++i)
     {
-        if (!e.occupied.load())
-        {
-            continue;
-        }
-
-        e.frameCounter += 1;
-
-        if (e.frameCounter >= e.nFrames)
-        {
+        auto &e = batch[i];
+        if (++e.frameCounter >= e.nFrames)
             e.f();
-            e.reset();
-        }
+        else
+            tempEventQueue.push_back(std::move(e));
     }
+
+    for (auto &e : tempEventQueue)
+        eventQueue.enqueue(std::move(e));
 }
 
 void FrameSeq::work(int nFrames)
@@ -584,7 +583,7 @@ void FrameSeq::work(int nFrames)
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex);
 
-        processEventsAfterNFrames(frameIndex);
+        processEventsAfterNFrames();
 
         if (!sequencerIsRunningAtStartOfBuffer)
         {
