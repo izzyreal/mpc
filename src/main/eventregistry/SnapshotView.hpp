@@ -2,16 +2,16 @@
 
 #include "eventregistry/EventTypes.hpp"
 
-#include <vector>
 #include <memory>
+#include <cstdio>
 
 namespace mpc::eventregistry
 {
     struct Snapshot
     {
-        std::vector<PhysicalPadPressEventPtr> physicalPadEvents;
-        std::vector<ProgramPadEventPtr>  programPadEvents;
-        std::vector<NoteEventPtr>           noteEvents;
+        PhysicalPadPressEventPtrs physicalPadEvents;
+        ProgramPadPressEventPtrs  programPadEvents;
+        NoteOnEventPtrs             noteEvents;
     };
 
     class SnapshotView
@@ -25,14 +25,14 @@ namespace mpc::eventregistry
         bool isProgramPadPressed(ProgramPadIndex idx) const;
         int getTotalPressedProgramPadCount() const;
 
-        NoteEventPtr retrievePlayNoteEvent(NoteNumber note) const;
+        NoteOnEventPtr retrievePlayNoteEvent(NoteNumber note) const;
         std::shared_ptr<sequencer::NoteOnEvent>
         retrieveRecordNoteEvent(NoteNumber note) const;
 
         PhysicalPadPressEventPtr
         retrievePhysicalPadPressEvent(PhysicalPadIndex idx) const;
 
-        NoteEventPtr retrieveNoteEvent(NoteNumber note, Source src) const;
+        NoteOnEventPtr retrieveNoteEvent(NoteNumber note, Source src) const;
 
         bool valid() const noexcept
         {
@@ -42,7 +42,7 @@ namespace mpc::eventregistry
         void printStats()
         {
             printf("===== EventRegistry Stats =======\n");
-            printf("physicalPadPressEvent count: %zu\n",
+            printf("physicalPadEvent count: %zu\n",
                    snap->physicalPadEvents.size());
             printf("programPadEvent  count: %zu\n",
                    snap->programPadEvents.size());

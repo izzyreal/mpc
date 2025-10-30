@@ -1,7 +1,6 @@
 #include "EventRegistry.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include <algorithm>
-#include <stdexcept>
 
 using namespace mpc::eventregistry;
 using namespace mpc::lcdgui;
@@ -10,7 +9,7 @@ using namespace mpc::sequencer;
 
 EventRegistry::EventRegistry()
 {
-    physicalPadPressEvents.reserve(CAPACITY);
+    physicalPadEvents.reserve(CAPACITY);
     programPadEvents.reserve(CAPACITY);
     noteEvents.reserve(CAPACITY);
 
@@ -26,7 +25,7 @@ EventRegistry::EventRegistry()
 }
 
 EventRegistry::EventRegistry(const EventRegistry &other) noexcept
-    : physicalPadPressEvents(other.physicalPadPressEvents),
+    : physicalPadEvents(other.physicalPadEvents),
       programPadEvents(other.programPadEvents), noteEvents(other.noteEvents)
 {
 }
@@ -35,7 +34,7 @@ EventRegistry &EventRegistry::operator=(const EventRegistry &other) noexcept
 {
     if (this != &other)
     {
-        physicalPadPressEvents = other.physicalPadPressEvents;
+        physicalPadEvents = other.physicalPadEvents;
         programPadEvents = other.programPadEvents;
         noteEvents = other.noteEvents;
     }
@@ -65,7 +64,11 @@ void EventRegistry::registerPhysicalPadPress(
     e->bank = bank;
     e->note = note;
     e->program = screen->getProgram();
-    enqueue({EventMessage::Type::PhysicalPadPress, e, {}, {}, {}, {}, action});
+
+    EventMessage msg {EventMessage::Type::PhysicalPadPress};
+    msg.physicalPadPress = e;
+    msg.action = action;
+    enqueue(std::move(msg));
 }
 
 void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
@@ -74,23 +77,10 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
     printf("registering physical pad aftertouch for pad index %i\n",
            padIndex.get());
 
-    const auto snapshotView = getSnapshot();
-
-    for (const auto &e : snapshotView.snap->physicalPadEvents)
-    {
-        if (e->padIndex == padIndex && e->source != Source::NoteRepeat)
-        {
-            enqueue({EventMessage::Type::PhysicalPadAftertouch,
-                     e,
-                     {},
-                     {},
-                     {},
-                     pressure});
-            return;
-        }
-    }
-
-    // throw std::invalid_argument("No matching pad for aftertouch");
+    auto e = std::make_shared<PhysicalPadAftertouchEvent>(PhysicalPadAftertouchEvent {padIndex, pressure});
+    EventMessage msg {EventMessage::Type::PhysicalPadAftertouch};
+    msg.physicalPadAftertouch = e;
+    enqueue(std::move(msg));
 }
 
 void EventRegistry::registerPhysicalPadRelease(
@@ -98,7 +88,7 @@ void EventRegistry::registerPhysicalPadRelease(
     std::function<void(void *)> action)
 {
     printf("registering physical pad release\n");
-    auto e = std::make_shared<PhysicalPadReleaseEvent>(PhysicalPadReleaseEvent{padIndex, source});
+    auto e = std::make_shared<PhysicalPadReleaseEvent>(PhysicalPadReleaseEvent{padIndex});
     EventMessage msg;
     msg.type = EventMessage::Type::PhysicalPadRelease;
     msg.action = action;
@@ -106,7 +96,7 @@ void EventRegistry::registerPhysicalPadRelease(
     enqueue(std::move(msg));
 }
 
-ProgramPadEventPtr EventRegistry::registerProgramPadPress(
+ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     Source source, std::shared_ptr<ScreenComponent> screen,
     std::shared_ptr<Bus> bus, std::shared_ptr<Program> program,
     ProgramPadIndex padIndex, Velocity velocity, Track *track,
@@ -115,7 +105,7 @@ ProgramPadEventPtr EventRegistry::registerProgramPadPress(
     assert(screen && bus && program);
     printf("registering program pad press\n");
 
-    auto e = std::make_shared<ProgramPadEvent>();
+    auto e = std::make_shared<ProgramPadPressEvent>();
     e->padIndex = padIndex;
     e->source = source;
     e->screen = screen;
@@ -124,7 +114,10 @@ ProgramPadEventPtr EventRegistry::registerProgramPadPress(
     e->program = program;
     e->velocity = velocity;
     e->midiChannel = midiChannel;
-    enqueue({EventMessage::Type::ProgramPadPress, {}, e, {}});
+
+    EventMessage msg {EventMessage::Type::ProgramPadPress};
+    msg.programPadPress = e;
+    enqueue(std::move(msg));
     return e;
 }
 
@@ -136,52 +129,30 @@ void EventRegistry::registerProgramPadAftertouch(
 
     printf("registering program pad aftertouch\n");
 
-    auto snapshot = getSnapshot();
-
-    for (auto &e : snapshot.snap->programPadEvents)
-    {
-        if (e->padIndex == padIndex && e->source == source)
-        {
-            enqueue({EventMessage::Type::ProgramPadAftertouch,
-                     {},
-                     e,
-                     {},
-                     {},
-                     pressure});
-            return;
-        }
-    }
+    auto e = std::make_shared<ProgramPadAftertouchEvent>(ProgramPadAftertouchEvent { padIndex, pressure });
+    EventMessage msg{EventMessage::Type::ProgramPadAftertouch};
+    msg.programPadAftertouch = e;
+    enqueue(std::move(msg));
 }
 
 void EventRegistry::registerProgramPadRelease(
     Source source, std::shared_ptr<Bus> bus, std::shared_ptr<Program> program,
     ProgramPadIndex padIndex, Track *track,
-    std::optional<MidiChannel> midiChannel)
+    std::optional<MidiChannel> midiChannel,
+    std::function<void(void *)> action)
 {
     assert(bus && program);
-
     printf("registering program pad release\n");
 
-    auto snapshot = getSnapshot();
-
-    for (auto it = snapshot.snap->programPadEvents.rbegin();
-         it != snapshot.snap->programPadEvents.rend(); ++it)
-    {
-        const auto &e = *it;
-        if (e->padIndex == padIndex && e->source == source &&
-            ((!midiChannel && !e->midiChannel) ||
-             (midiChannel && e->midiChannel && *midiChannel == e->midiChannel)))
-        {
-            enqueue({EventMessage::Type::ProgramPadRelease, {}, e, {}});
-            return;
-        }
-    }
-
-    throw std::invalid_argument(
-        "registerProgramPadRelease called without matching press");
+    auto e = std::make_shared<ProgramPadReleaseEvent>(ProgramPadReleaseEvent{padIndex});
+    EventMessage msg;
+    msg.type = EventMessage::Type::ProgramPadRelease;
+    msg.action = action;
+    msg.programPadRelease = e;
+    enqueue(std::move(msg));
 }
 
-NoteEventPtr EventRegistry::registerNoteOn(
+NoteOnEventPtr EventRegistry::registerNoteOn(
     Source source, std::shared_ptr<ScreenComponent> screen,
     std::shared_ptr<Bus> bus, NoteNumber noteNumber, Velocity velocity,
     Track *track, std::optional<MidiChannel> midiChannel,
@@ -189,16 +160,10 @@ NoteEventPtr EventRegistry::registerNoteOn(
 {
     printf("registering note on\n");
     assert(screen && bus);
-    auto e = std::make_shared<NoteEvent>();
-    e->noteNumber = noteNumber;
-    e->source = source;
-    e->screen = screen;
-    e->track = track;
-    e->bus = bus;
-    e->velocity = velocity;
-    e->midiChannel = midiChannel;
-    e->program = program;
-    enqueue({EventMessage::Type::NoteOn, {}, {}, e});
+    auto e = std::make_shared<NoteOnEvent>(NoteOnEvent{noteNumber, source, midiChannel, screen, track, bus, velocity, nullptr, program, std::nullopt});
+    EventMessage msg{EventMessage::Type::NoteOn};
+    msg.noteOnEvent = e;
+    enqueue(std::move(msg));
     return e;
 }
 
@@ -206,18 +171,11 @@ void EventRegistry::registerNoteAftertouch(Source source, NoteNumber noteNumber,
                                            Pressure pressure)
 {
     printf("registering note aftertouch\n");
-    auto snapshot = getSnapshot();
-
-    for (auto &e : snapshot.snap->noteEvents)
-    {
-        if (e->noteNumber == noteNumber && e->source == source &&
-            e->source != Source::NoteRepeat)
-        {
-            enqueue(
-                {EventMessage::Type::NoteAftertouch, {}, {}, e, {}, pressure});
-            return;
-        }
-    }
+    auto e = std::make_shared<NoteAftertouchEvent>(NoteAftertouchEvent{noteNumber, pressure});
+    EventMessage msg {EventMessage::Type::NoteAftertouch};
+    msg.source = source;
+    msg.noteAftertouchEvent = e;
+    enqueue(std::move(msg));
 }
 
 void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
@@ -228,28 +186,15 @@ void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
 
     printf("registering note off\n");
 
-    auto snapshot = getSnapshot();
-
-    for (auto it = snapshot.snap->noteEvents.rbegin();
-         it != snapshot.snap->noteEvents.rend(); ++it)
-    {
-        auto &e = *it;
-        if (e->noteNumber == noteNumber && e->source == source &&
-            ((!midiChannel && !e->midiChannel) ||
-             (midiChannel && e->midiChannel && *midiChannel == e->midiChannel)))
-        {
-            enqueue({EventMessage::Type::NoteOff, {}, {}, e});
-            return;
-        }
-    }
-
-    throw std::invalid_argument(
-        "registerNoteOff called without matching note on");
+    auto e = std::make_shared<NoteOffEvent>(NoteOffEvent{noteNumber, midiChannel});
+    EventMessage msg{EventMessage::Type::NoteOff};
+    msg.noteOffEvent = e;
+    enqueue(std::move(msg));
 }
 
 void EventRegistry::clear()
 {
-    physicalPadPressEvents.clear();
+    physicalPadEvents.clear();
     programPadEvents.clear();
     noteEvents.clear();
     enqueue({EventMessage::Type::Clear, {}, {}, {}});
@@ -261,7 +206,7 @@ void EventRegistry::publishSnapshotToBuffer(Snapshot *dst) noexcept
     dst->programPadEvents.clear();
     dst->noteEvents.clear();
 
-    for (const auto &e : physicalPadPressEvents)
+    for (const auto &e : physicalPadEvents)
     {
         dst->physicalPadEvents.push_back(e);
     }
@@ -312,16 +257,20 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
         case EventMessage::Type::PhysicalPadPress:
             printf("Applying PhysicalPadPress\n");
             assert(msg.physicalPadPress);
+            physicalPadEvents.push_back(msg.physicalPadPress);
             msg.action(nullptr);
-            physicalPadPressEvents.push_back(msg.physicalPadPress);
             break;
 
         case EventMessage::Type::PhysicalPadAftertouch:
             printf("Applying PhysicalPadAftertouch\n");
-            assert(msg.physicalPadPress);
-            assert(msg.pressure);
-            msg.action(nullptr);
-            msg.physicalPadPress->pressure = *msg.pressure;
+            for (auto &p : physicalPadEvents)
+            {
+                if (p->padIndex == msg.physicalPadAftertouch->padIndex)
+                {
+                    p->pressure = msg.physicalPadAftertouch->pressure;
+                    return;
+                }
+            }
             break;
 
         case EventMessage::Type::PhysicalPadRelease:
@@ -330,64 +279,93 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
             assert(msg.physicalPadRelease);
 
             auto padPress = std::find_if(
-                physicalPadPressEvents.begin(), physicalPadPressEvents.end(),
+                physicalPadEvents.begin(), physicalPadEvents.end(),
                 [&](const auto &e)
                 {
                     return e->padIndex == msg.physicalPadRelease->padIndex;
                 });
 
-            assert(padPress != physicalPadPressEvents.end());
+            assert(padPress != physicalPadEvents.end());
 
             msg.action((void *)(*padPress).get());
-            physicalPadPressEvents.erase(padPress);
+            physicalPadEvents.erase(padPress);
             break;
         }
         case EventMessage::Type::ProgramPadPress:
-            assert(msg.programPad);
+            assert(msg.programPadPress);
             printf("Appying ProgramPadPress\n");
-            programPadEvents.push_back(msg.programPad);
+            programPadEvents.push_back(msg.programPadPress);
             break;
 
         case EventMessage::Type::ProgramPadAftertouch:
-            assert(msg.programPad);
-            assert(msg.pressure);
+        {
             printf("Appying ProgramPadAftertouch\n");
-            msg.programPad->pressure = *msg.pressure;
+            for (auto &p : programPadEvents)
+            {
+                if (p->padIndex == msg.programPadAftertouch->padIndex)
+                {
+                    p->pressure = msg.programPadAftertouch->pressure;
+                    return;
+                }
+            }
             break;
-
+        }
         case EventMessage::Type::ProgramPadRelease:
-            assert(msg.programPad);
+        {
             printf("Appying ProgramPadRelease\n");
-            programPadEvents.erase(std::remove(programPadEvents.begin(),
-                                               programPadEvents.end(),
-                                               msg.programPad),
-                                   programPadEvents.end());
-            break;
+            assert(msg.programPadRelease);
+            auto padPress = std::find_if(
+                programPadEvents.begin(), programPadEvents.end(),
+                [&](const auto &e)
+                {
+                    return e->padIndex == msg.programPadRelease->padIndex;
+                });
 
+            assert(padPress != programPadEvents.end());
+            programPadEvents.erase(padPress);
+            publishSnapshot();
+            msg.action((void *)(*padPress).get());
+            break;
+        }
         case EventMessage::Type::NoteOn:
-            assert(msg.noteEvent);
+            assert(msg.noteOnEvent);
             printf("Appying NoteOn\n");
-            noteEvents.push_back(msg.noteEvent);
+            noteEvents.push_back(msg.noteOnEvent);
             break;
 
         case EventMessage::Type::NoteAftertouch:
-            assert(msg.noteEvent);
-            assert(msg.pressure);
             printf("Appying NoteAftertouch\n");
-            msg.noteEvent->pressure = *msg.pressure;
+            for (auto &n : noteEvents)
+            {
+                if (n->noteNumber == msg.noteAftertouchEvent->noteNumber)
+                {
+                    n->pressure = msg.noteAftertouchEvent->pressure;
+                    return;
+                }
+            }
+
             break;
 
         case EventMessage::Type::NoteOff:
-            assert(msg.noteEvent);
+        {
+            assert(msg.noteOffEvent);
             printf("Appying NoteOff\n");
-            noteEvents.erase(std::remove(noteEvents.begin(), noteEvents.end(),
-                                         msg.noteEvent),
-                             noteEvents.end());
-            break;
+            auto noteOn = std::find_if(
+                noteEvents.begin(), noteEvents.end(),
+                [&](const auto &n)
+                {
+                    return n->noteNumber == msg.noteOffEvent->noteNumber;
+                });
 
+            assert(noteOn!= noteEvents.end());
+
+            msg.action((void *)(*noteOn).get());
+            noteEvents.erase(noteOn);
+            break;
+        }
         case EventMessage::Type::Clear:
             printf("Appying Clear\n");
-            physicalPadPressEvents.clear();
+            physicalPadEvents.clear();
             programPadEvents.clear();
             noteEvents.clear();
             break;

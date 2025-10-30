@@ -169,7 +169,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
             auto registryPadEvent = mpc.eventRegistry->registerProgramPadPress(
                 registryNoteEvent->source, registryNoteEvent->screen,
                 registryNoteEvent->bus, program, programPadIndex,
-                *registryNoteEvent->velocity, registryNoteEvent->track,
+                registryNoteEvent->velocity, registryNoteEvent->track,
                 std::nullopt);
 
             const auto noteOffCtx = DrumNoteEventContextBuilder::buildNoteOff(
@@ -188,7 +188,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
                 eventRegistry->registerProgramPadRelease(
                     eventregistry::Source::Sequence, bus, program,
-                    programPadIndex, track, std::nullopt);
+                    programPadIndex, track, std::nullopt, [](void*){});
 
                 DrumNoteEventHandler::noteOff(noteOffCtx);
             };
@@ -359,7 +359,7 @@ void EventHandler::handleMidiInputNoteOn(
     auto registryPadEvent = mpc.eventRegistry->registerProgramPadPress(
         registryNoteEvent->source, registryNoteEvent->screen,
         registryNoteEvent->bus, program, programPadIndex,
-        *registryNoteEvent->velocity, registryNoteEvent->track, midiChannel);
+        registryNoteEvent->velocity, registryNoteEvent->track, midiChannel);
 
     const bool isSoundScreen = lcdgui::screengroups::isSoundScreen(
         mpc.getLayeredScreen()->getCurrentScreen());
@@ -450,7 +450,7 @@ void EventHandler::handleMidiInputNoteOff(
 
         eventRegistry->registerProgramPadRelease(
             registryEvent->source, registryEvent->bus, program, programPadIndex,
-            registryEvent->track, midiChannel);
+            registryEvent->track, midiChannel, [](void*){});
     };
 
     frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);

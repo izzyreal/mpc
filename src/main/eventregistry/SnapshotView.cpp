@@ -65,7 +65,7 @@ bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx) const
     return false;
 }
 
-NoteEventPtr
+NoteOnEventPtr
 SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
 {
     for (auto &e : snap->noteEvents)
@@ -105,7 +105,7 @@ SnapshotView::retrievePhysicalPadPressEvent(
     return {};
 }
 
-NoteEventPtr SnapshotView::retrieveNoteEvent(NoteNumber note,
+NoteOnEventPtr SnapshotView::retrieveNoteEvent(NoteNumber note,
                                                             Source src) const
 {
     for (const auto &e : snap->noteEvents)

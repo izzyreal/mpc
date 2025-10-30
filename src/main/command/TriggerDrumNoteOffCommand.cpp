@@ -3,6 +3,7 @@
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerDrumNoteOffContext.hpp"
 #include "eventregistry/EventRegistry.hpp"
+#include "eventregistry/EventTypes.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -47,85 +48,85 @@ void TriggerDrumNoteOffCommand::execute()
                                         ctx->noteOffEvent->getNote(),
                                         ctx->track, std::nullopt);
 
-    ctx->eventRegistry->registerProgramPadRelease(
-        ctx->source, ctx->drumBus, ctx->program, ctx->programPadIndex,
-        ctx->track, std::nullopt);
+    std::function<void(void*)> action = [](void*){};
 
-    ctx->eventRegistry->publishSnapshot();
-
-    auto snapshot = ctx->eventRegistry->getSnapshot();
-
-    const bool noMoreProgramPadsArePressed =
-        snapshot.getTotalPressedProgramPadCount() == 0;
-
-    if (!ctx->recordOnEvent)
+    if (ctx->recordOnEvent &&
+            !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
     {
-        return;
-    }
+        action = [ctx = ctx](void *userData){
 
-    if (ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed)
-    {
-        return;
-    }
+            auto programPadEvent = (eventregistry::ProgramPadPressEvent*)userData;
 
-    if (ctx->sequencerIsRecordingOrOverdubbing)
-    {
-        ctx->track->finalizeNoteEventASync(ctx->recordOnEvent);
-    }
+            const auto snapshot = ctx->eventRegistry->getSnapshot();
 
-    if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
-    {
-        auto newDuration =
-            ctx->metronomeOnlyTickPosition - ctx->recordOnEvent->getTick();
-        ctx->recordOnEvent->setTick(ctx->sequencerTickPosition);
+            const bool noMoreProgramPadsArePressed =
+                snapshot.getTotalPressedProgramPadCount() == 0;
 
-        if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
-        {
-            newDuration = static_cast<int>(ctx->noteValueLengthInTicks *
-                                           (ctx->tcValuePercentage * 0.01));
-            if (newDuration < 1)
+            if (ctx->sequencerIsRecordingOrOverdubbing)
             {
-                newDuration = 1;
+                ctx->track->finalizeNoteEventASync(ctx->recordOnEvent);
             }
-        }
 
-        const bool durationHasBeenAdjusted =
-            ctx->track->finalizeNoteEventSynced(ctx->recordOnEvent,
-                                                newDuration);
+            if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
+            {
+                auto newDuration =
+                    ctx->metronomeOnlyTickPosition - ctx->recordOnEvent->getTick();
+                ctx->recordOnEvent->setTick(ctx->sequencerTickPosition);
 
-        if ((durationHasBeenAdjusted && ctx->isRecMainWithoutPlaying) ||
-            (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))
-        {
+                if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
+                {
+                    newDuration = static_cast<int>(ctx->noteValueLengthInTicks *
+                                                   (ctx->tcValuePercentage * 0.01));
+                    if (newDuration < 1)
+                    {
+                        newDuration = 1;
+                    }
+                }
+
+                const bool durationHasBeenAdjusted =
+                    ctx->track->finalizeNoteEventSynced(ctx->recordOnEvent,
+                                                        newDuration);
+
+                if ((durationHasBeenAdjusted && ctx->isRecMainWithoutPlaying) ||
+                    (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))
+                {
+                    if (noMoreProgramPadsArePressed)
+                    {
+                        int nextPos =
+                            ctx->sequencerTickPosition + ctx->noteValueLengthInTicks;
+
+                        auto bar = ctx->currentBarIndex + 1;
+
+                        nextPos = ctx->track->timingCorrectTick(
+                            0, bar, nextPos, ctx->noteValueLengthInTicks, ctx->swing);
+
+                        auto lastTick = ctx->sequencerGetActiveSequenceLastTick();
+
+                        if (nextPos != 0 && nextPos < lastTick)
+                        {
+                            const double nextPosQuarterNotes =
+                                sequencer::Sequencer::ticksToQuarterNotes(nextPos);
+                            ctx->sequencerMoveToQuarterNotePosition(
+                                nextPosQuarterNotes);
+                        }
+                        else
+                        {
+                            ctx->sequencerMoveToQuarterNotePosition(
+                                sequencer::Sequencer::ticksToQuarterNotes(lastTick));
+                        }
+                    }
+                }
+            }
+
             if (noMoreProgramPadsArePressed)
             {
-                int nextPos =
-                    ctx->sequencerTickPosition + ctx->noteValueLengthInTicks;
-
-                auto bar = ctx->currentBarIndex + 1;
-
-                nextPos = ctx->track->timingCorrectTick(
-                    0, bar, nextPos, ctx->noteValueLengthInTicks, ctx->swing);
-
-                auto lastTick = ctx->sequencerGetActiveSequenceLastTick();
-
-                if (nextPos != 0 && nextPos < lastTick)
-                {
-                    const double nextPosQuarterNotes =
-                        sequencer::Sequencer::ticksToQuarterNotes(nextPos);
-                    ctx->sequencerMoveToQuarterNotePosition(
-                        nextPosQuarterNotes);
-                }
-                else
-                {
-                    ctx->sequencerMoveToQuarterNotePosition(
-                        sequencer::Sequencer::ticksToQuarterNotes(lastTick));
-                }
+                ctx->sequencerStopMetronomeTrack();
             }
-        }
+        };
     }
 
-    if (noMoreProgramPadsArePressed)
-    {
-        ctx->sequencerStopMetronomeTrack();
-    }
+    ctx->eventRegistry->registerProgramPadRelease(
+        ctx->source, ctx->drumBus, ctx->program, ctx->programPadIndex,
+        ctx->track, std::nullopt, action);
 }
+

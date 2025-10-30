@@ -11,7 +11,6 @@
 #include <concurrentqueue.h>
 
 #include <memory>
-#include <vector>
 #include <optional>
 #include <cassert>
 #include <atomic>
@@ -34,10 +33,6 @@ namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
-    using PhysicalPadPressEventPtrs = std::vector<PhysicalPadPressEventPtr>;
-    using ProgramPadEventPtrs = std::vector<ProgramPadEventPtr>;
-    using NoteEventPtrs = std::vector<NoteEventPtr>;
-
     class EventRegistry
     {
     public:
@@ -56,7 +51,7 @@ namespace mpc::eventregistry
         void registerPhysicalPadRelease(PhysicalPadIndex, Source source,
                                         std::function<void(void *)> action);
 
-        ProgramPadEventPtr registerProgramPadPress(
+        ProgramPadPressEventPtr registerProgramPadPress(
             Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
             std::shared_ptr<mpc::sequencer::Bus>,
             std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
@@ -72,9 +67,10 @@ namespace mpc::eventregistry
                                        std::shared_ptr<mpc::sampler::Program>,
                                        ProgramPadIndex padIndex,
                                        sequencer::Track *,
-                                       std::optional<MidiChannel>);
+                                       std::optional<MidiChannel>,
+                                        std::function<void(void *)> action);
 
-        NoteEventPtr
+        NoteOnEventPtr
         registerNoteOn(Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
                        std::shared_ptr<mpc::sequencer::Bus>, NoteNumber,
                        Velocity, sequencer::Track *, std::optional<MidiChannel>,
@@ -96,9 +92,9 @@ namespace mpc::eventregistry
     private:
         const size_t CAPACITY = 8192;
 
-        PhysicalPadPressEventPtrs physicalPadPressEvents;
-        ProgramPadEventPtrs programPadEvents;
-        NoteEventPtrs noteEvents;
+        PhysicalPadPressEventPtrs physicalPadEvents;
+        ProgramPadPressEventPtrs programPadEvents;
+        NoteOnEventPtrs noteEvents;
 
         moodycamel::ConcurrentQueue<EventMessage> queue{512};
 

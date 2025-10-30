@@ -26,11 +26,18 @@ namespace mpc::eventregistry
         } type;
 
         PhysicalPadPressEventPtr physicalPadPress;
-        ProgramPadEventPtr programPad;
-        NoteEventPtr noteEvent;
+        PhysicalPadAftertouchEventPtr physicalPadAftertouch;
         PhysicalPadReleaseEventPtr physicalPadRelease;
 
-        std::optional<Pressure> pressure;
+        ProgramPadPressEventPtr programPadPress;
+        ProgramPadAftertouchEventPtr programPadAftertouch;
+        ProgramPadReleaseEventPtr programPadRelease;
+        
+        NoteOnEventPtr noteOnEvent;
+        NoteAftertouchEventPtr noteAftertouchEvent;
+        NoteOffEventPtr noteOffEvent;
+
+        Source source;
         std::function<void(void *)> action = [](void *) {};
 
         EventMessage() = default;
