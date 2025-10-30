@@ -9,7 +9,6 @@ void PolyPressureEvent::setNote(int i)
         return;
     }
     note = i;
-
 }
 
 int PolyPressureEvent::getNote() const
@@ -25,7 +24,6 @@ void PolyPressureEvent::setAmount(int i)
     }
 
     polyPressureValue = i;
-
 }
 
 int PolyPressureEvent::getAmount() const

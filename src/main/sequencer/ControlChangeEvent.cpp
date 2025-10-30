@@ -9,7 +9,6 @@ void ControlChangeEvent::setController(int i)
         return;
     }
     controllerNumber = i;
-
 }
 
 int ControlChangeEvent::getController() const
@@ -25,7 +24,6 @@ void ControlChangeEvent::setAmount(int i)
     }
 
     controllerValue = i;
-
 }
 
 int ControlChangeEvent::getAmount() const

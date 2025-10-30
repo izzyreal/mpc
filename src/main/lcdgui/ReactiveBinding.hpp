@@ -14,16 +14,16 @@ namespace mpc::lcdgui
         ReactiveBinding() = default;
 
         template <
-            typename Getter,
-            typename Updater,
+            typename Getter, typename Updater,
             typename Comparator = std::equal_to<std::invoke_result_t<Getter>>,
             typename T = std::invoke_result_t<Getter>,
-            std::enable_if_t<
-                std::is_invocable_r_v<T, Getter> &&
-                std::is_invocable_v<Updater, const T &> &&
-                std::is_invocable_r_v<bool, Comparator, const T &, const T &>,
-            int> = 0>
-        ReactiveBinding(Getter &&getter, Updater &&updater, Comparator comp = {})
+            std::enable_if_t<std::is_invocable_r_v<T, Getter> &&
+                                 std::is_invocable_v<Updater, const T &> &&
+                                 std::is_invocable_r_v<bool, Comparator,
+                                                       const T &, const T &>,
+                             int> = 0>
+        ReactiveBinding(Getter &&getter, Updater &&updater,
+                        Comparator comp = {})
         {
             refreshFn = [get = std::forward<Getter>(getter),
                          upd = std::forward<Updater>(updater),
@@ -42,8 +42,9 @@ namespace mpc::lcdgui
         void refresh() const
         {
             if (refreshFn)
+            {
                 refreshFn();
+            }
         }
     };
 } // namespace mpc::lcdgui
-

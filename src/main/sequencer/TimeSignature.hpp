@@ -18,7 +18,7 @@ namespace mpc::sequencer
         }
         bool operator==(const TimeSignature &other) const
         {
-            return numerator == other.numerator && 
+            return numerator == other.numerator &&
                    denominator == other.denominator;
         }
         void setNumerator(int i);

@@ -20,6 +20,5 @@ namespace mpc::command
 
         // Should be invoked from the audio thread only
         void execute() override;
-
     };
 } // namespace mpc::command

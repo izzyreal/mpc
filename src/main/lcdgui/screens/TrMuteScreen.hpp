@@ -7,15 +7,13 @@ namespace mpc::lcdgui::screens
     {
 
     public:
+        TrMuteScreen(mpc::Mpc &mpc, const int layerIndex);
+
+        void open() override;
+
         void right() override;
         void turnWheel(int i) override;
         void function(int i) override;
-
-    public:
-        TrMuteScreen(mpc::Mpc &mpc, const int layerIndex);
-        void update(Observable *o, Message message) override;
-        void open() override;
-        void close() override;
 
     private:
         int bankoffset();

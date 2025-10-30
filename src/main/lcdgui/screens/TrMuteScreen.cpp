@@ -11,6 +11,89 @@ using namespace mpc::lcdgui::screens;
 TrMuteScreen::TrMuteScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "track-mute", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isSoloEnabled();
+                        },
+                        [&](auto)
+                        {
+                            refreshTracks();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->isSoloEnabled();
+                        },
+                        [&](auto)
+                        {
+                            refreshTracks();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return mpc.clientEventController->getActiveBank();
+                        },
+                        [&](auto)
+                        {
+                            displayBank();
+                            displayTrackNumbers();
+                            refreshTracks();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequence();
+                        },
+                        [&](auto)
+                        {
+                            displaySq();
+                            refreshTracks();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            const int bank = static_cast<int>(
+                                mpc.clientEventController->getActiveBank());
+
+                            uint16_t tracksEnabled = 0;
+
+                            for (int i = 0; i < 16; ++i)
+                            {
+                                int trackIndex = bank * 16 + i;
+                                if (sequencer->getActiveSequence()
+                                        ->getTrack(trackIndex)
+                                        ->isOn())
+                                {
+                                    tracksEnabled |= (1u << i);
+                                }
+                            }
+
+                            return tracksEnabled;
+                        },
+                        [&](auto)
+                        {
+                            refreshTracks();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveTrackIndex();
+                        },
+                        [&](auto)
+                        {
+                            refreshTracks();
+                        }});
 }
 
 void TrMuteScreen::open()
@@ -34,15 +117,6 @@ void TrMuteScreen::open()
     displayBank();
     displayTrackNumbers();
 
-    sequencer->addObserver(this);
-
-    auto sequence = sequencer->getActiveSequence();
-
-    for (int i = 0; i < 64; i++)
-    {
-        sequence->getTrack(i)->addObserver(this);
-    }
-
     for (int i = 0; i < 16; i++)
     {
         displayTrack(i);
@@ -53,20 +127,6 @@ void TrMuteScreen::open()
     displayNow0();
     displayNow1();
     displayNow2();
-
-    mpc.clientEventController->addObserver(this);
-}
-
-void TrMuteScreen::close()
-{
-    mpc.clientEventController->deleteObserver(this);
-    sequencer->deleteObserver(this);
-    auto sequence = sequencer->getActiveSequence();
-
-    for (int i = 0; i < 64; i++)
-    {
-        sequence->getTrack(i)->deleteObserver(this);
-    }
 }
 
 void TrMuteScreen::right()
@@ -81,24 +141,8 @@ void TrMuteScreen::turnWheel(int i)
 
     if (focusedFieldName == "sq" && !sequencer->isPlaying())
     {
-        auto oldSequence = sequencer->getActiveSequence();
-
-        for (int trackIndex = 0; trackIndex < 64; trackIndex++)
-        {
-            oldSequence->getTrack(trackIndex)->deleteObserver(this);
-        }
-
         sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
                                           i);
-        auto newSequence = sequencer->getActiveSequence();
-
-        for (int trackIndex = 0; trackIndex < 64; trackIndex++)
-        {
-            newSequence->getTrack(trackIndex)->addObserver(this);
-        }
-
-        displaySq();
-        refreshTracks();
     }
 }
 
@@ -199,49 +243,5 @@ void TrMuteScreen::refreshTracks()
     {
         displayTrack(i);
         setTrackColor(i);
-    }
-}
-
-void TrMuteScreen::update(Observable *o, Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "soloenabled")
-    {
-        refreshTracks();
-    }
-    else if (msg == "active-track-index")
-    {
-        refreshTracks();
-    }
-    else if (msg == "bank")
-    {
-        displayBank();
-        displayTrackNumbers();
-
-        for (int i = 0; i < 16; i++)
-        {
-            setTrackColor(i);
-        }
-
-        refreshTracks();
-    }
-    else if (msg == "seqnumbername")
-    {
-        displaySq();
-        refreshTracks();
-    }
-    else if (msg == "trackon")
-    {
-        for (int i = 0; i < 16; i++)
-        {
-            setTrackColor(i);
-        }
-    }
-    else if (msg == "now" || msg == "clock")
-    {
-        displayNow0();
-        displayNow1();
-        displayNow2();
     }
 }

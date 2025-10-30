@@ -96,7 +96,8 @@ namespace mpc::sequencer
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 
         mpc::Mpc &mpc;
-        moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue = moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
+        moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue =
+            moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
         std::vector<EventAfterNFrames> tempEventQueue;
 
         void move(int newTickPos);

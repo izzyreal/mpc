@@ -20,17 +20,20 @@ namespace mpc::lcdgui::screens
             const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent);
         void adhocPlayNoteEventsAtCurrentPosition();
 
-
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> computeEventsAtCurrentTick();
+        std::vector<std::shared_ptr<mpc::sequencer::Event>>
+        computeEventsAtCurrentTick();
 
     public:
         StepEditorScreen(mpc::Mpc &mpc, const int layerIndex);
 
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> computeVisibleEvents(const std::vector<std::shared_ptr<sequencer::Event>> &eventsAtCurrentTick = {});
+        std::vector<std::shared_ptr<mpc::sequencer::Event>>
+        computeVisibleEvents(
+            const std::vector<std::shared_ptr<sequencer::Event>>
+                &eventsAtCurrentTick = {});
 
         bool visibleEventsEqual(
-            const std::vector<std::shared_ptr<mpc::sequencer::Event>>& a,
-            const std::vector<std::shared_ptr<mpc::sequencer::Event>>& b);
+            const std::vector<std::shared_ptr<mpc::sequencer::Event>> &a,
+            const std::vector<std::shared_ptr<mpc::sequencer::Event>> &b);
 
         void shift();
 

@@ -125,18 +125,11 @@ void Track::setUsed(bool b)
     }
 
     used = b;
-
-    if (used)
-    {
-        notifyObservers(std::string("tracknumbername"));
-    }
 }
 
 void Track::setOn(bool b)
 {
     on = b;
-
-    notifyObservers(std::string("trackon"));
 }
 
 void Track::removeEvent(const std::shared_ptr<Event> &event)
@@ -149,7 +142,6 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
             break;
         }
     }
-
 }
 
 // This is called from the UI thread. Results in incorrect tickpos.
@@ -212,7 +204,6 @@ void Track::addEvent(int tick, const std::shared_ptr<Event> &event,
 
     insertEventWhileRetainingSort(
         event, allowMultipleNoteEventsWithSameNoteOnSameTick);
-
 }
 
 void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
@@ -275,7 +266,6 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
 void Track::removeEvent(int i)
 {
     events.erase(events.begin() + i);
-
 }
 
 void Track::removeEvents()
@@ -295,8 +285,6 @@ void Track::setVelocityRatio(int i)
     }
 
     velocityRatio = i;
-
-    notifyObservers(std::string("velocityratio"));
 }
 
 int Track::getVelocityRatio()
@@ -312,8 +300,6 @@ void Track::setProgramChange(int i)
     }
 
     programChange = i;
-
-    notifyObservers(std::string("programchange"));
 }
 
 int Track::getProgramChange()
@@ -329,8 +315,6 @@ void Track::setBusNumber(int i)
     }
 
     busNumber = i;
-
-    notifyObservers(std::string("bus"));
 }
 
 int Track::getBus()
@@ -346,10 +330,6 @@ void Track::setDeviceIndex(int i)
     }
 
     device = i;
-
-    notifyObservers(std::string("device"));
-
-    notifyObservers(std::string("devicename"));
 }
 
 int Track::getDeviceIndex()
@@ -365,8 +345,6 @@ std::shared_ptr<Event> Track::getEvent(int i)
 void Track::setName(std::string s)
 {
     name = s;
-
-    notifyObservers(std::string("tracknumbername"));
 }
 
 std::string Track::getName()

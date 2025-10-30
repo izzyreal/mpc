@@ -269,7 +269,9 @@ void ClientHardwareEventController::handlePadRelease(
             mpc.getAudioMidiServices()->getFrameSequencer(), programPadIndex,
             *drumIndex, info->screen, *info->note, info->program, info->track);
 
-        mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames([ctx]{}, 0);
+        mpc.getAudioMidiServices()
+            ->getFrameSequencer()
+            ->enqueueEventAfterNFrames([ctx] {}, 0);
         {
             TriggerDrumNoteOffCommand(ctx).execute();
         }

@@ -10,7 +10,6 @@ void SystemExclusiveEvent::setByteA(unsigned char i)
     }
 
     bytes[0] = i;
-
 }
 
 unsigned char SystemExclusiveEvent::getByteA()
@@ -26,7 +25,6 @@ void SystemExclusiveEvent::setByteB(unsigned char i)
     }
 
     bytes[1] = i;
-
 }
 
 unsigned char SystemExclusiveEvent::getByteB()

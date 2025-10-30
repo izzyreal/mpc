@@ -4,7 +4,6 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteEvent.hpp"
-#include "Observer.hpp"
 
 #include <concurrentqueue.h>
 #include <memory>
@@ -19,7 +18,7 @@ namespace mpc::sequencer
 
     class FrameSeq;
 
-    class Track : public Observable
+    class Track
     {
 
     private:

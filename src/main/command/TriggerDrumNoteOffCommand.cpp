@@ -55,7 +55,8 @@ void TriggerDrumNoteOffCommand::execute()
 
     auto snapshot = ctx.eventRegistry->getSnapshot();
 
-    const bool noMoreProgramPadsArePressed = snapshot.getTotalPressedProgramPadCount() == 0;
+    const bool noMoreProgramPadsArePressed =
+        snapshot.getTotalPressedProgramPadCount() == 0;
 
     if (!ctx.recordOnEvent)
     {

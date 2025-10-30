@@ -9,7 +9,6 @@ void ProgramChangeEvent::setProgram(int i)
         return;
     }
     programChangeValue = i;
-
 }
 
 int ProgramChangeEvent::getProgram() const

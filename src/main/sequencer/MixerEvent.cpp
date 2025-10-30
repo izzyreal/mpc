@@ -9,7 +9,6 @@ void MixerEvent::setParameter(int i)
         return;
     }
     mixerParameter = i;
-
 }
 
 int MixerEvent::getParameter() const
@@ -25,7 +24,6 @@ void MixerEvent::setPadNumber(int i)
     }
 
     padNumber = i;
-
 }
 
 int MixerEvent::getPad() const
@@ -41,7 +39,6 @@ void MixerEvent::setValue(int i)
     }
 
     mixerParameterValue = i;
-
 }
 
 int MixerEvent::getValue() const

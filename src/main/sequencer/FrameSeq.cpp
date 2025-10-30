@@ -489,13 +489,19 @@ void FrameSeq::processEventsAfterNFrames()
     {
         auto &e = batch[i];
         if (++e.frameCounter >= e.nFrames)
+        {
             e.f();
+        }
         else
+        {
             tempEventQueue.push_back(std::move(e));
+        }
     }
 
     for (auto &e : tempEventQueue)
+    {
         eventQueue.enqueue(std::move(e));
+    }
 }
 
 void FrameSeq::work(int nFrames)

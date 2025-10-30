@@ -9,7 +9,6 @@ void ChannelPressureEvent::setAmount(int i)
         return;
     }
     channelPressureValue = i;
-
 }
 
 int ChannelPressureEvent::getAmount() const

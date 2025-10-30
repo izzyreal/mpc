@@ -82,8 +82,8 @@ void MidiClockOutput::processTempoChange()
     }
 }
 
-void MidiClockOutput::enqueueEventAfterNFrames(const std::function<void()> &event,
-                                        unsigned long nFrames)
+void MidiClockOutput::enqueueEventAfterNFrames(
+    const std::function<void()> &event, unsigned long nFrames)
 {
     EventAfterNFrames e;
     e.f = event;
@@ -130,13 +130,19 @@ void MidiClockOutput::processEventsAfterNFrames()
     {
         auto &e = batch[i];
         if (++e.frameCounter >= e.nFrames)
+        {
             e.f();
+        }
         else
+        {
             tempEventQueue.push_back(std::move(e));
+        }
     }
 
     for (auto &e : tempEventQueue)
+    {
         eventQueue.enqueue(std::move(e));
+    }
 }
 
 void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,

@@ -10,7 +10,6 @@ void PitchBendEvent::setAmount(int i)
     }
 
     pitchBendAmount = i;
-
 }
 
 int PitchBendEvent::getAmount() const

@@ -127,20 +127,22 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
                             displayOn();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            if (sequencer->isCountingIn())
-                            {
-                                return static_cast<int>(Sequencer::quarterNotesToTicks(sequencer->getPlayStartPositionQuarterNotes()));
-                            }
-                            return sequencer->getTickPosition();
-                        },
-                        [&](auto)
-                        {
-                            displayNow0();
-                            displayNow1();
-                            displayNow2();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             if (sequencer->isCountingIn())
+             {
+                 return static_cast<int>(Sequencer::quarterNotesToTicks(
+                     sequencer->getPlayStartPositionQuarterNotes()));
+             }
+             return sequencer->getTickPosition();
+         },
+         [&](auto)
+         {
+             displayNow0();
+             displayNow1();
+             displayNow2();
+         }});
 
     addReactiveBinding({[&]
                         {

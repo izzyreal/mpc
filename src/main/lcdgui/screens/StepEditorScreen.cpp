@@ -59,27 +59,31 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
     MRECT r(31, 0, 164, 9);
     addChildT<Rectangle>("view-background", r);
 
-    addReactiveBinding({
-        [&] {
-            auto original = computeVisibleEvents();
-            std::vector<std::shared_ptr<mpc::sequencer::Event>> clones;
-            clones.reserve(original.size());
-            for (auto &e : original)
-                clones.push_back(cloneEvent(e));
-            return clones;
-        },
-        [&](auto) {
-            refreshEventRows();
-        },
-        [&](const auto &a, const auto &b) {
-            return visibleEventsEqual(a, b);
-        }
-    });
+    addReactiveBinding(
+        {[&]
+         {
+             auto original = computeVisibleEvents();
+             std::vector<std::shared_ptr<mpc::sequencer::Event>> clones;
+             clones.reserve(original.size());
+             for (auto &e : original)
+             {
+                 clones.push_back(cloneEvent(e));
+             }
+             return clones;
+         },
+         [&](auto)
+         {
+             refreshEventRows();
+         },
+         [&](const auto &a, const auto &b)
+         {
+             return visibleEventsEqual(a, b);
+         }});
 }
 
 bool StepEditorScreen::visibleEventsEqual(
-    const std::vector<std::shared_ptr<mpc::sequencer::Event>>& a,
-    const std::vector<std::shared_ptr<mpc::sequencer::Event>>& b)
+    const std::vector<std::shared_ptr<mpc::sequencer::Event>> &a,
+    const std::vector<std::shared_ptr<mpc::sequencer::Event>> &b)
 {
     if (a.size() != b.size())
     {
@@ -93,7 +97,10 @@ bool StepEditorScreen::visibleEventsEqual(
             return false;
         }
 
-        if (!a[i] && !b[i]) continue;
+        if (!a[i] && !b[i])
+        {
+            continue;
+        }
 
         if (!eventsEqual(a[i], b[i]))
         {
@@ -246,7 +253,8 @@ void StepEditorScreen::function(int i)
             const auto srcLetter = getActiveColumn();
 
             const auto visibleEvents = computeVisibleEvents();
-            const std::string eventType = visibleEvents[rowIndex]->getTypeName();
+            const std::string eventType =
+                visibleEvents[rowIndex]->getTypeName();
             lastColumn[eventType] = srcLetter;
 
             if (selectionStartIndex != -1)
@@ -277,7 +285,8 @@ void StepEditorScreen::function(int i)
             refreshEventRows();
             refreshSelection();
 
-            const std::string newEventType = visibleEvents[rowIndex]->getTypeName();
+            const std::string newEventType =
+                visibleEvents[rowIndex]->getTypeName();
 
             ls->setFocus(lastColumn[newEventType] + std::to_string(rowIndex));
             break;
@@ -999,7 +1008,8 @@ void StepEditorScreen::refreshSelection()
     }
 }
 
-std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTick)
+std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(
+    const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTick)
 {
     std::vector<std::shared_ptr<Event>> result(4);
     int firstVisibleEventIndex = yOffset;
@@ -1007,7 +1017,7 @@ std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(const
 
     std::optional<std::vector<std::shared_ptr<Event>>> ownedEvents;
 
-    const std::vector<std::shared_ptr<Event>>& eventsAtCurrentTickToUse =
+    const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTickToUse =
         eventsAtCurrentTick.empty()
             ? (ownedEvents = computeEventsAtCurrentTick(), *ownedEvents)
             : eventsAtCurrentTick;
@@ -1028,7 +1038,8 @@ std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(const
     return result;
 }
 
-std::vector<std::shared_ptr<Event>> StepEditorScreen::computeEventsAtCurrentTick()
+std::vector<std::shared_ptr<Event>>
+StepEditorScreen::computeEventsAtCurrentTick()
 {
     std::vector<std::shared_ptr<Event>> result;
 
@@ -1521,7 +1532,8 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
         return;
     }
 
-    const auto desiredColumn = lastColumn[computeVisibleEvents()[row]->getTypeName()];
+    const auto desiredColumn =
+        lastColumn[computeVisibleEvents()[row]->getTypeName()];
 
     ls->setFocus(desiredColumn + std::to_string(row));
 }
