@@ -7,14 +7,12 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        void turnWheel(int i) override;
-        void function(int i) override;
-
         NextSeqScreen(mpc::Mpc &mpc, const int layerIndex);
 
-        void update(Observable *, Message) override;
         void open() override;
-        void close() override;
+
+        void turnWheel(int i) override;
+        void function(int i) override;
 
     private:
         bool selectNextSqFromScratch = true;

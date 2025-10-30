@@ -17,6 +17,48 @@ using namespace mpc::lcdgui::screens::window;
 NextSeqScreen::NextSeqScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "next-seq", layerIndex)
 {
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getNextSq();
+                        },
+                        [&](const int nextSq)
+                        {
+                            displayNextSq();
+
+                            if (nextSq == -1)
+                            {
+                                selectNextSqFromScratch = true;
+                            }
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getActiveSequenceIndex();
+                        },
+                        [&](auto)
+                        {
+                            displaySq();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            displayNow0();
+                            displayNow1();
+                            displayNow2();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTempo();
+                        },
+                        [&](auto)
+                        {
+                            displayTempo();
+                        }});
 }
 
 void NextSeqScreen::open()
@@ -36,8 +78,6 @@ void NextSeqScreen::open()
     displayTiming();
     displayNextSq();
 
-    sequencer->addObserver(this);
-
     if (sequencer->getNextSq() == -1)
     {
         ls->setFocus("sq");
@@ -46,11 +86,6 @@ void NextSeqScreen::open()
     {
         ls->setFocus("nextsq");
     }
-}
-
-void NextSeqScreen::close()
-{
-    sequencer->deleteObserver(this);
 }
 
 void NextSeqScreen::turnWheel(int i)
@@ -237,51 +272,3 @@ void NextSeqScreen::displayTiming()
         SequencerScreen::timingCorrectNames[noteValue]);
 }
 
-void NextSeqScreen::update(Observable *o, Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "seqnumbername")
-    {
-        displaySq();
-    }
-    else if (msg == "bar")
-    {
-        displayNow0();
-    }
-    else if (msg == "beat")
-    {
-        displayNow1();
-    }
-    else if (msg == "clock")
-    {
-        displayNow2();
-    }
-    else if (msg == "now")
-    {
-        displayNow0();
-        displayNow1();
-        displayNow2();
-    }
-    else if (msg == "nextsqvalue")
-    {
-        displayNextSq();
-    }
-    else if (msg == "nextsq")
-    {
-        displayNextSq();
-    }
-    else if (msg == "nextsqoff")
-    {
-        selectNextSqFromScratch = true;
-        displayNextSq();
-    }
-    else if (msg == "timing")
-    {
-        displayTiming();
-    }
-    else if (msg == "tempo")
-    {
-        displayTempo();
-    }
-}
