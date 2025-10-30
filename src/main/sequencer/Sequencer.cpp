@@ -1027,7 +1027,7 @@ void Sequencer::setDefaultTrackName(std::string s, int i)
 int Sequencer::getCurrentBarIndex()
 {
     auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
-    auto pos = getTickPosition();
+    auto pos = isCountingIn() ? quarterNotesToTicks(playStartPositionQuarterNotes) : getTickPosition();
 
     if (pos == s->getLastTick())
     {
@@ -1059,7 +1059,7 @@ int Sequencer::getCurrentBarIndex()
 int Sequencer::getCurrentBeatIndex()
 {
     auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
-    auto pos = getTickPosition();
+    auto pos = isCountingIn() ? quarterNotesToTicks(playStartPositionQuarterNotes) : getTickPosition();
 
     if (pos == s->getLastTick())
     {
@@ -1112,7 +1112,7 @@ int Sequencer::getCurrentClockNumber()
     auto sequence =
         isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 
-    auto clock = getTickPosition();
+    auto clock = isCountingIn() ? quarterNotesToTicks(playStartPositionQuarterNotes) : getTickPosition();
 
     if (clock == sequence->getLastTick())
     {

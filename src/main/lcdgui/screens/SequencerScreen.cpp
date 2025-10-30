@@ -129,6 +129,10 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
+                            if (sequencer->isCountingIn())
+                            {
+                                return static_cast<int>(Sequencer::quarterNotesToTicks(sequencer->getPlayStartPositionQuarterNotes()));
+                            }
                             return sequencer->getTickPosition();
                         },
                         [&](auto)
