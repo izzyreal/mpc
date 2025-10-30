@@ -521,6 +521,13 @@ void FrameSeq::work(int nFrames)
                 triggerClickIfNeeded();
                 metronomeOnlyTickPosition++;
             }
+
+            if (eventRegistrySnapshotPublishFrameCounter++ >=
+                eventRegistrySnapshotPublishIntervalFrames)
+            {
+                eventRegistrySnapshotPublishFrameCounter = 0;
+                mpc.eventRegistry->publishSnapshot();
+            }
         }
 
         return;

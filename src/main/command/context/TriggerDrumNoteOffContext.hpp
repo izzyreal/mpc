@@ -48,7 +48,6 @@ namespace mpc::command::context
         const bool isErasePressed;
         sequencer::Track *track;
         const bool isStepRecording;
-        const std::function<bool()> isAnyProgramPadRegisteredAsPressed;
         const uint64_t metronomeOnlyTickPosition;
         const bool isRecMainWithoutPlaying;
         const int64_t sequencerTickPosition;

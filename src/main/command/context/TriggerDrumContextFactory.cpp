@@ -163,11 +163,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
         registrySnapshot.retrieveRecordNoteEvent(note);
 
-    std::function<bool()> isAnyProgramPadRegisteredAsPressed = [eventRegistry]()
-    {
-        return eventRegistry->getSnapshot().isAnyProgramPadPressed();
-    };
-
     const auto stepEditOptionsScreen =
         screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>();
     const auto timingCorrectScreen =
@@ -217,7 +212,6 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
             hardware->getButton(hardware::ComponentId::ERASE)->isPressed(),
             track,
             isStepRecording,
-            isAnyProgramPadRegisteredAsPressed,
             frameSequencer->getMetronomeOnlyTickPosition(),
             isRecMainWithoutPlaying,
             sequencer->getTickPosition(),

@@ -47,6 +47,15 @@ void TriggerDrumNoteOffCommand::execute()
                                        ctx.noteOffEvent->getNote(), ctx.track,
                                        std::nullopt);
 
+    const auto registrySnapshot = ctx.eventRegistry->getSnapshot();
+    const int totalPressedProgramPadCount = registrySnapshot.getTotalPressedProgramPadCount();
+
+    assert(totalPressedProgramPadCount >= 1);
+
+    // We're cheating here. Best is to run the code that depends on processed registrations
+    // on the audio thread.
+    const bool noMoreProgramPadsArePressed = totalPressedProgramPadCount == 1;
+
     ctx.eventRegistry->registerProgramPadRelease(
         ctx.source, ctx.drumBus, ctx.program, ctx.programPadIndex, ctx.track,
         std::nullopt);
@@ -88,7 +97,7 @@ void TriggerDrumNoteOffCommand::execute()
         if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying) ||
             (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))
         {
-            if (!ctx.isAnyProgramPadRegisteredAsPressed())
+            if (noMoreProgramPadsArePressed)
             {
                 int nextPos =
                     ctx.sequencerTickPosition + ctx.noteValueLengthInTicks;
@@ -115,7 +124,7 @@ void TriggerDrumNoteOffCommand::execute()
         }
     }
 
-    if (!ctx.isAnyProgramPadRegisteredAsPressed())
+    if (noMoreProgramPadsArePressed)
     {
         ctx.sequencerStopMetronomeTrack();
     }

@@ -385,11 +385,6 @@ bool EventRegistry::SnapshotView::isProgramPadPressed(ProgramPadIndex idx) const
     return false;
 }
 
-bool EventRegistry::SnapshotView::isAnyProgramPadPressed() const
-{
-    return !snap->programPadEvents.empty();
-}
-
 NoteEventPtr
 EventRegistry::SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
 {
@@ -440,6 +435,11 @@ NoteEventPtr EventRegistry::SnapshotView::retrieveNoteEvent(NoteNumber note,
         }
     }
     return {};
+}
+
+int EventRegistry::SnapshotView::getTotalPressedProgramPadCount() const
+{
+    return snap->programPadEvents.size();
 }
 
 void EventRegistry::drainQueue() noexcept

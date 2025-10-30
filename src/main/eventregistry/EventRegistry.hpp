@@ -211,7 +211,7 @@ namespace mpc::eventregistry
         VelocityOrPressure
         getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
         bool isProgramPadPressed(ProgramPadIndex idx) const;
-        bool isAnyProgramPadPressed() const;
+        int getTotalPressedProgramPadCount() const;
 
         NoteEventPtr retrievePlayNoteEvent(NoteNumber note) const;
         std::shared_ptr<sequencer::NoteOnEvent>
