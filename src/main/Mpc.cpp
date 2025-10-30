@@ -278,7 +278,7 @@ Mpc::~Mpc()
 
 void Mpc::panic()
 {
-    eventRegistry->clear();
+    // TODO Anything we should do in the eventRegistry?
     midiOutput->panic();
     eventHandler->clearTransposeCache();
 }
