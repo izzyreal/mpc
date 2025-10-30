@@ -765,7 +765,7 @@ void SequencerScreen::turnWheel(int i)
             auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
 
             if (std::dynamic_pointer_cast<NoteOnEvent>(
-                    stepEditorScreen->getVisibleEvents()[eventNumber]))
+                    stepEditorScreen->computeVisibleEvents()[eventNumber]))
             {
                 if (track->getBus() == 0)
                 {

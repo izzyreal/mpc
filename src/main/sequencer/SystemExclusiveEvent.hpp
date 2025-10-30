@@ -19,7 +19,7 @@ namespace mpc::sequencer
 
         SystemExclusiveEvent() = default;
         SystemExclusiveEvent(const SystemExclusiveEvent &event);
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "system-exclusive";
         }

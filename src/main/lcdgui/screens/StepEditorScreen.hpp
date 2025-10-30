@@ -20,8 +20,17 @@ namespace mpc::lcdgui::screens
             const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent);
         void adhocPlayNoteEventsAtCurrentPosition();
 
+
+        std::vector<std::shared_ptr<mpc::sequencer::Event>> computeEventsAtCurrentTick();
+
     public:
         StepEditorScreen(mpc::Mpc &mpc, const int layerIndex);
+
+        std::vector<std::shared_ptr<mpc::sequencer::Event>> computeVisibleEvents(const std::vector<std::shared_ptr<sequencer::Event>> &eventsAtCurrentTick = {});
+
+        bool visibleEventsEqual(
+            const std::vector<std::shared_ptr<mpc::sequencer::Event>>& a,
+            const std::vector<std::shared_ptr<mpc::sequencer::Event>>& b);
 
         void shift();
 
@@ -41,13 +50,10 @@ namespace mpc::lcdgui::screens
         void close() override;
         void openWindow() override;
 
-        void update(Observable *, Message message) override;
-
         void setFromNote(int i);
 
     private:
         void refreshSelection();
-        void initVisibleEvents();
         void refreshEventRows();
         void updateComponents();
         void setViewNotesText();
@@ -67,8 +73,6 @@ namespace mpc::lcdgui::screens
             "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
         const std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent =
             std::make_shared<mpc::sequencer::EmptyEvent>();
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> visibleEvents;
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
         std::vector<std::shared_ptr<mpc::sequencer::Event>> placeHolder;
         std::shared_ptr<mpc::sequencer::Event> selectedEvent;
         std::vector<std::shared_ptr<mpc::sequencer::Event>> selectedEvents;

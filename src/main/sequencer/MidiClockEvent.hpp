@@ -24,7 +24,7 @@ namespace mpc::sequencer
         MidiClockEvent(std::shared_ptr<mpc::engine::midi::ShortMessage> msg);
         MidiClockEvent(const MidiClockEvent &);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "midi-clock";
         }

@@ -21,8 +21,9 @@
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/ProgramChangeEvent.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
+#include "sequencer/EventEquals.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/EventRow.hpp"
@@ -57,6 +58,50 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
 
     MRECT r(31, 0, 164, 9);
     addChildT<Rectangle>("view-background", r);
+
+    addReactiveBinding({
+        [&] {
+            auto original = computeVisibleEvents();
+            std::vector<std::shared_ptr<mpc::sequencer::Event>> clones;
+            clones.reserve(original.size());
+            for (auto &e : original)
+                clones.push_back(cloneEvent(e));
+            return clones;
+        },
+        [&](auto) {
+            refreshEventRows();
+        },
+        [&](const auto &a, const auto &b) {
+            return visibleEventsEqual(a, b);
+        }
+    });
+}
+
+bool StepEditorScreen::visibleEventsEqual(
+    const std::vector<std::shared_ptr<mpc::sequencer::Event>>& a,
+    const std::vector<std::shared_ptr<mpc::sequencer::Event>>& b)
+{
+    if (a.size() != b.size())
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+        if ((!a[i] && b[i]) || (a[i] && !b[i]))
+        {
+            return false;
+        }
+
+        if (!a[i] && !b[i]) continue;
+
+        if (!eventsEqual(a[i], b[i]))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void StepEditorScreen::openWindow()
@@ -94,14 +139,12 @@ void StepEditorScreen::open()
     updateComponents();
     setViewNotesText();
     displayView();
-    sequencer->addObserver(this);
-    track->addObserver(this);
 
     findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
     findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
     findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 
-    initVisibleEvents();
+    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
     if (ls->isPreviousScreen<InsertEventScreen>())
     {
@@ -126,6 +169,8 @@ void StepEditorScreen::open()
         }
     }
 
+    const auto visibleEvents = computeVisibleEvents(eventsAtCurrentTick);
+
     if (ls->isPreviousScreenNot<StepTcScreen, InsertEventScreen,
                                 PasteEventScreen, EditMultipleScreen>())
     {
@@ -139,9 +184,7 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
-    sequencer->deleteObserver(this);
     auto track = mpc.getSequencer()->getActiveTrack();
-    track->deleteObserver(this);
 
     storeColumnForEventAtActiveRow();
 
@@ -152,43 +195,6 @@ void StepEditorScreen::close()
     {
         track->removeDoubles();
         sequencer->resetUndo();
-    }
-
-    for (auto &e : visibleEvents)
-    {
-        if (e)
-        {
-            e->deleteObserver(this);
-        }
-    }
-
-    for (auto &e : eventsAtCurrentTick)
-    {
-        if (e)
-        {
-            e->deleteObserver(this);
-        }
-    }
-
-    for (auto &e : selectedEvents)
-    {
-        if (e)
-        {
-            e->deleteObserver(this);
-        }
-    }
-
-    if (selectedEvent)
-    {
-        selectedEvent->deleteObserver(this);
-    }
-
-    for (auto &e : placeHolder)
-    {
-        if (e)
-        {
-            e->deleteObserver(this);
-        }
     }
 
     clearSelection();
@@ -217,6 +223,9 @@ void StepEditorScreen::function(int i)
             {
                 // CopySelectedNote
                 auto eventIndex = getActiveRow();
+
+                const auto visibleEvents = computeVisibleEvents();
+
                 auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(
                     visibleEvents[eventIndex]);
 
@@ -235,7 +244,9 @@ void StepEditorScreen::function(int i)
 
             const auto rowIndex = getActiveRow();
             const auto srcLetter = getActiveColumn();
-            std::string eventType = visibleEvents[rowIndex]->getTypeName();
+
+            const auto visibleEvents = computeVisibleEvents();
+            const std::string eventType = visibleEvents[rowIndex]->getTypeName();
             lastColumn[eventType] = srcLetter;
 
             if (selectionStartIndex != -1)
@@ -263,13 +274,12 @@ void StepEditorScreen::function(int i)
                 }
             }
 
-            initVisibleEvents();
             refreshEventRows();
             refreshSelection();
 
-            eventType = visibleEvents[rowIndex]->getTypeName();
+            const std::string newEventType = visibleEvents[rowIndex]->getTypeName();
 
-            ls->setFocus(lastColumn[eventType] + std::to_string(rowIndex));
+            ls->setFocus(lastColumn[newEventType] + std::to_string(rowIndex));
             break;
         }
         case 3:
@@ -286,7 +296,9 @@ void StepEditorScreen::function(int i)
             }
             else
             {
-                auto row = getActiveRow();
+                const auto row = getActiveRow();
+
+                const auto visibleEvents = computeVisibleEvents();
 
                 auto event = visibleEvents[row];
 
@@ -418,6 +430,7 @@ void StepEditorScreen::function(int i)
                 if (focusedFieldName.length() == 2)
                 {
                     auto eventNumber = getActiveRow();
+                    const auto visibleEvents = computeVisibleEvents();
                     auto event = visibleEvents[eventNumber];
                     auto noteEvent =
                         std::dynamic_pointer_cast<NoteOnEvent>(event);
@@ -502,7 +515,8 @@ void StepEditorScreen::turnWheel(int i)
     }
     else if (focusedFieldName.length() == 2)
     {
-        auto eventNumber = getActiveRow();
+        const auto eventNumber = getActiveRow();
+        const auto visibleEvents = computeVisibleEvents();
 
         if (auto sysEx = std::dynamic_pointer_cast<SystemExclusiveEvent>(
                 visibleEvents[eventNumber]))
@@ -787,6 +801,7 @@ void StepEditorScreen::up()
     {
         const auto srcLetter = focusedFieldName.substr(0, 1);
         const int srcNumber = stoi(focusedFieldName.substr(1, 1));
+        const auto visibleEvents = computeVisibleEvents();
 
         if (mpc.getHardware()
                 ->getButton(hardware::ComponentId::SHIFT)
@@ -839,8 +854,9 @@ void StepEditorScreen::up()
 
 void StepEditorScreen::down()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
+    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
+    const auto visibleEvents = computeVisibleEvents(eventsAtCurrentTick);
 
     if (focusedFieldName == "view" ||
         focusedFieldName.find("now") != std::string::npos ||
@@ -912,6 +928,8 @@ void StepEditorScreen::downOrUp(int increment)
 
         if (srcNumber + increment != -1)
         {
+            const auto visibleEvents = computeVisibleEvents();
+
             if (visibleEvents[srcNumber + increment])
             {
                 auto oldEventType = visibleEvents[srcNumber]->getTypeName();
@@ -981,18 +999,38 @@ void StepEditorScreen::refreshSelection()
     }
 }
 
-void StepEditorScreen::initVisibleEvents()
+std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTick)
 {
+    std::vector<std::shared_ptr<Event>> result(4);
+    int firstVisibleEventIndex = yOffset;
+    int visibleEventCounter = 0;
 
-    for (auto &e : eventsAtCurrentTick)
+    std::optional<std::vector<std::shared_ptr<Event>>> ownedEvents;
+
+    const std::vector<std::shared_ptr<Event>>& eventsAtCurrentTickToUse =
+        eventsAtCurrentTick.empty()
+            ? (ownedEvents = computeEventsAtCurrentTick(), *ownedEvents)
+            : eventsAtCurrentTick;
+
+    for (int i = 0; i < EVENT_ROW_COUNT; i++)
     {
-        if (e)
+        result[visibleEventCounter] =
+            eventsAtCurrentTickToUse[i + firstVisibleEventIndex];
+        visibleEventCounter++;
+
+        if (visibleEventCounter > 3 ||
+            visibleEventCounter > eventsAtCurrentTickToUse.size() - 1)
         {
-            e->deleteObserver(this);
+            break;
         }
     }
 
-    eventsAtCurrentTick.clear();
+    return result;
+}
+
+std::vector<std::shared_ptr<Event>> StepEditorScreen::computeEventsAtCurrentTick()
+{
+    std::vector<std::shared_ptr<Event>> result;
 
     auto track = mpc.getSequencer()->getActiveTrack();
 
@@ -1009,11 +1047,11 @@ void StepEditorScreen::initVisibleEvents()
                 {
                     if (fromNote == 34 || view == 0)
                     {
-                        eventsAtCurrentTick.push_back(ne);
+                        result.push_back(ne);
                     }
                     else if (fromNote != 34 && fromNote == ne->getNote())
                     {
-                        eventsAtCurrentTick.push_back(ne);
+                        result.push_back(ne);
                     }
                 }
                 else
@@ -1021,7 +1059,7 @@ void StepEditorScreen::initVisibleEvents()
                     if ((ne->getNote() >= noteA && ne->getNote() <= noteB) ||
                         view == 0)
                     {
-                        eventsAtCurrentTick.push_back(ne);
+                        result.push_back(ne);
                     }
                 }
             }
@@ -1029,7 +1067,7 @@ void StepEditorScreen::initVisibleEvents()
             if ((view == 0 || view == 2) &&
                 std::dynamic_pointer_cast<PitchBendEvent>(event))
             {
-                eventsAtCurrentTick.push_back(event);
+                result.push_back(event);
             }
 
             if ((view == 0 || view == 3) &&
@@ -1037,72 +1075,50 @@ void StepEditorScreen::initVisibleEvents()
             {
                 if (control == -1)
                 {
-                    eventsAtCurrentTick.push_back(event);
+                    result.push_back(event);
                 }
                 if (control ==
                     std::dynamic_pointer_cast<ControlChangeEvent>(event)
                         ->getController())
                 {
-                    eventsAtCurrentTick.push_back(event);
+                    result.push_back(event);
                 }
             }
             if ((view == 0 || view == 4) &&
                 std::dynamic_pointer_cast<ProgramChangeEvent>(event))
             {
-                eventsAtCurrentTick.push_back(event);
+                result.push_back(event);
             }
 
             if ((view == 0 || view == 5) &&
                 std::dynamic_pointer_cast<ChannelPressureEvent>(event))
             {
-                eventsAtCurrentTick.push_back(event);
+                result.push_back(event);
             }
 
             if ((view == 0 || view == 6) &&
                 std::dynamic_pointer_cast<PolyPressureEvent>(event))
             {
-                eventsAtCurrentTick.push_back(event);
+                result.push_back(event);
             }
 
             if ((view == 0 || view == 7) &&
                 (std::dynamic_pointer_cast<SystemExclusiveEvent>(event) ||
                  std::dynamic_pointer_cast<MixerEvent>(event)))
             {
-                eventsAtCurrentTick.push_back(event);
+                result.push_back(event);
             }
         }
     }
 
-    eventsAtCurrentTick.push_back(emptyEvent);
-
-    for (auto &e : visibleEvents)
-    {
-        if (e)
-        {
-            e->deleteObserver(this);
-        }
-    }
-
-    visibleEvents = std::vector<std::shared_ptr<Event>>(4);
-    int firstVisibleEventIndex = yOffset;
-    int visibleEventCounter = 0;
-
-    for (int i = 0; i < EVENT_ROW_COUNT; i++)
-    {
-        visibleEvents[visibleEventCounter] =
-            eventsAtCurrentTick[i + firstVisibleEventIndex];
-        visibleEventCounter++;
-
-        if (visibleEventCounter > 3 ||
-            visibleEventCounter > eventsAtCurrentTick.size() - 1)
-        {
-            break;
-        }
-    }
+    result.push_back(emptyEvent);
+    return result;
 }
 
 void StepEditorScreen::refreshEventRows()
 {
+    const auto visibleEvents = computeVisibleEvents();
+
     for (int i = 0; i < EVENT_ROW_COUNT; i++)
     {
         auto eventRow = findChild<EventRow>("event-row-" + std::to_string(i));
@@ -1111,7 +1127,6 @@ void StepEditorScreen::refreshEventRows()
         if (event)
         {
             eventRow->Hide(false);
-            event->addObserver(this);
             eventRow->setBus(sequencer->getActiveTrack()->getBus());
         }
         else
@@ -1232,7 +1247,6 @@ void StepEditorScreen::setNoteA(int i)
     }
 
     setViewNotesText();
-    initVisibleEvents();
     refreshEventRows();
     refreshSelection();
 }
@@ -1247,7 +1261,6 @@ void StepEditorScreen::setNoteB(int i)
     }
 
     setViewNotesText();
-    initVisibleEvents();
     refreshEventRows();
     refreshSelection();
 }
@@ -1257,7 +1270,6 @@ void StepEditorScreen::setControl(int i)
     control = std::clamp(i, -1, 127);
 
     setViewNotesText();
-    initVisibleEvents();
     refreshEventRows();
     refreshSelection();
 }
@@ -1268,9 +1280,9 @@ void StepEditorScreen::setyOffset(int i)
     {
         i = 0;
     }
+
     yOffset = i;
 
-    initVisibleEvents();
     refreshEventRows();
     refreshSelection();
 }
@@ -1283,13 +1295,14 @@ void StepEditorScreen::setFromNote(int i)
     displayView();
     updateComponents();
     setViewNotesText();
-    initVisibleEvents();
     refreshEventRows();
     refreshSelection();
 }
 
 void StepEditorScreen::setSelectionStartIndex(int i)
 {
+    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
+
     if (std::dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i]))
     {
         return;
@@ -1332,6 +1345,8 @@ void StepEditorScreen::setSelectedEvents()
         firstEventIndex = selectionEndIndex;
         lastEventIndex = selectionStartIndex;
     }
+
+    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
     for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
     {
@@ -1389,6 +1404,8 @@ void StepEditorScreen::removeEvents()
         lastEventIndex = selectionStartIndex;
     }
 
+    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
+
     for (int i = 0; i < eventsAtCurrentTick.size(); i++)
     {
         if (i >= firstEventIndex && i <= lastEventIndex)
@@ -1409,117 +1426,6 @@ void StepEditorScreen::removeEvents()
 void StepEditorScreen::displayView()
 {
     findField("view")->setText(viewNames[view]);
-}
-
-void StepEditorScreen::update(Observable *, Message message)
-{
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "step-editor")
-    {
-        auto &pads = mpc.getHardware()->getPads();
-
-        auto anyPadIsPressed =
-            std::any_of(pads.begin(), pads.end(),
-                        [](const std::shared_ptr<mpc::hardware::Pad> &p)
-                        {
-                            return p->isPressed();
-                        });
-
-        if (anyPadIsPressed)
-        {
-            // a note is currently being recorded by the user pressing a pad
-            initVisibleEvents();
-            refreshEventRows();
-            return;
-        }
-
-        const int row = getActiveRow();
-
-        if (row == -1)
-        {
-            return;
-        }
-
-        auto eventRow = findChild<EventRow>("event-row-" + std::to_string(row));
-
-        if (std::dynamic_pointer_cast<NoteOnEvent>(visibleEvents[row]))
-        {
-            auto track = mpc.getSequencer()->getActiveTrack();
-
-            if (track->getBus() != 0)
-            {
-                eventRow->setDrumNoteEventValues();
-            }
-            else
-            {
-                eventRow->setMidiNoteEventValues();
-            }
-        }
-        else if (std::dynamic_pointer_cast<MixerEvent>(visibleEvents[row]))
-        {
-            eventRow->setMixerEventValues();
-        }
-        else if (std::dynamic_pointer_cast<PitchBendEvent>(
-                     visibleEvents[row]) ||
-                 std::dynamic_pointer_cast<ProgramChangeEvent>(
-                     visibleEvents[row]))
-        {
-            eventRow->setMiscEventValues();
-        }
-        else if (std::dynamic_pointer_cast<ControlChangeEvent>(
-                     visibleEvents[row]))
-        {
-            eventRow->setControlChangeEventValues();
-        }
-        else if (std::dynamic_pointer_cast<ChannelPressureEvent>(
-                     visibleEvents[row]))
-        {
-            eventRow->setChannelPressureEventValues();
-        }
-        else if (std::dynamic_pointer_cast<PolyPressureEvent>(
-                     visibleEvents[row]))
-        {
-            eventRow->setPolyPressureEventValues();
-        }
-        else if (std::dynamic_pointer_cast<SystemExclusiveEvent>(
-                     visibleEvents[row]))
-        {
-            eventRow->setSystemExclusiveEventValues();
-        }
-        else if (std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[row]))
-        {
-            eventRow->setEmptyEventValues();
-        }
-    }
-    else if (msg == "adjust-duration")
-    {
-        initVisibleEvents();
-        refreshEventRows();
-    }
-    else if (msg == "bar")
-    {
-        findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1,
-                                         "0");
-        setyOffset(0);
-    }
-    else if (msg == "beat")
-    {
-        findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1,
-                                         "0");
-        setyOffset(0);
-    }
-    else if (msg == "clock")
-    {
-        findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(),
-                                         "0");
-        setyOffset(0);
-    }
-}
-
-std::vector<std::shared_ptr<Event>> &StepEditorScreen::getVisibleEvents()
-{
-    return visibleEvents;
 }
 
 std::vector<std::shared_ptr<Event>> &StepEditorScreen::getSelectedEvents()
@@ -1603,7 +1509,7 @@ void StepEditorScreen::storeColumnForEventAtActiveRow()
         return;
     }
 
-    lastColumn[visibleEvents[row]->getTypeName()] = column;
+    lastColumn[computeVisibleEvents()[row]->getTypeName()] = column;
 }
 
 void StepEditorScreen::restoreColumnForEventAtActiveRow()
@@ -1615,7 +1521,7 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
         return;
     }
 
-    const auto desiredColumn = lastColumn[visibleEvents[row]->getTypeName()];
+    const auto desiredColumn = lastColumn[computeVisibleEvents()[row]->getTypeName()];
 
     ls->setFocus(desiredColumn + std::to_string(row));
 }

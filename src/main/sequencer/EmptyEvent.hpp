@@ -8,7 +8,7 @@ namespace mpc::sequencer
 
     public:
         EmptyEvent();
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "empty";
         }

@@ -15,7 +15,7 @@ void NoteOffEvent::setNote(int i)
     number = i;
 }
 
-int NoteOffEvent::getNote()
+int NoteOffEvent::getNote() const
 {
     return number;
 }
@@ -61,7 +61,7 @@ NoteOnEvent::createShortMessage(int channel, int transpose)
     return msg;
 }
 
-std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff()
+std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff() const
 {
     return noteOff;
 }
@@ -79,7 +79,7 @@ void NoteOnEvent::setNote(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int NoteOnEvent::getNote()
+int NoteOnEvent::getNote() const
 {
     return number;
 }
@@ -93,7 +93,7 @@ void NoteOnEvent::setDuration(Duration d)
     notifyObservers(std::string("step-editor"));
 }
 
-NoteOnEvent::Duration NoteOnEvent::getDuration()
+NoteOnEvent::Duration NoteOnEvent::getDuration() const
 {
     return duration;
 }
@@ -104,7 +104,7 @@ void NoteOnEvent::resetDuration()
     notifyObservers(std::string("step-editor"));
 }
 
-NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType()
+NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType() const
 {
     return variationType;
 }
@@ -135,7 +135,7 @@ void NoteOnEvent::setVariationValue(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int NoteOnEvent::getVariationValue()
+int NoteOnEvent::getVariationValue() const
 {
     return variationValue;
 }
@@ -146,12 +146,12 @@ void NoteOnEvent::setVelocity(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int NoteOnEvent::getVelocity()
+int NoteOnEvent::getVelocity() const
 {
     return velocity;
 }
 
-bool NoteOnEvent::isFinalized()
+bool NoteOnEvent::isFinalized() const
 {
     return duration.has_value();
 }

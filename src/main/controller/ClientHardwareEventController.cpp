@@ -261,13 +261,18 @@ void ClientHardwareEventController::handlePadRelease(
     if (info->note)
     {
         assert(drumIndex);
+
         auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
             eventregistry::Source::VirtualMpcHardware, &mpc.getBasicPlayer(),
             mpc.eventRegistry, mpc.getEventHandler(), mpc.screens,
             mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController,
             mpc.getAudioMidiServices()->getFrameSequencer(), programPadIndex,
             *drumIndex, info->screen, *info->note, info->program, info->track);
-        TriggerDrumNoteOffCommand(ctx).execute();
+
+        mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames([ctx]{}, 0);
+        {
+            TriggerDrumNoteOffCommand(ctx).execute();
+        }
     }
 }
 

@@ -16,7 +16,7 @@ namespace mpc::sequencer
         ProgramChangeEvent() = default;
         ProgramChangeEvent(const ProgramChangeEvent &event);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "program-change";
         }

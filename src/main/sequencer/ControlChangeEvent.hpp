@@ -19,7 +19,7 @@ namespace mpc::sequencer
         ControlChangeEvent() = default;
         ControlChangeEvent(const ControlChangeEvent &event);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "control-change";
         }

@@ -23,9 +23,9 @@ namespace mpc::sequencer
         {
             number = numberToUse;
         }
-        int getNote();
+        int getNote() const;
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "note-off";
         }
@@ -56,29 +56,29 @@ namespace mpc::sequencer
         std::shared_ptr<NoteOffEvent> noteOff;
 
     public:
-        std::shared_ptr<NoteOffEvent> getNoteOff();
+        std::shared_ptr<NoteOffEvent> getNoteOff() const;
         void setTrack(int track) override;
 
         void setNote(int i);
-        int getNote();
+        int getNote() const;
         void setDuration(Duration duration);
-        Duration getDuration();
+        Duration getDuration() const;
         void resetDuration();
-        VARIATION_TYPE getVariationType();
+        VARIATION_TYPE getVariationType() const;
         void incrementVariationType(int amount);
         void setVariationType(VARIATION_TYPE type);
         void setVariationValue(int i);
-        int getVariationValue();
+        int getVariationValue() const;
         void setVelocity(int i);
-        int getVelocity();
-        bool isFinalized();
+        int getVelocity() const;
+        bool isFinalized() const;
         bool isPlayOnly();
 
         NoteOnEvent(int i = 60, int vel = 127);
         NoteOnEvent(mpc::engine::midi::ShortMessage *msg);
         NoteOnEvent(const NoteOnEvent &);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "note-on";
         }

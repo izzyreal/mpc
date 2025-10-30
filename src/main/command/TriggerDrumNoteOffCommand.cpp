@@ -47,18 +47,15 @@ void TriggerDrumNoteOffCommand::execute()
                                        ctx.noteOffEvent->getNote(), ctx.track,
                                        std::nullopt);
 
-    const auto registrySnapshot = ctx.eventRegistry->getSnapshot();
-    const int totalPressedProgramPadCount = registrySnapshot.getTotalPressedProgramPadCount();
-
-    assert(totalPressedProgramPadCount >= 1);
-
-    // We're cheating here. Best is to run the code that depends on processed registrations
-    // on the audio thread.
-    const bool noMoreProgramPadsArePressed = totalPressedProgramPadCount == 1;
-
     ctx.eventRegistry->registerProgramPadRelease(
         ctx.source, ctx.drumBus, ctx.program, ctx.programPadIndex, ctx.track,
         std::nullopt);
+
+    ctx.eventRegistry->publishSnapshot();
+
+    auto snapshot = ctx.eventRegistry->getSnapshot();
+
+    const bool noMoreProgramPadsArePressed = snapshot.getTotalPressedProgramPadCount() == 0;
 
     if (!ctx.recordOnEvent)
     {

@@ -14,7 +14,7 @@ namespace mpc::sequencer
         virtual void setTrack(int i);
         int getTrack() const;
 
-        virtual std::string getTypeName() = 0;
+        virtual std::string getTypeName() const = 0;
         Event() = default;
         Event(const Event &);
 

@@ -16,7 +16,7 @@ namespace mpc::sequencer
         PitchBendEvent() = default;
         PitchBendEvent(const PitchBendEvent &);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "pitch-bend";
         }

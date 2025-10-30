@@ -39,7 +39,7 @@ namespace mpc::sequencer
         TempoChangeEvent(Sequence *parent, int ratio, int step);
         TempoChangeEvent(const TempoChangeEvent &);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "tempo-change";
         }

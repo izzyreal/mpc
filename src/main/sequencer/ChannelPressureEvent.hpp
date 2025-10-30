@@ -16,7 +16,7 @@ namespace mpc::sequencer
         ChannelPressureEvent() = default;
         ChannelPressureEvent(const ChannelPressureEvent &event);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "channel-pressure";
         }

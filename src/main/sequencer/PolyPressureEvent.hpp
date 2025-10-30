@@ -19,7 +19,7 @@ namespace mpc::sequencer
         PolyPressureEvent() = default;
         PolyPressureEvent(const PolyPressureEvent &event);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "poly-pressure";
         }

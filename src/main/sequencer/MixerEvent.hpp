@@ -22,7 +22,7 @@ namespace mpc::sequencer
         MixerEvent() = default;
         MixerEvent(const MixerEvent &);
 
-        std::string getTypeName() override
+        std::string getTypeName() const override
         {
             return "mixer";
         }
