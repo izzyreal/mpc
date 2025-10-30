@@ -9,6 +9,7 @@
 #include <optional>
 #include <cassert>
 #include <atomic>
+#include <functional>
 
 namespace mpc::sampler
 {
@@ -28,14 +29,16 @@ namespace mpc::sequencer
 namespace mpc::eventregistry
 {
     struct ProgramPadEvent;
-    struct PhysicalPadEvent;
+    struct PhysicalPadPressEvent;
+    struct PhysicalPadReleaseEvent;
     struct NoteEvent;
 
-    using PhysicalPadEventPtr = std::shared_ptr<PhysicalPadEvent>;
+    using PhysicalPadPressEventPtr = std::shared_ptr<PhysicalPadPressEvent>;
+    using PhysicalPadReleaseEventPtr = std::shared_ptr<PhysicalPadReleaseEvent>;
     using ProgramPadEventPtr = std::shared_ptr<ProgramPadEvent>;
     using NoteEventPtr = std::shared_ptr<NoteEvent>;
 
-    using PhysicalPadEventPtrs = std::vector<PhysicalPadEventPtr>;
+    using PhysicalPadPressEventPtrs = std::vector<PhysicalPadPressEventPtr>;
     using ProgramPadEventPtrs = std::vector<ProgramPadEventPtr>;
     using NoteEventPtrs = std::vector<NoteEventPtr>;
 
@@ -57,7 +60,7 @@ namespace mpc::eventregistry
         NoteRepeat
     };
 
-    struct PhysicalPadEvent
+    struct PhysicalPadPressEvent
     {
         PhysicalPadIndex padIndex;
         Source source{};
@@ -69,6 +72,12 @@ namespace mpc::eventregistry
         int bank{};
         std::optional<int> note;
         std::shared_ptr<mpc::sampler::Program> program;
+    };
+
+    struct PhysicalPadReleaseEvent
+    {
+        PhysicalPadIndex padIndex;
+        Source source{};
     };
 
     struct ProgramPadEvent
@@ -115,16 +124,24 @@ namespace mpc::eventregistry
             Clear
         } type;
 
-        PhysicalPadEventPtr physicalPad;
+        PhysicalPadPressEventPtr physicalPadPress;
         ProgramPadEventPtr programPad;
         NoteEventPtr noteEvent;
+        PhysicalPadReleaseEventPtr physicalPadRelease;
 
         std::optional<Pressure> pressure;
+        std::function<void(void *)> action = [](void *) {};
+
+        EventMessage() = default;
+        EventMessage(const EventMessage&) = delete;
+        EventMessage& operator=(const EventMessage&) = delete;
+        EventMessage(EventMessage&&) noexcept = default;
+        EventMessage& operator=(EventMessage&&) noexcept = default;
     };
 
     struct Snapshot
     {
-        PhysicalPadEventPtrs physicalPadEvents;
+        PhysicalPadPressEventPtrs physicalPadPressEvents;
         ProgramPadEventPtrs programPadEvents;
         NoteEventPtrs noteEvents;
     };
@@ -136,14 +153,16 @@ namespace mpc::eventregistry
         EventRegistry(const EventRegistry &other) noexcept;
         EventRegistry &operator=(const EventRegistry &other) noexcept;
 
-        PhysicalPadEventPtr registerPhysicalPadPress(
+        void registerPhysicalPadPress(
             Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
             std::shared_ptr<mpc::sequencer::Bus>, PhysicalPadIndex padIndex,
             Velocity, mpc::sequencer::Track *, int bank,
-            std::optional<int> note);
+            std::optional<int> note, std::function<void(void *)> action);
 
         void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure);
-        PhysicalPadEventPtr registerPhysicalPadRelease(PhysicalPadIndex);
+
+        void registerPhysicalPadRelease(PhysicalPadIndex, Source source,
+                                        std::function<void(void *)> action);
 
         ProgramPadEventPtr registerProgramPadPress(
             Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
@@ -180,12 +199,13 @@ namespace mpc::eventregistry
         SnapshotView getSnapshot() noexcept;
 
         // Called from the audio thread only
+        void drainQueue() noexcept;
         void publishSnapshot() noexcept;
 
     private:
         const size_t CAPACITY = 8192;
 
-        PhysicalPadEventPtrs physicalPadEvents;
+        PhysicalPadPressEventPtrs physicalPadPressEvents;
         ProgramPadEventPtrs programPadEvents;
         NoteEventPtrs noteEvents;
 
@@ -198,7 +218,6 @@ namespace mpc::eventregistry
         void enqueue(EventMessage &&);
         void publishSnapshotToBuffer(struct Snapshot *dst) noexcept;
 
-        void drainQueue() noexcept;
         void applyMessage(const EventMessage &msg) noexcept;
     };
 
@@ -216,8 +235,9 @@ namespace mpc::eventregistry
         NoteEventPtr retrievePlayNoteEvent(NoteNumber note) const;
         std::shared_ptr<sequencer::NoteOnEvent>
         retrieveRecordNoteEvent(NoteNumber note) const;
-        PhysicalPadEventPtr
-        retrievePhysicalPadEvent(PhysicalPadIndex idx) const;
+
+        PhysicalPadPressEventPtr
+        retrievePhysicalPadPressEvent(PhysicalPadIndex idx) const;
 
         NoteEventPtr retrieveNoteEvent(NoteNumber note, Source src) const;
 
@@ -229,8 +249,10 @@ namespace mpc::eventregistry
         void printStats()
         {
             printf("===== EventRegistry Stats =======\n");
-            printf("physicalPadEvent count: %zu\n", snap->physicalPadEvents.size());
-            printf("programPadEvent  count: %zu\n", snap->programPadEvents.size());
+            printf("physicalPadPressEvent count: %zu\n",
+                   snap->physicalPadPressEvents.size());
+            printf("programPadEvent  count: %zu\n",
+                   snap->programPadEvents.size());
             printf("noteEvent        count: %zu\n", snap->noteEvents.size());
             printf("=================================\n");
         }

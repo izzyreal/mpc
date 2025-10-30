@@ -487,12 +487,13 @@ void FrameSeq::processEventsAfterNFrames()
 
 void FrameSeq::work(int nFrames)
 {
+    mpc.eventRegistry->drainQueue();
+    mpc.eventRegistry->publishSnapshot();
+
     const auto clock = mpc.getClock();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate =
         mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
-
-    mpc.eventRegistry->getSnapshot().printStats();
 
     if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
     {
@@ -510,13 +511,6 @@ void FrameSeq::work(int nFrames)
             {
                 triggerClickIfNeeded();
                 metronomeOnlyTickPosition++;
-            }
-
-            if (eventRegistrySnapshotPublishFrameCounter++ >=
-                eventRegistrySnapshotPublishIntervalFrames)
-            {
-                eventRegistrySnapshotPublishFrameCounter = 0;
-                mpc.eventRegistry->publishSnapshot();
             }
         }
 
@@ -562,13 +556,6 @@ void FrameSeq::work(int nFrames)
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
-        if (eventRegistrySnapshotPublishFrameCounter++ >=
-            eventRegistrySnapshotPublishIntervalFrames)
-        {
-            eventRegistrySnapshotPublishFrameCounter = 0;
-            mpc.eventRegistry->publishSnapshot();
-        }
-
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
                                       frameIndex);
 

@@ -48,7 +48,6 @@ namespace mpc::engine
 
 namespace mpc::command::context
 {
-
     struct TriggerDrumNoteOnContext
     {
         eventregistry::Source source;

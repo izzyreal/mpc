@@ -162,19 +162,6 @@ void ClientHardwareEventController::handlePadPress(
         }
     }
 
-    mpc.eventRegistry->registerPhysicalPadPress(
-        eventregistry::Source::VirtualMpcHardware, screen,
-        mpc.getSequencer()->getBus<sequencer::Bus>(track->getBus()),
-        physicalPadIndex, clampedVelocity, track.get(),
-        static_cast<int>(activeBank), note);
-
-    if (layeredScreen->isCurrentScreen<NameScreen>())
-    {
-        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
-            event.componentId);
-        return;
-    }
-
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
         eventregistry::Source::VirtualMpcHardware, layeredScreen,
         mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(),
@@ -188,37 +175,51 @@ void ClientHardwareEventController::handlePadPress(
         mpc.getHardware()->getButton(ComponentId::F6)->isPressed();
 
     PushPadScreenUpdateContext padPushScreenUpdateCtx{
-        ctx.isSixteenLevelsEnabled,
-        ctx.screenComponent,
-        ctx.program,
-        ctx.sequencer,
+        ctx->isSixteenLevelsEnabled,
+        ctx->screenComponent,
+        ctx->program,
+        ctx->sequencer,
         isF4Pressed,
         isF6Pressed,
         mpc.clientEventController->getActiveBank(),
-        ctx.setSelectedPad,
-        ctx.allowCentralNoteAndPadUpdate};
+        ctx->setSelectedPad,
+        ctx->allowCentralNoteAndPadUpdate};
 
     PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex)
         .execute();
 
     NoteInputScreenUpdateContext noteInputScreenUpdateContext{
-        ctx.isSixteenLevelsEnabled, ctx.allowCentralNoteAndPadUpdate,
-        ctx.screenComponent, ctx.setSelectedNote, ctx.currentFieldName};
+        ctx->isSixteenLevelsEnabled, ctx->allowCentralNoteAndPadUpdate,
+        ctx->screenComponent, ctx->setSelectedNote, ctx->currentFieldName};
 
-    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx.note)
+    NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx->note)
         .execute();
 
-    if (std::dynamic_pointer_cast<PopupScreen>(screen))
+    std::function<void(void*)> action = [](void*){};
+
+    if (layeredScreen->isCurrentScreen<PopupScreen>())
     {
         layeredScreen->closeCurrentScreen();
     }
 
-    if (screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
+    if (layeredScreen->isCurrentScreen<NameScreen>())
     {
-        return;
+        mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
+            event.componentId);
+    }
+    else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
+    {
+        action = [ctx](void*)
+        {
+            TriggerDrumNoteOnCommand(ctx).execute();
+        };
     }
 
-    TriggerDrumNoteOnCommand(ctx).execute();
+    mpc.eventRegistry->registerPhysicalPadPress(
+        eventregistry::Source::VirtualMpcHardware, screen,
+        mpc.getSequencer()->getBus<sequencer::Bus>(track->getBus()),
+        physicalPadIndex, clampedVelocity, track.get(),
+        static_cast<int>(activeBank), note, action);
 }
 
 void ClientHardwareEventController::handlePadRelease(
@@ -236,46 +237,54 @@ void ClientHardwareEventController::handlePadRelease(
     }
 
     const auto physicalPadIndex = *event.index;
-
-    const auto info =
-        mpc.eventRegistry->registerPhysicalPadRelease(physicalPadIndex);
-
-    const auto programPadIndex =
-        physicalPadIndex + static_cast<int>(info->bank) * 16;
-
     mpc.getHardware()->getPad(physicalPadIndex)->release();
 
-    if (screengroups::isPadDoesNotTriggerNoteEventScreen(info->screen))
+    auto action =
+        [eventRegistry = mpc.eventRegistry,
+         previewSoundPlayer = &mpc.getBasicPlayer(),
+         eventHandler = mpc.getEventHandler(), screens = mpc.screens,
+         sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
+         clientEventController = mpc.clientEventController,
+         frameSequencer =
+             mpc.getAudioMidiServices()->getFrameSequencer()](void *userData)
     {
-        return;
-    }
+        auto p = (eventregistry::PhysicalPadPressEvent *)userData;
 
-    std::optional<int> drumIndex = std::nullopt;
-
-    if (auto drumBus = std::dynamic_pointer_cast<sequencer::DrumBus>(info->bus);
-        drumBus)
-    {
-        drumIndex = drumBus->getIndex();
-    }
-
-    if (info->note)
-    {
-        assert(drumIndex);
-
-        auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-            eventregistry::Source::VirtualMpcHardware, &mpc.getBasicPlayer(),
-            mpc.eventRegistry, mpc.getEventHandler(), mpc.screens,
-            mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController,
-            mpc.getAudioMidiServices()->getFrameSequencer(), programPadIndex,
-            *drumIndex, info->screen, *info->note, info->program, info->track);
-
-        mpc.getAudioMidiServices()
-            ->getFrameSequencer()
-            ->enqueueEventAfterNFrames([ctx] {}, 0);
+        if (screengroups::isPadDoesNotTriggerNoteEventScreen(p->screen))
         {
+            return;
+        }
+
+        const auto programPadIndex =
+            p->padIndex.get() + static_cast<int>(p->bank) * 16;
+
+        std::optional<int> drumIndex = std::nullopt;
+
+        if (auto drumBus =
+                std::dynamic_pointer_cast<sequencer::DrumBus>(p->bus);
+            drumBus)
+        {
+            drumIndex = drumBus->getIndex();
+        }
+
+        if (p->note)
+        {
+            assert(drumIndex);
+
+            auto ctx =
+                TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+                    eventregistry::Source::VirtualMpcHardware,
+                    previewSoundPlayer, eventRegistry, eventHandler, screens,
+                    sequencer, hardware, clientEventController, frameSequencer,
+                    programPadIndex, *drumIndex, p->screen, *p->note,
+                    p->program, p->track);
+
             TriggerDrumNoteOffCommand(ctx).execute();
         }
-    }
+    };
+
+    mpc.eventRegistry->registerPhysicalPadRelease(
+        physicalPadIndex, eventregistry::Source::VirtualMpcHardware, action);
 }
 
 void ClientHardwareEventController::handlePadAftertouch(
@@ -292,6 +301,7 @@ void ClientHardwareEventController::handlePadAftertouch(
                    (float)Aftertouchable::MAX_PRESSURE);
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
+    /*
     mpc.eventRegistry->registerPhysicalPadAftertouch(padIndex, pressureToUse);
 
     auto physicalPadEvent =
@@ -316,6 +326,7 @@ void ClientHardwareEventController::handlePadAftertouch(
             eventregistry::Source::VirtualMpcHardware, *physicalPadEvent->note,
             pressureToUse);
     }
+    */
 }
 
 void ClientHardwareEventController::handleDataWheel(

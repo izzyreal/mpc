@@ -1,5 +1,8 @@
 #pragma once
+
 #include "command/Command.hpp"
+
+#include <memory>
 
 namespace mpc::command::context
 {
@@ -11,11 +14,12 @@ namespace mpc::command
     class TriggerDrumNoteOnCommand : public Command
     {
     public:
-        TriggerDrumNoteOnCommand(context::TriggerDrumNoteOnContext &ctx);
+        explicit TriggerDrumNoteOnCommand(
+            std::shared_ptr<context::TriggerDrumNoteOnContext>);
         void execute() override;
 
     private:
-        context::TriggerDrumNoteOnContext &ctx;
+        std::shared_ptr<context::TriggerDrumNoteOnContext> ctx;
     };
 
 } // namespace mpc::command

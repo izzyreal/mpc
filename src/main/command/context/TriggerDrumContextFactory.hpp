@@ -54,7 +54,8 @@ namespace mpc::command::context
     class TriggerDrumContextFactory
     {
     public:
-        static TriggerDrumNoteOnContext buildTriggerDrumNoteOnContext(
+        static std::shared_ptr<TriggerDrumNoteOnContext>
+        buildTriggerDrumNoteOnContext(
             eventregistry::Source, std::shared_ptr<lcdgui::LayeredScreen>,
             std::shared_ptr<controller::ClientEventController>,
             std::shared_ptr<hardware::Hardware>,
@@ -66,7 +67,8 @@ namespace mpc::command::context
             const int programPadIndex, const int velocity,
             const std::shared_ptr<mpc::lcdgui::ScreenComponent>);
 
-        static TriggerDrumNoteOffContext buildTriggerDrumNoteOffContext(
+        static std::shared_ptr<TriggerDrumNoteOffContext>
+        buildTriggerDrumNoteOffContext(
             eventregistry::Source, engine::PreviewSoundPlayer *,
             std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<audiomidi::EventHandler>,

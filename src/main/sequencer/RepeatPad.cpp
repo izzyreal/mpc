@@ -25,6 +25,10 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
                         int durationTicks, unsigned short eventFrameOffset,
                         double tempo, float sampleRate)
 {
+    ///////////////////////////
+    return;
+    ////////////////////////////
+
     if (mpc.getLayeredScreen()->getCurrentScreenName() != "sequencer")
     {
         return;
@@ -92,13 +96,13 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             noteEvent->setVariationValue(value);
         }
 
-        const auto physicalPadPressInfo =
-            snapshot.retrievePhysicalPadEvent(padIndex % 16);
+        //const auto physicalPadPressInfo =
+          //  snapshot.retrievePhysicalPadEvent(padIndex % 16);
 
-        const bool isPhysicallyPressed =
-            physicalPadPressInfo && physicalPadPressInfo->bank == padIndex / 16;
+        //const bool isPhysicallyPressed =
+          //  physicalPadPressInfo && physicalPadPressInfo->bank == padIndex / 16;
 
-        if (sixteenLevels && isPhysicallyPressed)
+        //if (sixteenLevels && isPhysicallyPressed)
         {
             Util::SixteenLevelsContext sixteenLevelsContext{
                 sixteenLevels,
@@ -112,7 +116,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             mpc::Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
             note = noteEvent->getNote();
         }
-        else
+        //else
         {
             const int velocityToUseIfNotFullLevel =
                 snapshot.getPressedProgramPadAfterTouchOrVelocity(padIndex);

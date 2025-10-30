@@ -15,49 +15,50 @@ using namespace mpc::command::context;
 using namespace mpc::sampler;
 
 TriggerDrumNoteOnCommand::TriggerDrumNoteOnCommand(
-    TriggerDrumNoteOnContext &ctx)
+    std::shared_ptr<TriggerDrumNoteOnContext> ctx)
     : ctx(ctx)
 {
 }
 
 void TriggerDrumNoteOnCommand::execute()
 {
-    if (ctx.isSoundScreen)
+    if (ctx->isSoundScreen)
     {
-        ctx.previewSoundPlayer->mpcNoteOn(ctx.sampler->getSoundIndex(), 127, 0);
+        ctx->previewSoundPlayer->mpcNoteOn(ctx->sampler->getSoundIndex(), 127,
+                                           0);
         return;
     }
 
-    const auto velo = ctx.isFullLevelEnabled ? 127 : ctx.velocity;
+    const auto velo = ctx->isFullLevelEnabled ? 127 : ctx->velocity;
 
     const auto noteOnEvent =
-        std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx.note, velo);
+        std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx->note, velo);
 
-    ctx.eventRegistry->registerProgramPadPress(
-        ctx.source, ctx.screenComponent,
-        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.program,
-        ctx.programPadIndex, noteOnEvent->getVelocity(), ctx.track,
+    ctx->eventRegistry->registerProgramPadPress(
+        ctx->source, ctx->screenComponent,
+        ctx->sequencer->getBus<sequencer::Bus>(ctx->trackBus), ctx->program,
+        ctx->programPadIndex, noteOnEvent->getVelocity(), ctx->track,
         std::nullopt);
 
-    auto registryNoteOn = ctx.eventRegistry->registerNoteOn(
-        ctx.source, ctx.screenComponent,
-        ctx.sequencer->getBus<sequencer::Bus>(ctx.trackBus), ctx.note,
-        noteOnEvent->getVelocity(), ctx.track, std::nullopt, ctx.program);
+    auto registryNoteOn = ctx->eventRegistry->registerNoteOn(
+        ctx->source, ctx->screenComponent,
+        ctx->sequencer->getBus<sequencer::Bus>(ctx->trackBus), ctx->note,
+        noteOnEvent->getVelocity(), ctx->track, std::nullopt, ctx->program);
 
-    if (ctx.isSequencerScreen && ctx.isNoteRepeatLockedOrPressed &&
-        ctx.sequencer->isPlaying())
+    if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
+        ctx->sequencer->isPlaying())
     {
         return;
     }
 
-    if (ctx.isRecordingOrOverdubbing && ctx.isErasePressed)
+    if (ctx->isRecordingOrOverdubbing && ctx->isErasePressed)
     {
         return;
     }
 
-    const bool is16LevelsEnabled = ctx.isSixteenLevelsEnabled;
+    const bool is16LevelsEnabled = ctx->isSixteenLevelsEnabled;
 
-    const auto assign16LevelsScreen = ctx.assign16LevelsScreen;
+    const auto assign16LevelsScreen = ctx->assign16LevelsScreen;
 
     Util::SixteenLevelsContext sixteenLevelsContext{
         is16LevelsEnabled,
@@ -65,16 +66,16 @@ void TriggerDrumNoteOnCommand::execute()
         assign16LevelsScreen->getOriginalKeyPad(),
         assign16LevelsScreen->getNote(),
         assign16LevelsScreen->getParameter(),
-        ctx.programPadIndex % 16};
+        ctx->programPadIndex % 16};
 
     Util::set16LevelsValues(sixteenLevelsContext, noteOnEvent);
 
     const bool isSliderNote =
-        ctx.program && ctx.program->getSlider()->getNote() == ctx.note;
-    auto programSlider = ctx.program->getSlider();
+        ctx->program && ctx->program->getSlider()->getNote() == ctx->note;
+    auto programSlider = ctx->program->getSlider();
 
     Util::SliderNoteVariationContext sliderNoteVariationContext{
-        ctx.hardwareSliderValue,
+        ctx->hardwareSliderValue,
         programSlider->getNote(),
         programSlider->getParameter(),
         programSlider->getTuneLowRange(),
@@ -86,7 +87,7 @@ void TriggerDrumNoteOnCommand::execute()
         programSlider->getFilterLowRange(),
         programSlider->getFilterHighRange()};
 
-    if (ctx.program && isSliderNote)
+    if (ctx->program && isSliderNote)
     {
         auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
             sliderNoteVariationContext);
@@ -94,59 +95,59 @@ void TriggerDrumNoteOnCommand::execute()
         noteOnEvent->setVariationValue(value);
     }
 
-    if (ctx.isSamplerScreen)
+    if (ctx->isSamplerScreen)
     {
-        ctx.eventHandler->handleUnfinalizedNoteOn(noteOnEvent, nullptr,
-                                                  std::nullopt, std::nullopt,
-                                                  ctx.drumScreenSelectedDrum);
+        ctx->eventHandler->handleUnfinalizedNoteOn(noteOnEvent, nullptr,
+                                                   std::nullopt, std::nullopt,
+                                                   ctx->drumScreenSelectedDrum);
     }
     else
     {
-        const auto drumIndexToUse = ctx.trackBus > 0
-                                        ? std::optional<int>(ctx.trackBus - 1)
+        const auto drumIndexToUse = ctx->trackBus > 0
+                                        ? std::optional<int>(ctx->trackBus - 1)
                                         : std::nullopt;
 
-        ctx.eventHandler->handleUnfinalizedNoteOn(
-            noteOnEvent, ctx.track, ctx.track->getDeviceIndex(),
-            ctx.track->getVelocityRatio(), drumIndexToUse);
+        ctx->eventHandler->handleUnfinalizedNoteOn(
+            noteOnEvent, ctx->track, ctx->track->getDeviceIndex(),
+            ctx->track->getVelocityRatio(), drumIndexToUse);
     }
 
     std::shared_ptr<sequencer::NoteOnEvent> recordNoteOnEvent;
 
-    if (ctx.sequencer->isRecordingOrOverdubbing())
+    if (ctx->sequencer->isRecordingOrOverdubbing())
     {
-        recordNoteOnEvent = ctx.track->recordNoteEventASync(ctx.note, velo);
+        recordNoteOnEvent = ctx->track->recordNoteEventASync(ctx->note, velo);
     }
-    else if (ctx.isStepRecording &&
-             (ctx.track->getBus() == 0 || sequencer::isDrumNote(ctx.note)))
+    else if (ctx->isStepRecording &&
+             (ctx->track->getBus() == 0 || sequencer::isDrumNote(ctx->note)))
     {
-        recordNoteOnEvent = ctx.track->recordNoteEventSynced(
-            ctx.sequencer->getTickPosition(), ctx.note, velo);
-        ctx.sequencer->playMetronomeTrack();
+        recordNoteOnEvent = ctx->track->recordNoteEventSynced(
+            ctx->sequencer->getTickPosition(), ctx->note, velo);
+        ctx->sequencer->playMetronomeTrack();
         recordNoteOnEvent->setTick(
-            ctx.frameSequencer->getMetronomeOnlyTickPosition());
+            ctx->frameSequencer->getMetronomeOnlyTickPosition());
     }
-    else if (ctx.isRecMainWithoutPlaying)
+    else if (ctx->isRecMainWithoutPlaying)
     {
-        recordNoteOnEvent = ctx.track->recordNoteEventSynced(
-            ctx.sequencer->getTickPosition(), ctx.note, velo);
-        ctx.sequencer->playMetronomeTrack();
+        recordNoteOnEvent = ctx->track->recordNoteEventSynced(
+            ctx->sequencer->getTickPosition(), ctx->note, velo);
+        ctx->sequencer->playMetronomeTrack();
         recordNoteOnEvent->setTick(
-            ctx.frameSequencer->getMetronomeOnlyTickPosition());
+            ctx->frameSequencer->getMetronomeOnlyTickPosition());
 
-        const auto timingCorrectScreen = ctx.timingCorrectScreen;
+        const auto timingCorrectScreen = ctx->timingCorrectScreen;
         const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
         if (stepLength != 1)
         {
-            const int bar = ctx.sequencer->getCurrentBarIndex() + 1;
-            const auto correctedTick = ctx.track->timingCorrectTick(
-                0, bar, ctx.sequencer->getTickPosition(), stepLength,
+            const int bar = ctx->sequencer->getCurrentBarIndex() + 1;
+            const auto correctedTick = ctx->track->timingCorrectTick(
+                0, bar, ctx->sequencer->getTickPosition(), stepLength,
                 timingCorrectScreen->getSwing());
 
-            if (ctx.sequencer->getTickPosition() != correctedTick)
+            if (ctx->sequencer->getTickPosition() != correctedTick)
             {
-                ctx.sequencer->move(
+                ctx->sequencer->move(
                     sequencer::Sequencer::ticksToQuarterNotes(correctedTick));
             }
         }
@@ -159,7 +160,7 @@ void TriggerDrumNoteOnCommand::execute()
             Util::set16LevelsValues(sixteenLevelsContext, recordNoteOnEvent);
         }
 
-        if (ctx.program && isSliderNote)
+        if (ctx->program && isSliderNote)
         {
             auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
                 sliderNoteVariationContext);

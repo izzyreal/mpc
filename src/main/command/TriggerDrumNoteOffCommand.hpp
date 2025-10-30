@@ -2,6 +2,8 @@
 
 #include "Command.hpp"
 
+#include <memory>
+
 namespace mpc::command::context
 {
     class TriggerDrumNoteOffContext;
@@ -12,11 +14,11 @@ namespace mpc::command
     class TriggerDrumNoteOffCommand : public Command
     {
     private:
-        context::TriggerDrumNoteOffContext &ctx;
+        std::shared_ptr<context::TriggerDrumNoteOffContext> ctx;
 
     public:
         explicit TriggerDrumNoteOffCommand(
-            context::TriggerDrumNoteOffContext &ctx);
+            std::shared_ptr<context::TriggerDrumNoteOffContext>);
 
         // Should be invoked from the audio thread only
         void execute() override;

@@ -12,77 +12,77 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 
 TriggerDrumNoteOffCommand::TriggerDrumNoteOffCommand(
-    TriggerDrumNoteOffContext &ctx)
+    std::shared_ptr<TriggerDrumNoteOffContext> ctx)
     : ctx(ctx)
 {
 }
 
 void TriggerDrumNoteOffCommand::execute()
 {
-    ctx.finishBasicVoiceIfSoundIsLooping();
+    ctx->finishBasicVoiceIfSoundIsLooping();
 
-    if (ctx.currentScreenIsSoundScreen)
+    if (ctx->currentScreenIsSoundScreen)
     {
         return;
     }
 
-    if (!ctx.noteOffEvent)
+    if (!ctx->noteOffEvent)
     {
         return;
     }
 
-    if (ctx.currentScreenIsSamplerScreen)
+    if (ctx->currentScreenIsSamplerScreen)
     {
-        ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.noteOffEvent, nullptr, std::nullopt, ctx.drumIndex);
+        ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
+            ctx->noteOffEvent, nullptr, std::nullopt, ctx->drumIndex);
     }
     else
     {
-        ctx.eventHandler->handleNoteOffFromUnfinalizedNoteOn(
-            ctx.noteOffEvent, ctx.track, ctx.track->getDeviceIndex(),
-            ctx.drumIndex);
+        ctx->eventHandler->handleNoteOffFromUnfinalizedNoteOn(
+            ctx->noteOffEvent, ctx->track, ctx->track->getDeviceIndex(),
+            ctx->drumIndex);
     }
 
-    ctx.eventRegistry->registerNoteOff(ctx.source, ctx.drumBus,
-                                       ctx.noteOffEvent->getNote(), ctx.track,
-                                       std::nullopt);
+    ctx->eventRegistry->registerNoteOff(ctx->source, ctx->drumBus,
+                                        ctx->noteOffEvent->getNote(),
+                                        ctx->track, std::nullopt);
 
-    ctx.eventRegistry->registerProgramPadRelease(
-        ctx.source, ctx.drumBus, ctx.program, ctx.programPadIndex, ctx.track,
-        std::nullopt);
+    ctx->eventRegistry->registerProgramPadRelease(
+        ctx->source, ctx->drumBus, ctx->program, ctx->programPadIndex,
+        ctx->track, std::nullopt);
 
-    ctx.eventRegistry->publishSnapshot();
+    ctx->eventRegistry->publishSnapshot();
 
-    auto snapshot = ctx.eventRegistry->getSnapshot();
+    auto snapshot = ctx->eventRegistry->getSnapshot();
 
     const bool noMoreProgramPadsArePressed =
         snapshot.getTotalPressedProgramPadCount() == 0;
 
-    if (!ctx.recordOnEvent)
+    if (!ctx->recordOnEvent)
     {
         return;
     }
 
-    if (ctx.sequencerIsRecordingOrOverdubbing && ctx.isErasePressed)
+    if (ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed)
     {
         return;
     }
 
-    if (ctx.sequencerIsRecordingOrOverdubbing)
+    if (ctx->sequencerIsRecordingOrOverdubbing)
     {
-        ctx.track->finalizeNoteEventASync(ctx.recordOnEvent);
+        ctx->track->finalizeNoteEventASync(ctx->recordOnEvent);
     }
 
-    if (ctx.isStepRecording || ctx.isRecMainWithoutPlaying)
+    if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
     {
         auto newDuration =
-            ctx.metronomeOnlyTickPosition - ctx.recordOnEvent->getTick();
-        ctx.recordOnEvent->setTick(ctx.sequencerTickPosition);
+            ctx->metronomeOnlyTickPosition - ctx->recordOnEvent->getTick();
+        ctx->recordOnEvent->setTick(ctx->sequencerTickPosition);
 
-        if (ctx.isStepRecording && ctx.isDurationOfRecordedNotesTcValue)
+        if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
         {
-            newDuration = static_cast<int>(ctx.noteValueLengthInTicks *
-                                           (ctx.tcValuePercentage * 0.01));
+            newDuration = static_cast<int>(ctx->noteValueLengthInTicks *
+                                           (ctx->tcValuePercentage * 0.01));
             if (newDuration < 1)
             {
                 newDuration = 1;
@@ -90,32 +90,34 @@ void TriggerDrumNoteOffCommand::execute()
         }
 
         const bool durationHasBeenAdjusted =
-            ctx.track->finalizeNoteEventSynced(ctx.recordOnEvent, newDuration);
+            ctx->track->finalizeNoteEventSynced(ctx->recordOnEvent,
+                                                newDuration);
 
-        if ((durationHasBeenAdjusted && ctx.isRecMainWithoutPlaying) ||
-            (ctx.isStepRecording && ctx.isAutoStepIncrementEnabled))
+        if ((durationHasBeenAdjusted && ctx->isRecMainWithoutPlaying) ||
+            (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))
         {
             if (noMoreProgramPadsArePressed)
             {
                 int nextPos =
-                    ctx.sequencerTickPosition + ctx.noteValueLengthInTicks;
+                    ctx->sequencerTickPosition + ctx->noteValueLengthInTicks;
 
-                auto bar = ctx.currentBarIndex + 1;
+                auto bar = ctx->currentBarIndex + 1;
 
-                nextPos = ctx.track->timingCorrectTick(
-                    0, bar, nextPos, ctx.noteValueLengthInTicks, ctx.swing);
+                nextPos = ctx->track->timingCorrectTick(
+                    0, bar, nextPos, ctx->noteValueLengthInTicks, ctx->swing);
 
-                auto lastTick = ctx.sequencerGetActiveSequenceLastTick();
+                auto lastTick = ctx->sequencerGetActiveSequenceLastTick();
 
                 if (nextPos != 0 && nextPos < lastTick)
                 {
                     const double nextPosQuarterNotes =
                         sequencer::Sequencer::ticksToQuarterNotes(nextPos);
-                    ctx.sequencerMoveToQuarterNotePosition(nextPosQuarterNotes);
+                    ctx->sequencerMoveToQuarterNotePosition(
+                        nextPosQuarterNotes);
                 }
                 else
                 {
-                    ctx.sequencerMoveToQuarterNotePosition(
+                    ctx->sequencerMoveToQuarterNotePosition(
                         sequencer::Sequencer::ticksToQuarterNotes(lastTick));
                 }
             }
@@ -124,6 +126,6 @@ void TriggerDrumNoteOffCommand::execute()
 
     if (noMoreProgramPadsArePressed)
     {
-        ctx.sequencerStopMetronomeTrack();
+        ctx->sequencerStopMetronomeTrack();
     }
 }
