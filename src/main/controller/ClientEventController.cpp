@@ -51,7 +51,7 @@ void ClientEventController::dispatchHostInput(
 
     if (!clientEvent.has_value())
     {
-        // printf("empty clientEvent\n");
+        //printf("empty clientEvent\n");
         return;
     }
 

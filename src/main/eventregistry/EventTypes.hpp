@@ -53,11 +53,6 @@ namespace mpc::eventregistry
         PhysicalPadIndex padIndex;
     };
 
-    using PhysicalPadPressEventPtr = std::shared_ptr<PhysicalPadPressEvent>;
-    using PhysicalPadAftertouchEventPtr =
-        std::shared_ptr<PhysicalPadAftertouchEvent>;
-    using PhysicalPadReleaseEventPtr = std::shared_ptr<PhysicalPadReleaseEvent>;
-
     struct ProgramPadPressEvent
     {
         ProgramPadIndex padIndex;
@@ -84,11 +79,6 @@ namespace mpc::eventregistry
         std::shared_ptr<mpc::sampler::Program> program;
     };
 
-    using ProgramPadPressEventPtr = std::shared_ptr<ProgramPadPressEvent>;
-    using ProgramPadAftertouchEventPtr =
-        std::shared_ptr<ProgramPadAftertouchEvent>;
-    using ProgramPadReleaseEventPtr = std::shared_ptr<ProgramPadReleaseEvent>;
-
     struct NoteOnEvent
     {
         NoteNumber noteNumber;
@@ -102,7 +92,6 @@ namespace mpc::eventregistry
             recordNoteEvent;
         std::shared_ptr<mpc::sampler::Program> program;
         std::optional<Pressure> pressure;
-        ProgramPadPressEventPtr programPadPress;
     };
 
     struct NoteAftertouchEvent
@@ -118,6 +107,14 @@ namespace mpc::eventregistry
         std::optional<MidiChannel> midiChannel;
     };
 
+    using PhysicalPadPressEventPtr = std::shared_ptr<PhysicalPadPressEvent>;
+    using PhysicalPadAftertouchEventPtr =
+        std::shared_ptr<PhysicalPadAftertouchEvent>;
+    using PhysicalPadReleaseEventPtr = std::shared_ptr<PhysicalPadReleaseEvent>;
+    using ProgramPadPressEventPtr = std::shared_ptr<ProgramPadPressEvent>;
+    using ProgramPadAftertouchEventPtr =
+        std::shared_ptr<ProgramPadAftertouchEvent>;
+    using ProgramPadReleaseEventPtr = std::shared_ptr<ProgramPadReleaseEvent>;
     using NoteOnEventPtr = std::shared_ptr<NoteOnEvent>;
     using NoteAftertouchEventPtr = std::shared_ptr<NoteAftertouchEvent>;
     using NoteOffEventPtr = std::shared_ptr<NoteOffEvent>;
