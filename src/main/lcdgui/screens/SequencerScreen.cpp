@@ -232,6 +232,15 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
+                            return mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
+                        },
+                        [&](auto)
+                        {
+                            displayTiming();
+                        }});
+
+    addReactiveBinding({[&]
+                        {
                             return sequencer->getNextSq();
                         },
                         [&](auto nextSqIndex)
@@ -796,7 +805,6 @@ void SequencerScreen::turnWheel(int i)
         auto noteValue = screen->getNoteValue();
         screen->setNoteValue(noteValue + i);
         setLastFocus("timing-correct", "notevalue");
-        displayTiming();
     }
     else if (focusedFieldName == "sq")
     {
