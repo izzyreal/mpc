@@ -46,7 +46,7 @@ namespace mpc::eventregistry
             Velocity, mpc::sequencer::Track *, int bank,
             std::optional<int> note, std::function<void(void *)> action);
 
-        void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure, std::function<void(void*)> action);
+        void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure, Source source, std::function<void(void*)> action);
 
         void registerPhysicalPadRelease(PhysicalPadIndex, Source source,
                                         std::function<void(void *)> action);
@@ -54,12 +54,14 @@ namespace mpc::eventregistry
         ProgramPadPressEventPtr registerProgramPadPress(
             Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
             std::shared_ptr<mpc::sequencer::Bus>,
-            std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
+            std::shared_ptr<mpc::sampler::Program>,
+            ProgramPadIndex padIndex,
             Velocity, sequencer::Track *, std::optional<MidiChannel>);
 
         void registerProgramPadAftertouch(
             Source, std::shared_ptr<mpc::sequencer::Bus>,
-            std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
+            std::shared_ptr<mpc::sampler::Program>,
+            ProgramPadIndex padIndex,
             Pressure, sequencer::Track *);
 
         void registerProgramPadRelease(Source,
@@ -76,7 +78,7 @@ namespace mpc::eventregistry
                        Velocity, sequencer::Track *, std::optional<MidiChannel>,
                        std::shared_ptr<sampler::Program>);
 
-        void registerNoteAftertouch(Source, NoteNumber, Pressure);
+        void registerNoteAftertouch(Source, NoteNumber, Pressure, std::optional<MidiChannel>);
         void registerNoteOff(Source, std::shared_ptr<mpc::sequencer::Bus>,
                              NoteNumber, sequencer::Track *,
                              std::optional<MidiChannel>);

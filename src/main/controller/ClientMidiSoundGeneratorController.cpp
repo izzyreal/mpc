@@ -121,7 +121,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
                         note != -1)
                     {
                         eventRegistry->registerNoteAftertouch(
-                            eventregistry::Source::MidiInput, note, pressure);
+                            eventregistry::Source::MidiInput, note, pressure, e.getChannel());
                     }
                 }
             }
@@ -138,7 +138,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
         auto bus = sequencer->getBus<Bus>(track->getBus());
         auto registrySnapshot = eventRegistry->getSnapshot();
         eventRegistry->registerNoteAftertouch(eventregistry::Source::MidiInput,
-                                              note, pressure);
+                                              note, pressure, e.getChannel());
 
         if (auto program = getProgramForEvent(e); program)
         {
@@ -191,6 +191,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     }
     else if (type == MessageType::CONTROLLER && e.getControllerNumber() == 123)
     {
+        eventRegistry->clear();
         // TODO
         // Send early note offs
     }

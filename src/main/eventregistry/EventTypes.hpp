@@ -69,12 +69,14 @@ namespace mpc::eventregistry
     struct ProgramPadAftertouchEvent
     {
         ProgramPadIndex padIndex;
+        std::shared_ptr<mpc::sampler::Program> program;
         Pressure pressure;
     };
 
     struct ProgramPadReleaseEvent
     {
         ProgramPadIndex padIndex;
+        std::shared_ptr<mpc::sampler::Program> program;
     };
 
     struct NoteOnEvent
@@ -96,6 +98,7 @@ namespace mpc::eventregistry
     {
         NoteNumber noteNumber;
         Pressure pressure;
+        std::optional<MidiChannel> midiChannel;
     };
 
     struct NoteOffEvent

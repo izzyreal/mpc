@@ -321,11 +321,11 @@ void ClientHardwareEventController::handlePadAftertouch(
         {
             eventRegistry->registerNoteAftertouch(
                 Source::VirtualMpcHardware, *padPress->note,
-                pressureToUse);
+                pressureToUse, std::nullopt);
         }
     };
 
-    mpc.eventRegistry->registerPhysicalPadAftertouch(padIndex, pressureToUse, action);
+    mpc.eventRegistry->registerPhysicalPadAftertouch(padIndex, pressureToUse, Source::VirtualMpcHardware, action);
 }
 
 void ClientHardwareEventController::handleDataWheel(
