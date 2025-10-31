@@ -65,6 +65,33 @@ bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx) const
     return false;
 }
 
+bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx, const::std::vector<Source> &sourcesToExclude) const
+{
+    for (auto &e : snap->programPadEvents)
+    {
+        if (e->padIndex == idx)
+        {
+            bool isSourceToExclude = false;
+
+            for (auto &s : sourcesToExclude)
+            {
+                if (e->source == s)
+                {
+                    isSourceToExclude = true;
+                    break;
+                }
+            }
+
+            if (!isSourceToExclude)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 NoteOnEventPtr
 SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
 {

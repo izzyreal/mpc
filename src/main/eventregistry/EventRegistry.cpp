@@ -103,7 +103,7 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     std::optional<MidiChannel> midiChannel)
 {
     assert(screen && bus && program);
-    printf("registering program pad press\n");
+    printf("registering program pad press with source %s\n", sourceToString(source).c_str());
 
     auto e = std::make_shared<ProgramPadPressEvent>();
     e->padIndex = padIndex;

@@ -50,10 +50,12 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
     auto snapshot = mpc.eventRegistry->getSnapshot();
 
+    static const std::vector<eventregistry::Source> sourcesToExclude { eventregistry::Source::NoteRepeat, eventregistry::Source::Sequence };
+
     for (int padIndex = 0; padIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
          ++padIndex)
     {
-        if (!snapshot.isProgramPadPressed(padIndex))
+        if (!snapshot.isProgramPadPressed(padIndex, sourcesToExclude))
         {
             continue;
         }
