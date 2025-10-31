@@ -212,59 +212,66 @@ std::vector<mpc::file::all::Song *> AllParser::getSongs()
     return songs;
 }
 
-std::vector<AllSequence *>
-AllParser::readSequences(std::vector<char> trimmedSeqsArray)
+std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeqsArray)
 {
     const int totalSeqChunkLength = trimmedSeqsArray.size();
 
-    if (totalSeqChunkLength == 0)
-    {
+    if (totalSeqChunkLength == 0) {
         return {};
     }
 
     std::vector<AllSequence *> seqs;
-    int eventSegments, currentSeqEnd, read = 0;
+    int read = 0;
 
     auto usednesses = seqNames->getUsednesses();
 
-    for (const auto &u : usednesses)
-    {
-        if (!u)
-        {
+    size_t pos = 0;
+
+    for (const auto &u : usednesses) {
+
+        if (!u) {
             seqs.push_back(nullptr);
             continue;
         }
 
-        eventSegments =
-            AllSequence::getNumberOfEventSegmentsForThisSeq(trimmedSeqsArray);
-        currentSeqEnd = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
-
-        if (currentSeqEnd > trimmedSeqsArray.size())
-        {
-            currentSeqEnd -= 8;
+        std::vector<char> view;
+        if (pos < trimmedSeqsArray.size()) {
+            view = Util::vecCopyOfRange(trimmedSeqsArray, pos, trimmedSeqsArray.size());
+        } else {
+            seqs.push_back(nullptr);
+            continue;
         }
 
-        auto currentSeqArray =
-            Util::vecCopyOfRange(trimmedSeqsArray, 0, currentSeqEnd);
+        int eventSegments = AllSequence::getNumberOfEventSegmentsForThisSeq(view);
+
+        int currentSeqLen = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
+
+        if ((size_t)currentSeqLen > view.size()) {
+            currentSeqLen = (int)view.size();
+        }
+
+        auto currentSeqArray = Util::vecCopyOfRange(trimmedSeqsArray, pos, pos + currentSeqLen);
+
         auto as = new AllSequence(currentSeqArray);
         seqs.push_back(as);
-        read += currentSeqEnd;
-        int multiplier = (eventSegments & 1) == 0 ? 0 : 1;
 
-        if (totalSeqChunkLength - read >= EMPTY_SEQ_LENGTH - 16)
-        {
-            trimmedSeqsArray = Util::vecCopyOfRange(
-                trimmedSeqsArray, currentSeqEnd - (multiplier * EVENT_LENGTH),
-                trimmedSeqsArray.size());
-        }
-        else
-        {
-            break;
+        read += currentSeqLen;
+        pos += currentSeqLen;
+
+        if ((eventSegments & 1) != 0) {
+            if (pos >= EVENT_LENGTH) {
+                pos -= EVENT_LENGTH;
+                read -= EVENT_LENGTH;
+            } else {
+                pos = 0;
+                read = 0;
+            }
         }
     }
 
     return seqs;
 }
+
 
 std::vector<char> &AllParser::getBytes()
 {
