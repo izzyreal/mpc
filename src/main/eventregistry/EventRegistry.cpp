@@ -273,7 +273,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
     switch (msg.type)
     {
         case EventMessage::Type::PhysicalPadPress:
-            printf("Applying PhysicalPadPress\n");
+            //printf("Applying PhysicalPadPress\n");
             assert(msg.physicalPadPress);
             physicalPadEvents.push_back(msg.physicalPadPress);
             publishSnapshot();
@@ -297,7 +297,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
 
         case EventMessage::Type::PhysicalPadRelease:
         {
-            printf("Applying PhysicalPadRelease\n");
+            //printf("Applying PhysicalPadRelease\n");
             assert(msg.physicalPadRelease);
 
             auto padPress = std::find_if(
