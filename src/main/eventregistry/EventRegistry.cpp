@@ -132,6 +132,7 @@ void EventRegistry::registerProgramPadAftertouch(
     auto e = std::make_shared<ProgramPadAftertouchEvent>(ProgramPadAftertouchEvent { padIndex, pressure });
     EventMessage msg{EventMessage::Type::ProgramPadAftertouch};
     msg.programPadAftertouch = e;
+    msg.source = source;
     enqueue(std::move(msg));
 }
 
@@ -142,11 +143,12 @@ void EventRegistry::registerProgramPadRelease(
     std::function<void(void *)> action)
 {
     assert(bus && program);
-    printf("registering program pad release\n");
+    printf("registering program pad release with source %s\n", sourceToString(source).c_str());
 
     auto e = std::make_shared<ProgramPadReleaseEvent>(ProgramPadReleaseEvent{padIndex});
     EventMessage msg;
     msg.type = EventMessage::Type::ProgramPadRelease;
+    msg.source = source;
     msg.action = action;
     msg.programPadRelease = e;
     enqueue(std::move(msg));
@@ -318,7 +320,8 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
                 programPadEvents.begin(), programPadEvents.end(),
                 [&](const auto &e)
                 {
-                    return e->padIndex == msg.programPadRelease->padIndex;
+                    return e->padIndex == msg.programPadRelease->padIndex &&
+                           e->source == msg.source;
                 });
 
             assert(padPress != programPadEvents.end());
