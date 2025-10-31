@@ -106,8 +106,7 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     std::optional<MidiChannel> midiChannel)
 {
     assert(screen && bus && program);
-    //printf("registering program pad press with source %s\n",
-           sourceToString(source).c_str());
+    //printf("registering program pad press with source %s\n", sourceToString(source).c_str());
 
     auto e = std::make_shared<ProgramPadPressEvent>();
     e->padIndex = padIndex;
@@ -147,8 +146,7 @@ void EventRegistry::registerProgramPadRelease(
     std::optional<MidiChannel> midiChannel, std::function<void(void *)> action)
 {
     assert(bus && program);
-    //printf("registering program pad release with source %s\n",
-           sourceToString(source).c_str());
+    //printf("registering program pad release with source %s\n", sourceToString(source).c_str());
 
     auto e = std::make_shared<ProgramPadReleaseEvent>(
         ProgramPadReleaseEvent{padIndex});

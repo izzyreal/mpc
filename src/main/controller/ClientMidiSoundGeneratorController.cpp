@@ -56,8 +56,8 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
 {
     using MessageType = ClientMidiEvent::MessageType;
 
-    std::cout << "[SoundGenerator] Handling event type " << e.getMessageType()
-              << " on channel " << e.getChannel() << std::endl;
+    //std::cout << "[SoundGenerator] Handling event type " << e.getMessageType()
+    //          << " on channel " << e.getChannel() << std::endl;
 
     if (!sequencer->isRecordingModeMulti())
     {
@@ -375,7 +375,7 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 
     if (!noteEventInfo)
     {
-        printf("no noteEventInfo found!\n");
+        //printf("no noteEventInfo found!\n");
         return;
     }
 
