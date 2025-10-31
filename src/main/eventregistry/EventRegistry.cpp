@@ -72,7 +72,8 @@ void EventRegistry::registerPhysicalPadPress(
 }
 
 void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
-                                                  Pressure pressure)
+                                                  Pressure pressure,
+                                                  std::function<void(void*)> action)
 {
     printf("registering physical pad aftertouch for pad index %i\n",
            padIndex.get());
@@ -81,6 +82,7 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
         PhysicalPadAftertouchEvent{padIndex, pressure});
     EventMessage msg{EventMessage::Type::PhysicalPadAftertouch};
     msg.physicalPadAftertouch = e;
+    msg.action = action;
     enqueue(std::move(msg));
 }
 
@@ -279,9 +281,10 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
                 if (p->padIndex == msg.physicalPadAftertouch->padIndex)
                 {
                     p->pressure = msg.physicalPadAftertouch->pressure;
-                    return;
+                    msg.action((void*)p.get());
                 }
             }
+
             break;
 
         case EventMessage::Type::PhysicalPadRelease:

@@ -46,7 +46,7 @@ namespace mpc::eventregistry
             Velocity, mpc::sequencer::Track *, int bank,
             std::optional<int> note, std::function<void(void *)> action);
 
-        void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure);
+        void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure, std::function<void(void*)> action);
 
         void registerPhysicalPadRelease(PhysicalPadIndex, Source source,
                                         std::function<void(void *)> action);
