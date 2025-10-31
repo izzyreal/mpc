@@ -10,8 +10,8 @@ namespace mpc::eventregistry
     struct Snapshot
     {
         PhysicalPadPressEventPtrs physicalPadEvents;
-        ProgramPadPressEventPtrs  programPadEvents;
-        NoteOnEventPtrs             noteEvents;
+        ProgramPadPressEventPtrs programPadEvents;
+        NoteOnEventPtrs noteEvents;
     };
 
     class SnapshotView
@@ -23,7 +23,9 @@ namespace mpc::eventregistry
         VelocityOrPressure
         getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
         bool isProgramPadPressed(ProgramPadIndex idx) const;
-        bool isProgramPadPressed(ProgramPadIndex idx, const::std::vector<Source> &sourcesToExclude) const;
+        bool isProgramPadPressed(
+            ProgramPadIndex idx,
+            const ::std::vector<Source> &sourcesToExclude) const;
         int getTotalPressedProgramPadCount() const;
 
         NoteOnEventPtr retrievePlayNoteEvent(NoteNumber note) const;
@@ -55,4 +57,4 @@ namespace mpc::eventregistry
         const Snapshot *snap{};
         friend class EventRegistry;
     };
-}
+} // namespace mpc::eventregistry

@@ -65,7 +65,7 @@ void EventRegistry::registerPhysicalPadPress(
     e->note = note;
     e->program = screen->getProgram();
 
-    EventMessage msg {EventMessage::Type::PhysicalPadPress};
+    EventMessage msg{EventMessage::Type::PhysicalPadPress};
     msg.physicalPadPress = e;
     msg.action = action;
     enqueue(std::move(msg));
@@ -77,8 +77,9 @@ void EventRegistry::registerPhysicalPadAftertouch(PhysicalPadIndex padIndex,
     printf("registering physical pad aftertouch for pad index %i\n",
            padIndex.get());
 
-    auto e = std::make_shared<PhysicalPadAftertouchEvent>(PhysicalPadAftertouchEvent {padIndex, pressure});
-    EventMessage msg {EventMessage::Type::PhysicalPadAftertouch};
+    auto e = std::make_shared<PhysicalPadAftertouchEvent>(
+        PhysicalPadAftertouchEvent{padIndex, pressure});
+    EventMessage msg{EventMessage::Type::PhysicalPadAftertouch};
     msg.physicalPadAftertouch = e;
     enqueue(std::move(msg));
 }
@@ -88,7 +89,8 @@ void EventRegistry::registerPhysicalPadRelease(
     std::function<void(void *)> action)
 {
     printf("registering physical pad release\n");
-    auto e = std::make_shared<PhysicalPadReleaseEvent>(PhysicalPadReleaseEvent{padIndex});
+    auto e = std::make_shared<PhysicalPadReleaseEvent>(
+        PhysicalPadReleaseEvent{padIndex});
     EventMessage msg;
     msg.type = EventMessage::Type::PhysicalPadRelease;
     msg.action = action;
@@ -103,7 +105,8 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     std::optional<MidiChannel> midiChannel)
 {
     assert(screen && bus && program);
-    printf("registering program pad press with source %s\n", sourceToString(source).c_str());
+    printf("registering program pad press with source %s\n",
+           sourceToString(source).c_str());
 
     auto e = std::make_shared<ProgramPadPressEvent>();
     e->padIndex = padIndex;
@@ -115,7 +118,7 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     e->velocity = velocity;
     e->midiChannel = midiChannel;
 
-    EventMessage msg {EventMessage::Type::ProgramPadPress};
+    EventMessage msg{EventMessage::Type::ProgramPadPress};
     msg.programPadPress = e;
     enqueue(std::move(msg));
     return e;
@@ -129,7 +132,8 @@ void EventRegistry::registerProgramPadAftertouch(
 
     printf("registering program pad aftertouch\n");
 
-    auto e = std::make_shared<ProgramPadAftertouchEvent>(ProgramPadAftertouchEvent { padIndex, pressure });
+    auto e = std::make_shared<ProgramPadAftertouchEvent>(
+        ProgramPadAftertouchEvent{padIndex, pressure});
     EventMessage msg{EventMessage::Type::ProgramPadAftertouch};
     msg.programPadAftertouch = e;
     msg.source = source;
@@ -139,13 +143,14 @@ void EventRegistry::registerProgramPadAftertouch(
 void EventRegistry::registerProgramPadRelease(
     Source source, std::shared_ptr<Bus> bus, std::shared_ptr<Program> program,
     ProgramPadIndex padIndex, Track *track,
-    std::optional<MidiChannel> midiChannel,
-    std::function<void(void *)> action)
+    std::optional<MidiChannel> midiChannel, std::function<void(void *)> action)
 {
     assert(bus && program);
-    printf("registering program pad release with source %s\n", sourceToString(source).c_str());
+    printf("registering program pad release with source %s\n",
+           sourceToString(source).c_str());
 
-    auto e = std::make_shared<ProgramPadReleaseEvent>(ProgramPadReleaseEvent{padIndex});
+    auto e = std::make_shared<ProgramPadReleaseEvent>(
+        ProgramPadReleaseEvent{padIndex});
     EventMessage msg;
     msg.type = EventMessage::Type::ProgramPadRelease;
     msg.source = source;
@@ -162,7 +167,9 @@ NoteOnEventPtr EventRegistry::registerNoteOn(
 {
     printf("registering note on\n");
     assert(screen && bus);
-    auto e = std::make_shared<NoteOnEvent>(NoteOnEvent{noteNumber, source, midiChannel, screen, track, bus, velocity, nullptr, program, std::nullopt});
+    auto e = std::make_shared<NoteOnEvent>(
+        NoteOnEvent{noteNumber, source, midiChannel, screen, track, bus,
+                    velocity, nullptr, program, std::nullopt});
     EventMessage msg{EventMessage::Type::NoteOn};
     msg.noteOnEvent = e;
     enqueue(std::move(msg));
@@ -173,8 +180,9 @@ void EventRegistry::registerNoteAftertouch(Source source, NoteNumber noteNumber,
                                            Pressure pressure)
 {
     printf("registering note aftertouch\n");
-    auto e = std::make_shared<NoteAftertouchEvent>(NoteAftertouchEvent{noteNumber, pressure});
-    EventMessage msg {EventMessage::Type::NoteAftertouch};
+    auto e = std::make_shared<NoteAftertouchEvent>(
+        NoteAftertouchEvent{noteNumber, pressure});
+    EventMessage msg{EventMessage::Type::NoteAftertouch};
     msg.source = source;
     msg.noteAftertouchEvent = e;
     enqueue(std::move(msg));
@@ -188,7 +196,8 @@ void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
 
     printf("registering note off\n");
 
-    auto e = std::make_shared<NoteOffEvent>(NoteOffEvent{noteNumber, midiChannel});
+    auto e =
+        std::make_shared<NoteOffEvent>(NoteOffEvent{noteNumber, midiChannel});
     EventMessage msg{EventMessage::Type::NoteOff};
     msg.noteOffEvent = e;
     enqueue(std::move(msg));
@@ -353,14 +362,14 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
         {
             assert(msg.noteOffEvent);
             printf("Appying NoteOff\n");
-            auto noteOn = std::find_if(
-                noteEvents.begin(), noteEvents.end(),
-                [&](const auto &n)
-                {
-                    return n->noteNumber == msg.noteOffEvent->noteNumber;
-                });
+            auto noteOn = std::find_if(noteEvents.begin(), noteEvents.end(),
+                                       [&](const auto &n)
+                                       {
+                                           return n->noteNumber ==
+                                                  msg.noteOffEvent->noteNumber;
+                                       });
 
-            assert(noteOn!= noteEvents.end());
+            assert(noteOn != noteEvents.end());
 
             msg.action((void *)(*noteOn).get());
             noteEvents.erase(noteOn);

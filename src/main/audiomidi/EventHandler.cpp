@@ -188,7 +188,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
                 eventRegistry->registerProgramPadRelease(
                     eventregistry::Source::Sequence, bus, program,
-                    programPadIndex, track, std::nullopt, [](void*){});
+                    programPadIndex, track, std::nullopt, [](void *) {});
 
                 DrumNoteEventHandler::noteOff(noteOffCtx);
             };
@@ -450,7 +450,7 @@ void EventHandler::handleMidiInputNoteOff(
 
         eventRegistry->registerProgramPadRelease(
             registryEvent->source, registryEvent->bus, program, programPadIndex,
-            registryEvent->track, midiChannel, [](void*){});
+            registryEvent->track, midiChannel, [](void *) {});
     };
 
     frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);

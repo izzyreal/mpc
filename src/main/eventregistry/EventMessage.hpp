@@ -32,7 +32,7 @@ namespace mpc::eventregistry
         ProgramPadPressEventPtr programPadPress;
         ProgramPadAftertouchEventPtr programPadAftertouch;
         ProgramPadReleaseEventPtr programPadRelease;
-        
+
         NoteOnEventPtr noteOnEvent;
         NoteAftertouchEventPtr noteAftertouchEvent;
         NoteOffEventPtr noteOffEvent;
@@ -41,10 +41,9 @@ namespace mpc::eventregistry
         std::function<void(void *)> action = [](void *) {};
 
         EventMessage() = default;
-        EventMessage(const EventMessage&) = delete;
-        EventMessage& operator=(const EventMessage&) = delete;
-        EventMessage(EventMessage&&) noexcept = default;
-        EventMessage& operator=(EventMessage&&) noexcept = default;
+        EventMessage(const EventMessage &) = delete;
+        EventMessage &operator=(const EventMessage &) = delete;
+        EventMessage(EventMessage &&) noexcept = default;
+        EventMessage &operator=(EventMessage &&) noexcept = default;
     };
-}
-
+} // namespace mpc::eventregistry

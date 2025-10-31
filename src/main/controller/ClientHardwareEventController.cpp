@@ -195,7 +195,7 @@ void ClientHardwareEventController::handlePadPress(
     NoteInputScreenUpdateCommand(noteInputScreenUpdateContext, ctx->note)
         .execute();
 
-    std::function<void(void*)> action = [](void*){};
+    std::function<void(void *)> action = [](void *) {};
 
     if (layeredScreen->isCurrentScreen<PopupScreen>())
     {
@@ -209,7 +209,7 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
-        action = [ctx](void*)
+        action = [ctx](void *)
         {
             TriggerDrumNoteOnCommand(ctx).execute();
         };

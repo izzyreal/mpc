@@ -13,13 +13,13 @@ namespace mpc::sequencer
     class Track;
     class Bus;
     class NoteOnEvent;
-}
+} // namespace mpc::sequencer
 
 namespace mpc::sampler
 {
     class Sampler;
     class Program;
-}
+} // namespace mpc::sampler
 
 namespace mpc::lcdgui
 {
@@ -105,10 +105,12 @@ namespace mpc::eventregistry
     };
 
     using PhysicalPadPressEventPtr = std::shared_ptr<PhysicalPadPressEvent>;
-    using PhysicalPadAftertouchEventPtr = std::shared_ptr<PhysicalPadAftertouchEvent>;
+    using PhysicalPadAftertouchEventPtr =
+        std::shared_ptr<PhysicalPadAftertouchEvent>;
     using PhysicalPadReleaseEventPtr = std::shared_ptr<PhysicalPadReleaseEvent>;
     using ProgramPadPressEventPtr = std::shared_ptr<ProgramPadPressEvent>;
-    using ProgramPadAftertouchEventPtr = std::shared_ptr<ProgramPadAftertouchEvent>;
+    using ProgramPadAftertouchEventPtr =
+        std::shared_ptr<ProgramPadAftertouchEvent>;
     using ProgramPadReleaseEventPtr = std::shared_ptr<ProgramPadReleaseEvent>;
     using NoteOnEventPtr = std::shared_ptr<NoteOnEvent>;
     using NoteAftertouchEventPtr = std::shared_ptr<NoteAftertouchEvent>;

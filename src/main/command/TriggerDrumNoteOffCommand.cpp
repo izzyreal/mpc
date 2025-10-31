@@ -48,14 +48,15 @@ void TriggerDrumNoteOffCommand::execute()
                                         ctx->noteOffEvent->getNote(),
                                         ctx->track, std::nullopt);
 
-    std::function<void(void*)> action = [](void*){};
+    std::function<void(void *)> action = [](void *) {};
 
     if (ctx->recordOnEvent &&
-            !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
+        !(ctx->sequencerIsRecordingOrOverdubbing && ctx->isErasePressed))
     {
-        action = [ctx = ctx](void *userData){
-
-            auto programPadEvent = (eventregistry::ProgramPadPressEvent*)userData;
+        action = [ctx = ctx](void *userData)
+        {
+            auto programPadEvent =
+                (eventregistry::ProgramPadPressEvent *)userData;
 
             const auto snapshot = ctx->eventRegistry->getSnapshot();
 
@@ -69,14 +70,16 @@ void TriggerDrumNoteOffCommand::execute()
 
             if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
             {
-                auto newDuration =
-                    ctx->metronomeOnlyTickPosition - ctx->recordOnEvent->getTick();
+                auto newDuration = ctx->metronomeOnlyTickPosition -
+                                   ctx->recordOnEvent->getTick();
                 ctx->recordOnEvent->setTick(ctx->sequencerTickPosition);
 
-                if (ctx->isStepRecording && ctx->isDurationOfRecordedNotesTcValue)
+                if (ctx->isStepRecording &&
+                    ctx->isDurationOfRecordedNotesTcValue)
                 {
-                    newDuration = static_cast<int>(ctx->noteValueLengthInTicks *
-                                                   (ctx->tcValuePercentage * 0.01));
+                    newDuration =
+                        static_cast<int>(ctx->noteValueLengthInTicks *
+                                         (ctx->tcValuePercentage * 0.01));
                     if (newDuration < 1)
                     {
                         newDuration = 1;
@@ -92,27 +95,31 @@ void TriggerDrumNoteOffCommand::execute()
                 {
                     if (noMoreProgramPadsArePressed)
                     {
-                        int nextPos =
-                            ctx->sequencerTickPosition + ctx->noteValueLengthInTicks;
+                        int nextPos = ctx->sequencerTickPosition +
+                                      ctx->noteValueLengthInTicks;
 
                         auto bar = ctx->currentBarIndex + 1;
 
                         nextPos = ctx->track->timingCorrectTick(
-                            0, bar, nextPos, ctx->noteValueLengthInTicks, ctx->swing);
+                            0, bar, nextPos, ctx->noteValueLengthInTicks,
+                            ctx->swing);
 
-                        auto lastTick = ctx->sequencerGetActiveSequenceLastTick();
+                        auto lastTick =
+                            ctx->sequencerGetActiveSequenceLastTick();
 
                         if (nextPos != 0 && nextPos < lastTick)
                         {
                             const double nextPosQuarterNotes =
-                                sequencer::Sequencer::ticksToQuarterNotes(nextPos);
+                                sequencer::Sequencer::ticksToQuarterNotes(
+                                    nextPos);
                             ctx->sequencerMoveToQuarterNotePosition(
                                 nextPosQuarterNotes);
                         }
                         else
                         {
                             ctx->sequencerMoveToQuarterNotePosition(
-                                sequencer::Sequencer::ticksToQuarterNotes(lastTick));
+                                sequencer::Sequencer::ticksToQuarterNotes(
+                                    lastTick));
                         }
                     }
                 }
@@ -129,4 +136,3 @@ void TriggerDrumNoteOffCommand::execute()
         ctx->source, ctx->drumBus, ctx->program, ctx->programPadIndex,
         ctx->track, std::nullopt, action);
 }
-

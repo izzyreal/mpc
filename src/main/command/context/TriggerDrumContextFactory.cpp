@@ -104,16 +104,39 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
-    return std::make_shared<TriggerDrumNoteOnContext>(TriggerDrumNoteOnContext {
-        source, eventRegistry, isSequencerScreen, programPadIndex, velocity,
-        isSoundScreen, isFullLevelEnabled, isSixteenLevelsEnabled,
-        isNoteRepeatLockedOrPressed, isErasePressed, isStepRecording,
-        isRecMainWithoutPlaying, sequencer->isRecordingOrOverdubbing(),
-        track->getBus(), program, note, drumScreenSelectedDrum, isSamplerScreen,
-        track, sampler, sequencer, timingCorrectScreen, assign16LevelsScreen,
-        eventHandler, frameSequencer, previewSoundPlayer,
-        allowCentralNoteAndPadUpdate, screen, setSelectedNote, setSelectedPad,
-        layeredScreen->getFocusedFieldName(), hardwareSliderValue });
+    return std::make_shared<TriggerDrumNoteOnContext>(
+        TriggerDrumNoteOnContext{source,
+                                 eventRegistry,
+                                 isSequencerScreen,
+                                 programPadIndex,
+                                 velocity,
+                                 isSoundScreen,
+                                 isFullLevelEnabled,
+                                 isSixteenLevelsEnabled,
+                                 isNoteRepeatLockedOrPressed,
+                                 isErasePressed,
+                                 isStepRecording,
+                                 isRecMainWithoutPlaying,
+                                 sequencer->isRecordingOrOverdubbing(),
+                                 track->getBus(),
+                                 program,
+                                 note,
+                                 drumScreenSelectedDrum,
+                                 isSamplerScreen,
+                                 track,
+                                 sampler,
+                                 sequencer,
+                                 timingCorrectScreen,
+                                 assign16LevelsScreen,
+                                 eventHandler,
+                                 frameSequencer,
+                                 previewSoundPlayer,
+                                 allowCentralNoteAndPadUpdate,
+                                 screen,
+                                 setSelectedNote,
+                                 setSelectedPad,
+                                 layeredScreen->getFocusedFieldName(),
+                                 hardwareSliderValue});
 }
 
 std::shared_ptr<TriggerDrumNoteOffContext>
@@ -174,20 +197,34 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     std::shared_ptr<sequencer::DrumBus> drumBus =
         sequencer->getDrumBus(drumIndex);
 
-    return std::make_shared<TriggerDrumNoteOffContext>( TriggerDrumNoteOffContext {
-        source, eventRegistry, drumBus, program, programPadIndex,
-        finishBasicVoiceIfSoundIsLooping, isSoundScreen, isSamplerScreen,
-        std::make_shared<sequencer::NoteOffEvent>(note), drumIndex,
-        eventHandler, sequencerRecordNoteOnEvent,
-        sequencer->isRecordingOrOverdubbing(),
-        hardware->getButton(hardware::ComponentId::ERASE)->isPressed(), track,
-        isStepRecording, frameSequencer->getMetronomeOnlyTickPosition(),
-        isRecMainWithoutPlaying, sequencer->getTickPosition(),
-        stepEditOptionsScreen->getTcValuePercentage(),
-        timingCorrectScreen->getNoteValueLengthInTicks(),
-        stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
-        stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-        sequencer->getCurrentBarIndex(), timingCorrectScreen->getSwing(),
-        getActiveSequenceLastTick, sequencerMoveToQuarterNotePosition,
-        sequencerStopMetronomeTrack});
+    return std::make_shared<TriggerDrumNoteOffContext>(
+        TriggerDrumNoteOffContext{
+            source,
+            eventRegistry,
+            drumBus,
+            program,
+            programPadIndex,
+            finishBasicVoiceIfSoundIsLooping,
+            isSoundScreen,
+            isSamplerScreen,
+            std::make_shared<sequencer::NoteOffEvent>(note),
+            drumIndex,
+            eventHandler,
+            sequencerRecordNoteOnEvent,
+            sequencer->isRecordingOrOverdubbing(),
+            hardware->getButton(hardware::ComponentId::ERASE)->isPressed(),
+            track,
+            isStepRecording,
+            frameSequencer->getMetronomeOnlyTickPosition(),
+            isRecMainWithoutPlaying,
+            sequencer->getTickPosition(),
+            stepEditOptionsScreen->getTcValuePercentage(),
+            timingCorrectScreen->getNoteValueLengthInTicks(),
+            stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
+            stepEditOptionsScreen->isAutoStepIncrementEnabled(),
+            sequencer->getCurrentBarIndex(),
+            timingCorrectScreen->getSwing(),
+            getActiveSequenceLastTick,
+            sequencerMoveToQuarterNotePosition,
+            sequencerStopMetronomeTrack});
 }

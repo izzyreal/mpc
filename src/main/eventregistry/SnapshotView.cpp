@@ -3,8 +3,8 @@
 using namespace mpc;
 using namespace mpc::eventregistry;
 
-bool SnapshotView::isProgramPadPressedBySource(
-    ProgramPadIndex idx, Source src) const
+bool SnapshotView::isProgramPadPressedBySource(ProgramPadIndex idx,
+                                               Source src) const
 {
     for (auto &e : snap->programPadEvents)
     {
@@ -16,8 +16,7 @@ bool SnapshotView::isProgramPadPressedBySource(
     return false;
 }
 
-VelocityOrPressure
-SnapshotView::getPressedProgramPadAfterTouchOrVelocity(
+VelocityOrPressure SnapshotView::getPressedProgramPadAfterTouchOrVelocity(
     ProgramPadIndex idx) const
 {
     std::optional<VelocityOrPressure> result;
@@ -65,7 +64,8 @@ bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx) const
     return false;
 }
 
-bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx, const::std::vector<Source> &sourcesToExclude) const
+bool SnapshotView::isProgramPadPressed(
+    ProgramPadIndex idx, const ::std::vector<Source> &sourcesToExclude) const
 {
     for (auto &e : snap->programPadEvents)
     {
@@ -92,8 +92,7 @@ bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx, const::std::vector<S
     return false;
 }
 
-NoteOnEventPtr
-SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
+NoteOnEventPtr SnapshotView::retrievePlayNoteEvent(NoteNumber note) const
 {
     for (auto &e : snap->noteEvents)
     {
@@ -119,8 +118,7 @@ SnapshotView::retrieveRecordNoteEvent(NoteNumber note) const
 }
 
 PhysicalPadPressEventPtr
-SnapshotView::retrievePhysicalPadPressEvent(
-    PhysicalPadIndex idx) const
+SnapshotView::retrievePhysicalPadPressEvent(PhysicalPadIndex idx) const
 {
     for (const auto &e : snap->physicalPadEvents)
     {
@@ -133,7 +131,7 @@ SnapshotView::retrievePhysicalPadPressEvent(
 }
 
 NoteOnEventPtr SnapshotView::retrieveNoteEvent(NoteNumber note,
-                                                            Source src) const
+                                               Source src) const
 {
     for (const auto &e : snap->noteEvents)
     {
@@ -149,4 +147,3 @@ int SnapshotView::getTotalPressedProgramPadCount() const
 {
     return snap->programPadEvents.size();
 }
-

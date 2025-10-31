@@ -68,7 +68,7 @@ namespace mpc::eventregistry
                                        ProgramPadIndex padIndex,
                                        sequencer::Track *,
                                        std::optional<MidiChannel>,
-                                        std::function<void(void *)> action);
+                                       std::function<void(void *)> action);
 
         NoteOnEventPtr
         registerNoteOn(Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
