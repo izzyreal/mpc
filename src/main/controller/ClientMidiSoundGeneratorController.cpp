@@ -192,8 +192,6 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
     else if (type == MessageType::CONTROLLER && e.getControllerNumber() == 123)
     {
         eventRegistry->clear();
-        // TODO
-        // Send early note offs
     }
 }
 
