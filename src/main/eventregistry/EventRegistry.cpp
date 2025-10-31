@@ -313,9 +313,10 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
                 return;
             }
 
+            auto padPressPtr = *padPress;
             physicalPadEvents.erase(padPress);
             publishSnapshot();
-            msg.action(padPress->get());
+            msg.action(padPressPtr.get());
             break;
         }
         case EventMessage::Type::ProgramPadPress:
@@ -361,9 +362,10 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
                 return;
             }
 
+            auto padPressPtr = *padPress;
             programPadEvents.erase(padPress);
             publishSnapshot();
-            msg.action(padPress->get());
+            msg.action(padPressPtr.get());
             break;
         }
         case EventMessage::Type::NoteOn:
@@ -407,9 +409,10 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
                 return;
             }
 
+            auto noteOnPtr = *noteOn;
             noteEvents.erase(noteOn);
             publishSnapshot();
-            msg.action(noteOn->get());
+            msg.action(noteOnPtr.get());
             break;
         }
         case EventMessage::Type::Clear:
