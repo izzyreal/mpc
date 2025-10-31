@@ -10,6 +10,7 @@
 
 #include "audiomidi/AudioMidiServices.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "eventregistry/EventRegistry.hpp"
 
 #include "sequencer/Track.hpp"
 
@@ -158,14 +159,13 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                          hTickPos) == end(recordedTickPos))
                 {
                     auto noteOnCtx = TriggerDrumContextFactory::
-                        buildTriggerDrumNoteOnContext(mpc, 0, 127, screen);
+                        buildTriggerDrumNoteOnContext(mpc::eventregistry::Source::VirtualMpcHardware, mpc.getLayeredScreen(), mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(), mpc.eventRegistry, mpc.getEventHandler(), mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(), 0, 127, mpc.getLayeredScreen()->getCurrentScreen());
                     TriggerDrumNoteOnCommand(noteOnCtx).execute();
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
                     auto noteOffCtx = TriggerDrumContextFactory::
-                        buildTriggerDrumNoteOffContext(
-                            mpc, 0, screen->getDrumIndex(), screen, 60);
+                        buildTriggerDrumNoteOffContext(mpc::eventregistry::Source::VirtualMpcHardware, &mpc.getBasicPlayer(), mpc.eventRegistry, mpc.getEventHandler(), mpc.screens, mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController, mpc.getAudioMidiServices()->getFrameSequencer(), 0, 0, mpc.getLayeredScreen()->getCurrentScreen(), 60, mpc.getSampler()->getProgram(0), mpc.getSequencer()->getActiveTrack().get());
                     TriggerDrumNoteOffCommand(noteOffCtx).execute();
                 }
             }
@@ -259,16 +259,14 @@ TEST_CASE("Undo", "[sequencer]")
     {
         if (i % 2 == 0)
         {
-            auto noteOnCtx =
-                TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
-                    mpc, 0, 127, screen);
+                    auto noteOnCtx = TriggerDrumContextFactory::
+                        buildTriggerDrumNoteOnContext(mpc::eventregistry::Source::VirtualMpcHardware, mpc.getLayeredScreen(), mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(), mpc.eventRegistry, mpc.getEventHandler(), mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(), 0, 127, mpc.getLayeredScreen()->getCurrentScreen());
             TriggerDrumNoteOnCommand(noteOnCtx).execute();
         }
         else
         {
-            auto noteOffCtx =
-                TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-                    mpc, 0, screen->getDrumIndex(), screen, 60);
+            auto noteOffCtx = TriggerDrumContextFactory::
+                        buildTriggerDrumNoteOffContext(mpc::eventregistry::Source::VirtualMpcHardware, &mpc.getBasicPlayer(), mpc.eventRegistry, mpc.getEventHandler(), mpc.screens, mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController, mpc.getAudioMidiServices()->getFrameSequencer(), 0, 0, mpc.getLayeredScreen()->getCurrentScreen(), 60, mpc.getSampler()->getProgram(0), mpc.getSequencer()->getActiveTrack().get());
             TriggerDrumNoteOffCommand(noteOffCtx).execute();
         }
 
