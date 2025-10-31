@@ -38,7 +38,6 @@ ClientMidiEventController::ClientMidiEventController(
         std::make_shared<ClientMidiFootswitchAssignmentController>(
             clientHardwareEventController, midiSwScreen, sequencer);
 
-    // Create the sound generator controller with the passed dependencies
     soundGeneratorController =
         std::make_shared<ClientMidiSoundGeneratorController>(
             eventRegistry, clientEventController, midiInputScreen, eventHandler,
