@@ -100,7 +100,6 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence *seq)
     auto segmentCount = 0;
     for (auto &track : seq->getTracks())
     {
-
         if (track->getIndex() > 63)
         {
             break;

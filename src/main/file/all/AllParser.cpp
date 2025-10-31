@@ -212,11 +212,13 @@ std::vector<mpc::file::all::Song *> AllParser::getSongs()
     return songs;
 }
 
-std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeqsArray)
+std::vector<AllSequence *>
+AllParser::readSequences(std::vector<char> trimmedSeqsArray)
 {
     const int totalSeqChunkLength = trimmedSeqsArray.size();
 
-    if (totalSeqChunkLength == 0) {
+    if (totalSeqChunkLength == 0)
+    {
         return {};
     }
 
@@ -227,30 +229,39 @@ std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeq
 
     size_t pos = 0;
 
-    for (const auto &u : usednesses) {
+    for (const auto &u : usednesses)
+    {
 
-        if (!u) {
+        if (!u)
+        {
             seqs.push_back(nullptr);
             continue;
         }
 
         std::vector<char> view;
-        if (pos < trimmedSeqsArray.size()) {
-            view = Util::vecCopyOfRange(trimmedSeqsArray, pos, trimmedSeqsArray.size());
-        } else {
+        if (pos < trimmedSeqsArray.size())
+        {
+            view = Util::vecCopyOfRange(trimmedSeqsArray, pos,
+                                        trimmedSeqsArray.size());
+        }
+        else
+        {
             seqs.push_back(nullptr);
             continue;
         }
 
-        int eventSegments = AllSequence::getNumberOfEventSegmentsForThisSeq(view);
+        int eventSegments =
+            AllSequence::getNumberOfEventSegmentsForThisSeq(view);
 
         int currentSeqLen = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
 
-        if ((size_t)currentSeqLen > view.size()) {
+        if ((size_t)currentSeqLen > view.size())
+        {
             currentSeqLen = (int)view.size();
         }
 
-        auto currentSeqArray = Util::vecCopyOfRange(trimmedSeqsArray, pos, pos + currentSeqLen);
+        auto currentSeqArray =
+            Util::vecCopyOfRange(trimmedSeqsArray, pos, pos + currentSeqLen);
 
         auto as = new AllSequence(currentSeqArray);
         seqs.push_back(as);
@@ -258,11 +269,15 @@ std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeq
         read += currentSeqLen;
         pos += currentSeqLen;
 
-        if ((eventSegments & 1) != 0) {
-            if (pos >= EVENT_LENGTH) {
+        if ((eventSegments & 1) != 0)
+        {
+            if (pos >= EVENT_LENGTH)
+            {
                 pos -= EVENT_LENGTH;
                 read -= EVENT_LENGTH;
-            } else {
+            }
+            else
+            {
                 pos = 0;
                 read = 0;
             }
@@ -271,7 +286,6 @@ std::vector<AllSequence *> AllParser::readSequences(std::vector<char> trimmedSeq
 
     return seqs;
 }
-
 
 std::vector<char> &AllParser::getBytes()
 {
