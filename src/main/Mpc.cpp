@@ -278,7 +278,8 @@ Mpc::~Mpc()
 
 void Mpc::panic()
 {
-    // TODO Anything we should do in the eventRegistry?
+    // TODO Anything we should do in the eventRegistry? Probably not, because panic is meant to
+    // help out other devices, i.e. things connected to the MPC2000XL's MIDI output.
     midiOutput->panic();
     eventHandler->clearTransposeCache();
 }
