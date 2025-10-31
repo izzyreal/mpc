@@ -238,7 +238,11 @@ void ClientHardwareEventController::handlePadRelease(
     }
 
     const auto physicalPadIndex = *event.index;
-    mpc.getHardware()->getPad(physicalPadIndex)->release();
+
+    if (!mpc.getHardware()->getPad(physicalPadIndex)->release())
+    {
+        return;
+    }
 
     auto action =
         [eventRegistry = mpc.eventRegistry,

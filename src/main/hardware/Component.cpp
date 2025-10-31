@@ -46,15 +46,16 @@ bool Pressable::press()
     return true;
 }
 
-void Pressable::release()
+bool Pressable::release()
 {
     if (!isPressed())
     {
-        return;
+        return false;
     }
 
     setPressed(false);
     onRelease();
+    return true;
 }
 
 bool Pressable::doublePress()

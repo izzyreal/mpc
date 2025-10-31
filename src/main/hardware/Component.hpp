@@ -47,7 +47,7 @@ namespace mpc::hardware
     public:
         virtual ~Pressable();
         bool press();
-        void release();
+        bool release();
         bool doublePress();
     };
 
