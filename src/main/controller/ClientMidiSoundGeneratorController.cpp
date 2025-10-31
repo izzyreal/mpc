@@ -56,8 +56,9 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
 {
     using MessageType = ClientMidiEvent::MessageType;
 
-    //std::cout << "[SoundGenerator] Handling event type " << e.getMessageType()
-    //          << " on channel " << e.getChannel() << std::endl;
+    // std::cout << "[SoundGenerator] Handling event type " <<
+    // e.getMessageType()
+    //           << " on channel " << e.getChannel() << std::endl;
 
     if (!sequencer->isRecordingModeMulti())
     {
@@ -121,7 +122,8 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
                         note != -1)
                     {
                         eventRegistry->registerNoteAftertouch(
-                            eventregistry::Source::MidiInput, note, pressure, e.getChannel());
+                            eventregistry::Source::MidiInput, note, pressure,
+                            e.getChannel());
                     }
                 }
             }
@@ -374,7 +376,7 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 
     if (!noteEventInfo)
     {
-        //printf("no noteEventInfo found!\n");
+        // printf("no noteEventInfo found!\n");
         return;
     }
 
