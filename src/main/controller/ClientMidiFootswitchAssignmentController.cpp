@@ -6,8 +6,6 @@
 
 #include "hardware/Component.hpp"
 
-#include <iostream>
-
 using namespace mpc::controller;
 using namespace mpc::client::event;
 using namespace mpc::lcdgui::screens;
@@ -67,8 +65,6 @@ void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
 
 void ClientMidiFootswitchAssignmentController::handleRecPunch()
 {
-    std::cout << "[FootswitchAssignment] Handling REC/PUNCH" << std::endl;
-
     if (!sequencer->isPlaying())
     {
         // STOP mode -> PLAY mode
@@ -91,8 +87,6 @@ void ClientMidiFootswitchAssignmentController::handleRecPunch()
 
 void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 {
-    std::cout << "[FootswitchAssignment] Handling ODUB/PNCH" << std::endl;
-
     if (!sequencer->isPlaying())
     {
         // STOP mode -> PLAY mode
@@ -116,10 +110,6 @@ void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 void ClientMidiFootswitchAssignmentController::handleEvent(
     const ClientMidiEvent &e)
 {
-    std::cout << "[FootswitchAssignment] Handling event type "
-              << e.getMessageType() << " on channel " << e.getChannel()
-              << std::endl;
-
     if (e.getMessageType() != ClientMidiEvent::MessageType::CONTROLLER)
     {
         return;
@@ -129,10 +119,6 @@ void ClientMidiFootswitchAssignmentController::handleEvent(
     const int value = e.getControllerValue();
 
     const bool pressed = value >= 64;
-
-    std::cout << "\n[FootswitchAssignment] Handling controller " << controller
-              << " (val=" << value << (pressed ? ", pressed" : ", released")
-              << ")\n";
 
     for (auto [switchCC, functionIndex] : midiSwScreen->getSwitches())
     {

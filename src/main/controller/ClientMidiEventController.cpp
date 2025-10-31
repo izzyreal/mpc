@@ -1,8 +1,6 @@
 #include "controller/ClientMidiEventController.hpp"
 #include "controller/ClientEventController.hpp"
-#include "lcdgui/screens/window/MidiInputScreen.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
-#include <iostream>
+
 #include <memory>
 
 using namespace mpc::eventregistry;
@@ -48,8 +46,6 @@ ClientMidiEventController::ClientMidiEventController(
 
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
-    e.printInfo();
-
     if (clientEventController->getLayeredScreen()
             ->isCurrentScreen<MidiInputMonitorScreen>())
     {
@@ -84,8 +80,6 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
             break;
 
         default:
-            std::cout << "[EventController] Unhandled MIDI event type "
-                      << e.getMessageType() << std::endl;
             break;
     }
 }

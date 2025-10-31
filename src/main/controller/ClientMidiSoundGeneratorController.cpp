@@ -16,7 +16,6 @@
 
 #include "command/context/TriggerDrumContextFactory.hpp"
 
-#include <iostream>
 #include <optional>
 
 using namespace mpc::eventregistry;
@@ -55,9 +54,6 @@ ClientMidiSoundGeneratorController::ClientMidiSoundGeneratorController(
 void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
 {
     using MessageType = ClientMidiEvent::MessageType;
-
-    //std::cout << "[SoundGenerator] Handling event type " << e.getMessageType()
-    //          << " on channel " << e.getChannel() << std::endl;
 
     if (!sequencer->isRecordingModeMulti())
     {
