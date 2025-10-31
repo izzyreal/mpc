@@ -1,6 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "client/event/ClientEvent.hpp"
+#include "client/event/ClientHardwareEvent.hpp"
+#include "controller/ClientEventController.hpp"
 #include "sequencer/Clock.hpp"
 
 #include "command/TriggerDrumNoteOffCommand.hpp"
@@ -20,6 +23,8 @@ using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::command;
 using namespace mpc::command::context;
+using namespace mpc::client::event;
+using namespace mpc::hardware;
 
 TEST_CASE("Next step, previous step", "[sequencer]")
 {
@@ -158,15 +163,28 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                 if (find(begin(recordedTickPos), end(recordedTickPos),
                          hTickPos) == end(recordedTickPos))
                 {
-                    auto noteOnCtx = TriggerDrumContextFactory::
-                        buildTriggerDrumNoteOnContext(mpc::eventregistry::Source::VirtualMpcHardware, mpc.getLayeredScreen(), mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(), mpc.eventRegistry, mpc.getEventHandler(), mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(), 0, 127, mpc.getLayeredScreen()->getCurrentScreen());
-                    TriggerDrumNoteOnCommand(noteOnCtx).execute();
+                    ClientEvent clientEvent;
+                    clientEvent.payload = ClientHardwareEvent{
+                        ClientHardwareEvent::Source::HostInputGesture,
+                        ClientHardwareEvent::Type::PadPress,
+                        0,
+                        ComponentId::PAD_1_OR_AB,
+                        127.f,
+                        std::nullopt,
+                        std::nullopt};
+                    mpc.clientEventController->handleClientEvent(clientEvent);
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
-                    auto noteOffCtx = TriggerDrumContextFactory::
-                        buildTriggerDrumNoteOffContext(mpc::eventregistry::Source::VirtualMpcHardware, &mpc.getBasicPlayer(), mpc.eventRegistry, mpc.getEventHandler(), mpc.screens, mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController, mpc.getAudioMidiServices()->getFrameSequencer(), 0, 0, mpc.getLayeredScreen()->getCurrentScreen(), 60, mpc.getSampler()->getProgram(0), mpc.getSequencer()->getActiveTrack().get());
-                    TriggerDrumNoteOffCommand(noteOffCtx).execute();
+                    clientEvent.payload = ClientHardwareEvent{
+                        ClientHardwareEvent::Source::HostInputGesture,
+                        ClientHardwareEvent::Type::PadRelease,
+                        0,
+                        ComponentId::PAD_1_OR_AB,
+                        127.f,
+                        std::nullopt,
+                        std::nullopt};
+                    mpc.clientEventController->handleClientEvent(clientEvent);
                 }
             }
         }
@@ -257,17 +275,30 @@ TEST_CASE("Undo", "[sequencer]")
 
     for (int i = 0; i < 20; i++)
     {
+        ClientEvent clientEvent;
         if (i % 2 == 0)
         {
-                    auto noteOnCtx = TriggerDrumContextFactory::
-                        buildTriggerDrumNoteOnContext(mpc::eventregistry::Source::VirtualMpcHardware, mpc.getLayeredScreen(), mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(), mpc.eventRegistry, mpc.getEventHandler(), mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(), 0, 127, mpc.getLayeredScreen()->getCurrentScreen());
-            TriggerDrumNoteOnCommand(noteOnCtx).execute();
+            clientEvent.payload = ClientHardwareEvent{
+                ClientHardwareEvent::Source::HostInputGesture,
+                ClientHardwareEvent::Type::PadPress,
+                0,
+                ComponentId::PAD_1_OR_AB,
+                127.f,
+                std::nullopt,
+                std::nullopt};
+            mpc.clientEventController->handleClientEvent(clientEvent);
         }
         else
         {
-            auto noteOffCtx = TriggerDrumContextFactory::
-                        buildTriggerDrumNoteOffContext(mpc::eventregistry::Source::VirtualMpcHardware, &mpc.getBasicPlayer(), mpc.eventRegistry, mpc.getEventHandler(), mpc.screens, mpc.getSequencer(), mpc.getHardware(), mpc.clientEventController, mpc.getAudioMidiServices()->getFrameSequencer(), 0, 0, mpc.getLayeredScreen()->getCurrentScreen(), 60, mpc.getSampler()->getProgram(0), mpc.getSequencer()->getActiveTrack().get());
-            TriggerDrumNoteOffCommand(noteOffCtx).execute();
+            clientEvent.payload = ClientHardwareEvent{
+                ClientHardwareEvent::Source::HostInputGesture,
+                ClientHardwareEvent::Type::PadRelease,
+                0,
+                ComponentId::PAD_1_OR_AB,
+                127.f,
+                std::nullopt,
+                std::nullopt};
+            mpc.clientEventController->handleClientEvent(clientEvent);
         }
 
         mpc.getClock()->processBufferInternal(sequencer->getTempo(),
