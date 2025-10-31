@@ -273,7 +273,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
     switch (msg.type)
     {
         case EventMessage::Type::PhysicalPadPress:
-            //printf("Applying PhysicalPadPress\n");
+            printf("Applying PhysicalPadPress\n");
             assert(msg.physicalPadPress);
             physicalPadEvents.push_back(msg.physicalPadPress);
             publishSnapshot();
@@ -297,7 +297,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
 
         case EventMessage::Type::PhysicalPadRelease:
         {
-            //printf("Appying PhysicalPadRelease\n");
+            printf("Applying PhysicalPadRelease\n");
             assert(msg.physicalPadRelease);
 
             auto padPress = std::find_if(
@@ -320,7 +320,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
         }
         case EventMessage::Type::ProgramPadPress:
             assert(msg.programPadPress);
-            //printf("Appying ProgramPadPress\n");
+            //printf("Applying ProgramPadPress\n");
             programPadEvents.push_back(msg.programPadPress);
             publishSnapshot();
             msg.action(msg.programPadPress.get());
@@ -328,7 +328,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
 
         case EventMessage::Type::ProgramPadAftertouch:
         {
-            //printf("Appying ProgramPadAftertouch\n");
+            //printf("Applying ProgramPadAftertouch\n");
             for (auto &p : programPadEvents)
             {
                 if (p->padIndex == msg.programPadAftertouch->padIndex &&
@@ -343,7 +343,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
         }
         case EventMessage::Type::ProgramPadRelease:
         {
-            //printf("Appying ProgramPadRelease\n");
+            //printf("Applying ProgramPadRelease\n");
             assert(msg.programPadRelease);
             auto padPress = std::find_if(
                 programPadEvents.begin(), programPadEvents.end(),
@@ -374,7 +374,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
             break;
 
         case EventMessage::Type::NoteAftertouch:
-            //printf("Appying NoteAftertouch\n");
+            //printf("Applying NoteAftertouch\n");
             for (auto &n : noteEvents)
             {
                 if (n->noteNumber == msg.noteAftertouchEvent->noteNumber &&
@@ -392,7 +392,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
         case EventMessage::Type::NoteOff:
         {
             assert(msg.noteOffEvent);
-            //printf("Appying NoteOff\n");
+            //printf("Applying NoteOff\n");
             auto noteOn = std::find_if(noteEvents.begin(), noteEvents.end(),
                                        [&](const auto &n)
                                        {
@@ -413,7 +413,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
             break;
         }
         case EventMessage::Type::Clear:
-            //printf("Appying Clear\n");
+            //printf("Applying Clear\n");
             physicalPadEvents.clear();
             programPadEvents.clear();
             noteEvents.clear();
