@@ -170,10 +170,10 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
         if (track->getDeviceIndex() > 0)
         {
-            const auto noteOnMsg = noteEvent->createShortMessage(
-                (track->getDeviceIndex() - 1) % 16);
-            noteOnMsg->bufferPos = eventFrameOffset;
-            mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
+            //const auto noteOnMsg = noteEvent->createShortMessage(
+                //(track->getDeviceIndex() - 1) % 16);
+            //noteOnMsg->bufferPos = eventFrameOffset;
+            //mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
         }
 
         if (sequencer->isRecordingOrOverdubbing())
@@ -200,10 +200,10 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
 
                     if (track->getDeviceIndex() > 0)
                     {
-                        const auto noteOffMsg =
-                            noteEvent->getNoteOff()->createShortMessage(
-                                (track->getDeviceIndex() - 1) % 16);
-                        mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
+                        //const auto noteOffMsg =
+                            //noteEvent->getNoteOff()->createShortMessage(
+                                //(track->getDeviceIndex() - 1) % 16);
+                        //mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
                     }
                 },
                 durationFrames - 1);

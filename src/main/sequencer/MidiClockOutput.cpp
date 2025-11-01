@@ -8,25 +8,23 @@
 
 #include "sequencer/SeqUtil.hpp"
 
-#include "engine/midi/ShortMessage.hpp"
-
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-using namespace mpc::engine::midi;
 
 MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
     : mpc(mpc), sequencer(mpc.getSequencer()),
-      syncScreen(mpc.screens->get<SyncScreen>()),
-      midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
-      msg(std::make_shared<ShortMessage>())
+      syncScreen(mpc.screens->get<SyncScreen>())
+      //midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
+      //msg(std::make_shared<ShortMessage>())
 {
     tempEventQueue.reserve(100);
-    msg->setMessage(ShortMessage::TIMING_CLOCK);
+    //msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
 
 void MidiClockOutput::sendMidiClockMsg(int frameIndex)
 {
+    /*
     auto clockMsg = std::make_shared<mpc::engine::midi::ShortMessage>();
     clockMsg->setMessage(ShortMessage::TIMING_CLOCK);
 
@@ -44,15 +42,17 @@ void MidiClockOutput::sendMidiClockMsg(int frameIndex)
             mpc.getMidiOutput()->enqueueMessageOutputB(clockMsg);
         }
     }
+    */
 }
 
 void MidiClockOutput::sendMidiSyncMsg(unsigned char status)
 {
-    midiSyncStartStopContinueMsg->setMessage(status);
+    //midiSyncStartStopContinueMsg->setMessage(status);
 
     // bufferpos should be set by FrameSeq when it's actually emitting these
     // events, i.e. enqueueing them for host processing
     // midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
+    /*
 
     if (syncScreen->getModeOut() > 0)
     {
@@ -70,6 +70,7 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status)
                 midiSyncStartStopContinueMsg);
         }
     }
+    */
 }
 
 void MidiClockOutput::processTempoChange()
@@ -93,6 +94,7 @@ void MidiClockOutput::enqueueEventAfterNFrames(
 
 void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
 {
+    /*
     const auto durationToNextClockInFrames =
         static_cast<unsigned int>(SeqUtil::ticksToFrames(
             4, clock.getBpm(), static_cast<float>(clock.getSampleRate())));
@@ -111,6 +113,7 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
                                 : ShortMessage::CONTINUE);
         },
         numberOfFramesBeforeMidiSyncStart);
+        */
 }
 
 void MidiClockOutput::setSampleRate(unsigned int sampleRate)
@@ -186,7 +189,7 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
 
         if (wasRunning && !isRunningAtStartOfBuffer)
         {
-            sendMidiSyncMsg(ShortMessage::STOP);
+            //sendMidiSyncMsg(ShortMessage::STOP);
             wasRunning = false;
         }
     }

@@ -1,6 +1,6 @@
 #pragma once
-#include <sequencer/Event.hpp>
-#include <engine/midi/ShortMessage.hpp>
+#include "sequencer/Event.hpp"
+
 #include <optional>
 #include <memory>
 #include <cassert>
@@ -29,8 +29,6 @@ namespace mpc::sequencer
         {
             return "note-off";
         }
-        std::shared_ptr<mpc::engine::midi::ShortMessage>
-        createShortMessage(int channel, int transpose = 0);
     };
 
     class NoteOnEvent : public Event
@@ -75,26 +73,18 @@ namespace mpc::sequencer
         bool isPlayOnly();
 
         NoteOnEvent(int i = 60, int vel = 127);
-        NoteOnEvent(mpc::engine::midi::ShortMessage *msg);
         NoteOnEvent(const NoteOnEvent &);
 
         std::string getTypeName() const override
         {
             return "note-on";
         }
-        std::shared_ptr<mpc::engine::midi::ShortMessage>
-        createShortMessage(int channel, int transpose = 0);
     };
 
     class NoteOnEventPlayOnly : public NoteOnEvent
     {
     public:
         NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i, vel)
-        {
-            setTick(-1);
-        }
-        NoteOnEventPlayOnly(mpc::engine::midi::ShortMessage *msg)
-            : NoteOnEvent(msg)
         {
             setTick(-1);
         }

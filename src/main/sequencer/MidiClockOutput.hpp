@@ -11,11 +11,6 @@
 #include <functional>
 #include <atomic>
 
-namespace mpc::engine::midi
-{
-    class ShortMessage;
-}
-
 namespace mpc
 {
     class Mpc;
@@ -51,8 +46,8 @@ namespace mpc::sequencer
         mpc::Mpc &mpc;
         unsigned char midiClockTickCounter = 0;
         bool wasRunning = false;
-        std::shared_ptr<mpc::engine::midi::ShortMessage>
-            midiSyncStartStopContinueMsg;
+        //std::shared_ptr<mpc::engine::midi::ShortMessage>
+            //midiSyncStartStopContinueMsg;
 
         moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue =
             moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
@@ -62,7 +57,7 @@ namespace mpc::sequencer
         void enqueueEventAfterNFrames(const std::function<void()> &event,
                                       unsigned long nFrames);
 
-        std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
+        //std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
 
     public:
         explicit MidiClockOutput(mpc::Mpc &mpc);

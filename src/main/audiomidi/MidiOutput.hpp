@@ -1,11 +1,11 @@
 #pragma once
 
-#include <engine/midi/ShortMessage.hpp>
+#include "client/event/ClientMidiEvent.hpp"
+
+#include <concurrentqueue.h>
 
 #include <vector>
 #include <memory>
-
-#include <concurrentqueue.h>
 
 namespace mpc::audiomidi
 {
@@ -14,24 +14,15 @@ namespace mpc::audiomidi
     {
 
     private:
-        moodycamel::ConcurrentQueue<
-            std::shared_ptr<mpc::engine::midi::ShortMessage>>
-            outputQueueA = moodycamel::ConcurrentQueue<
-                std::shared_ptr<mpc::engine::midi::ShortMessage>>(100);
-        moodycamel::ConcurrentQueue<
-            std::shared_ptr<mpc::engine::midi::ShortMessage>>
-            outputQueueB = moodycamel::ConcurrentQueue<
-                std::shared_ptr<mpc::engine::midi::ShortMessage>>(100);
+        using MidiEvent = client::event::ClientMidiEvent;
+        using MidiEventPtr = std::shared_ptr<MidiEvent>;
+        using MidiEventQueue = moodycamel::ConcurrentQueue<MidiEventPtr>;
+
+        MidiEventQueue queue = MidiEventQueue(100);
 
     public:
-        void enqueueMessageOutputA(
-            std::shared_ptr<mpc::engine::midi::ShortMessage>);
-        void enqueueMessageOutputB(
-            std::shared_ptr<mpc::engine::midi::ShortMessage>);
-        unsigned char dequeueOutputA(
-            std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>> &buf);
-        unsigned char dequeueOutputB(
-            std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>> &buf);
+        void enqueueEvent(MidiEventPtr);
+        int dequeue(std::vector<MidiEventPtr> &);
         void panic();
     };
 } // namespace mpc::audiomidi

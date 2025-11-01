@@ -1,9 +1,9 @@
 #include "sequencer/NoteEvent.hpp"
+
 #include <algorithm>
 #include <cassert>
 
 using namespace mpc::sequencer;
-using namespace mpc::engine::midi;
 
 bool mpc::sequencer::isDrumNote(int number)
 {
@@ -20,26 +20,11 @@ int NoteOffEvent::getNote() const
     return number;
 }
 
-std::shared_ptr<mpc::engine::midi::ShortMessage>
-NoteOffEvent::createShortMessage(int channel, int transpose)
-{
-    auto msg = std::make_shared<ShortMessage>();
-    msg->setMessage(ShortMessage::NOTE_OFF, channel,
-                    std::clamp(getNote() + transpose, 0, 127), 0);
-    return msg;
-}
-
 NoteOnEvent::NoteOnEvent(int i, int vel)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
     setNote(i);
     setVelocity(vel);
-}
-
-NoteOnEvent::NoteOnEvent(mpc::engine::midi::ShortMessage *msg)
-    : NoteOnEvent(msg->getData1(), msg->getData2())
-{
-    assert(msg->getCommand() == ShortMessage::NOTE_ON);
 }
 
 NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
@@ -50,15 +35,6 @@ NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
     setDuration(event.duration);
     setVariationType(event.variationType);
     setVariationValue(event.variationValue);
-}
-
-std::shared_ptr<mpc::engine::midi::ShortMessage>
-NoteOnEvent::createShortMessage(int channel, int transpose)
-{
-    auto msg = std::make_shared<ShortMessage>();
-    msg->setMessage(ShortMessage::NOTE_ON, channel,
-                    std::clamp(getNote() + transpose, 0, 127), getVelocity());
-    return msg;
 }
 
 std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff() const

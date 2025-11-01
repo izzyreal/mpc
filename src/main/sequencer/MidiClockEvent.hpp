@@ -1,9 +1,5 @@
 #pragma once
-#include <sequencer/Event.hpp>
-
-#include <memory>
-
-#include <engine/midi/ShortMessage.hpp>
+#include "sequencer/Event.hpp"
 
 namespace mpc::sequencer
 {
@@ -21,7 +17,6 @@ namespace mpc::sequencer
         virtual void setStatus(int i);
 
         MidiClockEvent(int statusToUse);
-        MidiClockEvent(std::shared_ptr<mpc::engine::midi::ShortMessage> msg);
         MidiClockEvent(const MidiClockEvent &);
 
         std::string getTypeName() const override
