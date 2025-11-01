@@ -85,7 +85,7 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
         handleNoteOffEvent(e);
     }
     else if (type == MessageType::CONTROLLER &&
-             e.getControllerNumber() == sliderControllerNumber)
+             e.getControllerNumber() == sliderControllerNumber && sliderControllerNumber >= 1)
     {
         // Verify on real 2KXL: what is the 0-based and 1-based range for this
         // property of the program?
