@@ -1,14 +1,12 @@
-#include <iostream>
 #include "sequencer/Track.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "audiomidi/EventHandler.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/NoteEvent.hpp"
-#include "sequencer/MidiClockEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
@@ -214,10 +212,6 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
     if (auto source = std::dynamic_pointer_cast<NoteOnEvent>(src))
     {
         clone = std::make_shared<NoteOnEvent>(*source);
-    }
-    else if (auto source = std::dynamic_pointer_cast<MidiClockEvent>(src))
-    {
-        clone = std::make_shared<MidiClockEvent>(*source);
     }
     else if (auto source = std::dynamic_pointer_cast<MixerEvent>(src))
     {
