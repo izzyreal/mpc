@@ -12,11 +12,32 @@ using namespace mpc::hardware;
 using namespace mpc::midi::input;
 
 ClientMidiFootswitchAssignmentController::ClientMidiFootswitchAssignmentController(
-    std::shared_ptr<ClientHardwareEventController> ch,
-    std::shared_ptr<lcdgui::screens::MidiSwScreen> ms,
-    std::shared_ptr<sequencer::Sequencer> seq)
+        std::shared_ptr<ClientHardwareEventController> ch,
+        std::shared_ptr<lcdgui::screens::MidiSwScreen> ms,
+        std::shared_ptr<sequencer::Sequencer> seq)
     : clientHardwareEventController(ch), midiSwScreen(ms), sequencer(seq)
 {
+    bindings.reserve(SWITCH_COUNT);
+    initializeDefaultBindings();
+}
+
+void ClientMidiFootswitchAssignmentController::initializeDefaultBindings()
+{
+    bindings.clear();
+
+    for (int i = 0; i < SWITCH_COUNT; i++)
+    {
+        HardwareBinding b{};
+        b.channel = -1; // OMNI
+        b.number  = -1;  // unassigned
+        b.interaction = Interaction::Press;
+        b.messageType = MidiBindingBase::MessageType::CC;
+
+        // Default target: unassigned pad (or could use PLAY as placeholder)
+        b.target.componentId = mpc::hardware::ComponentId::PLAY_START;
+
+        bindings.emplace_back(b);
+    }
 }
 
 void ClientMidiFootswitchAssignmentController::pressButton(ComponentId id)
@@ -76,7 +97,7 @@ void ClientMidiFootswitchAssignmentController::handleOdubPunch() {
 }
 
 void ClientMidiFootswitchAssignmentController::dispatchSequencerCommand(
-    MidiControlTarget::SequencerTarget::Command cmd)
+        MidiControlTarget::SequencerTarget::Command cmd)
 {
     using Cmd = MidiControlTarget::SequencerTarget::Command;
     switch (cmd) {
@@ -92,59 +113,6 @@ void ClientMidiFootswitchAssignmentController::dispatchSequencerCommand(
 
 void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent &e)
 {
-    if (bindings.empty())
-    {
-        using Cmd = MidiControlTarget::SequencerTarget::Command;
-        using MT  = MidiBindingBase::MessageType;
-
-        for (auto [switchCC, functionIndex] : midiSwScreen->getSwitches()) {
-            const std::string fn = midiSwScreen->getFunctionNames()[functionIndex];
-
-            auto trim = [](std::string s) {
-                s.erase(0, s.find_first_not_of(" \t"));
-                s.erase(s.find_last_not_of(" \t") + 1);
-                return s;
-            };
-            const std::string name = trim(fn);
-
-            // PAD X
-            if (name.rfind("PAD", 0) == 0) {
-                std::string rest = trim(name.substr(3));
-                const int padNum = std::stoi(rest);
-                const auto id = static_cast<ComponentId>(
-                    static_cast<int>(ComponentId::PAD_1_OR_AB) + padNum - 1);
-                bindings.push_back(HardwareBinding{{-1, switchCC, std::nullopt, Interaction::Press, MT::CC}, {id}});
-                continue;
-            }
-
-            // Regular component IDs
-            auto add = [&, switchCC = switchCC](ComponentId cid) {
-                bindings.push_back(HardwareBinding{{-1, switchCC, std::nullopt, Interaction::Press, MT::CC}, {cid}});
-            };
-
-            if (name == "PLAY STRT") add(ComponentId::PLAY_START);
-            else if (name == "PLAY") add(ComponentId::PLAY);
-            else if (name == "STOP") add(ComponentId::STOP);
-            else if (name == "TAP") add(ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
-            else if (name == "PAD BNK A") add(ComponentId::BANK_A);
-            else if (name == "PAD BNK B") add(ComponentId::BANK_B);
-            else if (name == "PAD BNK C") add(ComponentId::BANK_C);
-            else if (name == "PAD BNK D") add(ComponentId::BANK_D);
-            else if (name.rfind("F", 0) == 0 || name.find("   F") != std::string::npos) {
-                const int fNum = std::stoi(name.substr(name.find('F') + 1));
-                add(static_cast<ComponentId>(static_cast<int>(ComponentId::F1) + fNum - 1));
-            }
-            else if (name == "REC+PLAY")
-                bindings.push_back(SequencerBinding{{-1, switchCC, std::nullopt, Interaction::Press, MT::CC}, {Cmd::REC_PLUS_PLAY}});
-            else if (name == "ODUB+PLAY")
-                bindings.push_back(SequencerBinding{{-1, switchCC, std::nullopt, Interaction::Press, MT::CC}, {Cmd::ODUB_PLUS_PLAY}});
-            else if (name == "REC/PUNCH")
-                bindings.push_back(SequencerBinding{{-1, switchCC, std::nullopt, Interaction::Press, MT::CC}, {Cmd::REC_PUNCH}});
-            else if (name == "ODUB/PNCH")
-                bindings.push_back(SequencerBinding{{-1, switchCC, std::nullopt, Interaction::Press, MT::CC}, {Cmd::ODUB_PUNCH}});
-        }
-    }
-
     std::cout << "[MIDI] handleEvent called\n";
     e.printInfo();
 
@@ -159,45 +127,45 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
     bool pressed = value >= 64;
 
     std::cout /*<< "[MIDI] Channel=" << channel*/
-              << " CC=" << number
-              << " Value=" << value
-              << " Pressed=" << pressed << "\n";
+        << " CC=" << number
+        << " Value=" << value
+        << " Pressed=" << pressed << "\n";
 
     int checked = 0;
     int matched = 0;
 
-for (auto &binding : bindings) {
-    ++checked;
-    std::visit([&](auto &b) {
-        std::cout << "  [Binding " << checked << "] "
-                  << "ch=" << b.channel
-                  << " num=" << b.number
-                  << " interaction=" << static_cast<int>(b.interaction)
-                  << "\n";
+    for (auto &binding : bindings) {
+        ++checked;
+        std::visit([&](auto &b) {
+                std::cout << "  [Binding " << checked << "] "
+                << "ch=" << b.channel
+                << " num=" << b.number
+                << " interaction=" << static_cast<int>(b.interaction)
+                << "\n";
 
-        if (b.number != number)
-            return;
+                if (b.number != number)
+                return;
 
-        ++matched;
-        std::cout << "    → Match found. Pressed=" << pressed << "\n";
+                ++matched;
+                std::cout << "    → Match found. Pressed=" << pressed << "\n";
 
-        if constexpr (std::is_same_v<std::decay_t<decltype(b)>, HardwareBinding>) {
-            if (b.interaction == Interaction::Press) {
+                if constexpr (std::is_same_v<std::decay_t<decltype(b)>, HardwareBinding>) {
+                if (b.interaction == Interaction::Press) {
                 if (pressed) {
-                    std::cout << "    → ButtonPress for " << static_cast<int>(b.target.componentId) << "\n";
-                    pressButton(b.target.componentId);
+                std::cout << "    → ButtonPress for " << static_cast<int>(b.target.componentId) << "\n";
+                pressButton(b.target.componentId);
                 } else {
-                    std::cout << "    → ButtonRelease for " << static_cast<int>(b.target.componentId) << "\n";
-                    releaseButton(b.target.componentId);
+                std::cout << "    → ButtonRelease for " << static_cast<int>(b.target.componentId) << "\n";
+                releaseButton(b.target.componentId);
                 }
-            }
-        } else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, SequencerBinding>) {
-            if (pressed && b.interaction == Interaction::Press) {
-                std::cout << "    → Dispatching SequencerBinding command\n";
-                dispatchSequencerCommand(b.target.command);
-            }
-        }
-    }, binding);
-}
+                }
+                } else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, SequencerBinding>) {
+                    if (pressed && b.interaction == Interaction::Press) {
+                        std::cout << "    → Dispatching SequencerBinding command\n";
+                        dispatchSequencerCommand(b.target.command);
+                    }
+                }
+        }, binding);
+    }
     std::cout << "[MIDI] Checked " << checked << " bindings, matched " << matched << "\n";
 }

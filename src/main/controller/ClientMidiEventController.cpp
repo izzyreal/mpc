@@ -89,3 +89,10 @@ ClientMidiEventController::getSoundGeneratorController()
 {
     return soundGeneratorController;
 }
+
+std::shared_ptr<ClientMidiFootswitchAssignmentController>
+ClientMidiEventController::getFootswitchAssignmentController()
+{
+    return footswitchController;
+}
+

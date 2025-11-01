@@ -102,6 +102,9 @@ namespace mpc::controller
         std::shared_ptr<ClientMidiSoundGeneratorController>
         getSoundGeneratorController();
 
+        std::shared_ptr<ClientMidiFootswitchAssignmentController>
+        getFootswitchAssignmentController();
+
         void handleClientMidiEvent(const mpc::client::event::ClientMidiEvent &);
     };
 } // namespace mpc::controller

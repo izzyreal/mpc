@@ -2,6 +2,9 @@
 
 #include <Mpc.hpp>
 
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientMidiEventController.hpp"
+#include "controller/MidiFootswitchFunctionMap.hpp"
 #include "lcdgui/screens/window/StepEditOptionsScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 #include "lcdgui/screens/OthersScreen.hpp"
@@ -76,12 +79,34 @@ Misc::Misc(mpc::Mpc &mpc)
 
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>();
 
-    for (int i = 0; i < 4; i++)
-    {
-        auto ctrl = midiSwScreen->getSwitch(i).first;
-        auto func = midiSwScreen->getSwitch(i).second;
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] = ctrl == -1 ? 0xFF : ctrl;
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)func;
+    auto &footswitchBindings = mpc.clientEventController->getClientMidiEventController()->getFootswitchAssignmentController()->bindings;
+
+    for (int i = 0; i < controller::ClientMidiFootswitchAssignmentController::SWITCH_COUNT; i++) {
+        int cc = -1;
+        int funcIndex = 0;
+
+        std::visit([&](auto &b) {
+            cc = b.number;
+            if constexpr (std::is_same_v<std::decay_t<decltype(b)>, midi::input::HardwareBinding>) {
+                // find corresponding function enum (reverse map)
+                for (auto &[fn, cid] : mpc::controller::footswitchToComponentId) {
+                    if (cid == b.target.componentId) {
+                        funcIndex = static_cast<int>(fn);
+                        break;
+                    }
+                }
+            } else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, midi::input::SequencerBinding>) {
+                for (auto &[fn, cmd] : mpc::controller::footswitchToSequencerCmd) {
+                    if (cmd == b.target.command) {
+                        funcIndex = static_cast<int>(fn);
+                        break;
+                    }
+                }
+            }
+        }, footswitchBindings[i]);
+
+        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)]     = cc == -1 ? (char)0xFF : (char)cc;
+        saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)funcIndex;
     }
 
     saveBytes[AUTO_STEP_INCREMENT_OFFSET] =
