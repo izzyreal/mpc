@@ -6,7 +6,6 @@
 
 namespace mpc::audiomidi
 {
-    class VmpcMidiControlMode;
     class MidiDeviceDetector;
     class AudioMidiServices;
 } // namespace mpc::audiomidi
@@ -62,7 +61,6 @@ namespace mpc::lcdgui::screens
         void displayUpAndDown();
 
         friend class mpc::nvram::MidiControlPersistence;
-        friend class mpc::audiomidi::VmpcMidiControlMode;
         friend class mpc::audiomidi::MidiDeviceDetector;
         friend class mpc::audiomidi::AudioMidiServices;
         friend class mpc::lcdgui::screens::window::
