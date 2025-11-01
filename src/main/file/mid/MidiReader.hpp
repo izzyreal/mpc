@@ -1,6 +1,6 @@
 #pragma once
 
-#include <midi/MidiFile.hpp>
+#include "file/mid/MidiFile.hpp"
 
 #include <memory>
 #include <string>
@@ -11,7 +11,7 @@ namespace mpc
     class Mpc;
 }
 
-namespace mpc::midi::event
+namespace mpc::file::mid::event
 {
     class ChannelEvent;
 }
@@ -39,12 +39,12 @@ namespace mpc::file::mid
     private:
         static bool isInteger(std::string);
 
-        std::unique_ptr<mpc::midi::MidiFile> midiFile;
+        std::unique_ptr<mpc::file::mid::MidiFile> midiFile;
         std::weak_ptr<mpc::sequencer::Sequence> dest;
 
         int getNumberOfNoteOns(
             int noteValue,
-            std::vector<std::shared_ptr<mpc::midi::event::ChannelEvent>>
+            std::vector<std::shared_ptr<mpc::file::mid::event::ChannelEvent>>
                 allNotes);
         int getNumberOfNotes(
             int noteValue,

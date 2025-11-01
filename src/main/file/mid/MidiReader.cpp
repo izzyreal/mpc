@@ -1,20 +1,21 @@
 #include "file/mid/MidiReader.hpp"
 
-#include "midi/MidiFile.hpp"
-#include "midi/MidiTrack.hpp"
-#include "midi/event/ChannelAftertouch.hpp"
-#include "midi/event/Controller.hpp"
-#include "midi/event/NoteAftertouch.hpp"
-#include "midi/event/NoteOff.hpp"
-#include "midi/event/NoteOn.hpp"
-#include "midi/event/PitchBend.hpp"
-#include "midi/event/ProgramChange.hpp"
-#include "midi/event/SystemExclusive.hpp"
-#include "midi/event/meta/Tempo.hpp"
-#include "midi/event/meta/Text.hpp"
-#include "midi/event/meta/TimeSignatureEvent.hpp"
-#include "midi/event/meta/TrackName.hpp"
-#include <Mpc.hpp>
+#include "Mpc.hpp"
+
+#include "file/mid/MidiFile.hpp"
+#include "file/mid/MidiTrack.hpp"
+#include "file/mid/event/ChannelAftertouch.hpp"
+#include "file/mid/event/Controller.hpp"
+#include "file/mid/event/NoteAftertouch.hpp"
+#include "file/mid/event/NoteOff.hpp"
+#include "file/mid/event/NoteOn.hpp"
+#include "file/mid/event/PitchBend.hpp"
+#include "file/mid/event/ProgramChange.hpp"
+#include "file/mid/event/SystemExclusive.hpp"
+#include "file/mid/event/meta/Tempo.hpp"
+#include "file/mid/event/meta/Text.hpp"
+#include "file/mid/event/meta/TimeSignatureEvent.hpp"
+#include "file/mid/event/meta/TrackName.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
@@ -29,14 +30,14 @@
 #include "sequencer/TempoChangeEvent.hpp"
 
 using namespace mpc::file::mid;
-using namespace mpc::midi::event;
+using namespace mpc::file::mid::event;
 using namespace mpc::sequencer;
 
 MidiReader::MidiReader(std::shared_ptr<std::istream> istream,
                        std::weak_ptr<Sequence> _dest)
     : dest(_dest)
 {
-    midiFile = std::make_unique<mpc::midi::MidiFile>(istream);
+    midiFile = std::make_unique<mpc::file::mid::MidiFile>(istream);
 }
 
 void MidiReader::parseSequence(mpc::Mpc &mpc)
@@ -364,7 +365,7 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
         for (auto &me : mt->getEvents())
         {
             if (const auto sysEx = std::dynamic_pointer_cast<
-                    mpc::midi::event::SystemExclusiveEvent>(me.lock());
+                    mpc::file::mid::event::SystemExclusiveEvent>(me.lock());
                 sysEx)
             {
                 auto sysExEventBytes = sysEx->getData();
