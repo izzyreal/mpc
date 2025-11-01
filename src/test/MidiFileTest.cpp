@@ -10,13 +10,11 @@
 #include "file/mid/MidiReader.hpp"
 #include "file/mid/MidiWriter.hpp"
 
-#include <string>
 #include <vector>
 
 using namespace mpc;
 using namespace mpc::sequencer;
 using namespace mpc::disk;
-using namespace mpc::midi;
 using namespace mpc::file::mid;
 
 SCENARIO("A MidiFile can be written", "[file]")
