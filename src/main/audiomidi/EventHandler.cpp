@@ -506,7 +506,7 @@ void EventHandler::handleNoteEventMidiOut(
             transposeCache[noteOnEvent->getNoteOff()] = transposeAmount;
         }
 
-        //msg = noteOnEvent->createShortMessage(midiChannel, transposeAmount);
+        // msg = noteOnEvent->createShortMessage(midiChannel, transposeAmount);
 
         const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(
             noteOnEvent->getVelocity() * (*trackVelocityRatio * 0.01f));
@@ -514,8 +514,8 @@ void EventHandler::handleNoteEventMidiOut(
         const auto velocityToUse =
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
-        //msg->setMessage(msg->getStatus(), msg->getChannel(), msg->getData1(),
-        //                velocityToUse);
+        // msg->setMessage(msg->getStatus(), msg->getChannel(), msg->getData1(),
+        //                 velocityToUse);
 
         const auto audioMidiServices = mpc.getAudioMidiServices();
         const auto frameSeq = audioMidiServices->getFrameSequencer();
@@ -544,7 +544,7 @@ void EventHandler::handleNoteEventMidiOut(
             transposeCache.erase(candidate);
         }
 
-        //msg = noteOffEvent->createShortMessage(midiChannel, transposeAmount);
+        // msg = noteOffEvent->createShortMessage(midiChannel, transposeAmount);
     }
 
     const auto directToDiskRecorderScreen =
@@ -554,10 +554,10 @@ void EventHandler::handleNoteEventMidiOut(
           directToDiskRecorderScreen->offline) &&
         trackDevice != 0)
     {
-        //msg->bufferPos = mpc.getAudioMidiServices()
-                             //->getFrameSequencer()
-                             //->getEventFrameOffset();
-        //mpc.getMidiOutput()->enqueueMessageOutputA(msg);
+        // msg->bufferPos = mpc.getAudioMidiServices()
+        //->getFrameSequencer()
+        //->getEventFrameOffset();
+        // mpc.getMidiOutput()->enqueueMessageOutputA(msg);
     }
 
     // For the MIDI output monitor screen

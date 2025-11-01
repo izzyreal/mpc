@@ -60,7 +60,8 @@ int SequencerSpecificEvent::compareTo(mpc::file::mid::event::MidiEvent *other)
         return 1;
     }
     auto o = dynamic_cast<SequencerSpecificEvent *>(other);
-    if (mpc::file::mid::util::MidiUtil::bytesEqual(mData, o->mData, 0, mData.size()))
+    if (mpc::file::mid::util::MidiUtil::bytesEqual(mData, o->mData, 0,
+                                                   mData.size()))
     {
         return 0;
     }

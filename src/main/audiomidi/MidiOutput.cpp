@@ -2,9 +2,7 @@
 
 using namespace mpc::audiomidi;
 
-void MidiOutput::panic()
-{
-}
+void MidiOutput::panic() {}
 
 void MidiOutput::enqueueEvent(MidiEventPtr e)
 {
@@ -15,4 +13,3 @@ int MidiOutput::dequeue(std::vector<MidiEventPtr> &buf)
 {
     return queue.try_dequeue_bulk(buf.begin(), buf.size());
 }
-

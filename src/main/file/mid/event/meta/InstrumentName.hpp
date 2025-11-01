@@ -6,10 +6,10 @@ namespace mpc::file::mid::event::meta
     class InstrumentName : public TextualMetaEvent
     {
 
-        public:
-            void setName(std::string name);
-            std::string getName();
+    public:
+        void setName(std::string name);
+        std::string getName();
 
-            InstrumentName(int tick, int delta, std::string name);
+        InstrumentName(int tick, int delta, std::string name);
     };
-}
+} // namespace mpc::file::mid::event::meta

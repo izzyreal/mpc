@@ -15,11 +15,11 @@ using namespace mpc::sequencer;
 MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
     : mpc(mpc), sequencer(mpc.getSequencer()),
       syncScreen(mpc.screens->get<SyncScreen>())
-      //midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
-      //msg(std::make_shared<ShortMessage>())
+// midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
+// msg(std::make_shared<ShortMessage>())
 {
     tempEventQueue.reserve(100);
-    //msg->setMessage(ShortMessage::TIMING_CLOCK);
+    // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
 
 void MidiClockOutput::sendMidiClockMsg(int frameIndex)
@@ -47,7 +47,7 @@ void MidiClockOutput::sendMidiClockMsg(int frameIndex)
 
 void MidiClockOutput::sendMidiSyncMsg(unsigned char status)
 {
-    //midiSyncStartStopContinueMsg->setMessage(status);
+    // midiSyncStartStopContinueMsg->setMessage(status);
 
     // bufferpos should be set by FrameSeq when it's actually emitting these
     // events, i.e. enqueueing them for host processing
@@ -189,7 +189,7 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
 
         if (wasRunning && !isRunningAtStartOfBuffer)
         {
-            //sendMidiSyncMsg(ShortMessage::STOP);
+            // sendMidiSyncMsg(ShortMessage::STOP);
             wasRunning = false;
         }
     }

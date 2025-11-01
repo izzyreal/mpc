@@ -3,14 +3,15 @@
 
 #include <string>
 
-namespace mpc::file::mid::event::meta {
+namespace mpc::file::mid::event::meta
+{
     class CopyrightNotice : public TextualMetaEvent
     {
 
-        public:
-            void setNotice(std::string t);
-            std::string getNotice();
+    public:
+        void setNotice(std::string t);
+        std::string getNotice();
 
-            CopyrightNotice(int tick, int delta, std::string text);
+        CopyrightNotice(int tick, int delta, std::string text);
     };
-}
+} // namespace mpc::file::mid::event::meta

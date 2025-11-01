@@ -74,7 +74,8 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
     }
 
     meta->insertEvent(std::make_shared<meta::SmpteOffset>(
-        0, 0, mpc::file::mid::event::meta::FrameRate::FRAME_RATE_25, 0, 0, 0, 0, 0));
+        0, 0, mpc::file::mid::event::meta::FrameRate::FRAME_RATE_25, 0, 0, 0, 0,
+        0));
     std::set<std::vector<int>> tSigs;
     auto tSigTick = 0;
     auto lastAdded = std::vector<int>(3);
@@ -149,8 +150,8 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
         {
             auto value = stoi(trackDevice, 0, 16);
             value += t->getDeviceIndex();
-            trackDevice =
-                mpc::file::mid::util::MidiUtil::byteToHex(static_cast<char>(value));
+            trackDevice = mpc::file::mid::util::MidiUtil::byteToHex(
+                static_cast<char>(value));
         }
 
         auto text = std::make_shared<meta::Text>(
@@ -347,7 +348,8 @@ void MidiWriter::addNoteOn(std::shared_ptr<NoteOn> noteOn)
     noteOns.push_back(noteOn);
 }
 
-void MidiWriter::createDeltas(std::weak_ptr<mpc::file::mid::MidiTrack> midiTrack)
+void MidiWriter::createDeltas(
+    std::weak_ptr<mpc::file::mid::MidiTrack> midiTrack)
 {
     auto mt = midiTrack.lock();
     std::shared_ptr<mpc::file::mid::event::MidiEvent> previousEvent;

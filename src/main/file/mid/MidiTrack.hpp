@@ -34,7 +34,8 @@ namespace mpc::file::mid
         void readTrackData(std::vector<char> &data);
 
     public:
-        std::vector<std::weak_ptr<mpc::file::mid::event::MidiEvent>> getEvents();
+        std::vector<std::weak_ptr<mpc::file::mid::event::MidiEvent>>
+        getEvents();
         int getEventCount();
         int getSize();
         int getLengthInTicks();
@@ -42,7 +43,8 @@ namespace mpc::file::mid
         void setEndOfTrackDelta(int delta);
         void insertNote(int channel, int pitch, int velocity, int tick,
                         int duration);
-        void insertEvent(std::weak_ptr<mpc::file::mid::event::MidiEvent> newEvent);
+        void
+        insertEvent(std::weak_ptr<mpc::file::mid::event::MidiEvent> newEvent);
         bool removeEvent(mpc::file::mid::event::MidiEvent *E);
         void closeTrack();
 

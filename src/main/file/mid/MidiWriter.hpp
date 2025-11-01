@@ -24,7 +24,8 @@ namespace mpc::file::mid
         std::vector<std::shared_ptr<mpc::file::mid::event::NoteOn>> noteOffs;
         std::vector<std::shared_ptr<mpc::file::mid::event::NoteOff>> variations;
         std::vector<std::shared_ptr<mpc::file::mid::event::NoteOn>> noteOns;
-        std::vector<std::shared_ptr<mpc::file::mid::event::MidiEvent>> miscEvents;
+        std::vector<std::shared_ptr<mpc::file::mid::event::MidiEvent>>
+            miscEvents;
         mpc::sequencer::Sequence *sequence;
         std::unique_ptr<mpc::file::mid::MidiFile> mf;
 
