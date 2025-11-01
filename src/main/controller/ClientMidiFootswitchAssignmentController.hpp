@@ -1,49 +1,45 @@
 #pragma once
 
 #include "client/event/ClientMidiEvent.hpp"
-
 #include "hardware/ComponentId.hpp"
+#include "midi/input/MidiControlTargetBinding.hpp"
 
 #include <memory>
+#include <vector>
 
-namespace mpc::lcdgui::screens
-{
-    class MidiSwScreen;
-}
+namespace mpc::lcdgui::screens { class MidiSwScreen; }
+namespace mpc::sequencer { class Sequencer; }
 
-namespace mpc::sequencer
-{
-    class Sequencer;
-}
+namespace mpc::controller {
 
-namespace mpc::controller
-{
-    class ClientHardwareEventController;
+class ClientHardwareEventController;
 
-    class ClientMidiFootswitchAssignmentController
-    {
-    public:
-        ClientMidiFootswitchAssignmentController(
-            std::shared_ptr<ClientHardwareEventController>,
-            std::shared_ptr<lcdgui::screens::MidiSwScreen>,
-            std::shared_ptr<sequencer::Sequencer>);
+class ClientMidiFootswitchAssignmentController {
+public:
+    ClientMidiFootswitchAssignmentController(
+        std::shared_ptr<ClientHardwareEventController>,
+        std::shared_ptr<lcdgui::screens::MidiSwScreen>,
+        std::shared_ptr<sequencer::Sequencer>);
 
-        void handleEvent(const mpc::client::event::ClientMidiEvent &);
+    void handleEvent(const mpc::client::event::ClientMidiEvent &);
 
-    private:
-        std::shared_ptr<ClientHardwareEventController>
-            clientHardwareEventController;
-        std::shared_ptr<lcdgui::screens::MidiSwScreen> midiSwScreen;
-        std::shared_ptr<sequencer::Sequencer> sequencer;
+private:
+    std::shared_ptr<ClientHardwareEventController> clientHardwareEventController;
+    std::shared_ptr<lcdgui::screens::MidiSwScreen> midiSwScreen;
+    std::shared_ptr<sequencer::Sequencer> sequencer;
 
-        void triggerDualButtonCombo(hardware::ComponentId first,
-                                    hardware::ComponentId second);
-        void handleRecPunch();
-        void handleOdubPunch();
+    std::vector<mpc::midi::input::MidiControlTargetBinding> bindings;
 
-        void pressButton(hardware::ComponentId componentId);
-        void releaseButton(hardware::ComponentId componentId);
-        void handleStopToPlay();
-        void handleRecordingToPlay();
-    };
+    void dispatchSequencerCommand(mpc::midi::input::MidiControlTarget::SequencerTarget::Command);
+
+    void triggerDualButtonCombo(mpc::hardware::ComponentId, mpc::hardware::ComponentId);
+    void handleRecPunch();
+    void handleOdubPunch();
+    void pressButton(mpc::hardware::ComponentId);
+    void releaseButton(mpc::hardware::ComponentId);
+    void handleStopToPlay();
+    void handleRecordingToPlay();
+};
+
 } // namespace mpc::controller
+
