@@ -22,7 +22,7 @@ namespace mpc::eventregistry
         bool isProgramPadPressedBySource(ProgramPadIndex idx, Source src) const;
         VelocityOrPressure
         getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
-        
+
         bool isProgramPadPressed(ProgramPadIndex idx) const;
 
         ProgramPadPressEventPtr getMostRecentProgramPadPress(

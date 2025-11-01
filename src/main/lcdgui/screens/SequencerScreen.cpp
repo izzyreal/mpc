@@ -230,14 +230,15 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
                             displayTrackProps();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
-                        },
-                        [&](auto)
-                        {
-                            displayTiming();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
+         },
+         [&](auto)
+         {
+             displayTiming();
+         }});
 
     addReactiveBinding({[&]
                         {

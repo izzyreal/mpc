@@ -164,9 +164,9 @@ void ClientHardwareEventController::handlePadPress(
     }
 
     auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
-        Source::VirtualMpcHardware, layeredScreen,
-        mpc.clientEventController, mpc.getHardware(), mpc.getSequencer(),
-        mpc.screens, mpc.getSampler(), mpc.eventRegistry, mpc.getEventHandler(),
+        Source::VirtualMpcHardware, layeredScreen, mpc.clientEventController,
+        mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(),
+        mpc.eventRegistry, mpc.getEventHandler(),
         mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(),
         programPadIndex, clampedVelocity, screen);
 
@@ -278,11 +278,10 @@ void ClientHardwareEventController::handlePadRelease(
 
             auto ctx =
                 TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
-                    Source::VirtualMpcHardware,
-                    previewSoundPlayer, eventRegistry, eventHandler, screens,
-                    sequencer, hardware, clientEventController, frameSequencer,
-                    programPadIndex, *drumIndex, p->screen, *p->note,
-                    p->program, p->track);
+                    Source::VirtualMpcHardware, previewSoundPlayer,
+                    eventRegistry, eventHandler, screens, sequencer, hardware,
+                    clientEventController, frameSequencer, programPadIndex,
+                    *drumIndex, p->screen, *p->note, p->program, p->track);
 
             TriggerDrumNoteOffCommand(ctx).execute();
         }
@@ -308,28 +307,29 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 
-    std::function<void(void*)> action = [eventRegistry = mpc.eventRegistry,
-                                         pressureToUse](void* userData)
+    std::function<void(void *)> action =
+        [eventRegistry = mpc.eventRegistry, pressureToUse](void *userData)
     {
-        auto padPress = (PhysicalPadPressEvent*)userData;
+        auto padPress = (PhysicalPadPressEvent *)userData;
 
         if (padPress->program)
         {
             eventRegistry->registerProgramPadAftertouch(
-                Source::VirtualMpcHardware, padPress->bus,
-                padPress->program, padPress->padIndex.get() + (padPress->bank * 16),
-                pressureToUse, padPress->track);
+                Source::VirtualMpcHardware, padPress->bus, padPress->program,
+                padPress->padIndex.get() + (padPress->bank * 16), pressureToUse,
+                padPress->track);
         }
 
         if (padPress->note)
         {
-            eventRegistry->registerNoteAftertouch(
-                Source::VirtualMpcHardware, *padPress->note,
-                pressureToUse, std::nullopt);
+            eventRegistry->registerNoteAftertouch(Source::VirtualMpcHardware,
+                                                  *padPress->note,
+                                                  pressureToUse, std::nullopt);
         }
     };
 
-    mpc.eventRegistry->registerPhysicalPadAftertouch(padIndex, pressureToUse, Source::VirtualMpcHardware, action);
+    mpc.eventRegistry->registerPhysicalPadAftertouch(
+        padIndex, pressureToUse, Source::VirtualMpcHardware, action);
 }
 
 void ClientHardwareEventController::handleDataWheel(

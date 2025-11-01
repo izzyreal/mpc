@@ -117,7 +117,8 @@ void ClientMidiSoundGeneratorController::handleEvent(const ClientMidiEvent &e)
                         note != -1)
                     {
                         eventRegistry->registerNoteAftertouch(
-                            eventregistry::Source::MidiInput, note, pressure, e.getChannel());
+                            eventregistry::Source::MidiInput, note, pressure,
+                            e.getChannel());
                     }
                 }
             }
@@ -370,7 +371,7 @@ void ClientMidiSoundGeneratorController::handleNoteOffEvent(
 
     if (!noteEventInfo)
     {
-        //printf("no noteEventInfo found!\n");
+        // printf("no noteEventInfo found!\n");
         return;
     }
 
