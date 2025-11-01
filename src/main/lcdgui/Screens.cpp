@@ -242,26 +242,32 @@ Screens::getScreenLayout(const std::string &screenName)
 using ScreenFactory =
     std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
 
-inline const std::map<std::string, ScreenFactory> screenFactories = {
+const std::map<std::string, ScreenFactory>& getScreenFactories() {
+    static const std::map<std::string, ScreenFactory> factories = {
 #define X(ns, Class, name)                                                     \
     {name, [](mpc::Mpc &mpc, int layer)                                        \
      {                                                                         \
          return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer);          \
      }},
-    SCREEN_LIST
+        SCREEN_LIST
 #undef X
-};
+    };
+    return factories;
+}
 
-static const std::map<std::string, int> screensWithoutLayoutJson{{"popup", 3}};
+const std::map<std::string, int>& getScreensWithoutLayoutJson() {
+    static const std::map<std::string, int> screens{{"popup", 3}};
+    return screens;
+}
 
 void Screens::createAndCacheScreen(const std::string &screenName)
 {
-    if (const auto screenFactory = screenFactories.find(screenName);
-        screenFactory != screenFactories.end())
+    if (const auto screenFactory = getScreenFactories().find(screenName);
+        screenFactory != getScreenFactories().end())
     {
         if (auto screenWithoutLayoutJson =
-                screensWithoutLayoutJson.find(screenName);
-            screenWithoutLayoutJson != screensWithoutLayoutJson.end())
+                getScreensWithoutLayoutJson().find(screenName);
+            screenWithoutLayoutJson != getScreensWithoutLayoutJson().end())
         {
             auto screen =
                 screenFactory->second(mpc, screenWithoutLayoutJson->second);
