@@ -22,10 +22,13 @@ namespace mpc::eventregistry
         bool isProgramPadPressedBySource(ProgramPadIndex idx, Source src) const;
         VelocityOrPressure
         getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
+        
         bool isProgramPadPressed(ProgramPadIndex idx) const;
-        bool isProgramPadPressed(
+
+        ProgramPadPressEventPtr getMostRecentProgramPadPress(
             ProgramPadIndex idx,
             const ::std::vector<Source> &sourcesToExclude) const;
+
         int getTotalPressedProgramPadCount() const;
 
         NoteOnEventPtr retrievePlayNoteEvent(NoteNumber note) const;

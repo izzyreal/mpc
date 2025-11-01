@@ -64,6 +64,7 @@ namespace mpc::eventregistry
         std::shared_ptr<mpc::sampler::Program> program;
         Velocity velocity;
         std::optional<Pressure> pressure;
+        std::chrono::steady_clock::time_point pressTime;
     };
 
     struct ProgramPadAftertouchEvent

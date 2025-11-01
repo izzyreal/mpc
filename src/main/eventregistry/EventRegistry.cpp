@@ -121,6 +121,7 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     e->program = program;
     e->velocity = velocity;
     e->midiChannel = midiChannel;
+    e->pressTime = std::chrono::steady_clock::now();
 
     EventMessage msg{EventMessage::Type::ProgramPadPress};
     msg.programPadPress = e;

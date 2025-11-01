@@ -64,32 +64,26 @@ bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx) const
     return false;
 }
 
-bool SnapshotView::isProgramPadPressed(
-    ProgramPadIndex idx, const ::std::vector<Source> &sourcesToExclude) const
+ProgramPadPressEventPtr SnapshotView::getMostRecentProgramPadPress(
+    ProgramPadIndex idx,
+    const std::vector<Source> &sourcesToExclude) const
 {
-    for (auto &e : snap->programPadEvents)
+    ProgramPadPressEventPtr latest = nullptr;
+
+    for (auto& e : snap->programPadEvents)
     {
-        if (e->padIndex == idx)
-        {
-            bool isSourceToExclude = false;
+        if (e->padIndex != idx) continue;
 
-            for (auto &s : sourcesToExclude)
-            {
-                if (e->source == s)
-                {
-                    isSourceToExclude = true;
-                    break;
-                }
-            }
+        bool excluded = false;
+        for (auto& s : sourcesToExclude)
+            if (e->source == s) { excluded = true; break; }
+        if (excluded) continue;
 
-            if (!isSourceToExclude)
-            {
-                return true;
-            }
-        }
+        if (!latest || e->pressTime > latest->pressTime)
+            latest = e;
     }
 
-    return false;
+    return latest;
 }
 
 NoteOnEventPtr SnapshotView::retrievePlayNoteEvent(NoteNumber note) const

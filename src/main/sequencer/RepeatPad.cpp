@@ -56,7 +56,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
     for (int padIndex = 0; padIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
          ++padIndex)
     {
-        if (!snapshot.isProgramPadPressed(padIndex, sourcesToExclude))
+        if (!snapshot.getMostRecentProgramPadPress(padIndex, sourcesToExclude))
         {
             continue;
         }
