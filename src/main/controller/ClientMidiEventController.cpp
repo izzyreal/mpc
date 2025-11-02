@@ -95,4 +95,3 @@ ClientMidiEventController::getFootswitchAssignmentController()
 {
     return footswitchController;
 }
-

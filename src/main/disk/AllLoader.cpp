@@ -190,28 +190,40 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     auto locateScreen = mpc.screens->get<LocateScreen>();
     locateScreen->setLocations(misc->getLocations());
 
-    auto footswitchController = mpc.clientEventController->getClientMidiEventController()->getFootswitchAssignmentController();
+    auto footswitchController =
+        mpc.clientEventController->getClientMidiEventController()
+            ->getFootswitchAssignmentController();
     using Cmd = midi::input::MidiControlTarget::SequencerTarget::Command;
-    using MT  = midi::input::MidiBindingBase::MessageType;
+    using MT = midi::input::MidiBindingBase::MessageType;
 
     int bindingCounter = 0;
-    for (auto [cc, functionIndex] : misc->getSwitches()) {
-        controller::MidiFootswitchFunction fn = static_cast<controller::MidiFootswitchFunction>(functionIndex);
+    for (auto [cc, functionIndex] : misc->getSwitches())
+    {
+        controller::MidiFootswitchFunction fn =
+            static_cast<controller::MidiFootswitchFunction>(functionIndex);
 
-        if (auto hw = controller::footswitchToComponentId.find(fn); hw != controller::footswitchToComponentId.end()) {
+        if (auto hw = controller::footswitchToComponentId.find(fn);
+            hw != controller::footswitchToComponentId.end())
+        {
             footswitchController->bindings[bindingCounter++] =
-                midi::input::HardwareBinding{
-                    {-1, cc, std::nullopt, midi::input::Interaction::Press, MT::CC},
-                    {hw->second}
-                };
-        } else if (auto sq = controller::footswitchToSequencerCmd.find(fn); sq != controller::footswitchToSequencerCmd.end()) {
+                midi::input::HardwareBinding{{-1, cc, std::nullopt,
+                                              midi::input::Interaction::Press,
+                                              MT::CC},
+                                             {hw->second}};
+        }
+        else if (auto sq = controller::footswitchToSequencerCmd.find(fn);
+                 sq != controller::footswitchToSequencerCmd.end())
+        {
             footswitchController->bindings[bindingCounter++] =
-                midi::input::SequencerBinding{
-                    {-1, cc, std::nullopt, midi::input::Interaction::Press, MT::CC},
-                    {sq->second}
-                };
-        } else {
-            std::cout << "[Footswitch] Unmapped function index: " << functionIndex << "\n";
+                midi::input::SequencerBinding{{-1, cc, std::nullopt,
+                                               midi::input::Interaction::Press,
+                                               MT::CC},
+                                              {sq->second}};
+        }
+        else
+        {
+            std::cout << "[Footswitch] Unmapped function index: "
+                      << functionIndex << "\n";
         }
     }
 

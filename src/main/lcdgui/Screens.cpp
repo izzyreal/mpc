@@ -242,7 +242,8 @@ Screens::getScreenLayout(const std::string &screenName)
 using ScreenFactory =
     std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
 
-const std::map<std::string, ScreenFactory>& getScreenFactories() {
+const std::map<std::string, ScreenFactory> &getScreenFactories()
+{
     static const std::map<std::string, ScreenFactory> factories = {
 #define X(ns, Class, name)                                                     \
     {name, [](mpc::Mpc &mpc, int layer)                                        \
@@ -255,7 +256,8 @@ const std::map<std::string, ScreenFactory>& getScreenFactories() {
     return factories;
 }
 
-const std::map<std::string, int>& getScreensWithoutLayoutJson() {
+const std::map<std::string, int> &getScreensWithoutLayoutJson()
+{
     static const std::map<std::string, int> screens{{"popup", 3}};
     return screens;
 }
