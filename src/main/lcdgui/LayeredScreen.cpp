@@ -165,18 +165,16 @@ std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen()
     return history.back();
 }
 
-namespace {
-    using OpenScreenFunc = std::function<void(LayeredScreen &)>;
+using OpenScreenFunc = std::function<void(LayeredScreen &)>;
 
-    #define X(ns, Class, name) \
-        {name, [](LayeredScreen &ls) { ls.openScreen<mpc::lcdgui::ns::Class>(); }},
-    
-    const std::map<std::string, OpenScreenFunc> openScreenRegistry = {
-        SCREEN_LIST
-    };
-    
-    #undef X
-}
+#define X(ns, Class, name)                                                     \
+    {name, [](LayeredScreen &ls)                                               \
+     {                                                                         \
+         ls.openScreen<mpc::lcdgui::ns::Class>();                              \
+     }},
+static const std::map<std::string, OpenScreenFunc> openScreenRegistry = {
+    SCREEN_LIST};
+#undef X
 
 template <typename T> bool LayeredScreen::isCurrentScreenPopupFor() const
 {
