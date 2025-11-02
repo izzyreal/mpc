@@ -3,6 +3,7 @@
 #include "Observer.hpp"
 
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 namespace mpc
