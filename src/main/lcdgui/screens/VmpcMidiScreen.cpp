@@ -69,6 +69,7 @@ void VmpcMidiScreen::turnWheel(int i)
 
 void VmpcMidiScreen::open()
 {
+    /*
     auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
 
     screen->discardAndLeave = [this]()
@@ -106,6 +107,7 @@ void VmpcMidiScreen::open()
     setLearning(false);
     learnCandidate.reset();
     updateRows();
+    */
 }
 
 void VmpcMidiScreen::up()

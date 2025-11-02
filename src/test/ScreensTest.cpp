@@ -16,7 +16,7 @@ inline const std::vector<std::string> knownProblematicScreens{
     "tempo-change", // Crashes when opened in test, works fine in app
 };
 
-SCENARIO("All screens can be opened", "[gui]")
+SCENARIO("All screens can be opened", "[screens]")
 {
 
     GIVEN("An initialized Mpc with an initialized Sequence")
