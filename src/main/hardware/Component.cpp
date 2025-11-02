@@ -243,3 +243,5 @@ std::pair<T1, T1> Continuous<T, MIN, MAX>::getRangeAs() const
 
 template class mpc::hardware::Continuous<float, 0, 127>;
 template class mpc::hardware::Continuous<float, 0, 1>;
+template std::pair<float, float> mpc::hardware::Continuous<float, 0, 127>::getRangeAs<float>() const;
+template std::pair<float, float> mpc::hardware::Continuous<float, 0, 1>::getRangeAs<float>() const;
