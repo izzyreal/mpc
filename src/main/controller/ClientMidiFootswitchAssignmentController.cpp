@@ -132,8 +132,16 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
             {
                 if (b.interaction == Interaction::Press)
                 {
-                    if (pressed) pressButton(b.target.componentId);
-                    else releaseButton(b.target.componentId);
+                    if (pressed)
+                    {
+                        printf("Pressing\n");
+                        pressButton(b.target.componentId);
+                    }
+                    else
+                    {
+                        printf("Releasing\n");
+                        releaseButton(b.target.componentId);
+                    }
                 }
 
                 // Optional debug: get footswitch function
