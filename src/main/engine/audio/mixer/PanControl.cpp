@@ -2,6 +2,8 @@
 #include "engine/audio/mixer/MixControls.hpp"
 #include "engine/control/LinearLaw.hpp"
 
+#include "mpc_types.hpp"
+
 using namespace mpc::engine::audio::mixer;
 
 PanControl::PanControl()
@@ -23,7 +25,7 @@ float PanControl::getRight()
 
 void PanControl::setValue(float value)
 {
-    left = static_cast<float>(cos(M_PI * 0.5 * value));
-    right = static_cast<float>(sin(M_PI * 0.5 * value));
+    left = static_cast<float>(cos(mpc::math::pi * 0.5 * value));
+    right = static_cast<float>(sin(mpc::math::pi * 0.5 * value));
     LCRControl::setValue(value);
 }

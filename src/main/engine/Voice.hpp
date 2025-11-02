@@ -1,11 +1,12 @@
 #pragma once
 
-#include <atomic>
-
 #include "engine/audio/core/AudioProcess.hpp"
 #include "MuteInfo.hpp"
 #include "VoiceUtil.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
+
+#include <atomic>
+#include <memory>
 
 namespace mpc::sampler
 {

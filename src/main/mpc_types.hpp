@@ -7,6 +7,11 @@
 #include <string>
 #include <cstdint>
 
+namespace mpc::math
+{
+    constexpr double pi = 3.14159265358979323846;
+}
+
 namespace mpc::nvram
 {
     struct MidiControlPreset;

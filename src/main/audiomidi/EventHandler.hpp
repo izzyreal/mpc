@@ -5,6 +5,8 @@
 #include <memory>
 #include <optional>
 #include <unordered_map>
+#include <atomic>
+#include <cstdint>
 
 namespace mpc
 {

@@ -1,5 +1,8 @@
 #include "hardware/Component.hpp"
+
 #include <cassert>
+#include <algorithm>
+#include <stdexcept>
 
 using namespace mpc::hardware;
 

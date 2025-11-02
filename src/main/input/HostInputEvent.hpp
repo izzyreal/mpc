@@ -1,10 +1,11 @@
 #pragma once
 
-#include <variant>
-
 #include "client/event/ClientMidiEvent.hpp"
 
 #include "hardware/ComponentId.hpp"
+
+#include <variant>
+#include <stdexcept>
 
 namespace mpc::input
 {

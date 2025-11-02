@@ -13,7 +13,7 @@
 #include "Logger.hpp"
 
 #ifdef _WIN32
-#include <Windows.hpp>
+#include <Windows.h>
 #endif
 
 using namespace mpc::audiomidi;
