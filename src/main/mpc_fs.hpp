@@ -9,7 +9,7 @@
     defined(__has_include)
 #if __has_include(<filesystem>) && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500)
 #ifdef __APPLE__
-#include <TargetConditionals.hpp>
+#include <TargetConditionals.h>
 #endif
 #if !defined(__linux__) && !TARGET_OS_IOS
 #define GHC_USE_STD_FS
