@@ -185,6 +185,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                         std::nullopt,
                         std::nullopt};
                     mpc.clientEventController->handleClientEvent(clientEvent);
+                    recordedTickPos.push_back(hTickPos);
                 }
             }
         }
