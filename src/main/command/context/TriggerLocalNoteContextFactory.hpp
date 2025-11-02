@@ -1,7 +1,7 @@
 #pragma once
 
-#include "command/context/TriggerDrumNoteOnContext.hpp"
-#include "command/context/TriggerDrumNoteOffContext.hpp"
+#include "command/context/TriggerLocalNoteOnContext.hpp"
+#include "command/context/TriggerLocalNoteOffContext.hpp"
 
 #include <memory>
 
@@ -51,10 +51,10 @@ namespace mpc::lcdgui
 
 namespace mpc::command::context
 {
-    class TriggerDrumContextFactory
+    class TriggerLocalNoteContextFactory
     {
     public:
-        static std::shared_ptr<TriggerDrumNoteOnContext>
+        static std::shared_ptr<TriggerLocalNoteOnContext>
         buildTriggerDrumNoteOnContext(
             eventregistry::Source, std::shared_ptr<lcdgui::LayeredScreen>,
             std::shared_ptr<controller::ClientEventController>,
@@ -67,7 +67,7 @@ namespace mpc::command::context
             const int programPadIndex, const int velocity,
             const std::shared_ptr<mpc::lcdgui::ScreenComponent>);
 
-        static std::shared_ptr<TriggerDrumNoteOffContext>
+        static std::shared_ptr<TriggerLocalNoteOffContext>
         buildTriggerDrumNoteOffContext(
             eventregistry::Source, engine::PreviewSoundPlayer *,
             std::shared_ptr<eventregistry::EventRegistry>,

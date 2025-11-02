@@ -6,8 +6,8 @@
 #include "controller/ClientEventController.hpp"
 #include "sequencer/Clock.hpp"
 
-#include "command/TriggerDrumNoteOffCommand.hpp"
-#include "command/context/TriggerDrumContextFactory.hpp"
+#include "command/TriggerLocalNoteOffCommand.hpp"
+#include "command/context/TriggerLocalNoteContextFactory.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 

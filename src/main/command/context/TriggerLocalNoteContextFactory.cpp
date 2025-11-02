@@ -1,4 +1,4 @@
-#include "command/context/TriggerDrumContextFactory.hpp"
+#include "command/context/TriggerLocalNoteContextFactory.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -40,8 +40,8 @@ int getDrumIndexForCurrentScreen(std::shared_ptr<Sequencer> sequencer,
     return result;
 }
 
-std::shared_ptr<TriggerDrumNoteOnContext>
-TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+std::shared_ptr<TriggerLocalNoteOnContext>
+TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
     eventregistry::Source source, std::shared_ptr<LayeredScreen> layeredScreen,
     std::shared_ptr<ClientEventController> controller,
     std::shared_ptr<Hardware> hardware, std::shared_ptr<Sequencer> sequencer,
@@ -104,8 +104,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
-    return std::make_shared<TriggerDrumNoteOnContext>(
-        TriggerDrumNoteOnContext{source,
+    return std::make_shared<TriggerLocalNoteOnContext>(
+        TriggerLocalNoteOnContext{source,
                                  eventRegistry,
                                  isSequencerScreen,
                                  programPadIndex,
@@ -139,8 +139,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
                                  hardwareSliderValue});
 }
 
-std::shared_ptr<TriggerDrumNoteOffContext>
-TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+std::shared_ptr<TriggerLocalNoteOffContext>
+TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
     eventregistry::Source source, PreviewSoundPlayer *previewSoundPlayer,
     std::shared_ptr<EventRegistry> eventRegistry,
     std::shared_ptr<EventHandler> eventHandler,
@@ -197,8 +197,8 @@ TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
     std::shared_ptr<sequencer::DrumBus> drumBus =
         sequencer->getDrumBus(drumIndex);
 
-    return std::make_shared<TriggerDrumNoteOffContext>(
-        TriggerDrumNoteOffContext{
+    return std::make_shared<TriggerLocalNoteOffContext>(
+        TriggerLocalNoteOffContext{
             source,
             eventRegistry,
             drumBus,

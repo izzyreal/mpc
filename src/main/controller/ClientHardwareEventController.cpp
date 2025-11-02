@@ -1,14 +1,14 @@
 #include "controller/ClientHardwareEventController.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
-#include "command/TriggerDrumNoteOffCommand.hpp"
+#include "command/TriggerLocalNoteOffCommand.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "controller/ClientEventController.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Component.hpp"
 #include "client/event/ClientHardwareEvent.hpp"
-#include "command/context/TriggerDrumContextFactory.hpp"
+#include "command/context/TriggerLocalNoteContextFactory.hpp"
 #include "Mpc.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "hardware/Hardware.hpp"
@@ -163,7 +163,7 @@ void ClientHardwareEventController::handlePadPress(
         }
     }
 
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+    auto ctx = TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
         Source::VirtualMpcHardware, layeredScreen, mpc.clientEventController,
         mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(),
         mpc.eventRegistry, mpc.getEventHandler(),
@@ -212,7 +212,7 @@ void ClientHardwareEventController::handlePadPress(
     {
         action = [ctx](void *)
         {
-            TriggerDrumNoteOnCommand(ctx).execute();
+            TriggerLocalNoteOnCommand(ctx).execute();
         };
     }
 
@@ -277,13 +277,13 @@ void ClientHardwareEventController::handlePadRelease(
             assert(drumIndex);
 
             auto ctx =
-                TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+                TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
                     Source::VirtualMpcHardware, previewSoundPlayer,
                     eventRegistry, eventHandler, screens, sequencer, hardware,
                     clientEventController, frameSequencer, programPadIndex,
                     *drumIndex, p->screen, *p->note, p->program, p->track);
 
-            TriggerDrumNoteOffCommand(ctx).execute();
+            TriggerLocalNoteOffCommand(ctx).execute();
         }
     };
 

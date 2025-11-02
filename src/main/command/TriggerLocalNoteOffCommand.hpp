@@ -6,19 +6,19 @@
 
 namespace mpc::command::context
 {
-    class TriggerDrumNoteOffContext;
+    class TriggerLocalNoteOffContext;
 }
 
 namespace mpc::command
 {
-    class TriggerDrumNoteOffCommand : public Command
+    class TriggerLocalNoteOffCommand : public Command
     {
     private:
-        std::shared_ptr<context::TriggerDrumNoteOffContext> ctx;
+        std::shared_ptr<context::TriggerLocalNoteOffContext> ctx;
 
     public:
-        explicit TriggerDrumNoteOffCommand(
-            std::shared_ptr<context::TriggerDrumNoteOffContext>);
+        explicit TriggerLocalNoteOffCommand(
+            std::shared_ptr<context::TriggerLocalNoteOffContext>);
 
         // Should be invoked from the audio thread only
         void execute() override;

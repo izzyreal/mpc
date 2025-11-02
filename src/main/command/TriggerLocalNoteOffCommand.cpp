@@ -1,7 +1,7 @@
-#include "TriggerDrumNoteOffCommand.hpp"
+#include "TriggerLocalNoteOffCommand.hpp"
 
 #include "audiomidi/EventHandler.hpp"
-#include "command/context/TriggerDrumNoteOffContext.hpp"
+#include "command/context/TriggerLocalNoteOffContext.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "eventregistry/EventTypes.hpp"
 #include "sequencer/NoteEvent.hpp"
@@ -12,13 +12,13 @@
 using namespace mpc::command;
 using namespace mpc::command::context;
 
-TriggerDrumNoteOffCommand::TriggerDrumNoteOffCommand(
-    std::shared_ptr<TriggerDrumNoteOffContext> ctx)
+TriggerLocalNoteOffCommand::TriggerLocalNoteOffCommand(
+    std::shared_ptr<TriggerLocalNoteOffContext> ctx)
     : ctx(ctx)
 {
 }
 
-void TriggerDrumNoteOffCommand::execute()
+void TriggerLocalNoteOffCommand::execute()
 {
     ctx->finishBasicVoiceIfSoundIsLooping();
 

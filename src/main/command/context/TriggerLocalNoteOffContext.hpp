@@ -30,7 +30,7 @@ namespace mpc::audiomidi
 
 namespace mpc::command::context
 {
-    struct TriggerDrumNoteOffContext
+    struct TriggerLocalNoteOffContext
     {
         eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;

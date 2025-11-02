@@ -48,7 +48,7 @@ namespace mpc::engine
 
 namespace mpc::command::context
 {
-    struct TriggerDrumNoteOnContext
+    struct TriggerLocalNoteOnContext
     {
         eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;

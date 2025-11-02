@@ -1,7 +1,7 @@
-#include "TriggerDrumNoteOnCommand.hpp"
+#include "TriggerLocalNoteOnCommand.hpp"
 
 #include "audiomidi/EventHandler.hpp"
-#include "command/context/TriggerDrumNoteOnContext.hpp"
+#include "command/context/TriggerLocalNoteOnContext.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -14,13 +14,13 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 using namespace mpc::sampler;
 
-TriggerDrumNoteOnCommand::TriggerDrumNoteOnCommand(
-    std::shared_ptr<TriggerDrumNoteOnContext> ctx)
+TriggerLocalNoteOnCommand::TriggerLocalNoteOnCommand(
+    std::shared_ptr<TriggerLocalNoteOnContext> ctx)
     : ctx(ctx)
 {
 }
 
-void TriggerDrumNoteOnCommand::execute()
+void TriggerLocalNoteOnCommand::execute()
 {
     if (ctx->isSoundScreen)
     {

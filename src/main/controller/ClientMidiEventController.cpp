@@ -1,7 +1,7 @@
 #include "controller/ClientMidiEventController.hpp"
 #include "controller/ClientEventController.hpp"
 
-#include "command/context/TriggerDrumContextFactory.hpp"
+#include "command/context/TriggerLocalNoteContextFactory.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
@@ -193,13 +193,13 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         return;
     }
 
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOnContext(
+    auto ctx = TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
         eventregistry::Source::MidiInput, layeredScreen, clientEventController,
         hardware, sequencer, screens, sampler, eventRegistry, eventHandler,
         frameSequencer, previewSoundPlayer, programPadIndex, e.getVelocity(),
         layeredScreen->getCurrentScreen());
 
-    command::TriggerDrumNoteOnCommand(ctx).execute();
+    command::TriggerLocalNoteOnCommand(ctx).execute();
 }
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
@@ -256,14 +256,14 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         return;
     }
 
-    auto ctx = TriggerDrumContextFactory::buildTriggerDrumNoteOffContext(
+    auto ctx = TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
         eventregistry::Source::MidiInput, previewSoundPlayer, eventRegistry,
         eventHandler, screens, sequencer, hardware, clientEventController,
         frameSequencer, programPadIndex, drumBus->getIndex(),
         noteEventInfo->screen, note, noteEventInfo->program,
         noteEventInfo->track);
 
-    command::TriggerDrumNoteOffCommand(ctx).execute();
+    command::TriggerLocalNoteOffCommand(ctx).execute();
 }
 
 void ClientMidiEventController::handleKeyAftertouch(
