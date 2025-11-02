@@ -109,7 +109,6 @@
 #include <lcdgui/screens/window/ConvertSongToSeqScreen.hpp>
 #include <lcdgui/screens/window/LocateScreen.hpp>
 
-#include <lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp>
 #include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
 #include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
 #include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>

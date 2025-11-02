@@ -147,8 +147,6 @@
       "vmpc-convert-and-load-wav")                                             \
     X(screens::window, StepEditOptionsScreen, "step-edit-options")             \
     X(screens::window, VmpcMidiPresetsScreen, "vmpc-midi-presets")             \
-    X(screens::window, VmpcWarningSettingsIgnoredScreen,                       \
-      "vmpc-warning-settings-ignored")                                         \
     X(screens::window, VmpcKnownControllerDetectedScreen,                      \
       "vmpc-known-controller-detected")                                        \
     X(screens::window, VmpcContinuePreviousSessionScreen,                      \

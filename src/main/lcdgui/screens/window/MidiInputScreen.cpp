@@ -17,16 +17,6 @@ void MidiInputScreen::open()
     displayMidiFilter();
     displayType();
     displayPass();
-
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-
-    if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
-        vmpcSettingsScreen->midiControlMode ==
-            VmpcSettingsScreen::MidiControlMode::VMPC)
-    {
-        ls->Draw();
-        mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
-    }
 }
 
 void MidiInputScreen::function(int i)

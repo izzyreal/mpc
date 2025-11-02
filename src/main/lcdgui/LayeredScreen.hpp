@@ -90,10 +90,6 @@ namespace mpc::lcdgui
 
         void openScreen(const std::string screenName);
 
-        // Only needed by VmpcWarningSettingsIgnoredScreen.
-        // Let's see if we can solve this a different way.
-        void openPreviousScreen();
-
         std::shared_ptr<ScreenComponent> getCurrentScreen();
 
         void closeCurrentScreen();

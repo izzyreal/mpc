@@ -56,16 +56,6 @@ void MultiRecordingSetupScreen::open()
     displayMrsLine(0);
     displayMrsLine(1);
     displayMrsLine(2);
-
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-
-    if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
-        vmpcSettingsScreen->midiControlMode ==
-            VmpcSettingsScreen::MidiControlMode::VMPC)
-    {
-        ls->Draw();
-        mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
-    }
 }
 
 void MultiRecordingSetupScreen::left()

@@ -4,7 +4,6 @@
 #include "controller/ClientMidiEventController.hpp"
 #include "controller/ClientMidiFootswitchAssignmentController.hpp"
 #include "controller/MidiFootswitchFunctionMap.hpp"
-#include "lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controller;
@@ -19,23 +18,6 @@ void MidiSwScreen::open()
 {
     displaySwitchLabels();
     displayCtrlsAndFunctions();
-
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-
-    if (ls->isPreviousScreenNot<VmpcWarningSettingsIgnoredScreen>() &&
-        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
-    {
-        ls->Draw();
-        mpc.getLayeredScreen()->openScreen<VmpcWarningSettingsIgnoredScreen>();
-    }
-
-    auto footswitchController =
-        mpc.clientEventController->getClientMidiEventController()
-            ->getFootswitchAssignmentController();
-
-    const auto &bindings = footswitchController->bindings;
-
-    printf("bindings size: %zu\n", bindings.size());
 }
 
 void MidiSwScreen::displaySwitchLabels()
