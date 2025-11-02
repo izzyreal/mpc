@@ -73,6 +73,6 @@ inline std::string byte_count_to_short_string(uintmax_t byte_count,
         adjustedSize /= denominator;
     }
 
-    return std::to_string(static_cast<int>(floor(adjustedSize))) +
+    return std::to_string(static_cast<int>(std::floor(adjustedSize))) +
            (one_letter_suffix ? units[unit].substr(0, 1) : units[unit]);
 }
