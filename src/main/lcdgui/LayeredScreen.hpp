@@ -1,12 +1,15 @@
 #pragma once
 
 #include <memory>
+#include <thread>
 #include <vector>
 #include <string>
 #include <map>
 #include <deque>
 
+#include "lcdgui/ScreenId.hpp"
 #include "lcdgui/screens/Fwd.hpp"
+#include "lcdgui/ScreenRegistry.hpp"
 
 #include "BMFParser.hpp"
 
@@ -59,9 +62,6 @@ namespace mpc::lcdgui
         void transferUp();
         void transferDown();
 
-        template <typename T>
-        void showPopupAndThenOpen(const std::string msg, const int delayMs);
-
         void showPopupForMs(const std::string msg, const int delayMs);
 
         void showPopupAndThenReturnToLayer(const std::string msg,
@@ -73,20 +73,77 @@ namespace mpc::lcdgui
         int getFocusedLayerIndex();
         std::shared_ptr<Layer> getFocusedLayer();
 
-        template <typename T> void openScreen();
+        void openScreenById(const ScreenId);
 
-        template <typename T> void openScreen(const std::shared_ptr<T> &)
+        template <ScreenId... Ids> bool isPreviousScreen() const
         {
-            openScreen<T>();
+            if (history.size() < 2)
+            {
+                return false;
+            }
+
+            const auto &prev = history[history.size() - 2];
+            auto id = getScreenId(prev);
+            return ((id == Ids) || ...);
         }
 
-        template <typename... Ts> bool isPreviousScreen() const;
+        template <ScreenId... Ids> bool isPreviousScreenNot() const
+        {
+            if (history.size() < 2)
+            {
+                return true;
+            }
 
-        template <typename... Ts> bool isPreviousScreenNot() const;
+            const auto &prev = history[history.size() - 2];
+            auto id = getScreenId(prev);
+            return ((id != Ids) && ...);
+        }
 
-        template <typename... Ts> bool isCurrentScreen() const;
+        template <ScreenId... Ids> bool isCurrentScreen() const
+        {
+            if (history.empty())
+            {
+                return false;
+            }
+            auto curr = history.back();
+            if (!curr)
+            {
+                return false;
+            }
 
-        template <typename T> bool isCurrentScreenPopupFor() const;
+            auto id = getScreenId(curr);
+            return ((id == Ids) || ...);
+        }
+
+        template <ScreenId targetId>
+        void showPopupAndThenOpen(const std::string &msg, int delayMs)
+        {
+            setPopupScreenText(msg);
+            openScreenById(ScreenId::PopupScreen);
+
+            std::thread(
+                [this, delayMs]()
+                {
+                    std::this_thread::sleep_for(
+                        std::chrono::milliseconds(delayMs));
+                    openScreenById(targetId);
+                })
+                .detach();
+        }
+
+        template <ScreenId targetId> bool isCurrentScreenPopupFor() const
+        {
+            if (history.size() < 2)
+            {
+                return false;
+            }
+
+            auto curr = history.back();
+            auto prev = history[history.size() - 2];
+
+            return getScreenId(curr) == ScreenId::PopupScreen &&
+                   getScreenId(prev) == targetId;
+        }
 
         void openScreen(const std::string screenName);
 
@@ -97,11 +154,17 @@ namespace mpc::lcdgui
         void closeRecentScreensUntilReachingLayer(const int layerIndex);
 
     private:
+        void setPopupScreenText(const std::string);
         std::map<std::string, std::string> lastFocuses;
 
         void openScreenInternal(std::shared_ptr<ScreenComponent>);
         void returnToLastFocus(std::shared_ptr<ScreenComponent> screen,
                                std::string firstFieldOfThisScreen);
+
+        static ScreenId
+        getScreenId(const std::shared_ptr<ScreenComponent> &screen);
+
+        template <typename T> ScreenId getScreenIdByType();
 
     private:
         FunctionKeys *getFunctionKeys();

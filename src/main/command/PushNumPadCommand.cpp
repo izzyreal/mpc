@@ -5,9 +5,11 @@
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/LcdGuiUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::command;
+using namespace mpc::lcdgui;
 
 PushNumPadCommand::PushNumPadCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i) {}
 
@@ -19,27 +21,30 @@ void PushNumPadCommand::execute()
         {
             case 0:
             {
-                mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+                mpc.getLayeredScreen()->openScreenById(
+                    ScreenId::VmpcSettingsScreen);
                 break;
             }
             case 1:
             {
                 if (!mpc.getSequencer()->isPlaying())
                 {
-                    mpc.getLayeredScreen()->openScreen<SongScreen>();
+                    mpc.getLayeredScreen()->openScreenById(
+                        ScreenId::SongScreen);
                 }
                 break;
             }
             case 2:
             {
-                mpc.getLayeredScreen()->openScreen<PunchScreen>();
+                mpc.getLayeredScreen()->openScreenById(ScreenId::PunchScreen);
                 break;
             }
             case 3:
             {
                 if (!mpc.getSequencer()->isPlaying())
                 {
-                    mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                    mpc.getLayeredScreen()->openScreenById(
+                        ScreenId::LoadScreen);
                 }
                 break;
             }
@@ -47,7 +52,8 @@ void PushNumPadCommand::execute()
             {
                 if (!mpc.getSequencer()->isPlaying())
                 {
-                    mpc.getLayeredScreen()->openScreen<SampleScreen>();
+                    mpc.getLayeredScreen()->openScreenById(
+                        ScreenId::SampleScreen);
                 }
                 break;
             }
@@ -55,7 +61,8 @@ void PushNumPadCommand::execute()
             {
                 if (!mpc.getSequencer()->isPlaying())
                 {
-                    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+                    mpc.getLayeredScreen()->openScreenById(
+                        ScreenId::TrimScreen);
                 }
                 break;
             }
@@ -65,10 +72,10 @@ void PushNumPadCommand::execute()
                     mpc.getSequencer()->getActiveTrack()->getBus() - 1;
                 if (newDrum >= 0)
                 {
-                    mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(
-                        newDrum);
+                    mpc.screens->get<ScreenId::DrumScreen>()->setDrum(newDrum);
                 }
-                mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+                mpc.getLayeredScreen()->openScreenById(
+                    ScreenId::SelectDrumScreen);
                 break;
             }
             case 7:
@@ -77,17 +84,18 @@ void PushNumPadCommand::execute()
                     mpc.getSequencer()->getActiveTrack()->getBus() - 1;
                 if (newDrum >= 0)
                 {
-                    mpc.screens->get<lcdgui::screens::DrumScreen>()->setDrum(
-                        newDrum);
+                    mpc.screens->get<ScreenId::DrumScreen>()->setDrum(newDrum);
                 }
-                mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
+                mpc.getLayeredScreen()->openScreenById(
+                    ScreenId::SelectMixerDrumScreen);
                 break;
             }
             case 8:
             {
                 if (!mpc.getSequencer()->isPlaying())
                 {
-                    mpc.getLayeredScreen()->openScreen<OthersScreen>();
+                    mpc.getLayeredScreen()->openScreenById(
+                        ScreenId::OthersScreen);
                 }
                 break;
             }
@@ -95,7 +103,8 @@ void PushNumPadCommand::execute()
             {
                 if (!mpc.getSequencer()->isPlaying())
                 {
-                    mpc.getLayeredScreen()->openScreen<SyncScreen>();
+                    mpc.getLayeredScreen()->openScreenById(
+                        ScreenId::SyncScreen);
                 }
                 break;
             }

@@ -1,5 +1,6 @@
 #include "SelectMixerDrumScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 #include "lcdgui/screens/MixerScreen.hpp"
 
@@ -14,7 +15,7 @@ SelectMixerDrumScreen::SelectMixerDrumScreen(mpc::Mpc &mpc,
 
 void SelectMixerDrumScreen::open()
 {
-    auto drumScreen = mpc.screens->get<DrumScreen>();
+    auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
     ls->setFunctionKeysArrangement(drumScreen->getDrum());
 }
 
@@ -23,12 +24,12 @@ void SelectMixerDrumScreen::function(int i)
 
     if (i < 4)
     {
-        auto drumScreen = mpc.screens->get<DrumScreen>();
+        auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
         drumScreen->setDrum(i);
-        mpc.getLayeredScreen()->openScreen<MixerScreen>();
+        openScreenById(ScreenId::MixerScreen);
     }
     else if (i == 4)
     {
-        mpc.getLayeredScreen()->openScreen<MixerSetupScreen>();
+        openScreenById(ScreenId::MixerSetupScreen);
     }
 }

@@ -1,10 +1,15 @@
 #include "TrimScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoopScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
 #include "lcdgui/Layer.hpp"
+#include "sampler/Sampler.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -60,15 +65,15 @@ void TrimScreen::openWindow()
     if (focusedFieldName == "snd")
     {
         sampler->setPreviousScreenName("trim");
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
+        openScreenById(ScreenId::SoundScreen);
     }
     else if (focusedFieldName == "st")
     {
-        mpc.getLayeredScreen()->openScreen<StartFineScreen>();
+        openScreenById(ScreenId::StartFineScreen);
     }
     else if (focusedFieldName == "end")
     {
-        mpc.getLayeredScreen()->openScreen<EndFineScreen>();
+        openScreenById(ScreenId::EndFineScreen);
     }
 }
 
@@ -85,13 +90,13 @@ void TrimScreen::function(int f)
             break;
         }
         case 1:
-            mpc.getLayeredScreen()->openScreen<LoopScreen>();
+            openScreenById(ScreenId::LoopScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            openScreenById(ScreenId::ZoneScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
+            openScreenById(ScreenId::SndParamsScreen);
             break;
         case 4:
         {
@@ -100,10 +105,11 @@ void TrimScreen::function(int f)
                 return;
             }
 
-            auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
+            auto editSoundScreen =
+                mpc.screens->get<ScreenId::EditSoundScreen>();
             editSoundScreen->setReturnToScreenName("trim");
 
-            mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+            openScreenById(ScreenId::EditSoundScreen);
             break;
         }
         case 5:
@@ -291,7 +297,8 @@ void TrimScreen::setSliderEnd(int i)
 
 void TrimScreen::setEnd(int newValue)
 {
-    const auto loopLengthIsFixed = mpc.screens->get<LoopScreen>()->loopLngthFix;
+    const auto loopLengthIsFixed =
+        mpc.screens->get<ScreenId::LoopScreen>()->loopLngthFix;
     auto sound = sampler->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();
@@ -354,7 +361,7 @@ void TrimScreen::pressEnter()
 {
     if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+        openScreenById(ScreenId::SaveScreen);
         return;
     }
 

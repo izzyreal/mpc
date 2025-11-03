@@ -1,6 +1,9 @@
 #include "CreateNewProgramScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
@@ -13,7 +16,6 @@ CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc &mpc,
 
 void CreateNewProgramScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "midi-program-change")
@@ -24,7 +26,6 @@ void CreateNewProgramScreen::turnWheel(int i)
 
 void CreateNewProgramScreen::openNameScreen()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "new-name")
@@ -32,18 +33,18 @@ void CreateNewProgramScreen::openNameScreen()
         const auto enterAction = [this](std::string &nameScreenName)
         {
             newName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
+            openScreenById(ScreenId::CreateNewProgramScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(newName, 16, enterAction, "create-new-program");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
 void CreateNewProgramScreen::open()
 {
-    if (ls->isPreviousScreenNot<NameScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen>())
     {
         auto letterIndex = 21 + 24;
 
@@ -66,11 +67,10 @@ void CreateNewProgramScreen::open()
 
 void CreateNewProgramScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
             auto newProgram =
@@ -90,7 +90,7 @@ void CreateNewProgramScreen::function(int i)
             }
 
             getActiveDrumBus()->setProgram(index);
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
             break;
     }
 }

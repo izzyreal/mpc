@@ -16,9 +16,11 @@
 #include "file/aps/ApsParser.hpp"
 #include "file/all/AllParser.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sound.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -102,7 +104,7 @@ std::vector<std::string> AbstractDisk::getParentFileNames()
 
 bool AbstractDisk::deleteSelectedFile()
 {
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     return files[loadScreen->fileLoad]->del();
 }
 
@@ -275,7 +277,8 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p,
 
         const std::string popupMsg = "Saving " + fileName;
 
-        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
+        auto saveAProgramScreen =
+            mpc.screens->get<ScreenId::SaveAProgramScreen>();
 
         if (saveAProgramScreen->save != 0)
         {
@@ -339,7 +342,8 @@ void AbstractDisk::writeAps(const std::string &fileName)
         auto bytes = apsParser.getBytes();
         f->setFileData(bytes);
 
-        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
+        auto saveAProgramScreen =
+            mpc.screens->get<ScreenId::SaveAProgramScreen>();
 
         if (saveAProgramScreen->save != 0 &&
             mpc.getSampler()->getSoundCount() > 0)
@@ -701,7 +705,7 @@ AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> f)
     std::function<sequences_or_error()> readFunc = [this, f]
     {
         auto result = AllLoader::loadOnlySequencesFromFile(mpc, f.get());
-        auto loadScreen = mpc.screens->get<LoadScreen>();
+        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         loadScreen->fileLoad = 0;
         return result;
     };

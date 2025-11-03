@@ -1,6 +1,9 @@
 #include "CopySoundScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
@@ -12,7 +15,7 @@ CopySoundScreen::CopySoundScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void CopySoundScreen::open()
 {
-    if (ls->isPreviousScreenNot<NameScreen>() && sampler->getSound())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen>() && sampler->getSound())
     {
         newName = sampler->getSound()->getName();
         newName = sampler->addOrIncreaseNumber(newName);
@@ -27,7 +30,7 @@ void CopySoundScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         case 4:
         {
@@ -41,7 +44,7 @@ void CopySoundScreen::function(int i)
 
             newSound.lock()->setName(newName);
             sampler->setSoundIndex(sampler->getSoundCount() - 1);
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         }
     }
@@ -49,7 +52,6 @@ void CopySoundScreen::function(int i)
 
 void CopySoundScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "snd")
@@ -66,21 +68,20 @@ void CopySoundScreen::turnWheel(int i)
 
 void CopySoundScreen::openNameScreen()
 {
-
     const auto enterAction = [this](std::string &nameScreenName)
     {
-        if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+        if (sampler->isSoundNameOccupied(nameScreenName))
         {
             return;
         }
 
         newName = nameScreenName;
-        mpc.getLayeredScreen()->openScreen<CopySoundScreen>();
+        openScreenById(ScreenId::CopySoundScreen);
     };
 
-    const auto nameScreen = mpc.screens->get<NameScreen>();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(newName, 16, enterAction, "copy-sound");
-    mpc.getLayeredScreen()->openScreen<NameScreen>();
+    openScreenById(ScreenId::NameScreen);
 }
 
 void CopySoundScreen::displayNewName()

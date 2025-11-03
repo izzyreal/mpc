@@ -1,5 +1,6 @@
 #include "BarsScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 
@@ -18,9 +19,9 @@ BarsScreen::BarsScreen(mpc::Mpc &mpc, const int layerIndex)
 void BarsScreen::open()
 {
     auto fromSequence = sequencer->getActiveSequence();
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     auto toSequence = sequencer->getSequence(eventsScreen->toSq);
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     auto userLastBar = userScreen->lastBar;
 
     auto lastBarIndexFrom =
@@ -58,7 +59,7 @@ void BarsScreen::close()
 
 void BarsScreen::function(int j)
 {
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     switch (j)
     {
@@ -67,8 +68,7 @@ void BarsScreen::function(int j)
         case 2:
         case 3:
             eventsScreen->tab = j;
-            mpc.getLayeredScreen()->openScreen(
-                eventsScreen->tabNames[eventsScreen->tab]);
+            ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         case 4:
             break;
@@ -77,7 +77,7 @@ void BarsScreen::function(int j)
             copyBars(eventsScreen->toSq, firstBar, lastBar,
                      eventsScreen->copies, afterBar);
             sequencer->setActiveSequenceIndex(eventsScreen->toSq);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }
@@ -95,8 +95,8 @@ void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar,
 void BarsScreen::turnWheel(int i)
 {
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     auto userLastBar = userScreen->lastBar;
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -182,13 +182,13 @@ void BarsScreen::turnWheel(int i)
 
 void BarsScreen::displayCopies()
 {
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     findField("copies")->setTextPadded(eventsScreen->copies, " ");
 }
 
 void BarsScreen::displayToSq()
 {
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     findField("tosq")->setText(std::to_string(eventsScreen->toSq + 1));
 }
 
@@ -291,7 +291,7 @@ void BarsScreen::setCopies(int i)
         return;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     eventsScreen->copies = i;
     displayCopies();
 }

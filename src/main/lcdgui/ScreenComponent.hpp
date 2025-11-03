@@ -12,12 +12,22 @@
 #include <string>
 #include <map>
 
-#include "sequencer/Bus.hpp"
-#include "sampler/Sampler.hpp"
-#include "sequencer/Sequencer.hpp"
-#include "sequencer/Track.hpp"
-
-#include "command/AllCommands.hpp"
+namespace mpc::sampler
+{
+    class Sampler;
+    class Program;
+} // namespace mpc::sampler
+namespace mpc::sequencer
+{
+    class Sequencer;
+    class Track;
+    class Bus;
+    class DrumBus;
+} // namespace mpc::sequencer
+namespace mpc::lcdgui
+{
+    class LayeredScreen;
+}
 
 namespace mpc::lcdgui
 {
@@ -55,6 +65,7 @@ namespace mpc::lcdgui
         const std::string getLastFocus(const std::string &screenName);
         std::shared_ptr<Wave> findWave();
         std::shared_ptr<EnvGraph> findEnvGraph();
+        void openScreenById(const ScreenId);
 
     public:
         virtual void open() {}
@@ -72,74 +83,24 @@ namespace mpc::lcdgui
         std::map<std::string, std::vector<std::string>> &getTransferMap();
 
     public:
-        virtual void left()
-        {
-            command::PushLeftCommand(mpc).execute();
-        }
-        virtual void right()
-        {
-            command::PushRightCommand(mpc).execute();
-        }
-        virtual void up()
-        {
-            command::PushUpCommand(mpc).execute();
-        }
-        virtual void down()
-        {
-            command::PushDownCommand(mpc).execute();
-        }
+        virtual void left();
+        virtual void right();
+        virtual void up();
+        virtual void down();
 
-        virtual void function(int i)
-        {
-            if (i == 3)
-            {
-                mpc.getLayeredScreen()->closeCurrentScreen();
-            }
-        }
+        virtual void function(int i);
 
         virtual void openWindow();
         virtual void turnWheel(int) {}
-        virtual void numpad(int i)
-        {
-            command::PushNumPadCommand(mpc, i).execute();
-        }
-        virtual void pressEnter()
-        {
-            command::PushEnterCommand(mpc).execute();
-        }
-        virtual void rec()
-        {
-            command::PushRecCommand(mpc).execute();
-        }
-        virtual void overDub()
-        {
-            command::PushOverdubCommand(mpc).execute();
-        }
-        virtual void stop()
-        {
-            command::PushStopCommand(mpc).execute();
-        }
-        virtual void play()
-        {
-            command::PushPlayCommand(mpc).execute();
-        }
-        virtual void playStart()
-        {
-            command::PushPlayStartCommand(mpc).execute();
-        }
+        virtual void numpad(int i);
+        virtual void pressEnter();
+        virtual void rec();
+        virtual void overDub();
+        virtual void stop();
+        virtual void play();
+        virtual void playStart();
         virtual void setSlider(int) {}
 
-        int getSoundIncrement(const int dataWheelSteps)
-        {
-            auto result = dataWheelSteps;
-
-            if (std::abs(result) != 1)
-            {
-                result *= (int)(ceil(
-                    mpc.getSampler()->getSound()->getFrameCount() / 15000.f));
-            }
-
-            return result;
-        }
+        int getSoundIncrement(const int dataWheelSteps);
     };
 } // namespace mpc::lcdgui

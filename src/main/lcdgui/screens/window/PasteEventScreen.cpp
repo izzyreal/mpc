@@ -1,5 +1,6 @@
 #include "PasteEventScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/StepEditorScreen.hpp"
@@ -20,7 +21,8 @@ void PasteEventScreen::function(int i)
     switch (i)
     {
         case 4:
-            auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
+            auto stepEditorScreen =
+                mpc.screens->get<ScreenId::StepEditorScreen>();
 
             const bool allowMultipleNotesOnSameTick = true;
 
@@ -32,7 +34,7 @@ void PasteEventScreen::function(int i)
                     event, sequencer->getTickPosition(),
                     allowMultipleNotesOnSameTick);
             }
-            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+            openScreenById(ScreenId::StepEditorScreen);
             break;
     }
 }

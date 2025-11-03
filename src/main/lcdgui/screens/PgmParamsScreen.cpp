@@ -1,13 +1,16 @@
 #include "PgmParamsScreen.hpp"
 
+#include "Mpc.hpp"
 #include "SelectDrumScreen.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
+#include "sampler/Sampler.hpp"
 #include "sampler/VoiceOverlapMode.hpp"
 
 #include "sampler/NoteParameters.hpp"
 
 #include "lcdgui/EnvGraph.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -42,24 +45,25 @@ void PgmParamsScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            openScreenById(ScreenId::PgmAssignScreen);
             break;
         case 1:
         {
-            auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+            auto selectDrumScreen =
+                mpc.screens->get<ScreenId::SelectDrumScreen>();
             selectDrumScreen->redirectScreen = "program-params";
-            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+            openScreenById(ScreenId::SelectDrumScreen);
             break;
         }
         case 2:
-            mpc.getLayeredScreen()->openScreen<DrumScreen>();
+            openScreenById(ScreenId::DrumScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<PurgeScreen>();
+            openScreenById(ScreenId::PurgeScreen);
             break;
         case 4:
         {
-            mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
+            openScreenById(ScreenId::AutoChromaticAssignmentScreen);
             break;
         }
         case 5:
@@ -174,28 +178,28 @@ void PgmParamsScreen::openWindow()
 
     if (focusedFieldName == "pgm")
     {
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+        openScreenById(ScreenId::ProgramScreen);
     }
     else if (focusedFieldName == "note")
     {
-        mpc.getLayeredScreen()->openScreen<CopyNoteParametersScreen>();
+        openScreenById(ScreenId::CopyNoteParametersScreen);
     }
     else if (focusedFieldName == "attack" || focusedFieldName == "decay" ||
              focusedFieldName == "dcymd")
     {
-        mpc.getLayeredScreen()->openScreen<VelocityModulationScreen>();
+        openScreenById(ScreenId::VelocityModulationScreen);
     }
     else if (focusedFieldName == "freq" || focusedFieldName == "reson")
     {
-        mpc.getLayeredScreen()->openScreen<VeloEnvFilterScreen>();
+        openScreenById(ScreenId::VeloEnvFilterScreen);
     }
     else if (focusedFieldName == "tune")
     {
-        mpc.getLayeredScreen()->openScreen<VeloPitchScreen>();
+        openScreenById(ScreenId::VeloPitchScreen);
     }
     else if (focusedFieldName == "voiceoverlap")
     {
-        mpc.getLayeredScreen()->openScreen<MuteAssignScreen>();
+        openScreenById(ScreenId::MuteAssignScreen);
     }
 }
 

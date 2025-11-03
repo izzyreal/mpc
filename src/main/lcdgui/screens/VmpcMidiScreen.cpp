@@ -70,7 +70,7 @@ void VmpcMidiScreen::turnWheel(int i)
 void VmpcMidiScreen::open()
 {
     /*
-    auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+    auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
 
     screen->discardAndLeave = [this]()
     {
@@ -91,7 +91,7 @@ void VmpcMidiScreen::open()
 
     screen->stayScreen = "vmpc-midi";
 
-    if (ls->isPreviousScreenNot<VmpcDiscardMappingChangesScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::VmpcDiscardMappingChangesScreen>())
     {
         uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
 
@@ -148,7 +148,7 @@ void VmpcMidiScreen::up()
 
 void VmpcMidiScreen::openWindow()
 {
-    mpc.getLayeredScreen()->openScreen<VmpcMidiPresetsScreen>();
+    openScreenById(ScreenId::VmpcMidiPresetsScreen);
 }
 
 void VmpcMidiScreen::acceptLearnCandidate()
@@ -280,14 +280,14 @@ void VmpcMidiScreen::function(int i)
             if (hasMappingChanged())
             {
                 auto screen =
-                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                    mpc.screens
+                        ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
-                mpc.getLayeredScreen()
-                    ->openScreen<VmpcDiscardMappingChangesScreen>();
+                openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            openScreenById(ScreenId::VmpcSettingsScreen);
             break;
         case 1:
             if (learning)
@@ -298,14 +298,14 @@ void VmpcMidiScreen::function(int i)
             if (hasMappingChanged())
             {
                 auto screen =
-                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                    mpc.screens
+                        ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-keyboard";
-                mpc.getLayeredScreen()
-                    ->openScreen<VmpcDiscardMappingChangesScreen>();
+                openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
         case 2:
             if (learning)
@@ -319,14 +319,14 @@ void VmpcMidiScreen::function(int i)
             if (hasMappingChanged())
             {
                 auto screen =
-                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                    mpc.screens
+                        ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
-                mpc.getLayeredScreen()
-                    ->openScreen<VmpcDiscardMappingChangesScreen>();
+                openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            openScreenById(ScreenId::VmpcAutoSaveScreen);
             break;
         case 3:
             if (learning)

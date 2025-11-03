@@ -1,5 +1,6 @@
 #include "InitScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SetupScreen.hpp"
 
@@ -16,20 +17,20 @@ void InitScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<OthersScreen>();
+            openScreenById(ScreenId::OthersScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<VerScreen>();
+            openScreenById(ScreenId::VerScreen);
             break;
         case 5:
         {
-            auto userScreen = mpc.screens->get<UserScreen>();
+            auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
             userScreen->resetPreferences();
 
-            auto setupScreen = mpc.screens->get<SetupScreen>();
+            auto setupScreen = mpc.screens->get<ScreenId::SetupScreen>();
             setupScreen->resetPreferences();
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }

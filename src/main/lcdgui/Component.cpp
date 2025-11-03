@@ -4,6 +4,12 @@
 #include "Field.hpp"
 #include "Parameter.hpp"
 #include "ScreenComponent.hpp"
+#include "lcdgui/EventRow.hpp"
+#include "lcdgui/FunctionKeys.hpp"
+#include "lcdgui/Knob.hpp"
+#include "lcdgui/PunchRect.hpp"
+#include "lcdgui/Rectangle.hpp"
+#include "lcdgui/Underline.hpp"
 
 #include <string>
 
@@ -533,3 +539,45 @@ Component *Component::getParent()
 {
     return parent;
 }
+
+template <class T>
+std::shared_ptr<T> Component::findChild(const std::string &nameOfChildToFind)
+{
+    for (auto &c : children)
+    {
+        auto asT = std::dynamic_pointer_cast<T>(c);
+        if (asT)
+        {
+            if (nameOfChildToFind.empty() || c->getName() == nameOfChildToFind)
+            {
+                return asT;
+            }
+        }
+
+        if (auto candidate = c->findChild<T>(nameOfChildToFind))
+        {
+            return candidate;
+        }
+    }
+
+    return {};
+}
+
+#define INSTANTIATE_FINDCHILD(T)                                               \
+    template std::shared_ptr<T> Component::findChild<T>(const std::string &);
+
+// Explicit instantiations for all used types
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Background)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Rectangle)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::TextComp)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::FunctionKey)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::FunctionKeys)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::ScreenComponent)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Wave)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::EnvGraph)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Field)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Label)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Knob)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::PunchRect)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::EventRow)
+INSTANTIATE_FINDCHILD(mpc::lcdgui::Underline)

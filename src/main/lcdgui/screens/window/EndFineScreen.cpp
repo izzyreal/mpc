@@ -1,8 +1,12 @@
 #include "EndFineScreen.hpp"
+#include "Mpc.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/TrimScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -28,7 +32,7 @@ void EndFineScreen::open()
 
 void EndFineScreen::displayFineWave()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto sound = sampler->getSound();
 
@@ -68,7 +72,7 @@ void EndFineScreen::displayLngthLabel()
 
 void EndFineScreen::displaySmplLngth()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -113,7 +117,7 @@ void EndFineScreen::turnWheel(int i)
         focusedField->disableTypeMode();
     }
 
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     const auto focusedFieldName = focusedField->getName();
 
@@ -150,7 +154,7 @@ void EndFineScreen::right()
 
 void EndFineScreen::pressEnter()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     trimScreen->pressEnter();
     displayEnd();
     displayLngthLabel();
@@ -170,7 +174,7 @@ void EndFineScreen::setSlider(int i)
 
     if (focusedFieldName == "end")
     {
-        auto trimScreen = mpc.screens->get<TrimScreen>();
+        auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
         trimScreen->setSliderEnd(i);
         displayEnd();
         displayLngthLabel();

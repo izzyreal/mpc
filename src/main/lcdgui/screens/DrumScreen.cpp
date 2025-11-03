@@ -1,7 +1,10 @@
 #include "DrumScreen.hpp"
 
+#include "Mpc.hpp"
 #include "SelectDrumScreen.hpp"
 #include "StrUtil.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -24,24 +27,24 @@ void DrumScreen::open()
 
 void DrumScreen::function(int f)
 {
-
     switch (f)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            openScreenById(ScreenId::PgmAssignScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
+            openScreenById(ScreenId::PgmParamsScreen);
             break;
         case 2:
         {
-            auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+            auto selectDrumScreen =
+                mpc.screens->get<ScreenId::SelectDrumScreen>();
             selectDrumScreen->redirectScreen = "drum";
-            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+            openScreenById(ScreenId::SelectDrumScreen);
             break;
         }
         case 3:
-            mpc.getLayeredScreen()->openScreen<PurgeScreen>();
+            openScreenById(ScreenId::PurgeScreen);
             break;
     }
 }

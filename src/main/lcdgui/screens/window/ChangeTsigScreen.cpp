@@ -1,6 +1,7 @@
 #include "ChangeTsigScreen.hpp"
 
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <StrUtil.hpp>
 
@@ -48,7 +49,7 @@ void ChangeTsigScreen::function(int i)
                 }
             }
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }
@@ -105,12 +106,7 @@ void ChangeTsigScreen::displayNewTsig()
 
 void ChangeTsigScreen::setBar0(int i, int max)
 {
-    if (i < 0 || i > max)
-    {
-        return;
-    }
-
-    bar0 = i;
+    bar0 = std::clamp(i, 0, max);
 
     if (bar0 > bar1)
     {
@@ -122,12 +118,7 @@ void ChangeTsigScreen::setBar0(int i, int max)
 
 void ChangeTsigScreen::setBar1(int i, int max)
 {
-    if (i < 0 || i > max)
-    {
-        return;
-    }
-
-    bar1 = i;
+    bar1 = std::clamp(i, 0, max);
 
     if (bar1 < bar0)
     {

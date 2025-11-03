@@ -1,9 +1,13 @@
 #include "ZoneEndFineScreen.hpp"
+#include "Mpc.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/ZoneScreen.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -28,8 +32,8 @@ void ZoneEndFineScreen::open()
 
 void ZoneEndFineScreen::displayFineWave()
 {
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto sound = sampler->getSound();
 
@@ -45,14 +49,14 @@ void ZoneEndFineScreen::displayFineWave()
 
 void ZoneEndFineScreen::displayEnd()
 {
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     findField("end")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone),
                                     " ");
 }
 
 void ZoneEndFineScreen::displayLngthLabel()
 {
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     findLabel("lngth")->setTextPadded(
         zoneScreen->getZoneEnd(zoneScreen->zone) -
             zoneScreen->getZoneStart(zoneScreen->zone),
@@ -85,7 +89,7 @@ void ZoneEndFineScreen::function(int i)
 void ZoneEndFineScreen::turnWheel(int i)
 {
     auto sound = sampler->getSound();
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
 
     auto soundInc = getSoundIncrement(i);
 
@@ -131,7 +135,7 @@ void ZoneEndFineScreen::right()
 
 void ZoneEndFineScreen::pressEnter()
 {
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     zoneScreen->pressEnter();
 
     displayEnd();
@@ -152,7 +156,7 @@ void ZoneEndFineScreen::setSlider(int i)
 
     if (focusedFieldName == "end")
     {
-        auto zoneScreen = mpc.screens->get<ZoneScreen>();
+        auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
         zoneScreen->setSlider(i);
         displayEnd();
         displayLngthLabel();

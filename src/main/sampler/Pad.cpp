@@ -4,6 +4,7 @@
 
 #include "lcdgui/screens/PgmAssignScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::sampler;
 using namespace mpc::lcdgui;
@@ -17,7 +18,7 @@ std::vector<int> Pad::originalPadNotes = {
 
 std::vector<int> &Pad::getPadNotes(mpc::Mpc &mpc)
 {
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
     if (vmpcSettingsScreen->initialPadMapping == 0)
     {
@@ -54,7 +55,7 @@ void Pad::setNote(int i)
         return;
     }
 
-    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>();
+    auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
 
     if (pgmAssignScreen->padAssign)
     {
@@ -68,7 +69,7 @@ void Pad::setNote(int i)
 
 int Pad::getNote()
 {
-    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>();
+    auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
 
     if (pgmAssignScreen->padAssign)
     {

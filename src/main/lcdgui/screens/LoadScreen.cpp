@@ -15,6 +15,7 @@
 #include "lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp"
 
 #include "nvram/VolumesPersistence.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
@@ -31,7 +32,7 @@ void LoadScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->isPreviousScreenNot<PopupScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::PopupScreen>())
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
@@ -73,7 +74,7 @@ void LoadScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
         case 2:
             // openScreen<FormatScreen>();
@@ -213,19 +214,19 @@ void LoadScreen::function(int i)
             }
             else if (StrUtil::eqIgnoreCase(ext, ".pgm"))
             {
-                mpc.getLayeredScreen()->openScreen<LoadAProgramScreen>();
+                openScreenById(ScreenId::LoadAProgramScreen);
             }
             else if (StrUtil::eqIgnoreCase(ext, ".mid"))
             {
-                mpc.getLayeredScreen()->openScreen<LoadASequenceScreen>();
+                openScreenById(ScreenId::LoadASequenceScreen);
             }
             else if (StrUtil::eqIgnoreCase(ext, ".all"))
             {
-                mpc.getLayeredScreen()->openScreen<Mpc2000XlAllFileScreen>();
+                openScreenById(ScreenId::Mpc2000XlAllFileScreen);
             }
             else if (StrUtil::eqIgnoreCase(ext, ".aps"))
             {
-                mpc.getLayeredScreen()->openScreen<LoadApsFileScreen>();
+                openScreenById(ScreenId::LoadApsFileScreen);
             }
             break;
         }
@@ -241,10 +242,10 @@ void LoadScreen::openWindow()
         return;
     }
 
-    auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+    auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
     directoryScreen->findYOffset0();
     directoryScreen->setYOffset1(fileLoad);
-    mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+    openScreenById(ScreenId::DirectoryScreen);
 }
 
 void LoadScreen::turnWheel(int i)
@@ -502,7 +503,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         const auto ext = path.extension().string();
         const std::string msg =
             "LOADING " + StrUtil::padRight(name, " ", 16) + ext;
-        ls->showPopupAndThenOpen<LoadASoundScreen>(msg, 300);
+        ls->showPopupAndThenOpen<ScreenId::LoadASoundScreen>(msg, 300);
         return;
     }
 
@@ -517,9 +518,9 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         };
 
         auto convertAndLoadWavScreen =
-            mpc.screens->get<VmpcConvertAndLoadWavScreen>();
+            mpc.screens->get<ScreenId::VmpcConvertAndLoadWavScreen>();
         convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
-        mpc.getLayeredScreen()->openScreen<VmpcConvertAndLoadWavScreen>();
+        openScreenById(ScreenId::VmpcConvertAndLoadWavScreen);
     }
 }
 

@@ -1,9 +1,11 @@
 #include "SongWindow.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -23,7 +25,7 @@ void SongWindow::open()
     auto defaultSongNameFirstLetterField =
         findField("default-name-first-letter");
 
-    auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     auto song = sequencer->getSong(songScreen->activeSongIndex);
 
     songNameFirstLetterField->setText(song->getName().substr(0, 1));
@@ -38,13 +40,13 @@ void SongWindow::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
+            openScreenById(ScreenId::DeleteSongScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SongScreen>();
+            openScreenById(ScreenId::SongScreen);
             break;
         case 4:
-            mpc.getLayeredScreen()->openScreen<CopySongScreen>();
+            openScreenById(ScreenId::CopySongScreen);
             break;
     }
 }
@@ -55,7 +57,7 @@ void SongWindow::openNameScreen()
     std::function<void(std::string &)> enterAction;
     std::string initialNameScreenName;
 
-    auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -66,7 +68,7 @@ void SongWindow::openNameScreen()
         enterAction = [songScreen, this](std::string &newName)
         {
             songScreen->setDefaultSongName(newName);
-            mpc.getLayeredScreen()->openScreen<SongWindow>();
+            openScreenById(ScreenId::SongWindow);
         };
     }
     else
@@ -78,12 +80,12 @@ void SongWindow::openNameScreen()
         enterAction = [song, this](std::string &newName)
         {
             song->setName(newName);
-            mpc.getLayeredScreen()->openScreen<SongWindow>();
+            openScreenById(ScreenId::SongWindow);
         };
     }
 
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction,
                            "song-window");
-    mpc.getLayeredScreen()->openScreen<NameScreen>();
+    openScreenById(ScreenId::NameScreen);
 }

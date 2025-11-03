@@ -3,7 +3,7 @@
 #include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
-#include "lcdgui/screens/window/NameScreen.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 
 #include <memory>
 
@@ -26,7 +26,7 @@ PushFullLevelCommand::PushFullLevelCommand(
 
 void PushFullLevelCommand::execute()
 {
-    if (layeredScreen->isCurrentScreen<NameScreen>())
+    if (layeredScreen->isCurrentScreen<ScreenId::NameScreen>())
     {
         padAndButtonKeyboard->pressHardwareComponent(
             ComponentId::FULL_LEVEL_OR_CASE_SWITCH);

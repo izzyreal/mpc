@@ -4,6 +4,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/DirectToDiskSettings.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
@@ -76,7 +77,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         case 4:
         {
@@ -95,7 +96,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
             {
                 case 0:
                 {
-                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+                    openScreenById(ScreenId::SequencerScreen);
 
                     if (seqLoopWasEnabled)
                     {
@@ -115,8 +116,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     if (!mpc.getAudioMidiServices()->prepareBouncing(
                             settings.get()))
                     {
-                        mpc.getLayeredScreen()
-                            ->openScreen<VmpcFileInUseScreen>();
+                        openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
                     else
                     {
@@ -127,7 +127,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                 }
                 case 1:
                 {
-                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+                    openScreenById(ScreenId::SequencerScreen);
 
                     auto lengthInFrames =
                         SeqUtil::loopFrameLength(sequence.get(), rate);
@@ -149,8 +149,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     if (!mpc.getAudioMidiServices()->prepareBouncing(
                             settings.get()))
                     {
-                        mpc.getLayeredScreen()
-                            ->openScreen<VmpcFileInUseScreen>();
+                        openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
                     else
                     {
@@ -161,7 +160,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                 }
                 case 2:
                 {
-                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+                    openScreenById(ScreenId::SequencerScreen);
 
                     auto lengthInFrames = SeqUtil::sequenceFrameLength(
                         sequence.get(), time0, time1, rate);
@@ -182,8 +181,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     if (!mpc.getAudioMidiServices()->prepareBouncing(
                             settings.get()))
                     {
-                        mpc.getLayeredScreen()
-                            ->openScreen<VmpcFileInUseScreen>();
+                        openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
                     else
                     {
@@ -210,7 +208,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                         lengthInFrames, splitStereoIntoLeftAndRightChannel,
                         rate, recordingName);
 
-                    mpc.getLayeredScreen()->openScreen<SongScreen>();
+                    openScreenById(ScreenId::SongScreen);
 
                     songLoopWasEnabled = mpcSong->isLoopEnabled();
 
@@ -222,8 +220,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     if (!mpc.getAudioMidiServices()->prepareBouncing(
                             settings.get()))
                     {
-                        mpc.getLayeredScreen()
-                            ->openScreen<VmpcFileInUseScreen>();
+                        openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
                     else
                     {
@@ -234,7 +231,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     break;
                 }
                 case 4:
-                    mpc.getLayeredScreen()->openScreen<VmpcRecordJamScreen>();
+                    openScreenById(ScreenId::VmpcRecordJamScreen);
                     break;
             }
         }

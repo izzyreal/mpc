@@ -1,8 +1,12 @@
 #include "LoopEndFineScreen.hpp"
+#include "Mpc.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/screens/LoopScreen.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -29,7 +33,7 @@ void LoopEndFineScreen::open()
 
 void LoopEndFineScreen::displayLoopLngth()
 {
-    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     findField("loop-lngth")->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
@@ -48,7 +52,7 @@ void LoopEndFineScreen::displayLngthField()
 
 void LoopEndFineScreen::displayFineWave()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto sound = sampler->getSound();
 
@@ -100,8 +104,8 @@ void LoopEndFineScreen::function(int i)
 void LoopEndFineScreen::turnWheel(int i)
 {
     auto sound = sampler->getSound();
-    auto loopScreen = mpc.screens->get<LoopScreen>();
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto soundInc = getSoundIncrement(i);
 
@@ -161,7 +165,7 @@ void LoopEndFineScreen::right()
 
 void LoopEndFineScreen::pressEnter()
 {
-    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     loopScreen->pressEnter();
     displayEnd();
     displayLngthField();
@@ -177,8 +181,8 @@ void LoopEndFineScreen::setSlider(int i)
         return;
     }
 
-    auto loopScreen = mpc.screens->get<LoopScreen>();
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

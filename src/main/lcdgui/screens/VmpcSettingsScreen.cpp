@@ -1,4 +1,5 @@
 #include "VmpcSettingsScreen.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -36,13 +37,13 @@ void VmpcSettingsScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            openScreenById(ScreenId::VmpcAutoSaveScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
+            openScreenById(ScreenId::VmpcDisksScreen);
             break;
         case 4:
             if (midiControlMode == MidiControlMode::ORIGINAL)
@@ -50,7 +51,7 @@ void VmpcSettingsScreen::function(int i)
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            openScreenById(ScreenId::VmpcMidiScreen);
             break;
         case 5:
             if (easterEgg->IsHidden())

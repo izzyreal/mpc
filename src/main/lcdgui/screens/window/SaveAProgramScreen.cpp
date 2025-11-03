@@ -1,5 +1,7 @@
 #include "SaveAProgramScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 #include "disk/MpcFile.hpp"
@@ -8,6 +10,7 @@
 #include <Util.hpp>
 #include "disk/AbstractDisk.hpp"
 #include "lcdgui/Label.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
@@ -19,10 +22,10 @@ SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveAProgramScreen::open()
 {
-    if (ls->isPreviousScreen<SaveScreen>())
+    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
     {
-        auto nameScreen = mpc.screens->get<NameScreen>();
-        auto saveScreen = mpc.screens->get<SaveScreen>();
+        auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+        auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
         nameScreen->setNameToEdit(
             sampler->getProgram(saveScreen->getProgramIndex())->getName());
     }
@@ -55,11 +58,11 @@ void SaveAProgramScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
         case 4:
         {
-            auto nameScreen = mpc.screens->get<NameScreen>();
+            auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
                 mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
                 ".PGM";
@@ -83,24 +86,24 @@ void SaveAProgramScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
-                        mpc.getLayeredScreen()
-                            ->openScreen<SaveAProgramScreen>();
+                        openScreenById(ScreenId::SaveAProgramScreen);
                     };
                     nameScreen->initialize(nameScreen->getNameWithoutSpaces(),
                                            16, enterAction, "save");
                 };
 
-                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                auto fileExistsScreen =
+                    mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
                     [this]
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                        openScreenById(ScreenId::SaveScreen);
                     });
-                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                openScreenById(ScreenId::FileExistsScreen);
                 break;
             }
 
@@ -129,6 +132,6 @@ void SaveAProgramScreen::displayReplaceSameSounds()
 
 void SaveAProgramScreen::displayFile()
 {
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     findLabel("file")->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
 }

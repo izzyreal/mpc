@@ -74,7 +74,6 @@ namespace mpc::controller
         using Track = mpc::sequencer::Track;
         using Program = mpc::sampler::Program;
 
-
         std::shared_ptr<ClientEventController> clientEventController;
 
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
@@ -93,7 +92,6 @@ namespace mpc::controller
         std::optional<int> getDrumIndexForEvent(const MidiEvent &) const;
         std::shared_ptr<sequencer::DrumBus>
         getDrumBusForEvent(const MidiEvent &) const;
-
 
         bool isChannelMatch(const MidiEvent &e) const noexcept;
         bool isOmniOn() const noexcept;
@@ -135,12 +133,9 @@ namespace mpc::controller
     private:
         bool convertSustainPedalToDuration = false;
 
-        std::unordered_map<int, bool>
-            sustainPedalState;
-        std::unordered_map<int, std::vector<int>>
-            heldNotes;
-        std::unordered_map<int, std::vector<int>>
-            sustainedNotes;
+        std::unordered_map<int, bool> sustainPedalState;
+        std::unordered_map<int, std::vector<int>> heldNotes;
+        std::unordered_map<int, std::vector<int>> sustainedNotes;
 
         void handleNoteOn(const MidiEvent &e);
         void handleNoteOff(const MidiEvent &e);
@@ -177,6 +172,5 @@ namespace mpc::controller
         void releaseSustainedNotes(int channel);
 
         void enforceMonoMode(int channel, int newNote);
-
     };
 } // namespace mpc::controller

@@ -10,6 +10,8 @@
 #include "sampler/Pad.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sound.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/ZoneScreen.hpp"
@@ -107,7 +109,7 @@ void Sampler::setSoundIndex(int i)
 {
     soundIndex = std::clamp(i, 0, static_cast<int>(sounds.size() - 1));
 
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     zoneScreen->initZones();
 }
 
@@ -217,7 +219,8 @@ void Sampler::init()
 
 void Sampler::playMetronome(unsigned int velocity, int framePos)
 {
-    auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>();
+    auto metronomeSoundScreen =
+        mpc.screens->get<ScreenId::MetronomeSoundScreen>();
 
     if (metronomeSoundScreen->getSound() == 0)
     {
@@ -723,7 +726,7 @@ void Sampler::playX()
 
     if (playXMode == 1)
     {
-        auto zoneScreen = mpc.screens->get<ZoneScreen>();
+        auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
         auto zone = zoneScreen->getZone();
         start = zone[0];
         end = zone[1];

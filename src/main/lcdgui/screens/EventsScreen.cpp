@@ -1,5 +1,10 @@
 #include "EventsScreen.hpp"
 
+#include "MpcSpecs.hpp"
+
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -49,11 +54,12 @@ void EventsScreen::open()
 
     if (tab != 0)
     {
-        mpc.getLayeredScreen()->openScreen(tabNames[tab]);
+        ls->openScreen(tabNames[tab]);
         return;
     }
 
-    auto previousScreenWasSequencer = ls->isPreviousScreen<SequencerScreen>();
+    auto previousScreenWasSequencer =
+        ls->isPreviousScreen<ScreenId::SequencerScreen>();
     auto seq = sequencer->getActiveSequence();
 
     if (previousScreenWasSequencer)
@@ -63,7 +69,7 @@ void EventsScreen::open()
 
         if (!seq->isUsed())
         {
-            auto userScreen = mpc.screens->get<UserScreen>();
+            auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
             seq->init(userScreen->lastBar);
         }
 
@@ -114,7 +120,7 @@ void EventsScreen::function(int i)
         case 2:
         case 3:
             tab = i;
-            mpc.getLayeredScreen()->openScreen(tabNames[tab]);
+            ls->openScreen(tabNames[tab]);
             break;
         case 5:
         {
@@ -184,7 +190,7 @@ void EventsScreen::function(int i)
                 }
             }
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
         }
         break;
     }

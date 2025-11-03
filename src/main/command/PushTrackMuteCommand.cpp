@@ -7,40 +7,42 @@
 #include "lcdgui/screens/NextSeqPadScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/TrMuteScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushTrackMuteCommand::PushTrackMuteCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushTrackMuteCommand::execute()
 {
+    const auto ls = mpc.getLayeredScreen();
 
-    PushTrackMuteCommand::PushTrackMuteCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushTrackMuteCommand::execute()
+    if (ls->isCurrentScreen<ScreenId::TrMuteScreen>())
     {
-        const auto ls = mpc.getLayeredScreen();
-
-        if (ls->isCurrentScreen<TrMuteScreen>())
+        if (ls->isPreviousScreen<ScreenId::NextSeqScreen,
+                                 ScreenId::NextSeqPadScreen>())
         {
-            if (ls->isPreviousScreen<NextSeqScreen, NextSeqPadScreen>())
-            {
-                ls->openScreen<NextSeqScreen>();
-            }
-            else
-            {
-                ls->openScreen<SequencerScreen>();
-            }
-
-            mpc.getHardware()
-                ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
-                ->setEnabled(false);
+            ls->openScreenById(ScreenId::NextSeqScreen);
         }
-        else if (ls->isCurrentScreen<NextSeqScreen, NextSeqPadScreen,
-                                     SequencerScreen>() &&
-                 !mpc.getSequencer()->isRecordingOrOverdubbing())
+        else
         {
-            Util::initSequence(mpc);
-            mpc.getLayeredScreen()->openScreen<TrMuteScreen>();
-            mpc.getHardware()
-                ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
-                ->setEnabled(true);
+            ls->openScreenById(ScreenId::SequencerScreen);
         }
+
+        mpc.getHardware()
+            ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
+            ->setEnabled(false);
     }
-} // namespace mpc::command
+    else if (ls->isCurrentScreen<ScreenId::NextSeqScreen,
+                                 ScreenId::NextSeqPadScreen,
+                                 ScreenId::SequencerScreen>() &&
+             !mpc.getSequencer()->isRecordingOrOverdubbing())
+    {
+        Util::initSequence(mpc);
+        mpc.getLayeredScreen()->openScreenById(ScreenId::TrMuteScreen);
+        mpc.getHardware()
+            ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
+            ->setEnabled(true);
+    }
+}

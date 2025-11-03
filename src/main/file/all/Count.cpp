@@ -6,6 +6,7 @@
 
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -31,8 +32,10 @@ Count::Count(const std::vector<char> &b)
 
 Count::Count(mpc::Mpc &mpc)
 {
-    auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>();
-    auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>();
+    auto countMetronomeScreen =
+        mpc.screens->get<ScreenId::CountMetronomeScreen>();
+    auto metronomeSoundScreen =
+        mpc.screens->get<ScreenId::MetronomeSoundScreen>();
 
     auto lSequencer = mpc.getSequencer();
 

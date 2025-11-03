@@ -1,5 +1,6 @@
 #include "lcdgui/MixerStrip.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/Knob.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/MixerFaderBackground.hpp"
@@ -92,7 +93,7 @@ void MixerStrip::setValueB(int i)
 
 void MixerStrip::initLabels()
 {
-    auto mixerScreen = mpc.screens->get<MixerScreen>();
+    auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
 
     if (mixerScreen->getTab() == 0)
     {
@@ -168,7 +169,7 @@ void MixerStrip::setSelection(int i)
 
 void MixerStrip::setValueAString(std::string str)
 {
-    auto mixerScreen = mpc.screens->get<MixerScreen>();
+    auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
 
     if (mixerScreen->getTab() == 1)
     {

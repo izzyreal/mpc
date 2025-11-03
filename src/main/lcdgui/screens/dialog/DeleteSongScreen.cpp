@@ -1,6 +1,8 @@
 #include "DeleteSongScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 
 #include <StrUtil.hpp>
@@ -24,7 +26,7 @@ void DeleteSongScreen::turnWheel(int i)
 
     if (focusedFieldName == "song")
     {
-        auto songScreen = mpc.screens->get<SongScreen>();
+        auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
         auto candidate = songScreen->activeSongIndex + i;
 
         if (candidate < 0)
@@ -48,22 +50,22 @@ void DeleteSongScreen::function(int i)
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()->openScreen<DeleteAllSongScreen>();
+            openScreenById(ScreenId::DeleteAllSongScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SongWindow>();
+            openScreenById(ScreenId::SongWindow);
             break;
         case 4:
-            auto songScreen = mpc.screens->get<SongScreen>();
+            auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
             sequencer->deleteSong(songScreen->activeSongIndex);
-            mpc.getLayeredScreen()->openScreen<SongScreen>();
+            openScreenById(ScreenId::SongScreen);
             break;
     }
 }
 
 void DeleteSongScreen::displaySong()
 {
-    auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     auto song = sequencer->getSong(songScreen->activeSongIndex);
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",

@@ -1,5 +1,6 @@
 #include "TempoChangeScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
 
@@ -380,7 +381,7 @@ void TempoChangeScreen::function(int j)
         }
         break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         case 4:
         {

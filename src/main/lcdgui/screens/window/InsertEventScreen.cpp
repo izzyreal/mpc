@@ -4,6 +4,7 @@
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
@@ -39,7 +40,7 @@ void InsertEventScreen::function(int i)
         case 4:
             insertEvent();
             eventAddedBeforeLeavingTheScreen = true;
-            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+            openScreenById(ScreenId::StepEditorScreen);
             break;
     }
 }
@@ -54,7 +55,8 @@ void InsertEventScreen::insertEvent()
         auto noteEvent = std::make_shared<NoteOnEvent>();
         track->addEvent(sequencer->getTickPosition(), noteEvent,
                         allowMultipleNotesOnSameTick);
-        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
+        auto timingCorrectScreen =
+            mpc.screens->get<ScreenId::TimingCorrectScreen>();
         unsigned short duration =
             timingCorrectScreen->getNoteValueLengthInTicks();
         noteEvent->setDuration(duration);

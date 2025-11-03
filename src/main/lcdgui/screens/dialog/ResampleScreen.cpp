@@ -1,6 +1,9 @@
 #include "ResampleScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
@@ -12,7 +15,7 @@ ResampleScreen::ResampleScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void ResampleScreen::open()
 {
-    if (ls->isPreviousScreenNot<NameScreen>() && sampler->getSound())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen>() && sampler->getSound())
     {
         newName = sampler->getSound()->getName();
         newName = sampler->addOrIncreaseNumber(newName);
@@ -27,7 +30,6 @@ void ResampleScreen::open()
 
 void ResampleScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "newfs")
@@ -46,7 +48,6 @@ void ResampleScreen::turnWheel(int i)
 
 void ResampleScreen::openNameScreen()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "newname")
@@ -59,23 +60,22 @@ void ResampleScreen::openNameScreen()
             }
 
             setNewName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<ResampleScreen>();
+            openScreenById(ScreenId::ResampleScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(findField("newname")->getText(), 16, enterAction,
                                "resample");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
 void ResampleScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         case 4:
         {
@@ -146,7 +146,7 @@ void ResampleScreen::function(int i)
             destSnd->setLoopTo(snd->getLoopTo() * ratio);
 
             sampler->setSoundIndex(sampler->getSoundCount() - 1);
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         }
     }
@@ -174,34 +174,19 @@ void ResampleScreen::displayNewName()
 
 void ResampleScreen::setNewFs(int i)
 {
-    if (i < 4000 || i > 65000)
-    {
-        return;
-    }
-
-    newFs = i;
+    newFs = std::clamp(i, 4000, 65000);
     displayNewFs();
 }
 
 void ResampleScreen::setQuality(int i)
 {
-    if (i < 0 || i > 2)
-    {
-        return;
-    }
-
-    quality = i;
+    quality = std::clamp(i, 0, 2);
     displayQuality();
 }
 
 void ResampleScreen::setNewBit(int i)
 {
-    if (i < 0 || i > 2)
-    {
-        return;
-    }
-
-    newBit = i;
+    newBit = std::clamp(i, 0, 2);
     displayNewBit();
 }
 

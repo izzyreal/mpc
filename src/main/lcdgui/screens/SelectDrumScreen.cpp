@@ -1,5 +1,6 @@
 #include "SelectDrumScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 
 using namespace mpc::lcdgui;
@@ -12,7 +13,7 @@ SelectDrumScreen::SelectDrumScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SelectDrumScreen::open()
 {
-    auto drumScreen = mpc.screens->get<DrumScreen>();
+    auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
     ls->setFunctionKeysArrangement(drumScreen->getDrum());
 }
 
@@ -24,16 +25,16 @@ void SelectDrumScreen::function(int i)
         return;
     }
 
-    auto drumScreen = mpc.screens->get<DrumScreen>();
+    auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
     drumScreen->setDrum(i);
 
     if (redirectScreen.empty())
     {
-        mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+        openScreenById(ScreenId::PgmAssignScreen);
     }
     else
     {
-        mpc.getLayeredScreen()->openScreen(redirectScreen);
+        ls->openScreen(redirectScreen);
         redirectScreen = "";
     }
 }

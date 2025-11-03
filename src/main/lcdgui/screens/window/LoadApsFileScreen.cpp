@@ -1,4 +1,6 @@
 #include "LoadApsFileScreen.hpp"
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 
 #include "disk/AbstractDisk.hpp"
@@ -16,15 +18,15 @@ void LoadApsFileScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->closeCurrentScreen();
+            ls->closeCurrentScreen();
             break;
         case 4:
         {
             std::function<void()> on_success = [&]()
             {
-                mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
+                ls->closeRecentScreensUntilReachingLayer(0);
             };
-            auto loadScreen = mpc.screens->get<LoadScreen>();
+            auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
             break;
         }

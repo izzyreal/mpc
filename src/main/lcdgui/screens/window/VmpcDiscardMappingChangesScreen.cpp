@@ -1,4 +1,5 @@
 #include "VmpcDiscardMappingChangesScreen.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -21,17 +22,17 @@ void VmpcDiscardMappingChangesScreen::function(int i)
     {
         case 3:
             // stay
-            mpc.getLayeredScreen()->openScreen(stayScreen);
+            ls->openScreen(stayScreen);
             break;
         case 4:
             // discard and leave
             discardAndLeave();
-            mpc.getLayeredScreen()->openScreen(nextScreen);
+            ls->openScreen(nextScreen);
             break;
         case 5:
             // save and leave
             saveAndLeave();
-            mpc.getLayeredScreen()->openScreen(nextScreen);
+            ls->openScreen(nextScreen);
             break;
     }
 }

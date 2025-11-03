@@ -4,6 +4,7 @@
 #include "sequencer/Sequence.hpp"
 
 #include "lcdgui/screens/window/LoadASequenceScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
@@ -32,7 +33,8 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "load-into")
     {
-        auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
+        auto loadASequenceScreen =
+            mpc.screens->get<ScreenId::LoadASequenceScreen>();
         loadASequenceScreen->setLoadInto(loadASequenceScreen->loadInto + i);
         displayLoadInto();
     }
@@ -44,7 +46,7 @@ void LoadASequenceFromAllScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<Mpc2000XlAllFileScreen>();
+            openScreenById(ScreenId::Mpc2000XlAllFileScreen);
             break;
         case 4:
             auto candidate = sequencesFromAllFile[sourceSeqIndex];
@@ -52,10 +54,10 @@ void LoadASequenceFromAllScreen::function(int i)
             if (candidate)
             {
                 auto loadASequenceScreen =
-                    mpc.screens->get<LoadASequenceScreen>();
+                    mpc.screens->get<ScreenId::LoadASequenceScreen>();
                 sequencer->setSequence(loadASequenceScreen->loadInto,
                                        candidate);
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                openScreenById(ScreenId::LoadScreen);
             }
             break;
     }
@@ -79,7 +81,8 @@ void LoadASequenceFromAllScreen::displayFile()
 
 void LoadASequenceFromAllScreen::displayLoadInto()
 {
-    auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>();
+    auto loadASequenceScreen =
+        mpc.screens->get<ScreenId::LoadASequenceScreen>();
     findField("load-into")
         ->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
     findLabel("load-into0")

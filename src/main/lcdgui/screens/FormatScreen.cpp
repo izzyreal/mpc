@@ -1,4 +1,5 @@
 #include "FormatScreen.hpp"
+#include "Mpc.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -9,14 +10,13 @@ FormatScreen::FormatScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void FormatScreen::function(int i)
 {
-
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            openScreenById(ScreenId::LoadScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
     }
 }

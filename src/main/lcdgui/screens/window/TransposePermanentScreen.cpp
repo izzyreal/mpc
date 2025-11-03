@@ -2,6 +2,7 @@
 
 #include "lcdgui/screens/TransScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
 
@@ -21,7 +22,7 @@ void TransposePermanentScreen::function(int i)
     switch (i)
     {
         case 4:
-            auto transScreen = mpc.screens->get<TransScreen>();
+            auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
             auto all = transScreen->tr == -1;
 
             std::vector<int> tracks;
@@ -57,7 +58,7 @@ void TransposePermanentScreen::function(int i)
                 }
             }
             transScreen->setTransposeAmount(0);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

@@ -36,7 +36,7 @@ void StdDisk::initFiles()
 
     AkaiFileRenamer::renameFilesInDirectory(mpc, getDir()->fs_path);
 
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     auto view = loadScreen->view;
     auto dirList = getDir()->listFiles();

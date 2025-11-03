@@ -12,9 +12,11 @@
 
 #include "lcdgui/Rectangle.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
@@ -113,12 +115,12 @@ bool StepEditorScreen::visibleEventsEqual(
 
 void StepEditorScreen::openWindow()
 {
-    mpc.getLayeredScreen()->openScreen<StepEditOptionsScreen>();
+    openScreenById(ScreenId::StepEditOptionsScreen);
 }
 
 void StepEditorScreen::open()
 {
-    mpc.getSequencer()->storeActiveSequenceInUndoPlaceHolder();
+    sequencer->storeActiveSequenceInUndoPlaceHolder();
 
     findField("tonote")->setLocation(115, 0);
     findLabel("fromnote")->Hide(true);
@@ -153,9 +155,10 @@ void StepEditorScreen::open()
 
     const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
-    if (ls->isPreviousScreen<InsertEventScreen>())
+    if (ls->isPreviousScreen<ScreenId::InsertEventScreen>())
     {
-        auto insertEventScreen = mpc.screens->get<InsertEventScreen>();
+        auto insertEventScreen =
+            mpc.screens->get<ScreenId::InsertEventScreen>();
 
         if (insertEventScreen->isEventAddedBeforeLeavingTheScreen())
         {
@@ -178,8 +181,9 @@ void StepEditorScreen::open()
 
     const auto visibleEvents = computeVisibleEvents(eventsAtCurrentTick);
 
-    if (ls->isPreviousScreenNot<StepTcScreen, InsertEventScreen,
-                                PasteEventScreen, EditMultipleScreen>())
+    if (ls->isPreviousScreenNot<
+            ScreenId::StepTcScreen, ScreenId::InsertEventScreen,
+            ScreenId::PasteEventScreen, ScreenId::EditMultipleScreen>())
     {
         auto eventType = visibleEvents[0]->getTypeName();
         ls->setFocus(lastColumn[eventType] + "0");
@@ -215,7 +219,7 @@ void StepEditorScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<StepTcScreen>();
+            openScreenById(ScreenId::StepTcScreen);
             break;
         case 1:
             if (selectionStartIndex != -1)
@@ -300,7 +304,7 @@ void StepEditorScreen::function(int i)
             {
                 if (!posIsLastTick)
                 {
-                    mpc.getLayeredScreen()->openScreen<InsertEventScreen>();
+                    openScreenById(ScreenId::InsertEventScreen);
                 }
             }
             else
@@ -348,7 +352,7 @@ void StepEditorScreen::function(int i)
                 }
 
                 auto editMultipleScreen =
-                    mpc.screens->get<EditMultipleScreen>();
+                    mpc.screens->get<ScreenId::EditMultipleScreen>();
 
                 auto track = mpc.getSequencer()->getActiveTrack();
                 if (noteEvent && track->getBus() != 0)
@@ -422,7 +426,7 @@ void StepEditorScreen::function(int i)
                 setSelectedEvent(visibleEvents[row]);
                 setSelectedEvents();
                 setSelectedParameterLetter(column);
-                mpc.getLayeredScreen()->openScreen<EditMultipleScreen>();
+                openScreenById(ScreenId::EditMultipleScreen);
             }
 
             break;
@@ -430,7 +434,7 @@ void StepEditorScreen::function(int i)
         case 4:
             if (!placeHolder.empty())
             {
-                mpc.getLayeredScreen()->openScreen<PasteEventScreen>();
+                openScreenById(ScreenId::PasteEventScreen);
             }
             break;
         case 5:
@@ -499,7 +503,7 @@ void StepEditorScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "tcvalue")
     {
-        auto screen = mpc.screens->get<TimingCorrectScreen>();
+        auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
         auto noteValue = screen->getNoteValue();
         screen->setNoteValue(noteValue + i);
     }

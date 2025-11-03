@@ -1,6 +1,7 @@
 #include "VmpcContinuePreviousSessionScreen.hpp"
 
 #include "../VmpcAutoSaveScreen.hpp"
+#include "Mpc.hpp"
 #include "lcdgui/Label.hpp"
 
 using namespace mpc::lcdgui;
@@ -27,7 +28,7 @@ VmpcContinuePreviousSessionScreen::VmpcContinuePreviousSessionScreen(
 
 void VmpcContinuePreviousSessionScreen::function(int i)
 {
-    auto autoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
+    auto autoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
 
     switch (i)
     {

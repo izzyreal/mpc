@@ -4,6 +4,8 @@
 
 #include "Logger.hpp"
 #include "StrUtil.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/window/SaveAllFileScreen.hpp"
@@ -28,7 +30,7 @@ void SaveScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->isPreviousScreenNot<PopupScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::PopupScreen>())
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
@@ -74,7 +76,7 @@ void SaveScreen::openWindow()
 
     if (focusedFieldName == "directory")
     {
-        mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+        openScreenById(ScreenId::DirectoryScreen);
     }
 }
 
@@ -84,7 +86,7 @@ void SaveScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            openScreenById(ScreenId::LoadScreen);
             break;
         case 2:
             // openScreen<FormatScreen>();
@@ -151,7 +153,7 @@ void SaveScreen::function(int i)
             {
                 case 0:
                 {
-                    mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
+                    openScreenById(ScreenId::SaveAllFileScreen);
                     break;
                 }
                 case 1:
@@ -160,13 +162,13 @@ void SaveScreen::function(int i)
                         return;
                     }
 
-                    mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                    openScreenById(ScreenId::SaveASequenceScreen);
                     break;
                 case 2:
-                    mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+                    openScreenById(ScreenId::SaveApsFileScreen);
                     break;
                 case 3:
-                    mpc.getLayeredScreen()->openScreen<SaveAProgramScreen>();
+                    openScreenById(ScreenId::SaveAProgramScreen);
                     break;
                 case 4:
                     if (sampler->getSoundCount() == 0)
@@ -174,7 +176,7 @@ void SaveScreen::function(int i)
                         break;
                     }
 
-                    mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
+                    openScreenById(ScreenId::SaveASoundScreen);
                     break;
             }
         }
@@ -320,7 +322,7 @@ void SaveScreen::displayFile()
         case 0:
         {
             const auto saveAllFileScreen =
-                mpc.screens->get<SaveAllFileScreen>();
+                mpc.screens->get<ScreenId::SaveAllFileScreen>();
             fileName = saveAllFileScreen->fileName;
             break;
         }
@@ -336,7 +338,7 @@ void SaveScreen::displayFile()
         case 2:
         {
             const auto saveApsFileScreen =
-                mpc.screens->get<SaveApsFileScreen>();
+                mpc.screens->get<ScreenId::SaveApsFileScreen>();
             fileName = saveApsFileScreen->fileName;
             break;
         }

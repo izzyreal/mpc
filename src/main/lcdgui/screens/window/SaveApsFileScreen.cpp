@@ -2,9 +2,11 @@
 
 #include <Util.hpp>
 
+#include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
@@ -19,7 +21,7 @@ SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveApsFileScreen::open()
 {
-    if (ls->isPreviousScreen<SaveScreen>())
+    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
     {
         fileName = "ALL_PGMS";
     }
@@ -32,7 +34,7 @@ void SaveApsFileScreen::open()
 
 void SaveApsFileScreen::turnWheel(int i)
 {
-    auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
+    auto saveAProgramScreen = mpc.screens->get<ScreenId::SaveAProgramScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -54,11 +56,11 @@ void SaveApsFileScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
         case 4:
         {
-            auto nameScreen = mpc.screens->get<NameScreen>();
+            auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             std::string apsFileName = fileName + ".APS";
 
             auto disk = mpc.getDisk();
@@ -79,23 +81,24 @@ void SaveApsFileScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &nameScreenName)
                     {
                         fileName = nameScreenName;
-                        mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+                        openScreenById(ScreenId::SaveApsFileScreen);
                     };
                     nameScreen->initialize(fileName, 16, enterAction, "save");
                 };
 
-                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                auto fileExistsScreen =
+                    mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
                     [this]
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                        openScreenById(ScreenId::SaveScreen);
                     });
-                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                openScreenById(ScreenId::FileExistsScreen);
                 return;
             }
 
@@ -112,13 +115,13 @@ void SaveApsFileScreen::displayFile()
 
 void SaveApsFileScreen::displaySave()
 {
-    auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
+    auto saveAProgramScreen = mpc.screens->get<ScreenId::SaveAProgramScreen>();
     findField("save")->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
-    auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>();
+    auto saveAProgramScreen = mpc.screens->get<ScreenId::SaveAProgramScreen>();
     findField("replace-same-sounds")
         ->setText(
             std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
@@ -134,11 +137,11 @@ void SaveApsFileScreen::openNameScreen()
         const auto enterAction = [this](std::string &nameScreenName)
         {
             fileName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen<SaveApsFileScreen>();
+            openScreenById(ScreenId::SaveApsFileScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(fileName, 16, enterAction, "save-aps-file");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }

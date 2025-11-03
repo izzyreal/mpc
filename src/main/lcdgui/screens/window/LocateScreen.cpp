@@ -1,6 +1,7 @@
 #include "LocateScreen.hpp"
 
 #include "StrUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -12,7 +13,6 @@ LocateScreen::LocateScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void LocateScreen::function(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     switch (i)
@@ -30,11 +30,11 @@ void LocateScreen::function(int i)
             std::get<1>(location) = beatIndex;
             std::get<2>(location) = clock;
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         case 4:
             if (focusedFieldName.length() == 1)
@@ -61,7 +61,7 @@ void LocateScreen::function(int i)
                 sequencer->setBeat(beatIndex);
                 sequencer->setClock(clock);
             }
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         default:
             break;

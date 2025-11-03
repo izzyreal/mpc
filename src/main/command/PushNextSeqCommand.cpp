@@ -1,22 +1,23 @@
 #include "PushNextSeqCommand.hpp"
 #include "Mpc.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushNextSeqCommand::PushNextSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushNextSeqCommand::execute()
 {
-
-    PushNextSeqCommand::PushNextSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushNextSeqCommand::execute()
+    if (mpc.getLayeredScreen()
+            ->isCurrentScreen<ScreenId::NextSeqScreen,
+                              ScreenId::NextSeqPadScreen>())
     {
-        if (mpc.getLayeredScreen()
-                ->isCurrentScreen<NextSeqScreen, NextSeqPadScreen>())
-        {
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        }
-        else if (mpc.getLayeredScreen()
-                     ->isCurrentScreen<SequencerScreen, TrMuteScreen>())
-        {
-            mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
-        }
+        mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
-} // namespace mpc::command
+    else if (mpc.getLayeredScreen()
+                 ->isCurrentScreen<ScreenId::SequencerScreen,
+                                   ScreenId::TrMuteScreen>())
+    {
+        mpc.getLayeredScreen()->openScreenById(ScreenId::NextSeqScreen);
+    }
+}

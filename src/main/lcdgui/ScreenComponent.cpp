@@ -9,9 +9,14 @@
 #include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
+#include "sequencer/Bus.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Track.hpp"
+#include "command/AllCommands.hpp"
 
 #include <stdexcept>
 
@@ -28,6 +33,11 @@ ScreenComponent::ScreenComponent(mpc::Mpc &mpc, const std::string &name,
     auto background = std::dynamic_pointer_cast<Background>(
         addChild(std::make_shared<Background>()));
     background->setBackgroundName(name);
+}
+
+void ScreenComponent::openScreenById(const ScreenId screenId)
+{
+    ls->openScreenById(screenId);
 }
 
 void ScreenComponent::setTransferMap(
@@ -114,8 +124,7 @@ std::optional<int> ScreenComponent::getDrumIndex()
 {
     if (screengroups::isSamplerScreen(ls->getCurrentScreen()))
     {
-        const auto drumScreen =
-            mpc.screens->get<mpc::lcdgui::screens::DrumScreen>();
+        const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
         return drumScreen->getDrum();
     }
 
@@ -197,4 +206,73 @@ std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()
         throw std::runtime_error("Expected program");
     }
     return p;
+}
+
+void ScreenComponent::left()
+{
+    command::PushLeftCommand(mpc).execute();
+}
+void ScreenComponent::right()
+{
+    command::PushRightCommand(mpc).execute();
+}
+
+void ScreenComponent::up()
+{
+    command::PushUpCommand(mpc).execute();
+}
+
+void ScreenComponent::down()
+{
+    command::PushDownCommand(mpc).execute();
+}
+
+void ScreenComponent::function(int i)
+{
+    if (i == 3)
+    {
+        mpc.getLayeredScreen()->closeCurrentScreen();
+    }
+}
+
+void ScreenComponent::numpad(int i)
+{
+    command::PushNumPadCommand(mpc, i).execute();
+}
+void ScreenComponent::pressEnter()
+{
+    command::PushEnterCommand(mpc).execute();
+}
+void ScreenComponent::rec()
+{
+    command::PushRecCommand(mpc).execute();
+}
+void ScreenComponent::overDub()
+{
+    command::PushOverdubCommand(mpc).execute();
+}
+void ScreenComponent::stop()
+{
+    command::PushStopCommand(mpc).execute();
+}
+void ScreenComponent::play()
+{
+    command::PushPlayCommand(mpc).execute();
+}
+void ScreenComponent::playStart()
+{
+    command::PushPlayStartCommand(mpc).execute();
+}
+
+int ScreenComponent::getSoundIncrement(const int dataWheelSteps)
+{
+    auto result = dataWheelSteps;
+
+    if (std::abs(result) != 1)
+    {
+        result *= (int)(ceil(mpc.getSampler()->getSound()->getFrameCount() /
+                             15000.f));
+    }
+
+    return result;
 }

@@ -1,5 +1,7 @@
 #include "EditVelocityScreen.hpp"
 
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -20,7 +22,6 @@ EditVelocityScreen::EditVelocityScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void EditVelocityScreen::setNote0(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "note0")
@@ -95,7 +96,7 @@ void EditVelocityScreen::function(int i)
                 }
             }
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

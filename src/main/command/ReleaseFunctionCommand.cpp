@@ -5,8 +5,11 @@
 
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;
+using namespace mpc::lcdgui;
 
 ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc &mpc, int i)
     : mpc(mpc), i(i)
@@ -19,21 +22,23 @@ void ReleaseFunctionCommand::execute()
     switch (i)
     {
         case 0:
-            if (ls->isCurrentScreen<StepTcScreen>())
+            if (ls->isCurrentScreen<ScreenId::StepTcScreen>())
             {
-                mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+                mpc.getLayeredScreen()->openScreenById(
+                    ScreenId::StepEditorScreen);
             }
             break;
         case 2:
-            if (ls->isCurrentScreen<LoadASoundScreen>())
+            if (ls->isCurrentScreen<ScreenId::LoadASoundScreen>())
             {
                 mpc.getSampler()->finishBasicVoice();
             }
             break;
         case 4:
-            if (mpc.getLayeredScreen()->isCurrentScreenPopupFor<LoadScreen>())
+            if (mpc.getLayeredScreen()
+                    ->isCurrentScreenPopupFor<ScreenId::LoadScreen>())
             {
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
             }
             break;
@@ -43,12 +48,12 @@ void ReleaseFunctionCommand::execute()
             auto sampler = mpc.getSampler();
 
             if (!sequencer->isPlaying() &&
-                !ls->isCurrentScreen<SequencerScreen>())
+                !ls->isCurrentScreen<ScreenId::SequencerScreen>())
             {
                 sampler->finishBasicVoice();
             }
 
-            if (ls->isCurrentScreen<TrMuteScreen>())
+            if (ls->isCurrentScreen<ScreenId::TrMuteScreen>())
             {
                 if (!sequencer->isSoloEnabled())
                 {
@@ -58,9 +63,10 @@ void ReleaseFunctionCommand::execute()
                 sequencer->setSoloEnabled(sequencer->isSoloEnabled());
             }
             else if (mpc.getLayeredScreen()
-                         ->isCurrentScreenPopupFor<DirectoryScreen>())
+                         ->isCurrentScreenPopupFor<ScreenId::DirectoryScreen>())
             {
-                mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+                mpc.getLayeredScreen()->openScreenById(
+                    ScreenId::DirectoryScreen);
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
             }
             break;

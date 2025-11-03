@@ -1,11 +1,14 @@
 #include "SndParamsScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
 
 #include <Util.hpp>
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -54,7 +57,7 @@ void SndParamsScreen::openWindow()
     if (focusedFieldName == "snd")
     {
         sampler->setPreviousScreenName("params");
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
+        openScreenById(ScreenId::SoundScreen);
     }
 }
 
@@ -64,13 +67,13 @@ void SndParamsScreen::function(int f)
     switch (f)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<TrimScreen>();
+            openScreenById(ScreenId::TrimScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<LoopScreen>();
+            openScreenById(ScreenId::LoopScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            openScreenById(ScreenId::ZoneScreen);
             break;
         case 3:
         {
@@ -86,9 +89,10 @@ void SndParamsScreen::function(int f)
                 return;
             }
 
-            auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
+            auto editSoundScreen =
+                mpc.screens->get<ScreenId::EditSoundScreen>();
             editSoundScreen->setReturnToScreenName("trim");
-            mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+            openScreenById(ScreenId::EditSoundScreen);
             break;
         }
         case 5:

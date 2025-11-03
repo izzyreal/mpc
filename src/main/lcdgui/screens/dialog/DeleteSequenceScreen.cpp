@@ -1,4 +1,5 @@
 #include "DeleteSequenceScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <StrUtil.hpp>
 
@@ -16,7 +17,6 @@ void DeleteSequenceScreen::open()
 
 void DeleteSequenceScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "sq")
@@ -29,19 +29,18 @@ void DeleteSequenceScreen::turnWheel(int i)
 
 void DeleteSequenceScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()->openScreen<DeleteAllSequencesScreen>();
+            openScreenById(ScreenId::DeleteAllSequencesScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
+            openScreenById(ScreenId::SequenceScreen);
             break;
         case 4:
             sequencer->move(0);
             sequencer->purgeSequence(sequencer->getActiveSequenceIndex());
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

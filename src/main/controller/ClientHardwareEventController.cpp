@@ -1,7 +1,7 @@
 #include "controller/ClientHardwareEventController.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
-#include "command/TriggerLocalNoteOffCommand.hpp"
+#include "command/AllCommands.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "controller/ClientEventController.hpp"
@@ -23,6 +23,11 @@
 #include "lcdgui/screens/window/KeepOrRetryScreen.hpp"
 #include "lcdgui/screens/window/LoadASoundScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Track.hpp"
 
 #include <memory>
 
@@ -108,7 +113,7 @@ void ClientHardwareEventController::handlePadPress(
 
     auto layeredScreen = mpc.getLayeredScreen();
 
-    if (layeredScreen->isCurrentScreen<NameScreen>() &&
+    if (layeredScreen->isCurrentScreen<ScreenId::NameScreen>() &&
         event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         return;
@@ -198,12 +203,12 @@ void ClientHardwareEventController::handlePadPress(
 
     std::function<void(void *)> action = [](void *) {};
 
-    if (layeredScreen->isCurrentScreen<PopupScreen>())
+    if (layeredScreen->isCurrentScreen<ScreenId::PopupScreen>())
     {
         layeredScreen->closeCurrentScreen();
     }
 
-    if (layeredScreen->isCurrentScreen<NameScreen>())
+    if (layeredScreen->isCurrentScreen<ScreenId::NameScreen>())
     {
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
             event.componentId);
@@ -231,7 +236,7 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    if (mpc.getLayeredScreen()->isCurrentScreen<NameScreen>() &&
+    if (mpc.getLayeredScreen()->isCurrentScreen<ScreenId::NameScreen>() &&
         event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         return;
@@ -525,7 +530,8 @@ void ClientHardwareEventController::handleButtonPress(
         {
             if (vmpcKeyboardScreen->hasMappingChanged())
             {
-                layeredScreen->openScreen<VmpcDiscardMappingChangesScreen>();
+                layeredScreen->openScreenById(
+                    ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
         }
@@ -535,7 +541,8 @@ void ClientHardwareEventController::handleButtonPress(
         {
             if (vmpcMidiScreen->hasMappingChanged())
             {
-                layeredScreen->openScreen<VmpcDiscardMappingChangesScreen>();
+                layeredScreen->openScreenById(
+                    ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
         }

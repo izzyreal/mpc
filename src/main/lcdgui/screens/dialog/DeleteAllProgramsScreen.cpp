@@ -1,4 +1,5 @@
 #include "DeleteAllProgramsScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -10,16 +11,15 @@ DeleteAllProgramsScreen::DeleteAllProgramsScreen(mpc::Mpc &mpc,
 
 void DeleteAllProgramsScreen::function(int j)
 {
-
     switch (j)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
+            openScreenById(ScreenId::DeleteProgramScreen);
             break;
         case 4:
         {
             sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
-            mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
+            openScreenById(ScreenId::DeleteProgramScreen);
             break;
         }
     }

@@ -1,6 +1,7 @@
 #include "DeleteAllTracksScreen.hpp"
 
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -15,11 +16,11 @@ void DeleteAllTracksScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<DeleteTrackScreen>();
+            openScreenById(ScreenId::DeleteTrackScreen);
             break;
         case 4:
             sequencer->getActiveSequence()->purgeAllTracks();
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

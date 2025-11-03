@@ -2,20 +2,16 @@
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushEnterCommand::PushEnterCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushEnterCommand::execute()
 {
 
-    PushEnterCommand::PushEnterCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushEnterCommand::execute()
+    if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
-
-        if (mpc.getHardware()
-                ->getButton(hardware::ComponentId::SHIFT)
-                ->isPressed())
-        {
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
-        }
+        mpc.getLayeredScreen()->openScreenById(ScreenId::SaveScreen);
     }
-
-} // namespace mpc::command
+}

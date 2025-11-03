@@ -2,6 +2,7 @@
 
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -36,10 +37,10 @@ void SequenceScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<DeleteSequenceScreen>();
+            openScreenById(ScreenId::DeleteSequenceScreen);
             break;
         case 4:
-            mpc.getLayeredScreen()->openScreen<CopySequenceScreen>();
+            openScreenById(ScreenId::CopySequenceScreen);
             break;
     }
 }
@@ -59,7 +60,7 @@ void SequenceScreen::openNameScreen()
         enterAction = [this](std::string &nameScreenName)
         {
             sequencer->setDefaultSequenceName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
+            openScreenById(ScreenId::SequenceScreen);
         };
     }
     else
@@ -69,11 +70,11 @@ void SequenceScreen::openNameScreen()
         enterAction = [this](std::string &nameScreenName)
         {
             sequencer->getActiveSequence()->setName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
+            openScreenById(ScreenId::SequenceScreen);
         };
     }
 
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequence");
-    mpc.getLayeredScreen()->openScreen<NameScreen>();
+    openScreenById(ScreenId::NameScreen);
 }

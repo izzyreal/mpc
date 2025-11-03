@@ -5,6 +5,9 @@
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
 
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/NoteEvent.hpp"
@@ -230,15 +233,16 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
                             displayTrackProps();
                         }});
 
-    addReactiveBinding(
-        {[&]
-         {
-             return mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
-         },
-         [&](auto)
-         {
-             displayTiming();
-         }});
+    addReactiveBinding({[&]
+                        {
+                            return mpc.screens
+                                ->get<ScreenId::TimingCorrectScreen>()
+                                ->getNoteValue();
+                        },
+                        [&](auto)
+                        {
+                            displayTiming();
+                        }});
 
     addReactiveBinding({[&]
                         {
@@ -291,7 +295,7 @@ void SequencerScreen::open()
 
     findChild<TextComp>("fk3")->setBlinking(sequencer->isSoloEnabled());
 
-    auto punchScreen = mpc.screens->get<PunchScreen>();
+    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     if (sequencer->isSecondSequenceEnabled())
     {
@@ -604,7 +608,8 @@ std::vector<std::string> SequencerScreen::timingCorrectNames =
 
 void SequencerScreen::displayTiming()
 {
-    auto noteValue = mpc.screens->get<TimingCorrectScreen>()->getNoteValue();
+    auto noteValue =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>()->getNoteValue();
     findField("timing")->setText(timingCorrectNames[noteValue]);
 }
 
@@ -674,7 +679,7 @@ void SequencerScreen::function(int i)
 
             Util::initSequence(mpc);
 
-            mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+            openScreenById(ScreenId::StepEditorScreen);
             break;
         case 1:
         {
@@ -683,7 +688,7 @@ void SequencerScreen::function(int i)
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<EventsScreen>();
+            openScreenById(ScreenId::EventsScreen);
             break;
         }
         case 2:
@@ -774,7 +779,8 @@ void SequencerScreen::turnWheel(int i)
         {
             auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-            auto stepEditorScreen = mpc.screens->get<StepEditorScreen>();
+            auto stepEditorScreen =
+                mpc.screens->get<ScreenId::StepEditorScreen>();
 
             if (std::dynamic_pointer_cast<NoteOnEvent>(
                     stepEditorScreen->computeVisibleEvents()[eventNumber]))
@@ -802,7 +808,7 @@ void SequencerScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "timing")
     {
-        auto screen = mpc.screens->get<TimingCorrectScreen>();
+        auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
         auto noteValue = screen->getNoteValue();
         screen->setNoteValue(noteValue + i);
         setLastFocus("timing-correct", "notevalue");
@@ -846,7 +852,7 @@ void SequencerScreen::turnWheel(int i)
     {
         if (!sequencer->isPlaying())
         {
-            mpc.getLayeredScreen()->openScreen<ChangeBars2Screen>();
+            openScreenById(ScreenId::ChangeBars2Screen);
         }
     }
     else if (focusedFieldName == "tempo")
@@ -857,7 +863,7 @@ void SequencerScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "tsig")
     {
-        mpc.getLayeredScreen()->openScreen<ChangeTsigScreen>();
+        openScreenById(ScreenId::ChangeTsigScreen);
     }
     else if (focusedFieldName == "tempo-source")
     {
@@ -894,31 +900,31 @@ void SequencerScreen::openWindow()
     if (focusedFieldName == "sq")
     {
         Util::initSequence(mpc);
-        mpc.getLayeredScreen()->openScreen<SequenceScreen>();
+        openScreenById(ScreenId::SequenceScreen);
     }
     else if (focusedFieldName.find("now") != std::string::npos)
     {
-        mpc.getLayeredScreen()->openScreen<TimeDisplayScreen>();
+        openScreenById(ScreenId::TimeDisplayScreen);
     }
     else if (focusedFieldName.find("tempo") != std::string::npos)
     {
-        mpc.getLayeredScreen()->openScreen<TempoChangeScreen>();
+        openScreenById(ScreenId::TempoChangeScreen);
     }
     else if (focusedFieldName == "timing")
     {
-        mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
+        openScreenById(ScreenId::TimingCorrectScreen);
     }
     else if (focusedFieldName == "tsig")
     {
-        mpc.getLayeredScreen()->openScreen<ChangeTsigScreen>();
+        openScreenById(ScreenId::ChangeTsigScreen);
     }
     else if (focusedFieldName == "count")
     {
-        mpc.getLayeredScreen()->openScreen<CountMetronomeScreen>();
+        openScreenById(ScreenId::CountMetronomeScreen);
     }
     else if (focusedFieldName == "loop")
     {
-        mpc.getLayeredScreen()->openScreen<LoopBarsScreen>();
+        openScreenById(ScreenId::LoopBarsScreen);
     }
     else if (focusedFieldName == "tr")
     {
@@ -929,35 +935,35 @@ void SequencerScreen::openWindow()
             track->setUsed(true);
         }
 
-        mpc.getLayeredScreen()->openScreen<TrackScreen>();
+        openScreenById(ScreenId::TrackScreen);
     }
     else if (focusedFieldName == "on")
     {
-        mpc.getLayeredScreen()->openScreen<EraseAllOffTracksScreen>();
+        openScreenById(ScreenId::EraseAllOffTracksScreen);
     }
     else if (focusedFieldName == "pgm")
     {
-        mpc.getLayeredScreen()->openScreen<TransmitProgramChangesScreen>();
+        openScreenById(ScreenId::TransmitProgramChangesScreen);
     }
     else if (focusedFieldName == "recordingmode")
     {
-        mpc.getLayeredScreen()->openScreen<MultiRecordingSetupScreen>();
+        openScreenById(ScreenId::MultiRecordingSetupScreen);
     }
     else if (focusedFieldName == "bus")
     {
-        mpc.getLayeredScreen()->openScreen<MidiInputScreen>();
+        openScreenById(ScreenId::MidiInputScreen);
     }
     else if (focusedFieldName == "devicenumber")
     {
-        mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
+        openScreenById(ScreenId::MidiOutputScreen);
     }
     else if (focusedFieldName == "bars")
     {
-        mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
+        openScreenById(ScreenId::ChangeBarsScreen);
     }
     else if (focusedFieldName == "velo")
     {
-        mpc.getLayeredScreen()->openScreen<EditVelocityScreen>();
+        openScreenById(ScreenId::EditVelocityScreen);
     }
 }
 
@@ -1032,7 +1038,7 @@ void SequencerScreen::setPunchRectOn(int i, bool b)
 
 void SequencerScreen::displayPunchWhileRecording()
 {
-    auto punchScreen = mpc.screens->get<PunchScreen>();
+    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     auto hardware = mpc.getHardware();
     auto isRecPressedOrLocked =

@@ -3,6 +3,7 @@
 #include "PunchScreen.hpp"
 #include "lcdgui/Label.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -25,18 +26,18 @@ void TransScreen::open()
 
 void TransScreen::function(int i)
 {
-    auto punchScreen = mpc.screens->get<PunchScreen>();
+    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     switch (i)
     {
         case 0: // Intentional fall-through
         case 2:
             punchScreen->setActiveTab(i);
-            mpc.getLayeredScreen()->openScreen(punchScreen->getTabNames()[i]);
+            ls->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
             // if (amount == 0) break; // does 2kxl do that?
-            mpc.getLayeredScreen()->openScreen<TransposePermanentScreen>();
+            openScreenById(ScreenId::TransposePermanentScreen);
             break;
     }
 }

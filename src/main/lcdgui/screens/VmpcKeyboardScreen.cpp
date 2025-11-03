@@ -47,7 +47,7 @@ void VmpcKeyboardScreen::open()
     /*
     auto kbMapping =
     mpc.clientEventController->clientHardwareEventController->getKbMapping();
-    auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+    auto screen = mpc.screens->get<ScreenId::VmpcDiscardMappingChangesScreen>();
     screen->saveAndLeave = [kbMapping =
     kbMapping](){kbMapping->exportMapping();}; screen->discardAndLeave =
     [kbMapping = kbMapping](){kbMapping->importMapping();}; screen->stayScreen =
@@ -161,14 +161,14 @@ void VmpcKeyboardScreen::function(int i)
             if (hasMappingChanged())
             {
                 auto screen =
-                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                    mpc.screens
+                        ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
-                mpc.getLayeredScreen()
-                    ->openScreen<VmpcDiscardMappingChangesScreen>();
+                openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            openScreenById(ScreenId::VmpcSettingsScreen);
             break;
         case 2:
             if (learning)
@@ -182,14 +182,14 @@ void VmpcKeyboardScreen::function(int i)
             if (hasMappingChanged())
             {
                 auto screen =
-                    mpc.screens->get<VmpcDiscardMappingChangesScreen>();
+                    mpc.screens
+                        ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
-                mpc.getLayeredScreen()
-                    ->openScreen<VmpcDiscardMappingChangesScreen>();
+                openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            openScreenById(ScreenId::VmpcAutoSaveScreen);
             break;
         case 3:
             if (learning)
@@ -217,7 +217,7 @@ void VmpcKeyboardScreen::function(int i)
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcResetKeyboardScreen>();
+            openScreenById(ScreenId::VmpcResetKeyboardScreen);
             break;
         case 5:
             if (learning)

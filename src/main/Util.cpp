@@ -1,9 +1,11 @@
-#include <Util.hpp>
+#include "Util.hpp"
 
+#include "Mpc.hpp"
 #include "sequencer/NoteEvent.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -206,7 +208,7 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)
         return;
     }
 
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     sequence->init(userScreen->lastBar);
     auto numberString =
         StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2);

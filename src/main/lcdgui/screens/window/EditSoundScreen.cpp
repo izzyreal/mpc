@@ -4,8 +4,10 @@
 #include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sampler/TimeStretch1.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Bus.hpp"
 
@@ -40,22 +42,22 @@ void EditSoundScreen::open()
 {
     findField("create-new-program")->setAlignment(Alignment::Centered);
 
-    if (ls->isPreviousScreenNot<NameScreen>() && sampler->getSound())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen>() && sampler->getSound())
     {
         auto newSoundName = sampler->getSound()->getName();
         newSoundName = sampler->addOrIncreaseNumber(newSoundName);
         setNewName(newSoundName);
     }
 
-    if (ls->isPreviousScreen<ZoneScreen>())
+    if (ls->isPreviousScreen<ScreenId::ZoneScreen>())
     {
         setEdit(9);
     }
-    else if (ls->isPreviousScreen<LoopScreen>())
+    else if (ls->isPreviousScreen<ScreenId::LoopScreen>())
     {
         setEdit(1);
     }
-    else if (ls->isPreviousScreenNot<NameScreen>())
+    else if (ls->isPreviousScreenNot<ScreenId::NameScreen>())
     {
         setEdit(0);
     }
@@ -355,12 +357,12 @@ void EditSoundScreen::openNameScreen()
             }
 
             setNewName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+            openScreenById(ScreenId::EditSoundScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(newName, 16, enterAction, "edit-sound");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -448,7 +450,7 @@ void EditSoundScreen::function(int j)
 {
     ScreenComponent::function(j);
 
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
 
     switch (j)
     {
@@ -662,7 +664,7 @@ void EditSoundScreen::function(int j)
                 sound->setSampleData(
                     std::make_shared<std::vector<float>>(newSampleData));
 
-                mpc.getLayeredScreen()->openScreen(returnToScreenName);
+                ls->openScreen(returnToScreenName);
                 break;
             }
             else if (edit == 6)
@@ -732,7 +734,7 @@ void EditSoundScreen::function(int j)
 
                 sound->setSampleData(
                     std::make_shared<std::vector<float>>(newSampleData));
-                mpc.getLayeredScreen()->openScreen(returnToScreenName);
+                ls->openScreen(returnToScreenName);
                 break;
             }
             else if (edit == 7)
@@ -848,7 +850,7 @@ void EditSoundScreen::function(int j)
                 sound->setSampleData(
                     std::make_shared<std::vector<float>>(newSampleData));
 
-                mpc.getLayeredScreen()->openScreen(returnToScreenName);
+                ls->openScreen(returnToScreenName);
                 break;
             }
             else if (edit == 9)
@@ -908,7 +910,7 @@ void EditSoundScreen::function(int j)
                 }
             }
 
-            mpc.getLayeredScreen()->openScreen(returnToScreenName);
+            ls->openScreen(returnToScreenName);
             break;
     }
 }

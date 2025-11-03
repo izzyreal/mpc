@@ -4,11 +4,13 @@
 #include "command/context/TriggerLocalNoteOnContext.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "sampler/Sampler.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 #include "Util.hpp"
 #include "eventregistry/EventRegistry.hpp"
+#include "sequencer/Track.hpp"
 
 using namespace mpc::command;
 using namespace mpc::command::context;

@@ -19,6 +19,7 @@
 
 #include "disk/MpcFile.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
@@ -63,7 +64,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     auto allSeqNames = allParser.getSeqNames()->getNames();
     auto defaults = allParser.getDefaults();
 
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
 
     userScreen->setLastBar(defaults->getBarCount() - 1);
     userScreen->setLoop(defaults->isLoopEnabled());
@@ -113,16 +114,19 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     mpcSequencer->setTempoSourceSequence(
         allParserSequencer->tempoSourceIsSequence);
 
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(allParserSequencer->tc);
 
-    auto timeDisplayScreen = mpc.screens->get<TimeDisplayScreen>();
+    auto timeDisplayScreen = mpc.screens->get<ScreenId::TimeDisplayScreen>();
     timeDisplayScreen->setDisplayStyle(allParserSequencer->timeDisplayStyle);
 
     auto count = allParser.getCount();
 
-    auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>();
-    auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>();
+    auto countMetronomeScreen =
+        mpc.screens->get<ScreenId::CountMetronomeScreen>();
+    auto metronomeSoundScreen =
+        mpc.screens->get<ScreenId::MetronomeSoundScreen>();
 
     countMetronomeScreen->setCountIn(count->getCountInMode());
     metronomeSoundScreen->accentPad = count->getAccentPad();
@@ -140,10 +144,10 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
 
     auto midiInput = allParser.getMidiInput();
 
-    mpc.screens->get<MidiOutputScreen>()->setSoftThru(
+    mpc.screens->get<ScreenId::MidiOutputScreen>()->setSoftThru(
         midiInput->getSoftThruMode());
 
-    auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
+    auto midiInputScreen = mpc.screens->get<ScreenId::MidiInputScreen>();
 
     midiInputScreen->setReceiveCh(midiInput->getReceiveCh() - 1);
     midiInputScreen->setType(midiInput->getFilterType());
@@ -154,7 +158,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     auto trackDests = midiInput->getMultiRecTrackDests();
 
     auto multiRecordingSetupScreen =
-        mpc.screens->get<MultiRecordingSetupScreen>();
+        mpc.screens->get<ScreenId::MultiRecordingSetupScreen>();
 
     for (int i = 0; i < trackDests.size(); i++)
     {
@@ -178,7 +182,8 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     auto midiSyncMisc = allParser.getMidiSync();
 
     auto misc = allParser.getMisc();
-    auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>();
+    auto stepEditOptionsScreen =
+        mpc.screens->get<ScreenId::StepEditOptionsScreen>();
     stepEditOptionsScreen->setAutoStepIncrementEnabled(
         misc->isAutoStepIncEnabled());
     stepEditOptionsScreen->setDurationOfRecordedNotesTcValue(
@@ -187,7 +192,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
         misc->getDurationTcPercentage());
     midiInputScreen->setProgChangeSeq(misc->isPgmChToSeqEnabled());
 
-    auto locateScreen = mpc.screens->get<LocateScreen>();
+    auto locateScreen = mpc.screens->get<ScreenId::LocateScreen>();
     locateScreen->setLocations(misc->getLocations());
 
     auto footswitchController =
@@ -227,11 +232,11 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
         }
     }
 
-    auto othersScreen = mpc.screens->get<OthersScreen>();
+    auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
     othersScreen->setTapAveraging(misc->getTapAvg() + 2);
 
-    auto syncScreen = mpc.screens->get<SyncScreen>();
+    auto syncScreen = mpc.screens->get<ScreenId::SyncScreen>();
 
     syncScreen->receiveMMCEnabled = misc->isInReceiveMMCEnabled();
     syncScreen->sendMMCEnabled = midiSyncMisc->isSendMMCEnabled();
@@ -250,13 +255,14 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     mpcSequencer->setSecondSequenceEnabled(
         allParserSequencer->secondSeqEnabled);
 
-    auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>();
+    auto secondSequenceScreen = mpc.screens->get<ScreenId::SecondSeqScreen>();
     secondSequenceScreen->sq = allParserSequencer->secondSeqIndex;
 
-    auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     songScreen->setOffset(-1);
     songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
-    auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>();
+    auto ignoreTempoChangeScreen =
+        mpc.screens->get<ScreenId::IgnoreTempoChangeScreen>();
     ignoreTempoChangeScreen->setIgnore(
         midiSyncMisc->getSongModeIgnoreTempoChangeEvents());
 

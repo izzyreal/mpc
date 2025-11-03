@@ -32,7 +32,7 @@ void NvRam::loadUserScreenValues(mpc::Mpc &mpc)
     }
 
     auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, path);
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
 
     userScreen->lastBar = defaults.getBarCount() - 1;
     userScreen->bus = defaults.getBusses()[0];
@@ -69,9 +69,9 @@ void NvRam::saveUserScreenValues(mpc::Mpc &mpc)
 
 void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
 {
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
-    auto othersScreen = mpc.screens->get<OthersScreen>();
+    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
+    auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
     auto audioMidiServices = mpc.getAudioMidiServices();
     auto path = mpc.paths->configPath() / "vmpc-specific.ini";
@@ -108,9 +108,9 @@ void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
         return;
     }
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
-    auto othersScreen = mpc.screens->get<OthersScreen>();
+    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
+    auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
     const auto bytes = get_file_data(path);
 

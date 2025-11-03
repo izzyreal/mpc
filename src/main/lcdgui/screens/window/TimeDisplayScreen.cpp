@@ -1,6 +1,7 @@
 #include "TimeDisplayScreen.hpp"
 
 #include "StrUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -18,7 +19,6 @@ void TimeDisplayScreen::open()
 
 void TimeDisplayScreen::turnWheel(int i)
 {
-
     const auto startTime = sequencer->getActiveSequence()->getStartTime();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();

@@ -1,5 +1,6 @@
 #include "CopySongScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 
@@ -35,13 +36,13 @@ void CopySongScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SongWindow>();
+            openScreenById(ScreenId::SongWindow);
             break;
         case 4:
         {
-            auto songScreen = mpc.screens->get<SongScreen>();
+            auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
             sequencer->copySong(songScreen->activeSongIndex, song1);
-            mpc.getLayeredScreen()->openScreen<SongScreen>();
+            openScreenById(ScreenId::SongScreen);
             break;
         }
     }
@@ -50,7 +51,7 @@ void CopySongScreen::function(int i)
 void CopySongScreen::turnWheel(int i)
 {
 
-    auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -79,18 +80,13 @@ void CopySongScreen::turnWheel(int i)
 
 void CopySongScreen::setSong1(int i)
 {
-    if (i < 0 || i > 19)
-    {
-        return;
-    }
-
-    song1 = i;
+    song1 = std::clamp(i, 0, 19);
     displaySong1();
 }
 
 void CopySongScreen::displaySong0()
 {
-    auto songScreen = mpc.screens->get<SongScreen>();
+    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     auto song = sequencer->getSong(songScreen->activeSongIndex);
     findField("song0")->setText(
         StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",

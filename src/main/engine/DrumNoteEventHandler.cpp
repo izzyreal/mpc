@@ -9,7 +9,6 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/NoteParameters.hpp"
-#include "sampler/Sound.hpp"
 
 #include "engine/audio/mixer/AudioMixer.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
@@ -18,6 +17,7 @@
 #include "engine/DrumNoteEventContextBuilder.hpp"
 
 #include "MpcSpecs.hpp"
+#include "sequencer/Bus.hpp"
 
 #include <utility>
 

@@ -9,6 +9,11 @@
 #include <map>
 #include <functional>
 
+namespace mpc::sequencer
+{
+    class NoteOnEvent;
+}
+
 namespace mpc::lcdgui::screens
 {
     class StepEditorScreen : public mpc::lcdgui::ScreenComponent

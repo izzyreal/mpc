@@ -13,10 +13,10 @@ void VerScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<OthersScreen>();
+            openScreenById(ScreenId::OthersScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<InitScreen>();
+            openScreenById(ScreenId::InitScreen);
             break;
     }
 }

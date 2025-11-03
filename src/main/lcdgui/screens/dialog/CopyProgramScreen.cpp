@@ -1,6 +1,9 @@
 #include "CopyProgramScreen.hpp"
 
 #include "StrUtil.hpp"
+#include "lcdgui/LayeredScreen.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -26,7 +29,7 @@ void CopyProgramScreen::function(int i)
 
     {
         case int(3):
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
             if (pgm0 == pgm1)
@@ -36,7 +39,7 @@ void CopyProgramScreen::function(int i)
 
             sampler->copyProgram(pgm0, pgm1);
             getActiveDrumBus()->setProgram(pgm1);
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
             break;
     }
 }

@@ -1,4 +1,5 @@
 #include "CopySequenceScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <StrUtil.hpp>
 
@@ -20,20 +21,19 @@ void CopySequenceScreen::open()
 
 void CopySequenceScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
             sequencer->copySequenceParameters(sq0, sq1);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequenceScreen>();
+            openScreenById(ScreenId::SequenceScreen);
             break;
         case 4:
             sequencer->copySequence(sq0, sq1);
             sequencer->setActiveSequenceIndex(sq1);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

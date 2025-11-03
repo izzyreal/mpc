@@ -7,6 +7,7 @@
 #include "audiomidi/MidiOutput.hpp"
 
 #include "sequencer/SeqUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -14,7 +15,7 @@ using namespace mpc::sequencer;
 
 MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
     : mpc(mpc), sequencer(mpc.getSequencer()),
-      syncScreen(mpc.screens->get<SyncScreen>())
+      syncScreen(mpc.screens->get<ScreenId::SyncScreen>())
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
 {

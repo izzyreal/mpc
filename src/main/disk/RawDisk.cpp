@@ -14,6 +14,7 @@ using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
 using namespace akaifat::util;
 using namespace akaifat::fat;
+using namespace mpc::lcdgui;
 
 RawDisk::RawDisk(mpc::Mpc &_mpc) : AbstractDisk(_mpc) {}
 
@@ -38,7 +39,7 @@ void RawDisk::initFiles()
     files.clear();
     allFiles.clear();
 
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     auto view = loadScreen->view;
     auto dirList = getDir()->akaiNameIndex;

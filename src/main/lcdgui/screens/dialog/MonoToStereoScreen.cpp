@@ -1,11 +1,14 @@
 #include "MonoToStereoScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 #include <memory>
 
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
+#include "sampler/Sampler.hpp"
 
 namespace mpc::lcdgui
 {
@@ -24,7 +27,7 @@ MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc &mpc, const int layerIndex)
 void MonoToStereoScreen::open()
 {
     if (sampler->getSound() &&
-        ls->isPreviousScreenNot<NameScreen, PopupScreen>())
+        ls->isPreviousScreenNot<ScreenId::NameScreen, ScreenId::PopupScreen>())
     {
         auto name = sampler->getSound()->getName();
         name = StrUtil::trim(name);
@@ -33,7 +36,7 @@ void MonoToStereoScreen::open()
         newStName = name + "-S";
     }
 
-    if (ls->isPreviousScreenNot<NameScreen, PopupScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen, ScreenId::PopupScreen>())
     {
         ls->setFocus("lsource");
     }
@@ -90,22 +93,21 @@ void MonoToStereoScreen::openNameScreen()
             }
 
             newStName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen<MonoToStereoScreen>();
+            openScreenById(ScreenId::MonoToStereoScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(newStName, 16, enterAction, "mono-to-stereo");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
 void MonoToStereoScreen::function(int j)
 {
-
     switch (j)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         case 4:
         {
@@ -153,7 +155,7 @@ void MonoToStereoScreen::function(int j)
             sampler->mergeToStereo(left->getSampleData(), newSampleDataRight,
                                    newSound->getMutableSampleData());
             newSound->setMono(false);
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
         }
     }
 }
@@ -210,11 +212,6 @@ void MonoToStereoScreen::displayNewStName()
 
 void MonoToStereoScreen::setRSource(int i)
 {
-    if (i < 0 || i >= sampler->getSoundCount())
-    {
-        return;
-    }
-
-    rSource = i;
+    rSource = std::clamp(i, 0, sampler->getSoundCount() - 1);
     displayRSource();
 }

@@ -52,10 +52,10 @@ void CountMetronomeScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         case 4:
-            mpc.getLayeredScreen()->openScreen<MetronomeSoundScreen>();
+            openScreenById(ScreenId::MetronomeSoundScreen);
             break;
     }
 }

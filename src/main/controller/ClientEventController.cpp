@@ -13,6 +13,7 @@
 #include "hardware/ComponentId.hpp"
 
 #include "sequencer/SeqUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <variant>
 
@@ -36,11 +37,12 @@ void ClientEventController::init()
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
         mpc.eventRegistry, shared_from_this(), clientHardwareEventController,
-        screens->get<MidiSwScreen>(), sequencer, mpc.getSampler(),
-        screens->get<MidiInputScreen>(), mpc.getEventHandler(),
-        screens->get<MultiRecordingSetupScreen>(),
-        screens->get<TimingCorrectScreen>(), layeredScreen, hardware, screens,
-        mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer());
+        screens->get<ScreenId::MidiSwScreen>(), sequencer, mpc.getSampler(),
+        screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
+        screens->get<ScreenId::MultiRecordingSetupScreen>(),
+        screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
+        screens, mpc.getAudioMidiServices()->getFrameSequencer(),
+        &mpc.getBasicPlayer());
 }
 
 void ClientEventController::dispatchHostInput(
@@ -91,11 +93,11 @@ RecordingMode ClientEventController::determineRecordingMode() const
         return RecordingMode::Step;
     }
 
-    if (SeqUtil::isRecMainWithoutPlaying(sequencer,
-                                         screens->get<TimingCorrectScreen>(),
-                                         layeredScreen->getCurrentScreenName(),
-                                         hardware->getButton(ComponentId::REC),
-                                         clientHardwareEventController))
+    if (SeqUtil::isRecMainWithoutPlaying(
+            sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+            layeredScreen->getCurrentScreenName(),
+            hardware->getButton(ComponentId::REC),
+            clientHardwareEventController))
     {
         return RecordingMode::RecMainWithoutPlaying;
     }

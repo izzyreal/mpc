@@ -1,5 +1,6 @@
 #include "Mpc2000XlAllFileScreen.hpp"
 
+#include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -16,8 +17,7 @@ Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc &mpc,
 
 void Mpc2000XlAllFileScreen::function(int i)
 {
-
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     switch (i)
     {
@@ -29,23 +29,22 @@ void Mpc2000XlAllFileScreen::function(int i)
             if (result.has_value())
             {
                 auto loadASequenceFromAllScreen =
-                    mpc.screens->get<LoadASequenceFromAllScreen>();
+                    mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
                 loadASequenceFromAllScreen->sequencesFromAllFile =
                     result.value();
-                mpc.getLayeredScreen()
-                    ->openScreen<LoadASequenceFromAllScreen>();
+                openScreenById(ScreenId::LoadASequenceFromAllScreen);
             }
 
             break;
         }
         case 3:
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            openScreenById(ScreenId::LoadScreen);
             break;
         case 4:
         {
             auto on_success = [&]()
             {
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                openScreenById(ScreenId::LoadScreen);
             };
             mpc.getDisk()->readAll2(loadScreen->getSelectedFile(), on_success);
             break;

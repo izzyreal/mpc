@@ -1,6 +1,7 @@
 #include "LoopBarsScreen.hpp"
 
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

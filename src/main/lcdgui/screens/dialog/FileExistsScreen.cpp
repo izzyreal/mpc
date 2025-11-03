@@ -27,7 +27,7 @@ void FileExistsScreen::function(int i)
             break;
         case 4:
             initializeNameScreen();
-            mpc.getLayeredScreen()->openScreen<NameScreen>();
+            openScreenById(ScreenId::NameScreen);
     }
 }
 

@@ -2,6 +2,7 @@
 
 #include "lcdgui/Label.hpp"
 #include "sequencer/SeqUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
@@ -15,13 +16,13 @@ void PunchScreen::open()
 {
     if (sequencer->isPlaying())
     {
-        mpc.getLayeredScreen()->openScreen<TransScreen>();
+        openScreenById(ScreenId::TransScreen);
         return;
     }
 
     if (tab != 0)
     {
-        mpc.getLayeredScreen()->openScreen(tabNames[tab]);
+        ls->openScreen(tabNames[tab]);
         return;
     }
 
@@ -71,11 +72,11 @@ void PunchScreen::function(int i)
         case 1: // Intentional fall-through
         case 2:
             tab = i;
-            mpc.getLayeredScreen()->openScreen(tabNames[i]);
+            ls->openScreen(tabNames[i]);
             break;
         case 5:
             sequencer->setPunchEnabled(!sequencer->isPunchEnabled());
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }
@@ -143,13 +144,13 @@ void PunchScreen::displayBackground()
 
 void PunchScreen::rec()
 {
-    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+    openScreenById(ScreenId::SequencerScreen);
     ScreenComponent::rec();
 }
 
 void PunchScreen::overDub()
 {
-    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+    openScreenById(ScreenId::SequencerScreen);
     ScreenComponent::rec();
 }
 

@@ -1,5 +1,6 @@
 #include "FxEditScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/Effect.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 
@@ -43,7 +44,7 @@ void FxEditScreen::turnWheel(int i)
 
     if (focusedFieldName == "drum")
     {
-        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+        auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
         mixerSetupScreen->setFxDrum(mixerSetupScreen->getFxDrum() + i);
     }
 }
@@ -117,7 +118,7 @@ void FxEditScreen::checkEffects()
 
 void FxEditScreen::displayDrum()
 {
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
     findField("drum")->setText(
         std::to_string(mixerSetupScreen->getFxDrum() + 1));
 }

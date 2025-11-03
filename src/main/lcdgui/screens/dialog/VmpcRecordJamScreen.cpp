@@ -20,8 +20,7 @@ void VmpcRecordJamScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()
-                ->openScreen<VmpcDirectToDiskRecorderScreen>();
+            openScreenById(ScreenId::VmpcDirectToDiskRecorderScreen);
             break;
         case 4:
         {
@@ -37,12 +36,12 @@ void VmpcRecordJamScreen::function(int i)
 
             if (ams->prepareBouncing(settings.get()))
             {
-                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+                openScreenById(ScreenId::SequencerScreen);
                 ams->startBouncing();
             }
             else
             {
-                mpc.getLayeredScreen()->openScreen<VmpcFileInUseScreen>();
+                openScreenById(ScreenId::VmpcFileInUseScreen);
             }
 
             break;

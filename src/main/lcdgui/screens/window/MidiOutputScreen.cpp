@@ -5,6 +5,7 @@
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -16,10 +17,10 @@ MidiOutputScreen::MidiOutputScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void MidiOutputScreen::open()
 {
-
-    if (ls->isPreviousScreenNot<NameScreen, MidiOutputMonitorScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen,
+                                ScreenId::MidiOutputMonitorScreen>())
     {
-        auto track = mpc.getSequencer()->getActiveTrack();
+        auto track = sequencer->getActiveTrack();
         auto dev = track->getDeviceIndex();
 
         if (dev > 0)
@@ -49,14 +50,14 @@ void MidiOutputScreen::openNameScreen()
         {
             sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex,
                                                           nameScreenName);
-            mpc.getLayeredScreen()->openScreen<MidiOutputScreen>();
+            openScreenById(ScreenId::MidiOutputScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         auto seq = sequencer->getActiveSequence();
         nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8,
                                enterAction, "midi-output");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -97,7 +98,7 @@ void MidiOutputScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<MidiOutputMonitorScreen>();
+            openScreenById(ScreenId::MidiOutputMonitorScreen);
             break;
         case 4:
             mpc.panic();

@@ -1,10 +1,13 @@
 #include "SaveASoundScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "sampler/Sampler.hpp"
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens::window;
@@ -18,9 +21,9 @@ SaveASoundScreen::SaveASoundScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveASoundScreen::open()
 {
-    if (ls->isPreviousScreen<SaveScreen>())
+    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
     {
-        auto nameScreen = mpc.screens->get<NameScreen>();
+        auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->setNameToEdit(sampler->getSound()->getName());
     }
 
@@ -55,7 +58,7 @@ void SaveASoundScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
         case 4:
         {
@@ -63,8 +66,8 @@ void SaveASoundScreen::function(int i)
             auto s = sampler->getSound();
             auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
             auto fileName =
-                mpc::Util::getFileName(
-                    mpc.screens->get<NameScreen>()->getNameWithoutSpaces()) +
+                mpc::Util::getFileName(mpc.screens->get<ScreenId::NameScreen>()
+                                           ->getNameWithoutSpaces()) +
                 ext;
 
             auto saveAction = [this, disk, s, fileName]
@@ -100,23 +103,24 @@ void SaveASoundScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveASoundScreen>();
+                        openScreenById(ScreenId::SaveASoundScreen);
                     };
                     nameScreen->initialize(nameScreen->getNameWithoutSpaces(),
                                            16, enterAction, "save");
                 };
 
-                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                auto fileExistsScreen =
+                    mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
                     [this]
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                        openScreenById(ScreenId::SaveScreen);
                     });
-                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                openScreenById(ScreenId::FileExistsScreen);
                 return;
             }
             saveAction();
@@ -145,5 +149,5 @@ void SaveASoundScreen::displayFileType()
 void SaveASoundScreen::displayFile()
 {
     findField("file")->setText(
-        mpc.screens->get<NameScreen>()->getNameWithoutSpaces());
+        mpc.screens->get<ScreenId::NameScreen>()->getNameWithoutSpaces());
 }

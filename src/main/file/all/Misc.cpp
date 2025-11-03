@@ -50,7 +50,8 @@ Misc::Misc(mpc::Mpc &mpc)
 {
     saveBytes = std::vector<char>(LENGTH);
 
-    auto &locationsToPersist = mpc.screens->get<LocateScreen>()->getLocations();
+    auto &locationsToPersist =
+        mpc.screens->get<ScreenId::LocateScreen>()->getLocations();
 
     assert(locationsToPersist.size() == 9);
 
@@ -67,41 +68,60 @@ Misc::Misc(mpc::Mpc &mpc)
         saveBytes[locationOffset + 3] = locationClockByte;
     }
 
-    auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>();
-    auto othersScreen = mpc.screens->get<OthersScreen>();
+    auto stepEditOptionsScreen =
+        mpc.screens->get<ScreenId::StepEditOptionsScreen>();
+    auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
     saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging() - 2);
 
-    auto syncScreen = mpc.screens->get<SyncScreen>();
+    auto syncScreen = mpc.screens->get<ScreenId::SyncScreen>();
 
     saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] =
         (char)(syncScreen->receiveMMCEnabled ? 1 : 0);
 
-    auto midiSwScreen = mpc.screens->get<MidiSwScreen>();
+    auto midiSwScreen = mpc.screens->get<ScreenId::MidiSwScreen>();
 
     auto &footswitchBindings =
         mpc.clientEventController->getClientMidiEventController()
             ->getFootswitchAssignmentController()
             ->bindings;
 
-    for (int i = 0; i < controller::ClientMidiFootswitchAssignmentController::SWITCH_COUNT; i++)
+    for (int i = 0;
+         i < controller::ClientMidiFootswitchAssignmentController::SWITCH_COUNT;
+         i++)
     {
         int cc = -1;
         int funcIndex = 0;
 
-        std::visit([&](auto &b) {
-            cc = b.number;
+        std::visit(
+            [&](auto &b)
+            {
+                cc = b.number;
 
-            if constexpr (std::is_same_v<std::decay_t<decltype(b)>, midi::input::HardwareBinding>) {
-                if (auto fn = controller::componentIdToFootswitch(b.target.componentId))
-                    funcIndex = static_cast<int>(*fn);
-            } else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, midi::input::SequencerBinding>) {
-                if (auto fn = controller::sequencerCmdToFootswitch(b.target.command))
-                    funcIndex = static_cast<int>(*fn);
-            }
-        }, footswitchBindings[i]);
+                if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                             midi::input::HardwareBinding>)
+                {
+                    if (auto fn = controller::componentIdToFootswitch(
+                            b.target.componentId))
+                    {
+                        funcIndex = static_cast<int>(*fn);
+                    }
+                }
+                else if constexpr (std::is_same_v<
+                                       std::decay_t<decltype(b)>,
+                                       midi::input::SequencerBinding>)
+                {
+                    if (auto fn = controller::sequencerCmdToFootswitch(
+                            b.target.command))
+                    {
+                        funcIndex = static_cast<int>(*fn);
+                    }
+                }
+            },
+            footswitchBindings[i]);
 
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] = cc == -1 ? (char)0xFF : (char)cc;
+        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] =
+            cc == -1 ? (char)0xFF : (char)cc;
         saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)funcIndex;
     }
 
@@ -112,7 +132,7 @@ Misc::Misc(mpc::Mpc &mpc)
                                                                          : 0);
     saveBytes[DURATION_TC_PERCENTAGE_OFFSET] =
         (char)(stepEditOptionsScreen->getTcValuePercentage());
-    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>();
+    const auto midiInputScreen = mpc.screens->get<ScreenId::MidiInputScreen>();
     saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] =
         midiInputScreen->getProgChangeSeq() ? 0x01 : 0x00;
 }

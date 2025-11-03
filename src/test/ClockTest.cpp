@@ -322,7 +322,7 @@ TEST_CASE("1 bar loop", "[clock]")
     mpc.getSequencer()->getSequence(0)->init(1);
     mpc.getSequencer()->playFromStart();
 
-    auto syncScreen = mpc.screens->get<mpc::lcdgui::screens::SyncScreen>();
+    auto syncScreen = mpc.screens->get<mpc::lcdgui::ScreenId::SyncScreen>();
     syncScreen->modeIn = 1;
 
     std::vector<int32_t> ticks;

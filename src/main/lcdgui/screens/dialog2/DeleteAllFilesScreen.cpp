@@ -1,5 +1,6 @@
 #include "DeleteAllFilesScreen.hpp"
 
+#include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -26,11 +27,7 @@ void DeleteAllFilesScreen::displayDelete()
 
 void DeleteAllFilesScreen::setDelete(int i)
 {
-    if (i < 0 || i > 8)
-    {
-        return;
-    }
-    delete_ = i;
+    delete_ = std::clamp(i, 0, 8);
     displayDelete();
 }
 
@@ -41,11 +38,10 @@ void DeleteAllFilesScreen::turnWheel(int i)
 
 void DeleteAllFilesScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
+            openScreenById(ScreenId::DeleteFileScreen);
             break;
         case 4:
         {
@@ -53,14 +49,15 @@ void DeleteAllFilesScreen::function(int i)
 
             if (success)
             {
-                auto loadScreen = mpc.screens->get<LoadScreen>();
-                auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+                auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+                auto directoryScreen =
+                    mpc.screens->get<ScreenId::DirectoryScreen>();
                 loadScreen->fileLoad = 0;
                 directoryScreen->yOffset1 = 0;
                 mpc.getDisk()->initFiles();
             }
 
-            mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+            openScreenById(ScreenId::DirectoryScreen);
             break;
         }
     }

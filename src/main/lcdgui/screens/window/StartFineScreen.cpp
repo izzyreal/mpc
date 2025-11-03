@@ -1,8 +1,12 @@
 #include "StartFineScreen.hpp"
+#include "Mpc.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/TrimScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -28,7 +32,7 @@ void StartFineScreen::open()
 
 void StartFineScreen::displayFineWave()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto sound = sampler->getSound();
 
@@ -68,7 +72,7 @@ void StartFineScreen::displayLngthLabel()
 
 void StartFineScreen::displaySmplLngth()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -100,7 +104,7 @@ void StartFineScreen::turnWheel(int i)
 {
     auto sound = sampler->getSound();
     auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto sampleLength = sound->getFrameCount();
     auto soundInc = getSoundIncrement(i);
@@ -169,7 +173,7 @@ void StartFineScreen::right()
 
 void StartFineScreen::pressEnter()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     trimScreen->pressEnter();
     displayStart();
     displayLngthLabel();
@@ -189,7 +193,7 @@ void StartFineScreen::setSlider(int i)
 
     if (focusedFieldName == "start")
     {
-        auto trimScreen = mpc.screens->get<TrimScreen>();
+        auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
         trimScreen->setSliderStart(i);
         displayStart();
         displayLngthLabel();

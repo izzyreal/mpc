@@ -1,7 +1,9 @@
 #include "KeepOrRetryScreen.hpp"
 
+#include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -25,12 +27,11 @@ void KeepOrRetryScreen::close()
 
 void KeepOrRetryScreen::function(int i)
 {
-
     switch (i)
     {
         case 1:
             sampler->deleteSound(sampler->getPreviewSound());
-            mpc.getLayeredScreen()->openScreen<SampleScreen>();
+            openScreenById(ScreenId::SampleScreen);
             break;
         case 3:
             sampler->playPreviewSample(
@@ -47,7 +48,7 @@ void KeepOrRetryScreen::function(int i)
             }
 
             sampler->setSoundIndex(index);
-            mpc.getLayeredScreen()->openScreen<SampleScreen>();
+            openScreenById(ScreenId::SampleScreen);
             break;
     }
 }
@@ -66,13 +67,13 @@ void KeepOrRetryScreen::openNameScreen()
             }
 
             sampler->getPreviewSound()->setName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<KeepOrRetryScreen>();
+            openScreenById(ScreenId::KeepOrRetryScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(sampler->getPreviewSound()->getName(), 16,
                                enterAction, "keep-or-retry");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 

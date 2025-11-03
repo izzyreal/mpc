@@ -1,5 +1,7 @@
 #include "SaveAllFileScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
@@ -20,7 +22,7 @@ SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveAllFileScreen::open()
 {
-    if (ls->isPreviousScreen<SaveScreen>())
+    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
     {
         fileName = "ALL_SEQ_SONG1";
     }
@@ -52,12 +54,12 @@ void SaveAllFileScreen::openNameScreen()
         const auto enterAction = [this](std::string &nameScreenName)
         {
             fileName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
+            openScreenById(ScreenId::SaveAllFileScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(fileName, 16, enterAction, "save-all-file");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -67,7 +69,7 @@ void SaveAllFileScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
         case 4:
         {
@@ -90,23 +92,24 @@ void SaveAllFileScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &nameScreenName)
                     {
                         fileName = nameScreenName;
-                        mpc.getLayeredScreen()->openScreen<SaveAllFileScreen>();
+                        openScreenById(ScreenId::SaveAllFileScreen);
                     };
                     nameScreen->initialize(fileName, 16, enterAction, "save");
                 };
 
-                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                auto fileExistsScreen =
+                    mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
                     [this]
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                        openScreenById(ScreenId::SaveScreen);
                     });
-                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                openScreenById(ScreenId::FileExistsScreen);
                 return;
             }
 

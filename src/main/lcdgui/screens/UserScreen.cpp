@@ -1,11 +1,15 @@
 #include "UserScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/EventsScreen.hpp"
 
 #include <Util.hpp>
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -37,10 +41,9 @@ void UserScreen::function(int i)
         case 1:
         case 2:
         {
-            auto eventsScreen = mpc.screens->get<EventsScreen>();
+            auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
             eventsScreen->tab = i;
-            mpc.getLayeredScreen()->openScreen(
-                eventsScreen->tabNames[eventsScreen->tab]);
+            ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
     }
@@ -187,8 +190,7 @@ void UserScreen::displayDeviceName()
         {
             auto programName =
                 sampler
-                    ->getProgram(
-                        mpc.getSequencer()->getDrumBus(bus - 1)->getProgram())
+                    ->getProgram(sequencer->getDrumBus(bus - 1)->getProgram())
                     ->getName();
             findLabel("devicename")->setText(programName);
         }

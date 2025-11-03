@@ -1,5 +1,6 @@
 #include "VmpcConvertAndLoadWavScreen.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -22,7 +23,7 @@ void VmpcConvertAndLoadWavScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->closeCurrentScreen();
+            ls->closeCurrentScreen();
             break;
         case 4:
             loadRoutine();

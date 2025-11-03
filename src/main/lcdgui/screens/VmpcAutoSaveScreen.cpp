@@ -1,5 +1,7 @@
 #include "VmpcAutoSaveScreen.hpp"
+#include "Mpc.hpp"
 #include "VmpcSettingsScreen.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -15,7 +17,7 @@ void VmpcAutoSaveScreen::open()
     displayAutoSaveOnExit();
     displayAutoLoadOnStart();
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
     auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
     ls->setFunctionKeysArrangement(
         midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
@@ -27,17 +29,18 @@ void VmpcAutoSaveScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            openScreenById(ScreenId::VmpcSettingsScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<VmpcDisksScreen>();
+            openScreenById(ScreenId::VmpcDisksScreen);
             break;
         case 4:
         {
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+            auto vmpcSettingsScreen =
+                mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
             if (vmpcSettingsScreen->getMidiControlMode() ==
                 VmpcSettingsScreen::MidiControlMode::ORIGINAL)
@@ -45,7 +48,7 @@ void VmpcAutoSaveScreen::function(int i)
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            openScreenById(ScreenId::VmpcMidiScreen);
             break;
         }
     }
@@ -53,7 +56,6 @@ void VmpcAutoSaveScreen::function(int i)
 
 void VmpcAutoSaveScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldName();
 
     if (focusedFieldName == "auto-save-on-exit")
@@ -68,24 +70,13 @@ void VmpcAutoSaveScreen::turnWheel(int i)
 
 void VmpcAutoSaveScreen::setAutoSaveOnExit(int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    autoSaveOnExit = i;
-
+    autoSaveOnExit = std::clamp(i, 0, 1);
     displayAutoSaveOnExit();
 }
 
 void VmpcAutoSaveScreen::setAutoLoadOnStart(int i)
 {
-    if (i < 0 || i > 2)
-    {
-        return;
-    }
-
-    autoLoadOnStart = i;
+    autoLoadOnStart = std::clamp(i, 0, 2);
     displayAutoLoadOnStart();
 }
 

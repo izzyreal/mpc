@@ -1,5 +1,6 @@
 #include "CopyTrackScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include <StrUtil.hpp>
@@ -19,17 +20,16 @@ void CopyTrackScreen::open()
 
 void CopyTrackScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<TrackScreen>();
+            openScreenById(ScreenId::TrackScreen);
             break;
         case 4:
         {
             auto seqIndex = sequencer->getActiveSequenceIndex();
             sequencer->copyTrack(tr0, tr1, seqIndex, seqIndex);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }
@@ -37,7 +37,6 @@ void CopyTrackScreen::function(int i)
 
 void CopyTrackScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.find("0") != std::string::npos)
@@ -52,23 +51,13 @@ void CopyTrackScreen::turnWheel(int i)
 
 void CopyTrackScreen::setTr0(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    tr0 = i;
+    tr0 = std::clamp(i, 0, 63);
     displayTr0();
 }
 
 void CopyTrackScreen::setTr1(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    tr1 = i;
+    tr1 = std::clamp(i, 0, 63);
     displayTr1();
 }
 

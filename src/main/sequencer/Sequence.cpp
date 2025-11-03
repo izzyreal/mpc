@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
@@ -26,7 +27,7 @@ Sequence::Sequence(mpc::Mpc &_mpc)
     tempoChangeTrack->setUsed(true);
     tempoChangeTrack->setName("tempo");
 
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
 
     for (int i = 0; i < 33; i++)
     {
@@ -189,7 +190,7 @@ bool Sequence::isUsed()
 
 void Sequence::init(int newLastBarIndex)
 {
-    auto userScreen = mpc.screens->get<UserScreen>();
+    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     initialTempo = userScreen->tempo;
     loopEnabled = userScreen->loop;
 

@@ -2,19 +2,18 @@
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushEraseCommand::PushEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushEraseCommand::execute()
 {
-
-    PushEraseCommand::PushEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushEraseCommand::execute()
+    if (!mpc.getSequencer()->getActiveSequence()->isUsed() ||
+        mpc.getSequencer()->isPlaying())
     {
-        if (!mpc.getSequencer()->getActiveSequence()->isUsed() ||
-            mpc.getSequencer()->isPlaying())
-        {
-            return;
-        }
-
-        mpc.getLayeredScreen()->openScreen<EraseScreen>();
+        return;
     }
-} // namespace mpc::command
+
+    mpc.getLayeredScreen()->openScreenById(ScreenId::EraseScreen);
+}

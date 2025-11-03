@@ -5,6 +5,9 @@
 #include "lcdgui/screens/MixerScreen.hpp"
 #include "lcdgui/screens/NextSeqPadScreen.hpp"
 #include "lcdgui/screens/TrMuteScreen.hpp"
+#include "sampler/Program.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Track.hpp"
 
 #include <memory>
 

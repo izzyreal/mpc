@@ -1,6 +1,7 @@
 #include "lcdgui/screens/window/EraseAllOffTracksScreen.hpp"
 
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -30,7 +31,7 @@ void EraseAllOffTracksScreen::function(int i)
                 }
                 trackCounter++;
             }
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }
