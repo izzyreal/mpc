@@ -6,7 +6,7 @@
 
 namespace mpc::command::context
 {
-    class TriggerLocalNoteOffContext;
+    struct TriggerLocalNoteOffContext;
 }
 
 namespace mpc::command
