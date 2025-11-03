@@ -5,6 +5,8 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
+#include "sequencer/Sequencer.hpp"
+
 using namespace mpc::lcdgui::screens;
 
 NextSeqPadScreen::NextSeqPadScreen(mpc::Mpc &mpc, const int layerIndex)
@@ -105,7 +107,7 @@ void NextSeqPadScreen::function(int i)
     }
     else if (i == 5)
     {
-        mpc.getLayeredScreen()->openScreen<NextSeqScreen>();
+        openScreenById(ScreenId::NextSeqScreen);
     }
 }
 

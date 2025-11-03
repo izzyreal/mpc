@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lcdgui/ScreenId.hpp"
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -25,17 +27,18 @@ namespace mpc::lcdgui
     public:
         Screens(mpc::Mpc &mpc);
 
-        template <typename T> std::shared_ptr<T> get()
+        template <ScreenId ID>
+        std::shared_ptr<typename ScreenTypeMap<ID>::type> get()
         {
-            for (auto &screen : screens)
+            using T = typename ScreenTypeMap<ID>::type;
+            for (auto &s : screens)
             {
-                if (auto casted = std::dynamic_pointer_cast<T>(screen))
+                if (auto p = std::dynamic_pointer_cast<T>(s))
                 {
-                    return casted;
+                    return p;
                 }
             }
-
-            return {};
+            return nullptr;
         }
 
         void createAndCacheAllScreens();

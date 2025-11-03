@@ -1,7 +1,10 @@
 #include "PurgeScreen.hpp"
 
+#include "Mpc.hpp"
 #include "SelectDrumScreen.hpp"
 #include "lcdgui/Label.hpp"
+#include "lcdgui/LayeredScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -23,19 +26,20 @@ void PurgeScreen::function(int f)
     switch (f)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            openScreenById(ScreenId::PgmAssignScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
+            openScreenById(ScreenId::PgmParamsScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<DrumScreen>();
+            openScreenById(ScreenId::DrumScreen);
             break;
         case 3:
         {
-            auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+            auto selectDrumScreen =
+                mpc.screens->get<ScreenId::SelectDrumScreen>();
             selectDrumScreen->redirectScreen = "purge";
-            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+            openScreenById(ScreenId::SelectDrumScreen);
             break;
         }
         case 5:

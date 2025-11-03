@@ -3,6 +3,9 @@
 #include "disk/AbstractDisk.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -20,7 +23,6 @@ void LoadAProgramScreen::open()
 
 void LoadAProgramScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "load-replace-sound")
@@ -33,31 +35,30 @@ void LoadAProgramScreen::turnWheel(int i)
 void LoadAProgramScreen::function(int i)
 {
 
-    auto selectedFile = mpc.screens->get<LoadScreen>()->getSelectedFile();
+    auto selectedFile =
+        mpc.screens->get<ScreenId::LoadScreen>()->getSelectedFile();
 
     switch (i)
     {
         case 2:
         {
-            mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/true);
-            mpc.getSampler()->deleteAllSamples();
+            sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
+            sampler->deleteAllSamples();
 
-            mpc.getDisk()->readPgm2(selectedFile,
-                                    mpc.getSampler()->getProgram(0));
+            mpc.getDisk()->readPgm2(selectedFile, sampler->getProgram(0));
             break;
         }
         case 3:
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            openScreenById(ScreenId::LoadScreen);
             break;
         case 4:
         {
-            auto newProgram = mpc.getSampler()
-                                  ->createNewProgramAddFirstAvailableSlot()
-                                  .lock();
+            auto newProgram =
+                sampler->createNewProgramAddFirstAvailableSlot().lock();
 
             mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
-            auto track = mpc.getSequencer()->getActiveTrack();
+            auto track = sequencer->getActiveTrack();
 
             if (track->getBus() > 0)
             {

@@ -2,6 +2,7 @@
 #include "controller/ClientEventController.hpp"
 #include "sampler/Pad.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 
 #include "Mpc.hpp"
@@ -9,6 +10,7 @@
 #include "lcdgui/Background.hpp"
 #include "lcdgui/Label.hpp"
 #include "sampler/Program.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
@@ -200,7 +202,7 @@ void MetronomeSoundScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<CountMetronomeScreen>();
+            openScreenById(ScreenId::CountMetronomeScreen);
             break;
     }
 }

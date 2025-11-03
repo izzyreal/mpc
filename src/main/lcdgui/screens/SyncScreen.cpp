@@ -1,6 +1,7 @@
 #include "SyncScreen.hpp"
 
 #include "lcdgui/Label.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -11,14 +12,14 @@ SyncScreen::SyncScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SyncScreen::open()
 {
-    if (tab == 2 && ls->isPreviousScreen<MidiSwScreen>())
+    if (tab == 2 && ls->isPreviousScreen<ScreenId::MidiSwScreen>())
     {
         tab = 0;
     }
 
     if (tab == 2)
     {
-        mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
+        openScreenById(ScreenId::MidiSwScreen);
         return;
     }
 
@@ -75,12 +76,11 @@ void SyncScreen::turnWheel(int i)
 
 void SyncScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
             tab = 2;
-            mpc.getLayeredScreen()->openScreen<MidiSwScreen>();
+            openScreenById(ScreenId::MidiSwScreen);
             break;
     }
 }

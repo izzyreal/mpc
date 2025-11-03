@@ -1,10 +1,12 @@
 #include "LoadASequenceScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -15,7 +17,7 @@ LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void LoadASequenceScreen::open()
 {
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     auto midFile = loadScreen->getSelectedFile();
 
     if (!StrUtil::eqIgnoreCase(midFile->getExtension(), ".mid"))
@@ -68,19 +70,14 @@ void LoadASequenceScreen::function(int i)
         case 4:
             sequencer->movePlaceHolderTo(loadInto);
             sequencer->setActiveSequenceIndex(loadInto);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }
 
 void LoadASequenceScreen::setLoadInto(int i)
 {
-    if (i < 0 || i > 98)
-    {
-        return;
-    }
-
-    loadInto = i;
+    loadInto = std::clamp(i, 0, 98);
     displayLoadInto();
 }
 

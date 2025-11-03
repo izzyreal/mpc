@@ -26,6 +26,7 @@
 #include "engine/control/CompoundControl.hpp"
 #include "engine/control/BooleanControl.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 
 #include <string>
@@ -331,11 +332,12 @@ void AudioMidiServices::stopBouncing()
         return;
     }
 
-    mpc.getLayeredScreen()->openScreen<VmpcRecordingFinishedScreen>();
+    mpc.getLayeredScreen()->openScreenById(
+        ScreenId::VmpcRecordingFinishedScreen);
     bouncing.store(false);
 
     auto directToDiskRecorderScreen =
-        mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
+        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (directToDiskRecorderScreen->seqLoopWasEnabled)
     {
@@ -430,7 +432,7 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
 void AudioMidiServices::changeBounceStateIfRequired()
 {
     auto directToDiskRecorderScreen =
-        mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
+        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (isBouncing() && !wasBouncing)
     {
@@ -483,7 +485,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
 // Should be called from the audio thread only!
 void AudioMidiServices::switchMidiControlMappingIfRequired()
 {
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
+    auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
 
     if (vmpcMidiScreen->shouldSwitch.load())
     {

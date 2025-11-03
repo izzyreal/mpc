@@ -1,12 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 
 TEST_CASE("COPY1", "[events-screen]")
 {
@@ -35,7 +37,7 @@ TEST_CASE("COPY1", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -90,7 +92,7 @@ TEST_CASE("COPY2", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -150,7 +152,7 @@ TEST_CASE("COPY3", "[events-screen]")
 
     assert(tr->getEvents().size() == 8);
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -203,7 +205,7 @@ TEST_CASE("COPY4", "[events-screen]")
 
     assert(seq->getLastTick() == 384 + 288);
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     int start = 0;
     int end = 384;
@@ -252,7 +254,7 @@ TEST_CASE("COPY5", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     int start = 0;
     int end = 192;
@@ -308,7 +310,7 @@ TEST_CASE("COPY6", "[events-screen]")
         tickPos += 24;
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
 
     int start = 0;
     int end = 192;

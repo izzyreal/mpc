@@ -1,10 +1,12 @@
 #include "PadAndButtonKeyboard.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 
 using namespace mpc::input;
 using namespace mpc::hardware;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui;
 
 PadAndButtonKeyboard::PadAndButtonKeyboard(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
 {
@@ -44,7 +46,7 @@ void PadAndButtonKeyboard::pressHardwareComponent(const ComponentId id)
         return;
     }
 
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
 
     if (id == ComponentId::SIXTEEN_LEVELS_OR_SPACE)
     {

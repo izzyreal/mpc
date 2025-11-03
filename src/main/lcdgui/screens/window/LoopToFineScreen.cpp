@@ -1,8 +1,12 @@
 #include "LoopToFineScreen.hpp"
+#include "Mpc.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/screens/LoopScreen.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -29,7 +33,7 @@ void LoopToFineScreen::open()
 
 void LoopToFineScreen::displayLoopLngth()
 {
-    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     findField("loop-lngth")->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
@@ -48,7 +52,7 @@ void LoopToFineScreen::displayLngthField()
 
 void LoopToFineScreen::displayFineWave()
 {
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     auto sound = sampler->getSound();
 
     if (!sound)
@@ -100,7 +104,7 @@ void LoopToFineScreen::function(int i)
 void LoopToFineScreen::turnWheel(int i)
 {
     auto sound = sampler->getSound();
-    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
 
     auto soundInc = getSoundIncrement(i);
 
@@ -160,7 +164,7 @@ void LoopToFineScreen::right()
 
 void LoopToFineScreen::pressEnter()
 {
-    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     loopScreen->pressEnter();
     displayTo();
     displayLngthField();
@@ -176,7 +180,7 @@ void LoopToFineScreen::setSlider(int i)
         return;
     }
 
-    auto loopScreen = mpc.screens->get<LoopScreen>();
+    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

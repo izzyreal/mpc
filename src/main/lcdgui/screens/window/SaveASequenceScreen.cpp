@@ -1,5 +1,7 @@
 #include "SaveASequenceScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
@@ -7,6 +9,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
@@ -18,9 +21,9 @@ SaveASequenceScreen::SaveASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveASequenceScreen::open()
 {
-    if (ls->isPreviousScreen<SaveScreen>())
+    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
     {
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->setNameToEdit(sequencer->getActiveSequence()->getName());
     }
 
@@ -45,15 +48,15 @@ void SaveASequenceScreen::openNameScreen()
 
     if (focusedFieldName == "file")
     {
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(
             sequencer->getActiveSequence()->getName(), 16,
             [this](std::string &)
             {
-                mpc.getLayeredScreen()->openScreen<SaveASequenceScreen>();
+                openScreenById(ScreenId::SaveASequenceScreen);
             },
             "save-a-sequence");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -63,11 +66,11 @@ void SaveASequenceScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SaveScreen>();
+            openScreenById(ScreenId::SaveScreen);
             break;
         case 4:
         {
-            auto nameScreen = mpc.screens->get<NameScreen>();
+            auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
                 mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
                 ".MID";
@@ -90,24 +93,24 @@ void SaveASequenceScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<NameScreen>();
+                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
-                        mpc.getLayeredScreen()
-                            ->openScreen<SaveASequenceScreen>();
+                        openScreenById(ScreenId::SaveASequenceScreen);
                     };
                     nameScreen->initialize(nameScreen->getNameWithoutSpaces(),
                                            16, enterAction, "save");
                 };
 
-                auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
+                auto fileExistsScreen =
+                    mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
                     [this]
                     {
-                        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+                        openScreenById(ScreenId::SaveScreen);
                     });
-                mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+                openScreenById(ScreenId::FileExistsScreen);
                 return;
             }
 
@@ -127,7 +130,7 @@ void SaveASequenceScreen::displaySaveAs()
 
 void SaveASequenceScreen::displayFile()
 {
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     auto name = nameScreen->getNameWithoutSpaces();
 
     if (name.length() < 2)

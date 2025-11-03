@@ -1,12 +1,17 @@
 #include "ZoneScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include "command/SplitLeftCommand.hpp"
+#include "command/SplitRightCommand.hpp"
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/Layer.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/TrimScreen.hpp"
 #include "lcdgui/screens/window/NumberOfZonesScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -65,19 +70,19 @@ void ZoneScreen::openWindow()
     if (focusedFieldName == "snd")
     {
         sampler->setPreviousScreenName("zone");
-        mpc.getLayeredScreen()->openScreen<SoundScreen>();
+        openScreenById(ScreenId::SoundScreen);
     }
     else if (focusedFieldName == "zone")
     {
-        mpc.getLayeredScreen()->openScreen<NumberOfZonesScreen>();
+        openScreenById(ScreenId::NumberOfZonesScreen);
     }
     else if (focusedFieldName == "st")
     {
-        mpc.getLayeredScreen()->openScreen<ZoneStartFineScreen>();
+        openScreenById(ScreenId::ZoneStartFineScreen);
     }
     else if (focusedFieldName == "end")
     {
-        mpc.getLayeredScreen()->openScreen<ZoneEndFineScreen>();
+        openScreenById(ScreenId::ZoneEndFineScreen);
     }
 }
 
@@ -87,10 +92,10 @@ void ZoneScreen::function(int f)
     switch (f)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<TrimScreen>();
+            openScreenById(ScreenId::TrimScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<LoopScreen>();
+            openScreenById(ScreenId::LoopScreen);
             break;
         case 2:
         {
@@ -100,7 +105,7 @@ void ZoneScreen::function(int f)
             break;
         }
         case 3:
-            mpc.getLayeredScreen()->openScreen<SndParamsScreen>();
+            openScreenById(ScreenId::SndParamsScreen);
             break;
         case 4:
         {
@@ -109,9 +114,10 @@ void ZoneScreen::function(int f)
                 return;
             }
 
-            auto editSoundScreen = mpc.screens->get<EditSoundScreen>();
+            auto editSoundScreen =
+                mpc.screens->get<ScreenId::EditSoundScreen>();
             editSoundScreen->setReturnToScreenName("zone");
-            mpc.getLayeredScreen()->openScreen<EditSoundScreen>();
+            openScreenById(ScreenId::EditSoundScreen);
             break;
         }
         case 5:
@@ -265,7 +271,7 @@ void ZoneScreen::displayWave()
     }
 
     auto sampleData = sound->getSampleData();
-    auto trimScreen = mpc.screens->get<TrimScreen>();
+    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findWave()->setSampleData(sampleData, sampler->getSound()->isMono(),
                               trimScreen->view);
     findWave()->setSelection(getZoneStart(zone), getZoneEnd(zone));
@@ -477,7 +483,7 @@ void ZoneScreen::pressEnter()
 {
     if (mpc.getHardware()->getButton(hardware::ComponentId::SHIFT)->isPressed())
     {
-        mpc.getLayeredScreen()->openScreen<SaveScreen>();
+        openScreenById(ScreenId::SaveScreen);
         return;
     }
 
@@ -502,14 +508,14 @@ void ZoneScreen::pressEnter()
 
         if (focusedFieldName == "st")
         {
-            auto zoneScreen = mpc.screens->get<ZoneScreen>();
+            auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
             zoneScreen->setZoneStart(zoneScreen->zone, candidate);
             displaySt();
             displayWave();
         }
         else if (focusedFieldName == "end")
         {
-            auto zoneScreen = mpc.screens->get<ZoneScreen>();
+            auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
             zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
             displayEnd();
             displayWave();

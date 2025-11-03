@@ -1,6 +1,7 @@
 #include "ChangeBarsScreen.hpp"
 
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -33,7 +34,7 @@ void ChangeBarsScreen::function(int i)
 
             seq->insertBars(numberOfBars, afterBar);
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
         case 4:
@@ -44,7 +45,7 @@ void ChangeBarsScreen::function(int i)
             }
 
             seq->deleteBars(firstBar, lastBar);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }
@@ -97,12 +98,7 @@ void ChangeBarsScreen::setLastBar(int i)
 {
     auto seq = sequencer->getActiveSequence();
 
-    if (i < 0 || i > seq->getLastBarIndex())
-    {
-        return;
-    }
-
-    lastBar = i;
+    lastBar = std::clamp(i, 0, seq->getLastBarIndex());
 
     if (lastBar < firstBar)
     {
@@ -116,12 +112,7 @@ void ChangeBarsScreen::setFirstBar(int i)
 {
     auto seq = sequencer->getActiveSequence();
 
-    if (i < 0 || i > seq->getLastBarIndex())
-    {
-        return;
-    }
-
-    firstBar = i;
+    firstBar = std::clamp(i, 0, seq->getLastBarIndex());
 
     displayFirstBar();
 
@@ -134,25 +125,13 @@ void ChangeBarsScreen::setFirstBar(int i)
 void ChangeBarsScreen::setNumberOfBars(int i)
 {
     auto seq = sequencer->getActiveSequence();
-
-    if (i < 0 || i > (998 - seq->getLastBarIndex()))
-    {
-        return;
-    }
-
-    numberOfBars = i;
+    numberOfBars = std::clamp(i, 0, 998 - seq->getLastBarIndex());
     displayNumberOfBars();
 }
 
 void ChangeBarsScreen::setAfterBar(int i)
 {
     auto seq = sequencer->getActiveSequence();
-
-    if (i < 0 || i > seq->getLastBarIndex() + 1)
-    {
-        return;
-    }
-
-    afterBar = i;
+    afterBar = std::clamp(i, 0, seq->getLastBarIndex() + 1);
     displayAfterBar();
 }

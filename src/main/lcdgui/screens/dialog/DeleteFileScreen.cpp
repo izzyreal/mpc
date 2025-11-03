@@ -1,5 +1,6 @@
 #include "DeleteFileScreen.hpp"
 
+#include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
@@ -25,12 +26,13 @@ void DeleteFileScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<DeleteAllFilesScreen>();
+            openScreenById(ScreenId::DeleteAllFilesScreen);
             break;
 
         case 4:
         {
-            auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+            auto directoryScreen =
+                mpc.screens->get<ScreenId::DirectoryScreen>();
             ls->showPopupAndAwaitInteraction(
                 "Delete: " + directoryScreen->getSelectedFile()->getName());
             std::thread(
@@ -55,12 +57,12 @@ void DeleteFileScreen::deleteFile()
         disk->flush();
         disk->initFiles();
 
-        auto loadScreen = mpc.screens->get<LoadScreen>();
+        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         loadScreen->setFileLoad(loadScreen->fileLoad - 1);
 
-        auto directoryScreen = mpc.screens->get<DirectoryScreen>();
+        auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
         directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
     }
 
-    mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+    openScreenById(ScreenId::DirectoryScreen);
 }

@@ -3,6 +3,7 @@
 #include "StrUtil.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -46,7 +47,7 @@ void MultiRecordingSetupScreen::function(int i)
 {
     if (i == 3)
     {
-        mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+        openScreenById(ScreenId::SequencerScreen);
     }
 }
 
@@ -86,7 +87,6 @@ void MultiRecordingSetupScreen::right()
 
 void MultiRecordingSetupScreen::turnWheel(int i)
 {
-
     auto seq = sequencer->getActiveSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();

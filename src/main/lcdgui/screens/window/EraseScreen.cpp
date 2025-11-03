@@ -1,5 +1,7 @@
 #include "EraseScreen.hpp"
 
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -78,11 +80,11 @@ void EraseScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         case 4:
             doErase();
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

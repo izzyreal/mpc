@@ -1,10 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "TestMpc.hpp"
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui;
 
 TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
 {
@@ -19,14 +21,14 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
         ->getActiveSequence()
         ->getTrack(0)
         ->finalizeNoteEventSynced(event, 1);
-    mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     auto controls = mpc.getScreen();
     controls->function(4); // DO IT
     REQUIRE(event->getTick() == 0);
 
     event->setTick(1);
 
-    mpc.getLayeredScreen()->openScreen<TimingCorrectScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TimingCorrectScreen);
     controls->down();
     controls->down();
     controls->down();       // Move to 'Notes:' field.

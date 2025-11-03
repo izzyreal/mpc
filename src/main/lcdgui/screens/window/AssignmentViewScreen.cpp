@@ -1,10 +1,13 @@
 #include "AssignmentViewScreen.hpp"
+#include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "sampler/Pad.hpp"
 
 #include <StrUtil.hpp>
 
 #include "lcdgui/Label.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -21,8 +24,8 @@ void AssignmentViewScreen::open()
     ls->setFocus(getFocusFromPadIndex());
 
     displayAssignmentView();
-    mpc.clientEventController->addObserver(
-        this); // Subscribe to "pad" and "bank" messages
+    // Subscribe to "pad" and "bank" messages
+    mpc.clientEventController->addObserver(this);
 }
 
 void AssignmentViewScreen::close()

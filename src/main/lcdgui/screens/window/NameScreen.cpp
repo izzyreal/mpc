@@ -1,5 +1,6 @@
 #include "NameScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
@@ -154,7 +155,7 @@ void NameScreen::function(int i)
     {
         case 3:
         {
-            mpc.getLayeredScreen()->openScreen(cancelScreen);
+            ls->openScreen(cancelScreen);
             break;
         }
         case 4:

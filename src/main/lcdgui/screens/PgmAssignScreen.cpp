@@ -1,11 +1,15 @@
 #include "PgmAssignScreen.hpp"
 
+#include "Mpc.hpp"
 #include "SelectDrumScreen.hpp"
 #include "StrUtil.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "lcdgui/Label.hpp"
 #include "sampler/Pad.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -57,23 +61,24 @@ void PgmAssignScreen::function(int i)
     {
         case 0:
         {
-            auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>();
+            auto selectDrumScreen =
+                mpc.screens->get<ScreenId::SelectDrumScreen>();
             selectDrumScreen->redirectScreen = "program-assign";
-            mpc.getLayeredScreen()->openScreen<SelectDrumScreen>();
+            openScreenById(ScreenId::SelectDrumScreen);
             break;
         }
         case 1:
-            mpc.getLayeredScreen()->openScreen<PgmParamsScreen>();
+            openScreenById(ScreenId::PgmParamsScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<DrumScreen>();
+            openScreenById(ScreenId::DrumScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<PurgeScreen>();
+            openScreenById(ScreenId::PurgeScreen);
             break;
         case 4:
         {
-            mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
+            openScreenById(ScreenId::AutoChromaticAssignmentScreen);
             break;
         }
     }
@@ -265,19 +270,19 @@ void PgmAssignScreen::openWindow()
 
     if (focusedFieldName == "pgm")
     {
-        mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+        openScreenById(ScreenId::ProgramScreen);
     }
     else if (focusedFieldName == "pad" || focusedFieldName == "pad-note")
     {
-        mpc.getLayeredScreen()->openScreen<AssignmentViewScreen>();
+        openScreenById(ScreenId::AssignmentViewScreen);
     }
     else if (focusedFieldName == "pad-assign")
     {
-        mpc.getLayeredScreen()->openScreen<InitPadAssignScreen>();
+        openScreenById(ScreenId::InitPadAssignScreen);
     }
     else if (focusedFieldName == "note")
     {
-        mpc.getLayeredScreen()->openScreen<CopyNoteParametersScreen>();
+        openScreenById(ScreenId::CopyNoteParametersScreen);
     }
     else if (focusedFieldName == "snd")
     {
@@ -290,7 +295,7 @@ void PgmAssignScreen::openWindow()
         {
             sampler->setSoundIndex(soundIndex);
             sampler->setPreviousScreenName("program-assign");
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
         }
     }
 }

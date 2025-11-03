@@ -1,8 +1,11 @@
 #include "StereoToMonoScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 namespace mpc::lcdgui
 {
@@ -20,7 +23,7 @@ StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void StereoToMonoScreen::open()
 {
-    if (ls->isPreviousScreenNot<NameScreen, PopupScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen, ScreenId::PopupScreen>())
     {
         updateNewNames();
         ls->setFocus("stereosource");
@@ -66,13 +69,13 @@ void StereoToMonoScreen::openNameScreen()
             {
                 setNewRName(nameScreenName);
             }
-            mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
+            openScreenById(ScreenId::StereoToMonoScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         const auto newName = isL ? newLName : newRName;
         nameScreen->initialize(newName, 16, enterAction, "stereo-to-mono");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -82,7 +85,7 @@ void StereoToMonoScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->closeCurrentScreen();
+            ls->closeCurrentScreen();
             break;
         case 4:
         {

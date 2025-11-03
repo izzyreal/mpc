@@ -1,3 +1,4 @@
+#include "sampler/Sampler.hpp"
 #include "catch2/catch_test_macros.hpp"
 
 #include "TestMpc.hpp"
@@ -13,6 +14,7 @@ CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::disk;
+using namespace mpc::lcdgui;
 
 void prepareSamplerResources(mpc::Mpc &mpc)
 {
@@ -76,7 +78,7 @@ TEST_CASE("Sort sounds by memory index", "[sampler]")
         REQUIRE(s->getName() == "sound" + std::to_string(3 - i));
     }
 
-    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TrimScreen);
     auto controls = mpc.getScreen();
     auto soundName = [&]()
     {
@@ -128,7 +130,7 @@ TEST_CASE("Sort sounds by name", "[sampler]")
         REQUIRE(s.first->getName() == "sound" + std::to_string(i + 1));
     }
 
-    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TrimScreen);
     auto controls = mpc.getScreen();
     auto soundName = [&]()
     {
@@ -182,7 +184,7 @@ TEST_CASE("Sort sounds by size", "[sampler]")
         REQUIRE(s.first->getName() == "sound" + std::to_string(expected[i]));
     }
 
-    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TrimScreen);
     auto controls = mpc.getScreen();
     auto soundName = [&]()
     {
@@ -219,7 +221,7 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
 
     REQUIRE(sampler->getSoundCount() == 3);
 
-    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TrimScreen);
     auto controls = mpc.getScreen();
     auto soundName = [&]()
     {
@@ -234,8 +236,8 @@ TEST_CASE("Switch sort and retain correct sound index", "[sampler]")
         sampler->switchToNextSoundSortType();
     }
 
-    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-    mpc.getLayeredScreen()->openScreen<TrimScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
+    mpc.getLayeredScreen()->openScreenById(ScreenId::TrimScreen);
 
     REQUIRE(soundName() == "sound2          (ST)");
     controls->turnWheel(1);
@@ -267,7 +269,7 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
         soundLoader.loadSound(f, r, s, shouldBeConverted);
     }
 
-    mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::PgmAssignScreen);
     auto controls = mpc.getScreen();
     mpc.getLayeredScreen()->setFocus("snd");
 

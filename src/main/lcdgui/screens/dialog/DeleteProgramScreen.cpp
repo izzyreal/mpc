@@ -1,6 +1,8 @@
 #include "DeleteProgramScreen.hpp"
 
 #include "StrUtil.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
@@ -21,14 +23,13 @@ void DeleteProgramScreen::open()
 
 void DeleteProgramScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()->openScreen<DeleteAllProgramsScreen>();
+            openScreenById(ScreenId::DeleteAllProgramsScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
             if (sampler->getProgramCount() > 1)
@@ -40,14 +41,13 @@ void DeleteProgramScreen::function(int i)
                 sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
             }
 
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
             break;
     }
 }
 
 void DeleteProgramScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "pgm")

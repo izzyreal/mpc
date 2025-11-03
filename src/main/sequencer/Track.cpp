@@ -4,10 +4,13 @@
 #include "audiomidi/EventHandler.hpp"
 
 #include "controller/ClientEventController.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 #include "sequencer/Event.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
@@ -361,7 +364,8 @@ int Track::getCorrectedTickPos()
     auto pos = mpc.getSequencer()->getTickPosition();
     auto correctedTickPos = -1;
 
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
     auto swingPercentage = timingCorrectScreen->getSwing();
     auto noteValueLengthInTicks =
         timingCorrectScreen->getNoteValueLengthInTicks();
@@ -602,9 +606,9 @@ void Track::playNext()
                 mpc.clientEventController->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen =
-                    mpc.screens->get<VmpcSettingsScreen>();
+                    mpc.screens->get<ScreenId::VmpcSettingsScreen>();
                 auto assign16LevelsScreen =
-                    mpc.screens->get<Assign16LevelsScreen>();
+                    mpc.screens->get<ScreenId::Assign16LevelsScreen>();
 
                 if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
                 {

@@ -12,7 +12,7 @@ using namespace mpc::engine::audio::core;
 
 MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc &mpc, AudioProcess *process)
     : AudioProcessAdapter(process),
-      sampleScreen(mpc.screens->get<SampleScreen>())
+      sampleScreen(mpc.screens->get<ScreenId::SampleScreen>())
 {
 }
 

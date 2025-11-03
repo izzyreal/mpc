@@ -1,4 +1,5 @@
 #include "VmpcKnownControllerDetectedScreen.hpp"
+#include "Mpc.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "disk/AbstractDisk.hpp"
@@ -26,7 +27,7 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
 
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
+    auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
     auto &presets = mpc.midiControlPresets;
     auto preset = std::find_if(
         presets.begin(), presets.end(),
@@ -97,7 +98,8 @@ void VmpcKnownControllerDetectedScreen::open()
             else if (p->autoloadMode ==
                      nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
             {
-                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>();
+                auto vmpcMidiScreen =
+                    mpc.screens->get<ScreenId::VmpcMidiScreen>();
                 vmpcMidiScreen->shouldSwitch.store(true);
                 mpc.getLayeredScreen()->closeCurrentScreen();
                 return;

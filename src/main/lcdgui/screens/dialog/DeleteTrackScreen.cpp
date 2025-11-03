@@ -1,6 +1,7 @@
 #include "DeleteTrackScreen.hpp"
 
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include <StrUtil.hpp>
@@ -20,7 +21,6 @@ void DeleteTrackScreen::open()
 
 void DeleteTrackScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "tr")
@@ -31,32 +31,26 @@ void DeleteTrackScreen::turnWheel(int i)
 
 void DeleteTrackScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()->openScreen<DeleteAllTracksScreen>();
+            openScreenById(ScreenId::DeleteAllTracksScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<TrackScreen>();
+            openScreenById(ScreenId::TrackScreen);
             break;
         case 4:
         {
             auto s = sequencer->getActiveSequence();
             s->purgeTrack(tr);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
         }
     }
 }
 
 void DeleteTrackScreen::setTr(int i)
 {
-    if (i < 0 || i > 63)
-    {
-        return;
-    }
-
-    tr = i;
+    tr = std::clamp(i, 0, 63);
     displayTr();
 }
 

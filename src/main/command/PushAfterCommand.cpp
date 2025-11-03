@@ -24,7 +24,7 @@ namespace mpc::command
     {
         if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
         {
-            layeredScreen->openScreen<AssignScreen>();
+            layeredScreen->openScreenById(ScreenId::AssignScreen);
         }
         else
         {

@@ -5,6 +5,7 @@
 #include "disk/AbstractDisk.hpp"
 #include "file/wav/WavFile.hpp"
 #include "file/sndreader/SndReader.hpp"
+#include "sampler/Sampler.hpp"
 #include "sampler/Sound.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
@@ -60,7 +61,8 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
         if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100)
         {
 
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+            auto vmpcSettingsScreen =
+                mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
             if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted)
             {

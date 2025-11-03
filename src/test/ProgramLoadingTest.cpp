@@ -6,6 +6,7 @@
 #include "disk/ProgramLoader.hpp"
 #include "lcdgui/screens/window/LoadAProgramScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <string_view>
@@ -14,6 +15,7 @@ CMRC_DECLARE(mpctest);
 
 using namespace mpc;
 using namespace mpc::disk;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
 void prepareResources(mpc::Mpc &mpc)
@@ -53,7 +55,7 @@ void doTest(mpc::Mpc &mpc, const bool clear, const bool replaceSameSounds,
             std::shared_ptr<sampler::Program> &p1,
             std::shared_ptr<sampler::Program> &p2)
 {
-    mpc.screens->get<LoadAProgramScreen>()->setLoadReplaceSameSound(
+    mpc.screens->get<ScreenId::LoadAProgramScreen>()->setLoadReplaceSameSound(
         replaceSameSounds);
 
     prepareResources(mpc);
@@ -152,7 +154,7 @@ void doTestWithMissingSound(mpc::Mpc &mpc, const bool clear,
                             std::shared_ptr<sampler::Program> &p1,
                             std::shared_ptr<sampler::Program> &p2)
 {
-    mpc.screens->get<LoadAProgramScreen>()->setLoadReplaceSameSound(
+    mpc.screens->get<ScreenId::LoadAProgramScreen>()->setLoadReplaceSameSound(
         replaceSameSounds);
 
     prepareResources(mpc);
@@ -190,7 +192,8 @@ void doTestWithMissingSound(mpc::Mpc &mpc, const bool clear,
 
         if (mpc.getLayeredScreen()->getCurrentScreenName() == "cant-find-file")
         {
-            auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
+            auto cantFindFileScreen =
+                mpc.screens->get<ScreenId::CantFindFileScreen>();
             cantFindFileScreen->function(1);
             break;
         }

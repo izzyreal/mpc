@@ -21,7 +21,7 @@ void StepEditOptionsScreen::function(int i)
 {
     if (i == 4)
     {
-        mpc.getLayeredScreen()->openScreen<StepEditorScreen>();
+        openScreenById(ScreenId::StepEditorScreen);
     }
 }
 

@@ -11,6 +11,7 @@
 #include "lcdgui/screens/window/LoadAProgramScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 #include <StrUtil.hpp>
 
@@ -68,7 +69,7 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc,
                            std::shared_ptr<mpc::disk::MpcFile> file,
                            std::shared_ptr<mpc::sampler::Program> program)
 {
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
+    auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;
 
     auto disk = mpc.getDisk();
@@ -113,7 +114,7 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc,
                     }
 
                     const auto loadAProgramScreen =
-                        mpc.screens->get<LoadAProgramScreen>();
+                        mpc.screens->get<ScreenId::LoadAProgramScreen>();
                     const bool replaceExistingSameNamedSounds =
                         loadAProgramScreen->loadReplaceSameSound;
 
@@ -207,7 +208,7 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc,
                     }
                 }
 
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
                 return p;
             });
 }
@@ -215,8 +216,8 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc,
 void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name,
                                               std::string ext, int sampleSize)
 {
-    mpc.getLayeredScreen()->openScreen<PopupScreen>();
-    auto popupScreen = mpc.screens->get<PopupScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::PopupScreen);
+    auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
     popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." +
                          StrUtil::toUpper(ext));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -224,7 +225,7 @@ void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name,
 
 void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
 {
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
+    auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;
 
     if (!skipAll)
@@ -233,7 +234,7 @@ void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
 
         cantFindFileScreen->fileName = soundFileName;
 
-        mpc.getLayeredScreen()->openScreen<CantFindFileScreen>();
+        mpc.getLayeredScreen()->openScreenById(ScreenId::CantFindFileScreen);
 
         while (cantFindFileScreen->waitingForUser)
         {

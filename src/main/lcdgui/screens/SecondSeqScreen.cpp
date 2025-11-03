@@ -1,7 +1,9 @@
 #include "SecondSeqScreen.hpp"
 
+#include "Mpc.hpp"
 #include "PunchScreen.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -18,25 +20,25 @@ void SecondSeqScreen::open()
 
 void SecondSeqScreen::function(int i)
 {
-    auto punchScreen = mpc.screens->get<PunchScreen>();
+    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     switch (i)
     {
         case 0: // Intentional fall-through
         case 1:
             punchScreen->setActiveTab(i);
-            mpc.getLayeredScreen()->openScreen(punchScreen->getTabNames()[i]);
+            ls->openScreen(punchScreen->getTabNames()[i]);
             break;
         case 5:
             if (sequencer->isSecondSequenceEnabled())
             {
                 sequencer->setSecondSequenceEnabled(false);
-                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+                openScreenById(ScreenId::SequencerScreen);
                 return;
             }
 
             sequencer->setSecondSequenceEnabled(true);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

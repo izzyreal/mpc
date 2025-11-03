@@ -6,6 +6,7 @@
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;
+using namespace mpc::lcdgui;
 
 ReleaseTapCommand::ReleaseTapCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
@@ -20,7 +21,7 @@ void ReleaseTapCommand::execute()
              ->isNoteRepeatLocked())
     {
         const auto sequencerScreen =
-            mpc.screens->get<lcdgui::screens::SequencerScreen>();
+            mpc.screens->get<ScreenId::SequencerScreen>();
         sequencerScreen->hideFooterLabelAndShowFunctionKeys();
     }
 }

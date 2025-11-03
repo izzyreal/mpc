@@ -2,23 +2,21 @@
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushGoToCommand::PushGoToCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushGoToCommand::execute()
 {
 
-    PushGoToCommand::PushGoToCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushGoToCommand::execute()
+    if (!mpc.getSequencer()->getActiveSequence()->isUsed())
     {
-
-        if (!mpc.getSequencer()->getActiveSequence()->isUsed())
-        {
-            return;
-        }
-
-        if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer")
-        {
-            mpc.getLayeredScreen()->openScreen<LocateScreen>();
-        }
+        return;
     }
 
-} // namespace mpc::command
+    if (mpc.getLayeredScreen()->getCurrentScreenName() == "sequencer")
+    {
+        mpc.getLayeredScreen()->openScreenById(ScreenId::LocateScreen);
+    }
+}

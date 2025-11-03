@@ -13,11 +13,15 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "sampler/Pad.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include <memory>
 
 #include "eventregistry/EventRegistry.hpp"
 #include "lcdgui/screens/window/EditMultipleScreen.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;
 using namespace mpc::controller;
@@ -35,7 +39,7 @@ int getDrumIndexForCurrentScreen(std::shared_ptr<Sequencer> sequencer,
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const int result = isSamplerScreen
-                           ? screens->get<screens::DrumScreen>()->getDrum()
+                           ? screens->get<ScreenId::DrumScreen>()->getDrum()
                            : sequencer->getActiveTrack()->getBus() - 1;
     return result;
 }
@@ -53,7 +57,7 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
     const std::shared_ptr<ScreenComponent> screen)
 {
     const bool isSequencerScreen =
-        layeredScreen->isCurrentScreen<SequencerScreen>();
+        layeredScreen->isCurrentScreen<ScreenId::SequencerScreen>();
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
@@ -71,14 +75,12 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
 
     const bool isRecMainWithoutPlaying =
         sequencer::SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<TimingCorrectScreen>(), screen->getName(),
-            hardware->getButton(hardware::ComponentId::REC),
+            sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+            screen->getName(), hardware->getButton(hardware::ComponentId::REC),
             controller->clientHardwareEventController);
 
-    auto timingCorrectScreen =
-        screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
-    auto assign16LevelsScreen =
-        screens->get<mpc::lcdgui::screens::window::Assign16LevelsScreen>();
+    auto timingCorrectScreen = screens->get<ScreenId::TimingCorrectScreen>();
+    auto assign16LevelsScreen = screens->get<ScreenId::Assign16LevelsScreen>();
 
     auto track = sequencer->getActiveTrack().get();
 
@@ -99,44 +101,44 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
 
     const auto hardwareSliderValue = hardware->getSlider()->getValueAs<int>();
     const int drumScreenSelectedDrum =
-        screens->get<mpc::lcdgui::screens::DrumScreen>()->getDrum();
+        screens->get<ScreenId::DrumScreen>()->getDrum();
     const auto note = track->getBus() > 0
                           ? program->getPad(programPadIndex)->getNote()
                           : programPadIndex + 35;
 
     return std::make_shared<TriggerLocalNoteOnContext>(
         TriggerLocalNoteOnContext{source,
-                                 eventRegistry,
-                                 isSequencerScreen,
-                                 programPadIndex,
-                                 velocity,
-                                 isSoundScreen,
-                                 isFullLevelEnabled,
-                                 isSixteenLevelsEnabled,
-                                 isNoteRepeatLockedOrPressed,
-                                 isErasePressed,
-                                 isStepRecording,
-                                 isRecMainWithoutPlaying,
-                                 sequencer->isRecordingOrOverdubbing(),
-                                 track->getBus(),
-                                 program,
-                                 note,
-                                 drumScreenSelectedDrum,
-                                 isSamplerScreen,
-                                 track,
-                                 sampler,
-                                 sequencer,
-                                 timingCorrectScreen,
-                                 assign16LevelsScreen,
-                                 eventHandler,
-                                 frameSequencer,
-                                 previewSoundPlayer,
-                                 allowCentralNoteAndPadUpdate,
-                                 screen,
-                                 setSelectedNote,
-                                 setSelectedPad,
-                                 layeredScreen->getFocusedFieldName(),
-                                 hardwareSliderValue});
+                                  eventRegistry,
+                                  isSequencerScreen,
+                                  programPadIndex,
+                                  velocity,
+                                  isSoundScreen,
+                                  isFullLevelEnabled,
+                                  isSixteenLevelsEnabled,
+                                  isNoteRepeatLockedOrPressed,
+                                  isErasePressed,
+                                  isStepRecording,
+                                  isRecMainWithoutPlaying,
+                                  sequencer->isRecordingOrOverdubbing(),
+                                  track->getBus(),
+                                  program,
+                                  note,
+                                  drumScreenSelectedDrum,
+                                  isSamplerScreen,
+                                  track,
+                                  sampler,
+                                  sequencer,
+                                  timingCorrectScreen,
+                                  assign16LevelsScreen,
+                                  eventHandler,
+                                  frameSequencer,
+                                  previewSoundPlayer,
+                                  allowCentralNoteAndPadUpdate,
+                                  screen,
+                                  setSelectedNote,
+                                  setSelectedPad,
+                                  layeredScreen->getFocusedFieldName(),
+                                  hardwareSliderValue});
 }
 
 std::shared_ptr<TriggerLocalNoteOffContext>
@@ -165,9 +167,9 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
         registrySnapshot.retrieveRecordNoteEvent(note);
 
     const auto stepEditOptionsScreen =
-        screens->get<mpc::lcdgui::screens::window::StepEditOptionsScreen>();
+        screens->get<ScreenId::StepEditOptionsScreen>();
     const auto timingCorrectScreen =
-        screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>();
+        screens->get<ScreenId::TimingCorrectScreen>();
 
     std::function<int()> getActiveSequenceLastTick = [sequencer]
     {
@@ -190,8 +192,8 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
 
     const bool isRecMainWithoutPlaying =
         sequencer::SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<TimingCorrectScreen>(), screen->getName(),
-            hardware->getButton(hardware::ComponentId::REC),
+            sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+            screen->getName(), hardware->getButton(hardware::ComponentId::REC),
             controller->clientHardwareEventController);
 
     std::shared_ptr<sequencer::DrumBus> drumBus =

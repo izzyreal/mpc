@@ -8,6 +8,7 @@
 #include "lcdgui/screens/PgmAssignScreen.hpp"
 
 #include "file/BitUtil.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -41,14 +42,14 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc &mpc)
         }
     }
 
-    auto drumScreen = mpc.screens->get<DrumScreen>();
+    auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
 
     auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
 
-    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>();
+    auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
     auto const padAssignMasterVal = pgmAssignScreen->padAssign;
 
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
     auto const stereoMixSourceDrumVal =
         mixerSetupScreen->isStereoMixSourceDrum();
     auto const indivFxSourceDrumVal = mixerSetupScreen->isIndivFxSourceDrum();

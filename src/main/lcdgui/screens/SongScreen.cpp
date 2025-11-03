@@ -1,5 +1,6 @@
 #include "SongScreen.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Song.hpp"
 
@@ -164,15 +165,15 @@ void SongScreen::openWindow()
 
     if (focusedFieldName == "loop")
     {
-        mpc.getLayeredScreen()->openScreen<LoopSongScreen>();
+        openScreenById(ScreenId::LoopSongScreen);
     }
     else if (focusedFieldName == "song")
     {
-        mpc.getLayeredScreen()->openScreen<SongWindow>();
+        openScreenById(ScreenId::SongWindow);
     }
     else if (focusedFieldName == "tempo" || focusedFieldName == "tempo-source")
     {
-        mpc.getLayeredScreen()->openScreen<IgnoreTempoChangeScreen>();
+        openScreenById(ScreenId::IgnoreTempoChangeScreen);
     }
 }
 
@@ -298,7 +299,7 @@ void SongScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<ConvertSongToSeqScreen>();
+            openScreenById(ScreenId::ConvertSongToSeqScreen);
             break;
         case 4:
             if (sequencer->isPlaying())

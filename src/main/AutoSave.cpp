@@ -17,6 +17,9 @@
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
 #include "DirectorySaveTarget.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <StrUtil.hpp>
 #include <memory>
@@ -33,7 +36,7 @@ using namespace mpc::lcdgui::screens::window;
 void AutoSave::restoreAutoSavedStateWithTarget(
     Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
 {
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
+    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0)
     {
         return;
@@ -204,9 +207,10 @@ void AutoSave::restoreAutoSavedStateWithTarget(
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1)
     {
         auto confirmScreen =
-            mpc.screens->get<VmpcContinuePreviousSessionScreen>();
+            mpc.screens->get<ScreenId::VmpcContinuePreviousSessionScreen>();
         confirmScreen->setRestoreAutoSavedStateAction(restoreAction);
-        mpc.getLayeredScreen()->openScreen<VmpcContinuePreviousSessionScreen>();
+        mpc.getLayeredScreen()->openScreenById(
+            ScreenId::VmpcContinuePreviousSessionScreen);
         return;
     }
 
@@ -216,7 +220,7 @@ void AutoSave::restoreAutoSavedStateWithTarget(
 void AutoSave::storeAutoSavedStateWithTarget(
     Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
 {
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
+    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
 
     if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
         mpc.getLayeredScreen()->getCurrentScreenName() ==

@@ -7,50 +7,49 @@
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushStopCommand::PushStopCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushStopCommand::execute()
 {
+    const auto vmpcDirectToDiskRecorderScreen =
+        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
+    const auto ams = mpc.getAudioMidiServices();
 
-    PushStopCommand::PushStopCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    mpc.clientEventController->clientHardwareEventController
+        ->unlockNoteRepeat();
 
-    void PushStopCommand::execute()
+    if (ams->isBouncing() &&
+        (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
+         mpc.getHardware()
+             ->getButton(hardware::ComponentId::SHIFT)
+             ->isPressed()))
     {
-        const auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<
-            lcdgui::screens::window::VmpcDirectToDiskRecorderScreen>();
-        const auto ams = mpc.getAudioMidiServices();
-
-        mpc.clientEventController->clientHardwareEventController
-            ->unlockNoteRepeat();
-
-        if (ams->isBouncing() &&
-            (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
-             mpc.getHardware()
-                 ->getButton(hardware::ComponentId::SHIFT)
-                 ->isPressed()))
-        {
-            ams->stopBouncingEarly();
-        }
-
-        mpc.getSequencer()->stop();
-
-        if (!lcdgui::screengroups::isPlayScreen(
-                mpc.getLayeredScreen()->getCurrentScreen()))
-        {
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        }
-
-        const auto sequencerScreen =
-            mpc.screens->get<lcdgui::screens::SequencerScreen>();
-        sequencerScreen->hideFooterLabelAndShowFunctionKeys();
-
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::OVERDUB_LED)
-            ->setEnabled(mpc.getSequencer()->isOverdubbing());
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::REC_LED)
-            ->setEnabled(mpc.getSequencer()->isRecording());
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::PLAY_LED)
-            ->setEnabled(mpc.getSequencer()->isPlaying());
+        ams->stopBouncingEarly();
     }
-} // namespace mpc::command
+
+    mpc.getSequencer()->stop();
+
+    if (!lcdgui::screengroups::isPlayScreen(
+            mpc.getLayeredScreen()->getCurrentScreen()))
+    {
+        mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
+    }
+
+    const auto sequencerScreen = mpc.screens->get<ScreenId::SequencerScreen>();
+    sequencerScreen->hideFooterLabelAndShowFunctionKeys();
+
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::OVERDUB_LED)
+        ->setEnabled(mpc.getSequencer()->isOverdubbing());
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::REC_LED)
+        ->setEnabled(mpc.getSequencer()->isRecording());
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::PLAY_LED)
+        ->setEnabled(mpc.getSequencer()->isPlaying());
+}

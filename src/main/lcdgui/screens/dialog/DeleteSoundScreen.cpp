@@ -1,4 +1,6 @@
 #include "DeleteSoundScreen.hpp"
+#include "lcdgui/LayeredScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -14,14 +16,13 @@ void DeleteSoundScreen::open()
 
 void DeleteSoundScreen::function(int i)
 {
-
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()->openScreen<DeleteAllSoundScreen>();
+            openScreenById(ScreenId::DeleteAllSoundScreen);
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         case 4:
             sampler->deleteSound(sampler->getSoundIndex());
@@ -33,12 +34,11 @@ void DeleteSoundScreen::function(int i)
 
             if (sampler->getSoundCount() > 0)
             {
-                mpc.getLayeredScreen()->openScreen<SoundScreen>();
+                openScreenById(ScreenId::SoundScreen);
             }
             else
             {
-                mpc.getLayeredScreen()->openScreen(
-                    sampler->getPreviousScreenName());
+                ls->openScreen(sampler->getPreviousScreenName());
             }
 
             break;
@@ -47,7 +47,6 @@ void DeleteSoundScreen::function(int i)
 
 void DeleteSoundScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "snd")

@@ -7,6 +7,7 @@
 
 using namespace mpc;
 using namespace mpc::disk;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 TEST_CASE("Load an empty auto-save state", "[auto-save]")
@@ -25,7 +26,8 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
         Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
 
-        auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>();
+        auto vmpcAutoSaveScreen =
+            mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
 
         vmpcAutoSaveScreen->setAutoLoadOnStart(2);
         const auto autosaveDir = mpc.paths->autoSavePath();

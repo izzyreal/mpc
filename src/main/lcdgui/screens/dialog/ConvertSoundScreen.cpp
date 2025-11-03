@@ -1,4 +1,5 @@
 #include "ConvertSoundScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -29,23 +30,23 @@ void ConvertSoundScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
             break;
         case 4:
             if (convert == 0)
             {
                 if (sampler->getSound()->isMono())
                 {
-                    mpc.getLayeredScreen()->openScreen<MonoToStereoScreen>();
+                    openScreenById(ScreenId::MonoToStereoScreen);
                 }
                 else
                 {
-                    mpc.getLayeredScreen()->openScreen<StereoToMonoScreen>();
+                    openScreenById(ScreenId::StereoToMonoScreen);
                 }
             }
             else
             {
-                mpc.getLayeredScreen()->openScreen<ResampleScreen>();
+                openScreenById(ScreenId::ResampleScreen);
             }
     }
 }

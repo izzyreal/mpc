@@ -3,6 +3,7 @@
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sequencer/Track.hpp"
 
 #include "disk/MpcFile.hpp"
@@ -23,7 +24,7 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void LoadASoundScreen::open()
 {
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     findLabel("filename")
         ->setText("File:" +
                   loadScreen->getSelectedFile()->getNameWithoutExtension());
@@ -84,7 +85,7 @@ void LoadASoundScreen::function(int i)
                                          // being played, so it can be removed
                                          // from memory.
             sampler->deleteSound(sampler->getPreviewSound());
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            openScreenById(ScreenId::LoadScreen);
             break;
         case 4:
             keepSound();
@@ -136,13 +137,13 @@ void LoadASoundScreen::keepSound()
             const auto isMono = previewSound->isMono();
             sampler->replaceSound(existingSoundIndex, previewSound);
             actionAfterLoadingSound(isMono);
-            mpc.getLayeredScreen()->openScreen<LoadScreen>();
+            openScreenById(ScreenId::LoadScreen);
         };
 
         const auto initializeNameScreen =
             [this, actionAfterLoadingSound, previewSound]
         {
-            auto nameScreen = mpc.screens->get<NameScreen>();
+            auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
 
             auto enterAction = [this, actionAfterLoadingSound,
                                 previewSound](std::string &nameScreenName)
@@ -154,10 +155,10 @@ void LoadASoundScreen::keepSound()
 
                 previewSound->setName(nameScreenName);
                 actionAfterLoadingSound(previewSound->isMono());
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
+                openScreenById(ScreenId::LoadScreen);
             };
 
-            auto loadScreen = mpc.screens->get<LoadScreen>();
+            auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             auto mainScreenAction = [&]()
             {
                 sampler->deleteSound(sampler->getPreviewSound());
@@ -167,20 +168,20 @@ void LoadASoundScreen::keepSound()
                 enterAction, "load", mainScreenAction);
         };
 
-        auto fileExistsScreen = mpc.screens->get<FileExistsScreen>();
-        fileExistsScreen->initialize(
-            replaceAction, initializeNameScreen,
-            [this]
-            {
-                sampler->deleteSound(sampler->getPreviewSound());
-                mpc.getLayeredScreen()->openScreen<LoadScreen>();
-            });
-        mpc.getLayeredScreen()->openScreen<FileExistsScreen>();
+        auto fileExistsScreen = mpc.screens->get<ScreenId::FileExistsScreen>();
+        fileExistsScreen->initialize(replaceAction, initializeNameScreen,
+                                     [this]
+                                     {
+                                         sampler->deleteSound(
+                                             sampler->getPreviewSound());
+                                         openScreenById(ScreenId::LoadScreen);
+                                     });
+        openScreenById(ScreenId::FileExistsScreen);
         return;
     }
 
     actionAfterLoadingSound(previewSound->isMono());
-    mpc.getLayeredScreen()->openScreen<LoadScreen>();
+    openScreenById(ScreenId::LoadScreen);
 }
 
 void LoadASoundScreen::displayAssignToNote()

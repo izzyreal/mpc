@@ -1,10 +1,14 @@
 #include "AutoChromaticAssignmentScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "sampler/Pad.hpp"
 
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
@@ -17,7 +21,7 @@ AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(
 
 void AutoChromaticAssignmentScreen::open()
 {
-    if (ls->isPreviousScreenNot<NameScreen>())
+    if (ls->isPreviousScreenNot<ScreenId::NameScreen>())
     {
         auto letterNumber = sampler->getProgramCount() + 21;
         newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
@@ -44,7 +48,6 @@ void AutoChromaticAssignmentScreen::close()
 
 void AutoChromaticAssignmentScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
@@ -78,7 +81,7 @@ void AutoChromaticAssignmentScreen::function(int i)
                 }
             }
 
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            openScreenById(ScreenId::PgmAssignScreen);
             break;
         }
     }
@@ -121,13 +124,13 @@ void AutoChromaticAssignmentScreen::openNameScreen()
         const auto enterAction = [this](std::string &nameScreenName)
         {
             newName = nameScreenName;
-            mpc.getLayeredScreen()->openScreen<AutoChromaticAssignmentScreen>();
+            openScreenById(ScreenId::AutoChromaticAssignmentScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(newName, 16, enterAction,
                                "auto-chromatic-assignment");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 

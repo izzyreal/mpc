@@ -1,4 +1,5 @@
 #include "DeleteAllSongScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -9,11 +10,10 @@ DeleteAllSongScreen::DeleteAllSongScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void DeleteAllSongScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<DeleteSongScreen>();
+            openScreenById(ScreenId::DeleteSongScreen);
             break;
         case 4:
 
@@ -22,7 +22,7 @@ void DeleteAllSongScreen::function(int i)
                 sequencer->deleteSong(j);
             }
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
     }
 }

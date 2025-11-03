@@ -7,39 +7,35 @@
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushRecCommand::PushRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushRecCommand::execute()
 {
+    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
+        .unlock(hardware::ComponentId::REC);
+    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
+        .unlock(hardware::ComponentId::OVERDUB);
 
-    PushRecCommand::PushRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushRecCommand::execute()
+    if (lcdgui::screengroups::isPlayOnlyScreen(
+            mpc.getLayeredScreen()->getCurrentScreen()))
     {
-        mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.unlock(hardware::ComponentId::REC);
-        mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
-
-        if (lcdgui::screengroups::isPlayOnlyScreen(
-                mpc.getLayeredScreen()->getCurrentScreen()))
-        {
-            return;
-        }
-
-        if (mpc.getSequencer()->isRecordingOrOverdubbing())
-        {
-            mpc.getSequencer()->setRecording(false);
-            mpc.getSequencer()->setOverdubbing(false);
-        }
-
-        if (!lcdgui::screengroups::isPlayAndRecordScreen(
-                mpc.getLayeredScreen()->getCurrentScreen()))
-        {
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-        }
-
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::REC_LED)
-            ->setEnabled(true);
+        return;
     }
 
-} // namespace mpc::command
+    if (mpc.getSequencer()->isRecordingOrOverdubbing())
+    {
+        mpc.getSequencer()->setRecording(false);
+        mpc.getSequencer()->setOverdubbing(false);
+    }
+
+    if (!lcdgui::screengroups::isPlayAndRecordScreen(
+            mpc.getLayeredScreen()->getCurrentScreen()))
+    {
+        mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
+    }
+
+    mpc.getHardware()->getLed(hardware::ComponentId::REC_LED)->setEnabled(true);
+}

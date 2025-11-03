@@ -4,6 +4,7 @@
 #include "audiomidi/SoundRecorder.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/Label.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -75,7 +76,7 @@ void SampleScreen::down()
 
 void SampleScreen::openWindow()
 {
-    mpc.getLayeredScreen()->openScreen<SoundMemoryScreen>();
+    openScreenById(ScreenId::SoundMemoryScreen);
 }
 
 void SampleScreen::function(int i)

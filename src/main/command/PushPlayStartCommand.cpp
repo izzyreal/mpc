@@ -7,86 +7,86 @@
 #include "lcdgui/ScreenGroups.hpp"
 #include "sequencer/Sequencer.hpp"
 
-namespace mpc::command
+using namespace mpc::command;
+using namespace mpc::lcdgui;
+
+PushPlayStartCommand::PushPlayStartCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+
+void PushPlayStartCommand::execute()
 {
-
-    PushPlayStartCommand::PushPlayStartCommand(mpc::Mpc &mpc) : mpc(mpc) {}
-
-    void PushPlayStartCommand::execute()
+    if (mpc.getSequencer()->isPlaying())
     {
-        if (mpc.getSequencer()->isPlaying())
+        return;
+    }
+
+    const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
+    const bool currentScreenAllowsPlayAndRecord =
+        lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
+
+    auto hardware = mpc.getHardware();
+
+    const auto recButtonIsPressedOrLocked =
+        hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
+        mpc.clientEventController->clientHardwareEventController
+            ->buttonLockTracker.isLocked(hardware::ComponentId::REC);
+
+    const auto overdubButtonIsPressedOrLocked =
+        hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
+        mpc.clientEventController->clientHardwareEventController
+            ->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
+
+    if (recButtonIsPressedOrLocked)
+    {
+        if (!currentScreenAllowsPlayAndRecord)
         {
-            return;
+            mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
         }
 
-        const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
-        const bool currentScreenAllowsPlayAndRecord =
-            lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
-
-        auto hardware = mpc.getHardware();
-
-        const auto recButtonIsPressedOrLocked =
-            hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
-            mpc.clientEventController->clientHardwareEventController
-                ->buttonLockTracker.isLocked(hardware::ComponentId::REC);
-
-        const auto overdubButtonIsPressedOrLocked =
-            hardware->getButton(hardware::ComponentId::OVERDUB)->isPressed() ||
-            mpc.clientEventController->clientHardwareEventController
-                ->buttonLockTracker.isLocked(hardware::ComponentId::OVERDUB);
-
-        if (recButtonIsPressedOrLocked)
+        mpc.getSequencer()->recFromStart();
+    }
+    else if (overdubButtonIsPressedOrLocked)
+    {
+        if (!currentScreenAllowsPlayAndRecord)
         {
-            if (!currentScreenAllowsPlayAndRecord)
-            {
-                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            }
-
-            mpc.getSequencer()->recFromStart();
+            mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
         }
-        else if (overdubButtonIsPressedOrLocked)
-        {
-            if (!currentScreenAllowsPlayAndRecord)
-            {
-                mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-            }
 
-            mpc.getSequencer()->overdubFromStart();
+        mpc.getSequencer()->overdubFromStart();
+    }
+    else
+    {
+        if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
+        {
+            mpc.getLayeredScreen()->openScreenById(
+                ScreenId::VmpcDirectToDiskRecorderScreen);
         }
         else
         {
-            if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed())
+            if (!lcdgui::screengroups::isPlayScreen(currentScreen))
             {
+                mpc.getLayeredScreen()->openScreenById(
+                    ScreenId::SequencerScreen);
+            }
+
+            mpc.getSequencer()->setSongModeEnabled(
                 mpc.getLayeredScreen()
-                    ->openScreen<VmpcDirectToDiskRecorderScreen>();
-            }
-            else
-            {
-                if (!lcdgui::screengroups::isPlayScreen(currentScreen))
-                {
-                    mpc.getLayeredScreen()->openScreen<SequencerScreen>();
-                }
-
-                mpc.getSequencer()->setSongModeEnabled(
-                    mpc.getLayeredScreen()->isCurrentScreen<SongScreen>());
-                mpc.getSequencer()->playFromStart();
-            }
+                    ->isCurrentScreen<ScreenId::SongScreen>());
+            mpc.getSequencer()->playFromStart();
         }
-
-        mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.unlock(hardware::ComponentId::REC);
-        mpc.clientEventController->clientHardwareEventController
-            ->buttonLockTracker.unlock(hardware::ComponentId::OVERDUB);
-
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::OVERDUB_LED)
-            ->setEnabled(mpc.getSequencer()->isOverdubbing());
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::REC_LED)
-            ->setEnabled(mpc.getSequencer()->isRecording());
-        mpc.getHardware()
-            ->getLed(hardware::ComponentId::PLAY_LED)
-            ->setEnabled(mpc.getSequencer()->isPlaying());
     }
 
-} // namespace mpc::command
+    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
+        .unlock(hardware::ComponentId::REC);
+    mpc.clientEventController->clientHardwareEventController->buttonLockTracker
+        .unlock(hardware::ComponentId::OVERDUB);
+
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::OVERDUB_LED)
+        ->setEnabled(mpc.getSequencer()->isOverdubbing());
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::REC_LED)
+        ->setEnabled(mpc.getSequencer()->isRecording());
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::PLAY_LED)
+        ->setEnabled(mpc.getSequencer()->isPlaying());
+}

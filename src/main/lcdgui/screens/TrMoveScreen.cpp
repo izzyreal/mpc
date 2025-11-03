@@ -4,6 +4,7 @@
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
 
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui;
@@ -40,7 +41,7 @@ void TrMoveScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "sq")
     {
-        auto eventsScreen = mpc.screens->get<EventsScreen>();
+        auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
         eventsScreen->setFromSq(sequencer->getActiveSequenceIndex() + i);
         displaySq();
         displayTrFields();
@@ -117,10 +118,9 @@ void TrMoveScreen::function(int i)
         case 1:
         case 3:
         {
-            auto eventsScreen = mpc.screens->get<EventsScreen>();
+            auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
             eventsScreen->tab = i;
-            mpc.getLayeredScreen()->openScreen(
-                eventsScreen->tabNames[eventsScreen->tab]);
+            ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
         case 4:
@@ -184,7 +184,7 @@ void TrMoveScreen::displayTrLabels()
         }
     }
 
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     auto sequence = sequencer->getActiveSequence();
 
     if (tr0Index >= 0)
@@ -231,7 +231,7 @@ void TrMoveScreen::displayTrLabels()
 
 void TrMoveScreen::displayTrFields()
 {
-    auto eventsScreen = mpc.screens->get<EventsScreen>();
+    auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     auto sequence = sequencer->getActiveSequence();
 
     if (isSelected())

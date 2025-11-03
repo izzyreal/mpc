@@ -1,4 +1,5 @@
 #include "VmpcDisksScreen.hpp"
+#include "Mpc.hpp"
 #include "VmpcSettingsScreen.hpp"
 
 #include "lcdgui/Parameter.hpp"
@@ -54,17 +55,18 @@ void VmpcDisksScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getLayeredScreen()->openScreen<VmpcSettingsScreen>();
+            openScreenById(ScreenId::VmpcSettingsScreen);
             break;
         case 1:
-            mpc.getLayeredScreen()->openScreen<VmpcKeyboardScreen>();
+            openScreenById(ScreenId::VmpcKeyboardScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<VmpcAutoSaveScreen>();
+            openScreenById(ScreenId::VmpcAutoSaveScreen);
             break;
         case 4:
         {
-            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+            auto vmpcSettingsScreen =
+                mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
             if (vmpcSettingsScreen->getMidiControlMode() ==
                 VmpcSettingsScreen::MidiControlMode::ORIGINAL)
@@ -72,7 +74,7 @@ void VmpcDisksScreen::function(int i)
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<VmpcMidiScreen>();
+            openScreenById(ScreenId::VmpcMidiScreen);
             break;
         }
         case 5:
@@ -217,7 +219,7 @@ bool VmpcDisksScreen::hasConfigChanged()
 
 void VmpcDisksScreen::displayFunctionKeys()
 {
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>();
+    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
     auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
     auto newArrangement =
         midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1

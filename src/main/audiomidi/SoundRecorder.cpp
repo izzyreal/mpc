@@ -3,6 +3,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 
 #include "lcdgui/screens/SampleScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 #include <SampleOps.hpp>
 
@@ -56,7 +57,7 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
     lengthInFramesAtEngineSampleRate =
         newLengthInFrames * (engineSampleRate / 44100.f);
 
-    const auto sampleScreen = mpc.screens->get<SampleScreen>();
+    const auto sampleScreen = mpc.screens->get<ScreenId::SampleScreen>();
     const auto preRecFramesAt44Khz = (int)(44.1 * sampleScreen->preRec);
 
     lengthInFramesAtEngineSampleRate +=
@@ -64,7 +65,7 @@ void SoundRecorder::prepare(const std::shared_ptr<Sound> &soundToUse,
 
     cancelled = false;
 
-    mode = mpc.screens->get<SampleScreen>()->getMode();
+    mode = mpc.screens->get<ScreenId::SampleScreen>()->getMode();
 
     if (mode != 2)
     {
@@ -191,14 +192,14 @@ void SoundRecorder::stop()
         sound->removeFramesFromEnd(overflowAt44Khz);
     }
 
-    const auto sampleScreen = mpc.screens->get<SampleScreen>();
+    const auto sampleScreen = mpc.screens->get<ScreenId::SampleScreen>();
     const auto preRecFramesAt44Khz = (int)(44.1 * sampleScreen->preRec);
 
     sound->setStart(preRecFramesAt44Khz);
     sound->setLoopTo(sound->getFrameCount());
     sound->setEnd(sound->getFrameCount());
 
-    mpc.getLayeredScreen()->openScreen<KeepOrRetryScreen>();
+    mpc.getLayeredScreen()->openScreenById(ScreenId::KeepOrRetryScreen);
 }
 
 void SoundRecorder::cancel()
@@ -213,7 +214,7 @@ void SoundRecorder::setSampleScreenActive(bool active)
 
 int SoundRecorder::processAudio(AudioBuffer *buf, int nFrames)
 {
-    auto sampleScreen = mpc.screens->get<SampleScreen>();
+    auto sampleScreen = mpc.screens->get<ScreenId::SampleScreen>();
 
     if (!sampleScreenActive.load())
     {
@@ -226,7 +227,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, int nFrames)
 
     lastSampleScreenActive = true;
 
-    mode = mpc.screens->get<SampleScreen>()->getMode();
+    mode = mpc.screens->get<ScreenId::SampleScreen>()->getMode();
 
     const auto gain = inputGain * 0.01;
     float peakL = 0, peakR = 0;

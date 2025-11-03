@@ -5,6 +5,7 @@
 #include <StrUtil.hpp>
 
 #include "lcdgui/Label.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

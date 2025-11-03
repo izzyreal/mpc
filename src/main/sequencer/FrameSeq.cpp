@@ -9,6 +9,7 @@
 #include "eventregistry/EventRegistry.hpp"
 #include "hardware/Hardware.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
@@ -34,13 +35,13 @@ using namespace mpc::engine::midi;
 
 FrameSeq::FrameSeq(mpc::Mpc &mpc)
     : mpc(mpc), sequencer(mpc.getSequencer()),
-      countMetronomeScreen(mpc.screens->get<CountMetronomeScreen>()),
-      timingCorrectScreen(mpc.screens->get<TimingCorrectScreen>()),
-      sequencerScreen(mpc.screens->get<SequencerScreen>()),
-      syncScreen(mpc.screens->get<SyncScreen>()),
-      punchScreen(mpc.screens->get<PunchScreen>()),
-      songScreen(mpc.screens->get<SongScreen>()),
-      userScreen(mpc.screens->get<UserScreen>()),
+      countMetronomeScreen(mpc.screens->get<ScreenId::CountMetronomeScreen>()),
+      timingCorrectScreen(mpc.screens->get<ScreenId::TimingCorrectScreen>()),
+      sequencerScreen(mpc.screens->get<ScreenId::SequencerScreen>()),
+      syncScreen(mpc.screens->get<ScreenId::SyncScreen>()),
+      punchScreen(mpc.screens->get<ScreenId::PunchScreen>()),
+      songScreen(mpc.screens->get<ScreenId::SongScreen>()),
+      userScreen(mpc.screens->get<ScreenId::UserScreen>()),
       midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
 {
     tempEventQueue.reserve(100);
@@ -122,7 +123,7 @@ void FrameSeq::triggerClickIfNeeded()
     }
 
     const bool isStepEditor =
-        mpc.getLayeredScreen()->isCurrentScreen<StepEditorScreen>();
+        mpc.getLayeredScreen()->isCurrentScreen<ScreenId::StepEditorScreen>();
 
     const auto currentScreenName =
         mpc.getLayeredScreen()->getCurrentScreenName();

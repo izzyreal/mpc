@@ -64,8 +64,8 @@ void DirectoryScreen::function(int f)
 {
     ScreenComponent::function(f);
 
-    auto loadScreen = mpc.screens->get<LoadScreen>();
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     auto disk = mpc.getDisk();
 
     switch (f)
@@ -78,11 +78,11 @@ void DirectoryScreen::function(int f)
 
             if (getSelectedFile()->isDirectory())
             {
-                mpc.getLayeredScreen()->openScreen<DeleteFolderScreen>();
+                openScreenById(ScreenId::DeleteFolderScreen);
             }
             else
             {
-                mpc.getLayeredScreen()->openScreen<DeleteFileScreen>();
+                openScreenById(ScreenId::DeleteFileScreen);
             }
 
             break;
@@ -148,14 +148,14 @@ void DirectoryScreen::function(int f)
                 }
 
                 disk->initFiles();
-                mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+                openScreenById(ScreenId::DirectoryScreen);
             };
 
             nameScreen->initialize(getSelectedFile()->getNameWithoutExtension(),
                                    file->isDirectory() ? 8 : 16, enterAction,
                                    "directory");
 
-            mpc.getLayeredScreen()->openScreen<NameScreen>();
+            openScreenById(ScreenId::NameScreen);
 
             break;
         }
@@ -174,7 +174,7 @@ void DirectoryScreen::function(int f)
 
                 if (!success)
                 {
-                    mpc.getLayeredScreen()->openScreen<PopupScreen>();
+                    openScreenById(ScreenId::PopupScreen);
 
                     std::string msg;
 
@@ -187,7 +187,7 @@ void DirectoryScreen::function(int f)
                         msg = "Folder name exists !!";
                     }
 
-                    ls->showPopupAndThenOpen<NameScreen>(msg, 1000);
+                    ls->showPopupAndThenOpen<ScreenId::NameScreen>(msg, 1000);
                     return;
                 }
 
@@ -216,11 +216,11 @@ void DirectoryScreen::function(int f)
                     counter++;
                 }
 
-                mpc.getLayeredScreen()->openScreen<DirectoryScreen>();
+                openScreenById(ScreenId::DirectoryScreen);
             };
 
             nameScreen->initialize("NEWFOLDR", 8, enterAction, "directory");
-            mpc.getLayeredScreen()->openScreen<NameScreen>();
+            openScreenById(ScreenId::NameScreen);
             break;
         }
         case 5:
@@ -293,7 +293,7 @@ void DirectoryScreen::left()
     {
         if (disk->moveBack())
         {
-            auto loadScreen = mpc.screens->get<LoadScreen>();
+            auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             disk->initFiles();
 
             loadScreen->fileLoad = 0;
@@ -369,7 +369,7 @@ void DirectoryScreen::right()
         yPos0 = 0;
         yOffset1 = 0;
 
-        auto loadScreen = mpc.screens->get<LoadScreen>();
+        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         loadScreen->fileLoad = 0;
 
         for (int i = 0; i < disk->getParentFileNames().size(); i++)
@@ -395,7 +395,7 @@ void DirectoryScreen::right()
 void DirectoryScreen::up()
 {
     auto disk = mpc.getDisk();
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     if (xPos == 0)
     {
@@ -480,7 +480,7 @@ void DirectoryScreen::up()
 void DirectoryScreen::down()
 {
     auto disk = mpc.getDisk();
-    auto loadScreen = mpc.screens->get<LoadScreen>();
+    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     if (xPos == 0)
     {
@@ -574,7 +574,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 
     if (xPos == 1)
     {
-        auto loadScreen = mpc.screens->get<LoadScreen>();
+        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         yPos = loadScreen->fileLoad - yOffset1;
     }
 
@@ -652,7 +652,7 @@ void DirectoryScreen::refreshFocus()
     }
     else if (xPos == 1)
     {
-        auto loadScreen = mpc.screens->get<LoadScreen>();
+        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         ls->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
     }
 }

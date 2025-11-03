@@ -25,6 +25,7 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 using namespace mpc::client::event;
 using namespace mpc::hardware;
+using namespace mpc::lcdgui;
 
 TEST_CASE("Next step, previous step", "[sequencer]")
 {
@@ -256,7 +257,8 @@ TEST_CASE("Undo", "[sequencer]")
     auto sequencer = mpc.getSequencer();
     sequencer->setCountEnabled(false);
 
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(0);
 
     auto seq = sequencer->getActiveSequence();

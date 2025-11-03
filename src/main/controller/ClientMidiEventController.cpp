@@ -1,11 +1,19 @@
 #include "controller/ClientMidiEventController.hpp"
+#include "command/TriggerLocalNoteOffCommand.hpp"
+#include "command/TriggerLocalNoteOnCommand.hpp"
 #include "controller/ClientEventController.hpp"
 
 #include "command/context/TriggerLocalNoteContextFactory.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
 #include "lcdgui/screens/window/MultiRecordingSetupScreen.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
+#include "sequencer/Track.hpp"
 
 #include <memory>
 
@@ -41,9 +49,9 @@ ClientMidiEventController::ClientMidiEventController(
       eventRegistry(eventRegistry), midiInputScreen(midiInputScreen),
       eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
-      timingCorrectScreen(timingCorrectScreen),
-      layeredScreen(layeredScreen), hardware(hardware), screens(screens),
-      frameSequencer(frameSequencer), previewSoundPlayer(previewSoundPlayer)
+      timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
+      hardware(hardware), screens(screens), frameSequencer(frameSequencer),
+      previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =
         std::make_shared<ClientMidiFootswitchAssignmentController>(
@@ -53,7 +61,7 @@ ClientMidiEventController::ClientMidiEventController(
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
     if (clientEventController->getLayeredScreen()
-            ->isCurrentScreen<MidiInputMonitorScreen>())
+            ->isCurrentScreen<ScreenId::MidiInputMonitorScreen>())
     {
         const auto notificationMessage =
             std::string("a") + std::to_string(e.getChannel());
@@ -74,7 +82,6 @@ void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
     {
         return;
     }
-
 
     switch (e.getMessageType())
     {
@@ -133,13 +140,13 @@ ClientMidiEventController::getFootswitchAssignmentController()
 
 bool ClientMidiEventController::isOmniOn() const noexcept
 {
-    //return mode == 1 || mode == 2;
+    // return mode == 1 || mode == 2;
     return true;
 }
 
 bool ClientMidiEventController::isPolyMode() const noexcept
 {
-    //return mode == 1 || mode == 3;
+    // return mode == 1 || mode == 3;
     return true;
 }
 
@@ -266,8 +273,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
     command::TriggerLocalNoteOffCommand(ctx).execute();
 }
 
-void ClientMidiEventController::handleKeyAftertouch(
-    const ClientMidiEvent &e)
+void ClientMidiEventController::handleKeyAftertouch(const ClientMidiEvent &e)
 {
     auto pressure = e.getAftertouchValue();
     auto note = e.getAftertouchNote();
@@ -283,11 +289,11 @@ void ClientMidiEventController::handleKeyAftertouch(
             programPadIndex != -1)
         {
             eventRegistry->registerProgramPadAftertouch(
-                eventregistry::Source::MidiInput, bus, program,
-                programPadIndex, pressure, track.get());
+                eventregistry::Source::MidiInput, bus, program, programPadIndex,
+                pressure, track.get());
         }
     }
- }
+}
 
 void ClientMidiEventController::handleChannelAftertouch(
     const ClientMidiEvent &e)
@@ -324,8 +330,7 @@ void ClientMidiEventController::handlePitchBend(const ClientMidiEvent &e)
     // Pitch bend recognized (value range: -8192..8191)
 }
 
-void ClientMidiEventController::handleControlChange(
-    const ClientMidiEvent &e)
+void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
 {
     const int ch = e.getChannel();
     const int cc = e.getControllerNumber();
@@ -355,9 +360,8 @@ void ClientMidiEventController::handleControlChange(
     const auto program = getProgramForEvent(e);
     const auto sliderControllerNumber =
         program->getSlider()->getControlChange();
-    
-    if (cc == sliderControllerNumber &&
-             sliderControllerNumber >= 1)
+
+    if (cc == sliderControllerNumber && sliderControllerNumber >= 1)
     {
         // Verify on real 2KXL: what is the 0-based and 1-based range for this
         // property of the program?
@@ -370,8 +374,7 @@ void ClientMidiEventController::handleControlChange(
     }
 }
 
-void ClientMidiEventController::handleProgramChange(
-    const ClientMidiEvent &e)
+void ClientMidiEventController::handleProgramChange(const ClientMidiEvent &e)
 {
     if (midiInputScreen->getProgChangeSeq())
     {
@@ -384,9 +387,9 @@ void ClientMidiEventController::handleProgramChange(
                     sequencer->getSequence(e.getProgramNumber())->isUsed())
                 {
                     if (clientEventController->getLayeredScreen()
-                            ->isCurrentScreen<NextSeqScreen,
-                                              NextSeqPadScreen,
-                                              SequencerScreen>())
+                            ->isCurrentScreen<ScreenId::NextSeqScreen,
+                                              ScreenId::NextSeqPadScreen,
+                                              ScreenId::SequencerScreen>())
                     {
                         sequencer->setNextSq(e.getProgramNumber());
                     }
@@ -410,8 +413,7 @@ void ClientMidiEventController::handleProgramChange(
     }
 }
 
-void ClientMidiEventController::handleSystemExclusive(
-    const ClientMidiEvent &e)
+void ClientMidiEventController::handleSystemExclusive(const ClientMidiEvent &e)
 {
     // SysEx recognized only if ID == 0x45
 }
@@ -473,7 +475,7 @@ void ClientMidiEventController::handleReset(const ClientMidiEvent &e)
 }
 
 void ClientMidiEventController::noteOnInternal(int channel, int note,
-                                                   int velocity)
+                                               int velocity)
 {
     heldNotes[channel].push_back(note);
 }
@@ -509,8 +511,8 @@ void ClientMidiEventController::enforceMonoMode(int channel, int newNote)
     }
 }
 
-std::optional<int> ClientMidiEventController::getTrackIndexForEvent(
-    const ClientMidiEvent &e) const
+std::optional<int>
+ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
 {
     if (sequencer->isRecordingModeMulti())
     {
@@ -524,8 +526,8 @@ std::optional<int> ClientMidiEventController::getTrackIndexForEvent(
     return sequencer->getActiveTrackIndex();
 }
 
-std::shared_ptr<Track> ClientMidiEventController::getTrackForEvent(
-    const ClientMidiEvent &e) const
+std::shared_ptr<Track>
+ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
 {
     if (auto trackIndex = getTrackIndexForEvent(e); trackIndex)
     {
@@ -538,8 +540,8 @@ std::shared_ptr<Track> ClientMidiEventController::getTrackForEvent(
     return {};
 }
 
-std::shared_ptr<DrumBus> ClientMidiEventController::getDrumBusForEvent(
-    const ClientMidiEvent &e) const
+std::shared_ptr<DrumBus>
+ClientMidiEventController::getDrumBusForEvent(const ClientMidiEvent &e) const
 {
     if (auto drumIndex = getDrumIndexForEvent(e); drumIndex)
     {
@@ -548,8 +550,8 @@ std::shared_ptr<DrumBus> ClientMidiEventController::getDrumBusForEvent(
     return {};
 }
 
-std::shared_ptr<Program> ClientMidiEventController::getProgramForEvent(
-    const ClientMidiEvent &e) const
+std::shared_ptr<Program>
+ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
 {
     if (auto drumIndex = getDrumIndexForEvent(e); drumIndex)
     {
@@ -560,8 +562,8 @@ std::shared_ptr<Program> ClientMidiEventController::getProgramForEvent(
     return {};
 }
 
-std::optional<int> ClientMidiEventController::getDrumIndexForEvent(
-    const ClientMidiEvent &e) const
+std::optional<int>
+ClientMidiEventController::getDrumIndexForEvent(const ClientMidiEvent &e) const
 {
     auto track = getTrackForEvent(e);
     if (!track)
@@ -612,5 +614,3 @@ bool ClientMidiEventController::shouldProcessEvent(
             return true;
     }
 }
-
-

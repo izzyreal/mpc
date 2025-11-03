@@ -4,6 +4,8 @@
 #include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
+
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;

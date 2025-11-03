@@ -5,6 +5,7 @@
 #include <StrUtil.hpp>
 
 #include "lcdgui/Label.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -35,10 +36,9 @@ void ChangeBars2Screen::function(int i)
     switch (i)
     {
         case 2:
-            mpc.getLayeredScreen()
-                ->openScreen<SequencerScreen>(); // Required for desired screen
-                                                 // transitions
-            mpc.getLayeredScreen()->openScreen<ChangeBarsScreen>();
+            openScreenById(ScreenId::SequencerScreen); // Required for desired
+                                                       // screen transitions
+            openScreenById(ScreenId::ChangeBarsScreen);
             break;
         case 4:
         {
@@ -63,7 +63,7 @@ void ChangeBars2Screen::function(int i)
                 sequencer->move(0);
             }
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }
@@ -98,7 +98,6 @@ void ChangeBars2Screen::displayNewBars()
 
 void ChangeBars2Screen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "newbars")
@@ -109,11 +108,6 @@ void ChangeBars2Screen::turnWheel(int i)
 
 void ChangeBars2Screen::setNewBars(int i)
 {
-    if (i < 0 || i > 998)
-    {
-        return;
-    }
-
-    newBars = i;
+    newBars = std::clamp(i, 0, 998);
     displayNewBars();
 }

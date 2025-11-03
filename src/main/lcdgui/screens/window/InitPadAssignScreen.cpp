@@ -1,4 +1,5 @@
 #include "InitPadAssignScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -27,7 +28,6 @@ void InitPadAssignScreen::turnWheel(int i)
 
 void InitPadAssignScreen::function(int i)
 {
-
     ScreenComponent::function(i);
 
     switch (i)
@@ -42,7 +42,7 @@ void InitPadAssignScreen::function(int i)
                 getProgramOrThrow()->initPadAssign();
             }
 
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            openScreenById(ScreenId::PgmAssignScreen);
             break;
     }
 }

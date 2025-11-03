@@ -1,7 +1,10 @@
 #include "CopyNoteParametersScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
@@ -57,7 +60,7 @@ void CopyNoteParametersScreen::function(int i)
             auto dest = sampler->getProgram(prog1);
             auto clone = source->clone(note1);
             dest->setNoteParameters(note1, clone);
-            mpc.getLayeredScreen()->openScreen<PgmAssignScreen>();
+            openScreenById(ScreenId::PgmAssignScreen);
             break;
         }
     }

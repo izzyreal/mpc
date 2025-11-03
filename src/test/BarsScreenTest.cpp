@@ -1,12 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/BarsScreen.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 
 TEST_CASE("BARS1", "[bars-screen]")
 {
@@ -29,7 +31,7 @@ TEST_CASE("BARS1", "[bars-screen]")
         tickPos += 24;
     }
 
-    auto barsScreen = mpc.screens->get<BarsScreen>();
+    auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
     int toSeqIndex = 1;
     int firstBar = 0;
     int lastBar = 0;
@@ -73,7 +75,7 @@ TEST_CASE("BARS2", "[bars-screen]")
         tickPos += 24;
     }
 
-    auto barsScreen = mpc.screens->get<BarsScreen>();
+    auto barsScreen = mpc.screens->get<ScreenId::BarsScreen>();
     int toSeqIndex = 1;
     int firstBar = 0;
     int lastBar = 0;

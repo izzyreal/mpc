@@ -22,6 +22,9 @@
 #include <stdexcept>
 
 #include "Logger.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -38,7 +41,7 @@ void ApsLoader::load(mpc::Mpc &mpc, std::shared_ptr<MpcFile> file)
         throw std::invalid_argument("File does not exist");
     }
 
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
+    auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;
 
     ApsParser apsParser(file->getBytes());
@@ -262,7 +265,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
             apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
     }
 
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
 
     auto globals = apsParser.getGlobalParameters();
 
@@ -274,11 +277,11 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
     mixerSetupScreen->setIndivFxSourceDrum(globals->isIndivFxSourceDrum());
     mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
 
-    auto drumScreen = mpc.screens->get<DrumScreen>();
+    auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
     mixerSetupScreen->setMasterLevel(globals->getMasterLevel());
 
-    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>();
+    auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
 
     pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
@@ -325,7 +328,7 @@ void ApsLoader::showPopup(mpc::Mpc &mpc, std::string name, std::string ext,
 
 void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
 {
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>();
+    auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;
 
     if (!skipAll)
@@ -334,7 +337,7 @@ void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
 
         cantFindFileScreen->fileName = soundFileName;
 
-        mpc.getLayeredScreen()->openScreen<CantFindFileScreen>();
+        mpc.getLayeredScreen()->openScreenById(ScreenId::CantFindFileScreen);
 
         while (cantFindFileScreen->waitingForUser)
         {

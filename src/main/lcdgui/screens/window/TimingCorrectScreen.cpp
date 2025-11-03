@@ -1,5 +1,7 @@
 #include "TimingCorrectScreen.hpp"
 
+#include "sampler/Sampler.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 
@@ -88,7 +90,7 @@ void TimingCorrectScreen::function(int i)
             track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(),
                                     swing, noteRange[0], noteRange[1]);
 
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
             break;
         }
     }

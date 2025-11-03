@@ -1,5 +1,6 @@
 #include "ChannelSettingsScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 
@@ -8,6 +9,9 @@
 
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
@@ -23,7 +27,7 @@ void ChannelSettingsScreen::open()
 {
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
-    auto mixerScreen = mpc.screens->get<MixerScreen>();
+    auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
     const int padIndexWithoutBank = mixerScreen->xPos;
     const int padIndexWithBank = padIndexWithoutBank + (bank * 16);
     auto padNote = getProgramOrThrow()->getNoteFromPad(padIndexWithBank);
@@ -39,7 +43,7 @@ void ChannelSettingsScreen::close()
 
 std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 {
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
 
     if (mixerSetupScreen->isIndivFxSourceDrum())
     {
@@ -55,7 +59,7 @@ std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 
 std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 {
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
 
     if (mixerSetupScreen->isStereoMixSourceDrum())
     {

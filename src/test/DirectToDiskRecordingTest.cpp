@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "sampler/Sampler.hpp"
 #include "sequencer/Clock.hpp"
 #include "sequencer/Track.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
@@ -8,6 +9,8 @@
 #include "file/wav/WavFile.hpp"
 
 #include <thread>
+
+using namespace mpc::lcdgui;
 
 TEST_CASE("Direct to disk recording does not start with silence",
           "[direct-to-disk-recording]")
@@ -40,7 +43,8 @@ TEST_CASE("Direct to disk recording does not start with silence",
     auto event = seq->getTrack(0)->recordNoteEventSynced(0, 35, 127);
     seq->getTrack(0)->finalizeNoteEventSynced(event, 1);
 
-    mpc.getLayeredScreen()->openScreen<VmpcDirectToDiskRecorderScreen>();
+    mpc.getLayeredScreen()->openScreenById(
+        ScreenId::VmpcDirectToDiskRecorderScreen);
 
     auto audioMidiServices = mpc.getAudioMidiServices();
     auto audioServer = audioMidiServices->getAudioServer();

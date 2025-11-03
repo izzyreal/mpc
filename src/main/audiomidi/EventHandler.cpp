@@ -20,6 +20,7 @@
 #include "sampler/Program.hpp"
 
 #include "sequencer/NoteEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/MixerEvent.hpp"
@@ -38,10 +39,10 @@
 using namespace mpc::audiomidi;
 using namespace mpc::sampler;
 using namespace mpc::sequencer;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine;
-using namespace mpc::engine::midi;
 
 EventHandler::EventHandler(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
 {
@@ -150,7 +151,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
             auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
                 noteEventIdToUse, drumBus, mpc.getSampler(),
                 mpc.getAudioMidiServices()->getMixer(),
-                mpc.screens->get<MixerSetupScreen>(),
+                mpc.screens->get<ScreenId::MixerSetupScreen>(),
                 &mpc.getAudioMidiServices()->getVoices(),
                 mpc.getAudioMidiServices()->getMixerConnections(), note,
                 velocityToUse, variationTypeToUse, variationValueToUse,
@@ -222,7 +223,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 
         auto program = sampler->getProgram(drumBus->getProgram());
 
-        auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+        auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
 
         auto mixer = mixerSetupScreen->isStereoMixSourceDrum()
                          ? drumBus->getStereoMixerChannels()[pad]
@@ -268,7 +269,7 @@ void EventHandler::handleUnfinalizedNoteOn(
         auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
             0, drumBus, mpc.getSampler(),
             mpc.getAudioMidiServices()->getMixer(),
-            mpc.screens->get<MixerSetupScreen>(),
+            mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getAudioMidiServices()->getVoices(),
             mpc.getAudioMidiServices()->getMixerConnections(), note,
             velocityToUse, noteOnEvent->getVariationType(),
@@ -372,7 +373,7 @@ void EventHandler::handleMidiInputNoteOn(
     }
 
     const bool isSequencerScreen =
-        mpc.getLayeredScreen()->isCurrentScreen<SequencerScreen>();
+        mpc.getLayeredScreen()->isCurrentScreen<ScreenId::SequencerScreen>();
 
     const bool isNoteRepeatLockedOrPressed =
         mpc.clientEventController->clientHardwareEventController
@@ -389,7 +390,7 @@ void EventHandler::handleMidiInputNoteOn(
 
     auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
         0, drumBus, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
-        mpc.screens->get<MixerSetupScreen>(),
+        mpc.screens->get<ScreenId::MixerSetupScreen>(),
         &mpc.getAudioMidiServices()->getVoices(),
         mpc.getAudioMidiServices()->getMixerConnections(), note, velocityToUse,
         noteOnEvent->getVariationType(), noteOnEvent->getVariationValue(),
@@ -497,7 +498,7 @@ void EventHandler::handleNoteEventMidiOut(
 
     if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
-        auto transScreen = mpc.screens->get<TransScreen>();
+        auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
 
         if (transScreen->transposeAmount != 0 && track->getIndex() < 64 &&
             (transScreen->tr == -1 || transScreen->tr == track->getIndex()))
@@ -548,7 +549,7 @@ void EventHandler::handleNoteEventMidiOut(
     }
 
     const auto directToDiskRecorderScreen =
-        mpc.screens->get<VmpcDirectToDiskRecorderScreen>();
+        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (!(mpc.getAudioMidiServices()->isBouncing() &&
           directToDiskRecorderScreen->offline) &&

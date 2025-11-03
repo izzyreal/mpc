@@ -4,6 +4,7 @@
 #include "controller/ClientHardwareEventController.hpp"
 #include "controller/MidiFootswitchFunctionMap.hpp"
 #include "lcdgui/screens/MidiSwScreen.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <iostream>
 
@@ -80,21 +81,33 @@ void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
 void ClientMidiFootswitchAssignmentController::handleRecPunch()
 {
     if (!sequencer->isPlaying())
+    {
         handleStopToPlay();
+    }
     else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
+    {
         triggerDualButtonCombo(ComponentId::REC, ComponentId::PLAY);
+    }
     else if (sequencer->isRecording())
+    {
         handleRecordingToPlay();
+    }
 }
 
 void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 {
     if (!sequencer->isPlaying())
+    {
         handleStopToPlay();
+    }
     else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
+    {
         triggerDualButtonCombo(ComponentId::OVERDUB, ComponentId::PLAY);
+    }
     else if (sequencer->isOverdubbing())
+    {
         handleRecordingToPlay();
+    }
 }
 
 void ClientMidiFootswitchAssignmentController::dispatchSequencerCommand(
@@ -103,20 +116,38 @@ void ClientMidiFootswitchAssignmentController::dispatchSequencerCommand(
     using Cmd = MidiControlTarget::SequencerTarget::Command;
     switch (cmd)
     {
-        case Cmd::PLAY: handleStopToPlay(); break;
-        case Cmd::REC: handleRecordingToPlay(); break;
-        case Cmd::STOP: pressButton(ComponentId::STOP); releaseButton(ComponentId::STOP); break;
-        case Cmd::REC_PLUS_PLAY: triggerDualButtonCombo(ComponentId::REC, ComponentId::PLAY); break;
-        case Cmd::ODUB_PLUS_PLAY: triggerDualButtonCombo(ComponentId::OVERDUB, ComponentId::PLAY); break;
-        case Cmd::REC_PUNCH: handleRecPunch(); break;
-        case Cmd::ODUB_PUNCH: handleOdubPunch(); break;
+        case Cmd::PLAY:
+            handleStopToPlay();
+            break;
+        case Cmd::REC:
+            handleRecordingToPlay();
+            break;
+        case Cmd::STOP:
+            pressButton(ComponentId::STOP);
+            releaseButton(ComponentId::STOP);
+            break;
+        case Cmd::REC_PLUS_PLAY:
+            triggerDualButtonCombo(ComponentId::REC, ComponentId::PLAY);
+            break;
+        case Cmd::ODUB_PLUS_PLAY:
+            triggerDualButtonCombo(ComponentId::OVERDUB, ComponentId::PLAY);
+            break;
+        case Cmd::REC_PUNCH:
+            handleRecPunch();
+            break;
+        case Cmd::ODUB_PUNCH:
+            handleOdubPunch();
+            break;
     }
 }
 
-void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent &e)
+void ClientMidiFootswitchAssignmentController::handleEvent(
+    const ClientMidiEvent &e)
 {
     if (e.getMessageType() != ClientMidiEvent::MessageType::CONTROLLER)
+    {
         return;
+    }
 
     int number = e.getControllerNumber();
     int value = e.getControllerValue();
@@ -124,41 +155,55 @@ void ClientMidiFootswitchAssignmentController::handleEvent(const ClientMidiEvent
 
     for (auto &binding : bindings)
     {
-        std::visit([&](auto &b)
-        {
-            if (b.number != number) return;
-
-            if constexpr (std::is_same_v<std::decay_t<decltype(b)>, HardwareBinding>)
+        std::visit(
+            [&](auto &b)
             {
-                if (b.interaction == Interaction::Press)
+                if (b.number != number)
                 {
-                    if (pressed)
-                    {
-                        printf("Pressing\n");
-                        pressButton(b.target.componentId);
-                    }
-                    else
-                    {
-                        printf("Releasing\n");
-                        releaseButton(b.target.componentId);
-                    }
+                    return;
                 }
 
-                // Optional debug: get footswitch function
-                if (auto fn = controller::componentIdToFootswitch(b.target.componentId))
-                    std::cout << "[MIDI] Footswitch function: " << static_cast<int>(*fn) << "\n";
-            }
-            else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, SequencerBinding>)
-            {
-                if (pressed && b.interaction == Interaction::Press)
+                if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                             HardwareBinding>)
                 {
-                    dispatchSequencerCommand(b.target.command);
+                    if (b.interaction == Interaction::Press)
+                    {
+                        if (pressed)
+                        {
+                            printf("Pressing\n");
+                            pressButton(b.target.componentId);
+                        }
+                        else
+                        {
+                            printf("Releasing\n");
+                            releaseButton(b.target.componentId);
+                        }
+                    }
 
-                    if (auto fn = controller::sequencerCmdToFootswitch(b.target.command))
-                        std::cout << "[MIDI] Footswitch function: " << static_cast<int>(*fn) << "\n";
+                    // Optional debug: get footswitch function
+                    if (auto fn = controller::componentIdToFootswitch(
+                            b.target.componentId))
+                    {
+                        std::cout << "[MIDI] Footswitch function: "
+                                  << static_cast<int>(*fn) << "\n";
+                    }
                 }
-            }
-        }, binding);
+                else if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                                  SequencerBinding>)
+                {
+                    if (pressed && b.interaction == Interaction::Press)
+                    {
+                        dispatchSequencerCommand(b.target.command);
+
+                        if (auto fn = controller::sequencerCmdToFootswitch(
+                                b.target.command))
+                        {
+                            std::cout << "[MIDI] Footswitch function: "
+                                      << static_cast<int>(*fn) << "\n";
+                        }
+                    }
+                }
+            },
+            binding);
     }
 }
-

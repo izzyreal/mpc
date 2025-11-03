@@ -1,6 +1,9 @@
 #include "ProgramScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
@@ -18,7 +21,6 @@ void ProgramScreen::open()
 
 void ProgramScreen::openNameScreen()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "programname")
@@ -28,12 +30,12 @@ void ProgramScreen::openNameScreen()
         const auto enterAction = [this, program](std::string &nameScreenName)
         {
             program->setName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<ProgramScreen>();
+            openScreenById(ScreenId::ProgramScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(program->getName(), 16, enterAction, "program");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -57,7 +59,7 @@ void ProgramScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<DeleteProgramScreen>();
+            openScreenById(ScreenId::DeleteProgramScreen);
             break;
         case 2:
         {
@@ -68,11 +70,11 @@ void ProgramScreen::function(int i)
                 return;
             }
 
-            mpc.getLayeredScreen()->openScreen<CreateNewProgramScreen>();
+            openScreenById(ScreenId::CreateNewProgramScreen);
             break;
         }
         case 4:
-            mpc.getLayeredScreen()->openScreen<CopyProgramScreen>();
+            openScreenById(ScreenId::CopyProgramScreen);
             break;
     }
 }

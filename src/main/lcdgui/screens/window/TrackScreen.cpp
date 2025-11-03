@@ -1,6 +1,7 @@
 #include "TrackScreen.hpp"
 
 #include "lcdgui/Label.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/window/NameScreen.hpp"
@@ -31,10 +32,10 @@ void TrackScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<DeleteTrackScreen>();
+            openScreenById(ScreenId::DeleteTrackScreen);
             break;
         case 4:
-            mpc.getLayeredScreen()->openScreen<CopyTrackScreen>();
+            openScreenById(ScreenId::CopyTrackScreen);
             break;
     }
 }
@@ -55,7 +56,7 @@ void TrackScreen::openNameScreen()
         {
             sequencer->setDefaultTrackName(nameScreenName,
                                            sequencer->getActiveTrackIndex());
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
         };
     }
     else
@@ -72,11 +73,11 @@ void TrackScreen::openNameScreen()
         enterAction = [this, track](std::string &newName)
         {
             track->setName(newName);
-            mpc.getLayeredScreen()->openScreen<SequencerScreen>();
+            openScreenById(ScreenId::SequencerScreen);
         };
     }
 
-    auto nameScreen = mpc.screens->get<NameScreen>();
+    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequencer");
-    mpc.getLayeredScreen()->openScreen<NameScreen>();
+    openScreenById(ScreenId::NameScreen);
 }

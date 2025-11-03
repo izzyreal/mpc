@@ -8,7 +8,11 @@
 
 #include "sampler/Pad.hpp"
 
+#include "sampler/Program.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 #include "sequencer/MixerEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;
@@ -78,7 +82,7 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 
     auto noteParameters =
         dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
 
     return stereoMixSourceIsDrum
@@ -102,7 +106,7 @@ std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
 
     auto noteParameters =
         dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
-    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
     return indivFxSourceIsDrum
@@ -338,7 +342,7 @@ void MixerScreen::right()
 
 void MixerScreen::openWindow()
 {
-    mpc.getLayeredScreen()->openScreen<ChannelSettingsScreen>();
+    openScreenById(ScreenId::ChannelSettingsScreen);
 }
 
 void MixerScreen::function(int f)
@@ -352,7 +356,7 @@ void MixerScreen::function(int f)
             if (f == tab)
             {
                 lastTab = tab;
-                mpc.getLayeredScreen()->openScreen<SelectMixerDrumScreen>();
+                openScreenById(ScreenId::SelectMixerDrumScreen);
             }
             else
             {
@@ -360,7 +364,7 @@ void MixerScreen::function(int f)
             }
             break;
         case 3:
-            mpc.getLayeredScreen()->openScreen<MixerSetupScreen>();
+            openScreenById(ScreenId::MixerSetupScreen);
             break;
             //	case 4:
             // openScreen<FxEditScreen>(); // Not implemented
@@ -392,7 +396,8 @@ void MixerScreen::turnWheel(int i)
 
         if (tab == 0)
         {
-            const auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>();
+            const auto mixerSetupScreen =
+                mpc.screens->get<ScreenId::MixerSetupScreen>();
 
             const bool record = sequencer->isRecordingOrOverdubbing() &&
                                 mixerSetupScreen->isRecordMixChangesEnabled();

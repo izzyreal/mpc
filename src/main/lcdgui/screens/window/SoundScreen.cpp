@@ -1,8 +1,10 @@
 #include "SoundScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -21,26 +23,25 @@ void SoundScreen::open()
 
 void SoundScreen::openNameScreen()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "soundname")
     {
         const auto enterAction = [this](std::string &nameScreenName)
         {
-            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            if (sampler->isSoundNameOccupied(nameScreenName))
             {
                 return;
             }
 
             sampler->getSound()->setName(nameScreenName);
-            mpc.getLayeredScreen()->openScreen<SoundScreen>();
+            openScreenById(ScreenId::SoundScreen);
         };
 
-        const auto nameScreen = mpc.screens->get<NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(sampler->getSound()->getName(), 16, enterAction,
                                "sound");
-        mpc.getLayeredScreen()->openScreen<NameScreen>();
+        openScreenById(ScreenId::NameScreen);
     }
 }
 
@@ -51,13 +52,13 @@ void SoundScreen::function(int i)
     switch (i)
     {
         case 1:
-            mpc.getLayeredScreen()->openScreen<DeleteSoundScreen>();
+            openScreenById(ScreenId::DeleteSoundScreen);
             break;
         case 2:
-            mpc.getLayeredScreen()->openScreen<ConvertSoundScreen>();
+            openScreenById(ScreenId::ConvertSoundScreen);
             break;
         case 4:
-            mpc.getLayeredScreen()->openScreen<CopySoundScreen>();
+            openScreenById(ScreenId::CopySoundScreen);
             break;
     }
 }

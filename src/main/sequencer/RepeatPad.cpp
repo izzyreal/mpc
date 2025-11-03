@@ -12,11 +12,15 @@
 #include "engine/DrumNoteEventContextBuilder.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
+#include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::sequencer;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace mpc::engine;
@@ -45,7 +49,8 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
     const auto sixteenLevels =
         mpc.clientEventController->isSixteenLevelsEnabled();
 
-    auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>();
+    auto assign16LevelsScreen =
+        mpc.screens->get<ScreenId::Assign16LevelsScreen>();
     auto note = assign16LevelsScreen->getNote();
 
     auto snapshot = mpc.eventRegistry->getSnapshot();
@@ -152,7 +157,7 @@ void RepeatPad::process(mpc::Mpc &mpc, unsigned int tickPosition,
             auto ctx = DrumNoteEventContextBuilder::buildNoteOn(
                 0, drumBus, mpc.getSampler(),
                 mpc.getAudioMidiServices()->getMixer(),
-                mpc.screens->get<MixerSetupScreen>(),
+                mpc.screens->get<ScreenId::MixerSetupScreen>(),
                 &mpc.getAudioMidiServices()->getVoices(),
                 mpc.getAudioMidiServices()->getMixerConnections(), note,
                 noteEvent->getVelocity(), noteEvent->getVariationType(),

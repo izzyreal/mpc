@@ -1,4 +1,5 @@
 #include "MidiSwScreen.hpp"
+#include "Mpc.hpp"
 #include "VmpcSettingsScreen.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
@@ -53,20 +54,29 @@ void MidiSwScreen::displayCtrlsAndFunctions()
         std::string ctrlText;
         std::string fnText;
 
-        std::visit([&](auto &b) {
-            ctrlText = b.number == -1 ? "OFF" : std::to_string(b.number);
+        std::visit(
+            [&](auto &b)
+            {
+                ctrlText = b.number == -1 ? "OFF" : std::to_string(b.number);
 
-            if constexpr (std::is_same_v<std::decay_t<decltype(b)>, HardwareBinding>)
-            {
-                if (auto fn = componentIdToFootswitch(b.target.componentId))
-                    fnText = functionNameFromEnum.at(*fn);
-            }
-            else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, SequencerBinding>)
-            {
-                if (auto fn = sequencerCmdToFootswitch(b.target.command))
-                    fnText = functionNameFromEnum.at(*fn);
-            }
-        }, bindings[idx]);
+                if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                             HardwareBinding>)
+                {
+                    if (auto fn = componentIdToFootswitch(b.target.componentId))
+                    {
+                        fnText = functionNameFromEnum.at(*fn);
+                    }
+                }
+                else if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                                  SequencerBinding>)
+                {
+                    if (auto fn = sequencerCmdToFootswitch(b.target.command))
+                    {
+                        fnText = functionNameFromEnum.at(*fn);
+                    }
+                }
+            },
+            bindings[idx]);
 
         ctrlField->setText(ctrlText);
         functionField->setText(fnText.empty() ? "-" : fnText);
@@ -76,7 +86,8 @@ void MidiSwScreen::displayCtrlsAndFunctions()
 void MidiSwScreen::turnWheel(int delta)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const int xPos = std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    const int xPos =
+        std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
     const int selectedSwitch = xOffset + xPos;
     const bool editingCtrl = focusedFieldName.rfind("ctrl", 0) == 0;
 
@@ -85,7 +96,8 @@ void MidiSwScreen::turnWheel(int delta)
             ->getFootswitchAssignmentController();
 
     if (selectedSwitch < 0 ||
-        selectedSwitch >= static_cast<int>(footswitchController->bindings.size()))
+        selectedSwitch >=
+            static_cast<int>(footswitchController->bindings.size()))
     {
         return;
     }
@@ -94,53 +106,69 @@ void MidiSwScreen::turnWheel(int delta)
 
     if (editingCtrl)
     {
-        std::visit([&](auto &b) {
-            b.number = std::clamp(b.number + delta, -1, 127);
-        }, binding);
+        std::visit(
+            [&](auto &b)
+            {
+                b.number = std::clamp(b.number + delta, -1, 127);
+            },
+            binding);
     }
     else
     {
         // Use centralized ordered list
-        const auto& allFns = getAllFootswitchFunctions();
+        const auto &allFns = getAllFootswitchFunctions();
 
         // Find current function index
         int currentIdx = 0;
-        std::visit([&](auto &b) {
-            if constexpr (std::is_same_v<std::decay_t<decltype(b)>, HardwareBinding>)
+        std::visit(
+            [&](auto &b)
             {
-                if (auto fn = componentIdToFootswitch(b.target.componentId))
-                    currentIdx = static_cast<int>(*fn);
-            }
-            else if constexpr (std::is_same_v<std::decay_t<decltype(b)>, SequencerBinding>)
-            {
-                if (auto fn = sequencerCmdToFootswitch(b.target.command))
-                    currentIdx = static_cast<int>(*fn);
-            }
-        }, binding);
+                if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                             HardwareBinding>)
+                {
+                    if (auto fn = componentIdToFootswitch(b.target.componentId))
+                    {
+                        currentIdx = static_cast<int>(*fn);
+                    }
+                }
+                else if constexpr (std::is_same_v<std::decay_t<decltype(b)>,
+                                                  SequencerBinding>)
+                {
+                    if (auto fn = sequencerCmdToFootswitch(b.target.command))
+                    {
+                        currentIdx = static_cast<int>(*fn);
+                    }
+                }
+            },
+            binding);
 
         // Compute new function
-        int newIdx = std::clamp(currentIdx + delta, 0, static_cast<int>(allFns.size()) - 1);
+        int newIdx = std::clamp(currentIdx + delta, 0,
+                                static_cast<int>(allFns.size()) - 1);
         MidiFootswitchFunction newFn = allFns[newIdx];
 
         // Replace binding with new function
-        std::visit([&](auto &b) {
-            auto base = b; // copy shared fields
+        std::visit(
+            [&](auto &b)
+            {
+                auto base = b; // copy shared fields
 
-            if (auto cid = footswitchToComponentIdOpt(newFn))
-            {
-                HardwareBinding newB;
-                static_cast<MidiBindingBase &>(newB) = base;
-                newB.target.componentId = *cid;
-                binding = newB;
-            }
-            else if (auto cmd = footswitchToSequencerCmdOpt(newFn))
-            {
-                SequencerBinding newB;
-                static_cast<MidiBindingBase &>(newB) = base;
-                newB.target.command = *cmd;
-                binding = newB;
-            }
-        }, binding);
+                if (auto cid = footswitchToComponentIdOpt(newFn))
+                {
+                    HardwareBinding newB;
+                    static_cast<MidiBindingBase &>(newB) = base;
+                    newB.target.componentId = *cid;
+                    binding = newB;
+                }
+                else if (auto cmd = footswitchToSequencerCmdOpt(newFn))
+                {
+                    SequencerBinding newB;
+                    static_cast<MidiBindingBase &>(newB) = base;
+                    newB.target.command = *cmd;
+                    binding = newB;
+                }
+            },
+            binding);
     }
 
     displayCtrlsAndFunctions();
@@ -149,13 +177,16 @@ void MidiSwScreen::turnWheel(int delta)
 void MidiSwScreen::function(int i)
 {
     if (i == 0)
-        mpc.getLayeredScreen()->openScreen<SyncScreen>();
+    {
+        openScreenById(ScreenId::SyncScreen);
+    }
 }
 
 void MidiSwScreen::left()
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const int xPos = std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    const int xPos =
+        std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
 
     if (xPos == 0 && xOffset > 0)
     {
@@ -169,9 +200,11 @@ void MidiSwScreen::left()
 void MidiSwScreen::right()
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const int xPos = std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
+    const int xPos =
+        std::stoi(focusedFieldName.substr(focusedFieldName.length() - 1));
 
-    if (xPos == 3 && xOffset < ClientMidiFootswitchAssignmentController::SWITCH_COUNT - 4)
+    if (xPos == 3 &&
+        xOffset < ClientMidiFootswitchAssignmentController::SWITCH_COUNT - 4)
     {
         setXOffset(xOffset + 1);
         return;
@@ -183,7 +216,9 @@ void MidiSwScreen::right()
 void MidiSwScreen::setXOffset(int i)
 {
     if (i < 0 || i > ClientMidiFootswitchAssignmentController::SWITCH_COUNT - 4)
+    {
         return;
+    }
 
     xOffset = i;
     displaySwitchLabels();

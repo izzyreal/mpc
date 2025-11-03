@@ -25,7 +25,7 @@ void MidiInputScreen::function(int i)
 
     if (i == 1)
     {
-        mpc.getLayeredScreen()->openScreen<MidiInputMonitorScreen>();
+        openScreenById(ScreenId::MidiInputMonitorScreen);
     }
 }
 

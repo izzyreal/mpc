@@ -4,6 +4,7 @@
 #include "lcdgui/screens/SequencerScreen.hpp"
 
 #include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/Sequencer.hpp"
 
 #include <Util.hpp>
 
@@ -132,7 +133,7 @@ void NextSeqScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "timing")
     {
-        auto screen = mpc.screens->get<TimingCorrectScreen>();
+        auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
         auto noteValue = screen->getNoteValue();
         screen->setNoteValue(noteValue + i);
         setLastFocus("timing-correct", "notevalue");
@@ -167,7 +168,7 @@ void NextSeqScreen::function(int i)
     }
     else if (i == 5)
     {
-        mpc.getLayeredScreen()->openScreen<NextSeqPadScreen>();
+        openScreenById(ScreenId::NextSeqPadScreen);
     }
 }
 
@@ -266,7 +267,8 @@ void NextSeqScreen::displayTempoSource()
 
 void NextSeqScreen::displayTiming()
 {
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>();
+    auto timingCorrectScreen =
+        mpc.screens->get<ScreenId::TimingCorrectScreen>();
     auto noteValue = timingCorrectScreen->getNoteValue();
     findField("timing")->setText(
         SequencerScreen::timingCorrectNames[noteValue]);

@@ -1,6 +1,8 @@
 #include "NumberOfZonesScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/ZoneScreen.hpp"
+#include "sampler/Sampler.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -13,7 +15,7 @@ NumberOfZonesScreen::NumberOfZonesScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void NumberOfZonesScreen::open()
 {
-    auto zoneScreen = mpc.screens->get<ZoneScreen>();
+    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     numberOfZones = zoneScreen->numberOfZones;
     displayNumberOfZones();
 }
@@ -28,14 +30,14 @@ void NumberOfZonesScreen::function(int i)
     switch (i)
     {
         case 3:
-            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            openScreenById(ScreenId::ZoneScreen);
             break;
         case 4:
-            auto zoneScreen = mpc.screens->get<ZoneScreen>();
+            auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
             auto sound = sampler->getSound();
             zoneScreen->numberOfZones = numberOfZones;
             zoneScreen->initZones();
-            mpc.getLayeredScreen()->openScreen<ZoneScreen>();
+            openScreenById(ScreenId::ZoneScreen);
             break;
     }
 }
@@ -53,10 +55,6 @@ void NumberOfZonesScreen::turnWheel(int i)
 
 void NumberOfZonesScreen::setNumberOfZones(int i)
 {
-    if (i < 1 || i > 16)
-    {
-        return;
-    }
-    numberOfZones = i;
+    numberOfZones = std::clamp(i, 1, 16);
     displayNumberOfZones();
 }
