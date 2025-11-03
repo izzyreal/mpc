@@ -40,8 +40,6 @@ namespace mpc::lcdgui
 
         void createAndCacheAllScreens();
 
-        std::shared_ptr<ScreenComponent> getByName1(const std::string name);
-
     private:
         struct ScreenLayout
         {

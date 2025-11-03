@@ -43,19 +43,6 @@ void Screens::createAndCacheAllScreens()
     MLOG("Created and cached " + std::to_string(screens.size()) + " screens.");
 }
 
-std::shared_ptr<ScreenComponent> Screens::getByName1(const std::string name)
-{
-    for (auto &screen : screens)
-    {
-        if (screen->getName() == name)
-        {
-            return screen;
-        }
-    }
-
-    return {};
-}
-
 std::vector<std::unique_ptr<json>> &layerDocuments()
 {
     static std::vector<std::unique_ptr<json>> result;
