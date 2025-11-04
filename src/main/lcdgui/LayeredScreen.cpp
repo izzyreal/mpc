@@ -4,8 +4,6 @@
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/AllScreens.hpp"
 
-#include "BasicStructs.hpp"
-
 #include <Mpc.hpp>
 
 #include "Field.hpp"
@@ -15,7 +13,6 @@
 #include "audiomidi/SoundRecorder.hpp"
 
 #include "lcdgui/Layer.hpp"
-#include "lcdgui/ScreenComponent.hpp"
 
 #include <StrUtil.hpp>
 #include "Util.hpp"
@@ -24,14 +21,10 @@
 #include <memory>
 #include <set>
 #include <stdexcept>
-#include <typeindex>
 
-#include "Logger.hpp"
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "hardware/Hardware.hpp"
-#include "lcdgui/screens/SequencerScreen.hpp"
-#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 
 #if __linux__
@@ -43,6 +36,38 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
+
+namespace {
+
+template <typename T>
+struct ScreenTypeId {
+    static constexpr ScreenId value = ScreenId::Count;
+};
+
+#define X(ns, Class, nameStr) \
+template <> struct ScreenTypeId<ns::Class> { static constexpr ScreenId value = ScreenId::Class; };
+SCREEN_LIST
+#undef X
+
+struct ScreenNameEntry {
+    const char* name;
+    ScreenId id;
+};
+
+constexpr ScreenNameEntry screenNameList[] = {
+#define X(ns, Class, nameStr) {nameStr, ScreenId::Class},
+    SCREEN_LIST
+#undef X
+};
+
+inline std::optional<ScreenId> getScreenIdByName(const std::string& name) {
+    for (auto& entry : screenNameList) {
+        if (name == entry.name) return entry.id;
+    }
+    return std::nullopt;
+}
+
+} // anonymous namespace
 
 LayeredScreen::LayeredScreen(mpc::Mpc &mpc) : mpc(mpc)
 {
@@ -68,23 +93,6 @@ LayeredScreen::LayeredScreen(mpc::Mpc &mpc) : mpc(mpc)
     }
 }
 
-template <typename T> ScreenId LayeredScreen::getScreenIdByType()
-{
-    static const std::map<std::type_index, ScreenId> typeToId = {
-#define X(ns, Class, name) {typeid(ns::Class), ScreenId::Class},
-        SCREEN_LIST
-#undef X
-    };
-
-    auto it = typeToId.find(typeid(T));
-    if (it != typeToId.end())
-    {
-        return it->second;
-    }
-
-    return ScreenId::Count;
-}
-
 ScreenId
 LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
 {
@@ -93,19 +101,11 @@ LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
         return ScreenId::Count;
     }
 
-    static const std::map<std::type_index, ScreenId> typeToId = {
-#define X(ns, Class, name) {typeid(ns::Class), ScreenId::Class},
-        SCREEN_LIST
-#undef X
-    };
-
     ScreenComponent &ref = *screen;
-
-    auto it = typeToId.find(typeid(ref));
-    if (it != typeToId.end())
-    {
-        return it->second;
-    }
+    #define X(ns, Class, nameStr) \
+        if (dynamic_cast<ns::Class*>(screen.get())) return ScreenId::Class;
+    SCREEN_LIST
+    #undef X
 
     return ScreenId::Count;
 }
@@ -165,16 +165,9 @@ std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen()
 
 void LayeredScreen::openScreen(const std::string name)
 {
-    static const std::map<std::string, ScreenId> nameToId = {
-#define X(ns, Class, nameStr) {nameStr, ScreenId::Class},
-        SCREEN_LIST
-#undef X
-    };
-
-    auto it = nameToId.find(name);
-    if (it != nameToId.end())
+    if (auto id = getScreenIdByName(name))
     {
-        openScreenById(it->second);
+        openScreenById(*id);
     }
 }
 
@@ -370,8 +363,6 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
 
 void LayeredScreen::timerCallback()
 {
-    //	MLOG("LayeredScreen::timerCallback()");
-
     if (auto currentScreen = getCurrentScreen(); currentScreen)
     {
         currentScreen->timerCallback();
@@ -380,7 +371,6 @@ void LayeredScreen::timerCallback()
 
 void LayeredScreen::Draw()
 {
-    //	MLOG("LayeredScreen::Draw()");
     for (auto &c : root->findHiddenChildren())
     {
         c->drawRecursive(&pixels);
@@ -393,9 +383,7 @@ void LayeredScreen::Draw()
 
 MRECT LayeredScreen::getDirtyArea()
 {
-    //	MLOG("LayeredScreen::getDirtyArea()");
     auto dirtyArea = root->getDirtyArea();
-    // MLOG("dirtyArea: " + dirtyArea.getInfo());
     return dirtyArea;
 }
 
