@@ -5,14 +5,17 @@
 
 #include <samplerate.h>
 
-#include "readerwriterqueue.h"
-
 #include <memory>
 #include <atomic>
 #include <thread>
 
 using namespace mpc::sampler;
 using namespace mpc::engine::audio::core;
+
+namespace moodycamel {
+    template <typename T, size_t MAX_BLOCK_SIZE>
+    class ReaderWriterQueue;
+}
 
 namespace mpc::audiomidi
 {
@@ -44,10 +47,8 @@ namespace mpc::audiomidi
 
         std::atomic_bool playing = false;
         std::string filePath;
-        moodycamel::ReaderWriterQueue<float> bufferLeft =
-            moodycamel::ReaderWriterQueue<float>(60000);
-        moodycamel::ReaderWriterQueue<float> bufferRight =
-            moodycamel::ReaderWriterQueue<float>(60000);
+        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> bufferLeft;
+        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> bufferRight;
         std::vector<float> resampleInputBufferLeft;
         std::vector<float> resampleInputBufferRight;
         std::vector<float> resampleOutputBuffer;
