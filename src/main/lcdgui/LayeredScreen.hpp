@@ -8,8 +8,6 @@
 #include <deque>
 
 #include "lcdgui/ScreenId.hpp"
-#include "lcdgui/screens/Fwd.hpp"
-#include "lcdgui/ScreenRegistry.hpp"
 
 #include "BMFParser.hpp"
 
@@ -163,8 +161,6 @@ namespace mpc::lcdgui
 
         static ScreenId
         getScreenId(const std::shared_ptr<ScreenComponent> &screen);
-
-        template <typename T> ScreenId getScreenIdByType();
 
     private:
         FunctionKeys *getFunctionKeys();

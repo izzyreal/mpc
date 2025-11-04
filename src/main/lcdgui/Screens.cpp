@@ -226,17 +226,18 @@ Screens::getScreenLayout(const std::string &screenName)
     return result;
 }
 
-using ScreenFactory =
-    std::function<std::shared_ptr<ScreenComponent>(mpc::Mpc &, int)>;
+using ScreenFactory = std::shared_ptr<ScreenComponent> (*)(mpc::Mpc &, int);
+
+template<typename T>
+std::shared_ptr<ScreenComponent> createScreen(mpc::Mpc &mpc, int layer)
+{
+    return std::make_shared<T>(mpc, layer);
+}
 
 const std::map<std::string, ScreenFactory> &getScreenFactories()
 {
     static const std::map<std::string, ScreenFactory> factories = {
-#define X(ns, Class, name)                                                     \
-    {name, [](mpc::Mpc &mpc, int layer)                                        \
-     {                                                                         \
-         return std::make_shared<mpc::lcdgui::ns::Class>(mpc, layer);          \
-     }},
+#define X(ns, Class, name) {name, &createScreen<mpc::lcdgui::ns::Class>},
         SCREEN_LIST
 #undef X
     };
