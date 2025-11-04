@@ -5,11 +5,15 @@
 #include <sequencer/LegacyClock.hpp>
 #include "lcdgui/screens/SyncScreen.hpp"
 
-#include <concurrentqueue.h>
-
 #include <memory>
 #include <functional>
 #include <atomic>
+
+namespace moodycamel {
+    struct ConcurrentQueueDefaultTraits;
+    template <typename T, typename Traits>
+    class ConcurrentQueue;
+}
 
 namespace mpc
 {
@@ -49,8 +53,7 @@ namespace mpc::sequencer
         // std::shared_ptr<mpc::engine::midi::ShortMessage>
         // midiSyncStartStopContinueMsg;
 
-        moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue =
-            moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
+        std::shared_ptr<moodycamel::ConcurrentQueue<EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>> eventQueue;
         std::vector<EventAfterNFrames> tempEventQueue;
 
         void sendMidiClockMsg(int frameIndex);

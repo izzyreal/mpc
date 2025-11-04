@@ -8,13 +8,17 @@
 
 #include "eventregistry/SnapshotView.hpp"
 
-#include <concurrentqueue.h>
-
 #include <memory>
 #include <optional>
 #include <cassert>
 #include <atomic>
 #include <functional>
+
+namespace moodycamel {
+    struct ConcurrentQueueDefaultTraits;
+    template <typename T, typename Traits>
+    class ConcurrentQueue;
+}
 
 namespace mpc::sampler
 {
@@ -99,7 +103,7 @@ namespace mpc::eventregistry
         ProgramPadPressEventPtrs programPadEvents;
         NoteOnEventPtrs noteEvents;
 
-        moodycamel::ConcurrentQueue<EventMessage> queue{512};
+        std::shared_ptr<moodycamel::ConcurrentQueue<EventMessage, moodycamel::ConcurrentQueueDefaultTraits>> queue;
 
         Snapshot snapA;
         Snapshot snapB;

@@ -27,6 +27,8 @@
 
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
+#include <concurrentqueue.h>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -44,6 +46,7 @@ FrameSeq::FrameSeq(mpc::Mpc &mpc)
       userScreen(mpc.screens->get<ScreenId::UserScreen>()),
       midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
 {
+    eventQueue = std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
 }
 
@@ -451,7 +454,7 @@ void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
     EventAfterNFrames e;
     e.f = event;
     e.nFrames = nFrames;
-    eventQueue.enqueue(std::move(e));
+    eventQueue->enqueue(std::move(e));
 }
 
 void FrameSeq::setSampleRate(unsigned int sampleRate)
@@ -463,7 +466,7 @@ void FrameSeq::processEventsAfterNFrames()
 {
     EventAfterNFrames batch[100];
 
-    size_t count = eventQueue.try_dequeue_bulk(batch, 100);
+    size_t count = eventQueue->try_dequeue_bulk(batch, 100);
 
     tempEventQueue.clear();
 
@@ -482,7 +485,7 @@ void FrameSeq::processEventsAfterNFrames()
 
     for (auto &e : tempEventQueue)
     {
-        eventQueue.enqueue(std::move(e));
+        eventQueue->enqueue(std::move(e));
     }
 }
 

@@ -9,6 +9,8 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
 
+#include <concurrentqueue.h>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
@@ -19,6 +21,7 @@ MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
 {
+    eventQueue = std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
     // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
@@ -90,7 +93,7 @@ void MidiClockOutput::enqueueEventAfterNFrames(
     EventAfterNFrames e;
     e.f = event;
     e.nFrames = nFrames;
-    eventQueue.enqueue(std::move(e));
+    eventQueue->enqueue(std::move(e));
 }
 
 void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
@@ -126,7 +129,7 @@ void MidiClockOutput::processEventsAfterNFrames()
 {
     EventAfterNFrames batch[100];
 
-    size_t count = eventQueue.try_dequeue_bulk(batch, 100);
+    size_t count = eventQueue->try_dequeue_bulk(batch, 100);
 
     tempEventQueue.clear();
 
@@ -145,7 +148,7 @@ void MidiClockOutput::processEventsAfterNFrames()
 
     for (auto &e : tempEventQueue)
     {
-        eventQueue.enqueue(std::move(e));
+        eventQueue->enqueue(std::move(e));
     }
 }
 

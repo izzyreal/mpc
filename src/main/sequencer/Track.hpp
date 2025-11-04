@@ -5,12 +5,17 @@
 #include "sequencer/Event.hpp"
 #include "sequencer/NoteEvent.hpp"
 
-#include <concurrentqueue.h>
 #include <memory>
 
 namespace mpc
 {
     class Mpc;
+}
+
+namespace moodycamel {
+    struct ConcurrentQueueDefaultTraits;
+    template <typename T, typename Traits>
+    class ConcurrentQueue;
 }
 
 namespace mpc::sequencer
@@ -27,12 +32,11 @@ namespace mpc::sequencer
 
         std::vector<std::shared_ptr<Event>> events;
 
-        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>
-            queuedNoteOnEvents =
-                moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>(20);
-        moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>
-            queuedNoteOffEvents =
-                moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>(20);
+        std::shared_ptr<moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>, moodycamel::ConcurrentQueueDefaultTraits>>
+            queuedNoteOnEvents;
+        std::shared_ptr<moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>, moodycamel::ConcurrentQueueDefaultTraits>>
+            queuedNoteOffEvents;
+
         std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns =
             std::vector<std::shared_ptr<NoteOnEvent>>(20);
         std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs =

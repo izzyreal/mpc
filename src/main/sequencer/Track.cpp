@@ -27,6 +27,8 @@
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
+#include <concurrentqueue.h>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -45,6 +47,10 @@ Track::Track(mpc::Mpc &mpc, Sequence *parent, int i) : mpc(mpc)
     eventIndex = 0;
     device = 0;
     busNumber = 1;
+    queuedNoteOnEvents =
+        std::make_shared<moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>>(20);
+    queuedNoteOffEvents =
+        std::make_shared<moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>>(20);
 }
 
 void Track::move(int tick, int oldTick)
@@ -110,10 +116,10 @@ void Track::flushNoteCache()
 {
     std::shared_ptr<NoteOnEvent> e1;
     std::shared_ptr<NoteOffEvent> e2;
-    while (queuedNoteOnEvents.try_dequeue(e1))
+    while (queuedNoteOnEvents->try_dequeue(e1))
     {
     }
-    while (queuedNoteOffEvents.try_dequeue(e2))
+    while (queuedNoteOffEvents->try_dequeue(e2))
     {
     }
 }
@@ -154,7 +160,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note,
     auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
     onEvent->setTrack(getIndex());
     onEvent->setTick(-2);
-    queuedNoteOnEvents.enqueue(onEvent);
+    queuedNoteOnEvents->enqueue(onEvent);
     return onEvent;
 }
 
@@ -162,7 +168,7 @@ void Track::finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent> &event)
 {
     auto offEvent = event->getNoteOff();
     offEvent->setTick(-2);
-    queuedNoteOffEvents.enqueue(offEvent);
+    queuedNoteOffEvents->enqueue(offEvent);
 }
 
 std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note,
@@ -410,9 +416,9 @@ int Track::getCorrectedTickPos()
 void Track::processRealtimeQueuedEvents()
 {
     auto noteOnCount =
-        this->queuedNoteOnEvents.try_dequeue_bulk(bulkNoteOns.begin(), 20);
+        this->queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), 20);
     auto noteOffCount =
-        this->queuedNoteOffEvents.try_dequeue_bulk(bulkNoteOffs.begin(), 20);
+        this->queuedNoteOffEvents->try_dequeue_bulk(bulkNoteOffs.begin(), 20);
 
     if (noteOnCount == 0 && noteOffCount == 0)
     {
@@ -495,13 +501,13 @@ void Track::processRealtimeQueuedEvents()
             }
             else
             {
-                this->queuedNoteOffEvents.enqueue(noteOff);
+                this->queuedNoteOffEvents->enqueue(noteOff);
             }
         }
 
         if (needsToBeRequeued)
         {
-            this->queuedNoteOnEvents.enqueue(noteOn);
+            this->queuedNoteOnEvents->enqueue(noteOn);
         }
     }
 }
