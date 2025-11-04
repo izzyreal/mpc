@@ -3,12 +3,14 @@
 #include "engine/audio/core/AudioFormat.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
 
-#include <algorithm>
-
 #include "SampleOps.hpp"
 
 #include "WavInputFileStream.hpp"
 #include "SndInputFileStream.hpp"
+
+#include <readerwriterqueue.h>
+
+#include <algorithm>
 
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
@@ -17,6 +19,8 @@ SoundPlayer::SoundPlayer()
 {
     srcLeft = src_new(0, 1, &srcLeftError);
     srcRight = src_new(0, 1, &srcRightError);
+    bufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
+    bufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
 }
 
 SoundPlayer::~SoundPlayer()
@@ -78,10 +82,10 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
     src_reset(srcLeft);
     src_reset(srcRight);
 
-    while (bufferLeft.pop())
+    while (bufferLeft->pop())
     {
     }
-    while (bufferRight.pop())
+    while (bufferRight->pop())
     {
     }
 
@@ -139,12 +143,12 @@ void SoundPlayer::enableStopEarly()
 
 void SoundPlayer::readWithoutResampling()
 {
-    const auto capacity = bufferLeft.max_capacity();
+    const auto capacity = bufferLeft->max_capacity();
     const auto channels = inputAudioFormat->getChannels();
 
     const auto currentBufferSpace =
         capacity -
-        std::max<size_t>(bufferLeft.size_approx(), bufferRight.size_approx());
+        std::max<size_t>(bufferLeft->size_approx(), bufferRight->size_approx());
 
     if (currentBufferSpace == 0 || ingestedSourceFrameCount >= sourceFrameCount)
     {
@@ -168,11 +172,11 @@ void SoundPlayer::readWithoutResampling()
             break;
         }
 
-        bufferLeft.emplace(readNextFrame());
+        bufferLeft->emplace(readNextFrame());
 
         if (channels == 2 && fileFormat == WAV)
         {
-            bufferRight.emplace(readNextFrame());
+            bufferRight->emplace(readNextFrame());
             currentByteIndex += bytesPerSample;
         }
     }
@@ -188,7 +192,7 @@ void SoundPlayer::readWithoutResampling()
              currentByteIndex < (byteCountToIngest / 2);
              currentByteIndex += bytesPerSample)
         {
-            bufferRight.emplace(readNextFrame());
+            bufferRight->emplace(readNextFrame());
         }
 
         stream->seekg(-bytesPerChannel, std::ios_base::cur);
@@ -199,12 +203,12 @@ void SoundPlayer::readWithoutResampling()
 
 void SoundPlayer::readWithResampling(const float ratio)
 {
-    const auto capacity = bufferLeft.max_capacity();
+    const auto capacity = bufferLeft->max_capacity();
     const auto channels = inputAudioFormat->getChannels();
 
     const auto currentBufferSpace =
         capacity -
-        std::max<size_t>(bufferLeft.size_approx(), bufferRight.size_approx());
+        std::max<size_t>(bufferLeft->size_approx(), bufferRight->size_approx());
 
     if (currentBufferSpace == 0 || ingestedSourceFrameCount >= sourceFrameCount)
     {
@@ -279,7 +283,7 @@ void SoundPlayer::readWithResampling(const float ratio)
 
     for (int f = 0; f < data.output_frames_gen; f++)
     {
-        bufferLeft.enqueue(resampleOutputBuffer[f]);
+        bufferLeft->enqueue(resampleOutputBuffer[f]);
     }
 
     if (channels == 2)
@@ -289,7 +293,7 @@ void SoundPlayer::readWithResampling(const float ratio)
 
         for (int f = 0; f < data.output_frames_gen; f++)
         {
-            bufferRight.enqueue(resampleOutputBuffer[f]);
+            bufferRight->enqueue(resampleOutputBuffer[f]);
         }
     }
 
@@ -357,12 +361,12 @@ int SoundPlayer::processAudio(AudioBuffer *buf, int nFrames)
         return AUDIO_SILENCE;
     }
 
-    size_t availableFrameCount = bufferLeft.size_approx();
+    size_t availableFrameCount = bufferLeft->size_approx();
 
     if (inputAudioFormat->getChannels() == 2)
     {
         availableFrameCount =
-            std::min<size_t>(availableFrameCount, bufferRight.size_approx());
+            std::min<size_t>(availableFrameCount, bufferRight->size_approx());
     }
 
     int offsetWithinBuffer = 0;
@@ -388,13 +392,13 @@ int SoundPlayer::processAudio(AudioBuffer *buf, int nFrames)
     for (int frame = offsetWithinBuffer; frame < lastFrameIndexWithinBuffer;
          frame++)
     {
-        outputBufferLeft[frame] = *bufferLeft.peek();
-        bufferLeft.pop();
+        outputBufferLeft[frame] = *bufferLeft->peek();
+        bufferLeft->pop();
 
         if (inputAudioFormat->getChannels() == 2)
         {
-            outputBufferRight[frame] = *bufferRight.peek();
-            bufferRight.pop();
+            outputBufferRight[frame] = *bufferRight->peek();
+            bufferRight->pop();
         }
         else
         {

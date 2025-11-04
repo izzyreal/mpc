@@ -5,8 +5,6 @@
 #include <engine/audio/core/AudioProcessAdapter.hpp>
 #include <engine/audio/core/AudioProcess.hpp>
 
-#include <readerwriterqueue.h>
-
 #include <fstream>
 #include <string>
 #include <vector>
@@ -22,9 +20,13 @@ namespace mpc
     class Mpc;
 }
 
+namespace moodycamel {
+    template <typename T, size_t MAX_BLOCK_SIZE>
+    class ReaderWriterQueue;
+}
+
 namespace mpc::audiomidi
 {
-
     class DiskRecorder : public mpc::engine::audio::core::AudioProcessAdapter
 
     {
@@ -34,10 +36,8 @@ namespace mpc::audiomidi
         const int BUFFER_SIZE =
             192000; // Number of frames for 1 second at 192khz
         std::thread writeThread;
-        moodycamel::ReaderWriterQueue<float> ringBufferLeft =
-            moodycamel::ReaderWriterQueue<float>(0);
-        moodycamel::ReaderWriterQueue<float> ringBufferRight =
-            moodycamel::ReaderWriterQueue<float>(0);
+        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> ringBufferLeft;
+        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> ringBufferRight;
         std::vector<float> bufferLeft;
         std::vector<float> bufferRight;
 

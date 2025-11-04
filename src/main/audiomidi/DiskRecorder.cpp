@@ -8,6 +8,8 @@
 #include "engine/audio/core/AudioFormat.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
 
+#include <readerwriterqueue.h>
+
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
 
@@ -31,8 +33,8 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
 {
     if (bufferLeft.empty())
     {
-        ringBufferLeft = moodycamel::ReaderWriterQueue<float>(BUFFER_SIZE);
-        ringBufferRight = moodycamel::ReaderWriterQueue<float>(BUFFER_SIZE);
+        ringBufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float>>(BUFFER_SIZE);
+        ringBufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float>>(BUFFER_SIZE);
         bufferLeft = std::vector<float>(BUFFER_SIZE);
         bufferRight = std::vector<float>(BUFFER_SIZE);
     }
@@ -103,8 +105,8 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
                 writeRingBufferToDisk();
             }
 
-            ringBufferLeft = moodycamel::ReaderWriterQueue<float>(0);
-            ringBufferRight = moodycamel::ReaderWriterQueue<float>(0);
+            ringBufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
+            ringBufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
             bufferLeft.clear();
             bufferRight.clear();
 
@@ -137,8 +139,8 @@ int DiskRecorder::processAudio(AudioBuffer *buf, int nFrames)
 
         for (int f = 0; f < nFrames; f++)
         {
-            ringBufferLeft.enqueue(sourceBufferLeft[f]);
-            ringBufferRight.enqueue(sourceBufferRight[f]);
+            ringBufferLeft->enqueue(sourceBufferLeft[f]);
+            ringBufferRight->enqueue(sourceBufferRight[f]);
         }
     }
 
@@ -164,7 +166,7 @@ bool DiskRecorder::start()
 void DiskRecorder::writeRingBufferToDisk()
 {
     const auto availableFrames = std::min<size_t>(
-        ringBufferLeft.size_approx(), ringBufferRight.size_approx());
+        ringBufferLeft->size_approx(), ringBufferRight->size_approx());
 
     if (availableFrames == 0)
     {
@@ -175,10 +177,10 @@ void DiskRecorder::writeRingBufferToDisk()
 
     for (int frame = 0; frame < availableFrames; frame++)
     {
-        bufferLeft[frame] = *ringBufferLeft.peek();
-        bufferRight[frame] = *ringBufferRight.peek();
-        ringBufferLeft.pop();
-        ringBufferRight.pop();
+        bufferLeft[frame] = *ringBufferLeft->peek();
+        bufferRight[frame] = *ringBufferRight->peek();
+        ringBufferLeft->pop();
+        ringBufferRight->pop();
     }
 
     if (outputFileFormat->getChannels() == 1)
