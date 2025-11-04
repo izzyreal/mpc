@@ -7,12 +7,16 @@
 #include "MidiClockOutput.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 
-#include <concurrentqueue.h>
-
 #include <memory>
 #include <vector>
 #include <functional>
 #include <atomic>
+
+namespace moodycamel {
+    struct ConcurrentQueueDefaultTraits;
+    template <typename T, typename Traits>
+    class ConcurrentQueue;
+}
 
 namespace mpc
 {
@@ -89,8 +93,8 @@ namespace mpc::sequencer
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 
         mpc::Mpc &mpc;
-        moodycamel::ConcurrentQueue<EventAfterNFrames> eventQueue =
-            moodycamel::ConcurrentQueue<EventAfterNFrames>(100);
+
+        std::shared_ptr<moodycamel::ConcurrentQueue<EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>> eventQueue;
         std::vector<EventAfterNFrames> tempEventQueue;
 
         void move(int newTickPos);

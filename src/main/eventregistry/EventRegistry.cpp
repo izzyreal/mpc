@@ -1,5 +1,8 @@
 #include "EventRegistry.hpp"
 #include "lcdgui/ScreenComponent.hpp"
+
+#include <concurrentqueue.h>
+
 #include <algorithm>
 
 using namespace mpc::eventregistry;
@@ -22,6 +25,8 @@ EventRegistry::EventRegistry()
     snapB.noteEvents.reserve(CAPACITY);
 
     std::atomic_store_explicit(&snapshotPtr, &snapA, std::memory_order_release);
+
+    queue = std::make_shared<moodycamel::ConcurrentQueue<EventMessage>>(512);
 }
 
 EventRegistry::EventRegistry(const EventRegistry &other) noexcept
@@ -43,7 +48,7 @@ EventRegistry &EventRegistry::operator=(const EventRegistry &other) noexcept
 
 void EventRegistry::enqueue(EventMessage &&msg)
 {
-    queue.enqueue(std::move(msg));
+    queue->enqueue(std::move(msg));
 }
 
 void EventRegistry::registerPhysicalPadPress(
@@ -265,7 +270,7 @@ SnapshotView EventRegistry::getSnapshot() noexcept
 void EventRegistry::drainQueue() noexcept
 {
     EventMessage msg;
-    while (queue.try_dequeue(msg))
+    while (queue->try_dequeue(msg))
     {
         applyMessage(msg);
     }
