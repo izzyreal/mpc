@@ -20,9 +20,9 @@ namespace mpc
     class Mpc;
 }
 
-namespace moodycamel {
-    template <typename T, size_t MAX_BLOCK_SIZE>
-    class ReaderWriterQueue;
+namespace moodycamel
+{
+    template <typename T, size_t MAX_BLOCK_SIZE> class ReaderWriterQueue;
 }
 
 namespace mpc::audiomidi
@@ -36,8 +36,10 @@ namespace mpc::audiomidi
         const int BUFFER_SIZE =
             192000; // Number of frames for 1 second at 192khz
         std::thread writeThread;
-        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> ringBufferLeft;
-        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> ringBufferRight;
+        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>>
+            ringBufferLeft;
+        std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>>
+            ringBufferRight;
         std::vector<float> bufferLeft;
         std::vector<float> bufferRight;
 

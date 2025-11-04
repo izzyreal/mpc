@@ -15,13 +15,15 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-MidiClockOutput::MidiClockOutput(mpc::Mpc &mpc)
-    : mpc(mpc), sequencer(mpc.getSequencer()),
-      syncScreen(mpc.screens->get<ScreenId::SyncScreen>())
+MidiClockOutput::MidiClockOutput(std::shared_ptr<Sequencer> sequencer,
+                                 std::shared_ptr<SyncScreen> syncScreen,
+                                 std::function<bool()> isBouncing)
+    : sequencer(sequencer), syncScreen(syncScreen), isBouncing(isBouncing)
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
 {
-    eventQueue = std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
+    eventQueue =
+        std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
     // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
@@ -157,7 +159,7 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
 {
     lastProcessedFrameIsMidiClockLock = false;
 
-    if (mpc.getAudioMidiServices()->isBouncing())
+    if (isBouncing())
     {
         return;
     }

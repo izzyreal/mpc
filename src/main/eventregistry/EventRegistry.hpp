@@ -14,11 +14,11 @@
 #include <atomic>
 #include <functional>
 
-namespace moodycamel {
+namespace moodycamel
+{
     struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits>
-    class ConcurrentQueue;
-}
+    template <typename T, typename Traits> class ConcurrentQueue;
+} // namespace moodycamel
 
 namespace mpc::sampler
 {
@@ -103,7 +103,9 @@ namespace mpc::eventregistry
         ProgramPadPressEventPtrs programPadEvents;
         NoteOnEventPtrs noteEvents;
 
-        std::shared_ptr<moodycamel::ConcurrentQueue<EventMessage, moodycamel::ConcurrentQueueDefaultTraits>> queue;
+        std::shared_ptr<moodycamel::ConcurrentQueue<
+            EventMessage, moodycamel::ConcurrentQueueDefaultTraits>>
+            queue;
 
         Snapshot snapA;
         Snapshot snapB;

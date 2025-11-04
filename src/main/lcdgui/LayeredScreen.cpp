@@ -37,35 +37,45 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 
-namespace {
+namespace
+{
 
-template <typename T>
-struct ScreenTypeId {
-    static constexpr ScreenId value = ScreenId::Count;
-};
+    template <typename T> struct ScreenTypeId
+    {
+        static constexpr ScreenId value = ScreenId::Count;
+    };
 
-#define X(ns, Class, nameStr) \
-template <> struct ScreenTypeId<ns::Class> { static constexpr ScreenId value = ScreenId::Class; };
-SCREEN_LIST
-#undef X
-
-struct ScreenNameEntry {
-    const char* name;
-    ScreenId id;
-};
-
-constexpr ScreenNameEntry screenNameList[] = {
-#define X(ns, Class, nameStr) {nameStr, ScreenId::Class},
+#define X(ns, Class, nameStr)                                                  \
+    template <> struct ScreenTypeId<ns::Class>                                 \
+    {                                                                          \
+        static constexpr ScreenId value = ScreenId::Class;                     \
+    };
     SCREEN_LIST
 #undef X
-};
 
-inline std::optional<ScreenId> getScreenIdByName(const std::string& name) {
-    for (auto& entry : screenNameList) {
-        if (name == entry.name) return entry.id;
+    struct ScreenNameEntry
+    {
+        const char *name;
+        ScreenId id;
+    };
+
+    constexpr ScreenNameEntry screenNameList[] = {
+#define X(ns, Class, nameStr) {nameStr, ScreenId::Class},
+        SCREEN_LIST
+#undef X
+    };
+
+    inline std::optional<ScreenId> getScreenIdByName(const std::string &name)
+    {
+        for (auto &entry : screenNameList)
+        {
+            if (name == entry.name)
+            {
+                return entry.id;
+            }
+        }
+        return std::nullopt;
     }
-    return std::nullopt;
-}
 
 } // anonymous namespace
 
@@ -102,10 +112,11 @@ LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
     }
 
     ScreenComponent &ref = *screen;
-    #define X(ns, Class, nameStr) \
-        if (dynamic_cast<ns::Class*>(screen.get())) return ScreenId::Class;
+#define X(ns, Class, nameStr)                                                  \
+    if (dynamic_cast<ns::Class *>(screen.get()))                               \
+        return ScreenId::Class;
     SCREEN_LIST
-    #undef X
+#undef X
 
     return ScreenId::Count;
 }

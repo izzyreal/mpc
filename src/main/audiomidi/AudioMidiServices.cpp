@@ -1,4 +1,7 @@
 #include "AudioMidiServices.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
+#include "hardware/Hardware.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <Mpc.hpp>
@@ -26,6 +29,7 @@
 #include "engine/control/CompoundControl.hpp"
 #include "engine/control/BooleanControl.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 
@@ -43,10 +47,11 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::control;
 using namespace mpc::engine;
 
+using namespace mpc::sequencer;
+
 AudioMidiServices::AudioMidiServices(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
 {
     VoiceUtil::freqTable();
-    frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse);
 }
 
 AudioMidiServices::~AudioMidiServices()
@@ -59,13 +64,48 @@ void AudioMidiServices::start()
 
     server = std::make_shared<RealTimeAudioServer>();
     offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
-
-    frameSeq->setSampleRate(offlineServer->getSampleRate());
-
     soundRecorder = std::make_shared<SoundRecorder>(mpc);
     soundPlayer = std::make_shared<SoundPlayer>();
 
     setupMixer();
+
+    frameSeq = std::make_shared<FrameSeq>(
+        mpc.eventRegistry, mpc.getSequencer(), mpc.getClock(),
+        mpc.getLayeredScreen(),
+        [this]
+        {
+            return isBouncing();
+        },
+        [this]
+        {
+            return getAudioServer()->getSampleRate();
+        },
+        [clientEventController = mpc.clientEventController]
+        {
+            return clientEventController->isRecMainWithoutPlaying();
+        },
+        [sampler = mpc.getSampler()](int velo, int frameOffset)
+        {
+            sampler->playMetronome(velo, frameOffset);
+        },
+        mpc.screens,
+        [clientEventController = mpc.clientEventController]
+        {
+            return clientEventController->clientHardwareEventController
+                ->isNoteRepeatLockedOrPressed();
+        },
+        mpc.getSampler(), getMixer(),
+        [clientEventController = mpc.clientEventController]
+        {
+            return clientEventController->isFullLevelEnabled();
+        },
+        [clientEventController = mpc.clientEventController]
+        {
+            return clientEventController->isSixteenLevelsEnabled();
+        },
+        mpc.getHardware()->getSlider(), &voices, mixerConnections);
+
+    frameSeq->setSampleRate(offlineServer->getSampleRate());
 
     createSynth();
 

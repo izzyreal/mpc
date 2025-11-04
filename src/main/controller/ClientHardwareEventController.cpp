@@ -48,6 +48,14 @@ ClientHardwareEventController::ClientHardwareEventController(mpc::Mpc &mpcToUse)
 {
 }
 
+bool ClientHardwareEventController::isNoteRepeatLockedOrPressed()
+{
+    return isNoteRepeatLocked() ||
+           mpc.getHardware()
+               ->getButton(ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
+               ->isPressed();
+}
+
 void ClientHardwareEventController::handleClientHardwareEvent(
     const ClientHardwareEvent &event)
 {

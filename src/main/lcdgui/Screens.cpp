@@ -228,7 +228,7 @@ Screens::getScreenLayout(const std::string &screenName)
 
 using ScreenFactory = std::shared_ptr<ScreenComponent> (*)(mpc::Mpc &, int);
 
-template<typename T>
+template <typename T>
 std::shared_ptr<ScreenComponent> createScreen(mpc::Mpc &mpc, int layer)
 {
     return std::make_shared<T>(mpc, layer);

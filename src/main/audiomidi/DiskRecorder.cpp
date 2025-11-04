@@ -33,8 +33,10 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
 {
     if (bufferLeft.empty())
     {
-        ringBufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float>>(BUFFER_SIZE);
-        ringBufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float>>(BUFFER_SIZE);
+        ringBufferLeft =
+            std::make_shared<moodycamel::ReaderWriterQueue<float>>(BUFFER_SIZE);
+        ringBufferRight =
+            std::make_shared<moodycamel::ReaderWriterQueue<float>>(BUFFER_SIZE);
         bufferLeft = std::vector<float>(BUFFER_SIZE);
         bufferRight = std::vector<float>(BUFFER_SIZE);
     }
@@ -105,8 +107,10 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
                 writeRingBufferToDisk();
             }
 
-            ringBufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
-            ringBufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
+            ringBufferLeft =
+                std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
+            ringBufferRight =
+                std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
             bufferLeft.clear();
             bufferRight.clear();
 

@@ -12,11 +12,11 @@ namespace mpc
     class Mpc;
 }
 
-namespace moodycamel {
+namespace moodycamel
+{
     struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits>
-    class ConcurrentQueue;
-}
+    template <typename T, typename Traits> class ConcurrentQueue;
+} // namespace moodycamel
 
 namespace mpc::sequencer
 {
@@ -32,9 +32,13 @@ namespace mpc::sequencer
 
         std::vector<std::shared_ptr<Event>> events;
 
-        std::shared_ptr<moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>, moodycamel::ConcurrentQueueDefaultTraits>>
+        std::shared_ptr<moodycamel::ConcurrentQueue<
+            std::shared_ptr<NoteOnEvent>,
+            moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOnEvents;
-        std::shared_ptr<moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>, moodycamel::ConcurrentQueueDefaultTraits>>
+        std::shared_ptr<moodycamel::ConcurrentQueue<
+            std::shared_ptr<NoteOffEvent>,
+            moodycamel::ConcurrentQueueDefaultTraits>>
             queuedNoteOffEvents;
 
         std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns =

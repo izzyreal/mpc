@@ -5,11 +5,11 @@
 #include <vector>
 #include <memory>
 
-namespace moodycamel {
+namespace moodycamel
+{
     struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits>
-    class ConcurrentQueue;
-}
+    template <typename T, typename Traits> class ConcurrentQueue;
+} // namespace moodycamel
 
 namespace mpc::audiomidi
 {
@@ -22,7 +22,8 @@ namespace mpc::audiomidi
     private:
         using MidiEvent = client::event::ClientMidiEvent;
         using MidiEventPtr = std::shared_ptr<MidiEvent>;
-        using MidiEventQueue = moodycamel::ConcurrentQueue<MidiEventPtr, moodycamel::ConcurrentQueueDefaultTraits>;
+        using MidiEventQueue = moodycamel::ConcurrentQueue<
+            MidiEventPtr, moodycamel::ConcurrentQueueDefaultTraits>;
 
         std::shared_ptr<MidiEventQueue> queue;
 

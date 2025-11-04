@@ -1,15 +1,8 @@
 #include "FrameSeq.hpp"
 
-#include "Mpc.hpp"
-
-#include "audiomidi/AudioMidiServices.hpp"
-
 #include "controller/ClientEventController.hpp"
-#include "controller/ClientHardwareEventController.hpp"
 #include "eventregistry/EventRegistry.hpp"
-#include "hardware/Hardware.hpp"
 
-#include "sampler/Sampler.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
@@ -22,10 +15,12 @@
 #include "lcdgui/screens/PunchScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
+#include "MidiClockOutput.hpp"
 
 #include "sequencer/SeqUtil.hpp"
 
-#include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include <concurrentqueue.h>
 
@@ -33,20 +28,52 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace mpc::engine::midi;
+using namespace mpc::eventregistry;
 
-FrameSeq::FrameSeq(mpc::Mpc &mpc)
-    : mpc(mpc), sequencer(mpc.getSequencer()),
-      countMetronomeScreen(mpc.screens->get<ScreenId::CountMetronomeScreen>()),
-      timingCorrectScreen(mpc.screens->get<ScreenId::TimingCorrectScreen>()),
-      sequencerScreen(mpc.screens->get<ScreenId::SequencerScreen>()),
-      syncScreen(mpc.screens->get<ScreenId::SyncScreen>()),
-      punchScreen(mpc.screens->get<ScreenId::PunchScreen>()),
-      songScreen(mpc.screens->get<ScreenId::SongScreen>()),
-      userScreen(mpc.screens->get<ScreenId::UserScreen>()),
-      midiClockOutput(std::make_shared<MidiClockOutput>(mpc))
+using namespace mpc::sampler;
+using namespace mpc::engine::audio::mixer;
+
+FrameSeq::FrameSeq(
+    std::shared_ptr<EventRegistry> eventRegistry,
+    std::shared_ptr<sequencer::Sequencer> sequencer,
+    std::shared_ptr<Clock> clock, std::shared_ptr<LayeredScreen> layeredScreen,
+    std::function<bool()> isBouncing, std::function<int()> getSampleRate,
+    std::function<bool()> isRecMainWithoutPlaying,
+    std::function<void(int velo, int frameOffset)> triggerMetronome,
+    std::shared_ptr<Screens> screens,
+    std::function<bool()> isNoteRepeatLockedOrPressed,
+    // Only used by note repeat (RepeatPad)
+    std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> audioMixer,
+    std::function<bool()> isFullLevelEnabled,
+    std::function<bool()> isSixteenLevelsEnabled,
+    std::shared_ptr<hardware::Slider> hardwareSlider,
+    std::vector<std::shared_ptr<engine::Voice>> *voices,
+    std::vector<engine::MixerInterconnection *> &mixerInterconnections)
+    : eventRegistry(eventRegistry), sequencer(sequencer), clock(clock),
+      layeredScreen(layeredScreen), isBouncing(isBouncing),
+      getSampleRate(getSampleRate),
+      isRecMainWithoutPlaying(isRecMainWithoutPlaying),
+      triggerMetronome(triggerMetronome),
+      countMetronomeScreen(screens->get<ScreenId::CountMetronomeScreen>()),
+      timingCorrectScreen(screens->get<ScreenId::TimingCorrectScreen>()),
+      sequencerScreen(screens->get<ScreenId::SequencerScreen>()),
+      syncScreen(screens->get<ScreenId::SyncScreen>()),
+      punchScreen(screens->get<ScreenId::PunchScreen>()),
+      songScreen(screens->get<ScreenId::SongScreen>()),
+      userScreen(screens->get<ScreenId::UserScreen>()),
+      midiClockOutput(
+          std::make_shared<MidiClockOutput>(sequencer, syncScreen, isBouncing)),
+      isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
+      sampler(sampler), audioMixer(audioMixer),
+      isFullLevelEnabled(isFullLevelEnabled),
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
+      assign16LevelsScreen(screens->get<ScreenId::Assign16LevelsScreen>()),
+      mixerSetupScreen(screens->get<ScreenId::MixerSetupScreen>()),
+      hardwareSlider(hardwareSlider), voices(voices),
+      mixerInterconnections(mixerInterconnections)
 {
-    eventQueue = std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
+    eventQueue =
+        std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
 }
 
@@ -62,7 +89,7 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
         shouldWaitForMidiClockLock = true;
     }
 
-    mpc.getClock()->reset();
+    clock->reset();
 
     metronomeOnly = metronomeOnlyToUse;
     metronomeOnlyTickPosition = 0;
@@ -126,15 +153,9 @@ void FrameSeq::triggerClickIfNeeded()
     }
 
     const bool isStepEditor =
-        mpc.getLayeredScreen()->isCurrentScreen<ScreenId::StepEditorScreen>();
+        layeredScreen->isCurrentScreen<ScreenId::StepEditorScreen>();
 
-    const auto currentScreenName =
-        mpc.getLayeredScreen()->getCurrentScreenName();
-
-    const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
-        sequencer, timingCorrectScreen, currentScreenName,
-        mpc.getHardware()->getButton(hardware::ComponentId::REC),
-        mpc.clientEventController->clientHardwareEventController);
+    const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
     if (sequencer->isRecordingOrOverdubbing())
     {
@@ -147,7 +168,7 @@ void FrameSeq::triggerClickIfNeeded()
     {
 
         if (!isStepEditor && !countMetronomeScreen->getInPlay() &&
-            !sequencer->isCountingIn() && !isRecMainWithoutPlaying)
+            !sequencer->isCountingIn() && !isRecMainWithoutPlaying())
         {
             return;
         }
@@ -160,7 +181,7 @@ void FrameSeq::triggerClickIfNeeded()
     const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
     const auto relativePos = pos - firstTickOfBar;
 
-    if ((isStepEditor || isRecMainWithoutPlaying) && relativePos == 0)
+    if ((isStepEditor || isRecMainWithoutPlaying()) && relativePos == 0)
     {
         return;
     }
@@ -195,8 +216,7 @@ void FrameSeq::triggerClickIfNeeded()
 
     if (relativePos % static_cast<int>(denTicks) == 0)
     {
-        mpc.getSampler()->playMetronome(relativePos == 0 ? 127 : 64,
-                                        getEventFrameOffset());
+        triggerMetronome(relativePos == 0 ? 127 : 64, getEventFrameOffset());
     }
 }
 
@@ -339,12 +359,6 @@ bool FrameSeq::processSeqLoopEnabled()
             if (sequencer->isRecording())
             {
                 sequencer->switchRecordToOverdub();
-                mpc.getHardware()
-                    ->getLed(hardware::ComponentId::REC_LED)
-                    ->setEnabled(false);
-                mpc.getHardware()
-                    ->getLed(hardware::ComponentId::OVERDUB_LED)
-                    ->setEnabled(true);
             }
         }
 
@@ -371,9 +385,6 @@ bool FrameSeq::processSeqLoopDisabled()
         else
         {
             sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
-            mpc.getHardware()
-                ->getLed(hardware::ComponentId::PLAY_LED)
-                ->setEnabled(false);
             sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
@@ -385,14 +396,12 @@ bool FrameSeq::processSeqLoopDisabled()
 
 void FrameSeq::processNoteRepeat()
 {
-    const bool isNoteRepeatLockedOrPressed =
-        mpc.clientEventController->clientHardwareEventController
-            ->isNoteRepeatLocked() ||
-        mpc.getHardware()
-            ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
-            ->isPressed();
+    if (!layeredScreen->isCurrentScreen<ScreenId::SequencerScreen>())
+    {
+        return;
+    }
 
-    if (!isNoteRepeatLockedOrPressed)
+    if (!isNoteRepeatLockedOrPressed())
     {
         return;
     }
@@ -425,10 +434,12 @@ void FrameSeq::processNoteRepeat()
     if (shouldRepeatPad)
     {
         RepeatPad::process(
-            mpc, sequencer->getTickPosition(), repeatIntervalTicks,
+            this, sequencer, sampler, audioMixer, isFullLevelEnabled(),
+            isSixteenLevelsEnabled(), assign16LevelsScreen, mixerSetupScreen,
+            eventRegistry, hardwareSlider, voices, mixerInterconnections,
+            sequencer->getTickPosition(), repeatIntervalTicks,
             getEventFrameOffset(), sequencer->getTempo(),
-            static_cast<float>(
-                mpc.getAudioMidiServices()->getAudioServer()->getSampleRate()));
+            static_cast<float>(getSampleRate()));
     }
 }
 
@@ -436,15 +447,6 @@ void FrameSeq::stopSequencer()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->stop();
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(false);
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(false);
-    mpc.getHardware()
-        ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(false);
     move(0);
 }
 
@@ -491,13 +493,11 @@ void FrameSeq::processEventsAfterNFrames()
 
 void FrameSeq::work(int nFrames)
 {
-    mpc.eventRegistry->drainQueue();
-    mpc.eventRegistry->publishSnapshot();
+    eventRegistry->drainQueue();
+    eventRegistry->publishSnapshot();
 
-    const auto clock = mpc.getClock();
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
-    const auto sampleRate =
-        mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+    const auto sampleRate = getSampleRate();
 
     if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
     {
@@ -521,8 +521,7 @@ void FrameSeq::work(int nFrames)
         return;
     }
 
-    const bool isBouncing = mpc.getAudioMidiServices()->isBouncing();
-    const auto tempo = mpc.getSequencer()->getTempo();
+    const auto tempo = sequencer->getTempo();
 
     const auto &clockTicks = clock->getTicksForCurrentBuffer();
     const bool positionalJumpOccurred = clock->didJumpOccurInLastBuffer();
@@ -534,7 +533,7 @@ void FrameSeq::work(int nFrames)
         const auto hostPositionQuarterNotes =
             clock->getLastProcessedHostPositionQuarterNotes();
 
-        if (mpc.getLayeredScreen()->getCurrentScreenName() == "song")
+        if (layeredScreen->getCurrentScreenName() == "song")
         {
             sequencer->moveWithinSong(hostPositionQuarterNotes);
         }
@@ -570,7 +569,7 @@ void FrameSeq::work(int nFrames)
             continue;
         }
 
-        if (syncScreen->modeOut != 0 && !isBouncing)
+        if (syncScreen->modeOut != 0 && !isBouncing())
         {
             if (midiClockOutput->isLastProcessedFrameMidiClockLock())
             {

@@ -87,6 +87,8 @@ namespace mpc::controller
         int getSelectedNote() const;
         int getSelectedPad() const;
 
+        bool isRecMainWithoutPlaying() const;
+
     private:
         mpc::Mpc &mpc;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;

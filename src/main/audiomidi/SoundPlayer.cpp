@@ -19,8 +19,10 @@ SoundPlayer::SoundPlayer()
 {
     srcLeft = src_new(0, 1, &srcLeftError);
     srcRight = src_new(0, 1, &srcRightError);
-    bufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
-    bufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
+    bufferLeft =
+        std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
+    bufferRight =
+        std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
 }
 
 SoundPlayer::~SoundPlayer()

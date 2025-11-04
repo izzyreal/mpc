@@ -664,6 +664,12 @@ void Sequencer::switchRecordToOverdub()
 
     recording = false;
     overdubbing = true;
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::REC_LED)
+        ->setEnabled(false);
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::OVERDUB_LED)
+        ->setEnabled(true);
 }
 
 void Sequencer::overdubFromStart()
@@ -759,6 +765,16 @@ void Sequencer::stop(const StopMode stopMode)
     {
         ams->stopBouncing();
     }
+
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::PLAY_LED)
+        ->setEnabled(false);
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::REC_LED)
+        ->setEnabled(false);
+    mpc.getHardware()
+        ->getLed(hardware::ComponentId::OVERDUB_LED)
+        ->setEnabled(false);
 }
 
 bool Sequencer::isCountingIn()

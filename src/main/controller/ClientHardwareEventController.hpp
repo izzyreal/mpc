@@ -42,6 +42,8 @@ namespace mpc::controller
                 hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
         }
 
+        bool isNoteRepeatLockedOrPressed();
+
     protected:
         // Maps component label to accumulated delta for discretization
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;

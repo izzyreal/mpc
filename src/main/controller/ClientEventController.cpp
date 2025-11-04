@@ -81,6 +81,14 @@ ClientEventController::getClientMidiEventController()
     return clientMidiEventController;
 }
 
+bool ClientEventController::isRecMainWithoutPlaying() const
+{
+    return SeqUtil::isRecMainWithoutPlaying(
+        sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+        layeredScreen->getCurrentScreenName(),
+        hardware->getButton(ComponentId::REC), clientHardwareEventController);
+}
+
 RecordingMode ClientEventController::determineRecordingMode() const
 {
     if (sequencer->isRecordingOrOverdubbing())
@@ -93,11 +101,7 @@ RecordingMode ClientEventController::determineRecordingMode() const
         return RecordingMode::Step;
     }
 
-    if (SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
-            layeredScreen->getCurrentScreenName(),
-            hardware->getButton(ComponentId::REC),
-            clientHardwareEventController))
+    if (isRecMainWithoutPlaying())
     {
         return RecordingMode::RecMainWithoutPlaying;
     }

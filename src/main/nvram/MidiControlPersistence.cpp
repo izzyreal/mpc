@@ -29,9 +29,10 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc &mpc)
             auto &preset =
                 mpc.screens->get<ScreenId::VmpcMidiScreen>()->activePreset;
             // The below causes issues with auto-save restore when there are i/o
-            // issues and a popup is opened, because it closes the VmpcContinuePreviousSessionScreen
-            //mpc.getDisk()->readMidiControlPreset(lastStatePath, preset);
-            //healPreset(mpc, preset);
+            // issues and a popup is opened, because it closes the
+            // VmpcContinuePreviousSessionScreen
+            // mpc.getDisk()->readMidiControlPreset(lastStatePath, preset);
+            // healPreset(mpc, preset);
         }
         catch (const std::exception &e)
         {

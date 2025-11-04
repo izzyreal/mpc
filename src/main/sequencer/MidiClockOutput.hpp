@@ -9,16 +9,11 @@
 #include <functional>
 #include <atomic>
 
-namespace moodycamel {
-    struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits>
-    class ConcurrentQueue;
-}
-
-namespace mpc
+namespace moodycamel
 {
-    class Mpc;
-}
+    struct ConcurrentQueueDefaultTraits;
+    template <typename T, typename Traits> class ConcurrentQueue;
+} // namespace moodycamel
 
 namespace mpc::lcdgui::screens::window
 {
@@ -36,34 +31,10 @@ namespace mpc::sequencer
 
     class MidiClockOutput
     {
-    private:
-        std::atomic<bool> running{false};
-        std::atomic_int32_t requestedSampleRate{44100};
-        bool lastProcessedFrameIsMidiClockLock = false;
-        LegacyClock clock;
-        std::shared_ptr<Sequencer> sequencer;
-        std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
-
-        // Has to be called exactly once for each frameIndex
-        void processEventsAfterNFrames();
-
-        mpc::Mpc &mpc;
-        unsigned char midiClockTickCounter = 0;
-        bool wasRunning = false;
-        // std::shared_ptr<mpc::engine::midi::ShortMessage>
-        // midiSyncStartStopContinueMsg;
-
-        std::shared_ptr<moodycamel::ConcurrentQueue<EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>> eventQueue;
-        std::vector<EventAfterNFrames> tempEventQueue;
-
-        void sendMidiClockMsg(int frameIndex);
-        void enqueueEventAfterNFrames(const std::function<void()> &event,
-                                      unsigned long nFrames);
-
-        // std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
-
     public:
-        explicit MidiClockOutput(mpc::Mpc &mpc);
+        explicit MidiClockOutput(std::shared_ptr<Sequencer>,
+                                 std::shared_ptr<SyncScreen>,
+                                 std::function<bool()> isBouncing);
 
         void processTempoChange();
         void processSampleRateChange();
@@ -76,5 +47,33 @@ namespace mpc::sequencer
         void sendMidiSyncMsg(unsigned char status);
 
         bool isLastProcessedFrameMidiClockLock();
+
+    private:
+        std::atomic<bool> running{false};
+        std::atomic_int32_t requestedSampleRate{44100};
+        bool lastProcessedFrameIsMidiClockLock = false;
+        LegacyClock clock;
+        std::shared_ptr<Sequencer> sequencer;
+        std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
+        std::function<bool()> isBouncing;
+
+        // Has to be called exactly once for each frameIndex
+        void processEventsAfterNFrames();
+
+        unsigned char midiClockTickCounter = 0;
+        bool wasRunning = false;
+        // std::shared_ptr<mpc::engine::midi::ShortMessage>
+        // midiSyncStartStopContinueMsg;
+
+        std::shared_ptr<moodycamel::ConcurrentQueue<
+            EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>>
+            eventQueue;
+        std::vector<EventAfterNFrames> tempEventQueue;
+
+        void sendMidiClockMsg(int frameIndex);
+        void enqueueEventAfterNFrames(const std::function<void()> &event,
+                                      unsigned long nFrames);
+
+        // std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
     };
 } // namespace mpc::sequencer

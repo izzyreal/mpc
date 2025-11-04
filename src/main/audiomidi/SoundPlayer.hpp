@@ -12,9 +12,9 @@
 using namespace mpc::sampler;
 using namespace mpc::engine::audio::core;
 
-namespace moodycamel {
-    template <typename T, size_t MAX_BLOCK_SIZE>
-    class ReaderWriterQueue;
+namespace moodycamel
+{
+    template <typename T, size_t MAX_BLOCK_SIZE> class ReaderWriterQueue;
 }
 
 namespace mpc::audiomidi
