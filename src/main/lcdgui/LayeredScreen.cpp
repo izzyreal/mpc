@@ -40,20 +40,6 @@ using namespace mpc::lcdgui::screens::dialog2;
 
 namespace
 {
-
-    template <typename T> struct ScreenTypeId
-    {
-        static constexpr ScreenId value = ScreenId::Count;
-    };
-
-#define X(ns, Class, nameStr)                                                  \
-    template <> struct ScreenTypeId<ns::Class>                                 \
-    {                                                                          \
-        static constexpr ScreenId value = ScreenId::Class;                     \
-    };
-    SCREEN_LIST
-#undef X
-
     struct ScreenNameEntry
     {
         const char *name;
