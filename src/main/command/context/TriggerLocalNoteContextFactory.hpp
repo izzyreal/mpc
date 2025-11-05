@@ -55,7 +55,7 @@ namespace mpc::command::context
     {
     public:
         static std::shared_ptr<TriggerLocalNoteOnContext>
-        buildTriggerDrumNoteOnContext(
+        buildTriggerLocalNoteOnContext(
             eventregistry::Source, std::shared_ptr<lcdgui::LayeredScreen>,
             std::shared_ptr<controller::ClientEventController>,
             std::shared_ptr<hardware::Hardware>,
@@ -68,7 +68,7 @@ namespace mpc::command::context
             const std::shared_ptr<mpc::lcdgui::ScreenComponent>);
 
         static std::shared_ptr<TriggerLocalNoteOffContext>
-        buildTriggerDrumNoteOffContext(
+        buildTriggerLocalNoteOffContext(
             eventregistry::Source, engine::PreviewSoundPlayer *,
             std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<audiomidi::EventHandler>,

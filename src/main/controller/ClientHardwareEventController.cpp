@@ -176,7 +176,7 @@ void ClientHardwareEventController::handlePadPress(
         }
     }
 
-    auto ctx = TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
+    auto ctx = TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         Source::VirtualMpcHardware, layeredScreen, mpc.clientEventController,
         mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(),
         mpc.eventRegistry, mpc.getEventHandler(),
@@ -289,7 +289,7 @@ void ClientHardwareEventController::handlePadRelease(
             assert(drumIndex);
 
             auto ctx =
-                TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
+                TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     Source::VirtualMpcHardware, previewSoundPlayer,
                     eventRegistry, eventHandler, screens, sequencer, hardware,
                     clientEventController, frameSequencer, programPadIndex,

@@ -48,7 +48,7 @@ int getDrumIndexForCurrentScreen(std::shared_ptr<Sequencer> sequencer,
 }
 
 std::shared_ptr<TriggerLocalNoteOnContext>
-TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
+TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     eventregistry::Source source, std::shared_ptr<LayeredScreen> layeredScreen,
     std::shared_ptr<ClientEventController> controller,
     std::shared_ptr<Hardware> hardware, std::shared_ptr<Sequencer> sequencer,
@@ -145,7 +145,7 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
 }
 
 std::shared_ptr<TriggerLocalNoteOffContext>
-TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
+TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     eventregistry::Source source, PreviewSoundPlayer *previewSoundPlayer,
     std::shared_ptr<EventRegistry> eventRegistry,
     std::shared_ptr<EventHandler> eventHandler,

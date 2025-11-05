@@ -201,7 +201,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         return;
     }
 
-    auto ctx = TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
+    auto ctx = TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         eventregistry::Source::MidiInput, layeredScreen, clientEventController,
         hardware, sequencer, screens, sampler, eventRegistry, eventHandler,
         frameSequencer, previewSoundPlayer, programPadIndex, e.getVelocity(),
@@ -264,7 +264,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         return;
     }
 
-    auto ctx = TriggerLocalNoteContextFactory::buildTriggerDrumNoteOffContext(
+    auto ctx = TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
         eventregistry::Source::MidiInput, previewSoundPlayer, eventRegistry,
         eventHandler, screens, sequencer, hardware, clientEventController,
         frameSequencer, programPadIndex, drumBus->getIndex(),
