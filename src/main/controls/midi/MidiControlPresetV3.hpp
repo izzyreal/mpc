@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <set>
 #include <nlohmann/json.hpp>
-#include "ConstrainedInt.h"
+#include "ConstrainedInt.hpp"
 
 namespace mpc::controls::midi {
 

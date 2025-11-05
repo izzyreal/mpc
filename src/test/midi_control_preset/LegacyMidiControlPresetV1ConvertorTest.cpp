@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
-#include "controls/midi/legacy/LegacyMidiControlPresetV1Convertor.h"
-#include "controls/midi/legacy/LegacyMidiControlPresetPatcher.h"
+#include "controls/midi/legacy/LegacyMidiControlPresetV1Convertor.hpp"
+#include "controls/midi/legacy/LegacyMidiControlPresetPatcher.hpp"
 #include <nlohmann/json.hpp>
 #include <nlohmann/json-schema.hpp>
 #include <cmrc/cmrc.hpp>
@@ -8,7 +8,7 @@
 #include <iostream>
 #include <set>
 
-#include "iRigPadsUtil.h"
+#include "iRigPadsUtil.hpp"
 
 CMRC_DECLARE(mpctest);
 

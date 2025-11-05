@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ConstrainedInt.h"
+#include "ConstrainedInt.hpp"
 
 #include <cstdint>
 

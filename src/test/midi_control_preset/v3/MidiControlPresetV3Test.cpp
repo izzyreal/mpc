@@ -1,5 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
-#include "controls/midi/MidiControlPresetV3.h"
+#include "controls/midi/MidiControlPresetV3.hpp"
 #include <nlohmann/json.hpp>
 #include <cmrc/cmrc.hpp>
 #include <set>
