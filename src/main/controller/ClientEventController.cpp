@@ -26,7 +26,7 @@ using namespace mpc::lcdgui;
 
 ClientEventController::ClientEventController(mpc::Mpc &mpcToUse)
     : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>()),
-      mpc(mpcToUse), sequencer(mpc.getSequencer()), screens(mpc.screens),
+      mpc(mpcToUse), screens(mpc.screens),
       layeredScreen(mpc.getLayeredScreen()), hardware(mpc.getHardware())
 {
 }
@@ -38,7 +38,7 @@ void ClientEventController::init()
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
         mpc.eventRegistry, shared_from_this(), clientHardwareEventController,
-        screens->get<ScreenId::MidiSwScreen>(), sequencer, mpc.getSampler(),
+        screens->get<ScreenId::MidiSwScreen>(), mpc.getSequencer(), mpc.getSampler(),
         screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
         screens->get<ScreenId::MultiRecordingSetupScreen>(),
         screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
@@ -85,19 +85,19 @@ ClientEventController::getClientMidiEventController()
 bool ClientEventController::isRecMainWithoutPlaying() const
 {
     return SeqUtil::isRecMainWithoutPlaying(
-        sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+        mpc.getSequencer(), screens->get<ScreenId::TimingCorrectScreen>(),
         layeredScreen->getCurrentScreenName(),
         hardware->getButton(ComponentId::REC), clientHardwareEventController);
 }
 
 RecordingMode ClientEventController::determineRecordingMode() const
 {
-    if (sequencer->isRecordingOrOverdubbing())
+    if (mpc.getSequencer()->isRecordingOrOverdubbing())
     {
         return RecordingMode::Overdub;
     }
     if (SeqUtil::isStepRecording(layeredScreen->getCurrentScreenName(),
-                                 sequencer))
+                                 mpc.getSequencer()))
     {
         return RecordingMode::Step;
     }

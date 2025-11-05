@@ -94,7 +94,6 @@ namespace mpc::controller
         mpc::Mpc &mpc;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
         std::shared_ptr<mpc::input::KeyboardBindings> keyboardBindings;
-        std::shared_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<lcdgui::Screens> screens;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<hardware::Hardware> hardware;
