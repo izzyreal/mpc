@@ -1,9 +1,10 @@
-#include "FrameSeq.hpp"
-
+#include "sequencer/FrameSeq.hpp"
 #include "controller/ClientEventController.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
+#include "lcdgui/screens/SyncScreen.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"
@@ -32,46 +33,41 @@ using namespace mpc::sequencer;
 using namespace mpc::eventregistry;
 
 using namespace mpc::sampler;
+using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
+using namespace mpc::hardware;
 
 FrameSeq::FrameSeq(
     std::shared_ptr<EventRegistry> eventRegistry,
-    std::shared_ptr<sequencer::Sequencer> sequencer,
+    Sequencer *sequencer,
     std::shared_ptr<Clock> clock, std::shared_ptr<LayeredScreen> layeredScreen,
     std::function<bool()> isBouncing, std::function<int()> getSampleRate,
     std::function<bool()> isRecMainWithoutPlaying,
     std::function<void(int velo, int frameOffset)> triggerMetronome,
-    std::shared_ptr<Screens> screens,
+    std::function<std::shared_ptr<Screens>()> getScreens,
     std::function<bool()> isNoteRepeatLockedOrPressed,
     // Only used by note repeat (RepeatPad)
-    std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> audioMixer,
+    std::shared_ptr<Sampler> sampler,
+    std::function<std::shared_ptr<AudioMixer>()> getAudioMixer,
     std::function<bool()> isFullLevelEnabled,
     std::function<bool()> isSixteenLevelsEnabled,
     std::shared_ptr<hardware::Slider> hardwareSlider,
     std::vector<std::shared_ptr<engine::Voice>> *voices,
-    std::vector<engine::MixerInterconnection *> &mixerInterconnections)
+    std::function<std::vector<MixerInterconnection *> &()> getMixerInterconnections
+    )
     : eventRegistry(eventRegistry), sequencer(sequencer), clock(clock),
-      layeredScreen(layeredScreen), isBouncing(isBouncing),
+      layeredScreen(layeredScreen), getScreens(getScreens), isBouncing(isBouncing),
       getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       triggerMetronome(triggerMetronome),
-      countMetronomeScreen(screens->get<ScreenId::CountMetronomeScreen>()),
-      timingCorrectScreen(screens->get<ScreenId::TimingCorrectScreen>()),
-      sequencerScreen(screens->get<ScreenId::SequencerScreen>()),
-      syncScreen(screens->get<ScreenId::SyncScreen>()),
-      punchScreen(screens->get<ScreenId::PunchScreen>()),
-      songScreen(screens->get<ScreenId::SongScreen>()),
-      userScreen(screens->get<ScreenId::UserScreen>()),
       midiClockOutput(
-          std::make_shared<MidiClockOutput>(sequencer, syncScreen, isBouncing)),
+          std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing)),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
-      sampler(sampler), audioMixer(audioMixer),
+      sampler(sampler), getAudioMixer(getAudioMixer),
       isFullLevelEnabled(isFullLevelEnabled),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled),
-      assign16LevelsScreen(screens->get<ScreenId::Assign16LevelsScreen>()),
-      mixerSetupScreen(screens->get<ScreenId::MixerSetupScreen>()),
       hardwareSlider(hardwareSlider), voices(voices),
-      mixerInterconnections(mixerInterconnections)
+      getMixerInterconnections(getMixerInterconnections)
 {
     eventQueue =
         std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
@@ -85,7 +81,7 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
         return;
     }
 
-    if (syncScreen->modeOut != 0)
+    if (getScreens()->get<ScreenId::SyncScreen>()->modeOut != 0)
     {
         shouldWaitForMidiClockLock = true;
     }
@@ -157,6 +153,8 @@ void FrameSeq::triggerClickIfNeeded()
         layeredScreen->isCurrentScreen<ScreenId::StepEditorScreen>();
 
     const auto currentScreenName = layeredScreen->getCurrentScreenName();
+
+    auto countMetronomeScreen = getScreens()->get<ScreenId::CountMetronomeScreen>();
 
     if (sequencer->isRecordingOrOverdubbing())
     {
@@ -235,6 +233,8 @@ void FrameSeq::displayPunchRects()
         auto punchInTime = sequencer->getPunchInTime();
         auto punchOutTime = sequencer->getPunchOutTime();
 
+        auto sequencerScreen = getScreens()->get<ScreenId::SequencerScreen>();
+
         if (punchIn && sequencer->getTickPosition() == punchInTime)
         {
             sequencerScreen->setPunchRectOn(0, false);
@@ -271,6 +271,7 @@ bool FrameSeq::processSongMode()
 
     sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->incrementPlayedStepRepetitions();
+    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     auto song = sequencer->getSong(songScreen->getActiveSongIndex());
     auto step = songScreen->getOffset() + 1;
 
@@ -336,6 +337,8 @@ bool FrameSeq::processSeqLoopEnabled()
         bool punchOut = sequencer->getAutoPunchMode() == 1 ||
                         sequencer->getAutoPunchMode() == 2;
 
+        auto sequencerScreen = getScreens()->get<ScreenId::SequencerScreen>();
+
         if (punch && punchIn)
         {
             sequencerScreen->setPunchRectOn(0, true);
@@ -377,6 +380,8 @@ bool FrameSeq::processSeqLoopDisabled()
     {
         if (sequencer->isRecordingOrOverdubbing())
         {
+            auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+
             seq->insertBars(1, seq->getLastBarIndex());
             seq->setTimeSignature(seq->getLastBarIndex(),
                                   seq->getLastBarIndex(),
@@ -407,6 +412,8 @@ void FrameSeq::processNoteRepeat()
         return;
     }
 
+    auto timingCorrectScreen = getScreens()->get<ScreenId::TimingCorrectScreen>();
+
     auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
     int swingPercentage = timingCorrectScreen->getSwing();
     int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) *
@@ -434,10 +441,13 @@ void FrameSeq::processNoteRepeat()
 
     if (shouldRepeatPad)
     {
+        auto assign16LevelsScreen = getScreens()->get<ScreenId::Assign16LevelsScreen>();
+        auto mixerSetupScreen = getScreens()->get<ScreenId::MixerSetupScreen>();
+
         RepeatPad::process(
-            this, sequencer, sampler, audioMixer, isFullLevelEnabled(),
+            this, sequencer, sampler, getAudioMixer(), isFullLevelEnabled(),
             isSixteenLevelsEnabled(), assign16LevelsScreen, mixerSetupScreen,
-            eventRegistry, hardwareSlider, voices, mixerInterconnections,
+            eventRegistry, hardwareSlider, voices, getMixerInterconnections(),
             sequencer->getTickPosition(), repeatIntervalTicks,
             getEventFrameOffset(), sequencer->getTempo(),
             static_cast<float>(getSampleRate()));
@@ -458,11 +468,6 @@ void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
     e.f = event;
     e.nFrames = nFrames;
     eventQueue->enqueue(std::move(e));
-}
-
-void FrameSeq::setSampleRate(unsigned int sampleRate)
-{
-    requestedSampleRate = sampleRate;
 }
 
 void FrameSeq::processEventsAfterNFrames()
@@ -569,6 +574,8 @@ void FrameSeq::work(int nFrames)
         {
             continue;
         }
+
+        auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
 
         if (syncScreen->modeOut != 0 && !isBouncing())
         {

@@ -27,7 +27,7 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::eventregistry;
 
 void RepeatPad::process(
-    FrameSeq *frameSequencer, std::shared_ptr<Sequencer> sequencer,
+    FrameSeq *frameSequencer, Sequencer *sequencer,
     std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> mixer,
     bool isFullLevelEnabled, bool isSixteenLevelsEnabled,
     std::shared_ptr<Assign16LevelsScreen> assign16LevelsScreen,

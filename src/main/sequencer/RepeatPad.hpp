@@ -47,7 +47,7 @@ namespace mpc::sequencer
     {
     public:
         static void
-        process(FrameSeq *, std::shared_ptr<Sequencer>,
+        process(FrameSeq *, Sequencer *,
                 std::shared_ptr<sampler::Sampler>,
                 std::shared_ptr<engine::audio::mixer::AudioMixer>,
                 bool isFullLevelEnabled, bool isSixteenLevelsEnabled,

@@ -1,12 +1,6 @@
 #include "Sequencer.hpp"
 
-#include <chrono>
-
-#include "Mpc.hpp"
-
 #include "MpcSpecs.hpp"
-
-#include "audiomidi/AudioMidiServices.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "engine/Voice.hpp"
@@ -14,6 +8,7 @@
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -22,22 +17,28 @@
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
+#include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 
-#include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "StrUtil.hpp"
 
-#include <StrUtil.hpp>
-#include <memory>
+#include <chrono>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+using namespace mpc::engine;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::eventregistry;
+using namespace mpc::sampler;
+using namespace mpc::audiomidi;
 
 uint32_t Sequencer::quarterNotesToTicks(const double quarterNotes)
 {
@@ -57,7 +58,67 @@ uint64_t currentTimeMillis()
         .count();
 }
 
-Sequencer::Sequencer(mpc::Mpc &mpc) : mpc(mpc) {}
+Sequencer::Sequencer(
+        std::shared_ptr<LayeredScreen> layeredScreen,
+        std::function<std::shared_ptr<Screens>()> getScreens,
+        std::vector<std::shared_ptr<Voice>> *voices,
+        std::function<bool()> isAudioServerRunning,
+        std::shared_ptr<hardware::Hardware> hardware,
+        std::function<bool()> isBouncePrepared,
+        std::function<void()> startBouncing,
+        std::function<void()> stopBouncing,
+        std::function<bool()> isBouncing,
+        std::function<bool()> isEraseButtonPressed,
+        std::shared_ptr<EventRegistry> eventRegistry,
+        std::shared_ptr<Sampler> sampler,
+        std::shared_ptr<EventHandler> eventHandler,
+        std::function<bool()> isSixteenLevelsEnabled,
+        std::shared_ptr<Clock> clock,
+        std::function<int()> getSampleRate,
+        std::function<bool()> isRecMainWithoutPlaying,
+        std::function<bool()> isNoteRepeatLockedOrPressed,
+        std::function<std::shared_ptr<AudioMixer>()> getAudioMixer,
+        std::function<bool()> isFullLevelEnabled,
+        std::function<std::vector<MixerInterconnection *>&()> getMixerInterconnections
+    )
+:
+    layeredScreen(layeredScreen),
+    getScreens(getScreens),
+    voices(voices),
+    isAudioServerRunning(isAudioServerRunning),
+    hardware(hardware),
+    isBouncePrepared(isBouncePrepared),
+    startBouncing(startBouncing),
+    stopBouncing(stopBouncing),
+    isBouncing(isBouncing),
+    isEraseButtonPressed(isEraseButtonPressed),
+    eventRegistry(eventRegistry),
+    sampler(sampler),
+    eventHandler(eventHandler),
+    isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+{
+    frameSequencer = std::make_shared<FrameSeq>(
+        eventRegistry,
+        this,
+        clock,
+        layeredScreen,
+        isBouncing,
+        getSampleRate,
+        isRecMainWithoutPlaying,
+        [sampler](int velo, int frameOffset)
+        {
+            sampler->playMetronome(velo, frameOffset);
+        },
+        getScreens,
+        isNoteRepeatLockedOrPressed,
+        sampler,
+        getAudioMixer,
+        isFullLevelEnabled,
+        isSixteenLevelsEnabled,
+        hardware->getSlider(),
+        voices,
+        getMixerInterconnections);
+}
 
 void Sequencer::init()
 {
@@ -76,7 +137,7 @@ void Sequencer::init()
     lastTap = currentTimeMillis();
     nextSq = -1;
 
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
 
     for (int i = 0; i < 64; i++)
@@ -135,7 +196,7 @@ void Sequencer::playToTick(int targetTick)
     auto seqIndex =
         songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
     auto seq = sequences[seqIndex].get();
-    auto secondSequenceScreen = mpc.screens->get<ScreenId::SecondSeqScreen>();
+    auto secondSequenceScreen = getScreens()->get<ScreenId::SecondSeqScreen>();
 
     for (int i = 0; i < 2; i++)
     {
@@ -238,7 +299,7 @@ double Sequencer::getTempo()
 
     auto seq = getActiveSequence();
 
-    if (mpc.getLayeredScreen()->getCurrentScreenName() == "song")
+    if (layeredScreen->getCurrentScreenName() == "song")
     {
         if (!seq->isUsed())
         {
@@ -251,7 +312,7 @@ double Sequencer::getTempo()
     if (tempoSourceSequenceEnabled)
     {
         auto ignoreTempoChangeScreen =
-            mpc.screens->get<ScreenId::IgnoreTempoChangeScreen>();
+            getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
         if (seq->isTempoChangeOn() ||
             (songMode && !ignoreTempoChangeScreen->ignore))
@@ -339,12 +400,11 @@ void Sequencer::setSoloEnabled(bool b)
 
     if (soloEnabled)
     {
-        auto &voices = mpc.getAudioMidiServices()->getVoices();
         for (int drumIndex = 0; drumIndex < 4; ++drumIndex)
         {
             for (int note = 35; note <= 98; note++)
             {
-                for (auto &voice : voices)
+                for (auto &voice : (*voices))
                 {
                     if (!voice->isFinished() && voice->getNote() == note &&
                         voice->getVoiceOverlapMode() ==
@@ -443,16 +503,12 @@ void Sequencer::trackDown()
 
 bool Sequencer::isPlaying()
 {
-    auto ams = mpc.getAudioMidiServices();
-    auto frameSequencer = ams->getFrameSequencer();
-    auto server = ams->getAudioServer();
-
-    if (!server->isRunning() || !frameSequencer)
+    if (!isAudioServerRunning())
     {
         return false;
     }
 
-    return !metronomeOnly && ams->getFrameSequencer()->isRunning();
+    return !metronomeOnly && frameSequencer->isRunning();
 }
 
 void Sequencer::play(bool fromStart)
@@ -463,7 +519,7 @@ void Sequencer::play(bool fromStart)
     }
 
     endOfSong = false;
-    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     auto currentSong = songs[songScreen->getActiveSongIndex()];
 
     std::shared_ptr<Step> currentStep;
@@ -505,7 +561,7 @@ void Sequencer::play(bool fromStart)
     currentlyPlayingSequenceIndex = activeSequenceIndex;
 
     auto countMetronomeScreen =
-        mpc.screens->get<ScreenId::CountMetronomeScreen>();
+        getScreens()->get<ScreenId::CountMetronomeScreen>();
     auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 ||
@@ -557,21 +613,19 @@ void Sequencer::play(bool fromStart)
             auto copy = copySequence(s);
             undoPlaceHolder.swap(copy);
             undoSeqAvailable = true;
-            mpc.getHardware()
+            hardware
                 ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
         }
     }
 
-    auto ams = mpc.getAudioMidiServices();
-
-    if (ams->isBouncePrepared())
+    if (isBouncePrepared())
     {
-        ams->startBouncing();
+        startBouncing();
     }
     else
     {
-        ams->getFrameSequencer()->start();
+        frameSequencer->start();
     }
 }
 
@@ -598,7 +652,7 @@ void Sequencer::undoSeq()
 
     undoSeqAvailable = !undoSeqAvailable;
 
-    mpc.getHardware()
+    hardware
         ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
 }
@@ -666,10 +720,10 @@ void Sequencer::switchRecordToOverdub()
 
     recording = false;
     overdubbing = true;
-    mpc.getHardware()
+    hardware
         ->getLed(hardware::ComponentId::REC_LED)
         ->setEnabled(false);
-    mpc.getHardware()
+    hardware
         ->getLed(hardware::ComponentId::OVERDUB_LED)
         ->setEnabled(true);
 }
@@ -692,8 +746,7 @@ void Sequencer::stop()
 
 void Sequencer::stop(const StopMode stopMode)
 {
-    auto ams = mpc.getAudioMidiServices();
-    bool bouncing = ams->isBouncing();
+    bool bouncing = isBouncing();
 
     if (!isPlaying() && !bouncing)
     {
@@ -725,9 +778,9 @@ void Sequencer::stop(const StopMode stopMode)
     const int frameOffset =
         stopMode == AT_START_OF_BUFFER
             ? 0
-            : ams->getFrameSequencer()->getEventFrameOffset();
+            : frameSequencer->getEventFrameOffset();
 
-    ams->getFrameSequencer()->stop();
+    frameSequencer->stop();
 
     recording = false;
     overdubbing = false;
@@ -749,11 +802,11 @@ void Sequencer::stop(const StopMode stopMode)
 
     for (int i = 0; i < 16; i++)
     {
-        auto pad = mpc.getHardware()->getPad(i);
+        auto pad = hardware->getPad(i);
         pad->release();
     }
 
-    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
 
     if (endOfSong)
     {
@@ -761,20 +814,20 @@ void Sequencer::stop(const StopMode stopMode)
     }
 
     auto vmpcDirectToDiskRecorderScreen =
-        mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
+        getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
     {
-        ams->stopBouncing();
+        stopBouncing();
     }
 
-    mpc.getHardware()
+    hardware
         ->getLed(hardware::ComponentId::PLAY_LED)
         ->setEnabled(false);
-    mpc.getHardware()
+    hardware
         ->getLed(hardware::ComponentId::REC_LED)
         ->setEnabled(false);
-    mpc.getHardware()
+    hardware
         ->getLed(hardware::ComponentId::OVERDUB_LED)
         ->setEnabled(false);
 }
@@ -817,19 +870,19 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
     return std::make_shared<Sequence>(
             [&](int trackIndex) { return defaultTrackNames[trackIndex]; },
                 [&]{return getTickPosition();},
-                mpc.screens,
+                getScreens,
                 [&]{ return isRecordingModeMulti(); },
                 [&]{ return getActiveSequence(); },
                 [&]{ return getAutoPunchMode(); },
                 [&](int busIndex) { return getBus<Bus>(busIndex); },
-                [&]{ return mpc.clientEventController->isEraseButtonPressed(); },
+                [&]{ return isEraseButtonPressed(); },
                 [&](int programPadIndex, std::shared_ptr<sampler::Program> program)
                 {
-                    return mpc.eventRegistry->getSnapshot().isProgramPadPressed(programPadIndex, program);
+                    return eventRegistry->getSnapshot().isProgramPadPressed(programPadIndex, program);
                 },
-                mpc.getSampler(),
-                mpc.getEventHandler(),
-                [&]{return mpc.clientEventController->isSixteenLevelsEnabled(); },
+                sampler,
+                eventHandler,
+                [&]{return isSixteenLevelsEnabled(); },
                 [&]{return getActiveTrackIndex(); },
                 [&]{return isRecording(); },
                 [&]{return isOverdubbing(); },
@@ -1292,7 +1345,7 @@ int Sequencer::getLoopEnd()
 
 std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
-    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
 
     if (songMode &&
         songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
@@ -1384,7 +1437,7 @@ void Sequencer::goToNextEvent()
 void Sequencer::goToPreviousStep()
 {
     auto timingCorrectScreen =
-        mpc.screens->get<ScreenId::TimingCorrectScreen>();
+        getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = getTickPosition();
@@ -1423,7 +1476,7 @@ void Sequencer::goToPreviousStep()
 void Sequencer::goToNextStep()
 {
     auto timingCorrectScreen =
-        mpc.screens->get<ScreenId::TimingCorrectScreen>();
+        getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = getTickPosition();
@@ -1560,12 +1613,12 @@ void Sequencer::setPosition(const double positionQuarterNotesToUse)
 
 void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
 {
-    if (mpc.getLayeredScreen()->getCurrentScreenName() != "song")
+    if (layeredScreen->getCurrentScreenName() != "song")
     {
         return;
     }
 
-    const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     const auto song = songs[songScreen->getActiveSongIndex()];
 
     uint32_t stepStartTick;
@@ -1651,12 +1704,12 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
 
 void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 {
-    if (mpc.getLayeredScreen()->getCurrentScreenName() != "song")
+    if (layeredScreen->getCurrentScreenName() != "song")
     {
         return;
     }
 
-    const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     const auto song = songs[songScreen->getActiveSongIndex()];
 
     uint32_t stepStartTick;
@@ -1775,7 +1828,7 @@ void Sequencer::move(const double positionQuarterNotesToUse)
     if (secondSequenceEnabled)
     {
         auto secondSequenceScreen =
-            mpc.screens->get<ScreenId::SecondSeqScreen>();
+            getScreens()->get<ScreenId::SecondSeqScreen>();
         sequences[secondSequenceScreen->sq]->resetTrackEventIndices(
             quarterNotesToTicks(positionQuarterNotes));
     }
@@ -1807,7 +1860,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
     if (songMode)
     {
-        auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+        auto songScreen = getScreens()->get<ScreenId::SongScreen>();
         auto song = songs[songScreen->getActiveSongIndex()];
 
         if (!song->isUsed())
@@ -1930,7 +1983,7 @@ void Sequencer::setSongModeEnabled(bool b)
 
 int Sequencer::getSongSequenceIndex()
 {
-    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     auto song = songs[songScreen->getActiveSongIndex()];
     auto step = songScreen->getOffset() + 1;
 
@@ -1972,7 +2025,7 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 
     undoSeqAvailable = true;
 
-    mpc.getHardware()
+    hardware
         ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(true);
 }
@@ -1981,7 +2034,7 @@ void Sequencer::resetUndo()
 {
     undoPlaceHolder.reset();
     undoSeqAvailable = false;
-    mpc.getHardware()
+    hardware
         ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(false);
 }
@@ -2014,7 +2067,7 @@ void Sequencer::playMetronomeTrack()
     }
 
     metronomeOnly = true;
-    mpc.getAudioMidiServices()->getFrameSequencer()->startMetronome();
+    frameSequencer->startMetronome();
 }
 
 void Sequencer::stopMetronomeTrack()
@@ -2025,7 +2078,7 @@ void Sequencer::stopMetronomeTrack()
     }
 
     metronomeOnly = false;
-    mpc.getAudioMidiServices()->getFrameSequencer()->stop();
+    frameSequencer->stop();
 }
 
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
@@ -2132,6 +2185,11 @@ std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex)
     auto result = std::dynamic_pointer_cast<DrumBus>(buses[drumBusIndex + 1]);
     assert(result);
     return result;
+}
+
+std::shared_ptr<FrameSeq> Sequencer::getFrameSequencer()
+{
+    return frameSequencer;
 }
 
 template std::shared_ptr<Bus> Sequencer::getBus(const int busIndex);

@@ -1,11 +1,12 @@
 #include "audiomidi/SoundRecorder.hpp"
 
+#include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 
 #include "lcdgui/screens/SampleScreen.hpp"
 #include "sampler/Sampler.hpp"
 
-#include <SampleOps.hpp>
+#include "SampleOps.hpp"
 
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;

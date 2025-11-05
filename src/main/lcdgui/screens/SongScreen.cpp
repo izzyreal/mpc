@@ -2,6 +2,7 @@
 
 #include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Song.hpp"
 

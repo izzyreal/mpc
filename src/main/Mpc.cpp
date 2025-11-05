@@ -1,9 +1,12 @@
-#include <mpc_fs.hpp>
-
 #include "Mpc.hpp"
+
+#include <mpc_fs.hpp>
 
 #include "DemoFiles.hpp"
 
+#include "controller/ClientHardwareEventController.hpp"
+#include "engine/MixerInterconnection.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "controller/ClientMidiEventController.hpp"
 #include "lcdgui/ScreenComponent.hpp"
@@ -37,11 +40,14 @@
 
 using namespace mpc;
 using namespace mpc::lcdgui;
+using namespace mpc::sampler;
+using namespace mpc::sequencer;
+using namespace mpc::hardware;
 
 Mpc::Mpc()
 {
-    paths = std::make_shared<mpc::Paths>();
-    clock = std::make_shared<mpc::sequencer::Clock>();
+    paths = std::make_shared<Paths>();
+    clock = std::make_shared<Clock>();
 }
 
 void Mpc::init()
@@ -102,28 +108,22 @@ void Mpc::init()
     mpc::Logger::l.setPath(paths->logFilePath().string());
 
     padAndButtonKeyboard =
-        std::make_shared<mpc::input::PadAndButtonKeyboard>(*this);
+        std::make_shared<input::PadAndButtonKeyboard>(*this);
 
-    diskController = std::make_unique<mpc::disk::DiskController>(*this);
+    diskController = std::make_unique<disk::DiskController>(*this);
 
     nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
 
-    sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
-    MLOG("Sequencer created");
-
-    hardware = std::make_shared<hardware::Hardware>();
-
-    sampler = std::make_shared<mpc::sampler::Sampler>(*this);
+    sampler = std::make_shared<Sampler>(*this);
     MLOG("Sampler created");
+
+    hardware = std::make_shared<Hardware>();
 
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
 
     layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
 
     screens = std::make_shared<Screens>(*this);
-    // We create all screens once so they're all cached in mpc::lcdgui::Screens,
-    // avoiding memory allocations and I/O on the audio thread.
-    screens->createAndCacheAllScreens();
 
     eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
@@ -139,6 +139,35 @@ void Mpc::init()
         std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 
     MLOG("AudioMidiServices created");
+
+    sequencer = std::make_shared<Sequencer>( 
+            layeredScreen,
+            [&] { return screens; },
+            &audioMidiServices->getVoices(),
+            [&] { return audioMidiServices->getAudioServer()->isRunning(); },
+            hardware,
+            [&] { return audioMidiServices->isBouncePrepared(); },
+            [&] { audioMidiServices->startBouncing(); },
+            [&] { audioMidiServices->stopBouncing(); },
+            [&] { return audioMidiServices->isBouncing(); },
+            [&] { return clientEventController->isEraseButtonPressed(); },
+            eventRegistry,
+            sampler,
+            eventHandler,
+            [&] { return clientEventController->isSixteenLevelsEnabled(); },
+            clock,
+            [&] { return audioMidiServices->getAudioServer()->getSampleRate(); },
+            [&] { return clientEventController->isRecMainWithoutPlaying(); },
+            [&] { return clientEventController->clientHardwareEventController->isNoteRepeatLockedOrPressed(); },
+            [&] { return audioMidiServices->getMixer(); },
+            [&] { return clientEventController->isFullLevelEnabled(); },
+            [&] () -> std::vector<mpc::engine::MixerInterconnection*>& { return audioMidiServices->getMixerConnections(); {}; }
+        );
+    MLOG("Sequencer created");
+
+    // We create all screens once so they're all cached in mpc::lcdgui::Screens,
+    // avoiding memory allocations and I/O on the audio thread.
+    screens->createAndCacheAllScreens();
 
     sequencer->init();
     MLOG("Sequencer initialized");

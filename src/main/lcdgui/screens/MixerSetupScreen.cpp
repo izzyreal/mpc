@@ -1,6 +1,8 @@
 #include "MixerSetupScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"

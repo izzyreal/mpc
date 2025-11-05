@@ -44,7 +44,7 @@ namespace mpc::sequencer
             Sequence *parent,
             std::function<std::string(int)> getDefaultTrackName,
             std::function<int64_t()> getTickPosition,
-            std::shared_ptr<lcdgui::Screens> screens,
+            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
             std::function<bool()> isRecordingModeMulti,
             std::function<std::shared_ptr<Sequence>()> getActiveSequence,
             std::function<int()> getAutoPunchMode,
@@ -166,7 +166,7 @@ namespace mpc::sequencer
         Sequence *parent{nullptr};
         std::function<std::string(int)> getDefaultTrackName;
         std::function<int64_t()> getTickPosition;
-        std::shared_ptr<lcdgui::Screens> screens;
+        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<bool()> isRecordingModeMulti;
         std::function<std::shared_ptr<Sequence>()> getActiveSequence;
         std::function<int()> getAutoPunchMode;

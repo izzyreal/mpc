@@ -10,6 +10,7 @@
 #include "disk/MpcFile.hpp"
 #include "lcdgui/Label.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;

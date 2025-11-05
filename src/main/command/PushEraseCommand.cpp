@@ -1,6 +1,7 @@
 #include "PushEraseCommand.hpp"
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 
 using namespace mpc::command;
 using namespace mpc::lcdgui;

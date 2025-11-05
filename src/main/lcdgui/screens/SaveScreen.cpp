@@ -7,6 +7,7 @@
 #include "StrUtil.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/window/SaveAllFileScreen.hpp"

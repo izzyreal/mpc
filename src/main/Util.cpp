@@ -5,6 +5,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc;

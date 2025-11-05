@@ -8,6 +8,7 @@
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/NoteEvent.hpp"

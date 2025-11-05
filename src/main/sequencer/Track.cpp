@@ -36,7 +36,7 @@ Track::Track(
             Sequence *parent,
             std::function<std::string(int)> getDefaultTrackName,
             std::function<int64_t()> getTickPosition,
-            std::shared_ptr<lcdgui::Screens> screens,
+            std::function<std::shared_ptr<Screens>()> getScreens,
             std::function<bool()> isRecordingModeMulti,
             std::function<std::shared_ptr<Sequence>()> getActiveSequence,
             std::function<int()> getAutoPunchMode,
@@ -59,7 +59,7 @@ Track::Track(
     parent(parent),
     getDefaultTrackName(getDefaultTrackName),
     getTickPosition(getTickPosition),
-    screens(screens),
+    getScreens(getScreens),
     isRecordingModeMulti(isRecordingModeMulti),
     getActiveSequence(getActiveSequence),
     getAutoPunchMode(getAutoPunchMode),
@@ -417,7 +417,7 @@ int Track::getCorrectedTickPos()
     auto correctedTickPos = -1;
 
     auto timingCorrectScreen =
-        screens->get<ScreenId::TimingCorrectScreen>();
+        getScreens()->get<ScreenId::TimingCorrectScreen>();
     auto swingPercentage = timingCorrectScreen->getSwing();
     auto noteValueLengthInTicks =
         timingCorrectScreen->getNoteValueLengthInTicks();
@@ -648,9 +648,9 @@ void Track::playNext()
                 isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen =
-                    screens->get<ScreenId::VmpcSettingsScreen>();
+                    getScreens()->get<ScreenId::VmpcSettingsScreen>();
                 auto assign16LevelsScreen =
-                    screens->get<ScreenId::Assign16LevelsScreen>();
+                    getScreens()->get<ScreenId::Assign16LevelsScreen>();
 
                 if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
                 {

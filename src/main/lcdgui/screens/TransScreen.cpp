@@ -6,6 +6,7 @@
 
 #include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens;

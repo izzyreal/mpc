@@ -19,6 +19,7 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 
+#include "sequencer/FrameSeq.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -78,7 +79,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
             durationTicks, mpc.getSequencer()->getTempo(),
             audioServer->getSampleRate());
 
-        const auto frameSeq = audioMidiServices->getFrameSequencer();
+        const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
         const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
 
         const uint64_t noteEventIdToUse = noteEventId++;
@@ -412,7 +413,7 @@ void EventHandler::handleMidiInputNoteOff(
         handleNoteEventMidiOut(noteOffEvent, track, trackDevice, std::nullopt);
     };
 
-    const auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+    const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
 
     frameSeq->enqueueEventAfterNFrames(noteOffMidiOutEvent,
                                        frameOffsetInBuffer);
@@ -519,7 +520,7 @@ void EventHandler::handleNoteEventMidiOut(
         //                 velocityToUse);
 
         const auto audioMidiServices = mpc.getAudioMidiServices();
-        const auto frameSeq = audioMidiServices->getFrameSequencer();
+        const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
         const auto audioServer = audioMidiServices->getAudioServer();
 
         if (noteOnEvent->isFinalized())

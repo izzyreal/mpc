@@ -1,5 +1,6 @@
 #include "LoadScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/SoundPlayer.hpp"

@@ -20,6 +20,7 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sound.hpp"
 
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 

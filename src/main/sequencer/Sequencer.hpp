@@ -1,33 +1,64 @@
 #pragma once
-#include <sequencer/Sequence.hpp>
 
 #include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
+#include <functional>
 
-namespace mpc::engine::midi
+namespace mpc::lcdgui
 {
-    class ShortMessage;
+    class LayeredScreen;
+    class Screens;
 }
 
-namespace mpc
+namespace mpc::engine
 {
-    class Mpc;
+    class Voice;
+    class MixerInterconnection;
+}
+
+namespace mpc::engine::audio::mixer
+{
+    class AudioMixer;
+}
+
+namespace mpc::hardware
+{
+    class Hardware;
+}
+
+namespace mpc::sampler
+{
+    class Sampler;
+}
+
+namespace mpc::audiomidi
+{
+    class EventHandler;
 }
 
 namespace mpc::sequencer
 {
+    class Sequence;
     class Bus;
     class DrumBus;
     class Song;
+    class Track;
+    class TempoChangeEvent;
+    class FrameSeq;
+    class Clock;
 } // namespace mpc::sequencer
+
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
 
 namespace mpc::sequencer
 {
     class Sequencer final
     {
-
     public:
         enum StopMode
         {
@@ -35,14 +66,37 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
+        Sequencer(
+            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::function<std::shared_ptr<lcdgui::Screens>()>,
+            std::vector<std::shared_ptr<engine::Voice>> *,
+            std::function<bool()> isAudioServerRunning,
+            std::shared_ptr<hardware::Hardware>,
+            std::function<bool()> isBouncePrepared,
+            std::function<void()> startBouncing,
+            std::function<void()> stopBouncing,
+            std::function<bool()> isBouncing,
+            std::function<bool()> isEraseButtonPressed,
+            std::shared_ptr<eventregistry::EventRegistry>,
+            std::shared_ptr<sampler::Sampler>,
+            std::shared_ptr<audiomidi::EventHandler>,
+            std::function<bool()> isSixteenLevelsEnabled,
+            std::shared_ptr<Clock> clock,
+            std::function<int()> getSampleRate,
+            std::function<bool()> isRecMainWithoutPlaying,
+            std::function<bool()> isNoteRepeatLockedOrPressed,
+            std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()> getAudioMixer,
+            std::function<bool()> isFullLevelEnabled,
+            std::function<std::vector<engine::MixerInterconnection*>&()> getMixerInterconnections
+        );
+
+
         static const uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(const double quarterNotes);
         static double ticksToQuarterNotes(const uint32_t ticks);
 
         int countInStartPos = -1;
         int countInEndPos = -1;
-        Sequencer(mpc::Mpc &mpc);
-
         void playToTick(int targetTick);
         int getActiveSequenceIndex();
         std::shared_ptr<Track> getActiveTrack();
@@ -57,9 +111,25 @@ namespace mpc::sequencer
 
         template <typename T> std::shared_ptr<T> getBus(const int busIndex);
         std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex);
+        std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 
     private:
-        mpc::Mpc &mpc;
+        std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
+        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
+        std::vector<std::shared_ptr<engine::Voice>> *voices;
+        std::shared_ptr<FrameSeq> frameSequencer;
+        std::function<bool()> isAudioServerRunning;
+        std::shared_ptr<hardware::Hardware> hardware;
+        std::function<bool()> isBouncePrepared;
+        std::function<void()> startBouncing;
+        std::function<void()> stopBouncing;
+        std::function<bool()> isBouncing;
+        std::function<bool()> isEraseButtonPressed;
+        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        std::shared_ptr<sampler::Sampler> sampler;
+        std::shared_ptr<audiomidi::EventHandler> eventHandler;
+        std::function<bool()> isSixteenLevelsEnabled;
+
         std::vector<std::shared_ptr<Bus>> buses;
         bool playing = false;
         int lastNotifiedBar = -1;

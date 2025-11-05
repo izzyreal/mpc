@@ -180,7 +180,7 @@ void ClientHardwareEventController::handlePadPress(
         Source::VirtualMpcHardware, layeredScreen, mpc.clientEventController,
         mpc.getHardware(), mpc.getSequencer(), mpc.screens, mpc.getSampler(),
         mpc.eventRegistry, mpc.getEventHandler(),
-        mpc.getAudioMidiServices()->getFrameSequencer(), &mpc.getBasicPlayer(),
+        mpc.getSequencer()->getFrameSequencer(), &mpc.getBasicPlayer(),
         programPadIndex, clampedVelocity, screen);
 
     const bool isF4Pressed =
@@ -264,7 +264,7 @@ void ClientHardwareEventController::handlePadRelease(
          sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
          frameSequencer =
-             mpc.getAudioMidiServices()->getFrameSequencer()](void *userData)
+             mpc.getSequencer()->getFrameSequencer()](void *userData)
     {
         auto p = (PhysicalPadPressEvent *)userData;
 

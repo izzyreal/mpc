@@ -1,6 +1,7 @@
 #include "TempoChangeScreen.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"

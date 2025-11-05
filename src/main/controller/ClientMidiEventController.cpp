@@ -12,6 +12,7 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 

@@ -1,6 +1,7 @@
 #include "LocateScreen.hpp"
 
 #include "StrUtil.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui;

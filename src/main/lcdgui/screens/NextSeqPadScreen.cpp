@@ -6,6 +6,7 @@
 #include "lcdgui/Label.hpp"
 
 #include "Mpc.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;

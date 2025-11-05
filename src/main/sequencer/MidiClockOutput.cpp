@@ -15,10 +15,10 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-MidiClockOutput::MidiClockOutput(std::shared_ptr<Sequencer> sequencer,
-                                 std::shared_ptr<SyncScreen> syncScreen,
+MidiClockOutput::MidiClockOutput(Sequencer *sequencer,
+                                 std::function<std::shared_ptr<Screens>()> getScreens,
                                  std::function<bool()> isBouncing)
-    : sequencer(sequencer), syncScreen(syncScreen), isBouncing(isBouncing)
+    : sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
 {
@@ -157,6 +157,7 @@ void MidiClockOutput::processEventsAfterNFrames()
 void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
                                    int frameIndex)
 {
+    /*
     lastProcessedFrameIsMidiClockLock = false;
 
     if (isBouncing())
@@ -199,6 +200,7 @@ void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
             wasRunning = false;
         }
     }
+    */
 }
 
 void MidiClockOutput::processSampleRateChange()

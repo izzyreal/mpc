@@ -2,6 +2,7 @@
 
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 
@@ -15,11 +16,13 @@
 #include "sampler/Pad.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
+#include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include <memory>
 
 #include "eventregistry/EventRegistry.hpp"
 #include "lcdgui/screens/window/EditMultipleScreen.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 

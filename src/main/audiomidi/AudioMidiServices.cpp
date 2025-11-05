@@ -4,7 +4,7 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "audiomidi/DirectToDiskSettings.hpp"
 #include "audiomidi/DiskRecorder.hpp"
 #include "audiomidi/MonitorInputAdapter.hpp"
@@ -30,6 +30,8 @@
 #include "engine/control/BooleanControl.hpp"
 
 #include "sampler/Sampler.hpp"
+#include "sequencer/FrameSeq.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 
@@ -61,51 +63,12 @@ AudioMidiServices::~AudioMidiServices()
 
 void AudioMidiServices::start()
 {
-
     server = std::make_shared<RealTimeAudioServer>();
     offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
     soundRecorder = std::make_shared<SoundRecorder>(mpc);
     soundPlayer = std::make_shared<SoundPlayer>();
 
     setupMixer();
-
-    frameSeq = std::make_shared<FrameSeq>(
-        mpc.eventRegistry, mpc.getSequencer(), mpc.getClock(),
-        mpc.getLayeredScreen(),
-        [this]
-        {
-            return isBouncing();
-        },
-        [this]
-        {
-            return getAudioServer()->getSampleRate();
-        },
-        [clientEventController = mpc.clientEventController]
-        {
-            return clientEventController->isRecMainWithoutPlaying();
-        },
-        [sampler = mpc.getSampler()](int velo, int frameOffset)
-        {
-            sampler->playMetronome(velo, frameOffset);
-        },
-        mpc.screens,
-        [clientEventController = mpc.clientEventController]
-        {
-            return clientEventController->clientHardwareEventController
-                ->isNoteRepeatLockedOrPressed();
-        },
-        mpc.getSampler(), getMixer(),
-        [clientEventController = mpc.clientEventController]
-        {
-            return clientEventController->isFullLevelEnabled();
-        },
-        [clientEventController = mpc.clientEventController]
-        {
-            return clientEventController->isSixteenLevelsEnabled();
-        },
-        mpc.getHardware()->getSlider(), &voices, mixerConnections);
-
-    frameSeq->setSampleRate(offlineServer->getSampleRate());
 
     createSynth();
 
@@ -134,7 +97,7 @@ void AudioMidiServices::start()
         ->setValue(static_cast<float>(100));
 
     cac = std::make_shared<CompoundAudioClient>();
-    cac->add(frameSeq.get());
+    cac->add(mpc.getSequencer()->getFrameSequencer().get());
     cac->add(mixer.get());
 
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
@@ -425,11 +388,6 @@ void AudioMidiServices::stopSoundRecorder(bool cancel)
     recordingSound.store(false);
 }
 
-std::shared_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
-{
-    return frameSeq;
-}
-
 bool AudioMidiServices::isBouncePrepared()
 {
     return bouncePrepared;
@@ -485,7 +443,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
             //            auto rate =
             //            rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
             //            frameSeq->setSampleRate(offlineServer->getSampleRate());
-            frameSeq->start();
+            mpc.getSequencer()->getFrameSequencer()->start();
 
             if (getAudioServer()->isRealTime())
             {
@@ -499,7 +457,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            frameSeq->start();
+            mpc.getSequencer()->getFrameSequencer()->start();
         }
 
         for (auto &diskRecorder : diskRecorders)

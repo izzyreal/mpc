@@ -7,6 +7,7 @@
 #include "lcdgui/screens/TrMuteScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 
 #include <memory>

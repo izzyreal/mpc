@@ -1,5 +1,6 @@
 #include "VmpcRecordJamScreen.hpp"
 
+#include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/DirectToDiskSettings.hpp"
 
@@ -16,7 +17,6 @@ VmpcRecordJamScreen::VmpcRecordJamScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void VmpcRecordJamScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:

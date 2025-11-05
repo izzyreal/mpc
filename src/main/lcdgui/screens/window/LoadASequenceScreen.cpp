@@ -7,6 +7,7 @@
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 

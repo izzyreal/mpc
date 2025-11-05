@@ -1,5 +1,7 @@
 #include "DirectoryScreen.hpp"
 
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 

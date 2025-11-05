@@ -7,6 +7,7 @@
 
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 
 #include "Util.hpp"
 

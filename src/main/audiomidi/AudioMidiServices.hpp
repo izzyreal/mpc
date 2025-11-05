@@ -1,14 +1,16 @@
 #pragma once
 
-#include <Mpc.hpp>
-#include <sequencer/FrameSeq.hpp>
-
-#include <engine/audio/mixer/AudioMixer.hpp>
+#include "engine/audio/mixer/AudioMixer.hpp"
 #include "engine/MixerInterconnection.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 
 #include <memory>
 #include <atomic>
+
+namespace mpc
+{
+    class Mpc;
+}
 
 namespace mpc::engine
 {
@@ -101,7 +103,6 @@ namespace mpc::audiomidi
         mpc::engine::audio::server::IOAudioProcess *inputProcess = nullptr;
         std::vector<mpc::engine::audio::server::IOAudioProcess *>
             outputProcesses;
-        std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
         std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
         std::shared_ptr<SoundRecorder> soundRecorder;
         std::shared_ptr<SoundPlayer> soundPlayer;
@@ -132,7 +133,6 @@ namespace mpc::audiomidi
         std::shared_ptr<MidiOutput> getMidiOutput();
         void destroyServices();
         bool prepareBouncing(DirectToDiskSettings *settings);
-        std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
         bool isBouncePrepared();
 
         std::shared_ptr<engine::audio::mixer::AudioMixer> getMixer();

@@ -48,7 +48,7 @@ namespace mpc::sequencer
         Sequence(
             std::function<std::string(int)> getDefaultTrackName,
             std::function<int64_t()> getTickPosition,
-            std::shared_ptr<lcdgui::Screens> screens,
+            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
             std::function<bool()> isRecordingModeMulti,
             std::function<std::shared_ptr<Sequence>()> getActiveSequence,
             std::function<int()> getAutoPunchMode,
@@ -152,7 +152,7 @@ namespace mpc::sequencer
         std::vector<int> oldNumerators = std::vector<int>(999);
         std::vector<int> oldDenominators = std::vector<int>(999);
 
-        std::shared_ptr<lcdgui::Screens> screens;
+        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<int()> getCurrentBarIndex;
 
         std::string name;

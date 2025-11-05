@@ -1,5 +1,6 @@
 #include "controller/ClientEventController.hpp"
 
+#include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
@@ -41,7 +42,7 @@ void ClientEventController::init()
         screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
         screens->get<ScreenId::MultiRecordingSetupScreen>(),
         screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
-        screens, mpc.getAudioMidiServices()->getFrameSequencer(),
+        screens, mpc.getSequencer()->getFrameSequencer(),
         &mpc.getBasicPlayer());
 }
 

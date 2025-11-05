@@ -7,6 +7,7 @@
 #include "sequencer/Event.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"

@@ -3,7 +3,6 @@
 #include "EventAfterNFrames.hpp"
 
 #include <sequencer/LegacyClock.hpp>
-#include "lcdgui/screens/SyncScreen.hpp"
 
 #include <memory>
 #include <functional>
@@ -15,12 +14,10 @@ namespace moodycamel
     template <typename T, typename Traits> class ConcurrentQueue;
 } // namespace moodycamel
 
-namespace mpc::lcdgui::screens::window
+namespace mpc::lcdgui
 {
-    class CountMetronomeScreen;
-
-    class TimingCorrectScreen;
-} // namespace mpc::lcdgui::screens::window
+    class Screens;
+}
 
 namespace mpc::sequencer
 {
@@ -32,8 +29,8 @@ namespace mpc::sequencer
     class MidiClockOutput
     {
     public:
-        explicit MidiClockOutput(std::shared_ptr<Sequencer>,
-                                 std::shared_ptr<SyncScreen>,
+        explicit MidiClockOutput(Sequencer *,
+                                 std::function<std::shared_ptr<lcdgui::Screens>()>,
                                  std::function<bool()> isBouncing);
 
         void processTempoChange();
@@ -53,8 +50,8 @@ namespace mpc::sequencer
         std::atomic_int32_t requestedSampleRate{44100};
         bool lastProcessedFrameIsMidiClockLock = false;
         LegacyClock clock;
-        std::shared_ptr<Sequencer> sequencer;
-        std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
+        Sequencer *sequencer;
+        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         std::function<bool()> isBouncing;
 
         // Has to be called exactly once for each frameIndex
