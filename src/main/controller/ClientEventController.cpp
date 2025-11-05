@@ -193,5 +193,3 @@ bool ClientEventController::isEraseButtonPressed() const
 {
     return hardware->getButton(ComponentId::ERASE)->isPressed();
 }
-
-

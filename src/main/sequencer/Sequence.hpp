@@ -24,7 +24,7 @@ namespace mpc::sampler
 {
     class Program;
     class Sampler;
-} 
+} // namespace mpc::sampler
 
 namespace mpc::audiomidi
 {
@@ -45,28 +45,28 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-        Sequence(
-            std::function<std::string(int)> getDefaultTrackName,
-            std::function<int64_t()> getTickPosition,
-            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
-            std::function<bool()> isRecordingModeMulti,
-            std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-            std::function<int()> getAutoPunchMode,
-            std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
-            std::function<bool()> isEraseButtonPressed,
-            std::function<bool(int programPadIndex, std::shared_ptr<sampler::Program>)> isProgramPadPressed,
-            std::shared_ptr<sampler::Sampler> sampler,
-            std::shared_ptr<audiomidi::EventHandler> eventHandler,
-            std::function<bool()> isSixteenLevelsEnabled,
-            std::function<int()> getActiveTrackIndex,
-            std::function<bool()> isRecording,
-            std::function<bool()> isOverdubbing,
-            std::function<bool()> isPunchEnabled,
-            std::function<int64_t()> getPunchInTime,
-            std::function<int64_t()> getPunchOutTime,
-            std::function<bool()> isSoloEnabled,
-            std::function<int()> getCurrentBarIndex
-            );
+        Sequence(std::function<std::string(int)> getDefaultTrackName,
+                 std::function<int64_t()> getTickPosition,
+                 std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
+                 std::function<bool()> isRecordingModeMulti,
+                 std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+                 std::function<int()> getAutoPunchMode,
+                 std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+                 std::function<bool()> isEraseButtonPressed,
+                 std::function<bool(int programPadIndex,
+                                    std::shared_ptr<sampler::Program>)>
+                     isProgramPadPressed,
+                 std::shared_ptr<sampler::Sampler> sampler,
+                 std::shared_ptr<audiomidi::EventHandler> eventHandler,
+                 std::function<bool()> isSixteenLevelsEnabled,
+                 std::function<int()> getActiveTrackIndex,
+                 std::function<bool()> isRecording,
+                 std::function<bool()> isOverdubbing,
+                 std::function<bool()> isPunchEnabled,
+                 std::function<int64_t()> getPunchInTime,
+                 std::function<int64_t()> getPunchOutTime,
+                 std::function<bool()> isSoloEnabled,
+                 std::function<int()> getCurrentBarIndex);
 
     public:
         double getInitialTempo();
@@ -165,6 +165,5 @@ namespace mpc::sequencer
         int firstLoopBarIndex = 0;
         int lastLoopBarIndex = 0;
         bool lastLoopBarEnd = true;
-
     };
 } // namespace mpc::sequencer

@@ -32,50 +32,38 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 Track::Track(
-            const int trackIndex,
-            Sequence *parent,
-            std::function<std::string(int)> getDefaultTrackName,
-            std::function<int64_t()> getTickPosition,
-            std::function<std::shared_ptr<Screens>()> getScreens,
-            std::function<bool()> isRecordingModeMulti,
-            std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-            std::function<int()> getAutoPunchMode,
-            std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
-            std::function<bool()> isEraseButtonPressed,
-            std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
-            std::shared_ptr<sampler::Sampler> sampler,
-            std::shared_ptr<audiomidi::EventHandler> eventHandler,
-            std::function<bool()> isSixteenLevelsEnabled,
-            std::function<int()> getActiveTrackIndex,
-            std::function<bool()> isRecording,
-            std::function<bool()> isOverdubbing,
-            std::function<bool()> isPunchEnabled,
-            std::function<int64_t()> getPunchInTime,
-            std::function<int64_t()> getPunchOutTime,
-            std::function<bool()> isSoloEnabled
-       )
-    :
-    trackIndex(trackIndex),
-    parent(parent),
-    getDefaultTrackName(getDefaultTrackName),
-    getTickPosition(getTickPosition),
-    getScreens(getScreens),
-    isRecordingModeMulti(isRecordingModeMulti),
-    getActiveSequence(getActiveSequence),
-    getAutoPunchMode(getAutoPunchMode),
-    getSequencerBus(getSequencerBus),
-    isEraseButtonPressed(isEraseButtonPressed),
-    isProgramPadPressed(isProgramPadPressed),
-    sampler(sampler),
-    eventHandler(eventHandler),
-    isSixteenLevelsEnabled(isSixteenLevelsEnabled),
-    getActiveTrackIndex(getActiveTrackIndex),
-    isRecording(isRecording),
-    isOverdubbing(isOverdubbing),
-    isPunchEnabled(isPunchEnabled),
-    getPunchInTime(getPunchInTime),
-    getPunchOutTime(getPunchOutTime),
-    isSoloEnabled(isSoloEnabled)
+    const int trackIndex, Sequence *parent,
+    std::function<std::string(int)> getDefaultTrackName,
+    std::function<int64_t()> getTickPosition,
+    std::function<std::shared_ptr<Screens>()> getScreens,
+    std::function<bool()> isRecordingModeMulti,
+    std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+    std::function<int()> getAutoPunchMode,
+    std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+    std::function<bool()> isEraseButtonPressed,
+    std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
+    std::shared_ptr<sampler::Sampler> sampler,
+    std::shared_ptr<audiomidi::EventHandler> eventHandler,
+    std::function<bool()> isSixteenLevelsEnabled,
+    std::function<int()> getActiveTrackIndex, std::function<bool()> isRecording,
+    std::function<bool()> isOverdubbing, std::function<bool()> isPunchEnabled,
+    std::function<int64_t()> getPunchInTime,
+    std::function<int64_t()> getPunchOutTime,
+    std::function<bool()> isSoloEnabled)
+    : trackIndex(trackIndex), parent(parent),
+      getDefaultTrackName(getDefaultTrackName),
+      getTickPosition(getTickPosition), getScreens(getScreens),
+      isRecordingModeMulti(isRecordingModeMulti),
+      getActiveSequence(getActiveSequence), getAutoPunchMode(getAutoPunchMode),
+      getSequencerBus(getSequencerBus),
+      isEraseButtonPressed(isEraseButtonPressed),
+      isProgramPadPressed(isProgramPadPressed), sampler(sampler),
+      eventHandler(eventHandler),
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
+      getActiveTrackIndex(getActiveTrackIndex), isRecording(isRecording),
+      isOverdubbing(isOverdubbing), isPunchEnabled(isPunchEnabled),
+      getPunchInTime(getPunchInTime), getPunchOutTime(getPunchOutTime),
+      isSoloEnabled(isSoloEnabled)
 {
     purge();
 }
@@ -578,33 +566,28 @@ void Track::playNext()
     }
 
     const auto recordingModeIsMulti = isRecordingModeMulti();
-    const auto isActiveTrackIndex =
-        trackIndex == getActiveTrackIndex();
+    const auto isActiveTrackIndex = trackIndex == getActiveTrackIndex();
     auto _delete = isRecording() &&
                    (isActiveTrackIndex || recordingModeIsMulti) &&
                    (trackIndex < 64);
 
-    if (isRecording() && isPunchEnabled() &&
-        trackIndex < 64)
+    if (isRecording() && isPunchEnabled() && trackIndex < 64)
     {
         auto pos = getTickPosition();
 
         _delete = false;
 
-        if (getAutoPunchMode() == 0 &&
-            pos >= getPunchInTime())
+        if (getAutoPunchMode() == 0 && pos >= getPunchInTime())
         {
             _delete = true;
         }
 
-        if (getAutoPunchMode() == 1 &&
-            pos < getPunchOutTime())
+        if (getAutoPunchMode() == 1 && pos < getPunchOutTime())
         {
             _delete = true;
         }
 
-        if (getAutoPunchMode() == 2 &&
-            pos >= getPunchInTime() &&
+        if (getAutoPunchMode() == 2 && pos >= getPunchInTime() &&
             pos < getPunchOutTime())
         {
             _delete = true;
@@ -617,9 +600,9 @@ void Track::playNext()
     {
         note->setTrack(trackIndex);
 
-        if (auto drumBus = std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busNumber)); drumBus &&
-            isOverdubbing() &&
-            isEraseButtonPressed() &&
+        if (auto drumBus =
+                std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busNumber));
+            drumBus && isOverdubbing() && isEraseButtonPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
         {
@@ -630,7 +613,8 @@ void Track::playNext()
             bool oneOrMorePadsArePressed = false;
             bool noteIsPressed = false;
 
-            for (int programPadIndex = 0; programPadIndex < 64; ++programPadIndex)
+            for (int programPadIndex = 0; programPadIndex < 64;
+                 ++programPadIndex)
             {
                 if (isProgramPadPressed(programPadIndex, program))
                 {
@@ -644,8 +628,7 @@ void Track::playNext()
                 }
             }
 
-            if (!_delete && oneOrMorePadsArePressed &&
-                isSixteenLevelsEnabled())
+            if (!_delete && oneOrMorePadsArePressed && isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen =
                     getScreens()->get<ScreenId::VmpcSettingsScreen>();
@@ -662,7 +645,8 @@ void Track::playNext()
                     auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
                     auto _16l_type = assign16LevelsScreen->getType();
 
-                    for (int programPadIndex = 0; programPadIndex < 64; ++programPadIndex)
+                    for (int programPadIndex = 0; programPadIndex < 64;
+                         ++programPadIndex)
                     {
                         if (!isProgramPadPressed(programPadIndex, program))
                         {
@@ -717,10 +701,9 @@ void Track::playNext()
 
     events[eventIndex]->dontDelete = false;
 
-    if (isOn() && (!isSoloEnabled() ||
-                   getActiveTrackIndex() == trackIndex))
+    if (isOn() && (!isSoloEnabled() || getActiveTrackIndex() == trackIndex))
     {
-      eventHandler->handleFinalizedEvent(event, this);
+        eventHandler->handleFinalizedEvent(event, this);
     }
 
     eventIndex++;

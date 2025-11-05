@@ -38,8 +38,7 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::hardware;
 
 FrameSeq::FrameSeq(
-    std::shared_ptr<EventRegistry> eventRegistry,
-    Sequencer *sequencer,
+    std::shared_ptr<EventRegistry> eventRegistry, Sequencer *sequencer,
     std::shared_ptr<Clock> clock, std::shared_ptr<LayeredScreen> layeredScreen,
     std::function<bool()> isBouncing, std::function<int()> getSampleRate,
     std::function<bool()> isRecMainWithoutPlaying,
@@ -53,11 +52,11 @@ FrameSeq::FrameSeq(
     std::function<bool()> isSixteenLevelsEnabled,
     std::shared_ptr<hardware::Slider> hardwareSlider,
     std::vector<std::shared_ptr<engine::Voice>> *voices,
-    std::function<std::vector<MixerInterconnection *> &()> getMixerInterconnections
-    )
+    std::function<std::vector<MixerInterconnection *> &()>
+        getMixerInterconnections)
     : eventRegistry(eventRegistry), sequencer(sequencer), clock(clock),
-      layeredScreen(layeredScreen), getScreens(getScreens), isBouncing(isBouncing),
-      getSampleRate(getSampleRate),
+      layeredScreen(layeredScreen), getScreens(getScreens),
+      isBouncing(isBouncing), getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       triggerMetronome(triggerMetronome),
       midiClockOutput(
@@ -154,7 +153,8 @@ void FrameSeq::triggerClickIfNeeded()
 
     const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
-    auto countMetronomeScreen = getScreens()->get<ScreenId::CountMetronomeScreen>();
+    auto countMetronomeScreen =
+        getScreens()->get<ScreenId::CountMetronomeScreen>();
 
     if (sequencer->isRecordingOrOverdubbing())
     {
@@ -412,7 +412,8 @@ void FrameSeq::processNoteRepeat()
         return;
     }
 
-    auto timingCorrectScreen = getScreens()->get<ScreenId::TimingCorrectScreen>();
+    auto timingCorrectScreen =
+        getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
     int swingPercentage = timingCorrectScreen->getSwing();
@@ -441,7 +442,8 @@ void FrameSeq::processNoteRepeat()
 
     if (shouldRepeatPad)
     {
-        auto assign16LevelsScreen = getScreens()->get<ScreenId::Assign16LevelsScreen>();
+        auto assign16LevelsScreen =
+            getScreens()->get<ScreenId::Assign16LevelsScreen>();
         auto mixerSetupScreen = getScreens()->get<ScreenId::MixerSetupScreen>();
 
         RepeatPad::process(

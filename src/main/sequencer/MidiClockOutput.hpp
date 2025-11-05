@@ -29,9 +29,9 @@ namespace mpc::sequencer
     class MidiClockOutput
     {
     public:
-        explicit MidiClockOutput(Sequencer *,
-                                 std::function<std::shared_ptr<lcdgui::Screens>()>,
-                                 std::function<bool()> isBouncing);
+        explicit MidiClockOutput(
+            Sequencer *, std::function<std::shared_ptr<lcdgui::Screens>()>,
+            std::function<bool()> isBouncing);
 
         void processTempoChange();
         void processSampleRateChange();

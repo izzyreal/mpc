@@ -257,14 +257,13 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    auto action =
-        [eventRegistry = mpc.eventRegistry,
-         previewSoundPlayer = &mpc.getBasicPlayer(),
-         eventHandler = mpc.getEventHandler(), screens = mpc.screens,
-         sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
-         clientEventController = mpc.clientEventController,
-         frameSequencer =
-             mpc.getSequencer()->getFrameSequencer()](void *userData)
+    auto action = [eventRegistry = mpc.eventRegistry,
+                   previewSoundPlayer = &mpc.getBasicPlayer(),
+                   eventHandler = mpc.getEventHandler(), screens = mpc.screens,
+                   sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
+                   clientEventController = mpc.clientEventController,
+                   frameSequencer =
+                       mpc.getSequencer()->getFrameSequencer()](void *userData)
     {
         auto p = (PhysicalPadPressEvent *)userData;
 

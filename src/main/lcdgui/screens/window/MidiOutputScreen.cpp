@@ -20,8 +20,8 @@ MidiOutputScreen::MidiOutputScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void MidiOutputScreen::open()
 {
-    if (ls->isPreviousScreenNot({ScreenId::NameScreen,
-                                ScreenId::MidiOutputMonitorScreen}))
+    if (ls->isPreviousScreenNot(
+            {ScreenId::NameScreen, ScreenId::MidiOutputMonitorScreen}))
     {
         auto track = sequencer->getActiveTrack();
         auto dev = track->getDeviceIndex();

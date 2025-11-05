@@ -70,7 +70,7 @@ bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
         return false;
     }
 
-    const auto& prev = history[history.size() - 2];
+    const auto &prev = history[history.size() - 2];
     auto id = getScreenId(prev);
 
     for (auto candidate : ids)
@@ -84,14 +84,15 @@ bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
     return false;
 }
 
-bool LayeredScreen::isPreviousScreenNot(std::initializer_list<ScreenId> ids) const
+bool LayeredScreen::isPreviousScreenNot(
+    std::initializer_list<ScreenId> ids) const
 {
     if (history.size() < 2)
     {
         return true;
     }
 
-    const auto& prev = history[history.size() - 2];
+    const auto &prev = history[history.size() - 2];
     auto id = getScreenId(prev);
 
     for (auto candidate : ids)
@@ -112,7 +113,7 @@ bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
         return false;
     }
 
-    const auto& curr = history.back();
+    const auto &curr = history.back();
     if (!curr)
     {
         return false;
@@ -131,7 +132,8 @@ bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
     return false;
 }
 
-void LayeredScreen::showPopupAndThenOpen(ScreenId targetId, const std::string &msg, int delayMs)
+void LayeredScreen::showPopupAndThenOpen(ScreenId targetId,
+                                         const std::string &msg, int delayMs)
 {
     setPopupScreenText(msg);
     openScreenById(ScreenId::PopupScreen);
@@ -139,8 +141,7 @@ void LayeredScreen::showPopupAndThenOpen(ScreenId targetId, const std::string &m
     std::thread(
         [this, targetId, delayMs]()
         {
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(delayMs));
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
             openScreenById(targetId);
         })
         .detach();
@@ -396,9 +397,8 @@ void LayeredScreen::openScreenInternal(
 
     mpc.getHardware()
         ->getLed(hardware::ComponentId::NEXT_SEQ_LED)
-        ->setEnabled(mpc.getLayeredScreen()
-                         ->isCurrentScreen({ScreenId::NextSeqScreen,
-                                           ScreenId::NextSeqScreen}));
+        ->setEnabled(mpc.getLayeredScreen()->isCurrentScreen(
+            {ScreenId::NextSeqScreen, ScreenId::NextSeqScreen}));
 
     mpc.getHardware()
         ->getLed(hardware::ComponentId::TRACK_MUTE_LED)

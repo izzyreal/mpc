@@ -30,7 +30,9 @@ getScreenIdByName(const std::string &name)
     for (auto &entry : screenNames)
     {
         if (name == entry.name)
+        {
             return entry.id;
+        }
     }
     return std::nullopt;
 }
@@ -39,4 +41,3 @@ inline bool isValidScreenName(const std::string &name)
 {
     return getScreenIdByName(name).has_value();
 }
-

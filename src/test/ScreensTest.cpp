@@ -69,7 +69,8 @@ SCENARIO("All screens can be opened", "[screens]")
 
             if (ls->getFocusedLayerIndex() == -1)
             {
-                bad.push_back(std::string(screenName) + " could not be opened.");
+                bad.push_back(std::string(screenName) +
+                              " could not be opened.");
                 continue;
             }
 

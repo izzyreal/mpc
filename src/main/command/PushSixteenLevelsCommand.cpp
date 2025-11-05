@@ -21,8 +21,8 @@ PushSixteenLevelsCommand::PushSixteenLevelsCommand(
 
 void PushSixteenLevelsCommand::execute()
 {
-    if (!layeredScreen->isCurrentScreen({ScreenId::SequencerScreen,
-                                        ScreenId::Assign16LevelsScreen}))
+    if (!layeredScreen->isCurrentScreen(
+            {ScreenId::SequencerScreen, ScreenId::Assign16LevelsScreen}))
     {
         return;
     }

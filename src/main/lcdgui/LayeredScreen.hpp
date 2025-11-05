@@ -69,14 +69,15 @@ namespace mpc::lcdgui
         std::shared_ptr<Layer> getFocusedLayer();
 
         void openScreenById(const ScreenId);
-        
+
         bool isPreviousScreen(std::initializer_list<ScreenId> ids) const;
 
         bool isPreviousScreenNot(std::initializer_list<ScreenId> ids) const;
 
         bool isCurrentScreen(std::initializer_list<ScreenId> ids) const;
 
-        void showPopupAndThenOpen(ScreenId targetId, const std::string &msg, int delayMs);
+        void showPopupAndThenOpen(ScreenId targetId, const std::string &msg,
+                                  int delayMs);
 
         bool isCurrentScreenPopupFor(ScreenId targetId) const;
 

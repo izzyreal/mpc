@@ -107,8 +107,7 @@ void Mpc::init()
 
     mpc::Logger::l.setPath(paths->logFilePath().string());
 
-    padAndButtonKeyboard =
-        std::make_shared<input::PadAndButtonKeyboard>(*this);
+    padAndButtonKeyboard = std::make_shared<input::PadAndButtonKeyboard>(*this);
 
     diskController = std::make_unique<disk::DiskController>(*this);
 
@@ -140,29 +139,70 @@ void Mpc::init()
 
     MLOG("AudioMidiServices created");
 
-    sequencer = std::make_shared<Sequencer>( 
-            layeredScreen,
-            [&] { return screens; },
-            &audioMidiServices->getVoices(),
-            [&] { return audioMidiServices->getAudioServer()->isRunning(); },
-            hardware,
-            [&] { return audioMidiServices->isBouncePrepared(); },
-            [&] { audioMidiServices->startBouncing(); },
-            [&] { audioMidiServices->stopBouncing(); },
-            [&] { return audioMidiServices->isBouncing(); },
-            [&] { return clientEventController->isEraseButtonPressed(); },
-            eventRegistry,
-            sampler,
-            eventHandler,
-            [&] { return clientEventController->isSixteenLevelsEnabled(); },
-            clock,
-            [&] { return audioMidiServices->getAudioServer()->getSampleRate(); },
-            [&] { return clientEventController->isRecMainWithoutPlaying(); },
-            [&] { return clientEventController->clientHardwareEventController->isNoteRepeatLockedOrPressed(); },
-            [&] { return audioMidiServices->getMixer(); },
-            [&] { return clientEventController->isFullLevelEnabled(); },
-            [&] () -> std::vector<mpc::engine::MixerInterconnection*>& { return audioMidiServices->getMixerConnections(); {}; }
-        );
+    sequencer = std::make_shared<Sequencer>(
+        layeredScreen,
+        [&]
+        {
+            return screens;
+        },
+        &audioMidiServices->getVoices(),
+        [&]
+        {
+            return audioMidiServices->getAudioServer()->isRunning();
+        },
+        hardware,
+        [&]
+        {
+            return audioMidiServices->isBouncePrepared();
+        },
+        [&]
+        {
+            audioMidiServices->startBouncing();
+        },
+        [&]
+        {
+            audioMidiServices->stopBouncing();
+        },
+        [&]
+        {
+            return audioMidiServices->isBouncing();
+        },
+        [&]
+        {
+            return clientEventController->isEraseButtonPressed();
+        },
+        eventRegistry, sampler, eventHandler,
+        [&]
+        {
+            return clientEventController->isSixteenLevelsEnabled();
+        },
+        clock,
+        [&]
+        {
+            return audioMidiServices->getAudioServer()->getSampleRate();
+        },
+        [&]
+        {
+            return clientEventController->isRecMainWithoutPlaying();
+        },
+        [&]
+        {
+            return clientEventController->clientHardwareEventController
+                ->isNoteRepeatLockedOrPressed();
+        },
+        [&]
+        {
+            return audioMidiServices->getMixer();
+        },
+        [&]
+        {
+            return clientEventController->isFullLevelEnabled();
+        },
+        [&]() -> std::vector<mpc::engine::MixerInterconnection *> &
+        {
+            return audioMidiServices->getMixerConnections();
+            {};
+        });
     MLOG("Sequencer created");
 
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,

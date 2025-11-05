@@ -35,8 +35,8 @@ void ReleaseFunctionCommand::execute()
             }
             break;
         case 4:
-            if (mpc.getLayeredScreen()
-                    ->isCurrentScreenPopupFor(ScreenId::LoadScreen))
+            if (mpc.getLayeredScreen()->isCurrentScreenPopupFor(
+                    ScreenId::LoadScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
@@ -62,8 +62,8 @@ void ReleaseFunctionCommand::execute()
 
                 sequencer->setSoloEnabled(sequencer->isSoloEnabled());
             }
-            else if (mpc.getLayeredScreen()
-                         ->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
+            else if (mpc.getLayeredScreen()->isCurrentScreenPopupFor(
+                         ScreenId::DirectoryScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::DirectoryScreen);

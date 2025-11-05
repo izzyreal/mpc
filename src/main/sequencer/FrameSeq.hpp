@@ -64,9 +64,8 @@ namespace mpc::sequencer
     {
     public:
         explicit FrameSeq(
-            std::shared_ptr<eventregistry::EventRegistry>,
-            Sequencer *, std::shared_ptr<Clock>,
-            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::shared_ptr<eventregistry::EventRegistry>, Sequencer *,
+            std::shared_ptr<Clock>, std::shared_ptr<lcdgui::LayeredScreen>,
             std::function<bool()> isBouncing,
             std::function<int()> getSampleRate,
             std::function<bool()> isRecMainWithoutPlaying,
@@ -79,7 +78,8 @@ namespace mpc::sequencer
             std::function<bool()> isSixteenLevelsEnabled,
             std::shared_ptr<hardware::Slider> hardwareSlider,
             std::vector<std::shared_ptr<engine::Voice>> *,
-            std::function<std::vector<mpc::engine::MixerInterconnection *> &()>);
+            std::function<
+                std::vector<mpc::engine::MixerInterconnection *> &()>);
 
         void work(int nFrames) override;
 
@@ -112,12 +112,14 @@ namespace mpc::sequencer
 
         // Required for note repeat (RepeatPad)
         std::shared_ptr<sampler::Sampler> sampler;
-        std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()> getAudioMixer;
+        std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>
+            getAudioMixer;
         std::function<bool()> isFullLevelEnabled;
         std::function<bool()> isSixteenLevelsEnabled;
         std::shared_ptr<hardware::Slider> hardwareSlider;
         std::vector<std::shared_ptr<engine::Voice>> *voices;
-        std::function<std::vector<engine::MixerInterconnection *> &()> getMixerInterconnections;
+        std::function<std::vector<engine::MixerInterconnection *> &()>
+            getMixerInterconnections;
 
         std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;

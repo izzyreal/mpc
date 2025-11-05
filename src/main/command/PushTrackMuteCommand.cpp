@@ -20,8 +20,8 @@ void PushTrackMuteCommand::execute()
 
     if (ls->isCurrentScreen({ScreenId::TrMuteScreen}))
     {
-        if (ls->isPreviousScreen({ScreenId::NextSeqScreen,
-                                 ScreenId::NextSeqPadScreen}))
+        if (ls->isPreviousScreen(
+                {ScreenId::NextSeqScreen, ScreenId::NextSeqPadScreen}))
         {
             ls->openScreenById(ScreenId::NextSeqScreen);
         }
@@ -35,8 +35,8 @@ void PushTrackMuteCommand::execute()
             ->setEnabled(false);
     }
     else if (ls->isCurrentScreen({ScreenId::NextSeqScreen,
-                                 ScreenId::NextSeqPadScreen,
-                                 ScreenId::SequencerScreen}) &&
+                                  ScreenId::NextSeqPadScreen,
+                                  ScreenId::SequencerScreen}) &&
              !mpc.getSequencer()->isRecordingOrOverdubbing())
     {
         Util::initSequence(mpc);

@@ -10,13 +10,13 @@ namespace mpc::lcdgui
 {
     class LayeredScreen;
     class Screens;
-}
+} // namespace mpc::lcdgui
 
 namespace mpc::engine
 {
     class Voice;
     class MixerInterconnection;
-}
+} // namespace mpc::engine
 
 namespace mpc::engine::audio::mixer
 {
@@ -81,15 +81,14 @@ namespace mpc::sequencer
             std::shared_ptr<sampler::Sampler>,
             std::shared_ptr<audiomidi::EventHandler>,
             std::function<bool()> isSixteenLevelsEnabled,
-            std::shared_ptr<Clock> clock,
-            std::function<int()> getSampleRate,
+            std::shared_ptr<Clock> clock, std::function<int()> getSampleRate,
             std::function<bool()> isRecMainWithoutPlaying,
             std::function<bool()> isNoteRepeatLockedOrPressed,
-            std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()> getAudioMixer,
+            std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>
+                getAudioMixer,
             std::function<bool()> isFullLevelEnabled,
-            std::function<std::vector<engine::MixerInterconnection*>&()> getMixerInterconnections
-        );
-
+            std::function<std::vector<engine::MixerInterconnection *> &()>
+                getMixerInterconnections);
 
         static const uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(const double quarterNotes);

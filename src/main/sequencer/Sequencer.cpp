@@ -58,66 +58,46 @@ uint64_t currentTimeMillis()
         .count();
 }
 
-Sequencer::Sequencer(
-        std::shared_ptr<LayeredScreen> layeredScreen,
-        std::function<std::shared_ptr<Screens>()> getScreens,
-        std::vector<std::shared_ptr<Voice>> *voices,
-        std::function<bool()> isAudioServerRunning,
-        std::shared_ptr<hardware::Hardware> hardware,
-        std::function<bool()> isBouncePrepared,
-        std::function<void()> startBouncing,
-        std::function<void()> stopBouncing,
-        std::function<bool()> isBouncing,
-        std::function<bool()> isEraseButtonPressed,
-        std::shared_ptr<EventRegistry> eventRegistry,
-        std::shared_ptr<Sampler> sampler,
-        std::shared_ptr<EventHandler> eventHandler,
-        std::function<bool()> isSixteenLevelsEnabled,
-        std::shared_ptr<Clock> clock,
-        std::function<int()> getSampleRate,
-        std::function<bool()> isRecMainWithoutPlaying,
-        std::function<bool()> isNoteRepeatLockedOrPressed,
-        std::function<std::shared_ptr<AudioMixer>()> getAudioMixer,
-        std::function<bool()> isFullLevelEnabled,
-        std::function<std::vector<MixerInterconnection *>&()> getMixerInterconnections
-    )
-:
-    layeredScreen(layeredScreen),
-    getScreens(getScreens),
-    voices(voices),
-    isAudioServerRunning(isAudioServerRunning),
-    hardware(hardware),
-    isBouncePrepared(isBouncePrepared),
-    startBouncing(startBouncing),
-    stopBouncing(stopBouncing),
-    isBouncing(isBouncing),
-    isEraseButtonPressed(isEraseButtonPressed),
-    eventRegistry(eventRegistry),
-    sampler(sampler),
-    eventHandler(eventHandler),
-    isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
+                     std::function<std::shared_ptr<Screens>()> getScreens,
+                     std::vector<std::shared_ptr<Voice>> *voices,
+                     std::function<bool()> isAudioServerRunning,
+                     std::shared_ptr<hardware::Hardware> hardware,
+                     std::function<bool()> isBouncePrepared,
+                     std::function<void()> startBouncing,
+                     std::function<void()> stopBouncing,
+                     std::function<bool()> isBouncing,
+                     std::function<bool()> isEraseButtonPressed,
+                     std::shared_ptr<EventRegistry> eventRegistry,
+                     std::shared_ptr<Sampler> sampler,
+                     std::shared_ptr<EventHandler> eventHandler,
+                     std::function<bool()> isSixteenLevelsEnabled,
+                     std::shared_ptr<Clock> clock,
+                     std::function<int()> getSampleRate,
+                     std::function<bool()> isRecMainWithoutPlaying,
+                     std::function<bool()> isNoteRepeatLockedOrPressed,
+                     std::function<std::shared_ptr<AudioMixer>()> getAudioMixer,
+                     std::function<bool()> isFullLevelEnabled,
+                     std::function<std::vector<MixerInterconnection *> &()>
+                         getMixerInterconnections)
+    : layeredScreen(layeredScreen), getScreens(getScreens), voices(voices),
+      isAudioServerRunning(isAudioServerRunning), hardware(hardware),
+      isBouncePrepared(isBouncePrepared), startBouncing(startBouncing),
+      stopBouncing(stopBouncing), isBouncing(isBouncing),
+      isEraseButtonPressed(isEraseButtonPressed), eventRegistry(eventRegistry),
+      sampler(sampler), eventHandler(eventHandler),
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     frameSequencer = std::make_shared<FrameSeq>(
-        eventRegistry,
-        this,
-        clock,
-        layeredScreen,
-        isBouncing,
-        getSampleRate,
+        eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
         isRecMainWithoutPlaying,
         [sampler](int velo, int frameOffset)
         {
             sampler->playMetronome(velo, frameOffset);
         },
-        getScreens,
-        isNoteRepeatLockedOrPressed,
-        sampler,
-        getAudioMixer,
-        isFullLevelEnabled,
-        isSixteenLevelsEnabled,
-        hardware->getSlider(),
-        voices,
-        getMixerInterconnections);
+        getScreens, isNoteRepeatLockedOrPressed, sampler, getAudioMixer,
+        isFullLevelEnabled, isSixteenLevelsEnabled, hardware->getSlider(),
+        voices, getMixerInterconnections);
 }
 
 void Sequencer::init()
@@ -613,8 +593,7 @@ void Sequencer::play(bool fromStart)
             auto copy = copySequence(s);
             undoPlaceHolder.swap(copy);
             undoSeqAvailable = true;
-            hardware
-                ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+            hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
                 ->setEnabled(true);
         }
     }
@@ -652,8 +631,7 @@ void Sequencer::undoSeq()
 
     undoSeqAvailable = !undoSeqAvailable;
 
-    hardware
-        ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+    hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
 }
 
@@ -720,12 +698,8 @@ void Sequencer::switchRecordToOverdub()
 
     recording = false;
     overdubbing = true;
-    hardware
-        ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(false);
-    hardware
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(true);
+    hardware->getLed(hardware::ComponentId::REC_LED)->setEnabled(false);
+    hardware->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(true);
 }
 
 void Sequencer::overdubFromStart()
@@ -775,10 +749,9 @@ void Sequencer::stop(const StopMode stopMode)
         pos = s1->getLastTick();
     }
 
-    const int frameOffset =
-        stopMode == AT_START_OF_BUFFER
-            ? 0
-            : frameSequencer->getEventFrameOffset();
+    const int frameOffset = stopMode == AT_START_OF_BUFFER
+                                ? 0
+                                : frameSequencer->getEventFrameOffset();
 
     frameSequencer->stop();
 
@@ -821,15 +794,9 @@ void Sequencer::stop(const StopMode stopMode)
         stopBouncing();
     }
 
-    hardware
-        ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(false);
-    hardware
-        ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(false);
-    hardware
-        ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(false);
+    hardware->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(false);
+    hardware->getLed(hardware::ComponentId::REC_LED)->setEnabled(false);
+    hardware->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(false);
 }
 
 bool Sequencer::isCountingIn()
@@ -868,30 +835,77 @@ void Sequencer::purgeAllSequences()
 std::shared_ptr<Sequence> Sequencer::makeNewSequence()
 {
     return std::make_shared<Sequence>(
-            [&](int trackIndex) { return defaultTrackNames[trackIndex]; },
-                [&]{return getTickPosition();},
-                getScreens,
-                [&]{ return isRecordingModeMulti(); },
-                [&]{ return getActiveSequence(); },
-                [&]{ return getAutoPunchMode(); },
-                [&](int busIndex) { return getBus<Bus>(busIndex); },
-                [&]{ return isEraseButtonPressed(); },
-                [&](int programPadIndex, std::shared_ptr<sampler::Program> program)
-                {
-                    return eventRegistry->getSnapshot().isProgramPadPressed(programPadIndex, program);
-                },
-                sampler,
-                eventHandler,
-                [&]{return isSixteenLevelsEnabled(); },
-                [&]{return getActiveTrackIndex(); },
-                [&]{return isRecording(); },
-                [&]{return isOverdubbing(); },
-                [&]{return isPunchEnabled(); },
-                [&]{return getPunchInTime(); },
-                [&]{return getPunchOutTime(); },
-                [&]{return isSoloEnabled(); },
-                [&]{return getCurrentBarIndex(); }
-        );
+        [&](int trackIndex)
+        {
+            return defaultTrackNames[trackIndex];
+        },
+        [&]
+        {
+            return getTickPosition();
+        },
+        getScreens,
+        [&]
+        {
+            return isRecordingModeMulti();
+        },
+        [&]
+        {
+            return getActiveSequence();
+        },
+        [&]
+        {
+            return getAutoPunchMode();
+        },
+        [&](int busIndex)
+        {
+            return getBus<Bus>(busIndex);
+        },
+        [&]
+        {
+            return isEraseButtonPressed();
+        },
+        [&](int programPadIndex, std::shared_ptr<sampler::Program> program)
+        {
+            return eventRegistry->getSnapshot().isProgramPadPressed(
+                programPadIndex, program);
+        },
+        sampler, eventHandler,
+        [&]
+        {
+            return isSixteenLevelsEnabled();
+        },
+        [&]
+        {
+            return getActiveTrackIndex();
+        },
+        [&]
+        {
+            return isRecording();
+        },
+        [&]
+        {
+            return isOverdubbing();
+        },
+        [&]
+        {
+            return isPunchEnabled();
+        },
+        [&]
+        {
+            return getPunchInTime();
+        },
+        [&]
+        {
+            return getPunchOutTime();
+        },
+        [&]
+        {
+            return isSoloEnabled();
+        },
+        [&]
+        {
+            return getCurrentBarIndex();
+        });
 }
 
 void Sequencer::purgeSequence(int i)
@@ -934,7 +948,8 @@ Sequencer::copySequence(std::shared_ptr<Sequence> source)
 
     for (auto &event : source->getTempoChangeTrack()->getEvents())
     {
-        copy->getTempoChangeTrack()->cloneEventIntoTrack(event, event->getTick());
+        copy->getTempoChangeTrack()->cloneEventIntoTrack(event,
+                                                         event->getTick());
     }
 
     return copy;
@@ -2025,8 +2040,7 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 
     undoSeqAvailable = true;
 
-    hardware
-        ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+    hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(true);
 }
 
@@ -2034,8 +2048,7 @@ void Sequencer::resetUndo()
 {
     undoPlaceHolder.reset();
     undoSeqAvailable = false;
-    hardware
-        ->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+    hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(false);
 }
 

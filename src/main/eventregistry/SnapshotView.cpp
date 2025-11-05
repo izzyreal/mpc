@@ -3,7 +3,8 @@
 using namespace mpc;
 using namespace mpc::eventregistry;
 
-bool SnapshotView::isProgramPadPressed(ProgramPadIndex idx, std::shared_ptr<sampler::Program> program) const
+bool SnapshotView::isProgramPadPressed(
+    ProgramPadIndex idx, std::shared_ptr<sampler::Program> program) const
 {
     for (auto &e : snap->programPadEvents)
     {

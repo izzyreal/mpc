@@ -15,9 +15,9 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-MidiClockOutput::MidiClockOutput(Sequencer *sequencer,
-                                 std::function<std::shared_ptr<Screens>()> getScreens,
-                                 std::function<bool()> isBouncing)
+MidiClockOutput::MidiClockOutput(
+    Sequencer *sequencer, std::function<std::shared_ptr<Screens>()> getScreens,
+    std::function<bool()> isBouncing)
     : sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())

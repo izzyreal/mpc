@@ -16,36 +16,44 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 Sequence::Sequence(
-            std::function<std::string(int)> getDefaultTrackName,
-            std::function<int64_t()> getTickPosition,
-            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
-            std::function<bool()> isRecordingModeMulti,
-            std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-            std::function<int()> getAutoPunchMode,
-            std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
-            std::function<bool()> isEraseButtonPressed,
-            std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
-            std::shared_ptr<sampler::Sampler> sampler,
-            std::shared_ptr<audiomidi::EventHandler> eventHandler,
-            std::function<bool()> isSixteenLevelsEnabled,
-            std::function<int()> getActiveTrackIndex,
-            std::function<bool()> isRecording,
-            std::function<bool()> isOverdubbing,
-            std::function<bool()> isPunchEnabled,
-            std::function<int64_t()> getPunchInTime,
-            std::function<int64_t()> getPunchOutTime,
-            std::function<bool()> isSoloEnabled,
-            std::function<int()> getCurrentBarIndex
-        )
-    : getScreens(getScreens),
-    getCurrentBarIndex(getCurrentBarIndex)
+    std::function<std::string(int)> getDefaultTrackName,
+    std::function<int64_t()> getTickPosition,
+    std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
+    std::function<bool()> isRecordingModeMulti,
+    std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+    std::function<int()> getAutoPunchMode,
+    std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+    std::function<bool()> isEraseButtonPressed,
+    std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
+    std::shared_ptr<sampler::Sampler> sampler,
+    std::shared_ptr<audiomidi::EventHandler> eventHandler,
+    std::function<bool()> isSixteenLevelsEnabled,
+    std::function<int()> getActiveTrackIndex, std::function<bool()> isRecording,
+    std::function<bool()> isOverdubbing, std::function<bool()> isPunchEnabled,
+    std::function<int64_t()> getPunchInTime,
+    std::function<int64_t()> getPunchOutTime,
+    std::function<bool()> isSoloEnabled,
+    std::function<int()> getCurrentBarIndex)
+    : getScreens(getScreens), getCurrentBarIndex(getCurrentBarIndex)
 {
     for (int trackIndex = 0; trackIndex < 64; ++trackIndex)
     {
-        tracks.emplace_back(std::make_shared<Track>(trackIndex, this, getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getSequencerBus, isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled));
+        tracks.emplace_back(std::make_shared<Track>(
+            trackIndex, this, getDefaultTrackName, getTickPosition, getScreens,
+            isRecordingModeMulti, getActiveSequence, getAutoPunchMode,
+            getSequencerBus, isEraseButtonPressed, isProgramPadPressed, sampler,
+            eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex,
+            isRecording, isOverdubbing, isPunchEnabled, getPunchInTime,
+            getPunchOutTime, isSoloEnabled));
     }
 
-    tempoChangeTrack = std::make_shared<Track>(64, this, getDefaultTrackName, getTickPosition, getScreens, isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getSequencerBus, isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled);
+    tempoChangeTrack = std::make_shared<Track>(
+        64, this, getDefaultTrackName, getTickPosition, getScreens,
+        isRecordingModeMulti, getActiveSequence, getAutoPunchMode,
+        getSequencerBus, isEraseButtonPressed, isProgramPadPressed, sampler,
+        eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
+        isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
+        isSoloEnabled);
     tempoChangeTrack->setUsed(true);
 
     tracks.push_back(tempoChangeTrack);
@@ -746,4 +754,3 @@ std::shared_ptr<Track> Sequence::getTempoChangeTrack()
 {
     return tempoChangeTrack;
 }
-
