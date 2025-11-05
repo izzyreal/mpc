@@ -17,7 +17,7 @@ ChangeBars2Screen::ChangeBars2Screen(mpc::Mpc &mpc, const int layerIndex)
 
 void ChangeBars2Screen::open()
 {
-    setNewBars(sequencer->getActiveSequence()->getLastBarIndex());
+    setNewBars(std::max(sequencer->getActiveSequence()->getLastBarIndex(), 0));
     displayCurrent();
     displayNewBars();
 }
@@ -79,17 +79,17 @@ void ChangeBars2Screen::displayNewBars()
     findField("newbars")->setText(
         StrUtil::padLeft(std::to_string(newBars + 1), " ", 3));
 
-    if (newBars == seq->getLastBarIndex())
+    if (newBars == std::max(seq->getLastBarIndex(), 0))
     {
         message0->setText("");
         message1->setText("");
     }
-    else if (newBars > seq->getLastBarIndex())
+    else if (newBars > std::max(seq->getLastBarIndex(), 0))
     {
         message0->setText("Pressing DO IT will add");
         message1->setText("blank bars after last bar.");
     }
-    else if (newBars < seq->getLastBarIndex())
+    else if (newBars < std::max(seq->getLastBarIndex(), 0))
     {
         message0->setText("Pressing DO IT will truncate");
         message1->setText("bars after last bar.");
