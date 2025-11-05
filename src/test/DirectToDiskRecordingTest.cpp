@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "TestMpc.hpp"
+#include "lcdgui/ScreenComponent.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Clock.hpp"
 #include "sequencer/Track.hpp"
