@@ -23,7 +23,7 @@ StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void StereoToMonoScreen::open()
 {
-    if (ls->isPreviousScreenNot<ScreenId::NameScreen, ScreenId::PopupScreen>())
+    if (ls->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         updateNewNames();
         ls->setFocus("stereosource");

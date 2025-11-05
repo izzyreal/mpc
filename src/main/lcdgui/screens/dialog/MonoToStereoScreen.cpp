@@ -27,7 +27,7 @@ MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc &mpc, const int layerIndex)
 void MonoToStereoScreen::open()
 {
     if (sampler->getSound() &&
-        ls->isPreviousScreenNot<ScreenId::NameScreen, ScreenId::PopupScreen>())
+        ls->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         auto name = sampler->getSound()->getName();
         name = StrUtil::trim(name);
@@ -36,7 +36,7 @@ void MonoToStereoScreen::open()
         newStName = name + "-S";
     }
 
-    if (ls->isPreviousScreenNot<ScreenId::NameScreen, ScreenId::PopupScreen>())
+    if (ls->isPreviousScreenNot({ScreenId::NameScreen, ScreenId::PopupScreen}))
     {
         ls->setFocus("lsource");
     }

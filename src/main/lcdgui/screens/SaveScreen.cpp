@@ -32,7 +32,7 @@ void SaveScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->isPreviousScreenNot<ScreenId::PopupScreen>())
+    if (ls->isPreviousScreenNot({ScreenId::PopupScreen}))
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }

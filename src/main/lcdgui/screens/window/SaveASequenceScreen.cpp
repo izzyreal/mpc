@@ -22,7 +22,7 @@ SaveASequenceScreen::SaveASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveASequenceScreen::open()
 {
-    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
+    if (ls->isPreviousScreen({ScreenId::SaveScreen}))
     {
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->setNameToEdit(sequencer->getActiveSequence()->getName());

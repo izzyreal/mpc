@@ -21,7 +21,7 @@ SaveASoundScreen::SaveASoundScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SaveASoundScreen::open()
 {
-    if (ls->isPreviousScreen<ScreenId::SaveScreen>())
+    if (ls->isPreviousScreen({ScreenId::SaveScreen}))
     {
         auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->setNameToEdit(sampler->getSound()->getName());

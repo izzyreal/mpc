@@ -4,6 +4,7 @@
 #include "lcdgui/ScreenComponent.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Clock.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"

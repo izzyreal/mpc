@@ -60,7 +60,7 @@ TriggerLocalNoteContextFactory::buildTriggerDrumNoteOnContext(
     const std::shared_ptr<ScreenComponent> screen)
 {
     const bool isSequencerScreen =
-        layeredScreen->isCurrentScreen<ScreenId::SequencerScreen>();
+        layeredScreen->isCurrentScreen({ScreenId::SequencerScreen});
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =

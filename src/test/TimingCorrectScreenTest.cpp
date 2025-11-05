@@ -2,6 +2,7 @@
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sequencer/NoteEvent.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "TestMpc.hpp"

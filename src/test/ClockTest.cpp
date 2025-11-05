@@ -7,6 +7,7 @@
 #include "audiomidi/AudioMidiServices.hpp"
 
 #include "lcdgui/screens/SyncScreen.hpp"
+#include "sequencer/Sequence.hpp"
 
 #include <cmrc/cmrc.hpp>
 #include <string_view>
@@ -338,7 +339,7 @@ TEST_CASE("1 bar loop", "[clock]")
         mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100,
                                               120, timeInSamples);
 
-        auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+        auto frameSeq = mpc.getSequencer()->getFrameSequencer();
         frameSeq->work(blockSizes[i]);
         auto &ticksForCurrentBuffer =
             mpc.getClock()->getTicksForCurrentBuffer();

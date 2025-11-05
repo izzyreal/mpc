@@ -565,7 +565,7 @@ TEST_CASE("Loop To fine window", "[sound]")
     mpc.getScreen()->openWindow(); // Open Start fine window
 
     REQUIRE(
-        mpc.getLayeredScreen()->isCurrentScreen<ScreenId::StartFineScreen>());
+        mpc.getLayeredScreen()->isCurrentScreen({ScreenId::StartFineScreen}));
 
     mpc.getScreen()->down();       // Move to Smpl Length: field
     mpc.getScreen()->turnWheel(1); // Set Smpl Length to FIXed
@@ -573,13 +573,13 @@ TEST_CASE("Loop To fine window", "[sound]")
     mpc.getScreen()->function(
         1); // Open LOOP screen, and we should be back at the To: field
 
-    REQUIRE(mpc.getLayeredScreen()->isCurrentScreen<ScreenId::LoopScreen>());
+    REQUIRE(mpc.getLayeredScreen()->isCurrentScreen({ScreenId::LoopScreen}));
     REQUIRE(mpc.getLayeredScreen()->getFocusedFieldName() == "to");
 
     mpc.getScreen()->openWindow(); // Open Loop To fine window, we should be
                                    // back at the Lngth: field
     REQUIRE(
-        mpc.getLayeredScreen()->isCurrentScreen<ScreenId::LoopToFineScreen>());
+        mpc.getLayeredScreen()->isCurrentScreen({ScreenId::LoopToFineScreen}));
     REQUIRE(mpc.getLayeredScreen()->getFocusedFieldName() == "lngth");
     mpc.getScreen()->turnWheel(1); // Add 1 to the length
 

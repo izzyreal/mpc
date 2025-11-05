@@ -1,17 +1,14 @@
 #pragma once
 
 #include <memory>
-#include <thread>
 #include <vector>
 #include <string>
 #include <map>
 #include <deque>
 
 #include "lcdgui/ScreenId.hpp"
-
-#include "BMFParser.hpp"
-
-#include "BasicStructs.hpp"
+#include "lcdgui/BasicStructs.hpp"
+#include "lcdgui/BMFStructs.hpp"
 
 namespace mpc
 {
@@ -72,76 +69,16 @@ namespace mpc::lcdgui
         std::shared_ptr<Layer> getFocusedLayer();
 
         void openScreenById(const ScreenId);
+        
+        bool isPreviousScreen(std::initializer_list<ScreenId> ids) const;
 
-        template <ScreenId... Ids> bool isPreviousScreen() const
-        {
-            if (history.size() < 2)
-            {
-                return false;
-            }
+        bool isPreviousScreenNot(std::initializer_list<ScreenId> ids) const;
 
-            const auto &prev = history[history.size() - 2];
-            auto id = getScreenId(prev);
-            return ((id == Ids) || ...);
-        }
+        bool isCurrentScreen(std::initializer_list<ScreenId> ids) const;
 
-        template <ScreenId... Ids> bool isPreviousScreenNot() const
-        {
-            if (history.size() < 2)
-            {
-                return true;
-            }
+        void showPopupAndThenOpen(ScreenId targetId, const std::string &msg, int delayMs);
 
-            const auto &prev = history[history.size() - 2];
-            auto id = getScreenId(prev);
-            return ((id != Ids) && ...);
-        }
-
-        template <ScreenId... Ids> bool isCurrentScreen() const
-        {
-            if (history.empty())
-            {
-                return false;
-            }
-            auto curr = history.back();
-            if (!curr)
-            {
-                return false;
-            }
-
-            auto id = getScreenId(curr);
-            return ((id == Ids) || ...);
-        }
-
-        template <ScreenId targetId>
-        void showPopupAndThenOpen(const std::string &msg, int delayMs)
-        {
-            setPopupScreenText(msg);
-            openScreenById(ScreenId::PopupScreen);
-
-            std::thread(
-                [this, delayMs]()
-                {
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(delayMs));
-                    openScreenById(targetId);
-                })
-                .detach();
-        }
-
-        template <ScreenId targetId> bool isCurrentScreenPopupFor() const
-        {
-            if (history.size() < 2)
-            {
-                return false;
-            }
-
-            auto curr = history.back();
-            auto prev = history[history.size() - 2];
-
-            return getScreenId(curr) == ScreenId::PopupScreen &&
-                   getScreenId(prev) == targetId;
-        }
+        bool isCurrentScreenPopupFor(ScreenId targetId) const;
 
         void openScreen(const std::string screenName);
 

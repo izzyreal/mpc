@@ -26,7 +26,7 @@ PushFullLevelCommand::PushFullLevelCommand(
 
 void PushFullLevelCommand::execute()
 {
-    if (layeredScreen->isCurrentScreen<ScreenId::NameScreen>())
+    if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}))
     {
         padAndButtonKeyboard->pressHardwareComponent(
             ComponentId::FULL_LEVEL_OR_CASE_SWITCH);

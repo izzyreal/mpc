@@ -22,21 +22,21 @@ void ReleaseFunctionCommand::execute()
     switch (i)
     {
         case 0:
-            if (ls->isCurrentScreen<ScreenId::StepTcScreen>())
+            if (ls->isCurrentScreen({ScreenId::StepTcScreen}))
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::StepEditorScreen);
             }
             break;
         case 2:
-            if (ls->isCurrentScreen<ScreenId::LoadASoundScreen>())
+            if (ls->isCurrentScreen({ScreenId::LoadASoundScreen}))
             {
                 mpc.getSampler()->finishBasicVoice();
             }
             break;
         case 4:
             if (mpc.getLayeredScreen()
-                    ->isCurrentScreenPopupFor<ScreenId::LoadScreen>())
+                    ->isCurrentScreenPopupFor(ScreenId::LoadScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
                 mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
@@ -48,12 +48,12 @@ void ReleaseFunctionCommand::execute()
             auto sampler = mpc.getSampler();
 
             if (!sequencer->isPlaying() &&
-                !ls->isCurrentScreen<ScreenId::SequencerScreen>())
+                !ls->isCurrentScreen({ScreenId::SequencerScreen}))
             {
                 sampler->finishBasicVoice();
             }
 
-            if (ls->isCurrentScreen<ScreenId::TrMuteScreen>())
+            if (ls->isCurrentScreen({ScreenId::TrMuteScreen}))
             {
                 if (!sequencer->isSoloEnabled())
                 {
@@ -63,7 +63,7 @@ void ReleaseFunctionCommand::execute()
                 sequencer->setSoloEnabled(sequencer->isSoloEnabled());
             }
             else if (mpc.getLayeredScreen()
-                         ->isCurrentScreenPopupFor<ScreenId::DirectoryScreen>())
+                         ->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::DirectoryScreen);

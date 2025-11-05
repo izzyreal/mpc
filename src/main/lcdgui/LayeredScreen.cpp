@@ -1,10 +1,11 @@
 #include "lcdgui/LayeredScreen.hpp"
 
+#include "lcdgui/BMFParser.hpp"
 #include "lcdgui/ScreenGroups.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/AllScreens.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "Field.hpp"
 #include "Component.hpp"
@@ -14,18 +15,18 @@
 
 #include "lcdgui/Layer.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "Util.hpp"
-
-#include <cmath>
-#include <memory>
-#include <set>
-#include <stdexcept>
 
 #include "MpcResourceUtil.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
+
+#include <cmath>
+#include <memory>
+#include <set>
+#include <stdexcept>
 
 #if __linux__
 #include <climits>
@@ -101,6 +102,103 @@ LayeredScreen::LayeredScreen(mpc::Mpc &mpc) : mpc(mpc)
         layers.push_back(layer);
         root->addChild(layer);
     }
+}
+
+bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
+{
+    if (history.size() < 2)
+    {
+        return false;
+    }
+
+    const auto& prev = history[history.size() - 2];
+    auto id = getScreenId(prev);
+
+    for (auto candidate : ids)
+    {
+        if (id == candidate)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool LayeredScreen::isPreviousScreenNot(std::initializer_list<ScreenId> ids) const
+{
+    if (history.size() < 2)
+    {
+        return true;
+    }
+
+    const auto& prev = history[history.size() - 2];
+    auto id = getScreenId(prev);
+
+    for (auto candidate : ids)
+    {
+        if (id == candidate)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
+{
+    if (history.empty())
+    {
+        return false;
+    }
+
+    const auto& curr = history.back();
+    if (!curr)
+    {
+        return false;
+    }
+
+    auto id = getScreenId(curr);
+
+    for (auto candidate : ids)
+    {
+        if (id == candidate)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void LayeredScreen::showPopupAndThenOpen(ScreenId targetId, const std::string &msg, int delayMs)
+{
+    setPopupScreenText(msg);
+    openScreenById(ScreenId::PopupScreen);
+
+    std::thread(
+        [this, targetId, delayMs]()
+        {
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(delayMs));
+            openScreenById(targetId);
+        })
+        .detach();
+}
+
+bool LayeredScreen::isCurrentScreenPopupFor(ScreenId targetId) const
+{
+    if (history.size() < 2)
+    {
+        return false;
+    }
+
+    auto curr = history.back();
+    auto prev = history[history.size() - 2];
+
+    return getScreenId(curr) == ScreenId::PopupScreen &&
+           getScreenId(prev) == targetId;
 }
 
 ScreenId
@@ -251,18 +349,18 @@ void LayeredScreen::openScreenInternal(
 
     if (!history.empty())
     {
-        if (isCurrentScreen<ScreenId::SongScreen>() &&
+        if (isCurrentScreen({ScreenId::SongScreen}) &&
             mpc.getSequencer()->isPlaying())
         {
             return;
         }
-        else if (isCurrentScreen<ScreenId::SampleScreen>())
+        else if (isCurrentScreen({ScreenId::SampleScreen}))
         {
             ams->muteMonitor(true);
             ams->getSoundRecorder()->setSampleScreenActive(false);
         }
-        else if (isCurrentScreen<ScreenId::EraseScreen>() ||
-                 isCurrentScreen<ScreenId::TimingCorrectScreen>())
+        else if (isCurrentScreen({ScreenId::EraseScreen}) ||
+                 isCurrentScreen({ScreenId::TimingCorrectScreen}))
         {
             // This field may not be visible the next time we visit this screen.
             // Like the real 2KXL we always set focus to the first Notes: field
@@ -340,13 +438,13 @@ void LayeredScreen::openScreenInternal(
     mpc.getHardware()
         ->getLed(hardware::ComponentId::NEXT_SEQ_LED)
         ->setEnabled(mpc.getLayeredScreen()
-                         ->isCurrentScreen<ScreenId::NextSeqScreen,
-                                           ScreenId::NextSeqScreen>());
+                         ->isCurrentScreen({ScreenId::NextSeqScreen,
+                                           ScreenId::NextSeqScreen}));
 
     mpc.getHardware()
         ->getLed(hardware::ComponentId::TRACK_MUTE_LED)
         ->setEnabled(
-            mpc.getLayeredScreen()->isCurrentScreen<ScreenId::TrMuteScreen>());
+            mpc.getLayeredScreen()->isCurrentScreen({ScreenId::TrMuteScreen}));
 
     if (!screengroups::isNextSeqScreen(newScreen) ||
         (std::dynamic_pointer_cast<SequencerScreen>(newScreen) &&

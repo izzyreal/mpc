@@ -150,7 +150,7 @@ void FrameSeq::triggerClickIfNeeded()
     }
 
     const bool isStepEditor =
-        layeredScreen->isCurrentScreen<ScreenId::StepEditorScreen>();
+        layeredScreen->isCurrentScreen({ScreenId::StepEditorScreen});
 
     const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
@@ -402,7 +402,7 @@ bool FrameSeq::processSeqLoopDisabled()
 
 void FrameSeq::processNoteRepeat()
 {
-    if (!layeredScreen->isCurrentScreen<ScreenId::SequencerScreen>())
+    if (!layeredScreen->isCurrentScreen({ScreenId::SequencerScreen}))
     {
         return;
     }

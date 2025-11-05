@@ -374,7 +374,7 @@ void EventHandler::handleMidiInputNoteOn(
     }
 
     const bool isSequencerScreen =
-        mpc.getLayeredScreen()->isCurrentScreen<ScreenId::SequencerScreen>();
+        mpc.getLayeredScreen()->isCurrentScreen({ScreenId::SequencerScreen});
 
     const bool isNoteRepeatLockedOrPressed =
         mpc.clientEventController->clientHardwareEventController

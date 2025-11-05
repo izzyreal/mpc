@@ -158,7 +158,7 @@ void StepEditorScreen::open()
 
     const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
-    if (ls->isPreviousScreen<ScreenId::InsertEventScreen>())
+    if (ls->isPreviousScreen({ScreenId::InsertEventScreen}))
     {
         auto insertEventScreen =
             mpc.screens->get<ScreenId::InsertEventScreen>();
@@ -184,9 +184,9 @@ void StepEditorScreen::open()
 
     const auto visibleEvents = computeVisibleEvents(eventsAtCurrentTick);
 
-    if (ls->isPreviousScreenNot<
+    if (ls->isPreviousScreenNot({
             ScreenId::StepTcScreen, ScreenId::InsertEventScreen,
-            ScreenId::PasteEventScreen, ScreenId::EditMultipleScreen>())
+            ScreenId::PasteEventScreen, ScreenId::EditMultipleScreen}))
     {
         auto eventType = visibleEvents[0]->getTypeName();
         ls->setFocus(lastColumn[eventType] + "0");

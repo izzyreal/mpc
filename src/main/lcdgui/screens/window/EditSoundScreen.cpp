@@ -44,22 +44,22 @@ void EditSoundScreen::open()
 {
     findField("create-new-program")->setAlignment(Alignment::Centered);
 
-    if (ls->isPreviousScreenNot<ScreenId::NameScreen>() && sampler->getSound())
+    if (ls->isPreviousScreenNot({ScreenId::NameScreen}) && sampler->getSound())
     {
         auto newSoundName = sampler->getSound()->getName();
         newSoundName = sampler->addOrIncreaseNumber(newSoundName);
         setNewName(newSoundName);
     }
 
-    if (ls->isPreviousScreen<ScreenId::ZoneScreen>())
+    if (ls->isPreviousScreen({ScreenId::ZoneScreen}))
     {
         setEdit(9);
     }
-    else if (ls->isPreviousScreen<ScreenId::LoopScreen>())
+    else if (ls->isPreviousScreen({ScreenId::LoopScreen}))
     {
         setEdit(1);
     }
-    else if (ls->isPreviousScreenNot<ScreenId::NameScreen>())
+    else if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
     {
         setEdit(0);
     }

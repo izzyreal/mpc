@@ -121,7 +121,7 @@ void ClientHardwareEventController::handlePadPress(
 
     auto layeredScreen = mpc.getLayeredScreen();
 
-    if (layeredScreen->isCurrentScreen<ScreenId::NameScreen>() &&
+    if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}) &&
         event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         return;
@@ -211,12 +211,12 @@ void ClientHardwareEventController::handlePadPress(
 
     std::function<void(void *)> action = [](void *) {};
 
-    if (layeredScreen->isCurrentScreen<ScreenId::PopupScreen>())
+    if (layeredScreen->isCurrentScreen({ScreenId::PopupScreen}))
     {
         layeredScreen->closeCurrentScreen();
     }
 
-    if (layeredScreen->isCurrentScreen<ScreenId::NameScreen>())
+    if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}))
     {
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
             event.componentId);
@@ -244,7 +244,7 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    if (mpc.getLayeredScreen()->isCurrentScreen<ScreenId::NameScreen>() &&
+    if (mpc.getLayeredScreen()->isCurrentScreen({ScreenId::NameScreen}) &&
         event.source == ClientHardwareEvent::Source::HostInputKeyboard)
     {
         return;

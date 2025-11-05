@@ -62,7 +62,7 @@ void EventsScreen::open()
     }
 
     auto previousScreenWasSequencer =
-        ls->isPreviousScreen<ScreenId::SequencerScreen>();
+        ls->isPreviousScreen({ScreenId::SequencerScreen});
     auto seq = sequencer->getActiveSequence();
 
     if (previousScreenWasSequencer)

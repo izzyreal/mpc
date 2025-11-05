@@ -62,7 +62,7 @@ ClientMidiEventController::ClientMidiEventController(
 void ClientMidiEventController::handleClientMidiEvent(const ClientMidiEvent &e)
 {
     if (clientEventController->getLayeredScreen()
-            ->isCurrentScreen<ScreenId::MidiInputMonitorScreen>())
+            ->isCurrentScreen({ScreenId::MidiInputMonitorScreen}))
     {
         const auto notificationMessage =
             std::string("a") + std::to_string(e.getChannel());
@@ -388,9 +388,9 @@ void ClientMidiEventController::handleProgramChange(const ClientMidiEvent &e)
                     sequencer->getSequence(e.getProgramNumber())->isUsed())
                 {
                     if (clientEventController->getLayeredScreen()
-                            ->isCurrentScreen<ScreenId::NextSeqScreen,
+                            ->isCurrentScreen({ScreenId::NextSeqScreen,
                                               ScreenId::NextSeqPadScreen,
-                                              ScreenId::SequencerScreen>())
+                                              ScreenId::SequencerScreen}))
                     {
                         sequencer->setNextSq(e.getProgramNumber());
                     }

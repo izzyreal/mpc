@@ -3,6 +3,7 @@
 #include "TestMpc.hpp"
 #include "Mpc.hpp"
 #include "file/all/SequenceNames.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"

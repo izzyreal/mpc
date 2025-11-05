@@ -15,6 +15,7 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 
 #include "hardware/Component.hpp"

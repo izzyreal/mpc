@@ -15,7 +15,7 @@ ResampleScreen::ResampleScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void ResampleScreen::open()
 {
-    if (ls->isPreviousScreenNot<ScreenId::NameScreen>() && sampler->getSound())
+    if (ls->isPreviousScreenNot({ScreenId::NameScreen}) && sampler->getSound())
     {
         newName = sampler->getSound()->getName();
         newName = sampler->addOrIncreaseNumber(newName);

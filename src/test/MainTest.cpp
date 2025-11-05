@@ -4,10 +4,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
 
-#include <string>
-
 using namespace mpc;
-using namespace std;
 
 TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 {
@@ -37,8 +34,8 @@ SCENARIO("A Sequence initializes correctly", "[sequence]")
     {
         Mpc mpc;
         mpc::TestMpc::initializeTestMpc(mpc);
-        mpc::sequencer::Sequence seq(mpc);
-        seq.init(1);
-        REQUIRE(seq.getInitialTempo() == 120.0);
+        auto seq = mpc.getSequencer()->makeNewSequence();
+        seq->init(1);
+        REQUIRE(seq->getInitialTempo() == 120.0);
     }
 }

@@ -9,14 +9,14 @@ PushNextSeqCommand::PushNextSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 void PushNextSeqCommand::execute()
 {
     if (mpc.getLayeredScreen()
-            ->isCurrentScreen<ScreenId::NextSeqScreen,
-                              ScreenId::NextSeqPadScreen>())
+            ->isCurrentScreen({ScreenId::NextSeqScreen,
+                              ScreenId::NextSeqPadScreen}))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }
     else if (mpc.getLayeredScreen()
-                 ->isCurrentScreen<ScreenId::SequencerScreen,
-                                   ScreenId::TrMuteScreen>())
+                 ->isCurrentScreen({ScreenId::SequencerScreen,
+                                   ScreenId::TrMuteScreen}))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::NextSeqScreen);
     }

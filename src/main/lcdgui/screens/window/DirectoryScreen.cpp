@@ -189,7 +189,7 @@ void DirectoryScreen::function(int f)
                         msg = "Folder name exists !!";
                     }
 
-                    ls->showPopupAndThenOpen<ScreenId::NameScreen>(msg, 1000);
+                    ls->showPopupAndThenOpen(ScreenId::NameScreen, msg, 1000);
                     return;
                 }
 

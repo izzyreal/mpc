@@ -33,7 +33,7 @@ void LoadScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    if (ls->isPreviousScreenNot<ScreenId::PopupScreen>())
+    if (ls->isPreviousScreenNot({ScreenId::PopupScreen}))
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
@@ -504,7 +504,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         const auto ext = path.extension().string();
         const std::string msg =
             "LOADING " + StrUtil::padRight(name, " ", 16) + ext;
-        ls->showPopupAndThenOpen<ScreenId::LoadASoundScreen>(msg, 300);
+        ls->showPopupAndThenOpen(ScreenId::LoadASoundScreen, msg, 300);
         return;
     }
 
