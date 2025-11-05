@@ -2,9 +2,7 @@
 
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
-#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/ScreenGroups.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
@@ -13,18 +11,15 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
-#include "sampler/Pad.hpp"
-#include "sampler/Sampler.hpp"
-#include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
-#include "sequencer/SeqUtil.hpp"
-#include <memory>
-
-#include "eventregistry/EventRegistry.hpp"
-#include "lcdgui/screens/window/EditMultipleScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SeqUtil.hpp"
+#include "sequencer/NoteEvent.hpp"
+
+#include "eventregistry/EventRegistry.hpp"
 
 using namespace mpc::command::context;
 using namespace mpc::controller;
@@ -34,33 +29,26 @@ using namespace mpc::hardware;
 using namespace mpc::sampler;
 using namespace mpc::eventregistry;
 using namespace mpc::audiomidi;
-using namespace mpc::engine;
-
-int getDrumIndexForCurrentScreen(std::shared_ptr<Sequencer> sequencer,
-                                 const std::shared_ptr<ScreenComponent> screen,
-                                 std::shared_ptr<Screens> screens)
-{
-    const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
-    const int result = isSamplerScreen
-                           ? screens->get<ScreenId::DrumScreen>()->getDrum()
-                           : sequencer->getActiveTrack()->getBus() - 1;
-    return result;
-}
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-    eventregistry::Source source, std::shared_ptr<LayeredScreen> layeredScreen,
-    std::shared_ptr<ClientEventController> controller,
-    std::shared_ptr<Hardware> hardware, std::shared_ptr<Sequencer> sequencer,
-    std::shared_ptr<Screens> screens, std::shared_ptr<Sampler> sampler,
-    std::shared_ptr<EventRegistry> eventRegistry,
-    std::shared_ptr<EventHandler> eventHandler,
-    std::shared_ptr<FrameSeq> frameSequencer,
-    PreviewSoundPlayer *previewSoundPlayer, int programPadIndex, int velocity,
-    const std::shared_ptr<ScreenComponent> screen)
+    eventregistry::Source source,
+    eventregistry::NoteOnEvent *registryNoteOnEvent, const int note,
+    const int velocity, sequencer::Track *track,
+    std::shared_ptr<sequencer::Bus> bus,
+    const std::shared_ptr<lcdgui::ScreenComponent> screen,
+    std::optional<int> programPadIndex,
+    std::shared_ptr<sampler::Program> program,
+    std::shared_ptr<sequencer::Sequencer> sequencer,
+    std::shared_ptr<sequencer::FrameSeq> frameSequencer,
+    std::shared_ptr<eventregistry::EventRegistry> eventRegistry,
+    std::shared_ptr<controller::ClientEventController> controller,
+    std::shared_ptr<audiomidi::EventHandler> eventHandler,
+    std::shared_ptr<lcdgui::Screens> screens,
+    std::shared_ptr<hardware::Hardware> hardware)
 {
     const bool isSequencerScreen =
-        layeredScreen->isCurrentScreen({ScreenId::SequencerScreen});
+        std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
@@ -85,33 +73,25 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     auto timingCorrectScreen = screens->get<ScreenId::TimingCorrectScreen>();
     auto assign16LevelsScreen = screens->get<ScreenId::Assign16LevelsScreen>();
 
-    auto track = sequencer->getActiveTrack().get();
-
-    const int drumIndex =
-        getDrumIndexForCurrentScreen(sequencer, screen, screens);
-    const auto drumBus = sequencer->getDrumBus(drumIndex);
-    std::shared_ptr<sampler::Program> program =
-        drumIndex >= 0 ? sampler->getProgram(drumBus->getProgram()) : nullptr;
-
     std::function<void(int)> setSelectedNote = [controller](int n)
     {
         controller->setSelectedNote(n);
     };
+
     std::function<void(int)> setSelectedPad = [controller](int p)
     {
         controller->setSelectedPad(p);
     };
 
     const auto hardwareSliderValue = hardware->getSlider()->getValueAs<int>();
+
     const int drumScreenSelectedDrum =
         screens->get<ScreenId::DrumScreen>()->getDrum();
-    const auto note = track->getBus() > 0
-                          ? program->getPad(programPadIndex)->getNote()
-                          : programPadIndex + 35;
 
     return std::make_shared<TriggerLocalNoteOnContext>(
         TriggerLocalNoteOnContext{source,
                                   eventRegistry,
+                                  registryNoteOnEvent,
                                   isSequencerScreen,
                                   programPadIndex,
                                   velocity,
@@ -123,45 +103,38 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                                   isStepRecording,
                                   isRecMainWithoutPlaying,
                                   sequencer->isRecordingOrOverdubbing(),
-                                  track->getBus(),
+                                  bus,
                                   program,
                                   note,
                                   drumScreenSelectedDrum,
                                   isSamplerScreen,
                                   track,
-                                  sampler,
                                   sequencer,
                                   timingCorrectScreen,
                                   assign16LevelsScreen,
                                   eventHandler,
                                   frameSequencer,
-                                  previewSoundPlayer,
                                   allowCentralNoteAndPadUpdate,
                                   screen,
                                   setSelectedNote,
                                   setSelectedPad,
-                                  layeredScreen->getFocusedFieldName(),
                                   hardwareSliderValue});
 }
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-    eventregistry::Source source, PreviewSoundPlayer *previewSoundPlayer,
+    eventregistry::Source source, const int note, Track *track,
+    std::shared_ptr<sequencer::Bus> bus,
+    const std::shared_ptr<ScreenComponent> screen,
+    std::optional<int> programPadIndex,
+    std::shared_ptr<sampler::Program> program,
+    std::shared_ptr<Sequencer> sequencer,
+    std::shared_ptr<FrameSeq> frameSequencer,
     std::shared_ptr<EventRegistry> eventRegistry,
-    std::shared_ptr<EventHandler> eventHandler,
-    std::shared_ptr<Screens> screens, std::shared_ptr<Sequencer> sequencer,
-    std::shared_ptr<Hardware> hardware,
     std::shared_ptr<ClientEventController> controller,
-    std::shared_ptr<FrameSeq> frameSequencer, const int programPadIndex,
-    int drumIndex, const std::shared_ptr<ScreenComponent> screen,
-    const int note, std::shared_ptr<sampler::Program> program, Track *track)
+    std::shared_ptr<EventHandler> eventHandler,
+    std::shared_ptr<Screens> screens, std::shared_ptr<Hardware> hardware)
 {
-    std::function<void()> finishBasicVoiceIfSoundIsLooping =
-        [previewSoundPlayer]()
-    {
-        previewSoundPlayer->finishVoiceIfSoundIsLooping();
-    };
-
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
     const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
@@ -199,21 +172,16 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             screen->getName(), hardware->getButton(hardware::ComponentId::REC),
             controller->clientHardwareEventController);
 
-    std::shared_ptr<sequencer::DrumBus> drumBus =
-        sequencer->getDrumBus(drumIndex);
-
     return std::make_shared<TriggerLocalNoteOffContext>(
         TriggerLocalNoteOffContext{
             source,
             eventRegistry,
-            drumBus,
+            bus,
             program,
             programPadIndex,
-            finishBasicVoiceIfSoundIsLooping,
             isSoundScreen,
             isSamplerScreen,
             std::make_shared<sequencer::NoteOffEvent>(note),
-            drumIndex,
             eventHandler,
             sequencerRecordNoteOnEvent,
             sequencer->isRecordingOrOverdubbing(),

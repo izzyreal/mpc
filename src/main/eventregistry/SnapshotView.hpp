@@ -33,6 +33,8 @@ namespace mpc::eventregistry
 
         int getTotalPressedProgramPadCount() const;
 
+        int getTotalNoteOnCount() const;
+
         NoteOnEventPtr retrievePlayNoteEvent(NoteNumber note) const;
         std::shared_ptr<sequencer::NoteOnEvent>
         retrieveRecordNoteEvent(NoteNumber note) const;

@@ -138,6 +138,21 @@ std::optional<int> ScreenComponent::getDrumIndex()
     return std::nullopt;
 }
 
+std::shared_ptr<mpc::sequencer::Bus> ScreenComponent::getBus()
+{
+    if (auto drumIndex = getDrumIndex(); drumIndex)
+    {
+        return sequencer->getDrumBus(*drumIndex);
+    }
+
+    // We should check if the real MPC2000XL records notes while we're
+    // in one of the sampler screens (PGM ASSIGN, PGM PARAMS, etc.),
+    // or the MIXER screens, because in those screens, we've explicitly
+    // selected a DRUM bus to work with. It might still record to the
+    // active track, but I'm not sure.
+    return sequencer->getBus<MidiBus>(0);
+}
+
 std::shared_ptr<DrumBus> ScreenComponent::getActiveDrumBus()
 {
     const auto drumIndex = getDrumIndex();
@@ -181,6 +196,18 @@ std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow()
 std::string ScreenComponent::getFocusedFieldNameOrThrow()
 {
     return getFocusedFieldOrThrow()->getName();
+}
+
+bool ScreenComponent::isFocusedFieldName(const std::string fieldName)
+{
+    auto f = getFocusedField();
+
+    if (!f)
+    {
+        return false;
+    }
+
+    return f->getName() == fieldName;
 }
 
 std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram()

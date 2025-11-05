@@ -84,6 +84,20 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
          {
              return visibleEventsEqual(a, b);
          }});
+
+    addReactiveBinding({[&]
+                        {
+                            return sequencer->getTickPosition();
+                        },
+                        [&](auto)
+                        {
+                            findField("now0")->setTextPadded(
+                                sequencer->getCurrentBarIndex() + 1, "0");
+                            findField("now1")->setTextPadded(
+                                sequencer->getCurrentBeatIndex() + 1, "0");
+                            findField("now2")->setTextPadded(
+                                sequencer->getCurrentClockNumber(), "0");
+                        }});
 }
 
 bool StepEditorScreen::visibleEventsEqual(

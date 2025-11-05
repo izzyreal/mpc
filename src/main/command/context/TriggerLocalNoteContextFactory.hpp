@@ -12,11 +12,6 @@ namespace mpc::sequencer
     class FrameSeq;
 } // namespace mpc::sequencer
 
-namespace mpc::sampler
-{
-    class Sampler;
-}
-
 namespace mpc::eventregistry
 {
     class EventRegistry;
@@ -25,11 +20,6 @@ namespace mpc::eventregistry
 namespace mpc::audiomidi
 {
     class EventHandler;
-}
-
-namespace mpc::engine
-{
-    class PreviewSoundPlayer;
 }
 
 namespace mpc::hardware
@@ -44,7 +34,6 @@ namespace mpc::controller
 
 namespace mpc::lcdgui
 {
-    class LayeredScreen;
     class ScreenComponent;
     class Screens;
 } // namespace mpc::lcdgui
@@ -56,29 +45,34 @@ namespace mpc::command::context
     public:
         static std::shared_ptr<TriggerLocalNoteOnContext>
         buildTriggerLocalNoteOnContext(
-            eventregistry::Source, std::shared_ptr<lcdgui::LayeredScreen>,
-            std::shared_ptr<controller::ClientEventController>,
-            std::shared_ptr<hardware::Hardware>,
+            eventregistry::Source,
+            eventregistry::NoteOnEvent *registryNoteOnEvent, const int note,
+            const int velocity, sequencer::Track *,
+            std::shared_ptr<sequencer::Bus>,
+            const std::shared_ptr<lcdgui::ScreenComponent>,
+            std::optional<int> programPadIndex,
+            std::shared_ptr<sampler::Program>,
             std::shared_ptr<sequencer::Sequencer>,
-            std::shared_ptr<lcdgui::Screens>, std::shared_ptr<sampler::Sampler>,
+            std::shared_ptr<sequencer::FrameSeq>,
             std::shared_ptr<eventregistry::EventRegistry>,
+            std::shared_ptr<controller::ClientEventController>,
             std::shared_ptr<audiomidi::EventHandler>,
-            std::shared_ptr<sequencer::FrameSeq>, engine::PreviewSoundPlayer *,
-            const int programPadIndex, const int velocity,
-            const std::shared_ptr<mpc::lcdgui::ScreenComponent>);
+            std::shared_ptr<lcdgui::Screens>,
+            std::shared_ptr<hardware::Hardware>);
 
         static std::shared_ptr<TriggerLocalNoteOffContext>
         buildTriggerLocalNoteOffContext(
-            eventregistry::Source, engine::PreviewSoundPlayer *,
-            std::shared_ptr<eventregistry::EventRegistry>,
-            std::shared_ptr<audiomidi::EventHandler>,
-            std::shared_ptr<lcdgui::Screens>,
+            eventregistry::Source source, const int note, sequencer::Track *,
+            std::shared_ptr<sequencer::Bus>,
+            const std::shared_ptr<lcdgui::ScreenComponent>,
+            std::optional<int> programPadIndex,
+            std::shared_ptr<sampler::Program>,
             std::shared_ptr<sequencer::Sequencer>,
-            std::shared_ptr<hardware::Hardware>,
+            std::shared_ptr<sequencer::FrameSeq>,
+            std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<controller::ClientEventController>,
-            std::shared_ptr<sequencer::FrameSeq>, const int programPadIndex,
-            int drumIndex, const std::shared_ptr<mpc::lcdgui::ScreenComponent>,
-            const int note, std::shared_ptr<sampler::Program>,
-            sequencer::Track *);
+            std::shared_ptr<audiomidi::EventHandler> eventHandler,
+            std::shared_ptr<lcdgui::Screens>,
+            std::shared_ptr<hardware::Hardware>);
     };
 } // namespace mpc::command::context
