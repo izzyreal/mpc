@@ -1,8 +1,10 @@
 #include "TransScreen.hpp"
 
+#include "Mpc.hpp"
 #include "PunchScreen.hpp"
 #include "lcdgui/Label.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
@@ -44,7 +46,6 @@ void TransScreen::function(int i)
 
 void TransScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "tr")

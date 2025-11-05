@@ -1,5 +1,6 @@
 #include "PasteEventScreen.hpp"
 
+#include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
@@ -25,8 +26,6 @@ void PasteEventScreen::function(int i)
                 mpc.screens->get<ScreenId::StepEditorScreen>();
 
             const bool allowMultipleNotesOnSameTick = true;
-
-            auto sequencer = mpc.getSequencer();
 
             for (auto &event : stepEditorScreen->getPlaceHolder())
             {

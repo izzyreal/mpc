@@ -1,25 +1,38 @@
 #pragma once
-#include "Mpc.hpp"
 
+#include <vector>
 #include <memory>
 #include <atomic>
-
-namespace mpc
-{
-    class Mpc;
-}
+#include <functional>
+#include <string>
 
 namespace mpc::sequencer
 {
+    class Bus;
     class Track;
     class TimeSignature;
     class TempoChangeEvent;
     class Sequencer;
 } // namespace mpc::sequencer
 
+namespace mpc::lcdgui
+{
+    class Screens;
+}
+
+namespace mpc::sampler
+{
+    class Program;
+    class Sampler;
+} 
+
+namespace mpc::audiomidi
+{
+    class EventHandler;
+}
+
 namespace mpc::sequencer
 {
-
     class Sequence final
     {
     public:
@@ -32,38 +45,28 @@ namespace mpc::sequencer
             uint8_t frameDecimals;
         };
 
-    private:
-        StartTime startTime{0, 0, 0, 0, 0};
-        std::atomic_bool tempoTrackIsInitialized{false};
-        mpc::Mpc &mpc;
-        double initialTempo = 120.0;
-
-        std::vector<std::shared_ptr<Track>> tracks;
-        std::shared_ptr<Track> tempoChangeTrack;
-
-        std::vector<std::string> deviceNames = std::vector<std::string>(33);
-        std::vector<std::string> defaultTrackNames;
-
-        std::vector<int> barLengthsInTicks = std::vector<int>(999);
-        std::vector<int> numerators = std::vector<int>(999);
-        std::vector<int> denominators = std::vector<int>(999);
-
-        std::vector<int> oldBarLengthsInTicks = std::vector<int>(999);
-        std::vector<int> oldNumerators = std::vector<int>(999);
-        std::vector<int> oldDenominators = std::vector<int>(999);
-
-        std::string name;
-        bool loopEnabled = true;
-        int lastBarIndex = -1;
-        bool used = false;
-        bool tempoChangeOn = true;
-        int loopStart = 0;
-        int loopEnd = 0;
-        int firstLoopBarIndex = 0;
-        int lastLoopBarIndex = 0;
-        bool lastLoopBarEnd = true;
-
-        friend class Sequencer;
+        Sequence(
+            std::function<std::string(int)> getDefaultTrackName,
+            std::function<int64_t()> getTickPosition,
+            std::shared_ptr<lcdgui::Screens> screens,
+            std::function<bool()> isRecordingModeMulti,
+            std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+            std::function<int()> getAutoPunchMode,
+            std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+            std::function<bool()> isEraseButtonPressed,
+            std::function<bool(int programPadIndex, std::shared_ptr<sampler::Program>)> isProgramPadPressed,
+            std::shared_ptr<sampler::Sampler> sampler,
+            std::shared_ptr<audiomidi::EventHandler> eventHandler,
+            std::function<bool()> isSixteenLevelsEnabled,
+            std::function<int()> getActiveTrackIndex,
+            std::function<bool()> isRecording,
+            std::function<bool()> isOverdubbing,
+            std::function<bool()> isPunchEnabled,
+            std::function<int64_t()> getPunchInTime,
+            std::function<int64_t()> getPunchOutTime,
+            std::function<bool()> isSoloEnabled,
+            std::function<int()> getCurrentBarIndex
+            );
 
     public:
         double getInitialTempo();
@@ -77,8 +80,6 @@ namespace mpc::sequencer
         int getFirstLoopBarIndex();
         void setLastLoopBarIndex(int i);
         int getLastLoopBarIndex();
-
-    public:
         bool isLoopEnabled();
         void setName(std::string s);
         std::string getName();
@@ -129,9 +130,41 @@ namespace mpc::sequencer
 
         void resetTrackEventIndices(int tick);
 
+        std::shared_ptr<Track> getTempoChangeTrack();
+
         StartTime &getStartTime();
 
-    public:
-        Sequence(mpc::Mpc &);
+    private:
+        StartTime startTime{0, 0, 0, 0, 0};
+        std::atomic_bool tempoTrackIsInitialized{false};
+        double initialTempo = 120.0;
+
+        std::vector<std::shared_ptr<Track>> tracks;
+        std::shared_ptr<Track> tempoChangeTrack;
+
+        std::vector<std::string> deviceNames = std::vector<std::string>(33);
+
+        std::vector<int> barLengthsInTicks = std::vector<int>(999);
+        std::vector<int> numerators = std::vector<int>(999);
+        std::vector<int> denominators = std::vector<int>(999);
+
+        std::vector<int> oldBarLengthsInTicks = std::vector<int>(999);
+        std::vector<int> oldNumerators = std::vector<int>(999);
+        std::vector<int> oldDenominators = std::vector<int>(999);
+
+        std::shared_ptr<lcdgui::Screens> screens;
+        std::function<int()> getCurrentBarIndex;
+
+        std::string name;
+        bool loopEnabled = true;
+        int lastBarIndex = -1;
+        bool used = false;
+        bool tempoChangeOn = true;
+        int loopStart = 0;
+        int loopEnd = 0;
+        int firstLoopBarIndex = 0;
+        int lastLoopBarIndex = 0;
+        bool lastLoopBarEnd = true;
+
     };
 } // namespace mpc::sequencer

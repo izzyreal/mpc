@@ -1,4 +1,6 @@
 #include "StepEditorScreen.hpp"
+#include "Mpc.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 
 #include "audiomidi/EventHandler.hpp"
@@ -127,7 +129,7 @@ void StepEditorScreen::open()
 
     lastRow = 0;
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     if (track->getBus() != 0)
     {
@@ -195,7 +197,7 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     storeColumnForEventAtActiveRow();
 
@@ -270,7 +272,7 @@ void StepEditorScreen::function(int i)
 
             if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
             {
-                auto track = mpc.getSequencer()->getActiveTrack();
+                auto track = sequencer->getActiveTrack();
                 for (int e = 0; e < track->getEvents().size(); e++)
                 {
                     if (track->getEvents()[e] == visibleEvents[rowIndex])
@@ -354,7 +356,7 @@ void StepEditorScreen::function(int i)
                 auto editMultipleScreen =
                     mpc.screens->get<ScreenId::EditMultipleScreen>();
 
-                auto track = mpc.getSequencer()->getActiveTrack();
+                auto track = sequencer->getActiveTrack();
                 if (noteEvent && track->getBus() != 0)
                 {
                     if (isA)
@@ -471,7 +473,7 @@ void StepEditorScreen::turnWheel(int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     if (focusedFieldName == "view")
     {
@@ -697,7 +699,7 @@ void StepEditorScreen::setSequencerTickPos(
 
     if (oldTickPos != sequencer->getTickPosition())
     {
-        auto track = mpc.getSequencer()->getActiveTrack();
+        auto track = sequencer->getActiveTrack();
         track->removeDoubles();
         resetYPosAndYOffset();
         restoreColumnForEventAtActiveRow();
@@ -1047,7 +1049,7 @@ StepEditorScreen::computeEventsAtCurrentTick()
 {
     std::vector<std::shared_ptr<Event>> result;
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     for (auto &event : track->getEvents())
     {
@@ -1156,7 +1158,7 @@ void StepEditorScreen::refreshEventRows()
 
 void StepEditorScreen::updateComponents()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     if (view == 1 && track->getBus() != 0)
     {
@@ -1196,7 +1198,7 @@ void StepEditorScreen::updateComponents()
 
 void StepEditorScreen::setViewNotesText()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     if (view == 1 && track->getBus() != 0)
     {
@@ -1428,7 +1430,7 @@ void StepEditorScreen::removeEvents()
             auto event = eventsAtCurrentTick[i];
             if (!std::dynamic_pointer_cast<EmptyEvent>(event))
             {
-                auto track = mpc.getSequencer()->getActiveTrack();
+                auto track = sequencer->getActiveTrack();
                 track->removeEvent(event);
             }
         }
@@ -1472,7 +1474,7 @@ void StepEditorScreen::adhocPlayNoteEvent(
     const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent)
 {
     const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
     mpc.getEventHandler()->handleFinalizedEvent(adhoc, track.get());
 }
 
@@ -1545,7 +1547,7 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
 {
     auto tick = sequencer->getTickPosition();
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
     for (auto &e : track->getEventRange(tick, tick))
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);

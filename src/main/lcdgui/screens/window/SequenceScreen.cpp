@@ -1,5 +1,6 @@
 #include "SequenceScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/Label.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -47,7 +48,6 @@ void SequenceScreen::function(int i)
 
 void SequenceScreen::openNameScreen()
 {
-
     std::function<void(std::string &)> enterAction;
     std::string initialNameScreenName;
 

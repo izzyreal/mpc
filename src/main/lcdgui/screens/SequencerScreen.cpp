@@ -19,7 +19,8 @@
 #include "lcdgui/PunchRect.hpp"
 
 #include "sequencer/SeqUtil.hpp"
-#include <Util.hpp>
+#include "Util.hpp"
+#include "Mpc.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"

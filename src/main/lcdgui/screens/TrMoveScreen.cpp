@@ -1,6 +1,7 @@
 #include "TrMoveScreen.hpp"
 
 #include "EventsScreen.hpp"
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
 

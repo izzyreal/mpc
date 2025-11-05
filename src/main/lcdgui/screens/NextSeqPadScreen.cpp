@@ -5,6 +5,7 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
+#include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;

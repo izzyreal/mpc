@@ -1,5 +1,6 @@
 #include "ChangeTsigScreen.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 

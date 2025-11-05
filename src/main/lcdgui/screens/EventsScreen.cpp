@@ -1,7 +1,9 @@
 #include "EventsScreen.hpp"
 
+#include "Mpc.hpp"
 #include "MpcSpecs.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -12,7 +14,7 @@
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"

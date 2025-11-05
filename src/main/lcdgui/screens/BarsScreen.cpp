@@ -1,5 +1,6 @@
 #include "BarsScreen.hpp"
 
+#include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -266,32 +267,13 @@ void BarsScreen::setFirstBar(int i, int max)
 
 void BarsScreen::setAfterBar(int i, int max)
 {
-    if (i < 0)
-    {
-        return;
-    }
-
-    if (i > max)
-    {
-        if (afterBar == max)
-        {
-            return;
-        }
-        i = max;
-    }
-
-    afterBar = i;
+    afterBar = std::clamp(i, 0, max);
     displayAfterBar();
 }
 
 void BarsScreen::setCopies(int i)
 {
-    if (i < 1 || i > 999)
-    {
-        return;
-    }
-
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
-    eventsScreen->copies = i;
+    eventsScreen->copies = std::clamp(i, 1, 999);
     displayCopies();
 }

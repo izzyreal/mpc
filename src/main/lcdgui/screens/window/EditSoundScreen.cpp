@@ -1,7 +1,9 @@
 #include "EditSoundScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "sampler/Pad.hpp"
 
 #include "sampler/Sampler.hpp"

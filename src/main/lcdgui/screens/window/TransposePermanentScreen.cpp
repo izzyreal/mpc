@@ -1,5 +1,6 @@
 #include "TransposePermanentScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/screens/TransScreen.hpp"
 
 #include "sequencer/Sequencer.hpp"

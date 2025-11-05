@@ -24,6 +24,7 @@ namespace mpc::eventregistry
         getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
 
         bool isProgramPadPressed(ProgramPadIndex idx) const;
+        bool isProgramPadPressed(ProgramPadIndex idx, std::shared_ptr<sampler::Program>) const;
 
         ProgramPadPressEventPtr getMostRecentProgramPadPress(
             ProgramPadIndex idx,

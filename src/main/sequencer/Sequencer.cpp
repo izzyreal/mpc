@@ -8,7 +8,9 @@
 
 #include "audiomidi/AudioMidiServices.hpp"
 
+#include "controller/ClientEventController.hpp"
 #include "engine/Voice.hpp"
+#include "eventregistry/EventRegistry.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
 
@@ -166,9 +168,9 @@ void Sequencer::playToTick(int targetTick)
             }
         }
 
-        while (seq->tempoChangeTrack->getNextTick() <= targetTick)
+        while (seq->getTempoChangeTrack()->getNextTick() <= targetTick)
         {
-            seq->tempoChangeTrack->playNext();
+            seq->getTempoChangeTrack()->playNext();
         }
     }
 }
@@ -810,9 +812,38 @@ void Sequencer::purgeAllSequences()
     activeSequenceIndex = 0;
 }
 
+std::shared_ptr<Sequence> Sequencer::makeNewSequence()
+{
+    return std::make_shared<Sequence>(
+            [&](int trackIndex) { return defaultTrackNames[trackIndex]; },
+                [&]{return getTickPosition();},
+                mpc.screens,
+                [&]{ return isRecordingModeMulti(); },
+                [&]{ return getActiveSequence(); },
+                [&]{ return getAutoPunchMode(); },
+                [&](int busIndex) { return getBus<Bus>(busIndex); },
+                [&]{ return mpc.clientEventController->isEraseButtonPressed(); },
+                [&](int programPadIndex, std::shared_ptr<sampler::Program> program)
+                {
+                    return mpc.eventRegistry->getSnapshot().isProgramPadPressed(programPadIndex, program);
+                },
+                mpc.getSampler(),
+                mpc.getEventHandler(),
+                [&]{return mpc.clientEventController->isSixteenLevelsEnabled(); },
+                [&]{return getActiveTrackIndex(); },
+                [&]{return isRecording(); },
+                [&]{return isOverdubbing(); },
+                [&]{return isPunchEnabled(); },
+                [&]{return getPunchInTime(); },
+                [&]{return getPunchOutTime(); },
+                [&]{return isSoloEnabled(); },
+                [&]{return getCurrentBarIndex(); }
+        );
+}
+
 void Sequencer::purgeSequence(int i)
 {
-    sequences[i] = std::make_shared<Sequence>(mpc);
+    sequences[i] = makeNewSequence();
     sequences[i]->resetTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
     std::string res = defaultSequenceName;
@@ -837,7 +868,7 @@ void Sequencer::copySequenceParameters(const int source, const int dest)
 std::shared_ptr<Sequence>
 Sequencer::copySequence(std::shared_ptr<Sequence> source)
 {
-    auto copy = std::make_shared<Sequence>(mpc);
+    auto copy = makeNewSequence();
     copy->init(source->getLastBarIndex());
     copySequenceParameters(source, copy);
 
@@ -846,11 +877,11 @@ Sequencer::copySequence(std::shared_ptr<Sequence> source)
         copyTrack(source->getTrack(i), copy->getTrack(i));
     }
 
-    copy->tempoChangeTrack->removeEvents();
+    copy->getTempoChangeTrack()->removeEvents();
 
-    for (auto &event : source->tempoChangeTrack->getEvents())
+    for (auto &event : source->getTempoChangeTrack()->getEvents())
     {
-        copy->tempoChangeTrack->cloneEventIntoTrack(event, event->getTick());
+        copy->getTempoChangeTrack()->cloneEventIntoTrack(event, event->getTick());
     }
 
     return copy;
@@ -1999,7 +2030,7 @@ void Sequencer::stopMetronomeTrack()
 
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
 {
-    placeHolder = std::make_shared<Sequence>(mpc);
+    placeHolder = makeNewSequence();
     return placeHolder;
 }
 

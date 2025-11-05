@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "Mpc.hpp"
 #include "Logger.hpp"
 #include "StrUtil.hpp"
 #include "sampler/Sampler.hpp"

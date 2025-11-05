@@ -3,6 +3,7 @@
 #include "controller/ClientEventController.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/Track.hpp"

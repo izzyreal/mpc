@@ -1,5 +1,6 @@
 #include "ConvertSongToSeqScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 

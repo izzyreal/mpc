@@ -1,4 +1,5 @@
 #include "MixerScreen.hpp"
+#include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "hardware/Hardware.hpp"
 

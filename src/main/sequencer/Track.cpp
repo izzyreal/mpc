@@ -1,9 +1,5 @@
 #include "sequencer/Track.hpp"
 
-#include "Mpc.hpp"
-#include "audiomidi/EventHandler.hpp"
-
-#include "controller/ClientEventController.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Event.hpp"
@@ -18,28 +14,76 @@
 #include "sequencer/ChannelPressureEvent.hpp"
 #include "sequencer/PolyPressureEvent.hpp"
 #include "sequencer/SystemExclusiveEvent.hpp"
+#include "audiomidi/EventHandler.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
-#include "hardware/Hardware.hpp"
-#include "hardware/Component.hpp"
-
 #include <concurrentqueue.h>
 
+#include <memory>
+
+using namespace mpc::sequencer;
+using namespace mpc::sampler;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-using namespace mpc::sequencer;
-
-Track::Track(mpc::Mpc &mpc, Sequence *parent, int i) : mpc(mpc)
+Track::Track(
+            const int trackIndex,
+            Sequence *parent,
+            std::function<std::string(int)> getDefaultTrackName,
+            std::function<int64_t()> getTickPosition,
+            std::shared_ptr<lcdgui::Screens> screens,
+            std::function<bool()> isRecordingModeMulti,
+            std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+            std::function<int()> getAutoPunchMode,
+            std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+            std::function<bool()> isEraseButtonPressed,
+            std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
+            std::shared_ptr<sampler::Sampler> sampler,
+            std::shared_ptr<audiomidi::EventHandler> eventHandler,
+            std::function<bool()> isSixteenLevelsEnabled,
+            std::function<int()> getActiveTrackIndex,
+            std::function<bool()> isRecording,
+            std::function<bool()> isOverdubbing,
+            std::function<bool()> isPunchEnabled,
+            std::function<int64_t()> getPunchInTime,
+            std::function<int64_t()> getPunchOutTime,
+            std::function<bool()> isSoloEnabled
+       )
+    :
+    trackIndex(trackIndex),
+    parent(parent),
+    getDefaultTrackName(getDefaultTrackName),
+    getTickPosition(getTickPosition),
+    screens(screens),
+    isRecordingModeMulti(isRecordingModeMulti),
+    getActiveSequence(getActiveSequence),
+    getAutoPunchMode(getAutoPunchMode),
+    getSequencerBus(getSequencerBus),
+    isEraseButtonPressed(isEraseButtonPressed),
+    isProgramPadPressed(isProgramPadPressed),
+    sampler(sampler),
+    eventHandler(eventHandler),
+    isSixteenLevelsEnabled(isSixteenLevelsEnabled),
+    getActiveTrackIndex(getActiveTrackIndex),
+    isRecording(isRecording),
+    isOverdubbing(isOverdubbing),
+    isPunchEnabled(isPunchEnabled),
+    getPunchInTime(getPunchInTime),
+    getPunchOutTime(getPunchOutTime),
+    isSoloEnabled(isSoloEnabled)
 {
-    this->parent = parent;
+    purge();
+}
 
-    trackIndex = i;
+void Track::purge()
+{
+    events.clear();
+    name = trackIndex == 64 ? "tempo" : getDefaultTrackName(trackIndex);
     programChange = 0;
     velocityRatio = 100;
     used = false;
@@ -130,7 +174,7 @@ void Track::setUsed(bool b)
 {
     if (!used && b && trackIndex < 64)
     {
-        name = mpc.getSequencer()->getDefaultTrackName(trackIndex);
+        name = getDefaultTrackName(trackIndex);
     }
 
     used = b;
@@ -369,11 +413,11 @@ std::vector<std::shared_ptr<Event>> &Track::getEvents()
 
 int Track::getCorrectedTickPos()
 {
-    auto pos = mpc.getSequencer()->getTickPosition();
+    auto pos = getTickPosition();
     auto correctedTickPos = -1;
 
     auto timingCorrectScreen =
-        mpc.screens->get<ScreenId::TimingCorrectScreen>();
+        screens->get<ScreenId::TimingCorrectScreen>();
     auto swingPercentage = timingCorrectScreen->getSwing();
     auto noteValueLengthInTicks =
         timingCorrectScreen->getNoteValueLengthInTicks();
@@ -427,7 +471,7 @@ void Track::processRealtimeQueuedEvents()
         return;
     }
 
-    auto pos = mpc.getSequencer()->getTickPosition();
+    auto pos = getTickPosition();
     auto correctedTickPos = getCorrectedTickPos();
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
@@ -533,37 +577,35 @@ void Track::playNext()
         return;
     }
 
-    const auto sequencer = mpc.getSequencer();
-
-    const auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
+    const auto recordingModeIsMulti = isRecordingModeMulti();
     const auto isActiveTrackIndex =
-        trackIndex == sequencer->getActiveTrackIndex();
-    auto _delete = sequencer->isRecording() &&
+        trackIndex == getActiveTrackIndex();
+    auto _delete = isRecording() &&
                    (isActiveTrackIndex || recordingModeIsMulti) &&
                    (trackIndex < 64);
 
-    if (sequencer->isRecording() && sequencer->isPunchEnabled() &&
+    if (isRecording() && isPunchEnabled() &&
         trackIndex < 64)
     {
-        auto pos = sequencer->getTickPosition();
+        auto pos = getTickPosition();
 
         _delete = false;
 
-        if (sequencer->getAutoPunchMode() == 0 &&
-            pos >= sequencer->getPunchInTime())
+        if (getAutoPunchMode() == 0 &&
+            pos >= getPunchInTime())
         {
             _delete = true;
         }
 
-        if (sequencer->getAutoPunchMode() == 1 &&
-            pos < sequencer->getPunchOutTime())
+        if (getAutoPunchMode() == 1 &&
+            pos < getPunchOutTime())
         {
             _delete = true;
         }
 
-        if (sequencer->getAutoPunchMode() == 2 &&
-            pos >= sequencer->getPunchInTime() &&
-            pos < sequencer->getPunchOutTime())
+        if (getAutoPunchMode() == 2 &&
+            pos >= getPunchInTime() &&
+            pos < getPunchOutTime())
         {
             _delete = true;
         }
@@ -571,22 +613,16 @@ void Track::playNext()
 
     const auto event = eventIndex >= events.size() ? std::shared_ptr<Event>()
                                                    : events[eventIndex];
-    const auto hardware = mpc.getHardware();
-
     if (auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
         note->setTrack(trackIndex);
 
-        if (auto drumBus = sequencer->getBus<DrumBus>(busNumber);
-            sequencer->isOverdubbing() &&
-            mpc.getHardware()
-                ->getButton(hardware::ComponentId::ERASE)
-                ->isPressed() &&
+        if (auto drumBus = std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busNumber)); drumBus &&
+            isOverdubbing() &&
+            isEraseButtonPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
         {
-            const auto sampler = mpc.getSampler();
-
             auto program = sampler->getProgram(drumBus->getProgram());
 
             const auto noteNumber = note->getNote();
@@ -594,15 +630,13 @@ void Track::playNext()
             bool oneOrMorePadsArePressed = false;
             bool noteIsPressed = false;
 
-            for (auto &p : hardware->getPads())
+            for (int programPadIndex = 0; programPadIndex < 64; ++programPadIndex)
             {
-                if (p->isPressed())
+                if (isProgramPadPressed(programPadIndex, program))
                 {
                     oneOrMorePadsArePressed = true;
 
-                    // The pad index should be with bank at the time the pad was
-                    // pressed
-                    if (program->getNoteFromPad(p->getIndex()) == noteNumber)
+                    if (program->getNoteFromPad(programPadIndex) == noteNumber)
                     {
                         noteIsPressed = true;
                         break;
@@ -611,12 +645,12 @@ void Track::playNext()
             }
 
             if (!_delete && oneOrMorePadsArePressed &&
-                mpc.clientEventController->isSixteenLevelsEnabled())
+                isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen =
-                    mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+                    screens->get<ScreenId::VmpcSettingsScreen>();
                 auto assign16LevelsScreen =
-                    mpc.screens->get<ScreenId::Assign16LevelsScreen>();
+                    screens->get<ScreenId::Assign16LevelsScreen>();
 
                 if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
                 {
@@ -628,15 +662,15 @@ void Track::playNext()
                     auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
                     auto _16l_type = assign16LevelsScreen->getType();
 
-                    for (auto &pad : hardware->getPads())
+                    for (int programPadIndex = 0; programPadIndex < 64; ++programPadIndex)
                     {
-                        if (!pad->isPressed())
+                        if (!isProgramPadPressed(programPadIndex, program))
                         {
                             continue;
                         }
 
                         int wouldBeVarValue;
-                        auto padIndexWithoutBank = pad->getIndex();
+                        const int padIndexWithoutBank = programPadIndex % 16;
 
                         if (_16l_type == 0)
                         {
@@ -683,10 +717,10 @@ void Track::playNext()
 
     events[eventIndex]->dontDelete = false;
 
-    if (isOn() && (!sequencer->isSoloEnabled() ||
-                   sequencer->getActiveTrackIndex() == trackIndex))
+    if (isOn() && (!isSoloEnabled() ||
+                   getActiveTrackIndex() == trackIndex))
     {
-        mpc.getEventHandler()->handleFinalizedEvent(event, this);
+      eventHandler->handleFinalizedEvent(event, this);
     }
 
     eventIndex++;
@@ -722,7 +756,7 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength,
                              int swingPercentage, int lowestNote,
                              int highestNote)
 {
-    auto s = mpc.getSequencer()->getActiveSequence();
+    auto s = getActiveSequence();
     int accumBarLengths = 0;
     auto fromBar = 0;
     auto toBar = 0;
@@ -789,7 +823,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
     int previousAccumBarLengths = 0;
     auto barNumber = 0;
     auto numberOfSteps = 0;
-    auto sequence = mpc.getSequencer()->getActiveSequence();
+    auto sequence = getActiveSequence();
     int segmentStart = 0;
     int segmentEnd = 0;
 

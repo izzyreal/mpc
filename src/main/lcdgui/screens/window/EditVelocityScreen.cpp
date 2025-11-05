@@ -64,7 +64,7 @@ void EditVelocityScreen::function(int i)
 {
     ScreenComponent::function(i);
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     switch (i)
     {
@@ -135,7 +135,7 @@ void EditVelocityScreen::displayTime()
 
 void EditVelocityScreen::displayNotes()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     if (track->getBus() == 0)
     {

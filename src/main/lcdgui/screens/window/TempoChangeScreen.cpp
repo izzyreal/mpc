@@ -1,5 +1,6 @@
 #include "TempoChangeScreen.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/TimeSignature.hpp"
@@ -8,7 +9,7 @@
 
 #include "lcdgui/HorizontalBar2.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"

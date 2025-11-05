@@ -187,3 +187,10 @@ void ClientEventController::setSixteenLevelsEnabled(bool b)
 {
     sixteenLevelsEnabled = b;
 }
+
+bool ClientEventController::isEraseButtonPressed() const
+{
+    return hardware->getButton(ComponentId::ERASE)->isPressed();
+}
+
+

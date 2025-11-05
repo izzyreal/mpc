@@ -88,6 +88,7 @@ namespace mpc::controller
         int getSelectedPad() const;
 
         bool isRecMainWithoutPlaying() const;
+        bool isEraseButtonPressed() const;
 
     private:
         mpc::Mpc &mpc;

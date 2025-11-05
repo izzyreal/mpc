@@ -1,6 +1,7 @@
 #include "PunchScreen.hpp"
 
 #include "lcdgui/Label.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
 

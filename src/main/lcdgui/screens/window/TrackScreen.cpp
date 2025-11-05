@@ -1,5 +1,6 @@
 #include "TrackScreen.hpp"
 
+#include "Mpc.hpp"
 #include "lcdgui/Label.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -18,7 +19,7 @@ void TrackScreen::open()
     auto activeTrackIndex = sequencer->getActiveTrackIndex();
     auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
     findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
     findLabel("tracknamerest")->setText(track->getName().substr(1));
 
@@ -61,7 +62,7 @@ void TrackScreen::openNameScreen()
     }
     else
     {
-        auto track = mpc.getSequencer()->getActiveTrack();
+        auto track = sequencer->getActiveTrack();
 
         if (!track->isUsed())
         {

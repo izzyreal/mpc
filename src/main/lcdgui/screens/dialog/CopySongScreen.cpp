@@ -1,10 +1,11 @@
 #include "CopySongScreen.hpp"
 
+#include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 
@@ -32,7 +33,6 @@ void CopySongScreen::open()
 
 void CopySongScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
@@ -50,7 +50,6 @@ void CopySongScreen::function(int i)
 
 void CopySongScreen::turnWheel(int i)
 {
-
     auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();

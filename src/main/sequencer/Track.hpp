@@ -3,11 +3,8 @@
 #include <vector>
 #include <memory>
 #include <string>
-
-namespace mpc
-{
-    class Mpc;
-}
+#include <functional>
+#include <cstdint>
 
 namespace moodycamel
 {
@@ -15,17 +12,56 @@ namespace moodycamel
     template <typename T, typename Traits> class ConcurrentQueue;
 } // namespace moodycamel
 
+namespace mpc::lcdgui
+{
+    class Screens;
+}
+
+namespace mpc::sampler
+{
+    class Sampler;
+    class Program;
+}
+
+namespace mpc::audiomidi
+{
+    class EventHandler;
+}
+
 namespace mpc::sequencer
 {
     class Sequence;
     class Event;
     class NoteOnEvent;
     class NoteOffEvent;
+    class Bus;
 
     class Track
     {
     public:
-        Track(mpc::Mpc &mpc, Sequence *parent, int i);
+        Track(
+            const int trackIndex,
+            Sequence *parent,
+            std::function<std::string(int)> getDefaultTrackName,
+            std::function<int64_t()> getTickPosition,
+            std::shared_ptr<lcdgui::Screens> screens,
+            std::function<bool()> isRecordingModeMulti,
+            std::function<std::shared_ptr<Sequence>()> getActiveSequence,
+            std::function<int()> getAutoPunchMode,
+            std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+            std::function<bool()> isEraseButtonPressed,
+            std::function<bool(int programPadIndex, std::shared_ptr<sampler::Program>)> isProgramPadPressed,
+            std::shared_ptr<sampler::Sampler> sampler,
+            std::shared_ptr<audiomidi::EventHandler> eventHandler,
+            std::function<bool()> isSixteenLevelsEnabled,
+            std::function<int()> getActiveTrackIndex,
+            std::function<bool()> isRecording,
+            std::function<bool()> isOverdubbing,
+            std::function<bool()> isPunchEnabled,
+            std::function<int64_t()> getPunchInTime,
+            std::function<int64_t()> getPunchOutTime,
+            std::function<bool()> isSoloEnabled
+        );
 
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents();
 
@@ -101,9 +137,11 @@ namespace mpc::sequencer
         // Do not call from audio thread
         void removeDoubles();
 
+        void purge();
+
     private:
         static const int MAX_TICK{2147483647};
-        mpc::Mpc &mpc;
+
         int busNumber = 0;
         std::string name;
         bool on{false};
@@ -126,6 +164,25 @@ namespace mpc::sequencer
             queuedNoteOffEvents;
 
         Sequence *parent{nullptr};
+        std::function<std::string(int)> getDefaultTrackName;
+        std::function<int64_t()> getTickPosition;
+        std::shared_ptr<lcdgui::Screens> screens;
+        std::function<bool()> isRecordingModeMulti;
+        std::function<std::shared_ptr<Sequence>()> getActiveSequence;
+        std::function<int()> getAutoPunchMode;
+        std::function<std::shared_ptr<Bus>(int)> getSequencerBus;
+        std::function<bool()> isEraseButtonPressed;
+        std::function<bool(int programPadIndex, std::shared_ptr<sampler::Program>)> isProgramPadPressed;
+        std::shared_ptr<sampler::Sampler> sampler;
+        std::shared_ptr<audiomidi::EventHandler> eventHandler;
+        std::function<bool()> isSixteenLevelsEnabled;
+        std::function<int()> getActiveTrackIndex;
+        std::function<bool()> isRecording;
+        std::function<bool()> isOverdubbing;
+        std::function<bool()> isPunchEnabled;
+        std::function<int64_t()> getPunchInTime;
+        std::function<int64_t()> getPunchOutTime;
+        std::function<bool()> isSoloEnabled;
 
         std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns;
         std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs;

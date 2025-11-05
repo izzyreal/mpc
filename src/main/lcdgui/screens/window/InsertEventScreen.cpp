@@ -1,4 +1,5 @@
 #include "InsertEventScreen.hpp"
+#include "Mpc.hpp"
 #include "TimingCorrectScreen.hpp"
 
 #include "sequencer/ChannelPressureEvent.hpp"
@@ -47,7 +48,7 @@ void InsertEventScreen::function(int i)
 
 void InsertEventScreen::insertEvent()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    auto track = sequencer->getActiveTrack();
 
     if (insertEventType == 0)
     {
@@ -115,7 +116,6 @@ void InsertEventScreen::insertEvent()
 
 void InsertEventScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "eventtype")

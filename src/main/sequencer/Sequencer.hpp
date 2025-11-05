@@ -124,6 +124,9 @@ namespace mpc::sequencer
     public:
         static void copyTrackParameters(std::shared_ptr<Track> source,
                                         std::shared_ptr<Track> dest);
+
+        std::shared_ptr<Sequence> makeNewSequence();
+
         void init();
         void setTempo(double newTempo);
         double getTempo();

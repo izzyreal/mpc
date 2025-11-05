@@ -1,5 +1,6 @@
 #include "EditMultipleScreen.hpp"
 
+#include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/ChannelPressureEvent.hpp"

@@ -1,6 +1,7 @@
 #include "MultiRecordingSetupScreen.hpp"
 
 #include "StrUtil.hpp"
+#include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
 #include "sequencer/Sequencer.hpp"

@@ -1,5 +1,6 @@
 #include "LoadAProgramScreen.hpp"
 
+#include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 

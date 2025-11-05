@@ -316,7 +316,7 @@ AllLoader::loadOnlySequencesFromFile(mpc::Mpc &mpc, mpc::disk::MpcFile *f)
             continue;
         }
 
-        auto mpcSeq = std::make_shared<Sequence>(mpc);
+        auto mpcSeq = mpc.getSequencer()->makeNewSequence();
 
         allSequences[counter++]->applyToMpcSeq(mpcSeq);
 
