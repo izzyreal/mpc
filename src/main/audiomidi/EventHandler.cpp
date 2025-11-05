@@ -166,7 +166,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                 eventregistry::Source::Sequence,
                 mpc.getLayeredScreen()->getCurrentScreen(), ctx.drum,
                 noteOnEvent->getNote(), noteOnEvent->getVelocity(), track,
-                std::nullopt, program);
+                std::nullopt, program, [](void *) {});
 
             auto registryPadEvent = mpc.eventRegistry->registerProgramPadPress(
                 registryNoteEvent->source, registryNoteEvent->screen,
@@ -186,7 +186,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
                                      programPadIndex, noteOffCtx]
             {
                 eventRegistry->registerNoteOff(eventregistry::Source::Sequence,
-                                               bus, note, track, std::nullopt);
+                                               bus, note, track, std::nullopt,
+                                               [](void *) {});
 
                 eventRegistry->registerProgramPadRelease(
                     eventregistry::Source::Sequence, bus, program,
@@ -314,148 +315,6 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
     {
         handleNoteEventMidiOut(noteOffEvent, track, *trackDevice, std::nullopt);
     }
-}
-
-void EventHandler::handleMidiInputNoteOn(
-
-    const int midiChannel,
-    const std::shared_ptr<NoteOnEventPlayOnly> noteOnEvent,
-    const int frameOffsetInBuffer, Track *track, const int trackDevice,
-    const int trackVelocityRatio, const std::optional<int> drumIndex)
-{
-    assert(noteOnEvent);
-    assert(!noteOnEvent->isFinalized());
-
-    handleNoteEventMidiOut(noteOnEvent, track, trackDevice, trackVelocityRatio);
-
-    if (!drumIndex.has_value())
-    {
-        // No further processing applicable.
-        return;
-    }
-
-    assert(*drumIndex >= 0 && *drumIndex <= 3);
-
-    // This is a DRUM track, so we trigger sample playback and register a
-    // program pad press.
-    auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
-
-    assert(drumBus);
-
-    const auto program = mpc.getSampler()->getProgram(drumBus->getProgram());
-    const auto note = noteOnEvent->getNote();
-    const auto programPadIndex = program->getPadIndexFromNote(note);
-
-    const auto velocityWithTrackVelocityRatioApplied = static_cast<int>(
-        noteOnEvent->getVelocity() * (trackVelocityRatio * 0.01f));
-
-    const auto velocityToUse =
-        std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
-
-    auto registryNoteEvent = mpc.eventRegistry->registerNoteOn(
-        eventregistry::Source::MidiInput,
-        mpc.getLayeredScreen()->getCurrentScreen(), drumBus,
-        noteOnEvent->getNote(), noteOnEvent->getVelocity(), track, midiChannel,
-        program);
-
-    auto registryPadEvent = mpc.eventRegistry->registerProgramPadPress(
-        registryNoteEvent->source, registryNoteEvent->screen,
-        registryNoteEvent->bus, program, programPadIndex,
-        registryNoteEvent->velocity, registryNoteEvent->track, midiChannel);
-
-    const bool isSoundScreen = lcdgui::screengroups::isSoundScreen(
-        mpc.getLayeredScreen()->getCurrentScreen());
-
-    if (isSoundScreen)
-    {
-        mpc.getBasicPlayer().mpcNoteOn(mpc.getSampler()->getSoundIndex(), 127,
-                                       0);
-        return;
-    }
-
-    const bool isSequencerScreen =
-        mpc.getLayeredScreen()->isCurrentScreen({ScreenId::SequencerScreen});
-
-    const bool isNoteRepeatLockedOrPressed =
-        mpc.clientEventController->clientHardwareEventController
-            ->isNoteRepeatLocked() ||
-        mpc.getHardware()
-            ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
-            ->isPressed();
-
-    if (isSequencerScreen && isNoteRepeatLockedOrPressed &&
-        mpc.getSequencer()->isPlaying())
-    {
-        return;
-    }
-
-    auto ctx = engine::DrumNoteEventContextBuilder::buildNoteOn(
-        0, drumBus, mpc.getSampler(), mpc.getAudioMidiServices()->getMixer(),
-        mpc.screens->get<ScreenId::MixerSetupScreen>(),
-        &mpc.getAudioMidiServices()->getVoices(),
-        mpc.getAudioMidiServices()->getMixerConnections(), note, velocityToUse,
-        noteOnEvent->getVariationType(), noteOnEvent->getVariationValue(),
-        frameOffsetInBuffer, true, -1, -1);
-
-    DrumNoteEventHandler::noteOn(ctx);
-}
-
-void EventHandler::handleMidiInputNoteOff(
-
-    const int midiChannel, const std::shared_ptr<NoteOffEvent> noteOffEvent,
-    const int frameOffsetInBuffer, Track *track, const int trackDevice,
-    const std::optional<int> drumIndex)
-{
-    assert(noteOffEvent);
-
-    const auto noteOffMidiOutEvent = [this, noteOffEvent, track, trackDevice]
-    {
-        handleNoteEventMidiOut(noteOffEvent, track, trackDevice, std::nullopt);
-    };
-
-    const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
-
-    frameSeq->enqueueEventAfterNFrames(noteOffMidiOutEvent,
-                                       frameOffsetInBuffer);
-
-    if (!drumIndex.has_value())
-    {
-        // No further processing applicable.
-        return;
-    }
-
-    assert(*drumIndex >= 0 && *drumIndex <= 3);
-
-    // This is a DRUM track, so we stop sample playback and register a program
-    // pad release.
-
-    auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
-
-    assert(drumBus);
-
-    const auto drumNoteOffEvent =
-        [midiChannel, eventRegistry = mpc.eventRegistry, drumBus,
-         note = noteOffEvent->getNote(),
-         voices = &mpc.getAudioMidiServices()->getVoices(),
-         program = mpc.getSampler()->getProgram(drumBus->getProgram()), track]
-    {
-        auto ctx = DrumNoteEventContextBuilder::buildNoteOff(0, drumBus, voices,
-                                                             note, -1);
-
-        DrumNoteEventHandler::noteOff(ctx);
-        auto registryEvent =
-            eventRegistry->getSnapshot().retrievePlayNoteEvent(note);
-        eventRegistry->registerNoteOff(eventregistry::Source::MidiInput,
-                                       drumBus, ctx.note, track, midiChannel);
-
-        const auto programPadIndex = program->getPadIndexFromNote(ctx.note);
-
-        eventRegistry->registerProgramPadRelease(
-            registryEvent->source, registryEvent->bus, program, programPadIndex,
-            registryEvent->track, midiChannel, [](void *) {});
-    };
-
-    frameSeq->enqueueEventAfterNFrames(drumNoteOffEvent, frameOffsetInBuffer);
 }
 
 /**

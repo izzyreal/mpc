@@ -1,8 +1,8 @@
 #pragma once
 
 #include "eventregistry/EventRegistry.hpp"
+
 #include <memory>
-#include <string>
 #include <functional>
 
 namespace mpc::eventregistry
@@ -24,7 +24,6 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::sampler
 {
-    class Sampler;
     class Program;
 } // namespace mpc::sampler
 
@@ -37,14 +36,8 @@ namespace mpc::sequencer
 
 namespace mpc::audiomidi
 {
-    class AudioMidiServices;
     class EventHandler;
 } // namespace mpc::audiomidi
-
-namespace mpc::engine
-{
-    class PreviewSoundPlayer;
-}
 
 namespace mpc::command::context
 {
@@ -52,8 +45,9 @@ namespace mpc::command::context
     {
         eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
+        eventregistry::NoteOnEvent *registryNoteOnEvent;
         bool isSequencerScreen;
-        int programPadIndex;
+        std::optional<int> programPadIndex;
         int velocity;
         bool isSoundScreen;
 
@@ -64,7 +58,7 @@ namespace mpc::command::context
         bool isStepRecording;
         bool isRecMainWithoutPlaying;
         bool isRecordingOrOverdubbing;
-        int trackBus;
+        std::shared_ptr<sequencer::Bus> bus;
 
         std::shared_ptr<mpc::sampler::Program> program;
         int note;
@@ -73,7 +67,6 @@ namespace mpc::command::context
         bool isSamplerScreen;
 
         mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
             timingCorrectScreen;
@@ -82,14 +75,11 @@ namespace mpc::command::context
         std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
         std::shared_ptr<mpc::sequencer::FrameSeq> frameSequencer;
 
-        mpc::engine::PreviewSoundPlayer *previewSoundPlayer;
-
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
         std::function<void(int)> setSelectedNote;
         std::function<void(int)> setSelectedPad;
 
-        std::string currentFieldName;
         int hardwareSliderValue;
     };
 } // namespace mpc::command::context

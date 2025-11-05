@@ -175,7 +175,7 @@ NoteOnEventPtr EventRegistry::registerNoteOn(
     Source source, std::shared_ptr<ScreenComponent> screen,
     std::shared_ptr<Bus> bus, NoteNumber noteNumber, Velocity velocity,
     Track *track, std::optional<MidiChannel> midiChannel,
-    std::shared_ptr<Program> program)
+    std::shared_ptr<Program> program, std::function<void(void *)> action)
 {
     // printf("registering note on\n");
     assert(screen && bus);
@@ -185,6 +185,7 @@ NoteOnEventPtr EventRegistry::registerNoteOn(
     EventMessage msg{EventMessage::Type::NoteOn};
     msg.noteOnEvent = e;
     msg.source = source;
+    msg.action = action;
     enqueue(std::move(msg));
     return e;
 }
@@ -204,7 +205,8 @@ void EventRegistry::registerNoteAftertouch(
 
 void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
                                     NoteNumber noteNumber, Track *track,
-                                    std::optional<MidiChannel> midiChannel)
+                                    std::optional<MidiChannel> midiChannel,
+                                    std::function<void(void *)> action)
 {
     assert(bus);
 
@@ -215,6 +217,7 @@ void EventRegistry::registerNoteOff(Source source, std::shared_ptr<Bus> bus,
     EventMessage msg{EventMessage::Type::NoteOff};
     msg.noteOffEvent = e;
     msg.source = source;
+    msg.action = action;
     enqueue(std::move(msg));
 }
 

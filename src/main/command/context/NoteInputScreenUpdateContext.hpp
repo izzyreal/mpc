@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <functional>
 #include <memory>
 
@@ -18,7 +17,7 @@ namespace mpc::command::context
         bool isAllowCentralNoteAndPadUpdateScreen;
         std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
         std::function<void(int)> setSelectedNote;
-        std::string currentFieldName;
+        bool currentFieldNameIsFromNote;
     };
 
 } // namespace mpc::command::context

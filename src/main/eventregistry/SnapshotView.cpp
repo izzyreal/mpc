@@ -167,3 +167,8 @@ int SnapshotView::getTotalPressedProgramPadCount() const
 {
     return snap->programPadEvents.size();
 }
+
+int SnapshotView::getTotalNoteOnCount() const
+{
+    return snap->noteEvents.size();
+}

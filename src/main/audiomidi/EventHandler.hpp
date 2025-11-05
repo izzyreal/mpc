@@ -94,35 +94,6 @@ namespace mpc::audiomidi
         void
         handleNoteOffFromFinalizedNoteOn(const std::shared_ptr<NoteOffEvent>);
 
-        // MIDI input can only be handled when not in one of the sampler
-        // screens, because there we only have a DRUM to work with, and no
-        // track.
-        //
-        // Hence, trackIndex, trackDevice and trackVelocityRatio are mandatory.
-        //
-        // When not in one of the sampler screens, it's possible the track is
-        // not a DRUM track, in which case drumIndex is std::nullopt.
-        void handleMidiInputNoteOn(const int midiChannel,
-                                   const std::shared_ptr<NoteOnEventPlayOnly>,
-                                   const int frameOffsetInBuffer, Track *,
-                                   const int trackDevice,
-                                   const int trackVelocityRatio,
-                                   const std::optional<int> drumIndex);
-
-        // MIDI input can only be handled when not in one of the sampler
-        // screens, because there we only have a DRUM to work with, and no
-        // track.
-        //
-        // Hence, trackIndex and trackDevice are mandatory.
-        //
-        // When not in one of the sampler screens, it's possible the track is
-        // not a DRUM track, in which case drumIndex is std::nullopt.
-        void handleMidiInputNoteOff(const int midiChannel,
-                                    const std::shared_ptr<NoteOffEvent>,
-                                    const int frameOffsetInBuffer, Track *,
-                                    const int trackDevice,
-                                    const std::optional<int> drumIndex);
-
         /**
          * Right now we only clear the cache when mpc::Mpc::panic() is invoked.
          * We may want to clear it every time the sequencer stops, but currently

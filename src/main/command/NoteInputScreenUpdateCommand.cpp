@@ -59,8 +59,7 @@ void NoteInputScreenUpdateCommand::execute()
     }
     else if (auto stepEditorScreen =
                  std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
-             stepEditorScreen && ctx.currentFieldName == "fromnote" &&
-             note > 34)
+             stepEditorScreen && ctx.currentFieldNameIsFromNote && note > 34)
     {
         stepEditorScreen->setFromNote(note);
     }

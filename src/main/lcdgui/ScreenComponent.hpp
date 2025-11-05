@@ -42,8 +42,10 @@ namespace mpc::lcdgui
     public:
         const int &getLayerIndex();
 
+        std::shared_ptr<sequencer::Bus> getBus();
         std::optional<int> getDrumIndex();
         std::string getFocusedFieldNameOrThrow();
+        bool isFocusedFieldName(const std::string);
         std::shared_ptr<sampler::Program> getProgram();
 
     protected:

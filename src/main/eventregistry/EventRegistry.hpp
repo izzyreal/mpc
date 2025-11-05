@@ -80,13 +80,15 @@ namespace mpc::eventregistry
         registerNoteOn(Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
                        std::shared_ptr<mpc::sequencer::Bus>, NoteNumber,
                        Velocity, sequencer::Track *, std::optional<MidiChannel>,
-                       std::shared_ptr<sampler::Program>);
+                       std::shared_ptr<sampler::Program>,
+                       std::function<void(void *)> action);
 
         void registerNoteAftertouch(Source, NoteNumber, Pressure,
                                     std::optional<MidiChannel>);
         void registerNoteOff(Source, std::shared_ptr<mpc::sequencer::Bus>,
                              NoteNumber, sequencer::Track *,
-                             std::optional<MidiChannel>);
+                             std::optional<MidiChannel>,
+                             std::function<void(void *)> action);
 
         void clear();
 

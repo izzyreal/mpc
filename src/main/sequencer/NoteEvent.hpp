@@ -50,12 +50,28 @@ namespace mpc::sequencer
         int variationValue = 64;
         int velocity;
 
+        // Used when recording in the step editor or in the MAIN screen when the
+        // sequencer is not running, and we need to derive duration based on how
+        // long the note was pressed, using the metronome-only sequencer (which
+        // is also running when Count is OFF).
+        int metronomeOnlyTickPosition = 0;
+
     protected:
         std::shared_ptr<NoteOffEvent> noteOff;
 
     public:
         std::shared_ptr<NoteOffEvent> getNoteOff() const;
         void setTrack(int track) override;
+
+        void setMetrononomeOnlyTickPosition(const int pos)
+        {
+            metronomeOnlyTickPosition = pos;
+        }
+
+        int getMetronomeOnlyTickPosition()
+        {
+            return metronomeOnlyTickPosition;
+        }
 
         void setNote(int i);
         int getNote() const;

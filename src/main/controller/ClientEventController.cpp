@@ -38,8 +38,9 @@ void ClientEventController::init()
 
     clientMidiEventController = std::make_shared<ClientMidiEventController>(
         mpc.eventRegistry, shared_from_this(), clientHardwareEventController,
-        screens->get<ScreenId::MidiSwScreen>(), mpc.getSequencer(), mpc.getSampler(),
-        screens->get<ScreenId::MidiInputScreen>(), mpc.getEventHandler(),
+        screens->get<ScreenId::MidiSwScreen>(), mpc.getSequencer(),
+        mpc.getSampler(), screens->get<ScreenId::MidiInputScreen>(),
+        mpc.getEventHandler(),
         screens->get<ScreenId::MultiRecordingSetupScreen>(),
         screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
         screens, mpc.getSequencer()->getFrameSequencer(),

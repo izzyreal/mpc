@@ -34,14 +34,12 @@ namespace mpc::command::context
     {
         eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
-        std::shared_ptr<sequencer::DrumBus> drumBus;
+        std::shared_ptr<sequencer::Bus> bus;
         std::shared_ptr<sampler::Program> program;
-        int programPadIndex;
-        std::function<void()> finishBasicVoiceIfSoundIsLooping;
+        std::optional<int> programPadIndex;
         const bool currentScreenIsSoundScreen;
         const bool currentScreenIsSamplerScreen;
         std::shared_ptr<mpc::sequencer::NoteOffEvent> noteOffEvent;
-        std::optional<int> drumIndex;
         std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
         std::shared_ptr<mpc::sequencer::NoteOnEvent> recordOnEvent;
         const bool sequencerIsRecordingOrOverdubbing;

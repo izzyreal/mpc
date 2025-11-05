@@ -1,16 +1,19 @@
 #include "TriggerLocalNoteOnCommand.hpp"
 
-#include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerLocalNoteOnContext.hpp"
+
+#include "audiomidi/EventHandler.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
-#include "sampler/Sampler.hpp"
+#include "sampler/Program.hpp"
+#include "sequencer/Bus.hpp"
 #include "sequencer/FrameSeq.hpp"
+#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "engine/PreviewSoundPlayer.hpp"
 #include "Util.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "sequencer/Track.hpp"
+#include <memory>
 
 using namespace mpc::command;
 using namespace mpc::command::context;
@@ -24,28 +27,10 @@ TriggerLocalNoteOnCommand::TriggerLocalNoteOnCommand(
 
 void TriggerLocalNoteOnCommand::execute()
 {
-    if (ctx->isSoundScreen)
-    {
-        ctx->previewSoundPlayer->mpcNoteOn(ctx->sampler->getSoundIndex(), 127,
-                                           0);
-        return;
-    }
-
     const auto velo = ctx->isFullLevelEnabled ? 127 : ctx->velocity;
 
     const auto noteOnEvent =
         std::make_shared<sequencer::NoteOnEventPlayOnly>(ctx->note, velo);
-
-    ctx->eventRegistry->registerProgramPadPress(
-        ctx->source, ctx->screenComponent,
-        ctx->sequencer->getBus<sequencer::Bus>(ctx->trackBus), ctx->program,
-        ctx->programPadIndex, noteOnEvent->getVelocity(), ctx->track,
-        std::nullopt);
-
-    auto registryNoteOn = ctx->eventRegistry->registerNoteOn(
-        ctx->source, ctx->screenComponent,
-        ctx->sequencer->getBus<sequencer::Bus>(ctx->trackBus), ctx->note,
-        noteOnEvent->getVelocity(), ctx->track, std::nullopt, ctx->program);
 
     if (ctx->isSequencerScreen && ctx->isNoteRepeatLockedOrPressed &&
         ctx->sequencer->isPlaying())
@@ -58,44 +43,58 @@ void TriggerLocalNoteOnCommand::execute()
         return;
     }
 
-    const bool is16LevelsEnabled = ctx->isSixteenLevelsEnabled;
-
-    const auto assign16LevelsScreen = ctx->assign16LevelsScreen;
-
-    Util::SixteenLevelsContext sixteenLevelsContext{
-        is16LevelsEnabled,
-        assign16LevelsScreen->getType(),
-        assign16LevelsScreen->getOriginalKeyPad(),
-        assign16LevelsScreen->getNote(),
-        assign16LevelsScreen->getParameter(),
-        ctx->programPadIndex % 16};
-
-    Util::set16LevelsValues(sixteenLevelsContext, noteOnEvent);
-
-    const bool isSliderNote =
-        ctx->program && ctx->program->getSlider()->getNote() == ctx->note;
-    auto programSlider = ctx->program->getSlider();
-
-    Util::SliderNoteVariationContext sliderNoteVariationContext{
-        ctx->hardwareSliderValue,
-        programSlider->getNote(),
-        programSlider->getParameter(),
-        programSlider->getTuneLowRange(),
-        programSlider->getTuneHighRange(),
-        programSlider->getDecayLowRange(),
-        programSlider->getDecayHighRange(),
-        programSlider->getAttackLowRange(),
-        programSlider->getAttackHighRange(),
-        programSlider->getFilterLowRange(),
-        programSlider->getFilterHighRange()};
-
-    if (ctx->program && isSliderNote)
+    auto apply16LevelsAndSliderNoteVariation =
+        [&](std::shared_ptr<sequencer::NoteOnEvent> noteEventToApplyTo)
     {
-        auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
-            sliderNoteVariationContext);
-        noteOnEvent->setVariationType(type);
-        noteOnEvent->setVariationValue(value);
-    }
+        if (ctx->program && ctx->programPadIndex)
+        {
+            const bool is16LevelsEnabled = ctx->isSixteenLevelsEnabled;
+
+            const auto assign16LevelsScreen = ctx->assign16LevelsScreen;
+
+            Util::SixteenLevelsContext sixteenLevelsContext{
+                is16LevelsEnabled,
+                assign16LevelsScreen->getType(),
+                assign16LevelsScreen->getOriginalKeyPad(),
+                assign16LevelsScreen->getNote(),
+                assign16LevelsScreen->getParameter(),
+                *ctx->programPadIndex % 16};
+
+            Util::set16LevelsValues(sixteenLevelsContext, noteEventToApplyTo);
+        }
+
+        if (ctx->program)
+        {
+            const bool isSliderNote =
+                ctx->program &&
+                ctx->program->getSlider()->getNote() == ctx->note;
+
+            const auto programSlider = ctx->program->getSlider();
+
+            Util::SliderNoteVariationContext sliderNoteVariationContext{
+                ctx->hardwareSliderValue,
+                programSlider->getNote(),
+                programSlider->getParameter(),
+                programSlider->getTuneLowRange(),
+                programSlider->getTuneHighRange(),
+                programSlider->getDecayLowRange(),
+                programSlider->getDecayHighRange(),
+                programSlider->getAttackLowRange(),
+                programSlider->getAttackHighRange(),
+                programSlider->getFilterLowRange(),
+                programSlider->getFilterHighRange()};
+
+            if (ctx->program && isSliderNote)
+            {
+                auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
+                    sliderNoteVariationContext);
+                noteEventToApplyTo->setVariationType(type);
+                noteEventToApplyTo->setVariationValue(value);
+            }
+        }
+    };
+
+    apply16LevelsAndSliderNoteVariation(noteOnEvent);
 
     if (ctx->isSamplerScreen)
     {
@@ -105,13 +104,18 @@ void TriggerLocalNoteOnCommand::execute()
     }
     else
     {
-        const auto drumIndexToUse = ctx->trackBus > 0
-                                        ? std::optional<int>(ctx->trackBus - 1)
-                                        : std::nullopt;
+        std::optional<int> drumIndex = std::nullopt;
+
+        if (auto drumBus =
+                std::dynamic_pointer_cast<sequencer::DrumBus>(ctx->bus);
+            drumBus)
+        {
+            drumIndex = drumBus->getIndex();
+        }
 
         ctx->eventHandler->handleUnfinalizedNoteOn(
             noteOnEvent, ctx->track, ctx->track->getDeviceIndex(),
-            ctx->track->getVelocityRatio(), drumIndexToUse);
+            ctx->track->getVelocityRatio(), drumIndex);
     }
 
     std::shared_ptr<sequencer::NoteOnEvent> recordNoteOnEvent;
@@ -126,7 +130,7 @@ void TriggerLocalNoteOnCommand::execute()
         recordNoteOnEvent = ctx->track->recordNoteEventSynced(
             ctx->sequencer->getTickPosition(), ctx->note, velo);
         ctx->sequencer->playMetronomeTrack();
-        recordNoteOnEvent->setTick(
+        recordNoteOnEvent->setMetrononomeOnlyTickPosition(
             ctx->frameSequencer->getMetronomeOnlyTickPosition());
     }
     else if (ctx->isRecMainWithoutPlaying)
@@ -157,22 +161,7 @@ void TriggerLocalNoteOnCommand::execute()
 
     if (recordNoteOnEvent)
     {
-        if (is16LevelsEnabled)
-        {
-            Util::set16LevelsValues(sixteenLevelsContext, recordNoteOnEvent);
-        }
-
-        if (ctx->program && isSliderNote)
-        {
-            auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
-                sliderNoteVariationContext);
-            recordNoteOnEvent->setVariationType(type);
-            recordNoteOnEvent->setVariationValue(value);
-        }
-    }
-
-    if (recordNoteOnEvent)
-    {
-        registryNoteOn->recordNoteEvent = recordNoteOnEvent;
+        apply16LevelsAndSliderNoteVariation(recordNoteOnEvent);
+        ctx->registryNoteOnEvent->recordNoteEvent = recordNoteOnEvent;
     }
 }
