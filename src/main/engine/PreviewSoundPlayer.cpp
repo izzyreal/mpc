@@ -23,7 +23,7 @@ PreviewSoundPlayer::PreviewSoundPlayer(
     fader = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
 }
 
-void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity,
+void PreviewSoundPlayer::playSound(int soundNumber, int velocity,
                                    int frameOffset)
 {
     if (velocity == 0)

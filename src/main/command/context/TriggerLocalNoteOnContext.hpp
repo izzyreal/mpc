@@ -49,8 +49,6 @@ namespace mpc::command::context
         bool isSequencerScreen;
         std::optional<int> programPadIndex;
         int velocity;
-        bool isSoundScreen;
-
         bool isFullLevelEnabled;
         bool isSixteenLevelsEnabled;
         bool isNoteRepeatLockedOrPressed;

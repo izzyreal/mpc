@@ -21,11 +21,6 @@ TriggerLocalNoteOffCommand::TriggerLocalNoteOffCommand(
 
 void TriggerLocalNoteOffCommand::execute()
 {
-    if (ctx->currentScreenIsSoundScreen)
-    {
-        return;
-    }
-
     if (!ctx->noteOffEvent)
     {
         return;

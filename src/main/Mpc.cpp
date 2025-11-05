@@ -255,9 +255,9 @@ std::shared_ptr<sampler::Sampler> Mpc::getSampler()
     return sampler;
 }
 
-mpc::engine::PreviewSoundPlayer &Mpc::getBasicPlayer()
+mpc::engine::PreviewSoundPlayer &Mpc::getPreviewSoundPlayer()
 {
-    return audioMidiServices->getBasicPlayer();
+    return audioMidiServices->getPreviewSoundPlayer();
 }
 
 std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()

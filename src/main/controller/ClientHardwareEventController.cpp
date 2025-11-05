@@ -237,6 +237,11 @@ void ClientHardwareEventController::handlePadPress(
         mpc.getPadAndButtonKeyboard()->pressHardwareComponent(
             event.componentId);
     }
+    else if (screengroups::isSoundScreen(screen))
+    {
+        mpc.getPreviewSoundPlayer().playSound(sampler::PLAYX_SOUND,
+                                              127, 0);
+    }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
         if (program)
@@ -285,24 +290,21 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    /*
-if (ctx->isSoundScreen)
-{
-    ctx->previewSoundPlayer->mpcNoteOn(ctx->selectedSoundIndex, 127,
-                                       0);
-    return;
-}*/
-
-    auto action = [eventRegistry = mpc.eventRegistry,
-                   eventHandler = mpc.getEventHandler(), screens = mpc.screens,
-                   sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
-                   clientEventController = mpc.clientEventController,
-                   frameSequencer =
-                       mpc.getSequencer()->getFrameSequencer()](void *userData)
+    auto action =
+        [eventRegistry = mpc.eventRegistry,
+         eventHandler = mpc.getEventHandler(), screens = mpc.screens,
+         sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
+         clientEventController = mpc.clientEventController,
+         frameSequencer = mpc.getSequencer()->getFrameSequencer(),
+         previewSoundPlayer = &mpc.getPreviewSoundPlayer()](void *userData)
     {
         auto p = (PhysicalPadPressEvent *)userData;
 
-        if (screengroups::isPadDoesNotTriggerNoteEventScreen(p->screen))
+        if (screengroups::isSoundScreen(p->screen))
+        {
+            previewSoundPlayer->finishVoiceIfSoundIsLooping();
+        }
+        else if (screengroups::isPadDoesNotTriggerNoteEventScreen(p->screen))
         {
             return;
         }

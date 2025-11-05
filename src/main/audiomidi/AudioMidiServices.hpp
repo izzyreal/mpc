@@ -124,7 +124,7 @@ namespace mpc::audiomidi
         void setRecordLevel(int i);
         int getRecordLevel();
         void muteMonitor(bool mute);
-        mpc::engine::PreviewSoundPlayer &getBasicPlayer();
+        mpc::engine::PreviewSoundPlayer &getPreviewSoundPlayer();
         void initializeDiskRecorders();
         void closeIO();
 

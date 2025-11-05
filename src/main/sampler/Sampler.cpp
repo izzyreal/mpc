@@ -225,7 +225,7 @@ void Sampler::playMetronome(unsigned int velocity, int framePos)
     if (metronomeSoundScreen->getSound() == 0)
     {
         velocity *= metronomeSoundScreen->getVolume() * 0.01;
-        mpc.getBasicPlayer().mpcNoteOn(CLICK_SOUND, velocity, framePos);
+        mpc.getPreviewSoundPlayer().playSound(CLICK_SOUND, velocity, framePos);
         return;
     }
 
@@ -244,7 +244,7 @@ void Sampler::playMetronome(unsigned int velocity, int framePos)
     const auto note = programs[programIndex]->getNoteFromPad(pad);
     const auto soundNumber =
         programs[programIndex]->getNoteParameters(note)->getSoundIndex();
-    mpc.getBasicPlayer().mpcNoteOn(soundNumber, velocity, framePos);
+    mpc.getPreviewSoundPlayer().playSound(soundNumber, velocity, framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo)
@@ -261,7 +261,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo)
     previewSound->setStart(start);
     previewSound->setEnd(end);
     previewSound->setLoopTo(loopTo);
-    mpc.getBasicPlayer().mpcNoteOn(PREVIEW_SOUND, 127, 0);
+    mpc.getPreviewSoundPlayer().playSound(PREVIEW_SOUND, 127, 0);
     previewSound->setStart(oldStart);
     previewSound->setEnd(oldEnd);
     previewSound->setLoopTo(oldLoopTo);
@@ -708,7 +708,7 @@ void Sampler::stopAllVoices(int frameOffset)
 
 void Sampler::finishBasicVoice()
 {
-    mpc.getBasicPlayer().finishVoice();
+    mpc.getPreviewSoundPlayer().finishVoice();
 }
 
 void Sampler::playX()
@@ -749,7 +749,7 @@ void Sampler::playX()
     int oldEnd = sound->getEnd();
     sound->setStart(start);
     sound->setEnd(end);
-    mpc.getBasicPlayer().mpcNoteOn(PLAYX_SOUND, 127, 0);
+    mpc.getPreviewSoundPlayer().playSound(PLAYX_SOUND, 127, 0);
     sound->setStart(oldStart);
     sound->setEnd(oldEnd);
 }

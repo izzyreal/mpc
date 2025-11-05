@@ -50,7 +50,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const bool isSequencerScreen =
         std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
-    const bool isSoundScreen = screengroups::isSoundScreen(screen);
     const bool allowCentralNoteAndPadUpdate =
         screengroups::isCentralNoteAndPadUpdateScreen(screen);
     const bool isFullLevelEnabled = controller->isFullLevelEnabled();
@@ -95,7 +94,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                                   isSequencerScreen,
                                   programPadIndex,
                                   velocity,
-                                  isSoundScreen,
                                   isFullLevelEnabled,
                                   isSixteenLevelsEnabled,
                                   isNoteRepeatLockedOrPressed,
@@ -136,7 +134,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     std::shared_ptr<Screens> screens, std::shared_ptr<Hardware> hardware)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
-    const bool isSoundScreen = screengroups::isSoundScreen(screen);
 
     const auto registrySnapshot = eventRegistry->getSnapshot();
     const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
@@ -179,7 +176,6 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             bus,
             program,
             programPadIndex,
-            isSoundScreen,
             isSamplerScreen,
             std::make_shared<sequencer::NoteOffEvent>(note),
             eventHandler,

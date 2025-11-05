@@ -35,7 +35,7 @@ namespace mpc::engine
 
         void finishVoiceIfSoundIsLooping();
 
-        void mpcNoteOn(int soundNumber, int velocity, int frameOffset);
+        void playSound(int soundNumber, int velocity, int frameOffset);
 
         void connectVoice();
 

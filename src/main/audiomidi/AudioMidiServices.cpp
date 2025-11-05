@@ -219,7 +219,7 @@ void AudioMidiServices::setAssignableMixOutLevels()
     }
 }
 
-PreviewSoundPlayer &AudioMidiServices::getBasicPlayer()
+PreviewSoundPlayer &AudioMidiServices::getPreviewSoundPlayer()
 {
     return *basicSoundPlayerChannel.get();
 }

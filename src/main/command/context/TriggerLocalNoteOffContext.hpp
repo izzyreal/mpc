@@ -37,7 +37,6 @@ namespace mpc::command::context
         std::shared_ptr<sequencer::Bus> bus;
         std::shared_ptr<sampler::Program> program;
         std::optional<int> programPadIndex;
-        const bool currentScreenIsSoundScreen;
         const bool currentScreenIsSamplerScreen;
         std::shared_ptr<mpc::sequencer::NoteOffEvent> noteOffEvent;
         std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;

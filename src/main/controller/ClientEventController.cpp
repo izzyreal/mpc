@@ -44,7 +44,7 @@ void ClientEventController::init()
         screens->get<ScreenId::MultiRecordingSetupScreen>(),
         screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
         screens, mpc.getSequencer()->getFrameSequencer(),
-        &mpc.getBasicPlayer());
+        &mpc.getPreviewSoundPlayer());
 }
 
 void ClientEventController::dispatchHostInput(

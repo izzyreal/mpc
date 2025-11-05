@@ -126,7 +126,7 @@ namespace mpc
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        mpc::engine::PreviewSoundPlayer &getBasicPlayer();
+        mpc::engine::PreviewSoundPlayer &getPreviewSoundPlayer();
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
