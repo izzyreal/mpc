@@ -15,7 +15,6 @@
 #include "MpcResourceUtil.hpp"
 
 #include <nlohmann/json.hpp>
-#include <functional>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -28,7 +27,7 @@ Screens::Screens(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void Screens::createAndCacheAllScreens()
 {
-    for (auto screenName : screenNames)
+    for (auto [screenName, screenId] : screenNames)
     {
         if (std::find(knownUnimplementedScreens.begin(),
                       knownUnimplementedScreens.end(),

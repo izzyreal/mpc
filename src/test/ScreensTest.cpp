@@ -40,14 +40,14 @@ SCENARIO("All screens can be opened", "[screens]")
         std::vector<std::string> good;
         std::vector<std::string> bad;
 
-        for (auto &screenName : screenNames)
+        for (auto [screenName, screenId] : screenNames)
         {
             if (std::find(knownUnimplementedScreens.begin(),
                           knownUnimplementedScreens.end(),
                           screenName) != knownUnimplementedScreens.end())
             {
                 printf("Fix this known unimplemented screen asap: '%s'\n",
-                       screenName.c_str());
+                       screenName);
                 continue;
             }
             if (std::find(knownProblematicScreens.begin(),
@@ -55,21 +55,21 @@ SCENARIO("All screens can be opened", "[screens]")
                           screenName) != knownProblematicScreens.end())
             {
                 printf("Fix this known problematic screen asap: '%s'\n",
-                       screenName.c_str());
+                       screenName);
                 continue;
             }
 
             ls->openScreen(screenName);
 
             // We do a check for the most important screen
-            if (screenName == "sequencer")
+            if (std::string(screenName) == "sequencer")
             {
                 REQUIRE(ls->getFocusedLayerIndex() == 0);
             }
 
             if (ls->getFocusedLayerIndex() == -1)
             {
-                bad.push_back(screenName + " could not be opened.");
+                bad.push_back(std::string(screenName) + " could not be opened.");
                 continue;
             }
 
@@ -91,13 +91,13 @@ SCENARIO("All screens can be opened", "[screens]")
 
             if (blackPixelCount > 0)
             {
-                good.push_back(screenName + " has " +
+                good.push_back(std::string(screenName) + " has " +
                                std::to_string(blackPixelCount) +
                                " black pixels");
             }
             else
             {
-                bad.push_back(screenName +
+                bad.push_back(std::string(screenName) +
                               " is openable, but has 0 black pixels");
             }
         }

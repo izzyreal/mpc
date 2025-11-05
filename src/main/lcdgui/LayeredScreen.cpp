@@ -2,6 +2,7 @@
 
 #include "lcdgui/BMFParser.hpp"
 #include "lcdgui/ScreenGroups.hpp"
+#include "lcdgui/ScreenNames.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/AllScreens.hpp"
 
@@ -37,34 +38,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-
-namespace
-{
-    struct ScreenNameEntry
-    {
-        const char *name;
-        ScreenId id;
-    };
-
-    constexpr ScreenNameEntry screenNameList[] = {
-#define X(ns, Class, nameStr) {nameStr, ScreenId::Class},
-        SCREEN_LIST
-#undef X
-    };
-
-    inline std::optional<ScreenId> getScreenIdByName(const std::string &name)
-    {
-        for (auto &entry : screenNameList)
-        {
-            if (name == entry.name)
-            {
-                return entry.id;
-            }
-        }
-        return std::nullopt;
-    }
-
-} // anonymous namespace
 
 LayeredScreen::LayeredScreen(mpc::Mpc &mpc) : mpc(mpc)
 {

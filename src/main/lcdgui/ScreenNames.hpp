@@ -1,23 +1,42 @@
 #pragma once
 
-#include <vector>
 #include <string>
+#include <optional>
+#include <vector>
 
 #include "lcdgui/ScreenRegistry.hpp"
+#include "lcdgui/ScreenId.hpp"
 
 inline const std::vector<std::string> knownUnimplementedScreens{
     "format", // missing from json layouts
     "setup"   // missing from json layouts
 };
 
-inline const std::vector<std::string> screenNames = {
-#define X(ns, Class, name) name,
+struct ScreenNameEntry
+{
+    const char *name;
+    mpc::lcdgui::ScreenId id;
+};
+
+inline constexpr ScreenNameEntry screenNames[] = {
+#define X(ns, Class, nameStr) {nameStr, mpc::lcdgui::ScreenId::Class},
     SCREEN_LIST
 #undef X
 };
 
-static bool isValidScreenName(const std::string screenName)
+inline std::optional<mpc::lcdgui::ScreenId>
+getScreenIdByName(const std::string &name)
 {
-    return std::find(screenNames.begin(), screenNames.end(), screenName) !=
-           screenNames.end();
+    for (auto &entry : screenNames)
+    {
+        if (name == entry.name)
+            return entry.id;
+    }
+    return std::nullopt;
 }
+
+inline bool isValidScreenName(const std::string &name)
+{
+    return getScreenIdByName(name).has_value();
+}
+
