@@ -1,5 +1,6 @@
 #include "LoadASoundScreen.hpp"
 
+#include "Mpc.hpp"
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
 

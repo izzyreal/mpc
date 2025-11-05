@@ -4,6 +4,7 @@
 #include "sequencer/Track.hpp"
 
 #include "lcdgui/screens/EventsScreen.hpp"
+#include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;

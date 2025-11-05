@@ -3,6 +3,7 @@
 #include "StrUtil.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 
+#include "sequencer/Event.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"

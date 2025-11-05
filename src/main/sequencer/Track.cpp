@@ -47,6 +47,8 @@ Track::Track(mpc::Mpc &mpc, Sequence *parent, int i) : mpc(mpc)
     eventIndex = 0;
     device = 0;
     busNumber = 1;
+    bulkNoteOns = std::vector<std::shared_ptr<NoteOnEvent>>(20);
+    bulkNoteOffs = std::vector<std::shared_ptr<NoteOffEvent>>(20);
     queuedNoteOnEvents = std::make_shared<
         moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>>(20);
     queuedNoteOffEvents = std::make_shared<
