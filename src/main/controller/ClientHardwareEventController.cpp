@@ -147,7 +147,7 @@ void ClientHardwareEventController::handlePadPress(
         velocity, static_cast<float>(VelocitySensitivePressable::MIN_VELO),
         static_cast<float>(VelocitySensitivePressable::MAX_VELO));
 
-    if (mpc.getHardware()->getPad(physicalPadIndex)->pressWithVelocity(clampedVelocity))
+    if (!mpc.getHardware()->getPad(physicalPadIndex)->pressWithVelocity(clampedVelocity))
     {
         return;
     }
