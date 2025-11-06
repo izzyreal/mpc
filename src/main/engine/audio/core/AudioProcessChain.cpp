@@ -9,7 +9,7 @@ using namespace mpc::engine::control;
 using namespace mpc::engine::audio::core;
 
 AudioProcessChain::AudioProcessChain(
-    shared_ptr<AudioControlsChain> controlChain)
+    const shared_ptr<AudioControlsChain> &controlChain)
 {
     this->controlChain = controlChain;
 }

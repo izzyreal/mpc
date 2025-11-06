@@ -18,9 +18,9 @@ namespace mpc::file::aps
         static std::vector<char> PADDING;
 
     public:
-        int getProgram();
-        bool getReceivePgmChange();
-        bool getReceiveMidiVolume();
+        int getProgram() const;
+        bool getReceivePgmChange() const;
+        bool getReceiveMidiVolume() const;
 
     public:
         std::vector<char> getBytes();

@@ -142,29 +142,29 @@ namespace mpc::controller
         void handleNoteOff(const ClientMidiEvent &e);
         void handleKeyAftertouch(const ClientMidiEvent &e) const;
         void handleChannelAftertouch(const ClientMidiEvent &e) const;
-        void handlePitchBend(const ClientMidiEvent &e);
+        void handlePitchBend(const ClientMidiEvent &e) const;
         void handleControlChange(const ClientMidiEvent &e);
-        void handleProgramChange(const ClientMidiEvent &e);
+        void handleProgramChange(const ClientMidiEvent &e) const;
 
         // System Exclusive (Manufacturer ID: 0x45)
-        void handleSystemExclusive(const ClientMidiEvent &e);
+        void handleSystemExclusive(const ClientMidiEvent &e) const;
 
         // System Common
-        void handleSongPositionPointer(const ClientMidiEvent &e);
-        void handleSongSelect(const ClientMidiEvent &e);
-        void handleTuneRequest(const ClientMidiEvent &e);
+        void handleSongPositionPointer(const ClientMidiEvent &e) const;
+        void handleSongSelect(const ClientMidiEvent &e) const;
+        void handleTuneRequest(const ClientMidiEvent &e) const;
 
         // System Real-Time
-        void handleMidiClock(const ClientMidiEvent &e);
-        void handleStart(const ClientMidiEvent &e);
-        void handleStop(const ClientMidiEvent &e);
-        void handleContinue(const ClientMidiEvent &e);
+        void handleMidiClock(const ClientMidiEvent &e) const;
+        void handleStart(const ClientMidiEvent &e) const;
+        void handleStop(const ClientMidiEvent &e) const;
+        void handleContinue(const ClientMidiEvent &e) const;
 
         // Auxiliary / Non-Recognized Messages
-        void handleLocalOnOff(const ClientMidiEvent &e);
-        void handleAllNotesOff(const ClientMidiEvent &e);
-        void handleActiveSense(const ClientMidiEvent &e);
-        void handleReset(const ClientMidiEvent &e);
+        void handleLocalOnOff(const ClientMidiEvent &e) const;
+        void handleAllNotesOff(const ClientMidiEvent &e) const;
+        void handleActiveSense(const ClientMidiEvent &e) const;
+        void handleReset(const ClientMidiEvent &e) const;
 
         void noteOnInternal(int channel, int note, int velocity);
         void noteOffInternal(int channel, int note);

@@ -99,10 +99,11 @@ Voice::~Voice()
     }
 }
 
-void Voice::init(int newVelocity, std::shared_ptr<Sound> sound, int newNote,
-                 NoteParameters *np, int newVarType, int newVarValue,
-                 int drumIndex, int newFrameOffset, bool newEnableEnvs,
-                 int newStartTick, float engineSampleRate, uint64_t noteEventId)
+void Voice::init(int newVelocity, const std::shared_ptr<Sound> &sound,
+                 int newNote, NoteParameters *np, int newVarType,
+                 int newVarValue, int drumIndex, int newFrameOffset,
+                 bool newEnableEnvs, int newStartTick, float engineSampleRate,
+                 uint64_t noteEventId)
 {
     VoiceState *state = getInactiveState();
 

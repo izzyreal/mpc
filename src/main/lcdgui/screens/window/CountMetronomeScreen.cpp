@@ -4,7 +4,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-CountMetronomeScreen::CountMetronomeScreen(mpc::Mpc &mpc, const int layerIndex)
+CountMetronomeScreen::CountMetronomeScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "count-metronome", layerIndex)
 {
 }
@@ -22,32 +22,32 @@ void CountMetronomeScreen::open()
     displayWaitForKey();
 }
 
-void CountMetronomeScreen::displayWaitForKey()
+void CountMetronomeScreen::displayWaitForKey() const
 {
     findField("wait-for-key")->setText(waitForKey ? "ON" : "OFF");
 }
 
-void CountMetronomeScreen::displayInRec()
+void CountMetronomeScreen::displayInRec() const
 {
     findField("in-rec")->setText(inRec ? "YES" : "NO");
 }
 
-void CountMetronomeScreen::displayRate()
+void CountMetronomeScreen::displayRate() const
 {
     findField("rate")->setText(rateNames[rate]);
 }
 
-void CountMetronomeScreen::displayInPlay()
+void CountMetronomeScreen::displayInPlay() const
 {
     findField("in-play")->setText(inPlay ? "YES" : "NO");
 }
 
-void CountMetronomeScreen::displayCountIn()
+void CountMetronomeScreen::displayCountIn() const
 {
     findField("count-in")->setText(countInNames[countIn]);
 }
 
-void CountMetronomeScreen::function(int i)
+void CountMetronomeScreen::function(const int i)
 {
     switch (i)
     {
@@ -60,7 +60,7 @@ void CountMetronomeScreen::function(int i)
     }
 }
 
-void CountMetronomeScreen::turnWheel(int i)
+void CountMetronomeScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -87,12 +87,12 @@ void CountMetronomeScreen::turnWheel(int i)
     }
 }
 
-int CountMetronomeScreen::getCountInMode()
+int CountMetronomeScreen::getCountInMode() const
 {
     return countIn;
 }
 
-void CountMetronomeScreen::setCountIn(int i)
+void CountMetronomeScreen::setCountIn(const int i)
 {
     if (i < 0 || i > 2)
     {
@@ -103,7 +103,7 @@ void CountMetronomeScreen::setCountIn(int i)
     displayCountIn();
 }
 
-void CountMetronomeScreen::setInPlay(bool b)
+void CountMetronomeScreen::setInPlay(const bool b)
 {
     if (inPlay == b)
     {
@@ -114,17 +114,17 @@ void CountMetronomeScreen::setInPlay(bool b)
     displayInPlay();
 }
 
-bool CountMetronomeScreen::getInPlay()
+bool CountMetronomeScreen::getInPlay() const
 {
     return inPlay;
 }
 
-int CountMetronomeScreen::getRate()
+int CountMetronomeScreen::getRate() const
 {
     return rate;
 }
 
-void CountMetronomeScreen::setRate(int i)
+void CountMetronomeScreen::setRate(const int i)
 {
     if (i < 0 || i > 7)
     {
@@ -135,7 +135,7 @@ void CountMetronomeScreen::setRate(int i)
     displayRate();
 }
 
-void CountMetronomeScreen::setWaitForKey(bool b)
+void CountMetronomeScreen::setWaitForKey(const bool b)
 {
     if (waitForKey == b)
     {
@@ -146,12 +146,12 @@ void CountMetronomeScreen::setWaitForKey(bool b)
     displayWaitForKey();
 }
 
-bool CountMetronomeScreen::isWaitForKeyEnabled()
+bool CountMetronomeScreen::isWaitForKeyEnabled() const
 {
     return waitForKey;
 }
 
-void CountMetronomeScreen::setInRec(bool b)
+void CountMetronomeScreen::setInRec(const bool b)
 {
     if (inRec == b)
     {
@@ -162,7 +162,7 @@ void CountMetronomeScreen::setInRec(bool b)
     displayInRec();
 }
 
-bool CountMetronomeScreen::getInRec()
+bool CountMetronomeScreen::getInRec() const
 {
     return inRec;
 }

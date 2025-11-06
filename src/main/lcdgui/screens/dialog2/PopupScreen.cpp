@@ -4,7 +4,7 @@
 
 using namespace mpc::lcdgui::screens::dialog2;
 
-PopupScreen::PopupScreen(mpc::Mpc &mpc, int layer)
+PopupScreen::PopupScreen(Mpc &mpc, int layer)
     : ScreenComponent(mpc, "popup", layer)
 {
     addChild(std::make_shared<Label>(mpc, "popup", "", 43, 23, 0));

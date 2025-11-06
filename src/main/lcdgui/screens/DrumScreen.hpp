@@ -1,28 +1,28 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class DrumScreen : public mpc::lcdgui::ScreenComponent
+    class DrumScreen final : public ScreenComponent
     {
     public:
-        DrumScreen(mpc::Mpc &mpc, int layerIndex);
+        DrumScreen(Mpc &mpc, int layerIndex);
         void function(int f) override;
         void turnWheel(int i) override;
         void open() override;
 
         void setDrum(unsigned char i);
-        unsigned char getDrum();
+        unsigned char getDrum() const;
         void setPadToIntSound(bool b);
-        bool isPadToIntSound();
+        bool isPadToIntSound() const;
 
     private:
-        void displayCurrentVal();
-        void displayDrum();
-        void displayPadToInternalSound();
-        void displayPgm();
-        void displayPgmChange();
-        void displayMidiVolume();
+        void displayCurrentVal() const;
+        void displayDrum() const;
+        void displayPadToInternalSound() const;
+        void displayPgm() const;
+        void displayPgmChange() const;
+        void displayMidiVolume() const;
 
         bool padToInternalSound = true;
         unsigned char drum = 0;

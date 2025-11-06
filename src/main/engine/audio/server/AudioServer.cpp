@@ -25,7 +25,7 @@ AudioServer::getBuffers()
     return buffers;
 }
 
-const unsigned int AudioServer::getBufferSize()
+const unsigned int AudioServer::getBufferSize() const
 {
     return bufferSize;
 }

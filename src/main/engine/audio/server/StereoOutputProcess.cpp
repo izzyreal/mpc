@@ -5,7 +5,8 @@
 using namespace mpc::engine::audio::server;
 using namespace std;
 
-StereoOutputProcess::StereoOutputProcess(string name) : AudioServerProcess(name)
+StereoOutputProcess::StereoOutputProcess(const string &name)
+    : AudioServerProcess(name)
 {
 }
 

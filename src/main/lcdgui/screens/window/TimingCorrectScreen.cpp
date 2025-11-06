@@ -6,7 +6,7 @@
 #include "sequencer/Track.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
@@ -15,7 +15,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc &mpc, const int layerIndex)
+TimingCorrectScreen::TimingCorrectScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "timing-correct", layerIndex)
 {
 }
@@ -38,7 +38,7 @@ void TimingCorrectScreen::open()
     displayNotes();
 }
 
-void TimingCorrectScreen::function(int i)
+void TimingCorrectScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -98,7 +98,7 @@ void TimingCorrectScreen::function(int i)
     }
 }
 
-void TimingCorrectScreen::turnWheel(int i)
+void TimingCorrectScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -124,7 +124,7 @@ void TimingCorrectScreen::turnWheel(int i)
     displayTime();
 }
 
-void TimingCorrectScreen::setNote0(int i)
+void TimingCorrectScreen::setNote0(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -145,7 +145,7 @@ void TimingCorrectScreen::displayNoteValue()
     findField("swing")->Hide(!(noteValue == 1 || noteValue == 3));
 }
 
-void TimingCorrectScreen::displaySwing()
+void TimingCorrectScreen::displaySwing() const
 {
     findField("swing")->setText(std::to_string(swing));
 }
@@ -161,10 +161,10 @@ void TimingCorrectScreen::displayNotes()
         findField("note0")->setSize(47, 9);
         findField("note0")->setText(
             StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-            mpc::Util::noteNames()[note0] + u8"\u00D4");
+            Util::noteNames()[note0] + u8"\u00D4");
         findField("note1")->setText(
             StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-            mpc::Util::noteNames()[note1] + u8"\u00D4");
+            Util::noteNames()[note1] + u8"\u00D4");
         findLabel("note1")->Hide(false);
         findField("note1")->Hide(false);
     }
@@ -191,12 +191,12 @@ void TimingCorrectScreen::displayNotes()
     }
 }
 
-void TimingCorrectScreen::displayShiftTiming()
+void TimingCorrectScreen::displayShiftTiming() const
 {
     findField("shifttiming")->setText(shiftTimingLater ? "LATER" : "EARLIER");
 }
 
-void TimingCorrectScreen::displayAmount()
+void TimingCorrectScreen::displayAmount() const
 {
     findField("amount")->setTextPadded(amount);
 }
@@ -214,7 +214,7 @@ void TimingCorrectScreen::displayTime()
     findField("time5")->setTextPadded(SeqUtil::getClock(s, time1), "0");
 }
 
-void TimingCorrectScreen::setAmount(int i)
+void TimingCorrectScreen::setAmount(const int i)
 {
     int maxVal = 0;
 
@@ -250,46 +250,46 @@ void TimingCorrectScreen::setAmount(int i)
     displayAmount();
 }
 
-void TimingCorrectScreen::setShiftTimingLater(bool b)
+void TimingCorrectScreen::setShiftTimingLater(const bool b)
 {
     shiftTimingLater = b;
     displayShiftTiming();
 }
 
-int TimingCorrectScreen::getSwing()
+int TimingCorrectScreen::getSwing() const
 {
     return swing;
 }
 
-void TimingCorrectScreen::setSwing(int i)
+void TimingCorrectScreen::setSwing(const int i)
 {
     swing = std::clamp(i, 50, 75);
     displaySwing();
 }
 
-unsigned char TimingCorrectScreen::getNoteValueLengthInTicks()
+unsigned char TimingCorrectScreen::getNoteValueLengthInTicks() const
 {
     return noteValueLengthsInTicks[noteValue];
 }
 
-int TimingCorrectScreen::getNoteValue()
+int TimingCorrectScreen::getNoteValue() const
 {
     return noteValue;
 }
 
-void TimingCorrectScreen::setNoteValue(int i)
+void TimingCorrectScreen::setNoteValue(const int i)
 {
     noteValue = std::clamp(i, 0, 6);
     setAmount(amount); // reclamp to new bounds
     displayNoteValue();
 }
 
-int TimingCorrectScreen::getAmount()
+int TimingCorrectScreen::getAmount() const
 {
     return amount;
 }
 
-int TimingCorrectScreen::isShiftTimingLater()
+int TimingCorrectScreen::isShiftTimingLater() const
 {
     return shiftTimingLater;
 }

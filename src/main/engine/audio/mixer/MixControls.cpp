@@ -19,7 +19,8 @@ using namespace mpc::engine::control;
 using namespace std;
 
 MixControls::MixControls(MixerControls *mixerControls, int stripId,
-                         shared_ptr<BusControls> busControls, bool master)
+                         const shared_ptr<BusControls> &busControls,
+                         bool master)
     : AudioControls(busControls->getId(), busControls->getName())
 {
     this->mixerControls = mixerControls;
@@ -53,7 +54,7 @@ MixControls::MixControls(MixerControls *mixerControls, int stripId,
     derive(gainControl.get());
 }
 
-MixerControls *MixControls::getMixerControls()
+MixerControls *MixControls::getMixerControls() const
 {
     return mixerControls;
 }
@@ -81,12 +82,12 @@ void MixControls::derive(Control *c)
     }
 }
 
-bool MixControls::isMaster()
+bool MixControls::isMaster() const
 {
     return master;
 }
 
-bool MixControls::isMute()
+bool MixControls::isMute() const
 {
     return mute;
 }
@@ -96,18 +97,18 @@ bool MixControls::isEnabled()
     return !isMute();
 }
 
-float MixControls::getGain()
+float MixControls::getGain() const
 {
     return gain;
 }
 
-void MixControls::getChannelGains(vector<float> *dest)
+void MixControls::getChannelGains(vector<float> *dest) const
 {
     (*dest)[1] = gain * right;
     (*dest)[0] = gain * left;
 }
 
-float MixControls::getSmoothingFactor()
+float MixControls::getSmoothingFactor() const
 {
     return mixerControls->getSmoothingFactor();
 }

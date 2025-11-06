@@ -94,14 +94,14 @@ void CopyProgramScreen::setPgm1(const int i)
     displayFunctionKeys();
 }
 
-void CopyProgramScreen::displayPgm0()
+void CopyProgramScreen::displayPgm0() const
 {
     const auto programName = sampler->getProgram(pgm0)->getName();
     findField("pgm0")->setText(
         StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
-void CopyProgramScreen::displayPgm1()
+void CopyProgramScreen::displayPgm1() const
 {
     const auto program1 = sampler->getProgram(pgm1);
 

@@ -1,15 +1,15 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/screens/OpensNameScreen.hpp>
+#include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class KeepOrRetryScreen : public mpc::lcdgui::ScreenComponent,
-                              public mpc::lcdgui::screens::OpensNameScreen
+    class KeepOrRetryScreen final : public ScreenComponent,
+                                    public OpensNameScreen
     {
 
     public:
-        KeepOrRetryScreen(mpc::Mpc &mpc, int layerIndex);
+        KeepOrRetryScreen(Mpc &mpc, int layerIndex);
 
         void update(Observable *o, Message message) override;
 
@@ -20,8 +20,8 @@ namespace mpc::lcdgui::screens::window
         void right() override;
 
     private:
-        void displayNameForNewSound();
-        void displayAssignToNote();
+        void displayNameForNewSound() const;
+        void displayAssignToNote() const;
         void openNameScreen() override;
         unsigned char assignToNote = 34;
     };

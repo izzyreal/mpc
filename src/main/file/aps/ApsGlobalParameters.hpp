@@ -29,17 +29,17 @@ namespace mpc::file::aps
         std::vector<char> saveBytes{};
 
     private:
-        int readFxDrum(char b);
+        int readFxDrum(char b) const;
 
     public:
-        int getFxDrum();
-        bool isPadToIntSoundEnabled();
-        bool isPadAssignMaster();
-        bool isStereoMixSourceDrum();
-        bool isIndivFxSourceDrum();
-        bool isCopyPgmMixToDrumEnabled();
-        bool isRecordMixChangesEnabled();
-        int getMasterLevel();
+        int getFxDrum() const;
+        bool isPadToIntSoundEnabled() const;
+        bool isPadAssignMaster() const;
+        bool isStereoMixSourceDrum() const;
+        bool isIndivFxSourceDrum() const;
+        bool isCopyPgmMixToDrumEnabled() const;
+        bool isRecordMixChangesEnabled() const;
+        int getMasterLevel() const;
 
     public:
         std::vector<char> getBytes();

@@ -3,7 +3,7 @@
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-AudioBuffer::AudioBuffer(string name, int channelCount, int sampleCount,
+AudioBuffer::AudioBuffer(const string &name, int channelCount, int sampleCount,
                          float sampleRate)
     : FloatSampleBuffer(channelCount, sampleCount, sampleRate)
 {
@@ -55,7 +55,7 @@ void AudioBuffer::setChannelCount(int count)
     }
 }
 
-bool AudioBuffer::isRealTime()
+bool AudioBuffer::isRealTime() const
 {
     return realTime;
 }

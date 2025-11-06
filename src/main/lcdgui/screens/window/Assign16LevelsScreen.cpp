@@ -15,7 +15,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-Assign16LevelsScreen::Assign16LevelsScreen(mpc::Mpc &mpc, const int layerIndex)
+Assign16LevelsScreen::Assign16LevelsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "assign-16-levels", layerIndex)
 {
 }
@@ -28,7 +28,7 @@ void Assign16LevelsScreen::open()
     displayOriginalKeyPad();
 }
 
-void Assign16LevelsScreen::function(int i)
+void Assign16LevelsScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -46,7 +46,7 @@ void Assign16LevelsScreen::function(int i)
     }
 }
 
-void Assign16LevelsScreen::turnWheel(int i)
+void Assign16LevelsScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -99,14 +99,14 @@ void Assign16LevelsScreen::setNote(int newNote)
     displayNote();
 }
 
-void Assign16LevelsScreen::setParam(int i)
+void Assign16LevelsScreen::setParam(const int i)
 {
     parameter = std::clamp(i, 0, 1);
     displayParameter();
     displayType();
 }
 
-void Assign16LevelsScreen::setType(int i)
+void Assign16LevelsScreen::setType(const int i)
 {
     type = std::clamp(i, 0, 3);
 
@@ -114,33 +114,33 @@ void Assign16LevelsScreen::setType(int i)
     displayOriginalKeyPad();
 }
 
-void Assign16LevelsScreen::setOriginalKeyPad(int i)
+void Assign16LevelsScreen::setOriginalKeyPad(const int i)
 {
     originalKeyPad = std::clamp(i, 3, 12);
     displayOriginalKeyPad();
 }
 
-int Assign16LevelsScreen::getOriginalKeyPad()
+int Assign16LevelsScreen::getOriginalKeyPad() const
 {
     return originalKeyPad;
 }
 
-int Assign16LevelsScreen::getType()
+int Assign16LevelsScreen::getType() const
 {
     return type;
 }
 
-int Assign16LevelsScreen::getNote()
+int Assign16LevelsScreen::getNote() const
 {
     return note;
 }
 
-int Assign16LevelsScreen::getParameter()
+int Assign16LevelsScreen::getParameter() const
 {
     return parameter;
 }
 
-void Assign16LevelsScreen::displayNote()
+void Assign16LevelsScreen::displayNote() const
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
     const auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
@@ -160,12 +160,12 @@ void Assign16LevelsScreen::displayNote()
     findField("note")->setText(noteName + "/" + padName + "-" + soundName);
 }
 
-void Assign16LevelsScreen::displayParameter()
+void Assign16LevelsScreen::displayParameter() const
 {
     findField("param")->setText(paramNames[parameter]);
 }
 
-void Assign16LevelsScreen::displayType()
+void Assign16LevelsScreen::displayType() const
 {
     displayOriginalKeyPad();
 
@@ -180,7 +180,7 @@ void Assign16LevelsScreen::displayType()
     findField("type")->setText(typeNames[type]);
 }
 
-void Assign16LevelsScreen::displayOriginalKeyPad()
+void Assign16LevelsScreen::displayOriginalKeyPad() const
 {
     findField("originalkeypad")->Hide(!(parameter == 1 && type == 0));
     findLabel("originalkeypad")->Hide(!(parameter == 1 && type == 0));

@@ -8,7 +8,7 @@ using namespace mpc::engine::filter;
 using namespace mpc::engine::control;
 using namespace std;
 
-FilterControls::FilterControls(int id, string name, int idOffset)
+FilterControls::FilterControls(int id, const string &name, int idOffset)
     : CompoundControl(id, name)
 {
     this->idOffset = idOffset;
@@ -71,12 +71,12 @@ LawControl *FilterControls::createResonanceControl()
                           0.25f);
 }
 
-float FilterControls::getCutoff()
+float FilterControls::getCutoff() const
 {
     return cutoff;
 }
 
-float FilterControls::getResonance()
+float FilterControls::getResonance() const
 {
     return resonance;
 }

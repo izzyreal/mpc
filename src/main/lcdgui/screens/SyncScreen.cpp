@@ -5,7 +5,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-SyncScreen::SyncScreen(mpc::Mpc &mpc, const int layerIndex)
+SyncScreen::SyncScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sync", layerIndex)
 {
 }
@@ -122,7 +122,7 @@ void SyncScreen::setModeIn(unsigned char c)
     displayShiftEarly();
 }
 
-int SyncScreen::getModeOut()
+int SyncScreen::getModeOut() const
 {
     return modeOut;
 }
@@ -140,7 +140,7 @@ void SyncScreen::setReceiveMMCEnabled(bool b)
 }
 
 // Also used to display "Frame rate:" field}
-void SyncScreen::displayShiftEarly()
+void SyncScreen::displayShiftEarly() const
 {
     if (modeIn == 0)
     {
@@ -169,13 +169,13 @@ void SyncScreen::displayShiftEarly()
     }
 }
 
-void SyncScreen::displayIn()
+void SyncScreen::displayIn() const
 {
     const auto result = std::to_string(in + 1);
     findField("in")->setText(result);
 }
 
-void SyncScreen::displayOut()
+void SyncScreen::displayOut() const
 {
     auto outText = " A";
 
@@ -191,34 +191,34 @@ void SyncScreen::displayOut()
     findField("out")->setText(outText);
 }
 
-void SyncScreen::displayModeIn()
+void SyncScreen::displayModeIn() const
 {
     findField("mode-in")->setText(modeNames[getModeIn()]);
 }
 
-void SyncScreen::displayModeOut()
+void SyncScreen::displayModeOut() const
 {
     findField("mode-out")->setText(modeNames[getModeOut()]);
 }
 
-void SyncScreen::displayReceiveMMC()
+void SyncScreen::displayReceiveMMC() const
 {
     const auto mmc = std::string(receiveMMCEnabled ? "ON" : "OFF");
     findField("receive-mmc")->setText(mmc);
 }
 
-void SyncScreen::displaySendMMC()
+void SyncScreen::displaySendMMC() const
 {
     const auto mmc = std::string(sendMMCEnabled ? "ON" : "OFF");
     findField("send-mmc")->setText(mmc);
 }
 
-int SyncScreen::getModeIn()
+int SyncScreen::getModeIn() const
 {
     return modeIn;
 }
 
-int SyncScreen::getOut()
+int SyncScreen::getOut() const
 {
     return out;
 }

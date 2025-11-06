@@ -34,7 +34,7 @@ using namespace mpc::file::mid::event;
 using namespace mpc::sequencer;
 
 MidiReader::MidiReader(std::shared_ptr<std::istream> istream,
-                       std::weak_ptr<Sequence> _dest)
+                       const std::weak_ptr<Sequence> &_dest)
     : dest(_dest)
 {
     midiFile = std::make_unique<mpc::file::mid::MidiFile>(istream);
@@ -457,7 +457,7 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
     }
 }
 
-bool MidiReader::isInteger(std::string s)
+bool MidiReader::isInteger(const std::string &s)
 {
     for (auto &c : s)
     {
@@ -471,7 +471,8 @@ bool MidiReader::isInteger(std::string s)
 }
 
 int MidiReader::getNumberOfNoteOns(
-    int noteValue, std::vector<std::shared_ptr<ChannelEvent>> allNotes)
+    int noteValue,
+    const std::vector<std::shared_ptr<ChannelEvent>> &allNotes) const
 {
     int counter = 0;
 
@@ -492,7 +493,8 @@ int MidiReader::getNumberOfNoteOns(
 }
 
 int MidiReader::getNumberOfNotes(
-    int noteValue, std::vector<std::shared_ptr<NoteOnEvent>> allNotes)
+    int noteValue,
+    const std::vector<std::shared_ptr<NoteOnEvent>> &allNotes) const
 {
     int counter = 0;
 

@@ -1,12 +1,12 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 #include <string>
 
 namespace mpc::lcdgui::screens::window
 {
-    class CountMetronomeScreen : public mpc::lcdgui::ScreenComponent
+    class CountMetronomeScreen final : public ScreenComponent
     {
 
     private:
@@ -22,11 +22,11 @@ namespace mpc::lcdgui::screens::window
         bool inRec = true;
 
     public:
-        int getCountInMode();
-        bool getInPlay();
-        int getRate();
-        bool isWaitForKeyEnabled();
-        bool getInRec();
+        int getCountInMode() const;
+        bool getInPlay() const;
+        int getRate() const;
+        bool isWaitForKeyEnabled() const;
+        bool getInRec() const;
         void setCountIn(int i);
         void setInPlay(bool b);
         void setRate(int i);
@@ -34,14 +34,14 @@ namespace mpc::lcdgui::screens::window
         void setInRec(bool b);
 
     private:
-        void displayWaitForKey();
-        void displayInRec();
-        void displayRate();
-        void displayInPlay();
-        void displayCountIn();
+        void displayWaitForKey() const;
+        void displayInRec() const;
+        void displayRate() const;
+        void displayInPlay() const;
+        void displayCountIn() const;
 
     public:
-        CountMetronomeScreen(mpc::Mpc &mpc, int layerIndex);
+        CountMetronomeScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;

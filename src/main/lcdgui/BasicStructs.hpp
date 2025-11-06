@@ -58,7 +58,7 @@ namespace mpc::lcdgui
             return 0.5f * (float)(T + B);
         }
 
-        MRECT Union(MRECT *pRHS)
+        MRECT Union(MRECT *pRHS) const
         {
             if (Empty())
             {

@@ -1,21 +1,21 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class InitPadAssignScreen : public mpc::lcdgui::ScreenComponent
+    class InitPadAssignScreen final : public ScreenComponent
     {
 
     private:
-        void displayInitPadAssign();
+        void displayInitPadAssign() const;
         bool initPadAssignIsMaster = false;
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        InitPadAssignScreen(mpc::Mpc &mpc, int layerIndex);
+        InitPadAssignScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
     };

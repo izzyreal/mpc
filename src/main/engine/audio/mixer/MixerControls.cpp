@@ -14,14 +14,14 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine;
 using namespace std;
 
-MixerControls::MixerControls(string name, string mainBusName)
+MixerControls::MixerControls(const string &name, string mainBusName)
     : CompoundControl(1, name)
 {
     mainBusControls =
         make_shared<BusControls>(MixerControlsIds::MAIN_BUS, mainBusName);
 }
 
-float MixerControls::getSmoothingFactor()
+float MixerControls::getSmoothingFactor() const
 {
     return smoothingFactor;
 }
@@ -69,8 +69,8 @@ vector<shared_ptr<BusControls>> MixerControls::getAuxBusControls()
     return auxBusControls;
 }
 
-shared_ptr<AudioControlsChain> MixerControls::createStripControls(int id,
-                                                                  string name)
+shared_ptr<AudioControlsChain>
+MixerControls::createStripControls(int id, const string &name)
 {
     return createStripControls(id, name, true);
 }
@@ -88,13 +88,14 @@ MixerControls::createStripControls(int id, string name, bool hasMixControls)
     return chain;
 }
 
-void MixerControls::addStripControls(shared_ptr<CompoundControl> cc)
+void MixerControls::addStripControls(const shared_ptr<CompoundControl> &cc)
 {
     canAddBusses = false;
     add(cc);
 }
 
-shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
+shared_ptr<AudioControlsChain>
+MixerControls::getStripControls(const string &name)
 {
     for (auto &c : getControls())
     {
@@ -112,7 +113,7 @@ shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
     return {};
 }
 
-FaderControl *MixerControls::createFaderControl()
+FaderControl *MixerControls::createFaderControl() const
 {
     return new FaderControl();
 }

@@ -1,29 +1,21 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-
-namespace mpc::lcdgui::screens::dialog
-{
-    class FileExistsScreen;
-}
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveASoundScreen : public mpc::lcdgui::ScreenComponent
+    class SaveASoundScreen final : public ScreenComponent
     {
-
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        SaveASoundScreen(mpc::Mpc &mpc, int layerIndex);
+        SaveASoundScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
     private:
         void setFileType(int i);
         int fileType = 0;
-        void displayFileType();
-        void displayFile();
-
-        friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
+        void displayFileType() const;
+        void displayFile() const;
     };
 } // namespace mpc::lcdgui::screens::window

@@ -8,8 +8,8 @@ namespace mpc::file::mid::event
     {
 
     public:
-        int getNoteValue();
-        int getAmount();
+        int getNoteValue() const;
+        int getAmount() const;
         void setNoteValue(int p);
         void setAmount(int a);
 

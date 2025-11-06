@@ -6,7 +6,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-StepTcScreen::StepTcScreen(mpc::Mpc &mpc, const int layerIndex)
+StepTcScreen::StepTcScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "step-timing-correct", layerIndex)
 {
 }
@@ -16,7 +16,7 @@ void StepTcScreen::open()
     displayTcValue();
 }
 
-void StepTcScreen::turnWheel(int i)
+void StepTcScreen::turnWheel(const int i)
 {
     const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
@@ -24,7 +24,7 @@ void StepTcScreen::turnWheel(int i)
     displayTcValue();
 }
 
-void StepTcScreen::displayTcValue()
+void StepTcScreen::displayTcValue() const
 {
     const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();

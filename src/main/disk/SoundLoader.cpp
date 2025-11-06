@@ -85,7 +85,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
     {
         auto onSndReaderSuccess =
             [sampler, sound, nameWithoutExtension, &existingSoundIndex](
-                std::shared_ptr<SndReader> sndReader) -> sound_or_error
+                const std::shared_ptr<SndReader> &sndReader) -> sound_or_error
         {
             if (!sndReader->isHeaderValid())
             {
@@ -140,7 +140,8 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
             auto existingSound = sampler->getSound(existingSoundIndex);
 
             (void)soundOrError.map(
-                [existingSoundIndex, sampler, sound](std::shared_ptr<Sound> s)
+                [existingSoundIndex, sampler,
+                 sound](const std::shared_ptr<Sound> &s)
                 {
                     sampler->replaceSound(existingSoundIndex, s);
                 });
@@ -152,9 +153,11 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
     }
 }
 
-sound_or_error SoundLoader::onReadWavSuccess(
-    std::shared_ptr<mpc::file::wav::WavFile> &wavFile, std::string newSoundName,
-    std::shared_ptr<mpc::sampler::Sound> sound, const bool shouldBeConverted)
+sound_or_error
+SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &wavFile,
+                              const std::string &newSoundName,
+                              std::shared_ptr<mpc::sampler::Sound> sound,
+                              const bool shouldBeConverted) const
 {
     if (wavFile->getValidBits() != 16 && !shouldBeConverted)
     {

@@ -1,14 +1,14 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <disk/Volume.hpp>
 
 namespace mpc::lcdgui::screens
 {
-    class VmpcDisksScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcDisksScreen final : public ScreenComponent
     {
     public:
-        VmpcDisksScreen(mpc::Mpc &mpc, int layerIndex);
+        VmpcDisksScreen(Mpc &mpc, int layerIndex);
         void open() override;
         void function(int i) override;
         void turnWheel(int i) override;
@@ -18,14 +18,14 @@ namespace mpc::lcdgui::screens
         void refreshConfig();
 
     private:
-        std::map<std::string, mpc::disk::MountMode> config;
+        std::map<std::string, disk::MountMode> config;
         int row = 0;
         int rowOffset = 0;
 
         void displayRows();
-        void displayFunctionKeys();
+        void displayFunctionKeys() const;
         void displayUpAndDown();
 
-        bool hasConfigChanged();
+        bool hasConfigChanged() const;
     };
 } // namespace mpc::lcdgui::screens

@@ -18,14 +18,14 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 
-TempoChangeScreen::TempoChangeScreen(mpc::Mpc &mpc, const int layerIndex)
+TempoChangeScreen::TempoChangeScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "tempo-change", layerIndex)
 {
     for (int i = 0; i < 3; i++)
     {
-        const int w = 35;
-        const int h = 5;
-        const int x = 191;
+        constexpr int w = 35;
+        constexpr int h = 5;
+        constexpr int x = 191;
         const int y = 22 + (i * 9);
 
         auto rect = MRECT(x, y, x + w, y + h);
@@ -110,21 +110,21 @@ void TempoChangeScreen::initVisibleEvents()
     }
 }
 
-void TempoChangeScreen::displayInitialTempo()
+void TempoChangeScreen::displayInitialTempo() const
 {
     const auto seq = sequencer->getActiveSequence();
     findField("initial-tempo")
         ->setText(Util::tempoString(seq->getInitialTempo()));
 }
 
-void TempoChangeScreen::displayTempoChangeOn()
+void TempoChangeScreen::displayTempoChangeOn() const
 {
     const auto sequence = sequencer->getActiveSequence();
     findField("tempo-change")
         ->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
 }
 
-void TempoChangeScreen::displayTempoChange0()
+void TempoChangeScreen::displayTempoChange0() const
 {
     const auto sequence = sequencer->getActiveSequence();
     bars[0]->Hide(false);
@@ -164,7 +164,7 @@ void TempoChangeScreen::displayTempoChange0()
     bars[0]->setValue((tempo - 30) / 270.0);
 }
 
-void TempoChangeScreen::displayTempoChange1()
+void TempoChangeScreen::displayTempoChange1() const
 {
     const auto tce = visibleTempoChanges[1];
 
@@ -211,7 +211,7 @@ void TempoChangeScreen::displayTempoChange1()
     bars[1]->setValue((tempo - 30) / 270.0);
 }
 
-void TempoChangeScreen::displayTempoChange2()
+void TempoChangeScreen::displayTempoChange2() const
 {
     const auto tce = visibleTempoChanges[2];
 
@@ -299,7 +299,7 @@ void TempoChangeScreen::right()
     ScreenComponent::right();
 }
 
-void TempoChangeScreen::function(int j)
+void TempoChangeScreen::function(const int j)
 {
     ScreenComponent::function(j);
 
@@ -476,7 +476,7 @@ void TempoChangeScreen::init()
     }
 }
 
-void TempoChangeScreen::turnWheel(int j)
+void TempoChangeScreen::turnWheel(const int j)
 {
 
     const auto seq = sequencer->getActiveSequence();

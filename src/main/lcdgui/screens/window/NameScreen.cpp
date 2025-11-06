@@ -11,14 +11,14 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::hardware;
 
-NameScreen::NameScreen(mpc::Mpc &mpc, const int layerIndex)
+NameScreen::NameScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "name", layerIndex)
 {
     addChildT<Underline>();
 }
 
 void NameScreen::initialize(
-    const std::string &newNameToEdit, unsigned char nameLimitToUse,
+    const std::string &newNameToEdit, const unsigned char nameLimitToUse,
     const std::function<void(std::string &)> &enterActionToUse,
     const std::string &cancelScreenToUse,
     const std::function<void()> &mainScreenActionToUse)
@@ -45,7 +45,7 @@ void NameScreen::open()
     findField("0")->takeFocus();
 
     mpc.getHardware()
-        ->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)
+        ->getLed(FULL_LEVEL_OR_CASE_SWITCH_LED)
         ->setEnabled(!mpc.getPadAndButtonKeyboard()->isUpperCase());
 
     for (int i = 0; i < 16; i++)
@@ -59,7 +59,7 @@ void NameScreen::open()
 void NameScreen::close()
 {
     mpc.getHardware()
-        ->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)
+        ->getLed(FULL_LEVEL_OR_CASE_SWITCH_LED)
         ->setEnabled(mpc.clientEventController->isFullLevelEnabled());
 
     ls->setLastFocus("name", "0");
@@ -75,9 +75,8 @@ void NameScreen::close()
 void NameScreen::left()
 {
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (stoi(focusedFieldName) == 0)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        stoi(focusedFieldName) == 0)
     {
         return;
     }
@@ -95,7 +94,6 @@ void NameScreen::left()
 
 void NameScreen::right()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (stoi(focusedFieldName) == nameLimit - 1)
@@ -109,15 +107,13 @@ void NameScreen::right()
     {
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
         const auto focus = findFocus();
-        printf("New focus: %s\n", focus->getName().c_str());
         focus->setInverted(false);
         drawUnderline();
     }
 }
 
-void NameScreen::turnWheel(int j)
+void NameScreen::turnWheel(const int j)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (editing)
@@ -148,9 +144,8 @@ void NameScreen::turnWheel(int j)
     }
 }
 
-void NameScreen::function(int i)
+void NameScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
@@ -159,6 +154,7 @@ void NameScreen::function(int i)
             break;
         }
         case 4:
+        {
             auto newName = getNameWithoutSpaces();
             if (newName.empty())
             {
@@ -166,6 +162,8 @@ void NameScreen::function(int i)
             }
             enterAction(newName);
             break;
+        }
+        default:;
     }
 }
 
@@ -221,18 +219,18 @@ void NameScreen::setNameToEdit(const std::string &newNameToEdit)
     nameLimit = 16;
 }
 
-void NameScreen::setNameLimit(int i)
+void NameScreen::setNameLimit(const int i)
 {
     nameToEdit = nameToEdit.substr(0, i);
     nameLimit = i;
 }
 
-void NameScreen::setNameToEdit(const std::string &str, int i)
+void NameScreen::setNameToEdit(const std::string &str, const int i)
 {
     nameToEdit[i] = str[0];
 }
 
-std::string NameScreen::getNameWithoutSpaces()
+std::string NameScreen::getNameWithoutSpaces() const
 {
     auto s = nameToEdit;
 
@@ -252,7 +250,7 @@ std::string NameScreen::getNameWithoutSpaces()
     return s;
 }
 
-void NameScreen::changeNameCharacter(int i, bool up)
+void NameScreen::changeNameCharacter(const int i, const bool up)
 {
     if (i >= nameToEdit.length())
     {
@@ -263,7 +261,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
     std::string s{schar};
     auto stringCounter = 0;
 
-    for (auto str : mpc::Mpc::akaiAscii)
+    for (auto str : Mpc::akaiAscii)
     {
         if (str == s)
         {
@@ -296,7 +294,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
     }
     else
     {
-        s = mpc::Mpc::akaiAscii[stringCounter + change];
+        s = Mpc::akaiAscii[stringCounter + change];
     }
 
     nameToEdit = nameToEdit.substr(0, i).append(s).append(
@@ -304,7 +302,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
     displayName();
 }
 
-void NameScreen::displayName()
+void NameScreen::displayName() const
 {
     if (nameLimit == 0)
     {
@@ -354,12 +352,11 @@ void NameScreen::displayName()
     }
 }
 
-void NameScreen::typeCharacter(char c)
+void NameScreen::typeCharacter(const char c)
 {
 
-    if (std::find(mpc::Mpc::akaiAsciiChar.begin(),
-                  mpc::Mpc::akaiAsciiChar.end(),
-                  c) == mpc::Mpc::akaiAsciiChar.end())
+    if (std::find(Mpc::akaiAsciiChar.begin(), Mpc::akaiAsciiChar.end(), c) ==
+        Mpc::akaiAsciiChar.end())
     {
         return;
     }
@@ -444,7 +441,7 @@ void NameScreen::backSpace()
     }
 }
 
-void NameScreen::setEditing(bool b)
+void NameScreen::setEditing(const bool b)
 {
     editing = b;
 }

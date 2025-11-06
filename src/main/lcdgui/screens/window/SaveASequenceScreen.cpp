@@ -5,7 +5,7 @@
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "lcdgui/Label.hpp"
@@ -15,7 +15,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-SaveASequenceScreen::SaveASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+SaveASequenceScreen::SaveASequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save-a-sequence", layerIndex)
 {
 }
@@ -32,7 +32,7 @@ void SaveASequenceScreen::open()
     displayFile();
 }
 
-void SaveASequenceScreen::turnWheel(int i)
+void SaveASequenceScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -61,7 +61,7 @@ void SaveASequenceScreen::openNameScreen()
     }
 }
 
-void SaveASequenceScreen::function(int i)
+void SaveASequenceScreen::function(const int i)
 {
 
     switch (i)
@@ -73,8 +73,7 @@ void SaveASequenceScreen::function(int i)
         {
             const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
-                mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
-                ".MID";
+                Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
             auto disk = mpc.getDisk();
 
             if (disk->checkExists(fileName))
@@ -124,13 +123,13 @@ void SaveASequenceScreen::function(int i)
     }
 }
 
-void SaveASequenceScreen::displaySaveAs()
+void SaveASequenceScreen::displaySaveAs() const
 {
     findField("saveas")->setText("MIDI FILE TYPE " +
                                  std::to_string(saveSequenceAs));
 }
 
-void SaveASequenceScreen::displayFile()
+void SaveASequenceScreen::displayFile() const
 {
     const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     const auto name = nameScreen->getNameWithoutSpaces();
@@ -144,7 +143,7 @@ void SaveASequenceScreen::displayFile()
     findLabel("file1")->setText(name.substr(1));
 }
 
-void SaveASequenceScreen::setSaveSequenceAs(int i)
+void SaveASequenceScreen::setSaveSequenceAs(const int i)
 {
     if (i < 0 || i > 1)
     {

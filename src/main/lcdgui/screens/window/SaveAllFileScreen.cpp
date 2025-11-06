@@ -5,8 +5,6 @@
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/dialog/FileExistsScreen.hpp"
 
-#include <Util.hpp>
-
 #include "StrUtil.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/AbstractDisk.hpp"
@@ -15,7 +13,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc &mpc, const int layerIndex)
+SaveAllFileScreen::SaveAllFileScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save-all-file", layerIndex)
 {
 }
@@ -29,8 +27,12 @@ void SaveAllFileScreen::open()
 
     displayFile();
 }
+std::string SaveAllFileScreen::getFileName() const
+{
+    return fileName;
+}
 
-void SaveAllFileScreen::displayFile()
+void SaveAllFileScreen::displayFile() const
 {
     if (fileName.empty())
     {
@@ -51,7 +53,7 @@ void SaveAllFileScreen::openNameScreen()
 
     if (focusedFieldName == "file")
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             fileName = nameScreenName;
             openScreenById(ScreenId::SaveAllFileScreen);
@@ -63,9 +65,8 @@ void SaveAllFileScreen::openNameScreen()
     }
 }
 
-void SaveAllFileScreen::function(int i)
+void SaveAllFileScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
@@ -80,9 +81,7 @@ void SaveAllFileScreen::function(int i)
             {
                 auto replaceAction = [disk, allFileName]
                 {
-                    const auto success = disk->getFile(allFileName)->del();
-
-                    if (success)
+                    if (disk->getFile(allFileName)->del())
                     {
                         disk->flush();
                         disk->initFiles();
@@ -94,7 +93,7 @@ void SaveAllFileScreen::function(int i)
                 {
                     const auto nameScreen =
                         mpc.screens->get<ScreenId::NameScreen>();
-                    auto enterAction = [this](std::string &nameScreenName)
+                    auto enterAction = [this](const std::string &nameScreenName)
                     {
                         fileName = nameScreenName;
                         openScreenById(ScreenId::SaveAllFileScreen);
@@ -117,5 +116,6 @@ void SaveAllFileScreen::function(int i)
             disk->writeAll(allFileName);
             break;
         }
+        default:;
     }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lcdgui/Component.hpp>
+#include "lcdgui/Component.hpp"
 
 #include <memory>
 #include <vector>

@@ -1,12 +1,7 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <sequencer/TimeSignature.hpp>
-
-namespace mpc
-{
-    class Util;
-}
 
 namespace mpc::disk
 {
@@ -40,31 +35,32 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class UserScreen : public mpc::lcdgui::ScreenComponent
+    class UserScreen final : public ScreenComponent
     {
 
     public:
+        UserScreen(Mpc &mpc, int layerIndex);
+
+        void open() override;
+
         void function(int i) override;
         void turnWheel(int i) override;
 
-    public:
-        UserScreen(mpc::Mpc &mpc, int layerIndex);
-
-        void open() override;
+        int getLastBar() const;
 
     private:
         std::vector<std::string> busNames{"MIDI", "DRUM1", "DRUM2", "DRUM3",
                                           "DRUM4"};
 
-        void displayTempo();
-        void displayLoop();
-        void displayTsig();
-        void displayBars();
-        void displayPgm();
-        void displayRecordingMode();
+        void displayTempo() const;
+        void displayLoop() const;
+        void displayTsig() const;
+        void displayBars() const;
+        void displayPgm() const;
+        void displayRecordingMode() const;
         void displayBus();
-        void displayDeviceNumber();
-        void displayVelo();
+        void displayDeviceNumber() const;
+        void displayVelo() const;
         void displayDeviceName();
 
         double tempo = 0.0;
@@ -77,7 +73,7 @@ namespace mpc::lcdgui::screens
         std::string sequenceName;
         std::vector<std::string> trackNames;
         int lastBar = 0;
-        mpc::sequencer::TimeSignature timeSig;
+        sequencer::TimeSignature timeSig;
         std::vector<std::string> deviceNames;
 
         void setTempo(double newTempo);
@@ -95,20 +91,19 @@ namespace mpc::lcdgui::screens
 
         std::string getDeviceName(int i);
         std::string getTrackName(int i);
-        int8_t getTrackStatus();
+        int8_t getTrackStatus() const;
 
         void resetPreferences();
 
         friend class InitScreen;
-        friend class mpc::disk::AllLoader;
-        friend class mpc::file::all::Defaults;
-        friend class mpc::lcdgui::screens::SequencerScreen;
-        friend class mpc::lcdgui::screens::EventsScreen;
-        friend class mpc::lcdgui::screens::BarsScreen;
-        friend class mpc::nvram::NvRam;
-        friend class mpc::sequencer::Sequence;
-        friend class mpc::sequencer::Sequencer;
-        friend class mpc::sequencer::FrameSeq;
-        friend class mpc::Util;
+        friend class disk::AllLoader;
+        friend class file::all::Defaults;
+        friend class SequencerScreen;
+        friend class EventsScreen;
+        friend class BarsScreen;
+        friend class nvram::NvRam;
+        friend class sequencer::Sequence;
+        friend class sequencer::Sequencer;
+        friend class sequencer::FrameSeq;
     };
 } // namespace mpc::lcdgui::screens

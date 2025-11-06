@@ -7,7 +7,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc &mpc, const int layerIndex)
+VeloEnvFilterScreen::VeloEnvFilterScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
     addChildT<EnvGraph>(mpc);
@@ -31,7 +31,7 @@ void VeloEnvFilterScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void VeloEnvFilterScreen::turnWheel(int i)
+void VeloEnvFilterScreen::turnWheel(const int i)
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -74,7 +74,7 @@ void VeloEnvFilterScreen::turnWheel(int i)
     }
 }
 
-void VeloEnvFilterScreen::update(Observable *observable, Message message)
+void VeloEnvFilterScreen::update(Observable *observable, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 
@@ -88,7 +88,7 @@ void VeloEnvFilterScreen::update(Observable *observable, Message message)
     }
 }
 
-void VeloEnvFilterScreen::displayNote()
+void VeloEnvFilterScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -107,7 +107,7 @@ void VeloEnvFilterScreen::displayNote()
         "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
-void VeloEnvFilterScreen::displayVelo()
+void VeloEnvFilterScreen::displayVelo() const
 {
     findField("velo")->setTextPadded(velo, " ");
 }
@@ -134,7 +134,7 @@ void VeloEnvFilterScreen::displayDecay()
     findEnvGraph()->setCoordinates(attack, decay, true);
 }
 
-void VeloEnvFilterScreen::displayAmount()
+void VeloEnvFilterScreen::displayAmount() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -143,7 +143,7 @@ void VeloEnvFilterScreen::displayAmount()
         selectedNoteParameters->getFilterEnvelopeAmount(), " ");
 }
 
-void VeloEnvFilterScreen::displayVeloFreq()
+void VeloEnvFilterScreen::displayVeloFreq() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -153,7 +153,7 @@ void VeloEnvFilterScreen::displayVeloFreq()
                         " ");
 }
 
-void VeloEnvFilterScreen::setVelo(int i)
+void VeloEnvFilterScreen::setVelo(const int i)
 {
     velo = std::clamp(i, 1, 127);
     displayVelo();

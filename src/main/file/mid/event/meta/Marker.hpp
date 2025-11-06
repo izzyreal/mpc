@@ -9,9 +9,9 @@ namespace mpc::file::mid::event::meta
     {
 
     public:
-        void setMarkerName(std::string name);
+        void setMarkerName(const std::string &name);
         std::string getMarkerName();
 
-        Marker(int tick, int delta, std::string marker);
+        Marker(int tick, int delta, const std::string &marker);
     };
 } // namespace mpc::file::mid::event::meta

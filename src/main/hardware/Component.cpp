@@ -148,8 +148,7 @@ bool Led::isEnabled() const
 Button::Button(const ComponentId id) : Component(id) {}
 
 Pad::Pad(const int indexToUse)
-    : Component(
-          static_cast<ComponentId>(PAD_1_OR_AB + indexToUse)),
+    : Component(static_cast<ComponentId>(PAD_1_OR_AB + indexToUse)),
       index(indexToUse)
 {
     assert(index >= 0 && index < 16);
@@ -175,7 +174,8 @@ DataWheel::DataWheel() : Component(DATA_WHEEL) {}
 
 void DataWheel::turn(const int steps)
 {
-    angle = angle + (angleIncrementPerStep * static_cast<float>(std::clamp(steps, -20, 20)));
+    angle = angle + (angleIncrementPerStep *
+                     static_cast<float>(std::clamp(steps, -20, 20)));
 
     if (angle > 100.0f)
     {
@@ -192,10 +192,7 @@ float DataWheel::getAngle() const
     return angle;
 }
 
-Slider::Slider()
-    : Component(SLIDER), direction(Direction::UpIncreases)
-{
-}
+Slider::Slider() : Component(SLIDER), direction(Direction::UpIncreases) {}
 
 void Slider::moveToNormalizedY(const float normalizedY)
 {
@@ -252,4 +249,4 @@ namespace mpc::hardware
     Continuous<float, 0, 127>::getRangeAs<float>() const;
     template std::pair<float, float>
     Continuous<float, 0, 1>::getRangeAs<float>() const;
-}
+} // namespace mpc::hardware

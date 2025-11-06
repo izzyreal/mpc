@@ -30,7 +30,7 @@ AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char>
-AllPitchBendEvent::mpcEventToBytes(std::shared_ptr<PitchBendEvent> event)
+AllPitchBendEvent::mpcEventToBytes(const std::shared_ptr<PitchBendEvent> &event)
 {
     std::vector<char> bytes(8);
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PITCH_BEND_ID;

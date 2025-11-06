@@ -1,37 +1,22 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-
-namespace mpc
-{
-    class Mpc;
-}
-namespace mpc::disk
-{
-    class ProgramLoader;
-    class AbstractDisk;
-} // namespace mpc::disk
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadAProgramScreen : public mpc::lcdgui::ScreenComponent
+    class LoadAProgramScreen final : public ScreenComponent
     {
-
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        LoadAProgramScreen(mpc::Mpc &mpc, int layerIndex);
+        LoadAProgramScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
         void setLoadReplaceSameSound(bool b);
 
-    private:
         bool loadReplaceSameSound = false;
 
+    private:
         void displayLoadReplaceSound();
-
-        friend class mpc::Mpc;
-        friend class mpc::disk::AbstractDisk;
-        friend class mpc::disk::ProgramLoader;
     };
 } // namespace mpc::lcdgui::screens::window

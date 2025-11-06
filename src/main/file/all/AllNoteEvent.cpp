@@ -28,7 +28,7 @@ AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char>
-AllNoteOnEvent::mpcEventToBytes(std::shared_ptr<NoteOnEvent> event)
+AllNoteOnEvent::mpcEventToBytes(const std::shared_ptr<NoteOnEvent> &event)
 {
     std::vector<char> bytes(AllSequence::EVENT_SEG_LENGTH);
 

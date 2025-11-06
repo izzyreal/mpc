@@ -42,15 +42,15 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
 
     public:
-        int getInMode();
-        int getOutMode();
-        int getShiftEarly();
-        bool isSendMMCEnabled();
-        int getFrameRate();
-        int getInput();
-        int getOutput();
+        int getInMode() const;
+        int getOutMode() const;
+        int getShiftEarly() const;
+        bool isSendMMCEnabled() const;
+        int getFrameRate() const;
+        int getInput() const;
+        int getOutput() const;
         std::string getDefSongName();
-        bool getSongModeIgnoreTempoChangeEvents();
+        bool getSongModeIgnoreTempoChangeEvents() const;
 
     public:
         std::vector<char> &getBytes();

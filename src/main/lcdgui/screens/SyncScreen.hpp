@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::audiomidi
 {
@@ -20,19 +20,19 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens
 {
-    class SyncScreen : public mpc::lcdgui::ScreenComponent
+    class SyncScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        int getModeOut();
-        int getModeIn();
-        int getOut();
+        int getModeOut() const;
+        int getModeIn() const;
+        int getOut() const;
 
     public:
-        SyncScreen(mpc::Mpc &, int layerIndex);
+        SyncScreen(Mpc &, int layerIndex);
 
         void open() override;
 
@@ -62,19 +62,20 @@ namespace mpc::lcdgui::screens
 
         void setReceiveMMCEnabled(bool b);
 
-        void displayIn();
-        void displayOut();
-        void displayModeIn();
-        void displayModeOut();
-        void displayReceiveMMC();
-        void displaySendMMC();
-        void displayShiftEarly(); // Also used to display "Frame rate:" field
+        void displayIn() const;
+        void displayOut() const;
+        void displayModeIn() const;
+        void displayModeOut() const;
+        void displayReceiveMMC() const;
+        void displaySendMMC() const;
+        void
+        displayShiftEarly() const; // Also used to display "Frame rate:" field
 
     private:
-        friend class mpc::audiomidi::EventHandler;
-        friend class mpc::audiomidi::MidiInput;
-        friend class mpc::disk::AllLoader;
-        friend class mpc::file::all::MidiSyncMisc;
-        friend class mpc::file::all::Misc;
+        friend class audiomidi::EventHandler;
+        friend class audiomidi::MidiInput;
+        friend class disk::AllLoader;
+        friend class file::all::MidiSyncMisc;
+        friend class file::all::Misc;
     };
 } // namespace mpc::lcdgui::screens

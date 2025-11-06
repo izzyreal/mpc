@@ -73,7 +73,7 @@ void RealTimeAudioServer::resizeBuffers(int newSize)
 // For compatibility with the PortAudio framework
 void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer,
                                int nFrames, int inputChannelCount,
-                               int outputChannelCount)
+                               int outputChannelCount) const
 {
     if (!running)
     {
@@ -121,7 +121,7 @@ void RealTimeAudioServer::work(
     const std::vector<int8_t> &mpcMonoInputChannelIndices,
     const std::vector<int8_t> &mpcMonoOutputChannelIndices,
     const std::vector<int8_t> &hostInputChannelIndices,
-    const std::vector<int8_t> &hostOutputChannelIndices)
+    const std::vector<int8_t> &hostOutputChannelIndices) const
 {
     if (!running)
     {

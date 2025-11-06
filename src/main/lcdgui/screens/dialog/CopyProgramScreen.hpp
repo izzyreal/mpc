@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::dialog
 {
@@ -20,8 +20,8 @@ namespace mpc::lcdgui::screens::dialog
         void setPgm0(int i);
         void setPgm1(int i);
 
-        void displayPgm0();
-        void displayPgm1();
+        void displayPgm0() const;
+        void displayPgm1() const;
 
         void displayFunctionKeys();
     };

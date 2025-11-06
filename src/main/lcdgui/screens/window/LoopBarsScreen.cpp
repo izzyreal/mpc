@@ -5,7 +5,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-LoopBarsScreen::LoopBarsScreen(mpc::Mpc &mpc, const int layerIndex)
+LoopBarsScreen::LoopBarsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "loop-bars-window", layerIndex)
 {
 }
@@ -20,7 +20,7 @@ void LoopBarsScreen::open()
     displayNumberOfBars();
 }
 
-void LoopBarsScreen::turnWheel(int i)
+void LoopBarsScreen::turnWheel(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
 
@@ -63,7 +63,7 @@ void LoopBarsScreen::turnWheel(int i)
     }
 }
 
-void LoopBarsScreen::displayLastBar()
+void LoopBarsScreen::displayLastBar() const
 {
     const auto seq = sequencer->getActiveSequence();
 
@@ -78,7 +78,7 @@ void LoopBarsScreen::displayLastBar()
     }
 }
 
-void LoopBarsScreen::displayNumberOfBars()
+void LoopBarsScreen::displayNumberOfBars() const
 {
     const auto seq = sequencer->getActiveSequence();
     findField("numberofbars")
@@ -86,7 +86,7 @@ void LoopBarsScreen::displayNumberOfBars()
                                  seq->getFirstLoopBarIndex() + 1));
 }
 
-void LoopBarsScreen::displayFirstBar()
+void LoopBarsScreen::displayFirstBar() const
 {
     const auto seq = sequencer->getActiveSequence();
     findField("firstbar")

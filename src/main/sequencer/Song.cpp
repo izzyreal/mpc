@@ -11,7 +11,7 @@ void Song::setLoopEnabled(bool b)
     loopEnabled = b;
 }
 
-bool Song::isLoopEnabled()
+bool Song::isLoopEnabled() const
 {
     return loopEnabled;
 }
@@ -33,7 +33,7 @@ void Song::setFirstStep(int i)
     }
 }
 
-int Song::getFirstStep()
+int Song::getFirstStep() const
 {
     return firstStep;
 }
@@ -55,12 +55,12 @@ void Song::setLastStep(int i)
     }
 }
 
-int Song::getLastStep()
+int Song::getLastStep() const
 {
     return lastStep;
 }
 
-void Song::setName(std::string str)
+void Song::setName(const std::string &str)
 {
     name = str;
 }
@@ -100,12 +100,12 @@ std::weak_ptr<Step> Song::getStep(int i)
     return steps[i];
 }
 
-int Song::getStepCount()
+int Song::getStepCount() const
 {
     return steps.size();
 }
 
-bool Song::isUsed()
+bool Song::isUsed() const
 {
     return used;
 }

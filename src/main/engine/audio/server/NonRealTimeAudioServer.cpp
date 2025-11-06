@@ -53,7 +53,7 @@ void NonRealTimeAudioServer::setRealTime(bool rt)
     }
 }
 
-bool NonRealTimeAudioServer::isRealTime()
+bool NonRealTimeAudioServer::isRealTime() const
 {
     return realTime;
 }
@@ -138,7 +138,7 @@ void NonRealTimeAudioServer::work(
     const int nFrames, const std::vector<int8_t> &mpcMonoInputChannelIndices,
     const std::vector<int8_t> &mpcMonoOutputChannelIndices,
     const std::vector<int8_t> &hostInputChannelIndices,
-    const std::vector<int8_t> &hostOutputChannelIndices)
+    const std::vector<int8_t> &hostOutputChannelIndices) const
 {
     auto realTimeAudioServer =
         dynamic_pointer_cast<RealTimeAudioServer>(server);

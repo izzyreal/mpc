@@ -32,7 +32,7 @@ namespace mpc::engine::audio::server
     public:
         // For compatibility with the PortAudio framework
         void work(float *inputBuffer, float *outputBuffer, int nFrames,
-                  int inputChannelCount, int outputChannelCount);
+                  int inputChannelCount, int outputChannelCount) const;
 
         // For compatibility with JUCE 7.0.5+
         void work(const float *const *inputBuffer, float *const *outputBuffer,
@@ -40,6 +40,6 @@ namespace mpc::engine::audio::server
                   const std::vector<int8_t> &mpcMonoInputChannelIndices,
                   const std::vector<int8_t> &mpcMonoOutputChannelIndices,
                   const std::vector<int8_t> &hostInputChannelIndices,
-                  const std::vector<int8_t> &hostOutputChannelIndices);
+                  const std::vector<int8_t> &hostOutputChannelIndices) const;
     };
 } // namespace mpc::engine::audio::server

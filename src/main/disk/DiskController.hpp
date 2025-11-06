@@ -11,30 +11,22 @@ namespace mpc::disk
 {
     class AbstractDisk;
 }
-namespace mpc::lcdgui::screens
-{
-    class LoadScreen;
-}
 
 namespace mpc::disk
 {
     class DiskController
     {
-
-    private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         std::vector<std::shared_ptr<AbstractDisk>> disks;
         int activeDiskIndex = 0;
 
         void initDisks();
 
-        friend class mpc::lcdgui::screens::LoadScreen;
-
     public:
+        explicit DiskController(Mpc &);
         std::vector<std::shared_ptr<AbstractDisk>> &getDisks();
-        DiskController(mpc::Mpc &);
         std::shared_ptr<AbstractDisk> getActiveDisk();
-        int getActiveDiskIndex();
+        int getActiveDiskIndex() const;
         void setActiveDiskIndex(int newActiveDiskIndex);
 
         void detectRawUsbVolumes();

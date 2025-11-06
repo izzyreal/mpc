@@ -4,7 +4,7 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/EditSoundScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
@@ -14,7 +14,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-SndParamsScreen::SndParamsScreen(mpc::Mpc &mpc, const int layerIndex)
+SndParamsScreen::SndParamsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "params", layerIndex)
 {
 }
@@ -151,7 +151,7 @@ void SndParamsScreen::turnWheel(int i)
     }
 }
 
-void SndParamsScreen::displayLevel()
+void SndParamsScreen::displayLevel() const
 {
     const auto sound = sampler->getSound();
 
@@ -165,7 +165,7 @@ void SndParamsScreen::displayLevel()
     }
 }
 
-void SndParamsScreen::displayTune()
+void SndParamsScreen::displayTune() const
 {
     const auto sound = sampler->getSound();
 
@@ -179,7 +179,7 @@ void SndParamsScreen::displayTune()
     }
 }
 
-void SndParamsScreen::displayBeat()
+void SndParamsScreen::displayBeat() const
 {
     const auto sound = sampler->getSound();
 
@@ -193,7 +193,7 @@ void SndParamsScreen::displayBeat()
     }
 }
 
-void SndParamsScreen::displaySampleAndNewTempo()
+void SndParamsScreen::displaySampleAndNewTempo() const
 {
     auto sound = sampler->getSound();
 
@@ -221,7 +221,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
     bpmString = part1 + "." + part2;
     bpmString = StrUtil::padLeft(bpmString, " ", 5);
 
-    bpmString = mpc::Util::replaceDotWithSmallSpaceDot(bpmString);
+    bpmString = Util::replaceDotWithSmallSpaceDot(bpmString);
 
     findLabel("sample-tempo")->setText("Sample tempo=" + bpmString);
 
@@ -239,12 +239,12 @@ void SndParamsScreen::displaySampleAndNewTempo()
     bpmString = part1 + "." + part2;
     bpmString = StrUtil::padLeft(bpmString, " ", 5);
 
-    bpmString = mpc::Util::replaceDotWithSmallSpaceDot(bpmString);
+    bpmString = Util::replaceDotWithSmallSpaceDot(bpmString);
 
     findLabel("new-tempo")->setText("New tempo=" + bpmString);
 }
 
-void SndParamsScreen::displaySnd()
+void SndParamsScreen::displaySnd() const
 {
     const auto sound = sampler->getSound();
 
@@ -270,7 +270,7 @@ void SndParamsScreen::displaySnd()
     findField("snd")->setText(sampleName);
 }
 
-void SndParamsScreen::displayPlayX()
+void SndParamsScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }

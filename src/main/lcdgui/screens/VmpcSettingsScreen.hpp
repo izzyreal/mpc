@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::audiomidi
 {
@@ -33,7 +33,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
 {
-    class VmpcSettingsScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcSettingsScreen final : public ScreenComponent
     {
 
     public:
@@ -44,17 +44,17 @@ namespace mpc::lcdgui::screens
         };
         void turnWheel(int i) override;
 
-        VmpcSettingsScreen(mpc::Mpc &mpc, int layerIndex);
+        VmpcSettingsScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
         void function(int) override;
 
-        int getMidiControlMode();
-        const bool isNameTypingWithKeyboardEnabled();
+        int getMidiControlMode() const;
+        const bool isNameTypingWithKeyboardEnabled() const;
 
     private:
-        std::shared_ptr<mpc::lcdgui::Background> easterEgg;
+        std::shared_ptr<Background> easterEgg;
         const std::vector<std::string> initialPadMappingNames{"VMPC2000XL",
                                                               "ORIGINAL"};
         const std::vector<std::string> _16LevelsEraseModeNames{
@@ -74,19 +74,19 @@ namespace mpc::lcdgui::screens
         void setMidiControlMode(int i);
         void setNameTypingWithKeyboard(bool);
 
-        void displayInitialPadMapping();
-        void display16LevelsEraseMode();
-        void displayAutoConvertWavs();
-        void displayMidiControlMode();
-        void displayNameTypingWithKeyboard();
+        void displayInitialPadMapping() const;
+        void display16LevelsEraseMode() const;
+        void displayAutoConvertWavs() const;
+        void displayMidiControlMode() const;
+        void displayNameTypingWithKeyboard() const;
 
-        friend class mpc::sampler::Pad;
-        friend class mpc::nvram::NvRam;
-        friend class mpc::sequencer::Track;
-        friend class mpc::disk::SoundLoader;
-        friend class mpc::audiomidi::MidiInput;
-        friend class mpc::lcdgui::screens::MidiSwScreen;
-        friend class mpc::lcdgui::screens::window::MidiInputScreen;
-        friend class mpc::lcdgui::screens::window::MultiRecordingSetupScreen;
+        friend class sampler::Pad;
+        friend class nvram::NvRam;
+        friend class sequencer::Track;
+        friend class disk::SoundLoader;
+        friend class audiomidi::MidiInput;
+        friend class MidiSwScreen;
+        friend class MidiInputScreen;
+        friend class MultiRecordingSetupScreen;
     };
 } // namespace mpc::lcdgui::screens

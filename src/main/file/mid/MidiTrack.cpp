@@ -25,7 +25,7 @@ MidiTrack::MidiTrack()
     mEndOfTrackDelta = 0;
 }
 
-MidiTrack::MidiTrack(std::shared_ptr<std::istream> stream)
+MidiTrack::MidiTrack(const std::shared_ptr<std::istream> &stream)
 {
     mSize = 0;
     mSizeNeedsRecalculating = false;
@@ -96,7 +96,7 @@ void MidiTrack::readTrackData(std::vector<char> &data)
     }
 }
 
-std::vector<std::weak_ptr<MidiEvent>> MidiTrack::getEvents()
+std::vector<std::weak_ptr<MidiEvent>> MidiTrack::getEvents() const
 {
     std::vector<std::weak_ptr<MidiEvent>> res;
     for (auto &e : mEvents)
@@ -106,7 +106,7 @@ std::vector<std::weak_ptr<MidiEvent>> MidiTrack::getEvents()
     return res;
 }
 
-int MidiTrack::getEventCount()
+int MidiTrack::getEventCount() const
 {
     return mEvents.size();
 }
@@ -130,7 +130,7 @@ int MidiTrack::getLengthInTicks()
     return E->getTick();
 }
 
-int MidiTrack::getEndOfTrackDelta()
+int MidiTrack::getEndOfTrackDelta() const
 {
     return mEndOfTrackDelta;
 }
@@ -147,7 +147,7 @@ void MidiTrack::insertNote(int channel, int pitch, int velocity, int tick,
     insertEvent(std::make_shared<NoteOn>(tick + duration, channel, pitch, 0));
 }
 
-void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
+void MidiTrack::insertEvent(const std::weak_ptr<event::MidiEvent> &newE)
 {
     auto newEvent = newE.lock();
     if (!newEvent)
@@ -208,7 +208,7 @@ void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
     }
 }
 
-bool MidiTrack::removeEvent(mpc::file::mid::event::MidiEvent *e)
+bool MidiTrack::removeEvent(mpc::file::mid::event::MidiEvent *e) const
 {
     std::shared_ptr<MidiEvent> prev;
     std::shared_ptr<MidiEvent> curr;
@@ -273,7 +273,7 @@ void MidiTrack::recalculateSize()
     mSizeNeedsRecalculating = false;
 }
 
-void MidiTrack::writeToOutputStream(std::shared_ptr<std::ostream> stream)
+void MidiTrack::writeToOutputStream(const std::shared_ptr<std::ostream> &stream)
 {
     if (!mClosed)
     {

@@ -36,27 +36,27 @@ void TimeSignature::setTimeSignature(int num, int den, int meter, int div)
     mDivision = div;
 }
 
-int TimeSignature::getNumerator()
+int TimeSignature::getNumerator() const
 {
     return mNumerator;
 }
 
-int TimeSignature::getDenominatorValue()
+int TimeSignature::getDenominatorValue() const
 {
     return mDenominator;
 }
 
-int TimeSignature::getRealDenominator()
+int TimeSignature::getRealDenominator() const
 {
     return static_cast<int>(pow(2, mDenominator));
 }
 
-int TimeSignature::getMeter()
+int TimeSignature::getMeter() const
 {
     return mMeter;
 }
 
-int TimeSignature::getDivision()
+int TimeSignature::getDivision() const
 {
     return mDivision;
 }
@@ -96,7 +96,7 @@ TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData *info)
     return std::make_shared<TimeSignature>(tick, delta, num, den, met, fps);
 }
 
-int TimeSignature::log2(int den)
+int TimeSignature::log2(int den) const
 {
     switch (den)
     {

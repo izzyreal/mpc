@@ -12,7 +12,7 @@ void SystemExclusiveEvent::setByteA(unsigned char i)
     bytes[0] = i;
 }
 
-unsigned char SystemExclusiveEvent::getByteA()
+unsigned char SystemExclusiveEvent::getByteA() const
 {
     return bytes[0];
 }
@@ -27,7 +27,7 @@ void SystemExclusiveEvent::setByteB(unsigned char i)
     bytes[1] = i;
 }
 
-unsigned char SystemExclusiveEvent::getByteB()
+unsigned char SystemExclusiveEvent::getByteB() const
 {
     return bytes[1];
 }

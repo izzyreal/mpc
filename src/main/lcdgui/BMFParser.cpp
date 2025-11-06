@@ -43,7 +43,7 @@ BMFParser::BMFParser(char *fntData, int fntSize, char *bmpData, int bmpSize)
     }
 }
 
-void BMFParser::OrderCharsByID(std::vector<bmfont_char> *chars)
+void BMFParser::OrderCharsByID(std::vector<bmfont_char> *chars) const
 {
     std::vector<bmfont_char> result(255);
     for (int i = 0; i < chars->size(); i++)

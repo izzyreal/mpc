@@ -23,8 +23,8 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::pgmreader;
 
-void PgmFileToProgramConverter::setSlider(ProgramFileReader &reader,
-                                          std::shared_ptr<Program> program)
+void PgmFileToProgramConverter::setSlider(
+    ProgramFileReader &reader, const std::shared_ptr<Program> &program)
 {
     auto slider = reader.getSlider();
     auto nn =
@@ -43,7 +43,7 @@ void PgmFileToProgramConverter::setSlider(ProgramFileReader &reader,
 }
 
 void PgmFileToProgramConverter::setNoteParameters(
-    ProgramFileReader &reader, std::shared_ptr<Program> program)
+    ProgramFileReader &reader, const std::shared_ptr<Program> &program)
 {
     auto pgmNoteParameters = reader.getAllNoteParameters();
     auto pgmPads = reader.getPads();
@@ -106,8 +106,8 @@ void PgmFileToProgramConverter::setNoteParameters(
     }
 }
 
-void PgmFileToProgramConverter::setMixer(ProgramFileReader &reader,
-                                         std::shared_ptr<Program> program)
+void PgmFileToProgramConverter::setMixer(
+    ProgramFileReader &reader, const std::shared_ptr<Program> &program)
 {
     auto pgmMixer = reader.getMixer();
 
@@ -127,7 +127,8 @@ void PgmFileToProgramConverter::setMixer(ProgramFileReader &reader,
 }
 
 program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
-    std::shared_ptr<MpcFile> f, std::shared_ptr<mpc::sampler::Program> program,
+    const std::shared_ptr<MpcFile> &f,
+    std::shared_ptr<mpc::sampler::Program> program,
     std::vector<std::string> &soundNames)
 {
     if (!f->exists())

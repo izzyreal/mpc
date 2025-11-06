@@ -1,10 +1,10 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class ChangeBars2Screen : public mpc::lcdgui::ScreenComponent
+    class ChangeBars2Screen final : public ScreenComponent
     {
 
     public:
@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
 
     public:
-        ChangeBars2Screen(mpc::Mpc &mpc, int layerIndex);
+        ChangeBars2Screen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens::window
         void setNewBars(int i);
 
     private:
-        void displayCurrent();
-        void displayNewBars();
+        void displayCurrent() const;
+        void displayNewBars() const;
     };
 } // namespace mpc::lcdgui::screens::window

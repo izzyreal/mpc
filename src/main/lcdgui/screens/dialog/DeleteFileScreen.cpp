@@ -58,11 +58,11 @@ void DeleteFileScreen::deleteFile()
         disk->initFiles();
 
         const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-        loadScreen->setFileLoad(loadScreen->fileLoad - 1);
+        loadScreen->setFileLoad(loadScreen->getFileLoad() - 1);
 
         const auto directoryScreen =
             mpc.screens->get<ScreenId::DirectoryScreen>();
-        directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
+        directoryScreen->setYOffset1(directoryScreen->getYOffset1() - 1);
     }
 
     openScreenById(ScreenId::DirectoryScreen);

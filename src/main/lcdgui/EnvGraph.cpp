@@ -4,7 +4,7 @@
 
 #include "Bressenham.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::lcdgui;
 

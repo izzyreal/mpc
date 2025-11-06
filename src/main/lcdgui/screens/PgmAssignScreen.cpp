@@ -13,7 +13,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-PgmAssignScreen::PgmAssignScreen(mpc::Mpc &mpc, const int layerIndex)
+PgmAssignScreen::PgmAssignScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "program-assign", layerIndex)
 {
 }
@@ -300,7 +300,7 @@ void PgmAssignScreen::openWindow()
     }
 }
 
-void PgmAssignScreen::displayPgm()
+void PgmAssignScreen::displayPgm() const
 {
     const auto program = getProgramOrThrow();
     findField("pgm")->setText(
@@ -309,7 +309,7 @@ void PgmAssignScreen::displayPgm()
         "-" + program->getName());
 }
 
-void PgmAssignScreen::displaySoundName()
+void PgmAssignScreen::displaySoundName() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -340,12 +340,12 @@ void PgmAssignScreen::displaySoundName()
     }
 }
 
-void PgmAssignScreen::displayPadAssign()
+void PgmAssignScreen::displayPadAssign() const
 {
     findField("pad-assign")->setText(padAssign ? "MASTER" : "PROGRAM");
 }
 
-void PgmAssignScreen::displayPadNote()
+void PgmAssignScreen::displayPadNote() const
 {
 
     const auto program = getProgramOrThrow();
@@ -421,7 +421,7 @@ void PgmAssignScreen::displaySoundGenerationMode()
     }
 }
 
-void PgmAssignScreen::displayVeloRangeUpper()
+void PgmAssignScreen::displayVeloRangeUpper() const
 {
     const auto program = getProgramOrThrow();
 
@@ -431,7 +431,7 @@ void PgmAssignScreen::displayVeloRangeUpper()
     findField("velocity-range-upper")->setTextPadded(rangeB, " ");
 }
 
-void PgmAssignScreen::displayVeloRangeLower()
+void PgmAssignScreen::displayVeloRangeLower() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -440,7 +440,7 @@ void PgmAssignScreen::displayVeloRangeLower()
     findField("velocity-range-lower")->setTextPadded(rangeA, " ");
 }
 
-void PgmAssignScreen::displayOptionalNoteA()
+void PgmAssignScreen::displayOptionalNoteA() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -452,7 +452,7 @@ void PgmAssignScreen::displayOptionalNoteA()
     findField("optional-note-a")->setText(noteA + "/" + padA);
 }
 
-void PgmAssignScreen::displayOptionalNoteB()
+void PgmAssignScreen::displayOptionalNoteB() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -464,7 +464,7 @@ void PgmAssignScreen::displayOptionalNoteB()
     findField("optional-note-b")->setText(noteB + "/" + padB);
 }
 
-void PgmAssignScreen::displayNote()
+void PgmAssignScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -473,7 +473,7 @@ void PgmAssignScreen::displayNote()
         std::to_string(selectedNoteParameters->getNumber()));
 }
 
-void PgmAssignScreen::displayPad()
+void PgmAssignScreen::displayPad() const
 {
     findField("pad")->setText(
         sampler->getPadName(mpc.clientEventController->getSelectedPad()));

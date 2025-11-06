@@ -33,6 +33,6 @@ namespace mpc::file::all
         static std::shared_ptr<mpc::sequencer::Event>
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char>
-            mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event>);
+        mpcEventToBytes(const std::shared_ptr<mpc::sequencer::Event> &);
     };
 } // namespace mpc::file::all

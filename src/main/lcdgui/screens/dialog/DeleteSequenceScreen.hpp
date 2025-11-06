@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::dialog
 {
@@ -16,6 +16,6 @@ namespace mpc::lcdgui::screens::dialog
         void open() override;
 
     private:
-        void displaySequenceNumberName();
+        void displaySequenceNumberName() const;
     };
 } // namespace mpc::lcdgui::screens::dialog

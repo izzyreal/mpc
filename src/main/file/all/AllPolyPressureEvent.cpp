@@ -19,8 +19,8 @@ AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return event;
 }
 
-std::vector<char>
-AllPolyPressureEvent::mpcEventToBytes(std::shared_ptr<PolyPressureEvent> event)
+std::vector<char> AllPolyPressureEvent::mpcEventToBytes(
+    const std::shared_ptr<PolyPressureEvent> &event)
 {
     std::vector<char> bytes(8);
 

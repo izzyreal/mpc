@@ -104,32 +104,32 @@ MidiInput::MidiInput(mpc::Mpc &mpc)
     }
 }
 
-int MidiInput::getSoftThruMode()
+int MidiInput::getSoftThruMode() const
 {
     return softThruMode;
 }
 
-int MidiInput::getReceiveCh()
+int MidiInput::getReceiveCh() const
 {
     return receiveCh;
 }
 
-bool MidiInput::isSustainPedalToDurationEnabled()
+bool MidiInput::isSustainPedalToDurationEnabled() const
 {
     return sustainPedalToDuration;
 }
 
-bool MidiInput::isFilterEnabled()
+bool MidiInput::isFilterEnabled() const
 {
     return filterEnabled;
 }
 
-int MidiInput::getFilterType()
+int MidiInput::getFilterType() const
 {
     return filterType;
 }
 
-bool MidiInput::isMultiRecEnabled()
+bool MidiInput::isMultiRecEnabled() const
 {
     return multiRecEnabled;
 }
@@ -139,32 +139,32 @@ std::vector<int> MidiInput::getMultiRecTrackDests()
     return multiRecTrackDests;
 }
 
-bool MidiInput::isNotePassEnabled()
+bool MidiInput::isNotePassEnabled() const
 {
     return notePassEnabled;
 }
 
-bool MidiInput::isPitchBendPassEnabled()
+bool MidiInput::isPitchBendPassEnabled() const
 {
     return pitchBendPassEnabled;
 }
 
-bool MidiInput::isPgmChangePassEnabled()
+bool MidiInput::isPgmChangePassEnabled() const
 {
     return pgmChangePassEnabled;
 }
 
-bool MidiInput::isChPressurePassEnabled()
+bool MidiInput::isChPressurePassEnabled() const
 {
     return chPressurePassEnabled;
 }
 
-bool MidiInput::isPolyPressurePassEnabled()
+bool MidiInput::isPolyPressurePassEnabled() const
 {
     return polyPressurePassEnabled;
 }
 
-bool MidiInput::isExclusivePassEnabled()
+bool MidiInput::isExclusivePassEnabled() const
 {
     return exclusivePassEnabled;
 }

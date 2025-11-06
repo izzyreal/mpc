@@ -41,8 +41,8 @@ namespace mpc::audiomidi
         bool stopEarly = false;
         void readWithoutResampling();
         void readWithResampling(float ratio);
-        short readNextShort();
-        int32_t readNext24BitInt();
+        short readNextShort() const;
+        int32_t readNext24BitInt() const;
         float readNextFrame();
 
         std::atomic_bool playing = false;
@@ -64,7 +64,7 @@ namespace mpc::audiomidi
         int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
                          int nFrames) override;
         void enableStopEarly();
-        bool isPlaying();
+        bool isPlaying() const;
 
         SoundPlayer();
         ~SoundPlayer();

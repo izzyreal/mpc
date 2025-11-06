@@ -18,7 +18,7 @@ namespace mpc::engine
         float gain = 0.0f;
 
     public:
-        float getGain();
+        float getGain() const;
 
         void setValue(float value) override;
 

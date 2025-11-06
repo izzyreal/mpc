@@ -9,7 +9,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 
-CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc &mpc,
+CopyNoteParametersScreen::CopyNoteParametersScreen(Mpc &mpc,
                                                    const int layerIndex)
     : ScreenComponent(mpc, "copy-note-parameters", layerIndex)
 {
@@ -25,7 +25,7 @@ void CopyNoteParametersScreen::open()
     setNote1(mpc.clientEventController->getSelectedNote() - 35);
 }
 
-void CopyNoteParametersScreen::turnWheel(int i)
+void CopyNoteParametersScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -47,7 +47,7 @@ void CopyNoteParametersScreen::turnWheel(int i)
     }
 }
 
-void CopyNoteParametersScreen::function(int i)
+void CopyNoteParametersScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -66,7 +66,7 @@ void CopyNoteParametersScreen::function(int i)
     }
 }
 
-void CopyNoteParametersScreen::displayProg0()
+void CopyNoteParametersScreen::displayProg0() const
 {
     const auto program = sampler->getProgram(prog0);
     findField("prog0")->setText(
@@ -74,7 +74,7 @@ void CopyNoteParametersScreen::displayProg0()
         program->getName());
 }
 
-void CopyNoteParametersScreen::displayNote0()
+void CopyNoteParametersScreen::displayNote0() const
 {
     const auto sourceProgram = sampler->getProgram(prog0);
     const auto note0 = mpc.clientEventController->getSelectedNote();
@@ -96,7 +96,7 @@ void CopyNoteParametersScreen::displayNote0()
     findField("note0")->setText(noteText + "/" + padName + sampleName);
 }
 
-void CopyNoteParametersScreen::displayProg1()
+void CopyNoteParametersScreen::displayProg1() const
 {
     const auto program = sampler->getProgram(prog1);
     findField("prog1")->setText(
@@ -104,7 +104,7 @@ void CopyNoteParametersScreen::displayProg1()
         program->getName());
 }
 
-void CopyNoteParametersScreen::displayNote1()
+void CopyNoteParametersScreen::displayNote1() const
 {
     const auto program = sampler->getProgram(prog1);
     const auto padIndex = program->getPadIndexFromNote(note1 + 35);
@@ -124,25 +124,25 @@ void CopyNoteParametersScreen::displayNote1()
     findField("note1")->setText(noteText + "/" + padName + sampleName);
 }
 
-void CopyNoteParametersScreen::setProg0(int i)
+void CopyNoteParametersScreen::setProg0(const int i)
 {
     prog0 = std::clamp(i, 0, sampler->getProgramCount());
     displayProg0();
 }
 
-void CopyNoteParametersScreen::setProg1(int i)
+void CopyNoteParametersScreen::setProg1(const int i)
 {
     prog1 = std::clamp(i, 0, sampler->getProgramCount());
     displayProg1();
 }
 
-void CopyNoteParametersScreen::setNote0(int i)
+void CopyNoteParametersScreen::setNote0(const int i) const
 {
     mpc.clientEventController->setSelectedNote(i);
     displayNote0();
 }
 
-void CopyNoteParametersScreen::setNote1(int i)
+void CopyNoteParametersScreen::setNote1(const int i)
 {
     note1 = std::clamp(i, 0, 63);
     displayNote1();

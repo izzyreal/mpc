@@ -11,7 +11,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-TransScreen::TransScreen(mpc::Mpc &mpc, const int layerIndex)
+TransScreen::TransScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "trans", layerIndex)
 {
 }
@@ -129,12 +129,12 @@ void TransScreen::setBar1(int i)
     displayBars();
 }
 
-void TransScreen::displayTransposeAmount()
+void TransScreen::displayTransposeAmount() const
 {
     findField("transpose-amount")->setTextPadded(transposeAmount);
 }
 
-void TransScreen::displayTr()
+void TransScreen::displayTr() const
 {
     const auto trName = std::string(
         tr == -1 ? "ALL"
@@ -143,7 +143,7 @@ void TransScreen::displayTr()
     findLabel("track-name")->setText(trName);
 }
 
-void TransScreen::displayBars()
+void TransScreen::displayBars() const
 {
     findField("bar0")->setTextPadded(std::to_string(bar0 + 1), "0");
     findField("bar1")->setTextPadded(std::to_string(bar1 + 1), "0");

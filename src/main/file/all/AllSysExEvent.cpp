@@ -59,7 +59,8 @@ AllSysExEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     return event;
 }
 
-std::vector<char> AllSysExEvent::mpcEventToBytes(std::shared_ptr<Event> event)
+std::vector<char>
+AllSysExEvent::mpcEventToBytes(const std::shared_ptr<Event> &event)
 {
     std::vector<char> bytes;
 

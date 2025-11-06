@@ -41,7 +41,7 @@ void ClientMidiFootswitchAssignmentController::initializeDefaultBindings()
     }
 }
 
-void ClientMidiFootswitchAssignmentController::pressButton(ComponentId id)
+void ClientMidiFootswitchAssignmentController::pressButton(ComponentId id) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;
@@ -50,7 +50,8 @@ void ClientMidiFootswitchAssignmentController::pressButton(ComponentId id)
     clientHardwareEventController->handleClientHardwareEvent(ev);
 }
 
-void ClientMidiFootswitchAssignmentController::releaseButton(ComponentId id)
+void ClientMidiFootswitchAssignmentController::releaseButton(
+    ComponentId id) const
 {
     ClientHardwareEvent ev{};
     ev.source = ClientHardwareEvent::Source::Internal;

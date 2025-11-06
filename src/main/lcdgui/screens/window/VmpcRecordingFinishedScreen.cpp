@@ -2,13 +2,13 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(mpc::Mpc &mpc,
+VmpcRecordingFinishedScreen::VmpcRecordingFinishedScreen(Mpc &mpc,
                                                          const int layerIndex)
     : ScreenComponent(mpc, "vmpc-recording-finished", layerIndex)
 {
 }
 
-void VmpcRecordingFinishedScreen::function(int i)
+void VmpcRecordingFinishedScreen::function(const int i)
 {
 
     switch (i)

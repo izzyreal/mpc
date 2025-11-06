@@ -28,7 +28,7 @@ namespace mpc::engine::audio::mixer
         MixerControls *mixerControls{nullptr};
 
     public:
-        MixerControls *getMixerControls();
+        MixerControls *getMixerControls() const;
 
     private:
         bool master{false};
@@ -40,17 +40,17 @@ namespace mpc::engine::audio::mixer
         void derive(Control *c) override;
 
     public:
-        bool isMaster();
+        bool isMaster() const;
 
-        bool isMute();
+        bool isMute() const;
 
         bool isEnabled();
 
-        float getGain();
+        float getGain() const;
 
-        void getChannelGains(std::vector<float> *dest);
+        void getChannelGains(std::vector<float> *dest) const;
 
-        float getSmoothingFactor();
+        float getSmoothingFactor() const;
 
     public:
         virtual mpc::engine::control::EnumControl *
@@ -60,7 +60,8 @@ namespace mpc::engine::audio::mixer
 
     public:
         MixControls(MixerControls *mixerControls, int stripId,
-                    std::shared_ptr<BusControls> busControls, bool isMaster);
+                    const std::shared_ptr<BusControls> &busControls,
+                    bool isMaster);
 
     public:
         std::string getName() override;

@@ -12,7 +12,7 @@ void Step::setSequence(int i)
     sequence = i;
 }
 
-int Step::getSequence()
+int Step::getSequence() const
 {
     return sequence;
 }
@@ -27,7 +27,7 @@ void Step::setRepeats(int i)
     repeatCount = i;
 }
 
-int Step::getRepeats()
+int Step::getRepeats() const
 {
     return repeatCount;
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 
@@ -16,24 +16,24 @@ namespace mpc::sequencer
 namespace mpc::lcdgui::screens::window
 {
 
-    class TempoChangeScreen : public mpc::lcdgui::ScreenComponent
+    class TempoChangeScreen final : public ScreenComponent
     {
 
     private:
-        std::vector<std::shared_ptr<mpc::lcdgui::HorizontalBar2>> bars;
-        std::vector<std::shared_ptr<mpc::sequencer::TempoChangeEvent>>
+        std::vector<std::shared_ptr<HorizontalBar2>> bars;
+        std::vector<std::shared_ptr<sequencer::TempoChangeEvent>>
             visibleTempoChanges;
 
     private:
         void initVisibleEvents();
-        void displayTempoChange0();
-        void displayTempoChange1();
-        void displayTempoChange2();
-        void displayTempoChangeOn();
-        void displayInitialTempo();
+        void displayTempoChange0() const;
+        void displayTempoChange1() const;
+        void displayTempoChange2() const;
+        void displayTempoChangeOn() const;
+        void displayInitialTempo() const;
 
     public:
-        TempoChangeScreen(mpc::Mpc &mpc, int layerIndex);
+        TempoChangeScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
@@ -47,9 +47,9 @@ namespace mpc::lcdgui::screens::window
         void up() override;
 
     private:
-        std::weak_ptr<mpc::sequencer::TempoChangeEvent> previous;
-        std::weak_ptr<mpc::sequencer::TempoChangeEvent> current;
-        std::weak_ptr<mpc::sequencer::TempoChangeEvent> next;
+        std::weak_ptr<sequencer::TempoChangeEvent> previous;
+        std::weak_ptr<sequencer::TempoChangeEvent> current;
+        std::weak_ptr<sequencer::TempoChangeEvent> next;
         int offset = 0;
         void setOffset(int i);
 

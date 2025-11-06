@@ -17,8 +17,8 @@ namespace mpc
         static Logger l;
 
     public:
-        void log(std::string s);
-        void setPath(std::string s);
+        void log(std::string s) const;
+        void setPath(const std::string &s);
 
     public:
         Logger();

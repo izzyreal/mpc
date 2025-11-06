@@ -32,7 +32,7 @@ void KeySignature::setKey(int key)
     }
 }
 
-int KeySignature::getKey()
+int KeySignature::getKey() const
 {
     return mKey;
 }
@@ -42,7 +42,7 @@ void KeySignature::setScale(int scale)
     mScale = scale;
 }
 
-int KeySignature::getScale()
+int KeySignature::getScale() const
 {
     return mScale;
 }
@@ -77,7 +77,7 @@ std::shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta,
     return std::make_shared<KeySignature>(tick, delta, key, scale);
 }
 
-int KeySignature::compareTo(mpc::file::mid::event::MidiEvent *other)
+int KeySignature::compareTo(mpc::file::mid::event::MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

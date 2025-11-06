@@ -164,28 +164,28 @@ int TempoChangeEvent::getRatio() const
     return ratio;
 }
 
-int TempoChangeEvent::getBar(int n, int d)
+int TempoChangeEvent::getBar(int n, int d) const
 {
     auto barLength = (int)(96 * (4.0 / d) * n);
     auto bar = (int)(tick / barLength);
     return bar;
 }
 
-int TempoChangeEvent::getBeat(int n, int d)
+int TempoChangeEvent::getBeat(int n, int d) const
 {
     auto beatLength = static_cast<int>(96 * (4.0 / d));
     auto beat = (static_cast<int>(tick / beatLength)) % n;
     return beat;
 }
 
-int TempoChangeEvent::getClock(int denominator)
+int TempoChangeEvent::getClock(int denominator) const
 {
     auto beatLength = static_cast<int>(96 * (4.0 / denominator));
     auto clock = static_cast<int>(tick % beatLength);
     return clock;
 }
 
-double TempoChangeEvent::getTempo()
+double TempoChangeEvent::getTempo() const
 {
     auto tempo = parent->getInitialTempo() * ratio * 0.001;
 

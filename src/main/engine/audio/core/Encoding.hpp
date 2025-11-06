@@ -13,7 +13,7 @@ namespace mpc::engine::audio::core
         std::string name;
 
     public:
-        Encoding(std::string name);
+        Encoding(const std::string &name);
 
     public:
         static Encoding *&PCM_SIGNED();

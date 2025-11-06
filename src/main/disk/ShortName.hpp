@@ -16,31 +16,31 @@ namespace mpc::disk
         std::vector<char> nameBytes{};
 
     private:
-        static std::vector<char> toCharArray_(std::string name,
-                                              std::string ext);
-        void init();
+        static std::vector<char> toCharArray_(const std::string &name,
+                                              const std::string &ext);
+        void init() const;
 
     public:
-        int8_t checkSum();
-        static ShortName get(std::string name);
-        static bool canConvert(std::string nameExt);
+        int8_t checkSum() const;
+        static ShortName get(const std::string &name);
+        static bool canConvert(const std::string &nameExt);
         static ShortName parse(std::vector<char> data);
-        void write(std::vector<char> dest);
-        std::string asSimpleString();
+        void write(std::vector<char> dest) const;
+        std::string asSimpleString() const;
 
     private:
-        static void checkValidName(std::string name);
-        static void checkValidExt(std::string ext);
+        static void checkValidName(const std::string &name);
+        static void checkValidExt(const std::string &ext);
         static void checkString(std::string str, std::string strType,
                                 int minLength, int maxLength);
 
     public:
-        int hashCode();
-        static void checkValidChars(std::vector<char> chars);
+        int hashCode() const;
+        static void checkValidChars(const std::vector<char> &chars);
 
     public:
         ShortName(std::string nameExt);
-        ShortName(std::string name, std::string ext);
+        ShortName(const std::string &name, const std::string &ext);
 
     private:
         static std::vector<char> ILLEGAL_CHARS();

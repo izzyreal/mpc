@@ -1,19 +1,19 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <disk/ApsLoader.hpp>
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadApsFileScreen : public mpc::lcdgui::ScreenComponent
+    class LoadApsFileScreen final : public ScreenComponent
     {
 
     private:
-        std::unique_ptr<mpc::disk::ApsLoader> apsLoader;
+        std::unique_ptr<disk::ApsLoader> apsLoader;
 
     public:
         void function(int i) override;
 
-        LoadApsFileScreen(mpc::Mpc &mpc, int layerIndex);
+        LoadApsFileScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

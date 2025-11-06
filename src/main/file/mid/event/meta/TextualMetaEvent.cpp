@@ -6,14 +6,14 @@
 using namespace mpc::file::mid::event::meta;
 
 TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type,
-                                   std::string text)
+                                   const std::string &text)
     : MetaEvent(tick, delta, type)
 {
     setText(text);
     mLength = mpc::file::mid::util::VariableLengthInt(text.length());
 }
 
-void TextualMetaEvent::setText(std::string t)
+void TextualMetaEvent::setText(const std::string &t)
 {
     mText = t;
     mLength.setValue(t.length());
@@ -42,7 +42,7 @@ void TextualMetaEvent::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int TextualMetaEvent::compareTo(mpc::file::mid::event::MidiEvent *other)
+int TextualMetaEvent::compareTo(mpc::file::mid::event::MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

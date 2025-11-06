@@ -4,12 +4,12 @@
 
 using namespace mpc::file::mid::event::meta;
 
-Marker::Marker(int tick, int delta, std::string marker)
+Marker::Marker(int tick, int delta, const std::string &marker)
     : TextualMetaEvent(tick, delta, MetaEvent::MARKER, marker)
 {
 }
 
-void Marker::setMarkerName(std::string name)
+void Marker::setMarkerName(const std::string &name)
 {
     setText(name);
 }

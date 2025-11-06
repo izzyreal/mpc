@@ -28,8 +28,8 @@ namespace mpc::audiomidi
         std::shared_ptr<MidiEventQueue> queue;
 
     public:
-        void enqueueEvent(MidiEventPtr);
-        int dequeue(std::vector<MidiEventPtr> &);
-        void panic();
+        void enqueueEvent(const MidiEventPtr &) const;
+        int dequeue(std::vector<MidiEventPtr> &) const;
+        void panic() const;
     };
 } // namespace mpc::audiomidi

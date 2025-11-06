@@ -12,7 +12,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-EndFineScreen::EndFineScreen(mpc::Mpc &mpc, const int layerIndex)
+EndFineScreen::EndFineScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "end-fine", layerIndex)
 {
     addChildT<Wave>()->setFine(true);
@@ -81,7 +81,7 @@ void EndFineScreen::displayPlayX()
     findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
-void EndFineScreen::function(int i)
+void EndFineScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -99,7 +99,7 @@ void EndFineScreen::function(int i)
     }
 }
 
-void EndFineScreen::turnWheel(int i)
+void EndFineScreen::turnWheel(const int i)
 {
     const auto sound = sampler->getSound();
 
@@ -161,7 +161,7 @@ void EndFineScreen::pressEnter()
     displayFineWave();
 }
 
-void EndFineScreen::setSlider(int i)
+void EndFineScreen::setSlider(const int i)
 {
     if (!mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)

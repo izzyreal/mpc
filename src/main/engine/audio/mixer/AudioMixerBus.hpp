@@ -17,16 +17,16 @@ namespace mpc::engine::audio::mixer
         std::string name;
 
     public:
-        mpc::engine::audio::core::AudioBuffer *getBuffer();
+        mpc::engine::audio::core::AudioBuffer *getBuffer() const;
 
         std::string getName();
 
-        void silence();
+        void silence() const;
 
-        void write(int nFrames);
+        void write(int nFrames) const;
 
     public:
         AudioMixerBus(AudioMixer *mixer,
-                      std::shared_ptr<BusControls> busControls);
+                      const std::shared_ptr<BusControls> &busControls);
     };
 } // namespace mpc::engine::audio::mixer

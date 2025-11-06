@@ -63,7 +63,7 @@ namespace mpc::audiomidi
         bool isOnlySilence = true;
 
         void writeRingBufferToDisk();
-        void removeFilesIfEmpty();
+        void removeFilesIfEmpty() const;
 
     public:
         bool start();

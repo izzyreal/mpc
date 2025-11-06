@@ -10,6 +10,6 @@ namespace mpc::engine::audio::core
     {
 
     public:
-        AudioControls(int id, std::string name);
+        AudioControls(int id, const std::string &name);
     };
 } // namespace mpc::engine::audio::core

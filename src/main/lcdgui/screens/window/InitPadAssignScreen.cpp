@@ -3,7 +3,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-InitPadAssignScreen::InitPadAssignScreen(mpc::Mpc &mpc, const int layerIndex)
+InitPadAssignScreen::InitPadAssignScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "init-pad-assign", layerIndex)
 {
 }
@@ -14,7 +14,7 @@ void InitPadAssignScreen::open()
     displayInitPadAssign();
 }
 
-void InitPadAssignScreen::turnWheel(int i)
+void InitPadAssignScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -26,7 +26,7 @@ void InitPadAssignScreen::turnWheel(int i)
     }
 }
 
-void InitPadAssignScreen::function(int i)
+void InitPadAssignScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -47,7 +47,7 @@ void InitPadAssignScreen::function(int i)
     }
 }
 
-void InitPadAssignScreen::displayInitPadAssign()
+void InitPadAssignScreen::displayInitPadAssign() const
 {
     findField("init-pad-assign")
         ->setText(initPadAssignIsMaster ? "MASTER" : "PROGRAM");

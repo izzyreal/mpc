@@ -88,8 +88,8 @@ namespace mpc::controller
                                     mpc::hardware::ComponentId);
         void handleRecPunch();
         void handleOdubPunch();
-        void pressButton(mpc::hardware::ComponentId);
-        void releaseButton(mpc::hardware::ComponentId);
+        void pressButton(mpc::hardware::ComponentId) const;
+        void releaseButton(mpc::hardware::ComponentId) const;
         void handleStopToPlay();
         void handleRecordingToPlay();
     };

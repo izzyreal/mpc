@@ -47,9 +47,10 @@ namespace mpc::file::pgmwriter
         void setVelocityToCutoff(int midiNote, int velocityToCutoff);
         void setSliderParameter(int midiNote, int sliderParameter);
         void setVelocityToPitch(int midiNote, int velocityToPitch);
-        void setShort(std::vector<char> &ca, int offset, int16_t s);
+        void setShort(std::vector<char> &ca, int offset, int16_t s) const;
 
     public:
-        MidiNotes(mpc::sampler::Program *program, std::vector<int> snConvTable);
+        MidiNotes(mpc::sampler::Program *program,
+                  const std::vector<int> &snConvTable);
     };
 } // namespace mpc::file::pgmwriter

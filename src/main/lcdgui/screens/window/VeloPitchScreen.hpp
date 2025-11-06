@@ -1,15 +1,15 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class VeloPitchScreen : public mpc::lcdgui::ScreenComponent
+    class VeloPitchScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
-        VeloPitchScreen(mpc::Mpc &mpc, int layerIndex);
+        VeloPitchScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
@@ -17,9 +17,9 @@ namespace mpc::lcdgui::screens::window
         void update(Observable *observable, Message message) override;
 
     private:
-        void displayVelo();
-        void displayNote();
-        void displayVeloPitch();
-        void displayTune();
+        void displayVelo() const;
+        void displayNote() const;
+        void displayVeloPitch() const;
+        void displayTune() const;
     };
 } // namespace mpc::lcdgui::screens::window

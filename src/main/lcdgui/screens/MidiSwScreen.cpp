@@ -10,7 +10,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::controller;
 using namespace mpc::midi::input;
 
-MidiSwScreen::MidiSwScreen(mpc::Mpc &mpc, const int layerIndex)
+MidiSwScreen::MidiSwScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "midi-sw", layerIndex)
 {
 }

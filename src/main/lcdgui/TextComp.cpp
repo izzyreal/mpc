@@ -5,7 +5,7 @@
 #include "lcdgui/Label.hpp"
 #include "lcdgui/Field.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include <StrUtil.hpp>
 #include <utf8_decode.hpp>

@@ -71,7 +71,7 @@ std::vector<float> &TimeStretch::getProcessedData()
 }
 
 std::vector<float> TimeStretch::seg(std::vector<float> *src, int length,
-                                    int offset)
+                                    int offset) const
 {
     std::vector<float> res;
     for (int i = 0; i < length; i++)
@@ -81,7 +81,7 @@ std::vector<float> TimeStretch::seg(std::vector<float> *src, int length,
     return res;
 }
 
-void TimeStretch::fade(int length, std::vector<float> *fa)
+void TimeStretch::fade(int length, std::vector<float> *fa) const
 {
     float ampCoeff = 0.0f;
     float inc = 1.0f / ((float)(length));

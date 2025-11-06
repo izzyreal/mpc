@@ -9,7 +9,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
 VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
-    mpc::Mpc &m, int layer)
+    Mpc &m, const int layer)
     : ScreenComponent(m, "vmpc-known-controller-detected", layer)
 {
     const auto label0 = std::make_shared<Label>(
@@ -26,7 +26,7 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
     addChild(label3);
 }
 
-void VmpcKnownControllerDetectedScreen::function(int i)
+void VmpcKnownControllerDetectedScreen::function(const int i)
 {
     const auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
     auto &presets = mpc.midiControlPresets;
@@ -110,4 +110,10 @@ void VmpcKnownControllerDetectedScreen::open()
     }
 
     displayMessage();
+}
+
+void window::VmpcKnownControllerDetectedScreen::setControllerName(
+    const std::string controllerNameToUse)
+{
+    controllerName = controllerNameToUse;
 }

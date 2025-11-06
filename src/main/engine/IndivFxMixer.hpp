@@ -16,23 +16,23 @@ namespace mpc::engine
     public:
         void setFollowStereo(bool b);
 
-        bool isFollowingStereo();
+        bool isFollowingStereo() const;
 
-        int getOutput();
+        int getOutput() const;
 
         void setOutput(int i);
 
         void setVolumeIndividualOut(int i);
 
-        int getVolumeIndividualOut();
+        int getVolumeIndividualOut() const;
 
         void setFxPath(int i);
 
-        int getFxPath();
+        int getFxPath() const;
 
         void setFxSendLevel(int i);
 
-        int getFxSendLevel();
+        int getFxSendLevel() const;
 
     public:
         IndivFxMixer();

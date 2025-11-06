@@ -1,17 +1,17 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class NumberOfZonesScreen : public mpc::lcdgui::ScreenComponent
+    class NumberOfZonesScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
         void turnWheel(int i) override;
 
-        NumberOfZonesScreen(mpc::Mpc &mpc, int layerIndex);
+        NumberOfZonesScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 

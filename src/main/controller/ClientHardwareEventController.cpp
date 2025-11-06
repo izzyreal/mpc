@@ -132,7 +132,8 @@ void ClientHardwareEventController::handlePadPress(
     {
         opensNameScreen->openNameScreen();
 
-        if (event.source == ClientHardwareEvent::Source::HostInputKeyboard)
+        if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}) &&
+            event.source == ClientHardwareEvent::Source::HostInputKeyboard)
         {
             return;
         }
@@ -147,7 +148,9 @@ void ClientHardwareEventController::handlePadPress(
         velocity, static_cast<float>(VelocitySensitivePressable::MIN_VELO),
         static_cast<float>(VelocitySensitivePressable::MAX_VELO));
 
-    if (!mpc.getHardware()->getPad(physicalPadIndex)->pressWithVelocity(clampedVelocity))
+    if (!mpc.getHardware()
+             ->getPad(physicalPadIndex)
+             ->pressWithVelocity(clampedVelocity))
     {
         return;
     }

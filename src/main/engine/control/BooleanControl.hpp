@@ -13,10 +13,10 @@ namespace mpc::engine::control
     public:
         void setValue(bool value);
 
-        bool getValue();
+        bool getValue() const;
 
     public:
-        BooleanControl(int id, std::string name);
+        BooleanControl(int id, const std::string &name);
     };
 
 } // namespace mpc::engine::control

@@ -17,18 +17,18 @@ namespace mpc::file::sndreader
 
     public:
         std::vector<char> &getHeaderArray();
-        bool hasValidId();
-        std::string getName();
-        int getLevel();
-        int getTune();
-        bool isMono();
-        int getStart();
-        int getEnd();
-        int getNumberOfFrames();
-        int getLoopLength();
-        bool isLoopEnabled();
-        int getNumberOfBeats();
-        int getSampleRate();
+        bool hasValidId() const;
+        std::string getName() const;
+        int getLevel() const;
+        int getTune() const;
+        bool isMono() const;
+        int getStart() const;
+        int getEnd() const;
+        int getNumberOfFrames() const;
+        int getLoopLength() const;
+        bool isLoopEnabled() const;
+        int getNumberOfBeats() const;
+        int getSampleRate() const;
 
     public:
         SndHeaderReader(SndReader *sndReader);

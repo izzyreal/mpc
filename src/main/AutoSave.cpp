@@ -218,7 +218,7 @@ void AutoSave::restoreAutoSavedStateWithTarget(
 }
 
 void AutoSave::storeAutoSavedStateWithTarget(
-    Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
+    Mpc &mpc, const std::shared_ptr<SaveTarget> &saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
 

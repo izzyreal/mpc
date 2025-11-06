@@ -73,7 +73,7 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
     return result;
 }
 
-std::string MpcFile::getNameWithoutExtension()
+std::string MpcFile::getNameWithoutExtension() const
 {
     if (raw)
     {
@@ -91,7 +91,7 @@ std::string MpcFile::getNameWithoutExtension()
     }
 }
 
-std::string MpcFile::getExtension()
+std::string MpcFile::getExtension() const
 {
     if (raw)
     {
@@ -117,7 +117,7 @@ std::string MpcFile::getExtension()
     }
 }
 
-bool MpcFile::isDirectory()
+bool MpcFile::isDirectory() const
 {
     if (raw)
     {
@@ -134,7 +134,7 @@ bool MpcFile::isFile()
     return !isDirectory();
 }
 
-std::string MpcFile::getName()
+std::string MpcFile::getName() const
 {
     if (raw)
     {
@@ -146,7 +146,7 @@ std::string MpcFile::getName()
     }
 }
 
-bool MpcFile::setName(std::string s)
+bool MpcFile::setName(const std::string &s) const
 {
     if (raw)
     {
@@ -210,7 +210,7 @@ void MpcFile::setFileData(std::vector<char> &data)
     }
 }
 
-bool MpcFile::exists()
+bool MpcFile::exists() const
 {
     if (raw)
     {
@@ -222,7 +222,7 @@ bool MpcFile::exists()
     }
 }
 
-bool MpcFile::del()
+bool MpcFile::del() const
 {
     if (raw)
     {

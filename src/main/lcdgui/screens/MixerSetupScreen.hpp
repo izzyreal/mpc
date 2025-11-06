@@ -1,24 +1,24 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class MixerSetupScreen : public mpc::lcdgui::ScreenComponent
+    class MixerSetupScreen final : public ScreenComponent
     {
 
     public:
-        MixerSetupScreen(mpc::Mpc &mpc, int layerIndex);
+        MixerSetupScreen(Mpc &mpc, int layerIndex);
         void turnWheel(int increment) override;
         void function(int i) override;
         void open() override;
 
     private:
         void displayMasterLevel();
-        void displayFxDrum();
-        void displayStereoMixSource();
-        void displayIndivFxSource();
-        void displayCopyPgmMixToDrum();
-        void displayRecordMixChanges();
+        void displayFxDrum() const;
+        void displayStereoMixSource() const;
+        void displayIndivFxSource() const;
+        void displayCopyPgmMixToDrum() const;
+        void displayRecordMixChanges() const;
 
     private:
         std::vector<std::string> masterLevelNames = {u8"-\u00D9\u00DAdB",
@@ -48,19 +48,19 @@ namespace mpc::lcdgui::screens
         bool recordMixChangesEnabled = false;
 
     public:
-        bool isStereoMixSourceDrum();
-        bool isIndivFxSourceDrum();
+        bool isStereoMixSourceDrum() const;
+        bool isIndivFxSourceDrum() const;
 
     public:
         int getMasterLevel() const;
         void setMasterLevel(int i);
-        int getFxDrum();
+        int getFxDrum() const;
         void setFxDrum(int i);
         void setStereoMixSourceDrum(bool b);
         void setIndivFxSourceDrum(bool b);
-        bool isCopyPgmMixToDrumEnabled();
+        bool isCopyPgmMixToDrumEnabled() const;
         void setCopyPgmMixToDrumEnabled(bool b);
-        bool isRecordMixChangesEnabled();
+        bool isRecordMixChangesEnabled() const;
         void setRecordMixChangesEnabled(bool b);
         std::string getMasterLevelString();
     };

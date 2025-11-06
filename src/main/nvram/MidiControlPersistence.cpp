@@ -169,9 +169,8 @@ void MidiControlPersistence::saveCurrentState(mpc::Mpc &mpc)
     }
 }
 
-void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc,
-                                                            fs::path p,
-                                                            std::string name)
+void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(
+    mpc::Mpc &mpc, const fs::path &p, const std::string &name)
 {
     auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
 
@@ -209,7 +208,8 @@ void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc,
 }
 
 void MidiControlPersistence::loadFileByNameIntoPreset(
-    mpc::Mpc &mpc, std::string name, std::shared_ptr<MidiControlPreset> preset)
+    mpc::Mpc &mpc, const std::string &name,
+    const std::shared_ptr<MidiControlPreset> &preset)
 {
     auto presetsPath = mpc.paths->midiControlPresetsPath();
 
@@ -268,7 +268,7 @@ bool MidiControlPersistence::doesPresetWithNameExist(mpc::Mpc &mpc,
 }
 
 void MidiControlPersistence::healPreset(
-    mpc::Mpc &mpc, std::shared_ptr<MidiControlPreset> preset)
+    mpc::Mpc &mpc, const std::shared_ptr<MidiControlPreset> &preset)
 {
     const auto defaultPreset = createDefaultPreset(mpc);
     const auto &defaultRows = defaultPreset->rows;

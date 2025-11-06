@@ -1,13 +1,13 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class TrMuteScreen : public mpc::lcdgui::ScreenComponent
+    class TrMuteScreen final : public ScreenComponent
     {
 
     public:
-        TrMuteScreen(mpc::Mpc &mpc, int layerIndex);
+        TrMuteScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -16,15 +16,15 @@ namespace mpc::lcdgui::screens
         void function(int i) override;
 
     private:
-        int bankoffset();
-        void displayBank();
-        void displayTrackNumbers();
-        void displaySq();
-        void displayTrack(int i);
-        void setTrackColor(int i);
-        void displayNow0();
-        void displayNow1();
-        void displayNow2();
-        void refreshTracks();
+        int bankoffset() const;
+        void displayBank() const;
+        void displayTrackNumbers() const;
+        void displaySq() const;
+        void displayTrack(int i) const;
+        void setTrackColor(int i) const;
+        void displayNow0() const;
+        void displayNow1() const;
+        void displayNow2() const;
+        void refreshTracks() const;
     };
 } // namespace mpc::lcdgui::screens

@@ -1,14 +1,14 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class VmpcRecordingFinishedScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcRecordingFinishedScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
 
-        VmpcRecordingFinishedScreen(mpc::Mpc &mpc, int layerIndex);
+        VmpcRecordingFinishedScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

@@ -15,6 +15,6 @@ namespace mpc::engine::audio::core
         std::string sourceLocation;
 
     public:
-        AudioControlsChain(int id, std::string name);
+        AudioControlsChain(int id, const std::string &name);
     };
 } // namespace mpc::engine::audio::core

@@ -22,7 +22,7 @@ namespace mpc
                 ProgramFileReader *programFile{};
 
             public:
-                int getSampleNamesSize();
+                int getSampleNamesSize() const;
                 std::vector<char> getSampleNamesArray();
 
             public:

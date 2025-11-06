@@ -24,7 +24,7 @@ void FaderControl::setValue(float value)
     LawControl::setValue(value);
 }
 
-float FaderControl::getGain()
+float FaderControl::getGain() const
 {
     return gain;
 }

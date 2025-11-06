@@ -19,7 +19,7 @@ namespace mpc::engine::audio::core
         void setChannelCount(int count);
 
     public:
-        bool isRealTime();
+        bool isRealTime() const;
         void setRealTime(bool realTime);
 
     public:
@@ -30,7 +30,7 @@ namespace mpc::engine::audio::core
         const bool isSilent();
 
     public:
-        AudioBuffer(std::string name, int channelCount, int sampleCount,
+        AudioBuffer(const std::string &name, int channelCount, int sampleCount,
                     float sampleRate);
     };
 } // namespace mpc::engine::audio::core

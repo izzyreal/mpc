@@ -21,7 +21,7 @@ namespace mpc::file::all
     public:
         static std::shared_ptr<mpc::sequencer::PolyPressureEvent>
         bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char>
-            mpcEventToBytes(std::shared_ptr<mpc::sequencer::PolyPressureEvent>);
+        static std::vector<char> mpcEventToBytes(
+            const std::shared_ptr<mpc::sequencer::PolyPressureEvent> &);
     };
 } // namespace mpc::file::all

@@ -4,12 +4,12 @@
 
 using namespace mpc::file::mid::event::meta;
 
-CuePoint::CuePoint(int tick, int delta, std::string marker)
+CuePoint::CuePoint(int tick, int delta, const std::string &marker)
     : TextualMetaEvent(tick, delta, MetaEvent::CUE_POINT, marker)
 {
 }
 
-void CuePoint::setCue(std::string name)
+void CuePoint::setCue(const std::string &name)
 {
     setText(name);
 }

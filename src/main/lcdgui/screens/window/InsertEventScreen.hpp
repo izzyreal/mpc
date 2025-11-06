@@ -1,19 +1,19 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class InsertEventScreen : public mpc::lcdgui::ScreenComponent
+    class InsertEventScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
         void turnWheel(int i) override;
 
-        InsertEventScreen(mpc::Mpc &mpc, int layerIndex);
+        InsertEventScreen(Mpc &mpc, int layerIndex);
         void open() override;
-        bool isEventAddedBeforeLeavingTheScreen();
+        bool isEventAddedBeforeLeavingTheScreen() const;
 
     private:
         bool eventAddedBeforeLeavingTheScreen = false;
@@ -22,8 +22,8 @@ namespace mpc::lcdgui::screens::window
             "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE",      "MIXER"};
         int insertEventType = 0;
         void setInsertEventType(int i);
-        void displayInsertEventType();
+        void displayInsertEventType() const;
 
-        void insertEvent();
+        void insertEvent() const;
     };
 } // namespace mpc::lcdgui::screens::window

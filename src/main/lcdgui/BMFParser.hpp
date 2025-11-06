@@ -14,7 +14,7 @@ namespace mpc::lcdgui
         std::vector<std::vector<bool>> atlas;
 
     private:
-        void OrderCharsByID(std::vector<bmfont_char> *chars);
+        void OrderCharsByID(std::vector<bmfont_char> *chars) const;
         bool GetBMFontData(const char *pBinary, size_t fileSize,
                            bmfont *pBMFont);
 

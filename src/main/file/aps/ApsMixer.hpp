@@ -26,12 +26,12 @@ namespace mpc::file::aps
     public:
         mpc::engine::StereoMixer getStereoMixerChannel(int noteIndex);
         mpc::engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex);
-        int getFxPath(int noteIndex);
-        int getLevel(int noteIndex);
-        int getPanning(int noteIndex);
-        int getIndividualLevel(int noteIndex);
-        int getIndividualOutput(int noteIndex);
-        int getSendLevel(int noteIndex);
+        int getFxPath(int noteIndex) const;
+        int getLevel(int noteIndex) const;
+        int getPanning(int noteIndex) const;
+        int getIndividualLevel(int noteIndex) const;
+        int getIndividualOutput(int noteIndex) const;
+        int getSendLevel(int noteIndex) const;
         std::vector<char> getBytes();
 
     public:

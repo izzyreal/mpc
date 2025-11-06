@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::audiomidi
 {
@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
 {
-    class TransScreen : public mpc::lcdgui::ScreenComponent
+    class TransScreen final : public ScreenComponent
     {
 
     public:
@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
 
         void open() override;
 
-        TransScreen(mpc::Mpc &mpc, int layerIndex);
+        TransScreen(Mpc &mpc, int layerIndex);
 
         void play() override;
         void playStart() override;
@@ -42,11 +42,11 @@ namespace mpc::lcdgui::screens
         void setBar0(int i);
         void setBar1(int i);
 
-        void displayTransposeAmount();
-        void displayTr();
-        void displayBars();
+        void displayTransposeAmount() const;
+        void displayTr() const;
+        void displayBars() const;
 
-        friend class mpc::lcdgui::screens::window::TransposePermanentScreen;
-        friend class mpc::audiomidi::EventHandler;
+        friend class TransposePermanentScreen;
+        friend class audiomidi::EventHandler;
     };
 } // namespace mpc::lcdgui::screens

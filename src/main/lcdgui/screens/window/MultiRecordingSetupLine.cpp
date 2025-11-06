@@ -4,22 +4,22 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-void MultiRecordingSetupLine::setIn(int inToUse)
+void MultiRecordingSetupLine::setIn(const int inToUse)
 {
     in = inToUse;
 }
 
-int MultiRecordingSetupLine::getIn()
+int MultiRecordingSetupLine::getIn() const
 {
     return in;
 }
 
-void MultiRecordingSetupLine::setTrack(int i)
+void MultiRecordingSetupLine::setTrack(const int i)
 {
     track = std::clamp(i, -1, 63);
 }
 
-int MultiRecordingSetupLine::getTrack()
+int MultiRecordingSetupLine::getTrack() const
 {
     return track;
 }

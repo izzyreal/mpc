@@ -66,15 +66,17 @@ namespace mpc::sequencer
                              uint8_t copyAfterBar);
 
         static bool isRecMainWithoutPlaying(
-            std::shared_ptr<Sequencer> sequencer,
-            std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
-                timingCorrectScreen,
+            const std::shared_ptr<Sequencer> &sequencer,
+            const std::shared_ptr<
+                mpc::lcdgui::screens::window::TimingCorrectScreen>
+                &timingCorrectScreen,
             const std::string &currentScreenName,
-            std::shared_ptr<mpc::hardware::Button> recButton,
-            std::shared_ptr<mpc::controller::ClientHardwareEventController>
-                clientHardwareEventController);
+            const std::shared_ptr<mpc::hardware::Button> &recButton,
+            const std::shared_ptr<
+                mpc::controller::ClientHardwareEventController>
+                &clientHardwareEventController);
 
         static bool isStepRecording(const std::string &currentScreenName,
-                                    std::shared_ptr<Sequencer>);
+                                    const std::shared_ptr<Sequencer> &);
     };
 } // namespace mpc::sequencer

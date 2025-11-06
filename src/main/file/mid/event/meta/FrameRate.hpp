@@ -24,10 +24,10 @@ namespace mpc::file::mid::event::meta
         static FrameRate *fromInt(int val);
 
     private:
-        FrameRate(std::string name, int ordinal, int v);
+        FrameRate(const std::string &name, int ordinal, int v);
 
     public:
-        static FrameRate *valueOf(std::string a0);
+        static FrameRate *valueOf(const std::string &a0);
         static std::vector<FrameRate *> values();
     };
 } // namespace mpc::file::mid::event::meta

@@ -26,7 +26,7 @@ namespace mpc::engine
         void createControls();
         void deriveSampleRateIndependentVariables();
         void deriveSampleRateDependentVariables();
-        float deriveHold();
+        float deriveHold() const;
         void setSampleRate(int rate);
 
     private:
@@ -38,19 +38,19 @@ namespace mpc::engine
         static std::shared_ptr<mpc::engine::control::ControlLaw> DECAY_LAW();
 
     public:
-        float deriveTimeFactor(float milliseconds);
+        float deriveTimeFactor(float milliseconds) const;
         float deriveAttack();
         float deriveDecay();
-        mpc::engine::control::LawControl *createAttackControl(float init);
-        mpc::engine::control::LawControl *createHoldControl(float init);
-        mpc::engine::control::LawControl *createDecayControl(float init);
+        mpc::engine::control::LawControl *createAttackControl(float init) const;
+        mpc::engine::control::LawControl *createHoldControl(float init) const;
+        mpc::engine::control::LawControl *createDecayControl(float init) const;
 
     public:
-        float getAttackCoeff();
-        float getHold();
-        float getDecayCoeff();
+        float getAttackCoeff() const;
+        float getHold() const;
+        float getDecayCoeff() const;
 
     public:
-        EnvelopeControls(int id, std::string name, int idOffset);
+        EnvelopeControls(int id, const std::string &name, int idOffset);
     };
 } // namespace mpc::engine

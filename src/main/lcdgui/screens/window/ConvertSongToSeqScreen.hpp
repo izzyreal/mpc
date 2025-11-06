@@ -1,13 +1,13 @@
 #pragma once
 
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class ConvertSongToSeqScreen : public mpc::lcdgui::ScreenComponent
+    class ConvertSongToSeqScreen final : public ScreenComponent
     {
     public:
-        ConvertSongToSeqScreen(mpc::Mpc &, int layerIndex);
+        ConvertSongToSeqScreen(Mpc &, int layerIndex);
 
         void open() override;
         void function(int) override;
@@ -32,6 +32,6 @@ namespace mpc::lcdgui::screens::window
 
         void displayTrackStatus();
 
-        void convertSongToSeq();
+        void convertSongToSeq() const;
     };
 } // namespace mpc::lcdgui::screens::window

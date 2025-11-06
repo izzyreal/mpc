@@ -15,17 +15,17 @@ SequenceNumber::SequenceNumber(int tick, int delta, int number)
     mLength = mpc::file::mid::util::VariableLengthInt(2);
 }
 
-int SequenceNumber::getMostSignificantBits()
+int SequenceNumber::getMostSignificantBits() const
 {
     return mNumber >> 8;
 }
 
-int SequenceNumber::getLeastSignificantBits()
+int SequenceNumber::getLeastSignificantBits() const
 {
     return mNumber & 255;
 }
 
-int SequenceNumber::getSequenceNumber()
+int SequenceNumber::getSequenceNumber() const
 {
     return mNumber;
 }
@@ -61,7 +61,7 @@ int SequenceNumber::getEventSize()
     return 5;
 }
 
-int SequenceNumber::compareTo(mpc::file::mid::event::MidiEvent *other)
+int SequenceNumber::compareTo(mpc::file::mid::event::MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

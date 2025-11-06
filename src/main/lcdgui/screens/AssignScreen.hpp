@@ -1,13 +1,13 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class AssignScreen : public mpc::lcdgui::ScreenComponent
+    class AssignScreen final : public ScreenComponent
     {
 
     public:
-        AssignScreen(mpc::Mpc &mpc, int layerIndex);
+        AssignScreen(Mpc &mpc, int layerIndex);
 
     public:
         void turnWheel(int i) override;
@@ -16,11 +16,11 @@ namespace mpc::lcdgui::screens
         void update(Observable *o, Message message) override;
 
     private:
-        void displayAssignNote();
-        void displayParameter();
-        void displayHighRange();
-        void displayLowRange();
-        void displayAssignNv();
+        void displayAssignNote() const;
+        void displayParameter() const;
+        void displayHighRange() const;
+        void displayLowRange() const;
+        void displayAssignNv() const;
 
     private:
         std::vector<std::string> typeNames = {"TUNING", "DECAY", "ATTACK",

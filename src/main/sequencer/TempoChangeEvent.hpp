@@ -24,10 +24,10 @@ namespace mpc::sequencer
         void minusOneClock(TempoChangeEvent *previous);
         void setRatio(int i);
         int getRatio() const;
-        int getBar(int n, int d);
-        int getBeat(int n, int d);
-        int getClock(int denominator);
-        double getTempo();
+        int getBar(int n, int d) const;
+        int getBeat(int n, int d) const;
+        int getClock(int denominator) const;
+        double getTempo() const;
 
     public:
         // Smelly smelly smelly

@@ -95,7 +95,7 @@ bool Component::shouldNotDraw(std::vector<std::vector<bool>> *pixels)
 }
 
 std::shared_ptr<Parameter>
-Component::findParameter(const std::string &nameOfParameterToFind)
+Component::findParameter(const std::string &nameOfParameterToFind) const
 {
     for (auto &c : children)
     {
@@ -118,7 +118,7 @@ Component::findParameter(const std::string &nameOfParameterToFind)
 }
 
 std::shared_ptr<Label>
-Component::findLabel(const std::string &nameOfLabelToFind)
+Component::findLabel(const std::string &nameOfLabelToFind) const
 {
     for (auto &c : children)
     {
@@ -141,7 +141,7 @@ Component::findLabel(const std::string &nameOfLabelToFind)
 }
 
 std::shared_ptr<Field>
-Component::findField(const std::string &nameOfFieldToFind)
+Component::findField(const std::string &nameOfFieldToFind) const
 {
     for (auto &c : children)
     {
@@ -163,7 +163,7 @@ Component::findField(const std::string &nameOfFieldToFind)
     return {};
 }
 
-std::vector<std::shared_ptr<Label>> Component::findLabels()
+std::vector<std::shared_ptr<Label>> Component::findLabels() const
 {
     std::vector<std::shared_ptr<Label>> result;
 
@@ -184,7 +184,7 @@ std::vector<std::shared_ptr<Label>> Component::findLabels()
     return result;
 }
 
-std::vector<std::shared_ptr<Field>> Component::findFields()
+std::vector<std::shared_ptr<Field>> Component::findFields() const
 {
     std::vector<std::shared_ptr<Field>> result;
 
@@ -206,7 +206,7 @@ std::vector<std::shared_ptr<Field>> Component::findFields()
     return result;
 }
 
-std::vector<std::shared_ptr<Parameter>> Component::findParameters()
+std::vector<std::shared_ptr<Parameter>> Component::findParameters() const
 {
     std::vector<std::shared_ptr<Parameter>> result;
 
@@ -319,7 +319,7 @@ void Component::drawRecursive(std::vector<std::vector<bool>> *pixels)
     dirty = false;
 }
 
-const std::string &Component::getName()
+const std::string &Component::getName() const
 {
     return name;
 }
@@ -413,12 +413,12 @@ void Component::SetDirty(bool b)
     dirty = b;
 }
 
-bool Component::IsHidden()
+bool Component::IsHidden() const
 {
     return hidden;
 }
 
-bool Component::IsDirty()
+bool Component::IsDirty() const
 {
     auto dirtyChild = false;
 
@@ -442,7 +442,7 @@ bool Component::IsDirty()
     return dirty;
 }
 
-MRECT Component::getRect()
+MRECT Component::getRect() const
 {
     const auto x1 = std::max(0, x);
     const auto x2 = std::min(248, x + w);
@@ -499,7 +499,7 @@ void Component::preDrawClear(std::vector<std::vector<bool>> *pixels)
     preDrawClearRect.Clear();
 }
 
-std::vector<std::shared_ptr<Component>> Component::findHiddenChildren()
+std::vector<std::shared_ptr<Component>> Component::findHiddenChildren() const
 {
     std::vector<std::shared_ptr<Component>> result;
 
@@ -535,7 +535,7 @@ void Component::deleteChildren(const std::string &nameOfChildrenToDelete)
     }
 }
 
-Component *Component::getParent()
+Component *Component::getParent() const
 {
     return parent;
 }

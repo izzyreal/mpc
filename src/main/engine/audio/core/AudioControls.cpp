@@ -3,4 +3,7 @@
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-AudioControls::AudioControls(int id, string name) : CompoundControl(id, name) {}
+AudioControls::AudioControls(int id, const string &name)
+    : CompoundControl(id, name)
+{
+}

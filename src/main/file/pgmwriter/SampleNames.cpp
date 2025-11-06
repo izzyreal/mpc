@@ -8,7 +8,7 @@
 using namespace mpc::file::pgmwriter;
 
 SampleNames::SampleNames(mpc::sampler::Program *program,
-                         std::weak_ptr<mpc::sampler::Sampler> sampler)
+                         const std::weak_ptr<mpc::sampler::Sampler> &sampler)
 {
     std::vector<int> list;
 
@@ -63,7 +63,7 @@ std::vector<char> SampleNames::getSampleNamesArray()
     return sampleNamesArray;
 }
 
-void SampleNames::setSampleName(int sampleNumber, std::string name)
+void SampleNames::setSampleName(int sampleNumber, const std::string &name)
 {
     for (int i = 0; i < name.length(); i++)
     {
@@ -78,7 +78,7 @@ void SampleNames::setSampleName(int sampleNumber, std::string name)
     sampleNamesArray[16 + (sampleNumber * 17)] = 0;
 }
 
-int SampleNames::getNumberOfSamples()
+int SampleNames::getNumberOfSamples() const
 {
     return numberOfSamples;
 }

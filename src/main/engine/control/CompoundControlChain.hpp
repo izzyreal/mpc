@@ -12,6 +12,6 @@ namespace mpc::engine::control
         virtual void add(int index, std::shared_ptr<Control> control);
 
     public:
-        CompoundControlChain(int id, std::string name);
+        CompoundControlChain(int id, const std::string &name);
     };
 } // namespace mpc::engine::control

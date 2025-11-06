@@ -36,16 +36,17 @@ namespace mpc::engine::audio::mixer
         std::shared_ptr<MixerControls> getMixerControls();
 
     public:
-        mpc::engine::audio::core::AudioBuffer *getSharedBuffer();
+        mpc::engine::audio::core::AudioBuffer *getSharedBuffer() const;
 
-        mpc::engine::audio::core::AudioBuffer *createBuffer(std::string name);
+        mpc::engine::audio::core::AudioBuffer *
+        createBuffer(const std::string &name) const;
 
-        void removeBuffer(mpc::engine::audio::core::AudioBuffer *buffer);
+        void removeBuffer(mpc::engine::audio::core::AudioBuffer *buffer) const;
 
     public:
-        std::shared_ptr<AudioMixerStrip> getStrip(std::string name);
+        std::shared_ptr<AudioMixerStrip> getStrip(const std::string &name);
 
-        std::shared_ptr<AudioMixerStrip> getStripImpl(std::string name);
+        std::shared_ptr<AudioMixerStrip> getStripImpl(const std::string &name);
 
         void work(int nFrames) override;
 
@@ -57,22 +58,22 @@ namespace mpc::engine::audio::mixer
         static void silenceStrips(
             std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence);
 
-        void writeBusBuffers(int nFrames);
+        void writeBusBuffers(int nFrames) const;
 
-        void createBusses(std::shared_ptr<MixerControls> mixerControls);
+        void createBusses(const std::shared_ptr<MixerControls> &mixerControls);
 
         std::shared_ptr<AudioMixerBus>
         createBus(std::shared_ptr<BusControls> busControls);
 
     public:
-        std::shared_ptr<AudioMixerBus> getBus(std::string name);
+        std::shared_ptr<AudioMixerBus> getBus(const std::string &name);
 
         std::shared_ptr<AudioMixerBus> getMainBus();
 
         std::shared_ptr<AudioMixerStrip> getMainStrip();
 
     public:
-        void createStrips(std::shared_ptr<MixerControls> mixerControls);
+        void createStrips(const std::shared_ptr<MixerControls> &mixerControls);
 
         std::shared_ptr<AudioMixerStrip> createStrip(
             std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>

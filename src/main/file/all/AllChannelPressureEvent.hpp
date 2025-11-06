@@ -20,6 +20,6 @@ namespace mpc::file::all
         static std::shared_ptr<mpc::sequencer::ChannelPressureEvent>
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char> mpcEventToBytes(
-            std::shared_ptr<mpc::sequencer::ChannelPressureEvent>);
+            const std::shared_ptr<mpc::sequencer::ChannelPressureEvent> &);
     };
 } // namespace mpc::file::all

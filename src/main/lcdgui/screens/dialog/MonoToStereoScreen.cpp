@@ -206,7 +206,7 @@ void MonoToStereoScreen::displayRSource()
     }
 }
 
-void MonoToStereoScreen::displayNewStName()
+void MonoToStereoScreen::displayNewStName() const
 {
     findField("newstname")->setText(newStName);
 }

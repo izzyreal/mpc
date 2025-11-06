@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "input/KeyCodeHelper.hpp"
 
 namespace mpc
@@ -10,11 +10,11 @@ namespace mpc
 namespace mpc::lcdgui::screens
 {
 
-    class VmpcKeyboardScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcKeyboardScreen final : public ScreenComponent
     {
 
     public:
-        VmpcKeyboardScreen(mpc::Mpc &, int layerIndex);
+        VmpcKeyboardScreen(Mpc &, int layerIndex);
 
         void open() override;
         void up() override;
@@ -30,8 +30,8 @@ namespace mpc::lcdgui::screens
     private:
         int row = 0;
         int rowOffset = 0;
-        mpc::input::VmpcKeyCode learnCandidate =
-            mpc::input::VmpcKeyCode::VMPC_KEY_UNKNOWN;
+        input::VmpcKeyCode learnCandidate =
+            input::VmpcKeyCode::VMPC_KEY_UNKNOWN;
 
         bool learning = false;
         void setLearning(bool b);

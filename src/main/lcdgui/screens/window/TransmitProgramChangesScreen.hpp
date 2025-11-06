@@ -1,28 +1,28 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class TransmitProgramChangesScreen : public mpc::lcdgui::ScreenComponent
+    class TransmitProgramChangesScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
     public:
-        TransmitProgramChangesScreen(mpc::Mpc &mpc, int layerIndex);
+        TransmitProgramChangesScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
 
     private:
-        void displayTransmitProgramChangesInThisTrack();
+        void displayTransmitProgramChangesInThisTrack() const;
 
     private:
         bool transmitProgramChangesInThisTrack = false;
 
     public:
-        bool isTransmitProgramChangesInThisTrackEnabled();
+        bool isTransmitProgramChangesInThisTrackEnabled() const;
     };
 } // namespace mpc::lcdgui::screens::window

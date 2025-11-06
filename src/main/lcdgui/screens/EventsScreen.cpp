@@ -24,7 +24,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-EventsScreen::EventsScreen(mpc::Mpc &mpc, const int layerIndex)
+EventsScreen::EventsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "events", layerIndex)
 {
 }
@@ -296,7 +296,7 @@ void EventsScreen::turnWheel(int i)
     }
 }
 
-void EventsScreen::displayStart()
+void EventsScreen::displayStart() const
 {
     const auto seq = sequencer->getSequence(toSq);
     findField("start0")->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1,
@@ -322,7 +322,7 @@ void EventsScreen::displayTime()
     findField("time5")->setTextPadded(SeqUtil::getClock(seq.get(), time1), "0");
 }
 
-void EventsScreen::displayCopies()
+void EventsScreen::displayCopies() const
 {
     if (editFunctionNumber == 0)
     {
@@ -338,7 +338,7 @@ void EventsScreen::displayCopies()
     }
 }
 
-void EventsScreen::displayMode()
+void EventsScreen::displayMode() const
 {
     if (editFunctionNumber == 0)
     {
@@ -370,7 +370,7 @@ void EventsScreen::displayMode()
     }
 }
 
-void EventsScreen::displayEdit()
+void EventsScreen::displayEdit() const
 {
     findField("edit")->setText(functionNames[editFunctionNumber]);
 
@@ -492,7 +492,7 @@ void EventsScreen::displayNotes()
     }
 }
 
-void EventsScreen::displayMidiNotes()
+void EventsScreen::displayMidiNotes() const
 {
     findField("note0")->setText(
         StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
@@ -528,14 +528,14 @@ void EventsScreen::setEdit(int i)
     displayEdit();
 }
 
-void EventsScreen::setFromSq(int i)
+void EventsScreen::setFromSq(int i) const
 {
     sequencer->setActiveSequenceIndex(std::clamp(
         i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)));
     displayFromSq();
 }
 
-void EventsScreen::setFromTr(int i)
+void EventsScreen::setFromTr(int i) const
 {
     sequencer->setActiveTrackIndex(
         std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX)));
@@ -622,23 +622,23 @@ void EventsScreen::setStart(int i)
     displayStart();
 }
 
-void EventsScreen::displayFromSq()
+void EventsScreen::displayFromSq() const
 {
     findField("from-sq")->setTextPadded(sequencer->getActiveSequenceIndex() +
                                         1);
 }
 
-void EventsScreen::displayFromTr()
+void EventsScreen::displayFromTr() const
 {
     findField("from-tr")->setTextPadded(sequencer->getActiveTrackIndex() + 1);
 }
 
-void EventsScreen::displayToSq()
+void EventsScreen::displayToSq() const
 {
     findField("to-sq")->setTextPadded(toSq + 1);
 }
 
-void EventsScreen::displayToTr()
+void EventsScreen::displayToTr() const
 {
     findField("to-tr")->setTextPadded(toTr + 1);
 }
@@ -646,7 +646,8 @@ void EventsScreen::displayToTr()
 void EventsScreen::performCopy(int sourceStart, int sourceEnd,
                                int toSequenceIndex, int destStart,
                                int toTrackIndex, bool copyModeMerge,
-                               int copyCount, int copyNote0, int copyNote1)
+                               int copyCount, int copyNote0,
+                               int copyNote1) const
 {
     const auto segLength = sourceEnd - sourceStart;
     const auto sourceTrack = sequencer->getActiveTrack();

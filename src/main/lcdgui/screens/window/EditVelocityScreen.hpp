@@ -1,17 +1,17 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
-#include <lcdgui/screens/WithTimesAndNotes.hpp>
+#include "lcdgui/screens/WithTimesAndNotes.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class EditVelocityScreen : public mpc::lcdgui::ScreenComponent,
-                               public mpc::lcdgui::screens::WithTimesAndNotes
+    class EditVelocityScreen final : public ScreenComponent,
+                                     public WithTimesAndNotes
     {
 
     public:
-        EditVelocityScreen(mpc::Mpc &mpc, int layerIndex);
+        EditVelocityScreen(Mpc &mpc, int layerIndex);
 
         void setNote0(int i) override;
 
@@ -28,8 +28,8 @@ namespace mpc::lcdgui::screens::window
     private:
         void setEditType(int i);
         void setValue(int i);
-        void displayValue();
-        void displayEditType();
+        void displayValue() const;
+        void displayEditType() const;
 
     protected:
         void displayNotes() override;

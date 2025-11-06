@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens::dialog
 {
     class CreateNewProgramScreen final : public ScreenComponent,
-                                   public OpensNameScreen
+                                         public OpensNameScreen
     {
     public:
         void function(int i) override;
@@ -27,8 +27,8 @@ namespace mpc::lcdgui::screens::dialog
 
         void setMidiProgramChange(int i);
 
-        void displayNewName();
-        void displayMidiProgramChange();
+        void displayNewName() const;
+        void displayMidiProgramChange() const;
 
         friend class NameScreen;
     };

@@ -22,7 +22,7 @@ std::vector<char> PgmHeader::getHeaderArray()
     return headerArray;
 }
 
-bool PgmHeader::verifyMagic()
+bool PgmHeader::verifyMagic() const
 {
     return headerArray[0] == PGM_HEADER_MAGIC[0] &&
            headerArray[1] == PGM_HEADER_MAGIC[1];

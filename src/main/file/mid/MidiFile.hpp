@@ -30,14 +30,14 @@ namespace mpc::file::mid
 
     public:
         void setType(int type);
-        int getType();
+        int getType() const;
 
-        int getLengthInTicks();
-        std::vector<std::weak_ptr<MidiTrack>> getTracks();
-        void addTrack(std::shared_ptr<MidiTrack> T);
+        int getLengthInTicks() const;
+        std::vector<std::weak_ptr<MidiTrack>> getTracks() const;
+        void addTrack(const std::shared_ptr<MidiTrack> &T);
         void addTrack(std::shared_ptr<MidiTrack> T, int pos);
 
-        void writeToOutputStream(std::shared_ptr<std::ostream>);
+        void writeToOutputStream(const std::shared_ptr<std::ostream> &) const;
 
     private:
         void initFromBuffer(std::vector<char> &buffer);

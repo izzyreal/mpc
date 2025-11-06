@@ -19,7 +19,7 @@ AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char> AllChannelPressureEvent::mpcEventToBytes(
-    std::shared_ptr<ChannelPressureEvent> event)
+    const std::shared_ptr<ChannelPressureEvent> &event)
 {
     std::vector<char> bytes(8);
 

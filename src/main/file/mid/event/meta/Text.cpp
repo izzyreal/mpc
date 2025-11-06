@@ -4,7 +4,7 @@
 
 using namespace mpc::file::mid::event::meta;
 
-Text::Text(int tick, int delta, std::string text)
+Text::Text(int tick, int delta, const std::string &text)
     : TextualMetaEvent(tick, delta, MetaEvent::TEXT_EVENT, text)
 {
 }

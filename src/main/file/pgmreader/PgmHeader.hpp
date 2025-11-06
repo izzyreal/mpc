@@ -17,7 +17,7 @@ namespace mpc::file::pgmreader
     public:
         std::vector<char> getHeaderArray();
 
-        bool verifyMagic();
+        bool verifyMagic() const;
 
     public:
         const uint16_t getSoundCount();

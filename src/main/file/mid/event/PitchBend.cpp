@@ -14,17 +14,17 @@ PitchBend::PitchBend(int tick, int delta, int channel, int lsb, int msb)
 {
 }
 
-int PitchBend::getLeastSignificantBits()
+int PitchBend::getLeastSignificantBits() const
 {
     return mValue1;
 }
 
-int PitchBend::getMostSignificantBits()
+int PitchBend::getMostSignificantBits() const
 {
     return mValue2;
 }
 
-int PitchBend::getBendAmount()
+int PitchBend::getBendAmount() const
 {
     auto y = (mValue2 & 127) << 7;
     auto x = (mValue1);

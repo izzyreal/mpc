@@ -11,7 +11,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-NextSeqPadScreen::NextSeqPadScreen(mpc::Mpc &mpc, const int layerIndex)
+NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "next-seq-pad", layerIndex)
 {
     addReactiveBinding({[&]
@@ -113,7 +113,7 @@ void NextSeqPadScreen::function(int i)
     }
 }
 
-void NextSeqPadScreen::displayNextSq()
+void NextSeqPadScreen::displayNextSq() const
 {
     const auto nextSq = sequencer->getNextSq();
 
@@ -128,18 +128,18 @@ void NextSeqPadScreen::displayNextSq()
     findLabel("nextsq")->setText(number + "-" + name);
 }
 
-int NextSeqPadScreen::bankOffset()
+int NextSeqPadScreen::bankOffset() const
 {
     return static_cast<int>(mpc.clientEventController->getActiveBank()) * 16;
 }
 
-void NextSeqPadScreen::displayBank()
+void NextSeqPadScreen::displayBank() const
 {
     findLabel("bank")->setText(
         letters[static_cast<int>(mpc.clientEventController->getActiveBank())]);
 }
 
-void NextSeqPadScreen::displaySeqNumbers()
+void NextSeqPadScreen::displaySeqNumbers() const
 {
     const std::vector<std::string> seqn{"01-16", "17-32", "33-48", "49-64"};
     findLabel("seqnumbers")
@@ -147,7 +147,7 @@ void NextSeqPadScreen::displaySeqNumbers()
             seqn[static_cast<int>(mpc.clientEventController->getActiveBank())]);
 }
 
-void NextSeqPadScreen::displaySq()
+void NextSeqPadScreen::displaySq() const
 {
     findField("sq")->setText(
         StrUtil::padLeft(
@@ -155,35 +155,35 @@ void NextSeqPadScreen::displaySq()
         "-" + sequencer->getActiveSequence()->getName());
 }
 
-void NextSeqPadScreen::displaySeq(int i)
+void NextSeqPadScreen::displaySeq(int i) const
 {
     findField(std::to_string(i + 1))
         ->setText(
             sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
 }
 
-void NextSeqPadScreen::setSeqColor(int i)
+void NextSeqPadScreen::setSeqColor(int i) const
 {
     findField(std::to_string(i + 1))
         ->setInverted(i + bankOffset() == sequencer->getNextSq());
 }
 
-void NextSeqPadScreen::displayNow0()
+void NextSeqPadScreen::displayNow0() const
 {
     findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
-void NextSeqPadScreen::displayNow1()
+void NextSeqPadScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
-void NextSeqPadScreen::displayNow2()
+void NextSeqPadScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
-void NextSeqPadScreen::refreshSeqs()
+void NextSeqPadScreen::refreshSeqs() const
 {
     for (int i = 0; i < 16; i++)
     {

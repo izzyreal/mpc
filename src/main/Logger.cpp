@@ -14,12 +14,12 @@ Logger::Logger()
 }
 Logger Logger::l;
 
-void Logger::setPath(std::string s)
+void Logger::setPath(const std::string &s)
 {
     path = s;
 }
 
-void Logger::log(std::string s)
+void Logger::log(std::string s) const
 {
     if (path.empty())
     {

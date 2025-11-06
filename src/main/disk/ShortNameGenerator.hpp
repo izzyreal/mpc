@@ -21,12 +21,12 @@ namespace mpc::disk
         static bool isSkipChar(char c);
 
     private:
-        bool cleanString(std::string s);
-        std::string stripLeadingPeriods(std::string str);
+        bool cleanString(const std::string &s) const;
+        std::string stripLeadingPeriods(const std::string &str) const;
 
     public:
         ShortName generateShortName(const std::string &longFullName);
-        static std::string tidyString(std::string dirty);
+        static std::string tidyString(const std::string &dirty);
 
         ShortNameGenerator(const std::vector<std::string> &usedNames);
     };

@@ -6,7 +6,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-SelectDrumScreen::SelectDrumScreen(mpc::Mpc &mpc, const int layerIndex)
+SelectDrumScreen::SelectDrumScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "select-drum", layerIndex)
 {
 }

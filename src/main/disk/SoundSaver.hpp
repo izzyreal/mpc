@@ -26,12 +26,13 @@ namespace mpc::disk
         bool wav = false;
         std::thread saveSoundsThread;
         static void static_saveSounds(void *this_p);
-        void saveSounds();
+        void saveSounds() const;
 
     public:
-        SoundSaver(mpc::Mpc &mpc,
-                   std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds,
-                   bool wav);
+        SoundSaver(
+            mpc::Mpc &mpc,
+            const std::vector<std::shared_ptr<mpc::sampler::Sound>> &sounds,
+            bool wav);
         ~SoundSaver();
     };
 } // namespace mpc::disk

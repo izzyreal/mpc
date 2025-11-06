@@ -14,10 +14,10 @@ using namespace mpc::lcdgui;
 using namespace mpc::controller;
 
 PushFullLevelCommand::PushFullLevelCommand(
-    std::shared_ptr<LayeredScreen> layeredScreenToUse,
-    std::shared_ptr<PadAndButtonKeyboard> padAndButtonKeyboardToUse,
-    std::shared_ptr<Hardware> hardwareToUse,
-    std::shared_ptr<ClientEventController> controllerToUse)
+    const std::shared_ptr<LayeredScreen> &layeredScreenToUse,
+    const std::shared_ptr<PadAndButtonKeyboard> &padAndButtonKeyboardToUse,
+    const std::shared_ptr<Hardware> &hardwareToUse,
+    const std::shared_ptr<ClientEventController> &controllerToUse)
     : layeredScreen(layeredScreenToUse),
       padAndButtonKeyboard(padAndButtonKeyboardToUse), hardware(hardwareToUse),
       controller(controllerToUse)

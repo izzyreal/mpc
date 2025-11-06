@@ -95,7 +95,7 @@ int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat *format)
 }
 
 int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat *format,
-                                              int lenInSamples)
+                                              int lenInSamples) const
 {
     return format->getFrameSize() * lenInSamples;
 }
@@ -294,17 +294,17 @@ void FloatSampleBuffer::copy(int channel, int sourceIndex, int destIndex,
     }
 }
 
-int FloatSampleBuffer::getChannelCount()
+int FloatSampleBuffer::getChannelCount() const
 {
     return channelCount;
 }
 
-int FloatSampleBuffer::getSampleCount()
+int FloatSampleBuffer::getSampleCount() const
 {
     return sampleCount;
 }
 
-float FloatSampleBuffer::getSampleRate()
+float FloatSampleBuffer::getSampleRate() const
 {
     return sampleRate;
 }
@@ -335,7 +335,7 @@ std::vector<float> &FloatSampleBuffer::getChannel(int channel)
     return channels[channel];
 }
 
-float FloatSampleBuffer::getConvertDitherBits(int newFormatType)
+float FloatSampleBuffer::getConvertDitherBits(int newFormatType) const
 {
     auto doDither = false;
 

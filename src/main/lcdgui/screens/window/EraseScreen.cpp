@@ -7,7 +7,7 @@
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
@@ -15,7 +15,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-EraseScreen::EraseScreen(mpc::Mpc &mpc, const int layerIndex)
+EraseScreen::EraseScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "erase", layerIndex)
 {
 }
@@ -51,7 +51,7 @@ void EraseScreen::open()
     displayType();
 }
 
-void EraseScreen::turnWheel(int i)
+void EraseScreen::turnWheel(const int i)
 {
 
     if (checkAllTimesAndNotes(mpc, i))
@@ -75,7 +75,7 @@ void EraseScreen::turnWheel(int i)
     }
 }
 
-void EraseScreen::function(int i)
+void EraseScreen::function(const int i)
 {
 
     switch (i)
@@ -90,7 +90,7 @@ void EraseScreen::function(int i)
     }
 }
 
-void EraseScreen::displayTrack()
+void EraseScreen::displayTrack() const
 {
     std::string trackName;
 
@@ -123,12 +123,12 @@ void EraseScreen::displayTime()
     findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 
-void EraseScreen::displayErase()
+void EraseScreen::displayErase() const
 {
     findField("erase")->setText(eraseNames[erase]);
 }
 
-void EraseScreen::displayType()
+void EraseScreen::displayType() const
 {
     findField("type")->Hide(erase == 0);
 
@@ -162,11 +162,11 @@ void EraseScreen::displayNotes()
         findField("note0")->setSize(47, 9);
         findField("note0")->setText(
             (StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-             mpc::Util::noteNames()[note0]) +
+             Util::noteNames()[note0]) +
             ")");
         findField("note1")->setText(
             (StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-             mpc::Util::noteNames()[note1]) +
+             Util::noteNames()[note1]) +
             ")");
     }
     else
@@ -187,13 +187,13 @@ void EraseScreen::displayNotes()
     }
 }
 
-void EraseScreen::setTrack(int i)
+void EraseScreen::setTrack(const int i)
 {
     track = std::clamp(i, -1, 63);
     displayTrack();
 }
 
-void EraseScreen::setErase(int i)
+void EraseScreen::setErase(const int i)
 {
     erase = std::clamp(i, 0, 2);
     displayErase();
@@ -201,14 +201,14 @@ void EraseScreen::setErase(int i)
     displayNotes();
 }
 
-void EraseScreen::setType(int i)
+void EraseScreen::setType(const int i)
 {
     type = std::clamp(i, 0, 6);
     displayType();
     displayNotes();
 }
 
-void EraseScreen::doErase()
+void EraseScreen::doErase() const
 {
     const auto firstTrackIndex = track < 0 ? 0 : track;
     const auto lastTrackIndex = track < 0 ? 63 : track;

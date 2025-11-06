@@ -61,7 +61,7 @@ namespace mpc::disk
         std::shared_ptr<akaifat::ImageBlockDevice> volumeDevice;
         akaifat::fat::AkaiFatFileSystem *volumeFs;
 
-        std::string typeShortName()
+        std::string typeShortName() const
         {
             switch (type)
             {
@@ -91,12 +91,12 @@ namespace mpc::disk
             }
         }
 
-        std::string modeShortName()
+        std::string modeShortName() const
         {
             return modeShortName(mode);
         }
 
-        std::shared_ptr<mpc::disk::MpcFile> getRoot()
+        std::shared_ptr<mpc::disk::MpcFile> getRoot() const
         {
             if (type == LOCAL_DIRECTORY)
             {

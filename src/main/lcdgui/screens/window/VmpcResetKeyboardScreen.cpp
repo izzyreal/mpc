@@ -4,13 +4,12 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VmpcResetKeyboardScreen::VmpcResetKeyboardScreen(mpc::Mpc &mpc,
-                                                 const int layerIndex)
+VmpcResetKeyboardScreen::VmpcResetKeyboardScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-reset-keyboard", layerIndex)
 {
 }
 
-void VmpcResetKeyboardScreen::function(int i)
+void VmpcResetKeyboardScreen::function(const int i)
 {
     ScreenComponent::function(i);
 

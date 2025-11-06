@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <thread>
 #include <memory>
@@ -16,10 +16,8 @@ namespace mpc::lcdgui::screens::dialog
     {
 
         std::thread blinkThread;
-        void runBlinkThread(const std::weak_ptr<Label> &label);
-        static void
-        static_blink(void *args,
-                     const std::weak_ptr<Label> &label);
+        void runBlinkThread(const std::weak_ptr<Label> &label) const;
+        static void static_blink(void *args, const std::weak_ptr<Label> &label);
 
     public:
         void initTimer(std::weak_ptr<Label> label);

@@ -7,8 +7,8 @@ namespace mpc::file::mid::event
     {
 
     public:
-        int getControllerType();
-        int getValue();
+        int getControllerType() const;
+        int getValue() const;
         void setControllerType(int t);
         void setValue(int v);
 

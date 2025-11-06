@@ -1,13 +1,13 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class AssignmentViewScreen : public mpc::lcdgui::ScreenComponent
+    class AssignmentViewScreen final : public ScreenComponent
     {
 
     public:
-        AssignmentViewScreen(mpc::Mpc &mpc, int layerIndex);
+        AssignmentViewScreen(Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *o, Message message) override;
@@ -25,12 +25,12 @@ namespace mpc::lcdgui::screens::window
             "a3", "b3", "c3", "d3", "a2", "b2", "c2", "d2",
             "a1", "b1", "c1", "d1", "a0", "b0", "c0", "d0"};
         void displayAssignmentView();
-        void displayPad(int i);
-        void displayBankInfoAndNoteLabel();
+        void displayPad(int i) const;
+        void displayBankInfoAndNoteLabel() const;
         void displayNote();
         void displaySoundName();
 
         int getPadIndexFromFocus();
-        std::string getFocusFromPadIndex();
+        std::string getFocusFromPadIndex() const;
     };
 } // namespace mpc::lcdgui::screens::window

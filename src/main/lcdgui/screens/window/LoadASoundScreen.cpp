@@ -18,7 +18,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens;
 
-LoadASoundScreen::LoadASoundScreen(mpc::Mpc &mpc, const int layerIndex)
+LoadASoundScreen::LoadASoundScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "load-a-sound", layerIndex)
 {
 }
@@ -40,7 +40,7 @@ void LoadASoundScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void LoadASoundScreen::turnWheel(int i)
+void LoadASoundScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -62,7 +62,7 @@ void LoadASoundScreen::turnWheel(int i)
     }
 }
 
-void LoadASoundScreen::function(int i)
+void LoadASoundScreen::function(const int i)
 {
     switch (i)
     {
@@ -94,7 +94,7 @@ void LoadASoundScreen::function(int i)
     }
 }
 
-void LoadASoundScreen::keepSound()
+void LoadASoundScreen::keepSound() const
 {
     auto previewSound = sampler->getPreviewSound();
     const auto candidateSoundName = previewSound->getName();
@@ -147,7 +147,7 @@ void LoadASoundScreen::keepSound()
             const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
 
             auto enterAction = [this, actionAfterLoadingSound,
-                                previewSound](std::string &nameScreenName)
+                                previewSound](const std::string &nameScreenName)
             {
                 if (sampler->checkExists(nameScreenName) >= 0)
                 {
@@ -196,7 +196,7 @@ void LoadASoundScreen::displayAssignToNote()
     findField("assign-to-note")->setText(noteName + "/" + padName);
 }
 
-void LoadASoundScreen::update(Observable *observable, Message message)
+void LoadASoundScreen::update(Observable *observable, const Message message)
 {
     const auto msg = std::get<std::string>(message);
     if (msg == "note")

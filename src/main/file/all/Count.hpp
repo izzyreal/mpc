@@ -43,19 +43,19 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
 
     public:
-        bool isEnabled();
-        int getCountInMode();
-        int getClickVolume();
-        int getRate();
-        bool isEnabledInPlay();
-        bool isEnabledInRec();
-        int getClickOutput();
-        bool isWaitForKeyEnabled();
-        int getSound();
-        int getAccentPad();
-        int getNormalPad();
-        int getAccentVelo();
-        int getNormalVelo();
+        bool isEnabled() const;
+        int getCountInMode() const;
+        int getClickVolume() const;
+        int getRate() const;
+        bool isEnabledInPlay() const;
+        bool isEnabledInRec() const;
+        int getClickOutput() const;
+        bool isWaitForKeyEnabled() const;
+        int getSound() const;
+        int getAccentPad() const;
+        int getNormalPad() const;
+        int getAccentVelo() const;
+        int getNormalVelo() const;
 
     public:
         std::vector<char> &getBytes();

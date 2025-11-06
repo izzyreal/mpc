@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
@@ -8,10 +8,10 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class SetupScreen : public mpc::lcdgui::ScreenComponent
+    class SetupScreen final : public ScreenComponent
     {
     public:
-        SetupScreen(mpc::Mpc &mpc, int layerIndex);
+        SetupScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -22,8 +22,8 @@ namespace mpc::lcdgui::screens
         void setDiskDevice(int i);
         void setAutoLoadType(int i);
 
-        void displayDiskDevice();
-        void displayAutoLoadType();
+        void displayDiskDevice() const;
+        void displayAutoLoadType() const;
 
         void resetPreferences();
 

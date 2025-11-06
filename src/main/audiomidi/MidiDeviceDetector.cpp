@@ -73,29 +73,29 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                         {
                             path = mpc.paths->midiControlPresetsPath() /
                                    "MPD16.vmp";
-                            knownControllerDetectedScreen->controllerName =
-                                "MPD16";
+                            knownControllerDetectedScreen->setControllerName(
+                                "MPD16");
                         }
                         else if (name.find("MPD218") != std::string::npos)
                         {
                             path = mpc.paths->midiControlPresetsPath() /
                                    "MPD218.vmp";
-                            knownControllerDetectedScreen->controllerName =
-                                "MPD218";
+                            knownControllerDetectedScreen->setControllerName(
+                                "MPD218");
                         }
                         else if (name.find("iRig PADS") != std::string::npos)
                         {
                             path = mpc.paths->midiControlPresetsPath() /
                                    "iRig_PADS.vmp";
-                            knownControllerDetectedScreen->controllerName =
-                                "iRig_PADS";
+                            knownControllerDetectedScreen->setControllerName(
+                                "iRig_PADS");
                         }
                         else if (name.find("MPC Studio") != std::string::npos)
                         {
                             path = mpc.paths->midiControlPresetsPath() /
                                    "MPC_Studio.vmp";
-                            knownControllerDetectedScreen->controllerName =
-                                "MPC_Studio";
+                            knownControllerDetectedScreen->setControllerName(
+                                "MPC_Studio");
                         }
 
                         if (!path.empty() && fs::exists(path))

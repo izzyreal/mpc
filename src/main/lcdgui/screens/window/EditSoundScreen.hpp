@@ -1,12 +1,11 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/screens/OpensNameScreen.hpp>
+#include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class EditSoundScreen : public ScreenComponent,
-                            public OpensNameScreen
+    class EditSoundScreen final : public ScreenComponent, public OpensNameScreen
     {
 
     public:
@@ -65,10 +64,8 @@ namespace mpc::lcdgui::screens::window
         void setEndMargin(int i);
 
         void handleDiscardEdit() const;
-        void
-        handleLoopFromStartToEnd() const;
-        void
-        handleSectionToNewSound() const;
+        void handleLoopFromStartToEnd() const;
+        void handleSectionToNewSound() const;
         void handleInsertSoundSectionStart() const;
         void handleDeleteSection() const;
         void handleSilenceSection() const;

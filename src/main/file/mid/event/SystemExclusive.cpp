@@ -6,13 +6,13 @@
 using namespace mpc::file::mid::event;
 
 SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick,
-                                           std::vector<char> data)
+                                           const std::vector<char> &data)
     : SystemExclusiveEvent(type, tick, 0, data)
 {
 }
 
 SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta,
-                                           std::vector<char> data)
+                                           const std::vector<char> &data)
     : MidiEvent(tick, delta)
 {
     mType = type & 255;

@@ -11,7 +11,7 @@ using namespace mpc::engine::control;
 using namespace std;
 
 void MixerControlsFactory::createBusStrips(
-    shared_ptr<MixerControls> mixerControls, string mainStripName)
+    const shared_ptr<MixerControls> &mixerControls, const string &mainStripName)
 {
     auto lMixerControls = mixerControls;
     lMixerControls->createStripControls(MixerControlsIds::MAIN_STRIP,
@@ -27,7 +27,7 @@ void MixerControlsFactory::createBusStrips(
 }
 
 void MixerControlsFactory::createChannelStrips(
-    shared_ptr<MixerControls> mixerControls, int nchannels)
+    const shared_ptr<MixerControls> &mixerControls, int nchannels)
 {
 
     auto mbc = mixerControls->getMainBusControls();
@@ -39,8 +39,8 @@ void MixerControlsFactory::createChannelStrips(
 }
 
 void MixerControlsFactory::addMixControls(
-    MixerControls *mixerControls, shared_ptr<AudioControlsChain> controls,
-    bool hasMixControls)
+    MixerControls *mixerControls,
+    const shared_ptr<AudioControlsChain> &controls, bool hasMixControls)
 {
     auto lControls = controls;
     int stripId = lControls->getId();

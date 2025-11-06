@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-DrumScreen::DrumScreen(mpc::Mpc &mpc, const int layerIndex)
+DrumScreen::DrumScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "drum", layerIndex)
 {
 }
@@ -85,44 +85,44 @@ void DrumScreen::turnWheel(int i)
     }
 }
 
-void DrumScreen::displayCurrentVal()
+void DrumScreen::displayCurrentVal() const
 {
     findField("current-val")
         ->setTextPadded(getActiveDrumBus()->getLastReceivedMidiVolume());
 }
 
-void DrumScreen::displayDrum()
+void DrumScreen::displayDrum() const
 {
     findField("drum")->setText(std::to_string(drum + 1));
 }
 
-void DrumScreen::displayPadToInternalSound()
+void DrumScreen::displayPadToInternalSound() const
 {
     findField("padtointernalsound")->setText(padToInternalSound ? "ON" : "OFF");
 }
 
-void DrumScreen::displayPgm()
+void DrumScreen::displayPgm() const
 {
     const auto pn = getActiveDrumBus()->getProgram();
     findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) +
                               "-" + sampler->getProgram(pn)->getName());
 }
 
-void DrumScreen::displayPgmChange()
+void DrumScreen::displayPgmChange() const
 {
     findField("program-change")
         ->setText(getActiveDrumBus()->receivesPgmChange() ? "RECEIVE"
                                                           : "IGNORE");
 }
 
-void DrumScreen::displayMidiVolume()
+void DrumScreen::displayMidiVolume() const
 {
     findField("midi-volume")
         ->setText(getActiveDrumBus()->receivesMidiVolume() ? "RECEIVE"
                                                            : "IGNORE");
 }
 
-bool DrumScreen::isPadToIntSound()
+bool DrumScreen::isPadToIntSound() const
 {
     return padToInternalSound;
 }
@@ -149,7 +149,7 @@ void DrumScreen::setDrum(unsigned char i)
     displayCurrentVal();
 }
 
-unsigned char DrumScreen::getDrum()
+unsigned char DrumScreen::getDrum() const
 {
     return drum;
 }

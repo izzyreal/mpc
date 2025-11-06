@@ -67,24 +67,24 @@ namespace mpc::disk
 
     public:
         virtual std::shared_ptr<MpcFile> newFile(const std::string &name) = 0;
-        bool deleteSelectedFile();
+        bool deleteSelectedFile() const;
 
         std::vector<std::string> getFileNames();
-        std::string getFileName(int i);
-        std::vector<std::string> getParentFileNames();
+        std::string getFileName(int i) const;
+        std::vector<std::string> getParentFileNames() const;
 
         std::shared_ptr<MpcFile> getFile(int i);
         std::shared_ptr<MpcFile> getFile(const std::string &fileName);
         std::vector<std::shared_ptr<MpcFile>> &getAllFiles();
         std::shared_ptr<MpcFile> getParentFile(int i);
 
-        void writeSnd(std::shared_ptr<mpc::sampler::Sound>,
-                      std::string fileName);
-        void writeWav(std::shared_ptr<mpc::sampler::Sound>,
-                      std::string fileName);
-        void writeMid(std::shared_ptr<mpc::sequencer::Sequence>,
-                      std::string fileName);
-        void writePgm(std::shared_ptr<mpc::sampler::Program>,
+        void writeSnd(const std::shared_ptr<mpc::sampler::Sound> &,
+                      const std::string &fileName);
+        void writeWav(const std::shared_ptr<mpc::sampler::Sound> &,
+                      const std::string &fileName);
+        void writeMid(const std::shared_ptr<mpc::sequencer::Sequence> &,
+                      const std::string &fileName);
+        void writePgm(const std::shared_ptr<mpc::sampler::Program> &,
                       const std::string &fileName);
         void writeAps(const std::string &fileName);
         void writeAll(const std::string &fileName);
@@ -95,7 +95,7 @@ namespace mpc::disk
             const fs::path &p,
             const std::shared_ptr<mpc::nvram::MidiControlPreset> &);
 
-        bool checkExists(std::string fileName);
+        bool checkExists(const std::string &fileName);
         virtual bool deleteRecursive(std::weak_ptr<MpcFile>);
 
         bool isRoot();

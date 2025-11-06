@@ -48,12 +48,12 @@ namespace mpc::engine::filter
         virtual mpc::engine::control::LawControl *createResonanceControl();
 
     public:
-        float getCutoff();
+        float getCutoff() const;
 
-        float getResonance();
+        float getResonance() const;
 
     public:
-        FilterControls(int id, std::string name, int idOffset);
+        FilterControls(int id, const std::string &name, int idOffset);
 
     private:
         static std::shared_ptr<mpc::engine::control::ControlLaw> SEMITONE_LAW();

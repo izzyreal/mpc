@@ -18,9 +18,9 @@ namespace mpc::file::mid::event::meta
 
     public:
         void setKey(int key);
-        int getKey();
+        int getKey() const;
         void setScale(int scale);
-        int getScale();
+        int getScale() const;
 
     public:
         int getEventSize() override;
@@ -30,7 +30,7 @@ namespace mpc::file::mid::event::meta
     public:
         static std::shared_ptr<MetaEvent>
         parseKeySignature(int tick, int delta, MetaEventData *info);
-        int compareTo(mpc::file::mid::event::MidiEvent *other);
+        int compareTo(mpc::file::mid::event::MidiEvent *other) const;
 
     public:
         KeySignature(int tick, int delta, int key, int scale);

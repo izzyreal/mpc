@@ -155,9 +155,10 @@ namespace mpc::engine
                          int nFrames) override;
 
         // Called from main thread
-        void init(int velocity, std::shared_ptr<mpc::sampler::Sound> sound,
-                  int note, mpc::sampler::NoteParameters *np, int varType,
-                  int varValue, int drumIndex, int frameOffset, bool enableEnvs,
+        void init(int velocity,
+                  const std::shared_ptr<mpc::sampler::Sound> &sound, int note,
+                  mpc::sampler::NoteParameters *np, int varType, int varValue,
+                  int drumIndex, int frameOffset, bool enableEnvs,
                   int startTick, float engineSampleRate, uint64_t noteEventId);
 
         uint64_t getNoteEventId();

@@ -35,17 +35,17 @@ std::vector<char> ApsDrumConfiguration::TEMPLATE =
     std::vector<char>{0, 0, 1, 1, 127, 0, 1, 1, 127};
 std::vector<char> ApsDrumConfiguration::PADDING = std::vector<char>{64, 0, 6};
 
-int ApsDrumConfiguration::getProgram()
+int ApsDrumConfiguration::getProgram() const
 {
     return program;
 }
 
-bool ApsDrumConfiguration::getReceivePgmChange()
+bool ApsDrumConfiguration::getReceivePgmChange() const
 {
     return receivePgmChange;
 }
 
-bool ApsDrumConfiguration::getReceiveMidiVolume()
+bool ApsDrumConfiguration::getReceiveMidiVolume() const
 {
     return receiveMidiVolume;
 }

@@ -11,7 +11,7 @@
 using namespace mpc::file::pgmwriter;
 
 PgmWriter::PgmWriter(mpc::sampler::Program *program,
-                     std::weak_ptr<mpc::sampler::Sampler> sampler)
+                     const std::weak_ptr<mpc::sampler::Sampler> &sampler)
 {
     SampleNames pwSampleNames(program, sampler);
     sampleNames = pwSampleNames.getSampleNamesArray();
@@ -35,7 +35,7 @@ PgmWriter::PgmWriter(mpc::sampler::Program *program,
     pads = pwPads.getPadsArray();
 }
 
-std::vector<char> PgmWriter::get()
+std::vector<char> PgmWriter::get() const
 {
     std::vector<std::vector<char>> charArrayChunks(7);
     charArrayChunks[0] = header;

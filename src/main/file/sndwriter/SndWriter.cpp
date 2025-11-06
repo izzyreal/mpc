@@ -33,57 +33,57 @@ void SndWriter::setValues()
     setSampleData(*sound->getSampleData(), sound->isMono());
 }
 
-void SndWriter::setName(std::string s)
+void SndWriter::setName(const std::string &s) const
 {
     sndHeaderWriter->setName(s);
 }
 
-void SndWriter::setMono(bool b)
+void SndWriter::setMono(bool b) const
 {
     sndHeaderWriter->setMono(b);
 }
 
-void SndWriter::setFramesCount(int i)
+void SndWriter::setFramesCount(int i) const
 {
     sndHeaderWriter->setFrameCount(i);
 }
 
-void SndWriter::setSampleRate(int i)
+void SndWriter::setSampleRate(int i) const
 {
     sndHeaderWriter->setSampleRate(i);
 }
 
-void SndWriter::setLevel(int i)
+void SndWriter::setLevel(int i) const
 {
     sndHeaderWriter->setLevel(i);
 }
 
-void SndWriter::setStart(int i)
+void SndWriter::setStart(int i) const
 {
     sndHeaderWriter->setStart(i);
 }
 
-void SndWriter::setEnd(int i)
+void SndWriter::setEnd(int i) const
 {
     sndHeaderWriter->setEnd(i);
 }
 
-void SndWriter::setLoopLength(int i)
+void SndWriter::setLoopLength(int i) const
 {
     sndHeaderWriter->setLoopLength(i);
 }
 
-void SndWriter::setLoopEnabled(bool b)
+void SndWriter::setLoopEnabled(bool b) const
 {
     sndHeaderWriter->setLoopEnabled(b);
 }
 
-void SndWriter::setTune(int i)
+void SndWriter::setTune(int i) const
 {
     sndHeaderWriter->setTune(i);
 }
 
-void SndWriter::setBeatCount(int i)
+void SndWriter::setBeatCount(int i) const
 {
     sndHeaderWriter->setBeatCount(i);
 }

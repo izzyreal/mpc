@@ -36,7 +36,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
+SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sequencer", layerIndex)
 {
     MRECT punch0(0, 52, 30, 59);
@@ -388,13 +388,13 @@ void SequencerScreen::close()
     sequencer->resetUndo();
 }
 
-void SequencerScreen::displayVelo()
+void SequencerScreen::displayVelo() const
 {
     findField("velo")->setTextPadded(
         std::to_string(sequencer->getActiveTrack()->getVelocityRatio()));
 }
 
-void SequencerScreen::displayDeviceNumber()
+void SequencerScreen::displayDeviceNumber() const
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
     if (track->getDeviceIndex() == 0)
@@ -419,19 +419,19 @@ void SequencerScreen::displayDeviceNumber()
 std::vector<std::string> SequencerScreen::busNames =
     std::vector<std::string>{"MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4"};
 
-void SequencerScreen::displayBus()
+void SequencerScreen::displayBus() const
 {
     findField("bus")->setText(busNames[sequencer->getActiveTrack()->getBus()]);
     displayDeviceName();
 }
 
-void SequencerScreen::displayBars()
+void SequencerScreen::displayBars() const
 {
     findField("bars")->setText(
         std::to_string(sequencer->getActiveSequence()->getLastBarIndex() + 1));
 }
 
-void SequencerScreen::displayPgm()
+void SequencerScreen::displayPgm() const
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
     if (track->getProgramChange() == 0)
@@ -444,7 +444,7 @@ void SequencerScreen::displayPgm()
     }
 }
 
-void SequencerScreen::displayDeviceName()
+void SequencerScreen::displayDeviceName() const
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
 
@@ -479,14 +479,14 @@ void SequencerScreen::displayDeviceName()
     }
 }
 
-void SequencerScreen::displayTempo()
+void SequencerScreen::displayTempo() const
 {
     displayTempoLabel();
     findField("tempo")->setText(
         StrUtil::padLeft(Util::tempoString(sequencer->getTempo()), " ", 6));
 }
 
-void SequencerScreen::displayTempoLabel()
+void SequencerScreen::displayTempoLabel() const
 {
     auto currentRatio = -1;
     const auto seq = sequencer->getActiveSequence();
@@ -517,14 +517,14 @@ void SequencerScreen::displayTempoLabel()
     }
 }
 
-void SequencerScreen::displayTempoSource()
+void SequencerScreen::displayTempoSource() const
 {
     findField("tempo-source")
         ->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)"
                                                             : "(MAS)");
 }
 
-void SequencerScreen::displaySq()
+void SequencerScreen::displaySq() const
 {
     std::string result;
 
@@ -547,50 +547,50 @@ void SequencerScreen::displaySq()
     }
 }
 
-void SequencerScreen::displayNow0()
+void SequencerScreen::displayNow0() const
 {
     findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
-void SequencerScreen::displayNow1()
+void SequencerScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
-void SequencerScreen::displayNow2()
+void SequencerScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
-void SequencerScreen::displayRecordingMode()
+void SequencerScreen::displayRecordingMode() const
 {
     findField("recordingmode")
         ->setText(sequencer->isRecordingModeMulti() ? "M" : "S");
 }
 
-void SequencerScreen::displayTsig()
+void SequencerScreen::displayTsig() const
 {
     std::string result;
     auto ts = sequencer->getActiveSequence()->getTimeSignature();
     result.append(std::to_string(ts.getNumerator()));
     result.append("/");
     result.append(std::to_string(ts.getDenominator()));
-    findField("tsig")->setText(mpc::Util::distributeTimeSig(result));
+    findField("tsig")->setText(Util::distributeTimeSig(result));
 }
 
-void SequencerScreen::displayLoop()
+void SequencerScreen::displayLoop() const
 {
     findField("loop")->setText(
         sequencer->getActiveSequence()->isLoopEnabled() ? "ON" : "OFF");
 }
 
-void SequencerScreen::displayOn()
+void SequencerScreen::displayOn() const
 {
     findField("on")->setText(sequencer->getActiveTrack()->isOn() ? "YES"
                                                                  : "NO");
 }
 
-void SequencerScreen::displayTr()
+void SequencerScreen::displayTr() const
 {
 
     auto result = StrUtil::padLeft(
@@ -600,7 +600,7 @@ void SequencerScreen::displayTr()
     findField("tr")->setText(result);
 }
 
-void SequencerScreen::displayCount()
+void SequencerScreen::displayCount() const
 {
     findField("count")->setText(sequencer->isCountEnabled() ? "ON" : "OFF");
 }
@@ -609,7 +609,7 @@ std::vector<std::string> SequencerScreen::timingCorrectNames =
     std::vector<std::string>{"OFF",     "1/8",  "1/8(3)", "1/16",
                              "1/16(3)", "1/32", "1/32(3)"};
 
-void SequencerScreen::displayTiming()
+void SequencerScreen::displayTiming() const
 {
     const auto noteValue =
         mpc.screens->get<ScreenId::TimingCorrectScreen>()->getNoteValue();
@@ -715,7 +715,7 @@ void SequencerScreen::function(int i)
     }
 }
 
-void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused()
+void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused() const
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
 
@@ -1106,7 +1106,7 @@ void SequencerScreen::displayPunchWhileRecording()
     }
 }
 
-void SequencerScreen::displayNextSq()
+void SequencerScreen::displayNextSq() const
 {
     ls->setFunctionKeysArrangement(sequencer->getNextSq() == -1 ? 0 : 1);
 

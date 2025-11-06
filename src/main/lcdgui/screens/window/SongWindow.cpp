@@ -11,7 +11,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-SongWindow::SongWindow(mpc::Mpc &mpc, const int layerIndex)
+SongWindow::SongWindow(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "song-window", layerIndex)
 {
 }
@@ -35,7 +35,7 @@ void SongWindow::open()
     defaultSongNameRestLabel->setText(songScreen->defaultSongName.substr(1));
 }
 
-void SongWindow::function(int i)
+void SongWindow::function(const int i)
 {
     switch (i)
     {
@@ -48,24 +48,23 @@ void SongWindow::function(int i)
         case 4:
             openScreenById(ScreenId::CopySongScreen);
             break;
+        default:;
     }
 }
 
 void SongWindow::openNameScreen()
 {
-
     std::function<void(std::string &)> enterAction;
     std::string initialNameScreenName;
 
     auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.find("default") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("default") != std::string::npos)
     {
         initialNameScreenName = songScreen->getDefaultSongName();
 
-        enterAction = [songScreen, this](std::string &newName)
+        enterAction = [songScreen, this](const std::string &newName)
         {
             songScreen->setDefaultSongName(newName);
             openScreenById(ScreenId::SongWindow);
@@ -77,7 +76,7 @@ void SongWindow::openNameScreen()
         const auto song = sequencer->getSong(songIndex);
         initialNameScreenName = song->getName();
 
-        enterAction = [song, this](std::string &newName)
+        enterAction = [song, this](const std::string &newName)
         {
             song->setName(newName);
             openScreenById(ScreenId::SongWindow);

@@ -4,7 +4,7 @@
 #include "file/all/AllParser.hpp"
 
 #include <StrUtil.hpp>
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
@@ -62,37 +62,37 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc &mpc)
         mpc.screens->get<ScreenId::IgnoreTempoChangeScreen>()->getIgnore();
 }
 
-int MidiSyncMisc::getInMode()
+int MidiSyncMisc::getInMode() const
 {
     return inMode;
 }
 
-int MidiSyncMisc::getOutMode()
+int MidiSyncMisc::getOutMode() const
 {
     return outMode;
 }
 
-int MidiSyncMisc::getShiftEarly()
+int MidiSyncMisc::getShiftEarly() const
 {
     return shiftEarly;
 }
 
-bool MidiSyncMisc::isSendMMCEnabled()
+bool MidiSyncMisc::isSendMMCEnabled() const
 {
     return sendMMCEnabled;
 }
 
-int MidiSyncMisc::getFrameRate()
+int MidiSyncMisc::getFrameRate() const
 {
     return frameRate;
 }
 
-int MidiSyncMisc::getInput()
+int MidiSyncMisc::getInput() const
 {
     return input;
 }
 
-int MidiSyncMisc::getOutput()
+int MidiSyncMisc::getOutput() const
 {
     return output;
 }
@@ -102,7 +102,7 @@ std::string MidiSyncMisc::getDefSongName()
     return defSongName;
 }
 
-bool MidiSyncMisc::getSongModeIgnoreTempoChangeEvents()
+bool MidiSyncMisc::getSongModeIgnoreTempoChangeEvents() const
 {
     return songModeIgnoreTempoChangeEventsInSequence;
 }

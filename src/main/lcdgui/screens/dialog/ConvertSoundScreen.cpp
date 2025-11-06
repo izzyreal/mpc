@@ -51,7 +51,7 @@ void ConvertSoundScreen::function(const int i)
     }
 }
 
-void ConvertSoundScreen::displayConvert()
+void ConvertSoundScreen::displayConvert() const
 {
     if (!sampler->getSound())
     {

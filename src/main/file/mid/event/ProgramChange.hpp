@@ -6,7 +6,7 @@ namespace mpc::file::mid::event
     class ProgramChange : public ChannelEvent
     {
     public:
-        int getProgramNumber();
+        int getProgramNumber() const;
         void setProgramNumber(int p);
 
         ProgramChange(int tick, int channel, int program);

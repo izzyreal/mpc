@@ -11,7 +11,7 @@ namespace mpc::engine::audio::mixer
     {
 
     public:
-        BusControls(int id, std::string name);
+        BusControls(int id, const std::string &name);
     };
 
 } // namespace mpc::engine::audio::mixer

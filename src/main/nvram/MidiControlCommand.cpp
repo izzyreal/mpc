@@ -4,7 +4,7 @@
 using namespace mpc::nvram;
 
 MidiControlCommand::MidiControlCommand(
-    const std::string mpcHardwareLabelToUse,
+    const std::string &mpcHardwareLabelToUse,
     const MidiMessageType midiMessageTypeToUse,
     const int8_t midiChannelIndexToUse, const int8_t numberToUse)
     : mpcHardwareLabel(std::move(mpcHardwareLabelToUse)),
@@ -19,7 +19,7 @@ MidiControlCommand::MidiControlCommand(
 }
 
 MidiControlCommand::MidiControlCommand(
-    const std::string mpcHardwareLabelToUse,
+    const std::string &mpcHardwareLabelToUse,
     const MidiMessageType midiMessageTypeToUse,
     const int8_t midiChannelIndexToUse, const int8_t numberToUse,
     const int8_t valueToUse)
@@ -233,7 +233,7 @@ void MidiControlCommand::setValue(const int8_t valueToUse)
 }
 
 void MidiControlCommand::setMpcHardwareLabel(
-    const std::string mpcHardwareLabelToUse)
+    const std::string &mpcHardwareLabelToUse)
 {
     mpcHardwareLabel = mpcHardwareLabelToUse;
 }

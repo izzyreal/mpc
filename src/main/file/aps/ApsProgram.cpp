@@ -8,7 +8,7 @@
 #include "sampler/Program.hpp"
 
 #include <StrUtil.hpp>
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::file::aps;
 using namespace mpc::engine;
@@ -134,22 +134,22 @@ const int ApsProgram::PADDING3_LENGTH;
 const int ApsProgram::ASSIGN_TABLE_OFFSET;
 const int ApsProgram::ASSIGN_TABLE_LENGTH;
 
-ApsNoteParameters *ApsProgram::getNoteParameters(int noteIndex)
+ApsNoteParameters *ApsProgram::getNoteParameters(int noteIndex) const
 {
     return noteParameters[noteIndex];
 }
 
-ApsMixer *ApsProgram::getMixer()
+ApsMixer *ApsProgram::getMixer() const
 {
     return mixer;
 }
 
-ApsAssignTable *ApsProgram::getAssignTable()
+ApsAssignTable *ApsProgram::getAssignTable() const
 {
     return assignTable;
 }
 
-ApsSlider *ApsProgram::getSlider()
+ApsSlider *ApsProgram::getSlider() const
 {
     return slider;
 }
@@ -164,12 +164,12 @@ std::vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-StereoMixer ApsProgram::getStereoMixerChannel(int noteIndex)
+StereoMixer ApsProgram::getStereoMixerChannel(int noteIndex) const
 {
     return mixer->getStereoMixerChannel(noteIndex);
 }
 
-IndivFxMixer ApsProgram::getIndivFxMixerChannel(int noteIndex)
+IndivFxMixer ApsProgram::getIndivFxMixerChannel(int noteIndex) const
 {
     return mixer->getIndivFxMixerChannel(noteIndex);
 }

@@ -1,11 +1,11 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class SaveASequenceScreen : public mpc::lcdgui::ScreenComponent,
-                                public mpc::lcdgui::screens::OpensNameScreen
+    class SaveASequenceScreen final : public ScreenComponent,
+                                      public OpensNameScreen
     {
 
     public:
@@ -13,12 +13,12 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void openNameScreen() override;
 
-        SaveASequenceScreen(mpc::Mpc &mpc, int layerIndex);
+        SaveASequenceScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
     private:
-        void displaySaveAs();
-        void displayFile();
+        void displaySaveAs() const;
+        void displayFile() const;
 
         int saveSequenceAs = 1;
         void setSaveSequenceAs(int i);

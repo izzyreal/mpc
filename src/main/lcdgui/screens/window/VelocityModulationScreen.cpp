@@ -7,7 +7,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc &mpc,
+VelocityModulationScreen::VelocityModulationScreen(Mpc &mpc,
                                                    const int layerIndex)
     : ScreenComponent(mpc, "velocity-modulation", layerIndex)
 {
@@ -30,7 +30,7 @@ void VelocityModulationScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void VelocityModulationScreen::turnWheel(int i)
+void VelocityModulationScreen::turnWheel(const int i)
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -64,7 +64,7 @@ void VelocityModulationScreen::turnWheel(int i)
     }
 }
 
-void VelocityModulationScreen::displayNote()
+void VelocityModulationScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -83,12 +83,12 @@ void VelocityModulationScreen::displayNote()
         "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
-void VelocityModulationScreen::displayVelo()
+void VelocityModulationScreen::displayVelo() const
 {
     findField("velo")->setText("127"); // Unimplemented.
 }
 
-void VelocityModulationScreen::displayVeloAttack()
+void VelocityModulationScreen::displayVeloAttack() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -97,7 +97,7 @@ void VelocityModulationScreen::displayVeloAttack()
         ->setTextPadded(selectedNoteParameters->getVelocityToAttack(), " ");
 }
 
-void VelocityModulationScreen::displayVeloStart()
+void VelocityModulationScreen::displayVeloStart() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -106,7 +106,7 @@ void VelocityModulationScreen::displayVeloStart()
         ->setTextPadded(selectedNoteParameters->getVelocityToStart(), " ");
 }
 
-void VelocityModulationScreen::displayVeloLevel()
+void VelocityModulationScreen::displayVeloLevel() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -115,7 +115,8 @@ void VelocityModulationScreen::displayVeloLevel()
         ->setTextPadded(selectedNoteParameters->getVeloToLevel(), " ");
 }
 
-void VelocityModulationScreen::update(Observable *observable, Message message)
+void VelocityModulationScreen::update(Observable *observable,
+                                      const Message message)
 {
     const auto msg = std::get<std::string>(message);
 

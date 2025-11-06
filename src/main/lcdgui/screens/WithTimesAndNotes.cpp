@@ -11,7 +11,7 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
 
-bool WithTimesAndNotes::checkAllTimes(mpc::Mpc &mpc, int notch, Sequence *seq)
+bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, int notch, Sequence *seq)
 {
     const auto sequence =
         seq != nullptr ? seq : mpc.getSequencer()->getActiveSequence().get();
@@ -62,7 +62,7 @@ bool WithTimesAndNotes::checkAllTimes(mpc::Mpc &mpc, int notch, Sequence *seq)
     return false;
 }
 
-bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc &mpc, int notch,
+bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, int notch,
                                               Sequence *seq, Track *_track)
 {
     auto param = mpc.getLayeredScreen()->getFocusedFieldName();

@@ -15,6 +15,6 @@ namespace mpc::file::aps
         std::vector<char> getBytes();
 
         ApsAssignTable(const std::vector<char> &loadBytes);
-        ApsAssignTable(std::vector<int> assignTable);
+        ApsAssignTable(const std::vector<int> &assignTable);
     };
 } // namespace mpc::file::aps

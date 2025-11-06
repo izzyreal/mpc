@@ -12,7 +12,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-TrMoveScreen::TrMoveScreen(mpc::Mpc &mpc, const int layerIndex)
+TrMoveScreen::TrMoveScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "tr-move", layerIndex)
 {
 }
@@ -155,7 +155,7 @@ void TrMoveScreen::function(int i)
     }
 }
 
-void TrMoveScreen::displayTrLabels()
+void TrMoveScreen::displayTrLabels() const
 {
     std::string tr0;
     std::string tr1;
@@ -232,7 +232,7 @@ void TrMoveScreen::displayTrLabels()
     }
 }
 
-void TrMoveScreen::displayTrFields()
+void TrMoveScreen::displayTrFields() const
 {
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     const auto sequence = sequencer->getActiveSequence();
@@ -267,7 +267,7 @@ void TrMoveScreen::displayTrFields()
     }
 }
 
-void TrMoveScreen::displaySq()
+void TrMoveScreen::displaySq() const
 {
     const auto sequence = sequencer->getActiveSequence();
     findField("sq")->setText(StrUtil::padLeft(
@@ -276,7 +276,7 @@ void TrMoveScreen::displaySq()
     findLabel("sq-name")->setText(sequenceName);
 }
 
-bool TrMoveScreen::isSelected()
+bool TrMoveScreen::isSelected() const
 {
     if (selectedTrackIndex != -1)
     {
@@ -327,7 +327,7 @@ void TrMoveScreen::cancel()
     SetDirty();
 }
 
-void TrMoveScreen::insert(mpc::sequencer::Sequence *s)
+void TrMoveScreen::insert(sequencer::Sequence *s)
 {
     s->moveTrack(selectedTrackIndex, currentTrackIndex);
     selectedTrackIndex = -1;

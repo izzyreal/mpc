@@ -70,7 +70,7 @@ namespace mpc::lcdgui
         {
         }
         // Unsigned
-        uint8_t currentU8()
+        uint8_t currentU8() const
         {
             return (uint8_t)pByteData[pos];
         }
@@ -80,7 +80,7 @@ namespace mpc::lcdgui
             pos += 1;
             return value;
         }
-        uint16_t currentU16()
+        uint16_t currentU16() const
         {
             return (uint16_t)((pByteData[pos + 1] << 8) | pByteData[pos]);
         }
@@ -90,7 +90,7 @@ namespace mpc::lcdgui
             pos += 2;
             return value;
         }
-        uint32_t currentU32()
+        uint32_t currentU32() const
         {
             return (uint32_t)((pByteData[pos + 3] << 24) |
                               (pByteData[pos + 2] << 16) |
@@ -103,7 +103,7 @@ namespace mpc::lcdgui
             return value;
         }
         // Signed
-        int8_t currentS8()
+        int8_t currentS8() const
         {
             return (int8_t)pByteData[pos];
         }
@@ -113,7 +113,7 @@ namespace mpc::lcdgui
             pos += 1;
             return value;
         }
-        int16_t currentS16()
+        int16_t currentS16() const
         {
             return (int16_t)((pByteData[pos + 1] << 8) | pByteData[pos + 0]);
         }
@@ -123,7 +123,7 @@ namespace mpc::lcdgui
             pos += 2;
             return value;
         }
-        int32_t currentS32()
+        int32_t currentS32() const
         {
             return (int32_t)((pByteData[pos + 3] << 24) |
                              (pByteData[pos + 2] << 16) |
@@ -135,7 +135,7 @@ namespace mpc::lcdgui
             pos += 4;
             return value;
         }
-        uint8_t *getPtr()
+        uint8_t *getPtr() const
         {
             return &pByteData[pos];
         }
@@ -143,7 +143,7 @@ namespace mpc::lcdgui
         {
             pos += byteCount;
         }
-        bool isEOF()
+        bool isEOF() const
         {
             return pos >= size;
         }

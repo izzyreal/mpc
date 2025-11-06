@@ -8,8 +8,7 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 
-CreateNewProgramScreen::CreateNewProgramScreen(Mpc &mpc,
-                                               const int layerIndex)
+CreateNewProgramScreen::CreateNewProgramScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "create-new-program", layerIndex)
 {
 }
@@ -26,9 +25,8 @@ void CreateNewProgramScreen::turnWheel(const int i)
 
 void CreateNewProgramScreen::openNameScreen()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "new-name")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "new-name")
     {
         const auto enterAction = [this](const std::string &nameScreenName)
         {
@@ -73,6 +71,7 @@ void CreateNewProgramScreen::function(const int i)
             openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
+        {
             const auto newProgram =
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
@@ -92,15 +91,17 @@ void CreateNewProgramScreen::function(const int i)
             getActiveDrumBus()->setProgram(index);
             openScreenById(ScreenId::ProgramScreen);
             break;
+        }
+        default:;
     }
 }
 
-void CreateNewProgramScreen::displayMidiProgramChange()
+void CreateNewProgramScreen::displayMidiProgramChange() const
 {
     findField("midi-program-change")->setTextPadded(midiProgramChange);
 }
 
-void CreateNewProgramScreen::displayNewName()
+void CreateNewProgramScreen::displayNewName() const
 {
     findField("new-name")->setText(newName);
 }

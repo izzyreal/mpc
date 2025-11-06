@@ -16,10 +16,10 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
 
     public:
-        int getTicksPerBeat();
-        int getDenominator();
-        int getNumerator();
-        int getLastTick();
+        int getTicksPerBeat() const;
+        int getDenominator() const;
+        int getNumerator() const;
+        int getLastTick() const;
 
     public:
         std::vector<char> &getBytes();

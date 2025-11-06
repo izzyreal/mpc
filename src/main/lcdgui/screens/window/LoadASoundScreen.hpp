@@ -1,16 +1,16 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadASoundScreen : public mpc::lcdgui::ScreenComponent
+    class LoadASoundScreen final : public ScreenComponent
     {
 
     private:
-        void keepSound();
+        void keepSound() const;
 
     public:
-        LoadASoundScreen(mpc::Mpc &mpc, int layerIndex);
+        LoadASoundScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;

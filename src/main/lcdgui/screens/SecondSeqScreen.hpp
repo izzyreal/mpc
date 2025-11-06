@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::disk
 {
@@ -18,7 +18,7 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-    class SecondSeqScreen : public mpc::lcdgui::ScreenComponent
+    class SecondSeqScreen final : public ScreenComponent
     {
 
     public:
@@ -26,7 +26,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
     public:
-        SecondSeqScreen(mpc::Mpc &mpc, int layerIndex);
+        SecondSeqScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -34,11 +34,11 @@ namespace mpc::lcdgui::screens
         int sq = 0;
 
         void setSq(int i);
-        void displaySq();
-        void displayFunctionKeys();
+        void displaySq() const;
+        void displayFunctionKeys() const;
 
-        friend class mpc::sequencer::Sequencer;
-        friend class mpc::disk::AllLoader;
-        friend class mpc::file::all::AllSequencer;
+        friend class sequencer::Sequencer;
+        friend class disk::AllLoader;
+        friend class file::all::AllSequencer;
     };
 } // namespace mpc::lcdgui::screens

@@ -9,10 +9,10 @@ namespace mpc::file::mid::event::meta
     {
 
     public:
-        void setName(std::string name);
+        void setName(const std::string &name);
         std::string getTrackName();
 
     public:
-        TrackName(int tick, int delta, std::string name);
+        TrackName(int tick, int delta, const std::string &name);
     };
 } // namespace mpc::file::mid::event::meta

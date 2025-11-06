@@ -56,7 +56,7 @@ void DeleteProgramScreen::turnWheel(const int i)
     }
 }
 
-void DeleteProgramScreen::displayPgm()
+void DeleteProgramScreen::displayPgm() const
 {
     findField("pgm")->setText(
         StrUtil::padLeft(std::to_string(pgm + 1), " ", 2) + "-" +

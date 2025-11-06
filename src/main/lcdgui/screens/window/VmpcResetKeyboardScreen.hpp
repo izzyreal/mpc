@@ -1,14 +1,14 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class VmpcResetKeyboardScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcResetKeyboardScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
 
-        VmpcResetKeyboardScreen(mpc::Mpc &mpc, int layerIndex);
+        VmpcResetKeyboardScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

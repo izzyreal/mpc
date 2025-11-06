@@ -25,6 +25,6 @@ namespace mpc::engine::filter
     public:
         float update();
 
-        float filter(float sample, float f);
+        float filter(float sample, float f) const;
     };
 } // namespace mpc::engine::filter

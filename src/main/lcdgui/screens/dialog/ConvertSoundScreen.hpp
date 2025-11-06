@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::dialog
 {
@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens::dialog
     private:
         const std::vector<std::string> convertNames{"STEREO TO MONO",
                                                     "RE-SAMPLE"};
-        void displayConvert();
+        void displayConvert() const;
 
         int convert = 0;
         void setConvert(int i);

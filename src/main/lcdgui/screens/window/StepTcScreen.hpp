@@ -1,14 +1,14 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class StepTcScreen : public mpc::lcdgui::ScreenComponent
+    class StepTcScreen final : public ScreenComponent
     {
 
     public:
-        StepTcScreen(mpc::Mpc &mpc, int layerIndex);
+        StepTcScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -17,6 +17,6 @@ namespace mpc::lcdgui::screens::window
     private:
         const std::vector<std::string> timingCorrectNames{
             "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)"};
-        void displayTcValue();
+        void displayTcValue() const;
     };
 } // namespace mpc::lcdgui::screens::window

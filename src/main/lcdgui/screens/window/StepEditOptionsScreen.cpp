@@ -3,9 +3,8 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-StepEditOptionsScreen::StepEditOptionsScreen(mpc::Mpc &mpc,
-                                             const int layerIndex)
-    : mpc::lcdgui::ScreenComponent(mpc, "step-edit-options", layerIndex)
+StepEditOptionsScreen::StepEditOptionsScreen(Mpc &mpc, const int layerIndex)
+    : ScreenComponent(mpc, "step-edit-options", layerIndex)
 {
 }
 
@@ -17,7 +16,7 @@ void StepEditOptionsScreen::open()
     displayTcValue();
 }
 
-void StepEditOptionsScreen::function(int i)
+void StepEditOptionsScreen::function(const int i)
 {
     if (i == 4)
     {
@@ -25,7 +24,7 @@ void StepEditOptionsScreen::function(int i)
     }
 }
 
-void StepEditOptionsScreen::turnWheel(int i)
+void StepEditOptionsScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -47,32 +46,32 @@ void StepEditOptionsScreen::turnWheel(int i)
     }
 }
 
-bool StepEditOptionsScreen::isAutoStepIncrementEnabled()
+bool StepEditOptionsScreen::isAutoStepIncrementEnabled() const
 {
     return autoStepIncrementEnabled;
 }
 
-bool StepEditOptionsScreen::isDurationOfRecordedNotesTcValue()
+bool StepEditOptionsScreen::isDurationOfRecordedNotesTcValue() const
 {
     return durationOfRecordedNotesTcValue;
 }
 
-int StepEditOptionsScreen::getTcValuePercentage()
+int StepEditOptionsScreen::getTcValuePercentage() const
 {
     return tcValue;
 }
 
-void StepEditOptionsScreen::setAutoStepIncrementEnabled(bool b)
+void StepEditOptionsScreen::setAutoStepIncrementEnabled(const bool b)
 {
     autoStepIncrementEnabled = b;
 }
 
-void StepEditOptionsScreen::setDurationOfRecordedNotesTcValue(bool b)
+void StepEditOptionsScreen::setDurationOfRecordedNotesTcValue(const bool b)
 {
     durationOfRecordedNotesTcValue = b;
 }
 
-void StepEditOptionsScreen::setTcValueRecordedNotes(int i)
+void StepEditOptionsScreen::setTcValueRecordedNotes(const int i)
 {
     auto candidate = i;
 
@@ -90,19 +89,19 @@ void StepEditOptionsScreen::setTcValueRecordedNotes(int i)
     displayTcValue();
 }
 
-void StepEditOptionsScreen::displayAutoStepIncrement()
+void StepEditOptionsScreen::displayAutoStepIncrement() const
 {
     findField("auto-step-increment")
         ->setText(autoStepIncrementEnabled ? "YES" : "NO");
 }
 
-void StepEditOptionsScreen::displayDurationOfRecordedNotes()
+void StepEditOptionsScreen::displayDurationOfRecordedNotes() const
 {
     findField("duration-of-recorded-notes")
         ->setText(durationOfRecordedNotesTcValue ? "TC VALUE:" : "AS PLAYED");
 }
 
-void StepEditOptionsScreen::displayTcValue()
+void StepEditOptionsScreen::displayTcValue() const
 {
     const auto f = findField("tc-value");
     f->Hide(!durationOfRecordedNotesTcValue);

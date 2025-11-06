@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <sequencer/Event.hpp>
 #include <sequencer/EmptyEvent.hpp>
@@ -16,29 +16,28 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-    class StepEditorScreen : public mpc::lcdgui::ScreenComponent
+    class StepEditorScreen final : public ScreenComponent
     {
 
     private:
         void downOrUp(int increment);
         void adhocPlayNoteEvent(
-            const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent);
-        void adhocPlayNoteEventsAtCurrentPosition();
+            const std::shared_ptr<sequencer::NoteOnEvent> &noteEvent) const;
+        void adhocPlayNoteEventsAtCurrentPosition() const;
 
-        std::vector<std::shared_ptr<mpc::sequencer::Event>>
-        computeEventsAtCurrentTick();
+        std::vector<std::shared_ptr<sequencer::Event>>
+        computeEventsAtCurrentTick() const;
 
     public:
-        StepEditorScreen(mpc::Mpc &mpc, int layerIndex);
+        StepEditorScreen(Mpc &mpc, int layerIndex);
 
-        std::vector<std::shared_ptr<mpc::sequencer::Event>>
-        computeVisibleEvents(
+        std::vector<std::shared_ptr<sequencer::Event>> computeVisibleEvents(
             const std::vector<std::shared_ptr<sequencer::Event>>
-                &eventsAtCurrentTick = {});
+                &eventsAtCurrentTick = {}) const;
 
         bool visibleEventsEqual(
-            const std::vector<std::shared_ptr<mpc::sequencer::Event>> &a,
-            const std::vector<std::shared_ptr<mpc::sequencer::Event>> &b);
+            const std::vector<std::shared_ptr<sequencer::Event>> &a,
+            const std::vector<std::shared_ptr<sequencer::Event>> &b) const;
 
         void shift();
 
@@ -63,8 +62,8 @@ namespace mpc::lcdgui::screens
     private:
         void refreshSelection();
         void refreshEventRows();
-        void updateComponents();
-        void setViewNotesText();
+        void updateComponents() const;
+        void setViewNotesText() const;
 
         void resetYPosAndYOffset();
         std::string getActiveColumn();
@@ -72,18 +71,18 @@ namespace mpc::lcdgui::screens
         void storeColumnForEventAtActiveRow();
         void restoreColumnForEventAtActiveRow();
         void setSequencerTickPos(const std::function<void()> &tickPosSetter);
-        bool paramIsLetter(const std::string &letter);
+        bool paramIsLetter(const std::string &letter) const;
 
     private:
         int playSingleEventCounter = 0;
         const std::vector<std::string> viewNames{
             "ALL EVENTS",  "NOTES",       "PITCH BEND", "CTRL:",
             "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
-        const std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent =
-            std::make_shared<mpc::sequencer::EmptyEvent>();
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> placeHolder;
-        std::shared_ptr<mpc::sequencer::Event> selectedEvent;
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> selectedEvents;
+        const std::shared_ptr<sequencer::EmptyEvent> emptyEvent =
+            std::make_shared<sequencer::EmptyEvent>();
+        std::vector<std::shared_ptr<sequencer::Event>> placeHolder;
+        std::shared_ptr<sequencer::Event> selectedEvent;
+        std::vector<std::shared_ptr<sequencer::Event>> selectedEvents;
         std::map<std::string, std::string> lastColumn;
         int lastRow = 0;
 
@@ -108,21 +107,19 @@ namespace mpc::lcdgui::screens
         void setSelectionEndIndex(int i);
         void setSelectionStartIndex(int i);
         void setSelectedEvents();
-        void
-        setSelectedEvent(const std::weak_ptr<mpc::sequencer::Event> &event);
+        void setSelectedEvent(const std::weak_ptr<sequencer::Event> &event);
         void setSelectedParameterLetter(const std::string &str);
         void checkSelection();
         void removeEvents();
-        void displayView();
+        void displayView() const;
 
     public:
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> &getVisibleEvents();
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> &
-        getSelectedEvents();
-        std::shared_ptr<mpc::sequencer::Event> getSelectedEvent();
+        std::vector<std::shared_ptr<sequencer::Event>> &getVisibleEvents();
+        std::vector<std::shared_ptr<sequencer::Event>> &getSelectedEvents();
+        std::shared_ptr<sequencer::Event> getSelectedEvent();
         std::string getSelectedParameterLetter();
         void clearSelection();
-        int getYOffset();
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> &getPlaceHolder();
+        int getYOffset() const;
+        std::vector<std::shared_ptr<sequencer::Event>> &getPlaceHolder();
     };
 } // namespace mpc::lcdgui::screens

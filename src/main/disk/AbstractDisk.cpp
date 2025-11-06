@@ -1,7 +1,7 @@
 #include "AbstractDisk.hpp"
 
 #include "Mpc.hpp"
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "disk/MpcFile.hpp"
 #include "disk/ApsLoader.hpp"
@@ -78,19 +78,19 @@ std::vector<std::string> AbstractDisk::getFileNames()
 {
     std::vector<std::string> res;
     transform(files.begin(), files.end(), back_inserter(res),
-              [](std::shared_ptr<MpcFile> f)
+              [](const std::shared_ptr<MpcFile> &f)
               {
                   return f->getName();
               });
     return res;
 }
 
-std::string AbstractDisk::getFileName(int i)
+std::string AbstractDisk::getFileName(int i) const
 {
     return files[i]->getName();
 }
 
-std::vector<std::string> AbstractDisk::getParentFileNames()
+std::vector<std::string> AbstractDisk::getParentFileNames() const
 {
     std::vector<std::string> res;
 
@@ -103,7 +103,7 @@ std::vector<std::string> AbstractDisk::getParentFileNames()
     return res;
 }
 
-bool AbstractDisk::deleteSelectedFile()
+bool AbstractDisk::deleteSelectedFile() const
 {
     auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
     return files[loadScreen->fileLoad]->del();
@@ -119,7 +119,8 @@ std::shared_ptr<MpcFile> AbstractDisk::getParentFile(int i)
     return parentFiles[i];
 }
 
-void AbstractDisk::writeSnd(std::shared_ptr<Sound> s, std::string fileName)
+void AbstractDisk::writeSnd(const std::shared_ptr<Sound> &s,
+                            const std::string &fileName)
 {
     std::function<file_or_error()> writeFunc = [&]
     {
@@ -137,7 +138,8 @@ void AbstractDisk::writeSnd(std::shared_ptr<Sound> s, std::string fileName)
     performIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
-void AbstractDisk::writeWav(std::shared_ptr<Sound> s, std::string fileName)
+void AbstractDisk::writeWav(const std::shared_ptr<Sound> &s,
+                            const std::string &fileName)
 {
     std::function<file_or_error()> writeFunc = [&]
     {
@@ -178,8 +180,8 @@ void AbstractDisk::writeWav(std::shared_ptr<Sound> s, std::string fileName)
     performIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
-void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s,
-                            std::string fileName)
+void AbstractDisk::writeMid(const std::shared_ptr<mpc::sequencer::Sequence> &s,
+                            const std::string &fileName)
 {
     std::function<file_or_error()> writeFunc = [&]
     {
@@ -196,7 +198,7 @@ void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s,
     performIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
-bool AbstractDisk::checkExists(std::string fileName)
+bool AbstractDisk::checkExists(const std::string &fileName)
 {
     initFiles();
 
@@ -266,7 +268,7 @@ bool AbstractDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
     return toDelete->del();
 }
 
-void AbstractDisk::writePgm(std::shared_ptr<Program> p,
+void AbstractDisk::writePgm(const std::shared_ptr<Program> &p,
                             const std::string &fileName)
 {
     std::function<file_or_error()> writeFunc = [&]
@@ -726,7 +728,7 @@ tl::expected<return_type, mpc_io_error_msg>
 AbstractDisk::performIoOrOpenErrorPopup(
     std::function<tl::expected<return_type, mpc_io_error_msg>()> ioFunc)
 {
-    auto showPopup = [this](const std::string msg)
+    auto showPopup = [this](const std::string &msg)
     {
         mpc.getLayeredScreen()->showPopupAndThenReturnToLayer(msg, 1000, 0);
     };

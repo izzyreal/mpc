@@ -19,7 +19,7 @@ namespace mpc::file::mid::event::meta
         float mBPM;
 
     public:
-        float getBpm();
+        float getBpm() const;
         void setMpqn(int m);
         void setBpm(float b);
 

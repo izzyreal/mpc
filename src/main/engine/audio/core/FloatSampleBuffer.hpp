@@ -11,7 +11,7 @@ namespace mpc::engine::audio::core
         FloatSampleBuffer();
         FloatSampleBuffer(int channelCount, int sampleCount, float sampleRate);
 
-        float getConvertDitherBits(int newFormatType);
+        float getConvertDitherBits(int newFormatType) const;
 
         static const int DITHER_MODE_AUTOMATIC = 0;
         static const int DITHER_MODE_ON = 1;
@@ -46,7 +46,7 @@ namespace mpc::engine::audio::core
         void reset();
         void reset(int channels, int sampleCount, float sampleRate);
         int getByteArrayBufferSize(AudioFormat *format);
-        int getByteArrayBufferSize(AudioFormat *format, int lenInSamples);
+        int getByteArrayBufferSize(AudioFormat *format, int lenInSamples) const;
 
         int convertToByteArray_(int readOffset, int lenInSamples,
                                 std::vector<char> &buffer, int writeOffset,
@@ -63,12 +63,12 @@ namespace mpc::engine::audio::core
         void removeChannel(int channel);
         void removeChannel(int channel, bool lazy);
 
-        int getChannelCount();
+        int getChannelCount() const;
         std::vector<float> &getChannel(int channel);
 
-        int getSampleCount();
+        int getSampleCount() const;
 
         void setSampleRate(float sampleRate);
-        float getSampleRate();
+        float getSampleRate() const;
     };
 } // namespace mpc::engine::audio::core

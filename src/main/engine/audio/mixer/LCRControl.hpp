@@ -15,8 +15,8 @@ namespace mpc::engine::audio::mixer
         virtual float getRight() = 0;
 
     public:
-        LCRControl(std::string name,
-                   std::shared_ptr<mpc::engine::control::ControlLaw> law,
+        LCRControl(const std::string &name,
+                   const std::shared_ptr<mpc::engine::control::ControlLaw> &law,
                    float initialValue);
     };
 

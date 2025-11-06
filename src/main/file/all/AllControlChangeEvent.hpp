@@ -22,6 +22,6 @@ namespace mpc::file::all
         static std::shared_ptr<mpc::sequencer::ControlChangeEvent>
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char> mpcEventToBytes(
-            std::shared_ptr<mpc::sequencer::ControlChangeEvent>);
+            const std::shared_ptr<mpc::sequencer::ControlChangeEvent> &);
     };
 } // namespace mpc::file::all

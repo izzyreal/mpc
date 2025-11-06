@@ -9,7 +9,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-PunchScreen::PunchScreen(mpc::Mpc &mpc, const int layerIndex)
+PunchScreen::PunchScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "punch", layerIndex)
 {
 }
@@ -92,7 +92,7 @@ void PunchScreen::setAutoPunch(int i)
     displayBackground();
 }
 
-void PunchScreen::displayAutoPunch()
+void PunchScreen::displayAutoPunch() const
 {
     findField("auto-punch")
         ->setText(autoPunchNames[sequencer->getAutoPunchMode()]);

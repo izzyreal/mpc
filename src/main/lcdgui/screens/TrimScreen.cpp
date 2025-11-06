@@ -20,7 +20,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-TrimScreen::TrimScreen(mpc::Mpc &mpc, const int layerIndex)
+TrimScreen::TrimScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "trim", layerIndex)
 {
     addChildT<Wave>()->setFine(false);
@@ -258,7 +258,7 @@ void TrimScreen::setSlider(int i)
     }
 }
 
-void TrimScreen::setSliderStart(int i)
+void TrimScreen::setSliderStart(int i) const
 {
     const auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getStart();
@@ -287,7 +287,7 @@ void TrimScreen::setSliderStart(int i)
     }
 }
 
-void TrimScreen::setSliderEnd(int i)
+void TrimScreen::setSliderEnd(int i) const
 {
     const auto sound = sampler->getSound();
     const auto newValue = (int)((i / 124.0) * sound->getFrameCount());
@@ -295,7 +295,7 @@ void TrimScreen::setSliderEnd(int i)
     displayEnd();
 }
 
-void TrimScreen::setEnd(int newValue)
+void TrimScreen::setEnd(int newValue) const
 {
     const auto loopLengthIsFixed =
         mpc.screens->get<ScreenId::LoopScreen>()->loopLngthFix;
@@ -441,7 +441,7 @@ void TrimScreen::displayWave()
     findWave()->setSelection(sound->getStart(), sound->getEnd());
 }
 
-void TrimScreen::displaySnd()
+void TrimScreen::displaySnd() const
 {
     const auto sound = sampler->getSound();
 
@@ -466,12 +466,12 @@ void TrimScreen::displaySnd()
     findField("snd")->setText(sampleName);
 }
 
-void TrimScreen::displayPlayX()
+void TrimScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
-void TrimScreen::displaySt()
+void TrimScreen::displaySt() const
 {
     if (sampler->getSoundCount() != 0)
     {
@@ -484,7 +484,7 @@ void TrimScreen::displaySt()
     }
 }
 
-void TrimScreen::displayEnd()
+void TrimScreen::displayEnd() const
 {
     if (sampler->getSoundCount() != 0)
     {
@@ -497,7 +497,7 @@ void TrimScreen::displayEnd()
     }
 }
 
-void TrimScreen::displayView()
+void TrimScreen::displayView() const
 {
     if (view == 0)
     {

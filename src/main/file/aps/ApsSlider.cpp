@@ -36,52 +36,52 @@ ApsSlider::ApsSlider(mpc::sampler::PgmSlider *slider)
 
 std::vector<char> ApsSlider::PADDING = std::vector<char>{0, 35, 64, 0, 26, 0};
 
-int ApsSlider::getNote()
+int ApsSlider::getNote() const
 {
     return note;
 }
 
-int ApsSlider::getTuneLow()
+int ApsSlider::getTuneLow() const
 {
     return tuneLow;
 }
 
-int ApsSlider::getTuneHigh()
+int ApsSlider::getTuneHigh() const
 {
     return tuneHigh;
 }
 
-int ApsSlider::getDecayLow()
+int ApsSlider::getDecayLow() const
 {
     return decayLow;
 }
 
-int ApsSlider::getDecayHigh()
+int ApsSlider::getDecayHigh() const
 {
     return decayHigh;
 }
 
-int ApsSlider::getAttackLow()
+int ApsSlider::getAttackLow() const
 {
     return attackLow;
 }
 
-int ApsSlider::getAttackHigh()
+int ApsSlider::getAttackHigh() const
 {
     return attackHigh;
 }
 
-int ApsSlider::getFilterLow()
+int ApsSlider::getFilterLow() const
 {
     return filterLow;
 }
 
-int ApsSlider::getFilterHigh()
+int ApsSlider::getFilterHigh() const
 {
     return filterHigh;
 }
 
-int ApsSlider::getProgramChange()
+int ApsSlider::getProgramChange() const
 {
     return programChange;
 }

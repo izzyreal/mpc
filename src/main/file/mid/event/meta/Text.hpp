@@ -7,6 +7,6 @@ namespace mpc::file::mid::event::meta
     {
 
     public:
-        Text(int tick, int delta, std::string text);
+        Text(int tick, int delta, const std::string &text);
     };
 } // namespace mpc::file::mid::event::meta

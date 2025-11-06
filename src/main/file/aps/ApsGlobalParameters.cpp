@@ -75,7 +75,7 @@ std::vector<char> ApsGlobalParameters::TEMPLATE_NO_SOUNDS = {
 std::vector<char> ApsGlobalParameters::TEMPLATE_SOUNDS = {
     '\x03', '\x38', '\x00', '\xa1', 0, 0, 0, 64};
 
-int ApsGlobalParameters::readFxDrum(char b)
+int ApsGlobalParameters::readFxDrum(char b) const
 {
     for (int i = 2; i < 8; i++)
     {
@@ -85,42 +85,42 @@ int ApsGlobalParameters::readFxDrum(char b)
     return b;
 }
 
-int ApsGlobalParameters::getFxDrum()
+int ApsGlobalParameters::getFxDrum() const
 {
     return fxDrum;
 }
 
-bool ApsGlobalParameters::isPadToIntSoundEnabled()
+bool ApsGlobalParameters::isPadToIntSoundEnabled() const
 {
     return padToInternalSound;
 }
 
-bool ApsGlobalParameters::isPadAssignMaster()
+bool ApsGlobalParameters::isPadAssignMaster() const
 {
     return padAssignMaster;
 }
 
-bool ApsGlobalParameters::isStereoMixSourceDrum()
+bool ApsGlobalParameters::isStereoMixSourceDrum() const
 {
     return stereoMixSourceDrum;
 }
 
-bool ApsGlobalParameters::isIndivFxSourceDrum()
+bool ApsGlobalParameters::isIndivFxSourceDrum() const
 {
     return indivFxSourceDrum;
 }
 
-bool ApsGlobalParameters::isCopyPgmMixToDrumEnabled()
+bool ApsGlobalParameters::isCopyPgmMixToDrumEnabled() const
 {
     return copyPgmMixToDrum;
 }
 
-bool ApsGlobalParameters::isRecordMixChangesEnabled()
+bool ApsGlobalParameters::isRecordMixChangesEnabled() const
 {
     return recordMixChanges;
 }
 
-int ApsGlobalParameters::getMasterLevel()
+int ApsGlobalParameters::getMasterLevel() const
 {
     return masterLevel;
 }

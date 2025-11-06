@@ -24,8 +24,8 @@ namespace mpc::engine::control
         std::string getValueString() override;
 
     public:
-        LawControl(int id, std::string name, std::shared_ptr<ControlLaw> law,
-                   float initialValue);
+        LawControl(int id, const std::string &name,
+                   const std::shared_ptr<ControlLaw> &law, float initialValue);
     };
 
 } // namespace mpc::engine::control

@@ -19,9 +19,9 @@ namespace mpc
             virtual std::vector<float> &getProcessedData();
 
         private:
-            void fade(int length, std::vector<float> *fa);
+            void fade(int length, std::vector<float> *fa) const;
             std::vector<float> seg(std::vector<float> *src, int length,
-                                   int offset);
+                                   int offset) const;
 
         private:
             virtual float value(int length, int index);

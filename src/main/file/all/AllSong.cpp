@@ -112,22 +112,22 @@ std::vector<std::pair<uint8_t, uint8_t>> Song::getSteps()
     return steps;
 }
 
-bool Song::getIsUsed()
+bool Song::getIsUsed() const
 {
     return isUsed;
 }
 
-int Song::getLoopFirstStepIndex()
+int Song::getLoopFirstStepIndex() const
 {
     return loopFirstStepIndex;
 }
 
-int Song::getLoopLastStepIndex()
+int Song::getLoopLastStepIndex() const
 {
     return loopLastStepIndex;
 }
 
-bool Song::isLoopEnabled()
+bool Song::isLoopEnabled() const
 {
     return loopEnabled;
 }

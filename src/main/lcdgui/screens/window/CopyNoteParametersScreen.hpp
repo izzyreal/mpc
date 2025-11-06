@@ -1,16 +1,16 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class CopyNoteParametersScreen : public mpc::lcdgui::ScreenComponent
+    class CopyNoteParametersScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        CopyNoteParametersScreen(mpc::Mpc &mpc, int layerIndex);
+        CopyNoteParametersScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
     private:
@@ -20,12 +20,12 @@ namespace mpc::lcdgui::screens::window
 
         void setProg0(int i);
         void setProg1(int i);
-        void setNote0(int i);
+        void setNote0(int i) const;
         void setNote1(int i);
 
-        void displayProg0();
-        void displayNote0();
-        void displayProg1();
-        void displayNote1();
+        void displayProg0() const;
+        void displayNote0() const;
+        void displayProg1() const;
+        void displayNote1() const;
     };
 } // namespace mpc::lcdgui::screens::window

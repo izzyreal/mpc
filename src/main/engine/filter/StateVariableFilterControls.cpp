@@ -5,7 +5,7 @@
 using namespace mpc::engine::filter;
 using namespace std;
 
-StateVariableFilterControls::StateVariableFilterControls(string name,
+StateVariableFilterControls::StateVariableFilterControls(const string &name,
                                                          int idOffset)
     : FilterControls(34, name, idOffset)
 {

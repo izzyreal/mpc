@@ -321,7 +321,7 @@ void ClientMidiEventController::handleChannelAftertouch(
     }
 }
 
-void ClientMidiEventController::handlePitchBend(const ClientMidiEvent &e)
+void ClientMidiEventController::handlePitchBend(const ClientMidiEvent &e) const
 {
     // Pitch bend recognized (value range: -8192..8191)
 }
@@ -370,7 +370,8 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
     }
 }
 
-void ClientMidiEventController::handleProgramChange(const ClientMidiEvent &e)
+void ClientMidiEventController::handleProgramChange(
+    const ClientMidiEvent &e) const
 {
     if (midiInputScreen->getProgChangeSeq())
     {
@@ -409,63 +410,67 @@ void ClientMidiEventController::handleProgramChange(const ClientMidiEvent &e)
     }
 }
 
-void ClientMidiEventController::handleSystemExclusive(const ClientMidiEvent &e)
+void ClientMidiEventController::handleSystemExclusive(
+    const ClientMidiEvent &e) const
 {
     // SysEx recognized only if ID == 0x45
 }
 
 void ClientMidiEventController::handleSongPositionPointer(
-    const ClientMidiEvent &e)
+    const ClientMidiEvent &e) const
 {
     // Recognized System Common message
 }
 
-void ClientMidiEventController::handleSongSelect(const ClientMidiEvent &e)
+void ClientMidiEventController::handleSongSelect(const ClientMidiEvent &e) const
 {
     // Ignored by MPC2000XL
 }
 
-void ClientMidiEventController::handleTuneRequest(const ClientMidiEvent &e)
+void ClientMidiEventController::handleTuneRequest(
+    const ClientMidiEvent &e) const
 {
     // Ignored by MPC2000XL
 }
 
-void ClientMidiEventController::handleMidiClock(const ClientMidiEvent &e)
+void ClientMidiEventController::handleMidiClock(const ClientMidiEvent &e) const
 {
     // Recognized Real-Time message
 }
 
-void ClientMidiEventController::handleStart(const ClientMidiEvent &e)
+void ClientMidiEventController::handleStart(const ClientMidiEvent &e) const
 {
     // Recognized Real-Time message
 }
 
-void ClientMidiEventController::handleStop(const ClientMidiEvent &e)
+void ClientMidiEventController::handleStop(const ClientMidiEvent &e) const
 {
     // Recognized Real-Time message
 }
 
-void ClientMidiEventController::handleContinue(const ClientMidiEvent &e)
+void ClientMidiEventController::handleContinue(const ClientMidiEvent &e) const
 {
     // Recognized Real-Time message
 }
 
-void ClientMidiEventController::handleLocalOnOff(const ClientMidiEvent &e)
+void ClientMidiEventController::handleLocalOnOff(const ClientMidiEvent &e) const
 {
     // Not recognized
 }
 
-void ClientMidiEventController::handleAllNotesOff(const ClientMidiEvent &e)
+void ClientMidiEventController::handleAllNotesOff(
+    const ClientMidiEvent &e) const
 {
     // Not recognized
 }
 
-void ClientMidiEventController::handleActiveSense(const ClientMidiEvent &e)
+void ClientMidiEventController::handleActiveSense(
+    const ClientMidiEvent &e) const
 {
     // Not recognized
 }
 
-void ClientMidiEventController::handleReset(const ClientMidiEvent &e)
+void ClientMidiEventController::handleReset(const ClientMidiEvent &e) const
 {
     // Not recognized
 }

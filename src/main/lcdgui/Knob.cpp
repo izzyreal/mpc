@@ -1,6 +1,6 @@
 #include "lcdgui/Knob.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 #include "Bressenham.hpp"
 
 using namespace mpc::lcdgui;

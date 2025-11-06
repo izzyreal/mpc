@@ -13,7 +13,7 @@ using namespace mpc::engine;
 using namespace std;
 
 MixerInterconnection::MixerInterconnection(
-    string name, mpc::engine::audio::server::AudioServer *server)
+    const string &name, mpc::engine::audio::server::AudioServer *server)
 {
     auto const sharedBuffer = server->createAudioBuffer(name);
     inputProcess = make_shared<InterconnectionInputProcess>(this, sharedBuffer);
@@ -40,12 +40,12 @@ void MixerInterconnection::setRightEnabled(bool b)
     rightEnabled = b;
 }
 
-bool MixerInterconnection::isLeftEnabled()
+bool MixerInterconnection::isLeftEnabled() const
 {
     return leftEnabled;
 }
 
-bool MixerInterconnection::isRightEnabled()
+bool MixerInterconnection::isRightEnabled() const
 {
     return rightEnabled;
 }

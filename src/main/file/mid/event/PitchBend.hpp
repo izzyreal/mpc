@@ -7,9 +7,9 @@ namespace mpc::file::mid::event
     {
 
     public:
-        int getLeastSignificantBits();
-        int getMostSignificantBits();
-        int getBendAmount();
+        int getLeastSignificantBits() const;
+        int getMostSignificantBits() const;
+        int getBendAmount() const;
         void setLeastSignificantBits(int p);
         void setMostSignificantBits(int p);
         void setBendAmount(int amount);

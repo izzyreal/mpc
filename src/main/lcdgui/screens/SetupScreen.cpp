@@ -2,7 +2,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-SetupScreen::SetupScreen(mpc::Mpc &mpc, const int layerIndex)
+SetupScreen::SetupScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "setup", layerIndex)
 {
     resetPreferences();
@@ -36,9 +36,9 @@ void SetupScreen::setDiskDevice(int i)
     displayDiskDevice();
 }
 
-void SetupScreen::displayDiskDevice() {}
+void SetupScreen::displayDiskDevice() const {}
 
-void SetupScreen::displayAutoLoadType() {}
+void SetupScreen::displayAutoLoadType() const {}
 
 void SetupScreen::resetPreferences()
 {

@@ -4,12 +4,12 @@
 
 using namespace mpc::file::mid::event::meta;
 
-InstrumentName::InstrumentName(int tick, int delta, std::string name)
+InstrumentName::InstrumentName(int tick, int delta, const std::string &name)
     : TextualMetaEvent(tick, delta, MetaEvent::INSTRUMENT_NAME, name)
 {
 }
 
-void InstrumentName::setName(std::string name)
+void InstrumentName::setName(const std::string &name)
 {
     setText(name);
 }

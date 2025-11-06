@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::dialog
 {
@@ -15,10 +15,10 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
 {
-    class SongScreen : public mpc::lcdgui::ScreenComponent
+    class SongScreen final : public ScreenComponent
     {
     public:
-        SongScreen(mpc::Mpc &mpc, int layerIndex);
+        SongScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void up() override;
@@ -32,8 +32,8 @@ namespace mpc::lcdgui::screens
         void setOffset(int i);
         void setDefaultSongName(const std::string &s);
         std::string getDefaultSongName();
-        int getOffset();
-        int getActiveSongIndex();
+        int getOffset() const;
+        int getActiveSongIndex() const;
 
     private:
         int offset = -1;
@@ -42,19 +42,19 @@ namespace mpc::lcdgui::screens
 
         void setActiveSongIndex(int i);
 
-        void displayTempo();
-        void displayLoop();
-        void displaySteps();
-        void displayTempoSource();
-        void displayNow0();
-        void displayNow1();
-        void displayNow2();
-        void displaySongName();
+        void displayTempo() const;
+        void displayLoop() const;
+        void displaySteps() const;
+        void displayTempoSource() const;
+        void displayNow0() const;
+        void displayNow1() const;
+        void displayNow2() const;
+        void displaySongName() const;
 
-        friend class mpc::lcdgui::screens::window::SongWindow;
-        friend class mpc::lcdgui::screens::dialog::DeleteSongScreen;
-        friend class mpc::lcdgui::screens::dialog::CopySongScreen;
-        friend class mpc::lcdgui::screens::window::NameScreen;
-        friend class mpc::lcdgui::screens::window::ConvertSongToSeqScreen;
+        friend class SongWindow;
+        friend class DeleteSongScreen;
+        friend class CopySongScreen;
+        friend class NameScreen;
+        friend class ConvertSongToSeqScreen;
     };
 } // namespace mpc::lcdgui::screens

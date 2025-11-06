@@ -1,9 +1,9 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class TrMoveScreen : public mpc::lcdgui::ScreenComponent
+    class TrMoveScreen final : public ScreenComponent
     {
 
     public:
@@ -14,25 +14,25 @@ namespace mpc::lcdgui::screens
         void right() override;
         void function(int i) override;
 
-        TrMoveScreen(mpc::Mpc &mpc, int layerIndex);
+        TrMoveScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
     private:
-        void displayTrLabels();
-        void displayTrFields();
-        void displaySq();
+        void displayTrLabels() const;
+        void displayTrFields() const;
+        void displaySq() const;
 
     private:
         int selectedTrackIndex = -1;
         int currentTrackIndex = 0;
 
     public:
-        bool isSelected();
+        bool isSelected() const;
         void goUp();
         void goDown();
         void select();
         void cancel();
-        void insert(mpc::sequencer::Sequence *s);
+        void insert(sequencer::Sequence *s);
     };
 } // namespace mpc::lcdgui::screens

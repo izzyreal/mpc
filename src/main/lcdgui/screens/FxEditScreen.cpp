@@ -7,15 +7,15 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-FxEditScreen::FxEditScreen(mpc::Mpc &mpc, const int layerIndex)
+FxEditScreen::FxEditScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "fx-edit", layerIndex)
 {
-    const int effectWidth = 30;
-    const int effectHeight = 14;
-    const int effectDistance = 5;
-    const int effectOffset = 42;
+    constexpr int effectWidth = 30;
+    constexpr int effectHeight = 14;
+    constexpr int effectDistance = 5;
+    constexpr int effectOffset = 42;
     // int effectY = 36; // when effect is off
-    const int effectY = 23; // when effect is on
+    constexpr int effectY = 23; // when effect is on
 
     for (int i = 0; i < 6; i++)
     {
@@ -74,7 +74,7 @@ void FxEditScreen::down()
     checkEffects();
 }
 
-std::vector<std::weak_ptr<Effect>> FxEditScreen::findEffects()
+std::vector<std::weak_ptr<Effect>> FxEditScreen::findEffects() const
 {
     std::vector<std::weak_ptr<Effect>> result;
 
@@ -90,7 +90,7 @@ std::vector<std::weak_ptr<Effect>> FxEditScreen::findEffects()
     return result;
 }
 
-void FxEditScreen::checkEffects()
+void FxEditScreen::checkEffects() const
 {
     /*
     std::string prevParam = param;
@@ -117,7 +117,7 @@ void FxEditScreen::checkEffects()
     */
 }
 
-void FxEditScreen::displayDrum()
+void FxEditScreen::displayDrum() const
 {
     const auto mixerSetupScreen =
         mpc.screens->get<ScreenId::MixerSetupScreen>();
@@ -125,12 +125,12 @@ void FxEditScreen::displayDrum()
         std::to_string(mixerSetupScreen->getFxDrum() + 1));
 }
 
-void FxEditScreen::displayPgm()
+void FxEditScreen::displayPgm() const
 {
     findField("pgm")->setText("foo");
 }
 
-void FxEditScreen::displayEdit()
+void FxEditScreen::displayEdit() const
 {
     findField("edit")->setText("foo");
 }

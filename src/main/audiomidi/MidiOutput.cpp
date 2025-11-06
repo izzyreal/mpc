@@ -9,14 +9,14 @@ MidiOutput::MidiOutput()
     queue = std::make_shared<MidiEventQueue>(100);
 }
 
-void MidiOutput::panic() {}
+void MidiOutput::panic() const {}
 
-void MidiOutput::enqueueEvent(MidiEventPtr e)
+void MidiOutput::enqueueEvent(const MidiEventPtr &e) const
 {
     queue->enqueue(e);
 }
 
-int MidiOutput::dequeue(std::vector<MidiEventPtr> &buf)
+int MidiOutput::dequeue(std::vector<MidiEventPtr> &buf) const
 {
     return queue->try_dequeue_bulk(buf.begin(), buf.size());
 }

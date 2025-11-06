@@ -11,13 +11,13 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-TransposePermanentScreen::TransposePermanentScreen(mpc::Mpc &mpc,
+TransposePermanentScreen::TransposePermanentScreen(Mpc &mpc,
                                                    const int layerIndex)
     : ScreenComponent(mpc, "transpose-permanent", layerIndex)
 {
 }
 
-void TransposePermanentScreen::function(int i)
+void TransposePermanentScreen::function(const int i)
 {
     ScreenComponent::function(i); // For closing this window
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::dialog
 {
@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::dialog
         void setSq0(int i);
         void setSq1(int i);
 
-        void displaySq0();
-        void displaySq1();
+        void displaySq0() const;
+        void displaySq1() const;
     };
 } // namespace mpc::lcdgui::screens::dialog

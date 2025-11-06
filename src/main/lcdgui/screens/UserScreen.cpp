@@ -3,7 +3,7 @@
 #include "Mpc.hpp"
 #include "lcdgui/screens/EventsScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
@@ -13,7 +13,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-UserScreen::UserScreen(mpc::Mpc &mpc, const int layerIndex)
+UserScreen::UserScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "user", layerIndex)
 {
     resetPreferences();
@@ -47,6 +47,7 @@ void UserScreen::function(int i)
             ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
         }
+        default:;
     }
 }
 
@@ -101,30 +102,34 @@ void UserScreen::turnWheel(int i)
         setVelo(velo + i);
     }
 }
+int UserScreen::getLastBar() const
+{
+    return lastBar;
+}
 
-void UserScreen::displayTempo()
+void UserScreen::displayTempo() const
 {
     findField("tempo")->setText(Util::tempoString(tempo));
 }
 
-void UserScreen::displayLoop()
+void UserScreen::displayLoop() const
 {
     findField("loop")->setText(loop ? "ON" : "OFF");
 }
 
-void UserScreen::displayTsig()
+void UserScreen::displayTsig() const
 {
     const auto numerator = std::to_string(timeSig.getNumerator());
     const auto denominator = std::to_string(timeSig.getDenominator());
     findField("tsig")->setText(numerator + "/" + denominator);
 }
 
-void UserScreen::displayBars()
+void UserScreen::displayBars() const
 {
     findField("bars")->setText(std::to_string(lastBar + 1));
 }
 
-void UserScreen::displayPgm()
+void UserScreen::displayPgm() const
 {
     if (pgm == 0)
     {
@@ -136,7 +141,7 @@ void UserScreen::displayPgm()
     }
 }
 
-void UserScreen::displayRecordingMode()
+void UserScreen::displayRecordingMode() const
 {
     findField("recordingmode")->setText(recordingModeMulti ? "M" : "S");
 }
@@ -147,7 +152,7 @@ void UserScreen::displayBus()
     displayDeviceName();
 }
 
-void UserScreen::displayDeviceNumber()
+void UserScreen::displayDeviceNumber() const
 {
     if (device == 0)
     {
@@ -166,7 +171,7 @@ void UserScreen::displayDeviceNumber()
     }
 }
 
-void UserScreen::displayVelo()
+void UserScreen::displayVelo() const
 {
     findField("velo")->setText(std::to_string(velo));
 }
@@ -311,7 +316,7 @@ std::string UserScreen::getTrackName(int i)
     return trackNames[i];
 }
 
-int8_t UserScreen::getTrackStatus()
+int8_t UserScreen::getTrackStatus() const
 {
     // This number is so magic that I forgot what it's for.
     return 6;

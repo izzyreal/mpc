@@ -22,7 +22,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 
 VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(
-    mpc::Mpc &mpc, const int layerIndex)
+    Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-direct-to-disk-recorder", layerIndex)
 {
 }
@@ -38,7 +38,7 @@ void VmpcDirectToDiskRecorderScreen::open()
     displayRate();
 }
 
-void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
+void VmpcDirectToDiskRecorderScreen::turnWheel(const int i)
 {
 
     const auto seq = sequencer->getSequence(sq).get();
@@ -73,7 +73,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
     }
 }
 
-void VmpcDirectToDiskRecorderScreen::function(int i)
+void VmpcDirectToDiskRecorderScreen::function(const int i)
 {
 
     switch (i)
@@ -243,7 +243,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
     }
 }
 
-void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate)
+void VmpcDirectToDiskRecorderScreen::setSampleRate(const int rate)
 {
     if (rate < 0 || rate > 2)
     {
@@ -254,7 +254,7 @@ void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate)
     displayRate();
 }
 
-void VmpcDirectToDiskRecorderScreen::setRecord(int i)
+void VmpcDirectToDiskRecorderScreen::setRecord(const int i)
 {
     if (i < 0 || i > 4)
     {
@@ -270,7 +270,7 @@ void VmpcDirectToDiskRecorderScreen::setRecord(int i)
     displayOffline();
 }
 
-void VmpcDirectToDiskRecorderScreen::setSq(int i)
+void VmpcDirectToDiskRecorderScreen::setSq(const int i)
 {
     if (i < 0 || i > 98)
     {
@@ -295,7 +295,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(int i)
     displaySq();
 }
 
-void VmpcDirectToDiskRecorderScreen::setSong(int i)
+void VmpcDirectToDiskRecorderScreen::setSong(const int i)
 {
     if (i < 0 || i > 4)
     {
@@ -306,20 +306,20 @@ void VmpcDirectToDiskRecorderScreen::setSong(int i)
     displaySong();
 }
 
-void VmpcDirectToDiskRecorderScreen::setOffline(bool b)
+void VmpcDirectToDiskRecorderScreen::setOffline(const bool b)
 {
     offline = b;
     displayOffline();
     displayRate();
 }
 
-void VmpcDirectToDiskRecorderScreen::setSplitLR(bool b)
+void VmpcDirectToDiskRecorderScreen::setSplitLR(const bool b)
 {
     splitStereoIntoLeftAndRightChannel = b;
     displaySplitLR();
 }
 
-void VmpcDirectToDiskRecorderScreen::displayRate()
+void VmpcDirectToDiskRecorderScreen::displayRate() const
 {
     findField("rate")->Hide(true);
     findLabel("rate")->Hide(true);
@@ -335,7 +335,7 @@ void VmpcDirectToDiskRecorderScreen::displayRate()
     //	findField("rate")->setText(rate);
 }
 
-void VmpcDirectToDiskRecorderScreen::displaySong()
+void VmpcDirectToDiskRecorderScreen::displaySong() const
 {
     findField("song")->Hide(record != 3);
     findLabel("song")->Hide(record != 3);
@@ -349,7 +349,7 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
         StrUtil::padLeft(std::to_string(song + 1), "0", 2) + "-" + songName);
 }
 
-void VmpcDirectToDiskRecorderScreen::displayOffline()
+void VmpcDirectToDiskRecorderScreen::displayOffline() const
 {
     findField("offline")->Hide(record == 4);
     findLabel("offline")->Hide(record == 4);
@@ -360,18 +360,18 @@ void VmpcDirectToDiskRecorderScreen::displayOffline()
     }
 }
 
-void VmpcDirectToDiskRecorderScreen::displaySplitLR()
+void VmpcDirectToDiskRecorderScreen::displaySplitLR() const
 {
     findField("split-lr")
         ->setText(splitStereoIntoLeftAndRightChannel ? "YES" : "NO");
 }
 
-void VmpcDirectToDiskRecorderScreen::displayRecord()
+void VmpcDirectToDiskRecorderScreen::displayRecord() const
 {
     findField("record")->setText(recordNames[record]);
 }
 
-void VmpcDirectToDiskRecorderScreen::displaySq()
+void VmpcDirectToDiskRecorderScreen::displaySq() const
 {
     const auto visible = (record >= 0 && record <= 2);
 
@@ -419,17 +419,17 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
                                       "0");
 }
 
-bool VmpcDirectToDiskRecorderScreen::isOffline()
+bool VmpcDirectToDiskRecorderScreen::isOffline() const
 {
     return offline;
 }
 
-int VmpcDirectToDiskRecorderScreen::getSampleRate()
+int VmpcDirectToDiskRecorderScreen::getSampleRate() const
 {
     return sampleRate;
 }
 
-int VmpcDirectToDiskRecorderScreen::getRecord()
+int VmpcDirectToDiskRecorderScreen::getRecord() const
 {
     return record;
 }

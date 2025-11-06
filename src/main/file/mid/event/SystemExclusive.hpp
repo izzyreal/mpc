@@ -25,8 +25,8 @@ namespace mpc::file::mid::event
         int getEventSize() override;
 
     public:
-        SystemExclusiveEvent(int type, int tick, std::vector<char> data);
+        SystemExclusiveEvent(int type, int tick, const std::vector<char> &data);
         SystemExclusiveEvent(int type, int tick, int delta,
-                             std::vector<char> data);
+                             const std::vector<char> &data);
     };
 } // namespace mpc::file::mid::event

@@ -293,7 +293,7 @@ bool DiskRecorder::stopEarly()
     return true;
 }
 
-void DiskRecorder::removeFilesIfEmpty()
+void DiskRecorder::removeFilesIfEmpty() const
 {
     const bool isStereo = outputFileFormat->getChannels() == 2;
 

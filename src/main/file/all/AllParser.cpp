@@ -19,7 +19,7 @@
 
 #include "file/ByteUtil.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::file::all;
 
@@ -172,37 +172,37 @@ std::vector<AllSequence *> AllParser::getAllSequences()
     return sequences;
 }
 
-Defaults *AllParser::getDefaults()
+Defaults *AllParser::getDefaults() const
 {
     return defaults;
 }
 
-mpc::file::all::AllSequencer *AllParser::getSequencer()
+mpc::file::all::AllSequencer *AllParser::getSequencer() const
 {
     return sequencer;
 }
 
-Count *AllParser::getCount()
+Count *AllParser::getCount() const
 {
     return count;
 }
 
-MidiInput *AllParser::getMidiInput()
+MidiInput *AllParser::getMidiInput() const
 {
     return midiInput;
 }
 
-MidiSyncMisc *AllParser::getMidiSync()
+MidiSyncMisc *AllParser::getMidiSync() const
 {
     return midiSyncMisc;
 }
 
-Misc *AllParser::getMisc()
+Misc *AllParser::getMisc() const
 {
     return misc;
 }
 
-SequenceNames *AllParser::getSeqNames()
+SequenceNames *AllParser::getSeqNames() const
 {
     return seqNames;
 }
@@ -213,7 +213,7 @@ std::vector<mpc::file::all::Song *> AllParser::getSongs()
 }
 
 std::vector<AllSequence *>
-AllParser::readSequences(std::vector<char> trimmedSeqsArray)
+AllParser::readSequences(const std::vector<char> &trimmedSeqsArray) const
 {
     const int totalSeqChunkLength = trimmedSeqsArray.size();
 
@@ -231,7 +231,6 @@ AllParser::readSequences(std::vector<char> trimmedSeqsArray)
 
     for (const auto &u : usednesses)
     {
-
         if (!u)
         {
             seqs.push_back(nullptr);

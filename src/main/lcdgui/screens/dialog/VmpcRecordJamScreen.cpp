@@ -24,7 +24,7 @@ void VmpcRecordJamScreen::function(const int i)
             break;
         case 4:
         {
-            const auto minutes = 60;
+            constexpr auto minutes = 60;
             const auto ams = mpc.getAudioMidiServices();
             const auto rate =
                 static_cast<int>(ams->getAudioServer()->getSampleRate());

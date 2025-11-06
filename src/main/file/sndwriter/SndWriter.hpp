@@ -27,17 +27,17 @@ namespace mpc::file::sndwriter
 
     private:
         void setValues();
-        void setName(std::string s);
-        void setMono(bool b);
-        void setFramesCount(int i);
-        void setSampleRate(int i);
-        void setLevel(int i);
-        void setStart(int i);
-        void setEnd(int i);
-        void setLoopLength(int i);
-        void setLoopEnabled(bool b);
-        void setTune(int i);
-        void setBeatCount(int i);
+        void setName(const std::string &s) const;
+        void setMono(bool b) const;
+        void setFramesCount(int i) const;
+        void setSampleRate(int i) const;
+        void setLevel(int i) const;
+        void setStart(int i) const;
+        void setEnd(int i) const;
+        void setLoopLength(int i) const;
+        void setLoopEnabled(bool b) const;
+        void setTune(int i) const;
+        void setBeatCount(int i) const;
         void setSampleData(const std::vector<float> &fa, bool b);
 
     public:

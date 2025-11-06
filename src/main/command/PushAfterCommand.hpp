@@ -26,9 +26,9 @@ namespace mpc::command
     {
     public:
         explicit PushAfterCommand(
-            std::shared_ptr<controller::ClientEventController>,
-            std::shared_ptr<lcdgui::LayeredScreen>,
-            std::shared_ptr<hardware::Hardware>);
+            const std::shared_ptr<controller::ClientEventController> &,
+            const std::shared_ptr<lcdgui::LayeredScreen> &,
+            const std::shared_ptr<hardware::Hardware> &);
 
         void execute() override;
 

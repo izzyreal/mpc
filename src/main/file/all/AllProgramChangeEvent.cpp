@@ -19,7 +19,7 @@ AllProgramChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char> AllProgramChangeEvent::mpcEventToBytes(
-    std::shared_ptr<ProgramChangeEvent> event)
+    const std::shared_ptr<ProgramChangeEvent> &event)
 {
     std::vector<char> bytes(8);
 

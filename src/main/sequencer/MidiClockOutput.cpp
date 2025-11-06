@@ -16,8 +16,9 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
 MidiClockOutput::MidiClockOutput(
-    Sequencer *sequencer, std::function<std::shared_ptr<Screens>()> getScreens,
-    std::function<bool()> isBouncing)
+    Sequencer *sequencer,
+    const std::function<std::shared_ptr<Screens>()> &getScreens,
+    const std::function<bool()> &isBouncing)
     : sequencer(sequencer), getScreens(getScreens), isBouncing(isBouncing)
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
@@ -28,7 +29,7 @@ MidiClockOutput::MidiClockOutput(
     // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
 
-void MidiClockOutput::sendMidiClockMsg(int frameIndex)
+void MidiClockOutput::sendMidiClockMsg(int frameIndex) const
 {
     /*
     auto clockMsg = std::make_shared<mpc::engine::midi::ShortMessage>();
@@ -51,7 +52,7 @@ void MidiClockOutput::sendMidiClockMsg(int frameIndex)
     */
 }
 
-void MidiClockOutput::sendMidiSyncMsg(unsigned char status)
+void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 {
     // midiSyncStartStopContinueMsg->setMessage(status);
 
@@ -90,7 +91,7 @@ void MidiClockOutput::processTempoChange()
 }
 
 void MidiClockOutput::enqueueEventAfterNFrames(
-    const std::function<void()> &event, unsigned long nFrames)
+    const std::function<void()> &event, unsigned long nFrames) const
 {
     EventAfterNFrames e;
     e.f = event;
@@ -98,7 +99,7 @@ void MidiClockOutput::enqueueEventAfterNFrames(
     eventQueue->enqueue(std::move(e));
 }
 
-void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock()
+void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
 {
     /*
     const auto durationToNextClockInFrames =
@@ -155,7 +156,7 @@ void MidiClockOutput::processEventsAfterNFrames()
 }
 
 void MidiClockOutput::processFrame(bool isRunningAtStartOfBuffer,
-                                   int frameIndex)
+                                   int frameIndex) const
 {
     /*
     lastProcessedFrameIsMidiClockLock = false;
@@ -213,7 +214,7 @@ void MidiClockOutput::processSampleRateChange()
     }
 }
 
-bool MidiClockOutput::isLastProcessedFrameMidiClockLock()
+bool MidiClockOutput::isLastProcessedFrameMidiClockLock() const
 {
     return lastProcessedFrameIsMidiClockLock;
 }

@@ -17,12 +17,12 @@ Controller::Controller(int tick, int delta, int channel, int controllerType,
 {
 }
 
-int Controller::getControllerType()
+int Controller::getControllerType() const
 {
     return mValue1;
 }
 
-int Controller::getValue()
+int Controller::getValue() const
 {
     return mValue2;
 }

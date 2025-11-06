@@ -50,7 +50,7 @@ EventHandler::EventHandler(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
     transposeCache.reserve(512);
 }
 
-void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
+void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
                                         Track *const track)
 {
     if (mpc.getSequencer()->isCountingIn())
@@ -243,7 +243,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> event,
 }
 
 void EventHandler::handleUnfinalizedNoteOn(
-    const std::shared_ptr<NoteOnEvent> noteOnEvent, Track *track,
+    const std::shared_ptr<NoteOnEvent> &noteOnEvent, Track *track,
     const std::optional<int> trackDevice,
     const std::optional<int> trackVelocityRatio,
     const std::optional<int> drumIndex)
@@ -289,7 +289,7 @@ void EventHandler::handleUnfinalizedNoteOn(
 
 // Input from physical pad releases
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
-    const std::shared_ptr<NoteOffEvent> noteOffEvent, Track *track,
+    const std::shared_ptr<NoteOffEvent> &noteOffEvent, Track *track,
     const std::optional<int> trackDevice, const std::optional<int> drumIndex)
 {
     assert(noteOffEvent);
@@ -334,7 +334,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
  * handleNoteEventMidiOut at the appropriate time.
  */
 void EventHandler::handleNoteEventMidiOut(
-    const std::shared_ptr<Event> event, Track *track, const int trackDevice,
+    const std::shared_ptr<Event> &event, Track *track, const int trackDevice,
     const std::optional<int> trackVelocityRatio)
 {
     assert(std::dynamic_pointer_cast<NoteOnEvent>(event) ||

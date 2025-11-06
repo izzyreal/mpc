@@ -2,7 +2,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-VerScreen::VerScreen(mpc::Mpc &mpc, const int layerIndex)
+VerScreen::VerScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "ver", layerIndex)
 {
 }

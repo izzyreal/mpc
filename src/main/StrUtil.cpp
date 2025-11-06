@@ -8,8 +8,8 @@
 
 using namespace mpc;
 
-std::string StrUtil::replaceAll(std::string str, char c,
-                                std::string replacement)
+std::string StrUtil::replaceAll(const std::string &str, char c,
+                                const std::string &replacement)
 {
     if (replacement.length() > 1)
     {
@@ -37,7 +37,7 @@ std::string StrUtil::replaceAll(std::string str, char c,
     return res;
 }
 
-bool StrUtil::eqIgnoreCase(std::string s1, std::string s2)
+bool StrUtil::eqIgnoreCase(const std::string &s1, const std::string &s2)
 {
     if (s1.length() != s2.length())
     {
@@ -53,7 +53,7 @@ bool StrUtil::eqIgnoreCase(std::string s1, std::string s2)
     return true;
 }
 
-std::string StrUtil::toUpper(std::string str)
+std::string StrUtil::toUpper(const std::string &str)
 {
     std::string res = str;
     for (int i = 0; i < res.length(); i++)
@@ -63,7 +63,7 @@ std::string StrUtil::toUpper(std::string str)
     return res;
 }
 
-std::string StrUtil::toLower(std::string str)
+std::string StrUtil::toLower(const std::string &str)
 {
     std::string res = str;
 
@@ -75,7 +75,7 @@ std::string StrUtil::toLower(std::string str)
     return res;
 }
 
-std::string StrUtil::padLeft(std::string str, std::string pad, int size)
+std::string StrUtil::padLeft(std::string str, const std::string &pad, int size)
 {
     if (str.length() >= size)
     {
@@ -99,7 +99,7 @@ std::string StrUtil::padLeft(std::string str, std::string pad, int size)
     return result;
 };
 
-std::string StrUtil::padRight(std::string str, std::string pad, int size)
+std::string StrUtil::padRight(std::string str, const std::string &pad, int size)
 {
     if (str.length() >= size)
     {

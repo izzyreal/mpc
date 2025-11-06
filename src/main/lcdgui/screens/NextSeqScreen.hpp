@@ -1,13 +1,13 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class NextSeqScreen : public mpc::lcdgui::ScreenComponent
+    class NextSeqScreen final : public ScreenComponent
     {
 
     public:
-        NextSeqScreen(mpc::Mpc &mpc, int layerIndex);
+        NextSeqScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -17,14 +17,14 @@ namespace mpc::lcdgui::screens
     private:
         bool selectNextSqFromScratch = true;
 
-        void displaySq();
-        void displayNextSq();
-        void displayNow0();
-        void displayNow1();
-        void displayNow2();
-        void displayTempo();
-        void displayTempoLabel();
-        void displayTempoSource();
-        void displayTiming();
+        void displaySq() const;
+        void displayNextSq() const;
+        void displayNow0() const;
+        void displayNow1() const;
+        void displayNow2() const;
+        void displayTempo() const;
+        void displayTempoLabel() const;
+        void displayTempoSource() const;
+        void displayTiming() const;
     };
 } // namespace mpc::lcdgui::screens

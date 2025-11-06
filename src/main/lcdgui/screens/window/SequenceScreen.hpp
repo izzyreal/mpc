@@ -1,15 +1,14 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class SequenceScreen : public mpc::lcdgui::ScreenComponent,
-                           public mpc::lcdgui::screens::OpensNameScreen
+    class SequenceScreen final : public ScreenComponent, public OpensNameScreen
     {
     public:
         void openNameScreen() override;
-        SequenceScreen(mpc::Mpc &mpc, int layerIndex);
+        SequenceScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void function(int i) override;

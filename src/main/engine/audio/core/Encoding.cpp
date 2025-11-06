@@ -3,7 +3,7 @@
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-Encoding::Encoding(string name)
+Encoding::Encoding(const string &name)
 {
     this->name = name;
 }

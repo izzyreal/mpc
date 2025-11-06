@@ -11,8 +11,8 @@ namespace mpc::lcdgui::screens::window
 
     public:
         void setIn(int in);
-        int getIn();
+        int getIn() const;
         void setTrack(int i);
-        int getTrack();
+        int getTrack() const;
     };
 } // namespace mpc::lcdgui::screens::window

@@ -1,26 +1,26 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include "Observer.hpp"
 
 namespace mpc::lcdgui::screens
 {
 
-    class OthersScreen : public mpc::lcdgui::ScreenComponent, public Observable
+    class OthersScreen final : public ScreenComponent, public Observable
     {
 
     private:
-        void displayTapAveraging();
+        void displayTapAveraging() const;
         int tapAveraging = 2;
         int contrast = 0;
 
     public:
         void setTapAveraging(int i);
-        int getTapAveraging();
+        int getTapAveraging() const;
         void setContrast(int i);
-        int getContrast();
+        int getContrast() const;
 
-        OthersScreen(mpc::Mpc &mpc, int layerIndex);
+        OthersScreen(Mpc &mpc, int layerIndex);
         void open() override;
         void function(int i) override;
         void turnWheel(int notch) override;

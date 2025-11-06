@@ -62,7 +62,7 @@ void CopyTrackScreen::setTr1(const int i)
     displayTr1();
 }
 
-void CopyTrackScreen::displayTr0()
+void CopyTrackScreen::displayTr0() const
 {
     const auto seq = sequencer->getActiveSequence();
     const auto tr0Name = seq->getTrack(tr0)->getName();
@@ -70,7 +70,7 @@ void CopyTrackScreen::displayTr0()
         StrUtil::padLeft(std::to_string(tr0 + 1), "0", 2) + "-" + tr0Name);
 }
 
-void CopyTrackScreen::displayTr1()
+void CopyTrackScreen::displayTr1() const
 {
     const auto seq = sequencer->getActiveSequence();
     const auto tr1Name = seq->getTrack(tr1)->getName();

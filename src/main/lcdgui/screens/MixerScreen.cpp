@@ -22,7 +22,7 @@ using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-MixerScreen::MixerScreen(mpc::Mpc &mpc, const int layerIndex)
+MixerScreen::MixerScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "mixer", layerIndex)
 {
     selection.set(0);
@@ -67,7 +67,7 @@ void MixerScreen::addMixerStrips()
     }
 }
 
-std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
+std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index) const
 {
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
@@ -93,7 +93,8 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
                : noteParameters->getStereoMixerChannel();
 }
 
-std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
+std::shared_ptr<IndivFxMixer>
+MixerScreen::getIndivFxMixerChannel(int index) const
 {
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
@@ -200,7 +201,7 @@ void MixerScreen::update(Observable *o, Message message)
     }
 }
 
-void MixerScreen::displayFunctionKeys()
+void MixerScreen::displayFunctionKeys() const
 {
     if (tab == 0)
     {
@@ -266,7 +267,7 @@ void MixerScreen::setTab(int i)
     displayFunctionKeys();
 }
 
-int MixerScreen::getTab()
+int MixerScreen::getTab() const
 {
     return tab;
 }
@@ -465,7 +466,7 @@ void MixerScreen::turnWheel(int i)
     }
 }
 
-void MixerScreen::recordMixerEvent(int pad, int param, int value)
+void MixerScreen::recordMixerEvent(int pad, int param, int value) const
 {
     const auto event = std::make_shared<MixerEvent>();
     sequencer->getActiveTrack()->addEvent(sequencer->getTickPosition(), event);
@@ -708,7 +709,7 @@ void MixerScreen::displayFxSendLevels()
     }
 }
 
-bool MixerScreen::stripHasStereoSound(int stripIndex)
+bool MixerScreen::stripHasStereoSound(int stripIndex) const
 {
     const auto program = getProgramOrThrow();
     const int bank =

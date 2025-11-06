@@ -11,7 +11,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+LoadASequenceScreen::LoadASequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "load-a-sequence", layerIndex)
 {
 }
@@ -48,7 +48,7 @@ void LoadASequenceScreen::open()
     displayLoadInto();
 }
 
-void LoadASequenceScreen::turnWheel(int i)
+void LoadASequenceScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -59,7 +59,7 @@ void LoadASequenceScreen::turnWheel(int i)
     }
 }
 
-void LoadASequenceScreen::function(int i)
+void LoadASequenceScreen::function(const int i)
 {
 
     switch (i)
@@ -76,7 +76,7 @@ void LoadASequenceScreen::function(int i)
     }
 }
 
-void LoadASequenceScreen::setLoadInto(int i)
+void LoadASequenceScreen::setLoadInto(const int i)
 {
     loadInto = std::clamp(i, 0, 98);
     displayLoadInto();

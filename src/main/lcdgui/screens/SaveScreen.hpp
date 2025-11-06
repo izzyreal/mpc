@@ -1,22 +1,22 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class SaveScreen : public mpc::lcdgui::ScreenComponent
+    class SaveScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
         void turnWheel(int i) override;
 
-        SaveScreen(mpc::Mpc &mpc, int layerIndex);
+        SaveScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void openWindow() override;
         void up() override;
 
-        unsigned char getProgramIndex();
+        unsigned char getProgramIndex() const;
 
     private:
         const std::vector<std::string> types{
@@ -29,11 +29,11 @@ namespace mpc::lcdgui::screens
         unsigned char programIndex = 0;
         void setType(int i);
 
-        void displayType();
-        void displayFile();
-        void displaySize();
-        void displayFree();
-        void displayDirectory();
+        void displayType() const;
+        void displayFile() const;
+        void displaySize() const;
+        void displayFree() const;
+        void displayDirectory() const;
         void displayDevice();
         void displayDeviceType();
     };

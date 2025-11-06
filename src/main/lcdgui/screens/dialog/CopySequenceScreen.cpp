@@ -92,14 +92,14 @@ void CopySequenceScreen::setSq1(int i)
     displaySq1();
 }
 
-void CopySequenceScreen::displaySq0()
+void CopySequenceScreen::displaySq0() const
 {
     const auto sq0Name = sequencer->getSequence(sq0)->getName();
     findField("sq0")->setText(
         StrUtil::padLeft(std::to_string(sq0 + 1), "0", 2) + "-" + sq0Name);
 }
 
-void CopySequenceScreen::displaySq1()
+void CopySequenceScreen::displaySq1() const
 {
     const auto sq1Name = sequencer->getSequence(sq1)->getName();
     findField("sq1")->setText(

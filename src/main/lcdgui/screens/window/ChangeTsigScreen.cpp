@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-ChangeTsigScreen::ChangeTsigScreen(mpc::Mpc &mpc, const int layerIndex)
+ChangeTsigScreen::ChangeTsigScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "change-tsig", layerIndex)
 {
 }
@@ -24,7 +24,7 @@ void ChangeTsigScreen::open()
     displayNewTsig();
 }
 
-void ChangeTsigScreen::function(int i)
+void ChangeTsigScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -55,7 +55,7 @@ void ChangeTsigScreen::function(int i)
     }
 }
 
-void ChangeTsigScreen::turnWheel(int i)
+void ChangeTsigScreen::turnWheel(const int i)
 {
 
     const auto seq = sequencer->getActiveSequence();
@@ -84,13 +84,13 @@ void ChangeTsigScreen::turnWheel(int i)
     }
 }
 
-void ChangeTsigScreen::displayBars()
+void ChangeTsigScreen::displayBars() const
 {
     findField("bar0")->setTextPadded(bar0 + 1);
     findField("bar1")->setTextPadded(bar1 + 1);
 }
 
-void ChangeTsigScreen::displayNewTsig()
+void ChangeTsigScreen::displayNewTsig() const
 {
     if (ls->getCurrentScreenName() == "delete-sequence")
     {
@@ -105,7 +105,7 @@ void ChangeTsigScreen::displayNewTsig()
     findField("newtsig")->setText(result);
 }
 
-void ChangeTsigScreen::setBar0(int i, int max)
+void ChangeTsigScreen::setBar0(const int i, const int max)
 {
     bar0 = std::clamp(i, 0, max);
 
@@ -117,7 +117,7 @@ void ChangeTsigScreen::setBar0(int i, int max)
     displayBars();
 }
 
-void ChangeTsigScreen::setBar1(int i, int max)
+void ChangeTsigScreen::setBar1(const int i, const int max)
 {
     bar1 = std::clamp(i, 0, max);
 

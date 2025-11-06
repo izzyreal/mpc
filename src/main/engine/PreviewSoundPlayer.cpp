@@ -67,13 +67,13 @@ void PreviewSoundPlayer::playSound(int soundNumber, int velocity,
                 mixer->getSharedBuffer()->getSampleRate(), 1);
 }
 
-void PreviewSoundPlayer::finishVoice()
+void PreviewSoundPlayer::finishVoice() const
 {
     voice->finish(); // stops voice immediately, without a short fade-out/decay
                      // time
 }
 
-void PreviewSoundPlayer::finishVoiceIfSoundIsLooping()
+void PreviewSoundPlayer::finishVoiceIfSoundIsLooping() const
 {
     if (!soundHasLoop)
     {
@@ -83,7 +83,7 @@ void PreviewSoundPlayer::finishVoiceIfSoundIsLooping()
     voice->startDecay();
 }
 
-void PreviewSoundPlayer::connectVoice()
+void PreviewSoundPlayer::connectVoice() const
 {
     mixer->getStrip("65")->setInputProcess(voice);
 }

@@ -17,7 +17,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-LoopScreen::LoopScreen(mpc::Mpc &mpc, const int layerIndex)
+LoopScreen::LoopScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "loop", layerIndex)
 {
     addChildT<Wave>()->setFine(false);
@@ -265,7 +265,7 @@ void LoopScreen::setSlider(int i)
     }
 }
 
-void LoopScreen::setSliderLoopTo(int i)
+void LoopScreen::setSliderLoopTo(int i) const
 {
     const auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
@@ -275,7 +275,7 @@ void LoopScreen::setSliderLoopTo(int i)
     setLoopTo(newLoopToValue);
 }
 
-void LoopScreen::setLoopTo(int newLoopToValue)
+void LoopScreen::setLoopTo(int newLoopToValue) const
 {
     const auto loopLengthIsFixed = loopLngthFix;
     const auto soundLengthIsFixed =
@@ -321,7 +321,7 @@ void LoopScreen::setLoopTo(int newLoopToValue)
 }
 
 // Adjusts the Loop To value if soundLengthIsFixed, else adjusts the End value
-void LoopScreen::setLength(int newLength)
+void LoopScreen::setLength(int newLength) const
 {
     const auto loopLengthIsFixed = loopLngthFix;
 
@@ -351,7 +351,7 @@ void LoopScreen::setLength(int newLength)
     }
 }
 
-void LoopScreen::setSliderLength(int i)
+void LoopScreen::setSliderLength(int i) const
 {
     const auto sound = sampler->getSound();
     const auto newLength = (int)((i / 124.0) * sound->getFrameCount());
@@ -460,7 +460,7 @@ void LoopScreen::pressEnter()
     }
 }
 
-void LoopScreen::displaySnd()
+void LoopScreen::displaySnd() const
 {
     const auto sound = sampler->getSound();
 
@@ -486,12 +486,12 @@ void LoopScreen::displaySnd()
     findField("snd")->setText(sampleName);
 }
 
-void LoopScreen::displayPlayX()
+void LoopScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
-void LoopScreen::displayTo()
+void LoopScreen::displayTo() const
 {
     if (sampler->getSoundCount() != 0)
     {
@@ -509,12 +509,12 @@ void LoopScreen::displayTo()
     }
 }
 
-void LoopScreen::displayEndLength()
+void LoopScreen::displayEndLength() const
 {
     findField("endlength")->setText(endSelected ? "  End" : "Lngth");
 }
 
-void LoopScreen::displayEndLengthValue()
+void LoopScreen::displayEndLengthValue() const
 {
     if (sampler->getSoundCount() == 0)
     {
@@ -529,7 +529,7 @@ void LoopScreen::displayEndLengthValue()
     findField("endlengthvalue")->setTextPadded(text, " ");
 }
 
-void LoopScreen::displayLoop()
+void LoopScreen::displayLoop() const
 {
     if (sampler->getSoundCount() == 0)
     {

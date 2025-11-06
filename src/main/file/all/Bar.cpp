@@ -23,12 +23,12 @@ Bar::Bar(int ticksPerBeat, int lastTick)
     saveBytes[3] = static_cast<int8_t>(((lastTick - intVal) / 65536));
 }
 
-int Bar::getTicksPerBeat()
+int Bar::getTicksPerBeat() const
 {
     return ticksPerBeat;
 }
 
-int Bar::getDenominator()
+int Bar::getDenominator() const
 {
     auto result = 0;
     switch (ticksPerBeat)
@@ -50,12 +50,12 @@ int Bar::getDenominator()
     return result;
 }
 
-int Bar::getNumerator()
+int Bar::getNumerator() const
 {
     return barLength / ticksPerBeat;
 }
 
-int Bar::getLastTick()
+int Bar::getLastTick() const
 {
     return lastTick;
 }

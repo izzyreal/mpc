@@ -9,7 +9,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-TrackScreen::TrackScreen(mpc::Mpc &mpc, const int layerIndex)
+TrackScreen::TrackScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "track", layerIndex)
 {
 }
@@ -28,7 +28,7 @@ void TrackScreen::open()
     findLabel("defaultnamerest")->setText(defaultTrackName.substr(1));
 }
 
-void TrackScreen::function(int i)
+void TrackScreen::function(const int i)
 {
     ScreenComponent::function(i);
     switch (i)
@@ -54,7 +54,7 @@ void TrackScreen::openNameScreen()
         initialNameScreenName =
             sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex());
 
-        enterAction = [this](std::string &nameScreenName)
+        enterAction = [this](const std::string &nameScreenName)
         {
             sequencer->setDefaultTrackName(nameScreenName,
                                            sequencer->getActiveTrackIndex());
@@ -72,7 +72,7 @@ void TrackScreen::openNameScreen()
 
         initialNameScreenName = track->getName();
 
-        enterAction = [this, track](std::string &newName)
+        enterAction = [this, track](const std::string &newName)
         {
             track->setName(newName);
             openScreenById(ScreenId::SequencerScreen);

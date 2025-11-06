@@ -16,11 +16,11 @@ namespace mpc::engine::audio::mixer
         mpc::engine::control::EnumControl *
         createRouteControl(int stripId) override;
 
-        mpc::engine::control::EnumControl *getRouteControl();
+        mpc::engine::control::EnumControl *getRouteControl() const;
 
     public:
         MainMixControls(MixerControls *mixerControls, int stripId,
-                        std::shared_ptr<BusControls> busControls,
+                        const std::shared_ptr<BusControls> &busControls,
                         bool isMaster);
     };
 

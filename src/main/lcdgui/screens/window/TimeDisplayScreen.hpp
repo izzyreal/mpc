@@ -1,35 +1,35 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class TimeDisplayScreen : public mpc::lcdgui::ScreenComponent
+    class TimeDisplayScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
     public:
-        TimeDisplayScreen(mpc::Mpc &mpc, int layerIndex);
+        TimeDisplayScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
 
     private:
-        void displayDisplayStyle();
-        void displayStartTime();
-        void displayFrameRate();
+        void displayDisplayStyle() const;
+        void displayStartTime() const;
+        void displayFrameRate() const;
 
     public:
         void setFrameRate(int i);
         void setDisplayStyle(int i);
-        void setHours(int i);
-        void setMinutes(int i);
-        void setSeconds(int i);
-        void setFrames(int i);
-        void setFrameDecimals(int i);
-        int getDisplayStyle();
+        void setHours(int i) const;
+        void setMinutes(int i) const;
+        void setSeconds(int i) const;
+        void setFrames(int i) const;
+        void setFrameDecimals(int i) const;
+        int getDisplayStyle() const;
 
     private:
         std::vector<std::string> displayStyleNames{"BAR,BEAT,CLOCK",

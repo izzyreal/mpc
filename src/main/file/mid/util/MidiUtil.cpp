@@ -2,7 +2,7 @@
 
 using namespace mpc::file::mid::util;
 
-int MidiUtil::bytesToInt(std::vector<char> buff, int off, int len)
+int MidiUtil::bytesToInt(const std::vector<char> &buff, int off, int len)
 {
     int num = 0;
     int shift = 0;
@@ -32,8 +32,8 @@ std::vector<char> MidiUtil::intToBytes(int val, int byteCount)
     return buffer;
 }
 
-bool MidiUtil::bytesEqual(std::vector<char> buf1, std::vector<char> buf2,
-                          int off, int len)
+bool MidiUtil::bytesEqual(const std::vector<char> &buf1,
+                          const std::vector<char> &buf2, int off, int len)
 {
     for (int i = off; i < off + len; i++)
     {
@@ -62,7 +62,7 @@ std::string MidiUtil::byteToHex(char b)
     return res;
 }
 
-std::string MidiUtil::bytesToHex(std::vector<char> b)
+std::string MidiUtil::bytesToHex(const std::vector<char> &b)
 {
     std::string res = "";
     for (int i = 0; i < b.size(); i++)

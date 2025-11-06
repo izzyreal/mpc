@@ -1,11 +1,11 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/screens/WithTimesAndNotes.hpp>
+#include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/WithTimesAndNotes.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class TimingCorrectScreen : public mpc::lcdgui::ScreenComponent,
-                                public mpc::lcdgui::screens::WithTimesAndNotes
+    class TimingCorrectScreen final : public ScreenComponent,
+                                      public WithTimesAndNotes
     {
 
     public:
@@ -14,15 +14,15 @@ namespace mpc::lcdgui::screens::window
 
         void setNote0(int i) override;
 
-        TimingCorrectScreen(mpc::Mpc &mpc, int layerIndex);
+        TimingCorrectScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
     private:
         void displayNoteValue();
-        void displaySwing();
-        void displayShiftTiming();
-        void displayAmount();
+        void displaySwing() const;
+        void displayShiftTiming() const;
+        void displayAmount() const;
 
     protected:
         void displayNotes() override;
@@ -39,12 +39,12 @@ namespace mpc::lcdgui::screens::window
         int noteValue = 3;
 
     public:
-        unsigned char getNoteValueLengthInTicks();
-        int getNoteValue();
+        unsigned char getNoteValueLengthInTicks() const;
+        int getNoteValue() const;
         void setNoteValue(int i);
-        int getSwing();
-        int getAmount();
-        int isShiftTimingLater();
+        int getSwing() const;
+        int getAmount() const;
+        int isShiftTimingLater() const;
 
     private:
         void setAmount(int i);

@@ -7,7 +7,7 @@
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/SeqUtil.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include <StrUtil.hpp>
 
@@ -16,12 +16,12 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-EditVelocityScreen::EditVelocityScreen(mpc::Mpc &mpc, const int layerIndex)
+EditVelocityScreen::EditVelocityScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-velocity", layerIndex)
 {
 }
 
-void EditVelocityScreen::setNote0(int i)
+void EditVelocityScreen::setNote0(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -61,7 +61,7 @@ void EditVelocityScreen::open()
     displayNotes();
 }
 
-void EditVelocityScreen::function(int i)
+void EditVelocityScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -103,7 +103,7 @@ void EditVelocityScreen::function(int i)
     }
 }
 
-void EditVelocityScreen::turnWheel(int i)
+void EditVelocityScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -146,10 +146,10 @@ void EditVelocityScreen::displayNotes()
         findField("note1")->Hide(false);
         findField("note0")->setText(
             StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-            mpc::Util::noteNames()[note0] + u8"\u00D4");
+            Util::noteNames()[note0] + u8"\u00D4");
         findField("note1")->setText(
             StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-            mpc::Util::noteNames()[note1] + u8"\u00D4");
+            Util::noteNames()[note1] + u8"\u00D4");
     }
     else
     {
@@ -172,24 +172,24 @@ void EditVelocityScreen::displayNotes()
     }
 }
 
-void EditVelocityScreen::setEditType(int i)
+void EditVelocityScreen::setEditType(const int i)
 {
     editType = std::clamp(i, 0, 3);
     displayEditType();
 }
 
-void EditVelocityScreen::setValue(int i)
+void EditVelocityScreen::setValue(const int i)
 {
     value = std::clamp(i, 1, editType == 2 ? 200 : 127);
     displayValue();
 }
 
-void EditVelocityScreen::displayValue()
+void EditVelocityScreen::displayValue() const
 {
     findField("value")->setText(std::to_string(value));
 }
 
-void EditVelocityScreen::displayEditType()
+void EditVelocityScreen::displayEditType() const
 {
     findField("edittype")->setText(editTypeNames[editType]);
 }

@@ -21,62 +21,62 @@ SndReader::SndReader(const std::vector<char> &loadBytes)
     sndHeaderReader = std::make_shared<SndHeaderReader>(this);
 }
 
-bool SndReader::isHeaderValid()
+bool SndReader::isHeaderValid() const
 {
     return sndHeaderReader->hasValidId();
 }
 
-std::string SndReader::getName()
+std::string SndReader::getName() const
 {
     return sndHeaderReader->getName();
 }
 
-bool SndReader::isMono()
+bool SndReader::isMono() const
 {
     return sndHeaderReader->isMono();
 }
 
-int SndReader::getSampleRate()
+int SndReader::getSampleRate() const
 {
     return sndHeaderReader->getSampleRate();
 }
 
-int SndReader::getLevel()
+int SndReader::getLevel() const
 {
     return sndHeaderReader->getLevel();
 }
 
-int SndReader::getStart()
+int SndReader::getStart() const
 {
     return sndHeaderReader->getStart();
 }
 
-int SndReader::getEnd()
+int SndReader::getEnd() const
 {
     return sndHeaderReader->getEnd();
 }
 
-int SndReader::getLoopLength()
+int SndReader::getLoopLength() const
 {
     return sndHeaderReader->getLoopLength();
 }
 
-bool SndReader::isLoopEnabled()
+bool SndReader::isLoopEnabled() const
 {
     return sndHeaderReader->isLoopEnabled();
 }
 
-int SndReader::getTune()
+int SndReader::getTune() const
 {
     return sndHeaderReader->getTune();
 }
 
-int SndReader::getNumberOfBeats()
+int SndReader::getNumberOfBeats() const
 {
     return sndHeaderReader->getNumberOfBeats();
 }
 
-void SndReader::readData(std::shared_ptr<std::vector<float>> dest)
+void SndReader::readData(const std::shared_ptr<std::vector<float>> &dest)
 {
     int length = sndHeaderReader->getNumberOfFrames();
 

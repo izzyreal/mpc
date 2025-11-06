@@ -15,7 +15,7 @@ void StereoMixer::setPanning(int i)
     panning = std::clamp(i, 0, 100);
 }
 
-int StereoMixer::getPanning()
+int StereoMixer::getPanning() const
 {
     return panning;
 }
@@ -25,7 +25,7 @@ void StereoMixer::setLevel(int i)
     level = std::clamp(i, 0, 100);
 }
 
-int StereoMixer::getLevel()
+int StereoMixer::getLevel() const
 {
     return level;
 }

@@ -24,20 +24,20 @@ namespace mpc::sequencer
 
     public:
         void setLoopEnabled(bool b);
-        bool isLoopEnabled();
+        bool isLoopEnabled() const;
         void setFirstStep(int i);
-        int getFirstStep();
+        int getFirstStep() const;
         void setLastStep(int i);
-        int getLastStep();
-        void setName(std::string string);
+        int getLastStep() const;
+        void setName(const std::string &string);
         std::string getName();
         void deleteStep(int stepIndex);
         void insertStep(int stepIndex);
 
     public:
         std::weak_ptr<Step> getStep(int i);
-        int getStepCount();
-        bool isUsed();
+        int getStepCount() const;
+        bool isUsed() const;
         void setUsed(bool b);
     };
 } // namespace mpc::sequencer

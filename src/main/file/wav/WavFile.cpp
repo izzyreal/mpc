@@ -13,12 +13,12 @@ const int WavFile::DATA_CHUNK_ID;
 const int WavFile::RIFF_CHUNK_ID;
 const int WavFile::RIFF_TYPE_ID;
 
-int WavFile::getNumChannels()
+int WavFile::getNumChannels() const
 {
     return numChannels;
 }
 
-int WavFile::getNumSampleLoops()
+int WavFile::getNumSampleLoops() const
 {
     return numSampleLoops;
 }
@@ -28,22 +28,22 @@ SampleLoop &WavFile::getSampleLoop()
     return sampleLoop;
 }
 
-unsigned long WavFile::getNumFrames()
+unsigned long WavFile::getNumFrames() const
 {
     return numFrames;
 }
 
-int WavFile::getSampleRate()
+int WavFile::getSampleRate() const
 {
     return sampleRate;
 }
 
-int WavFile::getValidBits()
+int WavFile::getValidBits() const
 {
     return validBits;
 }
 
-WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream,
+WavFile WavFile::writeWavStream(const std::shared_ptr<std::ostream> &_ostream,
                                 int numChannels, int numFrames, int validBits,
                                 int sampleRate)
 {
@@ -131,7 +131,8 @@ WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream,
     return result;
 }
 
-wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
+wav_or_error
+WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
 {
     auto result = std::make_shared<WavFile>();
     result->numSampleLoops = 0;
@@ -445,7 +446,7 @@ int WavFile::writeFrames(const std::vector<float> &sampleBuffer,
     return numFramesToWrite;
 }
 
-void WavFile::close()
+void WavFile::close() const
 {
     auto ofStream = std::dynamic_pointer_cast<std::ofstream>(oStream);
     if (ofStream && ofStream->is_open())

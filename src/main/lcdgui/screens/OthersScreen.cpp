@@ -2,7 +2,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-OthersScreen::OthersScreen(mpc::Mpc &mpc, const int layerIndex)
+OthersScreen::OthersScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "others", layerIndex)
 {
 }
@@ -12,7 +12,7 @@ void OthersScreen::open()
     displayTapAveraging();
 }
 
-void OthersScreen::displayTapAveraging()
+void OthersScreen::displayTapAveraging() const
 {
     findField("tapaveraging")->setText(std::to_string(tapAveraging));
 }
@@ -27,7 +27,7 @@ void OthersScreen::setTapAveraging(int i)
     displayTapAveraging();
 }
 
-int OthersScreen::getTapAveraging()
+int OthersScreen::getTapAveraging() const
 {
     return tapAveraging;
 }
@@ -42,7 +42,7 @@ void OthersScreen::setContrast(int i)
     notifyObservers(std::string("contrast"));
 }
 
-int OthersScreen::getContrast()
+int OthersScreen::getContrast() const
 {
     return contrast;
 }

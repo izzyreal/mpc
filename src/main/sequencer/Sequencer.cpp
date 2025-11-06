@@ -295,7 +295,7 @@ double Sequencer::getTempo()
             getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
         if (seq->isTempoChangeOn() ||
-            (songMode && !ignoreTempoChangeScreen->ignore))
+            (songMode && !ignoreTempoChangeScreen->getIgnore()))
         {
             if (tce)
             {

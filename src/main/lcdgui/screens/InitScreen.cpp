@@ -6,7 +6,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-InitScreen::InitScreen(mpc::Mpc &mpc, const int layerIndex)
+InitScreen::InitScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "init", layerIndex)
 {
 }

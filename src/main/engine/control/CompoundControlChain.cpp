@@ -6,7 +6,7 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-CompoundControlChain::CompoundControlChain(int id, string name)
+CompoundControlChain::CompoundControlChain(int id, const string &name)
     : CompoundControl(id, name)
 {
 }

@@ -43,7 +43,7 @@ uint32_t MonoResampler::wrapUpAndGetRemainder(std::vector<float> &output)
     return data.output_frames_gen;
 }
 
-void MonoResampler::reset()
+void MonoResampler::reset() const
 {
     src_reset(state);
 }

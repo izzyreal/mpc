@@ -16,7 +16,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-InsertEventScreen::InsertEventScreen(mpc::Mpc &mpc, const int layerIndex)
+InsertEventScreen::InsertEventScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "insert-event", layerIndex)
 {
 }
@@ -27,12 +27,12 @@ void InsertEventScreen::open()
     displayInsertEventType();
 }
 
-void InsertEventScreen::displayInsertEventType()
+void InsertEventScreen::displayInsertEventType() const
 {
     findField("eventtype")->setText(eventTypeNames[insertEventType]);
 }
 
-void InsertEventScreen::function(int i)
+void InsertEventScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -46,13 +46,13 @@ void InsertEventScreen::function(int i)
     }
 }
 
-void InsertEventScreen::insertEvent()
+void InsertEventScreen::insertEvent() const
 {
     const auto track = sequencer->getActiveTrack();
 
     if (insertEventType == 0)
     {
-        const bool allowMultipleNotesOnSameTick = true;
+        constexpr bool allowMultipleNotesOnSameTick = true;
         const auto noteEvent = std::make_shared<NoteOnEvent>();
         track->addEvent(sequencer->getTickPosition(), noteEvent,
                         allowMultipleNotesOnSameTick);
@@ -116,7 +116,7 @@ void InsertEventScreen::insertEvent()
     }
 }
 
-void InsertEventScreen::turnWheel(int i)
+void InsertEventScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -126,13 +126,13 @@ void InsertEventScreen::turnWheel(int i)
     }
 }
 
-void InsertEventScreen::setInsertEventType(int i)
+void InsertEventScreen::setInsertEventType(const int i)
 {
     insertEventType = std::clamp(i, 0, 7);
     displayInsertEventType();
 }
 
-bool InsertEventScreen::isEventAddedBeforeLeavingTheScreen()
+bool InsertEventScreen::isEventAddedBeforeLeavingTheScreen() const
 {
     return eventAddedBeforeLeavingTheScreen;
 }

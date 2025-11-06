@@ -8,7 +8,7 @@
 
 using namespace mpc::file::mid::event::meta;
 
-FrameRate::FrameRate(std::string name, int ordinal, int v)
+FrameRate::FrameRate(const std::string &name, int ordinal, int v)
 {
     this->name = name;
     this->ordinal = ordinal;
@@ -37,7 +37,7 @@ FrameRate *FrameRate::fromInt(int val)
     return nullptr;
 }
 
-FrameRate *FrameRate::valueOf(std::string a0)
+FrameRate *FrameRate::valueOf(const std::string &a0)
 {
     if (FRAME_RATE_24->name == a0)
     {

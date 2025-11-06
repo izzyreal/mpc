@@ -23,7 +23,7 @@ namespace mpc::engine::audio::mixer
         float smoothingFactor{0.05f};
 
     public:
-        float getSmoothingFactor();
+        float getSmoothingFactor() const;
 
         void createAuxBusControls(std::string name);
 
@@ -34,20 +34,20 @@ namespace mpc::engine::audio::mixer
         std::vector<std::shared_ptr<BusControls>> getAuxBusControls();
 
         std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
-        createStripControls(int id, std::string name);
+        createStripControls(int id, const std::string &name);
 
         std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
         createStripControls(int id, std::string name, bool hasMixControls);
 
-        void addStripControls(std::shared_ptr<CompoundControl> cc);
+        void addStripControls(const std::shared_ptr<CompoundControl> &cc);
 
         std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
-        getStripControls(std::string name);
+        getStripControls(const std::string &name);
 
-        mpc::engine::FaderControl *createFaderControl();
+        mpc::engine::FaderControl *createFaderControl() const;
 
     public:
-        MixerControls(std::string name, std::string mainBusName);
+        MixerControls(const std::string &name, std::string mainBusName);
 
         MixerControls(std::string name) : MixerControls(std::move(name), "Main")
         {

@@ -1,40 +1,17 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-
-namespace mpc::lcdgui::screens::window
-{
-    class NameScreen;
-}
-
-namespace mpc::lcdgui::screens
-{
-    class LoadScreen;
-    class SaveScreen;
-} // namespace mpc::lcdgui::screens
-
-namespace mpc::lcdgui::screens::dialog2
-{
-    class DeleteAllFilesScreen;
-}
-
-namespace mpc::lcdgui::screens::dialog
-{
-    class DeleteFileScreen;
-    class DeleteFolderScreen;
-} // namespace mpc::lcdgui::screens::dialog
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::disk
 {
-    class AbstractDisk;
     class MpcFile;
 } // namespace mpc::disk
 
 namespace mpc::lcdgui::screens::window
 {
-    class DirectoryScreen : public mpc::lcdgui::ScreenComponent
+    class DirectoryScreen final : public ScreenComponent
     {
     public:
-        DirectoryScreen(mpc::Mpc &mpc, int layerIndex);
+        DirectoryScreen(Mpc &mpc, int layerIndex);
 
         void function(int f) override;
         void left() override;
@@ -44,37 +21,31 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void open() override;
 
-    private:
-        int xPos = 0;
+        void findYOffset0();
+        void setYOffset1(int i);
+        int getYOffset1() const;
+        std::shared_ptr<disk::MpcFile> getSelectedFile();
         int yPos0 = 0;
         int yOffset0 = 0;
         int yOffset1 = 0;
 
+    private:
+        int xPos = 0;
+
         void setFunctionKeys();
-        std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
-        std::shared_ptr<mpc::disk::MpcFile> getFileFromGrid(int x, int y);
+        std::shared_ptr<disk::MpcFile> getFileFromGrid(int x, int y) const;
         void displayLeftFields();
         void displayRightFields();
-        void refreshFocus();
+        void refreshFocus() const;
 
-        std::vector<std::string> getFirstColumn();
-        std::vector<std::string> getSecondColumn();
-        int getXPos();
-        int getYpos0();
-        void findYOffset0();
+        std::vector<std::string> getFirstColumn() const;
+        std::vector<std::string> getSecondColumn() const;
+        int getXPos() const;
         void setYOffset0(int i);
-        void setYOffset1(int i);
         void setYPos0(int i);
-        std::string padFileName(const std::string &s, const std::string &pad);
+        std::string padFileName(const std::string &s,
+                                const std::string &pad) const;
         void drawGraphicsLeft();
         void drawGraphicsRight();
-
-        friend class mpc::disk::AbstractDisk;
-        friend class mpc::lcdgui::screens::LoadScreen;
-        friend class mpc::lcdgui::screens::SaveScreen;
-        friend class mpc::lcdgui::screens::window::NameScreen;
-        friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
-        friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
-        friend class mpc::lcdgui::screens::dialog::DeleteFolderScreen;
     };
 } // namespace mpc::lcdgui::screens::window

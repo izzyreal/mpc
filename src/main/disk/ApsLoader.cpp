@@ -34,7 +34,7 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::aps;
 
-void ApsLoader::load(mpc::Mpc &mpc, std::shared_ptr<MpcFile> file)
+void ApsLoader::load(mpc::Mpc &mpc, const std::shared_ptr<MpcFile> &file)
 {
     if (!file->exists())
     {
@@ -286,8 +286,9 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
     pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
 
-void ApsLoader::loadSound(mpc::Mpc &mpc, std::string soundFileName,
-                          std::string ext, std::weak_ptr<MpcFile> _soundFile,
+void ApsLoader::loadSound(mpc::Mpc &mpc, const std::string &soundFileName,
+                          const std::string &ext,
+                          const std::weak_ptr<MpcFile> &_soundFile,
                           bool headless)
 {
     auto soundFile = _soundFile.lock();
@@ -316,8 +317,8 @@ void ApsLoader::loadSound(mpc::Mpc &mpc, std::string soundFileName,
     }
 }
 
-void ApsLoader::showPopup(mpc::Mpc &mpc, std::string name, std::string ext,
-                          int sampleSize)
+void ApsLoader::showPopup(mpc::Mpc &mpc, const std::string &name,
+                          const std::string &ext, int sampleSize)
 {
     std::string msg =
         "LOADING " +
@@ -326,7 +327,8 @@ void ApsLoader::showPopup(mpc::Mpc &mpc, std::string name, std::string ext,
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
+void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc,
+                                    const std::string &soundFileName)
 {
     auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;

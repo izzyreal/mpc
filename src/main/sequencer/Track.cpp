@@ -33,23 +33,26 @@ using namespace mpc::lcdgui::screens::window;
 
 Track::Track(
     const int trackIndex, Sequence *parent,
-    std::function<std::string(int)> getDefaultTrackName,
-    std::function<int64_t()> getTickPosition,
-    std::function<std::shared_ptr<Screens>()> getScreens,
-    std::function<bool()> isRecordingModeMulti,
-    std::function<std::shared_ptr<Sequence>()> getActiveSequence,
-    std::function<int()> getAutoPunchMode,
-    std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
-    std::function<bool()> isEraseButtonPressed,
-    std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
-    std::shared_ptr<sampler::Sampler> sampler,
-    std::shared_ptr<audiomidi::EventHandler> eventHandler,
-    std::function<bool()> isSixteenLevelsEnabled,
-    std::function<int()> getActiveTrackIndex, std::function<bool()> isRecording,
-    std::function<bool()> isOverdubbing, std::function<bool()> isPunchEnabled,
-    std::function<int64_t()> getPunchInTime,
-    std::function<int64_t()> getPunchOutTime,
-    std::function<bool()> isSoloEnabled)
+    const std::function<std::string(int)> &getDefaultTrackName,
+    const std::function<int64_t()> &getTickPosition,
+    const std::function<std::shared_ptr<Screens>()> &getScreens,
+    const std::function<bool()> &isRecordingModeMulti,
+    const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
+    const std::function<int()> &getAutoPunchMode,
+    const std::function<std::shared_ptr<Bus>(int)> &getSequencerBus,
+    const std::function<bool()> &isEraseButtonPressed,
+    const std::function<bool(int, std::shared_ptr<Program>)>
+        &isProgramPadPressed,
+    const std::shared_ptr<sampler::Sampler> &sampler,
+    const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
+    const std::function<bool()> &isSixteenLevelsEnabled,
+    const std::function<int()> &getActiveTrackIndex,
+    const std::function<bool()> &isRecording,
+    const std::function<bool()> &isOverdubbing,
+    const std::function<bool()> &isPunchEnabled,
+    const std::function<int64_t()> &getPunchInTime,
+    const std::function<int64_t()> &getPunchOutTime,
+    const std::function<bool()> &isSoloEnabled)
     : trackIndex(trackIndex), parent(parent),
       getDefaultTrackName(getDefaultTrackName),
       getTickPosition(getTickPosition), getScreens(getScreens),
@@ -123,7 +126,7 @@ void Track::move(int tick, int oldTick)
     }
 }
 
-std::shared_ptr<NoteOnEvent> Track::getNoteEvent(int tick, int note)
+std::shared_ptr<NoteOnEvent> Track::getNoteEvent(int tick, int note) const
 {
     for (auto &e : events)
     {
@@ -141,12 +144,12 @@ void Track::setTrackIndex(int i)
     trackIndex = i;
 }
 
-int Track::getIndex()
+int Track::getIndex() const
 {
     return trackIndex;
 }
 
-void Track::flushNoteCache()
+void Track::flushNoteCache() const
 {
     std::shared_ptr<NoteOnEvent> e1;
     std::shared_ptr<NoteOffEvent> e2;
@@ -198,7 +201,8 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note,
     return onEvent;
 }
 
-void Track::finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent> &event)
+void Track::finalizeNoteEventASync(
+    const std::shared_ptr<NoteOnEvent> &event) const
 {
     auto offEvent = event->getNoteOff();
     offEvent->setTick(-2);
@@ -226,7 +230,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note,
 }
 
 bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
-                                    int duration)
+                                    int duration) const
 {
     auto old_duration = event->getDuration();
     event->setDuration(duration);
@@ -324,7 +328,7 @@ void Track::setVelocityRatio(int i)
     velocityRatio = i;
 }
 
-int Track::getVelocityRatio()
+int Track::getVelocityRatio() const
 {
     return velocityRatio;
 }
@@ -339,7 +343,7 @@ void Track::setProgramChange(int i)
     programChange = i;
 }
 
-int Track::getProgramChange()
+int Track::getProgramChange() const
 {
     return programChange;
 }
@@ -354,7 +358,7 @@ void Track::setBusNumber(int i)
     busNumber = i;
 }
 
-int Track::getBus()
+int Track::getBus() const
 {
     return busNumber;
 }
@@ -369,7 +373,7 @@ void Track::setDeviceIndex(int i)
     device = i;
 }
 
-int Track::getDeviceIndex()
+int Track::getDeviceIndex() const
 {
     return device;
 }
@@ -379,7 +383,7 @@ std::shared_ptr<Event> Track::getEvent(int i)
     return events[i];
 }
 
-void Track::setName(std::string s)
+void Track::setName(const std::string &s)
 {
     name = s;
 }
@@ -709,18 +713,18 @@ void Track::playNext()
     eventIndex++;
 }
 
-bool Track::isOn()
+bool Track::isOn() const
 {
     return on;
 }
 
-bool Track::isUsed()
+bool Track::isUsed() const
 {
     return used || !events.empty();
 }
 
 std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick,
-                                                         int endTick)
+                                                         int endTick) const
 {
     std::vector<std::shared_ptr<Event>> res;
 
@@ -800,7 +804,7 @@ void Track::timingCorrect(int fromBar, int toBar,
 }
 
 int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
-                             int swingPercentage)
+                             int swingPercentage) const
 {
     int accumBarLengths = 0;
     int previousAccumBarLengths = 0;
@@ -994,7 +998,7 @@ void Track::updateEventTick(std::shared_ptr<Event> &e, int newTick)
     e->setTick(newTick);
 }
 
-std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents()
+std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
 {
     std::vector<std::shared_ptr<NoteOnEvent>> noteEvents;
 

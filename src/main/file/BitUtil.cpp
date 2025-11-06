@@ -6,7 +6,8 @@
 using namespace mpc::file;
 using namespace std;
 
-unsigned char BitUtil::removeUnusedBits(unsigned char b, vector<int> usedRange)
+unsigned char BitUtil::removeUnusedBits(unsigned char b,
+                                        const vector<int> &usedRange)
 {
     auto cleanedByte = b;
     auto range_to_clear = invertRange(usedRange);
@@ -18,7 +19,7 @@ unsigned char BitUtil::removeUnusedBits(unsigned char b, vector<int> usedRange)
     return cleanedByte;
 }
 
-vector<int> BitUtil::invertRange(vector<int> range)
+vector<int> BitUtil::invertRange(const vector<int> &range)
 {
     auto invRange = vector<int>(2);
     if (range[0] < range[1])
@@ -51,8 +52,10 @@ bool BitUtil::isBitOn(unsigned char b, int i)
     return false;
 }
 
-unsigned char BitUtil::stitchBytes(unsigned char b1, vector<int> usedBits1,
-                                   unsigned char b2, vector<int> usedBits2)
+unsigned char BitUtil::stitchBytes(unsigned char b1,
+                                   const vector<int> &usedBits1,
+                                   unsigned char b2,
+                                   const vector<int> &usedBits2)
 {
     auto byte1occupiesstart = usedBits1[0] == 0;
     if (byte1occupiesstart)

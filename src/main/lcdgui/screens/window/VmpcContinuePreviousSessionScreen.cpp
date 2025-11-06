@@ -9,7 +9,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 VmpcContinuePreviousSessionScreen::VmpcContinuePreviousSessionScreen(
-    mpc::Mpc &m, int layer)
+    Mpc &m, const int layer)
     : ScreenComponent(m, "vmpc-continue-previous-session", layer)
 {
     const auto label0 = std::make_shared<Label>(
@@ -26,7 +26,7 @@ VmpcContinuePreviousSessionScreen::VmpcContinuePreviousSessionScreen(
     addChild(label3);
 }
 
-void VmpcContinuePreviousSessionScreen::function(int i)
+void VmpcContinuePreviousSessionScreen::function(const int i)
 {
     const auto autoSaveScreen =
         mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();

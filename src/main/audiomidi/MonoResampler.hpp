@@ -21,7 +21,7 @@ namespace mpc::audiomidi
         // Returns number of generated frames
         uint32_t wrapUpAndGetRemainder(std::vector<float> &output);
 
-        void reset();
+        void reset() const;
 
     private:
         SRC_STATE *state;

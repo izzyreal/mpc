@@ -19,7 +19,7 @@ namespace mpc::file::all
     public:
         static std::shared_ptr<mpc::sequencer::PitchBendEvent>
         bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char>
-            mpcEventToBytes(std::shared_ptr<mpc::sequencer::PitchBendEvent>);
+        static std::vector<char> mpcEventToBytes(
+            const std::shared_ptr<mpc::sequencer::PitchBendEvent> &);
     };
 } // namespace mpc::file::all

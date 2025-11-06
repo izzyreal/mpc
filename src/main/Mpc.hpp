@@ -103,9 +103,9 @@ namespace mpc
             midiControlPresets;
         void init();
         void startMidiDeviceDetector();
-        void panic();
+        void panic() const;
         void setPluginModeEnabled(bool);
-        bool isPluginModeEnabled();
+        bool isPluginModeEnabled() const;
 
         std::shared_ptr<mpc::eventregistry::EventRegistry> eventRegistry;
 
@@ -113,28 +113,29 @@ namespace mpc
         std::shared_ptr<mpc::controller::ClientEventController>
             clientEventController;
 
-        void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
+        void
+        dispatchHostInput(const mpc::input::HostInputEvent &hostEvent) const;
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> getScreen();
+        std::shared_ptr<mpc::lcdgui::ScreenComponent> getScreen() const;
         std::shared_ptr<hardware::Hardware> getHardware();
-        mpc::disk::DiskController *getDiskController();
+        mpc::disk::DiskController *getDiskController() const;
         std::shared_ptr<mpc::input::PadAndButtonKeyboard>
         getPadAndButtonKeyboard();
 
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        mpc::engine::PreviewSoundPlayer &getPreviewSoundPlayer();
+        mpc::engine::PreviewSoundPlayer &getPreviewSoundPlayer() const;
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
         std::shared_ptr<mpc::sequencer::Clock> getClock();
 
     public:
-        std::shared_ptr<mpc::disk::AbstractDisk> getDisk();
-        std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks();
+        std::shared_ptr<mpc::disk::AbstractDisk> getDisk() const;
+        std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks() const;
 
         Mpc();
         ~Mpc();

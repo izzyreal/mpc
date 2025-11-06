@@ -8,6 +8,6 @@ namespace mpc::controller
     {
     public:
         ClientMidiInputSynchronizationController() = default;
-        void handleEvent(const mpc::client::event::ClientMidiEvent &);
+        void handleEvent(const mpc::client::event::ClientMidiEvent &) const;
     };
 } // namespace mpc::controller

@@ -1,16 +1,16 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
 
-    class PurgeScreen : public mpc::lcdgui::ScreenComponent
+    class PurgeScreen final : public ScreenComponent
     {
 
     public:
         void function(int f) override;
 
-        PurgeScreen(mpc::Mpc &mpc, int layerIndex);
+        PurgeScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
     };

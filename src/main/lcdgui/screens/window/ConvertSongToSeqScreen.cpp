@@ -16,8 +16,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
-ConvertSongToSeqScreen::ConvertSongToSeqScreen(mpc::Mpc &mpc,
-                                               const int layerIndex)
+ConvertSongToSeqScreen::ConvertSongToSeqScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "convert-song-to-seq", layerIndex)
 {
 }
@@ -39,7 +38,7 @@ void ConvertSongToSeqScreen::open()
     displayTrackStatus();
 }
 
-void ConvertSongToSeqScreen::function(int i)
+void ConvertSongToSeqScreen::function(const int i)
 {
     switch (i)
     {
@@ -53,7 +52,7 @@ void ConvertSongToSeqScreen::function(int i)
     }
 }
 
-void ConvertSongToSeqScreen::turnWheel(int i)
+void ConvertSongToSeqScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -72,7 +71,7 @@ void ConvertSongToSeqScreen::turnWheel(int i)
     }
 }
 
-void ConvertSongToSeqScreen::setFromSong(int8_t newValue)
+void ConvertSongToSeqScreen::setFromSong(const int8_t newValue)
 {
     const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 19);
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
@@ -80,14 +79,14 @@ void ConvertSongToSeqScreen::setFromSong(int8_t newValue)
     displayFromSong();
 }
 
-void ConvertSongToSeqScreen::setToSequenceIndex(int8_t newValue)
+void ConvertSongToSeqScreen::setToSequenceIndex(const int8_t newValue)
 {
     const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 98);
     toSequenceIndex = clampedNewValue;
     displayToSequence();
 }
 
-void ConvertSongToSeqScreen::setTrackStatus(int8_t newValue)
+void ConvertSongToSeqScreen::setTrackStatus(const int8_t newValue)
 {
     const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 2);
     trackStatus = clampedNewValue;
@@ -146,7 +145,7 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
     }
 }
 
-void ConvertSongToSeqScreen::convertSongToSeq()
+void ConvertSongToSeqScreen::convertSongToSeq() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->activeSongIndex);

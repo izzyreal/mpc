@@ -1,6 +1,6 @@
 #pragma once
 
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 #include <string>
@@ -13,11 +13,11 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens::window
 {
-    class ZoneStartFineScreen : public mpc::lcdgui::ScreenComponent
+    class ZoneStartFineScreen final : public ScreenComponent
     {
 
     public:
-        ZoneStartFineScreen(mpc::Mpc &mpc, int layerIndex);
+        ZoneStartFineScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 

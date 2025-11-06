@@ -4,7 +4,7 @@
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/Rectangle.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include <StrUtil.hpp>
 

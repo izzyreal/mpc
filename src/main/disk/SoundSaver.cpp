@@ -18,8 +18,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
 SoundSaver::SoundSaver(
-    mpc::Mpc &_mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds,
-    bool _wav)
+    mpc::Mpc &_mpc,
+    const std::vector<std::shared_ptr<mpc::sampler::Sound>> &_sounds, bool _wav)
     : mpc(_mpc), sounds(_sounds), wav(_wav),
       saveSoundsThread(std::thread(&SoundSaver::static_saveSounds, this))
 {
@@ -30,7 +30,7 @@ void SoundSaver::static_saveSounds(void *this_p)
     static_cast<SoundSaver *>(this_p)->saveSounds();
 }
 
-void SoundSaver::saveSounds()
+void SoundSaver::saveSounds() const
 {
     const auto ext = std::string(wav ? ".WAV" : ".SND");
     auto disk = mpc.getDisk();

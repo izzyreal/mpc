@@ -8,7 +8,6 @@
 #include "engine/MixerInterconnection.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
-#include "controller/ClientMidiEventController.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
 #include "Paths.hpp"
@@ -81,8 +80,8 @@ void Mpc::init()
 
         if (should_update)
         {
-            const auto data = mpc::MpcResourceUtil::get_resource_data(
-                "demodata/" + demo_file);
+            const auto data =
+                MpcResourceUtil::get_resource_data("demodata/" + demo_file);
             set_file_data(dst, data);
         }
     }
@@ -94,8 +93,8 @@ void Mpc::init()
 
     for (auto &preset : factory_midi_control_presets)
     {
-        const auto data = mpc::MpcResourceUtil::get_resource_data(
-            "midicontrolpresets/" + preset);
+        const auto data =
+            MpcResourceUtil::get_resource_data("midicontrolpresets/" + preset);
 
         if (!fs::exists(paths->midiControlPresetsPath() / preset) ||
             fs::file_size(paths->midiControlPresetsPath() / preset) !=
@@ -105,7 +104,7 @@ void Mpc::init()
         }
     }
 
-    mpc::Logger::l.setPath(paths->logFilePath().string());
+    Logger::l.setPath(paths->logFilePath().string());
 
     padAndButtonKeyboard = std::make_shared<input::PadAndButtonKeyboard>(*this);
 
@@ -120,22 +119,21 @@ void Mpc::init()
 
     midiOutput = std::make_shared<audiomidi::MidiOutput>();
 
-    layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
+    layeredScreen = std::make_shared<LayeredScreen>(*this);
 
     screens = std::make_shared<Screens>(*this);
 
-    eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
+    eventHandler = std::make_shared<audiomidi::EventHandler>(*this);
     MLOG("EventHandler created");
 
     eventRegistry = std::make_shared<eventregistry::EventRegistry>();
 
     clientEventController =
-        std::make_shared<mpc::controller::ClientEventController>(*this);
+        std::make_shared<controller::ClientEventController>(*this);
     /*
      * AudioMidiServices requires sequencer to exist.
      */
-    audioMidiServices =
-        std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
+    audioMidiServices = std::make_shared<audiomidi::AudioMidiServices>(*this);
 
     MLOG("AudioMidiServices created");
 
@@ -198,7 +196,7 @@ void Mpc::init()
         {
             return clientEventController->isFullLevelEnabled();
         },
-        [&]() -> std::vector<mpc::engine::MixerInterconnection *> &
+        [&]() -> std::vector<engine::MixerInterconnection *> &
         {
             return audioMidiServices->getMixerConnections();
             {};
@@ -219,14 +217,14 @@ void Mpc::init()
 
     // This needs to happen before the sampler initializes initMasterPadAssign
     // which we do in Sampler::init()
-    mpc::nvram::NvRam::loadVmpcSettings(*this);
+    nvram::NvRam::loadVmpcSettings(*this);
 
     sampler->init();
     MLOG("Sampler initialized");
 
-    mpc::nvram::NvRam::loadUserScreenValues(*this);
+    nvram::NvRam::loadUserScreenValues(*this);
 
-    mpc::nvram::MidiControlPersistence::restoreLastState(*this);
+    nvram::MidiControlPersistence::restoreLastState(*this);
 
     midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
 
@@ -235,27 +233,27 @@ void Mpc::init()
     layeredScreen->openScreenById(ScreenId::SequencerScreen);
 }
 
-std::shared_ptr<hardware::Hardware> Mpc::getHardware()
+std::shared_ptr<Hardware> Mpc::getHardware()
 {
     return hardware;
 }
 
-void Mpc::dispatchHostInput(const mpc::input::HostInputEvent &hostEvent)
+void Mpc::dispatchHostInput(const input::HostInputEvent &hostEvent) const
 {
     clientEventController->dispatchHostInput(hostEvent);
 }
 
-std::shared_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()
+std::shared_ptr<Sequencer> Mpc::getSequencer()
 {
     return sequencer;
 }
 
-std::shared_ptr<sampler::Sampler> Mpc::getSampler()
+std::shared_ptr<Sampler> Mpc::getSampler()
 {
     return sampler;
 }
 
-mpc::engine::PreviewSoundPlayer &Mpc::getPreviewSoundPlayer()
+engine::PreviewSoundPlayer &Mpc::getPreviewSoundPlayer() const
 {
     return audioMidiServices->getPreviewSoundPlayer();
 }
@@ -270,22 +268,22 @@ std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler()
     return eventHandler;
 }
 
-std::shared_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen()
+std::shared_ptr<LayeredScreen> Mpc::getLayeredScreen()
 {
     return layeredScreen;
 }
 
-std::shared_ptr<lcdgui::ScreenComponent> Mpc::getScreen()
+std::shared_ptr<ScreenComponent> Mpc::getScreen() const
 {
     return layeredScreen->getCurrentScreen();
 }
 
-std::shared_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
+std::shared_ptr<disk::AbstractDisk> Mpc::getDisk() const
 {
     return diskController->getActiveDisk();
 }
 
-std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
+std::vector<std::shared_ptr<disk::AbstractDisk>> Mpc::getDisks() const
 {
     return diskController->getDisks();
 }
@@ -310,7 +308,7 @@ std::shared_ptr<audiomidi::MidiOutput> Mpc::getMidiOutput()
     return midiOutput;
 }
 
-mpc::disk::DiskController *Mpc::getDiskController()
+disk::DiskController *Mpc::getDiskController() const
 {
     return diskController.get();
 }
@@ -330,9 +328,9 @@ Mpc::~Mpc()
         sequencer->stop();
     }
 
-    mpc::nvram::MidiControlPersistence::saveCurrentState(*this);
-    mpc::nvram::NvRam::saveUserScreenValues(*this);
-    mpc::nvram::NvRam::saveVmpcSettings(*this);
+    nvram::MidiControlPersistence::saveCurrentState(*this);
+    nvram::NvRam::saveUserScreenValues(*this);
+    nvram::NvRam::saveVmpcSettings(*this);
 
     if (layeredScreen)
     {
@@ -345,7 +343,7 @@ Mpc::~Mpc()
     }
 }
 
-void Mpc::panic()
+void Mpc::panic() const
 {
     // TODO Anything we should do in the eventRegistry? Probably not, because
     // panic is meant to help out other devices, i.e. things connected to the
@@ -354,7 +352,7 @@ void Mpc::panic()
     eventHandler->clearTransposeCache();
 }
 
-std::shared_ptr<mpc::sequencer::Clock> Mpc::getClock()
+std::shared_ptr<Clock> Mpc::getClock()
 {
     return clock;
 }
@@ -364,7 +362,7 @@ void Mpc::setPluginModeEnabled(bool b)
     pluginModeEnabled = b;
 }
 
-bool Mpc::isPluginModeEnabled()
+bool Mpc::isPluginModeEnabled() const
 {
     return pluginModeEnabled;
 }
@@ -374,7 +372,7 @@ void Mpc::startMidiDeviceDetector()
     midiDeviceDetector->start(*this);
 }
 
-std::shared_ptr<mpc::input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
+std::shared_ptr<input::PadAndButtonKeyboard> Mpc::getPadAndButtonKeyboard()
 {
     return padAndButtonKeyboard;
 }

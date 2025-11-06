@@ -10,12 +10,12 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 
-PasteEventScreen::PasteEventScreen(mpc::Mpc &mpc, const int layerIndex)
+PasteEventScreen::PasteEventScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "paste-event", layerIndex)
 {
 }
 
-void PasteEventScreen::function(int i)
+void PasteEventScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -25,7 +25,7 @@ void PasteEventScreen::function(int i)
             const auto stepEditorScreen =
                 mpc.screens->get<ScreenId::StepEditorScreen>();
 
-            const bool allowMultipleNotesOnSameTick = true;
+            constexpr bool allowMultipleNotesOnSameTick = true;
 
             for (auto &event : stepEditorScreen->getPlaceHolder())
             {

@@ -1,31 +1,31 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class NextSeqPadScreen : public mpc::lcdgui::ScreenComponent
+    class NextSeqPadScreen final : public ScreenComponent
     {
 
     public:
-        NextSeqPadScreen(mpc::Mpc &mpc, int layerIndex);
+        NextSeqPadScreen(Mpc &mpc, int layerIndex);
 
         void right() override;
         void function(int i) override;
         void open() override;
 
-        void refreshSeqs();
+        void refreshSeqs() const;
 
     private:
         const std::vector<std::string> letters{"A", "B", "C", "D"};
-        void displayNextSq();
-        int bankOffset();
-        void displayBank();
-        void displaySeqNumbers();
-        void displaySq();
-        void displaySeq(int i);
-        void setSeqColor(int i);
-        void displayNow0();
-        void displayNow1();
-        void displayNow2();
+        void displayNextSq() const;
+        int bankOffset() const;
+        void displayBank() const;
+        void displaySeqNumbers() const;
+        void displaySq() const;
+        void displaySeq(int i) const;
+        void setSeqColor(int i) const;
+        void displayNow0() const;
+        void displayNow1() const;
+        void displayNow2() const;
     };
 } // namespace mpc::lcdgui::screens

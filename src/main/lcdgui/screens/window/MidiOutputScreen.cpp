@@ -13,7 +13,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-MidiOutputScreen::MidiOutputScreen(mpc::Mpc &mpc, const int layerIndex)
+MidiOutputScreen::MidiOutputScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "midi-output", layerIndex)
 {
 }
@@ -49,7 +49,7 @@ void MidiOutputScreen::openNameScreen()
         auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
 
         const auto enterAction =
-            [this, renameDeviceIndex](std::string &nameScreenName)
+            [this, renameDeviceIndex](const std::string &nameScreenName)
         {
             sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex,
                                                           nameScreenName);
@@ -79,7 +79,7 @@ void MidiOutputScreen::right()
     }
 }
 
-void MidiOutputScreen::turnWheel(int i)
+void MidiOutputScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -94,7 +94,7 @@ void MidiOutputScreen::turnWheel(int i)
     }
 }
 
-void MidiOutputScreen::function(int i)
+void MidiOutputScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -109,12 +109,12 @@ void MidiOutputScreen::function(int i)
     }
 }
 
-void MidiOutputScreen::displaySoftThru()
+void MidiOutputScreen::displaySoftThru() const
 {
     findField("softthru")->setText(softThruNames[softThru]);
 }
 
-void MidiOutputScreen::displayDeviceName()
+void MidiOutputScreen::displayDeviceName() const
 {
     const auto sequence = sequencer->getActiveSequence();
     const auto devName = sequence->getDeviceName(deviceIndex + 1);
@@ -138,18 +138,18 @@ void MidiOutputScreen::displayDeviceName()
     findField("devicenumber")->setText(devNumber);
 }
 
-void MidiOutputScreen::setSoftThru(int i)
+void MidiOutputScreen::setSoftThru(const int i)
 {
     softThru = std::clamp(i, 0, 4);
     displaySoftThru();
 }
 
-int MidiOutputScreen::getSoftThru()
+int MidiOutputScreen::getSoftThru() const
 {
     return softThru;
 }
 
-void MidiOutputScreen::setDeviceIndex(int i)
+void MidiOutputScreen::setDeviceIndex(const int i)
 {
     deviceIndex = std::clamp(i, 0, 31);
     displayDeviceName();

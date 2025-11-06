@@ -11,7 +11,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc &mpc, const int layerIndex)
+AssignmentViewScreen::AssignmentViewScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "assignment-view", layerIndex)
 {
 }
@@ -94,7 +94,7 @@ void AssignmentViewScreen::right()
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
-void AssignmentViewScreen::turnWheel(int i)
+void AssignmentViewScreen::turnWheel(const int i)
 {
     const auto program = getProgramOrThrow();
     const auto selectedPad =
@@ -105,7 +105,7 @@ void AssignmentViewScreen::turnWheel(int i)
     displayPad(selectedPad->getIndex() % 16);
 }
 
-void AssignmentViewScreen::update(Observable *o, Message message)
+void AssignmentViewScreen::update(Observable *o, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 
@@ -138,7 +138,7 @@ void AssignmentViewScreen::displayAssignmentView()
     displaySoundName();
 }
 
-void AssignmentViewScreen::displayPad(int i)
+void AssignmentViewScreen::displayPad(const int i) const
 {
     const auto program = getProgramOrThrow();
     const int bank =
@@ -163,7 +163,7 @@ void AssignmentViewScreen::displayPad(int i)
     findField(padFocusNames[i])->setText(sampleName);
 }
 
-void AssignmentViewScreen::displayBankInfoAndNoteLabel()
+void AssignmentViewScreen::displayBankInfoAndNoteLabel() const
 {
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
@@ -222,7 +222,7 @@ int AssignmentViewScreen::getPadIndexFromFocus()
     return padIndex;
 }
 
-std::string AssignmentViewScreen::getFocusFromPadIndex()
+std::string AssignmentViewScreen::getFocusFromPadIndex() const
 {
     auto padIndex = mpc.clientEventController->getSelectedPad();
 

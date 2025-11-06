@@ -39,7 +39,7 @@ namespace mpc::audiomidi
         std::atomic<uint64_t> noteEventId = 1;
 
     public:
-        void handleFinalizedEvent(const std::shared_ptr<Event>, Track *const);
+        void handleFinalizedEvent(const std::shared_ptr<Event> &, Track *const);
 
         // Handles physical pad presses.
         //
@@ -61,7 +61,7 @@ namespace mpc::audiomidi
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
         void
-        handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent>, Track *,
+        handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent> &, Track *,
                                 const std::optional<int> trackDevice,
                                 const std::optional<int> trackVelocityRatio,
                                 const std::optional<int> drumIndex);
@@ -85,11 +85,10 @@ namespace mpc::audiomidi
         //
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
-        void
-        handleNoteOffFromUnfinalizedNoteOn(const std::shared_ptr<NoteOffEvent>,
-                                           Track *,
-                                           const std::optional<int> trackDevice,
-                                           const std::optional<int> drumIndex);
+        void handleNoteOffFromUnfinalizedNoteOn(
+            const std::shared_ptr<NoteOffEvent> &, Track *,
+            const std::optional<int> trackDevice,
+            const std::optional<int> drumIndex);
 
         void
         handleNoteOffFromFinalizedNoteOn(const std::shared_ptr<NoteOffEvent>);
@@ -112,7 +111,7 @@ namespace mpc::audiomidi
         // trackVelocityRatio is std::nullopt for note off events, else must be
         // non-null
         void
-        handleNoteEventMidiOut(const std::shared_ptr<Event>, Track *,
+        handleNoteEventMidiOut(const std::shared_ptr<Event> &, Track *,
                                const int trackDevice,
                                const std::optional<int> trackVelocityRatio);
 

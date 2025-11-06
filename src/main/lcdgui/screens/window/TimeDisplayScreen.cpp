@@ -6,7 +6,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-TimeDisplayScreen::TimeDisplayScreen(mpc::Mpc &mpc, const int layerIndex)
+TimeDisplayScreen::TimeDisplayScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "time-display", layerIndex)
 {
 }
@@ -18,7 +18,7 @@ void TimeDisplayScreen::open()
     displayFrameRate();
 }
 
-void TimeDisplayScreen::turnWheel(int i)
+void TimeDisplayScreen::turnWheel(const int i)
 {
     const auto startTime = sequencer->getActiveSequence()->getStartTime();
 
@@ -54,12 +54,12 @@ void TimeDisplayScreen::turnWheel(int i)
     }
 }
 
-void TimeDisplayScreen::displayDisplayStyle()
+void TimeDisplayScreen::displayDisplayStyle() const
 {
     findField("displaystyle")->setText(displayStyleNames[displayStyle]);
 }
 
-void TimeDisplayScreen::displayStartTime()
+void TimeDisplayScreen::displayStartTime() const
 {
     const auto startTime = sequencer->getActiveSequence()->getStartTime();
     findField("hours")->setText(
@@ -75,12 +75,12 @@ void TimeDisplayScreen::displayStartTime()
             StrUtil::padLeft(std::to_string(startTime.frameDecimals), "0", 2));
 }
 
-void TimeDisplayScreen::displayFrameRate()
+void TimeDisplayScreen::displayFrameRate() const
 {
     findField("framerate")->setText(frameRateNames[frameRate]);
 }
 
-void TimeDisplayScreen::setDisplayStyle(int i)
+void TimeDisplayScreen::setDisplayStyle(const int i)
 {
     if (i < 0 || i > 1)
     {
@@ -90,42 +90,42 @@ void TimeDisplayScreen::setDisplayStyle(int i)
     displayDisplayStyle();
 }
 
-void TimeDisplayScreen::setHours(int i)
+void TimeDisplayScreen::setHours(const int i) const
 {
     sequencer->getActiveSequence()->getStartTime().hours =
         std::clamp<uint8_t>(i, 0, 23);
     displayStartTime();
 }
 
-void TimeDisplayScreen::setMinutes(int i)
+void TimeDisplayScreen::setMinutes(const int i) const
 {
     sequencer->getActiveSequence()->getStartTime().minutes =
         std::clamp<uint8_t>(i, 0, 59);
     displayStartTime();
 }
 
-void TimeDisplayScreen::setSeconds(int i)
+void TimeDisplayScreen::setSeconds(const int i) const
 {
     sequencer->getActiveSequence()->getStartTime().seconds =
         std::clamp<uint8_t>(i, 0, 59);
     displayStartTime();
 }
 
-void TimeDisplayScreen::setFrames(int i)
+void TimeDisplayScreen::setFrames(const int i) const
 {
     sequencer->getActiveSequence()->getStartTime().frames =
         std::clamp<uint8_t>(i, 0, 29);
     displayStartTime();
 }
 
-void TimeDisplayScreen::setFrameDecimals(int i)
+void TimeDisplayScreen::setFrameDecimals(const int i) const
 {
     sequencer->getActiveSequence()->getStartTime().frameDecimals =
         std::clamp<uint8_t>(i, 0, 99);
     displayStartTime();
 }
 
-void TimeDisplayScreen::setFrameRate(int i)
+void TimeDisplayScreen::setFrameRate(const int i)
 {
     if (i < 0 || i > 3)
     {
@@ -136,7 +136,7 @@ void TimeDisplayScreen::setFrameRate(int i)
     displayFrameRate();
 }
 
-int TimeDisplayScreen::getDisplayStyle()
+int TimeDisplayScreen::getDisplayStyle() const
 {
     return displayStyle;
 }

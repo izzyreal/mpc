@@ -10,7 +10,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc &mpc,
+MultiRecordingSetupScreen::MultiRecordingSetupScreen(Mpc &mpc,
                                                      const int layerIndex)
     : ScreenComponent(mpc, "multi-recording-setup", layerIndex)
 {
@@ -45,7 +45,7 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc &mpc,
     }
 }
 
-void MultiRecordingSetupScreen::function(int i)
+void MultiRecordingSetupScreen::function(const int i)
 {
     if (i == 3)
     {
@@ -87,7 +87,7 @@ void MultiRecordingSetupScreen::right()
     ScreenComponent::right();
 }
 
-void MultiRecordingSetupScreen::turnWheel(int i)
+void MultiRecordingSetupScreen::turnWheel(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
 
@@ -193,7 +193,7 @@ void MultiRecordingSetupScreen::down()
     }
 }
 
-void MultiRecordingSetupScreen::displayMrsLine(int i)
+void MultiRecordingSetupScreen::displayMrsLine(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
     const auto trackIndex = visibleMrsLines[i]->getTrack();
@@ -257,7 +257,8 @@ void MultiRecordingSetupScreen::setYOffset(int i)
     displayMrsLine(2);
 }
 
-void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
+void MultiRecordingSetupScreen::setMrsTrack(const int inputNumber,
+                                            const int newTrackNumber)
 {
     mrsLines[inputNumber].setTrack(newTrackNumber);
 

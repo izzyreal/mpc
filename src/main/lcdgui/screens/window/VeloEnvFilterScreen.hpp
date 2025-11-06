@@ -1,15 +1,15 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class VeloEnvFilterScreen : public mpc::lcdgui::ScreenComponent
+    class VeloEnvFilterScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
-        VeloEnvFilterScreen(mpc::Mpc &mpc, int layerIndex);
+        VeloEnvFilterScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
@@ -19,11 +19,11 @@ namespace mpc::lcdgui::screens::window
     private:
         unsigned int velo = 127;
         void setVelo(int i);
-        void displayVelo();
-        void displayNote();
+        void displayVelo() const;
+        void displayNote() const;
         void displayAttack();
         void displayDecay();
-        void displayAmount();
-        void displayVeloFreq();
+        void displayAmount() const;
+        void displayVeloFreq() const;
     };
 } // namespace mpc::lcdgui::screens::window

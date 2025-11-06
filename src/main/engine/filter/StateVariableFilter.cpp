@@ -19,7 +19,7 @@ float StateVariableFilter::update()
     return vars->getCutoff();
 }
 
-float StateVariableFilter::filter(float sample, float f)
+float StateVariableFilter::filter(float sample, float f) const
 {
     float min = 0.24f < f * 0.25f ? 0.24f : f * 0.25f;
     auto f1 = 2.0f * sin(static_cast<float>(mpc::math::pi * min));

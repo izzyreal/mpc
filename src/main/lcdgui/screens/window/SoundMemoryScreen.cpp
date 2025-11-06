@@ -9,7 +9,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-SoundMemoryScreen::SoundMemoryScreen(mpc::Mpc &mpc, const int layerIndex)
+SoundMemoryScreen::SoundMemoryScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sound-memory", layerIndex)
 {
     MRECT r(23, 26, 223, 35);
@@ -23,7 +23,7 @@ void SoundMemoryScreen::open()
     displayMegabytesInstalled();
 }
 
-void SoundMemoryScreen::displayFreeMemoryTime()
+void SoundMemoryScreen::displayFreeMemoryTime() const
 {
     auto total = 33374880;
 
@@ -43,7 +43,7 @@ void SoundMemoryScreen::displayIndicator()
     findChild<PunchRect>("free-memory")->setSize((int)floor(200.0 * free), 9);
 }
 
-void SoundMemoryScreen::displayMegabytesInstalled()
+void SoundMemoryScreen::displayMegabytesInstalled() const
 {
     findLabel("megabytes-installed")->setText("32");
 }

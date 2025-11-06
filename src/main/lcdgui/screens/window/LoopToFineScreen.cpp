@@ -12,7 +12,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-LoopToFineScreen::LoopToFineScreen(mpc::Mpc &mpc, const int layerIndex)
+LoopToFineScreen::LoopToFineScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
     addChildT<Wave>()->setFine(true);
@@ -82,7 +82,7 @@ void LoopToFineScreen::displayTo()
     findField("to")->setTextPadded(sound->getLoopTo(), " ");
 }
 
-void LoopToFineScreen::function(int i)
+void LoopToFineScreen::function(const int i)
 {
 
     ScreenComponent::function(i);
@@ -101,7 +101,7 @@ void LoopToFineScreen::function(int i)
     }
 }
 
-void LoopToFineScreen::turnWheel(int i)
+void LoopToFineScreen::turnWheel(const int i)
 {
     const auto sound = sampler->getSound();
     const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
@@ -172,7 +172,7 @@ void LoopToFineScreen::pressEnter()
     displayFineWave();
 }
 
-void LoopToFineScreen::setSlider(int i)
+void LoopToFineScreen::setSlider(const int i)
 {
     if (!mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)

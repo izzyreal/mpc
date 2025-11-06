@@ -23,10 +23,11 @@ namespace mpc::file::wav
     class WavFile
     {
     public:
-        static WavFile writeWavStream(std::shared_ptr<std::ostream>,
+        static WavFile writeWavStream(const std::shared_ptr<std::ostream> &,
                                       int numChannels, int numFrames,
                                       int validBits, int sampleRate);
-        static wav_or_error readWavStream(std::shared_ptr<std::istream>);
+        static wav_or_error
+        readWavStream(const std::shared_ptr<std::istream> &);
 
     private:
         const static int SMPL_CHUNK_ID = 0x6C706D73; // 1819307379
@@ -72,12 +73,12 @@ namespace mpc::file::wav
         SampleLoop sampleLoop;
 
     public:
-        int getNumChannels();
-        unsigned long getNumFrames();
+        int getNumChannels() const;
+        unsigned long getNumFrames() const;
 
-        int getSampleRate();
-        int getValidBits();
-        int getNumSampleLoops();
+        int getSampleRate() const;
+        int getValidBits() const;
+        int getNumSampleLoops() const;
         SampleLoop &getSampleLoop();
 
     private:
@@ -93,6 +94,6 @@ namespace mpc::file::wav
                        unsigned long numFramesToRead);
         int writeFrames(const std::vector<float> &sampleBuffer,
                         unsigned long numFramesToWrite);
-        void close();
+        void close() const;
     };
 } // namespace mpc::file::wav

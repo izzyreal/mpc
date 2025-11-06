@@ -1,11 +1,10 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/screens/WithTimesAndNotes.hpp>
+#include "lcdgui/ScreenComponent.hpp"
+#include "lcdgui/screens/WithTimesAndNotes.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class EraseScreen : public mpc::lcdgui::ScreenComponent,
-                        public mpc::lcdgui::screens::WithTimesAndNotes
+    class EraseScreen final : public ScreenComponent, public WithTimesAndNotes
     {
 
     public:
@@ -13,15 +12,15 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
 
     public:
-        EraseScreen(mpc::Mpc &mpc, int layerIndex);
+        EraseScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
 
     private:
-        void displayTrack();
-        void displayErase();
-        void displayType();
+        void displayTrack() const;
+        void displayErase() const;
+        void displayType() const;
 
     protected:
         void displayNotes() override;
@@ -46,6 +45,6 @@ namespace mpc::lcdgui::screens::window
         void setErase(int i);
         void setType(int i);
 
-        void doErase();
+        void doErase() const;
     };
 } // namespace mpc::lcdgui::screens::window

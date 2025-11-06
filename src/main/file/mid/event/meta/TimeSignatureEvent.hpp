@@ -27,11 +27,11 @@ namespace mpc::file::mid::event::meta
 
     public:
         void setTimeSignature(int num, int den, int meter, int div);
-        int getNumerator();
-        int getDenominatorValue();
-        int getRealDenominator();
-        int getMeter();
-        int getDivision();
+        int getNumerator() const;
+        int getDenominatorValue() const;
+        int getRealDenominator() const;
+        int getMeter() const;
+        int getDivision() const;
 
     public:
         int getEventSize() override;
@@ -43,7 +43,7 @@ namespace mpc::file::mid::event::meta
         parseTimeSignature(int tick, int delta, MetaEventData *info);
 
     private:
-        int log2(int den);
+        int log2(int den) const;
 
     public:
         std::string toString() override;

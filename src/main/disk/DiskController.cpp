@@ -96,7 +96,7 @@ std::vector<std::shared_ptr<AbstractDisk>> &DiskController::getDisks()
     return disks;
 }
 
-int DiskController::getActiveDiskIndex()
+int DiskController::getActiveDiskIndex() const
 {
     return activeDiskIndex;
 }

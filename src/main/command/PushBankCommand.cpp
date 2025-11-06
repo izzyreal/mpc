@@ -8,7 +8,7 @@ namespace mpc::command
 {
 
     PushBankCommand::PushBankCommand(
-        std::shared_ptr<ClientEventController> controllerToUse,
+        const std::shared_ptr<ClientEventController> &controllerToUse,
         const Bank bankToUse)
         : controller(controllerToUse), bank(bankToUse)
     {

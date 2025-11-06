@@ -15,17 +15,17 @@ namespace mpc::engine::control
     public:
         virtual void add(std::shared_ptr<Control> control);
 
-        void remove(std::shared_ptr<Control> control);
+        void remove(const std::shared_ptr<Control> &control);
 
         std::vector<std::shared_ptr<Control>> getControls();
 
-        std::shared_ptr<Control> find(std::string name);
+        std::shared_ptr<Control> find(const std::string &name);
 
         std::shared_ptr<Control> deepFind(int controlId);
 
-        void disambiguate(std::shared_ptr<CompoundControl> c);
+        void disambiguate(const std::shared_ptr<CompoundControl> &c);
 
     public:
-        CompoundControl(int id, std::string name);
+        CompoundControl(int id, const std::string &name);
     };
 } // namespace mpc::engine::control

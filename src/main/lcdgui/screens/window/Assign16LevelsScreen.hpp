@@ -1,9 +1,9 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class Assign16LevelsScreen : public mpc::lcdgui::ScreenComponent
+    class Assign16LevelsScreen final : public ScreenComponent
     {
 
     public:
@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void open() override;
 
-        Assign16LevelsScreen(mpc::Mpc &mpc, int layerIndex);
+        Assign16LevelsScreen(Mpc &mpc, int layerIndex);
 
     private:
         const std::vector<std::string> typeNames{"TUNING", "DECAY", "ATTACK",
@@ -23,19 +23,19 @@ namespace mpc::lcdgui::screens::window
         int type = 0;
         int originalKeyPad = 3;
 
-        void displayNote();
-        void displayParameter();
-        void displayType();
-        void displayOriginalKeyPad();
+        void displayNote() const;
+        void displayParameter() const;
+        void displayType() const;
+        void displayOriginalKeyPad() const;
 
     public:
         void setNote(int newNote);
         void setParam(int i);
         void setType(int i);
         void setOriginalKeyPad(int i);
-        int getOriginalKeyPad();
-        int getType();
-        int getNote();
-        int getParameter();
+        int getOriginalKeyPad() const;
+        int getType() const;
+        int getNote() const;
+        int getParameter() const;
     };
 } // namespace mpc::lcdgui::screens::window

@@ -334,7 +334,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
     mf->setType(1);
 }
 
-void MidiWriter::addNoteOn(std::shared_ptr<NoteOn> noteOn)
+void MidiWriter::addNoteOn(const std::shared_ptr<NoteOn> &noteOn)
 {
     for (auto &no : noteOffs)
     {
@@ -349,7 +349,7 @@ void MidiWriter::addNoteOn(std::shared_ptr<NoteOn> noteOn)
 }
 
 void MidiWriter::createDeltas(
-    std::weak_ptr<mpc::file::mid::MidiTrack> midiTrack)
+    const std::weak_ptr<mpc::file::mid::MidiTrack> &midiTrack) const
 {
     auto mt = midiTrack.lock();
     std::shared_ptr<mpc::file::mid::event::MidiEvent> previousEvent;
@@ -379,7 +379,8 @@ void MidiWriter::createDeltas(
     mt->setEndOfTrackDelta(sequence->getLastTick() - previousTick);
 }
 
-void MidiWriter::writeToOStream(std::shared_ptr<std::ostream> _ostream)
+void MidiWriter::writeToOStream(
+    const std::shared_ptr<std::ostream> &_ostream) const
 {
     auto _ofstream = std::dynamic_pointer_cast<std::ofstream>(_ostream);
     if (_ofstream)

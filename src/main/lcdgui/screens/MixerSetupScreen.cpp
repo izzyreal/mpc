@@ -10,7 +10,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 
-MixerSetupScreen::MixerSetupScreen(mpc::Mpc &mpc, const int layerIndex)
+MixerSetupScreen::MixerSetupScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "mixer-setup", layerIndex)
 {
 }
@@ -40,30 +40,30 @@ void MixerSetupScreen::displayMasterLevel()
     findField("masterlevel")->setText(level);
 }
 
-void MixerSetupScreen::displayFxDrum()
+void MixerSetupScreen::displayFxDrum() const
 {
     findField("fxdrum")->setText(std::to_string(getFxDrum() + 1));
 }
 
-void MixerSetupScreen::displayStereoMixSource()
+void MixerSetupScreen::displayStereoMixSource() const
 {
     findField("stereomixsource")
         ->setText(isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
-void MixerSetupScreen::displayIndivFxSource()
+void MixerSetupScreen::displayIndivFxSource() const
 {
     findField("indivfxsource")
         ->setText(isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
-void MixerSetupScreen::displayCopyPgmMixToDrum()
+void MixerSetupScreen::displayCopyPgmMixToDrum() const
 {
     findField("copypgmmixtodrum")
         ->setText(isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
 }
 
-void MixerSetupScreen::displayRecordMixChanges()
+void MixerSetupScreen::displayRecordMixChanges() const
 {
     findField("recordmixchanges")
         ->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
@@ -130,7 +130,7 @@ void MixerSetupScreen::setMasterLevel(int i)
     displayMasterLevel();
 }
 
-int MixerSetupScreen::getFxDrum()
+int MixerSetupScreen::getFxDrum() const
 {
     return fxDrum;
 }
@@ -145,7 +145,7 @@ void MixerSetupScreen::setFxDrum(int i)
     displayFxDrum();
 }
 
-bool MixerSetupScreen::isStereoMixSourceDrum()
+bool MixerSetupScreen::isStereoMixSourceDrum() const
 {
     return stereoMixSourceDrum;
 }
@@ -156,7 +156,7 @@ void MixerSetupScreen::setStereoMixSourceDrum(bool b)
     displayStereoMixSource();
 }
 
-bool MixerSetupScreen::isIndivFxSourceDrum()
+bool MixerSetupScreen::isIndivFxSourceDrum() const
 {
     return indivFxSourceDrum;
 }
@@ -167,7 +167,7 @@ void MixerSetupScreen::setIndivFxSourceDrum(bool b)
     displayIndivFxSource();
 }
 
-bool MixerSetupScreen::isCopyPgmMixToDrumEnabled()
+bool MixerSetupScreen::isCopyPgmMixToDrumEnabled() const
 {
     return copyPgmMixToDrumEnabled;
 }
@@ -178,7 +178,7 @@ void MixerSetupScreen::setCopyPgmMixToDrumEnabled(bool b)
     displayCopyPgmMixToDrum();
 }
 
-bool MixerSetupScreen::isRecordMixChangesEnabled()
+bool MixerSetupScreen::isRecordMixChangesEnabled() const
 {
     return recordMixChangesEnabled;
 }

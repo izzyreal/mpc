@@ -22,7 +22,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-ZoneScreen::ZoneScreen(mpc::Mpc &mpc, const int layerIndex)
+ZoneScreen::ZoneScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "zone", layerIndex)
 {
     addChildT<Wave>()->setFine(false);
@@ -277,7 +277,7 @@ void ZoneScreen::displayWave()
     findWave()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
 
-void ZoneScreen::displaySnd()
+void ZoneScreen::displaySnd() const
 {
     const auto sound = sampler->getSound();
 
@@ -303,12 +303,12 @@ void ZoneScreen::displaySnd()
     findField("snd")->setText(sampleName);
 }
 
-void ZoneScreen::displayPlayX()
+void ZoneScreen::displayPlayX() const
 {
     findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
-void ZoneScreen::displaySt()
+void ZoneScreen::displaySt() const
 {
     if (sampler->getSoundCount() != 0)
     {
@@ -320,7 +320,7 @@ void ZoneScreen::displaySt()
     }
 }
 
-void ZoneScreen::displayEnd()
+void ZoneScreen::displayEnd() const
 {
     if (sampler->getSoundCount() != 0)
     {
@@ -332,7 +332,7 @@ void ZoneScreen::displayEnd()
     }
 }
 
-void ZoneScreen::displayZone()
+void ZoneScreen::displayZone() const
 {
     if (sampler->getSoundCount() == 0)
     {
@@ -409,7 +409,7 @@ void ZoneScreen::setZoneStart(int zoneIndex, int start)
     displayWave();
 }
 
-int ZoneScreen::getZoneStart(int zoneIndex)
+int ZoneScreen::getZoneStart(int zoneIndex) const
 {
     if (zoneIndex >= zones.size())
     {
@@ -449,7 +449,7 @@ void ZoneScreen::setZoneEnd(int zoneIndex, int end)
     displayWave();
 }
 
-int ZoneScreen::getZoneEnd(int zoneIndex)
+int ZoneScreen::getZoneEnd(int zoneIndex) const
 {
     if (zoneIndex >= zones.size())
     {
@@ -474,7 +474,7 @@ void ZoneScreen::setZone(int i)
     displayZone();
 }
 
-std::vector<int> ZoneScreen::getZone()
+std::vector<int> ZoneScreen::getZone() const
 {
     return std::vector<int>{getZoneStart(zone), getZoneEnd(zone)};
 }

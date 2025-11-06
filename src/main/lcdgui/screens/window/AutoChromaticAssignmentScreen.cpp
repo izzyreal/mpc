@@ -14,7 +14,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 
 AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(
-    mpc::Mpc &mpc, const int layerIndex)
+    Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
 {
 }
@@ -24,7 +24,7 @@ void AutoChromaticAssignmentScreen::open()
     if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
     {
         const auto letterNumber = sampler->getProgramCount() + 21;
-        newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
+        newName = "NewPgm-" + Mpc::akaiAscii[letterNumber];
         originalKey = 67;
         tune = 0;
     }
@@ -46,7 +46,7 @@ void AutoChromaticAssignmentScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void AutoChromaticAssignmentScreen::function(int i)
+void AutoChromaticAssignmentScreen::function(const int i)
 {
     switch (i)
     {
@@ -84,14 +84,15 @@ void AutoChromaticAssignmentScreen::function(int i)
             openScreenById(ScreenId::PgmAssignScreen);
             break;
         }
+        default:;
     }
 }
 
-void AutoChromaticAssignmentScreen::turnWheel(int i)
+void AutoChromaticAssignmentScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "source")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "source")
     {
         const auto program = getProgramOrThrow();
         mpc.clientEventController->setSelectedNote(
@@ -117,11 +118,10 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 
 void AutoChromaticAssignmentScreen::openNameScreen()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "program-name")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "program-name")
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             newName = nameScreenName;
             openScreenById(ScreenId::AutoChromaticAssignmentScreen);
@@ -134,25 +134,25 @@ void AutoChromaticAssignmentScreen::openNameScreen()
     }
 }
 
-void AutoChromaticAssignmentScreen::setSourceSoundIndex(int i)
+void AutoChromaticAssignmentScreen::setSourceSoundIndex(const int i)
 {
     sourceSoundIndex = std::clamp(i, -1, sampler->getSoundCount() - 1);
     displaySnd();
 }
 
-void AutoChromaticAssignmentScreen::setOriginalKey(int i)
+void AutoChromaticAssignmentScreen::setOriginalKey(const int i)
 {
     originalKey = std::clamp(i, 35, 98);
     displayOriginalKey();
 }
 
-void AutoChromaticAssignmentScreen::setTune(int i)
+void AutoChromaticAssignmentScreen::setTune(const int i)
 {
     tune = std::clamp(i, -240, 240);
     displayTune();
 }
 
-void AutoChromaticAssignmentScreen::displaySource()
+void AutoChromaticAssignmentScreen::displaySource() const
 {
     const auto program = getProgramOrThrow();
     const auto note = mpc.clientEventController->getSelectedNote();
@@ -161,21 +161,21 @@ void AutoChromaticAssignmentScreen::displaySource()
     findField("source")->setText(std::to_string(note) + "/" + padName);
 }
 
-void AutoChromaticAssignmentScreen::displayTune()
+void AutoChromaticAssignmentScreen::displayTune() const
 {
     const std::string prefix = tune < 0 ? "-" : " ";
     findField("tune")->setText(
         prefix + StrUtil::padLeft(std::to_string(abs(tune)), " ", 3));
 }
 
-void AutoChromaticAssignmentScreen::displayOriginalKey()
+void AutoChromaticAssignmentScreen::displayOriginalKey() const
 {
     const auto padName = sampler->getPadName(originalKey - 35);
     findField("original-key")
         ->setText(std::to_string(originalKey) + "/" + padName);
 }
 
-void AutoChromaticAssignmentScreen::displaySnd()
+void AutoChromaticAssignmentScreen::displaySnd() const
 {
     const auto sampleName = sourceSoundIndex == -1
                                 ? "OFF"
@@ -186,13 +186,13 @@ void AutoChromaticAssignmentScreen::displaySnd()
                                    : "(ST)";
     findField("snd")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
-void AutoChromaticAssignmentScreen::displayProgramName()
+void AutoChromaticAssignmentScreen::displayProgramName() const
 {
     findField("program-name")->setText(newName);
 }
 
 void AutoChromaticAssignmentScreen::update(Observable *observable,
-                                           Message message)
+                                           const Message message)
 {
     const auto msg = std::get<std::string>(message);
 

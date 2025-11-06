@@ -37,12 +37,12 @@ namespace mpc::file::all
         std::vector<char> saveBytes{};
 
     public:
-        int getDevice(int i);
-        int getBus(int i);
-        int getVelo(int i);
-        int getPgm(int i);
+        int getDevice(int i) const;
+        int getBus(int i) const;
+        int getVelo(int i) const;
+        int getPgm(int i) const;
         std::string getName(int i);
-        int getStatus(int i);
+        int getStatus(int i) const;
 
     public:
         std::vector<char> &getBytes();

@@ -1,15 +1,15 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class SelectMixerDrumScreen : public mpc::lcdgui::ScreenComponent
+    class SelectMixerDrumScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
 
-        SelectMixerDrumScreen(mpc::Mpc &mpc, int layerIndex);
+        SelectMixerDrumScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
     };

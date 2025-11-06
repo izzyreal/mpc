@@ -1,6 +1,6 @@
 #include "Wave.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "Bressenham.hpp"
 

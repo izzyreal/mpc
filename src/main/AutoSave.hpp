@@ -16,6 +16,6 @@ namespace mpc
                                         std::shared_ptr<mpc::SaveTarget>);
         static void
         storeAutoSavedStateWithTarget(mpc::Mpc &,
-                                      std::shared_ptr<mpc::SaveTarget>);
+                                      const std::shared_ptr<mpc::SaveTarget> &);
     };
 } // namespace mpc

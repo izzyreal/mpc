@@ -30,12 +30,12 @@ namespace mpc::engine
 
         void setRightEnabled(bool b);
 
-        bool isLeftEnabled();
+        bool isLeftEnabled() const;
 
-        bool isRightEnabled();
+        bool isRightEnabled() const;
 
     public:
-        MixerInterconnection(std::string name,
+        MixerInterconnection(const std::string &name,
                              mpc::engine::audio::server::AudioServer *server);
     };
 } // namespace mpc::engine

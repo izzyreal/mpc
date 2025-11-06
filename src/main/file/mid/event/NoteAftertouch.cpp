@@ -16,12 +16,12 @@ NoteAftertouch::NoteAftertouch(int tick, int delta, int channel, int note,
 {
 }
 
-int NoteAftertouch::getNoteValue()
+int NoteAftertouch::getNoteValue() const
 {
     return mValue1;
 }
 
-int NoteAftertouch::getAmount()
+int NoteAftertouch::getAmount() const
 {
     return mValue2;
 }

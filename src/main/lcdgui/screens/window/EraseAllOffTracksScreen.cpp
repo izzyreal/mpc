@@ -6,13 +6,12 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-EraseAllOffTracksScreen::EraseAllOffTracksScreen(mpc::Mpc &mpc,
-                                                 const int layerIndex)
+EraseAllOffTracksScreen::EraseAllOffTracksScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "erase-all-off-tracks", layerIndex)
 {
 }
 
-void EraseAllOffTracksScreen::function(int i)
+void EraseAllOffTracksScreen::function(const int i)
 {
     ScreenComponent::function(i);
 

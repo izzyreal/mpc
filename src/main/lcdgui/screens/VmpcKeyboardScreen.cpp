@@ -163,7 +163,7 @@ void VmpcKeyboardScreen::function(int i)
                 const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-settings";
+                screen->setNextScreen("vmpc-settings");
                 openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
@@ -184,7 +184,7 @@ void VmpcKeyboardScreen::function(int i)
                 const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-auto-save";
+                screen->setNextScreen("vmpc-auto-save");
                 openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
@@ -259,7 +259,7 @@ void VmpcKeyboardScreen::updateRows()
     // auto kbMapping =
     // mpc.clientEventController->clientHardwareEventController->getKbMapping();
     // auto& labelKeyMap = kbMapping->getLabelKeyMap();
-    const int MAX_LABEL_LENGTH = 15;
+    constexpr int MAX_LABEL_LENGTH = 15;
     /*
         for (int i = 0; i < 5; i++)
         {

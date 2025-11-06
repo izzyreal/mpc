@@ -13,9 +13,9 @@ namespace mpc::file::mid::event::meta
         int mNumber;
 
     public:
-        int getMostSignificantBits();
-        int getLeastSignificantBits();
-        int getSequenceNumber();
+        int getMostSignificantBits() const;
+        int getLeastSignificantBits() const;
+        int getSequenceNumber() const;
 
     public:
         static std::shared_ptr<MetaEvent>
@@ -27,7 +27,7 @@ namespace mpc::file::mid::event::meta
         int getEventSize() override;
 
     public:
-        int compareTo(mpc::file::mid::event::MidiEvent *other);
+        int compareTo(mpc::file::mid::event::MidiEvent *other) const;
 
     public:
         SequenceNumber(int tick, int delta, int number);

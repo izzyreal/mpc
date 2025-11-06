@@ -3,7 +3,8 @@
 
 using namespace mpc::engine::control;
 
-CompoundControl::CompoundControl(int id, std::string name) : Control(id, name)
+CompoundControl::CompoundControl(int id, const std::string &name)
+    : Control(id, name)
 {
 }
 
@@ -18,7 +19,7 @@ void CompoundControl::add(std::shared_ptr<Control> control)
     controls.push_back(control);
 }
 
-void CompoundControl::remove(std::shared_ptr<Control> c)
+void CompoundControl::remove(const std::shared_ptr<Control> &c)
 {
     auto control = c;
 
@@ -44,7 +45,7 @@ std::vector<std::shared_ptr<Control>> CompoundControl::getControls()
     return controls;
 }
 
-std::shared_ptr<Control> CompoundControl::find(std::string name)
+std::shared_ptr<Control> CompoundControl::find(const std::string &name)
 {
     for (auto &c : controls)
     {
@@ -79,7 +80,7 @@ std::shared_ptr<Control> CompoundControl::deepFind(int controlId)
     return {};
 }
 
-void CompoundControl::disambiguate(std::shared_ptr<CompoundControl> c)
+void CompoundControl::disambiguate(const std::shared_ptr<CompoundControl> &c)
 {
     auto original = c->getName();
     if (!find(original))

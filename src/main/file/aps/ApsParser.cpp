@@ -7,7 +7,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::file::aps;
 using namespace mpc::disk;
@@ -173,22 +173,22 @@ const int ApsParser::PROGRAM_PAD_LENGTH;
 const int ApsParser::LAST_PROGRAM_PAD_LENGTH;
 const char ApsParser::NAME_TERMINATOR;
 
-std::vector<std::string> ApsParser::getSoundNames()
+std::vector<std::string> ApsParser::getSoundNames() const
 {
     return soundNames->get();
 }
 
-bool ApsParser::isHeaderValid()
+bool ApsParser::isHeaderValid() const
 {
     return header->isValid();
 }
 
-std::string ApsParser::getApsName()
+std::string ApsParser::getApsName() const
 {
     return apsName->get();
 }
 
-std::vector<ApsProgram *> ApsParser::getPrograms()
+std::vector<ApsProgram *> ApsParser::getPrograms() const
 {
     std::vector<ApsProgram *> res;
     for (auto &ap : programs)
@@ -198,7 +198,7 @@ std::vector<ApsProgram *> ApsParser::getPrograms()
     return res;
 }
 
-std::vector<ApsMixer *> ApsParser::getDrumMixers()
+std::vector<ApsMixer *> ApsParser::getDrumMixers() const
 {
     std::vector<ApsMixer *> res;
     for (auto &am : drumMixers)
@@ -208,12 +208,12 @@ std::vector<ApsMixer *> ApsParser::getDrumMixers()
     return res;
 }
 
-ApsDrumConfiguration *ApsParser::getDrumConfiguration(int i)
+ApsDrumConfiguration *ApsParser::getDrumConfiguration(int i) const
 {
     return drumConfigurations[i].get();
 }
 
-ApsGlobalParameters *ApsParser::getGlobalParameters()
+ApsGlobalParameters *ApsParser::getGlobalParameters() const
 {
     return globalParameters.get();
 }

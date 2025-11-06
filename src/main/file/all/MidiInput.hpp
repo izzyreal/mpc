@@ -48,19 +48,19 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
 
     public:
-        int getSoftThruMode();
-        int getReceiveCh();
-        bool isSustainPedalToDurationEnabled();
-        bool isFilterEnabled();
-        int getFilterType();
-        bool isMultiRecEnabled();
+        int getSoftThruMode() const;
+        int getReceiveCh() const;
+        bool isSustainPedalToDurationEnabled() const;
+        bool isFilterEnabled() const;
+        int getFilterType() const;
+        bool isMultiRecEnabled() const;
         std::vector<int> getMultiRecTrackDests();
-        bool isNotePassEnabled();
-        bool isPitchBendPassEnabled();
-        bool isPgmChangePassEnabled();
-        bool isChPressurePassEnabled();
-        bool isPolyPressurePassEnabled();
-        bool isExclusivePassEnabled();
+        bool isNotePassEnabled() const;
+        bool isPitchBendPassEnabled() const;
+        bool isPgmChangePassEnabled() const;
+        bool isChPressurePassEnabled() const;
+        bool isPolyPressurePassEnabled() const;
+        bool isExclusivePassEnabled() const;
         std::vector<bool> getCcPassEnabled();
 
     public:

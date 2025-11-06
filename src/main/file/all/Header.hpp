@@ -12,7 +12,7 @@ namespace mpc::file::all
 
     public:
         std::vector<char> &getHeaderArray();
-        bool verifyFileID();
+        bool verifyFileID() const;
 
     public:
         std::vector<char> &getBytes();

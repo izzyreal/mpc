@@ -1,12 +1,12 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
-#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
+#include "lcdgui/screens/window/MultiRecordingSetupLine.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class MultiRecordingSetupScreen : public mpc::lcdgui::ScreenComponent
+    class MultiRecordingSetupScreen final : public ScreenComponent
     {
 
     private:
@@ -26,7 +26,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
 
     public:
-        MultiRecordingSetupScreen(mpc::Mpc &mpc, int layerIndex);
+        MultiRecordingSetupScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;

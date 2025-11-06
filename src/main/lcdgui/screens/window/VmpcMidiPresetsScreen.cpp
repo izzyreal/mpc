@@ -15,8 +15,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::nvram;
 
-VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc &mpc,
-                                             const int layerIndex)
+VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-midi-presets", layerIndex)
 {
     for (int i = 0; i < 4; i++)
@@ -112,7 +111,7 @@ void VmpcMidiPresetsScreen::displayUpAndDown()
                                    mpc.midiControlPresets.size());
 }
 
-void VmpcMidiPresetsScreen::turnWheel(int i)
+void VmpcMidiPresetsScreen::turnWheel(const int i)
 {
     const auto &presets = mpc.midiControlPresets;
     const int presetIndex = (row + rowOffset) - 1;
@@ -137,13 +136,13 @@ void VmpcMidiPresetsScreen::turnWheel(int i)
     {
         presets[presetIndex]->autoloadMode = candidate;
         mpc.getDisk()->writeMidiControlPreset(presets[presetIndex]);
-        nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
+        MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
     }
 
     displayRows();
 }
 
-void VmpcMidiPresetsScreen::function(int i)
+void VmpcMidiPresetsScreen::function(const int i)
 {
     ScreenComponent::function(i);
 

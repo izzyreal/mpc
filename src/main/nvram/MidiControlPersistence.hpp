@@ -30,16 +30,18 @@ namespace mpc::nvram
     class MidiControlPersistence
     {
     private:
-        static void saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::path p,
-                                                   std::string name);
-        static void healPreset(mpc::Mpc &, std::shared_ptr<MidiControlPreset>);
+        static void saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc,
+                                                   const fs::path &p,
+                                                   const std::string &name);
+        static void healPreset(mpc::Mpc &,
+                               const std::shared_ptr<MidiControlPreset> &);
 
     public:
         static bool doesPresetWithNameExist(mpc::Mpc &, std::string name);
 
         static void
-        loadFileByNameIntoPreset(mpc::Mpc &, std::string name,
-                                 std::shared_ptr<MidiControlPreset>);
+        loadFileByNameIntoPreset(mpc::Mpc &, const std::string &name,
+                                 const std::shared_ptr<MidiControlPreset> &);
         static void loadAllPresetsFromDiskIntoMemory(mpc::Mpc &);
 
         static std::shared_ptr<MidiControlPreset>

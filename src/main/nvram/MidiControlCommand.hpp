@@ -31,11 +31,11 @@ namespace mpc::nvram
 
         MidiControlCommand() = default;
 
-        MidiControlCommand(const std::string mpcHardwareLabel,
+        MidiControlCommand(const std::string &mpcHardwareLabel,
                            const MidiMessageType, const int8_t midiChannelIndex,
                            const int8_t number);
 
-        MidiControlCommand(const std::string mpcHardwareLabel,
+        MidiControlCommand(const std::string &mpcHardwareLabel,
                            const MidiMessageType, const int8_t midiChannelIndex,
                            const int8_t number, const int8_t value);
 
@@ -71,6 +71,6 @@ namespace mpc::nvram
 
         void setValue(const int8_t value);
 
-        void setMpcHardwareLabel(const std::string mpcHardwareLabel);
+        void setMpcHardwareLabel(const std::string &mpcHardwareLabel);
     };
 } // namespace mpc::nvram

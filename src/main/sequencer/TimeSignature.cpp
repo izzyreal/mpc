@@ -12,7 +12,7 @@ void TimeSignature::setNumerator(int i)
     numerator = i;
 }
 
-int TimeSignature::getNumerator()
+int TimeSignature::getNumerator() const
 {
     return numerator;
 }
@@ -22,7 +22,7 @@ void TimeSignature::setDenominator(int i)
     denominator = i;
 }
 
-int TimeSignature::getDenominator()
+int TimeSignature::getDenominator() const
 {
     return denominator;
 }

@@ -67,6 +67,11 @@ void CopySoundScreen::turnWheel(const int i)
 
 void CopySoundScreen::openNameScreen()
 {
+    if (getFocusedFieldNameOrThrow() != "newname")
+    {
+        return;
+    }
+
     const auto enterAction = [this](const std::string &nameScreenName)
     {
         if (sampler->isSoundNameOccupied(nameScreenName))
@@ -83,12 +88,12 @@ void CopySoundScreen::openNameScreen()
     openScreenById(ScreenId::NameScreen);
 }
 
-void CopySoundScreen::displayNewName()
+void CopySoundScreen::displayNewName() const
 {
     findField("newname")->setText(newName);
 }
 
-void CopySoundScreen::displaySnd()
+void CopySoundScreen::displaySnd() const
 {
     if (!sampler->getSound())
     {

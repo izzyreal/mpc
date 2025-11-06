@@ -1,28 +1,18 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-
-namespace mpc::disk
-{
-    class ProgramLoader;
-    class ApsLoader;
-} // namespace mpc::disk
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class CantFindFileScreen : public mpc::lcdgui::ScreenComponent
+    class CantFindFileScreen final : public ScreenComponent
     {
     public:
         void function(int i) override;
         void open() override;
 
-        CantFindFileScreen(mpc::Mpc &mpc, int layerIndex);
+        CantFindFileScreen(Mpc &mpc, int layerIndex);
 
-    private:
-        std::string fileName;
         bool skipAll = false;
         bool waitingForUser = false;
-
-        friend class mpc::disk::ProgramLoader;
-        friend class mpc::disk::ApsLoader;
+        std::string fileName;
     };
 } // namespace mpc::lcdgui::screens::window

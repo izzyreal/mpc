@@ -12,7 +12,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-LoadAProgramScreen::LoadAProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+LoadAProgramScreen::LoadAProgramScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "load-a-program", layerIndex)
 {
 }
@@ -22,7 +22,7 @@ void LoadAProgramScreen::open()
     displayLoadReplaceSound();
 }
 
-void LoadAProgramScreen::turnWheel(int i)
+void LoadAProgramScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -33,7 +33,7 @@ void LoadAProgramScreen::turnWheel(int i)
     }
 }
 
-void LoadAProgramScreen::function(int i)
+void LoadAProgramScreen::function(const int i)
 {
 
     const auto selectedFile =
@@ -84,7 +84,7 @@ void LoadAProgramScreen::displayLoadReplaceSound()
         ->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));
 }
 
-void LoadAProgramScreen::setLoadReplaceSameSound(bool b)
+void LoadAProgramScreen::setLoadReplaceSameSound(const bool b)
 {
     loadReplaceSameSound = b;
 }

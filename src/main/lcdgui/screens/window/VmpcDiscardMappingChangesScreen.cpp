@@ -4,7 +4,7 @@
 using namespace mpc::lcdgui::screens::window;
 
 VmpcDiscardMappingChangesScreen::VmpcDiscardMappingChangesScreen(
-    mpc::Mpc &mpc, const int layerIndex)
+    Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-discard-mapping-changes", layerIndex)
 {
 }
@@ -13,8 +13,12 @@ void VmpcDiscardMappingChangesScreen::close()
 {
     nextScreen = "sequencer";
 }
+void VmpcDiscardMappingChangesScreen::setNextScreen(std::string nextScreenToUse)
+{
+    nextScreen = nextScreenToUse;
+}
 
-void VmpcDiscardMappingChangesScreen::function(int i)
+void VmpcDiscardMappingChangesScreen::function(const int i)
 {
     ScreenComponent::function(i);
 

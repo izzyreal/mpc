@@ -10,7 +10,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-LoadASequenceFromAllScreen::LoadASequenceFromAllScreen(mpc::Mpc &mpc,
+LoadASequenceFromAllScreen::LoadASequenceFromAllScreen(Mpc &mpc,
                                                        const int layerIndex)
     : ScreenComponent(mpc, "load-a-sequence-from-all", layerIndex)
 {
@@ -23,7 +23,7 @@ void LoadASequenceFromAllScreen::open()
     displayLoadInto();
 }
 
-void LoadASequenceFromAllScreen::turnWheel(int i)
+void LoadASequenceFromAllScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -41,7 +41,7 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
     }
 }
 
-void LoadASequenceFromAllScreen::function(int i)
+void LoadASequenceFromAllScreen::function(const int i)
 {
 
     switch (i)
@@ -64,7 +64,7 @@ void LoadASequenceFromAllScreen::function(int i)
     }
 }
 
-void LoadASequenceFromAllScreen::displayFile()
+void LoadASequenceFromAllScreen::displayFile() const
 {
     if (sourceSeqIndex >= sequencesFromAllFile.size())
     {
@@ -80,7 +80,7 @@ void LoadASequenceFromAllScreen::displayFile()
     findLabel("file0")->setText("-" + name);
 }
 
-void LoadASequenceFromAllScreen::displayLoadInto()
+void LoadASequenceFromAllScreen::displayLoadInto() const
 {
     const auto loadASequenceScreen =
         mpc.screens->get<ScreenId::LoadASequenceScreen>();
@@ -92,7 +92,7 @@ void LoadASequenceFromAllScreen::displayLoadInto()
             sequencer->getSequence(loadASequenceScreen->loadInto)->getName());
 }
 
-void LoadASequenceFromAllScreen::setSourceSeqIndex(int i)
+void LoadASequenceFromAllScreen::setSourceSeqIndex(const int i)
 {
     if (i < 0 || i >= sequencesFromAllFile.size())
     {

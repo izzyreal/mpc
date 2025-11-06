@@ -8,7 +8,7 @@
 using namespace mpc::file::mid::event::meta;
 
 SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta,
-                                               std::vector<char> data)
+                                               const std::vector<char> &data)
     : MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC)
 {
     mData = data;

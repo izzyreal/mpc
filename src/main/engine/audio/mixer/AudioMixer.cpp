@@ -26,27 +26,28 @@ std::shared_ptr<MixerControls> AudioMixer::getMixerControls()
     return controls;
 }
 
-AudioBuffer *AudioMixer::getSharedBuffer()
+AudioBuffer *AudioMixer::getSharedBuffer() const
 {
     return sharedAudioBuffer;
 }
 
-AudioBuffer *AudioMixer::createBuffer(std::string name)
+AudioBuffer *AudioMixer::createBuffer(const std::string &name) const
 {
     return server->createAudioBuffer(name);
 }
 
-void AudioMixer::removeBuffer(AudioBuffer *buffer)
+void AudioMixer::removeBuffer(AudioBuffer *buffer) const
 {
     server->removeAudioBuffer(buffer);
 }
 
-std::shared_ptr<AudioMixerStrip> AudioMixer::getStrip(std::string name)
+std::shared_ptr<AudioMixerStrip> AudioMixer::getStrip(const std::string &name)
 {
     return getStripImpl(name);
 }
 
-std::shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(std::string name)
+std::shared_ptr<AudioMixerStrip>
+AudioMixer::getStripImpl(const std::string &name)
 {
     for (auto &strip : strips)
     {
@@ -103,7 +104,7 @@ void AudioMixer::silenceStrips(
     }
 }
 
-void AudioMixer::writeBusBuffers(int nFrames)
+void AudioMixer::writeBusBuffers(int nFrames) const
 {
     for (auto &bus : busses)
     {
@@ -111,7 +112,8 @@ void AudioMixer::writeBusBuffers(int nFrames)
     }
 }
 
-void AudioMixer::createBusses(std::shared_ptr<MixerControls> mixerControls)
+void AudioMixer::createBusses(
+    const std::shared_ptr<MixerControls> &mixerControls)
 {
     busses.clear();
     auxBusses.clear();
@@ -133,7 +135,7 @@ AudioMixer::createBus(std::shared_ptr<BusControls> busControls)
     return std::make_shared<AudioMixerBus>(this, busControls);
 }
 
-std::shared_ptr<AudioMixerBus> AudioMixer::getBus(std::string name)
+std::shared_ptr<AudioMixerBus> AudioMixer::getBus(const std::string &name)
 {
     for (auto &bus : busses)
     {
@@ -159,7 +161,8 @@ std::shared_ptr<AudioMixerStrip> AudioMixer::getMainStrip()
     return mainStrip;
 }
 
-void AudioMixer::createStrips(std::shared_ptr<MixerControls> mixerControls)
+void AudioMixer::createStrips(
+    const std::shared_ptr<MixerControls> &mixerControls)
 {
     for (auto &control : mixerControls->getControls())
     {

@@ -5,7 +5,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-VmpcAutoSaveScreen::VmpcAutoSaveScreen(mpc::Mpc &mpc, const int layerIndex)
+VmpcAutoSaveScreen::VmpcAutoSaveScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-auto-save", layerIndex)
 {
 }
@@ -81,24 +81,24 @@ void VmpcAutoSaveScreen::setAutoLoadOnStart(int i)
     displayAutoLoadOnStart();
 }
 
-void VmpcAutoSaveScreen::displayAutoSaveOnExit()
+void VmpcAutoSaveScreen::displayAutoSaveOnExit() const
 {
     findField("auto-save-on-exit")
         ->setText(autoSaveOnExitNames[autoSaveOnExit]);
 }
 
-void VmpcAutoSaveScreen::displayAutoLoadOnStart()
+void VmpcAutoSaveScreen::displayAutoLoadOnStart() const
 {
     findField("auto-load-on-start")
         ->setText(autoLoadOnStartNames[autoLoadOnStart]);
 }
 
-int VmpcAutoSaveScreen::getAutoSaveOnExit()
+int VmpcAutoSaveScreen::getAutoSaveOnExit() const
 {
     return autoSaveOnExit;
 }
 
-int VmpcAutoSaveScreen::getAutoLoadOnStart()
+int VmpcAutoSaveScreen::getAutoLoadOnStart() const
 {
     return autoLoadOnStart;
 }

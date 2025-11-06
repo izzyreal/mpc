@@ -30,20 +30,21 @@ namespace mpc::sequencer
     {
     public:
         explicit MidiClockOutput(
-            Sequencer *, std::function<std::shared_ptr<lcdgui::Screens>()>,
-            std::function<bool()> isBouncing);
+            Sequencer *,
+            const std::function<std::shared_ptr<lcdgui::Screens>()> &,
+            const std::function<bool()> &isBouncing);
 
         void processTempoChange();
         void processSampleRateChange();
-        void processFrame(bool isRunningAtStartOfBuffer, int frameIndex);
+        void processFrame(bool isRunningAtStartOfBuffer, int frameIndex) const;
 
-        void enqueueMidiSyncStart1msBeforeNextClock();
+        void enqueueMidiSyncStart1msBeforeNextClock() const;
 
         void setSampleRate(unsigned int sampleRate);
 
-        void sendMidiSyncMsg(unsigned char status);
+        void sendMidiSyncMsg(unsigned char status) const;
 
-        bool isLastProcessedFrameMidiClockLock();
+        bool isLastProcessedFrameMidiClockLock() const;
 
     private:
         std::atomic<bool> running{false};
@@ -67,9 +68,9 @@ namespace mpc::sequencer
             eventQueue;
         std::vector<EventAfterNFrames> tempEventQueue;
 
-        void sendMidiClockMsg(int frameIndex);
+        void sendMidiClockMsg(int frameIndex) const;
         void enqueueEventAfterNFrames(const std::function<void()> &event,
-                                      unsigned long nFrames);
+                                      unsigned long nFrames) const;
 
         // std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
     };

@@ -15,7 +15,7 @@ namespace mpc::engine::filter
         float deriveResonance() override;
 
     public:
-        StateVariableFilterControls(std::string name, int idOffset);
+        StateVariableFilterControls(const std::string &name, int idOffset);
     };
 
 } // namespace mpc::engine::filter

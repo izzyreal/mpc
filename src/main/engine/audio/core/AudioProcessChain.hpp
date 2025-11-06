@@ -33,7 +33,8 @@ namespace mpc::engine::audio::core
         }
 
     public:
-        AudioProcessChain(std::shared_ptr<AudioControlsChain> controlChain);
+        AudioProcessChain(
+            const std::shared_ptr<AudioControlsChain> &controlChain);
     };
 
 } // namespace mpc::engine::audio::core

@@ -16,7 +16,7 @@ namespace mpc::engine::control
         int intValue(float userVal) override;
 
     public:
-        LogLaw(float min, float max, std::string units);
+        LogLaw(float min, float max, const std::string &units);
     };
 
 } // namespace mpc::engine::control

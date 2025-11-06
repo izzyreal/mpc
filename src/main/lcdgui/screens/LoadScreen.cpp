@@ -12,16 +12,16 @@
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
-#include "lcdgui/screens/window/LoadASequenceScreen.hpp"
 #include "lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp"
 
 #include "nvram/VolumesPersistence.hpp"
 #include "sampler/Sampler.hpp"
 
-using namespace mpc::disk;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
+using namespace mpc::disk;
 using namespace mpc::sampler;
 
 LoadScreen::LoadScreen(mpc::Mpc &mpc, const int layerIndex)
@@ -59,7 +59,7 @@ void LoadScreen::open()
     if (focusedFieldName == "device")
     {
         ls->setFunctionKeysArrangement(
-            device == mpc.getDiskController()->activeDiskIndex ? 0 : 2);
+            device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 2);
     }
     else
     {
@@ -69,7 +69,6 @@ void LoadScreen::open()
 
 void LoadScreen::function(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     switch (i)
@@ -87,34 +86,32 @@ void LoadScreen::function(int i)
         {
             if (focusedFieldName == "device")
             {
-                if (mpc.getDiskController()->activeDiskIndex == device)
+                if (mpc.getDiskController()->getActiveDiskIndex() == device)
                 {
                     return;
                 }
 
-                auto &candidateVolume = mpc.getDisks()[device]->getVolume();
-
-                if (candidateVolume.mode == DISABLED)
+                if (auto &candidateVolume = mpc.getDisks()[device]->getVolume();
+                    candidateVolume.mode == DISABLED)
                 {
                     ls->showPopupForMs("Device is disabled in DISKS", 1000);
                     return;
                 }
 
-                auto oldIndex = mpc.getDiskController()->activeDiskIndex;
+                auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
 
-                mpc.getDiskController()->activeDiskIndex = device;
+                mpc.getDiskController()->setActiveDiskIndex(device);
                 auto newDisk = mpc.getDisk();
 
                 fileLoad = 0;
 
                 if (newDisk->getVolume().type == USB_VOLUME)
                 {
-
                     newDisk->initRoot();
 
                     if (!newDisk->getVolume().volumeStream.is_open())
                     {
-                        mpc.getDiskController()->activeDiskIndex = oldIndex;
+                        mpc.getDiskController()->setActiveDiskIndex(oldIndex);
                         ls->showPopupForMs("Error! Device seems in use", 2000);
                         return;
                     }
@@ -130,7 +127,7 @@ void LoadScreen::function(int i)
                 displayDevice();
                 displayDeviceType();
 
-                mpc::nvram::VolumesPersistence::save(mpc);
+                nvram::VolumesPersistence::save(mpc);
 
                 return;
             }
@@ -172,7 +169,6 @@ void LoadScreen::function(int i)
                     ls->showPopupAndAwaitInteraction("Can't play " + name);
                 }
             }
-
             break;
         }
         case 5:
@@ -210,7 +206,7 @@ void LoadScreen::function(int i)
             else if (StrUtil::eqIgnoreCase(ext, ".snd") ||
                      StrUtil::eqIgnoreCase(ext, ".wav"))
             {
-                const bool shouldBeConverted = false;
+                constexpr bool shouldBeConverted = false;
                 loadSound(shouldBeConverted);
             }
             else if (StrUtil::eqIgnoreCase(ext, ".pgm"))
@@ -231,6 +227,7 @@ void LoadScreen::function(int i)
             }
             break;
         }
+        default:;
     }
 }
 
@@ -314,7 +311,7 @@ void LoadScreen::turnWheel(int i)
         displayDevice();
         displayDeviceType();
         ls->setFunctionKeysArrangement(
-            mpc.getDiskController()->activeDiskIndex == device ? 0 : 2);
+            mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 2);
         return;
     }
 
@@ -326,17 +323,17 @@ void LoadScreen::turnWheel(int i)
     ls->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
-void LoadScreen::displayView()
+void LoadScreen::displayView() const
 {
     findField("view")->setText(views[view]);
 }
 
-void LoadScreen::displayDirectory()
+void LoadScreen::displayDirectory() const
 {
     findField("directory")->setText(mpc.getDisk()->getDirectoryName());
 }
 
-void LoadScreen::displayFreeSnd()
+void LoadScreen::displayFreeSnd() const
 {
     findLabel("freesnd")->setText(
         " " +
@@ -345,7 +342,7 @@ void LoadScreen::displayFreeSnd()
         "K");
 }
 
-void LoadScreen::displayFile()
+void LoadScreen::displayFile() const
 {
     if (mpc.getDisk()->getFileNames().empty())
     {
@@ -354,9 +351,9 @@ void LoadScreen::displayFile()
     }
 
     auto selectedFileName = getSelectedFileName();
-    const auto selectedFile = getSelectedFile();
 
-    if (selectedFileName.length() != 0 && selectedFile &&
+    if (const auto selectedFile = getSelectedFile();
+        selectedFileName.length() != 0 && selectedFile &&
         selectedFile->isDirectory())
     {
         findField("file")->setText(
@@ -381,7 +378,7 @@ void LoadScreen::displayFile()
     }
 }
 
-unsigned long LoadScreen::getFileSizeKb()
+unsigned long LoadScreen::getFileSizeKb() const
 {
     const auto file = getSelectedFile();
 
@@ -393,7 +390,7 @@ unsigned long LoadScreen::getFileSizeKb()
     return static_cast<unsigned long>(ceil(file->length() / 1024.0));
 }
 
-void LoadScreen::displaySize()
+void LoadScreen::displaySize() const
 {
     if (mpc.getDisk()->getFileNames().empty())
     {
@@ -438,12 +435,12 @@ void LoadScreen::setView(int i)
     displaySize();
 }
 
-std::shared_ptr<MpcFile> LoadScreen::getSelectedFile()
+std::shared_ptr<MpcFile> LoadScreen::getSelectedFile() const
 {
     return mpc.getDisk()->getFile(fileLoad);
 }
 
-std::string LoadScreen::getSelectedFileName()
+std::string LoadScreen::getSelectedFileName() const
 {
     auto fileNames = mpc.getDisk()->getFileNames();
 
@@ -455,7 +452,7 @@ std::string LoadScreen::getSelectedFileName()
     return fileNames[fileLoad];
 }
 
-bool LoadScreen::isSelectedFileDirectory()
+bool LoadScreen::isSelectedFileDirectory() const
 {
     return mpc.getDisk()->getFile(fileLoad)->isDirectory();
 }
@@ -480,6 +477,10 @@ void LoadScreen::setFileLoad(int i)
     fileLoad = i;
     displayFile();
     displaySize();
+}
+int LoadScreen::getFileLoad() const
+{
+    return fileLoad;
 }
 
 void LoadScreen::loadSound(bool shouldBeConverted)
@@ -515,7 +516,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     {
         auto loadRoutine = [&]()
         {
-            const bool shouldBeConverted2 = true;
+            constexpr bool shouldBeConverted2 = true;
             loadSound(shouldBeConverted2);
         };
 
@@ -541,11 +542,10 @@ void LoadScreen::displayDeviceType()
 void LoadScreen::up()
 {
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "device")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "device")
     {
-        device = mpc.getDiskController()->activeDiskIndex;
+        device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();
         const auto ext = fs::path(getSelectedFileName()).extension().string();
         const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||

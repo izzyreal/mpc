@@ -1,6 +1,6 @@
 #include "SaveApsFileScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
@@ -14,7 +14,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc &mpc, const int layerIndex)
+SaveApsFileScreen::SaveApsFileScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save-aps-file", layerIndex)
 {
 }
@@ -31,15 +31,18 @@ void SaveApsFileScreen::open()
     displayReplaceSameSounds();
     displaySave();
 }
+std::string SaveApsFileScreen::getFileName() const
+{
+    return fileName;
+}
 
-void SaveApsFileScreen::turnWheel(int i)
+void SaveApsFileScreen::turnWheel(const int i)
 {
     const auto saveAProgramScreen =
         mpc.screens->get<ScreenId::SaveAProgramScreen>();
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "save")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "save")
     {
         saveAProgramScreen->setSave(saveAProgramScreen->save + i);
         displaySave();
@@ -51,9 +54,8 @@ void SaveApsFileScreen::turnWheel(int i)
     }
 }
 
-void SaveApsFileScreen::function(int i)
+void SaveApsFileScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
@@ -68,11 +70,9 @@ void SaveApsFileScreen::function(int i)
 
             if (disk->checkExists(apsFileName))
             {
-                auto replaceAction = [this, disk, apsFileName]
+                auto replaceAction = [disk, apsFileName]
                 {
-                    const auto success = disk->getFile(apsFileName)->del();
-
-                    if (success)
+                    if (disk->getFile(apsFileName)->del())
                     {
                         disk->flush();
                         disk->initFiles();
@@ -80,11 +80,9 @@ void SaveApsFileScreen::function(int i)
                     }
                 };
 
-                const auto initializeNameScreen = [this]
+                const auto initializeNameScreen = [this, nameScreen]
                 {
-                    const auto nameScreen =
-                        mpc.screens->get<ScreenId::NameScreen>();
-                    auto enterAction = [this](std::string &nameScreenName)
+                    auto enterAction = [this](const std::string &nameScreenName)
                     {
                         fileName = nameScreenName;
                         openScreenById(ScreenId::SaveApsFileScreen);
@@ -107,22 +105,23 @@ void SaveApsFileScreen::function(int i)
             disk->writeAps(apsFileName);
             break;
         }
+        default:;
     }
 }
 
-void SaveApsFileScreen::displayFile()
+void SaveApsFileScreen::displayFile() const
 {
     findField("file")->setText(fileName);
 }
 
-void SaveApsFileScreen::displaySave()
+void SaveApsFileScreen::displaySave() const
 {
     const auto saveAProgramScreen =
         mpc.screens->get<ScreenId::SaveAProgramScreen>();
     findField("save")->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
-void SaveApsFileScreen::displayReplaceSameSounds()
+void SaveApsFileScreen::displayReplaceSameSounds() const
 {
     const auto saveAProgramScreen =
         mpc.screens->get<ScreenId::SaveAProgramScreen>();
@@ -133,12 +132,10 @@ void SaveApsFileScreen::displayReplaceSameSounds()
 
 void SaveApsFileScreen::openNameScreen()
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "file")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "file")
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             fileName = nameScreenName;
             openScreenById(ScreenId::SaveApsFileScreen);

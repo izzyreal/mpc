@@ -166,7 +166,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
         case HostInputEvent::Source::KEYBOARD:
         {
-            const auto &[keyDown, rawKeyCode, shiftDown, ctrlDown, altDown] = std::get<KeyEvent>(hostInputEvent.payload);
+            const auto &[keyDown, rawKeyCode, shiftDown, ctrlDown, altDown] =
+                std::get<KeyEvent>(hostInputEvent.payload);
             const auto vmpcKeyCode =
                 KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
             const auto binding = keyboardBindings->lookup(vmpcKeyCode);
@@ -193,8 +194,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                     }
 
                     clientHardwareEvent.textInputKey =
-                        ClientHardwareEvent::TextInputKey{charToUse,
-                                                          keyDown};
+                        ClientHardwareEvent::TextInputKey{charToUse, keyDown};
                 }
             }
 
@@ -220,15 +220,13 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
             clientHardwareEvent.componentId = id;
 
-            if (id >= PAD_1_OR_AB &&
-                id <= PAD_16_OR_PARENTHESES)
+            if (id >= PAD_1_OR_AB && id <= PAD_16_OR_PARENTHESES)
             {
                 clientHardwareEvent.type =
                     keyDown ? ClientHardwareEvent::Type::PadPress
-                                : ClientHardwareEvent::Type::PadRelease;
+                            : ClientHardwareEvent::Type::PadRelease;
                 clientHardwareEvent.index =
-                    static_cast<int>(id) -
-                    static_cast<int>(PAD_1_OR_AB);
+                    static_cast<int>(id) - static_cast<int>(PAD_1_OR_AB);
                 if (keyDown)
                 {
                     clientHardwareEvent.value = Pad::MAX_VELO_NORMALIZED;
@@ -281,7 +279,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             {
                 clientHardwareEvent.type =
                     keyDown ? ClientHardwareEvent::Type::ButtonPress
-                                : ClientHardwareEvent::Type::ButtonRelease;
+                            : ClientHardwareEvent::Type::ButtonRelease;
             }
             break;
         }

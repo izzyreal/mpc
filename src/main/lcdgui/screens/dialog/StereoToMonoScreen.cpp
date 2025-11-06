@@ -48,9 +48,8 @@ void StereoToMonoScreen::turnWheel(const int i)
 
 void StereoToMonoScreen::openNameScreen()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "newlname" || focusedFieldName == "newrname")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "newlname" || focusedFieldName == "newrname")
     {
         const auto isL = focusedFieldName == "newlname";
 
@@ -81,7 +80,6 @@ void StereoToMonoScreen::openNameScreen()
 
 void StereoToMonoScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
@@ -143,6 +141,7 @@ void StereoToMonoScreen::function(const int i)
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         }
+        default:;
     }
 }
 
@@ -185,12 +184,12 @@ void StereoToMonoScreen::displayStereoSource()
     }
 }
 
-void StereoToMonoScreen::displayNewLName()
+void StereoToMonoScreen::displayNewLName() const
 {
     findField("newlname")->setText(newLName);
 }
 
-void StereoToMonoScreen::displayNewRName()
+void StereoToMonoScreen::displayNewRName() const
 {
     findField("newrname")->setText(newRName);
 }

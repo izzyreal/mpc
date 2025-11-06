@@ -3,7 +3,7 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-LinearLaw::LinearLaw(float min, float max, string units)
+LinearLaw::LinearLaw(float min, float max, const string &units)
     : AbstractLaw(min, max, units)
 {
 }

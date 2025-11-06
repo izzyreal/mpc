@@ -5,8 +5,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-IgnoreTempoChangeScreen::IgnoreTempoChangeScreen(mpc::Mpc &mpc,
-                                                 const int layerIndex)
+IgnoreTempoChangeScreen::IgnoreTempoChangeScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "ignore-tempo-change", layerIndex)
 {
 }
@@ -17,7 +16,7 @@ void IgnoreTempoChangeScreen::open()
     displayIgnore();
 }
 
-void IgnoreTempoChangeScreen::function(int i)
+void IgnoreTempoChangeScreen::function(const int i)
 {
     switch (i)
     {
@@ -27,23 +26,23 @@ void IgnoreTempoChangeScreen::function(int i)
     }
 }
 
-void IgnoreTempoChangeScreen::turnWheel(int i)
+void IgnoreTempoChangeScreen::turnWheel(const int i)
 {
     ignore = i > 0;
     displayIgnore();
 }
 
-void IgnoreTempoChangeScreen::displayIgnore()
+void IgnoreTempoChangeScreen::displayIgnore() const
 {
     findField("insequence")->setText(ignore ? "ON" : "OFF");
 }
 
-void IgnoreTempoChangeScreen::setIgnore(bool b)
+void IgnoreTempoChangeScreen::setIgnore(const bool b)
 {
     ignore = b;
 }
 
-bool IgnoreTempoChangeScreen::getIgnore()
+bool IgnoreTempoChangeScreen::getIgnore() const
 {
     return ignore;
 }

@@ -3,7 +3,9 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-BooleanControl::BooleanControl(int id, string name) : Control(id, name) {}
+BooleanControl::BooleanControl(int id, const string &name) : Control(id, name)
+{
+}
 
 void BooleanControl::setValue(bool value)
 {
@@ -14,7 +16,7 @@ void BooleanControl::setValue(bool value)
     }
 }
 
-bool BooleanControl::getValue()
+bool BooleanControl::getValue() const
 {
     return value;
 }

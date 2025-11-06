@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
@@ -9,8 +9,7 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class ResampleScreen final : public ScreenComponent,
-                           public OpensNameScreen
+    class ResampleScreen final : public ScreenComponent, public OpensNameScreen
     {
 
     public:
@@ -28,10 +27,10 @@ namespace mpc::lcdgui::screens::dialog
         const std::vector<std::string> bitNames =
             std::vector<std::string>{"16", "12", "8"};
 
-        void displayNewFs();
-        void displayQuality();
-        void displayNewBit();
-        void displayNewName();
+        void displayNewFs() const;
+        void displayQuality() const;
+        void displayNewBit() const;
+        void displayNewName() const;
 
         void setNewFs(int i);
         void setQuality(int i);

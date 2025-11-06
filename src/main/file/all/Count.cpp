@@ -68,67 +68,67 @@ Count::Count(mpc::Mpc &mpc)
         static_cast<int8_t>(metronomeSoundScreen->getNormalVelo());
 }
 
-bool Count::isEnabled()
+bool Count::isEnabled() const
 {
     return enabled;
 }
 
-int Count::getCountInMode()
+int Count::getCountInMode() const
 {
     return countInMode;
 }
 
-int Count::getClickVolume()
+int Count::getClickVolume() const
 {
     return clickVolume;
 }
 
-int Count::getRate()
+int Count::getRate() const
 {
     return rate;
 }
 
-bool Count::isEnabledInPlay()
+bool Count::isEnabledInPlay() const
 {
     return enabledInPlay;
 }
 
-bool Count::isEnabledInRec()
+bool Count::isEnabledInRec() const
 {
     return enabledInRec;
 }
 
-int Count::getClickOutput()
+int Count::getClickOutput() const
 {
     return clickOutput;
 }
 
-bool Count::isWaitForKeyEnabled()
+bool Count::isWaitForKeyEnabled() const
 {
     return waitForKeyEnabled;
 }
 
-int Count::getSound()
+int Count::getSound() const
 {
     return sound;
 }
 
-int Count::getAccentPad()
+int Count::getAccentPad() const
 {
     return accentPad;
 }
 
-int Count::getNormalPad()
+int Count::getNormalPad() const
 {
     return normalPad;
 }
 
-int Count::getAccentVelo()
+int Count::getAccentVelo() const
 {
     return accentVelo;
 }
 
-int Count::getNormalVelo()
+int Count::getNormalVelo() const
 {
     return normalVelo;
 }

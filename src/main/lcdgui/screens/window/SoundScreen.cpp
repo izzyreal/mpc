@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-SoundScreen::SoundScreen(mpc::Mpc &mpc, const int layerIndex)
+SoundScreen::SoundScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sound", layerIndex)
 {
 }
@@ -27,7 +27,7 @@ void SoundScreen::openNameScreen()
 
     if (focusedFieldName == "soundname")
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             if (sampler->isSoundNameOccupied(nameScreenName))
             {
@@ -45,7 +45,7 @@ void SoundScreen::openNameScreen()
     }
 }
 
-void SoundScreen::function(int i)
+void SoundScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -63,7 +63,7 @@ void SoundScreen::function(int i)
     }
 }
 
-void SoundScreen::displaySoundName()
+void SoundScreen::displaySoundName() const
 {
     const auto sound = sampler->getSound();
 
@@ -76,7 +76,7 @@ void SoundScreen::displaySoundName()
     findField("soundname")->setText(sound->getName());
 }
 
-void SoundScreen::displayType()
+void SoundScreen::displayType() const
 {
     const auto sound = sampler->getSound();
 
@@ -90,7 +90,7 @@ void SoundScreen::displayType()
         "Type:" + std::string(sound->isMono() ? "MONO" : "STEREO"));
 }
 
-void SoundScreen::displayRate()
+void SoundScreen::displayRate() const
 {
     const auto sound = sampler->getSound();
 
@@ -104,7 +104,7 @@ void SoundScreen::displayRate()
         "Rate: " + std::to_string(sound->getSampleRate()) + "Hz");
 }
 
-void SoundScreen::displaySize()
+void SoundScreen::displaySize() const
 {
     const auto sound = sampler->getSound();
 

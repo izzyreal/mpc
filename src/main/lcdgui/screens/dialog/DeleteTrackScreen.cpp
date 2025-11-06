@@ -54,7 +54,7 @@ void DeleteTrackScreen::setTr(const int i)
     displayTr();
 }
 
-void DeleteTrackScreen::displayTr()
+void DeleteTrackScreen::displayTr() const
 {
     const auto trackName =
         sequencer->getActiveSequence()->getTrack(tr)->getName();

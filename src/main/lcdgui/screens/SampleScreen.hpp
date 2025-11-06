@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <map>
 
@@ -51,12 +51,12 @@ namespace mpc::lcdgui::screens
         void setMonitor(int i);
         void setPreRec(int i);
 
-        void displayInput();
-        void displayThreshold();
-        void displayMode();
-        void displayTime();
-        void displayMonitor();
-        void displayPreRec();
+        void displayInput() const;
+        void displayThreshold() const;
+        void displayMode() const;
+        void displayTime() const;
+        void displayMonitor() const;
+        void displayPreRec() const;
         void updateVU();
 
     public:

@@ -12,7 +12,7 @@ namespace mpc::file::mid::event::meta
         std::string mText;
 
     public:
-        void setText(std::string t);
+        void setText(const std::string &t);
         std::string getText();
 
     public:
@@ -22,9 +22,10 @@ namespace mpc::file::mid::event::meta
         int getEventSize() override;
 
     public:
-        int compareTo(mpc::file::mid::event::MidiEvent *other);
+        int compareTo(mpc::file::mid::event::MidiEvent *other) const;
 
     public:
-        TextualMetaEvent(int tick, int delta, int type, std::string text);
+        TextualMetaEvent(int tick, int delta, int type,
+                         const std::string &text);
     };
 } // namespace mpc::file::mid::event::meta

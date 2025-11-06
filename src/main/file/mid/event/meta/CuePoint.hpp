@@ -7,9 +7,9 @@ namespace mpc::file::mid::event::meta
     {
 
     public:
-        void setCue(std::string name);
+        void setCue(const std::string &name);
         std::string getCue();
 
-        CuePoint(int tick, int delta, std::string marker);
+        CuePoint(int tick, int delta, const std::string &marker);
     };
 } // namespace mpc::file::mid::event::meta

@@ -1,13 +1,13 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class MidiSwScreen : public mpc::lcdgui::ScreenComponent
+    class MidiSwScreen final : public ScreenComponent
     {
 
     public:
-        MidiSwScreen(mpc::Mpc &, int layerIndex);
+        MidiSwScreen(Mpc &, int layerIndex);
 
         void open() override;
         void turnWheel(int i) override;

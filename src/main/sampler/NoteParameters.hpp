@@ -14,26 +14,26 @@ namespace mpc::sampler
     class NoteParameters
     {
     public:
-        int getSoundIndex();
-        int getSoundGenerationMode();
-        int getOptionalNoteA();
-        int getOptionalNoteB();
-        int getMuteAssignA();
-        int getMuteAssignB();
-        int getTune();
-        int getVelocityToStart();
-        int getAttack();
-        int getDecay();
-        int getVelocityToAttack();
-        int getDecayMode();
-        int getVeloToLevel();
-        int getFilterFrequency();
-        int getVelocityToFilterFrequency();
-        int getFilterAttack();
-        int getFilterDecay();
-        int getFilterResonance();
-        int getFilterEnvelopeAmount();
-        VoiceOverlapMode getVoiceOverlapMode();
+        int getSoundIndex() const;
+        int getSoundGenerationMode() const;
+        int getOptionalNoteA() const;
+        int getOptionalNoteB() const;
+        int getMuteAssignA() const;
+        int getMuteAssignB() const;
+        int getTune() const;
+        int getVelocityToStart() const;
+        int getAttack() const;
+        int getDecay() const;
+        int getVelocityToAttack() const;
+        int getDecayMode() const;
+        int getVeloToLevel() const;
+        int getFilterFrequency() const;
+        int getVelocityToFilterFrequency() const;
+        int getFilterAttack() const;
+        int getFilterDecay() const;
+        int getFilterResonance() const;
+        int getFilterEnvelopeAmount() const;
+        VoiceOverlapMode getVoiceOverlapMode() const;
 
         std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
         std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
@@ -74,10 +74,10 @@ namespace mpc::sampler
         void setSoundIndex(int i);
         void setSoundGenMode(int i);
         void setVeloRangeLower(int i);
-        int getVelocityRangeLower();
+        int getVelocityRangeLower() const;
         void setOptNoteA(int i);
         void setVeloRangeUpper(int i);
-        int getVelocityRangeUpper();
+        int getVelocityRangeUpper() const;
         void setOptionalNoteB(int i);
         void setVoiceOverlapMode(const VoiceOverlapMode);
         void setMuteAssignA(int i);
@@ -96,11 +96,11 @@ namespace mpc::sampler
         void setVelocityToStart(int i);
         void setVelocityToFilterFrequency(int i);
         void setSliderParameterNumber(int i);
-        int getSliderParameterNumber();
+        int getSliderParameterNumber() const;
         void setVelocityToPitch(int i);
-        int getVelocityToPitch();
-        NoteParameters *clone(const int newIndex);
-        int getNumber();
+        int getVelocityToPitch() const;
+        NoteParameters *clone(const int newIndex) const;
+        int getNumber() const;
 
         NoteParameters(int index);
     };

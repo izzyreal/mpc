@@ -34,11 +34,11 @@ namespace mpc::sequencer
 
         const std::vector<uint16_t> &getTicksForCurrentBuffer();
         void reset();
-        bool areTicksBeingProduced();
+        bool areTicksBeingProduced() const;
 
-        const double getLastProcessedHostPositionQuarterNotes();
+        const double getLastProcessedHostPositionQuarterNotes() const;
 
-        bool didJumpOccurInLastBuffer();
+        bool didJumpOccurInLastBuffer() const;
 
         void generateTransportInfo(const float tempo, const uint32_t sampleRate,
                                    const uint16_t numSamples,

@@ -1,10 +1,10 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class MidiInputScreen : public mpc::lcdgui::ScreenComponent
+    class MidiInputScreen final : public ScreenComponent
     {
 
     public:
@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
 
     public:
-        MidiInputScreen(mpc::Mpc &mpc, int layerIndex);
+        MidiInputScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
@@ -26,11 +26,11 @@ namespace mpc::lcdgui::screens::window
         void displayReceiveCh();
 
     public:
-        int getReceiveCh();
-        bool getProgChangeSeq();
-        bool isSustainPedalToDurationEnabled();
-        bool isMidiFilterEnabled();
-        int getType();
+        int getReceiveCh() const;
+        bool getProgChangeSeq() const;
+        bool isSustainPedalToDurationEnabled() const;
+        bool isMidiFilterEnabled() const;
+        int getType() const;
         std::vector<bool> &getCcPassEnabled();
         void setReceiveCh(int i);
         void setProgChangeSeq(bool b);
@@ -38,17 +38,17 @@ namespace mpc::lcdgui::screens::window
         void setMidiFilterEnabled(bool b);
         void setType(int i);
         void setPass(bool b);
-        bool isNotePassEnabled();
+        bool isNotePassEnabled() const;
         void setNotePassEnabled(bool b);
-        bool isPitchBendPassEnabled();
+        bool isPitchBendPassEnabled() const;
         void setPitchBendPassEnabled(bool b);
-        bool isPgmChangePassEnabled();
+        bool isPgmChangePassEnabled() const;
         void setPgmChangePassEnabled(bool b);
-        bool isChPressurePassEnabled();
+        bool isChPressurePassEnabled() const;
         void setChPressurePassEnabled(bool b);
-        bool isPolyPressurePassEnabled();
+        bool isPolyPressurePassEnabled() const;
         void setPolyPressurePassEnabled(bool b);
-        bool isExclusivePassEnabled();
+        bool isExclusivePassEnabled() const;
         void setExclusivePassEnabled(bool b);
 
     private:

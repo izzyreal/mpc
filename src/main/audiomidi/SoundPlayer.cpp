@@ -317,7 +317,7 @@ float SoundPlayer::readNextFrame()
     return sampleops::short_to_float(readNextShort());
 }
 
-int32_t SoundPlayer::readNext24BitInt()
+int32_t SoundPlayer::readNext24BitInt() const
 {
     char buffer[3];
     stream->read(buffer, 3);
@@ -339,7 +339,7 @@ int32_t SoundPlayer::readNext24BitInt()
     return value;
 }
 
-short SoundPlayer::readNextShort()
+short SoundPlayer::readNextShort() const
 {
     char buffer[2];
     stream->read(buffer, 2);
@@ -448,7 +448,7 @@ int SoundPlayer::processAudio(AudioBuffer *buf, int nFrames)
     return AUDIO_OK;
 }
 
-bool SoundPlayer::isPlaying()
+bool SoundPlayer::isPlaying() const
 {
     return playing.load();
 }

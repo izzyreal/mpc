@@ -15,7 +15,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-PgmParamsScreen::PgmParamsScreen(mpc::Mpc &mpc, const int layerIndex)
+PgmParamsScreen::PgmParamsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "program-params", layerIndex)
 {
     addChildT<EnvGraph>(mpc);
@@ -220,7 +220,7 @@ void PgmParamsScreen::update(Observable *o, Message message)
     }
 }
 
-void PgmParamsScreen::displayReson()
+void PgmParamsScreen::displayReson() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -229,7 +229,7 @@ void PgmParamsScreen::displayReson()
         selectedNoteParameters->getFilterResonance());
 }
 
-void PgmParamsScreen::displayFreq()
+void PgmParamsScreen::displayFreq() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -251,7 +251,7 @@ void PgmParamsScreen::displayAttackDecay()
     findEnvGraph()->setCoordinates(attack, decay, decayModeStart);
 }
 
-void PgmParamsScreen::displayNote()
+void PgmParamsScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -270,12 +270,12 @@ void PgmParamsScreen::displayNote()
         "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
-void PgmParamsScreen::displayPgm()
+void PgmParamsScreen::displayPgm() const
 {
     findField("pgm")->setTextPadded(getActiveDrumBus()->getProgram() + 1, " ");
 }
 
-void PgmParamsScreen::displayTune()
+void PgmParamsScreen::displayTune() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -296,7 +296,7 @@ void PgmParamsScreen::displayDecayMode()
     displayAttackDecay();
 }
 
-void PgmParamsScreen::displayVoiceOverlap()
+void PgmParamsScreen::displayVoiceOverlap() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(

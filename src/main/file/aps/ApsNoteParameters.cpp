@@ -71,122 +71,122 @@ ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters *np)
     saveBytes[25] = np->getVelocityToPitch();
 }
 
-int ApsNoteParameters::getSoundIndex()
+int ApsNoteParameters::getSoundIndex() const
 {
     return soundIndex;
 }
 
-mpc::sampler::VoiceOverlapMode ApsNoteParameters::getVoiceOverlapMode()
+mpc::sampler::VoiceOverlapMode ApsNoteParameters::getVoiceOverlapMode() const
 {
     return voiceOverlapMode;
 }
 
-int ApsNoteParameters::getTune()
+int ApsNoteParameters::getTune() const
 {
     return tune;
 }
 
-int ApsNoteParameters::getDecayMode()
+int ApsNoteParameters::getDecayMode() const
 {
     return decayMode;
 }
 
-int ApsNoteParameters::getSoundGenerationMode()
+int ApsNoteParameters::getSoundGenerationMode() const
 {
     return soundGenerationMode;
 }
 
-int ApsNoteParameters::getVelocityRangeLower()
+int ApsNoteParameters::getVelocityRangeLower() const
 {
     return velocityRangeLower;
 }
 
-int ApsNoteParameters::getAlsoPlay1()
+int ApsNoteParameters::getAlsoPlay1() const
 {
     return alsoPlay1;
 }
 
-int ApsNoteParameters::getVelocityRangeUpper()
+int ApsNoteParameters::getVelocityRangeUpper() const
 {
     return velocityRangeUpper;
 }
 
-int ApsNoteParameters::getAlsoPlay2()
+int ApsNoteParameters::getAlsoPlay2() const
 {
     return alsoPlay2;
 }
 
-int ApsNoteParameters::getMute1()
+int ApsNoteParameters::getMute1() const
 {
     return mute1;
 }
 
-int ApsNoteParameters::getMute2()
+int ApsNoteParameters::getMute2() const
 {
     return mute2;
 }
 
-int ApsNoteParameters::getAttack()
+int ApsNoteParameters::getAttack() const
 {
     return attack;
 }
 
-int ApsNoteParameters::getDecay()
+int ApsNoteParameters::getDecay() const
 {
     return decay;
 }
 
-int ApsNoteParameters::getCutoffFrequency()
+int ApsNoteParameters::getCutoffFrequency() const
 {
     return cutoffFrequency;
 }
 
-int ApsNoteParameters::getResonance()
+int ApsNoteParameters::getResonance() const
 {
     return resonance;
 }
 
-int ApsNoteParameters::getVelocityToFilterAttack()
+int ApsNoteParameters::getVelocityToFilterAttack() const
 {
     return filterAttack;
 }
 
-int ApsNoteParameters::getVelocityToFilterDecay()
+int ApsNoteParameters::getVelocityToFilterDecay() const
 {
     return filterDecay;
 }
 
-int ApsNoteParameters::getVelocityToFilterAmount()
+int ApsNoteParameters::getVelocityToFilterAmount() const
 {
     return filterEnvelopeAmount;
 }
 
-int ApsNoteParameters::getVelocityToLevel()
+int ApsNoteParameters::getVelocityToLevel() const
 {
     return velocityToLevel;
 }
 
-int ApsNoteParameters::getVelocityToAttack()
+int ApsNoteParameters::getVelocityToAttack() const
 {
     return velocityToAttack;
 }
 
-int ApsNoteParameters::getVelocityToStart()
+int ApsNoteParameters::getVelocityToStart() const
 {
     return velocityToStart;
 }
 
-int ApsNoteParameters::getVelocityToFilterFrequency()
+int ApsNoteParameters::getVelocityToFilterFrequency() const
 {
     return velocityToFilterFrequency;
 }
 
-int ApsNoteParameters::getSliderParameter()
+int ApsNoteParameters::getSliderParameter() const
 {
     return sliderParameter;
 }
 
-int ApsNoteParameters::getVelocityToPitch()
+int ApsNoteParameters::getVelocityToPitch() const
 {
     return velocityToPitch;
 }

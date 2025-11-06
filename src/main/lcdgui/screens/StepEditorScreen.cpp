@@ -8,9 +8,7 @@
 #include "hardware/Hardware.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
-#include "lcdgui/screens/window/StepTcScreen.hpp"
 #include "lcdgui/screens/window/EditMultipleScreen.hpp"
-#include "lcdgui/screens/window/PasteEventScreen.hpp"
 
 #include "lcdgui/Rectangle.hpp"
 
@@ -39,7 +37,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
-const int EVENT_ROW_COUNT = 4;
+constexpr int EVENT_ROW_COUNT = 4;
 
 StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "step-editor", layerIndex)
@@ -64,26 +62,25 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
     MRECT r(31, 0, 164, 9);
     addChildT<Rectangle>("view-background", r);
 
-    addReactiveBinding(
-        {[&]
-         {
-             const auto original = computeVisibleEvents();
-             std::vector<std::shared_ptr<mpc::sequencer::Event>> clones;
-             clones.reserve(original.size());
-             for (auto &e : original)
-             {
-                 clones.push_back(cloneEvent(e));
-             }
-             return clones;
-         },
-         [&](auto)
-         {
-             refreshEventRows();
-         },
-         [&](const auto &a, const auto &b)
-         {
-             return visibleEventsEqual(a, b);
-         }});
+    addReactiveBinding({[&]
+                        {
+                            const auto original = computeVisibleEvents();
+                            std::vector<std::shared_ptr<Event>> clones;
+                            clones.reserve(original.size());
+                            for (auto &e : original)
+                            {
+                                clones.push_back(cloneEvent(e));
+                            }
+                            return clones;
+                        },
+                        [&](auto)
+                        {
+                            refreshEventRows();
+                        },
+                        [&](const auto &a, const auto &b)
+                        {
+                            return visibleEventsEqual(a, b);
+                        }});
 
     addReactiveBinding({[&]
                         {
@@ -101,8 +98,8 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
 }
 
 bool StepEditorScreen::visibleEventsEqual(
-    const std::vector<std::shared_ptr<mpc::sequencer::Event>> &a,
-    const std::vector<std::shared_ptr<mpc::sequencer::Event>> &b)
+    const std::vector<std::shared_ptr<Event>> &a,
+    const std::vector<std::shared_ptr<Event>> &b) const
 {
     if (a.size() != b.size())
     {
@@ -231,7 +228,6 @@ void StepEditorScreen::close()
 
 void StepEditorScreen::function(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     switch (i)
@@ -477,10 +473,11 @@ void StepEditorScreen::function(int i)
                 clearSelection();
             }
             break;
+        default:;
     }
 }
 
-bool StepEditorScreen::paramIsLetter(const std::string &letter)
+bool StepEditorScreen::paramIsLetter(const std::string &letter) const
 {
     return ls->getFocusedFieldName().find(letter) != std::string::npos;
 }
@@ -1035,7 +1032,7 @@ void StepEditorScreen::refreshSelection()
 }
 
 std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(
-    const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTick)
+    const std::vector<std::shared_ptr<Event>> &eventsAtCurrentTick) const
 {
     std::vector<std::shared_ptr<Event>> result(4);
     const int firstVisibleEventIndex = yOffset;
@@ -1065,7 +1062,7 @@ std::vector<std::shared_ptr<Event>> StepEditorScreen::computeVisibleEvents(
 }
 
 std::vector<std::shared_ptr<Event>>
-StepEditorScreen::computeEventsAtCurrentTick()
+StepEditorScreen::computeEventsAtCurrentTick() const
 {
     std::vector<std::shared_ptr<Event>> result;
 
@@ -1177,7 +1174,7 @@ void StepEditorScreen::refreshEventRows()
     }
 }
 
-void StepEditorScreen::updateComponents()
+void StepEditorScreen::updateComponents() const
 {
     const auto track = sequencer->getActiveTrack();
 
@@ -1217,7 +1214,7 @@ void StepEditorScreen::updateComponents()
     }
 }
 
-void StepEditorScreen::setViewNotesText()
+void StepEditorScreen::setViewNotesText() const
 {
     const auto track = sequencer->getActiveTrack();
 
@@ -1461,7 +1458,7 @@ void StepEditorScreen::removeEvents()
     setyOffset(0);
 }
 
-void StepEditorScreen::displayView()
+void StepEditorScreen::displayView() const
 {
     findField("view")->setText(viewNames[view]);
 }
@@ -1486,13 +1483,13 @@ std::vector<std::shared_ptr<Event>> &StepEditorScreen::getPlaceHolder()
     return placeHolder;
 }
 
-int StepEditorScreen::getYOffset()
+int StepEditorScreen::getYOffset() const
 {
     return yOffset;
 }
 
 void StepEditorScreen::adhocPlayNoteEvent(
-    const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent)
+    const std::shared_ptr<NoteOnEvent> &noteEvent) const
 {
     const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
     const auto track = sequencer->getActiveTrack();
@@ -1565,14 +1562,13 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
     ls->setFocus(desiredColumn + std::to_string(row));
 }
 
-void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
+void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
 {
     const auto tick = sequencer->getTickPosition();
     const auto track = sequencer->getActiveTrack();
     for (auto &e : track->getEventRange(tick, tick))
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
-        if (noteEvent)
+        if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
             adhocPlayNoteEvent(noteEvent);
         }

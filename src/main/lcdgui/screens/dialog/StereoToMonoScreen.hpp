@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens::dialog
 {
     class StereoToMonoScreen final : public ScreenComponent,
-                               public OpensNameScreen
+                                     public OpensNameScreen
     {
 
     public:
@@ -24,8 +24,8 @@ namespace mpc::lcdgui::screens::dialog
 
     private:
         void displayStereoSource();
-        void displayNewLName();
-        void displayNewRName();
+        void displayNewLName() const;
+        void displayNewRName() const;
         void updateNewNames();
 
         std::string newLName;

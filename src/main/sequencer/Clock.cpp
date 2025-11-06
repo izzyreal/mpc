@@ -159,17 +159,17 @@ void Clock::computeTicksForCurrentBuffer(
     ticksAreBeingProduced = ticksAreBeingProduced || ticks.size() > 0;
 }
 
-bool Clock::areTicksBeingProduced()
+bool Clock::areTicksBeingProduced() const
 {
     return ticksAreBeingProduced;
 }
 
-const double Clock::getLastProcessedHostPositionQuarterNotes()
+const double Clock::getLastProcessedHostPositionQuarterNotes() const
 {
     return previousHostPositionAtStartOfBufferQuarterNotes;
 }
 
-bool Clock::didJumpOccurInLastBuffer()
+bool Clock::didJumpOccurInLastBuffer() const
 {
     return jumpOccurredInLastBuffer;
 }

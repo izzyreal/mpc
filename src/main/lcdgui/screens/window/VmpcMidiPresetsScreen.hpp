@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 #include <string>
@@ -7,14 +7,11 @@
 
 namespace mpc::lcdgui::screens::window
 {
-
-    class VmpcKnownControllerDetectedScreen;
-
-    class VmpcMidiPresetsScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcMidiPresetsScreen final : public ScreenComponent
     {
 
     public:
-        VmpcMidiPresetsScreen(mpc::Mpc &presetName, int layerIndex);
+        VmpcMidiPresetsScreen(Mpc &presetName, int layerIndex);
 
         void open() override;
         void function(int i) override;
@@ -36,8 +33,5 @@ namespace mpc::lcdgui::screens::window
         void displayRows();
 
         std::vector<std::string> autoLoadModeNames{"NO", "ASK", "YES"};
-
-        friend class mpc::lcdgui::screens::window::
-            VmpcKnownControllerDetectedScreen;
     };
 } // namespace mpc::lcdgui::screens::window

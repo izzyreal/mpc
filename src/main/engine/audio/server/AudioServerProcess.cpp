@@ -3,7 +3,7 @@
 using namespace mpc::engine::audio::server;
 using namespace std;
 
-AudioServerProcess::AudioServerProcess(string name)
+AudioServerProcess::AudioServerProcess(const string &name)
 {
     this->name = name;
 }

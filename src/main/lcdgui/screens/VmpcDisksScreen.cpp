@@ -17,7 +17,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::disk;
 using namespace mpc::nvram;
 
-VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc &mpc, const int layerIndex)
+VmpcDisksScreen::VmpcDisksScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-disks", layerIndex)
 {
     for (int i = 0; i < 4; i++)
@@ -198,7 +198,7 @@ void VmpcDisksScreen::down()
     displayRows();
 }
 
-bool VmpcDisksScreen::hasConfigChanged()
+bool VmpcDisksScreen::hasConfigChanged() const
 {
     auto persisted = VolumesPersistence::getPersistedConfigs(mpc);
 
@@ -217,7 +217,7 @@ bool VmpcDisksScreen::hasConfigChanged()
     return false;
 }
 
-void VmpcDisksScreen::displayFunctionKeys()
+void VmpcDisksScreen::displayFunctionKeys() const
 {
     const auto vmpcSettingsScreen =
         mpc.screens->get<ScreenId::VmpcSettingsScreen>();

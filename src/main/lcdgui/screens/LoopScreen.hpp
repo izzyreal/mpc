@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
@@ -13,11 +13,11 @@ namespace mpc::lcdgui::screens
 
     class TrimScreen;
 
-    class LoopScreen : public mpc::lcdgui::ScreenComponent
+    class LoopScreen final : public ScreenComponent
     {
 
     public:
-        LoopScreen(mpc::Mpc &mpc, int layerIndex);
+        LoopScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -30,20 +30,20 @@ namespace mpc::lcdgui::screens
         void pressEnter() override;
         void setSlider(int i) override;
 
-        void setSliderLoopTo(int);
-        void setSliderLength(int);
-        void setLoopTo(int);
-        void setLength(int);
+        void setSliderLoopTo(int) const;
+        void setSliderLength(int) const;
+        void setLoopTo(int) const;
+        void setLength(int) const;
 
     private:
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};
-        void displaySnd();
-        void displayPlayX();
-        void displayTo();
-        void displayEndLength();
-        void displayEndLengthValue();
-        void displayLoop();
+        void displaySnd() const;
+        void displayPlayX() const;
+        void displayTo() const;
+        void displayEndLength() const;
+        void displayEndLengthValue() const;
+        void displayLoop() const;
         void displayWave();
 
         bool endSelected = true;
@@ -52,9 +52,9 @@ namespace mpc::lcdgui::screens
         void setEndSelected(bool b);
 
     private:
-        friend class mpc::lcdgui::screens::window::LoopEndFineScreen;
-        friend class mpc::lcdgui::screens::window::EndFineScreen;
-        friend class mpc::lcdgui::screens::window::LoopToFineScreen;
-        friend class mpc::lcdgui::screens::TrimScreen;
+        friend class LoopEndFineScreen;
+        friend class EndFineScreen;
+        friend class LoopToFineScreen;
+        friend class TrimScreen;
     };
 } // namespace mpc::lcdgui::screens

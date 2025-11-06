@@ -1,5 +1,5 @@
 #pragma once
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include <string>
 #include <vector>
@@ -25,19 +25,19 @@ namespace mpc::file::sndreader
         std::shared_ptr<SndHeaderReader> sndHeaderReader;
 
     public:
-        std::string getName();
-        bool isHeaderValid();
-        bool isMono();
+        std::string getName() const;
+        bool isHeaderValid() const;
+        bool isMono() const;
 
-        int getSampleRate();
-        int getLevel();
-        int getStart();
-        int getEnd();
-        int getLoopLength();
-        bool isLoopEnabled();
-        int getTune();
-        int getNumberOfBeats();
-        void readData(std::shared_ptr<std::vector<float>>);
+        int getSampleRate() const;
+        int getLevel() const;
+        int getStart() const;
+        int getEnd() const;
+        int getLoopLength() const;
+        bool isLoopEnabled() const;
+        int getTune() const;
+        int getNumberOfBeats() const;
+        void readData(const std::shared_ptr<std::vector<float>> &);
 
     public:
         std::vector<char> &getSndFileArray();

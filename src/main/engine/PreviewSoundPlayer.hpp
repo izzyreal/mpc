@@ -31,13 +31,13 @@ namespace mpc::engine
         PreviewSoundPlayer &operator=(const PreviewSoundPlayer &other) = delete;
 
     public:
-        void finishVoice();
+        void finishVoice() const;
 
-        void finishVoiceIfSoundIsLooping();
+        void finishVoiceIfSoundIsLooping() const;
 
         void playSound(int soundNumber, int velocity, int frameOffset);
 
-        void connectVoice();
+        void connectVoice() const;
 
         explicit PreviewSoundPlayer(
             std::shared_ptr<mpc::sampler::Sampler> sampler,

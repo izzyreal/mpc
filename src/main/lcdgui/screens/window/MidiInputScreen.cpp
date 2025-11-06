@@ -4,7 +4,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-MidiInputScreen::MidiInputScreen(mpc::Mpc &mpc, const int layerIndex)
+MidiInputScreen::MidiInputScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "midi-input", layerIndex)
 {
 }
@@ -19,7 +19,7 @@ void MidiInputScreen::open()
     displayPass();
 }
 
-void MidiInputScreen::function(int i)
+void MidiInputScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -29,7 +29,7 @@ void MidiInputScreen::function(int i)
     }
 }
 
-void MidiInputScreen::turnWheel(int i)
+void MidiInputScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -125,18 +125,18 @@ void MidiInputScreen::displayReceiveCh()
     }
 }
 
-void MidiInputScreen::setReceiveCh(int i)
+void MidiInputScreen::setReceiveCh(const int i)
 {
     receiveCh = std::clamp(i, -1, 15);
     displayReceiveCh();
 }
 
-int MidiInputScreen::getReceiveCh()
+int MidiInputScreen::getReceiveCh() const
 {
     return receiveCh;
 }
 
-void MidiInputScreen::setProgChangeSeq(bool b)
+void MidiInputScreen::setProgChangeSeq(const bool b)
 {
     if (progChangeSeq == b)
     {
@@ -147,12 +147,12 @@ void MidiInputScreen::setProgChangeSeq(bool b)
     displayProgChangeSeq();
 }
 
-bool MidiInputScreen::getProgChangeSeq()
+bool MidiInputScreen::getProgChangeSeq() const
 {
     return progChangeSeq;
 }
 
-void MidiInputScreen::setSustainPedalToDuration(bool b)
+void MidiInputScreen::setSustainPedalToDuration(const bool b)
 {
     if (sustainPedalToDuration == b)
     {
@@ -163,12 +163,12 @@ void MidiInputScreen::setSustainPedalToDuration(bool b)
     displaySustainPedalToDuration();
 }
 
-bool MidiInputScreen::isSustainPedalToDurationEnabled()
+bool MidiInputScreen::isSustainPedalToDurationEnabled() const
 {
     return sustainPedalToDuration;
 }
 
-void MidiInputScreen::setMidiFilterEnabled(bool b)
+void MidiInputScreen::setMidiFilterEnabled(const bool b)
 {
     if (midiFilter == b)
     {
@@ -179,24 +179,24 @@ void MidiInputScreen::setMidiFilterEnabled(bool b)
     displayMidiFilter();
 }
 
-bool MidiInputScreen::isMidiFilterEnabled()
+bool MidiInputScreen::isMidiFilterEnabled() const
 {
     return midiFilter;
 }
 
-void MidiInputScreen::setType(int i)
+void MidiInputScreen::setType(const int i)
 {
     type = std::clamp(i, 0, 134);
     displayType();
     displayPass();
 }
 
-int MidiInputScreen::getType()
+int MidiInputScreen::getType() const
 {
     return type;
 }
 
-void MidiInputScreen::setPass(bool b)
+void MidiInputScreen::setPass(const bool b)
 {
     switch (type)
     {
@@ -227,62 +227,62 @@ void MidiInputScreen::setPass(bool b)
     displayPass();
 }
 
-bool MidiInputScreen::isNotePassEnabled()
+bool MidiInputScreen::isNotePassEnabled() const
 {
     return notePassEnabled;
 }
 
-void MidiInputScreen::setNotePassEnabled(bool b)
+void MidiInputScreen::setNotePassEnabled(const bool b)
 {
     notePassEnabled = b;
 }
 
-bool MidiInputScreen::isPitchBendPassEnabled()
+bool MidiInputScreen::isPitchBendPassEnabled() const
 {
     return pitchBendPassEnabled;
 }
 
-void MidiInputScreen::setPitchBendPassEnabled(bool b)
+void MidiInputScreen::setPitchBendPassEnabled(const bool b)
 {
     pitchBendPassEnabled = b;
 }
 
-bool MidiInputScreen::isPgmChangePassEnabled()
+bool MidiInputScreen::isPgmChangePassEnabled() const
 {
     return pgmChangePassEnabled;
 }
 
-void MidiInputScreen::setPgmChangePassEnabled(bool b)
+void MidiInputScreen::setPgmChangePassEnabled(const bool b)
 {
     pgmChangePassEnabled = b;
 }
 
-bool MidiInputScreen::isChPressurePassEnabled()
+bool MidiInputScreen::isChPressurePassEnabled() const
 {
     return chPressurePassEnabled;
 }
 
-void MidiInputScreen::setChPressurePassEnabled(bool b)
+void MidiInputScreen::setChPressurePassEnabled(const bool b)
 {
     chPressurePassEnabled = b;
 }
 
-bool MidiInputScreen::isPolyPressurePassEnabled()
+bool MidiInputScreen::isPolyPressurePassEnabled() const
 {
     return polyPressurePassEnabled;
 }
 
-void MidiInputScreen::setPolyPressurePassEnabled(bool b)
+void MidiInputScreen::setPolyPressurePassEnabled(const bool b)
 {
     polyPressurePassEnabled = b;
 }
 
-bool MidiInputScreen::isExclusivePassEnabled()
+bool MidiInputScreen::isExclusivePassEnabled() const
 {
     return exclusivePassEnabled;
 }
 
-void MidiInputScreen::setExclusivePassEnabled(bool b)
+void MidiInputScreen::setExclusivePassEnabled(const bool b)
 {
     exclusivePassEnabled = b;
 }

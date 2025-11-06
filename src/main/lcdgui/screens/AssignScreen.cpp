@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-AssignScreen::AssignScreen(mpc::Mpc &mpc, const int layerIndex)
+AssignScreen::AssignScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "assign", layerIndex)
 {
 }
@@ -91,7 +91,7 @@ void AssignScreen::turnWheel(int i)
     }
 }
 
-void AssignScreen::displayAssignNote()
+void AssignScreen::displayAssignNote() const
 {
     const auto program = getProgramOrThrow();
     const auto slider = program->getSlider();
@@ -111,14 +111,14 @@ void AssignScreen::displayAssignNote()
         ->setText(noteName + "/" + padName + "-" + soundName);
 }
 
-void AssignScreen::displayParameter()
+void AssignScreen::displayParameter() const
 {
     const auto program = getProgramOrThrow();
     const auto slider = program->getSlider();
     findField("parameter")->setText(typeNames[slider->getParameter()]);
 }
 
-void AssignScreen::displayHighRange()
+void AssignScreen::displayHighRange() const
 {
     int value = 0;
     const auto program = getProgramOrThrow();
@@ -151,7 +151,7 @@ void AssignScreen::displayHighRange()
         ->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
-void AssignScreen::displayLowRange()
+void AssignScreen::displayLowRange() const
 {
     auto value = 0;
 
@@ -184,7 +184,7 @@ void AssignScreen::displayLowRange()
         ->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
-void AssignScreen::displayAssignNv()
+void AssignScreen::displayAssignNv() const
 {
     const auto program = getProgramOrThrow();
     const auto slider = program->getSlider();

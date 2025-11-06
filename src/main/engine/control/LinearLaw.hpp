@@ -14,7 +14,7 @@ namespace mpc::engine::control
     public:
         int intValue(float v) override;
 
-        LinearLaw(float min, float max, std::string units);
+        LinearLaw(float min, float max, const std::string &units);
 
     public:
         static std::shared_ptr<LinearLaw> UNITY();

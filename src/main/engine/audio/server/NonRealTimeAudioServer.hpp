@@ -32,7 +32,7 @@ namespace mpc::engine::audio::server
     public:
         void setRealTime(bool rt);
 
-        bool isRealTime();
+        bool isRealTime() const;
 
         void setSharedPtr(std::shared_ptr<NonRealTimeAudioServer> sharedPtr);
 
@@ -72,7 +72,7 @@ namespace mpc::engine::audio::server
                   const std::vector<int8_t> &mpcMonoInputChannelIndices,
                   const std::vector<int8_t> &mpcMonoOutputChannelIndices,
                   const std::vector<int8_t> &hostInputChannelIndices,
-                  const std::vector<int8_t> &hostOutputChannelIndices);
+                  const std::vector<int8_t> &hostOutputChannelIndices) const;
         NonRealTimeAudioServer(std::shared_ptr<AudioServer> server);
         ~NonRealTimeAudioServer();
     };

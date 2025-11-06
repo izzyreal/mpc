@@ -5,7 +5,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-MuteAssignScreen::MuteAssignScreen(mpc::Mpc &mpc, const int layerIndex)
+MuteAssignScreen::MuteAssignScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "mute-assign", layerIndex)
 {
 }
@@ -24,7 +24,7 @@ void MuteAssignScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void MuteAssignScreen::turnWheel(int i)
+void MuteAssignScreen::turnWheel(const int i)
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -51,7 +51,7 @@ void MuteAssignScreen::turnWheel(int i)
     }
 }
 
-void MuteAssignScreen::displayNote()
+void MuteAssignScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNote = mpc.clientEventController->getSelectedNote();
@@ -71,7 +71,7 @@ void MuteAssignScreen::displayNote()
                                "-" + soundName);
 }
 
-void MuteAssignScreen::displayNote0()
+void MuteAssignScreen::displayNote0() const
 {
     const auto program = getProgramOrThrow();
 
@@ -98,7 +98,7 @@ void MuteAssignScreen::displayNote0()
                                 sampler->getPadName(pad) + "-" + soundName);
 }
 
-void MuteAssignScreen::displayNote1()
+void MuteAssignScreen::displayNote1() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -124,7 +124,7 @@ void MuteAssignScreen::displayNote1()
                                 sampler->getPadName(pad) + "-" + soundName);
 }
 
-void MuteAssignScreen::update(Observable *o, Message message)
+void MuteAssignScreen::update(Observable *o, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 

@@ -20,7 +20,7 @@ AllControlChangeEvent::bytesToMpcEvent(const std::vector<char> &bytes)
 }
 
 std::vector<char> AllControlChangeEvent::mpcEventToBytes(
-    std::shared_ptr<ControlChangeEvent> event)
+    const std::shared_ptr<ControlChangeEvent> &event)
 {
     std::vector<char> bytes(8);
 

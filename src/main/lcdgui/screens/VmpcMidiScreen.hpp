@@ -1,26 +1,15 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "nvram/MidiControlPersistence.hpp"
 
 #include <atomic>
 
-namespace mpc::audiomidi
-{
-    class MidiDeviceDetector;
-    class AudioMidiServices;
-} // namespace mpc::audiomidi
-namespace mpc::lcdgui::screens::window
-{
-    class VmpcKnownControllerDetectedScreen;
-}
-
 namespace mpc::lcdgui::screens
 {
-
-    class VmpcMidiScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcMidiScreen final : public ScreenComponent
     {
     public:
-        VmpcMidiScreen(mpc::Mpc &, int layerIndex);
+        VmpcMidiScreen(Mpc &, int layerIndex);
 
         void open() override;
         void up() override;
@@ -34,36 +23,29 @@ namespace mpc::lcdgui::screens
         bool isLearning();
         void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number,
                                int8_t value);
-        void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand &c);
-        std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
+        void updateOrAddActivePresetCommand(nvram::MidiControlCommand &c);
+        std::shared_ptr<nvram::MidiControlPreset> getActivePreset();
         bool hasMappingChanged();
+
+        std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
+        std::shared_ptr<nvram::MidiControlPreset> switchToPreset =
+            std::make_shared<nvram::MidiControlPreset>();
+        std::shared_ptr<nvram::MidiControlPreset> activePreset =
+            std::make_shared<nvram::MidiControlPreset>();
 
     private:
         int row = 0;
         int rowOffset = 0;
         int column = 0;
-        mpc::nvram::MidiControlCommand learnCandidate;
+        nvram::MidiControlCommand learnCandidate;
 
         bool learning = false;
-        std::shared_ptr<mpc::nvram::MidiControlPreset> activePreset =
-            std::make_shared<mpc::nvram::MidiControlPreset>();
-        std::shared_ptr<mpc::nvram::MidiControlPreset>
-            uneditedActivePresetCopy =
-                std::make_shared<mpc::nvram::MidiControlPreset>();
-
-        std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
-        std::shared_ptr<mpc::nvram::MidiControlPreset> switchToPreset =
-            std::make_shared<mpc::nvram::MidiControlPreset>();
+        std::shared_ptr<nvram::MidiControlPreset> uneditedActivePresetCopy =
+            std::make_shared<nvram::MidiControlPreset>();
 
         void setLearning(bool b);
         void acceptLearnCandidate();
         void updateRows();
         void displayUpAndDown();
-
-        friend class mpc::nvram::MidiControlPersistence;
-        friend class mpc::audiomidi::MidiDeviceDetector;
-        friend class mpc::audiomidi::AudioMidiServices;
-        friend class mpc::lcdgui::screens::window::
-            VmpcKnownControllerDetectedScreen;
     };
 } // namespace mpc::lcdgui::screens

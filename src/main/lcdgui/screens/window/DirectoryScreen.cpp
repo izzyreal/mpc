@@ -13,16 +13,11 @@
 #include "audiomidi/SoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
-
-namespace mpc::lcdgui
-{
-    class FunctionKey;
-}
 
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
@@ -30,9 +25,14 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-DirectoryScreen::DirectoryScreen(mpc::Mpc &mpc, const int layerIndex)
+DirectoryScreen::DirectoryScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "directory", layerIndex)
 {
+}
+
+int DirectoryScreen::getYOffset1() const
+{
+    return yOffset1;
 }
 
 void DirectoryScreen::open()
@@ -63,7 +63,7 @@ void DirectoryScreen::setFunctionKeys()
         findChild<FunctionKey>("fk5")->getRect());
 }
 
-void DirectoryScreen::function(int f)
+void DirectoryScreen::function(const int f)
 {
     ScreenComponent::function(f);
 
@@ -98,13 +98,12 @@ void DirectoryScreen::function(int f)
                 return;
             }
 
-            auto fileName =
-                mpc::Util::splitName(getSelectedFile()->getName())[0];
+            auto fileName = Util::splitName(getSelectedFile()->getName())[0];
 
             const auto enterAction =
-                [this, fileName, file](std::string &nameScreenName)
+                [this, fileName, file](const std::string &nameScreenName)
             {
-                auto ext = mpc::Util::splitName(file->getName())[1];
+                auto ext = Util::splitName(file->getName())[1];
 
                 if (ext.length() > 0)
                 {
@@ -170,7 +169,7 @@ void DirectoryScreen::function(int f)
             }
 
             auto enterAction =
-                [this, disk, loadScreen](std::string &nameScreenName)
+                [this, disk, loadScreen](const std::string &nameScreenName)
             {
                 const bool success =
                     disk->newFolder(StrUtil::toUpper(nameScreenName));
@@ -181,7 +180,7 @@ void DirectoryScreen::function(int f)
 
                     std::string msg;
 
-                    if (disk->getVolume().mode == MountMode::READ_ONLY)
+                    if (disk->getVolume().mode == READ_ONLY)
                     {
                         msg = "Disk is read only !!";
                     }
@@ -270,7 +269,7 @@ void DirectoryScreen::function(int f)
     }
 }
 
-void DirectoryScreen::turnWheel(int i)
+void DirectoryScreen::turnWheel(const int i)
 {
     if (i > 0)
     {
@@ -585,7 +584,8 @@ std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
     return getFileFromGrid(xPos, yPos);
 }
 
-std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
+std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(const int x,
+                                                          const int y) const
 {
     const auto disk = mpc.getDisk();
 
@@ -648,7 +648,7 @@ void DirectoryScreen::displayRightFields()
     }
 }
 
-void DirectoryScreen::refreshFocus()
+void DirectoryScreen::refreshFocus() const
 {
     if (xPos == 0)
     {
@@ -661,17 +661,17 @@ void DirectoryScreen::refreshFocus()
     }
 }
 
-std::vector<std::string> DirectoryScreen::getFirstColumn()
+std::vector<std::string> DirectoryScreen::getFirstColumn() const
 {
     return mpc.getDisk()->getParentFileNames();
 }
 
-std::vector<std::string> DirectoryScreen::getSecondColumn()
+std::vector<std::string> DirectoryScreen::getSecondColumn() const
 {
     return mpc.getDisk()->getFileNames();
 }
 
-int DirectoryScreen::getXPos()
+int DirectoryScreen::getXPos() const
 {
     return xPos;
 }
@@ -694,12 +694,12 @@ void DirectoryScreen::findYOffset0()
     }
 }
 
-void DirectoryScreen::setYOffset0(int i)
+void DirectoryScreen::setYOffset0(const int i)
 {
     yOffset0 = i;
 }
 
-void DirectoryScreen::setYOffset1(int i)
+void DirectoryScreen::setYOffset1(const int i)
 {
     if (i < 0)
     {
@@ -709,7 +709,7 @@ void DirectoryScreen::setYOffset1(int i)
     yOffset1 = i;
 }
 
-void DirectoryScreen::setYPos0(int i)
+void DirectoryScreen::setYPos0(const int i)
 {
     yPos0 = i;
 }
@@ -803,8 +803,7 @@ void DirectoryScreen::drawGraphicsLeft()
         return;
     }
 
-    std::vector<std::shared_ptr<mpc::lcdgui::Label>> aLabels{a0, a1, a2, a3,
-                                                             a4};
+    std::vector<std::shared_ptr<Label>> aLabels{a0, a1, a2, a3, a4};
 
     if (size - yOffset0 <= 4)
     {
@@ -899,7 +898,7 @@ void DirectoryScreen::drawGraphicsLeft()
 
         if (lastVisibleFile->getName() == dirName)
         {
-            if (lastVisibleFile->getName() == fc[size -1])
+            if (lastVisibleFile->getName() == fc[size - 1])
             {
                 a4->setText(currentDirIcons[2]);
             }
@@ -910,7 +909,7 @@ void DirectoryScreen::drawGraphicsLeft()
         }
         else
         {
-            if (lastVisibleFile->getName() == fc[size -1])
+            if (lastVisibleFile->getName() == fc[size - 1])
             {
                 a4->setText(dirIcons[2]);
             }
@@ -1089,7 +1088,7 @@ void DirectoryScreen::drawGraphicsRight()
 }
 
 std::string DirectoryScreen::padFileName(const std::string &s,
-                                         const std::string &pad)
+                                         const std::string &pad) const
 {
     return StrUtil::padRight(StrUtil::trim(s), pad, 8);
 }

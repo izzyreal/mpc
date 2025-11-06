@@ -16,7 +16,7 @@ using namespace mpc::engine::audio::core;
 using namespace std;
 
 AudioMixerStrip::AudioMixerStrip(
-    AudioMixer *mixer, std::shared_ptr<AudioControlsChain> controlsChain)
+    AudioMixer *mixer, const std::shared_ptr<AudioControlsChain> &controlsChain)
     : AudioProcessChain(controlsChain)
 {
     silenceCountdown = silenceCount;
@@ -24,7 +24,8 @@ AudioMixerStrip::AudioMixerStrip(
     buffer = createBuffer();
 }
 
-void AudioMixerStrip::setInputProcess(std::shared_ptr<AudioProcess> input)
+void AudioMixerStrip::setInputProcess(
+    const std::shared_ptr<AudioProcess> &input)
 {
 
     if (controlChain->getId() != MixerControlsIds::CHANNEL_STRIP)
@@ -45,7 +46,7 @@ void AudioMixerStrip::setInputProcess(std::shared_ptr<AudioProcess> input)
 }
 
 void AudioMixerStrip::setDirectOutputProcess(
-    std::shared_ptr<AudioProcess> output)
+    const std::shared_ptr<AudioProcess> &output)
 {
     auto oldOutput = directOutput;
     if (output)

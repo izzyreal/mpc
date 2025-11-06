@@ -10,7 +10,7 @@ using namespace mpc::engine;
 using namespace mpc::engine::control;
 using namespace std;
 
-EnvelopeControls::EnvelopeControls(int id, string name, int idOffset)
+EnvelopeControls::EnvelopeControls(int id, const string &name, int idOffset)
     : CompoundControl(id, name)
 {
     this->idOffset = idOffset;
@@ -57,14 +57,14 @@ void EnvelopeControls::deriveSampleRateDependentVariables()
     decay = deriveDecay();
 }
 
-float EnvelopeControls::deriveHold()
+float EnvelopeControls::deriveHold() const
 {
     return holdControl->getValue();
 }
 
 float EnvelopeControls::LOG_0_01_ = static_cast<float>(log(0.01));
 
-float EnvelopeControls::deriveTimeFactor(float milliseconds)
+float EnvelopeControls::deriveTimeFactor(float milliseconds) const
 {
     double ns = milliseconds * sampleRate / 1000;
     double k = LOG_0_01_ / ns;
@@ -102,32 +102,32 @@ shared_ptr<ControlLaw> EnvelopeControls::HOLD_LAW()
     return res;
 }
 
-LawControl *EnvelopeControls::createAttackControl(float init)
+LawControl *EnvelopeControls::createAttackControl(float init) const
 {
     return new LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), init);
 }
 
-LawControl *EnvelopeControls::createHoldControl(float init)
+LawControl *EnvelopeControls::createHoldControl(float init) const
 {
     return new LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), init);
 }
 
-LawControl *EnvelopeControls::createDecayControl(float init)
+LawControl *EnvelopeControls::createDecayControl(float init) const
 {
     return new LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), init);
 }
 
-float EnvelopeControls::getAttackCoeff()
+float EnvelopeControls::getAttackCoeff() const
 {
     return attack;
 }
 
-float EnvelopeControls::getHold()
+float EnvelopeControls::getHold() const
 {
     return hold;
 }
 
-float EnvelopeControls::getDecayCoeff()
+float EnvelopeControls::getDecayCoeff() const
 {
     return decay;
 }

@@ -1,9 +1,9 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens
 {
-    class SndParamsScreen : public mpc::lcdgui::ScreenComponent
+    class SndParamsScreen final : public ScreenComponent
     {
 
     public:
@@ -11,17 +11,17 @@ namespace mpc::lcdgui::screens
         void function(int f) override;
         void turnWheel(int i) override;
 
-        SndParamsScreen(mpc::Mpc &mpc, int layerIndex);
+        SndParamsScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
     private:
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};
-        void displayLevel();
-        void displayTune();
-        void displayBeat();
-        void displaySampleAndNewTempo();
-        void displaySnd();
-        void displayPlayX();
+        void displayLevel() const;
+        void displayTune() const;
+        void displayBeat() const;
+        void displaySampleAndNewTempo() const;
+        void displaySnd() const;
+        void displayPlayX() const;
     };
 } // namespace mpc::lcdgui::screens

@@ -13,7 +13,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-BarsScreen::BarsScreen(mpc::Mpc &mpc, const int layerIndex)
+BarsScreen::BarsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "bars", layerIndex)
 {
 }
@@ -86,12 +86,12 @@ void BarsScreen::function(int j)
 }
 
 void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar,
-                          int copyCount, int copyAfterBar)
+                          int copyCount, int copyAfterBar) const
 {
     const auto fromSequenceIndex = sequencer->getActiveSequenceIndex();
-    mpc::sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex,
-                                      copyFirstBar, copyLastBar, copyCount,
-                                      copyAfterBar);
+    sequencer::SeqUtil::copyBars(mpc, fromSequenceIndex, toSeqIndex,
+                                 copyFirstBar, copyLastBar, copyCount,
+                                 copyAfterBar);
 }
 
 void BarsScreen::turnWheel(int i)
@@ -182,35 +182,35 @@ void BarsScreen::turnWheel(int i)
     }
 }
 
-void BarsScreen::displayCopies()
+void BarsScreen::displayCopies() const
 {
     const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     findField("copies")->setTextPadded(eventsScreen->copies, " ");
 }
 
-void BarsScreen::displayToSq()
+void BarsScreen::displayToSq() const
 {
     const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     findField("tosq")->setText(std::to_string(eventsScreen->toSq + 1));
 }
 
-void BarsScreen::displayFromSq()
+void BarsScreen::displayFromSq() const
 {
     findField("fromsq")->setText(
         std::to_string(sequencer->getActiveSequenceIndex() + 1));
 }
 
-void BarsScreen::displayAfterBar()
+void BarsScreen::displayAfterBar() const
 {
     findField("afterbar")->setText(std::to_string(afterBar));
 }
 
-void BarsScreen::displayLastBar()
+void BarsScreen::displayLastBar() const
 {
     findField("lastbar")->setText(std::to_string(lastBar + 1));
 }
 
-void BarsScreen::displayFirstBar()
+void BarsScreen::displayFirstBar() const
 {
     findField("firstbar")->setText(std::to_string(firstBar + 1));
 }
@@ -272,7 +272,7 @@ void BarsScreen::setAfterBar(int i, int max)
     displayAfterBar();
 }
 
-void BarsScreen::setCopies(int i)
+void BarsScreen::setCopies(int i) const
 {
     const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
     eventsScreen->copies = std::clamp(i, 1, 999);

@@ -7,12 +7,12 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-LocateScreen::LocateScreen(mpc::Mpc &mpc, const int layerIndex)
+LocateScreen::LocateScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "locate", layerIndex)
 {
 }
 
-void LocateScreen::function(int i)
+void LocateScreen::function(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -69,7 +69,7 @@ void LocateScreen::function(int i)
     }
 }
 
-void LocateScreen::turnWheel(int i)
+void LocateScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -100,25 +100,25 @@ void LocateScreen::open()
     displayLocations();
 }
 
-void LocateScreen::displayBar()
+void LocateScreen::displayBar() const
 {
     findField("goto0")->setText(
         StrUtil::padLeft(std::to_string(barIndex + 1), "0", 3));
 }
 
-void LocateScreen::displayBeat()
+void LocateScreen::displayBeat() const
 {
     findField("goto1")->setText(
         StrUtil::padLeft(std::to_string(beatIndex + 1), "0", 2));
 }
 
-void LocateScreen::displayClock()
+void LocateScreen::displayClock() const
 {
     findField("goto2")->setText(
         StrUtil::padLeft(std::to_string(clock), "0", 2));
 }
 
-void LocateScreen::displayLocations()
+void LocateScreen::displayLocations() const
 {
     for (int i = 0; i < 9; i++)
     {
@@ -142,7 +142,7 @@ void LocateScreen::displayLocations()
     }
 }
 
-void LocateScreen::setBarIndex(int16_t newBarIndex)
+void LocateScreen::setBarIndex(const int16_t newBarIndex)
 {
     const int maxBarIndex = getMaxBarIndexForThisSequence();
     barIndex = std::clamp<int16_t>(newBarIndex, 0, maxBarIndex);
@@ -172,7 +172,7 @@ void LocateScreen::setBarIndex(int16_t newBarIndex)
     }
 }
 
-void LocateScreen::setBeatIndex(int8_t newBeatIndex)
+void LocateScreen::setBeatIndex(const int8_t newBeatIndex)
 {
     if (barIndex == getMaxBarIndexForThisSequence())
     {
@@ -191,7 +191,7 @@ void LocateScreen::setBeatIndex(int8_t newBeatIndex)
     }
 }
 
-void LocateScreen::setClock(int8_t newClock)
+void LocateScreen::setClock(const int8_t newClock)
 {
     if (barIndex == getMaxBarIndexForThisSequence())
     {
@@ -202,18 +202,18 @@ void LocateScreen::setClock(int8_t newClock)
     displayClock();
 }
 
-uint16_t LocateScreen::getMaxBarIndexForThisSequence()
+uint16_t LocateScreen::getMaxBarIndexForThisSequence() const
 {
     return std::clamp<uint16_t>(
         sequencer->getActiveSequence()->getLastBarIndex() + 1, 0, 998);
 }
 
-uint8_t LocateScreen::getMaxBeatIndexForThisBar()
+uint8_t LocateScreen::getMaxBeatIndexForThisBar() const
 {
     return sequencer->getActiveSequence()->getNumerator(barIndex) - 1;
 }
 
-uint8_t LocateScreen::getMaxClockForThisBar()
+uint8_t LocateScreen::getMaxClockForThisBar() const
 {
     return 96 * (4.0 /
                  sequencer->getActiveSequence()->getDenominator(barIndex)) -

@@ -11,9 +11,9 @@ using namespace mpc::controller;
 using namespace mpc::hardware;
 
 PushSixteenLevelsCommand::PushSixteenLevelsCommand(
-    std::shared_ptr<LayeredScreen> layeredScreenToUse,
-    std::shared_ptr<ClientEventController> controllerToUse,
-    std::shared_ptr<Hardware> hardwareToUse)
+    const std::shared_ptr<LayeredScreen> &layeredScreenToUse,
+    const std::shared_ptr<ClientEventController> &controllerToUse,
+    const std::shared_ptr<Hardware> &hardwareToUse)
     : layeredScreen(layeredScreenToUse), controller(controllerToUse),
       hardware(hardwareToUse)
 {

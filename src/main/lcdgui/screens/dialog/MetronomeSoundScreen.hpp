@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 
@@ -39,13 +39,13 @@ namespace mpc::lcdgui::screens::dialog
         std::vector<std::string> soundNames = {"CLICK", "DRUM1", "DRUM2",
                                                "DRUM3", "DRUM4"};
 
-        void displaySound();
-        void displayVolume();
-        void displayOutput();
-        void displayAccent();
-        void displayNormal();
-        void displayAccentVelo();
-        void displayNormalVelo();
+        void displaySound() const;
+        void displayVolume() const;
+        void displayOutput() const;
+        void displayAccent() const;
+        void displayNormal() const;
+        void displayAccentVelo() const;
+        void displayNormalVelo() const;
 
         int volume = 100;
         int output = 0;
@@ -56,19 +56,19 @@ namespace mpc::lcdgui::screens::dialog
         int normalPad = 0;
 
     public:
-        int getVolume();
+        int getVolume() const;
         void setVolume(int i);
-        int getOutput();
+        int getOutput() const;
         void setOutput(int i);
-        int getSound();
+        int getSound() const;
         void setSound(int i);
-        int getAccentPad();
+        int getAccentPad() const;
         void setAccentPad(int i);
-        int getAccentVelo();
+        int getAccentVelo() const;
         void setAccentVelo(int i);
-        int getNormalPad();
+        int getNormalPad() const;
         void setNormalPad(int i);
-        int getNormalVelo();
+        int getNormalVelo() const;
         void setNormalVelo(int i);
 
     private:

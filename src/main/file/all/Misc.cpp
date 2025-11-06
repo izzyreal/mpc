@@ -137,32 +137,32 @@ Misc::Misc(mpc::Mpc &mpc)
         midiInputScreen->getProgChangeSeq() ? 0x01 : 0x00;
 }
 
-int Misc::getTapAvg()
+int Misc::getTapAvg() const
 {
     return tapAvg;
 }
 
-bool Misc::isInReceiveMMCEnabled()
+bool Misc::isInReceiveMMCEnabled() const
 {
     return inReceiveMMCEnabled;
 }
 
-bool Misc::isAutoStepIncEnabled()
+bool Misc::isAutoStepIncEnabled() const
 {
     return autoStepInc;
 }
 
-bool Misc::isDurationOfRecNotesTc()
+bool Misc::isDurationOfRecNotesTc() const
 {
     return durationOfRecNotesTcEnabled;
 }
 
-int Misc::getDurationTcPercentage()
+int Misc::getDurationTcPercentage() const
 {
     return durationTcPercentage;
 }
 
-bool Misc::isPgmChToSeqEnabled()
+bool Misc::isPgmChToSeqEnabled() const
 {
     return pgmChToSeqEnabled;
 }

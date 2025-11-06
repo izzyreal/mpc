@@ -1,6 +1,6 @@
 #include "file/all/Header.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include <string>
 
@@ -23,7 +23,7 @@ std::vector<char> &Header::getHeaderArray()
     return loadBytes;
 }
 
-bool Header::verifyFileID()
+bool Header::verifyFileID() const
 {
     auto verifyFileID = false;
     auto checkFileID = Util::vecCopyOfRange(loadBytes, 0, 16);

@@ -46,7 +46,7 @@ void DeleteSequenceScreen::function(const int i)
     }
 }
 
-void DeleteSequenceScreen::displaySequenceNumberName()
+void DeleteSequenceScreen::displaySequenceNumberName() const
 {
     const auto sequenceName = sequencer->getActiveSequence()->getName();
     findField("sq")->setText(

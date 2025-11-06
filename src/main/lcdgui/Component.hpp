@@ -58,7 +58,7 @@ namespace mpc::lcdgui
 
         virtual void onTimerCallback() {}
 
-        void printTree(int depth = 0)
+        void printTree(int depth = 0) const
         {
             std::string space;
             for (int i = 0; i < depth * 2; i++)
@@ -89,29 +89,29 @@ namespace mpc::lcdgui
         void addChildren(std::vector<std::shared_ptr<Component>> &children);
         std::shared_ptr<Component>
         findChild(const std::string &nameOfChildToFind);
-        std::shared_ptr<Label> findLabel(const std::string &name);
-        std::shared_ptr<Field> findField(const std::string &name);
-        std::shared_ptr<Parameter> findParameter(const std::string &name);
-        std::vector<std::shared_ptr<Label>> findLabels();
-        std::vector<std::shared_ptr<Field>> findFields();
-        std::vector<std::shared_ptr<Parameter>> findParameters();
+        std::shared_ptr<Label> findLabel(const std::string &name) const;
+        std::shared_ptr<Field> findField(const std::string &name) const;
+        std::shared_ptr<Parameter> findParameter(const std::string &name) const;
+        std::vector<std::shared_ptr<Label>> findLabels() const;
+        std::vector<std::shared_ptr<Field>> findFields() const;
+        std::vector<std::shared_ptr<Parameter>> findParameters() const;
         std::shared_ptr<Background> findBackground();
-        MRECT getRect();
-        std::vector<std::shared_ptr<Component>> findHiddenChildren();
+        MRECT getRect() const;
+        std::vector<std::shared_ptr<Component>> findHiddenChildren() const;
         void deleteChildren(const std::string &nameOfChildrenToDelete);
 
     public:
         virtual void Hide(bool b);
         virtual void SetDirty(bool b = true);
-        bool IsHidden();
-        bool IsDirty();
+        bool IsHidden() const;
+        bool IsDirty() const;
         MRECT getDirtyArea();
         virtual void setSize(int newW, int newH);
         void setLocation(int newX, int newY);
-        const std::string &getName();
+        const std::string &getName() const;
         void sendToBack(const std::shared_ptr<Component> &childToSendBack);
         bool bringToFront(Component *childToBringToFront);
-        Component *getParent();
+        Component *getParent() const;
 
     public:
         virtual void Draw(std::vector<std::vector<bool>> * /*pixels*/) {}

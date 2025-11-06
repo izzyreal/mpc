@@ -23,6 +23,7 @@ namespace mpc::file::mid::event::meta
         virtual int compareTo(mpc::file::mid::event::MidiEvent *other);
 
     public:
-        SequencerSpecificEvent(int tick, int delta, std::vector<char> data);
+        SequencerSpecificEvent(int tick, int delta,
+                               const std::vector<char> &data);
     };
 } // namespace mpc::file::mid::event::meta

@@ -1,18 +1,18 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <functional>
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class VmpcConvertAndLoadWavScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcConvertAndLoadWavScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
 
-        VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc, int layerIndex);
+        VmpcConvertAndLoadWavScreen(Mpc &mpc, int layerIndex);
 
         void setLoadRoutine(const std::function<void()> &newLoadRoutine);
 

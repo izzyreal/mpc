@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-SequenceScreen::SequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+SequenceScreen::SequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sequence", layerIndex)
 {
 }
@@ -33,7 +33,7 @@ void SequenceScreen::open()
         sequencer->getDefaultSequenceName().substr(1));
 }
 
-void SequenceScreen::function(int i)
+void SequenceScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -53,13 +53,12 @@ void SequenceScreen::openNameScreen()
     std::function<void(std::string &)> enterAction;
     std::string initialNameScreenName;
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.find("default") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("default") != std::string::npos)
     {
         initialNameScreenName = sequencer->getDefaultSequenceName();
 
-        enterAction = [this](std::string &nameScreenName)
+        enterAction = [this](const std::string &nameScreenName)
         {
             sequencer->setDefaultSequenceName(nameScreenName);
             openScreenById(ScreenId::SequenceScreen);
@@ -69,7 +68,7 @@ void SequenceScreen::openNameScreen()
     {
         initialNameScreenName = sequencer->getActiveSequence()->getName();
 
-        enterAction = [this](std::string &nameScreenName)
+        enterAction = [this](const std::string &nameScreenName)
         {
             sequencer->getActiveSequence()->setName(nameScreenName);
             openScreenById(ScreenId::SequenceScreen);

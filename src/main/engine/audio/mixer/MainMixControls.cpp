@@ -10,7 +10,7 @@ using namespace mpc::engine::control;
 using namespace std;
 
 MainMixControls::MainMixControls(MixerControls *mixerControls, int stripId,
-                                 shared_ptr<BusControls> busControls,
+                                 const shared_ptr<BusControls> &busControls,
                                  bool isMaster)
     : MixControls(mixerControls, stripId, busControls, isMaster)
 {
@@ -29,7 +29,7 @@ EnumControl *MainMixControls::createRouteControl(int stripId)
     return nullptr;
 }
 
-EnumControl *MainMixControls::getRouteControl()
+EnumControl *MainMixControls::getRouteControl() const
 {
     return routeControl;
 }

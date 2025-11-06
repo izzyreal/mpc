@@ -25,7 +25,7 @@ namespace mpc::engine
     public:
         float getEnvelope(bool decay);
 
-        bool isComplete();
+        bool isComplete() const;
 
         void reset();
 

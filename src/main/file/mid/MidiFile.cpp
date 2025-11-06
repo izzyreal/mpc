@@ -39,12 +39,12 @@ void MidiFile::setType(int type)
     mType = type;
 }
 
-int MidiFile::getType()
+int MidiFile::getType() const
 {
     return mType;
 }
 
-int MidiFile::getLengthInTicks()
+int MidiFile::getLengthInTicks() const
 {
     int length = 0;
     for (auto &T : mTracks)
@@ -58,7 +58,7 @@ int MidiFile::getLengthInTicks()
     return length;
 }
 
-std::vector<std::weak_ptr<MidiTrack>> MidiFile::getTracks()
+std::vector<std::weak_ptr<MidiTrack>> MidiFile::getTracks() const
 {
     auto res = std::vector<std::weak_ptr<MidiTrack>>();
     for (auto &t : mTracks)
@@ -68,7 +68,7 @@ std::vector<std::weak_ptr<MidiTrack>> MidiFile::getTracks()
     return res;
 }
 
-void MidiFile::addTrack(std::shared_ptr<MidiTrack> track)
+void MidiFile::addTrack(const std::shared_ptr<MidiTrack> &track)
 {
     addTrack(track, mTracks.size());
 }
@@ -88,7 +88,8 @@ void MidiFile::addTrack(std::shared_ptr<MidiTrack> track, int pos)
     mType = mTrackCount > 1 ? 1 : 0;
 }
 
-void MidiFile::writeToOutputStream(std::shared_ptr<std::ostream> stream)
+void MidiFile::writeToOutputStream(
+    const std::shared_ptr<std::ostream> &stream) const
 {
     stream->write(&IDENTIFIER[0], IDENTIFIER.size());
 

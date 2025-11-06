@@ -15,7 +15,7 @@ ProgramChange::ProgramChange(int tick, int delta, int channel, int program)
 {
 }
 
-int ProgramChange::getProgramNumber()
+int ProgramChange::getProgramNumber() const
 {
     return mValue1;
 }

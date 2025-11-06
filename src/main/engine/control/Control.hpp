@@ -15,9 +15,9 @@ namespace mpc::engine::control
         std::string name;
 
     public:
-        int getId();
+        int getId() const;
 
-        CompoundControl *getParent();
+        CompoundControl *getParent() const;
 
     protected:
         void setParent(CompoundControl *c);
@@ -29,12 +29,12 @@ namespace mpc::engine::control
     public:
         virtual std::string getName();
 
-        void setName(std::string s);
+        void setName(const std::string &s);
 
         virtual std::string getValueString();
 
     protected:
-        Control(int id, std::string name);
+        Control(int id, const std::string &name);
 
     private:
         friend class CompoundControl;

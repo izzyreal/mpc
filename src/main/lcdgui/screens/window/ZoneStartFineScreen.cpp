@@ -13,7 +13,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc &mpc, const int layerIndex)
+ZoneStartFineScreen::ZoneStartFineScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
     addChildT<Wave>()->setFine(true);
@@ -68,7 +68,7 @@ void ZoneStartFineScreen::displayPlayX()
     findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
-void ZoneStartFineScreen::function(int i)
+void ZoneStartFineScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -86,7 +86,7 @@ void ZoneStartFineScreen::function(int i)
     }
 }
 
-void ZoneStartFineScreen::turnWheel(int i)
+void ZoneStartFineScreen::turnWheel(const int i)
 {
     auto sound = sampler->getSound();
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
@@ -143,7 +143,7 @@ void ZoneStartFineScreen::pressEnter()
     displayFineWave();
 }
 
-void ZoneStartFineScreen::setSlider(int i)
+void ZoneStartFineScreen::setSlider(const int i)
 {
     if (!mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)

@@ -1,15 +1,15 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class EraseAllOffTracksScreen : public mpc::lcdgui::ScreenComponent
+    class EraseAllOffTracksScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
 
-        EraseAllOffTracksScreen(mpc::Mpc &mpc, int layerIndex);
+        EraseAllOffTracksScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

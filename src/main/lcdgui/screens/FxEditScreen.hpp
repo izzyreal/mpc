@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui
 {
@@ -8,7 +8,7 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens
 {
-    class FxEditScreen : public mpc::lcdgui::ScreenComponent
+    class FxEditScreen final : public ScreenComponent
     {
 
     public:
@@ -20,16 +20,16 @@ namespace mpc::lcdgui::screens
         void down() override;
 
     private:
-        void checkEffects();
-        std::vector<std::weak_ptr<Effect>> findEffects();
+        void checkEffects() const;
+        std::vector<std::weak_ptr<Effect>> findEffects() const;
 
     public:
-        FxEditScreen(mpc::Mpc &mpc, int layerIndex);
+        FxEditScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
     private:
-        void displayDrum();
-        void displayPgm();
-        void displayEdit();
+        void displayDrum() const;
+        void displayPgm() const;
+        void displayEdit() const;
     };
 } // namespace mpc::lcdgui::screens

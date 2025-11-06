@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 #include <functional>
@@ -12,31 +12,31 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-    class SequencerScreen : public mpc::lcdgui::ScreenComponent
+    class SequencerScreen final : public ScreenComponent
     {
 
     public:
-        SequencerScreen(mpc::Mpc &mpc, int layerIndex);
+        SequencerScreen(Mpc &mpc, int layerIndex);
 
         void erase();
         void tap();
 
     private:
-        void setTrackToUsedIfItIsCurrentlyUnused();
-        void displaySq();
-        void displayTempoSource();
-        void displayVelo();
-        void displayDeviceNumber();
-        void displayBus();
-        void displayBars();
-        void displayPgm();
-        void displayDeviceName();
-        void displayTempo();
-        void displayTempoLabel();
-        void displayOn();
-        void displayTr();
-        void displayCount();
-        void displayTiming();
+        void setTrackToUsedIfItIsCurrentlyUnused() const;
+        void displaySq() const;
+        void displayTempoSource() const;
+        void displayVelo() const;
+        void displayDeviceNumber() const;
+        void displayBus() const;
+        void displayBars() const;
+        void displayPgm() const;
+        void displayDeviceName() const;
+        void displayTempo() const;
+        void displayTempoLabel() const;
+        void displayOn() const;
+        void displayTr() const;
+        void displayCount() const;
+        void displayTiming() const;
 
         // Moving the cursor is wrapped in order to handle some alternative
         // destination mapping while there is a next sequence queued up.
@@ -48,14 +48,14 @@ namespace mpc::lcdgui::screens
 
     private:
         static std::vector<std::string> busNames;
-        void displayNow0();
-        void displayNow1();
-        void displayNow2();
-        void displayRecordingMode();
-        void displayTsig();
-        void displayLoop();
+        void displayNow0() const;
+        void displayNow1() const;
+        void displayNow2() const;
+        void displayRecordingMode() const;
+        void displayTsig() const;
+        void displayLoop() const;
         void displayPunchWhileRecording();
-        void displayNextSq();
+        void displayNextSq() const;
 
     public:
         void pressEnter() override;

@@ -15,7 +15,7 @@
 
 #include "file/ByteUtil.hpp"
 #include <StrUtil.hpp>
-#include <Util.hpp>
+#include "Util.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -107,7 +107,7 @@ AllSequence::~AllSequence()
 }
 
 void AllSequence::applyToMpcSeq(
-    std::shared_ptr<mpc::sequencer::Sequence> mpcSeq)
+    const std::shared_ptr<mpc::sequencer::Sequence> &mpcSeq)
 {
     mpcSeq->init(barCount - 1);
 
@@ -388,7 +388,7 @@ AllSequence::readEventSegments(const std::vector<char> &seqBytes)
     return eventArrays;
 }
 
-double AllSequence::getTempoDouble(const std::vector<char> &bytePair)
+double AllSequence::getTempoDouble(const std::vector<char> &bytePair) const
 {
     auto s = ByteUtil::bytes2ushort(bytePair);
     return static_cast<double>(s) / 10.0;
@@ -482,7 +482,7 @@ void AllSequence::setBarCount(int i)
 }
 
 std::vector<char>
-AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence *seq)
+AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence *seq) const
 {
     std::vector<std::vector<char>> ea;
 

@@ -6,7 +6,7 @@ namespace mpc::file::mid::event
     class ChannelAftertouch : public ChannelEvent
     {
     public:
-        int getAmount();
+        int getAmount() const;
         void setAmount(int p);
 
         ChannelAftertouch(int tick, int channel, int amount);

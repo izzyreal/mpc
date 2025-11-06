@@ -20,7 +20,7 @@ Tempo::Tempo(int tick, int delta, int mpqn)
 
 const int Tempo::DEFAULT_MPQN;
 
-float Tempo::getBpm()
+float Tempo::getBpm() const
 {
     return mBPM;
 }

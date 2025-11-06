@@ -12,9 +12,10 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
 DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
-    uint64_t noteEventId, std::shared_ptr<DrumBus> drum,
-    std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> mixer,
-    std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
+    uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
+    const std::shared_ptr<Sampler> &sampler,
+    const std::shared_ptr<AudioMixer> &mixer,
+    const std::shared_ptr<MixerSetupScreen> &mixerSetupScreen,
     std::vector<std::shared_ptr<Voice>> *voices,
     std::vector<MixerInterconnection *> &mixerConnections, int note,
     int velocity, int varType, int varValue, int frameOffset,
@@ -39,7 +40,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
 }
 
 DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
-    uint64_t noteEventId, std::shared_ptr<DrumBus> drum,
+    uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
     std::vector<std::shared_ptr<Voice>> *voices, int note, int noteOnStartTick)
 {
     DrumNoteOffContext ctx;

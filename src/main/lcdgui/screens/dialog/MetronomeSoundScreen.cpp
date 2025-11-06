@@ -49,7 +49,7 @@ void MetronomeSoundScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void MetronomeSoundScreen::displaySound()
+void MetronomeSoundScreen::displaySound() const
 {
     findField("sound")->setText(soundNames[sound]);
     findLabel("volume")->Hide(sound != 0);
@@ -66,19 +66,19 @@ void MetronomeSoundScreen::displaySound()
     findField("velocity-accent")->Hide(sound == 0);
 }
 
-void MetronomeSoundScreen::displayVolume()
+void MetronomeSoundScreen::displayVolume() const
 {
     findField("volume")->setTextPadded(volume);
 }
 
-void MetronomeSoundScreen::displayOutput()
+void MetronomeSoundScreen::displayOutput() const
 {
     const auto outputText =
         output == 0 ? "STEREO" : "OUT" + std::to_string(output);
     findField("output")->setText(outputText);
 }
 
-void MetronomeSoundScreen::displayAccent()
+void MetronomeSoundScreen::displayAccent() const
 {
     const auto drumBus = sequencer->getBus<DrumBus>(sound);
     const auto program = drumBus->getProgram();
@@ -88,7 +88,7 @@ void MetronomeSoundScreen::displayAccent()
                                  "/" + sampler->getPadName(accentPad));
 }
 
-void MetronomeSoundScreen::displayNormal()
+void MetronomeSoundScreen::displayNormal() const
 {
     const auto drumBus = sequencer->getBus<DrumBus>(sound);
     const auto program = drumBus->getProgram();
@@ -98,17 +98,17 @@ void MetronomeSoundScreen::displayNormal()
                                  "/" + sampler->getPadName(normalPad));
 }
 
-void MetronomeSoundScreen::displayAccentVelo()
+void MetronomeSoundScreen::displayAccentVelo() const
 {
     findField("velocity-accent")->setTextPadded(accentVelo);
 }
 
-void MetronomeSoundScreen::displayNormalVelo()
+void MetronomeSoundScreen::displayNormalVelo() const
 {
     findField("velocity-normal")->setTextPadded(normalVelo);
 }
 
-int MetronomeSoundScreen::getVolume()
+int MetronomeSoundScreen::getVolume() const
 {
     return volume;
 }
@@ -119,7 +119,7 @@ void MetronomeSoundScreen::setVolume(const int i)
     displayVolume();
 }
 
-int MetronomeSoundScreen::getOutput()
+int MetronomeSoundScreen::getOutput() const
 {
     return output;
 }
@@ -130,7 +130,7 @@ void MetronomeSoundScreen::setOutput(const int i)
     displayOutput();
 }
 
-int MetronomeSoundScreen::getSound()
+int MetronomeSoundScreen::getSound() const
 {
     return sound;
 }
@@ -156,7 +156,7 @@ void MetronomeSoundScreen::setSound(const int i)
     }
 }
 
-int MetronomeSoundScreen::getAccentPad()
+int MetronomeSoundScreen::getAccentPad() const
 {
     return accentPad;
 }
@@ -167,7 +167,7 @@ void MetronomeSoundScreen::setAccentPad(const int i)
     displayAccent();
 }
 
-int MetronomeSoundScreen::getAccentVelo()
+int MetronomeSoundScreen::getAccentVelo() const
 {
     return accentVelo;
 }
@@ -178,7 +178,7 @@ void MetronomeSoundScreen::setAccentVelo(const int i)
     displayAccentVelo();
 }
 
-int MetronomeSoundScreen::getNormalPad()
+int MetronomeSoundScreen::getNormalPad() const
 {
     return normalPad;
 }
@@ -189,7 +189,7 @@ void MetronomeSoundScreen::setNormalPad(const int i)
     displayNormal();
 }
 
-int MetronomeSoundScreen::getNormalVelo()
+int MetronomeSoundScreen::getNormalVelo() const
 {
     return normalVelo;
 }

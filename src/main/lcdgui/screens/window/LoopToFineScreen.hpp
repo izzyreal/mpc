@@ -1,17 +1,17 @@
 #pragma once
 
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <vector>
 #include <string>
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoopToFineScreen : public mpc::lcdgui::ScreenComponent
+    class LoopToFineScreen final : public ScreenComponent
     {
 
     public:
-        LoopToFineScreen(mpc::Mpc &mpc, int layerIndex);
+        LoopToFineScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 

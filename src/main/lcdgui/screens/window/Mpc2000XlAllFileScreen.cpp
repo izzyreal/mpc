@@ -9,13 +9,12 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc &mpc,
-                                               const int layerIndex)
+Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "mpc2000xl-all-file", layerIndex)
 {
 }
 
-void Mpc2000XlAllFileScreen::function(int i)
+void Mpc2000XlAllFileScreen::function(const int i)
 {
     const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 

@@ -12,9 +12,9 @@ namespace mpc::engine
 
     public:
         void setPanning(int i);
-        int getPanning();
+        int getPanning() const;
         void setLevel(int i);
-        int getLevel();
+        int getLevel() const;
 
     public:
         StereoMixer();

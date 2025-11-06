@@ -3,7 +3,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc &mpc, const int layerIndex)
+VmpcSettingsScreen::VmpcSettingsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-settings", layerIndex)
 {
     easterEgg = std::make_shared<Background>();
@@ -19,8 +19,7 @@ void VmpcSettingsScreen::open()
     displayAutoConvertWavs();
     displayMidiControlMode();
     displayNameTypingWithKeyboard();
-    ls->setFunctionKeysArrangement(
-        midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
+    ls->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
 }
 
 void VmpcSettingsScreen::close()
@@ -46,7 +45,7 @@ void VmpcSettingsScreen::function(int i)
             openScreenById(ScreenId::VmpcDisksScreen);
             break;
         case 4:
-            if (midiControlMode == MidiControlMode::ORIGINAL)
+            if (midiControlMode == ORIGINAL)
             {
                 return;
             }
@@ -90,8 +89,7 @@ void VmpcSettingsScreen::turnWheel(int i)
     else if (focusedFieldName == "midi-control-mode")
     {
         setMidiControlMode(midiControlMode + i);
-        ls->setFunctionKeysArrangement(
-            midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
+        ls->setFunctionKeysArrangement(midiControlMode == ORIGINAL ? 1 : 0);
     }
     else if (focusedFieldName == "name-typing-with-keyboard")
     {
@@ -111,13 +109,13 @@ void VmpcSettingsScreen::setInitialPadMapping(int i)
     displayInitialPadMapping();
 }
 
-void VmpcSettingsScreen::displayInitialPadMapping()
+void VmpcSettingsScreen::displayInitialPadMapping() const
 {
     findField("initial-pad-mapping")
         ->setText(initialPadMappingNames[initialPadMapping]);
 }
 
-void VmpcSettingsScreen::display16LevelsEraseMode()
+void VmpcSettingsScreen::display16LevelsEraseMode() const
 {
     findField("16-levels-erase-mode")
         ->setText(_16LevelsEraseModeNames[_16LevelsEraseMode]);
@@ -145,7 +143,7 @@ void VmpcSettingsScreen::setAutoConvertWavs(int i)
     displayAutoConvertWavs();
 }
 
-void VmpcSettingsScreen::displayAutoConvertWavs()
+void VmpcSettingsScreen::displayAutoConvertWavs() const
 {
     findField("auto-convert-wavs")
         ->setText(autoConvertWavs == 1 ? "YES" : "ASK");
@@ -162,18 +160,18 @@ void VmpcSettingsScreen::setMidiControlMode(int i)
     displayMidiControlMode();
 }
 
-void VmpcSettingsScreen::displayMidiControlMode()
+void VmpcSettingsScreen::displayMidiControlMode() const
 {
     findField("midi-control-mode")
         ->setText(midiControlModeNames[midiControlMode]);
 }
 
-int VmpcSettingsScreen::getMidiControlMode()
+int VmpcSettingsScreen::getMidiControlMode() const
 {
     return midiControlMode;
 }
 
-void VmpcSettingsScreen::displayNameTypingWithKeyboard()
+void VmpcSettingsScreen::displayNameTypingWithKeyboard() const
 {
     findField("name-typing-with-keyboard")
         ->setText(nameTypingWithKeyboardEnabled ? "YES" : "NO");
@@ -185,7 +183,7 @@ void VmpcSettingsScreen::setNameTypingWithKeyboard(const bool shouldBeEnabled)
     displayNameTypingWithKeyboard();
 }
 
-const bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled()
+const bool VmpcSettingsScreen::isNameTypingWithKeyboardEnabled() const
 {
     return nameTypingWithKeyboardEnabled;
 }

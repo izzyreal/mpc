@@ -1,34 +1,22 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-
-namespace mpc::lcdgui::screens
-{
-    class LoadScreen;
-}
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoadASequenceFromAllScreen;
-
-    class LoadASequenceScreen : public mpc::lcdgui::ScreenComponent
+    class LoadASequenceScreen final : public ScreenComponent
     {
-
     public:
+        LoadASequenceScreen(Mpc &mpc, int layerIndex);
+
+        void open() override;
         void turnWheel(int i) override;
         void function(int i) override;
 
-        LoadASequenceScreen(mpc::Mpc &mpc, int layerIndex);
-
-        void open() override;
-
-    private:
         int loadInto = 0;
         void setLoadInto(int i);
 
+    private:
         void displayLoadInto();
         void displayFile();
-
-        friend class LoadASequenceFromAllScreen;
-        friend class mpc::lcdgui::screens::LoadScreen;
     };
 } // namespace mpc::lcdgui::screens::window

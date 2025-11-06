@@ -24,12 +24,12 @@ void VariableLengthInt::setValue(int value)
     buildBytes();
 }
 
-int VariableLengthInt::getValue()
+int VariableLengthInt::getValue() const
 {
     return mValue;
 }
 
-int VariableLengthInt::getByteCount()
+int VariableLengthInt::getByteCount() const
 {
     return mSizeInBytes;
 }
@@ -108,7 +108,7 @@ void VariableLengthInt::buildBytes()
     }
 }
 
-std::string VariableLengthInt::toString()
+std::string VariableLengthInt::toString() const
 {
     return MidiUtil::bytesToHex(mBytes) + " (" + std::to_string(mValue) + ")";
 }

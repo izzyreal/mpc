@@ -5,7 +5,7 @@
 using namespace mpc::disk;
 using namespace std;
 
-void ShortName::init()
+void ShortName::init() const
 {
     // ASCII_ = ::java::nio::charset::Charset::forName("ASCII"_j);
     ILLEGAL_CHARS_ = vector<char>(
@@ -37,7 +37,7 @@ ShortName::ShortName(string nameExt)
     checkValidChars(nameBytes);
 }
 
-ShortName::ShortName(string name, string ext)
+ShortName::ShortName(const string &name, const string &ext)
 {
     this->nameBytes = toCharArray_(name, ext);
 }
@@ -71,7 +71,7 @@ ShortName ShortName::DOT_DOT()
 }
 ShortName ShortName::DOT_DOT_ = ShortName("..", "");
 
-vector<char> ShortName::toCharArray_(string name, string ext)
+vector<char> ShortName::toCharArray_(const string &name, const string &ext)
 {
     checkValidName(name);
     checkValidExt(ext);
@@ -106,7 +106,7 @@ vector<char> ShortName::toCharArray_(string name, string ext)
     return result;
 }
 
-int8_t ShortName::checkSum()
+int8_t ShortName::checkSum() const
 {
     auto const dest = new ::vector<char>(11);
     for (auto i = 0; i < 11; i++)
@@ -122,7 +122,7 @@ int8_t ShortName::checkSum()
     return static_cast<int8_t>((sum & 255));
 }
 
-ShortName ShortName::get(string name)
+ShortName ShortName::get(const string &name)
 {
     if (name.compare(".") == 0)
     {
@@ -138,7 +138,7 @@ ShortName ShortName::get(string name)
     }
 }
 
-bool ShortName::canConvert(string nameExt)
+bool ShortName::canConvert(const string &nameExt)
 {
     try
     {
@@ -173,12 +173,12 @@ ShortName ShortName::parse(vector<char> data)
     return ShortName("parsedum", "my");
 }
 
-void ShortName::write(::vector<char> dest)
+void ShortName::write(::vector<char> dest) const
 {
     // arraycopy(nameBytes, 0, dest, 0, nameBytes.size());
 }
 
-string ShortName::asSimpleString()
+string ShortName::asSimpleString() const
 {
     // auto const name = (new ::String(this->nameBytes, 0, 8, ASCII_))->trim();
     // auto const ext = (new ::String(this->nameBytes, 8, 3, ASCII_))->trim();
@@ -205,12 +205,12 @@ string ShortName::asSimpleString()
     return result;
 }
 
-void ShortName::checkValidName(string name)
+void ShortName::checkValidName(const string &name)
 {
     checkString(name, "name", 1, 8);
 }
 
-void ShortName::checkValidExt(string ext)
+void ShortName::checkValidExt(const string &ext)
 {
     checkString(ext, "extension", 0, 3);
 }
@@ -242,13 +242,13 @@ void ShortName::checkString(string str, string strType, int minLength,
     */
 }
 
-int ShortName::hashCode()
+int ShortName::hashCode() const
 {
     // return Arrays::hashCode(this->nameBytes);
     return 0;
 }
 
-void ShortName::checkValidChars(vector<char> chars)
+void ShortName::checkValidChars(const vector<char> &chars)
 {
     if (chars[0] == 32)
     {

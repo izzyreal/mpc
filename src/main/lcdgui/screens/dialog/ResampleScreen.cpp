@@ -152,22 +152,22 @@ void ResampleScreen::function(const int i)
     }
 }
 
-void ResampleScreen::displayNewFs()
+void ResampleScreen::displayNewFs() const
 {
     findField("newfs")->setText(std::to_string(newFs));
 }
 
-void ResampleScreen::displayQuality()
+void ResampleScreen::displayQuality() const
 {
     findField("quality")->setText(qualityNames[quality]);
 }
 
-void ResampleScreen::displayNewBit()
+void ResampleScreen::displayNewBit() const
 {
     findField("newbit")->setText(bitNames[newBit]);
 }
 
-void ResampleScreen::displayNewName()
+void ResampleScreen::displayNewName() const
 {
     findField("newname")->setText(newName);
 }

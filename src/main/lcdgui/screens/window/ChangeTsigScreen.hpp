@@ -1,12 +1,12 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <sequencer/TimeSignature.hpp>
 
 namespace mpc::lcdgui::screens::window
 {
 
-    class ChangeTsigScreen : public mpc::lcdgui::ScreenComponent
+    class ChangeTsigScreen final : public ScreenComponent
     {
 
     public:
@@ -14,17 +14,17 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
 
     public:
-        ChangeTsigScreen(mpc::Mpc &mpc, int layerIndex);
+        ChangeTsigScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
 
     private:
-        void displayBars();
-        void displayNewTsig();
+        void displayBars() const;
+        void displayNewTsig() const;
 
     private:
-        mpc::sequencer::TimeSignature timesignature;
+        sequencer::TimeSignature timesignature;
         int bar0 = 0;
         int bar1 = 0;
 

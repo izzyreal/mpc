@@ -16,7 +16,7 @@ ChannelAftertouch::ChannelAftertouch(int tick, int delta, int channel,
 {
 }
 
-int ChannelAftertouch::getAmount()
+int ChannelAftertouch::getAmount() const
 {
     return mValue1;
 }

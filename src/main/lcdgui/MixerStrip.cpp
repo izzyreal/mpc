@@ -210,7 +210,7 @@ std::shared_ptr<Knob> MixerStrip::findKnob()
         findChild("mixer-top-background")->findChild("knob"));
 }
 
-std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
+std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground() const
 {
     for (const auto &c : children)
     {
@@ -222,7 +222,8 @@ std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
     return {};
 }
 
-std::shared_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
+std::shared_ptr<MixerFaderBackground>
+MixerStrip::findMixerFaderBackground() const
 {
     for (const auto &c : children)
     {

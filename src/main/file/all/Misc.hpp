@@ -18,12 +18,12 @@ namespace mpc::file::all
         static const int LENGTH = 131;
 
         std::vector<std::pair<int, int>> getSwitches();
-        int getTapAvg();
-        bool isInReceiveMMCEnabled();
-        bool isAutoStepIncEnabled();
-        bool isDurationOfRecNotesTc();
-        int getDurationTcPercentage();
-        bool isPgmChToSeqEnabled();
+        int getTapAvg() const;
+        bool isInReceiveMMCEnabled() const;
+        bool isAutoStepIncEnabled() const;
+        bool isDurationOfRecNotesTc() const;
+        int getDurationTcPercentage() const;
+        bool isPgmChToSeqEnabled() const;
         std::vector<mpc::lcdgui::screens::window::LocateScreen::Location> &
         getLocations();
 

@@ -12,7 +12,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-SongScreen::SongScreen(mpc::Mpc &mpc, const int layerIndex)
+SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "song", layerIndex)
 {
     addReactiveBinding({[&]
@@ -354,27 +354,27 @@ void SongScreen::function(int i)
     }
 }
 
-void SongScreen::displayTempo()
+void SongScreen::displayTempo() const
 {
     findField("tempo")->setText(Util::tempoString(sequencer->getTempo()));
 }
 
-void SongScreen::displayLoop()
+void SongScreen::displayLoop() const
 {
     const auto song = sequencer->getSong(activeSongIndex);
     findField("loop")->setText(song->isLoopEnabled() ? "YES" : "NO");
 }
 
-void SongScreen::displaySteps()
+void SongScreen::displaySteps() const
 {
     const auto song = sequencer->getSong(activeSongIndex);
     const int steps = song->getStepCount();
 
-    const auto stepArray = std::vector<std::shared_ptr<mpc::lcdgui::Field>>{
+    const auto stepArray = std::vector<std::shared_ptr<Field>>{
         findField("step0"), findField("step1"), findField("step2")};
-    const auto sequenceArray = std::vector<std::shared_ptr<mpc::lcdgui::Field>>{
+    const auto sequenceArray = std::vector<std::shared_ptr<Field>>{
         findField("sequence0"), findField("sequence1"), findField("sequence2")};
-    const auto repsArray = std::vector<std::shared_ptr<mpc::lcdgui::Field>>{
+    const auto repsArray = std::vector<std::shared_ptr<Field>>{
         findField("reps0"), findField("reps1"), findField("reps2")};
 
     for (int i = 0; i < 3; i++)
@@ -408,13 +408,13 @@ void SongScreen::displaySteps()
     }
 }
 
-void SongScreen::displayTempoSource()
+void SongScreen::displayTempoSource() const
 {
     findField("tempo-source")
         ->setText(sequencer->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
 }
 
-void SongScreen::displayNow0()
+void SongScreen::displayNow0() const
 {
     int pastBars = 0;
 
@@ -447,17 +447,17 @@ void SongScreen::displayNow0()
         sequencer->getCurrentBarIndex() + 1 + pastBars, "0");
 }
 
-void SongScreen::displayNow1()
+void SongScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
-void SongScreen::displayNow2()
+void SongScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
-void SongScreen::displaySongName()
+void SongScreen::displaySongName() const
 {
     const auto song = sequencer->getSong(activeSongIndex);
     findField("song")->setText(
@@ -508,12 +508,12 @@ std::string SongScreen::getDefaultSongName()
     return defaultSongName;
 }
 
-int SongScreen::getOffset()
+int SongScreen::getOffset() const
 {
     return offset;
 }
 
-int SongScreen::getActiveSongIndex()
+int SongScreen::getActiveSongIndex() const
 {
     return activeSongIndex;
 }

@@ -22,9 +22,10 @@ namespace mpc::engine::audio::mixer
         int nmixed{1};
 
     public:
-        void setInputProcess(std::shared_ptr<AudioProcess> input);
+        void setInputProcess(const std::shared_ptr<AudioProcess> &input);
 
-        void setDirectOutputProcess(std::shared_ptr<AudioProcess> output);
+        void
+        setDirectOutputProcess(const std::shared_ptr<AudioProcess> &output);
 
         void silence();
 
@@ -51,8 +52,8 @@ namespace mpc::engine::audio::mixer
     public:
         AudioMixerStrip(
             AudioMixer *mixer,
-            std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
-                controlsChain);
+            const std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+                &controlsChain);
     };
 
 } // namespace mpc::engine::audio::mixer

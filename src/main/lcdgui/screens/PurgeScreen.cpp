@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-PurgeScreen::PurgeScreen(mpc::Mpc &mpc, const int layerIndex)
+PurgeScreen::PurgeScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "purge", layerIndex)
 {
 }

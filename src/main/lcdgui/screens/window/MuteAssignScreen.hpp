@@ -1,22 +1,22 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class MuteAssignScreen : public mpc::lcdgui::ScreenComponent
+    class MuteAssignScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
-        MuteAssignScreen(mpc::Mpc &mpc, int layerIndex);
+        MuteAssignScreen(Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *o, Message message) override;
 
     private:
-        void displayNote();
-        void displayNote0();
-        void displayNote1();
+        void displayNote() const;
+        void displayNote0() const;
+        void displayNote1() const;
     };
 } // namespace mpc::lcdgui::screens::window

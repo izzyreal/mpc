@@ -3,21 +3,21 @@
 
 using namespace mpc::file;
 
-std::uint16_t ByteUtil::bytes2ushort(std::vector<char> ca)
+std::uint16_t ByteUtil::bytes2ushort(const std::vector<char> &ca)
 {
     auto hi = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[1]));
     auto lo = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[0]));
     return (hi << 8) | lo;
 }
 
-std::int16_t ByteUtil::bytes2short(std::vector<char> ca)
+std::int16_t ByteUtil::bytes2short(const std::vector<char> &ca)
 {
     auto hi = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[1]));
     auto lo = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[0]));
     return static_cast<std::int16_t>((hi << 8) | lo);
 }
 
-std::uint32_t ByteUtil::bytes2uint(std::vector<char> quartet)
+std::uint32_t ByteUtil::bytes2uint(const std::vector<char> &quartet)
 {
     std::uint32_t result = 0;
     result |= static_cast<std::uint32_t>(static_cast<unsigned char>(quartet[3]))
@@ -85,7 +85,7 @@ char ByteUtil::hexToByte(const std::string &charPair)
     return static_cast<char>(byte % 0x100);
 }
 
-std::vector<char> ByteUtil::hexToBytes(std::string charPairs)
+std::vector<char> ByteUtil::hexToBytes(const std::string &charPairs)
 {
     std::vector<char> res;
     for (size_t i = 0; i < charPairs.size(); i += 2)
@@ -98,7 +98,7 @@ std::vector<char> ByteUtil::hexToBytes(std::string charPairs)
     return res;
 }
 
-std::vector<std::int16_t> ByteUtil::bytesToShorts(std::vector<char> src)
+std::vector<std::int16_t> ByteUtil::bytesToShorts(const std::vector<char> &src)
 {
     if (src.empty() || src.size() % 2 != 0)
     {

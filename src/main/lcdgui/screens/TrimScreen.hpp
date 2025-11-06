@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
@@ -19,7 +19,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens
 {
-    class TrimScreen : public mpc::lcdgui::ScreenComponent
+    class TrimScreen final : public ScreenComponent
     {
 
     public:
@@ -31,22 +31,22 @@ namespace mpc::lcdgui::screens
         void pressEnter() override;
         void setSlider(int i) override;
 
-        void setSliderStart(int);
-        void setSliderEnd(int);
-        void setEnd(int newValue);
+        void setSliderStart(int) const;
+        void setSliderEnd(int) const;
+        void setEnd(int newValue) const;
 
     public:
-        TrimScreen(mpc::Mpc &mpc, int layerIndex);
+        TrimScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
     private:
         const std::vector<std::string> playXNames = {"ALL", "ZONE", "BEFOR ST",
                                                      "BEFOR TO", "AFTR END"};
-        void displaySnd();
-        void displayPlayX();
-        void displaySt();
-        void displayEnd();
-        void displayView();
+        void displaySnd() const;
+        void displayPlayX() const;
+        void displaySt() const;
+        void displayEnd() const;
+        void displayView() const;
         void displayWave();
 
         bool smplLngthFix = false;
@@ -57,11 +57,11 @@ namespace mpc::lcdgui::screens
     private:
         friend class LoopScreen;
         friend class ZoneScreen;
-        friend class mpc::lcdgui::screens::window::StartFineScreen;
-        friend class mpc::lcdgui::screens::window::EndFineScreen;
-        friend class mpc::lcdgui::screens::window::LoopEndFineScreen;
-        friend class mpc::lcdgui::screens::window::LoopToFineScreen;
-        friend class mpc::lcdgui::screens::window::ZoneStartFineScreen;
-        friend class mpc::lcdgui::screens::window::ZoneEndFineScreen;
+        friend class StartFineScreen;
+        friend class EndFineScreen;
+        friend class LoopEndFineScreen;
+        friend class LoopToFineScreen;
+        friend class ZoneStartFineScreen;
+        friend class ZoneEndFineScreen;
     };
 } // namespace mpc::lcdgui::screens

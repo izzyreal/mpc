@@ -55,32 +55,32 @@ mpc::engine::IndivFxMixer ApsMixer::getIndivFxMixerChannel(int noteIndex)
     return result;
 }
 
-int ApsMixer::getFxPath(int noteIndex)
+int ApsMixer::getFxPath(int noteIndex) const
 {
     return fxPaths[noteIndex];
 }
 
-int ApsMixer::getLevel(int noteIndex)
+int ApsMixer::getLevel(int noteIndex) const
 {
     return levels[noteIndex];
 }
 
-int ApsMixer::getPanning(int noteIndex)
+int ApsMixer::getPanning(int noteIndex) const
 {
     return pannings[noteIndex];
 }
 
-int ApsMixer::getIndividualLevel(int noteIndex)
+int ApsMixer::getIndividualLevel(int noteIndex) const
 {
     return iLevels[noteIndex];
 }
 
-int ApsMixer::getIndividualOutput(int noteIndex)
+int ApsMixer::getIndividualOutput(int noteIndex) const
 {
     return iOutputs[noteIndex];
 }
 
-int ApsMixer::getSendLevel(int noteIndex)
+int ApsMixer::getSendLevel(int noteIndex) const
 {
     return sendLevels[noteIndex];
 }

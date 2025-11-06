@@ -1,13 +1,13 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::dialog2
 {
-    class DeleteAllFilesScreen : public mpc::lcdgui::ScreenComponent
+    class DeleteAllFilesScreen final : public ScreenComponent
     {
 
     public:
-        DeleteAllFilesScreen(mpc::Mpc &mpc, int layerIndex);
+        DeleteAllFilesScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void turnWheel(int i) override;

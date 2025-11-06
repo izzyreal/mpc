@@ -14,12 +14,12 @@ NoteOn::NoteOn(int tick, int delta, int channel, int note, int velocity)
 {
 }
 
-int NoteOn::getNoteValue()
+int NoteOn::getNoteValue() const
 {
     return mValue1;
 }
 
-int NoteOn::getVelocity()
+int NoteOn::getVelocity() const
 {
     return mValue2;
 }

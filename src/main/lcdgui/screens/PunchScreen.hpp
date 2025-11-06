@@ -1,20 +1,19 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
-#include <lcdgui/screens/WithTimesAndNotes.hpp>
+#include "lcdgui/screens/WithTimesAndNotes.hpp"
 
 namespace mpc::lcdgui::screens
 {
 
-    class PunchScreen : public mpc::lcdgui::ScreenComponent,
-                        private mpc::lcdgui::screens::WithTimesAndNotes
+    class PunchScreen final : public ScreenComponent, private WithTimesAndNotes
     {
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        PunchScreen(mpc::Mpc &mpc, int layerIndex);
+        PunchScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -33,7 +32,7 @@ namespace mpc::lcdgui::screens
 
         void setAutoPunch(int i);
 
-        void displayAutoPunch();
+        void displayAutoPunch() const;
         void displayBackground();
 
         void displayTime() override;

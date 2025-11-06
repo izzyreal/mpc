@@ -9,7 +9,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-VeloPitchScreen::VeloPitchScreen(mpc::Mpc &mpc, const int layerIndex)
+VeloPitchScreen::VeloPitchScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "velo-pitch", layerIndex)
 {
 }
@@ -30,7 +30,7 @@ void VeloPitchScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void VeloPitchScreen::turnWheel(int i)
+void VeloPitchScreen::turnWheel(const int i)
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -58,7 +58,7 @@ void VeloPitchScreen::turnWheel(int i)
     }
 }
 
-void VeloPitchScreen::displayTune()
+void VeloPitchScreen::displayTune() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -69,7 +69,7 @@ void VeloPitchScreen::displayTune()
         prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
-void VeloPitchScreen::displayVeloPitch()
+void VeloPitchScreen::displayVeloPitch() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(
@@ -81,12 +81,12 @@ void VeloPitchScreen::displayVeloPitch()
                   StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
-void VeloPitchScreen::displayVelo()
+void VeloPitchScreen::displayVelo() const
 {
     findField("velo")->setText("127");
 }
 
-void VeloPitchScreen::update(Observable *observable, Message message)
+void VeloPitchScreen::update(Observable *observable, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 
@@ -98,7 +98,7 @@ void VeloPitchScreen::update(Observable *observable, Message message)
     }
 }
 
-void VeloPitchScreen::displayNote()
+void VeloPitchScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto selectedNoteParameters = program->getNoteParameters(

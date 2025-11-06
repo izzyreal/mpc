@@ -237,24 +237,24 @@ void SampleScreen::setPreRec(const int i)
     displayPreRec();
 }
 
-void SampleScreen::displayInput()
+void SampleScreen::displayInput() const
 {
     findField("input")->setText(inputNames[input]);
 }
 
-void SampleScreen::displayThreshold()
+void SampleScreen::displayThreshold() const
 {
     const auto thresholdText =
         threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
     findField("threshold")->setTextPadded(thresholdText);
 }
 
-void SampleScreen::displayMode()
+void SampleScreen::displayMode() const
 {
     findField("mode")->setText(modeNames[mode]);
 }
 
-void SampleScreen::displayTime()
+void SampleScreen::displayTime() const
 {
     auto timeText = std::to_string(time);
     timeText = timeText.substr(0, timeText.length() - 1) + "." +
@@ -262,12 +262,12 @@ void SampleScreen::displayTime()
     findField("time")->setTextPadded(timeText);
 }
 
-void SampleScreen::displayMonitor()
+void SampleScreen::displayMonitor() const
 {
     findField("monitor")->setText(monitorNames[monitor]);
 }
 
-void SampleScreen::displayPreRec()
+void SampleScreen::displayPreRec() const
 {
     findField("prerec")->setTextPadded(preRec);
 }

@@ -9,9 +9,9 @@ namespace mpc::file::mid::event::meta
     {
 
     public:
-        void setNotice(std::string t);
+        void setNotice(const std::string &t);
         std::string getNotice();
 
-        CopyrightNotice(int tick, int delta, std::string text);
+        CopyrightNotice(int tick, int delta, const std::string &text);
     };
 } // namespace mpc::file::mid::event::meta

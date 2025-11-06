@@ -1,25 +1,18 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class NameScreen;
-}
-
-namespace mpc::lcdgui::screens::window
-{
-    class AutoChromaticAssignmentScreen
-        : public mpc::lcdgui::ScreenComponent,
-          public mpc::lcdgui::screens::OpensNameScreen
+    class AutoChromaticAssignmentScreen final : public ScreenComponent,
+                                                public OpensNameScreen
     {
-
     public:
         void turnWheel(int i) override;
         void function(int i) override;
         void openNameScreen() override;
 
-        AutoChromaticAssignmentScreen(mpc::Mpc &mpc, int layerIndex);
+        AutoChromaticAssignmentScreen(Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *o, Message message) override;
@@ -34,13 +27,10 @@ namespace mpc::lcdgui::screens::window
         void setOriginalKey(int i);
         void setTune(int i);
 
-        void displayOriginalKey();
-        void displaySource();
-        void displayTune();
-        void displayProgramName();
-        void displaySnd();
-
-    private:
-        friend class mpc::lcdgui::screens::window::NameScreen;
+        void displayOriginalKey() const;
+        void displaySource() const;
+        void displayTune() const;
+        void displayProgramName() const;
+        void displaySnd() const;
     };
 } // namespace mpc::lcdgui::screens::window

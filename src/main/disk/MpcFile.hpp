@@ -42,18 +42,18 @@ namespace mpc::disk
         // Returns an empty path if this MpcFile instance is backed by a
         // rawEntry.
         fs::path getPath();
-        bool isDirectory();
+        bool isDirectory() const;
         bool isFile();
-        bool exists();
-        std::string getName();
-        bool setName(std::string s);
+        bool exists() const;
+        std::string getName() const;
+        bool setName(const std::string &s) const;
         unsigned long length();
         void setFileData(std::vector<char> &data);
-        bool del();
+        bool del() const;
         std::vector<char> getBytes();
         std::vector<std::shared_ptr<MpcFile>> listFiles();
-        std::string getNameWithoutExtension();
-        std::string getExtension();
+        std::string getNameWithoutExtension() const;
+        std::string getExtension() const;
         std::shared_ptr<std::istream> getInputStream();
         std::shared_ptr<std::ostream> getOutputStream();
 

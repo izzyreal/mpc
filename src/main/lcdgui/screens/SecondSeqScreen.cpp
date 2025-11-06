@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-SecondSeqScreen::SecondSeqScreen(mpc::Mpc &mpc, const int layerIndex)
+SecondSeqScreen::SecondSeqScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "second-seq", layerIndex)
 {
 }
@@ -62,14 +62,14 @@ void SecondSeqScreen::setSq(int i)
     displayFunctionKeys();
 }
 
-void SecondSeqScreen::displaySq()
+void SecondSeqScreen::displaySq() const
 {
     const auto sqName = sequencer->getSequence(sq)->getName();
     findField("sq")->setTextPadded(sq + 1, "0");
     findLabel("sequence-name")->setText("-" + sqName);
 }
 
-void SecondSeqScreen::displayFunctionKeys()
+void SecondSeqScreen::displayFunctionKeys() const
 {
     if (sequencer->isSecondSequenceEnabled())
     {

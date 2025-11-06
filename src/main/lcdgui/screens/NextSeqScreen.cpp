@@ -18,7 +18,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-NextSeqScreen::NextSeqScreen(mpc::Mpc &mpc, const int layerIndex)
+NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "next-seq", layerIndex)
 {
     addReactiveBinding({[&]
@@ -175,7 +175,7 @@ void NextSeqScreen::function(int i)
     }
 }
 
-void NextSeqScreen::displaySq()
+void NextSeqScreen::displaySq() const
 {
     std::string result = "";
 
@@ -198,7 +198,7 @@ void NextSeqScreen::displaySq()
     }
 }
 
-void NextSeqScreen::displayNextSq()
+void NextSeqScreen::displayNextSq() const
 {
     const auto nextSq = sequencer->getNextSq();
     std::string res = "";
@@ -214,28 +214,28 @@ void NextSeqScreen::displayNextSq()
     findField("nextsq")->setText(res);
 }
 
-void NextSeqScreen::displayNow0()
+void NextSeqScreen::displayNow0() const
 {
     findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
-void NextSeqScreen::displayNow1()
+void NextSeqScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
-void NextSeqScreen::displayNow2()
+void NextSeqScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
-void NextSeqScreen::displayTempo()
+void NextSeqScreen::displayTempo() const
 {
     displayTempoLabel();
     findField("tempo")->setText(Util::tempoString(sequencer->getTempo()));
 }
 
-void NextSeqScreen::displayTempoLabel()
+void NextSeqScreen::displayTempoLabel() const
 {
     auto currentRatio = -1;
     const auto sequence = sequencer->isPlaying()
@@ -261,14 +261,14 @@ void NextSeqScreen::displayTempoLabel()
     }
 }
 
-void NextSeqScreen::displayTempoSource()
+void NextSeqScreen::displayTempoSource() const
 {
     findField("tempo-source")
         ->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)"
                                                             : "(MAS)");
 }
 
-void NextSeqScreen::displayTiming()
+void NextSeqScreen::displayTiming() const
 {
     const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();

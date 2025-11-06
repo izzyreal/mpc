@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
@@ -21,11 +21,11 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens
 {
 
-    class ZoneScreen : public mpc::lcdgui::ScreenComponent
+    class ZoneScreen final : public ScreenComponent
     {
 
     public:
-        ZoneScreen(mpc::Mpc &mpc, int layerIndex);
+        ZoneScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void openWindow() override;
@@ -41,11 +41,11 @@ namespace mpc::lcdgui::screens
 
     private:
         void displayWave();
-        void displaySnd();
-        void displayPlayX();
-        void displaySt();
-        void displayEnd();
-        void displayZone();
+        void displaySnd() const;
+        void displayPlayX() const;
+        void displaySt() const;
+        void displayEnd() const;
+        void displayZone() const;
 
     private:
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
@@ -57,16 +57,16 @@ namespace mpc::lcdgui::screens
 
         void initZones();
         void setZoneStart(int zoneIndex, int start);
-        int getZoneStart(int zoneIndex);
+        int getZoneStart(int zoneIndex) const;
         void setZoneEnd(int zoneIndex, int end);
-        int getZoneEnd(int zoneIndex);
+        int getZoneEnd(int zoneIndex) const;
         void setZone(int i);
-        std::vector<int> getZone();
+        std::vector<int> getZone() const;
 
-        friend class mpc::lcdgui::screens::window::NumberOfZonesScreen;
-        friend class mpc::lcdgui::screens::window::ZoneStartFineScreen;
-        friend class mpc::lcdgui::screens::window::ZoneEndFineScreen;
-        friend class mpc::lcdgui::screens::window::EditSoundScreen;
-        friend class mpc::sampler::Sampler;
+        friend class NumberOfZonesScreen;
+        friend class ZoneStartFineScreen;
+        friend class ZoneEndFineScreen;
+        friend class EditSoundScreen;
+        friend class sampler::Sampler;
     };
 } // namespace mpc::lcdgui::screens

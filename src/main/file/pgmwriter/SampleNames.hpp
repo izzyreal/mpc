@@ -30,15 +30,16 @@ namespace mpc
                 std::vector<char> getSampleNamesArray();
 
             private:
-                void setSampleName(int sampleNumber, std::string name);
+                void setSampleName(int sampleNumber, const std::string &name);
 
             public:
-                int getNumberOfSamples();
+                int getNumberOfSamples() const;
                 std::vector<int> getSnConvTable();
 
             public:
-                SampleNames(mpc::sampler::Program *program,
-                            std::weak_ptr<mpc::sampler::Sampler> sampler);
+                SampleNames(
+                    mpc::sampler::Program *program,
+                    const std::weak_ptr<mpc::sampler::Sampler> &sampler);
             };
 
         } // namespace pgmwriter

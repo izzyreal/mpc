@@ -11,7 +11,7 @@ ApsAssignTable::ApsAssignTable(const std::vector<char> &loadBytes)
     }
 }
 
-ApsAssignTable::ApsAssignTable(std::vector<int> assignTable)
+ApsAssignTable::ApsAssignTable(const std::vector<int> &assignTable)
 {
     saveBytes = std::vector<char>(64);
     for (int i = 0; i < 64; i++)

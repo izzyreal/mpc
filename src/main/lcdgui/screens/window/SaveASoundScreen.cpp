@@ -8,13 +8,13 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "sampler/Sampler.hpp"
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 
-SaveASoundScreen::SaveASoundScreen(mpc::Mpc &mpc, const int layerIndex)
+SaveASoundScreen::SaveASoundScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save-a-sound", layerIndex)
 {
 }
@@ -31,7 +31,7 @@ void SaveASoundScreen::open()
     displayFileType();
 }
 
-void SaveASoundScreen::turnWheel(int i)
+void SaveASoundScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -52,7 +52,7 @@ void SaveASoundScreen::turnWheel(int i)
     }
 }
 
-void SaveASoundScreen::function(int i)
+void SaveASoundScreen::function(const int i)
 {
 
     switch (i)
@@ -66,8 +66,8 @@ void SaveASoundScreen::function(int i)
             auto s = sampler->getSound();
             const auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
             auto fileName =
-                mpc::Util::getFileName(mpc.screens->get<ScreenId::NameScreen>()
-                                           ->getNameWithoutSpaces()) +
+                Util::getFileName(mpc.screens->get<ScreenId::NameScreen>()
+                                      ->getNameWithoutSpaces()) +
                 ext;
 
             auto saveAction = [this, disk, s, fileName]
@@ -130,7 +130,7 @@ void SaveASoundScreen::function(int i)
     }
 }
 
-void SaveASoundScreen::setFileType(int i)
+void SaveASoundScreen::setFileType(const int i)
 {
     if (i < 0 || i > 1)
     {
@@ -141,13 +141,13 @@ void SaveASoundScreen::setFileType(int i)
     displayFileType();
 }
 
-void SaveASoundScreen::displayFileType()
+void SaveASoundScreen::displayFileType() const
 {
     findField("file-type")
         ->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
 }
 
-void SaveASoundScreen::displayFile()
+void SaveASoundScreen::displayFile() const
 {
     findField("file")->setText(
         mpc.screens->get<ScreenId::NameScreen>()->getNameWithoutSpaces());

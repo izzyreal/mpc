@@ -64,10 +64,9 @@ std::shared_ptr<MpcFile> findSoundFileByFilenameWithoutExtension(
     return result;
 }
 
-program_or_error
-ProgramLoader::loadProgram(mpc::Mpc &mpc,
-                           std::shared_ptr<mpc::disk::MpcFile> file,
-                           std::shared_ptr<mpc::sampler::Program> program)
+program_or_error ProgramLoader::loadProgram(
+    mpc::Mpc &mpc, const std::shared_ptr<mpc::disk::MpcFile> &file,
+    const std::shared_ptr<mpc::sampler::Program> &program)
 {
     auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;
@@ -213,8 +212,10 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc,
             });
 }
 
-void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name,
-                                              std::string ext, int sampleSize)
+void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc,
+                                              const std::string &name,
+                                              const std::string &ext,
+                                              int sampleSize)
 {
     mpc.getLayeredScreen()->openScreenById(ScreenId::PopupScreen);
     auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
@@ -223,7 +224,7 @@ void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name,
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
+void ProgramLoader::notFound(mpc::Mpc &mpc, const std::string &soundFileName)
 {
     auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;

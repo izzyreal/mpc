@@ -1,6 +1,6 @@
 #include "file/all/Defaults.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 #include "Mpc.hpp"
 #include "file/all/AllParser.hpp"
 
@@ -94,7 +94,7 @@ Defaults::Defaults(mpc::Mpc &mpc) : mpc(mpc)
     saveBytes[LOOP_ENABLED_OFFSET] = userScreen->loop ? 0x01 : 0x00;
 }
 
-void Defaults::parseNames(std::vector<char> loadBytes)
+void Defaults::parseNames(const std::vector<char> &loadBytes)
 {
     std::vector<char> stringBuffer;
 
@@ -161,27 +161,27 @@ std::string Defaults::getDefaultSeqName()
     return defaultSeqName;
 }
 
-int Defaults::getTempo()
+int Defaults::getTempo() const
 {
     return tempo;
 }
 
-int Defaults::getTimeSigNum()
+int Defaults::getTimeSigNum() const
 {
     return timeSigNum;
 }
 
-int Defaults::getTimeSigDen()
+int Defaults::getTimeSigDen() const
 {
     return timeSigDen;
 }
 
-int Defaults::getBarCount()
+int Defaults::getBarCount() const
 {
     return barCount;
 }
 
-bool Defaults::isLoopEnabled()
+bool Defaults::isLoopEnabled() const
 {
     return loopEnabled;
 }

@@ -1,9 +1,9 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class ChangeBarsScreen : public mpc::lcdgui::ScreenComponent
+    class ChangeBarsScreen final : public ScreenComponent
     {
 
     public:
@@ -14,13 +14,13 @@ namespace mpc::lcdgui::screens::window
         void open() override;
 
     private:
-        void displayAfterBar();
-        void displayNumberOfBars();
-        void displayFirstBar();
-        void displayLastBar();
+        void displayAfterBar() const;
+        void displayNumberOfBars() const;
+        void displayFirstBar() const;
+        void displayLastBar() const;
 
     public:
-        ChangeBarsScreen(mpc::Mpc &mpc, int layerIndex);
+        ChangeBarsScreen(Mpc &mpc, int layerIndex);
 
     private:
         int lastBar = 0;

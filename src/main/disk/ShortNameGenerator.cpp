@@ -37,7 +37,7 @@ bool ShortNameGenerator::isSkipChar(char c)
     return (c == '.') || (c == ' ');
 }
 
-string ShortNameGenerator::tidyString(string dirty)
+string ShortNameGenerator::tidyString(const string &dirty)
 {
     string result = "";
     for (int src = 0; src < dirty.length(); src++)
@@ -60,7 +60,7 @@ string ShortNameGenerator::tidyString(string dirty)
     return result;
 }
 
-bool ShortNameGenerator::cleanString(string s)
+bool ShortNameGenerator::cleanString(const string &s) const
 {
     for (auto i = 0; i < s.length(); i++)
     {
@@ -77,7 +77,7 @@ bool ShortNameGenerator::cleanString(string s)
     return true;
 }
 
-string ShortNameGenerator::stripLeadingPeriods(string str)
+string ShortNameGenerator::stripLeadingPeriods(const string &str) const
 {
     string sb = "";
     for (int i = 0; i < str.length(); i++)

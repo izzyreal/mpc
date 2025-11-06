@@ -10,7 +10,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-ChangeBars2Screen::ChangeBars2Screen(mpc::Mpc &mpc, const int layerIndex)
+ChangeBars2Screen::ChangeBars2Screen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "change-bars-2", layerIndex)
 {
 }
@@ -22,13 +22,13 @@ void ChangeBars2Screen::open()
     displayNewBars();
 }
 
-void ChangeBars2Screen::displayCurrent()
+void ChangeBars2Screen::displayCurrent() const
 {
     const auto seq = sequencer->getActiveSequence();
     findLabel("current")->setText(std::to_string(seq->getLastBarIndex() + 1));
 }
 
-void ChangeBars2Screen::function(int i)
+void ChangeBars2Screen::function(const int i)
 {
     ScreenComponent::function(i);
     const auto seq = sequencer->getActiveSequence();
@@ -69,7 +69,7 @@ void ChangeBars2Screen::function(int i)
     }
 }
 
-void ChangeBars2Screen::displayNewBars()
+void ChangeBars2Screen::displayNewBars() const
 {
     const auto seq = sequencer->getActiveSequence();
 
@@ -96,7 +96,7 @@ void ChangeBars2Screen::displayNewBars()
     }
 }
 
-void ChangeBars2Screen::turnWheel(int i)
+void ChangeBars2Screen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -106,7 +106,7 @@ void ChangeBars2Screen::turnWheel(int i)
     }
 }
 
-void ChangeBars2Screen::setNewBars(int i)
+void ChangeBars2Screen::setNewBars(const int i)
 {
     newBars = std::clamp(i, 0, 998);
     displayNewBars();

@@ -1,23 +1,23 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class LoopSongScreen : public mpc::lcdgui::ScreenComponent
+    class LoopSongScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
     public:
-        LoopSongScreen(mpc::Mpc &mpc, int layerIndex);
+        LoopSongScreen(Mpc &mpc, int layerIndex);
 
     public:
         void open() override;
 
     private:
-        void displayNumberOfSteps();
-        void displayLastStep();
-        void displayFirstStep();
+        void displayNumberOfSteps() const;
+        void displayLastStep() const;
+        void displayFirstStep() const;
     };
 } // namespace mpc::lcdgui::screens::window

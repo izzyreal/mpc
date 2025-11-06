@@ -5,7 +5,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-ChangeBarsScreen::ChangeBarsScreen(mpc::Mpc &mpc, const int layerIndex)
+ChangeBarsScreen::ChangeBarsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "change-bars", layerIndex)
 {
 }
@@ -18,7 +18,7 @@ void ChangeBarsScreen::open()
     setLastBar(0);
 }
 
-void ChangeBarsScreen::function(int i)
+void ChangeBarsScreen::function(const int i)
 {
     ScreenComponent::function(i);
     const auto seq = sequencer->getActiveSequence();
@@ -51,7 +51,7 @@ void ChangeBarsScreen::function(int i)
     }
 }
 
-void ChangeBarsScreen::turnWheel(int i)
+void ChangeBarsScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -74,27 +74,27 @@ void ChangeBarsScreen::turnWheel(int i)
     }
 }
 
-void ChangeBarsScreen::displayAfterBar()
+void ChangeBarsScreen::displayAfterBar() const
 {
     findField("afterbar")->setTextPadded(afterBar);
 }
 
-void ChangeBarsScreen::displayNumberOfBars()
+void ChangeBarsScreen::displayNumberOfBars() const
 {
     findField("numberofbars")->setTextPadded(numberOfBars);
 }
 
-void ChangeBarsScreen::displayFirstBar()
+void ChangeBarsScreen::displayFirstBar() const
 {
     findField("firstbar")->setTextPadded(firstBar + 1);
 }
 
-void ChangeBarsScreen::displayLastBar()
+void ChangeBarsScreen::displayLastBar() const
 {
     findField("lastbar")->setTextPadded(lastBar + 1);
 }
 
-void ChangeBarsScreen::setLastBar(int i)
+void ChangeBarsScreen::setLastBar(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
 
@@ -108,7 +108,7 @@ void ChangeBarsScreen::setLastBar(int i)
     displayLastBar();
 }
 
-void ChangeBarsScreen::setFirstBar(int i)
+void ChangeBarsScreen::setFirstBar(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
 
@@ -122,14 +122,14 @@ void ChangeBarsScreen::setFirstBar(int i)
     }
 }
 
-void ChangeBarsScreen::setNumberOfBars(int i)
+void ChangeBarsScreen::setNumberOfBars(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
     numberOfBars = std::clamp(i, 0, 998 - std::max(seq->getLastBarIndex(), 0));
     displayNumberOfBars();
 }
 
-void ChangeBarsScreen::setAfterBar(int i)
+void ChangeBarsScreen::setAfterBar(const int i)
 {
     const auto seq = sequencer->getActiveSequence();
     afterBar = std::clamp(i, 0, std::max(seq->getLastBarIndex(), 0) + 1);

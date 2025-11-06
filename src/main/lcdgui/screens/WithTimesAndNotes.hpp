@@ -38,10 +38,10 @@ namespace mpc::lcdgui::screens
         virtual void displayTime() = 0;
 
     public:
-        bool checkAllTimes(mpc::Mpc &mpc, int notch,
-                           mpc::sequencer::Sequence *sequence = nullptr);
-        bool checkAllTimesAndNotes(mpc::Mpc &mpc, int notch,
-                                   mpc::sequencer::Sequence *sequence = nullptr,
-                                   mpc::sequencer::Track *track = nullptr);
+        bool checkAllTimes(Mpc &mpc, int notch,
+                           sequencer::Sequence *sequence = nullptr);
+        bool checkAllTimesAndNotes(Mpc &mpc, int notch,
+                                   sequencer::Sequence *sequence = nullptr,
+                                   sequencer::Track *track = nullptr);
     };
 } // namespace mpc::lcdgui::screens

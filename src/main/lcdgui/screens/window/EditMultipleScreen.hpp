@@ -1,27 +1,25 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 #include <sequencer/NoteEvent.hpp>
 
-namespace mpc::lcdgui::screens
-{
-    class StepEditorScreen;
-}
 using mpc::sequencer::NoteOnEvent;
 
 namespace mpc::lcdgui::screens::window
 {
-
-    class EditMultipleScreen : public mpc::lcdgui::ScreenComponent
+    class EditMultipleScreen final : public ScreenComponent
     {
-
     public:
+        EditMultipleScreen(Mpc &mpc, int layerIndex);
+
         void function(int i) override;
         void turnWheel(int i) override;
-        EditMultipleScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
 
         void setChangeNoteTo(int i);
+        void setVariationType(NoteOnEvent::VARIATION_TYPE type);
+        void setVariationValue(int i);
+        void setEditValue(int i);
 
     private:
         int editType = 0;
@@ -43,19 +41,14 @@ namespace mpc::lcdgui::screens::window
         int variationValue = 0;
         int editValue = 0;
 
-        void checkThreeParameters();
+        void checkThreeParameters() const;
         void checkFiveParameters();
-        void checkNotes();
+        void checkNotes() const;
 
-        void updateEditMultiple();
-        void updateDouble();
+        void updateEditMultiple() const;
+        void updateDouble() const;
         void setEditType(int i);
 
-        void setVariationType(NoteOnEvent::VARIATION_TYPE type);
         void incrementVariationType(int i);
-        void setVariationValue(int i);
-        void setEditValue(int i);
-
-        friend class mpc::lcdgui::screens::StepEditorScreen;
     };
 } // namespace mpc::lcdgui::screens::window

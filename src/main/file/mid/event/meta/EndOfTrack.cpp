@@ -28,7 +28,7 @@ void EndOfTrack::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int EndOfTrack::compareTo(mpc::file::mid::event::MidiEvent *other)
+int EndOfTrack::compareTo(mpc::file::mid::event::MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

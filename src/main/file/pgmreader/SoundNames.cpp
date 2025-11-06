@@ -3,7 +3,7 @@
 #include "file/pgmreader/PgmHeader.hpp"
 #include "file/pgmreader/ProgramFileReader.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::file::pgmreader;
 
@@ -12,7 +12,7 @@ SoundNames::SoundNames(ProgramFileReader *programFile)
     this->programFile = programFile;
 }
 
-int SoundNames::getSampleNamesSize()
+int SoundNames::getSampleNamesSize() const
 {
     int sampleNamesSize = (programFile->getHeader()->getSoundCount()) * 17;
     return sampleNamesSize;

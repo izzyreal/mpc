@@ -1,31 +1,23 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
-
-namespace mpc::sequencer
-{
-    class Sequencer;
-}
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
-    class IgnoreTempoChangeScreen : public mpc::lcdgui::ScreenComponent
+    class IgnoreTempoChangeScreen final : public ScreenComponent
     {
-
     public:
         void function(int i) override;
         void turnWheel(int i) override;
 
-        IgnoreTempoChangeScreen(mpc::Mpc &mpc, int layerIndex);
+        IgnoreTempoChangeScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
         void setIgnore(bool);
-        bool getIgnore();
+        bool getIgnore() const;
 
     private:
         bool ignore = true;
-        void displayIgnore();
-
-        friend class mpc::sequencer::Sequencer;
+        void displayIgnore() const;
     };
 } // namespace mpc::lcdgui::screens::window

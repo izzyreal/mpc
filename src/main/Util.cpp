@@ -27,7 +27,7 @@ std::string Util::getFileName(const std::string &s)
 {
     std::string copy = s;
     copy = StrUtil::trim(copy);
-    for (auto c : copy)
+    for (auto &c : copy)
     {
         c = toupper(c);
         if (c == ' ')
@@ -48,7 +48,7 @@ std::vector<std::string> Util::splitName(const std::string &s)
         return res;
     }
 
-    size_t i = s.find_last_of('.');
+    const size_t i = s.find_last_of('.');
     std::vector<std::string> res(2);
     res[0] = s.substr(0, i);
     res[1] = s.substr(i + 1);
@@ -120,9 +120,9 @@ std::vector<std::string> &Util::noteNames()
         int octave = -2;
         int noteCounter = 0;
 
-        std::vector<std::string> someNoteNames{"C.", "C#", "D.", "D#",
-                                               "E.", "F.", "F#", "G.",
-                                               "G#", "A.", "A#", "B."};
+        const std::vector<std::string> someNoteNames{"C.", "C#", "D.", "D#",
+                                                     "E.", "F.", "F#", "G.",
+                                                     "G#", "A.", "A#", "B."};
 
         for (int j = 0; j < 128; j++)
         {
@@ -201,43 +201,43 @@ void Util::initSequence(mpc::Mpc &mpc)
 
 void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)
 {
-    auto sequencer = mpc.getSequencer();
-    auto sequence = sequencer->getSequence(sequenceIndex);
+    const auto sequencer = mpc.getSequencer();
+    const auto sequence = sequencer->getSequence(sequenceIndex);
 
     if (sequence->isUsed())
     {
         return;
     }
 
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    sequence->init(userScreen->lastBar);
-    auto numberString =
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    sequence->init(userScreen->getLastBar());
+    const auto numberString =
         StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2);
-    std::string name =
+    const std::string name =
         StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;
     sequence->setName(name);
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
 void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
-                             const std::shared_ptr<NoteOnEvent> event)
+                             const std::shared_ptr<NoteOnEvent> &event)
 {
     if (!ctx.isSixteenLevelsEnabled)
     {
         return;
     }
 
-    auto _16l_type = NoteOnEvent::VARIATION_TYPE(ctx.type);
-    auto _16l_key = ctx.originalKeyPad;
-    auto _16l_note = ctx.note;
-    auto _16l_param = ctx.parameter;
+    const auto _16l_type = NoteOnEvent::VARIATION_TYPE(ctx.type);
+    const auto _16l_key = ctx.originalKeyPad;
+    const auto _16l_note = ctx.note;
+    const auto _16l_param = ctx.parameter;
 
     event->setNote(_16l_note);
     event->setVariationType(_16l_type);
 
     if (_16l_param == 0 && event->getVelocity() != 0)
     {
-        auto velocity =
+        const auto velocity =
             static_cast<int>((ctx.padIndexWithoutBank + 1) * (127.0 / 16.0));
         event->setVelocity(velocity);
     }
@@ -245,13 +245,13 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
     {
         if (_16l_type != 0)
         {
-            auto value = static_cast<int>(floor(100 / 16.0) *
-                                          (ctx.padIndexWithoutBank + 1));
+            const auto value = static_cast<int>(floor(100 / 16.0) *
+                                                (ctx.padIndexWithoutBank + 1));
             event->setVariationValue(value);
             return;
         }
 
-        auto diff = ctx.padIndexWithoutBank - _16l_key;
+        const auto diff = ctx.padIndexWithoutBank - _16l_key;
         auto candidate = 64 + (diff * 5);
 
         if (candidate > 124)
@@ -271,45 +271,45 @@ std::pair<NoteOnEvent::VARIATION_TYPE, int>
 Util::getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &ctx)
 {
     const auto variationType = NoteOnEvent::VARIATION_TYPE(ctx.sliderParameter);
-    int sliderValue = ctx.sliderValue;
+    const int sliderValue = ctx.sliderValue;
 
     switch (variationType)
     {
         case 0:
         {
-            auto rangeLow = ctx.tuneLowRange;
-            auto rangeHigh = ctx.tuneHighRange;
+            const auto rangeLow = ctx.tuneLowRange;
+            const auto rangeHigh = ctx.tuneHighRange;
 
-            auto sliderRange = rangeHigh - rangeLow;
-            auto sliderRangeRatio = sliderRange / 128.0;
+            const auto sliderRange = rangeHigh - rangeLow;
+            const auto sliderRangeRatio = sliderRange / 128.0;
             auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
             tuneValue += (120 - rangeHigh) / 2;
             return {variationType, tuneValue};
         }
         case 1:
         {
-            auto rangeLow = ctx.decayLowRange;
-            auto rangeHigh = ctx.decayHighRange;
-            auto sliderRange = rangeHigh - rangeLow;
-            auto sliderRangeRatio = sliderRange / 128.0;
+            const auto rangeLow = ctx.decayLowRange;
+            const auto rangeHigh = ctx.decayHighRange;
+            const auto sliderRange = rangeHigh - rangeLow;
+            const auto sliderRangeRatio = sliderRange / 128.0;
             auto decayValue = (int)(sliderValue * sliderRangeRatio);
             return {variationType, decayValue};
         }
         case 2:
         {
-            auto rangeLow = ctx.attackLowRange;
-            auto rangeHigh = ctx.attackHighRange;
-            auto sliderRange = rangeHigh - rangeLow;
-            auto sliderRangeRatio = sliderRange / 128.0;
+            const auto rangeLow = ctx.attackLowRange;
+            const auto rangeHigh = ctx.attackHighRange;
+            const auto sliderRange = rangeHigh - rangeLow;
+            const auto sliderRangeRatio = sliderRange / 128.0;
             auto attackValue = (int)(sliderValue * sliderRangeRatio);
             return {variationType, attackValue};
         }
         case 3:
         {
-            auto rangeLow = ctx.filterLowRange;
-            auto rangeHigh = ctx.filterHighRange;
-            auto sliderRange = rangeHigh - rangeLow;
-            auto sliderRangeRatio = sliderRange / 128.0;
+            const auto rangeLow = ctx.filterLowRange;
+            const auto rangeHigh = ctx.filterHighRange;
+            const auto sliderRange = rangeHigh - rangeLow;
+            const auto sliderRangeRatio = sliderRange / 128.0;
             auto filterValue = (int)(sliderValue * sliderRangeRatio);
             return {variationType, filterValue};
         }

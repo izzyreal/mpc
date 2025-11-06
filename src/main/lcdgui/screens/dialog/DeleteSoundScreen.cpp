@@ -56,7 +56,7 @@ void DeleteSoundScreen::turnWheel(const int i)
     }
 }
 
-void DeleteSoundScreen::displaySnd()
+void DeleteSoundScreen::displaySnd() const
 {
     if (!sampler->getSound())
     {

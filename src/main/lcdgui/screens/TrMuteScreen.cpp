@@ -12,7 +12,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-TrMuteScreen::TrMuteScreen(mpc::Mpc &mpc, const int layerIndex)
+TrMuteScreen::TrMuteScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "track-mute", layerIndex)
 {
     addReactiveBinding({[&]
@@ -170,14 +170,14 @@ void TrMuteScreen::function(int i)
     }
 }
 
-int TrMuteScreen::bankoffset()
+int TrMuteScreen::bankoffset() const
 {
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
     return bank * 16;
 }
 
-void TrMuteScreen::displayBank()
+void TrMuteScreen::displayBank() const
 {
     const std::vector<std::string> letters{"A", "B", "C", "D"};
     const int bank =
@@ -185,7 +185,7 @@ void TrMuteScreen::displayBank()
     findLabel("bank")->setText(letters[bank]);
 }
 
-void TrMuteScreen::displayTrackNumbers()
+void TrMuteScreen::displayTrackNumbers() const
 {
     const std::vector<std::string> trn{"01-16", "17-32", "33-48", "49-64"};
     const int bank =
@@ -193,7 +193,7 @@ void TrMuteScreen::displayTrackNumbers()
     findLabel("tracknumbers")->setText(trn[bank]);
 }
 
-void TrMuteScreen::displaySq()
+void TrMuteScreen::displaySq() const
 {
     const auto sequenceNumber = StrUtil::padLeft(
         std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
@@ -201,7 +201,7 @@ void TrMuteScreen::displaySq()
     findField("sq")->setText(sequenceNumber + "-" + sequenceName);
 }
 
-void TrMuteScreen::displayTrack(int i)
+void TrMuteScreen::displayTrack(int i) const
 {
     findField(std::to_string(i + 1))
         ->setText(sequencer->getActiveSequence()
@@ -210,7 +210,7 @@ void TrMuteScreen::displayTrack(int i)
                       .substr(0, 8));
 }
 
-void TrMuteScreen::setTrackColor(int i)
+void TrMuteScreen::setTrackColor(int i) const
 {
     if (sequencer->isSoloEnabled())
     {
@@ -226,22 +226,22 @@ void TrMuteScreen::setTrackColor(int i)
     }
 }
 
-void TrMuteScreen::displayNow0()
+void TrMuteScreen::displayNow0() const
 {
     findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
-void TrMuteScreen::displayNow1()
+void TrMuteScreen::displayNow1() const
 {
     findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
-void TrMuteScreen::displayNow2()
+void TrMuteScreen::displayNow2() const
 {
     findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
-void TrMuteScreen::refreshTracks()
+void TrMuteScreen::refreshTracks() const
 {
     for (int i = 0; i < 16; i++)
     {

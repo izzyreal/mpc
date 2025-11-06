@@ -60,9 +60,9 @@ namespace mpc::file::all
         Song(const std::vector<char> &loadBytes);
         Song(mpc::sequencer::Song *mpcSong);
         std::vector<std::pair<uint8_t, uint8_t>> getSteps();
-        bool getIsUsed();
-        int getLoopFirstStepIndex();
-        int getLoopLastStepIndex();
-        bool isLoopEnabled();
+        bool getIsUsed() const;
+        int getLoopFirstStepIndex() const;
+        int getLoopLastStepIndex() const;
+        bool isLoopEnabled() const;
     };
 } // namespace mpc::file::all

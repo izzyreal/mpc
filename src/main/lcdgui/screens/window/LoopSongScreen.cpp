@@ -9,7 +9,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
-LoopSongScreen::LoopSongScreen(mpc::Mpc &mpc, const int layerIndex)
+LoopSongScreen::LoopSongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "loop-song", layerIndex)
 {
 }
@@ -21,7 +21,7 @@ void LoopSongScreen::open()
     displayNumberOfSteps();
 }
 
-void LoopSongScreen::turnWheel(int i)
+void LoopSongScreen::turnWheel(const int i)
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
@@ -58,7 +58,7 @@ void LoopSongScreen::turnWheel(int i)
     }
 }
 
-void LoopSongScreen::displayFirstStep()
+void LoopSongScreen::displayFirstStep() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
@@ -66,7 +66,7 @@ void LoopSongScreen::displayFirstStep()
         ->setTextPadded(std::to_string(song->getFirstStep() + 1));
 }
 
-void LoopSongScreen::displayLastStep()
+void LoopSongScreen::displayLastStep() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
@@ -75,7 +75,7 @@ void LoopSongScreen::displayLastStep()
         ->setTextPadded(std::to_string(song->getLastStep() + 1));
 }
 
-void LoopSongScreen::displayNumberOfSteps()
+void LoopSongScreen::displayNumberOfSteps() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->getActiveSongIndex());

@@ -70,21 +70,20 @@ namespace mpc::file::all
 
     public:
         std::vector<AllSequence *> getAllSequences();
-        Defaults *getDefaults();
-        AllSequencer *getSequencer();
-        Count *getCount();
-        MidiInput *getMidiInput();
-        MidiSyncMisc *getMidiSync();
-        Misc *getMisc();
-        SequenceNames *getSeqNames();
+        Defaults *getDefaults() const;
+        AllSequencer *getSequencer() const;
+        Count *getCount() const;
+        MidiInput *getMidiInput() const;
+        MidiSyncMisc *getMidiSync() const;
+        Misc *getMisc() const;
+        SequenceNames *getSeqNames() const;
         std::vector<Song *> getSongs();
 
     private:
         mpc::Mpc &mpc;
 
-        // Dangerous method, as the caller relies on the argument being a copy
         std::vector<AllSequence *>
-        readSequences(std::vector<char> trimmedSeqsArray);
+        readSequences(const std::vector<char> &trimmedSeqsArray) const;
 
     public:
         std::vector<char> &getBytes();

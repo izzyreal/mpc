@@ -7,8 +7,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-SelectMixerDrumScreen::SelectMixerDrumScreen(mpc::Mpc &mpc,
-                                             const int layerIndex)
+SelectMixerDrumScreen::SelectMixerDrumScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "select-mixer-drum", layerIndex)
 {
 }

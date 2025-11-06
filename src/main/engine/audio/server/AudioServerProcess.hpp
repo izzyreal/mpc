@@ -19,7 +19,7 @@ namespace mpc::engine::audio
         public:
             std::string getName() override;
 
-            AudioServerProcess(std::string name);
+            AudioServerProcess(const std::string &name);
         };
 
     } // namespace server

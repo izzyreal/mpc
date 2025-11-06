@@ -7,7 +7,7 @@
 
 #include "file/ByteUtil.hpp"
 #include <StrUtil.hpp>
-#include <Util.hpp>
+#include "Util.hpp"
 
 using namespace mpc::file::all;
 
@@ -118,22 +118,22 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
 std::vector<char> Tracks::PADDING1 = std::vector<char>{
     (char)232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)232, 3};
 
-int Tracks::getDevice(int i)
+int Tracks::getDevice(int i) const
 {
     return devices[i];
 }
 
-int Tracks::getBus(int i)
+int Tracks::getBus(int i) const
 {
     return busses[i];
 }
 
-int Tracks::getVelo(int i)
+int Tracks::getVelo(int i) const
 {
     return veloRatios[i];
 }
 
-int Tracks::getPgm(int i)
+int Tracks::getPgm(int i) const
 {
     return pgms[i];
 }
@@ -143,7 +143,7 @@ std::string Tracks::getName(int i)
     return names[i];
 }
 
-int Tracks::getStatus(int i)
+int Tracks::getStatus(int i) const
 {
     return status[i];
 }

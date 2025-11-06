@@ -4,12 +4,12 @@
 
 using namespace mpc::file::mid::event::meta;
 
-TrackName::TrackName(int tick, int delta, std::string name)
+TrackName::TrackName(int tick, int delta, const std::string &name)
     : TextualMetaEvent(tick, delta, MetaEvent::TRACK_NAME, name)
 {
 }
 
-void TrackName::setName(std::string name)
+void TrackName::setName(const std::string &name)
 {
     setText(name);
 }

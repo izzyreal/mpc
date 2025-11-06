@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::nvram
 {
@@ -8,13 +8,13 @@ namespace mpc::nvram
 
 namespace mpc::lcdgui::screens
 {
-    class VmpcAutoSaveScreen : public mpc::lcdgui::ScreenComponent
+    class VmpcAutoSaveScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
 
-        VmpcAutoSaveScreen(mpc::Mpc &mpc, int layerIndex);
+        VmpcAutoSaveScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void function(int) override;
@@ -28,16 +28,16 @@ namespace mpc::lcdgui::screens
         int autoSaveOnExit = 1;
         int autoLoadOnStart = 1;
 
-        void displayAutoSaveOnExit();
-        void displayAutoLoadOnStart();
+        void displayAutoSaveOnExit() const;
+        void displayAutoLoadOnStart() const;
 
-        friend class mpc::nvram::NvRam;
+        friend class nvram::NvRam;
 
     public:
         void setAutoSaveOnExit(int i);
         void setAutoLoadOnStart(int i);
 
-        int getAutoSaveOnExit();
-        int getAutoLoadOnStart();
+        int getAutoSaveOnExit() const;
+        int getAutoLoadOnStart() const;
     };
 } // namespace mpc::lcdgui::screens

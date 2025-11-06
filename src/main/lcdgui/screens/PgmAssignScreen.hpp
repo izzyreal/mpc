@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::sampler
 {
@@ -14,7 +14,7 @@ namespace mpc::file::aps
 namespace mpc::lcdgui::screens
 {
 
-    class PgmAssignScreen : public mpc::lcdgui::ScreenComponent
+    class PgmAssignScreen final : public ScreenComponent
     {
 
     public:
@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
         void openWindow() override;
 
-        PgmAssignScreen(mpc::Mpc &mpc, int layerIndex);
+        PgmAssignScreen(Mpc &mpc, int layerIndex);
         void update(Observable *o, Message message) override;
         void open() override;
         void close() override;
@@ -33,20 +33,20 @@ namespace mpc::lcdgui::screens
         const std::vector<std::string> soundGenerationModes{"NORMAL", "SIMULT",
                                                             "VEL SW", "DCY SW"};
         bool padAssign = false;
-        void displayPgm();
-        void displaySoundName();
-        void displayPadAssign();
-        void displayPadNote();
+        void displayPgm() const;
+        void displaySoundName() const;
+        void displayPadAssign() const;
+        void displayPadNote() const;
         void displaySoundGenerationMode();
-        void displayVeloRangeUpper();
-        void displayVeloRangeLower();
-        void displayOptionalNoteB();
-        void displayOptionalNoteA();
-        void displayNote();
-        void displayPad();
+        void displayVeloRangeUpper() const;
+        void displayVeloRangeLower() const;
+        void displayOptionalNoteB() const;
+        void displayOptionalNoteA() const;
+        void displayNote() const;
+        void displayPad() const;
 
     private:
-        friend class mpc::sampler::Pad;
-        friend class mpc::file::aps::ApsGlobalParameters;
+        friend class sampler::Pad;
+        friend class file::aps::ApsGlobalParameters;
     };
 } // namespace mpc::lcdgui::screens

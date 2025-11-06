@@ -7,7 +7,7 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-LogLaw::LogLaw(float min, float max, string units)
+LogLaw::LogLaw(float min, float max, const string &units)
     : AbstractLaw(min, max, units)
 {
     assert(min != 0.f);

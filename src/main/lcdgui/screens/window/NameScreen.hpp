@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 #include <functional>
 
@@ -10,11 +10,11 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens::window
 {
-    class NameScreen : public mpc::lcdgui::ScreenComponent
+    class NameScreen final : public ScreenComponent
     {
 
     public:
-        NameScreen(mpc::Mpc &mpc, int layerIndex);
+        NameScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
@@ -24,7 +24,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int j) override;
         void function(int i) override;
         void pressEnter() override;
-        void numpad() {} // Block ways to leave the screen inadvertently
+        void numpad() const {} // Block ways to leave the screen inadvertently
 
         void typeCharacter(char c);
         void backSpace();
@@ -35,7 +35,7 @@ namespace mpc::lcdgui::screens::window
             const std::string &cancelScreen,
             const std::function<void()> &mainScreenAction = [] {});
 
-        std::string getNameWithoutSpaces();
+        std::string getNameWithoutSpaces() const;
         void setEditing(bool b);
 
         void setNameToEdit(const std::string &newNameToEdit);
@@ -47,8 +47,8 @@ namespace mpc::lcdgui::screens::window
         std::string cancelScreen;
         void drawUnderline();
         void initEditColors();
-        void displayName();
-        std::weak_ptr<mpc::lcdgui::Underline> findUnderline();
+        void displayName() const;
+        std::weak_ptr<Underline> findUnderline();
 
         void setNameLimit(int i);
         void setNameToEdit(const std::string &str, int i);

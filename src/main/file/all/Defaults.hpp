@@ -67,16 +67,16 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
 
     private:
-        void parseNames(std::vector<char> loadBytes);
+        void parseNames(const std::vector<char> &loadBytes);
         mpc::Mpc &mpc;
 
     public:
         std::string getDefaultSeqName();
-        int getTempo();
-        int getTimeSigNum();
-        int getTimeSigDen();
-        int getBarCount();
-        bool isLoopEnabled();
+        int getTempo() const;
+        int getTimeSigNum() const;
+        int getTimeSigDen() const;
+        int getBarCount() const;
+        bool isLoopEnabled() const;
         std::vector<std::string> getDefaultDevNames();
         std::vector<std::string> getDefaultTrackNames();
         std::vector<int> getDevices();

@@ -3,7 +3,7 @@
 
 using namespace mpc::lcdgui::screens;
 
-FormatScreen::FormatScreen(mpc::Mpc &mpc, const int layerIndex)
+FormatScreen::FormatScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "format", layerIndex)
 {
 }

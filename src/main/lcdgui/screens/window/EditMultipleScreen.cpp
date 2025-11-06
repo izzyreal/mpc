@@ -12,7 +12,7 @@
 
 #include "lcdgui/screens/StepEditorScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
@@ -22,7 +22,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 
-EditMultipleScreen::EditMultipleScreen(mpc::Mpc &mpc, const int layerIndex)
+EditMultipleScreen::EditMultipleScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-multiple", layerIndex)
 {
 }
@@ -39,7 +39,7 @@ void EditMultipleScreen::close()
     mpc.clientEventController->deleteObserver(this);
 }
 
-void EditMultipleScreen::function(int i)
+void EditMultipleScreen::function(const int i)
 {
     ScreenComponent::function(i);
     const auto stepEditorScreen =
@@ -149,7 +149,7 @@ void EditMultipleScreen::function(int i)
     }
 }
 
-void EditMultipleScreen::turnWheel(int i)
+void EditMultipleScreen::turnWheel(const int i)
 {
 
     const auto stepEditorScreen =
@@ -211,7 +211,7 @@ void EditMultipleScreen::turnWheel(int i)
     updateEditMultiple();
 }
 
-void EditMultipleScreen::checkThreeParameters()
+void EditMultipleScreen::checkThreeParameters() const
 {
     const auto stepEditorScreen =
         mpc.screens->get<ScreenId::StepEditorScreen>();
@@ -278,7 +278,7 @@ void EditMultipleScreen::checkFiveParameters()
     }
 }
 
-void EditMultipleScreen::checkNotes()
+void EditMultipleScreen::checkNotes() const
 {
     const auto stepEditorScreen =
         mpc.screens->get<ScreenId::StepEditorScreen>();
@@ -293,14 +293,14 @@ void EditMultipleScreen::checkNotes()
     }
 }
 
-void EditMultipleScreen::setEditType(int i)
+void EditMultipleScreen::setEditType(const int i)
 {
     editType = std::clamp(i, 0, 3);
     setEditValue(editValue); // re-clamp
     updateEditMultiple();
 }
 
-void EditMultipleScreen::updateEditMultiple()
+void EditMultipleScreen::updateEditMultiple() const
 {
 
     const auto stepEditorScreen =
@@ -450,7 +450,7 @@ void EditMultipleScreen::updateEditMultiple()
             findField("value0")->setSize(8 * 6 + 1, 9);
             findField("value0")->setText(
                 (StrUtil::padLeft(std::to_string(changeNoteTo), " ", 3) + "(" +
-                 mpc::Util::noteNames()[changeNoteTo]) +
+                 Util::noteNames()[changeNoteTo]) +
                 ")");
             findLabel("value0")->setSize(
                 findLabel("value0")->GetTextEntryLength() * 6 + 1, 9);
@@ -472,7 +472,7 @@ void EditMultipleScreen::updateEditMultiple()
     }
 }
 
-void EditMultipleScreen::updateDouble()
+void EditMultipleScreen::updateDouble() const
 {
     auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
 
@@ -498,7 +498,7 @@ void EditMultipleScreen::updateDouble()
     findField("value1")->setSize(3 * 6 + 1, 9);
 }
 
-void EditMultipleScreen::setChangeNoteTo(int i)
+void EditMultipleScreen::setChangeNoteTo(const int i)
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
     const auto midi = track->getBus() == 0;
@@ -506,28 +506,27 @@ void EditMultipleScreen::setChangeNoteTo(int i)
     updateEditMultiple();
 }
 
-void EditMultipleScreen::setVariationType(NoteOnEvent::VARIATION_TYPE type)
+void EditMultipleScreen::setVariationType(
+    const NoteOnEvent::VARIATION_TYPE type)
 {
     variationType = type;
     updateEditMultiple();
 }
 
-void mpc::lcdgui::screens::window::EditMultipleScreen::incrementVariationType(
-    int i)
+void EditMultipleScreen::incrementVariationType(const int i)
 {
-    variationType =
-        mpc::sequencer::NoteOnEvent::VARIATION_TYPE(std::clamp(i, 0, 3));
+    variationType = NoteOnEvent::VARIATION_TYPE(std::clamp(i, 0, 3));
     updateEditMultiple();
 }
 
-void EditMultipleScreen::setVariationValue(int i)
+void EditMultipleScreen::setVariationValue(const int i)
 {
     variationValue = std::clamp(
         i, 0, variationType == NoteOnEvent::VARIATION_TYPE::TUNE_0 ? 124 : 100);
     updateEditMultiple();
 }
 
-void EditMultipleScreen::setEditValue(int i)
+void EditMultipleScreen::setEditValue(const int i)
 {
     editValue = std::clamp(i, 0, editType == 2 ? 200 : 127);
     updateEditMultiple();

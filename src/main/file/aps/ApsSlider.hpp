@@ -29,16 +29,16 @@ namespace mpc::file::aps
         static std::vector<char> PADDING;
 
     public:
-        int getNote();
-        int getTuneLow();
-        int getTuneHigh();
-        int getDecayLow();
-        int getDecayHigh();
-        int getAttackLow();
-        int getAttackHigh();
-        int getFilterLow();
-        int getFilterHigh();
-        int getProgramChange();
+        int getNote() const;
+        int getTuneLow() const;
+        int getTuneHigh() const;
+        int getDecayLow() const;
+        int getDecayHigh() const;
+        int getAttackLow() const;
+        int getAttackHigh() const;
+        int getFilterLow() const;
+        int getFilterHigh() const;
+        int getProgramChange() const;
         std::vector<char> getBytes();
 
         ApsSlider(const std::vector<char> &loadBytes);

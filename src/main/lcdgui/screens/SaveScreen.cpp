@@ -1,29 +1,27 @@
 #include "SaveScreen.hpp"
 
-#include <cstdint>
-
 #include "Mpc.hpp"
 #include "Logger.hpp"
 #include "StrUtil.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
-#include "sequencer/Track.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "lcdgui/screens/window/SaveAllFileScreen.hpp"
 #include "lcdgui/screens/window/SaveApsFileScreen.hpp"
-#include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/Volume.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
 #include "nvram/VolumesPersistence.hpp"
 
+#include <cstdint>
+
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-SaveScreen::SaveScreen(mpc::Mpc &mpc, const int layerIndex)
+SaveScreen::SaveScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save", layerIndex)
 {
 }
@@ -56,9 +54,8 @@ void SaveScreen::open()
     displayDevice();
     displayDeviceType();
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "device")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "device")
     {
         findChild<FunctionKeys>("function-keys")
             ->setActiveArrangement(
@@ -82,9 +79,8 @@ void SaveScreen::openWindow()
     }
 }
 
-void SaveScreen::function(int i)
+void SaveScreen::function(const int i)
 {
-
     switch (i)
     {
         case 0:
@@ -110,7 +106,7 @@ void SaveScreen::function(int i)
                 const auto &candidateVolume =
                     mpc.getDisks()[device]->getVolume();
 
-                if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
+                if (candidateVolume.mode == disk::MountMode::DISABLED)
                 {
                     ls->showPopupForMs("Device is disabled in DISKS", 1000);
                     return;
@@ -122,8 +118,7 @@ void SaveScreen::function(int i)
                 mpc.getDiskController()->setActiveDiskIndex(device);
                 const auto newDisk = mpc.getDisk();
 
-                if (newDisk->getVolume().type ==
-                    mpc::disk::VolumeType::USB_VOLUME)
+                if (newDisk->getVolume().type == disk::VolumeType::USB_VOLUME)
                 {
 
                     newDisk->initRoot();
@@ -146,7 +141,7 @@ void SaveScreen::function(int i)
                 displayDevice();
                 displayDeviceType();
 
-                mpc::nvram::VolumesPersistence::save(mpc);
+                nvram::VolumesPersistence::save(mpc);
 
                 return;
             }
@@ -182,17 +177,17 @@ void SaveScreen::function(int i)
 
                     openScreenById(ScreenId::SaveASoundScreen);
                     break;
+                default:;
             }
         }
+        default:;
     }
 }
 
-void SaveScreen::turnWheel(int i)
+void SaveScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "type")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "type")
     {
         setType(type + i);
     }
@@ -213,9 +208,8 @@ void SaveScreen::turnWheel(int i)
             }
         }
 
-        const int candidate = position + i;
-
-        if (position != -1 && candidate >= 0 && candidate < parents.size())
+        if (const int candidate = position + i;
+            position != -1 && candidate >= 0 && candidate < parents.size())
         {
             if (disk->moveBack())
             {
@@ -271,6 +265,7 @@ void SaveScreen::turnWheel(int i)
             case 4:
                 sampler->setSoundIndex(sampler->getSoundIndex() + i);
                 break;
+            default:;
         }
         displayFile();
         displaySize();
@@ -291,7 +286,7 @@ void SaveScreen::turnWheel(int i)
     }
 }
 
-void SaveScreen::setType(int i)
+void SaveScreen::setType(const int i)
 {
     type = std::clamp(i, 0, 4);
 
@@ -312,12 +307,12 @@ void SaveScreen::setType(int i)
     displaySize();
 }
 
-void SaveScreen::displayType()
+void SaveScreen::displayType() const
 {
     findField("type")->setText(types[type]);
 }
 
-void SaveScreen::displayFile()
+void SaveScreen::displayFile() const
 {
     std::string fileName;
 
@@ -327,7 +322,7 @@ void SaveScreen::displayFile()
         {
             const auto saveAllFileScreen =
                 mpc.screens->get<ScreenId::SaveAllFileScreen>();
-            fileName = saveAllFileScreen->fileName;
+            fileName = saveAllFileScreen->getFileName();
             break;
         }
         case 1:
@@ -343,7 +338,7 @@ void SaveScreen::displayFile()
         {
             const auto saveApsFileScreen =
                 mpc.screens->get<ScreenId::SaveApsFileScreen>();
-            fileName = saveApsFileScreen->fileName;
+            fileName = saveApsFileScreen->getFileName();
             break;
         }
         case 3:
@@ -357,12 +352,13 @@ void SaveScreen::displayFile()
         case 5:
             fileName = "MPC2KXL         .BIN";
             break;
+        default:;
     }
 
     findField("file")->setText(fileName);
 }
 
-void SaveScreen::displaySize()
+void SaveScreen::displaySize() const
 {
     const auto seq = sequencer->getActiveSequence();
     auto size = 0;
@@ -392,13 +388,14 @@ void SaveScreen::displaySize()
         case 5:
             size = 512;
             break;
+        default:;
     }
 
     findLabel("size")->setText(
         StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
 }
 
-void SaveScreen::displayFree()
+void SaveScreen::displayFree() const
 {
     std::uintmax_t availableSpaceInBytes = 0;
 
@@ -417,7 +414,7 @@ void SaveScreen::displayFree()
     findLabel("free")->setText(text);
 }
 
-void SaveScreen::displayDirectory()
+void SaveScreen::displayDirectory() const
 {
     findField("directory")->setText(mpc.getDisk()->getDirectoryName());
 }
@@ -450,7 +447,7 @@ void SaveScreen::up()
     ScreenComponent::up();
 }
 
-unsigned char SaveScreen::getProgramIndex()
+unsigned char SaveScreen::getProgramIndex() const
 {
     return programIndex;
 }

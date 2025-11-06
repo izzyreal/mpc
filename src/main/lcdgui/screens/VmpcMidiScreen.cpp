@@ -282,7 +282,7 @@ void VmpcMidiScreen::function(int i)
                 const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-settings";
+                screen->setNextScreen("vmpc-settings");
                 openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
@@ -300,7 +300,7 @@ void VmpcMidiScreen::function(int i)
                 const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-keyboard";
+                screen->setNextScreen("vmpc-keyboard");
                 openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
@@ -321,7 +321,7 @@ void VmpcMidiScreen::function(int i)
                 const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
-                screen->nextScreen = "vmpc-auto-save";
+                screen->setNextScreen("vmpc-auto-save");
                 openScreenById(ScreenId::VmpcDiscardMappingChangesScreen);
                 return;
             }
@@ -408,7 +408,7 @@ void VmpcMidiScreen::updateRows()
         const auto typeLabel = findChild<Label>("type" + std::to_string(i));
         const auto typeField = findChild<Field>("type" + std::to_string(i));
 
-        const int length = 15;
+        constexpr int length = 15;
 
         const auto labelText =
             StrUtil::padRight(

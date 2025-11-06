@@ -32,7 +32,7 @@ namespace mpc::engine::audio::server
     public:
         const std::vector<mpc::engine::audio::core::AudioBuffer *> &
         getBuffers();
-        const unsigned int getBufferSize();
+        const unsigned int getBufferSize() const;
 
     public:
         virtual void start() = 0;

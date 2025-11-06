@@ -60,7 +60,7 @@ float EnvelopeGenerator::getEnvelope(bool decay)
     return envelope;
 }
 
-bool EnvelopeGenerator::isComplete()
+bool EnvelopeGenerator::isComplete() const
 {
     return state == COMPLETE;
 }

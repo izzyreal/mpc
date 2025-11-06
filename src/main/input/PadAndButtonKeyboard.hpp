@@ -40,7 +40,7 @@ namespace mpc::input
         void resetPressedZeroTimes();
         void resetUpperCase();
 
-        const bool isUpperCase()
+        const bool isUpperCase() const
         {
             return upperCase;
         }

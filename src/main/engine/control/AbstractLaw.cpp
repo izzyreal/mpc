@@ -3,7 +3,7 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-AbstractLaw::AbstractLaw(float min, float max, string units)
+AbstractLaw::AbstractLaw(float min, float max, const string &units)
 {
     this->min = min;
     this->max = max;

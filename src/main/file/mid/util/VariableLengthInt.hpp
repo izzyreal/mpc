@@ -17,10 +17,10 @@ namespace mpc::file::mid::util
 
     public:
         void setValue(int value);
-        int getValue();
-        int getByteCount();
+        int getValue() const;
+        int getByteCount() const;
         std::vector<char> getBytes();
-        std::string toString();
+        std::string toString() const;
 
     private:
         void parseBytes(std::stringstream &in);

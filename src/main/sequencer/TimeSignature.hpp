@@ -22,10 +22,10 @@ namespace mpc::sequencer
                    denominator == other.denominator;
         }
         void setNumerator(int i);
-        int getNumerator();
+        int getNumerator() const;
 
         void setDenominator(int i);
-        int getDenominator();
+        int getDenominator() const;
 
         void increase();
         void decrease();

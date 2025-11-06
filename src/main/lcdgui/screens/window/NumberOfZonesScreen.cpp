@@ -8,7 +8,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
-NumberOfZonesScreen::NumberOfZonesScreen(mpc::Mpc &mpc, const int layerIndex)
+NumberOfZonesScreen::NumberOfZonesScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "number-of-zones", layerIndex)
 {
 }
@@ -25,7 +25,7 @@ void NumberOfZonesScreen::displayNumberOfZones()
     findField("number-of-zones")->setTextPadded(numberOfZones);
 }
 
-void NumberOfZonesScreen::function(int i)
+void NumberOfZonesScreen::function(const int i)
 {
     switch (i)
     {
@@ -42,7 +42,7 @@ void NumberOfZonesScreen::function(int i)
     }
 }
 
-void NumberOfZonesScreen::turnWheel(int i)
+void NumberOfZonesScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -53,7 +53,7 @@ void NumberOfZonesScreen::turnWheel(int i)
     }
 }
 
-void NumberOfZonesScreen::setNumberOfZones(int i)
+void NumberOfZonesScreen::setNumberOfZones(const int i)
 {
     numberOfZones = std::clamp(i, 1, 16);
     displayNumberOfZones();

@@ -8,7 +8,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-ProgramScreen::ProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+ProgramScreen::ProgramScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "program", layerIndex)
 {
 }
@@ -27,7 +27,8 @@ void ProgramScreen::openNameScreen()
     {
         auto program = getProgramOrThrow();
 
-        const auto enterAction = [this, program](std::string &nameScreenName)
+        const auto enterAction =
+            [this, program](const std::string &nameScreenName)
         {
             program->setName(nameScreenName);
             openScreenById(ScreenId::ProgramScreen);
@@ -39,7 +40,7 @@ void ProgramScreen::openNameScreen()
     }
 }
 
-void ProgramScreen::turnWheel(int i)
+void ProgramScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -52,7 +53,7 @@ void ProgramScreen::turnWheel(int i)
     }
 }
 
-void ProgramScreen::function(int i)
+void ProgramScreen::function(const int i)
 {
     ScreenComponent::function(i);
 
@@ -79,13 +80,13 @@ void ProgramScreen::function(int i)
     }
 }
 
-void ProgramScreen::displayProgramName()
+void ProgramScreen::displayProgramName() const
 {
     const auto program = getProgramOrThrow();
     findField("programname")->setText(program->getName());
 }
 
-void ProgramScreen::displayMidiProgramChange()
+void ProgramScreen::displayMidiProgramChange() const
 {
     const auto program = getProgramOrThrow();
     findField("midiprogramchange")

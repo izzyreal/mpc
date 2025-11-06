@@ -1,5 +1,5 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::engine
 {
@@ -9,11 +9,11 @@ namespace mpc::engine
 
 namespace mpc::lcdgui::screens::window
 {
-    class ChannelSettingsScreen : public mpc::lcdgui::ScreenComponent
+    class ChannelSettingsScreen final : public ScreenComponent
     {
 
     public:
-        ChannelSettingsScreen(mpc::Mpc &mpc, int layerIndex);
+        ChannelSettingsScreen(Mpc &mpc, int layerIndex);
 
         void setNote(int newNote);
 
@@ -40,7 +40,7 @@ namespace mpc::lcdgui::screens::window
         void displayFollowStereo();
         void displayChannel();
 
-        std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
-        std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
+        std::shared_ptr<engine::IndivFxMixer> getIndivFxMixerChannel() const;
+        std::shared_ptr<engine::StereoMixer> getStereoMixerChannel() const;
     };
 } // namespace mpc::lcdgui::screens::window

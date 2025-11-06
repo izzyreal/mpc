@@ -21,7 +21,7 @@ namespace mpc
                 ProgramFileReader *programFile{};
 
             public:
-                int getSampleNamesSize();
+                int getSampleNamesSize() const;
                 int getMixerStart();
                 int getMixerEnd();
                 std::vector<char> getMixerArray();

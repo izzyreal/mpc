@@ -10,8 +10,8 @@ namespace mpc::file::mid::event
         typedef ChannelEvent super;
 
     public:
-        int getNoteValue();
-        int getVelocity();
+        int getNoteValue() const;
+        int getVelocity() const;
         void setNoteValue(int p);
         void setVelocity(int v);
 

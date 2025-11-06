@@ -59,8 +59,8 @@ namespace mpc::disk
 
         sound_or_error
         onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &,
-                         std::string filenameWithoutExtension,
+                         const std::string &filenameWithoutExtension,
                          std::shared_ptr<mpc::sampler::Sound> sound,
-                         const bool shouldBeConverted);
+                         const bool shouldBeConverted) const;
     };
 } // namespace mpc::disk

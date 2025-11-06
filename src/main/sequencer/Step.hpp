@@ -11,8 +11,8 @@ namespace mpc::sequencer
 
     public:
         void setSequence(int i);
-        int getSequence();
+        int getSequence() const;
         void setRepeats(int i);
-        int getRepeats();
+        int getRepeats() const;
     };
 } // namespace mpc::sequencer

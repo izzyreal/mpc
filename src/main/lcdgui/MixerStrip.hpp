@@ -48,8 +48,8 @@ namespace mpc::lcdgui
     private:
         std::shared_ptr<MixerFader> findMixerFader();
         std::shared_ptr<Knob> findKnob();
-        std::shared_ptr<MixerTopBackground> findMixerTopBackground();
-        std::shared_ptr<MixerFaderBackground> findMixerFaderBackground();
+        std::shared_ptr<MixerTopBackground> findMixerTopBackground() const;
+        std::shared_ptr<MixerFaderBackground> findMixerFaderBackground() const;
 
     public:
         void setValueA(int i);

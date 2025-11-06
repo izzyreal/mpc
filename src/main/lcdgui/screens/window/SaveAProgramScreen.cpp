@@ -7,7 +7,7 @@
 #include "disk/MpcFile.hpp"
 #include "lcdgui/screens/SaveScreen.hpp"
 
-#include <Util.hpp>
+#include "Util.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "lcdgui/Label.hpp"
 #include "sampler/Sampler.hpp"
@@ -15,7 +15,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 
-SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+SaveAProgramScreen::SaveAProgramScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "save-a-program", layerIndex)
 {
 }
@@ -36,7 +36,7 @@ void SaveAProgramScreen::open()
     displayReplaceSameSounds();
 }
 
-void SaveAProgramScreen::turnWheel(int i)
+void SaveAProgramScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -52,7 +52,7 @@ void SaveAProgramScreen::turnWheel(int i)
     }
 }
 
-void SaveAProgramScreen::function(int i)
+void SaveAProgramScreen::function(const int i)
 {
 
     switch (i)
@@ -64,8 +64,7 @@ void SaveAProgramScreen::function(int i)
         {
             const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
-                mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
-                ".PGM";
+                Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
             auto disk = mpc.getDisk();
 
             auto program = getProgramOrThrow();
@@ -114,24 +113,24 @@ void SaveAProgramScreen::function(int i)
     }
 }
 
-void SaveAProgramScreen::setSave(int i)
+void SaveAProgramScreen::setSave(const int i)
 {
     save = std::clamp(i, 0, 2);
     displaySave();
 }
 
-void SaveAProgramScreen::displaySave()
+void SaveAProgramScreen::displaySave() const
 {
     findField("save")->setText(pgmSaveNames[save]);
 }
 
-void SaveAProgramScreen::displayReplaceSameSounds()
+void SaveAProgramScreen::displayReplaceSameSounds() const
 {
     findField("replace-same-sounds")
         ->setText(std::string(replaceSameSounds ? "YES" : "NO"));
 }
 
-void SaveAProgramScreen::displayFile()
+void SaveAProgramScreen::displayFile() const
 {
     const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     findLabel("file")->setText(nameScreen->getNameWithoutSpaces() + ".PGM");

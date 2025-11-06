@@ -12,7 +12,7 @@
 using namespace mpc::file::pgmreader;
 
 ProgramFileReader::ProgramFileReader(
-    std::weak_ptr<mpc::disk::MpcFile> _programFile)
+    const std::weak_ptr<mpc::disk::MpcFile> &_programFile)
     : programFile(_programFile)
 {
     pgmHeader = new PgmHeader(this);
@@ -35,42 +35,42 @@ ProgramFileReader::~ProgramFileReader()
     delete pads;
 }
 
-std::vector<char> ProgramFileReader::readProgramFileArray()
+std::vector<char> ProgramFileReader::readProgramFileArray() const
 {
     return programFile.lock()->getBytes();
 }
 
-PgmHeader *ProgramFileReader::getHeader()
+PgmHeader *ProgramFileReader::getHeader() const
 {
     return pgmHeader;
 }
 
-SoundNames *ProgramFileReader::getSampleNames()
+SoundNames *ProgramFileReader::getSampleNames() const
 {
     return sampleNames;
 }
 
-PgmAllNoteParameters *ProgramFileReader::getAllNoteParameters()
+PgmAllNoteParameters *ProgramFileReader::getAllNoteParameters() const
 {
     return midiNotes;
 }
 
-Mixer *ProgramFileReader::getMixer()
+Mixer *ProgramFileReader::getMixer() const
 {
     return mixer;
 }
 
-Pads *ProgramFileReader::getPads()
+Pads *ProgramFileReader::getPads() const
 {
     return pads;
 }
 
-ProgramName *ProgramFileReader::getProgramName()
+ProgramName *ProgramFileReader::getProgramName() const
 {
     return programName;
 }
 
-Slider *ProgramFileReader::getSlider()
+Slider *ProgramFileReader::getSlider() const
 {
     return slider;
 }
