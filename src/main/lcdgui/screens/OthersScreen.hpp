@@ -1,7 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <Observer.hpp>
+#include "Observer.hpp"
 
 namespace mpc::lcdgui::screens
 {
