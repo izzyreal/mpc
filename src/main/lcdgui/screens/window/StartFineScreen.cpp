@@ -104,7 +104,7 @@ void StartFineScreen::turnWheel(int i)
 {
     const auto sound = sampler->getSound();
     const auto startEndLength =
-        static_cast<int>(sound->getEnd() - sound->getStart());
+        sound->getEnd() - sound->getStart();
     const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     const auto sampleLength = sound->getFrameCount();

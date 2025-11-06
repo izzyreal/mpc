@@ -52,8 +52,7 @@ std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
     }
     else
     {
-        const auto noteParameters = dynamic_cast<NoteParameters *>(
-            getProgramOrThrow()->getNoteParameters(note));
+        const auto noteParameters = getProgramOrThrow()->getNoteParameters(note);
         return noteParameters->getIndivFxMixerChannel();
     }
 }
@@ -69,8 +68,7 @@ std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
     }
     else
     {
-        const auto noteParameters = dynamic_cast<NoteParameters *>(
-            getProgramOrThrow()->getNoteParameters(note));
+        const auto noteParameters = getProgramOrThrow()->getNoteParameters(note);
         return noteParameters->getStereoMixerChannel();
     }
 }
@@ -177,7 +175,7 @@ void ChannelSettingsScreen::displayStereoVolume()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto mixerChannel = noteParameters->getStereoMixerChannel();
     findField("stereovolume")->setTextPadded(mixerChannel->getLevel(), " ");
 }
@@ -186,7 +184,7 @@ void ChannelSettingsScreen::displayIndividualVolume()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("individualvolume")
         ->setTextPadded(mixerChannel->getVolumeIndividualOut(), " ");
@@ -196,7 +194,7 @@ void ChannelSettingsScreen::displayFxSendLevel()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("fxsendlevel")
         ->setTextPadded(mixerChannel->getFxSendLevel(), " ");
@@ -206,7 +204,7 @@ void ChannelSettingsScreen::displayPanning()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto mixerChannel = noteParameters->getStereoMixerChannel();
 
     const int8_t normalizedPan = mixerChannel->getPanning() - 50;
@@ -234,7 +232,7 @@ void ChannelSettingsScreen::displayOutput()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto indivFxMixerChannel = noteParameters->getIndivFxMixerChannel();
     auto stereoMixerChannel = noteParameters->getStereoMixerChannel();
     const auto soundIndex = noteParameters->getSoundIndex();
@@ -257,7 +255,7 @@ void ChannelSettingsScreen::displayFxPath()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("fxpath")->setText(fxPathNames[mixerChannel->getFxPath()]);
 }
@@ -266,7 +264,7 @@ void ChannelSettingsScreen::displayFollowStereo()
 {
     const auto program = getProgramOrThrow();
     const auto noteParameters =
-        dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
+        program->getNoteParameters(note);
     const auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("followstereo")
         ->setText(mixerChannel->isFollowingStereo() ? "YES" : "NO");

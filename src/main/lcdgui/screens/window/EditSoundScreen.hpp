@@ -5,12 +5,12 @@
 namespace mpc::lcdgui::screens::window
 {
 
-    class EditSoundScreen : public mpc::lcdgui::ScreenComponent,
-                            public mpc::lcdgui::screens::OpensNameScreen
+    class EditSoundScreen : public ScreenComponent,
+                            public OpensNameScreen
     {
 
     public:
-        EditSoundScreen(mpc::Mpc &mpc, int layerIndex);
+        EditSoundScreen(Mpc &mpc, int layerIndex);
         void turnWheel(int j) override;
         void function(int j) override;
         void open() override;
@@ -63,5 +63,21 @@ namespace mpc::lcdgui::screens::window
         void setTimeStretchAdjust(int i);
         void setCreateNewProgram(bool b);
         void setEndMargin(int i);
+
+        void handleDiscardEdit() const;
+        void
+        handleLoopFromStartToEnd() const;
+        void
+        handleSectionToNewSound() const;
+        void handleInsertSoundSectionStart() const;
+        void handleDeleteSection() const;
+        void handleSilenceSection() const;
+        void handleReverseSection() const;
+        void handleTimeStretch() const;
+        void handleNormalizeSection() const;
+        void handleSliceSound() const;
+        std::pair<int, int> getStartEndFromContext() const;
+        std::pair<std::vector<float>, std::vector<float>>
+        splitStereo(const std::vector<float> &data) const;
     };
 } // namespace mpc::lcdgui::screens::window

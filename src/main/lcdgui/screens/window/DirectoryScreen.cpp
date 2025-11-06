@@ -899,7 +899,7 @@ void DirectoryScreen::drawGraphicsLeft()
 
         if (lastVisibleFile->getName() == dirName)
         {
-            if (lastVisibleFile->getName() == fc[(int)(size)-1])
+            if (lastVisibleFile->getName() == fc[size -1])
             {
                 a4->setText(currentDirIcons[2]);
             }
@@ -910,7 +910,7 @@ void DirectoryScreen::drawGraphicsLeft()
         }
         else
         {
-            if (lastVisibleFile->getName() == fc[(int)(size)-1])
+            if (lastVisibleFile->getName() == fc[size -1])
             {
                 a4->setText(dirIcons[2]);
             }

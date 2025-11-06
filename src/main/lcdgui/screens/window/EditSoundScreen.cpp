@@ -20,7 +20,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace mpc::sequencer;
 
-EditSoundScreen::EditSoundScreen(mpc::Mpc &mpc, const int layerIndex)
+EditSoundScreen::EditSoundScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)
 {
     std::vector<std::string> newTimeStretchPresetNames;
@@ -243,64 +243,33 @@ void EditSoundScreen::setNewName(const std::string &s)
     newName = s;
 }
 
-void EditSoundScreen::setEdit(int i)
+void EditSoundScreen::setEdit(const int i)
 {
-    if (i < 0 || i > 9)
-    {
-        return;
-    }
-
-    if (returnToScreenName != "zone" && i > 8)
-    {
-        return;
-    }
-
-    edit = i;
+    edit = std::clamp(i, 0, returnToScreenName == "zone" ? 9 : 8);
     displayEdit();
 }
 
-void EditSoundScreen::setInsertSndNr(int i, int soundCount)
+void EditSoundScreen::setInsertSndNr(const int i, const int soundCount)
 {
-    if (i < 0 || i > soundCount - 1)
-    {
-        return;
-    }
-
-    insertSoundIndex = i;
+    insertSoundIndex = std::clamp(i, 0, soundCount - 1);
     displayVariable();
 }
 
-void EditSoundScreen::setTimeStretchRatio(int i)
+void EditSoundScreen::setTimeStretchRatio(const int i)
 {
-    if (i < 5000 || i > 20000)
-    {
-        return;
-    }
-
-    timeStretchRatio = i;
-
+    timeStretchRatio = std::clamp(i, 5000, 20000);
     displayVariable();
 }
 
-void EditSoundScreen::setTimeStretchPresetNumber(int i)
+void EditSoundScreen::setTimeStretchPresetNumber(const int i)
 {
-    if (i < 0 || i > 53)
-    {
-        return;
-    }
-
-    timeStretchPresetIndex = i;
+    timeStretchPresetIndex = std::clamp(i, 0, 53);
     displayVariable();
 }
 
-void EditSoundScreen::setTimeStretchAdjust(int i)
+void EditSoundScreen::setTimeStretchAdjust(const int i)
 {
-    if (i < -100 || i > 100)
-    {
-        return;
-    }
-
-    timeStretchAdjust = i;
+    timeStretchAdjust = std::clamp(i, -100, 100);
     displayVariable();
 }
 
@@ -314,28 +283,22 @@ std::string EditSoundScreen::getReturnToScreenName()
     return returnToScreenName;
 }
 
-void EditSoundScreen::setCreateNewProgram(bool b)
+void EditSoundScreen::setCreateNewProgram(const bool b)
 {
     createNewProgram = b;
     displayCreateNewProgram();
 }
 
-void EditSoundScreen::setEndMargin(int i)
+void EditSoundScreen::setEndMargin(const int i)
 {
-    if (i < 0 || i > 99)
-    {
-        return;
-    }
-    endMargin = i;
+    endMargin = std::clamp(i, 0, 99);
     displayEndMargin();
 }
 
 void EditSoundScreen::right()
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "new-name" && (edit == 2 || edit == 7))
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "new-name" && (edit == 2 || edit == 7))
     {
         openNameScreen();
     }
@@ -351,7 +314,7 @@ void EditSoundScreen::openNameScreen()
 
     if (focusedFieldName == "new-name" && (edit == 2 || edit == 7))
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {
@@ -368,12 +331,10 @@ void EditSoundScreen::openNameScreen()
     }
 }
 
-void EditSoundScreen::turnWheel(int i)
+void EditSoundScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "edit")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "edit")
     {
         setEdit(edit + i);
     }
@@ -409,7 +370,7 @@ createZone(const std::shared_ptr<Sampler> &sampler,
            const int endMargin)
 {
     const auto overlapInFrames =
-        (int)(endMargin * source->getSampleRate() * 0.001);
+        static_cast<int>(endMargin * source->getSampleRate() * 0.001);
 
     auto zone = sampler->addSound(source->getSampleRate());
 
@@ -434,8 +395,8 @@ createZone(const std::shared_ptr<Sampler> &sampler,
 
         const auto frameData =
             source->isMono()
-                ? std::vector<float>{(*sourceSampleData)[frameIndex]}
-                : std::vector<float>{
+                ? std::vector{(*sourceSampleData)[frameIndex]}
+                : std::vector{
                       (*sourceSampleData)[frameIndex],
                       (*sourceSampleData)[frameIndex +
                                           source->getLastFrameIndex()]};
@@ -448,471 +409,310 @@ createZone(const std::shared_ptr<Sampler> &sampler,
     return zone;
 }
 
-void EditSoundScreen::function(int j)
+void EditSoundScreen::function(const int j)
 {
     ScreenComponent::function(j);
+    if (j != 4) return;
 
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-
-    switch (j)
+    if (const auto sound = sampler->getSound(); !sound)
     {
-        case 4:
-            auto sound = sampler->getSound();
-
-            if (edit == 0)
-            {
-                auto end = sound->getEnd();
-                auto start = sound->getStart();
-
-                if (returnToScreenName == "loop")
-                {
-                    start = sound->getLoopTo();
-                }
-                else if (returnToScreenName == "zone")
-                {
-                    const auto zone = zoneScreen->zone;
-                    start = zoneScreen->getZoneStart(zone);
-                    end = zoneScreen->getZoneEnd(zone);
-                }
-
-                auto newLoopTo = sound->getLoopTo() - start;
-
-                sampler->trimSample(sampler->getSoundIndex(), start, end);
-
-                sound->setStart(0);
-
-                auto newLength = sound->getEnd() - sound->getStart();
-                sound->setEnd(newLength);
-                sound->setMono(sound->isMono());
-                sound->setLoopTo(newLoopTo);
-                zoneScreen->initZones();
-            }
-            else if (edit == 1)
-            {
-                sound->setLoopTo(sound->getStart());
-            }
-            else if (edit == 2)
-            {
-                auto newSample = sampler->addSound();
-
-                if (!newSample)
-                {
-                    return;
-                }
-
-                newSample->setSampleRate(sound->getSampleRate());
-                newSample->setName(newName);
-                auto newSampleData = newSample->getMutableSampleData();
-                newSampleData->resize(sound->getSampleData()->size());
-
-                for (int i = 0; i < newSampleData->size(); i++)
-                {
-                    (*newSampleData)[i] = (*sound->getSampleData())[i];
-                }
-
-                newSample->setMono(sound->isMono());
-                sampler->trimSample(sampler->getSoundCount() - 1,
-                                    sound->getStart(), sound->getEnd());
-                sampler->setSoundIndex(sampler->getSoundCount() - 1);
-            }
-            else if (edit == 3)
-            {
-                // Insert sound into section start
-                auto source =
-                    sampler->getSortedSounds()[insertSoundIndex].first;
-                auto destination = sampler->getSound();
-
-                auto destinationStartFrame = sound->getStart();
-
-                if (returnToScreenName == "loop")
-                {
-                    destinationStartFrame = sound->getLoopTo();
-                }
-                else if (returnToScreenName == "zone")
-                {
-                    const auto zone = zoneScreen->zone;
-                    destinationStartFrame = zoneScreen->getZoneStart(zone);
-                }
-
-                auto sourceFrameCount = source->getFrameCount();
-                auto destinationFrameCount = destination->getFrameCount();
-
-                auto newSoundFrameCount =
-                    sourceFrameCount + destinationFrameCount;
-                auto newSoundSampleCount = newSoundFrameCount;
-
-                auto sourceData = source->getSampleData();
-                auto destinationData = destination->getSampleData();
-
-                if (!destination->isMono())
-                {
-                    newSoundSampleCount *= 2;
-                }
-
-                auto newData =
-                    std::make_shared<std::vector<float>>(newSoundSampleCount);
-                int sourceFrameCounter = 0;
-                int destinationFrameCounter = 0;
-
-                for (int i = 0; i < newSoundFrameCount; i++)
-                {
-                    if (i < destinationStartFrame)
-                    {
-                        (*newData)[i] =
-                            (*destinationData)[destinationFrameCounter];
-
-                        if (!destination->isMono())
-                        {
-                            (*newData)[i + newSoundFrameCount] =
-                                (*destinationData)[destinationFrameCounter +
-                                                   destinationFrameCount];
-                        }
-
-                        destinationFrameCounter++;
-                    }
-                    else if (i < destinationStartFrame + sourceFrameCount)
-                    {
-                        (*newData)[i] = (*sourceData)[sourceFrameCounter];
-
-                        if (!destination->isMono())
-                        {
-                            if (source->isMono())
-                            {
-                                (*newData)[i + newSoundFrameCount] =
-                                    (*newData)[i];
-                            }
-                            else
-                            {
-                                (*newData)[i + newSoundFrameCount] =
-                                    (*sourceData)[sourceFrameCounter +
-                                                  sourceFrameCount];
-                            }
-                        }
-                        sourceFrameCounter++;
-                    }
-                    else
-                    {
-                        (*newData)[i] =
-                            (*destinationData)[destinationFrameCounter];
-
-                        if (!destination->isMono())
-                        {
-                            (*newData)[i + newSoundFrameCount] =
-                                (*destinationData)[destinationFrameCounter +
-                                                   destinationFrameCount];
-                        }
-
-                        destinationFrameCounter++;
-                    }
-                }
-
-                destination->setSampleData(newData);
-                destination->setEnd(newSoundFrameCount);
-                destination->setStart(0);
-                destination->setMono(destination->isMono());
-                destination->setLoopTo(destination->getEnd());
-                zoneScreen->initZones();
-            }
-            else if (edit == 4)
-            {
-                auto end = sound->getEnd();
-                auto start = sound->getStart();
-
-                if (returnToScreenName == "loop")
-                {
-                    start = sound->getLoopTo();
-                }
-                else if (returnToScreenName == "zone")
-                {
-                    const auto zone = zoneScreen->zone;
-                    start = zoneScreen->getZoneStart(zone);
-                    end = zoneScreen->getZoneEnd(zone);
-                }
-
-                sampler->deleteSection(sampler->getSoundIndex(), start, end);
-                sound->setStart(0);
-                sound->setEnd(sound->getFrameCount());
-                sound->setLoopTo(sound->getFrameCount());
-                zoneScreen->initZones();
-            }
-            else if (edit == 5)
-            {
-                auto start = sound->getStart();
-                auto end = sound->getEnd();
-
-                if (returnToScreenName == "loop")
-                {
-                    start = sound->getLoopTo();
-                }
-                else if (returnToScreenName == "zone")
-                {
-                    const auto zone = zoneScreen->zone;
-                    start = zoneScreen->getZoneStart(zone);
-                    end = zoneScreen->getZoneEnd(zone);
-                }
-
-                auto newSampleData = *sound->getSampleData();
-
-                for (int i = start; i < end; i++)
-                {
-                    newSampleData[i] = 0.0f;
-
-                    if (!sound->isMono())
-                    {
-                        newSampleData[(i + sound->getFrameCount())] = 0.0f;
-                    }
-                }
-
-                sound->setSampleData(
-                    std::make_shared<std::vector<float>>(newSampleData));
-
-                ls->openScreen(returnToScreenName);
-                break;
-            }
-            else if (edit == 6)
-            {
-                auto start = sound->getStart();
-                auto end = sound->getEnd();
-
-                if (returnToScreenName == "loop")
-                {
-                    start = sound->getLoopTo();
-                }
-                else if (returnToScreenName == "zone")
-                {
-                    const auto zone = zoneScreen->zone;
-                    start = zoneScreen->getZoneStart(zone);
-                    end = zoneScreen->getZoneEnd(zone);
-                }
-
-                auto reverseCounter = end - 1;
-                auto newSampleData =
-                    std::vector<float>(sound->getSampleData()->size());
-
-                if (sound->isMono())
-                {
-                    auto sampleData = sound->getSampleData();
-
-                    for (int i = start; i < end; i++)
-                    {
-                        newSampleData[i] = (*sampleData)[reverseCounter];
-                        reverseCounter--;
-                    }
-                }
-                else
-                {
-                    std::vector<float> newSampleDataLeft(
-                        sound->getSampleData()->size() * 0.5);
-                    std::vector<float> newSampleDataRight(
-                        sound->getSampleData()->size() * 0.5);
-                    auto sampleData = sound->getSampleData();
-
-                    for (int i = 0; i < start; i++)
-                    {
-                        newSampleDataLeft[i] = (*sampleData)[i];
-                        newSampleDataRight[i] =
-                            (*sampleData)[i + sound->getFrameCount()];
-                    }
-
-                    for (int i = start; i < end; i++)
-                    {
-                        newSampleDataLeft[i] = (*sampleData)[reverseCounter];
-                        newSampleDataRight[i] =
-                            (*sampleData)[reverseCounter +
-                                          sound->getFrameCount()];
-                        reverseCounter--;
-                    }
-
-                    for (int i = end; i < sound->getFrameCount(); i++)
-                    {
-                        newSampleDataLeft[i] = (*sampleData)[i];
-                        newSampleDataRight[i] =
-                            (*sampleData)[i + sound->getFrameCount()];
-                    }
-
-                    newSampleData = mpc::sampler::Sampler::mergeToStereo(
-                        newSampleDataLeft, newSampleDataRight);
-                }
-
-                sound->setSampleData(
-                    std::make_shared<std::vector<float>>(newSampleData));
-                ls->openScreen(returnToScreenName);
-                break;
-            }
-            else if (edit == 7)
-            {
-                if (timeStretchRatio == 10000)
-                {
-                    return;
-                }
-
-                if (sound->isMono())
-                {
-                    auto newSample = sampler->addSound(sound->getSampleRate());
-
-                    if (!newSample)
-                    {
-                        return;
-                    }
-
-                    auto ts = mpc::sampler::TimeStretch(
-                        *sound->getSampleData(),
-                        (float)(timeStretchRatio * 0.0001),
-                        sound->getSampleRate(), timeStretchAdjust);
-                    auto &procData = ts.getProcessedData();
-                    newSample->setSampleData(
-                        std::make_shared<std::vector<float>>(procData));
-                    newSample->setMono(true);
-                    newSample->setName(newName);
-                }
-                else
-                {
-                    auto newSound = sampler->addSound(sound->getSampleRate());
-
-                    if (!newSound)
-                    {
-                        return;
-                    }
-
-                    std::vector<float> sampleDataLeft = *sound->getSampleData();
-                    sampleDataLeft.erase(sampleDataLeft.begin() +
-                                             (sampleDataLeft.size() * 0.5),
-                                         sampleDataLeft.end());
-                    std::vector<float> sampleDataRight =
-                        *sound->getSampleData();
-                    sampleDataRight.erase(sampleDataRight.begin(),
-                                          sampleDataRight.begin() +
-                                              (sampleDataRight.size() * 0.5));
-
-                    auto ts0 = mpc::sampler::TimeStretch(
-                        sampleDataLeft, (float)(timeStretchRatio / 10000.0),
-                        sound->getSampleRate(), timeStretchAdjust);
-                    auto &newSampleDataLeft = ts0.getProcessedData();
-                    auto ts1 = mpc::sampler::TimeStretch(
-                        sampleDataRight, (float)(timeStretchRatio / 10000.0),
-                        sound->getSampleRate(), timeStretchAdjust);
-                    auto &newSampleDataRight = ts1.getProcessedData();
-                    auto newSampleData = mpc::sampler::Sampler::mergeToStereo(
-                        newSampleDataLeft, newSampleDataRight);
-                    newSound->setSampleData(
-                        std::make_shared<std::vector<float>>(newSampleData));
-                    newSound->setMono(false);
-                    newSound->setName(newName);
-                }
-            }
-            else if (edit == 8)
-            {
-                auto start = sound->getStart();
-                auto end = sound->getEnd();
-
-                if (returnToScreenName == "loop")
-                {
-                    start = sound->getLoopTo();
-                }
-                else if (returnToScreenName == "zone")
-                {
-                    const auto zone = zoneScreen->zone;
-                    start = zoneScreen->getZoneStart(zone);
-                    end = zoneScreen->getZoneEnd(zone);
-                }
-
-                float peak = 0.0f;
-                auto sampleData = sound->getSampleData();
-
-                for (int i = start; i < end; i++)
-                {
-                    float v = std::fabs((*sampleData)[i]);
-                    peak = std::fmax(peak, v);
-
-                    if (!sound->isMono())
-                    {
-                        v = std::fabs(
-                            (*sampleData)[(i + sound->getFrameCount())]);
-                        peak = std::fmax(peak, v);
-                    }
-                }
-
-                peak = std::min(1.0f, peak);
-
-                const float factor = 1.0f / peak;
-
-                auto newSampleData = *sampleData;
-
-                for (int i = start; i < end; i++)
-                {
-                    newSampleData[i] = newSampleData[i] * factor;
-
-                    if (!sound->isMono())
-                    {
-                        newSampleData[(i + sound->getFrameCount())] =
-                            newSampleData[i] * factor;
-                    }
-                }
-
-                sound->setSampleData(
-                    std::make_shared<std::vector<float>>(newSampleData));
-
-                ls->openScreen(returnToScreenName);
-                break;
-            }
-            else if (edit == 9)
-            {
-                auto source = sampler->getSound();
-                auto zoneCount = zoneScreen->numberOfZones;
-
-                for (int i = 0; i < zoneScreen->numberOfZones; i++)
-                {
-                    auto start = zoneScreen->getZoneStart(i);
-                    auto end = zoneScreen->getZoneEnd(i);
-
-                    auto zone =
-                        createZone(sampler, source, start, end, endMargin);
-
-                    if (zone == nullptr)
-                    {
-                        return;
-                    }
-
-                    if (i == 0)
-                    {
-                        zone->setName(newName);
-                    }
-                    else
-                    {
-                        zone->setName(sampler->addOrIncreaseNumber(newName));
-                    }
-                }
-
-                if (createNewProgram)
-                {
-                    auto p =
-                        sampler->createNewProgramAddFirstAvailableSlot().lock();
-                    p->setName(source->getName());
-
-                    for (int i = 0; i < zoneCount; i++)
-                    {
-                        auto pad = p->getPad(i);
-                        auto note = pad->getNote();
-                        auto noteParameters = p->getNoteParameters(note);
-                        dynamic_cast<mpc::sampler::NoteParameters *>(
-                            noteParameters)
-                            ->setSoundIndex(sampler->getSoundCount() -
-                                            zoneCount + i);
-                    }
-
-                    auto s = sequencer->getSequence(
-                        sequencer->getActiveSequenceIndex());
-                    auto t = sequencer->getActiveTrack();
-
-                    if (auto drumBus = sequencer->getBus<DrumBus>(t->getBus());
-                        drumBus)
-                    {
-                        drumBus->setProgram(sampler->getProgramCount() - 1);
-                    }
-                }
-            }
-
-            ls->openScreen(returnToScreenName);
-            break;
+        return;
     }
+
+    switch (edit)
+    {
+        case 0: handleDiscardEdit(); break;
+        case 1: handleLoopFromStartToEnd(); break;
+        case 2: handleSectionToNewSound(); break;
+        case 3: handleInsertSoundSectionStart(); break;
+        case 4: handleDeleteSection(); break;
+        case 5: handleSilenceSection(); break;
+        case 6: handleReverseSection(); break;
+        case 7: handleTimeStretch(); break;
+        case 8: handleNormalizeSection(); break;
+        case 9: handleSliceSound(); break;
+        default:;
+    }
+
+    ls->openScreen(returnToScreenName);
+}
+
+void EditSoundScreen::handleDiscardEdit() const
+{
+    const auto sound = sampler->getSound();
+    auto [start, end] = getStartEndFromContext();
+    const auto newLoopTo = sound->getLoopTo() - start;
+
+    sampler->trimSample(sampler->getSoundIndex(), start, end);
+
+    sound->setStart(0);
+    sound->setEnd(sound->getEnd() - sound->getStart());
+    sound->setMono(sound->isMono());
+    sound->setLoopTo(newLoopTo);
+
+    mpc.screens->get<ScreenId::ZoneScreen>()->initZones();
+}
+
+void EditSoundScreen::handleLoopFromStartToEnd() const
+{
+    const auto sound = sampler->getSound();
+    sound->setLoopTo(sound->getStart());
+}
+
+void EditSoundScreen::handleSectionToNewSound() const
+{
+    const auto sound = sampler->getSound();
+    const auto newSample = sampler->addSound();
+    if (!newSample) return;
+
+    newSample->setSampleRate(sound->getSampleRate());
+    newSample->setName(newName);
+
+    const auto newData = newSample->getMutableSampleData();
+    newData->resize(sound->getSampleData()->size());
+    for (int i = 0; i < newData->size(); i++)
+        (*newData)[i] = (*sound->getSampleData())[i];
+
+    newSample->setMono(sound->isMono());
+    sampler->trimSample(sampler->getSoundCount() - 1, sound->getStart(), sound->getEnd());
+    sampler->setSoundIndex(sampler->getSoundCount() - 1);
+}
+
+void EditSoundScreen::handleInsertSoundSectionStart() const
+{
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto source = sampler->getSortedSounds()[insertSoundIndex].first;
+    const auto destination = sampler->getSound();
+
+    const int destinationStartFrame = getStartEndFromContext().first;
+
+    const auto srcFrames = source->getFrameCount();
+    const auto dstFrames = destination->getFrameCount();
+    const auto newFrames = srcFrames + dstFrames;
+    auto newSamples = newFrames * (destination->isMono() ? 1 : 2);
+
+    const auto newData = std::make_shared<std::vector<float>>(newSamples);
+    const auto srcData = source->getSampleData();
+    const auto dstData = destination->getSampleData();
+
+    int srcCounter = 0, dstCounter = 0;
+    for (int i = 0; i < newFrames; i++)
+    {
+        if (i < destinationStartFrame)
+        {
+            (*newData)[i] = (*dstData)[dstCounter];
+            if (!destination->isMono())
+                (*newData)[i + newFrames] = (*dstData)[dstCounter + dstFrames];
+            dstCounter++;
+        }
+        else if (i < destinationStartFrame + srcFrames)
+        {
+            (*newData)[i] = (*srcData)[srcCounter];
+            if (!destination->isMono())
+            {
+                (*newData)[i + newFrames] = source->isMono()
+                                                ? (*newData)[i]
+                                                : (*srcData)[srcCounter + srcFrames];
+            }
+            srcCounter++;
+        }
+        else
+        {
+            (*newData)[i] = (*dstData)[dstCounter];
+            if (!destination->isMono())
+                (*newData)[i + newFrames] = (*dstData)[dstCounter + dstFrames];
+            dstCounter++;
+        }
+    }
+
+    destination->setSampleData(newData);
+    destination->setEnd(newFrames);
+    destination->setStart(0);
+    destination->setMono(destination->isMono());
+    destination->setLoopTo(destination->getEnd());
+    zoneScreen->initZones();
+}
+
+void EditSoundScreen::handleDeleteSection() const
+{
+    const auto sound = sampler->getSound();
+    auto [start, end] = getStartEndFromContext();
+    sampler->deleteSection(sampler->getSoundIndex(), start, end);
+
+    sound->setStart(0);
+    sound->setEnd(sound->getFrameCount());
+    sound->setLoopTo(sound->getFrameCount());
+
+    mpc.screens->get<ScreenId::ZoneScreen>()->initZones();
+}
+
+void EditSoundScreen::handleSilenceSection() const
+{
+    const auto sound = sampler->getSound();
+    auto [start, end] = getStartEndFromContext();
+    auto newData = *sound->getSampleData();
+
+    for (int i = start; i < end; i++)
+    {
+        newData[i] = 0.0f;
+        if (!sound->isMono())
+            newData[i + sound->getFrameCount()] = 0.0f;
+    }
+
+    sound->setSampleData(std::make_shared<std::vector<float>>(newData));
+}
+
+void EditSoundScreen::handleReverseSection() const
+{
+    const auto sound = sampler->getSound();
+    auto [start, end] = getStartEndFromContext();
+    const auto sampleData = sound->getSampleData();
+    auto reverseCounter = end - 1;
+    std::vector<float> newData(sampleData->size());
+
+    if (sound->isMono())
+    {
+        for (int i = start; i < end; i++)
+            newData[i] = (*sampleData)[reverseCounter--];
+    }
+    else
+    {
+        auto [left, right] = splitStereo(*sampleData);
+        for (int i = start; i < end; i++)
+        {
+            left[i] = (*sampleData)[reverseCounter];
+            right[i] = (*sampleData)[reverseCounter + sound->getFrameCount()];
+            reverseCounter--;
+        }
+        newData = Sampler::mergeToStereo(left, right);
+    }
+
+    sound->setSampleData(std::make_shared<std::vector<float>>(newData));
+}
+
+void EditSoundScreen::handleTimeStretch() const
+{
+    if (timeStretchRatio == 10000)
+    {
+        return;
+    }
+
+    const float ratio = timeStretchRatio * 0.0001f;
+
+    if (const auto sound = sampler->getSound(); sound->isMono())
+    {
+        const auto newSample = sampler->addSound(sound->getSampleRate());
+        if (!newSample) return;
+
+        TimeStretch ts(*sound->getSampleData(), ratio,
+                                     sound->getSampleRate(), timeStretchAdjust);
+        newSample->setSampleData(std::make_shared<std::vector<float>>(ts.getProcessedData()));
+        newSample->setMono(true);
+        newSample->setName(newName);
+    }
+    else
+    {
+        const auto newSound = sampler->addSound(sound->getSampleRate());
+        if (!newSound) return;
+
+        auto [left, right] = splitStereo(*sound->getSampleData());
+        TimeStretch tsL(left, ratio, sound->getSampleRate(), timeStretchAdjust);
+        TimeStretch tsR(right, ratio, sound->getSampleRate(), timeStretchAdjust);
+
+        auto merged = Sampler::mergeToStereo(tsL.getProcessedData(),
+                                                           tsR.getProcessedData());
+        newSound->setSampleData(std::make_shared<std::vector<float>>(merged));
+        newSound->setMono(false);
+        newSound->setName(newName);
+    }
+}
+
+void EditSoundScreen::handleNormalizeSection() const
+{
+    const auto sound = sampler->getSound();
+    auto [start, end] = getStartEndFromContext();
+    auto data = *sound->getSampleData();
+
+    float peak = 0.0f;
+    for (int i = start; i < end; i++)
+    {
+        peak = std::max(peak, std::fabs(data[i]));
+        if (!sound->isMono())
+            peak = std::max(peak, std::fabs(data[i + sound->getFrameCount()]));
+    }
+
+    if (peak == 0.0f) return;
+    const float factor = 1.0f / std::min(1.0f, peak);
+
+    for (int i = start; i < end; i++)
+    {
+        data[i] *= factor;
+        if (!sound->isMono())
+            data[i + sound->getFrameCount()] *= factor;
+    }
+
+    sound->setSampleData(std::make_shared<std::vector<float>>(data));
+}
+
+void EditSoundScreen::handleSliceSound() const
+{
+    const auto source = sampler->getSound();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const int zoneCount = zoneScreen->numberOfZones;
+
+    for (int i = 0; i < zoneCount; i++)
+    {
+        const auto start = zoneScreen->getZoneStart(i);
+        const auto end = zoneScreen->getZoneEnd(i);
+        const auto zone = createZone(sampler, source, start, end, endMargin);
+        if (!zone) return;
+
+        zone->setName(i == 0 ? newName : sampler->addOrIncreaseNumber(newName));
+    }
+
+    if (!createNewProgram) return;
+
+    const auto p = sampler->createNewProgramAddFirstAvailableSlot().lock();
+    p->setName(source->getName());
+
+    for (int i = 0; i < zoneCount; i++)
+    {
+        const auto pad = p->getPad(i);
+        const auto noteParams = p->getNoteParameters(pad->getNote());
+        noteParams->setSoundIndex(sampler->getSoundCount() - zoneCount + i);
+    }
+
+    if (const auto drumBus = sequencer->getBus<DrumBus>(sequencer->getActiveTrack()->getBus()))
+        drumBus->setProgram(sampler->getProgramCount() - 1);
+}
+
+std::pair<int, int> EditSoundScreen::getStartEndFromContext() const
+{
+    const auto sound = sampler->getSound();
+    int start = sound->getStart();
+    int end = sound->getEnd();
+
+    if (returnToScreenName == "loop")
+    {
+        start = sound->getLoopTo();
+    }
+    else if (returnToScreenName == "zone")
+    {
+        const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+        const auto zone = zoneScreen->zone;
+        start = zoneScreen->getZoneStart(zone);
+        end = zoneScreen->getZoneEnd(zone);
+    }
+
+    return {start, end};
+}
+
+std::pair<std::vector<float>, std::vector<float>> EditSoundScreen::splitStereo(
+    const std::vector<float> &data) const
+{
+    const int half = data.size() / 2;
+    return {
+        std::vector(data.begin(), data.begin() + half),
+        std::vector(data.begin() + half, data.end())
+    };
 }
