@@ -27,11 +27,9 @@ namespace mpc
 
 namespace mpc::audiomidi
 {
-    class SoundRecorder : public AudioProcess, public Observable
+    class SoundRecorder final : public AudioProcess, public Observable
     {
-
-    private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         bool recording = false;
         bool cancelled = false;
         int lengthInFramesAtEngineSampleRate = 0;

@@ -250,7 +250,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
         peakR = std::max<float>(peakR, rightChannelCopy[i]);
     }
 
-    notifyObservers(std::pair<float, float>(peakL, peakR));
+    notifyObservers(std::pair(peakL, peakR));
 
     // Is this comparison correct or does the real 2KXL take Mode into account?
     // Also, does the real 2KXL do the below in a frame-accurate manner?
