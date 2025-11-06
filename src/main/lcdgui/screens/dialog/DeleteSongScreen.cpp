@@ -9,7 +9,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteSongScreen::DeleteSongScreen(mpc::Mpc &mpc, const int layerIndex)
+DeleteSongScreen::DeleteSongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-song", layerIndex)
 {
 }

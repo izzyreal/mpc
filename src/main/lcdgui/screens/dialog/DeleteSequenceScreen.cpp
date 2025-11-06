@@ -6,7 +6,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteSequenceScreen::DeleteSequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+DeleteSequenceScreen::DeleteSequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-sequence", layerIndex)
 {
 }

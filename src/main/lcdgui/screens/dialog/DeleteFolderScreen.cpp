@@ -16,7 +16,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 
-DeleteFolderScreen::DeleteFolderScreen(mpc::Mpc &mpc, const int layerIndex)
+DeleteFolderScreen::DeleteFolderScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-folder", layerIndex)
 {
 }

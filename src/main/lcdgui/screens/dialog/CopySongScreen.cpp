@@ -9,7 +9,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-CopySongScreen::CopySongScreen(mpc::Mpc &mpc, const int layerIndex)
+CopySongScreen::CopySongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-song", layerIndex)
 {
 }

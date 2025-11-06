@@ -4,14 +4,14 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-    class DeleteSequenceScreen : public mpc::lcdgui::ScreenComponent
+    class DeleteSequenceScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        DeleteSequenceScreen(mpc::Mpc &mpc, int layerIndex);
+        DeleteSequenceScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 

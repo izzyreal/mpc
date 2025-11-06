@@ -9,7 +9,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;
 
-MidiInputMonitorScreen::MidiInputMonitorScreen(mpc::Mpc &mpc,
+MidiInputMonitorScreen::MidiInputMonitorScreen(Mpc &mpc,
                                                const int layerIndex)
     : ScreenComponent(mpc, "midi-input-monitor", layerIndex)
 {
@@ -33,19 +33,19 @@ void MidiInputMonitorScreen::close()
 }
 
 void MidiInputMonitorScreen::static_blink(
-    void *arg1, const std::weak_ptr<mpc::lcdgui::Label> &label)
+    void *arg1, const std::weak_ptr<Label> &label)
 {
     static_cast<MidiInputMonitorScreen *>(arg1)->runBlinkThread(label);
 }
 
 void MidiInputMonitorScreen::runBlinkThread(
-    const std::weak_ptr<mpc::lcdgui::Label> &label)
+    const std::weak_ptr<Label> &label)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     label.lock()->setText(" ");
 }
 
-void MidiInputMonitorScreen::initTimer(std::weak_ptr<mpc::lcdgui::Label> label)
+void MidiInputMonitorScreen::initTimer(std::weak_ptr<Label> label)
 {
     if (blinkThread.joinable())
     {

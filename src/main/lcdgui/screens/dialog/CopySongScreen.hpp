@@ -3,14 +3,14 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class CopySongScreen : public mpc::lcdgui::ScreenComponent
+    class CopySongScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
         void turnWheel(int i) override;
 
-        CopySongScreen(mpc::Mpc &mpc, int layerIndex);
+        CopySongScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 

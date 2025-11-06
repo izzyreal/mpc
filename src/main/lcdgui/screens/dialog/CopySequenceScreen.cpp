@@ -6,7 +6,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-CopySequenceScreen::CopySequenceScreen(mpc::Mpc &mpc, const int layerIndex)
+CopySequenceScreen::CopySequenceScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-sequence", layerIndex)
 {
 }

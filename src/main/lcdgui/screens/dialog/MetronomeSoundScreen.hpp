@@ -22,11 +22,11 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class MetronomeSoundScreen : public mpc::lcdgui::ScreenComponent
+    class MetronomeSoundScreen final : public ScreenComponent
     {
 
     public:
-        MetronomeSoundScreen(mpc::Mpc &mpc, int layerIndex);
+        MetronomeSoundScreen(Mpc &mpc, int layerIndex);
 
         void turnWheel(int notch) override;
         void function(int i) override;
@@ -39,7 +39,6 @@ namespace mpc::lcdgui::screens::dialog
         std::vector<std::string> soundNames = {"CLICK", "DRUM1", "DRUM2",
                                                "DRUM3", "DRUM4"};
 
-    private:
         void displaySound();
         void displayVolume();
         void displayOutput();
@@ -48,7 +47,6 @@ namespace mpc::lcdgui::screens::dialog
         void displayAccentVelo();
         void displayNormalVelo();
 
-    private:
         int volume = 100;
         int output = 0;
         int sound = 0;
@@ -74,6 +72,6 @@ namespace mpc::lcdgui::screens::dialog
         void setNormalVelo(int i);
 
     private:
-        friend class mpc::disk::AllLoader;
+        friend class disk::AllLoader;
     };
 } // namespace mpc::lcdgui::screens::dialog

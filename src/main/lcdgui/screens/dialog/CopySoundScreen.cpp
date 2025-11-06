@@ -8,7 +8,7 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 
-CopySoundScreen::CopySoundScreen(mpc::Mpc &mpc, const int layerIndex)
+CopySoundScreen::CopySoundScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-sound", layerIndex)
 {
 }

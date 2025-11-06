@@ -10,7 +10,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace mpc::nvram;
 
-FileExistsScreen::FileExistsScreen(mpc::Mpc &mpc, const int layerIndex)
+FileExistsScreen::FileExistsScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "file-exists", layerIndex)
 {
 }

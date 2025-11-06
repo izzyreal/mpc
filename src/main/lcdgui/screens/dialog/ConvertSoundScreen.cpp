@@ -3,7 +3,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-ConvertSoundScreen::ConvertSoundScreen(mpc::Mpc &mpc, const int layerIndex)
+ConvertSoundScreen::ConvertSoundScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "convert-sound", layerIndex)
 {
 }

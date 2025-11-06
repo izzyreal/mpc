@@ -3,7 +3,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteAllProgramsScreen::DeleteAllProgramsScreen(mpc::Mpc &mpc,
+DeleteAllProgramsScreen::DeleteAllProgramsScreen(Mpc &mpc,
                                                  const int layerIndex)
     : ScreenComponent(mpc, "delete-all-programs", layerIndex)
 {

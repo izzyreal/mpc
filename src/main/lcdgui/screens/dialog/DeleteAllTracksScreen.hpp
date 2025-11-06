@@ -4,12 +4,12 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-    class DeleteAllTracksScreen : public mpc::lcdgui::ScreenComponent
+    class DeleteAllTracksScreen final : public ScreenComponent
     {
 
     public:
         void function(int i) override;
 
-        DeleteAllTracksScreen(mpc::Mpc &mpc, int layerIndex);
+        DeleteAllTracksScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::dialog

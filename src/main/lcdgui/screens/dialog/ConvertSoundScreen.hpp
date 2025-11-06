@@ -3,14 +3,14 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class ConvertSoundScreen : public mpc::lcdgui::ScreenComponent
+    class ConvertSoundScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        ConvertSoundScreen(mpc::Mpc &mpc, int layerIndex);
+        ConvertSoundScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 

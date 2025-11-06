@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc &mpc, const int layerIndex)
+DeleteTrackScreen::DeleteTrackScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-track", layerIndex)
 {
 }

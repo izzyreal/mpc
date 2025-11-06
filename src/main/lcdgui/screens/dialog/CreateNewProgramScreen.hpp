@@ -9,13 +9,13 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class CreateNewProgramScreen : public mpc::lcdgui::ScreenComponent,
-                                   public mpc::lcdgui::screens::OpensNameScreen
+    class CreateNewProgramScreen final : public ScreenComponent,
+                                   public OpensNameScreen
     {
     public:
         void function(int i) override;
 
-        CreateNewProgramScreen(mpc::Mpc &mpc, int layerIndex);
+        CreateNewProgramScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
         void turnWheel(int i) override;
@@ -30,7 +30,6 @@ namespace mpc::lcdgui::screens::dialog
         void displayNewName();
         void displayMidiProgramChange();
 
-    private:
-        friend class mpc::lcdgui::screens::window::NameScreen;
+        friend class NameScreen;
     };
 } // namespace mpc::lcdgui::screens::dialog

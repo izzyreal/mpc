@@ -8,7 +8,7 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 
-ResampleScreen::ResampleScreen(mpc::Mpc &mpc, const int layerIndex)
+ResampleScreen::ResampleScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "resample", layerIndex)
 {
 }

@@ -10,7 +10,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::audiomidi;
 
-VmpcRecordJamScreen::VmpcRecordJamScreen(mpc::Mpc &mpc, const int layerIndex)
+VmpcRecordJamScreen::VmpcRecordJamScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "vmpc-record-jam", layerIndex)
 {
 }

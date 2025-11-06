@@ -9,8 +9,8 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class ResampleScreen : public mpc::lcdgui::ScreenComponent,
-                           public mpc::lcdgui::screens::OpensNameScreen
+    class ResampleScreen final : public ScreenComponent,
+                           public OpensNameScreen
     {
 
     public:
@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int i) override;
         void openNameScreen() override;
 
-        ResampleScreen(mpc::Mpc &mpc, int layerIndex);
+        ResampleScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -43,7 +43,6 @@ namespace mpc::lcdgui::screens::dialog
         int quality = 0;
         int newBit = 0;
 
-    private:
-        friend class mpc::lcdgui::screens::window::NameScreen;
+        friend class NameScreen;
     };
 } // namespace mpc::lcdgui::screens::dialog

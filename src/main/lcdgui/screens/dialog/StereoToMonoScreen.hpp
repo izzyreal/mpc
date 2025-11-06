@@ -9,8 +9,8 @@ namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class StereoToMonoScreen : public mpc::lcdgui::ScreenComponent,
-                               public mpc::lcdgui::screens::OpensNameScreen
+    class StereoToMonoScreen final : public ScreenComponent,
+                               public OpensNameScreen
     {
 
     public:
@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int i) override;
         void openNameScreen() override;
 
-        StereoToMonoScreen(mpc::Mpc &mpc, int layerIndex);
+        StereoToMonoScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -34,7 +34,6 @@ namespace mpc::lcdgui::screens::dialog
         void setNewLName(const std::string &s);
         void setNewRName(const std::string &s);
 
-    private:
-        friend class mpc::lcdgui::screens::window::NameScreen;
+        friend class NameScreen;
     };
 } // namespace mpc::lcdgui::screens::dialog

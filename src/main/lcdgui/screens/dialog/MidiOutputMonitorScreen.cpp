@@ -7,7 +7,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;
 
-MidiOutputMonitorScreen::MidiOutputMonitorScreen(mpc::Mpc &mpc,
+MidiOutputMonitorScreen::MidiOutputMonitorScreen(Mpc &mpc,
                                                  const int layerIndex)
     : ScreenComponent(mpc, "midi-output-monitor", layerIndex)
 {
@@ -29,19 +29,19 @@ void MidiOutputMonitorScreen::close()
 }
 
 void MidiOutputMonitorScreen::static_blink(
-    void *arg1, const std::weak_ptr<mpc::lcdgui::Label> &label)
+    void *arg1, const std::weak_ptr<Label> &label)
 {
     static_cast<MidiOutputMonitorScreen *>(arg1)->runBlinkThread(label);
 }
 
 void MidiOutputMonitorScreen::runBlinkThread(
-    const std::weak_ptr<mpc::lcdgui::Label> &label)
+    const std::weak_ptr<Label> &label)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     label.lock()->setText(" ");
 }
 
-void MidiOutputMonitorScreen::initTimer(std::weak_ptr<mpc::lcdgui::Label> label)
+void MidiOutputMonitorScreen::initTimer(std::weak_ptr<Label> label)
 {
     if (blinkThread.joinable())
     {

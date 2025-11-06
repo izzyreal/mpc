@@ -10,10 +10,10 @@ namespace mpc::sampler
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class FileExistsScreen : public mpc::lcdgui::ScreenComponent
+    class FileExistsScreen final : public ScreenComponent
     {
     public:
-        FileExistsScreen(mpc::Mpc &mpc, int layerIndex);
+        FileExistsScreen(Mpc &mpc, int layerIndex);
         void function(int i) override;
         void numpad(int i) override {}
 

@@ -7,7 +7,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-CopyProgramScreen::CopyProgramScreen(mpc::Mpc &mpc, const int layerIndex)
+CopyProgramScreen::CopyProgramScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-program", layerIndex)
 {
 }

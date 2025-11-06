@@ -14,7 +14,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-DeleteFileScreen::DeleteFileScreen(mpc::Mpc &mpc, int layerIndex)
+DeleteFileScreen::DeleteFileScreen(Mpc &mpc, int layerIndex)
     : ScreenComponent(mpc, "delete-file", layerIndex)
 {
 }

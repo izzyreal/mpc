@@ -3,10 +3,10 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-    class DeleteFileScreen : public mpc::lcdgui::ScreenComponent
+    class DeleteFileScreen final : public ScreenComponent
     {
     public:
-        DeleteFileScreen(mpc::Mpc &mpc, int layerIndex);
+        DeleteFileScreen(Mpc &mpc, int layerIndex);
         void function(int i) override;
 
     private:

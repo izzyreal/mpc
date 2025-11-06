@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-CopyTrackScreen::CopyTrackScreen(mpc::Mpc &mpc, const int layerIndex)
+CopyTrackScreen::CopyTrackScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "copy-track", layerIndex)
 {
 }

@@ -3,7 +3,7 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 
-DeleteAllSongScreen::DeleteAllSongScreen(mpc::Mpc &mpc, const int layerIndex)
+DeleteAllSongScreen::DeleteAllSongScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-all-song", layerIndex)
 {
 }

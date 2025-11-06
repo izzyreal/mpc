@@ -16,7 +16,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 
-StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc &mpc, const int layerIndex)
+StereoToMonoScreen::StereoToMonoScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "stereo-to-mono", layerIndex)
 {
 }

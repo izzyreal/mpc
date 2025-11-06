@@ -8,7 +8,7 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 
-CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc &mpc,
+CreateNewProgramScreen::CreateNewProgramScreen(Mpc &mpc,
                                                const int layerIndex)
     : ScreenComponent(mpc, "create-new-program", layerIndex)
 {
@@ -58,7 +58,7 @@ void CreateNewProgramScreen::open()
             }
         }
 
-        newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterIndex];
+        newName = "NewPgm-" + Mpc::akaiAscii[letterIndex];
     }
 
     displayNewName();

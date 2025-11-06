@@ -4,14 +4,14 @@
 namespace mpc::lcdgui::screens::dialog
 {
 
-    class DeleteSongScreen : public mpc::lcdgui::ScreenComponent
+    class DeleteSongScreen final : public ScreenComponent
     {
 
     public:
         void turnWheel(int i) override;
         void function(int i) override;
 
-        DeleteSongScreen(mpc::Mpc &mpc, int layerIndex);
+        DeleteSongScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
