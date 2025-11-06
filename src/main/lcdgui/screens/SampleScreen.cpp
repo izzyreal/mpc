@@ -10,9 +10,39 @@
 
 using namespace mpc::lcdgui::screens;
 
-SampleScreen::SampleScreen(mpc::Mpc &mpc, const int layerIndex)
+SampleScreen::SampleScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "sample", layerIndex)
 {
+    addReactiveBinding(
+        {[&]() -> std::pair<bool, bool>
+         {
+             return {mpc.getAudioMidiServices()->isRecordingSound(),
+                     mpc.getAudioMidiServices()->getSoundRecorder()->isArmed()};
+         },
+         [&](auto isRecordingAndisArmed)
+         {
+             const auto b = findBackground();
+             if (isRecordingAndisArmed.first)
+             {
+                 b->setBackgroundName("recording");
+             }
+             else if (isRecordingAndisArmed.second)
+             {
+                 b->setBackgroundName("waiting-for-input-signal");
+             }
+             else
+             {
+                 b->setBackgroundName("sample");
+             }
+         }});
+    addReactiveBinding({[&]() -> std::pair<float, float>
+                        {
+                            return {currentBufferPeakL, currentBufferPeakR};
+                        },
+                        [&](auto)
+                        {
+                            updateVU();
+                        }});
 }
 
 void SampleScreen::open()
@@ -25,15 +55,6 @@ void SampleScreen::open()
     displayTime();
     displayMonitor();
     displayPreRec();
-
-    const auto ams = mpc.getAudioMidiServices();
-    ams->getSoundRecorder()->addObserver(this);
-}
-
-void SampleScreen::close()
-{
-    const auto ams = mpc.getAudioMidiServices();
-    ams->getSoundRecorder()->deleteObserver(this);
 }
 
 void SampleScreen::left()
@@ -81,9 +102,8 @@ void SampleScreen::openWindow()
     openScreenById(ScreenId::SoundMemoryScreen);
 }
 
-void SampleScreen::function(int i)
+void SampleScreen::function(const int i)
 {
-
     switch (i)
     {
         case 0:
@@ -92,23 +112,22 @@ void SampleScreen::function(int i)
                 return;
             }
 
-            peakL = 0.f;
-            peakR = 0.f;
+            peak.first = 0.f;
+            peak.second = 0.f;
             break;
         case 4:
             if (mpc.getAudioMidiServices()->isRecordingSound())
             {
                 mpc.getAudioMidiServices()->stopSoundRecorder(true);
-                findBackground()->setBackgroundName("sample");
             }
             else if (mpc.getAudioMidiServices()->getSoundRecorder()->isArmed())
             {
                 mpc.getAudioMidiServices()->getSoundRecorder()->setArmed(false);
                 sampler->deleteSound(sampler->getSoundCount() - 1);
-                findBackground()->setBackgroundName("sample");
             }
             break;
         case 5:
+        {
             const auto ams = mpc.getAudioMidiServices();
 
             if (ams->isRecordingSound())
@@ -120,7 +139,6 @@ void SampleScreen::function(int i)
             if (ams->getSoundRecorder()->isArmed())
             {
                 ams->startRecordingSound();
-                findBackground()->setBackgroundName("recording");
             }
             else
             {
@@ -137,14 +155,16 @@ void SampleScreen::function(int i)
                     sound, lengthInFrames,
                     ams->getAudioServer()->getSampleRate());
                 ams->getSoundRecorder()->setArmed(true);
-                findBackground()->setBackgroundName("waiting-for-input-signal");
             }
 
+            break;
+        }
+        default:
             break;
     }
 }
 
-void SampleScreen::turnWheel(int i)
+void SampleScreen::turnWheel(const int i)
 {
     const auto ams = mpc.getAudioMidiServices();
 
@@ -181,69 +201,39 @@ void SampleScreen::turnWheel(int i)
     }
 }
 
-void SampleScreen::setInput(int i)
+void SampleScreen::setInput(const int i)
 {
-    if (i < 0 || i > 1)
-    {
-        return;
-    }
-
-    input = i;
+    input = std::clamp(i, 0, 1);
     displayInput();
 }
 
-void SampleScreen::setThreshold(int i)
+void SampleScreen::setThreshold(const int i)
 {
-    if (i < -64 || i > 0)
-    {
-        return;
-    }
-
-    threshold = i;
+    threshold = std::clamp(i, -64, 0);
     displayThreshold();
 }
 
-void SampleScreen::setMode(int i)
+void SampleScreen::setMode(const int i)
 {
-    if (i < 0 || i > 2)
-    {
-        return;
-    }
-
-    mode = i;
+    mode = std::clamp(i, 0, 2);
     displayMode();
 }
 
-void SampleScreen::setTime(int i)
+void SampleScreen::setTime(const int i)
 {
-    if (i < 0 || i > 3786)
-    {
-        return;
-    }
-
-    time = i;
+    time = std::clamp(i, 0, 3786);
     displayTime();
 }
 
-void SampleScreen::setMonitor(int i)
+void SampleScreen::setMonitor(const int i)
 {
-    if (i < 0 || i > 5)
-    {
-        return;
-    }
-
-    monitor = i;
+    monitor = std::clamp(i, 0, 5);
     displayMonitor();
 }
 
-void SampleScreen::setPreRec(int i)
+void SampleScreen::setPreRec(const int i)
 {
-    if (i < 0 || i > 100)
-    {
-        return;
-    }
-
-    preRec = i;
+    preRec = std::clamp(i, 0, 100);
     displayPreRec();
 }
 
@@ -282,16 +272,16 @@ void SampleScreen::displayPreRec()
     findField("prerec")->setTextPadded(preRec);
 }
 
-void SampleScreen::updateVU(const float levelL, const float levelR)
+void SampleScreen::updateVU()
 {
     std::string lString;
     std::string rString;
 
-    int peaklValue = (int)floor(log10(peakL) * 20);
-    int peakrValue = (int)floor(log10(peakR) * 20);
+    int peaklValue = static_cast<int>(floor(log10(peak.first) * 20));
+    int peakrValue = static_cast<int>(floor(log10(peak.second) * 20));
 
-    int levell = (int)floor(log10(levelL) * 20);
-    int levelr = (int)floor(log10(levelR) * 20);
+    int levell = static_cast<int>(floor(log10(currentBufferPeakL) * 20));
+    int levelr = static_cast<int>(floor(log10(currentBufferPeakR) * 20));
 
     for (int i = 0; i < 34; i++)
     {
@@ -374,39 +364,21 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
                                       : "                                  ");
 }
 
-int SampleScreen::getMode()
+int SampleScreen::getMode() const
 {
     return mode;
 }
 
-int SampleScreen::getMonitor()
+int SampleScreen::getMonitor() const
 {
     return monitor;
 }
 
-void SampleScreen::update(Observable *o, Message message)
+void SampleScreen::setCurrentBufferPeak(
+    const std::pair<float, float> &peakToUse)
 {
-    if (dynamic_cast<mpc::audiomidi::SoundRecorder *>(o) != nullptr)
-    {
-        try
-        {
-            const auto vuValue = std::get<std::pair<float, float>>(message);
-            const auto left = vuValue.first;
-            const auto right = vuValue.second;
-            if (left > peakL)
-            {
-                peakL = left;
-            }
-            if (right > peakR)
-            {
-                peakR = right;
-            }
-            updateVU(left, right);
-        }
-        catch (const std::exception &)
-        {
-            // nothing to do
-        }
-        return;
-    }
+    currentBufferPeakL.store(peakToUse.first);
+    currentBufferPeakR.store(peakToUse.second);
+    peak.first = std::max(currentBufferPeakL.load(), peak.first);
+    peak.second = std::max(currentBufferPeakR.load(), peak.second);
 }

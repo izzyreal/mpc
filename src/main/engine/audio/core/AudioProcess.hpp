@@ -8,6 +8,7 @@ namespace mpc::engine::audio::core
     class AudioProcess
     {
     public:
+        virtual ~AudioProcess() = default;
         static const int AUDIO_OK{0};
         static const int AUDIO_DISCONNECT{1};
         static const int AUDIO_SILENCE{2};
