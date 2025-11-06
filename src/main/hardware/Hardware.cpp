@@ -4,8 +4,8 @@ using namespace mpc::hardware;
 
 Hardware::Hardware()
 {
-    for (int i = ComponentId::CURSOR_LEFT_OR_DIGIT;
-         i <= ComponentId::NUM_9_OR_MIDI_SYNC; i++)
+    for (int i = CURSOR_LEFT_OR_DIGIT;
+         i <= NUM_9_OR_MIDI_SYNC; i++)
     {
         const auto id = static_cast<ComponentId>(i);
         buttons[id] = std::make_shared<Button>(id);
@@ -18,13 +18,13 @@ Hardware::Hardware()
         components[pads.back()->getId()] = pads.back();
     }
 
-    for (int i = ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED;
-         i <= ComponentId::PLAY_LED; i++)
+    for (int i = FULL_LEVEL_OR_CASE_SWITCH_LED;
+         i <= PLAY_LED; i++)
     {
         const auto id = static_cast<ComponentId>(i);
         leds[id] = std::make_shared<Led>(id);
         components[id] = leds[id];
-        if (id == ComponentId::BANK_A_LED)
+        if (id == BANK_A_LED)
         {
             leds[id]->setEnabled(true);
         }
@@ -33,24 +33,24 @@ Hardware::Hardware()
     dataWheel = std::make_shared<DataWheel>();
     components[dataWheel->getId()] = dataWheel;
 
-    recPot = std::make_shared<Pot>(ComponentId::REC_GAIN_POT);
+    recPot = std::make_shared<Pot>(REC_GAIN_POT);
     components[recPot->getId()] = recPot;
 
-    volPot = std::make_shared<Pot>(ComponentId::MAIN_VOLUME_POT);
+    volPot = std::make_shared<Pot>(MAIN_VOLUME_POT);
     components[volPot->getId()] = volPot;
 
     slider = std::make_shared<Slider>();
     components[slider->getId()] = slider;
 }
 
-std::vector<std::string> Hardware::getButtonLabels()
+std::vector<std::string> Hardware::getButtonLabels() const
 {
     std::vector<std::string> result;
 
     for (auto &[label, id] : componentLabelToId)
     {
-        if (id >= ComponentId::CURSOR_LEFT_OR_DIGIT &&
-            id <= ComponentId::NUM_9_OR_MIDI_SYNC)
+        if (id >= CURSOR_LEFT_OR_DIGIT &&
+            id <= NUM_9_OR_MIDI_SYNC)
         {
             result.push_back(label);
         }
@@ -59,7 +59,7 @@ std::vector<std::string> Hardware::getButtonLabels()
     return result;
 }
 
-std::shared_ptr<Pad> Hardware::getPad(int index)
+std::shared_ptr<Pad> Hardware::getPad(const int index)
 {
     if (index < 0 || index >= static_cast<int>(pads.size()))
     {
@@ -73,7 +73,7 @@ std::vector<std::shared_ptr<Pad>> &Hardware::getPads()
     return pads;
 }
 
-std::shared_ptr<Button> Hardware::getButton(ComponentId id)
+std::shared_ptr<Button> Hardware::getButton(const ComponentId id)
 {
     if (buttons.count(id) == 0)
     {
@@ -82,7 +82,7 @@ std::shared_ptr<Button> Hardware::getButton(ComponentId id)
     return buttons[id];
 }
 
-std::shared_ptr<Led> Hardware::getLed(ComponentId id)
+std::shared_ptr<Led> Hardware::getLed(const ComponentId id)
 {
     if (leds.count(id) == 0)
     {
@@ -111,7 +111,7 @@ std::shared_ptr<Slider> Hardware::getSlider()
     return slider;
 }
 
-std::shared_ptr<Component> Hardware::getComponent(ComponentId id)
+std::shared_ptr<Component> Hardware::getComponent(const ComponentId id)
 {
     if (components.count(id) == 0)
     {

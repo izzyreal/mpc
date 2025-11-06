@@ -26,7 +26,7 @@ namespace mpc::hardware
     public:
         explicit Hardware();
 
-        std::vector<std::string> getButtonLabels();
+        std::vector<std::string> getButtonLabels() const;
         std::shared_ptr<Pad> getPad(int index);
         std::vector<std::shared_ptr<Pad>> &getPads();
         std::shared_ptr<Button> getButton(ComponentId id);

@@ -154,7 +154,7 @@ namespace mpc::hardware
     public:
         explicit DataWheel();
         void turn(int steps);
-        float getAngle();
+        float getAngle() const;
     };
 
     class Slider final : public Component, public Continuous<float, 0, 127>

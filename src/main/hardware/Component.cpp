@@ -6,7 +6,7 @@
 
 using namespace mpc::hardware;
 
-Component::Component(ComponentId idToUse) : id(idToUse) {}
+Component::Component(const ComponentId idToUse) : id(idToUse) {}
 
 Component::~Component() = default;
 
@@ -19,7 +19,7 @@ PressState::PressState() = default;
 
 PressState::~PressState() = default;
 
-void PressState::setPressed(bool pressedToUse)
+void PressState::setPressed(const bool pressedToUse)
 {
     pressed = pressedToUse;
 }
@@ -87,7 +87,7 @@ void VelocitySensitivePressable::doPressWithVelocity(int velocityToUse)
     velocity = velocityToUse;
 }
 
-bool VelocitySensitivePressable::pressWithVelocity(int velocityToUse)
+bool VelocitySensitivePressable::pressWithVelocity(const int velocityToUse)
 {
     if (isPressed())
     {
@@ -133,9 +133,9 @@ void Aftertouchable::aftertouch(int pressureToUse)
     onAftertouch(pressureToUse);
 }
 
-Led::Led(ComponentId id) : Component(id) {}
+Led::Led(const ComponentId id) : Component(id) {}
 
-void Led::setEnabled(bool enabledToUse)
+void Led::setEnabled(const bool enabledToUse)
 {
     enabled = enabledToUse;
 }
@@ -145,11 +145,11 @@ bool Led::isEnabled() const
     return enabled;
 }
 
-Button::Button(ComponentId id) : Component(id) {}
+Button::Button(const ComponentId id) : Component(id) {}
 
-Pad::Pad(int indexToUse)
+Pad::Pad(const int indexToUse)
     : Component(
-          static_cast<ComponentId>(ComponentId::PAD_1_OR_AB + indexToUse)),
+          static_cast<ComponentId>(PAD_1_OR_AB + indexToUse)),
       index(indexToUse)
 {
     assert(index >= 0 && index < 16);
@@ -171,11 +171,11 @@ int Pad::getIndex() const
     return index;
 }
 
-DataWheel::DataWheel() : Component(ComponentId::DATA_WHEEL) {}
+DataWheel::DataWheel() : Component(DATA_WHEEL) {}
 
-void DataWheel::turn(int steps)
+void DataWheel::turn(const int steps)
 {
-    angle = angle + (angleIncrementPerStep * (float)std::clamp(steps, -20, 20));
+    angle = angle + (angleIncrementPerStep * static_cast<float>(std::clamp(steps, -20, 20)));
 
     if (angle > 100.0f)
     {
@@ -187,17 +187,17 @@ void DataWheel::turn(int steps)
     }
 }
 
-float DataWheel::getAngle()
+float DataWheel::getAngle() const
 {
     return angle;
 }
 
 Slider::Slider()
-    : Component(ComponentId::SLIDER), direction(Direction::UpIncreases)
+    : Component(SLIDER), direction(Direction::UpIncreases)
 {
 }
 
-void Slider::moveToNormalizedY(float normalizedY)
+void Slider::moveToNormalizedY(const float normalizedY)
 {
     auto [min, max] = getRangeAs<float>();
     const float clampedY = std::clamp(normalizedY, 0.0f, 1.0f);
@@ -207,7 +207,7 @@ void Slider::moveToNormalizedY(float normalizedY)
     setValue(value);
 }
 
-void Slider::setDirection(Direction directionToUse)
+void Slider::setDirection(const Direction directionToUse)
 {
     direction = directionToUse;
 }
@@ -217,7 +217,7 @@ Slider::Direction Slider::getDirection() const
     return direction;
 }
 
-Pot::Pot(ComponentId id) : Component(id) {}
+Pot::Pot(const ComponentId id) : Component(id) {}
 
 template <typename T, int MIN, int MAX>
 void Continuous<T, MIN, MAX>::setValue(T v)
@@ -244,9 +244,12 @@ std::pair<T1, T1> Continuous<T, MIN, MAX>::getRangeAs() const
     return {static_cast<T1>(MIN), static_cast<T1>(MAX)};
 }
 
-template class mpc::hardware::Continuous<float, 0, 127>;
-template class mpc::hardware::Continuous<float, 0, 1>;
-template std::pair<float, float>
-mpc::hardware::Continuous<float, 0, 127>::getRangeAs<float>() const;
-template std::pair<float, float>
-mpc::hardware::Continuous<float, 0, 1>::getRangeAs<float>() const;
+namespace mpc::hardware
+{
+    template class Continuous<float, 0, 127>;
+    template class Continuous<float, 0, 1>;
+    template std::pair<float, float>
+    Continuous<float, 0, 127>::getRangeAs<float>() const;
+    template std::pair<float, float>
+    Continuous<float, 0, 1>::getRangeAs<float>() const;
+}
