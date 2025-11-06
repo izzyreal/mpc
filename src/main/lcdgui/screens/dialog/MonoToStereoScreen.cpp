@@ -85,7 +85,7 @@ void MonoToStereoScreen::openNameScreen()
 
     if (focusedFieldName == "newstname")
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {

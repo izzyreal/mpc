@@ -26,7 +26,6 @@ void CopySoundScreen::open()
 
 void CopySoundScreen::function(int i)
 {
-
     switch (i)
     {
         case 3:
@@ -47,6 +46,7 @@ void CopySoundScreen::function(int i)
             openScreenById(ScreenId::SoundScreen);
             break;
         }
+        default:;
     }
 }
 
@@ -68,7 +68,7 @@ void CopySoundScreen::turnWheel(int i)
 
 void CopySoundScreen::openNameScreen()
 {
-    const auto enterAction = [this](std::string &nameScreenName)
+    const auto enterAction = [this](const std::string &nameScreenName)
     {
         if (sampler->isSoundNameOccupied(nameScreenName))
         {

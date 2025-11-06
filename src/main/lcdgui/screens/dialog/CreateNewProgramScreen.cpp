@@ -30,7 +30,7 @@ void CreateNewProgramScreen::openNameScreen()
 
     if (focusedFieldName == "new-name")
     {
-        const auto enterAction = [this](std::string &nameScreenName)
+        const auto enterAction = [this](const std::string &nameScreenName)
         {
             newName = nameScreenName;
             openScreenById(ScreenId::CreateNewProgramScreen);

@@ -54,7 +54,7 @@ void StereoToMonoScreen::openNameScreen()
     {
         const auto isL = focusedFieldName == "newlname";
 
-        const auto enterAction = [this, isL](std::string &nameScreenName)
+        const auto enterAction = [this, isL](const std::string &nameScreenName)
         {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {
