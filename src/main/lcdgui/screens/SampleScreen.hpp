@@ -10,10 +10,12 @@ namespace mpc::audiomidi
 
 namespace mpc::lcdgui::screens
 {
-    class SampleScreen : public mpc::lcdgui::ScreenComponent
+    class SampleScreen final : public ScreenComponent
     {
-
     public:
+        SampleScreen(Mpc &mpc, int layerIndex);
+
+        void open() override;
         void function(int i) override;
         void turnWheel(int i) override;
         void openWindow() override;
@@ -22,11 +24,7 @@ namespace mpc::lcdgui::screens
         void up() override;
         void down() override;
 
-    public:
-        SampleScreen(mpc::Mpc &mpc, int layerIndex);
-        void open() override;
-        void close() override;
-        void update(Observable *observable, Message message) override;
+        void setCurrentBufferPeak(const std::pair<float, float> &peak);
 
     private:
         std::map<int, int> vuPosToDb{
@@ -42,8 +40,9 @@ namespace mpc::lcdgui::screens
         int time = 100;
         int monitor = 0;
         int preRec = 100;
-        float peakL = 0;
-        float peakR = 0;
+        std::pair<float, float> peak;
+        std::atomic<float> currentBufferPeakL;
+        std::atomic<float> currentBufferPeakR;
 
         void setInput(int i);
         void setThreshold(int i);
@@ -58,11 +57,11 @@ namespace mpc::lcdgui::screens
         void displayTime();
         void displayMonitor();
         void displayPreRec();
-        void updateVU(float levelL, float levelR);
+        void updateVU();
 
     public:
-        int getMode();
-        int getMonitor();
+        int getMode() const;
+        int getMonitor() const;
 
     private:
         const std::string vu_normal = u8"\u00F5";
@@ -77,6 +76,6 @@ namespace mpc::lcdgui::screens
         std::vector<std::string> monitorNames{"OFF", "L/R", "1/2",
                                               "3/4", "5/6", "7/8"};
 
-        friend class mpc::audiomidi::SoundRecorder;
+        friend class audiomidi::SoundRecorder;
     };
 } // namespace mpc::lcdgui::screens
