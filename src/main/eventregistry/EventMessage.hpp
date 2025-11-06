@@ -1,10 +1,7 @@
 #pragma once
 
-#include "IntTypes.hpp"
-
 #include "eventregistry/EventTypes.hpp"
 
-#include <optional>
 #include <functional>
 
 namespace mpc::eventregistry
