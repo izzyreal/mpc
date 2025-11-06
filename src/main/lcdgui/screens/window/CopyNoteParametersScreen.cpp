@@ -126,13 +126,13 @@ void CopyNoteParametersScreen::displayNote1() const
 
 void CopyNoteParametersScreen::setProg0(const int i)
 {
-    prog0 = std::clamp(i, 0, sampler->getProgramCount());
+    prog0 = std::clamp(i, 0, sampler->getProgramCount() - 1);
     displayProg0();
 }
 
 void CopyNoteParametersScreen::setProg1(const int i)
 {
-    prog1 = std::clamp(i, 0, sampler->getProgramCount());
+    prog1 = std::clamp(i, 0, sampler->getProgramCount() - 1);
     displayProg1();
 }
 

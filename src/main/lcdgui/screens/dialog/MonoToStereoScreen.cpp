@@ -213,6 +213,6 @@ void MonoToStereoScreen::displayNewStName() const
 
 void MonoToStereoScreen::setRSource(const int i)
 {
-    rSource = std::clamp(i, 0, sampler->getSoundCount() - 1);
+    rSource = std::clamp(i, 0, std::max(0, sampler->getSoundCount() - 1));
     displayRSource();
 }

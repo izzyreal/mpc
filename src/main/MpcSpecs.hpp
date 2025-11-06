@@ -23,6 +23,7 @@ namespace mpc
         static constexpr uint8_t DRUM_BUS_COUNT = 4;
         static constexpr uint8_t TOTAL_BUS_COUNT =
             MIDI_BUS_COUNT + DRUM_BUS_COUNT;
+        static constexpr uint8_t LAST_BUS_INDEX = TOTAL_BUS_COUNT - 1;
         static constexpr uint8_t TRACK_COUNT = 64;
         static constexpr uint8_t LAST_TRACK_INDEX = TRACK_COUNT - 1;
         static constexpr uint8_t SEQUENCE_COUNT = 99;

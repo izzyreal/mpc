@@ -274,7 +274,7 @@ void UserScreen::setLoop(bool b)
 
 void UserScreen::setBus(int i)
 {
-    bus = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::TOTAL_BUS_COUNT));
+    bus = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_BUS_INDEX));
     displayBus();
     displayDeviceName();
 }
