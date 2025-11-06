@@ -2,7 +2,7 @@
 
 #include "nvram/DefaultsParser.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"

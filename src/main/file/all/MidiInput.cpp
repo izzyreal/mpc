@@ -1,6 +1,6 @@
 #include "MidiInput.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "file/BitUtil.hpp"
 

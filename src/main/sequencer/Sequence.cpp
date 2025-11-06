@@ -1,6 +1,6 @@
 #include "Sequence.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -18,14 +18,14 @@ using namespace mpc::lcdgui::screens;
 Sequence::Sequence(
     std::function<std::string(int)> getDefaultTrackName,
     std::function<int64_t()> getTickPosition,
-    std::function<std::shared_ptr<lcdgui::Screens>()> getScreens,
+    std::function<std::shared_ptr<Screens>()> getScreens,
     std::function<bool()> isRecordingModeMulti,
     std::function<std::shared_ptr<Sequence>()> getActiveSequence,
     std::function<int()> getAutoPunchMode,
     std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
     std::function<bool()> isEraseButtonPressed,
     std::function<bool(int, std::shared_ptr<Program>)> isProgramPadPressed,
-    std::shared_ptr<sampler::Sampler> sampler,
+    std::shared_ptr<Sampler> sampler,
     std::shared_ptr<audiomidi::EventHandler> eventHandler,
     std::function<bool()> isSixteenLevelsEnabled,
     std::function<int()> getActiveTrackIndex, std::function<bool()> isRecording,
@@ -66,27 +66,27 @@ Sequence::Sequence(
     }
 }
 
-void Sequence::setLoopStart(int l)
+void Sequence::setLoopStart(const int l)
 {
     loopStart = l;
 }
 
-int Sequence::getLoopStart()
+int Sequence::getLoopStart() const
 {
     return loopStart;
 }
 
-void Sequence::setLoopEnd(int l)
+void Sequence::setLoopEnd(const int l)
 {
     loopEnd = l;
 }
 
-int Sequence::getLoopEnd()
+int Sequence::getLoopEnd() const
 {
     return loopEnd;
 }
 
-void Sequence::setFirstLoopBarIndex(int i)
+void Sequence::setFirstLoopBarIndex(const int i)
 {
     firstLoopBarIndex = std::clamp(i, 0, lastLoopBarIndex);
 
@@ -96,7 +96,7 @@ void Sequence::setFirstLoopBarIndex(int i)
     }
 }
 
-int Sequence::getFirstLoopBarIndex()
+int Sequence::getFirstLoopBarIndex() const
 {
     return firstLoopBarIndex;
 }
@@ -139,7 +139,7 @@ void Sequence::setLastLoopBarIndex(int i)
     lastLoopBarIndex = i;
 }
 
-int Sequence::getLastLoopBarIndex()
+int Sequence::getLastLoopBarIndex() const
 {
     if (lastLoopBarEnd)
     {
@@ -149,12 +149,12 @@ int Sequence::getLastLoopBarIndex()
     return lastLoopBarIndex;
 }
 
-bool Sequence::isLoopEnabled()
+bool Sequence::isLoopEnabled() const
 {
     return loopEnabled;
 }
 
-void Sequence::setName(std::string s)
+void Sequence::setName(const std::string &s)
 {
     name = s;
 }
@@ -169,52 +169,52 @@ std::string Sequence::getName()
     return name;
 }
 
-void Sequence::setDeviceName(int i, std::string s)
+void Sequence::setDeviceName(const int i, const std::string &s)
 {
     deviceNames[i] = s;
 }
 
-std::string Sequence::getDeviceName(int i)
+std::string Sequence::getDeviceName(const int i)
 {
     return deviceNames[i];
 }
 
-void Sequence::setLastBarIndex(int i)
+void Sequence::setLastBarIndex(const int i)
 {
     lastBarIndex = std::clamp(i, 0, 998);
 }
 
-int Sequence::getLastBarIndex()
+int Sequence::getLastBarIndex() const
 {
     return lastBarIndex;
 }
 
-int Sequence::getBarCount()
+int Sequence::getBarCount() const
 {
     return lastBarIndex + 1;
 }
 
-void Sequence::setLoopEnabled(bool b)
+void Sequence::setLoopEnabled(const bool b)
 {
     loopEnabled = b;
 }
 
-std::shared_ptr<Track> Sequence::getTrack(int i)
+std::shared_ptr<Track> Sequence::getTrack(const int i)
 {
     return tracks[i];
 }
 
-void Sequence::setUsed(bool b)
+void Sequence::setUsed(const bool b)
 {
     used = b;
 }
 
-bool Sequence::isUsed()
+bool Sequence::isUsed() const
 {
     return used;
 }
 
-void Sequence::init(int newLastBarIndex)
+void Sequence::init(const int newLastBarIndex)
 {
     auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     initialTempo = userScreen->tempo;
@@ -242,14 +242,16 @@ void Sequence::init(int newLastBarIndex)
     used = true;
 }
 
-void Sequence::setTimeSignature(int firstBar, int tsLastBar, int num, int den)
+void Sequence::setTimeSignature(const int firstBar, const int tsLastBar,
+                                const int num, const int den)
 {
-    sequencer::SeqUtil::setTimeSignature(this, firstBar, tsLastBar, num, den);
+    SeqUtil::setTimeSignature(this, firstBar, tsLastBar, num, den);
 }
 
-void Sequence::setTimeSignature(int barIndex, int num, int den)
+void Sequence::setTimeSignature(const int barIndex, const int num,
+                                const int den)
 {
-    sequencer::SeqUtil::setTimeSignature(this, barIndex, num, den);
+    SeqUtil::setTimeSignature(this, barIndex, num, den);
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()
@@ -262,12 +264,13 @@ std::vector<std::string> &Sequence::getDeviceNames()
     return deviceNames;
 }
 
-void Sequence::setDeviceNames(std::vector<std::string> &sa)
+void Sequence::setDeviceNames(const std::vector<std::string> &sa)
 {
     deviceNames = sa;
 }
 
-std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
+std::vector<std::shared_ptr<TempoChangeEvent>>
+Sequence::getTempoChangeEvents() const
 {
     if (!tempoTrackIsInitialized.load())
     {
@@ -284,14 +287,14 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
     return res;
 }
 
-std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent(int tick)
+std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent(const int tick)
 {
     auto res = std::make_shared<TempoChangeEvent>(this);
     tempoChangeTrack->addEvent(tick, res);
     return res;
 }
 
-double Sequence::getInitialTempo()
+double Sequence::getInitialTempo() const
 {
     return initialTempo;
 }
@@ -310,22 +313,22 @@ void Sequence::setInitialTempo(const double newInitialTempo)
     }
 }
 
-void Sequence::removeTempoChangeEvent(int i)
+void Sequence::removeTempoChangeEvent(const int i) const
 {
     tempoChangeTrack->removeEvent(i);
 }
 
-bool Sequence::isTempoChangeOn()
+bool Sequence::isTempoChangeOn() const
 {
     return tempoChangeOn;
 }
 
-void Sequence::setTempoChangeOn(bool b)
+void Sequence::setTempoChangeOn(const bool b)
 {
     tempoChangeOn = b;
 }
 
-int Sequence::getLastTick()
+int Sequence::getLastTick() const
 {
     int lastTick = 0;
 
@@ -337,7 +340,7 @@ int Sequence::getLastTick()
     return lastTick;
 }
 
-TimeSignature Sequence::getTimeSignature()
+TimeSignature Sequence::getTimeSignature() const
 {
     auto ts = TimeSignature();
     int bar = getCurrentBarIndex();
@@ -361,18 +364,18 @@ void Sequence::purgeAllTracks()
     }
 }
 
-std::shared_ptr<Track> Sequence::purgeTrack(int i)
+std::shared_ptr<Track> Sequence::purgeTrack(const int i)
 {
     tracks[i]->purge();
     return tracks[i];
 }
 
-int Sequence::getDenominator(int i)
+int Sequence::getDenominator(const int i) const
 {
     return denominators[i];
 }
 
-int Sequence::getNumerator(int i)
+int Sequence::getNumerator(const int i) const
 {
     return numerators[i];
 }
@@ -382,12 +385,12 @@ std::vector<int> &Sequence::getBarLengthsInTicks()
     return barLengthsInTicks;
 }
 
-void Sequence::setBarLengths(std::vector<int> &newBarLengths)
+void Sequence::setBarLengths(const std::vector<int> &newBarLengths)
 {
     barLengthsInTicks = newBarLengths;
 }
 
-void Sequence::deleteBars(int firstBar, int _lastBar)
+void Sequence::deleteBars(const int firstBar, int _lastBar)
 {
     if (lastBarIndex == -1)
     {
@@ -500,7 +503,7 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
     }
 }
 
-void Sequence::insertBars(int barCount, int afterBar)
+void Sequence::insertBars(int barCount, const int afterBar)
 {
     const bool isAppending = afterBar - 1 == lastBarIndex;
 
@@ -602,7 +605,7 @@ bool trackIndexComparator(const std::shared_ptr<Track> &t0,
     return t0->getIndex() < t1->getIndex();
 }
 
-void Sequence::moveTrack(int source, int destination)
+void Sequence::moveTrack(const int source, const int destination)
 {
     if (source == destination)
     {
@@ -634,12 +637,12 @@ void Sequence::moveTrack(int source, int destination)
     sort(begin(tracks), end(tracks), trackIndexComparator);
 }
 
-bool Sequence::isLastLoopBarEnd()
+bool Sequence::isLastLoopBarEnd() const
 {
     return lastLoopBarEnd;
 }
 
-int Sequence::getEventCount()
+int Sequence::getEventCount() const
 {
     auto counter = 0;
 
@@ -697,22 +700,23 @@ std::vector<int> &Sequence::getDenominators()
     return denominators;
 }
 
-void Sequence::setNumeratorsAndDenominators(std::vector<int> &newNumerators,
-                                            std::vector<int> &newDenominators)
+void Sequence::setNumeratorsAndDenominators(
+    const std::vector<int> &newNumerators,
+    const std::vector<int> &newDenominators)
 {
     numerators = newNumerators;
     denominators = newDenominators;
 }
 
-int Sequence::getFirstTickOfBeat(int bar, int beat)
+int Sequence::getFirstTickOfBeat(const int bar, const int beat) const
 {
     auto barStart = getFirstTickOfBar(bar);
     auto den = denominators[bar];
-    auto beatTicks = (int)(96 * (4.0 / den));
+    auto beatTicks = static_cast<int>(96 * (4.0 / den));
     return barStart + (beat * beatTicks);
 }
 
-int Sequence::getFirstTickOfBar(int index)
+int Sequence::getFirstTickOfBar(const int index) const
 {
     int res = 0;
 
@@ -724,12 +728,12 @@ int Sequence::getFirstTickOfBar(int index)
     return res;
 }
 
-int Sequence::getLastTickOfBar(int index)
+int Sequence::getLastTickOfBar(const int index) const
 {
     return getFirstTickOfBar(index) + barLengthsInTicks[index] - 1;
 }
 
-void Sequence::resetTrackEventIndices(int tick)
+void Sequence::resetTrackEventIndices(const int tick) const
 {
     if (!isUsed() || tick > getLastTick())
     {

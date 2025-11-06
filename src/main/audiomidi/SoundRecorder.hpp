@@ -79,11 +79,11 @@ namespace mpc::audiomidi
         void cancel();
         int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
                          int nFrames) override;
-        bool isRecording();
-        unsigned int getInputGain();
+        bool isRecording() const;
+        unsigned int getInputGain() const;
         void setInputGain(unsigned int);
         void setArmed(bool b);
-        bool isArmed();
+        bool isArmed() const;
 
         SoundRecorder(mpc::Mpc &mpc);
 

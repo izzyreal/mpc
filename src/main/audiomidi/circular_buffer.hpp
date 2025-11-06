@@ -13,7 +13,7 @@ template <class T> class circular_buffer
 {
 
 public:
-    circular_buffer(size_t size)
+    explicit circular_buffer(const size_t size)
         : buf_(std::unique_ptr<T[]>(new T[size])), size_(size)
     {
         // empty constructor
@@ -21,7 +21,7 @@ public:
 
     void put(T item)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard lock(mutex_);
 
         buf_[head_] = item;
         head_ = (head_ + 1) % size_;
@@ -37,7 +37,7 @@ public:
         tail_ = head_;
     }
 
-    void move(int delta)
+    void move(const int delta)
     {
         tail_ += delta;
         if (tail_ >= size_)
@@ -61,7 +61,7 @@ public:
 
     T get(void)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard lock(mutex_);
 
         if (empty())
         {
@@ -75,30 +75,30 @@ public:
         return val;
     }
 
-    void reset(void)
+    void reset()
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard lock(mutex_);
         head_ = tail_;
     }
 
-    bool empty(void)
+    bool empty() const
     {
         // if head and tail are equal, we are empty
         return head_ == tail_;
     }
 
-    bool full(void)
+    bool full() const
     {
         // If tail is ahead the head by 1, we are full
         return ((head_ + 1) % size_) == tail_;
     }
 
-    size_t size(void)
+    size_t size() const
     {
         return size_ - 1;
     }
 
-    size_t available(void)
+    size_t available() const
     {
         if (head_ < tail_)
         {

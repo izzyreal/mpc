@@ -14,6 +14,7 @@
 #include "eventregistry/EventRegistry.hpp"
 #include "sequencer/Track.hpp"
 #include <memory>
+#include <utility>
 
 using namespace mpc::command;
 using namespace mpc::command::context;
@@ -21,7 +22,7 @@ using namespace mpc::sampler;
 
 TriggerLocalNoteOnCommand::TriggerLocalNoteOnCommand(
     std::shared_ptr<TriggerLocalNoteOnContext> ctx)
-    : ctx(ctx)
+    : ctx(std::move(ctx))
 {
 }
 
@@ -44,7 +45,7 @@ void TriggerLocalNoteOnCommand::execute()
     }
 
     auto apply16LevelsAndSliderNoteVariation =
-        [&](std::shared_ptr<sequencer::NoteOnEvent> noteEventToApplyTo)
+        [&](const std::shared_ptr<sequencer::NoteOnEvent> &noteEventToApplyTo)
     {
         if (ctx->program && ctx->programPadIndex)
         {

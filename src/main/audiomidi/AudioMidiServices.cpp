@@ -1,6 +1,4 @@
 #include "AudioMidiServices.hpp"
-#include "controller/ClientEventController.hpp"
-#include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
@@ -29,7 +27,6 @@
 #include "engine/control/CompoundControl.hpp"
 #include "engine/control/BooleanControl.hpp"
 
-#include "sampler/Sampler.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -91,8 +88,9 @@ void AudioMidiServices::start()
 
     mixer->getStrip(std::string("66"))->setDirectOutputProcess(soundRecorder);
     mixer->getStrip(std::string("67"))->setInputProcess(soundPlayer);
-    auto sc = mixer->getMixerControls()->getStripControls("67");
-    auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
+    const auto sc = mixer->getMixerControls()->getStripControls("67");
+    const auto mmc =
+        std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(100));
 
@@ -108,19 +106,22 @@ void AudioMidiServices::start()
     offlineServer->start();
 }
 
-void AudioMidiServices::setMonitorLevel(int level)
+void AudioMidiServices::setMonitorLevel(const int level) const
 {
-    auto sc = mixer->getMixerControls()->getStripControls("66");
-    auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
+    const auto sc = mixer->getMixerControls()->getStripControls("66");
+    const auto mmc =
+        std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(level));
 }
 
-void AudioMidiServices::muteMonitor(bool mute)
+void AudioMidiServices::muteMonitor(const bool mute) const
 {
-    auto sc = mixer->getMixerControls()->getStripControls("66");
-    auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-    auto mc = std::dynamic_pointer_cast<BooleanControl>(mmc->find("Mute"));
+    const auto sc = mixer->getMixerControls()->getStripControls("66");
+    const auto mmc =
+        std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
+    const auto mc =
+        std::dynamic_pointer_cast<BooleanControl>(mmc->find("Mute"));
     mc->setValue(mute);
 }
 
@@ -134,7 +135,7 @@ std::shared_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
     return soundPlayer;
 }
 
-NonRealTimeAudioServer *AudioMidiServices::getAudioServer()
+NonRealTimeAudioServer *AudioMidiServices::getAudioServer() const
 {
     return offlineServer.get();
 }
@@ -157,41 +158,43 @@ void AudioMidiServices::setupMixer()
      * There are 32 voices. Each voice has one channel for mixing to STEREO OUT
      * L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are
      * strips 1-64. There's one channel for the PreviewSoundPlayer, which plays
-     * the metronome, preview and playX sounds. This is strip 65. Finally
+     * the metronome, preview and playX sounds. This is strip 65. Finally,
      * there's one channel to receive and monitor sampler input, this is strip
-     * 66, and one for playing quick previews, on strip 67. Hence nMixerChans =
+     * 66, and one for playing quick previews, on strip 67. Hence, nMixerChans =
      * 67
      */
-    int nMixerChans = 67;
+    constexpr int nMixerChans = 67;
     MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
     mixer = std::make_shared<AudioMixer>(mixerControls, offlineServer);
     muteMonitor(true);
     setAssignableMixOutLevels();
 }
 
-void AudioMidiServices::setMainLevel(int i)
+void AudioMidiServices::setMainLevel(const int i) const
 {
-    auto sc = mixer->getMixerControls()->getStripControls("L-R");
-    auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
+    const auto sc = mixer->getMixerControls()->getStripControls("L-R");
+    const auto cc =
+        std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
     std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->setValue(i);
 }
 
-int AudioMidiServices::getMainLevel()
+int AudioMidiServices::getMainLevel() const
 {
-    auto sc = mixer->getMixerControls()->getStripControls("L-R");
-    auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
-    auto val =
+    const auto sc = mixer->getMixerControls()->getStripControls("L-R");
+    const auto cc =
+        std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
+    const auto val =
         std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->getValue();
-    return (int)(val);
+    return static_cast<int>(val);
 }
 
-void AudioMidiServices::setRecordLevel(int i)
+void AudioMidiServices::setRecordLevel(const int i) const
 {
     soundRecorder->setInputGain(i);
     setMonitorLevel(i);
 }
 
-int AudioMidiServices::getRecordLevel()
+int AudioMidiServices::getRecordLevel() const
 {
     return soundRecorder->getInputGain();
     /*
@@ -203,7 +206,7 @@ int AudioMidiServices::getRecordLevel()
     */
 }
 
-void AudioMidiServices::setAssignableMixOutLevels()
+void AudioMidiServices::setAssignableMixOutLevels() const
 {
     /*
      * We have to make sure the ASSIGNABLE MIX OUTs are audible. They're fixed
@@ -211,15 +214,16 @@ void AudioMidiServices::setAssignableMixOutLevels()
      */
     for (auto j = 1; j <= 4; j++)
     {
-        std::string name = "AUX#" + std::to_string(j);
-        auto sc = mixer->getMixerControls()->getStripControls(name);
-        auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find(name));
+        const std::string name = "AUX#" + std::to_string(j);
+        const auto sc = mixer->getMixerControls()->getStripControls(name);
+        const auto cc =
+            std::dynamic_pointer_cast<CompoundControl>(sc->find(name));
         std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))
             ->setValue(100);
     }
 }
 
-PreviewSoundPlayer &AudioMidiServices::getPreviewSoundPlayer()
+PreviewSoundPlayer &AudioMidiServices::getPreviewSoundPlayer() const
 {
     return *basicSoundPlayerChannel.get();
 }
@@ -241,14 +245,14 @@ void AudioMidiServices::connectVoices()
 {
     for (auto j = 0; j < 32; j++)
     {
-        auto ams1 = mixer->getStrip(std::to_string(j + 1));
+        const auto ams1 = mixer->getStrip(std::to_string(j + 1));
         auto voice = voices[j];
         ams1->setInputProcess(voice);
         mixerConnections.emplace_back(
             new MixerInterconnection("con" + std::to_string(j), server.get()));
-        auto &mi = mixerConnections.back();
+        const auto &mi = mixerConnections.back();
         ams1->setDirectOutputProcess(mi->getInputProcess());
-        auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
+        const auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
         ams2->setInputProcess(mi->getOutputProcess());
     }
 
@@ -276,7 +280,7 @@ void AudioMidiServices::initializeDiskRecorders()
     }
 }
 
-void AudioMidiServices::destroyServices()
+void AudioMidiServices::destroyServices() const
 {
     offlineServer->stop();
     closeIO();
@@ -284,7 +288,7 @@ void AudioMidiServices::destroyServices()
     offlineServer->close();
 }
 
-void AudioMidiServices::closeIO()
+void AudioMidiServices::closeIO() const
 {
     server->closeAudioInput(inputProcess);
 
@@ -294,7 +298,7 @@ void AudioMidiServices::closeIO()
     }
 }
 
-bool AudioMidiServices::prepareBouncing(DirectToDiskSettings *settings)
+bool AudioMidiServices::prepareBouncing(const DirectToDiskSettings *settings)
 {
     const auto destinationDirectory =
         mpc.paths->recordingsPath() / settings->recordingName;
@@ -303,7 +307,7 @@ bool AudioMidiServices::prepareBouncing(DirectToDiskSettings *settings)
 
     for (int i = 0; i < diskRecorders.size(); i++)
     {
-        auto eapa = diskRecorders[i];
+        const auto eapa = diskRecorders[i];
 
         if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate,
                            !settings->splitStereoIntoLeftAndRightChannel,
@@ -339,19 +343,19 @@ void AudioMidiServices::stopBouncing()
         ScreenId::VmpcRecordingFinishedScreen);
     bouncing.store(false);
 
-    auto directToDiskRecorderScreen =
+    const auto directToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (directToDiskRecorderScreen->seqLoopWasEnabled)
     {
-        auto seq =
+        const auto seq =
             mpc.getSequencer()->getSequence(directToDiskRecorderScreen->sq);
         seq->setLoopEnabled(true);
         directToDiskRecorderScreen->seqLoopWasEnabled = false;
     }
     else if (directToDiskRecorderScreen->songLoopWasEnabled)
     {
-        auto song =
+        const auto song =
             mpc.getSequencer()->getSong(directToDiskRecorderScreen->song);
         song->setLoopEnabled(true);
         directToDiskRecorderScreen->songLoopWasEnabled = false;
@@ -365,7 +369,7 @@ void AudioMidiServices::stopBouncingEarly()
         return;
     }
 
-    for (auto &recorder : diskRecorders)
+    for (const auto &recorder : diskRecorders)
     {
         recorder->stopEarly();
     }
@@ -378,7 +382,7 @@ void AudioMidiServices::startRecordingSound()
     recordingSound.store(true);
 }
 
-void AudioMidiServices::stopSoundRecorder(bool cancel)
+void AudioMidiServices::stopSoundRecorder(const bool cancel)
 {
     if (cancel)
     {
@@ -388,17 +392,17 @@ void AudioMidiServices::stopSoundRecorder(bool cancel)
     recordingSound.store(false);
 }
 
-bool AudioMidiServices::isBouncePrepared()
+bool AudioMidiServices::isBouncePrepared() const
 {
     return bouncePrepared;
 }
 
-const bool AudioMidiServices::isBouncing()
+bool AudioMidiServices::isBouncing() const
 {
     return bouncing.load();
 }
 
-const bool AudioMidiServices::isRecordingSound()
+bool AudioMidiServices::isRecordingSound() const
 {
     return recordingSound.load();
 }
@@ -429,7 +433,7 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
 // Should be called from the audio thread only!
 void AudioMidiServices::changeBounceStateIfRequired()
 {
-    auto directToDiskRecorderScreen =
+    const auto directToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (isBouncing() && !wasBouncing)
@@ -460,7 +464,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
             mpc.getSequencer()->getFrameSequencer()->start();
         }
 
-        for (auto &diskRecorder : diskRecorders)
+        for (const auto &diskRecorder : diskRecorders)
         {
             diskRecorder->start();
         }
@@ -481,9 +485,9 @@ void AudioMidiServices::changeBounceStateIfRequired()
 }
 
 // Should be called from the audio thread only!
-void AudioMidiServices::switchMidiControlMappingIfRequired()
+void AudioMidiServices::switchMidiControlMappingIfRequired() const
 {
-    auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
+    const auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
 
     if (vmpcMidiScreen->shouldSwitch.load())
     {
@@ -498,7 +502,7 @@ void AudioMidiServices::switchMidiControlMappingIfRequired()
     }
 }
 
-void AudioMidiServices::setMixerMasterLevel(int8_t dbValue)
+void AudioMidiServices::setMixerMasterLevel(const int8_t dbValue) const
 {
     for (auto &v : voices)
     {

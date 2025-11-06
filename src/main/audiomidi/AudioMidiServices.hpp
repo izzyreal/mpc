@@ -54,17 +54,43 @@ namespace mpc::audiomidi
 
     class AudioMidiServices final
     {
+    public:
+        explicit AudioMidiServices(Mpc &mpcToUse);
+        ~AudioMidiServices();
+        void start();
+
+        engine::audio::server::NonRealTimeAudioServer *getAudioServer() const;
+
+        std::shared_ptr<SoundRecorder> getSoundRecorder();
+        std::shared_ptr<SoundPlayer> getSoundPlayer();
+        void setMainLevel(int i) const;
+        int getMainLevel() const;
+        void setMixerMasterLevel(int8_t dbValue) const;
+        void setRecordLevel(int i) const;
+        int getRecordLevel() const;
+        void muteMonitor(bool mute) const;
+        engine::PreviewSoundPlayer &getPreviewSoundPlayer() const;
+        void initializeDiskRecorders();
+        void closeIO() const;
+
+        void connectVoices();
+        void destroyServices() const;
+        bool prepareBouncing(const DirectToDiskSettings *settings);
+        bool isBouncePrepared() const;
+
+        std::shared_ptr<engine::audio::mixer::AudioMixer> getMixer();
+        std::vector<std::shared_ptr<engine::Voice>> &getVoices();
+        std::vector<engine::MixerInterconnection *> &getMixerConnections();
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
         std::atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess>
-            monitorInputAdapter;
+        std::shared_ptr<engine::audio::core::AudioProcess> monitorInputAdapter;
 
     public:
-        const bool isBouncing();
-        const bool isRecordingSound();
+        bool isBouncing() const;
+        bool isRecordingSound() const;
         void startBouncing();
         void stopBouncing();
         void stopBouncingEarly();
@@ -78,72 +104,35 @@ namespace mpc::audiomidi
         void changeBounceStateIfRequired();
 
         // Should be called from the audio thread only!
-        void switchMidiControlMappingIfRequired();
+        void switchMidiControlMappingIfRequired() const;
 
     private:
         bool bouncePrepared = false;
         bool wasRecordingSound = false;
         bool wasBouncing = false;
-        std::vector<std::shared_ptr<mpc::engine::control::CompoundControl>>
+        std::vector<std::shared_ptr<engine::control::CompoundControl>>
             soundPlayerChannelControls;
-        std::unique_ptr<mpc::engine::PreviewSoundPlayer>
-            basicSoundPlayerChannel;
-        std::vector<std::shared_ptr<mpc::engine::Voice>> voices;
-        std::vector<mpc::engine::MixerInterconnection *> mixerConnections;
-        std::shared_ptr<mpc::engine::Voice> basicVoice;
-        std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
-        std::shared_ptr<mpc::engine::audio::server::NonRealTimeAudioServer>
+        std::unique_ptr<engine::PreviewSoundPlayer> basicSoundPlayerChannel;
+        std::vector<std::shared_ptr<engine::Voice>> voices;
+        std::vector<engine::MixerInterconnection *> mixerConnections;
+        std::shared_ptr<engine::Voice> basicVoice;
+        std::shared_ptr<engine::audio::server::AudioServer> server;
+        std::shared_ptr<engine::audio::server::NonRealTimeAudioServer>
             offlineServer;
-        std::shared_ptr<mpc::engine::audio::system::DefaultAudioSystem>
-            audioSystem;
-        std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
-        std::shared_ptr<mpc::engine::audio::mixer::MixerControls> mixerControls;
-        std::shared_ptr<mpc::engine::audio::server::CompoundAudioClient> cac;
+        std::shared_ptr<engine::audio::system::DefaultAudioSystem> audioSystem;
+        std::shared_ptr<engine::audio::mixer::AudioMixer> mixer;
+        std::shared_ptr<engine::audio::mixer::MixerControls> mixerControls;
+        std::shared_ptr<engine::audio::server::CompoundAudioClient> cac;
         std::shared_ptr<MidiOutput> midiOutput;
-        mpc::engine::audio::server::IOAudioProcess *inputProcess = nullptr;
-        std::vector<mpc::engine::audio::server::IOAudioProcess *>
-            outputProcesses;
+        engine::audio::server::IOAudioProcess *inputProcess = nullptr;
+        std::vector<engine::audio::server::IOAudioProcess *> outputProcesses;
         std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
         std::shared_ptr<SoundRecorder> soundRecorder;
         std::shared_ptr<SoundPlayer> soundPlayer;
 
-    private:
         void setupMixer();
-        void setAssignableMixOutLevels();
+        void setAssignableMixOutLevels() const;
         void createSynth();
-        void setMonitorLevel(int level);
-
-    public:
-        mpc::engine::audio::server::NonRealTimeAudioServer *getAudioServer();
-
-        std::shared_ptr<SoundRecorder> getSoundRecorder();
-        std::shared_ptr<SoundPlayer> getSoundPlayer();
-        void setMainLevel(int i);
-        int getMainLevel();
-        void setMixerMasterLevel(int8_t dbValue);
-        void setRecordLevel(int i);
-        int getRecordLevel();
-        void muteMonitor(bool mute);
-        mpc::engine::PreviewSoundPlayer &getPreviewSoundPlayer();
-        void initializeDiskRecorders();
-        void closeIO();
-
-    public:
-        void connectVoices();
-        std::shared_ptr<MidiOutput> getMidiOutput();
-        void destroyServices();
-        bool prepareBouncing(DirectToDiskSettings *settings);
-        bool isBouncePrepared();
-
-        std::shared_ptr<engine::audio::mixer::AudioMixer> getMixer();
-        std::vector<std::shared_ptr<engine::Voice>> &getVoices();
-        std::vector<mpc::engine::MixerInterconnection *> &getMixerConnections();
-
-    public:
-        void start();
-
-    public:
-        AudioMidiServices(mpc::Mpc &mpcToUse);
-        ~AudioMidiServices();
+        void setMonitorLevel(int level) const;
     };
 } // namespace mpc::audiomidi

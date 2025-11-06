@@ -1,6 +1,6 @@
 #include "sampler/Pad.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "lcdgui/screens/PgmAssignScreen.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
@@ -16,7 +16,7 @@ std::vector<int> Pad::originalPadNotes = {
     52, 57, 58, 59, 60, 61, 67, 68, 70, 72, 75, 78, 79, 35, 41, 50,
     83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98};
 
-std::vector<int> &Pad::getPadNotes(mpc::Mpc &mpc)
+std::vector<int> &Pad::getPadNotes(const Mpc &mpc)
 {
     auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
@@ -42,13 +42,13 @@ std::vector<int> &Pad::getPadNotes(mpc::Mpc &mpc)
     }
 }
 
-Pad::Pad(mpc::Mpc &mpc, int indexToUse) : mpc(mpc)
+Pad::Pad(Mpc &mpc, const int indexToUse) : mpc(mpc)
 {
     index = indexToUse;
     note = getPadNotes(mpc)[indexToUse];
 }
 
-void Pad::setNote(int i)
+void Pad::setNote(const int i)
 {
     if (i < 34 || i > 98)
     {
@@ -67,7 +67,7 @@ void Pad::setNote(int i)
     }
 }
 
-int Pad::getNote()
+int Pad::getNote() const
 {
     auto pgmAssignScreen = mpc.screens->get<ScreenId::PgmAssignScreen>();
 
@@ -79,7 +79,7 @@ int Pad::getNote()
     return note;
 }
 
-int Pad::getIndex()
+int Pad::getIndex() const
 {
     return index;
 }

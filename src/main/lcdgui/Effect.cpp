@@ -1,6 +1,6 @@
 #include "Effect.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 using namespace mpc::lcdgui;
 

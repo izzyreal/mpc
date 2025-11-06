@@ -1,15 +1,13 @@
 #pragma once
 
-#include <Observer.hpp>
-
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace mpc::sampler
 {
-    class Sound : public Observable
+    class Sound
     {
-
-    private:
         std::string name;
         int numberOfBeats{4};
         bool mono = false, loopEnabled = false;
@@ -20,10 +18,10 @@ namespace mpc::sampler
 
         // Should only be called on newly created sounds that are unassigned
         void insertFrames(std::vector<float> &left, std::vector<float> &right,
-                          unsigned int index, uint32_t nFrames);
+                          unsigned int index, uint32_t nFrames) const;
 
     public:
-        void setName(std::string s);
+        void setName(const std::string &s);
         std::shared_ptr<const std::vector<float>> getSampleData() const;
 
         // Should only be called on newly created sounds that are unassigned
@@ -31,22 +29,22 @@ namespace mpc::sampler
 
         // Swaps the existing sampleData with another one, without destroying
         // the existing one
-        void setSampleData(std::shared_ptr<std::vector<float>>);
-        int getTune();
-        int getStart();
-        int getEnd();
-        bool isLoopEnabled();
-        int getLoopTo();
-        bool isMono();
-        int getLastFrameIndex();
-        int getSndLevel();
+        void setSampleData(const std::shared_ptr<std::vector<float>> &);
+        int getTune() const;
+        int getStart() const;
+        int getEnd() const;
+        bool isLoopEnabled() const;
+        int getLoopTo() const;
+        bool isMono() const;
+        int getLastFrameIndex() const;
+        int getSndLevel() const;
 
         void setBeatCount(int i);
-        int getBeatCount();
+        int getBeatCount() const;
         std::string getName();
-        int getSampleRate();
+        int getSampleRate() const;
         void setSampleRate(int sr);
-        int getFrameCount();
+        int getFrameCount() const;
         void setMono(bool mono);
         void setEnd(int end);
         void setLevel(int level);
@@ -56,17 +54,18 @@ namespace mpc::sampler
         void setTune(int tune);
 
         // Should only be called on newly created sounds that are unassigned
-        void insertFrame(std::vector<float> frame, unsigned int index);
+        void insertFrame(const std::vector<float> &frame,
+                         unsigned int index) const;
         // Should only be called on newly created sounds that are unassigned
         void insertFrames(std::vector<float> &frames, unsigned int index,
-                          uint32_t nFrames);
+                          uint32_t nFrames) const;
         // Should only be called on newly created sounds that are unassigned
-        void appendFrames(std::vector<float> &frames, uint32_t nFrames);
+        void appendFrames(std::vector<float> &frames, uint32_t nFrames) const;
         // Should only be called on newly created sounds that are unassigned
         void appendFrames(std::vector<float> &left, std::vector<float> &right,
-                          uint32_t nFrames);
+                          uint32_t nFrames) const;
         // Should only be called on newly created sounds that are unassigned
-        void removeFramesFromEnd(int numFramesToRemove);
+        void removeFramesFromEnd(int numFramesToRemove) const;
 
         Sound(int rate);
     };

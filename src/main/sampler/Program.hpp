@@ -1,7 +1,7 @@
 #pragma once
 
-#include <sampler/NoteParameters.hpp>
-#include <sampler/PgmSlider.hpp>
+#include "sampler/NoteParameters.hpp"
+#include "sampler/PgmSlider.hpp"
 
 #include <memory>
 
@@ -26,11 +26,11 @@ namespace mpc::sampler
 
     public:
         std::shared_ptr<mpc::engine::StereoMixer>
-        getStereoMixerChannel(int noteIndex);
+        getStereoMixerChannel(int noteIndex) const;
         std::shared_ptr<mpc::engine::IndivFxMixer>
-        getIndivFxMixerChannel(int noteIndex);
+        getIndivFxMixerChannel(int noteIndex) const;
 
-        int getPadIndexFromNote(int note);
+        int getPadIndexFromNote(int note) const;
 
     private:
         Sampler *sampler = nullptr;
@@ -43,19 +43,19 @@ namespace mpc::sampler
         void init();
 
     public:
-        int getNumberOfSamples();
-        void setName(std::string s);
+        int getNumberOfSamples() const;
+        void setName(const std::string &s);
         std::string getName();
-        Pad *getPad(int i);
+        Pad *getPad(int i) const;
         std::vector<NoteParameters *> getNotesParameters();
-        NoteParameters *getNoteParameters(int note);
-        mpc::sampler::PgmSlider *getSlider();
+        NoteParameters *getNoteParameters(int note) const;
+        mpc::sampler::PgmSlider *getSlider() const;
         void setNoteParameters(int i, NoteParameters *noteParameters);
-        int getMidiProgramChange();
+        int getMidiProgramChange() const;
         void setMidiProgramChange(int i);
-        void initPadAssign();
-        int getNoteFromPad(int i);
-        std::vector<int> getPadIndicesFromNote(const int note);
+        void initPadAssign() const;
+        int getNoteFromPad(int i) const;
+        std::vector<int> getPadIndicesFromNote(const int note) const;
 
     public:
         Program(mpc::Mpc &mpc, mpc::sampler::Sampler *samplerToUse);

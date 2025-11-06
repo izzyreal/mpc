@@ -58,23 +58,23 @@ namespace mpc::command::context
         bool isRecordingOrOverdubbing;
         std::shared_ptr<sequencer::Bus> bus;
 
-        std::shared_ptr<mpc::sampler::Program> program;
+        std::shared_ptr<sampler::Program> program;
         int note;
 
         int drumScreenSelectedDrum;
         bool isSamplerScreen;
 
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
-        std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
+        sequencer::Track *track;
+        std::shared_ptr<sequencer::Sequencer> sequencer;
+        std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>
             timingCorrectScreen;
-        std::shared_ptr<mpc::lcdgui::screens::window::Assign16LevelsScreen>
+        std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
             assign16LevelsScreen;
-        std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<mpc::sequencer::FrameSeq> frameSequencer;
+        std::shared_ptr<audiomidi::EventHandler> eventHandler;
+        std::shared_ptr<sequencer::FrameSeq> frameSequencer;
 
         bool allowCentralNoteAndPadUpdate;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
+        std::shared_ptr<lcdgui::ScreenComponent> screenComponent;
         std::function<void(int)> setSelectedNote;
         std::function<void(int)> setSelectedPad;
 

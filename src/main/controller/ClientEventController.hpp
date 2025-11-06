@@ -55,9 +55,10 @@ namespace mpc::controller
 
         void init();
 
-        void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
+        void
+        dispatchHostInput(const mpc::input::HostInputEvent &hostEvent) const;
 
-        void handleClientEvent(const client::event::ClientEvent &);
+        void handleClientEvent(const client::event::ClientEvent &) const;
 
         std::shared_ptr<mpc::input::KeyboardBindings> getKeyboardBindings()
         {

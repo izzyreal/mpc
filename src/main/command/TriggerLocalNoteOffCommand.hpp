@@ -18,7 +18,7 @@ namespace mpc::command
 
     public:
         explicit TriggerLocalNoteOffCommand(
-            std::shared_ptr<context::TriggerLocalNoteOffContext>);
+            const std::shared_ptr<context::TriggerLocalNoteOffContext> &);
 
         // Should be invoked from the audio thread only
         void execute() override;

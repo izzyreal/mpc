@@ -13,7 +13,7 @@
 using namespace mpc::sampler;
 using namespace mpc::engine;
 
-Program::Program(mpc::Mpc &mpc, mpc::sampler::Sampler *samplerToUse)
+Program::Program(Mpc &mpc, Sampler *samplerToUse)
 {
     sampler = samplerToUse;
 
@@ -37,7 +37,7 @@ void Program::init()
     midiProgramChange = 1;
 }
 
-int Program::getNumberOfSamples()
+int Program::getNumberOfSamples() const
 {
     auto counter = 0;
 
@@ -54,7 +54,7 @@ int Program::getNumberOfSamples()
     return counter;
 }
 
-void Program::setName(std::string s)
+void Program::setName(const std::string &s)
 {
     name = s;
 }
@@ -64,7 +64,7 @@ std::string Program::getName()
     return name;
 }
 
-NoteParameters *Program::getNoteParameters(int note)
+NoteParameters *Program::getNoteParameters(const int note) const
 {
     if (note < 35 || note > 98)
     {
@@ -74,24 +74,26 @@ NoteParameters *Program::getNoteParameters(int note)
     return noteParameters[note - 35];
 }
 
-Pad *Program::getPad(int i)
+Pad *Program::getPad(const int i) const
 {
     return pads[i];
 }
 
-std::shared_ptr<StereoMixer> Program::getStereoMixerChannel(int noteIndex)
+std::shared_ptr<StereoMixer>
+Program::getStereoMixerChannel(const int noteIndex) const
 {
     return std::dynamic_pointer_cast<StereoMixer>(
         noteParameters[noteIndex]->getStereoMixerChannel());
 }
 
-std::shared_ptr<IndivFxMixer> Program::getIndivFxMixerChannel(int noteIndex)
+std::shared_ptr<IndivFxMixer>
+Program::getIndivFxMixerChannel(const int noteIndex) const
 {
     return std::dynamic_pointer_cast<IndivFxMixer>(
         noteParameters[noteIndex]->getIndivFxMixerChannel());
 }
 
-int Program::getPadIndexFromNote(int note)
+int Program::getPadIndexFromNote(const int note) const
 {
     if (note < 35 || note > 98)
     {
@@ -114,12 +116,12 @@ std::vector<NoteParameters *> Program::getNotesParameters()
     return noteParameters;
 }
 
-mpc::sampler::PgmSlider *Program::getSlider()
+PgmSlider *Program::getSlider() const
 {
     return slider;
 }
 
-void Program::setNoteParameters(int index, NoteParameters *nn)
+void Program::setNoteParameters(const int index, NoteParameters *nn)
 {
     if (noteParameters[index] != nullptr)
     {
@@ -129,12 +131,12 @@ void Program::setNoteParameters(int index, NoteParameters *nn)
     noteParameters[index] = nn;
 }
 
-int Program::getMidiProgramChange()
+int Program::getMidiProgramChange() const
 {
     return midiProgramChange;
 }
 
-void Program::setMidiProgramChange(int i)
+void Program::setMidiProgramChange(const int i)
 {
     if (i < 1 || i > 128)
     {
@@ -144,7 +146,7 @@ void Program::setMidiProgramChange(int i)
     midiProgramChange = i;
 }
 
-void Program::initPadAssign()
+void Program::initPadAssign() const
 {
     for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
@@ -152,12 +154,12 @@ void Program::initPadAssign()
     }
 }
 
-int Program::getNoteFromPad(int i)
+int Program::getNoteFromPad(const int i) const
 {
     return pads[i]->getNote();
 }
 
-std::vector<int> Program::getPadIndicesFromNote(int note)
+std::vector<int> Program::getPadIndicesFromNote(const int note) const
 {
     std::vector<int> result;
 

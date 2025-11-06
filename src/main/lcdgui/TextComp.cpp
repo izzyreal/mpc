@@ -1,6 +1,6 @@
 #include "TextComp.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "lcdgui/Label.hpp"
 #include "lcdgui/Field.hpp"

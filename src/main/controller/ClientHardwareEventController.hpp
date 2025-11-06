@@ -42,7 +42,7 @@ namespace mpc::controller
                 hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT);
         }
 
-        bool isNoteRepeatLockedOrPressed();
+        bool isNoteRepeatLockedOrPressed() const;
 
     protected:
         // Maps component label to accumulated delta for discretization
@@ -51,14 +51,17 @@ namespace mpc::controller
     private:
         mpc::Mpc &mpc;
 
-        void handlePadPress(const client::event::ClientHardwareEvent &);
-        void handlePadAftertouch(const client::event::ClientHardwareEvent &);
-        void handlePadRelease(const client::event::ClientHardwareEvent &);
+        void handlePadPress(const client::event::ClientHardwareEvent &) const;
+        void
+        handlePadAftertouch(const client::event::ClientHardwareEvent &) const;
+        void handlePadRelease(const client::event::ClientHardwareEvent &) const;
         void handleDataWheel(const client::event::ClientHardwareEvent &);
-        void handleSlider(const client::event::ClientHardwareEvent &);
-        void handlePot(const client::event::ClientHardwareEvent &);
-        void handleButtonPress(const client::event::ClientHardwareEvent &);
-        void handleButtonRelease(const client::event::ClientHardwareEvent &);
+        void handleSlider(const client::event::ClientHardwareEvent &) const;
+        void handlePot(const client::event::ClientHardwareEvent &) const;
+        void
+        handleButtonPress(const client::event::ClientHardwareEvent &) const;
+        void
+        handleButtonRelease(const client::event::ClientHardwareEvent &) const;
         void
         handleButtonDoublePress(const client::event::ClientHardwareEvent &);
     };

@@ -2,7 +2,7 @@
 #include "lcdgui/screens/PgmAssignScreen.hpp"
 #include "sampler/Pad.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "disk/StdDisk.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/SoundLoader.hpp"

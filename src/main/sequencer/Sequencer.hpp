@@ -70,16 +70,16 @@ namespace mpc::sequencer
             std::shared_ptr<lcdgui::LayeredScreen>,
             std::function<std::shared_ptr<lcdgui::Screens>()>,
             std::vector<std::shared_ptr<engine::Voice>> *,
-            std::function<bool()> isAudioServerRunning,
-            std::shared_ptr<hardware::Hardware>,
-            std::function<bool()> isBouncePrepared,
-            std::function<void()> startBouncing,
-            std::function<void()> stopBouncing,
+            const std::function<bool()> &isAudioServerRunning,
+            const std::shared_ptr<hardware::Hardware> &,
+            const std::function<bool()> &isBouncePrepared,
+            const std::function<void()> &startBouncing,
+            const std::function<void()> &stopBouncing,
             std::function<bool()> isBouncing,
-            std::function<bool()> isEraseButtonPressed,
+            const std::function<bool()> &isEraseButtonPressed,
             std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<sampler::Sampler>,
-            std::shared_ptr<audiomidi::EventHandler>,
+            const std::shared_ptr<audiomidi::EventHandler> &,
             std::function<bool()> isSixteenLevelsEnabled,
             std::shared_ptr<Clock> clock, std::function<int()> getSampleRate,
             std::function<bool()> isRecMainWithoutPlaying,
@@ -90,14 +90,14 @@ namespace mpc::sequencer
             std::function<std::vector<engine::MixerInterconnection *> &()>
                 getMixerInterconnections);
 
-        static const uint16_t TICKS_PER_QUARTER_NOTE = 96;
+        static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(const double quarterNotes);
         static double ticksToQuarterNotes(const uint32_t ticks);
 
         int countInStartPos = -1;
         int countInEndPos = -1;
-        void playToTick(int targetTick);
-        int getActiveSequenceIndex();
+        void playToTick(int targetTick) const;
+        int getActiveSequenceIndex() const;
         std::shared_ptr<Track> getActiveTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();
         void clearPlaceHolder();
@@ -109,7 +109,7 @@ namespace mpc::sequencer
         void bumpPositionByTicks(const uint8_t ticks);
 
         template <typename T> std::shared_ptr<T> getBus(const int busIndex);
-        std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex);
+        std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex) const;
         std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 
     private:
@@ -183,46 +183,48 @@ namespace mpc::sequencer
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         void play(bool fromStart);
         std::shared_ptr<Sequence>
-        copySequence(std::shared_ptr<Sequence> source);
-        void copySequenceParameters(std::shared_ptr<Sequence> source,
-                                    std::shared_ptr<Sequence> dest);
-        void copyTempoChangeEvents(std::shared_ptr<Sequence> src,
-                                   std::shared_ptr<Sequence> dst);
-        void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
+        copySequence(const std::shared_ptr<Sequence> &source);
+        void
+        copySequenceParameters(const std::shared_ptr<Sequence> &source,
+                               const std::shared_ptr<Sequence> &dest) const;
+        void copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
+                                   const std::shared_ptr<Sequence> &dst) const;
+        void copyTrack(const std::shared_ptr<Track> &src,
+                       const std::shared_ptr<Track> &dest) const;
 
     public:
-        static void copyTrackParameters(std::shared_ptr<Track> source,
-                                        std::shared_ptr<Track> dest);
+        static void copyTrackParameters(const std::shared_ptr<Track> &source,
+                                        const std::shared_ptr<Track> &dest);
 
         std::shared_ptr<Sequence> makeNewSequence();
 
         void init();
         void setTempo(double newTempo);
         double getTempo();
-        bool isTempoSourceSequenceEnabled();
+        bool isTempoSourceSequenceEnabled() const;
         void setTempoSourceSequence(bool b);
-        bool isRecordingOrOverdubbing();
-        bool isRecording();
-        bool isSoloEnabled();
+        bool isRecordingOrOverdubbing() const;
+        bool isRecording() const;
+        bool isSoloEnabled() const;
         void setSoloEnabled(bool b);
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
-        void setDefaultSequenceName(std::string s);
+        void setDefaultSequenceName(const std::string &s);
         void setActiveSequenceIndex(int i);
-        bool isCountEnabled();
+        bool isCountEnabled() const;
         void setCountEnabled(bool b);
         void setTimeDisplayStyle(int i);
-        int getTimeDisplayStyle();
+        int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);
-        bool isRecordingModeMulti();
-        int getActiveTrackIndex();
+        bool isRecordingModeMulti() const;
+        int getActiveTrackIndex() const;
         void trackUp();
         void trackDown();
-        bool isPlaying();
+        bool isPlaying() const;
         void setEndOfSong(bool b);
 
         // Repititions of steps in SONG mode (not step editor)
-        int getPlayedStepRepetitions();
+        int getPlayedStepRepetitions() const;
         void incrementPlayedStepRepetitions();
         void resetPlayedStepRepetitions();
 
@@ -237,21 +239,22 @@ namespace mpc::sequencer
         void overdubFromStart();
         void stop();
         void stop(const StopMode);
-        bool isCountingIn();
+        bool isCountingIn() const;
         void setCountingIn(bool b);
         void setSequence(int i, std::shared_ptr<Sequence> s);
         void purgeAllSequences();
         void purgeSequence(int i);
         void copySequence(int sq0, int sq1);
-        void copySequenceParameters(const int source, const int dest);
+        void copySequenceParameters(const int source, const int dest) const;
         void copySong(const int source, const int dest);
 
     public:
         void copyTrack(int sourceTrackIndex, int destinationTrackIndex,
-                       int sourceSequenceIndex, int destinationSequenceIndex);
+                       int sourceSequenceIndex,
+                       int destinationSequenceIndex) const;
         std::vector<std::string> &getDefaultTrackNames();
         std::string getDefaultTrackName(int i);
-        void setDefaultTrackName(std::string s, int i);
+        void setDefaultTrackName(const std::string &s, int i);
         int getCurrentBarIndex();
         int getCurrentBeatIndex();
         int getCurrentClockNumber();
@@ -260,9 +263,9 @@ namespace mpc::sequencer
         void setClock(int i);
         int getLoopEnd();
         std::shared_ptr<Sequence> getActiveSequence();
-        int getUsedSequenceCount();
-        std::vector<std::shared_ptr<Sequence>> getUsedSequences();
-        std::vector<int> getUsedSequenceIndexes();
+        int getUsedSequenceCount() const;
+        std::vector<std::shared_ptr<Sequence>> getUsedSequences() const;
+        std::vector<int> getUsedSequenceIndexes() const;
         void goToPreviousEvent();
         void goToNextEvent();
         void goToPreviousStep();
@@ -276,28 +279,28 @@ namespace mpc::sequencer
         // If the current screen is not the Song screen, it results in a no-op.
         void moveWithinSong(const double positionQuarterNotes);
 
-        int getTickPosition();
+        int getTickPosition() const;
         std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
         void setActiveTrackIndex(int i);
-        int getCurrentlyPlayingSequenceIndex();
+        int getCurrentlyPlayingSequenceIndex() const;
         void setCurrentlyPlayingSequenceIndex(int i);
-        int getNextSq();
-        int getFirstUsedSeqDown(int from, bool unused = false);
-        int getFirstUsedSeqUp(int from, bool unused = false);
+        int getNextSq() const;
+        int getFirstUsedSeqDown(int from, bool unused = false) const;
+        int getFirstUsedSeqUp(int from, bool unused = false) const;
         void setNextSq(int i);
         void setNextSqPad(int i);
         std::shared_ptr<Song> getSong(int i);
         void deleteSong(int i);
-        bool isSongModeEnabled();
+        bool isSongModeEnabled() const;
         void setSongModeEnabled(bool b);
-        int getSongSequenceIndex();
-        bool isSecondSequenceEnabled();
+        int getSongSequenceIndex() const;
+        bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);
         void flushTrackNoteCache();
         void storeActiveSequenceInUndoPlaceHolder();
         void resetUndo();
-        bool isOverdubbing();
-        const double getPlayStartPositionQuarterNotes();
+        bool isOverdubbing() const;
+        double getPlayStartPositionQuarterNotes() const;
 
         void setRecording(bool b);
         void setOverdubbing(bool b);
@@ -305,13 +308,13 @@ namespace mpc::sequencer
         void stopMetronomeTrack();
 
         // Punch property getters and setters
-        bool isPunchEnabled();
+        bool isPunchEnabled() const;
         void setPunchEnabled(bool enabled);
-        int getAutoPunchMode();
+        int getAutoPunchMode() const;
         void setAutoPunchMode(int mode);
-        int getPunchInTime();
+        int getPunchInTime() const;
         void setPunchInTime(int time);
-        int getPunchOutTime();
+        int getPunchOutTime() const;
         void setPunchOutTime(int time);
     };
 } // namespace mpc::sequencer

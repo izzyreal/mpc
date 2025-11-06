@@ -1,6 +1,6 @@
 #include "MidiInputMonitorScreen.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"

@@ -1,6 +1,6 @@
 #include "ApsGlobalParameters.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "file/aps/ApsParser.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"

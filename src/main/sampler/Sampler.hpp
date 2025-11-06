@@ -1,7 +1,7 @@
 #pragma once
 
-#include <sampler/Program.hpp>
-#include <sampler/Sound.hpp>
+#include "sampler/Program.hpp"
+#include "sampler/Sound.hpp"
 #include "MpcSpecs.hpp"
 
 #include <memory>
@@ -9,13 +9,13 @@
 
 namespace mpc::sampler
 {
-    const int16_t PLAYX_SOUND = -4;
-    const int16_t PREVIEW_SOUND = -3;
-    const int16_t CLICK_SOUND = -2;
+    constexpr int16_t PLAYX_SOUND = -4;
+    constexpr int16_t PREVIEW_SOUND = -3;
+    constexpr int16_t CLICK_SOUND = -2;
 
     // Not sure if we actually need this.
     // We should investigate if this is ever used
-    const int16_t NO_SOUND = -1;
+    constexpr int16_t NO_SOUND = -1;
 
     class Sound;
     class Program;
@@ -34,17 +34,17 @@ namespace mpc::sampler
 
         void nudgeSoundIndex(bool up);
         void setSoundIndex(int i);
-        short getSoundIndex();
+        short getSoundIndex() const;
         std::shared_ptr<Sound> getSound();
         std::string getPreviousScreenName();
-        void setPreviousScreenName(std::string s);
-        bool isSoundNameOccupied(const std::string &);
+        void setPreviousScreenName(const std::string &s);
+        bool isSoundNameOccupied(const std::string &) const;
 
-        void finishBasicVoice();
+        void finishBasicVoice() const;
         void init();
-        void playMetronome(unsigned int velocity, int framePos);
-        void playPreviewSample(int start, int end, int loopTo);
-        int getProgramCount();
+        void playMetronome(unsigned int velocity, int framePos) const;
+        void playPreviewSample(int start, int end, int loopTo) const;
+        int getProgramCount() const;
 
         /**
          * The `programs` collection is always of size MAX_PROGRAM_COUNT (which
@@ -56,7 +56,7 @@ namespace mpc::sampler
 
         std::weak_ptr<Program> addProgram(int i);
 
-        void deleteProgram(std::weak_ptr<Program> program);
+        void deleteProgram(const std::weak_ptr<Program> &program);
 
         /**
          * This method deletes all programs and sets all DRUMs to program
@@ -69,57 +69,60 @@ namespace mpc::sampler
          */
         void deleteAllPrograms(bool createDefaultProgram);
 
-        void repairProgramReferences();
+        void repairProgramReferences() const;
         std::vector<std::shared_ptr<Sound>> &getSounds();
         std::shared_ptr<Sound> addSound();
         std::shared_ptr<Sound> addSound(const int sampleRate);
-        int getSoundCount();
-        std::string getSoundName(int i);
-        void replaceSound(int index, std::shared_ptr<Sound> &newSound);
+        int getSoundCount() const;
+        std::string getSoundName(int i) const;
+        void replaceSound(int index, const std::shared_ptr<Sound> &newSound);
 
         std::string getPadName(int i);
-        std::vector<std::weak_ptr<Program>> getPrograms();
+        std::vector<std::weak_ptr<Program>> getPrograms() const;
         void deleteSound(int deleteSoundIndex);
         void deleteSound(const std::shared_ptr<Sound> &sound);
-        void deleteSoundWithoutRepairingPrograms(std::shared_ptr<Sound> sound);
-        void trimSample(int sampleNumber, int start, int end);
+        void deleteSoundWithoutRepairingPrograms(
+            const std::shared_ptr<Sound> &sound);
+        void trimSample(int sampleNumber, int start, int end) const;
         void deleteSection(const unsigned int sampleNumber,
-                           const unsigned int start, const unsigned int end);
+                           const unsigned int start,
+                           const unsigned int end) const;
         void switchToNextSoundSortType();
-        std::string getSoundSortingTypeName();
+        std::string getSoundSortingTypeName() const;
         void deleteAllSamples();
 
-        void stopAllVoices(int frameOffset);
+        void stopAllVoices(int frameOffset) const;
         void playX();
-        int getFreeSampleSpace();
-        std::string addOrIncreaseNumber(std::string s);
-        int getUnusedSampleCount();
+        int getFreeSampleSpace() const;
+        std::string addOrIncreaseNumber(const std::string &s) const;
+        int getUnusedSampleCount() const;
         void purge();
-        void
-        mergeToStereo(std::shared_ptr<const std::vector<float>> sourceLeft,
-                      std::shared_ptr<const std::vector<float>> sourceRight,
-                      std::shared_ptr<std::vector<float>> dest);
+        void mergeToStereo(
+            const std::shared_ptr<const std::vector<float>> &sourceLeft,
+            const std::shared_ptr<const std::vector<float>> &sourceRight,
+            const std::shared_ptr<std::vector<float>> &dest) const;
 
-        int getUsedProgram(int startIndex, bool up);
-        int checkExists(std::string soundName);
+        int getUsedProgram(int startIndex, bool up) const;
+        int checkExists(const std::string &soundName) const;
         void selectPreviousSound();
         void selectNextSound();
-        std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
+        std::weak_ptr<Sound> copySound(const std::weak_ptr<Sound> &source);
         void copyProgram(const int sourceIndex, const int destIndex);
         std::vector<int> *getInitMasterPadAssign();
         std::vector<int> *getMasterPadAssign();
-        void setMasterPadAssign(std::vector<int> v);
+        void setMasterPadAssign(const std::vector<int> &v);
         void setPlayX(int i);
-        int getPlayX();
+        int getPlayX() const;
 
         static std::vector<float> mergeToStereo(const std::vector<float> &fa0,
                                                 const std::vector<float> &fa1);
         static void process12Bit(std::vector<float> &data);
         static void process8Bit(std::vector<float> &data);
-        static void resample(std::shared_ptr<const std::vector<float>> data,
-                             int sourceRate, std::shared_ptr<Sound> destSnd);
+        static void
+        resample(const std::shared_ptr<const std::vector<float>> &data,
+                 int sourceRate, const std::shared_ptr<Sound> &destSnd);
         static std::vector<float>
-        resampleSingleChannel(std::vector<float> &input, int sourceRate,
+        resampleSingleChannel(const std::vector<float> &input, int sourceRate,
                               int destRate);
         std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
 
@@ -143,10 +146,10 @@ namespace mpc::sampler
         std::shared_ptr<Sound> clickSound;
         std::vector<std::string> sortNames =
             std::vector<std::string>{"MEMORY", "NAME", "SIZE"};
-        std::vector<std::shared_ptr<Sound>> getUsedSounds();
-        int getLastInt(std::string s);
-        std::string addOrIncreaseNumber2(std::string s);
-        void trimSample(std::weak_ptr<Sound>, int start, int end);
+        std::vector<std::shared_ptr<Sound>> getUsedSounds() const;
+        int getLastInt(const std::string &s) const;
+        std::string addOrIncreaseNumber2(const std::string &s) const;
+        void trimSample(const std::weak_ptr<Sound> &, int start, int end) const;
         std::vector<std::pair<std::shared_ptr<Sound>, int>>
         getSoundsSortedByName();
         std::vector<std::pair<std::shared_ptr<Sound>, int>>

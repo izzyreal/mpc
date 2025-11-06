@@ -3,111 +3,91 @@
 namespace mpc::controller
 {
 
-    const std::unordered_map<MidiFootswitchFunction, mpc::hardware::ComponentId>
+    const std::unordered_map<MidiFootswitchFunction, hardware::ComponentId>
         footswitchToComponentId{
             {MidiFootswitchFunction::PLAY_START,
-             mpc::hardware::ComponentId::PLAY_START},
-            {MidiFootswitchFunction::PLAY, mpc::hardware::ComponentId::PLAY},
-            {MidiFootswitchFunction::STOP, mpc::hardware::ComponentId::STOP},
+             hardware::ComponentId::PLAY_START},
+            {MidiFootswitchFunction::PLAY, hardware::ComponentId::PLAY},
+            {MidiFootswitchFunction::STOP, hardware::ComponentId::STOP},
             {MidiFootswitchFunction::TAP,
-             mpc::hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT},
+             hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT},
 
-            {MidiFootswitchFunction::PAD_BANK_A,
-             mpc::hardware::ComponentId::BANK_A},
-            {MidiFootswitchFunction::PAD_BANK_B,
-             mpc::hardware::ComponentId::BANK_B},
-            {MidiFootswitchFunction::PAD_BANK_C,
-             mpc::hardware::ComponentId::BANK_C},
-            {MidiFootswitchFunction::PAD_BANK_D,
-             mpc::hardware::ComponentId::BANK_D},
+            {MidiFootswitchFunction::PAD_BANK_A, hardware::ComponentId::BANK_A},
+            {MidiFootswitchFunction::PAD_BANK_B, hardware::ComponentId::BANK_B},
+            {MidiFootswitchFunction::PAD_BANK_C, hardware::ComponentId::BANK_C},
+            {MidiFootswitchFunction::PAD_BANK_D, hardware::ComponentId::BANK_D},
 
-            {MidiFootswitchFunction::F1, mpc::hardware::ComponentId::F1},
-            {MidiFootswitchFunction::F2, mpc::hardware::ComponentId::F2},
-            {MidiFootswitchFunction::F3, mpc::hardware::ComponentId::F3},
-            {MidiFootswitchFunction::F4, mpc::hardware::ComponentId::F4},
-            {MidiFootswitchFunction::F5, mpc::hardware::ComponentId::F5},
-            {MidiFootswitchFunction::F6, mpc::hardware::ComponentId::F6},
+            {MidiFootswitchFunction::F1, hardware::ComponentId::F1},
+            {MidiFootswitchFunction::F2, hardware::ComponentId::F2},
+            {MidiFootswitchFunction::F3, hardware::ComponentId::F3},
+            {MidiFootswitchFunction::F4, hardware::ComponentId::F4},
+            {MidiFootswitchFunction::F5, hardware::ComponentId::F5},
+            {MidiFootswitchFunction::F6, hardware::ComponentId::F6},
 
             // Pads 1–16
-            {MidiFootswitchFunction::PAD_1,
-             mpc::hardware::ComponentId::PAD_1_OR_AB},
+            {MidiFootswitchFunction::PAD_1, hardware::ComponentId::PAD_1_OR_AB},
             {MidiFootswitchFunction::PAD_2,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 1)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 1)},
             {MidiFootswitchFunction::PAD_3,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 2)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 2)},
             {MidiFootswitchFunction::PAD_4,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 3)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 3)},
             {MidiFootswitchFunction::PAD_5,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 4)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 4)},
             {MidiFootswitchFunction::PAD_6,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 5)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 5)},
             {MidiFootswitchFunction::PAD_7,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 6)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 6)},
             {MidiFootswitchFunction::PAD_8,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 7)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 7)},
             {MidiFootswitchFunction::PAD_9,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 8)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 8)},
             {MidiFootswitchFunction::PAD_10,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 9)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 9)},
             {MidiFootswitchFunction::PAD_11,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 10)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 10)},
             {MidiFootswitchFunction::PAD_12,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 11)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 11)},
             {MidiFootswitchFunction::PAD_13,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 12)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 12)},
             {MidiFootswitchFunction::PAD_14,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 13)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 13)},
             {MidiFootswitchFunction::PAD_15,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 14)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 14)},
             {MidiFootswitchFunction::PAD_16,
-             static_cast<mpc::hardware::ComponentId>(
-                 static_cast<int>(mpc::hardware::ComponentId::PAD_1_OR_AB) +
-                 15)},
+             static_cast<hardware::ComponentId>(
+                 static_cast<int>(hardware::ComponentId::PAD_1_OR_AB) + 15)},
         };
 
     const std::unordered_map<
         MidiFootswitchFunction,
-        mpc::midi::input::MidiControlTarget::SequencerTarget::Command>
+        midi::input::MidiControlTarget::SequencerTarget::Command>
         footswitchToSequencerCmd{
             {MidiFootswitchFunction::REC_PLAY,
-             mpc::midi::input::MidiControlTarget::SequencerTarget::Command::
+             midi::input::MidiControlTarget::SequencerTarget::Command::
                  REC_PLUS_PLAY},
             {MidiFootswitchFunction::ODUB_PLAY,
-             mpc::midi::input::MidiControlTarget::SequencerTarget::Command::
+             midi::input::MidiControlTarget::SequencerTarget::Command::
                  ODUB_PLUS_PLAY},
             {MidiFootswitchFunction::REC_PUNCH,
-             mpc::midi::input::MidiControlTarget::SequencerTarget::Command::
+             midi::input::MidiControlTarget::SequencerTarget::Command::
                  REC_PUNCH},
             {MidiFootswitchFunction::ODUB_PUNCH,
-             mpc::midi::input::MidiControlTarget::SequencerTarget::Command::
+             midi::input::MidiControlTarget::SequencerTarget::Command::
                  ODUB_PUNCH},
         };
 

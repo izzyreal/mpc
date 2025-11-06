@@ -4,32 +4,23 @@
 
 using namespace mpc::sampler;
 
-Sound::Sound(int rate)
+Sound::Sound(const int rate)
 {
     setSampleRate(rate);
     sampleData = std::make_shared<std::vector<float>>();
 }
 
-void Sound::setName(std::string s)
+void Sound::setName(const std::string &s)
 {
     name = s;
-
-    notifyObservers(std::string("samplename"));
 }
 
-void Sound::setBeatCount(int i)
+void Sound::setBeatCount(const int i)
 {
-    if (i < 1 || i > 32)
-    {
-        return;
-    }
-
-    numberOfBeats = i;
-
-    notifyObservers(std::string("beat"));
+    numberOfBeats = std::clamp(i, 1, 32);
 }
 
-int Sound::getBeatCount()
+int Sound::getBeatCount() const
 {
     return numberOfBeats;
 }
@@ -39,7 +30,7 @@ std::string Sound::getName()
     return name;
 }
 
-void Sound::setLevel(int i)
+void Sound::setLevel(const int i)
 {
     if (i < 0 || i > 200)
     {
@@ -49,7 +40,7 @@ void Sound::setLevel(int i)
     sndLevel = i;
 }
 
-void Sound::setTune(int i)
+void Sound::setTune(const int i)
 {
     if (i < -120 || i > 120)
     {
@@ -59,12 +50,12 @@ void Sound::setTune(int i)
     tune = i;
 }
 
-void Sound::setLoopEnabled(bool b)
+void Sound::setLoopEnabled(const bool b)
 {
     loopEnabled = b;
 }
 
-void Sound::setStart(int i)
+void Sound::setStart(const int i)
 {
     auto value = i;
     if (value < 0)
@@ -93,7 +84,7 @@ void Sound::setStart(int i)
     }
 }
 
-void Sound::setEnd(int i)
+void Sound::setEnd(const int i)
 {
     auto value = i;
 
@@ -130,14 +121,14 @@ void Sound::setEnd(int i)
     }
 }
 
-void Sound::setMono(bool b)
+void Sound::setMono(const bool monoToUse)
 {
-    mono = b;
+    mono = monoToUse;
     end = getFrameCount();
     loopTo = end;
 }
 
-void Sound::setLoopTo(int i)
+void Sound::setLoopTo(const int i)
 {
     auto value = i;
 
@@ -153,37 +144,38 @@ void Sound::setLoopTo(int i)
     loopTo = value;
 }
 
-void Sound::setSampleData(std::shared_ptr<std::vector<float>> newSampleData)
+void Sound::setSampleData(
+    const std::shared_ptr<std::vector<float>> &newSampleData)
 {
     sampleData = newSampleData;
 }
 
-int Sound::getLastFrameIndex()
+int Sound::getLastFrameIndex() const
 {
     return (isMono() ? sampleData->size() : (sampleData->size() * 0.5)) - 1;
 }
 
-int Sound::getFrameCount()
+int Sound::getFrameCount() const
 {
     return getLastFrameIndex() + 1;
 }
 
-int Sound::getTune()
+int Sound::getTune() const
 {
     return tune;
 }
 
-bool Sound::isLoopEnabled()
+bool Sound::isLoopEnabled() const
 {
     return loopEnabled;
 }
 
-int Sound::getStart()
+int Sound::getStart() const
 {
     return start;
 }
 
-int Sound::getEnd()
+int Sound::getEnd() const
 {
     return end;
 }
@@ -198,32 +190,33 @@ std::shared_ptr<std::vector<float>> Sound::getMutableSampleData() const
     return sampleData;
 }
 
-bool Sound::isMono()
+bool Sound::isMono() const
 {
     return mono;
 }
 
-int Sound::getLoopTo()
+int Sound::getLoopTo() const
 {
     return loopTo;
 }
 
-int Sound::getSampleRate()
+int Sound::getSampleRate() const
 {
     return sampleRate;
 }
 
-void Sound::setSampleRate(int sr)
+void Sound::setSampleRate(const int sr)
 {
     sampleRate = sr;
 }
 
-int Sound::getSndLevel()
+int Sound::getSndLevel() const
 {
     return sndLevel;
 }
 
-void Sound::insertFrame(std::vector<float> frame, unsigned int index)
+void Sound::insertFrame(const std::vector<float> &frame,
+                        const unsigned int index) const
 {
     if (index > getFrameCount())
     {
@@ -248,8 +241,8 @@ void Sound::insertFrame(std::vector<float> frame, unsigned int index)
     sampleData->insert(sampleData->begin() + index, frame[0]);
 }
 
-void Sound::insertFrames(std::vector<float> &frames, unsigned int index,
-                         uint32_t nFrames)
+void Sound::insertFrames(std::vector<float> &frames, const unsigned int index,
+                         const uint32_t nFrames) const
 {
     assert(mono);
     sampleData->insert(sampleData->begin() + index, frames.begin(),
@@ -257,7 +250,7 @@ void Sound::insertFrames(std::vector<float> &frames, unsigned int index,
 }
 
 void Sound::insertFrames(std::vector<float> &left, std::vector<float> &right,
-                         unsigned int index, uint32_t nFrames)
+                         const unsigned int index, const uint32_t nFrames) const
 {
     assert(!mono);
     sampleData->insert(sampleData->begin() + index + getFrameCount(),
@@ -266,18 +259,19 @@ void Sound::insertFrames(std::vector<float> &left, std::vector<float> &right,
                        left.begin() + nFrames);
 }
 
-void Sound::appendFrames(std::vector<float> &frames, uint32_t nFrames)
+void Sound::appendFrames(std::vector<float> &frames,
+                         const uint32_t nFrames) const
 {
     insertFrames(frames, getFrameCount(), nFrames);
 }
 
 void Sound::appendFrames(std::vector<float> &left, std::vector<float> &right,
-                         uint32_t nFrames)
+                         const uint32_t nFrames) const
 {
     insertFrames(left, right, getFrameCount(), nFrames);
 }
 
-void Sound::removeFramesFromEnd(int numFramesToRemove)
+void Sound::removeFramesFromEnd(const int numFramesToRemove) const
 {
     if (!mono)
     {

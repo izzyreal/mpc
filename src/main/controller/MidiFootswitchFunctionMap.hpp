@@ -80,7 +80,7 @@ namespace mpc::controller
             []() -> std::vector<MidiFootswitchFunction>
         {
             std::vector<MidiFootswitchFunction> v;
-            const int maxVal = static_cast<int>(MidiFootswitchFunction::F6);
+            constexpr int maxVal = static_cast<int>(MidiFootswitchFunction::F6);
             for (int i = 0; i <= maxVal; ++i)
             {
                 v.push_back(static_cast<MidiFootswitchFunction>(i));

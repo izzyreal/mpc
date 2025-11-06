@@ -38,9 +38,9 @@ namespace mpc::command::context
         std::shared_ptr<sampler::Program> program;
         std::optional<int> programPadIndex;
         const bool currentScreenIsSamplerScreen;
-        std::shared_ptr<mpc::sequencer::NoteOffEvent> noteOffEvent;
-        std::shared_ptr<mpc::audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<mpc::sequencer::NoteOnEvent> recordOnEvent;
+        std::shared_ptr<sequencer::NoteOffEvent> noteOffEvent;
+        std::shared_ptr<audiomidi::EventHandler> eventHandler;
+        std::shared_ptr<sequencer::NoteOnEvent> recordOnEvent;
         const bool sequencerIsRecordingOrOverdubbing;
         const bool isErasePressed;
         sequencer::Track *track;

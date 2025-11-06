@@ -1,6 +1,6 @@
 #include "EventRow.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include <Util.hpp>
 #include "lcdgui/Layer.hpp"
 #include "lcdgui/HorizontalBar.hpp"

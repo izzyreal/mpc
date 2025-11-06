@@ -1,6 +1,6 @@
 #include "VmpcKeyboardScreen.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp"
 

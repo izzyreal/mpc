@@ -1,7 +1,6 @@
 #include "controller/ClientEventController.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
 
@@ -24,10 +23,11 @@ using namespace mpc::sequencer;
 using namespace mpc::hardware;
 using namespace mpc::lcdgui;
 
-ClientEventController::ClientEventController(mpc::Mpc &mpcToUse)
-    : keyboardBindings(std::make_shared<mpc::input::KeyboardBindings>()),
-      mpc(mpcToUse), screens(mpc.screens),
-      layeredScreen(mpc.getLayeredScreen()), hardware(mpc.getHardware())
+ClientEventController::ClientEventController(Mpc &mpcToUse)
+    : mpc(mpcToUse),
+      keyboardBindings(std::make_shared<input::KeyboardBindings>()),
+      screens(mpc.screens), layeredScreen(mpc.getLayeredScreen()),
+      hardware(mpc.getHardware())
 {
 }
 
@@ -48,10 +48,10 @@ void ClientEventController::init()
 }
 
 void ClientEventController::dispatchHostInput(
-    const mpc::input::HostInputEvent &hostEvent)
+    const input::HostInputEvent &hostEvent) const
 {
-    const auto clientEvent = mpc::input::HostToClientTranslator::translate(
-        hostEvent, keyboardBindings);
+    const auto clientEvent =
+        input::HostToClientTranslator::translate(hostEvent, keyboardBindings);
 
     if (!clientEvent.has_value())
     {
@@ -62,8 +62,7 @@ void ClientEventController::dispatchHostInput(
     handleClientEvent(*clientEvent);
 }
 
-void ClientEventController::handleClientEvent(
-    const client::event::ClientEvent &e)
+void ClientEventController::handleClientEvent(const ClientEvent &e) const
 {
     if (std::holds_alternative<ClientHardwareEvent>(e.payload))
     {
@@ -87,8 +86,8 @@ bool ClientEventController::isRecMainWithoutPlaying() const
 {
     return SeqUtil::isRecMainWithoutPlaying(
         mpc.getSequencer(), screens->get<ScreenId::TimingCorrectScreen>(),
-        layeredScreen->getCurrentScreenName(),
-        hardware->getButton(ComponentId::REC), clientHardwareEventController);
+        layeredScreen->getCurrentScreenName(), hardware->getButton(REC),
+        clientHardwareEventController);
 }
 
 RecordingMode ClientEventController::determineRecordingMode() const
@@ -129,14 +128,10 @@ void ClientEventController::setActiveBank(const Bank activeBankToUse)
 
     notifyObservers(std::string("bank"));
 
-    hardware->getLed(hardware::ComponentId::BANK_A_LED)
-        ->setEnabled(activeBank == Bank::A);
-    hardware->getLed(hardware::ComponentId::BANK_B_LED)
-        ->setEnabled(activeBank == Bank::B);
-    hardware->getLed(hardware::ComponentId::BANK_C_LED)
-        ->setEnabled(activeBank == Bank::C);
-    hardware->getLed(hardware::ComponentId::BANK_D_LED)
-        ->setEnabled(activeBank == Bank::D);
+    hardware->getLed(BANK_A_LED)->setEnabled(activeBank == Bank::A);
+    hardware->getLed(BANK_B_LED)->setEnabled(activeBank == Bank::B);
+    hardware->getLed(BANK_C_LED)->setEnabled(activeBank == Bank::C);
+    hardware->getLed(BANK_D_LED)->setEnabled(activeBank == Bank::D);
 }
 
 Bank ClientEventController::getActiveBank() const
@@ -192,5 +187,5 @@ void ClientEventController::setSixteenLevelsEnabled(bool b)
 
 bool ClientEventController::isEraseButtonPressed() const
 {
-    return hardware->getButton(ComponentId::ERASE)->isPressed();
+    return hardware->getButton(ERASE)->isPressed();
 }

@@ -33,12 +33,12 @@ namespace mpc::eventregistry
     {
         PhysicalPadIndex padIndex;
         Source source{};
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Bus> bus;
+        std::shared_ptr<lcdgui::ScreenComponent> screen;
+        sequencer::Track *track;
+        std::shared_ptr<sequencer::Bus> bus;
         Velocity velocity;
         int bank{};
-        std::shared_ptr<mpc::sampler::Program> program;
+        std::shared_ptr<sampler::Program> program;
         std::optional<int> note;
         std::optional<Pressure> pressure;
     };
@@ -59,10 +59,10 @@ namespace mpc::eventregistry
         ProgramPadIndex padIndex;
         Source source{};
         std::optional<MidiChannel> midiChannel;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Bus> bus;
-        std::shared_ptr<mpc::sampler::Program> program;
+        std::shared_ptr<lcdgui::ScreenComponent> screen;
+        sequencer::Track *track;
+        std::shared_ptr<sequencer::Bus> bus;
+        std::shared_ptr<sampler::Program> program;
         Velocity velocity;
         std::optional<Pressure> pressure;
         std::chrono::steady_clock::time_point pressTime;
@@ -71,14 +71,14 @@ namespace mpc::eventregistry
     struct ProgramPadAftertouchEvent
     {
         ProgramPadIndex padIndex;
-        std::shared_ptr<mpc::sampler::Program> program;
+        std::shared_ptr<sampler::Program> program;
         Pressure pressure;
     };
 
     struct ProgramPadReleaseEvent
     {
         ProgramPadIndex padIndex;
-        std::shared_ptr<mpc::sampler::Program> program;
+        std::shared_ptr<sampler::Program> program;
     };
 
     struct NoteOnEvent
@@ -86,13 +86,12 @@ namespace mpc::eventregistry
         NoteNumber noteNumber;
         Source source{};
         std::optional<MidiChannel> midiChannel;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screen;
-        mpc::sequencer::Track *track;
-        std::shared_ptr<mpc::sequencer::Bus> bus;
+        std::shared_ptr<lcdgui::ScreenComponent> screen;
+        sequencer::Track *track;
+        std::shared_ptr<sequencer::Bus> bus;
         Velocity velocity;
-        std::optional<std::shared_ptr<mpc::sequencer::NoteOnEvent>>
-            recordNoteEvent;
-        std::shared_ptr<mpc::sampler::Program> program;
+        std::optional<std::shared_ptr<sequencer::NoteOnEvent>> recordNoteEvent;
+        std::shared_ptr<sampler::Program> program;
         std::optional<Pressure> pressure;
     };
 

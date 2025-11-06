@@ -15,10 +15,12 @@ using namespace mpc::midi::input;
 
 ClientMidiFootswitchAssignmentController::
     ClientMidiFootswitchAssignmentController(
-        std::shared_ptr<ClientHardwareEventController> ch,
-        std::shared_ptr<lcdgui::screens::MidiSwScreen> ms,
-        std::shared_ptr<sequencer::Sequencer> seq)
-    : clientHardwareEventController(ch), midiSwScreen(ms), sequencer(seq)
+        const std::shared_ptr<ClientHardwareEventController>
+            &clientHardwareEventController,
+        const std::shared_ptr<MidiSwScreen> &midiSwScreen,
+        const std::shared_ptr<sequencer::Sequencer> &sequencer)
+    : clientHardwareEventController(clientHardwareEventController),
+      midiSwScreen(midiSwScreen), sequencer(sequencer)
 {
     bindings.reserve(SWITCH_COUNT);
     initializeDefaultBindings();
@@ -34,7 +36,7 @@ void ClientMidiFootswitchAssignmentController::initializeDefaultBindings()
         b.number = -1;  // unassigned
         b.interaction = Interaction::Press;
         b.messageType = MidiBindingBase::MessageType::CC;
-        b.target.componentId = ComponentId::PLAY_START; // default placeholder
+        b.target.componentId = PLAY_START; // default placeholder
         bindings.emplace_back(b);
     }
 }
@@ -68,14 +70,14 @@ void ClientMidiFootswitchAssignmentController::triggerDualButtonCombo(
 
 void ClientMidiFootswitchAssignmentController::handleStopToPlay()
 {
-    pressButton(ComponentId::PLAY);
-    releaseButton(ComponentId::PLAY);
+    pressButton(PLAY);
+    releaseButton(PLAY);
 }
 
 void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
 {
-    pressButton(ComponentId::REC);
-    releaseButton(ComponentId::REC);
+    pressButton(REC);
+    releaseButton(REC);
 }
 
 void ClientMidiFootswitchAssignmentController::handleRecPunch()
@@ -86,7 +88,7 @@ void ClientMidiFootswitchAssignmentController::handleRecPunch()
     }
     else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
     {
-        triggerDualButtonCombo(ComponentId::REC, ComponentId::PLAY);
+        triggerDualButtonCombo(REC, PLAY);
     }
     else if (sequencer->isRecording())
     {
@@ -102,7 +104,7 @@ void ClientMidiFootswitchAssignmentController::handleOdubPunch()
     }
     else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
     {
-        triggerDualButtonCombo(ComponentId::OVERDUB, ComponentId::PLAY);
+        triggerDualButtonCombo(OVERDUB, PLAY);
     }
     else if (sequencer->isOverdubbing())
     {
@@ -111,7 +113,7 @@ void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 }
 
 void ClientMidiFootswitchAssignmentController::dispatchSequencerCommand(
-    MidiControlTarget::SequencerTarget::Command cmd)
+    const MidiControlTarget::SequencerTarget::Command cmd)
 {
     using Cmd = MidiControlTarget::SequencerTarget::Command;
     switch (cmd)
@@ -123,14 +125,14 @@ void ClientMidiFootswitchAssignmentController::dispatchSequencerCommand(
             handleRecordingToPlay();
             break;
         case Cmd::STOP:
-            pressButton(ComponentId::STOP);
-            releaseButton(ComponentId::STOP);
+            pressButton(STOP);
+            releaseButton(STOP);
             break;
         case Cmd::REC_PLUS_PLAY:
-            triggerDualButtonCombo(ComponentId::REC, ComponentId::PLAY);
+            triggerDualButtonCombo(REC, PLAY);
             break;
         case Cmd::ODUB_PLUS_PLAY:
-            triggerDualButtonCombo(ComponentId::OVERDUB, ComponentId::PLAY);
+            triggerDualButtonCombo(OVERDUB, PLAY);
             break;
         case Cmd::REC_PUNCH:
             handleRecPunch();
@@ -150,7 +152,7 @@ void ClientMidiFootswitchAssignmentController::handleEvent(
     }
 
     int number = e.getControllerNumber();
-    int value = e.getControllerValue();
+    const int value = e.getControllerValue();
     bool pressed = value >= 64;
 
     for (auto &binding : bindings)

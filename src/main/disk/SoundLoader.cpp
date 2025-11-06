@@ -1,6 +1,6 @@
 #include "disk/SoundLoader.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "disk/MpcFile.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "file/wav/WavFile.hpp"

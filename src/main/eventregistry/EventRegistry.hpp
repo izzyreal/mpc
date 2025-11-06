@@ -10,7 +10,6 @@
 
 #include <memory>
 #include <optional>
-#include <cassert>
 #include <atomic>
 #include <functional>
 
@@ -45,54 +44,58 @@ namespace mpc::eventregistry
         EventRegistry &operator=(const EventRegistry &other) noexcept;
 
         void registerPhysicalPadPress(
-            Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
-            std::shared_ptr<mpc::sequencer::Bus>, PhysicalPadIndex padIndex,
-            Velocity, mpc::sequencer::Track *, int bank,
-            std::optional<int> note, std::function<void(void *)> action);
+            Source, const std::shared_ptr<mpc::lcdgui::ScreenComponent> &,
+            const std::shared_ptr<mpc::sequencer::Bus> &,
+            PhysicalPadIndex padIndex, Velocity, mpc::sequencer::Track *,
+            int bank, std::optional<int> note,
+            const std::function<void(void *)> &action) const;
 
-        void registerPhysicalPadAftertouch(PhysicalPadIndex, Pressure,
-                                           Source source,
-                                           std::function<void(void *)> action);
+        void registerPhysicalPadAftertouch(
+            PhysicalPadIndex, Pressure, Source source,
+            const std::function<void(void *)> &action) const;
 
-        void registerPhysicalPadRelease(PhysicalPadIndex, Source source,
-                                        std::function<void(void *)> action);
+        void registerPhysicalPadRelease(
+            PhysicalPadIndex, Source source,
+            const std::function<void(void *)> &action) const;
 
         ProgramPadPressEventPtr registerProgramPadPress(
-            Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
-            std::shared_ptr<mpc::sequencer::Bus>,
-            std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
-            Velocity, sequencer::Track *, std::optional<MidiChannel>);
+            Source, const std::shared_ptr<mpc::lcdgui::ScreenComponent> &,
+            const std::shared_ptr<mpc::sequencer::Bus> &,
+            const std::shared_ptr<mpc::sampler::Program> &,
+            ProgramPadIndex padIndex, Velocity, sequencer::Track *,
+            std::optional<MidiChannel>) const;
 
         void registerProgramPadAftertouch(
-            Source, std::shared_ptr<mpc::sequencer::Bus>,
-            std::shared_ptr<mpc::sampler::Program>, ProgramPadIndex padIndex,
-            Pressure, sequencer::Track *);
+            Source, const std::shared_ptr<mpc::sequencer::Bus> &,
+            const std::shared_ptr<mpc::sampler::Program> &,
+            ProgramPadIndex padIndex, Pressure, sequencer::Track *) const;
 
-        void registerProgramPadRelease(Source,
-                                       std::shared_ptr<mpc::sequencer::Bus>,
-                                       std::shared_ptr<mpc::sampler::Program>,
-                                       ProgramPadIndex padIndex,
-                                       sequencer::Track *,
-                                       std::optional<MidiChannel>,
-                                       std::function<void(void *)> action);
+        void registerProgramPadRelease(
+            Source, const std::shared_ptr<mpc::sequencer::Bus> &,
+            const std::shared_ptr<mpc::sampler::Program> &,
+            ProgramPadIndex padIndex, sequencer::Track *,
+            std::optional<MidiChannel>,
+            const std::function<void(void *)> &action) const;
 
         NoteOnEventPtr
-        registerNoteOn(Source, std::shared_ptr<mpc::lcdgui::ScreenComponent>,
-                       std::shared_ptr<mpc::sequencer::Bus>, NoteNumber,
+        registerNoteOn(Source,
+                       const std::shared_ptr<mpc::lcdgui::ScreenComponent> &,
+                       const std::shared_ptr<mpc::sequencer::Bus> &, NoteNumber,
                        Velocity, sequencer::Track *, std::optional<MidiChannel>,
-                       std::shared_ptr<sampler::Program>,
-                       std::function<void(void *)> action);
+                       const std::shared_ptr<sampler::Program> &,
+                       const std::function<void(void *)> &action) const;
 
         void registerNoteAftertouch(Source, NoteNumber, Pressure,
-                                    std::optional<MidiChannel>);
-        void registerNoteOff(Source, std::shared_ptr<mpc::sequencer::Bus>,
+                                    std::optional<MidiChannel>) const;
+        void registerNoteOff(Source,
+                             const std::shared_ptr<mpc::sequencer::Bus> &,
                              NoteNumber, sequencer::Track *,
                              std::optional<MidiChannel>,
-                             std::function<void(void *)> action);
+                             const std::function<void(void *)> &action) const;
 
         void clear();
 
-        SnapshotView getSnapshot() noexcept;
+        SnapshotView getSnapshot() const noexcept;
 
         // Called from the audio thread only
         void drainQueue() noexcept;
@@ -113,8 +116,8 @@ namespace mpc::eventregistry
         Snapshot snapB;
         alignas(void *) std::atomic<Snapshot *> snapshotPtr{&snapA};
 
-        void enqueue(EventMessage &&);
-        void publishSnapshotToBuffer(struct Snapshot *dst) noexcept;
+        void enqueue(EventMessage &&) const;
+        void publishSnapshotToBuffer(struct Snapshot *dst) const noexcept;
 
         void applyMessage(const EventMessage &msg) noexcept;
     };

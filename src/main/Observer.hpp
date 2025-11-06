@@ -24,6 +24,7 @@ namespace mpc
     class Observable
     {
     public:
+        virtual ~Observable() = default;
         virtual void notifyObservers()
         {
             notifyObservers(nullptr);

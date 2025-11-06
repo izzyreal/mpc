@@ -1,6 +1,6 @@
 #include "MonitorInputAdapter.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include <SampleOps.hpp>
 
 #include "lcdgui/screens/SampleScreen.hpp"

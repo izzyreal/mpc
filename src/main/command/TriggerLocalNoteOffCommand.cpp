@@ -3,7 +3,6 @@
 #include "audiomidi/EventHandler.hpp"
 #include "command/context/TriggerLocalNoteOffContext.hpp"
 #include "eventregistry/EventRegistry.hpp"
-#include "eventregistry/EventTypes.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -14,7 +13,7 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 
 TriggerLocalNoteOffCommand::TriggerLocalNoteOffCommand(
-    std::shared_ptr<TriggerLocalNoteOffContext> ctx)
+    const std::shared_ptr<TriggerLocalNoteOffContext> &ctx)
     : ctx(ctx)
 {
 }

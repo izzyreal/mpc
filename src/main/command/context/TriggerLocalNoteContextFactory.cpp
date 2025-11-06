@@ -13,7 +13,6 @@
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/Track.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
@@ -32,20 +31,19 @@ using namespace mpc::audiomidi;
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-    eventregistry::Source source,
-    eventregistry::NoteOnEvent *registryNoteOnEvent, const int note,
-    const int velocity, sequencer::Track *track,
-    std::shared_ptr<sequencer::Bus> bus,
-    const std::shared_ptr<lcdgui::ScreenComponent> screen,
-    std::optional<int> programPadIndex,
-    std::shared_ptr<sampler::Program> program,
-    std::shared_ptr<sequencer::Sequencer> sequencer,
-    std::shared_ptr<sequencer::FrameSeq> frameSequencer,
-    std::shared_ptr<eventregistry::EventRegistry> eventRegistry,
-    std::shared_ptr<controller::ClientEventController> controller,
-    std::shared_ptr<audiomidi::EventHandler> eventHandler,
-    std::shared_ptr<lcdgui::Screens> screens,
-    std::shared_ptr<hardware::Hardware> hardware)
+    const Source source, eventregistry::NoteOnEvent *registryNoteOnEvent,
+    const int note, const int velocity, Track *track,
+    const std::shared_ptr<Bus> &bus,
+    const std::shared_ptr<ScreenComponent> &screen,
+    const std::optional<int> programPadIndex,
+    const std::shared_ptr<Program> &program,
+    const std::shared_ptr<Sequencer> &sequencer,
+    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<ClientEventController> &controller,
+    const std::shared_ptr<EventHandler> &eventHandler,
+    const std::shared_ptr<Screens> &screens,
+    const std::shared_ptr<Hardware> &hardware)
 {
     const bool isSequencerScreen =
         std::dynamic_pointer_cast<SequencerScreen>(screen) != nullptr;
@@ -56,28 +54,27 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const bool isSixteenLevelsEnabled = controller->isSixteenLevelsEnabled();
     const bool isNoteRepeatLockedOrPressed =
         controller->clientHardwareEventController->isNoteRepeatLocked() ||
-        hardware->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
-            ->isPressed();
-    const bool isErasePressed =
-        hardware->getButton(hardware::ComponentId::ERASE)->isPressed();
+        hardware->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
+    const bool isErasePressed = hardware->getButton(ERASE)->isPressed();
     const bool isStepRecording =
-        sequencer::SeqUtil::isStepRecording(screen->getName(), sequencer);
+        SeqUtil::isStepRecording(screen->getName(), sequencer);
 
-    const bool isRecMainWithoutPlaying =
-        sequencer::SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
-            screen->getName(), hardware->getButton(hardware::ComponentId::REC),
-            controller->clientHardwareEventController);
+    const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
+        sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+        screen->getName(), hardware->getButton(REC),
+        controller->clientHardwareEventController);
 
-    auto timingCorrectScreen = screens->get<ScreenId::TimingCorrectScreen>();
-    auto assign16LevelsScreen = screens->get<ScreenId::Assign16LevelsScreen>();
+    const auto timingCorrectScreen =
+        screens->get<ScreenId::TimingCorrectScreen>();
+    const auto assign16LevelsScreen =
+        screens->get<ScreenId::Assign16LevelsScreen>();
 
-    std::function<void(int)> setSelectedNote = [controller](int n)
+    const std::function setSelectedNote = [controller](int n)
     {
         controller->setSelectedNote(n);
     };
 
-    std::function<void(int)> setSelectedPad = [controller](int p)
+    std::function setSelectedPad = [controller](int p)
     {
         controller->setSelectedPad(p);
     };
@@ -121,17 +118,18 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-    eventregistry::Source source, const int note, Track *track,
-    std::shared_ptr<sequencer::Bus> bus,
-    const std::shared_ptr<ScreenComponent> screen,
-    std::optional<int> programPadIndex,
-    std::shared_ptr<sampler::Program> program,
-    std::shared_ptr<Sequencer> sequencer,
-    std::shared_ptr<FrameSeq> frameSequencer,
-    std::shared_ptr<EventRegistry> eventRegistry,
-    std::shared_ptr<ClientEventController> controller,
-    std::shared_ptr<EventHandler> eventHandler,
-    std::shared_ptr<Screens> screens, std::shared_ptr<Hardware> hardware)
+    const Source source, const int note, Track *track,
+    const std::shared_ptr<Bus> &bus,
+    const std::shared_ptr<ScreenComponent> &screen,
+    const std::optional<int> programPadIndex,
+    const std::shared_ptr<Program> &program,
+    const std::shared_ptr<Sequencer> &sequencer,
+    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<ClientEventController> &controller,
+    const std::shared_ptr<EventHandler> &eventHandler,
+    const std::shared_ptr<Screens> &screens,
+    const std::shared_ptr<Hardware> &hardware)
 {
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 
@@ -144,30 +142,29 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const auto timingCorrectScreen =
         screens->get<ScreenId::TimingCorrectScreen>();
 
-    std::function<int()> getActiveSequenceLastTick = [sequencer]
+    const std::function getActiveSequenceLastTick = [sequencer]
     {
         return sequencer->getActiveSequence()->getLastTick();
     };
 
-    std::function<void(double)> sequencerMoveToQuarterNotePosition =
+    const std::function sequencerMoveToQuarterNotePosition =
         [sequencer = sequencer](double quarterNotePosition)
     {
         sequencer->move(quarterNotePosition);
     };
 
-    std::function<void()> sequencerStopMetronomeTrack = [sequencer = sequencer]
+    const std::function sequencerStopMetronomeTrack = [sequencer = sequencer]
     {
         sequencer->stopMetronomeTrack();
     };
 
     const bool isStepRecording =
-        sequencer::SeqUtil::isStepRecording(screen->getName(), sequencer);
+        SeqUtil::isStepRecording(screen->getName(), sequencer);
 
-    const bool isRecMainWithoutPlaying =
-        sequencer::SeqUtil::isRecMainWithoutPlaying(
-            sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
-            screen->getName(), hardware->getButton(hardware::ComponentId::REC),
-            controller->clientHardwareEventController);
+    const bool isRecMainWithoutPlaying = SeqUtil::isRecMainWithoutPlaying(
+        sequencer, screens->get<ScreenId::TimingCorrectScreen>(),
+        screen->getName(), hardware->getButton(REC),
+        controller->clientHardwareEventController);
 
     return std::make_shared<TriggerLocalNoteOffContext>(
         TriggerLocalNoteOffContext{
@@ -181,7 +178,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             eventHandler,
             sequencerRecordNoteOnEvent,
             sequencer->isRecordingOrOverdubbing(),
-            hardware->getButton(hardware::ComponentId::ERASE)->isPressed(),
+            hardware->getButton(ERASE)->isPressed(),
             track,
             isStepRecording,
             frameSequencer->getMetronomeOnlyTickPosition(),

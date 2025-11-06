@@ -1,6 +1,6 @@
 #include "MidiOutputMonitorScreen.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "lcdgui/Label.hpp"
 

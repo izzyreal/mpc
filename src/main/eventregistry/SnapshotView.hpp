@@ -3,7 +3,6 @@
 #include "eventregistry/EventTypes.hpp"
 
 #include <memory>
-#include <cstdio>
 
 namespace mpc::eventregistry
 {
@@ -24,8 +23,9 @@ namespace mpc::eventregistry
         getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
 
         bool isProgramPadPressed(ProgramPadIndex idx) const;
-        bool isProgramPadPressed(ProgramPadIndex idx,
-                                 std::shared_ptr<sampler::Program>) const;
+        bool
+        isProgramPadPressed(ProgramPadIndex idx,
+                            const std::shared_ptr<sampler::Program> &) const;
 
         ProgramPadPressEventPtr getMostRecentProgramPadPress(
             ProgramPadIndex idx,
@@ -49,7 +49,7 @@ namespace mpc::eventregistry
             return snap != nullptr;
         }
 
-        void printStats()
+        void printStats() const
         {
             printf("===== EventRegistry Stats =======\n");
             printf("physicalPadEvent count: %zu\n",

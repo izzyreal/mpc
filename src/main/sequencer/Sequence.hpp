@@ -69,66 +69,67 @@ namespace mpc::sequencer
                  std::function<int()> getCurrentBarIndex);
 
     public:
-        double getInitialTempo();
+        double getInitialTempo() const;
         void setInitialTempo(const double newInitialTempo);
 
         void setLoopStart(int l);
-        int getLoopStart();
+        int getLoopStart() const;
         void setLoopEnd(int l);
-        int getLoopEnd();
+        int getLoopEnd() const;
         void setFirstLoopBarIndex(int i);
-        int getFirstLoopBarIndex();
+        int getFirstLoopBarIndex() const;
         void setLastLoopBarIndex(int i);
-        int getLastLoopBarIndex();
-        bool isLoopEnabled();
-        void setName(std::string s);
+        int getLastLoopBarIndex() const;
+        bool isLoopEnabled() const;
+        void setName(const std::string &s);
         std::string getName();
-        void setDeviceName(int i, std::string s);
+        void setDeviceName(int i, const std::string &s);
         std::string getDeviceName(int i);
         void setLastBarIndex(int i);
-        int getLastBarIndex();
-        int getBarCount();
+        int getLastBarIndex() const;
+        int getBarCount() const;
         void setLoopEnabled(bool b);
         std::shared_ptr<Track> getTrack(int i);
         void setUsed(bool b);
-        bool isUsed();
+        bool isUsed() const;
         void init(int newLastBarIndex);
         void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
         void setTimeSignature(int barIndex, int num, int den);
         std::vector<std::shared_ptr<Track>> getTracks();
         std::vector<std::string> &getDeviceNames();
-        void setDeviceNames(std::vector<std::string> &sa);
-        std::vector<std::shared_ptr<TempoChangeEvent>> getTempoChangeEvents();
+        void setDeviceNames(const std::vector<std::string> &sa);
+        std::vector<std::shared_ptr<TempoChangeEvent>>
+        getTempoChangeEvents() const;
         std::shared_ptr<TempoChangeEvent> addTempoChangeEvent(int tick);
-        void removeTempoChangeEvent(int i);
+        void removeTempoChangeEvent(int i) const;
 
-        bool isTempoChangeOn();
+        bool isTempoChangeOn() const;
         void setTempoChangeOn(bool b);
-        int getLastTick();
-        TimeSignature getTimeSignature();
+        int getLastTick() const;
+        TimeSignature getTimeSignature() const;
         void purgeAllTracks();
         std::shared_ptr<Track> purgeTrack(int i);
-        int getDenominator(int i);
-        int getNumerator(int i);
+        int getDenominator(int i) const;
+        int getNumerator(int i) const;
         std::vector<int> &getBarLengthsInTicks();
-        void setBarLengths(std::vector<int> &);
-        void setNumeratorsAndDenominators(std::vector<int> &numerators,
-                                          std::vector<int> &denominators);
+        void setBarLengths(const std::vector<int> &);
+        void setNumeratorsAndDenominators(const std::vector<int> &numerators,
+                                          const std::vector<int> &denominators);
         void deleteBars(int firstBar, int lBar);
         void insertBars(int numberOfBars, int afterBar);
         void moveTrack(int source, int destination);
-        bool isLastLoopBarEnd();
+        bool isLastLoopBarEnd() const;
 
-        int getEventCount();
+        int getEventCount() const;
         void initLoop();
         std::vector<int> &getNumerators();
         std::vector<int> &getDenominators();
 
-        int getFirstTickOfBar(int index);
-        int getLastTickOfBar(int index);
-        int getFirstTickOfBeat(int bar, int beat);
+        int getFirstTickOfBar(int index) const;
+        int getLastTickOfBar(int index) const;
+        int getFirstTickOfBeat(int bar, int beat) const;
 
-        void resetTrackEventIndices(int tick);
+        void resetTrackEventIndices(int tick) const;
 
         std::shared_ptr<Track> getTempoChangeTrack();
 

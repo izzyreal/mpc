@@ -1,6 +1,6 @@
 #include "disk/RawDisk.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "lcdgui/screens/LoadScreen.hpp"
 
 #include "disk/MpcFile.hpp"

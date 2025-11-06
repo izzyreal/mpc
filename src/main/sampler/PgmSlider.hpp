@@ -3,10 +3,8 @@
 
 namespace mpc::sampler
 {
-    class PgmSlider : public Observable
+    class PgmSlider final : public Observable
     {
-
-    private:
         int assignNote = 34;
         int tuneLowRange = -120;
         int tuneHighRange = 120;
@@ -21,26 +19,26 @@ namespace mpc::sampler
 
     public:
         void setAssignNote(int i);
-        int getNote();
+        int getNote() const;
         void setTuneLowRange(int i);
-        int getTuneLowRange();
+        int getTuneLowRange() const;
         void setTuneHighRange(int i);
-        int getTuneHighRange();
+        int getTuneHighRange() const;
         void setDecayLowRange(int i);
-        int getDecayLowRange();
+        int getDecayLowRange() const;
         void setDecayHighRange(int i);
-        int getDecayHighRange();
+        int getDecayHighRange() const;
         void setAttackLowRange(int i);
-        int getAttackLowRange();
+        int getAttackLowRange() const;
         void setAttackHighRange(int i);
-        int getAttackHighRange();
+        int getAttackHighRange() const;
         void setFilterLowRange(int i);
-        int getFilterLowRange();
+        int getFilterLowRange() const;
         void setFilterHighRange(int i);
-        int getFilterHighRange();
+        int getFilterHighRange() const;
         void setControlChange(int i);
-        int getControlChange();
-        int getParameter();
+        int getControlChange() const;
+        int getParameter() const;
         void setParameter(int i);
     };
 } // namespace mpc::sampler

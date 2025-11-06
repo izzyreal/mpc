@@ -2,7 +2,7 @@
 #include "file/ByteUtil.hpp"
 #include "lcdgui/screens/window/TimeDisplayScreen.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"

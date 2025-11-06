@@ -43,12 +43,12 @@ using namespace mpc::audiomidi;
 uint32_t Sequencer::quarterNotesToTicks(const double quarterNotes)
 {
     return static_cast<uint32_t>(
-        std::floor(quarterNotes * (double)TICKS_PER_QUARTER_NOTE));
+        std::floor(quarterNotes * static_cast<double>(TICKS_PER_QUARTER_NOTE)));
 }
 
 double Sequencer::ticksToQuarterNotes(const uint32_t ticks)
 {
-    return ticks / (double)TICKS_PER_QUARTER_NOTE;
+    return ticks / static_cast<double>(TICKS_PER_QUARTER_NOTE);
 }
 
 uint64_t currentTimeMillis()
@@ -61,16 +61,16 @@ uint64_t currentTimeMillis()
 Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
                      std::function<std::shared_ptr<Screens>()> getScreens,
                      std::vector<std::shared_ptr<Voice>> *voices,
-                     std::function<bool()> isAudioServerRunning,
-                     std::shared_ptr<hardware::Hardware> hardware,
-                     std::function<bool()> isBouncePrepared,
-                     std::function<void()> startBouncing,
-                     std::function<void()> stopBouncing,
+                     const std::function<bool()> &isAudioServerRunning,
+                     const std::shared_ptr<hardware::Hardware> &hardware,
+                     const std::function<bool()> &isBouncePrepared,
+                     const std::function<void()> &startBouncing,
+                     const std::function<void()> &stopBouncing,
                      std::function<bool()> isBouncing,
-                     std::function<bool()> isEraseButtonPressed,
+                     const std::function<bool()> &isEraseButtonPressed,
                      std::shared_ptr<EventRegistry> eventRegistry,
                      std::shared_ptr<Sampler> sampler,
-                     std::shared_ptr<EventHandler> eventHandler,
+                     const std::shared_ptr<EventHandler> &eventHandler,
                      std::function<bool()> isSixteenLevelsEnabled,
                      std::shared_ptr<Clock> clock,
                      std::function<int()> getSampleRate,
@@ -91,7 +91,7 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
     frameSequencer = std::make_shared<FrameSeq>(
         eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
         isRecMainWithoutPlaying,
-        [sampler](int velo, int frameOffset)
+        [sampler](const int velo, const int frameOffset)
         {
             sampler->playMetronome(velo, frameOffset);
         },
@@ -151,12 +151,12 @@ void Sequencer::init()
     }
 }
 
-void Sequencer::deleteSong(int i)
+void Sequencer::deleteSong(const int i)
 {
     songs[i] = std::make_shared<Song>();
 }
 
-int Sequencer::getActiveSequenceIndex()
+int Sequencer::getActiveSequenceIndex() const
 {
     return activeSequenceIndex;
 }
@@ -171,7 +171,7 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
     return getActiveSequence()->getTrack(activeTrackIndex);
 }
 
-void Sequencer::playToTick(int targetTick)
+void Sequencer::playToTick(const int targetTick) const
 {
     auto seqIndex =
         songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
@@ -262,7 +262,7 @@ void Sequencer::setTempo(double newTempo)
     {
         auto initialTempo = s->getInitialTempo();
         auto ratio = newTempo / initialTempo;
-        tce->setRatio((int)round(ratio * 1000.0));
+        tce->setRatio(static_cast<int>(round(ratio * 1000.0)));
     }
     else
     {
@@ -344,32 +344,32 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     return s->getTempoChangeEvents()[index];
 }
 
-bool Sequencer::isTempoSourceSequenceEnabled()
+bool Sequencer::isTempoSourceSequenceEnabled() const
 {
     return tempoSourceSequenceEnabled;
 }
 
-void Sequencer::setTempoSourceSequence(bool b)
+void Sequencer::setTempoSourceSequence(const bool b)
 {
     tempoSourceSequenceEnabled = b;
 }
 
-bool Sequencer::isRecordingOrOverdubbing()
+bool Sequencer::isRecordingOrOverdubbing() const
 {
     return recording || overdubbing;
 }
 
-bool Sequencer::isRecording()
+bool Sequencer::isRecording() const
 {
     return recording;
 }
 
-bool Sequencer::isSoloEnabled()
+bool Sequencer::isSoloEnabled() const
 {
     return soloEnabled;
 }
 
-void Sequencer::setSoloEnabled(bool b)
+void Sequencer::setSoloEnabled(const bool b)
 {
     if (soloEnabled == b)
     {
@@ -401,7 +401,7 @@ void Sequencer::setSoloEnabled(bool b)
     }
 }
 
-std::shared_ptr<Sequence> Sequencer::getSequence(int i)
+std::shared_ptr<Sequence> Sequencer::getSequence(const int i)
 {
     return sequences[i];
 }
@@ -411,7 +411,7 @@ std::string Sequencer::getDefaultSequenceName()
     return defaultSequenceName;
 }
 
-void Sequencer::setDefaultSequenceName(std::string s)
+void Sequencer::setDefaultSequenceName(const std::string &s)
 {
     defaultSequenceName = s;
 }
@@ -428,37 +428,37 @@ void Sequencer::setActiveSequenceIndex(int i)
     }
 }
 
-bool Sequencer::isCountEnabled()
+bool Sequencer::isCountEnabled() const
 {
     return countEnabled;
 }
 
-void Sequencer::setCountEnabled(bool b)
+void Sequencer::setCountEnabled(const bool b)
 {
     countEnabled = b;
 }
 
-void Sequencer::setTimeDisplayStyle(int i)
+void Sequencer::setTimeDisplayStyle(const int i)
 {
     timeDisplayStyle = i;
 }
 
-int Sequencer::getTimeDisplayStyle()
+int Sequencer::getTimeDisplayStyle() const
 {
     return timeDisplayStyle;
 }
 
-void Sequencer::setRecordingModeMulti(bool b)
+void Sequencer::setRecordingModeMulti(const bool b)
 {
     recordingModeMulti = b;
 }
 
-bool Sequencer::isRecordingModeMulti()
+bool Sequencer::isRecordingModeMulti() const
 {
     return recordingModeMulti;
 }
 
-int Sequencer::getActiveTrackIndex()
+int Sequencer::getActiveTrackIndex() const
 {
     return activeTrackIndex;
 }
@@ -481,7 +481,7 @@ void Sequencer::trackDown()
     activeTrackIndex--;
 }
 
-bool Sequencer::isPlaying()
+bool Sequencer::isPlaying() const
 {
     if (!isAudioServerRunning())
     {
@@ -491,7 +491,7 @@ bool Sequencer::isPlaying()
     return !metronomeOnly && frameSequencer->isRunning();
 }
 
-void Sequencer::play(bool fromStart)
+void Sequencer::play(const bool fromStart)
 {
     if (isPlaying())
     {
@@ -501,8 +501,6 @@ void Sequencer::play(bool fromStart)
     endOfSong = false;
     auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     auto currentSong = songs[songScreen->getActiveSongIndex()];
-
-    std::shared_ptr<Step> currentStep;
 
     if (songMode)
     {
@@ -528,9 +526,9 @@ void Sequencer::play(bool fromStart)
             step = currentSong->getStepCount() - 1;
         }
 
-        currentStep = currentSong->getStep(step).lock();
-
-        if (!sequences[currentStep->getSequence()]->isUsed())
+        if (const std::shared_ptr<Step> currentStep =
+                currentSong->getStep(step).lock();
+            !sequences[currentStep->getSequence()]->isUsed())
         {
             return;
         }
@@ -749,9 +747,9 @@ void Sequencer::stop(const StopMode stopMode)
         pos = s1->getLastTick();
     }
 
-    const int frameOffset = stopMode == AT_START_OF_BUFFER
-                                ? 0
-                                : frameSequencer->getEventFrameOffset();
+    // const int frameOffset = stopMode == AT_START_OF_BUFFER
+    //                             ? 0
+    //                             : frameSequencer->getEventFrameOffset();
 
     frameSequencer->stop();
 
@@ -799,12 +797,12 @@ void Sequencer::stop(const StopMode stopMode)
     hardware->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(false);
 }
 
-bool Sequencer::isCountingIn()
+bool Sequencer::isCountingIn() const
 {
     return countingIn;
 }
 
-void Sequencer::setCountingIn(bool b)
+void Sequencer::setCountingIn(const bool b)
 {
     countingIn = b;
 
@@ -815,7 +813,7 @@ void Sequencer::setCountingIn(bool b)
     }
 }
 
-void Sequencer::setSequence(int i, std::shared_ptr<Sequence> s)
+void Sequencer::setSequence(const int i, std::shared_ptr<Sequence> s)
 {
     sequences[i].swap(s);
     sequences[i]->resetTrackEventIndices(
@@ -835,7 +833,7 @@ void Sequencer::purgeAllSequences()
 std::shared_ptr<Sequence> Sequencer::makeNewSequence()
 {
     return std::make_shared<Sequence>(
-        [&](int trackIndex)
+        [&](const int trackIndex)
         {
             return defaultTrackNames[trackIndex];
         },
@@ -856,7 +854,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         {
             return getAutoPunchMode();
         },
-        [&](int busIndex)
+        [&](const int busIndex)
         {
             return getBus<Bus>(busIndex);
         },
@@ -864,7 +862,8 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         {
             return isEraseButtonPressed();
         },
-        [&](int programPadIndex, std::shared_ptr<sampler::Program> program)
+        [&](const int programPadIndex,
+            const std::shared_ptr<sampler::Program> &program)
         {
             return eventRegistry->getSnapshot().isProgramPadPressed(
                 programPadIndex, program);
@@ -908,7 +907,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         });
 }
 
-void Sequencer::purgeSequence(int i)
+void Sequencer::purgeSequence(const int i)
 {
     sequences[i] = makeNewSequence();
     sequences[i]->resetTrackEventIndices(
@@ -918,7 +917,7 @@ void Sequencer::purgeSequence(int i)
     sequences[i]->setName(res);
 }
 
-void Sequencer::copySequence(int source, int destination)
+void Sequencer::copySequence(const int source, const int destination)
 {
     auto copy = copySequence(sequences[source]);
     sequences[destination].swap(copy);
@@ -927,13 +926,13 @@ void Sequencer::copySequence(int source, int destination)
     sequences[destination]->initLoop();
 }
 
-void Sequencer::copySequenceParameters(const int source, const int dest)
+void Sequencer::copySequenceParameters(const int source, const int dest) const
 {
     copySequenceParameters(sequences[source], sequences[dest]);
 }
 
 std::shared_ptr<Sequence>
-Sequencer::copySequence(std::shared_ptr<Sequence> source)
+Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
 {
     auto copy = makeNewSequence();
     copy->init(source->getLastBarIndex());
@@ -955,8 +954,9 @@ Sequencer::copySequence(std::shared_ptr<Sequence> source)
     return copy;
 }
 
-void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source,
-                                       std::shared_ptr<Sequence> dest)
+void Sequencer::copySequenceParameters(
+    const std::shared_ptr<Sequence> &source,
+    const std::shared_ptr<Sequence> &dest) const
 {
     dest->setName(source->getName());
     dest->setLoopEnabled(source->isLoopEnabled());
@@ -971,8 +971,9 @@ void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source,
     copyTempoChangeEvents(source, dest);
 }
 
-void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src,
-                                      std::shared_ptr<Sequence> dst)
+void Sequencer::copyTempoChangeEvents(
+    const std::shared_ptr<Sequence> &src,
+    const std::shared_ptr<Sequence> &dst) const
 {
     for (auto &e1 : src->getTempoChangeEvents())
     {
@@ -981,8 +982,10 @@ void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src,
     }
 }
 
-void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex,
-                          int sourceSequenceIndex, int destinationSequenceIndex)
+void Sequencer::copyTrack(const int sourceTrackIndex,
+                          const int destinationTrackIndex,
+                          const int sourceSequenceIndex,
+                          const int destinationSequenceIndex) const
 {
     if (sourceSequenceIndex == destinationSequenceIndex &&
         sourceTrackIndex == destinationTrackIndex)
@@ -1030,8 +1033,8 @@ void Sequencer::copySong(const int source, const int dest)
     s1->setLoopEnabled(s0->isLoopEnabled());
 }
 
-void Sequencer::copyTrack(std::shared_ptr<Track> src,
-                          std::shared_ptr<Track> dest)
+void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
+                          const std::shared_ptr<Track> &dest) const
 {
     if (src == dest)
     {
@@ -1048,8 +1051,8 @@ void Sequencer::copyTrack(std::shared_ptr<Track> src,
     copyTrackParameters(src, dest);
 }
 
-void Sequencer::copyTrackParameters(std::shared_ptr<Track> source,
-                                    std::shared_ptr<Track> dest)
+void Sequencer::copyTrackParameters(const std::shared_ptr<Track> &source,
+                                    const std::shared_ptr<Track> &dest)
 {
     dest->setUsed(source->isUsed());
     dest->setOn(source->isOn());
@@ -1060,7 +1063,7 @@ void Sequencer::copyTrackParameters(std::shared_ptr<Track> source,
     dest->setName(source->getName());
 }
 
-std::string Sequencer::getDefaultTrackName(int i)
+std::string Sequencer::getDefaultTrackName(const int i)
 {
     return defaultTrackNames[i];
 }
@@ -1070,7 +1073,7 @@ std::vector<std::string> &Sequencer::getDefaultTrackNames()
     return defaultTrackNames;
 }
 
-void Sequencer::setDefaultTrackName(std::string s, int i)
+void Sequencer::setDefaultTrackName(const std::string &s, const int i)
 {
     defaultTrackNames[i] = s;
 }
@@ -1158,7 +1161,8 @@ int Sequencer::getCurrentBeatIndex()
         barCounter++;
     }
 
-    const auto beatIndex = (int)floor((index - barStartPos) / denTicks);
+    const auto beatIndex =
+        static_cast<int>(floor((index - barStartPos) / denTicks));
     return beatIndex;
 }
 
@@ -1244,7 +1248,7 @@ void Sequencer::setBar(int i)
 
     auto ts = s->getTimeSignature();
     auto den = ts.getDenominator();
-    auto denTicks = (int)(96 * (4.0 / den));
+    auto denTicks = static_cast<int>(96 * (4.0 / den));
 
     if (i != s->getLastBarIndex() + 1)
     {
@@ -1372,12 +1376,12 @@ std::shared_ptr<Sequence> Sequencer::getActiveSequence()
     return sequences[activeSequenceIndex];
 }
 
-int Sequencer::getUsedSequenceCount()
+int Sequencer::getUsedSequenceCount() const
 {
     return getUsedSequences().size();
 }
 
-std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences()
+std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences() const
 {
     std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
@@ -1392,7 +1396,7 @@ std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences()
     return usedSeqs;
 }
 
-std::vector<int> Sequencer::getUsedSequenceIndexes()
+std::vector<int> Sequencer::getUsedSequenceIndexes() const
 {
     std::vector<int> usedSeqs;
 
@@ -1669,7 +1673,6 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
         }
     }
 
-    stepStartTick = 0;
     stepEndTick = 0;
 
     for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
@@ -1697,8 +1700,6 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
 
             const auto offsetWithinStepQuarterNotes =
                 wrappedNewPosition - stepStartPositionQuarterNotes;
-            const auto offsetWithinStepTicks =
-                quarterNotesToTicks(offsetWithinStepQuarterNotes);
 
             const double finalPosQuarterNotes =
                 fmod(offsetWithinStepQuarterNotes,
@@ -1760,7 +1761,6 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
         }
     }
 
-    stepStartTick = 0;
     stepEndTick = 0;
 
     for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
@@ -1791,8 +1791,9 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
             const auto offsetWithinStepTicks =
                 quarterNotesToTicks(offsetWithinStepQuarterNotes);
 
-            playedStepRepetitions = std::floor(offsetWithinStepTicks /
-                                               (float)sequence->getLastTick());
+            playedStepRepetitions =
+                std::floor(offsetWithinStepTicks /
+                           static_cast<float>(sequence->getLastTick()));
             sequence->resetTrackEventIndices(offsetWithinStepTicks %
                                              sequence->getLastTick());
 
@@ -1849,7 +1850,7 @@ void Sequencer::move(const double positionQuarterNotesToUse)
     }
 }
 
-int Sequencer::getTickPosition()
+int Sequencer::getTickPosition() const
 {
     return quarterNotesToTicks(positionQuarterNotes);
 }
@@ -1866,12 +1867,12 @@ std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
     return sequences[seqIndex];
 }
 
-void Sequencer::setActiveTrackIndex(int i)
+void Sequencer::setActiveTrackIndex(const int i)
 {
     activeTrackIndex = i;
 }
 
-int Sequencer::getCurrentlyPlayingSequenceIndex()
+int Sequencer::getCurrentlyPlayingSequenceIndex() const
 {
     if (songMode)
     {
@@ -1897,18 +1898,18 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
     return currentlyPlayingSequenceIndex;
 }
 
-void Sequencer::setCurrentlyPlayingSequenceIndex(int i)
+void Sequencer::setCurrentlyPlayingSequenceIndex(const int i)
 {
     currentlyPlayingSequenceIndex = i;
     setActiveSequenceIndex(i);
 }
 
-int Sequencer::getNextSq()
+int Sequencer::getNextSq() const
 {
     return nextSq;
 }
 
-int Sequencer::getFirstUsedSeqDown(int from, bool unused)
+int Sequencer::getFirstUsedSeqDown(const int from, const bool unused) const
 {
     for (int i = from; i >= 0; i--)
     {
@@ -1924,7 +1925,7 @@ int Sequencer::getFirstUsedSeqDown(int from, bool unused)
     return -1;
 }
 
-int Sequencer::getFirstUsedSeqUp(int from, bool unused)
+int Sequencer::getFirstUsedSeqUp(const int from, const bool unused) const
 {
     for (int i = from; i < 99; i++)
     {
@@ -1970,7 +1971,7 @@ void Sequencer::setNextSq(int i)
     nextSq = candidate;
 }
 
-void Sequencer::setNextSqPad(int i)
+void Sequencer::setNextSqPad(const int i)
 {
     if (!sequences[i]->isUsed())
     {
@@ -1981,22 +1982,22 @@ void Sequencer::setNextSqPad(int i)
     nextSq = i;
 }
 
-std::shared_ptr<Song> Sequencer::getSong(int i)
+std::shared_ptr<Song> Sequencer::getSong(const int i)
 {
     return songs[i];
 }
 
-bool Sequencer::isSongModeEnabled()
+bool Sequencer::isSongModeEnabled() const
 {
     return songMode;
 }
 
-void Sequencer::setSongModeEnabled(bool b)
+void Sequencer::setSongModeEnabled(const bool b)
 {
     songMode = b;
 }
 
-int Sequencer::getSongSequenceIndex()
+int Sequencer::getSongSequenceIndex() const
 {
     auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     auto song = songs[songScreen->getActiveSongIndex()];
@@ -2015,12 +2016,12 @@ int Sequencer::getSongSequenceIndex()
     return song->getStep(step).lock()->getSequence();
 }
 
-bool Sequencer::isSecondSequenceEnabled()
+bool Sequencer::isSecondSequenceEnabled() const
 {
     return secondSequenceEnabled;
 }
 
-void Sequencer::setSecondSequenceEnabled(bool b)
+void Sequencer::setSecondSequenceEnabled(const bool b)
 {
     secondSequenceEnabled = b;
 }
@@ -2052,22 +2053,22 @@ void Sequencer::resetUndo()
         ->setEnabled(false);
 }
 
-bool Sequencer::isOverdubbing()
+bool Sequencer::isOverdubbing() const
 {
     return overdubbing;
 }
 
-const double Sequencer::getPlayStartPositionQuarterNotes()
+double Sequencer::getPlayStartPositionQuarterNotes() const
 {
     return playStartPositionQuarterNotes;
 }
 
-void Sequencer::setRecording(bool b)
+void Sequencer::setRecording(const bool b)
 {
     recording = b;
 }
 
-void Sequencer::setOverdubbing(bool b)
+void Sequencer::setOverdubbing(const bool b)
 {
     overdubbing = b;
 }
@@ -2105,7 +2106,7 @@ void Sequencer::clearPlaceHolder()
     placeHolder.reset();
 }
 
-void Sequencer::movePlaceHolderTo(int destIndex)
+void Sequencer::movePlaceHolderTo(const int destIndex)
 {
     sequences[destIndex].swap(placeHolder);
     sequences[destIndex]->resetTrackEventIndices(
@@ -2118,12 +2119,12 @@ std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
     return placeHolder;
 }
 
-int Sequencer::getPlayedStepRepetitions()
+int Sequencer::getPlayedStepRepetitions() const
 {
     return playedStepRepetitions;
 }
 
-void Sequencer::setEndOfSong(bool b)
+void Sequencer::setEndOfSong(const bool b)
 {
     endOfSong = b;
 }
@@ -2138,22 +2139,22 @@ void Sequencer::resetPlayedStepRepetitions()
     playedStepRepetitions = 0;
 }
 
-bool Sequencer::isPunchEnabled()
+bool Sequencer::isPunchEnabled() const
 {
     return punchEnabled;
 }
 
-void Sequencer::setPunchEnabled(bool enabled)
+void Sequencer::setPunchEnabled(const bool enabled)
 {
     punchEnabled = enabled;
 }
 
-int Sequencer::getAutoPunchMode()
+int Sequencer::getAutoPunchMode() const
 {
     return autoPunchMode;
 }
 
-void Sequencer::setAutoPunchMode(int mode)
+void Sequencer::setAutoPunchMode(const int mode)
 {
     if (mode >= 0 && mode <= 2)
     {
@@ -2161,22 +2162,22 @@ void Sequencer::setAutoPunchMode(int mode)
     }
 }
 
-int Sequencer::getPunchInTime()
+int Sequencer::getPunchInTime() const
 {
     return punchInTime;
 }
 
-void Sequencer::setPunchInTime(int time)
+void Sequencer::setPunchInTime(const int time)
 {
     punchInTime = time;
 }
 
-int Sequencer::getPunchOutTime()
+int Sequencer::getPunchOutTime() const
 {
     return punchOutTime;
 }
 
-void Sequencer::setPunchOutTime(int time)
+void Sequencer::setPunchOutTime(const int time)
 {
     punchOutTime = time;
 }
@@ -2192,7 +2193,7 @@ template <typename T> std::shared_ptr<T> Sequencer::getBus(const int busIndex)
     return result;
 }
 
-std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex)
+std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex) const
 {
     assert(drumBusIndex >= 0 || drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT);
     auto result = std::dynamic_pointer_cast<DrumBus>(buses[drumBusIndex + 1]);

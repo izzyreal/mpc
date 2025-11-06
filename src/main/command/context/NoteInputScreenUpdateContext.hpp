@@ -15,7 +15,7 @@ namespace mpc::command::context
     {
         bool isSixteenLevelsEnabled;
         bool isAllowCentralNoteAndPadUpdateScreen;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
+        std::shared_ptr<lcdgui::ScreenComponent> screenComponent;
         std::function<void(int)> setSelectedNote;
         bool currentFieldNameIsFromNote;
     };

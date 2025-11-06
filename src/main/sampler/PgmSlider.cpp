@@ -1,6 +1,6 @@
 #include "sampler/PgmSlider.hpp"
 
-#include <algorithm> // for std::clamp
+#include <algorithm>
 
 using namespace mpc::sampler;
 
@@ -11,7 +11,7 @@ void PgmSlider::setAssignNote(int i)
     notifyObservers("assignnote");
 }
 
-int PgmSlider::getNote()
+int PgmSlider::getNote() const
 {
     return assignNote;
 }
@@ -28,7 +28,7 @@ void PgmSlider::setTuneLowRange(int i)
     }
 }
 
-int PgmSlider::getTuneLowRange()
+int PgmSlider::getTuneLowRange() const
 {
     return tuneLowRange;
 }
@@ -45,7 +45,7 @@ void PgmSlider::setTuneHighRange(int i)
     }
 }
 
-int PgmSlider::getTuneHighRange()
+int PgmSlider::getTuneHighRange() const
 {
     return tuneHighRange;
 }
@@ -62,7 +62,7 @@ void PgmSlider::setDecayLowRange(int i)
     }
 }
 
-int PgmSlider::getDecayLowRange()
+int PgmSlider::getDecayLowRange() const
 {
     return decayLowRange;
 }
@@ -79,7 +79,7 @@ void PgmSlider::setDecayHighRange(int i)
     }
 }
 
-int PgmSlider::getDecayHighRange()
+int PgmSlider::getDecayHighRange() const
 {
     return decayHighRange;
 }
@@ -96,7 +96,7 @@ void PgmSlider::setAttackLowRange(int i)
     }
 }
 
-int PgmSlider::getAttackLowRange()
+int PgmSlider::getAttackLowRange() const
 {
     return attackLowRange;
 }
@@ -113,7 +113,7 @@ void PgmSlider::setAttackHighRange(int i)
     }
 }
 
-int PgmSlider::getAttackHighRange()
+int PgmSlider::getAttackHighRange() const
 {
     return attackHighRange;
 }
@@ -130,7 +130,7 @@ void PgmSlider::setFilterLowRange(int i)
     }
 }
 
-int PgmSlider::getFilterLowRange()
+int PgmSlider::getFilterLowRange() const
 {
     return filterLowRange;
 }
@@ -147,7 +147,7 @@ void PgmSlider::setFilterHighRange(int i)
     }
 }
 
-int PgmSlider::getFilterHighRange()
+int PgmSlider::getFilterHighRange() const
 {
     return filterHighRange;
 }
@@ -159,12 +159,12 @@ void PgmSlider::setControlChange(int i)
     notifyObservers("controlchange");
 }
 
-int PgmSlider::getControlChange()
+int PgmSlider::getControlChange() const
 {
     return controlChange;
 }
 
-int PgmSlider::getParameter()
+int PgmSlider::getParameter() const
 {
     return parameter;
 }

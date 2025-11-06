@@ -1,6 +1,6 @@
 #include "file/all/SequenceNames.hpp"
 
-#include <Mpc.hpp>
+#include "Mpc.hpp"
 #include "file/all/AllParser.hpp"
 #include "sequencer/MixerEvent.hpp"
 #include "sequencer/Sequence.hpp"

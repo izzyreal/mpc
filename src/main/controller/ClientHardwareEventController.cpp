@@ -26,9 +26,7 @@
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
-#include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
-#include "sequencer/Track.hpp"
 
 #include <memory>
 
@@ -44,17 +42,15 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::eventregistry;
 
-ClientHardwareEventController::ClientHardwareEventController(mpc::Mpc &mpcToUse)
+ClientHardwareEventController::ClientHardwareEventController(Mpc &mpcToUse)
     : mpc(mpcToUse)
 {
 }
 
-bool ClientHardwareEventController::isNoteRepeatLockedOrPressed()
+bool ClientHardwareEventController::isNoteRepeatLockedOrPressed() const
 {
     return isNoteRepeatLocked() ||
-           mpc.getHardware()
-               ->getButton(ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
-               ->isPressed();
+           mpc.getHardware()->getButton(TAP_TEMPO_OR_NOTE_REPEAT)->isPressed();
 }
 
 void ClientHardwareEventController::handleClientHardwareEvent(
@@ -113,14 +109,14 @@ void ClientHardwareEventController::handleClientHardwareEvent(
 }
 
 void ClientHardwareEventController::handlePadPress(
-    const ClientHardwareEvent &event)
+    const ClientHardwareEvent &event) const
 {
     if (!event.index || !event.value)
     {
         return;
     }
 
-    auto layeredScreen = mpc.getLayeredScreen();
+    const auto layeredScreen = mpc.getLayeredScreen();
 
     if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}) &&
         event.source == ClientHardwareEvent::Source::HostInputKeyboard)
@@ -128,9 +124,9 @@ void ClientHardwareEventController::handlePadPress(
         return;
     }
 
-    auto screen = layeredScreen->getCurrentScreen();
+    const auto screen = layeredScreen->getCurrentScreen();
 
-    if (auto opensNameScreen =
+    if (const auto opensNameScreen =
             std::dynamic_pointer_cast<OpensNameScreen>(screen);
         opensNameScreen)
     {
@@ -145,20 +141,20 @@ void ClientHardwareEventController::handlePadPress(
     const auto physicalPadIndex = *event.index;
 
     const auto velocity =
-        *event.value * (float)VelocitySensitivePressable::MAX_VELO;
+        *event.value * static_cast<float>(VelocitySensitivePressable::MAX_VELO);
 
-    const auto clampedVelocity =
-        std::clamp(velocity, (float)VelocitySensitivePressable::MIN_VELO,
-                   (float)VelocitySensitivePressable::MAX_VELO);
+    const auto clampedVelocity = std::clamp(
+        velocity, static_cast<float>(VelocitySensitivePressable::MIN_VELO),
+        static_cast<float>(VelocitySensitivePressable::MAX_VELO));
 
-    auto pad = mpc.getHardware()->getPad(physicalPadIndex);
+    const auto pad = mpc.getHardware()->getPad(physicalPadIndex);
 
     if (!pad->pressWithVelocity(clampedVelocity))
     {
         return;
     }
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
     const auto program = screen->getProgram();
 
@@ -177,10 +173,8 @@ void ClientHardwareEventController::handlePadPress(
         note = program->getNoteFromPad(programPadIndex);
     }
 
-    const bool isF4Pressed =
-        mpc.getHardware()->getButton(ComponentId::F4)->isPressed();
-    const bool isF6Pressed =
-        mpc.getHardware()->getButton(ComponentId::F6)->isPressed();
+    const bool isF4Pressed = mpc.getHardware()->getButton(F4)->isPressed();
+    const bool isF6Pressed = mpc.getHardware()->getButton(F6)->isPressed();
 
     PushPadScreenUpdateContext padPushScreenUpdateCtx{
         mpc.clientEventController->isSixteenLevelsEnabled(),
@@ -199,7 +193,7 @@ void ClientHardwareEventController::handlePadPress(
     PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex)
         .execute();
 
-    eventregistry::NoteOnEventPtr registryNoteOnEvent;
+    NoteOnEventPtr registryNoteOnEvent;
 
     if (note)
     {
@@ -217,7 +211,7 @@ void ClientHardwareEventController::handlePadPress(
 
         if (*note >= 0)
         {
-            std::optional<int> midiChannel = std::nullopt;
+            constexpr std::optional<int> midiChannel = std::nullopt;
             registryNoteOnEvent = mpc.eventRegistry->registerNoteOn(
                 Source::VirtualMpcHardware, screen, screen->getBus(), *note,
                 clampedVelocity, track.get(), midiChannel, program,
@@ -239,8 +233,7 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (screengroups::isSoundScreen(screen))
     {
-        mpc.getPreviewSoundPlayer().playSound(sampler::PLAYX_SOUND,
-                                              127, 0);
+        mpc.getPreviewSoundPlayer().playSound(sampler::PLAYX_SOUND, 127, 0);
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
@@ -270,7 +263,7 @@ void ClientHardwareEventController::handlePadPress(
 }
 
 void ClientHardwareEventController::handlePadRelease(
-    const ClientHardwareEvent &event)
+    const ClientHardwareEvent &event) const
 {
     if (!event.index)
     {
@@ -298,7 +291,7 @@ void ClientHardwareEventController::handlePadRelease(
          frameSequencer = mpc.getSequencer()->getFrameSequencer(),
          previewSoundPlayer = &mpc.getPreviewSoundPlayer()](void *userData)
     {
-        auto p = (PhysicalPadPressEvent *)userData;
+        const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 
         if (screengroups::isSoundScreen(p->screen))
         {
@@ -314,7 +307,7 @@ void ClientHardwareEventController::handlePadRelease(
 
         if (p->note)
         {
-            auto ctx =
+            const auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     Source::VirtualMpcHardware, *p->note, p->track, p->bus,
                     p->screen, programPadIndex, p->program, sequencer,
@@ -325,7 +318,7 @@ void ClientHardwareEventController::handlePadRelease(
 
             if (*p->note >= 0)
             {
-                std::optional<int> midiChannel = std::nullopt;
+                constexpr std::optional<int> midiChannel = std::nullopt;
                 eventRegistry->registerNoteOff(Source::VirtualMpcHardware,
                                                p->bus, *p->note, p->track,
                                                midiChannel, [](void *) {});
@@ -345,7 +338,7 @@ void ClientHardwareEventController::handlePadRelease(
 }
 
 void ClientHardwareEventController::handlePadAftertouch(
-    const ClientHardwareEvent &event)
+    const ClientHardwareEvent &event) const
 {
     if (!event.index || !event.value)
     {
@@ -355,15 +348,15 @@ void ClientHardwareEventController::handlePadAftertouch(
     const auto padIndex = *event.index;
     const auto pressureToUse =
         std::clamp(*event.value * Aftertouchable::MAX_PRESSURE,
-                   (float)Aftertouchable::MIN_PRESSURE,
-                   (float)Aftertouchable::MAX_PRESSURE);
+                   static_cast<float>(Aftertouchable::MIN_PRESSURE),
+                   static_cast<float>(Aftertouchable::MAX_PRESSURE));
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 
-    std::function<void(void *)> action =
+    const std::function<void(void *)> action =
         [eventRegistry = mpc.eventRegistry, pressureToUse](void *userData)
     {
-        auto padPress = (PhysicalPadPressEvent *)userData;
+        const auto padPress = static_cast<PhysicalPadPressEvent *>(userData);
 
         if (padPress->program)
         {
@@ -414,11 +407,11 @@ void ClientHardwareEventController::handleDataWheel(
 
     mpc.getHardware()->getDataWheel()->turn(steps);
 
-    auto screen = mpc.getScreen();
+    const auto screen = mpc.getScreen();
 
     screen->turnWheel(steps);
 
-    if (auto opensNameScreen =
+    if (const auto opensNameScreen =
             std::dynamic_pointer_cast<OpensNameScreen>(screen);
         opensNameScreen)
     {
@@ -427,9 +420,9 @@ void ClientHardwareEventController::handleDataWheel(
 }
 
 void ClientHardwareEventController::handleSlider(
-    const ClientHardwareEvent &event)
+    const ClientHardwareEvent &event) const
 {
-    auto slider = mpc.getHardware()->getSlider();
+    const auto slider = mpc.getHardware()->getSlider();
 
     if (event.value)
     {
@@ -443,17 +436,18 @@ void ClientHardwareEventController::handleSlider(
     }
 }
 
-void ClientHardwareEventController::handlePot(const ClientHardwareEvent &event)
+void ClientHardwareEventController::handlePot(
+    const ClientHardwareEvent &event) const
 {
-    std::shared_ptr<Pot> pot = event.componentId == ComponentId::REC_GAIN_POT
-                                   ? mpc.getHardware()->getRecPot()
-                                   : mpc.getHardware()->getVolPot();
+    const std::shared_ptr<Pot> pot = event.componentId == REC_GAIN_POT
+                                         ? mpc.getHardware()->getRecPot()
+                                         : mpc.getHardware()->getVolPot();
 
-    auto audioMidiServices = mpc.getAudioMidiServices();
+    const auto audioMidiServices = mpc.getAudioMidiServices();
 
     pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
 
-    if (event.componentId == ComponentId::REC_GAIN_POT)
+    if (event.componentId == REC_GAIN_POT)
     {
         audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
     }
@@ -464,9 +458,9 @@ void ClientHardwareEventController::handlePot(const ClientHardwareEvent &event)
 }
 
 void ClientHardwareEventController::handleButtonPress(
-    const ClientHardwareEvent &event)
+    const ClientHardwareEvent &event) const
 {
-    auto button = mpc.getHardware()->getButton(event.componentId);
+    const auto button = mpc.getHardware()->getButton(event.componentId);
 
     // The below check is necessary because the keyboard mapping routines in
     // mpc::event may return labels like "ctrl" and "alt" rather than component
@@ -481,8 +475,7 @@ void ClientHardwareEventController::handleButtonPress(
     // so we don't depend on host-generated repeats. This way the behaviour is
     // the same for keyboard, mouse, touch and MIDI event.
     static const auto allowRepeat = std::vector<ComponentId>{
-        ComponentId::CURSOR_UP, ComponentId::CURSOR_RIGHT_OR_DIGIT,
-        ComponentId::CURSOR_DOWN, ComponentId::CURSOR_LEFT_OR_DIGIT};
+        CURSOR_UP, CURSOR_RIGHT_OR_DIGIT, CURSOR_DOWN, CURSOR_LEFT_OR_DIGIT};
 
     if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(),
                                       event.componentId) == allowRepeat.end())
@@ -490,33 +483,31 @@ void ClientHardwareEventController::handleButtonPress(
         return;
     }
 
-    auto screen = mpc.getScreen();
-    auto layeredScreen = mpc.getLayeredScreen();
-
-    using Id = ComponentId;
+    const auto screen = mpc.getScreen();
+    const auto layeredScreen = mpc.getLayeredScreen();
 
     const auto id = event.componentId;
 
-    if (auto stepEditorScreen =
+    if (const auto stepEditorScreen =
             std::dynamic_pointer_cast<StepEditorScreen>(screen);
         stepEditorScreen)
     {
-        if (id == Id::PREV_STEP_OR_EVENT)
+        if (id == PREV_STEP_OR_EVENT)
         {
             stepEditorScreen->prevStepEvent();
             return;
         }
-        else if (id == Id::NEXT_STEP_OR_EVENT)
+        else if (id == NEXT_STEP_OR_EVENT)
         {
             stepEditorScreen->nextStepEvent();
             return;
         }
-        else if (id == Id::PREV_BAR_START)
+        else if (id == PREV_BAR_START)
         {
             stepEditorScreen->prevBarStart();
             return;
         }
-        else if (id == Id::NEXT_BAR_END)
+        else if (id == NEXT_BAR_END)
         {
             stepEditorScreen->nextBarEnd();
             return;
@@ -529,50 +520,50 @@ void ClientHardwareEventController::handleButtonPress(
         return;
     }
 
-    if (id == Id::CURSOR_LEFT_OR_DIGIT)
+    if (id == CURSOR_LEFT_OR_DIGIT)
     {
         screen->left();
     }
-    else if (id == Id::CURSOR_RIGHT_OR_DIGIT)
+    else if (id == CURSOR_RIGHT_OR_DIGIT)
     {
         screen->right();
     }
-    else if (id == Id::CURSOR_UP)
+    else if (id == CURSOR_UP)
     {
         screen->up();
     }
-    else if (id == Id::CURSOR_DOWN)
+    else if (id == CURSOR_DOWN)
     {
         screen->down();
     }
-    else if (id == Id::REC)
+    else if (id == REC)
     {
         screen->rec();
     }
-    else if (id == Id::OVERDUB)
+    else if (id == OVERDUB)
     {
         screen->overDub();
     }
-    else if (id == Id::STOP)
+    else if (id == STOP)
     {
         screen->stop();
     }
-    else if (id == Id::PLAY)
+    else if (id == PLAY)
     {
         screen->play();
     }
-    else if (id == Id::PLAY_START)
+    else if (id == PLAY_START)
     {
         screen->playStart();
     }
-    else if (id == Id::MAIN_SCREEN)
+    else if (id == MAIN_SCREEN)
     {
         if (screengroups::isScreenThatIsNotAllowedToOpenMainScreen(screen))
         {
             return;
         }
 
-        if (auto vmpcKeyboardScreen =
+        if (const auto vmpcKeyboardScreen =
                 std::dynamic_pointer_cast<VmpcKeyboardScreen>(screen);
             vmpcKeyboardScreen)
         {
@@ -583,7 +574,7 @@ void ClientHardwareEventController::handleButtonPress(
                 return;
             }
         }
-        else if (auto vmpcMidiScreen =
+        else if (const auto vmpcMidiScreen =
                      std::dynamic_pointer_cast<VmpcMidiScreen>(screen);
                  vmpcMidiScreen)
         {
@@ -594,19 +585,19 @@ void ClientHardwareEventController::handleButtonPress(
                 return;
             }
         }
-        else if (auto loadASoundScreen =
+        else if (const auto loadASoundScreen =
                      std::dynamic_pointer_cast<LoadASoundScreen>(screen);
                  loadASoundScreen)
         {
             mpc.getSampler()->deleteSound(mpc.getSampler()->getPreviewSound());
         }
-        else if (auto nameScreen =
+        else if (const auto nameScreen =
                      std::dynamic_pointer_cast<NameScreen>(screen);
                  nameScreen)
         {
             nameScreen->mainScreenAction();
         }
-        else if (auto keepOrRetryScreen =
+        else if (const auto keepOrRetryScreen =
                      std::dynamic_pointer_cast<KeepOrRetryScreen>(screen);
                  keepOrRetryScreen)
         {
@@ -615,19 +606,19 @@ void ClientHardwareEventController::handleButtonPress(
 
         PushMainScreenCommand(mpc).execute();
     }
-    else if (id == Id::OPEN_WINDOW)
+    else if (id == OPEN_WINDOW)
     {
         screen->openWindow();
     }
-    else if (id == Id::GO_TO)
+    else if (id == GO_TO)
     {
         PushGoToCommand(mpc).execute();
     }
-    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT)
+    else if (id == TAP_TEMPO_OR_NOTE_REPEAT)
     {
         PushTapCommand(mpc).execute();
 
-        if (auto sequencerScreen =
+        if (const auto sequencerScreen =
                 std::dynamic_pointer_cast<SequencerScreen>(screen);
             sequencerScreen)
         {
@@ -635,55 +626,55 @@ void ClientHardwareEventController::handleButtonPress(
             sequencerScreen->tap();
         }
     }
-    else if (id == Id::NEXT_SEQ)
+    else if (id == NEXT_SEQ)
     {
         PushNextSeqCommand(mpc).execute();
     }
-    else if (id == Id::TRACK_MUTE)
+    else if (id == TRACK_MUTE)
     {
         PushTrackMuteCommand(mpc).execute();
     }
-    else if (id == Id::FULL_LEVEL_OR_CASE_SWITCH)
+    else if (id == FULL_LEVEL_OR_CASE_SWITCH)
     {
         PushFullLevelCommand(layeredScreen, mpc.getPadAndButtonKeyboard(),
                              mpc.getHardware(), mpc.clientEventController)
             .execute();
     }
-    else if (id == Id::SIXTEEN_LEVELS_OR_SPACE)
+    else if (id == SIXTEEN_LEVELS_OR_SPACE)
     {
         PushSixteenLevelsCommand(layeredScreen, mpc.clientEventController,
                                  mpc.getHardware())
             .execute();
     }
-    else if (id == Id::F1)
+    else if (id == F1)
     {
         screen->function(0);
     }
-    else if (id == Id::F2)
+    else if (id == F2)
     {
         screen->function(1);
     }
-    else if (id == Id::F3)
+    else if (id == F3)
     {
         screen->function(2);
     }
-    else if (id == Id::F4)
+    else if (id == F4)
     {
         screen->function(3);
     }
-    else if (id == Id::F5)
+    else if (id == F5)
     {
         screen->function(4);
     }
-    else if (id == Id::F6)
+    else if (id == F6)
     {
         screen->function(5);
     }
-    else if (id == Id::SHIFT)
+    else if (id == SHIFT)
     {
         PushShiftCommand(mpc).execute();
 
-        if (auto stepEditorScreen =
+        if (const auto stepEditorScreen =
                 std::dynamic_pointer_cast<StepEditorScreen>(screen);
             stepEditorScreen)
         {
@@ -691,19 +682,19 @@ void ClientHardwareEventController::handleButtonPress(
             stepEditorScreen->shift();
         }
     }
-    else if (id == Id::ENTER_OR_SAVE)
+    else if (id == ENTER_OR_SAVE)
     {
         screen->pressEnter();
     }
-    else if (id == Id::UNDO_SEQ)
+    else if (id == UNDO_SEQ)
     {
         PushUndoSeqCommand(mpc).execute();
     }
-    else if (id == Id::ERASE)
+    else if (id == ERASE)
     {
         PushEraseCommand(mpc).execute();
 
-        if (auto sequencerScreen =
+        if (const auto sequencerScreen =
                 std::dynamic_pointer_cast<SequencerScreen>(screen);
             sequencerScreen)
         {
@@ -714,74 +705,74 @@ void ClientHardwareEventController::handleButtonPress(
             }
         }
     }
-    else if (id == Id::AFTER_OR_ASSIGN)
+    else if (id == AFTER_OR_ASSIGN)
     {
         PushAfterCommand(mpc.clientEventController, layeredScreen,
                          mpc.getHardware())
             .execute();
     }
-    else if (id == Id::BANK_A)
+    else if (id == BANK_A)
     {
         PushBankCommand(mpc.clientEventController, Bank::A).execute();
     }
-    else if (id == Id::BANK_B)
+    else if (id == BANK_B)
     {
         PushBankCommand(mpc.clientEventController, Bank::B).execute();
     }
-    else if (id == Id::BANK_C)
+    else if (id == BANK_C)
     {
         PushBankCommand(mpc.clientEventController, Bank::C).execute();
     }
-    else if (id == Id::BANK_D)
+    else if (id == BANK_D)
     {
         PushBankCommand(mpc.clientEventController, Bank::D).execute();
     }
-    else if (id == Id::NUM_0_OR_VMPC)
+    else if (id == NUM_0_OR_VMPC)
     {
         screen->numpad(0);
     }
-    else if (id == Id::NUM_1_OR_SONG)
+    else if (id == NUM_1_OR_SONG)
     {
         screen->numpad(1);
     }
-    else if (id == Id::NUM_2_OR_MISC)
+    else if (id == NUM_2_OR_MISC)
     {
         screen->numpad(2);
     }
-    else if (id == Id::NUM_3_OR_LOAD)
+    else if (id == NUM_3_OR_LOAD)
     {
         screen->numpad(3);
     }
-    else if (id == Id::NUM_4_OR_SAMPLE)
+    else if (id == NUM_4_OR_SAMPLE)
     {
         screen->numpad(4);
     }
-    else if (id == Id::NUM_5_OR_TRIM)
+    else if (id == NUM_5_OR_TRIM)
     {
         screen->numpad(5);
     }
-    else if (id == Id::NUM_6_OR_PROGRAM)
+    else if (id == NUM_6_OR_PROGRAM)
     {
         screen->numpad(6);
     }
-    else if (id == Id::NUM_7_OR_MIXER)
+    else if (id == NUM_7_OR_MIXER)
     {
         screen->numpad(7);
     }
-    else if (id == Id::NUM_8_OR_OTHER)
+    else if (id == NUM_8_OR_OTHER)
     {
         screen->numpad(8);
     }
-    else if (id == Id::NUM_9_OR_MIDI_SYNC)
+    else if (id == NUM_9_OR_MIDI_SYNC)
     {
         screen->numpad(9);
     }
 }
 
 void ClientHardwareEventController::handleButtonRelease(
-    const ClientHardwareEvent &event)
+    const ClientHardwareEvent &event) const
 {
-    auto button = mpc.getHardware()->getButton(event.componentId);
+    const auto button = mpc.getHardware()->getButton(event.componentId);
 
     // The below check is necessary because the keyboard mapping routines in
     // mpc::event may return labels like "ctrl" and "alt" rather than component
@@ -794,43 +785,39 @@ void ClientHardwareEventController::handleButtonRelease(
 
     button->release();
 
-    using Id = ComponentId;
-
-    auto id = event.componentId;
-
-    if (id == Id::ERASE)
+    if (const auto id = event.componentId; id == ERASE)
     {
         ReleaseEraseCommand(mpc).execute();
     }
-    else if (id == Id::F1)
+    else if (id == F1)
     {
         ReleaseFunctionCommand(mpc, 0).execute();
     }
-    else if (id == Id::F3)
+    else if (id == F3)
     {
         ReleaseFunctionCommand(mpc, 2).execute();
     }
-    else if (id == Id::F4)
+    else if (id == F4)
     {
         ReleaseFunctionCommand(mpc, 3).execute();
     }
-    else if (id == Id::F5)
+    else if (id == F5)
     {
         ReleaseFunctionCommand(mpc, 4).execute();
     }
-    else if (id == Id::F6)
+    else if (id == F6)
     {
         ReleaseFunctionCommand(mpc, 5).execute();
     }
-    else if (id == Id::REC)
+    else if (id == REC)
     {
         ReleaseRecCommand(mpc).execute();
     }
-    else if (id == Id::OVERDUB)
+    else if (id == OVERDUB)
     {
         ReleaseOverdubCommand(mpc).execute();
     }
-    else if (id == Id::TAP_TEMPO_OR_NOTE_REPEAT)
+    else if (id == TAP_TEMPO_OR_NOTE_REPEAT)
     {
         ReleaseTapCommand(mpc).execute();
     }
@@ -839,32 +826,31 @@ void ClientHardwareEventController::handleButtonRelease(
 void ClientHardwareEventController::handleButtonDoublePress(
     const ClientHardwareEvent &event)
 {
-    auto button = mpc.getHardware()->getButton(event.componentId);
+    const auto button = mpc.getHardware()->getButton(event.componentId);
 
-    if (event.componentId == ComponentId::REC ||
-        event.componentId == ComponentId::OVERDUB)
+    if (event.componentId == REC || event.componentId == OVERDUB)
     {
         if (!button->doublePress())
         {
             return;
         }
 
-        if (event.componentId == ComponentId::REC)
+        if (event.componentId == REC)
         {
             buttonLockTracker.toggle(event.componentId);
 
-            if (buttonLockTracker.isLocked(ComponentId::REC))
+            if (buttonLockTracker.isLocked(REC))
             {
-                buttonLockTracker.unlock(ComponentId::OVERDUB);
+                buttonLockTracker.unlock(OVERDUB);
             }
         }
-        else if (event.componentId == ComponentId::OVERDUB)
+        else if (event.componentId == OVERDUB)
         {
-            buttonLockTracker.toggle(ComponentId::OVERDUB);
+            buttonLockTracker.toggle(OVERDUB);
 
-            if (buttonLockTracker.isLocked(ComponentId::OVERDUB))
+            if (buttonLockTracker.isLocked(OVERDUB))
             {
-                buttonLockTracker.unlock(ComponentId::REC);
+                buttonLockTracker.unlock(REC);
             }
         }
     }
