@@ -91,8 +91,10 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     if (alignment == Alignment::Centered && !textuallyAligned)
     {
-        const auto charsToAlignCount = std::min(
-            int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+        const auto charsToAlignCount =
+            std::min(static_cast<int>(
+                         ceil(alignmentEndX / static_cast<float>(FONT_WIDTH))),
+                     static_cast<int>(text.length()));
         const auto charsToAlign =
             StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
         textToRender = charsToAlign + text.substr(charsToAlignCount);
@@ -106,8 +108,6 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
         alignmentOffset = leftMargin;
     }
 
-    int atlasx, atlasy;
-
     char *tempText = new char[textToRender.length() + 1];
     std::strcpy(tempText, textToRender.c_str());
     utf8_decode_init(tempText, textToRender.length());
@@ -119,18 +119,15 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     while (next != UTF8_END && next >= 0)
     {
-        bmfont_char current_char;
-        current_char = font.chars[next];
-        atlasx = current_char.x;
-        atlasy = current_char.y;
+        const bmfont_char current_char = font.chars[next];
+        const int atlasx = current_char.x;
+        const int atlasy = current_char.y;
 
         for (int x1 = 0; x1 < current_char.width; x1++)
         {
             for (int y1 = 0; y1 < current_char.height; y1++)
             {
-                const bool on = atlas[atlasy + y1][atlasx + x1];
-
-                if (on)
+                if (atlas[atlasy + y1][atlasx + x1])
                 {
                     int xpos = textx + x1 + current_char.xoffset;
                     int ypos = texty + y1 + current_char.yoffset;
@@ -183,14 +180,15 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     if (twoDots)
     {
-        for (const auto xPos : std::vector<int>{12, 30})
+        for (const auto xPos : std::vector{12, 30})
         {
-            const bool doubleInverted = field != nullptr && field->isSplit() &&
-                                        field->getActiveSplit() + 2 <= xPos / 6;
+            const bool twoDotsDoubleInverted =
+                field != nullptr && field->isSplit() &&
+                field->getActiveSplit() + 2 <= xPos / 6;
 
             const bool color = (field != nullptr && field->isTypeModeEnabled())
                                    ? false
-                                   : !(inverted && !doubleInverted);
+                                   : !(inverted && !twoDotsDoubleInverted);
 
             if (w > xPos)
             {
@@ -202,22 +200,22 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
     dirty = false;
 }
 
-int TextComp::getX()
+int TextComp::getX() const
 {
     return x;
 }
 
-int TextComp::getY()
+int TextComp::getY() const
 {
     return y;
 }
 
-int TextComp::getW()
+int TextComp::getW() const
 {
     return w;
 }
 
-int TextComp::getH()
+int TextComp::getH() const
 {
     return h;
 }
@@ -240,7 +238,7 @@ void TextComp::setDoubleInverted(bool b)
     }
 }
 
-bool TextComp::isInverted()
+bool TextComp::isInverted() const
 {
     return (inverted && !doubleInverted) || (!inverted && doubleInverted);
 }
@@ -250,7 +248,7 @@ std::string TextComp::getText()
     return text;
 }
 
-unsigned int TextComp::GetTextEntryLength()
+unsigned int TextComp::GetTextEntryLength() const
 {
     return text.length();
 }
@@ -261,8 +259,10 @@ void TextComp::setText(const std::string &s)
 
     if (alignment == Alignment::Centered && alignmentEndX != w)
     {
-        const auto charsToAlignCount = std::min(
-            int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+        const auto charsToAlignCount =
+            std::min(static_cast<int>(
+                         ceil(alignmentEndX / static_cast<float>(FONT_WIDTH))),
+                     static_cast<int>(text.length()));
         const auto charsToAlign =
             StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
 
@@ -300,7 +300,7 @@ void TextComp::setText(const std::string &s)
 
 void TextComp::setTextPadded(const std::string &s, const std::string &padding)
 {
-    const auto columns = (int)floor(w / FONT_WIDTH);
+    const auto columns = static_cast<int>(floor(w / FONT_WIDTH));
     const std::string padded = StrUtil::padLeft(s, padding, columns);
     setText(padded);
 }

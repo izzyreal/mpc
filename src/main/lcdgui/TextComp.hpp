@@ -32,15 +32,15 @@ namespace mpc::lcdgui
         void setInverted(bool b);
         void setDoubleInverted(bool b);
         void setAlignment(Alignment newAlignment, int endX = -1);
-        int getX();
-        int getY();
-        int getW();
-        int getH();
+        int getX() const;
+        int getY() const;
+        int getW() const;
+        int getH() const;
         std::string getText();
         void setTextPadded(const std::string &s,
                            const std::string &padding = " ");
         void setTextPadded(int i, const std::string &padding = " ");
-        unsigned int GetTextEntryLength();
+        unsigned int GetTextEntryLength() const;
 
         void Draw(std::vector<std::vector<bool>> *pixels) override;
         void setSize(int w, int h) override;
@@ -64,7 +64,7 @@ namespace mpc::lcdgui
         bool doubleInverted = false;
         const int FONT_HEIGHT = 7;
         const int FONT_WIDTH = 6;
-        bool isInverted();
+        bool isInverted() const;
 
     protected:
         std::string text;

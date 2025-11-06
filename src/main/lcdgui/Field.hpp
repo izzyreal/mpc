@@ -35,20 +35,20 @@ namespace mpc::lcdgui
         bool scrolling = false;
 
     public:
-        bool hasFocus();
+        bool hasFocus() const;
         void setFocusable(bool b);
-        bool isFocusable();
+        bool isFocusable() const;
         void loseFocus(const std::string &next);
         void takeFocus();
         void setSplit(bool b);
-        bool isSplit();
-        int getSplitIncrement(bool positive);
-        int getActiveSplit();
+        bool isSplit() const;
+        int getSplitIncrement(bool positive) const;
+        int getActiveSplit() const;
         bool setActiveSplit(int i);
         bool enableTypeMode();
         int enter();
         void type(int i);
-        bool isTypeModeEnabled();
+        bool isTypeModeEnabled() const;
         void disableTypeMode();
         void setNextFocus(const std::string &newNextFocus);
 

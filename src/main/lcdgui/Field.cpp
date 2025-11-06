@@ -60,7 +60,7 @@ void Field::Draw(std::vector<std::vector<bool>> *pixels)
     if (split)
     {
         Clear(pixels);
-        const auto columns = (int)floor((w - 2) / FONT_WIDTH);
+        const auto columns = static_cast<int>(floor((w - 2) / FONT_WIDTH));
         const auto nonInvertedColumns = columns - activeSplit;
         r.R = r.L + (w - (nonInvertedColumns * FONT_WIDTH));
     }
@@ -209,17 +209,17 @@ void Field::setSplit(bool b)
     SetDirty();
 }
 
-bool Field::isSplit()
+bool Field::isSplit() const
 {
     return split;
 }
 
-int Field::getActiveSplit()
+int Field::getActiveSplit() const
 {
     return activeSplit;
 }
 
-int Field::getSplitIncrement(bool positive)
+int Field::getSplitIncrement(bool positive) const
 {
     static const std::vector<int> splitInc{10000000, 1000000, 100000, 10000,
                                            1000,     100,     10,     1};
@@ -364,7 +364,7 @@ void Field::type(int i)
     setTextPadded(newText);
 }
 
-bool Field::isTypeModeEnabled()
+bool Field::isTypeModeEnabled() const
 {
     return typeModeEnabled;
 }
@@ -390,12 +390,12 @@ void Field::setFocusable(bool b)
     }
 }
 
-bool Field::isFocusable()
+bool Field::isFocusable() const
 {
     return focusable;
 }
 
-bool Field::hasFocus()
+bool Field::hasFocus() const
 {
     return focus;
 }

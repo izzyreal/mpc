@@ -25,7 +25,7 @@ namespace mpc::lcdgui
 
     private:
         void makeLine(LcdBitmap &, std::vector<bool> *colors,
-                      unsigned int samplePos);
+                      unsigned int samplePos) const;
         void initSamplesPerPixel();
 
     public:

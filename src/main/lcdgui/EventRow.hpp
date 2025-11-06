@@ -83,31 +83,31 @@ namespace mpc::lcdgui
         int bus = -1;
         int rowIndex = 0;
 
-        bool isEmptyEvent();
+        bool isEmptyEvent() const;
 
     public:
         void setBus(int newBus);
-        void init();
-        void setEmptyEventValues();
-        void setSystemExclusiveEventValues();
-        void setPolyPressureEventValues();
-        void setChannelPressureEventValues();
-        void setControlChangeEventValues();
-        void setMiscEventValues();
-        void setMixerEventValues();
-        void setDrumNoteEventValues();
-        void setMidiNoteEventValues();
+        void init() const;
+        void setEmptyEventValues() const;
+        void setSystemExclusiveEventValues() const;
+        void setPolyPressureEventValues() const;
+        void setChannelPressureEventValues() const;
+        void setControlChangeEventValues() const;
+        void setMiscEventValues() const;
+        void setMixerEventValues() const;
+        void setDrumNoteEventValues() const;
+        void setMidiNoteEventValues() const;
 
     private:
-        void setColors();
-        void setLabelTexts(const std::vector<std::string> &labels);
+        void setColors() const;
+        void setLabelTexts(const std::vector<std::string> &labels) const;
         void setSizesAndLocations(const std::vector<int> &xPosArray,
-                                  const std::vector<int> &sizeArray);
+                                  const std::vector<int> &sizeArray) const;
 
     public:
         void setEvent(const std::weak_ptr<mpc::sequencer::Event> &newEvent);
         void setSelected(bool b);
-        bool isSelected();
+        bool isSelected() const;
 
         EventRow(mpc::Mpc &mpc, int rowNumber);
 

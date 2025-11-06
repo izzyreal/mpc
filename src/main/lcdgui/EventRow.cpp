@@ -159,9 +159,9 @@ std::vector<std::string> EventRow::controlNames{"BANK SEL MSB",
                                                 "MONO MODE ON",
                                                 "POLY MODE ON"};
 
-EventRow::EventRow(mpc::Mpc &mpc, int rowIndex)
-    : Component("event-row-" + std::to_string(rowIndex)), rowIndex(rowIndex),
-      mpc(mpc)
+EventRow::EventRow(mpc::Mpc &mpc, const int rowIndex)
+    : Component("event-row-" + std::to_string(rowIndex)), mpc(mpc),
+      rowIndex(rowIndex)
 {
     int w1 = 194;
     int h1 = 9;
@@ -205,12 +205,12 @@ void EventRow::setBus(const int newBus)
     bus = newBus;
 }
 
-bool EventRow::isEmptyEvent()
+bool EventRow::isEmptyEvent() const
 {
     return std::dynamic_pointer_cast<EmptyEvent>(event.lock()) ? true : false;
 }
 
-void EventRow::init()
+void EventRow::init() const
 {
     if (std::dynamic_pointer_cast<NoteOnEvent>(event.lock()))
     {
@@ -278,7 +278,7 @@ void EventRow::init()
     }
 }
 
-void EventRow::setEmptyEventValues()
+void EventRow::setEmptyEventValues() const
 {
     fields[0]->Hide(false);
     labels[0]->Hide(false);
@@ -294,7 +294,7 @@ void EventRow::setEmptyEventValues()
     }
 }
 
-void EventRow::setSystemExclusiveEventValues()
+void EventRow::setSystemExclusiveEventValues() const
 {
     if (!event.lock())
     {
@@ -327,7 +327,7 @@ void EventRow::setSystemExclusiveEventValues()
     }
 }
 
-void EventRow::setPolyPressureEventValues()
+void EventRow::setPolyPressureEventValues() const
 {
     if (!event.lock())
     {
@@ -358,7 +358,7 @@ void EventRow::setPolyPressureEventValues()
     }
 }
 
-void EventRow::setChannelPressureEventValues()
+void EventRow::setChannelPressureEventValues() const
 {
     if (!event.lock())
     {
@@ -382,7 +382,7 @@ void EventRow::setChannelPressureEventValues()
     }
 }
 
-void EventRow::setControlChangeEventValues()
+void EventRow::setControlChangeEventValues() const
 {
     if (!event.lock())
     {
@@ -413,7 +413,7 @@ void EventRow::setControlChangeEventValues()
     }
 }
 
-void EventRow::setMiscEventValues()
+void EventRow::setMiscEventValues() const
 {
     if (!event.lock())
     {
@@ -476,7 +476,7 @@ void EventRow::setMiscEventValues()
     }
 }
 
-void EventRow::setMixerEventValues()
+void EventRow::setMixerEventValues() const
 {
     if (!event.lock())
     {
@@ -548,7 +548,7 @@ void EventRow::setMixerEventValues()
     }
 }
 
-void EventRow::setDrumNoteEventValues()
+void EventRow::setDrumNoteEventValues() const
 {
     if (!event.lock())
     {
@@ -665,7 +665,7 @@ void EventRow::setDrumNoteEventValues()
     horizontalBar->Hide(false);
 }
 
-void EventRow::setMidiNoteEventValues()
+void EventRow::setMidiNoteEventValues() const
 {
     if (!event.lock())
     {
@@ -696,7 +696,7 @@ void EventRow::setMidiNoteEventValues()
     }
 }
 
-void EventRow::setColors()
+void EventRow::setColors() const
 {
     parameters->setColor(isSelected() && !isEmptyEvent());
 
@@ -718,7 +718,7 @@ void EventRow::setColors()
     }
 }
 
-void EventRow::setLabelTexts(const std::vector<std::string> &labelTexts)
+void EventRow::setLabelTexts(const std::vector<std::string> &labelTexts) const
 {
     for (int i = 0; i < labelTexts.size(); i++)
     {
@@ -727,7 +727,7 @@ void EventRow::setLabelTexts(const std::vector<std::string> &labelTexts)
 }
 
 void EventRow::setSizesAndLocations(const std::vector<int> &xPositions,
-                                    const std::vector<int> &fieldWidths)
+                                    const std::vector<int> &fieldWidths) const
 {
     for (int i = 0; i < xPositions.size(); i++)
     {
@@ -750,13 +750,13 @@ void EventRow::setEvent(const std::weak_ptr<Event> &newEvent)
     event = newEvent;
 }
 
-void EventRow::setSelected(bool b)
+void EventRow::setSelected(const bool b)
 {
     selected = b;
     setColors();
 }
 
-bool EventRow::isSelected()
+bool EventRow::isSelected() const
 {
     return selected;
 }
