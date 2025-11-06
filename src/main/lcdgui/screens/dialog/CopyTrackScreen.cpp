@@ -19,7 +19,7 @@ void CopyTrackScreen::open()
     displayTr1();
 }
 
-void CopyTrackScreen::function(int i)
+void CopyTrackScreen::function(const int i)
 {
     switch (i)
     {
@@ -36,7 +36,7 @@ void CopyTrackScreen::function(int i)
     }
 }
 
-void CopyTrackScreen::turnWheel(int i)
+void CopyTrackScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -50,13 +50,13 @@ void CopyTrackScreen::turnWheel(int i)
     }
 }
 
-void CopyTrackScreen::setTr0(int i)
+void CopyTrackScreen::setTr0(const int i)
 {
     tr0 = std::clamp(i, 0, 63);
     displayTr0();
 }
 
-void CopyTrackScreen::setTr1(int i)
+void CopyTrackScreen::setTr1(const int i)
 {
     tr1 = std::clamp(i, 0, 63);
     displayTr1();

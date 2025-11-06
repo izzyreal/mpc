@@ -11,7 +11,7 @@ DeleteAllTracksScreen::DeleteAllTracksScreen(Mpc &mpc,
 {
 }
 
-void DeleteAllTracksScreen::function(int i)
+void DeleteAllTracksScreen::function(const int i)
 {
     switch (i)
     {

@@ -15,7 +15,7 @@ FileExistsScreen::FileExistsScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void FileExistsScreen::function(int i)
+void FileExistsScreen::function(const int i)
 {
     switch (i)
     {

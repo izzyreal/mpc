@@ -9,7 +9,7 @@ DeleteAllSequencesScreen::DeleteAllSequencesScreen(Mpc &mpc,
 {
 }
 
-void DeleteAllSequencesScreen::function(int i)
+void DeleteAllSequencesScreen::function(const int i)
 {
     switch (i)
     {

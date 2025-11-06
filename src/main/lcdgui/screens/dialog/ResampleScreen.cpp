@@ -28,7 +28,7 @@ void ResampleScreen::open()
     displayQuality();
 }
 
-void ResampleScreen::turnWheel(int i)
+void ResampleScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -70,7 +70,7 @@ void ResampleScreen::openNameScreen()
     }
 }
 
-void ResampleScreen::function(int i)
+void ResampleScreen::function(const int i)
 {
     switch (i)
     {
@@ -172,19 +172,19 @@ void ResampleScreen::displayNewName()
     findField("newname")->setText(newName);
 }
 
-void ResampleScreen::setNewFs(int i)
+void ResampleScreen::setNewFs(const int i)
 {
     newFs = std::clamp(i, 4000, 65000);
     displayNewFs();
 }
 
-void ResampleScreen::setQuality(int i)
+void ResampleScreen::setQuality(const int i)
 {
     quality = std::clamp(i, 0, 2);
     displayQuality();
 }
 
-void ResampleScreen::setNewBit(int i)
+void ResampleScreen::setNewBit(const int i)
 {
     newBit = std::clamp(i, 0, 2);
     displayNewBit();

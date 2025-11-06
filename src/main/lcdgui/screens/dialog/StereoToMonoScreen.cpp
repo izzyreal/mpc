@@ -34,7 +34,7 @@ void StereoToMonoScreen::open()
     displayStereoSource();
 }
 
-void StereoToMonoScreen::turnWheel(int i)
+void StereoToMonoScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -79,7 +79,7 @@ void StereoToMonoScreen::openNameScreen()
     }
 }
 
-void StereoToMonoScreen::function(int i)
+void StereoToMonoScreen::function(const int i)
 {
 
     switch (i)

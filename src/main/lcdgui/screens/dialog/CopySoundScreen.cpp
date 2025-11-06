@@ -24,7 +24,7 @@ void CopySoundScreen::open()
     displayNewName();
 }
 
-void CopySoundScreen::function(int i)
+void CopySoundScreen::function(const int i)
 {
     switch (i)
     {
@@ -50,11 +50,10 @@ void CopySoundScreen::function(int i)
     }
 }
 
-void CopySoundScreen::turnWheel(int i)
+void CopySoundScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "snd")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "snd")
     {
         sampler->nudgeSoundIndex(i > 0);
         auto newSampleName = sampler->getSoundName(sampler->getSoundIndex());

@@ -22,7 +22,7 @@ void CopyProgramScreen::open()
     displayFunctionKeys();
 }
 
-void CopyProgramScreen::function(int i)
+void CopyProgramScreen::function(const int i)
 {
 
     switch (i)
@@ -44,7 +44,7 @@ void CopyProgramScreen::function(int i)
     }
 }
 
-void CopyProgramScreen::turnWheel(int i)
+void CopyProgramScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -59,7 +59,7 @@ void CopyProgramScreen::turnWheel(int i)
     }
 }
 
-void CopyProgramScreen::setPgm0(int i)
+void CopyProgramScreen::setPgm0(const int i)
 {
     auto candidate = i;
     const auto up = i > pgm0;
@@ -82,7 +82,7 @@ void CopyProgramScreen::setPgm0(int i)
     displayFunctionKeys();
 }
 
-void CopyProgramScreen::setPgm1(int i)
+void CopyProgramScreen::setPgm1(const int i)
 {
     if (i < 0 || i >= sampler->getPrograms().size())
     {

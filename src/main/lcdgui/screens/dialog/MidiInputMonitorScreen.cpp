@@ -56,7 +56,7 @@ void MidiInputMonitorScreen::initTimer(std::weak_ptr<Label> label)
         std::thread(&MidiInputMonitorScreen::static_blink, this, label);
 }
 
-void MidiInputMonitorScreen::update(Observable *o, Message message)
+void MidiInputMonitorScreen::update(Observable *o, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 

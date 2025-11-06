@@ -46,7 +46,7 @@ void MonoToStereoScreen::open()
     displayNewStName();
 }
 
-void MonoToStereoScreen::turnWheel(int i)
+void MonoToStereoScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -102,7 +102,7 @@ void MonoToStereoScreen::openNameScreen()
     }
 }
 
-void MonoToStereoScreen::function(int j)
+void MonoToStereoScreen::function(const int j)
 {
     switch (j)
     {
@@ -211,7 +211,7 @@ void MonoToStereoScreen::displayNewStName()
     findField("newstname")->setText(newStName);
 }
 
-void MonoToStereoScreen::setRSource(int i)
+void MonoToStereoScreen::setRSource(const int i)
 {
     rSource = std::clamp(i, 0, sampler->getSoundCount() - 1);
     displayRSource();

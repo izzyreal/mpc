@@ -6,7 +6,7 @@ VmpcFileInUseScreen::VmpcFileInUseScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void VmpcFileInUseScreen::function(int i)
+void VmpcFileInUseScreen::function(const int i)
 {
 
     switch (i)

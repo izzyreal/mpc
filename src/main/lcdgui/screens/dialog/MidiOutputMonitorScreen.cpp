@@ -52,7 +52,7 @@ void MidiOutputMonitorScreen::initTimer(std::weak_ptr<Label> label)
         std::thread(&MidiOutputMonitorScreen::static_blink, this, label);
 }
 
-void MidiOutputMonitorScreen::update(Observable *o, Message message)
+void MidiOutputMonitorScreen::update(Observable *o, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 

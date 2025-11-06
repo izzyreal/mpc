@@ -21,7 +21,7 @@ void DeleteProgramScreen::open()
     displayPgm();
 }
 
-void DeleteProgramScreen::function(int i)
+void DeleteProgramScreen::function(const int i)
 {
     switch (i)
     {
@@ -46,7 +46,7 @@ void DeleteProgramScreen::function(int i)
     }
 }
 
-void DeleteProgramScreen::turnWheel(int i)
+void DeleteProgramScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -63,7 +63,7 @@ void DeleteProgramScreen::displayPgm()
         sampler->getProgram(pgm)->getName());
 }
 
-void DeleteProgramScreen::setPgm(int i)
+void DeleteProgramScreen::setPgm(const int i)
 {
     auto candidate = i;
     const auto up = i > pgm;

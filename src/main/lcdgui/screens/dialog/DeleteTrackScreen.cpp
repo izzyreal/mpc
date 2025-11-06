@@ -19,7 +19,7 @@ void DeleteTrackScreen::open()
     displayTr();
 }
 
-void DeleteTrackScreen::turnWheel(int i)
+void DeleteTrackScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -29,7 +29,7 @@ void DeleteTrackScreen::turnWheel(int i)
     }
 }
 
-void DeleteTrackScreen::function(int i)
+void DeleteTrackScreen::function(const int i)
 {
     switch (i)
     {
@@ -48,7 +48,7 @@ void DeleteTrackScreen::function(int i)
     }
 }
 
-void DeleteTrackScreen::setTr(int i)
+void DeleteTrackScreen::setTr(const int i)
 {
     tr = std::clamp(i, 0, 63);
     displayTr();

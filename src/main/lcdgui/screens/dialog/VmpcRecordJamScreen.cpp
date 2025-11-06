@@ -15,7 +15,7 @@ VmpcRecordJamScreen::VmpcRecordJamScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void VmpcRecordJamScreen::function(int i)
+void VmpcRecordJamScreen::function(const int i)
 {
     switch (i)
     {

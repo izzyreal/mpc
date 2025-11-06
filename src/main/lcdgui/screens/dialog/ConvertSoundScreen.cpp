@@ -13,7 +13,7 @@ void ConvertSoundScreen::open()
     displayConvert();
 }
 
-void ConvertSoundScreen::turnWheel(int i)
+void ConvertSoundScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -24,7 +24,7 @@ void ConvertSoundScreen::turnWheel(int i)
     }
 }
 
-void ConvertSoundScreen::function(int i)
+void ConvertSoundScreen::function(const int i)
 {
 
     switch (i)
@@ -68,7 +68,7 @@ void ConvertSoundScreen::displayConvert()
     }
 }
 
-void ConvertSoundScreen::setConvert(int i)
+void ConvertSoundScreen::setConvert(const int i)
 {
     convert = i;
     displayConvert();

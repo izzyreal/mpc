@@ -88,7 +88,7 @@ void DeleteFolderScreen::deleteFolder()
     openScreenById(ScreenId::DirectoryScreen);
 }
 
-void DeleteFolderScreen::function(int i)
+void DeleteFolderScreen::function(const int i)
 {
     ScreenComponent::function(i);
 

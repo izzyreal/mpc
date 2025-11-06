@@ -113,7 +113,7 @@ int MetronomeSoundScreen::getVolume()
     return volume;
 }
 
-void MetronomeSoundScreen::setVolume(int i)
+void MetronomeSoundScreen::setVolume(const int i)
 {
     volume = std::clamp(i, 0, 100);
     displayVolume();
@@ -124,7 +124,7 @@ int MetronomeSoundScreen::getOutput()
     return output;
 }
 
-void MetronomeSoundScreen::setOutput(int i)
+void MetronomeSoundScreen::setOutput(const int i)
 {
     output = std::clamp(i, 0, 8);
     displayOutput();
@@ -135,7 +135,7 @@ int MetronomeSoundScreen::getSound()
     return sound;
 }
 
-void MetronomeSoundScreen::setSound(int i)
+void MetronomeSoundScreen::setSound(const int i)
 {
     sound = std::clamp(i, 0, 4);
     displaySound();
@@ -161,7 +161,7 @@ int MetronomeSoundScreen::getAccentPad()
     return accentPad;
 }
 
-void MetronomeSoundScreen::setAccentPad(int i)
+void MetronomeSoundScreen::setAccentPad(const int i)
 {
     accentPad = std::clamp(i, 0, 63);
     displayAccent();
@@ -172,7 +172,7 @@ int MetronomeSoundScreen::getAccentVelo()
     return accentVelo;
 }
 
-void MetronomeSoundScreen::setAccentVelo(int i)
+void MetronomeSoundScreen::setAccentVelo(const int i)
 {
     accentVelo = std::clamp(i, 1, 127);
     displayAccentVelo();
@@ -183,7 +183,7 @@ int MetronomeSoundScreen::getNormalPad()
     return normalPad;
 }
 
-void MetronomeSoundScreen::setNormalPad(int i)
+void MetronomeSoundScreen::setNormalPad(const int i)
 {
     normalPad = std::clamp(i, 0, 63);
     displayNormal();
@@ -194,13 +194,13 @@ int MetronomeSoundScreen::getNormalVelo()
     return normalVelo;
 }
 
-void MetronomeSoundScreen::setNormalVelo(int i)
+void MetronomeSoundScreen::setNormalVelo(const int i)
 {
     normalVelo = std::clamp(i, 1, 127);
     displayNormalVelo();
 }
 
-void MetronomeSoundScreen::function(int i)
+void MetronomeSoundScreen::function(const int i)
 {
     switch (i)
     {
@@ -210,7 +210,7 @@ void MetronomeSoundScreen::function(int i)
     }
 }
 
-void MetronomeSoundScreen::turnWheel(int i)
+void MetronomeSoundScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -244,7 +244,7 @@ void MetronomeSoundScreen::turnWheel(int i)
     }
 }
 
-void MetronomeSoundScreen::update(Observable *o, Message message)
+void MetronomeSoundScreen::update(Observable *o, const Message message)
 {
     const auto msg = std::get<std::string>(message);
 

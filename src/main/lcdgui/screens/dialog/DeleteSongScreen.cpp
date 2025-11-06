@@ -19,7 +19,7 @@ void DeleteSongScreen::open()
     displaySong();
 }
 
-void DeleteSongScreen::turnWheel(int i)
+void DeleteSongScreen::turnWheel(const int i)
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -44,7 +44,7 @@ void DeleteSongScreen::turnWheel(int i)
     }
 }
 
-void DeleteSongScreen::function(int i)
+void DeleteSongScreen::function(const int i)
 {
 
     switch (i)

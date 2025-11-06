@@ -31,7 +31,7 @@ void CopySongScreen::open()
     displaySong1();
 }
 
-void CopySongScreen::function(int i)
+void CopySongScreen::function(const int i)
 {
     switch (i)
     {
@@ -48,7 +48,7 @@ void CopySongScreen::function(int i)
     }
 }
 
-void CopySongScreen::turnWheel(int i)
+void CopySongScreen::turnWheel(const int i)
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
 
@@ -77,7 +77,7 @@ void CopySongScreen::turnWheel(int i)
     }
 }
 
-void CopySongScreen::setSong1(int i)
+void CopySongScreen::setSong1(const int i)
 {
     song1 = std::clamp(i, 0, 19);
     displaySong1();

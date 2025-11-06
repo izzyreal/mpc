@@ -14,7 +14,7 @@ CreateNewProgramScreen::CreateNewProgramScreen(Mpc &mpc,
 {
 }
 
-void CreateNewProgramScreen::turnWheel(int i)
+void CreateNewProgramScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -65,7 +65,7 @@ void CreateNewProgramScreen::open()
     displayMidiProgramChange();
 }
 
-void CreateNewProgramScreen::function(int i)
+void CreateNewProgramScreen::function(const int i)
 {
     switch (i)
     {

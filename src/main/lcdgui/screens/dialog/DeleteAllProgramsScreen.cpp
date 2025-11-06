@@ -9,7 +9,7 @@ DeleteAllProgramsScreen::DeleteAllProgramsScreen(Mpc &mpc,
 {
 }
 
-void DeleteAllProgramsScreen::function(int j)
+void DeleteAllProgramsScreen::function(const int j)
 {
     switch (j)
     {
