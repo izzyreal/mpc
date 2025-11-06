@@ -56,7 +56,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             const auto &gesture =
                 std::get<GestureEvent>(hostInputEvent.payload);
 
-            if (gesture.componentId == ComponentId::NONE)
+            if (gesture.componentId == NONE)
             {
                 throw std::invalid_argument(
                     "GestureEvent.componentId must not be NONE");
@@ -64,12 +64,12 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
             clientHardwareEvent.componentId = gesture.componentId;
 
-            if (gesture.componentId >= ComponentId::PAD_1_OR_AB &&
-                gesture.componentId <= ComponentId::PAD_16_OR_PARENTHESES)
+            if (gesture.componentId >= PAD_1_OR_AB &&
+                gesture.componentId <= PAD_16_OR_PARENTHESES)
             {
                 clientHardwareEvent.index =
                     static_cast<int>(gesture.componentId) -
-                    static_cast<int>(ComponentId::PAD_1_OR_AB);
+                    static_cast<int>(PAD_1_OR_AB);
 
                 if (gesture.type == GestureEvent::Type::BEGIN ||
                     gesture.type == GestureEvent::Type::REPEAT)
@@ -90,7 +90,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                     clientHardwareEvent.value = 1.f - gesture.normY;
                 }
             }
-            else if (gesture.componentId == ComponentId::SLIDER)
+            else if (gesture.componentId == SLIDER)
             {
                 if (gesture.type == GestureEvent::Type::UPDATE)
                 {
@@ -108,8 +108,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                     }
                 }
             }
-            else if (gesture.componentId >= ComponentId::CURSOR_LEFT_OR_DIGIT &&
-                     gesture.componentId <= ComponentId::NUM_9_OR_MIDI_SYNC)
+            else if (gesture.componentId >= CURSOR_LEFT_OR_DIGIT &&
+                     gesture.componentId <= NUM_9_OR_MIDI_SYNC)
             {
                 if (gesture.type == GestureEvent::Type::REPEAT)
                 {
@@ -142,7 +142,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                     return std::nullopt;
                 }
             }
-            else if (gesture.componentId == ComponentId::DATA_WHEEL)
+            else if (gesture.componentId == DATA_WHEEL)
             {
                 if (gesture.type == GestureEvent::Type::UPDATE)
                 {
@@ -151,8 +151,8 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                     clientHardwareEvent.deltaValue = gesture.continuousDelta;
                 }
             }
-            else if (gesture.componentId == ComponentId::REC_GAIN_POT ||
-                     gesture.componentId == ComponentId::MAIN_VOLUME_POT)
+            else if (gesture.componentId == REC_GAIN_POT ||
+                     gesture.componentId == MAIN_VOLUME_POT)
             {
                 if (gesture.type == GestureEvent::Type::UPDATE)
                 {
@@ -166,12 +166,12 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
         case HostInputEvent::Source::KEYBOARD:
         {
-            const auto &key = std::get<KeyEvent>(hostInputEvent.payload);
+            const auto &[keyDown, rawKeyCode, shiftDown, ctrlDown, altDown] = std::get<KeyEvent>(hostInputEvent.payload);
             const auto vmpcKeyCode =
-                KeyCodeHelper::getVmpcFromPlatformKeyCode(key.rawKeyCode);
+                KeyCodeHelper::getVmpcFromPlatformKeyCode(rawKeyCode);
             const auto binding = keyboardBindings->lookup(vmpcKeyCode);
 
-            if (!binding || binding->componentId != ComponentId::DATA_WHEEL)
+            if (!binding || binding->componentId != DATA_WHEEL)
             {
                 if (const auto typableChar =
                         KeyCodeHelper::getCharForTypableVmpcKeyCode(
@@ -180,7 +180,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                 {
                     char charToUse;
 
-                    if (key.shiftDown)
+                    if (shiftDown)
                     {
                         const auto charWithShift =
                             KeyCodeHelper::getCharWithShiftModifier(
@@ -194,7 +194,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
                     clientHardwareEvent.textInputKey =
                         ClientHardwareEvent::TextInputKey{charToUse,
-                                                          key.keyDown};
+                                                          keyDown};
                 }
             }
 
@@ -204,54 +204,48 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
                 {
                     return ClientEvent{clientHardwareEvent};
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
 
             const auto id = binding->componentId;
 
-            if (id == hardware::ComponentId::NONE)
+            if (id == NONE)
             {
                 if (clientHardwareEvent.textInputKey)
                 {
                     return ClientEvent{clientHardwareEvent};
                 }
-                else
-                {
-                    return std::nullopt;
-                }
+                return std::nullopt;
             }
 
             clientHardwareEvent.componentId = id;
 
-            if (id >= ComponentId::PAD_1_OR_AB &&
-                id <= ComponentId::PAD_16_OR_PARENTHESES)
+            if (id >= PAD_1_OR_AB &&
+                id <= PAD_16_OR_PARENTHESES)
             {
                 clientHardwareEvent.type =
-                    key.keyDown ? ClientHardwareEvent::Type::PadPress
+                    keyDown ? ClientHardwareEvent::Type::PadPress
                                 : ClientHardwareEvent::Type::PadRelease;
                 clientHardwareEvent.index =
                     static_cast<int>(id) -
-                    static_cast<int>(ComponentId::PAD_1_OR_AB);
-                if (key.keyDown)
+                    static_cast<int>(PAD_1_OR_AB);
+                if (keyDown)
                 {
-                    clientHardwareEvent.value = mpc::hardware::Pad::MAX_VELO;
+                    clientHardwareEvent.value = Pad::MAX_VELO_NORMALIZED;
                 }
             }
-            else if (id == ComponentId::SLIDER)
+            else if (id == SLIDER)
             {
-                if (!key.keyDown)
+                if (!keyDown)
                 {
                     break;
                 }
                 clientHardwareEvent.type =
                     ClientHardwareEvent::Type::SliderMove;
             }
-            else if (id == ComponentId::DATA_WHEEL)
+            else if (id == DATA_WHEEL)
             {
-                if (!key.keyDown)
+                if (!keyDown)
                 {
                     break;
                 }
@@ -262,21 +256,21 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
 
                 if (direction == Direction::None)
                 {
-                    std::invalid_argument(
+                    throw std::invalid_argument(
                         "DataWheel bindings must have a Direction");
                 }
 
                 int increment = toSign(direction);
 
-                if (key.ctrlDown)
+                if (ctrlDown)
                 {
                     increment *= 10;
                 }
-                if (key.altDown)
+                if (altDown)
                 {
                     increment *= 10;
                 }
-                if (key.shiftDown)
+                if (shiftDown)
                 {
                     increment *= 10;
                 }
@@ -286,7 +280,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             else
             {
                 clientHardwareEvent.type =
-                    key.keyDown ? ClientHardwareEvent::Type::ButtonPress
+                    keyDown ? ClientHardwareEvent::Type::ButtonPress
                                 : ClientHardwareEvent::Type::ButtonRelease;
             }
             break;
@@ -297,7 +291,7 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             break;
     }
 
-    if (clientHardwareEvent.componentId == ComponentId::NONE &&
+    if (clientHardwareEvent.componentId == NONE &&
         !clientHardwareEvent.textInputKey)
     {
         return std::nullopt;

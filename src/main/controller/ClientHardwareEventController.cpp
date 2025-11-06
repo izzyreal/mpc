@@ -147,9 +147,7 @@ void ClientHardwareEventController::handlePadPress(
         velocity, static_cast<float>(VelocitySensitivePressable::MIN_VELO),
         static_cast<float>(VelocitySensitivePressable::MAX_VELO));
 
-    const auto pad = mpc.getHardware()->getPad(physicalPadIndex);
-
-    if (!pad->pressWithVelocity(clampedVelocity))
+    if (mpc.getHardware()->getPad(physicalPadIndex)->pressWithVelocity(clampedVelocity))
     {
         return;
     }
@@ -219,7 +217,7 @@ void ClientHardwareEventController::handlePadPress(
         }
     }
 
-    std::function<void(void *)> action = [](void *) {};
+    std::function action = [](void *) {};
 
     if (layeredScreen->isCurrentScreen({ScreenId::PopupScreen}))
     {
@@ -353,7 +351,7 @@ void ClientHardwareEventController::handlePadAftertouch(
 
     mpc.getHardware()->getPad(padIndex)->aftertouch(pressureToUse);
 
-    const std::function<void(void *)> action =
+    const std::function action =
         [eventRegistry = mpc.eventRegistry, pressureToUse](void *userData)
     {
         const auto padPress = static_cast<PhysicalPadPressEvent *>(userData);
@@ -474,7 +472,7 @@ void ClientHardwareEventController::handleButtonPress(
     // Temporary hack. We actually want to synthesize repeat events ourselves,
     // so we don't depend on host-generated repeats. This way the behaviour is
     // the same for keyboard, mouse, touch and MIDI event.
-    static const auto allowRepeat = std::vector<ComponentId>{
+    static const auto allowRepeat = std::vector{
         CURSOR_UP, CURSOR_RIGHT_OR_DIGIT, CURSOR_DOWN, CURSOR_LEFT_OR_DIGIT};
 
     if (!button->press() && std::find(allowRepeat.begin(), allowRepeat.end(),
