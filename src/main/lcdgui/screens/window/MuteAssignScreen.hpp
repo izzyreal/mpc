@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens::window
     public:
         void turnWheel(int i) override;
 
-        MuteAssignScreen(mpc::Mpc &mpc, const int layerIndex);
+        MuteAssignScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *o, Message message) override;

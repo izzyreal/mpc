@@ -20,7 +20,7 @@ namespace mpc::lcdgui
             return (L == 0 && T == 0 && R == 0 && B == 0);
         }
 
-        inline std::string getInfo() const
+        std::string getInfo() const
         {
             return "x " + std::to_string(L) + ", y " + std::to_string(T) +
                    ", w " + std::to_string(W()) + ", h " + std::to_string(H());
@@ -41,24 +41,24 @@ namespace mpc::lcdgui
             return !(*this == rhs);
         }
 
-        inline int W() const
+        int W() const
         {
             return R - L;
         }
-        inline int H() const
+        int H() const
         {
             return B - T;
         }
-        inline float MW() const
+        float MW() const
         {
             return 0.5f * (float)(L + R);
         }
-        inline float MH() const
+        float MH() const
         {
             return 0.5f * (float)(T + B);
         }
 
-        inline MRECT Union(MRECT *pRHS)
+        MRECT Union(MRECT *pRHS)
         {
             if (Empty())
             {

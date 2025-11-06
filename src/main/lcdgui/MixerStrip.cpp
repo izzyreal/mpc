@@ -24,13 +24,13 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
     yPos1fx = 2;
     selection = -1;
 
-    auto x1 = 4 + (columnIndex * 15);
+    const auto x1 = 4 + (columnIndex * 15);
     addChild(std::move(
         std::make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
     addChild(std::move(
         std::make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
 
-    auto x2 = 5 + (columnIndex * 15);
+    const auto x2 = 5 + (columnIndex * 15);
     findChild("mixer-top-background")
         ->addChild(
             std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
@@ -64,11 +64,12 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
         }
     }
 
-    auto x3 = 12 + (columnIndex * 15);
+    const auto x3 = 12 + (columnIndex * 15);
     findMixerFaderBackground()->addChild(
         std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
 
-    auto padName = StrUtil::padLeft(std::to_string(columnIndex + 1), "0", 2);
+    const auto padName =
+        StrUtil::padLeft(std::to_string(columnIndex + 1), "0", 2);
     findLabel("3")->setText(padName.substr(0, 1));
     findLabel("4")->setText(padName.substr(1, 2));
 }
@@ -93,7 +94,7 @@ void MixerStrip::setValueB(int i)
 
 void MixerStrip::initLabels()
 {
-    auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
+    const auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
 
     if (mixerScreen->getTab() == 0)
     {
@@ -167,9 +168,9 @@ void MixerStrip::setSelection(int i)
     setColors();
 }
 
-void MixerStrip::setValueAString(std::string str)
+void MixerStrip::setValueAString(const std::string &str)
 {
-    auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
+    const auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
 
     if (mixerScreen->getTab() == 1)
     {
@@ -211,7 +212,7 @@ std::shared_ptr<Knob> MixerStrip::findKnob()
 
 std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
 {
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         if (c->getName() == "mixer-top-background")
         {
@@ -223,7 +224,7 @@ std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
 
 std::shared_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
 {
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         if (c->getName() == "mixer-fader-background")
         {

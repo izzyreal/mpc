@@ -42,17 +42,18 @@ void EditMultipleScreen::close()
 void EditMultipleScreen::function(int i)
 {
     ScreenComponent::function(i);
-    auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
 
-    auto selectedEvent = stepEditorScreen->getSelectedEvent();
-    auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto selectedEvent = stepEditorScreen->getSelectedEvent();
+    const auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
     switch (i)
     {
         case 4:
         {
-            auto noteEvent =
+            const auto noteEvent =
                 std::dynamic_pointer_cast<NoteOnEvent>(selectedEvent);
 
             if (noteEvent && track->getBus() != 0)
@@ -151,17 +152,18 @@ void EditMultipleScreen::function(int i)
 void EditMultipleScreen::turnWheel(int i)
 {
 
-    auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
-    auto event = stepEditorScreen->getSelectedEvent();
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
+    const auto event = stepEditorScreen->getSelectedEvent();
 
-    auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
+    const auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
     if (focusedFieldName == "value0")
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+        const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
         if (noteEvent && track->getBus() != 0)
         {
@@ -211,7 +213,8 @@ void EditMultipleScreen::turnWheel(int i)
 
 void EditMultipleScreen::checkThreeParameters()
 {
-    auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
 
     for (auto &event : stepEditorScreen->getSelectedEvents())
     {
@@ -238,7 +241,8 @@ void EditMultipleScreen::checkThreeParameters()
 
 void EditMultipleScreen::checkFiveParameters()
 {
-    auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
 
     for (auto &event : stepEditorScreen->getSelectedEvents())
     {
@@ -276,7 +280,8 @@ void EditMultipleScreen::checkFiveParameters()
 
 void EditMultipleScreen::checkNotes()
 {
-    auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
     for (auto &event : stepEditorScreen->getSelectedEvents())
     {
         auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
@@ -298,11 +303,12 @@ void EditMultipleScreen::setEditType(int i)
 void EditMultipleScreen::updateEditMultiple()
 {
 
-    auto stepEditorScreen = mpc.screens->get<ScreenId::StepEditorScreen>();
-    auto event = stepEditorScreen->getSelectedEvent();
-    auto letter = stepEditorScreen->getSelectedParameterLetter();
+    const auto stepEditorScreen =
+        mpc.screens->get<ScreenId::StepEditorScreen>();
+    const auto event = stepEditorScreen->getSelectedEvent();
+    const auto letter = stepEditorScreen->getSelectedParameterLetter();
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
     if (std::dynamic_pointer_cast<NoteOnEvent>(event) && track->getBus() != 0)
     {
@@ -318,10 +324,10 @@ void EditMultipleScreen::updateEditMultiple()
                 findLabel("value0")->setText(singleLabels[0]);
                 findField("value0")->setSize(6 * 6 + 1, 9);
 
-                auto program = getProgramOrThrow();
-                auto padName = sampler->getPadName(
+                const auto program = getProgramOrThrow();
+                const auto padName = sampler->getPadName(
                     program->getPadIndexFromNote(changeNoteTo));
-                auto noteName =
+                const auto noteName =
                     changeNoteTo == 34 ? "--" : std::to_string(changeNoteTo);
                 findField("value0")->setText(noteName + "/" + padName);
             }
@@ -494,8 +500,8 @@ void EditMultipleScreen::updateDouble()
 
 void EditMultipleScreen::setChangeNoteTo(int i)
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
-    auto midi = track->getBus() == 0;
+    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto midi = track->getBus() == 0;
     changeNoteTo = std::clamp(i, midi ? 0 : 34, midi ? 127 : 98);
     updateEditMultiple();
 }

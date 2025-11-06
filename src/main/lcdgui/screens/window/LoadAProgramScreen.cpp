@@ -36,7 +36,7 @@ void LoadAProgramScreen::turnWheel(int i)
 void LoadAProgramScreen::function(int i)
 {
 
-    auto selectedFile =
+    const auto selectedFile =
         mpc.screens->get<ScreenId::LoadScreen>()->getSelectedFile();
 
     switch (i)
@@ -54,12 +54,12 @@ void LoadAProgramScreen::function(int i)
             break;
         case 4:
         {
-            auto newProgram =
+            const auto newProgram =
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
 
             mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
-            auto track = sequencer->getActiveTrack();
+            const auto track = sequencer->getActiveTrack();
 
             if (track->getBus() > 0)
             {

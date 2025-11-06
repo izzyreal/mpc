@@ -23,7 +23,7 @@ BMFParser::BMFParser(char *fntData, int fntSize, char *bmpData, int bmpSize)
 
     image.openFromData(bmpData, bmpSize);
 
-    bool bmpValid = image.isImage();
+    const bool bmpValid = image.isImage();
 
     if (bmpValid)
     {
@@ -34,7 +34,7 @@ BMFParser::BMFParser(char *fntData, int fntSize, char *bmpData, int bmpSize)
     {
         std::vector<bool> boolRow;
 
-        for (auto &column : row)
+        for (const auto &column : row)
         {
             boolRow.push_back(!column.on);
         }
@@ -48,7 +48,7 @@ void BMFParser::OrderCharsByID(std::vector<bmfont_char> *chars)
     std::vector<bmfont_char> result(255);
     for (int i = 0; i < chars->size(); i++)
     {
-        auto destid = chars->at(i).id;
+        const auto destid = chars->at(i).id;
         result[destid] = chars->at(i);
     }
     chars->clear();
@@ -71,9 +71,9 @@ bool BMFParser::GetBMFontData(const char *pBinary, size_t fileSize,
     stream.offsetBy(4);
     while (!stream.isEOF())
     {
-        uint8_t blockID = stream.getU8();
+        const uint8_t blockID = stream.getU8();
         MLOG("Parsing font blockID " + std::to_string(blockID));
-        int32_t blockSize = stream.getU32();
+        const int32_t blockSize = stream.getU32();
         switch (blockID)
         {
             case BMFONT_BLOCK_TYPE_INFO:
@@ -110,7 +110,7 @@ bool BMFParser::GetBMFontData(const char *pBinary, size_t fileSize,
             }
             case BMFONT_BLOCK_TYPE_PAGES:
             {
-                uint16_t pageCount = pBMFont->common.pages;
+                const uint16_t pageCount = pBMFont->common.pages;
                 for (uint16_t index = 0; index < pageCount; ++index)
                 {
                     const char *pageName = (const char *)stream.getPtr();
@@ -127,7 +127,7 @@ bool BMFParser::GetBMFontData(const char *pBinary, size_t fileSize,
             }
             case BMFONT_BLOCK_TYPE_CHARS:
             {
-                int32_t charCount = blockSize / 20;
+                const int32_t charCount = blockSize / 20;
                 if (charCount > BMFONT_MAX_CHARS)
                 {
                     return false;

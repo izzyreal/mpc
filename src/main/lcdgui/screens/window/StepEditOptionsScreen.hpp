@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens::window
     class StepEditOptionsScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        StepEditOptionsScreen(mpc::Mpc &mpc, const int layerIndex);
+        StepEditOptionsScreen(mpc::Mpc &mpc, int layerIndex);
         void turnWheel(int i) override;
         void open() override;
         void function(int i) override;

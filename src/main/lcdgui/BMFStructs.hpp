@@ -76,7 +76,7 @@ namespace mpc::lcdgui
         }
         uint8_t getU8()
         {
-            uint8_t value = currentU8();
+            const uint8_t value = currentU8();
             pos += 1;
             return value;
         }
@@ -86,7 +86,7 @@ namespace mpc::lcdgui
         }
         uint16_t getU16()
         {
-            uint16_t value = currentU16();
+            const uint16_t value = currentU16();
             pos += 2;
             return value;
         }
@@ -98,7 +98,7 @@ namespace mpc::lcdgui
         }
         uint32_t getU32()
         {
-            uint32_t value = currentU32();
+            const uint32_t value = currentU32();
             pos += 4;
             return value;
         }
@@ -109,7 +109,7 @@ namespace mpc::lcdgui
         }
         int8_t getS8()
         {
-            int8_t value = static_cast<int8_t>(currentU8());
+            const int8_t value = static_cast<int8_t>(currentU8());
             pos += 1;
             return value;
         }
@@ -119,7 +119,7 @@ namespace mpc::lcdgui
         }
         int16_t getS16()
         {
-            int16_t value = static_cast<int16_t>(currentU16());
+            const int16_t value = static_cast<int16_t>(currentU16());
             pos += 2;
             return value;
         }
@@ -131,7 +131,7 @@ namespace mpc::lcdgui
         }
         int32_t getS32()
         {
-            int32_t value = static_cast<int32_t>(currentU32());
+            const int32_t value = static_cast<int32_t>(currentU32());
             pos += 4;
             return value;
         }

@@ -12,24 +12,25 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(
     mpc::Mpc &m, int layer)
     : ScreenComponent(m, "vmpc-known-controller-detected", layer)
 {
-    auto label0 = std::make_shared<Label>(
+    const auto label0 = std::make_shared<Label>(
         mpc, "line0", "It looks like you have connected", 24, 10, 32 * 6);
     addChild(label0);
-    auto label1 = std::make_shared<Label>(mpc, "line1", "", 24, 19, 32 * 6);
+    const auto label1 =
+        std::make_shared<Label>(mpc, "line1", "", 24, 19, 32 * 6);
     addChild(label1);
-    auto label2 = std::make_shared<Label>(
+    const auto label2 = std::make_shared<Label>(
         mpc, "line2", "Do you want to switch active MIDI", 24, 28, 32 * 6);
     addChild(label2);
-    auto label3 = std::make_shared<Label>(
+    const auto label3 = std::make_shared<Label>(
         mpc, "line3", "mapping to this controller?", 24, 37, 32 * 6);
     addChild(label3);
 }
 
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
-    auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
+    const auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
     auto &presets = mpc.midiControlPresets;
-    auto preset = std::find_if(
+    const auto preset = std::find_if(
         presets.begin(), presets.end(),
         [this](const std::shared_ptr<nvram::MidiControlPreset> &p)
         {
@@ -85,7 +86,7 @@ void VmpcKnownControllerDetectedScreen::displayMessage()
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-    for (auto &p : mpc.midiControlPresets)
+    for (const auto &p : mpc.midiControlPresets)
     {
         if (controllerName.find(p->name) != std::string::npos)
         {
@@ -98,7 +99,7 @@ void VmpcKnownControllerDetectedScreen::open()
             else if (p->autoloadMode ==
                      nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
             {
-                auto vmpcMidiScreen =
+                const auto vmpcMidiScreen =
                     mpc.screens->get<ScreenId::VmpcMidiScreen>();
                 vmpcMidiScreen->shouldSwitch.store(true);
                 mpc.getLayeredScreen()->closeCurrentScreen();

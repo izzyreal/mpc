@@ -301,7 +301,8 @@ void EventRow::setSystemExclusiveEventValues()
         return;
     }
 
-    auto see = std::dynamic_pointer_cast<SystemExclusiveEvent>(event.lock());
+    const auto see =
+        std::dynamic_pointer_cast<SystemExclusiveEvent>(event.lock());
 
     for (int i = 0; i < 2; i++)
     {
@@ -333,7 +334,7 @@ void EventRow::setPolyPressureEventValues()
         return;
     }
 
-    auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(event.lock());
+    const auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(event.lock());
 
     for (int i = 0; i < 2; i++)
     {
@@ -364,7 +365,8 @@ void EventRow::setChannelPressureEventValues()
         return;
     }
 
-    auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(event.lock());
+    const auto cpe =
+        std::dynamic_pointer_cast<ChannelPressureEvent>(event.lock());
     fields[0]->Hide(false);
     labels[0]->Hide(false);
     fields[0]->setText(
@@ -387,7 +389,8 @@ void EventRow::setControlChangeEventValues()
         return;
     }
 
-    auto cce = std::dynamic_pointer_cast<ControlChangeEvent>(event.lock());
+    const auto cce =
+        std::dynamic_pointer_cast<ControlChangeEvent>(event.lock());
 
     for (int i = 0; i < 2; i++)
     {
@@ -399,7 +402,7 @@ void EventRow::setControlChangeEventValues()
     fields[1]->setText(
         StrUtil::padLeft(std::to_string(cce->getAmount()), " ", 3));
 
-    auto lHorizontalBar = horizontalBar;
+    const auto lHorizontalBar = horizontalBar;
     lHorizontalBar->setValue(cce->getAmount());
     lHorizontalBar->Hide(false);
 
@@ -419,9 +422,9 @@ void EventRow::setMiscEventValues()
 
     auto parameterValue = 0;
 
-    auto pitchBendEvent =
+    const auto pitchBendEvent =
         std::dynamic_pointer_cast<PitchBendEvent>(event.lock());
-    auto programChangeEvent =
+    const auto programChangeEvent =
         std::dynamic_pointer_cast<ProgramChangeEvent>(event.lock());
 
     if (pitchBendEvent != nullptr)
@@ -480,7 +483,7 @@ void EventRow::setMixerEventValues()
         return;
     }
 
-    auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event.lock());
+    const auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event.lock());
 
     for (int i = 0; i < 3; i++)
     {
@@ -490,20 +493,20 @@ void EventRow::setMixerEventValues()
 
     fields[0]->setText(mixerParamNames[mixerEvent->getParameter()]);
 
-    auto sampler = mpc.getSampler();
-    auto sequencer = mpc.getSequencer();
+    const auto sampler = mpc.getSampler();
+    const auto sequencer = mpc.getSequencer();
 
-    auto drumBus = sequencer->getBus<DrumBus>(bus);
+    const auto drumBus = sequencer->getBus<DrumBus>(bus);
 
     if (drumBus)
     {
         return;
     }
 
-    auto program = sampler->getProgram(drumBus->getProgram());
-    auto nn = program->getPad(mixerEvent->getPad())->getNote();
+    const auto program = sampler->getProgram(drumBus->getProgram());
+    const auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
-    auto padName = sampler->getPadName(mixerEvent->getPad());
+    const auto padName = sampler->getPadName(mixerEvent->getPad());
     fields[1]->setText(std::string(nn == 34 ? "--" : std::to_string(nn)) + "/" +
                        padName);
 
@@ -534,7 +537,7 @@ void EventRow::setMixerEventValues()
             StrUtil::padLeft(std::to_string(mixerEvent->getValue()), " ", 3));
     }
 
-    auto lHorizontalBar = horizontalBar;
+    const auto lHorizontalBar = horizontalBar;
     lHorizontalBar->setValue(mixerEvent->getValue() * 1.27);
     lHorizontalBar->Hide(false);
 
@@ -552,7 +555,7 @@ void EventRow::setDrumNoteEventValues()
         return;
     }
 
-    auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
+    const auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 
     for (int i = 0; i < 5; i++)
     {
@@ -566,11 +569,12 @@ void EventRow::setDrumNoteEventValues()
     }
     else
     {
-        if (auto drumBus = mpc.getSequencer()->getBus<DrumBus>(bus); drumBus)
+        if (const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(bus);
+            drumBus)
         {
-            auto sampler = mpc.getSampler();
-            auto program = sampler->getProgram(drumBus->getProgram());
-            auto padName = sampler->getPadName(
+            const auto sampler = mpc.getSampler();
+            const auto program = sampler->getProgram(drumBus->getProgram());
+            const auto padName = sampler->getPadName(
                 program->getPadIndexFromNote(ne->getNote()));
             fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);
         }
@@ -668,7 +672,7 @@ void EventRow::setMidiNoteEventValues()
         return;
     }
 
-    auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
+    const auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 
     for (int i = 0; i < 3; i++)
     {
@@ -727,10 +731,10 @@ void EventRow::setSizesAndLocations(const std::vector<int> &xPositions,
 {
     for (int i = 0; i < xPositions.size(); i++)
     {
-        auto tf = fields[i];
-        auto label = labels[i];
+        const auto tf = fields[i];
+        const auto label = labels[i];
 
-        auto labelTextLength = label->getText().length();
+        const auto labelTextLength = label->getText().length();
 
         tf->setSize((fieldWidths[i] * 6) + 1, 9);
         tf->setLocation(xPositions[i] + (labelTextLength * 6) - 1,
@@ -741,7 +745,7 @@ void EventRow::setSizesAndLocations(const std::vector<int> &xPositions,
     }
 }
 
-void EventRow::setEvent(std::weak_ptr<Event> newEvent)
+void EventRow::setEvent(const std::weak_ptr<Event> &newEvent)
 {
     event = newEvent;
 }

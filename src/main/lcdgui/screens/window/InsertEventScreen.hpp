@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void turnWheel(int i) override;
 
-        InsertEventScreen(mpc::Mpc &mpc, const int layerIndex);
+        InsertEventScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         bool isEventAddedBeforeLeavingTheScreen();
 

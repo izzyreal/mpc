@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void openNameScreen() override;
 
-        SaveASequenceScreen(mpc::Mpc &mpc, const int layerIndex);
+        SaveASequenceScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

@@ -104,7 +104,7 @@ void StepEditOptionsScreen::displayDurationOfRecordedNotes()
 
 void StepEditOptionsScreen::displayTcValue()
 {
-    auto f = findField("tc-value");
+    const auto f = findField("tc-value");
     f->Hide(!durationOfRecordedNotesTcValue);
 
     if (durationOfRecordedNotesTcValue)

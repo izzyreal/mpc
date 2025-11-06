@@ -15,7 +15,7 @@ SelectMixerDrumScreen::SelectMixerDrumScreen(mpc::Mpc &mpc,
 
 void SelectMixerDrumScreen::open()
 {
-    auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
+    const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
     ls->setFunctionKeysArrangement(drumScreen->getDrum());
 }
 
@@ -24,7 +24,7 @@ void SelectMixerDrumScreen::function(int i)
 
     if (i < 4)
     {
-        auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
+        const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
         drumScreen->setDrum(i);
         openScreenById(ScreenId::MixerScreen);
     }

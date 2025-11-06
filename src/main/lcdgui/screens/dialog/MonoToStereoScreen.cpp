@@ -111,13 +111,13 @@ void MonoToStereoScreen::function(int j)
             break;
         case 4:
         {
-            auto right = sampler->getSortedSounds()[rSource].first;
+            const auto right = sampler->getSortedSounds()[rSource].first;
             if (!sampler->getSound()->isMono() || !right->isMono())
             {
                 return;
             }
 
-            for (auto &s : sampler->getSounds())
+            for (const auto &s : sampler->getSounds())
             {
                 if (s->getName() == newStName)
                 {
@@ -126,9 +126,10 @@ void MonoToStereoScreen::function(int j)
                 }
             }
 
-            auto left = sampler->getSound();
+            const auto left = sampler->getSound();
 
-            auto newSampleDataRight = std::make_shared<std::vector<float>>();
+            const auto newSampleDataRight =
+                std::make_shared<std::vector<float>>();
 
             if (right->getSampleRate() > left->getSampleRate())
             {
@@ -144,7 +145,7 @@ void MonoToStereoScreen::function(int j)
                 (*newSampleDataRight) = *right->getSampleData();
             }
 
-            auto newSound = sampler->addSound(left->getSampleRate());
+            const auto newSound = sampler->addSound(left->getSampleRate());
 
             if (newSound == nullptr)
             {
@@ -189,7 +190,7 @@ void MonoToStereoScreen::displayRSource()
         return;
     }
 
-    auto sound = sampler->getSortedSounds()[rSource];
+    const auto sound = sampler->getSortedSounds()[rSource];
 
     findField("rsource")->setText(sound.first->getName());
 

@@ -60,26 +60,31 @@ namespace mpc::sequencer
     class Sequence;
     class MidiClockOutput;
 
-    class FrameSeq : public mpc::engine::audio::server::AudioClient
+    class FrameSeq final : public engine::audio::server::AudioClient
     {
+        using EventQueue = moodycamel::ConcurrentQueue<
+            EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>;
+
     public:
         explicit FrameSeq(
-            std::shared_ptr<eventregistry::EventRegistry>, Sequencer *,
-            std::shared_ptr<Clock>, std::shared_ptr<lcdgui::LayeredScreen>,
+            const std::shared_ptr<eventregistry::EventRegistry> &, Sequencer *,
+            const std::shared_ptr<Clock> &,
+            const std::shared_ptr<lcdgui::LayeredScreen> &,
             std::function<bool()> isBouncing,
-            std::function<int()> getSampleRate,
-            std::function<bool()> isRecMainWithoutPlaying,
-            std::function<void(int velo, int frameOffset)> playMetronome,
+            const std::function<int()> &getSampleRate,
+            const std::function<bool()> &isRecMainWithoutPlaying,
+            const std::function<void(int velo, int frameOffset)> &playMetronome,
             std::function<std::shared_ptr<lcdgui::Screens>()>,
-            std::function<bool()> isNoteRepeatLockedOrPressed,
-            std::shared_ptr<sampler::Sampler>,
-            std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>,
-            std::function<bool()> isFullLevelEnabled,
-            std::function<bool()> isSixteenLevelsEnabled,
-            std::shared_ptr<hardware::Slider> hardwareSlider,
+            const std::function<bool()> &isNoteRepeatLockedOrPressed,
+            const std::shared_ptr<sampler::Sampler> &,
+            const std::function<
+                std::shared_ptr<engine::audio::mixer::AudioMixer>()> &,
+            const std::function<bool()> &isFullLevelEnabled,
+            const std::function<bool()> &isSixteenLevelsEnabled,
+            const std::shared_ptr<hardware::Slider> &hardwareSlider,
             std::vector<std::shared_ptr<engine::Voice>> *,
-            std::function<
-                std::vector<mpc::engine::MixerInterconnection *> &()>);
+            const std::function<std::vector<engine::MixerInterconnection *> &()>
+                &);
 
         void work(int nFrames) override;
 
@@ -91,14 +96,17 @@ namespace mpc::sequencer
 
         void stop();
 
-        bool isRunning();
+        bool isRunning() const;
 
         void enqueueEventAfterNFrames(const std::function<void()> &event,
-                                      unsigned long nFrames);
+                                      unsigned long nFrames) const;
 
-        uint64_t getMetronomeOnlyTickPosition();
+        uint64_t getMetronomeOnlyTickPosition() const;
 
     private:
+        std::shared_ptr<EventQueue> eventQueue;
+        std::vector<EventAfterNFrames> tempEventQueue;
+
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
@@ -133,31 +141,25 @@ namespace mpc::sequencer
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames();
 
-        void triggerClickIfNeeded();
+        void triggerClickIfNeeded() const;
 
-        void displayPunchRects();
+        void displayPunchRects() const;
 
-        void stopCountingInIfRequired();
+        void stopCountingInIfRequired() const;
 
-        std::shared_ptr<sequencer::Sequence> switchToNextSequence();
+        std::shared_ptr<Sequence> switchToNextSequence() const;
 
-        bool processSongMode();
+        bool processSongMode() const;
 
-        bool processSeqLoopEnabled();
+        bool processSeqLoopEnabled() const;
 
-        bool processSeqLoopDisabled();
+        bool processSeqLoopDisabled() const;
 
         void processNoteRepeat();
 
-    private:
-        std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>>
-            eventQueue;
-        std::vector<EventAfterNFrames> tempEventQueue;
+        void move(int newTickPos) const;
 
-        void move(int newTickPos);
-
-        void stopSequencer();
+        void stopSequencer() const;
 
         uint64_t metronomeOnlyTickPosition = 0;
     };

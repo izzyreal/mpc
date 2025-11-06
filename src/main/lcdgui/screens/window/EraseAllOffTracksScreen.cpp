@@ -20,10 +20,10 @@ void EraseAllOffTracksScreen::function(int i)
     {
         case 4:
         {
-            auto seq = sequencer->getActiveSequence();
+            const auto seq = sequencer->getActiveSequence();
             int trackCounter = 0;
 
-            for (auto &track : seq->getTracks())
+            for (const auto &track : seq->getTracks())
             {
                 if (!track->isOn())
                 {

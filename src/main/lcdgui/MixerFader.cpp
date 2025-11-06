@@ -29,7 +29,7 @@ void MixerFader::Draw(std::vector<std::vector<bool>> *pixels)
         return;
     }
 
-    auto rect = getRect();
+    const auto rect = getRect();
 
     for (int i = rect.L; i < rect.R; i++)
     {
@@ -39,9 +39,9 @@ void MixerFader::Draw(std::vector<std::vector<bool>> *pixels)
         }
     }
 
-    auto barHeight = (value / 100.0) * h;
+    const auto barHeight = (value / 100.0) * h;
 
-    MRECT tmp(rect.L, rect.B - barHeight, rect.R, rect.B);
+    const MRECT tmp(rect.L, rect.B - barHeight, rect.R, rect.B);
 
     for (int i = tmp.L; i < tmp.R; i++)
     {

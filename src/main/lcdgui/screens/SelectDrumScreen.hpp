@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens
     public:
         void function(int i) override;
 
-        SelectDrumScreen(mpc::Mpc &mpc, const int layerIndex);
+        SelectDrumScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

@@ -33,20 +33,18 @@ namespace mpc::lcdgui
 {
     class ScreenComponent : public Component, public Observer
     {
-
-    private:
         const int layer;
         std::map<std::string, std::vector<std::string>> transferMap;
         std::string firstField;
 
     public:
-        const int &getLayerIndex();
+        const int &getLayerIndex() const;
 
-        std::shared_ptr<sequencer::Bus> getBus();
-        std::optional<int> getDrumIndex();
+        std::shared_ptr<sequencer::Bus> getBus() const;
+        std::optional<int> getDrumIndex() const;
         std::string getFocusedFieldNameOrThrow();
-        bool isFocusedFieldName(const std::string);
-        std::shared_ptr<sampler::Program> getProgram();
+        bool isFocusedFieldName(const std::string &);
+        std::shared_ptr<sampler::Program> getProgram() const;
 
     protected:
         mpc::Mpc &mpc;
@@ -54,28 +52,27 @@ namespace mpc::lcdgui
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 
-        std::shared_ptr<mpc::sequencer::DrumBus> getActiveDrumBus();
+        std::shared_ptr<mpc::sequencer::DrumBus> getActiveDrumBus() const;
         std::shared_ptr<Field> getFocusedField();
         std::shared_ptr<Field> getFocusedFieldOrThrow();
         std::optional<std::string> getFocusedFieldName();
 
-        std::shared_ptr<sampler::Program> getProgramOrThrow();
+        std::shared_ptr<sampler::Program> getProgramOrThrow() const;
 
     protected:
         void setLastFocus(const std::string &screenName,
-                          const std::string &newLastFocus);
-        const std::string getLastFocus(const std::string &screenName);
+                          const std::string &newLastFocus) const;
+        std::string getLastFocus(const std::string &screenName) const;
         std::shared_ptr<Wave> findWave();
         std::shared_ptr<EnvGraph> findEnvGraph();
-        void openScreenById(const ScreenId);
+        void openScreenById(ScreenId) const;
 
     public:
         virtual void open() {}
         virtual void close() {}
 
     public:
-        ScreenComponent(mpc::Mpc &mpc, const std::string &name,
-                        const int layer);
+        ScreenComponent(mpc::Mpc &mpc, const std::string &name, int layer);
         std::shared_ptr<Field> findFocus();
         void
         setTransferMap(const std::map<std::string, std::vector<std::string>>
@@ -103,6 +100,6 @@ namespace mpc::lcdgui
         virtual void playStart();
         virtual void setSlider(int) {}
 
-        int getSoundIncrement(const int dataWheelSteps);
+        int getSoundIncrement(int dataWheelSteps) const;
     };
 } // namespace mpc::lcdgui

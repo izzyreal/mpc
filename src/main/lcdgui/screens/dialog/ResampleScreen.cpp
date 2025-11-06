@@ -80,7 +80,7 @@ void ResampleScreen::function(int i)
         case 4:
         {
             const auto snd = sampler->getSound(sampler->getSoundIndex());
-            auto destSnd = sampler->addSound();
+            const auto destSnd = sampler->addSound();
 
             if (destSnd == nullptr)
             {
@@ -91,7 +91,7 @@ void ResampleScreen::function(int i)
             destSnd->setSampleRate(newFs);
             destSnd->setMono(snd->isMono());
 
-            auto source = snd->getSampleData();
+            const auto source = snd->getSampleData();
 
             if (newFs != snd->getSampleRate())
             {
@@ -190,7 +190,7 @@ void ResampleScreen::setNewBit(int i)
     displayNewBit();
 }
 
-void ResampleScreen::setNewName(std::string s)
+void ResampleScreen::setNewName(const std::string &s)
 {
     newName = s;
     displayNewName();

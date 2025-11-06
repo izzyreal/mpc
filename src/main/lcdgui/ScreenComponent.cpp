@@ -4,19 +4,19 @@
 
 #include "Mpc.hpp"
 
-#include "command/context/PushPadScreenUpdateContext.hpp"
-#include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
-#include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
 #include "sequencer/Bus.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Sequencer.hpp"
 
-#include "lcdgui/ScreenGroups.hpp"
-#include "lcdgui/screens/DrumScreen.hpp"
-#include "sequencer/Bus.hpp"
 #include "sampler/Sampler.hpp"
-#include "sequencer/Track.hpp"
+
+#include "command/context/PushPadScreenUpdateContext.hpp"
 #include "command/AllCommands.hpp"
+
+#include "lcdgui/ScreenGroups.hpp"
+#include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
+#include "lcdgui/screens/dialog/MidiOutputMonitorScreen.hpp"
+#include "lcdgui/screens/DrumScreen.hpp"
 
 #include <stdexcept>
 
@@ -25,17 +25,17 @@ using namespace mpc::command;
 using namespace mpc::command::context;
 using namespace mpc::sequencer;
 
-ScreenComponent::ScreenComponent(mpc::Mpc &mpc, const std::string &name,
+ScreenComponent::ScreenComponent(Mpc &mpc, const std::string &name,
                                  const int layer)
-    : Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()),
-      sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
+    : Component(name), layer(layer), mpc(mpc), sampler(mpc.getSampler()),
+      sequencer(mpc.getSequencer()), ls(mpc.getLayeredScreen())
 {
-    auto background = std::dynamic_pointer_cast<Background>(
+    const auto background = std::dynamic_pointer_cast<Background>(
         addChild(std::make_shared<Background>()));
     background->setBackgroundName(name);
 }
 
-void ScreenComponent::openScreenById(const ScreenId screenId)
+void ScreenComponent::openScreenById(const ScreenId screenId) const
 {
     ls->openScreenById(screenId);
 }
@@ -72,7 +72,7 @@ std::shared_ptr<EnvGraph> ScreenComponent::findEnvGraph()
     return findChild<EnvGraph>("env-graph");
 }
 
-const int &ScreenComponent::getLayerIndex()
+const int &ScreenComponent::getLayerIndex() const
 {
     return layer;
 }
@@ -90,12 +90,12 @@ std::shared_ptr<Field> ScreenComponent::findFocus()
 }
 
 void ScreenComponent::setLastFocus(const std::string &screenName,
-                                   const std::string &newLastFocus)
+                                   const std::string &newLastFocus) const
 {
     mpc.getLayeredScreen()->setLastFocus(screenName, newLastFocus);
 }
 
-const std::string ScreenComponent::getLastFocus(const std::string &screenName)
+std::string ScreenComponent::getLastFocus(const std::string &screenName) const
 {
     return mpc.getLayeredScreen()->getLastFocus(screenName);
 }
@@ -120,7 +120,7 @@ void ScreenComponent::openWindow()
     mpc.getLayeredScreen()->closeCurrentScreen();
 }
 
-std::optional<int> ScreenComponent::getDrumIndex()
+std::optional<int> ScreenComponent::getDrumIndex() const
 {
     if (screengroups::isSamplerScreen(ls->getCurrentScreen()))
     {
@@ -138,9 +138,9 @@ std::optional<int> ScreenComponent::getDrumIndex()
     return std::nullopt;
 }
 
-std::shared_ptr<mpc::sequencer::Bus> ScreenComponent::getBus()
+std::shared_ptr<Bus> ScreenComponent::getBus() const
 {
-    if (auto drumIndex = getDrumIndex(); drumIndex)
+    if (const auto drumIndex = getDrumIndex(); drumIndex)
     {
         return sequencer->getDrumBus(*drumIndex);
     }
@@ -153,7 +153,7 @@ std::shared_ptr<mpc::sequencer::Bus> ScreenComponent::getBus()
     return sequencer->getBus<MidiBus>(0);
 }
 
-std::shared_ptr<DrumBus> ScreenComponent::getActiveDrumBus()
+std::shared_ptr<DrumBus> ScreenComponent::getActiveDrumBus() const
 {
     const auto drumIndex = getDrumIndex();
     assert(drumIndex);
@@ -175,7 +175,7 @@ std::shared_ptr<Field> ScreenComponent::getFocusedField()
 
 std::optional<std::string> ScreenComponent::getFocusedFieldName()
 {
-    if (auto f = getFocusedField(); f)
+    if (const auto f = getFocusedField(); f)
     {
         return f->getName();
     }
@@ -198,9 +198,9 @@ std::string ScreenComponent::getFocusedFieldNameOrThrow()
     return getFocusedFieldOrThrow()->getName();
 }
 
-bool ScreenComponent::isFocusedFieldName(const std::string fieldName)
+bool ScreenComponent::isFocusedFieldName(const std::string &fieldName)
 {
-    auto f = getFocusedField();
+    const auto f = getFocusedField();
 
     if (!f)
     {
@@ -210,7 +210,7 @@ bool ScreenComponent::isFocusedFieldName(const std::string fieldName)
     return f->getName() == fieldName;
 }
 
-std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram()
+std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram() const
 
 {
     const auto drumIndex = getDrumIndex();
@@ -224,8 +224,8 @@ std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram()
         sequencer->getDrumBus(*drumIndex)->getProgram());
 }
 
-std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()
-
+std::shared_ptr<mpc::sampler::Program>
+ScreenComponent::getProgramOrThrow() const
 {
     auto p = getProgram();
     if (!p)
@@ -237,21 +237,21 @@ std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgramOrThrow()
 
 void ScreenComponent::left()
 {
-    command::PushLeftCommand(mpc).execute();
+    PushLeftCommand(mpc).execute();
 }
 void ScreenComponent::right()
 {
-    command::PushRightCommand(mpc).execute();
+    PushRightCommand(mpc).execute();
 }
 
 void ScreenComponent::up()
 {
-    command::PushUpCommand(mpc).execute();
+    PushUpCommand(mpc).execute();
 }
 
 void ScreenComponent::down()
 {
-    command::PushDownCommand(mpc).execute();
+    PushDownCommand(mpc).execute();
 }
 
 void ScreenComponent::function(int i)
@@ -264,41 +264,41 @@ void ScreenComponent::function(int i)
 
 void ScreenComponent::numpad(int i)
 {
-    command::PushNumPadCommand(mpc, i).execute();
+    PushNumPadCommand(mpc, i).execute();
 }
 void ScreenComponent::pressEnter()
 {
-    command::PushEnterCommand(mpc).execute();
+    PushEnterCommand(mpc).execute();
 }
 void ScreenComponent::rec()
 {
-    command::PushRecCommand(mpc).execute();
+    PushRecCommand(mpc).execute();
 }
 void ScreenComponent::overDub()
 {
-    command::PushOverdubCommand(mpc).execute();
+    PushOverdubCommand(mpc).execute();
 }
 void ScreenComponent::stop()
 {
-    command::PushStopCommand(mpc).execute();
+    PushStopCommand(mpc).execute();
 }
 void ScreenComponent::play()
 {
-    command::PushPlayCommand(mpc).execute();
+    PushPlayCommand(mpc).execute();
 }
 void ScreenComponent::playStart()
 {
-    command::PushPlayStartCommand(mpc).execute();
+    PushPlayStartCommand(mpc).execute();
 }
 
-int ScreenComponent::getSoundIncrement(const int dataWheelSteps)
+int ScreenComponent::getSoundIncrement(const int dataWheelSteps) const
 {
     auto result = dataWheelSteps;
 
     if (std::abs(result) != 1)
     {
-        result *= (int)(ceil(mpc.getSampler()->getSound()->getFrameCount() /
-                             15000.f));
+        result *= static_cast<int>(
+            ceil(mpc.getSampler()->getSound()->getFrameCount() / 15000.f));
     }
 
     return result;

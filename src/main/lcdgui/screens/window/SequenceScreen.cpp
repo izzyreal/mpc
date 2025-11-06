@@ -15,14 +15,15 @@ SequenceScreen::SequenceScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SequenceScreen::open()
 {
-    auto sequenceNameRestLabel = findLabel("sequencenamerest");
-    auto defaultSequenceNameRestLabel = findLabel("defaultnamerest");
+    const auto sequenceNameRestLabel = findLabel("sequencenamerest");
+    const auto defaultSequenceNameRestLabel = findLabel("defaultnamerest");
 
-    auto sequenceNameFirstLetterField = findField("sequencenamefirstletter");
-    auto defaultSequenceNameFirstLetterField =
+    const auto sequenceNameFirstLetterField =
+        findField("sequencenamefirstletter");
+    const auto defaultSequenceNameFirstLetterField =
         findField("defaultnamefirstletter");
 
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
     defaultSequenceNameFirstLetterField->setText(
@@ -75,7 +76,7 @@ void SequenceScreen::openNameScreen()
         };
     }
 
-    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequence");
     openScreenById(ScreenId::NameScreen);
 }

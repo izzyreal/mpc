@@ -39,7 +39,8 @@ void EnvGraph::setCoordinates(int attack, int decay, bool decayModeStart)
     setCoordinates(lines);
 }
 
-void EnvGraph::setCoordinates(std::vector<std::vector<int>> newCoordinates)
+void EnvGraph::setCoordinates(
+    const std::vector<std::vector<int>> &newCoordinates)
 {
     coordinates = newCoordinates;
     SetDirty();
@@ -52,19 +53,19 @@ void EnvGraph::Draw(std::vector<std::vector<bool>> *pixels)
         return;
     }
 
-    auto csn = mpc.getLayeredScreen()->getCurrentScreenName();
+    const auto csn = mpc.getLayeredScreen()->getCurrentScreenName();
     int xoff = (csn == "program-params") ? 76 : 92;
     int yoff = (csn == "program-params") ? 16 : 22;
 
-    int width = 49;
-    int height = 27;
+    const int width = 49;
+    const int height = 27;
 
     for (int x = 0; x < width; x++)
     {
         for (int y = 0; y < height; y++)
         {
-            int x1 = xoff + x;
-            int y1 = yoff + y;
+            const int x1 = xoff + x;
+            const int y1 = yoff + y;
 
             (*pixels)[x1][y1] = false;
         }

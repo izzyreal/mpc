@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        SequencerScreen(mpc::Mpc &mpc, const int layerIndex);
+        SequencerScreen(mpc::Mpc &mpc, int layerIndex);
 
         void erase();
         void tap();

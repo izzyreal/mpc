@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
 
     public:
-        ChangeTsigScreen(mpc::Mpc &mpc, const int layerIndex);
+        ChangeTsigScreen(mpc::Mpc &mpc, int layerIndex);
 
     public:
         void open() override;

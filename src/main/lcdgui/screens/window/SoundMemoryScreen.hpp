@@ -6,7 +6,7 @@ namespace mpc::lcdgui::screens::window
     class SoundMemoryScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        SoundMemoryScreen(mpc::Mpc &mpc, const int layerIndex);
+        SoundMemoryScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

@@ -136,16 +136,16 @@ void NextSeqScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "timing")
     {
-        auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
-        auto noteValue = screen->getNoteValue();
+        const auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
+        const auto noteValue = screen->getNoteValue();
         screen->setNoteValue(noteValue + i);
         setLastFocus("timing-correct", "notevalue");
         displayTiming();
     }
     else if (focusedFieldName == "tempo")
     {
-        double oldTempo = sequencer->getTempo();
-        double newTempo = oldTempo + (i * 0.1);
+        const double oldTempo = sequencer->getTempo();
+        const double newTempo = oldTempo + (i * 0.1);
         sequencer->setTempo(newTempo);
         displayTempo();
     }
@@ -156,7 +156,7 @@ void NextSeqScreen::function(int i)
 
     if (i == 3 || i == 4)
     {
-        auto nextSq = sequencer->getNextSq();
+        const auto nextSq = sequencer->getNextSq();
         sequencer->setNextSq(-1);
         selectNextSqFromScratch = true;
         displayNextSq();
@@ -200,12 +200,12 @@ void NextSeqScreen::displaySq()
 
 void NextSeqScreen::displayNextSq()
 {
-    auto nextSq = sequencer->getNextSq();
+    const auto nextSq = sequencer->getNextSq();
     std::string res = "";
 
     if (nextSq != -1)
     {
-        auto seqName = sequencer->getSequence(nextSq)->getName();
+        const auto seqName = sequencer->getSequence(nextSq)->getName();
         res = StrUtil::padLeft(std::to_string(sequencer->getNextSq() + 1), "0",
                                2) +
               "-" + seqName;
@@ -238,10 +238,10 @@ void NextSeqScreen::displayTempo()
 void NextSeqScreen::displayTempoLabel()
 {
     auto currentRatio = -1;
-    auto sequence = sequencer->isPlaying()
-                        ? sequencer->getCurrentlyPlayingSequence()
-                        : sequencer->getActiveSequence();
-    for (auto &e : sequence->getTempoChangeEvents())
+    const auto sequence = sequencer->isPlaying()
+                              ? sequencer->getCurrentlyPlayingSequence()
+                              : sequencer->getActiveSequence();
+    for (const auto &e : sequence->getTempoChangeEvents())
     {
         if (e->getTick() > sequencer->getTickPosition())
         {
@@ -270,9 +270,9 @@ void NextSeqScreen::displayTempoSource()
 
 void NextSeqScreen::displayTiming()
 {
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
-    auto noteValue = timingCorrectScreen->getNoteValue();
+    const auto noteValue = timingCorrectScreen->getNoteValue();
     findField("timing")->setText(
         SequencerScreen::timingCorrectNames[noteValue]);
 }

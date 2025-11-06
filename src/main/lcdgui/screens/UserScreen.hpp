@@ -48,7 +48,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
     public:
-        UserScreen(mpc::Mpc &mpc, const int layerIndex);
+        UserScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -80,7 +80,7 @@ namespace mpc::lcdgui::screens
         mpc::sequencer::TimeSignature timeSig;
         std::vector<std::string> deviceNames;
 
-        void setTempo(const double newTempo);
+        void setTempo(double newTempo);
         void setLoop(bool b);
         void setBus(int i);
         void setDeviceNumber(int i);
@@ -88,10 +88,10 @@ namespace mpc::lcdgui::screens
         void setLastBar(int i);
         void setPgm(int i);
         void setVelo(int i);
-        void setDeviceName(int i, std::string s);
-        void setSequenceName(std::string name);
+        void setDeviceName(int i, const std::string &s);
+        void setSequenceName(const std::string &name);
         void setTimeSig(int num, int den);
-        void setTrackName(int i, std::string s);
+        void setTrackName(int i, const std::string &s);
 
         std::string getDeviceName(int i);
         std::string getTrackName(int i);

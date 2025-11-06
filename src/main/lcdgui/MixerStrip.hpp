@@ -57,7 +57,7 @@ namespace mpc::lcdgui
         void initLabels();
         void setColors();
         void setSelection(int i);
-        void setValueAString(std::string str);
+        void setValueAString(const std::string &str);
         void setBank(int i);
 
     public:

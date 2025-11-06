@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int i) override;
         void openNameScreen() override;
 
-        StereoToMonoScreen(mpc::Mpc &mpc, const int layerIndex);
+        StereoToMonoScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -31,8 +31,8 @@ namespace mpc::lcdgui::screens::dialog
         std::string newLName;
         std::string newRName;
 
-        void setNewLName(std::string s);
-        void setNewRName(std::string s);
+        void setNewLName(const std::string &s);
+        void setNewRName(const std::string &s);
 
     private:
         friend class mpc::lcdgui::screens::window::NameScreen;

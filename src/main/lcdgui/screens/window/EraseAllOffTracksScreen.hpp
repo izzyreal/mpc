@@ -10,6 +10,6 @@ namespace mpc::lcdgui::screens::window
     public:
         void function(int i) override;
 
-        EraseAllOffTracksScreen(mpc::Mpc &mpc, const int layerIndex);
+        EraseAllOffTracksScreen(mpc::Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

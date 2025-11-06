@@ -18,7 +18,7 @@ void StepTcScreen::open()
 
 void StepTcScreen::turnWheel(int i)
 {
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(timingCorrectScreen->getNoteValue() + i);
     displayTcValue();
@@ -26,8 +26,8 @@ void StepTcScreen::turnWheel(int i)
 
 void StepTcScreen::displayTcValue()
 {
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
-    auto noteValue = timingCorrectScreen->getNoteValue();
+    const auto noteValue = timingCorrectScreen->getNoteValue();
     findField("tcvalue")->setText(timingCorrectNames[noteValue]);
 }

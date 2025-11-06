@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        NameScreen(mpc::Mpc &mpc, const int layerIndex);
+        NameScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
@@ -30,7 +30,7 @@ namespace mpc::lcdgui::screens::window
         void backSpace();
 
         void initialize(
-            std::string nameToEdit, unsigned char nameLimit,
+            const std::string &nameToEdit, unsigned char nameLimit,
             const std::function<void(std::string &)> &enterAction,
             const std::string &cancelScreen,
             const std::function<void()> &mainScreenAction = [] {});
@@ -38,7 +38,7 @@ namespace mpc::lcdgui::screens::window
         std::string getNameWithoutSpaces();
         void setEditing(bool b);
 
-        void setNameToEdit(std::string newNameToEdit);
+        void setNameToEdit(const std::string &newNameToEdit);
 
         std::function<void()> mainScreenAction = []() {};
 
@@ -51,7 +51,7 @@ namespace mpc::lcdgui::screens::window
         std::weak_ptr<mpc::lcdgui::Underline> findUnderline();
 
         void setNameLimit(int i);
-        void setNameToEdit(std::string str, int i);
+        void setNameToEdit(const std::string &str, int i);
 
         void changeNameCharacter(int i, bool up);
         std::string nameToEdit;

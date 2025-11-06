@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void function(int i) override;
 
-        LoadAProgramScreen(mpc::Mpc &mpc, const int layerIndex);
+        LoadAProgramScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
         void setLoadReplaceSameSound(bool b);

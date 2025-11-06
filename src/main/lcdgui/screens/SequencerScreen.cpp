@@ -49,7 +49,7 @@ SequencerScreen::SequencerScreen(mpc::Mpc &mpc, const int layerIndex)
     addChildT<PunchRect>("punch-rect-2", punch2)->Hide(true);
 
     addChildT<TextComp>(mpc, "footer-label");
-    auto footerLabel = findChild<TextComp>("footer-label");
+    const auto footerLabel = findChild<TextComp>("footer-label");
     footerLabel->setLocation(36, 51);
     footerLabel->setText("(Hold pads or keys to repeat)");
     footerLabel->setSize(footerLabel->GetTextEntryLength() * 6, 8);
@@ -377,7 +377,7 @@ void SequencerScreen::close()
 {
     std::vector<std::string> screensThatDisablePunch{"song", "load", "save",
                                                      "others", "next-seq"};
-    auto nextScreen = ls->getCurrentScreenName();
+    const auto nextScreen = ls->getCurrentScreenName();
 
     if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch),
              nextScreen) != end(screensThatDisablePunch))
@@ -396,7 +396,7 @@ void SequencerScreen::displayVelo()
 
 void SequencerScreen::displayDeviceNumber()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
     if (track->getDeviceIndex() == 0)
     {
         findField("devicenumber")->setText("OFF");
@@ -433,7 +433,7 @@ void SequencerScreen::displayBars()
 
 void SequencerScreen::displayPgm()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
     if (track->getProgramChange() == 0)
     {
         findField("pgm")->setText("OFF");
@@ -446,14 +446,15 @@ void SequencerScreen::displayPgm()
 
 void SequencerScreen::displayDeviceName()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
-    if (auto drumBus = sequencer->getBus<DrumBus>(track->getBus()); drumBus)
+    if (const auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+        drumBus)
     {
         if (track->getDeviceIndex() == 0)
         {
-            int pgm = drumBus->getProgram();
-            auto p = sampler->getProgram(pgm);
+            const int pgm = drumBus->getProgram();
+            const auto p = sampler->getProgram(pgm);
             findLabel("devicename")->setText(p->getName());
         }
         else
@@ -488,7 +489,7 @@ void SequencerScreen::displayTempo()
 void SequencerScreen::displayTempoLabel()
 {
     auto currentRatio = -1;
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     if (!seq->isUsed() || !seq->isTempoChangeOn())
     {
@@ -496,7 +497,7 @@ void SequencerScreen::displayTempoLabel()
         return;
     }
 
-    for (auto &tce : seq->getTempoChangeEvents())
+    for (const auto &tce : seq->getTempoChangeEvents())
     {
         if (tce->getTick() > sequencer->getTickPosition())
         {
@@ -610,21 +611,21 @@ std::vector<std::string> SequencerScreen::timingCorrectNames =
 
 void SequencerScreen::displayTiming()
 {
-    auto noteValue =
+    const auto noteValue =
         mpc.screens->get<ScreenId::TimingCorrectScreen>()->getNoteValue();
     findField("timing")->setText(timingCorrectNames[noteValue]);
 }
 
 void SequencerScreen::pressEnter()
 {
-    auto focusedField = getFocusedFieldOrThrow();
+    const auto focusedField = getFocusedFieldOrThrow();
 
     if (!focusedField->isTypeModeEnabled())
     {
         return;
     }
 
-    auto candidate = focusedField->enter();
+    const auto candidate = focusedField->enter();
 
     const auto focusedFieldName = focusedField->getName();
 
@@ -695,7 +696,7 @@ void SequencerScreen::function(int i)
         }
         case 2:
         {
-            auto track = mpc.getSequencer()->getActiveTrack();
+            const auto track = mpc.getSequencer()->getActiveTrack();
             track->setOn(!track->isOn());
             break;
         }
@@ -716,7 +717,7 @@ void SequencerScreen::function(int i)
 
 void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
     if (!track->isUsed())
     {
@@ -739,7 +740,7 @@ void SequencerScreen::turnWheel(int i)
         return;
     }
 
-    auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getActiveTrack();
 
     if (focusedFieldName == "now0")
     {
@@ -775,13 +776,13 @@ void SequencerScreen::turnWheel(int i)
 
         track->setBusNumber(track->getBus() + i);
 
-        auto lastFocus = getLastFocus("step-editor");
+        const auto lastFocus = getLastFocus("step-editor");
 
         if (lastFocus.length() == 2)
         {
-            auto eventNumber = stoi(lastFocus.substr(1, 2));
+            const auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-            auto stepEditorScreen =
+            const auto stepEditorScreen =
                 mpc.screens->get<ScreenId::StepEditorScreen>();
 
             if (std::dynamic_pointer_cast<NoteOnEvent>(
@@ -810,8 +811,8 @@ void SequencerScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "timing")
     {
-        auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
-        auto noteValue = screen->getNoteValue();
+        const auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
+        const auto noteValue = screen->getNoteValue();
         screen->setNoteValue(noteValue + i);
         setLastFocus("timing-correct", "notevalue");
     }
@@ -859,8 +860,8 @@ void SequencerScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "tempo")
     {
-        double oldTempo = sequencer->getTempo();
-        double newTempo = oldTempo + (i * 0.1);
+        const double oldTempo = sequencer->getTempo();
+        const double newTempo = oldTempo + (i * 0.1);
         sequencer->setTempo(newTempo);
     }
     else if (focusedFieldName == "tsig")
@@ -930,7 +931,7 @@ void SequencerScreen::openWindow()
     }
     else if (focusedFieldName == "tr")
     {
-        auto track = mpc.getSequencer()->getActiveTrack();
+        const auto track = mpc.getSequencer()->getActiveTrack();
 
         if (!track->isUsed())
         {
@@ -1109,7 +1110,7 @@ void SequencerScreen::displayNextSq()
 {
     ls->setFunctionKeysArrangement(sequencer->getNextSq() == -1 ? 0 : 1);
 
-    auto noNextSq = sequencer->getNextSq() == -1;
+    const auto noNextSq = sequencer->getNextSq() == -1;
     findLabel("nextsq")->Hide(noNextSq);
     findField("nextsq")->Hide(noNextSq);
 
@@ -1146,8 +1147,8 @@ void SequencerScreen::stop()
             findChild<PunchRect>("punch-rect-" + std::to_string(i))->Hide(true);
         }
 
-        auto time0 = findLabel("punch-time-0");
-        auto time1 = findLabel("punch-time-1");
+        const auto time0 = findLabel("punch-time-0");
+        const auto time1 = findLabel("punch-time-1");
 
         time0->Hide(true);
         time1->Hide(true);

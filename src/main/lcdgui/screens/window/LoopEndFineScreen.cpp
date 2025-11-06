@@ -33,13 +33,13 @@ void LoopEndFineScreen::open()
 
 void LoopEndFineScreen::displayLoopLngth()
 {
-    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
+    const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     findField("loop-lngth")->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
 void LoopEndFineScreen::displayLngthField()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -52,9 +52,9 @@ void LoopEndFineScreen::displayLngthField()
 
 void LoopEndFineScreen::displayFineWave()
 {
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -68,7 +68,7 @@ void LoopEndFineScreen::displayFineWave()
 
 void LoopEndFineScreen::displayEnd()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -103,9 +103,9 @@ void LoopEndFineScreen::function(int i)
 
 void LoopEndFineScreen::turnWheel(int i)
 {
-    auto sound = sampler->getSound();
-    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto sound = sampler->getSound();
+    const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     auto soundInc = getSoundIncrement(i);
 
@@ -130,7 +130,8 @@ void LoopEndFineScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "lngth")
     {
-        auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
+        const auto newLength =
+            (sound->getEnd() - sound->getLoopTo()) + soundInc;
 
         loopScreen->setLength(newLength);
         displayEnd();
@@ -139,7 +140,7 @@ void LoopEndFineScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "end")
     {
-        auto newValue = sound->getEnd() + soundInc;
+        const auto newValue = sound->getEnd() + soundInc;
         trimScreen->setEnd(newValue);
 
         displayEnd();
@@ -165,7 +166,7 @@ void LoopEndFineScreen::right()
 
 void LoopEndFineScreen::pressEnter()
 {
-    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
+    const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
     loopScreen->pressEnter();
     displayEnd();
     displayLngthField();
@@ -181,8 +182,8 @@ void LoopEndFineScreen::setSlider(int i)
         return;
     }
 
-    auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto loopScreen = mpc.screens->get<ScreenId::LoopScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

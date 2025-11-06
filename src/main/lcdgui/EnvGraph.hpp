@@ -18,7 +18,7 @@ namespace mpc::lcdgui
         std::vector<std::vector<int>> coordinates;
 
     public:
-        void setCoordinates(std::vector<std::vector<int>> ia);
+        void setCoordinates(const std::vector<std::vector<int>> &ia);
         void setCoordinates(int attack, int decay, bool decayModeStart);
 
     public:

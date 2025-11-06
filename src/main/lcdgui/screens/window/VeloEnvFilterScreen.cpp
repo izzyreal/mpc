@@ -33,8 +33,8 @@ void VeloEnvFilterScreen::close()
 
 void VeloEnvFilterScreen::turnWheel(int i)
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -90,16 +90,16 @@ void VeloEnvFilterScreen::update(Observable *observable, Message message)
 
 void VeloEnvFilterScreen::displayNote()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
-    auto soundIndex = selectedNoteParameters->getSoundIndex();
-    auto padIndex =
+    const auto soundIndex = selectedNoteParameters->getSoundIndex();
+    const auto padIndex =
         program->getPadIndexFromNote(selectedNoteParameters->getNumber());
-    auto padName = sampler->getPadName(padIndex);
-    auto sampleName =
+    const auto padName = sampler->getPadName(padIndex);
+    const auto sampleName =
         soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-    std::string stereo =
+    const std::string stereo =
         soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
                                                                      : "";
     findField("note")->setText(
@@ -114,30 +114,30 @@ void VeloEnvFilterScreen::displayVelo()
 
 void VeloEnvFilterScreen::displayAttack()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
-    auto attack = selectedNoteParameters->getFilterAttack();
-    auto decay = selectedNoteParameters->getFilterDecay();
+    const auto attack = selectedNoteParameters->getFilterAttack();
+    const auto decay = selectedNoteParameters->getFilterDecay();
     findField("attack")->setTextPadded(attack, " ");
     findEnvGraph()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayDecay()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
-    auto attack = selectedNoteParameters->getFilterAttack();
-    auto decay = selectedNoteParameters->getFilterDecay();
+    const auto attack = selectedNoteParameters->getFilterAttack();
+    const auto decay = selectedNoteParameters->getFilterDecay();
     findField("decay")->setTextPadded(decay, " ");
     findEnvGraph()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayAmount()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
     findField("amount")->setTextPadded(
         selectedNoteParameters->getFilterEnvelopeAmount(), " ");
@@ -145,8 +145,8 @@ void VeloEnvFilterScreen::displayAmount()
 
 void VeloEnvFilterScreen::displayVeloFreq()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
     findField("velofreq")
         ->setTextPadded(selectedNoteParameters->getVelocityToFilterFrequency(),

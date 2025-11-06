@@ -26,7 +26,7 @@ LoopScreen::LoopScreen(mpc::Mpc &mpc, const int layerIndex)
 void LoopScreen::open()
 {
     findField("loop")->setAlignment(Alignment::Centered);
-    bool sound = sampler->getSound() ? true : false;
+    const bool sound = sampler->getSound() ? true : false;
 
     findField("snd")->setFocusable(sound);
     findField("playx")->setFocusable(sound);
@@ -53,7 +53,7 @@ void LoopScreen::openWindow()
 {
 
     const auto focusedField = getFocusedField();
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!focusedField || !sound)
     {
@@ -106,7 +106,7 @@ void LoopScreen::function(int f)
                 return;
             }
 
-            auto editSoundScreen =
+            const auto editSoundScreen =
                 mpc.screens->get<ScreenId::EditSoundScreen>();
             editSoundScreen->setReturnToScreenName("loop");
             openScreenById(ScreenId::EditSoundScreen);
@@ -129,7 +129,7 @@ void LoopScreen::turnWheel(int i)
 {
 
     auto soundInc = getSoundIncrement(i);
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     const auto focusedField = getFocusedField();
 
@@ -152,7 +152,7 @@ void LoopScreen::turnWheel(int i)
 
     if (focusedFieldName == "to")
     {
-        auto candidateLoopTo = sound->getLoopTo() + soundInc;
+        const auto candidateLoopTo = sound->getLoopTo() + soundInc;
         setLoopTo(candidateLoopTo);
         displayEndLength();
         displayEndLengthValue();
@@ -163,14 +163,15 @@ void LoopScreen::turnWheel(int i)
     {
         if (endSelected)
         {
-            auto newEndValue = sound->getEnd() + soundInc;
+            const auto newEndValue = sound->getEnd() + soundInc;
 
-            auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+            const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
             trimScreen->setEnd(newEndValue);
         }
         else
         {
-            auto newLength = (sound->getEnd() - sound->getLoopTo()) + soundInc;
+            const auto newLength =
+                (sound->getEnd() - sound->getLoopTo()) + soundInc;
             setLength(newLength);
         }
 
@@ -266,9 +267,9 @@ void LoopScreen::setSlider(int i)
 
 void LoopScreen::setSliderLoopTo(int i)
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
-    auto newLoopToValue =
+    const auto newLoopToValue =
         (int)((i / 124.0) * (loopLngthFix ? (sound->getFrameCount() - oldLength)
                                           : sound->getEnd()));
     setLoopTo(newLoopToValue);
@@ -279,7 +280,7 @@ void LoopScreen::setLoopTo(int newLoopToValue)
     const auto loopLengthIsFixed = loopLngthFix;
     const auto soundLengthIsFixed =
         mpc.screens->get<ScreenId::TrimScreen>()->smplLngthFix;
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     const auto oldSoundLength = sound->getEnd() - sound->getStart();
     const auto oldLoopLength = sound->getEnd() - sound->getLoopTo();
@@ -337,7 +338,7 @@ void LoopScreen::setLength(int newLength)
         newLength = 0;
     }
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (soundLengthIsFixed)
     {
@@ -345,15 +346,15 @@ void LoopScreen::setLength(int newLength)
     }
     else
     {
-        auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+        const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
         trimScreen->setEnd(sound->getLoopTo() + newLength);
     }
 }
 
 void LoopScreen::setSliderLength(int i)
 {
-    auto sound = sampler->getSound();
-    auto newLength = (int)((i / 124.0) * sound->getFrameCount());
+    const auto sound = sampler->getSound();
+    const auto newLength = (int)((i / 124.0) * sound->getFrameCount());
     setLength(newLength);
 }
 
@@ -383,7 +384,7 @@ void LoopScreen::pressEnter()
     }
 
     auto candidate = focusedField->enter();
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
 
@@ -461,7 +462,7 @@ void LoopScreen::pressEnter()
 
 void LoopScreen::displaySnd()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -494,7 +495,7 @@ void LoopScreen::displayTo()
 {
     if (sampler->getSoundCount() != 0)
     {
-        auto sound = sampler->getSound();
+        const auto sound = sampler->getSound();
         findField("to")->setTextPadded(sound->getLoopTo(), " ");
     }
     else
@@ -521,9 +522,9 @@ void LoopScreen::displayEndLengthValue()
         return;
     }
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
-    auto text = std::to_string(
+    const auto text = std::to_string(
         endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
     findField("endlengthvalue")->setTextPadded(text, " ");
 }
@@ -536,13 +537,13 @@ void LoopScreen::displayLoop()
         return;
     }
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
     findField("loop")->setText(sound->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void LoopScreen::displayWave()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -551,8 +552,8 @@ void LoopScreen::displayWave()
         return;
     }
 
-    auto sampleData = sound->getSampleData();
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto sampleData = sound->getSampleData();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findWave()->setSampleData(sampleData, sound->isMono(), trimScreen->view);
     findWave()->setSelection(sound->getLoopTo(), sound->getEnd());
 }

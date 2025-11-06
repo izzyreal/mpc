@@ -89,7 +89,7 @@ void MultiRecordingSetupScreen::right()
 
 void MultiRecordingSetupScreen::turnWheel(int i)
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -140,7 +140,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
     {
         if (visibleMrsLines[yPos]->getTrack() != -1)
         {
-            auto track = seq->getTrack(visibleMrsLines[yPos]->getTrack());
+            const auto track = seq->getTrack(visibleMrsLines[yPos]->getTrack());
             track->setDeviceIndex(track->getDeviceIndex() + i);
             displayMrsLine(yPos);
         }
@@ -195,12 +195,12 @@ void MultiRecordingSetupScreen::down()
 
 void MultiRecordingSetupScreen::displayMrsLine(int i)
 {
-    auto seq = sequencer->getActiveSequence();
-    auto trackIndex = visibleMrsLines[i]->getTrack();
+    const auto seq = sequencer->getActiveSequence();
+    const auto trackIndex = visibleMrsLines[i]->getTrack();
 
-    auto aField = findField("a" + std::to_string(i));
-    auto bField = findField("b" + std::to_string(i));
-    auto cField = findField("c" + std::to_string(i));
+    const auto aField = findField("a" + std::to_string(i));
+    const auto bField = findField("b" + std::to_string(i));
+    const auto cField = findField("c" + std::to_string(i));
 
     aField->setText(inNames[visibleMrsLines[i]->getIn()]);
 
@@ -210,7 +210,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
     }
     else
     {
-        auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
+        const auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
         auto trackNumber = std::to_string(trackIndex + 1);
         trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
         bField->setText(std::string(trackNumber + "-" + track->getName()));
@@ -222,8 +222,8 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
     }
     else
     {
-        auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
-        auto dev = track->getDeviceIndex();
+        const auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
+        const auto dev = track->getDeviceIndex();
 
         if (dev == 0)
         {
@@ -269,7 +269,7 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
     }
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    auto displayYPos = stoi(focusedFieldName.substr(1, 2));
+    const auto displayYPos = stoi(focusedFieldName.substr(1, 2));
     displayMrsLine(displayYPos);
 }
 

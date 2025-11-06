@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void openNameScreen() override;
 
-        ProgramScreen(mpc::Mpc &mpc, const int layerIndex);
+        ProgramScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

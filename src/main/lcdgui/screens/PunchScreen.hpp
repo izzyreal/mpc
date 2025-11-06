@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
         void function(int i) override;
 
-        PunchScreen(mpc::Mpc &mpc, const int layerIndex);
+        PunchScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens
         void overDub() override;
 
         int getActiveTab() const;
-        void setActiveTab(const int);
+        void setActiveTab(int);
         const std::vector<std::string> &getTabNames() const;
 
     private:

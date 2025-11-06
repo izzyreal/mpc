@@ -48,9 +48,10 @@ void DirectoryScreen::setFunctionKeys()
 {
     if (getSelectedFile())
     {
-        auto ext = fs::path(getSelectedFile()->getName()).extension().string();
-        auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
-                        StrUtil::eqIgnoreCase(ext, ".wav");
+        const auto ext =
+            fs::path(getSelectedFile()->getName()).extension().string();
+        const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
+                              StrUtil::eqIgnoreCase(ext, ".wav");
         ls->setFunctionKeysArrangement(playable ? 1 : 0);
     }
     else
@@ -67,7 +68,7 @@ void DirectoryScreen::function(int f)
     ScreenComponent::function(f);
 
     auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     auto disk = mpc.getDisk();
 
     switch (f)
@@ -132,10 +133,10 @@ void DirectoryScreen::function(int f)
                     disk->initFiles();
 
                     auto parentFileNames = disk->getParentFileNames();
-                    auto it = find(begin(parentFileNames), end(parentFileNames),
-                                   finalNewName);
+                    const auto it = find(begin(parentFileNames),
+                                         end(parentFileNames), finalNewName);
 
-                    auto index = distance(begin(parentFileNames), it);
+                    const auto index = distance(begin(parentFileNames), it);
 
                     if (index > 4)
                     {
@@ -171,7 +172,7 @@ void DirectoryScreen::function(int f)
             auto enterAction =
                 [this, disk, loadScreen](std::string &nameScreenName)
             {
-                bool success =
+                const bool success =
                     disk->newFolder(StrUtil::toUpper(nameScreenName));
 
                 if (!success)
@@ -227,14 +228,14 @@ void DirectoryScreen::function(int f)
         }
         case 5:
         {
-            auto file = loadScreen->getSelectedFile();
+            const auto file = loadScreen->getSelectedFile();
 
             if (!file->isDirectory())
             {
-                auto ext = fs::path(file->getName()).extension().string();
+                const auto ext = fs::path(file->getName()).extension().string();
 
-                bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
-                bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
+                const bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
+                const bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
 
                 if (!isWav && !isSnd)
                 {
@@ -245,14 +246,14 @@ void DirectoryScreen::function(int f)
                                                        ->getAudioServer()
                                                        ->getSampleRate();
 
-                bool started =
+                const bool started =
                     mpc.getAudioMidiServices()->getSoundPlayer()->start(
                         file->getInputStream(),
                         isSnd ? audiomidi::SoundPlayerFileFormat::SND
                               : audiomidi::SoundPlayerFileFormat::WAV,
                         audioServerSampleRate);
 
-                auto name = file->getNameWithoutExtension();
+                const auto name = file->getNameWithoutExtension();
 
                 if (started)
                 {
@@ -283,8 +284,8 @@ void DirectoryScreen::turnWheel(int i)
 
 void DirectoryScreen::left()
 {
-    auto disk = mpc.getDisk();
-    auto prevDirName = disk->getDirectoryName();
+    const auto disk = mpc.getDisk();
+    const auto prevDirName = disk->getDirectoryName();
 
     if (xPos == 1)
     {
@@ -295,7 +296,7 @@ void DirectoryScreen::left()
     {
         if (disk->moveBack())
         {
-            auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+            const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
             disk->initFiles();
 
             loadScreen->fileLoad = 0;
@@ -351,7 +352,7 @@ void DirectoryScreen::right()
     }
     else
     {
-        auto disk = mpc.getDisk();
+        const auto disk = mpc.getDisk();
 
         if (!getSelectedFile() || disk->getFileNames().size() == 0 ||
             !getSelectedFile()->isDirectory())
@@ -359,7 +360,7 @@ void DirectoryScreen::right()
             return;
         }
 
-        auto f = getSelectedFile();
+        const auto f = getSelectedFile();
 
         if (!disk->moveForward(f->getName()))
         {
@@ -371,7 +372,7 @@ void DirectoryScreen::right()
         yPos0 = 0;
         yOffset1 = 0;
 
-        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         loadScreen->fileLoad = 0;
 
         for (int i = 0; i < disk->getParentFileNames().size(); i++)
@@ -396,8 +397,8 @@ void DirectoryScreen::right()
 
 void DirectoryScreen::up()
 {
-    auto disk = mpc.getDisk();
-    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto disk = mpc.getDisk();
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     if (xPos == 0)
     {
@@ -410,7 +411,7 @@ void DirectoryScreen::up()
         {
             yOffset0--;
 
-            auto newDirectoryName = disk->getParentFileNames()[yOffset0];
+            const auto newDirectoryName = disk->getParentFileNames()[yOffset0];
 
             if (disk->moveBack())
             {
@@ -431,7 +432,7 @@ void DirectoryScreen::up()
             return;
         }
 
-        auto newDirectoryName =
+        const auto newDirectoryName =
             disk->getParentFileNames()[yPos0 - 1 + yOffset0];
 
         if (disk->moveBack())
@@ -459,7 +460,7 @@ void DirectoryScreen::up()
             return;
         }
 
-        auto yPos = loadScreen->fileLoad - yOffset1;
+        const auto yPos = loadScreen->fileLoad - yOffset1;
 
         if (yPos == 0)
         {
@@ -481,8 +482,8 @@ void DirectoryScreen::up()
 
 void DirectoryScreen::down()
 {
-    auto disk = mpc.getDisk();
-    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto disk = mpc.getDisk();
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     if (xPos == 0)
     {
@@ -499,7 +500,8 @@ void DirectoryScreen::down()
         if (yPos0 == 4)
         {
             yOffset0++;
-            auto newDirectoryName = disk->getParentFileNames()[4 + yOffset0];
+            const auto newDirectoryName =
+                disk->getParentFileNames()[4 + yOffset0];
 
             if (disk->moveBack())
             {
@@ -517,7 +519,7 @@ void DirectoryScreen::down()
             return;
         }
 
-        auto newDirectoryName =
+        const auto newDirectoryName =
             disk->getParentFileNames()[yPos0 + 1 + yOffset0];
 
         if (disk->moveBack())
@@ -550,7 +552,7 @@ void DirectoryScreen::down()
             return;
         }
 
-        auto yPos = loadScreen->fileLoad - yOffset1;
+        const auto yPos = loadScreen->fileLoad - yOffset1;
 
         if (yPos == 4)
         {
@@ -576,7 +578,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 
     if (xPos == 1)
     {
-        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         yPos = loadScreen->fileLoad - yOffset1;
     }
 
@@ -585,7 +587,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 
 std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
 {
-    auto disk = mpc.getDisk();
+    const auto disk = mpc.getDisk();
 
     if (x == 0 && disk->getParentFileNames().size() > y + yOffset0)
     {
@@ -601,10 +603,10 @@ std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
 
 void DirectoryScreen::displayLeftFields()
 {
-    auto disk = mpc.getDisk();
-    auto names = disk->getParentFileNames();
+    const auto disk = mpc.getDisk();
+    const auto names = disk->getParentFileNames();
 
-    int size = names.size();
+    const int size = names.size();
 
     for (int i = 0; i < 5; i++)
     {
@@ -626,8 +628,8 @@ void DirectoryScreen::displayLeftFields()
 
 void DirectoryScreen::displayRightFields()
 {
-    auto disk = mpc.getDisk();
-    int size = disk->getFileNames().size();
+    const auto disk = mpc.getDisk();
+    const int size = disk->getFileNames().size();
 
     for (int i = 0; i < 5; i++)
     {
@@ -654,7 +656,7 @@ void DirectoryScreen::refreshFocus()
     }
     else if (xPos == 1)
     {
-        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         ls->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
     }
 }
@@ -676,10 +678,10 @@ int DirectoryScreen::getXPos()
 
 void DirectoryScreen::findYOffset0()
 {
-    auto disk = mpc.getDisk();
-    auto names = disk->getParentFileNames();
-    auto dirName = disk->getDirectoryName();
-    auto size = names.size();
+    const auto disk = mpc.getDisk();
+    const auto names = disk->getParentFileNames();
+    const auto dirName = disk->getDirectoryName();
+    const auto size = names.size();
 
     for (int i = 0; i < size; i++)
     {
@@ -1086,7 +1088,8 @@ void DirectoryScreen::drawGraphicsRight()
     }
 }
 
-std::string DirectoryScreen::padFileName(std::string s, std::string pad)
+std::string DirectoryScreen::padFileName(const std::string &s,
+                                         const std::string &pad)
 {
     return StrUtil::padRight(StrUtil::trim(s), pad, 8);
 }

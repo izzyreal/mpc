@@ -23,7 +23,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using json = nlohmann::json;
 
-Screens::Screens(mpc::Mpc &mpc) : mpc(mpc) {}
+Screens::Screens(Mpc &mpc) : mpc(mpc) {}
 
 void Screens::createAndCacheAllScreens()
 {
@@ -101,9 +101,9 @@ std::vector<std::string> getFunctionKeyLabels(json &functionKeyLabels)
 }
 
 std::optional<Screens::ScreenLayout>
-Screens::getScreenLayout(const std::string &screenName)
+Screens::getScreenLayout(const std::string &screenName) const
 {
-    Screens::ScreenLayout result;
+    ScreenLayout result;
 
     for (int i = 0; i < 4; i++)
     {
@@ -254,11 +254,11 @@ void Screens::createAndCacheScreen(const std::string &screenName)
     if (const auto screenFactory = getScreenFactories().find(screenName);
         screenFactory != getScreenFactories().end())
     {
-        if (auto screenWithoutLayoutJson =
+        if (const auto screenWithoutLayoutJson =
                 getScreensWithoutLayoutJson().find(screenName);
             screenWithoutLayoutJson != getScreensWithoutLayoutJson().end())
         {
-            auto screen =
+            const auto screen =
                 screenFactory->second(mpc, screenWithoutLayoutJson->second);
             screens.push_back(screen);
         }
@@ -279,7 +279,7 @@ void Screens::createAndCacheScreen(const std::string &screenName)
             return;
         }
 
-        auto screen = screenFactory->second(mpc, layout->layerIndex);
+        const auto screen = screenFactory->second(mpc, layout->layerIndex);
         screen->findBackground()->addChildren(layout->components);
         screen->setTransferMap(layout->transferMap);
         screen->setFirstField(layout->firstField);

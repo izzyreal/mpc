@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void function(int i) override;
 
-        CopyNoteParametersScreen(mpc::Mpc &mpc, const int layerIndex);
+        CopyNoteParametersScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

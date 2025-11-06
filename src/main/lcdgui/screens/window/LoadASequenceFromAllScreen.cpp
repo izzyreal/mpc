@@ -34,7 +34,7 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "load-into")
     {
-        auto loadASequenceScreen =
+        const auto loadASequenceScreen =
             mpc.screens->get<ScreenId::LoadASequenceScreen>();
         loadASequenceScreen->setLoadInto(loadASequenceScreen->loadInto + i);
         displayLoadInto();
@@ -50,11 +50,11 @@ void LoadASequenceFromAllScreen::function(int i)
             openScreenById(ScreenId::Mpc2000XlAllFileScreen);
             break;
         case 4:
-            auto candidate = sequencesFromAllFile[sourceSeqIndex];
+            const auto candidate = sequencesFromAllFile[sourceSeqIndex];
 
             if (candidate)
             {
-                auto loadASequenceScreen =
+                const auto loadASequenceScreen =
                     mpc.screens->get<ScreenId::LoadASequenceScreen>();
                 sequencer->setSequence(loadASequenceScreen->loadInto,
                                        candidate);
@@ -73,16 +73,16 @@ void LoadASequenceFromAllScreen::displayFile()
 
     findField("file")->setTextPadded(sourceSeqIndex + 1, "0");
 
-    auto candidate = sequencesFromAllFile[sourceSeqIndex];
+    const auto candidate = sequencesFromAllFile[sourceSeqIndex];
 
-    auto name = candidate ? candidate->getName() : "(Unused)";
+    const auto name = candidate ? candidate->getName() : "(Unused)";
 
     findLabel("file0")->setText("-" + name);
 }
 
 void LoadASequenceFromAllScreen::displayLoadInto()
 {
-    auto loadASequenceScreen =
+    const auto loadASequenceScreen =
         mpc.screens->get<ScreenId::LoadASequenceScreen>();
     findField("load-into")
         ->setTextPadded(loadASequenceScreen->loadInto + 1, "0");

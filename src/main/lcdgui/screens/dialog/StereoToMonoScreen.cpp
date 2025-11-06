@@ -89,14 +89,14 @@ void StereoToMonoScreen::function(int i)
             break;
         case 4:
         {
-            auto sound = sampler->getSound();
+            const auto sound = sampler->getSound();
 
             if (sound->isMono())
             {
                 return;
             }
 
-            for (auto &s : sampler->getSounds())
+            for (const auto &s : sampler->getSounds())
             {
                 if (s->getName() == newLName || s->getName() == newRName)
                 {
@@ -105,14 +105,14 @@ void StereoToMonoScreen::function(int i)
                 }
             }
 
-            auto left = sampler->addSound(sound->getSampleRate());
+            const auto left = sampler->addSound(sound->getSampleRate());
 
             if (left == nullptr)
             {
                 return;
             }
 
-            auto right = sampler->addSound(sound->getSampleRate());
+            const auto right = sampler->addSound(sound->getSampleRate());
 
             if (right == nullptr)
             {
@@ -126,8 +126,8 @@ void StereoToMonoScreen::function(int i)
             left->setMono(true);
             right->setMono(true);
 
-            auto leftData = left->getMutableSampleData();
-            auto rightData = right->getMutableSampleData();
+            const auto leftData = left->getMutableSampleData();
+            const auto rightData = right->getMutableSampleData();
 
             for (int frameIndex = 0; frameIndex < sound->getFrameCount();
                  frameIndex++)
@@ -164,7 +164,7 @@ void StereoToMonoScreen::updateNewNames()
 
 void StereoToMonoScreen::displayStereoSource()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -195,13 +195,13 @@ void StereoToMonoScreen::displayNewRName()
     findField("newrname")->setText(newRName);
 }
 
-void StereoToMonoScreen::setNewLName(std::string s)
+void StereoToMonoScreen::setNewLName(const std::string &s)
 {
     newLName = s;
     displayNewLName();
 }
 
-void StereoToMonoScreen::setNewRName(std::string s)
+void StereoToMonoScreen::setNewRName(const std::string &s)
 {
     newRName = s;
     displayNewRName();

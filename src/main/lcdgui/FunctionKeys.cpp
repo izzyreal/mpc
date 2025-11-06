@@ -13,7 +13,7 @@ FunctionKey::FunctionKey(mpc::Mpc &mpc, const std::string &name, const int xPos)
     Component::setSize(39, 9);
     setLocation(xPos, 51);
 
-    auto label = addChildT<TextComp>(mpc, name);
+    const auto label = addChildT<TextComp>(mpc, name);
     label->setSize(0, 0);
     label->setLocation(xPos + 1, 52);
     label->preDrawClearRect.Clear();
@@ -72,12 +72,12 @@ void FunctionKey::Draw(std::vector<std::vector<bool>> *pixels)
 
 void FunctionKey::setText(const std::string &text)
 {
-    auto label = findChild<TextComp>(getName());
+    const auto label = findChild<TextComp>(getName());
     label->setText(text);
 
-    auto stringSize = label->GetTextEntryLength();
-    auto lengthInPixels = stringSize * 6;
-    int offsetx = (39 - lengthInPixels) * 0.5;
+    const auto stringSize = label->GetTextEntryLength();
+    const auto lengthInPixels = stringSize * 6;
+    const int offsetx = (39 - lengthInPixels) * 0.5;
 
     label->setLocation(x + offsetx, 52);
     label->setSize(39 - offsetx - 1, 7);
@@ -95,9 +95,10 @@ void FunctionKey::setType(const int newType)
     SetDirty();
 }
 
-FunctionKeys::FunctionKeys(mpc::Mpc &mpc, const std::string &name,
-                           std::vector<std::vector<std::string>> allTexts,
-                           std::vector<std::vector<int>> allTypes)
+FunctionKeys::FunctionKeys(
+    mpc::Mpc &mpc, const std::string &name,
+    const std::vector<std::vector<std::string>> &allTexts,
+    const std::vector<std::vector<int>> &allTypes)
     : Component(name)
 {
     this->texts = allTexts;
@@ -147,19 +148,19 @@ void FunctionKeys::setActiveArrangement(int i)
 
     for (int j = 0; j < 6; j++)
     {
-        auto fk = findChild<FunctionKey>("fk" + std::to_string(j));
+        const auto fk = findChild<FunctionKey>("fk" + std::to_string(j));
 
         if (!fk)
         {
             continue;
         }
 
-        auto type = types[activeArrangement][j];
+        const auto type = types[activeArrangement][j];
         fk->setType(type);
 
         if (type != -1)
         {
-            auto label = fk->findChild<TextComp>(fk->getName());
+            const auto label = fk->findChild<TextComp>(fk->getName());
             fk->setText(texts[activeArrangement][j]);
             label->setInverted(type == 0);
         }

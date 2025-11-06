@@ -34,7 +34,8 @@ void SaveApsFileScreen::open()
 
 void SaveApsFileScreen::turnWheel(int i)
 {
-    auto saveAProgramScreen = mpc.screens->get<ScreenId::SaveAProgramScreen>();
+    const auto saveAProgramScreen =
+        mpc.screens->get<ScreenId::SaveAProgramScreen>();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -69,7 +70,7 @@ void SaveApsFileScreen::function(int i)
             {
                 auto replaceAction = [this, disk, apsFileName]
                 {
-                    auto success = disk->getFile(apsFileName)->del();
+                    const auto success = disk->getFile(apsFileName)->del();
 
                     if (success)
                     {
@@ -81,7 +82,8 @@ void SaveApsFileScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+                    const auto nameScreen =
+                        mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &nameScreenName)
                     {
                         fileName = nameScreenName;
@@ -90,7 +92,7 @@ void SaveApsFileScreen::function(int i)
                     nameScreen->initialize(fileName, 16, enterAction, "save");
                 };
 
-                auto fileExistsScreen =
+                const auto fileExistsScreen =
                     mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
@@ -115,13 +117,15 @@ void SaveApsFileScreen::displayFile()
 
 void SaveApsFileScreen::displaySave()
 {
-    auto saveAProgramScreen = mpc.screens->get<ScreenId::SaveAProgramScreen>();
+    const auto saveAProgramScreen =
+        mpc.screens->get<ScreenId::SaveAProgramScreen>();
     findField("save")->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
-    auto saveAProgramScreen = mpc.screens->get<ScreenId::SaveAProgramScreen>();
+    const auto saveAProgramScreen =
+        mpc.screens->get<ScreenId::SaveAProgramScreen>();
     findField("replace-same-sounds")
         ->setText(
             std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));

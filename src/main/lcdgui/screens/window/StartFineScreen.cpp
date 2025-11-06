@@ -32,9 +32,9 @@ void StartFineScreen::open()
 
 void StartFineScreen::displayFineWave()
 {
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -48,7 +48,7 @@ void StartFineScreen::displayFineWave()
 
 void StartFineScreen::displayStart()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -60,7 +60,7 @@ void StartFineScreen::displayStart()
 
 void StartFineScreen::displayLngthLabel()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -72,7 +72,7 @@ void StartFineScreen::displayLngthLabel()
 
 void StartFineScreen::displaySmplLngth()
 {
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -102,14 +102,15 @@ void StartFineScreen::function(int i)
 
 void StartFineScreen::turnWheel(int i)
 {
-    auto sound = sampler->getSound();
-    auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto sound = sampler->getSound();
+    const auto startEndLength =
+        static_cast<int>(sound->getEnd() - sound->getStart());
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
-    auto sampleLength = sound->getFrameCount();
+    const auto sampleLength = sound->getFrameCount();
     auto soundInc = getSoundIncrement(i);
 
-    auto focusedField = getFocusedFieldOrThrow();
+    const auto focusedField = getFocusedFieldOrThrow();
 
     if (focusedField->isSplit())
     {
@@ -126,7 +127,7 @@ void StartFineScreen::turnWheel(int i)
     if (focusedFieldName == "start")
     {
         auto highestStartPos = sampleLength - 1;
-        auto length = sound->getEnd() - sound->getStart();
+        const auto length = sound->getEnd() - sound->getStart();
 
         if (trimScreen->smplLngthFix)
         {
@@ -173,7 +174,7 @@ void StartFineScreen::right()
 
 void StartFineScreen::pressEnter()
 {
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     trimScreen->pressEnter();
     displayStart();
     displayLngthLabel();
@@ -193,7 +194,7 @@ void StartFineScreen::setSlider(int i)
 
     if (focusedFieldName == "start")
     {
-        auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+        const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
         trimScreen->setSliderStart(i);
         displayStart();
         displayLngthLabel();

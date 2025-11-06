@@ -12,7 +12,6 @@ namespace mpc
 
 namespace mpc::lcdgui
 {
-
     enum class Alignment
     {
         None,
@@ -21,9 +20,34 @@ namespace mpc::lcdgui
 
     class TextComp : public Component
     {
+    public:
+        TextComp(Mpc &mpc, const std::string &name);
+        ~TextComp() override;
+
+        virtual void setText(const std::string &s);
+
+        void setLeftMargin(int margin);
+        void enableTwoDots();
+        void setBlinking(bool b);
+        void setInverted(bool b);
+        void setDoubleInverted(bool b);
+        void setAlignment(Alignment newAlignment, int endX = -1);
+        int getX();
+        int getY();
+        int getW();
+        int getH();
+        std::string getText();
+        void setTextPadded(const std::string &s,
+                           const std::string &padding = " ");
+        void setTextPadded(int i, const std::string &padding = " ");
+        unsigned int GetTextEntryLength();
+
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
+        void setSize(int w, int h) override;
+
     private:
-        mpc::Mpc &mpc;
-        static const int BLINK_INTERVAL = 300;
+        Mpc &mpc;
+        static constexpr int BLINK_INTERVAL = 300;
         bool blinking = false;
         bool invisibleDueToBlinking = false;
         std::thread blinkThread;
@@ -44,32 +68,5 @@ namespace mpc::lcdgui
 
     protected:
         std::string text;
-
-    public:
-        virtual void setText(const std::string &s);
-
-    public:
-        void setLeftMargin(const int margin);
-        void enableTwoDots();
-        void setBlinking(bool b);
-        void setInverted(bool b);
-        void setDoubleInverted(bool b);
-        void setAlignment(const Alignment newAlignment, int endX = -1);
-        int getX();
-        int getY();
-        int getW();
-        int getH();
-        std::string getText();
-        void setTextPadded(std::string s, std::string padding = " ");
-        void setTextPadded(int i, std::string padding = " ");
-        unsigned int GetTextEntryLength();
-
-    public:
-        virtual void Draw(std::vector<std::vector<bool>> *pixels) override;
-        void setSize(int w, int h) override;
-
-    public:
-        TextComp(mpc::Mpc &mpc, const std::string &name);
-        ~TextComp();
     };
 } // namespace mpc::lcdgui

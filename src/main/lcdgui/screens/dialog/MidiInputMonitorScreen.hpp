@@ -17,17 +17,18 @@ namespace mpc::lcdgui::screens::dialog
 
     private:
         std::thread blinkThread;
-        void runBlinkThread(std::weak_ptr<mpc::lcdgui::Label> label);
-        static void static_blink(void *args,
-                                 std::weak_ptr<mpc::lcdgui::Label> label);
+        void runBlinkThread(const std::weak_ptr<mpc::lcdgui::Label> &label);
+        static void
+        static_blink(void *args,
+                     const std::weak_ptr<mpc::lcdgui::Label> &label);
 
     public:
         void initTimer(std::weak_ptr<mpc::lcdgui::Label> label);
         void update(Observable *o, Message message) override;
 
     public:
-        MidiInputMonitorScreen(mpc::Mpc &mpc, const int layerIndex);
-        ~MidiInputMonitorScreen();
+        MidiInputMonitorScreen(mpc::Mpc &mpc, int layerIndex);
+        ~MidiInputMonitorScreen() override;
 
         void open() override;
         void close() override;

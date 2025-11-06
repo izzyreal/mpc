@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        LoopToFineScreen(mpc::Mpc &mpc, const int layerIndex);
+        LoopToFineScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

@@ -38,7 +38,7 @@ void KeepOrRetryScreen::function(int i)
                 0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
             break;
         case 4:
-            auto index = sampler->getSoundCount() - 1;
+            const auto index = sampler->getSoundCount() - 1;
 
             if (assignToNote != 34)
             {
@@ -130,8 +130,9 @@ void KeepOrRetryScreen::displayNameForNewSound()
 
 void KeepOrRetryScreen::displayAssignToNote()
 {
-    auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
-    auto padStr = sampler->getPadName(
+    const auto noteStr =
+        assignToNote == 34 ? "--" : std::to_string(assignToNote);
+    const auto padStr = sampler->getPadName(
         getProgramOrThrow()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }

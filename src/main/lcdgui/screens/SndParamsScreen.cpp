@@ -21,7 +21,7 @@ SndParamsScreen::SndParamsScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void SndParamsScreen::open()
 {
-    auto sound = sampler->getSound() ? true : false;
+    const auto sound = sampler->getSound() ? true : false;
 
     findField("snd")->setFocusable(sound);
     findField("playx")->setFocusable(sound);
@@ -45,7 +45,7 @@ void SndParamsScreen::openWindow()
 
     const auto focusedField = getFocusedField();
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!focusedField || !sound)
     {
@@ -89,7 +89,7 @@ void SndParamsScreen::function(int f)
                 return;
             }
 
-            auto editSoundScreen =
+            const auto editSoundScreen =
                 mpc.screens->get<ScreenId::EditSoundScreen>();
             editSoundScreen->setReturnToScreenName("trim");
             openScreenById(ScreenId::EditSoundScreen);
@@ -105,7 +105,7 @@ void SndParamsScreen::function(int f)
 
 void SndParamsScreen::turnWheel(int i)
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -153,7 +153,7 @@ void SndParamsScreen::turnWheel(int i)
 
 void SndParamsScreen::displayLevel()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (sound)
     {
@@ -167,7 +167,7 @@ void SndParamsScreen::displayLevel()
 
 void SndParamsScreen::displayTune()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (sound)
     {
@@ -181,7 +181,7 @@ void SndParamsScreen::displayTune()
 
 void SndParamsScreen::displayBeat()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (sound)
     {
@@ -246,7 +246,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 
 void SndParamsScreen::displaySnd()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (sampler->getSoundCount() == 0)
     {

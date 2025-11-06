@@ -21,7 +21,7 @@ void ChangeBarsScreen::open()
 void ChangeBarsScreen::function(int i)
 {
     ScreenComponent::function(i);
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     switch (i)
     {
@@ -96,7 +96,7 @@ void ChangeBarsScreen::displayLastBar()
 
 void ChangeBarsScreen::setLastBar(int i)
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     lastBar = std::clamp(i, 0, std::max(seq->getLastBarIndex(), 0));
 
@@ -110,7 +110,7 @@ void ChangeBarsScreen::setLastBar(int i)
 
 void ChangeBarsScreen::setFirstBar(int i)
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     firstBar = std::clamp(i, 0, std::max(seq->getLastBarIndex(), 0));
 
@@ -124,14 +124,14 @@ void ChangeBarsScreen::setFirstBar(int i)
 
 void ChangeBarsScreen::setNumberOfBars(int i)
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
     numberOfBars = std::clamp(i, 0, 998 - std::max(seq->getLastBarIndex(), 0));
     displayNumberOfBars();
 }
 
 void ChangeBarsScreen::setAfterBar(int i)
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
     afterBar = std::clamp(i, 0, std::max(seq->getLastBarIndex(), 0) + 1);
     displayAfterBar();
 }

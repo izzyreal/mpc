@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int i) override;
         void openNameScreen() override;
 
-        ResampleScreen(mpc::Mpc &mpc, const int layerIndex);
+        ResampleScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 
@@ -36,7 +36,7 @@ namespace mpc::lcdgui::screens::dialog
         void setNewFs(int i);
         void setQuality(int i);
         void setNewBit(int i);
-        void setNewName(std::string s);
+        void setNewName(const std::string &s);
 
         std::string newName;
         int newFs = 44100;

@@ -57,18 +57,17 @@ namespace mpc::lcdgui
         void transferUp();
         void transferDown();
 
-        void showPopupForMs(const std::string msg, const int delayMs);
+        void showPopupForMs(const std::string &msg, int delayMs);
 
-        void showPopupAndThenReturnToLayer(const std::string msg,
-                                           const int delayMs,
-                                           const int layerIndex);
+        void showPopupAndThenReturnToLayer(const std::string &msg, int delayMs,
+                                           int layerIndex);
 
-        void showPopupAndAwaitInteraction(const std::string msg);
+        void showPopupAndAwaitInteraction(const std::string &msg);
 
-        int getFocusedLayerIndex();
+        int getFocusedLayerIndex() const;
         std::shared_ptr<Layer> getFocusedLayer();
 
-        void openScreenById(const ScreenId);
+        void openScreenById(ScreenId);
 
         bool isPreviousScreen(std::initializer_list<ScreenId> ids) const;
 
@@ -81,21 +80,21 @@ namespace mpc::lcdgui
 
         bool isCurrentScreenPopupFor(ScreenId targetId) const;
 
-        void openScreen(const std::string screenName);
+        void openScreen(const std::string &screenName);
 
         std::shared_ptr<ScreenComponent> getCurrentScreen();
 
         void closeCurrentScreen();
 
-        void closeRecentScreensUntilReachingLayer(const int layerIndex);
+        void closeRecentScreensUntilReachingLayer(int layerIndex);
 
     private:
-        void setPopupScreenText(const std::string);
+        void setPopupScreenText(const std::string &) const;
         std::map<std::string, std::string> lastFocuses;
 
-        void openScreenInternal(std::shared_ptr<ScreenComponent>);
-        void returnToLastFocus(std::shared_ptr<ScreenComponent> screen,
-                               std::string firstFieldOfThisScreen);
+        void openScreenInternal(const std::shared_ptr<ScreenComponent> &);
+        void returnToLastFocus(const std::shared_ptr<ScreenComponent> &screen,
+                               const std::string &firstFieldOfThisScreen);
 
         static ScreenId
         getScreenId(const std::shared_ptr<ScreenComponent> &screen);
@@ -105,21 +104,22 @@ namespace mpc::lcdgui
 
     public:
         lcdgui::Background *getCurrentBackground();
-        void setCurrentBackground(std::string s);
+        void setCurrentBackground(const std::string &s);
 
     public:
-        void setLastFocus(std::string screenName, std::string tfName);
-        std::string getLastFocus(std::string screenName);
+        void setLastFocus(const std::string &screenName,
+                          const std::string &tfName);
+        std::string getLastFocus(const std::string &screenName);
 
-        std::string getCurrentScreenName();
-        std::string getFirstLayerScreenName();
+        std::string getCurrentScreenName() const;
+        std::string getFirstLayerScreenName() const;
         void setFunctionKeysArrangement(int arrangementIndex);
 
     public:
         std::vector<std::vector<bool>> *getPixels();
-        bool IsDirty();
-        void setDirty();
-        MRECT getDirtyArea();
+        bool IsDirty() const;
+        void setDirty() const;
+        MRECT getDirtyArea() const;
         void Draw();
         void timerCallback();
 

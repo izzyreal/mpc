@@ -41,7 +41,8 @@ void UserScreen::function(int i)
         case 1:
         case 2:
         {
-            auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
+            const auto eventsScreen =
+                mpc.screens->get<ScreenId::EventsScreen>();
             eventsScreen->tab = i;
             ls->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
             break;
@@ -55,7 +56,7 @@ void UserScreen::turnWheel(int i)
 
     if (focusedFieldName == "tempo")
     {
-        double newTempo = tempo + (i * 0.1);
+        const double newTempo = tempo + (i * 0.1);
         setTempo(newTempo);
     }
     else if (focusedFieldName == "loop")
@@ -113,8 +114,8 @@ void UserScreen::displayLoop()
 
 void UserScreen::displayTsig()
 {
-    auto numerator = std::to_string(timeSig.getNumerator());
-    auto denominator = std::to_string(timeSig.getDenominator());
+    const auto numerator = std::to_string(timeSig.getNumerator());
+    const auto denominator = std::to_string(timeSig.getDenominator());
     findField("tsig")->setText(numerator + "/" + denominator);
 }
 
@@ -188,7 +189,7 @@ void UserScreen::displayDeviceName()
     {
         if (device == 0)
         {
-            auto programName =
+            const auto programName =
                 sampler
                     ->getProgram(sequencer->getDrumBus(bus - 1)->getProgram())
                     ->getName();
@@ -316,12 +317,12 @@ int8_t UserScreen::getTrackStatus()
     return 6;
 }
 
-void UserScreen::setDeviceName(int i, std::string s)
+void UserScreen::setDeviceName(int i, const std::string &s)
 {
     deviceNames[i] = s;
 }
 
-void UserScreen::setSequenceName(std::string name)
+void UserScreen::setSequenceName(const std::string &name)
 {
     sequenceName = name;
 }
@@ -332,7 +333,7 @@ void UserScreen::setTimeSig(int num, int den)
     timeSig.setDenominator(den);
 }
 
-void UserScreen::setTrackName(int i, std::string s)
+void UserScreen::setTrackName(int i, const std::string &s)
 {
     trackNames[i] = s;
 }

@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        VmpcMidiPresetsScreen(mpc::Mpc &presetName, const int layerIndex);
+        VmpcMidiPresetsScreen(mpc::Mpc &presetName, int layerIndex);
 
         void open() override;
         void function(int i) override;

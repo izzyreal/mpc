@@ -6,7 +6,7 @@ namespace mpc::lcdgui::screens
     class DrumScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        DrumScreen(mpc::Mpc &mpc, const int layerIndex);
+        DrumScreen(mpc::Mpc &mpc, int layerIndex);
         void function(int f) override;
         void turnWheel(int i) override;
         void open() override;

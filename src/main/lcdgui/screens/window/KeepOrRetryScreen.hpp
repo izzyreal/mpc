@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        KeepOrRetryScreen(mpc::Mpc &mpc, const int layerIndex);
+        KeepOrRetryScreen(mpc::Mpc &mpc, int layerIndex);
 
         void update(Observable *o, Message message) override;
 

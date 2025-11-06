@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens::window
         void openNameScreen() override;
         void open() override;
 
-        SaveAllFileScreen(mpc::Mpc &mpc, const int layerIndex);
+        SaveAllFileScreen(mpc::Mpc &mpc, int layerIndex);
 
     private:
         void displayFile();

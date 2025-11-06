@@ -17,7 +17,7 @@ Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc &mpc,
 
 void Mpc2000XlAllFileScreen::function(int i)
 {
-    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
 
     switch (i)
     {
@@ -28,7 +28,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 
             if (result.has_value())
             {
-                auto loadASequenceFromAllScreen =
+                const auto loadASequenceFromAllScreen =
                     mpc.screens->get<ScreenId::LoadASequenceFromAllScreen>();
                 loadASequenceFromAllScreen->sequencesFromAllFile =
                     result.value();

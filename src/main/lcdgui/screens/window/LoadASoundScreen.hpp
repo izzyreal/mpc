@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
         void keepSound();
 
     public:
-        LoadASoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        LoadASoundScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;

@@ -77,6 +77,6 @@ namespace mpc::lcdgui
          **/
         void fromPixelMatrix(const PixelMatrix &m);
 
-        void openFromData(char *data, const int size);
+        void openFromData(char *data, int size);
     };
 } // namespace mpc::lcdgui

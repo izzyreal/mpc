@@ -29,7 +29,7 @@ namespace mpc::lcdgui::screens
         computeEventsAtCurrentTick();
 
     public:
-        StepEditorScreen(mpc::Mpc &mpc, const int layerIndex);
+        StepEditorScreen(mpc::Mpc &mpc, int layerIndex);
 
         std::vector<std::shared_ptr<mpc::sequencer::Event>>
         computeVisibleEvents(
@@ -108,8 +108,9 @@ namespace mpc::lcdgui::screens
         void setSelectionEndIndex(int i);
         void setSelectionStartIndex(int i);
         void setSelectedEvents();
-        void setSelectedEvent(std::weak_ptr<mpc::sequencer::Event> event);
-        void setSelectedParameterLetter(std::string str);
+        void
+        setSelectedEvent(const std::weak_ptr<mpc::sequencer::Event> &event);
+        void setSelectedParameterLetter(const std::string &str);
         void checkSelection();
         void removeEvents();
         void displayView();

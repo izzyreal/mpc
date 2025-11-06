@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens
     public:
         void turnWheel(int i) override;
 
-        VmpcAutoSaveScreen(mpc::Mpc &mpc, const int layerIndex);
+        VmpcAutoSaveScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void function(int) override;

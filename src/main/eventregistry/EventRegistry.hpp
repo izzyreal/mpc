@@ -38,6 +38,9 @@ namespace mpc::eventregistry
 {
     class EventRegistry
     {
+        using EventMessageQueue = moodycamel::ConcurrentQueue<
+            EventMessage, moodycamel::ConcurrentQueueDefaultTraits>;
+
     public:
         EventRegistry();
         EventRegistry(const EventRegistry &other) noexcept;
@@ -108,9 +111,7 @@ namespace mpc::eventregistry
         ProgramPadPressEventPtrs programPadEvents;
         NoteOnEventPtrs noteEvents;
 
-        std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventMessage, moodycamel::ConcurrentQueueDefaultTraits>>
-            queue;
+        std::shared_ptr<EventMessageQueue> eventMessageQueue;
 
         Snapshot snapA;
         Snapshot snapB;

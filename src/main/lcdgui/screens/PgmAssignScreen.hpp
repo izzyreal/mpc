@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
         void openWindow() override;
 
-        PgmAssignScreen(mpc::Mpc &mpc, const int layerIndex);
+        PgmAssignScreen(mpc::Mpc &mpc, int layerIndex);
         void update(Observable *o, Message message) override;
         void open() override;
         void close() override;

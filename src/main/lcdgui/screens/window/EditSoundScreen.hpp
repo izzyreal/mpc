@@ -10,15 +10,15 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        EditSoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        EditSoundScreen(mpc::Mpc &mpc, int layerIndex);
         void turnWheel(int j) override;
         void function(int j) override;
         void open() override;
         void right() override;
 
-        void setNewName(std::string s);
+        void setNewName(const std::string &s);
 
-        void setReturnToScreenName(std::string s);
+        void setReturnToScreenName(const std::string &s);
         std::string getReturnToScreenName();
 
     private:

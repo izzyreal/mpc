@@ -95,7 +95,7 @@ void NextSeqPadScreen::function(int i)
 
     if (i == 3 || i == 4)
     {
-        auto nextSq = sequencer->getNextSq();
+        const auto nextSq = sequencer->getNextSq();
         sequencer->setNextSq(-1);
         displayNextSq();
 
@@ -115,7 +115,7 @@ void NextSeqPadScreen::function(int i)
 
 void NextSeqPadScreen::displayNextSq()
 {
-    auto nextSq = sequencer->getNextSq();
+    const auto nextSq = sequencer->getNextSq();
 
     if (nextSq == -1)
     {
@@ -123,8 +123,8 @@ void NextSeqPadScreen::displayNextSq()
         return;
     }
 
-    auto number = StrUtil::padLeft(std::to_string(nextSq + 1), "0", 2);
-    auto name = sequencer->getSequence(nextSq)->getName();
+    const auto number = StrUtil::padLeft(std::to_string(nextSq + 1), "0", 2);
+    const auto name = sequencer->getSequence(nextSq)->getName();
     findLabel("nextsq")->setText(number + "-" + name);
 }
 
@@ -141,7 +141,7 @@ void NextSeqPadScreen::displayBank()
 
 void NextSeqPadScreen::displaySeqNumbers()
 {
-    std::vector<std::string> seqn{"01-16", "17-32", "33-48", "49-64"};
+    const std::vector<std::string> seqn{"01-16", "17-32", "33-48", "49-64"};
     findLabel("seqnumbers")
         ->setText(
             seqn[static_cast<int>(mpc.clientEventController->getActiveBank())]);

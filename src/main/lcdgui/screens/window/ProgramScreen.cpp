@@ -46,7 +46,7 @@ void ProgramScreen::turnWheel(int i)
 
     if (focusedFieldName == "midiprogramchange")
     {
-        auto program = getProgramOrThrow();
+        const auto program = getProgramOrThrow();
         program->setMidiProgramChange(program->getMidiProgramChange() + i);
         displayMidiProgramChange();
     }
@@ -81,13 +81,13 @@ void ProgramScreen::function(int i)
 
 void ProgramScreen::displayProgramName()
 {
-    auto program = getProgramOrThrow();
+    const auto program = getProgramOrThrow();
     findField("programname")->setText(program->getName());
 }
 
 void ProgramScreen::displayMidiProgramChange()
 {
-    auto program = getProgramOrThrow();
+    const auto program = getProgramOrThrow();
     findField("midiprogramchange")
         ->setTextPadded(program->getMidiProgramChange(), " ");
 }

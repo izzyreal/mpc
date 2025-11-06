@@ -13,6 +13,6 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void open() override;
 
-        TrackScreen(mpc::Mpc &mpc, const int layerIndex);
+        TrackScreen(mpc::Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

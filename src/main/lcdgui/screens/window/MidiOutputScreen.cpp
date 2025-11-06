@@ -23,8 +23,8 @@ void MidiOutputScreen::open()
     if (ls->isPreviousScreenNot(
             {ScreenId::NameScreen, ScreenId::MidiOutputMonitorScreen}))
     {
-        auto track = sequencer->getActiveTrack();
-        auto dev = track->getDeviceIndex();
+        const auto track = sequencer->getActiveTrack();
+        const auto dev = track->getDeviceIndex();
 
         if (dev > 0)
         {
@@ -57,7 +57,7 @@ void MidiOutputScreen::openNameScreen()
         };
 
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        auto seq = sequencer->getActiveSequence();
+        const auto seq = sequencer->getActiveSequence();
         nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8,
                                enterAction, "midi-output");
         openScreenById(ScreenId::NameScreen);
@@ -116,8 +116,8 @@ void MidiOutputScreen::displaySoftThru()
 
 void MidiOutputScreen::displayDeviceName()
 {
-    auto sequence = sequencer->getActiveSequence();
-    auto devName = sequence->getDeviceName(deviceIndex + 1);
+    const auto sequence = sequencer->getActiveSequence();
+    const auto devName = sequence->getDeviceName(deviceIndex + 1);
 
     findField("firstletter")->setText(devName.substr(0, 1));
     findLabel("devicename")->setText(devName.substr(1, devName.length()));

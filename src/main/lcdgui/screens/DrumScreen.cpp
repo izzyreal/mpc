@@ -37,7 +37,7 @@ void DrumScreen::function(int f)
             break;
         case 2:
         {
-            auto selectDrumScreen =
+            const auto selectDrumScreen =
                 mpc.screens->get<ScreenId::SelectDrumScreen>();
             selectDrumScreen->redirectScreen = "drum";
             openScreenById(ScreenId::SelectDrumScreen);
@@ -103,7 +103,7 @@ void DrumScreen::displayPadToInternalSound()
 
 void DrumScreen::displayPgm()
 {
-    auto pn = getActiveDrumBus()->getProgram();
+    const auto pn = getActiveDrumBus()->getProgram();
     findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) +
                               "-" + sampler->getProgram(pn)->getName());
 }

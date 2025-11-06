@@ -60,8 +60,8 @@ void Field::Draw(std::vector<std::vector<bool>> *pixels)
     if (split)
     {
         Clear(pixels);
-        auto columns = (int)floor((w - 2) / FONT_WIDTH);
-        auto nonInvertedColumns = columns - activeSplit;
+        const auto columns = (int)floor((w - 2) / FONT_WIDTH);
+        const auto nonInvertedColumns = columns - activeSplit;
         r.R = r.L + (w - (nonInvertedColumns * FONT_WIDTH));
     }
 
@@ -90,7 +90,7 @@ void Field::Draw(std::vector<std::vector<bool>> *pixels)
         }
     }
 
-    auto oldInverted = inverted;
+    const auto oldInverted = inverted;
 
     if (typeModeEnabled)
     {
@@ -108,7 +108,7 @@ void Field::Draw(std::vector<std::vector<bool>> *pixels)
 
 void Field::takeFocus()
 {
-    auto ls = mpc.getLayeredScreen();
+    const auto ls = mpc.getLayeredScreen();
     csn = ls->getCurrentScreenName();
 
     const auto name = getName();
@@ -117,7 +117,7 @@ void Field::takeFocus()
     {
         if (name == "view")
         {
-            auto screen = ls->getCurrentScreen();
+            const auto screen = ls->getCurrentScreen();
             screen->findField("fromnote")->setInverted(true);
             screen->findField("tonote")->setInverted(true);
             screen->findLabel("tonote")->setInverted(true);
@@ -145,9 +145,9 @@ void Field::takeFocus()
     SetDirty();
 }
 
-void Field::loseFocus(std::string next)
+void Field::loseFocus(const std::string &next)
 {
-    auto ls = mpc.getLayeredScreen();
+    const auto ls = mpc.getLayeredScreen();
     csn = ls->getCurrentScreenName();
 
     focus = false;
@@ -157,7 +157,7 @@ void Field::loseFocus(std::string next)
     {
         if (getName() == "view")
         {
-            auto screen = ls->getCurrentScreen();
+            const auto screen = ls->getCurrentScreen();
             screen->findChild<Rectangle>("")->setOn(false);
 
             if (next != "fromnote")
@@ -248,7 +248,7 @@ bool Field::enableTypeMode()
 
     if (split)
     {
-        auto oldActiveSplit = activeSplit;
+        const auto oldActiveSplit = activeSplit;
         setSplit(false);
         activeSplit = oldActiveSplit;
     }
@@ -312,8 +312,8 @@ void Field::type(int i)
         {
             // UTF-8 representation of u8"\u00CB", the special dot in a tempo
             // string
-            std::string toReplace = "\xC3\x8B";
-            size_t pos = textCopy.find(toReplace);
+            const std::string toReplace = "\xC3\x8B";
+            const size_t pos = textCopy.find(toReplace);
 
             if (pos != std::string::npos)
             {
@@ -360,7 +360,7 @@ void Field::type(int i)
         textCopy = "";
     }
 
-    auto newText = textCopy.append(std::to_string(i));
+    const auto newText = textCopy.append(std::to_string(i));
     setTextPadded(newText);
 }
 

@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        LoopScreen(mpc::Mpc &mpc, const int layerIndex);
+        LoopScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

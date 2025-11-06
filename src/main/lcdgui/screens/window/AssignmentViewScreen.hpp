@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        AssignmentViewScreen(mpc::Mpc &mpc, const int layerIndex);
+        AssignmentViewScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *o, Message message) override;

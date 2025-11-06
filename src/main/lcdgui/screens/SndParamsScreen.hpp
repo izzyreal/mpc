@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens
         void function(int f) override;
         void turnWheel(int i) override;
 
-        SndParamsScreen(mpc::Mpc &mpc, const int layerIndex);
+        SndParamsScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

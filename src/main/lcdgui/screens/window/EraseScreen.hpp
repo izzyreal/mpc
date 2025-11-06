@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
 
     public:
-        EraseScreen(mpc::Mpc &mpc, const int layerIndex);
+        EraseScreen(mpc::Mpc &mpc, int layerIndex);
 
     public:
         void open() override;

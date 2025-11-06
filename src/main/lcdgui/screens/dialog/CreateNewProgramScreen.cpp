@@ -73,7 +73,7 @@ void CreateNewProgramScreen::function(int i)
             openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
-            auto newProgram =
+            const auto newProgram =
                 sampler->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
             newProgram->setMidiProgramChange(midiProgramChange);

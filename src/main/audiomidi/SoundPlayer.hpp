@@ -1,7 +1,7 @@
 #pragma once
 #include <engine/audio/core/AudioProcess.hpp>
 
-#include <sampler/Sound.hpp>
+#include "sampler/Sound.hpp"
 
 #include <samplerate.h>
 

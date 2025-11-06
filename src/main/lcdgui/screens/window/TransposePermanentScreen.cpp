@@ -24,8 +24,8 @@ void TransposePermanentScreen::function(int i)
     switch (i)
     {
         case 4:
-            auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
-            auto all = transScreen->tr == -1;
+            const auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
+            const auto all = transScreen->tr == -1;
 
             std::vector<int> tracks;
 
@@ -41,15 +41,15 @@ void TransposePermanentScreen::function(int i)
                 tracks.push_back(transScreen->tr);
             }
 
-            auto seq = sequencer->getActiveSequence();
-            auto firstTick = seq->getFirstTickOfBar(transScreen->bar0);
-            auto lastTick = seq->getLastTickOfBar(transScreen->bar1);
+            const auto seq = sequencer->getActiveSequence();
+            const auto firstTick = seq->getFirstTickOfBar(transScreen->bar0);
+            const auto lastTick = seq->getLastTickOfBar(transScreen->bar1);
 
-            for (auto &trackIndex : tracks)
+            for (const auto &trackIndex : tracks)
             {
-                auto t = seq->getTrack(trackIndex);
+                const auto t = seq->getTrack(trackIndex);
 
-                for (auto &n : t->getNoteEvents())
+                for (const auto &n : t->getNoteEvents())
                 {
                     if (n->getTick() < firstTick || n->getTick() > lastTick)
                     {

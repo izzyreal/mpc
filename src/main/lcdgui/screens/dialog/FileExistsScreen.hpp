@@ -13,13 +13,13 @@ namespace mpc::lcdgui::screens::dialog
     class FileExistsScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        FileExistsScreen(mpc::Mpc &mpc, const int layerIndex);
+        FileExistsScreen(mpc::Mpc &mpc, int layerIndex);
         void function(int i) override;
         void numpad(int i) override {}
 
-        void initialize(std::function<void()> replaceAction,
-                        std::function<void()> initializeNameScreen,
-                        std::function<void()> cancelAction);
+        void initialize(const std::function<void()> &replaceAction,
+                        const std::function<void()> &initializeNameScreen,
+                        const std::function<void()> &cancelAction);
 
     private:
         std::function<void()> replaceAction;

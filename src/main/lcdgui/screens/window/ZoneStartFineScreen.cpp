@@ -32,10 +32,10 @@ void ZoneStartFineScreen::open()
 
 void ZoneStartFineScreen::displayFineWave()
 {
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -49,14 +49,14 @@ void ZoneStartFineScreen::displayFineWave()
 
 void ZoneStartFineScreen::displayStart()
 {
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     findField("start")->setTextPadded(
         zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayLngthLabel()
 {
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     findLabel("lngth")->setTextPadded(
         zoneScreen->getZoneEnd(zoneScreen->zone) -
             zoneScreen->getZoneStart(zoneScreen->zone),
@@ -89,7 +89,7 @@ void ZoneStartFineScreen::function(int i)
 void ZoneStartFineScreen::turnWheel(int i)
 {
     auto sound = sampler->getSound();
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
 
     auto soundInc = getSoundIncrement(i);
 
@@ -135,7 +135,7 @@ void ZoneStartFineScreen::right()
 
 void ZoneStartFineScreen::pressEnter()
 {
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     zoneScreen->pressEnter();
 
     displayStart();
@@ -156,7 +156,7 @@ void ZoneStartFineScreen::setSlider(int i)
 
     if (focusedFieldName == "start")
     {
-        auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+        const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
         zoneScreen->setSliderZoneStart(i);
         displayStart();
         displayLngthLabel();

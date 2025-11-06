@@ -38,7 +38,7 @@ namespace mpc::lcdgui
         bool hasFocus();
         void setFocusable(bool b);
         bool isFocusable();
-        void loseFocus(std::string next);
+        void loseFocus(const std::string &next);
         void takeFocus();
         void setSplit(bool b);
         bool isSplit();

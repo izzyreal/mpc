@@ -50,9 +50,9 @@ void LoadScreen::open()
     displayFreeSnd();
     findLabel("freeseq")->setText("  2640K");
 
-    auto ext = fs::path(getSelectedFileName()).extension().string();
-    auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
-                    StrUtil::eqIgnoreCase(ext, ".wav");
+    const auto ext = fs::path(getSelectedFileName()).extension().string();
+    const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
+                          StrUtil::eqIgnoreCase(ext, ".wav");
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -236,14 +236,14 @@ void LoadScreen::function(int i)
 
 void LoadScreen::openWindow()
 {
-    auto disk = mpc.getDisk();
+    const auto disk = mpc.getDisk();
 
     if (!disk)
     {
         return;
     }
 
-    auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
+    const auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
     directoryScreen->findYOffset0();
     directoryScreen->setYOffset1(fileLoad);
     openScreenById(ScreenId::DirectoryScreen);
@@ -264,9 +264,9 @@ void LoadScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "directory")
     {
-        auto disk = mpc.getDisk();
-        auto currentDir = disk->getDirectoryName();
-        auto parents = disk->getParentFileNames();
+        const auto disk = mpc.getDisk();
+        const auto currentDir = disk->getDirectoryName();
+        const auto parents = disk->getParentFileNames();
 
         int position = -1;
 
@@ -318,10 +318,11 @@ void LoadScreen::turnWheel(int i)
         return;
     }
 
-    auto newSelectedFileExtension =
+    const auto newSelectedFileExtension =
         fs::path(getSelectedFileName()).extension().string();
-    auto playable = StrUtil::eqIgnoreCase(newSelectedFileExtension, ".snd") ||
-                    StrUtil::eqIgnoreCase(newSelectedFileExtension, ".wav");
+    const auto playable =
+        StrUtil::eqIgnoreCase(newSelectedFileExtension, ".snd") ||
+        StrUtil::eqIgnoreCase(newSelectedFileExtension, ".wav");
     ls->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
@@ -353,7 +354,7 @@ void LoadScreen::displayFile()
     }
 
     auto selectedFileName = getSelectedFileName();
-    auto selectedFile = getSelectedFile();
+    const auto selectedFile = getSelectedFile();
 
     if (selectedFileName.length() != 0 && selectedFile &&
         selectedFile->isDirectory())
@@ -365,13 +366,13 @@ void LoadScreen::displayFile()
     }
     else
     {
-        auto periodIndex = selectedFileName.find_last_of('.');
+        const auto periodIndex = selectedFileName.find_last_of('.');
 
         if (periodIndex != std::string::npos)
         {
-            auto extension =
+            const auto extension =
                 selectedFileName.substr(periodIndex, selectedFileName.length());
-            auto fileName = StrUtil::padRight(
+            const auto fileName = StrUtil::padRight(
                 selectedFileName.substr(0, periodIndex), " ", 16);
             selectedFileName = fileName + extension;
         }
@@ -382,7 +383,7 @@ void LoadScreen::displayFile()
 
 unsigned long LoadScreen::getFileSizeKb()
 {
-    auto file = getSelectedFile();
+    const auto file = getSelectedFile();
 
     if (!file || file->isDirectory())
     {
@@ -402,7 +403,7 @@ void LoadScreen::displaySize()
 
     auto candidate = getFileSizeKb();
 
-    std::vector<std::string> units{"K", "M", "G", "T", "?"};
+    const std::vector<std::string> units{"K", "M", "G", "T", "?"};
 
     unsigned char counter = 0;
 
@@ -527,13 +528,13 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
 void LoadScreen::displayDevice()
 {
-    auto dev = findChild<Field>("device");
+    const auto dev = findChild<Field>("device");
     dev->setText(mpc.getDisks()[device]->getVolume().label);
 }
 
 void LoadScreen::displayDeviceType()
 {
-    auto type = findChild<Label>("device-type");
+    const auto type = findChild<Label>("device-type");
     type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
 }
 
@@ -546,9 +547,9 @@ void LoadScreen::up()
     {
         device = mpc.getDiskController()->activeDiskIndex;
         displayDevice();
-        auto ext = fs::path(getSelectedFileName()).extension().string();
-        auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
-                        StrUtil::eqIgnoreCase(ext, ".wav");
+        const auto ext = fs::path(getSelectedFileName()).extension().string();
+        const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
+                              StrUtil::eqIgnoreCase(ext, ".wav");
         ls->setFunctionKeysArrangement(playable ? 1 : 0);
     }
 

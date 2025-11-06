@@ -65,7 +65,7 @@ void VmpcDisksScreen::function(int i)
             break;
         case 4:
         {
-            auto vmpcSettingsScreen =
+            const auto vmpcSettingsScreen =
                 mpc.screens->get<ScreenId::VmpcSettingsScreen>();
 
             if (vmpcSettingsScreen->getMidiControlMode() ==
@@ -83,10 +83,10 @@ void VmpcDisksScreen::function(int i)
 
             if (hasConfigChanged())
             {
-                for (auto &kv : config)
+                for (const auto &kv : config)
                 {
                     auto uuid = kv.first;
-                    for (auto &d : mpc.getDisks())
+                    for (const auto &d : mpc.getDisks())
                     {
                         if (d->getVolume().volumeUUID == uuid)
                         {
@@ -111,14 +111,14 @@ void VmpcDisksScreen::function(int i)
 
 void VmpcDisksScreen::turnWheel(int i)
 {
-    auto &volume = mpc.getDisks()[row]->getVolume();
+    const auto &volume = mpc.getDisks()[row]->getVolume();
 
     if (volume.volumeUUID == "default_volume")
     {
         return;
     }
 
-    auto current = config[volume.volumeUUID];
+    const auto current = config[volume.volumeUUID];
     if (current + i < 0 || current + i > 2)
     {
         return;
@@ -131,14 +131,14 @@ void VmpcDisksScreen::turnWheel(int i)
 
 void VmpcDisksScreen::displayRows()
 {
-    auto disks = mpc.getDisks();
+    const auto disks = mpc.getDisks();
 
     for (int i = 0; i < 4; i++)
     {
-        auto volume = findChild<Label>("volume" + std::to_string(i));
-        auto type = findChild<Label>("type" + std::to_string(i));
-        auto size = findChild<Label>("size" + std::to_string(i));
-        auto mode = findChild<Field>("mode" + std::to_string(i));
+        const auto volume = findChild<Label>("volume" + std::to_string(i));
+        const auto type = findChild<Label>("type" + std::to_string(i));
+        const auto size = findChild<Label>("size" + std::to_string(i));
+        const auto mode = findChild<Field>("mode" + std::to_string(i));
 
         mode->setInverted(i == row);
 
@@ -151,7 +151,7 @@ void VmpcDisksScreen::displayRows()
             continue;
         }
 
-        auto disk = disks[i];
+        const auto disk = disks[i];
 
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
@@ -219,8 +219,9 @@ bool VmpcDisksScreen::hasConfigChanged()
 
 void VmpcDisksScreen::displayFunctionKeys()
 {
-    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-    auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
+    const auto vmpcSettingsScreen =
+        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    const auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
     auto newArrangement =
         midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1
                                                                          : 0;
@@ -238,7 +239,7 @@ void VmpcDisksScreen::refreshConfig()
 {
     config.clear();
 
-    for (auto &d : mpc.getDisks())
+    for (const auto &d : mpc.getDisks())
     {
         auto &diskVol = d->getVolume();
         config[diskVol.volumeUUID] = diskVol.mode;

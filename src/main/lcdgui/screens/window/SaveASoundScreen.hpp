@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void function(int i) override;
 
-        SaveASoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        SaveASoundScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

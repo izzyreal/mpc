@@ -40,6 +40,7 @@ namespace mpc::lcdgui
         void addReactiveBinding(ReactiveBinding);
 
     public:
+        virtual ~Component() = default;
         void timerCallback()
         {
             for (auto &b : reactiveBindings)
@@ -49,7 +50,7 @@ namespace mpc::lcdgui
 
             onTimerCallback();
 
-            for (auto &c : children)
+            for (const auto &c : children)
             {
                 c->onTimerCallback();
             }
@@ -65,7 +66,7 @@ namespace mpc::lcdgui
                 space.append(" ");
             }
             printf("%s%s\n", space.c_str(), name.c_str());
-            for (auto c : children)
+            for (const auto c : children)
             {
                 c->printTree(depth + 1);
             }
@@ -84,7 +85,7 @@ namespace mpc::lcdgui
             return child;
         }
 
-        void removeChild(std::shared_ptr<Component> child);
+        void removeChild(const std::shared_ptr<Component> &child);
         void addChildren(std::vector<std::shared_ptr<Component>> &children);
         std::shared_ptr<Component>
         findChild(const std::string &nameOfChildToFind);
@@ -108,7 +109,7 @@ namespace mpc::lcdgui
         virtual void setSize(int newW, int newH);
         void setLocation(int newX, int newY);
         const std::string &getName();
-        void sendToBack(std::shared_ptr<Component> childToSendBack);
+        void sendToBack(const std::shared_ptr<Component> &childToSendBack);
         bool bringToFront(Component *childToBringToFront);
         Component *getParent();
 

@@ -86,7 +86,7 @@ namespace mpc::lcdgui
         bool isEmptyEvent();
 
     public:
-        void setBus(const int newBus);
+        void setBus(int newBus);
         void init();
         void setEmptyEventValues();
         void setSystemExclusiveEventValues();
@@ -105,7 +105,7 @@ namespace mpc::lcdgui
                                   const std::vector<int> &sizeArray);
 
     public:
-        void setEvent(std::weak_ptr<mpc::sequencer::Event> newEvent);
+        void setEvent(const std::weak_ptr<mpc::sequencer::Event> &newEvent);
         void setSelected(bool b);
         bool isSelected();
 

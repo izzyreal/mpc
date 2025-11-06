@@ -25,7 +25,7 @@ void TimingCorrectScreen::open()
     findField("note1")->setAlignment(Alignment::Centered, 18);
     findField("note1")->setLocation(116, 40);
 
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -50,7 +50,7 @@ void TimingCorrectScreen::function(int i)
 
             std::vector<int> noteRange(2);
 
-            auto track = sequencer->getActiveTrack();
+            const auto track = sequencer->getActiveTrack();
 
             if (track->getBus() != 0)
             {
@@ -71,13 +71,14 @@ void TimingCorrectScreen::function(int i)
                 noteRange[1] = note1;
             }
 
-            auto eventRange = track->getEventRange(time0, time1);
+            const auto eventRange = track->getEventRange(time0, time1);
 
-            auto sequence = sequencer->getActiveSequence();
+            const auto sequence = sequencer->getActiveSequence();
 
             for (auto &e : eventRange)
             {
-                if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+                if (const auto noteEvent =
+                        std::dynamic_pointer_cast<NoteOnEvent>(e))
                 {
                     if (noteEvent->getNote() >= noteRange[0] &&
                         noteEvent->getNote() <= noteRange[1])
@@ -151,7 +152,7 @@ void TimingCorrectScreen::displaySwing()
 
 void TimingCorrectScreen::displayNotes()
 {
-    auto track = sequencer->getActiveTrack();
+    const auto track = sequencer->getActiveTrack();
 
     if (track->getBus() == 0)
     {
@@ -179,9 +180,9 @@ void TimingCorrectScreen::displayNotes()
         }
         else
         {
-            auto program = getProgramOrThrow();
-            auto padIndex = program->getPadIndexFromNote(note0);
-            auto padName = sampler->getPadName(padIndex);
+            const auto program = getProgramOrThrow();
+            const auto padIndex = program->getPadIndexFromNote(note0);
+            const auto padName = sampler->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
 
@@ -202,7 +203,7 @@ void TimingCorrectScreen::displayAmount()
 
 void TimingCorrectScreen::displayTime()
 {
-    auto s = sequencer->getActiveSequence().get();
+    const auto s = sequencer->getActiveSequence().get();
     findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1,
                                       "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");

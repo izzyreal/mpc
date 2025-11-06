@@ -12,9 +12,9 @@ namespace mpc::lcdgui::screens::window
     public:
         void function(int i) override;
 
-        VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc, const int layerIndex);
+        VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc, int layerIndex);
 
-        void setLoadRoutine(std::function<void()> newLoadRoutine);
+        void setLoadRoutine(const std::function<void()> &newLoadRoutine);
 
     private:
         std::function<void()> loadRoutine;

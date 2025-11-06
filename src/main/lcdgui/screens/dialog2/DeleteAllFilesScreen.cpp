@@ -45,12 +45,13 @@ void DeleteAllFilesScreen::function(int i)
             break;
         case 4:
         {
-            auto success = mpc.getDisk()->deleteAllFiles(delete_);
+            const auto success = mpc.getDisk()->deleteAllFiles(delete_);
 
             if (success)
             {
-                auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-                auto directoryScreen =
+                const auto loadScreen =
+                    mpc.screens->get<ScreenId::LoadScreen>();
+                const auto directoryScreen =
                     mpc.screens->get<ScreenId::DirectoryScreen>();
                 loadScreen->fileLoad = 0;
                 directoryScreen->yOffset1 = 0;

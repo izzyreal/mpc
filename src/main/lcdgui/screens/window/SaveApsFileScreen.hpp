@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::window
                               public mpc::lcdgui::screens::OpensNameScreen
     {
     public:
-        SaveApsFileScreen(mpc::Mpc &mpc, const int layerIndex);
+        SaveApsFileScreen(mpc::Mpc &mpc, int layerIndex);
 
         void turnWheel(int i) override;
         void function(int i) override;

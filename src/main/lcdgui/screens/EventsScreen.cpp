@@ -44,7 +44,7 @@ void EventsScreen::open()
 {
     sequencer->move(0);
 
-    auto note1Field = findField("note1");
+    const auto note1Field = findField("note1");
 
     if (setNote1X)
     {
@@ -61,9 +61,9 @@ void EventsScreen::open()
         return;
     }
 
-    auto previousScreenWasSequencer =
+    const auto previousScreenWasSequencer =
         ls->isPreviousScreen({ScreenId::SequencerScreen});
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     if (previousScreenWasSequencer)
     {
@@ -72,7 +72,7 @@ void EventsScreen::open()
 
         if (!seq->isUsed())
         {
-            auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+            const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
             seq->init(userScreen->lastBar);
         }
 
@@ -93,7 +93,7 @@ void EventsScreen::open()
             time1 = 0;
         }
 
-        auto toSeqLastTick = sequencer->getSequence(toSq)->getLastTick();
+        const auto toSeqLastTick = sequencer->getSequence(toSq)->getLastTick();
 
         if (start > toSeqLastTick)
         {
@@ -127,7 +127,7 @@ void EventsScreen::function(int i)
             break;
         case 5:
         {
-            auto sourceTrack = sequencer->getActiveTrack();
+            const auto sourceTrack = sequencer->getActiveTrack();
 
             if (editFunctionNumber == 0)
             {
@@ -136,7 +136,7 @@ void EventsScreen::function(int i)
             }
             else if (editFunctionNumber == 1)
             {
-                for (auto &noteEvent : sourceTrack->getNoteEvents())
+                for (const auto &noteEvent : sourceTrack->getNoteEvents())
                 {
                     if (durationMode == 0)
                     {
@@ -161,7 +161,7 @@ void EventsScreen::function(int i)
             }
             else if (editFunctionNumber == 2)
             {
-                for (auto &n : sourceTrack->getNoteEvents())
+                for (const auto &n : sourceTrack->getNoteEvents())
                 {
                     if (velocityMode == 0)
                     {
@@ -187,7 +187,7 @@ void EventsScreen::function(int i)
                 // The original does not process DRUM tracks.
                 // We do, because it's nice and doesn't bother anyone,
                 // so you won't see any filtering of that kind here.
-                for (auto &n : sourceTrack->getNoteEvents())
+                for (const auto &n : sourceTrack->getNoteEvents())
                 {
                     n->setNote(n->getNote() + transposeAmount);
                 }
@@ -201,7 +201,7 @@ void EventsScreen::function(int i)
 
 void EventsScreen::turnWheel(int i)
 {
-    auto toSequence = sequencer->getSequence(toSq);
+    const auto toSequence = sequencer->getSequence(toSq);
 
     if (checkAllTimesAndNotes(mpc, i, sequencer->getActiveSequence().get(),
                               sequencer->getActiveTrack().get()))
@@ -235,7 +235,7 @@ void EventsScreen::turnWheel(int i)
     {
         setFromSq(sequencer->getActiveSequenceIndex() + i);
 
-        auto fromSeq = sequencer->getActiveSequence();
+        const auto fromSeq = sequencer->getActiveSequence();
 
         if (time1 > fromSeq->getLastTick())
         {
@@ -249,7 +249,7 @@ void EventsScreen::turnWheel(int i)
     else if (focusedFieldName == "to-sq")
     {
         setToSq(toSq + i);
-        auto toSeq = sequencer->getSequence(toSq);
+        const auto toSeq = sequencer->getSequence(toSq);
 
         if (start > toSeq->getLastTick())
         {
@@ -298,7 +298,7 @@ void EventsScreen::turnWheel(int i)
 
 void EventsScreen::displayStart()
 {
-    auto seq = sequencer->getSequence(toSq);
+    const auto seq = sequencer->getSequence(toSq);
     findField("start0")->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1,
                                        "0");
     findField("start1")->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1,
@@ -309,7 +309,7 @@ void EventsScreen::displayStart()
 
 void EventsScreen::displayTime()
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
     findField("time0")->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1,
                                       "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1,
@@ -510,13 +510,14 @@ void EventsScreen::displayDrumNotes()
     }
     else
     {
-        auto track = sequencer->getActiveTrack();
-        auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+        const auto track = sequencer->getActiveTrack();
+        const auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
         assert(drumBus);
-        auto program = sampler->getProgram(drumBus->getProgram());
+        const auto program = sampler->getProgram(drumBus->getProgram());
 
-        auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
-        auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
+        const auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
+        const auto padName =
+            sampler->getPadName(program->getPadIndexFromNote(note0));
         findField("note0")->setText(noteText + "/" + padName);
     }
 }
@@ -648,18 +649,18 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
                                int copyCount, int copyNote0, int copyNote1)
 {
     const auto segLength = sourceEnd - sourceStart;
-    auto sourceTrack = sequencer->getActiveTrack();
+    const auto sourceTrack = sequencer->getActiveTrack();
 
-    auto fromSequence = sequencer->getActiveSequence();
+    const auto fromSequence = sequencer->getActiveSequence();
 
     if (!fromSequence->isUsed())
     {
         return;
     }
 
-    auto destOffset = destStart - sourceStart;
+    const auto destOffset = destStart - sourceStart;
 
-    auto toSequence = sequencer->getSequence(toSequenceIndex);
+    const auto toSequence = sequencer->getSequence(toSequenceIndex);
 
     if (!toSequence->isUsed())
     {
@@ -672,8 +673,8 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
 
     for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
     {
-        auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
-        auto barLength = toSequence->getBarLengthsInTicks()[i];
+        const auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
+        const auto barLength = toSequence->getBarLengthsInTicks()[i];
         if (destStart >= firstTickOfBar &&
             destStart <= firstTickOfBar + barLength)
         {
@@ -684,11 +685,11 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         }
     }
 
-    auto minimumRequiredNewSequenceLength = destStart + (segLength);
-    auto ticksToAdd =
+    const auto minimumRequiredNewSequenceLength = destStart + (segLength);
+    const auto ticksToAdd =
         minimumRequiredNewSequenceLength - toSequence->getLastTick();
-    auto barsToAdd = (int)(ceil((float)ticksToAdd / destBarLength));
-    auto initialLastBarIndex = toSequence->getLastBarIndex();
+    const auto barsToAdd = (int)(ceil((float)ticksToAdd / destBarLength));
+    const auto initialLastBarIndex = toSequence->getLastBarIndex();
     for (int i = 0; i < barsToAdd; i++)
     {
         const auto afterBar = initialLastBarIndex + i + 1;
@@ -702,14 +703,14 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
     }
 
-    auto destTrack = toSequence->getTrack(toTrackIndex);
+    const auto destTrack = toSequence->getTrack(toTrackIndex);
 
     if (!copyModeMerge)
     {
-        auto destTrackEvents = destTrack->getEvents();
+        const auto destTrackEvents = destTrack->getEvents();
         for (auto &e : destTrackEvents)
         {
-            auto tick = e->getTick();
+            const auto tick = e->getTick();
 
             if (tick >= destOffset &&
                 tick < destOffset + (segLength * copyCount))
@@ -752,7 +753,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         {
             for (int copy = 0; copy < copyCount; copy++)
             {
-                int tickCandidate =
+                const int tickCandidate =
                     e->getTick() + destOffset + (copy * segLength);
 
                 if (tickCandidate >= toSequence->getLastTick())

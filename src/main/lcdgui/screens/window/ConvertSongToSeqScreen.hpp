@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens::window
     class ConvertSongToSeqScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        ConvertSongToSeqScreen(mpc::Mpc &, const int layerIndex);
+        ConvertSongToSeqScreen(mpc::Mpc &, int layerIndex);
 
         void open() override;
         void function(int) override;

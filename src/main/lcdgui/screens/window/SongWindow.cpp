@@ -18,15 +18,15 @@ SongWindow::SongWindow(mpc::Mpc &mpc, const int layerIndex)
 
 void SongWindow::open()
 {
-    auto songNameRestLabel = findLabel("song-name-rest");
-    auto defaultSongNameRestLabel = findLabel("default-name-rest");
+    const auto songNameRestLabel = findLabel("song-name-rest");
+    const auto defaultSongNameRestLabel = findLabel("default-name-rest");
 
-    auto songNameFirstLetterField = findField("song-name-first-letter");
-    auto defaultSongNameFirstLetterField =
+    const auto songNameFirstLetterField = findField("song-name-first-letter");
+    const auto defaultSongNameFirstLetterField =
         findField("default-name-first-letter");
 
-    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    auto song = sequencer->getSong(songScreen->activeSongIndex);
+    const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    const auto song = sequencer->getSong(songScreen->activeSongIndex);
 
     songNameFirstLetterField->setText(song->getName().substr(0, 1));
     defaultSongNameFirstLetterField->setText(
@@ -84,7 +84,7 @@ void SongWindow::openNameScreen()
         };
     }
 
-    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction,
                            "song-window");
     openScreenById(ScreenId::NameScreen);

@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens::window
     public:
         void turnWheel(int i) override;
 
-        VeloPitchScreen(mpc::Mpc &mpc, const int layerIndex);
+        VeloPitchScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;

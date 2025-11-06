@@ -10,6 +10,6 @@ namespace mpc::lcdgui::screens::dialog
     public:
         void function(int i) override;
 
-        DeleteAllTracksScreen(mpc::Mpc &mpc, const int layerIndex);
+        DeleteAllTracksScreen(mpc::Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::dialog

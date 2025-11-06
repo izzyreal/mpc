@@ -24,8 +24,8 @@ void SaveAProgramScreen::open()
 {
     if (ls->isPreviousScreen({ScreenId::SaveScreen}))
     {
-        auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+        const auto saveScreen = mpc.screens->get<ScreenId::SaveScreen>();
         nameScreen->setNameToEdit(
             sampler->getProgram(saveScreen->getProgramIndex())->getName());
     }
@@ -62,7 +62,7 @@ void SaveAProgramScreen::function(int i)
             break;
         case 4:
         {
-            auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+            const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
                 mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
                 ".PGM";
@@ -74,7 +74,7 @@ void SaveAProgramScreen::function(int i)
             {
                 auto replaceAction = [disk, fileName, program]
                 {
-                    auto success = disk->getFile(fileName)->del();
+                    const auto success = disk->getFile(fileName)->del();
 
                     if (success)
                     {
@@ -86,7 +86,8 @@ void SaveAProgramScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+                    const auto nameScreen =
+                        mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
                         openScreenById(ScreenId::SaveAProgramScreen);
@@ -95,7 +96,7 @@ void SaveAProgramScreen::function(int i)
                                            16, enterAction, "save");
                 };
 
-                auto fileExistsScreen =
+                const auto fileExistsScreen =
                     mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
@@ -132,6 +133,6 @@ void SaveAProgramScreen::displayReplaceSameSounds()
 
 void SaveAProgramScreen::displayFile()
 {
-    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     findLabel("file")->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
 }

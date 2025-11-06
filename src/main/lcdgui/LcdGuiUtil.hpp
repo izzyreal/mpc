@@ -9,7 +9,6 @@
 
 namespace mpc::lcdgui::util
 {
-
     inline const std::vector<std::string> &
     getTypableFields(const std::string &screenName)
     {
@@ -29,7 +28,7 @@ namespace mpc::lcdgui::util
 
         static const std::vector<std::string> empty;
 
-        auto it = typableFields.find(screenName);
+        const auto it = typableFields.find(screenName);
 
         if (it != typableFields.end())
         {

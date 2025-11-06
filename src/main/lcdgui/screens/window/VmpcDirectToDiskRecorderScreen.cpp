@@ -41,7 +41,7 @@ void VmpcDirectToDiskRecorderScreen::open()
 void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 {
 
-    auto seq = sequencer->getSequence(sq).get();
+    const auto seq = sequencer->getSequence(sq).get();
 
     checkAllTimes(mpc, i, seq);
 
@@ -83,15 +83,15 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
             break;
         case 4:
         {
-            auto seq = sq;
-            std::vector<int> rates{44100, 48000, 88200};
+            const auto seq = sq;
+            const std::vector<int> rates{44100, 48000, 88200};
             auto rate = rates[sampleRate];
 
             //		if (!offline)
             rate = static_cast<int>(
                 mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
 
-            auto sequence = sequencer->getSequence(seq);
+            const auto sequence = sequencer->getSequence(seq);
             seqLoopWasEnabled = sequence->isLoopEnabled();
 
             switch (record)
@@ -136,9 +136,10 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     const auto recordingName =
                         sequence->getName() + "-" +
                         DirectToDiskSettings::getTimeStamp();
-                    auto settings = std::make_unique<DirectToDiskSettings>(
-                        lengthInFrames, splitStereoIntoLeftAndRightChannel,
-                        rate, recordingName);
+                    const auto settings =
+                        std::make_unique<DirectToDiskSettings>(
+                            lengthInFrames, splitStereoIntoLeftAndRightChannel,
+                            rate, recordingName);
 
                     if (seqLoopWasEnabled)
                     {
@@ -169,9 +170,10 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     const auto recordingName =
                         sequence->getName() + "-" +
                         DirectToDiskSettings::getTimeStamp();
-                    auto settings = std::make_unique<DirectToDiskSettings>(
-                        lengthInFrames, splitStereoIntoLeftAndRightChannel,
-                        rate, recordingName);
+                    const auto settings =
+                        std::make_unique<DirectToDiskSettings>(
+                            lengthInFrames, splitStereoIntoLeftAndRightChannel,
+                            rate, recordingName);
 
                     if (seqLoopWasEnabled)
                     {
@@ -194,7 +196,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                 }
                 case 3:
                 {
-                    auto mpcSong = sequencer->getSong(song);
+                    const auto mpcSong = sequencer->getSong(song);
 
                     if (!mpcSong->isUsed())
                     {
@@ -206,9 +208,10 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
                     const auto recordingName =
                         mpcSong->getName() + "-" +
                         DirectToDiskSettings::getTimeStamp();
-                    auto settings = std::make_unique<DirectToDiskSettings>(
-                        lengthInFrames, splitStereoIntoLeftAndRightChannel,
-                        rate, recordingName);
+                    const auto settings =
+                        std::make_unique<DirectToDiskSettings>(
+                            lengthInFrames, splitStereoIntoLeftAndRightChannel,
+                            rate, recordingName);
 
                     openScreenById(ScreenId::SongScreen);
 
@@ -278,7 +281,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(int i)
 
     setTime0(0);
 
-    auto s = sequencer->getSequence(sq);
+    const auto s = sequencer->getSequence(sq);
 
     if (s->isUsed())
     {
@@ -341,7 +344,7 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
     {
         return;
     }
-    auto songName = sequencer->getSong(song)->getName();
+    const auto songName = sequencer->getSong(song)->getName();
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(song + 1), "0", 2) + "-" + songName);
 }
@@ -370,7 +373,7 @@ void VmpcDirectToDiskRecorderScreen::displayRecord()
 
 void VmpcDirectToDiskRecorderScreen::displaySq()
 {
-    auto visible = (record >= 0 && record <= 2);
+    const auto visible = (record >= 0 && record <= 2);
 
     findField("sq")->Hide(!visible);
     findLabel("sq")->Hide(!visible);
@@ -380,14 +383,14 @@ void VmpcDirectToDiskRecorderScreen::displaySq()
         return;
     }
 
-    auto seqName = sequencer->getSequence(sq)->getName();
+    const auto seqName = sequencer->getSequence(sq)->getName();
     findField("sq")->setText(StrUtil::padLeft(std::to_string(sq + 1), "0", 2) +
                              "-" + seqName);
 }
 
 void VmpcDirectToDiskRecorderScreen::displayTime()
 {
-    auto invisible = record != 2;
+    const auto invisible = record != 2;
 
     for (int i = 0; i < 6; i++)
     {
@@ -400,7 +403,7 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
         return;
     }
 
-    auto sequence = sequencer->getSequence(sq);
+    const auto sequence = sequencer->getSequence(sq);
 
     findField("time0")->setTextPadded(
         SeqUtil::getBar(sequence.get(), time0) + 1, "0");

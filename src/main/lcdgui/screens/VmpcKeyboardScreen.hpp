@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
         bool isLearning();
-        void setLearnCandidate(const int rawKeyCode);
+        void setLearnCandidate(int rawKeyCode);
 
         bool hasMappingChanged();
 

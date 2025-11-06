@@ -10,16 +10,16 @@ using namespace mpc::lcdgui::screens;
 FxEditScreen::FxEditScreen(mpc::Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "fx-edit", layerIndex)
 {
-    int effectWidth = 30;
-    int effectHeight = 14;
-    int effectDistance = 5;
-    int effectOffset = 42;
+    const int effectWidth = 30;
+    const int effectHeight = 14;
+    const int effectDistance = 5;
+    const int effectOffset = 42;
     // int effectY = 36; // when effect is off
-    int effectY = 23; // when effect is on
+    const int effectY = 23; // when effect is on
 
     for (int i = 0; i < 6; i++)
     {
-        int x = (i * (effectWidth + effectDistance)) + effectOffset;
+        const int x = (i * (effectWidth + effectDistance)) + effectOffset;
         MRECT r(x, effectY, x + effectWidth - 1, effectY + effectHeight - 1);
         addChildT<Effect>(r);
     }
@@ -44,7 +44,8 @@ void FxEditScreen::turnWheel(int i)
 
     if (focusedFieldName == "drum")
     {
-        auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
+        const auto mixerSetupScreen =
+            mpc.screens->get<ScreenId::MixerSetupScreen>();
         mixerSetupScreen->setFxDrum(mixerSetupScreen->getFxDrum() + i);
     }
 }
@@ -118,7 +119,8 @@ void FxEditScreen::checkEffects()
 
 void FxEditScreen::displayDrum()
 {
-    auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
+    const auto mixerSetupScreen =
+        mpc.screens->get<ScreenId::MixerSetupScreen>();
     findField("drum")->setText(
         std::to_string(mixerSetupScreen->getFxDrum() + 1));
 }

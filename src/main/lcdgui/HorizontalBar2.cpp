@@ -21,10 +21,10 @@ void HorizontalBar2::Draw(std::vector<std::vector<bool>> *pixels)
         return;
     }
 
-    auto rect = getRect();
-    int x = rect.L;
-    int y = rect.T;
-    int x2 = x + floor(1 + value * w);
+    const auto rect = getRect();
+    const int x = rect.L;
+    const int y = rect.T;
+    const int x2 = x + floor(1 + value * w);
 
     for (int i = rect.L; i <= rect.R; i++)
     {

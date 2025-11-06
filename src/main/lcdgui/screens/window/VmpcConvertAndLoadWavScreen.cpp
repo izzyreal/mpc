@@ -13,7 +13,7 @@ VmpcConvertAndLoadWavScreen::VmpcConvertAndLoadWavScreen(mpc::Mpc &mpc,
 }
 
 void VmpcConvertAndLoadWavScreen::setLoadRoutine(
-    std::function<void()> newLoadRoutine)
+    const std::function<void()> &newLoadRoutine)
 {
     loadRoutine = newLoadRoutine;
 }

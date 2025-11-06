@@ -127,7 +127,7 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
         destinationSequence->getFirstTickOfBar(firstBarToRemove);
     const auto endTick = destinationSequence->getFirstTickOfBar(firstBarToKeep);
 
-    for (auto &track : destinationSequence->getTracks())
+    for (const auto &track : destinationSequence->getTracks())
     {
         if (sourceSequence->getTrack(track->getIndex())->isOn())
         {
@@ -235,7 +235,7 @@ void ConvertSongToSeqScreen::convertSongToSeq()
                 }
             }
 
-            for (auto &sourceTrack : sourceSequence->getTracks())
+            for (const auto &sourceTrack : sourceSequence->getTracks())
             {
                 const auto midiChannel = sourceTrack->getDeviceIndex() - 1;
 

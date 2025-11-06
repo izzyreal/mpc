@@ -28,7 +28,7 @@ void PunchScreen::open()
         return;
     }
 
-    auto lastTick = sequencer->getActiveSequence()->getLastTick();
+    const auto lastTick = sequencer->getActiveSequence()->getLastTick();
 
     if (lastTick < sequencer->getPunchInTime() ||
         lastTick < sequencer->getPunchOutTime() ||
@@ -100,7 +100,7 @@ void PunchScreen::displayAutoPunch()
 
 void PunchScreen::displayTime()
 {
-    auto sequence = sequencer->getActiveSequence().get();
+    const auto sequence = sequencer->getActiveSequence().get();
 
     for (int i = 0; i < 3; i++)
     {

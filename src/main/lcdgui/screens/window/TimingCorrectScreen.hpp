@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window
 
         void setNote0(int i) override;
 
-        TimingCorrectScreen(mpc::Mpc &mpc, const int layerIndex);
+        TimingCorrectScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

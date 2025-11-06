@@ -29,7 +29,7 @@ void TransScreen::open()
 
 void TransScreen::function(int i)
 {
-    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
+    const auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     switch (i)
     {
@@ -59,7 +59,7 @@ void TransScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "bar0")
     {
-        auto candidate = bar0 + i;
+        const auto candidate = bar0 + i;
 
         if (candidate < 0 ||
             candidate > sequencer->getActiveSequence()->getLastBarIndex())
@@ -71,7 +71,7 @@ void TransScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "bar1")
     {
-        auto candidate = bar1 + i;
+        const auto candidate = bar1 + i;
 
         if (candidate < 0 ||
             candidate > sequencer->getActiveSequence()->getLastBarIndex())
@@ -136,7 +136,7 @@ void TransScreen::displayTransposeAmount()
 
 void TransScreen::displayTr()
 {
-    auto trName = std::string(
+    const auto trName = std::string(
         tr == -1 ? "ALL"
                  : sequencer->getActiveSequence()->getTrack(tr)->getName());
     findField("tr")->setTextPadded(tr + 1, "0");

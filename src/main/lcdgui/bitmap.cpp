@@ -186,7 +186,7 @@ void Bitmap::openFromData(char *data, const int size)
             // Rows are padded so that they're always a multiple of 4 bytes
             row_bytes += (row_bytes % 4 == 0) ? 0 : (4 - row_bytes % 4);
 
-            std::unique_ptr<char[]> row_data(new char[row_bytes]);
+            const std::unique_ptr<char[]> row_data(new char[row_bytes]);
 
             // Transcribe Pixels from the image.
             for (int row = 0; row < dib_info.height; ++row)

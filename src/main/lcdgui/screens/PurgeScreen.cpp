@@ -36,7 +36,7 @@ void PurgeScreen::function(int f)
             break;
         case 3:
         {
-            auto selectDrumScreen =
+            const auto selectDrumScreen =
                 mpc.screens->get<ScreenId::SelectDrumScreen>();
             selectDrumScreen->redirectScreen = "purge";
             openScreenById(ScreenId::SelectDrumScreen);

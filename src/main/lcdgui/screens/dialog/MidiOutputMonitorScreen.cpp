@@ -29,13 +29,13 @@ void MidiOutputMonitorScreen::close()
 }
 
 void MidiOutputMonitorScreen::static_blink(
-    void *arg1, std::weak_ptr<mpc::lcdgui::Label> label)
+    void *arg1, const std::weak_ptr<mpc::lcdgui::Label> &label)
 {
     static_cast<MidiOutputMonitorScreen *>(arg1)->runBlinkThread(label);
 }
 
 void MidiOutputMonitorScreen::runBlinkThread(
-    std::weak_ptr<mpc::lcdgui::Label> label)
+    const std::weak_ptr<mpc::lcdgui::Label> &label)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     label.lock()->setText(" ");
@@ -63,7 +63,7 @@ void MidiOutputMonitorScreen::update(Observable *o, Message message)
         deviceNumber += 16;
     }
 
-    auto label = findLabel(std::to_string(deviceNumber));
+    const auto label = findLabel(std::to_string(deviceNumber));
     label->setText(u8"\u00CC");
     initTimer(label);
 }

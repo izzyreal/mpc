@@ -10,17 +10,14 @@ namespace mpc::lcdgui
 
     class Layer : public Component
     {
-
-    private:
         std::string focus;
 
     public:
-        mpc::lcdgui::Background *getBackground();
-        mpc::lcdgui::FunctionKeys *getFunctionKeys();
-        bool setFocus(std::string textFieldName);
-        std::string getFocus();
+        explicit Layer(int index);
 
-    public:
-        Layer(int index);
+        Background *getBackground();
+        FunctionKeys *getFunctionKeys();
+        bool setFocus(const std::string &textFieldName);
+        std::string getFocus();
     };
 } // namespace mpc::lcdgui

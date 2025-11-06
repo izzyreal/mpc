@@ -1,5 +1,4 @@
 #include "sequencer/FrameSeq.hpp"
-#include "controller/ClientEventController.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
@@ -7,22 +6,18 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
-#include "sequencer/Track.hpp"
 #include "sequencer/RepeatPad.hpp"
 #include "Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
-#include "lcdgui/screens/PunchScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
-#include "MidiClockOutput.hpp"
-
-#include "sequencer/SeqUtil.hpp"
-
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
+
+#include "MidiClockOutput.hpp"
 
 #include <concurrentqueue.h>
 
@@ -38,38 +33,38 @@ using namespace mpc::engine::audio::mixer;
 using namespace mpc::hardware;
 
 FrameSeq::FrameSeq(
-    std::shared_ptr<EventRegistry> eventRegistry, Sequencer *sequencer,
-    std::shared_ptr<Clock> clock, std::shared_ptr<LayeredScreen> layeredScreen,
-    std::function<bool()> isBouncing, std::function<int()> getSampleRate,
-    std::function<bool()> isRecMainWithoutPlaying,
-    std::function<void(int velo, int frameOffset)> triggerMetronome,
+    const std::shared_ptr<EventRegistry> &eventRegistry, Sequencer *sequencer,
+    const std::shared_ptr<Clock> &clock,
+    const std::shared_ptr<LayeredScreen> &layeredScreen,
+    std::function<bool()> isBouncing, const std::function<int()> &getSampleRate,
+    const std::function<bool()> &isRecMainWithoutPlaying,
+    const std::function<void(int velo, int frameOffset)> &triggerMetronome,
     std::function<std::shared_ptr<Screens>()> getScreens,
-    std::function<bool()> isNoteRepeatLockedOrPressed,
+    const std::function<bool()> &isNoteRepeatLockedOrPressed,
     // Only used by note repeat (RepeatPad)
-    std::shared_ptr<Sampler> sampler,
-    std::function<std::shared_ptr<AudioMixer>()> getAudioMixer,
-    std::function<bool()> isFullLevelEnabled,
-    std::function<bool()> isSixteenLevelsEnabled,
-    std::shared_ptr<hardware::Slider> hardwareSlider,
+    const std::shared_ptr<Sampler> &sampler,
+    const std::function<std::shared_ptr<AudioMixer>()> &getAudioMixer,
+    const std::function<bool()> &isFullLevelEnabled,
+    const std::function<bool()> &isSixteenLevelsEnabled,
+    const std::shared_ptr<hardware::Slider> &hardwareSlider,
     std::vector<std::shared_ptr<engine::Voice>> *voices,
-    std::function<std::vector<MixerInterconnection *> &()>
-        getMixerInterconnections)
-    : eventRegistry(eventRegistry), sequencer(sequencer), clock(clock),
-      layeredScreen(layeredScreen), getScreens(getScreens),
+    const std::function<std::vector<MixerInterconnection *> &()>
+        &getMixerInterconnections)
+    : eventRegistry(eventRegistry), layeredScreen(layeredScreen),
+      getScreens(getScreens), sequencer(sequencer), clock(clock),
       isBouncing(isBouncing), getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       triggerMetronome(triggerMetronome),
-      midiClockOutput(
-          std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing)),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
       sampler(sampler), getAudioMixer(getAudioMixer),
       isFullLevelEnabled(isFullLevelEnabled),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled),
       hardwareSlider(hardwareSlider), voices(voices),
-      getMixerInterconnections(getMixerInterconnections)
+      getMixerInterconnections(getMixerInterconnections),
+      midiClockOutput(
+          std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
 {
-    eventQueue =
-        std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
+    eventQueue = std::make_shared<EventQueue>(100);
     tempEventQueue.reserve(100);
 }
 
@@ -119,17 +114,17 @@ void FrameSeq::stop()
     tickFrameOffset = 0;
 }
 
-bool FrameSeq::isRunning()
+bool FrameSeq::isRunning() const
 {
     return sequencerIsRunning.load();
 }
 
-void FrameSeq::move(int newTickPos)
+void FrameSeq::move(const int newTickPos) const
 {
     sequencer->move(Sequencer::ticksToQuarterNotes(newTickPos));
 }
 
-std::shared_ptr<Sequence> FrameSeq::switchToNextSequence()
+std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTickPosition());
     sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
@@ -141,7 +136,7 @@ std::shared_ptr<Sequence> FrameSeq::switchToNextSequence()
     return newSeq;
 }
 
-void FrameSeq::triggerClickIfNeeded()
+void FrameSeq::triggerClickIfNeeded() const
 {
     if (!sequencer->isCountEnabled())
     {
@@ -153,7 +148,7 @@ void FrameSeq::triggerClickIfNeeded()
 
     const auto currentScreenName = layeredScreen->getCurrentScreenName();
 
-    auto countMetronomeScreen =
+    const auto countMetronomeScreen =
         getScreens()->get<ScreenId::CountMetronomeScreen>();
 
     if (sequencer->isRecordingOrOverdubbing())
@@ -211,6 +206,7 @@ void FrameSeq::triggerClickIfNeeded()
         case 7:
             denTicks *= 1.0f / 12;
             break;
+        default:;
     }
 
     if (relativePos % static_cast<int>(denTicks) == 0)
@@ -219,21 +215,22 @@ void FrameSeq::triggerClickIfNeeded()
     }
 }
 
-void FrameSeq::displayPunchRects()
+void FrameSeq::displayPunchRects() const
 {
-    auto punch =
+    const auto punch =
         sequencer->isPunchEnabled() && sequencer->isRecordingOrOverdubbing();
 
     if (punch)
     {
-        bool punchIn = sequencer->getAutoPunchMode() == 0 ||
-                       sequencer->getAutoPunchMode() == 2;
-        bool punchOut = sequencer->getAutoPunchMode() == 1 ||
-                        sequencer->getAutoPunchMode() == 2;
-        auto punchInTime = sequencer->getPunchInTime();
-        auto punchOutTime = sequencer->getPunchOutTime();
+        const bool punchIn = sequencer->getAutoPunchMode() == 0 ||
+                             sequencer->getAutoPunchMode() == 2;
+        const bool punchOut = sequencer->getAutoPunchMode() == 1 ||
+                              sequencer->getAutoPunchMode() == 2;
+        const auto punchInTime = sequencer->getPunchInTime();
+        const auto punchOutTime = sequencer->getPunchOutTime();
 
-        auto sequencerScreen = getScreens()->get<ScreenId::SequencerScreen>();
+        const auto sequencerScreen =
+            getScreens()->get<ScreenId::SequencerScreen>();
 
         if (punchIn && sequencer->getTickPosition() == punchInTime)
         {
@@ -248,7 +245,7 @@ void FrameSeq::displayPunchRects()
     }
 }
 
-void FrameSeq::stopCountingInIfRequired()
+void FrameSeq::stopCountingInIfRequired() const
 {
     if (sequencer->getTickPosition() >= sequencer->countInEndPos)
     {
@@ -260,9 +257,9 @@ void FrameSeq::stopCountingInIfRequired()
 }
 
 // Returns true if the song has stopped
-bool FrameSeq::processSongMode()
+bool FrameSeq::processSongMode() const
 {
-    auto seq = sequencer->getCurrentlyPlayingSequence();
+    const auto seq = sequencer->getCurrentlyPlayingSequence();
 
     if (sequencer->getTickPosition() < seq->getLastTick())
     {
@@ -271,19 +268,19 @@ bool FrameSeq::processSongMode()
 
     sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->incrementPlayedStepRepetitions();
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    auto song = sequencer->getSong(songScreen->getActiveSongIndex());
-    auto step = songScreen->getOffset() + 1;
+    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+    const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
+    const auto step = songScreen->getOffset() + 1;
 
-    auto doneRepeating = sequencer->getPlayedStepRepetitions() >=
-                         song->getStep(step).lock()->getRepeats();
-    auto reachedLastStep = step == song->getStepCount() - 1;
+    const auto doneRepeating = sequencer->getPlayedStepRepetitions() >=
+                               song->getStep(step).lock()->getRepeats();
+    const auto reachedLastStep = step == song->getStepCount() - 1;
 
     if (doneRepeating && song->isLoopEnabled() && step == song->getLastStep())
     {
         sequencer->resetPlayedStepRepetitions();
         songScreen->setOffset(song->getFirstStep() - 1);
-        auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
+        const auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
         if (!sequencer->getSequence(newStep->getSequence())->isUsed())
         {
@@ -306,7 +303,8 @@ bool FrameSeq::processSongMode()
             sequencer->resetPlayedStepRepetitions();
             songScreen->setOffset(songScreen->getOffset() + 1);
 
-            auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
+            const auto newStep =
+                song->getStep(songScreen->getOffset() + 1).lock();
 
             if (!sequencer->getSequence(newStep->getSequence())->isUsed())
             {
@@ -324,20 +322,21 @@ bool FrameSeq::processSongMode()
     return false;
 }
 
-bool FrameSeq::processSeqLoopEnabled()
+bool FrameSeq::processSeqLoopEnabled() const
 {
-    auto seq = sequencer->getCurrentlyPlayingSequence();
+    const auto seq = sequencer->getCurrentlyPlayingSequence();
 
     if (sequencer->getTickPosition() >= seq->getLoopEnd() - 1)
     {
-        auto punch = sequencer->isPunchEnabled() &&
-                     sequencer->isRecordingOrOverdubbing();
-        bool punchIn = sequencer->getAutoPunchMode() == 0 ||
-                       sequencer->getAutoPunchMode() == 2;
-        bool punchOut = sequencer->getAutoPunchMode() == 1 ||
-                        sequencer->getAutoPunchMode() == 2;
+        const auto punch = sequencer->isPunchEnabled() &&
+                           sequencer->isRecordingOrOverdubbing();
+        const bool punchIn = sequencer->getAutoPunchMode() == 0 ||
+                             sequencer->getAutoPunchMode() == 2;
+        const bool punchOut = sequencer->getAutoPunchMode() == 1 ||
+                              sequencer->getAutoPunchMode() == 2;
 
-        auto sequencerScreen = getScreens()->get<ScreenId::SequencerScreen>();
+        const auto sequencerScreen =
+            getScreens()->get<ScreenId::SequencerScreen>();
 
         if (punch && punchIn)
         {
@@ -372,15 +371,15 @@ bool FrameSeq::processSeqLoopEnabled()
     return false;
 }
 
-bool FrameSeq::processSeqLoopDisabled()
+bool FrameSeq::processSeqLoopDisabled() const
 {
-    auto seq = sequencer->getCurrentlyPlayingSequence();
+    const auto seq = sequencer->getCurrentlyPlayingSequence();
 
     if (sequencer->getTickPosition() >= seq->getLastTick())
     {
         if (sequencer->isRecordingOrOverdubbing())
         {
-            auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+            const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
 
             seq->insertBars(1, seq->getLastBarIndex());
             seq->setTimeSignature(seq->getLastBarIndex(),
@@ -412,16 +411,18 @@ void FrameSeq::processNoteRepeat()
         return;
     }
 
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         getScreens()->get<ScreenId::TimingCorrectScreen>();
 
-    auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
-    int swingPercentage = timingCorrectScreen->getSwing();
-    int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) *
-                            (repeatIntervalTicks * 0.5));
-    auto shiftTiming = timingCorrectScreen->getAmount() *
-                       (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
-    auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
+    const auto repeatIntervalTicks =
+        timingCorrectScreen->getNoteValueLengthInTicks();
+    const int swingPercentage = timingCorrectScreen->getSwing();
+    const int swingOffset = static_cast<int>(
+        (swingPercentage - 50) * (4.0 * 0.01) * (repeatIntervalTicks * 0.5));
+    const auto shiftTiming =
+        timingCorrectScreen->getAmount() *
+        (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
+    const auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
 
     bool shouldRepeatPad = false;
 
@@ -442,9 +443,10 @@ void FrameSeq::processNoteRepeat()
 
     if (shouldRepeatPad)
     {
-        auto assign16LevelsScreen =
+        const auto assign16LevelsScreen =
             getScreens()->get<ScreenId::Assign16LevelsScreen>();
-        auto mixerSetupScreen = getScreens()->get<ScreenId::MixerSetupScreen>();
+        const auto mixerSetupScreen =
+            getScreens()->get<ScreenId::MixerSetupScreen>();
 
         RepeatPad::process(
             this, sequencer, sampler, getAudioMixer(), isFullLevelEnabled(),
@@ -456,7 +458,7 @@ void FrameSeq::processNoteRepeat()
     }
 }
 
-void FrameSeq::stopSequencer()
+void FrameSeq::stopSequencer() const
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->stop();
@@ -464,7 +466,7 @@ void FrameSeq::stopSequencer()
 }
 
 void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
-                                        unsigned long nFrames)
+                                        const unsigned long nFrames) const
 {
     EventAfterNFrames e;
     e.f = event;
@@ -476,7 +478,7 @@ void FrameSeq::processEventsAfterNFrames()
 {
     EventAfterNFrames batch[100];
 
-    size_t count = eventQueue->try_dequeue_bulk(batch, 100);
+    const size_t count = eventQueue->try_dequeue_bulk(batch, 100);
 
     tempEventQueue.clear();
 
@@ -499,7 +501,7 @@ void FrameSeq::processEventsAfterNFrames()
     }
 }
 
-void FrameSeq::work(int nFrames)
+void FrameSeq::work(const int nFrames)
 {
     eventRegistry->drainQueue();
     eventRegistry->publishSnapshot();
@@ -528,8 +530,6 @@ void FrameSeq::work(int nFrames)
 
         return;
     }
-
-    const auto tempo = sequencer->getTempo();
 
     const auto &clockTicks = clock->getTicksForCurrentBuffer();
     const bool positionalJumpOccurred = clock->didJumpOccurInLastBuffer();
@@ -577,7 +577,7 @@ void FrameSeq::work(int nFrames)
             continue;
         }
 
-        auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
+        const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
 
         if (syncScreen->modeOut != 0 && !isBouncing())
         {
@@ -595,7 +595,7 @@ void FrameSeq::work(int nFrames)
 
         for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
         {
-            if (auto tickFrameIndex = clockTicks[tickIndex];
+            if (const auto tickFrameIndex = clockTicks[tickIndex];
                 tickFrameIndex == frameIndex)
             {
                 tickCountAtThisFrameIndex++;
@@ -663,7 +663,7 @@ void FrameSeq::work(int nFrames)
     }
 }
 
-uint64_t FrameSeq::getMetronomeOnlyTickPosition()
+uint64_t FrameSeq::getMetronomeOnlyTickPosition() const
 {
     return metronomeOnlyTickPosition;
 }

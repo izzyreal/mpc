@@ -32,8 +32,8 @@ void VelocityModulationScreen::close()
 
 void VelocityModulationScreen::turnWheel(int i)
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -66,16 +66,16 @@ void VelocityModulationScreen::turnWheel(int i)
 
 void VelocityModulationScreen::displayNote()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
-    auto soundIndex = selectedNoteParameters->getSoundIndex();
-    auto padIndex =
+    const auto soundIndex = selectedNoteParameters->getSoundIndex();
+    const auto padIndex =
         program->getPadIndexFromNote(selectedNoteParameters->getNumber());
-    auto padName = sampler->getPadName(padIndex);
-    auto sampleName =
+    const auto padName = sampler->getPadName(padIndex);
+    const auto sampleName =
         soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-    std::string stereo =
+    const std::string stereo =
         soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
                                                                      : "";
     findField("note")->setText(
@@ -90,8 +90,8 @@ void VelocityModulationScreen::displayVelo()
 
 void VelocityModulationScreen::displayVeloAttack()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
     findField("veloattack")
         ->setTextPadded(selectedNoteParameters->getVelocityToAttack(), " ");
@@ -99,8 +99,8 @@ void VelocityModulationScreen::displayVeloAttack()
 
 void VelocityModulationScreen::displayVeloStart()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
     findField("velostart")
         ->setTextPadded(selectedNoteParameters->getVelocityToStart(), " ");
@@ -108,8 +108,8 @@ void VelocityModulationScreen::displayVeloStart()
 
 void VelocityModulationScreen::displayVeloLevel()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
     findField("velolevel")
         ->setTextPadded(selectedNoteParameters->getVeloToLevel(), " ");

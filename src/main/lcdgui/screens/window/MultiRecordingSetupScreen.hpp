@@ -26,7 +26,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
 
     public:
-        MultiRecordingSetupScreen(mpc::Mpc &mpc, const int layerIndex);
+        MultiRecordingSetupScreen(mpc::Mpc &mpc, int layerIndex);
 
     public:
         void open() override;

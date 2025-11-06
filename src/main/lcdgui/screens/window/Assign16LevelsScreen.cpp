@@ -142,20 +142,20 @@ int Assign16LevelsScreen::getParameter()
 
 void Assign16LevelsScreen::displayNote()
 {
-    auto track = mpc.getSequencer()->getActiveTrack();
-    auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
     assert(drumBus);
-    auto program = sampler->getProgram(drumBus->getProgram());
-    auto padIndex = program->getPadIndexFromNote(note);
+    const auto program = sampler->getProgram(drumBus->getProgram());
+    const auto padIndex = program->getPadIndexFromNote(note);
 
-    auto padName = sampler->getPadName(padIndex);
+    const auto padName = sampler->getPadName(padIndex);
 
-    auto soundIndex =
+    const auto soundIndex =
         note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
-    auto soundName =
+    const auto soundName =
         soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
-    auto noteName = note == 34 ? "--" : std::to_string(note);
+    const auto noteName = note == 34 ? "--" : std::to_string(note);
 
     findField("note")->setText(noteName + "/" + padName + "-" + soundName);
 }

@@ -57,7 +57,7 @@ namespace mpc::lcdgui
         std::vector<std::shared_ptr<ScreenComponent>> screens;
 
         std::optional<ScreenLayout>
-        getScreenLayout(const std::string &screenName);
+        getScreenLayout(const std::string &screenName) const;
         void createAndCacheScreen(const std::string &screenName);
     };
 } // namespace mpc::lcdgui

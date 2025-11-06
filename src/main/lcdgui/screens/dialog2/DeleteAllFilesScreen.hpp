@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens::dialog2
     {
 
     public:
-        DeleteAllFilesScreen(mpc::Mpc &mpc, const int layerIndex);
+        DeleteAllFilesScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void turnWheel(int i) override;

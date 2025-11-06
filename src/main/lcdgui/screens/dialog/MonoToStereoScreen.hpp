@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int j) override;
         void openNameScreen() override;
 
-        MonoToStereoScreen(mpc::Mpc &mpc, const int layerIndex);
+        MonoToStereoScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

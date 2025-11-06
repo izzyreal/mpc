@@ -74,7 +74,7 @@ TrMuteScreen::TrMuteScreen(mpc::Mpc &mpc, const int layerIndex)
 
                             for (int i = 0; i < 16; ++i)
                             {
-                                int trackIndex = bank * 16 + i;
+                                const int trackIndex = bank * 16 + i;
                                 if (sequencer->getActiveSequence()
                                         ->getTrack(trackIndex)
                                         ->isOn())
@@ -113,7 +113,7 @@ void TrMuteScreen::open()
 
     for (int i = 0; i < 16; i++)
     {
-        auto trackField = findField(std::to_string(i + 1));
+        const auto trackField = findField(std::to_string(i + 1));
         trackField->setSize(49, 9);
         trackField->setFocusable(false);
     }
@@ -179,7 +179,7 @@ int TrMuteScreen::bankoffset()
 
 void TrMuteScreen::displayBank()
 {
-    std::vector<std::string> letters{"A", "B", "C", "D"};
+    const std::vector<std::string> letters{"A", "B", "C", "D"};
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
     findLabel("bank")->setText(letters[bank]);
@@ -187,7 +187,7 @@ void TrMuteScreen::displayBank()
 
 void TrMuteScreen::displayTrackNumbers()
 {
-    std::vector<std::string> trn{"01-16", "17-32", "33-48", "49-64"};
+    const std::vector<std::string> trn{"01-16", "17-32", "33-48", "49-64"};
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
     findLabel("tracknumbers")->setText(trn[bank]);
@@ -195,9 +195,9 @@ void TrMuteScreen::displayTrackNumbers()
 
 void TrMuteScreen::displaySq()
 {
-    auto sequenceNumber = StrUtil::padLeft(
+    const auto sequenceNumber = StrUtil::padLeft(
         std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
-    auto sequenceName = sequencer->getActiveSequence()->getName();
+    const auto sequenceName = sequencer->getActiveSequence()->getName();
     findField("sq")->setText(sequenceNumber + "-" + sequenceName);
 }
 

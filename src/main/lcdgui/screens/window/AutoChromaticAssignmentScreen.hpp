@@ -19,7 +19,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void openNameScreen() override;
 
-        AutoChromaticAssignmentScreen(mpc::Mpc &mpc, const int layerIndex);
+        AutoChromaticAssignmentScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *o, Message message) override;

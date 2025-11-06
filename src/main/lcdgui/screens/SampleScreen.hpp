@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
         void down() override;
 
     public:
-        SampleScreen(mpc::Mpc &mpc, const int layerIndex);
+        SampleScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
         void update(Observable *observable, Message message) override;
@@ -58,7 +58,7 @@ namespace mpc::lcdgui::screens
         void displayTime();
         void displayMonitor();
         void displayPreRec();
-        void updateVU(const float levelL, const float levelR);
+        void updateVU(float levelL, float levelR);
 
     public:
         int getMode();

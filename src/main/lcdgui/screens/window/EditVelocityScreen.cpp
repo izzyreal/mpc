@@ -33,7 +33,7 @@ void EditVelocityScreen::setNote0(int i)
 
 void EditVelocityScreen::open()
 {
-    auto bus = sequencer->getActiveTrack()->getBus();
+    const auto bus = sequencer->getActiveTrack()->getBus();
 
     if (bus == 0)
     {
@@ -50,7 +50,7 @@ void EditVelocityScreen::open()
 
     findField("note1")->setLocation(116, 42);
 
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -65,14 +65,15 @@ void EditVelocityScreen::function(int i)
 {
     ScreenComponent::function(i);
 
-    auto track = sequencer->getActiveTrack();
+    const auto track = sequencer->getActiveTrack();
 
     switch (i)
     {
         case 4:
             for (auto &event : track->getEvents())
             {
-                if (auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event))
+                if (const auto ne =
+                        std::dynamic_pointer_cast<NoteOnEvent>(event))
                 {
                     if (ne->getTick() >= time0 && ne->getTick() <= time1)
                     {
@@ -121,7 +122,7 @@ void EditVelocityScreen::turnWheel(int i)
 
 void EditVelocityScreen::displayTime()
 {
-    auto sequence = sequencer->getActiveSequence().get();
+    const auto sequence = sequencer->getActiveSequence().get();
     findField("time0")->setTextPadded(
         SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
@@ -136,7 +137,7 @@ void EditVelocityScreen::displayTime()
 
 void EditVelocityScreen::displayNotes()
 {
-    auto track = sequencer->getActiveTrack();
+    const auto track = sequencer->getActiveTrack();
 
     if (track->getBus() == 0)
     {
@@ -160,8 +161,8 @@ void EditVelocityScreen::displayNotes()
         }
         else
         {
-            auto program = getProgramOrThrow();
-            auto padName =
+            const auto program = getProgramOrThrow();
+            const auto padName =
                 sampler->getPadName(program->getPadIndexFromNote(note0));
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }

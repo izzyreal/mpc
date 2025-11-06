@@ -71,7 +71,7 @@ void SaveASequenceScreen::function(int i)
             break;
         case 4:
         {
-            auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+            const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
             auto fileName =
                 mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) +
                 ".MID";
@@ -81,7 +81,7 @@ void SaveASequenceScreen::function(int i)
             {
                 auto replaceAction = [this, disk, fileName]
                 {
-                    auto success = disk->getFile(fileName)->del();
+                    const auto success = disk->getFile(fileName)->del();
 
                     if (success)
                     {
@@ -94,7 +94,8 @@ void SaveASequenceScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+                    const auto nameScreen =
+                        mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
                         openScreenById(ScreenId::SaveASequenceScreen);
@@ -103,7 +104,7 @@ void SaveASequenceScreen::function(int i)
                                            16, enterAction, "save");
                 };
 
-                auto fileExistsScreen =
+                const auto fileExistsScreen =
                     mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,
@@ -115,7 +116,7 @@ void SaveASequenceScreen::function(int i)
                 return;
             }
 
-            auto seq = sequencer->getActiveSequence();
+            const auto seq = sequencer->getActiveSequence();
 
             disk->writeMid(seq, fileName);
             break;
@@ -131,8 +132,8 @@ void SaveASequenceScreen::displaySaveAs()
 
 void SaveASequenceScreen::displayFile()
 {
-    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-    auto name = nameScreen->getNameWithoutSpaces();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    const auto name = nameScreen->getNameWithoutSpaces();
 
     if (name.length() < 2)
     {

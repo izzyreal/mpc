@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int i) override;
         void turnWheel(int i) override;
 
-        DeleteSoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        DeleteSoundScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

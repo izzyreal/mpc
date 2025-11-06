@@ -66,7 +66,7 @@ void DeleteProgramScreen::displayPgm()
 void DeleteProgramScreen::setPgm(int i)
 {
     auto candidate = i;
-    auto up = i > pgm;
+    const auto up = i > pgm;
 
     candidate = up ? candidate - 1 : candidate + 1;
 

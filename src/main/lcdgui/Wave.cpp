@@ -74,10 +74,10 @@ void Wave::setCenterSamplePos(unsigned int newCenterSamplePos)
 }
 
 void Wave::setSampleData(
-    std::shared_ptr<const std::vector<float>> newSampleData, bool newMono,
-    unsigned int newView)
+    const std::shared_ptr<const std::vector<float>> &newSampleData,
+    bool newMono, unsigned int newView)
 {
-    auto newFrameCount =
+    const auto newFrameCount =
         newSampleData != nullptr
             ? (int)floor(newMono ? newSampleData->size()
                                  : (newSampleData->size() * 0.5))
@@ -137,7 +137,7 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors,
         centerSamplePixel = (centerSamplePos / samplesPerPixel) - 1;
     }
 
-    int samplePos =
+    const int samplePos =
         (int)(floor((float)(lineX - (fine ? (54 - centerSamplePixel) : 0)) *
                     samplesPerPixel));
     offset += samplePos;

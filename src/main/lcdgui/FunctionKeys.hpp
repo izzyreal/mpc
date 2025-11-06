@@ -16,11 +16,11 @@ namespace mpc::lcdgui
     {
 
     public:
-        FunctionKey(mpc::Mpc &mpc, const std::string &name, const int xPos);
+        FunctionKey(mpc::Mpc &mpc, const std::string &name, int xPos);
         void Draw(std::vector<std::vector<bool>> *pixels) override;
         int type = -1;
         void setText(const std::string &text);
-        void setType(const int newType);
+        void setType(int newType);
     };
 
     class FunctionKeys : public Component
@@ -35,7 +35,7 @@ namespace mpc::lcdgui
     public:
         void setActiveArrangement(int i);
         FunctionKeys(mpc::Mpc &mpc, const std::string &name,
-                     std::vector<std::vector<std::string>> texts,
-                     std::vector<std::vector<int>> types);
+                     const std::vector<std::vector<std::string>> &texts,
+                     const std::vector<std::vector<int>> &types);
     };
 } // namespace mpc::lcdgui

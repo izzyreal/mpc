@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        VmpcDiscardMappingChangesScreen(mpc::Mpc &mpc, const int layerIndex);
+        VmpcDiscardMappingChangesScreen(mpc::Mpc &mpc, int layerIndex);
 
         void function(int i) override;
         void close() override;

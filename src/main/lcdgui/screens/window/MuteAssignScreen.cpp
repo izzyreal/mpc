@@ -26,8 +26,8 @@ void MuteAssignScreen::close()
 
 void MuteAssignScreen::turnWheel(int i)
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -53,13 +53,14 @@ void MuteAssignScreen::turnWheel(int i)
 
 void MuteAssignScreen::displayNote()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNote = mpc.clientEventController->getSelectedNote();
-    auto pad = program->getPadIndexFromNote(selectedNote);
+    const auto program = getProgramOrThrow();
+    const auto selectedNote = mpc.clientEventController->getSelectedNote();
+    const auto pad = program->getPadIndexFromNote(selectedNote);
     std::string soundName = "OFF";
 
-    auto padName = sampler->getPadName(pad);
-    auto sound = program->getNoteParameters(selectedNote)->getSoundIndex();
+    const auto padName = sampler->getPadName(pad);
+    const auto sound =
+        program->getNoteParameters(selectedNote)->getSoundIndex();
 
     if (sound != -1)
     {
@@ -72,11 +73,11 @@ void MuteAssignScreen::displayNote()
 
 void MuteAssignScreen::displayNote0()
 {
-    auto program = getProgramOrThrow();
+    const auto program = getProgramOrThrow();
 
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
-    auto note0 = selectedNoteParameters->getMuteAssignA();
+    const auto note0 = selectedNoteParameters->getMuteAssignA();
 
     if (note0 == 34)
     {
@@ -84,9 +85,9 @@ void MuteAssignScreen::displayNote0()
         return;
     }
 
-    auto pad = program->getPadIndexFromNote(note0);
+    const auto pad = program->getPadIndexFromNote(note0);
     std::string soundName = "OFF";
-    auto sound = program->getNoteParameters(note0)->getSoundIndex();
+    const auto sound = program->getNoteParameters(note0)->getSoundIndex();
 
     if (sound != -1)
     {
@@ -99,10 +100,10 @@ void MuteAssignScreen::displayNote0()
 
 void MuteAssignScreen::displayNote1()
 {
-    auto program = getProgramOrThrow();
-    auto selectedNoteParameters = program->getNoteParameters(
+    const auto program = getProgramOrThrow();
+    const auto selectedNoteParameters = program->getNoteParameters(
         mpc.clientEventController->getSelectedNote());
-    auto note1 = selectedNoteParameters->getMuteAssignB();
+    const auto note1 = selectedNoteParameters->getMuteAssignB();
 
     if (note1 == 34)
     {
@@ -110,9 +111,9 @@ void MuteAssignScreen::displayNote1()
         return;
     }
 
-    auto pad = program->getPadIndexFromNote(note1);
+    const auto pad = program->getPadIndexFromNote(note1);
     std::string soundName = "OFF";
-    auto sound = program->getNoteParameters(note1)->getSoundIndex();
+    const auto sound = program->getNoteParameters(note1)->getSoundIndex();
 
     if (sound != -1)
     {

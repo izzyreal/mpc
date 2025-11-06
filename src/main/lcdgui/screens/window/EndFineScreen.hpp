@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        EndFineScreen(mpc::Mpc &mpc, const int layerIndex);
+        EndFineScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

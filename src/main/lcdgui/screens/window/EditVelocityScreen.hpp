@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        EditVelocityScreen(mpc::Mpc &mpc, const int layerIndex);
+        EditVelocityScreen(mpc::Mpc &mpc, int layerIndex);
 
         void setNote0(int i) override;
 

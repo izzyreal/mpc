@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens
 
         void setNote0(int i) override;
 
-        EventsScreen(mpc::Mpc &mpc, const int layerIndex);
+        EventsScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

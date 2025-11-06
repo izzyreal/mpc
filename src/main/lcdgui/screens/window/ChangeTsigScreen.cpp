@@ -31,14 +31,14 @@ void ChangeTsigScreen::function(int i)
     switch (i)
     {
         case 4:
-            auto sequence = sequencer->getActiveSequence();
+            const auto sequence = sequencer->getActiveSequence();
 
-            auto barLengths = sequence->getBarLengthsInTicks();
+            const auto barLengths = sequence->getBarLengthsInTicks();
 
             sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(),
                                        timesignature.getDenominator());
 
-            auto &newBarLengths = sequence->getBarLengthsInTicks();
+            const auto &newBarLengths = sequence->getBarLengthsInTicks();
 
             for (int j = 0; j < barLengths.size(); j++)
             {
@@ -58,7 +58,7 @@ void ChangeTsigScreen::function(int i)
 void ChangeTsigScreen::turnWheel(int i)
 {
 
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -97,7 +97,7 @@ void ChangeTsigScreen::displayNewTsig()
         return;
     }
 
-    auto result =
+    const auto result =
         StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +
         "/" +
         StrUtil::padLeft(std::to_string(timesignature.getDenominator()), " ",

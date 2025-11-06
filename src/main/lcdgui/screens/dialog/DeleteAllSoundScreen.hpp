@@ -8,6 +8,6 @@ namespace mpc::lcdgui::screens::dialog
     public:
         void function(int i) override;
 
-        DeleteAllSoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        DeleteAllSoundScreen(mpc::Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::dialog

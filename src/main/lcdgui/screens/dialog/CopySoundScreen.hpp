@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         void function(int i) override;
         void turnWheel(int renamerNewName) override;
 
-        CopySoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        CopySoundScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void openNameScreen() override;
@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens::dialog
         void displayNewName();
 
         std::string newName;
-        void setNewName(std::string s);
+        void setNewName(const std::string &s);
 
     private:
         friend class mpc::lcdgui::screens::window::NameScreen;

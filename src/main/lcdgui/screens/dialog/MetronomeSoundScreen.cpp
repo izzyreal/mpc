@@ -73,24 +73,27 @@ void MetronomeSoundScreen::displayVolume()
 
 void MetronomeSoundScreen::displayOutput()
 {
-    auto outputText = output == 0 ? "STEREO" : "OUT" + std::to_string(output);
+    const auto outputText =
+        output == 0 ? "STEREO" : "OUT" + std::to_string(output);
     findField("output")->setText(outputText);
 }
 
 void MetronomeSoundScreen::displayAccent()
 {
-    auto drumBus = sequencer->getBus<DrumBus>(sound);
-    auto program = drumBus->getProgram();
-    auto note = sampler->getProgram(program)->getPad(accentPad)->getNote();
+    const auto drumBus = sequencer->getBus<DrumBus>(sound);
+    const auto program = drumBus->getProgram();
+    const auto note =
+        sampler->getProgram(program)->getPad(accentPad)->getNote();
     findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) +
                                  "/" + sampler->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
-    auto drumBus = sequencer->getBus<DrumBus>(sound);
-    auto program = drumBus->getProgram();
-    auto note = sampler->getProgram(program)->getPad(normalPad)->getNote();
+    const auto drumBus = sequencer->getBus<DrumBus>(sound);
+    const auto program = drumBus->getProgram();
+    const auto note =
+        sampler->getProgram(program)->getPad(normalPad)->getNote();
     findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) +
                                  "/" + sampler->getPadName(normalPad));
 }

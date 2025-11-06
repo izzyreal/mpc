@@ -80,7 +80,7 @@ void SaveAllFileScreen::function(int i)
             {
                 auto replaceAction = [disk, allFileName]
                 {
-                    auto success = disk->getFile(allFileName)->del();
+                    const auto success = disk->getFile(allFileName)->del();
 
                     if (success)
                     {
@@ -92,7 +92,8 @@ void SaveAllFileScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+                    const auto nameScreen =
+                        mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &nameScreenName)
                     {
                         fileName = nameScreenName;
@@ -101,7 +102,7 @@ void SaveAllFileScreen::function(int i)
                     nameScreen->initialize(fileName, 16, enterAction, "save");
                 };
 
-                auto fileExistsScreen =
+                const auto fileExistsScreen =
                     mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,

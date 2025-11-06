@@ -36,7 +36,7 @@ namespace mpc::lcdgui::screens
         void setEnd(int newValue);
 
     public:
-        TrimScreen(mpc::Mpc &mpc, const int layerIndex);
+        TrimScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

@@ -39,9 +39,9 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc &mpc,
         {
             auto replaceAction = [this, presetName]
             {
-                auto vmpcMidiScreen =
+                const auto vmpcMidiScreen =
                     this->mpc.screens->get<ScreenId::VmpcMidiScreen>();
-                auto preset = vmpcMidiScreen->getActivePreset();
+                const auto preset = vmpcMidiScreen->getActivePreset();
                 preset->name = presetName;
                 this->mpc.getDisk()->writeMidiControlPreset(preset);
                 MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(
@@ -52,7 +52,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc &mpc,
 
             const auto initializeNameScreen = [this, presetName]
             {
-                auto nameScreen =
+                const auto nameScreen =
                     this->mpc.screens->get<ScreenId::NameScreen>();
 
                 auto enterAction = [this](std::string &nameScreenName)
@@ -65,7 +65,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc &mpc,
                                        "vmpc-midi-presets");
             };
 
-            auto fileExistsScreen =
+            const auto fileExistsScreen =
                 this->mpc.screens->get<ScreenId::FileExistsScreen>();
             fileExistsScreen->initialize(
                 replaceAction, initializeNameScreen,
@@ -77,9 +77,9 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc &mpc,
         }
         else
         {
-            auto vmpcMidiScreen =
+            const auto vmpcMidiScreen =
                 this->mpc.screens->get<ScreenId::VmpcMidiScreen>();
-            auto preset = vmpcMidiScreen->getActivePreset();
+            const auto preset = vmpcMidiScreen->getActivePreset();
             preset->name = presetName;
             this->mpc.getDisk()->writeMidiControlPreset(preset);
             MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(this->mpc);
@@ -114,7 +114,7 @@ void VmpcMidiPresetsScreen::displayUpAndDown()
 
 void VmpcMidiPresetsScreen::turnWheel(int i)
 {
-    auto &presets = mpc.midiControlPresets;
+    const auto &presets = mpc.midiControlPresets;
     const int presetIndex = (row + rowOffset) - 1;
 
     if (presetIndex < 0 || presetIndex >= presets.size())
@@ -147,7 +147,7 @@ void VmpcMidiPresetsScreen::function(int i)
 {
     ScreenComponent::function(i);
 
-    auto &presets = mpc.midiControlPresets;
+    const auto &presets = mpc.midiControlPresets;
 
     switch (i)
     {
@@ -164,7 +164,8 @@ void VmpcMidiPresetsScreen::function(int i)
 
             if (presetIndex == -1)
             {
-                auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+                const auto nameScreen =
+                    mpc.screens->get<ScreenId::NameScreen>();
                 nameScreen->initialize("New preset", 16, enterAction,
                                        "vmpc-midi-presets");
                 openScreenById(ScreenId::NameScreen);
@@ -181,7 +182,7 @@ void VmpcMidiPresetsScreen::function(int i)
             break;
         case 4:
         {
-            auto index = (row + rowOffset) - 1;
+            const auto index = (row + rowOffset) - 1;
 
             if (index == -1)
             {
@@ -189,7 +190,7 @@ void VmpcMidiPresetsScreen::function(int i)
             }
             else
             {
-                auto vmpcMidiScreen =
+                const auto vmpcMidiScreen =
                     mpc.screens->get<ScreenId::VmpcMidiScreen>();
                 MidiControlPersistence::loadFileByNameIntoPreset(
                     mpc, presets[index]->name,
@@ -271,15 +272,17 @@ void VmpcMidiPresetsScreen::right()
 
 void VmpcMidiPresetsScreen::displayRows()
 {
-    auto presets = mpc.midiControlPresets;
+    const auto presets = mpc.midiControlPresets;
 
     for (int i = 0; i < 4; i++)
     {
         const int presetIndex = (i + rowOffset) - 1;
         const int presetCount = static_cast<int>(presets.size());
-        auto name = findChild<Field>("name" + std::to_string(i));
-        auto autoLoadField = findChild<Field>("auto-load" + std::to_string(i));
-        auto autoLoadLabel = findChild<Label>("auto-load" + std::to_string(i));
+        const auto name = findChild<Field>("name" + std::to_string(i));
+        const auto autoLoadField =
+            findChild<Field>("auto-load" + std::to_string(i));
+        const auto autoLoadLabel =
+            findChild<Label>("auto-load" + std::to_string(i));
 
         name->Hide(presetIndex >= presetCount);
         autoLoadField->Hide(presetIndex == -1 || presetIndex >= presetCount);

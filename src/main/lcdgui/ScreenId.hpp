@@ -5,7 +5,6 @@
 
 namespace mpc::lcdgui
 {
-
     enum class ScreenId
     {
 #define X(ns, Class, name) Class,

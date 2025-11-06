@@ -21,23 +21,23 @@ void AssignScreen::open()
     displayLowRange();
     displayAssignNv();
 
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
     slider->addObserver(this);
 }
 
 void AssignScreen::close()
 {
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
     slider->deleteObserver(this);
 }
 
 void AssignScreen::turnWheel(int i)
 {
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
-    auto parameter = slider->getParameter();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
+    const auto parameter = slider->getParameter();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -93,19 +93,19 @@ void AssignScreen::turnWheel(int i)
 
 void AssignScreen::displayAssignNote()
 {
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
-    auto note = slider->getNote();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
+    const auto note = slider->getNote();
 
-    auto padIndex = program->getPadIndexFromNote(note);
-    auto padName = sampler->getPadName(padIndex);
+    const auto padIndex = program->getPadIndexFromNote(note);
+    const auto padName = sampler->getPadName(padIndex);
 
-    auto soundIndex =
+    const auto soundIndex =
         note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
-    auto soundName =
+    const auto soundName =
         soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
-    auto noteName = note == 34 ? "--" : std::to_string(note);
+    const auto noteName = note == 34 ? "--" : std::to_string(note);
 
     findField("assignnote")
         ->setText(noteName + "/" + padName + "-" + soundName);
@@ -113,16 +113,16 @@ void AssignScreen::displayAssignNote()
 
 void AssignScreen::displayParameter()
 {
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
     findField("parameter")->setText(typeNames[slider->getParameter()]);
 }
 
 void AssignScreen::displayHighRange()
 {
     int value = 0;
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
     auto sign = "";
 
     findField("highrange")->setSize(19, 9);
@@ -155,8 +155,8 @@ void AssignScreen::displayLowRange()
 {
     auto value = 0;
 
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
     auto sign = "";
     findField("lowrange")->setSize(19, 9);
 
@@ -186,11 +186,12 @@ void AssignScreen::displayLowRange()
 
 void AssignScreen::displayAssignNv()
 {
-    auto program = getProgramOrThrow();
-    auto slider = program->getSlider();
-    auto assignNvString = slider->getControlChange() == 0
-                              ? "OFF"
-                              : std::to_string(slider->getControlChange());
+    const auto program = getProgramOrThrow();
+    const auto slider = program->getSlider();
+    const auto assignNvString =
+        slider->getControlChange() == 0
+            ? "OFF"
+            : std::to_string(slider->getControlChange());
     findField("assignnv")->setTextPadded(assignNvString, " ");
 }
 

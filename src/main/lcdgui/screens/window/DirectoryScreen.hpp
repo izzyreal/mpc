@@ -34,7 +34,7 @@ namespace mpc::lcdgui::screens::window
     class DirectoryScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        DirectoryScreen(mpc::Mpc &mpc, const int layerIndex);
+        DirectoryScreen(mpc::Mpc &mpc, int layerIndex);
 
         void function(int f) override;
         void left() override;
@@ -65,7 +65,7 @@ namespace mpc::lcdgui::screens::window
         void setYOffset0(int i);
         void setYOffset1(int i);
         void setYPos0(int i);
-        std::string padFileName(std::string s, std::string pad);
+        std::string padFileName(const std::string &s, const std::string &pad);
         void drawGraphicsLeft();
         void drawGraphicsRight();
 

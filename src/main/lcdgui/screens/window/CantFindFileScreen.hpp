@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void open() override;
 
-        CantFindFileScreen(mpc::Mpc &mpc, const int layerIndex);
+        CantFindFileScreen(mpc::Mpc &mpc, int layerIndex);
 
     private:
         std::string fileName;

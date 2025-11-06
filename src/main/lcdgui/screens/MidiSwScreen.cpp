@@ -25,14 +25,14 @@ void MidiSwScreen::displaySwitchLabels()
 {
     for (int i = 0; i < 4; i++)
     {
-        auto label = findChild<TextComp>("switch" + std::to_string(i));
+        const auto label = findChild<TextComp>("switch" + std::to_string(i));
         label->setText("Switch " + std::to_string(i + 1 + xOffset));
     }
 }
 
 void MidiSwScreen::displayCtrlsAndFunctions()
 {
-    auto footswitchController =
+    const auto footswitchController =
         mpc.clientEventController->getClientMidiEventController()
             ->getFootswitchAssignmentController();
 
@@ -41,8 +41,9 @@ void MidiSwScreen::displayCtrlsAndFunctions()
     for (int i = 0; i < 4; i++)
     {
         const int idx = i + xOffset;
-        auto ctrlField = findChild<Field>("ctrl" + std::to_string(i));
-        auto functionField = findChild<Field>("function" + std::to_string(i));
+        const auto ctrlField = findChild<Field>("ctrl" + std::to_string(i));
+        const auto functionField =
+            findChild<Field>("function" + std::to_string(i));
 
         if (idx >= static_cast<int>(bindings.size()))
         {
@@ -91,7 +92,7 @@ void MidiSwScreen::turnWheel(int delta)
     const int selectedSwitch = xOffset + xPos;
     const bool editingCtrl = focusedFieldName.rfind("ctrl", 0) == 0;
 
-    auto footswitchController =
+    const auto footswitchController =
         mpc.clientEventController->getClientMidiEventController()
             ->getFootswitchAssignmentController();
 
@@ -143,9 +144,9 @@ void MidiSwScreen::turnWheel(int delta)
             binding);
 
         // Compute new function
-        int newIdx = std::clamp(currentIdx + delta, 0,
-                                static_cast<int>(allFns.size()) - 1);
-        MidiFootswitchFunction newFn = allFns[newIdx];
+        const int newIdx = std::clamp(currentIdx + delta, 0,
+                                      static_cast<int>(allFns.size()) - 1);
+        const MidiFootswitchFunction newFn = allFns[newIdx];
 
         // Replace binding with new function
         std::visit(
@@ -153,14 +154,14 @@ void MidiSwScreen::turnWheel(int delta)
             {
                 auto base = b; // copy shared fields
 
-                if (auto cid = footswitchToComponentIdOpt(newFn))
+                if (const auto cid = footswitchToComponentIdOpt(newFn))
                 {
                     HardwareBinding newB;
                     static_cast<MidiBindingBase &>(newB) = base;
                     newB.target.componentId = *cid;
                     binding = newB;
                 }
-                else if (auto cmd = footswitchToSequencerCmdOpt(newFn))
+                else if (const auto cmd = footswitchToSequencerCmdOpt(newFn))
                 {
                     SequencerBinding newB;
                     static_cast<MidiBindingBase &>(newB) = base;

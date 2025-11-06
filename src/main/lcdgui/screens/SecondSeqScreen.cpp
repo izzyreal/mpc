@@ -21,7 +21,7 @@ void SecondSeqScreen::open()
 
 void SecondSeqScreen::function(int i)
 {
-    auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
+    const auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
     switch (i)
     {
@@ -64,7 +64,7 @@ void SecondSeqScreen::setSq(int i)
 
 void SecondSeqScreen::displaySq()
 {
-    auto sqName = sequencer->getSequence(sq)->getName();
+    const auto sqName = sequencer->getSequence(sq)->getName();
     findField("sq")->setTextPadded(sq + 1, "0");
     findLabel("sequence-name")->setText("-" + sqName);
 }

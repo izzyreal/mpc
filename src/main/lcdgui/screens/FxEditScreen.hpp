@@ -24,7 +24,7 @@ namespace mpc::lcdgui::screens
         std::vector<std::weak_ptr<Effect>> findEffects();
 
     public:
-        FxEditScreen(mpc::Mpc &mpc, const int layerIndex);
+        FxEditScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

@@ -9,6 +9,6 @@ namespace mpc::lcdgui::screens::window
     public:
         void function(int i) override;
 
-        VmpcResetKeyboardScreen(mpc::Mpc &mpc, const int layerIndex);
+        VmpcResetKeyboardScreen(mpc::Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

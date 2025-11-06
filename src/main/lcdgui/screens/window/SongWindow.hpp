@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens::window
     {
 
     public:
-        SongWindow(mpc::Mpc &mpc, const int layerIndex);
+        SongWindow(mpc::Mpc &mpc, int layerIndex);
 
     public:
         void open() override;

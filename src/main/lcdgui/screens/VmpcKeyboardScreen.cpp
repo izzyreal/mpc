@@ -160,7 +160,7 @@ void VmpcKeyboardScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen =
+                const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
@@ -181,7 +181,7 @@ void VmpcKeyboardScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen =
+                const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";

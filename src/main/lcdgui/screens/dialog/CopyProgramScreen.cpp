@@ -62,7 +62,7 @@ void CopyProgramScreen::turnWheel(int i)
 void CopyProgramScreen::setPgm0(int i)
 {
     auto candidate = i;
-    auto up = i > pgm0;
+    const auto up = i > pgm0;
 
     candidate = up ? candidate - 1 : candidate + 1;
 
@@ -96,16 +96,16 @@ void CopyProgramScreen::setPgm1(int i)
 
 void CopyProgramScreen::displayPgm0()
 {
-    auto programName = sampler->getProgram(pgm0)->getName();
+    const auto programName = sampler->getProgram(pgm0)->getName();
     findField("pgm0")->setText(
         StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1()
 {
-    auto program1 = sampler->getProgram(pgm1);
+    const auto program1 = sampler->getProgram(pgm1);
 
-    auto programName = program1 ? program1->getName() : "(no program)";
+    const auto programName = program1 ? program1->getName() : "(no program)";
     findField("pgm1")->setText(
         StrUtil::padLeft(std::to_string(pgm1 + 1), " ", 2) + "-" + programName);
 }

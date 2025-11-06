@@ -8,6 +8,6 @@ namespace mpc::lcdgui::screens
     public:
         void function(int i) override;
 
-        FormatScreen(mpc::Mpc &mpc, const int layerIndex);
+        FormatScreen(mpc::Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens

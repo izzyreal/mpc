@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens::window
     public:
         void function(int i) override;
         void turnWheel(int i) override;
-        EditMultipleScreen(mpc::Mpc &mpc, const int layerIndex);
+        EditMultipleScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void close() override;
 

@@ -63,7 +63,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     if (dynamic_cast<Label *>(this) != nullptr)
     {
-        auto rect = getRect();
+        const auto rect = getRect();
         for (int x1 = rect.L + 1; x1 < rect.R; x1++)
         {
             for (int y1 = rect.T; y1 < rect.B - 1; y1++)
@@ -79,11 +79,11 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
         return;
     }
 
-    auto &font = mpc.getLayeredScreen()->font;
+    const auto &font = mpc.getLayeredScreen()->font;
     auto &atlas = mpc.getLayeredScreen()->atlas;
 
     int textx = x + 1;
-    int texty = y;
+    const int texty = y;
 
     int alignmentOffset = 0;
 
@@ -91,12 +91,13 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     if (alignment == Alignment::Centered && !textuallyAligned)
     {
-        auto charsToAlignCount = std::min(
+        const auto charsToAlignCount = std::min(
             int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
-        auto charsToAlign =
+        const auto charsToAlign =
             StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
         textToRender = charsToAlign + text.substr(charsToAlignCount);
-        auto charsWidthInPixels = mpc::Util::getTextWidthInPixels(charsToAlign);
+        const auto charsWidthInPixels =
+            mpc::Util::getTextWidthInPixels(charsToAlign);
         alignmentOffset = (alignmentEndX - charsWidthInPixels) * 0.5;
     }
 
@@ -114,7 +115,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
     int next = utf8_decode_next();
     int charCounter = 0;
 
-    auto field = dynamic_cast<Field *>(this);
+    const auto field = dynamic_cast<Field *>(this);
 
     while (next != UTF8_END && next >= 0)
     {
@@ -127,7 +128,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
         {
             for (int y1 = 0; y1 < current_char.height; y1++)
             {
-                bool on = atlas[atlasy + y1][atlasx + x1];
+                const bool on = atlas[atlasy + y1][atlasx + x1];
 
                 if (on)
                 {
@@ -182,10 +183,10 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
 
     if (twoDots)
     {
-        for (auto xPos : std::vector<int>{12, 30})
+        for (const auto xPos : std::vector<int>{12, 30})
         {
-            bool doubleInverted = field != nullptr && field->isSplit() &&
-                                  field->getActiveSplit() + 2 <= xPos / 6;
+            const bool doubleInverted = field != nullptr && field->isSplit() &&
+                                        field->getActiveSplit() + 2 <= xPos / 6;
 
             const bool color = (field != nullptr && field->isTypeModeEnabled())
                                    ? false
@@ -260,15 +261,15 @@ void TextComp::setText(const std::string &s)
 
     if (alignment == Alignment::Centered && alignmentEndX != w)
     {
-        auto charsToAlignCount = std::min(
+        const auto charsToAlignCount = std::min(
             int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
-        auto charsToAlign =
+        const auto charsToAlign =
             StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
 
         if ((charsToAlignCount - charsToAlign.length()) % 2 == 0)
         {
             text = s.substr(charsToAlignCount);
-            auto nudge = (charsToAlignCount - charsToAlign.length()) / 2;
+            const auto nudge = (charsToAlignCount - charsToAlign.length()) / 2;
 
             for (int i = 0; i < nudge; i++)
             {
@@ -297,14 +298,14 @@ void TextComp::setText(const std::string &s)
     SetDirty();
 }
 
-void TextComp::setTextPadded(std::string s, std::string padding)
+void TextComp::setTextPadded(const std::string &s, const std::string &padding)
 {
-    auto columns = (int)floor(w / FONT_WIDTH);
-    std::string padded = StrUtil::padLeft(s, padding, columns);
+    const auto columns = (int)floor(w / FONT_WIDTH);
+    const std::string padded = StrUtil::padLeft(s, padding, columns);
     setText(padded);
 }
 
-void TextComp::setTextPadded(int i, std::string padding)
+void TextComp::setTextPadded(int i, const std::string &padding)
 {
     setTextPadded(std::to_string(i), padding);
 }

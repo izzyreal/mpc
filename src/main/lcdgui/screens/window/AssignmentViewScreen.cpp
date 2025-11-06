@@ -43,7 +43,7 @@ void AssignmentViewScreen::up()
         return;
     }
 
-    auto padIndex = mpc.clientEventController->getSelectedPad() + 4;
+    const auto padIndex = mpc.clientEventController->getSelectedPad() + 4;
     ls->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
@@ -58,7 +58,7 @@ void AssignmentViewScreen::down()
         return;
     }
 
-    auto padIndex = mpc.clientEventController->getSelectedPad() - 4;
+    const auto padIndex = mpc.clientEventController->getSelectedPad() - 4;
     ls->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
@@ -74,7 +74,7 @@ void AssignmentViewScreen::left()
 
     ScreenComponent::left();
 
-    auto padIndex = mpc.clientEventController->getSelectedPad() - 1;
+    const auto padIndex = mpc.clientEventController->getSelectedPad() - 1;
     ls->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
@@ -89,15 +89,15 @@ void AssignmentViewScreen::right()
     }
 
     ScreenComponent::right();
-    auto padIndex = mpc.clientEventController->getSelectedPad() + 1;
+    const auto padIndex = mpc.clientEventController->getSelectedPad() + 1;
     ls->setFocus(padFocusNames[padIndex % 16]);
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
 void AssignmentViewScreen::turnWheel(int i)
 {
-    auto program = getProgramOrThrow();
-    auto selectedPad =
+    const auto program = getProgramOrThrow();
+    const auto selectedPad =
         program->getPad(mpc.clientEventController->getSelectedPad());
     selectedPad->setNote(selectedPad->getNote() + i);
     displayNote();
@@ -140,16 +140,17 @@ void AssignmentViewScreen::displayAssignmentView()
 
 void AssignmentViewScreen::displayPad(int i)
 {
-    auto program = getProgramOrThrow();
+    const auto program = getProgramOrThrow();
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
-    auto note = program->getPad(i + (16 * bank))->getNote();
+    const auto note = program->getPad(i + (16 * bank))->getNote();
 
     std::string sampleName;
 
     if (note != 34)
     {
-        auto sampleNumber = program->getNoteParameters(note)->getSoundIndex();
+        const auto sampleNumber =
+            program->getNoteParameters(note)->getSoundIndex();
         sampleName =
             sampleNumber != -1 ? sampler->getSoundName(sampleNumber) : "--";
 
@@ -171,17 +172,17 @@ void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 
 void AssignmentViewScreen::displayNote()
 {
-    auto program = getProgramOrThrow();
-    auto note = program->getPad(getPadIndexFromFocus())->getNote();
-    auto text = note == 34 ? "--" : std::to_string(note);
+    const auto program = getProgramOrThrow();
+    const auto note = program->getPad(getPadIndexFromFocus())->getNote();
+    const auto text = note == 34 ? "--" : std::to_string(note);
     findField("note")->setText(text);
 }
 
 void AssignmentViewScreen::displaySoundName()
 {
 
-    auto padIndex = getPadIndexFromFocus();
-    auto program = getProgramOrThrow();
+    const auto padIndex = getPadIndexFromFocus();
+    const auto program = getProgramOrThrow();
     const int note = program->getPad(padIndex)->getNote();
 
     if (note == 34)
@@ -192,10 +193,10 @@ void AssignmentViewScreen::displaySoundName()
 
     const int soundIndex = program->getNoteParameters(note)->getSoundIndex();
 
-    std::string soundName =
+    const std::string soundName =
         soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
 
-    std::string stereo =
+    const std::string stereo =
         soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)"
                                                                      : "";
 

@@ -107,7 +107,8 @@ void SaveScreen::function(int i)
                     return;
                 }
 
-                auto &candidateVolume = mpc.getDisks()[device]->getVolume();
+                const auto &candidateVolume =
+                    mpc.getDisks()[device]->getVolume();
 
                 if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
                 {
@@ -115,10 +116,11 @@ void SaveScreen::function(int i)
                     return;
                 }
 
-                auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
+                const auto oldIndex =
+                    mpc.getDiskController()->getActiveDiskIndex();
 
                 mpc.getDiskController()->setActiveDiskIndex(device);
-                auto newDisk = mpc.getDisk();
+                const auto newDisk = mpc.getDisk();
 
                 if (newDisk->getVolume().type ==
                     mpc::disk::VolumeType::USB_VOLUME)
@@ -196,9 +198,9 @@ void SaveScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "directory")
     {
-        auto disk = mpc.getDisk();
-        auto currentDir = disk->getDirectoryName();
-        auto parents = disk->getParentFileNames();
+        const auto disk = mpc.getDisk();
+        const auto currentDir = disk->getDirectoryName();
+        const auto parents = disk->getParentFileNames();
 
         int position = -1;
 
@@ -330,7 +332,7 @@ void SaveScreen::displayFile()
         }
         case 1:
         {
-            auto num = StrUtil::padLeft(
+            const auto num = StrUtil::padLeft(
                 std::to_string(sequencer->getActiveSequenceIndex() + 1), "0",
                 2);
             const auto sequenceName = sequencer->getActiveSequence()->getName();
@@ -362,7 +364,7 @@ void SaveScreen::displayFile()
 
 void SaveScreen::displaySize()
 {
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
     auto size = 0;
 
     switch (type)
@@ -422,13 +424,13 @@ void SaveScreen::displayDirectory()
 
 void SaveScreen::displayDevice()
 {
-    auto dev = findChild<Field>("device");
+    const auto dev = findChild<Field>("device");
     dev->setText(mpc.getDisks()[device]->getVolume().label);
 }
 
 void SaveScreen::displayDeviceType()
 {
-    auto deviceTypeLabel = findChild<Label>("device-type");
+    const auto deviceTypeLabel = findChild<Label>("device-type");
     deviceTypeLabel->setText(
         mpc.getDisks()[device]->getVolume().typeShortName());
 }

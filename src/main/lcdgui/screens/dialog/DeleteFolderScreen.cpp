@@ -28,14 +28,14 @@ void DeleteFolderScreen::static_deleteFolder(void *this_p)
 
 void DeleteFolderScreen::deleteFolder()
 {
-    auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
+    const auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
     openScreenById(ScreenId::PopupScreen);
-    auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
-    auto file = directoryScreen->getSelectedFile();
-    auto fileName = file->getName();
+    const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
+    const auto file = directoryScreen->getSelectedFile();
+    const auto fileName = file->getName();
     popupScreen->setText("Delete:" + fileName);
 
-    auto disk = mpc.getDisk();
+    const auto disk = mpc.getDisk();
     auto parentFileNames = disk->getParentFileNames();
 
     if (disk->deleteRecursive(file))
@@ -78,7 +78,7 @@ void DeleteFolderScreen::deleteFolder()
         }
         else
         {
-            auto nextDir = parentFileNames[currentIndex];
+            const auto nextDir = parentFileNames[currentIndex];
             disk->moveForward(nextDir);
             disk->initFiles();
         }

@@ -26,7 +26,7 @@ EventRegistry::EventRegistry()
 
     std::atomic_store_explicit(&snapshotPtr, &snapA, std::memory_order_release);
 
-    queue = std::make_shared<moodycamel::ConcurrentQueue<EventMessage>>(512);
+    eventMessageQueue = std::make_shared<EventMessageQueue>(512);
 }
 
 EventRegistry::EventRegistry(const EventRegistry &other) noexcept
@@ -48,7 +48,7 @@ EventRegistry &EventRegistry::operator=(const EventRegistry &other) noexcept
 
 void EventRegistry::enqueue(EventMessage &&msg) const
 {
-    queue->enqueue(std::move(msg));
+    eventMessageQueue->enqueue(std::move(msg));
 }
 
 void EventRegistry::registerPhysicalPadPress(
@@ -279,7 +279,7 @@ SnapshotView EventRegistry::getSnapshot() const noexcept
 void EventRegistry::drainQueue() noexcept
 {
     EventMessage msg;
-    while (queue->try_dequeue(msg))
+    while (eventMessageQueue->try_dequeue(msg))
     {
         applyMessage(msg);
     }

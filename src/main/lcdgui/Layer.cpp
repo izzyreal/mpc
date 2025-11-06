@@ -5,28 +5,28 @@
 
 using namespace mpc::lcdgui;
 
-Layer::Layer(int index) : Component("layer " + std::to_string(index)) {}
+Layer::Layer(const int index) : Component("layer " + std::to_string(index)) {}
 
-mpc::lcdgui::Background *Layer::getBackground()
+Background *Layer::getBackground()
 {
     return findChild<Background>("").get();
 }
 
-mpc::lcdgui::FunctionKeys *Layer::getFunctionKeys()
+FunctionKeys *Layer::getFunctionKeys()
 {
     return findChild<FunctionKeys>("function-keys").get();
 }
 
-bool Layer::setFocus(std::string fieldName)
+bool Layer::setFocus(const std::string &fieldName)
 {
-    auto newFocus = findField(fieldName);
+    const auto newFocus = findField(fieldName);
 
     if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
     {
         return false;
     }
 
-    for (auto &f : findFields())
+    for (const auto &f : findFields())
     {
         f->loseFocus(fieldName);
     }

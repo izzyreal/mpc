@@ -16,10 +16,11 @@ TrackScreen::TrackScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void TrackScreen::open()
 {
-    auto activeTrackIndex = sequencer->getActiveTrackIndex();
-    auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
+    const auto activeTrackIndex = sequencer->getActiveTrackIndex();
+    const auto defaultTrackName =
+        sequencer->getDefaultTrackName(activeTrackIndex);
 
-    auto track = sequencer->getActiveTrack();
+    const auto track = sequencer->getActiveTrack();
     findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
     findLabel("tracknamerest")->setText(track->getName().substr(1));
 
@@ -78,7 +79,7 @@ void TrackScreen::openNameScreen()
         };
     }
 
-    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+    const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
     nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequencer");
     openScreenById(ScreenId::NameScreen);
 }

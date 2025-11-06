@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
         void openWindow() override;
 
-        PgmParamsScreen(mpc::Mpc &mpc, const int layerIndex);
+        PgmParamsScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;

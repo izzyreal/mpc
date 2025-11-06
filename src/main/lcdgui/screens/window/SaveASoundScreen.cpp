@@ -23,7 +23,7 @@ void SaveASoundScreen::open()
 {
     if (ls->isPreviousScreen({ScreenId::SaveScreen}))
     {
-        auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+        const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->setNameToEdit(sampler->getSound()->getName());
     }
 
@@ -64,7 +64,7 @@ void SaveASoundScreen::function(int i)
         {
             auto disk = mpc.getDisk();
             auto s = sampler->getSound();
-            auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
+            const auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
             auto fileName =
                 mpc::Util::getFileName(mpc.screens->get<ScreenId::NameScreen>()
                                            ->getNameWithoutSpaces()) +
@@ -93,7 +93,7 @@ void SaveASoundScreen::function(int i)
             {
                 auto replaceAction = [saveAction, disk, fileName]
                 {
-                    auto success = disk->getFile(fileName)->del();
+                    const auto success = disk->getFile(fileName)->del();
 
                     if (success)
                     {
@@ -103,7 +103,8 @@ void SaveASoundScreen::function(int i)
 
                 const auto initializeNameScreen = [this]
                 {
-                    auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
+                    const auto nameScreen =
+                        mpc.screens->get<ScreenId::NameScreen>();
                     auto enterAction = [this](std::string &)
                     {
                         openScreenById(ScreenId::SaveASoundScreen);
@@ -112,7 +113,7 @@ void SaveASoundScreen::function(int i)
                                            16, enterAction, "save");
                 };
 
-                auto fileExistsScreen =
+                const auto fileExistsScreen =
                     mpc.screens->get<ScreenId::FileExistsScreen>();
                 fileExistsScreen->initialize(
                     replaceAction, initializeNameScreen,

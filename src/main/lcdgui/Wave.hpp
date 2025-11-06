@@ -29,9 +29,9 @@ namespace mpc::lcdgui
         void initSamplesPerPixel();
 
     public:
-        void
-        setSampleData(std::shared_ptr<const std::vector<float>> newSampleData,
-                      bool newMono, unsigned int newView);
+        void setSampleData(
+            const std::shared_ptr<const std::vector<float>> &newSampleData,
+            bool newMono, unsigned int newView);
         void setSelection(unsigned int start, unsigned int end);
 
     public:

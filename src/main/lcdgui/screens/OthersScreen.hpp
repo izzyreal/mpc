@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens
         void setContrast(int i);
         int getContrast();
 
-        OthersScreen(mpc::Mpc &mpc, const int layerIndex);
+        OthersScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
         void function(int i) override;
         void turnWheel(int notch) override;

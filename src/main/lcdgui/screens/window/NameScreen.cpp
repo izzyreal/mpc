@@ -18,7 +18,7 @@ NameScreen::NameScreen(mpc::Mpc &mpc, const int layerIndex)
 }
 
 void NameScreen::initialize(
-    std::string newNameToEdit, unsigned char nameLimitToUse,
+    const std::string &newNameToEdit, unsigned char nameLimitToUse,
     const std::function<void(std::string &)> &enterActionToUse,
     const std::string &cancelScreenToUse,
     const std::function<void()> &mainScreenActionToUse)
@@ -37,7 +37,7 @@ std::weak_ptr<Underline> NameScreen::findUnderline()
 
 void NameScreen::open()
 {
-    for (auto &f : findFields())
+    for (const auto &f : findFields())
     {
         f->loseFocus("");
     }
@@ -87,7 +87,7 @@ void NameScreen::left()
     if (editing)
     {
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
-        auto focus = findFocus();
+        const auto focus = findFocus();
         focus->setInverted(false);
         drawUnderline();
     }
@@ -108,7 +108,7 @@ void NameScreen::right()
     if (editing)
     {
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
-        auto focus = findFocus();
+        const auto focus = findFocus();
         printf("New focus: %s\n", focus->getName().c_str());
         focus->setInverted(false);
         drawUnderline();
@@ -185,14 +185,14 @@ void NameScreen::drawUnderline()
 {
     if (editing)
     {
-        std::string focus = ls->getFocusedFieldName();
+        const std::string focus = ls->getFocusedFieldName();
 
         if (focus.length() != 1 && focus.length() != 2)
         {
             return;
         }
 
-        auto u = findUnderline().lock();
+        const auto u = findUnderline().lock();
 
         for (int i = 0; i < 16; i++)
         {
@@ -207,7 +207,7 @@ void NameScreen::initEditColors()
 {
     for (int i = 0; i < 16; i++)
     {
-        auto field = findField(std::to_string(i));
+        const auto field = findField(std::to_string(i));
         field->setInverted(false);
     }
 
@@ -215,7 +215,7 @@ void NameScreen::initEditColors()
     focusedField->setInverted(false);
 }
 
-void NameScreen::setNameToEdit(std::string newNameToEdit)
+void NameScreen::setNameToEdit(const std::string &newNameToEdit)
 {
     nameToEdit = newNameToEdit;
     nameLimit = 16;
@@ -227,7 +227,7 @@ void NameScreen::setNameLimit(int i)
     nameLimit = i;
 }
 
-void NameScreen::setNameToEdit(std::string str, int i)
+void NameScreen::setNameToEdit(const std::string &str, int i)
 {
     nameToEdit[i] = str[0];
 }
@@ -259,7 +259,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
         nameToEdit = StrUtil::padRight(nameToEdit, " ", i + 1);
     }
 
-    char schar = nameToEdit[i];
+    const char schar = nameToEdit[i];
     std::string s{schar};
     auto stringCounter = 0;
 
@@ -311,7 +311,7 @@ void NameScreen::displayName()
         return;
     }
 
-    auto paddedName = StrUtil::padRight(nameToEdit, " ", nameLimit);
+    const auto paddedName = StrUtil::padRight(nameToEdit, " ", nameLimit);
 
     findField("0")->setText(paddedName.substr(0, 1));
     findField("1")->setText(paddedName.substr(1, 1));

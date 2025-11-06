@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens
     public:
         void function(int i) override;
 
-        SelectMixerDrumScreen(mpc::Mpc &mpc, const int layerIndex);
+        SelectMixerDrumScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
     };

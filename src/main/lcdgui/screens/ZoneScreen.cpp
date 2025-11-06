@@ -58,7 +58,7 @@ void ZoneScreen::openWindow()
 
     const auto focusedField = getFocusedField();
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!focusedField || !sound)
     {
@@ -114,7 +114,7 @@ void ZoneScreen::function(int f)
                 return;
             }
 
-            auto editSoundScreen =
+            const auto editSoundScreen =
                 mpc.screens->get<ScreenId::EditSoundScreen>();
             editSoundScreen->setReturnToScreenName("zone");
             openScreenById(ScreenId::EditSoundScreen);
@@ -141,7 +141,7 @@ void ZoneScreen::right()
 void ZoneScreen::turnWheel(int i)
 {
 
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     const auto focusedField = getFocusedField();
 
@@ -261,7 +261,7 @@ void ZoneScreen::setSliderZoneEnd(int i)
 
 void ZoneScreen::displayWave()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -270,8 +270,8 @@ void ZoneScreen::displayWave()
         return;
     }
 
-    auto sampleData = sound->getSampleData();
-    auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
+    const auto sampleData = sound->getSampleData();
+    const auto trimScreen = mpc.screens->get<ScreenId::TrimScreen>();
     findWave()->setSampleData(sampleData, sampler->getSound()->isMono(),
                               trimScreen->view);
     findWave()->setSelection(getZoneStart(zone), getZoneEnd(zone));
@@ -279,7 +279,7 @@ void ZoneScreen::displayWave()
 
 void ZoneScreen::displaySnd()
 {
-    auto sound = sampler->getSound();
+    const auto sound = sampler->getSound();
 
     if (!sound)
     {
@@ -421,7 +421,7 @@ int ZoneScreen::getZoneStart(int zoneIndex)
 
 void ZoneScreen::setZoneEnd(int zoneIndex, int end)
 {
-    auto length = sampler->getSound()->getFrameCount();
+    const auto length = sampler->getSound()->getFrameCount();
 
     if (end < zones[zoneIndex][0])
     {
@@ -499,7 +499,7 @@ void ZoneScreen::pressEnter()
         return;
     }
 
-    auto candidate = focusedField->enter();
+    const auto candidate = focusedField->enter();
     auto sound = sampler->getSound();
 
     if (candidate != INT_MAX)
@@ -508,14 +508,14 @@ void ZoneScreen::pressEnter()
 
         if (focusedFieldName == "st")
         {
-            auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+            const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
             zoneScreen->setZoneStart(zoneScreen->zone, candidate);
             displaySt();
             displayWave();
         }
         else if (focusedFieldName == "end")
         {
-            auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+            const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
             zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
             displayEnd();
             displayWave();

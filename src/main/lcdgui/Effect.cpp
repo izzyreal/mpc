@@ -23,9 +23,9 @@ void Effect::Draw(std::vector<std::vector<bool>> *pixels)
         return;
     }
 
-    auto rect = getRect();
-    int x = rect.L;
-    int y = rect.T;
+    const auto rect = getRect();
+    const int x = rect.L;
+    const int y = rect.T;
 
     for (int i = x + 1; i < x + rect.W() - 1; i++)
     {

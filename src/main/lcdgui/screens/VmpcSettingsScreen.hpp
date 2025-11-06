@@ -44,7 +44,7 @@ namespace mpc::lcdgui::screens
         };
         void turnWheel(int i) override;
 
-        VmpcSettingsScreen(mpc::Mpc &mpc, const int layerIndex);
+        VmpcSettingsScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
@@ -72,7 +72,7 @@ namespace mpc::lcdgui::screens
         void set16LevelsEraseMode(int i);
         void setAutoConvertWavs(int i);
         void setMidiControlMode(int i);
-        void setNameTypingWithKeyboard(const bool);
+        void setNameTypingWithKeyboard(bool);
 
         void displayInitialPadMapping();
         void display16LevelsEraseMode();

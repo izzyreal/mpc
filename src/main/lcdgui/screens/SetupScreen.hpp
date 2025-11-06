@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens
     class SetupScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        SetupScreen(mpc::Mpc &mpc, const int layerIndex);
+        SetupScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

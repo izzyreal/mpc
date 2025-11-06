@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        NextSeqScreen(mpc::Mpc &mpc, const int layerIndex);
+        NextSeqScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

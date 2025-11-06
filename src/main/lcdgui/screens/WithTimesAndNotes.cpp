@@ -13,7 +13,7 @@ using namespace mpc::lcdgui::screens;
 
 bool WithTimesAndNotes::checkAllTimes(mpc::Mpc &mpc, int notch, Sequence *seq)
 {
-    auto sequence =
+    const auto sequence =
         seq != nullptr ? seq : mpc.getSequencer()->getActiveSequence().get();
 
     const auto focusedFieldName = mpc.getLayeredScreen()
@@ -67,7 +67,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc &mpc, int notch,
 {
     auto param = mpc.getLayeredScreen()->getFocusedFieldName();
 
-    auto timesHaveChanged = checkAllTimes(mpc, notch, seq);
+    const auto timesHaveChanged = checkAllTimes(mpc, notch, seq);
     auto notesHaveChanged = false;
 
     const auto focusedFieldName = mpc.getLayeredScreen()
@@ -85,7 +85,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc &mpc, int notch,
 
         if (track->getBus() != 0)
         {
-            auto note = note0 + notch;
+            const auto note = note0 + notch;
 
             if (note < 34 || note > 98)
             {

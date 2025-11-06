@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void function(int i) override;
 
-        SaveAProgramScreen(mpc::Mpc &mpc, const int layerIndex);
+        SaveAProgramScreen(mpc::Mpc &mpc, int layerIndex);
         void open() override;
 
     private:

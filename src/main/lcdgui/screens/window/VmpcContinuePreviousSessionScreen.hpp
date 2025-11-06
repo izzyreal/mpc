@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window
     public:
         VmpcContinuePreviousSessionScreen(mpc::Mpc &, int layer);
 
-        void setRestoreAutoSavedStateAction(std::function<void()>);
+        void setRestoreAutoSavedStateAction(const std::function<void()> &);
 
         void function(int) override;
 

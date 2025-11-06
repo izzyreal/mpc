@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        MidiSwScreen(mpc::Mpc &, const int layerIndex);
+        MidiSwScreen(mpc::Mpc &, int layerIndex);
 
         void open() override;
         void turnWheel(int i) override;
@@ -24,7 +24,7 @@ namespace mpc::lcdgui::screens
         void displaySwitchLabels();
         void displayCtrlsAndFunctions();
 
-        void setSwitch(const int index, const std::pair<int, int>);
+        void setSwitch(int index, std::pair<int, int>);
 
         void setSwitches(const std::vector<std::pair<int, int>> &);
 

@@ -9,11 +9,10 @@ namespace mpc::sequencer
 {
     bool isDrumNote(int number);
 
-    class NoteOffEvent : public Event
+    class NoteOffEvent final : public Event
     {
         friend class NoteOnEvent;
 
-    private:
         int number = 60;
         NoteOffEvent() {}
         void setNote(int i);
@@ -68,7 +67,7 @@ namespace mpc::sequencer
             metronomeOnlyTickPosition = pos;
         }
 
-        int getMetronomeOnlyTickPosition()
+        int getMetronomeOnlyTickPosition() const
         {
             return metronomeOnlyTickPosition;
         }

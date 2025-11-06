@@ -18,15 +18,15 @@ LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void LoadASequenceScreen::open()
 {
-    auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-    auto midFile = loadScreen->getSelectedFile();
+    const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+    const auto midFile = loadScreen->getSelectedFile();
 
     if (!StrUtil::eqIgnoreCase(midFile->getExtension(), ".mid"))
     {
         return;
     }
 
-    sequence_or_error parsedMidFile = mpc.getDisk()->readMid2(midFile);
+    const sequence_or_error parsedMidFile = mpc.getDisk()->readMid2(midFile);
 
     if (parsedMidFile.has_value())
     {
@@ -91,7 +91,7 @@ void LoadASequenceScreen::displayLoadInto()
 
 void LoadASequenceScreen::displayFile()
 {
-    auto s = sequencer->getPlaceHolder();
+    const auto s = sequencer->getPlaceHolder();
     findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) +
                                ".MID");
 }

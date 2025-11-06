@@ -22,7 +22,7 @@ EraseScreen::EraseScreen(mpc::Mpc &mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-    auto bus = sequencer->getActiveTrack()->getBus();
+    const auto bus = sequencer->getActiveTrack()->getBus();
 
     if (bus == 0)
     {
@@ -41,7 +41,7 @@ void EraseScreen::open()
 
     setTime0(0);
 
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
     setTime1(seq->getLastTick());
 
     displayErase();
@@ -100,7 +100,7 @@ void EraseScreen::displayTrack()
     }
     else
     {
-        auto sequence = sequencer->getActiveSequence();
+        const auto sequence = sequencer->getActiveSequence();
         trackName = sequence->getTrack(track)->getActualName();
     }
 
@@ -110,7 +110,7 @@ void EraseScreen::displayTrack()
 
 void EraseScreen::displayTime()
 {
-    auto sequence = sequencer->getActiveSequence().get();
+    const auto sequence = sequencer->getActiveSequence().get();
     findField("time0")->setTextPadded(
         SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
@@ -150,7 +150,7 @@ void EraseScreen::displayNotes()
         return;
     }
 
-    auto bus = sequencer->getActiveTrack()->getBus();
+    const auto bus = sequencer->getActiveTrack()->getBus();
 
     findField("note0")->Hide(false);
     findLabel("note0")->Hide(false);
@@ -179,9 +179,9 @@ void EraseScreen::displayNotes()
         }
         else
         {
-            auto program = getProgramOrThrow();
-            auto padIndexWithBank = program->getPadIndexFromNote(note0);
-            auto padName = sampler->getPadName(padIndexWithBank);
+            const auto program = getProgramOrThrow();
+            const auto padIndexWithBank = program->getPadIndexFromNote(note0);
+            const auto padName = sampler->getPadName(padIndexWithBank);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
     }
@@ -218,7 +218,7 @@ void EraseScreen::doErase()
     const auto noteA = note0;
     const auto noteB = midi ? note1 : -1;
 
-    auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getActiveSequence();
 
     const auto selectedType = eventTypes[type];
 

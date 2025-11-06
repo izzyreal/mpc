@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void turnWheel(int i) override;
 
-        IgnoreTempoChangeScreen(mpc::Mpc &mpc, const int layerIndex);
+        IgnoreTempoChangeScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

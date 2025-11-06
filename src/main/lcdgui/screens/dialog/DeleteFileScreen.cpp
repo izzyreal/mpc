@@ -31,7 +31,7 @@ void DeleteFileScreen::function(int i)
 
         case 4:
         {
-            auto directoryScreen =
+            const auto directoryScreen =
                 mpc.screens->get<ScreenId::DirectoryScreen>();
             ls->showPopupAndAwaitInteraction(
                 "Delete: " + directoryScreen->getSelectedFile()->getName());
@@ -50,17 +50,18 @@ void DeleteFileScreen::deleteFile()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
-    auto disk = mpc.getDisk();
+    const auto disk = mpc.getDisk();
 
     if (disk->deleteSelectedFile())
     {
         disk->flush();
         disk->initFiles();
 
-        auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
+        const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
         loadScreen->setFileLoad(loadScreen->fileLoad - 1);
 
-        auto directoryScreen = mpc.screens->get<ScreenId::DirectoryScreen>();
+        const auto directoryScreen =
+            mpc.screens->get<ScreenId::DirectoryScreen>();
         directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
     }
 

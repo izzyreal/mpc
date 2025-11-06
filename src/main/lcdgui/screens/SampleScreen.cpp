@@ -26,13 +26,13 @@ void SampleScreen::open()
     displayMonitor();
     displayPreRec();
 
-    auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getAudioMidiServices();
     ams->getSoundRecorder()->addObserver(this);
 }
 
 void SampleScreen::close()
 {
-    auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getAudioMidiServices();
     ams->getSoundRecorder()->deleteObserver(this);
 }
 
@@ -109,7 +109,7 @@ void SampleScreen::function(int i)
             }
             break;
         case 5:
-            auto ams = mpc.getAudioMidiServices();
+            const auto ams = mpc.getAudioMidiServices();
 
             if (ams->isRecordingSound())
             {
@@ -124,7 +124,7 @@ void SampleScreen::function(int i)
             }
             else
             {
-                auto sound = sampler->addSound();
+                const auto sound = sampler->addSound();
 
                 if (!sound)
                 {
@@ -132,7 +132,7 @@ void SampleScreen::function(int i)
                 }
 
                 sound->setName(sampler->addOrIncreaseNumber("sound1"));
-                auto lengthInFrames = time * (44100 * 0.1);
+                const auto lengthInFrames = time * (44100 * 0.1);
                 ams->getSoundRecorder()->prepare(
                     sound, lengthInFrames,
                     ams->getAudioServer()->getSampleRate());
@@ -146,7 +146,7 @@ void SampleScreen::function(int i)
 
 void SampleScreen::turnWheel(int i)
 {
-    auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getAudioMidiServices();
 
     if (!ams->isRecordingSound())
     {
@@ -171,7 +171,7 @@ void SampleScreen::turnWheel(int i)
         else if (focusedFieldName == "monitor")
         {
             setMonitor(monitor + i);
-            bool muteMonitor = monitor == 0;
+            const bool muteMonitor = monitor == 0;
             mpc.getAudioMidiServices()->muteMonitor(muteMonitor);
         }
         else if (focusedFieldName == "prerec")
@@ -254,7 +254,7 @@ void SampleScreen::displayInput()
 
 void SampleScreen::displayThreshold()
 {
-    auto thresholdText =
+    const auto thresholdText =
         threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
     findField("threshold")->setTextPadded(thresholdText);
 }
@@ -390,9 +390,9 @@ void SampleScreen::update(Observable *o, Message message)
     {
         try
         {
-            auto vuValue = std::get<std::pair<float, float>>(message);
-            auto left = vuValue.first;
-            auto right = vuValue.second;
+            const auto vuValue = std::get<std::pair<float, float>>(message);
+            const auto left = vuValue.first;
+            const auto right = vuValue.second;
             if (left > peakL)
             {
                 peakL = left;

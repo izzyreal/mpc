@@ -35,7 +35,7 @@ namespace mpc::lcdgui::screens
         void right() override;
         void openWindow() override;
 
-        MixerScreen(mpc::Mpc &mpc, const int layerIndex);
+        MixerScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void close() override;
@@ -86,7 +86,7 @@ namespace mpc::lcdgui::screens
 
     public:
         int getTab();
-        void pressPadIndexWithoutBank(const uint8_t padIndexWithoutBank);
+        void pressPadIndexWithoutBank(uint8_t padIndexWithoutBank);
 
     public:
         void update(Observable *o, Message message) override;

@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens
     class SongScreen : public mpc::lcdgui::ScreenComponent
     {
     public:
-        SongScreen(mpc::Mpc &mpc, const int layerIndex);
+        SongScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
         void up() override;
@@ -30,7 +30,7 @@ namespace mpc::lcdgui::screens
         void function(int i) override;
 
         void setOffset(int i);
-        void setDefaultSongName(std::string s);
+        void setDefaultSongName(const std::string &s);
         std::string getDefaultSongName();
         int getOffset();
         int getActiveSongIndex();

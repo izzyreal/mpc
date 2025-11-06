@@ -27,7 +27,7 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc &mpc, const int layerIndex)
 
     const std::vector<std::string> letters{"A", "B", "C"};
 
-    for (auto &s : timeStretchPresetNames)
+    for (const auto &s : timeStretchPresetNames)
     {
         for (int i = 0; i < 3; i++)
         {
@@ -202,7 +202,7 @@ void EditSoundScreen::displayVariable()
     }
     else if (edit == 3)
     {
-        auto sampleName =
+        const auto sampleName =
             sampler->getSortedSounds()[insertSoundIndex].first->getName();
         findLabel("new-name")->setSize(11 * 6, 9);
         findLabel("new-name")->setText("Insert Snd:");
@@ -227,7 +227,7 @@ void EditSoundScreen::displayVariable()
                           20); // , 20 is that still from the old days?
         findField("new-name")->setText(newName);
 
-        auto trimmedPercentage =
+        const auto trimmedPercentage =
             StrUtil::TrimDecimals(std::to_string(timeStretchRatio * 0.01), 2);
         findField("ratio")->setText(
             StrUtil::padLeft(trimmedPercentage, " ", 6) + "%");
@@ -238,7 +238,7 @@ void EditSoundScreen::displayVariable()
     }
 }
 
-void EditSoundScreen::setNewName(std::string s)
+void EditSoundScreen::setNewName(const std::string &s)
 {
     newName = s;
 }
@@ -304,7 +304,7 @@ void EditSoundScreen::setTimeStretchAdjust(int i)
     displayVariable();
 }
 
-void EditSoundScreen::setReturnToScreenName(std::string s)
+void EditSoundScreen::setReturnToScreenName(const std::string &s)
 {
     returnToScreenName = s;
 }
@@ -403,10 +403,10 @@ void EditSoundScreen::turnWheel(int i)
     }
 }
 
-static std::shared_ptr<Sound> createZone(std::shared_ptr<Sampler> sampler,
-                                         const std::shared_ptr<Sound> source,
-                                         const int start, const int end,
-                                         const int endMargin)
+static std::shared_ptr<Sound>
+createZone(const std::shared_ptr<Sampler> &sampler,
+           const std::shared_ptr<Sound> &source, const int start, const int end,
+           const int endMargin)
 {
     const auto overlapInFrames =
         (int)(endMargin * source->getSampleRate() * 0.001);

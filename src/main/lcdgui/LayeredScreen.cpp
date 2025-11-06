@@ -24,9 +24,7 @@
 #include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
 
-#include <cmath>
 #include <memory>
-#include <set>
 #include <stdexcept>
 
 #if __linux__
@@ -71,9 +69,9 @@ bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
     }
 
     const auto &prev = history[history.size() - 2];
-    auto id = getScreenId(prev);
+    const auto id = getScreenId(prev);
 
-    for (auto candidate : ids)
+    for (const auto candidate : ids)
     {
         if (id == candidate)
         {
@@ -93,9 +91,9 @@ bool LayeredScreen::isPreviousScreenNot(
     }
 
     const auto &prev = history[history.size() - 2];
-    auto id = getScreenId(prev);
+    const auto id = getScreenId(prev);
 
-    for (auto candidate : ids)
+    for (const auto candidate : ids)
     {
         if (id == candidate)
         {
@@ -119,9 +117,9 @@ bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
         return false;
     }
 
-    auto id = getScreenId(curr);
+    const auto id = getScreenId(curr);
 
-    for (auto candidate : ids)
+    for (const auto candidate : ids)
     {
         if (id == candidate)
         {
@@ -154,8 +152,8 @@ bool LayeredScreen::isCurrentScreenPopupFor(ScreenId targetId) const
         return false;
     }
 
-    auto curr = history.back();
-    auto prev = history[history.size() - 2];
+    const auto curr = history.back();
+    const auto prev = history[history.size() - 2];
 
     return getScreenId(curr) == ScreenId::PopupScreen &&
            getScreenId(prev) == targetId;
@@ -169,7 +167,6 @@ LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
         return ScreenId::Count;
     }
 
-    ScreenComponent &ref = *screen;
 #define X(ns, Class, nameStr)                                                  \
     if (dynamic_cast<ns::Class *>(screen.get()))                               \
         return ScreenId::Class;
@@ -179,9 +176,9 @@ LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
     return ScreenId::Count;
 }
 
-void LayeredScreen::showPopupForMs(const std::string msg, const int delayMs)
+void LayeredScreen::showPopupForMs(const std::string &msg, const int delayMs)
 {
-    auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
+    const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
     popupScreen->setText(msg);
     openScreenById(ScreenId::PopupScreen);
 
@@ -194,16 +191,16 @@ void LayeredScreen::showPopupForMs(const std::string msg, const int delayMs)
         .detach();
 }
 
-void LayeredScreen::setPopupScreenText(const std::string text)
+void LayeredScreen::setPopupScreenText(const std::string &text) const
 {
     mpc.screens->get<ScreenId::PopupScreen>()->setText(text);
 }
 
-void LayeredScreen::showPopupAndThenReturnToLayer(const std::string msg,
+void LayeredScreen::showPopupAndThenReturnToLayer(const std::string &msg,
                                                   const int delayMs,
                                                   const int layerIndex)
 {
-    auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
+    const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
     popupScreen->setText(msg);
     openScreenById(ScreenId::PopupScreen);
     std::thread(
@@ -219,9 +216,9 @@ void LayeredScreen::showPopupAndThenReturnToLayer(const std::string msg,
         .detach();
 }
 
-void LayeredScreen::showPopupAndAwaitInteraction(const std::string msg)
+void LayeredScreen::showPopupAndAwaitInteraction(const std::string &msg)
 {
-    auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
+    const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
     popupScreen->setText(msg);
     openScreenById(ScreenId::PopupScreen);
 }
@@ -232,9 +229,9 @@ std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen()
     return history.back();
 }
 
-void LayeredScreen::openScreen(const std::string name)
+void LayeredScreen::openScreen(const std::string &name)
 {
-    if (auto id = getScreenIdByName(name))
+    if (const auto id = getScreenIdByName(name))
     {
         openScreenById(*id);
     }
@@ -277,12 +274,13 @@ void LayeredScreen::closeCurrentScreen()
         return;
     }
 
-    if (auto currentScreen = getFocusedLayer()->findChild<ScreenComponent>();
+    if (const auto currentScreen =
+            getFocusedLayer()->findChild<ScreenComponent>();
         currentScreen)
     {
-        if (auto focusedField = currentScreen->findFocus(); focusedField)
+        if (const auto focusedField = currentScreen->findFocus(); focusedField)
         {
-            auto focusedFieldName = focusedField->getName();
+            const auto focusedFieldName = focusedField->getName();
             setLastFocus(currentScreen->getName(), focusedFieldName);
         }
 
@@ -292,9 +290,8 @@ void LayeredScreen::closeCurrentScreen()
 
     for (int i = currentLayerIndex - 1; i >= 0; --i)
     {
-        auto screen = layers[i]->findChild<ScreenComponent>();
 
-        if (screen)
+        if (const auto screen = layers[i]->findChild<ScreenComponent>())
         {
             openScreenInternal(screen);
             break;
@@ -303,9 +300,9 @@ void LayeredScreen::closeCurrentScreen()
 }
 
 void LayeredScreen::openScreenInternal(
-    std::shared_ptr<ScreenComponent> newScreen)
+    const std::shared_ptr<ScreenComponent> &newScreen)
 {
-    auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getAudioMidiServices();
 
     if (!history.empty())
     {
@@ -338,10 +335,11 @@ void LayeredScreen::openScreenInternal(
         closeCurrentScreen();
     }
 
-    if (auto sampleScreen = std::dynamic_pointer_cast<SampleScreen>(newScreen);
+    if (const auto sampleScreen =
+            std::dynamic_pointer_cast<SampleScreen>(newScreen);
         sampleScreen)
     {
-        bool muteMonitor = sampleScreen->getMonitor() == 0;
+        const bool muteMonitor = sampleScreen->getMonitor() == 0;
         ams->muteMonitor(muteMonitor);
         ams->getSoundRecorder()->setSampleScreenActive(true);
     }
@@ -354,9 +352,9 @@ void LayeredScreen::openScreenInternal(
 
     if (!history.empty())
     {
-        if (auto focusedField = history.back()->findFocus(); focusedField)
+        if (const auto focusedField = history.back()->findFocus(); focusedField)
         {
-            auto focusedFieldName = focusedField->getName();
+            const auto focusedFieldName = focusedField->getName();
             setLastFocus(history.back()->getName(), focusedFieldName);
         }
         history.back()->close();
@@ -371,7 +369,8 @@ void LayeredScreen::openScreenInternal(
 
     const int screenLayerIndex = newScreen->getLayerIndex();
 
-    if (auto existing = layers[screenLayerIndex]->findChild<ScreenComponent>())
+    if (const auto existing =
+            layers[screenLayerIndex]->findChild<ScreenComponent>())
     {
         layers[screenLayerIndex]->removeChild(existing);
     }
@@ -431,7 +430,7 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
 
 void LayeredScreen::timerCallback()
 {
-    if (auto currentScreen = getCurrentScreen(); currentScreen)
+    if (const auto currentScreen = getCurrentScreen(); currentScreen)
     {
         currentScreen->timerCallback();
     }
@@ -439,7 +438,7 @@ void LayeredScreen::timerCallback()
 
 void LayeredScreen::Draw()
 {
-    for (auto &c : root->findHiddenChildren())
+    for (const auto &c : root->findHiddenChildren())
     {
         c->drawRecursive(&pixels);
     }
@@ -449,18 +448,18 @@ void LayeredScreen::Draw()
     return;
 }
 
-MRECT LayeredScreen::getDirtyArea()
+MRECT LayeredScreen::getDirtyArea() const
 {
-    auto dirtyArea = root->getDirtyArea();
+    const auto dirtyArea = root->getDirtyArea();
     return dirtyArea;
 }
 
-bool LayeredScreen::IsDirty()
+bool LayeredScreen::IsDirty() const
 {
     return root->IsDirty();
 }
 
-void LayeredScreen::setDirty()
+void LayeredScreen::setDirty() const
 {
     root->SetDirty();
 }
@@ -470,16 +469,17 @@ Background *LayeredScreen::getCurrentBackground()
     return getFocusedLayer()->getBackground();
 }
 
-void LayeredScreen::setCurrentBackground(std::string s)
+void LayeredScreen::setCurrentBackground(const std::string &s)
 {
     getCurrentBackground()->setBackgroundName(s);
 }
 
-void LayeredScreen::returnToLastFocus(std::shared_ptr<ScreenComponent> screen,
-                                      std::string firstFieldOfCurrentScreen)
+void LayeredScreen::returnToLastFocus(
+    const std::shared_ptr<ScreenComponent> &screen,
+    const std::string &firstFieldOfCurrentScreen)
 {
     assert(screen);
-    auto lastFocus = lastFocuses.find(screen->getName());
+    const auto lastFocus = lastFocuses.find(screen->getName());
 
     if (lastFocus == end(lastFocuses))
     {
@@ -491,15 +491,15 @@ void LayeredScreen::returnToLastFocus(std::shared_ptr<ScreenComponent> screen,
     setFocus(lastFocus->second);
 }
 
-void LayeredScreen::setLastFocus(std::string screenName,
-                                 std::string newLastFocus)
+void LayeredScreen::setLastFocus(const std::string &screenName,
+                                 const std::string &newLastFocus)
 {
     lastFocuses[screenName] = newLastFocus;
 }
 
-std::string LayeredScreen::getLastFocus(std::string screenName)
+std::string LayeredScreen::getLastFocus(const std::string &screenName)
 {
-    auto lastFocus = lastFocuses.find(screenName);
+    const auto lastFocus = lastFocuses.find(screenName);
 
     if (lastFocus == end(lastFocuses))
     {
@@ -509,7 +509,7 @@ std::string LayeredScreen::getLastFocus(std::string screenName)
     return lastFocus->second;
 }
 
-std::string LayeredScreen::getCurrentScreenName()
+std::string LayeredScreen::getCurrentScreenName() const
 {
     if (history.empty())
     {
@@ -519,11 +519,11 @@ std::string LayeredScreen::getCurrentScreenName()
     return history.back()->getName();
 }
 
-int LayeredScreen::getFocusedLayerIndex()
+int LayeredScreen::getFocusedLayerIndex() const
 {
     for (int i = 3; i >= 0; --i)
     {
-        if (auto screen = layers[i]->findChild<ScreenComponent>(); screen)
+        if (const auto screen = layers[i]->findChild<ScreenComponent>(); screen)
         {
             return screen->getLayerIndex();
         }
@@ -534,8 +534,8 @@ int LayeredScreen::getFocusedLayerIndex()
 
 std::shared_ptr<Layer> LayeredScreen::getFocusedLayer()
 {
-    int idx = getFocusedLayerIndex();
-    if (idx < 0 || idx >= (int)layers.size())
+    const int idx = getFocusedLayerIndex();
+    if (idx < 0 || idx >= static_cast<int>(layers.size()))
     {
         throw std::runtime_error("no focused layer");
     }
@@ -549,17 +549,18 @@ bool LayeredScreen::transfer(int direction)
         return false;
     }
 
-    auto currentFocus = getFocusedLayer()->findField(getFocusedFieldName());
+    const auto currentFocus =
+        getFocusedLayer()->findField(getFocusedFieldName());
     auto transferMap = history.back()->getTransferMap();
-    auto mapCandidate = transferMap.find(currentFocus->getName());
+    const auto mapCandidate = transferMap.find(currentFocus->getName());
 
     if (mapCandidate == end(transferMap))
     {
         return false;
     }
 
-    auto mapping = (*mapCandidate).second;
-    auto nextFocusNames = StrUtil::split(mapping[direction], ',');
+    const auto mapping = mapCandidate->second;
+    const auto nextFocusNames = StrUtil::split(mapping[direction], ',');
 
     for (auto &nextFocusName : nextFocusNames)
     {
@@ -584,7 +585,8 @@ void LayeredScreen::transferLeft()
         return;
     }
 
-    auto currentFocus = getFocusedLayer()->findField(getFocusedFieldName());
+    const auto currentFocus =
+        getFocusedLayer()->findField(getFocusedFieldName());
 
     std::shared_ptr<Field> candidate;
 
@@ -595,14 +597,14 @@ void LayeredScreen::transferLeft()
             continue;
         }
 
-        int verticalOffset = abs(currentFocus->getY() - f->getY());
+        const int verticalOffset = abs(currentFocus->getY() - f->getY());
 
         if (verticalOffset > 2)
         {
             continue;
         }
 
-        int candidateVerticalOffset =
+        const int candidateVerticalOffset =
             candidate ? abs(currentFocus->getY() - candidate->getY()) : INT_MAX;
 
         if (verticalOffset <= candidateVerticalOffset)
@@ -613,8 +615,8 @@ void LayeredScreen::transferLeft()
                 continue;
             }
 
-            int horizontalOffset = currentFocus->getX() - f->getX();
-            int candidateHorizontalOffset =
+            const int horizontalOffset = currentFocus->getX() - f->getX();
+            const int candidateHorizontalOffset =
                 candidate ? currentFocus->getX() - candidate->getX() : INT_MAX;
 
             if (horizontalOffset <= candidateHorizontalOffset)
@@ -639,7 +641,7 @@ void LayeredScreen::transferRight()
 
     std::shared_ptr<Field> candidate;
 
-    auto source = getFocusedLayer()->findField(getFocusedFieldName());
+    const auto source = getFocusedLayer()->findField(getFocusedFieldName());
 
     for (auto &f : getFocusedLayer()->findFields())
     {
@@ -648,14 +650,14 @@ void LayeredScreen::transferRight()
             continue;
         }
 
-        int verticalOffset = abs(source->getY() - f->getY());
+        const int verticalOffset = abs(source->getY() - f->getY());
 
         if (verticalOffset > 2)
         {
             continue;
         }
 
-        int candidateVerticalOffset =
+        const int candidateVerticalOffset =
             candidate ? abs(source->getY() - candidate->getY()) : INT_MAX;
 
         if (verticalOffset <= candidateVerticalOffset)
@@ -666,8 +668,8 @@ void LayeredScreen::transferRight()
                 continue;
             }
 
-            int horizontalOffset = f->getX() - source->getX();
-            int candidateHorizontalOffset =
+            const int horizontalOffset = f->getX() - source->getX();
+            const int candidateHorizontalOffset =
                 candidate ? candidate->getX() - source->getX() : INT_MAX;
 
             if (horizontalOffset <= candidateHorizontalOffset)
@@ -691,21 +693,23 @@ void LayeredScreen::transferDown()
     }
 
     int marginChars = 8;
-    int minDistV = 7;
+    constexpr int minDistV = 7;
     int maxDistH = 6 * marginChars;
-    auto current = getFocusedLayer()->findField(getFocusedFieldName());
+    const auto current = getFocusedLayer()->findField(getFocusedFieldName());
     std::shared_ptr<Field> next;
 
-    for (auto &field : getFocusedLayer()->findFields())
+    for (const auto &field : getFocusedLayer()->findFields())
     {
-        auto B1 = field->getRect().B;
-        auto B0 = current->getRect().B;
-        auto MW1 = 0.5f * (float)(field->getX() * 2 + field->getW());
-        auto MW0 = 0.5f * (float)(current->getX() * 2 + current->getW());
+        const auto B1 = field->getRect().B;
+        const auto B0 = current->getRect().B;
+        const auto MW1 =
+            0.5f * static_cast<float>(field->getX() * 2 + field->getW());
+        const auto MW0 =
+            0.5f * static_cast<float>(current->getX() * 2 + current->getW());
 
         if (B1 - B0 >= minDistV)
         {
-            if (abs((int)(MW1 - MW0)) <= maxDistH)
+            if (abs(static_cast<int>(MW1 - MW0)) <= maxDistH)
             {
                 if (!field->IsHidden() && field->isFocusable())
                 {
@@ -721,16 +725,18 @@ void LayeredScreen::transferDown()
         marginChars = 16;
         maxDistH = 6 * marginChars;
 
-        for (auto &field : getFocusedLayer()->findFields())
+        for (const auto &field : getFocusedLayer()->findFields())
         {
-            auto B0 = current->getY() + current->getH();
-            auto B1 = field->getY() + field->getH();
-            auto MW0 = 0.5f * (float)(current->getX() * 2 + current->getW());
-            auto MW1 = 0.5f * (float)(field->getX() * 2 + field->getW());
+            const auto B0 = current->getY() + current->getH();
+            const auto B1 = field->getY() + field->getH();
+            const auto MW0 = 0.5f * static_cast<float>(current->getX() * 2 +
+                                                       current->getW());
+            const auto MW1 =
+                0.5f * static_cast<float>(field->getX() * 2 + field->getW());
 
             if (B1 - B0 >= minDistV)
             {
-                if (abs((int)(MW1 - MW0)) <= maxDistH)
+                if (abs(static_cast<int>(MW1 - MW0)) <= maxDistH)
                 {
                     if (!field->IsHidden() && field->isFocusable())
                     {
@@ -758,25 +764,27 @@ void LayeredScreen::transferUp()
     }
 
     int marginChars = 8;
-    int minDistV = -7;
+    constexpr int minDistV = -7;
     int maxDistH = 6 * marginChars;
-    auto result = getFocusedLayer()->findField(getFocusedFieldName());
+    const auto result = getFocusedLayer()->findField(getFocusedFieldName());
     std::shared_ptr<Field> next;
 
     auto revComponents = getFocusedLayer()->findFields();
 
     reverse(revComponents.begin(), revComponents.end());
 
-    for (auto &field : revComponents)
+    for (const auto &field : revComponents)
     {
-        auto B1 = field->getY() + field->getH();
-        auto B0 = result->getY() + result->getH();
-        auto MW1 = 0.5f * (float)(field->getX() * 2 + field->getW());
-        auto MW0 = 0.5f * (float)(result->getX() * 2 + result->getW());
+        const auto B1 = field->getY() + field->getH();
+        const auto B0 = result->getY() + result->getH();
+        const auto MW1 =
+            0.5f * static_cast<float>(field->getX() * 2 + field->getW());
+        const auto MW0 =
+            0.5f * static_cast<float>(result->getX() * 2 + result->getW());
 
         if (B1 - B0 <= minDistV)
         {
-            if (abs((int)(MW1 - MW0)) <= maxDistH)
+            if (abs(static_cast<int>(MW1 - MW0)) <= maxDistH)
             {
                 if (!field->IsHidden() && field->isFocusable())
                 {
@@ -792,16 +800,18 @@ void LayeredScreen::transferUp()
         marginChars = 16;
         maxDistH = 6 * marginChars;
 
-        for (auto &field : revComponents)
+        for (const auto &field : revComponents)
         {
-            auto B1 = field->getY() + field->getH();
-            auto B0 = result->getY() + result->getH();
-            auto MW1 = 0.5f * (float)(field->getX() * 2 + field->getW());
-            auto MW0 = 0.5f * (float)(field->getX() * 2 + field->getW());
+            const auto B1 = field->getY() + field->getH();
+            const auto B0 = result->getY() + result->getH();
+            const auto MW1 =
+                0.5f * static_cast<float>(field->getX() * 2 + field->getW());
+            const auto MW0 =
+                0.5f * static_cast<float>(field->getX() * 2 + field->getW());
 
             if (B1 - B0 <= minDistV)
             {
-                if (abs((int)(MW1 - MW0)) <= maxDistH)
+                if (abs(static_cast<int>(MW1 - MW0)) <= maxDistH)
                 {
                     if (!field->IsHidden() && field->isFocusable())
                     {
@@ -847,9 +857,9 @@ std::shared_ptr<Field> LayeredScreen::getFocusedField()
     return focusedLayer->findField(focusedFieldName);
 }
 
-std::string LayeredScreen::getFirstLayerScreenName()
+std::string LayeredScreen::getFirstLayerScreenName() const
 {
-    if (auto screen = layers[0]->findChild<ScreenComponent>(); screen)
+    if (const auto screen = layers[0]->findChild<ScreenComponent>(); screen)
     {
         return screen->getName();
     }

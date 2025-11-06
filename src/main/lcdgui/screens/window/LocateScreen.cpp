@@ -41,7 +41,7 @@ void LocateScreen::function(int i)
             if (focusedFieldName.length() == 1)
             {
                 const auto locationIndex = std::stoi(focusedFieldName) - 1;
-                auto &location = locations[locationIndex];
+                const auto &location = locations[locationIndex];
 
                 const auto clampedBarIndex = std::clamp<uint16_t>(
                     std::get<0>(location), 0, getMaxBarIndexForThisSequence());

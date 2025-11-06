@@ -149,8 +149,8 @@ void SyncScreen::displayShiftEarly()
     }
     else if (modeIn == 1)
     {
-        auto label = findLabel("shift-early");
-        auto field = findField("shift-early");
+        const auto label = findLabel("shift-early");
+        const auto field = findField("shift-early");
         label->Hide(false);
         field->Hide(false);
         field->setLocation(100, field->getY());
@@ -159,8 +159,8 @@ void SyncScreen::displayShiftEarly()
     }
     else if (modeIn == 2)
     {
-        auto label = findLabel("shift-early");
-        auto field = findField("shift-early");
+        const auto label = findLabel("shift-early");
+        const auto field = findField("shift-early");
         label->Hide(false);
         field->Hide(false);
         field->setLocation(70, field->getY());
@@ -171,7 +171,7 @@ void SyncScreen::displayShiftEarly()
 
 void SyncScreen::displayIn()
 {
-    auto result = std::to_string(in + 1);
+    const auto result = std::to_string(in + 1);
     findField("in")->setText(result);
 }
 
@@ -203,13 +203,13 @@ void SyncScreen::displayModeOut()
 
 void SyncScreen::displayReceiveMMC()
 {
-    auto mmc = std::string(receiveMMCEnabled ? "ON" : "OFF");
+    const auto mmc = std::string(receiveMMCEnabled ? "ON" : "OFF");
     findField("receive-mmc")->setText(mmc);
 }
 
 void SyncScreen::displaySendMMC()
 {
-    auto mmc = std::string(sendMMCEnabled ? "ON" : "OFF");
+    const auto mmc = std::string(sendMMCEnabled ? "ON" : "OFF");
     findField("send-mmc")->setText(mmc);
 }
 

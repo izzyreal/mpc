@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void openNameScreen() override;
 
-        SoundScreen(mpc::Mpc &mpc, const int layerIndex);
+        SoundScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

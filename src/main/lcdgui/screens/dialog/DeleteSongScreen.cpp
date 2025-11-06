@@ -26,7 +26,7 @@ void DeleteSongScreen::turnWheel(int i)
 
     if (focusedFieldName == "song")
     {
-        auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+        const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
         auto candidate = songScreen->activeSongIndex + i;
 
         if (candidate < 0)
@@ -56,7 +56,7 @@ void DeleteSongScreen::function(int i)
             openScreenById(ScreenId::SongWindow);
             break;
         case 4:
-            auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+            const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
             sequencer->deleteSong(songScreen->activeSongIndex);
             openScreenById(ScreenId::SongScreen);
             break;
@@ -65,8 +65,8 @@ void DeleteSongScreen::function(int i)
 
 void DeleteSongScreen::displaySong()
 {
-    auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    auto song = sequencer->getSong(songScreen->activeSongIndex);
+    const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
+    const auto song = sequencer->getSong(songScreen->activeSongIndex);
     findField("song")->setText(
         StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",
                          2) +

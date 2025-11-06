@@ -47,8 +47,8 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
 
         const auto file_data_char =
             MpcResourceUtil::get_resource_data(fileName);
-        std::vector<unsigned char> file_data(file_data_char.begin(),
-                                             file_data_char.end());
+        const std::vector<unsigned char> file_data(file_data_char.begin(),
+                                                   file_data_char.end());
         std::vector<unsigned char> data;
 
         lodepng::decode(data, width, height, file_data, LCT_RGB, 8);
@@ -62,7 +62,7 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
 
         int byteCounter(0);
 
-        int byteCounterOffset = (scrollOffset * width) * 3;
+        const int byteCounterOffset = (scrollOffset * width) * 3;
 
         byteCounter += byteCounterOffset;
 

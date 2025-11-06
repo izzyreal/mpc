@@ -22,7 +22,7 @@ void Component::addReactiveBinding(ReactiveBinding b)
     reactiveBindings.push_back(std::move(b));
 }
 
-void Component::sendToBack(std::shared_ptr<Component> childToSendBack)
+void Component::sendToBack(const std::shared_ptr<Component> &childToSendBack)
 {
     for (int i = 0; i < children.size(); i++)
     {
@@ -54,15 +54,15 @@ bool Component::bringToFront(Component *childToBringToFront)
         }
     }
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         if (c->bringToFront(childToBringToFront))
         {
-            auto it = std::find_if(children.begin(), children.end(),
-                                   [&](const auto &ch)
-                                   {
-                                       return ch.get() == c.get();
-                                   });
+            const auto it = std::find_if(children.begin(), children.end(),
+                                         [&](const auto &ch)
+                                         {
+                                             return ch.get() == c.get();
+                                         });
 
             if (it != children.end())
             {
@@ -230,7 +230,7 @@ std::shared_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
 {
     if (dynamic_cast<ScreenComponent *>(this))
     {
-        auto background = findBackground();
+        const auto background = findBackground();
 
         if (background)
         {
@@ -244,7 +244,7 @@ std::shared_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
     return children.back();
 }
 
-void Component::removeChild(std::shared_ptr<Component> child)
+void Component::removeChild(const std::shared_ptr<Component> &child)
 {
     if (!child)
     {
@@ -260,7 +260,7 @@ void Component::removeChild(std::shared_ptr<Component> child)
         }
     }
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         c->removeChild(child);
     }
@@ -269,7 +269,7 @@ void Component::removeChild(std::shared_ptr<Component> child)
 void Component::addChildren(
     std::vector<std::shared_ptr<Component>> &childrenToAdd)
 {
-    for (auto &c : childrenToAdd)
+    for (const auto &c : childrenToAdd)
     {
         addChild(c);
     }
@@ -311,7 +311,7 @@ void Component::drawRecursive(std::vector<std::vector<bool>> *pixels)
 
     Draw(pixels);
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         c->drawRecursive(pixels);
     }
@@ -332,7 +332,7 @@ void Component::Hide(bool b)
         dirty = true;
     }
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         c->Hide(b);
     }
@@ -378,7 +378,7 @@ MRECT Component::getDirtyArea()
 {
     MRECT res;
 
-    for (auto c : children)
+    for (const auto c : children)
     {
         auto rect = c->getDirtyArea();
         res = res.Union(&rect);
@@ -405,7 +405,7 @@ void Component::SetDirty(bool b)
         return;
     }
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         c->SetDirty(b);
     }
@@ -422,7 +422,7 @@ bool Component::IsDirty()
 {
     auto dirtyChild = false;
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         if (c->IsDirty())
         {
@@ -444,16 +444,16 @@ bool Component::IsDirty()
 
 MRECT Component::getRect()
 {
-    auto x1 = std::max(0, x);
-    auto x2 = std::min(248, x + w);
-    auto y1 = std::max(0, y);
-    auto y2 = std::min(60, y + h);
+    const auto x1 = std::max(0, x);
+    const auto x2 = std::min(248, x + w);
+    const auto y1 = std::max(0, y);
+    const auto y2 = std::min(60, y + h);
     return MRECT(x1, y1, x2, y2);
 }
 
 void Component::Clear(std::vector<std::vector<bool>> *pixels)
 {
-    auto r = getRect();
+    const auto r = getRect();
 
     for (int i = r.L; i < r.R; i++)
     {
@@ -471,9 +471,9 @@ void Component::Clear(std::vector<std::vector<bool>> *pixels)
 
 void Component::preDrawClear(std::vector<std::vector<bool>> *pixels)
 {
-    auto r = preDrawClearRect;
+    const auto r = preDrawClearRect;
 
-    for (auto &c : children)
+    for (const auto &c : children)
     {
         c->preDrawClear(pixels);
     }

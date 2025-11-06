@@ -279,7 +279,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen =
+                const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-settings";
@@ -297,7 +297,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen =
+                const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-keyboard";
@@ -318,7 +318,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                auto screen =
+                const auto screen =
                     mpc.screens
                         ->get<ScreenId::VmpcDiscardMappingChangesScreen>();
                 screen->nextScreen = "vmpc-auto-save";
@@ -408,7 +408,7 @@ void VmpcMidiScreen::updateRows()
         const auto typeLabel = findChild<Label>("type" + std::to_string(i));
         const auto typeField = findChild<Field>("type" + std::to_string(i));
 
-        int length = 15;
+        const int length = 15;
 
         const auto labelText =
             StrUtil::padRight(
@@ -427,7 +427,8 @@ void VmpcMidiScreen::updateRows()
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);
 
-        auto channelField = findChild<Field>("channel" + std::to_string(i));
+        const auto channelField =
+            findChild<Field>("channel" + std::to_string(i));
 
         if (cmd.getMidiChannelIndex() == -1)
         {
@@ -441,7 +442,7 @@ void VmpcMidiScreen::updateRows()
 
         channelField->setInverted(row == i && column == 3);
 
-        auto numberField = findChild<Field>("number" + std::to_string(i));
+        const auto numberField = findChild<Field>("number" + std::to_string(i));
 
         if (cmd.getNumber() == -1)
         {
@@ -454,8 +455,8 @@ void VmpcMidiScreen::updateRows()
 
         numberField->setInverted(row == i && column == 1);
 
-        auto valueLabel = findChild<Label>("value" + std::to_string(i));
-        auto valueField = findChild<Field>("value" + std::to_string(i));
+        const auto valueLabel = findChild<Label>("value" + std::to_string(i));
+        const auto valueField = findChild<Field>("value" + std::to_string(i));
 
         if (cmd.isNote())
         {

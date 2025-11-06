@@ -7,7 +7,7 @@ namespace mpc::lcdgui::screens
     {
 
     public:
-        TrMuteScreen(mpc::Mpc &mpc, const int layerIndex);
+        TrMuteScreen(mpc::Mpc &mpc, int layerIndex);
 
         void open() override;
 

@@ -34,8 +34,8 @@ void CopySoundScreen::function(int i)
             break;
         case 4:
         {
-            auto sound = sampler->getSound();
-            auto newSound = sampler->copySound(sound);
+            const auto sound = sampler->getSound();
+            const auto newSound = sampler->copySound(sound);
 
             if (newSound.lock() == nullptr)
             {
@@ -99,7 +99,7 @@ void CopySoundScreen::displaySnd()
     findField("snd")->setText(sampler->getSound()->getName());
 }
 
-void CopySoundScreen::setNewName(std::string s)
+void CopySoundScreen::setNewName(const std::string &s)
 {
     newName = s;
     displayNewName();

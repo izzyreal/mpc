@@ -32,8 +32,8 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
         bool isLearning();
-        void setLearnCandidate(const bool isNote, const int8_t channelIndex,
-                               const int8_t number, const int8_t value);
+        void setLearnCandidate(bool isNote, int8_t channelIndex, int8_t number,
+                               int8_t value);
         void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand &c);
         std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
         bool hasMappingChanged();
