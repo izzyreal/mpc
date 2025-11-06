@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/audio/core/Encoding.hpp>
+#include "engine/audio/core/Encoding.hpp"
 
 namespace mpc::engine::audio::core
 {

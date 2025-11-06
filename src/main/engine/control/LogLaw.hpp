@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/control/AbstractLaw.hpp>
+#include "engine/control/AbstractLaw.hpp"
 
 namespace mpc::engine::control
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/audio/mixer/MixerControls.hpp>
+#include "engine/audio/mixer/MixerControls.hpp"
 
 namespace mpc::engine::audio::mixer
 {

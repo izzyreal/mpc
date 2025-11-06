@@ -1,8 +1,8 @@
 #pragma once
 
-#include <engine/audio/core/AudioProcess.hpp>
-#include <engine/audio/mixer/MixControls.hpp>
-#include <engine/audio/mixer/AudioMixerStrip.hpp>
+#include "engine/audio/core/AudioProcess.hpp"
+#include "engine/audio/mixer/MixControls.hpp"
+#include "engine/audio/mixer/AudioMixerStrip.hpp"
 
 namespace mpc::engine::audio::mixer
 {

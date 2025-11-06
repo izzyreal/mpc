@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/control/CompoundControl.hpp>
+#include "engine/control/CompoundControl.hpp"
 
 namespace mpc::engine::control
 {

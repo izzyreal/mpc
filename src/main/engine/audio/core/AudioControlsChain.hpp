@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/control/CompoundControlChain.hpp>
+#include "engine/control/CompoundControlChain.hpp"
 
 #include <vector>
 

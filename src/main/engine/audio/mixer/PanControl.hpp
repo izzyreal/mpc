@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/audio/mixer/LCRControl.hpp>
+#include "engine/audio/mixer/LCRControl.hpp"
 
 namespace mpc::engine::audio::mixer
 {

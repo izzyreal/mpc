@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/control/CompoundControl.hpp>
-#include <engine/control/BooleanControl.hpp>
+#include "engine/control/CompoundControl.hpp"
+#include "engine/control/BooleanControl.hpp"
 
 namespace mpc::engine::audio::core
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/control/CompoundControl.hpp>
+#include "engine/control/CompoundControl.hpp"
 
 #include <memory>
 #include <string>

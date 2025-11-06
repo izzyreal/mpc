@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/audio/core/AudioProcessAdapter.hpp>
-#include <engine/audio/core/AudioBuffer.hpp>
+#include "engine/audio/core/AudioProcessAdapter.hpp"
+#include "engine/audio/core/AudioBuffer.hpp"
 
 #include <memory>
 

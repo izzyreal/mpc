@@ -1,7 +1,7 @@
 #pragma once
 
-#include <engine/audio/mixer/MixControls.hpp>
-#include <engine/control/EnumControl.hpp>
+#include "engine/audio/mixer/MixControls.hpp"
+#include "engine/control/EnumControl.hpp"
 
 namespace mpc::engine::audio::mixer
 {

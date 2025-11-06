@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/audio/core/AudioBuffer.hpp>
+#include "engine/audio/core/AudioBuffer.hpp"
 
 namespace mpc::engine::audio::core
 {
