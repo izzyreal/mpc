@@ -16,7 +16,7 @@ namespace mpc::input
     {
     public:
         HostToClientTranslator();
-        
+
         std::optional<client::event::ClientEvent>
         translate(const HostInputEvent &, std::shared_ptr<KeyboardBindings>);
 

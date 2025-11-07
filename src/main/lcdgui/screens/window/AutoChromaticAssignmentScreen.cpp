@@ -136,7 +136,8 @@ void AutoChromaticAssignmentScreen::openNameScreen()
 
 void AutoChromaticAssignmentScreen::setSourceSoundIndex(const int i)
 {
-    sourceSoundIndex = std::clamp(i, -1, std::max(0, sampler->getSoundCount() - 1));
+    sourceSoundIndex =
+        std::clamp(i, -1, std::max(0, sampler->getSoundCount() - 1));
     displaySnd();
 }
 

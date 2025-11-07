@@ -9,7 +9,6 @@
 
 namespace mpc::input
 {
-
     struct FocusEvent
     {
         enum class Type
@@ -51,6 +50,13 @@ namespace mpc::input
                       // or encoder turn).
         };
 
+        enum class InputDeviceType
+        {
+            Mouse,
+            Touch,
+            Pen
+        };
+
         Type type;
 
         // Specifies whether this event represents absolute or relative motion.
@@ -65,10 +71,34 @@ namespace mpc::input
 
         // Only valid for REPEAT events. 2 for double, 3 for triple click/tap.
         int repeatCount = 0;
-        
+
         int sourceIndex = 0;
 
         hardware::ComponentId componentId;
+
+        bool shiftDown;
+        bool ctrlDown;
+        bool altDown;
+
+        InputDeviceType inputDeviceType;
+
+        int getModifierKeyDownCount() const
+        {
+            int result = 0;
+            if (shiftDown)
+            {
+                result++;
+            }
+            if (ctrlDown)
+            {
+                result++;
+            }
+            if (altDown)
+            {
+                result++;
+            }
+            return result;
+        }
     };
 
     /* Input events coming from the host, i.e. the machine the virtual MPC2000XL

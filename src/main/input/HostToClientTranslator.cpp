@@ -13,9 +13,7 @@ using namespace mpc::input;
 using namespace mpc::client::event;
 using namespace mpc::hardware;
 
-HostToClientTranslator::HostToClientTranslator()
-{
-}
+HostToClientTranslator::HostToClientTranslator() {}
 
 std::optional<ClientEvent> HostToClientTranslator::translate(
     const HostInputEvent &hostInputEvent,
@@ -150,22 +148,44 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             {
                 if (gesture.type == GestureEvent::Type::BEGIN)
                 {
-                    gestureSourceTracker.beginGesture(gesture.componentId, gesture.sourceIndex, 1);
+                    gestureSourceTracker.beginGesture(gesture.componentId,
+                                                      gesture.sourceIndex, 1);
                 }
                 else if (gesture.type == GestureEvent::Type::END)
                 {
-                    gestureSourceTracker.endGesture(gesture.componentId, gesture.sourceIndex);
+                    gestureSourceTracker.endGesture(gesture.componentId,
+                                                    gesture.sourceIndex);
                 }
                 else if (gesture.type == GestureEvent::Type::UPDATE)
                 {
-                    if (gestureSourceTracker.updateGesture(gesture.componentId, gesture.sourceIndex))
+                    if (gestureSourceTracker.updateGesture(gesture.componentId,
+                                                           gesture.sourceIndex))
                     {
                         clientHardwareEvent.type =
                             ClientHardwareEvent::Type::DataWheelTurn;
 
-                        const float turnSpeedFactor = gestureSourceTracker.getGestureCount(DATA_WHEEL) > 1 ? 2.f : 0.1f;
-                        
-                        clientHardwareEvent.deltaValue = gesture.continuousDelta * turnSpeedFactor;
+                        const int modKeyCount =
+                            gesture.getModifierKeyDownCount();
+                        const int gestureCount =
+                            gestureSourceTracker.getGestureCount(DATA_WHEEL);
+                        const bool shouldTurnFast =
+                            modKeyCount > 0 || gestureCount > 1;
+                        const float baseTurnFactor =
+                            gesture.inputDeviceType ==
+                                    GestureEvent::InputDeviceType::Mouse
+                                ? .3f
+                                : .1f;
+                        constexpr float fastTurnFactor = 10.f;
+                        const int fastTurnFactorMultiplier =
+                            modKeyCount + std::max(0, gestureCount - 1);
+
+                        const float turnSpeedFactor =
+                            shouldTurnFast ? baseTurnFactor * fastTurnFactor *
+                                                 fastTurnFactorMultiplier
+                                           : baseTurnFactor;
+
+                        clientHardwareEvent.deltaValue =
+                            gesture.continuousDelta * turnSpeedFactor;
                     }
                 }
             }

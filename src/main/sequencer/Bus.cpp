@@ -30,7 +30,8 @@ int DrumBus::getIndex() const
 void DrumBus::setProgram(int programIndexToUse)
 {
     programIndex =
-    std::clamp(programIndexToUse, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX));
+        std::clamp(programIndexToUse, 0,
+                   static_cast<int>(Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX));
 }
 
 int DrumBus::getProgram() const

@@ -13,7 +13,7 @@ namespace mpc::input
         using ComponentId = hardware::ComponentId;
         using SourceId = int;
 
-        struct ComponentGesture 
+        struct ComponentGesture
         {
             SourceId sourceId;
             bool mayUpdate;
@@ -22,7 +22,8 @@ namespace mpc::input
     public:
         GestureSourceTracker() = default;
 
-        void beginGesture(ComponentId componentId, SourceId sourceId, int maxUpdatingSourceCount)
+        void beginGesture(ComponentId componentId, SourceId sourceId,
+                          int maxUpdatingSourceCount)
         {
             if (gestures.count(componentId) == 0)
             {
@@ -32,8 +33,11 @@ namespace mpc::input
             else
             {
                 auto &componentGestures = gestures[componentId];
-                const bool mayUpdate = componentGestures.size() < static_cast<size_t>(maxUpdatingSourceCount);
-                componentGestures.emplace_back(ComponentGesture{sourceId, mayUpdate});
+                const bool mayUpdate =
+                    componentGestures.size() <
+                    static_cast<size_t>(maxUpdatingSourceCount);
+                componentGestures.emplace_back(
+                    ComponentGesture{sourceId, mayUpdate});
             }
         }
 
@@ -46,7 +50,8 @@ namespace mpc::input
 
             auto &componentGestures = gestures[componentId];
 
-            for (auto it = componentGestures.begin(); it != componentGestures.end(); ++it)
+            for (auto it = componentGestures.begin();
+                 it != componentGestures.end(); ++it)
             {
                 if (it->sourceId == sourceId)
                 {
@@ -65,7 +70,8 @@ namespace mpc::input
         {
             if (gestures.count(componentId) == 0)
             {
-                // For 'update' gestures that have no begin and end, i.e. mouse wheel events
+                // For 'update' gestures that have no begin and end, i.e. mouse
+                // wheel events
                 return true;
             }
 
@@ -91,6 +97,5 @@ namespace mpc::input
 
     private:
         std::unordered_map<ComponentId, std::vector<ComponentGesture>> gestures;
-
     };
-} // namespace mpc::controller
+} // namespace mpc::input
