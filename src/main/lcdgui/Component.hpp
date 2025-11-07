@@ -66,7 +66,7 @@ namespace mpc::lcdgui
                 space.append(" ");
             }
             printf("%s%s\n", space.c_str(), name.c_str());
-            for (const auto c : children)
+            for (const auto &c : children)
             {
                 c->printTree(depth + 1);
             }
