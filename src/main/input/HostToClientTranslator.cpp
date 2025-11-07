@@ -13,6 +13,10 @@ using namespace mpc::input;
 using namespace mpc::client::event;
 using namespace mpc::hardware;
 
+HostToClientTranslator::HostToClientTranslator()
+{
+}
+
 std::optional<ClientEvent> HostToClientTranslator::translate(
     const HostInputEvent &hostInputEvent,
     std::shared_ptr<KeyboardBindings> keyboardBindings)
@@ -144,11 +148,25 @@ std::optional<ClientEvent> HostToClientTranslator::translate(
             }
             else if (gesture.componentId == DATA_WHEEL)
             {
-                if (gesture.type == GestureEvent::Type::UPDATE)
+                if (gesture.type == GestureEvent::Type::BEGIN)
                 {
-                    clientHardwareEvent.type =
-                        ClientHardwareEvent::Type::DataWheelTurn;
-                    clientHardwareEvent.deltaValue = gesture.continuousDelta;
+                    gestureSourceTracker.beginGesture(gesture.componentId, gesture.sourceIndex, 1);
+                }
+                else if (gesture.type == GestureEvent::Type::END)
+                {
+                    gestureSourceTracker.endGesture(gesture.componentId, gesture.sourceIndex);
+                }
+                else if (gesture.type == GestureEvent::Type::UPDATE)
+                {
+                    if (gestureSourceTracker.updateGesture(gesture.componentId, gesture.sourceIndex))
+                    {
+                        clientHardwareEvent.type =
+                            ClientHardwareEvent::Type::DataWheelTurn;
+
+                        const float turnSpeedFactor = gestureSourceTracker.getGestureCount(DATA_WHEEL) > 1 ? 2.f : 0.1f;
+                        
+                        clientHardwareEvent.deltaValue = gesture.continuousDelta * turnSpeedFactor;
+                    }
                 }
             }
             else if (gesture.componentId == REC_GAIN_POT ||

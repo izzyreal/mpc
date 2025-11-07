@@ -41,7 +41,6 @@ namespace mpc::hardware
 
 namespace mpc::controller
 {
-
     class ClientHardwareEventController;
     class ClientMidiEventController;
 
@@ -56,7 +55,7 @@ namespace mpc::controller
         void init();
 
         void
-        dispatchHostInput(const mpc::input::HostInputEvent &hostEvent) const;
+        dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
 
         void handleClientEvent(const client::event::ClientEvent &) const;
 
@@ -93,6 +92,7 @@ namespace mpc::controller
 
     private:
         mpc::Mpc &mpc;
+        input::HostToClientTranslator hostToClientTranslator;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
         std::shared_ptr<mpc::input::KeyboardBindings> keyboardBindings;
         std::shared_ptr<lcdgui::Screens> screens;

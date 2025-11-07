@@ -65,6 +65,8 @@ namespace mpc::input
 
         // Only valid for REPEAT events. 2 for double, 3 for triple click/tap.
         int repeatCount = 0;
+        
+        int sourceIndex = 0;
 
         hardware::ComponentId componentId;
     };

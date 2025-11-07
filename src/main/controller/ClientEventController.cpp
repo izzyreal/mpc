@@ -48,10 +48,10 @@ void ClientEventController::init()
 }
 
 void ClientEventController::dispatchHostInput(
-    const input::HostInputEvent &hostEvent) const
+    const input::HostInputEvent &hostEvent)
 {
     const auto clientEvent =
-        input::HostToClientTranslator::translate(hostEvent, keyboardBindings);
+        hostToClientTranslator.translate(hostEvent, keyboardBindings);
 
     if (!clientEvent.has_value())
     {
