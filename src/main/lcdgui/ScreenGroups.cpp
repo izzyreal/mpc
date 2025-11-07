@@ -5,12 +5,12 @@
 
 namespace mpc::lcdgui::screengroups
 {
-
     bool isPadDoesNotTriggerNoteEventScreen(
         const std::shared_ptr<ScreenComponent> &s)
     {
         return isSoundScreen(s) || std::dynamic_pointer_cast<TrMuteScreen>(s) ||
-               std::dynamic_pointer_cast<NextSeqPadScreen>(s);
+               std::dynamic_pointer_cast<NextSeqPadScreen>(s) ||
+               std::dynamic_pointer_cast<PopupScreen>(s);
     }
 
     bool isStepEditorScreen(const std::shared_ptr<ScreenComponent> &s)

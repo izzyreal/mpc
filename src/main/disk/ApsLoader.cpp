@@ -323,7 +323,7 @@ void ApsLoader::showPopup(mpc::Mpc &mpc, const std::string &name,
     std::string msg =
         "LOADING " +
         StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
-    mpc.getLayeredScreen()->showPopupAndAwaitInteraction(msg);
+    mpc.getLayeredScreen()->showPopup(msg);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 

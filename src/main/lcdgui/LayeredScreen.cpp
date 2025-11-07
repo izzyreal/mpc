@@ -130,21 +130,6 @@ bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
     return false;
 }
 
-void LayeredScreen::showPopupAndThenOpen(ScreenId targetId,
-                                         const std::string &msg, int delayMs)
-{
-    setPopupScreenText(msg);
-    openScreenById(ScreenId::PopupScreen);
-
-    std::thread(
-        [this, targetId, delayMs]()
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
-            openScreenById(targetId);
-        })
-        .detach();
-}
-
 bool LayeredScreen::isCurrentScreenPopupFor(ScreenId targetId) const
 {
     if (history.size() < 2)
@@ -176,11 +161,34 @@ LayeredScreen::getScreenId(const std::shared_ptr<ScreenComponent> &screen)
     return ScreenId::Count;
 }
 
+void LayeredScreen::setPopupScreenText(const std::string &text) const
+{
+    mpc.screens->get<ScreenId::PopupScreen>()->setText(text);
+}
+
+void LayeredScreen::showPopup(const std::string &msg)
+{
+    setPopupScreenText(msg);
+    openScreenById(ScreenId::PopupScreen);
+}
+
+void LayeredScreen::showPopupAndThenOpen(ScreenId targetId,
+                                         const std::string &msg, int delayMs)
+{
+    showPopup(msg);
+
+    std::thread(
+        [this, targetId, delayMs]()
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+            openScreenById(targetId);
+        })
+        .detach();
+}
+
 void LayeredScreen::showPopupForMs(const std::string &msg, const int delayMs)
 {
-    const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
-    popupScreen->setText(msg);
-    openScreenById(ScreenId::PopupScreen);
+    showPopup(msg);
 
     std::thread(
         [this, delayMs]()
@@ -191,18 +199,11 @@ void LayeredScreen::showPopupForMs(const std::string &msg, const int delayMs)
         .detach();
 }
 
-void LayeredScreen::setPopupScreenText(const std::string &text) const
-{
-    mpc.screens->get<ScreenId::PopupScreen>()->setText(text);
-}
-
 void LayeredScreen::showPopupAndThenReturnToLayer(const std::string &msg,
                                                   const int delayMs,
                                                   const int layerIndex)
 {
-    const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
-    popupScreen->setText(msg);
-    openScreenById(ScreenId::PopupScreen);
+    showPopup(msg);
     std::thread(
         [this, delayMs, layerIndex]()
         {
@@ -220,6 +221,7 @@ void LayeredScreen::showPopupAndAwaitInteraction(const std::string &msg)
 {
     const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
     popupScreen->setText(msg);
+    popupScreen->setCloseUponButtonOrPadPressOrDataWheelTurn(true);
     openScreenById(ScreenId::PopupScreen);
 }
 

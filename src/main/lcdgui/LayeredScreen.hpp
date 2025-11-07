@@ -57,12 +57,17 @@ namespace mpc::lcdgui
         void transferUp();
         void transferDown();
 
+        void showPopup(const std::string &msg);
+
         void showPopupForMs(const std::string &msg, int delayMs);
 
         void showPopupAndThenReturnToLayer(const std::string &msg, int delayMs,
                                            int layerIndex);
 
         void showPopupAndAwaitInteraction(const std::string &msg);
+
+        void showPopupAndThenOpen(ScreenId targetId, const std::string &msg,
+                                  int delayMs);
 
         int getFocusedLayerIndex() const;
         std::shared_ptr<Layer> getFocusedLayer();
@@ -74,9 +79,6 @@ namespace mpc::lcdgui
         bool isPreviousScreenNot(std::initializer_list<ScreenId> ids) const;
 
         bool isCurrentScreen(std::initializer_list<ScreenId> ids) const;
-
-        void showPopupAndThenOpen(ScreenId targetId, const std::string &msg,
-                                  int delayMs);
 
         bool isCurrentScreenPopupFor(ScreenId targetId) const;
 

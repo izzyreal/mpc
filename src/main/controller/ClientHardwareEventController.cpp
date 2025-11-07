@@ -124,6 +124,12 @@ void ClientHardwareEventController::handlePadPress(
         return;
     }
 
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(layeredScreen->getCurrentScreen());
+            popupScreen && popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
+    {
+        layeredScreen->closeCurrentScreen();
+    }
+
     const auto screen = layeredScreen->getCurrentScreen();
 
     if (const auto opensNameScreen =
@@ -221,11 +227,6 @@ void ClientHardwareEventController::handlePadPress(
     }
 
     std::function action = [](void *) {};
-
-    if (layeredScreen->isCurrentScreen({ScreenId::PopupScreen}))
-    {
-        layeredScreen->closeCurrentScreen();
-    }
 
     if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}))
     {
@@ -410,6 +411,13 @@ void ClientHardwareEventController::handleDataWheel(
 
     const auto screen = mpc.getScreen();
 
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+            popupScreen && popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
+    {
+        mpc.getLayeredScreen()->closeCurrentScreen();
+        return;
+    }
+
     screen->turnWheel(steps);
 
     if (const auto opensNameScreen =
@@ -515,7 +523,8 @@ void ClientHardwareEventController::handleButtonPress(
         }
     }
 
-    if (std::dynamic_pointer_cast<PopupScreen>(screen))
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+            popupScreen && popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
     {
         layeredScreen->closeCurrentScreen();
         return;

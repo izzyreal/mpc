@@ -21,3 +21,19 @@ void PopupScreen::setText(std::string text)
     findChild<Label>("popup")->setText(text);
     SetDirty();
 }
+
+void PopupScreen::close()
+{
+    closeUponButtonOrPadPressOrDataWheelTurn = false;
+}
+
+void PopupScreen::setCloseUponButtonOrPadPressOrDataWheelTurn(const bool shouldClose)
+{
+    closeUponButtonOrPadPressOrDataWheelTurn = shouldClose;
+}
+
+bool PopupScreen::isCloseUponButtonOrPadPressOrDataWheelTurnEnabled() const
+{
+    return closeUponButtonOrPadPressOrDataWheelTurn;
+}
+

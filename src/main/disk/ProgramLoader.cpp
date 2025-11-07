@@ -10,7 +10,6 @@
 
 #include "lcdgui/screens/window/LoadAProgramScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
-#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "sampler/Sampler.hpp"
 
 #include <StrUtil.hpp>
@@ -217,9 +216,7 @@ void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc,
                                               const std::string &ext,
                                               int sampleSize)
 {
-    mpc.getLayeredScreen()->openScreenById(ScreenId::PopupScreen);
-    auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
-    popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." +
+    mpc.getLayeredScreen()->showPopup("Loading " + StrUtil::padRight(name, " ", 16) + "." +
                          StrUtil::toUpper(ext));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
