@@ -65,7 +65,8 @@ namespace mpc::input
         {
             if (gestures.count(componentId) == 0)
             {
-                return false;
+                // For 'update' gestures that have no begin and end, i.e. mouse wheel events
+                return true;
             }
 
             for (auto &gesture : gestures[componentId])
