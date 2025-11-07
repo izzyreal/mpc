@@ -13,6 +13,7 @@
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
 #include "lcdgui/Screens.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
@@ -21,8 +22,11 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequencer.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
+
+#include <chrono>
 #include <memory>
+#include <thread>
 
 using namespace mpc;
 using namespace mpc::file::all;
@@ -32,12 +36,13 @@ using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 
 void AutoSave::restoreAutoSavedStateWithTarget(
-    Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget)
+    Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget, const bool headless)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
-    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0)
+    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 && !mpc.isPluginModeEnabled())
     {
         return;
     }
@@ -61,9 +66,17 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         return;
     }
 
-    const auto restoreAction = [&mpc, saveTarget, availableFiles]
+    const auto restoreAction = [&mpc, availableFiles, saveTarget, headless]
     {
+        auto layeredScreen = mpc.getLayeredScreen();
         std::map<fs::path, std::vector<char>> processInOrder;
+
+        auto showMsg = [&](const std::string &msg)
+        {
+            if (headless) return;
+            layeredScreen->showPopup(msg);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        };
 
         for (const auto &f : availableFiles)
         {
@@ -72,6 +85,20 @@ void AutoSave::restoreAutoSavedStateWithTarget(
             {
                 continue;
             }
+
+            std::string desc;
+            if (f == "APS.APS") desc = "programs and settings";
+            else if (f == "ALL.ALL") desc = "sequence data";
+            else if (f == "sounds.txt") desc = "sounds";
+            else if (f == "soundIndex.txt") desc = "sound index";
+            else if (f == "selectedPad.txt") desc = "selected pad";
+            else if (f == "selectedNote.txt") desc = "selected note";
+            else if (f == "screen.txt") desc = "screen state";
+            else if (f == "focus.txt") desc = "focus field";
+            else if (f == "currentDir.txt") desc = "current directory";
+
+            showMsg("Loading " + desc);
+
             auto data = saveTarget->getFileData(f);
 
             if (f == "APS.APS")
@@ -91,17 +118,17 @@ void AutoSave::restoreAutoSavedStateWithTarget(
                 for (auto &soundName : soundNames)
                 {
                     if (soundName.empty())
-                    {
                         continue;
-                    }
+
+                    showMsg("Loading " + soundName.substr(0, 20));
+
                     auto soundData = saveTarget->getFileData(soundName);
                     SndReader sndReader(soundData);
                     auto sound =
                         mpc.getSampler()->addSound(sndReader.getSampleRate());
                     if (!sound)
-                    {
                         break;
-                    }
+
                     sound->setMono(sndReader.isMono());
                     sndReader.readData(sound->getMutableSampleData());
                     sound->setName(sndReader.getName());
@@ -167,9 +194,9 @@ void AutoSave::restoreAutoSavedStateWithTarget(
 
         const auto screenName = getStringProperty("screen.txt");
         const auto focusName = getStringProperty("focus.txt");
-        const auto layeredScreen = mpc.getLayeredScreen();
 
         layeredScreen->openScreen(screenName);
+
         if (!focusName.empty())
         {
             layeredScreen->setFocus(focusName);
@@ -204,7 +231,7 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         }
     };
 
-    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1)
+    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 && !mpc.isPluginModeEnabled())
     {
         auto confirmScreen =
             mpc.screens->get<ScreenId::VmpcContinuePreviousSessionScreen>();
@@ -214,11 +241,16 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         return;
     }
 
-    restoreAction();
+    std::thread(
+        [restoreAction]()
+        {
+            restoreAction();
+        })
+        .detach();
 }
 
 void AutoSave::storeAutoSavedStateWithTarget(
-    Mpc &mpc, const std::shared_ptr<SaveTarget> &saveTarget)
+    Mpc &mpc, const std::shared_ptr<SaveTarget> saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
 
@@ -229,10 +261,13 @@ void AutoSave::storeAutoSavedStateWithTarget(
         return;
     }
 
-    const auto storeAction = [&]()
+    const auto storeAction = [&mpc, saveTarget]()
     {
         auto layeredScreen = mpc.getLayeredScreen();
-        std::string currentScreen = layeredScreen->getFirstLayerScreenName();
+
+        std::string currentScreen =
+            layeredScreen->getFirstLayerScreenName();
+
         auto focus = layeredScreen->getFocusedFieldName();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
         auto selectedPad = mpc.clientEventController->getSelectedPad();
@@ -256,8 +291,8 @@ void AutoSave::storeAutoSavedStateWithTarget(
         std::string soundNames;
         for (auto &sound : mpc.getSampler()->getSounds())
         {
-            SndWriter sndWriter(sound.get());
             const auto sndPath = sound->getName() + ".SND";
+            SndWriter sndWriter(sound.get());
             saveTarget->setFileData(sndPath,
                                     {sndWriter.getSndFileArray().begin(),
                                      sndWriter.getSndFileArray().end()});
@@ -271,7 +306,9 @@ void AutoSave::storeAutoSavedStateWithTarget(
 
         saveTarget->setFileData("sounds.txt",
                                 {soundNames.begin(), soundNames.end()});
+        layeredScreen->closeCurrentScreen();
     };
 
     storeAction();
 }
+

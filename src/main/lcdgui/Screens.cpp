@@ -284,6 +284,7 @@ void Screens::createAndCacheScreen(const std::string &screenName)
         screen->setTransferMap(layout->transferMap);
         screen->setFirstField(layout->firstField);
         screens.push_back(screen);
+        return;
     }
 
     MLOG(
