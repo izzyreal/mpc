@@ -256,7 +256,7 @@ void DirectoryScreen::function(const int f)
 
                 if (started)
                 {
-                    ls->showPopupAndAwaitInteraction("Playing " + name);
+                    ls->showPopup("Playing " + name);
                 }
                 else
                 {

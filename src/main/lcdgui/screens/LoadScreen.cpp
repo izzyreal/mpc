@@ -162,7 +162,7 @@ void LoadScreen::function(int i)
 
                 if (started)
                 {
-                    ls->showPopupAndAwaitInteraction("Playing " + name);
+                    ls->showPopup("Playing " + name);
                 }
                 else
                 {

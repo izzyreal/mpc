@@ -493,7 +493,21 @@ void ClientHardwareEventController::handleButtonPress(
     }
 
     const auto screen = mpc.getScreen();
+
     const auto layeredScreen = mpc.getLayeredScreen();
+
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+            popupScreen)
+    {
+        if (popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
+        {
+            layeredScreen->closeCurrentScreen();
+        }
+        else
+        {
+            return;
+        }
+    }
 
     const auto id = event.componentId;
 
@@ -521,13 +535,6 @@ void ClientHardwareEventController::handleButtonPress(
             stepEditorScreen->nextBarEnd();
             return;
         }
-    }
-
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
-            popupScreen && popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
-    {
-        layeredScreen->closeCurrentScreen();
-        return;
     }
 
     if (id == CURSOR_LEFT_OR_DIGIT)
@@ -793,7 +800,10 @@ void ClientHardwareEventController::handleButtonRelease(
         return;
     }
 
-    button->release();
+    if (!button->release())
+    {
+        return;
+    }
 
     if (const auto id = event.componentId; id == ERASE)
     {
