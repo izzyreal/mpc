@@ -30,18 +30,18 @@ namespace mpc::engine::audio::mixer
         std::vector<std::shared_ptr<AudioMixerStrip>> auxStrips;
         std::shared_ptr<AudioMixerStrip> mainStrip;
         std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
-        mpc::engine::audio::core::AudioBuffer *sharedAudioBuffer = nullptr;
+        std::shared_ptr<core::AudioBuffer> sharedAudioBuffer;
 
     public:
         std::shared_ptr<MixerControls> getMixerControls();
 
     public:
-        mpc::engine::audio::core::AudioBuffer *getSharedBuffer() const;
+        std::shared_ptr<core::AudioBuffer> getSharedBuffer() const;
 
-        mpc::engine::audio::core::AudioBuffer *
+        std::shared_ptr<core::AudioBuffer>
         createBuffer(const std::string &name) const;
 
-        void removeBuffer(mpc::engine::audio::core::AudioBuffer *buffer) const;
+        void removeBuffer(std::shared_ptr<core::AudioBuffer>) const;
 
     public:
         std::shared_ptr<AudioMixerStrip> getStrip(const std::string &name);

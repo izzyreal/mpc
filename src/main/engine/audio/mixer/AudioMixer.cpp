@@ -26,17 +26,18 @@ std::shared_ptr<MixerControls> AudioMixer::getMixerControls()
     return controls;
 }
 
-AudioBuffer *AudioMixer::getSharedBuffer() const
+std::shared_ptr<AudioBuffer> AudioMixer::getSharedBuffer() const
 {
     return sharedAudioBuffer;
 }
 
-AudioBuffer *AudioMixer::createBuffer(const std::string &name) const
+std::shared_ptr<AudioBuffer>
+AudioMixer::createBuffer(const std::string &name) const
 {
     return server->createAudioBuffer(name);
 }
 
-void AudioMixer::removeBuffer(AudioBuffer *buffer) const
+void AudioMixer::removeBuffer(std::shared_ptr<AudioBuffer> buffer) const
 {
     server->removeAudioBuffer(buffer);
 }

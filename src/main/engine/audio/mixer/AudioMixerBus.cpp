@@ -13,7 +13,7 @@ AudioMixerBus::AudioMixerBus(AudioMixer *mixer,
     buffer = mixer->createBuffer(name);
 }
 
-AudioBuffer *AudioMixerBus::getBuffer() const
+std::shared_ptr<AudioBuffer> AudioMixerBus::getBuffer() const
 {
     return buffer;
 }
@@ -37,6 +37,6 @@ void AudioMixerBus::write(int nFrames) const
 
     if (output)
     {
-        output->processAudio(buffer, nFrames);
+        output->processAudio(buffer.get(), nFrames);
     }
 }

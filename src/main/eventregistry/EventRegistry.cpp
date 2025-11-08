@@ -262,7 +262,8 @@ void EventRegistry::publishSnapshot() noexcept
 
 SnapshotView EventRegistry::getSnapshot() const noexcept
 {
-    auto s = std::atomic_load_explicit(&currentSnapshot, std::memory_order_acquire);
+    auto s =
+        std::atomic_load_explicit(&currentSnapshot, std::memory_order_acquire);
     return SnapshotView{std::move(s)};
 }
 

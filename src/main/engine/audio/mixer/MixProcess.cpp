@@ -31,16 +31,15 @@ int MixProcess::processAudio(AudioBuffer *buffer)
     }
     else if (mixControls->isEnabled())
     {
-        //		gain = mixControls->getGain();
-        // if (gain > 0.0f || mixControls->isMaster()) {
         mixControls->getChannelGains(&channelGains);
+
         for (auto c = 0; c < channelGains.size(); c++)
         {
             smoothedChannelGains[c] +=
                 smoothingFactor * (channelGains[c] - smoothedChannelGains[c]);
         }
+
         getRoutedStrip()->mix(buffer, smoothedChannelGains);
-        //}
     }
     return AUDIO_OK;
 }

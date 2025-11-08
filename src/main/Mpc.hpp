@@ -12,11 +12,6 @@
 #include <string>
 #include <memory>
 
-namespace mpc::engine
-{
-    class PreviewSoundPlayer;
-} // namespace mpc::engine
-
 namespace mpc::hardware
 {
     class Hardware;
@@ -127,7 +122,6 @@ namespace mpc
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        mpc::engine::PreviewSoundPlayer &getPreviewSoundPlayer() const;
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();

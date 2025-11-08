@@ -7,7 +7,6 @@
 
 namespace mpc::engine::audio::mixer
 {
-
     class AudioMixerStrip : public core::AudioProcessChain
     {
 
@@ -15,22 +14,21 @@ namespace mpc::engine::audio::mixer
         AudioMixer *mixer{nullptr};
 
     private:
-        mpc::engine::audio::core::AudioBuffer *buffer{nullptr};
+        std::shared_ptr<audio::core::AudioBuffer> buffer;
         std::shared_ptr<AudioProcess> input;
         std::shared_ptr<AudioProcess> directOutput;
         bool isChannel{false};
         int nmixed{1};
 
     public:
-        void setInputProcess(const std::shared_ptr<AudioProcess> &input);
+        void setInputProcess(const std::shared_ptr<AudioProcess> &);
 
-        void
-        setDirectOutputProcess(const std::shared_ptr<AudioProcess> &output);
+        void setDirectOutputProcess(const std::shared_ptr<AudioProcess> &);
 
         void silence();
 
     public:
-        mpc::engine::audio::core::AudioBuffer *createBuffer();
+        std::shared_ptr<core::AudioBuffer> createBuffer();
 
     private:
         static const int silenceCount{500};
@@ -39,8 +37,7 @@ namespace mpc::engine::audio::mixer
     public:
         bool processBuffer(int nFrames);
 
-        int mix(mpc::engine::audio::core::AudioBuffer *bufferToMix,
-                std::vector<float> &gain);
+        int mix(core::AudioBuffer *bufferToMix, std::vector<float> &gain);
 
     public:
         std::shared_ptr<AudioProcess> createProcess(

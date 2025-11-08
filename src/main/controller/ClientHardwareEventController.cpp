@@ -5,6 +5,7 @@
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 #include "controller/ClientEventController.hpp"
+#include "engine/PreviewSoundPlayer.hpp"
 #include "eventregistry/EventTypes.hpp"
 #include "hardware/ComponentId.hpp"
 #include "hardware/Component.hpp"
@@ -237,7 +238,8 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (screengroups::isSoundScreen(screen))
     {
-        mpc.getPreviewSoundPlayer().playSound(sampler::PLAYX_SOUND, 127, 0);
+        mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+            sampler::PLAYX_SOUND, 127, 0);
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
@@ -287,13 +289,14 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    auto action =
-        [eventRegistry = mpc.eventRegistry,
-         eventHandler = mpc.getEventHandler(), screens = mpc.screens,
-         sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
-         clientEventController = mpc.clientEventController,
-         frameSequencer = mpc.getSequencer()->getFrameSequencer(),
-         previewSoundPlayer = &mpc.getPreviewSoundPlayer()](void *userData)
+    auto action = [eventRegistry = mpc.eventRegistry,
+                   eventHandler = mpc.getEventHandler(), screens = mpc.screens,
+                   sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
+                   clientEventController = mpc.clientEventController,
+                   frameSequencer = mpc.getSequencer()->getFrameSequencer(),
+                   previewSoundPlayer =
+                       mpc.getAudioMidiServices()->getPreviewSoundPlayer()](
+                      void *userData)
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 

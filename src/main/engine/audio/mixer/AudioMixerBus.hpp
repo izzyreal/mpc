@@ -12,12 +12,12 @@ namespace mpc::engine::audio::mixer
     {
 
     private:
-        mpc::engine::audio::core::AudioBuffer *buffer{nullptr};
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess> output;
+        std::shared_ptr<audio::core::AudioBuffer> buffer;
+        std::shared_ptr<core::AudioProcess> output;
         std::string name;
 
     public:
-        mpc::engine::audio::core::AudioBuffer *getBuffer() const;
+        std::shared_ptr<core::AudioBuffer> getBuffer() const;
 
         std::string getName();
 

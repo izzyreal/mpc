@@ -3,7 +3,6 @@
 #include "InterconnectionInputProcess.hpp"
 #include "InterconnectionOutputProcess.hpp"
 
-#include "engine/audio/core/AudioBuffer.hpp"
 #include "engine/audio/core/AudioProcess.hpp"
 #include "engine/audio/server/AudioServer.hpp"
 
@@ -16,8 +15,10 @@ MixerInterconnection::MixerInterconnection(
     const string &name, mpc::engine::audio::server::AudioServer *server)
 {
     auto const sharedBuffer = server->createAudioBuffer(name);
-    inputProcess = make_shared<InterconnectionInputProcess>(this, sharedBuffer);
-    outputProcess = make_shared<InterconnectionOutputProcess>(sharedBuffer);
+    inputProcess =
+        make_shared<InterconnectionInputProcess>(this, sharedBuffer.get());
+    outputProcess =
+        make_shared<InterconnectionOutputProcess>(sharedBuffer.get());
 }
 
 shared_ptr<AudioProcess> MixerInterconnection::getInputProcess()

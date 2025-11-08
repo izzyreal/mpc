@@ -16,4 +16,4 @@ namespace mpc::lcdgui
         std::mutex queueMutex;
         std::queue<std::function<void()>> queue;
     };
-}
+} // namespace mpc::lcdgui

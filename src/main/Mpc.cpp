@@ -253,11 +253,6 @@ std::shared_ptr<Sampler> Mpc::getSampler()
     return sampler;
 }
 
-engine::PreviewSoundPlayer &Mpc::getPreviewSoundPlayer() const
-{
-    return audioMidiServices->getPreviewSoundPlayer();
-}
-
 std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
 {
     return audioMidiServices;

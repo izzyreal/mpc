@@ -226,7 +226,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     if (metronomeSoundScreen->getSound() == 0)
     {
         velocity *= metronomeSoundScreen->getVolume() * 0.01;
-        mpc.getPreviewSoundPlayer().playSound(CLICK_SOUND, velocity, framePos);
+        mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+            CLICK_SOUND, velocity, framePos);
         return;
     }
 
@@ -245,7 +246,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     const auto note = programs[programIndex]->getNoteFromPad(pad);
     const auto soundNumber =
         programs[programIndex]->getNoteParameters(note)->getSoundIndex();
-    mpc.getPreviewSoundPlayer().playSound(soundNumber, velocity, framePos);
+    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+        soundNumber, velocity, framePos);
 }
 
 void Sampler::playPreviewSample(const int start, const int end,
@@ -263,7 +265,8 @@ void Sampler::playPreviewSample(const int start, const int end,
     previewSound->setStart(start);
     previewSound->setEnd(end);
     previewSound->setLoopTo(loopTo);
-    mpc.getPreviewSoundPlayer().playSound(PREVIEW_SOUND, 127, 0);
+    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+        PREVIEW_SOUND, 127, 0);
     previewSound->setStart(oldStart);
     previewSound->setEnd(oldEnd);
     previewSound->setLoopTo(oldLoopTo);
@@ -716,7 +719,7 @@ void Sampler::stopAllVoices(const int frameOffset) const
 
 void Sampler::finishBasicVoice() const
 {
-    mpc.getPreviewSoundPlayer().finishVoice();
+    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->finishVoice();
 }
 
 void Sampler::playX()
@@ -757,7 +760,8 @@ void Sampler::playX()
     int oldEnd = sound->getEnd();
     sound->setStart(start);
     sound->setEnd(end);
-    mpc.getPreviewSoundPlayer().playSound(PLAYX_SOUND, 127, 0);
+    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND,
+                                                                   127, 0);
     sound->setStart(oldStart);
     sound->setEnd(oldEnd);
 }

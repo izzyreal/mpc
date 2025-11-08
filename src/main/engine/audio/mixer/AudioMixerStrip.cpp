@@ -70,7 +70,7 @@ void AudioMixerStrip::silence()
     }
 }
 
-AudioBuffer *AudioMixerStrip::createBuffer()
+std::shared_ptr<AudioBuffer> AudioMixerStrip::createBuffer()
 {
     auto id = controlChain->getId();
     if (id == MixerControlsIds::CHANNEL_STRIP)
@@ -82,6 +82,7 @@ AudioBuffer *AudioMixerStrip::createBuffer()
     {
         return mixer->getMainBus()->getBuffer();
     }
+
     return mixer->getBus(getName())->getBuffer();
 }
 
@@ -94,7 +95,7 @@ bool AudioMixerStrip::processBuffer(int nFrames)
     {
         if (input)
         {
-            ret = input->processAudio(buffer, nFrames);
+            ret = input->processAudio(buffer.get(), nFrames);
 
             if (ret == AUDIO_DISCONNECT)
             {
@@ -111,7 +112,7 @@ bool AudioMixerStrip::processBuffer(int nFrames)
         }
     }
 
-    processAudio(buffer, nFrames);
+    processAudio(buffer.get(), nFrames);
 
     if (isChannel)
     {
@@ -133,7 +134,7 @@ bool AudioMixerStrip::processBuffer(int nFrames)
     }
     if (directOutput)
     {
-        directOutput->processAudio(buffer, nFrames);
+        directOutput->processAudio(buffer.get(), nFrames);
     }
     return true;
 }
@@ -162,10 +163,9 @@ AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
     return AudioProcessChain::createProcess(controls);
 }
 
-int AudioMixerStrip::mix(mpc::engine::audio::core::AudioBuffer *bufferToMix,
-                         vector<float> &gain)
+int AudioMixerStrip::mix(AudioBuffer *bufferToMix, vector<float> &gain)
 {
-    auto doMix = buffer != bufferToMix;
+    auto doMix = buffer.get() != bufferToMix;
     auto snc = bufferToMix->getChannelCount();
     auto dnc = buffer->getChannelCount();
 

@@ -14,27 +14,24 @@ namespace mpc::engine::audio::server
 {
     class RealTimeAudioServer : public AudioServer
     {
+    private:
+        std::shared_ptr<AudioClient> client;
 
     public:
         void start() override;
         void stop() override;
         bool isRunning() override;
         void close() override;
-        void setClient(std::shared_ptr<AudioClient> client) override;
-        IOAudioProcess *openAudioOutput(std::string name) override;
-        IOAudioProcess *openAudioInput(std::string name) override;
-        void closeAudioOutput(
-            mpc::engine::audio::server::IOAudioProcess *output) override;
-        void closeAudioInput(
-            mpc::engine::audio::server::IOAudioProcess *input) override;
+        void setClient(std::shared_ptr<AudioClient>) override;
+        std::shared_ptr<IOAudioProcess>
+        openAudioOutput(std::string name) override;
+        std::shared_ptr<IOAudioProcess>
+        openAudioInput(std::string name) override;
+        void closeAudioOutput(std::shared_ptr<IOAudioProcess>) override;
+        void closeAudioInput(std::shared_ptr<IOAudioProcess>) override;
         void resizeBuffers(int newSize) override;
 
     public:
-        // For compatibility with the PortAudio framework
-        void work(float *inputBuffer, float *outputBuffer, int nFrames,
-                  int inputChannelCount, int outputChannelCount) const;
-
-        // For compatibility with JUCE 7.0.5+
         void work(const float *const *inputBuffer, float *const *outputBuffer,
                   const int nFrames,
                   const std::vector<int8_t> &mpcMonoInputChannelIndices,

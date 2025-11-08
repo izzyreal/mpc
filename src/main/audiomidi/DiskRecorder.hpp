@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 #include "engine/audio/core/AudioProcessAdapter.hpp"
-#include "engine/audio/core/AudioProcess.hpp"
 
 #include <fstream>
 #include <string>
@@ -20,6 +19,11 @@ namespace mpc
     class Mpc;
 }
 
+namespace mpc::engine::audio::core
+{
+    class AudioProcess;
+}
+
 namespace moodycamel
 {
     template <typename T, size_t MAX_BLOCK_SIZE> class ReaderWriterQueue;
@@ -30,6 +34,10 @@ namespace mpc::audiomidi
     class DiskRecorder : public mpc::engine::audio::core::AudioProcessAdapter
 
     {
+    public:
+        DiskRecorder(mpc::Mpc &, AudioProcess *, int index);
+
+        ~DiskRecorder() override;
 
     private:
         mpc::Mpc &mpc;
@@ -70,13 +78,8 @@ namespace mpc::audiomidi
         bool stopEarly();
         bool prepare(int lengthInFrames, int sampleRate, bool isStereo,
                      fs::path destinationDirectory);
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
-                         int nFrames) override;
 
-    public:
-        DiskRecorder(mpc::Mpc &,
-                     mpc::engine::audio::core::AudioProcess *process,
-                     int index);
-        ~DiskRecorder() override;
+        int processAudio(engine::audio::core::AudioBuffer *,
+                         int nFrames) override;
     };
 } // namespace mpc::audiomidi

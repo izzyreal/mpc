@@ -1,8 +1,11 @@
 #include "AudioMidiServices.hpp"
-#include "hardware/Hardware.hpp"
-#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "Mpc.hpp"
+
+#include "hardware/Hardware.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
+
 #include "audiomidi/DirectToDiskSettings.hpp"
 #include "audiomidi/DiskRecorder.hpp"
 #include "audiomidi/MonitorInputAdapter.hpp"
@@ -11,21 +14,19 @@
 
 #include "engine/Voice.hpp"
 #include "engine/VoiceUtil.hpp"
+#include "engine/MixerInterconnection.hpp"
 #include "engine/FaderControl.hpp"
+#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
+#include "engine/audio/server/RealTimeAudioServer.hpp"
+#include "engine/audio/server/CompoundAudioClient.hpp"
+#include "engine/control/CompoundControl.hpp"
+#include "engine/control/CompoundControl.hpp"
+#include "engine/control/BooleanControl.hpp"
 #include "engine/audio/mixer/MixerControls.hpp"
-
-#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
-
 #include "engine/audio/mixer/AudioMixer.hpp"
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
-
-#include "engine/audio/server/CompoundAudioClient.hpp"
-#include "engine/audio/server/NonRealTimeAudioServer.hpp"
-#include "engine/audio/server/RealTimeAudioServer.hpp"
-
-#include "engine/control/CompoundControl.hpp"
-#include "engine/control/BooleanControl.hpp"
 
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/Sequence.hpp"
@@ -53,15 +54,11 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
     VoiceUtil::freqTable();
 }
 
-AudioMidiServices::~AudioMidiServices()
-{
-    offlineServer->setSharedPtr(nullptr);
-}
-
 void AudioMidiServices::start()
 {
-    server = std::make_shared<RealTimeAudioServer>();
-    offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
+    realTimeAudioServer = std::make_shared<RealTimeAudioServer>();
+    nonRealTimeAudioServer =
+        std::make_shared<NonRealTimeAudioServer>(realTimeAudioServer);
     soundRecorder = std::make_shared<SoundRecorder>(mpc);
     soundPlayer = std::make_shared<SoundPlayer>();
 
@@ -69,9 +66,9 @@ void AudioMidiServices::start()
 
     createSynth();
 
-    inputProcess = server->openAudioInput("RECORD IN");
+    inputProcess = realTimeAudioServer->openAudioInput("RECORD IN");
     monitorInputAdapter =
-        std::make_shared<MonitorInputAdapter>(mpc, inputProcess);
+        std::make_shared<MonitorInputAdapter>(mpc, inputProcess.get());
 
     const std::vector<std::string> outputNames{
         "STEREO OUT", "ASSIGNABLE MIX OUT 1/2", "ASSIGNABLE MIX OUT 3/4",
@@ -79,7 +76,8 @@ void AudioMidiServices::start()
 
     for (int i = 0; i < 5; i++)
     {
-        outputProcesses.push_back(server->openAudioOutput(outputNames[i]));
+        outputProcesses.push_back(
+            realTimeAudioServer->openAudioOutput(outputNames[i]));
     }
 
     connectVoices();
@@ -94,14 +92,13 @@ void AudioMidiServices::start()
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(100));
 
-    cac = std::make_shared<CompoundAudioClient>();
-    cac->add(mpc.getSequencer()->getFrameSequencer().get());
-    cac->add(mixer.get());
+    compoundAudioClient = std::make_shared<CompoundAudioClient>();
+    compoundAudioClient->add(mpc.getSequencer()->getFrameSequencer().get());
+    compoundAudioClient->add(mixer.get());
 
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
 
-    offlineServer->setSharedPtr(offlineServer);
-    offlineServer->setClient(cac);
+    nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
 
 void AudioMidiServices::setMonitorLevel(const int level) const
@@ -133,9 +130,10 @@ std::shared_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
     return soundPlayer;
 }
 
-NonRealTimeAudioServer *AudioMidiServices::getAudioServer() const
+std::shared_ptr<NonRealTimeAudioServer>
+AudioMidiServices::getAudioServer() const
 {
-    return offlineServer.get();
+    return nonRealTimeAudioServer;
 }
 
 void AudioMidiServices::setupMixer()
@@ -163,7 +161,7 @@ void AudioMidiServices::setupMixer()
      */
     constexpr int nMixerChans = 67;
     MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
-    mixer = std::make_shared<AudioMixer>(mixerControls, offlineServer);
+    mixer = std::make_shared<AudioMixer>(mixerControls, nonRealTimeAudioServer);
     muteMonitor(true);
     setAssignableMixOutLevels();
 }
@@ -221,9 +219,10 @@ void AudioMidiServices::setAssignableMixOutLevels() const
     }
 }
 
-PreviewSoundPlayer &AudioMidiServices::getPreviewSoundPlayer() const
+std::shared_ptr<PreviewSoundPlayer>
+AudioMidiServices::getPreviewSoundPlayer() const
 {
-    return *basicSoundPlayerChannel.get();
+    return previewSoundPlayer;
 }
 
 void AudioMidiServices::createSynth()
@@ -235,7 +234,7 @@ void AudioMidiServices::createSynth()
         voices.emplace_back(std::make_shared<Voice>(i + 1, false));
     }
 
-    basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(
+    previewSoundPlayer = std::make_shared<PreviewSoundPlayer>(
         mpc.getSampler(), mixer, basicVoice);
 }
 
@@ -246,15 +245,15 @@ void AudioMidiServices::connectVoices()
         const auto ams1 = mixer->getStrip(std::to_string(j + 1));
         auto voice = voices[j];
         ams1->setInputProcess(voice);
-        mixerConnections.emplace_back(
-            new MixerInterconnection("con" + std::to_string(j), server.get()));
+        mixerConnections.emplace_back(new MixerInterconnection(
+            "con" + std::to_string(j), realTimeAudioServer.get()));
         const auto &mi = mixerConnections.back();
         ams1->setDirectOutputProcess(mi->getInputProcess());
         const auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
         ams2->setInputProcess(mi->getOutputProcess());
     }
 
-    basicSoundPlayerChannel->connectVoice();
+    previewSoundPlayer->connectVoice();
 }
 
 void AudioMidiServices::initializeDiskRecorders()
@@ -262,7 +261,7 @@ void AudioMidiServices::initializeDiskRecorders()
     for (int i = 0; i < outputProcesses.size(); i++)
     {
         auto diskRecorder =
-            std::make_shared<DiskRecorder>(mpc, outputProcesses[i], i);
+            std::make_shared<DiskRecorder>(mpc, outputProcesses[i].get(), i);
 
         diskRecorders.push_back(diskRecorder);
 
@@ -280,19 +279,19 @@ void AudioMidiServices::initializeDiskRecorders()
 
 void AudioMidiServices::destroyServices() const
 {
-    offlineServer->stop();
+    nonRealTimeAudioServer->stop();
     closeIO();
     mixer->close();
-    offlineServer->close();
+    nonRealTimeAudioServer->close();
 }
 
 void AudioMidiServices::closeIO() const
 {
-    server->closeAudioInput(inputProcess);
+    realTimeAudioServer->closeAudioInput(inputProcess);
 
     for (auto &outputProcess : outputProcesses)
     {
-        server->closeAudioOutput(outputProcess);
+        realTimeAudioServer->closeAudioOutput(outputProcess);
     }
 }
 
@@ -436,26 +435,16 @@ void AudioMidiServices::changeBounceStateIfRequired()
 
     if (isBouncing() && !wasBouncing)
     {
-
         wasBouncing = true;
 
         if (directToDiskRecorderScreen->isOffline())
         {
-            //            std::vector<int> rates{ 44100, 48000, 88200 };
-            //            auto rate =
-            //            rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
-            //            frameSeq->setSampleRate(offlineServer->getSampleRate());
             mpc.getSequencer()->getFrameSequencer()->start();
 
             if (getAudioServer()->isRealTime())
             {
                 getAudioServer()->setRealTime(false);
             }
-
-            //            if (server->getSampleRate() != rate)
-            //            {
-            //                server->setSampleRate(rate);
-            //            }
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
@@ -475,7 +464,6 @@ void AudioMidiServices::changeBounceStateIfRequired()
         {
             if (!getAudioServer()->isRealTime())
             {
-                //                server->setSampleRate(static_cast<int>(getAudioServer()->getSampleRate()));
                 getAudioServer()->setRealTime(true);
             }
         }

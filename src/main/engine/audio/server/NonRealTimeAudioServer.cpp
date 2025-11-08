@@ -9,10 +9,9 @@
 
 using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::core;
-using namespace std;
 
 NonRealTimeAudioServer::NonRealTimeAudioServer(
-    shared_ptr<AudioServer> serverToUse)
+    std::shared_ptr<AudioServer> serverToUse)
 {
     server = std::move(serverToUse);
 }
@@ -20,12 +19,6 @@ NonRealTimeAudioServer::NonRealTimeAudioServer(
 void NonRealTimeAudioServer::setSampleRate(int rate)
 {
     server->setSampleRate(rate);
-}
-
-void NonRealTimeAudioServer::setSharedPtr(
-    shared_ptr<NonRealTimeAudioServer> sharedPtr)
-{
-    me = std::move(sharedPtr);
 }
 
 void NonRealTimeAudioServer::setRealTime(bool rt)
@@ -120,9 +113,9 @@ void NonRealTimeAudioServer::close()
     server = nullptr;
 }
 
-void NonRealTimeAudioServer::setClient(shared_ptr<AudioClient> clientToUse)
+void NonRealTimeAudioServer::setClient(std::shared_ptr<AudioClient> clientToUse)
 {
-    server->setClient(me);
+    server->setClient(shared_from_this());
     client = clientToUse;
 }
 
@@ -139,7 +132,8 @@ void NonRealTimeAudioServer::work(
     const std::vector<int8_t> &hostOutputChannelIndices) const
 {
     auto realTimeAudioServer =
-        dynamic_pointer_cast<RealTimeAudioServer>(server);
+        std::dynamic_pointer_cast<RealTimeAudioServer>(server);
+
     realTimeAudioServer->work(
         inputBuffer, outputBuffer, nFrames, mpcMonoInputChannelIndices,
         mpcMonoOutputChannelIndices, hostInputChannelIndices,
@@ -161,32 +155,38 @@ void NonRealTimeAudioServer::runNonRealTime()
     }
 }
 
-void NonRealTimeAudioServer::removeAudioBuffer(AudioBuffer *buffer)
+void NonRealTimeAudioServer::removeAudioBuffer(
+    std::shared_ptr<AudioBuffer> buffer)
 {
     server->removeAudioBuffer(buffer);
 }
 
-AudioBuffer *NonRealTimeAudioServer::createAudioBuffer(string name)
+std::shared_ptr<AudioBuffer>
+NonRealTimeAudioServer::createAudioBuffer(const std::string name)
 {
     return server->createAudioBuffer(name);
 }
 
-IOAudioProcess *NonRealTimeAudioServer::openAudioOutput(string name)
+std::shared_ptr<IOAudioProcess>
+NonRealTimeAudioServer::openAudioOutput(const std::string name)
 {
     return server->openAudioOutput(name);
 }
 
-IOAudioProcess *NonRealTimeAudioServer::openAudioInput(string name)
+std::shared_ptr<IOAudioProcess>
+NonRealTimeAudioServer::openAudioInput(const std::string name)
 {
     return server->openAudioInput(name);
 }
 
-void NonRealTimeAudioServer::closeAudioOutput(IOAudioProcess *output)
+void NonRealTimeAudioServer::closeAudioOutput(
+    std::shared_ptr<IOAudioProcess> output)
 {
     server->closeAudioOutput(output);
 }
 
-void NonRealTimeAudioServer::closeAudioInput(IOAudioProcess *input)
+void NonRealTimeAudioServer::closeAudioInput(
+    std::shared_ptr<IOAudioProcess> input)
 {
     server->closeAudioInput(input);
 }

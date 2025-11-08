@@ -3,6 +3,7 @@
 #include "engine/audio/server/AudioServer.hpp"
 #include "engine/audio/server/AudioClient.hpp"
 
+#include <memory>
 #include <thread>
 
 #include <string>
@@ -11,15 +12,12 @@
 
 namespace mpc::engine::audio::server
 {
-
     class NonRealTimeAudioServer : public AudioServer, public AudioClient
     {
 
     private:
-        std::shared_ptr<NonRealTimeAudioServer> me;
-
         std::atomic<bool> realTime{true};
-        std::atomic<bool> isRunningNonRealTime {false};
+        std::atomic<bool> isRunningNonRealTime{false};
         std::shared_ptr<AudioServer> server;
         std::shared_ptr<AudioClient> client;
         std::thread nonRealTimeThread;
@@ -47,19 +45,20 @@ namespace mpc::engine::audio::server
 
         bool isRunning() override;
 
-        mpc::engine::audio::core::AudioBuffer *
+        std::shared_ptr<core::AudioBuffer>
         createAudioBuffer(std::string name) override;
 
-        void removeAudioBuffer(
-            mpc::engine::audio::core::AudioBuffer *buffer) override;
+        void removeAudioBuffer(std::shared_ptr<core::AudioBuffer>) override;
 
-        IOAudioProcess *openAudioOutput(std::string name) override;
+        std::shared_ptr<IOAudioProcess>
+        openAudioOutput(std::string name) override;
 
-        IOAudioProcess *openAudioInput(std::string name) override;
+        std::shared_ptr<IOAudioProcess>
+        openAudioInput(std::string name) override;
 
-        void closeAudioOutput(IOAudioProcess *output) override;
+        void closeAudioOutput(std::shared_ptr<IOAudioProcess>) override;
 
-        void closeAudioInput(IOAudioProcess *input) override;
+        void closeAudioInput(std::shared_ptr<IOAudioProcess>) override;
 
         float getSampleRate() override;
 

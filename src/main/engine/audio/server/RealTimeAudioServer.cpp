@@ -5,7 +5,6 @@
 #include <cmath>
 
 using namespace mpc::engine::audio::server;
-using namespace std;
 
 void RealTimeAudioServer::start()
 {
@@ -29,22 +28,6 @@ bool RealTimeAudioServer::isRunning()
 
 void RealTimeAudioServer::close()
 {
-    for (auto &i : activeInputs)
-    {
-        if (i != nullptr)
-        {
-            delete i;
-        }
-    }
-
-    for (auto &o : activeOutputs)
-    {
-        if (o != nullptr)
-        {
-            delete o;
-        }
-    }
-
     activeInputs.clear();
     activeOutputs.clear();
 }
@@ -70,52 +53,6 @@ void RealTimeAudioServer::resizeBuffers(int newSize)
     AudioServer::resizeBuffers(newSize);
 }
 
-// For compatibility with the PortAudio framework
-void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer,
-                               int nFrames, int inputChannelCount,
-                               int outputChannelCount) const
-{
-    if (!running.load())
-    {
-        return;
-    }
-
-    int sampleCounter = 0;
-    const int inputsToProcess =
-        min((int)(inputChannelCount * 0.5), (int)activeInputs.size());
-
-    for (int frame = 0; frame < nFrames; frame++)
-    {
-        for (int input = 0; input < inputsToProcess; input++)
-        {
-            activeInputs[input]->localBuffer[sampleCounter++] = *inputBuffer++;
-            activeInputs[input]->localBuffer[sampleCounter++] = *inputBuffer++;
-        }
-    }
-
-    client->work(nFrames);
-
-    const int outputsToProcess = outputChannelCount * 0.5;
-
-    for (int frame = 0; frame < nFrames; frame++)
-    {
-        for (int output = 0; output < outputsToProcess; output++)
-        {
-            if (output >= activeOutputs.size())
-            {
-                *outputBuffer++ = 0.0f;
-                *outputBuffer++ = 0.0f;
-                continue;
-            }
-
-            *outputBuffer++ = activeOutputs[output]->localBuffer[(frame * 2)];
-            *outputBuffer++ =
-                activeOutputs[output]->localBuffer[(frame * 2) + 1];
-        }
-    }
-}
-
-// For compatibility with JUCE 7.0.5+
 void RealTimeAudioServer::work(
     const float *const *inputBuffer, float *const *outputBuffer, int nFrames,
     const std::vector<int8_t> &mpcMonoInputChannelIndices,
@@ -163,26 +100,29 @@ void RealTimeAudioServer::work(
     }
 }
 
-void RealTimeAudioServer::setClient(shared_ptr<AudioClient> client)
+void RealTimeAudioServer::setClient(std::shared_ptr<AudioClient> clientToUse)
 {
-    this->client = client.get();
+    client = clientToUse;
 }
 
-IOAudioProcess *RealTimeAudioServer::openAudioOutput(string name)
+std::shared_ptr<IOAudioProcess>
+RealTimeAudioServer::openAudioOutput(const std::string name)
 {
-    activeOutputs.push_back(new StereoOutputProcess(name));
+    activeOutputs.emplace_back(std::make_shared<StereoOutputProcess>(name));
     return activeOutputs.back();
 }
 
-IOAudioProcess *RealTimeAudioServer::openAudioInput(string name)
+std::shared_ptr<IOAudioProcess>
+RealTimeAudioServer::openAudioInput(const std::string name)
 {
-    activeInputs.push_back(new StereoInputProcess(name));
+    activeInputs.emplace_back(std::make_shared<StereoInputProcess>(name));
     return activeInputs.back();
 }
 
-void RealTimeAudioServer::closeAudioOutput(IOAudioProcess *output)
+void RealTimeAudioServer::closeAudioOutput(
+    std::shared_ptr<IOAudioProcess> output)
 {
-    if (output == nullptr)
+    if (!output)
     {
         return;
     }
@@ -199,9 +139,9 @@ void RealTimeAudioServer::closeAudioOutput(IOAudioProcess *output)
     }
 }
 
-void RealTimeAudioServer::closeAudioInput(IOAudioProcess *input)
+void RealTimeAudioServer::closeAudioInput(std::shared_ptr<IOAudioProcess> input)
 {
-    if (input == nullptr)
+    if (!input)
     {
         return;
     }

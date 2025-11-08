@@ -10,29 +10,24 @@
 
 namespace mpc::engine::audio::server
 {
-
     class AudioServer
     {
-
     protected:
         float sampleRate{44100.0};
         unsigned int bufferSize{512};
-        AudioClient *client{nullptr};
         std::atomic<bool> running{false};
-        std::vector<IOAudioProcess *> activeInputs;
-        std::vector<IOAudioProcess *> activeOutputs;
-        std::vector<mpc::engine::audio::core::AudioBuffer *> buffers;
+        std::vector<std::shared_ptr<IOAudioProcess>> activeInputs;
+        std::vector<std::shared_ptr<IOAudioProcess>> activeOutputs;
+        std::vector<std::shared_ptr<core::AudioBuffer>> buffers;
 
     public:
         virtual void resizeBuffers(int newSize);
-        virtual mpc::engine::audio::core::AudioBuffer *
+        virtual std::shared_ptr<core::AudioBuffer>
         createAudioBuffer(std::string name);
-        virtual void
-        removeAudioBuffer(mpc::engine::audio::core::AudioBuffer *buffer);
+        virtual void removeAudioBuffer(std::shared_ptr<core::AudioBuffer>);
 
     public:
-        const std::vector<mpc::engine::audio::core::AudioBuffer *> &
-        getBuffers();
+        const std::vector<std::shared_ptr<core::AudioBuffer>> &getBuffers();
         const unsigned int getBufferSize() const;
 
     public:
@@ -41,16 +36,17 @@ namespace mpc::engine::audio::server
         virtual bool isRunning() = 0;
         virtual void close() = 0;
         virtual void setClient(std::shared_ptr<AudioClient> client) = 0;
-        virtual IOAudioProcess *openAudioOutput(std::string name) = 0;
-        virtual IOAudioProcess *openAudioInput(std::string name) = 0;
-        virtual void closeAudioOutput(IOAudioProcess *output) = 0;
-        virtual void closeAudioInput(IOAudioProcess *input) = 0;
+        virtual std::shared_ptr<IOAudioProcess>
+        openAudioOutput(std::string name) = 0;
+        virtual std::shared_ptr<IOAudioProcess>
+        openAudioInput(std::string name) = 0;
+        virtual void closeAudioOutput(std::shared_ptr<IOAudioProcess>) = 0;
+        virtual void closeAudioInput(std::shared_ptr<IOAudioProcess>) = 0;
         virtual float getSampleRate();
         virtual void setSampleRate(int rate);
 
     public:
         AudioServer();
-        ~AudioServer();
 
     private:
         friend class StereoInputProcess;
