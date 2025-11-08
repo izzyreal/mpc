@@ -5,7 +5,9 @@
 #include <string>
 #include <map>
 #include <deque>
+#include <functional>
 
+#include "lcdgui/LayeredScreenTasks.hpp"
 #include "lcdgui/ScreenId.hpp"
 #include "lcdgui/BasicStructs.hpp"
 #include "lcdgui/BMFStructs.hpp"
@@ -34,6 +36,7 @@ namespace mpc::lcdgui
 
     private:
         mpc::Mpc &mpc;
+        LayeredScreenTasks uiTasks;
         std::unique_ptr<Component> root;
         std::vector<std::vector<bool>> pixels =
             std::vector<std::vector<bool>>(248, std::vector<bool>(60));
@@ -52,6 +55,7 @@ namespace mpc::lcdgui
         bool transfer(int direction);
 
     public:
+        void postToUiThread(const std::function<void()> &fn);
         void transferLeft();
         void transferRight();
         void transferUp();

@@ -78,7 +78,11 @@ void AutoSave::restoreAutoSavedStateWithTarget(
             {
                 return;
             }
-            layeredScreen->showPopup(msg);
+
+            layeredScreen->postToUiThread([layeredScreen, msg] {
+                layeredScreen->showPopup(msg);
+            });
+
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         };
 
@@ -230,12 +234,14 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         const auto screenName = getStringProperty("screen.txt");
         const auto focusName = getStringProperty("focus.txt");
 
-        layeredScreen->openScreen(screenName);
+        layeredScreen->postToUiThread([layeredScreen, screenName, focusName] {
+            layeredScreen->openScreen(screenName);
 
-        if (!focusName.empty())
-        {
-            layeredScreen->setFocus(focusName);
-        }
+            if (!focusName.empty())
+            {
+                layeredScreen->setFocus(focusName);
+            }
+        });
 
         for (auto &p : mpc.getSampler()->getPrograms())
         {

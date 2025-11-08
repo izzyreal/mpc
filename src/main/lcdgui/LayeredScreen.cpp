@@ -61,6 +61,11 @@ LayeredScreen::LayeredScreen(mpc::Mpc &mpc) : mpc(mpc)
     }
 }
 
+void LayeredScreen::postToUiThread(const std::function<void()> &fn)
+{
+    uiTasks.post(fn);
+}
+
 bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
 {
     if (history.size() < 2)
@@ -424,6 +429,8 @@ std::vector<std::vector<bool>> *LayeredScreen::getPixels()
 
 void LayeredScreen::timerCallback()
 {
+    uiTasks.drain();
+
     if (const auto currentScreen = getCurrentScreen(); currentScreen)
     {
         currentScreen->timerCallback();
