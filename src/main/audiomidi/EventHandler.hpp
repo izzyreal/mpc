@@ -20,6 +20,7 @@ namespace mpc::sequencer
     class NoteOnEvent;
     class NoteOffEvent;
     class NoteOnEventPlayOnly;
+    class DrumBus;
 } // namespace mpc::sequencer
 
 namespace mpc::audiomidi
@@ -114,6 +115,10 @@ namespace mpc::audiomidi
         handleNoteEventMidiOut(const std::shared_ptr<Event> &, Track *,
                                const int trackDevice,
                                const std::optional<int> trackVelocityRatio);
+
+        void handleFinalizedDrumNoteOnEvent(std::shared_ptr<NoteOnEvent>,
+                                            std::shared_ptr<sequencer::DrumBus>,
+                                            sequencer::Track *);
 
         /**
          * The MPC2000XL supports realtime, non-destructive transposition of
