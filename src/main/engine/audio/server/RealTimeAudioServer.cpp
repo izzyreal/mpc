@@ -9,22 +9,22 @@ using namespace std;
 
 void RealTimeAudioServer::start()
 {
-    if (running)
+    if (running.load())
     {
         return;
     }
 
-    running = true;
+    running.store(true);
 }
 
 void RealTimeAudioServer::stop()
 {
-    running = false;
+    running.store(false);
 }
 
 bool RealTimeAudioServer::isRunning()
 {
-    return running;
+    return running.load();
 }
 
 void RealTimeAudioServer::close()
@@ -75,7 +75,7 @@ void RealTimeAudioServer::work(float *inputBuffer, float *outputBuffer,
                                int nFrames, int inputChannelCount,
                                int outputChannelCount) const
 {
-    if (!running)
+    if (!running.load())
     {
         return;
     }
@@ -123,7 +123,7 @@ void RealTimeAudioServer::work(
     const std::vector<int8_t> &hostInputChannelIndices,
     const std::vector<int8_t> &hostOutputChannelIndices) const
 {
-    if (!running)
+    if (!running.load())
     {
         return;
     }

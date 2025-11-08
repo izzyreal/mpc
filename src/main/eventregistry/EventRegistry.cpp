@@ -20,11 +20,7 @@ EventRegistry::EventRegistry()
     snapA.programPadEvents.reserve(CAPACITY);
     snapA.noteEvents.reserve(CAPACITY);
 
-    snapB.physicalPadEvents.reserve(CAPACITY);
-    snapB.programPadEvents.reserve(CAPACITY);
-    snapB.noteEvents.reserve(CAPACITY);
-
-    std::atomic_store_explicit(&snapshotPtr, &snapA, std::memory_order_release);
+    currentSnapshot = std::make_shared<Snapshot>(snapA);
 
     eventMessageQueue = std::make_shared<EventMessageQueue>(512);
 }
@@ -259,21 +255,15 @@ void EventRegistry::publishSnapshotToBuffer(Snapshot *dst) const noexcept
 
 void EventRegistry::publishSnapshot() noexcept
 {
-    const Snapshot *cur =
-        std::atomic_load_explicit(&snapshotPtr, std::memory_order_acquire);
-    Snapshot *inactive = (cur == &snapA) ? &snapB : &snapA;
-
-    publishSnapshotToBuffer(inactive);
-
-    std::atomic_store_explicit(&snapshotPtr, inactive,
-                               std::memory_order_release);
+    auto s = std::make_shared<Snapshot>();
+    publishSnapshotToBuffer(s.get());
+    std::atomic_store(&currentSnapshot, s);
 }
 
 SnapshotView EventRegistry::getSnapshot() const noexcept
 {
-    Snapshot *s =
-        std::atomic_load_explicit(&snapshotPtr, std::memory_order_acquire);
-    return SnapshotView(s);
+    auto s = std::atomic_load_explicit(&currentSnapshot, std::memory_order_acquire);
+    return SnapshotView{std::move(s)};
 }
 
 void EventRegistry::drainQueue() noexcept

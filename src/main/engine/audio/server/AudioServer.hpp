@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <atomic>
 
 namespace mpc::engine::audio::server
 {
@@ -17,7 +18,7 @@ namespace mpc::engine::audio::server
         float sampleRate{44100.0};
         unsigned int bufferSize{512};
         AudioClient *client{nullptr};
-        bool running{false};
+        std::atomic<bool> running{false};
         std::vector<IOAudioProcess *> activeInputs;
         std::vector<IOAudioProcess *> activeOutputs;
         std::vector<mpc::engine::audio::core::AudioBuffer *> buffers;

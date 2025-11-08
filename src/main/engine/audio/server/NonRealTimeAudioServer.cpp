@@ -15,8 +15,6 @@ NonRealTimeAudioServer::NonRealTimeAudioServer(
     shared_ptr<AudioServer> serverToUse)
 {
     server = std::move(serverToUse);
-    realTime = true;
-    isRunningNonRealTime = false;
 }
 
 void NonRealTimeAudioServer::setSampleRate(int rate)
@@ -34,15 +32,15 @@ void NonRealTimeAudioServer::setRealTime(bool rt)
 {
     if (!isRunning())
     {
-        realTime = rt;
+        realTime.store(rt);
         return;
     }
 
-    if (realTime != rt)
+    if (realTime.load() != rt)
     {
         stop();
 
-        realTime = rt;
+        realTime.store(rt);
 
         for (auto &buffer : server->getBuffers())
         {
@@ -55,7 +53,7 @@ void NonRealTimeAudioServer::setRealTime(bool rt)
 
 bool NonRealTimeAudioServer::isRealTime() const
 {
-    return realTime;
+    return realTime.load();
 }
 
 void NonRealTimeAudioServer::start()
@@ -65,7 +63,7 @@ void NonRealTimeAudioServer::start()
         return;
     }
 
-    if (realTime)
+    if (realTime.load())
     {
         server->start();
     }
@@ -96,7 +94,7 @@ void NonRealTimeAudioServer::stop()
         return;
     }
 
-    if (realTime)
+    if (realTime.load())
     {
         server->stop();
     }
@@ -108,7 +106,7 @@ void NonRealTimeAudioServer::stop()
 
 void NonRealTimeAudioServer::stopNonRealTimeThread()
 {
-    isRunningNonRealTime = false;
+    isRunningNonRealTime.store(false);
 
     if (nonRealTimeThread.joinable())
     {
@@ -130,7 +128,7 @@ void NonRealTimeAudioServer::setClient(shared_ptr<AudioClient> clientToUse)
 
 bool NonRealTimeAudioServer::isRunning()
 {
-    return realTime ? server->isRunning() : isRunningNonRealTime;
+    return realTime.load() ? server->isRunning() : isRunningNonRealTime.load();
 }
 
 void NonRealTimeAudioServer::work(
@@ -155,9 +153,9 @@ void NonRealTimeAudioServer::work(int nFrames)
 
 void NonRealTimeAudioServer::runNonRealTime()
 {
-    isRunningNonRealTime = true;
+    isRunningNonRealTime.store(true);
 
-    while (isRunningNonRealTime)
+    while (isRunningNonRealTime.load())
     {
         work(server->getBufferSize());
     }

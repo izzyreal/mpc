@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <atomic>
 
 namespace mpc::engine::audio::server
 {
@@ -17,8 +18,8 @@ namespace mpc::engine::audio::server
     private:
         std::shared_ptr<NonRealTimeAudioServer> me;
 
-        bool realTime = true;
-        bool isRunningNonRealTime = false;
+        std::atomic<bool> realTime{true};
+        std::atomic<bool> isRunningNonRealTime {false};
         std::shared_ptr<AudioServer> server;
         std::shared_ptr<AudioClient> client;
         std::thread nonRealTimeThread;

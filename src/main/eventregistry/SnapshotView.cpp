@@ -7,7 +7,7 @@ bool SnapshotView::isProgramPadPressed(
     const ProgramPadIndex idx,
     const std::shared_ptr<sampler::Program> &program) const
 {
-    for (auto &e : snap->programPadEvents)
+    for (auto &e : snapshot->programPadEvents)
     {
         if (e->padIndex == idx && e->program == program)
         {
@@ -20,7 +20,7 @@ bool SnapshotView::isProgramPadPressed(
 bool SnapshotView::isProgramPadPressedBySource(const ProgramPadIndex idx,
                                                const Source src) const
 {
-    for (auto &e : snap->programPadEvents)
+    for (auto &e : snapshot->programPadEvents)
     {
         if (e->padIndex == idx && e->source == src)
         {
@@ -35,7 +35,7 @@ VelocityOrPressure SnapshotView::getPressedProgramPadAfterTouchOrVelocity(
 {
     std::optional<VelocityOrPressure> result;
 
-    for (const auto &e : snap->programPadEvents)
+    for (const auto &e : snapshot->programPadEvents)
     {
         if (e->source == Source::NoteRepeat)
         {
@@ -68,7 +68,7 @@ VelocityOrPressure SnapshotView::getPressedProgramPadAfterTouchOrVelocity(
 
 bool SnapshotView::isProgramPadPressed(const ProgramPadIndex idx) const
 {
-    for (auto &e : snap->programPadEvents)
+    for (auto &e : snapshot->programPadEvents)
     {
         if (e->padIndex == idx)
         {
@@ -84,7 +84,7 @@ ProgramPadPressEventPtr SnapshotView::getMostRecentProgramPadPress(
 {
     ProgramPadPressEventPtr latest = nullptr;
 
-    for (auto &e : snap->programPadEvents)
+    for (auto &e : snapshot->programPadEvents)
     {
         if (e->padIndex != idx)
         {
@@ -116,7 +116,7 @@ ProgramPadPressEventPtr SnapshotView::getMostRecentProgramPadPress(
 
 NoteOnEventPtr SnapshotView::retrievePlayNoteEvent(const NoteNumber note) const
 {
-    for (auto &e : snap->noteEvents)
+    for (auto &e : snapshot->noteEvents)
     {
         if (e->noteNumber == note)
         {
@@ -129,7 +129,7 @@ NoteOnEventPtr SnapshotView::retrievePlayNoteEvent(const NoteNumber note) const
 std::shared_ptr<sequencer::NoteOnEvent>
 SnapshotView::retrieveRecordNoteEvent(const NoteNumber note) const
 {
-    for (const auto &e : snap->noteEvents)
+    for (const auto &e : snapshot->noteEvents)
     {
         if (e->noteNumber == note && e->recordNoteEvent)
         {
@@ -142,7 +142,7 @@ SnapshotView::retrieveRecordNoteEvent(const NoteNumber note) const
 PhysicalPadPressEventPtr
 SnapshotView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
 {
-    for (const auto &e : snap->physicalPadEvents)
+    for (const auto &e : snapshot->physicalPadEvents)
     {
         if (e->padIndex == idx)
         {
@@ -155,7 +155,7 @@ SnapshotView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
 NoteOnEventPtr SnapshotView::retrieveNoteEvent(const NoteNumber note,
                                                const Source src) const
 {
-    for (const auto &e : snap->noteEvents)
+    for (const auto &e : snapshot->noteEvents)
     {
         if (e->noteNumber == note && e->source == src)
         {
@@ -167,10 +167,10 @@ NoteOnEventPtr SnapshotView::retrieveNoteEvent(const NoteNumber note,
 
 int SnapshotView::getTotalPressedProgramPadCount() const
 {
-    return snap->programPadEvents.size();
+    return snapshot->programPadEvents.size();
 }
 
 int SnapshotView::getTotalNoteOnCount() const
 {
-    return snap->noteEvents.size();
+    return snapshot->noteEvents.size();
 }

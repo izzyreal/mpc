@@ -109,8 +109,7 @@ namespace mpc::eventregistry
         std::shared_ptr<EventMessageQueue> eventMessageQueue;
 
         Snapshot snapA;
-        Snapshot snapB;
-        alignas(void *) std::atomic<Snapshot *> snapshotPtr{&snapA};
+        std::shared_ptr<Snapshot> currentSnapshot;
 
         void enqueue(EventMessage &&) const;
         void publishSnapshotToBuffer(struct Snapshot *dst) const noexcept;

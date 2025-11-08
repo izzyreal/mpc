@@ -16,7 +16,7 @@ namespace mpc::eventregistry
     class SnapshotView
     {
     public:
-        explicit SnapshotView(const Snapshot *s) noexcept : snap(s) {}
+        explicit SnapshotView(const std::shared_ptr<const Snapshot> s) noexcept : snapshot(s) {}
 
         bool isProgramPadPressedBySource(ProgramPadIndex idx, Source src) const;
         VelocityOrPressure
@@ -46,22 +46,22 @@ namespace mpc::eventregistry
 
         bool valid() const noexcept
         {
-            return snap != nullptr;
+            return snapshot != nullptr;
         }
 
         void printStats() const
         {
             printf("===== EventRegistry Stats =======\n");
             printf("physicalPadEvent count: %zu\n",
-                   snap->physicalPadEvents.size());
+                   snapshot->physicalPadEvents.size());
             printf("programPadEvent  count: %zu\n",
-                   snap->programPadEvents.size());
-            printf("noteEvent        count: %zu\n", snap->noteEvents.size());
+                   snapshot->programPadEvents.size());
+            printf("noteEvent        count: %zu\n", snapshot->noteEvents.size());
             printf("=================================\n");
         }
 
     private:
-        const Snapshot *snap{};
+        std::shared_ptr<const Snapshot> snapshot;
         friend class EventRegistry;
     };
 } // namespace mpc::eventregistry
