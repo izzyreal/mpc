@@ -11,6 +11,8 @@
 
 #include "Logger.hpp"
 
+#include <mutex>
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::nvram;
@@ -113,16 +115,22 @@ void DiskController::detectRawUsbVolumes()
 
     MLOG("RemovableVolumes instantiated");
 
-    class SimpleChangeListener : public VolumeChangeListener
-    {
+    class SimpleChangeListener : public VolumeChangeListener {
     public:
         std::vector<RemovableVolume> volumes;
-        void processChange(RemovableVolume v) override
-        {
-            volumes.push_back(v);
+        std::mutex m;
+
+        void processChange(RemovableVolume v) override {
+            std::lock_guard<std::mutex> lk(m);
+            volumes.push_back(std::move(v));
+        }
+
+        std::vector<RemovableVolume> snapshot() {
+            std::lock_guard<std::mutex> lk(m);
+            return volumes;
         }
     };
-
+    
     SimpleChangeListener listener;
 
     MLOG("SimpleChangeListener instantiated");
@@ -135,7 +143,10 @@ void DiskController::detectRawUsbVolumes()
 
     MLOG("RemovableVolumes initialized");
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    for (int i = 0; i < 10 && listener.volumes.empty(); ++i)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 
     MLOG("Iterating through scraped USB volumes...");
     auto persistedConfigs = VolumesPersistence::getPersistedConfigs(mpc);
@@ -164,7 +175,7 @@ void DiskController::detectRawUsbVolumes()
         }
     }
 
-    for (auto &v : listener.volumes)
+    for (auto &v : listener.snapshot())
     {
         MLOG("Discovered volume UUID " + v.volumeUUID);
 
