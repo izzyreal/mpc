@@ -10,6 +10,8 @@ using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
+constexpr bool isHeadless = true;
+
 TEST_CASE("Load an empty auto-save state", "[auto-save]")
 {
     {
@@ -18,8 +20,8 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
         const auto autosaveDir = mpc.paths->autoSavePath();
         auto saveTarget =
             std::make_shared<mpc::DirectorySaveTarget>(autosaveDir);
-        mpc::AutoSave::restoreAutoSavedStateWithTarget(mpc, saveTarget);
-        mpc::AutoSave::storeAutoSavedStateWithTarget(mpc, saveTarget);
+        mpc::AutoSave::restoreAutoSavedState(mpc, saveTarget, isHeadless);
+        mpc::AutoSave::storeAutoSavedState(mpc, saveTarget);
     }
 
     {
@@ -34,6 +36,6 @@ TEST_CASE("Load an empty auto-save state", "[auto-save]")
         auto saveTarget =
             std::make_shared<mpc::DirectorySaveTarget>(autosaveDir);
         REQUIRE_NOTHROW(
-            mpc::AutoSave::restoreAutoSavedStateWithTarget(mpc, saveTarget));
+            mpc::AutoSave::restoreAutoSavedState(mpc, saveTarget, isHeadless));
     }
 }

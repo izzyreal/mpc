@@ -38,7 +38,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
-void AutoSave::restoreAutoSavedStateWithTarget(
+void AutoSave::restoreAutoSavedState(
     Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget, const bool headless)
 {
     auto onCompletionTask = [&]
@@ -309,7 +309,7 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         .detach();
 }
 
-void AutoSave::storeAutoSavedStateWithTarget(
+void AutoSave::storeAutoSavedState(
     Mpc &mpc, const std::shared_ptr<SaveTarget> saveTarget)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
