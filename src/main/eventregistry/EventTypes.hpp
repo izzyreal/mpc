@@ -58,7 +58,7 @@ namespace mpc::eventregistry
     {
         ProgramPadIndex padIndex;
         Source source{};
-        std::optional<MidiChannel> midiChannel;
+        std::optional<MidiChannel> midiInputChannel;
         std::shared_ptr<lcdgui::ScreenComponent> screen;
         sequencer::Track *track;
         std::shared_ptr<sequencer::Bus> bus;
@@ -85,7 +85,7 @@ namespace mpc::eventregistry
     {
         NoteNumber noteNumber;
         Source source{};
-        std::optional<MidiChannel> midiChannel;
+        std::optional<MidiChannel> midiInputChannel;
         std::shared_ptr<lcdgui::ScreenComponent> screen;
         sequencer::Track *track;
         std::shared_ptr<sequencer::Bus> bus;
@@ -99,13 +99,13 @@ namespace mpc::eventregistry
     {
         NoteNumber noteNumber;
         Pressure pressure;
-        std::optional<MidiChannel> midiChannel;
+        std::optional<MidiChannel> midiInputChannel;
     };
 
     struct NoteOffEvent
     {
         NoteNumber noteNumber;
-        std::optional<MidiChannel> midiChannel;
+        std::optional<MidiChannel> midiInputChannel;
     };
 
     using PhysicalPadPressEventPtr = std::shared_ptr<PhysicalPadPressEvent>;

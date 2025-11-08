@@ -109,7 +109,7 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     const Source source, const std::shared_ptr<ScreenComponent> &screen,
     const std::shared_ptr<Bus> &bus, const std::shared_ptr<Program> &program,
     const ProgramPadIndex padIndex, const Velocity velocity, Track *track,
-    const std::optional<MidiChannel> midiChannel) const
+    const std::optional<MidiChannel> midiInputChannel) const
 {
     assert(screen && bus && program);
     // printf("registering program pad press with source %s\n",
@@ -123,7 +123,7 @@ ProgramPadPressEventPtr EventRegistry::registerProgramPadPress(
     e->bus = bus;
     e->program = program;
     e->velocity = velocity;
-    e->midiChannel = midiChannel;
+    e->midiInputChannel = midiInputChannel;
     e->pressTime = std::chrono::steady_clock::now();
 
     EventMessage msg{EventMessage::Type::ProgramPadPress};
@@ -153,7 +153,7 @@ void EventRegistry::registerProgramPadAftertouch(
 void EventRegistry::registerProgramPadRelease(
     const Source source, const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<Program> &program, const ProgramPadIndex padIndex,
-    Track *track, std::optional<MidiChannel> midiChannel,
+    Track *track, std::optional<MidiChannel> midiInputChannel,
     const std::function<void(void *)> &action) const
 {
     assert(bus && program);
@@ -174,14 +174,14 @@ NoteOnEventPtr EventRegistry::registerNoteOn(
     const Source source, const std::shared_ptr<ScreenComponent> &screen,
     const std::shared_ptr<Bus> &bus, const NoteNumber noteNumber,
     const Velocity velocity, Track *track,
-    const std::optional<MidiChannel> midiChannel,
+    const std::optional<MidiChannel> midiInputChannel,
     const std::shared_ptr<Program> &program,
     const std::function<void(void *)> &action) const
 {
     // printf("registering note on\n");
     assert(screen && bus);
     auto e = std::make_shared<NoteOnEvent>(
-        NoteOnEvent{noteNumber, source, midiChannel, screen, track, bus,
+        NoteOnEvent{noteNumber, source, midiInputChannel, screen, track, bus,
                     velocity, nullptr, program, std::nullopt});
     EventMessage msg{EventMessage::Type::NoteOn};
     msg.noteOnEvent = e;
@@ -193,11 +193,11 @@ NoteOnEventPtr EventRegistry::registerNoteOn(
 
 void EventRegistry::registerNoteAftertouch(
     const Source source, const NoteNumber noteNumber, const Pressure pressure,
-    const std::optional<MidiChannel> midiChannel) const
+    const std::optional<MidiChannel> midiInputChannel) const
 {
     // printf("registering note aftertouch\n");
     const auto e = std::make_shared<NoteAftertouchEvent>(
-        NoteAftertouchEvent{noteNumber, pressure, midiChannel});
+        NoteAftertouchEvent{noteNumber, pressure, midiInputChannel});
     EventMessage msg{EventMessage::Type::NoteAftertouch};
     msg.source = source;
     msg.noteAftertouchEvent = e;
@@ -205,17 +205,13 @@ void EventRegistry::registerNoteAftertouch(
 }
 
 void EventRegistry::registerNoteOff(
-    const Source source, const std::shared_ptr<Bus> &bus,
-    const NoteNumber noteNumber, Track *track,
-    const std::optional<MidiChannel> midiChannel,
+    const Source source,
+    const NoteNumber noteNumber,
+    const std::optional<MidiChannel> midiInputChannel,
     const std::function<void(void *)> &action) const
 {
-    assert(bus);
-
-    // printf("registering note off\n");
-
     const auto e =
-        std::make_shared<NoteOffEvent>(NoteOffEvent{noteNumber, midiChannel});
+        std::make_shared<NoteOffEvent>(NoteOffEvent{noteNumber, midiInputChannel});
     EventMessage msg{EventMessage::Type::NoteOff};
     msg.noteOffEvent = e;
     msg.source = source;
@@ -388,7 +384,7 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
             {
                 if (n->noteNumber == msg.noteAftertouchEvent->noteNumber &&
                     n->source == msg.source &&
-                    n->midiChannel == msg.noteAftertouchEvent->midiChannel)
+                    n->midiInputChannel == msg.noteAftertouchEvent->midiInputChannel)
                 {
                     n->pressure = msg.noteAftertouchEvent->pressure;
                     publishSnapshot();
@@ -406,9 +402,15 @@ void EventRegistry::applyMessage(const EventMessage &msg) noexcept
                 noteEvents.begin(), noteEvents.end(),
                 [&](const auto &n)
                 {
-                    return n->source == msg.source &&
-                           n->noteNumber == msg.noteOffEvent->noteNumber &&
-                           n->midiChannel == msg.noteOffEvent->midiChannel;
+                    const bool match =
+                        n->source == msg.source &&
+                        n->noteNumber == msg.noteOffEvent->noteNumber &&
+                        (
+                            n->source == Source::MidiInput
+                                ? n->midiInputChannel == msg.noteOffEvent->midiInputChannel
+                                : true
+                        );                
+                    return match;
                 });
 
             if (noteOn == noteEvents.end())

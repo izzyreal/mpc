@@ -152,15 +152,19 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
                            eventRegistry = mpc.eventRegistry, program,
                            programPadIndex, noteOffCtx]
     {
-        eventRegistry->registerNoteOff(eventregistry::Source::Sequence, bus,
-                                       note, track, std::nullopt,
+        constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
+
+        eventRegistry->registerNoteOff(eventregistry::Source::Sequence,
+                                       note, noMidiChannel,
                                        [](void *) {});
 
         if (programPadIndex != -1)
         {
+            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
+
             eventRegistry->registerProgramPadRelease(
                 eventregistry::Source::Sequence, bus, program, programPadIndex,
-                track, std::nullopt, [](void *) {});
+                track, noMidiChannel, [](void *) {});
         }
 
         DrumNoteEventHandler::noteOff(noteOffCtx);

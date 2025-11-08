@@ -4,6 +4,7 @@
 #include "controller/ClientEventController.hpp"
 
 #include "command/context/TriggerLocalNoteContextFactory.hpp"
+#include "eventregistry/EventTypes.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/MidiInputScreen.hpp"
 
@@ -217,57 +218,60 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 {
-    const int ch = e.getChannel();
-    const int note = e.getNoteNumber();
+    const int midiChannel = e.getChannel();
+    const int noteNumber = e.getNoteNumber();
 
-    if (convertSustainPedalToDuration && sustainPedalState[ch])
+    if (convertSustainPedalToDuration && sustainPedalState[midiChannel])
     {
-        holdNoteForSustain(ch, note);
+        holdNoteForSustain(midiChannel, noteNumber);
         return;
     }
 
-    noteOffInternal(ch, note);
+    noteOffInternal(midiChannel, noteNumber);
 
-    const auto snapshot = eventRegistry->getSnapshot();
-
-    const auto noteEventInfo =
-        snapshot.retrieveNoteEvent(note, Source::MidiInput);
-
-    if (!noteEventInfo)
+    const std::function action = [this, noteNumber, midiChannel](void *userData)
     {
-        printf("no noteEventInfo found!\n");
-        return;
-    }
+        eventregistry::NoteOnEvent *noteEventInfo = (eventregistry::NoteOnEvent*) userData;
+        std::optional<int> programPadIndex = std::nullopt;
 
-    std::optional<int> programPadIndex = std::nullopt;
+        std::shared_ptr<Program> program;
+        std::shared_ptr<Bus> bus;
+        Track *track = nullptr;
+        std::shared_ptr<ScreenComponent> screen;
 
-    if (const auto program = noteEventInfo->program)
-    {
-        programPadIndex = program->getPadIndexFromNote(note);
-
-        if (*programPadIndex >= 0)
+        if (noteEventInfo)
         {
-            eventRegistry->registerProgramPadRelease(
-                Source::MidiInput, noteEventInfo->bus, noteEventInfo->program,
-                *programPadIndex, noteEventInfo->track, e.getChannel(),
-                [](void *) {});
+            program = noteEventInfo->program;
+            bus = noteEventInfo->bus;
+            track = noteEventInfo->track;
+            screen = noteEventInfo->screen;
         }
-    }
 
-    auto ctx = TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-        Source::MidiInput, note, noteEventInfo->track, noteEventInfo->bus,
-        noteEventInfo->screen, programPadIndex, noteEventInfo->program,
-        sequencer, frameSequencer, eventRegistry, clientEventController,
-        eventHandler, screens, hardware);
+        if (program)
+        {
+            programPadIndex = program->getPadIndexFromNote(noteNumber);
 
-    const std::function action = [ctx](void *)
-    {
+            if (*programPadIndex >= 0)
+            {
+                eventRegistry->registerProgramPadRelease(
+                    Source::MidiInput, bus, program,
+                    *programPadIndex, track, midiChannel, 
+                    [](void *) {});
+            }
+        }
+
+        auto ctx = TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
+            Source::MidiInput, noteNumber, track, bus,
+            screen, programPadIndex, program,
+            sequencer, frameSequencer, eventRegistry, clientEventController,
+            eventHandler, screens, hardware);
+
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };
 
-    eventRegistry->registerNoteOff(Source::MidiInput, noteEventInfo->bus,
-                                   e.getNoteNumber(), noteEventInfo->track,
-                                   e.getChannel(), action);
+    eventRegistry->registerNoteOff(Source::MidiInput,
+                                   noteNumber,
+                                   midiChannel, action);
 }
 
 void ClientMidiEventController::handleKeyAftertouch(

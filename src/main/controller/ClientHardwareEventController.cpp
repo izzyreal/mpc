@@ -176,9 +176,11 @@ void ClientHardwareEventController::handlePadPress(
 
     if (program)
     {
+        constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
+
         mpc.eventRegistry->registerProgramPadPress(
             Source::VirtualMpcHardware, screen, screen->getBus(), program,
-            programPadIndex, clampedVelocity, track.get(), std::nullopt);
+            programPadIndex, clampedVelocity, track.get(), noMidiChannel);
 
         note = program->getNoteFromPad(programPadIndex);
     }
@@ -221,10 +223,10 @@ void ClientHardwareEventController::handlePadPress(
 
         if (*note >= 0)
         {
-            constexpr std::optional<int> midiChannel = std::nullopt;
+            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
             registryNoteOnEvent = mpc.eventRegistry->registerNoteOn(
                 Source::VirtualMpcHardware, screen, screen->getBus(), *note,
-                clampedVelocity, track.get(), midiChannel, program,
+                clampedVelocity, track.get(), noMidiChannel, program,
                 [](void *) {});
         }
     }
@@ -325,18 +327,19 @@ void ClientHardwareEventController::handlePadRelease(
 
             if (*p->note >= 0)
             {
-                constexpr std::optional<int> midiChannel = std::nullopt;
+                constexpr std::optional<int> noMidiChannel = std::nullopt;
                 eventRegistry->registerNoteOff(Source::VirtualMpcHardware,
-                                               p->bus, *p->note, p->track,
-                                               midiChannel, [](void *) {});
+                                               *p->note,
+                                               noMidiChannel, [](void *) {});
             }
         }
 
         if (p->program)
         {
+            constexpr std::optional<int> noMidiChannel = std::nullopt;
             eventRegistry->registerProgramPadRelease(
                 Source::VirtualMpcHardware, p->bus, p->program, programPadIndex,
-                p->track, std::nullopt, [](void *) {});
+                p->track, noMidiChannel, [](void *) {});
         }
     };
 

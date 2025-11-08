@@ -10,7 +10,6 @@
 
 #include <memory>
 #include <optional>
-#include <atomic>
 #include <functional>
 
 namespace moodycamel
@@ -86,8 +85,8 @@ namespace mpc::eventregistry
 
         void registerNoteAftertouch(Source, NoteNumber, Pressure,
                                     std::optional<MidiChannel>) const;
-        void registerNoteOff(Source, const std::shared_ptr<sequencer::Bus> &,
-                             NoteNumber, sequencer::Track *,
+        void registerNoteOff(Source, 
+                             NoteNumber,
                              std::optional<MidiChannel>,
                              const std::function<void(void *)> &action) const;
 
