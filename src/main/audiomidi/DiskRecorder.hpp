@@ -77,6 +77,6 @@ namespace mpc::audiomidi
         DiskRecorder(mpc::Mpc &,
                      mpc::engine::audio::core::AudioProcess *process,
                      int index);
-        ~DiskRecorder();
+        ~DiskRecorder() override;
     };
 } // namespace mpc::audiomidi

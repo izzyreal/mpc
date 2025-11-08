@@ -74,7 +74,7 @@ namespace mpc::engine::audio::server
                   const std::vector<int8_t> &hostInputChannelIndices,
                   const std::vector<int8_t> &hostOutputChannelIndices) const;
         NonRealTimeAudioServer(std::shared_ptr<AudioServer> server);
-        ~NonRealTimeAudioServer();
+        ~NonRealTimeAudioServer() override;
     };
 
 } // namespace mpc::engine::audio::server

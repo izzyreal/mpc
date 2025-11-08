@@ -92,7 +92,7 @@ namespace mpc::input
             {
                 return 0;
             }
-            return gestures[id].size();
+            return static_cast<int>(gestures[id].size());
         }
 
     private:
