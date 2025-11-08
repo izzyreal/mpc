@@ -1,4 +1,4 @@
-#include "RepeatPad.hpp"
+#include "NoteRepeatProcessor.hpp"
 
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
@@ -26,7 +26,7 @@ using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::eventregistry;
 
-void RepeatPad::process(
+void NoteRepeatProcessor::process(
     FrameSeq *frameSequencer, Sequencer *sequencer,
     std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> mixer,
     bool isFullLevelEnabled, bool isSixteenLevelsEnabled,

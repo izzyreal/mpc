@@ -6,7 +6,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
-#include "sequencer/RepeatPad.hpp"
+#include "sequencer/NoteRepeatProcessor.hpp"
 #include "Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -41,7 +41,7 @@ FrameSeq::FrameSeq(
     const std::function<void(int velo, int frameOffset)> &triggerMetronome,
     std::function<std::shared_ptr<Screens>()> getScreens,
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
-    // Only used by note repeat (RepeatPad)
+    // Only used by note repeat (NoteRepeatProcessor)
     const std::shared_ptr<Sampler> &sampler,
     const std::function<std::shared_ptr<AudioMixer>()> &getAudioMixer,
     const std::function<bool()> &isFullLevelEnabled,
@@ -424,7 +424,7 @@ void FrameSeq::processNoteRepeat()
         (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
     const auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
 
-    bool shouldRepeatPad = false;
+    bool shouldRepeatNote = false;
 
     if (repeatIntervalTicks == 24 || repeatIntervalTicks == 48)
     {
@@ -432,23 +432,23 @@ void FrameSeq::processNoteRepeat()
                 swingOffset + repeatIntervalTicks ||
             tickPosWithShift % (repeatIntervalTicks * 2) == 0)
         {
-            shouldRepeatPad = true;
+            shouldRepeatNote = true;
         }
     }
     else if (repeatIntervalTicks != 1 &&
              (tickPosWithShift % repeatIntervalTicks == 0))
     {
-        shouldRepeatPad = true;
+        shouldRepeatNote = true;
     }
 
-    if (shouldRepeatPad)
+    if (shouldRepeatNote)
     {
         const auto assign16LevelsScreen =
             getScreens()->get<ScreenId::Assign16LevelsScreen>();
         const auto mixerSetupScreen =
             getScreens()->get<ScreenId::MixerSetupScreen>();
 
-        RepeatPad::process(
+        NoteRepeatProcessor::process(
             this, sequencer, sampler, getAudioMixer(), isFullLevelEnabled(),
             isSixteenLevelsEnabled(), assign16LevelsScreen, mixerSetupScreen,
             eventRegistry, hardwareSlider, voices, getMixerInterconnections(),

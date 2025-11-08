@@ -43,7 +43,7 @@ namespace mpc::sequencer
 {
     class Sequencer;
     class FrameSeq;
-    class RepeatPad
+    class NoteRepeatProcessor
     {
     public:
         static void

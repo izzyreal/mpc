@@ -118,7 +118,7 @@ namespace mpc::sequencer
         std::function<void(int velo, int frameOffset)> triggerMetronome;
         std::function<bool()> isNoteRepeatLockedOrPressed;
 
-        // Required for note repeat (RepeatPad)
+        // Required for note repeat (NoteRepeatProcessor)
         std::shared_ptr<sampler::Sampler> sampler;
         std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>
             getAudioMixer;
