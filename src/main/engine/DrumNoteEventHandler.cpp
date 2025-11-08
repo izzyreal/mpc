@@ -197,7 +197,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 
         if (optA != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
-            auto ctxOptA = DrumNoteEventContextBuilder::buildNoteOn(
+            auto ctxOptA = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 c.noteEventId, c.drum, c.sampler, c.mixer, c.mixerSetupScreen,
                 c.voices, *c.mixerConnections, optA, c.velocity, c.varType,
                 c.varValue, c.frameOffset, false, c.startTick,
@@ -210,7 +210,7 @@ void DrumNoteEventHandler::noteOn(const DrumNoteOnContext &c)
 
         if (optB != Mpc2000XlSpecs::OPTIONAL_NOTE_DISABLED)
         {
-            auto ctxOptB = DrumNoteEventContextBuilder::buildNoteOn(
+            auto ctxOptB = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 c.noteEventId, c.drum, c.sampler, c.mixer, c.mixerSetupScreen,
                 c.voices, *c.mixerConnections, optB, c.velocity, c.varType,
                 c.varValue, c.frameOffset, false, c.startTick,

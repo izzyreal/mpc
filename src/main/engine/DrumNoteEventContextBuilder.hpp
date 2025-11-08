@@ -35,7 +35,7 @@ namespace mpc::engine
     class DrumNoteEventContextBuilder
     {
     public:
-        static DrumNoteOnContext buildNoteOn(
+        static DrumNoteOnContext buildDrumNoteOnContext(
             uint64_t noteEventId, const std::shared_ptr<sequencer::DrumBus> &,
             const std::shared_ptr<mpc::sampler::Sampler> &sampler,
             const std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> &mixer,
@@ -47,7 +47,7 @@ namespace mpc::engine
             bool firstGeneration, int startTick, int durationFrames);
 
         static DrumNoteOffContext
-        buildNoteOff(uint64_t noteEventId,
+        buildDrumNoteOffContext(uint64_t noteEventId,
                      const std::shared_ptr<sequencer::DrumBus> &drum,
                      std::vector<std::shared_ptr<Voice>> *voices, int note,
                      int noteOnStartTick);

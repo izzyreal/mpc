@@ -151,7 +151,7 @@ void RepeatPad::process(
                                     ? VoiceOverlapMode::NOTE_OFF
                                     : noteParameters->getVoiceOverlapMode();
 
-            auto ctx = DrumNoteEventContextBuilder::buildNoteOn(
+            auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, drumBus, sampler, mixer, mixerSetupScreen, voices,
                 mixerConnections, note, noteEvent->getVelocity(),
                 noteEvent->getVariationType(), noteEvent->getVariationValue(),
@@ -187,7 +187,7 @@ void RepeatPad::process(
             {
                 if (drumBus)
                 {
-                    auto ctx = DrumNoteEventContextBuilder::buildNoteOff(
+                    auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
                         0, drumBus, voices, note, tickPosition);
 
                     DrumNoteEventHandler::noteOff(ctx);

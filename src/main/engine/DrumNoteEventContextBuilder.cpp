@@ -11,7 +11,7 @@ using namespace mpc::sequencer;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::sampler;
 
-DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
+DrumNoteOnContext DrumNoteEventContextBuilder::buildDrumNoteOnContext(
     uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<AudioMixer> &mixer,
@@ -39,7 +39,7 @@ DrumNoteOnContext DrumNoteEventContextBuilder::buildNoteOn(
     return ctx;
 }
 
-DrumNoteOffContext DrumNoteEventContextBuilder::buildNoteOff(
+DrumNoteOffContext DrumNoteEventContextBuilder::buildDrumNoteOffContext(
     uint64_t noteEventId, const std::shared_ptr<DrumBus> &drum,
     std::vector<std::shared_ptr<Voice>> *voices, int note, int noteOnStartTick)
 {
