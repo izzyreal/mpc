@@ -20,7 +20,12 @@ EventRegistry::EventRegistry()
     snapA.programPadEvents.reserve(CAPACITY);
     snapA.noteEvents.reserve(CAPACITY);
 
-    currentSnapshot = std::make_shared<Snapshot>(snapA);
+    snapB.physicalPadEvents.reserve(CAPACITY);
+    snapB.programPadEvents.reserve(CAPACITY);
+    snapB.noteEvents.reserve(CAPACITY);
+
+    currentSnapshot = std::shared_ptr<Snapshot>(&snapA, [](Snapshot*){});
+    writeTarget = &snapB;
 
     eventMessageQueue = std::make_shared<EventMessageQueue>(512);
 }
@@ -251,9 +256,11 @@ void EventRegistry::publishSnapshotToBuffer(Snapshot *dst) const noexcept
 
 void EventRegistry::publishSnapshot() noexcept
 {
-    auto s = std::make_shared<Snapshot>();
-    publishSnapshotToBuffer(s.get());
-    std::atomic_store(&currentSnapshot, s);
+    Snapshot* dst = writeTarget;
+    publishSnapshotToBuffer(dst);
+    auto newShared = std::shared_ptr<Snapshot>(dst, [](Snapshot*){});
+    std::atomic_store(&currentSnapshot, newShared);
+    writeTarget = (dst == &snapA) ? &snapB : &snapA;
 }
 
 SnapshotView EventRegistry::getSnapshot() const noexcept

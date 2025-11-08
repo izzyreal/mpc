@@ -107,7 +107,8 @@ namespace mpc::eventregistry
 
         std::shared_ptr<EventMessageQueue> eventMessageQueue;
 
-        Snapshot snapA;
+        Snapshot snapA, snapB;
+        Snapshot* writeTarget;
         std::shared_ptr<Snapshot> currentSnapshot;
 
         void enqueue(EventMessage &&) const;
