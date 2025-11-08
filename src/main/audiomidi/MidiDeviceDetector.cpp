@@ -22,8 +22,14 @@ using namespace mpc::lcdgui::screens::window;
 
 void MidiDeviceDetector::start(mpc::Mpc &mpc)
 {
-    running = true;
-    pollThread = new std::thread(
+    if (running.load())
+    {
+        return;
+    }
+
+    running.store(true);
+
+    pollThread = std::make_unique<std::thread>(
         [&mpc, this]
         {
             std::shared_ptr<RtMidiIn> rtMidiIn;
@@ -40,18 +46,14 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                 return;
             }
 
-            lower_my_priority();
+            if (!lower_my_priority())
+            {
+                MLOG("MidiDeviceDetector failed to lower its priority!");
+            }
 
-            while (running)
+            while (running.load())
             {
                 std::set<std::string> allCurrentNames;
-
-                if (mpc.getLayeredScreen()->getCurrentScreenName() ==
-                    "vmpc-continue-previous-session")
-                {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                    continue;
-                }
 
                 for (int i = 0; i < rtMidiIn->getPortCount(); i++)
                 {
@@ -104,8 +106,14 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                                 mpc.screens->get<ScreenId::VmpcMidiScreen>();
                             mpc.getDisk()->readMidiControlPreset(
                                 path, vmpcMidiScreen->switchToPreset);
-                            mpc.getLayeredScreen()->openScreenById(
-                                ScreenId::VmpcKnownControllerDetectedScreen);
+                            auto layeredScreen = mpc.getLayeredScreen();
+                            layeredScreen->postToUiThread(
+                                [layeredScreen]
+                                {
+                                    layeredScreen->openScreenById(
+                                        ScreenId::
+                                            VmpcKnownControllerDetectedScreen);
+                                });
                         }
                     }
                 }
@@ -119,19 +127,17 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
 
 void MidiDeviceDetector::stop()
 {
-    running = false;
+    running.store(false);
 }
 
 MidiDeviceDetector::~MidiDeviceDetector()
 {
-    running = false;
+    stop();
 
     if (pollThread && pollThread->joinable())
     {
         pollThread->join();
     }
-
-    delete pollThread;
 }
 
 auto MidiDeviceDetector::lower_my_priority() -> bool

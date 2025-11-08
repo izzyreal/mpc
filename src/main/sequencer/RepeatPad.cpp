@@ -187,8 +187,9 @@ void RepeatPad::process(
             {
                 if (drumBus)
                 {
-                    auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-                        0, drumBus, voices, note, tickPosition);
+                    auto ctx =
+                        DrumNoteEventContextBuilder::buildDrumNoteOffContext(
+                            0, drumBus, voices, note, tickPosition);
 
                     DrumNoteEventHandler::noteOff(ctx);
                 }

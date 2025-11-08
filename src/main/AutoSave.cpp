@@ -41,10 +41,20 @@ using namespace mpc::lcdgui::screens::dialog2;
 void AutoSave::restoreAutoSavedStateWithTarget(
     Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget, const bool headless)
 {
+    auto onCompletionTask = [&]
+    {
+        mpc.getLayeredScreen()->postToUiThread(
+            [&]
+            {
+                mpc.startMidiDeviceDetector();
+            });
+    };
+
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 &&
         !mpc.isPluginModeEnabled())
     {
+        onCompletionTask();
         return;
     }
 
@@ -64,10 +74,12 @@ void AutoSave::restoreAutoSavedStateWithTarget(
 
     if (availableFiles.empty())
     {
+        onCompletionTask();
         return;
     }
 
-    const auto restoreAction = [&mpc, availableFiles, saveTarget, headless]
+    const auto restoreAction =
+        [&mpc, availableFiles, saveTarget, headless, onCompletionTask]
     {
         auto layeredScreen = mpc.getLayeredScreen();
         std::map<fs::path, std::vector<char>> processInOrder;
@@ -79,9 +91,11 @@ void AutoSave::restoreAutoSavedStateWithTarget(
                 return;
             }
 
-            layeredScreen->postToUiThread([layeredScreen, msg] {
-                layeredScreen->showPopup(msg);
-            });
+            layeredScreen->postToUiThread(
+                [layeredScreen, msg]
+                {
+                    layeredScreen->showPopup(msg);
+                });
 
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         };
@@ -234,14 +248,16 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         const auto screenName = getStringProperty("screen.txt");
         const auto focusName = getStringProperty("focus.txt");
 
-        layeredScreen->postToUiThread([layeredScreen, screenName, focusName] {
-            layeredScreen->openScreen(screenName);
-
-            if (!focusName.empty())
+        layeredScreen->postToUiThread(
+            [layeredScreen, screenName, focusName]
             {
-                layeredScreen->setFocus(focusName);
-            }
-        });
+                layeredScreen->openScreen(screenName);
+
+                if (!focusName.empty())
+                {
+                    layeredScreen->setFocus(focusName);
+                }
+            });
 
         for (auto &p : mpc.getSampler()->getPrograms())
         {
@@ -270,6 +286,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(
                 d->setProgram(0);
             }
         }
+
+        onCompletionTask();
     };
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 &&

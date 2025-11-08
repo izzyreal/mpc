@@ -115,22 +115,25 @@ void DiskController::detectRawUsbVolumes()
 
     MLOG("RemovableVolumes instantiated");
 
-    class SimpleChangeListener : public VolumeChangeListener {
+    class SimpleChangeListener : public VolumeChangeListener
+    {
     public:
         std::vector<RemovableVolume> volumes;
         std::mutex m;
 
-        void processChange(RemovableVolume v) override {
+        void processChange(RemovableVolume v) override
+        {
             std::lock_guard<std::mutex> lk(m);
             volumes.push_back(std::move(v));
         }
 
-        std::vector<RemovableVolume> snapshot() {
+        std::vector<RemovableVolume> snapshot()
+        {
             std::lock_guard<std::mutex> lk(m);
             return volumes;
         }
     };
-    
+
     SimpleChangeListener listener;
 
     MLOG("SimpleChangeListener instantiated");

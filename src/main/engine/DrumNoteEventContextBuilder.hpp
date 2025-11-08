@@ -48,8 +48,8 @@ namespace mpc::engine
 
         static DrumNoteOffContext
         buildDrumNoteOffContext(uint64_t noteEventId,
-                     const std::shared_ptr<sequencer::DrumBus> &drum,
-                     std::vector<std::shared_ptr<Voice>> *voices, int note,
-                     int noteOnStartTick);
+                                const std::shared_ptr<sequencer::DrumBus> &drum,
+                                std::vector<std::shared_ptr<Voice>> *voices,
+                                int note, int noteOnStartTick);
     };
 } // namespace mpc::engine
