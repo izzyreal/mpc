@@ -166,40 +166,53 @@ void LayeredScreen::setPopupScreenText(const std::string &text) const
     mpc.screens->get<ScreenId::PopupScreen>()->setText(text);
 }
 
-void LayeredScreen::showPopup(const std::string& msg)
+void LayeredScreen::showPopup(const std::string &msg)
 {
-    PopupScreen::PopupConfig cfg{ msg };
+    PopupScreen::PopupConfig cfg{msg};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }
 
-void LayeredScreen::showPopupForMs(const std::string& msg, int delayMs)
+void LayeredScreen::showPopupForMs(const std::string &msg, int delayMs)
 {
-    PopupScreen::PopupConfig cfg{ msg, false, delayMs, { PopupScreen::PopupBehavior::OnTimeoutAction::Close } };
+    PopupScreen::PopupConfig cfg{
+        msg,
+        false,
+        delayMs,
+        {PopupScreen::PopupBehavior::OnTimeoutAction::Close}};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }
 
 void LayeredScreen::showPopupAndThenOpen(ScreenId targetId,
-                                         const std::string& msg, int delayMs)
+                                         const std::string &msg, int delayMs)
 {
-    PopupScreen::PopupConfig cfg{ msg, false, delayMs, { PopupScreen::PopupBehavior::OnTimeoutAction::OpenScreen, std::nullopt, targetId } };
+    PopupScreen::PopupConfig cfg{
+        msg,
+        false,
+        delayMs,
+        {PopupScreen::PopupBehavior::OnTimeoutAction::OpenScreen, std::nullopt,
+         targetId}};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }
 
-void LayeredScreen::showPopupAndThenReturnToLayer(const std::string& msg,
-                                                  int delayMs,
-                                                  int layerIndex)
+void LayeredScreen::showPopupAndThenReturnToLayer(const std::string &msg,
+                                                  int delayMs, int layerIndex)
 {
-    PopupScreen::PopupConfig cfg{ msg, false, delayMs, { PopupScreen::PopupBehavior::OnTimeoutAction::ReturnToLayer, layerIndex } };
+    PopupScreen::PopupConfig cfg{
+        msg,
+        false,
+        delayMs,
+        {PopupScreen::PopupBehavior::OnTimeoutAction::ReturnToLayer,
+         layerIndex}};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }
 
-void LayeredScreen::showPopupAndAwaitInteraction(const std::string& msg)
+void LayeredScreen::showPopupAndAwaitInteraction(const std::string &msg)
 {
-    PopupScreen::PopupConfig cfg{ msg, true };
+    PopupScreen::PopupConfig cfg{msg, true};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }

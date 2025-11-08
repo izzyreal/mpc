@@ -216,8 +216,9 @@ void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc,
                                               const std::string &ext,
                                               int sampleSize)
 {
-    mpc.getLayeredScreen()->showPopup("Loading " + StrUtil::padRight(name, " ", 16) + "." +
-                         StrUtil::toUpper(ext));
+    mpc.getLayeredScreen()->showPopup("Loading " +
+                                      StrUtil::padRight(name, " ", 16) + "." +
+                                      StrUtil::toUpper(ext));
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 

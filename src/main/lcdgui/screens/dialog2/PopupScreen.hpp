@@ -13,23 +13,23 @@ namespace mpc::lcdgui::screens::dialog2
         {
             enum class OnTimeoutAction
             {
-                None,          // persistent popup
-                Close,         // close current screen
-                OpenScreen,    // open another screen
-                ReturnToLayer  // unwind to specific layer
+                None,         // persistent popup
+                Close,        // close current screen
+                OpenScreen,   // open another screen
+                ReturnToLayer // unwind to specific layer
             };
 
             OnTimeoutAction action = OnTimeoutAction::None;
-            std::optional<int> targetLayer;          // only used for ReturnToLayer
-            std::optional<ScreenId> targetScreen;    // only used for OpenScreen
+            std::optional<int> targetLayer;       // only used for ReturnToLayer
+            std::optional<ScreenId> targetScreen; // only used for OpenScreen
         };
 
         struct PopupConfig
         {
             std::string text;
             bool closeUponButtonOrPadPressOrDataWheelTurn = false;
-            std::optional<int> autoCloseDelayMs;      // delay before timeout action
-            PopupBehavior behavior;                   // what to do when timeout elapses
+            std::optional<int> autoCloseDelayMs; // delay before timeout action
+            PopupBehavior behavior; // what to do when timeout elapses
         };
 
         PopupScreen(Mpc &mpc, int layer);

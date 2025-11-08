@@ -42,7 +42,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(
     Mpc &mpc, std::shared_ptr<SaveTarget> saveTarget, const bool headless)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
-    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 && !mpc.isPluginModeEnabled())
+    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 &&
+        !mpc.isPluginModeEnabled())
     {
         return;
     }
@@ -73,7 +74,10 @@ void AutoSave::restoreAutoSavedStateWithTarget(
 
         auto showMsg = [&](const std::string &msg)
         {
-            if (headless) return;
+            if (headless)
+            {
+                return;
+            }
             layeredScreen->showPopup(msg);
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         };
@@ -87,15 +91,42 @@ void AutoSave::restoreAutoSavedStateWithTarget(
             }
 
             std::string desc;
-            if (f == "APS.APS") desc = "programs and settings";
-            else if (f == "ALL.ALL") desc = "sequence data";
-            else if (f == "sounds.txt") desc = "sounds";
-            else if (f == "soundIndex.txt") desc = "sound index";
-            else if (f == "selectedPad.txt") desc = "selected pad";
-            else if (f == "selectedNote.txt") desc = "selected note";
-            else if (f == "screen.txt") desc = "screen state";
-            else if (f == "focus.txt") desc = "focus field";
-            else if (f == "currentDir.txt") desc = "current directory";
+            if (f == "APS.APS")
+            {
+                desc = "programs and settings";
+            }
+            else if (f == "ALL.ALL")
+            {
+                desc = "sequence data";
+            }
+            else if (f == "sounds.txt")
+            {
+                desc = "sounds";
+            }
+            else if (f == "soundIndex.txt")
+            {
+                desc = "sound index";
+            }
+            else if (f == "selectedPad.txt")
+            {
+                desc = "selected pad";
+            }
+            else if (f == "selectedNote.txt")
+            {
+                desc = "selected note";
+            }
+            else if (f == "screen.txt")
+            {
+                desc = "screen state";
+            }
+            else if (f == "focus.txt")
+            {
+                desc = "focus field";
+            }
+            else if (f == "currentDir.txt")
+            {
+                desc = "current directory";
+            }
 
             showMsg("Loading " + desc);
 
@@ -118,7 +149,9 @@ void AutoSave::restoreAutoSavedStateWithTarget(
                 for (auto &soundName : soundNames)
                 {
                     if (soundName.empty())
+                    {
                         continue;
+                    }
 
                     showMsg("Loading " + soundName.substr(0, 20));
 
@@ -127,7 +160,9 @@ void AutoSave::restoreAutoSavedStateWithTarget(
                     auto sound =
                         mpc.getSampler()->addSound(sndReader.getSampleRate());
                     if (!sound)
+                    {
                         break;
+                    }
 
                     sound->setMono(sndReader.isMono());
                     sndReader.readData(sound->getMutableSampleData());
@@ -231,7 +266,8 @@ void AutoSave::restoreAutoSavedStateWithTarget(
         }
     };
 
-    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 && !mpc.isPluginModeEnabled())
+    if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 &&
+        !mpc.isPluginModeEnabled())
     {
         auto confirmScreen =
             mpc.screens->get<ScreenId::VmpcContinuePreviousSessionScreen>();
@@ -265,8 +301,7 @@ void AutoSave::storeAutoSavedStateWithTarget(
     {
         auto layeredScreen = mpc.getLayeredScreen();
 
-        std::string currentScreen =
-            layeredScreen->getFirstLayerScreenName();
+        std::string currentScreen = layeredScreen->getFirstLayerScreenName();
 
         auto focus = layeredScreen->getFocusedFieldName();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
@@ -311,4 +346,3 @@ void AutoSave::storeAutoSavedStateWithTarget(
 
     storeAction();
 }
-

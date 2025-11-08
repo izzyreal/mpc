@@ -124,8 +124,10 @@ void ClientHardwareEventController::handlePadPress(
         return;
     }
 
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(layeredScreen->getCurrentScreen());
-            popupScreen && popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
+    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(
+            layeredScreen->getCurrentScreen());
+        popupScreen &&
+        popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
     {
         layeredScreen->closeCurrentScreen();
     }
@@ -412,7 +414,8 @@ void ClientHardwareEventController::handleDataWheel(
     const auto screen = mpc.getScreen();
 
     if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
-            popupScreen && popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
+        popupScreen &&
+        popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
     {
         mpc.getLayeredScreen()->closeCurrentScreen();
         return;
@@ -497,7 +500,7 @@ void ClientHardwareEventController::handleButtonPress(
     const auto layeredScreen = mpc.getLayeredScreen();
 
     if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
-            popupScreen)
+        popupScreen)
     {
         if (popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
         {

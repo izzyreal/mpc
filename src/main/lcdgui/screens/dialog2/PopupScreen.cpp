@@ -49,7 +49,8 @@ void PopupScreen::onTimerCallback()
     }
 
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - startTime).count();
+                             std::chrono::steady_clock::now() - startTime)
+                             .count();
 
     if (elapsed < *config.autoCloseDelayMs)
     {
@@ -72,7 +73,8 @@ void PopupScreen::onTimerCallback()
         case PopupBehavior::OnTimeoutAction::ReturnToLayer:
             if (config.behavior.targetLayer)
             {
-                ls->closeRecentScreensUntilReachingLayer(*config.behavior.targetLayer);
+                ls->closeRecentScreensUntilReachingLayer(
+                    *config.behavior.targetLayer);
             }
             break;
 
@@ -80,6 +82,5 @@ void PopupScreen::onTimerCallback()
             break;
     }
 
-    config.autoCloseDelayMs.reset();    
+    config.autoCloseDelayMs.reset();
 }
-
