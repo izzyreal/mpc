@@ -102,8 +102,6 @@ void AudioMidiServices::start()
 
     offlineServer->setSharedPtr(offlineServer);
     offlineServer->setClient(cac);
-
-    offlineServer->start();
 }
 
 void AudioMidiServices::setMonitorLevel(const int level) const

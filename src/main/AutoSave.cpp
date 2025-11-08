@@ -1,7 +1,9 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
+#include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientEventController.hpp"
+#include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "mpc_fs.hpp"
 
@@ -47,6 +49,7 @@ void AutoSave::restoreAutoSavedState(
             [&]
             {
                 mpc.startMidiDeviceDetector();
+                mpc.getAudioMidiServices()->getAudioServer()->start();
             });
     };
 
