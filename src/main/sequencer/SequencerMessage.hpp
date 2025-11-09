@@ -10,6 +10,11 @@ namespace mpc::sequencer
         double positionQuarterNotes;
     };
 
+    struct SetPlayStartPositionQuarterNotes
+    {
+        double positionQuarterNotes;
+    };
+
     struct BumpPositionByTicks
     {
         uint8_t ticks;
@@ -22,6 +27,7 @@ namespace mpc::sequencer
 
     using SequencerMessage = std::variant<
         SetPositionQuarterNotes,
+        SetPlayStartPositionQuarterNotes,
         BumpPositionByTicks,
         SetSongModeEnabled
     >;

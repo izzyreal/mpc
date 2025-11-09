@@ -23,6 +23,11 @@ void SequencerStateManager::applyMessage(const SequencerMessage& msg) noexcept
             s.positionQuarterNotes = m.positionQuarterNotes;
             publishState();
         }
+        else if constexpr (std::is_same_v<T, SetPlayStartPositionQuarterNotes>)
+        {
+            s.playStartPositionQuarterNotes = m.positionQuarterNotes;
+            publishState();
+        }
         else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
         {
             const double delta = Sequencer::ticksToQuarterNotes(m.ticks);

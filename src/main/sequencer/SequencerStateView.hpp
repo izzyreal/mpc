@@ -14,6 +14,8 @@ namespace mpc::sequencer
 
         double getPositionQuarterNotes() const;
 
+        double getPlayStartPositionQuarterNotes() const;
+
         int64_t getPositionTicks() const;
 
         bool isSongModeEnabled() const;

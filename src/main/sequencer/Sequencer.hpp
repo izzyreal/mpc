@@ -153,7 +153,6 @@ namespace mpc::sequencer
 
         bool secondSequenceEnabled = false;
         bool undoSeqAvailable = false;
-        double playStartPositionQuarterNotes = 0.0;
 
         std::string defaultSequenceName;
         int timeDisplayStyle = 0;

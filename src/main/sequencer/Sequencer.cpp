@@ -1107,7 +1107,7 @@ int Sequencer::getCurrentBarIndex()
 {
     auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
     auto pos = isCountingIn()
-                   ? quarterNotesToTicks(playStartPositionQuarterNotes)
+                   ? quarterNotesToTicks(getPlayStartPositionQuarterNotes())
                    : getTickPosition();
 
     if (pos == s->getLastTick())
@@ -1141,7 +1141,7 @@ int Sequencer::getCurrentBeatIndex()
 {
     auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
     auto pos = isCountingIn()
-                   ? quarterNotesToTicks(playStartPositionQuarterNotes)
+                   ? quarterNotesToTicks(getPlayStartPositionQuarterNotes())
                    : getTickPosition();
 
     if (pos == s->getLastTick())
@@ -1197,7 +1197,7 @@ int Sequencer::getCurrentClockNumber()
         isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 
     auto clock = isCountingIn()
-                     ? quarterNotesToTicks(playStartPositionQuarterNotes)
+                     ? quarterNotesToTicks(getPlayStartPositionQuarterNotes())
                      : getTickPosition();
 
     if (clock == sequence->getLastTick())
@@ -1740,8 +1740,7 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
             }
 
             stateManager->enqueue(SetPositionQuarterNotes{finalPosQuarterNotes});
-            playStartPositionQuarterNotes = finalPosQuarterNotes;
-
+            stateManager->enqueue(SetPlayStartPositionQuarterNotes{finalPosQuarterNotes});
             break;
         }
     }
@@ -1831,7 +1830,7 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
                      ticksToQuarterNotes(sequence->getLastTick()));
 
             stateManager->enqueue(SetPositionQuarterNotes{finalPosQuarterNotes});
-            playStartPositionQuarterNotes = finalPosQuarterNotes;
+            stateManager->enqueue(SetPlayStartPositionQuarterNotes{finalPosQuarterNotes});
             break;
         }
     }
@@ -1867,7 +1866,8 @@ void Sequencer::move(const double positionQuarterNotesToUse)
     }
 
     stateManager->enqueue(SetPositionQuarterNotes{wrappedNewPosition});
-    playStartPositionQuarterNotes = wrappedNewPosition;
+    stateManager->enqueue(SetPlayStartPositionQuarterNotes{wrappedNewPosition});
+
     sequence->resetTrackEventIndices(quarterNotesToTicks(wrappedNewPosition));
 
     if (secondSequenceEnabled)
@@ -2090,7 +2090,7 @@ bool Sequencer::isOverdubbing() const
 
 double Sequencer::getPlayStartPositionQuarterNotes() const
 {
-    return playStartPositionQuarterNotes;
+    return stateManager->getSnapshot().getPlayStartPositionQuarterNotes();
 }
 
 void Sequencer::setRecording(const bool b)
