@@ -42,8 +42,6 @@ namespace mpc::eventregistry
 
     public:
         EventRegistry();
-        EventRegistry(const EventRegistry &other) noexcept;
-        EventRegistry &operator=(const EventRegistry &other) noexcept;
 
         void registerPhysicalPadPress(
             Source, const std::shared_ptr<lcdgui::ScreenComponent> &,

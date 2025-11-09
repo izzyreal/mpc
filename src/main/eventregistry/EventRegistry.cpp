@@ -30,23 +30,6 @@ EventRegistry::EventRegistry()
     eventMessageQueue = std::make_shared<EventMessageQueue>(512);
 }
 
-EventRegistry::EventRegistry(const EventRegistry &other) noexcept
-    : physicalPadEvents(other.physicalPadEvents),
-      programPadEvents(other.programPadEvents), noteEvents(other.noteEvents)
-{
-}
-
-EventRegistry &EventRegistry::operator=(const EventRegistry &other) noexcept
-{
-    if (this != &other)
-    {
-        physicalPadEvents = other.physicalPadEvents;
-        programPadEvents = other.programPadEvents;
-        noteEvents = other.noteEvents;
-    }
-    return *this;
-}
-
 void EventRegistry::enqueue(EventMessage &&msg) const
 {
     eventMessageQueue->enqueue(std::move(msg));
