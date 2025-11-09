@@ -34,7 +34,7 @@ namespace mpc::sequencer
 namespace mpc::eventregistry
 {
     class EventRegistry
-        : public mpc::concurrency::AtomicStateExchange<State, StateView,
+        : public concurrency::AtomicStateExchange<State, StateView,
                                                        EventMessage>
     {
     public:
@@ -86,10 +86,11 @@ namespace mpc::eventregistry
         void clear();
 
     protected:
-        void reserveState(State &s) override;
         void applyMessage(const EventMessage &msg) noexcept override;
 
     private:
         const size_t CAPACITY = 8192;
+
+        void reserveState(State &);
     };
 } // namespace mpc::eventregistry

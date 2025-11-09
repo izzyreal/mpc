@@ -2,6 +2,8 @@
 
 #include <atomic>
 #include <memory>
+#include <functional>
+
 #include <concurrentqueue.h>
 
 namespace mpc::concurrency
@@ -12,13 +14,21 @@ namespace mpc::concurrency
         using MessageQueue = moodycamel::ConcurrentQueue<
             Message, moodycamel::ConcurrentQueueDefaultTraits>;
 
-    public:
-        explicit AtomicStateExchange(size_t messageQueueCapacity = 512)
+    protected:
+        explicit AtomicStateExchange(std::function<void(State&)> reserveFn, size_t messageQueueCapacity = 512)
         {
+            reserveFn(activeState);
+            reserveFn(bufferA);
+            reserveFn(bufferB);
+        
+            currentSnapshot = std::shared_ptr<State>(&bufferA, [](State*) {});
+            writeBuffer = &bufferB;
+
             eventMessageQueue =
                 std::make_shared<MessageQueue>(messageQueueCapacity);
         }
 
+    public:
         void enqueue(Message &&msg) const noexcept
         {
             eventMessageQueue->enqueue(std::move(msg));
@@ -44,15 +54,6 @@ namespace mpc::concurrency
         }
 
     protected:
-        void initializeAtomicState()
-        {
-            reserveState(activeState);
-            reserveState(bufferA);
-            reserveState(bufferB);
-            currentSnapshot = std::shared_ptr<State>(&bufferA, [](State *) {});
-            writeBuffer = &bufferB;
-        }
-
         void publishState() noexcept
         {
             State *dst = writeBuffer;
@@ -62,7 +63,6 @@ namespace mpc::concurrency
             writeBuffer = (dst == &bufferA) ? &bufferB : &bufferA;
         }
 
-        virtual void reserveState(State &) = 0;
         virtual void applyMessage(const Message &msg) noexcept = 0;
         State activeState;
         State bufferA;

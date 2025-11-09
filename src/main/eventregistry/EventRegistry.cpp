@@ -8,9 +8,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::sampler;
 using namespace mpc::sequencer;
 
+using Base = mpc::concurrency::AtomicStateExchange<State, StateView, EventMessage>;
+
 EventRegistry::EventRegistry()
+    : Base([&](State &s){ reserveState(s); })
 {
-    initializeAtomicState();
 }
 
 void EventRegistry::reserveState(State &s)
