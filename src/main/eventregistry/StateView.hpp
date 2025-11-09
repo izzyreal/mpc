@@ -6,18 +6,13 @@
 
 namespace mpc::eventregistry
 {
-    struct Snapshot
-    {
-        PhysicalPadPressEventPtrs physicalPadEvents;
-        ProgramPadPressEventPtrs programPadEvents;
-        NoteOnEventPtrs noteEvents;
-    };
+    struct State;
 
-    class SnapshotView
+    class StateView
     {
     public:
-        explicit SnapshotView(const std::shared_ptr<const Snapshot> s) noexcept
-            : snapshot(s)
+        explicit StateView(const std::shared_ptr<const State> s) noexcept
+            : state(s)
         {
         }
 
@@ -49,22 +44,10 @@ namespace mpc::eventregistry
 
         bool valid() const noexcept
         {
-            return snapshot != nullptr;
-        }
-
-        void printStats() const
-        {
-            printf("===== EventRegistry Stats =======\n");
-            printf("physicalPadEvent count: %zu\n",
-                   snapshot->physicalPadEvents.size());
-            printf("programPadEvent  count: %zu\n",
-                   snapshot->programPadEvents.size());
-            printf("noteEvent        count: %zu\n",
-                   snapshot->noteEvents.size());
-            printf("=================================\n");
+            return state != nullptr;
         }
 
     private:
-        std::shared_ptr<const Snapshot> snapshot;
+        std::shared_ptr<const State> state;
     };
 } // namespace mpc::eventregistry

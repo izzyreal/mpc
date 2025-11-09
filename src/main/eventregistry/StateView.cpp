@@ -1,13 +1,15 @@
-#include "SnapshotView.hpp"
+#include "StateView.hpp"
+
+#include "eventregistry/State.hpp"
 
 using namespace mpc;
 using namespace mpc::eventregistry;
 
-bool SnapshotView::isProgramPadPressed(
+bool StateView::isProgramPadPressed(
     const ProgramPadIndex idx,
     const std::shared_ptr<sampler::Program> &program) const
 {
-    for (auto &e : snapshot->programPadEvents)
+    for (auto &e : state->programPadEvents)
     {
         if (e->padIndex == idx && e->program == program)
         {
@@ -17,10 +19,10 @@ bool SnapshotView::isProgramPadPressed(
     return false;
 }
 
-bool SnapshotView::isProgramPadPressedBySource(const ProgramPadIndex idx,
-                                               const Source src) const
+bool StateView::isProgramPadPressedBySource(const ProgramPadIndex idx,
+                                            const Source src) const
 {
-    for (auto &e : snapshot->programPadEvents)
+    for (auto &e : state->programPadEvents)
     {
         if (e->padIndex == idx && e->source == src)
         {
@@ -30,12 +32,12 @@ bool SnapshotView::isProgramPadPressedBySource(const ProgramPadIndex idx,
     return false;
 }
 
-VelocityOrPressure SnapshotView::getPressedProgramPadAfterTouchOrVelocity(
+VelocityOrPressure StateView::getPressedProgramPadAfterTouchOrVelocity(
     const ProgramPadIndex idx) const
 {
     std::optional<VelocityOrPressure> result;
 
-    for (const auto &e : snapshot->programPadEvents)
+    for (const auto &e : state->programPadEvents)
     {
         if (e->source == Source::NoteRepeat)
         {
@@ -66,9 +68,9 @@ VelocityOrPressure SnapshotView::getPressedProgramPadAfterTouchOrVelocity(
         "feature.\n");
 }
 
-bool SnapshotView::isProgramPadPressed(const ProgramPadIndex idx) const
+bool StateView::isProgramPadPressed(const ProgramPadIndex idx) const
 {
-    for (auto &e : snapshot->programPadEvents)
+    for (auto &e : state->programPadEvents)
     {
         if (e->padIndex == idx)
         {
@@ -78,13 +80,13 @@ bool SnapshotView::isProgramPadPressed(const ProgramPadIndex idx) const
     return false;
 }
 
-ProgramPadPressEventPtr SnapshotView::getMostRecentProgramPadPress(
+ProgramPadPressEventPtr StateView::getMostRecentProgramPadPress(
     const ProgramPadIndex idx,
     const std::vector<Source> &sourcesToExclude) const
 {
     ProgramPadPressEventPtr latest = nullptr;
 
-    for (auto &e : snapshot->programPadEvents)
+    for (auto &e : state->programPadEvents)
     {
         if (e->padIndex != idx)
         {
@@ -114,9 +116,9 @@ ProgramPadPressEventPtr SnapshotView::getMostRecentProgramPadPress(
     return latest;
 }
 
-NoteOnEventPtr SnapshotView::retrievePlayNoteEvent(const NoteNumber note) const
+NoteOnEventPtr StateView::retrievePlayNoteEvent(const NoteNumber note) const
 {
-    for (auto &e : snapshot->noteEvents)
+    for (auto &e : state->noteEvents)
     {
         if (e->noteNumber == note)
         {
@@ -127,9 +129,9 @@ NoteOnEventPtr SnapshotView::retrievePlayNoteEvent(const NoteNumber note) const
 }
 
 std::shared_ptr<sequencer::NoteOnEvent>
-SnapshotView::retrieveRecordNoteEvent(const NoteNumber note) const
+StateView::retrieveRecordNoteEvent(const NoteNumber note) const
 {
-    for (const auto &e : snapshot->noteEvents)
+    for (const auto &e : state->noteEvents)
     {
         if (e->noteNumber == note && e->recordNoteEvent)
         {
@@ -140,9 +142,9 @@ SnapshotView::retrieveRecordNoteEvent(const NoteNumber note) const
 }
 
 PhysicalPadPressEventPtr
-SnapshotView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
+StateView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
 {
-    for (const auto &e : snapshot->physicalPadEvents)
+    for (const auto &e : state->physicalPadEvents)
     {
         if (e->padIndex == idx)
         {
@@ -152,10 +154,10 @@ SnapshotView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
     return {};
 }
 
-NoteOnEventPtr SnapshotView::retrieveNoteEvent(const NoteNumber note,
-                                               const Source src) const
+NoteOnEventPtr StateView::retrieveNoteEvent(const NoteNumber note,
+                                            const Source src) const
 {
-    for (const auto &e : snapshot->noteEvents)
+    for (const auto &e : state->noteEvents)
     {
         if (e->noteNumber == note && e->source == src)
         {
@@ -165,12 +167,12 @@ NoteOnEventPtr SnapshotView::retrieveNoteEvent(const NoteNumber note,
     return {};
 }
 
-int SnapshotView::getTotalPressedProgramPadCount() const
+int StateView::getTotalPressedProgramPadCount() const
 {
-    return snapshot->programPadEvents.size();
+    return state->programPadEvents.size();
 }
 
-int SnapshotView::getTotalNoteOnCount() const
+int StateView::getTotalNoteOnCount() const
 {
-    return snapshot->noteEvents.size();
+    return state->noteEvents.size();
 }
