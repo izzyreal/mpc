@@ -4,6 +4,7 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
 #include "sequencer/NoteRepeatProcessor.hpp"
@@ -122,6 +123,7 @@ bool FrameSeq::isRunning() const
 void FrameSeq::move(const int newTickPos) const
 {
     sequencer->move(Sequencer::ticksToQuarterNotes(newTickPos));
+    sequencer->getStateManager()->drainQueue();
 }
 
 std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
@@ -129,7 +131,7 @@ std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
     sequencer->playToTick(sequencer->getTickPosition());
     sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
     sequencer->setNextSq(-1);
-    sequencer->move(0.0);
+    move(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
     newSeq->initLoop();
     move(0);
@@ -390,7 +392,7 @@ bool FrameSeq::processSeqLoopDisabled() const
         else
         {
             sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
-            sequencer->move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
+            move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
         return true;
@@ -503,6 +505,7 @@ void FrameSeq::processEventsAfterNFrames()
 
 void FrameSeq::work(const int nFrames)
 {
+    sequencer->getStateManager()->drainQueue();
     eventRegistry->drainQueue();
 
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
@@ -548,6 +551,7 @@ void FrameSeq::work(const int nFrames)
         {
             sequencer->move(hostPositionQuarterNotes);
         }
+        sequencer->getStateManager()->drainQueue();
     }
 
     bool songHasStopped = false;
@@ -609,6 +613,7 @@ void FrameSeq::work(const int nFrames)
         if (tickCountAtThisFrameIndex > 1)
         {
             sequencer->bumpPositionByTicks(tickCountAtThisFrameIndex - 1);
+            sequencer->getStateManager()->drainQueue();
         }
 
         tickFrameOffset = frameIndex;
@@ -619,6 +624,7 @@ void FrameSeq::work(const int nFrames)
         if (sequencer->isCountingIn())
         {
             sequencer->bumpPositionByTicks(1);
+            sequencer->getStateManager()->drainQueue();
             stopCountingInIfRequired();
             continue;
         }
@@ -659,6 +665,7 @@ void FrameSeq::work(const int nFrames)
         }
 
         sequencer->bumpPositionByTicks(1);
+        sequencer->getStateManager()->drainQueue();
     }
 }
 

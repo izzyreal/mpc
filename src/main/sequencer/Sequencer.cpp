@@ -1,5 +1,7 @@
 #include "Sequencer.hpp"
 
+#include "sequencer/SequencerStateManager.hpp"
+
 #include "MpcSpecs.hpp"
 
 #include "controller/ClientEventController.hpp"
@@ -88,6 +90,8 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
       sampler(sampler), eventHandler(eventHandler),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
+    stateManager = std::make_shared<SequencerStateManager>();
+
     frameSequencer = std::make_shared<FrameSeq>(
         eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
         isRecMainWithoutPlaying,
@@ -98,6 +102,11 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
         getScreens, isNoteRepeatLockedOrPressed, sampler, getAudioMixer,
         isFullLevelEnabled, isSixteenLevelsEnabled, hardware->getSlider(),
         voices, getMixerInterconnections);
+}
+
+std::shared_ptr<SequencerStateManager> Sequencer::getStateManager()
+{
+    return stateManager;
 }
 
 void Sequencer::init()
@@ -424,7 +433,7 @@ void Sequencer::setActiveSequenceIndex(int i)
 
     if (!isPlaying())
     {
-        positionQuarterNotes = 0.0;
+        stateManager->enqueue(SetPositionQuarterNotes{ 0.0 });
     }
 }
 
@@ -534,6 +543,8 @@ void Sequencer::play(const bool fromStart)
         }
     }
 
+    const auto snapshot = stateManager->getSnapshot();
+    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     move(positionQuarterNotes);
 
     currentlyPlayingSequenceIndex = activeSequenceIndex;
@@ -623,6 +634,9 @@ void Sequencer::undoSeq()
     undoPlaceHolder.swap(copy);
 
     sequences[activeSequenceIndex].swap(s);
+
+    const auto snapshot = stateManager->getSnapshot();
+    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
 
     sequences[activeSequenceIndex]->resetTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
@@ -722,6 +736,9 @@ void Sequencer::stop(const StopMode stopMode)
 
     if (!isPlaying() && !bouncing)
     {
+        const auto snapshot = stateManager->getSnapshot();
+        const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
+
         if (positionQuarterNotes != 0.0)
         {
             setBar(0); // real 2kxl doesn't do this
@@ -816,6 +833,8 @@ void Sequencer::setCountingIn(const bool b)
 void Sequencer::setSequence(const int i, std::shared_ptr<Sequence> s)
 {
     sequences[i].swap(s);
+    const auto snapshot = stateManager->getSnapshot();
+    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     sequences[i]->resetTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
 }
@@ -910,6 +929,8 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
 void Sequencer::purgeSequence(const int i)
 {
     sequences[i] = makeNewSequence();
+    const auto snapshot = stateManager->getSnapshot();
+    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     sequences[i]->resetTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
     std::string res = defaultSequenceName;
@@ -920,6 +941,8 @@ void Sequencer::purgeSequence(const int i)
 void Sequencer::copySequence(const int source, const int destination)
 {
     auto copy = copySequence(sequences[source]);
+    const auto snapshot = stateManager->getSnapshot();
+    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     sequences[destination].swap(copy);
     sequences[destination]->resetTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
@@ -1596,7 +1619,7 @@ void Sequencer::tap()
 
 void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
 {
-    positionQuarterNotes += ticksToQuarterNotes(tickCount);
+    stateManager->enqueue(BumpPositionByTicks{tickCount});
 }
 
 void Sequencer::setPosition(const double positionQuarterNotesToUse)
@@ -1627,7 +1650,7 @@ void Sequencer::setPosition(const double positionQuarterNotesToUse)
         }
     }
 
-    positionQuarterNotes = wrappedNewPosition;
+    stateManager->enqueue(SetPositionQuarterNotes{wrappedNewPosition});
 }
 
 void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
@@ -1705,12 +1728,12 @@ void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
                 fmod(offsetWithinStepQuarterNotes,
                      ticksToQuarterNotes(sequence->getLastTick()));
 
-            if (finalPosQuarterNotes == positionQuarterNotes)
+            if (finalPosQuarterNotes == stateManager->getSnapshot().getPositionQuarterNotes())
             {
                 return;
             }
 
-            positionQuarterNotes = finalPosQuarterNotes;
+            stateManager->enqueue(SetPositionQuarterNotes{finalPosQuarterNotes});
             playStartPositionQuarterNotes = finalPosQuarterNotes;
 
             break;
@@ -1801,9 +1824,8 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
                 fmod(offsetWithinStepQuarterNotes,
                      ticksToQuarterNotes(sequence->getLastTick()));
 
-            positionQuarterNotes = finalPosQuarterNotes;
+            stateManager->enqueue(SetPositionQuarterNotes{finalPosQuarterNotes});
             playStartPositionQuarterNotes = finalPosQuarterNotes;
-
             break;
         }
     }
@@ -1837,22 +1859,22 @@ void Sequencer::move(const double positionQuarterNotesToUse)
         }
     }
 
-    positionQuarterNotes = wrappedNewPosition;
+    stateManager->enqueue(SetPositionQuarterNotes{wrappedNewPosition});
     playStartPositionQuarterNotes = wrappedNewPosition;
-    sequence->resetTrackEventIndices(quarterNotesToTicks(positionQuarterNotes));
+    sequence->resetTrackEventIndices(quarterNotesToTicks(wrappedNewPosition));
 
     if (secondSequenceEnabled)
     {
         auto secondSequenceScreen =
             getScreens()->get<ScreenId::SecondSeqScreen>();
         sequences[secondSequenceScreen->sq]->resetTrackEventIndices(
-            quarterNotesToTicks(positionQuarterNotes));
+            quarterNotesToTicks(wrappedNewPosition));
     }
 }
 
 int Sequencer::getTickPosition() const
 {
-    return quarterNotesToTicks(positionQuarterNotes);
+    return stateManager->getSnapshot().getPositionTicks();
 }
 
 std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
@@ -2110,7 +2132,7 @@ void Sequencer::movePlaceHolderTo(const int destIndex)
 {
     sequences[destIndex].swap(placeHolder);
     sequences[destIndex]->resetTrackEventIndices(
-        quarterNotesToTicks(positionQuarterNotes));
+        quarterNotesToTicks(stateManager->getSnapshot().getPositionQuarterNotes()));
     clearPlaceHolder();
 }
 
