@@ -89,7 +89,7 @@ namespace mpc::eventregistry
         void applyMessage(const EventMessage &msg) noexcept override;
 
     private:
-        const size_t CAPACITY = 8192;
+        static constexpr size_t CAPACITY = 8192;
 
         void reserveState(State &);
     };
