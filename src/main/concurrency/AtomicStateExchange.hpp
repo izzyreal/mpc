@@ -3,33 +3,38 @@
 #include <atomic>
 #include <memory>
 #include <functional>
-
+#include <cstdio>
+#include <array>
 #include <concurrentqueue.h>
 
 namespace mpc::concurrency
 {
-    template <typename State, typename View, typename Message>
+    template <typename State, typename View, typename Message, size_t PoolSize = 3>
     class AtomicStateExchange
     {
         using MessageQueue = moodycamel::ConcurrentQueue<
             Message, moodycamel::ConcurrentQueueDefaultTraits>;
 
     protected:
-        explicit AtomicStateExchange(std::function<void(State&)> reserveFn, size_t messageQueueCapacity = 512)
+        explicit AtomicStateExchange(std::function<void(State&)> reserveFn,
+                                     size_t messageQueueCapacity = 512)
         {
             reserveFn(activeState);
-            reserveFn(bufferA);
-            reserveFn(bufferB);
-        
-            currentSnapshot = std::shared_ptr<State>(&bufferA, [](State*) {});
-            writeBuffer = &bufferB;
+
+            for (auto& s : pool)
+            {
+                reserveFn(s);
+            }
+
+            currentSnapshot = std::shared_ptr<State>(&pool[0], [](State*) {});
+            writeBuffer = &pool[1];
 
             eventMessageQueue =
                 std::make_shared<MessageQueue>(messageQueueCapacity);
         }
 
     public:
-        void enqueue(Message &&msg) const noexcept
+        void enqueue(Message&& msg) const noexcept
         {
             eventMessageQueue->enqueue(std::move(msg));
         }
@@ -38,12 +43,18 @@ namespace mpc::concurrency
         {
             Message msg;
 
+            bool shouldPublish = false;
+
             while (eventMessageQueue->try_dequeue(msg))
             {
                 applyMessage(msg);
+                shouldPublish = true;
             }
 
-            publishState();
+            if (shouldPublish)
+            {
+                publishState();
+            }
         }
 
         View getSnapshot() const noexcept
@@ -56,22 +67,43 @@ namespace mpc::concurrency
     protected:
         void publishState() noexcept
         {
-            State *dst = writeBuffer;
+            size_t nextIndex = (writeIndex + 1) % PoolSize;
+            State* dst = &pool[nextIndex];
+
+            auto oldSnap = std::atomic_load_explicit(&currentSnapshot,
+                                                     std::memory_order_acquire);
+
+            if (oldSnap.get() == dst)
+            {
+                uint64_t n = publishCount.fetch_add(1, std::memory_order_relaxed) + 1;
+
+                std::fprintf(stdout,
+                             "[AtomicStateExchange] WARNING: Overwriting buffer still held by readers at publish #%llu\n",
+                             static_cast<unsigned long long>(n));
+
+                std::fflush(stdout);
+            }
+
             *dst = activeState;
-            auto newShared = std::shared_ptr<State>(dst, [](State *) {});
+            auto newShared = std::shared_ptr<State>(dst, [](State*) {});
             std::atomic_store(&currentSnapshot, newShared);
-            writeBuffer = (dst == &bufferA) ? &bufferB : &bufferA;
+
+            writeIndex = nextIndex;
+            writeBuffer = dst;
         }
 
-        virtual void applyMessage(const Message &msg) noexcept = 0;
+        virtual void applyMessage(const Message& msg) noexcept = 0;
+
         State activeState;
-        State bufferA;
-        State bufferB;
+        std::array<State, PoolSize> pool;
         std::shared_ptr<State> currentSnapshot;
-        State *writeBuffer;
+        State* writeBuffer;
+        size_t writeIndex = 1;
 
     private:
+        std::atomic<uint64_t> publishCount{0};
         std::shared_ptr<MessageQueue> eventMessageQueue;
     };
 
 } // namespace mpc::concurrency
+
