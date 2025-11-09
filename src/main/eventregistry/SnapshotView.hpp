@@ -66,6 +66,5 @@ namespace mpc::eventregistry
 
     private:
         std::shared_ptr<const Snapshot> snapshot;
-        friend class EventRegistry;
     };
 } // namespace mpc::eventregistry
