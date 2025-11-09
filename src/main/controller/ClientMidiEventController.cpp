@@ -231,7 +231,8 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     const std::function action = [this, noteNumber, midiChannel](void *userData)
     {
-        eventregistry::NoteOnEvent *noteEventInfo = (eventregistry::NoteOnEvent*) userData;
+        eventregistry::NoteOnEvent *noteEventInfo =
+            (eventregistry::NoteOnEvent *)userData;
         std::optional<int> programPadIndex = std::nullopt;
 
         std::shared_ptr<Program> program;
@@ -254,24 +255,23 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             if (*programPadIndex >= 0)
             {
                 eventRegistry->registerProgramPadRelease(
-                    Source::MidiInput, bus, program,
-                    *programPadIndex, track, midiChannel, 
-                    [](void *) {});
+                    Source::MidiInput, bus, program, *programPadIndex, track,
+                    midiChannel, [](void *) {});
             }
         }
 
-        auto ctx = TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-            Source::MidiInput, noteNumber, track, bus,
-            screen, programPadIndex, program,
-            sequencer, frameSequencer, eventRegistry, clientEventController,
-            eventHandler, screens, hardware);
+        auto ctx =
+            TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
+                Source::MidiInput, noteNumber, track, bus, screen,
+                programPadIndex, program, sequencer, frameSequencer,
+                eventRegistry, clientEventController, eventHandler, screens,
+                hardware);
 
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };
 
-    eventRegistry->registerNoteOff(Source::MidiInput,
-                                   noteNumber,
-                                   midiChannel, action);
+    eventRegistry->registerNoteOff(Source::MidiInput, noteNumber, midiChannel,
+                                   action);
 }
 
 void ClientMidiEventController::handleKeyAftertouch(
@@ -354,6 +354,7 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
     }
     else if (cc == 123)
     {
+        // Should we do something else here? Trigger drum note offs for example?
         eventRegistry->clear();
     }
 

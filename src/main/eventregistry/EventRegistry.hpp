@@ -1,22 +1,20 @@
 #pragma once
 
+#include "eventregistry/State.hpp"
+
+#include "concurrency/AtomicStateExchange.hpp"
+
 #include "IntTypes.hpp"
 
 #include "eventregistry/Source.hpp"
 #include "eventregistry/EventTypes.hpp"
 #include "eventregistry/EventMessage.hpp"
 
-#include "eventregistry/SnapshotView.hpp"
+#include "eventregistry/StateView.hpp"
 
 #include <memory>
 #include <optional>
 #include <functional>
-
-namespace moodycamel
-{
-    struct ConcurrentQueueDefaultTraits;
-    template <typename T, typename Traits> class ConcurrentQueue;
-} // namespace moodycamel
 
 namespace mpc::sampler
 {
@@ -36,10 +34,9 @@ namespace mpc::sequencer
 namespace mpc::eventregistry
 {
     class EventRegistry
+        : public mpc::concurrency::AtomicStateExchange<State, StateView,
+                                                       EventMessage>
     {
-        using EventMessageQueue = moodycamel::ConcurrentQueue<
-            EventMessage, moodycamel::ConcurrentQueueDefaultTraits>;
-
     public:
         EventRegistry();
 
@@ -83,35 +80,16 @@ namespace mpc::eventregistry
 
         void registerNoteAftertouch(Source, NoteNumber, Pressure,
                                     std::optional<MidiChannel>) const;
-        void registerNoteOff(Source, 
-                             NoteNumber,
-                             std::optional<MidiChannel>,
+        void registerNoteOff(Source, NoteNumber, std::optional<MidiChannel>,
                              const std::function<void(void *)> &action) const;
 
         void clear();
 
-        SnapshotView getSnapshot() const noexcept;
-
-        // Called from the audio thread only
-        void drainQueue() noexcept;
-        void publishSnapshot() noexcept;
+    protected:
+        void reserveState(State &s) override;
+        void applyMessage(const EventMessage &msg) noexcept override;
 
     private:
         const size_t CAPACITY = 8192;
-
-        PhysicalPadPressEventPtrs physicalPadEvents;
-        ProgramPadPressEventPtrs programPadEvents;
-        NoteOnEventPtrs noteEvents;
-
-        std::shared_ptr<EventMessageQueue> eventMessageQueue;
-
-        Snapshot snapA, snapB;
-        Snapshot* writeTarget;
-        std::shared_ptr<Snapshot> currentSnapshot;
-
-        void enqueue(EventMessage &&) const;
-        void publishSnapshotToBuffer(struct Snapshot *dst) const noexcept;
-
-        void applyMessage(const EventMessage &msg) noexcept;
     };
 } // namespace mpc::eventregistry

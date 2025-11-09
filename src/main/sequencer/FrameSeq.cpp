@@ -504,7 +504,6 @@ void FrameSeq::processEventsAfterNFrames()
 void FrameSeq::work(const int nFrames)
 {
     eventRegistry->drainQueue();
-    eventRegistry->publishSnapshot();
 
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = getSampleRate();

@@ -329,8 +329,8 @@ void ClientHardwareEventController::handlePadRelease(
             {
                 constexpr std::optional<int> noMidiChannel = std::nullopt;
                 eventRegistry->registerNoteOff(Source::VirtualMpcHardware,
-                                               *p->note,
-                                               noMidiChannel, [](void *) {});
+                                               *p->note, noMidiChannel,
+                                               [](void *) {});
             }
         }
 

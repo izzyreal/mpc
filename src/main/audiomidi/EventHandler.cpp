@@ -154,9 +154,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
-        eventRegistry->registerNoteOff(eventregistry::Source::Sequence,
-                                       note, noMidiChannel,
-                                       [](void *) {});
+        eventRegistry->registerNoteOff(eventregistry::Source::Sequence, note,
+                                       noMidiChannel, [](void *) {});
 
         if (programPadIndex != -1)
         {
