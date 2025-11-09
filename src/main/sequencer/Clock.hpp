@@ -44,6 +44,8 @@ namespace mpc::sequencer
                                    const uint16_t numSamples,
                                    const double playStartPositionQuarterNotes);
 
+        void clearTicks();
+
     private:
         const double subDiv = 1.0 / Sequencer::TICKS_PER_QUARTER_NOTE;
 
@@ -60,7 +62,6 @@ namespace mpc::sequencer
         uint16_t previousBufferSize;
         bool jumpOccurredInLastBuffer;
 
-        void clearTicks();
         void resetJumpOccurredInLastBuffer();
         void computeTicksForCurrentBuffer(
             const double hostPositionAtStartOfBufferQuarterNotes,

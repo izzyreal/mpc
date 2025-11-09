@@ -529,6 +529,8 @@ void FrameSeq::work(const int nFrames)
                 metronomeOnlyTickPosition++;
             }
         }
+        
+        clock->clearTicks();
 
         return;
     }
@@ -564,7 +566,14 @@ void FrameSeq::work(const int nFrames)
     {
         if (clockTicks[tickIndex] >= nFrames)
         {
-            throw std::exception();
+            static int counter = 0;
+            printf("%i [AUDIO] tickIndex=%zu clockTick=%d >= nFrames=%d (clockTicks.size=%zu)\n",
+                   counter++,
+                   tickIndex,
+                   clockTicks[tickIndex],
+                   nFrames,
+                   clockTicks.size());
+            continue;
         }
     }
 
@@ -667,6 +676,8 @@ void FrameSeq::work(const int nFrames)
         sequencer->bumpPositionByTicks(1);
         sequencer->getStateManager()->drainQueue();
     }
+    
+    clock->clearTicks();
 }
 
 uint64_t FrameSeq::getMetronomeOnlyTickPosition() const
