@@ -40,6 +40,7 @@ namespace mpc::audiomidi
 
 namespace mpc::sequencer
 {
+    class SequencerStateManager;
     class Sequence;
     class Bus;
     class DrumBus;
@@ -129,6 +130,7 @@ namespace mpc::sequencer
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;
 
+        std::shared_ptr<SequencerStateManager> stateManager;
         std::vector<std::shared_ptr<Bus>> buses;
         bool playing = false;
         int lastNotifiedBar = -1;
@@ -163,7 +165,6 @@ namespace mpc::sequencer
         bool tempoSourceSequenceEnabled = false;
 
         bool countingIn = false;
-        double positionQuarterNotes = 0.0;
         uint64_t lastTap = 0;
         int tapIndex = 0;
 
@@ -195,6 +196,8 @@ namespace mpc::sequencer
     public:
         static void copyTrackParameters(const std::shared_ptr<Track> &source,
                                         const std::shared_ptr<Track> &dest);
+
+        std::shared_ptr<SequencerStateManager> getStateManager();
 
         std::shared_ptr<Sequence> makeNewSequence();
 
