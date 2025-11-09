@@ -15,9 +15,15 @@ namespace mpc::sequencer
         uint8_t ticks;
     };
 
+    struct SetSongModeEnabled
+    {
+        bool songModeEnabled;
+    };
+
     using SequencerMessage = std::variant<
         SetPositionQuarterNotes,
-        BumpPositionByTicks
+        BumpPositionByTicks,
+        SetSongModeEnabled
     >;
 }
 
