@@ -150,7 +150,7 @@ void Sequencer::init()
     metronomeOnly = false;
     activeSequenceIndex = 0;
     currentlyPlayingSequenceIndex = 0;
-    songMode = false;
+    stateManager->enqueue(SetSongModeEnabled{false});
 
     purgeAllSequences();
 
@@ -183,7 +183,7 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 void Sequencer::playToTick(const int targetTick) const
 {
     auto seqIndex =
-        songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
+        stateManager->getSnapshot().isSongModeEnabled() ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
     auto seq = sequences[seqIndex].get();
     auto secondSequenceScreen = getScreens()->get<ScreenId::SecondSeqScreen>();
 
@@ -304,7 +304,7 @@ double Sequencer::getTempo()
             getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
         if (seq->isTempoChangeOn() ||
-            (songMode && !ignoreTempoChangeScreen->getIgnore()))
+            (stateManager->getSnapshot().isSongModeEnabled() && !ignoreTempoChangeScreen->getIgnore()))
         {
             if (tce)
             {
@@ -511,6 +511,9 @@ void Sequencer::play(const bool fromStart)
     auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     auto currentSong = songs[songScreen->getActiveSongIndex()];
 
+    const auto snapshot = stateManager->getSnapshot();
+    const bool songMode = snapshot.isSongModeEnabled();
+
     if (songMode)
     {
         if (!currentSong->isUsed())
@@ -543,7 +546,6 @@ void Sequencer::play(const bool fromStart)
         }
     }
 
-    const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     move(positionQuarterNotes);
 
@@ -748,7 +750,7 @@ void Sequencer::stop(const StopMode stopMode)
     }
 
     playedStepRepetitions = 0;
-    songMode = false;
+    stateManager->enqueue(SetSongModeEnabled{false});
     nextSq = -1;
 
     lastNotifiedBar = -1;
@@ -1389,6 +1391,9 @@ std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
     auto songScreen = getScreens()->get<ScreenId::SongScreen>();
 
+    const auto snapshot = stateManager->getSnapshot();
+    const bool songMode = snapshot.isSongModeEnabled();
+
     if (songMode &&
         songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
     {
@@ -1627,6 +1632,7 @@ void Sequencer::setPosition(const double positionQuarterNotesToUse)
     auto wrappedNewPosition = positionQuarterNotesToUse;
 
     const auto songSequenceIndex = getSongSequenceIndex();
+    const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
 
     if (songMode && songSequenceIndex == -1)
     {
@@ -1834,6 +1840,7 @@ void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
 void Sequencer::move(const double positionQuarterNotesToUse)
 {
     const auto songSequenceIndex = getSongSequenceIndex();
+    const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
 
     if (songMode && songSequenceIndex < 0)
     {
@@ -1896,6 +1903,7 @@ void Sequencer::setActiveTrackIndex(const int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex() const
 {
+    const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
     if (songMode)
     {
         auto songScreen = getScreens()->get<ScreenId::SongScreen>();
@@ -2011,12 +2019,12 @@ std::shared_ptr<Song> Sequencer::getSong(const int i)
 
 bool Sequencer::isSongModeEnabled() const
 {
-    return songMode;
+    return stateManager->getSnapshot().isSongModeEnabled();
 }
 
 void Sequencer::setSongModeEnabled(const bool b)
 {
-    songMode = b;
+    getStateManager()->enqueue(SetSongModeEnabled{b});
 }
 
 int Sequencer::getSongSequenceIndex() const

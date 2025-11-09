@@ -140,7 +140,6 @@ namespace mpc::sequencer
         bool metronomeOnly = false;
         int activeSequenceIndex = 0;
         int currentlyPlayingSequenceIndex = 0;
-        bool songMode = false;
         int playedStepRepetitions = 0; // Part of SONG mode
         bool endOfSong = false;
 

@@ -16,6 +16,8 @@ namespace mpc::sequencer
 
         int64_t getPositionTicks() const;
 
+        bool isSongModeEnabled() const;
+
     private:
         const std::shared_ptr<const SequencerState> state;
 

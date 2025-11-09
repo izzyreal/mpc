@@ -20,3 +20,8 @@ int64_t SequencerStateView::getPositionTicks() const
     return Sequencer::quarterNotesToTicks(state->positionQuarterNotes);
 }
 
+bool SequencerStateView::isSongModeEnabled() const
+{
+    return state->songModeEnabled;
+}
+

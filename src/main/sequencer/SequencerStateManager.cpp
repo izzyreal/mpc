@@ -29,6 +29,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage& msg) noexcept
             s.positionQuarterNotes += delta;
             publishState();
         }
+        else if constexpr (std::is_same_v<T, SetSongModeEnabled>)
+        {
+            s.songModeEnabled = m.songModeEnabled;
+        }
     }, msg);
 }
 
