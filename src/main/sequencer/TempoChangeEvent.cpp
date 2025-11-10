@@ -166,28 +166,28 @@ int TempoChangeEvent::getRatio() const
 
 int TempoChangeEvent::getBar(int n, int d) const
 {
-    auto barLength = (int)(96 * (4.0 / d) * n);
-    auto bar = (int)(tick / barLength);
+    const auto barLength = (int)(96 * (4.0 / d) * n);
+    const auto bar = (int)(tick / barLength);
     return bar;
 }
 
 int TempoChangeEvent::getBeat(int n, int d) const
 {
-    auto beatLength = static_cast<int>(96 * (4.0 / d));
-    auto beat = (static_cast<int>(tick / beatLength)) % n;
+    const auto beatLength = static_cast<int>(96 * (4.0 / d));
+    const auto beat = (static_cast<int>(tick / beatLength)) % n;
     return beat;
 }
 
 int TempoChangeEvent::getClock(int denominator) const
 {
-    auto beatLength = static_cast<int>(96 * (4.0 / denominator));
-    auto clock = static_cast<int>(tick % beatLength);
+    const auto beatLength = static_cast<int>(96 * (4.0 / denominator));
+    const auto clock = static_cast<int>(tick % beatLength);
     return clock;
 }
 
 double TempoChangeEvent::getTempo() const
 {
-    auto tempo = parent->getInitialTempo() * ratio * 0.001;
+    const auto tempo = parent->getInitialTempo() * ratio * 0.001;
 
     if (tempo < 30.0)
     {

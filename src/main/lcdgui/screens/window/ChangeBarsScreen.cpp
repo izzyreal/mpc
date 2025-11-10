@@ -1,4 +1,5 @@
 #include "ChangeBarsScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -29,7 +30,7 @@ void ChangeBarsScreen::function(const int i)
         {
             if (numberOfBars > 0 && afterBar <= seq->getLastBarIndex())
             {
-                sequencer->move(0);
+                sequencer->getTransport()->setPosition(0);
             }
 
             seq->insertBars(numberOfBars, afterBar);
@@ -41,7 +42,7 @@ void ChangeBarsScreen::function(const int i)
         {
             if (firstBar <= seq->getLastBarIndex())
             {
-                sequencer->move(0);
+                sequencer->getTransport()->setPosition(0);
             }
 
             seq->deleteBars(firstBar, lastBar);

@@ -1,4 +1,5 @@
 #include "file/all/Count.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 
@@ -7,6 +8,7 @@
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/dialog/MetronomeSoundScreen.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Transport.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -40,8 +42,8 @@ Count::Count(mpc::Mpc &mpc)
     auto lSequencer = mpc.getSequencer();
 
     saveBytes = std::vector<char>(AllParser::COUNT_LENGTH);
-    saveBytes[ENABLED_OFFSET] =
-        static_cast<int8_t>((lSequencer->isCountEnabled() ? 1 : 0));
+    saveBytes[ENABLED_OFFSET] = static_cast<int8_t>(
+        (lSequencer->getTransport()->isCountEnabled() ? 1 : 0));
     saveBytes[COUNT_IN_MODE_OFFSET] =
         static_cast<int8_t>(countMetronomeScreen->getCountInMode());
     saveBytes[CLICK_VOLUME_OFFSET] =

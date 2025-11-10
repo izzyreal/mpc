@@ -1,4 +1,5 @@
 #include "PushNumPadCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 #include "lcdgui/Field.hpp"
@@ -27,7 +28,7 @@ void PushNumPadCommand::execute()
             }
             case 1:
             {
-                if (!mpc.getSequencer()->isPlaying())
+                if (!mpc.getSequencer()->getTransport()->isPlaying())
                 {
                     mpc.getLayeredScreen()->openScreenById(
                         ScreenId::SongScreen);
@@ -41,7 +42,7 @@ void PushNumPadCommand::execute()
             }
             case 3:
             {
-                if (!mpc.getSequencer()->isPlaying())
+                if (!mpc.getSequencer()->getTransport()->isPlaying())
                 {
                     mpc.getLayeredScreen()->openScreenById(
                         ScreenId::LoadScreen);
@@ -50,7 +51,7 @@ void PushNumPadCommand::execute()
             }
             case 4:
             {
-                if (!mpc.getSequencer()->isPlaying())
+                if (!mpc.getSequencer()->getTransport()->isPlaying())
                 {
                     mpc.getLayeredScreen()->openScreenById(
                         ScreenId::SampleScreen);
@@ -59,7 +60,7 @@ void PushNumPadCommand::execute()
             }
             case 5:
             {
-                if (!mpc.getSequencer()->isPlaying())
+                if (!mpc.getSequencer()->getTransport()->isPlaying())
                 {
                     mpc.getLayeredScreen()->openScreenById(
                         ScreenId::TrimScreen);
@@ -92,7 +93,7 @@ void PushNumPadCommand::execute()
             }
             case 8:
             {
-                if (!mpc.getSequencer()->isPlaying())
+                if (!mpc.getSequencer()->getTransport()->isPlaying())
                 {
                     mpc.getLayeredScreen()->openScreenById(
                         ScreenId::OthersScreen);
@@ -101,7 +102,7 @@ void PushNumPadCommand::execute()
             }
             case 9:
             {
-                if (!mpc.getSequencer()->isPlaying())
+                if (!mpc.getSequencer()->getTransport()->isPlaying())
                 {
                     mpc.getLayeredScreen()->openScreenById(
                         ScreenId::SyncScreen);
@@ -118,7 +119,7 @@ void PushNumPadCommand::execute()
     const auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     if (screenName == "sequencer" && fieldName.substr(0, 3) == "now" &&
-        mpc.getSequencer()->isPlaying())
+        mpc.getSequencer()->getTransport()->isPlaying())
     {
         return;
     }

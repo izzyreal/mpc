@@ -47,6 +47,7 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
 
         int getLastBar() const;
+        double getTempo() const;
 
     private:
         std::vector<std::string> busNames{"MIDI", "DRUM1", "DRUM2", "DRUM3",

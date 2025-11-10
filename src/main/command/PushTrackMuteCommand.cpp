@@ -1,4 +1,5 @@
 #include "PushTrackMuteCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "Util.hpp"
 #include "hardware/Hardware.hpp"
@@ -37,7 +38,7 @@ void PushTrackMuteCommand::execute()
     else if (ls->isCurrentScreen({ScreenId::NextSeqScreen,
                                   ScreenId::NextSeqPadScreen,
                                   ScreenId::SequencerScreen}) &&
-             !mpc.getSequencer()->isRecordingOrOverdubbing())
+             !mpc.getSequencer()->getTransport()->isRecordingOrOverdubbing())
     {
         Util::initSequence(mpc);
         mpc.getLayeredScreen()->openScreenById(ScreenId::TrMuteScreen);

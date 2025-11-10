@@ -1,4 +1,5 @@
 #include "StepEditorScreen.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
@@ -82,19 +83,20 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
                             return visibleEventsEqual(a, b);
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer->getTickPosition();
-                        },
-                        [&](auto)
-                        {
-                            findField("now0")->setTextPadded(
-                                sequencer->getCurrentBarIndex() + 1, "0");
-                            findField("now1")->setTextPadded(
-                                sequencer->getCurrentBeatIndex() + 1, "0");
-                            findField("now2")->setTextPadded(
-                                sequencer->getCurrentClockNumber(), "0");
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer->getTransport()->getTickPosition();
+         },
+         [&](auto)
+         {
+             findField("now0")->setTextPadded(
+                 sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+             findField("now1")->setTextPadded(
+                 sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+             findField("now2")->setTextPadded(
+                 sequencer->getTransport()->getCurrentClockNumber(), "0");
+         }});
 }
 
 bool StepEditorScreen::visibleEventsEqual(
@@ -163,9 +165,12 @@ void StepEditorScreen::open()
     setViewNotesText();
     displayView();
 
-    findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
-    findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
-    findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+    findField("now0")->setTextPadded(
+        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+    findField("now1")->setTextPadded(
+        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+    findField("now2")->setTextPadded(
+        sequencer->getTransport()->getCurrentClockNumber(), "0");
 
     const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
@@ -311,7 +316,7 @@ void StepEditorScreen::function(int i)
         }
         case 3:
         {
-            bool posIsLastTick = sequencer->getTickPosition() ==
+            bool posIsLastTick = sequencer->getTransport()->getTickPosition() ==
                                  sequencer->getActiveSequence()->getLastTick();
 
             if (selectionEndIndex == -1)
@@ -497,7 +502,8 @@ void StepEditorScreen::turnWheel(int i)
         setSequencerTickPos(
             [&]
             {
-                sequencer->setBar(sequencer->getCurrentBarIndex() + i);
+                sequencer->getTransport()->setBar(
+                    sequencer->getTransport()->getCurrentBarIndex() + i);
             });
     }
     else if (focusedFieldName == "now1")
@@ -505,7 +511,8 @@ void StepEditorScreen::turnWheel(int i)
         setSequencerTickPos(
             [&]
             {
-                sequencer->setBeat(sequencer->getCurrentBeatIndex() + i);
+                sequencer->getTransport()->setBeat(
+                    sequencer->getTransport()->getCurrentBeatIndex() + i);
             });
     }
     else if (focusedFieldName == "now2")
@@ -513,7 +520,8 @@ void StepEditorScreen::turnWheel(int i)
         setSequencerTickPos(
             [&]
             {
-                sequencer->setClock(sequencer->getCurrentClockNumber() + i);
+                sequencer->getTransport()->setClock(
+                    sequencer->getTransport()->getCurrentClockNumber() + i);
             });
     }
     else if (focusedFieldName == "tcvalue")
@@ -707,11 +715,11 @@ void StepEditorScreen::setSequencerTickPos(
 {
     storeColumnForEventAtActiveRow();
 
-    const auto oldTickPos = sequencer->getTickPosition();
+    const auto oldTickPos = sequencer->getTransport()->getTickPosition();
 
     tickPosSetter();
 
-    if (oldTickPos != sequencer->getTickPosition())
+    if (oldTickPos != sequencer->getTransport()->getTickPosition())
     {
         const auto track = sequencer->getActiveTrack();
         track->removeDoubles();
@@ -767,11 +775,12 @@ void StepEditorScreen::prevBarStart()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->setBar(0);
+                sequencer->getTransport()->setBar(0);
             }
             else
             {
-                sequencer->setBar(sequencer->getCurrentBarIndex() - 1);
+                sequencer->getTransport()->setBar(
+                    sequencer->getTransport()->getCurrentBarIndex() - 1);
             }
         });
 }
@@ -785,12 +794,13 @@ void StepEditorScreen::nextBarEnd()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->setBar(
+                sequencer->getTransport()->setBar(
                     sequencer->getActiveSequence()->getLastBarIndex() + 1);
             }
             else
             {
-                sequencer->setBar(sequencer->getCurrentBarIndex() + 1);
+                sequencer->getTransport()->setBar(
+                    sequencer->getTransport()->getCurrentBarIndex() + 1);
             }
         });
 }
@@ -1070,7 +1080,7 @@ StepEditorScreen::computeEventsAtCurrentTick() const
 
     for (auto &event : track->getEvents())
     {
-        if (event->getTick() == sequencer->getTickPosition())
+        if (event->getTick() == sequencer->getTransport()->getTickPosition())
         {
             if ((view == 0 || view == 1) &&
                 std::dynamic_pointer_cast<NoteOnEvent>(event))
@@ -1564,7 +1574,7 @@ void StepEditorScreen::restoreColumnForEventAtActiveRow()
 
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition() const
 {
-    const auto tick = sequencer->getTickPosition();
+    const auto tick = sequencer->getTransport()->getTickPosition();
     const auto track = sequencer->getActiveTrack();
     for (auto &e : track->getEventRange(tick, tick))
     {

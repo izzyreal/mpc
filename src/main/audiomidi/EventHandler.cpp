@@ -1,4 +1,5 @@
 #include "EventHandler.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 
@@ -77,7 +78,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         program && program->getSlider()->getNote() == note;
 
     if (mpc.clientEventController->isAfterEnabled() && isSliderNote &&
-        mpc.getSequencer()->isOverdubbing())
+        mpc.getSequencer()->getTransport()->isOverdubbing())
     {
         auto programSlider = program->getSlider();
 
@@ -113,9 +114,9 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const auto durationTicks = *noteOnEvent->getDuration();
     const auto audioMidiServices = mpc.getAudioMidiServices();
     const auto audioServer = audioMidiServices->getAudioServer();
-    const auto durationFrames =
-        SeqUtil::ticksToFrames(durationTicks, mpc.getSequencer()->getTempo(),
-                               audioServer->getSampleRate());
+    const auto durationFrames = SeqUtil::ticksToFrames(
+        durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
+        audioServer->getSampleRate());
 
     auto ctx = engine::DrumNoteEventContextBuilder::buildDrumNoteOnContext(
         noteEventIdToUse, drumBus, mpc.getSampler(),
@@ -176,7 +177,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
                                         Track *const track)
 {
-    if (mpc.getSequencer()->isCountingIn())
+    if (mpc.getSequencer()->getTransport()->isCountingIn())
     {
         return;
     }
@@ -218,7 +219,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
         const auto audioMidiServices = mpc.getAudioMidiServices();
         const auto audioServer = audioMidiServices->getAudioServer();
         const auto durationFrames = SeqUtil::ticksToFrames(
-            durationTicks, mpc.getSequencer()->getTempo(),
+            durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
             audioServer->getSampleRate());
 
         frameSeq->enqueueEventAfterNFrames(
@@ -400,9 +401,10 @@ void EventHandler::handleNoteEventMidiOut(
                     handleNoteEventMidiOut(noteOnEvent->getNoteOff(), track,
                                            trackDevice, std::nullopt);
                 },
-                SeqUtil::ticksToFrames(*noteOnEvent->getDuration(),
-                                       mpc.getSequencer()->getTempo(),
-                                       audioServer->getSampleRate()));
+                SeqUtil::ticksToFrames(
+                    *noteOnEvent->getDuration(),
+                    mpc.getSequencer()->getTransport()->getTempo(),
+                    audioServer->getSampleRate()));
         }
     }
     else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(event))

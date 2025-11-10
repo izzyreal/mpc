@@ -1,4 +1,5 @@
 #include "TrMuteScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
@@ -46,7 +47,7 @@ TrMuteScreen::TrMuteScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTickPosition();
+                            return sequencer->getTransport()->getTickPosition();
                         },
                         [&](auto)
                         {
@@ -143,7 +144,7 @@ void TrMuteScreen::turnWheel(int i)
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "sq" && !sequencer->isPlaying())
+    if (focusedFieldName == "sq" && !sequencer->getTransport()->isPlaying())
     {
         sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
                                           i);
@@ -228,17 +229,20 @@ void TrMuteScreen::setTrackColor(int i) const
 
 void TrMuteScreen::displayNow0() const
 {
-    findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(
+        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void TrMuteScreen::displayNow1() const
 {
-    findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(
+        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void TrMuteScreen::displayNow2() const
 {
-    findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(
+        sequencer->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void TrMuteScreen::refreshTracks() const

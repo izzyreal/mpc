@@ -191,8 +191,8 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
 // This is called from the UI thread. Results in incorrect tickpos.
 // We should only queue the fact that a note of n wants to be recorded.
 // Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note,
-                                                         unsigned char velocity)
+std::shared_ptr<NoteOnEvent>
+Track::recordNoteEventASync(unsigned char note, unsigned char velocity) const
 {
     auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
     onEvent->setTrack(getIndex());
@@ -204,7 +204,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note,
 void Track::finalizeNoteEventASync(
     const std::shared_ptr<NoteOnEvent> &event) const
 {
-    auto offEvent = event->getNoteOff();
+    const auto offEvent = event->getNoteOff();
     offEvent->setTick(-2);
     queuedNoteOffEvents->enqueue(offEvent);
 }
@@ -232,7 +232,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note,
 bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
                                     int duration) const
 {
-    auto old_duration = event->getDuration();
+    const auto old_duration = event->getDuration();
     event->setDuration(duration);
     return old_duration != duration;
 }
@@ -256,41 +256,47 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
 {
     std::shared_ptr<Event> clone;
 
-    if (auto source = std::dynamic_pointer_cast<NoteOnEvent>(src))
+    if (const auto source = std::dynamic_pointer_cast<NoteOnEvent>(src))
     {
         clone = std::make_shared<NoteOnEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<MixerEvent>(src))
+    else if (const auto source = std::dynamic_pointer_cast<MixerEvent>(src))
     {
         clone = std::make_shared<MixerEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<ChannelPressureEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<ChannelPressureEvent>(src))
     {
         clone = std::make_shared<ChannelPressureEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<PolyPressureEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<PolyPressureEvent>(src))
     {
         clone = std::make_shared<PolyPressureEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<PitchBendEvent>(src))
+    else if (const auto source = std::dynamic_pointer_cast<PitchBendEvent>(src))
     {
         clone = std::make_shared<PitchBendEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<TempoChangeEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<TempoChangeEvent>(src))
     {
-        auto t = std::make_shared<TempoChangeEvent>(*source);
+        const auto t = std::make_shared<TempoChangeEvent>(*source);
         t->setParent(parent);
         clone = t;
     }
-    else if (auto source = std::dynamic_pointer_cast<ControlChangeEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<ControlChangeEvent>(src))
     {
         clone = std::make_shared<ControlChangeEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<ProgramChangeEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<ProgramChangeEvent>(src))
     {
         clone = std::make_shared<ProgramChangeEvent>(*source);
     }
-    else if (auto source = std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
     {
         clone = std::make_shared<SystemExclusiveEvent>(*source);
     }
@@ -403,15 +409,15 @@ std::vector<std::shared_ptr<Event>> &Track::getEvents()
     return events;
 }
 
-int Track::getCorrectedTickPos()
+int Track::getCorrectedTickPos() const
 {
-    auto pos = getTickPosition();
+    const auto pos = getTickPosition();
     auto correctedTickPos = -1;
 
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         getScreens()->get<ScreenId::TimingCorrectScreen>();
-    auto swingPercentage = timingCorrectScreen->getSwing();
-    auto noteValueLengthInTicks =
+    const auto swingPercentage = timingCorrectScreen->getSwing();
+    const auto noteValueLengthInTicks =
         timingCorrectScreen->getNoteValueLengthInTicks();
 
     if (noteValueLengthInTicks > 1)
@@ -438,7 +444,7 @@ int Track::getCorrectedTickPos()
             shiftedTick = 0;
         }
 
-        auto lastTick = parent->getLastTick();
+        const auto lastTick = parent->getLastTick();
 
         if (shiftedTick > lastTick)
         {
@@ -453,9 +459,9 @@ int Track::getCorrectedTickPos()
 
 void Track::processRealtimeQueuedEvents()
 {
-    auto noteOnCount =
+    const auto noteOnCount =
         this->queuedNoteOnEvents->try_dequeue_bulk(bulkNoteOns.begin(), 20);
-    auto noteOffCount =
+    const auto noteOffCount =
         this->queuedNoteOffEvents->try_dequeue_bulk(bulkNoteOffs.begin(), 20);
 
     if (noteOnCount == 0 && noteOffCount == 0)
@@ -463,12 +469,12 @@ void Track::processRealtimeQueuedEvents()
         return;
     }
 
-    auto pos = getTickPosition();
-    auto correctedTickPos = getCorrectedTickPos();
+    const auto pos = getTickPosition();
+    const auto correctedTickPos = getCorrectedTickPos();
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
     {
-        auto noteOff = bulkNoteOffs[noteOffIndex];
+        const auto noteOff = bulkNoteOffs[noteOffIndex];
 
         if (noteOff->getTick() == -2)
         {
@@ -528,7 +534,7 @@ void Track::processRealtimeQueuedEvents()
                 }
                 noteOn->setDuration(duration);
 
-                bool wasInserted = insertEventWhileRetainingSort(noteOn);
+                const bool wasInserted = insertEventWhileRetainingSort(noteOn);
 
                 if (fixEventIndex && wasInserted)
                 {
@@ -577,7 +583,7 @@ void Track::playNext()
 
     if (isRecording() && isPunchEnabled() && trackIndex < 64)
     {
-        auto pos = getTickPosition();
+        const auto pos = getTickPosition();
 
         _delete = false;
 
@@ -600,17 +606,17 @@ void Track::playNext()
 
     const auto event = eventIndex >= events.size() ? std::shared_ptr<Event>()
                                                    : events[eventIndex];
-    if (auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
+    if (const auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
         note->setTrack(trackIndex);
 
-        if (auto drumBus =
+        if (const auto drumBus =
                 std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busNumber));
             drumBus && isOverdubbing() && isEraseButtonPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
         {
-            auto program = sampler->getProgram(drumBus->getProgram());
+            const auto program = sampler->getProgram(drumBus->getProgram());
 
             const auto noteNumber = note->getNote();
 
@@ -634,9 +640,9 @@ void Track::playNext()
 
             if (!_delete && oneOrMorePadsArePressed && isSixteenLevelsEnabled())
             {
-                auto vmpcSettingsScreen =
+                const auto vmpcSettingsScreen =
                     getScreens()->get<ScreenId::VmpcSettingsScreen>();
-                auto assign16LevelsScreen =
+                const auto assign16LevelsScreen =
                     getScreens()->get<ScreenId::Assign16LevelsScreen>();
 
                 if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
@@ -646,8 +652,9 @@ void Track::playNext()
                 else if (vmpcSettingsScreen->_16LevelsEraseMode == 1)
                 {
                     const auto &varValue = note->getVariationValue();
-                    auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
-                    auto _16l_type = assign16LevelsScreen->getType();
+                    const auto _16l_key =
+                        assign16LevelsScreen->getOriginalKeyPad();
+                    const auto _16l_type = assign16LevelsScreen->getType();
 
                     for (int programPadIndex = 0; programPadIndex < 64;
                          ++programPadIndex)
@@ -662,7 +669,7 @@ void Track::playNext()
 
                         if (_16l_type == 0)
                         {
-                            auto diff = padIndexWithoutBank - _16l_key;
+                            const auto diff = padIndexWithoutBank - _16l_key;
                             auto candidate = 64 + (diff * 5);
 
                             if (candidate > 124)
@@ -743,7 +750,7 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength,
                              int swingPercentage, int lowestNote,
                              int highestNote)
 {
-    auto s = getActiveSequence();
+    const auto s = getActiveSequence();
     int accumBarLengths = 0;
     auto fromBar = 0;
     auto toBar = 0;
@@ -810,7 +817,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
     int previousAccumBarLengths = 0;
     auto barNumber = 0;
     auto numberOfSteps = 0;
-    auto sequence = getActiveSequence();
+    const auto sequence = getActiveSequence();
     int segmentStart = 0;
     int segmentEnd = 0;
 
@@ -862,8 +869,8 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
 
     for (int i = 0; i <= numberOfSteps; i++)
     {
-        int stepStart = ((i - 1) * stepLength) + (stepLength / 2);
-        int stepEnd = (i * stepLength) + (stepLength / 2);
+        const int stepStart = ((i - 1) * stepLength) + (stepLength / 2);
+        const int stepEnd = (i * stepLength) + (stepLength / 2);
 
         if (tick - currentBarStart >= stepStart &&
             tick - currentBarStart <= stepEnd)
@@ -910,7 +917,7 @@ void Track::removeDoubles()
 
             bool contains = false;
 
-            for (auto &n : notesAtTick)
+            for (const auto &n : notesAtTick)
             {
                 if (n == ne->getNote())
                 {
@@ -935,7 +942,7 @@ void Track::removeDoubles()
 
     reverse(deleteIndexList.begin(), deleteIndexList.end());
 
-    for (auto &i : deleteIndexList)
+    for (const auto &i : deleteIndexList)
     {
         events.erase(events.begin() + i);
     }
@@ -1074,11 +1081,12 @@ bool Track::insertEventWhileRetainingSort(
 
     if (insertRequired)
     {
-        auto insertAt = std::find_if(events.begin(), events.end(),
-                                     [&tick](const std::shared_ptr<Event> &e)
-                                     {
-                                         return e->getTick() > tick;
-                                     });
+        const auto insertAt =
+            std::find_if(events.begin(), events.end(),
+                         [&tick](const std::shared_ptr<Event> &e)
+                         {
+                             return e->getTick() > tick;
+                         });
 
         if (insertAt == events.end())
         {

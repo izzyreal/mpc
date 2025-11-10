@@ -1,4 +1,5 @@
 #include "Mpc.hpp"
+#include "sequencer/Transport.hpp"
 
 #include <mpc_fs.hpp>
 
@@ -320,7 +321,7 @@ Mpc::~Mpc()
     }
     if (sequencer)
     {
-        sequencer->stop();
+        sequencer->getTransport()->stop();
     }
 
     nvram::MidiControlPersistence::saveCurrentState(*this);

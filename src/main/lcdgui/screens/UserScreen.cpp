@@ -342,3 +342,8 @@ void UserScreen::setTrackName(int i, const std::string &s)
 {
     trackNames[i] = s;
 }
+
+double UserScreen::getTempo() const
+{
+    return tempo;
+}

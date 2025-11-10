@@ -1,4 +1,5 @@
 #include "ReleaseOverdubCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -11,5 +12,5 @@ void ReleaseOverdubCommand::execute()
 {
     mpc.getHardware()
         ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->isOverdubbing());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
 }

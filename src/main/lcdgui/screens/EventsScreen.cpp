@@ -1,4 +1,5 @@
 #include "EventsScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 #include "MpcSpecs.hpp"
@@ -42,7 +43,7 @@ void EventsScreen::setNote0(int i)
 
 void EventsScreen::open()
 {
-    sequencer->move(0);
+    sequencer->getTransport()->setPosition(0);
 
     const auto note1Field = findField("note1");
 

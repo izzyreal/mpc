@@ -1,4 +1,5 @@
 #include "ReleaseTapCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -12,7 +13,7 @@ ReleaseTapCommand::ReleaseTapCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseTapCommand::execute()
 {
-    if (mpc.getSequencer()->isRecordingOrOverdubbing())
+    if (mpc.getSequencer()->getTransport()->isRecordingOrOverdubbing())
     {
         mpc.getSequencer()->flushTrackNoteCache();
     }

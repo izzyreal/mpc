@@ -1,4 +1,5 @@
 #include "AllSequencer.hpp"
+#include "sequencer/Transport.hpp"
 #include "file/ByteUtil.hpp"
 #include "lcdgui/screens/window/TimeDisplayScreen.hpp"
 
@@ -42,20 +43,21 @@ AllSequencer::AllSequencer(mpc::Mpc &mpc)
     saveBytes[TR_OFFSET] = mpcSequencer->getActiveTrackIndex();
 
     const bool tempoSourceIsSequence =
-        mpcSequencer->isTempoSourceSequenceEnabled();
+        mpcSequencer->getTransport()->isTempoSourceSequenceEnabled();
 
-    mpcSequencer->setTempoSourceSequence(false);
+    mpcSequencer->getTransport()->setTempoSourceSequence(false);
 
     const auto masterTempoBytes =
-        ByteUtil::ushort2bytes(mpcSequencer->getTempo() * 10.0);
+        ByteUtil::ushort2bytes(mpcSequencer->getTransport()->getTempo() * 10.0);
 
-    mpcSequencer->setTempoSourceSequence(tempoSourceIsSequence);
+    mpcSequencer->getTransport()->setTempoSourceSequence(tempoSourceIsSequence);
 
     saveBytes[MASTER_TEMPO_OFFSET] = masterTempoBytes[0];
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
 
     saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] =
-        mpcSequencer->isTempoSourceSequenceEnabled() ? 0x01 : 0x00;
+        mpcSequencer->getTransport()->isTempoSourceSequenceEnabled() ? 0x01
+                                                                     : 0x00;
 
     const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();

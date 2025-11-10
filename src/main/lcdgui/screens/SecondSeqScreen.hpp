@@ -30,6 +30,11 @@ namespace mpc::lcdgui::screens
 
         void open() override;
 
+        int getSq()
+        {
+            return sq;
+        }
+
     private:
         int sq = 0;
 

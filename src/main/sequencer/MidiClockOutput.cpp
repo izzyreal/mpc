@@ -1,4 +1,5 @@
 #include "MidiClockOutput.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 
@@ -82,7 +83,7 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 
 void MidiClockOutput::processTempoChange()
 {
-    double tempo = sequencer->getTempo();
+    const double tempo = sequencer->getTransport()->getTempo();
 
     if (tempo != clock.getBpm())
     {
@@ -115,9 +116,8 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
     enqueueEventAfterNFrames(
         [&]
         {
-            sendMidiSyncMsg(sequencer->getPlayStartPositionQuarterNotes() == 0.0
-                                ? ShortMessage::START
-                                : ShortMessage::CONTINUE);
+            sendMidiSyncMsg(sequencer->getTransport()->getPlayStartPositionQuarterNotes()
+    == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE);
         },
         numberOfFramesBeforeMidiSyncStart);
         */
@@ -132,7 +132,7 @@ void MidiClockOutput::processEventsAfterNFrames()
 {
     EventAfterNFrames batch[100];
 
-    size_t count = eventQueue->try_dequeue_bulk(batch, 100);
+    const size_t count = eventQueue->try_dequeue_bulk(batch, 100);
 
     tempEventQueue.clear();
 
@@ -208,7 +208,7 @@ void MidiClockOutput::processSampleRateChange()
 {
     if (clock.getSampleRate() != requestedSampleRate)
     {
-        auto bpm = clock.getBpm();
+        const auto bpm = clock.getBpm();
         clock.init(requestedSampleRate);
         clock.set_bpm(bpm);
     }

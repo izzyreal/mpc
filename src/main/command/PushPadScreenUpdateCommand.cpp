@@ -1,4 +1,5 @@
 #include "PushPadScreenUpdateCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
 
 #include "lcdgui/screens/AssignScreen.hpp"
@@ -86,17 +87,17 @@ void PushPadScreenUpdateCommand::execute()
             return;
         }
 
-        if (ctx.sequencer->isPlaying() && ctx.isF4Pressed)
+        if (ctx.sequencer->getTransport()->isPlaying() && ctx.isF4Pressed)
         {
             if (!ctx.sequencer->getSequence(padIndexWithBank)->isUsed())
             {
                 return;
             }
 
-            ctx.sequencer->stop();
-            ctx.sequencer->move(0);
+            ctx.sequencer->getTransport()->stop();
+            ctx.sequencer->getTransport()->setPosition(0);
             ctx.sequencer->setActiveSequenceIndex(padIndexWithBank);
-            ctx.sequencer->playFromStart();
+            ctx.sequencer->getTransport()->playFromStart();
             nextSeqPadScreen->refreshSeqs();
             return;
         }

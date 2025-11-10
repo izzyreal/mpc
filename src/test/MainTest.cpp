@@ -3,6 +3,7 @@
 #include "TestMpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/Transport.hpp"
 
 using namespace mpc;
 
@@ -23,7 +24,7 @@ SCENARIO("A Sequencer initializes correctly", "[sequencer]")
         auto seq = mpc.getSequencer();
         seq->init();
 
-        REQUIRE(seq->getTempo() == 120);
+        REQUIRE(seq->getTransport()->getTempo() == 120);
     }
 }
 

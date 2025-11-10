@@ -1,4 +1,5 @@
 #include "TransScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 #include "PunchScreen.hpp"
@@ -18,7 +19,7 @@ TransScreen::TransScreen(Mpc &mpc, const int layerIndex)
 
 void TransScreen::open()
 {
-    findChild("function-keys")->Hide(sequencer->isPlaying());
+    findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 
     setBar0(0);
     setBar1(sequencer->getActiveSequence()->getLastBarIndex());
@@ -152,29 +153,29 @@ void TransScreen::displayBars() const
 void TransScreen::play()
 {
     ScreenComponent::play();
-    findChild("function-keys")->Hide(sequencer->isPlaying());
+    findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 }
 
 void TransScreen::playStart()
 {
     ScreenComponent::playStart();
-    findChild("function-keys")->Hide(sequencer->isPlaying());
+    findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 }
 
 void TransScreen::rec()
 {
     ScreenComponent::rec();
-    findChild("function-keys")->Hide(sequencer->isPlaying());
+    findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 }
 
 void TransScreen::overDub()
 {
     ScreenComponent::overDub();
-    findChild("function-keys")->Hide(sequencer->isPlaying());
+    findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 }
 
 void TransScreen::stop()
 {
     ScreenComponent::stop();
-    findChild("function-keys")->Hide(sequencer->isPlaying());
+    findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 }

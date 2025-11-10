@@ -1,4 +1,5 @@
 #include "DeleteSequenceScreen.hpp"
+#include "sequencer/Transport.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 
@@ -39,7 +40,7 @@ void DeleteSequenceScreen::function(const int i)
             openScreenById(ScreenId::SequenceScreen);
             break;
         case 4:
-            sequencer->move(0);
+            sequencer->getTransport()->setPosition(0);
             sequencer->purgeSequence(sequencer->getActiveSequenceIndex());
             openScreenById(ScreenId::SequencerScreen);
             break;

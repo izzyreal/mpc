@@ -1,4 +1,5 @@
 #include "ChangeBars2Screen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "sequencer/Sequence.hpp"
 
@@ -60,7 +61,7 @@ void ChangeBars2Screen::function(const int i)
 
             if (changed)
             {
-                sequencer->move(0);
+                sequencer->getTransport()->setPosition(0);
             }
 
             openScreenById(ScreenId::SequencerScreen);

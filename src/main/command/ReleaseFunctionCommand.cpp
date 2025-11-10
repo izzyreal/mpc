@@ -1,4 +1,5 @@
 #include "ReleaseFunctionCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "audiomidi/SoundPlayer.hpp"
@@ -47,7 +48,7 @@ void ReleaseFunctionCommand::execute()
             auto sequencer = mpc.getSequencer();
             auto sampler = mpc.getSampler();
 
-            if (!sequencer->isPlaying() &&
+            if (!sequencer->getTransport()->isPlaying() &&
                 !ls->isCurrentScreen({ScreenId::SequencerScreen}))
             {
                 sampler->finishBasicVoice();

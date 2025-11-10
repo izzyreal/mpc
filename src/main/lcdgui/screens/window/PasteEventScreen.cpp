@@ -1,4 +1,5 @@
 #include "PasteEventScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
@@ -30,7 +31,7 @@ void PasteEventScreen::function(const int i)
             for (auto &event : stepEditorScreen->getPlaceHolder())
             {
                 sequencer->getActiveTrack()->cloneEventIntoTrack(
-                    event, sequencer->getTickPosition(),
+                    event, sequencer->getTransport()->getTickPosition(),
                     allowMultipleNotesOnSameTick);
             }
             openScreenById(ScreenId::StepEditorScreen);

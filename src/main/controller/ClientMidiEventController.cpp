@@ -1,4 +1,5 @@
 #include "controller/ClientMidiEventController.hpp"
+#include "sequencer/Transport.hpp"
 #include "command/TriggerLocalNoteOffCommand.hpp"
 #include "command/TriggerLocalNoteOnCommand.hpp"
 #include "controller/ClientEventController.hpp"
@@ -383,9 +384,9 @@ void ClientMidiEventController::handleProgramChange(
         if (e.getProgramNumber() >= 0 &&
             e.getProgramNumber() <= Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)
         {
-            if (sequencer->isPlaying())
+            if (sequencer->getTransport()->isPlaying())
             {
-                if (!sequencer->isRecordingOrOverdubbing() &&
+                if (!sequencer->getTransport()->isRecordingOrOverdubbing() &&
                     sequencer->getSequence(e.getProgramNumber())->isUsed())
                 {
                     if (clientEventController->getLayeredScreen()
@@ -537,7 +538,7 @@ ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
 {
     if (const auto trackIndex = getTrackIndexForEvent(e); trackIndex)
     {
-        const auto seq = sequencer->isPlaying()
+        const auto seq = sequencer->getTransport()->isPlaying()
                              ? sequencer->getCurrentlyPlayingSequence()
                              : sequencer->getActiveSequence();
         return seq->getTrack(*trackIndex);

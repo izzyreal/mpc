@@ -1,4 +1,5 @@
 #include "NoteRepeatProcessor.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Util.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
@@ -175,7 +176,7 @@ void NoteRepeatProcessor::process(
             // mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
         }
 
-        if (sequencer->isRecordingOrOverdubbing())
+        if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
             noteEvent->setVelocity(velocityBeforeTrackVelocityRatioApplied);
             track->insertEventWhileRetainingSort(noteEvent);
@@ -187,7 +188,7 @@ void NoteRepeatProcessor::process(
             {
                 if (drumBus)
                 {
-                    auto ctx =
+                    const auto ctx =
                         DrumNoteEventContextBuilder::buildDrumNoteOffContext(
                             0, drumBus, voices, note, tickPosition);
 

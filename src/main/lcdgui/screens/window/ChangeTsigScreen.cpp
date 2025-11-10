@@ -1,4 +1,5 @@
 #include "ChangeTsigScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
 #include "sequencer/Sequence.hpp"
@@ -44,8 +45,9 @@ void ChangeTsigScreen::function(const int i)
             {
                 if (barLengths[j] != newBarLengths[j])
                 {
-                    sequencer->move(0); // Only reset sequencer position when a
-                                        // bar length has changed
+                    sequencer->getTransport()->setPosition(
+                        0); // Only reset sequencer position when a
+                            // bar length has changed
                     break;
                 }
             }

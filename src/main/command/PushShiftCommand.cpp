@@ -1,4 +1,5 @@
 #include "PushShiftCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -17,7 +18,7 @@ namespace mpc::command
             mpc.getHardware()
                 ->getButton(hardware::ComponentId::TAP_TEMPO_OR_NOTE_REPEAT)
                 ->isPressed() &&
-            mpc.getSequencer()->isPlaying())
+            mpc.getSequencer()->getTransport()->isPlaying())
         {
             mpc.clientEventController->clientHardwareEventController
                 ->lockNoteRepeat();

@@ -1,4 +1,5 @@
 #include "command/context/TriggerLocalNoteContextFactory.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -85,35 +86,36 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
         screens->get<ScreenId::DrumScreen>()->getDrum();
 
     return std::make_shared<TriggerLocalNoteOnContext>(
-        TriggerLocalNoteOnContext{source,
-                                  eventRegistry,
-                                  registryNoteOnEvent,
-                                  isSequencerScreen,
-                                  programPadIndex,
-                                  velocity,
-                                  isFullLevelEnabled,
-                                  isSixteenLevelsEnabled,
-                                  isNoteRepeatLockedOrPressed,
-                                  isErasePressed,
-                                  isStepRecording,
-                                  isRecMainWithoutPlaying,
-                                  sequencer->isRecordingOrOverdubbing(),
-                                  bus,
-                                  program,
-                                  note,
-                                  drumScreenSelectedDrum,
-                                  isSamplerScreen,
-                                  track,
-                                  sequencer,
-                                  timingCorrectScreen,
-                                  assign16LevelsScreen,
-                                  eventHandler,
-                                  frameSequencer,
-                                  allowCentralNoteAndPadUpdate,
-                                  screen,
-                                  setSelectedNote,
-                                  setSelectedPad,
-                                  hardwareSliderValue});
+        TriggerLocalNoteOnContext{
+            source,
+            eventRegistry,
+            registryNoteOnEvent,
+            isSequencerScreen,
+            programPadIndex,
+            velocity,
+            isFullLevelEnabled,
+            isSixteenLevelsEnabled,
+            isNoteRepeatLockedOrPressed,
+            isErasePressed,
+            isStepRecording,
+            isRecMainWithoutPlaying,
+            sequencer->getTransport()->isRecordingOrOverdubbing(),
+            bus,
+            program,
+            note,
+            drumScreenSelectedDrum,
+            isSamplerScreen,
+            track,
+            sequencer,
+            timingCorrectScreen,
+            assign16LevelsScreen,
+            eventHandler,
+            frameSequencer,
+            allowCentralNoteAndPadUpdate,
+            screen,
+            setSelectedNote,
+            setSelectedPad,
+            hardwareSliderValue});
 }
 
 std::shared_ptr<TriggerLocalNoteOffContext>
@@ -150,12 +152,12 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::function sequencerMoveToQuarterNotePosition =
         [sequencer = sequencer](double quarterNotePosition)
     {
-        sequencer->move(quarterNotePosition);
+        sequencer->getTransport()->setPosition(quarterNotePosition);
     };
 
     const std::function sequencerStopMetronomeTrack = [sequencer = sequencer]
     {
-        sequencer->stopMetronomeTrack();
+        sequencer->getTransport()->stopMetronomeTrack();
     };
 
     const bool isStepRecording =
@@ -177,18 +179,18 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             std::make_shared<sequencer::NoteOffEvent>(note),
             eventHandler,
             sequencerRecordNoteOnEvent,
-            sequencer->isRecordingOrOverdubbing(),
+            sequencer->getTransport()->isRecordingOrOverdubbing(),
             hardware->getButton(ERASE)->isPressed(),
             track,
             isStepRecording,
             frameSequencer->getMetronomeOnlyTickPosition(),
             isRecMainWithoutPlaying,
-            sequencer->getTickPosition(),
+            sequencer->getTransport()->getTickPosition(),
             stepEditOptionsScreen->getTcValuePercentage(),
             timingCorrectScreen->getNoteValueLengthInTicks(),
             stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
             stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-            sequencer->getCurrentBarIndex(),
+            sequencer->getTransport()->getCurrentBarIndex(),
             timingCorrectScreen->getSwing(),
             getActiveSequenceLastTick,
             sequencerMoveToQuarterNotePosition,
