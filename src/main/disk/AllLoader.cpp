@@ -1,4 +1,5 @@
 #include "AllLoader.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 
@@ -20,6 +21,7 @@
 #include "disk/MpcFile.hpp"
 
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Transport.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
@@ -109,9 +111,9 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     auto allParserSequencer = allParser.getSequencer();
     mpcSequencer->setActiveSequenceIndex(allParserSequencer->sequence);
     mpcSequencer->setActiveTrackIndex(allParserSequencer->track);
-    mpcSequencer->setTempoSourceSequence(false);
-    mpcSequencer->setTempo(allParserSequencer->masterTempo);
-    mpcSequencer->setTempoSourceSequence(
+    mpcSequencer->getTransport()->setTempoSourceSequence(false);
+    mpcSequencer->getTransport()->setTempo(allParserSequencer->masterTempo);
+    mpcSequencer->getTransport()->setTempoSourceSequence(
         allParserSequencer->tempoSourceIsSequence);
 
     auto timingCorrectScreen =
@@ -140,7 +142,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc &mpc, AllParser &allParser)
     countMetronomeScreen->setInPlay(count->isEnabledInPlay());
     countMetronomeScreen->setInRec(count->isEnabledInRec());
     countMetronomeScreen->setWaitForKey(count->isWaitForKeyEnabled());
-    mpcSequencer->setCountEnabled(count->isEnabled());
+    mpcSequencer->getTransport()->setCountEnabled(count->isEnabled());
 
     auto midiInput = allParser.getMidiInput();
 

@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
 #include "client/event/ClientEvent.hpp"
@@ -34,7 +35,7 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     mpc::TestMpc::initializeTestMpc(mpc);
     auto pos = [&]
     {
-        return mpc.getSequencer()->getTickPosition();
+        return mpc.getSequencer()->getTransport()->getTickPosition();
     };
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
@@ -92,7 +93,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto seq = mpc.getSequencer();
-    seq->setCountEnabled(false);
+    seq->getTransport()->setCountEnabled(false);
 
     auto sequence = seq->getActiveSequence();
     sequence->init(0);
@@ -117,7 +118,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                    track->getEvents().size() < humanTickPositions.size())
             {
                 mpc.getClock()->processBufferInternal(
-                    seq->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+                    seq->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
                 server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
                 timeInSamples += BUFFER_SIZE;
 
@@ -142,11 +143,11 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    int tickPos = seq->getTickPosition();
+    int tickPos = seq->getTransport()->getTickPosition();
 
-    if (!seq->isRecordingOrOverdubbing())
+    if (!seq->getTransport()->isRecordingOrOverdubbing())
     {
-        seq->recFromStart();
+        seq->getTransport()->recFromStart();
     }
 
     std::vector<int> recordedTickPos;
@@ -194,10 +195,10 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         prevTickPos = tickPos;
-        tickPos = seq->getTickPosition();
+        tickPos = seq->getTransport()->getTickPosition();
     }
 
-    seq->stop();
+    seq->getTransport()->stop();
 
     while (audioThreadBusy)
     {
@@ -215,16 +216,16 @@ TEST_CASE("Copy sequence", "[sequencer]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
     auto sequencer = mpc.getSequencer();
-    sequencer->setTempo(121);
+    sequencer->getTransport()->setTempo(121);
 
-    REQUIRE(sequencer->getTempo() == 121);
+    REQUIRE(sequencer->getTransport()->getTempo() == 121);
 
     auto seq1 = sequencer->getActiveSequence();
     seq1->init(2);
 
     REQUIRE(seq1->getInitialTempo() == 120);
 
-    sequencer->setTempo(119);
+    sequencer->getTransport()->setTempo(119);
 
     REQUIRE(seq1->getInitialTempo() == 119);
 
@@ -235,13 +236,13 @@ TEST_CASE("Copy sequence", "[sequencer]")
     REQUIRE(seq2->getTempoChangeEvents().size() == 1);
     REQUIRE(seq2->getInitialTempo() == 119);
 
-    sequencer->setTempo(122);
+    sequencer->getTransport()->setTempo(122);
 
     REQUIRE(seq1->getInitialTempo() == 122);
     REQUIRE(seq2->getInitialTempo() == 119);
 
     sequencer->setActiveSequenceIndex(1);
-    sequencer->setTempo(123);
+    sequencer->getTransport()->setTempo(123);
 
     REQUIRE(seq1->getInitialTempo() == 122);
     REQUIRE(seq2->getInitialTempo() == 123);
@@ -256,7 +257,7 @@ TEST_CASE("Undo", "[sequencer]")
     mpc::TestMpc::initializeTestMpc(mpc);
 
     auto sequencer = mpc.getSequencer();
-    sequencer->setCountEnabled(false);
+    sequencer->getTransport()->setCountEnabled(false);
 
     auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
@@ -265,13 +266,13 @@ TEST_CASE("Undo", "[sequencer]")
     auto seq = sequencer->getActiveSequence();
     seq->init(2);
 
-    sequencer->setTempo(121);
+    sequencer->getTransport()->setTempo(121);
 
     auto server = mpc.getAudioMidiServices()->getAudioServer();
     server->resizeBuffers(BUFFER_SIZE);
     server->setSampleRate(SAMPLE_RATE);
 
-    sequencer->recFromStart();
+    sequencer->getTransport()->recFromStart();
 
     int64_t timeInSamples = 0;
 
@@ -305,14 +306,14 @@ TEST_CASE("Undo", "[sequencer]")
             mpc.clientEventController->handleClientEvent(clientEvent);
         }
 
-        mpc.getClock()->processBufferInternal(sequencer->getTempo(),
+        mpc.getClock()->processBufferInternal(sequencer->getTransport()->getTempo(),
                                               SAMPLE_RATE, BUFFER_SIZE, 0);
 
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
         timeInSamples += BUFFER_SIZE;
     }
 
-    sequencer->stop();
+    sequencer->getTransport()->stop();
     auto tr = seq->getTrack(0);
     REQUIRE(tr->getEvents().size() == 10);
 
@@ -322,7 +323,7 @@ TEST_CASE("Undo", "[sequencer]")
     tr = seq->getTrack(0);
 
     REQUIRE(seq->isUsed());
-    REQUIRE(sequencer->getTempo() == 121);
+    REQUIRE(sequencer->getTransport()->getTempo() == 121);
     REQUIRE(tr->getEvents().empty());
 
     sequencer->undoSeq();

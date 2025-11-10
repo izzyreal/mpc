@@ -1,4 +1,5 @@
 #include "controller/ClientHardwareEventController.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
 #include "command/AllCommands.hpp"
@@ -724,7 +725,7 @@ void ClientHardwareEventController::handleButtonPress(
                 std::dynamic_pointer_cast<SequencerScreen>(screen);
             sequencerScreen)
         {
-            if (mpc.getSequencer()->isOverdubbing())
+            if (mpc.getSequencer()->getTransport()->isOverdubbing())
             {
                 // Pure UI update
                 sequencerScreen->erase();

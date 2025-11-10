@@ -1,4 +1,5 @@
 #include "NextSeqPadScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
@@ -57,7 +58,7 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTickPosition();
+                            return sequencer->getTransport()->getTickPosition();
                         },
                         [&](auto)
                         {
@@ -101,10 +102,10 @@ void NextSeqPadScreen::function(int i)
 
         if (i == 3 && nextSq != -1)
         {
-            sequencer->stop();
-            sequencer->move(0);
+            sequencer->getTransport()->stop();
+            sequencer->getTransport()->setPosition(0);
             sequencer->setActiveSequenceIndex(nextSq);
-            sequencer->playFromStart();
+            sequencer->getTransport()->playFromStart();
         }
     }
     else if (i == 5)
@@ -170,17 +171,17 @@ void NextSeqPadScreen::setSeqColor(int i) const
 
 void NextSeqPadScreen::displayNow0() const
 {
-    findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow1() const
 {
-    findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow2() const
 {
-    findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(sequencer->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void NextSeqPadScreen::refreshSeqs() const

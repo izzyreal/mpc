@@ -1,4 +1,5 @@
 #include "sequencer/SeqUtil.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 
@@ -497,7 +498,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
         &clientHardwareEventController)
 {
     auto tc_note = timingCorrectScreen->getNoteValue();
-    bool posIsLastTick = sequencer->getTickPosition() ==
+    bool posIsLastTick = sequencer->getTransport()->getTickPosition() ==
                          sequencer->getActiveSequence()->getLastTick();
 
     const bool recIsPressedOrLocked =
@@ -506,7 +507,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
             hardware::ComponentId::REC);
 
     bool recMainWithoutPlaying =
-        currentScreenName == "sequencer" && !sequencer->isPlaying() &&
+        currentScreenName == "sequencer" && !sequencer->getTransport()->isPlaying() &&
         recIsPressedOrLocked && tc_note != 0 && !posIsLastTick;
 
     return recMainWithoutPlaying;
@@ -517,7 +518,7 @@ bool SeqUtil::isStepRecording(const std::string &currentScreenName,
 {
     auto posIsLastTick = [&]
     {
-        return sequencer->getTickPosition() ==
+        return sequencer->getTransport()->getTickPosition() ==
                sequencer->getActiveSequence()->getLastTick();
     };
     return currentScreenName == "step-editor" && !posIsLastTick();

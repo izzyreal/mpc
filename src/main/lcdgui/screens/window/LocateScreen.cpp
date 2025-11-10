@@ -1,4 +1,5 @@
 #include "LocateScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "StrUtil.hpp"
 #include "sequencer/Sequence.hpp"
@@ -52,15 +53,15 @@ void LocateScreen::function(const int i)
                 const auto clampedClock = std::clamp<uint8_t>(
                     std::get<2>(location), 0, getMaxClockForThisBar());
 
-                sequencer->setBar(clampedBarIndex);
-                sequencer->setBeat(clampedBeatIndex);
-                sequencer->setClock(clampedClock);
+                sequencer->getTransport()->setBar(clampedBarIndex);
+                sequencer->getTransport()->setBeat(clampedBeatIndex);
+                sequencer->getTransport()->setClock(clampedClock);
             }
             else
             {
-                sequencer->setBar(barIndex);
-                sequencer->setBeat(beatIndex);
-                sequencer->setClock(clock);
+                sequencer->getTransport()->setBar(barIndex);
+                sequencer->getTransport()->setBeat(beatIndex);
+                sequencer->getTransport()->setClock(clock);
             }
             openScreenById(ScreenId::SequencerScreen);
             break;
@@ -90,9 +91,9 @@ void LocateScreen::turnWheel(const int i)
 
 void LocateScreen::open()
 {
-    barIndex = sequencer->getCurrentBarIndex();
-    beatIndex = sequencer->getCurrentBeatIndex();
-    clock = sequencer->getCurrentClockNumber();
+    barIndex = sequencer->getTransport()->getCurrentBarIndex();
+    beatIndex = sequencer->getTransport()->getCurrentBeatIndex();
+    clock = sequencer->getTransport()->getCurrentClockNumber();
 
     displayBar();
     displayBeat();

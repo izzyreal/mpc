@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
 #include "lcdgui/ScreenComponent.hpp"
@@ -74,7 +75,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
             {
                 audioMidiServices->changeBounceStateIfRequired();
                 mpc.getClock()->processBufferInternal(
-                    mpc.getSequencer()->getTempo(), SAMPLE_RATE, BUFFER_SIZE,
+                    mpc.getSequencer()->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE,
                     0);
                 audioServer->work(inputBuffer, outputBuffer, BUFFER_SIZE, {},
                                   {0, 1}, {}, {0, 1});

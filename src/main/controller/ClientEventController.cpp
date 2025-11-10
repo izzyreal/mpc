@@ -1,4 +1,5 @@
 #include "controller/ClientEventController.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
@@ -93,7 +94,7 @@ bool ClientEventController::isRecMainWithoutPlaying() const
 
 RecordingMode ClientEventController::determineRecordingMode() const
 {
-    if (mpc.getSequencer()->isRecordingOrOverdubbing())
+    if (mpc.getSequencer()->getTransport()->isRecordingOrOverdubbing())
     {
         return RecordingMode::Overdub;
     }

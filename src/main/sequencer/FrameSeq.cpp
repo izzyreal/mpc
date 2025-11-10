@@ -1,4 +1,5 @@
 #include "sequencer/FrameSeq.hpp"
+#include "sequencer/Transport.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
@@ -123,13 +124,13 @@ bool FrameSeq::isRunning() const
 
 void FrameSeq::move(const int newTickPos) const
 {
-    sequencer->move(Sequencer::ticksToQuarterNotes(newTickPos));
+    sequencer->getTransport()->setPosition(Sequencer::ticksToQuarterNotes(newTickPos));
     sequencer->getStateManager()->drainQueue();
 }
 
 std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
 {
-    sequencer->playToTick(sequencer->getTickPosition());
+    sequencer->playToTick(sequencer->getTransport()->getTickPosition());
     sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
     sequencer->setNextSq(-1);
     move(0);
@@ -141,7 +142,7 @@ std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
 
 void FrameSeq::triggerClickIfNeeded() const
 {
-    if (!sequencer->isCountEnabled())
+    if (!sequencer->getTransport()->isCountEnabled())
     {
         return;
     }
@@ -154,9 +155,9 @@ void FrameSeq::triggerClickIfNeeded() const
     const auto countMetronomeScreen =
         getScreens()->get<ScreenId::CountMetronomeScreen>();
 
-    if (sequencer->isRecordingOrOverdubbing())
+    if (sequencer->getTransport()->isRecordingOrOverdubbing())
     {
-        if (!countMetronomeScreen->getInRec() && !sequencer->isCountingIn())
+        if (!countMetronomeScreen->getInRec() && !sequencer->getTransport()->isCountingIn())
         {
             return;
         }
@@ -165,15 +166,15 @@ void FrameSeq::triggerClickIfNeeded() const
     {
 
         if (!isStepEditor && !countMetronomeScreen->getInPlay() &&
-            !sequencer->isCountingIn() && !isRecMainWithoutPlaying())
+            !sequencer->getTransport()->isCountingIn() && !isRecMainWithoutPlaying())
         {
             return;
         }
     }
 
     const auto pos = metronomeOnly ? metronomeOnlyTickPosition
-                                   : sequencer->getTickPosition();
-    const auto bar = sequencer->getCurrentBarIndex();
+                                   : sequencer->getTransport()->getTickPosition();
+    const auto bar = sequencer->getTransport()->getCurrentBarIndex();
     const auto seq = sequencer->getCurrentlyPlayingSequence();
     const auto firstTickOfBar = seq->getFirstTickOfBar(bar);
     const auto relativePos = pos - firstTickOfBar;
@@ -221,26 +222,26 @@ void FrameSeq::triggerClickIfNeeded() const
 void FrameSeq::displayPunchRects() const
 {
     const auto punch =
-        sequencer->isPunchEnabled() && sequencer->isRecordingOrOverdubbing();
+        sequencer->getTransport()->isPunchEnabled() && sequencer->getTransport()->isRecordingOrOverdubbing();
 
     if (punch)
     {
-        const bool punchIn = sequencer->getAutoPunchMode() == 0 ||
-                             sequencer->getAutoPunchMode() == 2;
-        const bool punchOut = sequencer->getAutoPunchMode() == 1 ||
-                              sequencer->getAutoPunchMode() == 2;
-        const auto punchInTime = sequencer->getPunchInTime();
-        const auto punchOutTime = sequencer->getPunchOutTime();
+        const bool punchIn = sequencer->getTransport()->getAutoPunchMode() == 0 ||
+                             sequencer->getTransport()->getAutoPunchMode() == 2;
+        const bool punchOut = sequencer->getTransport()->getAutoPunchMode() == 1 ||
+                              sequencer->getTransport()->getAutoPunchMode() == 2;
+        const auto punchInTime = sequencer->getTransport()->getPunchInTime();
+        const auto punchOutTime = sequencer->getTransport()->getPunchOutTime();
 
         const auto sequencerScreen =
             getScreens()->get<ScreenId::SequencerScreen>();
 
-        if (punchIn && sequencer->getTickPosition() == punchInTime)
+        if (punchIn && sequencer->getTransport()->getTickPosition() == punchInTime)
         {
             sequencerScreen->setPunchRectOn(0, false);
             sequencerScreen->setPunchRectOn(1, true);
         }
-        else if (punchOut && sequencer->getTickPosition() == punchOutTime)
+        else if (punchOut && sequencer->getTransport()->getTickPosition() == punchOutTime)
         {
             sequencerScreen->setPunchRectOn(1, false);
             sequencerScreen->setPunchRectOn(2, true);
@@ -250,7 +251,7 @@ void FrameSeq::displayPunchRects() const
 
 void FrameSeq::stopCountingInIfRequired() const
 {
-    if (sequencer->getTickPosition() >=
+    if (sequencer->getTransport()->getTickPosition() >=
         sequencer->getTransport()->getCountInEndPos())
     {
         move(sequencer->getTransport()->getCountInStartPos());
@@ -264,24 +265,24 @@ bool FrameSeq::processSongMode() const
 {
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (sequencer->getTickPosition() < seq->getLastTick())
+    if (sequencer->getTransport()->getTickPosition() < seq->getLastTick())
     {
         return false;
     }
 
     sequencer->playToTick(seq->getLastTick() - 1);
-    sequencer->incrementPlayedStepRepetitions();
+    sequencer->getTransport()->incrementPlayedStepRepetitions();
     const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
     const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
     const auto step = songScreen->getOffset() + 1;
 
-    const auto doneRepeating = sequencer->getPlayedStepRepetitions() >=
+    const auto doneRepeating = sequencer->getTransport()->getPlayedStepRepetitions() >=
                                song->getStep(step).lock()->getRepeats();
     const auto reachedLastStep = step == song->getStepCount() - 1;
 
     if (doneRepeating && song->isLoopEnabled() && step == song->getLastStep())
     {
-        sequencer->resetPlayedStepRepetitions();
+        sequencer->getTransport()->resetPlayedStepRepetitions();
         songScreen->setOffset(song->getFirstStep() - 1);
         const auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
@@ -295,7 +296,7 @@ bool FrameSeq::processSongMode() const
     }
     else if (doneRepeating && reachedLastStep)
     {
-        sequencer->setEndOfSong(true);
+        sequencer->getTransport()->setEndOfSong(true);
         stopSequencer();
         return true;
     }
@@ -303,7 +304,7 @@ bool FrameSeq::processSongMode() const
     {
         if (doneRepeating)
         {
-            sequencer->resetPlayedStepRepetitions();
+            sequencer->getTransport()->resetPlayedStepRepetitions();
             songScreen->setOffset(songScreen->getOffset() + 1);
 
             const auto newStep =
@@ -329,14 +330,14 @@ bool FrameSeq::processSeqLoopEnabled() const
 {
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (sequencer->getTickPosition() >= seq->getLoopEnd() - 1)
+    if (sequencer->getTransport()->getTickPosition() >= seq->getLoopEnd() - 1)
     {
-        const auto punch = sequencer->isPunchEnabled() &&
-                           sequencer->isRecordingOrOverdubbing();
-        const bool punchIn = sequencer->getAutoPunchMode() == 0 ||
-                             sequencer->getAutoPunchMode() == 2;
-        const bool punchOut = sequencer->getAutoPunchMode() == 1 ||
-                              sequencer->getAutoPunchMode() == 2;
+        const auto punch = sequencer->getTransport()->isPunchEnabled() &&
+                           sequencer->getTransport()->isRecordingOrOverdubbing();
+        const bool punchIn = sequencer->getTransport()->getAutoPunchMode() == 0 ||
+                             sequencer->getTransport()->getAutoPunchMode() == 2;
+        const bool punchOut = sequencer->getTransport()->getAutoPunchMode() == 1 ||
+                              sequencer->getTransport()->getAutoPunchMode() == 2;
 
         const auto sequencerScreen =
             getScreens()->get<ScreenId::SequencerScreen>();
@@ -357,14 +358,14 @@ bool FrameSeq::processSeqLoopEnabled() const
             sequencerScreen->setPunchRectOn(1, true);
         }
 
-        sequencer->playToTick(sequencer->getTickPosition());
+        sequencer->playToTick(sequencer->getTransport()->getTickPosition());
         move(seq->getLoopStart());
 
-        if (sequencer->isRecordingOrOverdubbing())
+        if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
-            if (sequencer->isRecording())
+            if (sequencer->getTransport()->isRecording())
             {
-                sequencer->switchRecordToOverdub();
+                sequencer->getTransport()->switchRecordToOverdub();
             }
         }
 
@@ -378,9 +379,9 @@ bool FrameSeq::processSeqLoopDisabled() const
 {
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
-    if (sequencer->getTickPosition() >= seq->getLastTick())
+    if (sequencer->getTransport()->getTickPosition() >= seq->getLastTick())
     {
-        if (sequencer->isRecordingOrOverdubbing())
+        if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
             const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
 
@@ -392,7 +393,7 @@ bool FrameSeq::processSeqLoopDisabled() const
         }
         else
         {
-            sequencer->stop(Sequencer::StopMode::AT_START_OF_TICK);
+            sequencer->getTransport()->stop(Transport::StopMode::AT_START_OF_TICK);
             move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
@@ -425,7 +426,7 @@ void FrameSeq::processNoteRepeat()
     const auto shiftTiming =
         timingCorrectScreen->getAmount() *
         (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
-    const auto tickPosWithShift = sequencer->getTickPosition() - shiftTiming;
+    const auto tickPosWithShift = sequencer->getTransport()->getTickPosition() - shiftTiming;
 
     bool shouldRepeatNote = false;
 
@@ -455,8 +456,8 @@ void FrameSeq::processNoteRepeat()
             this, sequencer, sampler, getAudioMixer(), isFullLevelEnabled(),
             isSixteenLevelsEnabled(), assign16LevelsScreen, mixerSetupScreen,
             eventRegistry, hardwareSlider, voices, getMixerInterconnections(),
-            sequencer->getTickPosition(), repeatIntervalTicks,
-            getEventFrameOffset(), sequencer->getTempo(),
+            sequencer->getTransport()->getTickPosition(), repeatIntervalTicks,
+            getEventFrameOffset(), sequencer->getTransport()->getTempo(),
             static_cast<float>(getSampleRate()));
     }
 }
@@ -464,7 +465,7 @@ void FrameSeq::processNoteRepeat()
 void FrameSeq::stopSequencer() const
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
-    sequencer->stop();
+    sequencer->getTransport()->stop();
     move(0);
 }
 
@@ -514,7 +515,7 @@ void FrameSeq::work(const int nFrames)
 
     if (sequencerIsRunningAtStartOfBuffer && metronomeOnly)
     {
-        clock->processBufferInternal(sequencer->getTempo(), sampleRate, nFrames,
+        clock->processBufferInternal(sequencer->getTransport()->getTempo(), sampleRate, nFrames,
                                      0);
         const auto &ticksForCurrentBuffer = clock->getTicksForCurrentBuffer();
 
@@ -548,11 +549,11 @@ void FrameSeq::work(const int nFrames)
 
         if (layeredScreen->getCurrentScreenName() == "song")
         {
-            sequencer->moveWithinSong(hostPositionQuarterNotes);
+            sequencer->getTransport()->setPositionWithinSong(hostPositionQuarterNotes);
         }
         else
         {
-            sequencer->move(hostPositionQuarterNotes);
+            sequencer->getTransport()->setPosition(hostPositionQuarterNotes);
         }
         sequencer->getStateManager()->drainQueue();
     }
@@ -621,7 +622,7 @@ void FrameSeq::work(const int nFrames)
 
         if (tickCountAtThisFrameIndex > 1)
         {
-            sequencer->bumpPositionByTicks(tickCountAtThisFrameIndex - 1);
+            sequencer->getTransport()->bumpPositionByTicks(tickCountAtThisFrameIndex - 1);
             sequencer->getStateManager()->drainQueue();
         }
 
@@ -630,15 +631,15 @@ void FrameSeq::work(const int nFrames)
         triggerClickIfNeeded();
         displayPunchRects();
 
-        if (sequencer->isCountingIn())
+        if (sequencer->getTransport()->isCountingIn())
         {
-            sequencer->bumpPositionByTicks(1);
+            sequencer->getTransport()->bumpPositionByTicks(1);
             sequencer->getStateManager()->drainQueue();
             stopCountingInIfRequired();
             continue;
         }
 
-        if (sequencer->getTickPosition() >= seq->getLastTick() - 1 &&
+        if (sequencer->getTransport()->getTickPosition() >= seq->getLastTick() - 1 &&
             !sequencer->isSongModeEnabled() && sequencer->getNextSq() != -1)
         {
             seq = switchToNextSequence();
@@ -669,11 +670,11 @@ void FrameSeq::work(const int nFrames)
 
         if (!songHasStopped && !normalPlayHasStopped)
         {
-            sequencer->playToTick(sequencer->getTickPosition());
+            sequencer->playToTick(sequencer->getTransport()->getTickPosition());
             processNoteRepeat();
         }
 
-        sequencer->bumpPositionByTicks(1);
+        sequencer->getTransport()->bumpPositionByTicks(1);
         sequencer->getStateManager()->drainQueue();
     }
 

@@ -1,4 +1,5 @@
 #include "command/context/TriggerLocalNoteContextFactory.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -97,7 +98,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                                   isErasePressed,
                                   isStepRecording,
                                   isRecMainWithoutPlaying,
-                                  sequencer->isRecordingOrOverdubbing(),
+                                  sequencer->getTransport()->isRecordingOrOverdubbing(),
                                   bus,
                                   program,
                                   note,
@@ -150,12 +151,12 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::function sequencerMoveToQuarterNotePosition =
         [sequencer = sequencer](double quarterNotePosition)
     {
-        sequencer->move(quarterNotePosition);
+        sequencer->getTransport()->setPosition(quarterNotePosition);
     };
 
     const std::function sequencerStopMetronomeTrack = [sequencer = sequencer]
     {
-        sequencer->stopMetronomeTrack();
+        sequencer->getTransport()->stopMetronomeTrack();
     };
 
     const bool isStepRecording =
@@ -177,18 +178,18 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             std::make_shared<sequencer::NoteOffEvent>(note),
             eventHandler,
             sequencerRecordNoteOnEvent,
-            sequencer->isRecordingOrOverdubbing(),
+            sequencer->getTransport()->isRecordingOrOverdubbing(),
             hardware->getButton(ERASE)->isPressed(),
             track,
             isStepRecording,
             frameSequencer->getMetronomeOnlyTickPosition(),
             isRecMainWithoutPlaying,
-            sequencer->getTickPosition(),
+            sequencer->getTransport()->getTickPosition(),
             stepEditOptionsScreen->getTcValuePercentage(),
             timingCorrectScreen->getNoteValueLengthInTicks(),
             stepEditOptionsScreen->isDurationOfRecordedNotesTcValue(),
             stepEditOptionsScreen->isAutoStepIncrementEnabled(),
-            sequencer->getCurrentBarIndex(),
+            sequencer->getTransport()->getCurrentBarIndex(),
             timingCorrectScreen->getSwing(),
             getActiveSequenceLastTick,
             sequencerMoveToQuarterNotePosition,

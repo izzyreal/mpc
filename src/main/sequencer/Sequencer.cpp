@@ -92,7 +92,6 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>();
-    transport = std::make_shared<Transport>(*this);
 
     frameSequencer = std::make_shared<FrameSeq>(
         eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
@@ -118,6 +117,8 @@ std::shared_ptr<Transport> Sequencer::getTransport()
 
 void Sequencer::init()
 {
+    transport = std::make_shared<Transport>(*this);
+
     for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT;
          ++midiBusIndex)
     {
@@ -737,11 +738,7 @@ void Sequencer::goToPreviousEvent()
         }
     }
 
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    transport->setPosition(ticksToQuarterNotes(newPos),
-                           shouldSyncTrackEventIndicesToNewPosition,
-                           shouldSetPlayStartPosition);
+    transport->setPosition(ticksToQuarterNotes(newPos));
 }
 
 void Sequencer::goToNextEvent()
@@ -760,11 +757,7 @@ void Sequencer::goToNextEvent()
         }
     }
 
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    transport->setPosition(ticksToQuarterNotes(newPos),
-                           shouldSyncTrackEventIndicesToNewPosition,
-                           shouldSetPlayStartPosition);
+    transport->setPosition(ticksToQuarterNotes(newPos));
 }
 
 void Sequencer::goToPreviousStep()
@@ -803,11 +796,7 @@ void Sequencer::goToPreviousStep()
         prevStepIndex = 0;
     }
 
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    transport->setPosition(ticksToQuarterNotes(prevStepIndex * stepSize),
-                           shouldSyncTrackEventIndicesToNewPosition,
-                           shouldSetPlayStartPosition);
+    transport->setPosition(ticksToQuarterNotes(prevStepIndex * stepSize));
 }
 
 void Sequencer::goToNextStep()
@@ -845,11 +834,7 @@ void Sequencer::goToNextStep()
         nextStepIndex = stepGrid.size() - 1;
     }
 
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    transport->setPosition(ticksToQuarterNotes(nextStepIndex * stepSize),
-                           shouldSyncTrackEventIndicesToNewPosition,
-                           shouldSetPlayStartPosition);
+    transport->setPosition(ticksToQuarterNotes(nextStepIndex * stepSize));
 }
 
 void Sequencer::tap()

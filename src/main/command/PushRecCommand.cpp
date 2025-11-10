@@ -1,4 +1,5 @@
 #include "PushRecCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -25,10 +26,10 @@ void PushRecCommand::execute()
         return;
     }
 
-    if (mpc.getSequencer()->isRecordingOrOverdubbing())
+    if (mpc.getSequencer()->getTransport()->isRecordingOrOverdubbing())
     {
-        mpc.getSequencer()->setRecording(false);
-        mpc.getSequencer()->setOverdubbing(false);
+        mpc.getSequencer()->getTransport()->setRecording(false);
+        mpc.getSequencer()->getTransport()->setOverdubbing(false);
     }
 
     if (!lcdgui::screengroups::isPlayAndRecordScreen(

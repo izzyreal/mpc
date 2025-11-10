@@ -20,12 +20,10 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
 
-Transport::Transport(
-    Sequencer &owner,
-    std::function<std::shared_ptr<lcdgui::Screens>()> getScreens)
-    : sequencer(owner), getScreens(getScreens)
+Transport::Transport(Sequencer &owner)
+    : sequencer(owner)
 {
-    auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+    auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
 }
 
@@ -42,7 +40,7 @@ void Transport::play(const bool fromStart)
     }
 
     endOfSong = false;
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+    auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
     auto currentSong = sequencer.getSong(songScreen->getActiveSongIndex());
 
     const auto snapshot = sequencer.getStateManager()->getSnapshot();
@@ -81,16 +79,13 @@ void Transport::play(const bool fromStart)
     }
 
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    setPosition(positionQuarterNotes, shouldSyncTrackEventIndicesToNewPosition,
-                shouldSetPlayStartPosition);
+    setPosition(positionQuarterNotes);
 
     sequencer.setCurrentlyPlayingSequenceIndex(
         sequencer.getActiveSequenceIndex());
 
     auto countMetronomeScreen =
-        getScreens()->get<ScreenId::CountMetronomeScreen>();
+        sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
     auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 ||
@@ -98,8 +93,7 @@ void Transport::play(const bool fromStart)
     {
         if (fromStart)
         {
-            setPosition(0, shouldSyncTrackEventIndicesToNewPosition,
-                        shouldSetPlayStartPosition);
+            setPosition(0);
         }
     }
 
@@ -112,16 +106,12 @@ void Transport::play(const bool fromStart)
         {
             if (fromStart)
             {
-                setPosition(Sequencer::ticksToQuarterNotes(s->getLoopStart()),
-                            shouldSyncTrackEventIndicesToNewPosition,
-                            shouldSetPlayStartPosition);
+                setPosition(Sequencer::ticksToQuarterNotes(s->getLoopStart()));
             }
             else
             {
                 setPosition(Sequencer::ticksToQuarterNotes(
-                                s->getFirstTickOfBar(getCurrentBarIndex())),
-                            shouldSyncTrackEventIndicesToNewPosition,
-                            shouldSetPlayStartPosition);
+                                s->getFirstTickOfBar(getCurrentBarIndex())));
             }
 
             countInStartPos =
@@ -295,13 +285,9 @@ void Transport::stop(const StopMode stopMode)
         countingIn = false;
     }
 
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    setPosition(Sequencer::ticksToQuarterNotes(newTickPosition),
-                shouldSyncTrackEventIndicesToNewPosition,
-                shouldSetPlayStartPosition);
+    setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
 
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+    auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
 
     if (endOfSong)
     {
@@ -309,7 +295,7 @@ void Transport::stop(const StopMode stopMode)
     }
 
     auto vmpcDirectToDiskRecorderScreen =
-        getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
+        sequencer.getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
     {
@@ -338,6 +324,16 @@ void Transport::setRecording(bool b)
 void Transport::setOverdubbing(bool b)
 {
     overdubbing = b;
+}
+
+void Transport::setCountEnabled(const bool b)
+{
+    countEnabled = b;
+}
+
+bool Transport::isCountEnabled() const
+{
+    return countEnabled;
 }
 
 void Transport::setCountingIn(const bool b)
@@ -490,6 +486,11 @@ bool Transport::isRecordingOrOverdubbing() const
 bool Transport::isRecording() const
 {
     return recording;
+}
+
+bool Transport::isOverdubbing() const
+{
+    return overdubbing;
 }
 
 int Transport::getCurrentBarIndex()
@@ -647,13 +648,9 @@ void Transport::setBar(int i)
         return;
     }
 
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-
     if (i < 0)
     {
-        setPosition(0, shouldSyncTrackEventIndicesToNewPosition,
-                    shouldSetPlayStartPosition);
+        setPosition(0);
         return;
     }
 
@@ -704,9 +701,7 @@ void Transport::setBar(int i)
         pos = s->getLastTick();
     }
 
-    setPosition(Sequencer::ticksToQuarterNotes(pos),
-                shouldSyncTrackEventIndicesToNewPosition,
-                shouldSetPlayStartPosition);
+    setPosition(Sequencer::ticksToQuarterNotes(pos));
 
     setBeat(0);
     setClock(0);
@@ -744,11 +739,7 @@ void Transport::setBeat(int i)
 
     const auto denTicks = 96 * (4.0 / ts.getDenominator());
     pos += difference * denTicks;
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    setPosition(Sequencer::ticksToQuarterNotes(pos),
-                shouldSyncTrackEventIndicesToNewPosition,
-                shouldSetPlayStartPosition);
+    setPosition(Sequencer::ticksToQuarterNotes(pos));
 }
 
 void Transport::setClock(int i)
@@ -783,11 +774,7 @@ void Transport::setClock(int i)
     const int difference = i - getCurrentClockNumber();
 
     pos += difference;
-    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
-    constexpr bool shouldSetPlayStartPosition = true;
-    setPosition(Sequencer::ticksToQuarterNotes(pos),
-                shouldSyncTrackEventIndicesToNewPosition,
-                shouldSetPlayStartPosition);
+    setPosition(Sequencer::ticksToQuarterNotes(pos));
 }
 
 void Transport::setPosition(const double positionQuarterNotes,
@@ -837,7 +824,7 @@ void Transport::setPosition(const double positionQuarterNotes,
         if (sequencer.isSecondSequenceEnabled())
         {
             auto secondSequenceScreen =
-                getScreens()->get<ScreenId::SecondSeqScreen>();
+                sequencer.getScreens()->get<ScreenId::SecondSeqScreen>();
             sequencer.getSequence(secondSequenceScreen->getSq())
                 ->resetTrackEventIndices(
                     Sequencer::quarterNotesToTicks(wrappedNewPosition));
@@ -847,7 +834,8 @@ void Transport::setPosition(const double positionQuarterNotes,
 
 void Transport::setPositionWithinSong(
     const double positionQuarterNotes,
-    const bool shouldSyncTrackEventIndicesToNewPosition)
+    const bool shouldSyncTrackEventIndicesToNewPosition,
+    const bool shouldSetPlayStartPosition)
 {
     if (!screengroups::isSongScreen(
             sequencer.layeredScreen->getCurrentScreen()))
@@ -855,7 +843,7 @@ void Transport::setPositionWithinSong(
         return;
     }
 
-    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
     const auto song = sequencer.getSong(songScreen->getActiveSongIndex());
     uint32_t stepStartTick = 0;
     uint32_t stepEndTick = 0;
@@ -925,8 +913,7 @@ void Transport::setPositionWithinSong(
                 return;
             }
 
-            setPosition(finalPosQuarterNotes,
-                        shouldSyncTrackEventIndicesToNewPosition, true);
+            setPosition(finalPosQuarterNotes, shouldSyncTrackEventIndicesToNewPosition, shouldSetPlayStartPosition);
 
             if (shouldSyncTrackEventIndicesToNewPosition)
             {
@@ -1020,7 +1007,7 @@ double Transport::getTempo()
     if (tempoSourceSequenceEnabled)
     {
         auto ignoreTempoChangeScreen =
-            getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
+            sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
         if (seq->isTempoChangeOn() ||
             (sequencer.getStateManager()->getSnapshot().isSongModeEnabled() &&

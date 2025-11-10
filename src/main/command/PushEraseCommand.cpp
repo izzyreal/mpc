@@ -1,4 +1,5 @@
 #include "PushEraseCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
@@ -11,7 +12,7 @@ PushEraseCommand::PushEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 void PushEraseCommand::execute()
 {
     if (!mpc.getSequencer()->getActiveSequence()->isUsed() ||
-        mpc.getSequencer()->isPlaying())
+        mpc.getSequencer()->getTransport()->isPlaying())
     {
         return;
     }

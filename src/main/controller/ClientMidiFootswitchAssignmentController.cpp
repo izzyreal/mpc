@@ -1,4 +1,5 @@
 #include "controller/ClientMidiFootswitchAssignmentController.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "client/event/ClientHardwareEvent.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -83,15 +84,15 @@ void ClientMidiFootswitchAssignmentController::handleRecordingToPlay()
 
 void ClientMidiFootswitchAssignmentController::handleRecPunch()
 {
-    if (!sequencer->isPlaying())
+    if (!sequencer->getTransport()->isPlaying())
     {
         handleStopToPlay();
     }
-    else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
+    else if (sequencer->getTransport()->isPlaying() && !sequencer->getTransport()->isRecordingOrOverdubbing())
     {
         triggerDualButtonCombo(REC, PLAY);
     }
-    else if (sequencer->isRecording())
+    else if (sequencer->getTransport()->isRecording())
     {
         handleRecordingToPlay();
     }
@@ -99,15 +100,15 @@ void ClientMidiFootswitchAssignmentController::handleRecPunch()
 
 void ClientMidiFootswitchAssignmentController::handleOdubPunch()
 {
-    if (!sequencer->isPlaying())
+    if (!sequencer->getTransport()->isPlaying())
     {
         handleStopToPlay();
     }
-    else if (sequencer->isPlaying() && !sequencer->isRecordingOrOverdubbing())
+    else if (sequencer->getTransport()->isPlaying() && !sequencer->getTransport()->isRecordingOrOverdubbing())
     {
         triggerDualButtonCombo(OVERDUB, PLAY);
     }
-    else if (sequencer->isOverdubbing())
+    else if (sequencer->getTransport()->isOverdubbing())
     {
         handleRecordingToPlay();
     }

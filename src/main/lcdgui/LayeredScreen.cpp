@@ -1,4 +1,5 @@
 #include "lcdgui/LayeredScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "lcdgui/BMFParser.hpp"
 #include "lcdgui/ScreenGroups.hpp"
@@ -306,7 +307,7 @@ void LayeredScreen::openScreenInternal(
     if (!history.empty())
     {
         if (isCurrentScreen({ScreenId::SongScreen}) &&
-            mpc.getSequencer()->isPlaying())
+            mpc.getSequencer()->getTransport()->isPlaying())
         {
             return;
         }
@@ -405,7 +406,7 @@ void LayeredScreen::openScreenInternal(
 
     if (!screengroups::isNextSeqScreen(newScreen) ||
         (std::dynamic_pointer_cast<SequencerScreen>(newScreen) &&
-         !mpc.getSequencer()->isPlaying()))
+         !mpc.getSequencer()->getTransport()->isPlaying()))
     {
         if (mpc.getSequencer()->getNextSq() != -1)
         {

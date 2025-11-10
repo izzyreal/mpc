@@ -1,4 +1,5 @@
 #include "VmpcDirectToDiskRecorderScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
@@ -122,7 +123,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
                     else
                     {
-                        sequencer->playFromStart();
+                        sequencer->getTransport()->playFromStart();
                     }
 
                     break;
@@ -146,7 +147,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         sequence->setLoopEnabled(false);
                     }
 
-                    sequencer->move(Sequencer::ticksToQuarterNotes(
+                    sequencer->getTransport()->setPosition(Sequencer::ticksToQuarterNotes(
                         sequence->getLoopStart()));
 
                     if (!mpc.getAudioMidiServices()->prepareBouncing(
@@ -156,7 +157,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
                     else
                     {
-                        sequencer->play();
+                        sequencer->getTransport()->play();
                     }
 
                     break;
@@ -180,7 +181,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         sequence->setLoopEnabled(false);
                     }
 
-                    sequencer->move(Sequencer::ticksToQuarterNotes(time0));
+                    sequencer->getTransport()->setPosition(Sequencer::ticksToQuarterNotes(time0));
 
                     if (!mpc.getAudioMidiServices()->prepareBouncing(
                             settings.get()))
@@ -189,7 +190,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
                     else
                     {
-                        sequencer->play();
+                        sequencer->getTransport()->play();
                     }
 
                     break;
@@ -230,7 +231,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     else
                     {
                         sequencer->setSongModeEnabled(true);
-                        sequencer->playFromStart();
+                        sequencer->getTransport()->playFromStart();
                     }
 
                     break;

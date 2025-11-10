@@ -1,4 +1,5 @@
 #include "PushPlayStartCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
@@ -14,7 +15,7 @@ PushPlayStartCommand::PushPlayStartCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void PushPlayStartCommand::execute()
 {
-    if (mpc.getSequencer()->isPlaying())
+    if (mpc.getSequencer()->getTransport()->isPlaying())
     {
         return;
     }
@@ -42,7 +43,7 @@ void PushPlayStartCommand::execute()
             mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
         }
 
-        mpc.getSequencer()->recFromStart();
+        mpc.getSequencer()->getTransport()->recFromStart();
     }
     else if (overdubButtonIsPressedOrLocked)
     {
@@ -51,7 +52,7 @@ void PushPlayStartCommand::execute()
             mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
         }
 
-        mpc.getSequencer()->overdubFromStart();
+        mpc.getSequencer()->getTransport()->overdubFromStart();
     }
     else
     {
@@ -71,7 +72,7 @@ void PushPlayStartCommand::execute()
             mpc.getSequencer()->setSongModeEnabled(
                 mpc.getLayeredScreen()->isCurrentScreen(
                     {ScreenId::SongScreen}));
-            mpc.getSequencer()->playFromStart();
+            mpc.getSequencer()->getTransport()->playFromStart();
         }
     }
 
@@ -82,11 +83,11 @@ void PushPlayStartCommand::execute()
 
     mpc.getHardware()
         ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->isOverdubbing());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
     mpc.getHardware()
         ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(mpc.getSequencer()->isRecording());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isRecording());
     mpc.getHardware()
         ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(mpc.getSequencer()->isPlaying());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isPlaying());
 }

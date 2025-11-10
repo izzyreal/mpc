@@ -1,4 +1,5 @@
 #include "PushStopCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientEventController.hpp"
@@ -32,7 +33,7 @@ void PushStopCommand::execute()
         ams->stopBouncingEarly();
     }
 
-    mpc.getSequencer()->stop();
+    mpc.getSequencer()->getTransport()->stop();
 
     if (!lcdgui::screengroups::isPlayScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
@@ -45,11 +46,11 @@ void PushStopCommand::execute()
 
     mpc.getHardware()
         ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->isOverdubbing());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
     mpc.getHardware()
         ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(mpc.getSequencer()->isRecording());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isRecording());
     mpc.getHardware()
         ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(mpc.getSequencer()->isPlaying());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isPlaying());
 }

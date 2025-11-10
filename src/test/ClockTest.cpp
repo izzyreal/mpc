@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
 #include "sequencer/FrameSeq.hpp"
@@ -318,10 +319,10 @@ TEST_CASE("1 bar loop", "[clock]")
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
 
-    assert(mpc.getSequencer()->getTickPosition() == 0);
+    assert(mpc.getSequencer()->getTransport()->getTickPosition() == 0);
 
     mpc.getSequencer()->getSequence(0)->init(1);
-    mpc.getSequencer()->playFromStart();
+    mpc.getSequencer()->getTransport()->playFromStart();
 
     auto syncScreen = mpc.screens->get<mpc::lcdgui::ScreenId::SyncScreen>();
     syncScreen->modeIn = 1;
@@ -352,7 +353,7 @@ TEST_CASE("1 bar loop", "[clock]")
         }
 
         highestTickPos = std::max<uint64_t>(
-            highestTickPos, mpc.getSequencer()->getTickPosition());
+            highestTickPos, mpc.getSequencer()->getTransport()->getTickPosition());
         timeInSamples += blockSizes[i];
     }
 

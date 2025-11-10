@@ -1,8 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <memory>
-#include <functional>
 
 namespace mpc::lcdgui
 {
@@ -22,9 +20,7 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        explicit Transport(
-            Sequencer &owner,
-            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens);
+        explicit Transport(Sequencer &owner);
 
         void play();
         void play(bool fromStart);
@@ -39,11 +35,12 @@ namespace mpc::sequencer
         void setRecording(bool b);
         void setOverdubbing(bool b);
         void setPosition(double positionQuarterNotes,
-                         bool shouldSyncTrackEventIndicesToNewPosition,
-                         bool shouldSetPlayStartPosition);
+                         bool shouldSyncTrackEventIndicesToNewPosition = true,
+                         bool shouldSetPlayStartPosition = true);
         void
         setPositionWithinSong(double positionQuarterNotes,
-                              bool shouldSyncTrackEventIndicesToNewPosition);
+                              bool shouldSyncTrackEventIndicesToNewPosition = true,
+                              bool shouldSetPlayStartPosition = true);
         void bumpPositionByTicks(uint8_t ticks);
         bool isPlaying() const;
         bool isRecording() const;
@@ -93,8 +90,6 @@ namespace mpc::sequencer
 
     private:
         Sequencer &sequencer;
-
-        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
 
         bool playing = false;
         bool recording = false;

@@ -1,4 +1,5 @@
 #include "NextSeqScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 #include "lcdgui/LayeredScreen.hpp"
@@ -46,7 +47,7 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTickPosition();
+                            return sequencer->getTransport()->getTickPosition();
                         },
                         [&](auto)
                         {
@@ -57,7 +58,7 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTempo();
+                            return sequencer->getTransport()->getTempo();
                         },
                         [&](auto)
                         {
@@ -99,7 +100,7 @@ void NextSeqScreen::turnWheel(int i)
 
     if (focusedFieldName == "sq")
     {
-        if (sequencer->isPlaying())
+        if (sequencer->getTransport()->isPlaying())
         {
             sequencer->setNextSq(sequencer->getCurrentlyPlayingSequenceIndex() +
                                  i);
@@ -144,9 +145,9 @@ void NextSeqScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "tempo")
     {
-        const double oldTempo = sequencer->getTempo();
+        const double oldTempo = sequencer->getTransport()->getTempo();
         const double newTempo = oldTempo + (i * 0.1);
-        sequencer->setTempo(newTempo);
+        sequencer->getTransport()->setTempo(newTempo);
         displayTempo();
     }
 }
@@ -163,10 +164,10 @@ void NextSeqScreen::function(int i)
 
         if (i == 3 && nextSq != -1)
         {
-            sequencer->stop();
-            sequencer->move(0);
+            sequencer->getTransport()->stop();
+            sequencer->getTransport()->setPosition(0);
             sequencer->setActiveSequenceIndex(nextSq);
-            sequencer->playFromStart();
+            sequencer->getTransport()->playFromStart();
         }
     }
     else if (i == 5)
@@ -179,7 +180,7 @@ void NextSeqScreen::displaySq() const
 {
     std::string result = "";
 
-    if (sequencer->isPlaying())
+    if (sequencer->getTransport()->isPlaying())
     {
         result.append(StrUtil::padLeft(
             std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1),
@@ -216,34 +217,34 @@ void NextSeqScreen::displayNextSq() const
 
 void NextSeqScreen::displayNow0() const
 {
-    findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow1() const
 {
-    findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow2() const
 {
-    findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(sequencer->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void NextSeqScreen::displayTempo() const
 {
     displayTempoLabel();
-    findField("tempo")->setText(Util::tempoString(sequencer->getTempo()));
+    findField("tempo")->setText(Util::tempoString(sequencer->getTransport()->getTempo()));
 }
 
 void NextSeqScreen::displayTempoLabel() const
 {
     auto currentRatio = -1;
-    const auto sequence = sequencer->isPlaying()
+    const auto sequence = sequencer->getTransport()->isPlaying()
                               ? sequencer->getCurrentlyPlayingSequence()
                               : sequencer->getActiveSequence();
     for (const auto &e : sequence->getTempoChangeEvents())
     {
-        if (e->getTick() > sequencer->getTickPosition())
+        if (e->getTick() > sequencer->getTransport()->getTickPosition())
         {
             break;
         }
@@ -264,7 +265,7 @@ void NextSeqScreen::displayTempoLabel() const
 void NextSeqScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)"
+        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled() ? "(SEQ)"
                                                             : "(MAS)");
 }
 

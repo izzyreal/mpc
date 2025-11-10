@@ -1,4 +1,5 @@
 #include "MidiClockOutput.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
 
@@ -82,7 +83,7 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 
 void MidiClockOutput::processTempoChange()
 {
-    double tempo = sequencer->getTempo();
+    double tempo = sequencer->getTransport()->getTempo();
 
     if (tempo != clock.getBpm())
     {
@@ -115,7 +116,7 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
     enqueueEventAfterNFrames(
         [&]
         {
-            sendMidiSyncMsg(sequencer->getPlayStartPositionQuarterNotes() == 0.0
+            sendMidiSyncMsg(sequencer->getTransport()->getPlayStartPositionQuarterNotes() == 0.0
                                 ? ShortMessage::START
                                 : ShortMessage::CONTINUE);
         },

@@ -1,4 +1,5 @@
 #include "PushPlayCommand.hpp"
+#include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
 #include "controller/ClientEventController.hpp"
@@ -20,17 +21,17 @@ void PushPlayCommand::execute()
     auto recButton = hardware->getButton(hardware::ComponentId::REC);
     auto overdubButton = hardware->getButton(hardware::ComponentId::OVERDUB);
 
-    if (sequencer->isPlaying())
+    if (sequencer->getTransport()->isPlaying())
     {
-        if (recButton->isPressed() && !sequencer->isOverdubbing())
+        if (recButton->isPressed() && !sequencer->getTransport()->isOverdubbing())
         {
-            sequencer->setOverdubbing(false);
-            sequencer->setRecording(true);
+            sequencer->getTransport()->setOverdubbing(false);
+            sequencer->getTransport()->setRecording(true);
         }
-        else if (overdubButton->isPressed() && !sequencer->isRecording())
+        else if (overdubButton->isPressed() && !sequencer->getTransport()->isRecording())
         {
-            sequencer->setOverdubbing(true);
-            sequencer->setRecording(false);
+            sequencer->getTransport()->setOverdubbing(true);
+            sequencer->getTransport()->setRecording(false);
         }
 
         return;
@@ -57,7 +58,7 @@ void PushPlayCommand::execute()
             mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
         }
 
-        sequencer->rec();
+        sequencer->getTransport()->rec();
     }
     else if (overdubButtonIsPressedOrLocked)
     {
@@ -66,7 +67,7 @@ void PushPlayCommand::execute()
             mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
         }
 
-        sequencer->overdub();
+        sequencer->getTransport()->overdub();
     }
     else
     {
@@ -87,7 +88,7 @@ void PushPlayCommand::execute()
             sequencer->setSongModeEnabled(
                 mpc.getLayeredScreen()->isCurrentScreen(
                     {ScreenId::SongScreen}));
-            sequencer->play();
+            sequencer->getTransport()->play();
         }
     }
 
@@ -98,11 +99,11 @@ void PushPlayCommand::execute()
 
     mpc.getHardware()
         ->getLed(hardware::ComponentId::OVERDUB_LED)
-        ->setEnabled(mpc.getSequencer()->isOverdubbing());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isOverdubbing());
     mpc.getHardware()
         ->getLed(hardware::ComponentId::REC_LED)
-        ->setEnabled(mpc.getSequencer()->isRecording());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isRecording());
     mpc.getHardware()
         ->getLed(hardware::ComponentId::PLAY_LED)
-        ->setEnabled(mpc.getSequencer()->isPlaying());
+        ->setEnabled(mpc.getSequencer()->getTransport()->isPlaying());
 }

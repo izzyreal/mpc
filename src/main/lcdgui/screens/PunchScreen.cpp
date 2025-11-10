@@ -1,4 +1,5 @@
 #include "PunchScreen.hpp"
+#include "sequencer/Transport.hpp"
 
 #include "lcdgui/Label.hpp"
 #include "lcdgui/LayeredScreen.hpp"
@@ -16,7 +17,7 @@ PunchScreen::PunchScreen(Mpc &mpc, const int layerIndex)
 
 void PunchScreen::open()
 {
-    if (sequencer->isPlaying())
+    if (sequencer->getTransport()->isPlaying())
     {
         openScreenById(ScreenId::TransScreen);
         return;
@@ -30,23 +31,23 @@ void PunchScreen::open()
 
     const auto lastTick = sequencer->getActiveSequence()->getLastTick();
 
-    if (lastTick < sequencer->getPunchInTime() ||
-        lastTick < sequencer->getPunchOutTime() ||
-        (sequencer->getPunchInTime() == 0 && sequencer->getPunchOutTime() == 0))
+    if (lastTick < sequencer->getTransport()->getPunchInTime() ||
+        lastTick < sequencer->getTransport()->getPunchOutTime() ||
+        (sequencer->getTransport()->getPunchInTime() == 0 && sequencer->getTransport()->getPunchOutTime() == 0))
     {
-        sequencer->setPunchInTime(0);
-        sequencer->setPunchOutTime(
+        sequencer->getTransport()->setPunchInTime(0);
+        sequencer->getTransport()->setPunchOutTime(
             sequencer->getActiveSequence()->getLastTick());
         setTime1(sequencer->getActiveSequence()->getLastTick());
     }
 
-    setTime0(sequencer->getPunchInTime());
-    setTime1(sequencer->getPunchOutTime());
+    setTime0(sequencer->getTransport()->getPunchInTime());
+    setTime1(sequencer->getTransport()->getPunchOutTime());
 
     displayBackground();
     displayAutoPunch();
 
-    ls->setFunctionKeysArrangement(sequencer->isPunchEnabled());
+    ls->setFunctionKeysArrangement(sequencer->getTransport()->isPunchEnabled());
 }
 
 void PunchScreen::turnWheel(int i)
@@ -56,14 +57,14 @@ void PunchScreen::turnWheel(int i)
 
     if (focusedFieldName == "auto-punch")
     {
-        setAutoPunch(sequencer->getAutoPunchMode() + i);
+        setAutoPunch(sequencer->getTransport()->getAutoPunchMode() + i);
         return;
     }
 
     checkAllTimes(mpc, i);
 
-    sequencer->setPunchInTime(time0);
-    sequencer->setPunchOutTime(time1);
+    sequencer->getTransport()->setPunchInTime(time0);
+    sequencer->getTransport()->setPunchOutTime(time1);
 }
 
 void PunchScreen::function(int i)
@@ -77,7 +78,7 @@ void PunchScreen::function(int i)
             ls->openScreen(tabNames[i]);
             break;
         case 5:
-            sequencer->setPunchEnabled(!sequencer->isPunchEnabled());
+            sequencer->getTransport()->setPunchEnabled(!sequencer->getTransport()->isPunchEnabled());
             openScreenById(ScreenId::SequencerScreen);
             break;
     }
@@ -85,7 +86,7 @@ void PunchScreen::function(int i)
 
 void PunchScreen::setAutoPunch(int i)
 {
-    sequencer->setAutoPunchMode(std::clamp(i, 0, 2));
+    sequencer->getTransport()->setAutoPunchMode(std::clamp(i, 0, 2));
 
     displayAutoPunch();
     displayTime();
@@ -95,7 +96,7 @@ void PunchScreen::setAutoPunch(int i)
 void PunchScreen::displayAutoPunch() const
 {
     findField("auto-punch")
-        ->setText(autoPunchNames[sequencer->getAutoPunchMode()]);
+        ->setText(autoPunchNames[sequencer->getTransport()->getAutoPunchMode()]);
 }
 
 void PunchScreen::displayTime()
@@ -105,16 +106,16 @@ void PunchScreen::displayTime()
     for (int i = 0; i < 3; i++)
     {
         findField("time" + std::to_string(i))
-            ->Hide(sequencer->getAutoPunchMode() == 1);
+            ->Hide(sequencer->getTransport()->getAutoPunchMode() == 1);
         findLabel("time" + std::to_string(i))
-            ->Hide(sequencer->getAutoPunchMode() == 1);
+            ->Hide(sequencer->getTransport()->getAutoPunchMode() == 1);
         findField("time" + std::to_string(i + 3))
-            ->Hide(sequencer->getAutoPunchMode() == 0);
+            ->Hide(sequencer->getTransport()->getAutoPunchMode() == 0);
         findLabel("time" + std::to_string(i + 3))
-            ->Hide(sequencer->getAutoPunchMode() == 0);
+            ->Hide(sequencer->getTransport()->getAutoPunchMode() == 0);
     }
 
-    findLabel("time3")->Hide(sequencer->getAutoPunchMode() != 2);
+    findLabel("time3")->Hide(sequencer->getTransport()->getAutoPunchMode() != 2);
 
     findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1,
                                       "0");
@@ -132,11 +133,11 @@ void PunchScreen::displayBackground()
 {
     std::string bgName = "punch-in";
 
-    if (sequencer->getAutoPunchMode() == 1)
+    if (sequencer->getTransport()->getAutoPunchMode() == 1)
     {
         bgName = "punch-out";
     }
-    else if (sequencer->getAutoPunchMode() == 2)
+    else if (sequencer->getTransport()->getAutoPunchMode() == 2)
     {
         bgName = "punch-in-out";
     }
