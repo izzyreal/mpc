@@ -5,7 +5,8 @@
 
 using namespace mpc::sequencer;
 
-SequencerStateView::SequencerStateView(const std::shared_ptr<const SequencerState> s) noexcept
+SequencerStateView::SequencerStateView(
+    const std::shared_ptr<const SequencerState> s) noexcept
     : state(s)
 {
 }
@@ -29,4 +30,3 @@ bool SequencerStateView::isSongModeEnabled() const
 {
     return state->songModeEnabled;
 }
-

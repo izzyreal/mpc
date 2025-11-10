@@ -35,7 +35,7 @@ namespace mpc::eventregistry
 {
     class EventRegistry
         : public concurrency::AtomicStateExchange<State, StateView,
-                                                       EventMessage>
+                                                  EventMessage>
     {
     public:
         EventRegistry();

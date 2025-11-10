@@ -25,11 +25,7 @@ namespace mpc::sequencer
         bool songModeEnabled;
     };
 
-    using SequencerMessage = std::variant<
-        SetPositionQuarterNotes,
-        SetPlayStartPositionQuarterNotes,
-        BumpPositionByTicks,
-        SetSongModeEnabled
-    >;
-}
-
+    using SequencerMessage =
+        std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
+                     BumpPositionByTicks, SetSongModeEnabled>;
+} // namespace mpc::sequencer

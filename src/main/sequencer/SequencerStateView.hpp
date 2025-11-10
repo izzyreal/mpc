@@ -10,7 +10,8 @@ namespace mpc::sequencer
     class SequencerStateView
     {
     public:
-        explicit SequencerStateView(const std::shared_ptr<const SequencerState> s) noexcept;
+        explicit SequencerStateView(
+            const std::shared_ptr<const SequencerState> s) noexcept;
 
         double getPositionQuarterNotes() const;
 
@@ -22,6 +23,5 @@ namespace mpc::sequencer
 
     private:
         const std::shared_ptr<const SequencerState> state;
-
     };
-}
+} // namespace mpc::sequencer

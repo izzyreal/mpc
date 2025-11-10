@@ -8,4 +8,4 @@ namespace mpc::sequencer
         double playStartPositionQuarterNotes = 0.0;
         bool songModeEnabled = false;
     };
-}
+} // namespace mpc::sequencer
