@@ -405,8 +405,9 @@ void MixerScreen::turnWheel(int i)
             const auto mixerSetupScreen =
                 mpc.screens->get<ScreenId::MixerSetupScreen>();
 
-            const bool record = sequencer->getTransport()->isRecordingOrOverdubbing() &&
-                                mixerSetupScreen->isRecordMixChangesEnabled();
+            const bool record =
+                sequencer->getTransport()->isRecordingOrOverdubbing() &&
+                mixerSetupScreen->isRecordMixChangesEnabled();
 
             const int bank =
                 static_cast<int>(mpc.clientEventController->getActiveBank());
@@ -470,7 +471,8 @@ void MixerScreen::turnWheel(int i)
 void MixerScreen::recordMixerEvent(int pad, int param, int value) const
 {
     const auto event = std::make_shared<MixerEvent>();
-    sequencer->getActiveTrack()->addEvent(sequencer->getTransport()->getTickPosition(), event);
+    sequencer->getActiveTrack()->addEvent(
+        sequencer->getTransport()->getTickPosition(), event);
     event->setPadNumber(pad);
     event->setParameter(param);
     event->setValue(value);

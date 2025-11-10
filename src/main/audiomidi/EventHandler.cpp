@@ -114,9 +114,9 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     const auto durationTicks = *noteOnEvent->getDuration();
     const auto audioMidiServices = mpc.getAudioMidiServices();
     const auto audioServer = audioMidiServices->getAudioServer();
-    const auto durationFrames =
-        SeqUtil::ticksToFrames(durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
-                               audioServer->getSampleRate());
+    const auto durationFrames = SeqUtil::ticksToFrames(
+        durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
+        audioServer->getSampleRate());
 
     auto ctx = engine::DrumNoteEventContextBuilder::buildDrumNoteOnContext(
         noteEventIdToUse, drumBus, mpc.getSampler(),
@@ -401,9 +401,10 @@ void EventHandler::handleNoteEventMidiOut(
                     handleNoteEventMidiOut(noteOnEvent->getNoteOff(), track,
                                            trackDevice, std::nullopt);
                 },
-                SeqUtil::ticksToFrames(*noteOnEvent->getDuration(),
-                                       mpc.getSequencer()->getTransport()->getTempo(),
-                                       audioServer->getSampleRate()));
+                SeqUtil::ticksToFrames(
+                    *noteOnEvent->getDuration(),
+                    mpc.getSequencer()->getTransport()->getTempo(),
+                    audioServer->getSampleRate()));
         }
     }
     else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(event))

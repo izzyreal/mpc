@@ -189,7 +189,8 @@ void SongScreen::down()
     {
         const auto song = sequencer->getSong(activeSongIndex);
 
-        if (offset == song->getStepCount() - 1 || sequencer->getTransport()->isPlaying())
+        if (offset == song->getStepCount() - 1 ||
+            sequencer->getTransport()->isPlaying())
         {
             return;
         }
@@ -270,7 +271,8 @@ void SongScreen::turnWheel(int i)
     else if (focusedFieldName == "tempo" &&
              !sequencer->getTransport()->isTempoSourceSequenceEnabled())
     {
-        sequencer->getTransport()->setTempo(sequencer->getTransport()->getTempo() + (i * 0.1));
+        sequencer->getTransport()->setTempo(
+            sequencer->getTransport()->getTempo() + (i * 0.1));
     }
     else if (focusedFieldName == "tempo-source")
     {
@@ -357,7 +359,8 @@ void SongScreen::function(int i)
 
 void SongScreen::displayTempo() const
 {
-    findField("tempo")->setText(Util::tempoString(sequencer->getTransport()->getTempo()));
+    findField("tempo")->setText(
+        Util::tempoString(sequencer->getTransport()->getTempo()));
 }
 
 void SongScreen::displayLoop() const
@@ -412,7 +415,9 @@ void SongScreen::displaySteps() const
 void SongScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
+        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled()
+                      ? "SEQ"
+                      : "MAS");
 }
 
 void SongScreen::displayNow0() const
@@ -450,12 +455,14 @@ void SongScreen::displayNow0() const
 
 void SongScreen::displayNow1() const
 {
-    findField("now1")->setTextPadded(sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(
+        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void SongScreen::displayNow2() const
 {
-    findField("now2")->setTextPadded(sequencer->getTransport()->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(
+        sequencer->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void SongScreen::displaySongName() const

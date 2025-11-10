@@ -45,8 +45,9 @@ void ChangeTsigScreen::function(const int i)
             {
                 if (barLengths[j] != newBarLengths[j])
                 {
-                    sequencer->getTransport()->setPosition(0); // Only reset sequencer position when a
-                                        // bar length has changed
+                    sequencer->getTransport()->setPosition(
+                        0); // Only reset sequencer position when a
+                            // bar length has changed
                     break;
                 }
             }

@@ -139,7 +139,8 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
              if (sequencer->getTransport()->isCountingIn())
              {
                  return static_cast<int>(Sequencer::quarterNotesToTicks(
-                     sequencer->getTransport()->getPlayStartPositionQuarterNotes()));
+                     sequencer->getTransport()
+                         ->getPlayStartPositionQuarterNotes()));
              }
              return sequencer->getTransport()->getTickPosition();
          },
@@ -159,14 +160,15 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
                             displayTempo();
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer->getTransport()->isTempoSourceSequenceEnabled();
-                        },
-                        [&](auto)
-                        {
-                            displayTempoSource();
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer->getTransport()->isTempoSourceSequenceEnabled();
+         },
+         [&](auto)
+         {
+             displayTempoSource();
+         }});
 
     addReactiveBinding(
         {[&]
@@ -333,7 +335,8 @@ void SequencerScreen::open()
     findChild("footer-label")->Hide(footerIsInvisible);
 
     findChild("function-keys")
-        ->Hide(!footerIsInvisible || sequencer->getTransport()->isPunchEnabled() ||
+        ->Hide(!footerIsInvisible ||
+               sequencer->getTransport()->isPunchEnabled() ||
                (mpc.getHardware()
                     ->getButton(hardware::ComponentId::ERASE)
                     ->isPressed() &&
@@ -483,8 +486,8 @@ void SequencerScreen::displayDeviceName() const
 void SequencerScreen::displayTempo() const
 {
     displayTempoLabel();
-    findField("tempo")->setText(
-        StrUtil::padLeft(Util::tempoString(sequencer->getTransport()->getTempo()), " ", 6));
+    findField("tempo")->setText(StrUtil::padLeft(
+        Util::tempoString(sequencer->getTransport()->getTempo()), " ", 6));
 }
 
 void SequencerScreen::displayTempoLabel() const
@@ -521,8 +524,9 @@ void SequencerScreen::displayTempoLabel() const
 void SequencerScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled() ? "(SEQ)"
-                                                            : "(MAS)");
+        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled()
+                      ? "(SEQ)"
+                      : "(MAS)");
 }
 
 void SequencerScreen::displaySq() const
@@ -550,17 +554,20 @@ void SequencerScreen::displaySq() const
 
 void SequencerScreen::displayNow0() const
 {
-    findField("now0")->setTextPadded(sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(
+        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void SequencerScreen::displayNow1() const
 {
-    findField("now1")->setTextPadded(sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(
+        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void SequencerScreen::displayNow2() const
 {
-    findField("now2")->setTextPadded(sequencer->getTransport()->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(
+        sequencer->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void SequencerScreen::displayRecordingMode() const
@@ -603,7 +610,8 @@ void SequencerScreen::displayTr() const
 
 void SequencerScreen::displayCount() const
 {
-    findField("count")->setText(sequencer->getTransport()->isCountEnabled() ? "ON" : "OFF");
+    findField("count")->setText(
+        sequencer->getTransport()->isCountEnabled() ? "ON" : "OFF");
 }
 
 std::vector<std::string> SequencerScreen::timingCorrectNames =
@@ -736,7 +744,8 @@ void SequencerScreen::turnWheel(int i)
         setLastFocus("step-editor", "view");
     }
 
-    if (focusedFieldName.substr(0, 3) == "now" && sequencer->getTransport()->isPlaying())
+    if (focusedFieldName.substr(0, 3) == "now" &&
+        sequencer->getTransport()->isPlaying())
     {
         return;
     }
@@ -745,15 +754,18 @@ void SequencerScreen::turnWheel(int i)
 
     if (focusedFieldName == "now0")
     {
-        sequencer->getTransport()->setBar(sequencer->getTransport()->getCurrentBarIndex() + i);
+        sequencer->getTransport()->setBar(
+            sequencer->getTransport()->getCurrentBarIndex() + i);
     }
     else if (focusedFieldName == "now1")
     {
-        sequencer->getTransport()->setBeat(sequencer->getTransport()->getCurrentBeatIndex() + i);
+        sequencer->getTransport()->setBeat(
+            sequencer->getTransport()->getCurrentBeatIndex() + i);
     }
     else if (focusedFieldName == "now2")
     {
-        sequencer->getTransport()->setClock(sequencer->getTransport()->getCurrentClockNumber() + i);
+        sequencer->getTransport()->setClock(
+            sequencer->getTransport()->getCurrentClockNumber() + i);
     }
     else if (focusedFieldName == "devicenumber")
     {
@@ -1063,10 +1075,14 @@ void SequencerScreen::displayPunchWhileRecording()
         {
             auto punchRect =
                 findChild<PunchRect>("punch-rect-" + std::to_string(i));
-            punchRect->Hide((i == 0 && sequencer->getTransport()->getAutoPunchMode() == 1) ||
-                            (i == 2 && sequencer->getTransport()->getAutoPunchMode() == 0));
-            punchRect->setOn((i == 0 && sequencer->getTransport()->getAutoPunchMode() != 1) ||
-                             (i == 1 && sequencer->getTransport()->getAutoPunchMode() == 1));
+            punchRect->Hide(
+                (i == 0 &&
+                 sequencer->getTransport()->getAutoPunchMode() == 1) ||
+                (i == 2 && sequencer->getTransport()->getAutoPunchMode() == 0));
+            punchRect->setOn(
+                (i == 0 &&
+                 sequencer->getTransport()->getAutoPunchMode() != 1) ||
+                (i == 1 && sequencer->getTransport()->getAutoPunchMode() == 1));
         }
 
         auto time0 = findLabel("punch-time-0");
@@ -1079,28 +1095,36 @@ void SequencerScreen::displayPunchWhileRecording()
 
         auto text1 = StrUtil::padLeft(
             std::to_string(
-                SeqUtil::getBar(seq.get(), sequencer->getTransport()->getPunchInTime()) + 1),
+                SeqUtil::getBar(seq.get(),
+                                sequencer->getTransport()->getPunchInTime()) +
+                1),
             "0", 3);
         auto text2 = StrUtil::padLeft(
             std::to_string(
-                SeqUtil::getBeat(seq.get(), sequencer->getTransport()->getPunchInTime()) + 1),
+                SeqUtil::getBeat(seq.get(),
+                                 sequencer->getTransport()->getPunchInTime()) +
+                1),
             "0", 2);
-        auto text3 =
-            StrUtil::padLeft(std::to_string(SeqUtil::getClock(
-                                 seq.get(), sequencer->getTransport()->getPunchInTime())),
-                             "0", 2);
+        auto text3 = StrUtil::padLeft(
+            std::to_string(SeqUtil::getClock(
+                seq.get(), sequencer->getTransport()->getPunchInTime())),
+            "0", 2);
         auto text4 = StrUtil::padLeft(
             std::to_string(
-                SeqUtil::getBar(seq.get(), sequencer->getTransport()->getPunchOutTime()) + 1),
+                SeqUtil::getBar(seq.get(),
+                                sequencer->getTransport()->getPunchOutTime()) +
+                1),
             "0", 3);
         auto text5 = StrUtil::padLeft(
             std::to_string(
-                SeqUtil::getBeat(seq.get(), sequencer->getTransport()->getPunchOutTime()) + 1),
+                SeqUtil::getBeat(seq.get(),
+                                 sequencer->getTransport()->getPunchOutTime()) +
+                1),
             "0", 2);
-        auto text6 =
-            StrUtil::padLeft(std::to_string(SeqUtil::getClock(
-                                 seq.get(), sequencer->getTransport()->getPunchOutTime())),
-                             "0", 2);
+        auto text6 = StrUtil::padLeft(
+            std::to_string(SeqUtil::getClock(
+                seq.get(), sequencer->getTransport()->getPunchOutTime())),
+            "0", 2);
 
         time0->setText("IN:" + text1 + "." + text2 + "." + text3);
         time1->setText("OUT:" + text4 + "." + text5 + "." + text6);

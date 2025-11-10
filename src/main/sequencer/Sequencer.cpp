@@ -185,10 +185,11 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 void Sequencer::playToTick(const int targetTick) const
 {
     const auto seqIndex = stateManager->getSnapshot().isSongModeEnabled()
-                        ? getSongSequenceIndex()
-                        : currentlyPlayingSequenceIndex;
+                              ? getSongSequenceIndex()
+                              : currentlyPlayingSequenceIndex;
     auto seq = sequences[seqIndex].get();
-    const auto secondSequenceScreen = getScreens()->get<ScreenId::SecondSeqScreen>();
+    const auto secondSequenceScreen =
+        getScreens()->get<ScreenId::SecondSeqScreen>();
 
     for (int i = 0; i < 2; i++)
     {
@@ -934,11 +935,12 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
         const auto seqIndexShouldBeDerivedFromSongStep =
             songMode && songScreen->getOffset() + 1 < song->getStepCount();
 
-        const auto songSeqIndex = seqIndexShouldBeDerivedFromSongStep
-                                ? song->getStep(songScreen->getOffset() + 1)
-                                      .lock()
-                                      ->getSequence()
-                                : -1;
+        const auto songSeqIndex =
+            seqIndexShouldBeDerivedFromSongStep
+                ? song->getStep(songScreen->getOffset() + 1)
+                      .lock()
+                      ->getSequence()
+                : -1;
         return songSeqIndex;
     }
 

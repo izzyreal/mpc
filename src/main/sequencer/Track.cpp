@@ -191,8 +191,8 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
 // This is called from the UI thread. Results in incorrect tickpos.
 // We should only queue the fact that a note of n wants to be recorded.
 // Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note,
-                                                         unsigned char velocity) const
+std::shared_ptr<NoteOnEvent>
+Track::recordNoteEventASync(unsigned char note, unsigned char velocity) const
 {
     auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
     onEvent->setTrack(getIndex());
@@ -264,11 +264,13 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
     {
         clone = std::make_shared<MixerEvent>(*source);
     }
-    else if (const auto source = std::dynamic_pointer_cast<ChannelPressureEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<ChannelPressureEvent>(src))
     {
         clone = std::make_shared<ChannelPressureEvent>(*source);
     }
-    else if (const auto source = std::dynamic_pointer_cast<PolyPressureEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<PolyPressureEvent>(src))
     {
         clone = std::make_shared<PolyPressureEvent>(*source);
     }
@@ -276,21 +278,25 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
     {
         clone = std::make_shared<PitchBendEvent>(*source);
     }
-    else if (const auto source = std::dynamic_pointer_cast<TempoChangeEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<TempoChangeEvent>(src))
     {
         const auto t = std::make_shared<TempoChangeEvent>(*source);
         t->setParent(parent);
         clone = t;
     }
-    else if (const auto source = std::dynamic_pointer_cast<ControlChangeEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<ControlChangeEvent>(src))
     {
         clone = std::make_shared<ControlChangeEvent>(*source);
     }
-    else if (const auto source = std::dynamic_pointer_cast<ProgramChangeEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<ProgramChangeEvent>(src))
     {
         clone = std::make_shared<ProgramChangeEvent>(*source);
     }
-    else if (const auto source = std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
+    else if (const auto source =
+                 std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
     {
         clone = std::make_shared<SystemExclusiveEvent>(*source);
     }
@@ -646,7 +652,8 @@ void Track::playNext()
                 else if (vmpcSettingsScreen->_16LevelsEraseMode == 1)
                 {
                     const auto &varValue = note->getVariationValue();
-                    const auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
+                    const auto _16l_key =
+                        assign16LevelsScreen->getOriginalKeyPad();
                     const auto _16l_type = assign16LevelsScreen->getType();
 
                     for (int programPadIndex = 0; programPadIndex < 64;
@@ -1074,11 +1081,12 @@ bool Track::insertEventWhileRetainingSort(
 
     if (insertRequired)
     {
-        const auto insertAt = std::find_if(events.begin(), events.end(),
-                                     [&tick](const std::shared_ptr<Event> &e)
-                                     {
-                                         return e->getTick() > tick;
-                                     });
+        const auto insertAt =
+            std::find_if(events.begin(), events.end(),
+                         [&tick](const std::shared_ptr<Event> &e)
+                         {
+                             return e->getTick() > tick;
+                         });
 
         if (insertAt == events.end())
         {

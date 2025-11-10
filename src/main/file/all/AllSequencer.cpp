@@ -56,7 +56,8 @@ AllSequencer::AllSequencer(mpc::Mpc &mpc)
     saveBytes[MASTER_TEMPO_OFFSET + 1] = masterTempoBytes[1];
 
     saveBytes[TEMPO_SOURCE_IS_SEQUENCE_OFFSET] =
-        mpcSequencer->getTransport()->isTempoSourceSequenceEnabled() ? 0x01 : 0x00;
+        mpcSequencer->getTransport()->isTempoSourceSequenceEnabled() ? 0x01
+                                                                     : 0x00;
 
     const auto timingCorrectScreen =
         mpc.screens->get<ScreenId::TimingCorrectScreen>();

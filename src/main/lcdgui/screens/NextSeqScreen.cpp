@@ -217,23 +217,27 @@ void NextSeqScreen::displayNextSq() const
 
 void NextSeqScreen::displayNow0() const
 {
-    findField("now0")->setTextPadded(sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+    findField("now0")->setTextPadded(
+        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow1() const
 {
-    findField("now1")->setTextPadded(sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+    findField("now1")->setTextPadded(
+        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow2() const
 {
-    findField("now2")->setTextPadded(sequencer->getTransport()->getCurrentClockNumber(), "0");
+    findField("now2")->setTextPadded(
+        sequencer->getTransport()->getCurrentClockNumber(), "0");
 }
 
 void NextSeqScreen::displayTempo() const
 {
     displayTempoLabel();
-    findField("tempo")->setText(Util::tempoString(sequencer->getTransport()->getTempo()));
+    findField("tempo")->setText(
+        Util::tempoString(sequencer->getTransport()->getTempo()));
 }
 
 void NextSeqScreen::displayTempoLabel() const
@@ -265,8 +269,9 @@ void NextSeqScreen::displayTempoLabel() const
 void NextSeqScreen::displayTempoSource() const
 {
     findField("tempo-source")
-        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled() ? "(SEQ)"
-                                                            : "(MAS)");
+        ->setText(sequencer->getTransport()->isTempoSourceSequenceEnabled()
+                      ? "(SEQ)"
+                      : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming() const

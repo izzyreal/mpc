@@ -353,7 +353,8 @@ TEST_CASE("1 bar loop", "[clock]")
         }
 
         highestTickPos = std::max<uint64_t>(
-            highestTickPos, mpc.getSequencer()->getTransport()->getTickPosition());
+            highestTickPos,
+            mpc.getSequencer()->getTransport()->getTickPosition());
         timeInSamples += blockSizes[i];
     }
 

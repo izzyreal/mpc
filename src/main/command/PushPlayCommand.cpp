@@ -23,12 +23,14 @@ void PushPlayCommand::execute()
 
     if (sequencer->getTransport()->isPlaying())
     {
-        if (recButton->isPressed() && !sequencer->getTransport()->isOverdubbing())
+        if (recButton->isPressed() &&
+            !sequencer->getTransport()->isOverdubbing())
         {
             sequencer->getTransport()->setOverdubbing(false);
             sequencer->getTransport()->setRecording(true);
         }
-        else if (overdubButton->isPressed() && !sequencer->getTransport()->isRecording())
+        else if (overdubButton->isPressed() &&
+                 !sequencer->getTransport()->isRecording())
         {
             sequencer->getTransport()->setOverdubbing(true);
             sequencer->getTransport()->setRecording(false);

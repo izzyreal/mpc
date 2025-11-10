@@ -42,8 +42,8 @@ Count::Count(mpc::Mpc &mpc)
     auto lSequencer = mpc.getSequencer();
 
     saveBytes = std::vector<char>(AllParser::COUNT_LENGTH);
-    saveBytes[ENABLED_OFFSET] =
-        static_cast<int8_t>((lSequencer->getTransport()->isCountEnabled() ? 1 : 0));
+    saveBytes[ENABLED_OFFSET] = static_cast<int8_t>(
+        (lSequencer->getTransport()->isCountEnabled() ? 1 : 0));
     saveBytes[COUNT_IN_MODE_OFFSET] =
         static_cast<int8_t>(countMetronomeScreen->getCountInMode());
     saveBytes[CLICK_VOLUME_OFFSET] =

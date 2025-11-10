@@ -20,8 +20,7 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
 
-Transport::Transport(Sequencer &owner)
-    : sequencer(owner)
+Transport::Transport(Sequencer &owner) : sequencer(owner)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
@@ -41,7 +40,8 @@ void Transport::play(const bool fromStart)
 
     endOfSong = false;
     const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    const auto currentSong = sequencer.getSong(songScreen->getActiveSongIndex());
+    const auto currentSong =
+        sequencer.getSong(songScreen->getActiveSongIndex());
 
     const auto snapshot = sequencer.getStateManager()->getSnapshot();
     const bool songMode = snapshot.isSongModeEnabled();
@@ -111,7 +111,7 @@ void Transport::play(const bool fromStart)
             else
             {
                 setPosition(Sequencer::ticksToQuarterNotes(
-                                s->getFirstTickOfBar(getCurrentBarIndex())));
+                    s->getFirstTickOfBar(getCurrentBarIndex())));
             }
 
             countInStartPos =
@@ -496,7 +496,7 @@ bool Transport::isOverdubbing() const
 int Transport::getCurrentBarIndex() const
 {
     const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                         : sequencer.getActiveSequence();
+                               : sequencer.getActiveSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
@@ -532,7 +532,7 @@ int Transport::getCurrentBarIndex() const
 int Transport::getCurrentBeatIndex() const
 {
     const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                         : sequencer.getActiveSequence();
+                               : sequencer.getActiveSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
@@ -588,7 +588,7 @@ int Transport::getCurrentBeatIndex() const
 int Transport::getCurrentClockNumber() const
 {
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                                : sequencer.getActiveSequence();
+                                      : sequencer.getActiveSequence();
 
     auto clock =
         isCountingIn()
@@ -911,7 +911,9 @@ void Transport::setPositionWithinSong(
                 return;
             }
 
-            setPosition(finalPosQuarterNotes, shouldSyncTrackEventIndicesToNewPosition, shouldSetPlayStartPosition);
+            setPosition(finalPosQuarterNotes,
+                        shouldSyncTrackEventIndicesToNewPosition,
+                        shouldSetPlayStartPosition);
 
             if (shouldSyncTrackEventIndicesToNewPosition)
             {

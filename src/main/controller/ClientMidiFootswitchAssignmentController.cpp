@@ -88,7 +88,8 @@ void ClientMidiFootswitchAssignmentController::handleRecPunch()
     {
         handleStopToPlay();
     }
-    else if (sequencer->getTransport()->isPlaying() && !sequencer->getTransport()->isRecordingOrOverdubbing())
+    else if (sequencer->getTransport()->isPlaying() &&
+             !sequencer->getTransport()->isRecordingOrOverdubbing())
     {
         triggerDualButtonCombo(REC, PLAY);
     }
@@ -104,7 +105,8 @@ void ClientMidiFootswitchAssignmentController::handleOdubPunch()
     {
         handleStopToPlay();
     }
-    else if (sequencer->getTransport()->isPlaying() && !sequencer->getTransport()->isRecordingOrOverdubbing())
+    else if (sequencer->getTransport()->isPlaying() &&
+             !sequencer->getTransport()->isRecordingOrOverdubbing())
     {
         triggerDualButtonCombo(OVERDUB, PLAY);
     }

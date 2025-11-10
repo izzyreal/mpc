@@ -499,7 +499,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
 {
     const auto tc_note = timingCorrectScreen->getNoteValue();
     const bool posIsLastTick = sequencer->getTransport()->getTickPosition() ==
-                         sequencer->getActiveSequence()->getLastTick();
+                               sequencer->getActiveSequence()->getLastTick();
 
     const bool recIsPressedOrLocked =
         recButton->isPressed() ||
@@ -507,8 +507,9 @@ bool SeqUtil::isRecMainWithoutPlaying(
             hardware::ComponentId::REC);
 
     const bool recMainWithoutPlaying =
-        currentScreenName == "sequencer" && !sequencer->getTransport()->isPlaying() &&
-        recIsPressedOrLocked && tc_note != 0 && !posIsLastTick;
+        currentScreenName == "sequencer" &&
+        !sequencer->getTransport()->isPlaying() && recIsPressedOrLocked &&
+        tc_note != 0 && !posIsLastTick;
 
     return recMainWithoutPlaying;
 }

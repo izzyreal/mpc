@@ -33,7 +33,8 @@ void PunchScreen::open()
 
     if (lastTick < sequencer->getTransport()->getPunchInTime() ||
         lastTick < sequencer->getTransport()->getPunchOutTime() ||
-        (sequencer->getTransport()->getPunchInTime() == 0 && sequencer->getTransport()->getPunchOutTime() == 0))
+        (sequencer->getTransport()->getPunchInTime() == 0 &&
+         sequencer->getTransport()->getPunchOutTime() == 0))
     {
         sequencer->getTransport()->setPunchInTime(0);
         sequencer->getTransport()->setPunchOutTime(
@@ -78,7 +79,8 @@ void PunchScreen::function(int i)
             ls->openScreen(tabNames[i]);
             break;
         case 5:
-            sequencer->getTransport()->setPunchEnabled(!sequencer->getTransport()->isPunchEnabled());
+            sequencer->getTransport()->setPunchEnabled(
+                !sequencer->getTransport()->isPunchEnabled());
             openScreenById(ScreenId::SequencerScreen);
             break;
     }
@@ -96,7 +98,8 @@ void PunchScreen::setAutoPunch(int i)
 void PunchScreen::displayAutoPunch() const
 {
     findField("auto-punch")
-        ->setText(autoPunchNames[sequencer->getTransport()->getAutoPunchMode()]);
+        ->setText(
+            autoPunchNames[sequencer->getTransport()->getAutoPunchMode()]);
 }
 
 void PunchScreen::displayTime()
@@ -115,7 +118,8 @@ void PunchScreen::displayTime()
             ->Hide(sequencer->getTransport()->getAutoPunchMode() == 0);
     }
 
-    findLabel("time3")->Hide(sequencer->getTransport()->getAutoPunchMode() != 2);
+    findLabel("time3")->Hide(sequencer->getTransport()->getAutoPunchMode() !=
+                             2);
 
     findField("time0")->setTextPadded(SeqUtil::getBar(sequence, time0) + 1,
                                       "0");

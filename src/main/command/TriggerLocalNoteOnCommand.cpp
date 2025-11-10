@@ -148,12 +148,14 @@ void TriggerLocalNoteOnCommand::execute()
 
         if (stepLength != 1)
         {
-            const int bar = ctx->sequencer->getTransport()->getCurrentBarIndex() + 1;
+            const int bar =
+                ctx->sequencer->getTransport()->getCurrentBarIndex() + 1;
             const auto correctedTick = ctx->track->timingCorrectTick(
-                0, bar, ctx->sequencer->getTransport()->getTickPosition(), stepLength,
-                timingCorrectScreen->getSwing());
+                0, bar, ctx->sequencer->getTransport()->getTickPosition(),
+                stepLength, timingCorrectScreen->getSwing());
 
-            if (ctx->sequencer->getTransport()->getTickPosition() != correctedTick)
+            if (ctx->sequencer->getTransport()->getTickPosition() !=
+                correctedTick)
             {
                 ctx->sequencer->getTransport()->setPosition(
                     sequencer::Sequencer::ticksToQuarterNotes(correctedTick));

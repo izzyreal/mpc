@@ -116,9 +116,8 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
     enqueueEventAfterNFrames(
         [&]
         {
-            sendMidiSyncMsg(sequencer->getTransport()->getPlayStartPositionQuarterNotes() == 0.0
-                                ? ShortMessage::START
-                                : ShortMessage::CONTINUE);
+            sendMidiSyncMsg(sequencer->getTransport()->getPlayStartPositionQuarterNotes()
+    == 0.0 ? ShortMessage::START : ShortMessage::CONTINUE);
         },
         numberOfFramesBeforeMidiSyncStart);
         */

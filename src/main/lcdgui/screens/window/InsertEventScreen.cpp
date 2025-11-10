@@ -70,33 +70,38 @@ void InsertEventScreen::insertEvent() const
     else if (insertEventType == 1)
     {
         const auto pitchBendEvent = std::make_shared<PitchBendEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), pitchBendEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        pitchBendEvent);
         pitchBendEvent->setAmount(0);
     }
     else if (insertEventType == 2)
     {
         const auto controlChangeEvent = std::make_shared<ControlChangeEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), controlChangeEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        controlChangeEvent);
         controlChangeEvent->setController(0);
         controlChangeEvent->setAmount(0);
     }
     else if (insertEventType == 3)
     {
         const auto programChangeEvent = std::make_shared<ProgramChangeEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), programChangeEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        programChangeEvent);
         programChangeEvent->setProgram(1);
     }
     else if (insertEventType == 4)
     {
         const auto channelPressureEvent =
             std::make_shared<ChannelPressureEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), channelPressureEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        channelPressureEvent);
         channelPressureEvent->setAmount(0);
     }
     else if (insertEventType == 5)
     {
         const auto polyPressureEvent = std::make_shared<PolyPressureEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), polyPressureEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        polyPressureEvent);
         polyPressureEvent->setNote(60);
         polyPressureEvent->setAmount(0);
     }
@@ -104,13 +109,15 @@ void InsertEventScreen::insertEvent() const
     {
         const auto systemExclusiveEvent =
             std::make_shared<SystemExclusiveEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), systemExclusiveEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        systemExclusiveEvent);
         systemExclusiveEvent->setByteB(247);
     }
     else if (insertEventType == 7)
     {
         const auto mixerEvent = std::make_shared<MixerEvent>();
-        track->addEvent(sequencer->getTransport()->getTickPosition(), mixerEvent);
+        track->addEvent(sequencer->getTransport()->getTickPosition(),
+                        mixerEvent);
         mixerEvent->setPadNumber(0);
         mixerEvent->setParameter(0);
         mixerEvent->setValue(0);

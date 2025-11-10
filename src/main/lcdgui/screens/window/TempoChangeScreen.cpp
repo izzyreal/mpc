@@ -353,7 +353,8 @@ void TempoChangeScreen::function(const int j)
             auto nowDetected = -1;
             for (int i = 0; i < tceList.size(); i++)
             {
-                if (tceList[i]->getTick() == sequencer->getTransport()->getTickPosition())
+                if (tceList[i]->getTick() ==
+                    sequencer->getTransport()->getTickPosition())
                 {
                     nowDetected = i;
                     break;
@@ -362,8 +363,8 @@ void TempoChangeScreen::function(const int j)
 
             if (nowDetected == -1)
             {
-                std::shared_ptr<Event> tce =
-                    seq->addTempoChangeEvent(sequencer->getTransport()->getTickPosition());
+                std::shared_ptr<Event> tce = seq->addTempoChangeEvent(
+                    sequencer->getTransport()->getTickPosition());
                 initVisibleEvents();
                 displayTempoChange0();
                 displayTempoChange1();

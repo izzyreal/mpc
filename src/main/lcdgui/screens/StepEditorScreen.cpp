@@ -83,19 +83,20 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
                             return visibleEventsEqual(a, b);
                         }});
 
-    addReactiveBinding({[&]
-                        {
-                            return sequencer->getTransport()->getTickPosition();
-                        },
-                        [&](auto)
-                        {
-                            findField("now0")->setTextPadded(
-                                sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
-                            findField("now1")->setTextPadded(
-                                sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
-                            findField("now2")->setTextPadded(
-                                sequencer->getTransport()->getCurrentClockNumber(), "0");
-                        }});
+    addReactiveBinding(
+        {[&]
+         {
+             return sequencer->getTransport()->getTickPosition();
+         },
+         [&](auto)
+         {
+             findField("now0")->setTextPadded(
+                 sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+             findField("now1")->setTextPadded(
+                 sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+             findField("now2")->setTextPadded(
+                 sequencer->getTransport()->getCurrentClockNumber(), "0");
+         }});
 }
 
 bool StepEditorScreen::visibleEventsEqual(
@@ -164,9 +165,12 @@ void StepEditorScreen::open()
     setViewNotesText();
     displayView();
 
-    findField("now0")->setTextPadded(sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
-    findField("now1")->setTextPadded(sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
-    findField("now2")->setTextPadded(sequencer->getTransport()->getCurrentClockNumber(), "0");
+    findField("now0")->setTextPadded(
+        sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
+    findField("now1")->setTextPadded(
+        sequencer->getTransport()->getCurrentBeatIndex() + 1, "0");
+    findField("now2")->setTextPadded(
+        sequencer->getTransport()->getCurrentClockNumber(), "0");
 
     const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
 
@@ -498,7 +502,8 @@ void StepEditorScreen::turnWheel(int i)
         setSequencerTickPos(
             [&]
             {
-                sequencer->getTransport()->setBar(sequencer->getTransport()->getCurrentBarIndex() + i);
+                sequencer->getTransport()->setBar(
+                    sequencer->getTransport()->getCurrentBarIndex() + i);
             });
     }
     else if (focusedFieldName == "now1")
@@ -506,7 +511,8 @@ void StepEditorScreen::turnWheel(int i)
         setSequencerTickPos(
             [&]
             {
-                sequencer->getTransport()->setBeat(sequencer->getTransport()->getCurrentBeatIndex() + i);
+                sequencer->getTransport()->setBeat(
+                    sequencer->getTransport()->getCurrentBeatIndex() + i);
             });
     }
     else if (focusedFieldName == "now2")
@@ -514,7 +520,8 @@ void StepEditorScreen::turnWheel(int i)
         setSequencerTickPos(
             [&]
             {
-                sequencer->getTransport()->setClock(sequencer->getTransport()->getCurrentClockNumber() + i);
+                sequencer->getTransport()->setClock(
+                    sequencer->getTransport()->getCurrentClockNumber() + i);
             });
     }
     else if (focusedFieldName == "tcvalue")
@@ -772,7 +779,8 @@ void StepEditorScreen::prevBarStart()
             }
             else
             {
-                sequencer->getTransport()->setBar(sequencer->getTransport()->getCurrentBarIndex() - 1);
+                sequencer->getTransport()->setBar(
+                    sequencer->getTransport()->getCurrentBarIndex() - 1);
             }
         });
 }
@@ -791,7 +799,8 @@ void StepEditorScreen::nextBarEnd()
             }
             else
             {
-                sequencer->getTransport()->setBar(sequencer->getTransport()->getCurrentBarIndex() + 1);
+                sequencer->getTransport()->setBar(
+                    sequencer->getTransport()->getCurrentBarIndex() + 1);
             }
         });
 }

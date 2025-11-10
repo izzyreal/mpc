@@ -118,7 +118,8 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                    track->getEvents().size() < humanTickPositions.size())
             {
                 mpc.getClock()->processBufferInternal(
-                    seq->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
+                    seq->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE,
+                    0);
                 server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
                 timeInSamples += BUFFER_SIZE;
 
@@ -306,8 +307,8 @@ TEST_CASE("Undo", "[sequencer]")
             mpc.clientEventController->handleClientEvent(clientEvent);
         }
 
-        mpc.getClock()->processBufferInternal(sequencer->getTransport()->getTempo(),
-                                              SAMPLE_RATE, BUFFER_SIZE, 0);
+        mpc.getClock()->processBufferInternal(
+            sequencer->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
 
         server->work(nullptr, nullptr, BUFFER_SIZE, {}, {}, {}, {});
         timeInSamples += BUFFER_SIZE;
