@@ -755,10 +755,6 @@ void Sequencer::stop(const StopMode stopMode)
     stateManager->enqueue(SetSongModeEnabled{false});
     nextSq = -1;
 
-    lastNotifiedBar = -1;
-    lastNotifiedBeat = -1;
-    lastNotifiedClock = -1;
-
     auto s1 = getActiveSequence();
     auto s2 = getCurrentlyPlayingSequence();
     auto pos = getTickPosition();

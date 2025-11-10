@@ -133,9 +133,6 @@ namespace mpc::sequencer
         std::shared_ptr<SequencerStateManager> stateManager;
         std::vector<std::shared_ptr<Bus>> buses;
         bool playing = false;
-        int lastNotifiedBar = -1;
-        int lastNotifiedBeat = -1;
-        int lastNotifiedClock = -1;
         std::shared_ptr<Sequence> placeHolder;
         bool metronomeOnly = false;
         int activeSequenceIndex = 0;
