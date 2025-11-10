@@ -94,7 +94,7 @@ namespace mpc::sequencer
         bool finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
                                      int duration) const;
         std::shared_ptr<NoteOnEvent>
-        recordNoteEventASync(unsigned char note, unsigned char velocity);
+        recordNoteEventASync(unsigned char note, unsigned char velocity) const;
 
         void
         finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent> &event) const;
@@ -194,6 +194,6 @@ namespace mpc::sequencer
         std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note) const;
 
         void processRealtimeQueuedEvents();
-        int getCorrectedTickPos();
+        int getCorrectedTickPos() const;
     };
 } // namespace mpc::sequencer

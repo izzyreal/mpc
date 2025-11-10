@@ -23,7 +23,7 @@ using namespace mpc::lcdgui;
 Transport::Transport(Sequencer &owner)
     : sequencer(owner)
 {
-    auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
+    const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
 }
 
@@ -40,8 +40,8 @@ void Transport::play(const bool fromStart)
     }
 
     endOfSong = false;
-    auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    auto currentSong = sequencer.getSong(songScreen->getActiveSongIndex());
+    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
+    const auto currentSong = sequencer.getSong(songScreen->getActiveSongIndex());
 
     const auto snapshot = sequencer.getStateManager()->getSnapshot();
     const bool songMode = snapshot.isSongModeEnabled();
@@ -84,9 +84,9 @@ void Transport::play(const bool fromStart)
     sequencer.setCurrentlyPlayingSequenceIndex(
         sequencer.getActiveSequenceIndex());
 
-    auto countMetronomeScreen =
+    const auto countMetronomeScreen =
         sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
-    auto countInMode = countMetronomeScreen->getCountInMode();
+    const auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 ||
         (countInMode == 1 && !isRecordingOrOverdubbing()))
@@ -97,7 +97,7 @@ void Transport::play(const bool fromStart)
         }
     }
 
-    auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getActiveSequence();
 
     if (countEnabled && !songMode)
     {
@@ -240,7 +240,7 @@ void Transport::stop()
 
 void Transport::stop(const StopMode stopMode)
 {
-    bool bouncing = sequencer.isBouncing();
+    const bool bouncing = sequencer.isBouncing();
 
     if (!isPlaying() && !bouncing)
     {
@@ -287,14 +287,14 @@ void Transport::stop(const StopMode stopMode)
 
     setPosition(Sequencer::ticksToQuarterNotes(newTickPosition));
 
-    auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
+    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
 
     if (endOfSong)
     {
         songScreen->setOffset(songScreen->getOffset() + 1);
     }
 
-    auto vmpcDirectToDiskRecorderScreen =
+    const auto vmpcDirectToDiskRecorderScreen =
         sequencer.getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
     if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
@@ -351,7 +351,7 @@ bool Transport::isCountingIn() const
     return countingIn;
 }
 
-void Transport::bumpPositionByTicks(const uint8_t tickCount)
+void Transport::bumpPositionByTicks(const uint8_t tickCount) const
 {
     sequencer.getStateManager()->enqueue(BumpPositionByTicks{tickCount});
 }
@@ -493,11 +493,11 @@ bool Transport::isOverdubbing() const
     return overdubbing;
 }
 
-int Transport::getCurrentBarIndex()
+int Transport::getCurrentBarIndex() const
 {
-    auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+    const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                          : sequencer.getActiveSequence();
-    auto pos =
+    const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
             : getTickPosition();
@@ -507,7 +507,7 @@ int Transport::getCurrentBarIndex()
         return s->getLastBarIndex() + 1;
     }
 
-    auto &barLengths = s->getBarLengthsInTicks();
+    const auto &barLengths = s->getBarLengthsInTicks();
 
     int tickCounter = 0;
 
@@ -529,11 +529,11 @@ int Transport::getCurrentBarIndex()
     return 0;
 }
 
-int Transport::getCurrentBeatIndex()
+int Transport::getCurrentBeatIndex() const
 {
-    auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+    const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                          : sequencer.getActiveSequence();
-    auto pos =
+    const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
             : getTickPosition();
@@ -555,9 +555,9 @@ int Transport::getCurrentBeatIndex()
         }
     }
 
-    auto ts = s->getTimeSignature();
-    auto den = ts.getDenominator();
-    auto denTicks = 96 * (4.0 / den);
+    const auto ts = s->getTimeSignature();
+    const auto den = ts.getDenominator();
+    const auto denTicks = 96 * (4.0 / den);
 
     if (index == 0)
     {
@@ -569,7 +569,7 @@ int Transport::getCurrentBeatIndex()
 
     const auto currentBarIndex = getCurrentBarIndex();
 
-    for (auto &l : s->getBarLengthsInTicks())
+    for (const auto &l : s->getBarLengthsInTicks())
     {
         if (barCounter == currentBarIndex)
         {
@@ -585,9 +585,9 @@ int Transport::getCurrentBeatIndex()
     return beatIndex;
 }
 
-int Transport::getCurrentClockNumber()
+int Transport::getCurrentClockNumber() const
 {
-    auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+    const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                                 : sequencer.getActiveSequence();
 
     auto clock =
@@ -608,9 +608,9 @@ int Transport::getCurrentClockNumber()
         }
     }
 
-    auto ts = sequence->getTimeSignature();
-    auto den = ts.getDenominator();
-    auto denTicks = 96 * (4.0 / den);
+    const auto ts = sequence->getTimeSignature();
+    const auto den = ts.getDenominator();
+    const auto denTicks = 96 * (4.0 / den);
 
     if (clock == 0)
     {
@@ -618,9 +618,9 @@ int Transport::getCurrentClockNumber()
     }
 
     auto barCounter = 0;
-    auto currentBarIndex = getCurrentBarIndex();
+    const auto currentBarIndex = getCurrentBarIndex();
 
-    for (auto &l : sequence->getBarLengthsInTicks())
+    for (const auto &l : sequence->getBarLengthsInTicks())
     {
         if (barCounter == currentBarIndex)
         {
@@ -631,7 +631,7 @@ int Transport::getCurrentClockNumber()
         barCounter++;
     }
 
-    auto currentBeatIndex = getCurrentBeatIndex();
+    const auto currentBeatIndex = getCurrentBeatIndex();
 
     for (int i = 0; i < currentBeatIndex; i++)
     {
@@ -641,7 +641,7 @@ int Transport::getCurrentClockNumber()
     return clock;
 }
 
-void Transport::setBar(int i)
+void Transport::setBar(int i) const
 {
     if (isPlaying())
     {
@@ -654,7 +654,7 @@ void Transport::setBar(int i)
         return;
     }
 
-    auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getActiveSequence();
 
     if (i > s->getLastBarIndex() + 1)
     {
@@ -667,8 +667,8 @@ void Transport::setBar(int i)
     }
 
     auto ts = s->getTimeSignature();
-    auto den = ts.getDenominator();
-    auto denTicks = static_cast<int>(96 * (4.0 / den));
+    const auto den = ts.getDenominator();
+    const auto denTicks = static_cast<int>(96 * (4.0 / den));
 
     if (i != s->getLastBarIndex() + 1)
     {
@@ -676,13 +676,13 @@ void Transport::setBar(int i)
         ts.setDenominator(s->getDenominator(i));
     }
 
-    auto &barLengths = s->getBarLengthsInTicks();
-    auto currentClock = getCurrentClockNumber();
-    auto currentBeat = getCurrentBeatIndex();
+    const auto &barLengths = s->getBarLengthsInTicks();
+    const auto currentClock = getCurrentClockNumber();
+    const auto currentBeat = getCurrentBeatIndex();
     int pos = 0;
     auto barCounter = 0;
 
-    for (auto &l : barLengths)
+    for (const auto &l : barLengths)
     {
         if (barCounter == i)
         {
@@ -707,7 +707,7 @@ void Transport::setBar(int i)
     setClock(0);
 }
 
-void Transport::setBeat(int i)
+void Transport::setBeat(int i) const
 {
     if (isPlaying())
     {
@@ -719,7 +719,7 @@ void Transport::setBeat(int i)
         i = 0;
     }
 
-    auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getActiveSequence();
     auto pos = getTickPosition();
 
     if (pos == s->getLastTick())
@@ -727,8 +727,8 @@ void Transport::setBeat(int i)
         return;
     }
 
-    auto ts = s->getTimeSignature();
-    auto num = ts.getNumerator();
+    const auto ts = s->getTimeSignature();
+    const auto num = ts.getNumerator();
 
     if (i >= num)
     {
@@ -742,7 +742,7 @@ void Transport::setBeat(int i)
     setPosition(Sequencer::ticksToQuarterNotes(pos));
 }
 
-void Transport::setClock(int i)
+void Transport::setClock(int i) const
 {
     if (isPlaying())
     {
@@ -754,7 +754,7 @@ void Transport::setClock(int i)
         i = 0;
     }
 
-    auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getActiveSequence();
     int pos = getTickPosition();
 
     if (pos == s->getLastTick())
@@ -762,11 +762,9 @@ void Transport::setClock(int i)
         return;
     }
 
-    getCurrentClockNumber();
-    auto den = s->getTimeSignature().getDenominator();
-    auto denTicks = 96 * (4.0 / den);
+    const auto den = s->getTimeSignature().getDenominator();
 
-    if (i > denTicks - 1)
+    if (const auto denTicks = 96 * (4.0 / den); i > denTicks - 1)
     {
         i = denTicks - 1;
     }
@@ -779,7 +777,7 @@ void Transport::setClock(int i)
 
 void Transport::setPosition(const double positionQuarterNotes,
                             const bool shouldSyncTrackEventIndicesToNewPosition,
-                            const bool setPlayStartPosition)
+                            const bool shouldSetPlayStartPosition) const
 {
     const auto songSequenceIndex = sequencer.getSongSequenceIndex();
     const bool songMode =
@@ -811,7 +809,7 @@ void Transport::setPosition(const double positionQuarterNotes,
     sequencer.getStateManager()->enqueue(
         SetPositionQuarterNotes{wrappedNewPosition});
 
-    if (setPlayStartPosition)
+    if (shouldSetPlayStartPosition)
     {
         sequencer.getStateManager()->enqueue(
             SetPlayStartPositionQuarterNotes{wrappedNewPosition});
@@ -823,7 +821,7 @@ void Transport::setPosition(const double positionQuarterNotes,
             Sequencer::quarterNotesToTicks(wrappedNewPosition));
         if (sequencer.isSecondSequenceEnabled())
         {
-            auto secondSequenceScreen =
+            const auto secondSequenceScreen =
                 sequencer.getScreens()->get<ScreenId::SecondSeqScreen>();
             sequencer.getSequence(secondSequenceScreen->getSq())
                 ->resetTrackEventIndices(
@@ -942,8 +940,8 @@ void Transport::setTempo(double newTempo)
         newTempo = 300.0;
     }
 
-    auto s = sequencer.getActiveSequence();
-    auto tce = sequencer.getCurrentTempoChangeEvent();
+    const auto s = sequencer.getActiveSequence();
+    const auto tce = sequencer.getCurrentTempoChangeEvent();
 
     if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
     {
@@ -975,8 +973,8 @@ void Transport::setTempo(double newTempo)
     }
     else if (s->isTempoChangeOn())
     {
-        auto initialTempo = s->getInitialTempo();
-        auto ratio = newTempo / initialTempo;
+        const auto initialTempo = s->getInitialTempo();
+        const auto ratio = newTempo / initialTempo;
         tce->setRatio(static_cast<int>(round(ratio * 1000.0)));
     }
     else
@@ -985,14 +983,14 @@ void Transport::setTempo(double newTempo)
     }
 }
 
-double Transport::getTempo()
+double Transport::getTempo() const
 {
     if (!isPlaying() && !sequencer.getActiveSequence()->isUsed())
     {
         return tempo;
     }
 
-    auto seq = sequencer.getActiveSequence();
+    const auto seq = sequencer.getActiveSequence();
 
     if (screengroups::isSongScreen(sequencer.layeredScreen->getCurrentScreen()))
     {
@@ -1002,11 +1000,11 @@ double Transport::getTempo()
         }
     }
 
-    auto tce = sequencer.getCurrentTempoChangeEvent();
+    const auto tce = sequencer.getCurrentTempoChangeEvent();
 
     if (tempoSourceSequenceEnabled)
     {
-        auto ignoreTempoChangeScreen =
+        const auto ignoreTempoChangeScreen =
             sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
         if (seq->isTempoChangeOn() ||

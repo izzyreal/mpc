@@ -30,7 +30,7 @@ void LegacyClock::set_bpm(const double &BPM)
 bool LegacyClock::proc()
 {
     bool tick = false;
-    double tmp = pd;
+    const double tmp = pd;
     pd -= floor(pd);
     if (tmp > pd)
     {

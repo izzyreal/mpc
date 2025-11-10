@@ -36,19 +36,19 @@ namespace mpc::sequencer
         void setOverdubbing(bool b);
         void setPosition(double positionQuarterNotes,
                          bool shouldSyncTrackEventIndicesToNewPosition = true,
-                         bool shouldSetPlayStartPosition = true);
+                         bool shouldSetPlayStartPosition = true) const;
         void
         setPositionWithinSong(double positionQuarterNotes,
                               bool shouldSyncTrackEventIndicesToNewPosition = true,
                               bool shouldSetPlayStartPosition = true);
-        void bumpPositionByTicks(uint8_t ticks);
+        void bumpPositionByTicks(uint8_t ticks) const;
         bool isPlaying() const;
         bool isRecording() const;
         bool isOverdubbing() const;
         bool isRecordingOrOverdubbing() const;
 
         void setTempo(double newTempo);
-        double getTempo();
+        double getTempo() const;
         bool isTempoSourceSequenceEnabled() const;
         void setTempoSourceSequence(bool b);
 
@@ -63,12 +63,12 @@ namespace mpc::sequencer
 
         int getTickPosition() const;
         double getPlayStartPositionQuarterNotes() const;
-        int getCurrentBarIndex();
-        int getCurrentBeatIndex();
-        int getCurrentClockNumber();
-        void setBar(int i);
-        void setBeat(int i);
-        void setClock(int i);
+        int getCurrentBarIndex() const;
+        int getCurrentBeatIndex() const;
+        int getCurrentClockNumber() const;
+        void setBar(int i) const;
+        void setBeat(int i) const;
+        void setClock(int i) const;
 
         bool isCountEnabled() const;
         void setCountEnabled(bool b);

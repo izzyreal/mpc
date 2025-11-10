@@ -216,11 +216,11 @@ bool Sequence::isUsed() const
 
 void Sequence::init(const int newLastBarIndex)
 {
-    auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+    const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     initialTempo = userScreen->tempo;
     loopEnabled = userScreen->loop;
 
-    for (auto &t : tracks)
+    for (const auto &t : tracks)
     {
         t->setDeviceIndex(userScreen->device);
         t->setProgramChange(userScreen->pgm);
@@ -413,7 +413,7 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
         deleteLastTick += barLengthsInTicks[i];
     }
 
-    for (auto &t : tracks)
+    for (const auto &t : tracks)
     {
         auto events = t->getEvents();
 
@@ -427,12 +427,12 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
         }
     }
 
-    auto difference = _lastBar - firstBar;
+    const auto difference = _lastBar - firstBar;
     lastBarIndex -= difference;
     int oldBarStartPos = 0;
     auto barCounter = 0;
 
-    for (auto l : barLengthsInTicks)
+    for (const auto l : barLengthsInTicks)
     {
         if (barCounter == _lastBar)
         {
@@ -446,7 +446,7 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
     int newBarStartPos = 0;
     barCounter = 0;
 
-    for (auto l : barLengthsInTicks)
+    for (const auto l : barLengthsInTicks)
     {
         if (barCounter == firstBar)
         {
@@ -457,7 +457,7 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
         barCounter++;
     }
 
-    auto tickDifference = oldBarStartPos - newBarStartPos;
+    const auto tickDifference = oldBarStartPos - newBarStartPos;
 
     for (int i = firstBar; i < 999; i++)
     {
@@ -471,14 +471,14 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
         denominators[i] = denominators[i + difference];
     }
 
-    for (auto &t : tracks)
+    for (const auto &t : tracks)
     {
         if (t->getIndex() >= 64 || t->getIndex() == 65)
         {
             continue;
         }
 
-        for (auto &e : t->getEvents())
+        for (const auto &e : t->getEvents())
         {
             if (e->getTick() >= oldBarStartPos)
             {
@@ -548,7 +548,7 @@ void Sequence::insertBars(int barCount, const int afterBar)
     int barStart = 0;
     auto barCounter = 0;
 
-    for (auto l : barLengthsInTicks)
+    for (const auto l : barLengthsInTicks)
     {
         if (barCounter == afterBar)
         {
@@ -565,7 +565,7 @@ void Sequence::insertBars(int barCount, const int afterBar)
     {
         int newBarStart = 0;
 
-        for (auto l : barLengthsInTicks)
+        for (const auto l : barLengthsInTicks)
         {
             if (barCounter == afterBar + barCount)
             {
@@ -576,14 +576,14 @@ void Sequence::insertBars(int barCount, const int afterBar)
             barCounter++;
         }
 
-        for (auto &t : tracks)
+        for (const auto &t : tracks)
         {
             if (t->getIndex() == 64 || t->getIndex() == 65)
             {
                 continue;
             }
 
-            for (auto &e : t->getEvents())
+            for (const auto &e : t->getEvents())
             {
                 if (e->getTick() >= barStart)
                 {
@@ -618,7 +618,7 @@ void Sequence::moveTrack(const int source, const int destination)
 
         for (int i = destination; i < source; i++)
         {
-            auto t = tracks[i];
+            const auto t = tracks[i];
             t->setTrackIndex(t->getIndex() + 1);
         }
     }
@@ -629,7 +629,7 @@ void Sequence::moveTrack(const int source, const int destination)
 
         for (int i = source + 1; i <= destination; i++)
         {
-            auto t = tracks[i];
+            const auto t = tracks[i];
             t->setTrackIndex(t->getIndex() - 1);
         }
     }
@@ -671,8 +671,8 @@ void Sequence::initLoop()
         lastLoopBarIndex = lastBarIndex;
     }
 
-    auto firstBar = getFirstLoopBarIndex();
-    auto lastBar = getLastLoopBarIndex() + 1;
+    const auto firstBar = getFirstLoopBarIndex();
+    const auto lastBar = getLastLoopBarIndex() + 1;
     int newLoopStart = 0;
     int newLoopEnd = 0;
 
@@ -710,9 +710,9 @@ void Sequence::setNumeratorsAndDenominators(
 
 int Sequence::getFirstTickOfBeat(const int bar, const int beat) const
 {
-    auto barStart = getFirstTickOfBar(bar);
-    auto den = denominators[bar];
-    auto beatTicks = static_cast<int>(96 * (4.0 / den));
+    const auto barStart = getFirstTickOfBar(bar);
+    const auto den = denominators[bar];
+    const auto beatTicks = static_cast<int>(96 * (4.0 / den));
     return barStart + (beat * beatTicks);
 }
 

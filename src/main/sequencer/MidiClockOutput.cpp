@@ -83,7 +83,7 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 
 void MidiClockOutput::processTempoChange()
 {
-    double tempo = sequencer->getTransport()->getTempo();
+    const double tempo = sequencer->getTransport()->getTempo();
 
     if (tempo != clock.getBpm())
     {
@@ -133,7 +133,7 @@ void MidiClockOutput::processEventsAfterNFrames()
 {
     EventAfterNFrames batch[100];
 
-    size_t count = eventQueue->try_dequeue_bulk(batch, 100);
+    const size_t count = eventQueue->try_dequeue_bulk(batch, 100);
 
     tempEventQueue.clear();
 
@@ -209,7 +209,7 @@ void MidiClockOutput::processSampleRateChange()
 {
     if (clock.getSampleRate() != requestedSampleRate)
     {
-        auto bpm = clock.getBpm();
+        const auto bpm = clock.getBpm();
         clock.init(requestedSampleRate);
         clock.set_bpm(bpm);
     }

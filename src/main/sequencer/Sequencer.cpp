@@ -134,7 +134,7 @@ void Sequencer::init()
     lastTap = currentTimeMillis();
     nextSq = -1;
 
-    auto userScreen = getScreens()->get<ScreenId::UserScreen>();
+    const auto userScreen = getScreens()->get<ScreenId::UserScreen>();
     defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
 
     for (int i = 0; i < 64; i++)
@@ -184,11 +184,11 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 
 void Sequencer::playToTick(const int targetTick) const
 {
-    auto seqIndex = stateManager->getSnapshot().isSongModeEnabled()
+    const auto seqIndex = stateManager->getSnapshot().isSongModeEnabled()
                         ? getSongSequenceIndex()
                         : currentlyPlayingSequenceIndex;
     auto seq = sequences[seqIndex].get();
-    auto secondSequenceScreen = getScreens()->get<ScreenId::SecondSeqScreen>();
+    const auto secondSequenceScreen = getScreens()->get<ScreenId::SecondSeqScreen>();
 
     for (int i = 0; i < 2; i++)
     {
@@ -212,7 +212,7 @@ void Sequencer::playToTick(const int targetTick) const
 
         if (!transport->isMetronomeOnlyEnabled())
         {
-            for (auto &track : seq->getTracks())
+            for (const auto &track : seq->getTracks())
             {
                 while (track->getNextTick() <= targetTick)
                 {
@@ -231,14 +231,14 @@ void Sequencer::playToTick(const int targetTick) const
 std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
     auto index = -1;
-    auto s = getActiveSequence();
+    const auto s = getActiveSequence();
 
     if (!s->isUsed())
     {
         return {};
     }
 
-    for (auto &tce : s->getTempoChangeEvents())
+    for (const auto &tce : s->getTempoChangeEvents())
     {
         if (transport->getTickPosition() >= tce->getTick())
         {
@@ -278,7 +278,7 @@ void Sequencer::setSoloEnabled(const bool b)
         {
             for (int note = 35; note <= 98; note++)
             {
-                for (auto &voice : (*voices))
+                for (const auto &voice : (*voices))
                 {
                     if (!voice->isFinished() && voice->getNote() == note &&
                         voice->getVoiceOverlapMode() ==
@@ -563,9 +563,9 @@ void Sequencer::copyTempoChangeEvents(
     const std::shared_ptr<Sequence> &src,
     const std::shared_ptr<Sequence> &dst) const
 {
-    for (auto &e1 : src->getTempoChangeEvents())
+    for (const auto &e1 : src->getTempoChangeEvents())
     {
-        auto copy = dst->addTempoChangeEvent(e1->getTick());
+        const auto copy = dst->addTempoChangeEvent(e1->getTick());
         copy->setRatio(e1->getRatio());
     }
 }
@@ -581,8 +581,8 @@ void Sequencer::copyTrack(const int sourceTrackIndex,
         return;
     }
 
-    auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
-    auto dest =
+    const auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
+    const auto dest =
         sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex);
     copyTrack(src, dest);
 }
@@ -594,7 +594,7 @@ void Sequencer::copySong(const int source, const int dest)
         return;
     }
 
-    auto s0 = songs[source];
+    const auto s0 = songs[source];
 
     if (!s0->isUsed())
     {
@@ -603,14 +603,14 @@ void Sequencer::copySong(const int source, const int dest)
 
     deleteSong(dest);
 
-    auto s1 = songs[dest];
+    const auto s1 = songs[dest];
 
     s1->setUsed(true);
 
     for (int i = 0; i < s0->getStepCount(); i++)
     {
         s1->insertStep(i);
-        auto step = s1->getStep(i).lock();
+        const auto step = s1->getStep(i).lock();
         step->setRepeats(s0->getStep(i).lock()->getRepeats());
         step->setSequence(s0->getStep(i).lock()->getSequence());
     }
@@ -668,7 +668,7 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
 
 std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
 
     const auto snapshot = stateManager->getSnapshot();
     const bool songMode = snapshot.isSongModeEnabled();
@@ -709,7 +709,7 @@ std::vector<int> Sequencer::getUsedSequenceIndexes() const
 
     for (int i = 0; i < 99; i++)
     {
-        auto s = sequences[i];
+        const auto s = sequences[i];
 
         if (s->isUsed())
         {
@@ -722,14 +722,14 @@ std::vector<int> Sequencer::getUsedSequenceIndexes() const
 
 void Sequencer::goToPreviousEvent()
 {
-    auto s = getActiveSequence();
-    auto t = s->getTrack(getActiveTrackIndex());
+    const auto s = getActiveSequence();
+    const auto t = s->getTrack(getActiveTrackIndex());
 
     auto newPos = 0;
     auto events = t->getEvents();
     std::reverse(events.begin(), events.end());
 
-    for (auto &e : events)
+    for (const auto &e : events)
     {
         if (e->getTick() < transport->getTickPosition())
         {
@@ -743,12 +743,12 @@ void Sequencer::goToPreviousEvent()
 
 void Sequencer::goToNextEvent()
 {
-    auto s = getActiveSequence();
-    auto t = s->getTrack(getActiveTrackIndex());
+    const auto s = getActiveSequence();
+    const auto t = s->getTrack(getActiveTrackIndex());
 
     auto newPos = s->getLastTick();
 
-    for (auto &e : t->getEvents())
+    for (const auto &e : t->getEvents())
     {
         if (e->getTick() > transport->getTickPosition())
         {
@@ -762,7 +762,7 @@ void Sequencer::goToNextEvent()
 
 void Sequencer::goToPreviousStep()
 {
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
@@ -779,7 +779,7 @@ void Sequencer::goToPreviousStep()
 
     auto prevStepIndex = 0;
 
-    for (auto l : stepGrid)
+    for (const auto l : stepGrid)
     {
         if (pos <= l)
         {
@@ -801,7 +801,7 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-    auto timingCorrectScreen =
+    const auto timingCorrectScreen =
         getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
@@ -817,7 +817,7 @@ void Sequencer::goToNextStep()
 
     auto nextStepIndex = -1;
 
-    for (auto l : stepGrid)
+    for (const auto l : stepGrid)
     {
         if (pos < l)
         {
@@ -871,7 +871,7 @@ void Sequencer::tap()
 
     for (int i = 0; i < 3; i++)
     {
-        auto l0 = taps[index];
+        const auto l0 = taps[index];
 
         index--;
 
@@ -880,7 +880,7 @@ void Sequencer::tap()
             index = 3;
         }
 
-        auto l1 = taps[index];
+        const auto l1 = taps[index];
 
         if (l0 == 0 || l1 == 0)
         {
@@ -903,7 +903,7 @@ void Sequencer::tap()
 
 std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
-    auto seqIndex = getCurrentlyPlayingSequenceIndex();
+    const auto seqIndex = getCurrentlyPlayingSequenceIndex();
 
     if (seqIndex == -1)
     {
@@ -923,8 +923,8 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
     const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
     if (songMode)
     {
-        auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-        auto song = songs[songScreen->getActiveSongIndex()];
+        const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+        const auto song = songs[songScreen->getActiveSongIndex()];
 
         if (!song->isUsed())
         {
@@ -934,7 +934,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
         const auto seqIndexShouldBeDerivedFromSongStep =
             songMode && songScreen->getOffset() + 1 < song->getStepCount();
 
-        auto songSeqIndex = seqIndexShouldBeDerivedFromSongStep
+        const auto songSeqIndex = seqIndexShouldBeDerivedFromSongStep
                                 ? song->getStep(songScreen->getOffset() + 1)
                                       .lock()
                                       ->getSequence()
@@ -960,7 +960,7 @@ int Sequencer::getFirstUsedSeqDown(const int from, const bool unused) const
 {
     for (int i = from; i >= 0; i--)
     {
-        auto candidate =
+        const auto candidate =
             unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
         if (candidate)
@@ -976,7 +976,7 @@ int Sequencer::getFirstUsedSeqUp(const int from, const bool unused) const
 {
     for (int i = from; i < 99; i++)
     {
-        auto candidate =
+        const auto candidate =
             unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
         if (candidate)
@@ -999,7 +999,7 @@ void Sequencer::setNextSq(int i)
         i = 98;
     }
 
-    auto startingFromScratch = nextSq == -1;
+    const auto startingFromScratch = nextSq == -1;
 
     auto up = i > nextSq;
 
@@ -1008,7 +1008,7 @@ void Sequencer::setNextSq(int i)
         up = i > currentlyPlayingSequenceIndex;
     }
 
-    auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
+    const auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
 
     if (up && candidate == -1)
     {
@@ -1046,8 +1046,8 @@ void Sequencer::setSongModeEnabled(const bool b)
 
 int Sequencer::getSongSequenceIndex() const
 {
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    auto song = songs[songScreen->getActiveSongIndex()];
+    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
+    const auto song = songs[songScreen->getActiveSongIndex()];
     auto step = songScreen->getOffset() + 1;
 
     if (step > song->getStepCount() - 1)
@@ -1075,7 +1075,7 @@ void Sequencer::setSecondSequenceEnabled(const bool b)
 
 void Sequencer::flushTrackNoteCache()
 {
-    for (auto &t : getCurrentlyPlayingSequence()->getTracks())
+    for (const auto &t : getCurrentlyPlayingSequence()->getTracks())
     {
         t->flushNoteCache();
     }

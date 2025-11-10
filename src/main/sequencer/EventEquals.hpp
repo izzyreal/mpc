@@ -103,39 +103,39 @@ namespace mpc::sequencer
             return false;
         }
 
-        if (auto na = std::dynamic_pointer_cast<NoteOnEvent>(a))
+        if (const auto na = std::dynamic_pointer_cast<NoteOnEvent>(a))
         {
             return *na == *std::dynamic_pointer_cast<NoteOnEvent>(b);
         }
-        if (auto no = std::dynamic_pointer_cast<NoteOffEvent>(a))
+        if (const auto no = std::dynamic_pointer_cast<NoteOffEvent>(a))
         {
             return *no == *std::dynamic_pointer_cast<NoteOffEvent>(b);
         }
-        if (auto me = std::dynamic_pointer_cast<MixerEvent>(a))
+        if (const auto me = std::dynamic_pointer_cast<MixerEvent>(a))
         {
             return *me == *std::dynamic_pointer_cast<MixerEvent>(b);
         }
-        if (auto ce = std::dynamic_pointer_cast<ChannelPressureEvent>(a))
+        if (const auto ce = std::dynamic_pointer_cast<ChannelPressureEvent>(a))
         {
             return *ce == *std::dynamic_pointer_cast<ChannelPressureEvent>(b);
         }
-        if (auto cc = std::dynamic_pointer_cast<ControlChangeEvent>(a))
+        if (const auto cc = std::dynamic_pointer_cast<ControlChangeEvent>(a))
         {
             return *cc == *std::dynamic_pointer_cast<ControlChangeEvent>(b);
         }
-        if (auto pb = std::dynamic_pointer_cast<PitchBendEvent>(a))
+        if (const auto pb = std::dynamic_pointer_cast<PitchBendEvent>(a))
         {
             return *pb == *std::dynamic_pointer_cast<PitchBendEvent>(b);
         }
-        if (auto pe = std::dynamic_pointer_cast<PolyPressureEvent>(a))
+        if (const auto pe = std::dynamic_pointer_cast<PolyPressureEvent>(a))
         {
             return *pe == *std::dynamic_pointer_cast<PolyPressureEvent>(b);
         }
-        if (auto pg = std::dynamic_pointer_cast<ProgramChangeEvent>(a))
+        if (const auto pg = std::dynamic_pointer_cast<ProgramChangeEvent>(a))
         {
             return *pg == *std::dynamic_pointer_cast<ProgramChangeEvent>(b);
         }
-        if (auto sy = std::dynamic_pointer_cast<SystemExclusiveEvent>(a))
+        if (const auto sy = std::dynamic_pointer_cast<SystemExclusiveEvent>(a))
         {
             return *sy == *std::dynamic_pointer_cast<SystemExclusiveEvent>(b);
         }
@@ -153,39 +153,39 @@ namespace mpc::sequencer
             return nullptr;
         }
 
-        if (auto n = std::dynamic_pointer_cast<NoteOnEvent>(e))
+        if (const auto n = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
             return std::make_shared<NoteOnEvent>(*n);
         }
-        if (auto n = std::dynamic_pointer_cast<NoteOffEvent>(e))
+        if (const auto n = std::dynamic_pointer_cast<NoteOffEvent>(e))
         {
             return std::make_shared<NoteOffEvent>(*n);
         }
-        if (auto m = std::dynamic_pointer_cast<MixerEvent>(e))
+        if (const auto m = std::dynamic_pointer_cast<MixerEvent>(e))
         {
             return std::make_shared<MixerEvent>(*m);
         }
-        if (auto c = std::dynamic_pointer_cast<ControlChangeEvent>(e))
+        if (const auto c = std::dynamic_pointer_cast<ControlChangeEvent>(e))
         {
             return std::make_shared<ControlChangeEvent>(*c);
         }
-        if (auto p = std::dynamic_pointer_cast<PitchBendEvent>(e))
+        if (const auto p = std::dynamic_pointer_cast<PitchBendEvent>(e))
         {
             return std::make_shared<PitchBendEvent>(*p);
         }
-        if (auto pp = std::dynamic_pointer_cast<PolyPressureEvent>(e))
+        if (const auto pp = std::dynamic_pointer_cast<PolyPressureEvent>(e))
         {
             return std::make_shared<PolyPressureEvent>(*pp);
         }
-        if (auto ch = std::dynamic_pointer_cast<ChannelPressureEvent>(e))
+        if (const auto ch = std::dynamic_pointer_cast<ChannelPressureEvent>(e))
         {
             return std::make_shared<ChannelPressureEvent>(*ch);
         }
-        if (auto pr = std::dynamic_pointer_cast<ProgramChangeEvent>(e))
+        if (const auto pr = std::dynamic_pointer_cast<ProgramChangeEvent>(e))
         {
             return std::make_shared<ProgramChangeEvent>(*pr);
         }
-        if (auto sx = std::dynamic_pointer_cast<SystemExclusiveEvent>(e))
+        if (const auto sx = std::dynamic_pointer_cast<SystemExclusiveEvent>(e))
         {
             return std::make_shared<SystemExclusiveEvent>(*sx);
         }

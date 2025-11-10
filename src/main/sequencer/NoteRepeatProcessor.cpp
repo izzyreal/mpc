@@ -188,7 +188,7 @@ void NoteRepeatProcessor::process(
             {
                 if (drumBus)
                 {
-                    auto ctx =
+                    const auto ctx =
                         DrumNoteEventContextBuilder::buildDrumNoteOffContext(
                             0, drumBus, voices, note, tickPosition);
 
