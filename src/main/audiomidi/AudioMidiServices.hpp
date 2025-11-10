@@ -95,8 +95,8 @@ namespace mpc::audiomidi
 
     private:
         Mpc &mpc;
-        std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
-        std::atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
+        std::atomic<bool> bouncing{false};
+        std::atomic<bool> recordingSound{false};
         std::shared_ptr<AudioProcess> monitorInputAdapter;
 
     public:

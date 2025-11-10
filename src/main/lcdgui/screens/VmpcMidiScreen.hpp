@@ -27,7 +27,7 @@ namespace mpc::lcdgui::screens
         std::shared_ptr<nvram::MidiControlPreset> getActivePreset();
         bool hasMappingChanged();
 
-        std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
+        std::atomic_bool shouldSwitch{false};
         std::shared_ptr<nvram::MidiControlPreset> switchToPreset =
             std::make_shared<nvram::MidiControlPreset>();
         std::shared_ptr<nvram::MidiControlPreset> activePreset =

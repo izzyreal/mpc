@@ -63,8 +63,8 @@ namespace mpc::audiomidi
         fs::path destinationDirectory;
         mpc::engine::audio::core::AudioFormat *outputFileFormat = nullptr;
         std::vector<std::ofstream> fileStreams;
-        std::atomic<bool> writing = ATOMIC_VAR_INIT(false);
-        std::atomic<bool> preparedToWrite = ATOMIC_VAR_INIT(false);
+        std::atomic<bool> writing{false};
+        std::atomic<bool> preparedToWrite{false};
         int writtenByteCount = 0;
         int lengthInFrames = 0;
         int lengthInBytes = 0;
