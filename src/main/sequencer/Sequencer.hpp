@@ -41,6 +41,7 @@ namespace mpc::audiomidi
 namespace mpc::sequencer
 {
     class SequencerStateManager;
+    class Transport;
     class Sequence;
     class Bus;
     class DrumBus;
@@ -95,8 +96,6 @@ namespace mpc::sequencer
         static uint32_t quarterNotesToTicks(const double quarterNotes);
         static double ticksToQuarterNotes(const uint32_t ticks);
 
-        int countInStartPos = -1;
-        int countInEndPos = -1;
         void playToTick(int targetTick) const;
         int getActiveSequenceIndex() const;
         std::shared_ptr<Track> getActiveTrack();
@@ -130,15 +129,73 @@ namespace mpc::sequencer
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;
 
-        std::shared_ptr<SequencerStateManager> stateManager;
-        std::vector<std::shared_ptr<Bus>> buses;
+
+        /* scheduled for removal */
         bool playing = false;
+        bool overdubbing = false;
+        bool recording = false;
+        bool countingIn = false;
+        bool endOfSong = false;
+        bool punchEnabled = false;
+        int autoPunchMode = 0;
+        int punchInTime = 0;
+        int punchOutTime = 0;
+        int countInStartPos = -1;
+        int countInEndPos = -1;
+        int playedStepRepetitions = 0; // Part of SONG mode
+                                       
+    public:
+        void playFromStart();
+        void play();
+        void rec();
+        void recFromStart();
+        void overdub();
+        void switchRecordToOverdub();
+        void overdubFromStart();
+        void stop();
+        void stop(const StopMode);
+        bool isCountingIn() const;
+        void setCountingIn(bool b);
+        int getTickPosition() const;
+        void setRecording(bool b);
+        void setOverdubbing(bool b);
+        void playMetronomeTrack();
+        void stopMetronomeTrack();
+        bool isRecordingOrOverdubbing() const;
+        bool isRecording() const;
+        bool isPlaying() const;
+        void setEndOfSong(bool b);
+        // Applies wrap-around within the active or playing sequence
+        void move(const double positionQuarterNotes);
+
+        // Applies wrap-around within the current song.
+        // If the current screen is not the Song screen, it results in a no-op.
+        void moveWithinSong(const double positionQuarterNotes);
+
+        // Repititions of steps in SONG mode (not step editor)
+        int getPlayedStepRepetitions() const;
+        void incrementPlayedStepRepetitions();
+        void resetPlayedStepRepetitions();
+
+        // Punch property getters and setters
+        bool isPunchEnabled() const;
+        void setPunchEnabled(bool enabled);
+        int getAutoPunchMode() const;
+        void setAutoPunchMode(int mode);
+        int getPunchInTime() const;
+        void setPunchInTime(int time);
+        int getPunchOutTime() const;
+        void setPunchOutTime(int time);
+        /* end of scheduled for removal */
+
+    private:
+        std::shared_ptr<SequencerStateManager> stateManager;
+        std::shared_ptr<Transport> transport;
+        std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;
         bool metronomeOnly = false;
         int activeSequenceIndex = 0;
         int currentlyPlayingSequenceIndex = 0;
-        int playedStepRepetitions = 0; // Part of SONG mode
-        bool endOfSong = false;
 
         std::vector<std::shared_ptr<Sequence>> sequences =
             std::vector<std::shared_ptr<Sequence>>(99);
@@ -159,22 +216,13 @@ namespace mpc::sequencer
         bool soloEnabled = false;
         bool tempoSourceSequenceEnabled = false;
 
-        bool countingIn = false;
         uint64_t lastTap = 0;
         int tapIndex = 0;
 
         std::vector<std::string> defaultTrackNames;
-        bool overdubbing = false;
-        bool recording = false;
         int activeTrackIndex = 0;
         double tempo = 120.0;
         int nextSq = -1;
-
-        // Punch properties
-        bool punchEnabled = false;
-        int autoPunchMode = 0;
-        int punchInTime = 0;
-        int punchOutTime = 0;
 
         std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
         void play(bool fromStart);
@@ -193,6 +241,7 @@ namespace mpc::sequencer
                                         const std::shared_ptr<Track> &dest);
 
         std::shared_ptr<SequencerStateManager> getStateManager();
+        std::shared_ptr<Transport> getTransport();
 
         std::shared_ptr<Sequence> makeNewSequence();
 
@@ -201,8 +250,6 @@ namespace mpc::sequencer
         double getTempo();
         bool isTempoSourceSequenceEnabled() const;
         void setTempoSourceSequence(bool b);
-        bool isRecordingOrOverdubbing() const;
-        bool isRecording() const;
         bool isSoloEnabled() const;
         void setSoloEnabled(bool b);
         std::shared_ptr<Sequence> getSequence(int i);
@@ -218,27 +265,9 @@ namespace mpc::sequencer
         int getActiveTrackIndex() const;
         void trackUp();
         void trackDown();
-        bool isPlaying() const;
-        void setEndOfSong(bool b);
-
-        // Repititions of steps in SONG mode (not step editor)
-        int getPlayedStepRepetitions() const;
-        void incrementPlayedStepRepetitions();
-        void resetPlayedStepRepetitions();
 
     public:
         void undoSeq();
-        void playFromStart();
-        void play();
-        void rec();
-        void recFromStart();
-        void overdub();
-        void switchRecordToOverdub();
-        void overdubFromStart();
-        void stop();
-        void stop(const StopMode);
-        bool isCountingIn() const;
-        void setCountingIn(bool b);
         void setSequence(int i, std::shared_ptr<Sequence> s);
         void purgeAllSequences();
         void purgeSequence(int i);
@@ -270,14 +299,6 @@ namespace mpc::sequencer
         void goToNextStep();
         void tap();
 
-        // Applies wrap-around within the active or playing sequence
-        void move(const double positionQuarterNotes);
-
-        // Applies wrap-around within the current song.
-        // If the current screen is not the Song screen, it results in a no-op.
-        void moveWithinSong(const double positionQuarterNotes);
-
-        int getTickPosition() const;
         std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
         void setActiveTrackIndex(int i);
         int getCurrentlyPlayingSequenceIndex() const;
@@ -300,19 +321,5 @@ namespace mpc::sequencer
         bool isOverdubbing() const;
         double getPlayStartPositionQuarterNotes() const;
 
-        void setRecording(bool b);
-        void setOverdubbing(bool b);
-        void playMetronomeTrack();
-        void stopMetronomeTrack();
-
-        // Punch property getters and setters
-        bool isPunchEnabled() const;
-        void setPunchEnabled(bool enabled);
-        int getAutoPunchMode() const;
-        void setAutoPunchMode(int mode);
-        int getPunchInTime() const;
-        void setPunchInTime(int time);
-        int getPunchOutTime() const;
-        void setPunchOutTime(int time);
     };
 } // namespace mpc::sequencer

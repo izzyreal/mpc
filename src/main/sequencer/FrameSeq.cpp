@@ -19,6 +19,7 @@
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "MidiClockOutput.hpp"
+#include "sequencer/Transport.hpp"
 
 #include <concurrentqueue.h>
 
@@ -249,12 +250,11 @@ void FrameSeq::displayPunchRects() const
 
 void FrameSeq::stopCountingInIfRequired() const
 {
-    if (sequencer->getTickPosition() >= sequencer->countInEndPos)
+    if (sequencer->getTickPosition() >= sequencer->getTransport()->getCountInEndPos())
     {
-        move(sequencer->countInStartPos);
-        sequencer->setCountingIn(false);
-        sequencer->countInStartPos = -1;
-        sequencer->countInEndPos = -1;
+        move(sequencer->getTransport()->getCountInStartPos());
+        sequencer->getTransport()->setCountingIn(false);
+        sequencer->getTransport()->resetCountInPositions();
     }
 }
 

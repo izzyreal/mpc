@@ -1,8 +1,18 @@
 #include "Sequencer.hpp"
 
-#include "sequencer/SequencerStateManager.hpp"
-
 #include "MpcSpecs.hpp"
+
+#include "sequencer/SequencerStateManager.hpp"
+#include "sequencer/Transport.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/TempoChangeEvent.hpp"
+#include "sequencer/FrameSeq.hpp"
+#include "sequencer/Track.hpp"
+#include "sequencer/Song.hpp"
+#include "sequencer/Step.hpp"
+
+#include "sampler/Sampler.hpp"
 
 #include "controller/ClientEventController.hpp"
 #include "engine/Voice.hpp"
@@ -18,15 +28,6 @@
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
-
-#include "sampler/Sampler.hpp"
-#include "sequencer/Bus.hpp"
-#include "sequencer/Sequence.hpp"
-#include "sequencer/TempoChangeEvent.hpp"
-#include "sequencer/FrameSeq.hpp"
-#include "sequencer/Track.hpp"
-#include "sequencer/Song.hpp"
-#include "sequencer/Step.hpp"
 
 #include "StrUtil.hpp"
 
@@ -91,6 +92,7 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
     stateManager = std::make_shared<SequencerStateManager>();
+    transport = std::make_shared<Transport>(*this);
 
     frameSequencer = std::make_shared<FrameSeq>(
         eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
@@ -107,6 +109,11 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager()
 {
     return stateManager;
+}
+
+std::shared_ptr<Transport> Sequencer::getTransport()
+{
+    return transport;
 }
 
 void Sequencer::init()
