@@ -250,7 +250,8 @@ void FrameSeq::displayPunchRects() const
 
 void FrameSeq::stopCountingInIfRequired() const
 {
-    if (sequencer->getTickPosition() >= sequencer->getTransport()->getCountInEndPos())
+    if (sequencer->getTickPosition() >=
+        sequencer->getTransport()->getCountInEndPos())
     {
         move(sequencer->getTransport()->getCountInStartPos());
         sequencer->getTransport()->setCountingIn(false);

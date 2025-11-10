@@ -1,6 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <functional>
+
+namespace mpc::lcdgui
+{
+    class Screens;
+}
 
 namespace mpc::sequencer
 {
@@ -15,9 +22,12 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        explicit Transport(Sequencer &owner);
+        explicit Transport(
+            Sequencer &owner,
+            std::function<std::shared_ptr<lcdgui::Screens>()> getScreens);
 
         void play();
+        void play(bool fromStart);
         void playFromStart();
         void rec();
         void recFromStart();
@@ -28,51 +38,80 @@ namespace mpc::sequencer
         void stop(const StopMode);
         void setRecording(bool b);
         void setOverdubbing(bool b);
-        bool isCountingIn() const;
-        void setCountingIn(bool b);
-        void move(double positionQuarterNotes);
-        void moveWithinSong(double positionQuarterNotes);
-        void setPosition(double positionQuarterNotes);
-        void setPositionWithinSong(double positionQuarterNotes);
+        void setPosition(double positionQuarterNotes,
+                         bool shouldSyncTrackEventIndicesToNewPosition,
+                         bool shouldSetPlayStartPosition);
+        void
+        setPositionWithinSong(double positionQuarterNotes,
+                              bool shouldSyncTrackEventIndicesToNewPosition);
         void bumpPositionByTicks(uint8_t ticks);
-        void resetCountInPositions();
-
         bool isPlaying() const;
         bool isRecording() const;
         bool isOverdubbing() const;
         bool isRecordingOrOverdubbing() const;
+
+        void setTempo(double newTempo);
+        double getTempo();
+        bool isTempoSourceSequenceEnabled() const;
+        void setTempoSourceSequence(bool b);
 
         void setAutoPunchMode(int mode);
         void setPunchEnabled(bool enabled);
         void setPunchInTime(int time);
         void setPunchOutTime(int time);
 
+        bool isMetronomeOnlyEnabled() const;
         void playMetronomeTrack();
         void stopMetronomeTrack();
 
         int getTickPosition() const;
         double getPlayStartPositionQuarterNotes() const;
+        int getCurrentBarIndex();
+        int getCurrentBeatIndex();
+        int getCurrentClockNumber();
+        void setBar(int i);
+        void setBeat(int i);
+        void setClock(int i);
+
+        bool isCountEnabled() const;
+        void setCountEnabled(bool b);
+        bool isCountingIn() const;
+        void setCountingIn(bool b);
+        void resetCountInPositions();
+        int64_t getCountInStartPos() const;
+        int64_t getCountInEndPos() const;
+
         bool isPunchEnabled() const;
         int getAutoPunchMode() const;
         int getPunchInTime() const;
         int getPunchOutTime() const;
-        int64_t getCountInStartPos() const;
-        int64_t getCountInEndPos() const;
+
+        void setEndOfSong(bool);
+        int getPlayedStepRepetitions() const;
+        void incrementPlayedStepRepetitions();
+        void resetPlayedStepRepetitions();
 
     private:
         Sequencer &sequencer;
+
+        std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
 
         bool playing = false;
         bool recording = false;
         bool overdubbing = false;
         bool countingIn = false;
+        bool metronomeOnlyEnabled = false;
         bool endOfSong = false;
         bool punchEnabled = false;
+        bool countEnabled = true;
         int autoPunchMode = 0;
         int punchInTime = 0;
         int punchOutTime = 0;
         int countInStartPos = -1;
         int countInEndPos = -1;
         int playedStepRepetitions = 0;
+
+        double tempo = 120.0;
+        bool tempoSourceSequenceEnabled = true;
     };
 } // namespace mpc::sequencer

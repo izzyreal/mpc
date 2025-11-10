@@ -150,4 +150,12 @@ namespace mpc::lcdgui::screengroups
                std::dynamic_pointer_cast<MonoToStereoScreen>(s) ||
                std::dynamic_pointer_cast<ResampleScreen>(s);
     }
+
+    bool isSongScreen(const std::shared_ptr<ScreenComponent> &s)
+    {
+        return std::dynamic_pointer_cast<SongScreen>(s) ||
+               std::dynamic_pointer_cast<SongWindow>(s) ||
+               std::dynamic_pointer_cast<LoopSongScreen>(s) ||
+               std::dynamic_pointer_cast<IgnoreTempoChangeScreen>(s);
+    }
 } // namespace mpc::lcdgui::screengroups

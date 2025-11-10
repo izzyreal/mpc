@@ -148,13 +148,7 @@ void Sequencer::init()
     recordingModeMulti = userScreen->recordingModeMulti;
 
     soloEnabled = false;
-    tempoSourceSequenceEnabled = true;
-    countEnabled = true;
-    recording = false;
 
-    tempo = userScreen->tempo;
-
-    metronomeOnly = false;
     activeSequenceIndex = 0;
     currentlyPlayingSequenceIndex = 0;
     stateManager->enqueue(SetSongModeEnabled{false});
@@ -199,10 +193,10 @@ void Sequencer::playToTick(const int targetTick) const
     {
         if (i == 1)
         {
-            if (!secondSequenceEnabled || metronomeOnly ||
+            if (!secondSequenceEnabled || transport->isMetronomeOnlyEnabled() ||
                 secondSequenceScreen->sq ==
-                    seqIndex) // Real 2KXL would play all events twice for the
-                              // last clause
+                    seqIndex) // Real 2KXL would play all events twice (i.e.
+                              // double as loud as normal) for the last clause
             {
                 break;
             }
@@ -215,7 +209,7 @@ void Sequencer::playToTick(const int targetTick) const
             }
         }
 
-        if (!metronomeOnly)
+        if (!transport->isMetronomeOnlyEnabled())
         {
             for (auto &track : seq->getTracks())
             {
@@ -233,105 +227,6 @@ void Sequencer::playToTick(const int targetTick) const
     }
 }
 
-void Sequencer::setTempo(double newTempo)
-{
-    if (newTempo < 30.0)
-    {
-        newTempo = 30.0;
-    }
-    else if (newTempo > 300.0)
-    {
-        newTempo = 300.0;
-    }
-
-    auto s = getActiveSequence();
-    auto tce = getCurrentTempoChangeEvent();
-
-    if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
-    {
-        if (tce)
-        {
-            auto candidate = newTempo / (tce->getRatio() * 0.001);
-
-            if (candidate < 30.0)
-            {
-                candidate = 30.0;
-            }
-            else if (candidate > 300.0)
-            {
-                candidate = 300.0;
-            }
-
-            tempo = candidate;
-        }
-        else
-        {
-            tempo = newTempo;
-        }
-        return;
-    }
-
-    if (tce && tce->getTick() == 0 && s->isTempoChangeOn())
-    {
-        s->setInitialTempo(newTempo / (tce->getRatio() * 0.001));
-    }
-    else if (s->isTempoChangeOn())
-    {
-        auto initialTempo = s->getInitialTempo();
-        auto ratio = newTempo / initialTempo;
-        tce->setRatio(static_cast<int>(round(ratio * 1000.0)));
-    }
-    else
-    {
-        s->setInitialTempo(newTempo);
-    }
-}
-
-double Sequencer::getTempo()
-{
-    if (!isPlaying() && !getActiveSequence()->isUsed())
-    {
-        return tempo;
-    }
-
-    auto seq = getActiveSequence();
-
-    if (layeredScreen->getCurrentScreenName() == "song")
-    {
-        if (!seq->isUsed())
-        {
-            return 120.0;
-        }
-    }
-
-    auto tce = getCurrentTempoChangeEvent();
-
-    if (tempoSourceSequenceEnabled)
-    {
-        auto ignoreTempoChangeScreen =
-            getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
-
-        if (seq->isTempoChangeOn() ||
-            (stateManager->getSnapshot().isSongModeEnabled() &&
-             !ignoreTempoChangeScreen->getIgnore()))
-        {
-            if (tce)
-            {
-                return tce->getTempo();
-            }
-        }
-
-        return getActiveSequence()->getInitialTempo();
-    }
-
-    if (seq->isTempoChangeOn() && tce)
-    {
-        return tempo * tce->getRatio() * 0.001;
-    }
-
-    return tempo;
-}
-
 std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
     auto index = -1;
@@ -344,7 +239,7 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 
     for (auto &tce : s->getTempoChangeEvents())
     {
-        if (getTickPosition() >= tce->getTick())
+        if (transport->getTickPosition() >= tce->getTick())
         {
             index++;
         }
@@ -360,26 +255,6 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
     }
 
     return s->getTempoChangeEvents()[index];
-}
-
-bool Sequencer::isTempoSourceSequenceEnabled() const
-{
-    return tempoSourceSequenceEnabled;
-}
-
-void Sequencer::setTempoSourceSequence(const bool b)
-{
-    tempoSourceSequenceEnabled = b;
-}
-
-bool Sequencer::isRecordingOrOverdubbing() const
-{
-    return recording || overdubbing;
-}
-
-bool Sequencer::isRecording() const
-{
-    return recording;
 }
 
 bool Sequencer::isSoloEnabled() const
@@ -440,20 +315,10 @@ void Sequencer::setActiveSequenceIndex(int i)
 
     activeSequenceIndex = i;
 
-    if (!isPlaying())
+    if (!transport->isPlaying())
     {
         stateManager->enqueue(SetPositionQuarterNotes{0.0});
     }
-}
-
-bool Sequencer::isCountEnabled() const
-{
-    return countEnabled;
-}
-
-void Sequencer::setCountEnabled(const bool b)
-{
-    countEnabled = b;
 }
 
 void Sequencer::setTimeDisplayStyle(const int i)
@@ -499,138 +364,9 @@ void Sequencer::trackDown()
     activeTrackIndex--;
 }
 
-bool Sequencer::isPlaying() const
-{
-    if (!isAudioServerRunning())
-    {
-        return false;
-    }
-
-    return !metronomeOnly && frameSequencer->isRunning();
-}
-
-void Sequencer::play(const bool fromStart)
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    endOfSong = false;
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    auto currentSong = songs[songScreen->getActiveSongIndex()];
-
-    const auto snapshot = stateManager->getSnapshot();
-    const bool songMode = snapshot.isSongModeEnabled();
-
-    if (songMode)
-    {
-        if (!currentSong->isUsed())
-        {
-            return;
-        }
-
-        if (fromStart)
-        {
-            songScreen->setOffset(-1);
-        }
-
-        if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
-        {
-            return;
-        }
-
-        int step = songScreen->getOffset() + 1;
-
-        if (step > currentSong->getStepCount())
-        {
-            step = currentSong->getStepCount() - 1;
-        }
-
-        if (const std::shared_ptr<Step> currentStep =
-                currentSong->getStep(step).lock();
-            !sequences[currentStep->getSequence()]->isUsed())
-        {
-            return;
-        }
-    }
-
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    move(positionQuarterNotes);
-
-    currentlyPlayingSequenceIndex = activeSequenceIndex;
-
-    auto countMetronomeScreen =
-        getScreens()->get<ScreenId::CountMetronomeScreen>();
-    auto countInMode = countMetronomeScreen->getCountInMode();
-
-    if (!countEnabled || countInMode == 0 ||
-        (countInMode == 1 && !isRecordingOrOverdubbing()))
-    {
-        if (fromStart)
-        {
-            move(0);
-        }
-    }
-
-    auto s = getActiveSequence();
-
-    if (countEnabled && !songMode)
-    {
-        if (countInMode == 2 ||
-            (countInMode == 1 && (isRecordingOrOverdubbing())))
-        {
-            if (fromStart)
-            {
-                move(ticksToQuarterNotes(s->getLoopStart()));
-            }
-            else
-            {
-                move(ticksToQuarterNotes(
-                    s->getFirstTickOfBar(getCurrentBarIndex())));
-            }
-
-            countInStartPos = quarterNotesToTicks(positionQuarterNotes);
-            countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
-
-            countingIn = true;
-        }
-    }
-
-    if (!songMode)
-    {
-        if (!s->isUsed())
-        {
-            recording = false;
-            overdubbing = false;
-            return;
-        }
-
-        s->initLoop();
-
-        if (recording || overdubbing)
-        {
-            auto copy = copySequence(s);
-            undoPlaceHolder.swap(copy);
-            undoSeqAvailable = true;
-            hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
-                ->setEnabled(true);
-        }
-    }
-
-    if (isBouncePrepared())
-    {
-        startBouncing();
-    }
-    else
-    {
-        frameSequencer->start();
-    }
-}
-
 void Sequencer::undoSeq()
 {
-    if (isPlaying())
+    if (transport->isPlaying())
     {
         return;
     }
@@ -656,185 +392,6 @@ void Sequencer::undoSeq()
 
     hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
-}
-
-void Sequencer::playFromStart()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    play(true);
-}
-
-void Sequencer::play()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    play(false);
-}
-
-void Sequencer::rec()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    recording = true;
-
-    play(false);
-}
-
-void Sequencer::recFromStart()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    recording = true;
-    play(true);
-}
-
-void Sequencer::overdub()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    overdubbing = true;
-    play(false);
-}
-
-void Sequencer::switchRecordToOverdub()
-{
-    if (!recording)
-    {
-        return;
-    }
-
-    recording = false;
-    overdubbing = true;
-    hardware->getLed(hardware::ComponentId::REC_LED)->setEnabled(false);
-    hardware->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(true);
-}
-
-void Sequencer::overdubFromStart()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    overdubbing = true;
-    play(true);
-}
-
-void Sequencer::stop()
-{
-    stop(StopMode::AT_START_OF_BUFFER);
-}
-
-void Sequencer::stop(const StopMode stopMode)
-{
-    bool bouncing = isBouncing();
-
-    if (!isPlaying() && !bouncing)
-    {
-        const auto snapshot = stateManager->getSnapshot();
-        const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-
-        if (positionQuarterNotes != 0.0)
-        {
-            setBar(0); // real 2kxl doesn't do this
-        }
-
-        return;
-    }
-
-    playedStepRepetitions = 0;
-    stateManager->enqueue(SetSongModeEnabled{false});
-    nextSq = -1;
-
-    auto s1 = getActiveSequence();
-    auto s2 = getCurrentlyPlayingSequence();
-    auto pos = getTickPosition();
-
-    if (pos > s1->getLastTick())
-    {
-        pos = s1->getLastTick();
-    }
-
-    // const int frameOffset = stopMode == AT_START_OF_BUFFER
-    //                             ? 0
-    //                             : frameSequencer->getEventFrameOffset();
-
-    frameSequencer->stop();
-
-    recording = false;
-    overdubbing = false;
-
-    if (countingIn)
-    {
-        pos = countInStartPos;
-        countInStartPos = -1;
-        countInEndPos = -1;
-        countingIn = false;
-    }
-
-    move(ticksToQuarterNotes(pos));
-
-    if (!bouncing)
-    {
-        // mpc.getSampler()->stopAllVoices(frameOffset);
-    }
-
-    for (int i = 0; i < 16; i++)
-    {
-        auto pad = hardware->getPad(i);
-        pad->release();
-    }
-
-    auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-
-    if (endOfSong)
-    {
-        songScreen->setOffset(songScreen->getOffset() + 1);
-    }
-
-    auto vmpcDirectToDiskRecorderScreen =
-        getScreens()->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-
-    if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
-    {
-        stopBouncing();
-    }
-
-    hardware->getLed(hardware::ComponentId::PLAY_LED)->setEnabled(false);
-    hardware->getLed(hardware::ComponentId::REC_LED)->setEnabled(false);
-    hardware->getLed(hardware::ComponentId::OVERDUB_LED)->setEnabled(false);
-}
-
-bool Sequencer::isCountingIn() const
-{
-    return countingIn;
-}
-
-void Sequencer::setCountingIn(const bool b)
-{
-    countingIn = b;
-
-    if (!countingIn)
-    {
-        countInStartPos = -1;
-        countInEndPos = -1;
-    }
 }
 
 void Sequencer::setSequence(const int i, std::shared_ptr<Sequence> s)
@@ -865,7 +422,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         },
         [&]
         {
-            return getTickPosition();
+            return transport->getTickPosition();
         },
         getScreens,
         [&]
@@ -878,7 +435,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         },
         [&]
         {
-            return getAutoPunchMode();
+            return transport->getAutoPunchMode();
         },
         [&](const int busIndex)
         {
@@ -905,23 +462,23 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         },
         [&]
         {
-            return isRecording();
+            return transport->isRecording();
         },
         [&]
         {
-            return isOverdubbing();
+            return transport->isOverdubbing();
         },
         [&]
         {
-            return isPunchEnabled();
+            return transport->isPunchEnabled();
         },
         [&]
         {
-            return getPunchInTime();
+            return transport->getPunchInTime();
         },
         [&]
         {
-            return getPunchOutTime();
+            return transport->getPunchOutTime();
         },
         [&]
         {
@@ -929,7 +486,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         },
         [&]
         {
-            return getCurrentBarIndex();
+            return transport->getCurrentBarIndex();
         });
 }
 
@@ -1108,290 +665,6 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
     defaultTrackNames[i] = s;
 }
 
-int Sequencer::getCurrentBarIndex()
-{
-    auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
-    auto pos = isCountingIn()
-                   ? quarterNotesToTicks(getPlayStartPositionQuarterNotes())
-                   : getTickPosition();
-
-    if (pos == s->getLastTick())
-    {
-        return s->getLastBarIndex() + 1;
-    }
-
-    auto &barLengths = s->getBarLengthsInTicks();
-
-    int tickCounter = 0;
-
-    for (int i = 0; i < 999; i++)
-    {
-        if (i > s->getLastBarIndex())
-        {
-            return 0; // Should not happen
-        }
-
-        tickCounter += barLengths[i];
-
-        if (tickCounter > pos)
-        {
-            return i;
-        }
-    }
-
-    return 0;
-}
-
-int Sequencer::getCurrentBeatIndex()
-{
-    auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
-    auto pos = isCountingIn()
-                   ? quarterNotesToTicks(getPlayStartPositionQuarterNotes())
-                   : getTickPosition();
-
-    if (pos == s->getLastTick())
-    {
-        return 0;
-    }
-
-    auto index = pos;
-
-    if (isPlaying() && !countingIn)
-    {
-        index = getTickPosition();
-
-        if (index > s->getLastTick())
-        {
-            index %= s->getLastTick();
-        }
-    }
-
-    auto ts = s->getTimeSignature();
-    auto den = ts.getDenominator();
-    auto denTicks = 96 * (4.0 / den);
-
-    if (index == 0)
-    {
-        return 0;
-    }
-
-    int barStartPos = 0;
-    auto barCounter = 0;
-
-    const auto currentBarIndex = getCurrentBarIndex();
-
-    for (auto &l : s->getBarLengthsInTicks())
-    {
-        if (barCounter == currentBarIndex)
-        {
-            break;
-        }
-
-        barStartPos += l;
-        barCounter++;
-    }
-
-    const auto beatIndex =
-        static_cast<int>(floor((index - barStartPos) / denTicks));
-    return beatIndex;
-}
-
-int Sequencer::getCurrentClockNumber()
-{
-    auto sequence =
-        isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
-
-    auto clock = isCountingIn()
-                     ? quarterNotesToTicks(getPlayStartPositionQuarterNotes())
-                     : getTickPosition();
-
-    if (clock == sequence->getLastTick())
-    {
-        return 0;
-    }
-
-    if (isPlaying() && !countingIn)
-    {
-        if (clock > sequence->getLastTick())
-        {
-            clock %= sequence->getLastTick();
-        }
-    }
-
-    auto ts = sequence->getTimeSignature();
-    auto den = ts.getDenominator();
-    auto denTicks = 96 * (4.0 / den);
-
-    if (clock == 0)
-    {
-        return 0;
-    }
-
-    auto barCounter = 0;
-    auto currentBarIndex = getCurrentBarIndex();
-
-    for (auto &l : sequence->getBarLengthsInTicks())
-    {
-        if (barCounter == currentBarIndex)
-        {
-            break;
-        }
-
-        clock -= l;
-        barCounter++;
-    }
-
-    auto currentBeatIndex = getCurrentBeatIndex();
-
-    for (int i = 0; i < currentBeatIndex; i++)
-    {
-        clock -= denTicks;
-    }
-
-    return clock;
-}
-
-void Sequencer::setBar(int i)
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    if (i < 0)
-    {
-        move(0);
-        return;
-    }
-
-    auto s = getActiveSequence();
-
-    if (i > s->getLastBarIndex() + 1)
-    {
-        i = s->getLastBarIndex() + 1;
-    }
-
-    if (s->getLastBarIndex() == 998 && i > 998)
-    {
-        i = 998;
-    }
-
-    auto ts = s->getTimeSignature();
-    auto den = ts.getDenominator();
-    auto denTicks = static_cast<int>(96 * (4.0 / den));
-
-    if (i != s->getLastBarIndex() + 1)
-    {
-        ts.setNumerator(s->getNumerator(i));
-        ts.setDenominator(s->getDenominator(i));
-    }
-
-    auto &barLengths = s->getBarLengthsInTicks();
-    auto currentClock = getCurrentClockNumber();
-    auto currentBeat = getCurrentBeatIndex();
-    int pos = 0;
-    auto barCounter = 0;
-
-    for (auto &l : barLengths)
-    {
-        if (barCounter == i)
-        {
-            break;
-        }
-
-        pos += l;
-        barCounter++;
-    }
-
-    pos += currentBeat * denTicks;
-    pos += currentClock;
-
-    if (pos > s->getLastTick())
-    {
-        pos = s->getLastTick();
-    }
-
-    move(ticksToQuarterNotes(pos));
-
-    setBeat(0);
-    setClock(0);
-}
-
-void Sequencer::setBeat(int i)
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    if (i < 0)
-    {
-        i = 0;
-    }
-
-    auto s = getActiveSequence();
-    auto pos = getTickPosition();
-
-    if (pos == s->getLastTick())
-    {
-        return;
-    }
-
-    auto ts = s->getTimeSignature();
-    auto num = ts.getNumerator();
-
-    if (i >= num)
-    {
-        i = num - 1;
-    }
-
-    const auto difference = i - getCurrentBeatIndex();
-
-    const auto denTicks = 96 * (4.0 / ts.getDenominator());
-    pos += difference * denTicks;
-    move(ticksToQuarterNotes(pos));
-}
-
-void Sequencer::setClock(int i)
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    if (i < 0)
-    {
-        i = 0;
-    }
-
-    auto s = getActiveSequence();
-    int pos = getTickPosition();
-
-    if (pos == s->getLastTick())
-    {
-        return;
-    }
-
-    getCurrentClockNumber();
-    auto den = s->getTimeSignature().getDenominator();
-    auto denTicks = 96 * (4.0 / den);
-
-    if (i > denTicks - 1)
-    {
-        i = denTicks - 1;
-    }
-
-    const int difference = i - getCurrentClockNumber();
-
-    pos += difference;
-    move(ticksToQuarterNotes(pos));
-}
-
-int Sequencer::getLoopEnd()
-{
-    return getActiveSequence()->getLoopEnd();
-}
-
 std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
     auto songScreen = getScreens()->get<ScreenId::SongScreen>();
@@ -1457,14 +730,18 @@ void Sequencer::goToPreviousEvent()
 
     for (auto &e : events)
     {
-        if (e->getTick() < getTickPosition())
+        if (e->getTick() < transport->getTickPosition())
         {
             newPos = e->getTick();
             break;
         }
     }
 
-    move(ticksToQuarterNotes(newPos));
+    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
+    constexpr bool shouldSetPlayStartPosition = true;
+    transport->setPosition(ticksToQuarterNotes(newPos),
+                           shouldSyncTrackEventIndicesToNewPosition,
+                           shouldSetPlayStartPosition);
 }
 
 void Sequencer::goToNextEvent()
@@ -1476,14 +753,18 @@ void Sequencer::goToNextEvent()
 
     for (auto &e : t->getEvents())
     {
-        if (e->getTick() > getTickPosition())
+        if (e->getTick() > transport->getTickPosition())
         {
             newPos = e->getTick();
             break;
         }
     }
 
-    move(ticksToQuarterNotes(newPos));
+    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
+    constexpr bool shouldSetPlayStartPosition = true;
+    transport->setPosition(ticksToQuarterNotes(newPos),
+                           shouldSyncTrackEventIndicesToNewPosition,
+                           shouldSetPlayStartPosition);
 }
 
 void Sequencer::goToPreviousStep()
@@ -1492,7 +773,7 @@ void Sequencer::goToPreviousStep()
         getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
-    const auto pos = getTickPosition();
+    const auto pos = transport->getTickPosition();
     const auto stepCount =
         static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) +
         1;
@@ -1522,7 +803,11 @@ void Sequencer::goToPreviousStep()
         prevStepIndex = 0;
     }
 
-    move(ticksToQuarterNotes(prevStepIndex * stepSize));
+    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
+    constexpr bool shouldSetPlayStartPosition = true;
+    transport->setPosition(ticksToQuarterNotes(prevStepIndex * stepSize),
+                           shouldSyncTrackEventIndicesToNewPosition,
+                           shouldSetPlayStartPosition);
 }
 
 void Sequencer::goToNextStep()
@@ -1531,7 +816,7 @@ void Sequencer::goToNextStep()
         getScreens()->get<ScreenId::TimingCorrectScreen>();
 
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
-    const auto pos = getTickPosition();
+    const auto pos = transport->getTickPosition();
 
     std::vector<int> stepGrid(
         ceil(getActiveSequence()->getLastTick() / stepSize));
@@ -1560,12 +845,16 @@ void Sequencer::goToNextStep()
         nextStepIndex = stepGrid.size() - 1;
     }
 
-    move(ticksToQuarterNotes(nextStepIndex * stepSize));
+    constexpr bool shouldSyncTrackEventIndicesToNewPosition = true;
+    constexpr bool shouldSetPlayStartPosition = true;
+    transport->setPosition(ticksToQuarterNotes(nextStepIndex * stepSize),
+                           shouldSyncTrackEventIndicesToNewPosition,
+                           shouldSetPlayStartPosition);
 }
 
 void Sequencer::tap()
 {
-    if (isPlaying())
+    if (transport->isPlaying())
     {
         return;
     }
@@ -1624,274 +913,7 @@ void Sequencer::tap()
 
     auto newTempo = 60000.0 / (accum / usedTapsCounter);
     newTempo = floor(newTempo * 10) / 10;
-    setTempo(newTempo);
-}
-
-void Sequencer::bumpPositionByTicks(const uint8_t tickCount)
-{
-    stateManager->enqueue(BumpPositionByTicks{tickCount});
-}
-
-void Sequencer::setPosition(const double positionQuarterNotesToUse)
-{
-    auto wrappedNewPosition = positionQuarterNotesToUse;
-
-    const auto songSequenceIndex = getSongSequenceIndex();
-    const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
-
-    if (songMode && songSequenceIndex == -1)
-    {
-        return;
-    }
-
-    const auto sequence = isPlaying() ? getCurrentlyPlayingSequence()
-                                      : (songMode ? sequences[songSequenceIndex]
-                                                  : getActiveSequence());
-
-    const auto seqLengthQuarterNotes =
-        ticksToQuarterNotes(sequence->getLastTick());
-
-    if (wrappedNewPosition < 0 || wrappedNewPosition > seqLengthQuarterNotes)
-    {
-        wrappedNewPosition = fmod(wrappedNewPosition, seqLengthQuarterNotes);
-
-        while (wrappedNewPosition < 0)
-        {
-            wrappedNewPosition += seqLengthQuarterNotes;
-        }
-    }
-
-    stateManager->enqueue(SetPositionQuarterNotes{wrappedNewPosition});
-}
-
-void Sequencer::setPositionWithinSong(const double positionQuarterNotesToUse)
-{
-    if (layeredScreen->getCurrentScreenName() != "song")
-    {
-        return;
-    }
-
-    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto song = songs[songScreen->getActiveSongIndex()];
-
-    uint32_t stepStartTick;
-    uint32_t stepEndTick = 0;
-    uint64_t songEndTick = 0;
-
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        stepStartTick = stepEndTick;
-        const auto step = song->getStep(stepIndex);
-        const auto sequence = getSequence(step.lock()->getSequence());
-
-        if (sequence->isUsed())
-        {
-            stepEndTick = stepStartTick +
-                          (sequence->getLastTick() * step.lock()->getRepeats());
-        }
-
-        songEndTick = stepEndTick;
-    }
-
-    const double songLengthQuarterNotes = ticksToQuarterNotes(songEndTick);
-
-    auto wrappedNewPosition = positionQuarterNotesToUse;
-
-    if (wrappedNewPosition < 0 || wrappedNewPosition >= songLengthQuarterNotes)
-    {
-        wrappedNewPosition = fmod(wrappedNewPosition, songLengthQuarterNotes);
-
-        while (wrappedNewPosition < 0)
-        {
-            wrappedNewPosition += songLengthQuarterNotes;
-        }
-    }
-
-    stepEndTick = 0;
-
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        stepStartTick = stepEndTick;
-
-        const auto step = song->getStep(stepIndex);
-        const auto sequence = getSequence(step.lock()->getSequence());
-
-        if (sequence->isUsed())
-        {
-            stepEndTick = stepStartTick +
-                          (sequence->getLastTick() * step.lock()->getRepeats());
-        }
-
-        const auto stepStartPositionQuarterNotes =
-            ticksToQuarterNotes(stepStartTick);
-        const auto stepEndPositionQuarterNotes =
-            ticksToQuarterNotes(stepEndTick);
-
-        if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
-            wrappedNewPosition < stepEndPositionQuarterNotes)
-        {
-            songScreen->setOffset(stepIndex - 1);
-
-            const auto offsetWithinStepQuarterNotes =
-                wrappedNewPosition - stepStartPositionQuarterNotes;
-
-            const double finalPosQuarterNotes =
-                fmod(offsetWithinStepQuarterNotes,
-                     ticksToQuarterNotes(sequence->getLastTick()));
-
-            if (finalPosQuarterNotes ==
-                stateManager->getSnapshot().getPositionQuarterNotes())
-            {
-                return;
-            }
-
-            stateManager->enqueue(
-                SetPositionQuarterNotes{finalPosQuarterNotes});
-            stateManager->enqueue(
-                SetPlayStartPositionQuarterNotes{finalPosQuarterNotes});
-            break;
-        }
-    }
-}
-
-void Sequencer::moveWithinSong(const double positionQuarterNotesToUse)
-{
-    if (layeredScreen->getCurrentScreenName() != "song")
-    {
-        return;
-    }
-
-    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto song = songs[songScreen->getActiveSongIndex()];
-
-    uint32_t stepStartTick;
-    uint32_t stepEndTick = 0;
-    uint64_t songEndTick = 0;
-
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        stepStartTick = stepEndTick;
-        const auto step = song->getStep(stepIndex);
-        const auto sequence = getSequence(step.lock()->getSequence());
-
-        if (sequence->isUsed())
-        {
-            stepEndTick = stepStartTick +
-                          (sequence->getLastTick() * step.lock()->getRepeats());
-        }
-
-        songEndTick = stepEndTick;
-    }
-
-    const double songLengthQuarterNotes = ticksToQuarterNotes(songEndTick);
-
-    auto wrappedNewPosition = positionQuarterNotesToUse;
-
-    if (wrappedNewPosition < 0 || wrappedNewPosition >= songLengthQuarterNotes)
-    {
-        wrappedNewPosition = fmod(wrappedNewPosition, songLengthQuarterNotes);
-
-        while (wrappedNewPosition < 0)
-        {
-            wrappedNewPosition += songLengthQuarterNotes;
-        }
-    }
-
-    stepEndTick = 0;
-
-    for (uint8_t stepIndex = 0; stepIndex < song->getStepCount(); stepIndex++)
-    {
-        stepStartTick = stepEndTick;
-
-        const auto step = song->getStep(stepIndex);
-        const auto sequence = getSequence(step.lock()->getSequence());
-
-        if (sequence->isUsed())
-        {
-            stepEndTick = stepStartTick +
-                          (sequence->getLastTick() * step.lock()->getRepeats());
-        }
-
-        const auto stepStartPositionQuarterNotes =
-            ticksToQuarterNotes(stepStartTick);
-        const auto stepEndPositionQuarterNotes =
-            ticksToQuarterNotes(stepEndTick);
-
-        if (wrappedNewPosition >= stepStartPositionQuarterNotes &&
-            wrappedNewPosition < stepEndPositionQuarterNotes)
-        {
-            songScreen->setOffset(stepIndex - 1);
-
-            const auto offsetWithinStepQuarterNotes =
-                wrappedNewPosition - stepStartPositionQuarterNotes;
-            const auto offsetWithinStepTicks =
-                quarterNotesToTicks(offsetWithinStepQuarterNotes);
-
-            playedStepRepetitions =
-                std::floor(offsetWithinStepTicks /
-                           static_cast<float>(sequence->getLastTick()));
-            sequence->resetTrackEventIndices(offsetWithinStepTicks %
-                                             sequence->getLastTick());
-
-            const double finalPosQuarterNotes =
-                fmod(offsetWithinStepQuarterNotes,
-                     ticksToQuarterNotes(sequence->getLastTick()));
-
-            stateManager->enqueue(
-                SetPositionQuarterNotes{finalPosQuarterNotes});
-            stateManager->enqueue(
-                SetPlayStartPositionQuarterNotes{finalPosQuarterNotes});
-            break;
-        }
-    }
-}
-
-void Sequencer::move(const double positionQuarterNotesToUse)
-{
-    const auto songSequenceIndex = getSongSequenceIndex();
-    const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
-
-    if (songMode && songSequenceIndex < 0)
-    {
-        return;
-    }
-
-    auto wrappedNewPosition = positionQuarterNotesToUse;
-
-    const auto sequence = isPlaying() ? getCurrentlyPlayingSequence()
-                                      : (songMode ? sequences[songSequenceIndex]
-                                                  : getActiveSequence());
-
-    const auto seqLengthQuarterNotes =
-        ticksToQuarterNotes(sequence->getLastTick());
-
-    if (wrappedNewPosition < 0 || wrappedNewPosition > seqLengthQuarterNotes)
-    {
-        wrappedNewPosition = fmod(wrappedNewPosition, seqLengthQuarterNotes);
-
-        while (wrappedNewPosition < 0)
-        {
-            wrappedNewPosition += seqLengthQuarterNotes;
-        }
-    }
-
-    stateManager->enqueue(SetPositionQuarterNotes{wrappedNewPosition});
-    stateManager->enqueue(SetPlayStartPositionQuarterNotes{wrappedNewPosition});
-
-    sequence->resetTrackEventIndices(quarterNotesToTicks(wrappedNewPosition));
-
-    if (secondSequenceEnabled)
-    {
-        auto secondSequenceScreen =
-            getScreens()->get<ScreenId::SecondSeqScreen>();
-        sequences[secondSequenceScreen->sq]->resetTrackEventIndices(
-            quarterNotesToTicks(wrappedNewPosition));
-    }
-}
-
-int Sequencer::getTickPosition() const
-{
-    return stateManager->getSnapshot().getPositionTicks();
+    transport->setTempo(newTempo);
 }
 
 std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
@@ -2093,48 +1115,6 @@ void Sequencer::resetUndo()
         ->setEnabled(false);
 }
 
-bool Sequencer::isOverdubbing() const
-{
-    return overdubbing;
-}
-
-double Sequencer::getPlayStartPositionQuarterNotes() const
-{
-    return stateManager->getSnapshot().getPlayStartPositionQuarterNotes();
-}
-
-void Sequencer::setRecording(const bool b)
-{
-    recording = b;
-}
-
-void Sequencer::setOverdubbing(const bool b)
-{
-    overdubbing = b;
-}
-
-void Sequencer::playMetronomeTrack()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    metronomeOnly = true;
-    frameSequencer->startMetronome();
-}
-
-void Sequencer::stopMetronomeTrack()
-{
-    if (!metronomeOnly)
-    {
-        return;
-    }
-
-    metronomeOnly = false;
-    frameSequencer->stop();
-}
-
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
 {
     placeHolder = makeNewSequence();
@@ -2157,69 +1137,6 @@ void Sequencer::movePlaceHolderTo(const int destIndex)
 std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
 {
     return placeHolder;
-}
-
-int Sequencer::getPlayedStepRepetitions() const
-{
-    return playedStepRepetitions;
-}
-
-void Sequencer::setEndOfSong(const bool b)
-{
-    endOfSong = b;
-}
-
-void Sequencer::incrementPlayedStepRepetitions()
-{
-    playedStepRepetitions++;
-}
-
-void Sequencer::resetPlayedStepRepetitions()
-{
-    playedStepRepetitions = 0;
-}
-
-bool Sequencer::isPunchEnabled() const
-{
-    return punchEnabled;
-}
-
-void Sequencer::setPunchEnabled(const bool enabled)
-{
-    punchEnabled = enabled;
-}
-
-int Sequencer::getAutoPunchMode() const
-{
-    return autoPunchMode;
-}
-
-void Sequencer::setAutoPunchMode(const int mode)
-{
-    if (mode >= 0 && mode <= 2)
-    {
-        autoPunchMode = mode;
-    }
-}
-
-int Sequencer::getPunchInTime() const
-{
-    return punchInTime;
-}
-
-void Sequencer::setPunchInTime(const int time)
-{
-    punchInTime = time;
-}
-
-int Sequencer::getPunchOutTime() const
-{
-    return punchOutTime;
-}
-
-void Sequencer::setPunchOutTime(const int time)
-{
-    punchOutTime = time;
 }
 
 template <typename T> std::shared_ptr<T> Sequencer::getBus(const int busIndex)
