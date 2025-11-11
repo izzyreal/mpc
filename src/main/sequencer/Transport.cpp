@@ -17,6 +17,8 @@
 #include "sequencer/Step.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 
+#include <algorithm>
+
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
 
@@ -80,7 +82,7 @@ void Transport::play(const bool fromStart)
 
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     setPosition(positionQuarterNotes);
-    
+
     const auto countMetronomeScreen =
         sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
     const auto countInMode = countMetronomeScreen->getCountInMode();
@@ -241,13 +243,11 @@ void Transport::stop(const StopMode stopMode)
 
     if (!isPlaying() && !bouncing)
     {
-        const auto snapshot = sequencer.getStateManager()->getSnapshot();
 
-        if (const double positionQuarterNotes =
-                snapshot.getPositionQuarterNotes();
-            positionQuarterNotes != 0.0)
+        if (const auto snapshot = sequencer.getStateManager()->getSnapshot();
+            snapshot.getPositionQuarterNotes() != 0.0)
         {
-            setBar(0); // real 2kxl doesn't do this
+            setPosition(0); // real 2kxl doesn't do this
         }
 
         return;
@@ -639,6 +639,34 @@ int Transport::getCurrentClockNumber() const
     return clock;
 }
 
+void Transport::setBarBeatClock(const int bar, const int beat, const int clock) const
+{
+    if (isPlaying())
+    {
+        return;
+    }
+
+    const auto s = sequencer.getActiveSequence();
+    const auto &barLengths = s->getBarLengthsInTicks();
+    const auto ts = s->getTimeSignature();
+
+    const int clampedBar  = std::clamp(bar,  0, static_cast<int>(barLengths.size()) - 1);
+    const int clampedBeat = std::clamp(beat, 0, ts.getNumerator() - 1);
+
+    const int denTicks = static_cast<int>(96 * (4.0 / ts.getDenominator()));
+    const int clampedClock = std::clamp(clock, 0, denTicks - 1);
+
+    int pos = 0;
+    for (int b = 0; b < clampedBar; ++b)
+    {
+        pos += barLengths[b];
+    }
+
+    pos += clampedBeat * denTicks + clampedClock;
+
+    setPosition(Sequencer::ticksToQuarterNotes(pos));
+}
+
 void Transport::setBar(int i) const
 {
     if (isPlaying())
@@ -646,63 +674,18 @@ void Transport::setBar(int i) const
         return;
     }
 
-    if (i < 0)
-    {
-        setPosition(0);
-        return;
-    }
-
     const auto s = sequencer.getActiveSequence();
-
-    if (i > s->getLastBarIndex() + 1)
-    {
-        i = s->getLastBarIndex() + 1;
-    }
-
-    if (s->getLastBarIndex() == 998 && i > 998)
-    {
-        i = 998;
-    }
-
-    auto ts = s->getTimeSignature();
-    const auto den = ts.getDenominator();
-    const auto denTicks = static_cast<int>(96 * (4.0 / den));
-
-    if (i != s->getLastBarIndex() + 1)
-    {
-        ts.setNumerator(s->getNumerator(i));
-        ts.setDenominator(s->getDenominator(i));
-    }
-
     const auto &barLengths = s->getBarLengthsInTicks();
-    const auto currentClock = getCurrentClockNumber();
-    const auto currentBeat = getCurrentBeatIndex();
+
+    i = std::clamp(i, 0, static_cast<int>(barLengths.size()) - 1);
+
     int pos = 0;
-    auto barCounter = 0;
-
-    for (const auto &l : barLengths)
+    for (int b = 0; b < i; ++b)
     {
-        if (barCounter == i)
-        {
-            break;
-        }
-
-        pos += l;
-        barCounter++;
-    }
-
-    pos += currentBeat * denTicks;
-    pos += currentClock;
-
-    if (pos > s->getLastTick())
-    {
-        pos = s->getLastTick();
+        pos += barLengths[b];
     }
 
     setPosition(Sequencer::ticksToQuarterNotes(pos));
-
-    setBeat(0);
-    setClock(0);
 }
 
 void Transport::setBeat(int i) const

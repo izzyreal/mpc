@@ -66,6 +66,7 @@ namespace mpc::sequencer
         int getCurrentBarIndex() const;
         int getCurrentBeatIndex() const;
         int getCurrentClockNumber() const;
+        void setBarBeatClock(int bar, int beat, int clock) const;
         void setBar(int i) const;
         void setBeat(int i) const;
         void setClock(int i) const;

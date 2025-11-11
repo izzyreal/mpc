@@ -14,6 +14,7 @@ SequencerStateManager::SequencerStateManager() : Base([](SequencerState &) {})
 
 void SequencerStateManager::enqueue(SequencerMessage &&m) const noexcept
 {
+    /*
     std::visit(
         [&](auto &&m)
         {
@@ -41,6 +42,7 @@ void SequencerStateManager::enqueue(SequencerMessage &&m) const noexcept
             }
         },
         m);
+        */
 
     AtomicStateExchange::enqueue(std::move(m));
 }

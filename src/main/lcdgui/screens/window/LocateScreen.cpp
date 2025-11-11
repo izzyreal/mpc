@@ -53,15 +53,11 @@ void LocateScreen::function(const int i)
                 const auto clampedClock = std::clamp<uint8_t>(
                     std::get<2>(location), 0, getMaxClockForThisBar());
 
-                sequencer->getTransport()->setBar(clampedBarIndex);
-                sequencer->getTransport()->setBeat(clampedBeatIndex);
-                sequencer->getTransport()->setClock(clampedClock);
+                sequencer->getTransport()->setBarBeatClock(clampedBarIndex, clampedBeatIndex, clampedClock);
             }
             else
             {
-                sequencer->getTransport()->setBar(barIndex);
-                sequencer->getTransport()->setBeat(beatIndex);
-                sequencer->getTransport()->setClock(clock);
+                sequencer->getTransport()->setBarBeatClock(barIndex, beatIndex, clock);
             }
             openScreenById(ScreenId::SequencerScreen);
             break;

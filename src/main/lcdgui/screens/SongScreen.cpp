@@ -94,7 +94,7 @@ void SongScreen::up()
 
         setOffset(offset - 1);
         sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex());
-        sequencer->getTransport()->setBar(0);
+        sequencer->getTransport()->setPosition(0);
     }
     else
     {
@@ -197,7 +197,7 @@ void SongScreen::down()
 
         setOffset(offset + 1);
         sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex());
-        sequencer->getTransport()->setBar(0);
+        sequencer->getTransport()->setPosition(0);
     }
     else
     {
@@ -237,7 +237,7 @@ void SongScreen::turnWheel(int i)
 
         step->setSequence(step->getSequence() + i);
         sequencer->setActiveSequenceIndex(step->getSequence());
-        sequencer->getTransport()->setBar(0);
+        sequencer->getTransport()->setPosition(0);
         displayNow0();
         displayNow1();
 

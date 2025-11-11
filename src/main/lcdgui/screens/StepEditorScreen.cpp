@@ -775,7 +775,7 @@ void StepEditorScreen::prevBarStart()
                     ->getButton(hardware::ComponentId::GO_TO)
                     ->isPressed())
             {
-                sequencer->getTransport()->setBar(0);
+                sequencer->getTransport()->setPosition(0);
             }
             else
             {
