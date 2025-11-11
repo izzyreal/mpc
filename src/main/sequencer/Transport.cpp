@@ -80,10 +80,7 @@ void Transport::play(const bool fromStart)
 
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     setPosition(positionQuarterNotes);
-
-    sequencer.setCurrentlyPlayingSequenceIndex(
-        sequencer.getActiveSequenceIndex());
-
+    
     const auto countMetronomeScreen =
         sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
     const auto countInMode = countMetronomeScreen->getCountInMode();

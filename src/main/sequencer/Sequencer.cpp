@@ -147,7 +147,6 @@ void Sequencer::init()
     soloEnabled = false;
 
     activeSequenceIndex = 0;
-    currentlyPlayingSequenceIndex = 0;
     stateManager->enqueue(SetSongModeEnabled{false});
 
     purgeAllSequences();
@@ -182,7 +181,7 @@ void Sequencer::playToTick(const int targetTick) const
 {
     const auto seqIndex = stateManager->getSnapshot().isSongModeEnabled()
                               ? getSongSequenceIndex()
-                              : currentlyPlayingSequenceIndex;
+                              : activeSequenceIndex;
     auto seq = sequences[seqIndex].get();
     const auto secondSequenceScreen =
         getScreens()->get<ScreenId::SecondSeqScreen>();
@@ -934,13 +933,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
         return songSeqIndex;
     }
 
-    return currentlyPlayingSequenceIndex;
-}
-
-void Sequencer::setCurrentlyPlayingSequenceIndex(const int i)
-{
-    currentlyPlayingSequenceIndex = i;
-    setActiveSequenceIndex(i);
+    return activeSequenceIndex;
 }
 
 int Sequencer::getNextSq() const
@@ -997,7 +990,7 @@ void Sequencer::setNextSq(int i)
 
     if (startingFromScratch)
     {
-        up = i > currentlyPlayingSequenceIndex;
+        up = i > activeTrackIndex;
     }
 
     const auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);

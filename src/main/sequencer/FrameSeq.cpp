@@ -132,7 +132,7 @@ void FrameSeq::move(const int newTickPos) const
 std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTransport()->getTickPosition());
-    sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
+    sequencer->setActiveSequenceIndex(sequencer->getNextSq());
     sequencer->setNextSq(-1);
     move(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
@@ -389,9 +389,8 @@ bool FrameSeq::processSeqLoopEnabled() const
 
 bool FrameSeq::processSeqLoopDisabled() const
 {
-    const auto seq = sequencer->getCurrentlyPlayingSequence();
-
-    if (sequencer->getTransport()->getTickPosition() >= seq->getLastTick())
+    if (const auto seq = sequencer->getCurrentlyPlayingSequence();
+        sequencer->getTransport()->getTickPosition() >= seq->getLastTick())
     {
         if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {

@@ -130,7 +130,6 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;
         int activeSequenceIndex = 0;
-        int currentlyPlayingSequenceIndex = 0;
 
         std::vector<std::shared_ptr<Sequence>> sequences =
             std::vector<std::shared_ptr<Sequence>>(99);
@@ -217,7 +216,6 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
         void setActiveTrackIndex(int i);
         int getCurrentlyPlayingSequenceIndex() const;
-        void setCurrentlyPlayingSequenceIndex(int i);
         int getNextSq() const;
         int getFirstUsedSeqDown(int from, bool unused = false) const;
         int getFirstUsedSeqUp(int from, bool unused = false) const;
