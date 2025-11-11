@@ -54,9 +54,8 @@ namespace mpc::engine
             const std::function<bool()> &isRecMainWithoutPlaying,
             const std::function<void(int velo, int frameOffset)> &playMetronome,
             std::function<std::shared_ptr<lcdgui::Screens>()>,
-            const std::function<bool()> &isNoteRepeatLockedOrPressed
-            // , const std::shared_ptr<engine::NoteRepeatProcessor>
-        );
+            const std::function<bool()> &isNoteRepeatLockedOrPressed,
+            const std::shared_ptr<NoteRepeatProcessor> &);
 
         void work(int nFrames) override;
 
@@ -87,7 +86,7 @@ namespace mpc::engine
         std::function<bool()> isBouncing;
         std::function<int()> getSampleRate;
         std::function<bool()> isRecMainWithoutPlaying;
-        std::function<void(int velo, int frameOffset)> triggerMetronome;
+        std::function<void(int velo, int frameOffset)> playMetronome;
         std::function<bool()> isNoteRepeatLockedOrPressed;
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
 

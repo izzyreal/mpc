@@ -5,6 +5,8 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
+#include "lcdgui/screens/MixerSetupScreen.hpp"
 
 #include "audiomidi/DirectToDiskSettings.hpp"
 #include "audiomidi/DiskRecorder.hpp"
@@ -61,40 +63,6 @@ EngineHost::EngineHost(Mpc &mpcToUse) : mpc(mpcToUse)
 
 void EngineHost::start()
 {
-    sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
-        mpc.eventRegistry, mpc.getSequencer().get(), mpc.getClock(),
-        mpc.getLayeredScreen(),
-        [&]
-        {
-            return isBouncing();
-        },
-        [&]
-        {
-            return nonRealTimeAudioServer->getSampleRate();
-        },
-        [&]
-        {
-            return SeqUtil::isRecMainWithoutPlaying(
-                mpc.getSequencer(),
-                mpc.screens->get<ScreenId::TimingCorrectScreen>(),
-                mpc.getLayeredScreen()->getCurrentScreenName(),
-                mpc.getHardware()->getButton(hardware::REC),
-                mpc.clientEventController->clientHardwareEventController);
-        },
-        [sampler = mpc.getSampler()](const int velo, const int frameOffset)
-        {
-            sampler->playMetronome(velo, frameOffset);
-        },
-        [&]
-        {
-            return mpc.screens;
-        },
-        [&]
-        {
-            return mpc.clientEventController->clientHardwareEventController
-                ->isNoteRepeatLockedOrPressed();
-        });
-
     realTimeAudioServer = std::make_shared<RealTimeAudioServer>();
     nonRealTimeAudioServer =
         std::make_shared<NonRealTimeAudioServer>(realTimeAudioServer);
@@ -131,13 +99,61 @@ void EngineHost::start()
     std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))
         ->setValue(static_cast<float>(100));
 
+    mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
+
+    noteRepeatProcessor = std::make_shared<NoteRepeatProcessor>(
+        mpc.getSequencer(), mpc.getSampler(), mixer,
+        mpc.screens->get<ScreenId::Assign16LevelsScreen>(),
+        mpc.screens->get<ScreenId::MixerSetupScreen>(), mpc.eventRegistry,
+        mpc.getHardware()->getSlider(), &voices, mixerConnections,
+        [controller = mpc.clientEventController]
+        {
+            return controller->isFullLevelEnabled();
+        },
+        [controller = mpc.clientEventController]
+        {
+            return controller->isSixteenLevelsEnabled();
+        });
+
+    sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
+        mpc.eventRegistry, mpc.getSequencer().get(), mpc.getClock(),
+        mpc.getLayeredScreen(),
+        [&]
+        {
+            return isBouncing();
+        },
+        [&]
+        {
+            return nonRealTimeAudioServer->getSampleRate();
+        },
+        [&]
+        {
+            return SeqUtil::isRecMainWithoutPlaying(
+                mpc.getSequencer(),
+                mpc.screens->get<ScreenId::TimingCorrectScreen>(),
+                mpc.getLayeredScreen()->getCurrentScreenName(),
+                mpc.getHardware()->getButton(hardware::REC),
+                mpc.clientEventController->clientHardwareEventController);
+        },
+        [sampler = mpc.getSampler()](const int velo, const int frameOffset)
+        {
+            sampler->playMetronome(velo, frameOffset);
+        },
+        [&]
+        {
+            return mpc.screens;
+        },
+        [&]
+        {
+            return mpc.clientEventController->clientHardwareEventController
+                ->isNoteRepeatLockedOrPressed();
+        },
+        noteRepeatProcessor);
+
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
     compoundAudioClient->add(
         mpc.getEngineHost()->getSequencerPlaybackEngine().get());
     compoundAudioClient->add(mixer.get());
-
-    mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
-
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
 

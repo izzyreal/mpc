@@ -18,11 +18,8 @@
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
-#include "lcdgui/screens/MixerSetupScreen.hpp"
-#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include "sequencer/MidiClockOutput.hpp"
-#include "sequencer/Transport.hpp"
 
 #include <concurrentqueue.h>
 
@@ -39,18 +36,17 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     std::function<bool()> isBouncing, const std::function<int()> &getSampleRate,
     const std::function<bool()> &isRecMainWithoutPlaying,
-    const std::function<void(int velo, int frameOffset)> &triggerMetronome,
+    const std::function<void(int velo, int frameOffset)> &playMetronome,
     std::function<std::shared_ptr<Screens>()> getScreens,
-    const std::function<bool()> &isNoteRepeatLockedOrPressed
-    //, const std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor
-    )
+    const std::function<bool()> &isNoteRepeatLockedOrPressed,
+    const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor)
     : eventRegistry(eventRegistry), layeredScreen(layeredScreen),
       getScreens(getScreens), sequencer(sequencer), clock(clock),
       isBouncing(isBouncing), getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
-      triggerMetronome(triggerMetronome),
+      playMetronome(playMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
-      // noteRepeatProcessor(noteRepeatProcessor),
+      noteRepeatProcessor(noteRepeatProcessor),
       midiClockOutput(
           std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
 {
@@ -206,7 +202,7 @@ void SequencerPlaybackEngine::triggerClickIfNeeded() const
 
     if (relativePos % static_cast<int>(denTicks) == 0)
     {
-        triggerMetronome(relativePos == 0 ? 127 : 64, getEventFrameOffset());
+        playMetronome(relativePos == 0 ? 127 : 64, getEventFrameOffset());
     }
 }
 
@@ -449,18 +445,11 @@ void SequencerPlaybackEngine::processNoteRepeat()
 
     if (shouldRepeatNote)
     {
-        const auto assign16LevelsScreen =
-            getScreens()->get<ScreenId::Assign16LevelsScreen>();
-        const auto mixerSetupScreen =
-            getScreens()->get<ScreenId::MixerSetupScreen>();
-        /*
-                noteRepeatProcessor->process(
-                    this,
-                    sequencer->getTransport()->getTickPosition(),
-           repeatIntervalTicks, getEventFrameOffset(),
-           sequencer->getTransport()->getTempo(),
-                    static_cast<float>(getSampleRate()));
-                    */
+        noteRepeatProcessor->process(
+            this, sequencer->getTransport()->getTickPosition(),
+            repeatIntervalTicks, getEventFrameOffset(),
+            sequencer->getTransport()->getTempo(),
+            static_cast<float>(getSampleRate()));
     }
 }
 

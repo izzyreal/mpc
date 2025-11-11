@@ -57,22 +57,23 @@ uint64_t currentTimeMillis()
         .count();
 }
 
-Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
-                     std::function<std::shared_ptr<Screens>()> getScreens,
-                     std::vector<std::shared_ptr<Voice>> *voices,
-                     const std::function<bool()> &isAudioServerRunning,
-                     const std::shared_ptr<hardware::Hardware> &hardware,
-                     const std::function<bool()> &isBouncePrepared,
-                     const std::function<void()> &startBouncing,
-                     const std::function<void()> &stopBouncing,
-                     std::function<bool()> isBouncing,
-                     const std::function<bool()> &isEraseButtonPressed,
-                     std::shared_ptr<EventRegistry> eventRegistry,
-                     std::shared_ptr<Sampler> sampler,
-                     const std::shared_ptr<EventHandler> &eventHandler,
-                     const std::function<bool()> &isSixteenLevelsEnabled,
-                     std::function<std::shared_ptr<SequencerPlaybackEngine>()>
-                         getSequencerPlaybackEngine)
+Sequencer::Sequencer(
+    const std::shared_ptr<LayeredScreen> &layeredScreen,
+    const std::function<std::shared_ptr<Screens>()> &getScreens,
+    std::vector<std::shared_ptr<Voice>> *voices,
+    const std::function<bool()> &isAudioServerRunning,
+    const std::shared_ptr<hardware::Hardware> &hardware,
+    const std::function<bool()> &isBouncePrepared,
+    const std::function<void()> &startBouncing,
+    const std::function<void()> &stopBouncing,
+    const std::function<bool()> &isBouncing,
+    const std::function<bool()> &isEraseButtonPressed,
+    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<Sampler> &sampler,
+    const std::shared_ptr<EventHandler> &eventHandler,
+    const std::function<bool()> &isSixteenLevelsEnabled,
+    const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
+        &getSequencerPlaybackEngine)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),

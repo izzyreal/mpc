@@ -11,6 +11,7 @@ namespace mpc
 
 namespace mpc::engine
 {
+    class NoteRepeatProcessor;
     class SequencerPlaybackEngine;
     class Voice;
     class MixerInterconnection;
@@ -116,6 +117,7 @@ namespace mpc::engine
         bool wasBouncing = false;
 
         std::shared_ptr<PreviewSoundPlayer> previewSoundPlayer;
+        std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
         std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine;
         std::vector<std::shared_ptr<Voice>> voices;
         std::vector<MixerInterconnection *> mixerConnections;

@@ -54,8 +54,8 @@ namespace mpc::engine
             std::shared_ptr<hardware::Slider>,
             std::vector<std::shared_ptr<Voice>> *,
             std::vector<MixerInterconnection *> &,
-            std::function<bool()> &isFullLevelEnabled,
-            std::function<bool()> &isSixteenLevelsEnabled);
+            const std::function<bool()> &isFullLevelEnabled,
+            const std::function<bool()> &isSixteenLevelsEnabled);
 
         void process(const SequencerPlaybackEngine *, unsigned int tickPosition,
                      int durationTicks, unsigned short eventFrameOffset,
@@ -71,9 +71,9 @@ namespace mpc::engine
             mixerSetupScreen;
         const std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         const std::shared_ptr<hardware::Slider> hardwareSlider;
-        std::vector<std::shared_ptr<Voice>> *const voices;
+        std::vector<std::shared_ptr<Voice>> *voices;
         std::vector<MixerInterconnection *> &mixerConnections;
-        const std::function<bool()> &isFullLevelEnabled;
-        const std::function<bool()> &isSixteenLevelsEnabled;
+        const std::function<bool()> isFullLevelEnabled;
+        const std::function<bool()> isSixteenLevelsEnabled;
     };
 } // namespace mpc::engine
