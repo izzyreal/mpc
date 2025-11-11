@@ -7,14 +7,14 @@ std::uint16_t ByteUtil::bytes2ushort(const std::vector<char> &ca)
 {
     auto hi = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[1]));
     auto lo = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[0]));
-    return (hi << 8) | lo;
+    return hi << 8 | lo;
 }
 
 std::int16_t ByteUtil::bytes2short(const std::vector<char> &ca)
 {
     auto hi = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[1]));
     auto lo = static_cast<std::uint16_t>(static_cast<unsigned char>(ca[0]));
-    return static_cast<std::int16_t>((hi << 8) | lo);
+    return static_cast<std::int16_t>(hi << 8 | lo);
 }
 
 std::uint32_t ByteUtil::bytes2uint(const std::vector<char> &quartet)
@@ -34,9 +34,9 @@ std::uint32_t ByteUtil::bytes2uint(const std::vector<char> &quartet)
 std::vector<char> ByteUtil::uint2bytes(std::uint32_t n)
 {
     auto res = std::vector<char>(4);
-    res[3] = static_cast<char>((n >> 24) & 0xFF);
-    res[2] = static_cast<char>((n >> 16) & 0xFF);
-    res[1] = static_cast<char>((n >> 8) & 0xFF);
+    res[3] = static_cast<char>(n >> 24 & 0xFF);
+    res[2] = static_cast<char>(n >> 16 & 0xFF);
+    res[1] = static_cast<char>(n >> 8 & 0xFF);
     res[0] = static_cast<char>(n & 0xFF);
     return res;
 }
@@ -44,7 +44,7 @@ std::vector<char> ByteUtil::uint2bytes(std::uint32_t n)
 std::vector<char> ByteUtil::ushort2bytes(std::uint16_t n)
 {
     auto res = std::vector<char>(2);
-    res[1] = static_cast<char>((n >> 8) & 0xFF);
+    res[1] = static_cast<char>(n >> 8 & 0xFF);
     res[0] = static_cast<char>(n & 0xFF);
     return res;
 }
@@ -52,7 +52,7 @@ std::vector<char> ByteUtil::ushort2bytes(std::uint16_t n)
 std::vector<char> ByteUtil::short2bytes(std::int16_t n)
 {
     auto res = std::vector<char>(2);
-    res[1] = static_cast<char>((n >> 8) & 0xFF);
+    res[1] = static_cast<char>(n >> 8 & 0xFF);
     res[0] = static_cast<char>(n & 0xFF);
     return res;
 }

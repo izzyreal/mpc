@@ -28,14 +28,13 @@ void PushFullLevelCommand::execute()
 {
     if (layeredScreen->isCurrentScreen({ScreenId::NameScreen}))
     {
-        padAndButtonKeyboard->pressHardwareComponent(
-            ComponentId::FULL_LEVEL_OR_CASE_SWITCH);
-        hardware->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)
+        padAndButtonKeyboard->pressHardwareComponent(FULL_LEVEL_OR_CASE_SWITCH);
+        hardware->getLed(FULL_LEVEL_OR_CASE_SWITCH_LED)
             ->setEnabled(!padAndButtonKeyboard->isUpperCase());
         return;
     }
 
     controller->setFullLevelEnabled(!controller->isFullLevelEnabled());
-    hardware->getLed(ComponentId::FULL_LEVEL_OR_CASE_SWITCH_LED)
+    hardware->getLed(FULL_LEVEL_OR_CASE_SWITCH_LED)
         ->setEnabled(controller->isFullLevelEnabled());
 }

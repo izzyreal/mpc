@@ -43,7 +43,7 @@ Track::Track(
     const std::function<bool()> &isEraseButtonPressed,
     const std::function<bool(int, std::shared_ptr<Program>)>
         &isProgramPadPressed,
-    const std::shared_ptr<sampler::Sampler> &sampler,
+    const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled,
     const std::function<int()> &getActiveTrackIndex,
@@ -222,12 +222,9 @@ Track::recordNoteEventSynced(const int tick, int note, int velocity)
         insertEventWhileRetainingSort(onEvent);
         return onEvent;
     }
-    else
-    {
-        onEvent->setVelocity(velocity);
-        onEvent->resetDuration();
-        return onEvent;
-    }
+    onEvent->setVelocity(velocity);
+    onEvent->resetDuration();
+    return onEvent;
 }
 
 bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
@@ -580,7 +577,7 @@ void Track::playNext()
     const auto isActiveTrackIndex = trackIndex == getActiveTrackIndex();
     auto _delete = isRecording() &&
                    (isActiveTrackIndex || recordingModeIsMulti) &&
-                   (trackIndex < 64);
+                   trackIndex < 64;
 
     if (isRecording() && isPunchEnabled() && trackIndex < 64)
     {
@@ -671,7 +668,7 @@ void Track::playNext()
                         if (_16l_type == 0)
                         {
                             const auto diff = padIndexWithoutBank - _16l_key;
-                            auto candidate = 64 + (diff * 5);
+                            auto candidate = 64 + diff * 5;
 
                             if (candidate > 124)
                             {
@@ -682,7 +679,7 @@ void Track::playNext()
                                 candidate = 4;
                             }
 
-                            wouldBeVarValue = static_cast<int>(candidate);
+                            wouldBeVarValue = candidate;
                         }
                         else
                         {
@@ -855,7 +852,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 1; i < 1000; i++)
     {
-        if (sequence->getBarLengthsInTicks()[barNumber] - (i * stepLength) < 0)
+        if (sequence->getBarLengthsInTicks()[barNumber] - i * stepLength < 0)
         {
             numberOfSteps = i - 1;
             break;
@@ -871,13 +868,13 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
 
     for (int i = 0; i <= numberOfSteps; i++)
     {
-        const int stepStart = ((i - 1) * stepLength) + (stepLength / 2);
-        const int stepEnd = (i * stepLength) + (stepLength / 2);
+        const int stepStart = (i - 1) * stepLength + stepLength / 2;
+        const int stepEnd = i * stepLength + stepLength / 2;
 
         if (tick - currentBarStart >= stepStart &&
             tick - currentBarStart <= stepEnd)
         {
-            tick = (i * stepLength) + currentBarStart;
+            tick = i * stepLength + currentBarStart;
 
             if (tick >= segmentEnd)
             {
@@ -892,7 +889,7 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
         (tick + stepLength) % (stepLength * 2) == 0 && swingPercentage > 50)
     {
         const int swingOffset =
-            ((swingPercentage - 50.f) / 25.f) * (stepLength / 2.f);
+            (swingPercentage - 50.f) / 25.f * (stepLength / 2.f);
         tick += swingOffset;
     }
 

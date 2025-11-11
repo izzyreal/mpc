@@ -159,14 +159,14 @@ std::vector<std::string> EventRow::controlNames{"BANK SEL MSB",
                                                 "MONO MODE ON",
                                                 "POLY MODE ON"};
 
-EventRow::EventRow(mpc::Mpc &mpc, const int rowIndex)
+EventRow::EventRow(Mpc &mpc, const int rowIndex)
     : Component("event-row-" + std::to_string(rowIndex)), mpc(mpc),
       rowIndex(rowIndex)
 {
     int w1 = 194;
     int h1 = 9;
     int x1 = 0;
-    int y1 = 11 + (rowIndex * 9);
+    int y1 = 11 + rowIndex * 9;
 
     MRECT parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
     parameters = addChildT<EventRowParameters>(parametersRect);
@@ -188,7 +188,7 @@ EventRow::EventRow(mpc::Mpc &mpc, const int rowIndex)
     }
 
     h1 = 5;
-    y1 = 13 + (rowIndex * 9);
+    y1 = 13 + rowIndex * 9;
     x1 = 198;
     w1 = 50;
 
@@ -344,7 +344,7 @@ void EventRow::setPolyPressureEventValues() const
 
     fields[0]->setText(
         StrUtil::padLeft(std::to_string(ppe->getNote()), " ", 3) + "(" +
-        mpc::Util::noteNames()[ppe->getNote()] + ")");
+        Util::noteNames()[ppe->getNote()] + ")");
     fields[1]->setText(
         StrUtil::padLeft(std::to_string(ppe->getAmount()), " ", 3));
 
@@ -587,7 +587,7 @@ void EventRow::setDrumNoteEventValues() const
         fields[2]->setSize(4 * 6 + 1, 9);
         fields[2]->setLocation(90, fields[2]->getY());
 
-        auto noteVarValue = (ne->getVariationValue() * 2) - 128;
+        auto noteVarValue = ne->getVariationValue() * 2 - 128;
 
         if (noteVarValue < -120)
         {
@@ -681,7 +681,7 @@ void EventRow::setMidiNoteEventValues() const
     }
 
     fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) +
-                       "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
+                       "(" + Util::noteNames()[ne->getNote()] + ")");
     fields[1]->setText(
         StrUtil::padLeft(std::to_string(*ne->getDuration()), " ", 4));
     fields[2]->setText(std::to_string(ne->getVelocity()));
@@ -736,12 +736,12 @@ void EventRow::setSizesAndLocations(const std::vector<int> &xPositions,
 
         const auto labelTextLength = label->getText().length();
 
-        tf->setSize((fieldWidths[i] * 6) + 1, 9);
-        tf->setLocation(xPositions[i] + (labelTextLength * 6) - 1,
-                        11 + (rowIndex * 9));
+        tf->setSize(fieldWidths[i] * 6 + 1, 9);
+        tf->setLocation(xPositions[i] + labelTextLength * 6 - 1,
+                        11 + rowIndex * 9);
 
         label->setSize(labelTextLength * 6, 9);
-        label->setLocation(xPositions[i] - 1, 11 + (rowIndex * 9));
+        label->setLocation(xPositions[i] - 1, 11 + rowIndex * 9);
     }
 }
 

@@ -9,7 +9,7 @@
 
 using namespace mpc::file::sndwriter;
 
-SndWriter::SndWriter(mpc::sampler::Sound *sound)
+SndWriter::SndWriter(sampler::Sound *sound)
 {
     this->sound = sound;
     sndHeaderWriter = std::make_shared<SndHeaderWriter>();
@@ -90,18 +90,17 @@ void SndWriter::setBeatCount(int i) const
 
 void SndWriter::setSampleData(const std::vector<float> &fa, bool mono)
 {
-    sndFileArray = std::vector<char>(HEADER_SIZE + (fa.size() * 2));
+    sndFileArray = std::vector<char>(HEADER_SIZE + fa.size() * 2);
     auto frames = mono ? fa.size() : fa.size() * 0.5;
     sndHeaderWriter->setFrameCount(frames);
 
     std::vector<char> buffer(2);
     auto sPos = 0;
 
-    auto bytePos = SndWriter::HEADER_SIZE;
+    auto bytePos = HEADER_SIZE;
     for (int i = 0; i < fa.size(); i++)
     {
-        auto shortres =
-            mpc::sampleops::mean_normalized_float_to_short(fa[sPos++]);
+        auto shortres = sampleops::mean_normalized_float_to_short(fa[sPos++]);
         buffer = ByteUtil::short2bytes(shortres);
         sndFileArray[bytePos++] = buffer[0];
         sndFileArray[bytePos++] = buffer[1];

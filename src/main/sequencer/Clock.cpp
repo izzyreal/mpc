@@ -185,7 +185,7 @@ void Clock::generateTransportInfo(const float tempo, const uint32_t sampleRate,
 {
     const double lastProcessedPositionQuarterNotes =
         getLastProcessedHostPositionQuarterNotes();
-    const auto beatsPerFrame = 1.0 / ((1.0 / (tempo / 60.0)) * sampleRate);
+    const auto beatsPerFrame = 1.0 / (1.0 / (tempo / 60.0) * sampleRate);
 
     // This approach does not 100% mimic the values that Reaper produces.
     // Although it comes close, Reaper's values are 100% the same if we would
@@ -198,8 +198,7 @@ void Clock::generateTransportInfo(const float tempo, const uint32_t sampleRate,
         lastProcessedPositionQuarterNotes ==
                 std::numeric_limits<double>::lowest()
             ? playStartPositionQuarterNotes
-            : (lastProcessedPositionQuarterNotes +
-               (numSamples * beatsPerFrame));
+            : lastProcessedPositionQuarterNotes + numSamples * beatsPerFrame;
 
     computeTicksForCurrentBuffer(newPositionQuarterNotes, numSamples,
                                  sampleRate, tempo,
@@ -212,7 +211,7 @@ void Clock::processBufferInternal(const float tempo, const uint32_t sampleRate,
 {
     const double lastProcessedPositionQuarterNotes =
         getLastProcessedHostPositionQuarterNotes();
-    const auto beatsPerFrame = 1.0 / ((1.0 / (tempo / 60.0)) * sampleRate);
+    const auto beatsPerFrame = 1.0 / (1.0 / (tempo / 60.0) * sampleRate);
 
     // This approach does not 100% mimic the values that Reaper produces.
     // Although it comes close, Reaper's values are 100% the same if we would
@@ -225,8 +224,7 @@ void Clock::processBufferInternal(const float tempo, const uint32_t sampleRate,
         lastProcessedPositionQuarterNotes ==
                 std::numeric_limits<double>::lowest()
             ? playStartPositionQuarterNotes
-            : (lastProcessedPositionQuarterNotes +
-               (numSamples * beatsPerFrame));
+            : lastProcessedPositionQuarterNotes + numSamples * beatsPerFrame;
 
     computeTicksForCurrentBuffer(newPositionQuarterNotes, numSamples,
                                  sampleRate, tempo,

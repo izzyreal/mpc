@@ -16,7 +16,7 @@ using namespace akaifat::util;
 using namespace akaifat::fat;
 using namespace mpc::lcdgui;
 
-RawDisk::RawDisk(mpc::Mpc &_mpc) : AbstractDisk(_mpc) {}
+RawDisk::RawDisk(Mpc &_mpc) : AbstractDisk(_mpc) {}
 
 RawDisk::~RawDisk()
 {
@@ -82,7 +82,7 @@ void RawDisk::initParentFiles()
         return;
     }
 
-    auto parent = std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(
+    auto parent = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(
         path[path.size() - 1]->getParent());
 
     for (auto &kv : parent->akaiNameIndex)

@@ -63,7 +63,7 @@ void NoteOnEvent::setDuration(const Duration d)
 {
     if (d)
     {
-        duration = static_cast<int>(std::clamp(*d, 0, 9999));
+        duration = std::clamp(*d, 0, 9999);
     }
 }
 
@@ -95,7 +95,7 @@ void NoteOnEvent::setVariationType(const VARIATION_TYPE type)
 
 void NoteOnEvent::setVariationValue(const int i)
 {
-    if (variationType == VARIATION_TYPE::TUNE_0)
+    if (variationType == TUNE_0)
     {
         variationValue = std::clamp(i, 0, 124);
     }

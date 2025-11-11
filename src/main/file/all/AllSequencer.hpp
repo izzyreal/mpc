@@ -37,10 +37,9 @@ namespace mpc::file::all
         int secondSeqIndex;
         std::vector<char> saveBytes;
 
-    public:
         std::vector<char> &getBytes();
 
         AllSequencer(const std::vector<char> &loadBytes);
-        AllSequencer(mpc::Mpc &);
+        AllSequencer(Mpc &);
     };
 } // namespace mpc::file::all

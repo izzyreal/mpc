@@ -22,7 +22,7 @@ ApsNoteParameters::ApsNoteParameters(const std::vector<char> &loadBytes)
     voiceOverlapMode = static_cast<sampler::VoiceOverlapMode>(loadBytes[7]);
     mute1 = loadBytes[8] == 0 ? 34 : loadBytes[8];
     mute2 = loadBytes[9] == 0 ? 34 : loadBytes[9];
-    auto buf = std::vector<char>{loadBytes[10], loadBytes[11]};
+    auto buf = std::vector{loadBytes[10], loadBytes[11]};
     tune = ByteUtil::bytes2short(buf);
     attack = loadBytes[12];
     decay = loadBytes[13];
@@ -40,7 +40,7 @@ ApsNoteParameters::ApsNoteParameters(const std::vector<char> &loadBytes)
     velocityToPitch = loadBytes[25];
 }
 
-ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters *np)
+ApsNoteParameters::ApsNoteParameters(sampler::NoteParameters *np)
 {
     saveBytes[0] = np->getSoundIndex() == -1 ? '\xff' : np->getSoundIndex();
     saveBytes[1] = np->getSoundIndex() == -1 ? '\xff' : '\x00';

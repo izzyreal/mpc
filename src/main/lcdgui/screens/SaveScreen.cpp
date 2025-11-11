@@ -243,8 +243,8 @@ void SaveScreen::turnWheel(const int i)
             {
                 unsigned char counter = 0;
 
-                for (int idx = programIndex; (i < 0) ? idx >= 0 : idx < 24;
-                     (i < 0) ? idx-- : idx++)
+                for (int idx = programIndex; i < 0 ? idx >= 0 : idx < 24;
+                     i < 0 ? idx-- : idx++)
                 {
                     if (sampler->getProgram(idx))
                     {
@@ -380,10 +380,10 @@ void SaveScreen::displaySize() const
             size = 4;
             break;
         case 4:
-            size = sampler->getSoundCount() == 0
-                       ? -1
-                       : (sampler->getSound()->getSampleData()->size() * 2 *
-                          0.001);
+            size =
+                sampler->getSoundCount() == 0
+                    ? -1
+                    : sampler->getSound()->getSampleData()->size() * 2 * 0.001;
             break;
         case 5:
             size = 512;

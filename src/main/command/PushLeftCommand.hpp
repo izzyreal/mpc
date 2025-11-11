@@ -7,11 +7,11 @@ namespace mpc::command
     class PushLeftCommand : public Command
     {
     public:
-        explicit PushLeftCommand(mpc::Mpc &mpc);
+        explicit PushLeftCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

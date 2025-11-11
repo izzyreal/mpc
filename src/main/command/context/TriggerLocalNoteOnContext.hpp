@@ -5,6 +5,11 @@
 #include <memory>
 #include <functional>
 
+namespace mpc::engine
+{
+    class SequencerPlaybackEngine;
+}
+
 namespace mpc::eventregistry
 {
     class EventRegistry;
@@ -31,7 +36,6 @@ namespace mpc::sequencer
 {
     class Sequencer;
     class Track;
-    class FrameSeq;
 } // namespace mpc::sequencer
 
 namespace mpc::audiomidi
@@ -71,7 +75,8 @@ namespace mpc::command::context
         std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
             assign16LevelsScreen;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<sequencer::FrameSeq> frameSequencer;
+        std::shared_ptr<engine::SequencerPlaybackEngine>
+            sequencerPlaybackEngine;
 
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<lcdgui::ScreenComponent> screenComponent;

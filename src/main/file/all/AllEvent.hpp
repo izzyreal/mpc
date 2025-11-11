@@ -19,7 +19,6 @@ namespace mpc::file::all
         static const int TICK_BYTE3_OFFSET = 2;
         static std::vector<int> TICK_BYTE3_BIT_RANGE;
 
-    public:
         static const int TRACK_OFFSET = 3;
         static const int EVENT_ID_OFFSET = 4;
 
@@ -30,13 +29,12 @@ namespace mpc::file::all
         static const char PITCH_BEND_ID = 0xE0;
         static const char SYS_EX_ID = 0xF0;
 
-    public:
         static int readTick(const std::vector<char> &);
         static void writeTick(std::vector<char> &, int);
 
-        static std::shared_ptr<mpc::sequencer::Event>
+        static std::shared_ptr<sequencer::Event>
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char>
-        mpcEventToBytes(const std::shared_ptr<mpc::sequencer::Event> &);
+        mpcEventToBytes(const std::shared_ptr<sequencer::Event> &);
     };
 } // namespace mpc::file::all

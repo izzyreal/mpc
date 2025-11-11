@@ -8,7 +8,6 @@ namespace mpc::lcdgui::screens::window
     public:
         void function(int i) override;
 
-    public:
         TransposePermanentScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens::window

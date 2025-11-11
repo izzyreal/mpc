@@ -142,7 +142,7 @@ void MonoToStereoScreen::function(const int j)
             }
             else
             {
-                (*newSampleDataRight) = *right->getSampleData();
+                *newSampleDataRight = *right->getSampleData();
             }
 
             const auto newSound = sampler->addSound(left->getSampleRate());

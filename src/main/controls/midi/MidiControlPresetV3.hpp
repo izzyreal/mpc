@@ -18,9 +18,9 @@ namespace mpc::controls::midi
     {
         std::string labelName;
         std::string messageType;
-        mpc::ConstrainedInt<int, 0, 127> midiNumber{0};
-        mpc::ConstrainedInt<int, -1, 127> midiValue{0};
-        mpc::ConstrainedInt<int, -1, 15> midiChannelIndex{0};
+        ConstrainedInt<int, 0, 127> midiNumber{0};
+        ConstrainedInt<int, -1, 127> midiValue{0};
+        ConstrainedInt<int, -1, 15> midiChannelIndex{0};
         bool enabled{false};
 
         Binding() = default;
@@ -136,7 +136,7 @@ namespace mpc::controls::midi
 
     struct MidiControlPresetV3
     {
-        mpc::ConstrainedInt<long long, 0, 4503599627370496LL> version{
+        ConstrainedInt<long long, 0, 4503599627370496LL> version{
             CURRENT_PRESET_VERSION};
         std::string name;
         std::string midiControllerDeviceName;

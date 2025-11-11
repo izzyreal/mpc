@@ -41,7 +41,7 @@ void Mpc2000XlAllFileScreen::function(const int i)
             break;
         case 4:
         {
-            auto on_success = [&]()
+            auto on_success = [&]
             {
                 openScreenById(ScreenId::LoadScreen);
             };

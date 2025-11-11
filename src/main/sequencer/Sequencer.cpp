@@ -7,7 +7,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
@@ -57,48 +57,33 @@ uint64_t currentTimeMillis()
         .count();
 }
 
-Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
-                     std::function<std::shared_ptr<Screens>()> getScreens,
-                     std::vector<std::shared_ptr<Voice>> *voices,
-                     const std::function<bool()> &isAudioServerRunning,
-                     const std::shared_ptr<hardware::Hardware> &hardware,
-                     const std::function<bool()> &isBouncePrepared,
-                     const std::function<void()> &startBouncing,
-                     const std::function<void()> &stopBouncing,
-                     std::function<bool()> isBouncing,
-                     const std::function<bool()> &isEraseButtonPressed,
-                     std::shared_ptr<EventRegistry> eventRegistry,
-                     std::shared_ptr<Sampler> sampler,
-                     const std::shared_ptr<EventHandler> &eventHandler,
-                     std::function<bool()> isSixteenLevelsEnabled,
-                     std::shared_ptr<Clock> clock,
-                     std::function<int()> getSampleRate,
-                     std::function<bool()> isRecMainWithoutPlaying,
-                     std::function<bool()> isNoteRepeatLockedOrPressed,
-                     std::function<std::shared_ptr<AudioMixer>()> getAudioMixer,
-                     std::function<bool()> isFullLevelEnabled,
-                     std::function<std::vector<MixerInterconnection *> &()>
-                         getMixerInterconnections)
+Sequencer::Sequencer(
+    const std::shared_ptr<LayeredScreen> &layeredScreen,
+    const std::function<std::shared_ptr<Screens>()> &getScreens,
+    std::vector<std::shared_ptr<Voice>> *voices,
+    const std::function<bool()> &isAudioServerRunning,
+    const std::shared_ptr<hardware::Hardware> &hardware,
+    const std::function<bool()> &isBouncePrepared,
+    const std::function<void()> &startBouncing,
+    const std::function<void()> &stopBouncing,
+    const std::function<bool()> &isBouncing,
+    const std::function<bool()> &isEraseButtonPressed,
+    const std::shared_ptr<EventRegistry> &eventRegistry,
+    const std::shared_ptr<Sampler> &sampler,
+    const std::shared_ptr<EventHandler> &eventHandler,
+    const std::function<bool()> &isSixteenLevelsEnabled,
+    const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
+        &getSequencerPlaybackEngine)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed), eventRegistry(eventRegistry),
       sampler(sampler), eventHandler(eventHandler),
-      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
+      getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
-
-    frameSequencer = std::make_shared<FrameSeq>(
-        eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
-        isRecMainWithoutPlaying,
-        [sampler](const int velo, const int frameOffset)
-        {
-            sampler->playMetronome(velo, frameOffset);
-        },
-        getScreens, isNoteRepeatLockedOrPressed, sampler, getAudioMixer,
-        isFullLevelEnabled, isSixteenLevelsEnabled, hardware->getSlider(),
-        voices, getMixerInterconnections);
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager()
@@ -113,7 +98,7 @@ std::shared_ptr<Transport> Sequencer::getTransport()
 
 void Sequencer::init()
 {
-    transport = std::make_shared<Transport>(*this);
+    transport = std::make_shared<Transport>(*this, getSequencerPlaybackEngine);
 
     for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT;
          ++midiBusIndex)
@@ -306,10 +291,12 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
     defaultSequenceName = s;
 }
 
-void Sequencer::setActiveSequenceIndex(int i, const bool shouldSetPositionTo0)
+void Sequencer::setActiveSequenceIndex(const int i,
+                                       const bool shouldSetPositionTo0)
 {
     assert(!shouldSetPositionTo0 || !transport->isPlaying());
-    activeSequenceIndex = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
+    activeSequenceIndex =
+        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     if (shouldSetPositionTo0)
     {
         getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{0});
@@ -1122,11 +1109,6 @@ std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex) const
     auto result = std::dynamic_pointer_cast<DrumBus>(buses[drumBusIndex + 1]);
     assert(result);
     return result;
-}
-
-std::shared_ptr<FrameSeq> Sequencer::getFrameSequencer()
-{
-    return frameSequencer;
 }
 
 template std::shared_ptr<Bus> Sequencer::getBus(int busIndex);

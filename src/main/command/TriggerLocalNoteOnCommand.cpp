@@ -8,7 +8,7 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "Util.hpp"
@@ -133,7 +133,7 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
         ctx->sequencer->getTransport()->playMetronomeTrack();
         recordNoteOnEvent->setMetrononomeOnlyTickPosition(
-            ctx->frameSequencer->getMetronomeOnlyTickPosition());
+            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
@@ -141,7 +141,7 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
         ctx->sequencer->getTransport()->playMetronomeTrack();
         recordNoteOnEvent->setTick(
-            ctx->frameSequencer->getMetronomeOnlyTickPosition());
+            ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
         const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();

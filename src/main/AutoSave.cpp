@@ -1,7 +1,7 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientEventController.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"
@@ -50,7 +50,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             [&]
             {
                 mpc.startMidiDeviceDetector();
-                mpc.getAudioMidiServices()->getAudioServer()->start();
+                mpc.getEngineHost()->getAudioServer()->start();
             });
     };
 
@@ -306,7 +306,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
     }
 
     std::thread(
-        [restoreAction]()
+        [restoreAction]
         {
             restoreAction();
         })
@@ -325,7 +325,7 @@ void AutoSave::storeAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const auto storeAction = [&mpc, saveTarget]()
+    const auto storeAction = [&mpc, saveTarget]
     {
         auto layeredScreen = mpc.getLayeredScreen();
 

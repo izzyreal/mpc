@@ -4,7 +4,7 @@
 
 using namespace mpc::file::pgmwriter;
 
-Slider::Slider(mpc::sampler::Program *program)
+Slider::Slider(sampler::Program *program)
 {
     sliderArray = std::vector<char>(15);
     if (program->getSlider()->getNote() == 34)

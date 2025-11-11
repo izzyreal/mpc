@@ -9,18 +9,17 @@
 namespace mpc::file::mid::event::meta
 {
 
-    class MetaEvent : public mpc::file::mid::event::MidiEvent
+    class MetaEvent : public MidiEvent
     {
 
     protected:
         int mType = 0;
-        mpc::file::mid::util::VariableLengthInt mLength;
+        util::VariableLengthInt mLength;
 
     public:
         virtual void writeToOutputStream(std::ostream &output);
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
         static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta,
                                                          std::stringstream &in);
         static const int SEQUENCE_NUMBER{0};
@@ -39,7 +38,6 @@ namespace mpc::file::mid::event::meta
         static const int KEY_SIGNATURE{89};
         static const int SEQUENCER_SPECIFIC{127};
 
-    public:
         MetaEvent(int tick, int delta, int type);
     };
 } // namespace mpc::file::mid::event::meta

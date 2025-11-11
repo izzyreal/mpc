@@ -24,7 +24,7 @@ bool SndHeaderReader::hasValidId() const
     int i = headerArray[0];
     int j = headerArray[1];
 
-    return (i == 1 && j < 5);
+    return i == 1 && j < 5;
 }
 
 std::string SndHeaderReader::getName() const
@@ -102,5 +102,5 @@ int SndHeaderReader::getSampleRate() const
 {
     auto rateArray = Util::vecCopyOfRange(headerArray, 40, 42);
     auto rate = ByteUtil::bytes2ushort(rateArray);
-    return static_cast<int>(rate);
+    return rate;
 }

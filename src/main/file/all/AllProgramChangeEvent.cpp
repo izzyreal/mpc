@@ -24,7 +24,7 @@ std::vector<char> AllProgramChangeEvent::mpcEventToBytes(
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PGM_CHANGE_ID;
-    AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+    AllEvent::writeTick(bytes, event->getTick());
     bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
     bytes[PROGRAM_OFFSET] = static_cast<int8_t>(event->getProgram() - 1);
 

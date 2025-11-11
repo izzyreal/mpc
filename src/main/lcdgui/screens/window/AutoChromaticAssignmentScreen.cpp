@@ -67,7 +67,7 @@ void AutoChromaticAssignmentScreen::function(const int i)
                 newProgram->setNoteParameters(j - 35, noteParameters);
                 noteParameters->setSoundIndex(sourceSoundIndex);
 
-                noteParameters->setTune(((j - originalKey) * 10) + tune);
+                noteParameters->setTune((j - originalKey) * 10 + tune);
             }
 
             const auto programs = sampler->getPrograms();

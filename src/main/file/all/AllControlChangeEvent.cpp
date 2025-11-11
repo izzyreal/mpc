@@ -25,7 +25,7 @@ std::vector<char> AllControlChangeEvent::mpcEventToBytes(
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CONTROL_CHANGE_ID;
-    AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+    AllEvent::writeTick(bytes, event->getTick());
     bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
     bytes[CONTROLLER_OFFSET] = static_cast<int8_t>(event->getController());
     bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());

@@ -63,7 +63,7 @@ float &MixControls::HALF_ROOT_TWO()
 {
     return HALF_ROOT_TWO_;
 }
-float MixControls::HALF_ROOT_TWO_ = static_cast<float>((sqrt(2) / 2));
+float MixControls::HALF_ROOT_TWO_ = static_cast<float>(sqrt(2) / 2);
 
 void MixControls::derive(Control *c)
 {
@@ -92,7 +92,7 @@ bool MixControls::isMute() const
     return mute;
 }
 
-bool MixControls::isEnabled()
+bool MixControls::isEnabled() const
 {
     return !isMute();
 }

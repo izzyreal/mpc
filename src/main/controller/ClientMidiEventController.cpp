@@ -47,7 +47,7 @@ ClientMidiEventController::ClientMidiEventController(
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::shared_ptr<Hardware> &hardware,
     const std::shared_ptr<Screens> &screens,
-    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     PreviewSoundPlayer *previewSoundPlayer)
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
@@ -55,7 +55,8 @@ ClientMidiEventController::ClientMidiEventController(
       eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
-      hardware(hardware), screens(screens), frameSequencer(frameSequencer),
+      hardware(hardware), screens(screens),
+      sequencerPlaybackEngine(sequencerPlaybackEngine),
       previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =
@@ -206,8 +207,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                 Source::MidiInput, registryNoteOnEvent, noteNumber, velocity,
                 track.get(), screen->getBus(), screen, programPadIndex, program,
-                sequencer, frameSequencer, eventRegistry, clientEventController,
-                eventHandler, screens, hardware);
+                sequencer, sequencerPlaybackEngine, eventRegistry,
+                clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
     };
@@ -264,7 +265,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 Source::MidiInput, noteNumber, track, bus, screen,
-                programPadIndex, program, sequencer, frameSequencer,
+                programPadIndex, program, sequencer, sequencerPlaybackEngine,
                 eventRegistry, clientEventController, eventHandler, screens,
                 hardware);
 
@@ -342,7 +343,7 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
     {
         if (convertSustainPedalToDuration)
         {
-            sustainPedalState[ch] = (val >= 64);
+            sustainPedalState[ch] = val >= 64;
             if (!sustainPedalState[ch])
             {
                 releaseSustainedNotes(ch);
@@ -371,7 +372,7 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
         event.source = ClientHardwareEvent::Source::Internal;
         event.componentId = SLIDER;
         event.type = ClientHardwareEvent::Type::SliderMove;
-        event.value = 1.f - (e.getControllerValue() / 127.f);
+        event.value = 1.f - e.getControllerValue() / 127.f;
         clientEventController->handleClientEvent(ClientEvent{event});
     }
 }

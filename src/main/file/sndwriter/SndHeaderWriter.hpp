@@ -12,7 +12,6 @@ namespace mpc::file::sndwriter
 {
     class SndHeaderWriter
     {
-    private:
         std::vector<char> headerArray = std::vector<char>(42);
 
     public:

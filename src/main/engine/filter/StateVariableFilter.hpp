@@ -10,7 +10,7 @@ namespace mpc::engine::filter
     class StateVariableFilter
     {
     public:
-        StateVariableFilter(mpc::engine::filter::FilterControls *variables);
+        StateVariableFilter(FilterControls *variables);
 
         ~StateVariableFilter();
 

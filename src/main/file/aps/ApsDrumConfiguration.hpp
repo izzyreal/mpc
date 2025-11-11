@@ -22,10 +22,8 @@ namespace mpc::file::aps
         bool getReceivePgmChange() const;
         bool getReceiveMidiVolume() const;
 
-    public:
         std::vector<char> getBytes();
 
-    public:
         ApsDrumConfiguration(const std::vector<char> &loadBytes);
         ApsDrumConfiguration(int program, bool recPgmChange,
                              bool recMidiVolume);

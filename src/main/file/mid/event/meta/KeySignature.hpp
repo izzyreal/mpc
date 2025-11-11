@@ -22,17 +22,14 @@ namespace mpc::file::mid::event::meta
         void setScale(int scale);
         int getScale() const;
 
-    public:
         int getEventSize() override;
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
         static std::shared_ptr<MetaEvent>
         parseKeySignature(int tick, int delta, MetaEventData *info);
-        int compareTo(mpc::file::mid::event::MidiEvent *other) const;
+        int compareTo(MidiEvent *other) const;
 
-    public:
         KeySignature(int tick, int delta, int key, int scale);
     };
 } // namespace mpc::file::mid::event::meta

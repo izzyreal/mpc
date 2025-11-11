@@ -15,11 +15,11 @@ FrameRate::FrameRate(const std::string &name, int ordinal, int v)
     value = v;
 }
 
-FrameRate *FrameRate::FRAME_RATE_24 = new ::FrameRate("FRAME_RATE_24", 0, 0);
-FrameRate *FrameRate::FRAME_RATE_25 = new ::FrameRate("FRAME_RATE_25", 1, 1);
+FrameRate *FrameRate::FRAME_RATE_24 = new FrameRate("FRAME_RATE_24", 0, 0);
+FrameRate *FrameRate::FRAME_RATE_25 = new FrameRate("FRAME_RATE_25", 1, 1);
 FrameRate *FrameRate::FRAME_RATE_30_DROP =
-    new ::FrameRate("FRAME_RATE_30_DROP", 2, 2);
-FrameRate *FrameRate::FRAME_RATE_30 = new ::FrameRate("FRAME_RATE_30", 3, 3);
+    new FrameRate("FRAME_RATE_30_DROP", 2, 2);
+FrameRate *FrameRate::FRAME_RATE_30 = new FrameRate("FRAME_RATE_30", 3, 3);
 
 FrameRate *FrameRate::fromInt(int val)
 {
@@ -60,7 +60,7 @@ FrameRate *FrameRate::valueOf(const std::string &a0)
 
 std::vector<FrameRate *> FrameRate::values()
 {
-    return std::vector<FrameRate *>{
+    return std::vector{
         FRAME_RATE_24,
         FRAME_RATE_25,
         FRAME_RATE_30,

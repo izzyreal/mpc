@@ -6,7 +6,6 @@ namespace mpc::engine
     class IndivFxMixer
     {
 
-    private:
         int output{0};
         int volumeIndividualOut{0};
         int fxPath{0};
@@ -34,7 +33,6 @@ namespace mpc::engine
 
         int getFxSendLevel() const;
 
-    public:
         IndivFxMixer();
     };
 } // namespace mpc::engine

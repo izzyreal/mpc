@@ -15,10 +15,10 @@ TimeSignature::TimeSignature()
 
 TimeSignature::TimeSignature(int tick, int delta, int num, int den, int meter,
                              int div)
-    : MetaEvent(tick, delta, MetaEvent::TIME_SIGNATURE)
+    : MetaEvent(tick, delta, TIME_SIGNATURE)
 {
     setTimeSignature(num, den, meter, div);
-    mLength = mpc::file::mid::util::VariableLengthInt(4);
+    mLength = util::VariableLengthInt(4);
 }
 
 const int TimeSignature::METER_EIGHTH;
@@ -92,7 +92,7 @@ TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData *info)
     int den = info->data[1];
     int met = info->data[2];
     int fps = info->data[3];
-    den = (int)(pow(2, den));
+    den = (int)pow(2, den);
     return std::make_shared<TimeSignature>(tick, delta, num, den, met, fps);
 }
 
@@ -121,7 +121,7 @@ std::string TimeSignature::toString()
            std::to_string(getRealDenominator());
 }
 
-int TimeSignature::compareTo(mpc::file::mid::event::MidiEvent *other)
+int TimeSignature::compareTo(MidiEvent *other)
 {
     if (mTick != other->getTick())
     {

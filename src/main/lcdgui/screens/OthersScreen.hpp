@@ -9,7 +9,6 @@ namespace mpc::lcdgui::screens
     class OthersScreen final : public ScreenComponent, public Observable
     {
 
-    private:
         void displayTapAveraging() const;
         int tapAveraging = 2;
         int contrast = 0;

@@ -14,12 +14,12 @@ namespace mpc::controller
 
     // Forward maps (existing)
     extern const std::unordered_map<MidiFootswitchFunction,
-                                    mpc::hardware::ComponentId>
+                                    hardware::ComponentId>
         footswitchToComponentId;
 
     extern const std::unordered_map<
         MidiFootswitchFunction,
-        mpc::midi::input::MidiControlTarget::SequencerTarget::Command>
+        midi::input::MidiControlTarget::SequencerTarget::Command>
         footswitchToSequencerCmd;
 
     extern const std::unordered_map<MidiFootswitchFunction, std::string>
@@ -28,7 +28,7 @@ namespace mpc::controller
     // === REVERSE LOOKUP HELPERS (inline, header-only) ===
 
     inline std::optional<MidiFootswitchFunction>
-    componentIdToFootswitch(mpc::hardware::ComponentId cid)
+    componentIdToFootswitch(hardware::ComponentId cid)
     {
         for (const auto &[fn, id] : footswitchToComponentId)
         {
@@ -41,7 +41,7 @@ namespace mpc::controller
     }
 
     inline std::optional<MidiFootswitchFunction> sequencerCmdToFootswitch(
-        mpc::midi::input::MidiControlTarget::SequencerTarget::Command cmd)
+        midi::input::MidiControlTarget::SequencerTarget::Command cmd)
     {
         for (const auto &[fn, c] : footswitchToSequencerCmd)
         {
@@ -53,7 +53,7 @@ namespace mpc::controller
         return std::nullopt;
     }
 
-    inline std::optional<mpc::hardware::ComponentId>
+    inline std::optional<hardware::ComponentId>
     footswitchToComponentIdOpt(MidiFootswitchFunction fn)
     {
         auto it = footswitchToComponentId.find(fn);
@@ -63,7 +63,7 @@ namespace mpc::controller
     }
 
     inline std::optional<
-        mpc::midi::input::MidiControlTarget::SequencerTarget::Command>
+        midi::input::MidiControlTarget::SequencerTarget::Command>
     footswitchToSequencerCmdOpt(MidiFootswitchFunction fn)
     {
         auto it = footswitchToSequencerCmd.find(fn);

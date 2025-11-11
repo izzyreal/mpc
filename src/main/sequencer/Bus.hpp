@@ -47,19 +47,17 @@ namespace mpc::sequencer
         std::map<int, int> &getSimultA();
         std::map<int, int> &getSimultB();
 
-        std::vector<std::shared_ptr<mpc::engine::StereoMixer>> &
+        std::vector<std::shared_ptr<engine::StereoMixer>> &
         getStereoMixerChannels();
-        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>> &
+        std::vector<std::shared_ptr<engine::IndivFxMixer>> &
         getIndivFxMixerChannels();
 
     private:
         const int drumIndex;
         int programIndex = 0;
 
-        std::vector<std::shared_ptr<mpc::engine::StereoMixer>>
-            stereoMixerChannels;
-        std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>
-            indivFxMixerChannels;
+        std::vector<std::shared_ptr<engine::StereoMixer>> stereoMixerChannels;
+        std::vector<std::shared_ptr<engine::IndivFxMixer>> indivFxMixerChannels;
 
         std::map<int, int> simultA;
         std::map<int, int> simultB;

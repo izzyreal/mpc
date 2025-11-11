@@ -8,7 +8,7 @@
 
 using namespace mpc::lcdgui;
 
-EnvGraph::EnvGraph(mpc::Mpc &mpc) : Component("env-graph"), mpc(mpc)
+EnvGraph::EnvGraph(Mpc &mpc) : Component("env-graph"), mpc(mpc)
 {
     Component::setSize(190, 40);
     setLocation(10, 10);
@@ -16,7 +16,7 @@ EnvGraph::EnvGraph(mpc::Mpc &mpc) : Component("env-graph"), mpc(mpc)
 
 void EnvGraph::setCoordinates(int attack, int decay, bool decayModeStart)
 {
-    std::vector<int> line1{75, 43, 75 + (int)(attack * 0.2), 24};
+    std::vector line1{75, 43, 75 + (int)(attack * 0.2), 24};
 
     std::vector<int> line2;
     std::vector<int> line3;
@@ -54,8 +54,8 @@ void EnvGraph::Draw(std::vector<std::vector<bool>> *pixels)
     }
 
     const auto csn = mpc.getLayeredScreen()->getCurrentScreenName();
-    int xoff = (csn == "program-params") ? 76 : 92;
-    int yoff = (csn == "program-params") ? 16 : 22;
+    int xoff = csn == "program-params" ? 76 : 92;
+    int yoff = csn == "program-params" ? 16 : 22;
 
     const int width = 49;
     const int height = 27;
@@ -71,14 +71,14 @@ void EnvGraph::Draw(std::vector<std::vector<bool>> *pixels)
         }
     }
 
-    xoff = (csn == "program-params") ? 0 : 16;
-    yoff = (csn == "program-params") ? 0 : 6;
+    xoff = csn == "program-params" ? 0 : 16;
+    yoff = csn == "program-params" ? 0 : 6;
 
     for (auto &c : coordinates)
     {
         auto linePixels = Bressenham::Line(c[0] + xoff, c[1] + yoff,
                                            c[2] + xoff, c[3] + yoff);
-        mpc::Util::drawLine(*pixels, linePixels, true);
+        Util::drawLine(*pixels, linePixels, true);
     }
     dirty = false;
 }

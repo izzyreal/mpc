@@ -10,7 +10,6 @@ namespace mpc::engine::audio::server
     class CompoundAudioClient final : public AudioClient
     {
 
-    private:
         std::vector<AudioClient *> clients;
 
     public:
@@ -18,7 +17,7 @@ namespace mpc::engine::audio::server
 
         void add(AudioClient *client);
 
-        void remove(AudioClient *client);
+        void remove(const AudioClient *client);
     };
 
 } // namespace mpc::engine::audio::server

@@ -66,7 +66,6 @@ namespace mpc::lcdgui
         const int FONT_WIDTH = 6;
         bool isInverted() const;
 
-    protected:
         std::string text;
     };
 } // namespace mpc::lcdgui

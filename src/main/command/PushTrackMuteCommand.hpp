@@ -7,11 +7,11 @@ namespace mpc::command
     class PushTrackMuteCommand : public Command
     {
     public:
-        explicit PushTrackMuteCommand(mpc::Mpc &mpc);
+        explicit PushTrackMuteCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

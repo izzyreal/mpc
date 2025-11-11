@@ -16,7 +16,7 @@
 
 using namespace mpc::lcdgui;
 
-TextComp::TextComp(mpc::Mpc &mpc, const std::string &name)
+TextComp::TextComp(Mpc &mpc, const std::string &name)
     : Component(name), mpc(mpc)
 {
 }
@@ -99,7 +99,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
             StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
         textToRender = charsToAlign + text.substr(charsToAlignCount);
         const auto charsWidthInPixels =
-            mpc::Util::getTextWidthInPixels(charsToAlign);
+            Util::getTextWidthInPixels(charsToAlign);
         alignmentOffset = (alignmentEndX - charsWidthInPixels) * 0.5;
     }
 
@@ -140,7 +140,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
                         }
                         else
                         {
-                            xpos += (2 * alignmentOffset);
+                            xpos += 2 * alignmentOffset;
                         }
                     }
                     else if (leftMargin != 0)
@@ -186,7 +186,7 @@ void TextComp::Draw(std::vector<std::vector<bool>> *pixels)
                 field != nullptr && field->isSplit() &&
                 field->getActiveSplit() + 2 <= xPos / 6;
 
-            const bool color = (field != nullptr && field->isTypeModeEnabled())
+            const bool color = field != nullptr && field->isTypeModeEnabled()
                                    ? false
                                    : !(inverted && !twoDotsDoubleInverted);
 

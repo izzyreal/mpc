@@ -33,8 +33,7 @@ void NoteInputScreenUpdateCommand::execute()
 
     const auto screenComponent = ctx.screenComponent;
 
-    if (mpc::sequencer::isDrumNote(note) &&
-        ctx.isAllowCentralNoteAndPadUpdateScreen)
+    if (sequencer::isDrumNote(note) && ctx.isAllowCentralNoteAndPadUpdateScreen)
     {
         ctx.setSelectedNote(note);
     }

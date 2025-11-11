@@ -23,7 +23,7 @@ std::string EnumControl::getValueString()
     {
         return std::to_string(*intValue);
     }
-    else if (auto strValue = std::get_if<std::string>(&value))
+    if (auto strValue = std::get_if<std::string>(&value))
     {
         return *strValue;
     }

@@ -7,11 +7,11 @@
 
 using namespace mpc::lcdgui;
 
-Parameter::Parameter(mpc::Mpc &mpc, std::string labelStr, std::string name,
-                     int x, int y, int fieldWidth)
+Parameter::Parameter(Mpc &mpc, std::string labelStr, std::string name, int x,
+                     int y, int fieldWidth)
     : Component(name)
 {
-    const auto labelWidth = mpc::Util::getTextWidthInPixels(labelStr);
+    const auto labelWidth = Util::getTextWidthInPixels(labelStr);
 
     addChild(
         std::make_shared<Label>(mpc, name, labelStr, x, y - 1, labelWidth));

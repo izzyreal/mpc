@@ -15,7 +15,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/NoteEvent.hpp"
 
@@ -29,6 +29,7 @@ using namespace mpc::hardware;
 using namespace mpc::sampler;
 using namespace mpc::eventregistry;
 using namespace mpc::audiomidi;
+using namespace mpc::engine;
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
@@ -39,7 +40,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::optional<int> programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     const std::shared_ptr<EventRegistry> &eventRegistry,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
@@ -70,12 +71,12 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const auto assign16LevelsScreen =
         screens->get<ScreenId::Assign16LevelsScreen>();
 
-    const std::function setSelectedNote = [controller](int n)
+    const std::function setSelectedNote = [controller](const int n)
     {
         controller->setSelectedNote(n);
     };
 
-    std::function setSelectedPad = [controller](int p)
+    const std::function setSelectedPad = [controller](const int p)
     {
         controller->setSelectedPad(p);
     };
@@ -110,7 +111,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
             timingCorrectScreen,
             assign16LevelsScreen,
             eventHandler,
-            frameSequencer,
+            sequencerPlaybackEngine,
             allowCentralNoteAndPadUpdate,
             screen,
             setSelectedNote,
@@ -126,7 +127,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::optional<int> programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     const std::shared_ptr<EventRegistry> &eventRegistry,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
@@ -150,7 +151,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     };
 
     const std::function sequencerMoveToQuarterNotePosition =
-        [sequencer = sequencer](double quarterNotePosition)
+        [sequencer = sequencer](const double quarterNotePosition)
     {
         sequencer->getTransport()->setPosition(quarterNotePosition);
     };
@@ -183,7 +184,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
             hardware->getButton(ERASE)->isPressed(),
             track,
             isStepRecording,
-            frameSequencer->getMetronomeOnlyTickPosition(),
+            sequencerPlaybackEngine->getMetronomeOnlyTickPosition(),
             isRecMainWithoutPlaying,
             sequencer->getTransport()->getTickPosition(),
             stepEditOptionsScreen->getTcValuePercentage(),

@@ -35,7 +35,6 @@ namespace mpc::lcdgui::screens
         void setSliderEnd(int) const;
         void setEnd(int newValue) const;
 
-    public:
         TrimScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
@@ -54,7 +53,6 @@ namespace mpc::lcdgui::screens
 
         void setView(int i);
 
-    private:
         friend class LoopScreen;
         friend class ZoneScreen;
         friend class StartFineScreen;

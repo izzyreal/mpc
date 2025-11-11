@@ -7,11 +7,11 @@ namespace mpc::command
     class PushEnterCommand : public Command
     {
     public:
-        explicit PushEnterCommand(mpc::Mpc &mpc);
+        explicit PushEnterCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

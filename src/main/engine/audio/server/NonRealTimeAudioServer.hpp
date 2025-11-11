@@ -15,7 +15,6 @@ namespace mpc::engine::audio::server
     class NonRealTimeAudioServer : public AudioServer, public AudioClient
     {
 
-    private:
         std::atomic<bool> realTime{true};
         std::atomic<bool> isRunningNonRealTime{false};
         std::shared_ptr<AudioServer> server;

@@ -42,7 +42,6 @@ namespace mpc::file::all
         int normalVelo;
         std::vector<char> saveBytes;
 
-    public:
         bool isEnabled() const;
         int getCountInMode() const;
         int getClickVolume() const;
@@ -57,10 +56,9 @@ namespace mpc::file::all
         int getAccentVelo() const;
         int getNormalVelo() const;
 
-    public:
         std::vector<char> &getBytes();
 
         Count(const std::vector<char> &b);
-        Count(mpc::Mpc &mpc);
+        Count(Mpc &mpc);
     };
 } // namespace mpc::file::all

@@ -44,7 +44,7 @@ namespace mpc::engine
         sampler::VoiceOverlapMode voiceOverlapMode;
 
         // Pointer to currently playing note parameters
-        mpc::sampler::NoteParameters *noteParameters = nullptr;
+        sampler::NoteParameters *noteParameters = nullptr;
 
         // Pointer to sample data when the voice was triggered
         std::shared_ptr<const std::vector<float>> sampleData;
@@ -64,7 +64,7 @@ namespace mpc::engine
         bool loopEnabled = false;
         bool finished = true;
         bool isMono = false;
-        mpc::engine::MuteInfo muteInfo;
+        MuteInfo muteInfo;
         int frameOffset = 0;
         int decayCounter = 0;
         bool enableEnvs = false;
@@ -86,10 +86,9 @@ namespace mpc::engine
         uint64_t noteEventId = 0;
     };
 
-    class Voice : public mpc::engine::audio::core::AudioProcess
+    class Voice : public audio::core::AudioProcess
     {
 
-    private:
         VoiceState *getActiveState()
         {
             return active.load(std::memory_order_acquire);
@@ -103,13 +102,13 @@ namespace mpc::engine
         VoiceState *getInactiveState()
         {
             VoiceState *current = active.load(std::memory_order_acquire);
-            return (current == &stateA) ? &stateB : &stateA;
+            return current == &stateA ? &stateB : &stateA;
         }
 
         void swapStates()
         {
             VoiceState *current = active.load(std::memory_order_relaxed);
-            VoiceState *other = (current == &stateA) ? &stateB : &stateA;
+            VoiceState *other = current == &stateA ? &stateB : &stateA;
             active.store(other, std::memory_order_release);
         }
 
@@ -122,23 +121,23 @@ namespace mpc::engine
         VoiceState stateB;
         std::atomic<VoiceState *> active{&stateA};
 
-        mpc::engine::EnvelopeGenerator *staticEnv = nullptr;
-        mpc::engine::EnvelopeGenerator *ampEnv = nullptr;
-        mpc::engine::EnvelopeGenerator *filterEnv = nullptr;
-        mpc::engine::filter::StateVariableFilter *svfLeft = nullptr;
-        mpc::engine::filter::StateVariableFilter *svfRight = nullptr;
-        mpc::engine::control::LawControl *attack = nullptr;
-        mpc::engine::control::LawControl *hold = nullptr;
-        mpc::engine::control::LawControl *decay = nullptr;
-        mpc::engine::control::LawControl *fattack = nullptr;
-        mpc::engine::control::LawControl *fhold = nullptr;
-        mpc::engine::control::LawControl *fdecay = nullptr;
-        mpc::engine::control::LawControl *shold = nullptr;
-        mpc::engine::control::LawControl *reso = nullptr;
-        mpc::engine::EnvelopeControls *ampEnvControls = nullptr;
-        mpc::engine::EnvelopeControls *staticEnvControls = nullptr;
-        mpc::engine::EnvelopeControls *filterEnvControls = nullptr;
-        mpc::engine::filter::StateVariableFilterControls *svfControls = nullptr;
+        EnvelopeGenerator *staticEnv = nullptr;
+        EnvelopeGenerator *ampEnv = nullptr;
+        EnvelopeGenerator *filterEnv = nullptr;
+        filter::StateVariableFilter *svfLeft = nullptr;
+        filter::StateVariableFilter *svfRight = nullptr;
+        control::LawControl *attack = nullptr;
+        control::LawControl *hold = nullptr;
+        control::LawControl *decay = nullptr;
+        control::LawControl *fattack = nullptr;
+        control::LawControl *fhold = nullptr;
+        control::LawControl *fdecay = nullptr;
+        control::LawControl *shold = nullptr;
+        control::LawControl *reso = nullptr;
+        EnvelopeControls *ampEnvControls = nullptr;
+        EnvelopeControls *staticEnvControls = nullptr;
+        EnvelopeControls *filterEnvControls = nullptr;
+        filter::StateVariableFilterControls *svfControls = nullptr;
 
         // The master level that is set in the Mixer Setup screen.
         // -Inf, -72, -66, -60, -54, -48, -42, -36, -30, -24, -18, -12, -6, 0, 6
@@ -151,14 +150,13 @@ namespace mpc::engine
 
     public:
         // Called from audio thread
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+        int processAudio(audio::core::AudioBuffer *buffer,
                          int nFrames) override;
 
         // Called from main thread
-        void init(int velocity,
-                  const std::shared_ptr<mpc::sampler::Sound> &sound, int note,
-                  mpc::sampler::NoteParameters *np, int varType, int varValue,
-                  int drumIndex, int frameOffset, bool enableEnvs,
+        void init(int velocity, const std::shared_ptr<sampler::Sound> &sound,
+                  int note, sampler::NoteParameters *np, int varType,
+                  int varValue, int drumIndex, int frameOffset, bool enableEnvs,
                   int startTick, float engineSampleRate, uint64_t noteEventId);
 
         uint64_t getNoteEventId();
@@ -175,7 +173,7 @@ namespace mpc::engine
 
         bool isFinished() const;
 
-        const mpc::sampler::NoteParameters *getNoteParameters() const;
+        const sampler::NoteParameters *getNoteParameters() const;
 
         sampler::VoiceOverlapMode getVoiceOverlapMode() const;
 
@@ -187,7 +185,6 @@ namespace mpc::engine
 
         const MuteInfo &getMuteInfo() const;
 
-    public:
         Voice(const int stripNumber, const bool basic);
 
         ~Voice();

@@ -21,14 +21,12 @@ namespace mpc::sequencer
 
     inline bool operator==(const NoteOffEvent &a, const NoteOffEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getNote() == b.getNote();
+        return a == b && a.getNote() == b.getNote();
     }
 
     inline bool operator==(const NoteOnEvent &a, const NoteOnEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getNote() == b.getNote() &&
+        return a == b && a.getNote() == b.getNote() &&
                a.getVelocity() == b.getVelocity() &&
                a.getDuration().has_value() == b.getDuration().has_value() &&
                (!a.getDuration().has_value() ||
@@ -43,51 +41,45 @@ namespace mpc::sequencer
 
     inline bool operator==(const MixerEvent &a, const MixerEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getParameter() == b.getParameter() &&
+        return a == b && a.getParameter() == b.getParameter() &&
                a.getPad() == b.getPad() && a.getValue() == b.getValue();
     }
 
     inline bool operator==(const ChannelPressureEvent &a,
                            const ChannelPressureEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getAmount() == b.getAmount();
+        return a == b && a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const ControlChangeEvent &a,
                            const ControlChangeEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getController() == b.getController() &&
+        return a == b && a.getController() == b.getController() &&
                a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const PitchBendEvent &a, const PitchBendEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getAmount() == b.getAmount();
+        return a == b && a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const PolyPressureEvent &a,
                            const PolyPressureEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getNote() == b.getNote() && a.getAmount() == b.getAmount();
+        return a == b && a.getNote() == b.getNote() &&
+               a.getAmount() == b.getAmount();
     }
 
     inline bool operator==(const ProgramChangeEvent &a,
                            const ProgramChangeEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getProgram() == b.getProgram();
+        return a == b && a.getProgram() == b.getProgram();
     }
 
     inline bool operator==(const SystemExclusiveEvent &a,
                            const SystemExclusiveEvent &b)
     {
-        return static_cast<const Event &>(a) == static_cast<const Event &>(b) &&
-               a.getBytes() == b.getBytes();
+        return a == b && a.getBytes() == b.getBytes();
     }
 
     inline bool eventsEqual(const std::shared_ptr<Event> &a,
@@ -144,8 +136,7 @@ namespace mpc::sequencer
         return *a == *b;
     }
 
-    inline std::shared_ptr<mpc::sequencer::Event>
-    cloneEvent(const std::shared_ptr<mpc::sequencer::Event> &e)
+    inline std::shared_ptr<Event> cloneEvent(const std::shared_ptr<Event> &e)
     {
         using namespace mpc::sequencer;
         if (!e)

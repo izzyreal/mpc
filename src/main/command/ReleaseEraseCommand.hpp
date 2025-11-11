@@ -5,10 +5,10 @@ namespace mpc::command
 {
     class ReleaseEraseCommand : public Command
     {
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
     public:
-        explicit ReleaseEraseCommand(mpc::Mpc &mpc);
+        explicit ReleaseEraseCommand(Mpc &mpc);
         void execute() override;
     };
 } // namespace mpc::command

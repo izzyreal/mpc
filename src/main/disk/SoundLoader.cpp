@@ -18,7 +18,7 @@ using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-SoundLoader::SoundLoader(mpc::Mpc &mpcToUse, bool replaceToUse)
+SoundLoader::SoundLoader(Mpc &mpcToUse, bool replaceToUse)
     : mpc(mpcToUse), replace(replaceToUse)
 {
 }
@@ -153,11 +153,10 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult &r,
     }
 }
 
-sound_or_error
-SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &wavFile,
-                              const std::string &newSoundName,
-                              std::shared_ptr<mpc::sampler::Sound> sound,
-                              const bool shouldBeConverted) const
+sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<WavFile> &wavFile,
+                                             const std::string &newSoundName,
+                                             std::shared_ptr<Sound> sound,
+                                             const bool shouldBeConverted) const
 {
     if (wavFile->getValidBits() != 16 && !shouldBeConverted)
     {
@@ -229,12 +228,12 @@ SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &wavFile,
             wavFile->getSampleRate() > 44100 && shouldBeConverted;
         const float conversionRatio = wavFile->getSampleRate() / 44100.0;
         const auto sampleLoopStart = hasBeenConverted
-                                         ? (sampleLoop.start / conversionRatio)
+                                         ? sampleLoop.start / conversionRatio
                                          : sampleLoop.start;
         sound->setLoopTo(sampleLoopStart);
         auto currentEnd = sound->getEnd();
         const auto sampleLoopEnd = hasBeenConverted
-                                       ? (sampleLoop.end / conversionRatio)
+                                       ? sampleLoop.end / conversionRatio
                                        : sampleLoop.end;
         sound->setEnd(sampleLoopEnd <= 0 ? currentEnd : sampleLoopEnd);
         sound->setLoopEnabled(true);
@@ -246,9 +245,9 @@ SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &wavFile,
     }
 
     const auto tuneFactor = (float)(sound->getSampleRate() / 44100.0);
-    const auto rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
+    const auto rateToTuneBase = (float)pow(2, 1.0 / 12.0);
 
-    int tune = (int)(floor(log(tuneFactor) / log(rateToTuneBase) * 10.0));
+    int tune = (int)floor(log(tuneFactor) / log(rateToTuneBase) * 10.0);
 
     if (tune < -120)
     {

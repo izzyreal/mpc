@@ -6,7 +6,6 @@ namespace mpc::engine::audio::mixer
 {
     class BalanceControl : public LCRControl
     {
-    private:
         float left{1};
         float right{1};
 
@@ -17,7 +16,6 @@ namespace mpc::engine::audio::mixer
 
         void setValue(float value) override;
 
-    public:
         BalanceControl();
     };
 

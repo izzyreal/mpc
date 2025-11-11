@@ -57,7 +57,7 @@ void UserScreen::turnWheel(int i)
 
     if (focusedFieldName == "tempo")
     {
-        const double newTempo = tempo + (i * 0.1);
+        const double newTempo = tempo + i * 0.1;
         setTempo(newTempo);
     }
     else if (focusedFieldName == "loop")
@@ -223,7 +223,7 @@ void UserScreen::resetPreferences()
     for (int i = 0; i < 64; i++)
     {
         trackNames.push_back(std::string(
-            "Track-" + StrUtil::padLeft(std::to_string((int)(i + 1)), "0", 2)));
+            "Track-" + StrUtil::padLeft(std::to_string(i + 1), "0", 2)));
     }
 
     lastBar = 1;

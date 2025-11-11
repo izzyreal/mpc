@@ -3,7 +3,7 @@
 #include <functional>
 #include <cstdint>
 
-namespace mpc::sequencer
+namespace mpc::engine
 {
     struct EventAfterNFrames
     {
@@ -11,4 +11,4 @@ namespace mpc::sequencer
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
     };
-} // namespace mpc::sequencer
+} // namespace mpc::engine

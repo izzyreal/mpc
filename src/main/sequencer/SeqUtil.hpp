@@ -54,26 +54,22 @@ namespace mpc::sequencer
     public:
         static double ticksToFrames(double ticks, const double tempo, int sr);
 
-    public:
         static double sequenceFrameLength(Sequence *, int firstTick,
                                           int lastTick, int sr);
         static int loopFrameLength(Sequence *, int sr);
         static int songFrameLength(Song *song, Sequencer *, int sr);
 
-        static void copyBars(mpc::Mpc &, uint8_t fromSeqIndex,
-                             uint8_t toSeqIndex, uint8_t copyFirstBar,
-                             uint8_t copyLastBar, uint8_t copyCount,
-                             uint8_t copyAfterBar);
+        static void copyBars(Mpc &, uint8_t fromSeqIndex, uint8_t toSeqIndex,
+                             uint8_t copyFirstBar, uint8_t copyLastBar,
+                             uint8_t copyCount, uint8_t copyAfterBar);
 
         static bool isRecMainWithoutPlaying(
             const std::shared_ptr<Sequencer> &sequencer,
-            const std::shared_ptr<
-                mpc::lcdgui::screens::window::TimingCorrectScreen>
+            const std::shared_ptr<lcdgui::screens::window::TimingCorrectScreen>
                 &timingCorrectScreen,
             const std::string &currentScreenName,
-            const std::shared_ptr<mpc::hardware::Button> &recButton,
-            const std::shared_ptr<
-                mpc::controller::ClientHardwareEventController>
+            const std::shared_ptr<hardware::Button> &recButton,
+            const std::shared_ptr<controller::ClientHardwareEventController>
                 &clientHardwareEventController);
 
         static bool isStepRecording(const std::string &currentScreenName,

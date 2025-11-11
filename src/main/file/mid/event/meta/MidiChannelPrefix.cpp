@@ -9,10 +9,10 @@
 using namespace mpc::file::mid::event::meta;
 
 MidiChannelPrefix::MidiChannelPrefix(int tick, int delta, int channel)
-    : MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX)
+    : MetaEvent(tick, delta, MIDI_CHANNEL_PREFIX)
 {
     mChannel = channel;
-    mLength = mpc::file::mid::util::VariableLengthInt(4);
+    mLength = util::VariableLengthInt(4);
 }
 
 void MidiChannelPrefix::setChannel(int c)
@@ -49,7 +49,7 @@ MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta,
     return std::make_shared<MidiChannelPrefix>(tick, delta, channel);
 }
 
-int MidiChannelPrefix::compareTo(mpc::file::mid::event::MidiEvent *other)
+int MidiChannelPrefix::compareTo(MidiEvent *other)
 {
     return 0;
 }

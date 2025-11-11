@@ -20,7 +20,7 @@ void Underline::Draw(std::vector<std::vector<bool>> *pixels)
     {
         for (int j = 0; j < 6; j++)
         {
-            (*pixels)[j + (i * 6) + x][y] = states[i];
+            (*pixels)[j + i * 6 + x][y] = states[i];
         }
     }
     dirty = false;

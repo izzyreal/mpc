@@ -13,13 +13,12 @@ namespace mpc::file::all
     class AllPitchBendEvent
     {
 
-    private:
         const static int AMOUNT_OFFSET = 5;
 
     public:
-        static std::shared_ptr<mpc::sequencer::PitchBendEvent>
+        static std::shared_ptr<sequencer::PitchBendEvent>
         bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(
-            const std::shared_ptr<mpc::sequencer::PitchBendEvent> &);
+        static std::vector<char>
+        mpcEventToBytes(const std::shared_ptr<sequencer::PitchBendEvent> &);
     };
 } // namespace mpc::file::all

@@ -6,7 +6,6 @@ namespace mpc::sequencer
     class SystemExclusiveEvent : public Event
     {
 
-    private:
         std::vector<unsigned char> bytes = std::vector<unsigned char>(2);
 
     public:

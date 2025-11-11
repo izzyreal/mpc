@@ -7,11 +7,11 @@ namespace mpc::command
     class PushRecCommand : public Command
     {
     public:
-        explicit PushRecCommand(mpc::Mpc &mpc);
+        explicit PushRecCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

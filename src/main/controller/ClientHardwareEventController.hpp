@@ -6,8 +6,6 @@
 
 #include "controller/ButtonLockTracker.hpp"
 
-#include <cassert>
-
 namespace mpc
 {
     class Mpc;
@@ -19,10 +17,10 @@ namespace mpc::controller
     class ClientHardwareEventController
     {
     public:
-        ClientHardwareEventController(mpc::Mpc &);
+        explicit ClientHardwareEventController(Mpc &);
 
         void handleClientHardwareEvent(
-            const mpc::client::event::ClientHardwareEvent &event);
+            const client::event::ClientHardwareEvent &event);
 
         ButtonLockTracker buttonLockTracker;
 
@@ -49,7 +47,7 @@ namespace mpc::controller
         std::unordered_map<hardware::ComponentId, float> deltaAccumulators;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
         void handlePadPress(const client::event::ClientHardwareEvent &) const;
         void

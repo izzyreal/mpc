@@ -5,8 +5,6 @@ namespace mpc::sequencer
 {
     class ControlChangeEvent : public Event
     {
-
-    private:
         int controllerNumber = 0;
         int controllerValue = 0;
 

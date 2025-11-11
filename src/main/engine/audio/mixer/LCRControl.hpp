@@ -6,7 +6,7 @@
 namespace mpc::engine::audio::mixer
 {
 
-    class LCRControl : public mpc::engine::control::LawControl
+    class LCRControl : public control::LawControl
     {
 
     public:
@@ -14,9 +14,8 @@ namespace mpc::engine::audio::mixer
 
         virtual float getRight() = 0;
 
-    public:
         LCRControl(const std::string &name,
-                   const std::shared_ptr<mpc::engine::control::ControlLaw> &law,
+                   const std::shared_ptr<control::ControlLaw> &law,
                    float initialValue);
     };
 

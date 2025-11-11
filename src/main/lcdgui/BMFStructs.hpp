@@ -72,7 +72,7 @@ namespace mpc::lcdgui
         // Unsigned
         uint8_t currentU8() const
         {
-            return (uint8_t)pByteData[pos];
+            return pByteData[pos];
         }
         uint8_t getU8()
         {
@@ -82,7 +82,7 @@ namespace mpc::lcdgui
         }
         uint16_t currentU16() const
         {
-            return (uint16_t)((pByteData[pos + 1] << 8) | pByteData[pos]);
+            return (uint16_t)(pByteData[pos + 1] << 8 | pByteData[pos]);
         }
         uint16_t getU16()
         {
@@ -92,9 +92,9 @@ namespace mpc::lcdgui
         }
         uint32_t currentU32() const
         {
-            return (uint32_t)((pByteData[pos + 3] << 24) |
-                              (pByteData[pos + 2] << 16) |
-                              (pByteData[pos + 1] << 8) | pByteData[pos]);
+            return (uint32_t)(pByteData[pos + 3] << 24 |
+                              pByteData[pos + 2] << 16 |
+                              pByteData[pos + 1] << 8 | pByteData[pos]);
         }
         uint32_t getU32()
         {
@@ -115,7 +115,7 @@ namespace mpc::lcdgui
         }
         int16_t currentS16() const
         {
-            return (int16_t)((pByteData[pos + 1] << 8) | pByteData[pos + 0]);
+            return (int16_t)(pByteData[pos + 1] << 8 | pByteData[pos + 0]);
         }
         int16_t getS16()
         {
@@ -125,9 +125,8 @@ namespace mpc::lcdgui
         }
         int32_t currentS32() const
         {
-            return (int32_t)((pByteData[pos + 3] << 24) |
-                             (pByteData[pos + 2] << 16) |
-                             (pByteData[pos + 1] << 8) | pByteData[pos]);
+            return pByteData[pos + 3] << 24 | pByteData[pos + 2] << 16 |
+                   pByteData[pos + 1] << 8 | pByteData[pos];
         }
         int32_t getS32()
         {

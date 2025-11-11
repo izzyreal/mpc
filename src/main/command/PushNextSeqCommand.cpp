@@ -4,7 +4,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushNextSeqCommand::PushNextSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushNextSeqCommand::PushNextSeqCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushNextSeqCommand::execute()
 {

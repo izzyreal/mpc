@@ -28,14 +28,14 @@ namespace mpc::audiomidi
     class EventHandler final : public Observable
     {
     public:
-        EventHandler(mpc::Mpc &mpc);
+        EventHandler(Mpc &mpc);
 
     private:
-        using Track = mpc::sequencer::Track;
-        using Event = mpc::sequencer::Event;
-        using NoteOnEvent = mpc::sequencer::NoteOnEvent;
-        using NoteOffEvent = mpc::sequencer::NoteOffEvent;
-        using NoteOnEventPlayOnly = mpc::sequencer::NoteOnEventPlayOnly;
+        using Track = sequencer::Track;
+        using Event = sequencer::Event;
+        using NoteOnEvent = sequencer::NoteOnEvent;
+        using NoteOffEvent = sequencer::NoteOffEvent;
+        using NoteOnEventPlayOnly = sequencer::NoteOnEventPlayOnly;
 
         std::atomic<uint64_t> noteEventId = 1;
 
@@ -116,9 +116,9 @@ namespace mpc::audiomidi
                                const int trackDevice,
                                const std::optional<int> trackVelocityRatio);
 
-        void handleFinalizedDrumNoteOnEvent(std::shared_ptr<NoteOnEvent>,
-                                            std::shared_ptr<sequencer::DrumBus>,
-                                            sequencer::Track *);
+        void handleFinalizedDrumNoteOnEvent(
+            const std::shared_ptr<NoteOnEvent> &,
+            const std::shared_ptr<sequencer::DrumBus> &, sequencer::Track *);
 
         /**
          * The MPC2000XL supports realtime, non-destructive transposition of
@@ -145,6 +145,6 @@ namespace mpc::audiomidi
         const size_t TRANSPOSE_CACHE_CAPACITY = 512;
         std::unordered_map<std::shared_ptr<NoteOffEvent>, int> transposeCache;
 
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 } // namespace mpc::audiomidi

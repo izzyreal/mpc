@@ -4,7 +4,7 @@
 namespace mpc::command
 {
 
-    PushLeftCommand::PushLeftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    PushLeftCommand::PushLeftCommand(Mpc &mpc) : mpc(mpc) {}
 
     void PushLeftCommand::execute()
     {

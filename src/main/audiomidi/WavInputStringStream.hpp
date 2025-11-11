@@ -136,7 +136,7 @@ bool wav_read_header(std::istringstream &stream, int &sampleRate,
         return false;
     }
 
-    numFrames = (dataChunkSize / (validBits / 8)) / numChannels;
+    numFrames = dataChunkSize / (validBits / 8) / numChannels;
 
     return true;
 }

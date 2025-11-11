@@ -6,7 +6,6 @@ namespace mpc::sequencer
     class PitchBendEvent : public Event
     {
 
-    private:
         int pitchBendAmount{0};
 
     public:

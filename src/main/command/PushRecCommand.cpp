@@ -11,7 +11,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushRecCommand::PushRecCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushRecCommand::PushRecCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushRecCommand::execute()
 {
@@ -20,7 +20,7 @@ void PushRecCommand::execute()
     mpc.clientEventController->clientHardwareEventController->buttonLockTracker
         .unlock(hardware::ComponentId::OVERDUB);
 
-    if (lcdgui::screengroups::isPlayOnlyScreen(
+    if (screengroups::isPlayOnlyScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
     {
         return;
@@ -32,7 +32,7 @@ void PushRecCommand::execute()
         mpc.getSequencer()->getTransport()->setOverdubbing(false);
     }
 
-    if (!lcdgui::screengroups::isPlayAndRecordScreen(
+    if (!screengroups::isPlayAndRecordScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);

@@ -15,13 +15,12 @@ namespace mpc::engine::audio::core
 
         virtual void open() {}
 
-        virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer)
+        virtual int processAudio(AudioBuffer *buffer)
         {
             return processAudio(buffer, buffer->getSampleCount());
         }
 
-        virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
-                                 int)
+        virtual int processAudio(AudioBuffer *buffer, int)
         {
             return processAudio(buffer);
         }

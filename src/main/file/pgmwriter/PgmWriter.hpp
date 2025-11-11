@@ -15,7 +15,6 @@ namespace mpc::file::pgmwriter
     class PgmWriter
     {
 
-    private:
         std::vector<char> header;
         std::vector<char> pgmName;
         std::vector<char> sampleNames;
@@ -27,7 +26,7 @@ namespace mpc::file::pgmwriter
     public:
         std::vector<char> get() const;
 
-        PgmWriter(mpc::sampler::Program *program,
-                  const std::weak_ptr<mpc::sampler::Sampler> &sampler);
+        PgmWriter(sampler::Program *program,
+                  const std::weak_ptr<sampler::Sampler> &sampler);
     };
 } // namespace mpc::file::pgmwriter

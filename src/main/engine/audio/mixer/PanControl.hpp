@@ -8,7 +8,6 @@ namespace mpc::engine::audio::mixer
     class PanControl : public LCRControl
     {
 
-    private:
         float left;
         float right;
 
@@ -19,7 +18,6 @@ namespace mpc::engine::audio::mixer
 
         void setValue(float value) override;
 
-    public:
         PanControl();
     };
 

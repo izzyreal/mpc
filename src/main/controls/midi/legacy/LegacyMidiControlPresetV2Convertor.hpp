@@ -85,7 +85,7 @@ namespace mpc::controls::midi::legacy
 
             json binding;
             binding["labelName"] = label;
-            binding["messageType"] = (typeByte == 0) ? "CC" : "Note";
+            binding["messageType"] = typeByte == 0 ? "CC" : "Note";
 
             int midiChannel = static_cast<signed char>(channelByte); // -1..15
             binding["midiChannelIndex"] = midiChannel;

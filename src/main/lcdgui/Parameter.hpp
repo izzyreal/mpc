@@ -20,7 +20,7 @@ namespace mpc::lcdgui
     {
 
     public:
-        Parameter(mpc::Mpc &mpc, std::string labelStr, std::string name, int x,
+        Parameter(Mpc &mpc, std::string labelStr, std::string name, int x,
                   int y, int fieldWidth);
     };
 } // namespace mpc::lcdgui

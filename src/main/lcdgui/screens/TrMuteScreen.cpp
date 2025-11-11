@@ -79,7 +79,7 @@ TrMuteScreen::TrMuteScreen(Mpc &mpc, const int layerIndex)
                                         ->getTrack(trackIndex)
                                         ->isOn())
                                 {
-                                    tracksEnabled |= (1u << i);
+                                    tracksEnabled |= 1u << i;
                                 }
                             }
 
@@ -144,8 +144,8 @@ void TrMuteScreen::turnWheel(int i)
 
     if (focusedFieldName == "sq" && !sequencer->getTransport()->isPlaying())
     {
-        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i, true);
+        sequencer->setActiveSequenceIndex(
+            sequencer->getActiveSequenceIndex() + i, true);
     }
 }
 

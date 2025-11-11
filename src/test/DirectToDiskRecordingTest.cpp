@@ -7,7 +7,7 @@
 #include "sequencer/Clock.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
 
@@ -49,8 +49,8 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc.getLayeredScreen()->openScreenById(
         ScreenId::VmpcDirectToDiskRecorderScreen);
 
-    auto audioMidiServices = mpc.getAudioMidiServices();
-    auto audioServer = audioMidiServices->getAudioServer();
+    auto engineHost = mpc.getEngineHost();
+    auto audioServer = engineHost->getAudioServer();
 
     audioServer->setSampleRate(SAMPLE_RATE);
     audioServer->resizeBuffers(BUFFER_SIZE);
@@ -73,7 +73,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
         {
             for (int i = 0; i < DSP_CYCLE_COUNT; i++)
             {
-                audioMidiServices->changeBounceStateIfRequired();
+                engineHost->changeBounceStateIfRequired();
                 mpc.getClock()->processBufferInternal(
                     mpc.getSequencer()->getTransport()->getTempo(), SAMPLE_RATE,
                     BUFFER_SIZE, 0);

@@ -92,7 +92,7 @@ void CompoundControl::disambiguate(const std::shared_ptr<CompoundControl> &c)
     do
     {
         index++;
-        str = original + " #" + (std::to_string(index));
+        str = original + " #" + std::to_string(index);
     } while (find(str));
     c->setName(str);
 }

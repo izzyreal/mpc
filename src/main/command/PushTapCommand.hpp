@@ -7,11 +7,11 @@ namespace mpc::command
     class PushTapCommand : public Command
     {
     public:
-        explicit PushTapCommand(mpc::Mpc &mpc);
+        explicit PushTapCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

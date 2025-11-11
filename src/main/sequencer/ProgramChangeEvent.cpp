@@ -16,8 +16,7 @@ int ProgramChangeEvent::getProgram() const
     return programChangeValue;
 }
 
-mpc::sequencer::ProgramChangeEvent::ProgramChangeEvent(
-    const ProgramChangeEvent &event)
+ProgramChangeEvent::ProgramChangeEvent(const ProgramChangeEvent &event)
     : Event(event)
 {
     setProgram(event.getProgram());

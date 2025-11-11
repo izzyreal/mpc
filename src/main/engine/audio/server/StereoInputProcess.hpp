@@ -9,8 +9,7 @@ namespace mpc::engine::audio::server
     {
 
     public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
-                         int nFrames) override;
+        int processAudio(core::AudioBuffer *buffer, int nFrames) override;
 
         StereoInputProcess(const std::string &name);
     };

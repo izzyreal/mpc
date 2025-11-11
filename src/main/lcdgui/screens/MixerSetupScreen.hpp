@@ -20,7 +20,6 @@ namespace mpc::lcdgui::screens
         void displayCopyPgmMixToDrum() const;
         void displayRecordMixChanges() const;
 
-    private:
         std::vector<std::string> masterLevelNames = {u8"-\u00D9\u00DAdB",
                                                      "-72dB",
                                                      "-66dB",
@@ -51,7 +50,6 @@ namespace mpc::lcdgui::screens
         bool isStereoMixSourceDrum() const;
         bool isIndivFxSourceDrum() const;
 
-    public:
         int getMasterLevel() const;
         void setMasterLevel(int i);
         int getFxDrum() const;

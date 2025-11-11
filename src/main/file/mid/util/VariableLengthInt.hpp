@@ -10,7 +10,6 @@ namespace mpc::file::mid::util
     class VariableLengthInt
     {
 
-    private:
         int mValue = 0;
         std::vector<char> mBytes;
         int mSizeInBytes = 0;

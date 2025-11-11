@@ -12,10 +12,9 @@ namespace mpc::file::mid::event::meta
 
     public:
         int type = 0;
-        mpc::file::mid::util::VariableLengthInt length;
+        util::VariableLengthInt length;
         std::vector<char> data;
 
-    public:
         MetaEventData(std::stringstream &in);
     };
 } // namespace mpc::file::mid::event::meta

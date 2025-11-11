@@ -10,16 +10,13 @@ namespace mpc::lcdgui::screens::window
     public:
         void turnWheel(int i) override;
 
-    public:
         TransmitProgramChangesScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:
         void displayTransmitProgramChangesInThisTrack() const;
 
-    private:
         bool transmitProgramChangesInThisTrack = false;
 
     public:

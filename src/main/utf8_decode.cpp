@@ -79,7 +79,7 @@ Return UTF8_ERROR if it is not a contination byte.
 static int cont()
 {
     int c = get();
-    return ((c & 0xC0) == 0x80) ? (c & 0x3F) : UTF8_ERROR;
+    return (c & 0xC0) == 0x80 ? c & 0x3F : UTF8_ERROR;
 }
 
 /*
@@ -108,7 +108,7 @@ The character offset matches the byte offset if the text is strictly ASCII.
 */
 int utf8_decode_at_character()
 {
-    return (the_char > 0) ? the_char - 1 : 0;
+    return the_char > 0 ? the_char - 1 : 0;
 }
 
 /*
@@ -147,7 +147,7 @@ int utf8_decode_next()
         c1 = cont();
         if (c1 >= 0)
         {
-            r = ((c & 0x1F) << 6) | c1;
+            r = (c & 0x1F) << 6 | c1;
             if (r >= 128)
             {
                 return r;
@@ -164,7 +164,7 @@ int utf8_decode_next()
         c2 = cont();
         if ((c1 | c2) >= 0)
         {
-            r = ((c & 0x0F) << 12) | (c1 << 6) | c2;
+            r = (c & 0x0F) << 12 | c1 << 6 | c2;
             if (r >= 2048 && (r < 55296 || r > 57343))
             {
                 return r;
@@ -182,7 +182,7 @@ int utf8_decode_next()
         c3 = cont();
         if ((c1 | c2 | c3) >= 0)
         {
-            r = ((c & 0x07) << 18) | (c1 << 12) | (c2 << 6) | c3;
+            r = (c & 0x07) << 18 | c1 << 12 | c2 << 6 | c3;
             if (r >= 65536 && r <= 1114111)
             {
                 return r;

@@ -27,7 +27,7 @@ namespace mpc::eventregistry
 
         ProgramPadPressEventPtr getMostRecentProgramPadPress(
             ProgramPadIndex idx,
-            const ::std::vector<Source> &sourcesToExclude) const;
+            const std::vector<Source> &sourcesToExclude) const;
 
         int getTotalPressedProgramPadCount() const;
 

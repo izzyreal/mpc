@@ -13,7 +13,6 @@ namespace mpc::file::pgmwriter
     class Pads
     {
 
-    private:
         std::vector<char> padsArray;
         static std::string
             fxBoardSettings; // dummy -- not implemented in any way -- just to
@@ -29,6 +28,6 @@ namespace mpc::file::pgmwriter
     public:
         static std::vector<char> getFxBoardSettings();
 
-        Pads(mpc::sampler::Program *program);
+        Pads(sampler::Program *program);
     };
 } // namespace mpc::file::pgmwriter

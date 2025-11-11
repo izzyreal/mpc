@@ -5,8 +5,6 @@
 
 #include "DemoFiles.hpp"
 
-#include "controller/ClientHardwareEventController.hpp"
-#include "engine/MixerInterconnection.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "lcdgui/ScreenComponent.hpp"
@@ -17,7 +15,7 @@
 
 #include "disk/AbstractDisk.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiDeviceDetector.hpp"
 #include "audiomidi/MidiOutput.hpp"
@@ -52,7 +50,7 @@ Mpc::Mpc()
 
 void Mpc::init()
 {
-    std::vector<fs::path> requiredPaths{
+    const std::vector requiredPaths{
         paths->appDocumentsPath(), paths->configPath(),
         paths->storesPath(),       paths->defaultLocalVolumePath(),
         paths->recordingsPath(),   paths->autoSavePath()};
@@ -132,11 +130,11 @@ void Mpc::init()
     clientEventController =
         std::make_shared<controller::ClientEventController>(*this);
     /*
-     * AudioMidiServices requires sequencer to exist.
+     * EngineHost requires sequencer to exist.
      */
-    audioMidiServices = std::make_shared<audiomidi::AudioMidiServices>(*this);
+    engineHost = std::make_shared<engine::EngineHost>(*this);
 
-    MLOG("AudioMidiServices created");
+    MLOG("EngineHost created");
 
     sequencer = std::make_shared<Sequencer>(
         layeredScreen,
@@ -144,27 +142,27 @@ void Mpc::init()
         {
             return screens;
         },
-        &audioMidiServices->getVoices(),
+        &engineHost->getVoices(),
         [&]
         {
-            return audioMidiServices->getAudioServer()->isRunning();
+            return engineHost->getAudioServer()->isRunning();
         },
         hardware,
         [&]
         {
-            return audioMidiServices->isBouncePrepared();
+            return engineHost->isBouncePrepared();
         },
         [&]
         {
-            audioMidiServices->startBouncing();
+            engineHost->startBouncing();
         },
         [&]
         {
-            audioMidiServices->stopBouncing();
+            engineHost->stopBouncing();
         },
         [&]
         {
-            return audioMidiServices->isBouncing();
+            return engineHost->isBouncing();
         },
         [&]
         {
@@ -175,32 +173,9 @@ void Mpc::init()
         {
             return clientEventController->isSixteenLevelsEnabled();
         },
-        clock,
         [&]
         {
-            return audioMidiServices->getAudioServer()->getSampleRate();
-        },
-        [&]
-        {
-            return clientEventController->isRecMainWithoutPlaying();
-        },
-        [&]
-        {
-            return clientEventController->clientHardwareEventController
-                ->isNoteRepeatLockedOrPressed();
-        },
-        [&]
-        {
-            return audioMidiServices->getMixer();
-        },
-        [&]
-        {
-            return clientEventController->isFullLevelEnabled();
-        },
-        [&]() -> std::vector<engine::MixerInterconnection *> &
-        {
-            return audioMidiServices->getMixerConnections();
-            {};
+            return engineHost->getSequencerPlaybackEngine();
         });
     MLOG("Sequencer created");
 
@@ -211,8 +186,8 @@ void Mpc::init()
     sequencer->init();
     MLOG("Sequencer initialized");
 
-    audioMidiServices->start();
-    MLOG("AudioMidiServices started");
+    engineHost->start();
+    MLOG("EngineHost started");
 
     clientEventController->init();
 
@@ -254,9 +229,9 @@ std::shared_ptr<Sampler> Mpc::getSampler()
     return sampler;
 }
 
-std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
+std::shared_ptr<engine::EngineHost> Mpc::getEngineHost()
 {
-    return audioMidiServices;
+    return engineHost;
 }
 
 std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler()
@@ -333,9 +308,9 @@ Mpc::~Mpc()
         layeredScreen.reset();
     }
 
-    if (audioMidiServices)
+    if (engineHost)
     {
-        audioMidiServices->destroyServices();
+        engineHost->destroyServices();
     }
 }
 
@@ -353,7 +328,7 @@ std::shared_ptr<Clock> Mpc::getClock()
     return clock;
 }
 
-void Mpc::setPluginModeEnabled(bool b)
+void Mpc::setPluginModeEnabled(const bool b)
 {
     pluginModeEnabled = b;
 }

@@ -25,7 +25,6 @@ namespace mpc::lcdgui::screens
         void displayLastBar() const;
         void displayFirstBar() const;
 
-    private:
         int lastBar = 0;
         int firstBar = 0;
         int afterBar = 0;

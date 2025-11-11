@@ -9,7 +9,6 @@ namespace mpc::lcdgui::screens::window
     class MultiRecordingSetupScreen final : public ScreenComponent
     {
 
-    private:
         int yPos = 0;
         int yOffset = 0;
         std::vector<MultiRecordingSetupLine> mrsLines =
@@ -25,10 +24,8 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void function(int i) override;
 
-    public:
         MultiRecordingSetupScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:

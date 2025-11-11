@@ -17,7 +17,7 @@ using namespace mpc::file;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-StdDisk::StdDisk(mpc::Mpc &mpc) : AbstractDisk(mpc) {}
+StdDisk::StdDisk(Mpc &mpc) : AbstractDisk(mpc) {}
 
 void StdDisk::close()
 {
@@ -110,7 +110,7 @@ std::string StdDisk::getDirectoryName()
         return "ROOT";
     }
 
-    return path[(int)(path.size()) - 1];
+    return path[(int)path.size() - 1];
 }
 
 bool StdDisk::moveBack()
@@ -120,7 +120,7 @@ bool StdDisk::moveBack()
         return false;
     }
 
-    int lastPathIndex = (int)(path.size()) - 1;
+    int lastPathIndex = (int)path.size() - 1;
 
     path.erase(path.begin() + lastPathIndex);
     return true;

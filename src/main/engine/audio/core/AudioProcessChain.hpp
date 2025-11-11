@@ -14,25 +14,20 @@ namespace mpc::engine::audio::core
         std::shared_ptr<AudioControlsChain> controlChain;
         std::vector<std::shared_ptr<AudioProcess>> processes;
 
-    public:
         void open() override;
 
-    public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
-                         int nFrames) override;
+        int processAudio(AudioBuffer *buffer, int nFrames) override;
 
         void close() override;
 
         virtual std::string getName();
 
-    public:
         virtual std::shared_ptr<AudioProcess>
         createProcess(std::shared_ptr<AudioControls>)
         {
             return {};
         }
 
-    public:
         AudioProcessChain(
             const std::shared_ptr<AudioControlsChain> &controlChain);
     };

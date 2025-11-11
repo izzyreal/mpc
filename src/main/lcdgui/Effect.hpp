@@ -7,8 +7,6 @@ namespace mpc::lcdgui
 
     class Effect : public Component
     {
-
-    private:
         bool filled = false;
 
     public:

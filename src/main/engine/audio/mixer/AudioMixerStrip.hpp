@@ -14,7 +14,7 @@ namespace mpc::engine::audio::mixer
         AudioMixer *mixer{nullptr};
 
     private:
-        std::shared_ptr<audio::core::AudioBuffer> buffer;
+        std::shared_ptr<core::AudioBuffer> buffer;
         std::shared_ptr<AudioProcess> input;
         std::shared_ptr<AudioProcess> directOutput;
         bool isChannel{false};
@@ -27,7 +27,6 @@ namespace mpc::engine::audio::mixer
 
         void silence();
 
-    public:
         std::shared_ptr<core::AudioBuffer> createBuffer();
 
     private:
@@ -37,20 +36,16 @@ namespace mpc::engine::audio::mixer
     public:
         bool processBuffer(int nFrames);
 
-        int mix(core::AudioBuffer *bufferToMix, std::vector<float> &gain);
+        int mix(core::AudioBuffer *bufferToMix, const std::vector<float> &gain);
 
-    public:
-        std::shared_ptr<AudioProcess> createProcess(
-            std::shared_ptr<mpc::engine::audio::core::AudioControls> controls)
-            override;
+        std::shared_ptr<AudioProcess>
+        createProcess(std::shared_ptr<core::AudioControls> controls) override;
 
         void close() override;
 
-    public:
         AudioMixerStrip(
             AudioMixer *mixer,
-            const std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
-                &controlsChain);
+            const std::shared_ptr<core::AudioControlsChain> &controlsChain);
     };
 
 } // namespace mpc::engine::audio::mixer

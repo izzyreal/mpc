@@ -26,7 +26,7 @@ void HorizontalBar::Draw(std::vector<std::vector<bool>> *pixels)
     const auto rect = getRect();
     const int x = rect.L;
     const int y = rect.T;
-    const int x2 = x + ((int)(floor((value - 1) / 2.55))) + 1;
+    const int x2 = x + (int)floor((value - 1) / 2.55) + 1;
 
     for (int i = rect.L; i <= rect.R; i++)
     {

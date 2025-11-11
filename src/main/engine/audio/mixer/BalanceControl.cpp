@@ -5,7 +5,7 @@
 using namespace mpc::engine::audio::mixer;
 
 BalanceControl::BalanceControl()
-    : LCRControl("Balance", mpc::engine::control::LinearLaw::UNITY(), 0.5f)
+    : LCRControl("Balance", control::LinearLaw::UNITY(), 0.5f)
 {
 }
 

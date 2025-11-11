@@ -13,22 +13,18 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void turnWheel(int i) override;
 
-    public:
         ChangeTsigScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:
         void displayBars() const;
         void displayNewTsig() const;
 
-    private:
         sequencer::TimeSignature timesignature;
         int bar0 = 0;
         int bar1 = 0;
 
-    private:
         void setBar0(int i, int max);
         void setBar1(int i, int max);
     };

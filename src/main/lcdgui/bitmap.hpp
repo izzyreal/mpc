@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 namespace mpc::lcdgui
 {
@@ -43,7 +43,6 @@ namespace mpc::lcdgui
      **/
     class Bitmap
     {
-    private:
         PixelMatrix pixels;
 
     public:

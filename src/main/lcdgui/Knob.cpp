@@ -50,18 +50,18 @@ void Knob::Draw(std::vector<std::vector<bool>> *pixels)
     lines.emplace_back(Bressenham::Line(7, 0, 3, 0));
     lines.emplace_back(Bressenham::Line(3, 0, 0, 3));
 
-    const int angle = (int)((value * 3.1) - 245);
+    const int angle = (int)(value * 3.1 - 245);
     const float radius = 4.95f;
-    const int radiusInt = (int)(radius);
-    const float angleToRadians = ((float)(angle) / 180.0) * 3.14159265;
+    const int radiusInt = (int)radius;
+    const float angleToRadians = (float)angle / 180.0 * 3.14159265;
     const int x0 = (int)(radius * cos(angleToRadians));
     const int y0 = (int)(radius * sin(angleToRadians));
     lines.emplace_back(
         Bressenham::Line(5, 5, x0 + radiusInt + 1, y0 + radiusInt + 1));
 
-    const std::vector<bool> colors(lines.size(), color);
+    const std::vector colors(lines.size(), color);
 
-    const std::vector<int> offsetxy{rect.L, rect.T};
-    mpc::Util::drawLines(*pixels, lines, colors, offsetxy);
+    const std::vector offsetxy{rect.L, rect.T};
+    Util::drawLines(*pixels, lines, colors, offsetxy);
     dirty = false;
 }

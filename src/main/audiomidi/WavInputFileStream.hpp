@@ -145,6 +145,6 @@ bool wav_read_header(const std::shared_ptr<std::istream> &stream,
         return false;
     }
 
-    numFrames = (dataChunkSize / (validBits / 8)) / numChannels;
+    numFrames = dataChunkSize / (validBits / 8) / numChannels;
     return true;
 }

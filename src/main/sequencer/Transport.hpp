@@ -1,10 +1,17 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <functional>
 
 namespace mpc::lcdgui
 {
     class Screens;
+}
+
+namespace mpc::engine
+{
+    class SequencerPlaybackEngine;
 }
 
 namespace mpc::sequencer
@@ -20,7 +27,10 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        explicit Transport(Sequencer &owner);
+        explicit Transport(
+            Sequencer &owner,
+            const std::function<
+                std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
         void play();
         void play(bool fromStart);
@@ -91,6 +101,8 @@ namespace mpc::sequencer
 
     private:
         Sequencer &sequencer;
+        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+            getSequencerPlaybackEngine;
 
         bool playing = false;
         bool recording = false;

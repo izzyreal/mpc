@@ -191,7 +191,7 @@ int Util::getTextWidthInPixels(const std::string &text)
         nPos = text.find(halfSpace, nPos + halfSpace.size());
     }
 
-    return (count * 6) - (halfSpaceCount * 3);
+    return count * 6 - halfSpaceCount * 3;
 }
 
 void Util::initSequence(mpc::Mpc &mpc)
@@ -251,7 +251,7 @@ void Util::set16LevelsValues(const SixteenLevelsContext &ctx,
         }
 
         const auto diff = ctx.padIndexWithoutBank - _16l_key;
-        auto candidate = 64 + (diff * 5);
+        auto candidate = 64 + diff * 5;
 
         if (candidate > 124)
         {

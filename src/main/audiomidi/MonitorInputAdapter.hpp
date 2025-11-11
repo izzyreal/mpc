@@ -17,16 +17,13 @@ namespace mpc::lcdgui::screens
 namespace mpc::audiomidi
 {
 
-    class MonitorInputAdapter
-        : public mpc::engine::audio::core::AudioProcessAdapter
+    class MonitorInputAdapter : public engine::audio::core::AudioProcessAdapter
     {
-    private:
-        std::shared_ptr<mpc::lcdgui::screens::SampleScreen> sampleScreen;
+        std::shared_ptr<lcdgui::screens::SampleScreen> sampleScreen;
 
     public:
-        int32_t processAudio(mpc::engine::audio::core::AudioBuffer *buffer,
+        int32_t processAudio(engine::audio::core::AudioBuffer *buffer,
                              int nFrames) override;
-        MonitorInputAdapter(mpc::Mpc &mpc,
-                            mpc::engine::audio::core::AudioProcess *process);
+        MonitorInputAdapter(Mpc &mpc, AudioProcess *process);
     };
 } // namespace mpc::audiomidi

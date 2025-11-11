@@ -105,8 +105,8 @@ void BarsScreen::turnWheel(int i)
 
     if (focusedFieldName == "fromsq")
     {
-        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i, true);
+        sequencer->setActiveSequenceIndex(
+            sequencer->getActiveSequenceIndex() + i, true);
 
         displayFromSq();
 
@@ -175,7 +175,7 @@ void BarsScreen::turnWheel(int i)
 
         if (!toSequence->isUsed())
         {
-            mpc::Util::initSequence(eventsScreen->toSq, mpc);
+            Util::initSequence(eventsScreen->toSq, mpc);
         }
 
         setCopies(eventsScreen->copies + i);

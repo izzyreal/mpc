@@ -1,7 +1,7 @@
 #include "audiomidi/SoundRecorder.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 
 #include "lcdgui/screens/SampleScreen.hpp"
 #include "sampler/Sampler.hpp"
@@ -177,7 +177,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
                   log10(peakR) * 20 > sampleScreen->threshold))
     {
         armed = false;
-        mpc.getAudioMidiServices()->startRecordingSound();
+        mpc.getEngineHost()->startRecordingSound();
     }
 
     // If not recording, nothing to consume this frame (we keep always-writing)
@@ -206,8 +206,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
     {
         if (mode == 0 || mode == 1)
         {
-            const auto &input =
-                (mode == 0 ? unresampledLeft : unresampledRight);
+            const auto &input = mode == 0 ? unresampledLeft : unresampledRight;
             const auto generatedFrameCount = resamplers[0].resample(
                 input, resampledLeft, engineSampleRate, consumed);
             sound->appendFrames(resampledLeft, generatedFrameCount);

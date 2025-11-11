@@ -25,7 +25,6 @@ namespace mpc::file::pgmreader
     class ProgramFileReader
     {
 
-    private:
         PgmHeader *pgmHeader;
         SoundNames *sampleNames;
         ProgramName *programName;
@@ -33,12 +32,11 @@ namespace mpc::file::pgmreader
         Mixer *mixer;
         Slider *slider;
         Pads *pads;
-        std::weak_ptr<mpc::disk::MpcFile> programFile;
+        std::weak_ptr<disk::MpcFile> programFile;
 
     public:
         std::vector<char> readProgramFileArray() const;
 
-    public:
         PgmHeader *getHeader() const;
         SoundNames *getSampleNames() const;
         PgmAllNoteParameters *getAllNoteParameters() const;
@@ -47,7 +45,7 @@ namespace mpc::file::pgmreader
         ProgramName *getProgramName() const;
         Slider *getSlider() const;
 
-        ProgramFileReader(const std::weak_ptr<mpc::disk::MpcFile> &);
+        ProgramFileReader(const std::weak_ptr<disk::MpcFile> &);
         ~ProgramFileReader();
     };
 } // namespace mpc::file::pgmreader

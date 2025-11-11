@@ -24,10 +24,7 @@ std::string StrUtil::replaceAll(const std::string &str, char c,
             {
                 continue;
             }
-            else
-            {
-                res.push_back(replacement[0]);
-            }
+            res.push_back(replacement[0]);
         }
         else
         {
@@ -167,8 +164,8 @@ bool StrUtil::hasEnding(std::string const &fullString,
 {
     if (fullString.length() >= ending.length())
     {
-        return (0 == fullString.compare(fullString.length() - ending.length(),
-                                        ending.length(), ending));
+        return 0 == fullString.compare(fullString.length() - ending.length(),
+                                       ending.length(), ending);
     }
     else
     {
@@ -179,13 +176,13 @@ bool StrUtil::hasEnding(std::string const &fullString,
 inline std::string ltrim(const std::string &s, char c)
 {
     size_t start = s.find_first_not_of(c);
-    return (start == std::string::npos) ? "" : s.substr(start);
+    return start == std::string::npos ? "" : s.substr(start);
 }
 
 inline std::string rtrim(const std::string &s, char c)
 {
     size_t end = s.find_last_not_of(c);
-    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+    return end == std::string::npos ? "" : s.substr(0, end + 1);
 }
 
 inline std::string trim_by_c(const std::string &s, char c)

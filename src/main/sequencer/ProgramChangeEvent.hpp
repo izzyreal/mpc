@@ -6,7 +6,6 @@ namespace mpc::sequencer
     class ProgramChangeEvent : public Event
     {
 
-    private:
         int programChangeValue = 0;
 
     public:

@@ -5,7 +5,6 @@ namespace mpc::engine
     class MuteInfo
     {
 
-    private:
         int note{0};
         int drum{0};
 

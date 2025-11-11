@@ -25,7 +25,7 @@ namespace mpc::command::context
     struct PushPadScreenUpdateContext
     {
         bool isSixteenLevelsEnabled;
-        std::shared_ptr<mpc::lcdgui::ScreenComponent> screenComponent;
+        std::shared_ptr<lcdgui::ScreenComponent> screenComponent;
         std::shared_ptr<sampler::Program> program;
         std::shared_ptr<sequencer::Sequencer> sequencer;
         bool isF4Pressed;

@@ -11,7 +11,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushPlayStartCommand::PushPlayStartCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushPlayStartCommand::PushPlayStartCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushPlayStartCommand::execute()
 {
@@ -22,7 +22,7 @@ void PushPlayStartCommand::execute()
 
     const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
     const bool currentScreenAllowsPlayAndRecord =
-        lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
+        screengroups::isPlayAndRecordScreen(currentScreen);
 
     auto hardware = mpc.getHardware();
 
@@ -63,7 +63,7 @@ void PushPlayStartCommand::execute()
         }
         else
         {
-            if (!lcdgui::screengroups::isPlayScreen(currentScreen))
+            if (!screengroups::isPlayScreen(currentScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::SequencerScreen);

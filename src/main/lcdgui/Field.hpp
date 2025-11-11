@@ -20,8 +20,7 @@ namespace mpc::lcdgui
     class Field : public TextComp
     {
 
-    private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         // When hiding a field that is focused, we pass focus to nextFocus
         std::string nextFocus = "_";
 
@@ -52,10 +51,9 @@ namespace mpc::lcdgui
         void disableTypeMode();
         void setNextFocus(const std::string &newNextFocus);
 
-    public:
         void Draw(std::vector<std::vector<bool>> *pixels) override;
         void Hide(bool b) override;
 
-        Field(mpc::Mpc &mpc, const std::string &name, int x, int y, int width);
+        Field(Mpc &mpc, const std::string &name, int x, int y, int width);
     };
 } // namespace mpc::lcdgui

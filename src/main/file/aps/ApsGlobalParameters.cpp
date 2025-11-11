@@ -26,7 +26,7 @@ ApsGlobalParameters::ApsGlobalParameters(const std::vector<char> &loadBytes)
     masterLevel = loadBytes[6];
 }
 
-ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc &mpc)
+ApsGlobalParameters::ApsGlobalParameters(Mpc &mpc)
 {
     saveBytes = std::vector<char>(ApsParser::PARAMETERS_LENGTH);
 

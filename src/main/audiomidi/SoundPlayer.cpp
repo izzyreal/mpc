@@ -19,10 +19,8 @@ SoundPlayer::SoundPlayer()
 {
     srcLeft = src_new(0, 1, &srcLeftError);
     srcRight = src_new(0, 1, &srcRightError);
-    bufferLeft =
-        std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
-    bufferRight =
-        std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(60000);
+    bufferLeft = std::make_shared<moodycamel::ReaderWriterQueue<float>>(60000);
+    bufferRight = std::make_shared<moodycamel::ReaderWriterQueue<float>>(60000);
 }
 
 SoundPlayer::~SoundPlayer()
@@ -169,7 +167,7 @@ void SoundPlayer::readWithoutResampling()
          currentByteIndex += bytesPerSample)
     {
         if (channels == 2 && fileFormat == SND &&
-            currentByteIndex >= (byteCountToIngest / bytesPerSample))
+            currentByteIndex >= byteCountToIngest / bytesPerSample)
         {
             break;
         }
@@ -190,8 +188,7 @@ void SoundPlayer::readWithoutResampling()
         stream->seekg(-(byteCountToIngest / 2) + bytesPerChannel,
                       std::ios_base::cur);
 
-        for (int currentByteIndex = 0;
-             currentByteIndex < (byteCountToIngest / 2);
+        for (int currentByteIndex = 0; currentByteIndex < byteCountToIngest / 2;
              currentByteIndex += bytesPerSample)
         {
             bufferRight->emplace(readNextFrame());
@@ -233,7 +230,7 @@ void SoundPlayer::readWithResampling(const float ratio)
          currentByteIndex += bytesPerSample)
     {
         if (channels == 2 && fileFormat == SND &&
-            currentByteIndex >= (byteCountToIngest / 2))
+            currentByteIndex >= byteCountToIngest / 2)
         {
             break;
         }
@@ -258,8 +255,7 @@ void SoundPlayer::readWithResampling(const float ratio)
 
         frameCounter = 0;
 
-        for (int currentByteIndex = 0;
-             currentByteIndex < (byteCountToIngest / 2);
+        for (int currentByteIndex = 0; currentByteIndex < byteCountToIngest / 2;
              currentByteIndex += bytesPerSample)
         {
             resampleInputBufferRight[frameCounter++] = readNextFrame();
@@ -270,8 +266,7 @@ void SoundPlayer::readWithResampling(const float ratio)
 
     ingestedSourceFrameCount += unresampledFrameCountToIngest;
 
-    const int endOfInput =
-        (ingestedSourceFrameCount >= sourceFrameCount) ? 1 : 0;
+    const int endOfInput = ingestedSourceFrameCount >= sourceFrameCount ? 1 : 0;
 
     SRC_DATA data;
     data.data_in = &resampleInputBufferLeft[0];
@@ -328,8 +323,8 @@ int32_t SoundPlayer::readNext24BitInt() const
     }
 
     int32_t value = static_cast<unsigned char>(buffer[0]) |
-                    (static_cast<unsigned char>(buffer[1]) << 8) |
-                    (static_cast<unsigned char>(buffer[2]) << 16);
+                    static_cast<unsigned char>(buffer[1]) << 8 |
+                    static_cast<unsigned char>(buffer[2]) << 16;
 
     if (value & 0x00800000)
     {
@@ -350,7 +345,7 @@ short SoundPlayer::readNextShort() const
     }
 
     const short value = static_cast<unsigned char>(buffer[0]) |
-                        (static_cast<unsigned char>(buffer[1]) << 8);
+                        static_cast<unsigned char>(buffer[1]) << 8;
 
     return value;
 }

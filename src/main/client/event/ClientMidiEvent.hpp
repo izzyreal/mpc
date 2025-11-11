@@ -51,7 +51,7 @@ namespace mpc::client::event
         }
         int getChannel() const noexcept
         {
-            return static_cast<int>(channel);
+            return channel;
         }
 
         void setBufferOffset(const double b) noexcept
@@ -65,7 +65,7 @@ namespace mpc::client::event
 
         int getNoteNumber() const noexcept
         {
-            return static_cast<int>(data1);
+            return data1;
         }
         void setNoteNumber(int n) noexcept
         {
@@ -74,7 +74,7 @@ namespace mpc::client::event
 
         int getVelocity() const noexcept
         {
-            return static_cast<int>(data2);
+            return data2;
         }
         void setVelocity(int v) noexcept
         {
@@ -83,7 +83,7 @@ namespace mpc::client::event
 
         int getControllerNumber() const noexcept
         {
-            return static_cast<int>(data1);
+            return data1;
         }
         void setControllerNumber(int c) noexcept
         {
@@ -92,7 +92,7 @@ namespace mpc::client::event
 
         int getControllerValue() const noexcept
         {
-            return static_cast<int>(data2);
+            return data2;
         }
         void setControllerValue(int v) noexcept
         {
@@ -101,7 +101,7 @@ namespace mpc::client::event
 
         int getAftertouchNote() const noexcept
         {
-            return static_cast<int>(data1);
+            return data1;
         }
         void setAftertouchNote(int n) noexcept
         {
@@ -110,7 +110,7 @@ namespace mpc::client::event
 
         int getAftertouchValue() const noexcept
         {
-            return static_cast<int>(data2);
+            return data2;
         }
         void setAftertouchValue(int v) noexcept
         {
@@ -119,7 +119,7 @@ namespace mpc::client::event
 
         int getChannelPressure() const noexcept
         {
-            return static_cast<int>(data1);
+            return data1;
         }
         void setChannelPressure(int p) noexcept
         {
@@ -128,7 +128,7 @@ namespace mpc::client::event
 
         int getProgramNumber() const noexcept
         {
-            return static_cast<int>(data1);
+            return data1;
         }
         void setProgramNumber(int n) noexcept
         {
@@ -137,13 +137,13 @@ namespace mpc::client::event
 
         int getPitchWheelValue() const noexcept
         {
-            return static_cast<int>((data2 << 7) | data1) - 8192;
+            return (data2 << 7 | data1) - 8192;
         }
         void setPitchWheelValue(int v) noexcept
         {
             v += 8192;
             data1 = static_cast<uint8_t>(v & 0x7F);
-            data2 = static_cast<uint8_t>((v >> 7) & 0x7F);
+            data2 = static_cast<uint8_t>(v >> 7 & 0x7F);
         }
 
         void printInfo() const noexcept;

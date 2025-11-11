@@ -27,7 +27,7 @@ TempoChangeScreen::TempoChangeScreen(Mpc &mpc, const int layerIndex)
         constexpr int w = 35;
         constexpr int h = 5;
         constexpr int x = 191;
-        const int y = 22 + (i * 9);
+        const int y = 22 + i * 9;
 
         auto rect = MRECT(x, y, x + w, y + h);
         bars.push_back(addChildT<HorizontalBar2>(rect));
@@ -492,10 +492,10 @@ void TempoChangeScreen::turnWheel(const int j)
         displayTempoChangeOn();
         return;
     }
-    else if (focusedFieldName == "initial-tempo")
+    if (focusedFieldName == "initial-tempo")
     {
         auto tce = tceList[0];
-        seq->setInitialTempo(seq->getInitialTempo() + (j * 0.1));
+        seq->setInitialTempo(seq->getInitialTempo() + j * 0.1);
         displayInitialTempo();
         displayTempoChange0();
         displayTempoChange1();
@@ -612,12 +612,12 @@ void TempoChangeScreen::down()
     {
         return;
     }
-    else if (yPos == 1 && !tce2)
+    if (yPos == 1 && !tce2)
     {
         ls->setFocus("a2");
         return;
     }
-    else if (yPos == 2)
+    if (yPos == 2)
     {
         setOffset(offset + 1);
 

@@ -13,10 +13,9 @@ namespace mpc::engine::audio::mixer
 
     class AudioMixerBus;
 
-    class AudioMixer final : public mpc::engine::audio::server::AudioClient
+    class AudioMixer final : public server::AudioClient
     {
 
-    private:
         std::shared_ptr<MixerControls> controls;
 
     protected:
@@ -29,13 +28,12 @@ namespace mpc::engine::audio::mixer
         std::vector<std::shared_ptr<AudioMixerStrip>> channelStrips;
         std::vector<std::shared_ptr<AudioMixerStrip>> auxStrips;
         std::shared_ptr<AudioMixerStrip> mainStrip;
-        std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
+        std::shared_ptr<server::AudioServer> server;
         std::shared_ptr<core::AudioBuffer> sharedAudioBuffer;
 
     public:
         std::shared_ptr<MixerControls> getMixerControls();
 
-    public:
         std::shared_ptr<core::AudioBuffer> getSharedBuffer() const;
 
         std::shared_ptr<core::AudioBuffer>
@@ -43,7 +41,6 @@ namespace mpc::engine::audio::mixer
 
         void removeBuffer(std::shared_ptr<core::AudioBuffer>) const;
 
-    public:
         std::shared_ptr<AudioMixerStrip> getStrip(const std::string &name);
 
         std::shared_ptr<AudioMixerStrip> getStripImpl(const std::string &name);
@@ -51,12 +48,14 @@ namespace mpc::engine::audio::mixer
         void work(int nFrames) override;
 
     private:
-        static void evaluateStrips(
-            std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate,
-            int nFrames);
+        static void
+        evaluateStrips(const std::vector<std::shared_ptr<AudioMixerStrip>>
+                           &stripsToEvaluate,
+                       int nFrames);
 
-        static void silenceStrips(
-            std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence);
+        static void
+        silenceStrips(const std::vector<std::shared_ptr<AudioMixerStrip>>
+                          &stripsToSilence);
 
         void writeBusBuffers(int nFrames) const;
 
@@ -72,20 +71,14 @@ namespace mpc::engine::audio::mixer
 
         std::shared_ptr<AudioMixerStrip> getMainStrip();
 
-    public:
         void createStrips(const std::shared_ptr<MixerControls> &mixerControls);
 
-        std::shared_ptr<AudioMixerStrip> createStrip(
-            std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
-                controls);
+        std::shared_ptr<AudioMixerStrip>
+        createStrip(std::shared_ptr<core::AudioControlsChain> controls);
 
-    public:
         void close();
 
-    public:
-        AudioMixer(
-            const std::shared_ptr<MixerControls> &controls,
-            const std::shared_ptr<mpc::engine::audio::server::AudioServer>
-                &server);
+        AudioMixer(const std::shared_ptr<MixerControls> &controls,
+                   const std::shared_ptr<server::AudioServer> &server);
     };
 } // namespace mpc::engine::audio::mixer

@@ -26,15 +26,13 @@ namespace mpc::file::all
         std::vector<bool> usednesses = std::vector<bool>(99);
         std::vector<char> saveBytes;
 
-    public:
         std::vector<std::string> &getNames();
         std::vector<bool> &getUsednesses();
 
-    public:
         std::vector<char> &getBytes();
-        static int getSegmentCount(mpc::sequencer::Sequence *seq);
+        static int getSegmentCount(sequencer::Sequence *seq);
 
         SequenceNames(const std::vector<char> &b);
-        SequenceNames(mpc::Mpc &mpc);
+        SequenceNames(Mpc &mpc);
     };
 } // namespace mpc::file::all

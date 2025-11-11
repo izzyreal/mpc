@@ -30,7 +30,6 @@ namespace mpc::engine::audio::core
         float sampleRate = {0};
         int sampleSizeInBits = {0};
 
-    public:
         virtual int getChannels();
 
         virtual Encoding *getEncoding();

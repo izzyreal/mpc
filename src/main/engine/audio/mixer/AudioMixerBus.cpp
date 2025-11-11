@@ -5,7 +5,7 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine::audio::mixer;
 using namespace std;
 
-AudioMixerBus::AudioMixerBus(AudioMixer *mixer,
+AudioMixerBus::AudioMixerBus(const AudioMixer *mixer,
                              const shared_ptr<BusControls> &busControls)
 {
     auto lBusControls = busControls;

@@ -10,17 +10,14 @@ namespace mpc
     class Logger
     {
 
-    private:
         std::string path;
 
     public:
         static Logger l;
 
-    public:
         void log(std::string s) const;
         void setPath(const std::string &s);
 
-    public:
         Logger();
     };
 } // namespace mpc

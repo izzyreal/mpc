@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EventAfterNFrames.hpp"
+#include "engine/EventAfterNFrames.hpp"
 
 #include <sequencer/LegacyClock.hpp>
 
@@ -64,9 +64,10 @@ namespace mpc::sequencer
         // midiSyncStartStopContinueMsg;
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>>
+            engine::EventAfterNFrames,
+            moodycamel::ConcurrentQueueDefaultTraits>>
             eventQueue;
-        std::vector<EventAfterNFrames> tempEventQueue;
+        std::vector<engine::EventAfterNFrames> tempEventQueue;
 
         void sendMidiClockMsg(int frameIndex) const;
         void enqueueEventAfterNFrames(const std::function<void()> &event,

@@ -11,11 +11,10 @@ using namespace mpc::file::mid::event::meta;
 
 Tempo::Tempo() : Tempo(0, 0, DEFAULT_MPQN) {}
 
-Tempo::Tempo(int tick, int delta, int mpqn)
-    : MetaEvent(tick, delta, MetaEvent::TEMPO)
+Tempo::Tempo(int tick, int delta, int mpqn) : MetaEvent(tick, delta, TEMPO)
 {
     setMpqn(mpqn);
-    mLength = mpc::file::mid::util::VariableLengthInt(3);
+    mLength = util::VariableLengthInt(3);
 }
 
 const int Tempo::DEFAULT_MPQN;
@@ -46,7 +45,7 @@ void Tempo::writeToOutputStream(std::ostream &out)
 {
     MetaEvent::writeToOutputStream(out);
     out << (char)3;
-    auto mpqn = mpc::file::mid::util::MidiUtil::intToBytes(mMPQN, 3);
+    auto mpqn = util::MidiUtil::intToBytes(mMPQN, 3);
     out.write(&mpqn[0], mpqn.size());
 }
 
@@ -62,11 +61,11 @@ std::shared_ptr<MetaEvent> Tempo::parseTempo(int tick, int delta,
     {
         return std::make_shared<GenericMetaEvent>(tick, delta, info);
     }
-    auto mpqn = mpc::file::mid::util::MidiUtil::bytesToInt(info->data, 0, 3);
+    auto mpqn = util::MidiUtil::bytesToInt(info->data, 0, 3);
     return std::make_shared<Tempo>(tick, delta, mpqn);
 }
 
-int Tempo::compareTo(mpc::file::mid::event::MidiEvent *other)
+int Tempo::compareTo(MidiEvent *other)
 {
     if (mTick != other->getTick())
     {

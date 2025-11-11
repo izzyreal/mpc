@@ -1,6 +1,6 @@
 #include "VmpcContinuePreviousSessionScreen.hpp"
 
-#include "../VmpcAutoSaveScreen.hpp"
+#include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/Label.hpp"
 
@@ -41,7 +41,7 @@ void VmpcContinuePreviousSessionScreen::function(const int i)
             // YES
             mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
             std::thread(
-                [this]()
+                [this]
                 {
                     restoreAutoSavedStateAction();
                 })
@@ -57,7 +57,7 @@ void VmpcContinuePreviousSessionScreen::function(const int i)
             autoSaveScreen->setAutoLoadOnStart(2);
             mpc.getLayeredScreen()->closeRecentScreensUntilReachingLayer(0);
             std::thread(
-                [this]()
+                [this]
                 {
                     restoreAutoSavedStateAction();
                 })

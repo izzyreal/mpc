@@ -1,7 +1,7 @@
 #include "ReleaseFunctionCommand.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -12,8 +12,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-ReleaseFunctionCommand::ReleaseFunctionCommand(mpc::Mpc &mpc, int i)
-    : mpc(mpc), i(i)
+ReleaseFunctionCommand::ReleaseFunctionCommand(Mpc &mpc, int i) : mpc(mpc), i(i)
 {
 }
 
@@ -40,7 +39,7 @@ void ReleaseFunctionCommand::execute()
                     ScreenId::LoadScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
-                mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
+                mpc.getEngineHost()->getSoundPlayer()->enableStopEarly();
             }
             break;
         case 5:
@@ -68,7 +67,7 @@ void ReleaseFunctionCommand::execute()
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::DirectoryScreen);
-                mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
+                mpc.getEngineHost()->getSoundPlayer()->enableStopEarly();
             }
             break;
         }

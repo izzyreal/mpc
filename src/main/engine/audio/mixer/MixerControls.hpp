@@ -13,10 +13,9 @@
 namespace mpc::engine::audio::mixer
 {
 
-    class MixerControls : public mpc::engine::control::CompoundControl
+    class MixerControls : public control::CompoundControl
     {
 
-    private:
         bool canAddBusses{true};
         std::shared_ptr<BusControls> mainBusControls{nullptr};
         std::vector<std::shared_ptr<BusControls>> auxBusControls{};
@@ -33,20 +32,19 @@ namespace mpc::engine::audio::mixer
 
         std::vector<std::shared_ptr<BusControls>> getAuxBusControls();
 
-        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+        std::shared_ptr<core::AudioControlsChain>
         createStripControls(int id, const std::string &name);
 
-        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+        std::shared_ptr<core::AudioControlsChain>
         createStripControls(int id, std::string name, bool hasMixControls);
 
         void addStripControls(const std::shared_ptr<CompoundControl> &cc);
 
-        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
+        std::shared_ptr<core::AudioControlsChain>
         getStripControls(const std::string &name);
 
-        mpc::engine::FaderControl *createFaderControl() const;
+        FaderControl *createFaderControl() const;
 
-    public:
         MixerControls(const std::string &name, std::string mainBusName);
 
         MixerControls(std::string name) : MixerControls(std::move(name), "Main")

@@ -14,7 +14,7 @@ namespace mpc::file::aps
     {
     public:
         ApsSoundNames(const std::vector<char> &loadBytes);
-        ApsSoundNames(mpc::sampler::Sampler *sampler);
+        ApsSoundNames(sampler::Sampler *sampler);
 
         static const int NAME_STRING_LENGTH = 16;
 

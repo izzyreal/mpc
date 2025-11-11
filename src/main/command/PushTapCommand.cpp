@@ -7,7 +7,7 @@
 namespace mpc::command
 {
 
-    PushTapCommand::PushTapCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    PushTapCommand::PushTapCommand(Mpc &mpc) : mpc(mpc) {}
 
     void PushTapCommand::execute()
     {

@@ -8,11 +8,15 @@ namespace mpc::disk
     class AllLoader;
 }
 
+namespace mpc::engine
+{
+    class SequencerPlaybackEngine;
+}
+
 namespace mpc::sequencer
 {
     class Sequence;
     class Sequencer;
-    class FrameSeq;
 } // namespace mpc::sequencer
 
 namespace mpc::nvram
@@ -105,6 +109,6 @@ namespace mpc::lcdgui::screens
         friend class nvram::NvRam;
         friend class sequencer::Sequence;
         friend class sequencer::Sequencer;
-        friend class sequencer::FrameSeq;
+        friend class engine::SequencerPlaybackEngine;
     };
 } // namespace mpc::lcdgui::screens

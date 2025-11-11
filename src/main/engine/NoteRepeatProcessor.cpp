@@ -1,49 +1,56 @@
 #include "NoteRepeatProcessor.hpp"
-#include "sequencer/Transport.hpp"
 
-#include "Util.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
-#include "audiomidi/MidiOutput.hpp"
-#include "controller/ClientEventController.hpp"
-#include "controller/ClientHardwareEventController.hpp"
+#include "sequencer/Transport.hpp"
 #include "eventregistry/EventRegistry.hpp"
-#include "hardware/Hardware.hpp"
-#include "engine/DrumNoteEventHandler.hpp"
-#include "engine/DrumNoteEventContextBuilder.hpp"
+#include "hardware/Component.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
-#include "sequencer/SeqUtil.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "engine/DrumNoteEventHandler.hpp"
+#include "engine/DrumNoteEventContextBuilder.hpp"
+#include "sequencer/SeqUtil.hpp"
+#include "Util.hpp"
 
-using namespace mpc::sequencer;
-using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens::window;
-using namespace mpc::sampler;
+using namespace mpc;
 using namespace mpc::engine;
-using namespace mpc::engine::audio::mixer;
+using namespace mpc::sequencer;
+using namespace mpc::sampler;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::eventregistry;
+using namespace mpc::engine::audio::mixer;
+
+NoteRepeatProcessor::NoteRepeatProcessor(
+    std::shared_ptr<Sequencer> s, std::shared_ptr<Sampler> sa,
+    std::shared_ptr<AudioMixer> m, std::shared_ptr<Assign16LevelsScreen> a,
+    std::shared_ptr<MixerSetupScreen> ms, std::shared_ptr<EventRegistry> e,
+    std::shared_ptr<hardware::Slider> h, std::vector<std::shared_ptr<Voice>> *v,
+    std::vector<MixerInterconnection *> &mi,
+    const std::function<bool()> &isFullLevelEnabled,
+    const std::function<bool()> &isSixteenLevelsEnabled)
+    : sequencer(std::move(s)), sampler(std::move(sa)), mixer(std::move(m)),
+      assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
+      eventRegistry(std::move(e)), hardwareSlider(std::move(h)), voices(v),
+      mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+{
+}
 
 void NoteRepeatProcessor::process(
-    FrameSeq *frameSequencer, Sequencer *sequencer,
-    std::shared_ptr<Sampler> sampler, std::shared_ptr<AudioMixer> mixer,
-    bool isFullLevelEnabled, bool isSixteenLevelsEnabled,
-    std::shared_ptr<Assign16LevelsScreen> assign16LevelsScreen,
-    std::shared_ptr<MixerSetupScreen> mixerSetupScreen,
-    std::shared_ptr<EventRegistry> eventRegistry,
-    std::shared_ptr<hardware::Slider> hardwareSlider,
-    std::vector<std::shared_ptr<Voice>> *voices,
-    std::vector<MixerInterconnection *> &mixerConnections,
+    const SequencerPlaybackEngine *sequencerPlaybackEngine,
     unsigned int tickPosition, int durationTicks,
-    unsigned short eventFrameOffset, double tempo, float sampleRate)
+    const unsigned short eventFrameOffset, const double tempo,
+    const float sampleRate) const
 {
     auto track = sequencer->getActiveTrack();
     auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
 
-    std::shared_ptr<mpc::sampler::Program> program;
+    std::shared_ptr<Program> program;
 
     if (drumBus)
     {
@@ -52,10 +59,10 @@ void NoteRepeatProcessor::process(
 
     auto note = assign16LevelsScreen->getNote();
 
-    auto snapshot = eventRegistry->getSnapshot();
+    const auto snapshot = eventRegistry->getSnapshot();
 
-    static const std::vector<eventregistry::Source> sourcesToExclude{
-        eventregistry::Source::NoteRepeat, eventregistry::Source::Sequence};
+    static const std::vector sourcesToExclude{Source::NoteRepeat,
+                                              Source::Sequence};
 
     for (int padIndex = 0; padIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
          ++padIndex)
@@ -65,19 +72,19 @@ void NoteRepeatProcessor::process(
             continue;
         }
 
-        if (!isSixteenLevelsEnabled && program)
+        if (!isSixteenLevelsEnabled() && program)
         {
             note = program->getNoteFromPad(padIndex);
         }
 
-        auto noteEvent = std::make_shared<NoteOnEvent>(note);
+        auto noteEvent = std::make_shared<sequencer::NoteOnEvent>(note);
         noteEvent->setTick(static_cast<int>(tickPosition));
         const bool isSliderNote =
             program && program->getSlider()->getNote() == note;
 
         if (program && isSliderNote)
         {
-            auto programSlider = program->getSlider();
+            const auto programSlider = program->getSlider();
 
             Util::SliderNoteVariationContext sliderNoteVariationContext{
                 hardwareSlider->getValueAs<int>(),
@@ -104,10 +111,10 @@ void NoteRepeatProcessor::process(
         const bool isPhysicallyPressed =
             physicalPadPressInfo && physicalPadPressInfo->bank == padIndex / 16;
 
-        if (isSixteenLevelsEnabled && isPhysicallyPressed)
+        if (isSixteenLevelsEnabled() && isPhysicallyPressed)
         {
             Util::SixteenLevelsContext sixteenLevelsContext{
-                isSixteenLevelsEnabled,
+                isSixteenLevelsEnabled(),
                 assign16LevelsScreen->getType(),
                 assign16LevelsScreen->getOriginalKeyPad(),
                 assign16LevelsScreen->getNote(),
@@ -115,7 +122,7 @@ void NoteRepeatProcessor::process(
                 padIndex % 16};
 
             noteEvent->setVelocity(127);
-            mpc::Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
+            Util::set16LevelsValues(sixteenLevelsContext, noteEvent);
             note = noteEvent->getNote();
         }
         else
@@ -124,7 +131,7 @@ void NoteRepeatProcessor::process(
                 snapshot.getPressedProgramPadAfterTouchOrVelocity(padIndex);
 
             noteEvent->setVelocity(
-                isFullLevelEnabled ? 127 : velocityToUseIfNotFullLevel);
+                isFullLevelEnabled() ? 127 : velocityToUseIfNotFullLevel);
         }
 
         noteEvent->setDuration(durationTicks);
@@ -148,9 +155,10 @@ void NoteRepeatProcessor::process(
             const auto noteParameters = program->getNoteParameters(note);
             const auto sound =
                 sampler->getSound(noteParameters->getSoundIndex());
-            auto voiceOverlap = (sound && sound->isLoopEnabled())
-                                    ? VoiceOverlapMode::NOTE_OFF
-                                    : noteParameters->getVoiceOverlapMode();
+            const auto voiceOverlap =
+                sound && sound->isLoopEnabled()
+                    ? VoiceOverlapMode::NOTE_OFF
+                    : noteParameters->getVoiceOverlapMode();
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, drumBus, sampler, mixer, mixerSetupScreen, voices,
@@ -182,9 +190,8 @@ void NoteRepeatProcessor::process(
             track->insertEventWhileRetainingSort(noteEvent);
         }
 
-        frameSequencer->enqueueEventAfterNFrames(
-            [voices, track, note, noteEvent, tickPosition, program, padIndex,
-             drumBus]
+        sequencerPlaybackEngine->enqueueEventAfterNFrames(
+            [voices = voices, track, note, tickPosition, drumBus]
             {
                 if (drumBus)
                 {

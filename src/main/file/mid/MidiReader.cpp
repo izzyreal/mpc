@@ -38,15 +38,15 @@ MidiReader::MidiReader(std::shared_ptr<std::istream> istream,
                        const std::weak_ptr<Sequence> &_dest)
     : dest(_dest)
 {
-    midiFile = std::make_unique<mpc::file::mid::MidiFile>(istream);
+    midiFile = std::make_unique<MidiFile>(istream);
 }
 
-void MidiReader::parseSequence(mpc::Mpc &mpc)
+void MidiReader::parseSequence(Mpc &mpc)
 {
     auto lSequencer = mpc.getSequencer();
     auto midiTracks = midiFile->getTracks();
-    auto lengthInTicks = (int)(midiFile->getLengthInTicks() +
-                               midiTracks[0].lock()->getEndOfTrackDelta());
+    auto lengthInTicks = midiFile->getLengthInTicks() +
+                         midiTracks[0].lock()->getEndOfTrackDelta();
 
     std::vector<std::weak_ptr<meta::TimeSignature>> timeSignatures;
     std::vector<std::weak_ptr<meta::Tempo>> tempoChanges;
@@ -131,7 +131,7 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
     {
         auto lTcMidi = tempoChanges[i].lock();
         auto tce = sequence->addTempoChangeEvent(lTcMidi->getTick());
-        auto ratio = (float)(lTcMidi->getBpm()) / initialTempo;
+        auto ratio = lTcMidi->getBpm() / initialTempo;
         tce->setRatio((int)(ratio * 1000.0));
     }
 
@@ -262,7 +262,7 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
                                                noteOffs))
                         {
                             noteOffs.emplace_back(std::make_shared<NoteOn>(
-                                noteOn->getTick(), 0, (noteOn->getNoteValue()),
+                                noteOn->getTick(), 0, noteOn->getNoteValue(),
                                 0));
                         }
 
@@ -353,8 +353,8 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
 
             if (indexCandidate != -1)
             {
-                noteOn->setDuration((int)(noteOffs[indexCandidate]->getTick() -
-                                          noteOn->getTick()));
+                noteOn->setDuration(noteOffs[indexCandidate]->getTick() -
+                                    noteOn->getTick());
                 noteOffs.erase(noteOffs.begin() + indexCandidate);
             }
             else
@@ -365,8 +365,9 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
 
         for (auto &me : mt->getEvents())
         {
-            if (const auto sysEx = std::dynamic_pointer_cast<
-                    mpc::file::mid::event::SystemExclusiveEvent>(me.lock());
+            if (const auto sysEx =
+                    std::dynamic_pointer_cast<event::SystemExclusiveEvent>(
+                        me.lock());
                 sysEx)
             {
                 auto sysExEventBytes = sysEx->getData();
@@ -392,8 +393,8 @@ void MidiReader::parseSequence(mpc::Mpc &mpc)
                         sysExEventBytes[j + 1] = sysEx->getData()[j];
                     }
 
-                    auto see = std::make_shared<
-                        mpc::sequencer::SystemExclusiveEvent>();
+                    auto see =
+                        std::make_shared<sequencer::SystemExclusiveEvent>();
                     track->addEvent(sysEx->getTick(), see);
                     std::vector<unsigned char> tmp;
 

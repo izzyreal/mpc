@@ -110,10 +110,8 @@ void NextSeqScreen::turnWheel(int i)
         else
         {
             sequencer->getStateManager()->enqueue(
-                sequencer::SetActiveSequenceIndex
-            {
-                sequencer->getActiveSequenceIndex() + i
-            });
+                sequencer::SetActiveSequenceIndex{
+                    sequencer->getActiveSequenceIndex() + i});
         }
     }
     else if (focusedFieldName == "nextsq")
@@ -150,7 +148,7 @@ void NextSeqScreen::turnWheel(int i)
     else if (focusedFieldName == "tempo")
     {
         const double oldTempo = sequencer->getTransport()->getTempo();
-        const double newTempo = oldTempo + (i * 0.1);
+        const double newTempo = oldTempo + i * 0.1;
         sequencer->getTransport()->setTempo(newTempo);
         displayTempo();
     }
@@ -168,7 +166,8 @@ void NextSeqScreen::function(int i)
 
         if (i == 3 && nextSq != -1)
         {
-            sequencer->getStateManager()->enqueue(sequencer::SwitchToNextSequence{nextSq});
+            sequencer->getStateManager()->enqueue(
+                sequencer::SwitchToNextSequence{nextSq});
         }
     }
     else if (i == 5)

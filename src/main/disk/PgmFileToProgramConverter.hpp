@@ -28,16 +28,16 @@ namespace mpc::disk
     public:
         static program_or_error
         loadFromFileAndConvert(const std::shared_ptr<MpcFile> &,
-                               std::shared_ptr<mpc::sampler::Program>,
+                               std::shared_ptr<sampler::Program>,
                                std::vector<std::string> &soundNames);
 
     private:
-        static void setSlider(mpc::file::pgmreader::ProgramFileReader &,
-                              const std::shared_ptr<mpc::sampler::Program> &);
+        static void setSlider(file::pgmreader::ProgramFileReader &,
+                              const std::shared_ptr<sampler::Program> &);
         static void
-        setNoteParameters(mpc::file::pgmreader::ProgramFileReader &,
-                          const std::shared_ptr<mpc::sampler::Program> &);
-        static void setMixer(mpc::file::pgmreader::ProgramFileReader &,
-                             const std::shared_ptr<mpc::sampler::Program> &);
+        setNoteParameters(file::pgmreader::ProgramFileReader &,
+                          const std::shared_ptr<sampler::Program> &);
+        static void setMixer(file::pgmreader::ProgramFileReader &,
+                             const std::shared_ptr<sampler::Program> &);
     };
 } // namespace mpc::disk

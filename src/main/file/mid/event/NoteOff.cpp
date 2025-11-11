@@ -5,12 +5,12 @@
 using namespace mpc::file::mid::event;
 
 NoteOff::NoteOff(int tick, int channel, int note, int velocity)
-    : ChannelEvent(tick, ChannelEvent::NOTE_OFF, channel, note, velocity)
+    : ChannelEvent(tick, NOTE_OFF, channel, note, velocity)
 {
 }
 
 NoteOff::NoteOff(int tick, int delta, int channel, int note, int velocity)
-    : ChannelEvent(tick, delta, ChannelEvent::NOTE_OFF, channel, note, velocity)
+    : ChannelEvent(tick, delta, NOTE_OFF, channel, note, velocity)
 {
 }
 

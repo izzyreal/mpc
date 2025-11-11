@@ -43,10 +43,8 @@ namespace mpc::file::all
         static const int DEFAULTS_OFFSET{16};
         static std::vector<char> UNKNOWN_CHUNK;
 
-    public:
         static const int DEFAULTS_LENGTH{1728};
 
-    public:
         static const int SEQUENCER_OFFSET{1808};
         static const int COUNT_OFFSET{1829};
         static const int COUNT_LENGTH{13};
@@ -68,7 +66,6 @@ namespace mpc::file::all
         std::vector<Song *> songs = std::vector<Song *>(20);
         std::vector<char> saveBytes;
 
-    public:
         std::vector<AllSequence *> getAllSequences();
         Defaults *getDefaults() const;
         AllSequencer *getSequencer() const;
@@ -80,7 +77,7 @@ namespace mpc::file::all
         std::vector<Song *> getSongs();
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
         std::vector<AllSequence *>
         readSequences(const std::vector<char> &trimmedSeqsArray) const;
@@ -88,9 +85,8 @@ namespace mpc::file::all
     public:
         std::vector<char> &getBytes();
 
-    public:
-        AllParser(mpc::Mpc &, const std::vector<char> &loadBytes);
-        AllParser(mpc::Mpc &);
+        AllParser(Mpc &, const std::vector<char> &loadBytes);
+        AllParser(Mpc &);
         ~AllParser();
     };
 } // namespace mpc::file::all

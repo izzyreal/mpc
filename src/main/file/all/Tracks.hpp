@@ -13,7 +13,6 @@ namespace mpc::file::all
     class Tracks
     {
 
-    private:
         static const int TRACK_NAMES_OFFSET{0};
         static const int DEVICES_OFFSET{1024};
         static const int BUSSES_OFFSET{1088};
@@ -36,7 +35,6 @@ namespace mpc::file::all
     public:
         std::vector<char> saveBytes{};
 
-    public:
         int getDevice(int i) const;
         int getBus(int i) const;
         int getVelo(int i) const;
@@ -44,10 +42,9 @@ namespace mpc::file::all
         std::string getName(int i);
         int getStatus(int i) const;
 
-    public:
         std::vector<char> &getBytes();
 
         Tracks(const std::vector<char> &loadBytes);
-        Tracks(mpc::sequencer::Sequence *seq);
+        Tracks(sequencer::Sequence *seq);
     };
 } // namespace mpc::file::all

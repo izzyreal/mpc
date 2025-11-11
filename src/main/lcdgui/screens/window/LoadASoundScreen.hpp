@@ -6,7 +6,6 @@ namespace mpc::lcdgui::screens::window
     class LoadASoundScreen final : public ScreenComponent
     {
 
-    private:
         void keepSound() const;
 
     public:

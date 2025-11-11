@@ -116,23 +116,17 @@ void Sequence::setLastLoopBarIndex(int i)
             lastLoopBarIndex = lastBarIndex;
             return;
         }
-        else
-        {
-            return;
-        }
+        return;
+    }
+    if (i > lastBarIndex)
+    {
+        lastLoopBarEnd = true;
     }
     else
     {
-        if (i > lastBarIndex)
+        if (i < firstLoopBarIndex)
         {
-            lastLoopBarEnd = true;
-        }
-        else
-        {
-            if (i < firstLoopBarIndex)
-            {
-                firstLoopBarIndex = i;
-            }
+            firstLoopBarIndex = i;
         }
     }
 
@@ -713,7 +707,7 @@ int Sequence::getFirstTickOfBeat(const int bar, const int beat) const
     const auto barStart = getFirstTickOfBar(bar);
     const auto den = denominators[bar];
     const auto beatTicks = static_cast<int>(96 * (4.0 / den));
-    return barStart + (beat * beatTicks);
+    return barStart + beat * beatTicks;
 }
 
 int Sequence::getFirstTickOfBar(const int index) const

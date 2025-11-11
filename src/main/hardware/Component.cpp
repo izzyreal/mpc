@@ -174,8 +174,8 @@ DataWheel::DataWheel() : Component(DATA_WHEEL) {}
 
 void DataWheel::turn(const int steps)
 {
-    angle = angle + (angleIncrementPerStep *
-                     static_cast<float>(std::clamp(steps, -20, 20)));
+    angle = angle + angleIncrementPerStep *
+                        static_cast<float>(std::clamp(steps, -20, 20));
 
     if (angle > 100.0f)
     {
@@ -198,7 +198,7 @@ void Slider::moveToNormalizedY(const float normalizedY)
 {
     auto [min, max] = getRangeAs<float>();
     const float clampedY = std::clamp(normalizedY, 0.0f, 1.0f);
-    float value = (direction == Direction::UpIncreases)
+    float value = direction == Direction::UpIncreases
                       ? (1.0f - clampedY) * max + clampedY * min
                       : clampedY * max + (1.0f - clampedY) * min;
     setValue(value);

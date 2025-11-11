@@ -10,7 +10,7 @@
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
@@ -20,9 +20,14 @@
 #include <algorithm>
 
 using namespace mpc::sequencer;
+using namespace mpc::engine;
 using namespace mpc::lcdgui;
 
-Transport::Transport(Sequencer &owner) : sequencer(owner)
+Transport::Transport(
+    Sequencer &owner,
+    const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
+        &getSequencerPlaybackEngine)
+    : sequencer(owner), getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
@@ -30,7 +35,7 @@ Transport::Transport(Sequencer &owner) : sequencer(owner)
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && sequencer.getFrameSequencer()->isRunning();
+    return !metronomeOnlyEnabled && getSequencerPlaybackEngine()->isRunning();
 }
 
 void Transport::play(const bool fromStart)
@@ -84,7 +89,8 @@ void Transport::play(const bool fromStart)
         sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
     const auto countInMode = countMetronomeScreen->getCountInMode();
 
-    std::optional<int64_t> positionQuarterNotesToStartPlayingFrom = std::nullopt;
+    std::optional<int64_t> positionQuarterNotesToStartPlayingFrom =
+        std::nullopt;
 
     if (!countEnabled || countInMode == 0 ||
         (countInMode == 1 && !isRecordingOrOverdubbing()))
@@ -104,16 +110,18 @@ void Transport::play(const bool fromStart)
         {
             if (fromStart)
             {
-                positionQuarterNotesToStartPlayingFrom = Sequencer::ticksToQuarterNotes(s->getLoopStart());
+                positionQuarterNotesToStartPlayingFrom =
+                    Sequencer::ticksToQuarterNotes(s->getLoopStart());
             }
             else
             {
-                positionQuarterNotesToStartPlayingFrom = Sequencer::ticksToQuarterNotes(
-                    s->getFirstTickOfBar(getCurrentBarIndex()));
+                positionQuarterNotesToStartPlayingFrom =
+                    Sequencer::ticksToQuarterNotes(
+                        s->getFirstTickOfBar(getCurrentBarIndex()));
             }
 
-            countInStartPos =
-                Sequencer::quarterNotesToTicks(snapshot.getPositionQuarterNotes());
+            countInStartPos = Sequencer::quarterNotesToTicks(
+                snapshot.getPositionQuarterNotes());
             countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
 
             countingIn = true;
@@ -148,7 +156,7 @@ void Transport::play(const bool fromStart)
     }
     else
     {
-        sequencer.getFrameSequencer()->start();
+        getSequencerPlaybackEngine()->start();
     }
 }
 
@@ -273,9 +281,10 @@ void Transport::stop(const StopMode stopMode)
 
     // const int frameOffset = stopMode == AT_START_OF_BUFFER
     //                             ? 0
-    //                             : frameSequencer->getEventFrameOffset();
+    //                             :
+    //                             getSequencerPlaybackEngine()->getEventFrameOffset();
 
-    sequencer.getFrameSequencer()->stop();
+    getSequencerPlaybackEngine()->stop();
 
     recording = false;
     overdubbing = false;
@@ -378,7 +387,7 @@ void Transport::playMetronomeTrack()
     }
 
     metronomeOnlyEnabled = true;
-    sequencer.getFrameSequencer()->startMetronome();
+    getSequencerPlaybackEngine()->startMetronome();
 }
 
 void Transport::stopMetronomeTrack()
@@ -388,7 +397,7 @@ void Transport::stopMetronomeTrack()
         return;
     }
 
-    sequencer.getFrameSequencer()->stop();
+    getSequencerPlaybackEngine()->stop();
     metronomeOnlyEnabled = false;
 }
 
@@ -643,7 +652,8 @@ int Transport::getCurrentClockNumber() const
     return clock;
 }
 
-void Transport::setBarBeatClock(const int bar, const int beat, const int clock) const
+void Transport::setBarBeatClock(const int bar, const int beat,
+                                const int clock) const
 {
     if (isPlaying())
     {
@@ -654,7 +664,8 @@ void Transport::setBarBeatClock(const int bar, const int beat, const int clock) 
     const auto &barLengths = s->getBarLengthsInTicks();
     const auto ts = s->getTimeSignature();
 
-    const int clampedBar  = std::clamp(bar,  0, static_cast<int>(barLengths.size()) - 1);
+    const int clampedBar =
+        std::clamp(bar, 0, static_cast<int>(barLengths.size()) - 1);
     const int clampedBeat = std::clamp(beat, 0, ts.getNumerator() - 1);
 
     const int denTicks = static_cast<int>(96 * (4.0 / ts.getDenominator()));
@@ -908,7 +919,7 @@ void Transport::setPositionWithinSong(
                     std::floor(offsetWithinStepTicks /
                                static_cast<float>(sequence->getLastTick()));
                 sequence->syncTrackEventIndices(offsetWithinStepTicks %
-                                                 sequence->getLastTick());
+                                                sequence->getLastTick());
             }
             break;
         }

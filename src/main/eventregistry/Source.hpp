@@ -19,19 +19,19 @@ namespace mpc::eventregistry
         {
             return "VirtualMpcHardware";
         }
-        else if (s == Source::Sequence)
+        if (s == Source::Sequence)
         {
             return "Sequence";
         }
-        else if (s == Source::MidiInput)
+        if (s == Source::MidiInput)
         {
             return "MidiInput";
         }
-        else if (s == Source::StepEditor)
+        if (s == Source::StepEditor)
         {
             return "StepEditor";
         }
-        else if (s == Source::NoteRepeat)
+        if (s == Source::NoteRepeat)
         {
             return "NoteRepeat";
         }

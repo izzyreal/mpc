@@ -11,10 +11,8 @@ namespace mpc::lcdgui::screens::window
         void turnWheel(int i) override;
         void function(int i) override;
 
-    public:
         EraseScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:

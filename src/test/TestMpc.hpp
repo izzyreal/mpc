@@ -7,6 +7,6 @@ namespace mpc
     class TestMpc
     {
     public:
-        static void initializeTestMpc(mpc::Mpc &mpc);
+        static void initializeTestMpc(Mpc &mpc);
     };
 } // namespace mpc

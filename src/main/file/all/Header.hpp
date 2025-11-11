@@ -10,11 +10,9 @@ namespace mpc::file::all
         std::vector<char> loadBytes;
         std::vector<char> saveBytes;
 
-    public:
         std::vector<char> &getHeaderArray();
         bool verifyFileID() const;
 
-    public:
         std::vector<char> &getBytes();
 
         Header(const std::vector<char> &loadBytes);

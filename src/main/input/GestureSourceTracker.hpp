@@ -9,7 +9,6 @@ namespace mpc::input
 {
     class GestureSourceTracker
     {
-    private:
         using ComponentId = hardware::ComponentId;
         using SourceId = int;
 

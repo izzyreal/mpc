@@ -19,12 +19,10 @@ namespace mpc::lcdgui::screens::window
     class TempoChangeScreen final : public ScreenComponent
     {
 
-    private:
         std::vector<std::shared_ptr<HorizontalBar2>> bars;
         std::vector<std::shared_ptr<sequencer::TempoChangeEvent>>
             visibleTempoChanges;
 
-    private:
         void initVisibleEvents();
         void displayTempoChange0() const;
         void displayTempoChange1() const;
@@ -35,10 +33,8 @@ namespace mpc::lcdgui::screens::window
     public:
         TempoChangeScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
-    public:
         void left() override;
         void right() override;
         void function(int j) override;

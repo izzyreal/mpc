@@ -184,7 +184,7 @@ TEST_CASE("Binding rejects out-of-range MIDI values", "[MidiControlPresetV3]")
 TEST_CASE("Binding::from_json enforces midiValue rules",
           "[MidiControlPresetV3]")
 {
-    using json = nlohmann::json;
+    using json = json;
     json validCC = {{"labelName", "left"},   {"messageType", "CC"},
                     {"midiNumber", 10},      {"midiValue", 20},
                     {"midiChannelIndex", 0}, {"enabled", true}};
@@ -227,7 +227,7 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
     }
     preset.setBindings(b);
 
-    nlohmann::json j = preset;
+    json j = preset;
     MidiControlPresetV3 copy = j.get<MidiControlPresetV3>();
     REQUIRE(copy.getMidiControllerDeviceName() == "MPK Mini Plus");
 }
@@ -235,7 +235,7 @@ TEST_CASE("MidiControlPresetV3 preserves midiControllerDeviceName through JSON",
 TEST_CASE("MidiControlPresetV3 rejects unknown JSON keys",
           "[MidiControlPresetV3]")
 {
-    using json = nlohmann::json;
+    using json = json;
 
     // Minimal valid bindings for the test
     std::vector<json> bindings(81);

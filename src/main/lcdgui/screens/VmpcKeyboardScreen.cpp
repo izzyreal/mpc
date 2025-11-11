@@ -15,14 +15,14 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::input;
 
-VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc &mpc, int layerIndex)
+VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, int layerIndex)
     : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
         auto param = std::make_shared<Parameter>(mpc, "                ",
                                                  "row" + std::to_string(i), 2,
-                                                 3 + (i * 9), 23 * 6);
+                                                 3 + i * 9, 23 * 6);
         addChild(param);
     }
 }

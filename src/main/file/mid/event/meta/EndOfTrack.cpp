@@ -7,9 +7,9 @@
 using namespace mpc::file::mid::event::meta;
 
 EndOfTrack::EndOfTrack(int tick, int delta)
-    : MetaEvent(tick, delta, MetaEvent::END_OF_TRACK)
+    : MetaEvent(tick, delta, END_OF_TRACK)
 {
-    mLength = mpc::file::mid::util::VariableLengthInt(0);
+    mLength = util::VariableLengthInt(0);
 }
 
 int EndOfTrack::getEventSize()
@@ -28,7 +28,7 @@ void EndOfTrack::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int EndOfTrack::compareTo(mpc::file::mid::event::MidiEvent *other) const
+int EndOfTrack::compareTo(MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

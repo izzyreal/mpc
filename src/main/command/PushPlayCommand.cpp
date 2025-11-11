@@ -1,7 +1,7 @@
 #include "PushPlayCommand.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/ComponentId.hpp"
@@ -12,7 +12,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushPlayCommand::PushPlayCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushPlayCommand::PushPlayCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushPlayCommand::execute()
 {
@@ -41,7 +41,7 @@ void PushPlayCommand::execute()
 
     const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
     const bool isPlayAndRecordScreen =
-        lcdgui::screengroups::isPlayAndRecordScreen(currentScreen);
+        screengroups::isPlayAndRecordScreen(currentScreen);
 
     const auto recButtonIsPressedOrLocked =
         hardware->getButton(hardware::ComponentId::REC)->isPressed() ||
@@ -74,14 +74,14 @@ void PushPlayCommand::execute()
     else
     {
         if (hardware->getButton(hardware::ComponentId::SHIFT)->isPressed() &&
-            !mpc.getAudioMidiServices()->isBouncing())
+            !mpc.getEngineHost()->isBouncing())
         {
             mpc.getLayeredScreen()->openScreenById(
                 ScreenId::VmpcDirectToDiskRecorderScreen);
         }
         else
         {
-            if (!lcdgui::screengroups::isPlayScreen(currentScreen))
+            if (!screengroups::isPlayScreen(currentScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::SequencerScreen);

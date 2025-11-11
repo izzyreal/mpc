@@ -82,7 +82,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
             {
                 constexpr bool setPositionTo0 = false;
-                enqueue(SetActiveSequenceIndex{m.sequenceIndex, setPositionTo0});
+                enqueue(
+                    SetActiveSequenceIndex{m.sequenceIndex, setPositionTo0});
                 enqueue(Stop{});
                 enqueue(PlayFromStart{});
             }

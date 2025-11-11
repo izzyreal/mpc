@@ -19,7 +19,7 @@ AllNoteOnEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     event->setTick(AllEvent::readTick(bytes));
     auto track = readTrackNumber(bytes);
     event->setTrack(track);
-    event->setDuration(readDuration(bytes) - (track * 4));
+    event->setDuration(readDuration(bytes) - track * 4);
     event->setVelocity(readVelocity(bytes));
     event->setVariationType(readVariationType(bytes));
     event->setVariationValue(readVariationValue(bytes));
@@ -51,14 +51,11 @@ AllNoteOnEvent::mpcEventToBytes(const std::shared_ptr<NoteOnEvent> &event)
     return bytes;
 }
 
-std::vector<int> AllNoteOnEvent::DURATION_BYTE1_BIT_RANGE =
-    std::vector<int>{4, 7};
-std::vector<int> AllNoteOnEvent::DURATION_BYTE2_BIT_RANGE =
-    std::vector<int>{6, 7};
-std::vector<int> AllNoteOnEvent::TRACK_NUMBER_BIT_RANGE =
-    std::vector<int>{0, 5};
-std::vector<int> AllNoteOnEvent::VELOCITY_BIT_RANGE = std::vector<int>{0, 6};
-std::vector<int> AllNoteOnEvent::VAR_VALUE_BIT_RANGE = std::vector<int>{0, 6};
+std::vector<int> AllNoteOnEvent::DURATION_BYTE1_BIT_RANGE = std::vector{4, 7};
+std::vector<int> AllNoteOnEvent::DURATION_BYTE2_BIT_RANGE = std::vector{6, 7};
+std::vector<int> AllNoteOnEvent::TRACK_NUMBER_BIT_RANGE = std::vector{0, 5};
+std::vector<int> AllNoteOnEvent::VELOCITY_BIT_RANGE = std::vector{0, 6};
+std::vector<int> AllNoteOnEvent::VAR_VALUE_BIT_RANGE = std::vector{0, 6};
 
 int AllNoteOnEvent::readDuration(const std::vector<char> &bytes)
 {
@@ -76,9 +73,9 @@ int AllNoteOnEvent::readDuration(const std::vector<char> &bytes)
     b1 = BitUtil::removeUnusedBits(b1, DURATION_BYTE1_BIT_RANGE);
     b2 = BitUtil::removeUnusedBits(b2, DURATION_BYTE2_BIT_RANGE);
 
-    auto i1 = static_cast<int>(b1 & 255);
-    auto i2 = static_cast<int>(b2 & 255);
-    auto i3 = static_cast<int>(b3 & 255);
+    auto i1 = b1 & 255;
+    auto i2 = b2 & 255;
+    auto i3 = b3 & 255;
 
     return (i1 << 6) + (i2 << 2) + i3;
 }
@@ -90,7 +87,7 @@ int AllNoteOnEvent::readTrackNumber(const std::vector<char> &bytes)
     {
         if (i < TRACK_NUMBER_BIT_RANGE[0] || i > TRACK_NUMBER_BIT_RANGE[1])
         {
-            b = BitUtil::setBit(static_cast<unsigned char>(b), i, false);
+            b = BitUtil::setBit(b, i, false);
         }
     }
     return b;
@@ -103,7 +100,7 @@ int AllNoteOnEvent::readVelocity(const std::vector<char> &bytes)
     {
         if (i < VELOCITY_BIT_RANGE[0] || i > VELOCITY_BIT_RANGE[1])
         {
-            b = BitUtil::setBit(static_cast<unsigned char>(b), i, false);
+            b = BitUtil::setBit(b, i, false);
         }
     }
     return b;
@@ -116,7 +113,7 @@ int AllNoteOnEvent::readVariationValue(const std::vector<char> &bytes)
     {
         if (i < VAR_VALUE_BIT_RANGE[0] || i > VAR_VALUE_BIT_RANGE[1])
         {
-            b = BitUtil::setBit(static_cast<unsigned char>(b), i, false);
+            b = BitUtil::setBit(b, i, false);
         }
     }
     return b;
@@ -135,21 +132,15 @@ AllNoteOnEvent::readVariationType(const std::vector<char> &bytes)
     {
         return NoteOnEvent::VARIATION_TYPE::FILTER_3;
     }
-
-    else if (b1 && !b2)
+    if (b1 && !b2)
     {
         return NoteOnEvent::VARIATION_TYPE::ATTACK_2;
     }
-
-    else if (!b1 && b2)
+    if (!b1 && b2)
     {
         return NoteOnEvent::VARIATION_TYPE::DECAY_1;
     }
-
-    else
-    {
-        return NoteOnEvent::VARIATION_TYPE::TUNE_0;
-    }
+    return NoteOnEvent::VARIATION_TYPE::TUNE_0;
 }
 
 void AllNoteOnEvent::writeVelocity(std::vector<char> &event, int v)
@@ -157,7 +148,7 @@ void AllNoteOnEvent::writeVelocity(std::vector<char> &event, int v)
     auto value = static_cast<int8_t>(v);
     event[VELOCITY_OFFSET] = BitUtil::stitchBytes(
         event[VELOCITY_OFFSET],
-        std::vector<int>{VAR_TYPE_BYTE1_BIT, VAR_TYPE_BYTE1_BIT}, value,
+        std::vector{VAR_TYPE_BYTE1_BIT, VAR_TYPE_BYTE1_BIT}, value,
         VELOCITY_BIT_RANGE);
 }
 
@@ -174,7 +165,7 @@ void AllNoteOnEvent::writeVariationValue(std::vector<char> &event, int v)
     auto value = static_cast<int8_t>(v);
     event[VAR_VALUE_OFFSET] = BitUtil::stitchBytes(
         event[VAR_VALUE_OFFSET],
-        std::vector<int>{VAR_TYPE_BYTE2_BIT, VAR_TYPE_BYTE2_BIT}, value,
+        std::vector{VAR_TYPE_BYTE2_BIT, VAR_TYPE_BYTE2_BIT}, value,
         VAR_VALUE_BIT_RANGE);
 }
 

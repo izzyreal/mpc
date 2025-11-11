@@ -34,12 +34,11 @@ namespace mpc::lcdgui
     class LayeredScreen
     {
 
-    private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         LayeredScreenTasks uiTasks;
         std::unique_ptr<Component> root;
         std::vector<std::vector<bool>> pixels =
-            std::vector<std::vector<bool>>(248, std::vector<bool>(60));
+            std::vector(248, std::vector<bool>(60));
         std::deque<std::shared_ptr<ScreenComponent>> history;
 
     public:
@@ -55,6 +54,8 @@ namespace mpc::lcdgui
         bool transfer(int direction);
 
     public:
+        // Uses a lock, so don't invoke on the audio thread.
+        // It is meant to be used from worker threads.
         void postToUiThread(const std::function<void()> &fn);
         void transferLeft();
         void transferRight();
@@ -105,14 +106,12 @@ namespace mpc::lcdgui
         static ScreenId
         getScreenId(const std::shared_ptr<ScreenComponent> &screen);
 
-    private:
         FunctionKeys *getFunctionKeys();
 
     public:
-        lcdgui::Background *getCurrentBackground();
+        Background *getCurrentBackground();
         void setCurrentBackground(const std::string &s);
 
-    public:
         void setLastFocus(const std::string &screenName,
                           const std::string &tfName);
         std::string getLastFocus(const std::string &screenName);
@@ -121,7 +120,6 @@ namespace mpc::lcdgui
         std::string getFirstLayerScreenName() const;
         void setFunctionKeysArrangement(int arrangementIndex);
 
-    public:
         std::vector<std::vector<bool>> *getPixels();
         bool IsDirty() const;
         void setDirty() const;
@@ -129,12 +127,10 @@ namespace mpc::lcdgui
         void Draw();
         void timerCallback();
 
-    public:
         std::string getFocusedFieldName();
         std::shared_ptr<Field> getFocusedField();
         bool setFocus(const std::string &focus);
 
-    public:
-        LayeredScreen(mpc::Mpc &mpc);
+        LayeredScreen(Mpc &mpc);
     };
 } // namespace mpc::lcdgui

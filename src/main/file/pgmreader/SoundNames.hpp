@@ -25,7 +25,6 @@ namespace mpc
                 int getSampleNamesSize() const;
                 std::vector<char> getSampleNamesArray();
 
-            public:
                 std::string getSampleName(int sampleNumber);
 
                 SoundNames(ProgramFileReader *programFile);

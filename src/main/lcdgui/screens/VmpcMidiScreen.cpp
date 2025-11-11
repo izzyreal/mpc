@@ -16,26 +16,26 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 
-VmpcMidiScreen::VmpcMidiScreen(mpc::Mpc &mpc, int layerIndex)
+VmpcMidiScreen::VmpcMidiScreen(Mpc &mpc, int layerIndex)
     : ScreenComponent(mpc, "vmpc-midi", layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
         auto typeParam = std::make_shared<Parameter>(mpc, "                ",
                                                      "type" + std::to_string(i),
-                                                     2, 3 + (i * 9), 4 * 6);
+                                                     2, 3 + i * 9, 4 * 6);
         addChild(typeParam);
 
         auto numberParam = std::make_shared<Parameter>(
-            mpc, "#:", "number" + std::to_string(i), 125, 3 + (i * 9), 3 * 6);
+            mpc, "#:", "number" + std::to_string(i), 125, 3 + i * 9, 3 * 6);
         addChild(numberParam);
 
         auto valueParam = std::make_shared<Parameter>(
-            mpc, "v:", "value" + std::to_string(i), 164, 3 + (i * 9), 3 * 6);
+            mpc, "v:", "value" + std::to_string(i), 164, 3 + i * 9, 3 * 6);
         addChild(valueParam);
 
         auto channelParam = std::make_shared<Parameter>(
-            mpc, "ch:", "channel" + std::to_string(i), 202, 3 + (i * 9), 3 * 6);
+            mpc, "ch:", "channel" + std::to_string(i), 202, 3 + i * 9, 3 * 6);
         addChild(channelParam);
     }
 }
@@ -418,7 +418,7 @@ void VmpcMidiScreen::updateRows()
 
         typeLabel->setText(labelText);
         MidiControlCommand &cmd =
-            (learning && row == i && !learnCandidate.isEmpty())
+            learning && row == i && !learnCandidate.isEmpty()
                 ? learnCandidate
                 : activePreset->rows[i + rowOffset];
 

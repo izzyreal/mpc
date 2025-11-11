@@ -11,6 +11,8 @@ namespace mpc
 
 namespace mpc::engine
 {
+    class NoteRepeatProcessor;
+    class SequencerPlaybackEngine;
     class Voice;
     class MixerInterconnection;
     class PreviewSoundPlayer;
@@ -36,11 +38,6 @@ namespace mpc::engine::audio::mixer
     class MixerControls;
 } // namespace mpc::engine::audio::mixer
 
-namespace mpc::engine::audio::system
-{
-    class DefaultAudioSystem;
-}
-
 namespace mpc::audiomidi
 {
     class MidiOutput;
@@ -50,35 +47,32 @@ namespace mpc::audiomidi
     class SoundPlayer;
 } // namespace mpc::audiomidi
 
-namespace mpc::audiomidi
+namespace mpc::engine
 {
-
-    class AudioMidiServices final
+    class EngineHost final
     {
-        using NonRealTimeAudioServer =
-            engine::audio::server::NonRealTimeAudioServer;
-        using RealTimeAudioServer = engine::audio::server::RealTimeAudioServer;
-        using CompoundAudioClient = engine::audio::server::CompoundAudioClient;
-        using DefaultAudioSystem = engine::audio::system::DefaultAudioSystem;
-        using AudioMixer = engine::audio::mixer::AudioMixer;
-        using MixerControls = engine::audio::mixer::MixerControls;
-        using AudioProcess = engine::audio::core::AudioProcess;
-        using IOAudioProcess = engine::audio::server::IOAudioProcess;
+        using NonRealTimeAudioServer = audio::server::NonRealTimeAudioServer;
+        using RealTimeAudioServer = audio::server::RealTimeAudioServer;
+        using CompoundAudioClient = audio::server::CompoundAudioClient;
+        using AudioMixer = audio::mixer::AudioMixer;
+        using MixerControls = audio::mixer::MixerControls;
+        using AudioProcess = audio::core::AudioProcess;
+        using IOAudioProcess = audio::server::IOAudioProcess;
 
     public:
-        explicit AudioMidiServices(Mpc &mpcToUse);
+        explicit EngineHost(Mpc &mpcToUse);
 
         void start();
 
+        std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
-        std::shared_ptr<engine::PreviewSoundPlayer>
-        getPreviewSoundPlayer() const;
-        std::shared_ptr<engine::audio::mixer::AudioMixer> getMixer();
-        std::vector<std::shared_ptr<engine::Voice>> &getVoices();
-        std::vector<engine::MixerInterconnection *> &getMixerConnections();
+        std::shared_ptr<PreviewSoundPlayer> getPreviewSoundPlayer() const;
+        std::shared_ptr<audio::mixer::AudioMixer> getMixer();
+        std::vector<std::shared_ptr<Voice>> &getVoices();
+        std::vector<MixerInterconnection *> &getMixerConnections();
 
-        std::shared_ptr<SoundRecorder> getSoundRecorder();
-        std::shared_ptr<SoundPlayer> getSoundPlayer();
+        std::shared_ptr<audiomidi::SoundRecorder> getSoundRecorder();
+        std::shared_ptr<audiomidi::SoundPlayer> getSoundPlayer();
         void setMainLevel(int i) const;
         int getMainLevel() const;
         void setMixerMasterLevel(int8_t dbValue) const;
@@ -90,7 +84,7 @@ namespace mpc::audiomidi
 
         void connectVoices();
         void destroyServices() const;
-        bool prepareBouncing(const DirectToDiskSettings *settings);
+        bool prepareBouncing(const audiomidi::DirectToDiskSettings *settings);
         bool isBouncePrepared() const;
 
     private:
@@ -122,27 +116,28 @@ namespace mpc::audiomidi
         bool wasRecordingSound = false;
         bool wasBouncing = false;
 
-        std::shared_ptr<engine::PreviewSoundPlayer> previewSoundPlayer;
-        std::vector<std::shared_ptr<engine::Voice>> voices;
-        std::vector<engine::MixerInterconnection *> mixerConnections;
-        std::shared_ptr<engine::Voice> basicVoice;
+        std::shared_ptr<PreviewSoundPlayer> previewSoundPlayer;
+        std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
+        std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine;
+        std::vector<std::shared_ptr<Voice>> voices;
+        std::vector<MixerInterconnection *> mixerConnections;
+        std::shared_ptr<Voice> basicVoice;
         std::shared_ptr<RealTimeAudioServer> realTimeAudioServer;
         std::shared_ptr<NonRealTimeAudioServer> nonRealTimeAudioServer;
-        std::shared_ptr<DefaultAudioSystem> audioSystem;
         std::shared_ptr<AudioMixer> mixer;
         std::shared_ptr<MixerControls> mixerControls;
         std::shared_ptr<CompoundAudioClient> compoundAudioClient;
-        std::shared_ptr<MidiOutput> midiOutput;
+        std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::shared_ptr<IOAudioProcess> inputProcess;
         std::vector<std::shared_ptr<IOAudioProcess>> outputProcesses;
-        std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
+        std::vector<std::shared_ptr<audiomidi::DiskRecorder>> diskRecorders;
 
-        std::shared_ptr<SoundRecorder> soundRecorder;
-        std::shared_ptr<SoundPlayer> soundPlayer;
+        std::shared_ptr<audiomidi::SoundRecorder> soundRecorder;
+        std::shared_ptr<audiomidi::SoundPlayer> soundPlayer;
 
         void setupMixer();
         void setAssignableMixOutLevels() const;
         void createSynth();
         void setMonitorLevel(int level) const;
     };
-} // namespace mpc::audiomidi
+} // namespace mpc::engine

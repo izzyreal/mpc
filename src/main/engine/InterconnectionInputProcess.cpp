@@ -6,14 +6,12 @@
 using namespace mpc::engine;
 
 InterconnectionInputProcess::InterconnectionInputProcess(
-    MixerInterconnection *mmi,
-    mpc::engine::audio::core::AudioBuffer *sharedBuffer)
+    MixerInterconnection *mmi, audio::core::AudioBuffer *sharedBuffer)
     : mmi(mmi), sharedBuffer(sharedBuffer)
 {
 }
 
-int InterconnectionInputProcess::processAudio(
-    mpc::engine::audio::core::AudioBuffer *buffer)
+int InterconnectionInputProcess::processAudio(audio::core::AudioBuffer *buffer)
 {
     sharedBuffer->copyFrom(buffer);
     if (!mmi->isLeftEnabled())

@@ -10,8 +10,7 @@ StereoInputProcess::StereoInputProcess(const string &name)
 {
 }
 
-int StereoInputProcess::processAudio(
-    mpc::engine::audio::core::AudioBuffer *buffer, int nFrames)
+int StereoInputProcess::processAudio(core::AudioBuffer *buffer, int nFrames)
 {
     if (!buffer->isRealTime())
     {
@@ -26,8 +25,8 @@ int StereoInputProcess::processAudio(
 
     for (int i = 0; i < ns; i++)
     {
-        left[i] = static_cast<float>(localBuffer[sampleCounter++]);
-        right[i] = static_cast<float>(localBuffer[sampleCounter++]);
+        left[i] = localBuffer[sampleCounter++];
+        right[i] = localBuffer[sampleCounter++];
     }
 
     return AUDIO_OK;

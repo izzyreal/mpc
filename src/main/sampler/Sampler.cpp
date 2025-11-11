@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "MpcSpecs.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/WavInputStringStream.hpp"
 
 #include "controller/ClientEventController.hpp"
@@ -41,7 +41,7 @@ using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-Sampler::Sampler(mpc::Mpc &mpc) : mpc(mpc) {}
+Sampler::Sampler(Mpc &mpc) : mpc(mpc) {}
 
 std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
@@ -208,7 +208,7 @@ void Sampler::init()
             for (int i = 0; i < numFrames; i++)
             {
                 float frame = wav_get_LE(stream, 2) / 32768.0;
-                clickSound->insertFrame(std::vector<float>{frame},
+                clickSound->insertFrame(std::vector{frame},
                                         clickSound->getFrameCount());
             }
         }
@@ -226,7 +226,7 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     if (metronomeSoundScreen->getSound() == 0)
     {
         velocity *= metronomeSoundScreen->getVolume() * 0.01;
-        mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+        mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
             CLICK_SOUND, velocity, framePos);
         return;
     }
@@ -246,8 +246,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     const auto note = programs[programIndex]->getNoteFromPad(pad);
     const auto soundNumber =
         programs[programIndex]->getNoteParameters(note)->getSoundIndex();
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
-        soundNumber, velocity, framePos);
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(soundNumber,
+                                                            velocity, framePos);
 }
 
 void Sampler::playPreviewSample(const int start, const int end,
@@ -265,8 +265,8 @@ void Sampler::playPreviewSample(const int start, const int end,
     previewSound->setStart(start);
     previewSound->setEnd(end);
     previewSound->setLoopTo(loopTo);
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
-        PREVIEW_SOUND, 127, 0);
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PREVIEW_SOUND, 127,
+                                                            0);
     previewSound->setStart(oldStart);
     previewSound->setEnd(oldEnd);
     previewSound->setLoopTo(oldLoopTo);
@@ -516,14 +516,11 @@ std::string Sampler::getSoundSortingTypeName() const
     {
         return "MEMORY";
     }
-    else if (soundSortingType == 1)
+    if (soundSortingType == 1)
     {
         return "NAME";
     }
-    else
-    {
-        return "SIZE";
-    }
+    return "SIZE";
 }
 
 void Sampler::switchToNextSoundSortType()
@@ -706,7 +703,7 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
 
 void Sampler::stopAllVoices(const int frameOffset) const
 {
-    for (auto &voice : mpc.getAudioMidiServices()->getVoices())
+    for (auto &voice : mpc.getEngineHost()->getVoices())
     {
         if (voice->isFinished())
         {
@@ -719,7 +716,7 @@ void Sampler::stopAllVoices(const int frameOffset) const
 
 void Sampler::finishBasicVoice() const
 {
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->finishVoice();
+    mpc.getEngineHost()->getPreviewSoundPlayer()->finishVoice();
 }
 
 void Sampler::playX()
@@ -760,8 +757,8 @@ void Sampler::playX()
     int oldEnd = sound->getEnd();
     sound->setStart(start);
     sound->setEnd(end);
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND,
-                                                                   127, 0);
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND, 127,
+                                                            0);
     sound->setStart(oldStart);
     sound->setEnd(oldEnd);
 }
@@ -777,8 +774,7 @@ int Sampler::getFreeSampleSpace() const
 
     for (auto &s : sounds)
     {
-        freeSpace -=
-            (s->getSampleData()->size() * 2) / static_cast<double>(1024);
+        freeSpace -= s->getSampleData()->size() * 2 / static_cast<double>(1024);
     }
 
     return static_cast<int>(floor(freeSpace));
@@ -1126,9 +1122,7 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 
     for (int i = 0; i < 64; i++)
     {
-        auto copy =
-            dynamic_cast<NoteParameters *>(src->getNoteParameters(i + 35))
-                ->clone(i);
+        auto copy = src->getNoteParameters(i + 35)->clone(i);
         dest->setNoteParameters(i, copy);
 
         auto mc1 = dest->getIndivFxMixerChannel(i);
@@ -1276,7 +1270,7 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSortedSounds()
 
         return result;
     }
-    else if (soundSortingType == 1)
+    if (soundSortingType == 1)
     {
         return getSoundsSortedByName();
     }

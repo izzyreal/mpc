@@ -25,7 +25,6 @@ namespace mpc::engine::control
 
         void disambiguate(const std::shared_ptr<CompoundControl> &c);
 
-    public:
         CompoundControl(int id, const std::string &name);
     };
 } // namespace mpc::engine::control

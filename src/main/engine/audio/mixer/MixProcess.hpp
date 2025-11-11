@@ -7,7 +7,7 @@
 namespace mpc::engine::audio::mixer
 {
 
-    class MixProcess : public mpc::engine::audio::core::AudioProcess
+    class MixProcess : public core::AudioProcess
     {
 
     protected:
@@ -23,11 +23,8 @@ namespace mpc::engine::audio::mixer
     public:
         virtual AudioMixerStrip *getRoutedStrip();
 
-    public:
-        int
-        processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
+        int processAudio(core::AudioBuffer *buffer) override;
 
-    public:
         MixProcess(const std::shared_ptr<AudioMixerStrip> &strip,
                    const std::shared_ptr<MixControls> &mixControls);
     };

@@ -22,7 +22,7 @@ ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange,
 
     for (int i = 0; i < 3; i++)
     {
-        saveBytes[i + 9] = (PADDING[i]);
+        saveBytes[i + 9] = PADDING[i];
     }
 
     saveBytes[1] = program;

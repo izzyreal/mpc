@@ -16,7 +16,6 @@ namespace mpc::audiomidi
 
         static std::string getTimeStamp();
 
-    public:
         DirectToDiskSettings(int lengthInFrames,
                              bool splitStereoIntoLeftAndRightChannel,
                              int sampleRate, std::string recordingName);

@@ -76,7 +76,7 @@ void SndHeaderWriter::setLoopLength(int i)
 
 void SndHeaderWriter::setLoopEnabled(bool b)
 {
-    headerArray[38] = (b ? 1 : 0);
+    headerArray[38] = b ? 1 : 0;
 }
 
 void SndHeaderWriter::setBeatCount(int i)

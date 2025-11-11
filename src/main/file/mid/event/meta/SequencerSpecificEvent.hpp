@@ -7,22 +7,18 @@ namespace mpc::file::mid::event::meta
 
     class SequencerSpecificEvent : public MetaEvent
     {
-    private:
         std::vector<char> mData;
 
     public:
         virtual void setData(std::vector<char> data);
         virtual std::vector<char> getData();
 
-    public:
         int getEventSize() override;
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
-        virtual int compareTo(mpc::file::mid::event::MidiEvent *other);
+        virtual int compareTo(MidiEvent *other);
 
-    public:
         SequencerSpecificEvent(int tick, int delta,
                                const std::vector<char> &data);
     };

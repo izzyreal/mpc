@@ -51,7 +51,6 @@ namespace mpc::file::wav
         std::shared_ptr<std::istream> iStream;
         std::shared_ptr<std::ostream> oStream;
 
-    private:
         static const int BUFFER_SIZE{2048};
         static const int FMT_CHUNK_ID{544501094};
         static const int DATA_CHUNK_ID{1635017060};

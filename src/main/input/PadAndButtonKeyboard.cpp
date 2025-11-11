@@ -8,9 +8,7 @@ using namespace mpc::hardware;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-PadAndButtonKeyboard::PadAndButtonKeyboard(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
-{
-}
+PadAndButtonKeyboard::PadAndButtonKeyboard(Mpc &mpcToUse) : mpc(mpcToUse) {}
 
 std::unordered_map<ComponentId, std::string> PadAndButtonKeyboard::charMap()
 {
@@ -48,11 +46,11 @@ void PadAndButtonKeyboard::pressHardwareComponent(const ComponentId id)
 
     auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
 
-    if (id == ComponentId::SIXTEEN_LEVELS_OR_SPACE)
+    if (id == SIXTEEN_LEVELS_OR_SPACE)
     {
         nameScreen->typeCharacter(' ');
     }
-    else if (id == ComponentId::FULL_LEVEL_OR_CASE_SWITCH)
+    else if (id == FULL_LEVEL_OR_CASE_SWITCH)
     {
         upperCase = !upperCase;
         return;
@@ -81,7 +79,7 @@ void PadAndButtonKeyboard::pressHardwareComponent(const ComponentId id)
         static_cast<char>(upperCase ? toupper(c) : tolower(c));
 
     const bool previousPadWasTheSameOne = previousPad == id;
-    const bool previousPadWasEmpty = previousPad == ComponentId::NONE;
+    const bool previousPadWasEmpty = previousPad == NONE;
 
     if (!previousPadWasTheSameOne && !previousPadWasEmpty)
     {
@@ -103,7 +101,7 @@ void PadAndButtonKeyboard::pressHardwareComponent(const ComponentId id)
 
 void PadAndButtonKeyboard::resetPreviousPad()
 {
-    previousPad = ComponentId::NONE;
+    previousPad = NONE;
 }
 
 void PadAndButtonKeyboard::resetPressedZeroTimes()

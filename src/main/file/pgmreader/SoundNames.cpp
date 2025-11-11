@@ -14,7 +14,7 @@ SoundNames::SoundNames(ProgramFileReader *programFile)
 
 int SoundNames::getSampleNamesSize() const
 {
-    int sampleNamesSize = (programFile->getHeader()->getSoundCount()) * 17;
+    int sampleNamesSize = programFile->getHeader()->getSoundCount() * 17;
     return sampleNamesSize;
 }
 
@@ -23,7 +23,7 @@ std::vector<char> SoundNames::getSampleNamesArray()
     auto sampleNamesSize = getSampleNamesSize();
     auto pgmFileArray = programFile->readProgramFileArray();
     sampleNamesArray =
-        Util::vecCopyOfRange(pgmFileArray, 4, (4 + sampleNamesSize + 2));
+        Util::vecCopyOfRange(pgmFileArray, 4, 4 + sampleNamesSize + 2);
     return sampleNamesArray;
 }
 
@@ -35,7 +35,7 @@ std::string SoundNames::getSampleName(int sampleNumber)
     {
         sampleNamesArray = getSampleNamesArray();
         auto sampleName = Util::vecCopyOfRange(
-            sampleNamesArray, (sampleNumber * 17), ((sampleNumber * 17) + 16));
+            sampleNamesArray, sampleNumber * 17, sampleNumber * 17 + 16);
         for (char c : sampleName)
         {
             if (c == 0x00)

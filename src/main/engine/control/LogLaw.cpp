@@ -23,6 +23,6 @@ int LogLaw::intValue(float userVal)
     {
         userVal = 1;
     }
-    return static_cast<int>(
-        0.5f + ((resolution - 1) * (log10(userVal) - logMin) / logSpan));
+    return static_cast<int>(0.5f + (resolution - 1) *
+                                       (log10(userVal) - logMin) / logSpan);
 }

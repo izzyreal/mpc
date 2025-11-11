@@ -9,11 +9,11 @@
 using namespace mpc::file::mid::event::meta;
 
 KeySignature::KeySignature(int tick, int delta, int key, int scale)
-    : MetaEvent(tick, delta, MetaEvent::KEY_SIGNATURE)
+    : MetaEvent(tick, delta, KEY_SIGNATURE)
 {
     setKey(key);
     mScale = scale;
-    mLength = mpc::file::mid::util::VariableLengthInt(2);
+    mLength = util::VariableLengthInt(2);
 }
 
 const int KeySignature::SCALE_MAJOR;
@@ -77,7 +77,7 @@ std::shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta,
     return std::make_shared<KeySignature>(tick, delta, key, scale);
 }
 
-int KeySignature::compareTo(mpc::file::mid::event::MidiEvent *other) const
+int KeySignature::compareTo(MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

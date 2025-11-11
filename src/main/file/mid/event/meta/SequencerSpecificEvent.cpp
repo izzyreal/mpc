@@ -9,10 +9,10 @@ using namespace mpc::file::mid::event::meta;
 
 SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta,
                                                const std::vector<char> &data)
-    : MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC)
+    : MetaEvent(tick, delta, SEQUENCER_SPECIFIC)
 {
     mData = data;
-    mpc::file::mid::util::VariableLengthInt(data.size());
+    util::VariableLengthInt(data.size());
 }
 
 void SequencerSpecificEvent::setData(std::vector<char> data)
@@ -45,7 +45,7 @@ void SequencerSpecificEvent::writeToOutputStream(std::ostream &out,
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int SequencerSpecificEvent::compareTo(mpc::file::mid::event::MidiEvent *other)
+int SequencerSpecificEvent::compareTo(MidiEvent *other)
 {
     if (mTick != other->getTick())
     {
@@ -60,8 +60,7 @@ int SequencerSpecificEvent::compareTo(mpc::file::mid::event::MidiEvent *other)
         return 1;
     }
     auto o = dynamic_cast<SequencerSpecificEvent *>(other);
-    if (mpc::file::mid::util::MidiUtil::bytesEqual(mData, o->mData, 0,
-                                                   mData.size()))
+    if (util::MidiUtil::bytesEqual(mData, o->mData, 0, mData.size()))
     {
         return 0;
     }

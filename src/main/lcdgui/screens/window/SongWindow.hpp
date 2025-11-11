@@ -10,7 +10,6 @@ namespace mpc::lcdgui::screens::window
     public:
         SongWindow(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
         void openNameScreen() override;
         void function(int i) override;

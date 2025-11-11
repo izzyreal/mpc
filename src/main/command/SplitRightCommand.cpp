@@ -8,7 +8,7 @@
 namespace mpc::command
 {
 
-    SplitRightCommand::SplitRightCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    SplitRightCommand::SplitRightCommand(Mpc &mpc) : mpc(mpc) {}
 
     void SplitRightCommand::execute()
     {

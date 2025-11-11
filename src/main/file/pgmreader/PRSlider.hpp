@@ -17,7 +17,6 @@ namespace mpc
             public:
                 int sampleNamesSize{0};
 
-            public:
                 std::vector<char> sliderArray{};
 
             private:
@@ -29,7 +28,6 @@ namespace mpc
                 int getSliderEnd();
                 std::vector<char> getSliderArray();
 
-            public:
                 int getMidiNoteAssign();
                 int getTuneLow();
                 int getTuneHigh();

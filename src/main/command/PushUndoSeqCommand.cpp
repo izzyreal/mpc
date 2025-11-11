@@ -5,7 +5,7 @@
 namespace mpc::command
 {
 
-    PushUndoSeqCommand::PushUndoSeqCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    PushUndoSeqCommand::PushUndoSeqCommand(Mpc &mpc) : mpc(mpc) {}
 
     void PushUndoSeqCommand::execute()
     {

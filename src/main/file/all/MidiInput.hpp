@@ -47,7 +47,6 @@ namespace mpc::file::all
         std::vector<bool> ccPassEnabled = std::vector<bool>(128);
         std::vector<char> saveBytes;
 
-    public:
         int getSoftThruMode() const;
         int getReceiveCh() const;
         bool isSustainPedalToDurationEnabled() const;
@@ -63,10 +62,9 @@ namespace mpc::file::all
         bool isExclusivePassEnabled() const;
         std::vector<bool> getCcPassEnabled();
 
-    public:
         std::vector<char> &getBytes();
 
         MidiInput(const std::vector<char> &b);
-        MidiInput(mpc::Mpc &mpc);
+        MidiInput(Mpc &mpc);
     };
 } // namespace mpc::file::all

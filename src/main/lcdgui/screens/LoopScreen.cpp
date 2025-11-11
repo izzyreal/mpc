@@ -171,7 +171,7 @@ void LoopScreen::turnWheel(int i)
         else
         {
             const auto newLength =
-                (sound->getEnd() - sound->getLoopTo()) + soundInc;
+                sound->getEnd() - sound->getLoopTo() + soundInc;
             setLength(newLength);
         }
 
@@ -270,8 +270,9 @@ void LoopScreen::setSliderLoopTo(int i) const
     const auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getLoopTo();
     const auto newLoopToValue =
-        (int)((i / 124.0) * (loopLngthFix ? (sound->getFrameCount() - oldLength)
-                                          : sound->getEnd()));
+        (int)(i / 124.0 *
+              (loopLngthFix ? sound->getFrameCount() - oldLength
+                            : sound->getEnd()));
     setLoopTo(newLoopToValue);
 }
 
@@ -354,7 +355,7 @@ void LoopScreen::setLength(int newLength) const
 void LoopScreen::setSliderLength(int i) const
 {
     const auto sound = sampler->getSound();
-    const auto newLength = (int)((i / 124.0) * sound->getFrameCount());
+    const auto newLength = (int)(i / 124.0 * sound->getFrameCount());
     setLength(newLength);
 }
 

@@ -5,7 +5,6 @@ namespace mpc::sequencer
     class Step
     {
 
-    private:
         int sequence = 0;
         int repeatCount = 1;
 

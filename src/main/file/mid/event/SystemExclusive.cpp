@@ -20,7 +20,7 @@ SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta,
     {
         mType = 240;
     }
-    mLength = new mpc::file::mid::util::VariableLengthInt(data.size());
+    mLength = new util::VariableLengthInt(data.size());
     mData = data;
 }
 

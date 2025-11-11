@@ -75,7 +75,7 @@ SCENARIO("All screens can be opened", "[screens]")
             }
 
             auto layer = ls->getFocusedLayer();
-            std::vector<std::vector<bool>> pixels(248, std::vector<bool>(60));
+            std::vector pixels(248, std::vector<bool>(60));
             layer->drawRecursive(&pixels);
             int blackPixelCount = 0;
 

@@ -5,7 +5,7 @@
 using namespace mpc::file::mid::event::meta;
 
 InstrumentName::InstrumentName(int tick, int delta, const std::string &name)
-    : TextualMetaEvent(tick, delta, MetaEvent::INSTRUMENT_NAME, name)
+    : TextualMetaEvent(tick, delta, INSTRUMENT_NAME, name)
 {
 }
 

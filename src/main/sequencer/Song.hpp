@@ -14,7 +14,6 @@ namespace mpc::sequencer
     class Song
     {
 
-    private:
         std::string name;
         std::vector<std::shared_ptr<Step>> steps;
         bool loopEnabled = false;
@@ -34,7 +33,6 @@ namespace mpc::sequencer
         void deleteStep(int stepIndex);
         void insertStep(int stepIndex);
 
-    public:
         std::weak_ptr<Step> getStep(int i);
         int getStepCount() const;
         bool isUsed() const;

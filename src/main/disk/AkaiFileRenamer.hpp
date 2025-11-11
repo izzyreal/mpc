@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 namespace mpc
 {
@@ -12,6 +12,6 @@ namespace mpc::disk
     class AkaiFileRenamer
     {
     public:
-        static void renameFilesInDirectory(mpc::Mpc &, const fs::path &p);
+        static void renameFilesInDirectory(Mpc &, const fs::path &p);
     };
 } // namespace mpc::disk

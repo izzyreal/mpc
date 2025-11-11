@@ -7,11 +7,11 @@ namespace mpc::command
     class PushMainScreenCommand : public Command
     {
     public:
-        explicit PushMainScreenCommand(mpc::Mpc &mpc);
+        explicit PushMainScreenCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

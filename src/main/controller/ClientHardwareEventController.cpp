@@ -1,7 +1,7 @@
 #include "controller/ClientHardwareEventController.hpp"
 #include "sequencer/Transport.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "command/AllCommands.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"
@@ -171,7 +171,7 @@ void ClientHardwareEventController::handlePadPress(
 
     const Bank activeBank = mpc.clientEventController->getActiveBank();
     const auto programPadIndex =
-        physicalPadIndex + (static_cast<int>(activeBank) * 16);
+        physicalPadIndex + static_cast<int>(activeBank) * 16;
 
     std::optional<int> note = std::nullopt;
 
@@ -241,7 +241,7 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (screengroups::isSoundScreen(screen))
     {
-        mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+        mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
             sampler::PLAYX_SOUND, 127, 0);
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
@@ -254,9 +254,9 @@ void ClientHardwareEventController::handlePadPress(
                     program->getNoteFromPad(programPadIndex), clampedVelocity,
                     track.get(), screen->getBus(), screen, programPadIndex,
                     program, mpc.getSequencer(),
-                    mpc.getSequencer()->getFrameSequencer(), mpc.eventRegistry,
-                    mpc.clientEventController, mpc.getEventHandler(),
-                    mpc.screens, mpc.getHardware());
+                    mpc.getEngineHost()->getSequencerPlaybackEngine(),
+                    mpc.eventRegistry, mpc.clientEventController,
+                    mpc.getEventHandler(), mpc.screens, mpc.getHardware());
 
             action = [ctx](void *)
             {
@@ -292,14 +292,15 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    auto action = [eventRegistry = mpc.eventRegistry,
-                   eventHandler = mpc.getEventHandler(), screens = mpc.screens,
-                   sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
-                   clientEventController = mpc.clientEventController,
-                   frameSequencer = mpc.getSequencer()->getFrameSequencer(),
-                   previewSoundPlayer =
-                       mpc.getAudioMidiServices()->getPreviewSoundPlayer()](
-                      void *userData)
+    auto action =
+        [eventRegistry = mpc.eventRegistry,
+         eventHandler = mpc.getEventHandler(), screens = mpc.screens,
+         sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
+         clientEventController = mpc.clientEventController,
+         sequencerPlaybackEngine =
+             mpc.getEngineHost()->getSequencerPlaybackEngine(),
+         previewSoundPlayer =
+             mpc.getEngineHost()->getPreviewSoundPlayer()](void *userData)
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 
@@ -312,8 +313,7 @@ void ClientHardwareEventController::handlePadRelease(
             return;
         }
 
-        const auto programPadIndex =
-            p->padIndex.get() + static_cast<int>(p->bank) * 16;
+        const auto programPadIndex = p->padIndex.get() + p->bank * 16;
 
         if (p->note)
         {
@@ -321,8 +321,8 @@ void ClientHardwareEventController::handlePadRelease(
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     Source::VirtualMpcHardware, *p->note, p->track, p->bus,
                     p->screen, programPadIndex, p->program, sequencer,
-                    frameSequencer, eventRegistry, clientEventController,
-                    eventHandler, screens, hardware);
+                    sequencerPlaybackEngine, eventRegistry,
+                    clientEventController, eventHandler, screens, hardware);
 
             TriggerLocalNoteOffCommand(ctx).execute();
 
@@ -373,7 +373,7 @@ void ClientHardwareEventController::handlePadAftertouch(
         {
             eventRegistry->registerProgramPadAftertouch(
                 Source::VirtualMpcHardware, padPress->bus, padPress->program,
-                padPress->padIndex.get() + (padPress->bank * 16), pressureToUse,
+                padPress->padIndex.get() + padPress->bank * 16, pressureToUse,
                 padPress->track);
         }
 
@@ -462,17 +462,17 @@ void ClientHardwareEventController::handlePot(
                                          ? mpc.getHardware()->getRecPot()
                                          : mpc.getHardware()->getVolPot();
 
-    const auto audioMidiServices = mpc.getAudioMidiServices();
+    const auto engineHost = mpc.getEngineHost();
 
     pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
 
     if (event.componentId == REC_GAIN_POT)
     {
-        audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
+        engineHost->setRecordLevel(std::round(pot->getValue() * 100.f));
     }
     else
     {
-        audioMidiServices->setMainLevel(std::round(pot->getValue() * 100.f));
+        engineHost->setMainLevel(std::round(pot->getValue() * 100.f));
     }
 }
 
@@ -530,17 +530,17 @@ void ClientHardwareEventController::handleButtonPress(
             stepEditorScreen->prevStepEvent();
             return;
         }
-        else if (id == NEXT_STEP_OR_EVENT)
+        if (id == NEXT_STEP_OR_EVENT)
         {
             stepEditorScreen->nextStepEvent();
             return;
         }
-        else if (id == PREV_BAR_START)
+        if (id == PREV_BAR_START)
         {
             stepEditorScreen->prevBarStart();
             return;
         }
-        else if (id == NEXT_BAR_END)
+        if (id == NEXT_BAR_END)
         {
             stepEditorScreen->nextBarEnd();
             return;

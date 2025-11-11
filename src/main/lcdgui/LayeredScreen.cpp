@@ -12,7 +12,7 @@
 #include "Field.hpp"
 #include "Component.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundRecorder.hpp"
 
 #include "lcdgui/Layer.hpp"
@@ -38,7 +38,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 
-LayeredScreen::LayeredScreen(mpc::Mpc &mpc) : mpc(mpc)
+LayeredScreen::LayeredScreen(Mpc &mpc) : mpc(mpc)
 {
     const auto fntPath = "fonts/mpc2000xl-font.fnt";
     auto fntData = MpcResourceUtil::get_resource_data(fntPath);
@@ -244,7 +244,7 @@ void LayeredScreen::openScreenById(const ScreenId id)
         return;
     }
 
-    std::shared_ptr<mpc::lcdgui::ScreenComponent> newScreen;
+    std::shared_ptr<ScreenComponent> newScreen;
 
     switch (id)
     {
@@ -302,7 +302,7 @@ void LayeredScreen::closeCurrentScreen()
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {
-    const auto ams = mpc.getAudioMidiServices();
+    const auto engineHost = mpc.getEngineHost();
 
     if (!history.empty())
     {
@@ -311,10 +311,10 @@ void LayeredScreen::openScreenInternal(
         {
             return;
         }
-        else if (isCurrentScreen({ScreenId::SampleScreen}))
+        if (isCurrentScreen({ScreenId::SampleScreen}))
         {
-            ams->muteMonitor(true);
-            ams->getSoundRecorder()->setSampleScreenActive(false);
+            engineHost->muteMonitor(true);
+            engineHost->getSoundRecorder()->setSampleScreenActive(false);
         }
         else if (isCurrentScreen({ScreenId::EraseScreen}) ||
                  isCurrentScreen({ScreenId::TimingCorrectScreen}))
@@ -340,10 +340,10 @@ void LayeredScreen::openScreenInternal(
         sampleScreen)
     {
         const bool muteMonitor = sampleScreen->getMonitor() == 0;
-        ams->muteMonitor(muteMonitor);
-        ams->getSoundRecorder()->setSampleScreenActive(true);
+        engineHost->muteMonitor(muteMonitor);
+        engineHost->getSoundRecorder()->setSampleScreenActive(true);
     }
-    else if (std::dynamic_pointer_cast<NameScreen>(newScreen))
+    else if (std::dynamic_pointer_cast<window::NameScreen>(newScreen))
     {
         mpc.getPadAndButtonKeyboard()->resetPreviousPad();
         mpc.getPadAndButtonKeyboard()->resetPressedZeroTimes();
@@ -391,7 +391,7 @@ void LayeredScreen::openScreenInternal(
 
     if (std::dynamic_pointer_cast<NextSeqScreen>(newScreen))
     {
-        mpc::Util::initSequence(mpc);
+        Util::initSequence(mpc);
     }
 
     mpc.getHardware()

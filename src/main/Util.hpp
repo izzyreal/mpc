@@ -56,22 +56,22 @@ namespace mpc
         static std::string distributeTimeSig(const std::string &s);
         static std::string replaceDotWithSmallSpaceDot(const std::string &s);
         static void drawLine(std::vector<std::vector<bool>> &pixels,
-                             const LcdLine &line, const bool color);
+                             const LcdLine &line, bool color);
         static void drawLine(std::vector<std::vector<bool>> &pixels,
-                             const LcdLine &line, const bool color,
+                             const LcdLine &line, bool color,
                              const std::vector<int> &offsetxy);
         static void drawLines(std::vector<std::vector<bool>> &pixels,
                               const LcdBitmap &lines,
                               const std::vector<bool> &colors,
                               const std::vector<int> &offsetxy);
         static std::vector<std::string> &noteNames();
-        static std::string tempoString(const double tempo);
+        static std::string tempoString(double tempo);
         static int getTextWidthInPixels(const std::string &text);
-        static void initSequence(mpc::Mpc &mpc);
-        static void initSequence(int sequenceIndex, mpc::Mpc &mpc);
+        static void initSequence(Mpc &mpc);
+        static void initSequence(int sequenceIndex, Mpc &mpc);
         static void
         set16LevelsValues(const SixteenLevelsContext &,
-                          const std::shared_ptr<mpc::sequencer::NoteOnEvent> &);
+                          const std::shared_ptr<sequencer::NoteOnEvent> &);
 
         static std::pair<sequencer::NoteOnEvent::VARIATION_TYPE, int>
         getSliderNoteVariationTypeAndValue(const SliderNoteVariationContext &);

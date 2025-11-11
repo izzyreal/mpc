@@ -11,7 +11,7 @@ using namespace mpc::file::mid::event::meta;
 
 SmpteOffset::SmpteOffset(int tick, int delta, FrameRate *fps, int hour, int min,
                          int sec, int fr, int subfr)
-    : MetaEvent(tick, delta, MetaEvent::SMPTE_OFFSET)
+    : MetaEvent(tick, delta, SMPTE_OFFSET)
 {
     mFrameRate = fps;
     mHours = hour;
@@ -19,7 +19,7 @@ SmpteOffset::SmpteOffset(int tick, int delta, FrameRate *fps, int hour, int min,
     mSeconds = sec;
     mFrames = fr;
     mSubFrames = subfr;
-    mLength = mpc::file::mid::util::VariableLengthInt(5);
+    mLength = util::VariableLengthInt(5);
 }
 
 const int SmpteOffset::FRAME_RATE_24;
@@ -127,7 +127,7 @@ std::shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta,
                                          sub);
 }
 
-int SmpteOffset::compareTo(mpc::file::mid::event::MidiEvent *other)
+int SmpteOffset::compareTo(MidiEvent *other)
 {
     if (mTick != other->getTick())
     {

@@ -52,7 +52,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
 
-AbstractDisk::AbstractDisk(mpc::Mpc &_mpc) : mpc(_mpc) {}
+AbstractDisk::AbstractDisk(Mpc &_mpc) : mpc(_mpc) {}
 
 AbstractDisk::~AbstractDisk()
 {
@@ -124,8 +124,8 @@ void AbstractDisk::writeSnd(const std::shared_ptr<Sound> &s,
 {
     std::function<file_or_error()> writeFunc = [&]
     {
-        auto name = mpc::Util::getFileName(
-            fileName == "" ? s->getName() + ".SND" : fileName);
+        auto name = Util::getFileName(fileName == "" ? s->getName() + ".SND"
+                                                     : fileName);
         auto f = newFile(name);
         auto sw = SndWriter(s.get());
         auto &sndArray = sw.getSndFileArray();
@@ -143,8 +143,8 @@ void AbstractDisk::writeWav(const std::shared_ptr<Sound> &s,
 {
     std::function<file_or_error()> writeFunc = [&]
     {
-        auto name = mpc::Util::getFileName(
-            fileName == "" ? s->getName() + ".WAV" : fileName);
+        auto name = Util::getFileName(fileName == "" ? s->getName() + ".WAV"
+                                                     : fileName);
         auto f = newFile(name);
         auto outputStream = f->getOutputStream();
         auto isMono = s->isMono();
@@ -180,7 +180,7 @@ void AbstractDisk::writeWav(const std::shared_ptr<Sound> &s,
     performIoOrOpenErrorPopupNonReturning(writeFunc);
 }
 
-void AbstractDisk::writeMid(const std::shared_ptr<mpc::sequencer::Sequence> &s,
+void AbstractDisk::writeMid(const std::shared_ptr<sequencer::Sequence> &s,
                             const std::string &fileName)
 {
     std::function<file_or_error()> writeFunc = [&]
@@ -410,7 +410,7 @@ void AbstractDisk::writeMidiControlPreset(
 
         const uint8_t fileFormatVersion = 2;
 
-        data.push_back(static_cast<char>(fileFormatVersion));
+        data.push_back(fileFormatVersion);
 
         data.push_back(preset->autoloadMode);
 
@@ -556,8 +556,8 @@ void readMidiControlPresetV2(const std::vector<char> &data,
         currentChunkSize += 4;
 
         const auto chunk =
-            std::vector<char>(data.begin() + (pointer - currentChunkSize),
-                              data.begin() + pointer);
+            std::vector(data.begin() + (pointer - currentChunkSize),
+                        data.begin() + pointer);
         preset->rows.emplace_back(MidiControlCommand::fromBytes(chunk));
     }
 }
@@ -567,7 +567,7 @@ void AbstractDisk::readMidiControlPreset(
 {
     MLOG("Trying to read MIDI control preset at path " + p.string());
 
-    std::function<preset_or_error()> ioFunc = [p, preset]() -> preset_or_error
+    std::function ioFunc = [p, preset]() -> preset_or_error
     {
         auto data = get_file_data(p);
 
@@ -595,7 +595,7 @@ void AbstractDisk::readMidiControlPreset(
 
 wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
 {
-    std::function<wav_or_error()> readFunc = [f]
+    std::function readFunc = [f]
     {
         return WavFile::readWavStream(f->getInputStream());
     };
@@ -607,7 +607,7 @@ sound_or_error AbstractDisk::readWav2(
     std::shared_ptr<MpcFile> f,
     std::function<sound_or_error(std::shared_ptr<WavFile>)> onSuccess)
 {
-    std::function<sound_or_error()> readFunc = [f, onSuccess]
+    std::function readFunc = [f, onSuccess]
     {
         return WavFile::readWavStream(f->getInputStream()).and_then(onSuccess);
     };
@@ -618,7 +618,7 @@ sound_or_error AbstractDisk::readSnd2(
     std::shared_ptr<MpcFile> f,
     std::function<sound_or_error(std::shared_ptr<SndReader>)> onSuccess)
 {
-    std::function<sound_or_error()> readFunc = [f, onSuccess]
+    std::function readFunc = [f, onSuccess]
     {
         return onSuccess(std::make_shared<SndReader>(f.get()));
     };
@@ -627,8 +627,7 @@ sound_or_error AbstractDisk::readSnd2(
 
 sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 {
-    std::function<sequence_or_error()> readFunc = [this,
-                                                   f]() -> sequence_or_error
+    std::function readFunc = [this, f]() -> sequence_or_error
     {
         if (!f)
         {
@@ -658,7 +657,7 @@ void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f,
                             std::shared_ptr<Program> p)
 {
     new std::thread(
-        [this, f, p]()
+        [this, f, p]
         {
             std::function<tl::expected<bool, mpc_io_error_msg>()> readFunc =
                 [this, f, p]
@@ -675,7 +674,7 @@ void AbstractDisk::readAps2(std::shared_ptr<MpcFile> f,
                             std::function<void()> onSuccess)
 {
     new std::thread(
-        [this, f, onSuccess]()
+        [this, f, onSuccess]
         {
             std::function<tl::expected<bool, mpc_io_error_msg>()> readFunc = [&]
             {

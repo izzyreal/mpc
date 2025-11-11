@@ -3,7 +3,7 @@
 
 #include "Mpc.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiOutput.hpp"
 
@@ -24,8 +24,8 @@ MidiClockOutput::MidiClockOutput(
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
 {
-    eventQueue =
-        std::make_shared<moodycamel::ConcurrentQueue<EventAfterNFrames>>(100);
+    eventQueue = std::make_shared<
+        moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
     // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }
@@ -57,8 +57,8 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 {
     // midiSyncStartStopContinueMsg->setMessage(status);
 
-    // bufferpos should be set by FrameSeq when it's actually emitting these
-    // events, i.e. enqueueing them for host processing
+    // bufferpos should be set by SequencerPlaybackEngine when it's actually
+    // emitting these events, i.e. enqueueing them for host processing
     // midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
     /*
 
@@ -94,7 +94,7 @@ void MidiClockOutput::processTempoChange()
 void MidiClockOutput::enqueueEventAfterNFrames(
     const std::function<void()> &event, const unsigned long nFrames) const
 {
-    EventAfterNFrames e;
+    engine::EventAfterNFrames e;
     e.f = event;
     e.nFrames = nFrames;
     eventQueue->enqueue(std::move(e));
@@ -130,7 +130,7 @@ void MidiClockOutput::setSampleRate(const unsigned int sampleRate)
 
 void MidiClockOutput::processEventsAfterNFrames()
 {
-    EventAfterNFrames batch[100];
+    engine::EventAfterNFrames batch[100];
 
     const size_t count = eventQueue->try_dequeue_bulk(batch, 100);
 

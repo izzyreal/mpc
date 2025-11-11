@@ -129,8 +129,7 @@ void LoopToFineScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "lngth")
     {
-        const auto newLength =
-            (sound->getEnd() - sound->getLoopTo()) + soundInc;
+        const auto newLength = sound->getEnd() - sound->getLoopTo() + soundInc;
 
         loopScreen->setLength(newLength);
 

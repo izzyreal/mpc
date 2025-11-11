@@ -8,8 +8,6 @@ namespace mpc::lcdgui::screens::window
 {
     class CountMetronomeScreen final : public ScreenComponent
     {
-
-    private:
         std::vector<std::string> countInNames = {"OFF", "REC ONLY", "REC+PLAY"};
         std::vector<std::string> rateNames = {"1/4",    "1/4(3)", "1/8",
                                               "1/8(3)", "1/16",   "1/16(3)",
@@ -43,10 +41,8 @@ namespace mpc::lcdgui::screens::window
     public:
         CountMetronomeScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
-    public:
         void function(int i) override;
         void turnWheel(int i) override;
     };

@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
@@ -24,7 +24,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::disk;
 using namespace mpc::sampler;
 
-LoadScreen::LoadScreen(mpc::Mpc &mpc, const int layerIndex)
+LoadScreen::LoadScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "load", layerIndex)
 {
 }
@@ -147,16 +147,14 @@ void LoadScreen::function(int i)
                     return;
                 }
 
-                const auto audioServerSampleRate = mpc.getAudioMidiServices()
-                                                       ->getAudioServer()
-                                                       ->getSampleRate();
+                const auto audioServerSampleRate =
+                    mpc.getEngineHost()->getAudioServer()->getSampleRate();
 
-                bool started =
-                    mpc.getAudioMidiServices()->getSoundPlayer()->start(
-                        file->getInputStream(),
-                        isSnd ? audiomidi::SoundPlayerFileFormat::SND
-                              : audiomidi::SoundPlayerFileFormat::WAV,
-                        audioServerSampleRate);
+                bool started = mpc.getEngineHost()->getSoundPlayer()->start(
+                    file->getInputStream(),
+                    isSnd ? audiomidi::SoundPlayerFileFormat::SND
+                          : audiomidi::SoundPlayerFileFormat::WAV,
+                    audioServerSampleRate);
 
                 auto name = file->getNameWithoutExtension();
 
@@ -514,7 +512,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     if (result.canBeConverted)
     {
-        auto loadRoutine = [&]()
+        auto loadRoutine = [&]
         {
             constexpr bool shouldBeConverted2 = true;
             loadSound(shouldBeConverted2);

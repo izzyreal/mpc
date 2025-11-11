@@ -6,7 +6,6 @@ namespace mpc::lcdgui
     class HorizontalBar2 : public Component
     {
 
-    private:
         float value = 0.0f;
 
     public:

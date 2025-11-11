@@ -633,7 +633,7 @@ getDescriptorIfCommonForAsciiAndUnicode(const VmpcKeyCode vmpcKeyCode)
         vmpcKeyCode <= VmpcKeyCode::VMPC_KEY_F12)
     {
         const auto fNumber =
-            ((int)vmpcKeyCode - (int)VmpcKeyCode::VMPC_KEY_F1) + 1;
+            (int)vmpcKeyCode - (int)VmpcKeyCode::VMPC_KEY_F1 + 1;
         return "F" + std::to_string(fNumber);
     }
 

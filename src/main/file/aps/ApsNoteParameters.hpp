@@ -41,7 +41,6 @@ namespace mpc::file::aps
         int velocityToPitch;
         std::vector<char> saveBytes = std::vector<char>(26);
 
-    public:
         int getSoundIndex() const;
         sampler::VoiceOverlapMode getVoiceOverlapMode() const;
         int getTune() const;
@@ -69,6 +68,6 @@ namespace mpc::file::aps
         std::vector<char> getBytes();
 
         ApsNoteParameters(const std::vector<char> &loadBytes);
-        ApsNoteParameters(mpc::sampler::NoteParameters *np);
+        ApsNoteParameters(sampler::NoteParameters *np);
     };
 } // namespace mpc::file::aps

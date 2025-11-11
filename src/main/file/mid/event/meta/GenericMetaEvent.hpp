@@ -9,7 +9,6 @@ namespace mpc::file::mid::event::meta
     class GenericMetaEvent : public MetaEvent
     {
 
-    private:
         std::vector<char> mData;
 
     public:
@@ -17,10 +16,8 @@ namespace mpc::file::mid::event::meta
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
-        virtual int compareTo(mpc::file::mid::event::MidiEvent *other);
+        virtual int compareTo(MidiEvent *other);
 
-    public:
         GenericMetaEvent(int tick, int delta, MetaEventData *info);
     };
 } // namespace mpc::file::mid::event::meta

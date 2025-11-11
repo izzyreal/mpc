@@ -39,7 +39,7 @@ void MixerFader::Draw(std::vector<std::vector<bool>> *pixels)
         }
     }
 
-    const auto barHeight = (value / 100.0) * h;
+    const auto barHeight = value / 100.0 * h;
 
     const MRECT tmp(rect.L, rect.B - barHeight, rect.R, rect.B);
 

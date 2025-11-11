@@ -1,7 +1,7 @@
 #include "PushStopCommand.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/Hardware.hpp"
@@ -13,30 +13,29 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushStopCommand::PushStopCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushStopCommand::PushStopCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushStopCommand::execute()
 {
     const auto vmpcDirectToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-    const auto ams = mpc.getAudioMidiServices();
+    const auto engineHost = mpc.getEngineHost();
 
     mpc.clientEventController->clientHardwareEventController
         ->unlockNoteRepeat();
 
-    if (ams->isBouncing() &&
+    if (engineHost->isBouncing() &&
         (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
          mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)
              ->isPressed()))
     {
-        ams->stopBouncingEarly();
+        engineHost->stopBouncingEarly();
     }
 
     mpc.getSequencer()->getTransport()->stop();
 
-    if (!lcdgui::screengroups::isPlayScreen(
-            mpc.getLayeredScreen()->getCurrentScreen()))
+    if (!screengroups::isPlayScreen(mpc.getLayeredScreen()->getCurrentScreen()))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }

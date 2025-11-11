@@ -11,7 +11,6 @@ namespace mpc::file::aps
 {
     class ApsGlobalParameters
     {
-    private:
         bool padToInternalSound;
         bool padAssignMaster;
         bool stereoMixSourceDrum;
@@ -21,7 +20,6 @@ namespace mpc::file::aps
         int masterLevel;
         int fxDrum;
 
-    private:
         static std::vector<char> TEMPLATE_NO_SOUNDS;
         static std::vector<char> TEMPLATE_SOUNDS;
 
@@ -41,11 +39,9 @@ namespace mpc::file::aps
         bool isRecordMixChangesEnabled() const;
         int getMasterLevel() const;
 
-    public:
         std::vector<char> getBytes();
 
-    public:
         ApsGlobalParameters(const std::vector<char> &loadBytes);
-        ApsGlobalParameters(mpc::Mpc &mpc);
+        ApsGlobalParameters(Mpc &mpc);
     };
 } // namespace mpc::file::aps

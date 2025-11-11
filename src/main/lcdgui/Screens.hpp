@@ -25,7 +25,7 @@ namespace mpc::lcdgui
     class Screens
     {
     public:
-        Screens(mpc::Mpc &mpc);
+        Screens(Mpc &mpc);
 
         template <ScreenId ID>
         std::shared_ptr<typename ScreenTypeMap<ID>::type> get()
@@ -52,7 +52,7 @@ namespace mpc::lcdgui
             std::map<std::string, std::vector<std::string>> transferMap;
         };
 
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
         std::vector<std::shared_ptr<ScreenComponent>> screens;
 

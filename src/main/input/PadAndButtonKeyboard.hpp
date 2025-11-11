@@ -20,22 +20,19 @@ namespace mpc::input
 
     class PadAndButtonKeyboard
     {
-    private:
-        static std::unordered_map<mpc::hardware::ComponentId, std::string>
-        charMap();
+        static std::unordered_map<hardware::ComponentId, std::string> charMap();
 
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
         bool upperCase = true;
 
-        std::unordered_map<mpc::hardware::ComponentId, bool> pressedZeroTimes;
+        std::unordered_map<hardware::ComponentId, bool> pressedZeroTimes;
 
-        mpc::hardware::ComponentId previousPad =
-            mpc::hardware::ComponentId::NONE;
+        hardware::ComponentId previousPad = hardware::ComponentId::NONE;
 
     public:
-        PadAndButtonKeyboard(mpc::Mpc &);
-        void pressHardwareComponent(const mpc::hardware::ComponentId);
+        PadAndButtonKeyboard(Mpc &);
+        void pressHardwareComponent(const hardware::ComponentId);
         void resetPreviousPad();
         void resetPressedZeroTimes();
         void resetUpperCase();

@@ -9,7 +9,6 @@ namespace mpc::file::aps
     class ApsName
     {
 
-    private:
         static const int NAME_STRING_LENGTH{16};
 
     public:

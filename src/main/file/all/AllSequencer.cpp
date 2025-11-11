@@ -28,7 +28,7 @@ AllSequencer::AllSequencer(const std::vector<char> &loadBytes)
     secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
 }
 
-AllSequencer::AllSequencer(mpc::Mpc &mpc)
+AllSequencer::AllSequencer(Mpc &mpc)
 {
     saveBytes = std::vector<char>(LENGTH);
 

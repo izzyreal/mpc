@@ -6,7 +6,6 @@ namespace mpc::sequencer
     class MixerEvent : public Event
     {
 
-    private:
         int mixerParameter{0};
         int padNumber{0};
         int mixerParameterValue{0};

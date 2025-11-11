@@ -67,7 +67,7 @@ void NameScreen::close()
 
     enterAction = [](const std::string &) {};
     cancelScreen.clear();
-    mainScreenAction = []() {};
+    mainScreenAction = [] {};
     nameToEdit.clear();
     nameLimit = 16;
 }

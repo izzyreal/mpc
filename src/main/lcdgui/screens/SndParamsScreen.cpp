@@ -225,7 +225,7 @@ void SndParamsScreen::displaySampleAndNewTempo() const
 
     findLabel("sample-tempo")->setText("Sample tempo=" + bpmString);
 
-    auto newBpm = (int)(pow(2.0, (sound->getTune() / 120.0)) * bpm);
+    auto newBpm = (int)(pow(2.0, sound->getTune() / 120.0) * bpm);
     bpmString = std::to_string(newBpm);
     part1 = bpmString.substr(0, bpmString.length() - 1);
     part2 = bpmString.substr(bpmString.length() - 1);

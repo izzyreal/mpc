@@ -43,7 +43,7 @@ MidiTrack::MidiTrack(const std::shared_ptr<std::istream> &stream)
 
     stream->read(&buffer[0], buffer.size());
 
-    mSize = mpc::file::mid::util::MidiUtil::bytesToInt(buffer, 0, 4);
+    mSize = MidiUtil::bytesToInt(buffer, 0, 4);
     buffer.clear();
     buffer.resize(mSize);
     stream->read(&buffer[0], mSize);
@@ -74,7 +74,7 @@ void MidiTrack::readTrackData(std::vector<char> &data)
 
     while ((available = (int)in.rdbuf()->in_avail() > 0))
     {
-        auto delta = mpc::file::mid::util::VariableLengthInt(in);
+        auto delta = VariableLengthInt(in);
         int value = delta.getValue();
         totalTicks += value;
 
@@ -126,7 +126,7 @@ int MidiTrack::getLengthInTicks()
     {
         return 0;
     }
-    auto E = *std::next(mEvents.begin(), (int)(mEvents.size()) - 1);
+    auto E = *std::next(mEvents.begin(), (int)mEvents.size() - 1);
     return E->getTick();
 }
 
@@ -147,7 +147,7 @@ void MidiTrack::insertNote(int channel, int pitch, int velocity, int tick,
     insertEvent(std::make_shared<NoteOn>(tick + duration, channel, pitch, 0));
 }
 
-void MidiTrack::insertEvent(const std::weak_ptr<event::MidiEvent> &newE)
+void MidiTrack::insertEvent(const std::weak_ptr<MidiEvent> &newE)
 {
     auto newEvent = newE.lock();
     if (!newEvent)
@@ -208,7 +208,7 @@ void MidiTrack::insertEvent(const std::weak_ptr<event::MidiEvent> &newE)
     }
 }
 
-bool MidiTrack::removeEvent(mpc::file::mid::event::MidiEvent *e) const
+bool MidiTrack::removeEvent(MidiEvent *e) const
 {
     std::shared_ptr<MidiEvent> prev;
     std::shared_ptr<MidiEvent> curr;
@@ -250,7 +250,7 @@ void MidiTrack::closeTrack()
     if (mEvents.size() > 0)
     {
         auto last = std::dynamic_pointer_cast<MidiEvent>(
-            *std::next(mEvents.begin(), (int)(mEvents.size()) - 1));
+            *std::next(mEvents.begin(), (int)mEvents.size() - 1));
         lastTick = last->getTick();
     }
     insertEvent(
@@ -287,7 +287,7 @@ void MidiTrack::writeToOutputStream(const std::shared_ptr<std::ostream> &stream)
 
     stream->write(&IDENTIFIER[0], IDENTIFIER.size());
 
-    auto trackSizeBuffer = mpc::file::mid::util::MidiUtil::intToBytes(mSize, 4);
+    auto trackSizeBuffer = MidiUtil::intToBytes(mSize, 4);
     stream->write(&trackSizeBuffer[0], trackSizeBuffer.size());
 
     std::shared_ptr<MidiEvent> lastEvent;

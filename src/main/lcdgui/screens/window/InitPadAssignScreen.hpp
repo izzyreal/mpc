@@ -7,7 +7,6 @@ namespace mpc::lcdgui::screens::window
     class InitPadAssignScreen final : public ScreenComponent
     {
 
-    private:
         void displayInitPadAssign() const;
         bool initPadAssignIsMaster = false;
 

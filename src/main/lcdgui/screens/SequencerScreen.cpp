@@ -854,10 +854,8 @@ void SequencerScreen::turnWheel(int i)
                 findChild("function-keys")->Hide(false);
             }
 
-            sequencer->getStateManager()->enqueue(SetActiveSequenceIndex
-            {
-                sequencer->getActiveSequenceIndex() + i
-            });
+            sequencer->getStateManager()->enqueue(SetActiveSequenceIndex{
+                sequencer->getActiveSequenceIndex() + i});
         }
     }
     else if (focusedFieldName == "nextsq")
@@ -877,7 +875,7 @@ void SequencerScreen::turnWheel(int i)
     else if (focusedFieldName == "tempo")
     {
         const double oldTempo = sequencer->getTransport()->getTempo();
-        const double newTempo = oldTempo + (i * 0.1);
+        const double newTempo = oldTempo + i * 0.1;
         sequencer->getTransport()->setTempo(newTempo);
     }
     else if (focusedFieldName == "tsig")
@@ -989,7 +987,7 @@ void SequencerScreen::openWindow()
 void SequencerScreen::left()
 {
     moveCursor(
-        [&]()
+        [&]
         {
             ScreenComponent::left();
         });
@@ -998,7 +996,7 @@ void SequencerScreen::left()
 void SequencerScreen::right()
 {
     moveCursor(
-        [&]()
+        [&]
         {
             ScreenComponent::right();
         });
@@ -1035,7 +1033,7 @@ void SequencerScreen::moveCursor(const std::function<void()> &cursorCall)
 void SequencerScreen::up()
 {
     moveCursor(
-        [&]()
+        [&]
         {
             ScreenComponent::up();
         });
@@ -1044,7 +1042,7 @@ void SequencerScreen::up()
 void SequencerScreen::down()
 {
     moveCursor(
-        [&]()
+        [&]
         {
             ScreenComponent::down();
         });

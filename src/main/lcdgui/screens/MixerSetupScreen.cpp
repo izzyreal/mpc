@@ -5,7 +5,7 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/DrumScreen.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
@@ -124,7 +124,7 @@ void MixerSetupScreen::setMasterLevel(int i)
     }
     masterLevel = i;
 
-    mpc.getAudioMidiServices()->setMixerMasterLevel(
+    mpc.getEngineHost()->setMixerMasterLevel(
         masterLevelValues[masterLevel + 13]);
 
     displayMasterLevel();

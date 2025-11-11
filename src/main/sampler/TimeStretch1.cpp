@@ -84,7 +84,7 @@ std::vector<float> TimeStretch::seg(std::vector<float> *src, int length,
 void TimeStretch::fade(int length, std::vector<float> *fa) const
 {
     float ampCoeff = 0.0f;
-    float inc = 1.0f / ((float)(length));
+    float inc = 1.0f / (float)length;
     int fadeOutOffset = fa->size() - length;
     for (int i = 0; i < length; i++)
     {

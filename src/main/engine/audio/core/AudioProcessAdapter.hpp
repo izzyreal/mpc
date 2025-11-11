@@ -10,8 +10,7 @@ namespace mpc::engine::audio::core
         AudioProcess *process;
 
     public:
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
-                         int nFrames) override;
+        int processAudio(AudioBuffer *buf, int nFrames) override;
 
         AudioProcessAdapter(AudioProcess *process);
     };

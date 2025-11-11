@@ -5,8 +5,8 @@
 using namespace mpc::sequencer;
 
 const double LegacyClock::ppqn_f = 96.0;
-const double LegacyClock::rec60 = (1.0 / 60.0);
-const double LegacyClock::rec03 = (10.0 / 3.0);
+const double LegacyClock::rec60 = 1.0 / 60.0;
+const double LegacyClock::rec03 = 10.0 / 3.0;
 
 LegacyClock::LegacyClock()
 {
@@ -24,7 +24,7 @@ void LegacyClock::init(const double Fs)
 void LegacyClock::set_bpm(const double &BPM)
 {
     bpm = fabs(BPM);
-    omega = ((bpm)*rec60 * Fs_rec);
+    omega = bpm * rec60 * Fs_rec;
 }
 
 bool LegacyClock::proc()
@@ -63,7 +63,7 @@ void LegacyClock::reset()
 
 void LegacyClock::zero()
 {
-    pd = dinphase / (ppqn_f);
+    pd = dinphase / ppqn_f;
     dinphase = dinphase - vpd;
     pd -= omega;
     lvpd = -0.3;

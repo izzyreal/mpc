@@ -13,7 +13,6 @@ namespace mpc::engine::audio
         class AudioServerProcess : public IOAudioProcess
         {
 
-        private:
             std::string name;
 
         public:

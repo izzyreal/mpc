@@ -2,7 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
 
@@ -45,8 +45,8 @@ void ClientEventController::init()
         mpc.getEventHandler(),
         screens->get<ScreenId::MultiRecordingSetupScreen>(),
         screens->get<ScreenId::TimingCorrectScreen>(), layeredScreen, hardware,
-        screens, mpc.getSequencer()->getFrameSequencer(),
-        mpc.getAudioMidiServices()->getPreviewSoundPlayer().get());
+        screens, mpc.getEngineHost()->getSequencerPlaybackEngine(),
+        mpc.getEngineHost()->getPreviewSoundPlayer().get());
 }
 
 void ClientEventController::dispatchHostInput(

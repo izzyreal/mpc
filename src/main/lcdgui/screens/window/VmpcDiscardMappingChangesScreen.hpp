@@ -16,8 +16,8 @@ namespace mpc::lcdgui::screens::window
 
         void setNextScreen(std::string nextScreen);
 
-        std::function<void()> discardAndLeave = []() {};
-        std::function<void()> saveAndLeave = []() {};
+        std::function<void()> discardAndLeave = [] {};
+        std::function<void()> saveAndLeave = [] {};
         std::string stayScreen;
 
     private:

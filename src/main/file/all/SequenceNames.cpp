@@ -40,7 +40,7 @@ SequenceNames::SequenceNames(const std::vector<char> &b)
     }
 }
 
-SequenceNames::SequenceNames(mpc::Mpc &mpc)
+SequenceNames::SequenceNames(Mpc &mpc)
 {
     saveBytes = std::vector<char>(LENGTH);
     auto sequencer = mpc.getSequencer();
@@ -65,7 +65,7 @@ SequenceNames::SequenceNames(mpc::Mpc &mpc)
                 eventSegmentCount--;
             }
 
-            auto lastEventIndex = 641 + (eventSegmentCount / 2);
+            auto lastEventIndex = 641 + eventSegmentCount / 2;
 
             if (lastEventIndex < 641)
             {
@@ -95,7 +95,7 @@ std::vector<char> &SequenceNames::getBytes()
     return saveBytes;
 }
 
-int SequenceNames::getSegmentCount(mpc::sequencer::Sequence *seq)
+int SequenceNames::getSegmentCount(sequencer::Sequence *seq)
 {
     auto segmentCount = 0;
     for (auto &track : seq->getTracks())
@@ -108,15 +108,14 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence *seq)
         for (auto &e : track->getEvents())
         {
             auto sysEx =
-                std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(
-                    e);
+                std::dynamic_pointer_cast<sequencer::SystemExclusiveEvent>(e);
 
             if (sysEx)
             {
-                auto dataSegments = (int)(ceil(sysEx->getBytes().size() / 8.0));
+                auto dataSegments = (int)ceil(sysEx->getBytes().size() / 8.0);
                 segmentCount += dataSegments + 1;
             }
-            else if (std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e))
+            else if (std::dynamic_pointer_cast<sequencer::MixerEvent>(e))
             {
                 segmentCount += 2;
             }

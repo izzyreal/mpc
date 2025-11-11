@@ -45,7 +45,6 @@ namespace mpc::lcdgui::screens
         void displayNote() const;
         void displayPad() const;
 
-    private:
         friend class sampler::Pad;
         friend class file::aps::ApsGlobalParameters;
     };

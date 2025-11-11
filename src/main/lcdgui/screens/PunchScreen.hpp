@@ -6,7 +6,7 @@
 namespace mpc::lcdgui::screens
 {
 
-    class PunchScreen final : public ScreenComponent, private WithTimesAndNotes
+    class PunchScreen final : public ScreenComponent, WithTimesAndNotes
     {
 
     public:

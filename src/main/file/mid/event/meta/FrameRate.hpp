@@ -7,7 +7,6 @@ namespace mpc::file::mid::event::meta
 {
     class FrameRate
     {
-    private:
         std::string name;
         int ordinal{-1};
 
@@ -17,10 +16,8 @@ namespace mpc::file::mid::event::meta
         static FrameRate *FRAME_RATE_30_DROP;
         static FrameRate *FRAME_RATE_30;
 
-    public:
         int value{};
 
-    public:
         static FrameRate *fromInt(int val);
 
     private:

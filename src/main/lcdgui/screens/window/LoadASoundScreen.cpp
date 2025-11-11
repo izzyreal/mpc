@@ -160,7 +160,7 @@ void LoadASoundScreen::keepSound() const
             };
 
             const auto loadScreen = mpc.screens->get<ScreenId::LoadScreen>();
-            auto mainScreenAction = [&]()
+            auto mainScreenAction = [&]
             {
                 sampler->deleteSound(sampler->getPreviewSound());
             };

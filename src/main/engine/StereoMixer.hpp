@@ -6,7 +6,6 @@ namespace mpc::engine
     class StereoMixer
     {
 
-    private:
         int panning = 0;
         int level = 0;
 
@@ -16,7 +15,6 @@ namespace mpc::engine
         void setLevel(int i);
         int getLevel() const;
 
-    public:
         StereoMixer();
     };
 } // namespace mpc::engine

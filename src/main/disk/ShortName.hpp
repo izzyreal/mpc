@@ -8,14 +8,12 @@ namespace mpc::disk
     class ShortName
     {
 
-    private:
         static std::vector<char> ILLEGAL_CHARS_;
         static const char ASCII_SPACE{32};
         static ShortName DOT_;
         static ShortName DOT_DOT_;
         std::vector<char> nameBytes{};
 
-    private:
         static std::vector<char> toCharArray_(const std::string &name,
                                               const std::string &ext);
         void init() const;
@@ -38,7 +36,6 @@ namespace mpc::disk
         int hashCode() const;
         static void checkValidChars(const std::vector<char> &chars);
 
-    public:
         ShortName(std::string nameExt);
         ShortName(const std::string &name, const std::string &ext);
 

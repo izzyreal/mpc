@@ -47,7 +47,7 @@ MidiInput::MidiInput(const std::vector<char> &b)
     }
 }
 
-MidiInput::MidiInput(mpc::Mpc &mpc)
+MidiInput::MidiInput(Mpc &mpc)
 {
     saveBytes = std::vector<char>(LENGTH);
 
@@ -60,7 +60,7 @@ MidiInput::MidiInput(mpc::Mpc &mpc)
     saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(
         midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
     saveBytes[FILTER_ENABLED_OFFSET] =
-        static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
+        static_cast<int8_t>(midiInputScreen->isMidiFilterEnabled() ? 1 : 0);
     saveBytes[FILTER_TYPE_OFFSET] =
         static_cast<int8_t>(midiInputScreen->getType());
     saveBytes[MULTI_REC_ENABLED_OFFSET] =
@@ -94,7 +94,7 @@ MidiInput::MidiInput(mpc::Mpc &mpc)
         for (int j = 0; j < 8; j++)
         {
             const bool currentCcPassEnabled =
-                midiInputScreen->getCcPassEnabled()[(i * 8) + j];
+                midiInputScreen->getCcPassEnabled()[i * 8 + j];
 
             currentCcPassByte =
                 BitUtil::setBit(currentCcPassByte, j, currentCcPassEnabled);

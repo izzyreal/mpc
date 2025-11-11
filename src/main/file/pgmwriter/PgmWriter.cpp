@@ -10,8 +10,8 @@
 
 using namespace mpc::file::pgmwriter;
 
-PgmWriter::PgmWriter(mpc::sampler::Program *program,
-                     const std::weak_ptr<mpc::sampler::Sampler> &sampler)
+PgmWriter::PgmWriter(sampler::Program *program,
+                     const std::weak_ptr<sampler::Sampler> &sampler)
 {
     SampleNames pwSampleNames(program, sampler);
     sampleNames = pwSampleNames.getSampleNamesArray();

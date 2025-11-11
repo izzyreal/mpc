@@ -33,7 +33,7 @@ MidiSyncMisc::MidiSyncMisc(const std::vector<char> &b)
         b[SONG_MODE_IGNORE_TEMPO_CHANGE_EVENTS_IN_SEQUENCE_OFFSET] == 0x01;
 }
 
-MidiSyncMisc::MidiSyncMisc(mpc::Mpc &mpc)
+MidiSyncMisc::MidiSyncMisc(Mpc &mpc)
 {
     saveBytes = std::vector<char>(LENGTH);
 
@@ -43,7 +43,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc &mpc)
     saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeOut());
     saveBytes[SHIFT_EARLY_OFFSET] = static_cast<int8_t>(syncScreen->shiftEarly);
     saveBytes[SEND_MMC_OFFSET] =
-        static_cast<int8_t>((syncScreen->sendMMCEnabled ? 1 : 0));
+        static_cast<int8_t>(syncScreen->sendMMCEnabled ? 1 : 0);
     saveBytes[FRAME_RATE_OFFSET] = static_cast<int8_t>(syncScreen->frameRate);
     saveBytes[INPUT_OFFSET] = static_cast<int8_t>(syncScreen->in);
     saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(syncScreen->out);

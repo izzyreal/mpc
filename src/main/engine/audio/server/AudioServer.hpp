@@ -26,11 +26,9 @@ namespace mpc::engine::audio::server
         createAudioBuffer(std::string name);
         virtual void removeAudioBuffer(std::shared_ptr<core::AudioBuffer>);
 
-    public:
         const std::vector<std::shared_ptr<core::AudioBuffer>> &getBuffers();
         const unsigned int getBufferSize() const;
 
-    public:
         virtual void start() = 0;
         virtual void stop() = 0;
         virtual bool isRunning() = 0;
@@ -45,7 +43,6 @@ namespace mpc::engine::audio::server
         virtual float getSampleRate();
         virtual void setSampleRate(int rate);
 
-    public:
         AudioServer();
 
     private:

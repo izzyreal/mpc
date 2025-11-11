@@ -40,7 +40,7 @@ using namespace mpc::sequencer;
 
 constexpr int EVENT_ROW_COUNT = 4;
 
-StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
+StepEditorScreen::StepEditorScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "step-editor", layerIndex)
 {
     lastColumn["empty"] = "a";
@@ -680,7 +680,7 @@ void StepEditorScreen::turnWheel(int i)
 
                     return;
                 }
-                else if (note->getNote() + i < 35)
+                if (note->getNote() + i < 35)
                 {
                     if (note->getNote() != 35)
                     {
@@ -689,12 +689,12 @@ void StepEditorScreen::turnWheel(int i)
 
                     return;
                 }
-                else if (note->getNote() < 35)
+                if (note->getNote() < 35)
                 {
                     note->setNote(35);
                     return;
                 }
-                else if (note->getNote() > 98)
+                if (note->getNote() > 98)
                 {
                     note->setNote(98);
                     return;
@@ -1246,10 +1246,10 @@ void StepEditorScreen::setViewNotesText() const
     {
         findField("fromnote")
             ->setText(StrUtil::padLeft(std::to_string(noteA), " ", 3) + "(" +
-                      mpc::Util::noteNames()[noteA] + u8"\u00D4");
+                      Util::noteNames()[noteA] + u8"\u00D4");
         findField("tonote")->setText(
             StrUtil::padLeft(std::to_string(noteB), " ", 3) + "(" +
-            mpc::Util::noteNames()[noteB] + u8"\u00D4");
+            Util::noteNames()[noteB] + u8"\u00D4");
     }
     else if (view == 3)
     {

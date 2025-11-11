@@ -11,11 +11,9 @@ namespace mpc
     class AutoSave
     {
     public:
-        static void restoreAutoSavedState(mpc::Mpc &,
-                                          std::shared_ptr<mpc::SaveTarget>,
-                                          const bool headless);
+        static void restoreAutoSavedState(Mpc &, std::shared_ptr<SaveTarget>,
+                                          bool headless);
 
-        static void storeAutoSavedState(mpc::Mpc &,
-                                        const std::shared_ptr<mpc::SaveTarget>);
+        static void storeAutoSavedState(Mpc &, std::shared_ptr<SaveTarget>);
     };
 } // namespace mpc

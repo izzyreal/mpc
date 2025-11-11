@@ -14,6 +14,7 @@ namespace mpc::lcdgui
 
 namespace mpc::engine
 {
+    class SequencerPlaybackEngine;
     class Voice;
     class MixerInterconnection;
 } // namespace mpc::engine
@@ -48,8 +49,6 @@ namespace mpc::sequencer
     class Song;
     class Track;
     class TempoChangeEvent;
-    class FrameSeq;
-    class Clock;
 } // namespace mpc::sequencer
 
 namespace mpc::eventregistry
@@ -68,29 +67,22 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(
-            std::shared_ptr<lcdgui::LayeredScreen>,
-            std::function<std::shared_ptr<lcdgui::Screens>()>,
-            std::vector<std::shared_ptr<engine::Voice>> *,
-            const std::function<bool()> &isAudioServerRunning,
-            const std::shared_ptr<hardware::Hardware> &,
-            const std::function<bool()> &isBouncePrepared,
-            const std::function<void()> &startBouncing,
-            const std::function<void()> &stopBouncing,
-            std::function<bool()> isBouncing,
-            const std::function<bool()> &isEraseButtonPressed,
-            std::shared_ptr<eventregistry::EventRegistry>,
-            std::shared_ptr<sampler::Sampler>,
-            const std::shared_ptr<audiomidi::EventHandler> &,
-            std::function<bool()> isSixteenLevelsEnabled,
-            std::shared_ptr<Clock> clock, std::function<int()> getSampleRate,
-            std::function<bool()> isRecMainWithoutPlaying,
-            std::function<bool()> isNoteRepeatLockedOrPressed,
-            std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>
-                getAudioMixer,
-            std::function<bool()> isFullLevelEnabled,
-            std::function<std::vector<engine::MixerInterconnection *> &()>
-                getMixerInterconnections);
+        Sequencer(const std::shared_ptr<lcdgui::LayeredScreen> &,
+                  const std::function<std::shared_ptr<lcdgui::Screens>()> &,
+                  std::vector<std::shared_ptr<engine::Voice>> *,
+                  const std::function<bool()> &isAudioServerRunning,
+                  const std::shared_ptr<hardware::Hardware> &,
+                  const std::function<bool()> &isBouncePrepared,
+                  const std::function<void()> &startBouncing,
+                  const std::function<void()> &stopBouncing,
+                  const std::function<bool()> &isBouncing,
+                  const std::function<bool()> &isEraseButtonPressed,
+                  const std::shared_ptr<eventregistry::EventRegistry> &,
+                  const std::shared_ptr<sampler::Sampler> &,
+                  const std::shared_ptr<audiomidi::EventHandler> &,
+                  const std::function<bool()> &isSixteenLevelsEnabled,
+                  const std::function<
+                      std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(double quarterNotes);
@@ -105,7 +97,6 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         template <typename T> std::shared_ptr<T> getBus(int busIndex);
         std::shared_ptr<DrumBus> getDrumBus(int drumBusIndex) const;
-        std::shared_ptr<FrameSeq> getFrameSequencer();
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         const std::function<bool()> isBouncePrepared;
         const std::function<void()> startBouncing;
@@ -117,7 +108,6 @@ namespace mpc::sequencer
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
-        std::shared_ptr<FrameSeq> frameSequencer;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
@@ -126,6 +116,8 @@ namespace mpc::sequencer
         std::function<bool()> isSixteenLevelsEnabled;
 
         std::shared_ptr<SequencerStateManager> stateManager;
+        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+            getSequencerPlaybackEngine;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;

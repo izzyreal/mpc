@@ -8,7 +8,6 @@ namespace mpc::engine::control
 {
     class EnumControl : public Control
     {
-    private:
         std::variant<int, std::string> value;
 
     public:

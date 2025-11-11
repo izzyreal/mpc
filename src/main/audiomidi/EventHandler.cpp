@@ -3,12 +3,10 @@
 
 #include "Mpc.hpp"
 
-#include "audiomidi/MidiOutput.hpp"
 #include "controller/ClientEventController.hpp"
-#include "controller/ClientHardwareEventController.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
-
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "sequencer/Bus.hpp"
@@ -16,11 +14,9 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 
 #include "lcdgui/screens/MixerSetupScreen.hpp"
-#include "lcdgui/ScreenGroups.hpp"
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 
-#include "sequencer/FrameSeq.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -46,16 +42,16 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine;
 
-EventHandler::EventHandler(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
+EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
 {
     transposeCache.reserve(512);
 }
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
-    std::shared_ptr<NoteOnEvent> noteOnEvent,
-    const std::shared_ptr<DrumBus> drumBus, Track *track)
+    const std::shared_ptr<NoteOnEvent> &noteOnEvent,
+    const std::shared_ptr<DrumBus> &drumBus, Track *track)
 {
-    auto sampler = mpc.getSampler();
+    const auto sampler = mpc.getSampler();
     const auto program = sampler->getProgram(drumBus->getProgram());
     const auto note = noteOnEvent->getNote();
     const int programPadIndex = program->getPadIndexFromNote(note);
@@ -70,7 +66,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     const auto sound = sampler->getSound(noteParameters->getSoundIndex());
 
-    const auto voiceOverlapMode = (sound && sound->isLoopEnabled())
+    const auto voiceOverlapMode = sound && sound->isLoopEnabled()
                                       ? VoiceOverlapMode::NOTE_OFF
                                       : noteParameters->getVoiceOverlapMode();
 
@@ -80,12 +76,9 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     if (mpc.clientEventController->isAfterEnabled() && isSliderNote &&
         mpc.getSequencer()->getTransport()->isOverdubbing())
     {
-        auto programSlider = program->getSlider();
+        const auto programSlider = program->getSlider();
 
-        int variationTypeToUse = noteOnEvent->getVariationType();
-        int variationValueToUse = noteOnEvent->getVariationValue();
-
-        Util::SliderNoteVariationContext sliderNoteVariationContext{
+        const Util::SliderNoteVariationContext sliderNoteVariationContext{
             mpc.getHardware()->getSlider()->getValueAs<int>(),
             programSlider->getNote(),
             programSlider->getParameter(),
@@ -98,39 +91,37 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
             programSlider->getFilterLowRange(),
             programSlider->getFilterHighRange()};
 
-        const auto sliderValue = mpc.getHardware()->getSlider()->getValue();
-
         auto [type, value] = Util::getSliderNoteVariationTypeAndValue(
             sliderNoteVariationContext);
-        variationTypeToUse = type;
-        variationValueToUse = value;
 
         noteOnEvent->setVariationType(type);
-        noteOnEvent->setVariationValue(variationValueToUse);
+        noteOnEvent->setVariationValue(value);
     }
 
-    const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
-    const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
+    const auto engineHost = mpc.getEngineHost();
+    const auto sequencerPlaybackEngine =
+        engineHost->getSequencerPlaybackEngine();
+    const auto eventFrameOffsetInBuffer =
+        sequencerPlaybackEngine->getEventFrameOffset();
     const auto durationTicks = *noteOnEvent->getDuration();
-    const auto audioMidiServices = mpc.getAudioMidiServices();
-    const auto audioServer = audioMidiServices->getAudioServer();
+    const auto audioServer = engineHost->getAudioServer();
     const auto durationFrames = SeqUtil::ticksToFrames(
         durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
         audioServer->getSampleRate());
 
-    auto ctx = engine::DrumNoteEventContextBuilder::buildDrumNoteOnContext(
+    auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
         noteEventIdToUse, drumBus, mpc.getSampler(),
-        mpc.getAudioMidiServices()->getMixer(),
+        mpc.getEngineHost()->getMixer(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
-        &mpc.getAudioMidiServices()->getVoices(),
-        mpc.getAudioMidiServices()->getMixerConnections(), note, velocityToUse,
+        &mpc.getEngineHost()->getVoices(),
+        mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
         noteOnEvent->getVariationType(), noteOnEvent->getVariationValue(),
         eventFrameOffsetInBuffer, true, noteOnEvent->getTick(),
         voiceOverlapMode == VoiceOverlapMode::NOTE_OFF ? durationFrames : -1);
 
     DrumNoteEventHandler::noteOn(ctx);
 
-    auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
+    const auto currentScreen = mpc.getLayeredScreen()->getCurrentScreen();
 
     mpc.eventRegistry->registerNoteOn(eventregistry::Source::Sequence,
                                       currentScreen, ctx.drum, note,
@@ -146,8 +137,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     const auto noteOffCtx =
         DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-            noteEventIdToUse, drumBus, &mpc.getAudioMidiServices()->getVoices(),
-            note, noteOnEvent->getTick());
+            noteEventIdToUse, drumBus, &mpc.getEngineHost()->getVoices(), note,
+            noteOnEvent->getTick());
 
     auto noteOffEventFn = [bus = ctx.drum, note = noteOnEvent->getNote(), track,
                            eventRegistry = mpc.eventRegistry, program,
@@ -160,8 +151,6 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
         if (programPadIndex != -1)
         {
-            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
-
             eventRegistry->registerProgramPadRelease(
                 eventregistry::Source::Sequence, bus, program, programPadIndex,
                 track, noMidiChannel, [](void *) {});
@@ -170,7 +159,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         DrumNoteEventHandler::noteOff(noteOffCtx);
     };
 
-    frameSeq->enqueueEventAfterNFrames(
+    sequencerPlaybackEngine->enqueueEventAfterNFrames(
         noteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
 }
 
@@ -187,13 +176,14 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
         return;
     }
 
-    if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+    if (const auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
         noteOnEvent)
     {
         assert(noteOnEvent->getDuration().has_value() &&
                *noteOnEvent->getDuration() >= 0);
 
-        if (auto drumBus = mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+        if (const auto drumBus =
+                mpc.getSequencer()->getBus<DrumBus>(track->getBus());
             drumBus)
         {
             if (isDrumNote(noteOnEvent->getNote()))
@@ -213,34 +203,39 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
                                    std::nullopt);
         };
 
-        const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
-        const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
+        const auto engineHost = mpc.getEngineHost();
+        const auto sequencerPlaybackEngine =
+            engineHost->getSequencerPlaybackEngine();
+        const auto eventFrameOffsetInBuffer =
+            sequencerPlaybackEngine->getEventFrameOffset();
         const auto durationTicks = *noteOnEvent->getDuration();
-        const auto audioMidiServices = mpc.getAudioMidiServices();
-        const auto audioServer = audioMidiServices->getAudioServer();
+        const auto audioServer = engineHost->getAudioServer();
         const auto durationFrames = SeqUtil::ticksToFrames(
             durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
             audioServer->getSampleRate());
 
-        frameSeq->enqueueEventAfterNFrames(
+        sequencerPlaybackEngine->enqueueEventAfterNFrames(
             midiNoteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
     }
-    else if (auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
+    else if (const auto mixerEvent =
+                 std::dynamic_pointer_cast<MixerEvent>(event);
              mixerEvent != nullptr)
     {
-        auto pad = mixerEvent->getPad();
-        auto sampler = mpc.getSampler();
-        auto drumBus = mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+        const auto pad = mixerEvent->getPad();
+        const auto sampler = mpc.getSampler();
+        const auto drumBus =
+            mpc.getSequencer()->getBus<DrumBus>(track->getBus());
 
         assert(drumBus);
 
-        auto program = sampler->getProgram(drumBus->getProgram());
+        const auto program = sampler->getProgram(drumBus->getProgram());
 
-        auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
+        const auto mixerSetupScreen =
+            mpc.screens->get<ScreenId::MixerSetupScreen>();
 
-        auto mixer = mixerSetupScreen->isStereoMixSourceDrum()
-                         ? drumBus->getStereoMixerChannels()[pad]
-                         : program->getStereoMixerChannel(pad);
+        const auto mixer = mixerSetupScreen->isStereoMixSourceDrum()
+                               ? drumBus->getStereoMixerChannels()[pad]
+                               : program->getStereoMixerChannel(pad);
 
         if (mixerEvent->getParameter() == 0)
         {
@@ -262,11 +257,9 @@ void EventHandler::handleUnfinalizedNoteOn(
     assert(noteOnEvent);
     assert(!noteOnEvent->isFinalized());
 
-    const uint64_t noteEventIdToUse = noteEventId++;
-
     if (drumIndex.has_value() && isDrumNote(noteOnEvent->getNote()))
     {
-        auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+        const auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
         assert(drumBus);
         const auto program =
             mpc.getSampler()->getProgram(drumBus->getProgram());
@@ -279,14 +272,13 @@ void EventHandler::handleUnfinalizedNoteOn(
         const auto velocityToUse =
             std::clamp(velocityWithTrackVelocityRatioApplied, 1, 127);
 
-        auto ctx = engine::DrumNoteEventContextBuilder::buildDrumNoteOnContext(
-            0, drumBus, mpc.getSampler(),
-            mpc.getAudioMidiServices()->getMixer(),
+        const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
+            0, drumBus, mpc.getSampler(), mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
-            &mpc.getAudioMidiServices()->getVoices(),
-            mpc.getAudioMidiServices()->getMixerConnections(), note,
-            velocityToUse, noteOnEvent->getVariationType(),
-            noteOnEvent->getVariationValue(), 0, true, -1, -1);
+            &mpc.getEngineHost()->getVoices(),
+            mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
+            noteOnEvent->getVariationType(), noteOnEvent->getVariationValue(),
+            0, true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
     }
@@ -307,7 +299,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
 
     if (drumIndex.has_value() && isDrumNote(noteOffEvent->getNote()))
     {
-        auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+        const auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
 
         assert(drumBus);
 
@@ -315,9 +307,8 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
             mpc.getSampler()->getProgram(drumBus->getProgram());
         const auto note = noteOffEvent->getNote();
 
-        auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-            0, drumBus, &mpc.getAudioMidiServices()->getVoices(),
-            noteOffEvent->getNote(), -1);
+        const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
+            0, drumBus, &mpc.getEngineHost()->getVoices(), note, -1);
 
         DrumNoteEventHandler::noteOff(ctx);
     }
@@ -354,10 +345,9 @@ void EventHandler::handleNoteEventMidiOut(
     assert(trackVelocityRatio.has_value() ||
            std::dynamic_pointer_cast<NoteOffEvent>(event));
 
-    const auto isRealTime =
-        mpc.getAudioMidiServices()->getAudioServer()->isRealTime();
-
-    if (!isRealTime || trackDevice == 0)
+    if (const auto isRealTime =
+            mpc.getEngineHost()->getAudioServer()->isRealTime();
+        !isRealTime || trackDevice == 0)
     {
         return;
     }
@@ -369,7 +359,7 @@ void EventHandler::handleNoteEventMidiOut(
 
     if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
-        auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
+        const auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
 
         if (transScreen->transposeAmount != 0 && track->getIndex() < 64 &&
             (transScreen->tr == -1 || transScreen->tr == track->getIndex()))
@@ -389,13 +379,14 @@ void EventHandler::handleNoteEventMidiOut(
         // msg->setMessage(msg->getStatus(), msg->getChannel(), msg->getData1(),
         //                 velocityToUse);
 
-        const auto audioMidiServices = mpc.getAudioMidiServices();
-        const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
-        const auto audioServer = audioMidiServices->getAudioServer();
+        const auto engineHost = mpc.getEngineHost();
+        const auto sequencerPlaybackEngine =
+            engineHost->getSequencerPlaybackEngine();
+        const auto audioServer = engineHost->getAudioServer();
 
         if (noteOnEvent->isFinalized())
         {
-            frameSeq->enqueueEventAfterNFrames(
+            sequencerPlaybackEngine->enqueueEventAfterNFrames(
                 [this, noteOnEvent, track, trackDevice]
                 {
                     handleNoteEventMidiOut(noteOnEvent->getNoteOff(), track,
@@ -407,11 +398,12 @@ void EventHandler::handleNoteEventMidiOut(
                     audioServer->getSampleRate()));
         }
     }
-    else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(event))
+    else if (const auto noteOffEvent =
+                 std::dynamic_pointer_cast<NoteOffEvent>(event))
     {
-        auto candidate = transposeCache.find(noteOffEvent);
 
-        if (candidate != end(transposeCache) && track->getIndex() < 64)
+        if (const auto candidate = transposeCache.find(noteOffEvent);
+            candidate != end(transposeCache) && track->getIndex() < 64)
         {
             transposeAmount = candidate->second;
             transposeCache.erase(candidate);
@@ -423,12 +415,12 @@ void EventHandler::handleNoteEventMidiOut(
     const auto directToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
 
-    if (!(mpc.getAudioMidiServices()->isBouncing() &&
+    if (!(mpc.getEngineHost()->isBouncing() &&
           directToDiskRecorderScreen->offline) &&
         trackDevice != 0)
     {
-        // msg->bufferPos = mpc.getAudioMidiServices()
-        //->getFrameSequencer()
+        // msg->bufferPos = mpc.getEngineHost()
+        //->getSequencerPlaybackEngine()
         //->getEventFrameOffset();
         // mpc.getMidiOutput()->enqueueMessageOutputA(msg);
     }
