@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void ControlChangeEvent::setController(int i)
+void ControlChangeEvent::setController(const int i)
 {
     if (i < 0 || i > 127)
     {
@@ -16,7 +16,7 @@ int ControlChangeEvent::getController() const
     return controllerNumber;
 }
 
-void ControlChangeEvent::setAmount(int i)
+void ControlChangeEvent::setAmount(const int i)
 {
     if (i < 0 || i > 127)
     {

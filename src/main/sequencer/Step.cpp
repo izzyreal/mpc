@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void Step::setSequence(int i)
+void Step::setSequence(const int i)
 {
     if (i < 0 || i > 98)
     {
@@ -17,7 +17,7 @@ int Step::getSequence() const
     return sequence;
 }
 
-void Step::setRepeats(int i)
+void Step::setRepeats(const int i)
 {
     if (i < 0 || i > 99)
     {

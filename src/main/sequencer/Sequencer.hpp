@@ -93,8 +93,8 @@ namespace mpc::sequencer
                 getMixerInterconnections);
 
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
-        static uint32_t quarterNotesToTicks(const double quarterNotes);
-        static double ticksToQuarterNotes(const uint32_t ticks);
+        static uint32_t quarterNotesToTicks(double quarterNotes);
+        static double ticksToQuarterNotes(uint32_t ticks);
 
         void playToTick(int targetTick) const;
         int getActiveSequenceIndex() const;
@@ -103,9 +103,9 @@ namespace mpc::sequencer
         void clearPlaceHolder();
         void movePlaceHolderTo(int destIndex);
         std::shared_ptr<Sequence> getPlaceHolder();
-        template <typename T> std::shared_ptr<T> getBus(const int busIndex);
-        std::shared_ptr<DrumBus> getDrumBus(const int drumBusIndex) const;
-        std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
+        template <typename T> std::shared_ptr<T> getBus(int busIndex);
+        std::shared_ptr<DrumBus> getDrumBus(int drumBusIndex) const;
+        std::shared_ptr<FrameSeq> getFrameSequencer();
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         const std::function<bool()> isBouncePrepared;
         const std::function<void()> startBouncing;
@@ -190,16 +190,14 @@ namespace mpc::sequencer
         void trackUp();
         void trackDown();
 
-    public:
         void undoSeq();
         void setSequence(int i, std::shared_ptr<Sequence> s);
         void purgeAllSequences();
         void purgeSequence(int i);
-        void copySequence(int sq0, int sq1);
-        void copySequenceParameters(const int source, const int dest) const;
-        void copySong(const int source, const int dest);
+        void copySequence(int source, int destination);
+        void copySequenceParameters(int source, int dest) const;
+        void copySong(int source, int dest);
 
-    public:
         void copyTrack(int sourceTrackIndex, int destinationTrackIndex,
                        int sourceSequenceIndex,
                        int destinationSequenceIndex) const;

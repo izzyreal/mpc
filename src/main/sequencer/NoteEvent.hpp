@@ -18,7 +18,7 @@ namespace mpc::sequencer
         void setNote(int i);
 
     public:
-        NoteOffEvent(int numberToUse)
+        NoteOffEvent(const int numberToUse)
         {
             number = numberToUse;
         }
@@ -99,7 +99,8 @@ namespace mpc::sequencer
     class NoteOnEventPlayOnly : public NoteOnEvent
     {
     public:
-        NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i, vel)
+        NoteOnEventPlayOnly(const int i = 60, const int vel = 127)
+            : NoteOnEvent(i, vel)
         {
             setTick(-1);
         }

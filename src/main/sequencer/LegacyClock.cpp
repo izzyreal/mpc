@@ -13,7 +13,7 @@ LegacyClock::LegacyClock()
     init(44100);
 }
 
-void LegacyClock::init(double Fs)
+void LegacyClock::init(const double Fs)
 {
     Fs_rec = 1.0 / Fs;
     set_bpm(120.0);

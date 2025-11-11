@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void Event::setTick(int relativeTick)
+void Event::setTick(const int relativeTick)
 {
     tick = relativeTick;
 
@@ -19,7 +19,7 @@ int Event::getTrack() const
     return track;
 }
 
-void Event::setTrack(int i)
+void Event::setTrack(const int i)
 {
     track = i;
 }

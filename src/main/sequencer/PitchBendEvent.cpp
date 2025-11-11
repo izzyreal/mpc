@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void PitchBendEvent::setAmount(int i)
+void PitchBendEvent::setAmount(const int i)
 {
     if (i < -8192 || i > 8191)
     {

@@ -14,7 +14,6 @@
 
 #include "sampler/Sampler.hpp"
 
-#include "controller/ClientEventController.hpp"
 #include "engine/Voice.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "hardware/Hardware.hpp"
@@ -24,10 +23,7 @@
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
-#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
-#include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
-#include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
 #include "StrUtil.hpp"
 
@@ -83,10 +79,10 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
                      std::function<bool()> isFullLevelEnabled,
                      std::function<std::vector<MixerInterconnection *> &()>
                          getMixerInterconnections)
-    : layeredScreen(layeredScreen), getScreens(getScreens), voices(voices),
-      isAudioServerRunning(isAudioServerRunning), hardware(hardware),
-      isBouncePrepared(isBouncePrepared), startBouncing(startBouncing),
-      stopBouncing(stopBouncing), isBouncing(isBouncing),
+    : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
+      startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
+      stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
+      isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed), eventRegistry(eventRegistry),
       sampler(sampler), eventHandler(eventHandler),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
@@ -279,11 +275,11 @@ void Sequencer::setSoloEnabled(const bool b)
         {
             for (int note = 35; note <= 98; note++)
             {
-                for (const auto &voice : (*voices))
+                for (const auto &voice : *voices)
                 {
                     if (!voice->isFinished() && voice->getNote() == note &&
                         voice->getVoiceOverlapMode() ==
-                            sampler::VoiceOverlapMode::NOTE_OFF &&
+                            VoiceOverlapMode::NOTE_OFF &&
                         !voice->isDecaying() &&
                         drumIndex == voice->getMuteInfo().getDrum())
                     {
@@ -392,7 +388,7 @@ void Sequencer::undoSeq()
 
     undoSeqAvailable = !undoSeqAvailable;
 
-    hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
+    hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)
         ->setEnabled(undoSeqAvailable);
 }
 
@@ -447,8 +443,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         {
             return isEraseButtonPressed();
         },
-        [&](const int programPadIndex,
-            const std::shared_ptr<sampler::Program> &program)
+        [&](const int programPadIndex, const std::shared_ptr<Program> &program)
         {
             return eventRegistry->getSnapshot().isProgramPadPressed(
                 programPadIndex, program);
@@ -670,11 +665,9 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
 std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
     const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-
     const auto snapshot = stateManager->getSnapshot();
-    const bool songMode = snapshot.isSongModeEnabled();
-
-    if (songMode &&
+    if (const bool songMode = snapshot.isSongModeEnabled();
+        songMode &&
         songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
     {
         return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
@@ -710,9 +703,7 @@ std::vector<int> Sequencer::getUsedSequenceIndexes() const
 
     for (int i = 0; i < 99; i++)
     {
-        const auto s = sequences[i];
-
-        if (s->isUsed())
+        if (const auto s = sequences[i]; s->isUsed())
         {
             usedSeqs.push_back(i);
         }
@@ -921,8 +912,7 @@ void Sequencer::setActiveTrackIndex(const int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex() const
 {
-    const bool songMode = stateManager->getSnapshot().isSongModeEnabled();
-    if (songMode)
+    if (const bool songMode = stateManager->getSnapshot().isSongModeEnabled())
     {
         const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
         const auto song = songs[songScreen->getActiveSongIndex()];
@@ -1090,16 +1080,14 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 
     undoSeqAvailable = true;
 
-    hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
-        ->setEnabled(true);
+    hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(true);
 }
 
 void Sequencer::resetUndo()
 {
     undoPlaceHolder.reset();
     undoSeqAvailable = false;
-    hardware->getLed(mpc::hardware::ComponentId::UNDO_SEQ_LED)
-        ->setEnabled(false);
+    hardware->getLed(hardware::ComponentId::UNDO_SEQ_LED)->setEnabled(false);
 }
 
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
@@ -1150,6 +1138,6 @@ std::shared_ptr<FrameSeq> Sequencer::getFrameSequencer()
     return frameSequencer;
 }
 
-template std::shared_ptr<Bus> Sequencer::getBus(const int busIndex);
-template std::shared_ptr<MidiBus> Sequencer::getBus(const int busIndex);
-template std::shared_ptr<DrumBus> Sequencer::getBus(const int busIndex);
+template std::shared_ptr<Bus> Sequencer::getBus(int busIndex);
+template std::shared_ptr<MidiBus> Sequencer::getBus(int busIndex);
+template std::shared_ptr<DrumBus> Sequencer::getBus(int busIndex);

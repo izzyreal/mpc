@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void ChannelPressureEvent::setAmount(int i)
+void ChannelPressureEvent::setAmount(const int i)
 {
     if (i < 0 || i > 127)
     {

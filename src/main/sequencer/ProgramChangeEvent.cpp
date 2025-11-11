@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void ProgramChangeEvent::setProgram(int i)
+void ProgramChangeEvent::setProgram(const int i)
 {
     if (i < 1 || i > 128)
     {

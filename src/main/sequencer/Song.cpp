@@ -6,7 +6,7 @@
 
 using namespace mpc::sequencer;
 
-void Song::setLoopEnabled(bool b)
+void Song::setLoopEnabled(const bool b)
 {
     loopEnabled = b;
 }
@@ -16,7 +16,7 @@ bool Song::isLoopEnabled() const
     return loopEnabled;
 }
 
-void Song::setFirstStep(int i)
+void Song::setFirstStep(const int i)
 {
     const auto candidate = std::clamp(i, 0, std::max(0, getStepCount() - 1));
 
@@ -38,7 +38,7 @@ int Song::getFirstStep() const
     return firstStep;
 }
 
-void Song::setLastStep(int i)
+void Song::setLastStep(const int i)
 {
     const auto candidate = std::clamp(i, 0, std::max(0, getStepCount() - 1));
 
@@ -75,7 +75,7 @@ std::string Song::getName()
     return name;
 }
 
-void Song::deleteStep(int stepIndex)
+void Song::deleteStep(const int stepIndex)
 {
     if (stepIndex >= (int)steps.size())
     {
@@ -90,12 +90,12 @@ void Song::deleteStep(int stepIndex)
     }
 }
 
-void Song::insertStep(int stepIndex)
+void Song::insertStep(const int stepIndex)
 {
     steps.insert(steps.begin() + stepIndex, std::make_shared<Step>());
 }
 
-std::weak_ptr<Step> Song::getStep(int i)
+std::weak_ptr<Step> Song::getStep(const int i)
 {
     return steps[i];
 }
@@ -110,7 +110,7 @@ bool Song::isUsed() const
     return used;
 }
 
-void Song::setUsed(bool b)
+void Song::setUsed(const bool b)
 {
     used = b;
 

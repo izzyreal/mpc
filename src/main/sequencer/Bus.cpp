@@ -27,7 +27,7 @@ int DrumBus::getIndex() const
     return drumIndex;
 }
 
-void DrumBus::setProgram(int programIndexToUse)
+void DrumBus::setProgram(const int programIndexToUse)
 {
     programIndex =
         std::clamp(programIndexToUse, 0,
@@ -44,7 +44,7 @@ bool DrumBus::receivesPgmChange() const
     return receivePgmChange;
 }
 
-void DrumBus::setReceivePgmChange(bool b)
+void DrumBus::setReceivePgmChange(const bool b)
 {
     receivePgmChange = b;
 }
@@ -54,7 +54,7 @@ bool DrumBus::receivesMidiVolume() const
     return receiveMidiVolume;
 }
 
-void DrumBus::setReceiveMidiVolume(bool b)
+void DrumBus::setReceiveMidiVolume(const bool b)
 {
     receiveMidiVolume = b;
 }
@@ -64,7 +64,7 @@ int DrumBus::getLastReceivedMidiVolume() const
     return lastReceivedMidiVolume;
 }
 
-void DrumBus::setLastReceivedMidiVolume(int volume)
+void DrumBus::setLastReceivedMidiVolume(const int volume)
 {
     lastReceivedMidiVolume = std::clamp(volume, 0, 127);
 }

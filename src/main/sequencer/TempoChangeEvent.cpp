@@ -10,7 +10,7 @@ TempoChangeEvent::TempoChangeEvent(Sequence *parent)
 {
 }
 
-TempoChangeEvent::TempoChangeEvent(Sequence *parent, int ratio)
+TempoChangeEvent::TempoChangeEvent(Sequence *parent, const int ratio)
 {
     this->ratio = ratio;
     this->parent = parent;
@@ -147,7 +147,7 @@ void TempoChangeEvent::minusOneClock(TempoChangeEvent *previous)
     notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::setRatio(int i)
+void TempoChangeEvent::setRatio(const int i)
 {
     if (i < 100 || i > 9998)
     {
@@ -164,21 +164,21 @@ int TempoChangeEvent::getRatio() const
     return ratio;
 }
 
-int TempoChangeEvent::getBar(int n, int d) const
+int TempoChangeEvent::getBar(const int n, const int d) const
 {
     const auto barLength = (int)(96 * (4.0 / d) * n);
     const auto bar = (int)(tick / barLength);
     return bar;
 }
 
-int TempoChangeEvent::getBeat(int n, int d) const
+int TempoChangeEvent::getBeat(const int n, const int d) const
 {
     const auto beatLength = static_cast<int>(96 * (4.0 / d));
     const auto beat = (static_cast<int>(tick / beatLength)) % n;
     return beat;
 }
 
-int TempoChangeEvent::getClock(int denominator) const
+int TempoChangeEvent::getClock(const int denominator) const
 {
     const auto beatLength = static_cast<int>(96 * (4.0 / denominator));
     const auto clock = static_cast<int>(tick % beatLength);

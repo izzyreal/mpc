@@ -5,12 +5,12 @@
 
 using namespace mpc::sequencer;
 
-bool mpc::sequencer::isDrumNote(int number)
+bool mpc::sequencer::isDrumNote(const int number)
 {
     return number >= 35 && number <= 98;
 }
 
-void NoteOffEvent::setNote(int i)
+void NoteOffEvent::setNote(const int i)
 {
     number = i;
 }
@@ -20,7 +20,7 @@ int NoteOffEvent::getNote() const
     return number;
 }
 
-NoteOnEvent::NoteOnEvent(int i, int vel)
+NoteOnEvent::NoteOnEvent(const int i, const int vel)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
     setNote(i);
@@ -42,13 +42,13 @@ std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff() const
     return noteOff;
 }
 
-void NoteOnEvent::setTrack(int i)
+void NoteOnEvent::setTrack(const int i)
 {
     track = i;
     noteOff->setTrack(i);
 }
 
-void NoteOnEvent::setNote(int i)
+void NoteOnEvent::setNote(const int i)
 {
     number = std::clamp(i, 0, 127);
     noteOff->setNote(number);
@@ -59,7 +59,7 @@ int NoteOnEvent::getNote() const
     return number;
 }
 
-void NoteOnEvent::setDuration(Duration d)
+void NoteOnEvent::setDuration(const Duration d)
 {
     if (d)
     {
@@ -82,18 +82,18 @@ NoteOnEvent::VARIATION_TYPE NoteOnEvent::getVariationType() const
     return variationType;
 }
 
-void NoteOnEvent::incrementVariationType(int amount)
+void NoteOnEvent::incrementVariationType(const int amount)
 {
     variationType =
         VARIATION_TYPE(std::clamp(int(variationType) + amount, 0, 3));
 }
 
-void NoteOnEvent::setVariationType(VARIATION_TYPE type)
+void NoteOnEvent::setVariationType(const VARIATION_TYPE type)
 {
     variationType = type;
 }
 
-void NoteOnEvent::setVariationValue(int i)
+void NoteOnEvent::setVariationValue(const int i)
 {
     if (variationType == VARIATION_TYPE::TUNE_0)
     {
@@ -110,7 +110,7 @@ int NoteOnEvent::getVariationValue() const
     return variationValue;
 }
 
-void NoteOnEvent::setVelocity(int i)
+void NoteOnEvent::setVelocity(const int i)
 {
     velocity = std::clamp(i, 1, 127);
 }

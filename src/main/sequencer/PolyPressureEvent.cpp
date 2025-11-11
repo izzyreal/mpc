@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void PolyPressureEvent::setNote(int i)
+void PolyPressureEvent::setNote(const int i)
 {
     if (i < 0 || i > 127)
     {
@@ -16,7 +16,7 @@ int PolyPressureEvent::getNote() const
     return note;
 }
 
-void PolyPressureEvent::setAmount(int i)
+void PolyPressureEvent::setAmount(const int i)
 {
     if (i < 0 || i > 127)
     {

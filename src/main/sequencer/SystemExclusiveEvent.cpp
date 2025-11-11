@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void SystemExclusiveEvent::setByteA(unsigned char i)
+void SystemExclusiveEvent::setByteA(const unsigned char i)
 {
     if (i < 0 || i > 255)
     {
@@ -17,7 +17,7 @@ unsigned char SystemExclusiveEvent::getByteA() const
     return bytes[0];
 }
 
-void SystemExclusiveEvent::setByteB(unsigned char i)
+void SystemExclusiveEvent::setByteB(const unsigned char i)
 {
     if (i < 0 || i > 255)
     {

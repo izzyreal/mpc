@@ -16,7 +16,7 @@
 
 using namespace mpc::sequencer;
 
-int SeqUtil::getTickFromBar(int i, Sequence *s, int position)
+int SeqUtil::getTickFromBar(const int i, Sequence *s, int position)
 {
     if (i < 0)
     {
@@ -39,7 +39,7 @@ int SeqUtil::getTickFromBar(int i, Sequence *s, int position)
     return position;
 }
 
-int SeqUtil::getBarFromTick(Sequence *s, int position)
+int SeqUtil::getBarFromTick(Sequence *s, const int position)
 {
     if (position == 0)
     {
@@ -67,13 +67,14 @@ double SeqUtil::ticksPerSecond(const double tempo)
     return bps * 96.0;
 }
 
-double SeqUtil::ticksToFrames(double ticks, const double tempo, int sr)
+double SeqUtil::ticksToFrames(const double ticks, const double tempo,
+                              const int sr)
 {
     return (ticks * secondsPerTick(tempo) * sr);
 }
 
-double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick,
-                                    int sr)
+double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
+                                    const int lastTick, const int sr)
 {
     double result = 0;
     auto lastTceTick = firstTick;
@@ -129,13 +130,13 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, int firstTick, int lastTick,
     return (int)(ceil(result));
 }
 
-int SeqUtil::loopFrameLength(Sequence *seq, int sr)
+int SeqUtil::loopFrameLength(Sequence *seq, const int sr)
 {
     return static_cast<int>(
         sequenceFrameLength(seq, seq->getLoopStart(), seq->getLoopEnd(), sr));
 }
 
-int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, int sr)
+int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, const int sr)
 {
     double result = 0;
     const auto steps = song->getStepCount();
@@ -153,8 +154,9 @@ int SeqUtil::songFrameLength(Song *song, Sequencer *sequencer, int sr)
 
     return static_cast<int>(result);
 }
-void SeqUtil::setTimeSignature(Sequence *sequence, int firstBarIndex,
-                               int tsLastBarIndex, int num, int den)
+void SeqUtil::setTimeSignature(Sequence *sequence, const int firstBarIndex,
+                               const int tsLastBarIndex, const int num,
+                               const int den)
 {
     for (int i = firstBarIndex; i <= tsLastBarIndex; i++)
     {
@@ -162,7 +164,8 @@ void SeqUtil::setTimeSignature(Sequence *sequence, int firstBarIndex,
     }
 }
 
-void SeqUtil::setTimeSignature(Sequence *sequence, int bar, int num, int den)
+void SeqUtil::setTimeSignature(Sequence *sequence, const int bar, const int num,
+                               const int den)
 {
     const auto newDenTicks = 96 * (4.0 / den);
 
@@ -304,7 +307,7 @@ int SeqUtil::setClock(int i, Sequence *s, int position)
     return position;
 }
 
-int SeqUtil::getBar(Sequence *s, int position)
+int SeqUtil::getBar(Sequence *s, const int position)
 {
     if (position == 0)
     {
@@ -319,7 +322,7 @@ int SeqUtil::getBar(Sequence *s, int position)
     return bar;
 }
 
-int SeqUtil::getBeat(Sequence *s, int position)
+int SeqUtil::getBeat(Sequence *s, const int position)
 {
     if (position == 0)
     {
@@ -333,7 +336,7 @@ int SeqUtil::getBeat(Sequence *s, int position)
     return beat;
 }
 
-int SeqUtil::getClock(Sequence *s, int position)
+int SeqUtil::getClock(Sequence *s, const int position)
 {
     const auto den = s->getTimeSignature().getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
@@ -347,9 +350,10 @@ int SeqUtil::getClock(Sequence *s, int position)
     return clock;
 }
 
-void SeqUtil::copyBars(mpc::Mpc &mpc, uint8_t fromSeqIndex, uint8_t toSeqIndex,
-                       uint8_t copyFirstBar, uint8_t copyLastBar,
-                       uint8_t copyCount, uint8_t copyAfterBar)
+void SeqUtil::copyBars(mpc::Mpc &mpc, const uint8_t fromSeqIndex,
+                       const uint8_t toSeqIndex, const uint8_t copyFirstBar,
+                       const uint8_t copyLastBar, const uint8_t copyCount,
+                       const uint8_t copyAfterBar)
 {
     const auto sequencer = mpc.getSequencer();
 

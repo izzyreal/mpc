@@ -7,7 +7,7 @@ TimeSignature::TimeSignature(const TimeSignature &other)
 {
 }
 
-void TimeSignature::setNumerator(int i)
+void TimeSignature::setNumerator(const int i)
 {
     numerator = i;
 }
@@ -17,7 +17,7 @@ int TimeSignature::getNumerator() const
     return numerator;
 }
 
-void TimeSignature::setDenominator(int i)
+void TimeSignature::setDenominator(const int i)
 {
     denominator = i;
 }

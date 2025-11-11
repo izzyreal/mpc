@@ -92,7 +92,7 @@ void MidiClockOutput::processTempoChange()
 }
 
 void MidiClockOutput::enqueueEventAfterNFrames(
-    const std::function<void()> &event, unsigned long nFrames) const
+    const std::function<void()> &event, const unsigned long nFrames) const
 {
     EventAfterNFrames e;
     e.f = event;
@@ -123,7 +123,7 @@ void MidiClockOutput::enqueueMidiSyncStart1msBeforeNextClock() const
         */
 }
 
-void MidiClockOutput::setSampleRate(unsigned int sampleRate)
+void MidiClockOutput::setSampleRate(const unsigned int sampleRate)
 {
     requestedSampleRate = sampleRate;
 }

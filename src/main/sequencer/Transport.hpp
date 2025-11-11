@@ -41,7 +41,7 @@ namespace mpc::sequencer
             double positionQuarterNotes,
             bool shouldSyncTrackEventIndicesToNewPosition = true,
             bool shouldSetPlayStartPosition = true);
-        void bumpPositionByTicks(uint8_t ticks) const;
+        void bumpPositionByTicks(uint8_t tickCount) const;
         bool isPlaying() const;
         bool isRecording() const;
         bool isOverdubbing() const;

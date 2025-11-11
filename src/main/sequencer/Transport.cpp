@@ -102,7 +102,7 @@ void Transport::play(const bool fromStart)
     if (countEnabled && !songMode)
     {
         if (countInMode == 2 ||
-            (countInMode == 1 && (isRecordingOrOverdubbing())))
+            (countInMode == 1 && isRecordingOrOverdubbing()))
         {
             if (fromStart)
             {
@@ -235,7 +235,7 @@ void Transport::overdubFromStart()
 
 void Transport::stop()
 {
-    stop(StopMode::AT_START_OF_BUFFER);
+    stop(AT_START_OF_BUFFER);
 }
 
 void Transport::stop(const StopMode stopMode)
@@ -245,9 +245,10 @@ void Transport::stop(const StopMode stopMode)
     if (!isPlaying() && !bouncing)
     {
         const auto snapshot = sequencer.getStateManager()->getSnapshot();
-        const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
 
-        if (positionQuarterNotes != 0.0)
+        if (const double positionQuarterNotes =
+                snapshot.getPositionQuarterNotes();
+            positionQuarterNotes != 0.0)
         {
             setBar(0); // real 2kxl doesn't do this
         }
@@ -316,12 +317,12 @@ void Transport::resetCountInPositions()
     countInEndPos = -1;
 }
 
-void Transport::setRecording(bool b)
+void Transport::setRecording(const bool b)
 {
     recording = b;
 }
 
-void Transport::setOverdubbing(bool b)
+void Transport::setOverdubbing(const bool b)
 {
     overdubbing = b;
 }
@@ -728,9 +729,8 @@ void Transport::setBeat(int i) const
     }
 
     const auto ts = s->getTimeSignature();
-    const auto num = ts.getNumerator();
 
-    if (i >= num)
+    if (const auto num = ts.getNumerator(); i >= num)
     {
         i = num - 1;
     }
@@ -788,10 +788,9 @@ void Transport::setPosition(const double positionQuarterNotes,
         return;
     }
 
-    const auto sequence =
-        isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                    : (songMode ? sequencer.getSequence(songSequenceIndex)
-                                : sequencer.getActiveSequence());
+    const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
+                          : songMode  ? sequencer.getSequence(songSequenceIndex)
+                                      : sequencer.getActiveSequence();
 
     const auto seqLengthQuarterNotes =
         Sequencer::ticksToQuarterNotes(sequence->getLastTick());
@@ -851,12 +850,13 @@ void Transport::setPositionWithinSong(
     {
         stepStartTick = stepEndTick;
         const auto step = song->getStep(stepIndex);
-        const auto sequence = sequencer.getSequence(step.lock()->getSequence());
 
-        if (sequence->isUsed())
+        if (const auto sequence =
+                sequencer.getSequence(step.lock()->getSequence());
+            sequence->isUsed())
         {
             stepEndTick = stepStartTick +
-                          (sequence->getLastTick() * step.lock()->getRepeats());
+                          sequence->getLastTick() * step.lock()->getRepeats();
         }
         songEndTick = stepEndTick;
     }
@@ -886,7 +886,7 @@ void Transport::setPositionWithinSong(
         if (sequence->isUsed())
         {
             stepEndTick = stepStartTick +
-                          (sequence->getLastTick() * step.lock()->getRepeats());
+                          sequence->getLastTick() * step.lock()->getRepeats();
         }
 
         const auto stepStartPositionQuarterNotes =

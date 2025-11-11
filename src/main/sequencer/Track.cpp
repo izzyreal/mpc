@@ -90,7 +90,7 @@ void Track::purge()
         moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>>(20);
 }
 
-void Track::move(int tick, int oldTick)
+void Track::move(const int tick, const int oldTick)
 {
     if (tick == 0)
     {
@@ -126,7 +126,8 @@ void Track::move(int tick, int oldTick)
     }
 }
 
-std::shared_ptr<NoteOnEvent> Track::getNoteEvent(int tick, int note) const
+std::shared_ptr<NoteOnEvent> Track::getNoteEvent(const int tick,
+                                                 const int note) const
 {
     for (auto &e : events)
     {
@@ -139,7 +140,7 @@ std::shared_ptr<NoteOnEvent> Track::getNoteEvent(int tick, int note) const
     return {};
 }
 
-void Track::setTrackIndex(int i)
+void Track::setTrackIndex(const int i)
 {
     trackIndex = i;
 }
@@ -161,7 +162,7 @@ void Track::flushNoteCache() const
     }
 }
 
-void Track::setUsed(bool b)
+void Track::setUsed(const bool b)
 {
     if (!used && b && trackIndex < 64)
     {
@@ -171,7 +172,7 @@ void Track::setUsed(bool b)
     used = b;
 }
 
-void Track::setOn(bool b)
+void Track::setOn(const bool b)
 {
     on = b;
 }
@@ -209,8 +210,8 @@ void Track::finalizeNoteEventASync(
     queuedNoteOffEvents->enqueue(offEvent);
 }
 
-std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note,
-                                                          int velocity)
+std::shared_ptr<NoteOnEvent>
+Track::recordNoteEventSynced(const int tick, int note, int velocity)
 {
     auto onEvent = getNoteEvent(tick, note);
     if (!onEvent)
@@ -237,8 +238,8 @@ bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
     return old_duration != duration;
 }
 
-void Track::addEvent(int tick, const std::shared_ptr<Event> &event,
-                     bool allowMultipleNoteEventsWithSameNoteOnSameTick)
+void Track::addEvent(const int tick, const std::shared_ptr<Event> &event,
+                     const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (events.empty())
     {
@@ -251,8 +252,8 @@ void Track::addEvent(int tick, const std::shared_ptr<Event> &event,
         event, allowMultipleNoteEventsWithSameNoteOnSameTick);
 }
 
-void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
-                                bool allowMultipleNotesOnSameTick)
+void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, const int tick,
+                                const bool allowMultipleNotesOnSameTick)
 {
     std::shared_ptr<Event> clone;
 
@@ -310,7 +311,7 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
     insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
 }
 
-void Track::removeEvent(int i)
+void Track::removeEvent(const int i)
 {
     events.erase(events.begin() + i);
 }
@@ -339,7 +340,7 @@ int Track::getVelocityRatio() const
     return velocityRatio;
 }
 
-void Track::setProgramChange(int i)
+void Track::setProgramChange(const int i)
 {
     if (i < 0 || i > 128)
     {
@@ -354,7 +355,7 @@ int Track::getProgramChange() const
     return programChange;
 }
 
-void Track::setBusNumber(int i)
+void Track::setBusNumber(const int i)
 {
     if (i < 0 || i > 4)
     {
@@ -369,7 +370,7 @@ int Track::getBus() const
     return busNumber;
 }
 
-void Track::setDeviceIndex(int i)
+void Track::setDeviceIndex(const int i)
 {
     if (i < 0 || i > 32)
     {
@@ -384,7 +385,7 @@ int Track::getDeviceIndex() const
     return device;
 }
 
-std::shared_ptr<Event> Track::getEvent(int i)
+std::shared_ptr<Event> Track::getEvent(const int i)
 {
     return events[i];
 }
@@ -730,8 +731,8 @@ bool Track::isUsed() const
     return used || !events.empty();
 }
 
-std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick,
-                                                         int endTick) const
+std::vector<std::shared_ptr<Event>>
+Track::getEventRange(const int startTick, const int endTick) const
 {
     std::vector<std::shared_ptr<Event>> res;
 
@@ -746,9 +747,9 @@ std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick,
     return res;
 }
 
-void Track::correctTimeRange(int startPos, int endPos, int stepLength,
-                             int swingPercentage, int lowestNote,
-                             int highestNote)
+void Track::correctTimeRange(const int startPos, const int endPos,
+                             const int stepLength, const int swingPercentage,
+                             const int lowestNote, const int highestNote)
 {
     const auto s = getActiveSequence();
     int accumBarLengths = 0;
@@ -800,9 +801,9 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength,
     removeDoubles();
 }
 
-void Track::timingCorrect(int fromBar, int toBar,
+void Track::timingCorrect(const int fromBar, const int toBar,
                           const std::shared_ptr<NoteOnEvent> &noteEvent,
-                          int stepLength, int swingPercentage)
+                          const int stepLength, const int swingPercentage)
 {
     auto event = std::dynamic_pointer_cast<Event>(noteEvent);
     updateEventTick(event,
@@ -810,8 +811,9 @@ void Track::timingCorrect(int fromBar, int toBar,
                                       stepLength, swingPercentage));
 }
 
-int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
-                             int swingPercentage) const
+int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
+                             const int stepLength,
+                             const int swingPercentage) const
 {
     int accumBarLengths = 0;
     int previousAccumBarLengths = 0;
@@ -963,7 +965,7 @@ void moveEvent(std::vector<t> &v, size_t oldIndex, size_t newIndex)
     }
 }
 
-void Track::updateEventTick(std::shared_ptr<Event> &e, int newTick)
+void Track::updateEventTick(std::shared_ptr<Event> &e, const int newTick)
 {
     if (e->getTick() == newTick)
     {
@@ -1022,8 +1024,8 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
     return noteEvents;
 }
 
-void Track::shiftTiming(std::shared_ptr<Event> event, bool later, int amount,
-                        int lastTick)
+void Track::shiftTiming(std::shared_ptr<Event> event, const bool later,
+                        int amount, const int lastTick)
 {
     if (!later)
     {
@@ -1051,7 +1053,7 @@ std::string Track::getActualName()
 
 bool Track::insertEventWhileRetainingSort(
     const std::shared_ptr<Event> &event,
-    bool allowMultipleNoteEventsWithSameNoteOnSameTick)
+    const bool allowMultipleNoteEventsWithSameNoteOnSameTick)
 {
     if (!isUsed())
     {

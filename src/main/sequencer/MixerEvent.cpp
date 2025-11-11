@@ -2,7 +2,7 @@
 
 using namespace mpc::sequencer;
 
-void MixerEvent::setParameter(int i)
+void MixerEvent::setParameter(const int i)
 {
     if (i < 0 || i > 3)
     {
@@ -16,7 +16,7 @@ int MixerEvent::getParameter() const
     return mixerParameter;
 }
 
-void MixerEvent::setPadNumber(int i)
+void MixerEvent::setPadNumber(const int i)
 {
     if (i < 0 || i > 63)
     {
@@ -31,7 +31,7 @@ int MixerEvent::getPad() const
     return padNumber;
 }
 
-void MixerEvent::setValue(int i)
+void MixerEvent::setValue(const int i)
 {
     if (i < 0 || i > 100)
     {
