@@ -18,8 +18,6 @@ namespace mpc::lcdgui::screens
 {
     class StepEditorScreen final : public ScreenComponent
     {
-
-    private:
         void downOrUp(int increment);
         void adhocPlayNoteEvent(
             const std::shared_ptr<sequencer::NoteOnEvent> &noteEvent) const;
@@ -60,6 +58,8 @@ namespace mpc::lcdgui::screens
         void setFromNote(int i);
 
     private:
+        bool isFirstTickPosChangeAfterScreenHasBeenOpened = true;
+
         void refreshSelection();
         void refreshEventRows();
         void updateComponents() const;
@@ -73,8 +73,6 @@ namespace mpc::lcdgui::screens
         void setSequencerTickPos(const std::function<void()> &tickPosSetter);
         bool paramIsLetter(const std::string &letter) const;
 
-    private:
-        int playSingleEventCounter = 0;
         const std::vector<std::string> viewNames{
             "ALL EVENTS",  "NOTES",       "PITCH BEND", "CTRL:",
             "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE"};
@@ -97,7 +95,6 @@ namespace mpc::lcdgui::screens
         std::string selectedParameterLetter;
         bool durationTcPercentageEnabled = false;
 
-    private:
         void setView(int i);
         void setNoteA(int i);
         void setNoteB(int i);

@@ -90,6 +90,19 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc &mpc, const int layerIndex)
          },
          [&](auto)
          {
+             if (isFirstTickPosChangeAfterScreenHasBeenOpened)
+             {
+                 isFirstTickPosChangeAfterScreenHasBeenOpened = false;
+             }
+             else
+             {
+                 const auto track = sequencer->getActiveTrack();
+                 track->removeDoubles();
+                 resetYPosAndYOffset();
+                 restoreColumnForEventAtActiveRow();
+                 adhocPlayNoteEventsAtCurrentPosition();
+             }
+
              findField("now0")->setTextPadded(
                  sequencer->getTransport()->getCurrentBarIndex() + 1, "0");
              findField("now1")->setTextPadded(
@@ -215,6 +228,8 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
+    isFirstTickPosChangeAfterScreenHasBeenOpened = true;
+
     const auto track = sequencer->getActiveTrack();
 
     storeColumnForEventAtActiveRow();
@@ -714,20 +729,7 @@ void StepEditorScreen::setSequencerTickPos(
     const std::function<void()> &tickPosSetter)
 {
     storeColumnForEventAtActiveRow();
-
-    const auto oldTickPos = sequencer->getTransport()->getTickPosition();
-
     tickPosSetter();
-
-    if (oldTickPos != sequencer->getTransport()->getTickPosition())
-    {
-        const auto track = sequencer->getActiveTrack();
-        track->removeDoubles();
-        resetYPosAndYOffset();
-        restoreColumnForEventAtActiveRow();
-    }
-
-    adhocPlayNoteEventsAtCurrentPosition();
 }
 
 void StepEditorScreen::prevStepEvent()
