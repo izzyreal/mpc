@@ -3,6 +3,7 @@
 #include "EventAfterNFrames.hpp"
 
 #include "engine/audio/server/AudioClient.hpp"
+#include "engine/NoteRepeatProcessor.hpp"
 
 #include <memory>
 #include <vector>
@@ -15,43 +16,21 @@ namespace moodycamel
     template <typename T, typename Traits> class ConcurrentQueue;
 } // namespace moodycamel
 
+namespace mpc::engine
+{
+    class NoteRepeatProcessor;
+}
+
 namespace mpc::eventregistry
 {
     class EventRegistry;
 }
-
-namespace mpc::hardware
-{
-    class Slider;
-}
-
-namespace mpc::engine::audio::mixer
-{
-    class AudioMixer;
-}
-
-namespace mpc::engine
-{
-    class Voice;
-    class MixerInterconnection;
-} // namespace mpc::engine
 
 namespace mpc::lcdgui
 {
     class LayeredScreen;
     class Screens;
 } // namespace mpc::lcdgui
-
-namespace mpc::sampler
-{
-    class Sampler;
-}
-
-namespace mpc::engine
-{
-    class Voice;
-    class MixerInterconnection;
-} // namespace mpc::engine
 
 namespace mpc::sequencer
 {
@@ -60,13 +39,13 @@ namespace mpc::sequencer
     class Sequence;
     class MidiClockOutput;
 
-    class FrameSeq final : public engine::audio::server::AudioClient
+    class SequencerPlaybackEngine final : public engine::audio::server::AudioClient
     {
         using EventQueue = moodycamel::ConcurrentQueue<
             EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>;
 
     public:
-        explicit FrameSeq(
+        explicit SequencerPlaybackEngine(
             const std::shared_ptr<eventregistry::EventRegistry> &, Sequencer *,
             const std::shared_ptr<Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
@@ -75,16 +54,9 @@ namespace mpc::sequencer
             const std::function<bool()> &isRecMainWithoutPlaying,
             const std::function<void(int velo, int frameOffset)> &playMetronome,
             std::function<std::shared_ptr<lcdgui::Screens>()>,
-            const std::function<bool()> &isNoteRepeatLockedOrPressed,
-            const std::shared_ptr<sampler::Sampler> &,
-            const std::function<
-                std::shared_ptr<engine::audio::mixer::AudioMixer>()> &,
-            const std::function<bool()> &isFullLevelEnabled,
-            const std::function<bool()> &isSixteenLevelsEnabled,
-            const std::shared_ptr<hardware::Slider> &hardwareSlider,
-            std::vector<std::shared_ptr<engine::Voice>> *,
-            const std::function<std::vector<engine::MixerInterconnection *> &()>
-                &);
+            const std::function<bool()> &isNoteRepeatLockedOrPressed
+           // , const std::shared_ptr<engine::NoteRepeatProcessor>
+            );
 
         void work(int nFrames) override;
 
@@ -117,17 +89,7 @@ namespace mpc::sequencer
         std::function<bool()> isRecMainWithoutPlaying;
         std::function<void(int velo, int frameOffset)> triggerMetronome;
         std::function<bool()> isNoteRepeatLockedOrPressed;
-
-        // Required for note repeat (NoteRepeatProcessor)
-        std::shared_ptr<sampler::Sampler> sampler;
-        std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>
-            getAudioMixer;
-        std::function<bool()> isFullLevelEnabled;
-        std::function<bool()> isSixteenLevelsEnabled;
-        std::shared_ptr<hardware::Slider> hardwareSlider;
-        std::vector<std::shared_ptr<engine::Voice>> *voices;
-        std::function<std::vector<engine::MixerInterconnection *> &()>
-            getMixerInterconnections;
+        std::shared_ptr<engine::NoteRepeatProcessor> noteRepeatProcessor;
 
         std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;

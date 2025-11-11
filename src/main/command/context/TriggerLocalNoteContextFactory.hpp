@@ -9,7 +9,7 @@ namespace mpc::sequencer
 {
     class Track;
     class Sequencer;
-    class FrameSeq;
+    class SequencerPlaybackEngine;
 } // namespace mpc::sequencer
 
 namespace mpc::eventregistry
@@ -53,7 +53,7 @@ namespace mpc::command::context
             std::optional<int> programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
-            const std::shared_ptr<sequencer::FrameSeq> &,
+            const std::shared_ptr<sequencer::SequencerPlaybackEngine> &,
             const std::shared_ptr<eventregistry::EventRegistry> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &,
@@ -68,7 +68,7 @@ namespace mpc::command::context
             std::optional<int> programPadIndex,
             const std::shared_ptr<sampler::Program> &,
             const std::shared_ptr<sequencer::Sequencer> &,
-            const std::shared_ptr<sequencer::FrameSeq> &,
+            const std::shared_ptr<sequencer::SequencerPlaybackEngine> &,
             const std::shared_ptr<eventregistry::EventRegistry> &,
             const std::shared_ptr<controller::ClientEventController> &,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,

@@ -48,7 +48,7 @@ namespace mpc::sequencer
     class Song;
     class Track;
     class TempoChangeEvent;
-    class FrameSeq;
+    class SequencerPlaybackEngine;
     class Clock;
 } // namespace mpc::sequencer
 
@@ -82,15 +82,11 @@ namespace mpc::sequencer
             std::shared_ptr<eventregistry::EventRegistry>,
             std::shared_ptr<sampler::Sampler>,
             const std::shared_ptr<audiomidi::EventHandler> &,
-            std::function<bool()> isSixteenLevelsEnabled,
+                  const std::function<bool()> &isSixteenLevelsEnabled,
             std::shared_ptr<Clock> clock, std::function<int()> getSampleRate,
             std::function<bool()> isRecMainWithoutPlaying,
-            std::function<bool()> isNoteRepeatLockedOrPressed,
-            std::function<std::shared_ptr<engine::audio::mixer::AudioMixer>()>
-                getAudioMixer,
-            std::function<bool()> isFullLevelEnabled,
-            std::function<std::vector<engine::MixerInterconnection *> &()>
-                getMixerInterconnections);
+            std::function<bool()> isNoteRepeatLockedOrPressed
+            );
 
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(double quarterNotes);
@@ -105,7 +101,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getPlaceHolder();
         template <typename T> std::shared_ptr<T> getBus(int busIndex);
         std::shared_ptr<DrumBus> getDrumBus(int drumBusIndex) const;
-        std::shared_ptr<FrameSeq> getFrameSequencer();
+        std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         const std::function<bool()> isBouncePrepared;
         const std::function<void()> startBouncing;
@@ -117,7 +113,7 @@ namespace mpc::sequencer
 
     private:
         std::vector<std::shared_ptr<engine::Voice>> *voices;
-        std::shared_ptr<FrameSeq> frameSequencer;
+        std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine;
         std::function<bool()> isAudioServerRunning;
         std::function<bool()> isEraseButtonPressed;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;

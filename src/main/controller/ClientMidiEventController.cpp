@@ -47,7 +47,7 @@ ClientMidiEventController::ClientMidiEventController(
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::shared_ptr<Hardware> &hardware,
     const std::shared_ptr<Screens> &screens,
-    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &frameSequencer,
     PreviewSoundPlayer *previewSoundPlayer)
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
@@ -55,7 +55,7 @@ ClientMidiEventController::ClientMidiEventController(
       eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
-      hardware(hardware), screens(screens), frameSequencer(frameSequencer),
+      hardware(hardware), screens(screens), sequencerPlaybackEngine(frameSequencer),
       previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =
@@ -206,7 +206,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                 Source::MidiInput, registryNoteOnEvent, noteNumber, velocity,
                 track.get(), screen->getBus(), screen, programPadIndex, program,
-                sequencer, frameSequencer, eventRegistry, clientEventController,
+                sequencer, sequencerPlaybackEngine, eventRegistry, clientEventController,
                 eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
@@ -264,7 +264,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
         auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 Source::MidiInput, noteNumber, track, bus, screen,
-                programPadIndex, program, sequencer, frameSequencer,
+                programPadIndex, program, sequencer, sequencerPlaybackEngine,
                 eventRegistry, clientEventController, eventHandler, screens,
                 hardware);
 

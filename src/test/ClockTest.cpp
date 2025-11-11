@@ -2,7 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/Clock.hpp"
 
 #include "audiomidi/AudioMidiServices.hpp"
@@ -340,7 +340,7 @@ TEST_CASE("1 bar loop", "[clock]")
         mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100,
                                               120, timeInSamples);
 
-        auto frameSeq = mpc.getSequencer()->getFrameSequencer();
+        auto frameSeq = mpc.getSequencer()->getSequencerPlaybackEngine();
         frameSeq->work(blockSizes[i]);
         auto &ticksForCurrentBuffer =
             mpc.getClock()->getTicksForCurrentBuffer();

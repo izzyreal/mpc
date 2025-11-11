@@ -1,5 +1,8 @@
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
+
 #include "sequencer/Transport.hpp"
+
+#include "engine/NoteRepeatProcessor.hpp"
 #include "eventregistry/EventRegistry.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
@@ -8,7 +11,6 @@
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
-#include "sequencer/NoteRepeatProcessor.hpp"
 #include "Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
@@ -29,13 +31,9 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::eventregistry;
-
-using namespace mpc::sampler;
 using namespace mpc::engine;
-using namespace mpc::engine::audio::mixer;
-using namespace mpc::hardware;
 
-FrameSeq::FrameSeq(
+SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::shared_ptr<EventRegistry> &eventRegistry, Sequencer *sequencer,
     const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
@@ -43,27 +41,16 @@ FrameSeq::FrameSeq(
     const std::function<bool()> &isRecMainWithoutPlaying,
     const std::function<void(int velo, int frameOffset)> &triggerMetronome,
     std::function<std::shared_ptr<Screens>()> getScreens,
-    const std::function<bool()> &isNoteRepeatLockedOrPressed,
-    // Only used by note repeat (NoteRepeatProcessor)
-    const std::shared_ptr<Sampler> &sampler,
-    const std::function<std::shared_ptr<AudioMixer>()> &getAudioMixer,
-    const std::function<bool()> &isFullLevelEnabled,
-    const std::function<bool()> &isSixteenLevelsEnabled,
-    const std::shared_ptr<hardware::Slider> &hardwareSlider,
-    std::vector<std::shared_ptr<engine::Voice>> *voices,
-    const std::function<std::vector<MixerInterconnection *> &()>
-        &getMixerInterconnections)
+    const std::function<bool()> &isNoteRepeatLockedOrPressed
+    //, const std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor
+    )
     : eventRegistry(eventRegistry), layeredScreen(layeredScreen),
       getScreens(getScreens), sequencer(sequencer), clock(clock),
       isBouncing(isBouncing), getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       triggerMetronome(triggerMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
-      sampler(sampler), getAudioMixer(getAudioMixer),
-      isFullLevelEnabled(isFullLevelEnabled),
-      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
-      hardwareSlider(hardwareSlider), voices(voices),
-      getMixerInterconnections(getMixerInterconnections),
+      //noteRepeatProcessor(noteRepeatProcessor),
       midiClockOutput(
           std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
 {
@@ -71,7 +58,7 @@ FrameSeq::FrameSeq(
     tempEventQueue.reserve(100);
 }
 
-void FrameSeq::start(const bool metronomeOnlyToUse)
+void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
 {
     if (sequencerIsRunning.load())
     {
@@ -91,7 +78,7 @@ void FrameSeq::start(const bool metronomeOnlyToUse)
     sequencerIsRunning.store(true);
 }
 
-void FrameSeq::startMetronome()
+void SequencerPlaybackEngine::startMetronome()
 {
     if (sequencerIsRunning.load())
     {
@@ -101,12 +88,12 @@ void FrameSeq::startMetronome()
     start(true);
 }
 
-unsigned short FrameSeq::getEventFrameOffset() const
+unsigned short SequencerPlaybackEngine::getEventFrameOffset() const
 {
     return tickFrameOffset;
 }
 
-void FrameSeq::stop()
+void SequencerPlaybackEngine::stop()
 {
     if (!sequencerIsRunning.load())
     {
@@ -117,19 +104,19 @@ void FrameSeq::stop()
     tickFrameOffset = 0;
 }
 
-bool FrameSeq::isRunning() const
+bool SequencerPlaybackEngine::isRunning() const
 {
     return sequencerIsRunning.load();
 }
 
-void FrameSeq::setTickPositionEffectiveImmediately(const int newTickPos) const
+void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(const int newTickPos) const
 {
     sequencer->getTransport()->setPosition(
         Sequencer::ticksToQuarterNotes(newTickPos));
     sequencer->getStateManager()->drainQueue();
 }
 
-std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
+std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTransport()->getTickPosition());
     sequencer->setActiveSequenceIndex(sequencer->getNextSq(), false);
@@ -140,7 +127,7 @@ std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
     return newSeq;
 }
 
-void FrameSeq::triggerClickIfNeeded() const
+void SequencerPlaybackEngine::triggerClickIfNeeded() const
 {
     if (!sequencer->getTransport()->isCountEnabled())
     {
@@ -222,7 +209,7 @@ void FrameSeq::triggerClickIfNeeded() const
     }
 }
 
-void FrameSeq::displayPunchRects() const
+void SequencerPlaybackEngine::displayPunchRects() const
 {
     const auto punch = sequencer->getTransport()->isPunchEnabled() &&
                        sequencer->getTransport()->isRecordingOrOverdubbing();
@@ -256,7 +243,7 @@ void FrameSeq::displayPunchRects() const
     }
 }
 
-void FrameSeq::stopCountingInIfRequired() const
+void SequencerPlaybackEngine::stopCountingInIfRequired() const
 {
     if (sequencer->getTransport()->getTickPosition() >=
         sequencer->getTransport()->getCountInEndPos())
@@ -268,7 +255,7 @@ void FrameSeq::stopCountingInIfRequired() const
 }
 
 // Returns true if the song has stopped
-bool FrameSeq::processSongMode() const
+bool SequencerPlaybackEngine::processSongMode() const
 {
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -334,7 +321,7 @@ bool FrameSeq::processSongMode() const
     return false;
 }
 
-bool FrameSeq::processSeqLoopEnabled() const
+bool SequencerPlaybackEngine::processSeqLoopEnabled() const
 {
     const auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -386,7 +373,7 @@ bool FrameSeq::processSeqLoopEnabled() const
     return false;
 }
 
-bool FrameSeq::processSeqLoopDisabled() const
+bool SequencerPlaybackEngine::processSeqLoopDisabled() const
 {
     if (const auto seq = sequencer->getCurrentlyPlayingSequence();
         sequencer->getTransport()->getTickPosition() >= seq->getLastTick())
@@ -414,7 +401,7 @@ bool FrameSeq::processSeqLoopDisabled() const
     return false;
 }
 
-void FrameSeq::processNoteRepeat()
+void SequencerPlaybackEngine::processNoteRepeat()
 {
     if (!layeredScreen->isCurrentScreen({ScreenId::SequencerScreen}))
     {
@@ -463,25 +450,24 @@ void FrameSeq::processNoteRepeat()
             getScreens()->get<ScreenId::Assign16LevelsScreen>();
         const auto mixerSetupScreen =
             getScreens()->get<ScreenId::MixerSetupScreen>();
-
-        NoteRepeatProcessor::process(
-            this, sequencer, sampler, getAudioMixer(), isFullLevelEnabled(),
-            isSixteenLevelsEnabled(), assign16LevelsScreen, mixerSetupScreen,
-            eventRegistry, hardwareSlider, voices, getMixerInterconnections(),
+/*
+        noteRepeatProcessor->process(
+            this, 
             sequencer->getTransport()->getTickPosition(), repeatIntervalTicks,
             getEventFrameOffset(), sequencer->getTransport()->getTempo(),
             static_cast<float>(getSampleRate()));
+            */
     }
 }
 
-void FrameSeq::stopSequencer() const
+void SequencerPlaybackEngine::stopSequencer() const
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->getTransport()->stop();
     setTickPositionEffectiveImmediately(0);
 }
 
-void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
+void SequencerPlaybackEngine::enqueueEventAfterNFrames(const std::function<void()> &event,
                                         const unsigned long nFrames) const
 {
     EventAfterNFrames e;
@@ -490,7 +476,7 @@ void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
     eventQueue->enqueue(std::move(e));
 }
 
-void FrameSeq::processEventsAfterNFrames()
+void SequencerPlaybackEngine::processEventsAfterNFrames()
 {
     EventAfterNFrames batch[100];
 
@@ -517,7 +503,7 @@ void FrameSeq::processEventsAfterNFrames()
     }
 }
 
-void FrameSeq::work(const int nFrames)
+void SequencerPlaybackEngine::work(const int nFrames)
 {
     sequencer->getStateManager()->drainQueue();
     eventRegistry->drainQueue();
@@ -697,7 +683,7 @@ void FrameSeq::work(const int nFrames)
     clock->clearTicks();
 }
 
-uint64_t FrameSeq::getMetronomeOnlyTickPosition() const
+uint64_t SequencerPlaybackEngine::getMetronomeOnlyTickPosition() const
 {
     return metronomeOnlyTickPosition;
 }

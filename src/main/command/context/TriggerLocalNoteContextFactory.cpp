@@ -15,7 +15,7 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/NoteEvent.hpp"
 
@@ -39,7 +39,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
     const std::optional<int> programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &frameSequencer,
     const std::shared_ptr<EventRegistry> &eventRegistry,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,
@@ -126,7 +126,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const std::optional<int> programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<FrameSeq> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &frameSequencer,
     const std::shared_ptr<EventRegistry> &eventRegistry,
     const std::shared_ptr<ClientEventController> &controller,
     const std::shared_ptr<EventHandler> &eventHandler,

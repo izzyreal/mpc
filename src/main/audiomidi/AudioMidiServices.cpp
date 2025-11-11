@@ -28,7 +28,7 @@
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
@@ -93,7 +93,7 @@ void AudioMidiServices::start()
         ->setValue(static_cast<float>(100));
 
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
-    compoundAudioClient->add(mpc.getSequencer()->getFrameSequencer().get());
+    compoundAudioClient->add(mpc.getSequencer()->getSequencerPlaybackEngine().get());
     compoundAudioClient->add(mixer.get());
 
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
@@ -439,7 +439,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
 
         if (directToDiskRecorderScreen->isOffline())
         {
-            mpc.getSequencer()->getFrameSequencer()->start();
+            mpc.getSequencer()->getSequencerPlaybackEngine()->start();
 
             if (getAudioServer()->isRealTime())
             {
@@ -448,7 +448,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            mpc.getSequencer()->getFrameSequencer()->start();
+            mpc.getSequencer()->getSequencerPlaybackEngine()->start();
         }
 
         for (const auto &diskRecorder : diskRecorders)

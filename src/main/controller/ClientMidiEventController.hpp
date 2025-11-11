@@ -18,7 +18,7 @@ namespace mpc::eventregistry
 namespace mpc::sequencer
 {
     class Sequencer;
-    class FrameSeq;
+    class SequencerPlaybackEngine;
 } // namespace mpc::sequencer
 
 namespace mpc::engine
@@ -88,7 +88,7 @@ namespace mpc::controller
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             const std::shared_ptr<hardware::Hardware> &,
             const std::shared_ptr<lcdgui::Screens> &,
-            const std::shared_ptr<sequencer::FrameSeq> &,
+            const std::shared_ptr<sequencer::SequencerPlaybackEngine> &,
             engine::PreviewSoundPlayer *);
 
         std::shared_ptr<ClientMidiFootswitchAssignmentController>
@@ -129,7 +129,7 @@ namespace mpc::controller
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<lcdgui::Screens> screens;
-        std::shared_ptr<sequencer::FrameSeq> frameSequencer;
+        std::shared_ptr<sequencer::SequencerPlaybackEngine> sequencerPlaybackEngine;
         engine::PreviewSoundPlayer *previewSoundPlayer;
 
         bool convertSustainPedalToDuration = false;

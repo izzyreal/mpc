@@ -254,7 +254,7 @@ void ClientHardwareEventController::handlePadPress(
                     program->getNoteFromPad(programPadIndex), clampedVelocity,
                     track.get(), screen->getBus(), screen, programPadIndex,
                     program, mpc.getSequencer(),
-                    mpc.getSequencer()->getFrameSequencer(), mpc.eventRegistry,
+                    mpc.getSequencer()->getSequencerPlaybackEngine(), mpc.eventRegistry,
                     mpc.clientEventController, mpc.getEventHandler(),
                     mpc.screens, mpc.getHardware());
 
@@ -296,7 +296,7 @@ void ClientHardwareEventController::handlePadRelease(
                    eventHandler = mpc.getEventHandler(), screens = mpc.screens,
                    sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
                    clientEventController = mpc.clientEventController,
-                   frameSequencer = mpc.getSequencer()->getFrameSequencer(),
+                   frameSequencer = mpc.getSequencer()->getSequencerPlaybackEngine(),
                    previewSoundPlayer =
                        mpc.getAudioMidiServices()->getPreviewSoundPlayer()](
                       void *userData)

@@ -20,7 +20,7 @@
 #include "sampler/Sampler.hpp"
 #include "sampler/Program.hpp"
 
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
@@ -109,7 +109,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         noteOnEvent->setVariationValue(variationValueToUse);
     }
 
-    const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
+    const auto frameSeq = mpc.getSequencer()->getSequencerPlaybackEngine();
     const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
     const auto durationTicks = *noteOnEvent->getDuration();
     const auto audioMidiServices = mpc.getAudioMidiServices();
@@ -213,7 +213,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
                                    std::nullopt);
         };
 
-        const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
+        const auto frameSeq = mpc.getSequencer()->getSequencerPlaybackEngine();
         const auto eventFrameOffsetInBuffer = frameSeq->getEventFrameOffset();
         const auto durationTicks = *noteOnEvent->getDuration();
         const auto audioMidiServices = mpc.getAudioMidiServices();
@@ -390,7 +390,7 @@ void EventHandler::handleNoteEventMidiOut(
         //                 velocityToUse);
 
         const auto audioMidiServices = mpc.getAudioMidiServices();
-        const auto frameSeq = mpc.getSequencer()->getFrameSequencer();
+        const auto frameSeq = mpc.getSequencer()->getSequencerPlaybackEngine();
         const auto audioServer = audioMidiServices->getAudioServer();
 
         if (noteOnEvent->isFinalized())

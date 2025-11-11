@@ -10,7 +10,7 @@
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
@@ -30,7 +30,7 @@ Transport::Transport(Sequencer &owner) : sequencer(owner)
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled && sequencer.getFrameSequencer()->isRunning();
+    return !metronomeOnlyEnabled && sequencer.getSequencerPlaybackEngine()->isRunning();
 }
 
 void Transport::play(const bool fromStart)
@@ -148,7 +148,7 @@ void Transport::play(const bool fromStart)
     }
     else
     {
-        sequencer.getFrameSequencer()->start();
+        sequencer.getSequencerPlaybackEngine()->start();
     }
 }
 
@@ -275,7 +275,7 @@ void Transport::stop(const StopMode stopMode)
     //                             ? 0
     //                             : frameSequencer->getEventFrameOffset();
 
-    sequencer.getFrameSequencer()->stop();
+    sequencer.getSequencerPlaybackEngine()->stop();
 
     recording = false;
     overdubbing = false;
@@ -378,7 +378,7 @@ void Transport::playMetronomeTrack()
     }
 
     metronomeOnlyEnabled = true;
-    sequencer.getFrameSequencer()->startMetronome();
+    sequencer.getSequencerPlaybackEngine()->startMetronome();
 }
 
 void Transport::stopMetronomeTrack()
@@ -388,7 +388,7 @@ void Transport::stopMetronomeTrack()
         return;
     }
 
-    sequencer.getFrameSequencer()->stop();
+    sequencer.getSequencerPlaybackEngine()->stop();
     metronomeOnlyEnabled = false;
 }
 
