@@ -8,11 +8,13 @@
 namespace mpc::sequencer
 {
     class SequencerStateManager
-        : public mpc::concurrency::AtomicStateExchange<
+        : public concurrency::AtomicStateExchange<
               SequencerState, SequencerStateView, SequencerMessage>
     {
     public:
         SequencerStateManager();
+
+        void enqueue(SequencerMessage &&msg) const noexcept override;
 
     protected:
         void applyMessage(const SequencerMessage &msg) noexcept override;

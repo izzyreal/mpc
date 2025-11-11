@@ -35,7 +35,7 @@ namespace mpc::concurrency
         }
 
     public:
-        void enqueue(Message &&msg) const noexcept
+        virtual void enqueue(Message &&msg) const noexcept
         {
             eventMessageQueue->enqueue(std::move(msg));
         }
