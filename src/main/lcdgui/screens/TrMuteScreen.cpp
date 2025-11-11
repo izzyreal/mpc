@@ -3,7 +3,6 @@
 
 #include "StrUtil.hpp"
 #include "controller/ClientEventController.hpp"
-#include "hardware/Hardware.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "Mpc.hpp"
@@ -141,13 +140,12 @@ void TrMuteScreen::right()
 
 void TrMuteScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "sq" && !sequencer->getTransport()->isPlaying())
     {
         sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i);
+                                          i, true);
     }
 }
 
@@ -155,19 +153,17 @@ void TrMuteScreen::function(int i)
 {
     ScreenComponent::function(i);
 
-    switch (i)
+    if (i == 5)
     {
-        case 5:
-            if (sequencer->isSoloEnabled())
-            {
-                ls->setCurrentBackground("track-mute");
-                sequencer->setSoloEnabled(false);
-            }
-            else
-            {
-                ls->setCurrentBackground("track-mute-solo-1");
-            }
-            break;
+        if (sequencer->isSoloEnabled())
+        {
+            ls->setCurrentBackground("track-mute");
+            sequencer->setSoloEnabled(false);
+        }
+        else
+        {
+            ls->setCurrentBackground("track-mute-solo-1");
+        }
     }
 }
 

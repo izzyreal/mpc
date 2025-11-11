@@ -122,7 +122,7 @@ bool FrameSeq::isRunning() const
     return sequencerIsRunning.load();
 }
 
-void FrameSeq::move(const int newTickPos) const
+void FrameSeq::setTickPositionEffectiveImmediately(const int newTickPos) const
 {
     sequencer->getTransport()->setPosition(
         Sequencer::ticksToQuarterNotes(newTickPos));
@@ -132,12 +132,11 @@ void FrameSeq::move(const int newTickPos) const
 std::shared_ptr<Sequence> FrameSeq::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTransport()->getTickPosition());
-    sequencer->setActiveSequenceIndex(sequencer->getNextSq());
+    sequencer->setActiveSequenceIndex(sequencer->getNextSq(), false);
     sequencer->setNextSq(-1);
-    move(0);
+    setTickPositionEffectiveImmediately(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
     newSeq->initLoop();
-    move(0);
     return newSeq;
 }
 
@@ -262,7 +261,7 @@ void FrameSeq::stopCountingInIfRequired() const
     if (sequencer->getTransport()->getTickPosition() >=
         sequencer->getTransport()->getCountInEndPos())
     {
-        move(sequencer->getTransport()->getCountInStartPos());
+        setTickPositionEffectiveImmediately(sequencer->getTransport()->getCountInStartPos());
         sequencer->getTransport()->setCountingIn(false);
         sequencer->getTransport()->resetCountInPositions();
     }
@@ -301,7 +300,7 @@ bool FrameSeq::processSongMode() const
             return true;
         }
 
-        move(0);
+        setTickPositionEffectiveImmediately(0);
     }
     else if (doneRepeating && reachedLastStep)
     {
@@ -329,7 +328,7 @@ bool FrameSeq::processSongMode() const
         {
             sequencer->playToTick(seq->getLastTick() - 1);
         }
-        move(0);
+        setTickPositionEffectiveImmediately(0);
     }
 
     return false;
@@ -371,7 +370,7 @@ bool FrameSeq::processSeqLoopEnabled() const
         }
 
         sequencer->playToTick(sequencer->getTransport()->getTickPosition());
-        move(seq->getLoopStart());
+        setTickPositionEffectiveImmediately(seq->getLoopStart());
 
         if (sequencer->getTransport()->isRecordingOrOverdubbing())
         {
@@ -406,7 +405,7 @@ bool FrameSeq::processSeqLoopDisabled() const
         {
             sequencer->getTransport()->stop(
                 Transport::StopMode::AT_START_OF_TICK);
-            move(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
+            setTickPositionEffectiveImmediately(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
         return true;
@@ -479,7 +478,7 @@ void FrameSeq::stopSequencer() const
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
     sequencer->getTransport()->stop();
-    move(0);
+    setTickPositionEffectiveImmediately(0);
 }
 
 void FrameSeq::enqueueEventAfterNFrames(const std::function<void()> &event,
@@ -661,7 +660,8 @@ void FrameSeq::work(const int nFrames)
             seq = switchToNextSequence();
             continue;
         }
-        else if (sequencer->isSongModeEnabled())
+
+        if (sequencer->isSongModeEnabled())
         {
             if (!songHasStopped && processSongMode())
             {

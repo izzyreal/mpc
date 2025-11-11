@@ -87,7 +87,7 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
       sampler(sampler), eventHandler(eventHandler),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
-    stateManager = std::make_shared<SequencerStateManager>();
+    stateManager = std::make_shared<SequencerStateManager>(this);
 
     frameSequencer = std::make_shared<FrameSeq>(
         eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
@@ -306,15 +306,13 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
     defaultSequenceName = s;
 }
 
-void Sequencer::setActiveSequenceIndex(int i)
+void Sequencer::setActiveSequenceIndex(int i, const bool shouldSetPositionTo0)
 {
-    i = std::clamp(i, 0, 98);
-
-    activeSequenceIndex = i;
-
-    if (!transport->isPlaying())
+    assert(!shouldSetPositionTo0 || !transport->isPlaying());
+    activeSequenceIndex = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
+    if (shouldSetPositionTo0)
     {
-        stateManager->enqueue(SetPositionQuarterNotes{0.0});
+        getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{0});
     }
 }
 

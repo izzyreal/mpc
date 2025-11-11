@@ -26,6 +26,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #ifdef __linux__
 #include <climits>
@@ -853,8 +854,10 @@ void SequencerScreen::turnWheel(int i)
                 findChild("function-keys")->Hide(false);
             }
 
-            sequencer->setActiveSequenceIndex(
-                sequencer->getActiveSequenceIndex() + i);
+            sequencer->getStateManager()->enqueue(SetActiveSequenceIndex
+            {
+                sequencer->getActiveSequenceIndex() + i
+            });
         }
     }
     else if (focusedFieldName == "nextsq")

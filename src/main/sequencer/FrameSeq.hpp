@@ -157,7 +157,7 @@ namespace mpc::sequencer
 
         void processNoteRepeat();
 
-        void move(int newTickPos) const;
+        void setTickPositionEffectiveImmediately(int newTickPos) const;
 
         void stopSequencer() const;
 

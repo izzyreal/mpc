@@ -9,6 +9,8 @@
 #include "sampler/Program.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Sequence.hpp"
+#include "sequencer/SequencerMessage.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Track.hpp"
 
 #include <memory>
@@ -94,15 +96,11 @@ void PushPadScreenUpdateCommand::execute()
                 return;
             }
 
-            ctx.sequencer->getTransport()->stop();
-            ctx.sequencer->setActiveSequenceIndex(padIndexWithBank);
-            ctx.sequencer->getTransport()->playFromStart();
-            nextSeqPadScreen->refreshSeqs();
+            ctx.sequencer->getStateManager()->enqueue(sequencer::SwitchToNextSequence{padIndexWithBank});
             return;
         }
 
         ctx.sequencer->setNextSqPad(padIndexWithBank);
-        nextSeqPadScreen->refreshSeqs();
     }
     else if (auto assignScreen =
                  std::dynamic_pointer_cast<AssignScreen>(screenComponent);

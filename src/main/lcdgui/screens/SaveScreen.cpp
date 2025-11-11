@@ -237,7 +237,7 @@ void SaveScreen::turnWheel(const int i)
         {
             case 1:
                 sequencer->setActiveSequenceIndex(
-                    sequencer->getActiveSequenceIndex() + i);
+                    sequencer->getActiveSequenceIndex() + i, true);
                 break;
             case 3:
             {

@@ -9,6 +9,7 @@
 #include "Mpc.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -101,9 +102,7 @@ void NextSeqPadScreen::function(int i)
 
         if (i == 3 && nextSq != -1)
         {
-            sequencer->getTransport()->stop();
-            sequencer->setActiveSequenceIndex(nextSq);
-            sequencer->getTransport()->playFromStart();
+            sequencer->getStateManager()->enqueue(sequencer::SwitchToNextSequence{nextSq});
         }
     }
     else if (i == 5)

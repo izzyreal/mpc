@@ -93,8 +93,7 @@ void SongScreen::up()
         }
 
         setOffset(offset - 1);
-        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex());
-        sequencer->getTransport()->setPosition(0);
+        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(), true);
     }
     else
     {
@@ -196,8 +195,7 @@ void SongScreen::down()
         }
 
         setOffset(offset + 1);
-        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex());
-        sequencer->getTransport()->setPosition(0);
+        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(), true);
     }
     else
     {
@@ -236,8 +234,7 @@ void SongScreen::turnWheel(int i)
         const auto step = song->getStep(offset + 1).lock();
 
         step->setSequence(step->getSequence() + i);
-        sequencer->setActiveSequenceIndex(step->getSequence());
-        sequencer->getTransport()->setPosition(0);
+        sequencer->setActiveSequenceIndex(step->getSequence(), true);
         displayNow0();
         displayNow1();
 
@@ -265,7 +262,7 @@ void SongScreen::turnWheel(int i)
         if (song->isUsed() && song->getStepCount() != 0)
         {
             sequencer->setActiveSequenceIndex(
-                song->getStep(0).lock()->getSequence());
+                song->getStep(0).lock()->getSequence(), true);
         }
     }
     else if (focusedFieldName == "tempo" &&

@@ -531,8 +531,7 @@ void EventsScreen::setEdit(int i)
 
 void EventsScreen::setFromSq(int i) const
 {
-    sequencer->setActiveSequenceIndex(std::clamp(
-        i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX)));
+    sequencer->setActiveSequenceIndex(i, true);
     displayFromSq();
 }
 
@@ -768,5 +767,5 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         }
     }
 
-    sequencer->setActiveSequenceIndex(toSequenceIndex);
+    sequencer->setActiveSequenceIndex(toSequenceIndex, true);
 }

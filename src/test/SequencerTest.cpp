@@ -242,7 +242,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
     REQUIRE(seq1->getInitialTempo() == 122);
     REQUIRE(seq2->getInitialTempo() == 119);
 
-    sequencer->setActiveSequenceIndex(1);
+    sequencer->setActiveSequenceIndex(1, false);
     sequencer->getTransport()->setTempo(123);
 
     REQUIRE(seq1->getInitialTempo() == 122);

@@ -14,6 +14,7 @@
 
 #include "StrUtil.hpp"
 #include "lcdgui/Label.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -108,8 +109,11 @@ void NextSeqScreen::turnWheel(int i)
         }
         else
         {
-            sequencer->setActiveSequenceIndex(
-                sequencer->getActiveSequenceIndex() + i);
+            sequencer->getStateManager()->enqueue(
+                sequencer::SetActiveSequenceIndex
+            {
+                sequencer->getActiveSequenceIndex() + i
+            });
         }
     }
     else if (focusedFieldName == "nextsq")
@@ -164,9 +168,7 @@ void NextSeqScreen::function(int i)
 
         if (i == 3 && nextSq != -1)
         {
-            sequencer->getTransport()->stop();
-            sequencer->setActiveSequenceIndex(nextSq);
-            sequencer->getTransport()->playFromStart();
+            sequencer->getStateManager()->enqueue(sequencer::SwitchToNextSequence{nextSq});
         }
     }
     else if (i == 5)

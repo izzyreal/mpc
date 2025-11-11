@@ -25,7 +25,28 @@ namespace mpc::sequencer
         bool songModeEnabled;
     };
 
+    struct SwitchToNextSequence
+    {
+        int sequenceIndex;
+    };
+
+    struct SetActiveSequenceIndex
+    {
+        int sequenceIndex;
+        bool setPositionTo0 = true;
+    };
+
+    struct Stop
+    {
+    };
+
+    struct PlayFromStart
+    {
+    };
+
     using SequencerMessage =
         std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
-                     BumpPositionByTicks, SetSongModeEnabled>;
+                     BumpPositionByTicks, SetSongModeEnabled,
+                     SwitchToNextSequence, SetActiveSequenceIndex, Stop,
+                     PlayFromStart>;
 } // namespace mpc::sequencer

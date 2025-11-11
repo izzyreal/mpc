@@ -1,5 +1,6 @@
 #include "sequencer/SequencerStateManager.hpp"
 
+#include "Transport.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::sequencer;
@@ -8,7 +9,8 @@ using Base =
     mpc::concurrency::AtomicStateExchange<SequencerState, SequencerStateView,
                                           SequencerMessage>;
 
-SequencerStateManager::SequencerStateManager() : Base([](SequencerState &) {})
+SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
+    : Base([](SequencerState &) {}), sequencer(sequencer)
 {
 }
 
@@ -25,7 +27,8 @@ void SequencerStateManager::enqueue(SequencerMessage &&m) const noexcept
                 printf("[Sequencer] SetPositionQuarterNotes: %.3f\n",
                        m.positionQuarterNotes);
             }
-            else if constexpr (std::is_same_v<T, SetPlayStartPositionQuarterNotes>)
+            else if constexpr (std::is_same_v<T,
+    SetPlayStartPositionQuarterNotes>)
             {
                 printf("[Sequencer] SetPlayStartPositionQuarterNotes: %.3f\n",
                        m.positionQuarterNotes);
@@ -76,9 +79,30 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 s.songModeEnabled = m.songModeEnabled;
             }
+            else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
+            {
+                constexpr bool setPositionTo0 = false;
+                enqueue(SetActiveSequenceIndex{m.sequenceIndex, setPositionTo0});
+                enqueue(Stop{});
+                enqueue(PlayFromStart{});
+            }
+            else if constexpr (std::is_same_v<T, SetActiveSequenceIndex>)
+            {
+                sequencer->setActiveSequenceIndex(m.sequenceIndex, false);
+
+                if (m.setPositionTo0)
+                {
+                    enqueue(SetPositionQuarterNotes{0.0});
+                }
+            }
+            else if constexpr (std::is_same_v<T, Stop>)
+            {
+                sequencer->getTransport()->stop();
+            }
+            else if constexpr (std::is_same_v<T, PlayFromStart>)
+            {
+                sequencer->getTransport()->playFromStart();
+            }
         },
         msg);
-
-    auto &s = activeState;
-    printf("Current position: %f, playStartPosition: %f\n", s.positionQuarterNotes, s.playStartPositionQuarterNotes);
 }

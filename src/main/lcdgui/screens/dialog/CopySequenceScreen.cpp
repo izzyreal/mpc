@@ -33,7 +33,7 @@ void CopySequenceScreen::function(const int i)
             break;
         case 4:
             sequencer->copySequence(sq0, sq1);
-            sequencer->setActiveSequenceIndex(sq1);
+            sequencer->setActiveSequenceIndex(sq1, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
     }

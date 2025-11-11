@@ -80,19 +80,18 @@ void Transport::play(const bool fromStart)
         }
     }
 
-    const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    setPosition(positionQuarterNotes);
-
     const auto countMetronomeScreen =
         sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
     const auto countInMode = countMetronomeScreen->getCountInMode();
 
+    std::optional<int64_t> positionQuarterNotesToStartPlayingFrom = std::nullopt;
+
     if (!countEnabled || countInMode == 0 ||
         (countInMode == 1 && !isRecordingOrOverdubbing()))
     {
-        if (fromStart)
+        if (fromStart && snapshot.getPositionQuarterNotes() != 0)
         {
-            setPosition(0);
+            positionQuarterNotesToStartPlayingFrom = 0;
         }
     }
 
@@ -105,20 +104,25 @@ void Transport::play(const bool fromStart)
         {
             if (fromStart)
             {
-                setPosition(Sequencer::ticksToQuarterNotes(s->getLoopStart()));
+                positionQuarterNotesToStartPlayingFrom = Sequencer::ticksToQuarterNotes(s->getLoopStart());
             }
             else
             {
-                setPosition(Sequencer::ticksToQuarterNotes(
-                    s->getFirstTickOfBar(getCurrentBarIndex())));
+                positionQuarterNotesToStartPlayingFrom = Sequencer::ticksToQuarterNotes(
+                    s->getFirstTickOfBar(getCurrentBarIndex()));
             }
 
             countInStartPos =
-                Sequencer::quarterNotesToTicks(positionQuarterNotes);
+                Sequencer::quarterNotesToTicks(snapshot.getPositionQuarterNotes());
             countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
 
             countingIn = true;
         }
+    }
+
+    if (positionQuarterNotesToStartPlayingFrom)
+    {
+        setPosition(*positionQuarterNotesToStartPlayingFrom);
     }
 
     if (!songMode)

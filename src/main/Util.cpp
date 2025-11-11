@@ -216,7 +216,6 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)
     const std::string name =
         StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;
     sequence->setName(name);
-    sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
 void Util::set16LevelsValues(const SixteenLevelsContext &ctx,

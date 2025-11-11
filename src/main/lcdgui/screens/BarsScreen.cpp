@@ -78,7 +78,7 @@ void BarsScreen::function(int j)
         {
             copyBars(eventsScreen->toSq, firstBar, lastBar,
                      eventsScreen->copies, afterBar);
-            sequencer->setActiveSequenceIndex(eventsScreen->toSq);
+            sequencer->setActiveSequenceIndex(eventsScreen->toSq, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
@@ -106,7 +106,7 @@ void BarsScreen::turnWheel(int i)
     if (focusedFieldName == "fromsq")
     {
         sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i);
+                                          i, true);
 
         displayFromSq();
 

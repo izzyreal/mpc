@@ -180,7 +180,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
         void setDefaultSequenceName(const std::string &s);
-        void setActiveSequenceIndex(int i);
+        void setActiveSequenceIndex(int i, bool shouldSetPositionTo0);
         void setTimeDisplayStyle(int i);
         int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);

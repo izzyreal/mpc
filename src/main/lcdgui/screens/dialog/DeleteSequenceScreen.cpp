@@ -24,7 +24,7 @@ void DeleteSequenceScreen::turnWheel(const int i)
     if (focusedFieldName == "sq")
     {
         sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i);
+                                          i, true);
         displaySequenceNumberName();
     }
 }

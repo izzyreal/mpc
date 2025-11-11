@@ -70,7 +70,7 @@ void LoadASequenceScreen::function(const int i)
             break;
         case 4:
             sequencer->movePlaceHolderTo(loadInto);
-            sequencer->setActiveSequenceIndex(loadInto);
+            sequencer->setActiveSequenceIndex(loadInto, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
     }
