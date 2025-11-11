@@ -93,7 +93,6 @@ void NextSeqPadScreen::right()
 
 void NextSeqPadScreen::function(int i)
 {
-
     if (i == 3 || i == 4)
     {
         const auto nextSq = sequencer->getNextSq();
@@ -103,7 +102,6 @@ void NextSeqPadScreen::function(int i)
         if (i == 3 && nextSq != -1)
         {
             sequencer->getTransport()->stop();
-            sequencer->getTransport()->setPosition(0);
             sequencer->setActiveSequenceIndex(nextSq);
             sequencer->getTransport()->playFromStart();
         }

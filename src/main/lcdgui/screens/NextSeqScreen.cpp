@@ -165,7 +165,6 @@ void NextSeqScreen::function(int i)
         if (i == 3 && nextSq != -1)
         {
             sequencer->getTransport()->stop();
-            sequencer->getTransport()->setPosition(0);
             sequencer->setActiveSequenceIndex(nextSq);
             sequencer->getTransport()->playFromStart();
         }
