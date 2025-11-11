@@ -2,7 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "TestMpc.hpp"
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Clock.hpp"
 
 #include "engine/EngineHost.hpp"
@@ -340,8 +340,8 @@ TEST_CASE("1 bar loop", "[clock]")
         mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100,
                                               120, timeInSamples);
 
-        auto frameSeq = mpc.getSequencer()->getSequencerPlaybackEngine();
-        frameSeq->work(blockSizes[i]);
+        auto sequencerPlaybackEngine = mpc.getEngineHost()->getSequencerPlaybackEngine();
+        sequencerPlaybackEngine->work(blockSizes[i]);
         auto &ticksForCurrentBuffer =
             mpc.getClock()->getTicksForCurrentBuffer();
 

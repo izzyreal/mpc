@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 namespace mpc
 {

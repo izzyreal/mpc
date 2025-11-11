@@ -47,7 +47,7 @@ ClientMidiEventController::ClientMidiEventController(
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     const std::shared_ptr<Hardware> &hardware,
     const std::shared_ptr<Screens> &screens,
-    const std::shared_ptr<SequencerPlaybackEngine> &frameSequencer,
+    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine,
     PreviewSoundPlayer *previewSoundPlayer)
     : clientEventController(clientEventController),
       clientHardwareEventController(clientHardwareEventController),
@@ -56,7 +56,7 @@ ClientMidiEventController::ClientMidiEventController(
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
       hardware(hardware), screens(screens),
-      sequencerPlaybackEngine(frameSequencer),
+      sequencerPlaybackEngine(sequencerPlaybackEngine),
       previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =

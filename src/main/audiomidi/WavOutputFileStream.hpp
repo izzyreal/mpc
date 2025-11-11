@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 static const int RIFF_CHUNK_ID{1179011410};
 static const int RIFF_TYPE_ID{1163280727};

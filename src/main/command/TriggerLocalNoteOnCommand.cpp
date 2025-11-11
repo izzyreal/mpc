@@ -8,7 +8,7 @@
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "Util.hpp"

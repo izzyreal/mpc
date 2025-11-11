@@ -7,7 +7,7 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"

@@ -73,7 +73,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    auto audioMidiServices = mpc.getEngineHost();
+    auto engineHost = mpc.getEngineHost();
     auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
     std::vector<char> bytes{
@@ -81,8 +81,8 @@ void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
         (char)(vmpcSettingsScreen->_16LevelsEraseMode),
         (char)(vmpcAutoSaveScreen->autoSaveOnExit),
         (char)(vmpcAutoSaveScreen->autoLoadOnStart),
-        (char)(audioMidiServices->getRecordLevel()),
-        (char)(audioMidiServices->getMainLevel()),
+        (char)(engineHost->getRecordLevel()),
+        (char)(engineHost->getMainLevel()),
         (char)(mpc.getHardware()->getSlider()->getValue()),
         (char)(vmpcSettingsScreen->autoConvertWavs),
         0x00, // This was tap averaging, but it does not belong here
@@ -95,15 +95,15 @@ void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
 
 void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
 {
-    auto audioMidiServices = mpc.getEngineHost();
+    auto engineHost = mpc.getEngineHost();
 
     auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
     if (!fs::exists(path))
     {
-        audioMidiServices->setRecordLevel(DEFAULT_REC_GAIN);
+        engineHost->setRecordLevel(DEFAULT_REC_GAIN);
         mpc.getHardware()->getRecPot()->setValue(DEFAULT_REC_GAIN * 0.01f);
-        audioMidiServices->setMainLevel(DEFAULT_MAIN_VOLUME);
+        engineHost->setMainLevel(DEFAULT_MAIN_VOLUME);
         mpc.getHardware()->getVolPot()->setValue(DEFAULT_MAIN_VOLUME * 0.01f);
         return;
     }
@@ -140,13 +140,13 @@ void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
     }
     if (bytes.size() > 4)
     {
-        audioMidiServices->setRecordLevel(bytes[4]);
+        engineHost->setRecordLevel(bytes[4]);
         mpc.getHardware()->getRecPot()->setValue(bytes[4] * 0.01f);
     }
 
     if (bytes.size() > 5)
     {
-        audioMidiServices->setMainLevel(bytes[5]);
+        engineHost->setMainLevel(bytes[5]);
         mpc.getHardware()->getVolPot()->setValue(bytes[5] * 0.01f);
     }
 

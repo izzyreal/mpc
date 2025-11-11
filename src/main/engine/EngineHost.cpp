@@ -26,7 +26,7 @@
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
@@ -54,6 +54,16 @@ EngineHost::EngineHost(Mpc &mpcToUse) : mpc(mpcToUse)
 
 void EngineHost::start()
 {
+
+    // sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
+    //     eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
+    //     isRecMainWithoutPlaying,
+    //     [sampler](const int velo, const int frameOffset)
+    //     {
+    //         sampler->playMetronome(velo, frameOffset);
+    //     },
+    //     getScreens, isNoteRepeatLockedOrPressed);
+
     realTimeAudioServer = std::make_shared<RealTimeAudioServer>();
     nonRealTimeAudioServer =
         std::make_shared<NonRealTimeAudioServer>(realTimeAudioServer);
@@ -92,7 +102,7 @@ void EngineHost::start()
 
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
     compoundAudioClient->add(
-        mpc.getSequencer()->getSequencerPlaybackEngine().get());
+        mpc.getEngineHost()->getSequencerPlaybackEngine().get());
     compoundAudioClient->add(mixer.get());
 
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
@@ -435,7 +445,7 @@ void EngineHost::changeBounceStateIfRequired()
 
         if (directToDiskRecorderScreen->isOffline())
         {
-            mpc.getSequencer()->getSequencerPlaybackEngine()->start();
+            mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
 
             if (getAudioServer()->isRealTime())
             {
@@ -444,7 +454,7 @@ void EngineHost::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            mpc.getSequencer()->getSequencerPlaybackEngine()->start();
+            mpc.getEngineHost()->getSequencerPlaybackEngine()->start();
         }
 
         for (const auto &diskRecorder : diskRecorders)
@@ -505,4 +515,9 @@ std::vector<std::shared_ptr<Voice>> &EngineHost::getVoices()
 std::vector<MixerInterconnection *> &EngineHost::getMixerConnections()
 {
     return mixerConnections;
+}
+
+std::shared_ptr<SequencerPlaybackEngine> EngineHost::getSequencerPlaybackEngine()
+{
+    return sequencerPlaybackEngine;
 }

@@ -10,7 +10,7 @@
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
@@ -20,9 +20,12 @@
 #include <algorithm>
 
 using namespace mpc::sequencer;
+using namespace mpc::engine;
 using namespace mpc::lcdgui;
 
-Transport::Transport(Sequencer &owner) : sequencer(owner)
+Transport::Transport(Sequencer &owner,
+    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine)
+    : sequencer(owner), sequencerPlaybackEngine(sequencerPlaybackEngine)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
@@ -31,7 +34,7 @@ Transport::Transport(Sequencer &owner) : sequencer(owner)
 bool Transport::isPlaying() const
 {
     return !metronomeOnlyEnabled &&
-           sequencer.getSequencerPlaybackEngine()->isRunning();
+           sequencerPlaybackEngine->isRunning();
 }
 
 void Transport::play(const bool fromStart)
@@ -152,7 +155,7 @@ void Transport::play(const bool fromStart)
     }
     else
     {
-        sequencer.getSequencerPlaybackEngine()->start();
+        sequencerPlaybackEngine->start();
     }
 }
 
@@ -277,9 +280,9 @@ void Transport::stop(const StopMode stopMode)
 
     // const int frameOffset = stopMode == AT_START_OF_BUFFER
     //                             ? 0
-    //                             : frameSequencer->getEventFrameOffset();
+    //                             : sequencerPlaybackEngine->getEventFrameOffset();
 
-    sequencer.getSequencerPlaybackEngine()->stop();
+    sequencerPlaybackEngine->stop();
 
     recording = false;
     overdubbing = false;
@@ -382,7 +385,7 @@ void Transport::playMetronomeTrack()
     }
 
     metronomeOnlyEnabled = true;
-    sequencer.getSequencerPlaybackEngine()->startMetronome();
+    sequencerPlaybackEngine->startMetronome();
 }
 
 void Transport::stopMetronomeTrack()
@@ -392,7 +395,7 @@ void Transport::stopMetronomeTrack()
         return;
     }
 
-    sequencer.getSequencerPlaybackEngine()->stop();
+    sequencerPlaybackEngine->stop();
     metronomeOnlyEnabled = false;
 }
 

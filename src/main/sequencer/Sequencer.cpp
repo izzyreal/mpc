@@ -7,7 +7,7 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
@@ -74,25 +74,18 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
                      std::shared_ptr<Clock> clock,
                      std::function<int()> getSampleRate,
                      std::function<bool()> isRecMainWithoutPlaying,
-                     std::function<bool()> isNoteRepeatLockedOrPressed)
+                     std::function<bool()> isNoteRepeatLockedOrPressed,
+                     std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
       isAudioServerRunning(isAudioServerRunning),
       isEraseButtonPressed(isEraseButtonPressed), eventRegistry(eventRegistry),
       sampler(sampler), eventHandler(eventHandler),
-      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled),
+      sequencerPlaybackEngine(sequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
-
-    sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
-        eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
-        isRecMainWithoutPlaying,
-        [sampler](const int velo, const int frameOffset)
-        {
-            sampler->playMetronome(velo, frameOffset);
-        },
-        getScreens, isNoteRepeatLockedOrPressed);
 }
 
 std::shared_ptr<SequencerStateManager> Sequencer::getStateManager()
@@ -107,7 +100,7 @@ std::shared_ptr<Transport> Sequencer::getTransport()
 
 void Sequencer::init()
 {
-    transport = std::make_shared<Transport>(*this);
+    transport = std::make_shared<Transport>(*this, sequencerPlaybackEngine);
 
     for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT;
          ++midiBusIndex)
@@ -1118,11 +1111,6 @@ std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex) const
     auto result = std::dynamic_pointer_cast<DrumBus>(buses[drumBusIndex + 1]);
     assert(result);
     return result;
-}
-
-std::shared_ptr<SequencerPlaybackEngine> Sequencer::getSequencerPlaybackEngine()
-{
-    return sequencerPlaybackEngine;
 }
 
 template std::shared_ptr<Bus> Sequencer::getBus(int busIndex);

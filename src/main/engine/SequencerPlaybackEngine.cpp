@@ -1,4 +1,4 @@
-#include "sequencer/SequencerPlaybackEngine.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 
 #include "sequencer/Transport.hpp"
 
@@ -11,7 +11,7 @@
 #include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
-#include "Clock.hpp"
+#include "sequencer/Clock.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/window/CountMetronomeScreen.hpp"
@@ -21,17 +21,17 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
-#include "MidiClockOutput.hpp"
+#include "sequencer/MidiClockOutput.hpp"
 #include "sequencer/Transport.hpp"
 
 #include <concurrentqueue.h>
 
+using namespace mpc::engine;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace mpc::eventregistry;
-using namespace mpc::engine;
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::shared_ptr<EventRegistry> &eventRegistry, Sequencer *sequencer,

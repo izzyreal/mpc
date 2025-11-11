@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EventAfterNFrames.hpp"
+#include "engine/EventAfterNFrames.hpp"
 
 #include "engine/audio/server/AudioClient.hpp"
 #include "engine/NoteRepeatProcessor.hpp"
@@ -16,9 +16,12 @@ namespace moodycamel
     template <typename T, typename Traits> class ConcurrentQueue;
 } // namespace moodycamel
 
-namespace mpc::engine
+namespace mpc::sequencer
 {
-    class NoteRepeatProcessor;
+    class Sequencer;
+    class Clock;
+    class Sequence;
+    class MidiClockOutput;
 }
 
 namespace mpc::eventregistry
@@ -32,23 +35,20 @@ namespace mpc::lcdgui
     class Screens;
 } // namespace mpc::lcdgui
 
-namespace mpc::sequencer
+namespace mpc::engine
 {
-    class Sequencer;
-    class Clock;
-    class Sequence;
-    class MidiClockOutput;
+    class NoteRepeatProcessor;
 
     class SequencerPlaybackEngine final
-        : public engine::audio::server::AudioClient
+        : public audio::server::AudioClient
     {
         using EventQueue = moodycamel::ConcurrentQueue<
             EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>;
 
     public:
         explicit SequencerPlaybackEngine(
-            const std::shared_ptr<eventregistry::EventRegistry> &, Sequencer *,
-            const std::shared_ptr<Clock> &,
+            const std::shared_ptr<eventregistry::EventRegistry> &, sequencer::Sequencer *,
+            const std::shared_ptr<sequencer::Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             std::function<bool()> isBouncing,
             const std::function<int()> &getSampleRate,
@@ -83,20 +83,20 @@ namespace mpc::sequencer
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
-        Sequencer *sequencer;
-        std::shared_ptr<Clock> clock;
+        sequencer::Sequencer *sequencer;
+        std::shared_ptr<sequencer::Clock> clock;
         std::function<bool()> isBouncing;
         std::function<int()> getSampleRate;
         std::function<bool()> isRecMainWithoutPlaying;
         std::function<void(int velo, int frameOffset)> triggerMetronome;
         std::function<bool()> isNoteRepeatLockedOrPressed;
-        std::shared_ptr<engine::NoteRepeatProcessor> noteRepeatProcessor;
+        std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
 
         std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;
         bool shouldWaitForMidiClockLock = false;
         bool metronomeOnly = false;
-        std::shared_ptr<MidiClockOutput> midiClockOutput;
+        std::shared_ptr<sequencer::MidiClockOutput> midiClockOutput;
 
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
@@ -110,7 +110,7 @@ namespace mpc::sequencer
 
         void stopCountingInIfRequired() const;
 
-        std::shared_ptr<Sequence> switchToNextSequence() const;
+        std::shared_ptr<sequencer::Sequence> switchToNextSequence() const;
 
         bool processSongMode() const;
 

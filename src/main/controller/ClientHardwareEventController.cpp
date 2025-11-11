@@ -254,7 +254,7 @@ void ClientHardwareEventController::handlePadPress(
                     program->getNoteFromPad(programPadIndex), clampedVelocity,
                     track.get(), screen->getBus(), screen, programPadIndex,
                     program, mpc.getSequencer(),
-                    mpc.getSequencer()->getSequencerPlaybackEngine(),
+                    mpc.getEngineHost()->getSequencerPlaybackEngine(),
                     mpc.eventRegistry, mpc.clientEventController,
                     mpc.getEventHandler(), mpc.screens, mpc.getHardware());
 
@@ -297,7 +297,7 @@ void ClientHardwareEventController::handlePadRelease(
          eventHandler = mpc.getEventHandler(), screens = mpc.screens,
          sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
-         frameSequencer = mpc.getSequencer()->getSequencerPlaybackEngine(),
+         sequencerPlaybackEngine = mpc.getEngineHost()->getSequencerPlaybackEngine(),
          previewSoundPlayer =
              mpc.getEngineHost()->getPreviewSoundPlayer()](void *userData)
     {
@@ -321,7 +321,7 @@ void ClientHardwareEventController::handlePadRelease(
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     Source::VirtualMpcHardware, *p->note, p->track, p->bus,
                     p->screen, programPadIndex, p->program, sequencer,
-                    frameSequencer, eventRegistry, clientEventController,
+                    sequencerPlaybackEngine, eventRegistry, clientEventController,
                     eventHandler, screens, hardware);
 
             TriggerLocalNoteOffCommand(ctx).execute();
@@ -462,17 +462,17 @@ void ClientHardwareEventController::handlePot(
                                          ? mpc.getHardware()->getRecPot()
                                          : mpc.getHardware()->getVolPot();
 
-    const auto audioMidiServices = mpc.getEngineHost();
+    const auto engineHost = mpc.getEngineHost();
 
     pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
 
     if (event.componentId == REC_GAIN_POT)
     {
-        audioMidiServices->setRecordLevel(std::round(pot->getValue() * 100.f));
+        engineHost->setRecordLevel(std::round(pot->getValue() * 100.f));
     }
     else
     {
-        audioMidiServices->setMainLevel(std::round(pot->getValue() * 100.f));
+        engineHost->setMainLevel(std::round(pot->getValue() * 100.f));
     }
 }
 

@@ -133,7 +133,7 @@ void Mpc::init()
     /*
      * EngineHost requires sequencer to exist.
      */
-    engineHost = std::make_shared<audiomidi::EngineHost>(*this);
+    engineHost = std::make_shared<engine::EngineHost>(*this);
 
     MLOG("EngineHost created");
 
@@ -187,7 +187,9 @@ void Mpc::init()
         {
             return clientEventController->clientHardwareEventController
                 ->isNoteRepeatLockedOrPressed();
-        });
+        },
+        engineHost->getSequencerPlaybackEngine()
+        );
     MLOG("Sequencer created");
 
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
@@ -240,7 +242,7 @@ std::shared_ptr<Sampler> Mpc::getSampler()
     return sampler;
 }
 
-std::shared_ptr<audiomidi::EngineHost> Mpc::getEngineHost()
+std::shared_ptr<engine::EngineHost> Mpc::getEngineHost()
 {
     return engineHost;
 }

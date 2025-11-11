@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../client/event/ClientMidiEvent.hpp"
+#include "client/event/ClientMidiEvent.hpp"
 
 namespace mpc::controller
 {

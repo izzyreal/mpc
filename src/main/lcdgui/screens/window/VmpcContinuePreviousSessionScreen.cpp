@@ -1,6 +1,6 @@
 #include "VmpcContinuePreviousSessionScreen.hpp"
 
-#include "../VmpcAutoSaveScreen.hpp"
+#include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "Mpc.hpp"
 #include "lcdgui/Label.hpp"
 

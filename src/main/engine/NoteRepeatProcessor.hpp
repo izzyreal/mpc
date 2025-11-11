@@ -10,6 +10,7 @@ namespace mpc::engine::audio::mixer
 }
 namespace mpc::engine
 {
+    class SequencerPlaybackEngine;
     class Voice;
     class MixerInterconnection;
 } // namespace mpc::engine
@@ -36,7 +37,6 @@ namespace mpc::hardware
 namespace mpc::sequencer
 {
     class Sequencer;
-    class SequencerPlaybackEngine;
 } // namespace mpc::sequencer
 
 namespace mpc::engine
@@ -57,7 +57,7 @@ namespace mpc::engine
             std::function<bool()> &isFullLevelEnabled,
             std::function<bool()> &isSixteenLevelsEnabled);
 
-        void process(const sequencer::SequencerPlaybackEngine *,
+        void process(const SequencerPlaybackEngine *,
                      unsigned int tickPosition, int durationTicks,
                      unsigned short eventFrameOffset, double tempo,
                      float sampleRate) const;

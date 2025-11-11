@@ -6,7 +6,7 @@
 
 #include "ShortNameGenerator.hpp"
 #include "ShortName.hpp"
-#include "../file/AkaiName.hpp"
+#include "file/AkaiName.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file;

@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 namespace mpc::lcdgui
 {

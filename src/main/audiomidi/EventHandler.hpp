@@ -116,8 +116,9 @@ namespace mpc::audiomidi
                                const int trackDevice,
                                const std::optional<int> trackVelocityRatio);
 
-        void handleFinalizedDrumNoteOnEvent(std::shared_ptr<NoteOnEvent>,
-                                            std::shared_ptr<sequencer::DrumBus>,
+        void handleFinalizedDrumNoteOnEvent(
+            const std::shared_ptr<NoteOnEvent> &,
+            const std::shared_ptr<sequencer::DrumBus> &,
                                             sequencer::Track *);
 
         /**

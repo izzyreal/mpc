@@ -1,14 +1,14 @@
 #include "DiskRecorder.hpp"
 
-#include <utility>
-
 #include "WavOutputFileStream.hpp"
-#include "../engine/EngineHost.hpp"
 
+#include "engine/EngineHost.hpp"
 #include "engine/audio/core/AudioFormat.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
 
 #include <readerwriterqueue.h>
+
+#include <utility>
 
 using namespace mpc::audiomidi;
 using namespace mpc::engine::audio::core;
@@ -23,14 +23,14 @@ const std::vector<std::pair<std::string, std::string>>
 const std::vector<std::string> DiskRecorder::fileNamesStereo{
     "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav"};
 
-DiskRecorder::DiskRecorder(mpc::Mpc &mpcToUse, AudioProcess *process,
-                           int indexToUse)
+DiskRecorder::DiskRecorder(Mpc &mpcToUse, AudioProcess *process,
+                           const int indexToUse)
     : AudioProcessAdapter(process), mpc(mpcToUse), index(indexToUse)
 {
 }
 
-bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
-                           bool isStereo, fs::path destinationDirectoryToUse)
+bool DiskRecorder::prepare(const int lengthInFramesToUse, const int sampleRate,
+                           const bool isStereo, fs::path destinationDirectoryToUse)
 {
     if (bufferLeft.empty())
     {
@@ -53,8 +53,8 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
     for (int i = 0; i < (isStereo ? 1 : 2); i++)
     {
         const auto fileName = isStereo ? fileNamesStereo[index]
-                                       : (i == 0 ? fileNamesMono[index].first
-                                                 : fileNamesMono[index].second);
+                                       : i == 0 ? fileNamesMono[index].first
+                                       : fileNamesMono[index].second;
 
         auto absolutePath = destinationDirectory / fileName;
 
@@ -72,7 +72,7 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
         wav_writeHeader(fileStream, sampleRate, isStereo ? 2 : 1);
     }
 
-    const int numBytesPerSample = 2; // assume 16 bit PCM
+    constexpr int numBytesPerSample = 2; // assume 16 bit PCM
 
     lengthInBytes = lengthInFrames * numBytesPerSample;
 
@@ -93,7 +93,7 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
     delete outputFileFormat;
 
     outputFileFormat =
-        new AudioFormat(sampleRate, 16, (isStereo ? 2 : 1), true, false);
+        new AudioFormat(sampleRate, 16, isStereo ? 2 : 1, true, false);
 
     isOnlySilence = true;
 
@@ -128,7 +128,7 @@ bool DiskRecorder::prepare(int lengthInFramesToUse, int sampleRate,
     return true;
 }
 
-int DiskRecorder::processAudio(AudioBuffer *buf, int nFrames)
+int DiskRecorder::processAudio(AudioBuffer *buf, const int nFrames)
 {
     const auto ret = AudioProcessAdapter::processAudio(buf, nFrames);
 
@@ -218,7 +218,7 @@ void DiskRecorder::writeRingBufferToDisk()
         writing.store(false);
     }
     else if (outputFileFormat->getChannels() == 2 &&
-             (bytesToWritePerChannel * 2) + writtenByteCount >= lengthInBytes)
+             bytesToWritePerChannel * 2 + writtenByteCount >= lengthInBytes)
     {
         bytesToWritePerChannel = (lengthInBytes - writtenByteCount) / 2;
         writing.store(false);
@@ -275,9 +275,9 @@ bool DiskRecorder::stopEarly()
     writing.store(false);
     preparedToWrite.store(false);
 
-    auto bytesPerFrame = outputFileFormat->getChannels() == 1 ? 2 : 4;
+    const auto bytesPerFrame = outputFileFormat->getChannels() == 1 ? 2 : 4;
 
-    auto writtenFrames = writtenByteCount / bytesPerFrame;
+    const auto writtenFrames = writtenByteCount / bytesPerFrame;
 
     for (auto &fileStream : fileStreams)
     {
@@ -301,8 +301,8 @@ void DiskRecorder::removeFilesIfEmpty() const
     for (int i = 0; i < (isStereo ? 1 : 2); i++)
     {
         const auto fileName = isStereo ? fileNamesStereo[index]
-                                       : (i == 0 ? fileNamesMono[index].first
-                                                 : fileNamesMono[index].second);
+                                       : i == 0 ? fileNamesMono[index].first
+                                       : fileNamesMono[index].second;
 
         const auto absolutePath = destinationDirectory / fileName;
 

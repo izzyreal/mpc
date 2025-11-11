@@ -3,7 +3,7 @@
 #include <functional>
 #include <cstdint>
 
-namespace mpc::sequencer
+namespace mpc::engine
 {
     struct EventAfterNFrames
     {

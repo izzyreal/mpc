@@ -1,6 +1,6 @@
 #include "BMFParser.hpp"
 
-#include "../mpc_fs.hpp"
+#include "mpc_fs.hpp"
 
 #include "bitmap.hpp"
 
