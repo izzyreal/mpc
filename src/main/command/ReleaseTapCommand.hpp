@@ -5,10 +5,10 @@ namespace mpc::command
 {
     class ReleaseTapCommand : public Command
     {
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
     public:
-        explicit ReleaseTapCommand(mpc::Mpc &mpc);
+        explicit ReleaseTapCommand(Mpc &mpc);
         void execute() override;
     };
 } // namespace mpc::command

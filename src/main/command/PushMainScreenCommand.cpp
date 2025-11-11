@@ -7,15 +7,14 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushMainScreenCommand::PushMainScreenCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushMainScreenCommand::PushMainScreenCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushMainScreenCommand::execute()
 {
-    const auto ams = mpc.getEngineHost();
 
-    if (ams->isRecordingSound())
+    if (const auto engineHost = mpc.getEngineHost(); engineHost->isRecordingSound())
     {
-        ams->stopSoundRecorder();
+        engineHost->stopSoundRecorder();
     }
 
     mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);

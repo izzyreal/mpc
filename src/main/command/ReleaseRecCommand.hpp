@@ -5,10 +5,10 @@ namespace mpc::command
 {
     class ReleaseRecCommand : public Command
     {
-        mpc::Mpc &mpc;
+        Mpc &mpc;
 
     public:
-        explicit ReleaseRecCommand(mpc::Mpc &mpc);
+        explicit ReleaseRecCommand(Mpc &mpc);
         void execute() override;
     };
 } // namespace mpc::command

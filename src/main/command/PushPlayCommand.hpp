@@ -7,11 +7,11 @@ namespace mpc::command
     class PushPlayCommand : public Command
     {
     public:
-        explicit PushPlayCommand(mpc::Mpc &mpc);
+        explicit PushPlayCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

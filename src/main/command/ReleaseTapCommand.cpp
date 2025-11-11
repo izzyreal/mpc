@@ -9,7 +9,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-ReleaseTapCommand::ReleaseTapCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+ReleaseTapCommand::ReleaseTapCommand(Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseTapCommand::execute()
 {

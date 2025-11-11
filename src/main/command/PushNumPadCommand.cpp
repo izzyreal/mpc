@@ -12,7 +12,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushNumPadCommand::PushNumPadCommand(mpc::Mpc &mpc, int i) : mpc(mpc), i(i) {}
+PushNumPadCommand::PushNumPadCommand(Mpc &mpc, int i) : mpc(mpc), i(i) {}
 
 void PushNumPadCommand::execute()
 {
@@ -124,7 +124,7 @@ void PushNumPadCommand::execute()
         return;
     }
 
-    if (lcdgui::util::isTypableField(screenName, fieldName))
+    if (util::isTypableField(screenName, fieldName))
     {
         auto field = mpc.getLayeredScreen()->getFocusedField();
 

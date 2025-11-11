@@ -13,29 +13,29 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushStopCommand::PushStopCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushStopCommand::PushStopCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushStopCommand::execute()
 {
     const auto vmpcDirectToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-    const auto ams = mpc.getEngineHost();
+    const auto engineHost = mpc.getEngineHost();
 
     mpc.clientEventController->clientHardwareEventController
         ->unlockNoteRepeat();
 
-    if (ams->isBouncing() &&
+    if (engineHost->isBouncing() &&
         (vmpcDirectToDiskRecorderScreen->getRecord() != 4 ||
          mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)
              ->isPressed()))
     {
-        ams->stopBouncingEarly();
+        engineHost->stopBouncingEarly();
     }
 
     mpc.getSequencer()->getTransport()->stop();
 
-    if (!lcdgui::screengroups::isPlayScreen(
+    if (!screengroups::isPlayScreen(
             mpc.getLayeredScreen()->getCurrentScreen()))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);

@@ -10,7 +10,7 @@
 namespace mpc::command
 {
 
-    PushShiftCommand::PushShiftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    PushShiftCommand::PushShiftCommand(Mpc &mpc) : mpc(mpc) {}
 
     void PushShiftCommand::execute()
     {

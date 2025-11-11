@@ -7,11 +7,11 @@ namespace mpc::command
     class PushShiftCommand : public Command
     {
     public:
-        explicit PushShiftCommand(mpc::Mpc &mpc);
+        explicit PushShiftCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

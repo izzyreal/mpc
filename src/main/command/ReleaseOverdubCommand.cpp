@@ -6,7 +6,7 @@
 
 using namespace mpc::command;
 
-ReleaseOverdubCommand::ReleaseOverdubCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+ReleaseOverdubCommand::ReleaseOverdubCommand(Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseOverdubCommand::execute()
 {

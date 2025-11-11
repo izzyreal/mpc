@@ -7,11 +7,11 @@ namespace mpc::command
     class PushOverdubCommand : public Command
     {
     public:
-        explicit PushOverdubCommand(mpc::Mpc &mpc);
+        explicit PushOverdubCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

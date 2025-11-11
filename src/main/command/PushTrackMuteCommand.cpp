@@ -13,7 +13,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushTrackMuteCommand::PushTrackMuteCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushTrackMuteCommand::PushTrackMuteCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushTrackMuteCommand::execute()
 {

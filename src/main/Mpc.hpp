@@ -84,7 +84,7 @@ namespace mpc
         std::shared_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<audiomidi::EngineHost> audioMidiServices;
+        std::shared_ptr<audiomidi::EngineHost> engineHost;
         std::shared_ptr<audiomidi::MidiDeviceDetector> midiDeviceDetector;
         std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<disk::DiskController> diskController;

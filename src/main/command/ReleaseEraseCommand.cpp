@@ -6,7 +6,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-ReleaseEraseCommand::ReleaseEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+ReleaseEraseCommand::ReleaseEraseCommand(Mpc &mpc) : mpc(mpc) {}
 
 void ReleaseEraseCommand::execute()
 {

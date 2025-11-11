@@ -7,11 +7,11 @@ namespace mpc::command
     class PushEraseCommand : public Command
     {
     public:
-        explicit PushEraseCommand(mpc::Mpc &mpc);
+        explicit PushEraseCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

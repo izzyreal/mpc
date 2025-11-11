@@ -7,7 +7,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushEraseCommand::PushEraseCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushEraseCommand::PushEraseCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushEraseCommand::execute()
 {

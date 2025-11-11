@@ -7,11 +7,11 @@ namespace mpc::command
     class PushNextSeqCommand : public Command
     {
     public:
-        explicit PushNextSeqCommand(mpc::Mpc &mpc);
+        explicit PushNextSeqCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

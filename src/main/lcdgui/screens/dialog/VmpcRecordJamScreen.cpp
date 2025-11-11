@@ -25,19 +25,19 @@ void VmpcRecordJamScreen::function(const int i)
         case 4:
         {
             constexpr auto minutes = 60;
-            const auto ams = mpc.getEngineHost();
+            const auto engineHost = mpc.getEngineHost();
             const auto rate =
-                static_cast<int>(ams->getAudioServer()->getSampleRate());
+                static_cast<int>(engineHost->getAudioServer()->getSampleRate());
             const auto lengthInFrames = rate * 60 * minutes;
             const auto recordingName =
                 "Jam-" + DirectToDiskSettings::getTimeStamp();
             const auto settings = std::make_unique<DirectToDiskSettings>(
                 lengthInFrames, false, rate, recordingName);
 
-            if (ams->prepareBouncing(settings.get()))
+            if (engineHost->prepareBouncing(settings.get()))
             {
                 openScreenById(ScreenId::SequencerScreen);
-                ams->startBouncing();
+                engineHost->startBouncing();
             }
             else
             {
@@ -46,5 +46,6 @@ void VmpcRecordJamScreen::function(const int i)
 
             break;
         }
+        default:;
     }
 }

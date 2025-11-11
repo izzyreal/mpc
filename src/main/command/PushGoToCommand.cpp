@@ -6,7 +6,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushGoToCommand::PushGoToCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+PushGoToCommand::PushGoToCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushGoToCommand::execute()
 {

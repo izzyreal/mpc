@@ -7,11 +7,11 @@ namespace mpc::command
     class PushNumPadCommand : public Command
     {
     public:
-        PushNumPadCommand(mpc::Mpc &mpc, int i);
+        PushNumPadCommand(Mpc &mpc, int i);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         int i;
     };
 

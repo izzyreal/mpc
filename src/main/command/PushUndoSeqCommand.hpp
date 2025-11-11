@@ -7,11 +7,11 @@ namespace mpc::command
     class PushUndoSeqCommand : public Command
     {
     public:
-        explicit PushUndoSeqCommand(mpc::Mpc &mpc);
+        explicit PushUndoSeqCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

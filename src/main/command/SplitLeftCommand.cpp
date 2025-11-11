@@ -9,7 +9,7 @@
 namespace mpc::command
 {
 
-    SplitLeftCommand::SplitLeftCommand(mpc::Mpc &mpc) : mpc(mpc) {}
+    SplitLeftCommand::SplitLeftCommand(Mpc &mpc) : mpc(mpc) {}
 
     void SplitLeftCommand::execute()
     {

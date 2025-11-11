@@ -7,11 +7,11 @@ namespace mpc::command
     class SplitRightCommand : public Command
     {
     public:
-        explicit SplitRightCommand(mpc::Mpc &mpc);
+        explicit SplitRightCommand(Mpc &mpc);
         void execute() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
     };
 
 } // namespace mpc::command

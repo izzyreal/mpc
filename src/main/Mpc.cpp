@@ -131,11 +131,11 @@ void Mpc::init()
     clientEventController =
         std::make_shared<controller::ClientEventController>(*this);
     /*
-     * AudioMidiServices requires sequencer to exist.
+     * EngineHost requires sequencer to exist.
      */
-    audioMidiServices = std::make_shared<audiomidi::EngineHost>(*this);
+    engineHost = std::make_shared<audiomidi::EngineHost>(*this);
 
-    MLOG("AudioMidiServices created");
+    MLOG("EngineHost created");
 
     sequencer = std::make_shared<Sequencer>(
         layeredScreen,
@@ -143,27 +143,27 @@ void Mpc::init()
         {
             return screens;
         },
-        &audioMidiServices->getVoices(),
+        &engineHost->getVoices(),
         [&]
         {
-            return audioMidiServices->getAudioServer()->isRunning();
+            return engineHost->getAudioServer()->isRunning();
         },
         hardware,
         [&]
         {
-            return audioMidiServices->isBouncePrepared();
+            return engineHost->isBouncePrepared();
         },
         [&]
         {
-            audioMidiServices->startBouncing();
+            engineHost->startBouncing();
         },
         [&]
         {
-            audioMidiServices->stopBouncing();
+            engineHost->stopBouncing();
         },
         [&]
         {
-            return audioMidiServices->isBouncing();
+            return engineHost->isBouncing();
         },
         [&]
         {
@@ -177,7 +177,7 @@ void Mpc::init()
         clock,
         [&]
         {
-            return audioMidiServices->getAudioServer()->getSampleRate();
+            return engineHost->getAudioServer()->getSampleRate();
         },
         [&]
         {
@@ -197,8 +197,8 @@ void Mpc::init()
     sequencer->init();
     MLOG("Sequencer initialized");
 
-    audioMidiServices->start();
-    MLOG("AudioMidiServices started");
+    engineHost->start();
+    MLOG("EngineHost started");
 
     clientEventController->init();
 
@@ -242,7 +242,7 @@ std::shared_ptr<Sampler> Mpc::getSampler()
 
 std::shared_ptr<audiomidi::EngineHost> Mpc::getEngineHost()
 {
-    return audioMidiServices;
+    return engineHost;
 }
 
 std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler()
@@ -319,9 +319,9 @@ Mpc::~Mpc()
         layeredScreen.reset();
     }
 
-    if (audioMidiServices)
+    if (engineHost)
     {
-        audioMidiServices->destroyServices();
+        engineHost->destroyServices();
     }
 }
 

@@ -128,17 +128,17 @@ void SampleScreen::function(const int i)
             break;
         case 5:
         {
-            const auto ams = mpc.getEngineHost();
+            const auto engineHost = mpc.getEngineHost();
 
-            if (ams->isRecordingSound())
+            if (engineHost->isRecordingSound())
             {
-                ams->stopSoundRecorder();
+                engineHost->stopSoundRecorder();
                 return;
             }
 
-            if (ams->getSoundRecorder()->isArmed())
+            if (engineHost->getSoundRecorder()->isArmed())
             {
-                ams->startRecordingSound();
+                engineHost->startRecordingSound();
             }
             else
             {
@@ -151,10 +151,10 @@ void SampleScreen::function(const int i)
 
                 sound->setName(sampler->addOrIncreaseNumber("sound1"));
                 const auto lengthInFrames = time * (44100 * 0.1);
-                ams->getSoundRecorder()->prepare(
+                engineHost->getSoundRecorder()->prepare(
                     sound, lengthInFrames,
-                    ams->getAudioServer()->getSampleRate());
-                ams->getSoundRecorder()->setArmed(true);
+                    engineHost->getAudioServer()->getSampleRate());
+                engineHost->getSoundRecorder()->setArmed(true);
             }
 
             break;
@@ -166,13 +166,11 @@ void SampleScreen::function(const int i)
 
 void SampleScreen::turnWheel(const int i)
 {
-    const auto ams = mpc.getEngineHost();
-
-    if (!ams->isRecordingSound())
+    if (const auto engineHost = mpc.getEngineHost();
+        !engineHost->isRecordingSound())
     {
-        const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-        if (focusedFieldName == "input")
+        if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+            focusedFieldName == "input")
         {
             setInput(input + i);
         }
@@ -356,10 +354,10 @@ void SampleScreen::updateVU()
         rString += r;
     }
 
-    findLabel("vuleft")->setText((mode == 0 || mode == 2)
+    findLabel("vuleft")->setText(mode == 0 || mode == 2
                                      ? lString
                                      : "                                  ");
-    findLabel("vuright")->setText((mode == 1 || mode == 2)
+    findLabel("vuright")->setText(mode == 1 || mode == 2
                                       ? rString
                                       : "                                  ");
 }
