@@ -95,7 +95,6 @@ void PushPadScreenUpdateCommand::execute()
             }
 
             ctx.sequencer->getTransport()->stop();
-            ctx.sequencer->getTransport()->setPosition(0);
             ctx.sequencer->setActiveSequenceIndex(padIndexWithBank);
             ctx.sequencer->getTransport()->playFromStart();
             nextSeqPadScreen->refreshSeqs();

@@ -382,7 +382,7 @@ void Sequencer::undoSeq()
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
 
-    sequences[activeSequenceIndex]->resetTrackEventIndices(
+    sequences[activeSequenceIndex]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
 
     undoSeqAvailable = !undoSeqAvailable;
@@ -396,7 +396,7 @@ void Sequencer::setSequence(const int i, std::shared_ptr<Sequence> s)
     sequences[i].swap(s);
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[i]->resetTrackEventIndices(
+    sequences[i]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
 }
 
@@ -491,7 +491,7 @@ void Sequencer::purgeSequence(const int i)
     sequences[i] = makeNewSequence();
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
-    sequences[i]->resetTrackEventIndices(
+    sequences[i]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
     std::string res = defaultSequenceName;
     res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
@@ -504,7 +504,7 @@ void Sequencer::copySequence(const int source, const int destination)
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
     sequences[destination].swap(copy);
-    sequences[destination]->resetTrackEventIndices(
+    sequences[destination]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
     sequences[destination]->initLoop();
 }
@@ -1097,7 +1097,7 @@ void Sequencer::clearPlaceHolder()
 void Sequencer::movePlaceHolderTo(const int destIndex)
 {
     sequences[destIndex].swap(placeHolder);
-    sequences[destIndex]->resetTrackEventIndices(quarterNotesToTicks(
+    sequences[destIndex]->syncTrackEventIndices(quarterNotesToTicks(
         stateManager->getSnapshot().getPositionQuarterNotes()));
     clearPlaceHolder();
 }

@@ -796,14 +796,14 @@ void Transport::setPosition(const double positionQuarterNotes,
 
     if (shouldSyncTrackEventIndicesToNewPosition)
     {
-        sequence->resetTrackEventIndices(
+        sequence->syncTrackEventIndices(
             Sequencer::quarterNotesToTicks(wrappedNewPosition));
         if (sequencer.isSecondSequenceEnabled())
         {
             const auto secondSequenceScreen =
                 sequencer.getScreens()->get<ScreenId::SecondSeqScreen>();
             sequencer.getSequence(secondSequenceScreen->getSq())
-                ->resetTrackEventIndices(
+                ->syncTrackEventIndices(
                     Sequencer::quarterNotesToTicks(wrappedNewPosition));
         }
     }
@@ -903,7 +903,7 @@ void Transport::setPositionWithinSong(
                 playedStepRepetitions =
                     std::floor(offsetWithinStepTicks /
                                static_cast<float>(sequence->getLastTick()));
-                sequence->resetTrackEventIndices(offsetWithinStepTicks %
+                sequence->syncTrackEventIndices(offsetWithinStepTicks %
                                                  sequence->getLastTick());
             }
             break;

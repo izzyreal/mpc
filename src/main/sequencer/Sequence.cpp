@@ -733,7 +733,7 @@ int Sequence::getLastTickOfBar(const int index) const
     return getFirstTickOfBar(index) + barLengthsInTicks[index] - 1;
 }
 
-void Sequence::resetTrackEventIndices(const int tick) const
+void Sequence::syncTrackEventIndices(const int tick) const
 {
     if (!isUsed() || tick > getLastTick())
     {
