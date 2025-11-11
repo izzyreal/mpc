@@ -504,7 +504,6 @@ bool StepEditorScreen::paramIsLetter(const std::string &letter) const
 
 void StepEditorScreen::turnWheel(int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     const auto track = sequencer->getActiveTrack();
 
@@ -728,6 +727,7 @@ void StepEditorScreen::turnWheel(int i)
 void StepEditorScreen::setSequencerTickPos(
     const std::function<void()> &tickPosSetter)
 {
+    isFirstTickPosChangeAfterScreenHasBeenOpened = false;
     storeColumnForEventAtActiveRow();
     tickPosSetter();
 }
@@ -809,7 +809,6 @@ void StepEditorScreen::nextBarEnd()
 
 void StepEditorScreen::left()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.length() == 2 && getActiveColumn() == "a")
@@ -835,7 +834,6 @@ void StepEditorScreen::right()
 
 void StepEditorScreen::up()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.length() == 2)
@@ -948,7 +946,6 @@ void StepEditorScreen::down()
 
 void StepEditorScreen::shift()
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.length() == 2)
