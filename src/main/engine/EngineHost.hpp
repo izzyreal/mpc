@@ -36,11 +36,6 @@ namespace mpc::engine::audio::mixer
     class MixerControls;
 } // namespace mpc::engine::audio::mixer
 
-namespace mpc::engine::audio::system
-{
-    class DefaultAudioSystem;
-}
-
 namespace mpc::audiomidi
 {
     class MidiOutput;
@@ -58,7 +53,6 @@ namespace mpc::audiomidi
             engine::audio::server::NonRealTimeAudioServer;
         using RealTimeAudioServer = engine::audio::server::RealTimeAudioServer;
         using CompoundAudioClient = engine::audio::server::CompoundAudioClient;
-        using DefaultAudioSystem = engine::audio::system::DefaultAudioSystem;
         using AudioMixer = engine::audio::mixer::AudioMixer;
         using MixerControls = engine::audio::mixer::MixerControls;
         using AudioProcess = engine::audio::core::AudioProcess;
@@ -127,7 +121,6 @@ namespace mpc::audiomidi
         std::shared_ptr<engine::Voice> basicVoice;
         std::shared_ptr<RealTimeAudioServer> realTimeAudioServer;
         std::shared_ptr<NonRealTimeAudioServer> nonRealTimeAudioServer;
-        std::shared_ptr<DefaultAudioSystem> audioSystem;
         std::shared_ptr<AudioMixer> mixer;
         std::shared_ptr<MixerControls> mixerControls;
         std::shared_ptr<CompoundAudioClient> compoundAudioClient;
