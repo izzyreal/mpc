@@ -25,7 +25,7 @@ void VmpcRecordJamScreen::function(const int i)
         case 4:
         {
             constexpr auto minutes = 60;
-            const auto ams = mpc.getAudioMidiServices();
+            const auto ams = mpc.getEngineHost();
             const auto rate =
                 static_cast<int>(ams->getAudioServer()->getSampleRate());
             const auto lengthInFrames = rate * 60 * minutes;

@@ -90,7 +90,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
 
             //		if (!offline)
             rate = static_cast<int>(
-                mpc.getAudioMidiServices()->getAudioServer()->getSampleRate());
+                mpc.getEngineHost()->getAudioServer()->getSampleRate());
 
             const auto sequence = sequencer->getSequence(seq);
             seqLoopWasEnabled = sequence->isLoopEnabled();
@@ -116,7 +116,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                             lengthInFrames, splitStereoIntoLeftAndRightChannel,
                             rate, recordingName);
 
-                    if (!mpc.getAudioMidiServices()->prepareBouncing(
+                    if (!mpc.getEngineHost()->prepareBouncing(
                             settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
@@ -151,7 +151,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         Sequencer::ticksToQuarterNotes(
                             sequence->getLoopStart()));
 
-                    if (!mpc.getAudioMidiServices()->prepareBouncing(
+                    if (!mpc.getEngineHost()->prepareBouncing(
                             settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
@@ -185,7 +185,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     sequencer->getTransport()->setPosition(
                         Sequencer::ticksToQuarterNotes(time0));
 
-                    if (!mpc.getAudioMidiServices()->prepareBouncing(
+                    if (!mpc.getEngineHost()->prepareBouncing(
                             settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
@@ -225,7 +225,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         mpcSong->setLoopEnabled(false);
                     }
 
-                    if (!mpc.getAudioMidiServices()->prepareBouncing(
+                    if (!mpc.getEngineHost()->prepareBouncing(
                             settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);

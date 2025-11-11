@@ -241,7 +241,7 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (screengroups::isSoundScreen(screen))
     {
-        mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+        mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
             sampler::PLAYX_SOUND, 127, 0);
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
@@ -298,7 +298,7 @@ void ClientHardwareEventController::handlePadRelease(
                    clientEventController = mpc.clientEventController,
                    frameSequencer = mpc.getSequencer()->getSequencerPlaybackEngine(),
                    previewSoundPlayer =
-                       mpc.getAudioMidiServices()->getPreviewSoundPlayer()](
+             mpc.getEngineHost()->getPreviewSoundPlayer()](
                       void *userData)
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
@@ -462,7 +462,7 @@ void ClientHardwareEventController::handlePot(
                                          ? mpc.getHardware()->getRecPot()
                                          : mpc.getHardware()->getVolPot();
 
-    const auto audioMidiServices = mpc.getAudioMidiServices();
+    const auto audioMidiServices = mpc.getEngineHost();
 
     pot->setValue(pot->getValue() + *event.deltaValue * 0.01f);
 

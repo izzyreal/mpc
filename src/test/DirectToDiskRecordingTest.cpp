@@ -49,7 +49,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     mpc.getLayeredScreen()->openScreenById(
         ScreenId::VmpcDirectToDiskRecorderScreen);
 
-    auto audioMidiServices = mpc.getAudioMidiServices();
+    auto audioMidiServices = mpc.getEngineHost();
     auto audioServer = audioMidiServices->getAudioServer();
 
     audioServer->setSampleRate(SAMPLE_RATE);

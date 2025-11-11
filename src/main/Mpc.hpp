@@ -122,7 +122,7 @@ namespace mpc
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        std::shared_ptr<audiomidi::EngineHost> getAudioMidiServices();
+        std::shared_ptr<audiomidi::EngineHost> getEngineHost();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<audiomidi::MidiOutput> getMidiOutput();
         std::shared_ptr<sequencer::Clock> getClock();

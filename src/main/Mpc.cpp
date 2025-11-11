@@ -240,7 +240,7 @@ std::shared_ptr<Sampler> Mpc::getSampler()
     return sampler;
 }
 
-std::shared_ptr<audiomidi::EngineHost> Mpc::getAudioMidiServices()
+std::shared_ptr<audiomidi::EngineHost> Mpc::getEngineHost()
 {
     return audioMidiServices;
 }

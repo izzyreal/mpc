@@ -19,7 +19,7 @@ void PushStopCommand::execute()
 {
     const auto vmpcDirectToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
-    const auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getEngineHost();
 
     mpc.clientEventController->clientHardwareEventController
         ->unlockNoteRepeat();

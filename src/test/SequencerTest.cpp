@@ -100,7 +100,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
 
     auto track = seq->getActiveTrack();
 
-    auto server = mpc.getAudioMidiServices()->getAudioServer();
+    auto server = mpc.getEngineHost()->getAudioServer();
 
     server->resizeBuffers(BUFFER_SIZE);
 
@@ -269,7 +269,7 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->getTransport()->setTempo(121);
 
-    auto server = mpc.getAudioMidiServices()->getAudioServer();
+    auto server = mpc.getEngineHost()->getAudioServer();
     server->resizeBuffers(BUFFER_SIZE);
     server->setSampleRate(SAMPLE_RATE);
 

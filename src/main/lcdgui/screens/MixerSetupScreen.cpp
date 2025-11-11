@@ -124,7 +124,7 @@ void MixerSetupScreen::setMasterLevel(int i)
     }
     masterLevel = i;
 
-    mpc.getAudioMidiServices()->setMixerMasterLevel(
+    mpc.getEngineHost()->setMixerMasterLevel(
         masterLevelValues[masterLevel + 13]);
 
     displayMasterLevel();

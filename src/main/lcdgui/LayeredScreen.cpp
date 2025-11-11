@@ -302,7 +302,7 @@ void LayeredScreen::closeCurrentScreen()
 void LayeredScreen::openScreenInternal(
     const std::shared_ptr<ScreenComponent> &newScreen)
 {
-    const auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getEngineHost();
 
     if (!history.empty())
     {

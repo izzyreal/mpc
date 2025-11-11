@@ -73,7 +73,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    auto audioMidiServices = mpc.getAudioMidiServices();
+    auto audioMidiServices = mpc.getEngineHost();
     auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
     std::vector<char> bytes{
@@ -95,7 +95,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
 
 void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
 {
-    auto audioMidiServices = mpc.getAudioMidiServices();
+    auto audioMidiServices = mpc.getEngineHost();
 
     auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 

@@ -226,7 +226,7 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     if (metronomeSoundScreen->getSound() == 0)
     {
         velocity *= metronomeSoundScreen->getVolume() * 0.01;
-        mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+        mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
             CLICK_SOUND, velocity, framePos);
         return;
     }
@@ -246,7 +246,7 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     const auto note = programs[programIndex]->getNoteFromPad(pad);
     const auto soundNumber =
         programs[programIndex]->getNoteParameters(note)->getSoundIndex();
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
         soundNumber, velocity, framePos);
 }
 
@@ -265,7 +265,7 @@ void Sampler::playPreviewSample(const int start, const int end,
     previewSound->setStart(start);
     previewSound->setEnd(end);
     previewSound->setLoopTo(loopTo);
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
         PREVIEW_SOUND, 127, 0);
     previewSound->setStart(oldStart);
     previewSound->setEnd(oldEnd);
@@ -706,7 +706,7 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
 
 void Sampler::stopAllVoices(const int frameOffset) const
 {
-    for (auto &voice : mpc.getAudioMidiServices()->getVoices())
+    for (auto &voice : mpc.getEngineHost()->getVoices())
     {
         if (voice->isFinished())
         {
@@ -719,7 +719,7 @@ void Sampler::stopAllVoices(const int frameOffset) const
 
 void Sampler::finishBasicVoice() const
 {
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->finishVoice();
+    mpc.getEngineHost()->getPreviewSoundPlayer()->finishVoice();
 }
 
 void Sampler::playX()
@@ -760,7 +760,7 @@ void Sampler::playX()
     int oldEnd = sound->getEnd();
     sound->setStart(start);
     sound->setEnd(end);
-    mpc.getAudioMidiServices()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND,
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND,
                                                                    127, 0);
     sound->setStart(oldStart);
     sound->setEnd(oldEnd);

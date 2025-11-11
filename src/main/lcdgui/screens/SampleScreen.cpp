@@ -16,8 +16,8 @@ SampleScreen::SampleScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]() -> std::pair<bool, bool>
          {
-             return {mpc.getAudioMidiServices()->isRecordingSound(),
-                     mpc.getAudioMidiServices()->getSoundRecorder()->isArmed()};
+             return {mpc.getEngineHost()->isRecordingSound(),
+                     mpc.getEngineHost()->getSoundRecorder()->isArmed()};
          },
          [&](auto isRecordingAndisArmed)
          {
@@ -59,7 +59,7 @@ void SampleScreen::open()
 
 void SampleScreen::left()
 {
-    if (mpc.getAudioMidiServices()->isRecordingSound())
+    if (mpc.getEngineHost()->isRecordingSound())
     {
         return;
     }
@@ -69,7 +69,7 @@ void SampleScreen::left()
 
 void SampleScreen::right()
 {
-    if (mpc.getAudioMidiServices()->isRecordingSound())
+    if (mpc.getEngineHost()->isRecordingSound())
     {
         return;
     }
@@ -79,7 +79,7 @@ void SampleScreen::right()
 
 void SampleScreen::up()
 {
-    if (mpc.getAudioMidiServices()->isRecordingSound())
+    if (mpc.getEngineHost()->isRecordingSound())
     {
         return;
     }
@@ -89,7 +89,7 @@ void SampleScreen::up()
 
 void SampleScreen::down()
 {
-    if (mpc.getAudioMidiServices()->isRecordingSound())
+    if (mpc.getEngineHost()->isRecordingSound())
     {
         return;
     }
@@ -107,7 +107,7 @@ void SampleScreen::function(const int i)
     switch (i)
     {
         case 0:
-            if (mpc.getAudioMidiServices()->isRecordingSound())
+            if (mpc.getEngineHost()->isRecordingSound())
             {
                 return;
             }
@@ -116,19 +116,19 @@ void SampleScreen::function(const int i)
             peak.second = 0.f;
             break;
         case 4:
-            if (mpc.getAudioMidiServices()->isRecordingSound())
+            if (mpc.getEngineHost()->isRecordingSound())
             {
-                mpc.getAudioMidiServices()->stopSoundRecorder(true);
+                mpc.getEngineHost()->stopSoundRecorder(true);
             }
-            else if (mpc.getAudioMidiServices()->getSoundRecorder()->isArmed())
+            else if (mpc.getEngineHost()->getSoundRecorder()->isArmed())
             {
-                mpc.getAudioMidiServices()->getSoundRecorder()->setArmed(false);
+                mpc.getEngineHost()->getSoundRecorder()->setArmed(false);
                 sampler->deleteSound(sampler->getSoundCount() - 1);
             }
             break;
         case 5:
         {
-            const auto ams = mpc.getAudioMidiServices();
+            const auto ams = mpc.getEngineHost();
 
             if (ams->isRecordingSound())
             {
@@ -166,7 +166,7 @@ void SampleScreen::function(const int i)
 
 void SampleScreen::turnWheel(const int i)
 {
-    const auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getEngineHost();
 
     if (!ams->isRecordingSound())
     {
@@ -192,7 +192,7 @@ void SampleScreen::turnWheel(const int i)
         {
             setMonitor(monitor + i);
             const bool muteMonitor = monitor == 0;
-            mpc.getAudioMidiServices()->muteMonitor(muteMonitor);
+            mpc.getEngineHost()->muteMonitor(muteMonitor);
         }
         else if (focusedFieldName == "prerec")
         {

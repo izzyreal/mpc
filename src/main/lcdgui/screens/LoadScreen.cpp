@@ -147,12 +147,12 @@ void LoadScreen::function(int i)
                     return;
                 }
 
-                const auto audioServerSampleRate = mpc.getAudioMidiServices()
+                const auto audioServerSampleRate =
+                    mpc.getEngineHost()
                                                        ->getAudioServer()
                                                        ->getSampleRate();
 
-                bool started =
-                    mpc.getAudioMidiServices()->getSoundPlayer()->start(
+                bool started = mpc.getEngineHost()->getSoundPlayer()->start(
                         file->getInputStream(),
                         isSnd ? audiomidi::SoundPlayerFileFormat::SND
                               : audiomidi::SoundPlayerFileFormat::WAV,

@@ -11,7 +11,7 @@ PushMainScreenCommand::PushMainScreenCommand(mpc::Mpc &mpc) : mpc(mpc) {}
 
 void PushMainScreenCommand::execute()
 {
-    const auto ams = mpc.getAudioMidiServices();
+    const auto ams = mpc.getEngineHost();
 
     if (ams->isRecordingSound())
     {

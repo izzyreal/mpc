@@ -40,7 +40,7 @@ void ReleaseFunctionCommand::execute()
                     ScreenId::LoadScreen))
             {
                 mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
-                mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
+                mpc.getEngineHost()->getSoundPlayer()->enableStopEarly();
             }
             break;
         case 5:
@@ -68,7 +68,7 @@ void ReleaseFunctionCommand::execute()
             {
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::DirectoryScreen);
-                mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
+                mpc.getEngineHost()->getSoundPlayer()->enableStopEarly();
             }
             break;
         }

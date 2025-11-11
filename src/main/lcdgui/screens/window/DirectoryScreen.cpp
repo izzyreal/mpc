@@ -241,12 +241,13 @@ void DirectoryScreen::function(const int f)
                     return;
                 }
 
-                const auto audioServerSampleRate = mpc.getAudioMidiServices()
+                const auto audioServerSampleRate =
+                    mpc.getEngineHost()
                                                        ->getAudioServer()
                                                        ->getSampleRate();
 
                 const bool started =
-                    mpc.getAudioMidiServices()->getSoundPlayer()->start(
+                    mpc.getEngineHost()->getSoundPlayer()->start(
                         file->getInputStream(),
                         isSnd ? audiomidi::SoundPlayerFileFormat::SND
                               : audiomidi::SoundPlayerFileFormat::WAV,

@@ -177,7 +177,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
                   log10(peakR) * 20 > sampleScreen->threshold))
     {
         armed = false;
-        mpc.getAudioMidiServices()->startRecordingSound();
+        mpc.getEngineHost()->startRecordingSound();
     }
 
     // If not recording, nothing to consume this frame (we keep always-writing)

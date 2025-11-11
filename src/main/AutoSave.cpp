@@ -50,7 +50,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             [&]
             {
                 mpc.startMidiDeviceDetector();
-                mpc.getAudioMidiServices()->getAudioServer()->start();
+                mpc.getEngineHost()->getAudioServer()->start();
             });
     };
 
