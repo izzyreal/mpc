@@ -148,15 +148,13 @@ void LoadScreen::function(int i)
                 }
 
                 const auto audioServerSampleRate =
-                    mpc.getEngineHost()
-                                                       ->getAudioServer()
-                                                       ->getSampleRate();
+                    mpc.getEngineHost()->getAudioServer()->getSampleRate();
 
                 bool started = mpc.getEngineHost()->getSoundPlayer()->start(
-                        file->getInputStream(),
-                        isSnd ? audiomidi::SoundPlayerFileFormat::SND
-                              : audiomidi::SoundPlayerFileFormat::WAV,
-                        audioServerSampleRate);
+                    file->getInputStream(),
+                    isSnd ? audiomidi::SoundPlayerFileFormat::SND
+                          : audiomidi::SoundPlayerFileFormat::WAV,
+                    audioServerSampleRate);
 
                 auto name = file->getNameWithoutExtension();
 

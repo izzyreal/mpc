@@ -39,7 +39,8 @@ namespace mpc::sequencer
     class Sequence;
     class MidiClockOutput;
 
-    class SequencerPlaybackEngine final : public engine::audio::server::AudioClient
+    class SequencerPlaybackEngine final
+        : public engine::audio::server::AudioClient
     {
         using EventQueue = moodycamel::ConcurrentQueue<
             EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>;
@@ -55,8 +56,8 @@ namespace mpc::sequencer
             const std::function<void(int velo, int frameOffset)> &playMetronome,
             std::function<std::shared_ptr<lcdgui::Screens>()>,
             const std::function<bool()> &isNoteRepeatLockedOrPressed
-           // , const std::shared_ptr<engine::NoteRepeatProcessor>
-            );
+            // , const std::shared_ptr<engine::NoteRepeatProcessor>
+        );
 
         void work(int nFrames) override;
 

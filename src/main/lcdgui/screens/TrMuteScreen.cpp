@@ -144,8 +144,8 @@ void TrMuteScreen::turnWheel(int i)
 
     if (focusedFieldName == "sq" && !sequencer->getTransport()->isPlaying())
     {
-        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i, true);
+        sequencer->setActiveSequenceIndex(
+            sequencer->getActiveSequenceIndex() + i, true);
     }
 }
 

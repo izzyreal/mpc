@@ -105,8 +105,8 @@ void BarsScreen::turnWheel(int i)
 
     if (focusedFieldName == "fromsq")
     {
-        sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() +
-                                          i, true);
+        sequencer->setActiveSequenceIndex(
+            sequencer->getActiveSequenceIndex() + i, true);
 
         displayFromSq();
 

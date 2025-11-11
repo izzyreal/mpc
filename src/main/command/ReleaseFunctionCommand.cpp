@@ -12,8 +12,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-ReleaseFunctionCommand::ReleaseFunctionCommand(Mpc &mpc, int i)
-    : mpc(mpc), i(i)
+ReleaseFunctionCommand::ReleaseFunctionCommand(Mpc &mpc, int i) : mpc(mpc), i(i)
 {
 }
 

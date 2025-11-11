@@ -102,7 +102,8 @@ int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat *format,
 
 int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples,
                                            std::vector<char> &buffer,
-                                           int writeOffset, AudioFormat *format) const
+                                           int writeOffset,
+                                           AudioFormat *format) const
 {
     int byteCount = getByteArrayBufferSize(format, lenInSamples);
     if (writeOffset + byteCount > buffer.size())

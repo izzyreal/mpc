@@ -116,8 +116,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                             lengthInFrames, splitStereoIntoLeftAndRightChannel,
                             rate, recordingName);
 
-                    if (!mpc.getEngineHost()->prepareBouncing(
-                            settings.get()))
+                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
@@ -151,8 +150,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         Sequencer::ticksToQuarterNotes(
                             sequence->getLoopStart()));
 
-                    if (!mpc.getEngineHost()->prepareBouncing(
-                            settings.get()))
+                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
@@ -185,8 +183,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     sequencer->getTransport()->setPosition(
                         Sequencer::ticksToQuarterNotes(time0));
 
-                    if (!mpc.getEngineHost()->prepareBouncing(
-                            settings.get()))
+                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
                     }
@@ -225,8 +222,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                         mpcSong->setLoopEnabled(false);
                     }
 
-                    if (!mpc.getEngineHost()->prepareBouncing(
-                            settings.get()))
+                    if (!mpc.getEngineHost()->prepareBouncing(settings.get()))
                     {
                         openScreenById(ScreenId::VmpcFileInUseScreen);
                     }

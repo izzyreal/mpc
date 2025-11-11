@@ -254,9 +254,9 @@ void ClientHardwareEventController::handlePadPress(
                     program->getNoteFromPad(programPadIndex), clampedVelocity,
                     track.get(), screen->getBus(), screen, programPadIndex,
                     program, mpc.getSequencer(),
-                    mpc.getSequencer()->getSequencerPlaybackEngine(), mpc.eventRegistry,
-                    mpc.clientEventController, mpc.getEventHandler(),
-                    mpc.screens, mpc.getHardware());
+                    mpc.getSequencer()->getSequencerPlaybackEngine(),
+                    mpc.eventRegistry, mpc.clientEventController,
+                    mpc.getEventHandler(), mpc.screens, mpc.getHardware());
 
             action = [ctx](void *)
             {
@@ -292,14 +292,14 @@ void ClientHardwareEventController::handlePadRelease(
         return;
     }
 
-    auto action = [eventRegistry = mpc.eventRegistry,
-                   eventHandler = mpc.getEventHandler(), screens = mpc.screens,
-                   sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
-                   clientEventController = mpc.clientEventController,
-                   frameSequencer = mpc.getSequencer()->getSequencerPlaybackEngine(),
-                   previewSoundPlayer =
-             mpc.getEngineHost()->getPreviewSoundPlayer()](
-                      void *userData)
+    auto action =
+        [eventRegistry = mpc.eventRegistry,
+         eventHandler = mpc.getEventHandler(), screens = mpc.screens,
+         sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
+         clientEventController = mpc.clientEventController,
+         frameSequencer = mpc.getSequencer()->getSequencerPlaybackEngine(),
+         previewSoundPlayer =
+             mpc.getEngineHost()->getPreviewSoundPlayer()](void *userData)
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 

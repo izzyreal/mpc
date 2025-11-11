@@ -50,7 +50,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       triggerMetronome(triggerMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
-      //noteRepeatProcessor(noteRepeatProcessor),
+      // noteRepeatProcessor(noteRepeatProcessor),
       midiClockOutput(
           std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
 {
@@ -109,7 +109,8 @@ bool SequencerPlaybackEngine::isRunning() const
     return sequencerIsRunning.load();
 }
 
-void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(const int newTickPos) const
+void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
+    const int newTickPos) const
 {
     sequencer->getTransport()->setPosition(
         Sequencer::ticksToQuarterNotes(newTickPos));
@@ -248,7 +249,8 @@ void SequencerPlaybackEngine::stopCountingInIfRequired() const
     if (sequencer->getTransport()->getTickPosition() >=
         sequencer->getTransport()->getCountInEndPos())
     {
-        setTickPositionEffectiveImmediately(sequencer->getTransport()->getCountInStartPos());
+        setTickPositionEffectiveImmediately(
+            sequencer->getTransport()->getCountInStartPos());
         sequencer->getTransport()->setCountingIn(false);
         sequencer->getTransport()->resetCountInPositions();
     }
@@ -392,7 +394,8 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
         {
             sequencer->getTransport()->stop(
                 Transport::StopMode::AT_START_OF_TICK);
-            setTickPositionEffectiveImmediately(Sequencer::ticksToQuarterNotes(seq->getLastTick()));
+            setTickPositionEffectiveImmediately(
+                Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }
 
         return true;
@@ -450,13 +453,14 @@ void SequencerPlaybackEngine::processNoteRepeat()
             getScreens()->get<ScreenId::Assign16LevelsScreen>();
         const auto mixerSetupScreen =
             getScreens()->get<ScreenId::MixerSetupScreen>();
-/*
-        noteRepeatProcessor->process(
-            this, 
-            sequencer->getTransport()->getTickPosition(), repeatIntervalTicks,
-            getEventFrameOffset(), sequencer->getTransport()->getTempo(),
-            static_cast<float>(getSampleRate()));
-            */
+        /*
+                noteRepeatProcessor->process(
+                    this,
+                    sequencer->getTransport()->getTickPosition(),
+           repeatIntervalTicks, getEventFrameOffset(),
+           sequencer->getTransport()->getTempo(),
+                    static_cast<float>(getSampleRate()));
+                    */
     }
 }
 
@@ -467,8 +471,8 @@ void SequencerPlaybackEngine::stopSequencer() const
     setTickPositionEffectiveImmediately(0);
 }
 
-void SequencerPlaybackEngine::enqueueEventAfterNFrames(const std::function<void()> &event,
-                                        const unsigned long nFrames) const
+void SequencerPlaybackEngine::enqueueEventAfterNFrames(
+    const std::function<void()> &event, const unsigned long nFrames) const
 {
     EventAfterNFrames e;
     e.f = event;

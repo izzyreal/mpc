@@ -91,7 +91,8 @@ void EngineHost::start()
         ->setValue(static_cast<float>(100));
 
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
-    compoundAudioClient->add(mpc.getSequencer()->getSequencerPlaybackEngine().get());
+    compoundAudioClient->add(
+        mpc.getSequencer()->getSequencerPlaybackEngine().get());
     compoundAudioClient->add(mixer.get());
 
     mixer->getStrip("66")->setInputProcess(monitorInputAdapter);
@@ -128,8 +129,7 @@ std::shared_ptr<SoundPlayer> EngineHost::getSoundPlayer()
     return soundPlayer;
 }
 
-std::shared_ptr<NonRealTimeAudioServer>
-EngineHost::getAudioServer() const
+std::shared_ptr<NonRealTimeAudioServer> EngineHost::getAudioServer() const
 {
     return nonRealTimeAudioServer;
 }
@@ -217,8 +217,7 @@ void EngineHost::setAssignableMixOutLevels() const
     }
 }
 
-std::shared_ptr<PreviewSoundPlayer>
-EngineHost::getPreviewSoundPlayer() const
+std::shared_ptr<PreviewSoundPlayer> EngineHost::getPreviewSoundPlayer() const
 {
     return previewSoundPlayer;
 }
@@ -302,10 +301,10 @@ bool EngineHost::prepareBouncing(const DirectToDiskSettings *settings)
 
     for (int i = 0; i < diskRecorders.size(); i++)
     {
-        if (const auto diskRecorder = diskRecorders[i];
-            !diskRecorder->prepare(settings->lengthInFrames, settings->sampleRate,
-                           !settings->splitStereoIntoLeftAndRightChannel,
-                           destinationDirectory))
+        if (const auto diskRecorder = diskRecorders[i]; !diskRecorder->prepare(
+                settings->lengthInFrames, settings->sampleRate,
+                !settings->splitStereoIntoLeftAndRightChannel,
+                destinationDirectory))
         {
             return false;
         }
@@ -503,8 +502,7 @@ std::vector<std::shared_ptr<Voice>> &EngineHost::getVoices()
     return voices;
 }
 
-std::vector<MixerInterconnection *> &
-EngineHost::getMixerConnections()
+std::vector<MixerInterconnection *> &EngineHost::getMixerConnections()
 {
     return mixerConnections;
 }

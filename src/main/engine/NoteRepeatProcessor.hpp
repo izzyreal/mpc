@@ -4,14 +4,40 @@
 #include <vector>
 #include <functional>
 
-namespace mpc::engine::audio::mixer { class AudioMixer; }
-namespace mpc::engine { class Voice; class MixerInterconnection; }
-namespace mpc::sampler { class Sampler; }
-namespace mpc::lcdgui::screens::window { class Assign16LevelsScreen; }
-namespace mpc::lcdgui::screens { class MixerSetupScreen; }
-namespace mpc::eventregistry { class EventRegistry; }
-namespace mpc::hardware { class Slider; }
-namespace mpc::sequencer { class Sequencer; class SequencerPlaybackEngine; }
+namespace mpc::engine::audio::mixer
+{
+    class AudioMixer;
+}
+namespace mpc::engine
+{
+    class Voice;
+    class MixerInterconnection;
+} // namespace mpc::engine
+namespace mpc::sampler
+{
+    class Sampler;
+}
+namespace mpc::lcdgui::screens::window
+{
+    class Assign16LevelsScreen;
+}
+namespace mpc::lcdgui::screens
+{
+    class MixerSetupScreen;
+}
+namespace mpc::eventregistry
+{
+    class EventRegistry;
+}
+namespace mpc::hardware
+{
+    class Slider;
+}
+namespace mpc::sequencer
+{
+    class Sequencer;
+    class SequencerPlaybackEngine;
+} // namespace mpc::sequencer
 
 namespace mpc::engine
 {
@@ -32,18 +58,18 @@ namespace mpc::engine
             std::function<bool()> &isSixteenLevelsEnabled);
 
         void process(const sequencer::SequencerPlaybackEngine *,
-                     unsigned int tickPosition,
-                     int durationTicks,
-                     unsigned short eventFrameOffset,
-                     double tempo,
+                     unsigned int tickPosition, int durationTicks,
+                     unsigned short eventFrameOffset, double tempo,
                      float sampleRate) const;
 
     private:
         const std::shared_ptr<sequencer::Sequencer> sequencer;
         const std::shared_ptr<sampler::Sampler> sampler;
         const std::shared_ptr<audio::mixer::AudioMixer> mixer;
-        const std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen> assign16LevelsScreen;
-        const std::shared_ptr<lcdgui::screens::MixerSetupScreen> mixerSetupScreen;
+        const std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
+            assign16LevelsScreen;
+        const std::shared_ptr<lcdgui::screens::MixerSetupScreen>
+            mixerSetupScreen;
         const std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         const std::shared_ptr<hardware::Slider> hardwareSlider;
         std::vector<std::shared_ptr<Voice>> *const voices;
@@ -52,4 +78,3 @@ namespace mpc::engine
         const std::function<bool()> &isSixteenLevelsEnabled;
     };
 } // namespace mpc::engine
-

@@ -30,8 +30,7 @@ void PushSixteenLevelsCommand::execute()
     if (controller->isSixteenLevelsEnabled())
     {
         controller->setSixteenLevelsEnabled(false);
-        hardware->getLed(SIXTEEN_LEVELS_OR_SPACE_LED)
-            ->setEnabled(false);
+        hardware->getLed(SIXTEEN_LEVELS_OR_SPACE_LED)->setEnabled(false);
     }
     else
     {

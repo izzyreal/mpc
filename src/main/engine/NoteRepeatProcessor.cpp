@@ -26,28 +26,18 @@ using namespace mpc::eventregistry;
 using namespace mpc::engine::audio::mixer;
 
 NoteRepeatProcessor::NoteRepeatProcessor(
-    std::shared_ptr<Sequencer> s,
-    std::shared_ptr<Sampler> sa,
-    std::shared_ptr<AudioMixer> m,
-    std::shared_ptr<Assign16LevelsScreen> a,
-    std::shared_ptr<MixerSetupScreen> ms,
-    std::shared_ptr<EventRegistry> e,
-    std::shared_ptr<hardware::Slider> h,
-    std::vector<std::shared_ptr<Voice>> *v,
+    std::shared_ptr<Sequencer> s, std::shared_ptr<Sampler> sa,
+    std::shared_ptr<AudioMixer> m, std::shared_ptr<Assign16LevelsScreen> a,
+    std::shared_ptr<MixerSetupScreen> ms, std::shared_ptr<EventRegistry> e,
+    std::shared_ptr<hardware::Slider> h, std::vector<std::shared_ptr<Voice>> *v,
     std::vector<MixerInterconnection *> &mi,
     std::function<bool()> &isFullLevelEnabled,
     std::function<bool()> &isSixteenLevelsEnabled)
-    : sequencer(std::move(s))
-    , sampler(std::move(sa))
-    , mixer(std::move(m))
-    , assign16LevelsScreen(std::move(a))
-    , mixerSetupScreen(std::move(ms))
-    , eventRegistry(std::move(e))
-    , hardwareSlider(std::move(h))
-    , voices(v)
-    , mixerConnections(mi)
-    , isFullLevelEnabled(isFullLevelEnabled)
-    , isSixteenLevelsEnabled(isSixteenLevelsEnabled)
+    : sequencer(std::move(s)), sampler(std::move(sa)), mixer(std::move(m)),
+      assign16LevelsScreen(std::move(a)), mixerSetupScreen(std::move(ms)),
+      eventRegistry(std::move(e)), hardwareSlider(std::move(h)), voices(v),
+      mixerConnections(mi), isFullLevelEnabled(isFullLevelEnabled),
+      isSixteenLevelsEnabled(isSixteenLevelsEnabled)
 {
 }
 
@@ -61,21 +51,27 @@ void NoteRepeatProcessor::process(
     auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
 
     std::shared_ptr<Program> program;
-    if (drumBus) program = sampler->getProgram(drumBus->getProgram());
+    if (drumBus)
+    {
+        program = sampler->getProgram(drumBus->getProgram());
+    }
 
     auto note = assign16LevelsScreen->getNote();
     const auto snapshot = eventRegistry->getSnapshot();
 
-    static const std::vector exclude{
-        Source::NoteRepeat, Source::Sequence};
+    static const std::vector exclude{Source::NoteRepeat, Source::Sequence};
 
     for (int pad = 0; pad < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX; ++pad)
     {
         if (!snapshot.getMostRecentProgramPadPress(pad, exclude))
+        {
             continue;
+        }
 
         if (!isSixteenLevelsEnabled && program)
+        {
             note = program->getNoteFromPad(pad);
+        }
 
         auto noteEvent = std::make_shared<sequencer::NoteOnEvent>(note);
         noteEvent->setTick(static_cast<int>(tickPosition));
@@ -103,9 +99,10 @@ void NoteRepeatProcessor::process(
             noteEvent->setVariationValue(value);
         }
 
-        const auto physicalPadPress = snapshot.retrievePhysicalPadPressEvent(pad % 16);
-        const bool isPhysicallyPressed = physicalPadPress &&
-                                         physicalPadPress->bank == pad / 16;
+        const auto physicalPadPress =
+            snapshot.retrievePhysicalPadPressEvent(pad % 16);
+        const bool isPhysicallyPressed =
+            physicalPadPress && physicalPadPress->bank == pad / 16;
 
         if (isSixteenLevelsEnabled() && isPhysicallyPressed)
         {
@@ -129,7 +126,8 @@ void NoteRepeatProcessor::process(
         }
 
         noteEvent->setDuration(durationTicks);
-        noteEvent->getNoteOff()->setTick(static_cast<int>(tickPosition) + durationTicks);
+        noteEvent->getNoteOff()->setTick(static_cast<int>(tickPosition) +
+                                         durationTicks);
 
         const auto velBeforeRatio = noteEvent->getVelocity();
         noteEvent->setVelocity(noteEvent->getVelocity() *
@@ -145,8 +143,8 @@ void NoteRepeatProcessor::process(
             const auto noteParams = program->getNoteParameters(note);
             const auto sound = sampler->getSound(noteParams->getSoundIndex());
             const auto overlap = sound && sound->isLoopEnabled()
-                               ? VoiceOverlapMode::NOTE_OFF
-                               : noteParams->getVoiceOverlapMode();
+                                     ? VoiceOverlapMode::NOTE_OFF
+                                     : noteParams->getVoiceOverlapMode();
 
             auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
                 0, drumBus, sampler, mixer, mixerSetupScreen, voices,
@@ -178,4 +176,3 @@ void NoteRepeatProcessor::process(
             durationFrames - 1);
     }
 }
-

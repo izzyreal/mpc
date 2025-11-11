@@ -93,7 +93,8 @@ void SongScreen::up()
         }
 
         setOffset(offset - 1);
-        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(), true);
+        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(),
+                                          true);
     }
     else
     {
@@ -195,7 +196,8 @@ void SongScreen::down()
         }
 
         setOffset(offset + 1);
-        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(), true);
+        sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(),
+                                          true);
     }
     else
     {

@@ -108,16 +108,14 @@ namespace mpc
         std::shared_ptr<controller::ClientEventController>
             clientEventController;
 
-        void
-        dispatchHostInput(const input::HostInputEvent &hostEvent) const;
+        void dispatchHostInput(const input::HostInputEvent &hostEvent) const;
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::shared_ptr<lcdgui::ScreenComponent> getScreen() const;
         std::shared_ptr<hardware::Hardware> getHardware();
         disk::DiskController *getDiskController() const;
-        std::shared_ptr<input::PadAndButtonKeyboard>
-        getPadAndButtonKeyboard();
+        std::shared_ptr<input::PadAndButtonKeyboard> getPadAndButtonKeyboard();
 
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();

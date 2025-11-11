@@ -102,7 +102,8 @@ void NextSeqPadScreen::function(int i)
 
         if (i == 3 && nextSq != -1)
         {
-            sequencer->getStateManager()->enqueue(sequencer::SwitchToNextSequence{nextSq});
+            sequencer->getStateManager()->enqueue(
+                sequencer::SwitchToNextSequence{nextSq});
         }
     }
     else if (i == 5)

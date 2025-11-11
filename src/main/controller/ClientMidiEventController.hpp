@@ -129,7 +129,8 @@ namespace mpc::controller
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<hardware::Hardware> hardware;
         std::shared_ptr<lcdgui::Screens> screens;
-        std::shared_ptr<sequencer::SequencerPlaybackEngine> sequencerPlaybackEngine;
+        std::shared_ptr<sequencer::SequencerPlaybackEngine>
+            sequencerPlaybackEngine;
         engine::PreviewSoundPlayer *previewSoundPlayer;
 
         bool convertSustainPedalToDuration = false;

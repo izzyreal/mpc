@@ -854,10 +854,8 @@ void SequencerScreen::turnWheel(int i)
                 findChild("function-keys")->Hide(false);
             }
 
-            sequencer->getStateManager()->enqueue(SetActiveSequenceIndex
-            {
-                sequencer->getActiveSequenceIndex() + i
-            });
+            sequencer->getStateManager()->enqueue(SetActiveSequenceIndex{
+                sequencer->getActiveSequenceIndex() + i});
         }
     }
     else if (focusedFieldName == "nextsq")

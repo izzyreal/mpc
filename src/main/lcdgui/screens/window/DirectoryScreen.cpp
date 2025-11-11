@@ -242,9 +242,7 @@ void DirectoryScreen::function(const int f)
                 }
 
                 const auto audioServerSampleRate =
-                    mpc.getEngineHost()
-                                                       ->getAudioServer()
-                                                       ->getSampleRate();
+                    mpc.getEngineHost()->getAudioServer()->getSampleRate();
 
                 const bool started =
                     mpc.getEngineHost()->getSoundPlayer()->start(

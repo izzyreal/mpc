@@ -35,8 +35,7 @@ void PushStopCommand::execute()
 
     mpc.getSequencer()->getTransport()->stop();
 
-    if (!screengroups::isPlayScreen(
-            mpc.getLayeredScreen()->getCurrentScreen()))
+    if (!screengroups::isPlayScreen(mpc.getLayeredScreen()->getCurrentScreen()))
     {
         mpc.getLayeredScreen()->openScreenById(ScreenId::SequencerScreen);
     }

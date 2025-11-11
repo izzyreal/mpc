@@ -12,7 +12,8 @@ PushMainScreenCommand::PushMainScreenCommand(Mpc &mpc) : mpc(mpc) {}
 void PushMainScreenCommand::execute()
 {
 
-    if (const auto engineHost = mpc.getEngineHost(); engineHost->isRecordingSound())
+    if (const auto engineHost = mpc.getEngineHost();
+        engineHost->isRecordingSound())
     {
         engineHost->stopSoundRecorder();
     }

@@ -71,7 +71,8 @@ namespace mpc::command::context
         std::shared_ptr<lcdgui::screens::window::Assign16LevelsScreen>
             assign16LevelsScreen;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
-        std::shared_ptr<sequencer::SequencerPlaybackEngine> sequencerPlaybackEngine;
+        std::shared_ptr<sequencer::SequencerPlaybackEngine>
+            sequencerPlaybackEngine;
 
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<lcdgui::ScreenComponent> screenComponent;

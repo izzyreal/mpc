@@ -51,10 +51,14 @@ namespace mpc::engine::audio::mixer
         void work(int nFrames) override;
 
     private:
-        static void evaluateStrips(const std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate,
-            int nFrames);
+        static void
+        evaluateStrips(const std::vector<std::shared_ptr<AudioMixerStrip>>
+                           &stripsToEvaluate,
+                       int nFrames);
 
-        static void silenceStrips(const std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence);
+        static void
+        silenceStrips(const std::vector<std::shared_ptr<AudioMixerStrip>>
+                          &stripsToSilence);
 
         void writeBusBuffers(int nFrames) const;
 

@@ -300,10 +300,12 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
     defaultSequenceName = s;
 }
 
-void Sequencer::setActiveSequenceIndex(const int i, const bool shouldSetPositionTo0)
+void Sequencer::setActiveSequenceIndex(const int i,
+                                       const bool shouldSetPositionTo0)
 {
     assert(!shouldSetPositionTo0 || !transport->isPlaying());
-    activeSequenceIndex = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
+    activeSequenceIndex =
+        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     if (shouldSetPositionTo0)
     {
         getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{0});

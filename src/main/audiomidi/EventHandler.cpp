@@ -146,8 +146,8 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
 
     const auto noteOffCtx =
         DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-            noteEventIdToUse, drumBus, &mpc.getEngineHost()->getVoices(),
-            note, noteOnEvent->getTick());
+            noteEventIdToUse, drumBus, &mpc.getEngineHost()->getVoices(), note,
+            noteOnEvent->getTick());
 
     auto noteOffEventFn = [bus = ctx.drum, note = noteOnEvent->getNote(), track,
                            eventRegistry = mpc.eventRegistry, program,
@@ -283,9 +283,9 @@ void EventHandler::handleUnfinalizedNoteOn(
             0, drumBus, mpc.getSampler(), mpc.getEngineHost()->getMixer(),
             mpc.screens->get<ScreenId::MixerSetupScreen>(),
             &mpc.getEngineHost()->getVoices(),
-            mpc.getEngineHost()->getMixerConnections(), note,
-            velocityToUse, noteOnEvent->getVariationType(),
-            noteOnEvent->getVariationValue(), 0, true, -1, -1);
+            mpc.getEngineHost()->getMixerConnections(), note, velocityToUse,
+            noteOnEvent->getVariationType(), noteOnEvent->getVariationValue(),
+            0, true, -1, -1);
 
         DrumNoteEventHandler::noteOn(ctx);
     }

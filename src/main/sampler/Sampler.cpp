@@ -246,8 +246,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
     const auto note = programs[programIndex]->getNoteFromPad(pad);
     const auto soundNumber =
         programs[programIndex]->getNoteParameters(note)->getSoundIndex();
-    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
-        soundNumber, velocity, framePos);
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(soundNumber,
+                                                            velocity, framePos);
 }
 
 void Sampler::playPreviewSample(const int start, const int end,
@@ -265,8 +265,8 @@ void Sampler::playPreviewSample(const int start, const int end,
     previewSound->setStart(start);
     previewSound->setEnd(end);
     previewSound->setLoopTo(loopTo);
-    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(
-        PREVIEW_SOUND, 127, 0);
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PREVIEW_SOUND, 127,
+                                                            0);
     previewSound->setStart(oldStart);
     previewSound->setEnd(oldEnd);
     previewSound->setLoopTo(oldLoopTo);
@@ -760,8 +760,8 @@ void Sampler::playX()
     int oldEnd = sound->getEnd();
     sound->setStart(start);
     sound->setEnd(end);
-    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND,
-                                                                   127, 0);
+    mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND, 127,
+                                                            0);
     sound->setStart(oldStart);
     sound->setEnd(oldEnd);
 }

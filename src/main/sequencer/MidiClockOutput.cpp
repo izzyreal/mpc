@@ -57,8 +57,8 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 {
     // midiSyncStartStopContinueMsg->setMessage(status);
 
-    // bufferpos should be set by SequencerPlaybackEngine when it's actually emitting these
-    // events, i.e. enqueueing them for host processing
+    // bufferpos should be set by SequencerPlaybackEngine when it's actually
+    // emitting these events, i.e. enqueueing them for host processing
     // midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
     /*
 

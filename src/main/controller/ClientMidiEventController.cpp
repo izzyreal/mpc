@@ -55,7 +55,8 @@ ClientMidiEventController::ClientMidiEventController(
       eventHandler(eventHandler), sequencer(sequencer), sampler(sampler),
       multiRecordingSetupScreen(multiRecordingSetupScreen),
       timingCorrectScreen(timingCorrectScreen), layeredScreen(layeredScreen),
-      hardware(hardware), screens(screens), sequencerPlaybackEngine(frameSequencer),
+      hardware(hardware), screens(screens),
+      sequencerPlaybackEngine(frameSequencer),
       previewSoundPlayer(previewSoundPlayer)
 {
     footswitchController =
@@ -206,8 +207,8 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                 Source::MidiInput, registryNoteOnEvent, noteNumber, velocity,
                 track.get(), screen->getBus(), screen, programPadIndex, program,
-                sequencer, sequencerPlaybackEngine, eventRegistry, clientEventController,
-                eventHandler, screens, hardware);
+                sequencer, sequencerPlaybackEngine, eventRegistry,
+                clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOnCommand(ctx).execute();
     };
