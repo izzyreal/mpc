@@ -64,7 +64,8 @@ namespace mpc::sequencer
         // midiSyncStartStopContinueMsg;
 
         std::shared_ptr<moodycamel::ConcurrentQueue<
-            engine::EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>>
+            engine::EventAfterNFrames,
+            moodycamel::ConcurrentQueueDefaultTraits>>
             eventQueue;
         std::vector<engine::EventAfterNFrames> tempEventQueue;
 

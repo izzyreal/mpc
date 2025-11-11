@@ -23,9 +23,11 @@ using namespace mpc::sequencer;
 using namespace mpc::engine;
 using namespace mpc::lcdgui;
 
-Transport::Transport(Sequencer &owner,
-    const std::shared_ptr<SequencerPlaybackEngine> &sequencerPlaybackEngine)
-    : sequencer(owner), sequencerPlaybackEngine(sequencerPlaybackEngine)
+Transport::Transport(
+    Sequencer &owner,
+    const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
+        &getSequencerPlaybackEngine)
+    : sequencer(owner), getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
@@ -33,8 +35,7 @@ Transport::Transport(Sequencer &owner,
 
 bool Transport::isPlaying() const
 {
-    return !metronomeOnlyEnabled &&
-           sequencerPlaybackEngine->isRunning();
+    return !metronomeOnlyEnabled && getSequencerPlaybackEngine()->isRunning();
 }
 
 void Transport::play(const bool fromStart)
@@ -155,7 +156,7 @@ void Transport::play(const bool fromStart)
     }
     else
     {
-        sequencerPlaybackEngine->start();
+        getSequencerPlaybackEngine()->start();
     }
 }
 
@@ -280,9 +281,10 @@ void Transport::stop(const StopMode stopMode)
 
     // const int frameOffset = stopMode == AT_START_OF_BUFFER
     //                             ? 0
-    //                             : sequencerPlaybackEngine->getEventFrameOffset();
+    //                             :
+    //                             getSequencerPlaybackEngine()->getEventFrameOffset();
 
-    sequencerPlaybackEngine->stop();
+    getSequencerPlaybackEngine()->stop();
 
     recording = false;
     overdubbing = false;
@@ -385,7 +387,7 @@ void Transport::playMetronomeTrack()
     }
 
     metronomeOnlyEnabled = true;
-    sequencerPlaybackEngine->startMetronome();
+    getSequencerPlaybackEngine()->startMetronome();
 }
 
 void Transport::stopMetronomeTrack()
@@ -395,7 +397,7 @@ void Transport::stopMetronomeTrack()
         return;
     }
 
-    sequencerPlaybackEngine->stop();
+    getSequencerPlaybackEngine()->stop();
     metronomeOnlyEnabled = false;
 }
 

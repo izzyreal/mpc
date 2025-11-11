@@ -11,4 +11,4 @@ namespace mpc::engine
         int64_t nFrames = 0;
         int64_t frameCounter = 0;
     };
-} // namespace mpc::sequencer
+} // namespace mpc::engine

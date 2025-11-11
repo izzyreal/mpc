@@ -340,7 +340,8 @@ TEST_CASE("1 bar loop", "[clock]")
         mpc.getClock()->processBufferExternal(position, blockSizes[i], 44100,
                                               120, timeInSamples);
 
-        auto sequencerPlaybackEngine = mpc.getEngineHost()->getSequencerPlaybackEngine();
+        auto sequencerPlaybackEngine =
+            mpc.getEngineHost()->getSequencerPlaybackEngine();
         sequencerPlaybackEngine->work(blockSizes[i]);
         auto &ticksForCurrentBuffer =
             mpc.getClock()->getTicksForCurrentBuffer();

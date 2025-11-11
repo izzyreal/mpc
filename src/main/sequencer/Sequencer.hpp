@@ -49,7 +49,6 @@ namespace mpc::sequencer
     class Song;
     class Track;
     class TempoChangeEvent;
-    class Clock;
 } // namespace mpc::sequencer
 
 namespace mpc::eventregistry
@@ -68,25 +67,22 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        Sequencer(std::shared_ptr<lcdgui::LayeredScreen>,
-                  std::function<std::shared_ptr<lcdgui::Screens>()>,
-                  std::vector<std::shared_ptr<engine::Voice>> *,
-                  const std::function<bool()> &isAudioServerRunning,
-                  const std::shared_ptr<hardware::Hardware> &,
-                  const std::function<bool()> &isBouncePrepared,
-                  const std::function<void()> &startBouncing,
-                  const std::function<void()> &stopBouncing,
-                  std::function<bool()> isBouncing,
-                  const std::function<bool()> &isEraseButtonPressed,
-                  std::shared_ptr<eventregistry::EventRegistry>,
-                  std::shared_ptr<sampler::Sampler>,
-                  const std::shared_ptr<audiomidi::EventHandler> &,
-                  const std::function<bool()> &isSixteenLevelsEnabled,
-                  std::shared_ptr<Clock> clock,
-                  std::function<int()> getSampleRate,
-                  std::function<bool()> isRecMainWithoutPlaying,
-                  std::function<bool()> isNoteRepeatLockedOrPressed,
-                  std::shared_ptr<engine::SequencerPlaybackEngine>);
+        Sequencer(
+            std::shared_ptr<lcdgui::LayeredScreen>,
+            std::function<std::shared_ptr<lcdgui::Screens>()>,
+            std::vector<std::shared_ptr<engine::Voice>> *,
+            const std::function<bool()> &isAudioServerRunning,
+            const std::shared_ptr<hardware::Hardware> &,
+            const std::function<bool()> &isBouncePrepared,
+            const std::function<void()> &startBouncing,
+            const std::function<void()> &stopBouncing,
+            std::function<bool()> isBouncing,
+            const std::function<bool()> &isEraseButtonPressed,
+            std::shared_ptr<eventregistry::EventRegistry>,
+            std::shared_ptr<sampler::Sampler>,
+            const std::shared_ptr<audiomidi::EventHandler> &,
+            const std::function<bool()> &isSixteenLevelsEnabled,
+            std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>);
 
         static constexpr uint16_t TICKS_PER_QUARTER_NOTE = 96;
         static uint32_t quarterNotesToTicks(double quarterNotes);
@@ -120,7 +116,8 @@ namespace mpc::sequencer
         std::function<bool()> isSixteenLevelsEnabled;
 
         std::shared_ptr<SequencerStateManager> stateManager;
-        std::shared_ptr<engine::SequencerPlaybackEngine> sequencerPlaybackEngine;
+        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+            getSequencerPlaybackEngine;
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;

@@ -24,8 +24,8 @@ MidiClockOutput::MidiClockOutput(
 // midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>()),
 // msg(std::make_shared<ShortMessage>())
 {
-    eventQueue =
-        std::make_shared<moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);
+    eventQueue = std::make_shared<
+        moodycamel::ConcurrentQueue<engine::EventAfterNFrames>>(100);
     tempEventQueue.reserve(100);
     // msg->setMessage(ShortMessage::TIMING_CLOCK);
 }

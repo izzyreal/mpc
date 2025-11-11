@@ -22,7 +22,7 @@ namespace mpc::sequencer
     class Clock;
     class Sequence;
     class MidiClockOutput;
-}
+} // namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
@@ -39,16 +39,15 @@ namespace mpc::engine
 {
     class NoteRepeatProcessor;
 
-    class SequencerPlaybackEngine final
-        : public audio::server::AudioClient
+    class SequencerPlaybackEngine final : public audio::server::AudioClient
     {
         using EventQueue = moodycamel::ConcurrentQueue<
             EventAfterNFrames, moodycamel::ConcurrentQueueDefaultTraits>;
 
     public:
         explicit SequencerPlaybackEngine(
-            const std::shared_ptr<eventregistry::EventRegistry> &, sequencer::Sequencer *,
-            const std::shared_ptr<sequencer::Clock> &,
+            const std::shared_ptr<eventregistry::EventRegistry> &,
+            sequencer::Sequencer *, const std::shared_ptr<sequencer::Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             std::function<bool()> isBouncing,
             const std::function<int()> &getSampleRate,
@@ -126,4 +125,4 @@ namespace mpc::engine
 
         uint64_t metronomeOnlyTickPosition = 0;
     };
-} // namespace mpc::sequencer
+} // namespace mpc::engine

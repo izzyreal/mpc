@@ -99,8 +99,10 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
     }
 
     const auto engineHost = mpc.getEngineHost();
-    const auto sequencerPlaybackEngine = engineHost->getSequencerPlaybackEngine();
-    const auto eventFrameOffsetInBuffer = sequencerPlaybackEngine->getEventFrameOffset();
+    const auto sequencerPlaybackEngine =
+        engineHost->getSequencerPlaybackEngine();
+    const auto eventFrameOffsetInBuffer =
+        sequencerPlaybackEngine->getEventFrameOffset();
     const auto durationTicks = *noteOnEvent->getDuration();
     const auto audioServer = engineHost->getAudioServer();
     const auto durationFrames = SeqUtil::ticksToFrames(
@@ -180,7 +182,8 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
         assert(noteOnEvent->getDuration().has_value() &&
                *noteOnEvent->getDuration() >= 0);
 
-        if (const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+        if (const auto drumBus =
+                mpc.getSequencer()->getBus<DrumBus>(track->getBus());
             drumBus)
         {
             if (isDrumNote(noteOnEvent->getNote()))
@@ -201,8 +204,10 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
         };
 
         const auto engineHost = mpc.getEngineHost();
-        const auto sequencerPlaybackEngine = engineHost->getSequencerPlaybackEngine();
-        const auto eventFrameOffsetInBuffer = sequencerPlaybackEngine->getEventFrameOffset();
+        const auto sequencerPlaybackEngine =
+            engineHost->getSequencerPlaybackEngine();
+        const auto eventFrameOffsetInBuffer =
+            sequencerPlaybackEngine->getEventFrameOffset();
         const auto durationTicks = *noteOnEvent->getDuration();
         const auto audioServer = engineHost->getAudioServer();
         const auto durationFrames = SeqUtil::ticksToFrames(
@@ -212,22 +217,25 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
         sequencerPlaybackEngine->enqueueEventAfterNFrames(
             midiNoteOffEventFn, durationFrames + eventFrameOffsetInBuffer);
     }
-    else if (const auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
+    else if (const auto mixerEvent =
+                 std::dynamic_pointer_cast<MixerEvent>(event);
              mixerEvent != nullptr)
     {
         const auto pad = mixerEvent->getPad();
         const auto sampler = mpc.getSampler();
-        const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+        const auto drumBus =
+            mpc.getSequencer()->getBus<DrumBus>(track->getBus());
 
         assert(drumBus);
 
         const auto program = sampler->getProgram(drumBus->getProgram());
 
-        const auto mixerSetupScreen = mpc.screens->get<ScreenId::MixerSetupScreen>();
+        const auto mixerSetupScreen =
+            mpc.screens->get<ScreenId::MixerSetupScreen>();
 
         const auto mixer = mixerSetupScreen->isStereoMixSourceDrum()
-                         ? drumBus->getStereoMixerChannels()[pad]
-                         : program->getStereoMixerChannel(pad);
+                               ? drumBus->getStereoMixerChannels()[pad]
+                               : program->getStereoMixerChannel(pad);
 
         if (mixerEvent->getParameter() == 0)
         {
@@ -300,8 +308,7 @@ void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
         const auto note = noteOffEvent->getNote();
 
         const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOffContext(
-            0, drumBus, &mpc.getEngineHost()->getVoices(),
-            note, -1);
+            0, drumBus, &mpc.getEngineHost()->getVoices(), note, -1);
 
         DrumNoteEventHandler::noteOff(ctx);
     }
@@ -373,7 +380,8 @@ void EventHandler::handleNoteEventMidiOut(
         //                 velocityToUse);
 
         const auto engineHost = mpc.getEngineHost();
-        const auto sequencerPlaybackEngine = engineHost->getSequencerPlaybackEngine();
+        const auto sequencerPlaybackEngine =
+            engineHost->getSequencerPlaybackEngine();
         const auto audioServer = engineHost->getAudioServer();
 
         if (noteOnEvent->isFinalized())
@@ -390,7 +398,8 @@ void EventHandler::handleNoteEventMidiOut(
                     audioServer->getSampleRate()));
         }
     }
-    else if (const auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(event))
+    else if (const auto noteOffEvent =
+                 std::dynamic_pointer_cast<NoteOffEvent>(event))
     {
 
         if (const auto candidate = transposeCache.find(noteOffEvent);

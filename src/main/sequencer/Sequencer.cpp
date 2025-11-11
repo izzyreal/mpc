@@ -71,11 +71,8 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
                      std::shared_ptr<Sampler> sampler,
                      const std::shared_ptr<EventHandler> &eventHandler,
                      const std::function<bool()> &isSixteenLevelsEnabled,
-                     std::shared_ptr<Clock> clock,
-                     std::function<int()> getSampleRate,
-                     std::function<bool()> isRecMainWithoutPlaying,
-                     std::function<bool()> isNoteRepeatLockedOrPressed,
-                     std::shared_ptr<SequencerPlaybackEngine> sequencerPlaybackEngine)
+                     std::function<std::shared_ptr<SequencerPlaybackEngine>()>
+                         getSequencerPlaybackEngine)
     : getScreens(getScreens), isBouncePrepared(isBouncePrepared),
       startBouncing(startBouncing), hardware(hardware), isBouncing(isBouncing),
       stopBouncing(stopBouncing), layeredScreen(layeredScreen), voices(voices),
@@ -83,7 +80,7 @@ Sequencer::Sequencer(std::shared_ptr<LayeredScreen> layeredScreen,
       isEraseButtonPressed(isEraseButtonPressed), eventRegistry(eventRegistry),
       sampler(sampler), eventHandler(eventHandler),
       isSixteenLevelsEnabled(isSixteenLevelsEnabled),
-      sequencerPlaybackEngine(sequencerPlaybackEngine)
+      getSequencerPlaybackEngine(getSequencerPlaybackEngine)
 {
     stateManager = std::make_shared<SequencerStateManager>(this);
 }
@@ -100,7 +97,7 @@ std::shared_ptr<Transport> Sequencer::getTransport()
 
 void Sequencer::init()
 {
-    transport = std::make_shared<Transport>(*this, sequencerPlaybackEngine);
+    transport = std::make_shared<Transport>(*this, getSequencerPlaybackEngine);
 
     for (int midiBusIndex = 0; midiBusIndex < Mpc2000XlSpecs::MIDI_BUS_COUNT;
          ++midiBusIndex)

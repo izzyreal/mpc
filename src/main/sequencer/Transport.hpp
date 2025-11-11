@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <functional>
 
 namespace mpc::lcdgui
 {
@@ -26,8 +27,10 @@ namespace mpc::sequencer
             AT_START_OF_TICK
         };
 
-        explicit Transport(Sequencer &owner,
-            const std::shared_ptr<engine::SequencerPlaybackEngine> &);
+        explicit Transport(
+            Sequencer &owner,
+            const std::function<
+                std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
         void play();
         void play(bool fromStart);
@@ -98,7 +101,8 @@ namespace mpc::sequencer
 
     private:
         Sequencer &sequencer;
-        std::shared_ptr<engine::SequencerPlaybackEngine> sequencerPlaybackEngine;
+        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+            getSequencerPlaybackEngine;
 
         bool playing = false;
         bool recording = false;

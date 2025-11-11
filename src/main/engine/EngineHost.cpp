@@ -4,12 +4,15 @@
 
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
+#include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
 #include "audiomidi/DirectToDiskSettings.hpp"
 #include "audiomidi/DiskRecorder.hpp"
 #include "audiomidi/MonitorInputAdapter.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "audiomidi/SoundRecorder.hpp"
+#include "controller/ClientEventController.hpp"
+#include "controller/ClientHardwareEventController.hpp"
 
 #include "engine/Voice.hpp"
 #include "engine/VoiceUtil.hpp"
@@ -27,6 +30,10 @@
 #include "engine/audio/mixer/MainMixControls.hpp"
 
 #include "engine/SequencerPlaybackEngine.hpp"
+#include "hardware/ComponentId.hpp"
+#include "hardware/Hardware.hpp"
+#include "sampler/Sampler.hpp"
+#include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Song.hpp"
@@ -54,15 +61,39 @@ EngineHost::EngineHost(Mpc &mpcToUse) : mpc(mpcToUse)
 
 void EngineHost::start()
 {
-
-    // sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
-    //     eventRegistry, this, clock, layeredScreen, isBouncing, getSampleRate,
-    //     isRecMainWithoutPlaying,
-    //     [sampler](const int velo, const int frameOffset)
-    //     {
-    //         sampler->playMetronome(velo, frameOffset);
-    //     },
-    //     getScreens, isNoteRepeatLockedOrPressed);
+    sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
+        mpc.eventRegistry, mpc.getSequencer().get(), mpc.getClock(),
+        mpc.getLayeredScreen(),
+        [&]
+        {
+            return isBouncing();
+        },
+        [&]
+        {
+            return nonRealTimeAudioServer->getSampleRate();
+        },
+        [&]
+        {
+            return SeqUtil::isRecMainWithoutPlaying(
+                mpc.getSequencer(),
+                mpc.screens->get<ScreenId::TimingCorrectScreen>(),
+                mpc.getLayeredScreen()->getCurrentScreenName(),
+                mpc.getHardware()->getButton(hardware::REC),
+                mpc.clientEventController->clientHardwareEventController);
+        },
+        [sampler = mpc.getSampler()](const int velo, const int frameOffset)
+        {
+            sampler->playMetronome(velo, frameOffset);
+        },
+        [&]
+        {
+            return mpc.screens;
+        },
+        [&]
+        {
+            return mpc.clientEventController->clientHardwareEventController
+                ->isNoteRepeatLockedOrPressed();
+        });
 
     realTimeAudioServer = std::make_shared<RealTimeAudioServer>();
     nonRealTimeAudioServer =
@@ -517,7 +548,8 @@ std::vector<MixerInterconnection *> &EngineHost::getMixerConnections()
     return mixerConnections;
 }
 
-std::shared_ptr<SequencerPlaybackEngine> EngineHost::getSequencerPlaybackEngine()
+std::shared_ptr<SequencerPlaybackEngine>
+EngineHost::getSequencerPlaybackEngine()
 {
     return sequencerPlaybackEngine;
 }

@@ -50,8 +50,7 @@ namespace mpc::engine
 {
     class EngineHost final
     {
-        using NonRealTimeAudioServer =
-            audio::server::NonRealTimeAudioServer;
+        using NonRealTimeAudioServer = audio::server::NonRealTimeAudioServer;
         using RealTimeAudioServer = audio::server::RealTimeAudioServer;
         using CompoundAudioClient = audio::server::CompoundAudioClient;
         using AudioMixer = audio::mixer::AudioMixer;
@@ -66,8 +65,7 @@ namespace mpc::engine
 
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
-        std::shared_ptr<PreviewSoundPlayer>
-        getPreviewSoundPlayer() const;
+        std::shared_ptr<PreviewSoundPlayer> getPreviewSoundPlayer() const;
         std::shared_ptr<audio::mixer::AudioMixer> getMixer();
         std::vector<std::shared_ptr<Voice>> &getVoices();
         std::vector<MixerInterconnection *> &getMixerConnections();
@@ -140,4 +138,4 @@ namespace mpc::engine
         void createSynth();
         void setMonitorLevel(int level) const;
     };
-} // namespace mpc::audiomidi
+} // namespace mpc::engine

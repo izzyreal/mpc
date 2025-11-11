@@ -24,7 +24,7 @@ namespace mpc::engine
 {
     class SequencerPlaybackEngine;
     class PreviewSoundPlayer;
-}
+} // namespace mpc::engine
 
 namespace mpc::sampler
 {

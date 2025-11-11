@@ -297,7 +297,8 @@ void ClientHardwareEventController::handlePadRelease(
          eventHandler = mpc.getEventHandler(), screens = mpc.screens,
          sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
-         sequencerPlaybackEngine = mpc.getEngineHost()->getSequencerPlaybackEngine(),
+         sequencerPlaybackEngine =
+             mpc.getEngineHost()->getSequencerPlaybackEngine(),
          previewSoundPlayer =
              mpc.getEngineHost()->getPreviewSoundPlayer()](void *userData)
     {
@@ -321,8 +322,8 @@ void ClientHardwareEventController::handlePadRelease(
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                     Source::VirtualMpcHardware, *p->note, p->track, p->bus,
                     p->screen, programPadIndex, p->program, sequencer,
-                    sequencerPlaybackEngine, eventRegistry, clientEventController,
-                    eventHandler, screens, hardware);
+                    sequencerPlaybackEngine, eventRegistry,
+                    clientEventController, eventHandler, screens, hardware);
 
             TriggerLocalNoteOffCommand(ctx).execute();
 

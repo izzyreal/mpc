@@ -118,8 +118,7 @@ namespace mpc::audiomidi
 
         void handleFinalizedDrumNoteOnEvent(
             const std::shared_ptr<NoteOnEvent> &,
-            const std::shared_ptr<sequencer::DrumBus> &,
-                                            sequencer::Track *);
+            const std::shared_ptr<sequencer::DrumBus> &, sequencer::Track *);
 
         /**
          * The MPC2000XL supports realtime, non-destructive transposition of

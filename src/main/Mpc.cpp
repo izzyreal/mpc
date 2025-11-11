@@ -5,7 +5,6 @@
 
 #include "DemoFiles.hpp"
 
-#include "controller/ClientHardwareEventController.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "lcdgui/ScreenComponent.hpp"
@@ -174,22 +173,10 @@ void Mpc::init()
         {
             return clientEventController->isSixteenLevelsEnabled();
         },
-        clock,
         [&]
         {
-            return engineHost->getAudioServer()->getSampleRate();
-        },
-        [&]
-        {
-            return clientEventController->isRecMainWithoutPlaying();
-        },
-        [&]
-        {
-            return clientEventController->clientHardwareEventController
-                ->isNoteRepeatLockedOrPressed();
-        },
-        engineHost->getSequencerPlaybackEngine()
-        );
+            return engineHost->getSequencerPlaybackEngine();
+        });
     MLOG("Sequencer created");
 
     // We create all screens once so they're all cached in mpc::lcdgui::Screens,
