@@ -5,7 +5,7 @@
 #include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/Clock.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 
 #include "lcdgui/screens/SyncScreen.hpp"
 #include "sequencer/Sequence.hpp"

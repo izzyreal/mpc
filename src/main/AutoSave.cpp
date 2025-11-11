@@ -1,7 +1,7 @@
 #include "AutoSave.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientEventController.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/screens/window/NameScreen.hpp"

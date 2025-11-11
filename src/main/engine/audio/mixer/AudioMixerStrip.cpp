@@ -163,7 +163,7 @@ AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
     return AudioProcessChain::createProcess(controls);
 }
 
-int AudioMixerStrip::mix(AudioBuffer *bufferToMix, vector<float> &gain)
+int AudioMixerStrip::mix(AudioBuffer *bufferToMix, const vector<float> &gain)
 {
     auto doMix = buffer.get() != bufferToMix;
     auto snc = bufferToMix->getChannelCount();

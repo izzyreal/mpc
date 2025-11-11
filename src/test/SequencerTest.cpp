@@ -12,7 +12,7 @@
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
 

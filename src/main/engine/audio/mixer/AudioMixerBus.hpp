@@ -26,7 +26,7 @@ namespace mpc::engine::audio::mixer
         void write(int nFrames) const;
 
     public:
-        AudioMixerBus(AudioMixer *mixer,
+        AudioMixerBus(const AudioMixer *mixer,
                       const std::shared_ptr<BusControls> &busControls);
     };
 } // namespace mpc::engine::audio::mixer

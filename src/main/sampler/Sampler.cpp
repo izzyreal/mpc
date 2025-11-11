@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "MpcSpecs.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/WavInputStringStream.hpp"
 
 #include "controller/ClientEventController.hpp"

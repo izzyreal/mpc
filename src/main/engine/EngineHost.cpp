@@ -1,8 +1,7 @@
-#include "AudioMidiServices.hpp"
+#include "EngineHost.hpp"
 
 #include "Mpc.hpp"
 
-#include "hardware/Hardware.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 
@@ -20,7 +19,6 @@
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "engine/audio/server/RealTimeAudioServer.hpp"
 #include "engine/audio/server/CompoundAudioClient.hpp"
-#include "engine/control/CompoundControl.hpp"
 #include "engine/control/CompoundControl.hpp"
 #include "engine/control/BooleanControl.hpp"
 #include "engine/audio/mixer/MixerControls.hpp"
@@ -49,12 +47,12 @@ using namespace mpc::engine;
 
 using namespace mpc::sequencer;
 
-AudioMidiServices::AudioMidiServices(mpc::Mpc &mpcToUse) : mpc(mpcToUse)
+EngineHost::EngineHost(Mpc &mpcToUse) : mpc(mpcToUse)
 {
     VoiceUtil::freqTable();
 }
 
-void AudioMidiServices::start()
+void EngineHost::start()
 {
     realTimeAudioServer = std::make_shared<RealTimeAudioServer>();
     nonRealTimeAudioServer =
@@ -101,7 +99,7 @@ void AudioMidiServices::start()
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
 
-void AudioMidiServices::setMonitorLevel(const int level) const
+void EngineHost::setMonitorLevel(const int level) const
 {
     const auto sc = mixer->getMixerControls()->getStripControls("66");
     const auto mmc =
@@ -110,7 +108,7 @@ void AudioMidiServices::setMonitorLevel(const int level) const
         ->setValue(static_cast<float>(level));
 }
 
-void AudioMidiServices::muteMonitor(const bool mute) const
+void EngineHost::muteMonitor(const bool mute) const
 {
     const auto sc = mixer->getMixerControls()->getStripControls("66");
     const auto mmc =
@@ -120,23 +118,23 @@ void AudioMidiServices::muteMonitor(const bool mute) const
     mc->setValue(mute);
 }
 
-std::shared_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder()
+std::shared_ptr<SoundRecorder> EngineHost::getSoundRecorder()
 {
     return soundRecorder;
 }
 
-std::shared_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
+std::shared_ptr<SoundPlayer> EngineHost::getSoundPlayer()
 {
     return soundPlayer;
 }
 
 std::shared_ptr<NonRealTimeAudioServer>
-AudioMidiServices::getAudioServer() const
+EngineHost::getAudioServer() const
 {
     return nonRealTimeAudioServer;
 }
 
-void AudioMidiServices::setupMixer()
+void EngineHost::setupMixer()
 {
     mixerControls = std::make_shared<MixerControls>("", 1.f);
 
@@ -166,7 +164,7 @@ void AudioMidiServices::setupMixer()
     setAssignableMixOutLevels();
 }
 
-void AudioMidiServices::setMainLevel(const int i) const
+void EngineHost::setMainLevel(const int i) const
 {
     const auto sc = mixer->getMixerControls()->getStripControls("L-R");
     const auto cc =
@@ -174,7 +172,7 @@ void AudioMidiServices::setMainLevel(const int i) const
     std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->setValue(i);
 }
 
-int AudioMidiServices::getMainLevel() const
+int EngineHost::getMainLevel() const
 {
     const auto sc = mixer->getMixerControls()->getStripControls("L-R");
     const auto cc =
@@ -184,13 +182,13 @@ int AudioMidiServices::getMainLevel() const
     return static_cast<int>(val);
 }
 
-void AudioMidiServices::setRecordLevel(const int i) const
+void EngineHost::setRecordLevel(const int i) const
 {
     soundRecorder->setInputGain(i);
     setMonitorLevel(i);
 }
 
-int AudioMidiServices::getRecordLevel() const
+int EngineHost::getRecordLevel() const
 {
     return soundRecorder->getInputGain();
     /*
@@ -202,7 +200,7 @@ int AudioMidiServices::getRecordLevel() const
     */
 }
 
-void AudioMidiServices::setAssignableMixOutLevels() const
+void EngineHost::setAssignableMixOutLevels() const
 {
     /*
      * We have to make sure the ASSIGNABLE MIX OUTs are audible. They're fixed
@@ -220,12 +218,12 @@ void AudioMidiServices::setAssignableMixOutLevels() const
 }
 
 std::shared_ptr<PreviewSoundPlayer>
-AudioMidiServices::getPreviewSoundPlayer() const
+EngineHost::getPreviewSoundPlayer() const
 {
     return previewSoundPlayer;
 }
 
-void AudioMidiServices::createSynth()
+void EngineHost::createSynth()
 {
     basicVoice = std::make_shared<Voice>(65, true);
 
@@ -238,7 +236,7 @@ void AudioMidiServices::createSynth()
         mpc.getSampler(), mixer, basicVoice);
 }
 
-void AudioMidiServices::connectVoices()
+void EngineHost::connectVoices()
 {
     for (auto j = 0; j < 32; j++)
     {
@@ -256,7 +254,7 @@ void AudioMidiServices::connectVoices()
     previewSoundPlayer->connectVoice();
 }
 
-void AudioMidiServices::initializeDiskRecorders()
+void EngineHost::initializeDiskRecorders()
 {
     for (int i = 0; i < outputProcesses.size(); i++)
     {
@@ -277,7 +275,7 @@ void AudioMidiServices::initializeDiskRecorders()
     }
 }
 
-void AudioMidiServices::destroyServices() const
+void EngineHost::destroyServices() const
 {
     nonRealTimeAudioServer->stop();
     closeIO();
@@ -285,7 +283,7 @@ void AudioMidiServices::destroyServices() const
     nonRealTimeAudioServer->close();
 }
 
-void AudioMidiServices::closeIO() const
+void EngineHost::closeIO() const
 {
     realTimeAudioServer->closeAudioInput(inputProcess);
 
@@ -295,7 +293,7 @@ void AudioMidiServices::closeIO() const
     }
 }
 
-bool AudioMidiServices::prepareBouncing(const DirectToDiskSettings *settings)
+bool EngineHost::prepareBouncing(const DirectToDiskSettings *settings)
 {
     const auto destinationDirectory =
         mpc.paths->recordingsPath() / settings->recordingName;
@@ -304,9 +302,8 @@ bool AudioMidiServices::prepareBouncing(const DirectToDiskSettings *settings)
 
     for (int i = 0; i < diskRecorders.size(); i++)
     {
-        const auto eapa = diskRecorders[i];
-
-        if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate,
+        if (const auto diskRecorder = diskRecorders[i];
+            !diskRecorder->prepare(settings->lengthInFrames, settings->sampleRate,
                            !settings->splitStereoIntoLeftAndRightChannel,
                            destinationDirectory))
         {
@@ -318,7 +315,7 @@ bool AudioMidiServices::prepareBouncing(const DirectToDiskSettings *settings)
     return true;
 }
 
-void AudioMidiServices::startBouncing()
+void EngineHost::startBouncing()
 {
     if (!bouncePrepared)
     {
@@ -329,7 +326,7 @@ void AudioMidiServices::startBouncing()
     bouncing.store(true);
 }
 
-void AudioMidiServices::stopBouncing()
+void EngineHost::stopBouncing()
 {
     if (!bouncing.load())
     {
@@ -359,7 +356,7 @@ void AudioMidiServices::stopBouncing()
     }
 }
 
-void AudioMidiServices::stopBouncingEarly()
+void EngineHost::stopBouncingEarly()
 {
     if (!bouncing.load())
     {
@@ -374,12 +371,12 @@ void AudioMidiServices::stopBouncingEarly()
     stopBouncing();
 }
 
-void AudioMidiServices::startRecordingSound()
+void EngineHost::startRecordingSound()
 {
     recordingSound.store(true);
 }
 
-void AudioMidiServices::stopSoundRecorder(const bool cancel)
+void EngineHost::stopSoundRecorder(const bool cancel)
 {
     if (cancel)
     {
@@ -389,23 +386,23 @@ void AudioMidiServices::stopSoundRecorder(const bool cancel)
     recordingSound.store(false);
 }
 
-bool AudioMidiServices::isBouncePrepared() const
+bool EngineHost::isBouncePrepared() const
 {
     return bouncePrepared;
 }
 
-bool AudioMidiServices::isBouncing() const
+bool EngineHost::isBouncing() const
 {
     return bouncing.load();
 }
 
-bool AudioMidiServices::isRecordingSound() const
+bool EngineHost::isRecordingSound() const
 {
     return recordingSound.load();
 }
 
 // Should be called from the audio thread only!
-void AudioMidiServices::changeSoundRecorderStateIfRequired()
+void EngineHost::changeSoundRecorderStateIfRequired()
 {
     if (wasRecordingSound && !soundRecorder->isRecording())
     {
@@ -428,7 +425,7 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
 }
 
 // Should be called from the audio thread only!
-void AudioMidiServices::changeBounceStateIfRequired()
+void EngineHost::changeBounceStateIfRequired()
 {
     const auto directToDiskRecorderScreen =
         mpc.screens->get<ScreenId::VmpcDirectToDiskRecorderScreen>();
@@ -471,11 +468,11 @@ void AudioMidiServices::changeBounceStateIfRequired()
 }
 
 // Should be called from the audio thread only!
-void AudioMidiServices::switchMidiControlMappingIfRequired() const
+void EngineHost::switchMidiControlMappingIfRequired() const
 {
-    const auto vmpcMidiScreen = mpc.screens->get<ScreenId::VmpcMidiScreen>();
-
-    if (vmpcMidiScreen->shouldSwitch.load())
+    if (const auto vmpcMidiScreen =
+            mpc.screens->get<ScreenId::VmpcMidiScreen>();
+        vmpcMidiScreen->shouldSwitch.load())
     {
         vmpcMidiScreen->activePreset = vmpcMidiScreen->switchToPreset;
 
@@ -488,7 +485,7 @@ void AudioMidiServices::switchMidiControlMappingIfRequired() const
     }
 }
 
-void AudioMidiServices::setMixerMasterLevel(const int8_t dbValue) const
+void EngineHost::setMixerMasterLevel(const int8_t dbValue) const
 {
     for (auto &v : voices)
     {
@@ -496,18 +493,18 @@ void AudioMidiServices::setMixerMasterLevel(const int8_t dbValue) const
     }
 }
 
-std::shared_ptr<AudioMixer> AudioMidiServices::getMixer()
+std::shared_ptr<AudioMixer> EngineHost::getMixer()
 {
     return mixer;
 }
 
-std::vector<std::shared_ptr<engine::Voice>> &AudioMidiServices::getVoices()
+std::vector<std::shared_ptr<Voice>> &EngineHost::getVoices()
 {
     return voices;
 }
 
-std::vector<mpc::engine::MixerInterconnection *> &
-AudioMidiServices::getMixerConnections()
+std::vector<MixerInterconnection *> &
+EngineHost::getMixerConnections()
 {
     return mixerConnections;
 }

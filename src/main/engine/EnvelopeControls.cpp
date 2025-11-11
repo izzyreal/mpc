@@ -71,12 +71,12 @@ float EnvelopeControls::deriveTimeFactor(float milliseconds) const
     return static_cast<float>(1.0f - exp(k));
 }
 
-float EnvelopeControls::deriveAttack()
+float EnvelopeControls::deriveAttack() const
 {
     return deriveTimeFactor(attackControl->getValue());
 }
 
-float EnvelopeControls::deriveDecay()
+float EnvelopeControls::deriveDecay() const
 {
     return deriveTimeFactor(decayControl->getValue());
 }

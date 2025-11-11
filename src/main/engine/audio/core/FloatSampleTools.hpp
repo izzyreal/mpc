@@ -70,7 +70,7 @@ namespace mpc::engine::audio::core
         static int quantize32(float sample, float ditherBits);
 
     public:
-        static void float2byte(std::vector<std::vector<float>> &input,
+        static void float2byte(const std::vector<std::vector<float>> &input,
                                int inOffset, std::vector<char> &output,
                                int outByteOffset, int frameCount,
                                AudioFormat *format, float ditherBits);
@@ -81,7 +81,7 @@ namespace mpc::engine::audio::core
                                       int outByteOffset, int outByteStep,
                                       int sampleCount, AudioFormat *format,
                                       float ditherBits);
-        static void float2byteGeneric(std::vector<float> &input, int inOffset,
+        static void float2byteGeneric(const std::vector<float> &input, int inOffset,
                                       std::vector<char> &output,
                                       int outByteOffset, int outByteStep,
                                       int sampleCount, int formatType,

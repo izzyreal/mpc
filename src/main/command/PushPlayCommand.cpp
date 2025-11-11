@@ -1,7 +1,7 @@
 #include "PushPlayCommand.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "hardware/ComponentId.hpp"

@@ -3,7 +3,7 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/DirectToDiskSettings.hpp"
 
 #include "sequencer/Sequencer.hpp"

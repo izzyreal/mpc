@@ -39,8 +39,8 @@ namespace mpc::engine
 
     public:
         float deriveTimeFactor(float milliseconds) const;
-        float deriveAttack();
-        float deriveDecay();
+        float deriveAttack() const;
+        float deriveDecay() const;
         mpc::engine::control::LawControl *createAttackControl(float init) const;
         mpc::engine::control::LawControl *createHoldControl(float init) const;
         mpc::engine::control::LawControl *createDecayControl(float init) const;

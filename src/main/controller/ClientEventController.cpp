@@ -2,7 +2,7 @@
 #include "sequencer/Transport.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 #include "controller/ClientMidiEventController.hpp"
 

@@ -1,7 +1,7 @@
 #include "controller/ClientHardwareEventController.hpp"
 #include "sequencer/Transport.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "command/AllCommands.hpp"
 #include "command/context/NoteInputScreenUpdateContext.hpp"
 #include "command/context/PushPadScreenUpdateContext.hpp"

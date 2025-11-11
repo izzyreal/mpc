@@ -20,7 +20,7 @@ void CompoundAudioClient::add(AudioClient *client)
     clients.push_back(client);
 }
 
-void CompoundAudioClient::remove(AudioClient *client)
+void CompoundAudioClient::remove(const AudioClient *client)
 {
     if (client == nullptr)
     {

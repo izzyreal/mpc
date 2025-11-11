@@ -1,6 +1,6 @@
 #include "DrumNoteEventContextBuilder.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sequencer/Bus.hpp"
 #include "engine/audio/mixer/AudioMixer.hpp"

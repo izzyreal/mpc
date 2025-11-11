@@ -18,7 +18,7 @@ namespace mpc::engine::audio::server
 
         void add(AudioClient *client);
 
-        void remove(AudioClient *client);
+        void remove(const AudioClient *client);
     };
 
 } // namespace mpc::engine::audio::server

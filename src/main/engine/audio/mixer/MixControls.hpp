@@ -44,7 +44,7 @@ namespace mpc::engine::audio::mixer
 
         bool isMute() const;
 
-        bool isEnabled();
+        bool isEnabled() const;
 
         float getGain() const;
 

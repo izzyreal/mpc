@@ -1,7 +1,7 @@
 #include "SampleScreen.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundRecorder.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "lcdgui/Label.hpp"

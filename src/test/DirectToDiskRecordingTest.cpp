@@ -7,7 +7,7 @@
 #include "sequencer/Clock.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "file/wav/WavFile.hpp"
 

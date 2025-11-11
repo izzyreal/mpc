@@ -8,7 +8,7 @@
 #include "controller/ClientHardwareEventController.hpp"
 #include "engine/DrumNoteEventContextBuilder.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "sequencer/Bus.hpp"
@@ -428,7 +428,7 @@ void EventHandler::handleNoteEventMidiOut(
         trackDevice != 0)
     {
         // msg->bufferPos = mpc.getAudioMidiServices()
-        //->getFrameSequencer()
+        //->getSequencerPlaybackEngine()
         //->getEventFrameOffset();
         // mpc.getMidiOutput()->enqueueMessageOutputA(msg);
     }

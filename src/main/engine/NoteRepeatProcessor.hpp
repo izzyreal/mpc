@@ -31,13 +31,12 @@ namespace mpc::engine
             std::function<bool()> &isFullLevelEnabled,
             std::function<bool()> &isSixteenLevelsEnabled);
 
-        void process(
-                     sequencer::SequencerPlaybackEngine *,
+        void process(const sequencer::SequencerPlaybackEngine *,
                      unsigned int tickPosition,
                      int durationTicks,
                      unsigned short eventFrameOffset,
                      double tempo,
-                     float sampleRate);
+                     float sampleRate) const;
 
     private:
         const std::shared_ptr<sequencer::Sequencer> sequencer;

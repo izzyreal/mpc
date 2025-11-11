@@ -7,7 +7,7 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "sampler/Sampler.hpp"
 #include "sequencer/Bus.hpp"
-#include "sequencer/FrameSeq.hpp"
+#include "sequencer/SequencerPlaybackEngine.hpp"
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/NoteEvent.hpp"
@@ -52,22 +52,22 @@ NoteRepeatProcessor::NoteRepeatProcessor(
 }
 
 void NoteRepeatProcessor::process(
-        FrameSeq *frameSequencer,
+    const SequencerPlaybackEngine *sequencerPlaybackEngine,
     unsigned int tickPosition, int durationTicks,
-    unsigned short eventFrameOffset, double tempo,
-    float sampleRate)
+    const unsigned short eventFrameOffset, const double tempo,
+    const float sampleRate) const
 {
-    auto track = sequencer->getActiveTrack();
+    const auto track = sequencer->getActiveTrack();
     auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
 
     std::shared_ptr<Program> program;
     if (drumBus) program = sampler->getProgram(drumBus->getProgram());
 
     auto note = assign16LevelsScreen->getNote();
-    auto snapshot = eventRegistry->getSnapshot();
+    const auto snapshot = eventRegistry->getSnapshot();
 
-    static const std::vector<eventregistry::Source> exclude{
-        eventregistry::Source::NoteRepeat, eventregistry::Source::Sequence};
+    static const std::vector exclude{
+        Source::NoteRepeat, Source::Sequence};
 
     for (int pad = 0; pad < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX; ++pad)
     {
@@ -144,7 +144,7 @@ void NoteRepeatProcessor::process(
         {
             const auto noteParams = program->getNoteParameters(note);
             const auto sound = sampler->getSound(noteParams->getSoundIndex());
-            auto overlap = (sound && sound->isLoopEnabled())
+            const auto overlap = sound && sound->isLoopEnabled()
                                ? VoiceOverlapMode::NOTE_OFF
                                : noteParams->getVoiceOverlapMode();
 
@@ -164,8 +164,8 @@ void NoteRepeatProcessor::process(
             track->insertEventWhileRetainingSort(noteEvent);
         }
 
-        frameSequencer->enqueueEventAfterNFrames(
-            [voices = voices, track, note, noteEvent, tickPosition, drumBus]
+        sequencerPlaybackEngine->enqueueEventAfterNFrames(
+            [voices = voices, note, tickPosition, drumBus]
             {
                 if (drumBus)
                 {

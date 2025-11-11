@@ -326,7 +326,7 @@ int FloatSampleTools::quantize32(float sample, float ditherBits)
     }
 }
 
-void FloatSampleTools::float2byte(std::vector<std::vector<float>> &input,
+void FloatSampleTools::float2byte(const std::vector<std::vector<float>> &input,
                                   int inOffset, std::vector<char> &output,
                                   int outByteOffset, int frameCount,
                                   AudioFormat *format, float ditherBits)
@@ -353,7 +353,7 @@ void FloatSampleTools::float2byteGeneric(std::vector<float> &input,
                       sampleCount, formatType, ditherBits);
 }
 
-void FloatSampleTools::float2byteGeneric(std::vector<float> &input,
+void FloatSampleTools::float2byteGeneric(const std::vector<float> &input,
                                          int inOffset,
                                          std::vector<char> &output,
                                          int outByteOffset, int outByteStep,

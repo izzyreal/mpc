@@ -45,12 +45,12 @@ namespace mpc::engine::audio::core
 
         void reset();
         void reset(int channels, int sampleCount, float sampleRate);
-        int getByteArrayBufferSize(AudioFormat *format);
+        int getByteArrayBufferSize(AudioFormat *format) const;
         int getByteArrayBufferSize(AudioFormat *format, int lenInSamples) const;
 
         int convertToByteArray_(int readOffset, int lenInSamples,
                                 std::vector<char> &buffer, int writeOffset,
-                                AudioFormat *format);
+                                AudioFormat *format) const;
 
         void changeSampleCount(int newSampleCount, bool keepOldSamples);
         void makeSilence();

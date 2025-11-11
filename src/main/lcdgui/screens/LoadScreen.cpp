@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "StrUtil.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 

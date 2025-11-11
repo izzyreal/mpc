@@ -6,7 +6,6 @@
 #include "DemoFiles.hpp"
 
 #include "controller/ClientHardwareEventController.hpp"
-#include "engine/MixerInterconnection.hpp"
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"
 #include "eventregistry/EventRegistry.hpp"
 #include "lcdgui/ScreenComponent.hpp"
@@ -17,7 +16,7 @@
 
 #include "disk/AbstractDisk.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiDeviceDetector.hpp"
 #include "audiomidi/MidiOutput.hpp"
@@ -52,7 +51,7 @@ Mpc::Mpc()
 
 void Mpc::init()
 {
-    std::vector<fs::path> requiredPaths{
+    const std::vector requiredPaths{
         paths->appDocumentsPath(), paths->configPath(),
         paths->storesPath(),       paths->defaultLocalVolumePath(),
         paths->recordingsPath(),   paths->autoSavePath()};
@@ -134,7 +133,7 @@ void Mpc::init()
     /*
      * AudioMidiServices requires sequencer to exist.
      */
-    audioMidiServices = std::make_shared<audiomidi::AudioMidiServices>(*this);
+    audioMidiServices = std::make_shared<audiomidi::EngineHost>(*this);
 
     MLOG("AudioMidiServices created");
 
@@ -188,19 +187,6 @@ void Mpc::init()
         {
             return clientEventController->clientHardwareEventController
                 ->isNoteRepeatLockedOrPressed();
-        },
-        [&]
-        {
-            return audioMidiServices->getMixer();
-        },
-        [&]
-        {
-            return clientEventController->isFullLevelEnabled();
-        },
-        [&]() -> std::vector<engine::MixerInterconnection *> &
-        {
-            return audioMidiServices->getMixerConnections();
-            {};
         });
     MLOG("Sequencer created");
 
@@ -254,7 +240,7 @@ std::shared_ptr<Sampler> Mpc::getSampler()
     return sampler;
 }
 
-std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
+std::shared_ptr<audiomidi::EngineHost> Mpc::getAudioMidiServices()
 {
     return audioMidiServices;
 }
@@ -353,7 +339,7 @@ std::shared_ptr<Clock> Mpc::getClock()
     return clock;
 }
 
-void Mpc::setPluginModeEnabled(bool b)
+void Mpc::setPluginModeEnabled(const bool b)
 {
     pluginModeEnabled = b;
 }

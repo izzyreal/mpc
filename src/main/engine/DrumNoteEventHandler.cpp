@@ -33,7 +33,7 @@ static constexpr int STRIP_OFFSET = 32;
 
 namespace
 {
-    void handleMuteGroups(NoteParameters *noteParameters, const int drumIndex,
+    void handleMuteGroups(const NoteParameters *noteParameters, const int drumIndex,
                           const std::vector<std::shared_ptr<Voice>> *voices)
     {
         if (noteParameters->getMuteAssignA() !=

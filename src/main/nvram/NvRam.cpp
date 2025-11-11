@@ -9,7 +9,7 @@
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/OthersScreen.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "sequencer/TimeSignature.hpp"

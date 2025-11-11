@@ -92,7 +92,7 @@ bool MixControls::isMute() const
     return mute;
 }
 
-bool MixControls::isEnabled()
+bool MixControls::isEnabled() const
 {
     return !isMute();
 }

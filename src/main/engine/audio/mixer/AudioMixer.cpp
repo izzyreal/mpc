@@ -87,7 +87,7 @@ void AudioMixer::work(int nFrames)
 }
 
 void AudioMixer::evaluateStrips(
-    std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate,
+    const std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToEvaluate,
     int nFrames)
 {
     for (auto &strip : stripsToEvaluate)
@@ -97,7 +97,7 @@ void AudioMixer::evaluateStrips(
 }
 
 void AudioMixer::silenceStrips(
-    std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence)
+    const std::vector<std::shared_ptr<AudioMixerStrip>> &stripsToSilence)
 {
     for (auto &strip : stripsToSilence)
     {

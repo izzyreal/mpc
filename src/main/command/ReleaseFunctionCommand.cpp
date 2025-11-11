@@ -1,7 +1,7 @@
 #include "ReleaseFunctionCommand.hpp"
 #include "sequencer/Transport.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundPlayer.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"

@@ -3,7 +3,7 @@
 
 #include "Mpc.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/EventHandler.hpp"
 #include "audiomidi/MidiOutput.hpp"
 
@@ -57,7 +57,7 @@ void MidiClockOutput::sendMidiSyncMsg(unsigned char status) const
 {
     // midiSyncStartStopContinueMsg->setMessage(status);
 
-    // bufferpos should be set by FrameSeq when it's actually emitting these
+    // bufferpos should be set by SequencerPlaybackEngine when it's actually emitting these
     // events, i.e. enqueueing them for host processing
     // midiSyncStartStopContinueMsg->bufferPos = static_cast<int>(frameIndex);
     /*

@@ -37,7 +37,7 @@ namespace mpc::engine::audio::mixer
     public:
         bool processBuffer(int nFrames);
 
-        int mix(core::AudioBuffer *bufferToMix, std::vector<float> &gain);
+        int mix(core::AudioBuffer *bufferToMix, const std::vector<float> &gain);
 
     public:
         std::shared_ptr<AudioProcess> createProcess(

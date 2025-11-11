@@ -52,8 +52,7 @@ namespace mpc::audiomidi
 
 namespace mpc::audiomidi
 {
-
-    class AudioMidiServices final
+    class EngineHost final
     {
         using NonRealTimeAudioServer =
             engine::audio::server::NonRealTimeAudioServer;
@@ -66,7 +65,7 @@ namespace mpc::audiomidi
         using IOAudioProcess = engine::audio::server::IOAudioProcess;
 
     public:
-        explicit AudioMidiServices(Mpc &mpcToUse);
+        explicit EngineHost(Mpc &mpcToUse);
 
         void start();
 

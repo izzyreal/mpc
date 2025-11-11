@@ -12,7 +12,7 @@
 #include "Field.hpp"
 #include "Component.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/SoundRecorder.hpp"
 
 #include "lcdgui/Layer.hpp"

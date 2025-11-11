@@ -1,7 +1,7 @@
 #include "VmpcRecordJamScreen.hpp"
 
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "audiomidi/DirectToDiskSettings.hpp"
 
 #include "engine/audio/server/NonRealTimeAudioServer.hpp"

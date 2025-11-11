@@ -1,6 +1,6 @@
 #include "PushMainScreenCommand.hpp"
 #include "Mpc.hpp"
-#include "audiomidi/AudioMidiServices.hpp"
+#include "engine/EngineHost.hpp"
 #include "hardware/Hardware.hpp"
 #include "sequencer/Sequencer.hpp"
 

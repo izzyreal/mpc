@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "WavOutputFileStream.hpp"
-#include "AudioMidiServices.hpp"
+#include "../engine/EngineHost.hpp"
 
 #include "engine/audio/core/AudioFormat.hpp"
 #include "engine/audio/core/AudioBuffer.hpp"
