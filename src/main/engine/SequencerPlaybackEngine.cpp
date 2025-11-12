@@ -245,10 +245,10 @@ void SequencerPlaybackEngine::displayPunchRects() const
 void SequencerPlaybackEngine::stopCountingInIfRequired() const
 {
     if (sequencer->getTransport()->getTickPosition() >=
-        sequencer->getTransport()->getCountInEndPos())
+        sequencer->getTransport()->getCountInEndPosTicks())
     {
         setTickPositionEffectiveImmediately(
-            sequencer->getTransport()->getCountInStartPos());
+            sequencer->getTransport()->getCountInStartPosTicks());
         sequencer->getTransport()->setCountingIn(false);
         sequencer->getTransport()->resetCountInPositions();
     }

@@ -72,7 +72,8 @@ void PushPlayStartCommand::execute()
             mpc.getSequencer()->setSongModeEnabled(
                 mpc.getLayeredScreen()->isCurrentScreen(
                     {ScreenId::SongScreen}));
-            mpc.getSequencer()->getTransport()->playFromStart();
+            constexpr bool fromStart = true;
+            mpc.getSequencer()->getTransport()->play(fromStart);
         }
     }
 

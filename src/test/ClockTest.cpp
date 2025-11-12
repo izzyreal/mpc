@@ -322,7 +322,7 @@ TEST_CASE("1 bar loop", "[clock]")
     assert(mpc.getSequencer()->getTransport()->getTickPosition() == 0);
 
     mpc.getSequencer()->getSequence(0)->init(1);
-    mpc.getSequencer()->getTransport()->playFromStart();
+    mpc.getSequencer()->getTransport()->play();
 
     auto syncScreen = mpc.screens->get<mpc::lcdgui::ScreenId::SyncScreen>();
     syncScreen->modeIn = 1;

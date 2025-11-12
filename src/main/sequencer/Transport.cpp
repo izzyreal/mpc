@@ -7,7 +7,6 @@
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
-#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 #include "lcdgui/screens/window/IgnoreTempoChangeScreen.hpp"
 #include "lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp"
 #include "engine/SequencerPlaybackEngine.hpp"
@@ -40,144 +39,7 @@ bool Transport::isPlaying() const
 
 void Transport::play(const bool fromStart)
 {
-    if (isPlaying())
-    {
-        return;
-    }
-
-    endOfSong = false;
-    const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    const auto currentSong =
-        sequencer.getSong(songScreen->getActiveSongIndex());
-
-    const auto snapshot = sequencer.getStateManager()->getSnapshot();
-    const bool songMode = snapshot.isSongModeEnabled();
-
-    if (songMode)
-    {
-        if (!currentSong->isUsed())
-        {
-            return;
-        }
-
-        if (fromStart)
-        {
-            songScreen->setOffset(-1);
-        }
-
-        if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
-        {
-            return;
-        }
-
-        int step = songScreen->getOffset() + 1;
-
-        if (step > currentSong->getStepCount())
-        {
-            step = currentSong->getStepCount() - 1;
-        }
-
-        if (const std::shared_ptr<Step> currentStep =
-                currentSong->getStep(step).lock();
-            !sequencer.getSequence(currentStep->getSequence())->isUsed())
-        {
-            return;
-        }
-    }
-
-    const auto countMetronomeScreen =
-        sequencer.getScreens()->get<ScreenId::CountMetronomeScreen>();
-    const auto countInMode = countMetronomeScreen->getCountInMode();
-
-    std::optional<int64_t> positionQuarterNotesToStartPlayingFrom =
-        std::nullopt;
-
-    if (!countEnabled || countInMode == 0 ||
-        (countInMode == 1 && !isRecordingOrOverdubbing()))
-    {
-        if (fromStart && snapshot.getPositionQuarterNotes() != 0)
-        {
-            positionQuarterNotesToStartPlayingFrom = 0;
-        }
-    }
-
-    const auto s = sequencer.getActiveSequence();
-
-    if (countEnabled && !songMode)
-    {
-        if (countInMode == 2 ||
-            (countInMode == 1 && isRecordingOrOverdubbing()))
-        {
-            if (fromStart)
-            {
-                positionQuarterNotesToStartPlayingFrom =
-                    Sequencer::ticksToQuarterNotes(s->getLoopStart());
-            }
-            else
-            {
-                positionQuarterNotesToStartPlayingFrom =
-                    Sequencer::ticksToQuarterNotes(
-                        s->getFirstTickOfBar(getCurrentBarIndex()));
-            }
-
-            countInStartPos = Sequencer::quarterNotesToTicks(
-                snapshot.getPositionQuarterNotes());
-            countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
-
-            countingIn = true;
-        }
-    }
-
-    if (positionQuarterNotesToStartPlayingFrom)
-    {
-        setPosition(*positionQuarterNotesToStartPlayingFrom);
-    }
-
-    if (!songMode)
-    {
-        if (!s->isUsed())
-        {
-            recording = false;
-            overdubbing = false;
-            return;
-        }
-
-        s->initLoop();
-
-        if (recording || overdubbing)
-        {
-            sequencer.storeActiveSequenceInUndoPlaceHolder();
-        }
-    }
-
-    if (sequencer.isBouncePrepared())
-    {
-        sequencer.startBouncing();
-    }
-    else
-    {
-        getSequencerPlaybackEngine()->start();
-    }
-}
-
-void Transport::playFromStart()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    play(true);
-}
-
-void Transport::play()
-{
-    if (isPlaying())
-    {
-        return;
-    }
-
-    play(false);
+    sequencer.getStateManager()->enqueue(Play{fromStart});
 }
 
 void Transport::rec()
@@ -469,14 +331,22 @@ void Transport::setPunchOutTime(const int time)
     punchOutTime = time;
 }
 
-int64_t Transport::getCountInStartPos() const
+int64_t Transport::getCountInStartPosTicks() const
 {
     return countInStartPos;
 }
 
-int64_t Transport::getCountInEndPos() const
+int64_t Transport::getCountInEndPosTicks() const
 {
     return countInEndPos;
+}
+void Transport::setCountInStartPosTicks(const int64_t pos)
+{
+    countInStartPos = pos;
+}
+void Transport::setCountInEndPosTicks(const int64_t pos)
+{
+    countInEndPos = pos;
 }
 
 bool Transport::isTempoSourceSequenceEnabled() const

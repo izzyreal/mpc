@@ -40,13 +40,14 @@ namespace mpc::sequencer
     {
     };
 
-    struct PlayFromStart
+    struct Play
     {
+        bool fromStart;
     };
 
     using SequencerMessage =
         std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
                      BumpPositionByTicks, SetSongModeEnabled,
                      SwitchToNextSequence, SetActiveSequenceIndex, Stop,
-                     PlayFromStart>;
+                     Play>;
 } // namespace mpc::sequencer

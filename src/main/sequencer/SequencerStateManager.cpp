@@ -1,9 +1,20 @@
 #include "sequencer/SequencerStateManager.hpp"
 
-#include "Transport.hpp"
+#include "sequencer/Transport.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Sequence.hpp"
+#include "sequencer/Song.hpp"
+#include "sequencer/Step.hpp"
+
+#include "engine/SequencerPlaybackEngine.hpp"
+
+#include "lcdgui/ScreenId.hpp"
+#include "lcdgui/Screens.hpp"
+#include "lcdgui/screens/SongScreen.hpp"
+#include "lcdgui/screens/window/CountMetronomeScreen.hpp"
 
 using namespace mpc::sequencer;
+using namespace mpc::lcdgui;
 
 using Base =
     mpc::concurrency::AtomicStateExchange<SequencerState, SequencerStateView,
@@ -85,7 +96,8 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 enqueue(
                     SetActiveSequenceIndex{m.sequenceIndex, setPositionTo0});
                 enqueue(Stop{});
-                enqueue(PlayFromStart{});
+                constexpr bool fromStart = true;
+                enqueue(Play{fromStart});
             }
             else if constexpr (std::is_same_v<T, SetActiveSequenceIndex>)
             {
@@ -100,10 +112,141 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 sequencer->getTransport()->stop();
             }
-            else if constexpr (std::is_same_v<T, PlayFromStart>)
+            else if constexpr (std::is_same_v<T, Play>)
             {
-                sequencer->getTransport()->playFromStart();
+                applyPlayMessage(m.fromStart);
             }
         },
         msg);
+}
+
+void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
+{
+    auto transport = sequencer->getTransport();
+
+    if (transport->isPlaying())
+    {
+        return;
+    }
+
+    transport->setEndOfSong(false);
+
+    const auto songScreen =
+        sequencer->getScreens()->get<ScreenId::SongScreen>();
+
+    const auto currentSong =
+        sequencer->getSong(songScreen->getActiveSongIndex());
+
+    const bool songMode = activeState.songModeEnabled;
+
+    if (songMode)
+    {
+        if (!currentSong->isUsed())
+        {
+            return;
+        }
+
+        if (fromStart)
+        {
+            songScreen->setOffset(-1);
+        }
+
+        if (songScreen->getOffset() + 1 >
+            currentSong->getStepCount() - 1)
+        {
+            return;
+        }
+
+        int step = songScreen->getOffset() + 1;
+
+        if (step > currentSong->getStepCount())
+        {
+            step = currentSong->getStepCount() - 1;
+        }
+
+        if (const std::shared_ptr<Step> currentStep =
+                currentSong->getStep(step).lock();
+            !sequencer->getSequence(currentStep->getSequence())
+                 ->isUsed())
+        {
+            return;
+        }
+    }
+
+    const auto countMetronomeScreen =
+        sequencer->getScreens()
+            ->get<ScreenId::CountMetronomeScreen>();
+
+    const auto countInMode = countMetronomeScreen->getCountInMode();
+
+    std::optional<int64_t> positionQuarterNotesToStartPlayingFrom =
+        std::nullopt;
+
+    if (!transport->isCountEnabled() || countInMode == 0 ||
+        (countInMode == 1 && !transport->isRecordingOrOverdubbing()))
+    {
+        if (fromStart && activeState.positionQuarterNotes != 0)
+        {
+            positionQuarterNotesToStartPlayingFrom = 0;
+        }
+    }
+
+    const auto activeSequence = sequencer->getActiveSequence();
+
+    if (transport->isCountEnabled() && !songMode)
+    {
+        if (countInMode == 2 ||
+            (countInMode == 1 && transport->isRecordingOrOverdubbing()))
+        {
+            if (fromStart)
+            {
+                positionQuarterNotesToStartPlayingFrom =
+                    Sequencer::ticksToQuarterNotes(
+                        activeSequence->getLoopStart());
+            }
+            else
+            {
+                positionQuarterNotesToStartPlayingFrom =
+                    Sequencer::ticksToQuarterNotes(
+                        activeSequence->getFirstTickOfBar(transport->getCurrentBarIndex()));
+            }
+
+            transport->setCountInStartPosTicks(Sequencer::quarterNotesToTicks(
+                activeState.positionQuarterNotes));
+
+            transport->setCountInEndPosTicks(activeSequence->getLastTickOfBar(transport->getCurrentBarIndex()));
+            transport->setCountingIn(true);
+        }
+    }
+
+    if (positionQuarterNotesToStartPlayingFrom)
+    {
+        transport->setPosition(*positionQuarterNotesToStartPlayingFrom);
+    }
+
+    if (!songMode)
+    {
+        if (!activeSequence->isUsed())
+        {
+            transport->setRecording(false);
+            transport->setOverdubbing(false);
+            return;
+        }
+
+        activeSequence->initLoop();
+
+        if (transport->isRecordingOrOverdubbing())
+        {
+            sequencer->storeActiveSequenceInUndoPlaceHolder();
+        }
+    }
+
+    if (sequencer->isBouncePrepared())
+    {
+        sequencer->startBouncing();
+    }
+    else
+    {
+        transport->getSequencerPlaybackEngine()->start();
+    }
 }

@@ -32,9 +32,7 @@ namespace mpc::sequencer
             const std::function<
                 std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
-        void play();
-        void play(bool fromStart);
-        void playFromStart();
+        void play(bool fromStart = false);
         void rec();
         void recFromStart();
         void overdub();
@@ -86,8 +84,10 @@ namespace mpc::sequencer
         bool isCountingIn() const;
         void setCountingIn(bool b);
         void resetCountInPositions();
-        int64_t getCountInStartPos() const;
-        int64_t getCountInEndPos() const;
+        int64_t getCountInStartPosTicks() const;
+        int64_t getCountInEndPosTicks() const;
+        void setCountInStartPosTicks(int64_t);
+        void setCountInEndPosTicks(int64_t);
 
         bool isPunchEnabled() const;
         int getAutoPunchMode() const;
@@ -99,10 +99,11 @@ namespace mpc::sequencer
         void incrementPlayedStepRepetitions();
         void resetPlayedStepRepetitions();
 
+        const std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
+            getSequencerPlaybackEngine;
+
     private:
         Sequencer &sequencer;
-        std::function<std::shared_ptr<engine::SequencerPlaybackEngine>()>
-            getSequencerPlaybackEngine;
 
         bool playing = false;
         bool recording = false;
