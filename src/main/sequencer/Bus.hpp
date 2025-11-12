@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BusType.hpp"
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -17,11 +19,16 @@ namespace mpc::sequencer
     public:
         virtual ~Bus() = default;
 
-        Bus() = default;
+        Bus(BusType);
         Bus(const Bus &) = delete;
         Bus &operator=(const Bus &) = delete;
         Bus(Bus &&) = delete;
         Bus &operator=(Bus &&) = delete;
+
+        const BusType busType;
+
+    private:
+        Bus() = delete;
     };
 
     class DrumBus final : public Bus
@@ -70,7 +77,7 @@ namespace mpc::sequencer
     class MidiBus final : public Bus
     {
     public:
-        MidiBus() = default;
+        MidiBus();
         ~MidiBus() override = default;
 
         MidiBus(const MidiBus &) = delete;

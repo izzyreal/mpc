@@ -6,9 +6,9 @@ namespace mpc::eventregistry
 {
     struct State
     {
-        PhysicalPadPressEventPtrs physicalPadEvents;
-        ProgramPadPressEventPtrs programPadEvents;
-        NoteOnEventPtrs noteEvents;
+        PhysicalPadPressEvents physicalPadEvents;
+        ProgramPadPressEvents programPadEvents;
+        NoteOnEvents noteEvents;
 
         State() = default;
 

@@ -10,7 +10,10 @@
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-DrumBus::DrumBus(const int drumIndexToUse) : drumIndex(drumIndexToUse)
+Bus::Bus(BusType busType) : busType(busType) {}
+
+DrumBus::DrumBus(const int drumIndexToUse)
+    : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse)
 {
     receivePgmChange = true;
     receiveMidiVolume = true;
@@ -88,3 +91,5 @@ std::vector<std::shared_ptr<IndivFxMixer>> &DrumBus::getIndivFxMixerChannels()
 {
     return indivFxMixerChannels;
 }
+
+MidiBus::MidiBus() : Bus(BusType::MIDI) {}

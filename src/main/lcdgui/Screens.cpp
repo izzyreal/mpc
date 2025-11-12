@@ -11,6 +11,8 @@
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 
+#include "lcdgui/LayeredScreen.hpp"
+
 #include <StrUtil.hpp>
 #include "MpcResourceUtil.hpp"
 
@@ -25,6 +27,17 @@ using json = nlohmann::json;
 
 Screens::Screens(Mpc &mpc) : mpc(mpc) {}
 
+std::shared_ptr<ScreenComponent> Screens::getScreenById(ScreenId screenId)
+{
+    for (auto &s : screens)
+    {
+        if (LayeredScreen::getScreenId(s) == screenId)
+        {
+            return s;
+        }
+    }
+    return {};
+}
 void Screens::createAndCacheAllScreens()
 {
     for (auto [screenName, screenId] : screenNames)

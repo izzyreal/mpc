@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BusType.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -96,6 +98,7 @@ namespace mpc::sequencer
         void movePlaceHolderTo(int destIndex);
         std::shared_ptr<Sequence> getPlaceHolder();
         template <typename T> std::shared_ptr<T> getBus(int busIndex);
+        std::shared_ptr<Bus> getBus(BusType);
         std::shared_ptr<DrumBus> getDrumBus(int drumBusIndex) const;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         const std::function<bool()> isBouncePrepared;

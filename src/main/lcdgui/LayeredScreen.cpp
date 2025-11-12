@@ -223,7 +223,7 @@ void LayeredScreen::showPopupAndAwaitInteraction(const std::string &msg)
     openScreenById(ScreenId::PopupScreen);
 }
 
-std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen()
+std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen() const
 {
     assert(!history.empty());
     return history.back();
@@ -509,6 +509,10 @@ std::string LayeredScreen::getLastFocus(const std::string &screenName)
     }
 
     return lastFocus->second;
+}
+ScreenId LayeredScreen::getCurrentScreenId() const
+{
+    return getScreenId(getCurrentScreen());
 }
 
 std::string LayeredScreen::getCurrentScreenName() const

@@ -255,11 +255,13 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         const auto focusName = getStringProperty("focus.txt");
 
         layeredScreen->postToUiThread(
-            [layeredScreen, screenName, focusName, sequencer = mpc.getSequencer()]
+            [layeredScreen, screenName, focusName,
+             sequencer = mpc.getSequencer()]
             {
                 layeredScreen->openScreen(screenName);
 
-                if (screengroups::isSongScreen(layeredScreen->getCurrentScreen()))
+                if (screengroups::isSongScreen(
+                        layeredScreen->getCurrentScreen()))
                 {
                     sequencer->getTransport()->setPosition(0);
                 }

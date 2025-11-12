@@ -42,7 +42,6 @@ namespace mpc::sequencer
 
     using SequencerMessage =
         std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
-                     BumpPositionByTicks,
-                     SwitchToNextSequence, SetActiveSequenceIndex, Stop,
-                     Play>;
+                     BumpPositionByTicks, SwitchToNextSequence,
+                     SetActiveSequenceIndex, Stop, Play>;
 } // namespace mpc::sequencer

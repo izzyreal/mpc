@@ -34,6 +34,7 @@ namespace mpc::sampler
 
 namespace mpc::sequencer
 {
+    class Bus;
     class Sequencer;
     class Track;
 } // namespace mpc::sequencer
@@ -49,7 +50,7 @@ namespace mpc::command::context
     {
         eventregistry::Source source;
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
-        eventregistry::NoteOnEvent *registryNoteOnEvent;
+        eventregistry::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;
         std::optional<int> programPadIndex;
         int velocity;

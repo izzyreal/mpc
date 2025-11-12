@@ -136,7 +136,7 @@ TEST_CASE("ALL file note event", "[allfile]")
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     auto tr = seq->getTrack(63);
-    auto event = tr->recordNoteEventSynced(0, 60, 127);
+    auto event = tr->recordNoteEventNonLive(0, 60, 127);
     event->setNote(0);
     event->setTrack(tr->getIndex());
     event->setVelocity(127);

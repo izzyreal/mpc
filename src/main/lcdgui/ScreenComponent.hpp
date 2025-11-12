@@ -44,6 +44,7 @@ namespace mpc::lcdgui
         std::optional<int> getDrumIndex() const;
         std::string getFocusedFieldNameOrThrow();
         bool isFocusedFieldName(const std::string &);
+        std::optional<int> getProgramIndex() const;
         std::shared_ptr<sampler::Program> getProgram() const;
 
     protected:

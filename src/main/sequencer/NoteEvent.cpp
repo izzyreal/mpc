@@ -1,7 +1,6 @@
 #include "sequencer/NoteEvent.hpp"
 
 #include <algorithm>
-#include <cassert>
 
 using namespace mpc::sequencer;
 
@@ -20,7 +19,8 @@ int NoteOffEvent::getNote() const
     return number;
 }
 
-NoteOnEvent::NoteOnEvent(const int i, const int vel)
+NoteOnEvent::NoteOnEvent(const int i, const int vel, const NoteEventId id)
+    : id(id)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
     setNote(i);
@@ -37,6 +37,24 @@ NoteOnEvent::NoteOnEvent(const NoteOnEvent &event) : Event(event)
     setVariationValue(event.variationValue);
 }
 
+bool NoteOnEvent::finalizeNonLive(const int newDuration)
+{
+    const auto oldDuration = getDuration();
+    setDuration(newDuration);
+    setBeingRecorded(false);
+    return oldDuration != duration;
+}
+
+void NoteOnEvent::setMetronomeOnlyTickPosition(const int pos)
+{
+    metronomeOnlyTickPosition = pos;
+}
+
+int NoteOnEvent::getMetronomeOnlyTickPosition() const
+{
+    return metronomeOnlyTickPosition;
+}
+
 std::shared_ptr<NoteOffEvent> NoteOnEvent::getNoteOff() const
 {
     return noteOff;
@@ -46,6 +64,15 @@ void NoteOnEvent::setTrack(const int i)
 {
     track = i;
     noteOff->setTrack(i);
+}
+void NoteOnEvent::setBeingRecorded(bool b)
+{
+    beingRecorded = b;
+}
+
+bool NoteOnEvent::isBeingRecorded() const
+{
+    return beingRecorded;
 }
 
 void NoteOnEvent::setNote(const int i)
@@ -128,4 +155,9 @@ bool NoteOnEvent::isFinalized() const
 bool NoteOnEvent::isPlayOnly()
 {
     return dynamic_cast<NoteOnEventPlayOnly *>(this) != nullptr;
+}
+
+uint32_t NoteOnEvent::getId() const
+{
+    return id;
 }

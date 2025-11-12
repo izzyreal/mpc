@@ -33,7 +33,7 @@ SCENARIO("A MidiFile can be written", "[file]")
         track0->setUsed(true);
         track0->setDeviceIndex(2);
 
-        auto noteEvent = track0->recordNoteEventSynced(0, 37, 127);
+        auto noteEvent = track0->recordNoteEventNonLive(0, 37, 127);
         noteEvent->setDuration(10);
         noteEvent->setVelocity(127);
 

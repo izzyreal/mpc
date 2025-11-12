@@ -20,6 +20,7 @@
 #include "sequencer/NoteEvent.hpp"
 
 #include "eventregistry/EventRegistry.hpp"
+#include "sequencer/Track.hpp"
 
 using namespace mpc::command::context;
 using namespace mpc::controller;
@@ -33,7 +34,7 @@ using namespace mpc::engine;
 
 std::shared_ptr<TriggerLocalNoteOnContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-    const Source source, eventregistry::NoteOnEvent *registryNoteOnEvent,
+    const Source source, const eventregistry::NoteOnEvent &registryNoteOnEvent,
     const int note, const int velocity, Track *track,
     const std::shared_ptr<Bus> &bus,
     const std::shared_ptr<ScreenComponent> &screen,
@@ -121,9 +122,9 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
 std::shared_ptr<TriggerLocalNoteOffContext>
 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-    const Source source, const int note, Track *track,
-    const std::shared_ptr<Bus> &bus,
-    const std::shared_ptr<ScreenComponent> &screen,
+    const Source source, const int note,
+    const NoteEventId recordedNoteOnEventId, Track *track,
+    const BusType busType, const std::shared_ptr<ScreenComponent> &screen,
     const std::optional<int> programPadIndex,
     const std::shared_ptr<Program> &program,
     const std::shared_ptr<Sequencer> &sequencer,
@@ -137,8 +138,14 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
     const bool isSamplerScreen = screengroups::isSamplerScreen(screen);
 
     const auto registrySnapshot = eventRegistry->getSnapshot();
-    const std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent =
-        registrySnapshot.retrieveRecordNoteEvent(note);
+
+    std::shared_ptr<sequencer::NoteOnEvent> sequencerRecordNoteOnEvent;
+
+    if (recordedNoteOnEventId != NoNoteEventId)
+    {
+        sequencerRecordNoteOnEvent =
+            track->findRecordingNoteOnEventById(recordedNoteOnEventId);
+    }
 
     const auto stepEditOptionsScreen =
         screens->get<ScreenId::StepEditOptionsScreen>();
@@ -173,7 +180,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
         TriggerLocalNoteOffContext{
             source,
             eventRegistry,
-            bus,
+            sequencer->getBus(busType),
             program,
             programPadIndex,
             isSamplerScreen,

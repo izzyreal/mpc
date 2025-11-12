@@ -124,20 +124,22 @@ void TriggerLocalNoteOnCommand::execute()
 
     if (ctx->sequencer->getTransport()->isRecordingOrOverdubbing())
     {
-        recordNoteOnEvent = ctx->track->recordNoteEventASync(ctx->note, velo);
+        recordNoteOnEvent = ctx->track->recordNoteEventLive(ctx->note, velo);
     }
     else if (ctx->isStepRecording &&
              (ctx->track->getBus() == 0 || sequencer::isDrumNote(ctx->note)))
     {
-        recordNoteOnEvent = ctx->track->recordNoteEventSynced(
+        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
             ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
+
         ctx->sequencer->getTransport()->playMetronomeTrack();
-        recordNoteOnEvent->setMetrononomeOnlyTickPosition(
+
+        recordNoteOnEvent->setMetronomeOnlyTickPosition(
             ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
     }
     else if (ctx->isRecMainWithoutPlaying)
     {
-        recordNoteOnEvent = ctx->track->recordNoteEventSynced(
+        recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
             ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
         ctx->sequencer->getTransport()->playMetronomeTrack();
         recordNoteOnEvent->setTick(
@@ -166,6 +168,6 @@ void TriggerLocalNoteOnCommand::execute()
     if (recordNoteOnEvent)
     {
         apply16LevelsAndSliderNoteVariation(recordNoteOnEvent);
-        ctx->registryNoteOnEvent->recordNoteEvent = recordNoteOnEvent;
+        ctx->registryNoteOnEvent.recordNoteEventId = recordNoteOnEvent->getId();
     }
 }

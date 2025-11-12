@@ -121,8 +121,7 @@ void EngineHost::start()
         });
 
     sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
-        mpc.getSequencer().get(), mpc.getClock(),
-        mpc.getLayeredScreen(),
+        mpc.getSequencer().get(), mpc.getClock(), mpc.getLayeredScreen(),
         [&]
         {
             return isBouncing();
@@ -159,14 +158,13 @@ void EngineHost::start()
             return !nonRealTimeAudioServer->isRealTime();
         });
 
-
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
     compoundAudioClient->add(
         mpc.getEngineHost()->getSequencerPlaybackEngine().get());
     compoundAudioClient->add(mixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
 }
-void EngineHost::applyPendingStateChanges()
+void EngineHost::applyPendingStateChanges() const
 {
     mpc.getSequencer()->getStateManager()->drainQueue();
     mpc.eventRegistry->drainQueue();

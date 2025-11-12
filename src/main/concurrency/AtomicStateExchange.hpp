@@ -19,6 +19,7 @@ namespace mpc::concurrency
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
                                      size_t messageQueueCapacity = 512)
         {
+            actions.reserve(10);
             reserveFn(activeState);
 
             for (auto &s : pool)
@@ -55,6 +56,13 @@ namespace mpc::concurrency
             {
                 publishState();
             }
+
+            for (auto &a : actions)
+            {
+                a();
+            }
+
+            actions.clear();
         }
 
         View getSnapshot() const noexcept
@@ -65,6 +73,15 @@ namespace mpc::concurrency
         }
 
     protected:
+        virtual void applyMessage(const Message &msg) noexcept = 0;
+
+        State activeState;
+        std::array<State, PoolSize> pool;
+        std::shared_ptr<State> currentSnapshot;
+        State *writeBuffer;
+        size_t writeIndex = 1;
+        std::vector<std::function<void()>> actions;
+
         void publishState() noexcept
         {
             size_t nextIndex = (writeIndex + 1) % PoolSize;
@@ -93,14 +110,6 @@ namespace mpc::concurrency
             writeIndex = nextIndex;
             writeBuffer = dst;
         }
-
-        virtual void applyMessage(const Message &msg) noexcept = 0;
-
-        State activeState;
-        std::array<State, PoolSize> pool;
-        std::shared_ptr<State> currentSnapshot;
-        State *writeBuffer;
-        size_t writeIndex = 1;
 
     private:
         std::atomic<uint64_t> publishCount{0};

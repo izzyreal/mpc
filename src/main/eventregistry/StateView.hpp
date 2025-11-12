@@ -16,36 +16,25 @@ namespace mpc::eventregistry
         {
         }
 
-        bool isProgramPadPressedBySource(ProgramPadIndex idx, Source src) const;
+        bool isProgramPadPressedBySource(ProgramPadIndex, Source) const;
         VelocityOrPressure
-        getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex idx) const;
+            getPressedProgramPadAfterTouchOrVelocity(ProgramPadIndex) const;
 
-        bool isProgramPadPressed(ProgramPadIndex idx) const;
-        bool
-        isProgramPadPressed(ProgramPadIndex idx,
-                            const std::shared_ptr<sampler::Program> &) const;
+        bool isProgramPadPressed(ProgramPadIndex) const;
+        bool isProgramPadPressed(ProgramPadIndex, ProgramIndex) const;
 
-        ProgramPadPressEventPtr getMostRecentProgramPadPress(
-            ProgramPadIndex idx,
-            const std::vector<Source> &sourcesToExclude) const;
+        std::optional<ProgramPadPressEvent> getMostRecentProgramPadPress(
+            ProgramPadIndex, const std::vector<Source> &sourcesToExclude) const;
 
         int getTotalPressedProgramPadCount() const;
 
         int getTotalNoteOnCount() const;
 
-        NoteOnEventPtr retrievePlayNoteEvent(NoteNumber note) const;
-        std::shared_ptr<sequencer::NoteOnEvent>
-        retrieveRecordNoteEvent(NoteNumber note) const;
+        // std::shared_ptr<sequencer::NoteOnEvent>
+        // retrieveRecordNoteEvent(NoteNumber note) const;
 
-        PhysicalPadPressEventPtr
-        retrievePhysicalPadPressEvent(PhysicalPadIndex idx) const;
-
-        NoteOnEventPtr retrieveNoteEvent(NoteNumber note, Source src) const;
-
-        bool valid() const noexcept
-        {
-            return state != nullptr;
-        }
+        PhysicalPadPressEvent
+            retrievePhysicalPadPressEvent(PhysicalPadIndex) const;
 
     private:
         std::shared_ptr<const State> state;

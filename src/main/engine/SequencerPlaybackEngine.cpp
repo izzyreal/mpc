@@ -29,8 +29,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
-    Sequencer *sequencer,
-    const std::shared_ptr<Clock> &clock,
+    Sequencer *sequencer, const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     std::function<bool()> isBouncing, const std::function<int()> &getSampleRate,
     const std::function<bool()> &isRecMainWithoutPlaying,
@@ -39,14 +38,15 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
     const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor,
     std::function<bool()> isAudioServerCurrentlyRunningOffline)
-    : layeredScreen(layeredScreen),
-      getScreens(getScreens), sequencer(sequencer), clock(clock),
-      isBouncing(isBouncing), getSampleRate(getSampleRate),
+    : layeredScreen(layeredScreen), getScreens(getScreens),
+      sequencer(sequencer), clock(clock), isBouncing(isBouncing),
+      getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
       playMetronome(playMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
       noteRepeatProcessor(noteRepeatProcessor),
-      isAudioServerCurrentlyRunningOffline(isAudioServerCurrentlyRunningOffline),
+      isAudioServerCurrentlyRunningOffline(
+          isAudioServerCurrentlyRunningOffline),
       midiClockOutput(
           std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
 {
@@ -526,12 +526,11 @@ void SequencerPlaybackEngine::work(const int nFrames)
         return;
     }
 
-    if (sequencerIsRunningAtStartOfBuffer && isAudioServerCurrentlyRunningOffline())
+    if (sequencerIsRunningAtStartOfBuffer &&
+        isAudioServerCurrentlyRunningOffline())
     {
         clock->processBufferInternal(
-            sequencer->getTransport()->getTempo(),
-            sampleRate,
-            nFrames,
+            sequencer->getTransport()->getTempo(), sampleRate, nFrames,
             sequencer->getTransport()->getPlayStartPositionQuarterNotes());
     }
 

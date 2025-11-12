@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <vector>
 #include <memory>
 #include <string>
@@ -20,7 +22,6 @@ namespace mpc::lcdgui
 namespace mpc::sampler
 {
     class Sampler;
-    class Program;
 } // namespace mpc::sampler
 
 namespace mpc::audiomidi
@@ -40,7 +41,7 @@ namespace mpc::sequencer
     {
     public:
         Track(
-            const int trackIndex, Sequence *parent,
+            int trackIndex, Sequence *parent,
             const std::function<std::string(int)> &getDefaultTrackName,
             const std::function<int64_t()> &getTickPosition,
             const std::function<std::shared_ptr<lcdgui::Screens>()> &getScreens,
@@ -49,8 +50,7 @@ namespace mpc::sequencer
             const std::function<int()> &getAutoPunchMode,
             const std::function<std::shared_ptr<Bus>(int)> &getSequencerBus,
             const std::function<bool()> &isEraseButtonPressed,
-            const std::function<bool(int programPadIndex,
-                                     std::shared_ptr<sampler::Program>)>
+            const std::function<bool(int programPadIndex, ProgramIndex)>
                 &isProgramPadPressed,
             const std::shared_ptr<sampler::Sampler> &sampler,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
@@ -63,6 +63,7 @@ namespace mpc::sequencer
             const std::function<int64_t()> &getPunchOutTime,
             const std::function<bool()> &isSoloEnabled);
 
+        // Allocates! Don't invoke on audio thread
         std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents() const;
 
         void timingCorrect(int fromBar, int toBar,
@@ -88,16 +89,20 @@ namespace mpc::sequencer
             const std::shared_ptr<Event> &event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note,
-                                                           int velocity);
+        std::shared_ptr<NoteOnEvent> recordNoteEventNonLive(int tick, int note,
+                                                            int velocity);
 
-        bool finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
-                                     int duration) const;
         std::shared_ptr<NoteOnEvent>
-        recordNoteEventASync(unsigned char note, unsigned char velocity) const;
+        recordNoteEventLive(unsigned char note, unsigned char velocity);
 
+        // Only to be used for note events that are being recorded while the
+        // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
+        // other input.
+        // For non-live note event recording, i.e. in the step editor and in the
+        // MAIN screen when the sequencer is not running, use
+        // NoteOnEvent::finalizeNonLive.
         void
-        finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent> &event) const;
+        finalizeNoteEventLive(const std::shared_ptr<NoteOnEvent> &event) const;
 
         void
         addEvent(int tick, const std::shared_ptr<Event> &event,
@@ -140,6 +145,11 @@ namespace mpc::sequencer
 
         void purge();
 
+        std::shared_ptr<NoteOnEvent> findRecordingNoteOnEventById(NoteEventId);
+
+        std::shared_ptr<NoteOnEvent>
+            findRecordingNoteOnEventByNoteNumber(NoteNumber);
+
     private:
         static const int MAX_TICK{2147483647};
 
@@ -152,6 +162,8 @@ namespace mpc::sequencer
         int trackIndex = 0;
         bool used{false};
         int eventIndex = 0;
+
+        NoteEventId nextNoteEventId{MinNoteEventId};
 
         std::vector<std::shared_ptr<Event>> events;
 
@@ -173,8 +185,7 @@ namespace mpc::sequencer
         std::function<int()> getAutoPunchMode;
         std::function<std::shared_ptr<Bus>(int)> getSequencerBus;
         std::function<bool()> isEraseButtonPressed;
-        std::function<bool(int programPadIndex,
-                           std::shared_ptr<sampler::Program>)>
+        std::function<bool(int programPadIndex, ProgramIndex)>
             isProgramPadPressed;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;

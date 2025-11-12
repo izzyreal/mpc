@@ -69,7 +69,7 @@ namespace mpc::engine
         // by the audio thread in the correct state. This includes, but is not
         // limited to, the transport state, which pads are pressed and which
         // local note events are currently active.
-        void applyPendingStateChanges();
+        void applyPendingStateChanges() const;
 
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;

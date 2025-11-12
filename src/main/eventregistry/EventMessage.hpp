@@ -22,17 +22,17 @@ namespace mpc::eventregistry
             Clear
         } type;
 
-        PhysicalPadPressEventPtr physicalPadPress;
-        PhysicalPadAftertouchEventPtr physicalPadAftertouch;
-        PhysicalPadReleaseEventPtr physicalPadRelease;
+        PhysicalPadPressEvent physicalPadPress;
+        PhysicalPadAftertouchEvent physicalPadAftertouch;
+        PhysicalPadReleaseEvent physicalPadRelease;
 
-        ProgramPadPressEventPtr programPadPress;
-        ProgramPadAftertouchEventPtr programPadAftertouch;
-        ProgramPadReleaseEventPtr programPadRelease;
+        ProgramPadPressEvent programPadPress;
+        ProgramPadAftertouchEvent programPadAftertouch;
+        ProgramPadReleaseEvent programPadRelease;
 
-        NoteOnEventPtr noteOnEvent;
-        NoteAftertouchEventPtr noteAftertouchEvent;
-        NoteOffEventPtr noteOffEvent;
+        NoteOnEvent noteOnEvent;
+        NoteAftertouchEvent noteAftertouchEvent;
+        NoteOffEvent noteOffEvent;
 
         Source source;
         std::function<void(void *)> action = [](void *) {};

@@ -18,7 +18,7 @@ TEST_CASE("TimingCorrectScreen", "[timing-correct-screen]")
     auto event = mpc.getSequencer()
                      ->getActiveSequence()
                      ->getTrack(0)
-                     ->recordNoteEventSynced(1, 60, 127);
+                     ->recordNoteEventNonLive(1, 60, 127);
     mpc.getSequencer()
         ->getActiveSequence()
         ->getTrack(0)

@@ -8,7 +8,8 @@
 namespace mpc::eventregistry
 {
     class EventRegistry;
-}
+    class NoteOnEvent;
+} // namespace mpc::eventregistry
 
 namespace mpc::sampler
 {
@@ -17,6 +18,7 @@ namespace mpc::sampler
 
 namespace mpc::sequencer
 {
+    class Bus;
     class NoteOnEvent;
     class NoteOffEvent;
     class Track;
