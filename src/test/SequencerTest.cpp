@@ -8,7 +8,6 @@
 #include "sequencer/Clock.hpp"
 
 #include "command/TriggerLocalNoteOffCommand.hpp"
-#include "command/context/TriggerLocalNoteContextFactory.hpp"
 
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 
@@ -92,7 +91,6 @@ TEST_CASE("Can record and playback from different threads", "[sequencer-multithr
     std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
                                    192, 216, 240, 264, 288, 312, 336, 360};
 
-    bool mainThreadBusy = true;
     bool audioThreadBusy = true;
 
     mpc::Mpc mpc;
@@ -123,6 +121,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer-multithr
                        AUDIO_THREAD_TIMEOUT &&
                    track->getEvents().size() < humanTickPositions.size())
             {
+                mpc.getEngineHost()->applyPendingStateChanges();
                 mpc.getClock()->processBufferInternal(
                     seq->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE,
                     0);
@@ -313,6 +312,8 @@ TEST_CASE("Undo", "[sequencer]")
                 std::nullopt};
             mpc.clientEventController->handleClientEvent(clientEvent);
         }
+
+        mpc.getEngineHost()->applyPendingStateChanges();
 
         mpc.getClock()->processBufferInternal(
             sequencer->getTransport()->getTempo(), SAMPLE_RATE, BUFFER_SIZE, 0);
