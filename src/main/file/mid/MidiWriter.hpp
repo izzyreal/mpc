@@ -17,22 +17,18 @@ namespace mpc::file::mid
     class MidiWriter
     {
     public:
-        MidiWriter(mpc::sequencer::Sequence *sequence);
+        MidiWriter(sequencer::Sequence *sequence);
         void writeToOStream(const std::shared_ptr<std::ostream> &) const;
 
     private:
-        std::vector<std::shared_ptr<mpc::file::mid::event::NoteOn>> noteOffs;
-        std::vector<std::shared_ptr<mpc::file::mid::event::NoteOff>> variations;
-        std::vector<std::shared_ptr<mpc::file::mid::event::NoteOn>> noteOns;
-        std::vector<std::shared_ptr<mpc::file::mid::event::MidiEvent>>
-            miscEvents;
-        mpc::sequencer::Sequence *sequence;
-        std::unique_ptr<mpc::file::mid::MidiFile> mf;
+        std::vector<std::shared_ptr<event::NoteOn>> noteOffs;
+        std::vector<std::shared_ptr<event::NoteOff>> variations;
+        std::vector<std::shared_ptr<event::NoteOn>> noteOns;
+        std::vector<std::shared_ptr<event::MidiEvent>> miscEvents;
+        sequencer::Sequence *sequence;
+        std::unique_ptr<MidiFile> mf;
 
-    private:
-        void
-        addNoteOn(const std::shared_ptr<mpc::file::mid::event::NoteOn> &noteOn);
-        void
-        createDeltas(const std::weak_ptr<mpc::file::mid::MidiTrack> &mt) const;
+        void addNoteOn(const std::shared_ptr<event::NoteOn> &noteOn);
+        void createDeltas(const std::weak_ptr<MidiTrack> &mt) const;
     };
 } // namespace mpc::file::mid

@@ -48,7 +48,7 @@ json read(mpc::Mpc &mpc)
     return result;
 }
 
-std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc &mpc)
+std::string VolumesPersistence::getPersistedActiveUUID(Mpc &mpc)
 {
     json doc = read(mpc);
     auto &volumes = doc["volumes"];
@@ -68,7 +68,7 @@ std::string VolumesPersistence::getPersistedActiveUUID(mpc::Mpc &mpc)
 }
 
 std::map<std::string, MountMode>
-VolumesPersistence::getPersistedConfigs(mpc::Mpc &mpc)
+VolumesPersistence::getPersistedConfigs(Mpc &mpc)
 {
     std::map<std::string, MountMode> persistedConfigs;
 
@@ -84,7 +84,7 @@ VolumesPersistence::getPersistedConfigs(mpc::Mpc &mpc)
     return persistedConfigs;
 }
 
-void VolumesPersistence::save(mpc::Mpc &mpc)
+void VolumesPersistence::save(Mpc &mpc)
 {
     json d = read(mpc);
     auto &volumes = d["volumes"];
@@ -115,7 +115,7 @@ void VolumesPersistence::save(mpc::Mpc &mpc)
                 if (vol["uuid"].get<std::string>() == diskVol.volumeUUID)
                 {
                     vol["mode"] = diskVol.mode;
-                    vol["active"] = (diskVol.volumeUUID == activeUUID);
+                    vol["active"] = diskVol.volumeUUID == activeUUID;
                     break;
                 }
             }
@@ -132,5 +132,5 @@ void VolumesPersistence::save(mpc::Mpc &mpc)
     const auto data = d.dump(4); // pretty print (optional)
     const auto path = getVolumesPersistencePath(mpc);
 
-    set_file_data(path, std::vector<char>(data.begin(), data.end()));
+    set_file_data(path, std::vector(data.begin(), data.end()));
 }

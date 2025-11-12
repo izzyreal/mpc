@@ -77,7 +77,7 @@ TEST_CASE("swing1", "[track]")
     REQUIRE(tr->getEvent(0) == event2);
 
     auto n2 = event2;
-    auto range = std::vector<int>{91, 91};
+    auto range = std::vector{91, 91};
     tr->timingCorrect(0, 0, n2, 24, 71);
 
     REQUIRE(n1->getTick() == 23);

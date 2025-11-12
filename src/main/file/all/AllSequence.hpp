@@ -86,19 +86,18 @@ namespace mpc::file::all
         int loopLast;
         bool loopLastEnd;
         bool loop;
-        mpc::sequencer::Sequence::StartTime startTime{0, 0, 0, 0, 0};
+        sequencer::Sequence::StartTime startTime{0, 0, 0, 0, 0};
 
         double tempo;
         std::vector<std::string> devNames = std::vector<std::string>(33);
         Tracks *tracks = nullptr;
         BarList *barList = nullptr;
-        std::vector<std::shared_ptr<mpc::sequencer::Event>> allEvents;
+        std::vector<std::shared_ptr<sequencer::Event>> allEvents;
 
     private:
         std::vector<char> saveBytes;
 
-    private:
-        static std::vector<std::shared_ptr<mpc::sequencer::Event>>
+        static std::vector<std::shared_ptr<sequencer::Event>>
         readEvents(const std::vector<char> &seqBytes);
         static std::vector<std::vector<char>>
         readEventSegments(const std::vector<char> &seqBytes);
@@ -110,22 +109,21 @@ namespace mpc::file::all
         virtual int getEventAmount();
 
     private:
-        static int getSegmentCount(mpc::sequencer::Sequence *seq);
-        void setUnknown32BitInt(mpc::sequencer::Sequence *seq);
+        static int getSegmentCount(sequencer::Sequence *seq);
+        void setUnknown32BitInt(sequencer::Sequence *seq);
         void setBarCount(int i);
         std::vector<char>
-        createEventSegmentsChunk(mpc::sequencer::Sequence *seq) const;
+        createEventSegmentsChunk(sequencer::Sequence *seq) const;
         void setTempoDouble(double tempoForSaveBytes);
-        void setLastTick(mpc::sequencer::Sequence *seq);
+        void setLastTick(sequencer::Sequence *seq);
 
     public:
         std::vector<char> &getBytes();
 
-        void
-        applyToMpcSeq(const std::shared_ptr<mpc::sequencer::Sequence> &mpcSeq);
+        void applyToMpcSeq(const std::shared_ptr<sequencer::Sequence> &mpcSeq);
 
         AllSequence(const std::vector<char> &b);
-        AllSequence(mpc::sequencer::Sequence *seq, int number);
+        AllSequence(sequencer::Sequence *seq, int number);
         ~AllSequence();
     };
 } // namespace mpc::file::all

@@ -34,7 +34,7 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::aps;
 
-void ApsLoader::load(mpc::Mpc &mpc, const std::shared_ptr<MpcFile> &file)
+void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file)
 {
     if (!file->exists())
     {
@@ -57,13 +57,13 @@ void ApsLoader::load(mpc::Mpc &mpc, const std::shared_ptr<MpcFile> &file)
     }
 
     auto withoutSounds = false;
-    ApsLoader::loadFromParsedAps(apsParser, mpc, withoutSounds);
+    loadFromParsedAps(apsParser, mpc, withoutSounds);
 
     mpc.getSampler()->setSoundIndex(0);
 }
 
-void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
-                                  bool headless, bool withoutSounds)
+void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
+                                  bool withoutSounds)
 {
     auto sampler = mpc.getSampler();
     auto disk = mpc.getDisk();
@@ -122,7 +122,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
 
                 if (!headless)
                 {
-                    ApsLoader::handleSoundNotFound(mpc, soundFileName);
+                    handleSoundNotFound(mpc, soundFileName);
                 }
 
                 continue;
@@ -130,7 +130,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
 
             finalSoundIndices[i] = i - skipCount;
 
-            ApsLoader::loadSound(mpc, soundFileName, ext, soundFile, headless);
+            loadSound(mpc, soundFileName, ext, soundFile, headless);
         }
     }
 
@@ -152,8 +152,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
             auto sourceIndivFxMixerChannel =
                 apsProgram->getIndivFxMixerChannel(noteIndex);
 
-            auto destNoteParams = dynamic_cast<NoteParameters *>(
-                newProgram->getNoteParameters(noteIndex + 35));
+            auto destNoteParams = newProgram->getNoteParameters(noteIndex + 35);
             auto destStereoMixerCh = destNoteParams->getStereoMixerChannel();
             auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel();
 
@@ -223,8 +222,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
                 srcNoteParams->getVelocityToPitch());
         }
 
-        auto slider =
-            dynamic_cast<mpc::sampler::PgmSlider *>(newProgram->getSlider());
+        auto slider = newProgram->getSlider();
         slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
         slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
         slider->setControlChange(apsProgram->getSlider()->getProgramChange());
@@ -286,7 +284,7 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, mpc::Mpc &mpc,
     pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
 
-void ApsLoader::loadSound(mpc::Mpc &mpc, const std::string &soundFileName,
+void ApsLoader::loadSound(Mpc &mpc, const std::string &soundFileName,
                           const std::string &ext,
                           const std::weak_ptr<MpcFile> &_soundFile,
                           bool headless)
@@ -297,7 +295,7 @@ void ApsLoader::loadSound(mpc::Mpc &mpc, const std::string &soundFileName,
 
     if (!headless)
     {
-        ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
+        showPopup(mpc, soundFileName, ext, soundFile->length());
     }
 
     SoundLoaderResult result;
@@ -317,7 +315,7 @@ void ApsLoader::loadSound(mpc::Mpc &mpc, const std::string &soundFileName,
     }
 }
 
-void ApsLoader::showPopup(mpc::Mpc &mpc, const std::string &name,
+void ApsLoader::showPopup(Mpc &mpc, const std::string &name,
                           const std::string &ext, int sampleSize)
 {
     std::string msg =
@@ -327,8 +325,7 @@ void ApsLoader::showPopup(mpc::Mpc &mpc, const std::string &name,
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
-void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc,
-                                    const std::string &soundFileName)
+void ApsLoader::handleSoundNotFound(Mpc &mpc, const std::string &soundFileName)
 {
     auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
     auto skipAll = cantFindFileScreen->skipAll;

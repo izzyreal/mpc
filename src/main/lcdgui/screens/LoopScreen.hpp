@@ -21,7 +21,6 @@ namespace mpc::lcdgui::screens
 
         void open() override;
 
-    public:
         void openWindow() override;
         void function(int f) override;
         void turnWheel(int i) override;
@@ -51,7 +50,6 @@ namespace mpc::lcdgui::screens
 
         void setEndSelected(bool b);
 
-    private:
         friend class LoopEndFineScreen;
         friend class EndFineScreen;
         friend class LoopToFineScreen;

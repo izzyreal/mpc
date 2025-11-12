@@ -78,7 +78,7 @@ std::shared_ptr<AudioBuffer> AudioMixerStrip::createBuffer()
         isChannel = true;
         return mixer->getSharedBuffer();
     }
-    else if (id == MixerControlsIds::MAIN_STRIP)
+    if (id == MixerControlsIds::MAIN_STRIP)
     {
         return mixer->getMainBus()->getBuffer();
     }
@@ -101,7 +101,7 @@ bool AudioMixerStrip::processBuffer(int nFrames)
             {
                 return false;
             }
-            else if (ret == AUDIO_SILENCE && silenceCountdown == 0)
+            if (ret == AUDIO_SILENCE && silenceCountdown == 0)
             {
                 return false;
             }
@@ -153,11 +153,8 @@ AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
             return std::make_shared<MainMixProcess>(routedStrip, mixControls,
                                                     mixer);
         }
-        else
-        {
-            routedStrip = mixer->getStripImpl(mixControls->getName());
-            return std::make_shared<MixProcess>(routedStrip, mixControls);
-        }
+        routedStrip = mixer->getStripImpl(mixControls->getName());
+        return std::make_shared<MixProcess>(routedStrip, mixControls);
     }
 
     return AudioProcessChain::createProcess(controls);
@@ -171,7 +168,7 @@ int AudioMixerStrip::mix(AudioBuffer *bufferToMix, const vector<float> &gain)
 
     auto ns = buffer->getSampleCount();
     float g;
-    auto k = static_cast<float>((snc)) / dnc;
+    auto k = static_cast<float>(snc) / dnc;
     for (auto i = 0; i < dnc; i++)
     {
         g = gain[i] * k;

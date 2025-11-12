@@ -7,7 +7,7 @@
 
 using namespace mpc::file::pgmwriter;
 
-Pads::Pads(mpc::sampler::Program *program)
+Pads::Pads(sampler::Program *program)
 {
 
     padsArray = std::vector<char>(264);

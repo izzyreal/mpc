@@ -56,21 +56,18 @@ namespace mpc::file::aps
         ApsAssignTable *assignTable = nullptr;
         std::vector<char> saveBytes;
 
-    public:
         ApsNoteParameters *getNoteParameters(int noteIndex) const;
         ApsMixer *getMixer() const;
         ApsAssignTable *getAssignTable() const;
         ApsSlider *getSlider() const;
         std::string getName();
 
-    public:
         std::vector<char> getBytes();
-        mpc::engine::StereoMixer getStereoMixerChannel(int noteIndex) const;
-        mpc::engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex) const;
+        engine::StereoMixer getStereoMixerChannel(int noteIndex) const;
+        engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex) const;
 
-    public:
         ApsProgram(const std::vector<char> &loadBytes);
-        ApsProgram(mpc::sampler::Program *program, int index);
+        ApsProgram(sampler::Program *program, int index);
         ~ApsProgram();
     };
 } // namespace mpc::file::aps

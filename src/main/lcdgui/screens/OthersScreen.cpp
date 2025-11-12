@@ -70,7 +70,7 @@ void OthersScreen::turnWheel(int i)
         auto increment = i > 0 ? 1 : -1;
         setContrast(contrast + increment);
     }
-    else if (focusedFieldName == "tapaveraging")
+    if (focusedFieldName == "tapaveraging")
     {
         setTapAveraging(tapAveraging + i);
     }

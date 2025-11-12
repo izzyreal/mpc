@@ -25,7 +25,6 @@ namespace mpc::lcdgui::screens::window
         std::vector<std::string> editTypeNames = {"ADD VALUE", "SUB VALUE",
                                                   "MULT VAL%", "SET TO VAL"};
 
-    private:
         void setEditType(int i);
         void setValue(int i);
         void displayValue() const;

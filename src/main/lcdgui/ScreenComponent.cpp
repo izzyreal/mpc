@@ -111,7 +111,7 @@ void ScreenComponent::openWindow()
     {
         return;
     }
-    else if (dynamic_cast<MetronomeSoundScreen *>(this))
+    if (dynamic_cast<MetronomeSoundScreen *>(this))
     {
         PushMainScreenCommand(mpc).execute();
         return;

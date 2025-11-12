@@ -9,7 +9,6 @@ namespace mpc::file::all
     class AllEvent;
     class AllNoteOnEvent
     {
-    private:
         static const int DURATION_BYTE1_OFFSET = 2;
         static std::vector<int> DURATION_BYTE1_BIT_RANGE;
         static const int DURATION_BYTE2_OFFSET = 3;
@@ -31,7 +30,7 @@ namespace mpc::file::all
         static int readTrackNumber(const std::vector<char> &);
         static int readVelocity(const std::vector<char> &);
         static int readVariationValue(const std::vector<char> &);
-        static mpc::sequencer::NoteOnEvent::VARIATION_TYPE
+        static sequencer::NoteOnEvent::VARIATION_TYPE
         readVariationType(const std::vector<char> &);
 
         static void writeVelocity(std::vector<char> &event, int);
@@ -40,12 +39,12 @@ namespace mpc::file::all
         static void writeDuration(std::vector<char> &event, int);
         static void writeVariationType(std::vector<char> &event, int);
 
-        friend class mpc::file::all::AllEvent;
+        friend class AllEvent;
 
     public:
-        static std::shared_ptr<mpc::sequencer::NoteOnEvent>
+        static std::shared_ptr<sequencer::NoteOnEvent>
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char>
-        mpcEventToBytes(const std::shared_ptr<mpc::sequencer::NoteOnEvent> &);
+        mpcEventToBytes(const std::shared_ptr<sequencer::NoteOnEvent> &);
     };
 } // namespace mpc::file::all

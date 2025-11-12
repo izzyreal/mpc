@@ -277,9 +277,10 @@ bool SequencerPlaybackEngine::processSongMode() const
     {
         sequencer->getTransport()->resetPlayedStepRepetitions();
         songScreen->setOffset(song->getFirstStep() - 1);
-        const auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
-        if (!sequencer->getSequence(newStep->getSequence())->isUsed())
+        if (const auto newStep =
+                song->getStep(songScreen->getOffset() + 1).lock();
+            !sequencer->getSequence(newStep->getSequence())->isUsed())
         {
             stopSequencer();
             return true;
@@ -321,9 +322,8 @@ bool SequencerPlaybackEngine::processSongMode() const
 
 bool SequencerPlaybackEngine::processSeqLoopEnabled() const
 {
-    const auto seq = sequencer->getCurrentlyPlayingSequence();
-
-    if (sequencer->getTransport()->getTickPosition() >= seq->getLoopEnd() - 1)
+    if (const auto seq = sequencer->getCurrentlyPlayingSequence();
+        sequencer->getTransport()->getTickPosition() >= seq->getLoopEnd() - 1)
     {
         const auto punch =
             sequencer->getTransport()->isPunchEnabled() &&
@@ -400,7 +400,7 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
     return false;
 }
 
-void SequencerPlaybackEngine::processNoteRepeat()
+void SequencerPlaybackEngine::processNoteRepeat() const
 {
     if (!layeredScreen->isCurrentScreen({ScreenId::SequencerScreen}))
     {
@@ -438,7 +438,7 @@ void SequencerPlaybackEngine::processNoteRepeat()
         }
     }
     else if (repeatIntervalTicks != 1 &&
-             (tickPosWithShift % repeatIntervalTicks == 0))
+             tickPosWithShift % repeatIntervalTicks == 0)
     {
         shouldRepeatNote = true;
     }
@@ -479,8 +479,7 @@ void SequencerPlaybackEngine::processEventsAfterNFrames()
 
     for (size_t i = 0; i < count; ++i)
     {
-        auto &e = batch[i];
-        if (++e.frameCounter >= e.nFrames)
+        if (auto &e = batch[i]; ++e.frameCounter >= e.nFrames)
         {
             e.f();
         }
@@ -556,20 +555,6 @@ void SequencerPlaybackEngine::work(const int nFrames)
     midiClockOutput->processSampleRateChange();
     midiClockOutput->processTempoChange();
 
-    for (size_t tickIndex = 0; tickIndex < clockTicks.size(); tickIndex++)
-    {
-        if (clockTicks[tickIndex] >= nFrames)
-        {
-            static int counter = 0;
-            printf(
-                "%i [AUDIO] tickIndex=%zu clockTick=%d >= nFrames=%d "
-                "(clockTicks.size=%zu)\n",
-                counter++, tickIndex, clockTicks[tickIndex], nFrames,
-                clockTicks.size());
-            continue;
-        }
-    }
-
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
         midiClockOutput->processFrame(sequencerIsRunningAtStartOfBuffer,
@@ -582,9 +567,8 @@ void SequencerPlaybackEngine::work(const int nFrames)
             continue;
         }
 
-        const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
-
-        if (syncScreen->modeOut != 0 && !isBouncing())
+        if (const auto syncScreen = getScreens()->get<ScreenId::SyncScreen>();
+            syncScreen->modeOut != 0 && !isBouncing())
         {
             if (midiClockOutput->isLastProcessedFrameMidiClockLock())
             {

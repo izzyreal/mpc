@@ -79,7 +79,7 @@ TrMuteScreen::TrMuteScreen(Mpc &mpc, const int layerIndex)
                                         ->getTrack(trackIndex)
                                         ->isOn())
                                 {
-                                    tracksEnabled |= (1u << i);
+                                    tracksEnabled |= 1u << i;
                                 }
                             }
 

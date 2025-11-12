@@ -4,9 +4,7 @@
 
 using namespace mpc::file::mid::util;
 
-VariableLengthInt::VariableLengthInt() : VariableLengthInt::VariableLengthInt(0)
-{
-}
+VariableLengthInt::VariableLengthInt() : VariableLengthInt(0) {}
 
 VariableLengthInt::VariableLengthInt(int value)
 {
@@ -57,11 +55,11 @@ void VariableLengthInt::parseBytes(std::stringstream &in)
 
         if (!variable)
         {
-            ints[mSizeInBytes - 1] = (b & 127);
+            ints[mSizeInBytes - 1] = b & 127;
             break;
         }
 
-        ints[mSizeInBytes - 1] = (b & 127);
+        ints[mSizeInBytes - 1] = b & 127;
         b = in.get();
     }
 

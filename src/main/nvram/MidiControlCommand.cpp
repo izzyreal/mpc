@@ -142,9 +142,8 @@ MidiControlCommand MidiControlCommand::fromBytes(const std::vector<char> &bytes)
 
     if (midiMessageType == NOTE)
     {
-        return MidiControlCommand(mpcHardwareLabel,
-                                  MidiControlCommand::MidiMessageType::NOTE,
-                                  midiChannelIndex, number);
+        return MidiControlCommand(mpcHardwareLabel, NOTE, midiChannelIndex,
+                                  number);
     }
 
     const int8_t value = bytes[pointer];

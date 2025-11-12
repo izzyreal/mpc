@@ -10,7 +10,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-DeleteAllFilesScreen::DeleteAllFilesScreen(mpc::Mpc &mpc, const int layerIndex)
+DeleteAllFilesScreen::DeleteAllFilesScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "delete-all-files", layerIndex)
 {
 }

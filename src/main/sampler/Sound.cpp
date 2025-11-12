@@ -152,7 +152,7 @@ void Sound::setSampleData(
 
 int Sound::getLastFrameIndex() const
 {
-    return (isMono() ? sampleData->size() : (sampleData->size() * 0.5)) - 1;
+    return (isMono() ? sampleData->size() : sampleData->size() * 0.5) - 1;
 }
 
 int Sound::getFrameCount() const

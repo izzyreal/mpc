@@ -4,7 +4,6 @@ namespace mpc::sequencer
 {
     class TimeSignature
     {
-    private:
         int numerator{};
         int denominator{};
 

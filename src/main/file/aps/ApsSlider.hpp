@@ -42,6 +42,6 @@ namespace mpc::file::aps
         std::vector<char> getBytes();
 
         ApsSlider(const std::vector<char> &loadBytes);
-        ApsSlider(mpc::sampler::PgmSlider *slider);
+        ApsSlider(sampler::PgmSlider *slider);
     };
 } // namespace mpc::file::aps

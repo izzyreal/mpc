@@ -29,10 +29,9 @@ namespace mpc::disk
     class AllLoader
     {
     public:
-        static void loadEverythingFromFile(mpc::Mpc &, mpc::disk::MpcFile *);
-        static void loadEverythingFromAllParser(mpc::Mpc &,
-                                                mpc::file::all::AllParser &);
-        static std::vector<std::shared_ptr<mpc::sequencer::Sequence>>
-        loadOnlySequencesFromFile(mpc::Mpc &, mpc::disk::MpcFile *);
+        static void loadEverythingFromFile(Mpc &, MpcFile *);
+        static void loadEverythingFromAllParser(Mpc &, file::all::AllParser &);
+        static std::vector<std::shared_ptr<sequencer::Sequence>>
+        loadOnlySequencesFromFile(Mpc &, MpcFile *);
     };
 } // namespace mpc::disk

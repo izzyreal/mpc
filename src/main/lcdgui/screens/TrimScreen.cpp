@@ -262,7 +262,7 @@ void TrimScreen::setSliderStart(int i) const
 {
     const auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getStart();
-    auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
+    auto candidatePos = (int)(i / 124.0 * sound->getFrameCount());
 
     const auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength
                                      : sound->getFrameCount();
@@ -290,7 +290,7 @@ void TrimScreen::setSliderStart(int i) const
 void TrimScreen::setSliderEnd(int i) const
 {
     const auto sound = sampler->getSound();
-    const auto newValue = (int)((i / 124.0) * sound->getFrameCount());
+    const auto newValue = (int)(i / 124.0 * sound->getFrameCount());
     setEnd(newValue);
     displayEnd();
 }

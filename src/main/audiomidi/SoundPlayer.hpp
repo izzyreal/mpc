@@ -28,7 +28,6 @@ namespace mpc::audiomidi
     class SoundPlayer : public AudioProcess
     {
 
-    private:
         std::thread readThread;
         int ingestedSourceFrameCount = 0;
         int sourceFrameCount = 0;
@@ -61,8 +60,7 @@ namespace mpc::audiomidi
     public:
         bool start(const std::shared_ptr<std::istream> &, SoundPlayerFileFormat,
                    int audioServerSampleRate);
-        int processAudio(mpc::engine::audio::core::AudioBuffer *buf,
-                         int nFrames) override;
+        int processAudio(AudioBuffer *buf, int nFrames) override;
         void enableStopEarly();
         bool isPlaying() const;
 

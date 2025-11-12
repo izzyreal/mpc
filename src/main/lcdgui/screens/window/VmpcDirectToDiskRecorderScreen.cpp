@@ -85,7 +85,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
         case 4:
         {
             const auto seq = sq;
-            const std::vector<int> rates{44100, 48000, 88200};
+            const std::vector rates{44100, 48000, 88200};
             auto rate = rates[sampleRate];
 
             //		if (!offline)
@@ -372,7 +372,7 @@ void VmpcDirectToDiskRecorderScreen::displayRecord() const
 
 void VmpcDirectToDiskRecorderScreen::displaySq() const
 {
-    const auto visible = (record >= 0 && record <= 2);
+    const auto visible = record >= 0 && record <= 2;
 
     findField("sq")->Hide(!visible);
     findLabel("sq")->Hide(!visible);

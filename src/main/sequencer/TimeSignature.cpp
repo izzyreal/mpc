@@ -34,17 +34,16 @@ void TimeSignature::increase()
         case 4:
         case 8:
         case 16:
+        {
             if (numerator != 16)
             {
                 ++numerator;
                 break;
             }
-            else
-            {
-                numerator = 1;
-                denominator *= 2;
-                break;
-            }
+            numerator = 1;
+            denominator *= 2;
+            break;
+        }
         case 32:
             if (numerator != 32)
             {
@@ -67,16 +66,15 @@ void TimeSignature::decrease()
         case 8:
         case 16:
         case 32:
+        {
             if (numerator == 1)
             {
                 numerator = 16;
                 denominator /= 2;
                 break;
             }
-            else
-            {
-                --numerator;
-                break;
-            }
+            --numerator;
+            break;
+        }
     }
 }

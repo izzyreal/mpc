@@ -46,7 +46,7 @@ int MixerEvent::getValue() const
     return mixerParameterValue;
 }
 
-mpc::sequencer::MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
+MixerEvent::MixerEvent(const MixerEvent &event) : Event(event)
 {
     setPadNumber(event.getPad());
     setParameter(event.getParameter());

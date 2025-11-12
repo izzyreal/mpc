@@ -8,7 +8,6 @@ namespace mpc::lcdgui::screens::window
     class LoadApsFileScreen final : public ScreenComponent
     {
 
-    private:
         std::unique_ptr<disk::ApsLoader> apsLoader;
 
     public:

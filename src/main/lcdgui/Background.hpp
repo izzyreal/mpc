@@ -5,11 +5,8 @@
 
 namespace mpc::lcdgui
 {
-
     class Background : public Component
     {
-
-    private:
         MRECT unobtrusiveRect;
         unsigned short scrollOffset = 0;
         bool scrolling = false;

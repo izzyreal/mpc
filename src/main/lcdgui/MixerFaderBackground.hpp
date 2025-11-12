@@ -10,7 +10,6 @@ namespace mpc::lcdgui
     public:
         void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-    public:
         MixerFaderBackground(MRECT rect);
         void setColor(bool);
 

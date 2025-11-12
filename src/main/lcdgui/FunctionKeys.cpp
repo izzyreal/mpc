@@ -7,7 +7,7 @@
 
 using namespace mpc::lcdgui;
 
-FunctionKey::FunctionKey(mpc::Mpc &mpc, const std::string &name, const int xPos)
+FunctionKey::FunctionKey(Mpc &mpc, const std::string &name, const int xPos)
     : Component(name)
 {
     Component::setSize(39, 9);
@@ -96,7 +96,7 @@ void FunctionKey::setType(const int newType)
 }
 
 FunctionKeys::FunctionKeys(
-    mpc::Mpc &mpc, const std::string &name,
+    Mpc &mpc, const std::string &name,
     const std::vector<std::vector<std::string>> &allTexts,
     const std::vector<std::vector<int>> &allTypes)
     : Component(name)

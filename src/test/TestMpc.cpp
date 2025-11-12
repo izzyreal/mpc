@@ -4,9 +4,9 @@
 
 #include <memory>
 
-void mpc::TestMpc::initializeTestMpc(mpc::Mpc &mpc)
+void mpc::TestMpc::initializeTestMpc(Mpc &mpc)
 {
-    mpc.paths = std::make_shared<mpc::TestPaths>();
+    mpc.paths = std::make_shared<TestPaths>();
     auto testDocPath = mpc.paths->appDocumentsPath();
     fs::remove_all(testDocPath);
     fs::create_directories(testDocPath);

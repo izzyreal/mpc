@@ -11,7 +11,6 @@ namespace mpc::sequencer
     class TempoChangeEvent : public Event
     {
 
-    private:
         int ratio = 1000;
         Sequence *parent = nullptr;
 
@@ -29,11 +28,9 @@ namespace mpc::sequencer
         int getClock(int denominator) const;
         double getTempo() const;
 
-    public:
         // Smelly smelly smelly
         void setParent(Sequence *newParent);
 
-    public:
         TempoChangeEvent(Sequence *parent);
         TempoChangeEvent(Sequence *parent, int ratio);
         TempoChangeEvent(Sequence *parent, int ratio, int step);

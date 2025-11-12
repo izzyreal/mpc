@@ -11,8 +11,8 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine;
 using namespace std;
 
-MixerInterconnection::MixerInterconnection(
-    const string &name, mpc::engine::audio::server::AudioServer *server)
+MixerInterconnection::MixerInterconnection(const string &name,
+                                           audio::server::AudioServer *server)
 {
     auto const sharedBuffer = server->createAudioBuffer(name);
     inputProcess =

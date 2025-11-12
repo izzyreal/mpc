@@ -23,8 +23,7 @@
 
 using namespace mpc::file::all;
 
-AllParser::AllParser(mpc::Mpc &_mpc, const std::vector<char> &loadBytes)
-    : mpc(_mpc)
+AllParser::AllParser(Mpc &_mpc, const std::vector<char> &loadBytes) : mpc(_mpc)
 {
     if (loadBytes.size() >= HEADER_OFFSET + HEADER_LENGTH)
     {
@@ -56,7 +55,7 @@ AllParser::AllParser(mpc::Mpc &_mpc, const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 20; i++)
     {
-        int offset = SONGS_OFFSET + (i * Song::LENGTH);
+        int offset = SONGS_OFFSET + i * Song::LENGTH;
         songs[i] = new Song(
             Util::vecCopyOfRange(loadBytes, offset, offset + Song::LENGTH));
     }
@@ -65,7 +64,7 @@ AllParser::AllParser(mpc::Mpc &_mpc, const std::vector<char> &loadBytes)
         Util::vecCopyOfRange(loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
-AllParser::AllParser(mpc::Mpc &_mpc) : mpc(_mpc)
+AllParser::AllParser(Mpc &_mpc) : mpc(_mpc)
 {
     std::vector<std::vector<char>> chunks;
     chunks.push_back(Header().getBytes());
@@ -177,7 +176,7 @@ Defaults *AllParser::getDefaults() const
     return defaults;
 }
 
-mpc::file::all::AllSequencer *AllParser::getSequencer() const
+AllSequencer *AllParser::getSequencer() const
 {
     return sequencer;
 }
@@ -207,7 +206,7 @@ SequenceNames *AllParser::getSeqNames() const
     return seqNames;
 }
 
-std::vector<mpc::file::all::Song *> AllParser::getSongs()
+std::vector<Song *> AllParser::getSongs()
 {
     return songs;
 }
@@ -252,7 +251,7 @@ AllParser::readSequences(const std::vector<char> &trimmedSeqsArray) const
         int eventSegments =
             AllSequence::getNumberOfEventSegmentsForThisSeq(view);
 
-        int currentSeqLen = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
+        int currentSeqLen = EMPTY_SEQ_LENGTH + eventSegments * EVENT_LENGTH;
 
         if ((size_t)currentSeqLen > view.size())
         {

@@ -12,7 +12,6 @@ namespace mpc::lcdgui::screens::window
         void close() override;
         void update(Observable *o, Message message) override;
 
-    public:
         void up() override;
         void down() override;
         void left() override;

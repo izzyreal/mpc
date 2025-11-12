@@ -14,15 +14,12 @@ namespace mpc::file::mid::event
         int mValue1{0};
         int mValue2{0};
 
-    public:
         virtual int getType();
         virtual void setChannel(int c);
         virtual int getChannel();
 
-    public:
         int getEventSize() override;
 
-    public:
         virtual int compareTo(MidiEvent *other);
         virtual bool requiresStatusByte(MidiEvent *prevEvent) override;
         virtual void writeToOutputStream(std::ostream &out,
@@ -31,7 +28,6 @@ namespace mpc::file::mid::event
         parseChannelEvent(int tick, int delta, int type, int channel,
                           std::stringstream &in);
 
-    public:
         static const int NOTE_OFF{8};
         static const int NOTE_ON{9};
         static const int NOTE_AFTERTOUCH{10};
@@ -40,7 +36,6 @@ namespace mpc::file::mid::event
         static const int CHANNEL_AFTERTOUCH{13};
         static const int PITCH_BEND{14};
 
-    public:
         ChannelEvent(int tick, int type, int channel, int param1, int param2);
         ChannelEvent(int tick, int delta, int type, int channel, int param1,
                      int param2);

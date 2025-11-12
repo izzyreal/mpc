@@ -5,7 +5,7 @@
 using namespace mpc::file::mid::event::meta;
 
 Marker::Marker(int tick, int delta, const std::string &marker)
-    : TextualMetaEvent(tick, delta, MetaEvent::MARKER, marker)
+    : TextualMetaEvent(tick, delta, MARKER, marker)
 {
 }
 

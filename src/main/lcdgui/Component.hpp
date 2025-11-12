@@ -20,7 +20,6 @@ namespace mpc::lcdgui
 {
     class Component
     {
-    private:
         const std::string name;
         std::vector<ReactiveBinding> reactiveBindings;
 
@@ -100,7 +99,6 @@ namespace mpc::lcdgui
         std::vector<std::shared_ptr<Component>> findHiddenChildren() const;
         void deleteChildren(const std::string &nameOfChildrenToDelete);
 
-    public:
         virtual void Hide(bool b);
         virtual void SetDirty(bool b = true);
         bool IsHidden() const;
@@ -113,13 +111,11 @@ namespace mpc::lcdgui
         bool bringToFront(Component *childToBringToFront);
         Component *getParent() const;
 
-    public:
         virtual void Draw(std::vector<std::vector<bool>> * /*pixels*/) {}
         void drawRecursive(std::vector<std::vector<bool>> *pixels);
         virtual void Clear(std::vector<std::vector<bool>> *pixels);
         void preDrawClear(std::vector<std::vector<bool>> *pixels);
 
-    public:
         MRECT preDrawClearRect;
         Component(const std::string &name);
     };

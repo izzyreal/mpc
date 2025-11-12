@@ -76,7 +76,7 @@ void RealTimeAudioServer::work(
         for (int frame = 0; frame < nFrames; frame++)
         {
             const auto localBufferFrameIndex =
-                (frame * 2) + localBufferFrameOffset;
+                frame * 2 + localBufferFrameOffset;
             vmpcInput->localBuffer[localBufferFrameIndex] = hostBuffer[frame];
         }
     }
@@ -94,7 +94,7 @@ void RealTimeAudioServer::work(
         for (int frame = 0; frame < nFrames; frame++)
         {
             const auto localBufferFrameIndex =
-                (frame * 2) + localBufferFrameOffset;
+                frame * 2 + localBufferFrameOffset;
             hostBuffer[frame] = vmpcOutput->localBuffer[localBufferFrameIndex];
         }
     }

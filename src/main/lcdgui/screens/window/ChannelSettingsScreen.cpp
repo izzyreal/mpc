@@ -28,7 +28,7 @@ void ChannelSettingsScreen::open()
         static_cast<int>(mpc.clientEventController->getActiveBank());
     const auto mixerScreen = mpc.screens->get<ScreenId::MixerScreen>();
     const int padIndexWithoutBank = mixerScreen->xPos;
-    const int padIndexWithBank = padIndexWithoutBank + (bank * 16);
+    const int padIndexWithBank = padIndexWithoutBank + bank * 16;
     const auto padNote = getProgramOrThrow()->getNoteFromPad(padIndexWithBank);
     note = padNote == 34 ? 35 : padNote;
     displayChannel();
@@ -50,12 +50,8 @@ ChannelSettingsScreen::getIndivFxMixerChannel() const
     {
         return getActiveDrumBus()->getIndivFxMixerChannels()[note - 35];
     }
-    else
-    {
-        const auto noteParameters =
-            getProgramOrThrow()->getNoteParameters(note);
-        return noteParameters->getIndivFxMixerChannel();
-    }
+    const auto noteParameters = getProgramOrThrow()->getNoteParameters(note);
+    return noteParameters->getIndivFxMixerChannel();
 }
 
 std::shared_ptr<StereoMixer>
@@ -68,12 +64,8 @@ ChannelSettingsScreen::getStereoMixerChannel() const
     {
         return getActiveDrumBus()->getStereoMixerChannels()[note - 35];
     }
-    else
-    {
-        const auto noteParameters =
-            getProgramOrThrow()->getNoteParameters(note);
-        return noteParameters->getStereoMixerChannel();
-    }
+    const auto noteParameters = getProgramOrThrow()->getNoteParameters(note);
+    return noteParameters->getStereoMixerChannel();
 }
 
 void ChannelSettingsScreen::turnWheel(const int i)

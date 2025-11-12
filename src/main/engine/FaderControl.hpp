@@ -7,12 +7,10 @@
 namespace mpc::engine
 {
 
-    class FaderControl : public mpc::engine::control::LawControl
+    class FaderControl : public control::LawControl
     {
 
-    private:
-        static std::shared_ptr<mpc::engine::control::ControlLaw>
-        MPC_FADER_LAW();
+        static std::shared_ptr<control::ControlLaw> MPC_FADER_LAW();
 
     protected:
         float gain = 0.0f;

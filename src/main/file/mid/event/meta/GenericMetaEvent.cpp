@@ -31,7 +31,7 @@ void GenericMetaEvent::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int GenericMetaEvent::compareTo(mpc::file::mid::event::MidiEvent *other)
+int GenericMetaEvent::compareTo(MidiEvent *other)
 {
     if (mTick != other->getTick())
     {

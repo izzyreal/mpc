@@ -55,11 +55,11 @@ namespace mpc::disk
 
         // Used when type == DISK_IMAGE || USB_VOLUME
         std::string volumeUUID;
-        MountMode mode = MountMode::DISABLED;
+        MountMode mode = DISABLED;
         uint64_t volumeSize;
         std::fstream volumeStream;
-        std::shared_ptr<akaifat::ImageBlockDevice> volumeDevice;
-        akaifat::fat::AkaiFatFileSystem *volumeFs;
+        std::shared_ptr<ImageBlockDevice> volumeDevice;
+        fat::AkaiFatFileSystem *volumeFs;
 
         std::string typeShortName() const
         {
@@ -96,33 +96,32 @@ namespace mpc::disk
             return modeShortName(mode);
         }
 
-        std::shared_ptr<mpc::disk::MpcFile> getRoot() const
+        std::shared_ptr<MpcFile> getRoot() const
         {
             if (type == LOCAL_DIRECTORY)
             {
-                return std::make_shared<mpc::disk::MpcFile>(
-                    fs::path(localDirectoryPath));
+                return std::make_shared<MpcFile>(fs::path(localDirectoryPath));
             }
             return {};
         }
 
-        std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getRawRoot()
+        std::shared_ptr<fat::AkaiFatLfnDirectory> getRawRoot()
         {
             if (type == USB_VOLUME && mode != DISABLED)
             {
-                volumeStream = akaifat::util::VolumeMounter::mount(
-                    volumePath, mode == READ_ONLY);
+                volumeStream =
+                    util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
 
                 if (volumeStream.is_open())
                 {
-                    volumeDevice = std::make_shared<akaifat::ImageBlockDevice>(
+                    volumeDevice = std::make_shared<ImageBlockDevice>(
                         volumeStream, volumeSize);
-                    volumeFs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(
-                        akaifat::FileSystemFactory::createAkai(
-                            volumeDevice, mode == READ_ONLY));
+                    volumeFs = dynamic_cast<fat::AkaiFatFileSystem *>(
+                        FileSystemFactory::createAkai(volumeDevice,
+                                                      mode == READ_ONLY));
 
-                    return std::dynamic_pointer_cast<
-                        akaifat::fat::AkaiFatLfnDirectory>(volumeFs->getRoot());
+                    return std::dynamic_pointer_cast<fat::AkaiFatLfnDirectory>(
+                        volumeFs->getRoot());
                 }
             }
             return {};

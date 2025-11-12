@@ -13,10 +13,8 @@ namespace mpc::file::mid::event::meta
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
-        int compareTo(mpc::file::mid::event::MidiEvent *other) const;
+        int compareTo(MidiEvent *other) const;
 
-    public:
         EndOfTrack(int tick, int delta);
     };
 } // namespace mpc::file::mid::event::meta

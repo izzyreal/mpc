@@ -10,7 +10,7 @@
 using namespace mpc::file::sndreader;
 using namespace mpc::sampleops;
 
-SndReader::SndReader(mpc::disk::MpcFile *soundFile)
+SndReader::SndReader(disk::MpcFile *soundFile)
     : SndReader(soundFile->getBytes())
 {
 }
@@ -91,7 +91,7 @@ void SndReader::readData(const std::shared_ptr<std::vector<float>> &dest)
     dest->resize(length);
 
     auto shorts = ByteUtil::bytesToShorts(
-        std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
+        std::vector(sndFileArray.begin() + 42, sndFileArray.end()));
 
     for (int i = 0; i < length; ++i)
     {

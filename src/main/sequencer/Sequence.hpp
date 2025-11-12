@@ -68,7 +68,6 @@ namespace mpc::sequencer
                  std::function<bool()> isSoloEnabled,
                  std::function<int()> getCurrentBarIndex);
 
-    public:
         double getInitialTempo() const;
         void setInitialTempo(const double newInitialTempo);
 

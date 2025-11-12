@@ -29,7 +29,7 @@ void SoundMemoryScreen::displayFreeMemoryTime() const
 
     for (const auto &s : sampler->getSounds())
     {
-        total -= (s->getSampleData()->size() * 2);
+        total -= s->getSampleData()->size() * 2;
     }
 
     const auto time =

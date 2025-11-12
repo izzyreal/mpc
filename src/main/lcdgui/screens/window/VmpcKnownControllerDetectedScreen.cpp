@@ -96,8 +96,8 @@ void VmpcKnownControllerDetectedScreen::open()
                 mpc.getLayeredScreen()->closeCurrentScreen();
                 return;
             }
-            else if (p->autoloadMode ==
-                     nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
+            if (p->autoloadMode ==
+                nvram::MidiControlPreset::AutoLoadMode::AutoLoadModeYes)
             {
                 const auto vmpcMidiScreen =
                     mpc.screens->get<ScreenId::VmpcMidiScreen>();
@@ -112,7 +112,7 @@ void VmpcKnownControllerDetectedScreen::open()
     displayMessage();
 }
 
-void window::VmpcKnownControllerDetectedScreen::setControllerName(
+void VmpcKnownControllerDetectedScreen::setControllerName(
     const std::string controllerNameToUse)
 {
     controllerName = controllerNameToUse;

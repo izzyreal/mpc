@@ -18,7 +18,7 @@ CMRC_DECLARE(mpctest);
 using namespace mpc;
 using namespace mpc::disk;
 
-void prepareAllResources(mpc::Mpc &mpc)
+void prepareAllResources(Mpc &mpc)
 {
     auto disk = mpc.getDisk();
     auto fs = cmrc::mpctest::get_filesystem();
@@ -26,7 +26,7 @@ void prepareAllResources(mpc::Mpc &mpc)
     for (auto &&entry : fs.iterate_directory("test/AllLoading"))
     {
         auto file = fs.open("test/AllLoading/" + entry.filename());
-        std::vector<char> data(file.begin(), file.end());
+        std::vector data(file.begin(), file.end());
         auto newFile = disk->newFile(entry.filename());
         newFile->setFileData(data);
     }
@@ -37,7 +37,7 @@ void prepareAllResources(mpc::Mpc &mpc)
 TEST_CASE("Load ALL and check sequence 21 is used", "[load-all]")
 {
     Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpc(mpc);
     prepareAllResources(mpc);
 
     auto disk = mpc.getDisk();
@@ -45,7 +45,7 @@ TEST_CASE("Load ALL and check sequence 21 is used", "[load-all]")
 
     REQUIRE(allFile);
 
-    mpc::file::all::AllParser parser(mpc, allFile->getBytes());
+    file::all::AllParser parser(mpc, allFile->getBytes());
 
     auto seqNames = parser.getSeqNames();
 

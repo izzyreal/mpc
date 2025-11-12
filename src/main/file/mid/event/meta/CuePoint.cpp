@@ -5,7 +5,7 @@
 using namespace mpc::file::mid::event::meta;
 
 CuePoint::CuePoint(int tick, int delta, const std::string &marker)
-    : TextualMetaEvent(tick, delta, MetaEvent::CUE_POINT, marker)
+    : TextualMetaEvent(tick, delta, CUE_POINT, marker)
 {
 }
 

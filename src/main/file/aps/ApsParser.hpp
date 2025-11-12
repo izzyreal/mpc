@@ -57,7 +57,6 @@ namespace mpc::file::aps
         std::vector<std::unique_ptr<ApsProgram>> programs;
         std::vector<char> saveBytes;
 
-    public:
         std::vector<std::string> getSoundNames() const;
         bool isHeaderValid() const;
         std::string getApsName() const;
@@ -66,11 +65,9 @@ namespace mpc::file::aps
         ApsDrumConfiguration *getDrumConfiguration(int i) const;
         ApsGlobalParameters *getGlobalParameters() const;
 
-    public:
         std::vector<char> getBytes();
 
-    public:
         ApsParser(const std::vector<char> &loadBytes);
-        ApsParser(mpc::Mpc &, std::string apsNameString);
+        ApsParser(Mpc &, std::string apsNameString);
     };
 } // namespace mpc::file::aps

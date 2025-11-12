@@ -45,7 +45,7 @@ namespace mpc::sequencer
     private:
         int number = 60;
         Duration duration;
-        VARIATION_TYPE variationType = VARIATION_TYPE::TUNE_0;
+        VARIATION_TYPE variationType = TUNE_0;
         int variationValue = 64;
         int velocity;
 

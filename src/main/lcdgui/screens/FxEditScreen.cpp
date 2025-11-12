@@ -19,7 +19,7 @@ FxEditScreen::FxEditScreen(Mpc &mpc, const int layerIndex)
 
     for (int i = 0; i < 6; i++)
     {
-        const int x = (i * (effectWidth + effectDistance)) + effectOffset;
+        const int x = i * (effectWidth + effectDistance) + effectOffset;
         MRECT r(x, effectY, x + effectWidth - 1, effectY + effectHeight - 1);
         addChildT<Effect>(r);
     }

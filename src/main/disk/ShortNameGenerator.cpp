@@ -26,15 +26,15 @@ bool ShortNameGenerator::validChar(char toTest)
         return true;
     }
 
-    return (toTest == '_' || toTest == '^' || toTest == '$' || toTest == '~' ||
-            toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' ||
-            toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' ||
-            toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`');
+    return toTest == '_' || toTest == '^' || toTest == '$' || toTest == '~' ||
+           toTest == '!' || toTest == '#' || toTest == '%' || toTest == '&' ||
+           toTest == '-' || toTest == '{' || toTest == '}' || toTest == '(' ||
+           toTest == ')' || toTest == '@' || toTest == '\'' || toTest == '`';
 }
 
 bool ShortNameGenerator::isSkipChar(char c)
 {
-    return (c == '.') || (c == ' ');
+    return c == '.' || c == ' ';
 }
 
 string ShortNameGenerator::tidyString(const string &dirty)
@@ -110,9 +110,9 @@ ShortName ShortNameGenerator::generateShortName(const string &longFullName)
         longName = tidyString(name.substr(0, dotIdx));
         longExt = tidyString(name.substr(dotIdx + 1));
     }
-    string shortExt = (longExt.length() > 3) ? longExt.substr(0, 3) : longExt;
+    string shortExt = longExt.length() > 3 ? longExt.substr(0, 3) : longExt;
 
-    if (forceSuffix || (longName.length() > 8) ||
+    if (forceSuffix || longName.length() > 8 ||
         find(usedNames.begin(), usedNames.end(),
              ShortName(longName, shortExt).asSimpleString()) != usedNames.end())
     {

@@ -13,7 +13,7 @@ BarList::BarList(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 999; i++)
     {
-        auto bar = new Bar(Util::vecCopyOfRange(loadBytes, i * 4, (i * 4) + 4),
+        auto bar = new Bar(Util::vecCopyOfRange(loadBytes, i * 4, i * 4 + 4),
                            previousBar);
 
         if (bar->lastTick == 0)
@@ -38,7 +38,7 @@ BarList::~BarList()
     }
 }
 
-BarList::BarList(mpc::sequencer::Sequence *seq)
+BarList::BarList(sequencer::Sequence *seq)
 {
     saveBytes = std::vector<char>(3996);
     auto &barLengths = seq->getBarLengthsInTicks();
@@ -48,13 +48,13 @@ BarList::BarList(mpc::sequencer::Sequence *seq)
     for (int i = 0; i < seq->getLastBarIndex() + 1; i++)
     {
         lastTick += barLengths[i];
-        ticksPerBeat = static_cast<int>(barLengths[i] / seq->getNumerator(i));
+        ticksPerBeat = barLengths[i] / seq->getNumerator(i);
 
         Bar bar(ticksPerBeat, lastTick);
 
         for (auto j = 0; j < 4; j++)
         {
-            saveBytes[(i * 4) + j] = bar.getBytes()[j];
+            saveBytes[i * 4 + j] = bar.getBytes()[j];
         }
     }
 

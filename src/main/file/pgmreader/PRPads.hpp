@@ -17,7 +17,6 @@ namespace mpc
             public:
                 int sampleNamesSize{0};
 
-            public:
                 std::vector<char> padsArray{};
 
             private:
@@ -29,10 +28,8 @@ namespace mpc
                 int getPadsEnd();
                 std::vector<char> getPadsArray();
 
-            public:
                 int getNote(int pad);
 
-            public:
                 Pads(ProgramFileReader *programFile);
             };
 

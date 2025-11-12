@@ -11,7 +11,7 @@ StateVariableFilterControls::StateVariableFilterControls(const string &name,
 {
 }
 
-void StateVariableFilterControls::derive(mpc::engine::control::Control *c)
+void StateVariableFilterControls::derive(Control *c)
 {
     FilterControls::derive(c);
 }

@@ -16,16 +16,14 @@ namespace mpc::file::mid
     class MidiTrack
     {
 
-    private:
         static const bool VERBOSE = false;
         static std::vector<char> IDENTIFIER;
 
-    private:
         int mSize;
         bool mSizeNeedsRecalculating;
         bool mClosed;
         int mEndOfTrackDelta;
-        std::vector<std::shared_ptr<mpc::file::mid::event::MidiEvent>> mEvents;
+        std::vector<std::shared_ptr<event::MidiEvent>> mEvents;
 
     public:
         static MidiTrack *createTempoTrack();
@@ -34,8 +32,7 @@ namespace mpc::file::mid
         void readTrackData(std::vector<char> &data);
 
     public:
-        std::vector<std::weak_ptr<mpc::file::mid::event::MidiEvent>>
-        getEvents() const;
+        std::vector<std::weak_ptr<event::MidiEvent>> getEvents() const;
         int getEventCount() const;
         int getSize();
         int getLengthInTicks();
@@ -43,9 +40,8 @@ namespace mpc::file::mid
         void setEndOfTrackDelta(int delta);
         void insertNote(int channel, int pitch, int velocity, int tick,
                         int duration);
-        void insertEvent(
-            const std::weak_ptr<mpc::file::mid::event::MidiEvent> &newEvent);
-        bool removeEvent(mpc::file::mid::event::MidiEvent *E) const;
+        void insertEvent(const std::weak_ptr<event::MidiEvent> &newEvent);
+        bool removeEvent(event::MidiEvent *E) const;
         void closeTrack();
 
     private:
@@ -54,7 +50,6 @@ namespace mpc::file::mid
     public:
         void writeToOutputStream(const std::shared_ptr<std::ostream> &);
 
-    public:
         MidiTrack();
         MidiTrack(const std::shared_ptr<std::istream> &);
     };

@@ -8,8 +8,7 @@ using namespace mpc::disk;
 using namespace akaifat::fat;
 
 MpcFile::MpcFile(
-    const std::variant<fs::path,
-                       std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>>
+    const std::variant<fs::path, std::shared_ptr<AkaiFatLfnDirectoryEntry>>
         &fileObject)
 {
     if (auto fsPath = std::get_if<fs::path>(&fileObject))
@@ -17,9 +16,8 @@ MpcFile::MpcFile(
         fs_path = *fsPath;
         return;
     }
-    else if (auto akaiEntry =
-                 std::get_if<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(
-                     &fileObject))
+    if (auto akaiEntry =
+            std::get_if<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(&fileObject))
     {
         rawEntry = *akaiEntry;
         raw = true;
@@ -85,10 +83,7 @@ std::string MpcFile::getNameWithoutExtension() const
         }
         return name;
     }
-    else
-    {
-        return fs_path.stem().string();
-    }
+    return fs_path.stem().string();
 }
 
 std::string MpcFile::getExtension() const
@@ -107,14 +102,11 @@ std::string MpcFile::getExtension() const
         }
         return ext;
     }
-    else
+    if (fs_path.has_extension())
     {
-        if (fs_path.has_extension())
-        {
-            return fs_path.extension().string();
-        }
-        return "";
+        return fs_path.extension().string();
     }
+    return "";
 }
 
 bool MpcFile::isDirectory() const
@@ -123,10 +115,7 @@ bool MpcFile::isDirectory() const
     {
         return rawEntry->isDirectory();
     }
-    else
-    {
-        return fs::is_directory(fs_path);
-    }
+    return fs::is_directory(fs_path);
 }
 
 bool MpcFile::isFile()
@@ -140,10 +129,7 @@ std::string MpcFile::getName() const
     {
         return rawEntry->getAkaiName();
     }
-    else
-    {
-        return fs_path.filename().string();
-    }
+    return fs_path.filename().string();
 }
 
 bool MpcFile::setName(const std::string &s) const
@@ -160,14 +146,11 @@ bool MpcFile::setName(const std::string &s) const
             return false;
         }
     }
-    else
-    {
-        fs::path new_path = fs_path;
-        new_path.replace_filename(s);
-        std::error_code ec;
-        fs::rename(fs_path, new_path, ec);
-        return ec.value() == 0;
-    }
+    fs::path new_path = fs_path;
+    new_path.replace_filename(s);
+    std::error_code ec;
+    fs::rename(fs_path, new_path, ec);
+    return ec.value() == 0;
 }
 
 unsigned long MpcFile::length()
@@ -187,10 +170,7 @@ unsigned long MpcFile::length()
         }
         return 0;
     }
-    else
-    {
-        return static_cast<unsigned long>(fs::file_size(fs_path));
-    }
+    return fs::file_size(fs_path);
 }
 
 void MpcFile::setFileData(std::vector<char> &data)
@@ -216,10 +196,7 @@ bool MpcFile::exists() const
     {
         return rawEntry->isValid();
     }
-    else
-    {
-        return fs::exists(fs_path);
-    }
+    return fs::exists(fs_path);
 }
 
 bool MpcFile::del() const
@@ -236,10 +213,7 @@ bool MpcFile::del() const
             return false;
         }
     }
-    else
-    {
-        return fs::remove(fs_path);
-    }
+    return fs::remove(fs_path);
 }
 
 std::vector<char> MpcFile::getBytes()
@@ -278,30 +252,22 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
 {
     if (raw)
     {
-        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(
-                   rawEntry->getFile())
+        return std::dynamic_pointer_cast<FatFile>(rawEntry->getFile())
             ->getInputStream();
     }
-    else
-    {
-        return std::make_shared<std::ifstream>(fs_path,
-                                               std::ios::in | std::ios::binary);
-    }
+    return std::make_shared<std::ifstream>(fs_path,
+                                           std::ios::in | std::ios::binary);
 }
 
 std::shared_ptr<std::ostream> MpcFile::getOutputStream()
 {
     if (raw)
     {
-        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(
-                   rawEntry->getFile())
+        return std::dynamic_pointer_cast<FatFile>(rawEntry->getFile())
             ->getOutputStream();
     }
-    else
-    {
-        return std::make_shared<std::ofstream>(fs_path, std::ios::out |
-                                                            std::ios::binary);
-    }
+    return std::make_shared<std::ofstream>(fs_path,
+                                           std::ios::out | std::ios::binary);
 }
 
 fs::path MpcFile::getPath()

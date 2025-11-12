@@ -21,11 +21,10 @@ namespace mpc::nvram
     {
 
     public:
-        static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc &mpc,
-                                                            fs::path file);
+        static file::all::Defaults AllDefaultsFromFile(Mpc &mpc, fs::path file);
         std::vector<char> saveBytes;
         std::vector<char> getBytes();
 
-        DefaultsParser(mpc::Mpc &mpc);
+        DefaultsParser(Mpc &mpc);
     };
 } // namespace mpc::nvram

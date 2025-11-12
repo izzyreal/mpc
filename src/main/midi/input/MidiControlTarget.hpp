@@ -10,7 +10,7 @@ namespace mpc::midi::input
     {
         struct HardwareTarget
         {
-            mpc::hardware::ComponentId componentId;
+            hardware::ComponentId componentId;
         };
 
         struct SequencerTarget

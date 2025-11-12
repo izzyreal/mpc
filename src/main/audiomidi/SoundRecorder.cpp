@@ -206,8 +206,7 @@ int SoundRecorder::processAudio(AudioBuffer *buf, const int nFrames)
     {
         if (mode == 0 || mode == 1)
         {
-            const auto &input =
-                (mode == 0 ? unresampledLeft : unresampledRight);
+            const auto &input = mode == 0 ? unresampledLeft : unresampledRight;
             const auto generatedFrameCount = resamplers[0].resample(
                 input, resampledLeft, engineSampleRate, consumed);
             sound->appendFrames(resampledLeft, generatedFrameCount);

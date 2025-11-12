@@ -5,13 +5,12 @@
 using namespace mpc::file::mid::event;
 
 ProgramChange::ProgramChange(int tick, int channel, int program)
-    : ChannelEvent(tick, ChannelEvent::PROGRAM_CHANGE, channel, program, 0)
+    : ChannelEvent(tick, PROGRAM_CHANGE, channel, program, 0)
 {
 }
 
 ProgramChange::ProgramChange(int tick, int delta, int channel, int program)
-    : ChannelEvent(tick, delta, ChannelEvent::PROGRAM_CHANGE, channel, program,
-                   0)
+    : ChannelEvent(tick, delta, PROGRAM_CHANGE, channel, program, 0)
 {
 }
 

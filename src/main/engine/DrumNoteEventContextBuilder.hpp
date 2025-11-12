@@ -37,9 +37,9 @@ namespace mpc::engine
     public:
         static DrumNoteOnContext buildDrumNoteOnContext(
             uint64_t noteEventId, const std::shared_ptr<sequencer::DrumBus> &,
-            const std::shared_ptr<mpc::sampler::Sampler> &sampler,
-            const std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> &mixer,
-            const std::shared_ptr<mpc::lcdgui::screens::MixerSetupScreen>
+            const std::shared_ptr<sampler::Sampler> &sampler,
+            const std::shared_ptr<audio::mixer::AudioMixer> &mixer,
+            const std::shared_ptr<lcdgui::screens::MixerSetupScreen>
                 &mixerSetupScreen,
             std::vector<std::shared_ptr<Voice>> *voices,
             std::vector<MixerInterconnection *> &mixerConnections, int note,

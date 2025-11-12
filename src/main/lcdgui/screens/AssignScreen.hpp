@@ -9,7 +9,6 @@ namespace mpc::lcdgui::screens
     public:
         AssignScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void turnWheel(int i) override;
         void open() override;
         void close() override;
@@ -22,7 +21,6 @@ namespace mpc::lcdgui::screens
         void displayLowRange() const;
         void displayAssignNv() const;
 
-    private:
         std::vector<std::string> typeNames = {"TUNING", "DECAY", "ATTACK",
                                               "FILTER"};
     };

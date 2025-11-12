@@ -25,7 +25,6 @@ namespace mpc::lcdgui::screens
         void function(int i) override;
         void turnWheel(int i) override;
 
-    public:
         SecondSeqScreen(Mpc &mpc, int layerIndex);
 
         void open() override;

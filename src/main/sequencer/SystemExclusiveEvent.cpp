@@ -42,8 +42,7 @@ const std::vector<unsigned char> &SystemExclusiveEvent::getBytes() const
     return bytes;
 }
 
-mpc::sequencer::SystemExclusiveEvent::SystemExclusiveEvent(
-    const SystemExclusiveEvent &event)
+SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent &event)
     : Event(event)
 {
     setBytes(event.getBytes());

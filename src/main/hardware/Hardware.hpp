@@ -13,7 +13,6 @@ namespace mpc::hardware
 
     class Hardware final
     {
-    private:
         std::unordered_map<ComponentId, std::shared_ptr<Component>> components;
         std::unordered_map<ComponentId, std::shared_ptr<Led>> leds;
         std::vector<std::shared_ptr<Pad>> pads;

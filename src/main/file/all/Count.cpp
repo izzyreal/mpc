@@ -32,7 +32,7 @@ Count::Count(const std::vector<char> &b)
     normalVelo = b[NORMAL_VELO_OFFSET];
 }
 
-Count::Count(mpc::Mpc &mpc)
+Count::Count(Mpc &mpc)
 {
     auto countMetronomeScreen =
         mpc.screens->get<ScreenId::CountMetronomeScreen>();
@@ -43,7 +43,7 @@ Count::Count(mpc::Mpc &mpc)
 
     saveBytes = std::vector<char>(AllParser::COUNT_LENGTH);
     saveBytes[ENABLED_OFFSET] = static_cast<int8_t>(
-        (lSequencer->getTransport()->isCountEnabled() ? 1 : 0));
+        lSequencer->getTransport()->isCountEnabled() ? 1 : 0);
     saveBytes[COUNT_IN_MODE_OFFSET] =
         static_cast<int8_t>(countMetronomeScreen->getCountInMode());
     saveBytes[CLICK_VOLUME_OFFSET] =
@@ -51,13 +51,13 @@ Count::Count(mpc::Mpc &mpc)
     saveBytes[RATE_OFFSET] =
         static_cast<int8_t>(countMetronomeScreen->getRate());
     saveBytes[ENABLED_IN_PLAY_OFFSET] =
-        static_cast<int8_t>((countMetronomeScreen->getInPlay() ? 1 : 0));
+        static_cast<int8_t>(countMetronomeScreen->getInPlay() ? 1 : 0);
     saveBytes[ENABLED_IN_REC_OFFSET] =
-        static_cast<int8_t>((countMetronomeScreen->getInRec() ? 1 : 0));
+        static_cast<int8_t>(countMetronomeScreen->getInRec() ? 1 : 0);
     saveBytes[CLICK_OUTPUT_OFFSET] =
         static_cast<int8_t>(metronomeSoundScreen->getOutput());
     saveBytes[WAIT_FOR_KEY_ENABLED_OFFSET] = static_cast<int8_t>(
-        (countMetronomeScreen->isWaitForKeyEnabled() ? 1 : 0));
+        countMetronomeScreen->isWaitForKeyEnabled() ? 1 : 0);
     saveBytes[SOUND_OFFSET] =
         static_cast<int8_t>(metronomeSoundScreen->getSound());
     saveBytes[ACCENT_PAD_OFFSET] =

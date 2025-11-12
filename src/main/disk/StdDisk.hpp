@@ -14,11 +14,11 @@ namespace mpc::disk
     {
 
     public:
-        StdDisk(mpc::Mpc &);
+        StdDisk(Mpc &);
         std::shared_ptr<MpcFile> getDir();
 
     private:
-        std::shared_ptr<mpc::disk::MpcFile> root;
+        std::shared_ptr<MpcFile> root;
         Volume volume;
         std::vector<std::string> path;
         void initParentFiles();

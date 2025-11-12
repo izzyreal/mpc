@@ -10,7 +10,6 @@ namespace mpc
         class TimeStretch
         {
 
-        private:
             static constexpr float TWO_PI{6.2831855f};
             int cycleLength = 1000;
             std::vector<float> processedData;
@@ -23,7 +22,6 @@ namespace mpc
             std::vector<float> seg(std::vector<float> *src, int length,
                                    int offset) const;
 
-        private:
             virtual float value(int length, int index);
 
         public:

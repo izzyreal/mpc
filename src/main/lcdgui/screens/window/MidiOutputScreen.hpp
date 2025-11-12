@@ -15,10 +15,8 @@ namespace mpc::lcdgui::screens::window
         void right() override;
         void openNameScreen() override;
 
-    public:
         MidiOutputScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:

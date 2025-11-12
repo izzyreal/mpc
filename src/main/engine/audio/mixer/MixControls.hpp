@@ -11,16 +11,14 @@ namespace mpc::engine::audio::mixer
 
     class LCRControl;
 
-    class MixControls : public mpc::engine::audio::core::AudioControls
+    class MixControls : public core::AudioControls
     {
 
-    private:
         static float HALF_ROOT_TWO_;
 
-    private:
-        std::shared_ptr<mpc::engine::control::BooleanControl> soloControl;
-        std::shared_ptr<mpc::engine::control::BooleanControl> muteControl;
-        std::shared_ptr<mpc::engine::FaderControl> gainControl;
+        std::shared_ptr<control::BooleanControl> soloControl;
+        std::shared_ptr<control::BooleanControl> muteControl;
+        std::shared_ptr<FaderControl> gainControl;
         std::shared_ptr<LCRControl> lcrControl;
         std::shared_ptr<BusControls> busControls;
 
@@ -39,7 +37,6 @@ namespace mpc::engine::audio::mixer
     public:
         void derive(Control *c) override;
 
-    public:
         bool isMaster() const;
 
         bool isMute() const;
@@ -52,21 +49,16 @@ namespace mpc::engine::audio::mixer
 
         float getSmoothingFactor() const;
 
-    public:
-        virtual mpc::engine::control::EnumControl *
-        createRouteControl(int stripId);
+        virtual control::EnumControl *createRouteControl(int stripId);
 
-        virtual mpc::engine::control::BooleanControl *createMuteControl();
+        virtual control::BooleanControl *createMuteControl();
 
-    public:
         MixControls(MixerControls *mixerControls, int stripId,
                     const std::shared_ptr<BusControls> &busControls,
                     bool isMaster);
 
-    public:
         std::string getName() override;
 
-    public:
         static float &HALF_ROOT_TWO();
     };
 } // namespace mpc::engine::audio::mixer

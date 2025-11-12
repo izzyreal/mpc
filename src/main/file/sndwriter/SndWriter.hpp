@@ -19,13 +19,11 @@ namespace mpc::file::sndwriter
     class SndWriter
     {
 
-    private:
         static const int HEADER_SIZE = 42;
         std::shared_ptr<SndHeaderWriter> sndHeaderWriter;
-        mpc::sampler::Sound *sound;
+        sampler::Sound *sound;
         std::vector<char> sndFileArray;
 
-    private:
         void setValues();
         void setName(const std::string &s) const;
         void setMono(bool b) const;
@@ -43,6 +41,6 @@ namespace mpc::file::sndwriter
     public:
         std::vector<char> &getSndFileArray();
 
-        SndWriter(mpc::sampler::Sound *sound);
+        SndWriter(sampler::Sound *sound);
     };
 } // namespace mpc::file::sndwriter

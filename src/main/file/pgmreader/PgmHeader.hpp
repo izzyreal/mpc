@@ -10,7 +10,6 @@ namespace mpc::file::pgmreader
     class PgmHeader
     {
 
-    private:
         const std::vector<char> PGM_HEADER_MAGIC{0x07, 0x04};
         std::vector<char> headerArray;
 
@@ -19,7 +18,6 @@ namespace mpc::file::pgmreader
 
         bool verifyMagic() const;
 
-    public:
         const uint16_t getSoundCount();
 
         PgmHeader(ProgramFileReader *programFile);

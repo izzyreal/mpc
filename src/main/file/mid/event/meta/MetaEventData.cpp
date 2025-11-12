@@ -6,7 +6,7 @@ MetaEventData::MetaEventData(std::stringstream &in)
 {
     type = in.get();
 
-    length = mpc::file::mid::util::VariableLengthInt(in);
+    length = util::VariableLengthInt(in);
 
     data = std::vector<char>(length.getValue());
 

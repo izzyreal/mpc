@@ -17,7 +17,7 @@ namespace mpc::lcdgui
 
         bool Empty() const
         {
-            return (L == 0 && T == 0 && R == 0 && B == 0);
+            return L == 0 && T == 0 && R == 0 && B == 0;
         }
 
         std::string getInfo() const
@@ -33,7 +33,7 @@ namespace mpc::lcdgui
 
         bool operator==(const MRECT &rhs) const
         {
-            return (L == rhs.L && T == rhs.T && R == rhs.R && B == rhs.B);
+            return L == rhs.L && T == rhs.T && R == rhs.R && B == rhs.B;
         }
 
         bool operator!=(const MRECT &rhs) const

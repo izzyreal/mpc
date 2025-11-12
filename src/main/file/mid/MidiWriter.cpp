@@ -40,30 +40,29 @@
 using namespace mpc::file::mid::event;
 using namespace mpc::file::mid;
 
-MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
+MidiWriter::MidiWriter(sequencer::Sequence *sequence)
 {
     this->sequence = sequence;
-    mf = std::make_unique<mpc::file::mid::MidiFile>();
-    auto meta = std::make_shared<mpc::file::mid::MidiTrack>();
-    auto seqParams = std::make_shared<mpc::file::mid::event::meta::Text>(
+    mf = std::make_unique<MidiFile>();
+    auto meta = std::make_shared<MidiTrack>();
+    auto seqParams = std::make_shared<meta::Text>(
         0, 0, "LOOP=ON  START=000 END=END TEMPO=ON ");
     meta->insertEvent(seqParams);
-    auto seqName = std::make_shared<mpc::file::mid::event::meta::TrackName>(
+    auto seqName = std::make_shared<meta::TrackName>(
         0, 0,
         "MPC2000XL 1.00  " + StrUtil::padRight(sequence->getName(), " ", 16));
     meta->insertEvent(seqName);
-    std::vector<std::shared_ptr<mpc::file::mid::event::meta::Tempo>> tempos;
+    std::vector<std::shared_ptr<meta::Tempo>> tempos;
     int previousTick = 0;
     auto tempo = sequence->getInitialTempo();
     auto mpqn = (int)(6.0E7 / tempo);
-    tempos.push_back(
-        std::make_shared<mpc::file::mid::event::meta::Tempo>(0, 0, mpqn));
+    tempos.push_back(std::make_shared<meta::Tempo>(0, 0, mpqn));
 
     for (auto &e : sequence->getTempoChangeEvents())
     {
         tempo = e->getTempo();
         mpqn = (int)(6.0E7 / tempo);
-        tempos.push_back(std::make_shared<mpc::file::mid::event::meta::Tempo>(
+        tempos.push_back(std::make_shared<meta::Tempo>(
             e->getTick(), e->getTick() - previousTick, mpqn));
         previousTick = e->getTick();
     }
@@ -74,8 +73,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
     }
 
     meta->insertEvent(std::make_shared<meta::SmpteOffset>(
-        0, 0, mpc::file::mid::event::meta::FrameRate::FRAME_RATE_25, 0, 0, 0, 0,
-        0));
+        0, 0, meta::FrameRate::FRAME_RATE_25, 0, 0, 0, 0, 0));
     std::set<std::vector<int>> tSigs;
     auto tSigTick = 0;
     auto lastAdded = std::vector<int>(3);
@@ -88,8 +86,8 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
             actualTick = lastAdded[2];
         }
 
-        auto vec = std::vector<int>{sequence->getNumerator(i),
-                                    sequence->getDenominator(i), actualTick};
+        auto vec = std::vector{sequence->getNumerator(i),
+                               sequence->getDenominator(i), actualTick};
         auto foo = tSigs.emplace(vec);
         if (foo.second)
         {
@@ -139,7 +137,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
             break;
         }
 
-        auto mt = std::make_shared<mpc::file::mid::MidiTrack>();
+        auto mt = std::make_shared<MidiTrack>();
         auto in = std::make_shared<meta::InstrumentName>(0, 0, "        ");
         mt->insertEvent(in);
         auto trackNumber =
@@ -150,8 +148,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
         {
             auto value = stoi(trackDevice, 0, 16);
             value += t->getDeviceIndex();
-            trackDevice = mpc::file::mid::util::MidiUtil::byteToHex(
-                static_cast<char>(value));
+            trackDevice = util::MidiUtil::byteToHex(static_cast<char>(value));
         }
 
         auto text = std::make_shared<meta::Text>(
@@ -164,27 +161,23 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
         for (auto &event : t->getEvents())
         {
             auto noteEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);
+                std::dynamic_pointer_cast<sequencer::NoteOnEvent>(event);
             auto mpcSysExEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(
+                std::dynamic_pointer_cast<sequencer::SystemExclusiveEvent>(
                     event);
             auto pitchBendEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(
-                    event);
+                std::dynamic_pointer_cast<sequencer::PitchBendEvent>(event);
             auto channelPressureEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(
+                std::dynamic_pointer_cast<sequencer::ChannelPressureEvent>(
                     event);
             auto polyPressureEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(
-                    event);
+                std::dynamic_pointer_cast<sequencer::PolyPressureEvent>(event);
             auto controlChangeEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(
-                    event);
+                std::dynamic_pointer_cast<sequencer::ControlChangeEvent>(event);
             auto programChangeEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(
-                    event);
+                std::dynamic_pointer_cast<sequencer::ProgramChangeEvent>(event);
             auto mixerEvent =
-                std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
+                std::dynamic_pointer_cast<sequencer::MixerEvent>(event);
             if (noteEvent)
             {
                 addNoteOn(std::make_shared<NoteOn>(
@@ -226,7 +219,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
             else if (mpcSysExEvent)
             {
                 auto sysExData = std::vector<char>(
-                    (int)(mpcSysExEvent->getBytes().size()) - 1);
+                    (int)mpcSysExEvent->getBytes().size() - 1);
 
                 for (int j = 0; j < sysExData.size(); j++)
                 {
@@ -241,9 +234,9 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence *sequence)
             {
                 auto amountBytes =
                     ByteUtil::ushort2bytes(pitchBendEvent->getAmount() + 8192);
-                auto pb = std::make_shared<PitchBend>(
-                    pitchBendEvent->getTick(), 1, (int)(amountBytes[0] & 255),
-                    (int)(amountBytes[1] & 255));
+                auto pb = std::make_shared<PitchBend>(pitchBendEvent->getTick(),
+                                                      1, amountBytes[0] & 255,
+                                                      amountBytes[1] & 255);
                 pb->setBendAmount(pitchBendEvent->getAmount() + 8192);
                 miscEvents.push_back(pb);
             }
@@ -348,16 +341,14 @@ void MidiWriter::addNoteOn(const std::shared_ptr<NoteOn> &noteOn)
     noteOns.push_back(noteOn);
 }
 
-void MidiWriter::createDeltas(
-    const std::weak_ptr<mpc::file::mid::MidiTrack> &midiTrack) const
+void MidiWriter::createDeltas(const std::weak_ptr<MidiTrack> &midiTrack) const
 {
     auto mt = midiTrack.lock();
-    std::shared_ptr<mpc::file::mid::event::MidiEvent> previousEvent;
+    std::shared_ptr<MidiEvent> previousEvent;
 
     for (auto &me : mt->getEvents())
     {
-        auto event =
-            std::dynamic_pointer_cast<mpc::file::mid::event::NoteOn>(me.lock());
+        auto event = std::dynamic_pointer_cast<NoteOn>(me.lock());
         if (event)
         {
             if (previousEvent)

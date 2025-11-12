@@ -171,7 +171,7 @@ void ClientHardwareEventController::handlePadPress(
 
     const Bank activeBank = mpc.clientEventController->getActiveBank();
     const auto programPadIndex =
-        physicalPadIndex + (static_cast<int>(activeBank) * 16);
+        physicalPadIndex + static_cast<int>(activeBank) * 16;
 
     std::optional<int> note = std::nullopt;
 
@@ -313,8 +313,7 @@ void ClientHardwareEventController::handlePadRelease(
             return;
         }
 
-        const auto programPadIndex =
-            p->padIndex.get() + static_cast<int>(p->bank) * 16;
+        const auto programPadIndex = p->padIndex.get() + p->bank * 16;
 
         if (p->note)
         {
@@ -374,7 +373,7 @@ void ClientHardwareEventController::handlePadAftertouch(
         {
             eventRegistry->registerProgramPadAftertouch(
                 Source::VirtualMpcHardware, padPress->bus, padPress->program,
-                padPress->padIndex.get() + (padPress->bank * 16), pressureToUse,
+                padPress->padIndex.get() + padPress->bank * 16, pressureToUse,
                 padPress->track);
         }
 
@@ -531,17 +530,17 @@ void ClientHardwareEventController::handleButtonPress(
             stepEditorScreen->prevStepEvent();
             return;
         }
-        else if (id == NEXT_STEP_OR_EVENT)
+        if (id == NEXT_STEP_OR_EVENT)
         {
             stepEditorScreen->nextStepEvent();
             return;
         }
-        else if (id == PREV_BAR_START)
+        if (id == PREV_BAR_START)
         {
             stepEditorScreen->prevBarStart();
             return;
         }
-        else if (id == NEXT_BAR_END)
+        if (id == NEXT_BAR_END)
         {
             stepEditorScreen->nextBarEnd();
             return;

@@ -11,7 +11,7 @@
 using namespace mpc::disk;
 using namespace mpc::file;
 
-void AkaiFileRenamer::renameFilesInDirectory(mpc::Mpc &mpc, const fs::path &p)
+void AkaiFileRenamer::renameFilesInDirectory(Mpc &mpc, const fs::path &p)
 {
     assert(fs::is_directory(p));
 

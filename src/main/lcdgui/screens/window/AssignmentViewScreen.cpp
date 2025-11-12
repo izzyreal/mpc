@@ -143,7 +143,7 @@ void AssignmentViewScreen::displayPad(const int i) const
     const auto program = getProgramOrThrow();
     const int bank =
         static_cast<int>(mpc.clientEventController->getActiveBank());
-    const auto note = program->getPad(i + (16 * bank))->getNote();
+    const auto note = program->getPad(i + 16 * bank)->getNote();
 
     std::string sampleName;
 

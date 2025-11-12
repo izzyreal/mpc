@@ -11,17 +11,14 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void turnWheel(int i) override;
 
-    public:
         ChangeBars2Screen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:
         int newBars = 1;
         void setNewBars(int i);
 
-    private:
         void displayCurrent() const;
         void displayNewBars() const;
     };

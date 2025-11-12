@@ -21,7 +21,6 @@ namespace mpc
             public:
                 std::vector<char> mixerArray{};
 
-            public:
                 std::vector<char> getMixerArray();
 
             private:
@@ -33,7 +32,7 @@ namespace mpc
                 void setEffectsSendLevel(int pad, int effectsSendLevel);
 
             public:
-                Mixer(mpc::sampler::Program *program);
+                Mixer(sampler::Program *program);
             };
 
         } // namespace pgmwriter

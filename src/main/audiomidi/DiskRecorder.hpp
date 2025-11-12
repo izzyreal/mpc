@@ -31,16 +31,16 @@ namespace moodycamel
 
 namespace mpc::audiomidi
 {
-    class DiskRecorder : public mpc::engine::audio::core::AudioProcessAdapter
+    class DiskRecorder : public engine::audio::core::AudioProcessAdapter
 
     {
     public:
-        DiskRecorder(mpc::Mpc &, AudioProcess *, int index);
+        DiskRecorder(Mpc &, AudioProcess *, int index);
 
         ~DiskRecorder() override;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         const int BUFFER_SIZE =
             192000; // Number of frames for 1 second at 192khz
         std::thread writeThread;
@@ -61,7 +61,7 @@ namespace mpc::audiomidi
 
         int index = 0;
         fs::path destinationDirectory;
-        mpc::engine::audio::core::AudioFormat *outputFileFormat = nullptr;
+        engine::audio::core::AudioFormat *outputFileFormat = nullptr;
         std::vector<std::ofstream> fileStreams;
         std::atomic<bool> writing{false};
         std::atomic<bool> preparedToWrite{false};

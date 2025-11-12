@@ -44,7 +44,7 @@ unsigned char BitUtil::setBit(unsigned char b, int i, bool on)
 
 bool BitUtil::isBitOn(unsigned char b, int i)
 {
-    if ((b & (1UL << i)) != 0)
+    if ((b & 1UL << i) != 0)
     {
         return true;
     }

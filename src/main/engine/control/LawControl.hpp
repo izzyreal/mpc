@@ -11,7 +11,6 @@ namespace mpc::engine::control
     class LawControl : public Control
     {
 
-    private:
         std::shared_ptr<ControlLaw> law;
         float value{0};
 
@@ -20,10 +19,8 @@ namespace mpc::engine::control
 
         virtual void setValue(float value);
 
-    public:
         std::string getValueString() override;
 
-    public:
         LawControl(int id, const std::string &name,
                    const std::shared_ptr<ControlLaw> &law, float initialValue);
     };

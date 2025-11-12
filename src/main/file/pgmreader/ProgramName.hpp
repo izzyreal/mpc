@@ -18,7 +18,6 @@ namespace mpc
             public:
                 int sampleNamesSize{0};
 
-            public:
                 std::vector<char> programNameArray{};
 
             private:
@@ -30,7 +29,6 @@ namespace mpc
                 int getProgramNameEnd();
                 std::vector<char> getProgramNameArray();
 
-            public:
                 std::string getProgramNameASCII();
 
                 ProgramName(ProgramFileReader *programFile);

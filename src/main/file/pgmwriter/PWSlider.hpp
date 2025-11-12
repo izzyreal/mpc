@@ -21,7 +21,6 @@ namespace mpc
             public:
                 std::vector<char> sliderArray{};
 
-            public:
                 std::vector<char> getSliderArray();
 
             private:
@@ -37,7 +36,7 @@ namespace mpc
                 void setControlChange(int controlChange);
 
             public:
-                Slider(mpc::sampler::Program *program);
+                Slider(sampler::Program *program);
             };
 
         } // namespace pgmwriter

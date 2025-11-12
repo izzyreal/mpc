@@ -8,13 +8,12 @@ namespace mpc::engine::filter
     class StateVariableFilterControls : public FilterControls
     {
     public:
-        void derive(mpc::engine::control::Control *c) override;
+        void derive(Control *c) override;
 
         void deriveSampleRateIndependentVariables() override;
 
         float deriveResonance() override;
 
-    public:
         StateVariableFilterControls(const std::string &name, int idOffset);
     };
 

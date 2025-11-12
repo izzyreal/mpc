@@ -55,8 +55,7 @@ void PgmFileToProgramConverter::setNoteParameters(
         auto note = padNote == -1 ? 34 : padNote;
         program->getPad(i)->setNote(note);
 
-        programNoteParameters =
-            dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
+        programNoteParameters = program->getNoteParameters(i + 35);
         programNoteParameters->setAttack(pgmNoteParameters->getAttack(i));
         programNoteParameters->setDecay(pgmNoteParameters->getDecay(i));
         programNoteParameters->setDecayMode(pgmNoteParameters->getDecayMode(i));
@@ -113,8 +112,7 @@ void PgmFileToProgramConverter::setMixer(
 
     for (int i = 0; i < 64; i++)
     {
-        auto noteParameters =
-            dynamic_cast<NoteParameters *>(program->getNoteParameters(i + 35));
+        auto noteParameters = program->getNoteParameters(i + 35);
         auto smc = noteParameters->getStereoMixerChannel();
         auto ifmc = noteParameters->getIndivFxMixerChannel();
 
@@ -127,8 +125,7 @@ void PgmFileToProgramConverter::setMixer(
 }
 
 program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
-    const std::shared_ptr<MpcFile> &f,
-    std::shared_ptr<mpc::sampler::Program> program,
+    const std::shared_ptr<MpcFile> &f, std::shared_ptr<Program> program,
     std::vector<std::string> &soundNames)
 {
     if (!f->exists())

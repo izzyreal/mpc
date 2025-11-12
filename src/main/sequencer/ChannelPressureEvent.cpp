@@ -16,8 +16,7 @@ int ChannelPressureEvent::getAmount() const
     return channelPressureValue;
 }
 
-mpc::sequencer::ChannelPressureEvent::ChannelPressureEvent(
-    const ChannelPressureEvent &event)
+ChannelPressureEvent::ChannelPressureEvent(const ChannelPressureEvent &event)
     : Event(event)
 {
     setAmount(event.getAmount());

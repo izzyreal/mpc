@@ -29,12 +29,12 @@ float VoiceUtil::midiFreq(const float pitch)
         return freqTable()[0];
     }
 
-    if (pitch >= (int)(freqTable().size()) - 1)
+    if (pitch >= (int)freqTable().size() - 1)
     {
-        return freqTable()[(int)(freqTable().size()) - 2];
+        return freqTable()[(int)freqTable().size() - 2];
     }
 
-    const auto idx = (int)(pitch);
+    const auto idx = (int)pitch;
     const auto frac = pitch - idx;
 
     return freqTable()[idx] * (1 - frac) + freqTable()[idx + 1] * frac;
@@ -42,5 +42,5 @@ float VoiceUtil::midiFreq(const float pitch)
 
 float VoiceUtil::midiFreqImpl(const int pitch)
 {
-    return (float)(440.0 * pow(2.0, ((double)(pitch)-69.0) / 12.0));
+    return (float)(440.0 * pow(2.0, ((double)pitch - 69.0) / 12.0));
 }

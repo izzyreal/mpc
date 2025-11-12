@@ -69,9 +69,9 @@ namespace mpc::controller
             const std::shared_ptr<lcdgui::screens::MidiSwScreen> &,
             const std::shared_ptr<sequencer::Sequencer> &);
 
-        void handleEvent(const mpc::client::event::ClientMidiEvent &);
+        void handleEvent(const client::event::ClientMidiEvent &);
 
-        std::vector<mpc::midi::input::MidiControlTargetBinding> bindings;
+        std::vector<midi::input::MidiControlTargetBinding> bindings;
 
         void initializeDefaultBindings();
 
@@ -82,14 +82,14 @@ namespace mpc::controller
         std::shared_ptr<sequencer::Sequencer> sequencer;
 
         void dispatchSequencerCommand(
-            mpc::midi::input::MidiControlTarget::SequencerTarget::Command);
+            midi::input::MidiControlTarget::SequencerTarget::Command);
 
-        void triggerDualButtonCombo(mpc::hardware::ComponentId,
-                                    mpc::hardware::ComponentId);
+        void triggerDualButtonCombo(hardware::ComponentId,
+                                    hardware::ComponentId);
         void handleRecPunch();
         void handleOdubPunch();
-        void pressButton(mpc::hardware::ComponentId) const;
-        void releaseButton(mpc::hardware::ComponentId) const;
+        void pressButton(hardware::ComponentId) const;
+        void releaseButton(hardware::ComponentId) const;
         void handleStopToPlay();
         void handleRecordingToPlay();
     };

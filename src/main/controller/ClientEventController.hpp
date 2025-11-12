@@ -46,19 +46,19 @@ namespace mpc::controller
 
     class ClientEventController
         : public std::enable_shared_from_this<ClientEventController>,
-          public mpc::Observable
+          public Observable
     {
 
     public:
-        ClientEventController(mpc::Mpc &);
+        ClientEventController(Mpc &);
 
         void init();
 
-        void dispatchHostInput(const mpc::input::HostInputEvent &hostEvent);
+        void dispatchHostInput(const input::HostInputEvent &hostEvent);
 
         void handleClientEvent(const client::event::ClientEvent &) const;
 
-        std::shared_ptr<mpc::input::KeyboardBindings> getKeyboardBindings()
+        std::shared_ptr<input::KeyboardBindings> getKeyboardBindings()
         {
             return keyboardBindings;
         }
@@ -90,10 +90,10 @@ namespace mpc::controller
         bool isEraseButtonPressed() const;
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         input::HostToClientTranslator hostToClientTranslator;
         std::shared_ptr<ClientMidiEventController> clientMidiEventController;
-        std::shared_ptr<mpc::input::KeyboardBindings> keyboardBindings;
+        std::shared_ptr<input::KeyboardBindings> keyboardBindings;
         std::shared_ptr<lcdgui::Screens> screens;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::shared_ptr<hardware::Hardware> hardware;

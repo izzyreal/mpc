@@ -592,7 +592,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(const int x,
     {
         return disk->getParentFile(y + yOffset0);
     }
-    else if (x == 1 && disk->getFileNames().size() > y + yOffset1)
+    if (x == 1 && disk->getFileNames().size() > y + yOffset1)
     {
         return disk->getFile(y + yOffset1);
     }
@@ -779,7 +779,7 @@ void DirectoryScreen::drawGraphicsLeft()
     auto dirName = disk->getDirectoryName();
     int visibleListLength = bottomVisibleFileIndex + 1;
 
-    if ((size - yOffset0) == 2)
+    if (size - yOffset0 == 2)
     {
         if (firstVisibleFile->getName() == dirName)
         {
@@ -802,7 +802,7 @@ void DirectoryScreen::drawGraphicsLeft()
         return;
     }
 
-    std::vector<std::shared_ptr<Label>> aLabels{a0, a1, a2, a3, a4};
+    std::vector aLabels{a0, a1, a2, a3, a4};
 
     if (size - yOffset0 <= 4)
     {

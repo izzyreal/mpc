@@ -108,7 +108,7 @@ vector<char> ShortName::toCharArray_(const string &name, const string &ext)
 
 int8_t ShortName::checkSum() const
 {
-    auto const dest = new ::vector<char>(11);
+    auto const dest = new vector<char>(11);
     for (auto i = 0; i < 11; i++)
     {
         (*dest)[i] = static_cast<int8_t>(nameBytes[i]);
@@ -119,7 +119,7 @@ int8_t ShortName::checkSum() const
     {
         sum = (*dest)[i] + (((sum & 1) << 7) + ((sum & 254) >> 1));
     }
-    return static_cast<int8_t>((sum & 255));
+    return static_cast<int8_t>(sum & 255);
 }
 
 ShortName ShortName::get(const string &name)
@@ -128,21 +128,18 @@ ShortName ShortName::get(const string &name)
     {
         return DOT_;
     }
-    else if (name.compare("..") == 0)
+    if (name.compare("..") == 0)
     {
         return DOT_DOT_;
     }
-    else
-    {
-        return ShortName(name);
-    }
+    return ShortName(name);
 }
 
 bool ShortName::canConvert(const string &nameExt)
 {
     try
     {
-        ShortName::get(nameExt);
+        get(nameExt);
         return true;
     }
     catch (exception e)
@@ -173,7 +170,7 @@ ShortName ShortName::parse(vector<char> data)
     return ShortName("parsedum", "my");
 }
 
-void ShortName::write(::vector<char> dest) const
+void ShortName::write(vector<char> dest) const
 {
     // arraycopy(nameBytes, 0, dest, 0, nameBytes.size());
 }

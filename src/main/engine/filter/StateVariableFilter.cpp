@@ -22,7 +22,7 @@ float StateVariableFilter::update()
 float StateVariableFilter::filter(float sample, float f) const
 {
     float min = 0.24f < f * 0.25f ? 0.24f : f * 0.25f;
-    auto f1 = 2.0f * sin(static_cast<float>(mpc::math::pi * min));
+    auto f1 = 2.0f * sin(static_cast<float>(math::pi * min));
     float v1 = 1.9f;
     float v2 = 2.0f / f1 - f1 * 0.5f;
     min = v1 < v2 ? v1 : v2;

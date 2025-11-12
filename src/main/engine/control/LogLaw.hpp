@@ -8,14 +8,12 @@ namespace mpc::engine::control
     class LogLaw : public AbstractLaw
     {
 
-    private:
         double logMin, logMax;
         double logSpan;
 
     public:
         int intValue(float userVal) override;
 
-    public:
         LogLaw(float min, float max, const std::string &units);
     };
 

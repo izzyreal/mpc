@@ -19,7 +19,7 @@ using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
-DiskController::DiskController(mpc::Mpc &_mpc) : mpc(_mpc) {}
+DiskController::DiskController(Mpc &_mpc) : mpc(_mpc) {}
 
 void DiskController::initDisks()
 {
@@ -123,13 +123,13 @@ void DiskController::detectRawUsbVolumes()
 
         void processChange(RemovableVolume v) override
         {
-            std::lock_guard<std::mutex> lk(m);
+            std::lock_guard lk(m);
             volumes.push_back(std::move(v));
         }
 
         std::vector<RemovableVolume> snapshot()
         {
-            std::lock_guard<std::mutex> lk(m);
+            std::lock_guard lk(m);
             return volumes;
         }
     };

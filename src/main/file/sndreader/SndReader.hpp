@@ -20,7 +20,6 @@ namespace mpc::file::sndreader
     class SndReader
     {
 
-    private:
         std::vector<char> sndFileArray;
         std::shared_ptr<SndHeaderReader> sndHeaderReader;
 
@@ -39,11 +38,9 @@ namespace mpc::file::sndreader
         int getNumberOfBeats() const;
         void readData(const std::shared_ptr<std::vector<float>> &);
 
-    public:
         std::vector<char> &getSndFileArray();
 
-    public:
-        SndReader(mpc::disk::MpcFile *);
+        SndReader(disk::MpcFile *);
 
         SndReader(const std::vector<char> &loadBytes);
     };

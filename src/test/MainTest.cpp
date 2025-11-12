@@ -10,7 +10,7 @@ using namespace mpc;
 TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 {
     Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpc(mpc);
     REQUIRE(mpc.getSequencer());
 }
 
@@ -20,7 +20,7 @@ SCENARIO("A Sequencer initializes correctly", "[sequencer]")
     GIVEN("A Sequencer")
     {
         Mpc mpc;
-        mpc::TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpc(mpc);
         auto seq = mpc.getSequencer();
         seq->init();
 
@@ -34,7 +34,7 @@ SCENARIO("A Sequence initializes correctly", "[sequence]")
     GIVEN("An initialized Sequence")
     {
         Mpc mpc;
-        mpc::TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpc(mpc);
         auto seq = mpc.getSequencer()->makeNewSequence();
         seq->init(1);
         REQUIRE(seq->getInitialTempo() == 120.0);

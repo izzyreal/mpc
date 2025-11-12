@@ -24,13 +24,12 @@ namespace mpc::file::all
         bool isDurationOfRecNotesTc() const;
         int getDurationTcPercentage() const;
         bool isPgmChToSeqEnabled() const;
-        std::vector<mpc::lcdgui::screens::window::LocateScreen::Location> &
-        getLocations();
+        std::vector<LocateScreen::Location> &getLocations();
 
         std::vector<char> &getBytes();
 
         Misc(const std::vector<char> &b);
-        Misc(mpc::Mpc &);
+        Misc(Mpc &);
 
     private:
         static const int LOCATIONS_OFFSET = 0;
@@ -51,9 +50,7 @@ namespace mpc::file::all
         std::vector<char> saveBytes;
         std::vector<std::pair<int, int>> switches =
             std::vector<std::pair<int, int>>(4);
-        std::vector<mpc::lcdgui::screens::window::LocateScreen::Location>
-            locations = std::vector<
-                mpc::lcdgui::screens::window::LocateScreen::Location>(
-                9, {0, 0, 0});
+        std::vector<LocateScreen::Location> locations =
+            std::vector<LocateScreen::Location>(9, {0, 0, 0});
     };
 } // namespace mpc::file::all

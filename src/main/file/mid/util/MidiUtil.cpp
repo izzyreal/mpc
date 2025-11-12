@@ -55,7 +55,7 @@ std::string MidiUtil::byteToHex(char b)
 {
 
     int high = (b & 240) >> 4;
-    int low = (b & 15);
+    int low = b & 15;
     std::string res;
     res.push_back(HEX[high]);
     res.push_back(HEX[low]);

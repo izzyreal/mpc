@@ -19,7 +19,7 @@ Tracks::Tracks(const std::vector<char> &loadBytes)
         busses[i] = loadBytes[BUSSES_OFFSET + i];
         pgms[i] = loadBytes[PGMS_OFFSET + i];
         veloRatios[i] = loadBytes[VELO_RATIOS_OFFSET + i];
-        auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
+        auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
         std::string name;
 
         for (char c : Util::vecCopyOfRange(loadBytes, offset,
@@ -37,7 +37,7 @@ Tracks::Tracks(const std::vector<char> &loadBytes)
     }
 }
 
-Tracks::Tracks(mpc::sequencer::Sequence *seq)
+Tracks::Tracks(sequencer::Sequence *seq)
 {
     saveBytes = std::vector<char>(AllSequence::TRACKS_LENGTH);
     for (int i = 0; i < 64; i++)
@@ -46,16 +46,16 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
 
         for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
         {
-            auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
+            auto offset = TRACK_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
             auto name = StrUtil::padRight(t->getActualName(), " ",
                                           AllParser::NAME_LENGTH);
             saveBytes[offset + j] = name[j];
         }
 
-        saveBytes[DEVICES_OFFSET + i] = (t->getDeviceIndex());
-        saveBytes[BUSSES_OFFSET + i] = (t->getBus());
-        saveBytes[PGMS_OFFSET + i] = (t->getProgramChange());
-        saveBytes[VELO_RATIOS_OFFSET + i] = (t->getVelocityRatio());
+        saveBytes[DEVICES_OFFSET + i] = t->getDeviceIndex();
+        saveBytes[BUSSES_OFFSET + i] = t->getBus();
+        saveBytes[PGMS_OFFSET + i] = t->getProgramChange();
+        saveBytes[VELO_RATIOS_OFFSET + i] = t->getVelocityRatio();
 
         /**
          * 4 == track is unused and off
@@ -83,7 +83,7 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
             saveStatus = 5;
         }
 
-        saveBytes[STATUS_OFFSET + i] = (saveStatus);
+        saveBytes[STATUS_OFFSET + i] = saveStatus;
     }
 
     for (int i = 0; i < PADDING1.size(); i++)
@@ -91,13 +91,13 @@ Tracks::Tracks(mpc::sequencer::Sequence *seq)
         saveBytes[PADDING1_OFFSET + i] = PADDING1[i];
     }
 
-    auto lastTick = static_cast<int>(seq->getLastTick());
+    auto lastTick = seq->getLastTick();
     auto remainder = lastTick % 65535;
     auto large = static_cast<int>(floor(lastTick / 65536.0));
     auto lastTickBytes = ByteUtil::ushort2bytes(remainder);
     saveBytes[LAST_TICK_BYTE1_OFFSET] = lastTickBytes[0];
     saveBytes[LAST_TICK_BYTE2_OFFSET] = lastTickBytes[1];
-    saveBytes[LAST_TICK_BYTE3_OFFSET] = (large);
+    saveBytes[LAST_TICK_BYTE3_OFFSET] = large;
 
     auto unknown32BitIntBytes1 = ByteUtil::uint2bytes(10000000);
     auto unknown32BitIntBytes2 =

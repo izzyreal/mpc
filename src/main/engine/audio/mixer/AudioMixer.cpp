@@ -62,7 +62,7 @@ AudioMixer::getStripImpl(const std::string &name)
 
 void AudioMixer::work(int nFrames)
 {
-    AudioMixer::silenceStrips(auxStrips);
+    silenceStrips(auxStrips);
     mainStrip->silence();
 
     for (int i = 0; i < 32; i++)
@@ -81,7 +81,7 @@ void AudioMixer::work(int nFrames)
         channelStrips[i]->processBuffer(nFrames);
     }
 
-    AudioMixer::evaluateStrips(auxStrips, nFrames);
+    evaluateStrips(auxStrips, nFrames);
     mainStrip->processBuffer(nFrames);
     writeBusBuffers(nFrames);
 }
@@ -167,8 +167,7 @@ void AudioMixer::createStrips(
 {
     for (auto &control : mixerControls->getControls())
     {
-        auto candidate =
-            std::dynamic_pointer_cast<core::AudioControlsChain>(control);
+        auto candidate = std::dynamic_pointer_cast<AudioControlsChain>(control);
         if (candidate)
         {
             createStrip(candidate);

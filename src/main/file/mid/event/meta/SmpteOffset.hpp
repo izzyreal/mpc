@@ -39,17 +39,14 @@ namespace mpc::file::mid::event::meta
         virtual void setSubFrames(int s);
         virtual int getSubFrames();
 
-    public:
         int getEventSize() override;
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
         static std::shared_ptr<MetaEvent> parseSmpteOffset(int tick, int delta,
                                                            MetaEventData *info);
-        virtual int compareTo(mpc::file::mid::event::MidiEvent *other);
+        virtual int compareTo(MidiEvent *other);
 
-    public:
         SmpteOffset(int tick, int delta, FrameRate *fps, int hour, int min,
                     int sec, int fr, int subfr);
     };

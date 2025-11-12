@@ -21,18 +21,18 @@ std::vector<char> Defaults::UNKNOWN2 = {
     0, 0, 0,          0,          0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,
     0, 0, 0,          0,          0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32};
 
-Defaults::Defaults(mpc::Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
+Defaults::Defaults(Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
 {
     parseNames(loadBytes);
 
-    auto tempoBytes = std::vector<char>{loadBytes[TEMPO_BYTE1_OFFSET],
-                                        loadBytes[TEMPO_BYTE2_OFFSET]};
+    auto tempoBytes = std::vector{loadBytes[TEMPO_BYTE1_OFFSET],
+                                  loadBytes[TEMPO_BYTE2_OFFSET]};
     tempo = ByteUtil::bytes2ushort(tempoBytes);
     timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
     timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
 
-    auto barCountBytes = std::vector<char>{loadBytes[BAR_COUNT_BYTE1_OFFSET],
-                                           loadBytes[BAR_COUNT_BYTE2_OFFSET]};
+    auto barCountBytes = std::vector{loadBytes[BAR_COUNT_BYTE1_OFFSET],
+                                     loadBytes[BAR_COUNT_BYTE2_OFFSET]};
 
     barCount = ByteUtil::bytes2ushort(barCountBytes);
     loopEnabled = loadBytes[LOOP_ENABLED_OFFSET] == 0x01;
@@ -47,7 +47,7 @@ Defaults::Defaults(mpc::Mpc &mpc, const std::vector<char> &loadBytes) : mpc(mpc)
     }
 }
 
-Defaults::Defaults(mpc::Mpc &mpc) : mpc(mpc)
+Defaults::Defaults(Mpc &mpc) : mpc(mpc)
 {
     saveBytes = std::vector<char>(AllParser::DEFAULTS_LENGTH);
 
@@ -79,7 +79,7 @@ Defaults::Defaults(mpc::Mpc &mpc) : mpc(mpc)
     {
         for (int j = 0; j < 4; j++)
         {
-            saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] =
+            saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + i * 4] =
                 unknownNumberBytes[j];
         }
     }
@@ -118,7 +118,7 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 33; i++)
     {
-        offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
+        offset = DEV_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
         stringBuffer = Util::vecCopyOfRange(
             loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
         std::string s;
@@ -138,7 +138,7 @@ void Defaults::parseNames(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 64; i++)
     {
-        offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
+        offset = TR_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
         stringBuffer = Util::vecCopyOfRange(loadBytes, offset,
                                             offset + AllParser::NAME_LENGTH);
         std::string s;
@@ -221,11 +221,11 @@ void Defaults::setTrackSettings()
     auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
     for (int i = 0; i < 64; i++)
     {
-        saveBytes[DEVICES_OFFSET + i] = (userScreen->device);
-        saveBytes[BUSSES_OFFSET + i] = (userScreen->bus);
-        saveBytes[PGMS_OFFSET + i] = (userScreen->pgm);
-        saveBytes[TR_VELOS_OFFSET + i] = (userScreen->velo);
-        saveBytes[TR_STATUS_OFFSET + i] = (userScreen->getTrackStatus());
+        saveBytes[DEVICES_OFFSET + i] = userScreen->device;
+        saveBytes[BUSSES_OFFSET + i] = userScreen->bus;
+        saveBytes[PGMS_OFFSET + i] = userScreen->pgm;
+        saveBytes[TR_VELOS_OFFSET + i] = userScreen->velo;
+        saveBytes[TR_STATUS_OFFSET + i] = userScreen->getTrackStatus();
     }
 }
 
@@ -251,8 +251,8 @@ void Defaults::setBarCount()
 void Defaults::setTimeSig()
 {
     auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
-    saveBytes[TIMESIG_NUM_OFFSET] = (userScreen->timeSig.getNumerator());
-    saveBytes[TIMESIG_DEN_OFFSET] = (userScreen->timeSig.getDenominator());
+    saveBytes[TIMESIG_NUM_OFFSET] = userScreen->timeSig.getNumerator();
+    saveBytes[TIMESIG_DEN_OFFSET] = userScreen->timeSig.getDenominator();
 }
 
 void Defaults::setNames()
@@ -273,7 +273,7 @@ void Defaults::setNames()
         auto const defDevName = userScreen->getDeviceName(i);
         stringBuffer =
             StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
-        auto offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
+        auto offset = DEV_NAMES_OFFSET + i * AllParser::DEV_NAME_LENGTH;
 
         for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
         {
@@ -285,7 +285,7 @@ void Defaults::setNames()
         auto const defTrackName = userScreen->getTrackName(i);
         stringBuffer =
             StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
-        auto offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
+        auto offset = TR_NAMES_OFFSET + i * AllParser::NAME_LENGTH;
 
         for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
         {

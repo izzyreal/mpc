@@ -79,12 +79,11 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     // The event at tick 382 is expected to be quantized to tick 0, because the
     // sequence is one bar long. Event at tick 2 will also be quantized to tick
     // 0. Hence of the 17 ticks below, only 16 will survive.
-    std::vector<int> humanTickPositions{2,   23,  49,  70,  95,  124,
-                                        143, 167, 194, 218, 243, 264,
-                                        290, 310, 332, 361, 382};
+    std::vector humanTickPositions{2,   23,  49,  70,  95,  124, 143, 167, 194,
+                                   218, 243, 264, 290, 310, 332, 361, 382};
 
-    std::vector<int> quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
-                                        192, 216, 240, 264, 288, 312, 336, 360};
+    std::vector quantizedPositions{0,   24,  48,  72,  96,  120, 144, 168,
+                                   192, 216, 240, 264, 288, 312, 336, 360};
 
     bool mainThreadBusy = true;
     bool audioThreadBusy = true;
@@ -109,7 +108,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     int64_t timeInSamples = 0;
 
     std::thread audioThread(
-        [&]()
+        [&]
         {
             int dspCycleCounter = 0;
 
@@ -172,7 +171,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                         ClientHardwareEvent::Source::HostInputGesture,
                         ClientHardwareEvent::Type::PadPress,
                         0,
-                        ComponentId::PAD_1_OR_AB,
+                        PAD_1_OR_AB,
                         127.f,
                         std::nullopt,
                         std::nullopt};
@@ -184,7 +183,7 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
                         ClientHardwareEvent::Source::HostInputGesture,
                         ClientHardwareEvent::Type::PadRelease,
                         0,
-                        ComponentId::PAD_1_OR_AB,
+                        PAD_1_OR_AB,
                         127.f,
                         std::nullopt,
                         std::nullopt};
@@ -288,7 +287,7 @@ TEST_CASE("Undo", "[sequencer]")
                 ClientHardwareEvent::Source::HostInputGesture,
                 ClientHardwareEvent::Type::PadPress,
                 0,
-                ComponentId::PAD_1_OR_AB,
+                PAD_1_OR_AB,
                 127.f,
                 std::nullopt,
                 std::nullopt};
@@ -300,7 +299,7 @@ TEST_CASE("Undo", "[sequencer]")
                 ClientHardwareEvent::Source::HostInputGesture,
                 ClientHardwareEvent::Type::PadRelease,
                 0,
-                ComponentId::PAD_1_OR_AB,
+                PAD_1_OR_AB,
                 127.f,
                 std::nullopt,
                 std::nullopt};

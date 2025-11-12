@@ -26,7 +26,6 @@ namespace mpc
                 int getMixerEnd();
                 std::vector<char> getMixerArray();
 
-            public:
                 int getEffectsOutput(int note);
                 int getVolume(int note);
                 int getPan(int note);

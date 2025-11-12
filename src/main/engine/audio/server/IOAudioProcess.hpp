@@ -5,7 +5,7 @@
 
 namespace mpc::engine::audio::server
 {
-    class IOAudioProcess : public mpc::engine::audio::core::AudioProcess
+    class IOAudioProcess : public core::AudioProcess
     {
     public:
         std::vector<float> localBuffer;

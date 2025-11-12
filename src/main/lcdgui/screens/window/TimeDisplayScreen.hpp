@@ -10,10 +10,8 @@ namespace mpc::lcdgui::screens::window
     public:
         void turnWheel(int i) override;
 
-    public:
         TimeDisplayScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:

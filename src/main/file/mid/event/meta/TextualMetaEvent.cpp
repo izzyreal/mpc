@@ -10,7 +10,7 @@ TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type,
     : MetaEvent(tick, delta, type)
 {
     setText(text);
-    mLength = mpc::file::mid::util::VariableLengthInt(text.length());
+    mLength = util::VariableLengthInt(text.length());
 }
 
 void TextualMetaEvent::setText(const std::string &t)
@@ -42,7 +42,7 @@ void TextualMetaEvent::writeToOutputStream(std::ostream &out, bool writeType)
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-int TextualMetaEvent::compareTo(mpc::file::mid::event::MidiEvent *other) const
+int TextualMetaEvent::compareTo(MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

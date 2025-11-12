@@ -27,13 +27,13 @@ int SeqUtil::getTickFromBar(const int i, Sequence *s, int position)
     const auto den = s->getTimeSignature().getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (position + (difference * denTicks * 4) > s->getLastTick())
+    if (position + difference * denTicks * 4 > s->getLastTick())
     {
         position = s->getLastTick();
     }
     else
     {
-        position = position + (difference * denTicks * 4);
+        position = position + difference * denTicks * 4;
     }
 
     return position;
@@ -50,7 +50,7 @@ int SeqUtil::getBarFromTick(Sequence *s, const int position)
     const auto num = ts.getNumerator();
     const auto den = ts.getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
-    const auto bar = (int)(floor(position / (denTicks * num)));
+    const auto bar = (int)floor(position / (denTicks * num));
 
     return bar;
 }
@@ -70,7 +70,7 @@ double SeqUtil::ticksPerSecond(const double tempo)
 double SeqUtil::ticksToFrames(const double ticks, const double tempo,
                               const int sr)
 {
-    return (ticks * secondsPerTick(tempo) * sr);
+    return ticks * secondsPerTick(tempo) * sr;
 }
 
 double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
@@ -88,15 +88,12 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
             ticksToFrames(lastTick - firstTick, seq->getInitialTempo(), sr);
         return result;
     }
-    else
-    {
-        const auto firstTceTick = tempoChangeEvents[0]->getTick();
+    const auto firstTceTick = tempoChangeEvents[0]->getTick();
 
-        if (firstTick < firstTceTick)
-        {
-            result = ticksToFrames(firstTceTick - firstTick,
-                                   seq->getInitialTempo(), sr);
-        }
+    if (firstTick < firstTceTick)
+    {
+        result =
+            ticksToFrames(firstTceTick - firstTick, seq->getInitialTempo(), sr);
     }
 
     for (int i = 0; i < tceSize - 1; i++)
@@ -127,7 +124,7 @@ double SeqUtil::sequenceFrameLength(Sequence *seq, const int firstTick,
 
     result +=
         ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
-    return (int)(ceil(result));
+    return (int)ceil(result);
 }
 
 int SeqUtil::loopFrameLength(Sequence *seq, const int sr)
@@ -230,17 +227,17 @@ int SeqUtil::setBar(int i, Sequence *sequence, int position)
         i = 0;
     }
 
-    const auto difference = i - SeqUtil::getBar(sequence, position);
+    const auto difference = i - getBar(sequence, position);
     const auto den = sequence->getTimeSignature().getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (position + (difference * denTicks * 4) > sequence->getLastTick())
+    if (position + difference * denTicks * 4 > sequence->getLastTick())
     {
         position = sequence->getLastTick();
     }
     else
     {
-        position = position + (difference * denTicks * 4);
+        position = position + difference * denTicks * 4;
     }
 
     return position;
@@ -261,18 +258,18 @@ int SeqUtil::setBeat(int i, Sequence *s, int position)
         i = num - 1;
     }
 
-    const auto difference = i - SeqUtil::getBeat(s, position);
+    const auto difference = i - getBeat(s, position);
 
     const auto den = ts.getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
 
-    if (position + (difference * denTicks) > s->getLastTick())
+    if (position + difference * denTicks > s->getLastTick())
     {
         position = s->getLastTick();
     }
     else
     {
-        position = position + (difference * denTicks);
+        position = position + difference * denTicks;
     }
 
     return position;
@@ -318,7 +315,7 @@ int SeqUtil::getBar(Sequence *s, const int position)
     const auto num = ts.getNumerator();
     const auto den = ts.getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
-    const auto bar = (int)(floor(position / (denTicks * num)));
+    const auto bar = (int)floor(position / (denTicks * num));
     return bar;
 }
 
@@ -331,7 +328,7 @@ int SeqUtil::getBeat(Sequence *s, const int position)
 
     const auto den = s->getTimeSignature().getDenominator();
     const auto denTicks = (int)(96 * (4.0 / den));
-    auto beat = (int)(floor(position / (denTicks)));
+    auto beat = (int)floor(position / denTicks);
     beat = beat % den;
     return beat;
 }
@@ -346,11 +343,11 @@ int SeqUtil::getClock(Sequence *s, const int position)
         return 0;
     }
 
-    const auto clock = (int)(position % (denTicks));
+    const auto clock = position % denTicks;
     return clock;
 }
 
-void SeqUtil::copyBars(mpc::Mpc &mpc, const uint8_t fromSeqIndex,
+void SeqUtil::copyBars(Mpc &mpc, const uint8_t fromSeqIndex,
                        const uint8_t toSeqIndex, const uint8_t copyFirstBar,
                        const uint8_t copyLastBar, const uint8_t copyCount,
                        const uint8_t copyAfterBar)
@@ -388,7 +385,7 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, const uint8_t fromSeqIndex,
 
     int sourceBarCounter = 0;
 
-    const auto numberOfSourceBars = (copyLastBar + 1) - copyFirstBar;
+    const auto numberOfSourceBars = copyLastBar + 1 - copyFirstBar;
 
     for (int i = 0; i < numberOfDestinationBars; i++)
     {
@@ -477,7 +474,7 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, const uint8_t fromSeqIndex,
 
             for (auto k = 0; k < copyCount; k++)
             {
-                const auto tick = firstCopyTick + (k * segmentLengthTicks);
+                const auto tick = firstCopyTick + k * segmentLengthTicks;
 
                 // We do a more specific exit-check here, since within-bounds
                 // copies may be followed by out-of-bounds ones.
@@ -494,11 +491,10 @@ void SeqUtil::copyBars(mpc::Mpc &mpc, const uint8_t fromSeqIndex,
 
 bool SeqUtil::isRecMainWithoutPlaying(
     const std::shared_ptr<Sequencer> &sequencer,
-    const std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen>
-        &timingCorrectScreen,
+    const std::shared_ptr<TimingCorrectScreen> &timingCorrectScreen,
     const std::string &currentScreenName,
-    const std::shared_ptr<mpc::hardware::Button> &recButton,
-    const std::shared_ptr<mpc::controller::ClientHardwareEventController>
+    const std::shared_ptr<hardware::Button> &recButton,
+    const std::shared_ptr<controller::ClientHardwareEventController>
         &clientHardwareEventController)
 {
     const auto tc_note = timingCorrectScreen->getNoteValue();

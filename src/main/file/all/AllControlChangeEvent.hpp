@@ -14,14 +14,13 @@ namespace mpc::file::all
     class AllControlChangeEvent
     {
 
-    private:
         const static int CONTROLLER_OFFSET = 5;
         const static int AMOUNT_OFFSET = 6;
 
     public:
-        static std::shared_ptr<mpc::sequencer::ControlChangeEvent>
+        static std::shared_ptr<sequencer::ControlChangeEvent>
         bytesToMpcEvent(const std::vector<char> &);
-        static std::vector<char> mpcEventToBytes(
-            const std::shared_ptr<mpc::sequencer::ControlChangeEvent> &);
+        static std::vector<char>
+        mpcEventToBytes(const std::shared_ptr<sequencer::ControlChangeEvent> &);
     };
 } // namespace mpc::file::all

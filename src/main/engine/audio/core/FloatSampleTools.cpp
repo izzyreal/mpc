@@ -10,13 +10,12 @@ using namespace mpc::engine::audio::core;
 void FloatSampleTools::checkSupportedSampleSize(int ssib, int channels,
                                                 int frameSize)
 {
-    if ((ssib * channels) != frameSize * 8)
+    if (ssib * channels != frameSize * 8)
     {
         std::string description =
             "unsupported sample size: " + std::to_string(ssib) + " stored in " +
             std::to_string(frameSize / channels) + " bytes.";
         printf("ERROR: %s", description.c_str());
-        return;
     }
 }
 
@@ -81,7 +80,7 @@ int FloatSampleTools::getFormatType(int ssib, bool signed_, bool bigEndian)
     {
         res |= F_SIGNED;
     }
-    if (bigEndian && (ssib != 8))
+    if (bigEndian && ssib != 8)
     {
         res |= F_BIGENDIAN;
     }
@@ -200,39 +199,39 @@ void FloatSampleTools::byte2floatGeneric(const std::vector<char> &input,
                 break;
             case CT_16SB:
                 output[outIndex] =
-                    ((input[inIndex] << 8) | (input[inIndex + 1] & 255)) *
+                    (input[inIndex] << 8 | input[inIndex + 1] & 255) *
                     invTwoPower15;
                 break;
             case CT_16SL:
                 output[outIndex] =
-                    ((input[inIndex + 1] << 8) | (input[inIndex] & 255)) *
+                    (input[inIndex + 1] << 8 | input[inIndex] & 255) *
                     invTwoPower15;
                 break;
             case CT_24SB:
-                output[outIndex] = ((input[inIndex] << 16) |
-                                    ((input[inIndex + 1] & 255) << 8) |
-                                    (input[inIndex + 2] & 255)) *
-                                   invTwoPower23;
+                output[outIndex] =
+                    (input[inIndex] << 16 | (input[inIndex + 1] & 255) << 8 |
+                     input[inIndex + 2] & 255) *
+                    invTwoPower23;
                 break;
             case CT_24SL:
-                output[outIndex] = ((input[inIndex + 2] << 16) |
-                                    ((input[inIndex + 1] & 255) << 8) |
-                                    (input[inIndex] & 255)) *
-                                   invTwoPower23;
+                output[outIndex] =
+                    (input[inIndex + 2] << 16 |
+                     (input[inIndex + 1] & 255) << 8 | input[inIndex] & 255) *
+                    invTwoPower23;
                 break;
             case CT_32SB:
-                output[outIndex] = ((input[inIndex] << 24) |
-                                    ((input[inIndex + 1] & 255) << 16) |
-                                    ((input[inIndex + 2] & 255) << 8) |
-                                    (input[inIndex + 3] & 255)) *
-                                   invTwoPower31;
+                output[outIndex] =
+                    (input[inIndex] << 24 | (input[inIndex + 1] & 255) << 16 |
+                     (input[inIndex + 2] & 255) << 8 |
+                     input[inIndex + 3] & 255) *
+                    invTwoPower31;
                 break;
             case CT_32SL:
-                output[outIndex] = ((input[inIndex + 3] << 24) |
-                                    ((input[inIndex + 2] & 255) << 16) |
-                                    ((input[inIndex + 1] & 255) << 8) |
-                                    (input[inIndex] & 255)) *
-                                   invTwoPower31;
+                output[outIndex] =
+                    (input[inIndex + 3] << 24 |
+                     (input[inIndex + 2] & 255) << 16 |
+                     (input[inIndex + 1] & 255) << 8 | input[inIndex] & 255) *
+                    invTwoPower31;
                 break;
             default:
                 std::string description =
@@ -250,24 +249,20 @@ int8_t FloatSampleTools::quantize8(float sample, float ditherBits)
     }
     if (sample >= 127.0f)
     {
-        return static_cast<int8_t>(127);
+        return 127;
     }
-    else if (sample <= -128.0f)
+    if (sample <= -128.0f)
     {
-        return static_cast<int8_t>(-128);
+        return -128;
     }
-    else
-    {
-        return static_cast<int8_t>(
-            (sample < 0 ? (sample - 0.5f) : (sample + 0.5f)));
-    }
+    return static_cast<int8_t>(sample < 0 ? sample - 0.5f : sample + 0.5f);
 }
 
 int FloatSampleTools::quantize16(float sample, float ditherBits)
 {
     if (ditherBits != 0)
     {
-        sample += (((float)rand() / RAND_MAX) + 1) *
+        sample += ((float)rand() / RAND_MAX + 1) *
                   ditherBits; // apparently this is not super duper distributed
                               // random or something. check original.
     }
@@ -275,55 +270,45 @@ int FloatSampleTools::quantize16(float sample, float ditherBits)
     {
         return 32767;
     }
-    else if (sample <= -32768.0f)
+    if (sample <= -32768.0f)
     {
         return -32768;
     }
-    else
-    {
-        return static_cast<int>(sample < 0 ? (sample - 0.5f) : (sample + 0.5f));
-    }
+    return static_cast<int>(sample < 0 ? sample - 0.5f : sample + 0.5f);
 }
 
 int FloatSampleTools::quantize24(float sample, float ditherBits)
 {
     if (ditherBits != 0)
     {
-        sample += (((float)rand() / RAND_MAX) + 1) * ditherBits;
+        sample += ((float)rand() / RAND_MAX + 1) * ditherBits;
     }
     if (sample >= 8388607.0f)
     {
         return 8388607;
     }
-    else if (sample <= -8388608.0f)
+    if (sample <= -8388608.0f)
     {
         return -8388608;
     }
-    else
-    {
-        return static_cast<int>(sample < 0 ? (sample - 0.5f) : (sample + 0.5f));
-    }
+    return static_cast<int>(sample < 0 ? sample - 0.5f : sample + 0.5f);
 }
 
 int FloatSampleTools::quantize32(float sample, float ditherBits)
 {
     if (ditherBits != 0)
     {
-        sample += (((float)rand() / RAND_MAX) + 1) * ditherBits;
+        sample += ((float)rand() / RAND_MAX + 1) * ditherBits;
     }
     if (sample >= 2.14748365E9f)
     {
         return 2147483647;
     }
-    else if (sample <= -2.14748365E9f)
+    if (sample <= -2.14748365E9f)
     {
         return int(-0x7fffffff - 1);
     }
-    else
-    {
-        return static_cast<int>(
-            (sample < 0 ? (sample - 0.5f) : (sample + 0.5f)));
-    }
+    return static_cast<int>(sample < 0 ? sample - 0.5f : sample + 0.5f);
 }
 
 void FloatSampleTools::float2byte(const std::vector<std::vector<float>> &input,
@@ -371,8 +356,8 @@ void FloatSampleTools::float2byteGeneric(const std::vector<float> &input,
         printf("ERROR: %s\n", description.c_str());
     }
     if (outByteOffset < 0 ||
-        outByteOffset + (sampleCount * outByteStep) >=
-            (output.size() + outByteStep) ||
+        outByteOffset + sampleCount * outByteStep >=
+            output.size() + outByteStep ||
         outByteStep < getSampleSize(formatType))
     {
         std::string description =
@@ -406,7 +391,7 @@ void FloatSampleTools::float2byteGeneric(const std::vector<float> &input,
                 break;
             case CT_8U:
                 output[outIndex] =
-                    quantize8((input[inIndex] * twoPower7), ditherBits) + 128;
+                    quantize8(input[inIndex] * twoPower7, ditherBits) + 128;
                 break;
             case CT_16SB:
                 iSample = quantize16(input[inIndex] * twoPower15, ditherBits);

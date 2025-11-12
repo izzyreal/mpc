@@ -16,7 +16,6 @@ namespace mpc::engine::control
 
         LinearLaw(float min, float max, const std::string &units);
 
-    public:
         static std::shared_ptr<LinearLaw> UNITY();
     };
 } // namespace mpc::engine::control

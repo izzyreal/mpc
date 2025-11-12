@@ -23,38 +23,36 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, int notch, Sequence *seq)
     if (focusedFieldName == "time0")
     {
         setTime0(SeqUtil::getTickFromBar(
-            (SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence,
-            time0));
+            SeqUtil::getBarFromTick(sequence, time0) + notch, sequence, time0));
         return true;
     }
-    else if (focusedFieldName == "time1")
+    if (focusedFieldName == "time1")
     {
-        setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch,
+        setTime0(SeqUtil::setBeat(SeqUtil::getBeat(sequence, time0) + notch,
                                   sequence, time0));
         return true;
     }
-    else if (focusedFieldName == "time2")
+    if (focusedFieldName == "time2")
     {
-        setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch,
+        setTime0(SeqUtil::setClock(SeqUtil::getClock(sequence, time0) + notch,
                                    sequence, time0));
         return true;
     }
-    else if (focusedFieldName == "time3")
+    if (focusedFieldName == "time3")
     {
         setTime1(SeqUtil::getTickFromBar(
-            (SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence,
-            time1));
+            SeqUtil::getBarFromTick(sequence, time1) + notch, sequence, time1));
         return true;
     }
-    else if (focusedFieldName == "time4")
+    if (focusedFieldName == "time4")
     {
-        setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch,
+        setTime1(SeqUtil::setBeat(SeqUtil::getBeat(sequence, time1) + notch,
                                   sequence, time1));
         return true;
     }
-    else if (focusedFieldName == "time5")
+    if (focusedFieldName == "time5")
     {
-        setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch,
+        setTime1(SeqUtil::setClock(SeqUtil::getClock(sequence, time1) + notch,
                                    sequence, time1));
         return true;
     }

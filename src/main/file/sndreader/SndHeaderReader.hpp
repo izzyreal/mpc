@@ -12,7 +12,6 @@ namespace mpc::file::sndreader
 {
     class SndHeaderReader
     {
-    private:
         std::vector<char> headerArray = std::vector<char>(42);
 
     public:
@@ -30,7 +29,6 @@ namespace mpc::file::sndreader
         int getNumberOfBeats() const;
         int getSampleRate() const;
 
-    public:
         SndHeaderReader(SndReader *sndReader);
     };
 } // namespace mpc::file::sndreader

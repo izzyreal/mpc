@@ -15,7 +15,7 @@ AllPitchBendEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     event->setTick(AllEvent::readTick(bytes));
     event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
 
-    auto candidate = ByteUtil::bytes2ushort(std::vector<char>{
+    auto candidate = ByteUtil::bytes2ushort(std::vector{
                          bytes[AMOUNT_OFFSET], bytes[AMOUNT_OFFSET + 1]}) -
                      16384;
 
@@ -34,7 +34,7 @@ AllPitchBendEvent::mpcEventToBytes(const std::shared_ptr<PitchBendEvent> &event)
 {
     std::vector<char> bytes(8);
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PITCH_BEND_ID;
-    AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+    AllEvent::writeTick(bytes, event->getTick());
     bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
 
     auto candidate = event->getAmount() + 16384;

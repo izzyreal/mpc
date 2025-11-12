@@ -21,7 +21,6 @@ namespace mpc
             class SampleNames
             {
 
-            private:
                 std::vector<char> sampleNamesArray{};
                 int numberOfSamples{};
                 std::vector<int> snConvTable{};
@@ -36,10 +35,8 @@ namespace mpc
                 int getNumberOfSamples() const;
                 std::vector<int> getSnConvTable();
 
-            public:
-                SampleNames(
-                    mpc::sampler::Program *program,
-                    const std::weak_ptr<mpc::sampler::Sampler> &sampler);
+                SampleNames(sampler::Program *program,
+                            const std::weak_ptr<sampler::Sampler> &sampler);
             };
 
         } // namespace pgmwriter

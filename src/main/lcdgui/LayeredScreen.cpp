@@ -311,7 +311,7 @@ void LayeredScreen::openScreenInternal(
         {
             return;
         }
-        else if (isCurrentScreen({ScreenId::SampleScreen}))
+        if (isCurrentScreen({ScreenId::SampleScreen}))
         {
             engineHost->muteMonitor(true);
             engineHost->getSoundRecorder()->setSampleScreenActive(false);

@@ -347,7 +347,7 @@ void EditMultipleScreen::updateEditMultiple() const
                     findField("value0")->setSize(4 * 6 + 1, 9);
                     findField("value0")->setLocation(
                         45, findField("value0")->getY());
-                    auto noteVarValue = (variationValue * 2) - 128;
+                    auto noteVarValue = variationValue * 2 - 128;
 
                     if (noteVarValue < -120)
                     {
@@ -449,9 +449,8 @@ void EditMultipleScreen::updateEditMultiple() const
             findLabel("value0")->setText(singleLabels[0]);
             findField("value0")->setSize(8 * 6 + 1, 9);
             findField("value0")->setText(
-                (StrUtil::padLeft(std::to_string(changeNoteTo), " ", 3) + "(" +
-                 Util::noteNames()[changeNoteTo]) +
-                ")");
+                StrUtil::padLeft(std::to_string(changeNoteTo), " ", 3) + "(" +
+                Util::noteNames()[changeNoteTo] + ")");
             findLabel("value0")->setSize(
                 findLabel("value0")->GetTextEntryLength() * 6 + 1, 9);
             findField("value0")->Hide(false);
@@ -489,9 +488,9 @@ void EditMultipleScreen::updateDouble() const
         findLabel("value1")->GetTextEntryLength() * 6 + 1, 9);
     findLabel("value1")->setLocation(xPosDouble[1], yPosDouble[1]);
     findField("value0")->setLocation(
-        (xPosDouble[0] + findLabel("value0")->getW()), yPosDouble[0]);
+        xPosDouble[0] + findLabel("value0")->getW(), yPosDouble[0]);
     findField("value1")->setLocation(
-        (xPosDouble[1] + findLabel("value1")->getW()), yPosDouble[1]);
+        xPosDouble[1] + findLabel("value1")->getW(), yPosDouble[1]);
     findField("value0")->setText(editTypeNames[editType]);
     findField("value1")->setText(std::to_string(editValue));
     findField("value0")->setSize(10 * 6 + 1, 9);

@@ -4,7 +4,7 @@
 
 using namespace mpc::file::pgmwriter;
 
-PgmName::PgmName(mpc::sampler::Program *program)
+PgmName::PgmName(sampler::Program *program)
 {
     auto ca = program->getName();
     std::vector<char> temp(17);

@@ -20,13 +20,13 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(Mpc &mpc, const int layerIndex)
 {
     for (int i = 0; i < 4; i++)
     {
-        const int y = 11 + (i * 9);
+        const int y = 11 + i * 9;
         auto nameParam = std::make_shared<Parameter>(
             mpc, "", "name" + std::to_string(i), 23, y + 1, 16 * 6);
         addChild(nameParam);
 
         auto autoLoadParam = std::make_shared<Parameter>(
-            mpc, "Auto-load:", "auto-load" + std::to_string(i), 23 + (17 * 6),
+            mpc, "Auto-load:", "auto-load" + std::to_string(i), 23 + 17 * 6,
             y + 1, 3 * 6);
         addChild(autoLoadParam);
     }
@@ -92,7 +92,7 @@ void VmpcMidiPresetsScreen::open()
 {
     MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc);
 
-    if (row + rowOffset >= (mpc.midiControlPresets.size() + 1))
+    if (row + rowOffset >= mpc.midiControlPresets.size() + 1)
     {
         row = 0;
         rowOffset = 0;
@@ -114,7 +114,7 @@ void VmpcMidiPresetsScreen::displayUpAndDown()
 void VmpcMidiPresetsScreen::turnWheel(const int i)
 {
     const auto &presets = mpc.midiControlPresets;
-    const int presetIndex = (row + rowOffset) - 1;
+    const int presetIndex = row + rowOffset - 1;
 
     if (presetIndex < 0 || presetIndex >= presets.size())
     {
@@ -152,7 +152,7 @@ void VmpcMidiPresetsScreen::function(const int i)
     {
         case 2:
         {
-            const int presetIndex = (row + rowOffset) - 1;
+            const int presetIndex = row + rowOffset - 1;
 
             std::function<void(std::string &)> enterAction;
 
@@ -181,7 +181,7 @@ void VmpcMidiPresetsScreen::function(const int i)
             break;
         case 4:
         {
-            const auto index = (row + rowOffset) - 1;
+            const auto index = row + rowOffset - 1;
 
             if (index == -1)
             {
@@ -275,7 +275,7 @@ void VmpcMidiPresetsScreen::displayRows()
 
     for (int i = 0; i < 4; i++)
     {
-        const int presetIndex = (i + rowOffset) - 1;
+        const int presetIndex = i + rowOffset - 1;
         const int presetCount = static_cast<int>(presets.size());
         const auto name = findChild<Field>("name" + std::to_string(i));
         const auto autoLoadField =

@@ -13,7 +13,6 @@ namespace mpc::file::all
     class AllSysExEvent
     {
 
-    private:
         const static int CHUNK_HEADER_ID_OFFSET = 4;
         const static int BYTE_COUNT_OFFSET = 5;
         const static int DATA_OFFSET = 8;
@@ -30,9 +29,9 @@ namespace mpc::file::all
         static std::vector<char> MIXER_SIGNATURE;
 
     public:
-        static std::shared_ptr<mpc::sequencer::Event>
+        static std::shared_ptr<sequencer::Event>
         bytesToMpcEvent(const std::vector<char> &);
         static std::vector<char>
-        mpcEventToBytes(const std::shared_ptr<mpc::sequencer::Event> &);
+        mpcEventToBytes(const std::shared_ptr<sequencer::Event> &);
     };
 } // namespace mpc::file::all

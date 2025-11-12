@@ -6,7 +6,6 @@ namespace mpc::file::aps
 {
     class ApsHeader
     {
-    private:
         const std::vector<char> APS_HEADER_MAGIC{0x0A, 0x05};
 
     public:
@@ -14,7 +13,6 @@ namespace mpc::file::aps
         uint16_t soundCount = 0;
         std::vector<char> saveBytes;
 
-    public:
         bool isValid() const;
         int getSoundAmount() const;
         std::vector<char> getBytes() const;

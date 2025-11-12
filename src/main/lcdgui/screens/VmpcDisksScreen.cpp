@@ -22,7 +22,7 @@ VmpcDisksScreen::VmpcDisksScreen(Mpc &mpc, const int layerIndex)
 {
     for (int i = 0; i < 4; i++)
     {
-        const int y = 11 + (i * 9);
+        const int y = 11 + i * 9;
         auto volumeLabel = std::make_shared<Label>(
             mpc, "volume" + std::to_string(i), "", 2, y, 11 * 6);
         auto typeLabel = std::make_shared<Label>(

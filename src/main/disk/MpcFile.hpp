@@ -31,7 +31,6 @@ namespace mpc::disk
     class MpcFile
     {
 
-    private:
         bool raw = false;
         std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
         fs::path fs_path;

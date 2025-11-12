@@ -12,7 +12,6 @@ namespace mpc::file::mid::event::meta
         void setName(const std::string &name);
         std::string getTrackName();
 
-    public:
         TrackName(int tick, int delta, const std::string &name);
     };
 } // namespace mpc::file::mid::event::meta

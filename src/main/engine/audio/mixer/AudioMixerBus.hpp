@@ -11,8 +11,7 @@ namespace mpc::engine::audio::mixer
     class AudioMixerBus
     {
 
-    private:
-        std::shared_ptr<audio::core::AudioBuffer> buffer;
+        std::shared_ptr<core::AudioBuffer> buffer;
         std::shared_ptr<core::AudioProcess> output;
         std::string name;
 
@@ -25,7 +24,6 @@ namespace mpc::engine::audio::mixer
 
         void write(int nFrames) const;
 
-    public:
         AudioMixerBus(const AudioMixer *mixer,
                       const std::shared_ptr<BusControls> &busControls);
     };

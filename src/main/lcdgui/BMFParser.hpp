@@ -9,11 +9,9 @@ namespace mpc::lcdgui
     class BMFParser
     {
 
-    private:
         bmfont loadedFont;
         std::vector<std::vector<bool>> atlas;
 
-    private:
         void OrderCharsByID(std::vector<bmfont_char> *chars) const;
         bool GetBMFontData(const char *pBinary, size_t fileSize,
                            bmfont *pBMFont);
@@ -22,7 +20,6 @@ namespace mpc::lcdgui
         std::vector<std::vector<bool>> getAtlas();
         bmfont getLoadedFont();
 
-    public:
         BMFParser(char *fntData, int fntSize, char *bmpData, int bmpSize);
     };
 } // namespace mpc::lcdgui

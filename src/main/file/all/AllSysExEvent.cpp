@@ -72,7 +72,7 @@ AllSysExEvent::mpcEventToBytes(const std::shared_ptr<Event> &event)
         bytes = std::vector<char>(32);
 
         AllEvent::writeTick(bytes, mixerEvent->getTick());
-        bytes[AllEvent::TRACK_OFFSET] = (char)(event->getTrack());
+        bytes[AllEvent::TRACK_OFFSET] = (char)event->getTrack();
         bytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
         bytes[BYTE_COUNT_OFFSET] = 9;
         bytes[DATA_HEADER_ID_OFFSET] = HEADER_ID;
@@ -91,9 +91,8 @@ AllSysExEvent::mpcEventToBytes(const std::shared_ptr<Event> &event)
         }
 
         paramCandidate++;
-        bytes[DATA_OFFSET + MIXER_PARAMETER_OFFSET] = (char)(paramCandidate);
-        bytes[DATA_OFFSET + MIXER_VALUE_OFFSET] =
-            (char)(mixerEvent->getValue());
+        bytes[DATA_OFFSET + MIXER_PARAMETER_OFFSET] = (char)paramCandidate;
+        bytes[DATA_OFFSET + MIXER_VALUE_OFFSET] = (char)mixerEvent->getValue();
         bytes[DATA_OFFSET + MIXER_VALUE_OFFSET + 1] = DATA_TERMINATOR_ID;
         bytes[MIX_TERMINATOR_ID_OFFSET] = CHUNK_TERMINATOR_ID;
     }
@@ -104,19 +103,19 @@ AllSysExEvent::mpcEventToBytes(const std::shared_ptr<Event> &event)
         int dataSegments = static_cast<int>(dataSize / 8.0);
         bytes = std::vector<char>((dataSegments + 2) *
                                   AllSequence::EVENT_SEG_LENGTH);
-        bytes[AllEvent::TRACK_OFFSET] = (char)(event->getTrack());
+        bytes[AllEvent::TRACK_OFFSET] = (char)event->getTrack();
         bytes[AllEvent::TRACK_OFFSET +
-              ((dataSegments + 1) * AllSequence::EVENT_SEG_LENGTH)] =
-            (char)(event->getTrack());
+              (dataSegments + 1) * AllSequence::EVENT_SEG_LENGTH] =
+            (char)event->getTrack();
         bytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
-        bytes[BYTE_COUNT_OFFSET] = (char)(dataSize);
+        bytes[BYTE_COUNT_OFFSET] = (char)dataSize;
 
         for (int i = 0; i < dataSize; i++)
         {
             bytes[DATA_OFFSET + i] = sysExEvent->getBytes()[i];
         }
 
-        bytes[(int)(bytes.size()) - 4] = CHUNK_TERMINATOR_ID;
+        bytes[(int)bytes.size() - 4] = CHUNK_TERMINATOR_ID;
     }
 
     return bytes;

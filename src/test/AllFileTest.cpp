@@ -21,7 +21,7 @@ using namespace mpc::sequencer;
 // exist.
 const std::string filename = "SHS4CABHNAXJ9LQ.ALL";
 
-void deleteTestAllFile(const std::shared_ptr<mpc::disk::AbstractDisk> &disk)
+void deleteTestAllFile(const std::shared_ptr<AbstractDisk> &disk)
 {
     disk->initFiles();
 
@@ -42,7 +42,7 @@ void saveAndLoadTestAllFile(mpc::Mpc &mpc)
     auto disk = mpc.getDisk();
     auto f = disk->newFile(filename);
 
-    mpc::file::all::AllParser allParser(mpc);
+    AllParser allParser(mpc);
     auto bytes = allParser.getBytes();
     f->setFileData(bytes);
 

@@ -16,7 +16,6 @@ namespace mpc::file::pgmreader
     private:
         std::vector<char> midiNotesArray;
 
-    private:
         ProgramFileReader *programFile;
 
     public:
@@ -25,7 +24,6 @@ namespace mpc::file::pgmreader
         int getMidiNotesEnd();
         std::vector<char> getMidiNotesArray();
 
-    public:
         int getSampleSelect(int midiNote);
         int getSoundGenerationMode(int midiNote);
         int getVelocityRangeLower(int midiNote);

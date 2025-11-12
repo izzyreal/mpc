@@ -16,9 +16,7 @@ TempoChangeEvent::TempoChangeEvent(Sequence *parent, const int ratio)
     this->parent = parent;
 }
 
-mpc::sequencer::TempoChangeEvent::TempoChangeEvent(
-    const TempoChangeEvent &event)
-    : Event(event)
+TempoChangeEvent::TempoChangeEvent(const TempoChangeEvent &event) : Event(event)
 {
     setRatio(event.getRatio());
 }
@@ -167,21 +165,21 @@ int TempoChangeEvent::getRatio() const
 int TempoChangeEvent::getBar(const int n, const int d) const
 {
     const auto barLength = (int)(96 * (4.0 / d) * n);
-    const auto bar = (int)(tick / barLength);
+    const auto bar = tick / barLength;
     return bar;
 }
 
 int TempoChangeEvent::getBeat(const int n, const int d) const
 {
     const auto beatLength = static_cast<int>(96 * (4.0 / d));
-    const auto beat = (static_cast<int>(tick / beatLength)) % n;
+    const auto beat = tick / beatLength % n;
     return beat;
 }
 
 int TempoChangeEvent::getClock(const int denominator) const
 {
     const auto beatLength = static_cast<int>(96 * (4.0 / denominator));
-    const auto clock = static_cast<int>(tick % beatLength);
+    const auto clock = tick % beatLength;
     return clock;
 }
 
@@ -193,8 +191,7 @@ double TempoChangeEvent::getTempo() const
     {
         return 30.0;
     }
-
-    else if (tempo > 300.0)
+    if (tempo > 300.0)
     {
         return 300.0;
     }

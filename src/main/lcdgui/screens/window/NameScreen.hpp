@@ -40,7 +40,7 @@ namespace mpc::lcdgui::screens::window
 
         void setNameToEdit(const std::string &newNameToEdit);
 
-        std::function<void()> mainScreenAction = []() {};
+        std::function<void()> mainScreenAction = [] {};
 
     private:
         std::function<void(std::string &)> enterAction = [](std::string &) {};

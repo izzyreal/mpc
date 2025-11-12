@@ -31,7 +31,6 @@ namespace mpc::lcdgui::screens
         int getModeIn() const;
         int getOut() const;
 
-    public:
         SyncScreen(Mpc &, int layerIndex);
 
         void open() override;
@@ -71,7 +70,6 @@ namespace mpc::lcdgui::screens
         void
         displayShiftEarly() const; // Also used to display "Frame rate:" field
 
-    private:
         friend class audiomidi::EventHandler;
         friend class audiomidi::MidiInput;
         friend class disk::AllLoader;

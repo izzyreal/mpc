@@ -11,20 +11,16 @@ namespace mpc::file::mid::event::meta
     public:
         std::string mText;
 
-    public:
         void setText(const std::string &t);
         std::string getText();
 
-    public:
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
         std::string toString() override;
         int getEventSize() override;
 
-    public:
-        int compareTo(mpc::file::mid::event::MidiEvent *other) const;
+        int compareTo(MidiEvent *other) const;
 
-    public:
         TextualMetaEvent(int tick, int delta, int type,
                          const std::string &text);
     };

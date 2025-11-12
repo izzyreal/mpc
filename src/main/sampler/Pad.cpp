@@ -36,10 +36,7 @@ std::vector<int> &Pad::getPadNotes(const Mpc &mpc)
 
         return vmpcPadNotes;
     }
-    else
-    {
-        return originalPadNotes;
-    }
+    return originalPadNotes;
 }
 
 Pad::Pad(Mpc &mpc, const int indexToUse) : mpc(mpc)

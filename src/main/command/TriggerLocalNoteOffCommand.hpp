@@ -13,7 +13,6 @@ namespace mpc::command
 {
     class TriggerLocalNoteOffCommand : public Command
     {
-    private:
         std::shared_ptr<context::TriggerLocalNoteOffContext> ctx;
 
     public:

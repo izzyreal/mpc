@@ -110,9 +110,9 @@ bool DiskRecorder::prepare(const int lengthInFramesToUse, const int sampleRate,
             }
 
             ringBufferLeft =
-                std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
+                std::make_shared<moodycamel::ReaderWriterQueue<float>>(0);
             ringBufferRight =
-                std::make_shared<moodycamel::ReaderWriterQueue<float, 512>>(0);
+                std::make_shared<moodycamel::ReaderWriterQueue<float>>(0);
             bufferLeft.clear();
             bufferRight.clear();
 

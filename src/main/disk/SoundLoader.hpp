@@ -45,22 +45,21 @@ namespace mpc::disk
     class SoundLoader
     {
     public:
-        SoundLoader(mpc::Mpc &mpcToUse, bool replaceToUse);
+        SoundLoader(Mpc &mpcToUse, bool replaceToUse);
 
         void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult &,
-                       std::shared_ptr<mpc::sampler::Sound>,
-                       const bool shouldBeConverted);
+                       std::shared_ptr<sampler::Sound>, bool shouldBeConverted);
         void setPreview(bool);
 
     private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         bool preview = false;
         bool replace = false;
 
         sound_or_error
-        onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &,
+        onReadWavSuccess(std::shared_ptr<file::wav::WavFile> &,
                          const std::string &filenameWithoutExtension,
-                         std::shared_ptr<mpc::sampler::Sound> sound,
-                         const bool shouldBeConverted) const;
+                         std::shared_ptr<sampler::Sound> sound,
+                         bool shouldBeConverted) const;
     };
 } // namespace mpc::disk

@@ -10,22 +10,17 @@ namespace mpc::engine
     class MixerInterconnection
     {
 
-    private:
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess> inputProcess;
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess> outputProcess;
+        std::shared_ptr<audio::core::AudioProcess> inputProcess;
+        std::shared_ptr<audio::core::AudioProcess> outputProcess;
 
-    private:
         bool leftEnabled{true};
         bool rightEnabled{true};
 
     public:
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess>
-        getInputProcess();
+        std::shared_ptr<audio::core::AudioProcess> getInputProcess();
 
-        std::shared_ptr<mpc::engine::audio::core::AudioProcess>
-        getOutputProcess();
+        std::shared_ptr<audio::core::AudioProcess> getOutputProcess();
 
-    public:
         void setLeftEnabled(bool b);
 
         void setRightEnabled(bool b);
@@ -34,8 +29,7 @@ namespace mpc::engine
 
         bool isRightEnabled() const;
 
-    public:
         MixerInterconnection(const std::string &name,
-                             mpc::engine::audio::server::AudioServer *server);
+                             audio::server::AudioServer *server);
     };
 } // namespace mpc::engine

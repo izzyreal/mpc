@@ -17,8 +17,7 @@ int PitchBendEvent::getAmount() const
     return pitchBendAmount;
 }
 
-mpc::sequencer::PitchBendEvent::PitchBendEvent(const PitchBendEvent &event)
-    : Event(event)
+PitchBendEvent::PitchBendEvent(const PitchBendEvent &event) : Event(event)
 {
     setAmount(event.getAmount());
 }

@@ -13,7 +13,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 
-MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
+MixerStrip::MixerStrip(Mpc &mpc, int columnIndex)
     : Component("mixer-strip"), mpc(mpc)
 {
     this->columnIndex = columnIndex;
@@ -24,27 +24,27 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
     yPos1fx = 2;
     selection = -1;
 
-    const auto x1 = 4 + (columnIndex * 15);
+    const auto x1 = 4 + columnIndex * 15;
     addChild(std::move(
         std::make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
     addChild(std::move(
         std::make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
 
-    const auto x2 = 5 + (columnIndex * 15);
+    const auto x2 = 5 + columnIndex * 15;
     findChild("mixer-top-background")
         ->addChild(
             std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
 
     for (int i = 0; i < 5; i++)
     {
-        auto xPos = 5 + (columnIndex * 15);
+        auto xPos = 5 + columnIndex * 15;
 
         if (i == 1)
         {
             xPos += 6;
         }
 
-        auto yPos = 2 + (i * 13);
+        auto yPos = 2 + i * 13;
 
         if (i >= 1)
         {
@@ -64,7 +64,7 @@ MixerStrip::MixerStrip(mpc::Mpc &mpc, int columnIndex)
         }
     }
 
-    const auto x3 = 12 + (columnIndex * 15);
+    const auto x3 = 12 + columnIndex * 15;
     findMixerFaderBackground()->addChild(
         std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
 

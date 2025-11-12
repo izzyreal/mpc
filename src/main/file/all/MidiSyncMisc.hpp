@@ -41,7 +41,6 @@ namespace mpc::file::all
 
         std::vector<char> saveBytes;
 
-    public:
         int getInMode() const;
         int getOutMode() const;
         int getShiftEarly() const;
@@ -52,10 +51,9 @@ namespace mpc::file::all
         std::string getDefSongName();
         bool getSongModeIgnoreTempoChangeEvents() const;
 
-    public:
         std::vector<char> &getBytes();
 
         MidiSyncMisc(const std::vector<char> &b);
-        MidiSyncMisc(mpc::Mpc &mpc);
+        MidiSyncMisc(Mpc &mpc);
     };
 } // namespace mpc::file::all

@@ -5,7 +5,6 @@ namespace mpc::lcdgui::screens::window
     class MultiRecordingSetupLine
     {
 
-    private:
         int in = 0;
         int track = 0;
 

@@ -306,7 +306,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
     }
 
     std::thread(
-        [restoreAction]()
+        [restoreAction]
         {
             restoreAction();
         })
@@ -325,7 +325,7 @@ void AutoSave::storeAutoSavedState(Mpc &mpc,
         return;
     }
 
-    const auto storeAction = [&mpc, saveTarget]()
+    const auto storeAction = [&mpc, saveTarget]
     {
         auto layeredScreen = mpc.getLayeredScreen();
 

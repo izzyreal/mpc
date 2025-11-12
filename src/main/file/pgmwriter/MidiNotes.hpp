@@ -50,7 +50,7 @@ namespace mpc::file::pgmwriter
         void setShort(std::vector<char> &ca, int offset, int16_t s) const;
 
     public:
-        MidiNotes(mpc::sampler::Program *program,
+        MidiNotes(sampler::Program *program,
                   const std::vector<int> &snConvTable);
     };
 } // namespace mpc::file::pgmwriter

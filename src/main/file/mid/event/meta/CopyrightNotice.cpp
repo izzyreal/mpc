@@ -5,7 +5,7 @@
 using namespace mpc::file::mid::event::meta;
 
 CopyrightNotice::CopyrightNotice(int tick, int delta, const std::string &text)
-    : TextualMetaEvent(tick, delta, MetaEvent::COPYRIGHT_NOTICE, text)
+    : TextualMetaEvent(tick, delta, COPYRIGHT_NOTICE, text)
 {
 }
 

@@ -25,7 +25,7 @@ std::vector<char> AllPolyPressureEvent::mpcEventToBytes(
     std::vector<char> bytes(8);
 
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::POLY_PRESSURE_ID;
-    AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+    AllEvent::writeTick(bytes, event->getTick());
     bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
     bytes[NOTE_OFFSET] = static_cast<int8_t>(event->getNote());
     bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());

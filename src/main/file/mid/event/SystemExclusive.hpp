@@ -9,9 +9,8 @@ namespace mpc::file::mid::event
     class SystemExclusiveEvent : public MidiEvent
     {
 
-    private:
         int mType;
-        mpc::file::mid::util::VariableLengthInt *mLength;
+        util::VariableLengthInt *mLength;
         std::vector<char> mData;
 
     public:
@@ -21,10 +20,8 @@ namespace mpc::file::mid::event
         void writeToOutputStream(std::ostream &out, bool writeType) override;
         virtual int compareTo(MidiEvent *other);
 
-    public:
         int getEventSize() override;
 
-    public:
         SystemExclusiveEvent(int type, int tick, const std::vector<char> &data);
         SystemExclusiveEvent(int type, int tick, int delta,
                              const std::vector<char> &data);

@@ -21,14 +21,11 @@ namespace mpc
             public:
                 int sampleNamesSize{0};
 
-            public:
                 std::vector<char> programNameArray{};
 
-            public:
                 std::vector<char> getPgmNameArray();
 
-            public:
-                PgmName(mpc::sampler::Program *program);
+                PgmName(sampler::Program *program);
             };
 
         } // namespace pgmwriter

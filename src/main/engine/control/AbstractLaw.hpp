@@ -17,7 +17,6 @@ namespace mpc::engine::control
     public:
         std::string getUnits() override;
 
-    public:
         AbstractLaw(float min, float max, const std::string &units);
     };
 

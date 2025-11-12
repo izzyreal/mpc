@@ -187,7 +187,7 @@ WavFile::readWavStream(const std::shared_ptr<std::istream> &_istream)
 
         auto chunkID = getLE(result->buffer, 0, 4);
         auto chunkSize = getLE(result->buffer, 4, 4);
-        auto numChunkBytes = (chunkSize % 2 == 1) ? chunkSize + 1 : chunkSize;
+        auto numChunkBytes = chunkSize % 2 == 1 ? chunkSize + 1 : chunkSize;
 
         if (chunkID == FMT_CHUNK_ID)
         {
@@ -360,7 +360,7 @@ void WavFile::writeSample(int val)
             oStream->write(&buffer[0], BUFFER_SIZE);
             bufferPointer = 0;
         }
-        buffer[bufferPointer] = static_cast<int8_t>((val & 255));
+        buffer[bufferPointer] = static_cast<int8_t>(val & 255);
         val >>= 8;
         bufferPointer++;
     }

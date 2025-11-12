@@ -13,7 +13,6 @@ namespace mpc::disk
     class ShortNameGenerator
     {
 
-    private:
         std::vector<std::string> usedNames;
 
     public:

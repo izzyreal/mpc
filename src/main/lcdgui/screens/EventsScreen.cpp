@@ -174,8 +174,7 @@ void EventsScreen::function(int i)
                     }
                     else if (velocityMode == 2)
                     {
-                        n->setVelocity(
-                            (n->getVelocity() * velocityValue * 0.01));
+                        n->setVelocity(n->getVelocity() * velocityValue * 0.01);
                     }
                     else if (velocityMode == 3)
                     {
@@ -497,10 +496,10 @@ void EventsScreen::displayMidiNotes() const
 {
     findField("note0")->setText(
         StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-        mpc::Util::noteNames()[note0] + u8"\u00D4");
+        Util::noteNames()[note0] + u8"\u00D4");
     findField("note1")->setText(
         StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-        mpc::Util::noteNames()[note1] + u8"\u00D4");
+        Util::noteNames()[note1] + u8"\u00D4");
 }
 
 void EventsScreen::displayDrumNotes()
@@ -686,10 +685,10 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         }
     }
 
-    const auto minimumRequiredNewSequenceLength = destStart + (segLength);
+    const auto minimumRequiredNewSequenceLength = destStart + segLength;
     const auto ticksToAdd =
         minimumRequiredNewSequenceLength - toSequence->getLastTick();
-    const auto barsToAdd = (int)(ceil((float)ticksToAdd / destBarLength));
+    const auto barsToAdd = (int)ceil((float)ticksToAdd / destBarLength);
     const auto initialLastBarIndex = toSequence->getLastBarIndex();
     for (int i = 0; i < barsToAdd; i++)
     {
@@ -713,8 +712,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         {
             const auto tick = e->getTick();
 
-            if (tick >= destOffset &&
-                tick < destOffset + (segLength * copyCount))
+            if (tick >= destOffset && tick < destOffset + segLength * copyCount)
             {
                 destTrack->removeEvent(e);
             }
@@ -755,7 +753,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
             for (int copy = 0; copy < copyCount; copy++)
             {
                 const int tickCandidate =
-                    e->getTick() + destOffset + (copy * segLength);
+                    e->getTick() + destOffset + copy * segLength;
 
                 if (tickCandidate >= toSequence->getLastTick())
                 {

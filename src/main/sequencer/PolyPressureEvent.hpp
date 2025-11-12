@@ -6,7 +6,6 @@ namespace mpc::sequencer
     class PolyPressureEvent : public Event
     {
 
-    private:
         int note{0};
         int polyPressureValue{0};
 

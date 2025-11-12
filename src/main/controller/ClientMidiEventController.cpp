@@ -343,7 +343,7 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
     {
         if (convertSustainPedalToDuration)
         {
-            sustainPedalState[ch] = (val >= 64);
+            sustainPedalState[ch] = val >= 64;
             if (!sustainPedalState[ch])
             {
                 releaseSustainedNotes(ch);
@@ -372,7 +372,7 @@ void ClientMidiEventController::handleControlChange(const ClientMidiEvent &e)
         event.source = ClientHardwareEvent::Source::Internal;
         event.componentId = SLIDER;
         event.type = ClientHardwareEvent::Type::SliderMove;
-        event.value = 1.f - (e.getControllerValue() / 127.f);
+        event.value = 1.f - e.getControllerValue() / 127.f;
         clientEventController->handleClientEvent(ClientEvent{event});
     }
 }

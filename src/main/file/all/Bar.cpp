@@ -8,7 +8,7 @@ Bar::Bar(const std::vector<char> &bytes, Bar *previousBar)
 {
     ticksPerBeat = bytes[0] & 255;
     auto intVal = ByteUtil::bytes2ushort({bytes[1], bytes[2]});
-    lastTick = ((bytes[3] & 255) * 65536) + intVal;
+    lastTick = (bytes[3] & 255) * 65536 + intVal;
     barLength = lastTick - (previousBar == nullptr ? 0 : previousBar->lastTick);
 }
 
@@ -20,7 +20,7 @@ Bar::Bar(int ticksPerBeat, int lastTick)
     auto bytePair = ByteUtil::ushort2bytes(intVal);
     saveBytes[1] = bytePair[0];
     saveBytes[2] = bytePair[1];
-    saveBytes[3] = static_cast<int8_t>(((lastTick - intVal) / 65536));
+    saveBytes[3] = static_cast<int8_t>((lastTick - intVal) / 65536);
 }
 
 int Bar::getTicksPerBeat() const

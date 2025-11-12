@@ -81,7 +81,7 @@ void Wave::setSampleData(
     const auto newFrameCount =
         newSampleData != nullptr
             ? static_cast<int>(floor(newMono ? newSampleData->size()
-                                             : (newSampleData->size() * 0.5)))
+                                             : newSampleData->size() * 0.5))
             : 0;
 
     if (sampleData == newSampleData && newFrameCount == frameCount &&
@@ -117,9 +117,9 @@ void Wave::setSelection(const unsigned int start, const unsigned int end)
     selectionStart = start;
     selectionEnd = end;
 
-    if (selectionEnd - selectionStart < (samplesPerPixel * 2))
+    if (selectionEnd - selectionStart < samplesPerPixel * 2)
     {
-        selectionEnd = selectionStart + (samplesPerPixel * 2);
+        selectionEnd = selectionStart + samplesPerPixel * 2;
     }
 
     SetDirty();
@@ -135,12 +135,12 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors,
 
     if (fine)
     {
-        centerSamplePixel = (centerSamplePos / samplesPerPixel) - 1;
+        centerSamplePixel = centerSamplePos / samplesPerPixel - 1;
     }
 
-    const int samplePos = static_cast<int>(floor(
-        static_cast<float>(lineX - (fine ? (54 - centerSamplePixel) : 0)) *
-        samplesPerPixel));
+    const int samplePos = static_cast<int>(
+        floor(static_cast<float>(lineX - (fine ? 54 - centerSamplePixel : 0)) *
+              samplesPerPixel));
     offset += samplePos;
 
     if (!mono && view == 1)
@@ -202,7 +202,7 @@ void Wave::makeLine(LcdBitmap &bitmap, std::vector<bool> *colors,
     if (peakPos > invisible)
     {
         bitmap.emplace_back(
-            Bressenham::Line(lineX, (13 - posLineLength) - 1, lineX, 12));
+            Bressenham::Line(lineX, 13 - posLineLength - 1, lineX, 12));
     }
 
     if (std::fabs(peakNeg) > invisible)
@@ -320,8 +320,7 @@ void Wave::Draw(std::vector<std::vector<bool>> *pixels)
 
         for (auto &line : bitmap)
         {
-            mpc::Util::drawLine(*pixels, line, colors[counter++],
-                                std::vector<int>{x, y});
+            Util::drawLine(*pixels, line, colors[counter++], std::vector{x, y});
         }
     }
 

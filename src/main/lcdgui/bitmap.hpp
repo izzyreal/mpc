@@ -43,7 +43,6 @@ namespace mpc::lcdgui
      **/
     class Bitmap
     {
-    private:
         PixelMatrix pixels;
 
     public:

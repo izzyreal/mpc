@@ -38,7 +38,7 @@ ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 64; i++)
     {
-        int offset = NOTE_PARAMETERS_OFFSET + (i * NOTE_PARAMETERS_LENGTH);
+        int offset = NOTE_PARAMETERS_OFFSET + i * NOTE_PARAMETERS_LENGTH;
         noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(
             loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
     }
@@ -50,7 +50,7 @@ ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
                              ASSIGN_TABLE_OFFSET + ASSIGN_TABLE_LENGTH));
 }
 
-ApsProgram::ApsProgram(mpc::sampler::Program *program, int index)
+ApsProgram::ApsProgram(sampler::Program *program, int index)
 {
     std::vector<std::vector<char>> byteList;
     this->index = index;
@@ -71,8 +71,7 @@ ApsProgram::ApsProgram(mpc::sampler::Program *program, int index)
 
     for (int i = 0; i < 64; i++)
     {
-        ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters *>(
-            program->getNoteParameters(i + 35)));
+        ApsNoteParameters np((program->getNoteParameters(i + 35)));
         byteList.push_back(np.getBytes());
     }
 
@@ -99,7 +98,7 @@ ApsProgram::ApsProgram(mpc::sampler::Program *program, int index)
 
     ApsAssignTable table(apsAssignTable);
     byteList.push_back(table.getBytes());
-    byteList.push_back(mpc::file::pgmwriter::Pads::getFxBoardSettings());
+    byteList.push_back(pgmwriter::Pads::getFxBoardSettings());
     auto totalSize = 0;
 
     for (auto &ba : byteList)

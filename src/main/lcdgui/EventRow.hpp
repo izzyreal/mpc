@@ -33,13 +33,12 @@ namespace mpc::lcdgui
 {
     class EventRow : public Component
     {
-    private:
-        mpc::Mpc &mpc;
-        std::weak_ptr<mpc::sequencer::Event> event;
-        std::shared_ptr<mpc::lcdgui::HorizontalBar> horizontalBar;
-        std::shared_ptr<mpc::lcdgui::EventRowParameters> parameters;
-        std::vector<std::shared_ptr<mpc::lcdgui::Field>> fields;
-        std::vector<std::shared_ptr<mpc::lcdgui::Label>> labels;
+        Mpc &mpc;
+        std::weak_ptr<sequencer::Event> event;
+        std::shared_ptr<HorizontalBar> horizontalBar;
+        std::shared_ptr<EventRowParameters> parameters;
+        std::vector<std::shared_ptr<Field>> fields;
+        std::vector<std::shared_ptr<Label>> labels;
 
         const std::vector<std::string> letters{"a", "b", "c", "d", "e"};
         const std::vector<std::string> noteVarParamNames{"Tun", "Dcy", "Atk",
@@ -105,11 +104,11 @@ namespace mpc::lcdgui
                                   const std::vector<int> &sizeArray) const;
 
     public:
-        void setEvent(const std::weak_ptr<mpc::sequencer::Event> &newEvent);
+        void setEvent(const std::weak_ptr<sequencer::Event> &newEvent);
         void setSelected(bool b);
         bool isSelected() const;
 
-        EventRow(mpc::Mpc &mpc, int rowNumber);
+        EventRow(Mpc &mpc, int rowNumber);
 
         static std::vector<std::string> controlNames;
     };

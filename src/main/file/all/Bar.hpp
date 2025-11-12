@@ -15,13 +15,11 @@ namespace mpc::file::all
         int barLength;
         std::vector<char> saveBytes;
 
-    public:
         int getTicksPerBeat() const;
         int getDenominator() const;
         int getNumerator() const;
         int getLastTick() const;
 
-    public:
         std::vector<char> &getBytes();
 
         Bar(const std::vector<char> &bytes, Bar *previousBar);

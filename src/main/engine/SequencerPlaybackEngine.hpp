@@ -59,7 +59,7 @@ namespace mpc::engine
 
         void work(int nFrames) override;
 
-        void start(bool metronomeOnly = false);
+        void start(bool metronomeOnlyToUse = false);
 
         void startMetronome();
 
@@ -116,7 +116,7 @@ namespace mpc::engine
 
         bool processSeqLoopDisabled() const;
 
-        void processNoteRepeat();
+        void processNoteRepeat() const;
 
         void setTickPositionEffectiveImmediately(int newTickPos) const;
 

@@ -19,7 +19,7 @@ ApsSlider::ApsSlider(const std::vector<char> &loadBytes)
     programChange = loadBytes[9];
 }
 
-ApsSlider::ApsSlider(mpc::sampler::PgmSlider *slider)
+ApsSlider::ApsSlider(sampler::PgmSlider *slider)
 {
     saveBytes = std::vector<char>(ApsProgram::SLIDER_LENGTH);
     saveBytes[0] = slider->getNote() == 34 ? 0 : slider->getNote();

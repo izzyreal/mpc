@@ -23,11 +23,11 @@ namespace mpc::sampler
     class Sampler final
     {
     public:
-        Sampler(mpc::Mpc &);
+        Sampler(Mpc &);
 
-        std::shared_ptr<mpc::sampler::Sound> getPlayXSound();
-        std::shared_ptr<mpc::sampler::Sound> getClickSound();
-        std::shared_ptr<mpc::sampler::Sound> getSound(int index);
+        std::shared_ptr<Sound> getPlayXSound();
+        std::shared_ptr<Sound> getClickSound();
+        std::shared_ptr<Sound> getSound(int index);
 
         std::shared_ptr<Sound> getPreviewSound();
         std::shared_ptr<Program> getProgram(int index);
@@ -131,7 +131,7 @@ namespace mpc::sampler
         int playXMode = 0;
         std::string previousScreenName;
 
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         std::vector<int> initMasterPadAssign;
         std::vector<int> masterPadAssign;
 

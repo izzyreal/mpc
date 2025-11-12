@@ -6,7 +6,6 @@ namespace mpc::sequencer
     class LegacyClock
     {
 
-    private:
         static const double ppqn_f;
         static const double rec60;
         static const double rec03;

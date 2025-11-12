@@ -21,11 +21,10 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-    class MixerStrip : public mpc::lcdgui::Component
+    class MixerStrip : public Component
     {
 
-    private:
-        mpc::Mpc &mpc;
+        Mpc &mpc;
         const std::vector<std::string> abcd{"A", "B", "C", "D"};
         const std::vector<int> xPos0indiv{5,   20,  35,  50,  65,  80,
                                           95,  110, 125, 140, 155, 170,
@@ -45,7 +44,6 @@ namespace mpc::lcdgui
         int yPos1fx;
         int selection;
 
-    private:
         std::shared_ptr<MixerFader> findMixerFader();
         std::shared_ptr<Knob> findKnob();
         std::shared_ptr<MixerTopBackground> findMixerTopBackground() const;
@@ -60,7 +58,6 @@ namespace mpc::lcdgui
         void setValueAString(const std::string &str);
         void setBank(int i);
 
-    public:
-        MixerStrip(mpc::Mpc &mpc, int columnIndex);
+        MixerStrip(Mpc &mpc, int columnIndex);
     };
 } // namespace mpc::lcdgui

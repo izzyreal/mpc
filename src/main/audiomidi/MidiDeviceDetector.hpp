@@ -16,7 +16,7 @@ namespace mpc::audiomidi
     class MidiDeviceDetector
     {
     public:
-        void start(mpc::Mpc &);
+        void start(Mpc &);
         void stop();
         ~MidiDeviceDetector();
 

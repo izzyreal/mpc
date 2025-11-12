@@ -25,10 +25,10 @@ ApsParser::ApsParser(const std::vector<char> &loadBytes)
         loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 
     auto const soundNamesEnd =
-        HEADER_LENGTH + (header->getSoundAmount() * SOUND_NAME_LENGTH);
+        HEADER_LENGTH + header->getSoundAmount() * SOUND_NAME_LENGTH;
     soundNames = std::make_unique<ApsSoundNames>(Util::vecCopyOfRange(
         loadBytes, HEADER_OFFSET + HEADER_LENGTH, soundNamesEnd));
-    programCount = (loadBytes.size() - 1689 - (soundNames->get().size() * 17)) /
+    programCount = (loadBytes.size() - 1689 - soundNames->get().size() * 17) /
                    PROGRAM_LENGTH;
     auto const nameEnd = soundNamesEnd + PAD_LENGTH1 + APS_NAME_LENGTH;
     auto const nameOffset = soundNamesEnd + PAD_LENGTH1;
@@ -44,9 +44,8 @@ ApsParser::ApsParser(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 4; i++)
     {
-        int offset =
-            drum1MixerOffset +
-            (i * (MIXER_LENGTH + DRUM_CONFIG_LENGTH + DRUM_PAD_LENGTH));
+        int offset = drum1MixerOffset +
+                     i * (MIXER_LENGTH + DRUM_CONFIG_LENGTH + DRUM_PAD_LENGTH);
         drumMixers[i] = std::make_unique<ApsMixer>(
             Util::vecCopyOfRange(loadBytes, offset, offset + MIXER_LENGTH));
         drumConfigurations[i] = std::make_unique<ApsDrumConfiguration>(
@@ -55,19 +54,19 @@ ApsParser::ApsParser(const std::vector<char> &loadBytes)
     }
 
     int const firstProgramOffset = drum1MixerOffset +
-                                   ((MIXER_LENGTH + DRUM_CONFIG_LENGTH) * 4) +
+                                   (MIXER_LENGTH + DRUM_CONFIG_LENGTH) * 4 +
                                    PAD_LENGTH3 - 6;
 
     for (int i = 0; i < programCount; i++)
     {
         int offset =
-            firstProgramOffset + (i * (PROGRAM_LENGTH + PROGRAM_PAD_LENGTH));
+            firstProgramOffset + i * (PROGRAM_LENGTH + PROGRAM_PAD_LENGTH);
         programs.push_back(std::make_unique<ApsProgram>(
             Util::vecCopyOfRange(loadBytes, offset, offset + PROGRAM_LENGTH)));
     }
 }
 
-ApsParser::ApsParser(mpc::Mpc &mpc, std::string apsNameString)
+ApsParser::ApsParser(Mpc &mpc, std::string apsNameString)
 {
     auto sampler = mpc.getSampler();
     std::vector<std::vector<char>> chunks;
@@ -131,12 +130,11 @@ ApsParser::ApsParser(mpc::Mpc &mpc, std::string apsNameString)
             continue;
         }
 
-        auto program =
-            ApsProgram(dynamic_cast<mpc::sampler::Program *>(p.get()), i);
+        auto program = ApsProgram(p.get(), i);
         chunks.push_back(program.getBytes());
     }
 
-    chunks.push_back(std::vector<char>{(char)255, (char)255});
+    chunks.push_back(std::vector{(char)255, (char)255});
     auto totalSize = 0;
 
     for (auto &ba : chunks)

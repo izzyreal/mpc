@@ -9,7 +9,7 @@ using namespace mpc::file::mid::event;
 MidiEvent::MidiEvent(int tick, int delta)
 {
     mTick = tick;
-    mDelta = mpc::file::mid::util::VariableLengthInt(delta);
+    mDelta = util::VariableLengthInt(delta);
 }
 
 int MidiEvent::getTick()
@@ -39,7 +39,7 @@ bool MidiEvent::requiresStatusByte(MidiEvent *prevEvent)
         return true;
     }
 
-    if (dynamic_cast<mpc::file::mid::event::meta::MetaEvent *>(this) != nullptr)
+    if (dynamic_cast<meta::MetaEvent *>(this) != nullptr)
     {
         return true;
     }
@@ -69,7 +69,7 @@ std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta,
 
     auto pos = in.tellg();
 
-    auto id = (int)(in.get() & 0xFF);
+    auto id = in.get() & 0xFF;
 
     if (!verifyIdentifier(id))
     {
@@ -82,25 +82,22 @@ std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta,
         return ChannelEvent::parseChannelEvent(tick, delta, sType, sChannel,
                                                in);
     }
-    else if (sId == 255)
+    if (sId == 255)
     {
         return meta::MetaEvent::parseMetaEvent(tick, delta, in);
     }
-    else if (sId == 240 || sId == 247)
+    if (sId == 240 || sId == 247)
     {
-        auto size = mpc::file::mid::util::VariableLengthInt(in);
+        auto size = util::VariableLengthInt(in);
         auto data = std::vector<char>(size.getValue());
         in.read(&data[0], data.size());
         return std::make_shared<SystemExclusiveEvent>(sId, tick, delta, data);
     }
-    else
+    std::string error =
+        "Unable to handle status byte, skipping: " + std::to_string(sId);
+    if (reset)
     {
-        std::string error =
-            "Unable to handle status byte, skipping: " + std::to_string(sId);
-        if (reset)
-        {
-            in.ignore(1);
-        }
+        in.ignore(1);
     }
 
     return {};

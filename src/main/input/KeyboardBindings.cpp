@@ -7,10 +7,10 @@ KeyboardBindings::KeyboardBindings()
     initializeDefaults();
 }
 
-std::vector<mpc::input::VmpcKeyCode>
+std::vector<VmpcKeyCode>
 KeyboardBindings::lookupComponent(hardware::ComponentId id) const
 {
-    std::vector<mpc::input::VmpcKeyCode> result;
+    std::vector<VmpcKeyCode> result;
 
     for (const auto &[key, binding] : bindings)
     {

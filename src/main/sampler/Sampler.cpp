@@ -41,7 +41,7 @@ using namespace mpc::sampler;
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-Sampler::Sampler(mpc::Mpc &mpc) : mpc(mpc) {}
+Sampler::Sampler(Mpc &mpc) : mpc(mpc) {}
 
 std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
@@ -208,7 +208,7 @@ void Sampler::init()
             for (int i = 0; i < numFrames; i++)
             {
                 float frame = wav_get_LE(stream, 2) / 32768.0;
-                clickSound->insertFrame(std::vector<float>{frame},
+                clickSound->insertFrame(std::vector{frame},
                                         clickSound->getFrameCount());
             }
         }
@@ -516,14 +516,11 @@ std::string Sampler::getSoundSortingTypeName() const
     {
         return "MEMORY";
     }
-    else if (soundSortingType == 1)
+    if (soundSortingType == 1)
     {
         return "NAME";
     }
-    else
-    {
-        return "SIZE";
-    }
+    return "SIZE";
 }
 
 void Sampler::switchToNextSoundSortType()
@@ -777,8 +774,7 @@ int Sampler::getFreeSampleSpace() const
 
     for (auto &s : sounds)
     {
-        freeSpace -=
-            (s->getSampleData()->size() * 2) / static_cast<double>(1024);
+        freeSpace -= s->getSampleData()->size() * 2 / static_cast<double>(1024);
     }
 
     return static_cast<int>(floor(freeSpace));
@@ -1126,9 +1122,7 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 
     for (int i = 0; i < 64; i++)
     {
-        auto copy =
-            dynamic_cast<NoteParameters *>(src->getNoteParameters(i + 35))
-                ->clone(i);
+        auto copy = src->getNoteParameters(i + 35)->clone(i);
         dest->setNoteParameters(i, copy);
 
         auto mc1 = dest->getIndivFxMixerChannel(i);
@@ -1276,7 +1270,7 @@ std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSortedSounds()
 
         return result;
     }
-    else if (soundSortingType == 1)
+    if (soundSortingType == 1)
     {
         return getSoundsSortedByName();
     }

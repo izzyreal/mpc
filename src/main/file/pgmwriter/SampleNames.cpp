@@ -7,8 +7,8 @@
 
 using namespace mpc::file::pgmwriter;
 
-SampleNames::SampleNames(mpc::sampler::Program *program,
-                         const std::weak_ptr<mpc::sampler::Sampler> &sampler)
+SampleNames::SampleNames(sampler::Program *program,
+                         const std::weak_ptr<sampler::Sampler> &sampler)
 {
     std::vector<int> list;
 
@@ -48,14 +48,14 @@ SampleNames::SampleNames(mpc::sampler::Program *program,
         snConvTable.push_back(j);
     }
     numberOfSamples = finalNames.size();
-    sampleNamesArray = std::vector<char>((numberOfSamples * 17) + 2);
+    sampleNamesArray = std::vector<char>(numberOfSamples * 17 + 2);
     int counter = 0;
     for (auto &s : finalNames)
     {
         setSampleName(counter++, s);
     }
-    sampleNamesArray[(int)(sampleNamesArray.size()) - 2] = 30;
-    sampleNamesArray[(int)(sampleNamesArray.size()) - 1] = 0;
+    sampleNamesArray[(int)sampleNamesArray.size() - 2] = 30;
+    sampleNamesArray[(int)sampleNamesArray.size() - 1] = 0;
 }
 
 std::vector<char> SampleNames::getSampleNamesArray()
@@ -67,15 +67,15 @@ void SampleNames::setSampleName(int sampleNumber, const std::string &name)
 {
     for (int i = 0; i < name.length(); i++)
     {
-        sampleNamesArray[i + (sampleNumber * 17)] = name[i];
+        sampleNamesArray[i + sampleNumber * 17] = name[i];
     }
 
     for (int i = name.length(); i < 16; i++)
     {
-        sampleNamesArray[i + (sampleNumber * 17)] = 32;
+        sampleNamesArray[i + sampleNumber * 17] = 32;
     }
 
-    sampleNamesArray[16 + (sampleNumber * 17)] = 0;
+    sampleNamesArray[16 + sampleNumber * 17] = 0;
 }
 
 int SampleNames::getNumberOfSamples() const

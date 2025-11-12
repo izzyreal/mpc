@@ -25,14 +25,13 @@ namespace mpc::disk
     {
     public:
         static program_or_error
-        loadProgram(mpc::Mpc &, const std::shared_ptr<mpc::disk::MpcFile> &,
-                    const std::shared_ptr<mpc::sampler::Program> &);
+        loadProgram(Mpc &, const std::shared_ptr<MpcFile> &,
+                    const std::shared_ptr<sampler::Program> &);
 
     private:
-        static void showLoadingSoundNamePopup(mpc::Mpc &mpc,
-                                              const std::string &name,
+        static void showLoadingSoundNamePopup(Mpc &mpc, const std::string &name,
                                               const std::string &ext,
                                               int sampleSize);
-        static void notFound(mpc::Mpc &, const std::string &soundFileName);
+        static void notFound(Mpc &, const std::string &soundFileName);
     };
 } // namespace mpc::disk

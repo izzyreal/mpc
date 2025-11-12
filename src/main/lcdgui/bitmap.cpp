@@ -100,7 +100,7 @@ void Bitmap::openFromData(char *data, const int size)
         bmpfile_header header;
         for (auto i = 0; i < sizeof(header); i++)
         {
-            ((char *)(&header))[i] = data[pos + i];
+            ((char *)&header)[i] = data[pos + i];
         }
 
         pos += sizeof(header);
@@ -108,7 +108,7 @@ void Bitmap::openFromData(char *data, const int size)
         bmpfile_dib_info dib_info;
         for (auto i = 0; i < sizeof(dib_info); i++)
         {
-            ((char *)(&dib_info))[i] = data[pos + i];
+            ((char *)&dib_info)[i] = data[pos + i];
         }
 
         pos += sizeof(dib_info);
@@ -116,7 +116,7 @@ void Bitmap::openFromData(char *data, const int size)
         bmpfile_color_table color1;
         for (auto i = 0; i < sizeof(color1); i++)
         {
-            ((char *)(&color1))[i] = data[pos + i];
+            ((char *)&color1)[i] = data[pos + i];
         }
 
         pos += sizeof(color1);
@@ -124,7 +124,7 @@ void Bitmap::openFromData(char *data, const int size)
         bmpfile_color_table color2;
         for (auto i = 0; i < sizeof(color2); i++)
         {
-            ((char *)(&color2))[i] = data[pos + i];
+            ((char *)&color2)[i] = data[pos + i];
         }
 
         pos += sizeof(color2);
@@ -182,9 +182,9 @@ void Bitmap::openFromData(char *data, const int size)
             // All but the last byte
             row_bytes += dib_info.width / 8;
             // Is there a last byte?
-            row_bytes += (dib_info.width % 8 != 0) ? 1 : 0;
+            row_bytes += dib_info.width % 8 != 0 ? 1 : 0;
             // Rows are padded so that they're always a multiple of 4 bytes
-            row_bytes += (row_bytes % 4 == 0) ? 0 : (4 - row_bytes % 4);
+            row_bytes += row_bytes % 4 == 0 ? 0 : 4 - row_bytes % 4;
 
             const std::unique_ptr<char[]> row_data(new char[row_bytes]);
 
@@ -207,7 +207,7 @@ void Bitmap::openFromData(char *data, const int size)
                 {
                     for (int bit = 7; bit >= 0; --bit)
                     {
-                        high = ((row_data.get()[col] & (1 << bit)) != 0);
+                        high = (row_data.get()[col] & 1 << bit) != 0;
                         row_pixels.push_back(Pixel(high));
                     }
                 }
@@ -216,7 +216,7 @@ void Bitmap::openFromData(char *data, const int size)
                 for (int rev_bit = 0; rev_bit < dib_info.width % 8; ++rev_bit)
                 {
                     high = (row_data.get()[dib_info.width / 8] &
-                            (1 << (7 - rev_bit))) != 0;
+                            1 << (7 - rev_bit)) != 0;
                     row_pixels.push_back(Pixel(high));
                 }
 
@@ -366,9 +366,9 @@ void Bitmap::open(fs::path p)
                 // All but the last byte
                 row_bytes += dib_info.width / 8;
                 // Is there a last byte?
-                row_bytes += (dib_info.width % 8 != 0) ? 1 : 0;
+                row_bytes += dib_info.width % 8 != 0 ? 1 : 0;
                 // Rows are padded so that they're always a multiple of 4 bytes
-                row_bytes += (row_bytes % 4 == 0) ? 0 : (4 - row_bytes % 4);
+                row_bytes += row_bytes % 4 == 0 ? 0 : 4 - row_bytes % 4;
 
                 std::unique_ptr<char[]> row_data(new char[row_bytes]);
 
@@ -386,7 +386,7 @@ void Bitmap::open(fs::path p)
                     {
                         for (int bit = 7; bit >= 0; --bit)
                         {
-                            high = ((row_data.get()[col] & (1 << bit)) != 0);
+                            high = (row_data.get()[col] & 1 << bit) != 0;
                             row_pixels.emplace_back(high);
                         }
                     }
@@ -396,7 +396,7 @@ void Bitmap::open(fs::path p)
                          ++rev_bit)
                     {
                         high = (row_data.get()[dib_info.width / 8] &
-                                (1 << (7 - rev_bit))) != 0;
+                                1 << (7 - rev_bit)) != 0;
                         row_pixels.emplace_back(high);
                     }
 
@@ -443,10 +443,7 @@ PixelMatrix Bitmap::toPixelMatrix() const
     {
         return pixels;
     }
-    else
-    {
-        return PixelMatrix();
-    }
+    return PixelMatrix();
 }
 
 void Bitmap::fromPixelMatrix(const PixelMatrix &values)

@@ -34,10 +34,7 @@ namespace mpc::lcdgui::util
         {
             return it->second;
         }
-        else
-        {
-            return empty;
-        }
+        return empty;
     }
 
     inline bool isTypableField(const std::string &screenName,
@@ -54,9 +51,9 @@ namespace mpc::lcdgui::util
         return false;
     }
 
-    inline bool isFieldSplittable(
-        const std::shared_ptr<mpc::lcdgui::ScreenComponent> &screen,
-        const std::string &fieldName)
+    inline bool
+    isFieldSplittable(const std::shared_ptr<ScreenComponent> &screen,
+                      const std::string &fieldName)
     {
         using namespace mpc::lcdgui::screengroups;
 

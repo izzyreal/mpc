@@ -29,7 +29,6 @@ namespace mpc::engine::audio::core
         static const int CT_32SB = {int(28)};
         static const int CT_32SL = {int(12)};
 
-    public:
         static void checkSupportedSampleSize(int ssib, int channels,
                                              int frameSize);
         static int getFormatType(AudioFormat *format);
@@ -53,7 +52,6 @@ namespace mpc::engine::audio::core
                                int outOffset, int frameCount,
                                AudioFormat *format);
 
-    public:
         static void byte2floatGeneric(const std::vector<char> &input,
                                       int inByteOffset, int inByteStep,
                                       std::vector<float> &output, int outOffset,
@@ -75,7 +73,6 @@ namespace mpc::engine::audio::core
                                int outByteOffset, int frameCount,
                                AudioFormat *format, float ditherBits);
 
-    public:
         static void float2byteGeneric(std::vector<float> &input, int inOffset,
                                       std::vector<char> &output,
                                       int outByteOffset, int outByteStep,

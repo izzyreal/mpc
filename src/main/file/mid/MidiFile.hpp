@@ -22,7 +22,6 @@ namespace mpc::file::mid
     private:
         static std::vector<char> IDENTIFIER;
 
-    private:
         int mType = 0;
         int mTrackCount = 0;
         int mResolution = 96;

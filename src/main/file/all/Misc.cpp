@@ -22,7 +22,7 @@ Misc::Misc(const std::vector<char> &b)
 {
     for (int i = 0; i < 9; i++)
     {
-        const auto locationOffset = LOCATIONS_OFFSET + (i * 4);
+        const auto locationOffset = LOCATIONS_OFFSET + i * 4;
         const uint16_t locationBarIndex =
             ByteUtil::bytes2ushort({b[locationOffset], b[locationOffset + 1]});
         const uint8_t locationBeatIndex = b[locationOffset + 2];
@@ -35,8 +35,8 @@ Misc::Misc(const std::vector<char> &b)
 
     for (int i = 0; i < 4; i++)
     {
-        auto ctrl = static_cast<int>(b[MIDI_SWITCH_OFFSET + (i * 2)]);
-        auto func = b[MIDI_SWITCH_OFFSET + (i * 2) + 1];
+        auto ctrl = static_cast<int>(b[MIDI_SWITCH_OFFSET + i * 2]);
+        auto func = b[MIDI_SWITCH_OFFSET + i * 2 + 1];
         switches[i] = std::pair(ctrl == 0xFF ? -1 : ctrl, func);
     }
 
@@ -46,7 +46,7 @@ Misc::Misc(const std::vector<char> &b)
     pgmChToSeqEnabled = b[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] > 0;
 }
 
-Misc::Misc(mpc::Mpc &mpc)
+Misc::Misc(Mpc &mpc)
 {
     saveBytes = std::vector<char>(LENGTH);
 
@@ -61,7 +61,7 @@ Misc::Misc(mpc::Mpc &mpc)
             ByteUtil::ushort2bytes(std::get<0>(locationsToPersist[i]));
         const auto locationBeatByte = std::get<1>(locationsToPersist[i]);
         const auto locationClockByte = std::get<2>(locationsToPersist[i]);
-        const auto locationOffset = LOCATIONS_OFFSET + (i * 4);
+        const auto locationOffset = LOCATIONS_OFFSET + i * 4;
         saveBytes[locationOffset] = locationBarBytes[0];
         saveBytes[locationOffset + 1] = locationBarBytes[1];
         saveBytes[locationOffset + 2] = locationBeatByte;
@@ -120,9 +120,9 @@ Misc::Misc(mpc::Mpc &mpc)
             },
             footswitchBindings[i]);
 
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2)] =
+        saveBytes[MIDI_SWITCH_OFFSET + i * 2] =
             cc == -1 ? (char)0xFF : (char)cc;
-        saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char)funcIndex;
+        saveBytes[MIDI_SWITCH_OFFSET + i * 2 + 1] = (char)funcIndex;
     }
 
     saveBytes[AUTO_STEP_INCREMENT_OFFSET] =
@@ -131,7 +131,7 @@ Misc::Misc(mpc::Mpc &mpc)
         (char)(stepEditOptionsScreen->isDurationOfRecordedNotesTcValue() ? 1
                                                                          : 0);
     saveBytes[DURATION_TC_PERCENTAGE_OFFSET] =
-        (char)(stepEditOptionsScreen->getTcValuePercentage());
+        (char)stepEditOptionsScreen->getTcValuePercentage();
     const auto midiInputScreen = mpc.screens->get<ScreenId::MidiInputScreen>();
     saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] =
         midiInputScreen->getProgChangeSeq() ? 0x01 : 0x00;

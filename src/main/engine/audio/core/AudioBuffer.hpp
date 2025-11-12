@@ -8,7 +8,6 @@ namespace mpc::engine::audio::core
     class AudioBuffer : public FloatSampleBuffer
     {
 
-    private:
         bool realTime{true};
         std::string name;
 
@@ -22,14 +21,12 @@ namespace mpc::engine::audio::core
         bool isRealTime() const;
         void setRealTime(bool realTime);
 
-    public:
         void swap(int a, int b);
         float square();
 
         void copyFrom(AudioBuffer *src);
         const bool isSilent();
 
-    public:
         AudioBuffer(const std::string &name, int channelCount, int sampleCount,
                     float sampleRate);
     };

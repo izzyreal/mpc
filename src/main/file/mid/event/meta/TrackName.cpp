@@ -5,7 +5,7 @@
 using namespace mpc::file::mid::event::meta;
 
 TrackName::TrackName(int tick, int delta, const std::string &name)
-    : TextualMetaEvent(tick, delta, MetaEvent::TRACK_NAME, name)
+    : TextualMetaEvent(tick, delta, TRACK_NAME, name)
 {
 }
 

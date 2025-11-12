@@ -10,13 +10,12 @@ StereoOutputProcess::StereoOutputProcess(const string &name)
 {
 }
 
-int StereoOutputProcess::processAudio(
-    mpc::engine::audio::core::AudioBuffer *buffer, int nFrames)
+int StereoOutputProcess::processAudio(core::AudioBuffer *buffer, int nFrames)
 {
 
     if (!buffer->isRealTime())
     {
-        return AudioProcess::AUDIO_OK;
+        return AUDIO_OK;
     }
 
     auto &left = buffer->getChannel(0);
@@ -30,5 +29,5 @@ int StereoOutputProcess::processAudio(
         localBuffer[i + 1] = right[frameCounter++];
     }
 
-    return AudioProcess::AUDIO_OK;
+    return AUDIO_OK;
 }

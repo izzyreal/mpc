@@ -22,7 +22,7 @@ void LoadApsFileScreen::function(const int i)
             break;
         case 4:
         {
-            const std::function<void()> on_success = [&]()
+            const std::function on_success = [&]
             {
                 ls->closeRecentScreensUntilReachingLayer(0);
             };

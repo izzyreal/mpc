@@ -47,7 +47,6 @@ namespace mpc::lcdgui::screens
         void displayEnd() const;
         void displayZone() const;
 
-    private:
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};
         int numberOfZones = 16;

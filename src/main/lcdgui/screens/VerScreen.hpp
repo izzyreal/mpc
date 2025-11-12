@@ -9,7 +9,6 @@ namespace mpc::lcdgui::screens
     public:
         void function(int i) override;
 
-    public:
         VerScreen(Mpc &mpc, int layerIndex);
     };
 } // namespace mpc::lcdgui::screens

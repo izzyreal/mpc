@@ -148,7 +148,7 @@ void NextSeqScreen::turnWheel(int i)
     else if (focusedFieldName == "tempo")
     {
         const double oldTempo = sequencer->getTransport()->getTempo();
-        const double newTempo = oldTempo + (i * 0.1);
+        const double newTempo = oldTempo + i * 0.1;
         sequencer->getTransport()->setTempo(newTempo);
         displayTempo();
     }

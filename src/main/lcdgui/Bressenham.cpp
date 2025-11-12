@@ -26,7 +26,7 @@ LcdLine Bressenham::Line(int x1, int y1, int const x2, int const y2)
 
         while (x1 != x2)
         {
-            if ((error >= 0) && (error || (ix > 0)))
+            if (error >= 0 && (error || ix > 0))
             {
                 error -= delta_x;
                 y1 += iy;
@@ -46,7 +46,7 @@ LcdLine Bressenham::Line(int x1, int y1, int const x2, int const y2)
 
         while (y1 != y2)
         {
-            if ((error >= 0) && (error || (iy > 0)))
+            if (error >= 0 && (error || iy > 0))
             {
                 error -= delta_y;
                 x1 += ix;

@@ -244,7 +244,7 @@ void ZoneScreen::setSliderZoneStart(int i)
     const auto minZoneStart = zone == 0 ? 0 : zones[zone - 1][0];
     const auto maxZoneStart = zones[zone][1];
     const auto rangeLength = maxZoneStart - minZoneStart;
-    const auto newZoneStart = ((i / 124.0) * rangeLength) + minZoneStart;
+    const auto newZoneStart = i / 124.0 * rangeLength + minZoneStart;
     setZoneStart(zone, static_cast<int>(newZoneStart));
 }
 
@@ -252,10 +252,10 @@ void ZoneScreen::setSliderZoneEnd(int i)
 {
     const auto sound = sampler->getSound();
     const auto minZoneEnd = zones[zone][0];
-    const auto maxZoneEnd = zone == (numberOfZones - 1) ? sound->getFrameCount()
-                                                        : zones[zone + 1][1];
+    const auto maxZoneEnd =
+        zone == numberOfZones - 1 ? sound->getFrameCount() : zones[zone + 1][1];
     const auto rangeLength = maxZoneEnd - minZoneEnd;
-    const auto newZoneEnd = ((i / 124.0) * rangeLength) + minZoneEnd;
+    const auto newZoneEnd = i / 124.0 * rangeLength + minZoneEnd;
     setZoneEnd(zone, static_cast<int>(newZoneEnd));
 }
 
@@ -476,7 +476,7 @@ void ZoneScreen::setZone(int i)
 
 std::vector<int> ZoneScreen::getZone() const
 {
-    return std::vector<int>{getZoneStart(zone), getZoneEnd(zone)};
+    return std::vector{getZoneStart(zone), getZoneEnd(zone)};
 }
 
 void ZoneScreen::pressEnter()

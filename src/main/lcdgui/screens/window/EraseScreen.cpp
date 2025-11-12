@@ -161,13 +161,11 @@ void EraseScreen::displayNotes()
     {
         findField("note0")->setSize(47, 9);
         findField("note0")->setText(
-            (StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
-             Util::noteNames()[note0]) +
-            ")");
+            StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" +
+            Util::noteNames()[note0] + ")");
         findField("note1")->setText(
-            (StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
-             Util::noteNames()[note1]) +
-            ")");
+            StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" +
+            Util::noteNames()[note1] + ")");
     }
     else
     {

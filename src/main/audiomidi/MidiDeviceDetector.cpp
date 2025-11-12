@@ -20,7 +20,7 @@ using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-void MidiDeviceDetector::start(mpc::Mpc &mpc)
+void MidiDeviceDetector::start(Mpc &mpc)
 {
     if (running.load())
     {

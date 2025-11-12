@@ -17,13 +17,12 @@ namespace mpc::engine
     class PreviewSoundPlayer final
     {
 
-    private:
-        std::shared_ptr<mpc::sampler::Sampler> sampler;
-        std::shared_ptr<mpc::engine::Voice> voice;
-        std::shared_ptr<mpc::sampler::Sound> tempVars;
+        std::shared_ptr<sampler::Sampler> sampler;
+        std::shared_ptr<Voice> voice;
+        std::shared_ptr<sampler::Sound> tempVars;
 
-        std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
-        std::shared_ptr<mpc::engine::FaderControl> fader;
+        std::shared_ptr<audio::mixer::AudioMixer> mixer;
+        std::shared_ptr<FaderControl> fader;
 
         bool soundHasLoop = false;
 
@@ -40,8 +39,8 @@ namespace mpc::engine
         void connectVoice() const;
 
         explicit PreviewSoundPlayer(
-            std::shared_ptr<mpc::sampler::Sampler> sampler,
-            std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
+            std::shared_ptr<sampler::Sampler> sampler,
+            std::shared_ptr<audio::mixer::AudioMixer> mixer,
             std::shared_ptr<Voice> voice);
     };
 } // namespace mpc::engine

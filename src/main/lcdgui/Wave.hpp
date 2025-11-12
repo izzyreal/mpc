@@ -10,7 +10,6 @@ namespace mpc::lcdgui
     class Wave : public Component
     {
 
-    private:
         std::shared_ptr<const std::vector<float>> sampleData;
         bool fine{false};
         bool mono{true};
@@ -23,7 +22,6 @@ namespace mpc::lcdgui
         unsigned int centerSamplePos = 0; // zoomed view only
         unsigned int zoomFactor{3};       // zoomed view only
 
-    private:
         void makeLine(LcdBitmap &, std::vector<bool> *colors,
                       unsigned int samplePos) const;
         void initSamplesPerPixel();
@@ -34,16 +32,13 @@ namespace mpc::lcdgui
             bool newMono, unsigned int newView);
         void setSelection(unsigned int start, unsigned int end);
 
-    public:
         void setFine(bool newFineEnabled);
         void zoomPlus();
         void zoomMinus();
         void setCenterSamplePos(unsigned int newCenterSamplePos);
 
-    public:
         void Draw(std::vector<std::vector<bool>> *pixels) override;
 
-    public:
         Wave();
     };
 } // namespace mpc::lcdgui

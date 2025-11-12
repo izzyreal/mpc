@@ -12,13 +12,10 @@ namespace mpc::engine::audio::mixer
     public:
         std::shared_ptr<AudioMixerStrip> nextRoutedStrip;
 
-    public:
-        mpc::engine::control::EnumControl *routeControl{nullptr};
+        control::EnumControl *routeControl{nullptr};
 
-    public:
         AudioMixerStrip *getRoutedStrip() override;
 
-    public:
         MainMixProcess(const std::shared_ptr<AudioMixerStrip> &strip,
                        const std::shared_ptr<MixControls> &mixControls,
                        AudioMixer *mixer);

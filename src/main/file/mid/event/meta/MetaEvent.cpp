@@ -19,8 +19,7 @@
 
 using namespace mpc::file::mid::event::meta;
 
-MetaEvent::MetaEvent(int tick, int delta, int type)
-    : mpc::file::mid::event::MidiEvent(tick, delta)
+MetaEvent::MetaEvent(int tick, int delta, int type) : MidiEvent(tick, delta)
 {
     mType = type & 255;
 }

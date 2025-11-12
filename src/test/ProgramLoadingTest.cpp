@@ -18,7 +18,7 @@ using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 
-void prepareResources(mpc::Mpc &mpc)
+void prepareResources(Mpc &mpc)
 {
     auto disk = mpc.getDisk();
 
@@ -42,7 +42,7 @@ void prepareResources(mpc::Mpc &mpc)
                                                   file.end() - file.begin())
                              .data();
             auto newFile = disk->newFile(entry2.filename());
-            std::vector<char> dataVec(data, data + file.size());
+            std::vector dataVec(data, data + file.size());
             newFile->setFileData(dataVec);
         }
 
@@ -51,7 +51,7 @@ void prepareResources(mpc::Mpc &mpc)
     }
 }
 
-void doTest(mpc::Mpc &mpc, const bool clear, const bool replaceSameSounds,
+void doTest(Mpc &mpc, const bool clear, const bool replaceSameSounds,
             std::shared_ptr<sampler::Program> &p1,
             std::shared_ptr<sampler::Program> &p2)
 {
@@ -105,7 +105,7 @@ TEST_CASE("Load 2 programs in Clear P & S mode", "[load-programs]")
     for (int i = 0; i < 2; i++)
     {
         Mpc mpc;
-        mpc::TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpc(mpc);
         std::shared_ptr<sampler::Program> p1;
         std::shared_ptr<sampler::Program> p2;
         doTest(mpc, true, i == 0, p1, p2);
@@ -126,7 +126,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode", "[load-programs]")
     for (int i = 0; i < 2; i++)
     {
         Mpc mpc;
-        mpc::TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpc(mpc);
         std::shared_ptr<sampler::Program> p1;
         std::shared_ptr<sampler::Program> p2;
 
@@ -149,7 +149,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode", "[load-programs]")
     }
 }
 
-void doTestWithMissingSound(mpc::Mpc &mpc, const bool clear,
+void doTestWithMissingSound(Mpc &mpc, const bool clear,
                             const bool replaceSameSounds,
                             std::shared_ptr<sampler::Program> &p1,
                             std::shared_ptr<sampler::Program> &p2)
@@ -173,7 +173,7 @@ void doTestWithMissingSound(mpc::Mpc &mpc, const bool clear,
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
 
     std::thread loadThread(
-        [&]()
+        [&]
         {
             (void)ProgramLoader::loadProgram(mpc, pgmFile1, p1);
         });
@@ -238,7 +238,7 @@ TEST_CASE("Load 2 programs in Add to P & S mode, 1 missing sound",
     for (int i = 0; i < 2; i++)
     {
         Mpc mpc;
-        mpc::TestMpc::initializeTestMpc(mpc);
+        TestMpc::initializeTestMpc(mpc);
         std::shared_ptr<sampler::Program> p1;
         std::shared_ptr<sampler::Program> p2;
 

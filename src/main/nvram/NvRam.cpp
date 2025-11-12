@@ -21,12 +21,12 @@ using namespace mpc::nvram;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-void NvRam::loadUserScreenValues(mpc::Mpc &mpc)
+void NvRam::loadUserScreenValues(Mpc &mpc)
 {
     const auto path = mpc.paths->configPath() / "nvram.vmp";
 
     if (!fs::exists(path) ||
-        fs::file_size(path) != mpc::file::all::AllParser::DEFAULTS_LENGTH)
+        fs::file_size(path) != file::all::AllParser::DEFAULTS_LENGTH)
     {
         return;
     }
@@ -51,7 +51,7 @@ void NvRam::loadUserScreenValues(mpc::Mpc &mpc)
     }
 
     userScreen->device = defaults.getDevices()[0];
-    mpc::sequencer::TimeSignature timeSignature;
+    sequencer::TimeSignature timeSignature;
     timeSignature.setNumerator(defaults.getTimeSigNum());
     timeSignature.setDenominator(defaults.getTimeSigDen());
     userScreen->timeSig = timeSignature;
@@ -60,14 +60,14 @@ void NvRam::loadUserScreenValues(mpc::Mpc &mpc)
     userScreen->velo = defaults.getTrVelos()[0];
 }
 
-void NvRam::saveUserScreenValues(mpc::Mpc &mpc)
+void NvRam::saveUserScreenValues(Mpc &mpc)
 {
     DefaultsParser dp(mpc);
     auto path = mpc.paths->configPath() / "nvram.vmp";
     set_file_data(path, dp.getBytes());
 }
 
-void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
+void NvRam::saveVmpcSettings(Mpc &mpc)
 {
     auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
     auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
@@ -77,23 +77,23 @@ void NvRam::saveVmpcSettings(mpc::Mpc &mpc)
     auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
     std::vector<char> bytes{
-        (char)(vmpcSettingsScreen->initialPadMapping),
-        (char)(vmpcSettingsScreen->_16LevelsEraseMode),
-        (char)(vmpcAutoSaveScreen->autoSaveOnExit),
-        (char)(vmpcAutoSaveScreen->autoLoadOnStart),
-        (char)(engineHost->getRecordLevel()),
-        (char)(engineHost->getMainLevel()),
-        (char)(mpc.getHardware()->getSlider()->getValue()),
-        (char)(vmpcSettingsScreen->autoConvertWavs),
+        (char)vmpcSettingsScreen->initialPadMapping,
+        (char)vmpcSettingsScreen->_16LevelsEraseMode,
+        (char)vmpcAutoSaveScreen->autoSaveOnExit,
+        (char)vmpcAutoSaveScreen->autoLoadOnStart,
+        (char)engineHost->getRecordLevel(),
+        (char)engineHost->getMainLevel(),
+        (char)mpc.getHardware()->getSlider()->getValue(),
+        (char)vmpcSettingsScreen->autoConvertWavs,
         0x00, // This was tap averaging, but it does not belong here
-        (char)(othersScreen->getContrast()),
-        (char)(vmpcSettingsScreen->midiControlMode),
-        (char)(vmpcSettingsScreen->nameTypingWithKeyboardEnabled)};
+        (char)othersScreen->getContrast(),
+        (char)vmpcSettingsScreen->midiControlMode,
+        (char)vmpcSettingsScreen->nameTypingWithKeyboardEnabled};
 
     set_file_data(path, bytes);
 }
 
-void NvRam::loadVmpcSettings(mpc::Mpc &mpc)
+void NvRam::loadVmpcSettings(Mpc &mpc)
 {
     auto engineHost = mpc.getEngineHost();
 

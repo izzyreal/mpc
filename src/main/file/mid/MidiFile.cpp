@@ -113,7 +113,7 @@ void MidiFile::writeToOutputStream(
 
 void MidiFile::initFromBuffer(std::vector<char> &buffer)
 {
-    if (!mpc::file::mid::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4))
+    if (!MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4))
     {
         mType = 0;
         mTrackCount = 0;

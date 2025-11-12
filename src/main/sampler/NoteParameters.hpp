@@ -35,14 +35,14 @@ namespace mpc::sampler
         int getFilterEnvelopeAmount() const;
         VoiceOverlapMode getVoiceOverlapMode() const;
 
-        std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
-        std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
+        std::shared_ptr<engine::StereoMixer> getStereoMixerChannel();
+        std::shared_ptr<engine::IndivFxMixer> getIndivFxMixerChannel();
 
     private:
-        std::shared_ptr<mpc::engine::StereoMixer> stereoMixerChannel =
-            std::make_shared<mpc::engine::StereoMixer>();
-        std::shared_ptr<mpc::engine::IndivFxMixer> indivFxMixerChannel =
-            std::make_shared<mpc::engine::IndivFxMixer>();
+        std::shared_ptr<engine::StereoMixer> stereoMixerChannel =
+            std::make_shared<engine::StereoMixer>();
+        std::shared_ptr<engine::IndivFxMixer> indivFxMixerChannel =
+            std::make_shared<engine::IndivFxMixer>();
         int soundIndex = -1;
         int soundGenerationMode = 0;
         int velocityRangeLower = 0;

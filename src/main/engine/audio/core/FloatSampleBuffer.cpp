@@ -52,7 +52,7 @@ void FloatSampleBuffer::createChannels(int channelCount, int sampleCount,
     {
         while (channels.size() > channelCount)
         {
-            channels.erase(channels.begin() + (int)(channels.size()) - 1);
+            channels.erase(channels.begin() + (int)channels.size() - 1);
         }
     }
 }

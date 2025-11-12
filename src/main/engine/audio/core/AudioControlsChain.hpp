@@ -7,10 +7,9 @@
 namespace mpc::engine::audio::core
 {
 
-    class AudioControlsChain : public mpc::engine::control::CompoundControlChain
+    class AudioControlsChain : public control::CompoundControlChain
     {
 
-    private:
         std::string sourceLabel;
         std::string sourceLocation;
 

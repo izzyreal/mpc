@@ -28,7 +28,7 @@ void snd_read_bytes(const std::shared_ptr<std::istream> &stream,
                     const std::vector<char> &bytes, const int maxLength)
 {
     auto byteCountToRead = std::min((int)bytes.size(), maxLength);
-    stream->read((char *)(&bytes[0]), byteCountToRead);
+    stream->read((char *)&bytes[0], byteCountToRead);
 }
 
 std::string snd_get_string(const std::shared_ptr<std::istream> &stream,
@@ -41,7 +41,7 @@ std::string snd_get_string(const std::shared_ptr<std::istream> &stream,
     {
         if (buffer[i] == 0x20 || buffer[i] == 0x00)
         {
-            buffer = std::vector<char>(buffer.begin(), buffer.begin() + i);
+            buffer = std::vector(buffer.begin(), buffer.begin() + i);
             break;
         }
     }
@@ -53,8 +53,7 @@ uint16_t snd_get_unsigned_short_LE(const std::shared_ptr<std::istream> &stream)
 {
     char buffer[2];
     stream->read(buffer, 2);
-    return static_cast<uint16_t>(((buffer[1] & 0xFF) << 8) |
-                                 (buffer[0] & 0xFF));
+    return static_cast<uint16_t>((buffer[1] & 0xFF) << 8 | buffer[0] & 0xFF);
 }
 
 int snd_get_LE(const std::shared_ptr<std::istream> &stream, int numBytes)

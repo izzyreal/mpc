@@ -23,19 +23,15 @@ namespace mpc::file::mid::event::meta
         void setMpqn(int m);
         void setBpm(float b);
 
-    public:
         int getEventSize() override;
         void writeToOutputStream(std::ostream &out) override;
         void writeToOutputStream(std::ostream &out, bool writeType) override;
 
-    public:
         static std::shared_ptr<MetaEvent> parseTempo(int tick, int delta,
                                                      MetaEventData *info);
 
-    public:
-        virtual int compareTo(mpc::file::mid::event::MidiEvent *other);
+        virtual int compareTo(MidiEvent *other);
 
-    public:
         Tempo();
         Tempo(int tick, int delta, int mpqn);
     };

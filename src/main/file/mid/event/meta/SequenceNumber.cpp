@@ -9,10 +9,10 @@
 using namespace mpc::file::mid::event::meta;
 
 SequenceNumber::SequenceNumber(int tick, int delta, int number)
-    : MetaEvent(tick, delta, MetaEvent::SEQUENCE_NUMBER)
+    : MetaEvent(tick, delta, SEQUENCE_NUMBER)
 {
     mNumber = number;
-    mLength = mpc::file::mid::util::VariableLengthInt(2);
+    mLength = util::VariableLengthInt(2);
 }
 
 int SequenceNumber::getMostSignificantBits() const
@@ -61,7 +61,7 @@ int SequenceNumber::getEventSize()
     return 5;
 }
 
-int SequenceNumber::compareTo(mpc::file::mid::event::MidiEvent *other) const
+int SequenceNumber::compareTo(MidiEvent *other) const
 {
     if (mTick != other->getTick())
     {

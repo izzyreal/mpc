@@ -271,7 +271,7 @@ void SongScreen::turnWheel(int i)
              !sequencer->getTransport()->isTempoSourceSequenceEnabled())
     {
         sequencer->getTransport()->setTempo(
-            sequencer->getTransport()->getTempo() + (i * 0.1));
+            sequencer->getTransport()->getTempo() + i * 0.1);
     }
     else if (focusedFieldName == "tempo-source")
     {
@@ -373,12 +373,12 @@ void SongScreen::displaySteps() const
     const auto song = sequencer->getSong(activeSongIndex);
     const int steps = song->getStepCount();
 
-    const auto stepArray = std::vector<std::shared_ptr<Field>>{
-        findField("step0"), findField("step1"), findField("step2")};
-    const auto sequenceArray = std::vector<std::shared_ptr<Field>>{
+    const auto stepArray =
+        std::vector{findField("step0"), findField("step1"), findField("step2")};
+    const auto sequenceArray = std::vector{
         findField("sequence0"), findField("sequence1"), findField("sequence2")};
-    const auto repsArray = std::vector<std::shared_ptr<Field>>{
-        findField("reps0"), findField("reps1"), findField("reps2")};
+    const auto repsArray =
+        std::vector{findField("reps0"), findField("reps1"), findField("reps2")};
 
     for (int i = 0; i < 3; i++)
     {

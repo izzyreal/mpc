@@ -24,7 +24,7 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::disk;
 using namespace mpc::sampler;
 
-LoadScreen::LoadScreen(mpc::Mpc &mpc, const int layerIndex)
+LoadScreen::LoadScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "load", layerIndex)
 {
 }
@@ -512,7 +512,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     if (result.canBeConverted)
     {
-        auto loadRoutine = [&]()
+        auto loadRoutine = [&]
         {
             constexpr bool shouldBeConverted2 = true;
             loadSound(shouldBeConverted2);

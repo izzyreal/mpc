@@ -11,10 +11,8 @@ namespace mpc::lcdgui::screens::window
         void function(int i) override;
         void turnWheel(int i) override;
 
-    public:
         MidiInputScreen(Mpc &mpc, int layerIndex);
 
-    public:
         void open() override;
 
     private:
@@ -198,6 +196,6 @@ namespace mpc::lcdgui::screens::window
         bool chPressurePassEnabled = true;
         bool polyPressurePassEnabled = true;
         bool exclusivePassEnabled = true;
-        std::vector<bool> ccPassEnabled = std::vector<bool>(128, true);
+        std::vector<bool> ccPassEnabled = std::vector(128, true);
     };
 } // namespace mpc::lcdgui::screens::window

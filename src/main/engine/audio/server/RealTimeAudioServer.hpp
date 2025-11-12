@@ -14,7 +14,6 @@ namespace mpc::engine::audio::server
 {
     class RealTimeAudioServer : public AudioServer
     {
-    private:
         std::shared_ptr<AudioClient> client;
 
     public:
@@ -31,7 +30,6 @@ namespace mpc::engine::audio::server
         void closeAudioInput(std::shared_ptr<IOAudioProcess>) override;
         void resizeBuffers(int newSize) override;
 
-    public:
         void work(const float *const *inputBuffer, float *const *outputBuffer,
                   const int nFrames,
                   const std::vector<int8_t> &mpcMonoInputChannelIndices,

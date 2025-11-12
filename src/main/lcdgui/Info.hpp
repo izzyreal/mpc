@@ -17,6 +17,6 @@ namespace mpc::lcdgui
     {
 
     public:
-        Info(mpc::Mpc &mpc, const std::string &name, int x, int y, int size);
+        Info(Mpc &mpc, const std::string &name, int x, int y, int size);
     };
 } // namespace mpc::lcdgui

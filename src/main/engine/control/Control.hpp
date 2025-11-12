@@ -9,7 +9,6 @@ namespace mpc::engine::control
 
     class Control
     {
-    private:
         int id;
         CompoundControl *parent{nullptr};
         std::string name;

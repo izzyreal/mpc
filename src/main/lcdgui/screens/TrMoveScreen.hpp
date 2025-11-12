@@ -23,7 +23,6 @@ namespace mpc::lcdgui::screens
         void displayTrFields() const;
         void displaySq() const;
 
-    private:
         int selectedTrackIndex = -1;
         int currentTrackIndex = 0;
 

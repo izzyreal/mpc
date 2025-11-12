@@ -53,7 +53,7 @@ void wav_writeHeader(std::ofstream &stream, const int sampleRate,
 void wav_write_bytes(std::ofstream &stream, const std::vector<char> &bytes,
                      uint32_t byteCount)
 {
-    stream.write((char *)(&bytes[0]), byteCount);
+    stream.write(&bytes[0], byteCount);
 }
 
 void wav_close(std::ofstream &stream, const int frameCount,

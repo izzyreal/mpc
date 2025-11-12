@@ -15,7 +15,7 @@ using namespace mpc;
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens::window;
 
-void prepareApsResources(mpc::Mpc &mpc)
+void prepareApsResources(Mpc &mpc)
 {
     auto disk = mpc.getDisk();
 
@@ -28,14 +28,14 @@ void prepareApsResources(mpc::Mpc &mpc)
             (char *)std::string_view(file.begin(), file.end() - file.begin())
                 .data();
         auto newFile = disk->newFile(entry.filename());
-        std::vector<char> dataVec(data, data + file.size());
+        std::vector dataVec(data, data + file.size());
         newFile->setFileData(dataVec);
     }
 
     disk->initFiles();
 }
 
-void doApsTest(mpc::Mpc &mpc)
+void doApsTest(Mpc &mpc)
 {
     prepareApsResources(mpc);
 
@@ -65,6 +65,6 @@ void doApsTest(mpc::Mpc &mpc)
 TEST_CASE("Load APS with 2 programs and 3 sounds", "[load-aps]")
 {
     Mpc mpc;
-    mpc::TestMpc::initializeTestMpc(mpc);
+    TestMpc::initializeTestMpc(mpc);
     doApsTest(mpc);
 }

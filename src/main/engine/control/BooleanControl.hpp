@@ -6,8 +6,6 @@ namespace mpc::engine::control
 {
     class BooleanControl : public Control
     {
-
-    private:
         bool value{false};
 
     public:
@@ -15,7 +13,6 @@ namespace mpc::engine::control
 
         bool getValue() const;
 
-    public:
         BooleanControl(int id, const std::string &name);
     };
 

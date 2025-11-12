@@ -62,7 +62,7 @@ void Background::Draw(std::vector<std::vector<bool>> *pixels)
 
         int byteCounter(0);
 
-        const int byteCounterOffset = (scrollOffset * width) * 3;
+        const int byteCounterOffset = scrollOffset * width * 3;
 
         byteCounter += byteCounterOffset;
 

@@ -28,14 +28,14 @@ bool AkaiName::isValidChar(const char &c)
         return true;
     }
 
-    return find(AkaiName::allowedSpecialCharacters.begin(),
-                AkaiName::allowedSpecialCharacters.end(),
-                c) != AkaiName::allowedSpecialCharacters.end();
+    return find(allowedSpecialCharacters.begin(),
+                allowedSpecialCharacters.end(),
+                c) != allowedSpecialCharacters.end();
 }
 
 bool AkaiName::isCharThatShouldBeRemoved(const char &c)
 {
-    return (c == '.') || (c == ' ');
+    return c == '.' || c == ' ';
 }
 
 std::string AkaiName::cleanUpName(const std::string &name)
@@ -99,7 +99,7 @@ std::string AkaiName::generate(const std::string &name,
         longExt = cleanUpName(nameWithoutLeadingPeriod.substr(dotIdx + 1));
     }
 
-    auto shortExt = (longExt.length() > 3) ? longExt.substr(0, 3) : longExt;
+    auto shortExt = longExt.length() > 3 ? longExt.substr(0, 3) : longExt;
     shortExt = shortExt;
 
     longName = longName.substr(0, std::min((int)longName.length(), 16));

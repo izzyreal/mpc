@@ -13,8 +13,7 @@ namespace mpc::concurrency
               size_t PoolSize = 3>
     class AtomicStateExchange
     {
-        using MessageQueue = moodycamel::ConcurrentQueue<
-            Message, moodycamel::ConcurrentQueueDefaultTraits>;
+        using MessageQueue = moodycamel::ConcurrentQueue<Message>;
 
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
