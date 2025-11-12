@@ -17,6 +17,7 @@
 #include "hardware/Hardware.hpp"
 #include "input/PadAndButtonKeyboard.hpp"
 #include "lcdgui/ScreenGroups.hpp"
+#include "lcdgui/ScreenIdGroups.hpp"
 #include "lcdgui/ScreenComponent.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 #include "lcdgui/screens/StepEditorScreen.hpp"
@@ -28,7 +29,11 @@
 #include "lcdgui/screens/window/NameScreen.hpp"
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/NoteEvent.hpp"
+#include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/Track.hpp"
 
 #include <memory>
 
@@ -135,6 +140,7 @@ void ClientHardwareEventController::handlePadPress(
     }
 
     const auto screen = layeredScreen->getCurrentScreen();
+    const auto screenId = mpc.getLayeredScreen()->getCurrentScreenId();
 
     if (const auto opensNameScreen =
             std::dynamic_pointer_cast<OpensNameScreen>(screen);
@@ -167,6 +173,7 @@ void ClientHardwareEventController::handlePadPress(
 
     const auto track = mpc.getSequencer()->getActiveTrack();
 
+    const auto programIndex = screen->getProgramIndex();
     const auto program = screen->getProgram();
 
     const Bank activeBank = mpc.clientEventController->getActiveBank();
@@ -177,11 +184,13 @@ void ClientHardwareEventController::handlePadPress(
 
     if (program)
     {
+        assert(programIndex);
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
         mpc.eventRegistry->registerProgramPadPress(
-            Source::VirtualMpcHardware, screen, screen->getBus(), program,
-            programPadIndex, clampedVelocity, track.get(), noMidiChannel);
+            Source::VirtualMpcHardware, noMidiChannel, screenId,
+            track->getIndex(), screen->getBus()->busType, programPadIndex,
+            clampedVelocity, *programIndex);
 
         note = program->getNoteFromPad(programPadIndex);
     }
@@ -206,7 +215,7 @@ void ClientHardwareEventController::handlePadPress(
     PushPadScreenUpdateCommand(padPushScreenUpdateCtx, programPadIndex)
         .execute();
 
-    NoteOnEventPtr registryNoteOnEvent;
+    std::optional<NoteOnEvent> registryNoteOnEvent = std::nullopt;
 
     if (note)
     {
@@ -226,9 +235,9 @@ void ClientHardwareEventController::handlePadPress(
         {
             constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
             registryNoteOnEvent = mpc.eventRegistry->registerNoteOn(
-                Source::VirtualMpcHardware, screen, screen->getBus(), *note,
-                clampedVelocity, track.get(), noMidiChannel, program,
-                [](void *) {});
+                Source::VirtualMpcHardware, noMidiChannel, screenId,
+                track->getIndex(), screen->getBus()->busType, *note,
+                clampedVelocity, programIndex, [](void *) {});
         }
     }
 
@@ -246,11 +255,11 @@ void ClientHardwareEventController::handlePadPress(
     }
     else if (!screengroups::isPadDoesNotTriggerNoteEventScreen(screen))
     {
-        if (program)
+        if (program && registryNoteOnEvent)
         {
             auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-                    Source::VirtualMpcHardware, registryNoteOnEvent.get(),
+                    Source::VirtualMpcHardware, *registryNoteOnEvent,
                     program->getNoteFromPad(programPadIndex), clampedVelocity,
                     track.get(), screen->getBus(), screen, programPadIndex,
                     program, mpc.getSequencer(),
@@ -266,9 +275,9 @@ void ClientHardwareEventController::handlePadPress(
     }
 
     mpc.eventRegistry->registerPhysicalPadPress(
-        Source::VirtualMpcHardware, screen, screen->getBus(), physicalPadIndex,
-        clampedVelocity, track.get(), static_cast<int>(activeBank), note,
-        action);
+        Source::VirtualMpcHardware, screenId, screen->getBus()->busType,
+        physicalPadIndex, clampedVelocity, track->getIndex(), activeBank,
+        screen->getProgramIndex(), note, action);
 }
 
 void ClientHardwareEventController::handlePadRelease(
@@ -293,7 +302,7 @@ void ClientHardwareEventController::handlePadRelease(
     }
 
     auto action =
-        [eventRegistry = mpc.eventRegistry,
+        [eventRegistry = mpc.eventRegistry, sampler = mpc.getSampler(),
          eventHandler = mpc.getEventHandler(), screens = mpc.screens,
          sequencer = mpc.getSequencer(), hardware = mpc.getHardware(),
          clientEventController = mpc.clientEventController,
@@ -304,43 +313,58 @@ void ClientHardwareEventController::handlePadRelease(
     {
         const auto p = static_cast<PhysicalPadPressEvent *>(userData);
 
-        if (screengroups::isSoundScreen(p->screen))
+        if (!p)
+        {
+            // TODO What to do with orphaned physical pad presses?
+            return;
+        }
+
+        if (screengroups::isSoundScreen(p->screenId))
         {
             previewSoundPlayer->finishVoiceIfSoundIsLooping();
         }
-        else if (screengroups::isPadDoesNotTriggerNoteEventScreen(p->screen))
+        else if (screengroups::isPadDoesNotTriggerNoteEventScreen(p->screenId))
         {
             return;
         }
 
-        const auto programPadIndex = p->padIndex.get() + p->bank * 16;
+        const auto programPadIndex =
+            physicalPadAndBankToProgramPadIndex(p->padIndex, p->bank);
+        auto track =
+            sequencer->getActiveSequence()->getTrack(p->trackIndex).get();
 
-        if (p->note)
+        auto recordingNoteOnEvent =
+            track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
+
+        auto recordingNoteEventId = recordingNoteOnEvent != nullptr
+                                        ? recordingNoteOnEvent->getId()
+                                        : NoNoteEventId;
+
+        if (p->noteNumber != NoNoteNumber)
         {
             const auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-                    Source::VirtualMpcHardware, *p->note, p->track, p->bus,
-                    p->screen, programPadIndex, p->program, sequencer,
+                    Source::VirtualMpcHardware, p->noteNumber,
+                    recordingNoteEventId, track, p->busType,
+                    screens->getScreenById(p->screenId), programPadIndex,
+                    sampler->getProgram(p->programIndex), sequencer,
                     sequencerPlaybackEngine, eventRegistry,
                     clientEventController, eventHandler, screens, hardware);
 
             TriggerLocalNoteOffCommand(ctx).execute();
 
-            if (*p->note >= 0)
-            {
-                constexpr std::optional<int> noMidiChannel = std::nullopt;
-                eventRegistry->registerNoteOff(Source::VirtualMpcHardware,
-                                               *p->note, noMidiChannel,
-                                               [](void *) {});
-            }
+            constexpr std::optional<int> noMidiChannel = std::nullopt;
+            eventRegistry->registerNoteOff(Source::VirtualMpcHardware,
+                                           p->noteNumber, noMidiChannel,
+                                           [](void *) {});
         }
 
-        if (p->program)
+        if (p->programIndex != NoProgramIndex)
         {
             constexpr std::optional<int> noMidiChannel = std::nullopt;
             eventRegistry->registerProgramPadRelease(
-                Source::VirtualMpcHardware, p->bus, p->program, programPadIndex,
-                p->track, noMidiChannel, [](void *) {});
+                Source::VirtualMpcHardware, programPadIndex, p->programIndex,
+                [](void *) {});
         }
     };
 
@@ -369,18 +393,19 @@ void ClientHardwareEventController::handlePadAftertouch(
     {
         const auto padPress = static_cast<PhysicalPadPressEvent *>(userData);
 
-        if (padPress->program)
+        if (padPress->programIndex != NoProgramIndex)
         {
             eventRegistry->registerProgramPadAftertouch(
-                Source::VirtualMpcHardware, padPress->bus, padPress->program,
-                padPress->padIndex.get() + padPress->bank * 16, pressureToUse,
-                padPress->track);
+                Source::VirtualMpcHardware,
+                physicalPadAndBankToProgramPadIndex(padPress->padIndex,
+                                                    padPress->bank),
+                padPress->programIndex, pressureToUse);
         }
 
-        if (padPress->note)
+        if (padPress->noteNumber != NoNoteNumber)
         {
             eventRegistry->registerNoteAftertouch(Source::VirtualMpcHardware,
-                                                  *padPress->note,
+                                                  padPress->noteNumber,
                                                   pressureToUse, std::nullopt);
         }
     };

@@ -109,7 +109,8 @@ void NoteRepeatProcessor::process(
             snapshot.retrievePhysicalPadPressEvent(padIndex % 16);
 
         const bool isPhysicallyPressed =
-            physicalPadPressInfo && physicalPadPressInfo->bank == padIndex / 16;
+            physicalPadPressInfo.bank ==
+            controller::programPadIndexToBank(padIndex);
 
         if (isSixteenLevelsEnabled() && isPhysicallyPressed)
         {

@@ -312,7 +312,7 @@ void MidiReader::parseSequence(Mpc &mpc)
 
         for (auto &n : noteOns)
         {
-            auto noteOn = track->recordNoteEventSynced(
+            auto noteOn = track->recordNoteEventNonLive(
                 n->getTick(), n->getNote(), n->getVelocity());
 
             int indexCandidate = -1;

@@ -24,6 +24,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::command;
 using namespace mpc::command::context;
 using namespace mpc::sequencer;
+using namespace mpc::sampler;
 
 ScreenComponent::ScreenComponent(Mpc &mpc, const std::string &name,
                                  const int layer)
@@ -209,23 +210,32 @@ bool ScreenComponent::isFocusedFieldName(const std::string &fieldName)
 
     return f->getName() == fieldName;
 }
-
-std::shared_ptr<mpc::sampler::Program> ScreenComponent::getProgram() const
-
+std::optional<int> ScreenComponent::getProgramIndex() const
 {
     const auto drumIndex = getDrumIndex();
 
     if (!drumIndex)
     {
+        return std::nullopt;
+    }
+
+    return sequencer->getDrumBus(*drumIndex)->getProgram();
+}
+
+std::shared_ptr<Program> ScreenComponent::getProgram() const
+
+{
+    const auto programIndex = getProgramIndex();
+
+    if (!programIndex)
+    {
         return {};
     }
 
-    return mpc.getSampler()->getProgram(
-        sequencer->getDrumBus(*drumIndex)->getProgram());
+    return mpc.getSampler()->getProgram(*programIndex);
 }
 
-std::shared_ptr<mpc::sampler::Program>
-ScreenComponent::getProgramOrThrow() const
+std::shared_ptr<Program> ScreenComponent::getProgramOrThrow() const
 {
     auto p = getProgram();
     if (!p)

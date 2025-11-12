@@ -1,35 +1,16 @@
 #pragma once
 
 #include "eventregistry/State.hpp"
-
 #include "concurrency/AtomicStateExchange.hpp"
-
 #include "IntTypes.hpp"
-
 #include "eventregistry/Source.hpp"
 #include "eventregistry/EventTypes.hpp"
 #include "eventregistry/EventMessage.hpp"
-
 #include "eventregistry/StateView.hpp"
+#include "sequencer/BusType.hpp"
 
-#include <memory>
 #include <optional>
 #include <functional>
-
-namespace mpc::sampler
-{
-    class Program;
-}
-namespace mpc::lcdgui
-{
-    class ScreenComponent;
-}
-namespace mpc::sequencer
-{
-    class Track;
-    class Bus;
-    class NoteOnEvent;
-} // namespace mpc::sequencer
 
 namespace mpc::eventregistry
 {
@@ -41,56 +22,52 @@ namespace mpc::eventregistry
         EventRegistry();
 
         void registerPhysicalPadPress(
-            Source, const std::shared_ptr<lcdgui::ScreenComponent> &,
-            const std::shared_ptr<sequencer::Bus> &, PhysicalPadIndex padIndex,
-            Velocity, sequencer::Track *, int bank, std::optional<int> note,
+            Source, lcdgui::ScreenId, sequencer::BusType, PhysicalPadIndex,
+            Velocity, TrackIndex, controller::Bank, std::optional<ProgramIndex>,
+            std::optional<NoteNumber>,
             const std::function<void(void *)> &action) const;
 
         void registerPhysicalPadAftertouch(
-            PhysicalPadIndex, Pressure, Source source,
+            PhysicalPadIndex, Pressure, Source,
             const std::function<void(void *)> &action) const;
 
         void registerPhysicalPadRelease(
-            PhysicalPadIndex, Source source,
+            PhysicalPadIndex, Source,
             const std::function<void(void *)> &action) const;
 
-        ProgramPadPressEventPtr registerProgramPadPress(
-            Source, const std::shared_ptr<lcdgui::ScreenComponent> &,
-            const std::shared_ptr<sequencer::Bus> &,
-            const std::shared_ptr<sampler::Program> &, ProgramPadIndex padIndex,
-            Velocity, sequencer::Track *, std::optional<MidiChannel>) const;
+        void registerProgramPadPress(
+            Source, std::optional<MidiChannel> midiInputChannel,
+            lcdgui::ScreenId, TrackIndex, sequencer::BusType, ProgramPadIndex,
+            Velocity, ProgramIndex) const;
 
-        void registerProgramPadAftertouch(
-            Source, const std::shared_ptr<sequencer::Bus> &,
-            const std::shared_ptr<sampler::Program> &, ProgramPadIndex padIndex,
-            Pressure, sequencer::Track *) const;
+        void registerProgramPadAftertouch(Source, ProgramPadIndex, ProgramIndex,
+                                          Pressure) const;
 
         void registerProgramPadRelease(
-            Source, const std::shared_ptr<sequencer::Bus> &,
-            const std::shared_ptr<sampler::Program> &, ProgramPadIndex padIndex,
-            sequencer::Track *, std::optional<MidiChannel>,
+            Source, ProgramPadIndex, ProgramIndex,
             const std::function<void(void *)> &action) const;
 
-        NoteOnEventPtr
-        registerNoteOn(Source, const std::shared_ptr<lcdgui::ScreenComponent> &,
-                       const std::shared_ptr<sequencer::Bus> &, NoteNumber,
-                       Velocity, sequencer::Track *, std::optional<MidiChannel>,
-                       const std::shared_ptr<sampler::Program> &,
+        NoteOnEvent
+        registerNoteOn(Source, std::optional<MidiChannel> midiInputChannel,
+                       lcdgui::ScreenId, TrackIndex, sequencer::BusType,
+                       NoteNumber, Velocity, std::optional<ProgramIndex>,
                        const std::function<void(void *)> &action) const;
 
-        void registerNoteAftertouch(Source, NoteNumber, Pressure,
-                                    std::optional<MidiChannel>) const;
-        void registerNoteOff(Source, NoteNumber, std::optional<MidiChannel>,
+        void registerNoteAftertouch(
+            Source, NoteNumber, Pressure,
+            std::optional<MidiChannel> midiInputChannel) const;
+
+        void registerNoteOff(Source, NoteNumber,
+                             std::optional<MidiChannel> midiInputChannel,
                              const std::function<void(void *)> &action) const;
 
         void clear();
 
     protected:
-        void applyMessage(const EventMessage &msg) noexcept override;
+        void applyMessage(const EventMessage &) noexcept override;
 
     private:
         static constexpr size_t CAPACITY = 8192;
-
         void reserveState(State &);
     };
 } // namespace mpc::eventregistry

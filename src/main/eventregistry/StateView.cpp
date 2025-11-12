@@ -5,13 +5,12 @@
 using namespace mpc;
 using namespace mpc::eventregistry;
 
-bool StateView::isProgramPadPressed(
-    const ProgramPadIndex idx,
-    const std::shared_ptr<sampler::Program> &program) const
+bool StateView::isProgramPadPressed(const ProgramPadIndex idx,
+                                    const ProgramIndex programIndex) const
 {
     for (auto &e : state->programPadEvents)
     {
-        if (e->padIndex == idx && e->program == program)
+        if (e.padIndex == idx && e.programIndex == programIndex)
         {
             return true;
         }
@@ -24,7 +23,7 @@ bool StateView::isProgramPadPressedBySource(const ProgramPadIndex idx,
 {
     for (auto &e : state->programPadEvents)
     {
-        if (e->padIndex == idx && e->source == src)
+        if (e.padIndex == idx && e.source == src)
         {
             return true;
         }
@@ -35,31 +34,31 @@ bool StateView::isProgramPadPressedBySource(const ProgramPadIndex idx,
 VelocityOrPressure StateView::getPressedProgramPadAfterTouchOrVelocity(
     const ProgramPadIndex idx) const
 {
-    std::optional<VelocityOrPressure> result;
+    VelocityOrPressure result;
 
     for (const auto &e : state->programPadEvents)
     {
-        if (e->source == Source::NoteRepeat)
+        if (e.source == Source::NoteRepeat)
         {
             continue;
         }
 
-        if (e->padIndex == idx)
+        if (e.padIndex == idx)
         {
-            if (e->pressure)
+            if (e.pressure != NoPressure)
             {
-                result = *e->pressure;
+                result = e.pressure;
             }
-            else if (!result)
+            else if (result == NoVelocityOrPressure)
             {
-                result = e->velocity;
+                result = e.velocity;
             }
         }
     }
 
-    if (result)
+    if (result != NoVelocityOrPressure)
     {
-        return *result;
+        return result;
     }
 
     throw std::invalid_argument(
@@ -72,7 +71,7 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx) const
 {
     for (auto &e : state->programPadEvents)
     {
-        if (e->padIndex == idx)
+        if (e.padIndex == idx)
         {
             return true;
         }
@@ -80,15 +79,15 @@ bool StateView::isProgramPadPressed(const ProgramPadIndex idx) const
     return false;
 }
 
-ProgramPadPressEventPtr StateView::getMostRecentProgramPadPress(
+std::optional<ProgramPadPressEvent> StateView::getMostRecentProgramPadPress(
     const ProgramPadIndex idx,
     const std::vector<Source> &sourcesToExclude) const
 {
-    ProgramPadPressEventPtr latest = nullptr;
+    std::optional<ProgramPadPressEvent> latest = std::nullopt;
 
     for (auto &e : state->programPadEvents)
     {
-        if (e->padIndex != idx)
+        if (e.padIndex != idx)
         {
             continue;
         }
@@ -96,7 +95,7 @@ ProgramPadPressEventPtr StateView::getMostRecentProgramPadPress(
         bool excluded = false;
         for (auto &s : sourcesToExclude)
         {
-            if (e->source == s)
+            if (e.source == s)
             {
                 excluded = true;
                 break;
@@ -107,7 +106,7 @@ ProgramPadPressEventPtr StateView::getMostRecentProgramPadPress(
             continue;
         }
 
-        if (!latest || e->pressTime > latest->pressTime)
+        if (!latest || e.pressTimeMs > latest->pressTimeMs)
         {
             latest = e;
         }
@@ -116,55 +115,33 @@ ProgramPadPressEventPtr StateView::getMostRecentProgramPadPress(
     return latest;
 }
 
-NoteOnEventPtr StateView::retrievePlayNoteEvent(const NoteNumber note) const
-{
-    for (auto &e : state->noteEvents)
-    {
-        if (e->noteNumber == note)
-        {
-            return e;
-        }
-    }
-    return nullptr;
-}
+// std::shared_ptr<sequencer::NoteOnEvent>
+// StateView::retrieveRecordNoteEvent(const NoteNumber note) const
+// {
+//     for (const auto &e : state->noteEvents)
+//     {
+//         if (e.noteNumber == note && e.recordNoteEvent)
+//         {
+//             return *e->recordNoteEvent;
+//         }
+//     }
+//     return {};
+// }
 
-std::shared_ptr<sequencer::NoteOnEvent>
-StateView::retrieveRecordNoteEvent(const NoteNumber note) const
-{
-    for (const auto &e : state->noteEvents)
-    {
-        if (e->noteNumber == note && e->recordNoteEvent)
-        {
-            return *e->recordNoteEvent;
-        }
-    }
-    return {};
-}
-
-PhysicalPadPressEventPtr
+PhysicalPadPressEvent
 StateView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
 {
     for (const auto &e : state->physicalPadEvents)
     {
-        if (e->padIndex == idx)
+        if (e.padIndex == idx)
         {
             return e;
         }
     }
-    return {};
-}
 
-NoteOnEventPtr StateView::retrieveNoteEvent(const NoteNumber note,
-                                            const Source src) const
-{
-    for (const auto &e : state->noteEvents)
-    {
-        if (e->noteNumber == note && e->source == src)
-        {
-            return e;
-        }
-    }
-    return {};
+    throw std::invalid_argument(
+        "This method should only be called for physical pads that are "
+        "pressed");
 }
 
 int StateView::getTotalPressedProgramPadCount() const

@@ -165,9 +165,8 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 
 void Sequencer::playToTick(const int targetTick) const
 {
-    const auto seqIndex = isSongModeEnabled()
-                              ? getSongSequenceIndex()
-                              : activeSequenceIndex;
+    const auto seqIndex =
+        isSongModeEnabled() ? getSongSequenceIndex() : activeSequenceIndex;
     auto seq = sequences[seqIndex].get();
     const auto secondSequenceScreen =
         getScreens()->get<ScreenId::SecondSeqScreen>();
@@ -428,10 +427,10 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         {
             return isEraseButtonPressed();
         },
-        [&](const int programPadIndex, const std::shared_ptr<Program> &program)
+        [&](const int programPadIndex, const ProgramIndex programIndex)
         {
             return eventRegistry->getSnapshot().isProgramPadPressed(
-                programPadIndex, program);
+                programPadIndex, programIndex);
         },
         sampler, eventHandler,
         [&]
@@ -651,7 +650,8 @@ std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
     if (const bool songMode = isSongModeEnabled();
         songMode &&
-        songs[getScreens()->get<ScreenId::SongScreen>()->getActiveSongIndex()]->getStepCount() != 0)
+        songs[getScreens()->get<ScreenId::SongScreen>()->getActiveSongIndex()]
+                ->getStepCount() != 0)
     {
         return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
                                                      : activeSequenceIndex];
@@ -1095,6 +1095,11 @@ template <typename T> std::shared_ptr<T> Sequencer::getBus(const int busIndex)
 
     auto result = std::dynamic_pointer_cast<T>(buses[busIndex]);
     return result;
+}
+
+std::shared_ptr<Bus> Sequencer::getBus(BusType busType)
+{
+    return buses[static_cast<size_t>(busType)];
 }
 
 std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex) const

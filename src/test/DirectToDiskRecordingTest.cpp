@@ -43,7 +43,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
     auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(1);
     seq->setInitialTempo(300);
-    auto event = seq->getTrack(0)->recordNoteEventSynced(0, 35, 127);
+    auto event = seq->getTrack(0)->recordNoteEventNonLive(0, 35, 127);
     seq->getTrack(0)->finalizeNoteEventSynced(event, 1);
 
     mpc.getLayeredScreen()->openScreenById(

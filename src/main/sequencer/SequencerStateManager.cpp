@@ -143,12 +143,12 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
             songScreen->setOffset(-1);
             if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
             {
-                sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(), true);
+                sequencer->setActiveSequenceIndex(
+                    sequencer->getSongSequenceIndex(), true);
             }
         }
 
-        if (songScreen->getOffset() + 1 >
-            currentSong->getStepCount() - 1)
+        if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
         {
             return;
         }
@@ -162,16 +162,14 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
 
         if (const std::shared_ptr<Step> currentStep =
                 currentSong->getStep(step).lock();
-            !sequencer->getSequence(currentStep->getSequence())
-                 ->isUsed())
+            !sequencer->getSequence(currentStep->getSequence())->isUsed())
         {
             return;
         }
     }
 
     const auto countMetronomeScreen =
-        sequencer->getScreens()
-            ->get<ScreenId::CountMetronomeScreen>();
+        sequencer->getScreens()->get<ScreenId::CountMetronomeScreen>();
 
     const auto countInMode = countMetronomeScreen->getCountInMode();
 
@@ -204,13 +202,15 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
             {
                 positionQuarterNotesToStartPlayingFrom =
                     Sequencer::ticksToQuarterNotes(
-                        activeSequence->getFirstTickOfBar(transport->getCurrentBarIndex()));
+                        activeSequence->getFirstTickOfBar(
+                            transport->getCurrentBarIndex()));
             }
 
             transport->setCountInStartPosTicks(Sequencer::quarterNotesToTicks(
                 activeState.positionQuarterNotes));
 
-            transport->setCountInEndPosTicks(activeSequence->getLastTickOfBar(transport->getCurrentBarIndex()));
+            transport->setCountInEndPosTicks(activeSequence->getLastTickOfBar(
+                transport->getCurrentBarIndex()));
             transport->setCountingIn(true);
         }
     }

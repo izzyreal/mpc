@@ -41,6 +41,8 @@ namespace mpc::lcdgui
             return nullptr;
         }
 
+        std::shared_ptr<ScreenComponent> getScreenById(ScreenId screenId);
+
         void createAndCacheAllScreens();
 
     private:

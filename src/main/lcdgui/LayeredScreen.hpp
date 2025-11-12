@@ -89,7 +89,7 @@ namespace mpc::lcdgui
 
         void openScreen(const std::string &screenName);
 
-        std::shared_ptr<ScreenComponent> getCurrentScreen();
+        std::shared_ptr<ScreenComponent> getCurrentScreen() const;
 
         void closeCurrentScreen();
 
@@ -103,12 +103,12 @@ namespace mpc::lcdgui
         void returnToLastFocus(const std::shared_ptr<ScreenComponent> &screen,
                                const std::string &firstFieldOfThisScreen);
 
-        static ScreenId
-        getScreenId(const std::shared_ptr<ScreenComponent> &screen);
-
         FunctionKeys *getFunctionKeys();
 
     public:
+        static ScreenId
+        getScreenId(const std::shared_ptr<ScreenComponent> &screen);
+
         Background *getCurrentBackground();
         void setCurrentBackground(const std::string &s);
 
@@ -116,6 +116,7 @@ namespace mpc::lcdgui
                           const std::string &tfName);
         std::string getLastFocus(const std::string &screenName);
 
+        ScreenId getCurrentScreenId() const;
         std::string getCurrentScreenName() const;
         std::string getFirstLayerScreenName() const;
         void setFunctionKeysArrangement(int arrangementIndex);

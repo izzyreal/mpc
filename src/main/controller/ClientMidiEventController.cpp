@@ -183,16 +183,20 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
     std::optional<int> programPadIndex;
 
     auto screen = layeredScreen->getCurrentScreen();
+    auto screenId = layeredScreen->getCurrentScreenId();
 
-    if (program)
+    auto programIndex = screen->getProgramIndex();
+
+    if (program && programIndex)
     {
         programPadIndex = program->getPadIndexFromNote(e.getNoteNumber());
 
         if (*programPadIndex >= 0)
         {
             eventRegistry->registerProgramPadPress(
-                Source::MidiInput, screen, screen->getBus(), program,
-                *programPadIndex, e.getVelocity(), track.get(), e.getChannel());
+                Source::MidiInput, e.getChannel(), screenId, track->getIndex(),
+                screen->getBus()->busType, *programPadIndex, e.getVelocity(),
+                *programIndex);
         }
     }
 
@@ -205,7 +209,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
 
         const auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
-                Source::MidiInput, registryNoteOnEvent, noteNumber, velocity,
+                Source::MidiInput, *registryNoteOnEvent, noteNumber, velocity,
                 track.get(), screen->getBus(), screen, programPadIndex, program,
                 sequencer, sequencerPlaybackEngine, eventRegistry,
                 clientEventController, eventHandler, screens, hardware);
@@ -213,9 +217,10 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
         command::TriggerLocalNoteOnCommand(ctx).execute();
     };
 
-    auto registryNoteOnEventPtr = eventRegistry->registerNoteOn(
-        Source::MidiInput, screen, screen->getBus(), e.getNoteNumber(),
-        e.getVelocity(), track.get(), e.getChannel(), program, action);
+    eventRegistry->registerNoteOn(Source::MidiInput, e.getChannel(), screenId,
+                                  track->getIndex(), screen->getBus()->busType,
+                                  e.getNoteNumber(), e.getVelocity(),
+                                  programIndex, action);
 }
 
 void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
@@ -231,23 +236,26 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
 
     noteOffInternal(midiChannel, noteNumber);
 
-    const std::function action = [this, noteNumber, midiChannel](void *userData)
+    const std::function action = [this, noteNumber](void *userData)
     {
         eventregistry::NoteOnEvent *noteEventInfo =
             (eventregistry::NoteOnEvent *)userData;
-        std::optional<int> programPadIndex = std::nullopt;
 
-        std::shared_ptr<Program> program;
-        std::shared_ptr<Bus> bus;
-        Track *track = nullptr;
-        std::shared_ptr<ScreenComponent> screen;
-
-        if (noteEventInfo)
+        if (!noteEventInfo)
         {
-            program = noteEventInfo->program;
-            bus = noteEventInfo->bus;
-            track = noteEventInfo->track;
-            screen = noteEventInfo->screen;
+            // TODO What do we do with orphaned note offs?
+            return;
+        }
+
+        std::optional<int> programPadIndex = std::nullopt;
+        std::shared_ptr<Program> program;
+
+        const auto programIndex = noteEventInfo->programIndex;
+        const auto trackIndex = noteEventInfo->trackIndex;
+
+        if (programIndex != NoProgramIndex)
+        {
+            program = sampler->getProgram(programIndex);
         }
 
         if (program)
@@ -257,17 +265,20 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             if (*programPadIndex >= 0)
             {
                 eventRegistry->registerProgramPadRelease(
-                    Source::MidiInput, bus, program, *programPadIndex, track,
-                    midiChannel, [](void *) {});
+                    Source::MidiInput, *programPadIndex, programIndex,
+                    [](void *) {});
             }
         }
 
+        auto screen = screens->getScreenById(noteEventInfo->screenId);
+
         auto ctx =
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
-                Source::MidiInput, noteNumber, track, bus, screen,
-                programPadIndex, program, sequencer, sequencerPlaybackEngine,
-                eventRegistry, clientEventController, eventHandler, screens,
-                hardware);
+                Source::MidiInput, noteNumber, noteEventInfo->recordNoteEventId,
+                sequencer->getActiveSequence()->getTrack(trackIndex).get(),
+                noteEventInfo->busType, screen, programPadIndex, program,
+                sequencer, sequencerPlaybackEngine, eventRegistry,
+                clientEventController, eventHandler, screens, hardware);
 
         command::TriggerLocalNoteOffCommand(ctx).execute();
     };
@@ -292,8 +303,8 @@ void ClientMidiEventController::handleKeyAftertouch(
             programPadIndex != -1)
         {
             eventRegistry->registerProgramPadAftertouch(
-                Source::MidiInput, bus, program, programPadIndex, pressure,
-                track.get());
+                Source::MidiInput, programPadIndex, pressure,
+                track->getIndex());
         }
     }
 }
@@ -313,8 +324,8 @@ void ClientMidiEventController::handleChannelAftertouch(
                  ++programPadIndex)
             {
                 eventRegistry->registerProgramPadAftertouch(
-                    Source::MidiInput, bus, program, programPadIndex, pressure,
-                    track.get());
+                    Source::MidiInput, programPadIndex, pressure,
+                    track->getIndex());
 
                 if (const auto note = program->getNoteFromPad(programPadIndex);
                     note != -1)

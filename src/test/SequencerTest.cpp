@@ -67,7 +67,8 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     REQUIRE(pos() == 0);
 }
 
-TEST_CASE("Can record and playback from different threads", "[sequencer-multithread]")
+TEST_CASE("Can record and playback from different threads",
+          "[sequencer-multithread]")
 {
     const int SAMPLE_RATE = 44100;
     const int BUFFER_SIZE = 512;

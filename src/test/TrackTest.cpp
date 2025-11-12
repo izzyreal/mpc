@@ -19,16 +19,16 @@ TEST_CASE("timing-correct", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = tr->recordNoteEventSynced(12, 88, 127);
+    auto n0 = tr->recordNoteEventNonLive(12, 88, 127);
     tr->finalizeNoteEventSynced(n0, 1);
 
-    auto n0a = tr->recordNoteEventSynced(13, 89, 127);
+    auto n0a = tr->recordNoteEventNonLive(13, 89, 127);
     tr->finalizeNoteEventSynced(n0a, 1);
 
-    auto n1 = tr->recordNoteEventSynced(23, 90, 127);
+    auto n1 = tr->recordNoteEventNonLive(23, 90, 127);
     tr->finalizeNoteEventSynced(n1, 1);
 
-    auto event2 = tr->recordNoteEventSynced(22, 60, 127);
+    auto event2 = tr->recordNoteEventNonLive(22, 60, 127);
     tr->finalizeNoteEventSynced(event2, 1);
 
     REQUIRE(tr->getEvent(0) == n0);
@@ -68,10 +68,10 @@ TEST_CASE("swing1", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n1 = tr->recordNoteEventSynced(23, 90, 127);
+    auto n1 = tr->recordNoteEventNonLive(23, 90, 127);
     tr->finalizeNoteEventSynced(n1, 1);
 
-    auto event2 = tr->recordNoteEventSynced(22, 91, 127);
+    auto event2 = tr->recordNoteEventNonLive(22, 91, 127);
     tr->finalizeNoteEventSynced(event2, 1);
 
     REQUIRE(tr->getEvent(0) == event2);
@@ -103,7 +103,7 @@ TEST_CASE("quantize", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = tr->recordNoteEventSynced(0, 60, 127);
+    auto n0 = tr->recordNoteEventNonLive(0, 60, 127);
     tr->finalizeNoteEventSynced(n0, 1);
 
     for (int i = 0; i <= 12; i++)

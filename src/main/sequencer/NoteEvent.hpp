@@ -1,4 +1,5 @@
 #pragma once
+#include "IntTypes.hpp"
 #include "sequencer/Event.hpp"
 
 #include <optional>
@@ -43,6 +44,8 @@ namespace mpc::sequencer
         typedef std::optional<int> Duration;
 
     private:
+        bool beingRecorded = false;
+        NoteEventId id;
         int number = 60;
         Duration duration;
         VARIATION_TYPE variationType = TUNE_0;
@@ -59,18 +62,24 @@ namespace mpc::sequencer
         std::shared_ptr<NoteOffEvent> noteOff;
 
     public:
+        NoteOnEvent(int i = 60, int vel = 127, NoteEventId = NoNoteEventId);
+        NoteOnEvent(const NoteOnEvent &);
         std::shared_ptr<NoteOffEvent> getNoteOff() const;
         void setTrack(int track) override;
 
-        void setMetrononomeOnlyTickPosition(const int pos)
-        {
-            metronomeOnlyTickPosition = pos;
-        }
+        void setBeingRecorded(bool);
+        bool isBeingRecorded() const;
 
-        int getMetronomeOnlyTickPosition() const
-        {
-            return metronomeOnlyTickPosition;
-        }
+        // Only to be used to finalize note events that are being recorded
+        // in the context of a non-running sequencer, i.e. non-live. This is
+        // true for recording note events in the step editor, as well is in
+        // the MAIN screen when the sequencer is not running.
+        // For live note event finalized, use Track::finalizeNoteEventLive.
+        bool finalizeNonLive(int newDuration);
+
+        void setMetronomeOnlyTickPosition(int pos);
+
+        int getMetronomeOnlyTickPosition() const;
 
         void setNote(int i);
         int getNote() const;
@@ -87,13 +96,12 @@ namespace mpc::sequencer
         bool isFinalized() const;
         bool isPlayOnly();
 
-        NoteOnEvent(int i = 60, int vel = 127);
-        NoteOnEvent(const NoteOnEvent &);
-
         std::string getTypeName() const override
         {
             return "note-on";
         }
+
+        uint32_t getId() const;
     };
 
     class NoteOnEventPlayOnly : public NoteOnEvent

@@ -55,7 +55,7 @@ void TriggerLocalNoteOffCommand::execute()
 
         if (ctx->sequencerIsRecordingOrOverdubbing)
         {
-            ctx->track->finalizeNoteEventASync(ctx->recordOnEvent);
+            ctx->track->finalizeNoteEventLive(ctx->recordOnEvent);
         }
 
         if (ctx->isStepRecording || ctx->isRecMainWithoutPlaying)
@@ -76,8 +76,7 @@ void TriggerLocalNoteOffCommand::execute()
             }
 
             const bool durationHasBeenAdjusted =
-                ctx->track->finalizeNoteEventSynced(ctx->recordOnEvent,
-                                                    newDuration);
+                ctx->recordOnEvent->finalizeNonLive(newDuration);
 
             if ((durationHasBeenAdjusted && ctx->isRecMainWithoutPlaying) ||
                 (ctx->isStepRecording && ctx->isAutoStepIncrementEnabled))

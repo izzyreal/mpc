@@ -6,7 +6,6 @@
 #include "sequencer/Sequence.hpp"
 #include "sequencer/NoteEvent.hpp"
 #include "sequencer/MixerEvent.hpp"
-#include "sequencer/Sequencer.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 #include "sequencer/PitchBendEvent.hpp"
 #include "sequencer/ControlChangeEvent.hpp"
@@ -31,6 +30,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
+constexpr int TickUnassignedWhileRecording = -2;
+
 Track::Track(
     const int trackIndex, Sequence *parent,
     const std::function<std::string(int)> &getDefaultTrackName,
@@ -41,8 +42,7 @@ Track::Track(
     const std::function<int()> &getAutoPunchMode,
     const std::function<std::shared_ptr<Bus>(int)> &getSequencerBus,
     const std::function<bool()> &isEraseButtonPressed,
-    const std::function<bool(int, std::shared_ptr<Program>)>
-        &isProgramPadPressed,
+    const std::function<bool(int, ProgramIndex)> &isProgramPadPressed,
     const std::shared_ptr<Sampler> &sampler,
     const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
     const std::function<bool()> &isSixteenLevelsEnabled,
@@ -82,12 +82,82 @@ void Track::purge()
     eventIndex = 0;
     device = 0;
     busNumber = 1;
-    bulkNoteOns = std::vector<std::shared_ptr<NoteOnEvent>>(20);
-    bulkNoteOffs = std::vector<std::shared_ptr<NoteOffEvent>>(20);
+    bulkNoteOns.reserve(20);
+    bulkNoteOffs.reserve(20);
     queuedNoteOnEvents = std::make_shared<
         moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>>>(20);
     queuedNoteOffEvents = std::make_shared<
         moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>>>(20);
+}
+
+std::shared_ptr<NoteOnEvent>
+Track::findRecordingNoteOnEventById(const NoteEventId id)
+{
+    for (auto &e : events)
+    {
+        if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
+            noteOnEvent && noteOnEvent->getId() == id)
+        {
+            assert(noteOnEvent->isBeingRecorded());
+            return noteOnEvent;
+        }
+    }
+    std::shared_ptr<NoteOnEvent> found;
+    std::shared_ptr<NoteOnEvent> e;
+    bulkNoteOns.clear();
+    while (queuedNoteOnEvents->try_dequeue(e))
+    {
+        if (e->getId() == id)
+        {
+            found = e;
+        }
+        assert(found->isBeingRecorded());
+        bulkNoteOns.push_back(e);
+    }
+
+    for (auto &e2 : bulkNoteOns)
+    {
+        queuedNoteOnEvents->enqueue(e2);
+    }
+
+    bulkNoteOns.clear();
+
+    return found;
+}
+
+std::shared_ptr<NoteOnEvent>
+Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
+{
+    for (auto &e : events)
+    {
+        if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
+            noteOnEvent && noteOnEvent->isBeingRecorded() &&
+            noteOnEvent->getNote() == noteNumber)
+        {
+            return noteOnEvent;
+        }
+    }
+
+    std::shared_ptr<NoteOnEvent> found;
+    std::shared_ptr<NoteOnEvent> e;
+    bulkNoteOns.clear();
+    while (queuedNoteOnEvents->try_dequeue(e))
+    {
+        if (e->getNote() == noteNumber && e->isBeingRecorded())
+        {
+            found = e;
+        }
+        bulkNoteOns.push_back(e);
+    }
+
+    for (auto &e2 : bulkNoteOns)
+    {
+        queuedNoteOnEvents->enqueue(e2);
+    }
+
+    bulkNoteOns.clear();
+
+    return found;
 }
 
 void Track::move(const int tick, const int oldTick)
@@ -189,50 +259,47 @@ void Track::removeEvent(const std::shared_ptr<Event> &event)
     }
 }
 
-// This is called from the UI thread. Results in incorrect tickpos.
-// We should only queue the fact that a note of n wants to be recorded.
-// Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteOnEvent>
-Track::recordNoteEventASync(unsigned char note, unsigned char velocity) const
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventLive(unsigned char note,
+                                                        unsigned char velocity)
 {
-    auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-    onEvent->setTrack(getIndex());
-    onEvent->setTick(-2);
-    queuedNoteOnEvents->enqueue(onEvent);
-    return onEvent;
+    auto noteOnEvent =
+        std::make_shared<NoteOnEvent>(note, velocity, nextNoteEventId);
+    noteOnEvent->setBeingRecorded(true);
+    nextNoteEventId = getNextNoteEventId(nextNoteEventId);
+    noteOnEvent->setTrack(getIndex());
+    noteOnEvent->setTick(TickUnassignedWhileRecording);
+    queuedNoteOnEvents->enqueue(noteOnEvent);
+    return noteOnEvent;
 }
 
-void Track::finalizeNoteEventASync(
+void Track::finalizeNoteEventLive(
     const std::shared_ptr<NoteOnEvent> &event) const
 {
     const auto offEvent = event->getNoteOff();
-    offEvent->setTick(-2);
+    offEvent->setTick(TickUnassignedWhileRecording);
+    event->setBeingRecorded(false);
     queuedNoteOffEvents->enqueue(offEvent);
 }
 
 std::shared_ptr<NoteOnEvent>
-Track::recordNoteEventSynced(const int tick, int note, int velocity)
+Track::recordNoteEventNonLive(const int tick, int note, int velocity)
 {
     auto onEvent = getNoteEvent(tick, note);
     if (!onEvent)
     {
-        onEvent = std::make_shared<NoteOnEvent>(note, velocity);
+        onEvent =
+            std::make_shared<NoteOnEvent>(note, velocity, nextNoteEventId);
+        nextNoteEventId = getNextNoteEventId(nextNoteEventId);
         onEvent->setTrack(this->getIndex());
         onEvent->setTick(tick);
+        onEvent->setBeingRecorded(true);
         insertEventWhileRetainingSort(onEvent);
         return onEvent;
     }
+    onEvent->setBeingRecorded(true);
     onEvent->setVelocity(velocity);
     onEvent->resetDuration();
     return onEvent;
-}
-
-bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent> &event,
-                                    int duration) const
-{
-    const auto old_duration = event->getDuration();
-    event->setDuration(duration);
-    return old_duration != duration;
 }
 
 void Track::addEvent(const int tick, const std::shared_ptr<Event> &event,
@@ -474,7 +541,7 @@ void Track::processRealtimeQueuedEvents()
     {
         const auto noteOff = bulkNoteOffs[noteOffIndex];
 
-        if (noteOff->getTick() == -2)
+        if (noteOff->getTick() == TickUnassignedWhileRecording)
         {
             noteOff->setTick(pos);
         }
@@ -482,10 +549,9 @@ void Track::processRealtimeQueuedEvents()
 
     for (int noteOnIndex = 0; noteOnIndex < noteOnCount; noteOnIndex++)
     {
-
         auto noteOn = bulkNoteOns[noteOnIndex];
 
-        if (noteOn->getTick() == -2)
+        if (noteOn->getTick() == TickUnassignedWhileRecording)
         {
             noteOn->setTick(pos);
 
@@ -614,7 +680,8 @@ void Track::playNext()
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
         {
-            const auto program = sampler->getProgram(drumBus->getProgram());
+            const auto programIndex = drumBus->getProgram();
+            const auto program = sampler->getProgram(programIndex);
 
             const auto noteNumber = note->getNote();
 
@@ -624,7 +691,7 @@ void Track::playNext()
             for (int programPadIndex = 0; programPadIndex < 64;
                  ++programPadIndex)
             {
-                if (isProgramPadPressed(programPadIndex, program))
+                if (isProgramPadPressed(programPadIndex, programIndex))
                 {
                     oneOrMorePadsArePressed = true;
 
@@ -657,7 +724,7 @@ void Track::playNext()
                     for (int programPadIndex = 0; programPadIndex < 64;
                          ++programPadIndex)
                     {
-                        if (!isProgramPadPressed(programPadIndex, program))
+                        if (!isProgramPadPressed(programPadIndex, programIndex))
                         {
                             continue;
                         }

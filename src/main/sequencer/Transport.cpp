@@ -872,9 +872,8 @@ double Transport::getTempo() const
         const auto ignoreTempoChangeScreen =
             sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
-        if (seq->isTempoChangeOn() ||
-            (sequencer.isSongModeEnabled() &&
-             !ignoreTempoChangeScreen->getIgnore()))
+        if (seq->isTempoChangeOn() || (sequencer.isSongModeEnabled() &&
+                                       !ignoreTempoChangeScreen->getIgnore()))
         {
             if (tce)
             {

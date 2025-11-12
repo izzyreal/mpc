@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <vector>
 #include <memory>
 #include <atomic>
@@ -53,8 +55,7 @@ namespace mpc::sequencer
                  std::function<int()> getAutoPunchMode,
                  std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
                  std::function<bool()> isEraseButtonPressed,
-                 std::function<bool(int programPadIndex,
-                                    std::shared_ptr<sampler::Program>)>
+                 std::function<bool(int programPadIndex, ProgramIndex)>
                      isProgramPadPressed,
                  std::shared_ptr<sampler::Sampler> sampler,
                  std::shared_ptr<audiomidi::EventHandler> eventHandler,

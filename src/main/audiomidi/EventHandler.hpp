@@ -111,10 +111,12 @@ namespace mpc::audiomidi
     private:
         // trackVelocityRatio is std::nullopt for note off events, else must be
         // non-null
-        void
-        handleNoteEventMidiOut(const std::shared_ptr<Event> &, Track *,
-                               const int trackDevice,
-                               const std::optional<int> trackVelocityRatio);
+        /*
+                void
+                handleNoteEventMidiOut(const std::shared_ptr<Event> &, Track *,
+                                       int trackDevice,
+                                       std::optional<int> trackVelocityRatio);
+                                       */
 
         void handleFinalizedDrumNoteOnEvent(
             const std::shared_ptr<NoteOnEvent> &,
