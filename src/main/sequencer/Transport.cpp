@@ -128,7 +128,6 @@ void Transport::stop(const StopMode stopMode)
     }
 
     playedStepRepetitions = 0;
-    sequencer.getStateManager()->enqueue(SetSongModeEnabled{false});
     sequencer.setNextSq(-1);
 
     const auto activeSequence = sequencer.getActiveSequence();
@@ -645,8 +644,7 @@ void Transport::setPosition(const double positionQuarterNotes,
                             const bool shouldSetPlayStartPosition) const
 {
     const auto songSequenceIndex = sequencer.getSongSequenceIndex();
-    const bool songMode =
-        sequencer.getStateManager()->getSnapshot().isSongModeEnabled();
+    const bool songMode = sequencer.isSongModeEnabled();
 
     if (songMode && songSequenceIndex == -1)
     {
@@ -875,7 +873,7 @@ double Transport::getTempo() const
             sequencer.getScreens()->get<ScreenId::IgnoreTempoChangeScreen>();
 
         if (seq->isTempoChangeOn() ||
-            (sequencer.getStateManager()->getSnapshot().isSongModeEnabled() &&
+            (sequencer.isSongModeEnabled() &&
              !ignoreTempoChangeScreen->getIgnore()))
         {
             if (tce)

@@ -21,7 +21,6 @@ void DeleteSongScreen::open()
 
 void DeleteSongScreen::turnWheel(const int i)
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName == "song")

@@ -216,7 +216,6 @@ namespace mpc::sequencer
         std::shared_ptr<Song> getSong(int i);
         void deleteSong(int i);
         bool isSongModeEnabled() const;
-        void setSongModeEnabled(bool b);
         int getSongSequenceIndex() const;
         bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);

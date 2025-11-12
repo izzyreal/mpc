@@ -545,7 +545,7 @@ void SequencerPlaybackEngine::work(const int nFrames)
         const auto hostPositionQuarterNotes =
             clock->getLastProcessedHostPositionQuarterNotes();
 
-        if (layeredScreen->getCurrentScreenName() == "song")
+        if (sequencer->isSongModeEnabled())
         {
             sequencer->getTransport()->setPositionWithinSong(
                 hostPositionQuarterNotes);

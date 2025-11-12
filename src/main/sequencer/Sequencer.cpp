@@ -7,7 +7,6 @@
 #include "sequencer/Bus.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
-#include "engine/SequencerPlaybackEngine.hpp"
 #include "sequencer/Track.hpp"
 #include "sequencer/Song.hpp"
 #include "sequencer/Step.hpp"
@@ -15,6 +14,8 @@
 #include "sampler/Sampler.hpp"
 
 #include "engine/Voice.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
+
 #include "eventregistry/EventRegistry.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/Component.hpp"
@@ -24,6 +25,7 @@
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
+#include "lcdgui/ScreenGroups.hpp"
 
 #include "StrUtil.hpp"
 
@@ -132,7 +134,6 @@ void Sequencer::init()
     soloEnabled = false;
 
     activeSequenceIndex = 0;
-    stateManager->enqueue(SetSongModeEnabled{false});
 
     purgeAllSequences();
 
@@ -164,7 +165,7 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 
 void Sequencer::playToTick(const int targetTick) const
 {
-    const auto seqIndex = stateManager->getSnapshot().isSongModeEnabled()
+    const auto seqIndex = isSongModeEnabled()
                               ? getSongSequenceIndex()
                               : activeSequenceIndex;
     auto seq = sequences[seqIndex].get();
@@ -299,7 +300,7 @@ void Sequencer::setActiveSequenceIndex(const int i,
         std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     if (shouldSetPositionTo0)
     {
-        getStateManager()->enqueue(SetPlayStartPositionQuarterNotes{0});
+        transport->setPosition(0);
     }
 }
 
@@ -648,11 +649,9 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
 
 std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
-    const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto snapshot = stateManager->getSnapshot();
-    if (const bool songMode = snapshot.isSongModeEnabled();
+    if (const bool songMode = isSongModeEnabled();
         songMode &&
-        songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
+        songs[getScreens()->get<ScreenId::SongScreen>()->getActiveSongIndex()]->getStepCount() != 0)
     {
         return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
                                                      : activeSequenceIndex];
@@ -896,7 +895,7 @@ void Sequencer::setActiveTrackIndex(const int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex() const
 {
-    if (const bool songMode = stateManager->getSnapshot().isSongModeEnabled())
+    if (isSongModeEnabled())
     {
         const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
         const auto song = songs[songScreen->getActiveSongIndex()];
@@ -907,7 +906,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex() const
         }
 
         const auto seqIndexShouldBeDerivedFromSongStep =
-            songMode && songScreen->getOffset() + 1 < song->getStepCount();
+            songScreen->getOffset() + 1 < song->getStepCount();
 
         const auto songSeqIndex =
             seqIndexShouldBeDerivedFromSongStep
@@ -1006,12 +1005,7 @@ std::shared_ptr<Song> Sequencer::getSong(const int i)
 
 bool Sequencer::isSongModeEnabled() const
 {
-    return stateManager->getSnapshot().isSongModeEnabled();
-}
-
-void Sequencer::setSongModeEnabled(const bool b)
-{
-    getStateManager()->enqueue(SetSongModeEnabled{b});
+    return screengroups::isSongScreen(layeredScreen->getCurrentScreen());
 }
 
 int Sequencer::getSongSequenceIndex() const

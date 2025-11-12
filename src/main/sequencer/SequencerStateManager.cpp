@@ -49,11 +49,6 @@ void SequencerStateManager::enqueue(SequencerMessage &&m) const noexcept
                 printf("[Sequencer] BumpPositionByTicks: %d ticks (%.6f qn)\n",
                        m.ticks, Sequencer::ticksToQuarterNotes(m.ticks));
             }
-            else if constexpr (std::is_same_v<T, SetSongModeEnabled>)
-            {
-                printf("[Sequencer] SetSongModeEnabled: %s\n",
-                       m.songModeEnabled ? "true" : "false");
-            }
         },
         m);
         */
@@ -85,10 +80,6 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
                 const double delta = Sequencer::ticksToQuarterNotes(m.ticks);
                 s.positionQuarterNotes += delta;
                 publishState();
-            }
-            else if constexpr (std::is_same_v<T, SetSongModeEnabled>)
-            {
-                s.songModeEnabled = m.songModeEnabled;
             }
             else if constexpr (std::is_same_v<T, SwitchToNextSequence>)
             {
@@ -137,7 +128,7 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
     const auto currentSong =
         sequencer->getSong(songScreen->getActiveSongIndex());
 
-    const bool songMode = activeState.songModeEnabled;
+    const bool songMode = sequencer->isSongModeEnabled();
 
     if (songMode)
     {
@@ -148,7 +139,12 @@ void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
 
         if (fromStart)
         {
+            const int oldSongSequenceIndex = sequencer->getSongSequenceIndex();
             songScreen->setOffset(-1);
+            if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
+            {
+                sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex(), true);
+            }
         }
 
         if (songScreen->getOffset() + 1 >

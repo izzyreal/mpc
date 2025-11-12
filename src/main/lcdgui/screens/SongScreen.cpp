@@ -48,7 +48,7 @@ SongScreen::SongScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getTransport()->getTickPosition();
+                            return sequencer->getActiveSequenceIndex();
                         },
                         [&](auto)
                         {
@@ -281,7 +281,6 @@ void SongScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "loop")
     {
-        const auto song = sequencer->getSong(activeSongIndex);
         song->setLoopEnabled(i > 0);
         displayLoop();
     }

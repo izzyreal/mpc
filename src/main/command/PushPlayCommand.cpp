@@ -87,9 +87,6 @@ void PushPlayCommand::execute()
                     ScreenId::SequencerScreen);
             }
 
-            sequencer->setSongModeEnabled(
-                mpc.getLayeredScreen()->isCurrentScreen(
-                    {ScreenId::SongScreen}));
             sequencer->getTransport()->play();
         }
     }
