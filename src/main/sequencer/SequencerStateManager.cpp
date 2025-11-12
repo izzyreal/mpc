@@ -90,10 +90,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             else if constexpr (std::is_same_v<T, SetActiveSequenceIndex>)
             {
                 sequencer->setActiveSequenceIndex(m.sequenceIndex, false);
-
                 if (m.setPositionTo0)
                 {
-                    enqueue(SetPositionQuarterNotes{0.0});
+                    sequencer->getTransport()->setPosition(0);
+                    drainQueue();
                 }
             }
             else if constexpr (std::is_same_v<T, Stop>)

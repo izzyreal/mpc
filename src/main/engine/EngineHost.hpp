@@ -64,6 +64,13 @@ namespace mpc::engine
 
         void start();
 
+        // Should be invoked on the audio thread at the very start of an
+        // audio callback, in order to get the part of the model that is owned
+        // by the audio thread in the correct state. This includes, but is not
+        // limited to, the transport state, which pads are pressed and which
+        // local note events are currently active.
+        void applyPendingStateChanges();
+
         std::shared_ptr<SequencerPlaybackEngine> getSequencerPlaybackEngine();
         std::shared_ptr<NonRealTimeAudioServer> getAudioServer() const;
         std::shared_ptr<PreviewSoundPlayer> getPreviewSoundPlayer() const;

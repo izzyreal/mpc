@@ -3,7 +3,6 @@
 #include "sequencer/Transport.hpp"
 
 #include "engine/NoteRepeatProcessor.hpp"
-#include "eventregistry/EventRegistry.hpp"
 
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/screens/SyncScreen.hpp"
@@ -28,10 +27,9 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace mpc::eventregistry;
 
 SequencerPlaybackEngine::SequencerPlaybackEngine(
-    const std::shared_ptr<EventRegistry> &eventRegistry, Sequencer *sequencer,
+    Sequencer *sequencer,
     const std::shared_ptr<Clock> &clock,
     const std::shared_ptr<LayeredScreen> &layeredScreen,
     std::function<bool()> isBouncing, const std::function<int()> &getSampleRate,
@@ -40,7 +38,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     std::function<std::shared_ptr<Screens>()> getScreens,
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
     const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor)
-    : eventRegistry(eventRegistry), layeredScreen(layeredScreen),
+    : layeredScreen(layeredScreen),
       getScreens(getScreens), sequencer(sequencer), clock(clock),
       isBouncing(isBouncing), getSampleRate(getSampleRate),
       isRecMainWithoutPlaying(isRecMainWithoutPlaying),
@@ -497,9 +495,6 @@ void SequencerPlaybackEngine::processEventsAfterNFrames()
 
 void SequencerPlaybackEngine::work(const int nFrames)
 {
-    sequencer->getStateManager()->drainQueue();
-    eventRegistry->drainQueue();
-
     const bool sequencerIsRunningAtStartOfBuffer = sequencerIsRunning.load();
     const auto sampleRate = getSampleRate();
 

@@ -41,7 +41,6 @@ void VmpcDirectToDiskRecorderScreen::open()
 
 void VmpcDirectToDiskRecorderScreen::turnWheel(const int i)
 {
-
     const auto seq = sequencer->getSequence(sq).get();
 
     checkAllTimes(mpc, i, seq);
@@ -76,7 +75,6 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(const int i)
 
 void VmpcDirectToDiskRecorderScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:

@@ -24,11 +24,6 @@ namespace mpc::sequencer
     class MidiClockOutput;
 } // namespace mpc::sequencer
 
-namespace mpc::eventregistry
-{
-    class EventRegistry;
-}
-
 namespace mpc::lcdgui
 {
     class LayeredScreen;
@@ -46,7 +41,6 @@ namespace mpc::engine
 
     public:
         explicit SequencerPlaybackEngine(
-            const std::shared_ptr<eventregistry::EventRegistry> &,
             sequencer::Sequencer *, const std::shared_ptr<sequencer::Clock> &,
             const std::shared_ptr<lcdgui::LayeredScreen> &,
             std::function<bool()> isBouncing,
@@ -78,7 +72,6 @@ namespace mpc::engine
         std::shared_ptr<EventQueue> eventQueue;
         std::vector<EventAfterNFrames> tempEventQueue;
 
-        std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         sequencer::Sequencer *sequencer;

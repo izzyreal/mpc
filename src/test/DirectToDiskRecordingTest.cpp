@@ -54,6 +54,7 @@ TEST_CASE("Direct to disk recording does not start with silence",
 
     audioServer->setSampleRate(SAMPLE_RATE);
     audioServer->resizeBuffers(BUFFER_SIZE);
+    audioServer->start();
 
     const float **inputBuffer = new const float *[2];
     inputBuffer[0] = new float[BUFFER_SIZE];

@@ -16,6 +16,7 @@
 #include "controller/ClientEventController.hpp"
 #include "controller/ClientHardwareEventController.hpp"
 
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "engine/Voice.hpp"
 #include "engine/VoiceUtil.hpp"
 #include "engine/MixerInterconnection.hpp"
@@ -31,13 +32,17 @@
 #include "engine/audio/mixer/MixerControlsFactory.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 
-#include "engine/SequencerPlaybackEngine.hpp"
+#include "eventregistry/EventRegistry.hpp"
+
 #include "hardware/ComponentId.hpp"
 #include "hardware/Hardware.hpp"
+
 #include "sampler/Sampler.hpp"
+
 #include "sequencer/SeqUtil.hpp"
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Sequencer.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 #include "sequencer/Song.hpp"
 
 #include <string>
@@ -116,7 +121,7 @@ void EngineHost::start()
         });
 
     sequencerPlaybackEngine = std::make_shared<SequencerPlaybackEngine>(
-        mpc.eventRegistry, mpc.getSequencer().get(), mpc.getClock(),
+        mpc.getSequencer().get(), mpc.getClock(),
         mpc.getLayeredScreen(),
         [&]
         {
@@ -155,6 +160,11 @@ void EngineHost::start()
         mpc.getEngineHost()->getSequencerPlaybackEngine().get());
     compoundAudioClient->add(mixer.get());
     nonRealTimeAudioServer->setClient(compoundAudioClient);
+}
+void EngineHost::applyPendingStateChanges()
+{
+    mpc.getSequencer()->getStateManager()->drainQueue();
+    mpc.eventRegistry->drainQueue();
 }
 
 void EngineHost::setMonitorLevel(const int level) const
