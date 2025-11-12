@@ -18,6 +18,7 @@
 
 #include "sequencer/Sequence.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/SequencerStateManager.hpp"
 
 #include "hardware/Component.hpp"
 
@@ -43,6 +44,7 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     seq->setTimeSignature(1, 4, 4);
     REQUIRE(pos() == 0);
     mpc.getSequencer()->goToNextStep();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     // TODO User-friendlier would be if the next step starts at the beginning of
     // a bar, which is not the
     //  case with the above timesignatures (first bar 1/32, second bar 4/4) on
@@ -50,18 +52,23 @@ TEST_CASE("Next step, previous step", "[sequencer]")
     //  do the user-friendlier variety at some point.
     REQUIRE(pos() == 24);
     mpc.getSequencer()->goToNextStep();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     REQUIRE(pos() == 48);
     mpc.getSequencer()->goToNextStep();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     REQUIRE(pos() == 72);
     mpc.getSequencer()->goToPreviousStep();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     REQUIRE(pos() == 48);
     mpc.getSequencer()->goToPreviousStep();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     REQUIRE(pos() == 24);
     mpc.getSequencer()->goToPreviousStep();
+    mpc.getSequencer()->getStateManager()->drainQueue();
     REQUIRE(pos() == 0);
 }
 
-TEST_CASE("Can record and playback from different threads", "[sequencer]")
+TEST_CASE("Can record and playback from different threads", "[sequencer-multithread]")
 {
     const int SAMPLE_RATE = 44100;
     const int BUFFER_SIZE = 512;
@@ -102,8 +109,8 @@ TEST_CASE("Can record and playback from different threads", "[sequencer]")
     auto server = mpc.getEngineHost()->getAudioServer();
 
     server->resizeBuffers(BUFFER_SIZE);
-
     server->setSampleRate(SAMPLE_RATE);
+    server->start();
 
     int64_t timeInSamples = 0;
 
@@ -271,6 +278,7 @@ TEST_CASE("Undo", "[sequencer]")
     auto server = mpc.getEngineHost()->getAudioServer();
     server->resizeBuffers(BUFFER_SIZE);
     server->setSampleRate(SAMPLE_RATE);
+    server->start();
 
     sequencer->getTransport()->recFromStart();
 
