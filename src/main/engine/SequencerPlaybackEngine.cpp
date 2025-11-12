@@ -37,7 +37,8 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     const std::function<void(int velo, int frameOffset)> &playMetronome,
     std::function<std::shared_ptr<Screens>()> getScreens,
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
-    const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor)
+    const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor,
+    std::function<bool()> isAudioServerCurrentlyRunningOffline)
     : layeredScreen(layeredScreen),
       getScreens(getScreens), sequencer(sequencer), clock(clock),
       isBouncing(isBouncing), getSampleRate(getSampleRate),
@@ -45,6 +46,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
       playMetronome(playMetronome),
       isNoteRepeatLockedOrPressed(isNoteRepeatLockedOrPressed),
       noteRepeatProcessor(noteRepeatProcessor),
+      isAudioServerCurrentlyRunningOffline(isAudioServerCurrentlyRunningOffline),
       midiClockOutput(
           std::make_shared<MidiClockOutput>(sequencer, getScreens, isBouncing))
 {
@@ -61,7 +63,9 @@ void SequencerPlaybackEngine::start(const bool metronomeOnlyToUse)
 
     if (getScreens()->get<ScreenId::SyncScreen>()->modeOut != 0)
     {
-        shouldWaitForMidiClockLock = true;
+        // TODO Implement MIDI clock out
+        // shouldWaitForMidiClockLock = true;
+        shouldWaitForMidiClockLock = false;
     }
 
     clock->reset();
@@ -520,6 +524,15 @@ void SequencerPlaybackEngine::work(const int nFrames)
         clock->clearTicks();
 
         return;
+    }
+
+    if (sequencerIsRunningAtStartOfBuffer && isAudioServerCurrentlyRunningOffline())
+    {
+        clock->processBufferInternal(
+            sequencer->getTransport()->getTempo(),
+            sampleRate,
+            nFrames,
+            sequencer->getTransport()->getPlayStartPositionQuarterNotes());
     }
 
     const auto &clockTicks = clock->getTicksForCurrentBuffer();

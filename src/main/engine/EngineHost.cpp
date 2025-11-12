@@ -153,7 +153,12 @@ void EngineHost::start()
             return mpc.clientEventController->clientHardwareEventController
                 ->isNoteRepeatLockedOrPressed();
         },
-        noteRepeatProcessor);
+        noteRepeatProcessor,
+        [&]
+        {
+            return !nonRealTimeAudioServer->isRealTime();
+        });
+
 
     compoundAudioClient = std::make_shared<CompoundAudioClient>();
     compoundAudioClient->add(

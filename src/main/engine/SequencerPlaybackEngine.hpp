@@ -49,7 +49,8 @@ namespace mpc::engine
             const std::function<void(int velo, int frameOffset)> &playMetronome,
             std::function<std::shared_ptr<lcdgui::Screens>()>,
             const std::function<bool()> &isNoteRepeatLockedOrPressed,
-            const std::shared_ptr<NoteRepeatProcessor> &);
+            const std::shared_ptr<NoteRepeatProcessor> &,
+            std::function<bool()> isAudioServerCurrentlyRunningOffline);
 
         void work(int nFrames) override;
 
@@ -82,6 +83,7 @@ namespace mpc::engine
         std::function<void(int velo, int frameOffset)> playMetronome;
         std::function<bool()> isNoteRepeatLockedOrPressed;
         std::shared_ptr<NoteRepeatProcessor> noteRepeatProcessor;
+        std::function<bool()> isAudioServerCurrentlyRunningOffline;
 
         std::atomic<bool> sequencerIsRunning{false};
         double previousTempo = 0.0;
