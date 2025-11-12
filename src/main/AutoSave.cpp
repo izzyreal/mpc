@@ -25,6 +25,8 @@
 #include "sequencer/Sequencer.hpp"
 
 #include "StrUtil.hpp"
+#include "lcdgui/ScreenGroups.hpp"
+#include "sequencer/Transport.hpp"
 
 #include <chrono>
 #include <memory>
@@ -253,9 +255,14 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         const auto focusName = getStringProperty("focus.txt");
 
         layeredScreen->postToUiThread(
-            [layeredScreen, screenName, focusName]
+            [layeredScreen, screenName, focusName, sequencer = mpc.getSequencer()]
             {
                 layeredScreen->openScreen(screenName);
+
+                if (screengroups::isSongScreen(layeredScreen->getCurrentScreen()))
+                {
+                    sequencer->getTransport()->setPosition(0);
+                }
 
                 if (!focusName.empty())
                 {
