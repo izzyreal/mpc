@@ -16,12 +16,8 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
 
-using Base =
-    mpc::concurrency::AtomicStateExchange<SequencerState, SequencerStateView,
-                                          SequencerMessage>;
-
 SequencerStateManager::SequencerStateManager(Sequencer *sequencer)
-    : Base([](SequencerState &) {}), sequencer(sequencer)
+    : AtomicStateExchange([](SequencerState &) {}), sequencer(sequencer)
 {
 }
 
@@ -111,9 +107,10 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
         msg);
 }
 
-void SequencerStateManager::applyPlayMessage(const bool fromStart) noexcept
+void SequencerStateManager::applyPlayMessage(
+    const bool fromStart) const noexcept
 {
-    auto transport = sequencer->getTransport();
+    const auto transport = sequencer->getTransport();
 
     if (transport->isPlaying())
     {

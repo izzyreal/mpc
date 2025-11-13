@@ -35,6 +35,7 @@ namespace mpc::concurrency
         }
 
     public:
+        virtual ~AtomicStateExchange() = default;
         virtual void enqueue(Message &&msg) const noexcept
         {
             eventMessageQueue->enqueue(std::move(msg));

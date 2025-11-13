@@ -9,12 +9,12 @@ namespace mpc::sequencer
 {
     class Sequencer;
 
-    class SequencerStateManager
+    class SequencerStateManager final
         : public concurrency::AtomicStateExchange<
               SequencerState, SequencerStateView, SequencerMessage>
     {
     public:
-        SequencerStateManager(Sequencer *);
+        explicit SequencerStateManager(Sequencer *);
 
         void enqueue(SequencerMessage &&msg) const noexcept override;
 
@@ -24,6 +24,6 @@ namespace mpc::sequencer
     private:
         Sequencer *sequencer;
 
-        void applyPlayMessage(bool fromStart) noexcept;
+        void applyPlayMessage(bool fromStart) const noexcept;
     };
 } // namespace mpc::sequencer

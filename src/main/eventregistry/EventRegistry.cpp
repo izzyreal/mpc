@@ -16,7 +16,7 @@ EventRegistry::EventRegistry()
 {
 }
 
-void EventRegistry::reserveState(State &s)
+void EventRegistry::reserveState(State &s) const
 {
     s.physicalPadEvents.reserve(CAPACITY);
     s.programPadEvents.reserve(CAPACITY);
@@ -24,22 +24,23 @@ void EventRegistry::reserveState(State &s)
 }
 
 void EventRegistry::registerPhysicalPadPress(
-    Source source, lcdgui::ScreenId screen, sequencer::BusType busType,
-    PhysicalPadIndex padIndex, Velocity velocity, TrackIndex trackIndex,
-    controller::Bank bank, std::optional<ProgramIndex> programIndex,
-    std::optional<NoteNumber> noteNumber,
+    const Source source, const lcdgui::ScreenId screen,
+    const sequencer::BusType busType, const PhysicalPadIndex padIndex,
+    const Velocity velocity, const TrackIndex trackIndex,
+    const controller::Bank bank, const std::optional<ProgramIndex> programIndex,
+    const std::optional<NoteNumber> noteNumber,
     const std::function<void(void *)> &action) const
 {
-    PhysicalPadPressEvent e{padIndex,
-                            source,
-                            screen,
-                            trackIndex,
-                            busType,
-                            velocity,
-                            bank,
-                            programIndex.value_or(NoProgramIndex),
-                            noteNumber.value_or(NoNoteNumber),
-                            NoPressure};
+    const PhysicalPadPressEvent e{padIndex,
+                                  source,
+                                  screen,
+                                  trackIndex,
+                                  busType,
+                                  velocity,
+                                  bank,
+                                  programIndex.value_or(NoProgramIndex),
+                                  noteNumber.value_or(NoNoteNumber),
+                                  NoPressure};
     EventMessage msg{EventMessage::Type::PhysicalPadPress};
     msg.physicalPadPress = e;
     msg.source = source;
@@ -48,10 +49,10 @@ void EventRegistry::registerPhysicalPadPress(
 }
 
 void EventRegistry::registerPhysicalPadAftertouch(
-    PhysicalPadIndex padIndex, Pressure pressure, Source source,
-    const std::function<void(void *)> &action) const
+    const PhysicalPadIndex padIndex, const Pressure pressure,
+    const Source source, const std::function<void(void *)> &action) const
 {
-    PhysicalPadAftertouchEvent e{padIndex, pressure};
+    const PhysicalPadAftertouchEvent e{padIndex, pressure};
     EventMessage msg{EventMessage::Type::PhysicalPadAftertouch};
     msg.physicalPadAftertouch = e;
     msg.source = source;
@@ -60,10 +61,10 @@ void EventRegistry::registerPhysicalPadAftertouch(
 }
 
 void EventRegistry::registerPhysicalPadRelease(
-    PhysicalPadIndex padIndex, Source source,
+    const PhysicalPadIndex padIndex, const Source source,
     const std::function<void(void *)> &action) const
 {
-    PhysicalPadReleaseEvent e{padIndex};
+    const PhysicalPadReleaseEvent e{padIndex};
     EventMessage msg{EventMessage::Type::PhysicalPadRelease};
     msg.physicalPadRelease = e;
     msg.source = source;
@@ -72,32 +73,33 @@ void EventRegistry::registerPhysicalPadRelease(
 }
 
 void EventRegistry::registerProgramPadPress(
-    Source source, std::optional<MidiChannel> midiInputChannel,
-    lcdgui::ScreenId screen, TrackIndex trackIndex, sequencer::BusType busType,
-    ProgramPadIndex padIndex, Velocity velocity, ProgramIndex program) const
+    const Source source, const std::optional<MidiChannel> midiInputChannel,
+    const lcdgui::ScreenId screen, const TrackIndex trackIndex,
+    const sequencer::BusType busType, const ProgramPadIndex padIndex,
+    const Velocity velocity, const ProgramIndex program) const
 {
-    ProgramPadPressEvent e{padIndex,
-                           source,
-                           midiInputChannel.value_or(NoMidiChannel),
-                           screen,
-                           trackIndex,
-                           busType,
-                           program,
-                           velocity,
-                           NoPressure,
-                           utils::nowInMilliseconds()};
+    const ProgramPadPressEvent e{padIndex,
+                                 source,
+                                 midiInputChannel.value_or(NoMidiChannel),
+                                 screen,
+                                 trackIndex,
+                                 busType,
+                                 program,
+                                 velocity,
+                                 NoPressure,
+                                 utils::nowInMilliseconds()};
     EventMessage msg{EventMessage::Type::ProgramPadPress};
     msg.programPadPress = e;
     msg.source = source;
     enqueue(std::move(msg));
 }
 
-void EventRegistry::registerProgramPadAftertouch(Source source,
-                                                 ProgramPadIndex padIndex,
-                                                 ProgramIndex program,
-                                                 Pressure pressure) const
+void EventRegistry::registerProgramPadAftertouch(const Source source,
+                                                 const ProgramPadIndex padIndex,
+                                                 const ProgramIndex program,
+                                                 const Pressure pressure) const
 {
-    ProgramPadAftertouchEvent e{padIndex, program, pressure};
+    const ProgramPadAftertouchEvent e{padIndex, program, pressure};
     EventMessage msg{EventMessage::Type::ProgramPadAftertouch};
     msg.programPadAftertouch = e;
     msg.source = source;
@@ -105,10 +107,10 @@ void EventRegistry::registerProgramPadAftertouch(Source source,
 }
 
 void EventRegistry::registerProgramPadRelease(
-    Source source, ProgramPadIndex padIndex, ProgramIndex program,
-    const std::function<void(void *)> &action) const
+    const Source source, const ProgramPadIndex padIndex,
+    const ProgramIndex program, const std::function<void(void *)> &action) const
 {
-    ProgramPadReleaseEvent e{padIndex, program};
+    const ProgramPadReleaseEvent e{padIndex, program};
     EventMessage msg{EventMessage::Type::ProgramPadRelease};
     msg.programPadRelease = e;
     msg.source = source;
@@ -117,21 +119,21 @@ void EventRegistry::registerProgramPadRelease(
 }
 
 NoteOnEvent EventRegistry::registerNoteOn(
-    Source source, std::optional<MidiChannel> midiInputChannel,
-    lcdgui::ScreenId screen, TrackIndex trackIndex, sequencer::BusType busType,
-    NoteNumber noteNumber, Velocity velocity,
-    std::optional<ProgramIndex> programIndex,
+    const Source source, const std::optional<MidiChannel> midiInputChannel,
+    const lcdgui::ScreenId screen, const TrackIndex trackIndex,
+    const sequencer::BusType busType, const NoteNumber noteNumber,
+    const Velocity velocity, const std::optional<ProgramIndex> programIndex,
     const std::function<void(void *)> &action) const
 {
-    NoteOnEvent e{noteNumber,
-                  source,
-                  midiInputChannel.value_or(NoMidiChannel),
-                  screen,
-                  trackIndex,
-                  busType,
-                  velocity,
-                  programIndex.value_or(NoProgramIndex),
-                  NoPressure};
+    const NoteOnEvent e{noteNumber,
+                        source,
+                        midiInputChannel.value_or(NoMidiChannel),
+                        screen,
+                        trackIndex,
+                        busType,
+                        velocity,
+                        programIndex.value_or(NoProgramIndex),
+                        NoPressure};
     EventMessage msg{EventMessage::Type::NoteOn};
     msg.noteOnEvent = e;
     msg.source = source;
@@ -141,11 +143,11 @@ NoteOnEvent EventRegistry::registerNoteOn(
 }
 
 void EventRegistry::registerNoteAftertouch(
-    Source source, NoteNumber noteNumber, Pressure pressure,
-    std::optional<MidiChannel> midiInputChannel) const
+    const Source source, const NoteNumber noteNumber, const Pressure pressure,
+    const std::optional<MidiChannel> midiInputChannel) const
 {
-    NoteAftertouchEvent e{noteNumber, pressure,
-                          midiInputChannel.value_or(NoMidiChannel)};
+    const NoteAftertouchEvent e{noteNumber, pressure,
+                                midiInputChannel.value_or(NoMidiChannel)};
     EventMessage msg{EventMessage::Type::NoteAftertouch};
     msg.noteAftertouchEvent = e;
     msg.source = source;
@@ -153,11 +155,11 @@ void EventRegistry::registerNoteAftertouch(
 }
 
 void EventRegistry::registerNoteOff(
-    Source source, NoteNumber noteNumber,
-    std::optional<MidiChannel> midiInputChannel,
+    const Source source, const NoteNumber noteNumber,
+    const std::optional<MidiChannel> midiInputChannel,
     const std::function<void(void *)> &action) const
 {
-    NoteOffEvent e{
+    const NoteOffEvent e{
         noteNumber,
         midiInputChannel.value_or(NoMidiChannel),
     };
@@ -168,7 +170,7 @@ void EventRegistry::registerNoteOff(
     enqueue(std::move(msg));
 }
 
-void EventRegistry::clear()
+void EventRegistry::clear() const
 {
     enqueue({EventMessage::Type::Clear, {}, {}, {}});
 }

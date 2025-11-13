@@ -14,7 +14,7 @@
 
 namespace mpc::eventregistry
 {
-    class EventRegistry
+    class EventRegistry final
         : public concurrency::AtomicStateExchange<State, StateView,
                                                   EventMessage>
     {
@@ -61,13 +61,13 @@ namespace mpc::eventregistry
                              std::optional<MidiChannel> midiInputChannel,
                              const std::function<void(void *)> &action) const;
 
-        void clear();
+        void clear() const;
 
     protected:
         void applyMessage(const EventMessage &) noexcept override;
 
     private:
         static constexpr size_t CAPACITY = 8192;
-        void reserveState(State &);
+        void reserveState(State &) const;
     };
 } // namespace mpc::eventregistry
