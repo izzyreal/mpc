@@ -1099,8 +1099,8 @@ std::shared_ptr<Bus> Sequencer::getBus(const BusType busType) const
 std::shared_ptr<DrumBus>
 Sequencer::getDrumBus(const DrumBusIndex drumBusIndex) const
 {
-    assert(drumBusIndex >= 0 &&
-           drumBusIndex <= Mpc2000XlSpecs::DRUM_BUS_COUNT - 1);
+    assert(drumBusIndex.get() >= 0 &&
+           drumBusIndex.get() <= Mpc2000XlSpecs::DRUM_BUS_COUNT - 1);
     auto result = getBus<DrumBus>(drumBusIndexToDrumBusType(drumBusIndex));
     assert(result);
     return result;

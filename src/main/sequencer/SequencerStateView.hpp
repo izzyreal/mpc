@@ -5,7 +5,7 @@
 
 namespace mpc::sequencer
 {
-    class SequencerState;
+    struct SequencerState;
 
     class SequencerStateView
     {

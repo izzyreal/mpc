@@ -4,7 +4,10 @@ namespace mpc::sequencer
 {
     struct SequencerState
     {
-        double positionQuarterNotes = 0.0;
-        double playStartPositionQuarterNotes = 0.0;
+        struct TransportState
+        {
+            double positionQuarterNotes = 0.0;
+            double playStartPositionQuarterNotes = 0.0;
+        } transportState;
     };
 } // namespace mpc::sequencer

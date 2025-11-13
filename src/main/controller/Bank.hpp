@@ -35,7 +35,10 @@ namespace mpc::controller
     constexpr Bank
     programPadIndexToBank(const ProgramPadIndex programPadIndex) noexcept
     {
-        return static_cast<Bank>(programPadIndex / 16);
+        if (programPadIndex.get() < 16) return Bank::A;
+        if (programPadIndex.get() < 32) return Bank::B;
+        if (programPadIndex.get() < 48) return Bank::C;
+        return Bank::D;
     }
 
     constexpr ProgramPadIndex

@@ -13,15 +13,15 @@ SequencerStateView::SequencerStateView(
 
 double SequencerStateView::getPositionQuarterNotes() const
 {
-    return state->positionQuarterNotes;
+    return state->transportState.positionQuarterNotes;
 }
 
 double SequencerStateView::getPlayStartPositionQuarterNotes() const
 {
-    return state->playStartPositionQuarterNotes;
+    return state->transportState.playStartPositionQuarterNotes;
 }
 
 int64_t SequencerStateView::getPositionTicks() const
 {
-    return Sequencer::quarterNotesToTicks(state->positionQuarterNotes);
+    return Sequencer::quarterNotesToTicks(state->transportState.positionQuarterNotes);
 }
