@@ -60,9 +60,8 @@ void TrimScreen::openWindow()
         return;
     }
 
-    const auto focusedFieldName = focusedField->getName();
-
-    if (focusedFieldName == "snd")
+    if (const auto focusedFieldName = focusedField->getName();
+        focusedFieldName == "snd")
     {
         sampler->setPreviousScreenName("trim");
         openScreenById(ScreenId::SoundScreen);
@@ -77,9 +76,8 @@ void TrimScreen::openWindow()
     }
 }
 
-void TrimScreen::function(int f)
+void TrimScreen::function(const int f)
 {
-
     switch (f)
     {
         case 0:
@@ -117,10 +115,11 @@ void TrimScreen::function(int f)
             sampler->playX();
             break;
         }
+        default:;
     }
 }
 
-void TrimScreen::turnWheel(int i)
+void TrimScreen::turnWheel(const int i)
 {
 
     const auto sound = sampler->getSound();
@@ -146,9 +145,8 @@ void TrimScreen::turnWheel(int i)
         focusedField->disableTypeMode();
     }
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "st")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "st")
     {
         if (smplLngthFix &&
             sound->getStart() + soundInc + oldLength > sound->getFrameCount())
@@ -228,7 +226,7 @@ void TrimScreen::turnWheel(int i)
     }
 }
 
-void TrimScreen::setSlider(int i)
+void TrimScreen::setSlider(const int i)
 {
     if (!mpc.getHardware()
              ->getButton(hardware::ComponentId::SHIFT)
@@ -244,9 +242,8 @@ void TrimScreen::setSlider(int i)
         return;
     }
 
-    const auto focusedFieldName = focusedField->getName();
-
-    if (focusedFieldName == "st")
+    if (const auto focusedFieldName = focusedField->getName();
+        focusedFieldName == "st")
     {
         setSliderStart(i);
         displayWave();
@@ -258,11 +255,11 @@ void TrimScreen::setSlider(int i)
     }
 }
 
-void TrimScreen::setSliderStart(int i) const
+void TrimScreen::setSliderStart(const int i) const
 {
     const auto sound = sampler->getSound();
     auto const oldLength = sound->getEnd() - sound->getStart();
-    auto candidatePos = (int)(i / 124.0 * sound->getFrameCount());
+    auto candidatePos = static_cast<int>(i / 124.0 * sound->getFrameCount());
 
     const auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength
                                      : sound->getFrameCount();
@@ -287,10 +284,10 @@ void TrimScreen::setSliderStart(int i) const
     }
 }
 
-void TrimScreen::setSliderEnd(int i) const
+void TrimScreen::setSliderEnd(const int i) const
 {
     const auto sound = sampler->getSound();
-    const auto newValue = (int)(i / 124.0 * sound->getFrameCount());
+    const auto newValue = static_cast<int>(i / 124.0 * sound->getFrameCount());
     setEnd(newValue);
     displayEnd();
 }
@@ -345,6 +342,10 @@ void TrimScreen::setEnd(int newValue) const
         displaySt();
     }
 }
+int TrimScreen::getView() const
+{
+    return view;
+}
 
 void TrimScreen::left()
 {
@@ -383,9 +384,8 @@ void TrimScreen::pressEnter()
 
     if (candidate != INT_MAX)
     {
-        const auto focusedFieldName = focusedField->getName();
-
-        if (focusedFieldName == "st" || focusedFieldName == "start")
+        if (const auto focusedFieldName = focusedField->getName();
+            focusedFieldName == "st" || focusedFieldName == "start")
         {
             if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
             {
@@ -509,7 +509,7 @@ void TrimScreen::displayView() const
     }
 }
 
-void TrimScreen::setView(int i)
+void TrimScreen::setView(const int i)
 {
     if (i < 0 || i > 1)
     {

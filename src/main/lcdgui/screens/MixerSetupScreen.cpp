@@ -24,7 +24,8 @@ void MixerSetupScreen::open()
     displayCopyPgmMixToDrum();
     displayRecordMixChanges();
     const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
-    ls->setFunctionKeysArrangement(drumScreen->getDrum());
+    ls->setFunctionKeysArrangement(
+        sequencer::drumBusTypeToDrumIndex(drumScreen->getDrum()));
 }
 
 void MixerSetupScreen::displayMasterLevel()
@@ -69,44 +70,41 @@ void MixerSetupScreen::displayRecordMixChanges() const
         ->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
 }
 
-void MixerSetupScreen::turnWheel(int i)
+void MixerSetupScreen::turnWheel(const int increment)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "stereomixsource")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "stereomixsource")
     {
-        setStereoMixSourceDrum(i > 0);
+        setStereoMixSourceDrum(increment > 0);
     }
     else if (focusedFieldName == "indivfxsource")
     {
-        setIndivFxSourceDrum(i > 0);
+        setIndivFxSourceDrum(increment > 0);
     }
     else if (focusedFieldName == "copypgmmixtodrum")
     {
-        setCopyPgmMixToDrumEnabled(i > 0);
+        setCopyPgmMixToDrumEnabled(increment > 0);
     }
     else if (focusedFieldName == "recordmixchanges")
     {
-        setRecordMixChangesEnabled(i > 0);
+        setRecordMixChangesEnabled(increment > 0);
     }
     else if (focusedFieldName == "masterlevel")
     {
-        setMasterLevel(masterLevel + i);
+        setMasterLevel(masterLevel + increment);
     }
     else if (focusedFieldName == "fxdrum")
     {
-        setFxDrum(fxDrum + i);
+        setFxDrum(fxDrum + increment);
     }
 }
 
-void MixerSetupScreen::function(int i)
+void MixerSetupScreen::function(const int i)
 {
-
     if (i < 4)
     {
         const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
-        drumScreen->setDrum(i);
+        drumScreen->setDrum(sequencer::drumBusIndexToDrumBusType(i));
         openScreenById(ScreenId::MixerScreen);
     }
 }
@@ -116,7 +114,7 @@ int MixerSetupScreen::getMasterLevel() const
     return masterLevel;
 }
 
-void MixerSetupScreen::setMasterLevel(int i)
+void MixerSetupScreen::setMasterLevel(const int i)
 {
     if (i < -13 || i > 2)
     {
@@ -135,7 +133,7 @@ int MixerSetupScreen::getFxDrum() const
     return fxDrum;
 }
 
-void MixerSetupScreen::setFxDrum(int i)
+void MixerSetupScreen::setFxDrum(const int i)
 {
     if (i < 0 || i > 3)
     {
@@ -150,7 +148,7 @@ bool MixerSetupScreen::isStereoMixSourceDrum() const
     return stereoMixSourceDrum;
 }
 
-void MixerSetupScreen::setStereoMixSourceDrum(bool b)
+void MixerSetupScreen::setStereoMixSourceDrum(const bool b)
 {
     stereoMixSourceDrum = b;
     displayStereoMixSource();
@@ -161,7 +159,7 @@ bool MixerSetupScreen::isIndivFxSourceDrum() const
     return indivFxSourceDrum;
 }
 
-void MixerSetupScreen::setIndivFxSourceDrum(bool b)
+void MixerSetupScreen::setIndivFxSourceDrum(const bool b)
 {
     indivFxSourceDrum = b;
     displayIndivFxSource();
@@ -172,7 +170,7 @@ bool MixerSetupScreen::isCopyPgmMixToDrumEnabled() const
     return copyPgmMixToDrumEnabled;
 }
 
-void MixerSetupScreen::setCopyPgmMixToDrumEnabled(bool b)
+void MixerSetupScreen::setCopyPgmMixToDrumEnabled(const bool b)
 {
     copyPgmMixToDrumEnabled = b;
     displayCopyPgmMixToDrum();
@@ -183,7 +181,7 @@ bool MixerSetupScreen::isRecordMixChangesEnabled() const
     return recordMixChangesEnabled;
 }
 
-void MixerSetupScreen::setRecordMixChangesEnabled(bool b)
+void MixerSetupScreen::setRecordMixChangesEnabled(const bool b)
 {
     recordMixChangesEnabled = b;
     displayRecordMixChanges();

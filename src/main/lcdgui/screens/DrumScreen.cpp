@@ -7,6 +7,7 @@
 #include "sequencer/Bus.hpp"
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::sequencer;
 
 DrumScreen::DrumScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "drum", layerIndex)
@@ -25,7 +26,7 @@ void DrumScreen::open()
     displayCurrentVal();
 }
 
-void DrumScreen::function(int f)
+void DrumScreen::function(const int f)
 {
     switch (f)
     {
@@ -46,15 +47,14 @@ void DrumScreen::function(int f)
         case 3:
             openScreenById(ScreenId::PurgeScreen);
             break;
+        default:;
     }
 }
 
-void DrumScreen::turnWheel(int i)
+void DrumScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "drum")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "drum")
     {
         setDrum(drum + i);
     }
@@ -93,7 +93,7 @@ void DrumScreen::displayCurrentVal() const
 
 void DrumScreen::displayDrum() const
 {
-    findField("drum")->setText(std::to_string(drum + 1));
+    findField("drum")->setText(busTypeToString(drum));
 }
 
 void DrumScreen::displayPadToInternalSound() const
@@ -127,20 +127,17 @@ bool DrumScreen::isPadToIntSound() const
     return padToInternalSound;
 }
 
-void DrumScreen::setPadToIntSound(bool b)
+void DrumScreen::setPadToIntSound(const bool b)
 {
     padToInternalSound = b;
     displayPadToInternalSound();
 }
 
-void DrumScreen::setDrum(unsigned char i)
+void DrumScreen::setDrum(const BusType drumBusType)
 {
-    if (i < 0 || i > 3)
-    {
-        return;
-    }
+    assert(isDrumBusType(drumBusType));
 
-    drum = i;
+    drum = drumBusType;
 
     displayDrum();
     displayPgm();
@@ -149,7 +146,7 @@ void DrumScreen::setDrum(unsigned char i)
     displayCurrentVal();
 }
 
-unsigned char DrumScreen::getDrum() const
+BusType DrumScreen::getDrum() const
 {
     return drum;
 }

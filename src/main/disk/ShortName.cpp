@@ -1,6 +1,6 @@
 #include "ShortName.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::disk;
 using namespace std;

@@ -8,7 +8,7 @@
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include <thread>
 

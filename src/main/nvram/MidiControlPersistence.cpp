@@ -4,7 +4,7 @@
 #include "hardware/Component.hpp"
 #include "Mpc.hpp"
 #include "disk/AbstractDisk.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <cassert>

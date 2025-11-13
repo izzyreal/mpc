@@ -9,7 +9,7 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 
 #include "file/ByteUtil.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "Util.hpp"
 
 using namespace mpc::file::all;

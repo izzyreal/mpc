@@ -52,7 +52,7 @@ void TimingCorrectScreen::function(const int i)
 
             const auto track = sequencer->getActiveTrack();
 
-            if (track->getBus() != 0)
+            if (isMidiBusType(track->getBusType()))
             {
                 if (note0 == 34)
                 {
@@ -154,7 +154,7 @@ void TimingCorrectScreen::displayNotes()
 {
     const auto track = sequencer->getActiveTrack();
 
-    if (track->getBus() == 0)
+    if (isDrumBusType(track->getBusType()))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
         findField("note0")->setLocation(62, 40);

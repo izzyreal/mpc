@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens::dialog
     public:
         MetronomeSoundScreen(Mpc &mpc, int layerIndex);
 
-        void turnWheel(int notch) override;
+        void turnWheel(int increment) override;
         void function(int i) override;
         void open() override;
         void close() override;

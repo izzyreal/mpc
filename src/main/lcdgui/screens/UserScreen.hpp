@@ -1,5 +1,6 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include "sequencer/BusType.hpp"
 
 #include <sequencer/TimeSignature.hpp>
 
@@ -48,15 +49,12 @@ namespace mpc::lcdgui::screens
         void open() override;
 
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
 
         int getLastBar() const;
         double getTempo() const;
 
     private:
-        std::vector<std::string> busNames{"MIDI", "DRUM1", "DRUM2", "DRUM3",
-                                          "DRUM4"};
-
         void displayTempo() const;
         void displayLoop() const;
         void displayTsig() const;
@@ -70,7 +68,7 @@ namespace mpc::lcdgui::screens
 
         double tempo = 0.0;
         bool loop = false;
-        int bus = 0;
+        sequencer::BusType busType = sequencer::BusType::MIDI;
         int device = 0;
         int pgm = 0;
         int velo = 0;
@@ -83,7 +81,7 @@ namespace mpc::lcdgui::screens
 
         void setTempo(double newTempo);
         void setLoop(bool b);
-        void setBus(int i);
+        void setBus(sequencer::BusType);
         void setDeviceNumber(int i);
         void setRecordingModeMulti(bool b);
         void setLastBar(int i);

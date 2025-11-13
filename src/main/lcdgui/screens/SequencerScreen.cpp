@@ -203,7 +203,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveTrack()->getBus();
+                            return sequencer->getActiveTrack()->getBusType();
                         },
                         [&](auto)
                         {
@@ -382,9 +382,9 @@ void SequencerScreen::close()
 {
     std::vector<std::string> screensThatDisablePunch{"song", "load", "save",
                                                      "others", "next-seq"};
-    const auto nextScreen = ls->getCurrentScreenName();
 
-    if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch),
+    if (const auto nextScreen = ls->getCurrentScreenName();
+        find(begin(screensThatDisablePunch), end(screensThatDisablePunch),
              nextScreen) != end(screensThatDisablePunch))
     {
         sequencer->getTransport()->setPunchEnabled(false);
@@ -401,8 +401,8 @@ void SequencerScreen::displayVelo() const
 
 void SequencerScreen::displayDeviceNumber() const
 {
-    const auto track = mpc.getSequencer()->getActiveTrack();
-    if (track->getDeviceIndex() == 0)
+    if (const auto track = mpc.getSequencer()->getActiveTrack();
+        track->getDeviceIndex() == 0)
     {
         findField("devicenumber")->setText("OFF");
     }
@@ -421,12 +421,10 @@ void SequencerScreen::displayDeviceNumber() const
     }
 }
 
-std::vector<std::string> SequencerScreen::busNames =
-    std::vector<std::string>{"MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4"};
-
 void SequencerScreen::displayBus() const
 {
-    findField("bus")->setText(busNames[sequencer->getActiveTrack()->getBus()]);
+    findField("bus")->setText(
+        busTypeToString(sequencer->getActiveTrack()->getBusType()));
     displayDeviceName();
 }
 
@@ -438,8 +436,8 @@ void SequencerScreen::displayBars() const
 
 void SequencerScreen::displayPgm() const
 {
-    const auto track = mpc.getSequencer()->getActiveTrack();
-    if (track->getProgramChange() == 0)
+    if (const auto track = mpc.getSequencer()->getActiveTrack();
+        track->getProgramChange() == 0)
     {
         findField("pgm")->setText("OFF");
     }
@@ -453,7 +451,7 @@ void SequencerScreen::displayDeviceName() const
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
 
-    if (const auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+    if (const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
         drumBus)
     {
         if (track->getDeviceIndex() == 0)
@@ -580,7 +578,7 @@ void SequencerScreen::displayRecordingMode() const
 void SequencerScreen::displayTsig() const
 {
     std::string result;
-    auto ts = sequencer->getActiveSequence()->getTimeSignature();
+    const auto ts = sequencer->getActiveSequence()->getTimeSignature();
     result.append(std::to_string(ts.getNumerator()));
     result.append("/");
     result.append(std::to_string(ts.getDenominator()));
@@ -668,7 +666,7 @@ void SequencerScreen::pressEnter()
     }
 }
 
-void SequencerScreen::function(int i)
+void SequencerScreen::function(const int i)
 {
     ScreenComponent::function(i);
     if (sequencer->getTransport()->isPunchEnabled())
@@ -722,21 +720,21 @@ void SequencerScreen::function(int i)
         case 5:
             sequencer->trackUp();
             break;
+        default:;
     }
 }
 
 void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused() const
 {
-    const auto track = mpc.getSequencer()->getActiveTrack();
-
-    if (!track->isUsed())
+    if (const auto track = mpc.getSequencer()->getActiveTrack();
+        !track->isUsed())
     {
         track->setUsed(true);
         displayTr();
     }
 }
 
-void SequencerScreen::turnWheel(int i)
+void SequencerScreen::turnWheel(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -788,11 +786,10 @@ void SequencerScreen::turnWheel(int i)
     {
         setTrackToUsedIfItIsCurrentlyUnused();
 
-        track->setBusNumber(track->getBus() + i);
+        track->setBusType(track->getBusType() + i);
 
-        const auto lastFocus = getLastFocus("step-editor");
-
-        if (lastFocus.length() == 2)
+        if (const auto lastFocus = getLastFocus("step-editor");
+            lastFocus.length() == 2)
         {
             const auto eventNumber = stoi(lastFocus.substr(1, 2));
 
@@ -802,7 +799,7 @@ void SequencerScreen::turnWheel(int i)
             if (std::dynamic_pointer_cast<NoteOnEvent>(
                     stepEditorScreen->computeVisibleEvents()[eventNumber]))
             {
-                if (track->getBus() == 0)
+                if (isDrumBusType(track->getBusType()))
                 {
                     if (lastFocus[0] == 'd' || lastFocus[0] == 'e')
                     {
@@ -912,9 +909,8 @@ void SequencerScreen::openWindow()
         return;
     }
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "sq")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "sq")
     {
         Util::initSequence(mpc);
         openScreenById(ScreenId::SequenceScreen);
@@ -945,9 +941,8 @@ void SequencerScreen::openWindow()
     }
     else if (focusedFieldName == "tr")
     {
-        const auto track = mpc.getSequencer()->getActiveTrack();
-
-        if (!track->isUsed())
+        if (const auto track = mpc.getSequencer()->getActiveTrack();
+            !track->isUsed())
         {
             track->setUsed(true);
         }
@@ -1012,9 +1007,9 @@ void SequencerScreen::moveCursor(const std::function<void()> &cursorCall)
 
     auto defaultTransferMap = getTransferMap();
 
-    for (auto &fieldMap : getTransferMap())
+    for (auto &[first, second] : getTransferMap())
     {
-        for (auto &destinationField : fieldMap.second)
+        for (auto &destinationField : second)
         {
             if (destinationField == "sq")
             {
@@ -1048,7 +1043,7 @@ void SequencerScreen::down()
         });
 }
 
-void SequencerScreen::setPunchRectOn(int i, bool b)
+void SequencerScreen::setPunchRectOn(const int i, const bool b)
 {
     findChild<PunchRect>("punch-rect-" + std::to_string(i))->setOn(b);
 }

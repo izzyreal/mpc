@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
 
     public:
         EditSoundScreen(Mpc &mpc, int layerIndex);
-        void turnWheel(int j) override;
+        void turnWheel(int increment) override;
         void function(int j) override;
         void open() override;
         void right() override;
@@ -40,9 +40,9 @@ namespace mpc::lcdgui::screens::window
             "LFREQ ORCH.",  "SLOW ORCH."};
 
         void displayEdit();
-        void displayCreateNewProgram();
-        void displayEndMargin();
-        void displayVariable();
+        void displayCreateNewProgram() const;
+        void displayEndMargin() const;
+        void displayVariable() const;
         void openNameScreen() override;
 
         int edit = 0;

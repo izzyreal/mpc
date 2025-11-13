@@ -419,9 +419,9 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         {
             return transport->getAutoPunchMode();
         },
-        [&](const int busIndex)
+        [&](const BusType busType)
         {
-            return getBus<Bus>(busIndex);
+            return getBus<Bus>(busType);
         },
         [&]
         {
@@ -522,9 +522,8 @@ Sequencer::copySequence(const std::shared_ptr<Sequence> &source)
     return copy;
 }
 
-void Sequencer::copySequenceParameters(
-    const std::shared_ptr<Sequence> &source,
-    const std::shared_ptr<Sequence> &dest) const
+void Sequencer::copySequenceParameters(const std::shared_ptr<Sequence> &source,
+                                       const std::shared_ptr<Sequence> &dest)
 {
     dest->setName(source->getName());
     dest->setLoopEnabled(source->isLoopEnabled());
@@ -539,9 +538,8 @@ void Sequencer::copySequenceParameters(
     copyTempoChangeEvents(source, dest);
 }
 
-void Sequencer::copyTempoChangeEvents(
-    const std::shared_ptr<Sequence> &src,
-    const std::shared_ptr<Sequence> &dst) const
+void Sequencer::copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
+                                      const std::shared_ptr<Sequence> &dst)
 {
     for (const auto &e1 : src->getTempoChangeEvents())
     {
@@ -602,7 +600,7 @@ void Sequencer::copySong(const int source, const int dest)
 }
 
 void Sequencer::copyTrack(const std::shared_ptr<Track> &src,
-                          const std::shared_ptr<Track> &dest) const
+                          const std::shared_ptr<Track> &dest)
 {
     if (src == dest)
     {
@@ -625,7 +623,7 @@ void Sequencer::copyTrackParameters(const std::shared_ptr<Track> &source,
     dest->setUsed(source->isUsed());
     dest->setOn(source->isOn());
     dest->setDeviceIndex(source->getDeviceIndex());
-    dest->setBusNumber(source->getBus());
+    dest->setBusType(source->getBusType());
     dest->setVelocityRatio(source->getVelocityRatio());
     dest->setProgramChange(source->getProgramChange());
     dest->setName(source->getName());
@@ -1086,30 +1084,35 @@ std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
     return placeHolder;
 }
 
-template <typename T> std::shared_ptr<T> Sequencer::getBus(const int busIndex)
+template <typename T>
+std::shared_ptr<T> Sequencer::getBus(const BusType busType) const
 {
-    if (busIndex < 0 || busIndex >= buses.size())
-    {
-        return {};
-    }
-
-    auto result = std::dynamic_pointer_cast<T>(buses[busIndex]);
+    auto result = std::dynamic_pointer_cast<T>(buses[busTypeToIndex(busType)]);
     return result;
 }
 
-std::shared_ptr<Bus> Sequencer::getBus(BusType busType)
+std::shared_ptr<Bus> Sequencer::getBus(const BusType busType) const
 {
-    return buses[static_cast<size_t>(busType)];
+    return buses[busTypeToIndex(busType)];
 }
 
-std::shared_ptr<DrumBus> Sequencer::getDrumBus(const int drumBusIndex) const
+std::shared_ptr<DrumBus>
+Sequencer::getDrumBus(const DrumBusIndex drumBusIndex) const
 {
-    assert(drumBusIndex >= 0 || drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT);
-    auto result = std::dynamic_pointer_cast<DrumBus>(buses[drumBusIndex + 1]);
+    assert(drumBusIndex >= 0 &&
+           drumBusIndex <= Mpc2000XlSpecs::DRUM_BUS_COUNT - 1);
+    auto result = getBus<DrumBus>(drumBusIndexToDrumBusType(drumBusIndex));
     assert(result);
     return result;
 }
 
-template std::shared_ptr<Bus> Sequencer::getBus(int busIndex);
-template std::shared_ptr<MidiBus> Sequencer::getBus(int busIndex);
-template std::shared_ptr<DrumBus> Sequencer::getBus(int busIndex);
+std::shared_ptr<DrumBus> Sequencer::getDrumBus(const BusType busType) const
+{
+    assert(isDrumBusType(busType));
+    auto result = getBus<DrumBus>(busType);
+    assert(result);
+    return result;
+}
+
+template std::shared_ptr<MidiBus> Sequencer::getBus(BusType) const;
+template std::shared_ptr<DrumBus> Sequencer::getBus(BusType) const;

@@ -9,7 +9,7 @@
 
 #include "Util.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include "lcdgui/Label.hpp"
 
@@ -23,9 +23,8 @@ EditVelocityScreen::EditVelocityScreen(Mpc &mpc, const int layerIndex)
 
 void EditVelocityScreen::setNote0(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "note0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "note0")
     {
         WithTimesAndNotes::setNote0(i);
     }
@@ -33,9 +32,8 @@ void EditVelocityScreen::setNote0(const int i)
 
 void EditVelocityScreen::open()
 {
-    const auto bus = sequencer->getActiveTrack()->getBus();
-
-    if (bus == 0)
+    if (const auto busType = sequencer->getActiveTrack()->getBusType();
+        isMidiBusType(busType))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
         findField("note1")->setAlignment(Alignment::Centered, 18);
@@ -100,15 +98,14 @@ void EditVelocityScreen::function(const int i)
 
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
 void EditVelocityScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "edittype")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "edittype")
     {
         setEditType(editType + i);
     }
@@ -137,9 +134,8 @@ void EditVelocityScreen::displayTime()
 
 void EditVelocityScreen::displayNotes()
 {
-    const auto track = sequencer->getActiveTrack();
-
-    if (track->getBus() == 0)
+    if (const auto track = sequencer->getActiveTrack();
+        isDrumBusType(track->getBusType()))
     {
         findField("note0")->setSize(47, 9);
         findLabel("note1")->Hide(false);

@@ -7,8 +7,6 @@ namespace mpc::lcdgui::screens::window
     class EndFineScreen;
     class LoopToFineScreen;
     class LoopEndFineScreen;
-    class ZoneStartFineScreen;
-    class ZoneEndFineScreen;
 } // namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
@@ -35,6 +33,8 @@ namespace mpc::lcdgui::screens
         void setSliderEnd(int) const;
         void setEnd(int newValue) const;
 
+        int getView() const;
+
         TrimScreen(Mpc &mpc, int layerIndex);
         void open() override;
 
@@ -59,7 +59,5 @@ namespace mpc::lcdgui::screens
         friend class EndFineScreen;
         friend class LoopEndFineScreen;
         friend class LoopToFineScreen;
-        friend class ZoneStartFineScreen;
-        friend class ZoneEndFineScreen;
     };
 } // namespace mpc::lcdgui::screens

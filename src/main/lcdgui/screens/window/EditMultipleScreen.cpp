@@ -56,7 +56,7 @@ void EditMultipleScreen::function(const int i)
             const auto noteEvent =
                 std::dynamic_pointer_cast<NoteOnEvent>(selectedEvent);
 
-            if (noteEvent && track->getBus() != 0)
+            if (noteEvent && isMidiBusType(track->getBusType()))
             {
                 if (paramLetter == "a")
                 {
@@ -97,7 +97,7 @@ void EditMultipleScreen::function(const int i)
                 }
             }
 
-            if (noteEvent && track->getBus() == 0)
+            if (noteEvent && isDrumBusType(track->getBusType()))
             {
                 if (paramLetter == "a")
                 {
@@ -165,7 +165,7 @@ void EditMultipleScreen::turnWheel(const int i)
     {
         const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-        if (noteEvent && track->getBus() != 0)
+        if (noteEvent && isMidiBusType(track->getBusType()))
         {
             if (paramLetter == "a")
             {
@@ -184,7 +184,7 @@ void EditMultipleScreen::turnWheel(const int i)
                 setEditType(editType + i);
             }
         }
-        else if (noteEvent && track->getBus() == 0)
+        else if (noteEvent && isDrumBusType(track->getBusType()))
         {
             if (paramLetter == "a")
             {
@@ -310,7 +310,8 @@ void EditMultipleScreen::updateEditMultiple() const
 
     const auto track = mpc.getSequencer()->getActiveTrack();
 
-    if (std::dynamic_pointer_cast<NoteOnEvent>(event) && track->getBus() != 0)
+    if (std::dynamic_pointer_cast<NoteOnEvent>(event) &&
+        isMidiBusType(track->getBusType()))
     {
         if (letter == "a" || letter == "b" || letter == "c")
         {
@@ -438,7 +439,8 @@ void EditMultipleScreen::updateEditMultiple() const
         }
     }
 
-    if (std::dynamic_pointer_cast<NoteOnEvent>(event) && track->getBus() == 0)
+    if (std::dynamic_pointer_cast<NoteOnEvent>(event) &&
+        isDrumBusType(track->getBusType()))
     {
         if (letter == "a")
         {
@@ -500,7 +502,7 @@ void EditMultipleScreen::updateDouble() const
 void EditMultipleScreen::setChangeNoteTo(const int i)
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
-    const auto midi = track->getBus() == 0;
+    const auto midi = isDrumBusType(track->getBusType());
     changeNoteTo = std::clamp(i, midi ? 0 : 34, midi ? 127 : 98);
     updateEditMultiple();
 }

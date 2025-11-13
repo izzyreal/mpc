@@ -3,7 +3,7 @@
 #include "Mpc.hpp"
 #include "file/all/AllParser.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "Util.hpp"
 
 #include "lcdgui/screens/SongScreen.hpp"

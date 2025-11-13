@@ -6,7 +6,7 @@
 #include "sequencer/Track.hpp"
 
 #include "file/ByteUtil.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "Util.hpp"
 
 using namespace mpc::file::all;
@@ -53,7 +53,7 @@ Tracks::Tracks(sequencer::Sequence *seq)
         }
 
         saveBytes[DEVICES_OFFSET + i] = t->getDeviceIndex();
-        saveBytes[BUSSES_OFFSET + i] = t->getBus();
+        saveBytes[BUSSES_OFFSET + i] = busTypeToIndex(t->getBusType());
         saveBytes[PGMS_OFFSET + i] = t->getProgramChange();
         saveBytes[VELO_RATIOS_OFFSET + i] = t->getVelocityRatio();
 

@@ -2,7 +2,7 @@
 
 #include "lcdgui/PunchRect.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include "lcdgui/Label.hpp"
 #include "sampler/Sampler.hpp"

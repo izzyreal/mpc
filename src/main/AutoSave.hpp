@@ -14,6 +14,7 @@ namespace mpc
         static void restoreAutoSavedState(Mpc &, std::shared_ptr<SaveTarget>,
                                           bool headless);
 
-        static void storeAutoSavedState(Mpc &, std::shared_ptr<SaveTarget>);
+        static void storeAutoSavedState(Mpc &,
+                                        const std::shared_ptr<SaveTarget> &);
     };
 } // namespace mpc

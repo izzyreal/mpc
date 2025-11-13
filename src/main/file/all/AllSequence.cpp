@@ -14,7 +14,7 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 
 #include "file/ByteUtil.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "Util.hpp"
 
 #ifdef __linux__
@@ -127,7 +127,7 @@ void AllSequence::applyToMpcSeq(const std::shared_ptr<Sequence> &mpcSeq)
         t->setUsed(at->getStatus(i) == 5 || at->getStatus(i) == 7);
         t->setName(at->getName(i));
         t->setDeviceIndex(at->getDevice(i));
-        t->setBusNumber(at->getBus(i));
+        t->setBusType(busIndexToBusType(at->getBus(i)));
         t->setProgramChange(at->getPgm(i));
         t->setOn(at->getStatus(i) == 6 || at->getStatus(i) == 7);
         t->setVelocityRatio(at->getVelo(i));

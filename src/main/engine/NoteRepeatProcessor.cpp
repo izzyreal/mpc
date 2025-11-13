@@ -48,7 +48,7 @@ void NoteRepeatProcessor::process(
     const float sampleRate) const
 {
     auto track = sequencer->getActiveTrack();
-    auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+    auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
 
     std::shared_ptr<Program> program;
 

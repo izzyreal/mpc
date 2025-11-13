@@ -7,7 +7,7 @@
 
 #include <util/VolumeMounter.h>
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include <Logger.hpp>
 
 using namespace mpc::disk;

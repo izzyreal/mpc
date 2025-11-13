@@ -33,10 +33,10 @@ inline std::vector<char> get_file_data(const fs::path &p)
         return {};
     }
 
-    std::ifstream::pos_type fileSize = ifs.tellg();
+    const std::ifstream::pos_type fileSize = ifs.tellg();
     ifs.seekg(0, std::ios::beg);
 
-    std::vector<char> bytes(fileSize);
+    std::vector<char> bytes(static_cast<size_t>(fileSize));
     ifs.read(bytes.data(), fileSize);
 
     return bytes;
@@ -45,17 +45,18 @@ inline std::vector<char> get_file_data(const fs::path &p)
 inline void set_file_data(const fs::path &p, const std::vector<char> &bytes)
 {
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
-    ofs.write(bytes.data(), std::streamsize(bytes.size()));
+    ofs.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
 }
 
 inline void set_file_data(const fs::path &p, const std::string &bytes)
 {
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
-    ofs.write(bytes.data(), std::streamsize(bytes.size()));
+    ofs.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
 }
 
-inline std::string byte_count_to_short_string(uintmax_t byte_count,
-                                              bool one_letter_suffix = false)
+inline std::string
+byte_count_to_short_string(const uintmax_t byte_count,
+                           const bool one_letter_suffix = false)
 {
     const static std::vector<std::string> units = {"B",  "KB", "MB", "GB", "TB",
                                                    "PB", "EB", "ZB", "YB"};
@@ -63,7 +64,7 @@ inline std::string byte_count_to_short_string(uintmax_t byte_count,
 
     auto adjustedSize = byte_count;
 #ifdef __APPLE__
-    const auto denominator = 1000;
+    constexpr auto denominator = 1000;
 #else
     const auto denominator = 1024;
 #endif

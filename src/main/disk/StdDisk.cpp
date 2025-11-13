@@ -10,7 +10,7 @@
 
 #include "lcdgui/screens/LoadScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::disk;
 using namespace mpc::file;

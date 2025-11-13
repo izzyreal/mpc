@@ -21,7 +21,7 @@ Sequence::Sequence(std::function<std::string(int)> getDefaultTrackName,
                    std::function<bool()> isRecordingModeMulti,
                    std::function<std::shared_ptr<Sequence>()> getActiveSequence,
                    std::function<int()> getAutoPunchMode,
-                   std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+                   std::function<std::shared_ptr<Bus>(BusType)> getBus,
                    std::function<bool()> isEraseButtonPressed,
                    std::function<bool(int, ProgramIndex)> isProgramPadPressed,
                    std::shared_ptr<Sampler> sampler,
@@ -41,20 +41,19 @@ Sequence::Sequence(std::function<std::string(int)> getDefaultTrackName,
     {
         tracks.emplace_back(std::make_shared<Track>(
             trackIndex, this, getDefaultTrackName, getTickPosition, getScreens,
-            isRecordingModeMulti, getActiveSequence, getAutoPunchMode,
-            getSequencerBus, isEraseButtonPressed, isProgramPadPressed, sampler,
-            eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex,
-            isRecording, isOverdubbing, isPunchEnabled, getPunchInTime,
-            getPunchOutTime, isSoloEnabled));
+            isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
+            isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
+            isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
+            isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
+            isSoloEnabled));
     }
 
     tempoChangeTrack = std::make_shared<Track>(
         64, this, getDefaultTrackName, getTickPosition, getScreens,
-        isRecordingModeMulti, getActiveSequence, getAutoPunchMode,
-        getSequencerBus, isEraseButtonPressed, isProgramPadPressed, sampler,
-        eventHandler, isSixteenLevelsEnabled, getActiveTrackIndex, isRecording,
-        isOverdubbing, isPunchEnabled, getPunchInTime, getPunchOutTime,
-        isSoloEnabled);
+        isRecordingModeMulti, getActiveSequence, getAutoPunchMode, getBus,
+        isEraseButtonPressed, isProgramPadPressed, sampler, eventHandler,
+        isSixteenLevelsEnabled, getActiveTrackIndex, isRecording, isOverdubbing,
+        isPunchEnabled, getPunchInTime, getPunchOutTime, isSoloEnabled);
     tempoChangeTrack->setUsed(true);
 
     tracks.push_back(tempoChangeTrack);
@@ -219,7 +218,7 @@ void Sequence::init(const int newLastBarIndex)
     {
         t->setDeviceIndex(userScreen->device);
         t->setProgramChange(userScreen->pgm);
-        t->setBusNumber(userScreen->bus);
+        t->setBusType(userScreen->busType);
         t->setVelocityRatio(userScreen->velo);
     }
 
@@ -385,14 +384,14 @@ void Sequence::setBarLengths(const std::vector<int> &newBarLengths)
     barLengthsInTicks = newBarLengths;
 }
 
-void Sequence::deleteBars(const int firstBar, int _lastBar)
+void Sequence::deleteBars(const int firstBar, int lastBarToDelete)
 {
     if (lastBarIndex == -1)
     {
         return;
     }
 
-    _lastBar++;
+    lastBarToDelete++;
 
     int deleteFirstTick = 0;
 
@@ -403,7 +402,7 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
 
     int deleteLastTick = deleteFirstTick;
 
-    for (int i = firstBar; i < _lastBar; i++)
+    for (int i = firstBar; i < lastBarToDelete; i++)
     {
         deleteLastTick += barLengthsInTicks[i];
     }
@@ -422,14 +421,14 @@ void Sequence::deleteBars(const int firstBar, int _lastBar)
         }
     }
 
-    const auto difference = _lastBar - firstBar;
+    const auto difference = lastBarToDelete - firstBar;
     lastBarIndex -= difference;
     int oldBarStartPos = 0;
     auto barCounter = 0;
 
     for (const auto l : barLengthsInTicks)
     {
-        if (barCounter == _lastBar)
+        if (barCounter == lastBarToDelete)
         {
             break;
         }
@@ -739,7 +738,7 @@ void Sequence::syncTrackEventIndices(const int tick) const
     {
         if (t->isUsed())
         {
-            t->move(tick, tick);
+            t->syncEventIndex(tick, tick);
         }
     }
 }

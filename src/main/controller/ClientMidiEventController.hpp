@@ -5,6 +5,7 @@
 #include "lcdgui/screens/MidiSwScreen.hpp"
 
 #include "Observer.hpp"
+#include "sequencer/BusType.hpp"
 
 namespace mpc::file::mid::event
 {
@@ -112,7 +113,8 @@ namespace mpc::controller
 
         std::shared_ptr<Program>
         getProgramForEvent(const ClientMidiEvent &) const;
-        std::optional<int> getDrumIndexForEvent(const ClientMidiEvent &) const;
+        std::optional<sequencer::BusType>
+        getDrumBusTypeForEvent(const ClientMidiEvent &) const;
         std::shared_ptr<sequencer::DrumBus>
         getDrumBusForEvent(const ClientMidiEvent &) const;
 

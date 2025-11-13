@@ -28,7 +28,7 @@
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
 #include "lcdgui/screens/window/SaveAProgramScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include <stdexcept>
 
 #include "Logger.hpp"

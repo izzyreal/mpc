@@ -24,9 +24,8 @@ void LoadAProgramScreen::open()
 
 void LoadAProgramScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "load-replace-sound")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "load-replace-sound")
     {
         loadReplaceSameSound = i > 0;
         displayLoadReplaceSound();
@@ -59,9 +58,8 @@ void LoadAProgramScreen::function(const int i)
 
             mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
-            const auto track = sequencer->getActiveTrack();
-
-            if (track->getBus() > 0)
+            if (const auto track = sequencer->getActiveTrack();
+                sequencer::isDrumBusType(track->getBusType()))
             {
                 for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++)
                 {
@@ -75,10 +73,11 @@ void LoadAProgramScreen::function(const int i)
 
             break;
         }
+        default:;
     }
 }
 
-void LoadAProgramScreen::displayLoadReplaceSound()
+void LoadAProgramScreen::displayLoadReplaceSound() const
 {
     findField("load-replace-sound")
         ->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));

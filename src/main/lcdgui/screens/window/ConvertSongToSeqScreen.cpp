@@ -49,17 +49,17 @@ void ConvertSongToSeqScreen::function(const int i)
             convertSongToSeq();
             openScreenById(ScreenId::SongScreen);
             break;
+        default:;
     }
 }
 
 void ConvertSongToSeqScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "fromsong")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "fromsong")
     {
         const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-        setFromSong(songScreen->activeSongIndex + i);
+        setFromSong(songScreen->getActiveSongIndex() + i);
     }
     else if (focusedFieldName == "tosequence")
     {
@@ -71,7 +71,7 @@ void ConvertSongToSeqScreen::turnWheel(const int i)
     }
 }
 
-void ConvertSongToSeqScreen::setFromSong(const int8_t newValue)
+void ConvertSongToSeqScreen::setFromSong(const int8_t newValue) const
 {
     const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 19);
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
@@ -93,7 +93,7 @@ void ConvertSongToSeqScreen::setTrackStatus(const int8_t newValue)
     displayTrackStatus();
 }
 
-void ConvertSongToSeqScreen::displayFromSong()
+void ConvertSongToSeqScreen::displayFromSong() const
 {
     const auto activeSongIndex =
         mpc.screens->get<ScreenId::SongScreen>()->getActiveSongIndex();
@@ -104,7 +104,7 @@ void ConvertSongToSeqScreen::displayFromSong()
     findField("fromsong")->setText(songIndexString + "-" + songName);
 }
 
-void ConvertSongToSeqScreen::displayToSequence()
+void ConvertSongToSeqScreen::displayToSequence() const
 {
     const auto activeSequence = sequencer->getSequence(toSequenceIndex);
     const auto sequenceIndexString =
@@ -113,7 +113,7 @@ void ConvertSongToSeqScreen::displayToSequence()
     findField("tosequence")->setText(sequenceIndexString + "-" + sequenceName);
 }
 
-void ConvertSongToSeqScreen::displayTrackStatus()
+void ConvertSongToSeqScreen::displayTrackStatus() const
 {
     findField("trackstatus")->setText(trackStatusNames[trackStatus]);
 }
@@ -135,9 +135,8 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 
         for (int i = track->getEvents().size() - 1; i >= 0; i--)
         {
-            const auto event = track->getEvent(i);
-
-            if (event->getTick() >= startTick && event->getTick() < endTick)
+            if (const auto event = track->getEvent(i);
+                event->getTick() >= startTick && event->getTick() < endTick)
             {
                 track->removeEvent(event);
             }
@@ -148,7 +147,7 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 void ConvertSongToSeqScreen::convertSongToSeq() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->activeSongIndex);
+    const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
 
     if (!song->isUsed())
     {
@@ -250,15 +249,16 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
                 {
                     // copy to destination track indexes 32 - 35 as per source
                     // track drum bus
-                    const auto drumBusIndex = sourceTrack->getBus() - 1;
-
-                    if (drumBusIndex < 0)
+                    if (sourceTrack->getBusType() == BusType::MIDI)
                     {
                         // The source track has neither a MIDI out device, nor a
                         // DRUM bus. Nothing to copy to the destination sequence
                         // in this case.
                         continue;
                     }
+
+                    const auto drumBusIndex =
+                        drumBusTypeToDrumIndex(sourceTrack->getBusType());
 
                     destinationTrack =
                         destinationSequence->getTrack(32 + drumBusIndex);
@@ -300,7 +300,7 @@ void ConvertSongToSeqScreen::convertSongToSeq() const
         {
             auto referenceTrack = referenceSequence->getTrack(trackIndex);
             auto destTrack = destinationSequence->getTrack(trackIndex);
-            sequencer->copyTrackParameters(referenceTrack, destTrack);
+            Sequencer::copyTrackParameters(referenceTrack, destTrack);
 
             if (trackStatus == 1)
             {

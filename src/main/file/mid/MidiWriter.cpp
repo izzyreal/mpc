@@ -31,7 +31,7 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 #include "sequencer/TempoChangeEvent.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "file/ByteUtil.hpp"
 
 #include <set>

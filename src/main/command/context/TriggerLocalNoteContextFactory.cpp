@@ -84,7 +84,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
 
     const auto hardwareSliderValue = hardware->getSlider()->getValueAs<int>();
 
-    const int drumScreenSelectedDrum =
+    const auto drumScreenSelectedDrum =
         screens->get<ScreenId::DrumScreen>()->getDrum();
 
     return std::make_shared<TriggerLocalNoteOnContext>(

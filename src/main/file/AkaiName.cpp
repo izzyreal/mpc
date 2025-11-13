@@ -1,5 +1,5 @@
 #include "AkaiName.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include <algorithm>
 

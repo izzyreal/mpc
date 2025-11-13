@@ -1,5 +1,7 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
+#include "sequencer/Bus.hpp"
+#include "sequencer/BusType.hpp"
 
 namespace mpc::lcdgui::screens
 {
@@ -11,8 +13,8 @@ namespace mpc::lcdgui::screens
         void turnWheel(int i) override;
         void open() override;
 
-        void setDrum(unsigned char i);
-        unsigned char getDrum() const;
+        void setDrum(sequencer::BusType);
+        sequencer::BusType getDrum() const;
         void setPadToIntSound(bool b);
         bool isPadToIntSound() const;
 
@@ -25,6 +27,6 @@ namespace mpc::lcdgui::screens
         void displayMidiVolume() const;
 
         bool padToInternalSound = true;
-        unsigned char drum = 0;
+        sequencer::BusType drum = sequencer::BusType::DRUM1;
     };
 } // namespace mpc::lcdgui::screens

@@ -17,6 +17,7 @@ namespace mpc
     using VelocityOrPressure = ConstrainedInt<int8_t, -1, 127>;
     using TrackIndex = ConstrainedInt<uint8_t, 0, 63>;
     using ProgramIndex = ConstrainedInt<int8_t, 0, 23>;
+    using DrumBusIndex = ConstrainedInt<int8_t, 0, 3>;
 
     using NoteEventId = uint32_t;
     constexpr NoteEventId NoNoteEventId = 0;

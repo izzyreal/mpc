@@ -22,7 +22,7 @@
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include "MpcResourceUtil.hpp"
 #include "engine/Voice.hpp"
@@ -110,7 +110,7 @@ void Sampler::setSoundIndex(const int i)
     soundIndex =
         std::clamp(i, 0, std::max(0, static_cast<int>(sounds.size() - 1)));
 
-    auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+    const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
     zoneScreen->initZones();
 }
 
@@ -171,7 +171,7 @@ void Sampler::init()
 {
     initMasterPadAssign = Pad::getPadNotes(mpc);
 
-    auto program = createNewProgramAddFirstAvailableSlot().lock();
+    const auto program = createNewProgramAddFirstAvailableSlot().lock();
     program->setName("NewPgm-A");
 
     for (int i = 0; i < 4; i++)
@@ -207,7 +207,7 @@ void Sampler::init()
         {
             for (int i = 0; i < numFrames; i++)
             {
-                float frame = wav_get_LE(stream, 2) / 32768.0;
+                const float frame = wav_get_LE(stream, 2) / 32768.0;
                 clickSound->insertFrame(std::vector{frame},
                                         clickSound->getFrameCount());
             }
@@ -220,7 +220,7 @@ void Sampler::init()
 
 void Sampler::playMetronome(unsigned int velocity, const int framePos) const
 {
-    auto metronomeSoundScreen =
+    const auto metronomeSoundScreen =
         mpc.screens->get<ScreenId::MetronomeSoundScreen>();
 
     if (metronomeSoundScreen->getSound() == 0)
@@ -231,8 +231,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
         return;
     }
 
-    const auto drumBus =
-        mpc.getSequencer()->getBus<DrumBus>(metronomeSoundScreen->getSound());
+    const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(
+        busIndexToBusType(metronomeSoundScreen->getSound()));
 
     assert(drumBus);
 
@@ -258,10 +258,10 @@ void Sampler::playPreviewSample(const int start, const int end,
         return;
     }
 
-    auto previewSound = sounds[sounds.size() - 1];
-    auto oldStart = previewSound->getStart();
-    auto oldEnd = previewSound->getEnd();
-    auto oldLoopTo = previewSound->getLoopTo();
+    const auto previewSound = sounds[sounds.size() - 1];
+    const auto oldStart = previewSound->getStart();
+    const auto oldEnd = previewSound->getEnd();
+    const auto oldLoopTo = previewSound->getLoopTo();
     previewSound->setStart(start);
     previewSound->setEnd(end);
     previewSound->setLoopTo(loopTo);
@@ -307,7 +307,7 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
             {
                 for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
                 {
-                    auto drumBus = mpc.getSequencer()->getDrumBus(i);
+                    const auto drumBus = mpc.getSequencer()->getDrumBus(i);
                     drumBus->setProgram(0);
                 }
             }
@@ -318,11 +318,11 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
     return std::weak_ptr<Program>();
 }
 
-void Sampler::deleteProgram(const std::weak_ptr<Program> &_program)
+void Sampler::deleteProgram(const std::weak_ptr<Program> &program)
 {
     for (auto &&p : programs)
     {
-        if (p == _program.lock())
+        if (p == program.lock())
         {
             p.reset();
             break;
@@ -413,12 +413,12 @@ void Sampler::deleteAllPrograms(const bool createDefaultProgram)
 
 void Sampler::repairProgramReferences() const
 {
-    for (int busIndex = 1; busIndex < 5; busIndex++)
+    for (int busIndex = 1; busIndex < 5; ++busIndex)
     {
-        auto drumBus = mpc.getSequencer()->getBus<DrumBus>(busIndex);
-        auto pgm = drumBus->getProgram();
+        const auto drumBus =
+            mpc.getSequencer()->getBus<DrumBus>(busIndexToBusType(busIndex));
 
-        if (!programs[pgm])
+        if (auto pgm = drumBus->getProgram(); !programs[pgm])
         {
             for (int programIndex = pgm - 1; programIndex > 0; programIndex--)
             {
@@ -451,16 +451,16 @@ void Sampler::repairProgramReferences() const
 void Sampler::trimSample(const int sampleNumber, const int start,
                          const int end) const
 {
-    auto s = sounds[sampleNumber];
+    const auto s = sounds[sampleNumber];
     trimSample(s, start, end);
 }
 
 void Sampler::trimSample(const std::weak_ptr<Sound> &sound, const int start,
                          int end) const
 {
-    auto s = sound.lock();
+    const auto s = sound.lock();
     std::vector<float> newData = *s->getSampleData();
-    auto frameCount = s->getFrameCount();
+    const auto frameCount = s->getFrameCount();
 
     if (end > frameCount)
     {
@@ -474,8 +474,8 @@ void Sampler::trimSample(const std::weak_ptr<Sound> &sound, const int start,
     }
     else
     {
-        int startRight = start + frameCount;
-        int endRight = end + frameCount;
+        const int startRight = start + frameCount;
+        const int endRight = end + frameCount;
 
         newData.erase(newData.begin() + endRight, newData.end());
         newData.erase(newData.begin() + frameCount,
@@ -495,9 +495,9 @@ void Sampler::deleteSection(const unsigned int sampleNumber,
                             const unsigned int start,
                             const unsigned int end) const
 {
-    auto s = sounds[sampleNumber];
+    const auto s = sounds[sampleNumber];
     std::vector<float> newData = *s->getSampleData();
-    auto frameCount = s->getFrameCount();
+    const auto frameCount = s->getFrameCount();
 
     if (!s->isMono())
     {
@@ -525,14 +525,14 @@ std::string Sampler::getSoundSortingTypeName() const
 
 void Sampler::switchToNextSoundSortType()
 {
-    auto s = getSound();
+    const auto s = getSound();
 
     if (soundSortingType++ >= 2)
     {
         soundSortingType = 0;
     }
 
-    auto sortedSounds = getSortedSounds();
+    const auto sortedSounds = getSortedSounds();
 
     for (int i = 0; i < sortedSounds.size(); i++)
     {
@@ -548,14 +548,14 @@ void Sampler::deleteAllSamples()
 {
     sounds.clear();
 
-    for (auto &p : programs)
+    for (const auto &p : programs)
     {
         if (!p)
         {
             continue;
         }
 
-        for (auto &n : p->getNotesParameters())
+        for (const auto &n : p->getNotesParameters())
         {
             n->setSoundIndex(-1);
         }
@@ -564,15 +564,15 @@ void Sampler::deleteAllSamples()
     soundIndex = 0;
 }
 
-void Sampler::process12Bit(std::vector<float> &fa)
+void Sampler::process12Bit(std::vector<float> &data)
 {
-    for (auto j = 0; j < fa.size(); j++)
+    for (auto j = 0; j < data.size(); j++)
     {
-        if (fa[j] != 0.0f)
+        if (data[j] != 0.0f)
         {
-            auto fShort = static_cast<int16_t>(fa[j] * 32767.4999999);
+            auto fShort = static_cast<int16_t>(data[j] * 32767.4999999);
 
-            if (fa[j] > 0.9999999f)
+            if (data[j] > 0.9999999f)
             {
                 fShort = 32767;
             }
@@ -583,22 +583,22 @@ void Sampler::process12Bit(std::vector<float> &fa)
             newShort &= ~(1 << 2);
             newShort &= ~(1 << 3);
 
-            fa[j] = static_cast<float>(newShort / 32767.4999999);
+            data[j] = static_cast<float>(newShort / 32767.4999999);
         }
         else
         {
-            fa[j] = 0;
+            data[j] = 0;
         }
     }
 }
 
-void Sampler::process8Bit(std::vector<float> &fa)
+void Sampler::process8Bit(std::vector<float> &data)
 {
-    for (auto j = 0; j < fa.size(); j++)
+    for (auto j = 0; j < data.size(); j++)
     {
-        if (fa[j] != 0.0f)
+        if (data[j] != 0.0f)
         {
-            float f = fa[j];
+            float f = data[j];
 
             if (f < -1)
             {
@@ -625,7 +625,7 @@ void Sampler::process8Bit(std::vector<float> &fa)
                 f = 1;
             }
 
-            fa[j] = f;
+            data[j] = f;
         }
     }
 }
@@ -646,12 +646,10 @@ Sampler::resampleSingleChannel(const std::vector<float> &input,
     srcData.output_frames = outputFrameCount;
     srcData.src_ratio = 1.0 / ratio;
 
-    auto error = src_simple(&srcData, 0, 1);
-
-    if (error != 0)
+    if (const auto error = src_simple(&srcData, 0, 1); error != 0)
     {
         const char *errormsg = src_strerror(error);
-        std::string errorStr(errormsg);
+        const std::string errorStr(errormsg);
         MLOG("libsamplerate error: " + errorStr);
     }
 
@@ -677,7 +675,7 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
 
     srcData.output_frames = outputFrameCount;
 
-    auto destinationSampleData = destSnd->getMutableSampleData();
+    const auto destinationSampleData = destSnd->getMutableSampleData();
     destinationSampleData->resize(destinationSampleCount);
 
     const int numChannels = destSnd->isMono() ? 1 : 2;
@@ -690,9 +688,7 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
         float *destArray = &(*destinationSampleData)[i * outputFrameCount];
         srcData.data_out = destArray;
 
-        auto error = src_simple(&srcData, 0, 1);
-
-        if (error != 0)
+        if (const auto error = src_simple(&srcData, 0, 1); error != 0)
         {
             const char *errormsg = src_strerror(error);
             std::string errorStr(errormsg);
@@ -703,7 +699,7 @@ void Sampler::resample(const std::shared_ptr<const std::vector<float>> &data,
 
 void Sampler::stopAllVoices(const int frameOffset) const
 {
-    for (auto &voice : mpc.getEngineHost()->getVoices())
+    for (const auto &voice : mpc.getEngineHost()->getVoices())
     {
         if (voice->isFinished())
         {
@@ -721,7 +717,7 @@ void Sampler::finishBasicVoice() const
 
 void Sampler::playX()
 {
-    auto sound = getSortedSounds()[soundIndex].first;
+    const auto sound = getSortedSounds()[soundIndex].first;
     auto start = 0;
     auto end = sound->getSampleData()->size() - 1;
 
@@ -730,12 +726,12 @@ void Sampler::playX()
         end *= 0.5;
     }
 
-    auto fullEnd = end;
+    const auto fullEnd = end;
 
     if (playXMode == 1)
     {
-        auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-        auto zone = zoneScreen->getZone();
+        const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
+        const auto zone = zoneScreen->getZone();
         start = zone[0];
         end = zone[1];
     }
@@ -753,8 +749,8 @@ void Sampler::playX()
         end = fullEnd;
     }
 
-    int oldStart = sound->getStart();
-    int oldEnd = sound->getEnd();
+    const int oldStart = sound->getStart();
+    const int oldEnd = sound->getEnd();
     sound->setStart(start);
     sound->setEnd(end);
     mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(PLAYX_SOUND, 127,
@@ -786,9 +782,7 @@ int Sampler::getLastInt(const std::string &s) const
 
     for (int i = s.length() - 1; i >= 0; i--)
     {
-        auto c = s[i];
-
-        if (isdigit(c))
+        if (const auto c = s[i]; isdigit(c))
         {
             offset--;
         }
@@ -872,7 +866,7 @@ std::vector<std::shared_ptr<Sound>> Sampler::getUsedSounds() const
             continue;
         }
 
-        for (auto &nn : p->getNotesParameters())
+        for (const auto &nn : p->getNotesParameters())
         {
             if (nn->getSoundIndex() != -1)
             {
@@ -955,14 +949,14 @@ void Sampler::deleteSound(const std::shared_ptr<Sound> &sound)
         return;
     }
 
-    for (auto &p : programs)
+    for (const auto &p : programs)
     {
         if (!p)
         {
             continue;
         }
 
-        for (auto &n : p->getNotesParameters())
+        for (const auto &n : p->getNotesParameters())
         {
             if (n->getSoundIndex() == index)
             {
@@ -993,7 +987,7 @@ std::vector<float> Sampler::mergeToStereo(const std::vector<float> &fa0,
 {
     const int newLengthFrames =
         fa0.size() > fa1.size() ? fa0.size() : fa1.size();
-    std::vector<float> newSampleData = std::vector<float>(newLengthFrames * 2);
+    std::vector<float> newSampleData(newLengthFrames * 2);
 
     for (int i = 0; i < newLengthFrames; i++)
     {
@@ -1033,7 +1027,7 @@ void Sampler::mergeToStereo(
 
     if (sourceLeft->size() < sourceRight->size())
     {
-        auto diff = sourceRight->size() - sourceLeft->size();
+        const auto diff = sourceRight->size() - sourceLeft->size();
 
         for (int i = 0; i < diff; i++)
         {
@@ -1048,7 +1042,7 @@ void Sampler::mergeToStereo(
 
     if (sourceRight->size() < sourceLeft->size())
     {
-        auto diff = sourceLeft->size() - sourceRight->size();
+        const auto diff = sourceLeft->size() - sourceRight->size();
         for (int i = 0; i < diff; i++)
         {
             dest->push_back(0);
@@ -1086,7 +1080,7 @@ void Sampler::selectNextSound()
 
 std::weak_ptr<Sound> Sampler::copySound(const std::weak_ptr<Sound> &source)
 {
-    auto sound = source.lock();
+    const auto sound = source.lock();
     auto newSound = addSound(sound->getSampleRate());
 
     if (!newSound)
@@ -1096,8 +1090,8 @@ std::weak_ptr<Sound> Sampler::copySound(const std::weak_ptr<Sound> &source)
 
     newSound->setName(sound->getName());
     newSound->setLoopEnabled(sound->isLoopEnabled());
-    auto dest = newSound->getMutableSampleData();
-    auto src = sound->getSampleData();
+    const auto dest = newSound->getMutableSampleData();
+    const auto src = sound->getSampleData();
     dest->reserve(src->size());
     copy(src->begin(), src->end(), back_inserter(*dest));
     newSound->setMono(sound->isMono());
@@ -1114,37 +1108,37 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
         programs[destIndex].reset();
     }
 
-    auto src = programs[sourceIndex];
-    auto dest = addProgram(destIndex).lock();
+    const auto src = programs[sourceIndex];
+    const auto dest = addProgram(destIndex).lock();
 
     dest->setMidiProgramChange(dest->getMidiProgramChange());
     dest->setName(src->getName());
 
     for (int i = 0; i < 64; i++)
     {
-        auto copy = src->getNoteParameters(i + 35)->clone(i);
+        const auto copy = src->getNoteParameters(i + 35)->clone(i);
         dest->setNoteParameters(i, copy);
 
-        auto mc1 = dest->getIndivFxMixerChannel(i);
-        auto mc2 = src->getIndivFxMixerChannel(i);
+        const auto mc1 = dest->getIndivFxMixerChannel(i);
+        const auto mc2 = src->getIndivFxMixerChannel(i);
         mc1->setFollowStereo(mc2->isFollowingStereo());
         mc1->setFxPath(mc2->getFxPath());
         mc1->setFxSendLevel(mc2->getFxSendLevel());
         mc1->setOutput(mc2->getOutput());
         mc1->setVolumeIndividualOut(mc2->getVolumeIndividualOut());
 
-        auto mc3 = dest->getStereoMixerChannel(i);
-        auto mc4 = src->getStereoMixerChannel(i);
+        const auto mc3 = dest->getStereoMixerChannel(i);
+        const auto mc4 = src->getStereoMixerChannel(i);
         mc3->setLevel(mc4->getLevel());
         mc3->setPanning(mc4->getPanning());
 
-        auto srcPad = src->getPad(i);
-        auto destPad = dest->getPad(i);
+        const auto srcPad = src->getPad(i);
+        const auto destPad = dest->getPad(i);
         destPad->setNote(srcPad->getNote());
     }
 
-    auto srcSlider = src->getSlider();
-    auto destSlider = dest->getSlider();
+    const auto srcSlider = src->getSlider();
+    const auto destSlider = dest->getSlider();
     destSlider->setAssignNote(srcSlider->getNote());
     destSlider->setAttackHighRange(srcSlider->getAttackHighRange());
     destSlider->setAttackLowRange(srcSlider->getAttackLowRange());

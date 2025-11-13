@@ -4,7 +4,7 @@
 
 #include "Util.hpp"
 #include "file/ByteUtil.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::file::sndreader;
 

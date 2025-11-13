@@ -81,7 +81,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, int notch,
             track = _track;
         }
 
-        if (track->getBus() != 0)
+        if (isMidiBusType(track->getBusType()))
         {
             const auto note = note0 + notch;
 

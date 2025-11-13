@@ -17,7 +17,7 @@
 #include "lcdgui/screens/MixerSetupScreen.hpp"
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include <stdexcept>
 

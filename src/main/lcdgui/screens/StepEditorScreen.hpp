@@ -45,7 +45,7 @@ namespace mpc::lcdgui::screens
         void nextBarEnd();
 
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void left() override;
         void right() override;
         void up() override;
@@ -66,8 +66,8 @@ namespace mpc::lcdgui::screens
         void setViewNotesText() const;
 
         void resetYPosAndYOffset();
-        std::string getActiveColumn();
-        int getActiveRow();
+        std::string getActiveColumn() const;
+        int getActiveRow() const;
         void storeColumnForEventAtActiveRow();
         void restoreColumnForEventAtActiveRow();
         void setSequencerTickPos(const std::function<void()> &tickPosSetter);

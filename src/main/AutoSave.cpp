@@ -15,7 +15,6 @@
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 #include "lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp"
 #include "lcdgui/Screens.hpp"
-#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 
 #include "disk/AllLoader.hpp"
 #include "file/all/AllParser.hpp"
@@ -56,7 +55,8 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             });
     };
 
-    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
+    const auto vmpcAutoSaveScreen =
+        mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 0 &&
         !mpc.isPluginModeEnabled())
     {
@@ -108,8 +108,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
 
         for (const auto &f : availableFiles)
         {
-            auto size = saveTarget->fileSize(f);
-            if (size == 0)
+            if (auto size = saveTarget->fileSize(f); size == 0)
             {
                 continue;
             }
@@ -227,17 +226,17 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         };
 
         setIntProperty("soundIndex.txt",
-                       [&](int v)
+                       [&](const int v)
                        {
                            mpc.getSampler()->setSoundIndex(v);
                        });
         setIntProperty("selectedNote.txt",
-                       [&](int v)
+                       [&](const int v)
                        {
                            mpc.clientEventController->setSelectedNote(v);
                        });
         setIntProperty("selectedPad.txt",
-                       [&](int v)
+                       [&](const int v)
                        {
                            mpc.clientEventController->setSelectedPad(v);
                        });
@@ -291,10 +290,12 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
             mpc.getSampler()->addProgram(0);
         }
 
-        for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
+        for (size_t drumBusIndex = 0;
+             drumBusIndex < Mpc2000XlSpecs::DRUM_BUS_COUNT; ++drumBusIndex)
         {
-            auto d = mpc.getSequencer()->getDrumBus(i);
-            if (!mpc.getSampler()->getProgram(d->getProgram()))
+            if (auto d = mpc.getSequencer()->getDrumBus(
+                    sequencer::drumBusIndexToDrumBusType(drumBusIndex));
+                !mpc.getSampler()->getProgram(d->getProgram()))
             {
                 d->setProgram(0);
             }
@@ -306,7 +307,7 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1 &&
         !mpc.isPluginModeEnabled())
     {
-        auto confirmScreen =
+        const auto confirmScreen =
             mpc.screens->get<ScreenId::VmpcContinuePreviousSessionScreen>();
         confirmScreen->setRestoreAutoSavedStateAction(restoreAction);
         mpc.getLayeredScreen()->openScreenById(
@@ -322,12 +323,12 @@ void AutoSave::restoreAutoSavedState(Mpc &mpc,
         .detach();
 }
 
-void AutoSave::storeAutoSavedState(Mpc &mpc,
-                                   const std::shared_ptr<SaveTarget> saveTarget)
+void AutoSave::storeAutoSavedState(
+    Mpc &mpc, const std::shared_ptr<SaveTarget> &saveTarget)
 {
-    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
-
-    if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
+    if (const auto vmpcAutoSaveScreen =
+            mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
+        vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
         mpc.getLayeredScreen()->getCurrentScreenName() ==
             "vmpc-continue-previous-session")
     {
@@ -351,9 +352,12 @@ void AutoSave::storeAutoSavedState(Mpc &mpc,
         saveTarget->setFileData("focus.txt", {focus.begin(), focus.end()});
         saveTarget->setFileData("currentDir.txt",
                                 {currentDir.begin(), currentDir.end()});
-        saveTarget->setFileData("soundIndex.txt", {(char)soundIndex});
-        saveTarget->setFileData("selectedNote.txt", {(char)selectedNote});
-        saveTarget->setFileData("selectedPad.txt", {(char)selectedPad});
+        saveTarget->setFileData("soundIndex.txt",
+                                {static_cast<char>(soundIndex)});
+        saveTarget->setFileData("selectedNote.txt",
+                                {static_cast<char>(selectedNote)});
+        saveTarget->setFileData("selectedPad.txt",
+                                {static_cast<char>(selectedPad)});
 
         {
             ApsParser apsParser(mpc, "stateinfo");

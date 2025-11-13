@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BusType.hpp"
+#include "IntTypes.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -97,9 +98,10 @@ namespace mpc::sequencer
         void clearPlaceHolder();
         void movePlaceHolderTo(int destIndex);
         std::shared_ptr<Sequence> getPlaceHolder();
-        template <typename T> std::shared_ptr<T> getBus(int busIndex);
-        std::shared_ptr<Bus> getBus(BusType);
-        std::shared_ptr<DrumBus> getDrumBus(int drumBusIndex) const;
+        template <typename T> std::shared_ptr<T> getBus(BusType) const;
+        std::shared_ptr<Bus> getBus(BusType) const;
+        std::shared_ptr<DrumBus> getDrumBus(BusType) const;
+        std::shared_ptr<DrumBus> getDrumBus(DrumBusIndex) const;
         std::function<std::shared_ptr<lcdgui::Screens>()> getScreens;
         const std::function<bool()> isBouncePrepared;
         const std::function<void()> startBouncing;
@@ -152,13 +154,13 @@ namespace mpc::sequencer
 
         std::shared_ptr<Sequence>
         copySequence(const std::shared_ptr<Sequence> &source);
-        void
+        static void
         copySequenceParameters(const std::shared_ptr<Sequence> &source,
-                               const std::shared_ptr<Sequence> &dest) const;
-        void copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
-                                   const std::shared_ptr<Sequence> &dst) const;
-        void copyTrack(const std::shared_ptr<Track> &src,
-                       const std::shared_ptr<Track> &dest) const;
+                               const std::shared_ptr<Sequence> &dest);
+        static void copyTempoChangeEvents(const std::shared_ptr<Sequence> &src,
+                                          const std::shared_ptr<Sequence> &dst);
+        static void copyTrack(const std::shared_ptr<Track> &src,
+                              const std::shared_ptr<Track> &dest);
 
     public:
         static void copyTrackParameters(const std::shared_ptr<Track> &source,

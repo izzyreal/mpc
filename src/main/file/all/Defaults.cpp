@@ -7,7 +7,7 @@
 #include "lcdgui/screens/UserScreen.hpp"
 
 #include "file/ByteUtil.hpp"
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;
@@ -222,7 +222,8 @@ void Defaults::setTrackSettings()
     for (int i = 0; i < 64; i++)
     {
         saveBytes[DEVICES_OFFSET + i] = userScreen->device;
-        saveBytes[BUSSES_OFFSET + i] = userScreen->bus;
+        saveBytes[BUSSES_OFFSET + i] =
+            sequencer::busTypeToIndex(userScreen->busType);
         saveBytes[PGMS_OFFSET + i] = userScreen->pgm;
         saveBytes[TR_VELOS_OFFSET + i] = userScreen->velo;
         saveBytes[TR_STATUS_OFFSET + i] = userScreen->getTrackStatus();

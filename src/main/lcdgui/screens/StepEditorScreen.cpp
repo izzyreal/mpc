@@ -156,9 +156,8 @@ void StepEditorScreen::open()
 
     lastRow = 0;
 
-    const auto track = sequencer->getActiveTrack();
-
-    if (track->getBus() != 0)
+    if (const auto track = sequencer->getActiveTrack();
+        isDrumBusType(track->getBusType()))
     {
         findField("fromnote")->setAlignment(Alignment::None);
     }
@@ -234,9 +233,8 @@ void StepEditorScreen::close()
 
     storeColumnForEventAtActiveRow();
 
-    const auto nextScreen = ls->getCurrentScreenName();
-
-    if (nextScreen != "step-timing-correct" && nextScreen != "insert-event" &&
+    if (const auto nextScreen = ls->getCurrentScreenName();
+        nextScreen != "step-timing-correct" && nextScreen != "insert-event" &&
         nextScreen != "paste-event" && nextScreen != "edit-multiple")
     {
         track->removeDoubles();
@@ -389,7 +387,7 @@ void StepEditorScreen::function(int i)
                     mpc.screens->get<ScreenId::EditMultipleScreen>();
 
                 auto track = sequencer->getActiveTrack();
-                if (noteEvent && track->getBus() != 0)
+                if (noteEvent && isDrumBusType(track->getBusType()))
                 {
                     if (isA)
                     {
@@ -420,7 +418,7 @@ void StepEditorScreen::function(int i)
                     }
                 }
 
-                if (noteEvent && track->getBus() == 0)
+                if (noteEvent && isMidiBusType(track->getBusType()))
                 {
                     if (isA)
                     {
@@ -502,14 +500,14 @@ bool StepEditorScreen::paramIsLetter(const std::string &letter) const
     return ls->getFocusedFieldName().find(letter) != std::string::npos;
 }
 
-void StepEditorScreen::turnWheel(int i)
+void StepEditorScreen::turnWheel(const int increment)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
     const auto track = sequencer->getActiveTrack();
 
     if (focusedFieldName == "view")
     {
-        setView(view + i);
+        setView(view + increment);
     }
     else if (focusedFieldName == "now0")
     {
@@ -517,7 +515,8 @@ void StepEditorScreen::turnWheel(int i)
             [&]
             {
                 sequencer->getTransport()->setBar(
-                    sequencer->getTransport()->getCurrentBarIndex() + i);
+                    sequencer->getTransport()->getCurrentBarIndex() +
+                    increment);
             });
     }
     else if (focusedFieldName == "now1")
@@ -526,7 +525,8 @@ void StepEditorScreen::turnWheel(int i)
             [&]
             {
                 sequencer->getTransport()->setBeat(
-                    sequencer->getTransport()->getCurrentBeatIndex() + i);
+                    sequencer->getTransport()->getCurrentBeatIndex() +
+                    increment);
             });
     }
     else if (focusedFieldName == "now2")
@@ -535,33 +535,35 @@ void StepEditorScreen::turnWheel(int i)
             [&]
             {
                 sequencer->getTransport()->setClock(
-                    sequencer->getTransport()->getCurrentClockNumber() + i);
+                    sequencer->getTransport()->getCurrentClockNumber() +
+                    increment);
             });
     }
     else if (focusedFieldName == "tcvalue")
     {
         const auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
         const auto noteValue = screen->getNoteValue();
-        screen->setNoteValue(noteValue + i);
+        screen->setNoteValue(noteValue + increment);
     }
     else if (focusedFieldName == "fromnote" && view == 1)
     {
-        if (track->getBus() != 0)
+        if (isDrumBusType(track->getBusType()))
         {
-            setFromNote(fromNote + i);
+            setFromNote(fromNote + increment);
         }
-        if (track->getBus() == 0)
+        else
         {
-            setNoteA(noteA + i);
+            assert(isMidiBusType(track->getBusType()));
+            setNoteA(noteA + increment);
         }
     }
     else if (focusedFieldName == "tonote")
     {
-        setNoteB(noteB + i);
+        setNoteB(noteB + increment);
     }
     else if (focusedFieldName == "fromnote" && view == 3)
     {
-        setControl(control + i);
+        setControl(control + increment);
     }
     else if (focusedFieldName.length() == 2)
     {
@@ -573,11 +575,11 @@ void StepEditorScreen::turnWheel(int i)
         {
             if (paramIsLetter("a"))
             {
-                sysEx->setByteA(sysEx->getByteA() + i);
+                sysEx->setByteA(sysEx->getByteA() + increment);
             }
             else if (paramIsLetter("b"))
             {
-                sysEx->setByteB(sysEx->getByteB() + i);
+                sysEx->setByteB(sysEx->getByteB() + increment);
             }
         }
         else if (const auto channelPressure =
@@ -586,7 +588,8 @@ void StepEditorScreen::turnWheel(int i)
         {
             if (paramIsLetter("a"))
             {
-                channelPressure->setAmount(channelPressure->getAmount() + i);
+                channelPressure->setAmount(channelPressure->getAmount() +
+                                           increment);
             }
         }
         else if (const auto polyPressure =
@@ -595,11 +598,11 @@ void StepEditorScreen::turnWheel(int i)
         {
             if (paramIsLetter("a"))
             {
-                polyPressure->setNote(polyPressure->getNote() + i);
+                polyPressure->setNote(polyPressure->getNote() + increment);
             }
             else if (paramIsLetter("b"))
             {
-                polyPressure->setAmount(polyPressure->getAmount() + i);
+                polyPressure->setAmount(polyPressure->getAmount() + increment);
             }
         }
         else if (const auto controlChange =
@@ -609,11 +612,12 @@ void StepEditorScreen::turnWheel(int i)
             if (paramIsLetter("a"))
             {
                 controlChange->setController(controlChange->getController() +
-                                             i);
+                                             increment);
             }
             else if (paramIsLetter("b"))
             {
-                controlChange->setAmount(controlChange->getAmount() + i);
+                controlChange->setAmount(controlChange->getAmount() +
+                                         increment);
             }
         }
         else if (const auto programChange =
@@ -622,7 +626,8 @@ void StepEditorScreen::turnWheel(int i)
         {
             if (paramIsLetter("a"))
             {
-                programChange->setProgram(programChange->getProgram() + i);
+                programChange->setProgram(programChange->getProgram() +
+                                          increment);
             }
         }
         else if (const auto pitchBend =
@@ -631,7 +636,7 @@ void StepEditorScreen::turnWheel(int i)
         {
             if (paramIsLetter("a"))
             {
-                pitchBend->setAmount(pitchBend->getAmount() + i);
+                pitchBend->setAmount(pitchBend->getAmount() + increment);
             }
         }
         else if (const auto mixer = std::dynamic_pointer_cast<MixerEvent>(
@@ -639,39 +644,39 @@ void StepEditorScreen::turnWheel(int i)
         {
             if (paramIsLetter("a"))
             {
-                mixer->setParameter(mixer->getParameter() + i);
+                mixer->setParameter(mixer->getParameter() + increment);
             }
             else if (paramIsLetter("b"))
             {
-                mixer->setPadNumber(mixer->getPad() + i);
+                mixer->setPadNumber(mixer->getPad() + increment);
             }
             else if (paramIsLetter("c"))
             {
-                mixer->setValue(mixer->getValue() + i);
+                mixer->setValue(mixer->getValue() + increment);
             }
         }
         else if (const auto note = std::dynamic_pointer_cast<NoteOnEvent>(
                      visibleEvents[eventNumber]);
-                 track->getBus() == 0 && note)
+                 isDrumBusType(track->getBusType()) && note)
         {
             if (paramIsLetter("a"))
             {
-                note->setNote(note->getNote() + i);
+                note->setNote(note->getNote() + increment);
             }
             else if (paramIsLetter("b"))
             {
-                note->setDuration(note->getDuration() + i);
+                note->setDuration(note->getDuration() + increment);
             }
             else if (paramIsLetter("c"))
             {
-                note->setVelocity(note->getVelocity() + i);
+                note->setVelocity(note->getVelocity() + increment);
             }
         }
-        else if (note && track->getBus() != 0)
+        else if (note && isMidiBusType(track->getBusType()))
         {
             if (paramIsLetter("a"))
             {
-                if (note->getNote() + i > 98)
+                if (note->getNote() + increment > 98)
                 {
                     if (note->getNote() != 98)
                     {
@@ -680,7 +685,7 @@ void StepEditorScreen::turnWheel(int i)
 
                     return;
                 }
-                if (note->getNote() + i < 35)
+                if (note->getNote() + increment < 35)
                 {
                     if (note->getNote() != 35)
                     {
@@ -700,23 +705,23 @@ void StepEditorScreen::turnWheel(int i)
                     return;
                 }
 
-                note->setNote(note->getNote() + i);
+                note->setNote(note->getNote() + increment);
             }
             else if (paramIsLetter("b"))
             {
-                note->incrementVariationType(i);
+                note->incrementVariationType(increment);
             }
             else if (paramIsLetter("c"))
             {
-                note->setVariationValue(note->getVariationValue() + i);
+                note->setVariationValue(note->getVariationValue() + increment);
             }
             else if (paramIsLetter("d"))
             {
-                note->setDuration(note->getDuration() + i);
+                note->setDuration(note->getDuration() + increment);
             }
             else if (paramIsLetter("e"))
             {
-                note->setVelocity(note->getVelocity() + i);
+                note->setVelocity(note->getVelocity() + increment);
             }
         }
     }
@@ -809,9 +814,8 @@ void StepEditorScreen::nextBarEnd()
 
 void StepEditorScreen::left()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.length() == 2 && getActiveColumn() == "a")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.length() == 2 && getActiveColumn() == "a")
     {
         lastRow = getActiveRow();
         ls->setFocus("view");
@@ -834,9 +838,8 @@ void StepEditorScreen::right()
 
 void StepEditorScreen::up()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.length() == 2)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.length() == 2)
     {
         const auto srcLetter = focusedFieldName.substr(0, 1);
         const int srcNumber = stoi(focusedFieldName.substr(1, 1));
@@ -909,9 +912,9 @@ void StepEditorScreen::down()
     if (focusedFieldName.length() == 2)
     {
         const auto srcLetter = focusedFieldName.substr(0, 1);
-        const int srcNumber = stoi(focusedFieldName.substr(1, 1));
 
-        if (srcNumber == 3)
+        if (const int srcNumber = stoi(focusedFieldName.substr(1, 1));
+            srcNumber == 3)
         {
             if (yOffset + 4 == eventsAtCurrentTick.size())
             {
@@ -946,29 +949,26 @@ void StepEditorScreen::down()
 
 void StepEditorScreen::shift()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.length() == 2)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.length() == 2)
     {
         const auto eventNumber = getActiveRow();
         setSelectionStartIndex(eventNumber + yOffset);
     }
 }
 
-void StepEditorScreen::downOrUp(int increment)
+void StepEditorScreen::downOrUp(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.length() == 2)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.length() == 2)
     {
         const auto srcLetter = focusedFieldName.substr(0, 1);
         const int srcNumber = stoi(focusedFieldName.substr(1, 1));
 
         if (srcNumber + increment != -1)
         {
-            const auto visibleEvents = computeVisibleEvents();
-
-            if (visibleEvents[srcNumber + increment])
+            if (const auto visibleEvents = computeVisibleEvents();
+                visibleEvents[srcNumber + increment])
             {
                 const auto oldEventType =
                     visibleEvents[srcNumber]->getTypeName();
@@ -1086,13 +1086,13 @@ StepEditorScreen::computeEventsAtCurrentTick() const
             {
                 auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-                if (track->getBus() != 0)
+                if (isMidiBusType(track->getBusType()))
                 {
                     if (fromNote == 34 || view == 0)
                     {
                         result.push_back(ne);
                     }
-                    else if (fromNote != 34 && fromNote == ne->getNote())
+                    else if (/*fromNote != 34 &&*/ fromNote == ne->getNote())
                     {
                         result.push_back(ne);
                     }
@@ -1171,7 +1171,7 @@ void StepEditorScreen::refreshEventRows()
         if (event)
         {
             eventRow->Hide(false);
-            eventRow->setBus(sequencer->getActiveTrack()->getBus());
+            eventRow->setBus(sequencer->getActiveTrack()->getBusType());
         }
         else
         {
@@ -1185,9 +1185,8 @@ void StepEditorScreen::refreshEventRows()
 
 void StepEditorScreen::updateComponents() const
 {
-    const auto track = sequencer->getActiveTrack();
-
-    if (view == 1 && track->getBus() != 0)
+    if (const auto track = sequencer->getActiveTrack();
+        view == 1 && isMidiBusType(track->getBusType()))
     {
         findField("fromnote")->Hide(false);
         findField("fromnote")->setSize(37, 9);
@@ -1195,7 +1194,7 @@ void StepEditorScreen::updateComponents() const
         findLabel("tonote")->Hide(true);
         findField("tonote")->Hide(true);
     }
-    else if (view == 1 && track->getBus() == 0)
+    else if (view == 1 && isDrumBusType(track->getBusType()))
     {
         findField("fromnote")->Hide(false);
         findField("fromnote")->setLocation(61, 0);
@@ -1225,9 +1224,8 @@ void StepEditorScreen::updateComponents() const
 
 void StepEditorScreen::setViewNotesText() const
 {
-    const auto track = sequencer->getActiveTrack();
-
-    if (view == 1 && track->getBus() != 0)
+    if (const auto track = sequencer->getActiveTrack();
+        view == 1 && isMidiBusType(track->getBusType()))
     {
         if (fromNote == 34)
         {
@@ -1242,7 +1240,7 @@ void StepEditorScreen::setViewNotesText() const
                 ->setText(std::to_string(fromNote) + "/" + padName);
         }
     }
-    else if (view == 1 && track->getBus() == 0)
+    else if (view == 1 && isDrumBusType(track->getBusType()))
     {
         findField("fromnote")
             ->setText(StrUtil::padLeft(std::to_string(noteA), " ", 3) + "(" +
@@ -1270,7 +1268,7 @@ void StepEditorScreen::setViewNotesText() const
     findField("view")->setSize(newWidth, 9);
 }
 
-void StepEditorScreen::setView(int i)
+void StepEditorScreen::setView(const int i)
 {
     view = std::clamp(i, 0, 7);
 
@@ -1281,7 +1279,7 @@ void StepEditorScreen::setView(int i)
     findChild<Rectangle>()->SetDirty();
 }
 
-void StepEditorScreen::setNoteA(int i)
+void StepEditorScreen::setNoteA(const int i)
 {
     noteA = std::clamp(i, 0, 127);
 
@@ -1295,7 +1293,7 @@ void StepEditorScreen::setNoteA(int i)
     refreshSelection();
 }
 
-void StepEditorScreen::setNoteB(int i)
+void StepEditorScreen::setNoteB(const int i)
 {
     noteB = std::clamp(i, 0, 127);
 
@@ -1309,7 +1307,7 @@ void StepEditorScreen::setNoteB(int i)
     refreshSelection();
 }
 
-void StepEditorScreen::setControl(int i)
+void StepEditorScreen::setControl(const int i)
 {
     control = std::clamp(i, -1, 127);
 
@@ -1331,7 +1329,7 @@ void StepEditorScreen::setyOffset(int i)
     refreshSelection();
 }
 
-void StepEditorScreen::setFromNote(int i)
+void StepEditorScreen::setFromNote(const int i)
 {
     fromNote = std::clamp(i, 34, 98);
 
@@ -1343,11 +1341,10 @@ void StepEditorScreen::setFromNote(int i)
     refreshSelection();
 }
 
-void StepEditorScreen::setSelectionStartIndex(int i)
+void StepEditorScreen::setSelectionStartIndex(const int i)
 {
-    const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
-
-    if (std::dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i]))
+    if (const auto eventsAtCurrentTick = computeEventsAtCurrentTick();
+        std::dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i]))
     {
         return;
     }
@@ -1454,8 +1451,8 @@ void StepEditorScreen::removeEvents()
     {
         if (i >= firstEventIndex && i <= lastEventIndex)
         {
-            auto event = eventsAtCurrentTick[i];
-            if (!std::dynamic_pointer_cast<EmptyEvent>(event))
+            if (auto event = eventsAtCurrentTick[i];
+                !std::dynamic_pointer_cast<EmptyEvent>(event))
             {
                 const auto track = sequencer->getActiveTrack();
                 track->removeEvent(event);
@@ -1517,7 +1514,7 @@ void StepEditorScreen::resetYPosAndYOffset()
     ls->setFocus("a0");
 }
 
-std::string StepEditorScreen::getActiveColumn()
+std::string StepEditorScreen::getActiveColumn() const
 {
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -1530,9 +1527,8 @@ std::string StepEditorScreen::getActiveColumn()
     return focusedFieldName.substr(0, 1);
 }
 
-int StepEditorScreen::getActiveRow()
+int StepEditorScreen::getActiveRow() const
 {
-
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
     if (focusedFieldName.length() != 2)

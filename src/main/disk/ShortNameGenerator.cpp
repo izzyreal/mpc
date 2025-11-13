@@ -2,7 +2,7 @@
 
 #include "ShortName.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include <algorithm>
 

@@ -32,10 +32,10 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
     }
 
     auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, path);
-    auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
+    const auto userScreen = mpc.screens->get<ScreenId::UserScreen>();
 
     userScreen->lastBar = defaults.getBarCount() - 1;
-    userScreen->bus = defaults.getBusses()[0];
+    userScreen->busType = sequencer::busIndexToBusType(defaults.getBusses()[0]);
 
     for (int i = 0; i < 33; i++)
     {
@@ -43,7 +43,7 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
     }
 
     userScreen->setSequenceName(defaults.getDefaultSeqName());
-    auto defTrackNames = defaults.getDefaultTrackNames();
+    const auto defTrackNames = defaults.getDefaultTrackNames();
 
     for (int i = 0; i < 64; i++)
     {
@@ -63,41 +63,43 @@ void NvRam::loadUserScreenValues(Mpc &mpc)
 void NvRam::saveUserScreenValues(Mpc &mpc)
 {
     DefaultsParser dp(mpc);
-    auto path = mpc.paths->configPath() / "nvram.vmp";
+    const auto path = mpc.paths->configPath() / "nvram.vmp";
     set_file_data(path, dp.getBytes());
 }
 
 void NvRam::saveVmpcSettings(Mpc &mpc)
 {
-    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
-    auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
+    const auto vmpcSettingsScreen =
+        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    const auto vmpcAutoSaveScreen =
+        mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
+    const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
-    auto engineHost = mpc.getEngineHost();
-    auto path = mpc.paths->configPath() / "vmpc-specific.ini";
+    const auto engineHost = mpc.getEngineHost();
+    const auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
-    std::vector<char> bytes{
-        (char)vmpcSettingsScreen->initialPadMapping,
-        (char)vmpcSettingsScreen->_16LevelsEraseMode,
-        (char)vmpcAutoSaveScreen->autoSaveOnExit,
-        (char)vmpcAutoSaveScreen->autoLoadOnStart,
-        (char)engineHost->getRecordLevel(),
-        (char)engineHost->getMainLevel(),
-        (char)mpc.getHardware()->getSlider()->getValue(),
-        (char)vmpcSettingsScreen->autoConvertWavs,
+    const std::vector<char> bytes{
+        static_cast<char>(vmpcSettingsScreen->initialPadMapping),
+        static_cast<char>(vmpcSettingsScreen->_16LevelsEraseMode),
+        static_cast<char>(vmpcAutoSaveScreen->autoSaveOnExit),
+        static_cast<char>(vmpcAutoSaveScreen->autoLoadOnStart),
+        static_cast<char>(engineHost->getRecordLevel()),
+        static_cast<char>(engineHost->getMainLevel()),
+        static_cast<char>(mpc.getHardware()->getSlider()->getValue()),
+        static_cast<char>(vmpcSettingsScreen->autoConvertWavs),
         0x00, // This was tap averaging, but it does not belong here
-        (char)othersScreen->getContrast(),
-        (char)vmpcSettingsScreen->midiControlMode,
-        (char)vmpcSettingsScreen->nameTypingWithKeyboardEnabled};
+        static_cast<char>(othersScreen->getContrast()),
+        static_cast<char>(vmpcSettingsScreen->midiControlMode),
+        static_cast<char>(vmpcSettingsScreen->nameTypingWithKeyboardEnabled)};
 
     set_file_data(path, bytes);
 }
 
 void NvRam::loadVmpcSettings(Mpc &mpc)
 {
-    auto engineHost = mpc.getEngineHost();
+    const auto engineHost = mpc.getEngineHost();
 
-    auto path = mpc.paths->configPath() / "vmpc-specific.ini";
+    const auto path = mpc.paths->configPath() / "vmpc-specific.ini";
 
     if (!fs::exists(path))
     {
@@ -108,9 +110,11 @@ void NvRam::loadVmpcSettings(Mpc &mpc)
         return;
     }
 
-    auto vmpcSettingsScreen = mpc.screens->get<ScreenId::VmpcSettingsScreen>();
-    auto vmpcAutoSaveScreen = mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
-    auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
+    const auto vmpcSettingsScreen =
+        mpc.screens->get<ScreenId::VmpcSettingsScreen>();
+    const auto vmpcAutoSaveScreen =
+        mpc.screens->get<ScreenId::VmpcAutoSaveScreen>();
+    const auto othersScreen = mpc.screens->get<ScreenId::OthersScreen>();
 
     const auto bytes = get_file_data(path);
 

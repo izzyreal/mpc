@@ -293,7 +293,7 @@ void ClientMidiEventController::handleKeyAftertouch(
     const auto pressure = e.getAftertouchValue();
     const auto note = e.getAftertouchNote();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer->getBus<Bus>(track->getBus());
+    const auto bus = sequencer->getBus<Bus>(track->getBusType());
     eventRegistry->registerNoteAftertouch(Source::MidiInput, note, pressure,
                                           e.getChannel());
 
@@ -314,7 +314,7 @@ void ClientMidiEventController::handleChannelAftertouch(
 {
     const auto pressure = e.getChannelPressure();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer->getBus<Bus>(track->getBus());
+    const auto bus = sequencer->getBus<Bus>(track->getBusType());
 
     for (auto &p : sampler->getPrograms())
     {
@@ -535,8 +535,8 @@ ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
 {
     if (sequencer->isRecordingModeMulti())
     {
-        const auto mrsLines = multiRecordingSetupScreen->getMrsLines();
-        if (e.getChannel() < static_cast<int>(mrsLines.size()))
+        if (const auto mrsLines = multiRecordingSetupScreen->getMrsLines();
+            e.getChannel() < static_cast<int>(mrsLines.size()))
         {
             return mrsLines[e.getChannel()]->getTrack();
         }
@@ -562,9 +562,9 @@ ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
 std::shared_ptr<DrumBus>
 ClientMidiEventController::getDrumBusForEvent(const ClientMidiEvent &e) const
 {
-    if (const auto drumIndex = getDrumIndexForEvent(e); drumIndex)
+    if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
-        return sequencer->getDrumBus(*drumIndex);
+        return sequencer->getDrumBus(*drumBusType);
     }
     return {};
 }
@@ -572,17 +572,17 @@ ClientMidiEventController::getDrumBusForEvent(const ClientMidiEvent &e) const
 std::shared_ptr<Program>
 ClientMidiEventController::getProgramForEvent(const ClientMidiEvent &e) const
 {
-    if (const auto drumIndex = getDrumIndexForEvent(e); drumIndex)
+    if (const auto drumBusType = getDrumBusTypeForEvent(e); drumBusType)
     {
         return sampler->getProgram(
-            sequencer->getDrumBus(*drumIndex)->getProgram());
+            sequencer->getDrumBus(*drumBusType)->getProgram());
     }
 
     return {};
 }
 
-std::optional<int>
-ClientMidiEventController::getDrumIndexForEvent(const ClientMidiEvent &e) const
+std::optional<BusType> ClientMidiEventController::getDrumBusTypeForEvent(
+    const ClientMidiEvent &e) const
 {
     const auto track = getTrackForEvent(e);
     if (!track)
@@ -590,8 +590,9 @@ ClientMidiEventController::getDrumIndexForEvent(const ClientMidiEvent &e) const
         return std::nullopt;
     }
 
-    return track->getBus() > 0 ? std::optional(track->getBus() - 1)
-                               : std::nullopt;
+    return isDrumBusType(track->getBusType())
+               ? std::optional(track->getBusType())
+               : std::nullopt;
 }
 
 bool ClientMidiEventController::shouldProcessEvent(

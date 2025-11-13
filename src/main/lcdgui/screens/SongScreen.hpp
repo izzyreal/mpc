@@ -10,7 +10,6 @@ namespace mpc::lcdgui::screens::window
 {
     class SongWindow;
     class NameScreen;
-    class ConvertSongToSeqScreen;
 } // namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
@@ -26,7 +25,7 @@ namespace mpc::lcdgui::screens
         void left() override;
         void right() override;
         void openWindow() override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void function(int i) override;
 
         void setOffset(int i);
@@ -34,13 +33,12 @@ namespace mpc::lcdgui::screens
         std::string getDefaultSongName();
         int getOffset() const;
         int getActiveSongIndex() const;
+        void setActiveSongIndex(int i);
 
     private:
         int offset = -1;
         int activeSongIndex = 0;
         std::string defaultSongName = "Song";
-
-        void setActiveSongIndex(int i);
 
         void displayTempo() const;
         void displayLoop() const;
@@ -55,6 +53,5 @@ namespace mpc::lcdgui::screens
         friend class DeleteSongScreen;
         friend class CopySongScreen;
         friend class NameScreen;
-        friend class ConvertSongToSeqScreen;
     };
 } // namespace mpc::lcdgui::screens

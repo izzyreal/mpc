@@ -4,7 +4,7 @@
 #include "sequencer/Sequencer.hpp"
 #include "sequencer/Track.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 

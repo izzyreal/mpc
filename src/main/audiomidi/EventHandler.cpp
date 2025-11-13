@@ -50,7 +50,7 @@ EventHandler::EventHandler(Mpc &mpc) : mpc(mpc)
 
 void EventHandler::handleFinalizedDrumNoteOnEvent(
     const std::shared_ptr<NoteOnEvent> &noteOnEvent,
-    const std::shared_ptr<DrumBus> &drumBus, Track *track)
+    const std::shared_ptr<DrumBus> &drumBus, const Track *track)
 {
     const auto sampler = mpc.getSampler();
     const auto programIndex = drumBus->getProgram();
@@ -111,7 +111,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         durationTicks, mpc.getSequencer()->getTransport()->getTempo(),
         audioServer->getSampleRate());
 
-    auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
+    const auto ctx = DrumNoteEventContextBuilder::buildDrumNoteOnContext(
         noteEventIdToUse, drumBus, mpc.getSampler(),
         mpc.getEngineHost()->getMixer(),
         mpc.screens->get<ScreenId::MixerSetupScreen>(),
@@ -143,9 +143,9 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
             noteEventIdToUse, drumBus, &mpc.getEngineHost()->getVoices(), note,
             noteOnEvent->getTick());
 
-    auto noteOffEventFn = [bus = ctx.drum, note = noteOnEvent->getNote(),
-                           programIndex, eventRegistry = mpc.eventRegistry,
-                           programPadIndex, noteOffCtx]
+    auto noteOffEventFn = [note = noteOnEvent->getNote(), programIndex,
+                           eventRegistry = mpc.eventRegistry, programPadIndex,
+                           noteOffCtx]
     {
         constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
 
@@ -186,7 +186,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
                *noteOnEvent->getDuration() >= 0);
 
         if (const auto drumBus =
-                mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+                mpc.getSequencer()->getBus<DrumBus>(track->getBusType());
             drumBus)
         {
             if (isDrumNote(noteOnEvent->getNote()))
@@ -227,7 +227,7 @@ void EventHandler::handleFinalizedEvent(const std::shared_ptr<Event> &event,
         const auto pad = mixerEvent->getPad();
         const auto sampler = mpc.getSampler();
         const auto drumBus =
-            mpc.getSequencer()->getBus<DrumBus>(track->getBus());
+            mpc.getSequencer()->getBus<DrumBus>(track->getBusType());
 
         assert(drumBus);
 
@@ -255,14 +255,14 @@ void EventHandler::handleUnfinalizedNoteOn(
     const std::shared_ptr<NoteOnEvent> &noteOnEvent, Track *track,
     const std::optional<int> trackDevice,
     const std::optional<int> trackVelocityRatio,
-    const std::optional<int> drumIndex)
+    const std::optional<BusType> drumBusType) const
 {
     assert(noteOnEvent);
     assert(!noteOnEvent->isFinalized());
 
-    if (drumIndex.has_value() && isDrumNote(noteOnEvent->getNote()))
+    if (drumBusType.has_value() && isDrumNote(noteOnEvent->getNote()))
     {
-        const auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+        const auto drumBus = mpc.getSequencer()->getDrumBus(*drumBusType);
         assert(drumBus);
         const auto program =
             mpc.getSampler()->getProgram(drumBus->getProgram());
@@ -298,13 +298,14 @@ void EventHandler::handleUnfinalizedNoteOn(
 // Input from physical pad releases
 void EventHandler::handleNoteOffFromUnfinalizedNoteOn(
     const std::shared_ptr<NoteOffEvent> &noteOffEvent, Track *track,
-    const std::optional<int> trackDevice, const std::optional<int> drumIndex)
+    const std::optional<int> trackDevice,
+    const std::optional<DrumBusIndex> drumBusIndex) const
 {
     assert(noteOffEvent);
 
-    if (drumIndex.has_value() && isDrumNote(noteOffEvent->getNote()))
+    if (drumBusIndex.has_value() && isDrumNote(noteOffEvent->getNote()))
     {
-        const auto drumBus = mpc.getSequencer()->getDrumBus(*drumIndex);
+        const auto drumBus = mpc.getSequencer()->getDrumBus(*drumBusIndex);
 
         assert(drumBus);
 

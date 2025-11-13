@@ -14,7 +14,6 @@
 #include "sequencer/SeqUtil.hpp"
 
 #include "lcdgui/screens/UserScreen.hpp"
-#include "lcdgui/screens/SequencerScreen.hpp"
 
 #include "Util.hpp"
 
@@ -30,12 +29,10 @@ EventsScreen::EventsScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void EventsScreen::setNote0(int i)
+void EventsScreen::setNote0(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "note0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "note0")
     {
         WithTimesAndNotes::setNote0(i);
     }
@@ -94,9 +91,9 @@ void EventsScreen::open()
             time1 = 0;
         }
 
-        const auto toSeqLastTick = sequencer->getSequence(toSq)->getLastTick();
-
-        if (start > toSeqLastTick)
+        if (const auto toSeqLastTick =
+                sequencer->getSequence(toSq)->getLastTick();
+            start > toSeqLastTick)
         {
             start = toSeqLastTick;
         }
@@ -111,7 +108,7 @@ void EventsScreen::open()
     displayCopies();
 }
 
-void EventsScreen::function(int i)
+void EventsScreen::function(const int i)
 {
 
     auto fromSequence = sequencer->getActiveSequence();
@@ -196,10 +193,11 @@ void EventsScreen::function(int i)
             openScreenById(ScreenId::SequencerScreen);
         }
         break;
+        default:;
     }
 }
 
-void EventsScreen::turnWheel(int i)
+void EventsScreen::turnWheel(const int i)
 {
     const auto toSequence = sequencer->getSequence(toSq);
 
@@ -209,9 +207,8 @@ void EventsScreen::turnWheel(int i)
         return;
     }
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "start0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "start0")
     {
         setStart(SeqUtil::setBar(SeqUtil::getBar(toSequence.get(), start) + i,
                                  toSequence.get(), start));
@@ -235,9 +232,8 @@ void EventsScreen::turnWheel(int i)
     {
         setFromSq(sequencer->getActiveSequenceIndex() + i);
 
-        const auto fromSeq = sequencer->getActiveSequence();
-
-        if (time1 > fromSeq->getLastTick())
+        if (const auto fromSeq = sequencer->getActiveSequence();
+            time1 > fromSeq->getLastTick())
         {
             setTime1(fromSeq->getLastTick());
         }
@@ -249,9 +245,9 @@ void EventsScreen::turnWheel(int i)
     else if (focusedFieldName == "to-sq")
     {
         setToSq(toSq + i);
-        const auto toSeq = sequencer->getSequence(toSq);
 
-        if (start > toSeq->getLastTick())
+        if (const auto toSeq = sequencer->getSequence(toSq);
+            start > toSeq->getLastTick())
         {
             setStart(toSeq->getLastTick());
         }
@@ -473,22 +469,22 @@ void EventsScreen::displayEdit() const
 
 void EventsScreen::displayNotes()
 {
-
-    if (sequencer->getActiveTrack()->getBus() == 0)
-    {
-        findField("note0")->setSize(47, 9);
-        findField("note1")->Hide(false);
-        findLabel("note1")->Hide(false);
-        findField("note0")->setAlignment(Alignment::Centered, 18);
-        displayMidiNotes();
-    }
-    else
+    if (isDrumBusType(sequencer->getActiveTrack()->getBusType()))
     {
         findField("note0")->setSize(37, 9);
         findField("note1")->Hide(true);
         findLabel("note1")->Hide(true);
         findField("note0")->setAlignment(Alignment::None);
         displayDrumNotes();
+    }
+    else
+    {
+        assert(isMidiBusType(sequencer->getActiveTrack()->getBusType()));
+        findField("note0")->setSize(47, 9);
+        findField("note1")->Hide(false);
+        findLabel("note1")->Hide(false);
+        findField("note0")->setAlignment(Alignment::Centered, 18);
+        displayMidiNotes();
     }
 }
 
@@ -511,7 +507,7 @@ void EventsScreen::displayDrumNotes()
     else
     {
         const auto track = sequencer->getActiveTrack();
-        const auto drumBus = sequencer->getBus<DrumBus>(track->getBus());
+        const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
         assert(drumBus);
         const auto program = sampler->getProgram(drumBus->getProgram());
 
@@ -522,51 +518,51 @@ void EventsScreen::displayDrumNotes()
     }
 }
 
-void EventsScreen::setEdit(int i)
+void EventsScreen::setEdit(const int i)
 {
     editFunctionNumber = std::clamp(i, 0, 3);
     displayEdit();
 }
 
-void EventsScreen::setFromSq(int i) const
+void EventsScreen::setFromSq(const int i) const
 {
     sequencer->setActiveSequenceIndex(i, true);
     displayFromSq();
 }
 
-void EventsScreen::setFromTr(int i) const
+void EventsScreen::setFromTr(const int i) const
 {
     sequencer->setActiveTrackIndex(
         std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX)));
     displayFromTr();
 }
 
-void EventsScreen::setToSq(int i)
+void EventsScreen::setToSq(const int i)
 {
     toSq =
         std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     displayToSq();
 }
 
-void EventsScreen::setToTr(int i)
+void EventsScreen::setToTr(const int i)
 {
     toTr = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_TRACK_INDEX));
     displayToTr();
 }
 
-void EventsScreen::setModeMerge(bool b)
+void EventsScreen::setModeMerge(const bool b)
 {
     modeMerge = b;
     displayMode();
 }
 
-void EventsScreen::setCopies(int i)
+void EventsScreen::setCopies(const int i)
 {
     copies = std::clamp(i, 1, 999);
     displayCopies();
 }
 
-void EventsScreen::setDurationMode(int i)
+void EventsScreen::setDurationMode(const int i)
 {
     durationMode = std::clamp(i, 0, 3);
 
@@ -578,7 +574,7 @@ void EventsScreen::setDurationMode(int i)
     displayMode();
 }
 
-void EventsScreen::setVelocityMode(int i)
+void EventsScreen::setVelocityMode(const int i)
 {
     velocityMode = std::clamp(i, 0, 3);
 
@@ -590,7 +586,7 @@ void EventsScreen::setVelocityMode(int i)
     displayMode();
 }
 
-void EventsScreen::setTransposeAmount(int i)
+void EventsScreen::setTransposeAmount(const int i)
 {
     transposeAmount = std::clamp(i, -12, 12);
     // Field otherwise used for displaying mode is
@@ -598,7 +594,7 @@ void EventsScreen::setTransposeAmount(int i)
     displayMode();
 }
 
-void EventsScreen::setDuration(int i)
+void EventsScreen::setDuration(const int i)
 {
     durationValue = std::clamp(
         i, 1,
@@ -606,7 +602,7 @@ void EventsScreen::setDuration(int i)
     displayCopies();
 }
 
-void EventsScreen::setVelocityValue(int i)
+void EventsScreen::setVelocityValue(const int i)
 {
     velocityValue = std::clamp(i, 1, velocityMode == 2 ? 200 : 127);
 
@@ -615,9 +611,9 @@ void EventsScreen::setVelocityValue(int i)
     displayCopies();
 }
 
-void EventsScreen::setStart(int i)
+void EventsScreen::setStart(const int startTick)
 {
-    start = i;
+    start = startTick;
     displayStart();
 }
 
@@ -642,11 +638,11 @@ void EventsScreen::displayToTr() const
     findField("to-tr")->setTextPadded(toTr + 1);
 }
 
-void EventsScreen::performCopy(int sourceStart, int sourceEnd,
-                               int toSequenceIndex, int destStart,
-                               int toTrackIndex, bool copyModeMerge,
-                               int copyCount, int copyNote0,
-                               int copyNote1) const
+void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
+                               const int toSequenceIndex, const int destStart,
+                               const int toTrackIndex, const bool copyModeMerge,
+                               const int copyCount, const int copyNote0,
+                               const int copyNote1) const
 {
     const auto segLength = sourceEnd - sourceStart;
     const auto sourceTrack = sequencer->getActiveTrack();
@@ -674,8 +670,9 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
     for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
     {
         const auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
-        const auto barLength = toSequence->getBarLengthsInTicks()[i];
-        if (destStart >= firstTickOfBar &&
+
+        if (const auto barLength = toSequence->getBarLengthsInTicks()[i];
+            destStart >= firstTickOfBar &&
             destStart <= firstTickOfBar + barLength)
         {
             destNumerator = toSequence->getNumerator(i);
@@ -688,7 +685,8 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
     const auto minimumRequiredNewSequenceLength = destStart + segLength;
     const auto ticksToAdd =
         minimumRequiredNewSequenceLength - toSequence->getLastTick();
-    const auto barsToAdd = (int)ceil((float)ticksToAdd / destBarLength);
+    const auto barsToAdd =
+        static_cast<int>(ceil(static_cast<float>(ticksToAdd) / destBarLength));
     const auto initialLastBarIndex = toSequence->getLastBarIndex();
     for (int i = 0; i < barsToAdd; i++)
     {
@@ -710,33 +708,31 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd,
         const auto destTrackEvents = destTrack->getEvents();
         for (auto &e : destTrackEvents)
         {
-            const auto tick = e->getTick();
 
-            if (tick >= destOffset && tick < destOffset + segLength * copyCount)
+            if (const auto tick = e->getTick();
+                tick >= destOffset && tick < destOffset + segLength * copyCount)
             {
                 destTrack->removeEvent(e);
             }
         }
     }
 
-    auto sourceTrackEvents = sourceTrack->getEvents();
+    const auto sourceTrackEvents = sourceTrack->getEvents();
 
     for (auto &e : sourceTrackEvents)
     {
-        auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
-
-        if (ne)
+        if (const auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            if (sourceTrack->getBus() == 0)
+            if (isDrumBusType(sourceTrack->getBusType()))
             {
-                if (ne->getNote() < copyNote0 || ne->getNote() > copyNote1)
+                if (copyNote0 != 34 && copyNote0 != ne->getNote())
                 {
                     continue;
                 }
             }
             else
             {
-                if (copyNote0 != 34 && copyNote0 != ne->getNote())
+                if (ne->getNote() < copyNote0 || ne->getNote() > copyNote1)
                 {
                     continue;
                 }

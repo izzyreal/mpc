@@ -12,7 +12,7 @@
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-PushNumPadCommand::PushNumPadCommand(Mpc &mpc, int i) : mpc(mpc), i(i) {}
+PushNumPadCommand::PushNumPadCommand(Mpc &mpc, const int i) : mpc(mpc), i(i) {}
 
 void PushNumPadCommand::execute()
 {
@@ -69,11 +69,13 @@ void PushNumPadCommand::execute()
             }
             case 6:
             {
-                auto newDrum =
-                    mpc.getSequencer()->getActiveTrack()->getBus() - 1;
-                if (newDrum >= 0)
+                const auto newBusType =
+                    mpc.getSequencer()->getActiveTrack()->getBusType() - 1;
+
+                if (sequencer::isDrumBusType(newBusType))
                 {
-                    mpc.screens->get<ScreenId::DrumScreen>()->setDrum(newDrum);
+                    mpc.screens->get<ScreenId::DrumScreen>()->setDrum(
+                        newBusType);
                 }
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::SelectDrumScreen);
@@ -81,12 +83,15 @@ void PushNumPadCommand::execute()
             }
             case 7:
             {
-                auto newDrum =
-                    mpc.getSequencer()->getActiveTrack()->getBus() - 1;
-                if (newDrum >= 0)
+                const auto newDrumBusType =
+                    mpc.getSequencer()->getActiveTrack()->getBusType() - 1;
+
+                if (sequencer::isDrumBusType(newDrumBusType))
                 {
-                    mpc.screens->get<ScreenId::DrumScreen>()->setDrum(newDrum);
+                    mpc.screens->get<ScreenId::DrumScreen>()->setDrum(
+                        newDrumBusType);
                 }
+
                 mpc.getLayeredScreen()->openScreenById(
                     ScreenId::SelectMixerDrumScreen);
                 break;
@@ -109,6 +114,7 @@ void PushNumPadCommand::execute()
                 }
                 break;
             }
+            default:;
         }
 
         return;

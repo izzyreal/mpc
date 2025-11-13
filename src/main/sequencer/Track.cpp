@@ -23,6 +23,7 @@
 #include <concurrentqueue.h>
 
 #include <memory>
+#include <limits>
 
 using namespace mpc::sequencer;
 using namespace mpc::sampler;
@@ -40,7 +41,7 @@ Track::Track(
     const std::function<bool()> &isRecordingModeMulti,
     const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
     const std::function<int()> &getAutoPunchMode,
-    const std::function<std::shared_ptr<Bus>(int)> &getSequencerBus,
+    const std::function<std::shared_ptr<Bus>(BusType)> &getSequencerBus,
     const std::function<bool()> &isEraseButtonPressed,
     const std::function<bool(int, ProgramIndex)> &isProgramPadPressed,
     const std::shared_ptr<Sampler> &sampler,
@@ -81,7 +82,7 @@ void Track::purge()
     on = true;
     eventIndex = 0;
     device = 0;
-    busNumber = 1;
+    busType = BusType::DRUM1;
     bulkNoteOns.reserve(20);
     bulkNoteOffs.reserve(20);
     queuedNoteOnEvents = std::make_shared<
@@ -160,7 +161,7 @@ Track::findRecordingNoteOnEventByNoteNumber(const NoteNumber noteNumber)
     return found;
 }
 
-void Track::move(const int tick, const int oldTick)
+void Track::syncEventIndex(const int tick, const int oldTick)
 {
     if (tick == 0)
     {
@@ -316,63 +317,69 @@ void Track::addEvent(const int tick, const std::shared_ptr<Event> &event,
         event, allowMultipleNoteEventsWithSameNoteOnSameTick);
 }
 
-void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, const int tick,
+void Track::cloneEventIntoTrack(const std::shared_ptr<Event> &src,
+                                const int tick,
                                 const bool allowMultipleNotesOnSameTick)
 {
     std::shared_ptr<Event> clone;
 
-    if (const auto source = std::dynamic_pointer_cast<NoteOnEvent>(src))
+    if (const auto noteOnSrc = std::dynamic_pointer_cast<NoteOnEvent>(src))
     {
-        clone = std::make_shared<NoteOnEvent>(*source);
+        clone = std::make_shared<NoteOnEvent>(*noteOnSrc);
     }
-    else if (const auto source = std::dynamic_pointer_cast<MixerEvent>(src))
+    else if (const auto mixerSrc = std::dynamic_pointer_cast<MixerEvent>(src))
     {
-        clone = std::make_shared<MixerEvent>(*source);
+        clone = std::make_shared<MixerEvent>(*mixerSrc);
     }
-    else if (const auto source =
+    else if (const auto chanPressSrc =
                  std::dynamic_pointer_cast<ChannelPressureEvent>(src))
     {
-        clone = std::make_shared<ChannelPressureEvent>(*source);
+        clone = std::make_shared<ChannelPressureEvent>(*chanPressSrc);
     }
-    else if (const auto source =
+    else if (const auto polyPressSrc =
                  std::dynamic_pointer_cast<PolyPressureEvent>(src))
     {
-        clone = std::make_shared<PolyPressureEvent>(*source);
+        clone = std::make_shared<PolyPressureEvent>(*polyPressSrc);
     }
-    else if (const auto source = std::dynamic_pointer_cast<PitchBendEvent>(src))
+    else if (const auto pitchBendSrc =
+                 std::dynamic_pointer_cast<PitchBendEvent>(src))
     {
-        clone = std::make_shared<PitchBendEvent>(*source);
+        clone = std::make_shared<PitchBendEvent>(*pitchBendSrc);
     }
-    else if (const auto source =
+    else if (const auto tempoSrc =
                  std::dynamic_pointer_cast<TempoChangeEvent>(src))
     {
-        const auto t = std::make_shared<TempoChangeEvent>(*source);
+        const auto t = std::make_shared<TempoChangeEvent>(*tempoSrc);
         t->setParent(parent);
         clone = t;
     }
-    else if (const auto source =
+    else if (const auto ctrlChangeSrc =
                  std::dynamic_pointer_cast<ControlChangeEvent>(src))
     {
-        clone = std::make_shared<ControlChangeEvent>(*source);
+        clone = std::make_shared<ControlChangeEvent>(*ctrlChangeSrc);
     }
-    else if (const auto source =
+    else if (const auto progChangeSrc =
                  std::dynamic_pointer_cast<ProgramChangeEvent>(src))
     {
-        clone = std::make_shared<ProgramChangeEvent>(*source);
+        clone = std::make_shared<ProgramChangeEvent>(*progChangeSrc);
     }
-    else if (const auto source =
+    else if (const auto sysExSrc =
                  std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
     {
-        clone = std::make_shared<SystemExclusiveEvent>(*source);
+        clone = std::make_shared<SystemExclusiveEvent>(*sysExSrc);
     }
-    clone->setTick(tick);
 
-    if (!used)
+    if (clone)
     {
-        setUsed(true);
-    }
+        clone->setTick(tick);
 
-    insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
+        if (!used)
+        {
+            setUsed(true);
+        }
+
+        insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
+    }
 }
 
 void Track::removeEvent(const int i)
@@ -406,12 +413,7 @@ int Track::getVelocityRatio() const
 
 void Track::setProgramChange(const int i)
 {
-    if (i < 0 || i > 128)
-    {
-        return;
-    }
-
-    programChange = i;
+    programChange = std::clamp(i, 0, 128);
 }
 
 int Track::getProgramChange() const
@@ -419,29 +421,19 @@ int Track::getProgramChange() const
     return programChange;
 }
 
-void Track::setBusNumber(const int i)
+void Track::setBusType(const BusType busTypeToUse)
 {
-    if (i < 0 || i > 4)
-    {
-        return;
-    }
-
-    busNumber = i;
+    busType = busTypeToUse;
 }
 
-int Track::getBus() const
+BusType Track::getBusType() const
 {
-    return busNumber;
+    return busType;
 }
 
 void Track::setDeviceIndex(const int i)
 {
-    if (i < 0 || i > 32)
-    {
-        return;
-    }
-
-    device = i;
+    device = std::clamp(i, 0, 32);
 }
 
 int Track::getDeviceIndex() const
@@ -465,7 +457,6 @@ std::string Track::getName()
     {
         return "(Unused)";
     }
-
     return name;
 }
 
@@ -509,9 +500,7 @@ int Track::getCorrectedTickPos() const
             shiftedTick = 0;
         }
 
-        const auto lastTick = parent->getLastTick();
-
-        if (shiftedTick > lastTick)
+        if (const auto lastTick = parent->getLastTick(); shiftedTick > lastTick)
         {
             shiftedTick = lastTick;
         }
@@ -539,9 +528,8 @@ void Track::processRealtimeQueuedEvents()
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
     {
-        const auto noteOff = bulkNoteOffs[noteOffIndex];
-
-        if (noteOff->getTick() == TickUnassignedWhileRecording)
+        if (const auto noteOff = bulkNoteOffs[noteOffIndex];
+            noteOff->getTick() == TickUnassignedWhileRecording)
         {
             noteOff->setTick(pos);
         }
@@ -567,9 +555,8 @@ void Track::processRealtimeQueuedEvents()
 
         for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
         {
-            auto noteOff = bulkNoteOffs[noteOffIndex];
-
-            if (noteOff->getNote() == noteOn->getNote())
+            if (auto noteOff = bulkNoteOffs[noteOffIndex];
+                noteOff->getNote() == noteOn->getNote())
             {
                 auto newTick = noteOff->getTick() + noteOn->wasMoved;
                 if (newTick < 0)
@@ -598,9 +585,9 @@ void Track::processRealtimeQueuedEvents()
                 }
                 noteOn->setDuration(duration);
 
-                const bool wasInserted = insertEventWhileRetainingSort(noteOn);
-
-                if (fixEventIndex && wasInserted)
+                if (const bool wasInserted =
+                        insertEventWhileRetainingSort(noteOn);
+                    fixEventIndex && wasInserted)
                 {
                     eventIndex--;
                 }
@@ -625,7 +612,7 @@ int Track::getNextTick()
     if (eventIndex >= events.size())
     {
         processRealtimeQueuedEvents();
-        return MAX_TICK;
+        return std::numeric_limits<int>::max();
     }
 
     processRealtimeQueuedEvents();
@@ -675,7 +662,7 @@ void Track::playNext()
         note->setTrack(trackIndex);
 
         if (const auto drumBus =
-                std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busNumber));
+                std::dynamic_pointer_cast<DrumBus>(getSequencerBus(busType));
             drumBus && isOverdubbing() && isEraseButtonPressed() &&
             (isActiveTrackIndex || recordingModeIsMulti) && trackIndex < 64 &&
             drumBus)
@@ -869,7 +856,7 @@ void Track::timingCorrect(const int fromBar, const int toBar,
                           const std::shared_ptr<NoteOnEvent> &noteEvent,
                           const int stepLength, const int swingPercentage)
 {
-    auto event = std::dynamic_pointer_cast<Event>(noteEvent);
+    const auto event = std::dynamic_pointer_cast<Event>(noteEvent);
     updateEventTick(event,
                     timingCorrectTick(fromBar, toBar, noteEvent->getTick(),
                                       stepLength, swingPercentage));
@@ -936,9 +923,9 @@ int Track::timingCorrectTick(const int fromBar, const int toBar, int tick,
     for (int i = 0; i <= numberOfSteps; i++)
     {
         const int stepStart = (i - 1) * stepLength + stepLength / 2;
-        const int stepEnd = i * stepLength + stepLength / 2;
 
-        if (tick - currentBarStart >= stepStart &&
+        if (const int stepEnd = i * stepLength + stepLength / 2;
+            tick - currentBarStart >= stepStart &&
             tick - currentBarStart <= stepEnd)
         {
             tick = i * stepLength + currentBarStart;
@@ -972,9 +959,7 @@ void Track::removeDoubles()
 
     for (auto &e : events)
     {
-        auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
-
-        if (ne)
+        if (const auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
             if (lastTick != e->getTick())
             {
@@ -1029,7 +1014,7 @@ void moveEvent(std::vector<t> &v, size_t oldIndex, size_t newIndex)
     }
 }
 
-void Track::updateEventTick(std::shared_ptr<Event> &e, const int newTick)
+void Track::updateEventTick(const std::shared_ptr<Event> &e, const int newTick)
 {
     if (e->getTick() == newTick)
     {
@@ -1077,26 +1062,26 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents() const
 
     for (auto &e : events)
     {
-        auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
-
-        if (ne)
+        if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            noteEvents.push_back(ne);
+            noteEvents.push_back(noteEvent);
         }
     }
 
     return noteEvents;
 }
 
-void Track::shiftTiming(std::shared_ptr<Event> event, const bool later,
-                        int amount, const int lastTick)
+void Track::shiftTiming(const std::shared_ptr<Event> &event, const bool later,
+                        const int amount, const int lastTick)
 {
+    int amountToUse = amount;
+
     if (!later)
     {
-        amount *= -1;
+        amountToUse *= -1;
     }
 
-    int newEventTick = event->getTick() + amount;
+    int newEventTick = event->getTick() + amountToUse;
 
     if (newEventTick < 0)
     {
@@ -1126,9 +1111,8 @@ bool Track::insertEventWhileRetainingSort(
 
     auto tick = event->getTick();
 
-    auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-    if (noteEvent && !allowMultipleNoteEventsWithSameNoteOnSameTick)
+    if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+        noteEvent && !allowMultipleNoteEventsWithSameNoteOnSameTick)
     {
         for (auto &e : events)
         {

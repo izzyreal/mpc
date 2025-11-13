@@ -30,9 +30,9 @@ namespace mpc::lcdgui::screens::window
 
     private:
         void displayFineWave();
-        void displayStart();
-        void displayLngthLabel();
-        void displayPlayX();
+        void displayStart() const;
+        void displayLngthLabel() const;
+        void displayPlayX() const;
 
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};

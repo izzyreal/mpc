@@ -47,7 +47,6 @@ namespace mpc::lcdgui::screens
         static std::vector<std::string> timingCorrectNames;
 
     private:
-        static std::vector<std::string> busNames;
         void displayNow0() const;
         void displayNow1() const;
         void displayNow2() const;

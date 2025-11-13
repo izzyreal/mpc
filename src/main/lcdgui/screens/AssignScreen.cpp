@@ -4,7 +4,7 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sampler.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::lcdgui::screens;
 

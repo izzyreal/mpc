@@ -22,9 +22,8 @@ EraseScreen::EraseScreen(Mpc &mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-    const auto bus = sequencer->getActiveTrack()->getBus();
-
-    if (bus == 0)
+    if (const auto busType = sequencer->getActiveTrack()->getBusType();
+        isMidiBusType(busType))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
         findField("note1")->setAlignment(Alignment::Centered, 18);
@@ -59,9 +58,8 @@ void EraseScreen::turnWheel(const int i)
         return;
     }
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "track")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "track")
     {
         setTrack(track + i);
     }
@@ -77,7 +75,6 @@ void EraseScreen::turnWheel(const int i)
 
 void EraseScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
@@ -87,6 +84,7 @@ void EraseScreen::function(const int i)
             doErase();
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
@@ -150,14 +148,14 @@ void EraseScreen::displayNotes()
         return;
     }
 
-    const auto bus = sequencer->getActiveTrack()->getBus();
+    const auto busType = sequencer->getActiveTrack()->getBusType();
 
     findField("note0")->Hide(false);
     findLabel("note0")->Hide(false);
-    findField("note1")->Hide(bus != 0);
-    findLabel("note1")->Hide(bus != 0);
+    findField("note1")->Hide(isDrumBusType(busType));
+    findLabel("note1")->Hide(isDrumBusType(busType));
 
-    if (bus == 0)
+    if (isMidiBusType(busType))
     {
         findField("note0")->setSize(47, 9);
         findField("note0")->setText(
@@ -211,7 +209,7 @@ void EraseScreen::doErase() const
     const auto firstTrackIndex = track < 0 ? 0 : track;
     const auto lastTrackIndex = track < 0 ? 63 : track;
 
-    const auto midi = sequencer->getActiveTrack()->getBus() == 0;
+    const auto midi = isMidiBusType(sequencer->getActiveTrack()->getBusType());
 
     const auto noteA = note0;
     const auto noteB = midi ? note1 : -1;
@@ -241,9 +239,10 @@ void EraseScreen::doErase() const
                 {
                     if (noteEvent)
                     {
-                        const auto nn = noteEvent->getNote();
-                        if ((midi && nn >= noteA && nn <= noteB) ||
-                            (!midi && (noteA <= 34 || noteA == nn)))
+                        if (const auto noteNumber = noteEvent->getNote();
+                            (midi && noteNumber >= noteA &&
+                             noteNumber <= noteB) ||
+                            (!midi && (noteA <= 34 || noteA == noteNumber)))
                         {
                             seqTrack->removeEvent(eventIndex);
                         }

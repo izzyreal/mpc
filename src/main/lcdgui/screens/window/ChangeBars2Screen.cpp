@@ -3,7 +3,7 @@
 
 #include "sequencer/Sequence.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include "lcdgui/Label.hpp"
 #include "sequencer/Sequencer.hpp"

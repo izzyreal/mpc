@@ -1,7 +1,11 @@
 #pragma once
 
+#include "MpcSpecs.hpp"
+
 #include <cstdint>
 #include <type_traits>
+#include <string>
+#include <cassert>
 
 namespace mpc::sequencer
 {
@@ -14,15 +18,83 @@ namespace mpc::sequencer
         DRUM4 = 4
     };
 
-    constexpr BusType operator+(BusType lhs, int rhs) noexcept
+    inline std::string busTypeToString(const BusType busType) noexcept
+    {
+        switch (busType)
+        {
+            case BusType::MIDI:
+                return "MIDI";
+            case BusType::DRUM1:
+                return "DRUM1";
+            case BusType::DRUM2:
+                return "DRUM2";
+            case BusType::DRUM3:
+                return "DRUM3";
+            case BusType::DRUM4:
+                return "DRUM4";
+            default:
+                return "Unknown";
+        }
+    }
+
+    inline bool isDrumBusType(const BusType busType) noexcept
+    {
+        return busType == BusType::DRUM1 || busType == BusType::DRUM2 ||
+               busType == BusType::DRUM3 || busType == BusType::DRUM4;
+    }
+
+    inline bool isMidiBusType(const BusType busType) noexcept
+    {
+        return busType == BusType::MIDI;
+    }
+
+    inline size_t busTypeToIndex(const BusType busType) noexcept
+    {
+        const auto result = static_cast<size_t>(busType);
+        assert(result <= mpc::Mpc2000XlSpecs::LAST_BUS_INDEX);
+        return result;
+    }
+
+    inline size_t drumBusTypeToDrumIndex(const BusType busType) noexcept
+    {
+        assert(isDrumBusType(busType));
+        return busTypeToIndex(busType) - 1;
+    }
+
+    inline BusType busIndexToBusType(const size_t index) noexcept
+    {
+        assert(index <= mpc::Mpc2000XlSpecs::LAST_BUS_INDEX);
+        return static_cast<BusType>(index);
+    }
+
+    inline BusType drumBusIndexToDrumBusType(const size_t index) noexcept
+    {
+        assert(index <= mpc::Mpc2000XlSpecs::DRUM_BUS_COUNT - 1);
+        return static_cast<BusType>(index + 1);
+    }
+
+    inline BusType drumIndexToDrumBusType(const size_t index) noexcept
+    {
+        assert(index <= Mpc2000XlSpecs::DRUM_BUS_COUNT - 1);
+        return busIndexToBusType(index + 1);
+    }
+
+    constexpr BusType operator+(BusType lhs, const int rhs) noexcept
     {
         using T = std::underlying_type_t<BusType>;
         return static_cast<BusType>(static_cast<T>(lhs) + rhs);
     }
 
-    constexpr BusType operator+(int lhs, BusType rhs) noexcept
+    constexpr BusType operator-(BusType lhs, const int rhs) noexcept
+    {
+        using T = std::underlying_type_t<BusType>;
+        return static_cast<BusType>(static_cast<T>(lhs) - rhs);
+    }
+
+    constexpr BusType operator+(const int lhs, BusType rhs) noexcept
     {
         using T = std::underlying_type_t<BusType>;
         return static_cast<BusType>(lhs + static_cast<T>(rhs));
     }
+
 } // namespace mpc::sequencer

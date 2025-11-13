@@ -25,7 +25,9 @@
 #include "sequencer/SystemExclusiveEvent.hpp"
 #include "sequencer/Bus.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
+
+#include <cassert>
 
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
@@ -168,7 +170,7 @@ EventRow::EventRow(Mpc &mpc, const int rowIndex)
     int x1 = 0;
     int y1 = 11 + rowIndex * 9;
 
-    MRECT parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
+    auto parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
     parameters = addChildT<EventRowParameters>(parametersRect);
 
     for (int i = 4; i >= 0; i--)
@@ -192,7 +194,7 @@ EventRow::EventRow(Mpc &mpc, const int rowIndex)
     x1 = 198;
     w1 = 50;
 
-    MRECT horizontalBarRect = MRECT(x1, y1, x1 + w1, y1 + h1);
+    auto horizontalBarRect = MRECT(x1, y1, x1 + w1, y1 + h1);
     horizontalBar = std::dynamic_pointer_cast<HorizontalBar>(
         addChild(std::make_shared<HorizontalBar>(horizontalBarRect)));
     horizontalBar->Hide(true);
@@ -200,9 +202,9 @@ EventRow::EventRow(Mpc &mpc, const int rowIndex)
     setColors();
 }
 
-void EventRow::setBus(const int newBus)
+void EventRow::setBus(const BusType newBusType)
 {
-    bus = newBus;
+    busType = newBusType;
 }
 
 bool EventRow::isEmptyEvent() const
@@ -214,17 +216,18 @@ void EventRow::init() const
 {
     if (std::dynamic_pointer_cast<NoteOnEvent>(event.lock()))
     {
-        if (bus == 0)
-        {
-            setLabelTexts(midiNoteEventLabels);
-            setSizesAndLocations(midiNoteEventXPos, midiNoteEventSizes);
-            setMidiNoteEventValues();
-        }
-        else
+        if (isDrumBusType(busType))
         {
             setLabelTexts(drumNoteEventLabels);
             setSizesAndLocations(drumNoteEventXPos, drumNoteEventSizes);
             setDrumNoteEventValues();
+        }
+        else
+        {
+            assert(isMidiBusType(busType));
+            setLabelTexts(midiNoteEventLabels);
+            setSizesAndLocations(midiNoteEventXPos, midiNoteEventSizes);
+            setMidiNoteEventValues();
         }
     }
     else if (std::dynamic_pointer_cast<EmptyEvent>(event.lock()))
@@ -461,7 +464,7 @@ void EventRow::setMiscEventValues() const
                 "-" +
                 StrUtil::padLeft(std::to_string(abs(parameterValue)), " ", 4));
         }
-        else if (parameterValue == 0)
+        else
         {
             fields[0]->setText("    0");
         }
@@ -496,9 +499,9 @@ void EventRow::setMixerEventValues() const
     const auto sampler = mpc.getSampler();
     const auto sequencer = mpc.getSequencer();
 
-    const auto drumBus = sequencer->getBus<DrumBus>(bus);
+    const auto drumBus = sequencer->getBus<DrumBus>(busType);
 
-    if (drumBus)
+    if (!drumBus)
     {
         return;
     }
@@ -569,7 +572,7 @@ void EventRow::setDrumNoteEventValues() const
     }
     else
     {
-        if (const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(bus);
+        if (const auto drumBus = mpc.getSequencer()->getBus<DrumBus>(busType);
             drumBus)
         {
             const auto sampler = mpc.getSampler();
@@ -608,7 +611,7 @@ void EventRow::setDrumNoteEventValues() const
                 "-" +
                 StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 3));
         }
-        else if (noteVarValue > 0)
+        else
         {
             fields[2]->setText(
                 "+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));

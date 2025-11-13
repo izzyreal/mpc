@@ -180,17 +180,17 @@ void EditSoundScreen::displayEdit()
     displayVariable();
 }
 
-void EditSoundScreen::displayCreateNewProgram()
+void EditSoundScreen::displayCreateNewProgram() const
 {
     findField("create-new-program")->setText(createNewProgram ? "YES" : "NO");
 }
 
-void EditSoundScreen::displayEndMargin()
+void EditSoundScreen::displayEndMargin() const
 {
     findField("end-margin")->setTextPadded(endMargin);
 }
 
-void EditSoundScreen::displayVariable()
+void EditSoundScreen::displayVariable() const
 {
     if (edit == 2)
     {
@@ -310,9 +310,8 @@ void EditSoundScreen::right()
 
 void EditSoundScreen::openNameScreen()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "new-name" && (edit == 2 || edit == 7))
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "new-name" && (edit == 2 || edit == 7))
     {
         const auto enterAction = [this](const std::string &nameScreenName)
         {
@@ -331,36 +330,36 @@ void EditSoundScreen::openNameScreen()
     }
 }
 
-void EditSoundScreen::turnWheel(const int i)
+void EditSoundScreen::turnWheel(const int increment)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "edit")
     {
-        setEdit(edit + i);
+        setEdit(edit + increment);
     }
     else if (focusedFieldName == "new-name" && edit == 3)
     {
-        setInsertSndNr(insertSoundIndex + i, sampler->getSoundCount());
+        setInsertSndNr(insertSoundIndex + increment, sampler->getSoundCount());
     }
     else if (focusedFieldName == "ratio")
     {
-        setTimeStretchRatio(timeStretchRatio + i);
+        setTimeStretchRatio(timeStretchRatio + increment);
     }
     else if (focusedFieldName == "preset")
     {
-        setTimeStretchPresetNumber(timeStretchPresetIndex + i);
+        setTimeStretchPresetNumber(timeStretchPresetIndex + increment);
     }
     else if (focusedFieldName == "adjust")
     {
-        setTimeStretchAdjust(timeStretchAdjust + i);
+        setTimeStretchAdjust(timeStretchAdjust + increment);
     }
     else if (focusedFieldName == "end-margin")
     {
-        setEndMargin(endMargin + i);
+        setEndMargin(endMargin + increment);
     }
     else if (focusedFieldName == "create-new-program")
     {
-        setCreateNewProgram(i > 0);
+        setCreateNewProgram(increment > 0);
     }
 }
 
@@ -709,7 +708,7 @@ void EditSoundScreen::handleSliceSound() const
 {
     const auto source = sampler->getSound();
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-    const int zoneCount = zoneScreen->numberOfZones;
+    const int zoneCount = zoneScreen->getZoneCount();
 
     for (int i = 0; i < zoneCount; i++)
     {
@@ -739,8 +738,8 @@ void EditSoundScreen::handleSliceSound() const
         noteParams->setSoundIndex(sampler->getSoundCount() - zoneCount + i);
     }
 
-    if (const auto drumBus =
-            sequencer->getBus<DrumBus>(sequencer->getActiveTrack()->getBus()))
+    if (const auto drumBus = sequencer->getBus<DrumBus>(
+            sequencer->getActiveTrack()->getBusType()))
     {
         drumBus->setProgram(sampler->getProgramCount() - 1);
     }
@@ -759,7 +758,7 @@ std::pair<int, int> EditSoundScreen::getStartEndFromContext() const
     else if (returnToScreenName == "zone")
     {
         const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-        const auto zone = zoneScreen->zone;
+        const auto zone = zoneScreen->getSelectedZoneIndex();
         start = zoneScreen->getZoneStart(zone);
         end = zoneScreen->getZoneEnd(zone);
     }

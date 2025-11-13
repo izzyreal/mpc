@@ -13,7 +13,7 @@
 
 #include "lcdgui/LayeredScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include "MpcResourceUtil.hpp"
 
 #include <nlohmann/json.hpp>

@@ -20,17 +20,17 @@ namespace mpc::lcdgui::screens::window
         uint8_t toSequenceIndex = 0;
         uint8_t trackStatus = 0;
 
-        void setFromSong(int8_t);
+        void setFromSong(int8_t) const;
 
         void setToSequenceIndex(int8_t);
 
         void setTrackStatus(int8_t);
 
-        void displayFromSong();
+        void displayFromSong() const;
 
-        void displayToSequence();
+        void displayToSequence() const;
 
-        void displayTrackStatus();
+        void displayTrackStatus() const;
 
         void convertSongToSeq() const;
     };

@@ -12,6 +12,7 @@
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::sequencer;
 
 UserScreen::UserScreen(Mpc &mpc, const int layerIndex)
     : ScreenComponent(mpc, "user", layerIndex)
@@ -32,7 +33,7 @@ void UserScreen::open()
     displayVelo();
 }
 
-void UserScreen::function(int i)
+void UserScreen::function(const int i)
 {
     switch (i)
     {
@@ -51,22 +52,21 @@ void UserScreen::function(int i)
     }
 }
 
-void UserScreen::turnWheel(int i)
+void UserScreen::turnWheel(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldName();
-
-    if (focusedFieldName == "tempo")
+    if (const auto focusedFieldName = getFocusedFieldName();
+        focusedFieldName == "tempo")
     {
-        const double newTempo = tempo + i * 0.1;
+        const double newTempo = tempo + increment * 0.1;
         setTempo(newTempo);
     }
     else if (focusedFieldName == "loop")
     {
-        setLoop(i > 0);
+        setLoop(increment > 0);
     }
     else if (focusedFieldName == "tsig")
     {
-        if (i > 0)
+        if (increment > 0)
         {
             timeSig.increase();
         }
@@ -79,27 +79,27 @@ void UserScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "bars")
     {
-        setLastBar(lastBar + i);
+        setLastBar(lastBar + increment);
     }
     else if (focusedFieldName == "pgm")
     {
-        setPgm(pgm + i);
+        setPgm(pgm + increment);
     }
     else if (focusedFieldName == "recordingmode")
     {
-        setRecordingModeMulti(i > 0);
+        setRecordingModeMulti(increment > 0);
     }
     else if (focusedFieldName == "bus")
     {
-        setBus(bus + i);
+        setBus(busType + increment);
     }
     else if (focusedFieldName == "device")
     {
-        setDeviceNumber(device + i);
+        setDeviceNumber(device + increment);
     }
     else if (focusedFieldName == "velo")
     {
-        setVelo(velo + i);
+        setVelo(velo + increment);
     }
 }
 int UserScreen::getLastBar() const
@@ -148,7 +148,7 @@ void UserScreen::displayRecordingMode() const
 
 void UserScreen::displayBus()
 {
-    findField("bus")->setText(busNames[bus]);
+    findField("bus")->setText(busTypeToString(busType));
     displayDeviceName();
 }
 
@@ -178,8 +178,7 @@ void UserScreen::displayVelo() const
 
 void UserScreen::displayDeviceName()
 {
-
-    if (bus == 0)
+    if (busType == BusType::MIDI)
     {
         if (device != 0)
         {
@@ -196,7 +195,7 @@ void UserScreen::displayDeviceName()
         {
             const auto programName =
                 sampler
-                    ->getProgram(sequencer->getDrumBus(bus - 1)->getProgram())
+                    ->getProgram(sequencer->getDrumBus(busType)->getProgram())
                     ->getName();
             findLabel("devicename")->setText(programName);
         }
@@ -210,7 +209,7 @@ void UserScreen::displayDeviceName()
 void UserScreen::resetPreferences()
 {
     sequenceName = std::string("Sequence");
-    bus = 1;
+    busType = BusType::DRUM1;
     tempo = 120.0;
     velo = 100;
     pgm = 0;
@@ -241,7 +240,7 @@ void UserScreen::resetPreferences()
     }
 }
 
-std::string UserScreen::getDeviceName(int i)
+std::string UserScreen::getDeviceName(const int i)
 {
     return deviceNames[i];
 }
@@ -266,52 +265,52 @@ void UserScreen::setTempo(const double newTempo)
     displayTempo();
 }
 
-void UserScreen::setLoop(bool b)
+void UserScreen::setLoop(const bool b)
 {
     loop = b;
     displayLoop();
 }
 
-void UserScreen::setBus(int i)
+void UserScreen::setBus(const BusType busTypeToUse)
 {
-    bus = std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_BUS_INDEX));
+    busType = busTypeToUse;
     displayBus();
     displayDeviceName();
 }
 
-void UserScreen::setDeviceNumber(int i)
+void UserScreen::setDeviceNumber(const int i)
 {
     device = std::clamp(i, 0, 33);
     displayDeviceNumber();
     displayDeviceName();
 }
 
-void UserScreen::setRecordingModeMulti(bool b)
+void UserScreen::setRecordingModeMulti(const bool b)
 {
     recordingModeMulti = b;
     displayRecordingMode();
 }
 
-void UserScreen::setLastBar(int i)
+void UserScreen::setLastBar(const int i)
 {
     lastBar =
         std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::MAX_LAST_BAR_INDEX));
     displayBars();
 }
 
-void UserScreen::setPgm(int i)
+void UserScreen::setPgm(const int i)
 {
     pgm = std::clamp(i, 0, 128);
     displayPgm();
 }
 
-void UserScreen::setVelo(int i)
+void UserScreen::setVelo(const int i)
 {
     velo = std::clamp(i, 1, 200);
     displayVelo();
 }
 
-std::string UserScreen::getTrackName(int i)
+std::string UserScreen::getTrackName(const int i)
 {
     return trackNames[i];
 }
@@ -322,7 +321,7 @@ int8_t UserScreen::getTrackStatus() const
     return 6;
 }
 
-void UserScreen::setDeviceName(int i, const std::string &s)
+void UserScreen::setDeviceName(const int i, const std::string &s)
 {
     deviceNames[i] = s;
 }
@@ -332,13 +331,13 @@ void UserScreen::setSequenceName(const std::string &name)
     sequenceName = name;
 }
 
-void UserScreen::setTimeSig(int num, int den)
+void UserScreen::setTimeSig(const int num, const int den)
 {
     timeSig.setNumerator(num);
     timeSig.setDenominator(den);
 }
 
-void UserScreen::setTrackName(int i, const std::string &s)
+void UserScreen::setTrackName(const int i, const std::string &s)
 {
     trackNames[i] = s;
 }

@@ -12,7 +12,7 @@
 #include "lcdgui/screens/window/CantFindFileScreen.hpp"
 #include "sampler/Sampler.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include <thread>
 

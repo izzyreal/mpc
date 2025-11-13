@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace mpc::eventregistry
 {
     enum class Source
@@ -13,7 +11,8 @@ namespace mpc::eventregistry
         NoteRepeat
     };
 
-    static std::string sourceToString(Source s)
+    /*
+    static std::string sourceToString(const Source s)
     {
         if (s == Source::VirtualMpcHardware)
         {
@@ -37,4 +36,5 @@ namespace mpc::eventregistry
         }
         return "Unknown";
     }
+    */
 } // namespace mpc::eventregistry

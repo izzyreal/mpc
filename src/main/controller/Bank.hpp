@@ -43,6 +43,7 @@ namespace mpc::controller
                                         Bank bank) noexcept
     {
         using T = std::underlying_type_t<Bank>;
-        return static_cast<T>(bank) * 16 + physicalPadIndex;
+        return static_cast<uint8_t>(
+            static_cast<int>(static_cast<T>(bank)) * 16 + physicalPadIndex);
     }
 } // namespace mpc::controller

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "IntTypes.hpp"
 #include "Observer.hpp"
+#include "sequencer/BusType.hpp"
 
 #include <memory>
 #include <optional>
@@ -40,7 +42,7 @@ namespace mpc::audiomidi
         std::atomic<uint64_t> noteEventId = 1;
 
     public:
-        void handleFinalizedEvent(const std::shared_ptr<Event> &, Track *const);
+        void handleFinalizedEvent(const std::shared_ptr<Event> &, Track *);
 
         // Handles physical pad presses.
         //
@@ -61,11 +63,11 @@ namespace mpc::audiomidi
         //
         // While in any of the other screens, trackIndex and trackDevice must be
         // derived from the active track.
-        void
-        handleUnfinalizedNoteOn(const std::shared_ptr<NoteOnEvent> &, Track *,
-                                const std::optional<int> trackDevice,
-                                const std::optional<int> trackVelocityRatio,
-                                const std::optional<int> drumIndex);
+        void handleUnfinalizedNoteOn(
+            const std::shared_ptr<NoteOnEvent> &, Track *,
+            std::optional<int> trackDevice,
+            std::optional<int> trackVelocityRatio,
+            std::optional<sequencer::BusType> drumBusType) const;
 
         // Handles physical pad releases.
         //
@@ -88,11 +90,7 @@ namespace mpc::audiomidi
         // derived from the active track.
         void handleNoteOffFromUnfinalizedNoteOn(
             const std::shared_ptr<NoteOffEvent> &, Track *,
-            const std::optional<int> trackDevice,
-            const std::optional<int> drumIndex);
-
-        void
-        handleNoteOffFromFinalizedNoteOn(const std::shared_ptr<NoteOffEvent>);
+            std::optional<int> trackDevice, std::optional<DrumBusIndex>) const;
 
         /**
          * Right now we only clear the cache when mpc::Mpc::panic() is invoked.
@@ -120,7 +118,8 @@ namespace mpc::audiomidi
 
         void handleFinalizedDrumNoteOnEvent(
             const std::shared_ptr<NoteOnEvent> &,
-            const std::shared_ptr<sequencer::DrumBus> &, sequencer::Track *);
+            const std::shared_ptr<sequencer::DrumBus> &,
+            const sequencer::Track *);
 
         /**
          * The MPC2000XL supports realtime, non-destructive transposition of

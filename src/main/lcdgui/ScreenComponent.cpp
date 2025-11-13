@@ -78,7 +78,7 @@ const int &ScreenComponent::getLayerIndex() const
     return layer;
 }
 
-std::shared_ptr<Field> ScreenComponent::findFocus()
+std::shared_ptr<Field> ScreenComponent::findFocus() const
 {
     for (auto &field : findFields())
     {
@@ -121,47 +121,26 @@ void ScreenComponent::openWindow()
     mpc.getLayeredScreen()->closeCurrentScreen();
 }
 
-std::optional<int> ScreenComponent::getDrumIndex() const
+std::shared_ptr<Bus> ScreenComponent::getBus() const
 {
     if (screengroups::isSamplerScreen(ls->getCurrentScreen()))
     {
         const auto drumScreen = mpc.screens->get<ScreenId::DrumScreen>();
-        return drumScreen->getDrum();
+        return sequencer->getBus(drumScreen->getDrum());
     }
 
-    if (const int drumIndex =
-            mpc.getSequencer()->getActiveTrack()->getBus() - 1;
-        drumIndex >= 0)
-    {
-        return drumIndex;
-    }
-
-    return std::nullopt;
-}
-
-std::shared_ptr<Bus> ScreenComponent::getBus() const
-{
-    if (const auto drumIndex = getDrumIndex(); drumIndex)
-    {
-        return sequencer->getDrumBus(*drumIndex);
-    }
-
-    // We should check if the real MPC2000XL records notes while we're
-    // in one of the sampler screens (PGM ASSIGN, PGM PARAMS, etc.),
-    // or the MIXER screens, because in those screens, we've explicitly
-    // selected a DRUM bus to work with. It might still record to the
-    // active track, but I'm not sure.
-    return sequencer->getBus<MidiBus>(0);
+    return mpc.getSequencer()->getBus(
+        mpc.getSequencer()->getActiveTrack()->getBusType());
 }
 
 std::shared_ptr<DrumBus> ScreenComponent::getActiveDrumBus() const
 {
-    const auto drumIndex = getDrumIndex();
-    assert(drumIndex);
-    return sequencer->getDrumBus(*drumIndex);
+    auto result = std::dynamic_pointer_cast<DrumBus>(getBus());
+    assert(result);
+    return result;
 }
 
-std::shared_ptr<Field> ScreenComponent::getFocusedField()
+std::shared_ptr<Field> ScreenComponent::getFocusedField() const
 {
     for (auto &f : findFields())
     {
@@ -174,7 +153,7 @@ std::shared_ptr<Field> ScreenComponent::getFocusedField()
     return {};
 }
 
-std::optional<std::string> ScreenComponent::getFocusedFieldName()
+std::optional<std::string> ScreenComponent::getFocusedFieldName() const
 {
     if (const auto f = getFocusedField(); f)
     {
@@ -184,7 +163,7 @@ std::optional<std::string> ScreenComponent::getFocusedFieldName()
     return std::nullopt;
 }
 
-std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow()
+std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow() const
 {
     auto f = getFocusedField();
     if (!f)
@@ -194,12 +173,12 @@ std::shared_ptr<Field> ScreenComponent::getFocusedFieldOrThrow()
     return f;
 }
 
-std::string ScreenComponent::getFocusedFieldNameOrThrow()
+std::string ScreenComponent::getFocusedFieldNameOrThrow() const
 {
     return getFocusedFieldOrThrow()->getName();
 }
 
-bool ScreenComponent::isFocusedFieldName(const std::string &fieldName)
+bool ScreenComponent::isFocusedFieldName(const std::string &fieldName) const
 {
     const auto f = getFocusedField();
 
@@ -212,14 +191,15 @@ bool ScreenComponent::isFocusedFieldName(const std::string &fieldName)
 }
 std::optional<int> ScreenComponent::getProgramIndex() const
 {
-    const auto drumIndex = getDrumIndex();
+    const auto bus = getBus();
+    const auto drumBus = std::dynamic_pointer_cast<DrumBus>(bus);
 
-    if (!drumIndex)
+    if (!drumBus)
     {
         return std::nullopt;
     }
 
-    return sequencer->getDrumBus(*drumIndex)->getProgram();
+    return drumBus->getProgram();
 }
 
 std::shared_ptr<Program> ScreenComponent::getProgram() const
@@ -264,7 +244,7 @@ void ScreenComponent::down()
     PushDownCommand(mpc).execute();
 }
 
-void ScreenComponent::function(int i)
+void ScreenComponent::function(const int i)
 {
     if (i == 3)
     {
@@ -272,7 +252,7 @@ void ScreenComponent::function(int i)
     }
 }
 
-void ScreenComponent::numpad(int i)
+void ScreenComponent::numpad(const int i)
 {
     PushNumPadCommand(mpc, i).execute();
 }

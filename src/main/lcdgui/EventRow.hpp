@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lcdgui/Component.hpp"
+#include "sequencer/BusType.hpp"
 
 #include <memory>
 #include <vector>
@@ -79,13 +80,13 @@ namespace mpc::lcdgui
         std::vector<int> mixerEventXPos{0, 96, 162};
 
         bool selected = false;
-        int bus = -1;
+        sequencer::BusType busType = sequencer::BusType::DRUM1;
         int rowIndex = 0;
 
         bool isEmptyEvent() const;
 
     public:
-        void setBus(int newBus);
+        void setBus(sequencer::BusType);
         void init() const;
         void setEmptyEventValues() const;
         void setSystemExclusiveEventValues() const;

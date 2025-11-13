@@ -27,7 +27,7 @@ void MetronomeSoundScreen::open()
     // There was an issue with previous ALL parsers, which resulted in previous
     // demo data versions to have erroneous ALL files that crashed this screen
     // because of out of range pads. Here we make sure that doesn't
-    // happen anymore. Also the demo data has been fixed, but once the user has
+    // happen anymore. Also, the demo data has been fixed, but once the user has
     // loaded an ALL file, this erroneous setting may have persisted into their
     // files too.
     if (accentPad < 0 || accentPad > 63)
@@ -80,7 +80,7 @@ void MetronomeSoundScreen::displayOutput() const
 
 void MetronomeSoundScreen::displayAccent() const
 {
-    const auto drumBus = sequencer->getBus<DrumBus>(sound);
+    const auto drumBus = sequencer->getBus<DrumBus>(busIndexToBusType(sound));
     const auto program = drumBus->getProgram();
     const auto note =
         sampler->getProgram(program)->getPad(accentPad)->getNote();
@@ -90,7 +90,7 @@ void MetronomeSoundScreen::displayAccent() const
 
 void MetronomeSoundScreen::displayNormal() const
 {
-    const auto drumBus = sequencer->getBus<DrumBus>(sound);
+    const auto drumBus = sequencer->getBus<DrumBus>(busIndexToBusType(sound));
     const auto program = drumBus->getProgram();
     const auto note =
         sampler->getProgram(program)->getPad(normalPad)->getNote();
@@ -207,52 +207,49 @@ void MetronomeSoundScreen::function(const int i)
         case 3:
             openScreenById(ScreenId::CountMetronomeScreen);
             break;
+        default:;
     }
 }
 
-void MetronomeSoundScreen::turnWheel(const int i)
+void MetronomeSoundScreen::turnWheel(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "sound")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "sound")
     {
-        setSound(sound + i);
+        setSound(sound + increment);
     }
     else if (focusedFieldName == "volume")
     {
-        setVolume(volume + i);
+        setVolume(volume + increment);
     }
     else if (focusedFieldName == "output")
     {
-        setOutput(output + i);
+        setOutput(output + increment);
     }
     else if (focusedFieldName == "accent")
     {
-        setAccentPad(accentPad + i);
+        setAccentPad(accentPad + increment);
     }
     else if (focusedFieldName == "normal")
     {
-        setNormalPad(normalPad + i);
+        setNormalPad(normalPad + increment);
     }
     else if (focusedFieldName == "velocity-accent")
     {
-        setAccentVelo(accentVelo + i);
+        setAccentVelo(accentVelo + increment);
     }
     else if (focusedFieldName == "velocity-normal")
     {
-        setNormalVelo(normalVelo + i);
+        setNormalVelo(normalVelo + increment);
     }
 }
 
 void MetronomeSoundScreen::update(Observable *o, const Message message)
 {
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
+    if (const auto msg = std::get<std::string>(message); msg == "note")
     {
-        const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-        if (focusedFieldName == "accent")
+        if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+            focusedFieldName == "accent")
         {
             setAccentPad(mpc.clientEventController->getSelectedPad());
         }

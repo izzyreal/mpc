@@ -16,13 +16,13 @@ NumberOfZonesScreen::NumberOfZonesScreen(Mpc &mpc, const int layerIndex)
 void NumberOfZonesScreen::open()
 {
     const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
-    numberOfZones = zoneScreen->numberOfZones;
+    zoneCount = zoneScreen->getZoneCount();
     displayNumberOfZones();
 }
 
-void NumberOfZonesScreen::displayNumberOfZones()
+void NumberOfZonesScreen::displayNumberOfZones() const
 {
-    findField("number-of-zones")->setTextPadded(numberOfZones);
+    findField("number-of-zones")->setTextPadded(zoneCount);
 }
 
 void NumberOfZonesScreen::function(const int i)
@@ -33,12 +33,15 @@ void NumberOfZonesScreen::function(const int i)
             openScreenById(ScreenId::ZoneScreen);
             break;
         case 4:
+        {
             const auto zoneScreen = mpc.screens->get<ScreenId::ZoneScreen>();
             auto sound = sampler->getSound();
-            zoneScreen->numberOfZones = numberOfZones;
+            zoneScreen->setZoneCount(zoneCount);
             zoneScreen->initZones();
             openScreenById(ScreenId::ZoneScreen);
             break;
+        }
+        default:;
     }
 }
 
@@ -49,12 +52,12 @@ void NumberOfZonesScreen::turnWheel(const int i)
 
     if (focusedFieldName == "number-of-zones")
     {
-        setNumberOfZones(numberOfZones + i);
+        setNumberOfZones(zoneCount + i);
     }
 }
 
 void NumberOfZonesScreen::setNumberOfZones(const int i)
 {
-    numberOfZones = std::clamp(i, 1, 16);
+    zoneCount = std::clamp(i, 1, 16);
     displayNumberOfZones();
 }

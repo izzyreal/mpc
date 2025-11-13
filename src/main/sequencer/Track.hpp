@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
 
 #include <vector>
@@ -22,7 +23,7 @@ namespace mpc::lcdgui
 namespace mpc::sampler
 {
     class Sampler;
-} // namespace mpc::sampler
+}
 
 namespace mpc::audiomidi
 {
@@ -48,7 +49,7 @@ namespace mpc::sequencer
             const std::function<bool()> &isRecordingModeMulti,
             const std::function<std::shared_ptr<Sequence>()> &getActiveSequence,
             const std::function<int()> &getAutoPunchMode,
-            const std::function<std::shared_ptr<Bus>(int)> &getSequencerBus,
+            const std::function<std::shared_ptr<Bus>(BusType)> &getSequencerBus,
             const std::function<bool()> &isEraseButtonPressed,
             const std::function<bool(int programPadIndex, ProgramIndex)>
                 &isProgramPadPressed,
@@ -73,12 +74,12 @@ namespace mpc::sequencer
         int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength,
                               int swingPercentage) const;
 
-        void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later,
-                         int amount, int lastTick);
+        void shiftTiming(const std::shared_ptr<Event> &, bool later, int amount,
+                         int lastTick);
 
         std::string getActualName();
 
-        void move(int tick, int oldTick);
+        void syncEventIndex(int tick, int oldTick);
         void setTrackIndex(int i);
         int getIndex() const;
         void flushNoteCache() const;
@@ -108,7 +109,7 @@ namespace mpc::sequencer
         addEvent(int tick, const std::shared_ptr<Event> &event,
                  bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        void cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick,
+        void cloneEventIntoTrack(const std::shared_ptr<Event> &src, int tick,
                                  bool allowMultipleNotesOnSameTick = false);
 
         void removeEvent(int i);
@@ -118,8 +119,8 @@ namespace mpc::sequencer
         int getVelocityRatio() const;
         void setProgramChange(int i);
         int getProgramChange() const;
-        void setBusNumber(int i);
-        int getBus() const;
+        void setBusType(BusType);
+        BusType getBusType() const;
         void setDeviceIndex(int i);
         int getDeviceIndex() const;
         std::shared_ptr<Event> getEvent(int i);
@@ -151,9 +152,7 @@ namespace mpc::sequencer
             findRecordingNoteOnEventByNoteNumber(NoteNumber);
 
     private:
-        static const int MAX_TICK{2147483647};
-
-        int busNumber = 0;
+        BusType busType = BusType::DRUM1;
         std::string name;
         bool on{false};
         int velocityRatio = 0;
@@ -183,7 +182,7 @@ namespace mpc::sequencer
         std::function<bool()> isRecordingModeMulti;
         std::function<std::shared_ptr<Sequence>()> getActiveSequence;
         std::function<int()> getAutoPunchMode;
-        std::function<std::shared_ptr<Bus>(int)> getSequencerBus;
+        std::function<std::shared_ptr<Bus>(BusType)> getSequencerBus;
         std::function<bool()> isEraseButtonPressed;
         std::function<bool(int programPadIndex, ProgramIndex)>
             isProgramPadPressed;
@@ -201,7 +200,7 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns;
         std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs;
 
-        void updateEventTick(std::shared_ptr<Event> &e, int newTick);
+        void updateEventTick(const std::shared_ptr<Event> &e, int newTick);
         std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note) const;
 
         void processRealtimeQueuedEvents();

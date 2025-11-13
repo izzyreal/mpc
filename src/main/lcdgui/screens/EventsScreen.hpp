@@ -71,6 +71,6 @@ namespace mpc::lcdgui::screens
         void setTransposeAmount(int i);
         void setDuration(int i);
         void setVelocityValue(int i);
-        void setStart(int startTicks);
+        void setStart(int startTick);
     };
 } // namespace mpc::lcdgui::screens

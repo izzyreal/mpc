@@ -8,7 +8,7 @@
 #include "lcdgui/MixerFader.hpp"
 #include "lcdgui/screens/MixerScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;

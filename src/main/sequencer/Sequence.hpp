@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sequencer/BusType.hpp"
 #include "IntTypes.hpp"
 
 #include <vector>
@@ -53,7 +54,7 @@ namespace mpc::sequencer
                  std::function<bool()> isRecordingModeMulti,
                  std::function<std::shared_ptr<Sequence>()> getActiveSequence,
                  std::function<int()> getAutoPunchMode,
-                 std::function<std::shared_ptr<Bus>(int)> getSequencerBus,
+                 std::function<std::shared_ptr<Bus>(BusType)> getBus,
                  std::function<bool()> isEraseButtonPressed,
                  std::function<bool(int programPadIndex, ProgramIndex)>
                      isProgramPadPressed,
@@ -70,7 +71,7 @@ namespace mpc::sequencer
                  std::function<int()> getCurrentBarIndex);
 
         double getInitialTempo() const;
-        void setInitialTempo(const double newInitialTempo);
+        void setInitialTempo(double newInitialTempo);
 
         void setLoopStart(int l);
         int getLoopStart() const;
@@ -113,10 +114,11 @@ namespace mpc::sequencer
         int getNumerator(int i) const;
         std::vector<int> &getBarLengthsInTicks();
         void setBarLengths(const std::vector<int> &);
-        void setNumeratorsAndDenominators(const std::vector<int> &numerators,
-                                          const std::vector<int> &denominators);
-        void deleteBars(int firstBar, int lBar);
-        void insertBars(int numberOfBars, int afterBar);
+        void
+        setNumeratorsAndDenominators(const std::vector<int> &newNumerators,
+                                     const std::vector<int> &newDenominators);
+        void deleteBars(int firstBar, int lastBarToDelete);
+        void insertBars(int barCount, int afterBar);
         void moveTrack(int source, int destination);
         bool isLastLoopBarEnd() const;
 

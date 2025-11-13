@@ -17,6 +17,6 @@ namespace mpc::lcdgui::screens::window
         bool loadReplaceSameSound = false;
 
     private:
-        void displayLoadReplaceSound();
+        void displayLoadReplaceSound() const;
     };
 } // namespace mpc::lcdgui::screens::window

@@ -1,21 +1,9 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
-namespace mpc::lcdgui::screens::window
-{
-    class ZoneStartFineScreen;
-    class ZoneEndFineScreen;
-    class EditSoundScreen;
-} // namespace mpc::lcdgui::screens::window
-
 namespace mpc::sampler
 {
     class Sampler;
-}
-
-namespace mpc::lcdgui::screens::window
-{
-    class NumberOfZonesScreen;
 }
 
 namespace mpc::lcdgui::screens
@@ -39,6 +27,15 @@ namespace mpc::lcdgui::screens
         void setSliderZoneStart(int);
         void setSliderZoneEnd(int);
 
+        void initZones();
+        int getZoneStart(int zoneIndex) const;
+        int getZoneEnd(int zoneIndex) const;
+        int getZoneCount() const;
+        void setZoneCount(int zoneCountToUse);
+        int getSelectedZoneIndex() const;
+        void setZoneStart(int zoneIndex, int start);
+        void setZoneEnd(int zoneIndex, int end);
+
     private:
         void displayWave();
         void displaySnd() const;
@@ -49,23 +46,14 @@ namespace mpc::lcdgui::screens
 
         const std::vector<std::string> playXNames{"ALL", "ZONE", "BEFOR ST",
                                                   "BEFOR TO", "AFTR END"};
-        int numberOfZones = 16;
+        int zoneCount = 16;
         uint32_t numberOfFramesAtLastZoneInitialization = 0;
         std::vector<std::vector<int>> zones;
-        int zone = 0;
+        int selectedZoneIndex = 0;
 
-        void initZones();
-        void setZoneStart(int zoneIndex, int start);
-        int getZoneStart(int zoneIndex) const;
-        void setZoneEnd(int zoneIndex, int end);
-        int getZoneEnd(int zoneIndex) const;
-        void setZone(int i);
+        void setSelectedZoneIndex(int zoneIndexToUse);
         std::vector<int> getZone() const;
 
-        friend class NumberOfZonesScreen;
-        friend class ZoneStartFineScreen;
-        friend class ZoneEndFineScreen;
-        friend class EditSoundScreen;
         friend class sampler::Sampler;
     };
 } // namespace mpc::lcdgui::screens

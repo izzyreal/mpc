@@ -66,7 +66,7 @@ namespace mpc::command::context
         std::shared_ptr<sampler::Program> program;
         int note;
 
-        int drumScreenSelectedDrum;
+        sequencer::BusType drumScreenSelectedDrum;
         bool isSamplerScreen;
 
         sequencer::Track *track;

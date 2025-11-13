@@ -54,7 +54,7 @@ void TriggerLocalNoteOnCommand::execute()
 
             const auto assign16LevelsScreen = ctx->assign16LevelsScreen;
 
-            Util::SixteenLevelsContext sixteenLevelsContext{
+            const Util::SixteenLevelsContext sixteenLevelsContext{
                 is16LevelsEnabled,
                 assign16LevelsScreen->getType(),
                 assign16LevelsScreen->getOriginalKeyPad(),
@@ -73,7 +73,7 @@ void TriggerLocalNoteOnCommand::execute()
 
             const auto programSlider = ctx->program->getSlider();
 
-            Util::SliderNoteVariationContext sliderNoteVariationContext{
+            const Util::SliderNoteVariationContext sliderNoteVariationContext{
                 ctx->hardwareSliderValue,
                 programSlider->getNote(),
                 programSlider->getParameter(),
@@ -106,18 +106,19 @@ void TriggerLocalNoteOnCommand::execute()
     }
     else
     {
-        std::optional<int> drumIndex = std::nullopt;
+        std::optional<sequencer::BusType> drumBusType = std::nullopt;
 
-        if (auto drumBus =
+        if (const auto drumBus =
                 std::dynamic_pointer_cast<sequencer::DrumBus>(ctx->bus);
             drumBus)
         {
-            drumIndex = drumBus->getIndex();
+            drumBusType =
+                sequencer::drumBusIndexToDrumBusType(drumBus->getIndex());
         }
 
         ctx->eventHandler->handleUnfinalizedNoteOn(
             noteOnEvent, ctx->track, ctx->track->getDeviceIndex(),
-            ctx->track->getVelocityRatio(), drumIndex);
+            ctx->track->getVelocityRatio(), drumBusType);
     }
 
     std::shared_ptr<sequencer::NoteOnEvent> recordNoteOnEvent;
@@ -127,7 +128,8 @@ void TriggerLocalNoteOnCommand::execute()
         recordNoteOnEvent = ctx->track->recordNoteEventLive(ctx->note, velo);
     }
     else if (ctx->isStepRecording &&
-             (ctx->track->getBus() == 0 || sequencer::isDrumNote(ctx->note)))
+             (sequencer::isMidiBusType(ctx->track->getBusType()) ||
+              sequencer::isDrumNote(ctx->note)))
     {
         recordNoteOnEvent = ctx->track->recordNoteEventNonLive(
             ctx->sequencer->getTransport()->getTickPosition(), ctx->note, velo);
@@ -146,9 +148,10 @@ void TriggerLocalNoteOnCommand::execute()
             ctx->sequencerPlaybackEngine->getMetronomeOnlyTickPosition());
 
         const auto timingCorrectScreen = ctx->timingCorrectScreen;
-        const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
-        if (stepLength != 1)
+        if (const int stepLength =
+                timingCorrectScreen->getNoteValueLengthInTicks();
+            stepLength != 1)
         {
             const int bar =
                 ctx->sequencer->getTransport()->getCurrentBarIndex() + 1;

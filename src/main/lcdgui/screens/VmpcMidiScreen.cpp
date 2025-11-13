@@ -8,7 +8,7 @@
 #include "lcdgui/Label.hpp"
 #include "lcdgui/Field.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;

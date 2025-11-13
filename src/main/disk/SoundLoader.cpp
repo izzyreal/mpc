@@ -9,7 +9,7 @@
 #include "sampler/Sound.hpp"
 #include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 using namespace mpc::sampler;
 using namespace mpc::disk;

@@ -6,7 +6,7 @@
 
 #include "Util.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 
 #include <stdexcept>
 

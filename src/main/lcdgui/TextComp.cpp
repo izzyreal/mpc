@@ -7,7 +7,7 @@
 
 #include "Util.hpp"
 
-#include <StrUtil.hpp>
+#include "StrUtil.hpp"
 #include <utf8_decode.hpp>
 
 #ifdef __linux
