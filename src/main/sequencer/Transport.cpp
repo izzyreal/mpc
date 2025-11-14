@@ -26,7 +26,7 @@ Transport::Transport(
     Sequencer &owner,
     const std::function<std::shared_ptr<SequencerPlaybackEngine>()>
         &getSequencerPlaybackEngine)
-    : sequencer(owner), getSequencerPlaybackEngine(getSequencerPlaybackEngine)
+    : getSequencerPlaybackEngine(getSequencerPlaybackEngine), sequencer(owner)
 {
     const auto userScreen = sequencer.getScreens()->get<ScreenId::UserScreen>();
     tempo = userScreen->getTempo();
@@ -37,7 +37,7 @@ bool Transport::isPlaying() const
     return !metronomeOnlyEnabled && getSequencerPlaybackEngine()->isRunning();
 }
 
-void Transport::play(const bool fromStart)
+void Transport::play(const bool fromStart) const
 {
     sequencer.getStateManager()->enqueue(Play{fromStart});
 }
@@ -128,7 +128,7 @@ void Transport::stop(const StopMode stopMode)
     }
 
     playedStepRepetitions = 0;
-    sequencer.setNextSq(-1);
+    sequencer.setNextSq(NoSequenceIndex);
 
     const auto activeSequence = sequencer.getActiveSequence();
     const auto pos = getTickPosition();
@@ -646,7 +646,7 @@ void Transport::setPosition(const double positionQuarterNotes,
     const auto songSequenceIndex = sequencer.getSongSequenceIndex();
     const bool songMode = sequencer.isSongModeEnabled();
 
-    if (songMode && songSequenceIndex == -1)
+    if (songMode && songSequenceIndex == NoSequenceIndex)
     {
         return;
     }

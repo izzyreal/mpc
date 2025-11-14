@@ -152,17 +152,17 @@ void Sampler::setPreviousScreenName(const std::string &s)
     previousScreenName = s;
 }
 
-std::vector<int> *Sampler::getInitMasterPadAssign()
+std::vector<mpc::DrumNoteNumber> *Sampler::getInitMasterPadAssign()
 {
     return &initMasterPadAssign;
 }
 
-std::vector<int> *Sampler::getMasterPadAssign()
+std::vector<mpc::DrumNoteNumber> *Sampler::getMasterPadAssign()
 {
     return &masterPadAssign;
 }
 
-void Sampler::setMasterPadAssign(const std::vector<int> &v)
+void Sampler::setMasterPadAssign(const std::vector<DrumNoteNumber> &v)
 {
     masterPadAssign = v;
 }
@@ -243,7 +243,8 @@ void Sampler::playMetronome(unsigned int velocity, const int framePos) const
                       : metronomeSoundScreen->getNormalVelo();
     const auto pad = accent ? metronomeSoundScreen->getAccentPad()
                             : metronomeSoundScreen->getNormalPad();
-    const auto note = programs[programIndex]->getNoteFromPad(pad);
+    const auto note =
+        programs[programIndex]->getNoteFromPad(ProgramPadIndex(pad));
     const auto soundNumber =
         programs[programIndex]->getNoteParameters(note)->getSoundIndex();
     mpc.getEngineHost()->getPreviewSoundPlayer()->playSound(soundNumber,
@@ -307,8 +308,9 @@ std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
             {
                 for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
                 {
-                    const auto drumBus = mpc.getSequencer()->getDrumBus(i);
-                    drumBus->setProgram(0);
+                    const auto drumBus =
+                        mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
+                    drumBus->setProgram(ProgramIndex(0));
                 }
             }
             return p;
@@ -418,18 +420,19 @@ void Sampler::repairProgramReferences() const
         const auto drumBus =
             mpc.getSequencer()->getBus<DrumBus>(busIndexToBusType(busIndex));
 
-        if (auto pgm = drumBus->getProgram(); !programs[pgm])
+        if (const auto pgm = drumBus->getProgram(); !programs[pgm])
         {
+            ProgramIndex programIndexToUse = NoProgramIndex;
             for (int programIndex = pgm - 1; programIndex > 0; programIndex--)
             {
                 if (programs[programIndex])
                 {
-                    pgm = programIndex;
+                    programIndexToUse = ProgramIndex(programIndex);
                     break;
                 }
             }
 
-            if (!programs[pgm])
+            if (!programs[programIndexToUse])
             {
                 for (int programIndex = 0;
                      programIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT;
@@ -437,13 +440,13 @@ void Sampler::repairProgramReferences() const
                 {
                     if (programs[programIndex])
                     {
-                        pgm = programIndex;
+                        programIndexToUse = ProgramIndex(programIndex);
                         break;
                     }
                 }
             }
 
-            drumBus->setProgram(pgm);
+            drumBus->setProgram(programIndexToUse);
         }
     }
 }
@@ -1152,7 +1155,8 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
     destSlider->setTuneLowRange(srcSlider->getTuneLowRange());
 }
 
-int Sampler::getUsedProgram(const int startIndex, const bool up) const
+mpc::ProgramIndex Sampler::getUsedProgram(const int startIndex,
+                                          const bool up) const
 {
     auto res = startIndex;
 
@@ -1179,7 +1183,7 @@ int Sampler::getUsedProgram(const int startIndex, const bool up) const
         }
     }
 
-    return res;
+    return ProgramIndex(res);
 }
 
 void Sampler::setPlayX(const int i)

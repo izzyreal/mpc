@@ -26,14 +26,14 @@ void LoadASequenceScreen::open()
         return;
     }
 
-    const sequence_or_error parsedMidFile = mpc.getDisk()->readMid2(midFile);
-
-    if (parsedMidFile.has_value())
+    if (const sequence_or_error parsedMidFile =
+            mpc.getDisk()->readMid2(midFile);
+        parsedMidFile.has_value())
     {
         auto usedSeqs = sequencer->getUsedSequenceIndexes();
         int index;
 
-        for (index = 0; index < 98; index++)
+        for (index = MinSequenceIndex; index <= MaxSequenceIndex; index += 1)
         {
             if (find(begin(usedSeqs), end(usedSeqs), index) == end(usedSeqs))
             {
@@ -41,27 +41,24 @@ void LoadASequenceScreen::open()
             }
         }
 
-        loadInto = index;
+        loadInto = SequenceIndex(index);
         displayFile();
     }
 
     displayLoadInto();
 }
 
-void LoadASequenceScreen::turnWheel(const int i)
+void LoadASequenceScreen::turnWheel(const int increment)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "load-into")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "load-into")
     {
-        setLoadInto(loadInto + i);
+        setLoadInto(loadInto + increment);
     }
 }
 
 void LoadASequenceScreen::function(const int i)
 {
-
     switch (i)
     {
         case 3:
@@ -73,23 +70,24 @@ void LoadASequenceScreen::function(const int i)
             sequencer->setActiveSequenceIndex(loadInto, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
+        default:;
     }
 }
 
-void LoadASequenceScreen::setLoadInto(const int i)
+void LoadASequenceScreen::setLoadInto(const SequenceIndex i)
 {
-    loadInto = std::clamp(i, 0, 98);
+    loadInto = std::clamp(i, MinSequenceIndex, MaxSequenceIndex);
     displayLoadInto();
 }
 
-void LoadASequenceScreen::displayLoadInto()
+void LoadASequenceScreen::displayLoadInto() const
 {
     findField("load-into")->setTextPadded(loadInto + 1, "0");
     findLabel("name")->setText("-" +
                                sequencer->getSequence(loadInto)->getName());
 }
 
-void LoadASequenceScreen::displayFile()
+void LoadASequenceScreen::displayFile() const
 {
     const auto s = sequencer->getPlaceHolder();
     findLabel("file")->setText("File:" + StrUtil::toUpper(s->getName()) +

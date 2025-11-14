@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <vector>
 
 namespace mpc::file::aps
@@ -14,7 +16,7 @@ namespace mpc::file::aps
         std::vector<int> get();
         std::vector<char> getBytes();
 
-        ApsAssignTable(const std::vector<char> &loadBytes);
-        ApsAssignTable(const std::vector<int> &assignTable);
+        explicit ApsAssignTable(const std::vector<char> &loadBytes);
+        ApsAssignTable(const std::vector<DrumNoteNumber> &assignTable);
     };
 } // namespace mpc::file::aps

@@ -92,7 +92,7 @@ namespace mpc::sequencer
         static double ticksToQuarterNotes(uint32_t ticks);
 
         void playToTick(int targetTick) const;
-        int getActiveSequenceIndex() const;
+        SequenceIndex getActiveSequenceIndex() const;
         std::shared_ptr<Track> getActiveTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();
         void clearPlaceHolder();
@@ -126,7 +126,7 @@ namespace mpc::sequencer
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;
-        int activeSequenceIndex = 0;
+        SequenceIndex activeSequenceIndex{0};
 
         std::vector<std::shared_ptr<Sequence>> sequences =
             std::vector<std::shared_ptr<Sequence>>(99);
@@ -150,7 +150,7 @@ namespace mpc::sequencer
 
         std::vector<std::string> defaultTrackNames;
         int activeTrackIndex = 0;
-        int nextSq = -1;
+        SequenceIndex nextSq{NoSequenceIndex};
 
         std::shared_ptr<Sequence>
         copySequence(const std::shared_ptr<Sequence> &source);
@@ -177,7 +177,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
         void setDefaultSequenceName(const std::string &s);
-        void setActiveSequenceIndex(int i, bool shouldSetPositionTo0);
+        void setActiveSequenceIndex(SequenceIndex, bool shouldSetPositionTo0);
         void setTimeDisplayStyle(int i);
         int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);
@@ -187,7 +187,7 @@ namespace mpc::sequencer
         void trackDown();
 
         void undoSeq();
-        void setSequence(int i, std::shared_ptr<Sequence> s);
+        void setSequence(SequenceIndex, std::shared_ptr<Sequence>);
         void purgeAllSequences();
         void purgeSequence(int i);
         void copySequence(int source, int destination);
@@ -212,16 +212,18 @@ namespace mpc::sequencer
 
         std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
         void setActiveTrackIndex(int i);
-        int getCurrentlyPlayingSequenceIndex() const;
-        int getNextSq() const;
-        int getFirstUsedSeqDown(int from, bool unused = false) const;
-        int getFirstUsedSeqUp(int from, bool unused = false) const;
-        void setNextSq(int i);
-        void setNextSqPad(int i);
+        SequenceIndex getCurrentlyPlayingSequenceIndex() const;
+        SequenceIndex getNextSq() const;
+        SequenceIndex getFirstUsedSeqDown(SequenceIndex from,
+                                          bool unused = false) const;
+        SequenceIndex getFirstUsedSeqUp(SequenceIndex from,
+                                        bool unused = false) const;
+        void setNextSq(SequenceIndex);
+        void setNextSqPad(SequenceIndex);
         std::shared_ptr<Song> getSong(int i);
         void deleteSong(int i);
         bool isSongModeEnabled() const;
-        int getSongSequenceIndex() const;
+        SequenceIndex getSongSequenceIndex() const;
         bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);
         void flushTrackNoteCache();

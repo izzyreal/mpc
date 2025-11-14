@@ -33,7 +33,7 @@ namespace mpc
             const bool isSixteenLevelsEnabled;
             const int type;
             const int originalKeyPad;
-            const int note;
+            const DrumNoteNumber note;
             const int parameter;
             const int padIndexWithoutBank;
         };

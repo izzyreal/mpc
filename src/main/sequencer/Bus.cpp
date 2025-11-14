@@ -1,16 +1,15 @@
 #include "Bus.hpp"
 
+#include "IntTypes.hpp"
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
-
-#include "MpcSpecs.hpp"
 
 #include <algorithm>
 
 using namespace mpc::sequencer;
 using namespace mpc::engine;
 
-Bus::Bus(BusType busType) : busType(busType) {}
+Bus::Bus(const BusType busType) : busType(busType) {}
 
 DrumBus::DrumBus(const int drumIndexToUse)
     : Bus(BusType::DRUM1 + drumIndexToUse), drumIndex(drumIndexToUse)
@@ -25,19 +24,17 @@ DrumBus::DrumBus(const int drumIndexToUse)
     }
 }
 
-int DrumBus::getIndex() const
+mpc::DrumBusIndex DrumBus::getIndex() const
 {
     return drumIndex;
 }
 
-void DrumBus::setProgram(const int programIndexToUse)
+void DrumBus::setProgram(const ProgramIndex programIndexToUse)
 {
-    programIndex =
-        std::clamp(programIndexToUse, 0,
-                   static_cast<int>(Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX));
+    programIndex = programIndexToUse;
 }
 
-int DrumBus::getProgram() const
+mpc::ProgramIndex DrumBus::getProgram() const
 {
     return programIndex;
 }

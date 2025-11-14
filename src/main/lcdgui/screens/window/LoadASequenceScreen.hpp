@@ -9,14 +9,14 @@ namespace mpc::lcdgui::screens::window
         LoadASequenceScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void function(int i) override;
 
-        int loadInto = 0;
-        void setLoadInto(int i);
+        SequenceIndex loadInto{MinSequenceIndex};
+        void setLoadInto(SequenceIndex);
 
     private:
-        void displayLoadInto();
-        void displayFile();
+        void displayLoadInto() const;
+        void displayFile() const;
     };
 } // namespace mpc::lcdgui::screens::window

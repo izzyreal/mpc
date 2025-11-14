@@ -12,21 +12,22 @@ namespace mpc::lcdgui::screens
         void function(int i) override;
         void turnWheel(int i) override;
 
-        void setNote0(int i) override;
+        void setNote0(NoteNumber) override;
 
         EventsScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
 
-        void performCopy(int sourceStart, int sourceEnd, int toSequenceIndex,
-                         int destStart, int toTrackIndex, bool copyModeMerge,
-                         int copyCount, int copyNote0, int copyNote1) const;
+        void performCopy(int sourceStart, int sourceEnd,
+                         SequenceIndex toSequenceIndex, int destStart,
+                         int toTrackIndex, bool copyModeMerge, int copyCount,
+                         int copyNote0, int copyNote1) const;
 
-        int toSq = 0;
+        SequenceIndex toSq{MinSequenceIndex};
         int tab = 0;
         int copies = 1;
-        void setFromSq(int i) const;
-        void setToSq(int i);
+        void setFromSq(SequenceIndex) const;
+        void setToSq(SequenceIndex);
 
         const std::vector<std::string> tabNames{"events", "bars", "tr-move",
                                                 "user"};
@@ -59,7 +60,7 @@ namespace mpc::lcdgui::screens
         int velocityMode = 0;
         int transposeAmount = 0;
         int durationValue = 1;
-        int velocityValue = 1;
+        int velocityValue = Velocity(1);
 
         void setEdit(int i);
         void setFromTr(int i) const;

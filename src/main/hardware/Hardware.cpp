@@ -11,9 +11,9 @@ Hardware::Hardware()
         components[id] = buttons[id];
     }
 
-    for (int i = 0; i < 16; ++i)
+    for (uint8_t i = 0; i < 16; ++i)
     {
-        pads.push_back(std::make_shared<Pad>(i));
+        pads.push_back(std::make_shared<Pad>(PhysicalPadIndex(i)));
         components[pads.back()->getId()] = pads.back();
     }
 

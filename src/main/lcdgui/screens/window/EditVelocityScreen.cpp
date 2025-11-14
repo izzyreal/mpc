@@ -21,12 +21,12 @@ EditVelocityScreen::EditVelocityScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void EditVelocityScreen::setNote0(const int i)
+void EditVelocityScreen::setNote0(const NoteNumber noteNumber)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "note0")
     {
-        WithTimesAndNotes::setNote0(i);
+        WithTimesAndNotes::setNote0(noteNumber);
     }
 }
 
@@ -90,7 +90,7 @@ void EditVelocityScreen::function(const int i)
                         }
                         else if (editType == 3)
                         {
-                            ne->setVelocity(value);
+                            ne->setVelocity(Velocity(value));
                         }
                     }
                 }
@@ -151,15 +151,15 @@ void EditVelocityScreen::displayNotes()
     {
         findField("note0")->setSize(37, 9);
 
-        if (note0 == 34)
+        if (note0 == NoDrumNoteAssigned)
         {
             findField("note0")->setText("ALL");
         }
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padName =
-                sampler->getPadName(program->getPadIndexFromNote(note0));
+            const auto padName = sampler->getPadName(
+                program->getPadIndexFromNote(DrumNoteNumber(note0)));
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
 
@@ -176,7 +176,7 @@ void EditVelocityScreen::setEditType(const int i)
 
 void EditVelocityScreen::setValue(const int i)
 {
-    value = std::clamp(i, 1, editType == 2 ? 200 : 127);
+    value = std::clamp(i, 1, editType == 2 ? 200 : MaxVelocity);
     displayValue();
 }
 

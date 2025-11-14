@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         CreateNewProgramScreen(Mpc &mpc, int layerIndex);
 
         void open() override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void openNameScreen() override;
 
     private:

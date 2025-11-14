@@ -676,32 +676,32 @@ void StepEditorScreen::turnWheel(const int increment)
         {
             if (paramIsLetter("a"))
             {
-                if (note->getNote() + increment > 98)
+                if (note->getNote() + increment > MaxDrumNoteNumber)
                 {
-                    if (note->getNote() != 98)
+                    if (note->getNote() != MaxDrumNoteNumber)
                     {
-                        note->setNote(98);
+                        note->setNote(MaxDrumNoteNumber);
                     }
 
                     return;
                 }
-                if (note->getNote() + increment < 35)
+                if (note->getNote() + increment < MinDrumNoteNumber)
                 {
-                    if (note->getNote() != 35)
+                    if (note->getNote() != MinDrumNoteNumber)
                     {
-                        note->setNote(35);
+                        note->setNote(MinDrumNoteNumber);
                     }
 
                     return;
                 }
-                if (note->getNote() < 35)
+                if (note->getNote() < MinDrumNoteNumber)
                 {
-                    note->setNote(35);
+                    note->setNote(MinDrumNoteNumber);
                     return;
                 }
-                if (note->getNote() > 98)
+                if (note->getNote() > MaxDrumNoteNumber)
                 {
-                    note->setNote(98);
+                    note->setNote(MaxDrumNoteNumber);
                     return;
                 }
 
@@ -1088,11 +1088,12 @@ StepEditorScreen::computeEventsAtCurrentTick() const
 
                 if (isMidiBusType(track->getBusType()))
                 {
-                    if (fromNote == 34 || view == 0)
+                    if (fromNote == NoDrumNoteAssigned || view == 0)
                     {
                         result.push_back(ne);
                     }
-                    else if (/*fromNote != 34 &&*/ fromNote == ne->getNote())
+                    else if (/*fromNote != NoDrumNoteAssigned &&*/ fromNote ==
+                             ne->getNote())
                     {
                         result.push_back(ne);
                     }
@@ -1227,7 +1228,7 @@ void StepEditorScreen::setViewNotesText() const
     if (const auto track = sequencer->getActiveTrack();
         view == 1 && isMidiBusType(track->getBusType()))
     {
-        if (fromNote == 34)
+        if (fromNote == NoDrumNoteAssigned)
         {
             findField("fromnote")->setText("ALL");
         }
@@ -1279,9 +1280,9 @@ void StepEditorScreen::setView(const int i)
     findChild<Rectangle>()->SetDirty();
 }
 
-void StepEditorScreen::setNoteA(const int i)
+void StepEditorScreen::setNoteA(const NoteNumber noteNumber)
 {
-    noteA = std::clamp(i, 0, 127);
+    noteA = std::clamp(noteNumber, MinNoteNumber, MaxNoteNumber);
 
     if (noteA > noteB)
     {
@@ -1293,9 +1294,9 @@ void StepEditorScreen::setNoteA(const int i)
     refreshSelection();
 }
 
-void StepEditorScreen::setNoteB(const int i)
+void StepEditorScreen::setNoteB(const NoteNumber noteNumber)
 {
-    noteB = std::clamp(i, 0, 127);
+    noteB = std::clamp(noteNumber, MinNoteNumber, MaxNoteNumber);
 
     if (noteB < noteA)
     {
@@ -1329,9 +1330,9 @@ void StepEditorScreen::setyOffset(int i)
     refreshSelection();
 }
 
-void StepEditorScreen::setFromNote(const int i)
+void StepEditorScreen::setFromNote(const DrumNoteNumber noteNumber)
 {
-    fromNote = std::clamp(i, 34, 98);
+    fromNote = std::clamp(noteNumber, NoDrumNoteAssigned, MaxDrumNoteNumber);
 
     setViewNotesText();
     displayView();

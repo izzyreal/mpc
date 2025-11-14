@@ -52,8 +52,8 @@ namespace mpc::command::context
         std::shared_ptr<eventregistry::EventRegistry> eventRegistry;
         eventregistry::NoteOnEvent registryNoteOnEvent;
         bool isSequencerScreen;
-        std::optional<int> programPadIndex;
-        int velocity;
+        std::optional<ProgramPadIndex> programPadIndex;
+        Velocity velocity;
         bool isFullLevelEnabled;
         bool isSixteenLevelsEnabled;
         bool isNoteRepeatLockedOrPressed;
@@ -64,7 +64,7 @@ namespace mpc::command::context
         std::shared_ptr<sequencer::Bus> bus;
 
         std::shared_ptr<sampler::Program> program;
-        int note;
+        NoteNumber note;
 
         sequencer::BusType drumScreenSelectedDrum;
         bool isSamplerScreen;
@@ -81,8 +81,8 @@ namespace mpc::command::context
 
         bool allowCentralNoteAndPadUpdate;
         std::shared_ptr<lcdgui::ScreenComponent> screenComponent;
-        std::function<void(int)> setSelectedNote;
-        std::function<void(int)> setSelectedPad;
+        std::function<void(DrumNoteNumber)> setSelectedNote;
+        std::function<void(ProgramPadIndex)> setSelectedPad;
 
         int hardwareSliderValue;
     };

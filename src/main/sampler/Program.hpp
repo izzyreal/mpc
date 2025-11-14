@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IntTypes.hpp"
 #include "sampler/NoteParameters.hpp"
 #include "sampler/PgmSlider.hpp"
 
@@ -23,17 +24,19 @@ namespace mpc::sampler
 
     class Program
     {
-
     public:
+        Program(Mpc &mpc, Sampler *samplerToUse);
+        ~Program();
+
         std::shared_ptr<engine::StereoMixer>
         getStereoMixerChannel(int noteIndex) const;
         std::shared_ptr<engine::IndivFxMixer>
         getIndivFxMixerChannel(int noteIndex) const;
 
-        int getPadIndexFromNote(int note) const;
+        ProgramPadIndex getPadIndexFromNote(DrumNoteNumber) const;
 
     private:
-        Sampler *sampler = nullptr;
+        Sampler *const sampler;
         std::string name;
         std::vector<NoteParameters *> noteParameters;
         std::vector<Pad *> pads;
@@ -50,14 +53,13 @@ namespace mpc::sampler
         std::vector<NoteParameters *> getNotesParameters();
         NoteParameters *getNoteParameters(int note) const;
         PgmSlider *getSlider() const;
-        void setNoteParameters(int i, NoteParameters *noteParameters);
+        void setNoteParameters(int noteParametersIndex,
+                               NoteParameters *noteParametersToUse);
         int getMidiProgramChange() const;
         void setMidiProgramChange(int i);
         void initPadAssign() const;
-        int getNoteFromPad(int i) const;
-        std::vector<int> getPadIndicesFromNote(const int note) const;
-
-        Program(Mpc &mpc, Sampler *samplerToUse);
-        ~Program();
+        DrumNoteNumber getNoteFromPad(ProgramPadIndex) const;
+        std::vector<ProgramPadIndex>
+            getPadIndicesFromNote(DrumNoteNumber) const;
     };
 } // namespace mpc::sampler

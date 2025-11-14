@@ -35,10 +35,8 @@ void AssignmentViewScreen::close()
 
 void AssignmentViewScreen::up()
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.find("0") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("0") != std::string::npos)
     {
         return;
     }
@@ -50,10 +48,8 @@ void AssignmentViewScreen::up()
 
 void AssignmentViewScreen::down()
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.find("3") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("3") != std::string::npos)
     {
         return;
     }
@@ -65,9 +61,8 @@ void AssignmentViewScreen::down()
 
 void AssignmentViewScreen::left()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.find("a") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("a") != std::string::npos)
     {
         return;
     }
@@ -81,9 +76,8 @@ void AssignmentViewScreen::left()
 
 void AssignmentViewScreen::right()
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName.find("d") != std::string::npos)
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName.find("d") != std::string::npos)
     {
         return;
     }
@@ -94,12 +88,12 @@ void AssignmentViewScreen::right()
     mpc.clientEventController->setSelectedPad(padIndex);
 }
 
-void AssignmentViewScreen::turnWheel(const int i)
+void AssignmentViewScreen::turnWheel(const int increment)
 {
     const auto program = getProgramOrThrow();
     const auto selectedPad =
         program->getPad(mpc.clientEventController->getSelectedPad());
-    selectedPad->setNote(selectedPad->getNote() + i);
+    selectedPad->setNote(selectedPad->getNote() + increment);
     displayNote();
     displaySoundName();
     displayPad(selectedPad->getIndex() % 16);
@@ -107,9 +101,7 @@ void AssignmentViewScreen::turnWheel(const int i)
 
 void AssignmentViewScreen::update(Observable *o, const Message message)
 {
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "bank")
+    if (const auto msg = std::get<std::string>(message); msg == "bank")
     {
         displayAssignmentView();
     }
@@ -126,9 +118,9 @@ void AssignmentViewScreen::update(Observable *o, const Message message)
     }
 }
 
-void AssignmentViewScreen::displayAssignmentView()
+void AssignmentViewScreen::displayAssignmentView() const
 {
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::PADS_PER_BANK_COUNT; i++)
     {
         displayPad(i);
     }
@@ -147,7 +139,7 @@ void AssignmentViewScreen::displayPad(const int i) const
 
     std::string sampleName;
 
-    if (note != 34)
+    if (note != NoDrumNoteAssigned)
     {
         const auto sampleNumber =
             program->getNoteParameters(note)->getSoundIndex();
@@ -170,22 +162,21 @@ void AssignmentViewScreen::displayBankInfoAndNoteLabel() const
     findLabel("info0")->setText("Bank:" + letters[bank] + " Note:");
 }
 
-void AssignmentViewScreen::displayNote()
+void AssignmentViewScreen::displayNote() const
 {
     const auto program = getProgramOrThrow();
     const auto note = program->getPad(getPadIndexFromFocus())->getNote();
-    const auto text = note == 34 ? "--" : std::to_string(note);
+    const auto text = note == NoDrumNoteAssigned ? "--" : std::to_string(note);
     findField("note")->setText(text);
 }
 
-void AssignmentViewScreen::displaySoundName()
+void AssignmentViewScreen::displaySoundName() const
 {
-
     const auto padIndex = getPadIndexFromFocus();
     const auto program = getProgramOrThrow();
     const int note = program->getPad(padIndex)->getNote();
 
-    if (note == 34)
+    if (note == NoDrumNoteAssigned)
     {
         findLabel("info2")->setText("=");
         return;
@@ -204,7 +195,7 @@ void AssignmentViewScreen::displaySoundName()
                                 stereo);
 }
 
-int AssignmentViewScreen::getPadIndexFromFocus()
+int AssignmentViewScreen::getPadIndexFromFocus() const
 {
     int padIndex = -1;
 
@@ -228,7 +219,7 @@ std::string AssignmentViewScreen::getFocusFromPadIndex() const
 
     while (padIndex > 15)
     {
-        padIndex -= 16;
+        padIndex = padIndex - 16;
     }
 
     return padFocusNames[padIndex];

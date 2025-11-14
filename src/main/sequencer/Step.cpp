@@ -2,29 +2,19 @@
 
 using namespace mpc::sequencer;
 
-void Step::setSequence(const int i)
+void Step::setSequence(const SequenceIndex i)
 {
-    if (i < 0 || i > 98)
-    {
-        return;
-    }
-
-    sequence = i;
+    sequence = std::clamp(i, MinSequenceIndex, MaxSequenceIndex);
 }
 
-int Step::getSequence() const
+mpc::SequenceIndex Step::getSequence() const
 {
     return sequence;
 }
 
 void Step::setRepeats(const int i)
 {
-    if (i < 0 || i > 99)
-    {
-        return;
-    }
-
-    repeatCount = i;
+    repeatCount = std::clamp(i, 0, 99);
 }
 
 int Step::getRepeats() const

@@ -10,13 +10,12 @@ namespace mpc::lcdgui
 
 namespace mpc::command::context
 {
-
     struct NoteInputScreenUpdateContext
     {
         bool isSixteenLevelsEnabled;
         bool isAllowCentralNoteAndPadUpdateScreen;
         std::shared_ptr<lcdgui::ScreenComponent> screenComponent;
-        std::function<void(int)> setSelectedNote;
+        std::function<void(DrumNoteNumber)> setSelectedNote;
         bool currentFieldNameIsFromNote;
     };
 

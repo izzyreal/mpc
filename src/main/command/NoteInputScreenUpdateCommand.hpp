@@ -1,4 +1,5 @@
 #pragma once
+#include "IntTypes.hpp"
 #include "command/Command.hpp"
 
 namespace mpc::command::context
@@ -8,17 +9,16 @@ namespace mpc::command::context
 
 namespace mpc::command
 {
-
-    class NoteInputScreenUpdateCommand : public Command
+    class NoteInputScreenUpdateCommand final : public Command
     {
     public:
-        NoteInputScreenUpdateCommand(context::NoteInputScreenUpdateContext &ctx,
-                                     const int note);
+        NoteInputScreenUpdateCommand(
+            context::NoteInputScreenUpdateContext &ctxToUse,
+            NoteNumber noteToUse);
         void execute() override;
 
     private:
         context::NoteInputScreenUpdateContext &ctx;
-        const int note;
+        const DrumNoteNumber note;
     };
-
 } // namespace mpc::command

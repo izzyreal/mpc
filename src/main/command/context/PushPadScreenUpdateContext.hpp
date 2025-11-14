@@ -31,7 +31,7 @@ namespace mpc::command::context
         bool isF4Pressed;
         bool isF6Pressed;
         controller::Bank bank;
-        std::function<void(int)> setSelectedPad;
+        std::function<void(ProgramPadIndex)> setSelectedPad;
         bool isAllowCentralNoteAndPadUpdateScreen;
     };
 

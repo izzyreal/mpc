@@ -55,7 +55,7 @@ namespace mpc::lcdgui::screens
         void close() override;
         void openWindow() override;
 
-        void setFromNote(int i);
+        void setFromNote(DrumNoteNumber);
 
     private:
         bool isFirstTickPosChangeAfterScreenHasBeenOpened = true;
@@ -85,19 +85,19 @@ namespace mpc::lcdgui::screens
         int lastRow = 0;
 
         int view = 0;
-        int noteA = 0;
-        int noteB = 127;
+        NoteNumber noteA{MinNoteNumber};
+        NoteNumber noteB{MaxNoteNumber};
         int control = -1;
         int yOffset = 0;
-        int fromNote = 34;
+        DrumNoteNumber fromNote{NoDrumNoteAssigned};
         int selectionStartIndex = -1;
         int selectionEndIndex = -1;
         std::string selectedParameterLetter;
         bool durationTcPercentageEnabled = false;
 
         void setView(int i);
-        void setNoteA(int i);
-        void setNoteB(int i);
+        void setNoteA(NoteNumber);
+        void setNoteB(NoteNumber);
         void setControl(int i);
         void setyOffset(int i);
         void setSelectedEventIndex(int i);

@@ -31,7 +31,7 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
                         {
                             displayNextSq();
 
-                            if (nextSq == -1)
+                            if (nextSq == NoSequenceIndex)
                             {
                                 selectNextSqFromScratch = true;
                             }
@@ -84,7 +84,7 @@ void NextSeqScreen::open()
     displayTiming();
     displayNextSq();
 
-    if (sequencer->getNextSq() == -1)
+    if (sequencer->getNextSq() == NoSequenceIndex)
     {
         ls->setFocus("sq");
     }
@@ -94,43 +94,41 @@ void NextSeqScreen::open()
     }
 }
 
-void NextSeqScreen::turnWheel(int i)
+void NextSeqScreen::turnWheel(const int increment)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "sq")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "sq")
     {
         if (sequencer->getTransport()->isPlaying())
         {
             sequencer->setNextSq(sequencer->getCurrentlyPlayingSequenceIndex() +
-                                 i);
+                                 increment);
             ls->setFocus("nextsq");
         }
         else
         {
             sequencer->getStateManager()->enqueue(
                 sequencer::SetActiveSequenceIndex{
-                    sequencer->getActiveSequenceIndex() + i});
+                    sequencer->getActiveSequenceIndex() + increment});
         }
     }
     else if (focusedFieldName == "nextsq")
     {
         auto nextSq = sequencer->getNextSq();
 
-        if (nextSq == -1 && i < 0)
+        if (nextSq == NoSequenceIndex && increment < 0)
         {
             return;
         }
 
-        if (nextSq == -1 && selectNextSqFromScratch)
+        if (nextSq == NoSequenceIndex && selectNextSqFromScratch)
         {
             nextSq = sequencer->getActiveSequenceIndex();
             selectNextSqFromScratch = false;
         }
         else
         {
-            nextSq += i;
+            nextSq = nextSq + increment;
         }
 
         sequencer->setNextSq(nextSq);
@@ -141,30 +139,29 @@ void NextSeqScreen::turnWheel(int i)
     {
         const auto screen = mpc.screens->get<ScreenId::TimingCorrectScreen>();
         const auto noteValue = screen->getNoteValue();
-        screen->setNoteValue(noteValue + i);
+        screen->setNoteValue(noteValue + increment);
         setLastFocus("timing-correct", "notevalue");
         displayTiming();
     }
     else if (focusedFieldName == "tempo")
     {
         const double oldTempo = sequencer->getTransport()->getTempo();
-        const double newTempo = oldTempo + i * 0.1;
+        const double newTempo = oldTempo + increment * 0.1;
         sequencer->getTransport()->setTempo(newTempo);
         displayTempo();
     }
 }
 
-void NextSeqScreen::function(int i)
+void NextSeqScreen::function(const int i)
 {
-
     if (i == 3 || i == 4)
     {
         const auto nextSq = sequencer->getNextSq();
-        sequencer->setNextSq(-1);
+        sequencer->setNextSq(NoSequenceIndex);
         selectNextSqFromScratch = true;
         displayNextSq();
 
-        if (i == 3 && nextSq != -1)
+        if (i == 3 && nextSq != NoSequenceIndex)
         {
             sequencer->getStateManager()->enqueue(
                 sequencer::SwitchToNextSequence{nextSq});
@@ -192,7 +189,8 @@ void NextSeqScreen::displaySq() const
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+            std::to_string(sequencer->getActiveSequenceIndex().get() + 1), "0",
+            2));
         result.append("-");
         result.append(sequencer->getActiveSequence()->getName());
         findField("sq")->setText(result);
@@ -204,7 +202,7 @@ void NextSeqScreen::displayNextSq() const
     const auto nextSq = sequencer->getNextSq();
     std::string res = "";
 
-    if (nextSq != -1)
+    if (nextSq != NoSequenceIndex)
     {
         const auto seqName = sequencer->getSequence(nextSq)->getName();
         res = StrUtil::padLeft(std::to_string(sequencer->getNextSq() + 1), "0",

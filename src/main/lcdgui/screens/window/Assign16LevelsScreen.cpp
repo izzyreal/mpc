@@ -43,24 +43,24 @@ void Assign16LevelsScreen::function(const int i)
             mpc.getLayeredScreen()->closeCurrentScreen();
             break;
         }
+        default:;
     }
 }
 
 void Assign16LevelsScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "note")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "note")
     {
-        auto candidate = note + i;
+        DrumNoteNumber candidate = note + i;
 
-        if (candidate < 35)
+        if (candidate < MinDrumNoteNumber)
         {
-            candidate = 35;
+            candidate = MinDrumNoteNumber;
         }
-        else if (candidate > 98)
+        else if (candidate > MaxDrumNoteNumber)
         {
-            candidate = 98;
+            candidate = MaxDrumNoteNumber;
         }
 
         setNote(candidate);
@@ -79,15 +79,15 @@ void Assign16LevelsScreen::turnWheel(const int i)
     }
 }
 
-void Assign16LevelsScreen::setNote(int newNote)
+void Assign16LevelsScreen::setNote(DrumNoteNumber newNote)
 {
-    if (newNote < 34)
+    if (newNote < NoDrumNoteAssigned)
     {
-        newNote = 34;
+        newNote = NoDrumNoteAssigned;
     }
-    else if (newNote > 98)
+    else if (newNote > MaxDrumNoteNumber)
     {
-        newNote = 98;
+        newNote = MaxDrumNoteNumber;
     }
 
     if (note == newNote)
@@ -130,7 +130,7 @@ int Assign16LevelsScreen::getType() const
     return type;
 }
 
-int Assign16LevelsScreen::getNote() const
+mpc::DrumNoteNumber Assign16LevelsScreen::getNote() const
 {
     return note;
 }
@@ -151,11 +151,14 @@ void Assign16LevelsScreen::displayNote() const
     const auto padName = sampler->getPadName(padIndex);
 
     const auto soundIndex =
-        note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
+        note == NoDrumNoteAssigned
+            ? -1
+            : program->getNoteParameters(note)->getSoundIndex();
     const auto soundName =
         soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
-    const auto noteName = note == 34 ? "--" : std::to_string(note);
+    const auto noteName =
+        note == NoDrumNoteAssigned ? "--" : std::to_string(note);
 
     findField("note")->setText(noteName + "/" + padName + "-" + soundName);
 }

@@ -225,7 +225,6 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                     }
                     else
                     {
-                        sequencer->isSongModeEnabled();
                         constexpr bool fromStart = true;
                         sequencer->getTransport()->play(fromStart);
                     }
@@ -235,8 +234,10 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                 case 4:
                     openScreenById(ScreenId::VmpcRecordJamScreen);
                     break;
+                default:;
             }
         }
+        default:;
     }
 }
 
@@ -267,9 +268,9 @@ void VmpcDirectToDiskRecorderScreen::setRecord(const int i)
     displayOffline();
 }
 
-void VmpcDirectToDiskRecorderScreen::setSq(const int i)
+void VmpcDirectToDiskRecorderScreen::setSq(const SequenceIndex i)
 {
-    if (i < 0 || i > 98)
+    if (i < MinSequenceIndex || i > MaxSequenceIndex)
     {
         return;
     }
@@ -278,9 +279,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(const int i)
 
     setTime0(0);
 
-    const auto s = sequencer->getSequence(sq);
-
-    if (s->isUsed())
+    if (const auto s = sequencer->getSequence(sq); s->isUsed())
     {
         setTime1(s->getLastTick());
     }
@@ -294,7 +293,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(const int i)
 
 void VmpcDirectToDiskRecorderScreen::setSong(const int i)
 {
-    if (i < 0 || i > 4)
+    if (i < 0 || i > 19)
     {
         return;
     }

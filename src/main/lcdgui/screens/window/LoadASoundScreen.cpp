@@ -42,16 +42,16 @@ void LoadASoundScreen::close()
 
 void LoadASoundScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
-    if (focusedFieldName == "assign-to-note")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "assign-to-note")
     {
         const auto newAssignToNote =
-            std::clamp(static_cast<int>(assignToNote) + i, 34, 98);
+            std::clamp(assignToNote + i, NoDrumNoteAssigned, MaxDrumNoteNumber);
 
-        if (newAssignToNote == 34)
+        if (newAssignToNote == NoDrumNoteAssigned)
         {
-            mpc.clientEventController->setSelectedNote(35);
+            mpc.clientEventController->setSelectedNote(MinDrumNoteNumber);
             assignToNote = newAssignToNote;
             displayAssignToNote();
         }
@@ -91,6 +91,7 @@ void LoadASoundScreen::function(const int i)
         case 4:
             keepSound();
             break;
+        default:;
     }
 }
 
@@ -116,11 +117,11 @@ void LoadASoundScreen::keepSound() const
         }
     }
 
-    auto actionAfterLoadingSound = [this](bool newSoundIsMono)
+    auto actionAfterLoadingSound = [this](bool)
     {
         const auto soundIndex = sampler->getSoundCount() - 1;
 
-        if (assignToNote != 34)
+        if (assignToNote != NoDrumNoteAssigned)
         {
             getProgramOrThrow()
                 ->getNoteParameters(assignToNote)
@@ -186,7 +187,7 @@ void LoadASoundScreen::keepSound() const
     openScreenById(ScreenId::LoadScreen);
 }
 
-void LoadASoundScreen::displayAssignToNote()
+void LoadASoundScreen::displayAssignToNote() const
 {
     const auto padIndex =
         getProgramOrThrow()->getPadIndexFromNote(assignToNote);
@@ -198,8 +199,7 @@ void LoadASoundScreen::displayAssignToNote()
 
 void LoadASoundScreen::update(Observable *observable, const Message message)
 {
-    const auto msg = std::get<std::string>(message);
-    if (msg == "note")
+    if (const auto msg = std::get<std::string>(message); msg == "note")
     {
         assignToNote = mpc.clientEventController->getSelectedNote();
         displayAssignToNote();

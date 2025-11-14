@@ -110,7 +110,8 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
 
     auto allParserSequencer = allParser.getSequencer();
     // Direct state init — safe because sequencer is inactive
-    mpcSequencer->setActiveSequenceIndex(allParserSequencer->sequence, false);
+    mpcSequencer->setActiveSequenceIndex(
+        SequenceIndex(allParserSequencer->sequence), false);
     mpcSequencer->getTransport()->setPosition(0);
     mpcSequencer->setActiveTrackIndex(allParserSequencer->track);
     mpcSequencer->getTransport()->setTempoSourceSequence(false);
@@ -289,7 +290,7 @@ void AllLoader::loadEverythingFromAllParser(Mpc &mpc, AllParser &allParser)
             {
                 mpcSong->insertStep(mpcSong->getStepCount());
                 auto step = mpcSong->getStep(j).lock();
-                step->setSequence(steps[j].first);
+                step->setSequence(SequenceIndex(steps[j].first));
                 step->setRepeats(steps[j].second);
             }
 

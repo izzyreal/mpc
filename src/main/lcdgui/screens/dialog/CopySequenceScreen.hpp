@@ -9,17 +9,17 @@ namespace mpc::lcdgui::screens::dialog
 
     public:
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
 
-        CopySequenceScreen(Mpc &mpc, int layerIndex);
+        CopySequenceScreen(Mpc &, int layerIndex);
 
         void open() override;
 
     private:
-        int sq0 = 0;
-        int sq1 = 0;
-        void setSq0(int i);
-        void setSq1(int i);
+        SequenceIndex sq0{MinSequenceIndex};
+        SequenceIndex sq1{MinSequenceIndex};
+        void setSq0(SequenceIndex);
+        void setSq1(SequenceIndex);
 
         void displaySq0() const;
         void displaySq1() const;

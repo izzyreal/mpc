@@ -3,6 +3,7 @@
 #include "sampler/Program.hpp"
 #include "sampler/Sound.hpp"
 #include "MpcSpecs.hpp"
+#include "IntTypes.hpp"
 
 #include <memory>
 #include <string>
@@ -23,7 +24,7 @@ namespace mpc::sampler
     class Sampler final
     {
     public:
-        Sampler(Mpc &);
+        explicit Sampler(Mpc &);
 
         std::shared_ptr<Sound> getPlayXSound();
         std::shared_ptr<Sound> getClickSound();
@@ -102,15 +103,15 @@ namespace mpc::sampler
             const std::shared_ptr<const std::vector<float>> &sourceRight,
             const std::shared_ptr<std::vector<float>> &dest) const;
 
-        int getUsedProgram(int startIndex, bool up) const;
+        ProgramIndex getUsedProgram(int startIndex, bool up) const;
         int checkExists(const std::string &soundName) const;
         void selectPreviousSound();
         void selectNextSound();
         std::weak_ptr<Sound> copySound(const std::weak_ptr<Sound> &source);
-        void copyProgram(const int sourceIndex, const int destIndex);
-        std::vector<int> *getInitMasterPadAssign();
-        std::vector<int> *getMasterPadAssign();
-        void setMasterPadAssign(const std::vector<int> &v);
+        void copyProgram(int sourceIndex, int destIndex);
+        std::vector<DrumNoteNumber> *getInitMasterPadAssign();
+        std::vector<DrumNoteNumber> *getMasterPadAssign();
+        void setMasterPadAssign(const std::vector<DrumNoteNumber> &v);
         void setPlayX(int i);
         int getPlayX() const;
 
@@ -132,8 +133,8 @@ namespace mpc::sampler
         std::string previousScreenName;
 
         Mpc &mpc;
-        std::vector<int> initMasterPadAssign;
-        std::vector<int> masterPadAssign;
+        std::vector<DrumNoteNumber> initMasterPadAssign;
+        std::vector<DrumNoteNumber> masterPadAssign;
 
         std::vector<std::shared_ptr<Sound>> sounds;
         std::vector<std::shared_ptr<Program>> programs =

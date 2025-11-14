@@ -578,7 +578,7 @@ void EventRow::setDrumNoteEventValues() const
             const auto sampler = mpc.getSampler();
             const auto program = sampler->getProgram(drumBus->getProgram());
             const auto padName = sampler->getPadName(
-                program->getPadIndexFromNote(ne->getNote()));
+                program->getPadIndexFromNote(DrumNoteNumber(ne->getNote())));
             fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);
         }
     }

@@ -16,7 +16,7 @@ void KeepOrRetryScreen::open()
 {
     if (ls->isPreviousScreenNot({ScreenId::NameScreen}))
     {
-        assignToNote = 34;
+        assignToNote = NoDrumNoteAssigned;
     }
     displayNameForNewSound();
     displayAssignToNote();
@@ -44,7 +44,7 @@ void KeepOrRetryScreen::function(const int i)
         {
             const auto index = sampler->getSoundCount() - 1;
 
-            if (assignToNote != 34)
+            if (assignToNote != NoDrumNoteAssigned)
             {
                 getProgramOrThrow()
                     ->getNoteParameters(assignToNote)
@@ -91,25 +91,25 @@ void KeepOrRetryScreen::right()
     }
 }
 
-void KeepOrRetryScreen::turnWheel(const int i)
+void KeepOrRetryScreen::turnWheel(const int increment)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "assign-to-note")
     {
-        auto newAssignToNote = assignToNote + i;
+        auto newAssignToNote = assignToNote + increment;
 
-        if (newAssignToNote < 34)
+        if (newAssignToNote < NoDrumNoteAssigned)
         {
-            newAssignToNote = 34;
+            newAssignToNote = NoDrumNoteAssigned;
         }
-        else if (newAssignToNote > 98)
+        else if (newAssignToNote > MaxDrumNoteNumber)
         {
-            newAssignToNote = 98;
+            newAssignToNote = MaxDrumNoteNumber;
         }
 
-        if (newAssignToNote == 34)
+        if (newAssignToNote == NoDrumNoteAssigned)
         {
-            mpc.clientEventController->setSelectedNote(35);
+            mpc.clientEventController->setSelectedNote(MinDrumNoteNumber);
             assignToNote = newAssignToNote;
             displayAssignToNote();
         }
@@ -133,8 +133,9 @@ void KeepOrRetryScreen::displayNameForNewSound() const
 
 void KeepOrRetryScreen::displayAssignToNote() const
 {
-    const auto noteStr =
-        assignToNote == 34 ? "--" : std::to_string(assignToNote);
+    const auto noteStr = assignToNote == NoDrumNoteAssigned
+                             ? "--"
+                             : std::to_string(assignToNote);
     const auto padStr = sampler->getPadName(
         getProgramOrThrow()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note")->setText(noteStr + "/" + padStr);
@@ -142,9 +143,7 @@ void KeepOrRetryScreen::displayAssignToNote() const
 
 void KeepOrRetryScreen::update(Observable *o, const Message message)
 {
-    const auto msg = std::get<std::string>(message);
-
-    if (msg == "note")
+    if (const auto msg = std::get<std::string>(message); msg == "note")
     {
         assignToNote = mpc.clientEventController->getSelectedNote();
         displayAssignToNote();

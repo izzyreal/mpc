@@ -37,7 +37,7 @@ SequencerPlaybackEngine::SequencerPlaybackEngine(
     std::function<std::shared_ptr<Screens>()> getScreens,
     const std::function<bool()> &isNoteRepeatLockedOrPressed,
     const std::shared_ptr<NoteRepeatProcessor> &noteRepeatProcessor,
-    std::function<bool()> isAudioServerCurrentlyRunningOffline)
+    const std::function<bool()> &isAudioServerCurrentlyRunningOffline)
     : layeredScreen(layeredScreen), getScreens(getScreens),
       sequencer(sequencer), clock(clock), isBouncing(isBouncing),
       getSampleRate(getSampleRate),
@@ -119,7 +119,7 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTransport()->getTickPosition());
     sequencer->setActiveSequenceIndex(sequencer->getNextSq(), false);
-    sequencer->setNextSq(-1);
+    sequencer->setNextSq(NoSequenceIndex);
     setTickPositionEffectiveImmediately(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
     newSeq->initLoop();

@@ -21,10 +21,10 @@ namespace mpc::lcdgui::screens::window
         const std::vector<std::string> letters{"A", "B", "C", "D"};
         std::string newName;
         int sourceSoundIndex = -1;
-        int originalKey = 67;
+        DrumNoteNumber originalKey{67};
         int tune = 0;
         void setSourceSoundIndex(int i);
-        void setOriginalKey(int i);
+        void setOriginalKey(DrumNoteNumber);
         void setTune(int i);
 
         void displayOriginalKey() const;

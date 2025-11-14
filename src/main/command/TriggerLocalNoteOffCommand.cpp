@@ -25,9 +25,10 @@ void TriggerLocalNoteOffCommand::execute()
         return;
     }
 
-    std::optional<int> drumIndex = std::nullopt;
+    std::optional<DrumBusIndex> drumIndex = std::nullopt;
 
-    if (auto drumBus = std::dynamic_pointer_cast<sequencer::DrumBus>(ctx->bus);
+    if (const auto drumBus =
+            std::dynamic_pointer_cast<sequencer::DrumBus>(ctx->bus);
         drumBus)
     {
         drumIndex = drumBus->getIndex();

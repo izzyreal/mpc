@@ -44,13 +44,13 @@ namespace mpc::controller
     class ClientHardwareEventController;
     class ClientMidiEventController;
 
-    class ClientEventController
+    class ClientEventController final
         : public std::enable_shared_from_this<ClientEventController>,
           public Observable
     {
 
     public:
-        ClientEventController(Mpc &);
+        explicit ClientEventController(Mpc &);
 
         void init();
 
@@ -79,12 +79,12 @@ namespace mpc::controller
         void setFullLevelEnabled(bool);
         bool isSixteenLevelsEnabled() const;
         void setSixteenLevelsEnabled(bool);
-        void setActiveBank(const Bank);
+        void setActiveBank(Bank);
         Bank getActiveBank() const;
-        void setSelectedNote(int note);
-        void setSelectedPad(int padIndexWithBank);
-        int getSelectedNote() const;
-        int getSelectedPad() const;
+        void setSelectedNote(DrumNoteNumber);
+        void setSelectedPad(ProgramPadIndex);
+        DrumNoteNumber getSelectedNote() const;
+        ProgramPadIndex getSelectedPad() const;
 
         bool isRecMainWithoutPlaying() const;
         bool isEraseButtonPressed() const;
@@ -103,7 +103,7 @@ namespace mpc::controller
         bool sixteenLevelsEnabled = false;
 
         Bank activeBank = Bank::A;
-        int selectedPad = 0;
-        int selectedNote = 60;
+        ProgramPadIndex selectedPad{MinProgramPadIndex};
+        DrumNoteNumber selectedNote{60};
     };
 } // namespace mpc::controller

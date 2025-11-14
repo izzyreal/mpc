@@ -95,15 +95,14 @@ void TimingCorrectScreen::function(const int i)
             openScreenById(ScreenId::SequencerScreen);
             break;
         }
+        default:;
     }
 }
 
 void TimingCorrectScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "notevalue")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "notevalue")
     {
         setNoteValue(noteValue + i);
     }
@@ -124,14 +123,12 @@ void TimingCorrectScreen::turnWheel(const int i)
     displayTime();
 }
 
-void TimingCorrectScreen::setNote0(const int i)
+void TimingCorrectScreen::setNote0(const NoteNumber noteNumber)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "note0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "note0")
     {
-        WithTimesAndNotes::setNote0(i);
+        WithTimesAndNotes::setNote0(noteNumber);
     }
 }
 
@@ -152,9 +149,8 @@ void TimingCorrectScreen::displaySwing() const
 
 void TimingCorrectScreen::displayNotes()
 {
-    const auto track = sequencer->getActiveTrack();
-
-    if (isDrumBusType(track->getBusType()))
+    if (const auto track = sequencer->getActiveTrack();
+        isDrumBusType(track->getBusType()))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
         findField("note0")->setLocation(62, 40);
@@ -181,7 +177,8 @@ void TimingCorrectScreen::displayNotes()
         else
         {
             const auto program = getProgramOrThrow();
-            const auto padIndex = program->getPadIndexFromNote(note0);
+            const auto padIndex =
+                program->getPadIndexFromNote(DrumNoteNumber(note0));
             const auto padName = sampler->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }

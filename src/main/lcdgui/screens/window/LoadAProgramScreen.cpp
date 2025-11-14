@@ -61,11 +61,12 @@ void LoadAProgramScreen::function(const int i)
             if (const auto track = sequencer->getActiveTrack();
                 sequencer::isDrumBusType(track->getBusType()))
             {
-                for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++)
+                for (int pgmIndex = 0;
+                     pgmIndex < Mpc2000XlSpecs::MAX_PROGRAM_COUNT; pgmIndex++)
                 {
                     if (sampler->getProgram(pgmIndex) == newProgram)
                     {
-                        getActiveDrumBus()->setProgram(pgmIndex);
+                        getActiveDrumBus()->setProgram(ProgramIndex(pgmIndex));
                         break;
                     }
                 }

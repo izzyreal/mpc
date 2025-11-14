@@ -51,7 +51,7 @@ namespace mpc::sequencer
             const std::function<int()> &getAutoPunchMode,
             const std::function<std::shared_ptr<Bus>(BusType)> &getSequencerBus,
             const std::function<bool()> &isEraseButtonPressed,
-            const std::function<bool(int programPadIndex, ProgramIndex)>
+            const std::function<bool(ProgramPadIndex, ProgramIndex)>
                 &isProgramPadPressed,
             const std::shared_ptr<sampler::Sampler> &sampler,
             const std::shared_ptr<audiomidi::EventHandler> &eventHandler,
@@ -80,8 +80,8 @@ namespace mpc::sequencer
         std::string getActualName();
 
         void syncEventIndex(int tick, int oldTick);
-        void setTrackIndex(int i);
-        int getIndex() const;
+        void setTrackIndex(TrackIndex i);
+        TrackIndex getIndex() const;
         void flushNoteCache() const;
         void setUsed(bool b);
         void setOn(bool b);
@@ -90,11 +90,10 @@ namespace mpc::sequencer
             const std::shared_ptr<Event> &event,
             bool allowMultipleNoteEventsWithSameNoteOnSameTick = false);
 
-        std::shared_ptr<NoteOnEvent> recordNoteEventNonLive(int tick, int note,
-                                                            int velocity);
-
         std::shared_ptr<NoteOnEvent>
-        recordNoteEventLive(unsigned char note, unsigned char velocity);
+        recordNoteEventNonLive(int tick, NoteNumber, Velocity);
+
+        std::shared_ptr<NoteOnEvent> recordNoteEventLive(NoteNumber, Velocity);
 
         // Only to be used for note events that are being recorded while the
         // sequencer is running, i.e. due to live MIDI, mouse, keyboard or
@@ -158,7 +157,7 @@ namespace mpc::sequencer
         int velocityRatio = 0;
         int programChange = 0;
         int device = 0;
-        int trackIndex = 0;
+        TrackIndex trackIndex{0};
         bool used{false};
         int eventIndex = 0;
 
@@ -184,8 +183,7 @@ namespace mpc::sequencer
         std::function<int()> getAutoPunchMode;
         std::function<std::shared_ptr<Bus>(BusType)> getSequencerBus;
         std::function<bool()> isEraseButtonPressed;
-        std::function<bool(int programPadIndex, ProgramIndex)>
-            isProgramPadPressed;
+        std::function<bool(ProgramPadIndex, ProgramIndex)> isProgramPadPressed;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::EventHandler> eventHandler;
         std::function<bool()> isSixteenLevelsEnabled;
@@ -201,7 +199,7 @@ namespace mpc::sequencer
         std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs;
 
         void updateEventTick(const std::shared_ptr<Event> &e, int newTick);
-        std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note) const;
+        std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, NoteNumber) const;
 
         void processRealtimeQueuedEvents();
         int getCorrectedTickPos() const;

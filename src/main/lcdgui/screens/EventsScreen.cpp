@@ -29,12 +29,12 @@ EventsScreen::EventsScreen(Mpc &mpc, const int layerIndex)
 {
 }
 
-void EventsScreen::setNote0(const int i)
+void EventsScreen::setNote0(const NoteNumber noteNumber)
 {
     if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
         focusedFieldName == "note0")
     {
-        WithTimesAndNotes::setNote0(i);
+        WithTimesAndNotes::setNote0(noteNumber);
     }
 }
 
@@ -171,11 +171,12 @@ void EventsScreen::function(const int i)
                     }
                     else if (velocityMode == 2)
                     {
-                        n->setVelocity(n->getVelocity() * velocityValue * 0.01);
+                        n->setVelocity(n->getVelocity() *
+                                       Velocity(velocityValue) * 0.01);
                     }
                     else if (velocityMode == 3)
                     {
-                        n->setVelocity(velocityValue);
+                        n->setVelocity(Velocity(velocityValue));
                     }
                 }
             }
@@ -500,7 +501,7 @@ void EventsScreen::displayMidiNotes() const
 
 void EventsScreen::displayDrumNotes()
 {
-    if (note0 == 34)
+    if (note0 == NoDrumNoteAssigned)
     {
         findField("note0")->setText("ALL");
     }
@@ -512,8 +513,8 @@ void EventsScreen::displayDrumNotes()
         const auto program = sampler->getProgram(drumBus->getProgram());
 
         const auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
-        const auto padName =
-            sampler->getPadName(program->getPadIndexFromNote(note0));
+        const auto padName = sampler->getPadName(
+            program->getPadIndexFromNote(DrumNoteNumber(note0)));
         findField("note0")->setText(noteText + "/" + padName);
     }
 }
@@ -524,7 +525,7 @@ void EventsScreen::setEdit(const int i)
     displayEdit();
 }
 
-void EventsScreen::setFromSq(const int i) const
+void EventsScreen::setFromSq(const SequenceIndex i) const
 {
     sequencer->setActiveSequenceIndex(i, true);
     displayFromSq();
@@ -537,10 +538,11 @@ void EventsScreen::setFromTr(const int i) const
     displayFromTr();
 }
 
-void EventsScreen::setToSq(const int i)
+void EventsScreen::setToSq(const SequenceIndex i)
 {
-    toSq =
-        std::clamp(i, 0, static_cast<int>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
+    toSq = std::clamp(
+        i, MinSequenceIndex,
+        static_cast<SequenceIndex>(Mpc2000XlSpecs::LAST_SEQUENCE_INDEX));
     displayToSq();
 }
 
@@ -578,9 +580,9 @@ void EventsScreen::setVelocityMode(const int i)
 {
     velocityMode = std::clamp(i, 0, 3);
 
-    if (velocityMode != 2 && velocityValue > 127)
+    if (velocityMode != 2 && velocityValue > MaxVelocity)
     {
-        setVelocityValue(127);
+        setVelocityValue(MaxVelocity);
     }
 
     displayMode();
@@ -604,7 +606,7 @@ void EventsScreen::setDuration(const int i)
 
 void EventsScreen::setVelocityValue(const int i)
 {
-    velocityValue = std::clamp(i, 1, velocityMode == 2 ? 200 : 127);
+    velocityValue = std::clamp(i, 1, velocityMode == 2 ? 200 : MaxVelocity);
 
     // Field otherwise used for displaying "Copies:" is
     // replaced by a "Value:" field.
@@ -619,8 +621,8 @@ void EventsScreen::setStart(const int startTick)
 
 void EventsScreen::displayFromSq() const
 {
-    findField("from-sq")->setTextPadded(sequencer->getActiveSequenceIndex() +
-                                        1);
+    findField("from-sq")->setTextPadded(
+        sequencer->getActiveSequenceIndex().get() + 1);
 }
 
 void EventsScreen::displayFromTr() const
@@ -639,10 +641,10 @@ void EventsScreen::displayToTr() const
 }
 
 void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
-                               const int toSequenceIndex, const int destStart,
-                               const int toTrackIndex, const bool copyModeMerge,
-                               const int copyCount, const int copyNote0,
-                               const int copyNote1) const
+                               const SequenceIndex toSequenceIndex,
+                               const int destStart, const int toTrackIndex,
+                               const bool copyModeMerge, const int copyCount,
+                               const int copyNote0, const int copyNote1) const
 {
     const auto segLength = sourceEnd - sourceStart;
     const auto sourceTrack = sequencer->getActiveTrack();
@@ -725,7 +727,8 @@ void EventsScreen::performCopy(const int sourceStart, const int sourceEnd,
         {
             if (isDrumBusType(sourceTrack->getBusType()))
             {
-                if (copyNote0 != 34 && copyNote0 != ne->getNote())
+                if (copyNote0 != NoDrumNoteAssigned &&
+                    copyNote0 != ne->getNote())
                 {
                     continue;
                 }

@@ -22,12 +22,12 @@ namespace mpc::sequencer
 
     struct SwitchToNextSequence
     {
-        int sequenceIndex;
+        SequenceIndex sequenceIndex;
     };
 
     struct SetActiveSequenceIndex
     {
-        int sequenceIndex;
+        SequenceIndex sequenceIndex;
         bool setPositionTo0 = true;
     };
 

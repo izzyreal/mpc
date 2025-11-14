@@ -146,12 +146,12 @@ void EditMultipleScreen::function(const int i)
             stepEditorScreen->clearSelection();
             openScreenById(ScreenId::StepEditorScreen);
         }
+        default:;
     }
 }
 
-void EditMultipleScreen::turnWheel(const int i)
+void EditMultipleScreen::turnWheel(const int increment)
 {
-
     const auto stepEditorScreen =
         mpc.screens->get<ScreenId::StepEditorScreen>();
     const auto event = stepEditorScreen->getSelectedEvent();
@@ -163,36 +163,36 @@ void EditMultipleScreen::turnWheel(const int i)
 
     if (focusedFieldName == "value0")
     {
-        const auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-        if (noteEvent && isMidiBusType(track->getBusType()))
+        if (const auto noteEvent =
+                std::dynamic_pointer_cast<NoteOnEvent>(event);
+            noteEvent && isMidiBusType(track->getBusType()))
         {
             if (paramLetter == "a")
             {
-                setChangeNoteTo(changeNoteTo + i);
+                setChangeNoteTo(changeNoteTo + increment);
             }
             else if (paramLetter == "b")
             {
-                incrementVariationType(i);
+                incrementVariationType(increment);
             }
             else if (paramLetter == "c")
             {
-                setVariationValue(variationValue + i);
+                setVariationValue(variationValue + increment);
             }
             else if (paramLetter == "d" || paramLetter == "e")
             {
-                setEditType(editType + i);
+                setEditType(editType + increment);
             }
         }
         else if (noteEvent && isDrumBusType(track->getBusType()))
         {
             if (paramLetter == "a")
             {
-                setChangeNoteTo(changeNoteTo + i);
+                setChangeNoteTo(changeNoteTo + increment);
             }
             else if (paramLetter == "b" || paramLetter == "c")
             {
-                setEditType(editType + i);
+                setEditType(editType + increment);
             }
         }
         else if (std::dynamic_pointer_cast<ProgramChangeEvent>(event) ||
@@ -200,12 +200,12 @@ void EditMultipleScreen::turnWheel(const int i)
                  std::dynamic_pointer_cast<ChannelPressureEvent>(event) ||
                  std::dynamic_pointer_cast<ControlChangeEvent>(event))
         {
-            setEditType(editType + i);
+            setEditType(editType + increment);
         }
     }
     else if (focusedFieldName == "value1")
     {
-        setEditValue(editValue + i);
+        setEditValue(editValue + increment);
     }
 
     updateEditMultiple();
@@ -226,7 +226,7 @@ void EditMultipleScreen::checkThreeParameters() const
 
         if (note)
         {
-            note->setVelocity(editValue);
+            note->setVelocity(Velocity(editValue));
         }
         else if (controlChange)
         {
@@ -284,9 +284,7 @@ void EditMultipleScreen::checkNotes() const
         mpc.screens->get<ScreenId::StepEditorScreen>();
     for (auto &event : stepEditorScreen->getSelectedEvents())
     {
-        auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
-
-        if (note)
+        if (const auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
         {
             note->setNote(changeNoteTo);
         }
@@ -302,7 +300,6 @@ void EditMultipleScreen::setEditType(const int i)
 
 void EditMultipleScreen::updateEditMultiple() const
 {
-
     const auto stepEditorScreen =
         mpc.screens->get<ScreenId::StepEditorScreen>();
     const auto event = stepEditorScreen->getSelectedEvent();
@@ -327,9 +324,10 @@ void EditMultipleScreen::updateEditMultiple() const
 
                 const auto program = getProgramOrThrow();
                 const auto padName = sampler->getPadName(
-                    program->getPadIndexFromNote(changeNoteTo));
-                const auto noteName =
-                    changeNoteTo == 34 ? "--" : std::to_string(changeNoteTo);
+                    program->getPadIndexFromNote(DrumNoteNumber(changeNoteTo)));
+                const auto noteName = changeNoteTo == NoDrumNoteAssigned
+                                          ? "--"
+                                          : std::to_string(changeNoteTo);
                 findField("value0")->setText(noteName + "/" + padName);
             }
             else if (letter == "b")
@@ -499,11 +497,13 @@ void EditMultipleScreen::updateDouble() const
     findField("value1")->setSize(3 * 6 + 1, 9);
 }
 
-void EditMultipleScreen::setChangeNoteTo(const int i)
+void EditMultipleScreen::setChangeNoteTo(const NoteNumber i)
 {
     const auto track = mpc.getSequencer()->getActiveTrack();
     const auto midi = isDrumBusType(track->getBusType());
-    changeNoteTo = std::clamp(i, midi ? 0 : 34, midi ? 127 : 98);
+    changeNoteTo =
+        std::clamp(i, NoteNumber(midi ? MinDrumNoteNumber : NoDrumNoteAssigned),
+                   midi ? MaxNoteNumber : MaxDrumNoteNumber);
     updateEditMultiple();
 }
 
@@ -516,7 +516,8 @@ void EditMultipleScreen::setVariationType(
 
 void EditMultipleScreen::incrementVariationType(const int i)
 {
-    variationType = NoteOnEvent::VARIATION_TYPE(std::clamp(i, 0, 3));
+    variationType =
+        static_cast<NoteOnEvent::VARIATION_TYPE>(std::clamp(i, 0, 3));
     updateEditMultiple();
 }
 

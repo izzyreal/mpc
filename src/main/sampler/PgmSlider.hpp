@@ -1,11 +1,12 @@
 #pragma once
+#include "IntTypes.hpp"
 #include "Observer.hpp"
 
 namespace mpc::sampler
 {
     class PgmSlider final : public Observable
     {
-        int assignNote = 34;
+        DrumNoteNumber assignNote{NoDrumNoteAssigned};
         int tuneLowRange = -120;
         int tuneHighRange = 120;
         int decayLowRange = 12;
@@ -18,8 +19,8 @@ namespace mpc::sampler
         int parameter = 0;
 
     public:
-        void setAssignNote(int i);
-        int getNote() const;
+        void setAssignNote(DrumNoteNumber);
+        DrumNoteNumber getNote() const;
         void setTuneLowRange(int i);
         int getTuneLowRange() const;
         void setTuneHighRange(int i);

@@ -32,7 +32,7 @@ namespace mpc::sequencer
             const std::function<
                 std::shared_ptr<engine::SequencerPlaybackEngine>()> &);
 
-        void play(bool fromStart = false);
+        void play(bool fromStart = false) const;
         void rec();
         void recFromStart();
         void overdub();

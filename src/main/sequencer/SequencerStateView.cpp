@@ -23,5 +23,6 @@ double SequencerStateView::getPlayStartPositionQuarterNotes() const
 
 int64_t SequencerStateView::getPositionTicks() const
 {
-    return Sequencer::quarterNotesToTicks(state->transportState.positionQuarterNotes);
+    return Sequencer::quarterNotesToTicks(
+        state->transportState.positionQuarterNotes);
 }

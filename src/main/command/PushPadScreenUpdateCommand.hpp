@@ -1,4 +1,5 @@
 #pragma once
+#include "IntTypes.hpp"
 #include "command/Command.hpp"
 
 namespace mpc::command::context
@@ -12,13 +13,14 @@ namespace mpc::command
     class PushPadScreenUpdateCommand : public Command
     {
     public:
-        PushPadScreenUpdateCommand(context::PushPadScreenUpdateContext &ctx,
-                                   int padIndexWithBank);
+        PushPadScreenUpdateCommand(
+            context::PushPadScreenUpdateContext &ctxToUse,
+            int padIndexWithBankToUse);
         void execute() override;
 
     private:
         context::PushPadScreenUpdateContext &ctx;
-        const int padIndexWithBank;
+        const ProgramPadIndex padIndexWithBank;
     };
 
 } // namespace mpc::command

@@ -8,22 +8,22 @@
 
 namespace mpc::sequencer
 {
-    bool isDrumNote(int number);
+    bool isDrumNote(NoteNumber);
 
     class NoteOffEvent final : public Event
     {
         friend class NoteOnEvent;
 
-        int number = 60;
+        NoteNumber number{60};
         NoteOffEvent() {}
-        void setNote(int i);
+        void setNote(NoteNumber);
 
     public:
-        NoteOffEvent(const int numberToUse)
+        explicit NoteOffEvent(const NoteNumber numberToUse)
         {
             number = numberToUse;
         }
-        int getNote() const;
+        NoteNumber getNote() const;
 
         std::string getTypeName() const override
         {
@@ -46,11 +46,11 @@ namespace mpc::sequencer
     private:
         bool beingRecorded = false;
         NoteEventId id;
-        int number = 60;
+        NoteNumber noteNumber{60};
         Duration duration;
         VARIATION_TYPE variationType = TUNE_0;
         int variationValue = 64;
-        int velocity;
+        Velocity velocity;
 
         // Used when recording in the step editor or in the MAIN screen when the
         // sequencer is not running, and we need to derive duration based on how
@@ -62,10 +62,13 @@ namespace mpc::sequencer
         std::shared_ptr<NoteOffEvent> noteOff;
 
     public:
-        NoteOnEvent(int i = 60, int vel = 127, NoteEventId = NoNoteEventId);
+        explicit NoteOnEvent(NoteNumber, Velocity vel = MaxVelocity,
+                             NoteEventId = NoNoteEventId);
+        NoteOnEvent();
+        explicit NoteOnEvent(DrumNoteNumber);
         NoteOnEvent(const NoteOnEvent &);
         std::shared_ptr<NoteOffEvent> getNoteOff() const;
-        void setTrack(int track) override;
+        void setTrack(TrackIndex trackIndexToUse) override;
 
         void setBeingRecorded(bool);
         bool isBeingRecorded() const;
@@ -81,8 +84,8 @@ namespace mpc::sequencer
 
         int getMetronomeOnlyTickPosition() const;
 
-        void setNote(int i);
-        int getNote() const;
+        void setNote(NoteNumber);
+        NoteNumber getNote() const;
         void setDuration(Duration duration);
         Duration getDuration() const;
         void resetDuration();
@@ -91,8 +94,8 @@ namespace mpc::sequencer
         void setVariationType(VARIATION_TYPE type);
         void setVariationValue(int i);
         int getVariationValue() const;
-        void setVelocity(int i);
-        int getVelocity() const;
+        void setVelocity(Velocity);
+        Velocity getVelocity() const;
         bool isFinalized() const;
         bool isPlayOnly();
 
@@ -104,22 +107,28 @@ namespace mpc::sequencer
         uint32_t getId() const;
     };
 
-    class NoteOnEventPlayOnly : public NoteOnEvent
+    class NoteOnEventPlayOnly final : public NoteOnEvent
     {
     public:
-        NoteOnEventPlayOnly(const int i = 60, const int vel = 127)
+        explicit NoteOnEventPlayOnly(const NoteNumber i,
+                                     const Velocity vel = MaxVelocity)
             : NoteOnEvent(i, vel)
         {
             setTick(-1);
         }
+
         NoteOnEventPlayOnly(const NoteOnEventPlayOnly &event)
             : NoteOnEvent(event)
         {
             setTick(-1);
+            NoteOnEvent::setTrack(event.track);
         }
-        NoteOnEventPlayOnly(const NoteOnEvent &event) : NoteOnEvent(event)
+
+        explicit NoteOnEventPlayOnly(const NoteOnEvent &event)
+            : NoteOnEvent(event)
         {
             setTick(-1);
+            NoteOnEvent::setTrack(event.getTrack());
         }
     };
 } // namespace mpc::sequencer

@@ -24,11 +24,9 @@ void CopyProgramScreen::open()
 
 void CopyProgramScreen::function(const int i)
 {
-
     switch (i)
-
     {
-        case int(3):
+        case 3:
             openScreenById(ScreenId::ProgramScreen);
             break;
         case 4:
@@ -41,27 +39,26 @@ void CopyProgramScreen::function(const int i)
             getActiveDrumBus()->setProgram(pgm1);
             openScreenById(ScreenId::ProgramScreen);
             break;
+        default:;
     }
 }
 
-void CopyProgramScreen::turnWheel(const int i)
+void CopyProgramScreen::turnWheel(const int increment)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "pgm0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "pgm0")
     {
-        setPgm0(pgm0 + i);
+        setPgm0(pgm0 + increment);
     }
     else if (focusedFieldName == "pgm1")
     {
-        setPgm1(pgm1 + i);
+        setPgm1(pgm1 + increment);
     }
 }
 
-void CopyProgramScreen::setPgm0(const int i)
+void CopyProgramScreen::setPgm0(const ProgramIndex i)
 {
-    auto candidate = i;
+    ProgramIndex candidate = i;
     const auto up = i > pgm0;
 
     candidate = up ? candidate - 1 : candidate + 1;
@@ -70,7 +67,7 @@ void CopyProgramScreen::setPgm0(const int i)
     {
         candidate = up ? candidate + 1 : candidate - 1;
 
-        if (candidate < 0 || candidate >= sampler->getPrograms().size())
+        if (candidate < MinProgramIndex || candidate > MaxProgramIndex)
         {
             return;
         }
@@ -82,9 +79,9 @@ void CopyProgramScreen::setPgm0(const int i)
     displayFunctionKeys();
 }
 
-void CopyProgramScreen::setPgm1(const int i)
+void CopyProgramScreen::setPgm1(const ProgramIndex i)
 {
-    if (i < 0 || i >= sampler->getPrograms().size())
+    if (i < 0 || i > MaxProgramIndex)
     {
         return;
     }

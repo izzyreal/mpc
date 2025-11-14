@@ -180,7 +180,7 @@ void ClientHardwareEventController::handlePadPress(
     const auto programPadIndex =
         physicalPadIndex + static_cast<int>(activeBank) * 16;
 
-    std::optional<int> note = std::nullopt;
+    std::optional<NoteNumber> note = std::nullopt;
 
     if (program)
     {
@@ -189,10 +189,12 @@ void ClientHardwareEventController::handlePadPress(
 
         mpc.eventRegistry->registerProgramPadPress(
             Source::VirtualMpcHardware, noMidiChannel, screenId,
-            track->getIndex(), screen->getBus()->busType, programPadIndex,
-            clampedVelocity, *programIndex);
+            track->getIndex(), screen->getBus()->busType,
+            ProgramPadIndex(programPadIndex), Velocity(clampedVelocity),
+            *programIndex);
 
-        note = program->getNoteFromPad(programPadIndex);
+        note = NoteNumber(
+            program->getNoteFromPad(ProgramPadIndex(programPadIndex)));
     }
 
     const bool isF4Pressed = mpc.getHardware()->getButton(F4)->isPressed();
@@ -206,7 +208,8 @@ void ClientHardwareEventController::handlePadPress(
         isF4Pressed,
         isF6Pressed,
         mpc.clientEventController->getActiveBank(),
-        [clientEventController = mpc.clientEventController](int p)
+        [clientEventController =
+             mpc.clientEventController](const ProgramPadIndex p)
         {
             clientEventController->setSelectedPad(p);
         },
@@ -222,7 +225,8 @@ void ClientHardwareEventController::handlePadPress(
         NoteInputScreenUpdateContext noteInputScreenUpdateContext{
             mpc.clientEventController->isSixteenLevelsEnabled(),
             screengroups::isCentralNoteAndPadUpdateScreen(screen), screen,
-            [clientEventController = mpc.clientEventController](int n)
+            [clientEventController =
+                 mpc.clientEventController](const DrumNoteNumber n)
             {
                 clientEventController->setSelectedNote(n);
             },
@@ -237,7 +241,7 @@ void ClientHardwareEventController::handlePadPress(
             registryNoteOnEvent = mpc.eventRegistry->registerNoteOn(
                 Source::VirtualMpcHardware, noMidiChannel, screenId,
                 track->getIndex(), screen->getBus()->busType, *note,
-                clampedVelocity, programIndex, [](void *) {});
+                Velocity(clampedVelocity), programIndex, [](void *) {});
         }
     }
 
@@ -260,9 +264,11 @@ void ClientHardwareEventController::handlePadPress(
             auto ctx =
                 TriggerLocalNoteContextFactory::buildTriggerLocalNoteOnContext(
                     Source::VirtualMpcHardware, *registryNoteOnEvent,
-                    program->getNoteFromPad(programPadIndex), clampedVelocity,
-                    track.get(), screen->getBus(), screen, programPadIndex,
-                    program, mpc.getSequencer(),
+                    NoteNumber(program->getNoteFromPad(
+                        ProgramPadIndex(programPadIndex))),
+                    Velocity(clampedVelocity), track.get(), screen->getBus(),
+                    screen, ProgramPadIndex(programPadIndex), program,
+                    mpc.getSequencer(),
                     mpc.getEngineHost()->getSequencerPlaybackEngine(),
                     mpc.eventRegistry, mpc.clientEventController,
                     mpc.getEventHandler(), mpc.screens, mpc.getHardware());
@@ -276,8 +282,8 @@ void ClientHardwareEventController::handlePadPress(
 
     mpc.eventRegistry->registerPhysicalPadPress(
         Source::VirtualMpcHardware, screenId, screen->getBus()->busType,
-        physicalPadIndex, clampedVelocity, track->getIndex(), activeBank,
-        screen->getProgramIndex(), note, action);
+        PhysicalPadIndex(physicalPadIndex), Velocity(clampedVelocity),
+        track->getIndex(), activeBank, screen->getProgramIndex(), note, action);
 }
 
 void ClientHardwareEventController::handlePadRelease(
@@ -330,15 +336,15 @@ void ClientHardwareEventController::handlePadRelease(
 
         const auto programPadIndex =
             physicalPadAndBankToProgramPadIndex(p->padIndex, p->bank);
-        auto track =
+        const auto track =
             sequencer->getActiveSequence()->getTrack(p->trackIndex).get();
 
-        auto recordingNoteOnEvent =
+        const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);
 
-        auto recordingNoteEventId = recordingNoteOnEvent != nullptr
-                                        ? recordingNoteOnEvent->getId()
-                                        : NoNoteEventId;
+        const auto recordingNoteEventId = recordingNoteOnEvent != nullptr
+                                              ? recordingNoteOnEvent->getId()
+                                              : NoNoteEventId;
 
         if (p->noteNumber != NoNoteNumber)
         {
@@ -353,7 +359,7 @@ void ClientHardwareEventController::handlePadRelease(
 
             TriggerLocalNoteOffCommand(ctx).execute();
 
-            constexpr std::optional<int> noMidiChannel = std::nullopt;
+            constexpr std::optional<MidiChannel> noMidiChannel = std::nullopt;
             eventRegistry->registerNoteOff(Source::VirtualMpcHardware,
                                            p->noteNumber, noMidiChannel,
                                            [](void *) {});
@@ -361,7 +367,6 @@ void ClientHardwareEventController::handlePadRelease(
 
         if (p->programIndex != NoProgramIndex)
         {
-            constexpr std::optional<int> noMidiChannel = std::nullopt;
             eventRegistry->registerProgramPadRelease(
                 Source::VirtualMpcHardware, programPadIndex, p->programIndex,
                 [](void *) {});
@@ -369,7 +374,7 @@ void ClientHardwareEventController::handlePadRelease(
     };
 
     mpc.eventRegistry->registerPhysicalPadRelease(
-        physicalPadIndex, Source::VirtualMpcHardware, action);
+        PhysicalPadIndex(physicalPadIndex), Source::VirtualMpcHardware, action);
 }
 
 void ClientHardwareEventController::handlePadAftertouch(
@@ -399,19 +404,20 @@ void ClientHardwareEventController::handlePadAftertouch(
                 Source::VirtualMpcHardware,
                 physicalPadAndBankToProgramPadIndex(padPress->padIndex,
                                                     padPress->bank),
-                padPress->programIndex, pressureToUse);
+                padPress->programIndex, Pressure(pressureToUse));
         }
 
         if (padPress->noteNumber != NoNoteNumber)
         {
-            eventRegistry->registerNoteAftertouch(Source::VirtualMpcHardware,
-                                                  padPress->noteNumber,
-                                                  pressureToUse, std::nullopt);
+            eventRegistry->registerNoteAftertouch(
+                Source::VirtualMpcHardware, padPress->noteNumber,
+                Pressure(pressureToUse), std::nullopt);
         }
     };
 
     mpc.eventRegistry->registerPhysicalPadAftertouch(
-        padIndex, pressureToUse, Source::VirtualMpcHardware, action);
+        PhysicalPadIndex(padIndex), Pressure(pressureToUse),
+        Source::VirtualMpcHardware, action);
 }
 
 void ClientHardwareEventController::handleDataWheel(
@@ -445,7 +451,7 @@ void ClientHardwareEventController::handleDataWheel(
 
     const auto screen = mpc.getScreen();
 
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+    if (const auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
         popupScreen &&
         popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
     {
@@ -531,7 +537,7 @@ void ClientHardwareEventController::handleButtonPress(
 
     const auto layeredScreen = mpc.getLayeredScreen();
 
-    if (auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
+    if (const auto popupScreen = std::dynamic_pointer_cast<PopupScreen>(screen);
         popupScreen)
     {
         if (popupScreen->isCloseUponButtonOrPadPressOrDataWheelTurnEnabled())
@@ -899,7 +905,7 @@ void ClientHardwareEventController::handleButtonDoublePress(
                 buttonLockTracker.unlock(OVERDUB);
             }
         }
-        else if (event.componentId == OVERDUB)
+        else /*if (event.componentId == OVERDUB)*/
         {
             buttonLockTracker.toggle(OVERDUB);
 

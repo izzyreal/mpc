@@ -16,12 +16,12 @@ using namespace mpc::engine;
 ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
 {
     index = loadBytes[INDEX_OFFSET];
-    auto nameBytes =
+    const auto nameBytes =
         Util::vecCopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
 
     name = "";
 
-    for (char c : nameBytes)
+    for (const char c : nameBytes)
     {
         if (c == 0x00)
         {
@@ -38,7 +38,7 @@ ApsProgram::ApsProgram(const std::vector<char> &loadBytes)
 
     for (int i = 0; i < 64; i++)
     {
-        int offset = NOTE_PARAMETERS_OFFSET + i * NOTE_PARAMETERS_LENGTH;
+        const int offset = NOTE_PARAMETERS_OFFSET + i * NOTE_PARAMETERS_LENGTH;
         noteParameters[i] = new ApsNoteParameters(Util::vecCopyOfRange(
             loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
     }
@@ -54,7 +54,7 @@ ApsProgram::ApsProgram(sampler::Program *program, int index)
 {
     std::vector<std::vector<char>> byteList;
     this->index = index;
-    byteList.push_back({(char)index});
+    byteList.push_back({static_cast<char>(index)});
     byteList.push_back(UNKNOWN);
     auto programName = StrUtil::padRight(program->getName(), " ", 16);
 
@@ -88,12 +88,13 @@ ApsProgram::ApsProgram(sampler::Program *program, int index)
 
     ApsMixer apsMixer(stereoMixerChannels, indivFxMixerChannels);
     byteList.push_back(apsMixer.getBytes());
-    byteList.push_back({0, 64, 0});
-    auto apsAssignTable = std::vector<int>(64);
+    byteList.push_back({0, Mpc2000XlSpecs::PROGRAM_PAD_COUNT, 0});
+    auto apsAssignTable =
+        std::vector<DrumNoteNumber>(Mpc2000XlSpecs::PROGRAM_PAD_COUNT);
 
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::PROGRAM_PAD_COUNT; i++)
     {
-        apsAssignTable[i] = program->getNoteFromPad(i);
+        apsAssignTable[i] = program->getNoteFromPad(ProgramPadIndex(i));
     }
 
     ApsAssignTable table(apsAssignTable);
@@ -133,7 +134,7 @@ const int ApsProgram::PADDING3_LENGTH;
 const int ApsProgram::ASSIGN_TABLE_OFFSET;
 const int ApsProgram::ASSIGN_TABLE_LENGTH;
 
-ApsNoteParameters *ApsProgram::getNoteParameters(int noteIndex) const
+ApsNoteParameters *ApsProgram::getNoteParameters(const int noteIndex) const
 {
     return noteParameters[noteIndex];
 }
@@ -163,12 +164,12 @@ std::vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-StereoMixer ApsProgram::getStereoMixerChannel(int noteIndex) const
+StereoMixer ApsProgram::getStereoMixerChannel(const int noteIndex) const
 {
     return mixer->getStereoMixerChannel(noteIndex);
 }
 
-IndivFxMixer ApsProgram::getIndivFxMixerChannel(int noteIndex) const
+IndivFxMixer ApsProgram::getIndivFxMixerChannel(const int noteIndex) const
 {
     return mixer->getIndivFxMixerChannel(noteIndex);
 }
@@ -188,7 +189,7 @@ ApsProgram::~ApsProgram()
         delete assignTable;
     }
 
-    for (auto &np : noteParameters)
+    for (const auto &np : noteParameters)
     {
         if (np != nullptr)
         {

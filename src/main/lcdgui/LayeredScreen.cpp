@@ -67,7 +67,8 @@ void LayeredScreen::postToUiThread(const std::function<void()> &fn)
     uiTasks.post(fn);
 }
 
-bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
+bool LayeredScreen::isPreviousScreen(
+    const std::initializer_list<ScreenId> ids) const
 {
     if (history.size() < 2)
     {
@@ -89,7 +90,7 @@ bool LayeredScreen::isPreviousScreen(std::initializer_list<ScreenId> ids) const
 }
 
 bool LayeredScreen::isPreviousScreenNot(
-    std::initializer_list<ScreenId> ids) const
+    const std::initializer_list<ScreenId> ids) const
 {
     if (history.size() < 2)
     {
@@ -110,7 +111,8 @@ bool LayeredScreen::isPreviousScreenNot(
     return true;
 }
 
-bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
+bool LayeredScreen::isCurrentScreen(
+    const std::initializer_list<ScreenId> ids) const
 {
     if (history.empty())
     {
@@ -136,7 +138,7 @@ bool LayeredScreen::isCurrentScreen(std::initializer_list<ScreenId> ids) const
     return false;
 }
 
-bool LayeredScreen::isCurrentScreenPopupFor(ScreenId targetId) const
+bool LayeredScreen::isCurrentScreenPopupFor(const ScreenId targetId) const
 {
     if (history.size() < 2)
     {
@@ -174,14 +176,14 @@ void LayeredScreen::setPopupScreenText(const std::string &text) const
 
 void LayeredScreen::showPopup(const std::string &msg)
 {
-    PopupScreen::PopupConfig cfg{msg};
+    const PopupScreen::PopupConfig cfg{msg};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }
 
 void LayeredScreen::showPopupForMs(const std::string &msg, int delayMs)
 {
-    PopupScreen::PopupConfig cfg{
+    const PopupScreen::PopupConfig cfg{
         msg,
         false,
         delayMs,
@@ -193,7 +195,7 @@ void LayeredScreen::showPopupForMs(const std::string &msg, int delayMs)
 void LayeredScreen::showPopupAndThenOpen(ScreenId targetId,
                                          const std::string &msg, int delayMs)
 {
-    PopupScreen::PopupConfig cfg{
+    const PopupScreen::PopupConfig cfg{
         msg,
         false,
         delayMs,
@@ -206,7 +208,7 @@ void LayeredScreen::showPopupAndThenOpen(ScreenId targetId,
 void LayeredScreen::showPopupAndThenReturnToLayer(const std::string &msg,
                                                   int delayMs, int layerIndex)
 {
-    PopupScreen::PopupConfig cfg{
+    const PopupScreen::PopupConfig cfg{
         msg,
         false,
         delayMs,
@@ -218,7 +220,7 @@ void LayeredScreen::showPopupAndThenReturnToLayer(const std::string &msg,
 
 void LayeredScreen::showPopupAndAwaitInteraction(const std::string &msg)
 {
-    PopupScreen::PopupConfig cfg{msg, true};
+    const PopupScreen::PopupConfig cfg{msg, true};
     mpc.screens->get<ScreenId::PopupScreen>()->show(cfg);
     openScreenById(ScreenId::PopupScreen);
 }
@@ -229,9 +231,9 @@ std::shared_ptr<ScreenComponent> LayeredScreen::getCurrentScreen() const
     return history.back();
 }
 
-void LayeredScreen::openScreen(const std::string &name)
+void LayeredScreen::openScreen(const std::string &screenName)
 {
-    if (const auto id = getScreenIdByName(name))
+    if (const auto id = getScreenIdByName(screenName))
     {
         openScreenById(*id);
     }
@@ -408,9 +410,9 @@ void LayeredScreen::openScreenInternal(
         (std::dynamic_pointer_cast<SequencerScreen>(newScreen) &&
          !mpc.getSequencer()->getTransport()->isPlaying()))
     {
-        if (mpc.getSequencer()->getNextSq() != -1)
+        if (mpc.getSequencer()->getNextSq() != NoSequenceIndex)
         {
-            mpc.getSequencer()->setNextSq(-1);
+            mpc.getSequencer()->setNextSq(NoSequenceIndex);
         }
     }
 }
@@ -447,7 +449,6 @@ void LayeredScreen::Draw()
 
     root->preDrawClear(&pixels);
     root->drawRecursive(&pixels);
-    return;
 }
 
 MRECT LayeredScreen::getDirtyArea() const
@@ -540,15 +541,15 @@ int LayeredScreen::getFocusedLayerIndex() const
 
 std::shared_ptr<Layer> LayeredScreen::getFocusedLayer()
 {
-    const int idx = getFocusedLayerIndex();
-    if (idx < 0 || idx >= static_cast<int>(layers.size()))
+    if (const int idx = getFocusedLayerIndex();
+        idx < 0 || idx >= static_cast<int>(layers.size()))
     {
         throw std::runtime_error("no focused layer");
     }
     return layers[getFocusedLayerIndex()];
 }
 
-bool LayeredScreen::transfer(int direction)
+bool LayeredScreen::transfer(const int direction)
 {
     if (history.empty())
     {
@@ -846,7 +847,7 @@ bool LayeredScreen::setFocus(const std::string &focus)
     return getFocusedLayer()->setFocus(focus);
 }
 
-void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)
+void LayeredScreen::setFunctionKeysArrangement(const int arrangementIndex)
 {
     getFunctionKeys()->setActiveArrangement(arrangementIndex);
 }

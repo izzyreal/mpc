@@ -86,11 +86,12 @@ ApsParser::ApsParser(Mpc &mpc, std::string apsNameString)
 
     auto masterTable = ApsAssignTable(*sampler->getMasterPadAssign());
     chunks.push_back(masterTable.getBytes());
-    chunks.push_back(std::vector<char>{4, 0, (char)136, 1, 64, 0, 6});
+    chunks.push_back(
+        std::vector<char>{4, 0, static_cast<char>(136), 1, 64, 0, 6});
 
     for (int i = 0; i < Mpc2000XlSpecs::DRUM_BUS_COUNT; i++)
     {
-        auto drumBus = mpc.getSequencer()->getDrumBus(i);
+        auto drumBus = mpc.getSequencer()->getDrumBus(DrumBusIndex(i));
 
         ApsMixer mixer(drumBus->getStereoMixerChannels(),
                        drumBus->getIndivFxMixerChannels());

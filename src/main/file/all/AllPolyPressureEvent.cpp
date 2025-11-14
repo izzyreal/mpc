@@ -12,7 +12,7 @@ AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char> &bytes)
     auto event = std::make_shared<PolyPressureEvent>();
 
     event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+    event->setTrack(TrackIndex(bytes[AllEvent::TRACK_OFFSET]));
     event->setNote(bytes[NOTE_OFFSET]);
     event->setAmount(bytes[AMOUNT_OFFSET]);
 

@@ -1,16 +1,16 @@
 #pragma once
+#include "IntTypes.hpp"
 
 namespace mpc::sequencer
 {
     class Step
     {
-
-        int sequence = 0;
+        SequenceIndex sequence{MinSequenceIndex};
         int repeatCount = 1;
 
     public:
-        void setSequence(int i);
-        int getSequence() const;
+        void setSequence(SequenceIndex);
+        SequenceIndex getSequence() const;
         void setRepeats(int i);
         int getRepeats() const;
     };
