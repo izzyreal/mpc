@@ -115,35 +115,6 @@ std::optional<ProgramPadPressEvent> StateView::getMostRecentProgramPadPress(
     return latest;
 }
 
-// std::shared_ptr<sequencer::NoteOnEvent>
-// StateView::retrieveRecordNoteEvent(const NoteNumber note) const
-// {
-//     for (const auto &e : state->noteEvents)
-//     {
-//         if (e.noteNumber == note && e.recordNoteEvent)
-//         {
-//             return *e->recordNoteEvent;
-//         }
-//     }
-//     return {};
-// }
-
-PhysicalPadPressEvent
-StateView::retrievePhysicalPadPressEvent(const PhysicalPadIndex idx) const
-{
-    for (const auto &e : state->physicalPadEvents)
-    {
-        if (e.padIndex == idx)
-        {
-            return e;
-        }
-    }
-
-    throw std::invalid_argument(
-        "This method should only be called for physical pads that are "
-        "pressed");
-}
-
 int StateView::getTotalPressedProgramPadCount() const
 {
     return state->programPadEvents.size();

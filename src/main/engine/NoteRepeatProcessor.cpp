@@ -68,8 +68,9 @@ void NoteRepeatProcessor::process(
          programPadIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
          ++programPadIndex)
     {
-        if (!snapshot.getMostRecentProgramPadPress(
-                ProgramPadIndex(programPadIndex), sourcesToExclude))
+        auto mostRecentProgramPadPressEvent = snapshot.getMostRecentProgramPadPress(ProgramPadIndex(programPadIndex), sourcesToExclude);
+
+        if (!mostRecentProgramPadPressEvent)
         {
             continue;
         }
@@ -107,15 +108,11 @@ void NoteRepeatProcessor::process(
             noteEvent->setVariationValue(value);
         }
 
-        const auto physicalPadPressInfo =
-            snapshot.retrievePhysicalPadPressEvent(
-                PhysicalPadIndex(programPadIndex % 16));
+        const PhysicalPadIndex physicalPadIndex = mostRecentProgramPadPressEvent->physicalPadIndex;
 
-        const bool isPhysicallyPressed =
-            physicalPadPressInfo.bank ==
-            controller::programPadIndexToBank(ProgramPadIndex(programPadIndex));
-
-        if (isSixteenLevelsEnabled() && isPhysicallyPressed)
+        if (const bool isPhysicallyPressed =
+                physicalPadIndex != NoPhysicalPadIndex;
+            isSixteenLevelsEnabled() && isPhysicallyPressed)
         {
             Util::SixteenLevelsContext sixteenLevelsContext{
                 isSixteenLevelsEnabled(),

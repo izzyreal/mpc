@@ -198,7 +198,7 @@ void ClientMidiEventController::handleNoteOn(const ClientMidiEvent &e)
                 Source::MidiInput, std::optional<MidiChannel>(e.getChannel()),
                 screenId, track->getIndex(), screen->getBus()->busType,
                 ProgramPadIndex(programPadIndex), Velocity(e.getVelocity()),
-                ProgramIndex(*programIndex));
+                ProgramIndex(*programIndex), NoPhysicalPadIndex);
         }
     }
 

@@ -76,7 +76,8 @@ void EventRegistry::registerProgramPadPress(
     const Source source, const std::optional<MidiChannel> midiInputChannel,
     const lcdgui::ScreenId screen, const TrackIndex trackIndex,
     const sequencer::BusType busType, const ProgramPadIndex padIndex,
-    const Velocity velocity, const ProgramIndex program) const
+    const Velocity velocity, const ProgramIndex program,
+    const PhysicalPadIndex physicalPadIndex) const
 {
     const ProgramPadPressEvent e{padIndex,
                                  source,
@@ -87,7 +88,8 @@ void EventRegistry::registerProgramPadPress(
                                  program,
                                  velocity,
                                  NoPressure,
-                                 utils::nowInMilliseconds()};
+                                 utils::nowInMilliseconds(),
+                                 physicalPadIndex};
     EventMessage msg{EventMessage::Type::ProgramPadPress};
     msg.programPadPress = e;
     msg.source = source;

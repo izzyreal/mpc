@@ -49,6 +49,7 @@ namespace mpc::eventregistry
         Velocity velocity;
         Pressure pressure;
         TimeInMilliseconds pressTimeMs;
+        PhysicalPadIndex physicalPadIndex;
     };
 
     struct ProgramPadAftertouchEvent

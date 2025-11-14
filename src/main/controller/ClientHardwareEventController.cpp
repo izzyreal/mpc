@@ -191,7 +191,7 @@ void ClientHardwareEventController::handlePadPress(
             Source::VirtualMpcHardware, noMidiChannel, screenId,
             track->getIndex(), screen->getBus()->busType,
             ProgramPadIndex(programPadIndex), Velocity(clampedVelocity),
-            *programIndex);
+            *programIndex, PhysicalPadIndex(physicalPadIndex));
 
         note = NoteNumber(
             program->getNoteFromPad(ProgramPadIndex(programPadIndex)));

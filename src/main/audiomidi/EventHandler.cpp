@@ -136,7 +136,7 @@ void EventHandler::handleFinalizedDrumNoteOnEvent(
         mpc.eventRegistry->registerProgramPadPress(
             eventregistry::Source::Sequence, std::nullopt, screenId,
             track->getIndex(), ctx.drum->busType, programPadIndex,
-            noteOnEvent->getVelocity(), programIndex);
+            noteOnEvent->getVelocity(), programIndex, NoPhysicalPadIndex);
     }
 
     const auto noteOffCtx =

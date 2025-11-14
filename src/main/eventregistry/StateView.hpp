@@ -30,12 +30,6 @@ namespace mpc::eventregistry
 
         int getTotalNoteOnCount() const;
 
-        // std::shared_ptr<sequencer::NoteOnEvent>
-        // retrieveRecordNoteEvent(NoteNumber note) const;
-
-        PhysicalPadPressEvent
-            retrievePhysicalPadPressEvent(PhysicalPadIndex) const;
-
     private:
         std::shared_ptr<const State> state;
     };
