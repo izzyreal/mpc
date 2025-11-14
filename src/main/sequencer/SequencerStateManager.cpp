@@ -62,8 +62,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 
                 if (m.setPositionTo0)
                 {
-                    sequencer->getTransport()->setPosition(0);
-                    drainQueue();
+                    actions.push_back([&]{sequencer->getTransport()->setPosition(0); });
                 }
             }
             else if constexpr (std::is_same_v<T, Stop>)
@@ -79,7 +78,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
 }
 
 void SequencerStateManager::applyPlayMessage(
-    const bool fromStart) const noexcept
+    const bool fromStart) noexcept
 {
     const auto transport = sequencer->getTransport();
 
@@ -188,6 +187,8 @@ void SequencerStateManager::applyPlayMessage(
         transport->setPosition(*positionQuarterNotesToStartPlayingFrom);
     }
 
+    drainQueue();
+
     if (!songMode)
     {
         if (!activeSequence->isUsed())
@@ -217,31 +218,34 @@ void SequencerStateManager::applyPlayMessage(
 
 void SequencerStateManager::enqueue(SequencerMessage &&m) const noexcept
 {
-    /*
-    std::visit(
+    /*std::visit(
         [&](auto &&m)
         {
             using T = std::decay_t<decltype(m)>;
 
             if constexpr (std::is_same_v<T, SetPositionQuarterNotes>)
             {
-                printf("[Sequencer] SetPositionQuarterNotes: %.3f\n",
-                       m.positionQuarterNotes);
+                // printf("[Sequencer] SetPositionQuarterNotes: %.3f\n",
+                //        m.positionQuarterNotes);
             }
             else if constexpr (std::is_same_v<T,
     SetPlayStartPositionQuarterNotes>)
             {
-                printf("[Sequencer] SetPlayStartPositionQuarterNotes: %.3f\n",
-                       m.positionQuarterNotes);
+                // printf("[Sequencer] SetPlayStartPositionQuarterNotes: %.3f\n",
+                //        m.positionQuarterNotes);
             }
             else if constexpr (std::is_same_v<T, BumpPositionByTicks>)
             {
-                printf("[Sequencer] BumpPositionByTicks: %d ticks (%.6f qn)\n",
-                       m.ticks, Sequencer::ticksToQuarterNotes(m.ticks));
+                // printf("[Sequencer] BumpPositionByTicks: %d ticks (%.6f qn)\n",
+                //        m.ticks, Sequencer::ticksToQuarterNotes(m.ticks));
+            }
+            else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
+            {
+                printf("[Sequencer] SetSelectedSequenceIndex %i\n",
+                       m.sequenceIndex.get());
             }
         },
-        m);
-        */
+        m);*/
 
     AtomicStateExchange::enqueue(std::move(m));
 }

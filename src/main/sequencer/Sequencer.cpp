@@ -293,8 +293,9 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
                                          const bool shouldSetPositionTo0) const
 {
-    stateManager->enqueue(
-        SetSelectedSequenceIndex{sequenceIndexToUse, shouldSetPositionTo0});
+    stateManager->enqueue(SetSelectedSequenceIndex{
+        std::clamp(sequenceIndexToUse, MinSequenceIndex, MaxSequenceIndex),
+        shouldSetPositionTo0});
 }
 
 void Sequencer::setTimeDisplayStyle(const int i)
@@ -648,8 +649,9 @@ std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
         songs[getScreens()->get<ScreenId::SongScreen>()->getSelectedSongIndex()]
                 ->getStepCount() != 0)
     {
-        return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
-                                                     : getSelectedSequenceIndex()];
+        return sequences[getSongSequenceIndex() >= 0
+                             ? getSongSequenceIndex()
+                             : getSelectedSequenceIndex()];
     }
 
     return sequences[getSelectedSequenceIndex()];

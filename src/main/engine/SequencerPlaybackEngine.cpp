@@ -119,9 +119,11 @@ std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTransport()->getTickPosition());
     sequencer->setSelectedSequenceIndex(sequencer->getNextSq(), false);
+    sequencer->getStateManager()->drainQueue();
     sequencer->setNextSq(NoSequenceIndex);
     setTickPositionEffectiveImmediately(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
+    newSeq->syncTrackEventIndices(0);
     newSeq->initLoop();
     return newSeq;
 }

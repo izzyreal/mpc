@@ -4,6 +4,7 @@
 #include <memory>
 #include <functional>
 #include <cstdio>
+#include <cstdint>
 #include <array>
 #include <concurrentqueue.h>
 
@@ -13,7 +14,14 @@ namespace mpc::concurrency
               size_t PoolSize = 3>
     class AtomicStateExchange
     {
-        using MessageQueue = moodycamel::ConcurrentQueue<Message>;
+        struct SequencedMessage {
+            uint64_t seq;
+            Message payload;
+        };
+
+        using MessageQueue = moodycamel::ConcurrentQueue<SequencedMessage>;
+        mutable std::atomic<uint64_t> globalSeq{0};
+        std::vector<SequencedMessage> sequencedMessages;
 
     protected:
         explicit AtomicStateExchange(std::function<void(State &)> reserveFn,
@@ -32,26 +40,46 @@ namespace mpc::concurrency
 
             eventMessageQueue =
                 std::make_shared<MessageQueue>(messageQueueCapacity);
+            sequencedMessages.reserve(messageQueueCapacity);
         }
 
     public:
         virtual ~AtomicStateExchange() = default;
-        virtual void enqueue(Message &&msg) const noexcept
+
+        virtual void enqueue(Message&& msg) const noexcept
         {
-            eventMessageQueue->enqueue(std::move(msg));
+            SequencedMessage sm;
+            sm.seq = globalSeq.fetch_add(1, std::memory_order_relaxed);
+            sm.payload = std::move(msg);
+            eventMessageQueue->enqueue(std::move(sm));
         }
 
         void drainQueue() noexcept
         {
-            Message msg;
+            SequencedMessage sm;
 
             bool shouldPublish = false;
 
-            while (eventMessageQueue->try_dequeue(msg))
+            while (eventMessageQueue->try_dequeue(sm))
             {
-                applyMessage(msg);
+                sequencedMessages.push_back(std::move(sm));
                 shouldPublish = true;
             }
+
+            std::sort(sequencedMessages.begin(), sequencedMessages.end(),
+                      [](const auto &a, const auto &b)
+                      {
+                          return a.seq < b.seq;
+                      });
+
+            for (auto it = sequencedMessages.begin(); it != sequencedMessages.end(); )
+            {
+                auto msg = std::move(it->payload);
+                it = sequencedMessages.erase(it);
+                applyMessage(msg);
+            }
+
+            sequencedMessages.clear();
 
             if (shouldPublish)
             {
@@ -93,7 +121,7 @@ namespace mpc::concurrency
 
             if (oldSnap.get() == dst)
             {
-                uint64_t n =
+                const uint64_t n =
                     publishCount.fetch_add(1, std::memory_order_relaxed) + 1;
 
                 std::fprintf(stdout,
