@@ -50,7 +50,7 @@ void InsertEventScreen::function(const int i)
 
 void InsertEventScreen::insertEvent() const
 {
-    const auto track = sequencer->getActiveTrack();
+    const auto track = sequencer->getSelectedTrack();
 
     if (insertEventType == 0)
     {

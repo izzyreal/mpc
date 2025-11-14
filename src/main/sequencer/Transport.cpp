@@ -130,7 +130,7 @@ void Transport::stop(const StopMode stopMode)
     playedStepRepetitions = 0;
     sequencer.setNextSq(NoSequenceIndex);
 
-    const auto activeSequence = sequencer.getActiveSequence();
+    const auto activeSequence = sequencer.getSelectedSequence();
     const auto pos = getTickPosition();
 
     int64_t newTickPosition = pos;
@@ -376,7 +376,7 @@ bool Transport::isOverdubbing() const
 int Transport::getCurrentBarIndex() const
 {
     const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                               : sequencer.getActiveSequence();
+                               : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
@@ -412,7 +412,7 @@ int Transport::getCurrentBarIndex() const
 int Transport::getCurrentBeatIndex() const
 {
     const auto s = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                               : sequencer.getActiveSequence();
+                               : sequencer.getSelectedSequence();
     const auto pos =
         isCountingIn()
             ? Sequencer::quarterNotesToTicks(getPlayStartPositionQuarterNotes())
@@ -468,7 +468,7 @@ int Transport::getCurrentBeatIndex() const
 int Transport::getCurrentClockNumber() const
 {
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
-                                      : sequencer.getActiveSequence();
+                                      : sequencer.getSelectedSequence();
 
     auto clock =
         isCountingIn()
@@ -529,7 +529,7 @@ void Transport::setBarBeatClock(const int bar, const int beat,
         return;
     }
 
-    const auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getSelectedSequence();
     const auto &barLengths = s->getBarLengthsInTicks();
     const auto ts = s->getTimeSignature();
 
@@ -558,7 +558,7 @@ void Transport::setBar(int i) const
         return;
     }
 
-    const auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getSelectedSequence();
     const auto &barLengths = s->getBarLengthsInTicks();
 
     i = std::clamp(i, 0, static_cast<int>(barLengths.size()) - 1);
@@ -584,7 +584,7 @@ void Transport::setBeat(int i) const
         i = 0;
     }
 
-    const auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getSelectedSequence();
     auto pos = getTickPosition();
 
     if (pos == s->getLastTick())
@@ -618,7 +618,7 @@ void Transport::setClock(int i) const
         i = 0;
     }
 
-    const auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getSelectedSequence();
     int pos = getTickPosition();
 
     if (pos == s->getLastTick())
@@ -653,7 +653,7 @@ void Transport::setPosition(const double positionQuarterNotes,
 
     const auto sequence = isPlaying() ? sequencer.getCurrentlyPlayingSequence()
                           : songMode  ? sequencer.getSequence(songSequenceIndex)
-                                      : sequencer.getActiveSequence();
+                                      : sequencer.getSelectedSequence();
 
     const auto seqLengthQuarterNotes =
         Sequencer::ticksToQuarterNotes(sequence->getLastTick());
@@ -704,7 +704,7 @@ void Transport::setPositionWithinSong(
     }
 
     const auto songScreen = sequencer.getScreens()->get<ScreenId::SongScreen>();
-    const auto song = sequencer.getSong(songScreen->getActiveSongIndex());
+    const auto song = sequencer.getSong(songScreen->getSelectedSongIndex());
     uint32_t stepStartTick = 0;
     uint32_t stepEndTick = 0;
     uint64_t songEndTick = 0;
@@ -805,7 +805,7 @@ void Transport::setTempo(double newTempo)
         newTempo = 300.0;
     }
 
-    const auto s = sequencer.getActiveSequence();
+    const auto s = sequencer.getSelectedSequence();
     const auto tce = sequencer.getCurrentTempoChangeEvent();
 
     if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
@@ -850,12 +850,12 @@ void Transport::setTempo(double newTempo)
 
 double Transport::getTempo() const
 {
-    if (!isPlaying() && !sequencer.getActiveSequence()->isUsed())
+    if (!isPlaying() && !sequencer.getSelectedSequence()->isUsed())
     {
         return tempo;
     }
 
-    const auto seq = sequencer.getActiveSequence();
+    const auto seq = sequencer.getSelectedSequence();
 
     if (screengroups::isSongScreen(sequencer.layeredScreen->getCurrentScreen()))
     {
@@ -881,7 +881,7 @@ double Transport::getTempo() const
             }
         }
 
-        return sequencer.getActiveSequence()->getInitialTempo();
+        return sequencer.getSelectedSequence()->getInitialTempo();
     }
 
     if (seq->isTempoChangeOn() && tce)

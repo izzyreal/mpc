@@ -142,7 +142,7 @@ int Assign16LevelsScreen::getParameter() const
 
 void Assign16LevelsScreen::displayNote() const
 {
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
     const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
     assert(drumBus);
     const auto program = sampler->getProgram(drumBus->getProgram());

@@ -10,7 +10,7 @@ PushGoToCommand::PushGoToCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushGoToCommand::execute()
 {
-    if (!mpc.getSequencer()->getActiveSequence()->isUsed())
+    if (!mpc.getSequencer()->getSelectedSequence()->isUsed())
     {
         return;
     }

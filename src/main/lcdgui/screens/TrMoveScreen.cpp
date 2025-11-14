@@ -44,7 +44,7 @@ void TrMoveScreen::turnWheel(int i)
     else if (focusedFieldName == "sq")
     {
         const auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
-        eventsScreen->setFromSq(sequencer->getActiveSequenceIndex() + i);
+        eventsScreen->setFromSq(sequencer->getSelectedSequenceIndex() + i);
         displaySq();
         displayTrFields();
         displayTrLabels();
@@ -143,7 +143,7 @@ void TrMoveScreen::function(int i)
 
             if (isSelected())
             {
-                const auto sequence = sequencer->getActiveSequence();
+                const auto sequence = sequencer->getSelectedSequence();
                 insert(sequence.get());
             }
             else
@@ -188,7 +188,7 @@ void TrMoveScreen::displayTrLabels() const
     }
 
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
-    auto sequence = sequencer->getActiveSequence();
+    auto sequence = sequencer->getSelectedSequence();
 
     if (tr0Index >= 0)
     {
@@ -235,7 +235,7 @@ void TrMoveScreen::displayTrLabels() const
 void TrMoveScreen::displayTrFields() const
 {
     auto eventsScreen = mpc.screens->get<ScreenId::EventsScreen>();
-    const auto sequence = sequencer->getActiveSequence();
+    const auto sequence = sequencer->getSelectedSequence();
 
     if (isSelected())
     {
@@ -269,9 +269,9 @@ void TrMoveScreen::displayTrFields() const
 
 void TrMoveScreen::displaySq() const
 {
-    const auto sequence = sequencer->getActiveSequence();
+    const auto sequence = sequencer->getSelectedSequence();
     findField("sq")->setText(StrUtil::padLeft(
-        std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+        std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0", 2));
     const auto sequenceName = "-" + sequence->getName();
     findLabel("sq-name")->setText(sequenceName);
 }

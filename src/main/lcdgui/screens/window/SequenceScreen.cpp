@@ -23,7 +23,7 @@ void SequenceScreen::open()
     const auto defaultSequenceNameFirstLetterField =
         findField("defaultnamefirstletter");
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
     defaultSequenceNameFirstLetterField->setText(
@@ -66,11 +66,11 @@ void SequenceScreen::openNameScreen()
     }
     else
     {
-        initialNameScreenName = sequencer->getActiveSequence()->getName();
+        initialNameScreenName = sequencer->getSelectedSequence()->getName();
 
         enterAction = [this](const std::string &nameScreenName)
         {
-            sequencer->getActiveSequence()->setName(nameScreenName);
+            sequencer->getSelectedSequence()->setName(nameScreenName);
             openScreenById(ScreenId::SequenceScreen);
         };
     }

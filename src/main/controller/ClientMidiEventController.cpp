@@ -281,7 +281,7 @@ void ClientMidiEventController::handleNoteOff(const ClientMidiEvent &e)
             TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
                 Source::MidiInput, NoteNumber(noteNumber),
                 noteEventInfo->recordNoteEventId,
-                sequencer->getActiveSequence()->getTrack(trackIndex).get(),
+                sequencer->getSelectedSequence()->getTrack(trackIndex).get(),
                 noteEventInfo->busType, screen, programPadIndex, program,
                 sequencer, sequencerPlaybackEngine, eventRegistry,
                 clientEventController, eventHandler, screens, hardware);
@@ -426,7 +426,7 @@ void ClientMidiEventController::handleProgramChange(
             }
             else
             {
-                sequencer->setActiveTrackIndex(e.getProgramNumber());
+                sequencer->setSelectedTrackIndex(e.getProgramNumber());
             }
         }
     }
@@ -556,7 +556,7 @@ ClientMidiEventController::getTrackIndexForEvent(const ClientMidiEvent &e) const
         }
         return std::nullopt;
     }
-    return sequencer->getActiveTrackIndex();
+    return sequencer->getSelectedTrackIndex();
 }
 
 std::shared_ptr<Track>
@@ -566,7 +566,7 @@ ClientMidiEventController::getTrackForEvent(const ClientMidiEvent &e) const
     {
         const auto seq = sequencer->getTransport()->isPlaying()
                              ? sequencer->getCurrentlyPlayingSequence()
-                             : sequencer->getActiveSequence();
+                             : sequencer->getSelectedSequence();
         return seq->getTrack(*trackIndex);
     }
 

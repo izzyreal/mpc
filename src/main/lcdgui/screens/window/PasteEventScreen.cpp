@@ -30,7 +30,7 @@ void PasteEventScreen::function(const int i)
 
             for (auto &event : stepEditorScreen->getPlaceHolder())
             {
-                sequencer->getActiveTrack()->cloneEventIntoTrack(
+                sequencer->getSelectedTrack()->cloneEventIntoTrack(
                     event, sequencer->getTransport()->getTickPosition(),
                     allowMultipleNotesOnSameTick);
             }

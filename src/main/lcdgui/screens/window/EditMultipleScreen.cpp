@@ -47,7 +47,7 @@ void EditMultipleScreen::function(const int i)
 
     const auto selectedEvent = stepEditorScreen->getSelectedEvent();
     const auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
 
     switch (i)
     {
@@ -159,7 +159,7 @@ void EditMultipleScreen::turnWheel(const int increment)
     const auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
 
     if (focusedFieldName == "value0")
     {
@@ -305,7 +305,7 @@ void EditMultipleScreen::updateEditMultiple() const
     const auto event = stepEditorScreen->getSelectedEvent();
     const auto letter = stepEditorScreen->getSelectedParameterLetter();
 
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
 
     if (std::dynamic_pointer_cast<NoteOnEvent>(event) &&
         isMidiBusType(track->getBusType()))
@@ -499,7 +499,7 @@ void EditMultipleScreen::updateDouble() const
 
 void EditMultipleScreen::setChangeNoteTo(const NoteNumber i)
 {
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
     const auto midi = isDrumBusType(track->getBusType());
     changeNoteTo =
         std::clamp(i, NoteNumber(midi ? MinDrumNoteNumber : NoDrumNoteAssigned),

@@ -16,7 +16,7 @@ bool WithTimesAndNotes::checkAllTimes(Mpc &mpc, const int notch,
 {
     const auto sequenceToUse =
         sequence != nullptr ? sequence
-                            : mpc.getSequencer()->getActiveSequence().get();
+                            : mpc.getSequencer()->getSelectedSequence().get();
 
     const auto focusedFieldName = mpc.getLayeredScreen()
                                       ->getCurrentScreen()
@@ -86,7 +86,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(Mpc &mpc, const int notch,
 
         if (const auto trackToUse =
                 track != nullptr ? track
-                                 : mpc.getSequencer()->getActiveTrack().get();
+                                 : mpc.getSequencer()->getSelectedTrack().get();
             isMidiBusType(trackToUse->getBusType()))
         {
             const auto note = note0 + notch;

@@ -23,8 +23,8 @@ void DeleteSequenceScreen::turnWheel(const int i)
 
     if (focusedFieldName == "sq")
     {
-        sequencer->setActiveSequenceIndex(
-            sequencer->getActiveSequenceIndex() + i, true);
+        sequencer->setSelectedSequenceIndex(
+            sequencer->getSelectedSequenceIndex() + i, true);
         displaySequenceNumberName();
     }
 }
@@ -41,7 +41,7 @@ void DeleteSequenceScreen::function(const int i)
             break;
         case 4:
             sequencer->getTransport()->setPosition(0);
-            sequencer->purgeSequence(sequencer->getActiveSequenceIndex());
+            sequencer->purgeSequence(sequencer->getSelectedSequenceIndex());
             openScreenById(ScreenId::SequencerScreen);
             break;
     }
@@ -49,9 +49,9 @@ void DeleteSequenceScreen::function(const int i)
 
 void DeleteSequenceScreen::displaySequenceNumberName() const
 {
-    const auto sequenceName = sequencer->getActiveSequence()->getName();
+    const auto sequenceName = sequencer->getSelectedSequence()->getName();
     findField("sq")->setText(
         StrUtil::padLeft(
-            std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) +
+            std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0", 2) +
         "-" + sequenceName);
 }

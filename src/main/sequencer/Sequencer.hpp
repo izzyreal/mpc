@@ -92,8 +92,8 @@ namespace mpc::sequencer
         static double ticksToQuarterNotes(uint32_t ticks);
 
         void playToTick(int targetTick) const;
-        SequenceIndex getActiveSequenceIndex() const;
-        std::shared_ptr<Track> getActiveTrack();
+        SequenceIndex getSelectedSequenceIndex() const;
+        std::shared_ptr<Track> getSelectedTrack();
         std::shared_ptr<Sequence> createSeqInPlaceHolder();
         void clearPlaceHolder();
         void movePlaceHolderTo(int destIndex);
@@ -126,7 +126,7 @@ namespace mpc::sequencer
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;
-        SequenceIndex activeSequenceIndex{0};
+        SequenceIndex selectedSequenceIndex{0};
 
         std::vector<std::shared_ptr<Sequence>> sequences =
             std::vector<std::shared_ptr<Sequence>>(99);
@@ -149,7 +149,7 @@ namespace mpc::sequencer
         int tapIndex = 0;
 
         std::vector<std::string> defaultTrackNames;
-        int activeTrackIndex = 0;
+        int selectedTrackIndex = 0;
         SequenceIndex nextSq{NoSequenceIndex};
 
         std::shared_ptr<Sequence>
@@ -177,12 +177,12 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
         void setDefaultSequenceName(const std::string &s);
-        void setActiveSequenceIndex(SequenceIndex, bool shouldSetPositionTo0);
+        void setSelectedSequenceIndex(SequenceIndex, bool shouldSetPositionTo0);
         void setTimeDisplayStyle(int i);
         int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);
         bool isRecordingModeMulti() const;
-        int getActiveTrackIndex() const;
+        int getSelectedTrackIndex() const;
         void trackUp();
         void trackDown();
 
@@ -200,7 +200,7 @@ namespace mpc::sequencer
         std::vector<std::string> &getDefaultTrackNames();
         std::string getDefaultTrackName(int i);
         void setDefaultTrackName(const std::string &s, int i);
-        std::shared_ptr<Sequence> getActiveSequence();
+        std::shared_ptr<Sequence> getSelectedSequence();
         int getUsedSequenceCount() const;
         std::vector<std::shared_ptr<Sequence>> getUsedSequences() const;
         std::vector<int> getUsedSequenceIndexes() const;
@@ -211,7 +211,7 @@ namespace mpc::sequencer
         void tap();
 
         std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
-        void setActiveTrackIndex(int i);
+        void setSelectedTrackIndex(int i);
         SequenceIndex getCurrentlyPlayingSequenceIndex() const;
         SequenceIndex getNextSq() const;
         SequenceIndex getFirstUsedSeqDown(SequenceIndex from,
@@ -227,7 +227,7 @@ namespace mpc::sequencer
         bool isSecondSequenceEnabled() const;
         void setSecondSequenceEnabled(bool b);
         void flushTrackNoteCache();
-        void storeActiveSequenceInUndoPlaceHolder();
+        void storeSelectedSequenceInUndoPlaceHolder();
         void resetUndo();
     };
 } // namespace mpc::sequencer

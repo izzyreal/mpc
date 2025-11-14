@@ -204,18 +204,18 @@ void LocateScreen::setClock(const int8_t newClock)
 uint16_t LocateScreen::getMaxBarIndexForThisSequence() const
 {
     return std::clamp<uint16_t>(
-        sequencer->getActiveSequence()->getLastBarIndex() + 1, 0, 998);
+        sequencer->getSelectedSequence()->getLastBarIndex() + 1, 0, 998);
 }
 
 uint8_t LocateScreen::getMaxBeatIndexForThisBar() const
 {
-    return sequencer->getActiveSequence()->getNumerator(barIndex) - 1;
+    return sequencer->getSelectedSequence()->getNumerator(barIndex) - 1;
 }
 
 uint8_t LocateScreen::getMaxClockForThisBar() const
 {
     return 96 * (4.0 /
-                 sequencer->getActiveSequence()->getDenominator(barIndex)) -
+                 sequencer->getSelectedSequence()->getDenominator(barIndex)) -
            1;
 }
 

@@ -58,7 +58,7 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             }
             else if constexpr (std::is_same_v<T, SetActiveSequenceIndex>)
             {
-                sequencer->setActiveSequenceIndex(m.sequenceIndex, false);
+                sequencer->setSelectedSequenceIndex(m.sequenceIndex, false);
                 if (m.setPositionTo0)
                 {
                     sequencer->getTransport()->setPosition(0);
@@ -93,7 +93,7 @@ void SequencerStateManager::applyPlayMessage(
         sequencer->getScreens()->get<ScreenId::SongScreen>();
 
     const auto currentSong =
-        sequencer->getSong(songScreen->getActiveSongIndex());
+        sequencer->getSong(songScreen->getSelectedSongIndex());
 
     const bool songMode = sequencer->isSongModeEnabled();
 
@@ -110,7 +110,7 @@ void SequencerStateManager::applyPlayMessage(
             songScreen->setOffset(-1);
             if (sequencer->getSongSequenceIndex() != oldSongSequenceIndex)
             {
-                sequencer->setActiveSequenceIndex(
+                sequencer->setSelectedSequenceIndex(
                     sequencer->getSongSequenceIndex(), true);
             }
         }
@@ -152,7 +152,7 @@ void SequencerStateManager::applyPlayMessage(
         }
     }
 
-    const auto activeSequence = sequencer->getActiveSequence();
+    const auto activeSequence = sequencer->getSelectedSequence();
 
     if (transport->isCountEnabled() && !songMode)
     {
@@ -200,7 +200,7 @@ void SequencerStateManager::applyPlayMessage(
 
         if (transport->isRecordingOrOverdubbing())
         {
-            sequencer->storeActiveSequenceInUndoPlaceHolder();
+            sequencer->storeSelectedSequenceInUndoPlaceHolder();
         }
     }
 

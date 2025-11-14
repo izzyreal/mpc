@@ -25,7 +25,7 @@ void TimingCorrectScreen::open()
     findField("note1")->setAlignment(Alignment::Centered, 18);
     findField("note1")->setLocation(116, 40);
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     setTime0(0);
     setTime1(seq->getLastTick());
@@ -46,11 +46,11 @@ void TimingCorrectScreen::function(const int i)
     {
         case 4:
         {
-            sequencer->storeActiveSequenceInUndoPlaceHolder();
+            sequencer->storeSelectedSequenceInUndoPlaceHolder();
 
             std::vector<int> noteRange(2);
 
-            const auto track = sequencer->getActiveTrack();
+            const auto track = sequencer->getSelectedTrack();
 
             if (isMidiBusType(track->getBusType()))
             {
@@ -73,7 +73,7 @@ void TimingCorrectScreen::function(const int i)
 
             const auto eventRange = track->getEventRange(time0, time1);
 
-            const auto sequence = sequencer->getActiveSequence();
+            const auto sequence = sequencer->getSelectedSequence();
 
             for (auto &e : eventRange)
             {
@@ -149,7 +149,7 @@ void TimingCorrectScreen::displaySwing() const
 
 void TimingCorrectScreen::displayNotes()
 {
-    if (const auto track = sequencer->getActiveTrack();
+    if (const auto track = sequencer->getSelectedTrack();
         isDrumBusType(track->getBusType()))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
@@ -200,7 +200,7 @@ void TimingCorrectScreen::displayAmount() const
 
 void TimingCorrectScreen::displayTime()
 {
-    const auto s = sequencer->getActiveSequence().get();
+    const auto s = sequencer->getSelectedSequence().get();
     findField("time0")->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1,
                                       "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");

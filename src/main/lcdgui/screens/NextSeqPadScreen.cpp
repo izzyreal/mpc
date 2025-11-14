@@ -48,7 +48,7 @@ NextSeqPadScreen::NextSeqPadScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveSequenceIndex();
+                            return sequencer->getSelectedSequenceIndex();
                         },
                         [&](auto)
                         {
@@ -149,8 +149,8 @@ void NextSeqPadScreen::displaySq() const
 {
     findField("sq")->setText(
         StrUtil::padLeft(
-            std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) +
-        "-" + sequencer->getActiveSequence()->getName());
+            std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0", 2) +
+        "-" + sequencer->getSelectedSequence()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(const int i) const

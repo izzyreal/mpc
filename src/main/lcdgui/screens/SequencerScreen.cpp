@@ -78,7 +78,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveSequenceIndex();
+                            return sequencer->getSelectedSequenceIndex();
                         },
                         [displaySequenceProps, displayTrackProps](auto)
                         {
@@ -88,7 +88,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveSequence()->isUsed();
+                            return sequencer->getSelectedSequence()->isUsed();
                         },
                         [displaySequenceProps, displayTrackProps](auto)
                         {
@@ -108,7 +108,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getActiveSequence()->isLoopEnabled();
+             return sequencer->getSelectedSequence()->isLoopEnabled();
          },
          [&](auto)
          {
@@ -126,7 +126,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveTrack()->isOn();
+                            return sequencer->getSelectedTrack()->isOn();
                         },
                         [&](auto)
                         {
@@ -173,7 +173,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getActiveTrack()->getProgramChange();
+             return sequencer->getSelectedTrack()->getProgramChange();
          },
          [&](auto)
          {
@@ -183,7 +183,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getActiveSequence()->getTimeSignature();
+             return sequencer->getSelectedSequence()->getTimeSignature();
          },
          [&](auto)
          {
@@ -193,7 +193,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getActiveTrack()->getVelocityRatio();
+             return sequencer->getSelectedTrack()->getVelocityRatio();
          },
          [&](auto)
          {
@@ -202,7 +202,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveTrack()->getBusType();
+                            return sequencer->getSelectedTrack()->getBusType();
                         },
                         [&](auto)
                         {
@@ -212,7 +212,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
     addReactiveBinding(
         {[&]
          {
-             return sequencer->getActiveTrack()->getDeviceIndex();
+             return sequencer->getSelectedTrack()->getDeviceIndex();
          },
          [&](auto)
          {
@@ -222,7 +222,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveTrackIndex();
+                            return sequencer->getSelectedTrackIndex();
                         },
                         [displayTrackProps](auto)
                         {
@@ -231,7 +231,7 @@ SequencerScreen::SequencerScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveTrack()->isUsed();
+                            return sequencer->getSelectedTrack()->isUsed();
                         },
                         [displayTrackProps](auto)
                         {
@@ -393,12 +393,12 @@ void SequencerScreen::close()
 void SequencerScreen::displayVelo() const
 {
     findField("velo")->setTextPadded(
-        std::to_string(sequencer->getActiveTrack()->getVelocityRatio()));
+        std::to_string(sequencer->getSelectedTrack()->getVelocityRatio()));
 }
 
 void SequencerScreen::displayDeviceNumber() const
 {
-    if (const auto track = mpc.getSequencer()->getActiveTrack();
+    if (const auto track = mpc.getSequencer()->getSelectedTrack();
         track->getDeviceIndex() == 0)
     {
         findField("devicenumber")->setText("OFF");
@@ -421,19 +421,19 @@ void SequencerScreen::displayDeviceNumber() const
 void SequencerScreen::displayBus() const
 {
     findField("bus")->setText(
-        busTypeToString(sequencer->getActiveTrack()->getBusType()));
+        busTypeToString(sequencer->getSelectedTrack()->getBusType()));
     displayDeviceName();
 }
 
 void SequencerScreen::displayBars() const
 {
     findField("bars")->setText(
-        std::to_string(sequencer->getActiveSequence()->getLastBarIndex() + 1));
+        std::to_string(sequencer->getSelectedSequence()->getLastBarIndex() + 1));
 }
 
 void SequencerScreen::displayPgm() const
 {
-    if (const auto track = mpc.getSequencer()->getActiveTrack();
+    if (const auto track = mpc.getSequencer()->getSelectedTrack();
         track->getProgramChange() == 0)
     {
         findField("pgm")->setText("OFF");
@@ -446,7 +446,7 @@ void SequencerScreen::displayPgm() const
 
 void SequencerScreen::displayDeviceName() const
 {
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
 
     if (const auto drumBus = sequencer->getBus<DrumBus>(track->getBusType());
         drumBus)
@@ -460,7 +460,7 @@ void SequencerScreen::displayDeviceName() const
         else
         {
             findLabel("devicename")
-                ->setText(sequencer->getActiveSequence()->getDeviceName(
+                ->setText(sequencer->getSelectedSequence()->getDeviceName(
                     track->getDeviceIndex()));
         }
     }
@@ -473,7 +473,7 @@ void SequencerScreen::displayDeviceName() const
         else
         {
             findLabel("devicename")
-                ->setText(sequencer->getActiveSequence()->getDeviceName(
+                ->setText(sequencer->getSelectedSequence()->getDeviceName(
                     track->getDeviceIndex()));
         }
     }
@@ -489,7 +489,7 @@ void SequencerScreen::displayTempo() const
 void SequencerScreen::displayTempoLabel() const
 {
     auto currentRatio = -1;
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     if (!seq->isUsed() || !seq->isTempoChangeOn())
     {
@@ -541,10 +541,10 @@ void SequencerScreen::displaySq() const
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getActiveSequenceIndex().get() + 1), "0",
+            std::to_string(sequencer->getSelectedSequenceIndex().get() + 1), "0",
             2));
         result.append("-");
-        result.append(sequencer->getActiveSequence()->getName());
+        result.append(sequencer->getSelectedSequence()->getName());
         findField("sq")->setText(result);
     }
 }
@@ -576,7 +576,7 @@ void SequencerScreen::displayRecordingMode() const
 void SequencerScreen::displayTsig() const
 {
     std::string result;
-    const auto ts = sequencer->getActiveSequence()->getTimeSignature();
+    const auto ts = sequencer->getSelectedSequence()->getTimeSignature();
     result.append(std::to_string(ts.getNumerator()));
     result.append("/");
     result.append(std::to_string(ts.getDenominator()));
@@ -586,12 +586,12 @@ void SequencerScreen::displayTsig() const
 void SequencerScreen::displayLoop() const
 {
     findField("loop")->setText(
-        sequencer->getActiveSequence()->isLoopEnabled() ? "ON" : "OFF");
+        sequencer->getSelectedSequence()->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void SequencerScreen::displayOn() const
 {
-    findField("on")->setText(sequencer->getActiveTrack()->isOn() ? "YES"
+    findField("on")->setText(sequencer->getSelectedTrack()->isOn() ? "YES"
                                                                  : "NO");
 }
 
@@ -599,9 +599,9 @@ void SequencerScreen::displayTr() const
 {
 
     auto result = StrUtil::padLeft(
-        std::to_string(sequencer->getActiveTrackIndex() + 1), "0", 2);
+        std::to_string(sequencer->getSelectedTrackIndex() + 1), "0", 2);
     result.append("-");
-    result.append(sequencer->getActiveTrack()->getName());
+    result.append(sequencer->getSelectedTrack()->getName());
     findField("tr")->setText(result);
 }
 
@@ -659,7 +659,7 @@ void SequencerScreen::pressEnter()
         else if (focusedFieldName == "velo")
         {
             setTrackToUsedIfItIsCurrentlyUnused();
-            mpc.getSequencer()->getActiveTrack()->setVelocityRatio(candidate);
+            mpc.getSequencer()->getSelectedTrack()->setVelocityRatio(candidate);
         }
     }
 }
@@ -702,7 +702,7 @@ void SequencerScreen::function(const int i)
         }
         case 2:
         {
-            const auto track = mpc.getSequencer()->getActiveTrack();
+            const auto track = mpc.getSequencer()->getSelectedTrack();
             track->setOn(!track->isOn());
             break;
         }
@@ -724,7 +724,7 @@ void SequencerScreen::function(const int i)
 
 void SequencerScreen::setTrackToUsedIfItIsCurrentlyUnused() const
 {
-    if (const auto track = mpc.getSequencer()->getActiveTrack();
+    if (const auto track = mpc.getSequencer()->getSelectedTrack();
         !track->isUsed())
     {
         track->setUsed(true);
@@ -747,7 +747,7 @@ void SequencerScreen::turnWheel(const int i)
         return;
     }
 
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
 
     if (focusedFieldName == "now0")
     {
@@ -850,7 +850,7 @@ void SequencerScreen::turnWheel(const int i)
             }
 
             sequencer->getStateManager()->enqueue(SetActiveSequenceIndex{
-                sequencer->getActiveSequenceIndex() + i});
+                sequencer->getSelectedSequenceIndex() + i});
         }
     }
     else if (focusedFieldName == "nextsq")
@@ -887,7 +887,7 @@ void SequencerScreen::turnWheel(const int i)
     }
     else if (focusedFieldName == "loop")
     {
-        sequencer->getActiveSequence()->setLoopEnabled(i > 0);
+        sequencer->getSelectedSequence()->setLoopEnabled(i > 0);
     }
     else if (focusedFieldName == "recordingmode")
     {
@@ -939,7 +939,7 @@ void SequencerScreen::openWindow()
     }
     else if (focusedFieldName == "tr")
     {
-        if (const auto track = mpc.getSequencer()->getActiveTrack();
+        if (const auto track = mpc.getSequencer()->getSelectedTrack();
             !track->isUsed())
         {
             track->setUsed(true);
@@ -1083,7 +1083,7 @@ void SequencerScreen::displayPunchWhileRecording()
         time0->Hide(sequencer->getTransport()->getAutoPunchMode() == 1);
         time1->Hide(sequencer->getTransport()->getAutoPunchMode() == 0);
 
-        auto seq = sequencer->getActiveSequence();
+        auto seq = sequencer->getSelectedSequence();
 
         auto text1 = StrUtil::padLeft(
             std::to_string(

@@ -171,7 +171,7 @@ void ClientHardwareEventController::handlePadPress(
         return;
     }
 
-    const auto track = mpc.getSequencer()->getActiveTrack();
+    const auto track = mpc.getSequencer()->getSelectedTrack();
 
     const auto programIndex = screen->getProgramIndex();
     const auto program = screen->getProgram();
@@ -337,7 +337,7 @@ void ClientHardwareEventController::handlePadRelease(
         const auto programPadIndex =
             physicalPadAndBankToProgramPadIndex(p->padIndex, p->bank);
         const auto track =
-            sequencer->getActiveSequence()->getTrack(p->trackIndex).get();
+            sequencer->getSelectedSequence()->getTrack(p->trackIndex).get();
 
         const auto recordingNoteOnEvent =
             track->findRecordingNoteOnEventByNoteNumber(p->noteNumber);

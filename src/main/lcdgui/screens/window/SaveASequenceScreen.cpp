@@ -25,7 +25,7 @@ void SaveASequenceScreen::open()
     if (ls->isPreviousScreen({ScreenId::SaveScreen}))
     {
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
-        nameScreen->setNameToEdit(sequencer->getActiveSequence()->getName());
+        nameScreen->setNameToEdit(sequencer->getSelectedSequence()->getName());
     }
 
     displaySaveAs();
@@ -51,7 +51,7 @@ void SaveASequenceScreen::openNameScreen()
     {
         const auto nameScreen = mpc.screens->get<ScreenId::NameScreen>();
         nameScreen->initialize(
-            sequencer->getActiveSequence()->getName(), 16,
+            sequencer->getSelectedSequence()->getName(), 16,
             [this](std::string &)
             {
                 openScreenById(ScreenId::SaveASequenceScreen);
@@ -86,7 +86,7 @@ void SaveASequenceScreen::function(const int i)
                     {
                         disk->flush();
                         disk->initFiles();
-                        disk->writeMid(sequencer->getActiveSequence(),
+                        disk->writeMid(sequencer->getSelectedSequence(),
                                        fileName);
                     }
                 };
@@ -115,7 +115,7 @@ void SaveASequenceScreen::function(const int i)
                 return;
             }
 
-            const auto seq = sequencer->getActiveSequence();
+            const auto seq = sequencer->getSelectedSequence();
 
             disk->writeMid(seq, fileName);
             break;

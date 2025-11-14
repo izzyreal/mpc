@@ -100,10 +100,10 @@ TEST_CASE("Can record and playback from different threads",
     auto seq = mpc.getSequencer();
     seq->getTransport()->setCountEnabled(false);
 
-    auto sequence = seq->getActiveSequence();
+    auto sequence = seq->getSelectedSequence();
     sequence->init(0);
 
-    auto track = seq->getActiveTrack();
+    auto track = seq->getSelectedTrack();
 
     auto server = mpc.getEngineHost()->getAudioServer();
 
@@ -227,7 +227,7 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     REQUIRE(sequencer->getTransport()->getTempo() == 121);
 
-    auto seq1 = sequencer->getActiveSequence();
+    auto seq1 = sequencer->getSelectedSequence();
     seq1->init(2);
 
     REQUIRE(seq1->getInitialTempo() == 120);
@@ -270,7 +270,7 @@ TEST_CASE("Undo", "[sequencer]")
         mpc.screens->get<ScreenId::TimingCorrectScreen>();
     timingCorrectScreen->setNoteValue(0);
 
-    auto seq = sequencer->getActiveSequence();
+    auto seq = sequencer->getSelectedSequence();
     seq->init(2);
 
     sequencer->getTransport()->setTempo(121);
@@ -329,7 +329,7 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->undoSeq();
 
-    seq = sequencer->getActiveSequence();
+    seq = sequencer->getSelectedSequence();
     tr = seq->getTrack(0);
 
     REQUIRE(seq->isUsed());
@@ -338,7 +338,7 @@ TEST_CASE("Undo", "[sequencer]")
 
     sequencer->undoSeq();
 
-    seq = sequencer->getActiveSequence();
+    seq = sequencer->getSelectedSequence();
     tr = seq->getTrack(0);
     REQUIRE(tr->getEvents().size() == 10);
 }

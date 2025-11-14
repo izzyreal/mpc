@@ -16,10 +16,10 @@ ChangeTsigScreen::ChangeTsigScreen(Mpc &mpc, const int layerIndex)
 
 void ChangeTsigScreen::open()
 {
-    timesignature = sequencer->getActiveSequence()->getTimeSignature();
+    timesignature = sequencer->getSelectedSequence()->getTimeSignature();
 
     bar0 = 0;
-    bar1 = sequencer->getActiveSequence()->getLastBarIndex();
+    bar1 = sequencer->getSelectedSequence()->getLastBarIndex();
 
     displayBars();
     displayNewTsig();
@@ -32,7 +32,7 @@ void ChangeTsigScreen::function(const int i)
     switch (i)
     {
         case 4:
-            const auto sequence = sequencer->getActiveSequence();
+            const auto sequence = sequencer->getSelectedSequence();
 
             const auto barLengths = sequence->getBarLengthsInTicks();
 
@@ -60,7 +60,7 @@ void ChangeTsigScreen::function(const int i)
 void ChangeTsigScreen::turnWheel(const int i)
 {
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

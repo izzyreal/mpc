@@ -128,13 +128,13 @@ void Sequencer::init()
         defaultTrackNames.push_back(name);
     }
 
-    activeTrackIndex = 0;
+    selectedTrackIndex = 0;
 
     recordingModeMulti = userScreen->recordingModeMulti;
 
     soloEnabled = false;
 
-    activeSequenceIndex = MinSequenceIndex;
+    selectedSequenceIndex = MinSequenceIndex;
 
     purgeAllSequences();
 
@@ -149,25 +149,25 @@ void Sequencer::deleteSong(const int i)
     songs[i] = std::make_shared<Song>();
 }
 
-SequenceIndex Sequencer::getActiveSequenceIndex() const
+SequenceIndex Sequencer::getSelectedSequenceIndex() const
 {
-    return activeSequenceIndex;
+    return selectedSequenceIndex;
 }
 
-std::shared_ptr<Track> Sequencer::getActiveTrack()
+std::shared_ptr<Track> Sequencer::getSelectedTrack()
 {
-    if (!getActiveSequence())
+    if (!getSelectedSequence())
     {
         return {};
     }
 
-    return getActiveSequence()->getTrack(activeTrackIndex);
+    return getSelectedSequence()->getTrack(selectedTrackIndex);
 }
 
 void Sequencer::playToTick(const int targetTick) const
 {
     const auto seqIndex =
-        isSongModeEnabled() ? getSongSequenceIndex() : activeSequenceIndex;
+        isSongModeEnabled() ? getSongSequenceIndex() : selectedSequenceIndex;
     auto seq = sequences[seqIndex].get();
     const auto secondSequenceScreen =
         getScreens()->get<ScreenId::SecondSeqScreen>();
@@ -213,7 +213,7 @@ void Sequencer::playToTick(const int targetTick) const
 std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
     auto index = -1;
-    const auto s = getActiveSequence();
+    const auto s = getSelectedSequence();
 
     if (!s->isUsed())
     {
@@ -292,11 +292,11 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
     defaultSequenceName = s;
 }
 
-void Sequencer::setActiveSequenceIndex(const SequenceIndex sequenceIndexToUse,
+void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
                                        const bool shouldSetPositionTo0)
 {
     assert(!shouldSetPositionTo0 || !transport->isPlaying());
-    activeSequenceIndex = sequenceIndexToUse;
+    selectedSequenceIndex = sequenceIndexToUse;
     if (shouldSetPositionTo0)
     {
         transport->setPosition(0);
@@ -323,27 +323,27 @@ bool Sequencer::isRecordingModeMulti() const
     return recordingModeMulti;
 }
 
-int Sequencer::getActiveTrackIndex() const
+int Sequencer::getSelectedTrackIndex() const
 {
-    return activeTrackIndex;
+    return selectedTrackIndex;
 }
 
 void Sequencer::trackUp()
 {
-    if (activeTrackIndex == 63)
+    if (selectedTrackIndex == 63)
     {
         return;
     }
-    activeTrackIndex++;
+    selectedTrackIndex++;
 }
 
 void Sequencer::trackDown()
 {
-    if (activeTrackIndex == 0)
+    if (selectedTrackIndex == 0)
     {
         return;
     }
-    activeTrackIndex--;
+    selectedTrackIndex--;
 }
 
 void Sequencer::undoSeq()
@@ -359,15 +359,15 @@ void Sequencer::undoSeq()
     }
 
     auto s = copySequence(undoPlaceHolder);
-    auto copy = copySequence(sequences[activeSequenceIndex]);
+    auto copy = copySequence(sequences[selectedSequenceIndex]);
     undoPlaceHolder.swap(copy);
 
-    sequences[activeSequenceIndex].swap(s);
+    sequences[selectedSequenceIndex].swap(s);
 
     const auto snapshot = stateManager->getSnapshot();
     const double positionQuarterNotes = snapshot.getPositionQuarterNotes();
 
-    sequences[activeSequenceIndex]->syncTrackEventIndices(
+    sequences[selectedSequenceIndex]->syncTrackEventIndices(
         quarterNotesToTicks(positionQuarterNotes));
 
     undoSeqAvailable = !undoSeqAvailable;
@@ -393,7 +393,7 @@ void Sequencer::purgeAllSequences()
         purgeSequence(i);
     }
 
-    activeSequenceIndex = MinSequenceIndex;
+    selectedSequenceIndex = MinSequenceIndex;
 }
 
 std::shared_ptr<Sequence> Sequencer::makeNewSequence()
@@ -414,7 +414,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         },
         [&]
         {
-            return getActiveSequence();
+            return getSelectedSequence();
         },
         [&]
         {
@@ -441,7 +441,7 @@ std::shared_ptr<Sequence> Sequencer::makeNewSequence()
         },
         [&]
         {
-            return getActiveTrackIndex();
+            return getSelectedTrackIndex();
         },
         [&]
         {
@@ -646,18 +646,18 @@ void Sequencer::setDefaultTrackName(const std::string &s, const int i)
     defaultTrackNames[i] = s;
 }
 
-std::shared_ptr<Sequence> Sequencer::getActiveSequence()
+std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
 {
     if (const bool songMode = isSongModeEnabled();
         songMode &&
-        songs[getScreens()->get<ScreenId::SongScreen>()->getActiveSongIndex()]
+        songs[getScreens()->get<ScreenId::SongScreen>()->getSelectedSongIndex()]
                 ->getStepCount() != 0)
     {
         return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
-                                                     : activeSequenceIndex];
+                                                     : selectedSequenceIndex];
     }
 
-    return sequences[activeSequenceIndex];
+    return sequences[selectedSequenceIndex];
 }
 
 int Sequencer::getUsedSequenceCount() const
@@ -697,8 +697,8 @@ std::vector<int> Sequencer::getUsedSequenceIndexes() const
 
 void Sequencer::goToPreviousEvent()
 {
-    const auto s = getActiveSequence();
-    const auto t = s->getTrack(getActiveTrackIndex());
+    const auto s = getSelectedSequence();
+    const auto t = s->getTrack(getSelectedTrackIndex());
 
     auto newPos = 0;
     auto events = t->getEvents();
@@ -718,8 +718,8 @@ void Sequencer::goToPreviousEvent()
 
 void Sequencer::goToNextEvent()
 {
-    const auto s = getActiveSequence();
-    const auto t = s->getTrack(getActiveTrackIndex());
+    const auto s = getSelectedSequence();
+    const auto t = s->getTrack(getSelectedTrackIndex());
 
     auto newPos = s->getLastTick();
 
@@ -743,7 +743,7 @@ void Sequencer::goToPreviousStep()
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = transport->getTickPosition();
     const auto stepCount =
-        static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) +
+        static_cast<int>(ceil(getSelectedSequence()->getLastTick() / stepSize)) +
         1;
     std::vector<int> stepGrid(stepCount);
 
@@ -783,7 +783,7 @@ void Sequencer::goToNextStep()
     const auto pos = transport->getTickPosition();
 
     std::vector<int> stepGrid(
-        ceil(getActiveSequence()->getLastTick() / stepSize));
+        ceil(getSelectedSequence()->getLastTick() / stepSize));
 
     for (int i = 0; i < stepGrid.size(); i++)
     {
@@ -888,9 +888,9 @@ std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
     return sequences[seqIndex];
 }
 
-void Sequencer::setActiveTrackIndex(const int i)
+void Sequencer::setSelectedTrackIndex(const int i)
 {
-    activeTrackIndex = i;
+    selectedTrackIndex = i;
 }
 
 SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
@@ -898,7 +898,7 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
     if (isSongModeEnabled())
     {
         const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-        const auto song = songs[songScreen->getActiveSongIndex()];
+        const auto song = songs[songScreen->getSelectedSongIndex()];
 
         if (!song->isUsed())
         {
@@ -917,7 +917,7 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
         return songSeqIndex;
     }
 
-    return activeSequenceIndex;
+    return selectedSequenceIndex;
 }
 
 SequenceIndex Sequencer::getNextSq() const
@@ -976,7 +976,7 @@ void Sequencer::setNextSq(SequenceIndex i)
 
     if (startingFromScratch)
     {
-        up = i > activeTrackIndex;
+        up = i > selectedTrackIndex;
     }
 
     const auto candidate =
@@ -1014,7 +1014,7 @@ bool Sequencer::isSongModeEnabled() const
 SequenceIndex Sequencer::getSongSequenceIndex() const
 {
     const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto song = songs[songScreen->getActiveSongIndex()];
+    const auto song = songs[songScreen->getSelectedSongIndex()];
     auto step = songScreen->getOffset() + 1;
 
     if (step > song->getStepCount() - 1)
@@ -1048,9 +1048,9 @@ void Sequencer::flushTrackNoteCache()
     }
 }
 
-void Sequencer::storeActiveSequenceInUndoPlaceHolder()
+void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 {
-    auto copy = copySequence(sequences[activeSequenceIndex]);
+    auto copy = copySequence(sequences[selectedSequenceIndex]);
     undoPlaceHolder.swap(copy);
 
     undoSeqAvailable = true;

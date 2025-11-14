@@ -130,7 +130,7 @@ std::shared_ptr<Bus> ScreenComponent::getBus() const
     }
 
     return mpc.getSequencer()->getBus(
-        mpc.getSequencer()->getActiveTrack()->getBusType());
+        mpc.getSequencer()->getSelectedTrack()->getBusType());
 }
 
 std::shared_ptr<DrumBus> ScreenComponent::getActiveDrumBus() const

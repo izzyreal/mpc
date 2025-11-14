@@ -70,7 +70,7 @@ void PushNumPadCommand::execute()
             case 6:
             {
                 const auto newBusType =
-                    mpc.getSequencer()->getActiveTrack()->getBusType() - 1;
+                    mpc.getSequencer()->getSelectedTrack()->getBusType() - 1;
 
                 if (sequencer::isDrumBusType(newBusType))
                 {
@@ -84,7 +84,7 @@ void PushNumPadCommand::execute()
             case 7:
             {
                 const auto newDrumBusType =
-                    mpc.getSequencer()->getActiveTrack()->getBusType() - 1;
+                    mpc.getSequencer()->getSelectedTrack()->getBusType() - 1;
 
                 if (sequencer::isDrumBusType(newDrumBusType))
                 {

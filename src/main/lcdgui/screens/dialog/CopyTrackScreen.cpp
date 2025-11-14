@@ -28,7 +28,7 @@ void CopyTrackScreen::function(const int i)
             break;
         case 4:
         {
-            const auto seqIndex = sequencer->getActiveSequenceIndex();
+            const auto seqIndex = sequencer->getSelectedSequenceIndex();
             sequencer->copyTrack(tr0, tr1, seqIndex, seqIndex);
             openScreenById(ScreenId::SequencerScreen);
             break;
@@ -64,7 +64,7 @@ void CopyTrackScreen::setTr1(const int i)
 
 void CopyTrackScreen::displayTr0() const
 {
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
     const auto tr0Name = seq->getTrack(tr0)->getName();
     findField("tr0")->setText(
         StrUtil::padLeft(std::to_string(tr0 + 1), "0", 2) + "-" + tr0Name);
@@ -72,7 +72,7 @@ void CopyTrackScreen::displayTr0() const
 
 void CopyTrackScreen::displayTr1() const
 {
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
     const auto tr1Name = seq->getTrack(tr1)->getName();
     findField("tr1")->setText(
         StrUtil::padLeft(std::to_string(tr1 + 1), "0", 2) + "-" + tr1Name);

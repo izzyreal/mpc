@@ -13,7 +13,7 @@ CopySequenceScreen::CopySequenceScreen(Mpc &mpc, const int layerIndex)
 
 void CopySequenceScreen::open()
 {
-    sq0 = sequencer->getActiveSequenceIndex();
+    sq0 = sequencer->getSelectedSequenceIndex();
     sq1 = sequencer->getFirstUsedSeqUp(MinSequenceIndex, true);
 
     displaySq0();
@@ -33,7 +33,7 @@ void CopySequenceScreen::function(const int i)
             break;
         case 4:
             sequencer->copySequence(sq0, sq1);
-            sequencer->setActiveSequenceIndex(sq1, true);
+            sequencer->setSelectedSequenceIndex(sq1, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
         default:;

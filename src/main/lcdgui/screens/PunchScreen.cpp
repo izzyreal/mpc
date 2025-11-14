@@ -29,7 +29,7 @@ void PunchScreen::open()
         return;
     }
 
-    const auto lastTick = sequencer->getActiveSequence()->getLastTick();
+    const auto lastTick = sequencer->getSelectedSequence()->getLastTick();
 
     if (lastTick < sequencer->getTransport()->getPunchInTime() ||
         lastTick < sequencer->getTransport()->getPunchOutTime() ||
@@ -38,8 +38,8 @@ void PunchScreen::open()
     {
         sequencer->getTransport()->setPunchInTime(0);
         sequencer->getTransport()->setPunchOutTime(
-            sequencer->getActiveSequence()->getLastTick());
-        setTime1(sequencer->getActiveSequence()->getLastTick());
+            sequencer->getSelectedSequence()->getLastTick());
+        setTime1(sequencer->getSelectedSequence()->getLastTick());
     }
 
     setTime0(sequencer->getTransport()->getPunchInTime());
@@ -104,7 +104,7 @@ void PunchScreen::displayAutoPunch() const
 
 void PunchScreen::displayTime()
 {
-    const auto sequence = sequencer->getActiveSequence().get();
+    const auto sequence = sequencer->getSelectedSequence().get();
 
     for (int i = 0; i < 3; i++)
     {

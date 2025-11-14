@@ -18,7 +18,7 @@ void DeleteAllTracksScreen::function(const int i)
             openScreenById(ScreenId::DeleteTrackScreen);
             break;
         case 4:
-            sequencer->getActiveSequence()->purgeAllTracks();
+            sequencer->getSelectedSequence()->purgeAllTracks();
             openScreenById(ScreenId::SequencerScreen);
             break;
     }

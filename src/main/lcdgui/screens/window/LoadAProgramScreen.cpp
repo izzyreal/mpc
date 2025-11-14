@@ -58,7 +58,7 @@ void LoadAProgramScreen::function(const int i)
 
             mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
-            if (const auto track = sequencer->getActiveTrack();
+            if (const auto track = sequencer->getSelectedTrack();
                 sequencer::isDrumBusType(track->getBusType()))
             {
                 for (int pgmIndex = 0;

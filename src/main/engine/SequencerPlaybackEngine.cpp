@@ -118,7 +118,7 @@ void SequencerPlaybackEngine::setTickPositionEffectiveImmediately(
 std::shared_ptr<Sequence> SequencerPlaybackEngine::switchToNextSequence() const
 {
     sequencer->playToTick(sequencer->getTransport()->getTickPosition());
-    sequencer->setActiveSequenceIndex(sequencer->getNextSq(), false);
+    sequencer->setSelectedSequenceIndex(sequencer->getNextSq(), false);
     sequencer->setNextSq(NoSequenceIndex);
     setTickPositionEffectiveImmediately(0);
     auto newSeq = sequencer->getCurrentlyPlayingSequence();
@@ -267,7 +267,7 @@ bool SequencerPlaybackEngine::processSongMode() const
     sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->getTransport()->incrementPlayedStepRepetitions();
     const auto songScreen = getScreens()->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
+    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
     const auto step = songScreen->getOffset() + 1;
 
     const auto doneRepeating =

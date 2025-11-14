@@ -20,7 +20,7 @@ void TimeDisplayScreen::open()
 
 void TimeDisplayScreen::turnWheel(const int i)
 {
-    const auto startTime = sequencer->getActiveSequence()->getStartTime();
+    const auto startTime = sequencer->getSelectedSequence()->getStartTime();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -61,7 +61,7 @@ void TimeDisplayScreen::displayDisplayStyle() const
 
 void TimeDisplayScreen::displayStartTime() const
 {
-    const auto startTime = sequencer->getActiveSequence()->getStartTime();
+    const auto startTime = sequencer->getSelectedSequence()->getStartTime();
     findField("hours")->setText(
         StrUtil::padLeft(std::to_string(startTime.hours), "0", 2));
     findField("minutes")->setText(
@@ -92,35 +92,35 @@ void TimeDisplayScreen::setDisplayStyle(const int i)
 
 void TimeDisplayScreen::setHours(const int i) const
 {
-    sequencer->getActiveSequence()->getStartTime().hours =
+    sequencer->getSelectedSequence()->getStartTime().hours =
         std::clamp<uint8_t>(i, 0, 23);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setMinutes(const int i) const
 {
-    sequencer->getActiveSequence()->getStartTime().minutes =
+    sequencer->getSelectedSequence()->getStartTime().minutes =
         std::clamp<uint8_t>(i, 0, 59);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setSeconds(const int i) const
 {
-    sequencer->getActiveSequence()->getStartTime().seconds =
+    sequencer->getSelectedSequence()->getStartTime().seconds =
         std::clamp<uint8_t>(i, 0, 59);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setFrames(const int i) const
 {
-    sequencer->getActiveSequence()->getStartTime().frames =
+    sequencer->getSelectedSequence()->getStartTime().frames =
         std::clamp<uint8_t>(i, 0, 29);
     displayStartTime();
 }
 
 void TimeDisplayScreen::setFrameDecimals(const int i) const
 {
-    sequencer->getActiveSequence()->getStartTime().frameDecimals =
+    sequencer->getSelectedSequence()->getStartTime().frameDecimals =
         std::clamp<uint8_t>(i, 0, 99);
     displayStartTime();
 }

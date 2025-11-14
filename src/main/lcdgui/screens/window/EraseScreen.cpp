@@ -22,7 +22,7 @@ EraseScreen::EraseScreen(Mpc &mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-    if (const auto busType = sequencer->getActiveTrack()->getBusType();
+    if (const auto busType = sequencer->getSelectedTrack()->getBusType();
         isMidiBusType(busType))
     {
         findField("note0")->setAlignment(Alignment::Centered, 18);
@@ -40,7 +40,7 @@ void EraseScreen::open()
 
     setTime0(0);
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
     setTime1(seq->getLastTick());
 
     displayErase();
@@ -98,7 +98,7 @@ void EraseScreen::displayTrack() const
     }
     else
     {
-        const auto sequence = sequencer->getActiveSequence();
+        const auto sequence = sequencer->getSelectedSequence();
         trackName = sequence->getTrack(track)->getActualName();
     }
 
@@ -108,7 +108,7 @@ void EraseScreen::displayTrack() const
 
 void EraseScreen::displayTime()
 {
-    const auto sequence = sequencer->getActiveSequence().get();
+    const auto sequence = sequencer->getSelectedSequence().get();
     findField("time0")->setTextPadded(
         SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
     findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1,
@@ -148,7 +148,7 @@ void EraseScreen::displayNotes()
         return;
     }
 
-    const auto busType = sequencer->getActiveTrack()->getBusType();
+    const auto busType = sequencer->getSelectedTrack()->getBusType();
 
     findField("note0")->Hide(false);
     findLabel("note0")->Hide(false);
@@ -210,12 +210,12 @@ void EraseScreen::doErase() const
     const auto firstTrackIndex = track < 0 ? 0 : track;
     const auto lastTrackIndex = track < 0 ? 63 : track;
 
-    const auto midi = isMidiBusType(sequencer->getActiveTrack()->getBusType());
+    const auto midi = isMidiBusType(sequencer->getSelectedTrack()->getBusType());
 
     const auto noteA = note0;
     const auto noteB = midi ? note1 : -1;
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     const auto selectedType = eventTypes[type];
 

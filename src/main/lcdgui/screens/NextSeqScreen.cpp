@@ -39,7 +39,7 @@ NextSeqScreen::NextSeqScreen(Mpc &mpc, const int layerIndex)
 
     addReactiveBinding({[&]
                         {
-                            return sequencer->getActiveSequenceIndex();
+                            return sequencer->getSelectedSequenceIndex();
                         },
                         [&](auto)
                         {
@@ -109,7 +109,7 @@ void NextSeqScreen::turnWheel(const int increment)
         {
             sequencer->getStateManager()->enqueue(
                 sequencer::SetActiveSequenceIndex{
-                    sequencer->getActiveSequenceIndex() + increment});
+                    sequencer->getSelectedSequenceIndex() + increment});
         }
     }
     else if (focusedFieldName == "nextsq")
@@ -123,7 +123,7 @@ void NextSeqScreen::turnWheel(const int increment)
 
         if (nextSq == NoSequenceIndex && selectNextSqFromScratch)
         {
-            nextSq = sequencer->getActiveSequenceIndex();
+            nextSq = sequencer->getSelectedSequenceIndex();
             selectNextSqFromScratch = false;
         }
         else
@@ -189,10 +189,10 @@ void NextSeqScreen::displaySq() const
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getActiveSequenceIndex().get() + 1), "0",
+            std::to_string(sequencer->getSelectedSequenceIndex().get() + 1), "0",
             2));
         result.append("-");
-        result.append(sequencer->getActiveSequence()->getName());
+        result.append(sequencer->getSelectedSequence()->getName());
         findField("sq")->setText(result);
     }
 }
@@ -243,7 +243,7 @@ void NextSeqScreen::displayTempoLabel() const
     auto currentRatio = -1;
     const auto sequence = sequencer->getTransport()->isPlaying()
                               ? sequencer->getCurrentlyPlayingSequence()
-                              : sequencer->getActiveSequence();
+                              : sequencer->getSelectedSequence();
     for (const auto &e : sequence->getTempoChangeEvents())
     {
         if (e->getTick() > sequencer->getTransport()->getTickPosition())

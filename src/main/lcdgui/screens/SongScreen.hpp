@@ -32,12 +32,12 @@ namespace mpc::lcdgui::screens
         void setDefaultSongName(const std::string &s);
         std::string getDefaultSongName();
         int getOffset() const;
-        int getActiveSongIndex() const;
-        void setActiveSongIndex(int i);
+        int getSelectedSongIndex() const;
+        void setSelectedSongIndex(int i);
 
     private:
         int offset = -1;
-        int activeSongIndex = 0;
+        int selectedSongIndex = 0;
         std::string defaultSongName = "Song";
 
         void displayTempo() const;

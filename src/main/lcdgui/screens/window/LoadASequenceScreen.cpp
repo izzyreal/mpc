@@ -67,7 +67,7 @@ void LoadASequenceScreen::function(const int i)
             break;
         case 4:
             sequencer->movePlaceHolderTo(loadInto);
-            sequencer->setActiveSequenceIndex(loadInto, true);
+            sequencer->setSelectedSequenceIndex(loadInto, true);
             openScreenById(ScreenId::SequencerScreen);
             break;
         default:;

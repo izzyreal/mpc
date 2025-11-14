@@ -16,7 +16,7 @@ TEST_CASE("BARS1", "[bars-screen]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
@@ -60,7 +60,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 {
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);

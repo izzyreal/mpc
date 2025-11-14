@@ -739,7 +739,7 @@ void EditSoundScreen::handleSliceSound() const
     }
 
     if (const auto drumBus = sequencer->getBus<DrumBus>(
-            sequencer->getActiveTrack()->getBusType()))
+            sequencer->getSelectedTrack()->getBusType()))
     {
         drumBus->setProgram(ProgramIndex(sampler->getProgramCount() - 1));
     }

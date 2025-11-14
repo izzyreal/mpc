@@ -118,7 +118,7 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 
     assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
 
-    auto seq1 = mpc.getSequencer()->getActiveSequence();
+    auto seq1 = mpc.getSequencer()->getSelectedSequence();
     REQUIRE(!seq1->getTrack(60)->isUsed());
     REQUIRE(seq1->getTrack(60)->isOn());
     REQUIRE(!seq1->getTrack(61)->isUsed());
@@ -153,7 +153,7 @@ TEST_CASE("ALL file note event", "[allfile]")
 
     assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
 
-    auto seq1 = mpc.getSequencer()->getActiveSequence();
+    auto seq1 = mpc.getSequencer()->getSelectedSequence();
     auto tr1 = seq1->getTrack(63);
     auto event1 = tr1->getEvent(0);
     REQUIRE(event1->getTypeName() == "note-on");
@@ -185,7 +185,7 @@ TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
 
     assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
 
-    auto seq1 = mpc.getSequencer()->getActiveSequence();
+    auto seq1 = mpc.getSequencer()->getSelectedSequence();
 
     REQUIRE(seq1->getTrack(60)->getDeviceIndex() == 1);
     REQUIRE(seq1->getTrack(61)->getDeviceIndex() == 2);

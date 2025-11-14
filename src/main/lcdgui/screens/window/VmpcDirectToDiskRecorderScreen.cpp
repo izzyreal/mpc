@@ -30,7 +30,7 @@ VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(
 
 void VmpcDirectToDiskRecorderScreen::open()
 {
-    setSq(sequencer->getActiveSequenceIndex());
+    setSq(sequencer->getSelectedSequenceIndex());
     displayRecord();
     displaySong();
     displayTime();
@@ -87,7 +87,7 @@ void VmpcDirectToDiskRecorderScreen::function(const int i)
                 mpc.getEngineHost()->getAudioServer()->getSampleRate());
 
             constexpr bool setPositionTo0 = true;
-            sequencer->setActiveSequenceIndex(sq, setPositionTo0);
+            sequencer->setSelectedSequenceIndex(sq, setPositionTo0);
             const auto sequence = sequencer->getSequence(seq);
             seqLoopWasEnabled = sequence->isLoopEnabled();
 

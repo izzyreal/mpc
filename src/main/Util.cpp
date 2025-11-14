@@ -196,7 +196,7 @@ int Util::getTextWidthInPixels(const std::string &text)
 
 void Util::initSequence(mpc::Mpc &mpc)
 {
-    initSequence(mpc.getSequencer()->getActiveSequenceIndex(), mpc);
+    initSequence(mpc.getSequencer()->getSelectedSequenceIndex(), mpc);
 }
 
 void Util::initSequence(int sequenceIndex, mpc::Mpc &mpc)

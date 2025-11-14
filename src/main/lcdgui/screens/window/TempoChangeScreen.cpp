@@ -47,7 +47,7 @@ void TempoChangeScreen::open()
     findField("a1")->setAlignment(Alignment::Centered);
     findField("a2")->setAlignment(Alignment::Centered);
 
-    const auto events = sequencer->getActiveSequence()->getTempoChangeEvents();
+    const auto events = sequencer->getSelectedSequence()->getTempoChangeEvents();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -78,7 +78,7 @@ void TempoChangeScreen::open()
 
 void TempoChangeScreen::initVisibleEvents()
 {
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     for (auto &t : visibleTempoChanges)
     {
@@ -113,21 +113,21 @@ void TempoChangeScreen::initVisibleEvents()
 
 void TempoChangeScreen::displayInitialTempo() const
 {
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
     findField("initial-tempo")
         ->setText(Util::tempoString(seq->getInitialTempo()));
 }
 
 void TempoChangeScreen::displayTempoChangeOn() const
 {
-    const auto sequence = sequencer->getActiveSequence();
+    const auto sequence = sequencer->getSelectedSequence();
     findField("tempo-change")
         ->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
 }
 
 void TempoChangeScreen::displayTempoChange0() const
 {
-    const auto sequence = sequencer->getActiveSequence();
+    const auto sequence = sequencer->getSelectedSequence();
     bars[0]->Hide(false);
 
     const auto tce = visibleTempoChanges[0];
@@ -189,7 +189,7 @@ void TempoChangeScreen::displayTempoChange1() const
 
     findField("a1")->setText(std::to_string(offset + 2));
 
-    const auto sequence = sequencer->getActiveSequence();
+    const auto sequence = sequencer->getSelectedSequence();
     auto timeSig = sequence->getTimeSignature();
 
     findField("b1")->setTextPadded(
@@ -244,7 +244,7 @@ void TempoChangeScreen::displayTempoChange2() const
 
     findField("a2")->setText(std::to_string(offset + 3));
 
-    const auto sequence = sequencer->getActiveSequence();
+    const auto sequence = sequencer->getSelectedSequence();
     auto timeSig = sequence->getTimeSignature();
     findField("b2")->setTextPadded(
         tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
@@ -315,7 +315,7 @@ void TempoChangeScreen::function(const int j)
         yPos = stoi(focusedFieldName.substr(1, 2));
     }
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
 
     auto tceList = seq->getTempoChangeEvents();
 
@@ -438,7 +438,7 @@ void TempoChangeScreen::function(const int j)
 
 void TempoChangeScreen::init()
 {
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
     const auto tceList = seq->getTempoChangeEvents();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -481,7 +481,7 @@ void TempoChangeScreen::init()
 void TempoChangeScreen::turnWheel(const int j)
 {
 
-    const auto seq = sequencer->getActiveSequence();
+    const auto seq = sequencer->getSelectedSequence();
     const auto tceList = seq->getTempoChangeEvents();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
@@ -621,7 +621,7 @@ void TempoChangeScreen::down()
     {
         setOffset(offset + 1);
 
-        const auto sequence = sequencer->getActiveSequence();
+        const auto sequence = sequencer->getSelectedSequence();
 
         if (offset + yPos == sequence->getTempoChangeEvents().size() &&
             focusedFieldName[0] != 'a')

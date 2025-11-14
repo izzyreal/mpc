@@ -154,7 +154,7 @@ TriggerLocalNoteContextFactory::buildTriggerLocalNoteOffContext(
 
     const std::function getActiveSequenceLastTick = [sequencer]
     {
-        return sequencer->getActiveSequence()->getLastTick();
+        return sequencer->getSelectedSequence()->getLastTick();
     };
 
     const std::function sequencerMoveToQuarterNotePosition =

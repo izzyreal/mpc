@@ -22,7 +22,7 @@ void TransScreen::open()
     findChild("function-keys")->Hide(sequencer->getTransport()->isPlaying());
 
     setBar0(0);
-    setBar1(sequencer->getActiveSequence()->getLastBarIndex());
+    setBar1(sequencer->getSelectedSequence()->getLastBarIndex());
 
     displayTransposeAmount();
     displayTr();
@@ -63,7 +63,7 @@ void TransScreen::turnWheel(int i)
         const auto candidate = bar0 + i;
 
         if (candidate < 0 ||
-            candidate > sequencer->getActiveSequence()->getLastBarIndex())
+            candidate > sequencer->getSelectedSequence()->getLastBarIndex())
         {
             return;
         }
@@ -75,7 +75,7 @@ void TransScreen::turnWheel(int i)
         const auto candidate = bar1 + i;
 
         if (candidate < 0 ||
-            candidate > sequencer->getActiveSequence()->getLastBarIndex())
+            candidate > sequencer->getSelectedSequence()->getLastBarIndex())
         {
             return;
         }
@@ -139,7 +139,7 @@ void TransScreen::displayTr() const
 {
     const auto trName = std::string(
         tr == -1 ? "ALL"
-                 : sequencer->getActiveSequence()->getTrack(tr)->getName());
+                 : sequencer->getSelectedSequence()->getTrack(tr)->getName());
     findField("tr")->setTextPadded(tr + 1, "0");
     findLabel("track-name")->setText(trName);
 }

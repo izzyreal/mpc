@@ -499,7 +499,7 @@ bool SeqUtil::isRecMainWithoutPlaying(
 {
     const auto tc_note = timingCorrectScreen->getNoteValue();
     const bool posIsLastTick = sequencer->getTransport()->getTickPosition() ==
-                               sequencer->getActiveSequence()->getLastTick();
+                               sequencer->getSelectedSequence()->getLastTick();
 
     const bool recIsPressedOrLocked =
         recButton->isPressed() ||
@@ -520,7 +520,7 @@ bool SeqUtil::isStepRecording(const std::string &currentScreenName,
     auto posIsLastTick = [&]
     {
         return sequencer->getTransport()->getTickPosition() ==
-               sequencer->getActiveSequence()->getLastTick();
+               sequencer->getSelectedSequence()->getLastTick();
     };
     return currentScreenName == "step-editor" && !posIsLastTick();
 }

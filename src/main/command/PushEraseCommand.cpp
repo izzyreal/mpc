@@ -11,7 +11,7 @@ PushEraseCommand::PushEraseCommand(Mpc &mpc) : mpc(mpc) {}
 
 void PushEraseCommand::execute()
 {
-    if (!mpc.getSequencer()->getActiveSequence()->isUsed() ||
+    if (!mpc.getSequencer()->getSelectedSequence()->isUsed() ||
         mpc.getSequencer()->getTransport()->isPlaying())
     {
         return;

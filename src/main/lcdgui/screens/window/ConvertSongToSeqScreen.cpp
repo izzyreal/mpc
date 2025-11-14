@@ -59,7 +59,7 @@ void ConvertSongToSeqScreen::turnWheel(const int i)
         focusedFieldName == "fromsong")
     {
         const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-        setFromSong(songScreen->getActiveSongIndex() + i);
+        setFromSong(songScreen->getSelectedSongIndex() + i);
     }
     else if (focusedFieldName == "tosequence")
     {
@@ -75,7 +75,7 @@ void ConvertSongToSeqScreen::setFromSong(const int8_t newValue) const
 {
     const auto clampedNewValue = std::clamp<int8_t>(newValue, 0, 19);
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    songScreen->setActiveSongIndex(clampedNewValue);
+    songScreen->setSelectedSongIndex(clampedNewValue);
     displayFromSong();
 }
 
@@ -96,7 +96,7 @@ void ConvertSongToSeqScreen::setTrackStatus(const int8_t newValue)
 void ConvertSongToSeqScreen::displayFromSong() const
 {
     const auto activeSongIndex =
-        mpc.screens->get<ScreenId::SongScreen>()->getActiveSongIndex();
+        mpc.screens->get<ScreenId::SongScreen>()->getSelectedSongIndex();
     const auto activeSong = sequencer->getSong(activeSongIndex);
     const auto songIndexString =
         StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2);
@@ -147,7 +147,7 @@ void eraseOffTracks(const int firstBarToRemove, const int firstBarToKeep,
 void ConvertSongToSeqScreen::convertSongToSeq() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->getActiveSongIndex());
+    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
 
     if (!song->isUsed())
     {

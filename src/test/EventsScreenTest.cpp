@@ -21,7 +21,7 @@ TEST_CASE("COPY1", "[events-screen]")
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
 
@@ -77,7 +77,7 @@ TEST_CASE("COPY2", "[events-screen]")
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
@@ -135,7 +135,7 @@ TEST_CASE("COPY3", "[events-screen]")
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
@@ -200,7 +200,7 @@ TEST_CASE("COPY4", "[events-screen]")
 
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(1);
     seq->setTimeSignature(0, 4, 4);
     seq->setTimeSignature(1, 3, 4);
@@ -239,7 +239,7 @@ TEST_CASE("COPY5", "[events-screen]")
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
@@ -295,7 +295,7 @@ TEST_CASE("COPY6", "[events-screen]")
      */
     mpc::Mpc mpc;
     mpc::TestMpc::initializeTestMpc(mpc);
-    auto seq = mpc.getSequencer()->getActiveSequence();
+    auto seq = mpc.getSequencer()->getSelectedSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);

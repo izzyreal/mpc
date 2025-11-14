@@ -39,8 +39,8 @@ AllSequencer::AllSequencer(Mpc &mpc)
 
     const auto mpcSequencer = mpc.getSequencer();
 
-    saveBytes[SEQ_OFFSET] = mpcSequencer->getActiveSequenceIndex();
-    saveBytes[TR_OFFSET] = mpcSequencer->getActiveTrackIndex();
+    saveBytes[SEQ_OFFSET] = mpcSequencer->getSelectedSequenceIndex();
+    saveBytes[TR_OFFSET] = mpcSequencer->getSelectedTrackIndex();
 
     const bool tempoSourceIsSequence =
         mpcSequencer->getTransport()->isTempoSourceSequenceEnabled();

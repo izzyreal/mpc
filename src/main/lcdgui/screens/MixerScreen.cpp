@@ -471,7 +471,7 @@ void MixerScreen::recordMixerEvent(const int pad, const int param,
                                    const int value) const
 {
     const auto event = std::make_shared<MixerEvent>();
-    sequencer->getActiveTrack()->addEvent(
+    sequencer->getSelectedTrack()->addEvent(
         sequencer->getTransport()->getTickPosition(), event);
     event->setPadNumber(pad);
     event->setParameter(param);
