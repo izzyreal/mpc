@@ -52,7 +52,7 @@ void MidiOutputScreen::openNameScreen()
             [this, renameDeviceIndex](const std::string &nameScreenName)
         {
             sequencer->getSelectedSequence()->setDeviceName(renameDeviceIndex,
-                                                          nameScreenName);
+                                                            nameScreenName);
             openScreenById(ScreenId::MidiOutputScreen);
         };
 

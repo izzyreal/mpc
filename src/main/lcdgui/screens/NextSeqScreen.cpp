@@ -189,8 +189,8 @@ void NextSeqScreen::displaySq() const
     else
     {
         result.append(StrUtil::padLeft(
-            std::to_string(sequencer->getSelectedSequenceIndex().get() + 1), "0",
-            2));
+            std::to_string(sequencer->getSelectedSequenceIndex().get() + 1),
+            "0", 2));
         result.append("-");
         result.append(sequencer->getSelectedSequence()->getName());
         findField("sq")->setText(result);

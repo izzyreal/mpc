@@ -1,14 +1,8 @@
 #pragma once
 #include "lcdgui/ScreenComponent.hpp"
 
-namespace mpc::lcdgui::screens::dialog
-{
-    class DeleteSongScreen;
-    class CopySongScreen;
-} // namespace mpc::lcdgui::screens::dialog
 namespace mpc::lcdgui::screens::window
 {
-    class SongWindow;
     class NameScreen;
 } // namespace mpc::lcdgui::screens::window
 
@@ -49,9 +43,6 @@ namespace mpc::lcdgui::screens
         void displayNow2() const;
         void displaySongName() const;
 
-        friend class SongWindow;
-        friend class DeleteSongScreen;
-        friend class CopySongScreen;
         friend class NameScreen;
     };
 } // namespace mpc::lcdgui::screens

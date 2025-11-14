@@ -21,46 +21,44 @@ void TransposePermanentScreen::function(const int i)
 {
     ScreenComponent::function(i); // For closing this window
 
-    switch (i)
+    if (i == 4)
     {
-        case 4:
-            const auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
-            const auto all = transScreen->tr == -1;
+        const auto transScreen = mpc.screens->get<ScreenId::TransScreen>();
+        const auto all = transScreen->getTr() == TransScreen::ALL_TRACKS;
 
-            std::vector<int> tracks;
+        std::vector<int> tracks;
 
-            if (all)
+        if (all)
+        {
+            for (int trackIndex = 0; trackIndex < 64; trackIndex++)
             {
-                for (int trackIndex = 0; trackIndex < 64; trackIndex++)
+                tracks.push_back(trackIndex);
+            }
+        }
+        else
+        {
+            tracks.push_back(transScreen->getTr());
+        }
+
+        const auto seq = sequencer->getSelectedSequence();
+        const auto firstTick = seq->getFirstTickOfBar(transScreen->getBar0());
+        const auto lastTick = seq->getLastTickOfBar(transScreen->getBar1());
+
+        for (const auto &trackIndex : tracks)
+        {
+            const auto t = seq->getTrack(trackIndex);
+
+            for (const auto &n : t->getNoteEvents())
+            {
+                if (n->getTick() < firstTick || n->getTick() > lastTick)
                 {
-                    tracks.push_back(trackIndex);
+                    continue;
                 }
+
+                n->setNote(n->getNote() + transScreen->getTransposeAmount());
             }
-            else
-            {
-                tracks.push_back(transScreen->tr);
-            }
-
-            const auto seq = sequencer->getActiveSequence();
-            const auto firstTick = seq->getFirstTickOfBar(transScreen->bar0);
-            const auto lastTick = seq->getLastTickOfBar(transScreen->bar1);
-
-            for (const auto &trackIndex : tracks)
-            {
-                const auto t = seq->getTrack(trackIndex);
-
-                for (const auto &n : t->getNoteEvents())
-                {
-                    if (n->getTick() < firstTick || n->getTick() > lastTick)
-                    {
-                        continue;
-                    }
-
-                    n->setNote(n->getNote() + transScreen->transposeAmount);
-                }
-            }
-            transScreen->setTransposeAmount(0);
-            openScreenById(ScreenId::SequencerScreen);
-            break;
+        }
+        transScreen->setTransposeAmount(0);
+        openScreenById(ScreenId::SequencerScreen);
     }
 }

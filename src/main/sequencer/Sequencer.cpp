@@ -293,7 +293,7 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 }
 
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
-                                       const bool shouldSetPositionTo0)
+                                         const bool shouldSetPositionTo0)
 {
     assert(!shouldSetPositionTo0 || !transport->isPlaying());
     selectedSequenceIndex = sequenceIndexToUse;
@@ -743,7 +743,8 @@ void Sequencer::goToPreviousStep()
     const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
     const auto pos = transport->getTickPosition();
     const auto stepCount =
-        static_cast<int>(ceil(getSelectedSequence()->getLastTick() / stepSize)) +
+        static_cast<int>(
+            ceil(getSelectedSequence()->getLastTick() / stepSize)) +
         1;
     std::vector<int> stepGrid(stepCount);
 

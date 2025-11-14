@@ -26,13 +26,14 @@ void SongWindow::open()
         findField("default-name-first-letter");
 
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->activeSongIndex);
+    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
 
     songNameFirstLetterField->setText(song->getName().substr(0, 1));
     defaultSongNameFirstLetterField->setText(
-        songScreen->defaultSongName.substr(0, 1));
+        songScreen->getDefaultSongName().substr(0, 1));
     songNameRestLabel->setText(song->getName().substr(1));
-    defaultSongNameRestLabel->setText(songScreen->defaultSongName.substr(1));
+    defaultSongNameRestLabel->setText(
+        songScreen->getDefaultSongName().substr(1));
 }
 
 void SongWindow::function(const int i)
@@ -72,7 +73,7 @@ void SongWindow::openNameScreen()
     }
     else
     {
-        const auto songIndex = songScreen->getActiveSongIndex();
+        const auto songIndex = songScreen->getSelectedSongIndex();
         const auto song = sequencer->getSong(songIndex);
         initialNameScreenName = song->getName();
 

@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
         void right() override;
         void up() override;
         void down() override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
         void function(int i) override;
 
         MultiRecordingSetupScreen(Mpc &mpc, int layerIndex);
@@ -29,7 +29,7 @@ namespace mpc::lcdgui::screens::window
         void open() override;
 
     private:
-        void displayMrsLine(int i);
+        void displayMrsLine(int i) const;
         void setYOffset(int i);
         void setMrsTrack(int inputNumber, int newTrackNumber);
 

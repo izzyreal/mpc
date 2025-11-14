@@ -21,12 +21,11 @@ void DeleteSongScreen::open()
 
 void DeleteSongScreen::turnWheel(const int i)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "song")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "song")
     {
         const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-        auto candidate = songScreen->activeSongIndex + i;
+        auto candidate = songScreen->getSelectedSongIndex() + i;
 
         if (candidate < 0)
         {
@@ -37,7 +36,7 @@ void DeleteSongScreen::turnWheel(const int i)
             candidate = 19;
         }
 
-        songScreen->activeSongIndex = candidate;
+        songScreen->setSelectedSongIndex(candidate);
 
         displaySong();
     }
@@ -45,7 +44,6 @@ void DeleteSongScreen::turnWheel(const int i)
 
 void DeleteSongScreen::function(const int i)
 {
-
     switch (i)
     {
         case 2:
@@ -55,19 +53,22 @@ void DeleteSongScreen::function(const int i)
             openScreenById(ScreenId::SongWindow);
             break;
         case 4:
+        {
             const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-            sequencer->deleteSong(songScreen->activeSongIndex);
+            sequencer->deleteSong(songScreen->getSelectedSongIndex());
             openScreenById(ScreenId::SongScreen);
             break;
+        }
+        default:;
     }
 }
 
-void DeleteSongScreen::displaySong()
+void DeleteSongScreen::displaySong() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->activeSongIndex);
+    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
     findField("song")->setText(
-        StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",
-                         2) +
+        StrUtil::padLeft(std::to_string(songScreen->getSelectedSongIndex() + 1),
+                         "0", 2) +
         "-" + song->getName());
 }

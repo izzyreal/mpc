@@ -27,7 +27,7 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(Mpc &mpc, int layerIndex)
     }
 }
 
-void VmpcKeyboardScreen::turnWheel(int i)
+void VmpcKeyboardScreen::turnWheel(int increment)
 {
     /*
     auto kbMapping =

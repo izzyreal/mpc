@@ -2,28 +2,19 @@
 
 #include "lcdgui/ScreenComponent.hpp"
 
-namespace mpc::audiomidi
-{
-    class EventHandler;
-}
-
-namespace mpc::lcdgui::screens::window
-{
-    class TransposePermanentScreen;
-}
+#include <cstdint>
 
 namespace mpc::lcdgui::screens
 {
     class TransScreen final : public ScreenComponent
     {
-
     public:
+        static constexpr int8_t ALL_TRACKS = -1;
+        TransScreen(Mpc &mpc, int layerIndex);
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
 
         void open() override;
-
-        TransScreen(Mpc &mpc, int layerIndex);
 
         void play() override;
         void playStart() override;
@@ -31,22 +22,24 @@ namespace mpc::lcdgui::screens
         void overDub() override;
         void stop() override;
 
+        void setTransposeAmount(int i);
+        int getTransposeAmount() const;
+        int getTr() const;
+        int getBar0() const;
+        int getBar1() const;
+
     private:
-        int tr = -1;
+        int8_t tr = ALL_TRACKS;
         int transposeAmount = 0;
         int bar0 = 0;
         int bar1 = 0;
 
-        void setTransposeAmount(int i);
-        void setTr(int i);
+        void setTr(int8_t i);
         void setBar0(int i);
         void setBar1(int i);
 
         void displayTransposeAmount() const;
         void displayTr() const;
         void displayBars() const;
-
-        friend class TransposePermanentScreen;
-        friend class audiomidi::EventHandler;
     };
 } // namespace mpc::lcdgui::screens

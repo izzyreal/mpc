@@ -330,7 +330,8 @@ void SaveScreen::displayFile() const
             const auto num = StrUtil::padLeft(
                 std::to_string(sequencer->getSelectedSequenceIndex() + 1), "0",
                 2);
-            const auto sequenceName = sequencer->getSelectedSequence()->getName();
+            const auto sequenceName =
+                sequencer->getSelectedSequence()->getName();
             fileName = num + "-" + sequenceName;
             break;
         }

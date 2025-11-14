@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::dialog
         int song1 = 0;
         void setSong1(int i);
 
-        void displaySong0();
-        void displaySong1();
+        void displaySong0() const;
+        void displaySong1() const;
     };
 } // namespace mpc::lcdgui::screens::dialog

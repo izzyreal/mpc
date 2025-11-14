@@ -329,8 +329,9 @@ void StepEditorScreen::function(int i)
         }
         case 3:
         {
-            bool posIsLastTick = sequencer->getTransport()->getTickPosition() ==
-                                 sequencer->getSelectedSequence()->getLastTick();
+            bool posIsLastTick =
+                sequencer->getTransport()->getTickPosition() ==
+                sequencer->getSelectedSequence()->getLastTick();
 
             if (selectionEndIndex == -1)
             {

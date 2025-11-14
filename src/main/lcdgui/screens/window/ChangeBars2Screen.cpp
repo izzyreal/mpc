@@ -18,7 +18,8 @@ ChangeBars2Screen::ChangeBars2Screen(Mpc &mpc, const int layerIndex)
 
 void ChangeBars2Screen::open()
 {
-    setNewBars(std::max(sequencer->getSelectedSequence()->getLastBarIndex(), 0));
+    setNewBars(
+        std::max(sequencer->getSelectedSequence()->getLastBarIndex(), 0));
     displayCurrent();
     displayNewBars();
 }

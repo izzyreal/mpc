@@ -12,7 +12,7 @@ namespace mpc
             MAX_PROGRAM_COUNT - 1;
         static constexpr uint16_t PROGRAM_BANK_COUNT = 4;
         static constexpr uint16_t HARDWARE_PAD_COUNT = 16;
-        static constexpr uint16_t PADS_PER_BANK_COUNT = 16;
+        static constexpr int8_t PADS_PER_BANK_COUNT = 16;
         static constexpr uint16_t PROGRAM_PAD_COUNT =
             PROGRAM_BANK_COUNT * PADS_PER_BANK_COUNT;
         static constexpr uint8_t FIRST_DRUM_NOTE = 35;
@@ -25,7 +25,7 @@ namespace mpc
             MIDI_BUS_COUNT + DRUM_BUS_COUNT;
         static constexpr uint8_t LAST_BUS_INDEX = TOTAL_BUS_COUNT - 1;
         static constexpr uint8_t TRACK_COUNT = 64;
-        static constexpr uint8_t LAST_TRACK_INDEX = TRACK_COUNT - 1;
+        static constexpr int8_t LAST_TRACK_INDEX = TRACK_COUNT - 1;
         static constexpr uint8_t SEQUENCE_COUNT = 99;
         static constexpr uint16_t MAX_BAR_COUNT = 999;
         static constexpr uint16_t MAX_LAST_BAR_INDEX = MAX_BAR_COUNT - 1;

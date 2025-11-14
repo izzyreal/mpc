@@ -28,7 +28,7 @@ void TransScreen::open()
     displayTr();
 }
 
-void TransScreen::function(int i)
+void TransScreen::function(const int i)
 {
     const auto punchScreen = mpc.screens->get<ScreenId::PunchScreen>();
 
@@ -43,24 +43,24 @@ void TransScreen::function(int i)
             // if (amount == 0) break; // does 2kxl do that?
             openScreenById(ScreenId::TransposePermanentScreen);
             break;
+        default:;
     }
 }
 
-void TransScreen::turnWheel(int i)
+void TransScreen::turnWheel(const int increment)
 {
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "tr")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "tr")
     {
-        setTr(tr + i);
+        setTr(tr + increment);
     }
     else if (focusedFieldName == "transpose-amount")
     {
-        setTransposeAmount(transposeAmount + i);
+        setTransposeAmount(transposeAmount + increment);
     }
     else if (focusedFieldName == "bar0")
     {
-        const auto candidate = bar0 + i;
+        const auto candidate = bar0 + increment;
 
         if (candidate < 0 ||
             candidate > sequencer->getSelectedSequence()->getLastBarIndex())
@@ -72,7 +72,7 @@ void TransScreen::turnWheel(int i)
     }
     else if (focusedFieldName == "bar1")
     {
-        const auto candidate = bar1 + i;
+        const auto candidate = bar1 + increment;
 
         if (candidate < 0 ||
             candidate > sequencer->getSelectedSequence()->getLastBarIndex())
@@ -84,15 +84,33 @@ void TransScreen::turnWheel(int i)
     }
 }
 
-void TransScreen::setTransposeAmount(int i)
+void TransScreen::setTransposeAmount(const int i)
 {
     transposeAmount = std::clamp(i, -12, 12);
     displayTransposeAmount();
 }
-
-void TransScreen::setTr(int i)
+int TransScreen::getTransposeAmount() const
 {
-    tr = std::clamp(i, -1, 63);
+    return transposeAmount;
+}
+int TransScreen::getTr() const
+{
+    return tr;
+}
+
+int TransScreen::getBar0() const
+{
+    return bar0;
+}
+
+int TransScreen::getBar1() const
+{
+    return bar1;
+}
+
+void TransScreen::setTr(const int8_t i)
+{
+    tr = std::clamp(i, ALL_TRACKS, Mpc2000XlSpecs::LAST_TRACK_INDEX);
     displayTr();
 }
 
@@ -138,8 +156,9 @@ void TransScreen::displayTransposeAmount() const
 void TransScreen::displayTr() const
 {
     const auto trName = std::string(
-        tr == -1 ? "ALL"
-                 : sequencer->getSelectedSequence()->getTrack(tr)->getName());
+        tr == ALL_TRACKS
+            ? "ALL"
+            : sequencer->getSelectedSequence()->getTrack(tr)->getName());
     findField("tr")->setTextPadded(tr + 1, "0");
     findLabel("track-name")->setText(trName);
 }

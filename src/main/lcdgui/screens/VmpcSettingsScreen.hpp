@@ -28,7 +28,6 @@ namespace mpc::lcdgui::screens
 namespace mpc::lcdgui::screens::window
 {
     class MidiInputScreen;
-    class MultiRecordingSetupScreen;
 } // namespace mpc::lcdgui::screens::window
 
 namespace mpc::lcdgui::screens
@@ -87,6 +86,5 @@ namespace mpc::lcdgui::screens
         friend class audiomidi::MidiInput;
         friend class MidiSwScreen;
         friend class MidiInputScreen;
-        friend class MultiRecordingSetupScreen;
     };
 } // namespace mpc::lcdgui::screens

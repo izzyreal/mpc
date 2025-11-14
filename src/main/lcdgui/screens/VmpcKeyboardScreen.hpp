@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens
         void up() override;
         void down() override;
         void function(int i) override;
-        void turnWheel(int i) override;
+        void turnWheel(int increment) override;
 
         bool isLearning();
         void setLearnCandidate(int rawKeyCode);

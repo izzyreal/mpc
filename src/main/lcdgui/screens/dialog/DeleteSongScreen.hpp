@@ -16,6 +16,6 @@ namespace mpc::lcdgui::screens::dialog
         void open() override;
 
     private:
-        void displaySong();
+        void displaySong() const;
     };
 } // namespace mpc::lcdgui::screens::dialog

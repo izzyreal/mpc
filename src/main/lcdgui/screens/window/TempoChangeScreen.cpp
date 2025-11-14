@@ -47,7 +47,8 @@ void TempoChangeScreen::open()
     findField("a1")->setAlignment(Alignment::Centered);
     findField("a2")->setAlignment(Alignment::Centered);
 
-    const auto events = sequencer->getSelectedSequence()->getTempoChangeEvents();
+    const auto events =
+        sequencer->getSelectedSequence()->getTempoChangeEvents();
 
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 

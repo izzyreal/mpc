@@ -212,7 +212,8 @@ void TrMuteScreen::setTrackColor(int i) const
     if (sequencer->isSoloEnabled())
     {
         findField(std::to_string(i + 1))
-            ->setInverted(i + bankoffset() == sequencer->getSelectedTrackIndex());
+            ->setInverted(i + bankoffset() ==
+                          sequencer->getSelectedTrackIndex());
     }
     else
     {

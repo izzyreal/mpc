@@ -9,7 +9,7 @@
 namespace mpc
 {
     using PhysicalPadIndex =
-        ConstrainedInt<uint8_t, 0, Mpc2000XlSpecs::HARDWARE_PAD_COUNT - 1>;
+        ConstrainedInt<int8_t, 0, Mpc2000XlSpecs::HARDWARE_PAD_COUNT - 1>;
     using Velocity = ConstrainedInt<int8_t, -1, 127>;
     using ProgramPadIndex =
         ConstrainedInt<int8_t, -1, Mpc2000XlSpecs::PROGRAM_PAD_COUNT - 1>;

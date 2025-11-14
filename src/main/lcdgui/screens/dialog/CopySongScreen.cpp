@@ -41,10 +41,11 @@ void CopySongScreen::function(const int i)
         case 4:
         {
             const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-            sequencer->copySong(songScreen->activeSongIndex, song1);
+            sequencer->copySong(songScreen->getSelectedSongIndex(), song1);
             openScreenById(ScreenId::SongScreen);
             break;
         }
+        default:;
     }
 }
 
@@ -52,11 +53,10 @@ void CopySongScreen::turnWheel(const int i)
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "song0")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "song0")
     {
-        auto candidate = songScreen->activeSongIndex + i;
+        auto candidate = songScreen->getSelectedSongIndex() + i;
 
         if (candidate < 0)
         {
@@ -67,7 +67,7 @@ void CopySongScreen::turnWheel(const int i)
             candidate = 19;
         }
 
-        songScreen->activeSongIndex = candidate;
+        songScreen->setSelectedSongIndex(candidate);
 
         displaySong0();
     }
@@ -83,17 +83,17 @@ void CopySongScreen::setSong1(const int i)
     displaySong1();
 }
 
-void CopySongScreen::displaySong0()
+void CopySongScreen::displaySong0() const
 {
     const auto songScreen = mpc.screens->get<ScreenId::SongScreen>();
-    const auto song = sequencer->getSong(songScreen->activeSongIndex);
+    const auto song = sequencer->getSong(songScreen->getSelectedSongIndex());
     findField("song0")->setText(
-        StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0",
-                         2) +
+        StrUtil::padLeft(std::to_string(songScreen->getSelectedSongIndex() + 1),
+                         "0", 2) +
         "-" + song->getName());
 }
 
-void CopySongScreen::displaySong1()
+void CopySongScreen::displaySong1() const
 {
     const auto song = sequencer->getSong(song1);
     findField("song1")->setText(

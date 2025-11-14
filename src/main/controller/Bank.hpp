@@ -3,10 +3,11 @@
 #include "IntTypes.hpp"
 
 #include <type_traits>
+#include <cstdint>
 
 namespace mpc::controller
 {
-    enum class Bank
+    enum class Bank : int8_t
     {
         A = 0,
         B = 1,
@@ -55,8 +56,8 @@ namespace mpc::controller
                                         Bank bank) noexcept
     {
         using T = std::underlying_type_t<Bank>;
-        return ProgramPadIndex(static_cast<uint8_t>(
-            static_cast<T>(bank) * Mpc2000XlSpecs::PADS_PER_BANK_COUNT +
-            physicalPadIndex));
+        return ProgramPadIndex(static_cast<T>(bank) *
+                                   Mpc2000XlSpecs::PADS_PER_BANK_COUNT +
+                               physicalPadIndex);
     }
 } // namespace mpc::controller
