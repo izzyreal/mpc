@@ -68,7 +68,9 @@ void NoteRepeatProcessor::process(
          programPadIndex < Mpc2000XlSpecs::MAX_LAST_PROGRAM_INDEX;
          ++programPadIndex)
     {
-        auto mostRecentProgramPadPressEvent = snapshot.getMostRecentProgramPadPress(ProgramPadIndex(programPadIndex), sourcesToExclude);
+        auto mostRecentProgramPadPressEvent =
+            snapshot.getMostRecentProgramPadPress(
+                ProgramPadIndex(programPadIndex), sourcesToExclude);
 
         if (!mostRecentProgramPadPressEvent)
         {
@@ -108,7 +110,8 @@ void NoteRepeatProcessor::process(
             noteEvent->setVariationValue(value);
         }
 
-        const PhysicalPadIndex physicalPadIndex = mostRecentProgramPadPressEvent->physicalPadIndex;
+        const PhysicalPadIndex physicalPadIndex =
+            mostRecentProgramPadPressEvent->physicalPadIndex;
 
         if (const bool isPhysicallyPressed =
                 physicalPadIndex != NoPhysicalPadIndex;

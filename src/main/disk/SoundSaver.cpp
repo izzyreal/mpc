@@ -18,40 +18,38 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 
 SoundSaver::SoundSaver(
-    Mpc &_mpc, const std::vector<std::shared_ptr<sampler::Sound>> &_sounds,
-    bool _wav)
-    : mpc(_mpc), sounds(_sounds), wav(_wav),
-      saveSoundsThread(std::thread(&SoundSaver::static_saveSounds, this))
+    Mpc &mpc, const std::vector<std::shared_ptr<sampler::Sound>> &sounds,
+    const bool isWav)
+    : mpc(mpc), sounds(sounds), isWav(isWav), saveSoundsThread(std::thread(
+                                                  [this]
+                                                  {
+                                                      saveSounds();
+                                                  }))
 {
-}
-
-void SoundSaver::static_saveSounds(void *this_p)
-{
-    static_cast<SoundSaver *>(this_p)->saveSounds();
 }
 
 void SoundSaver::saveSounds() const
 {
-    const auto ext = std::string(wav ? ".WAV" : ".SND");
-    auto disk = mpc.getDisk();
+    const auto ext = std::string(isWav ? ".WAV" : ".SND");
+    const auto disk = mpc.getDisk();
 
     for (auto s : sounds)
     {
         auto fileName = StrUtil::replaceAll(s->getName(), ' ', "");
 
         mpc.getLayeredScreen()->openScreenById(ScreenId::PopupScreen);
-        auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
+        const auto popupScreen = mpc.screens->get<ScreenId::PopupScreen>();
         popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) +
                              ext);
 
         if (disk->checkExists(fileName + ext))
         {
-            auto saveAProgramScreen =
+            const auto saveAProgramScreen =
                 mpc.screens->get<ScreenId::SaveAProgramScreen>();
 
             if (saveAProgramScreen->replaceSameSounds)
             {
-                disk->getFile(fileName + ext)
+                (void)disk->getFile(fileName + ext)
                     ->del(); // possibly prepend auto success =
             }
             else
@@ -60,7 +58,7 @@ void SoundSaver::saveSounds() const
             }
         }
 
-        if (wav)
+        if (isWav)
         {
             disk->writeWav(s, "");
         }

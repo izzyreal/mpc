@@ -38,8 +38,7 @@ namespace mpc::eventregistry
         void registerProgramPadPress(
             Source, std::optional<MidiChannel> midiInputChannel,
             lcdgui::ScreenId, TrackIndex, sequencer::BusType, ProgramPadIndex,
-            Velocity, ProgramIndex,
-            PhysicalPadIndex) const;
+            Velocity, ProgramIndex, PhysicalPadIndex) const;
 
         void registerProgramPadAftertouch(Source, ProgramPadIndex, ProgramIndex,
                                           Pressure) const;

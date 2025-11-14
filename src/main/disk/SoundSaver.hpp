@@ -16,21 +16,18 @@ namespace mpc::sampler
 
 namespace mpc::disk
 {
-
     class SoundSaver
     {
-
         Mpc &mpc;
         std::vector<std::shared_ptr<sampler::Sound>> sounds;
-        bool wav = false;
+        bool isWav = false;
         std::thread saveSoundsThread;
-        static void static_saveSounds(void *this_p);
         void saveSounds() const;
 
     public:
         SoundSaver(Mpc &mpc,
                    const std::vector<std::shared_ptr<sampler::Sound>> &sounds,
-                   bool wav);
+                   bool isWav);
         ~SoundSaver();
     };
 } // namespace mpc::disk

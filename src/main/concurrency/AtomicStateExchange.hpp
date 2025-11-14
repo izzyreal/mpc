@@ -14,7 +14,8 @@ namespace mpc::concurrency
               size_t PoolSize = 3>
     class AtomicStateExchange
     {
-        struct SequencedMessage {
+        struct SequencedMessage
+        {
             uint64_t seq;
             Message payload;
         };
@@ -46,7 +47,7 @@ namespace mpc::concurrency
     public:
         virtual ~AtomicStateExchange() = default;
 
-        virtual void enqueue(Message&& msg) const noexcept
+        virtual void enqueue(Message &&msg) const noexcept
         {
             SequencedMessage sm;
             sm.seq = globalSeq.fetch_add(1, std::memory_order_relaxed);
@@ -72,7 +73,8 @@ namespace mpc::concurrency
                           return a.seq < b.seq;
                       });
 
-            for (auto it = sequencedMessages.begin(); it != sequencedMessages.end(); )
+            for (auto it = sequencedMessages.begin();
+                 it != sequencedMessages.end();)
             {
                 auto msg = std::move(it->payload);
                 it = sequencedMessages.erase(it);

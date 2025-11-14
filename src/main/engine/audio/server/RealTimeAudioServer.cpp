@@ -55,8 +55,7 @@ void RealTimeAudioServer::resizeBuffers(const int newSize)
 
 void RealTimeAudioServer::work(
     const float *const *inputBuffer, float *const *outputBuffer,
-    const int nFrames,
-    const std::vector<int8_t> &mpcMonoInputChannelIndices,
+    const int nFrames, const std::vector<int8_t> &mpcMonoInputChannelIndices,
     const std::vector<int8_t> &mpcMonoOutputChannelIndices,
     const std::vector<int8_t> &hostInputChannelIndices,
     const std::vector<int8_t> &hostOutputChannelIndices) const

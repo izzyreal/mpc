@@ -35,9 +35,9 @@ namespace mpc::disk
                                         const std::string &soundFileName);
         static void loadSound(Mpc &, const std::string &soundFileName,
                               const std::string &ext,
-                              const std::weak_ptr<MpcFile> &soundFile,
+                              const std::shared_ptr<MpcFile> &soundFile,
                               bool headless = false);
         static void showPopup(Mpc &, const std::string &name,
-                              const std::string &ext, int sampleSize);
+                              const std::string &ext);
     };
 } // namespace mpc::disk

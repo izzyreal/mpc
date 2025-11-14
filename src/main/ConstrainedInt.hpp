@@ -6,8 +6,7 @@
 
 namespace mpc
 {
-    template <typename IntType, IntType Min, IntType Max>
-    class ConstrainedInt
+    template <typename IntType, IntType Min, IntType Max> class ConstrainedInt
     {
         static_assert(std::is_integral_v<IntType>);
         static_assert(Min <= Max);
@@ -20,10 +19,10 @@ namespace mpc
         }
 
     public:
-        template <typename OtherInt, OtherInt OtherMin, OtherInt OtherMax,
-                  typename = std::enable_if_t<
-                      std::is_integral_v<OtherInt> &&
-                      (OtherMin >= Min) && (OtherMax <= Max)>>
+        template <
+            typename OtherInt, OtherInt OtherMin, OtherInt OtherMax,
+            typename = std::enable_if_t<std::is_integral_v<OtherInt> &&
+                                        (OtherMin >= Min) && (OtherMax <= Max)>>
         constexpr ConstrainedInt(
             const ConstrainedInt<OtherInt, OtherMin, OtherMax> &other)
             : value(static_cast<IntType>(other.get()))
@@ -37,8 +36,14 @@ namespace mpc
 
         constexpr ConstrainedInt() : value(Min) {}
 
-        constexpr IntType get() const { return value; }
-        constexpr operator IntType() const { return value; }
+        constexpr IntType get() const
+        {
+            return value;
+        }
+        constexpr operator IntType() const
+        {
+            return value;
+        }
 
         constexpr ConstrainedInt operator+(IntType rhs) const
         {
@@ -54,14 +59,16 @@ namespace mpc
                   typename = std::enable_if_t<std::is_integral_v<T>>>
         constexpr ConstrainedInt operator+(T rhs) const
         {
-            return ConstrainedInt(constrainedIntClamp(value + static_cast<IntType>(rhs)));
+            return ConstrainedInt(
+                constrainedIntClamp(value + static_cast<IntType>(rhs)));
         }
 
         template <typename T,
                   typename = std::enable_if_t<std::is_integral_v<T>>>
         constexpr ConstrainedInt operator-(T rhs) const
         {
-            return ConstrainedInt(constrainedIntClamp(value - static_cast<IntType>(rhs)));
+            return ConstrainedInt(
+                constrainedIntClamp(value - static_cast<IntType>(rhs)));
         }
 
         constexpr ConstrainedInt operator*(const ConstrainedInt &rhs) const
@@ -74,10 +81,11 @@ namespace mpc
         constexpr ConstrainedInt operator*(T rhs) const
         {
             using Wide = double;
-            const Wide scaled = static_cast<Wide>(value) * static_cast<Wide>(rhs);
+            const Wide scaled =
+                static_cast<Wide>(value) * static_cast<Wide>(rhs);
             const Wide rounded = std::round(scaled);
-            Wide clamped =
-                std::clamp(rounded, static_cast<Wide>(Min), static_cast<Wide>(Max));
+            Wide clamped = std::clamp(rounded, static_cast<Wide>(Min),
+                                      static_cast<Wide>(Max));
 
             return ConstrainedInt(static_cast<IntType>(clamped));
         }

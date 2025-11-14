@@ -53,7 +53,7 @@ namespace mpc::disk
     class AbstractDisk
     {
     protected:
-        AbstractDisk(Mpc &);
+        explicit AbstractDisk(Mpc &);
         ~AbstractDisk();
 
         Mpc &mpc;
@@ -73,7 +73,7 @@ namespace mpc::disk
         std::string getFileName(int i) const;
         std::vector<std::string> getParentFileNames() const;
 
-        std::shared_ptr<MpcFile> getFile(int i);
+        std::shared_ptr<MpcFile> getFile(int fileIndex);
         std::shared_ptr<MpcFile> getFile(const std::string &fileName);
         std::vector<std::shared_ptr<MpcFile>> &getAllFiles();
         std::shared_ptr<MpcFile> getParentFile(int i);
@@ -121,6 +121,8 @@ namespace mpc::disk
 
     private:
         std::thread programSoundsSaveThread = std::thread([] {});
+        std::thread readApsThread = std::thread([] {});
+        std::thread readPgmThread = std::thread([] {});
         std::unique_ptr<SoundSaver> soundSaver;
         std::unique_ptr<AllLoader> allLoader;
 
@@ -154,7 +156,7 @@ namespace mpc::disk
         sequence_or_error readMid2(std::shared_ptr<MpcFile>);
 
         void readAps2(std::shared_ptr<MpcFile>,
-                      std::function<void()> on_success);
+                      std::function<void()> onSuccess);
         void readAll2(std::shared_ptr<MpcFile>,
                       std::function<void()> onSuccess);
         sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);

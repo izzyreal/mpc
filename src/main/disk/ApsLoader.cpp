@@ -41,7 +41,8 @@ void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file)
         throw std::invalid_argument("File does not exist");
     }
 
-    auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
+    const auto cantFindFileScreen =
+        mpc.screens->get<ScreenId::CantFindFileScreen>();
     cantFindFileScreen->skipAll = false;
 
     ApsParser apsParser(file->getBytes());
@@ -56,14 +57,14 @@ void ApsLoader::load(Mpc &mpc, const std::shared_ptr<MpcFile> &file)
         throw std::runtime_error("Invalid APS header");
     }
 
-    auto withoutSounds = false;
+    constexpr auto withoutSounds = false;
     loadFromParsedAps(apsParser, mpc, withoutSounds);
 
     mpc.getSampler()->setSoundIndex(0);
 }
 
-void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
-                                  bool withoutSounds)
+void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc,
+                                  bool withoutSounds, bool headless)
 {
     auto sampler = mpc.getSampler();
     auto disk = mpc.getDisk();
@@ -75,10 +76,9 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
     std::vector<int> unavailableSoundIndices;
     std::map<int, int> finalSoundIndices;
 
-    int skipCount = 0;
-
     if (!withoutSounds)
     {
+        int skipCount = 0;
         sampler->deleteAllSamples();
 
         for (int i = 0; i < apsParser.getSoundNames().size(); i++)
@@ -292,21 +292,20 @@ void ApsLoader::loadFromParsedAps(ApsParser &apsParser, Mpc &mpc, bool headless,
 
 void ApsLoader::loadSound(Mpc &mpc, const std::string &soundFileName,
                           const std::string &ext,
-                          const std::weak_ptr<MpcFile> &_soundFile,
-                          bool headless)
+                          const std::shared_ptr<MpcFile> &soundFile,
+                          const bool headless)
 {
-    auto soundFile = _soundFile.lock();
-    const auto replace = false;
+    constexpr auto replace = false;
     SoundLoader soundLoader(mpc, replace);
 
     if (!headless)
     {
-        showPopup(mpc, soundFileName, ext, soundFile->length());
+        showPopup(mpc, soundFileName, ext);
     }
 
     SoundLoaderResult result;
-    bool shouldBeConverted = false;
-    auto sound = mpc.getSampler()->addSound();
+    constexpr bool shouldBeConverted = false;
+    const auto sound = mpc.getSampler()->addSound();
 
     if (!sound)
     {
@@ -322,9 +321,9 @@ void ApsLoader::loadSound(Mpc &mpc, const std::string &soundFileName,
 }
 
 void ApsLoader::showPopup(Mpc &mpc, const std::string &name,
-                          const std::string &ext, int sampleSize)
+                          const std::string &ext)
 {
-    std::string msg =
+    const std::string msg =
         "LOADING " +
         StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext);
     mpc.getLayeredScreen()->showPopup(msg);
@@ -333,8 +332,9 @@ void ApsLoader::showPopup(Mpc &mpc, const std::string &name,
 
 void ApsLoader::handleSoundNotFound(Mpc &mpc, const std::string &soundFileName)
 {
-    auto cantFindFileScreen = mpc.screens->get<ScreenId::CantFindFileScreen>();
-    auto skipAll = cantFindFileScreen->skipAll;
+    const auto cantFindFileScreen =
+        mpc.screens->get<ScreenId::CantFindFileScreen>();
+    const auto skipAll = cantFindFileScreen->skipAll;
 
     if (!skipAll)
     {
