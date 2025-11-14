@@ -300,7 +300,7 @@ void ClientMidiEventController::handleKeyAftertouch(
     const auto pressure = e.getAftertouchValue();
     const auto note = e.getAftertouchNote();
     const auto track = getTrackForEvent(e);
-    const auto bus = sequencer->getBus<Bus>(track->getBusType());
+    const auto bus = sequencer->getBus(track->getBusType());
     eventRegistry->registerNoteAftertouch(
         Source::MidiInput, NoteNumber(note), Pressure(pressure),
         std::optional<MidiChannel>(e.getChannel()));
