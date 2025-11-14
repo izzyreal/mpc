@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <memory>
 #include <cstdint>
 
@@ -12,6 +14,8 @@ namespace mpc::sequencer
     public:
         explicit SequencerStateView(
             const std::shared_ptr<const SequencerState> &s) noexcept;
+
+        SequenceIndex getSelectedSequenceIndex() const noexcept;
 
         double getPositionQuarterNotes() const;
 

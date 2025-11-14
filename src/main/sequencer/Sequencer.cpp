@@ -89,7 +89,7 @@ Sequencer::Sequencer(
     stateManager = std::make_shared<SequencerStateManager>(this);
 }
 
-std::shared_ptr<SequencerStateManager> Sequencer::getStateManager()
+std::shared_ptr<SequencerStateManager> Sequencer::getStateManager() const
 {
     return stateManager;
 }
@@ -134,8 +134,6 @@ void Sequencer::init()
 
     soloEnabled = false;
 
-    selectedSequenceIndex = MinSequenceIndex;
-
     purgeAllSequences();
 
     for (int i = 0; i < 20; i++)
@@ -151,7 +149,7 @@ void Sequencer::deleteSong(const int i)
 
 SequenceIndex Sequencer::getSelectedSequenceIndex() const
 {
-    return selectedSequenceIndex;
+    return stateManager->getSnapshot().getSelectedSequenceIndex();
 }
 
 std::shared_ptr<Track> Sequencer::getSelectedTrack()
@@ -166,8 +164,8 @@ std::shared_ptr<Track> Sequencer::getSelectedTrack()
 
 void Sequencer::playToTick(const int targetTick) const
 {
-    const auto seqIndex =
-        isSongModeEnabled() ? getSongSequenceIndex() : selectedSequenceIndex;
+    const auto seqIndex = isSongModeEnabled() ? getSongSequenceIndex()
+                                              : getSelectedSequenceIndex();
     auto seq = sequences[seqIndex].get();
     const auto secondSequenceScreen =
         getScreens()->get<ScreenId::SecondSeqScreen>();
@@ -293,14 +291,11 @@ void Sequencer::setDefaultSequenceName(const std::string &s)
 }
 
 void Sequencer::setSelectedSequenceIndex(const SequenceIndex sequenceIndexToUse,
-                                         const bool shouldSetPositionTo0)
+                                         const bool shouldSetPositionTo0) const
 {
     assert(!shouldSetPositionTo0 || !transport->isPlaying());
-    selectedSequenceIndex = sequenceIndexToUse;
-    if (shouldSetPositionTo0)
-    {
-        transport->setPosition(0);
-    }
+    stateManager->enqueue(
+        SetSelectedSequenceIndex{sequenceIndexToUse, shouldSetPositionTo0});
 }
 
 void Sequencer::setTimeDisplayStyle(const int i)
@@ -359,6 +354,7 @@ void Sequencer::undoSeq()
     }
 
     auto s = copySequence(undoPlaceHolder);
+    const auto selectedSequenceIndex = getSelectedSequenceIndex();
     auto copy = copySequence(sequences[selectedSequenceIndex]);
     undoPlaceHolder.swap(copy);
 
@@ -388,12 +384,12 @@ void Sequencer::setSequence(const SequenceIndex sequenceIndex,
 
 void Sequencer::purgeAllSequences()
 {
-    for (int i = 0; i < 99; i++)
+    for (int i = 0; i < Mpc2000XlSpecs::SEQUENCE_COUNT; i++)
     {
         purgeSequence(i);
     }
 
-    selectedSequenceIndex = MinSequenceIndex;
+    setSelectedSequenceIndex(MinSequenceIndex, true);
 }
 
 std::shared_ptr<Sequence> Sequencer::makeNewSequence()
@@ -654,10 +650,10 @@ std::shared_ptr<Sequence> Sequencer::getSelectedSequence()
                 ->getStepCount() != 0)
     {
         return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex()
-                                                     : selectedSequenceIndex];
+                                                     : getSelectedSequenceIndex()];
     }
 
-    return sequences[selectedSequenceIndex];
+    return sequences[getSelectedSequenceIndex()];
 }
 
 int Sequencer::getUsedSequenceCount() const
@@ -918,7 +914,7 @@ SequenceIndex Sequencer::getCurrentlyPlayingSequenceIndex() const
         return songSeqIndex;
     }
 
-    return selectedSequenceIndex;
+    return getSelectedSequenceIndex();
 }
 
 SequenceIndex Sequencer::getNextSq() const
@@ -1051,7 +1047,7 @@ void Sequencer::flushTrackNoteCache()
 
 void Sequencer::storeSelectedSequenceInUndoPlaceHolder()
 {
-    auto copy = copySequence(sequences[selectedSequenceIndex]);
+    auto copy = copySequence(sequences[getSelectedSequenceIndex()]);
     undoPlaceHolder.swap(copy);
 
     undoSeqAvailable = true;

@@ -10,6 +10,10 @@ SequencerStateView::SequencerStateView(
     : state(s)
 {
 }
+mpc::SequenceIndex SequencerStateView::getSelectedSequenceIndex() const noexcept
+{
+    return state->selectedSequenceIndex;
+}
 
 double SequencerStateView::getPositionQuarterNotes() const
 {

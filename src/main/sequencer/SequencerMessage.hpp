@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IntTypes.hpp"
+
 #include <cstdint>
 #include <variant>
 
@@ -25,7 +27,7 @@ namespace mpc::sequencer
         SequenceIndex sequenceIndex;
     };
 
-    struct SetActiveSequenceIndex
+    struct SetSelectedSequenceIndex
     {
         SequenceIndex sequenceIndex;
         bool setPositionTo0 = true;
@@ -43,5 +45,5 @@ namespace mpc::sequencer
     using SequencerMessage =
         std::variant<SetPositionQuarterNotes, SetPlayStartPositionQuarterNotes,
                      BumpPositionByTicks, SwitchToNextSequence,
-                     SetActiveSequenceIndex, Stop, Play>;
+                     SetSelectedSequenceIndex, Stop, Play>;
 } // namespace mpc::sequencer

@@ -6,7 +6,7 @@ namespace mpc::sequencer
 {
     struct SequencerState
     {
-        SequenceIndex selectedSequenceIndex{0};
+        SequenceIndex selectedSequenceIndex{MinSequenceIndex};
 
         struct TransportState
         {

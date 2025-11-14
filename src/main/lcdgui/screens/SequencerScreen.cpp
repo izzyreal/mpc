@@ -849,7 +849,7 @@ void SequencerScreen::turnWheel(const int i)
                 findChild("function-keys")->Hide(false);
             }
 
-            sequencer->getStateManager()->enqueue(SetActiveSequenceIndex{
+            sequencer->getStateManager()->enqueue(SetSelectedSequenceIndex{
                 sequencer->getSelectedSequenceIndex() + i});
         }
     }

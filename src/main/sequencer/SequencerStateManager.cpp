@@ -51,12 +51,12 @@ void SequencerStateManager::applyMessage(const SequencerMessage &msg) noexcept
             {
                 constexpr bool setPositionTo0 = false;
                 enqueue(
-                    SetActiveSequenceIndex{m.sequenceIndex, setPositionTo0});
+                    SetSelectedSequenceIndex{m.sequenceIndex, setPositionTo0});
                 enqueue(Stop{});
                 constexpr bool fromStart = true;
                 enqueue(Play{fromStart});
             }
-            else if constexpr (std::is_same_v<T, SetActiveSequenceIndex>)
+            else if constexpr (std::is_same_v<T, SetSelectedSequenceIndex>)
             {
                 sequencer->setSelectedSequenceIndex(m.sequenceIndex, false);
                 if (m.setPositionTo0)

@@ -108,7 +108,7 @@ void NextSeqScreen::turnWheel(const int increment)
         else
         {
             sequencer->getStateManager()->enqueue(
-                sequencer::SetActiveSequenceIndex{
+                sequencer::SetSelectedSequenceIndex{
                     sequencer->getSelectedSequenceIndex() + increment});
         }
     }

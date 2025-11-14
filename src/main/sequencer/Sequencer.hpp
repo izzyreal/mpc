@@ -126,7 +126,6 @@ namespace mpc::sequencer
         std::shared_ptr<Transport> transport;
         std::vector<std::shared_ptr<Bus>> buses;
         std::shared_ptr<Sequence> placeHolder;
-        SequenceIndex selectedSequenceIndex{0};
 
         std::vector<std::shared_ptr<Sequence>> sequences =
             std::vector<std::shared_ptr<Sequence>>(99);
@@ -166,7 +165,7 @@ namespace mpc::sequencer
         static void copyTrackParameters(const std::shared_ptr<Track> &source,
                                         const std::shared_ptr<Track> &dest);
 
-        std::shared_ptr<SequencerStateManager> getStateManager();
+        std::shared_ptr<SequencerStateManager> getStateManager() const;
         std::shared_ptr<Transport> getTransport();
 
         std::shared_ptr<Sequence> makeNewSequence();
@@ -177,7 +176,7 @@ namespace mpc::sequencer
         std::shared_ptr<Sequence> getSequence(int i);
         std::string getDefaultSequenceName();
         void setDefaultSequenceName(const std::string &s);
-        void setSelectedSequenceIndex(SequenceIndex, bool shouldSetPositionTo0);
+        void setSelectedSequenceIndex(SequenceIndex, bool shouldSetPositionTo0) const;
         void setTimeDisplayStyle(int i);
         int getTimeDisplayStyle() const;
         void setRecordingModeMulti(bool b);
