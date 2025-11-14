@@ -25,7 +25,7 @@
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/window/TimingCorrectScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
-#include "lcdgui/ScreenGroups.hpp"
+#include "lcdgui/ScreenIdGroups.hpp"
 
 #include "StrUtil.hpp"
 
@@ -1006,7 +1006,7 @@ std::shared_ptr<Song> Sequencer::getSong(const int i)
 
 bool Sequencer::isSongModeEnabled() const
 {
-    return screengroups::isSongScreen(layeredScreen->getCurrentScreen());
+    return screengroups::isSongScreen(layeredScreen->getCurrentScreenId());
 }
 
 SequenceIndex Sequencer::getSongSequenceIndex() const

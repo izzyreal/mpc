@@ -33,13 +33,13 @@ namespace mpc::lcdgui
 
     class LayeredScreen
     {
-
         Mpc &mpc;
         LayeredScreenTasks uiTasks;
         std::unique_ptr<Component> root;
         std::vector<std::vector<bool>> pixels =
             std::vector(248, std::vector<bool>(60));
         std::deque<std::shared_ptr<ScreenComponent>> history;
+        std::atomic<ScreenId> currentScreenId = ScreenId::NoScreenId;
 
     public:
         std::vector<std::vector<bool>> atlas;

@@ -2,7 +2,7 @@
 
 namespace mpc::lcdgui::screengroups
 {
-    bool isPadDoesNotTriggerNoteEventScreen(ScreenId screenId)
+    bool isPadDoesNotTriggerNoteEventScreen(const ScreenId screenId)
     {
         return isSoundScreen(screenId) || screenId == ScreenId::TrMuteScreen ||
                screenId == ScreenId::NextSeqPadScreen ||
@@ -30,5 +30,13 @@ namespace mpc::lcdgui::screengroups
                screenId == ScreenId::StereoToMonoScreen ||
                screenId == ScreenId::MonoToStereoScreen ||
                screenId == ScreenId::ResampleScreen;
+    }
+
+    bool isSongScreen(const ScreenId screenId)
+    {
+        return screenId == ScreenId::SongScreen ||
+               screenId == ScreenId::SongWindow ||
+               screenId == ScreenId::LoopSongScreen ||
+               screenId == ScreenId::IgnoreTempoChangeScreen;
     }
 } // namespace mpc::lcdgui::screengroups

@@ -10,7 +10,8 @@ namespace mpc::lcdgui
 #define X(ns, Class, name) Class,
         SCREEN_LIST
 #undef X
-            Count
+            NoScreenId,
+        Count
     };
     template <ScreenId ID> struct ScreenTypeMap;
 

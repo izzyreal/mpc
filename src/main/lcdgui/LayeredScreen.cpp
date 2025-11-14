@@ -292,7 +292,6 @@ void LayeredScreen::closeCurrentScreen()
 
     for (int i = currentLayerIndex - 1; i >= 0; --i)
     {
-
         if (const auto screen = layers[i]->findChild<ScreenComponent>())
         {
             openScreenInternal(screen);
@@ -384,6 +383,8 @@ void LayeredScreen::openScreenInternal(
     {
         returnToLastFocus(newScreen, newScreen->getFirstField());
     }
+
+    currentScreenId.store(getScreenId(newScreen));
 
     newScreen->open();
 
@@ -513,7 +514,7 @@ std::string LayeredScreen::getLastFocus(const std::string &screenName)
 }
 ScreenId LayeredScreen::getCurrentScreenId() const
 {
-    return getScreenId(getCurrentScreen());
+    return currentScreenId.load();
 }
 
 std::string LayeredScreen::getCurrentScreenName() const
