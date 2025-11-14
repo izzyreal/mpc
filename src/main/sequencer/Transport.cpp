@@ -4,6 +4,7 @@
 #include "lcdgui/LayeredScreen.hpp"
 #include "lcdgui/Screens.hpp"
 #include "lcdgui/ScreenGroups.hpp"
+#include "lcdgui/ScreenIdGroups.hpp"
 #include "lcdgui/screens/SecondSeqScreen.hpp"
 #include "lcdgui/screens/SongScreen.hpp"
 #include "lcdgui/screens/UserScreen.hpp"
@@ -108,16 +109,10 @@ void Transport::overdubFromStart()
 
 void Transport::stop()
 {
-    stop(AT_START_OF_BUFFER);
-}
-
-void Transport::stop(const StopMode stopMode)
-{
     const bool bouncing = sequencer.isBouncing();
 
     if (!isPlaying() && !bouncing)
     {
-
         if (const auto snapshot = sequencer.getStateManager()->getSnapshot();
             snapshot.getPositionQuarterNotes() != 0.0)
         {
@@ -857,7 +852,7 @@ double Transport::getTempo() const
 
     const auto seq = sequencer.getSelectedSequence();
 
-    if (screengroups::isSongScreen(sequencer.layeredScreen->getCurrentScreen()))
+    if (screengroups::isSongScreen(sequencer.layeredScreen->getCurrentScreenId()))
     {
         if (!seq->isUsed())
         {

@@ -392,8 +392,7 @@ bool SequencerPlaybackEngine::processSeqLoopDisabled() const
         }
         else
         {
-            sequencer->getTransport()->stop(
-                Transport::StopMode::AT_START_OF_TICK);
+            sequencer->getTransport()->stop();
             setTickPositionEffectiveImmediately(
                 Sequencer::ticksToQuarterNotes(seq->getLastTick()));
         }

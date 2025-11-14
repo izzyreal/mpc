@@ -21,12 +21,6 @@ namespace mpc::sequencer
     class Transport
     {
     public:
-        enum StopMode
-        {
-            AT_START_OF_BUFFER,
-            AT_START_OF_TICK
-        };
-
         explicit Transport(
             Sequencer &owner,
             const std::function<
@@ -39,7 +33,6 @@ namespace mpc::sequencer
         void overdubFromStart();
         void switchRecordToOverdub();
         void stop();
-        void stop(StopMode);
         void setRecording(bool b);
         void setOverdubbing(bool b);
         void setPosition(double positionQuarterNotes,
