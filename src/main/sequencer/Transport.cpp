@@ -852,7 +852,8 @@ double Transport::getTempo() const
 
     const auto seq = sequencer.getSelectedSequence();
 
-    if (screengroups::isSongScreen(sequencer.layeredScreen->getCurrentScreenId()))
+    if (screengroups::isSongScreen(
+            sequencer.layeredScreen->getCurrentScreenId()))
     {
         if (!seq->isUsed())
         {

@@ -41,7 +41,6 @@ namespace mpc::sampler
         void setPreviousScreenName(const std::string &s);
         bool isSoundNameOccupied(const std::string &) const;
 
-        void finishBasicVoice() const;
         void init();
         void playMetronome(unsigned int velocity, int framePos) const;
         void playPreviewSample(int start, int end, int loopTo) const;

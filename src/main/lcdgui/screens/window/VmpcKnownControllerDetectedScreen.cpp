@@ -79,7 +79,7 @@ void VmpcKnownControllerDetectedScreen::function(const int i)
     }
 }
 
-void VmpcKnownControllerDetectedScreen::displayMessage()
+void VmpcKnownControllerDetectedScreen::displayMessage() const
 {
     findLabel("line1")->setText(controllerName);
 }

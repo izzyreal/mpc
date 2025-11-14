@@ -15,7 +15,7 @@
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
 
-SoundPlayer::SoundPlayer()
+SoundPlayer::SoundPlayer() : fileFormat()
 {
     srcLeft = src_new(0, 1, &srcLeftError);
     srcRight = src_new(0, 1, &srcRightError);
@@ -37,8 +37,8 @@ SoundPlayer::~SoundPlayer()
 }
 
 bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
-                        SoundPlayerFileFormat fileFormatToUse,
-                        int audioServerSampleRate)
+                        const SoundPlayerFileFormat fileFormatToUse,
+                        const int audioServerSampleRate)
 {
     if (playing.load())
     {
@@ -103,7 +103,7 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
     resamplerGeneratedFrameCounter = 0;
 
     fadeFactor = 1.0f;
-    stopEarly = false;
+    stopEarly.store(false);
     playedFrameCount = 0;
     ingestedSourceFrameCount = 0;
 
@@ -138,7 +138,11 @@ bool SoundPlayer::start(const std::shared_ptr<std::istream> &streamToUse,
 
 void SoundPlayer::enableStopEarly()
 {
-    stopEarly = true;
+    if (!playing.load())
+    {
+        return;
+    }
+    stopEarly.store(true);
 }
 
 void SoundPlayer::readWithoutResampling()
@@ -302,7 +306,7 @@ void SoundPlayer::readWithResampling(const float ratio)
     }
 }
 
-float SoundPlayer::readNextFrame()
+float SoundPlayer::readNextFrame() const
 {
     if (inputAudioFormat->getSampleSizeInBits() == 24)
     {
@@ -350,7 +354,7 @@ short SoundPlayer::readNextShort() const
     return value;
 }
 
-int SoundPlayer::processAudio(AudioBuffer *buf, int nFrames)
+int SoundPlayer::processAudio(AudioBuffer *buf, const int nFrames)
 {
     if (!playing.load())
     {
@@ -402,7 +406,7 @@ int SoundPlayer::processAudio(AudioBuffer *buf, int nFrames)
             outputBufferRight[frame] = outputBufferLeft[frame];
         }
 
-        if (stopEarly)
+        if (stopEarly.load())
         {
             if (fadeFactor > 0.f)
             {
@@ -420,9 +424,9 @@ int SoundPlayer::processAudio(AudioBuffer *buf, int nFrames)
         playedFrameCount++;
     }
 
-    const auto ratio = buf->getSampleRate() / inputAudioFormat->getSampleRate();
-
-    if (ratio == 1.f)
+    if (const auto ratio =
+            buf->getSampleRate() / inputAudioFormat->getSampleRate();
+        ratio == 1.f)
     {
         if (playedFrameCount >= sourceFrameCount)
         {

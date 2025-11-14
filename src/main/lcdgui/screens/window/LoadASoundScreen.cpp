@@ -8,6 +8,9 @@
 #include "sequencer/Track.hpp"
 
 #include "disk/MpcFile.hpp"
+#include "engine/EngineHost.hpp"
+#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/LoadScreen.hpp"
@@ -82,10 +85,19 @@ void LoadASoundScreen::function(const int i)
             break;
         }
         case 3:
-            sampler->finishBasicVoice(); // Here we make sure the sound is not
-                                         // being played, so it can be removed
-                                         // from memory.
-            sampler->deleteSound(sampler->getPreviewSound());
+
+            mpc.getEngineHost()
+                ->getSequencerPlaybackEngine()
+                ->enqueueEventAfterNFrames(
+                    [&]
+                    {
+                        mpc.getEngineHost()
+                            ->getPreviewSoundPlayer()
+                            ->finishVoice();
+                        sampler->deleteSound(sampler->getPreviewSound());
+                    },
+                    0);
+
             openScreenById(ScreenId::LoadScreen);
             break;
         case 4:

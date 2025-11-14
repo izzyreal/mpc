@@ -3,16 +3,16 @@
 #include "Mpc.hpp"
 #include "engine/EngineHost.hpp"
 #include "audiomidi/SoundPlayer.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 
-#include "lcdgui/screens/LoadScreen.hpp"
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
-#include "sampler/Sampler.hpp"
 #include "sequencer/Sequencer.hpp"
 
 using namespace mpc::command;
 using namespace mpc::lcdgui;
 
-ReleaseFunctionCommand::ReleaseFunctionCommand(Mpc &mpc, int i) : mpc(mpc), i(i)
+ReleaseFunctionCommand::ReleaseFunctionCommand(Mpc &mpc, const int i)
+    : mpc(mpc), i(i)
 {
 }
 
@@ -31,26 +31,43 @@ void ReleaseFunctionCommand::execute()
         case 2:
             if (ls->isCurrentScreen({ScreenId::LoadASoundScreen}))
             {
-                mpc.getSampler()->finishBasicVoice();
+                mpc.getEngineHost()->finishPreviewSoundPlayerVoice();
             }
             break;
         case 4:
-            if (mpc.getLayeredScreen()->isCurrentScreenPopupFor(
-                    ScreenId::LoadScreen))
+        {
+            if (mpc.getEngineHost()->getSoundPlayer()->isPlaying() ||
+                ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
             {
-                mpc.getLayeredScreen()->openScreenById(ScreenId::LoadScreen);
-                mpc.getEngineHost()->getSoundPlayer()->enableStopEarly();
+                const std::function stopSoundPlayer =
+                    [ls, engineHost = mpc.getEngineHost()]
+                {
+                    if (ls->isCurrentScreenPopupFor(ScreenId::LoadScreen))
+                    {
+                        engineHost->getSoundPlayer()->enableStopEarly();
+                        ls->postToUiThread(
+                            [ls]
+                            {
+                                ls->openScreenById(ScreenId::LoadScreen);
+                            });
+                    }
+                };
+
+                mpc.getEngineHost()
+                    ->getSequencerPlaybackEngine()
+                    ->enqueueEventAfterNFrames(stopSoundPlayer, 0);
             }
             break;
+        }
         case 5:
         {
-            auto sequencer = mpc.getSequencer();
+            const auto sequencer = mpc.getSequencer();
             auto sampler = mpc.getSampler();
 
             if (!sequencer->getTransport()->isPlaying() &&
                 !ls->isCurrentScreen({ScreenId::SequencerScreen}))
             {
-                sampler->finishBasicVoice();
+                mpc.getEngineHost()->finishPreviewSoundPlayerVoice();
             }
 
             if (ls->isCurrentScreen({ScreenId::TrMuteScreen}))
@@ -62,14 +79,34 @@ void ReleaseFunctionCommand::execute()
 
                 sequencer->setSoloEnabled(sequencer->isSoloEnabled());
             }
-            else if (mpc.getLayeredScreen()->isCurrentScreenPopupFor(
-                         ScreenId::DirectoryScreen))
+            else
             {
-                mpc.getLayeredScreen()->openScreenById(
-                    ScreenId::DirectoryScreen);
-                mpc.getEngineHost()->getSoundPlayer()->enableStopEarly();
+                if (mpc.getEngineHost()->getSoundPlayer()->isPlaying() ||
+                    ls->isCurrentScreenPopupFor(ScreenId::DirectoryScreen))
+                {
+                    const std::function stopSoundPlayer =
+                        [ls, engineHost = mpc.getEngineHost()]
+                    {
+                        if (ls->isCurrentScreenPopupFor(
+                                ScreenId::DirectoryScreen))
+                        {
+                            engineHost->getSoundPlayer()->enableStopEarly();
+                            ls->postToUiThread(
+                                [ls]
+                                {
+                                    ls->openScreenById(
+                                        ScreenId::DirectoryScreen);
+                                });
+                        }
+                    };
+
+                    mpc.getEngineHost()
+                        ->getSequencerPlaybackEngine()
+                        ->enqueueEventAfterNFrames(stopSoundPlayer, 0);
+                }
             }
             break;
         }
+        default:;
     }
 }

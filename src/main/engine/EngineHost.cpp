@@ -460,6 +460,16 @@ bool EngineHost::isBouncePrepared() const
     return bouncePrepared;
 }
 
+void EngineHost::finishPreviewSoundPlayerVoice()
+{
+    getSequencerPlaybackEngine()->enqueueEventAfterNFrames(
+        [&]
+        {
+            getPreviewSoundPlayer()->finishVoice();
+        },
+        0);
+}
+
 bool EngineHost::isBouncing() const
 {
     return bouncing.load();

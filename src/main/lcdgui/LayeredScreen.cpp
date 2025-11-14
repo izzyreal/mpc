@@ -140,16 +140,14 @@ bool LayeredScreen::isCurrentScreen(
 
 bool LayeredScreen::isCurrentScreenPopupFor(const ScreenId targetId) const
 {
-    if (history.size() < 2)
+    if (currentScreenId == ScreenId::NoScreenId ||
+        previousScreenId == ScreenId::NoScreenId)
     {
         return false;
     }
 
-    const auto curr = history.back();
-    const auto prev = history[history.size() - 2];
-
-    return getScreenId(curr) == ScreenId::PopupScreen &&
-           getScreenId(prev) == targetId;
+    return currentScreenId == ScreenId::PopupScreen &&
+           previousScreenId == targetId;
 }
 
 ScreenId
@@ -384,6 +382,7 @@ void LayeredScreen::openScreenInternal(
         returnToLastFocus(newScreen, newScreen->getFirstField());
     }
 
+    previousScreenId.store(currentScreenId.load());
     currentScreenId.store(getScreenId(newScreen));
 
     newScreen->open();

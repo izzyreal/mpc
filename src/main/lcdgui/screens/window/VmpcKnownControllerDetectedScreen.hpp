@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
         void setControllerName(std::string);
 
     private:
-        void displayMessage();
+        void displayMessage() const;
 
         std::string controllerName;
     };

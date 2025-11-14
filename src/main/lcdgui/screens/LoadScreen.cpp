@@ -9,6 +9,7 @@
 #include "disk/SoundLoader.hpp"
 #include "disk/AbstractDisk.hpp"
 #include "disk/MpcFile.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/Label.hpp"
 
 #include "lcdgui/screens/window/DirectoryScreen.hpp"
@@ -54,9 +55,8 @@ void LoadScreen::open()
     const auto playable = StrUtil::eqIgnoreCase(ext, ".snd") ||
                           StrUtil::eqIgnoreCase(ext, ".wav");
 
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "device")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "device")
     {
         ls->setFunctionKeysArrangement(
             device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 2);
@@ -67,7 +67,7 @@ void LoadScreen::open()
     }
 }
 
-void LoadScreen::function(int i)
+void LoadScreen::function(const int i)
 {
     const auto focusedFieldName = getFocusedFieldNameOrThrow();
 
@@ -91,17 +91,19 @@ void LoadScreen::function(int i)
                     return;
                 }
 
-                if (auto &candidateVolume = mpc.getDisks()[device]->getVolume();
+                if (const auto &candidateVolume =
+                        mpc.getDisks()[device]->getVolume();
                     candidateVolume.mode == DISABLED)
                 {
                     ls->showPopupForMs("Device is disabled in DISKS", 1000);
                     return;
                 }
 
-                auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
+                const auto oldIndex =
+                    mpc.getDiskController()->getActiveDiskIndex();
 
                 mpc.getDiskController()->setActiveDiskIndex(device);
-                auto newDisk = mpc.getDisk();
+                const auto newDisk = mpc.getDisk();
 
                 fileLoad = 0;
 
@@ -132,54 +134,66 @@ void LoadScreen::function(int i)
                 return;
             }
 
-            auto file = getSelectedFile();
-
-            if (!file->isDirectory())
+            if (const auto file = getSelectedFile(); !file->isDirectory())
             {
+                const auto ext = fs::path(file->getName()).extension().string();
 
-                auto ext = fs::path(file->getName()).extension().string();
-
-                bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
-                bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
+                const bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
+                const bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
 
                 if (!isWav && !isSnd)
                 {
                     return;
                 }
 
-                const auto audioServerSampleRate =
-                    mpc.getEngineHost()->getAudioServer()->getSampleRate();
-
-                bool started = mpc.getEngineHost()->getSoundPlayer()->start(
-                    file->getInputStream(),
-                    isSnd ? audiomidi::SoundPlayerFileFormat::SND
-                          : audiomidi::SoundPlayerFileFormat::WAV,
-                    audioServerSampleRate);
-
-                auto name = file->getNameWithoutExtension();
-
-                if (started)
+                const std::function startSoundPlayer =
+                    [engineHost = mpc.getEngineHost(), file = file, isSnd,
+                     layeredScreen = ls]
                 {
-                    ls->showPopup("Playing " + name);
-                }
-                else
-                {
-                    ls->showPopupAndAwaitInteraction("Can't play " + name);
-                }
+                    const auto audioServerSampleRate =
+                        engineHost->getAudioServer()->getSampleRate();
+
+                    const bool started = engineHost->getSoundPlayer()->start(
+                        file->getInputStream(),
+                        isSnd ? audiomidi::SoundPlayerFileFormat::SND
+                              : audiomidi::SoundPlayerFileFormat::WAV,
+                        audioServerSampleRate);
+
+                    layeredScreen->postToUiThread(
+                        [started, file = file, layeredScreen = layeredScreen]
+                        {
+                            const auto name = file->getNameWithoutExtension();
+
+                            if (started)
+                            {
+                                layeredScreen->showPopup("Playing " + name);
+                            }
+                            else
+                            {
+                                layeredScreen->showPopupAndAwaitInteraction(
+                                    "Can't play " + name);
+                            }
+                        });
+                };
+
+                mpc.getEngineHost()
+                    ->getSequencerPlaybackEngine()
+                    ->enqueueEventAfterNFrames(startSoundPlayer, 0);
             }
             break;
         }
         case 5:
         {
-            auto disk = mpc.getDisk();
+            const auto disk = mpc.getDisk();
 
             if (!disk || disk->getFileNames().empty())
             {
                 return;
             }
 
-            auto selectedFile = getSelectedFile();
-            auto ext = fs::path(selectedFile->getName()).extension().string();
+            const auto selectedFile = getSelectedFile();
+            const auto ext =
+                fs::path(selectedFile->getName()).extension().string();
 
             if (isSelectedFileDirectory())
             {
@@ -194,10 +208,10 @@ void LoadScreen::function(int i)
                     displayFile();
                     displaySize();
 
-                    auto ext1 =
+                    const auto ext1 =
                         fs::path(getSelectedFileName()).extension().string();
-                    auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
-                                    StrUtil::eqIgnoreCase(ext, ".wav");
+                    const auto playable = StrUtil::eqIgnoreCase(ext1, ".snd") ||
+                                          StrUtil::eqIgnoreCase(ext, ".wav");
                     ls->setFunctionKeysArrangement(playable ? 1 : 0);
                 }
             }
@@ -231,9 +245,7 @@ void LoadScreen::function(int i)
 
 void LoadScreen::openWindow()
 {
-    const auto disk = mpc.getDisk();
-
-    if (!disk)
+    if (const auto disk = mpc.getDisk(); !disk)
     {
         return;
     }
@@ -244,12 +256,10 @@ void LoadScreen::openWindow()
     openScreenById(ScreenId::DirectoryScreen);
 }
 
-void LoadScreen::turnWheel(int i)
+void LoadScreen::turnWheel(const int i)
 {
-
-    const auto focusedFieldName = getFocusedFieldNameOrThrow();
-
-    if (focusedFieldName == "view")
+    if (const auto focusedFieldName = getFocusedFieldNameOrThrow();
+        focusedFieldName == "view")
     {
         setView(view + i);
     }
@@ -274,9 +284,8 @@ void LoadScreen::turnWheel(int i)
             }
         }
 
-        const int candidate = position + i;
-
-        if (position != -1 && candidate >= 0 && candidate < parents.size())
+        if (const int candidate = position + i;
+            position != -1 && candidate >= 0 && candidate < parents.size())
         {
             if (disk->moveBack())
             {
@@ -361,9 +370,8 @@ void LoadScreen::displayFile() const
     }
     else
     {
-        const auto periodIndex = selectedFileName.find_last_of('.');
-
-        if (periodIndex != std::string::npos)
+        if (const auto periodIndex = selectedFileName.find_last_of('.');
+            periodIndex != std::string::npos)
         {
             const auto extension =
                 selectedFileName.substr(periodIndex, selectedFileName.length());
@@ -419,7 +427,7 @@ void LoadScreen::displaySize() const
                                units[counter]);
 }
 
-void LoadScreen::setView(int i)
+void LoadScreen::setView(const int i)
 {
     view = std::clamp(i, 0, 8);
 
@@ -455,7 +463,7 @@ bool LoadScreen::isSelectedFileDirectory() const
     return mpc.getDisk()->getFile(fileLoad)->isDirectory();
 }
 
-void LoadScreen::setFileLoadWithMaxCheck(int i)
+void LoadScreen::setFileLoadWithMaxCheck(const int i)
 {
     if (i >= mpc.getDisk()->getFileNames().size())
     {

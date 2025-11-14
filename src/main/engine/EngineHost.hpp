@@ -94,6 +94,8 @@ namespace mpc::engine
         bool prepareBouncing(const audiomidi::DirectToDiskSettings *settings);
         bool isBouncePrepared() const;
 
+        void finishPreviewSoundPlayerVoice();
+
     private:
         Mpc &mpc;
         std::atomic<bool> bouncing{false};

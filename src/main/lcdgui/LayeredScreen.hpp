@@ -40,6 +40,7 @@ namespace mpc::lcdgui
             std::vector(248, std::vector<bool>(60));
         std::deque<std::shared_ptr<ScreenComponent>> history;
         std::atomic<ScreenId> currentScreenId = ScreenId::NoScreenId;
+        std::atomic<ScreenId> previousScreenId = ScreenId::NoScreenId;
 
     public:
         std::vector<std::vector<bool>> atlas;

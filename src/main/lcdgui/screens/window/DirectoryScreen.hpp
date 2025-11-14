@@ -24,7 +24,7 @@ namespace mpc::lcdgui::screens::window
         void findYOffset0();
         void setYOffset1(int i);
         int getYOffset1() const;
-        std::shared_ptr<disk::MpcFile> getSelectedFile();
+        std::shared_ptr<disk::MpcFile> getSelectedFile() const;
         int yPos0 = 0;
         int yOffset0 = 0;
         int yOffset1 = 0;
@@ -34,8 +34,8 @@ namespace mpc::lcdgui::screens::window
 
         void setFunctionKeys();
         std::shared_ptr<disk::MpcFile> getFileFromGrid(int x, int y) const;
-        void displayLeftFields();
-        void displayRightFields();
+        void displayLeftFields() const;
+        void displayRightFields() const;
         void refreshFocus() const;
 
         std::vector<std::string> getFirstColumn() const;
@@ -45,7 +45,7 @@ namespace mpc::lcdgui::screens::window
         void setYPos0(int i);
         std::string padFileName(const std::string &s,
                                 const std::string &pad) const;
-        void drawGraphicsLeft();
-        void drawGraphicsRight();
+        void drawGraphicsLeft() const;
+        void drawGraphicsRight() const;
     };
 } // namespace mpc::lcdgui::screens::window

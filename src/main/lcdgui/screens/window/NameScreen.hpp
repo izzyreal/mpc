@@ -46,7 +46,7 @@ namespace mpc::lcdgui::screens::window
         std::function<void(std::string &)> enterAction = [](std::string &) {};
         std::string cancelScreen;
         void drawUnderline();
-        void initEditColors();
+        void initEditColors() const;
         void displayName() const;
         std::weak_ptr<Underline> findUnderline();
 

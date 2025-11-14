@@ -53,8 +53,8 @@ namespace mpc::engine
         double increment = 0;
         double position = 0;
         float initialFilterValue = 0;
-        bool staticDecay = 0;
-        int note = -1;
+        bool staticDecay = false;
+        int noteNumber = -1;
         int velocity = 0;
         float amplitude = 0;
         int start = 0;
@@ -86,9 +86,8 @@ namespace mpc::engine
         uint64_t noteEventId = 0;
     };
 
-    class Voice : public audio::core::AudioProcess
+    class Voice final : public audio::core::AudioProcess
     {
-
         VoiceState *getActiveState()
         {
             return active.load(std::memory_order_acquire);
@@ -101,19 +100,19 @@ namespace mpc::engine
 
         VoiceState *getInactiveState()
         {
-            VoiceState *current = active.load(std::memory_order_acquire);
+            const VoiceState *current = active.load(std::memory_order_acquire);
             return current == &stateA ? &stateB : &stateA;
         }
 
         void swapStates()
         {
-            VoiceState *current = active.load(std::memory_order_relaxed);
+            const VoiceState *current = active.load(std::memory_order_relaxed);
             VoiceState *other = current == &stateA ? &stateB : &stateA;
             active.store(other, std::memory_order_release);
         }
 
         const int stripNumber = -1;
-        const bool basic = false;
+        const bool isBasicVoice = false;
 
         std::vector<float> frame;
 
@@ -155,19 +154,20 @@ namespace mpc::engine
 
         // Called from main thread
         void init(int velocity, const std::shared_ptr<sampler::Sound> &sound,
-                  int note, sampler::NoteParameters *np, int varType,
-                  int varValue, int drumIndex, int frameOffset, bool enableEnvs,
-                  int startTick, float engineSampleRate, uint64_t noteEventId);
+                  int noteNumber, sampler::NoteParameters *noteParameters,
+                  int varType, int varValue, int drumIndex, int frameOffset,
+                  bool enableEnvs, int startTick, float engineSampleRate,
+                  uint64_t noteEventId);
 
         uint64_t getNoteEventId();
 
         void startDecay();
 
-        void startDecay(const int offset);
+        void startDecay(int offset);
 
         void finish();
 
-        void setMasterLevel(const int8_t masterLevel);
+        void setMasterLevel(int8_t masterLevelToUse);
 
         int getNote() const;
 
@@ -185,9 +185,9 @@ namespace mpc::engine
 
         const MuteInfo &getMuteInfo() const;
 
-        Voice(const int stripNumber, const bool basic);
+        Voice(int stripNumber, bool isBasicVoice);
 
-        ~Voice();
+        ~Voice() override;
     };
 
 } // namespace mpc::engine

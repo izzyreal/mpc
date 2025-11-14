@@ -713,11 +713,6 @@ void Sampler::stopAllVoices(const int frameOffset) const
     }
 }
 
-void Sampler::finishBasicVoice() const
-{
-    mpc.getEngineHost()->getPreviewSoundPlayer()->finishVoice();
-}
-
 void Sampler::playX()
 {
     const auto sound = getSortedSounds()[soundIndex].first;

@@ -16,6 +16,7 @@
 #include "Util.hpp"
 
 #include "StrUtil.hpp"
+#include "engine/SequencerPlaybackEngine.hpp"
 #include "lcdgui/FunctionKeys.hpp"
 #include "lcdgui/Label.hpp"
 
@@ -101,7 +102,7 @@ void DirectoryScreen::function(const int f)
             auto fileName = Util::splitName(getSelectedFile()->getName())[0];
 
             const auto enterAction =
-                [this, fileName, file](const std::string &nameScreenName)
+                [this, file, disk](const std::string &nameScreenName)
             {
                 auto ext = Util::splitName(file->getName())[1];
 
@@ -113,15 +114,13 @@ void DirectoryScreen::function(const int f)
                 const auto finalNewName =
                     StrUtil::trim(StrUtil::toUpper(nameScreenName)) + ext;
                 const bool isDirectory = file->isDirectory();
-                const auto success = file->setName(finalNewName);
 
-                if (!success)
+                if (const auto success = file->setName(finalNewName); !success)
                 {
                     ls->showPopupAndAwaitInteraction("File name exists !!");
                     return;
                 }
 
-                const auto disk = mpc.getDisk();
                 disk->flush();
 
                 if (isDirectory && getXPos() == 0)
@@ -135,9 +134,8 @@ void DirectoryScreen::function(const int f)
                     const auto it = find(begin(parentFileNames),
                                          end(parentFileNames), finalNewName);
 
-                    const auto index = distance(begin(parentFileNames), it);
-
-                    if (index > 4)
+                    if (const auto index = distance(begin(parentFileNames), it);
+                        index > 4)
                     {
                         setYOffset0(index - 4);
                         setYPos0(4);
@@ -227,9 +225,9 @@ void DirectoryScreen::function(const int f)
         }
         case 5:
         {
-            const auto file = loadScreen->getSelectedFile();
 
-            if (!file->isDirectory())
+            if (const auto file = loadScreen->getSelectedFile();
+                !file->isDirectory())
             {
                 const auto ext = fs::path(file->getName()).extension().string();
 
@@ -241,30 +239,44 @@ void DirectoryScreen::function(const int f)
                     return;
                 }
 
-                const auto audioServerSampleRate =
-                    mpc.getEngineHost()->getAudioServer()->getSampleRate();
+                const std::function startSoundPlayer =
+                    [engineHost = mpc.getEngineHost(), file = file, isSnd,
+                     layeredScreen = ls]
+                {
+                    const auto audioServerSampleRate =
+                        engineHost->getAudioServer()->getSampleRate();
 
-                const bool started =
-                    mpc.getEngineHost()->getSoundPlayer()->start(
+                    const bool started = engineHost->getSoundPlayer()->start(
                         file->getInputStream(),
                         isSnd ? audiomidi::SoundPlayerFileFormat::SND
                               : audiomidi::SoundPlayerFileFormat::WAV,
                         audioServerSampleRate);
 
-                const auto name = file->getNameWithoutExtension();
+                    layeredScreen->postToUiThread(
+                        [started, file = file, layeredScreen = layeredScreen]
+                        {
+                            const auto name = file->getNameWithoutExtension();
 
-                if (started)
-                {
-                    ls->showPopup("Playing " + name);
-                }
-                else
-                {
-                    ls->showPopupAndAwaitInteraction("Can't play " + name);
-                }
+                            if (started)
+                            {
+                                layeredScreen->showPopup("Playing " + name);
+                            }
+                            else
+                            {
+                                layeredScreen->showPopupAndAwaitInteraction(
+                                    "Can't play " + name);
+                            }
+                        });
+                };
+
+                mpc.getEngineHost()
+                    ->getSequencerPlaybackEngine()
+                    ->enqueueEventAfterNFrames(startSoundPlayer, 0);
             }
 
             break;
         }
+        default:;
     }
 }
 
@@ -458,9 +470,7 @@ void DirectoryScreen::up()
             return;
         }
 
-        const auto yPos = loadScreen->fileLoad - yOffset1;
-
-        if (yPos == 0)
+        if (const auto yPos = loadScreen->fileLoad - yOffset1; yPos == 0)
         {
             yOffset1--;
             loadScreen->fileLoad -= 1;
@@ -550,9 +560,7 @@ void DirectoryScreen::down()
             return;
         }
 
-        const auto yPos = loadScreen->fileLoad - yOffset1;
-
-        if (yPos == 4)
+        if (const auto yPos = loadScreen->fileLoad - yOffset1; yPos == 4)
         {
             yOffset1++;
             loadScreen->fileLoad += 1;
@@ -570,7 +578,7 @@ void DirectoryScreen::down()
     }
 }
 
-std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
+std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile() const
 {
     auto yPos = yPos0;
 
@@ -600,7 +608,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(const int x,
     return {};
 }
 
-void DirectoryScreen::displayLeftFields()
+void DirectoryScreen::displayLeftFields() const
 {
     const auto disk = mpc.getDisk();
     const auto names = disk->getParentFileNames();
@@ -625,7 +633,7 @@ void DirectoryScreen::displayLeftFields()
     }
 }
 
-void DirectoryScreen::displayRightFields()
+void DirectoryScreen::displayRightFields() const
 {
     const auto disk = mpc.getDisk();
     const int size = disk->getFileNames().size();
@@ -713,7 +721,7 @@ void DirectoryScreen::setYPos0(const int i)
     yPos0 = i;
 }
 
-void DirectoryScreen::drawGraphicsLeft()
+void DirectoryScreen::drawGraphicsLeft() const
 {
     auto topLeft = findLabel("topleft");
     auto a0 = findLabel("a0i");
@@ -920,7 +928,7 @@ void DirectoryScreen::drawGraphicsLeft()
     }
 }
 
-void DirectoryScreen::drawGraphicsRight()
+void DirectoryScreen::drawGraphicsRight() const
 {
     auto b0 = findLabel("b0i");
     auto b1 = findLabel("b1i");
@@ -998,9 +1006,7 @@ void DirectoryScreen::drawGraphicsRight()
     auto c3 = findLabel("c3i");
     auto c4 = findLabel("c4i");
 
-    auto file10 = getFileFromGrid(1, 0);
-
-    if (file10 && file10->isDirectory())
+    if (auto file10 = getFileFromGrid(1, 0); file10 && file10->isDirectory())
     {
         if (yOffset1 == 0)
         {
@@ -1027,9 +1033,7 @@ void DirectoryScreen::drawGraphicsRight()
         }
     }
 
-    auto file11 = getFileFromGrid(1, 1);
-
-    if (file11 && file11->isDirectory())
+    if (auto file11 = getFileFromGrid(1, 1); file11 && file11->isDirectory())
     {
         c1->setText(u8"\u00E6");
     }
@@ -1038,9 +1042,7 @@ void DirectoryScreen::drawGraphicsRight()
         c1->setText(u8"\u00E3");
     }
 
-    auto file12 = getFileFromGrid(1, 2);
-
-    if (file12 && file12->isDirectory())
+    if (auto file12 = getFileFromGrid(1, 2); file12 && file12->isDirectory())
     {
         c2->setText(u8"\u00E6");
     }
@@ -1049,9 +1051,7 @@ void DirectoryScreen::drawGraphicsRight()
         c2->setText(u8"\u00E3");
     }
 
-    auto file13 = getFileFromGrid(1, 3);
-
-    if (file13 && file13->isDirectory())
+    if (auto file13 = getFileFromGrid(1, 3); file13 && file13->isDirectory())
     {
         c3->setText(u8"\u00E6");
     }
@@ -1060,9 +1060,7 @@ void DirectoryScreen::drawGraphicsRight()
         c3->setText(u8"\u00E3");
     }
 
-    auto file14 = getFileFromGrid(1, 4);
-
-    if (file14 && file14->isDirectory())
+    if (auto file14 = getFileFromGrid(1, 4); file14 && file14->isDirectory())
     {
         if (yOffset1 + 5 == secondColumn.size())
         {

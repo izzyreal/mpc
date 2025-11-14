@@ -201,7 +201,7 @@ void NameScreen::drawUnderline()
     }
 }
 
-void NameScreen::initEditColors()
+void NameScreen::initEditColors() const
 {
     for (int i = 0; i < 16; i++)
     {

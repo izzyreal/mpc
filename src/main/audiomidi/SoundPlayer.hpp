@@ -25,9 +25,8 @@ namespace mpc::audiomidi
         WAV
     };
 
-    class SoundPlayer : public AudioProcess
+    class SoundPlayer final : public AudioProcess
     {
-
         std::thread readThread;
         int ingestedSourceFrameCount = 0;
         int sourceFrameCount = 0;
@@ -37,14 +36,14 @@ namespace mpc::audiomidi
         std::shared_ptr<AudioFormat> inputAudioFormat;
         SoundPlayerFileFormat fileFormat;
         float fadeFactor = -1.0f;
-        bool stopEarly = false;
+        std::atomic<bool> stopEarly{false};
         void readWithoutResampling();
         void readWithResampling(float ratio);
         short readNextShort() const;
         int32_t readNext24BitInt() const;
-        float readNextFrame();
+        float readNextFrame() const;
 
-        std::atomic_bool playing = false;
+        std::atomic<bool> playing{false};
         std::string filePath;
         std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> bufferLeft;
         std::shared_ptr<moodycamel::ReaderWriterQueue<float, 512>> bufferRight;
@@ -65,6 +64,6 @@ namespace mpc::audiomidi
         bool isPlaying() const;
 
         SoundPlayer();
-        ~SoundPlayer();
+        ~SoundPlayer() override;
     };
 } // namespace mpc::audiomidi
